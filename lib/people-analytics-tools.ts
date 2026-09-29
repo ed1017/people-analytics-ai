@@ -1,4 +1,11 @@
 import { supabaseServer } from "./supabase-server";
+import {
+  runScenarioModel,
+  type ScenarioEngineBaselinePoint,
+} from "./scenario-engine";
+import type {
+  ScenarioModelAssumptions,
+} from "./types";
 
 function toNumber(
   value: number | string | null | undefined
@@ -26,6 +33,35 @@ function compactRows(
       ])
     )
   );
+}
+
+type ScenarioToolArgs = {
+  annual_growth_pct: number | null;
+  salary_inflation_pct: number | null;
+  annual_attrition_pct: number | null;
+  additional_attrition_pct_points: number | null;
+  fill_rate_pct: number | null;
+  productivity_hiring_reduction_pct: number | null;
+};
+
+function clamp(
+  value: number,
+  min: number,
+  max: number
+) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function overrideOrDefault(
+  value: number | null | undefined,
+  fallback: number,
+  min: number,
+  max: number
+) {
+  return typeof value === "number" &&
+    Number.isFinite(value)
+    ? clamp(value, min, max)
+    : fallback;
 }
 
 export const peopleAnalyticsTools: any[] = [
@@ -77,6 +113,57 @@ export const peopleAnalyticsTools: any[] = [
       type: "object",
       properties: {},
       required: [],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
+    name: "run_workforce_scenario",
+    description:
+      "Run the approved deterministic workforce scenario engine for a new what-if. Use only when the user asks to change planning assumptions such as growth, salary inflation, attrition, fill rate, or productivity-driven hiring demand. Pass null for every lever the user did not change. If the user says attrition increases by X percentage points, use additional_attrition_pct_points rather than inventing an absolute rate.",
+    parameters: {
+      type: "object",
+      properties: {
+        annual_growth_pct: {
+          type: ["number", "null"],
+          description:
+            "Custom annual enterprise headcount growth percentage, or null to keep Baseline.",
+        },
+        salary_inflation_pct: {
+          type: ["number", "null"],
+          description:
+            "Custom annual labor-cost inflation percentage, or null to keep Baseline.",
+        },
+        annual_attrition_pct: {
+          type: ["number", "null"],
+          description:
+            "Custom total annual attrition percentage, or null if unchanged or expressed as additional points.",
+        },
+        additional_attrition_pct_points: {
+          type: ["number", "null"],
+          description:
+            "Percentage-point change added to Baseline annual attrition, e.g. 2 means Baseline + 2 points.",
+        },
+        fill_rate_pct: {
+          type: ["number", "null"],
+          description:
+            "Percent of modeled hiring demand filled, or null to keep Baseline.",
+        },
+        productivity_hiring_reduction_pct: {
+          type: ["number", "null"],
+          description:
+            "Percent reduction in gross hiring demand from AI/productivity, or null to keep Baseline.",
+        },
+      },
+      required: [
+        "annual_growth_pct",
+        "salary_inflation_pct",
+        "annual_attrition_pct",
+        "additional_attrition_pct_points",
+        "fill_rate_pct",
+        "productivity_hiring_reduction_pct",
+      ],
       additionalProperties: false,
     },
     strict: true,
@@ -458,6 +545,154 @@ async function getWorkforcePlanning() {
   };
 }
 
+async function runWorkforceScenario(
+  args: ScenarioToolArgs
+) {
+  const [
+    defaultsResult,
+    baselineResult,
+    overviewResult,
+  ] = await Promise.all([
+    supabaseServer
+      .from("scenario_modeler_defaults")
+      .select("*")
+      .single(),
+    supabaseServer
+      .from("workforce_scenario_summary")
+      .select(
+        "planning_month, planned_headcount, planned_fte, planned_labor_cost_usd"
+      )
+      .eq("scenario_name", "Baseline")
+      .order("planning_month", {
+        ascending: true,
+      }),
+    supabaseServer
+      .from("dashboard_overview_current")
+      .select("snapshot_date, headcount")
+      .single(),
+  ]);
+
+  for (const result of [
+    defaultsResult,
+    baselineResult,
+    overviewResult,
+  ]) {
+    if (result.error) {
+      throw new Error(
+        "Scenario tool: " +
+          result.error.message
+      );
+    }
+  }
+
+  const defaults: ScenarioModelAssumptions = {
+    annual_growth_pct: toNumber(
+      defaultsResult.data
+        ?.baseline_annual_growth_pct
+    ),
+    salary_inflation_pct: toNumber(
+      defaultsResult.data
+        ?.baseline_salary_inflation_pct
+    ),
+    annual_attrition_pct: toNumber(
+      defaultsResult.data
+        ?.baseline_annual_attrition_pct
+    ),
+    fill_rate_pct: toNumber(
+      defaultsResult.data
+        ?.baseline_fill_rate_pct
+    ),
+    productivity_hiring_reduction_pct:
+      toNumber(
+        defaultsResult.data
+          ?.baseline_productivity_hiring_reduction_pct
+      ),
+  };
+
+  const explicitAttrition =
+    typeof args.annual_attrition_pct ===
+      "number" &&
+    Number.isFinite(args.annual_attrition_pct)
+      ? args.annual_attrition_pct
+      : null;
+
+  const attritionWithDelta =
+    explicitAttrition ??
+    (typeof args.additional_attrition_pct_points ===
+      "number" &&
+    Number.isFinite(
+      args.additional_attrition_pct_points
+    )
+      ? defaults.annual_attrition_pct +
+        args.additional_attrition_pct_points
+      : defaults.annual_attrition_pct);
+
+  const assumptions: ScenarioModelAssumptions = {
+    annual_growth_pct: overrideOrDefault(
+      args.annual_growth_pct,
+      defaults.annual_growth_pct,
+      -10,
+      20
+    ),
+    salary_inflation_pct: overrideOrDefault(
+      args.salary_inflation_pct,
+      defaults.salary_inflation_pct,
+      -5,
+      15
+    ),
+    annual_attrition_pct: clamp(
+      attritionWithDelta,
+      0,
+      30
+    ),
+    fill_rate_pct: overrideOrDefault(
+      args.fill_rate_pct,
+      defaults.fill_rate_pct,
+      0,
+      100
+    ),
+    productivity_hiring_reduction_pct:
+      overrideOrDefault(
+        args.productivity_hiring_reduction_pct,
+        defaults.productivity_hiring_reduction_pct,
+        0,
+        50
+      ),
+  };
+
+  const baselinePoints:
+    ScenarioEngineBaselinePoint[] =
+    (baselineResult.data ?? []).map(
+      (row) => ({
+        planning_month:
+          row.planning_month,
+        planned_headcount: toNumber(
+          row.planned_headcount
+        ),
+        planned_fte: toNumber(
+          row.planned_fte
+        ),
+        planned_labor_cost_usd:
+          toNumber(
+            row.planned_labor_cost_usd
+          ),
+      })
+    );
+
+  return runScenarioModel({
+    asOf:
+      overviewResult.data?.snapshot_date ??
+      defaultsResult.data?.as_of ??
+      "2026-09-30",
+    startingHeadcount: toNumber(
+      overviewResult.data?.headcount
+    ),
+    baselinePoints,
+    defaults,
+    assumptions,
+  });
+}
+
 async function getTalentAcquisition() {
   const [
     currentResult,
@@ -654,7 +889,8 @@ async function getSurveySentiment() {
 }
 
 export async function runPeopleAnalyticsTool(
-  name: string
+  name: string,
+  args: Record<string, unknown> = {}
 ) {
   switch (name) {
     case "get_workforce_overview":
@@ -665,6 +901,10 @@ export async function runPeopleAnalyticsTool(
       return getWorkforceSkills();
     case "get_workforce_planning":
       return getWorkforcePlanning();
+    case "run_workforce_scenario":
+      return runWorkforceScenario(
+        args as ScenarioToolArgs
+      );
     case "get_talent_acquisition":
       return getTalentAcquisition();
     case "get_survey_sentiment":

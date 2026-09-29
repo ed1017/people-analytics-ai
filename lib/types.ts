@@ -357,3 +357,47 @@ export type SurveySentimentResponse = {
   business_units: SurveyBusinessUnit[];
   exit_reasons: SurveyExitReason[];
 };
+
+export type ScenarioModelAssumptions = {
+  annual_growth_pct: number;
+  salary_inflation_pct: number;
+  annual_attrition_pct: number;
+  fill_rate_pct: number;
+  productivity_hiring_reduction_pct: number;
+};
+
+export type ScenarioModelPoint = {
+  planning_month: string;
+  baseline_headcount: number;
+  target_headcount: number;
+  modeled_headcount: number;
+  modeled_fte: number;
+  planned_hiring_demand: number;
+  modeled_hires: number;
+  modeled_exits: number;
+  modeled_labor_cost_usd: number;
+  gap_vs_target: number;
+};
+
+export type ScenarioModelResponse = {
+  as_of: string;
+  source_scenario: string;
+  defaults: ScenarioModelAssumptions;
+  assumptions: ScenarioModelAssumptions;
+  summary: {
+    starting_headcount: number;
+    baseline_end_headcount: number;
+    target_end_headcount: number;
+    modeled_end_headcount: number;
+    modeled_end_fte: number;
+    headcount_delta_vs_baseline: number;
+    headcount_gap_vs_target: number;
+    baseline_end_labor_cost_usd: number;
+    modeled_end_labor_cost_usd: number;
+    labor_cost_delta_vs_baseline_usd: number;
+    cumulative_modeled_hires: number;
+    cumulative_modeled_exits: number;
+  };
+  points: ScenarioModelPoint[];
+  methodology: string[];
+};
