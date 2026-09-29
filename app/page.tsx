@@ -1138,7 +1138,10 @@ export default function Home() {
             skillsError={skillsError}
             blsData={blsData}
             blsLoading={blsLoading}
-             ) : (
+            blsError={blsError}
+            maxSkillDemand={maxSkillDemand}
+          />
+        ) : (
           <WorkforcePlanningPage
             planningScenarios={planningScenarios}
             planningLoading={planningLoading}
@@ -1160,11 +1163,6 @@ export default function Home() {
             positionLevels={positionLevels}
             onScenarioChange={setSelectedPlanningScenario}
           />
-        )}urned.
-              </div>
-            )
-          )}
-        </section>
         )}
 
         <AiPanel
