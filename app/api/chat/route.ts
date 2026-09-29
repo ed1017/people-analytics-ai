@@ -221,6 +221,72 @@ type TalentAcquisitionContext = {
   }>;
 };
 
+type SurveySentimentContext = {
+  summary: {
+    engagement_respondents: number;
+    engagement_eligible_population: number;
+    engagement_participation_pct: number;
+    engagement_avg_score: number;
+    engagement_favorable_pct: number;
+    pulse_respondents: number;
+    pulse_avg_score: number;
+    pulse_favorable_pct: number;
+    manager_respondents: number;
+    manager_avg_score: number;
+    manager_favorable_pct: number;
+    onboarding_90_respondents: number;
+    onboarding_90_avg_score: number;
+    onboarding_90_favorable_pct: number;
+    exit_respondents: number;
+    open_text_comments: number;
+  };
+  engagementTrend: Array<{
+    survey_name: string;
+    launch_date: string;
+    respondents: number;
+    participation_pct: number;
+    avg_score: number;
+    favorable_pct: number;
+  }>;
+  engagementDimensions: Array<{
+    dimension: string;
+    avg_score: number;
+    favorable_pct: number;
+  }>;
+  pulseDimensions: Array<{
+    dimension: string;
+    avg_score: number;
+    favorable_pct: number;
+  }>;
+  managerDimensions: Array<{
+    dimension: string;
+    avg_score: number;
+    favorable_pct: number;
+  }>;
+  onboardingDimensions: Array<{
+    survey_code: string;
+    dimension: string;
+    avg_score: number;
+    favorable_pct: number;
+  }>;
+  exitDimensions: Array<{
+    dimension: string;
+    avg_score: number;
+    favorable_pct: number;
+  }>;
+  businessUnits: Array<{
+    org_name: string;
+    respondents: number;
+    avg_score: number;
+    favorable_pct: number;
+  }>;
+  exitReasons: Array<{
+    primary_reason: string;
+    exits: number;
+    pct_of_exit_responses: number;
+  }>;
+};
+
 
 function numberValue(
   value: number | string | null | undefined
@@ -281,7 +347,8 @@ export async function POST(
       body?.page === "workforce-planning" ||
       body?.page === "finance" ||
       body?.page === "skills" ||
-      body?.page === "talent-acquisition"
+      body?.page === "talent-acquisition" ||
+      body?.page === "survey-sentiment"
         ? body.page
         : "overview";
 
@@ -308,6 +375,11 @@ export async function POST(
     const talentAcquisitionContext =
       body?.talentAcquisitionContext
         ? (body.talentAcquisitionContext as TalentAcquisitionContext)
+        : null;
+
+    const surveySentimentContext =
+      body?.surveySentimentContext
+        ? (body.surveySentimentContext as SurveySentimentContext)
         : null;
 
     if (!message) {
@@ -602,6 +674,97 @@ Interpretation rules:
 - Interviewed applicants are deduplicated by application even when multiple interview rounds exist.
 - Internal Mobility has a structurally different funnel from external recruiting; do not compare its 100% application-to-hire conversion directly with external sources as if they were equivalent.
 - Do not infer recruiting quality, candidate quality, bias, causality, or recruiter performance beyond the supplied metrics.
+`.trim()
+        : "";
+
+    const surveySentimentPrompt =
+      page === "survey-sentiment" &&
+      surveySentimentContext
+        ? `
+CURRENT SURVEY & SENTIMENT CONTEXT
+Current listening summary:
+- 2026 engagement favorable: ${surveySentimentContext.summary.engagement_favorable_pct}%
+- 2026 engagement participation: ${surveySentimentContext.summary.engagement_participation_pct}%
+- 2026 engagement average score: ${surveySentimentContext.summary.engagement_avg_score}/5
+- Q2 pulse favorable: ${surveySentimentContext.summary.pulse_favorable_pct}%
+- Q2 pulse average score: ${surveySentimentContext.summary.pulse_avg_score}/5
+- Manager effectiveness favorable: ${surveySentimentContext.summary.manager_favorable_pct}%
+- Manager effectiveness average score: ${surveySentimentContext.summary.manager_avg_score}/5
+- 90-day onboarding favorable: ${surveySentimentContext.summary.onboarding_90_favorable_pct}%
+- Exit survey respondents: ${surveySentimentContext.summary.exit_respondents}
+- Open-text comments available: ${surveySentimentContext.summary.open_text_comments}
+
+Engagement trend:
+${surveySentimentContext.engagementTrend
+  .map(
+    (row) =>
+      `- ${row.survey_name}: favorable ${row.favorable_pct}%, participation ${row.participation_pct}%, avg score ${row.avg_score}/5, respondents ${row.respondents}`
+  )
+  .join("\n")}
+
+2026 engagement dimensions:
+${surveySentimentContext.engagementDimensions
+  .map(
+    (row) =>
+      `- ${row.dimension}: favorable ${row.favorable_pct}%, avg score ${row.avg_score}/5`
+  )
+  .join("\n")}
+
+Q2 pulse dimensions:
+${surveySentimentContext.pulseDimensions
+  .map(
+    (row) =>
+      `- ${row.dimension}: favorable ${row.favorable_pct}%, avg score ${row.avg_score}/5`
+  )
+  .join("\n")}
+
+Manager effectiveness dimensions:
+${surveySentimentContext.managerDimensions
+  .map(
+    (row) =>
+      `- ${row.dimension}: favorable ${row.favorable_pct}%, avg score ${row.avg_score}/5`
+  )
+  .join("\n")}
+
+Onboarding dimensions:
+${surveySentimentContext.onboardingDimensions
+  .map(
+    (row) =>
+      `- ${row.survey_code} / ${row.dimension}: favorable ${row.favorable_pct}%, avg score ${row.avg_score}/5`
+  )
+  .join("\n")}
+
+Business unit engagement:
+${surveySentimentContext.businessUnits
+  .map(
+    (row) =>
+      `- ${row.org_name}: favorable ${row.favorable_pct}%, avg score ${row.avg_score}/5, respondents ${row.respondents}`
+  )
+  .join("\n")}
+
+Exit reasons:
+${surveySentimentContext.exitReasons
+  .map(
+    (row) =>
+      `- ${row.primary_reason}: ${row.exits} responses, ${row.pct_of_exit_responses}% of exit responses`
+  )
+  .join("\n")}
+
+Structured exit experience:
+${surveySentimentContext.exitDimensions
+  .map(
+    (row) =>
+      `- ${row.dimension}: favorable ${row.favorable_pct}%, avg score ${row.avg_score}/5`
+  )
+  .join("\n")}
+
+Interpretation rules:
+- Favorable means a numeric response of 4 or 5 on a 1-to-5 item.
+- Participation uses the nearest available workforce snapshot to the annual survey close date.
+- Survey results are aggregate listening signals, not proof of causality.
+- Business-unit differences are descriptive. Do not infer manager quality, leadership intent, or root cause without additional evidence.
+- Do not claim qualitative themes or sentiment from open-text comments; the comments are not supplied to you in this context.
+- Exit reasons are reported reasons among exit-survey respondents and should not be treated as causal attrition drivers without further analysis.
 `.trim()
         : "";
 
@@ -920,6 +1083,8 @@ ${financePrompt}
 ${skillsPrompt}
 
 ${talentAcquisitionPrompt}
+
+${surveySentimentPrompt}
 
 ${globalEnterprisePrompt}
 

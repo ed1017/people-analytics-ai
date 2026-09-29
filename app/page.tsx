@@ -13,6 +13,7 @@ import { FinancePage } from "@/components/pages/finance-page";
 import { SkillsPage } from "@/components/pages/skills-page";
 import { WorkforcePlanningPage } from "@/components/pages/workforce-planning-page";
 import { TalentAcquisitionPage } from "@/components/pages/talent-acquisition-page";
+import { SurveySentimentPage } from "@/components/pages/survey-sentiment-page";
 import { AiPanel } from "@/components/ai-panel";
 import type {
   AppPage,
@@ -27,6 +28,7 @@ import type {
   PositionModelingResponse,
   SkillsResponse,
   TalentAcquisitionResponse,
+  SurveySentimentResponse,
   WorkforcePlanningResponse,
 } from "@/lib/types";
 
@@ -109,6 +111,13 @@ export default function Home() {
   const [talentAcquisitionLoading, setTalentAcquisitionLoading] =
     useState(false);
   const [talentAcquisitionError, setTalentAcquisitionError] =
+    useState<string | null>(null);
+
+  const [surveySentimentData, setSurveySentimentData] =
+    useState<SurveySentimentResponse | null>(null);
+  const [surveySentimentLoading, setSurveySentimentLoading] =
+    useState(false);
+  const [surveySentimentError, setSurveySentimentError] =
     useState<string | null>(null);
 
   const [blsData, setBlsData] =
@@ -364,6 +373,51 @@ export default function Home() {
   }, [activePage, talentAcquisitionData]);
   useEffect(() => {
     if (
+      activePage !== "survey-sentiment" ||
+      surveySentimentData
+    ) {
+      return;
+    }
+
+    async function loadSurveySentiment() {
+      try {
+        setSurveySentimentLoading(true);
+        setSurveySentimentError(null);
+
+        const response = await fetch(
+          "/api/survey-sentiment",
+          { cache: "no-store" }
+        );
+
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            payload?.error ??
+              "Failed to load Survey & Sentiment data."
+          );
+        }
+
+        setSurveySentimentData(
+          payload as SurveySentimentResponse
+        );
+      } catch (error) {
+        console.error(error);
+        setSurveySentimentError(
+          error instanceof Error
+            ? error.message
+            : "Failed to load Survey & Sentiment data."
+        );
+      } finally {
+        setSurveySentimentLoading(false);
+      }
+    }
+
+    loadSurveySentiment();
+  }, [activePage, surveySentimentData]);
+
+  useEffect(() => {
+    if (
       activePage !== "skills" ||
       skillsData
     ) {
@@ -611,9 +665,7 @@ export default function Home() {
         )
       : 0;
 
-  const previewPage =
-    activePage ===
-      "survey-sentiment";
+  const previewPage = false;
 
   const suggestedPrompts =
     previewPage
@@ -642,7 +694,13 @@ export default function Home() {
                 "Which business units have the greatest hiring pressure?",
                 "Which recruiting sources are most effective?",
               ]
-            : [
+            : activePage === "survey-sentiment"
+              ? [
+                  "What are the biggest engagement risks?",
+                  "Which business units stand out most?",
+                  "What do onboarding and exit results suggest?",
+                ]
+              : [
               "Summarize this workforce",
               "What stands out?",
               "Are there workforce risks?",
@@ -810,6 +868,32 @@ export default function Home() {
                         0,
                         10
                       ),
+                  }
+                : null,
+
+            surveySentimentContext:
+              activePage ===
+                "survey-sentiment" &&
+              surveySentimentData
+                ? {
+                    summary:
+                      surveySentimentData.summary,
+                    engagementTrend:
+                      surveySentimentData.engagement_trend,
+                    engagementDimensions:
+                      surveySentimentData.engagement_dimensions,
+                    pulseDimensions:
+                      surveySentimentData.pulse_dimensions,
+                    managerDimensions:
+                      surveySentimentData.manager_dimensions,
+                    onboardingDimensions:
+                      surveySentimentData.onboarding_dimensions,
+                    exitDimensions:
+                      surveySentimentData.exit_dimensions,
+                    businessUnits:
+                      surveySentimentData.business_units,
+                    exitReasons:
+                      surveySentimentData.exit_reasons,
                   }
                 : null,
 
@@ -1007,66 +1091,11 @@ export default function Home() {
             error={talentAcquisitionError}
           />        ) : activePage ===
           "survey-sentiment" ? (
-          <section className="min-w-0 p-6">
-            <div className="mb-8 flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-2xl font-semibold">
-                  Survey & Sentiment
-                </h2>
-                <p className="text-muted-foreground">
-                  Engagement, onboarding, exit feedback, sentiment trends, and employee-listening analytics.
-                </p>
-              </div>
-
-              <span className="rounded-full border px-3 py-1 text-xs font-medium text-muted-foreground">
-                In Development
-              </span>
-            </div>
-
-            <div className="rounded-xl border bg-muted/10 p-6">
-              <div className="mb-6 max-w-2xl">
-                <p className="text-lg font-semibold">
-                  Employee Listening Intelligence
-                </p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  This module will connect structured survey results with workforce context and AI-assisted theme analysis.
-                </p>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="rounded-lg border bg-background p-5">
-                  <p className="text-sm font-semibold">
-                    Engagement
-                  </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Favorability, drivers, trends, participation, and population comparisons.
-                  </p>
-                </div>
-
-                <div className="rounded-lg border bg-background p-5">
-                  <p className="text-sm font-semibold">
-                    Onboarding
-                  </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    New-hire experience, early sentiment, enablement, and manager effectiveness.
-                  </p>
-                </div>
-
-                <div className="rounded-lg border bg-background p-5">
-                  <p className="text-sm font-semibold">
-                    Exit & Sentiment
-                  </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Exit themes, sentiment shifts, retention signals, and qualitative feedback.
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-6 rounded-lg border border-dashed p-5 text-sm text-muted-foreground">
-                Planned AI capability: summarize themes, compare populations, and connect listening signals with workforce outcomes.
-              </div>
-            </div>
-          </section>
+          <SurveySentimentPage
+            data={surveySentimentData}
+            loading={surveySentimentLoading}
+            error={surveySentimentError}
+          />
         ) : activePage === "finance" ? (
           <FinancePage
             financeData={financeData}
