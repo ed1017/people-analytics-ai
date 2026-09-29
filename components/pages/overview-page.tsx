@@ -1,0 +1,431 @@
+"use client";
+
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+import { Button } from "@/components/ui/button";
+import type {
+  DashboardFilterOptions,
+  HeadcountTrendPoint,
+  OverviewData,
+} from "@/lib/types";
+
+type OverviewPageProps = {
+  overviewData: OverviewData | null;
+  headcountTrend: HeadcountTrendPoint[];
+  filterOptions: DashboardFilterOptions;
+  selectedCountry: string;
+  selectedOrg: string;
+  selectedLevel: string;
+  selectedCountryLabel: string;
+  selectedOrgLabel: string;
+  selectedLevelLabel: string;
+  dashboardLoading: boolean;
+  dashboardError: string | null;
+  filtersActive: boolean;
+  headcountGrowthPct: number | null;
+  onCountryChange: (value: string) => void;
+  onOrgChange: (value: string) => void;
+  onLevelChange: (value: string) => void;
+  onResetFilters: () => void;
+};
+
+function formatMonth(value: string) {
+  return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
+    month: "short",
+    year: "2-digit",
+  });
+}
+
+function formatLongDate(value: string) {
+  return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+export function OverviewPage({
+  overviewData,
+  headcountTrend,
+  filterOptions,
+  selectedCountry,
+  selectedOrg,
+  selectedLevel,
+  selectedCountryLabel,
+  selectedOrgLabel,
+  selectedLevelLabel,
+  dashboardLoading,
+  dashboardError,
+  filtersActive,
+  headcountGrowthPct,
+  onCountryChange,
+  onOrgChange,
+  onLevelChange,
+  onResetFilters,
+}: OverviewPageProps) {
+  return (
+    <section className="min-w-0 p-6">
+      <div className="mb-6 flex items-end justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-semibold">
+            Workforce Overview
+          </h2>
+          <p className="text-muted-foreground">
+            Monitor workforce health, trends, and business impact.
+          </p>
+        </div>
+
+        {overviewData && (
+          <p className="text-xs text-muted-foreground">
+            As of{" "}
+            {formatLongDate(
+              overviewData.snapshot_date
+            )}
+          </p>
+        )}
+      </div>
+
+      <div className="mb-6 rounded-lg border p-4">
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div>
+            <p className="font-medium">
+              Dashboard Filters
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {selectedCountryLabel} ·{" "}
+              {selectedOrgLabel} ·{" "}
+              {selectedLevelLabel}
+            </p>
+          </div>
+
+          <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
+            {dashboardLoading
+              ? "Refreshing data…"
+              : "Live Supabase data"}
+          </span>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-4">
+          <label className="space-y-1">
+            <span className="text-xs font-medium text-muted-foreground">
+              Country
+            </span>
+            <select
+              value={selectedCountry}
+              onChange={(event) =>
+                onCountryChange(
+                  event.target.value
+                )
+              }
+              className="h-10 w-full rounded-md border bg-background px-3 text-sm outline-none"
+            >
+              <option value="all">
+                All countries
+              </option>
+              {filterOptions.countries.map(
+                (option) => (
+                  <option
+                    key={option.value}
+                    value={option.value}
+                  >
+                    {option.label}
+                  </option>
+                )
+              )}
+            </select>
+          </label>
+
+          <label className="space-y-1">
+            <span className="text-xs font-medium text-muted-foreground">
+              Business Unit
+            </span>
+            <select
+              value={selectedOrg}
+              onChange={(event) =>
+                onOrgChange(
+                  event.target.value
+                )
+              }
+              className="h-10 w-full rounded-md border bg-background px-3 text-sm outline-none"
+            >
+              <option value="all">
+                All business units
+              </option>
+              {filterOptions.business_units.map(
+                (option) => (
+                  <option
+                    key={option.value}
+                    value={option.value}
+                  >
+                    {option.label}
+                  </option>
+                )
+              )}
+            </select>
+          </label>
+
+          <label className="space-y-1">
+            <span className="text-xs font-medium text-muted-foreground">
+              Level
+            </span>
+            <select
+              value={selectedLevel}
+              onChange={(event) =>
+                onLevelChange(
+                  event.target.value
+                )
+              }
+              className="h-10 w-full rounded-md border bg-background px-3 text-sm outline-none"
+            >
+              <option value="all">
+                All levels
+              </option>
+              {filterOptions.levels.map(
+                (option) => (
+                  <option
+                    key={option.value}
+                    value={option.value}
+                  >
+                    {option.label}
+                  </option>
+                )
+              )}
+            </select>
+          </label>
+
+          <div className="flex items-end">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={onResetFilters}
+              disabled={!filtersActive}
+            >
+              Reset Filters
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {dashboardError && (
+        <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          {dashboardError}
+        </div>
+      )}
+
+      <div
+        className={`grid grid-cols-1 gap-4 transition-opacity sm:grid-cols-2 xl:grid-cols-4 ${
+          dashboardLoading
+            ? "opacity-60"
+            : "opacity-100"
+        }`}
+      >
+        <div className="rounded-lg border p-4">
+          <p className="text-sm text-muted-foreground">
+            Headcount
+          </p>
+          <p className="mt-2 text-3xl font-semibold">
+            {overviewData
+              ? overviewData.headcount.toLocaleString()
+              : "—"}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {overviewData
+              ? `${Number(
+                  overviewData.fte
+                ).toLocaleString()} FTE`
+              : "Loading"}
+          </p>
+        </div>
+
+        <div className="rounded-lg border p-4">
+          <p className="text-sm text-muted-foreground">
+            Attrition
+          </p>
+          <p className="mt-2 text-3xl font-semibold">
+            {overviewData
+              ? `${overviewData.voluntary_turnover_ytd_pct}%`
+              : "—"}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Voluntary turnover YTD
+          </p>
+        </div>
+
+        <div className="rounded-lg border p-4">
+          <p className="text-sm text-muted-foreground">
+            Labor Cost
+          </p>
+          <p className="mt-2 text-3xl font-semibold">
+            {overviewData
+              ? `$${(
+                  Number(
+                    overviewData.labor_cost_usd
+                  ) / 1_000_000_000
+                ).toFixed(2)}B`
+              : "—"}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Annualized total labor cost
+          </p>
+        </div>
+
+        <div className="rounded-lg border p-4">
+          <p className="text-sm text-muted-foreground">
+            Open Positions
+          </p>
+          <p className="mt-2 text-3xl font-semibold">
+            {overviewData
+              ? overviewData.open_positions.toLocaleString()
+              : "—"}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Current vacant positions
+          </p>
+        </div>
+      </div>
+
+      <div
+        className={`mt-6 rounded-lg border p-4 transition-opacity ${
+          dashboardLoading
+            ? "opacity-60"
+            : "opacity-100"
+        }`}
+      >
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div>
+            <h3 className="font-semibold">
+              Headcount Trend
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Monthly active workforce from January 2024 through September 2026
+            </p>
+          </div>
+
+          {headcountTrend.length > 0 && (
+            <div className="flex gap-6 text-right">
+              <div>
+                <p className="text-xs text-muted-foreground">
+                  Growth since Jan 2024
+                </p>
+                <p className="font-semibold">
+                  {headcountGrowthPct !== null
+                    ? `${
+                        headcountGrowthPct >= 0
+                          ? "+"
+                          : ""
+                      }${headcountGrowthPct.toFixed(
+                        1
+                      )}%`
+                    : "—"}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs text-muted-foreground">
+                  Current
+                </p>
+                <p className="font-semibold">
+                  {headcountTrend[
+                    headcountTrend.length - 1
+                  ].headcount.toLocaleString()}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="h-80 w-full">
+          {headcountTrend.length > 0 ? (
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+              <LineChart
+                data={headcountTrend}
+                margin={{
+                  top: 8,
+                  right: 16,
+                  left: 8,
+                  bottom: 8,
+                }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  opacity={0.25}
+                />
+                <XAxis
+                  dataKey="snapshot_date"
+                  tickFormatter={formatMonth}
+                  minTickGap={28}
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis
+                  domain={[
+                    (dataMin: number) =>
+                      Math.max(
+                        0,
+                        Math.floor(
+                          dataMin * 0.95
+                        )
+                      ),
+                    (dataMax: number) =>
+                      Math.ceil(
+                        dataMax * 1.05
+                      ),
+                  ]}
+                  tickFormatter={(
+                    value: number
+                  ) => value.toLocaleString()}
+                  width={64}
+                  tick={{ fontSize: 12 }}
+                />
+                <Tooltip
+                  labelFormatter={(value) =>
+                    formatLongDate(
+                      String(value)
+                    )
+                  }
+                  formatter={(value) => [
+                    Number(
+                      value
+                    ).toLocaleString(),
+                    "Headcount",
+                  ]}
+                  contentStyle={{
+                    backgroundColor:
+                      "var(--background)",
+                    border:
+                      "1px solid var(--border)",
+                    borderRadius: "0.5rem",
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="headcount"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  dot={false}
+                  activeDot={{ r: 5 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+              {dashboardLoading
+                ? "Refreshing filtered trend…"
+                : "No workforce history for this filter combination."}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
