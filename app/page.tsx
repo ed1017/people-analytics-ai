@@ -665,9 +665,7 @@ export default function Home() {
         )
       : 0;
 
-  const previewPage =
-    activePage ===
-      "survey-sentiment";
+  const previewPage = false;
 
   const suggestedPrompts =
     previewPage
@@ -696,7 +694,13 @@ export default function Home() {
                 "Which business units have the greatest hiring pressure?",
                 "Which recruiting sources are most effective?",
               ]
-            : [
+            : activePage === "survey-sentiment"
+              ? [
+                  "What are the biggest engagement risks?",
+                  "Which business units stand out most?",
+                  "What do onboarding and exit results suggest?",
+                ]
+              : [
               "Summarize this workforce",
               "What stands out?",
               "Are there workforce risks?",
@@ -864,6 +868,32 @@ export default function Home() {
                         0,
                         10
                       ),
+                  }
+                : null,
+
+            surveySentimentContext:
+              activePage ===
+                "survey-sentiment" &&
+              surveySentimentData
+                ? {
+                    summary:
+                      surveySentimentData.summary,
+                    engagementTrend:
+                      surveySentimentData.engagement_trend,
+                    engagementDimensions:
+                      surveySentimentData.engagement_dimensions,
+                    pulseDimensions:
+                      surveySentimentData.pulse_dimensions,
+                    managerDimensions:
+                      surveySentimentData.manager_dimensions,
+                    onboardingDimensions:
+                      surveySentimentData.onboarding_dimensions,
+                    exitDimensions:
+                      surveySentimentData.exit_dimensions,
+                    businessUnits:
+                      surveySentimentData.business_units,
+                    exitReasons:
+                      surveySentimentData.exit_reasons,
                   }
                 : null,
 
