@@ -284,6 +284,7 @@ export function runScenarioModel(
       "Gross hiring demand equals target net headcount change plus replacement demand based on the Baseline annual attrition rate.",
       "Productivity reduces gross hiring demand before the fill-rate assumption is applied.",
       "Modeled exits use the custom annual attrition assumption and reduce realized headcount.",
+      "Modeled hires and exits are engine-implied gross flows used for the what-if calculation; they are not the stored plan's planned_hires or planned_exits fields, which do not fully explain the Baseline headcount curve.",
       "Modeled FTE preserves each Baseline month's FTE-to-headcount ratio.",
       "Labor cost uses the Baseline cost per FTE adjusted for the custom salary-inflation assumption, then multiplies by modeled FTE.",
       "This is a deterministic custom model, not an LLM-generated forecast.",

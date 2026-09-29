@@ -486,8 +486,9 @@ ${planningContext.scenarios
 
 Important modeling rule:
 - You may compare the stored scenarios and calculate simple deltas from the values above.
-- If the user proposes a NEW assumption that has not been modeled by the application yet, clearly label any arithmetic as an illustrative what-if estimate rather than an official modeled scenario.
-- Do not claim the database has rerun a scenario unless the application actually supplies a new modeled result.
+- If the user proposes a NEW assumption, call run_workforce_scenario rather than estimating the scenario yourself.
+- Only treat the returned deterministic tool result as the modeled what-if outcome.
+- Do not claim the workforce model reran unless run_workforce_scenario returned a result in this turn.
 `.trim()
         : "";
 
@@ -827,8 +828,12 @@ Shared rules:
 - You may call more than one tool when a question spans domains.
 - Do not call a tool when the current page context already contains everything needed for a simple page-specific answer.
 - Never invent employee facts, benchmarks, causes, correlations, budgets, forecasts, survey themes, or scenario reruns that are not supplied.
+- For any NEW workforce-planning what-if that changes growth, salary inflation, attrition, fill rate, or productivity-driven hiring demand, you MUST call run_workforce_scenario.
+- The LLM must not independently invent or approximate scenario math. It may only explain or compare values returned by run_workforce_scenario.
+- Pass null for scenario levers the user did not change. If the user says attrition changes by X percentage points, use additional_attrition_pct_points rather than converting it to an absolute rate yourself.
+- Do not claim the workforce model reran unless run_workforce_scenario returned a result in this conversation turn.
 - If the available page context and approved tools cannot answer the question, say what data is missing.
-- You may calculate straightforward ratios or comparisons from supplied metrics.
+- You may calculate straightforward ratios or comparisons from supplied metrics, but not substitute those calculations for the deterministic scenario engine when a scenario lever changes.
 - Distinguish observation from interpretation.
 - Be concise and specific.
 - Use bullets when they improve readability.
@@ -890,9 +895,19 @@ ${message}
           toolCalls.map(
             async (call: any) => {
               try {
+                const toolArgs =
+                  typeof call.arguments ===
+                    "string" &&
+                  call.arguments.trim()
+                    ? JSON.parse(
+                        call.arguments
+                      )
+                    : {};
+
                 const result =
                   await runPeopleAnalyticsTool(
-                    call.name
+                    call.name,
+                    toolArgs
                   );
 
                 return {
