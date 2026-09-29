@@ -174,6 +174,53 @@ type SkillsContext = {
   strongestCoverage: SkillContextRow[];
 };
 
+type TalentAcquisitionContext = {
+  summary: {
+    applications: number;
+    interviewed_applications: number;
+    offered_applications: number;
+    hires: number;
+    application_to_interview_pct: number;
+    interview_to_offer_pct: number;
+    offer_to_hire_pct: number;
+    application_to_hire_pct: number;
+    offer_acceptance_pct: number;
+    open_requisitions: number;
+    open_positions: number;
+    avg_time_to_fill_days: number;
+    median_time_to_fill_days: number;
+    avg_open_req_age_days: number;
+    median_open_req_age_days: number;
+    open_reqs_over_60_days: number;
+    internal_hires: number;
+    external_hires: number;
+  };
+  businessUnits: Array<{
+    org_name: string;
+    open_requisitions: number;
+    open_positions: number;
+    applications: number;
+    hires: number;
+    avg_time_to_fill_days: number;
+    application_to_hire_pct: number;
+  }>;
+  sources: Array<{
+    source_name: string;
+    source_category: string;
+    applications: number;
+    hires: number;
+    application_to_hire_pct: number;
+  }>;
+  recruiters: Array<{
+    recruiter_name: string;
+    region: string | null;
+    specialty: string | null;
+    open_requisitions: number;
+    open_positions: number;
+    avg_time_to_fill_days: number;
+  }>;
+};
+
 
 function numberValue(
   value: number | string | null | undefined
@@ -233,7 +280,8 @@ export async function POST(
     const page =
       body?.page === "workforce-planning" ||
       body?.page === "finance" ||
-      body?.page === "skills"
+      body?.page === "skills" ||
+      body?.page === "talent-acquisition"
         ? body.page
         : "overview";
 
@@ -255,6 +303,11 @@ export async function POST(
     const skillsContext =
       body?.skillsContext
         ? (body.skillsContext as SkillsContext)
+        : null;
+
+    const talentAcquisitionContext =
+      body?.talentAcquisitionContext
+        ? (body.talentAcquisitionContext as TalentAcquisitionContext)
         : null;
 
     if (!message) {
@@ -493,6 +546,62 @@ Interpretation rules:
 - Missing or stale skill data does not prove an employee lacks a capability.
 - Do not call a gap a verified shortage unless the supplied data supports that conclusion.
 - O*NET is an external reference layer; do not imply O*NET directly measured this company's employees.
+`.trim()
+        : "";
+
+    const talentAcquisitionPrompt =
+      page === "talent-acquisition" &&
+      talentAcquisitionContext
+        ? `
+CURRENT TALENT ACQUISITION CONTEXT
+As-of recruiting summary:
+- Open requisitions: ${talentAcquisitionContext.summary.open_requisitions}
+- Open positions: ${talentAcquisitionContext.summary.open_positions}
+- Applications: ${talentAcquisitionContext.summary.applications}
+- Interviewed applicants: ${talentAcquisitionContext.summary.interviewed_applications}
+- Offers: ${talentAcquisitionContext.summary.offered_applications}
+- Hires: ${talentAcquisitionContext.summary.hires}
+- Application to interview: ${talentAcquisitionContext.summary.application_to_interview_pct}%
+- Interview to offer: ${talentAcquisitionContext.summary.interview_to_offer_pct}%
+- Offer to hire: ${talentAcquisitionContext.summary.offer_to_hire_pct}%
+- Application to hire: ${talentAcquisitionContext.summary.application_to_hire_pct}%
+- Offer acceptance: ${talentAcquisitionContext.summary.offer_acceptance_pct}%
+- Median time to fill: ${talentAcquisitionContext.summary.median_time_to_fill_days} days
+- Average time to fill: ${talentAcquisitionContext.summary.avg_time_to_fill_days} days
+- Median open requisition age: ${talentAcquisitionContext.summary.median_open_req_age_days} days
+- Open requisitions older than 60 days: ${talentAcquisitionContext.summary.open_reqs_over_60_days}
+- Internal hires: ${talentAcquisitionContext.summary.internal_hires}
+- External hires: ${talentAcquisitionContext.summary.external_hires}
+
+Business unit recruiting demand:
+${talentAcquisitionContext.businessUnits
+  .map(
+    (row) =>
+      `- ${row.org_name}: open positions ${row.open_positions}, hires ${row.hires}, applications ${row.applications}, avg time to fill ${row.avg_time_to_fill_days} days, application-to-hire ${row.application_to_hire_pct}%`
+  )
+  .join("\n")}
+
+Recruiting source performance:
+${talentAcquisitionContext.sources
+  .map(
+    (row) =>
+      `- ${row.source_name} (${row.source_category}): applications ${row.applications}, hires ${row.hires}, application-to-hire ${row.application_to_hire_pct}%`
+  )
+  .join("\n")}
+
+Top recruiter workloads:
+${talentAcquisitionContext.recruiters
+  .map(
+    (row) =>
+      `- ${row.recruiter_name}: region ${row.region ?? "N/A"}, specialty ${row.specialty ?? "N/A"}, open reqs ${row.open_requisitions}, avg time to fill ${row.avg_time_to_fill_days} days`
+  )
+  .join("\n")}
+
+Interpretation rules:
+- Funnel stages are governed aggregate analytics, not candidate-level assessments.
+- Interviewed applicants are deduplicated by application even when multiple interview rounds exist.
+- Internal Mobility has a structurally different funnel from external recruiting; do not compare its 100% application-to-hire conversion directly with external sources as if they were equivalent.
+- Do not infer recruiting quality, candidate quality, bias, causality, or recruiter performance beyond the supplied metrics.
 `.trim()
         : "";
 
@@ -809,6 +918,8 @@ ${positionPrompt}
 ${financePrompt}
 
 ${skillsPrompt}
+
+${talentAcquisitionPrompt}
 
 ${globalEnterprisePrompt}
 
