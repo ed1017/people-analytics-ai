@@ -5,6 +5,7 @@ import {
   useMemo,
   useState,
   type MouseEvent as ReactMouseEvent,
+  type ReactNode,
 } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -361,99 +362,231 @@ function renderInlineMarkdown(
   });
 }
 
+function parseMarkdownTableRow(
+  line: string
+) {
+  return line
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((cell) => cell.trim());
+}
+
+function isMarkdownTableSeparator(
+  line: string
+) {
+  const cells =
+    parseMarkdownTableRow(line);
+
+  return (
+    cells.length >= 2 &&
+    cells.every((cell) =>
+      /^:?-{3,}:?$/.test(cell)
+    )
+  );
+}
+
 function ChatContent({
   content,
 }: {
   content: string;
 }) {
   const lines = content.split("\n");
+  const rendered: ReactNode[] = [];
+
+  let index = 0;
+
+  while (index < lines.length) {
+    const line = lines[index];
+    const trimmed = line.trim();
+
+    const nextLine =
+      lines[index + 1]?.trim() ?? "";
+
+    const looksLikeTable =
+      trimmed.includes("|") &&
+      nextLine.includes("|") &&
+      isMarkdownTableSeparator(
+        nextLine
+      );
+
+    if (looksLikeTable) {
+      const headers =
+        parseMarkdownTableRow(trimmed);
+
+      const rows: string[][] = [];
+      index += 2;
+
+      while (
+        index < lines.length &&
+        lines[index].trim().includes("|") &&
+        lines[index].trim() !== ""
+      ) {
+        rows.push(
+          parseMarkdownTableRow(
+            lines[index]
+          )
+        );
+        index += 1;
+      }
+
+      rendered.push(
+        <div
+          key={`table-${index}`}
+          className="my-3 overflow-x-auto rounded-lg border"
+        >
+          <table className="w-full min-w-[560px] text-xs">
+            <thead className="bg-muted/40">
+              <tr>
+                {headers.map(
+                  (header, headerIndex) => (
+                    <th
+                      key={headerIndex}
+                      className="border-b px-3 py-2 text-left font-semibold"
+                    >
+                      {renderInlineMarkdown(
+                        header
+                      )}
+                    </th>
+                  )
+                )}
+              </tr>
+            </thead>
+
+            <tbody>
+              {rows.map(
+                (row, rowIndex) => (
+                  <tr
+                    key={rowIndex}
+                    className="border-b last:border-0"
+                  >
+                    {headers.map(
+                      (
+                        _header,
+                        cellIndex
+                      ) => (
+                        <td
+                          key={cellIndex}
+                          className="px-3 py-2 align-top"
+                        >
+                          {renderInlineMarkdown(
+                            row[
+                              cellIndex
+                            ] ?? ""
+                          )}
+                        </td>
+                      )
+                    )}
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
+        </div>
+      );
+
+      continue;
+    }
+
+    if (!trimmed) {
+      rendered.push(
+        <div
+          key={`space-${index}`}
+          className="h-1"
+        />
+      );
+      index += 1;
+      continue;
+    }
+
+    const headingMatch =
+      trimmed.match(
+        /^(#{1,3})\s+(.+)$/
+      );
+
+    if (headingMatch) {
+      rendered.push(
+        <p
+          key={`heading-${index}`}
+          className="font-semibold"
+        >
+          {renderInlineMarkdown(
+            headingMatch[2]
+          )}
+        </p>
+      );
+
+      index += 1;
+      continue;
+    }
+
+    const bulletMatch =
+      trimmed.match(
+        /^[-*]\s+(.+)$/
+      );
+
+    if (bulletMatch) {
+      rendered.push(
+        <div
+          key={`bullet-${index}`}
+          className="flex gap-2"
+        >
+          <span className="text-muted-foreground">
+            •
+          </span>
+          <span>
+            {renderInlineMarkdown(
+              bulletMatch[1]
+            )}
+          </span>
+        </div>
+      );
+
+      index += 1;
+      continue;
+    }
+
+    const numberedMatch =
+      trimmed.match(
+        /^(\d+)\.\s+(.+)$/
+      );
+
+    if (numberedMatch) {
+      rendered.push(
+        <div
+          key={`number-${index}`}
+          className="flex gap-2"
+        >
+          <span className="min-w-5 text-muted-foreground">
+            {numberedMatch[1]}.
+          </span>
+          <span>
+            {renderInlineMarkdown(
+              numberedMatch[2]
+            )}
+          </span>
+        </div>
+      );
+
+      index += 1;
+      continue;
+    }
+
+    rendered.push(
+      <p key={`text-${index}`}>
+        {renderInlineMarkdown(
+          trimmed
+        )}
+      </p>
+    );
+
+    index += 1;
+  }
 
   return (
     <div className="space-y-2 leading-relaxed">
-      {lines.map((line, index) => {
-        const trimmed = line.trim();
-
-        if (!trimmed) {
-          return (
-            <div
-              key={index}
-              className="h-1"
-            />
-          );
-        }
-
-        const headingMatch =
-          trimmed.match(
-            /^(#{1,3})\s+(.+)$/
-          );
-
-        if (headingMatch) {
-          return (
-            <p
-              key={index}
-              className="font-semibold"
-            >
-              {renderInlineMarkdown(
-                headingMatch[2]
-              )}
-            </p>
-          );
-        }
-
-        const bulletMatch =
-          trimmed.match(
-            /^[-*]\s+(.+)$/
-          );
-
-        if (bulletMatch) {
-          return (
-            <div
-              key={index}
-              className="flex gap-2"
-            >
-              <span className="text-muted-foreground">
-                •
-              </span>
-              <span>
-                {renderInlineMarkdown(
-                  bulletMatch[1]
-                )}
-              </span>
-            </div>
-          );
-        }
-
-        const numberedMatch =
-          trimmed.match(
-            /^(\d+)\.\s+(.+)$/
-          );
-
-        if (numberedMatch) {
-          return (
-            <div
-              key={index}
-              className="flex gap-2"
-            >
-              <span className="min-w-5 text-muted-foreground">
-                {numberedMatch[1]}.
-              </span>
-              <span>
-                {renderInlineMarkdown(
-                  numberedMatch[2]
-                )}
-              </span>
-            </div>
-          );
-        }
-
-        return (
-          <p key={index}>
-            {renderInlineMarkdown(
-              trimmed
-            )}
-          </p>
-        );
-      })}
+      {rendered}
     </div>
   );
 }
@@ -3458,7 +3591,7 @@ export default function Home() {
         )}
 
         {/* AI panel */}
-        <aside className="min-w-0 border-l p-3">
+        <aside className="sticky top-16 flex h-[calc(100vh-4rem)] min-w-0 flex-col overflow-hidden border-l p-3">
           <div className="mb-4 flex items-center justify-between gap-2">
             {!aiCollapsed && (
               <div className="flex items-center gap-2">
@@ -3511,7 +3644,7 @@ export default function Home() {
               <Sparkles className="h-5 w-5 text-muted-foreground" />
             </div>
           ) : (
-            <div className="flex min-h-[calc(100vh-8rem)] flex-col">
+            <div className="flex min-h-0 flex-1 flex-col">
               <p className="mb-3 text-sm text-muted-foreground">
                 Ask questions about the workforce data currently shown.
               </p>
@@ -3544,7 +3677,7 @@ export default function Home() {
                 </div>
               )}
 
-              <div className="mb-3 flex-1 space-y-3 overflow-y-auto rounded-lg border p-3">
+              <div className="mb-3 min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain rounded-lg border p-3 pr-2">
                 {chatMessages.length === 0 ? (
                   <div className="flex h-full min-h-28 items-center justify-center text-center text-sm text-muted-foreground">
                     AI conversation will appear here.

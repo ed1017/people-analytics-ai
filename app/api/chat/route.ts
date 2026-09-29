@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { supabaseServer } from "../../../lib/supabase-server";
 
 export const dynamic = "force-dynamic";
 
@@ -172,6 +173,18 @@ type SkillsContext = {
   highestDemand: SkillContextRow[];
   strongestCoverage: SkillContextRow[];
 };
+
+
+function numberValue(
+  value: number | string | null | undefined
+) {
+  if (value === null || value === undefined) {
+    return 0;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
 
 export async function POST(
   request: NextRequest
@@ -483,6 +496,229 @@ Interpretation rules:
 `.trim()
         : "";
 
+
+    // Global enterprise grounding:
+    // Keep the current page/filter context, but also provide compact
+    // cross-domain enterprise summaries so the assistant can answer
+    // broader questions without pretending the visible page is all it knows.
+    const [
+      financeGlobalResult,
+      skillsGlobalResult,
+      planningGlobalResult,
+      businessUnitsResult,
+    ] = await Promise.all([
+      supabaseServer
+        .from("finance_current_summary")
+        .select(
+          "org_code, org_name, headcount, fte, labor_cost_usd, cost_per_fte_usd, vacant_positions, estimated_vacancy_cost_exposure_usd"
+        ),
+
+      supabaseServer
+        .from(
+          "skills_proficiency_gap_summary"
+        )
+        .select(
+          "skill_name, skill_category, employees_in_roles_requiring_skill, employees_below_or_missing_requirement, avg_required_proficiency, avg_observed_proficiency, requirement_met_pct"
+        )
+        .gt(
+          "employees_in_roles_requiring_skill",
+          0
+        )
+        .order(
+          "requirement_met_pct",
+          { ascending: true }
+        )
+        .limit(20),
+
+      supabaseServer
+        .from(
+          "workforce_scenario_summary"
+        )
+        .select(
+          "scenario_name, planned_headcount, planned_fte, planned_labor_cost_usd"
+        )
+        .eq(
+          "planning_month",
+          "2027-12-01"
+        ),
+
+      supabaseServer
+        .from("org_units")
+        .select(
+          "org_code, org_name"
+        )
+        .eq(
+          "org_type",
+          "business_unit"
+        ),
+    ]);
+
+    const businessUnits =
+      businessUnitsResult.data ?? [];
+
+    const businessUnitDashboardResults =
+      await Promise.all(
+        businessUnits.map(
+          async (businessUnit) => {
+            const { data, error } =
+              await supabaseServer.rpc(
+                "dashboard_overview_filtered",
+                {
+                  p_country_code: null,
+                  p_org_code:
+                    businessUnit.org_code,
+                  p_level_code: null,
+                }
+              );
+
+            if (error || !data) {
+              return null;
+            }
+
+            const overview =
+              data.overview ?? null;
+            const trend =
+              Array.isArray(data.trend)
+                ? data.trend
+                : [];
+
+            const first =
+              trend[0] ?? null;
+            const last =
+              trend[
+                trend.length - 1
+              ] ?? null;
+
+            const growthPct =
+              first &&
+              last &&
+              numberValue(
+                first.headcount
+              ) > 0
+                ? (
+                    ((numberValue(
+                      last.headcount
+                    ) -
+                      numberValue(
+                        first.headcount
+                      )) /
+                      numberValue(
+                        first.headcount
+                      )) *
+                    100
+                  )
+                : null;
+
+            return {
+              org_code:
+                businessUnit.org_code,
+              org_name:
+                businessUnit.org_name,
+              headcount:
+                numberValue(
+                  overview?.headcount
+                ),
+              voluntary_turnover_ytd_pct:
+                numberValue(
+                  overview?.voluntary_turnover_ytd_pct
+                ),
+              labor_cost_usd:
+                numberValue(
+                  overview?.labor_cost_usd
+                ),
+              open_positions:
+                numberValue(
+                  overview?.open_positions
+                ),
+              growth_pct:
+                growthPct,
+            };
+          }
+        )
+      );
+
+    const businessUnitDashboard =
+      businessUnitDashboardResults.filter(
+        (
+          row
+        ): row is NonNullable<
+          typeof row
+        > => Boolean(row)
+      );
+
+    const globalEnterprisePrompt = `
+GLOBAL ENTERPRISE ANALYTICS CONTEXT
+
+Business-unit workforce comparison:
+${businessUnitDashboard
+  .map(
+    (row) =>
+      `- ${row.org_name}: HC ${row.headcount}, voluntary turnover YTD ${row.voluntary_turnover_ytd_pct}%, labor cost USD ${row.labor_cost_usd}, open positions ${row.open_positions}, headcount growth over displayed history ${
+        row.growth_pct === null
+          ? "N/A"
+          : `${row.growth_pct.toFixed(1)}%`
+      }`
+  )
+  .join("\n")}
+
+Finance by business unit:
+${(financeGlobalResult.data ?? [])
+  .map(
+    (row) =>
+      `- ${row.org_name}: HC ${numberValue(
+        row.headcount
+      )}, FTE ${numberValue(
+        row.fte
+      )}, labor cost USD ${numberValue(
+        row.labor_cost_usd
+      )}, cost/FTE USD ${numberValue(
+        row.cost_per_fte_usd
+      )}, vacancies ${numberValue(
+        row.vacant_positions
+      )}, estimated vacancy exposure USD ${numberValue(
+        row.estimated_vacancy_cost_exposure_usd
+      )}`
+  )
+  .join("\n")}
+
+Largest enterprise proficiency gaps:
+${(skillsGlobalResult.data ?? [])
+  .map(
+    (row) =>
+      `- ${row.skill_name} (${row.skill_category}): demand population ${numberValue(
+        row.employees_in_roles_requiring_skill
+      )}, below/missing ${numberValue(
+        row.employees_below_or_missing_requirement
+      )}, required proficiency ${numberValue(
+        row.avg_required_proficiency
+      )}, observed proficiency ${numberValue(
+        row.avg_observed_proficiency
+      )}, requirement met ${numberValue(
+        row.requirement_met_pct
+      )}%`
+  )
+  .join("\n")}
+
+2027 enterprise workforce scenarios:
+${(planningGlobalResult.data ?? [])
+  .map(
+    (row) =>
+      `- ${row.scenario_name}: HC ${numberValue(
+        row.planned_headcount
+      )}, FTE ${numberValue(
+        row.planned_fte
+      )}, labor cost USD ${numberValue(
+        row.planned_labor_cost_usd
+      )}`
+  )
+  .join("\n")}
+
+Global grounding rules:
+- Use this enterprise context for cross-business-unit, cross-page, or "overall company" questions.
+- Use the current page/filter context when the user asks specifically about the visible filtered population.
+- Do not imply that Talent Acquisition or Survey/Sentiment is grounded yet; those modules are still in development.
+`.trim();
+
     const personaInstructions: Record<
       Persona,
       string
@@ -550,8 +786,9 @@ ${personaInstructions[persona]}
 
 Shared rules:
 - Ground every factual claim in the supplied contexts.
-- Treat the CURRENT PAGE-specific context as primary for questions about Finance, Skills, Workforce Planning, or Position Modeling.
-- The overview dashboard context is supplemental and may use different filters; do not silently apply overview filters to page-specific enterprise data.
+- Treat the CURRENT PAGE-specific context as primary when the user is asking about that page or its visible filters.
+- Use GLOBAL ENTERPRISE ANALYTICS CONTEXT for cross-page, cross-business-unit, or overall-company questions.
+- Never assume the current visible filter is the whole company when broader enterprise context is available.
 - Do not invent employee facts, benchmarks, causes, correlations, budgets, or forecasts that are not provided.
 - If the user asks for information that is not available in the current context, say that the current dashboard does not contain enough information yet.
 - You may calculate straightforward ratios or comparisons from supplied metrics.
@@ -572,6 +809,8 @@ ${positionPrompt}
 ${financePrompt}
 
 ${skillsPrompt}
+
+${globalEnterprisePrompt}
 
 RECENT CONVERSATION
 ${conversation || "No prior conversation."}
