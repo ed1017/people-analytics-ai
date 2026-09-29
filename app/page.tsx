@@ -1116,7 +1116,11 @@ export default function Home() {
               </div>
 
               <div className="mt-6 rounded-lg border border-dashed p-5 text-sm text-muted-foreground">
-                Planned AI capability: summarize themes, compare populations, and connect listening signals with workforce outcomes        ) : activePage === "finance" ? (
+                Planned AI capability: summarize themes, compare populations, and connect listening signals with workforce outcomes.
+              </div>
+            </div>
+          </section>
+        ) : activePage === "finance" ? (
           <FinancePage
             financeData={financeData}
             financeLoading={financeLoading}
@@ -1125,10 +1129,6 @@ export default function Home() {
             financeScenarios={financeScenarios}
             maxFinanceLaborCost={maxFinanceLaborCost}
           />
-ed."}
-              </div>
-            )}
-          </section>
         ) : activePage === "skills" ? (
           <section className="min-w-0 p-6">
             <div className="mb-6 flex items-end justify-between gap-4">
