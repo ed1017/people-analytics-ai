@@ -12,6 +12,7 @@ import { OverviewPage } from "@/components/pages/overview-page";
 import { FinancePage } from "@/components/pages/finance-page";
 import { SkillsPage } from "@/components/pages/skills-page";
 import { WorkforcePlanningPage } from "@/components/pages/workforce-planning-page";
+import { TalentAcquisitionPage } from "@/components/pages/talent-acquisition-page";
 import { AiPanel } from "@/components/ai-panel";
 import type {
   AppPage,
@@ -25,6 +26,7 @@ import type {
   Persona,
   PositionModelingResponse,
   SkillsResponse,
+  TalentAcquisitionResponse,
   WorkforcePlanningResponse,
 } from "@/lib/types";
 
@@ -100,6 +102,13 @@ export default function Home() {
   const [skillsLoading, setSkillsLoading] =
     useState(false);
   const [skillsError, setSkillsError] =
+    useState<string | null>(null);
+
+  const [talentAcquisitionData, setTalentAcquisitionData] =
+    useState<TalentAcquisitionResponse | null>(null);
+  const [talentAcquisitionLoading, setTalentAcquisitionLoading] =
+    useState(false);
+  const [talentAcquisitionError, setTalentAcquisitionError] =
     useState<string | null>(null);
 
   const [blsData, setBlsData] =
@@ -328,6 +337,31 @@ export default function Home() {
     loadFinance();
   }, [activePage, financeData]);
 
+  useEffect(() => {
+    if (activePage !== "talent-acquisition" || talentAcquisitionData) {
+      return;
+    }
+
+    async function loadTalentAcquisition() {
+      try {
+        setTalentAcquisitionLoading(true);
+        setTalentAcquisitionError(null);
+        const response = await fetch("/api/talent-acquisition", { cache: "no-store" });
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload?.error ?? "Failed to load Talent Acquisition data.");
+        }
+        setTalentAcquisitionData(payload as TalentAcquisitionResponse);
+      } catch (error) {
+        console.error(error);
+        setTalentAcquisitionError(error instanceof Error ? error.message : "Failed to load Talent Acquisition data.");
+      } finally {
+        setTalentAcquisitionLoading(false);
+      }
+    }
+
+    loadTalentAcquisition();
+  }, [activePage, talentAcquisitionData]);
   useEffect(() => {
     if (
       activePage !== "skills" ||
@@ -944,67 +978,11 @@ export default function Home() {
           />
         ) : activePage ===
           "talent-acquisition" ? (
-          <section className="min-w-0 p-6">
-            <div className="mb-8 flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-2xl font-semibold">
-                  Talent Acquisition
-                </h2>
-                <p className="text-muted-foreground">
-                  Recruiting funnel, hiring velocity, source effectiveness, and quality-of-hire analytics.
-                </p>
-              </div>
-
-              <span className="rounded-full border px-3 py-1 text-xs font-medium text-muted-foreground">
-                In Development
-              </span>
-            </div>
-
-            <div className="rounded-xl border bg-muted/10 p-6">
-              <div className="mb-6 max-w-2xl">
-                <p className="text-lg font-semibold">
-                  Talent Acquisition Intelligence
-                </p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  This module is being built on top of the existing synthetic recruiting data model.
-                </p>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="rounded-lg border bg-background p-5">
-                  <p className="text-sm font-semibold">
-                    Recruiting Funnel
-                  </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Requisitions, applications, interviews, offers, hires, and conversion rates.
-                  </p>
-                </div>
-
-                <div className="rounded-lg border bg-background p-5">
-                  <p className="text-sm font-semibold">
-                    Hiring Velocity
-                  </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Time to fill, aging requisitions, hiring demand, and recruiter workload.
-                  </p>
-                </div>
-
-                <div className="rounded-lg border bg-background p-5">
-                  <p className="text-sm font-semibold">
-                    Source & Quality
-                  </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Source effectiveness, internal versus external hiring, and downstream quality signals.
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-6 rounded-lg border border-dashed p-5 text-sm text-muted-foreground">
-                Planned AI capability: ask questions such as “Where is the hiring funnel breaking down?” and “Which business units have the greatest recruiting demand?”
-              </div>
-            </div>
-          </section>
-        ) : activePage ===
+          <TalentAcquisitionPage
+            data={talentAcquisitionData}
+            loading={talentAcquisitionLoading}
+            error={talentAcquisitionError}
+          />        ) : activePage ===
           "survey-sentiment" ? (
           <section className="min-w-0 p-6">
             <div className="mb-8 flex items-start justify-between gap-4">

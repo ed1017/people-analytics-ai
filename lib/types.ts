@@ -219,3 +219,70 @@ export type BlsResponse = {
   latest_date: string | null;
   metrics: BlsMetric[];
 };
+
+export type TalentAcquisitionSource = {
+  source_code: string;
+  source_name: string;
+  source_category: string;
+  applications: number;
+  hires: number;
+  application_to_hire_pct: number;
+};
+
+export type TalentAcquisitionBusinessUnit = {
+  org_code: string;
+  org_name: string;
+  open_requisitions: number;
+  open_positions: number;
+  applications: number;
+  hires: number;
+  avg_time_to_fill_days: number;
+  application_to_hire_pct: number;
+};
+
+export type TalentAcquisitionRecruiter = {
+  recruiter_name: string;
+  region: string | null;
+  specialty: string | null;
+  total_requisitions: number;
+  open_requisitions: number;
+  open_positions: number;
+  filled_requisitions: number;
+  avg_time_to_fill_days: number;
+};
+
+export type TalentAcquisitionMonthlyPoint = {
+  month: string;
+  applications: number;
+  interviewed_applications: number;
+  offers: number;
+  hires: number;
+};
+
+export type TalentAcquisitionResponse = {
+  as_of: string;
+  summary: {
+    applications: number;
+    interviewed_applications: number;
+    offered_applications: number;
+    hires: number;
+    application_to_interview_pct: number;
+    interview_to_offer_pct: number;
+    offer_to_hire_pct: number;
+    application_to_hire_pct: number;
+    offer_acceptance_pct: number;
+    open_requisitions: number;
+    open_positions: number;
+    avg_time_to_fill_days: number;
+    median_time_to_fill_days: number;
+    avg_open_req_age_days: number;
+    median_open_req_age_days: number;
+    open_reqs_over_60_days: number;
+    internal_hires: number;
+    external_hires: number;
+  };
+  sources: TalentAcquisitionSource[];
+  business_units: TalentAcquisitionBusinessUnit[];
+  recruiters: TalentAcquisitionRecruiter[];
+  monthly: TalentAcquisitionMonthlyPoint[];
+};
