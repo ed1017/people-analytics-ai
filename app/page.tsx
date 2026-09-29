@@ -613,8 +613,6 @@ export default function Home() {
 
   const previewPage =
     activePage ===
-      "talent-acquisition" ||
-    activePage ===
       "survey-sentiment";
 
   const suggestedPrompts =
@@ -638,7 +636,13 @@ export default function Home() {
               "Which skills have the highest demand?",
               "Where should we build versus hire capability?",
             ]
-          : [
+          : activePage === "talent-acquisition"
+            ? [
+                "Where is the recruiting funnel weakest?",
+                "Which business units have the greatest hiring pressure?",
+                "Which recruiting sources are most effective?",
+              ]
+            : [
               "Summarize this workforce",
               "What stands out?",
               "Are there workforce risks?",
@@ -787,6 +791,25 @@ export default function Home() {
                       skillsData.highest_demand,
                     strongestCoverage:
                       skillsData.strongest_coverage,
+                  }
+                : null,
+
+            talentAcquisitionContext:
+              activePage ===
+                "talent-acquisition" &&
+              talentAcquisitionData
+                ? {
+                    summary:
+                      talentAcquisitionData.summary,
+                    businessUnits:
+                      talentAcquisitionData.business_units,
+                    sources:
+                      talentAcquisitionData.sources,
+                    recruiters:
+                      talentAcquisitionData.recruiters.slice(
+                        0,
+                        10
+                      ),
                   }
                 : null,
 
