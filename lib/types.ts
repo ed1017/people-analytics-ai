@@ -286,3 +286,74 @@ export type TalentAcquisitionResponse = {
   recruiters: TalentAcquisitionRecruiter[];
   monthly: TalentAcquisitionMonthlyPoint[];
 };
+
+export type SurveyListeningDimension = {
+  survey_code: string;
+  survey_name: string;
+  survey_type: string;
+  question_code: string;
+  dimension: string;
+  question_text: string;
+  employee_respondents: number;
+  candidate_respondents: number;
+  separation_respondents: number;
+  avg_score: number;
+  favorable_pct: number;
+};
+
+export type SurveyEngagementTrendPoint = {
+  survey_code: string;
+  survey_name: string;
+  launch_date: string;
+  close_date: string;
+  respondents: number;
+  denominator_snapshot_date: string;
+  eligible_population: number;
+  participation_pct: number;
+  avg_score: number;
+  favorable_pct: number;
+};
+
+export type SurveyBusinessUnit = {
+  org_code: string;
+  org_name: string;
+  respondents: number;
+  avg_score: number;
+  favorable_pct: number;
+};
+
+export type SurveyExitReason = {
+  primary_reason: string;
+  exits: number;
+  pct_of_exit_responses: number;
+};
+
+export type SurveySentimentResponse = {
+  as_of: string;
+  summary: {
+    engagement_respondents: number;
+    engagement_eligible_population: number;
+    engagement_participation_pct: number;
+    engagement_avg_score: number;
+    engagement_favorable_pct: number;
+    pulse_respondents: number;
+    pulse_avg_score: number;
+    pulse_favorable_pct: number;
+    manager_respondents: number;
+    manager_avg_score: number;
+    manager_favorable_pct: number;
+    onboarding_90_respondents: number;
+    onboarding_90_avg_score: number;
+    onboarding_90_favorable_pct: number;
+    exit_respondents: number;
+    open_text_comments: number;
+  };
+  engagement_trend: SurveyEngagementTrendPoint[];
+  engagement_dimensions: SurveyListeningDimension[];
+  pulse_dimensions: SurveyListeningDimension[];
+  manager_dimensions: SurveyListeningDimension[];
+  onboarding_dimensions: SurveyListeningDimension[];
+  exit_dimensions: SurveyListeningDimension[];
+  business_units: SurveyBusinessUnit[];
+  exit_reasons: SurveyExitReason[];
+};
