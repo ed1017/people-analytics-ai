@@ -13,16 +13,6 @@ import { FinancePage } from "@/components/pages/finance-page";
 import { SkillsPage } from "@/components/pages/skills-page";
 import { WorkforcePlanningPage } from "@/components/pages/workforce-planning-page";
 import { AiPanel } from "@/components/ai-panel";
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-
 import type {
   AppPage,
   BlsResponse,
@@ -43,52 +33,6 @@ const EMPTY_FILTER_OPTIONS: DashboardFilterOptions = {
   business_units: [],
   levels: [],
 };
-
-function formatMonth(value: string) {
-  return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
-    month: "short",
-    year: "2-digit",
-  });
-}
-
-function formatLongDate(value: string) {
-  return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-
-function formatCurrencyCompact(
-  value: number
-) {
-  if (Math.abs(value) >= 1_000_000_000) {
-    return `$${(
-      value / 1_000_000_000
-    ).toFixed(2)}B`;
-  }
-
-  if (Math.abs(value) >= 1_000_000) {
-    return `$${(
-      value / 1_000_000
-    ).toFixed(1)}M`;
-  }
-
-  return `$${Math.round(
-    value
-  ).toLocaleString()}`;
-}
-
-function formatAssumptionName(
-  value: string
-) {
-  return value
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (letter) =>
-      letter.toUpperCase()
-    );
-}
 
 export default function Home() {
   const [navCollapsed, setNavCollapsed] = useState(false);
