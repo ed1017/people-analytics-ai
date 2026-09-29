@@ -21,6 +21,8 @@ import {
   Sparkles,
   Send,
   LoaderCircle,
+  UserPlus,
+  MessageSquareText,
 } from "lucide-react";
 import {
   CartesianGrid,
@@ -73,6 +75,8 @@ type Persona = "HR" | "Leader" | "Finance";
 
 type AppPage =
   | "overview"
+  | "talent-acquisition"
+  | "survey-sentiment"
   | "finance"
   | "skills"
   | "workforce-planning";
@@ -302,6 +306,156 @@ function formatAssumptionName(
     .replace(/\b\w/g, (letter) =>
       letter.toUpperCase()
     );
+}
+
+function renderInlineMarkdown(
+  value: string
+) {
+  const parts = value.split(
+    /(\*\*\*.*?\*\*\*|\*\*.*?\*\*|\*.*?\*)/g
+  );
+
+  return parts.map((part, index) => {
+    if (
+      part.startsWith("***") &&
+      part.endsWith("***")
+    ) {
+      return (
+        <strong
+          key={index}
+          className="italic"
+        >
+          {part.slice(3, -3)}
+        </strong>
+      );
+    }
+
+    if (
+      part.startsWith("**") &&
+      part.endsWith("**")
+    ) {
+      return (
+        <strong key={index}>
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+
+    if (
+      part.startsWith("*") &&
+      part.endsWith("*") &&
+      part.length > 2
+    ) {
+      return (
+        <em key={index}>
+          {part.slice(1, -1)}
+        </em>
+      );
+    }
+
+    return (
+      <span key={index}>
+        {part}
+      </span>
+    );
+  });
+}
+
+function ChatContent({
+  content,
+}: {
+  content: string;
+}) {
+  const lines = content.split("\n");
+
+  return (
+    <div className="space-y-2 leading-relaxed">
+      {lines.map((line, index) => {
+        const trimmed = line.trim();
+
+        if (!trimmed) {
+          return (
+            <div
+              key={index}
+              className="h-1"
+            />
+          );
+        }
+
+        const headingMatch =
+          trimmed.match(
+            /^(#{1,3})\s+(.+)$/
+          );
+
+        if (headingMatch) {
+          return (
+            <p
+              key={index}
+              className="font-semibold"
+            >
+              {renderInlineMarkdown(
+                headingMatch[2]
+              )}
+            </p>
+          );
+        }
+
+        const bulletMatch =
+          trimmed.match(
+            /^[-*]\s+(.+)$/
+          );
+
+        if (bulletMatch) {
+          return (
+            <div
+              key={index}
+              className="flex gap-2"
+            >
+              <span className="text-muted-foreground">
+                •
+              </span>
+              <span>
+                {renderInlineMarkdown(
+                  bulletMatch[1]
+                )}
+              </span>
+            </div>
+          );
+        }
+
+        const numberedMatch =
+          trimmed.match(
+            /^(\d+)\.\s+(.+)$/
+          );
+
+        if (numberedMatch) {
+          return (
+            <div
+              key={index}
+              className="flex gap-2"
+            >
+              <span className="min-w-5 text-muted-foreground">
+                {numberedMatch[1]}.
+              </span>
+              <span>
+                {renderInlineMarkdown(
+                  numberedMatch[2]
+                )}
+              </span>
+            </div>
+          );
+        }
+
+        return (
+          <p key={index}>
+            {renderInlineMarkdown(
+              trimmed
+            )}
+          </p>
+        );
+      })}
+    </div>
+  );
 }
 
 export default function Home() {
@@ -847,8 +1001,16 @@ export default function Home() {
         )
       : 0;
 
+  const previewPage =
+    activePage ===
+      "talent-acquisition" ||
+    activePage ===
+      "survey-sentiment";
+
   const suggestedPrompts =
-    activePage === "workforce-planning"
+    previewPage
+      ? []
+      : activePage === "workforce-planning"
       ? [
           "Compare all four workforce scenarios",
           "What stands out in this scenario?",
@@ -1285,6 +1447,60 @@ export default function Home() {
 
             <Button
               variant={
+                activePage ===
+                "talent-acquisition"
+                  ? "default"
+                  : "ghost"
+              }
+              className={`w-full gap-3 ${
+                navCollapsed
+                  ? "justify-center px-0"
+                  : "justify-start"
+              }`}
+              title="Talent Acquisition"
+              onClick={() =>
+                setActivePage(
+                  "talent-acquisition"
+                )
+              }
+            >
+              <UserPlus className="h-5 w-5 shrink-0" />
+              {!navCollapsed && (
+                <span>
+                  Talent Acquisition
+                </span>
+              )}
+            </Button>
+
+            <Button
+              variant={
+                activePage ===
+                "survey-sentiment"
+                  ? "default"
+                  : "ghost"
+              }
+              className={`w-full gap-3 ${
+                navCollapsed
+                  ? "justify-center px-0"
+                  : "justify-start"
+              }`}
+              title="Survey & Sentiment"
+              onClick={() =>
+                setActivePage(
+                  "survey-sentiment"
+                )
+              }
+            >
+              <MessageSquareText className="h-5 w-5 shrink-0" />
+              {!navCollapsed && (
+                <span>
+                  Survey & Sentiment
+                </span>
+              )}
+            </Button>
+
+            <Button
+              variant={
                 activePage === "finance"
                   ? "default"
                   : "ghost"
@@ -1716,6 +1932,130 @@ export default function Home() {
             </div>
           </div>
         </section>
+        ) : activePage ===
+          "talent-acquisition" ? (
+          <section className="min-w-0 p-6">
+            <div className="mb-8 flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-semibold">
+                  Talent Acquisition
+                </h2>
+                <p className="text-muted-foreground">
+                  Recruiting funnel, hiring velocity, source effectiveness, and quality-of-hire analytics.
+                </p>
+              </div>
+
+              <span className="rounded-full border px-3 py-1 text-xs font-medium text-muted-foreground">
+                In Development
+              </span>
+            </div>
+
+            <div className="rounded-xl border bg-muted/10 p-6">
+              <div className="mb-6 max-w-2xl">
+                <p className="text-lg font-semibold">
+                  Talent Acquisition Intelligence
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  This module is being built on top of the existing synthetic recruiting data model.
+                </p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="rounded-lg border bg-background p-5">
+                  <p className="text-sm font-semibold">
+                    Recruiting Funnel
+                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Requisitions, applications, interviews, offers, hires, and conversion rates.
+                  </p>
+                </div>
+
+                <div className="rounded-lg border bg-background p-5">
+                  <p className="text-sm font-semibold">
+                    Hiring Velocity
+                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Time to fill, aging requisitions, hiring demand, and recruiter workload.
+                  </p>
+                </div>
+
+                <div className="rounded-lg border bg-background p-5">
+                  <p className="text-sm font-semibold">
+                    Source & Quality
+                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Source effectiveness, internal versus external hiring, and downstream quality signals.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-lg border border-dashed p-5 text-sm text-muted-foreground">
+                Planned AI capability: ask questions such as “Where is the hiring funnel breaking down?” and “Which business units have the greatest recruiting demand?”
+              </div>
+            </div>
+          </section>
+        ) : activePage ===
+          "survey-sentiment" ? (
+          <section className="min-w-0 p-6">
+            <div className="mb-8 flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-semibold">
+                  Survey & Sentiment
+                </h2>
+                <p className="text-muted-foreground">
+                  Engagement, onboarding, exit feedback, sentiment trends, and employee-listening analytics.
+                </p>
+              </div>
+
+              <span className="rounded-full border px-3 py-1 text-xs font-medium text-muted-foreground">
+                In Development
+              </span>
+            </div>
+
+            <div className="rounded-xl border bg-muted/10 p-6">
+              <div className="mb-6 max-w-2xl">
+                <p className="text-lg font-semibold">
+                  Employee Listening Intelligence
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  This module will connect structured survey results with workforce context and AI-assisted theme analysis.
+                </p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="rounded-lg border bg-background p-5">
+                  <p className="text-sm font-semibold">
+                    Engagement
+                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Favorability, drivers, trends, participation, and population comparisons.
+                  </p>
+                </div>
+
+                <div className="rounded-lg border bg-background p-5">
+                  <p className="text-sm font-semibold">
+                    Onboarding
+                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    New-hire experience, early sentiment, enablement, and manager effectiveness.
+                  </p>
+                </div>
+
+                <div className="rounded-lg border bg-background p-5">
+                  <p className="text-sm font-semibold">
+                    Exit & Sentiment
+                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Exit themes, sentiment shifts, retention signals, and qualitative feedback.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-lg border border-dashed p-5 text-sm text-muted-foreground">
+                Planned AI capability: summarize themes, compare populations, and connect listening signals with workforce outcomes.
+              </div>
+            </div>
+          </section>
         ) : activePage === "finance" ? (
           <section className="min-w-0 p-6">
             <div className="mb-6 flex items-end justify-between gap-4">
@@ -3176,91 +3516,11 @@ export default function Home() {
                 Ask questions about the workforce data currently shown.
               </p>
 
-              <div className="mb-3 rounded-lg border p-3 text-xs text-muted-foreground">
-                <p className="mb-1 font-medium text-foreground">
-                  Current context
-                </p>
-                <p className="mb-1 font-medium text-foreground">
-                  Persona: {selectedPersona}
-                </p>
-
-                {activePage ===
-                "workforce-planning" ? (
-                  <>
-                    <p>Page: Workforce Planning</p>
-                    <p>
-                      Scenario:{" "}
-                      {activePlanningScenario
-                        ?.scenario_name ??
-                        "Loading"}
-                    </p>
-                    {activePlanningEnd && (
-                      <p className="mt-2">
-                        {activePlanningEnd.planned_headcount.toLocaleString()}{" "}
-                        Dec 2027 HC ·{" "}
-                        {formatCurrencyCompact(
-                          activePlanningEnd.planned_labor_cost_usd
-                        )}{" "}
-                        labor cost
-                      </p>
-                    )}
-                  </>
-                ) : activePage === "finance" ? (
-                  <>
-                    <p>Page: Workforce Finance</p>
-                    {financeData && (
-                      <p className="mt-2">
-                        {formatCurrencyCompact(
-                          financeData.current.labor_cost_usd
-                        )}{" "}
-                        labor cost · $
-                        {Math.round(
-                          financeData.current.cost_per_fte_usd
-                        ).toLocaleString()}
-                        /FTE ·{" "}
-                        {financeData.current.vacant_positions.toLocaleString()}{" "}
-                        vacancies
-                      </p>
-                    )}
-                  </>
-                ) : activePage === "skills" ? (
-                  <>
-                    <p>Page: Workforce Skills</p>
-                    {skillsData && (
-                      <p className="mt-2">
-                        {skillsData.summary.active_skills.toLocaleString()}{" "}
-                        skills ·{" "}
-                        {skillsData.summary.skills_below_60_pct.toLocaleString()}{" "}
-                        below 60% attainment ·{" "}
-                        {skillsData.summary.onet_mapped_job_profiles.toLocaleString()}
-                        /
-                        {skillsData.summary.total_job_profiles.toLocaleString()}{" "}
-                        O*NET mapped
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <p>
-                      {selectedCountryLabel}
-                    </p>
-                    <p>{selectedOrgLabel}</p>
-                    <p>
-                      {selectedLevelLabel}
-                    </p>
-                    {overviewData && (
-                      <p className="mt-2">
-                        {overviewData.headcount.toLocaleString()}{" "}
-                        HC ·{" "}
-                        {overviewData.voluntary_turnover_ytd_pct}
-                        % attrition ·{" "}
-                        {overviewData.open_positions.toLocaleString()}{" "}
-                        open positions
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
+              {previewPage && (
+                <div className="mb-3 rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
+                  AI grounding for this module is coming soon.
+                </div>
+              )}
 
               {chatMessages.length === 0 && (
                 <div className="mb-3 grid gap-2">
@@ -3305,9 +3565,18 @@ export default function Home() {
                             ? "You"
                             : "People Analytics AI"}
                         </p>
-                        <p className="whitespace-pre-wrap leading-relaxed">
-                          {message.content}
-                        </p>
+                        {message.role ===
+                        "assistant" ? (
+                          <ChatContent
+                            content={
+                              message.content
+                            }
+                          />
+                        ) : (
+                          <p className="whitespace-pre-wrap leading-relaxed">
+                            {message.content}
+                          </p>
+                        )}
                       </div>
                     )
                   )
@@ -3344,9 +3613,14 @@ export default function Home() {
                       sendChatMessage();
                     }
                   }}
-                  placeholder="Ask about the current workforce…"
+                  placeholder={
+                    previewPage
+                      ? "AI grounding for this module is coming soon…"
+                      : "Ask about the current workforce…"
+                  }
+                  disabled={previewPage}
                   rows={3}
-                  className="min-h-20 flex-1 resize-none rounded-lg border bg-background p-3 text-sm outline-none"
+                  className="min-h-20 flex-1 resize-none rounded-lg border bg-background p-3 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-60"
                 />
 
                 <Button
@@ -3356,6 +3630,7 @@ export default function Home() {
                     sendChatMessage()
                   }
                   disabled={
+                    previewPage ||
                     chatLoading ||
                     !chatInput.trim() ||
                     !overviewData
