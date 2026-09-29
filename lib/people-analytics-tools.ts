@@ -217,7 +217,13 @@ async function getWorkforceFinance() {
     >[]
   );
 
-  const enterprise = businessUnits.reduce(
+  const enterprise = businessUnits.reduce<{
+    headcount: number;
+    fte: number;
+    labor_cost_usd: number;
+    vacant_positions: number;
+    estimated_vacancy_cost_exposure_usd: number;
+  }>(
     (acc, row) => {
       acc.headcount += toNumber(
         row.headcount as number | string
