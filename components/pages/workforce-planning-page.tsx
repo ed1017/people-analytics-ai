@@ -45,6 +45,9 @@ type WorkforcePlanningPageProps = {
   topPositionBusinessUnits: PositionBusinessUnit[];
   positionLevels: PositionLevel[];
   onScenarioChange: (scenario: string) => void;
+  onExplainCustomScenario: (
+    scenario: ScenarioModelResponse
+  ) => void | Promise<void>;
 };
 
 function formatMonth(value: string) {
@@ -63,15 +66,18 @@ function formatLongDate(value: string) {
 }
 
 function formatCurrencyCompact(value: number) {
-  if (Math.abs(value) >= 1_000_000_000) {
-    return "$" + (value / 1_000_000_000).toFixed(2) + "B";
+  const sign = value < 0 ? "-" : "";
+  const absoluteValue = Math.abs(value);
+
+  if (absoluteValue >= 1_000_000_000) {
+    return sign + "$" + (absoluteValue / 1_000_000_000).toFixed(2) + "B";
   }
 
-  if (Math.abs(value) >= 1_000_000) {
-    return "$" + (value / 1_000_000).toFixed(1) + "M";
+  if (absoluteValue >= 1_000_000) {
+    return sign + "$" + (absoluteValue / 1_000_000).toFixed(1) + "M";
   }
 
-  return "$" + Math.round(value).toLocaleString();
+  return sign + "$" + Math.round(absoluteValue).toLocaleString();
 }
 
 function formatAssumptionName(value: string) {
@@ -144,6 +150,7 @@ export function WorkforcePlanningPage({
   topPositionBusinessUnits,
   positionLevels,
   onScenarioChange,
+  onExplainCustomScenario,
 }: WorkforcePlanningPageProps) {
   const [scenarioDefaults, setScenarioDefaults] =
     useState<ScenarioModelAssumptions | null>(null);
@@ -369,42 +376,69 @@ export function WorkforcePlanningPage({
 
             {customAssumptions ? (
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-                {scenarioFields.map((field) => (
-                  <label
-                    key={field.key}
-                    className="rounded-md border p-3"
-                  >
-                    <span
-                      className="cursor-help border-b border-dotted text-xs font-medium text-muted-foreground"
-                      title={field.help}
+                {scenarioFields.map((field) => {
+                  const baseline =
+                    scenarioDefaults?.[field.key] ?? null;
+                  const currentValue =
+                    customAssumptions[field.key];
+                  const delta =
+                    baseline === null
+                      ? null
+                      : currentValue - baseline;
+
+                  return (
+                    <label
+                      key={field.key}
+                      className="rounded-md border p-3"
                     >
-                      {field.label}
-                    </span>
-                    <div className="mt-2 flex items-center gap-2">
-                      <input
-                        type="number"
-                        step={field.step}
-                        value={customAssumptions[field.key]}
-                        onChange={(event) =>
-                          setCustomAssumptions((current) =>
-                            current
-                              ? {
-                                  ...current,
-                                  [field.key]: Number(
-                                    event.target.value
-                                  ),
-                                }
-                              : current
-                          )
-                        }
-                        className="min-w-0 flex-1 rounded-md border bg-background px-2 py-2 text-right text-sm tabular-nums"
-                      />
-                      <span className="text-sm text-muted-foreground">
-                        {field.suffix}
+                      <span
+                        className="cursor-help border-b border-dotted text-xs font-medium text-muted-foreground"
+                        title={field.help}
+                      >
+                        {field.label}
                       </span>
-                    </div>
-                  </label>
-                ))}
+                      <div className="mt-2 flex items-center gap-2">
+                        <input
+                          type="number"
+                          step={field.step}
+                          value={currentValue}
+                          onChange={(event) =>
+                            setCustomAssumptions((current) =>
+                              current
+                                ? {
+                                    ...current,
+                                    [field.key]: Number(
+                                      event.target.value
+                                    ),
+                                  }
+                                : current
+                            )
+                          }
+                          className="min-w-0 flex-1 rounded-md border bg-background px-2 py-2 text-right text-sm tabular-nums"
+                        />
+                        <span className="text-sm text-muted-foreground">
+                          {field.suffix}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-[11px] text-muted-foreground">
+                        Baseline{" "}
+                        {baseline === null
+                          ? "—"
+                          : baseline.toFixed(1) + field.suffix}
+                        {delta !== null && (
+                          <>
+                            {" · "}
+                            <span className="font-medium">
+                              {delta === 0
+                                ? "No change"
+                                : `${delta > 0 ? "+" : ""}${delta.toFixed(1)} pp`}
+                            </span>
+                          </>
+                        )}
+                      </p>
+                    </label>
+                  );
+                })}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
@@ -429,8 +463,45 @@ export function WorkforcePlanningPage({
                       Deterministic result anchored to the stored Baseline curve
                     </p>
                   </div>
-                  <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
-                    Dec 2027
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        void onExplainCustomScenario(
+                          customScenario
+                        )
+                      }
+                      className="rounded-md border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted"
+                    >
+                      Explain with AI
+                    </button>
+                    <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
+                      Dec 2027
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mb-4 rounded-md border bg-muted/20 px-3 py-2 text-sm">
+                  <span className="font-medium">
+                    Impact vs Baseline:
+                  </span>{" "}
+                  <span className="tabular-nums">
+                    {customScenario.summary.headcount_delta_vs_baseline >= 0
+                      ? "+"
+                      : ""}
+                    {customScenario.summary.headcount_delta_vs_baseline.toLocaleString()} HC
+                    {" · "}
+                    {customScenario.summary.labor_cost_delta_vs_baseline_usd >= 0
+                      ? "+"
+                      : ""}
+                    {formatCurrencyCompact(
+                      customScenario.summary.labor_cost_delta_vs_baseline_usd
+                    )} labor cost
+                    {" · "}
+                    {customScenario.summary.headcount_gap_vs_target >= 0
+                      ? "+"
+                      : ""}
+                    {customScenario.summary.headcount_gap_vs_target.toLocaleString()} vs target
                   </span>
                 </div>
 
