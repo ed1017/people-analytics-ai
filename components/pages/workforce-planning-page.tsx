@@ -1,6 +1,10 @@
 "use client";
 
 import {
+  useEffect,
+  useState,
+} from "react";
+import {
   CartesianGrid,
   Line,
   LineChart,
@@ -17,6 +21,8 @@ import type {
   PositionLevel,
   PositionModelingResponse,
   PositionScenario,
+  ScenarioModelAssumptions,
+  ScenarioModelResponse,
 } from "@/lib/types";
 
 type WorkforcePlanningPageProps = {
@@ -74,6 +80,50 @@ function formatAssumptionName(value: string) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+const scenarioFields: Array<{
+  key: keyof ScenarioModelAssumptions;
+  label: string;
+  suffix: string;
+  step: number;
+  help: string;
+}> = [
+  {
+    key: "annual_growth_pct",
+    label: "Enterprise Growth",
+    suffix: "%",
+    step: 0.5,
+    help: "Annual enterprise headcount growth assumption.",
+  },
+  {
+    key: "salary_inflation_pct",
+    label: "Salary Inflation",
+    suffix: "%",
+    step: 0.5,
+    help: "Annual labor-cost inflation applied to modeled cost per FTE.",
+  },
+  {
+    key: "annual_attrition_pct",
+    label: "Annual Attrition",
+    suffix: "%",
+    step: 0.5,
+    help: "Annualized attrition assumption used for modeled exits.",
+  },
+  {
+    key: "fill_rate_pct",
+    label: "Opening Fill Rate",
+    suffix: "%",
+    step: 5,
+    help: "Share of modeled hiring demand that is successfully filled.",
+  },
+  {
+    key: "productivity_hiring_reduction_pct",
+    label: "AI / Productivity Hiring Reduction",
+    suffix: "%",
+    step: 5,
+    help: "Reduction in gross hiring demand attributed to productivity.",
+  },
+];
+
 export function WorkforcePlanningPage({
   planningScenarios,
   planningLoading,
@@ -95,6 +145,100 @@ export function WorkforcePlanningPage({
   positionLevels,
   onScenarioChange,
 }: WorkforcePlanningPageProps) {
+  const [scenarioDefaults, setScenarioDefaults] =
+    useState<ScenarioModelAssumptions | null>(null);
+  const [customAssumptions, setCustomAssumptions] =
+    useState<ScenarioModelAssumptions | null>(null);
+  const [customScenario, setCustomScenario] =
+    useState<ScenarioModelResponse | null>(null);
+  const [customScenarioLoading, setCustomScenarioLoading] =
+    useState(false);
+  const [customScenarioError, setCustomScenarioError] =
+    useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadScenarioDefaults() {
+      try {
+        const response = await fetch("/api/scenario-modeler", {
+          cache: "no-store",
+        });
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            payload?.error ??
+              "Failed to load scenario defaults."
+          );
+        }
+
+        if (!cancelled) {
+          setScenarioDefaults(payload.defaults);
+          setCustomAssumptions(payload.defaults);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setCustomScenarioError(
+            error instanceof Error
+              ? error.message
+              : "Failed to load scenario defaults."
+          );
+        }
+      }
+    }
+
+    loadScenarioDefaults();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function runCustomScenario() {
+    if (!customAssumptions) return;
+
+    try {
+      setCustomScenarioLoading(true);
+      setCustomScenarioError(null);
+
+      const response = await fetch("/api/scenario-modeler", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          assumptions: customAssumptions,
+        }),
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload?.error ??
+            "Failed to run custom scenario."
+        );
+      }
+
+      setCustomScenario(payload as ScenarioModelResponse);
+    } catch (error) {
+      setCustomScenarioError(
+        error instanceof Error
+          ? error.message
+          : "Failed to run custom scenario."
+      );
+    } finally {
+      setCustomScenarioLoading(false);
+    }
+  }
+
+  function resetCustomScenario() {
+    if (!scenarioDefaults) return;
+    setCustomAssumptions(scenarioDefaults);
+    setCustomScenario(null);
+    setCustomScenarioError(null);
+  }
+
   return (
 <section className="min-w-0 p-6">
           <div className="mb-6 flex items-end justify-between gap-4">
@@ -187,6 +331,172 @@ export function WorkforcePlanningPage({
                   </button>
                 );
               }
+            )}
+          </div>
+
+          <div className="mb-6 rounded-lg border p-4">
+            <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="font-semibold">
+                  Custom Scenario
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Change explicit planning assumptions and run the deterministic model.
+                </p>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={resetCustomScenario}
+                  disabled={!scenarioDefaults || customScenarioLoading}
+                  className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Reset
+                </button>
+                <button
+                  type="button"
+                  onClick={runCustomScenario}
+                  disabled={!customAssumptions || customScenarioLoading}
+                  className="rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {customScenarioLoading
+                    ? "Running…"
+                    : "Run Scenario"}
+                </button>
+              </div>
+            </div>
+
+            {customAssumptions ? (
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+                {scenarioFields.map((field) => (
+                  <label
+                    key={field.key}
+                    className="rounded-md border p-3"
+                  >
+                    <span
+                      className="cursor-help border-b border-dotted text-xs font-medium text-muted-foreground"
+                      title={field.help}
+                    >
+                      {field.label}
+                    </span>
+                    <div className="mt-2 flex items-center gap-2">
+                      <input
+                        type="number"
+                        step={field.step}
+                        value={customAssumptions[field.key]}
+                        onChange={(event) =>
+                          setCustomAssumptions((current) =>
+                            current
+                              ? {
+                                  ...current,
+                                  [field.key]: Number(
+                                    event.target.value
+                                  ),
+                                }
+                              : current
+                          )
+                        }
+                        className="min-w-0 flex-1 rounded-md border bg-background px-2 py-2 text-right text-sm tabular-nums"
+                      />
+                      <span className="text-sm text-muted-foreground">
+                        {field.suffix}
+                      </span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Loading Baseline assumptions…
+              </p>
+            )}
+
+            {customScenarioError && (
+              <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                {customScenarioError}
+              </div>
+            )}
+
+            {customScenario && (
+              <div className="mt-5 border-t pt-5">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p className="font-medium">
+                      Modeled Outcome
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Deterministic result anchored to the stored Baseline curve
+                    </p>
+                  </div>
+                  <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
+                    Dec 2027
+                  </span>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                  <div className="rounded-md border p-3">
+                    <p className="text-xs text-muted-foreground">
+                      Ending Headcount
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold">
+                      {customScenario.summary.modeled_end_headcount.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {customScenario.summary.headcount_delta_vs_baseline >= 0
+                        ? "+"
+                        : ""}
+                      {customScenario.summary.headcount_delta_vs_baseline.toLocaleString()} vs Baseline
+                    </p>
+                  </div>
+
+                  <div className="rounded-md border p-3">
+                    <p className="text-xs text-muted-foreground">
+                      Ending FTE
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold">
+                      {customScenario.summary.modeled_end_fte.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Modeled capacity
+                    </p>
+                  </div>
+
+                  <div className="rounded-md border p-3">
+                    <p className="text-xs text-muted-foreground">
+                      Ending Labor Cost
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold">
+                      {formatCurrencyCompact(
+                        customScenario.summary.modeled_end_labor_cost_usd
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {customScenario.summary.labor_cost_delta_vs_baseline_usd >= 0
+                        ? "+"
+                        : ""}
+                      {formatCurrencyCompact(
+                        customScenario.summary.labor_cost_delta_vs_baseline_usd
+                      )} vs Baseline
+                    </p>
+                  </div>
+
+                  <div className="rounded-md border p-3">
+                    <p className="text-xs text-muted-foreground">
+                      Target Gap
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold">
+                      {customScenario.summary.headcount_gap_vs_target >= 0
+                        ? "+"
+                        : ""}
+                      {customScenario.summary.headcount_gap_vs_target.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Modeled HC minus target HC
+                    </p>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
