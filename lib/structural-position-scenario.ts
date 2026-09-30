@@ -11,6 +11,13 @@ type NumericValue =
   | null
   | undefined;
 
+type SkillRequirementRow = {
+  job_profile_code: string;
+  skill_code: string;
+  skill_name: string;
+  skill_category: string;
+};
+
 type InventoryRow = {
   org_code: string;
   org_name: string;
@@ -65,18 +72,34 @@ function uniqueBy<T>(
   return Array.from(map.values());
 }
 async function loadInventory() {
-  const [inventoryResult, overviewResult] =
-    await Promise.all([
-      supabaseServer
-        .from(
-          "position_action_structural_inventory"
-        )
-        .select("*"),
-      supabaseServer
-        .from("dashboard_overview_current")
-        .select("snapshot_date")
-        .single(),
-    ]);
+  const [
+    inventoryResult,
+    overviewResult,
+    skillRequirementResult,
+    skillSupplyResult,
+  ] = await Promise.all([
+    supabaseServer
+      .from(
+        "position_action_structural_inventory"
+      )
+      .select("*"),
+    supabaseServer
+      .from("dashboard_overview_current")
+      .select("snapshot_date")
+      .single(),
+    supabaseServer
+      .from(
+        "position_skill_requirement_map"
+      )
+      .select(
+        "job_profile_code, skill_code, skill_name, skill_category"
+      ),
+    supabaseServer
+      .from("skills_current_supply")
+      .select(
+        "skill_code, employees_with_skill"
+      ),
+  ]);
 
   if (inventoryResult.error) {
     throw new Error(
@@ -91,6 +114,48 @@ async function loadInventory() {
         overviewResult.error.message
     );
   }
+
+  if (skillRequirementResult.error) {
+    throw new Error(
+      "Position skill requirements: " +
+        skillRequirementResult.error.message
+    );
+  }
+
+  if (skillSupplyResult.error) {
+    throw new Error(
+      "Current skill supply: " +
+        skillSupplyResult.error.message
+    );
+  }
+
+  const skillRequirements:
+    SkillRequirementRow[] =
+    (skillRequirementResult.data ?? []).map(
+      (row) => ({
+        job_profile_code:
+          row.job_profile_code,
+        skill_code: row.skill_code,
+        skill_name: row.skill_name,
+        skill_category:
+          row.skill_category,
+      })
+    );
+
+  const skillSupply = new Map<
+    string,
+    number
+  >(
+    (skillSupplyResult.data ?? []).map(
+      (row) => [
+        row.skill_code,
+        toNumber(
+          row.employees_with_skill
+        ),
+      ]
+    )
+  );
+
   const rows: InventoryRow[] =
     (inventoryResult.data ?? []).map(
       (row) => ({
@@ -138,6 +203,8 @@ async function loadInventory() {
       overviewResult.data?.snapshot_date ??
       "2026-09-30",
     rows,
+    skillRequirements,
+    skillSupply,
   };
 }
 function matchesAction(
@@ -272,6 +339,231 @@ function recruitingTotals(
       uncovered: 0,
     }
   );
+}
+
+function buildSkillDemand(
+  initialRows: InventoryRow[],
+  modeledRows: InventoryRow[],
+  requirements: SkillRequirementRow[],
+  supply: Map<string, number>
+) {
+  type SkillImpact =
+    StructuralPositionScenarioResponse[
+      "skill_demand"
+    ]["top_changed_skills"][number];
+
+  const byProfile = new Map<
+    string,
+    SkillRequirementRow[]
+  >();
+
+  for (const requirement of requirements) {
+    const rows =
+      byProfile.get(
+        requirement.job_profile_code
+      ) ?? [];
+    rows.push(requirement);
+    byProfile.set(
+      requirement.job_profile_code,
+      rows
+    );
+  }
+
+  const impactMap = new Map<
+    string,
+    {
+      skill_code: string;
+      skill_name: string;
+      skill_category: string;
+      currentAuthorized: number;
+      modeledAuthorized: number;
+      currentRecruiting: number;
+      modeledRecruiting: number;
+    }
+  >();
+
+  for (
+    let index = 0;
+    index < modeledRows.length;
+    index += 1
+  ) {
+    const initial = initialRows[index];
+    const modeled = modeledRows[index];
+    const profileRequirements =
+      byProfile.get(
+        modeled.job_profile_code
+      ) ?? [];
+
+    const currentAuthorized =
+      initial.filled +
+      initial.vacant +
+      initial.frozen;
+    const modeledAuthorized =
+      modeled.filled +
+      modeled.vacant +
+      modeled.frozen;
+
+    const currentRecruiting =
+      initial.open_req +
+      initial.uncovered;
+    const modeledRecruiting =
+      modeled.open_req +
+      modeled.uncovered;
+
+    for (
+      const requirement
+      of profileRequirements
+    ) {
+      const existing =
+        impactMap.get(
+          requirement.skill_code
+        ) ?? {
+          skill_code:
+            requirement.skill_code,
+          skill_name:
+            requirement.skill_name,
+          skill_category:
+            requirement.skill_category,
+          currentAuthorized: 0,
+          modeledAuthorized: 0,
+          currentRecruiting: 0,
+          modeledRecruiting: 0,
+        };
+
+      existing.currentAuthorized +=
+        currentAuthorized;
+      existing.modeledAuthorized +=
+        modeledAuthorized;
+      existing.currentRecruiting +=
+        currentRecruiting;
+      existing.modeledRecruiting +=
+        modeledRecruiting;
+
+      impactMap.set(
+        requirement.skill_code,
+        existing
+      );
+    }
+  }
+
+  const impacts: SkillImpact[] =
+    Array.from(impactMap.values()).map(
+      (row) => {
+        const currentSupply =
+          supply.get(row.skill_code) ?? 0;
+
+        return {
+          skill_code: row.skill_code,
+          skill_name: row.skill_name,
+          skill_category:
+            row.skill_category,
+          current_authorized_position_demand:
+            round1(
+              row.currentAuthorized
+            ),
+          modeled_authorized_position_demand:
+            round1(
+              row.modeledAuthorized
+            ),
+          authorized_demand_delta:
+            round1(
+              row.modeledAuthorized -
+                row.currentAuthorized
+            ),
+          current_employee_supply:
+            round1(currentSupply),
+          current_position_gap:
+            round1(
+              row.currentAuthorized -
+                currentSupply
+            ),
+          modeled_position_gap:
+            round1(
+              row.modeledAuthorized -
+                currentSupply
+            ),
+          current_active_recruiting_demand:
+            round1(
+              row.currentRecruiting
+            ),
+          modeled_active_recruiting_demand:
+            round1(
+              row.modeledRecruiting
+            ),
+          active_recruiting_demand_delta:
+            round1(
+              row.modeledRecruiting -
+                row.currentRecruiting
+            ),
+        };
+      }
+    );
+
+  const topChanged = impacts
+    .filter(
+      (row) =>
+        Math.abs(
+          row.authorized_demand_delta
+        ) >= 0.1
+    )
+    .sort(
+      (a, b) =>
+        Math.abs(
+          b.authorized_demand_delta
+        ) -
+          Math.abs(
+            a.authorized_demand_delta
+          ) ||
+        b.modeled_position_gap -
+          a.modeled_position_gap
+    )
+    .slice(0, 15);
+
+  const largestGaps = impacts
+    .filter(
+      (row) =>
+        row.modeled_position_gap > 0
+    )
+    .sort(
+      (a, b) =>
+        b.modeled_position_gap -
+          a.modeled_position_gap ||
+        b.authorized_demand_delta -
+          a.authorized_demand_delta
+    )
+    .slice(0, 15);
+
+  const topRecruiting = impacts
+    .filter(
+      (row) =>
+        row.modeled_active_recruiting_demand >
+        0
+    )
+    .sort(
+      (a, b) =>
+        b.modeled_active_recruiting_demand -
+          a.modeled_active_recruiting_demand ||
+        b.active_recruiting_demand_delta -
+          a.active_recruiting_demand_delta
+    )
+    .slice(0, 15);
+
+  return {
+    skills_with_increased_authorized_demand:
+      impacts.filter(
+        (row) =>
+          row.authorized_demand_delta > 0.05
+      ).length,
+    skills_with_reduced_authorized_demand:
+      impacts.filter(
+        (row) =>
+          row.authorized_demand_delta < -0.05
+      ).length,
+    top_changed_skills: topChanged,
+    largest_modeled_gaps: largestGaps,
+    top_recruiting_skill_demand:
+      topRecruiting,
+  };
 }
 
 function consumeVacancyCategories(
@@ -831,6 +1123,13 @@ export async function runStructuralPositionScenario(
     inventoryTotals(rows);
   const endingRecruiting =
     recruitingTotals(rows);
+  const skillDemand =
+    buildSkillDemand(
+      initialRows,
+      rows,
+      inventory.skillRequirements,
+      inventory.skillSupply
+    );
 
   const recruitingByBusinessUnitMap =
     new Map<
@@ -988,6 +1287,7 @@ export async function runStructuralPositionScenario(
           staffedLaborCostDelta
         ),
     },
+    skill_demand: skillDemand,
     recruiting_demand: {
       active_open_requisitions:
         round1(endingRecruiting.open),
@@ -1038,7 +1338,11 @@ export async function runStructuralPositionScenario(
       "Current vacancy coverage is grounded in the linked requisition record for each vacant position: open requisitions are active recruiting demand and on-hold requisitions are tracked separately.",
       "New positions enter without a requisition. If they remain open, they create incremental requisition demand; if they are modeled as filled, the model counts the requisition that would need to be created first.",
       "Freezing a vacancy with an open requisition creates a modeled requisition-to-hold action. Closing a vacancy cancels its linked open/on-hold requisition. Filling a vacancy closes its requisition as filled; on-hold or uncovered vacancies require reactivation or creation first.",
-      "The model is read-only and does not change source position, requisition, budget, or employee records.",
+      "Position-based skill demand counts how many authorized positions have a job profile that requires each skill. It includes vacant and frozen authorized positions, unlike the incumbent-only current Skills demand view.",
+      "Active recruiting skill demand counts only active open requisition vacancies plus uncovered active vacancies; on-hold and frozen vacancies are excluded from active recruiting demand.",
+      "Current employee skill supply is held constant during the scenario. Modeled skill gaps therefore show the gap implied by the new position structure before any reskilling, hiring, or internal mobility response.",
+      "Job-skill requirement weights are not treated as percentages because profile-level weight totals are not normalized consistently; skill-demand counts use the existence of a requirement, not its weight.",
+      "The model is read-only and does not change source position, requisition, skill, budget, or employee records.",
     ],
   };
 }

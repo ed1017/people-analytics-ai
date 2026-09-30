@@ -908,6 +908,9 @@ Shared rules:
 - The simple unscoped position-action model does not calculate labor-cost effects. The structural position model does return an authorized-position budget delta and an annualized staffed labor-cost delta using Baseline Dec-2027 planned cost per position. Describe those as modeled budget/cost deltas, not realized cash savings.
 - Structural position scenarios also return recruiting-demand implications grounded in the requisition linked to each current vacancy. Treat reqs-to-hold/cancel/create/reactivate/close-as-filled as modeled ATS actions only; the scenario is read-only and does not change requisitions.
 - New structural positions have no requisition by default. If they remain active vacancies they create incremental requisition demand; if they are modeled as filled, the tool will count the requisition that would need to be created first.
+- Structural position scenarios also return position-based skill demand. This demand counts authorized positions whose job profiles require each skill and includes vacant/frozen authorized positions. Do not confuse it with the current Skills page's incumbent-only role demand.
+- Skill supply is held constant in a structural scenario. Treat modeled skill gaps as pre-response capacity gaps before any hiring, reskilling, or internal mobility action; do not claim those actions occurred unless separately modeled.
+- Do not convert job-skill weights into percentages or shares; those weights are not normalized consistently across job profiles.
 - For business-unit scenario ending results, use the planning_horizon_end returned by run_business_unit_scenario. Do not infer the ending month from the current date.
 - If the available page context and approved tools cannot answer the question, say what data is missing.
 - You may calculate straightforward ratios or comparisons from supplied metrics, but not substitute those calculations for the deterministic scenario engine when a scenario lever changes.
@@ -945,6 +948,11 @@ CURRENT USER QUESTION
 ${message}
 `.trim();
 
+    const maxOutputTokens =
+      page === "workforce-planning"
+        ? 1100
+        : 700;
+
     let response: any =
       await client.responses.create({
         model: "gpt-5.6-luna",
@@ -952,7 +960,8 @@ ${message}
         input: aiInput,
         tools: peopleAnalyticsTools,
         tool_choice: "auto",
-        max_output_tokens: 700,
+        max_output_tokens:
+          maxOutputTokens,
       });
 
     for (
@@ -1022,7 +1031,8 @@ ${message}
           input: toolOutputs,
           tools: peopleAnalyticsTools,
           tool_choice: "auto",
-          max_output_tokens: 700,
+          max_output_tokens:
+          maxOutputTokens,
         });
     }
 
