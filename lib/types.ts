@@ -429,6 +429,37 @@ export type InternalTalentReadinessResponse = {
   methodology: string[];
 };
 
+export type RoleBuyFeasibilityResponse = {
+  as_of: string;
+  job_profile_code: string;
+  job_profile_name: string;
+  current_pipeline: {
+    open_requisitions: number;
+    applicants: number;
+    advanced_candidates: number;
+    interviews: number;
+    offers: number;
+  };
+  historical_external: {
+    filled_requisitions: number;
+    recent_12m_filled_requisitions: number;
+    recent_12m_avg_monthly_fills: number;
+    recent_12m_peak_monthly_fills: number;
+    median_time_to_fill_days: number | null;
+    offer_acceptance_rate_pct: number | null;
+    applicants_per_filled_requisition: number | null;
+    evidence_start_date: string | null;
+    recent_12m_window_start: string;
+  };
+  requested_buy: number;
+  buy_scale: {
+    pct_of_recent_12m_external_fills: number | null;
+    multiple_of_recent_avg_monthly_fills: number | null;
+  };
+  warnings: string[];
+  methodology: string[];
+};
+
 export type RoleWorkforceResponsePlanResponse = {
   job_profile_code: string;
   job_profile_name: string;
@@ -439,6 +470,7 @@ export type RoleWorkforceResponsePlanResponse = {
   overplanned_capacity: number;
   coverage_pct_if_executed: number;
   internal_talent_readiness: InternalTalentReadinessResponse;
+  external_recruiting_feasibility: RoleBuyFeasibilityResponse;
   skill_bundle: Array<{
     skill_code: string;
     skill_name: string;

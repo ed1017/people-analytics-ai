@@ -4126,6 +4126,81 @@ export function WorkforcePlanningPage({
                                 </p>
                               </div>
 
+                              <div className="mt-4 rounded-md border p-4">
+                                <div className="mb-3">
+                                  <p className="font-medium">
+                                    External Recruiting Feasibility
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Whole-role ATS evidence for Buy. Current pipeline is context only; historical recruiting performance is not a forecast.
+                                  </p>
+                                </div>
+
+                                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                  <div className="rounded-md border p-3">
+                                    <p className="text-xs text-muted-foreground">
+                                      Open Requisitions
+                                    </p>
+                                    <p className="mt-1 text-xl font-semibold">
+                                      {roleResponsePlanResult.external_recruiting_feasibility.current_pipeline.open_requisitions.toLocaleString()}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground">
+                                      {roleResponsePlanResult.external_recruiting_feasibility.current_pipeline.applicants.toLocaleString()} applicants · {roleResponsePlanResult.external_recruiting_feasibility.current_pipeline.advanced_candidates.toLocaleString()} advanced
+                                    </p>
+                                  </div>
+                                  <div className="rounded-md border p-3">
+                                    <p className="text-xs text-muted-foreground">
+                                      External Fills · 12M
+                                    </p>
+                                    <p className="mt-1 text-xl font-semibold">
+                                      {roleResponsePlanResult.external_recruiting_feasibility.historical_external.recent_12m_filled_requisitions.toLocaleString()}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground">
+                                      Peak {roleResponsePlanResult.external_recruiting_feasibility.historical_external.recent_12m_peak_monthly_fills.toLocaleString()} in one month
+                                    </p>
+                                  </div>
+                                  <div className="rounded-md border p-3">
+                                    <p
+                                      className="cursor-help border-b border-dotted text-xs text-muted-foreground"
+                                      title="Historical median across completed external requisitions. This is not a forecast."
+                                    >
+                                      Historical Median TTF
+                                    </p>
+                                    <p className="mt-1 text-xl font-semibold">
+                                      {roleResponsePlanResult.external_recruiting_feasibility.historical_external.median_time_to_fill_days === null
+                                        ? "—"
+                                        : roleResponsePlanResult.external_recruiting_feasibility.historical_external.median_time_to_fill_days.toFixed(0) + "d"}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground">
+                                      {roleResponsePlanResult.external_recruiting_feasibility.historical_external.offer_acceptance_rate_pct === null
+                                        ? "Offer acceptance unavailable"
+                                        : roleResponsePlanResult.external_recruiting_feasibility.historical_external.offer_acceptance_rate_pct.toFixed(1) + "% offer acceptance"}
+                                    </p>
+                                  </div>
+                                  <div className="rounded-md border p-3">
+                                    <p className="text-xs text-muted-foreground">
+                                      Buy Scale vs 12M
+                                    </p>
+                                    <p className="mt-1 text-xl font-semibold">
+                                      {roleResponsePlanResult.external_recruiting_feasibility.requested_buy <= 0
+                                        ? "—"
+                                        : roleResponsePlanResult.external_recruiting_feasibility.buy_scale.pct_of_recent_12m_external_fills === null
+                                          ? "No history"
+                                          : roleResponsePlanResult.external_recruiting_feasibility.buy_scale.pct_of_recent_12m_external_fills.toFixed(1) + "%"}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground">
+                                      {roleResponsePlanResult.external_recruiting_feasibility.requested_buy <= 0
+                                        ? "No Buy target entered"
+                                        : roleResponsePlanResult.external_recruiting_feasibility.requested_buy.toLocaleString() + " planned external hire(s)"}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <p className="mt-3 text-[11px] text-muted-foreground">
+                                  Existing open requisitions are not automatically netted against scenario-created Buy demand. Recruiting history describes prior execution at this role; it does not establish future labor-market supply.
+                                </p>
+                              </div>
+
                               <div className="mt-4 overflow-x-auto rounded-md border p-3">
                                 <table className="w-full min-w-[820px] text-sm">
                                   <thead>

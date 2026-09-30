@@ -3,6 +3,9 @@ import {
   getInternalTalentReadiness,
 } from "./internal-talent-readiness";
 import {
+  getRoleBuyFeasibility,
+} from "./role-buy-feasibility";
+import {
   runStructuralPositionScenario,
 } from "./structural-position-scenario";
 import type {
@@ -103,6 +106,7 @@ export async function runRoleWorkforceResponsePlan(
   const [
     bundleResult,
     internalTalentReadiness,
+    externalRecruitingFeasibility,
   ] = await Promise.all([
     supabaseServer
       .from("position_skill_requirement_map")
@@ -118,6 +122,10 @@ export async function runRoleWorkforceResponsePlan(
       }),
     getInternalTalentReadiness(
       profile.job_profile_code
+    ),
+    getRoleBuyFeasibility(
+      profile.job_profile_code,
+      allocation.buy
     ),
   ]);
 
@@ -298,12 +306,9 @@ export async function runRoleWorkforceResponsePlan(
     );
   }
 
-  if (
-    allocation.buy > 0 &&
-    skillsWithBuy < skillBundle.length
-  ) {
+  if (allocation.buy > 0) {
     warnings.push(
-      "Buy is planned for the role, but not every required skill has historical filled-requisition evidence."
+      ...externalRecruitingFeasibility.warnings
     );
   }
 
@@ -331,6 +336,8 @@ export async function runRoleWorkforceResponsePlan(
       coveragePct,
     internal_talent_readiness:
       internalTalentReadiness,
+    external_recruiting_feasibility:
+      externalRecruitingFeasibility,
     skill_bundle: skillBundle,
     evidence_summary: {
       required_skill_count:
@@ -349,6 +356,7 @@ export async function runRoleWorkforceResponsePlan(
       "The required skill bundle comes from governed job-profile skill requirements, including required proficiency and importance.",
       "Move evidence uses aggregate whole-role readiness among active employees who prefer the target profile and are not already in it; required skills must meet the governed proficiency thresholds.",
       "Build pathway coverage checks whether each near-ready candidate's current required-skill gaps all have an active mapped learning course. Course availability does not guarantee proficiency gain or eventual role readiness.",
+      "Buy evidence uses whole-role ATS history: current open requisition pipeline plus historical external fills, time-to-fill, offer acceptance, and requested Buy scale versus trailing-12-month external fill volume. These are descriptive signals, not forecasts.",
       "Skill-level Build and Buy evidence is shown across the required bundle, but skill-level counts are not added together as unique people.",
       "Role coverage is conditional on executed Build/Move/Buy capacity meeting the full job-profile requirements; readiness remains a planning signal rather than an employment decision.",
       "Borrow is unavailable until governed role-level contingent-capacity evidence exists. Automate is unavailable until governed role- or task-level automation evidence exists.",
