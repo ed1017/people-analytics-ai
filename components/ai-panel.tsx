@@ -6,6 +6,8 @@ import type {
 import {
   LoaderCircle,
   Maximize2,
+  PanelLeftClose,
+  PanelLeftOpen,
   PanelRightClose,
   PanelRightOpen,
   Send,
@@ -19,6 +21,7 @@ import type { ChatMessage } from "@/lib/types";
 type AiPanelProps = {
   aiCollapsed: boolean;
   aiExpanded: boolean;
+  aiSide: "left" | "right";
   previewPage: boolean;
   suggestedPrompts: string[];
   chatMessages: ChatMessage[];
@@ -29,6 +32,9 @@ type AiPanelProps = {
   onResizeStart: MouseEventHandler<HTMLDivElement>;
   onToggleExpanded: () => void;
   onToggleCollapsed: () => void;
+  onAiSideChange: (
+    side: "left" | "right"
+  ) => void;
   onSuggestedPrompt: (
     prompt: string
   ) => void | Promise<void>;
@@ -39,6 +45,7 @@ type AiPanelProps = {
 export function AiPanel({
   aiCollapsed,
   aiExpanded,
+  aiSide,
   previewPage,
   suggestedPrompts,
   chatMessages,
@@ -49,6 +56,7 @@ export function AiPanel({
   onResizeStart,
   onToggleExpanded,
   onToggleCollapsed,
+  onAiSideChange,
   onSuggestedPrompt,
   onChatInputChange,
   onSend,
@@ -77,7 +85,7 @@ export function AiPanel({
           {!aiCollapsed && (
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
-              <h2 className="text-lg font-semibold">
+              <h2 className="text-xl font-semibold">
                 Ask People Analytics AI
               </h2>
             </div>
@@ -109,7 +117,13 @@ export function AiPanel({
                   : "Collapse AI panel"
               }
             >
-              {aiCollapsed ? (
+              {aiSide === "left" ? (
+                aiCollapsed ? (
+                  <PanelLeftOpen className="h-5 w-5" />
+                ) : (
+                  <PanelLeftClose className="h-5 w-5" />
+                )
+              ) : aiCollapsed ? (
                 <PanelRightOpen className="h-5 w-5" />
               ) : (
                 <PanelRightClose className="h-5 w-5" />
@@ -124,7 +138,38 @@ export function AiPanel({
           </div>
         ) : (
           <div className="flex min-h-0 flex-1 flex-col">
-            <p className="mb-3 text-[15px] text-muted-foreground">
+            <div className="mb-3 hidden grid-cols-2 gap-1 rounded-lg border p-1 text-sm md:grid">
+              <button
+                type="button"
+                aria-pressed={aiSide === "left"}
+                onClick={() =>
+                  onAiSideChange("left")
+                }
+                className={
+                  aiSide === "left"
+                    ? "rounded-md bg-muted px-3 py-2 font-medium"
+                    : "rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+                }
+              >
+                AI on left
+              </button>
+              <button
+                type="button"
+                aria-pressed={aiSide === "right"}
+                onClick={() =>
+                  onAiSideChange("right")
+                }
+                className={
+                  aiSide === "right"
+                    ? "rounded-md bg-muted px-3 py-2 font-medium"
+                    : "rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+                }
+              >
+                AI on right
+              </button>
+            </div>
+
+            <p className="mb-3 text-base text-muted-foreground">
               Ask questions about the workforce data currently shown.
             </p>
 
@@ -150,7 +195,7 @@ export function AiPanel({
                         chatLoading ||
                         !dashboardReady
                       }
-                      className="rounded-lg border p-2.5 text-left text-sm leading-snug transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                      className="rounded-lg border p-3 text-left text-[15px] leading-snug transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {prompt}
                     </button>
@@ -161,7 +206,7 @@ export function AiPanel({
 
             <div className="mb-3 min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain rounded-lg border p-3 pr-2">
               {chatMessages.length === 0 ? (
-                <div className="flex h-full min-h-28 items-center justify-center text-center text-[15px] text-muted-foreground">
+                <div className="flex h-full min-h-28 items-center justify-center text-center text-base text-muted-foreground">
                   AI conversation will appear here.
                 </div>
               ) : (
@@ -171,8 +216,8 @@ export function AiPanel({
                       key={`${message.role}-${index}`}
                       className={
                         message.role === "user"
-                          ? "ml-4 rounded-lg bg-muted p-3.5 text-[15px] leading-relaxed md:ml-6 md:text-base"
-                          : "mr-4 rounded-lg border p-3.5 text-[15px] leading-relaxed md:mr-6 md:text-base"
+                          ? "ml-3 rounded-lg bg-muted p-4 text-[17px] leading-relaxed md:ml-5"
+                          : "mr-3 rounded-lg border p-4 text-[17px] leading-relaxed md:mr-5"
                       }
                     >
                       <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
@@ -199,7 +244,7 @@ export function AiPanel({
               )}
 
               {chatLoading && (
-                <div className="mr-4 flex items-center gap-2 rounded-lg border p-3 text-[15px] text-muted-foreground md:mr-6">
+                <div className="mr-3 flex items-center gap-2 rounded-lg border p-3 text-[17px] text-muted-foreground md:mr-5">
                   <LoaderCircle className="h-4 w-4 animate-spin" />
                   Analyzing current workforce context…
                 </div>
@@ -236,12 +281,12 @@ export function AiPanel({
                 }
                 disabled={previewPage}
                 rows={3}
-                className="min-h-20 min-w-0 flex-1 resize-none rounded-lg border bg-background p-3 text-base leading-relaxed outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                className="min-h-24 min-w-0 flex-1 resize-none rounded-lg border bg-background p-3.5 text-[17px] leading-relaxed outline-none disabled:cursor-not-allowed disabled:opacity-60"
               />
 
               <Button
                 size="icon"
-                className="h-20 w-11 shrink-0"
+                className="h-24 w-12 shrink-0"
                 onClick={() => void onSend()}
                 disabled={
                   previewPage ||

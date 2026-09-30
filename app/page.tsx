@@ -50,10 +50,17 @@ const EMPTY_FILTER_OPTIONS: DashboardFilterOptions = {
   levels: [],
 };
 
+type AiSide = "left" | "right";
+
+const AI_SIDE_STORAGE_KEY =
+  "people-analytics.ai-side.v1";
+
 export default function Home() {
   const [navCollapsed, setNavCollapsed] = useState(false);
   const [aiCollapsed, setAiCollapsed] = useState(false);
-  const [aiWidth, setAiWidth] = useState(400);
+  const [aiWidth, setAiWidth] = useState(460);
+  const [aiSide, setAiSide] =
+    useState<AiSide>("left");
 
   const [overviewData, setOverviewData] =
     useState<OverviewData | null>(null);
@@ -190,6 +197,24 @@ export default function Home() {
   const [chatLoading, setChatLoading] = useState(false);
   const [chatError, setChatError] =
     useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const savedSide =
+        window.localStorage.getItem(
+          AI_SIDE_STORAGE_KEY
+        );
+
+      if (
+        savedSide === "left" ||
+        savedSide === "right"
+      ) {
+        setAiSide(savedSide);
+      }
+    } catch {
+      // Local preference persistence is optional.
+    }
+  }, []);
 
   useEffect(() => {
     const requestId = ++dashboardRequestIdRef.current;
@@ -1324,7 +1349,7 @@ export default function Home() {
   // Expand AI to approximately 44% of the browser width.
   const toggleAiExpanded = () => {
     if (aiExpanded) {
-      setAiWidth(400);
+      setAiWidth(460);
     } else {
       const expandedWidth = Math.min(
         window.innerWidth * 0.5,
@@ -1355,7 +1380,9 @@ export default function Home() {
       moveEvent: MouseEvent
     ) => {
       const movement =
-        startX - moveEvent.clientX;
+        aiSide === "left"
+          ? moveEvent.clientX - startX
+          : startX - moveEvent.clientX;
       const newWidth =
         startWidth + movement;
 
@@ -1397,6 +1424,21 @@ export default function Home() {
     );
   };
 
+  const updateAiSide = (
+    nextSide: AiSide
+  ) => {
+    setAiSide(nextSide);
+
+    try {
+      window.localStorage.setItem(
+        AI_SIDE_STORAGE_KEY,
+        nextSide
+      );
+    } catch {
+      // Local preference persistence is optional.
+    }
+  };
+
   return (
     <main className="min-h-screen bg-background text-foreground">
       {/* Top header */}
@@ -1408,7 +1450,7 @@ export default function Home() {
 
       {/* Main application */}
       <div
-        className="app-shell"
+        className={`app-shell app-ai-${aiSide}`}
         style={
           {
             "--nav-width": `${
@@ -1542,6 +1584,7 @@ export default function Home() {
         <AiPanel
           aiCollapsed={aiCollapsed}
           aiExpanded={aiExpanded}
+          aiSide={aiSide}
           previewPage={previewPage}
           suggestedPrompts={suggestedPrompts}
           chatMessages={chatMessages}
@@ -1554,6 +1597,7 @@ export default function Home() {
           onToggleCollapsed={() =>
             setAiCollapsed(!aiCollapsed)
           }
+          onAiSideChange={updateAiSide}
           onSuggestedPrompt={(prompt) =>
             sendChatMessage(prompt)
           }
