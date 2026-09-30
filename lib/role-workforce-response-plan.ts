@@ -11,6 +11,7 @@ import {
 import type {
   RoleWorkforceResponsePlanResponse,
   StructuralPositionAction,
+  StructuralPositionScenarioResponse,
   WorkforceResponsePlanAllocation,
 } from "./types";
 
@@ -55,12 +56,14 @@ function cleanAllocation(
 }
 
 export async function runRoleWorkforceResponsePlan(
-  request: RoleWorkforceResponsePlanRequest
+  request: RoleWorkforceResponsePlanRequest,
+  scenarioOverride?: StructuralPositionScenarioResponse
 ): Promise<RoleWorkforceResponsePlanResponse> {
   const scenario =
-    await runStructuralPositionScenario(
+    scenarioOverride ??
+    (await runStructuralPositionScenario(
       request.actions
-    );
+    ));
 
   const profileKey = normalize(
     request.job_profile

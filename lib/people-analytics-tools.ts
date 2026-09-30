@@ -6,6 +6,10 @@ import {
   getRoleBuyFeasibility,
 } from "./role-buy-feasibility";
 import {
+  runWorkforceResponsePortfolio,
+  type WorkforceResponsePortfolioRequest,
+} from "./workforce-response-portfolio";
+import {
   runStructuralPositionScenario,
 } from "./structural-position-scenario";
 import {
@@ -605,6 +609,87 @@ export const peopleAnalyticsTools: any[] = [
         "job_profile",
         "allocation",
       ],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
+    name: "run_workforce_response_portfolio",
+    description:
+      "Run a user-directed multi-role workforce response portfolio for one structural scenario. Each role plan supplies explicit Build, Move, Buy, Borrow, and Automate allocations. The tool aggregates whole-role coverage, remaining gaps, internal readiness, development-pathway coverage, and recruiting evidence without double-counting internal talent across target roles. It is not an optimizer and must not invent allocations.",
+    parameters: {
+      type: "object",
+      properties: {
+        actions: {
+          type: "array",
+          minItems: 1,
+          maxItems: 20,
+          items: {
+            type: "object",
+            properties: {
+              action_type: {
+                type: "string",
+                enum: [
+                  "add_positions",
+                  "close_vacant_positions",
+                  "freeze_vacancies",
+                  "fill_vacancies",
+                ],
+              },
+              business_unit: { type: ["string", "null"] },
+              level: { type: ["string", "null"] },
+              job_profile: { type: ["string", "null"] },
+              amount: { type: ["number", "null"] },
+              fill_pct: { type: ["number", "null"] },
+            },
+            required: [
+              "action_type",
+              "business_unit",
+              "level",
+              "job_profile",
+              "amount",
+              "fill_pct",
+            ],
+            additionalProperties: false,
+          },
+        },
+        plans: {
+          type: "array",
+          minItems: 1,
+          maxItems: 20,
+          items: {
+            type: "object",
+            properties: {
+              job_profile: { type: "string" },
+              allocation: {
+                type: "object",
+                properties: {
+                  build: { type: "number" },
+                  move: { type: "number" },
+                  buy: { type: "number" },
+                  borrow: { type: "number" },
+                  automate: { type: "number" },
+                },
+                required: [
+                  "build",
+                  "move",
+                  "buy",
+                  "borrow",
+                  "automate",
+                ],
+                additionalProperties: false,
+              },
+            },
+            required: [
+              "job_profile",
+              "allocation",
+            ],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: ["actions", "plans"],
       additionalProperties: false,
     },
     strict: true,
@@ -1501,6 +1586,10 @@ export async function runPeopleAnalyticsTool(
     case "run_role_workforce_response_plan":
       return runRoleWorkforceResponsePlan(
         args as RoleWorkforceResponsePlanRequest
+      );
+    case "run_workforce_response_portfolio":
+      return runWorkforceResponsePortfolio(
+        args as WorkforceResponsePortfolioRequest
       );
     case "get_talent_acquisition":
       return getTalentAcquisition();
