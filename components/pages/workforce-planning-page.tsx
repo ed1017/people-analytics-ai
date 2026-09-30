@@ -82,6 +82,17 @@ function formatModeledCount(value: number) {
   });
 }
 
+function formatSignedModeledCount(value: number) {
+  const formatted = formatModeledCount(
+    Math.abs(value)
+  );
+  return value > 0
+    ? "+" + formatted
+    : value < 0
+      ? "-" + formatted
+      : formatted;
+}
+
 function formatCurrencyCompact(value: number) {
   const sign = value < 0 ? "-" : "";
   const absoluteValue = Math.abs(value);
@@ -1059,6 +1070,31 @@ export function WorkforcePlanningPage({
 
     if (positiveRoles.length === 0) return;
 
+    const plans = positiveRoles
+      .map((role) => ({
+        job_profile:
+          role.job_profile_code,
+        allocation:
+          responsePortfolioAllocations[
+            role.job_profile_code
+          ] ??
+          createResponsePlanAllocation(),
+      }))
+      .filter(
+        (plan) =>
+          plan.allocation.build +
+            plan.allocation.move +
+            plan.allocation.buy >
+          0
+      );
+
+    if (plans.length === 0) {
+      setResponsePortfolioError(
+        "Enter at least one Build, Move, or Buy allocation before running the portfolio."
+      );
+      return;
+    }
+
     try {
       setResponsePortfolioLoading(true);
       setResponsePortfolioError(null);
@@ -1074,17 +1110,7 @@ export function WorkforcePlanningPage({
           body: JSON.stringify({
             actions:
               structuralPositionActions,
-            plans: positiveRoles.map(
-              (role) => ({
-                job_profile:
-                  role.job_profile_code,
-                allocation:
-                  responsePortfolioAllocations[
-                    role.job_profile_code
-                  ] ??
-                  createResponsePlanAllocation(),
-              })
-            ),
+            plans,
           }),
         }
       );
@@ -4152,6 +4178,70 @@ export function WorkforcePlanningPage({
                                 · {responsePortfolioResult.recruiting_evidence.current_open_requisitions.toLocaleString()} current open reqs ·{" "}
                                 {responsePortfolioResult.recruiting_evidence.recent_12m_external_fills.toLocaleString()} external fills in trailing 12M
                               </div>
+
+                              {responsePortfolioResult.demand_by_business_unit.length > 0 && (
+                                <div className="mt-4 rounded-md border p-3">
+                                  <div className="mb-2">
+                                    <p className="text-xs font-medium">
+                                      Organizational Demand Ownership
+                                    </p>
+                                    <p className="text-[11px] text-muted-foreground">
+                                      Signed modeled role-demand deltas by business unit. These reconcile to enterprise role demand; Build / Move / Buy remain role-level allocations.
+                                    </p>
+                                  </div>
+                                  <div className="max-h-[260px] overflow-auto">
+                                    <table className="w-full min-w-[720px] text-xs">
+                                      <thead className="sticky top-0 bg-background">
+                                        <tr className="border-b text-left text-muted-foreground">
+                                          <th className="pb-2 pr-3">Business Unit</th>
+                                          <th className="pb-2 px-3 text-right">Scenario Δ</th>
+                                          <th className="pb-2 px-3 text-right">Portfolio Δ</th>
+                                          <th className="pb-2 pl-3">Role Detail</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {responsePortfolioResult.demand_by_business_unit.map(
+                                          (bu) => (
+                                            <tr
+                                              key={bu.org_code}
+                                              className="border-b last:border-0"
+                                            >
+                                              <td className="py-2 pr-3 font-medium">
+                                                {bu.org_name}
+                                              </td>
+                                              <td className="px-3 py-2 text-right font-medium tabular-nums">
+                                                {formatSignedModeledCount(
+                                                  bu.scenario_role_demand_delta
+                                                )}
+                                              </td>
+                                              <td className="px-3 py-2 text-right tabular-nums">
+                                                {formatSignedModeledCount(
+                                                  bu.portfolio_role_demand_delta
+                                                )}
+                                              </td>
+                                              <td className="py-2 pl-3 text-muted-foreground">
+                                                {bu.roles
+                                                  .map(
+                                                    (role) =>
+                                                      role.job_profile_name +
+                                                      " " +
+                                                      formatSignedModeledCount(
+                                                        role.scenario_created_role_demand_delta
+                                                      ) +
+                                                      (role.included_in_portfolio
+                                                        ? ""
+                                                        : " (unplanned)")
+                                                  )
+                                                  .join(" · ")}
+                                              </td>
+                                            </tr>
+                                          )
+                                        )}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              )}
 
                               <div className="mt-4 overflow-x-auto rounded-md border">
                                 <table className="w-full min-w-[760px] text-sm">

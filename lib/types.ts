@@ -215,6 +215,21 @@ export type StructuralPositionScenarioResponse = {
     modeled_frozen_positions: number;
     modeled_active_recruiting_demand: number;
   }>;
+  business_unit_job_profile_impact: Array<{
+    org_code: string;
+    org_name: string;
+    job_profile_code: string;
+    job_profile_name: string;
+    current_authorized_positions: number;
+    modeled_authorized_positions: number;
+    authorized_position_delta: number;
+    current_filled_positions: number;
+    modeled_filled_positions: number;
+    filled_position_delta: number;
+    modeled_open_vacancies: number;
+    modeled_frozen_positions: number;
+    modeled_active_recruiting_demand: number;
+  }>;
   skill_demand: {
     skills_with_increased_authorized_demand: number;
     skills_with_reduced_authorized_demand: number;
@@ -514,6 +529,18 @@ export type WorkforceResponsePortfolioResponse = {
     current_open_requisitions: number;
     recent_12m_external_fills: number;
   };
+  demand_by_business_unit: Array<{
+    org_code: string;
+    org_name: string;
+    scenario_role_demand_delta: number;
+    portfolio_role_demand_delta: number;
+    roles: Array<{
+      job_profile_code: string;
+      job_profile_name: string;
+      scenario_created_role_demand_delta: number;
+      included_in_portfolio: boolean;
+    }>;
+  }>;
   roles: RoleWorkforceResponsePlanResponse[];
   unplanned_roles: Array<{
     job_profile_code: string;

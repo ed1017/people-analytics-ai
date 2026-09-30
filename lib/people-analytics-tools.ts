@@ -617,7 +617,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "run_workforce_response_portfolio",
     description:
-      "Run a user-directed multi-role workforce response portfolio for one structural scenario. Each role plan supplies explicit Build, Move, Buy, Borrow, and Automate allocations. The tool aggregates whole-role coverage, remaining gaps, internal readiness, development-pathway coverage, and recruiting evidence without double-counting internal talent across target roles. It is not an optimizer and must not invent allocations.",
+      "Run a user-directed multi-role workforce response portfolio for one structural scenario. Each role plan supplies explicit Build, Move, Buy, Borrow, and Automate allocations. The tool aggregates whole-role coverage, remaining gaps, internal readiness, development-pathway coverage, recruiting evidence, and signed business-unit demand ownership without double-counting internal talent across target roles. BU demand is descriptive ownership of modeled role deltas; response allocations remain role-level. It is not an optimizer and must not invent allocations.",
     parameters: {
       type: "object",
       properties: {

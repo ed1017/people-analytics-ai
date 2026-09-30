@@ -217,6 +217,111 @@ export async function runWorkforceResponsePortfolio(
           role.job_profile_code
       )
     );
+  const positiveRoleCodes =
+    new Set(
+      positiveRoles.map(
+        (role) =>
+          role.job_profile_code
+      )
+    );
+
+  const demandByBusinessUnitMap =
+    new Map<
+      string,
+      WorkforceResponsePortfolioResponse["demand_by_business_unit"][number]
+    >();
+
+  for (
+    const segment of
+      scenario.business_unit_job_profile_impact
+  ) {
+    if (
+      !positiveRoleCodes.has(
+        segment.job_profile_code
+      ) ||
+      segment.authorized_position_delta === 0
+    ) {
+      continue;
+    }
+
+    const existing =
+      demandByBusinessUnitMap.get(
+        segment.org_code
+      ) ?? {
+        org_code: segment.org_code,
+        org_name: segment.org_name,
+        scenario_role_demand_delta: 0,
+        portfolio_role_demand_delta: 0,
+        roles: [],
+      };
+    const included = plannedCodes.has(
+      segment.job_profile_code
+    );
+
+    existing.scenario_role_demand_delta +=
+      segment.authorized_position_delta;
+    if (included) {
+      existing.portfolio_role_demand_delta +=
+        segment.authorized_position_delta;
+    }
+    existing.roles.push({
+      job_profile_code:
+        segment.job_profile_code,
+      job_profile_name:
+        segment.job_profile_name,
+      scenario_created_role_demand_delta:
+        round1(
+          segment.authorized_position_delta
+        ),
+      included_in_portfolio:
+        included,
+    });
+
+    demandByBusinessUnitMap.set(
+      segment.org_code,
+      existing
+    );
+  }
+
+  const demandByBusinessUnit =
+    Array.from(
+      demandByBusinessUnitMap.values()
+    )
+      .map((row) => ({
+        ...row,
+        scenario_role_demand_delta:
+          round1(
+            row.scenario_role_demand_delta
+          ),
+        portfolio_role_demand_delta:
+          round1(
+            row.portfolio_role_demand_delta
+          ),
+        roles: row.roles.sort(
+          (a, b) =>
+            Math.abs(
+              b.scenario_created_role_demand_delta
+            ) -
+              Math.abs(
+                a.scenario_created_role_demand_delta
+              ) ||
+            a.job_profile_name.localeCompare(
+              b.job_profile_name
+            )
+        ),
+      }))
+      .sort(
+        (a, b) =>
+          Math.abs(
+            b.scenario_role_demand_delta
+          ) -
+            Math.abs(
+              a.scenario_role_demand_delta
+            ) ||
+          a.org_name.localeCompare(
+            b.org_name
+          )
+      );
 
   const unplannedRoles =
     positiveRoles
@@ -350,6 +455,8 @@ export async function runWorkforceResponsePortfolio(
           0
         ),
     },
+    demand_by_business_unit:
+      demandByBusinessUnit,
     roles,
     unplanned_roles:
       unplannedRoles,
@@ -360,6 +467,8 @@ export async function runWorkforceResponsePortfolio(
       "Current governed career-preference data enforces one preference row per employee, so interested internal Build and Move pools are mutually exclusive across target job profiles.",
       "Within each role, role-ready and near-ready cohorts are mutually exclusive, so Move and Build supply are not double-counted within that role.",
       "Portfolio planned coverage caps each role's contribution at that role's scenario-created demand; overplanned capacity is reported separately.",
+      "Business-unit demand ownership is taken directly from the modeled BU-by-job-profile inventory. Signed BU deltas reconcile to the enterprise role delta, including cases where a role grows in one BU and shrinks in another.",
+      "Build, Move, and Buy remain role-level allocations in this portfolio. The model does not automatically assign response capacity back to business units.",
       "Unplanned positive role demand remains visible and is treated as uncovered rather than silently excluded.",
       "Recruiting evidence is aggregated only across distinct target job profiles. Historical hiring evidence remains descriptive and is not a forecast.",
       "The portfolio is read-only and does not change positions, employee records, learning assignments, requisitions, or hiring records.",
