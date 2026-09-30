@@ -33,6 +33,7 @@ import type {
   StructuralPositionCatalogResponse,
   StructuralPositionScenarioResponse,
   TimePhasedWorkforceExecutionResponse,
+  WorkforceResponseConstraintResponse,
   WorkforceResponsePlanAllocation,
   WorkforceResponsePlanResponse,
   WorkforceResponsePortfolioResponse,
@@ -145,6 +146,19 @@ type ResponseExecutionDraft = {
   effective_month: string;
 };
 
+type ResponseConstraintDraft = {
+  max_total_build: number | null;
+  max_total_move: number | null;
+  max_total_buy: number | null;
+  max_monthly_build: number | null;
+  max_monthly_move: number | null;
+  max_monthly_buy: number | null;
+  max_monthly_total: number | null;
+  deadline_month: string;
+  required_coverage_pct_by_deadline: number | null;
+  require_all_approved_capacity_scheduled: boolean;
+};
+
 const SAVED_SCENARIOS_STORAGE_KEY =
   "people-analytics.saved-workforce-scenarios.v1";
 
@@ -168,6 +182,21 @@ function createResponsePlanAllocation():
     buy: 0,
     borrow: 0,
     automate: 0,
+  };
+}
+
+function createResponseConstraintDraft(): ResponseConstraintDraft {
+  return {
+    max_total_build: null,
+    max_total_move: null,
+    max_total_buy: null,
+    max_monthly_build: null,
+    max_monthly_move: null,
+    max_monthly_buy: null,
+    max_monthly_total: null,
+    deadline_month: "",
+    required_coverage_pct_by_deadline: null,
+    require_all_approved_capacity_scheduled: false,
   };
 }
 
@@ -489,6 +518,27 @@ export function WorkforcePlanningPage({
   const [
     responseExecutionError,
     setResponseExecutionError,
+  ] = useState<string | null>(null);
+  const [
+    responseConstraintDraft,
+    setResponseConstraintDraft,
+  ] = useState<ResponseConstraintDraft>(
+    createResponseConstraintDraft()
+  );
+  const [
+    responseConstraintResult,
+    setResponseConstraintResult,
+  ] =
+    useState<WorkforceResponseConstraintResponse | null>(
+      null
+    );
+  const [
+    responseConstraintLoading,
+    setResponseConstraintLoading,
+  ] = useState(false);
+  const [
+    responseConstraintError,
+    setResponseConstraintError,
   ] = useState<string | null>(null);
 
   useEffect(() => {
@@ -1403,6 +1453,11 @@ export function WorkforcePlanningPage({
       );
       setResponseExecutionResult(null);
       setResponseExecutionError(null);
+      setResponseConstraintDraft(
+        createResponseConstraintDraft()
+      );
+      setResponseConstraintResult(null);
+      setResponseConstraintError(null);
     } catch (error) {
       setBusinessUnitResponseError(
         error instanceof Error
@@ -1421,6 +1476,11 @@ export function WorkforcePlanningPage({
     setResponseExecutionDrafts([]);
     setResponseExecutionResult(null);
     setResponseExecutionError(null);
+    setResponseConstraintDraft(
+      createResponseConstraintDraft()
+    );
+    setResponseConstraintResult(null);
+    setResponseConstraintError(null);
   }
 
   function updateResponseExecutionDraft(
@@ -1440,6 +1500,8 @@ export function WorkforcePlanningPage({
     );
     setResponseExecutionResult(null);
     setResponseExecutionError(null);
+    setResponseConstraintResult(null);
+    setResponseConstraintError(null);
   }
 
   function addResponseExecutionPhase(
@@ -1480,6 +1542,8 @@ export function WorkforcePlanningPage({
     );
     setResponseExecutionResult(null);
     setResponseExecutionError(null);
+    setResponseConstraintResult(null);
+    setResponseConstraintError(null);
   }
 
   function removeResponseExecutionPhase(
@@ -1493,6 +1557,8 @@ export function WorkforcePlanningPage({
     );
     setResponseExecutionResult(null);
     setResponseExecutionError(null);
+    setResponseConstraintResult(null);
+    setResponseConstraintError(null);
   }
 
   async function runResponseExecution() {
@@ -1580,6 +1646,8 @@ export function WorkforcePlanningPage({
       setResponseExecutionResult(
         payload as TimePhasedWorkforceExecutionResponse
       );
+      setResponseConstraintResult(null);
+      setResponseConstraintError(null);
     } catch (error) {
       setResponseExecutionError(
         error instanceof Error
@@ -1601,6 +1669,156 @@ export function WorkforcePlanningPage({
     );
     setResponseExecutionResult(null);
     setResponseExecutionError(null);
+    setResponseConstraintResult(null);
+    setResponseConstraintError(null);
+  }
+
+  async function runResponseConstraints() {
+    if (
+      !businessUnitResponseResult ||
+      !responsePortfolioResult ||
+      !responseExecutionResult
+    ) {
+      return;
+    }
+
+    const schedule =
+      responseExecutionResult.schedule_entries.map(
+        (row) => ({
+          business_unit:
+            row.org_code,
+          job_profile:
+            row.job_profile_code,
+          response_type:
+            row.response_type,
+          amount: row.amount,
+          effective_month:
+            row.effective_month,
+        })
+      );
+
+    if (schedule.length === 0) {
+      setResponseConstraintError(
+        "Run at least one scheduled execution phase before checking constraints."
+      );
+      return;
+    }
+
+    const hasExplicitConstraint =
+      [
+        responseConstraintDraft.max_total_build,
+        responseConstraintDraft.max_total_move,
+        responseConstraintDraft.max_total_buy,
+        responseConstraintDraft.max_monthly_build,
+        responseConstraintDraft.max_monthly_move,
+        responseConstraintDraft.max_monthly_buy,
+        responseConstraintDraft.max_monthly_total,
+        responseConstraintDraft
+          .required_coverage_pct_by_deadline,
+      ].some((value) => value !== null) ||
+      Boolean(
+        responseConstraintDraft.deadline_month
+      ) ||
+      responseConstraintDraft
+        .require_all_approved_capacity_scheduled;
+
+    if (!hasExplicitConstraint) {
+      setResponseConstraintError(
+        "Enter at least one explicit constraint before running the feasibility check."
+      );
+      return;
+    }
+
+    try {
+      setResponseConstraintLoading(true);
+      setResponseConstraintError(null);
+
+      const response = await fetch(
+        "/api/workforce-response-constraints",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            actions:
+              structuralPositionActions,
+            allocations:
+              businessUnitResponseResult.business_units.map(
+                (row) => ({
+                  business_unit:
+                    row.org_code,
+                  job_profile:
+                    row.job_profile_code,
+                  allocation:
+                    row.allocation,
+                })
+              ),
+            role_plans:
+              responsePortfolioResult.roles.map(
+                (role) => ({
+                  job_profile:
+                    role.job_profile_code,
+                  allocation:
+                    role.allocation,
+                })
+              ),
+            schedule,
+            constraints: {
+              ...responseConstraintDraft,
+              deadline_month:
+                responseConstraintDraft.deadline_month ||
+                null,
+            },
+          }),
+        }
+      );
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload?.error ??
+            "Failed to evaluate workforce response constraints."
+        );
+      }
+
+      setResponseConstraintResult(
+        payload as WorkforceResponseConstraintResponse
+      );
+    } catch (error) {
+      setResponseConstraintError(
+        error instanceof Error
+          ? error.message
+          : "Failed to evaluate workforce response constraints."
+      );
+    } finally {
+      setResponseConstraintLoading(false);
+    }
+  }
+
+  function resetResponseConstraints() {
+    setResponseConstraintDraft(
+      createResponseConstraintDraft()
+    );
+    setResponseConstraintResult(null);
+    setResponseConstraintError(null);
+  }
+
+  function updateResponseConstraintDraft<
+    K extends keyof ResponseConstraintDraft
+  >(
+    key: K,
+    value: ResponseConstraintDraft[K]
+  ) {
+    setResponseConstraintDraft(
+      (current) => ({
+        ...current,
+        [key]: value,
+      })
+    );
+    setResponseConstraintResult(null);
+    setResponseConstraintError(null);
   }
 
   function persistSavedScenarios(
@@ -5280,6 +5498,314 @@ export function WorkforcePlanningPage({
                                                   </ul>
                                                 </div>
                                               )}
+
+                                              <details className="mt-4 rounded-md border">
+                                                <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
+                                                  Constraint Feasibility
+                                                  <span className="ml-2 text-xs font-normal text-muted-foreground">
+                                                    hard caps + evidence checks
+                                                  </span>
+                                                </summary>
+                                                <div className="border-t p-4">
+                                                  <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                                                    <p className="max-w-3xl text-xs text-muted-foreground">
+                                                      Blank caps are unconstrained. Hard feasibility uses only the limits you enter plus schedule-integrity checks. Readiness and recruiting history remain separate evidence signals.
+                                                    </p>
+                                                    <div className="flex gap-2">
+                                                      <button
+                                                        type="button"
+                                                        onClick={resetResponseConstraints}
+                                                        disabled={responseConstraintLoading}
+                                                        className="rounded-md border px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+                                                      >
+                                                        Reset
+                                                      </button>
+                                                      <button
+                                                        type="button"
+                                                        onClick={runResponseConstraints}
+                                                        disabled={responseConstraintLoading}
+                                                        className="rounded-md bg-foreground px-3 py-2 text-xs font-medium text-background disabled:cursor-not-allowed disabled:opacity-50"
+                                                      >
+                                                        {responseConstraintLoading
+                                                          ? "Checking..."
+                                                          : "Check Constraints"}
+                                                      </button>
+                                                    </div>
+                                                  </div>
+
+                                                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                                                    {(
+                                                      [
+                                                        ["max_total_build", "Total Build cap"],
+                                                        ["max_total_move", "Total Move cap"],
+                                                        ["max_total_buy", "Total Buy cap"],
+                                                        ["max_monthly_build", "Monthly Build cap"],
+                                                        ["max_monthly_move", "Monthly Move cap"],
+                                                        ["max_monthly_buy", "Monthly Buy cap"],
+                                                        ["max_monthly_total", "Monthly total cap"],
+                                                      ] as const
+                                                    ).map(([key, label]) => (
+                                                      <label
+                                                        key={key}
+                                                        className="rounded-md border p-3"
+                                                      >
+                                                        <span className="text-[11px] text-muted-foreground">
+                                                          {label}
+                                                        </span>
+                                                        <input
+                                                          type="number"
+                                                          min={0}
+                                                          step={1}
+                                                          placeholder="No cap"
+                                                          value={
+                                                            responseConstraintDraft[
+                                                              key
+                                                            ] ?? ""
+                                                          }
+                                                          onChange={(event) =>
+                                                            updateResponseConstraintDraft(
+                                                              key,
+                                                              event.target.value === ""
+                                                                ? null
+                                                                : Number(
+                                                                    event.target.value
+                                                                  )
+                                                            )
+                                                          }
+                                                          className="mt-1 w-full rounded-md border bg-background px-2 py-2 text-right text-sm tabular-nums"
+                                                        />
+                                                      </label>
+                                                    ))}
+                                                  </div>
+
+                                                  <div className="mt-3 grid gap-3 md:grid-cols-2">
+                                                    <label className="rounded-md border p-3">
+                                                      <span className="text-[11px] text-muted-foreground">
+                                                        Coverage deadline
+                                                      </span>
+                                                      <input
+                                                        type="month"
+                                                        min={
+                                                          responseExecutionResult.planning_start_month
+                                                        }
+                                                        value={
+                                                          responseConstraintDraft.deadline_month
+                                                        }
+                                                        onChange={(event) =>
+                                                          updateResponseConstraintDraft(
+                                                            "deadline_month",
+                                                            event.target.value
+                                                          )
+                                                        }
+                                                        className="mt-1 w-full rounded-md border bg-background px-2 py-2 text-sm"
+                                                      />
+                                                    </label>
+
+                                                    <label className="rounded-md border p-3">
+                                                      <span className="text-[11px] text-muted-foreground">
+                                                        Required coverage by deadline %
+                                                      </span>
+                                                      <input
+                                                        type="number"
+                                                        min={0}
+                                                        max={100}
+                                                        step={1}
+                                                        placeholder="No deadline target"
+                                                        value={
+                                                          responseConstraintDraft.required_coverage_pct_by_deadline ??
+                                                          ""
+                                                        }
+                                                        onChange={(event) =>
+                                                          updateResponseConstraintDraft(
+                                                            "required_coverage_pct_by_deadline",
+                                                            event.target.value === ""
+                                                              ? null
+                                                              : Number(
+                                                                  event.target.value
+                                                                )
+                                                          )
+                                                        }
+                                                        className="mt-1 w-full rounded-md border bg-background px-2 py-2 text-right text-sm tabular-nums"
+                                                      />
+                                                    </label>
+                                                  </div>
+
+                                                  <label className="mt-3 flex items-center gap-2 rounded-md border p-3 text-xs">
+                                                    <input
+                                                      type="checkbox"
+                                                      checked={
+                                                        responseConstraintDraft.require_all_approved_capacity_scheduled
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateResponseConstraintDraft(
+                                                          "require_all_approved_capacity_scheduled",
+                                                          event.target.checked
+                                                        )
+                                                      }
+                                                    />
+                                                    Require every approved Build / Move / Buy unit to have an effective month
+                                                  </label>
+
+                                                  <p className="mt-3 text-[11px] text-muted-foreground">
+                                                    FY2027 budget data is not automatically used here because the execution horizon begins in 2026 and path-specific Build / Move / Buy costs are not modeled as defensible hard constraints.
+                                                  </p>
+
+                                                  {responseConstraintError && (
+                                                    <div className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
+                                                      {responseConstraintError}
+                                                    </div>
+                                                  )}
+
+                                                  {responseConstraintResult && (
+                                                    <>
+                                                      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                                                        <div className="rounded-md border p-3">
+                                                          <p className="text-[11px] text-muted-foreground">
+                                                            Hard-Constraint Result
+                                                          </p>
+                                                          <p className="mt-1 text-xl font-semibold">
+                                                            {responseConstraintResult.overall_feasible
+                                                              ? "Feasible"
+                                                              : "Breach"}
+                                                          </p>
+                                                        </div>
+                                                        <div className="rounded-md border p-3">
+                                                          <p className="text-[11px] text-muted-foreground">
+                                                            Constraints Checked
+                                                          </p>
+                                                          <p className="mt-1 text-xl font-semibold">
+                                                            {responseConstraintResult.hard_constraint_count.toLocaleString()}
+                                                          </p>
+                                                        </div>
+                                                        <div className="rounded-md border p-3">
+                                                          <p className="text-[11px] text-muted-foreground">
+                                                            Hard Breaches
+                                                          </p>
+                                                          <p className="mt-1 text-xl font-semibold">
+                                                            {responseConstraintResult.hard_constraint_breaches.toLocaleString()}
+                                                          </p>
+                                                        </div>
+                                                      </div>
+
+                                                      <div className="mt-4 overflow-x-auto rounded-md border">
+                                                        <table className="w-full min-w-[760px] text-xs">
+                                                          <thead>
+                                                            <tr className="border-b text-left text-muted-foreground">
+                                                              <th className="p-3">Hard Constraint</th>
+                                                              <th className="p-3 text-right">Actual</th>
+                                                              <th className="p-3 text-right">Limit / Minimum</th>
+                                                              <th className="p-3 text-right">Result</th>
+                                                            </tr>
+                                                          </thead>
+                                                          <tbody>
+                                                            {responseConstraintResult.hard_constraints.map(
+                                                              (row) => (
+                                                                <tr
+                                                                  key={row.constraint_code}
+                                                                  className="border-b last:border-0"
+                                                                >
+                                                                  <td className="p-3">
+                                                                    <p className="font-medium">
+                                                                      {row.label}
+                                                                    </p>
+                                                                    <p className="mt-1 text-[10px] text-muted-foreground">
+                                                                      {row.detail}
+                                                                    </p>
+                                                                  </td>
+                                                                  <td className="p-3 text-right tabular-nums">
+                                                                    {String(
+                                                                      row.actual_value
+                                                                    )}
+                                                                  </td>
+                                                                  <td className="p-3 text-right tabular-nums">
+                                                                    {String(
+                                                                      row.limit_value
+                                                                    )}
+                                                                  </td>
+                                                                  <td className="p-3 text-right font-medium">
+                                                                    {row.passed
+                                                                      ? "Pass"
+                                                                      : "Breach"}
+                                                                  </td>
+                                                                </tr>
+                                                              )
+                                                            )}
+                                                          </tbody>
+                                                        </table>
+                                                      </div>
+
+                                                      {responseConstraintResult.evidence_checks.length >
+                                                        0 && (
+                                                        <div className="mt-4 overflow-x-auto rounded-md border">
+                                                          <table className="w-full min-w-[900px] text-xs">
+                                                            <thead>
+                                                              <tr className="border-b text-left text-muted-foreground">
+                                                                <th className="p-3">Role Evidence</th>
+                                                                <th className="p-3 text-right">Build Target</th>
+                                                                <th className="p-3 text-right">Path-Covered Near-Ready</th>
+                                                                <th className="p-3 text-right">Move Target</th>
+                                                                <th className="p-3 text-right">Role-Ready</th>
+                                                                <th className="p-3 text-right">Buy Target</th>
+                                                                <th className="p-3 text-right">12M External Fills</th>
+                                                              </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                              {responseConstraintResult.evidence_checks.map(
+                                                                (row) => (
+                                                                  <tr
+                                                                    key={
+                                                                      row.job_profile_code
+                                                                    }
+                                                                    className="border-b last:border-0"
+                                                                  >
+                                                                    <td className="p-3 font-medium">
+                                                                      {row.job_profile_name}
+                                                                    </td>
+                                                                    <td className="p-3 text-right tabular-nums">
+                                                                      {formatModeledCount(
+                                                                        row.build_target
+                                                                      )}
+                                                                    </td>
+                                                                    <td className="p-3 text-right tabular-nums">
+                                                                      {row.fully_pathway_covered_near_ready.toLocaleString()}
+                                                                      {row.build_exceeds_current_path_covered
+                                                                        ? " *"
+                                                                        : ""}
+                                                                    </td>
+                                                                    <td className="p-3 text-right tabular-nums">
+                                                                      {formatModeledCount(
+                                                                        row.move_target
+                                                                      )}
+                                                                    </td>
+                                                                    <td className="p-3 text-right tabular-nums">
+                                                                      {row.role_ready_internal_candidates.toLocaleString()}
+                                                                      {row.move_exceeds_role_ready
+                                                                        ? " *"
+                                                                        : ""}
+                                                                    </td>
+                                                                    <td className="p-3 text-right tabular-nums">
+                                                                      {formatModeledCount(
+                                                                        row.buy_target
+                                                                      )}
+                                                                    </td>
+                                                                    <td className="p-3 text-right tabular-nums">
+                                                                      {row.recent_12m_external_fills.toLocaleString()}
+                                                                    </td>
+                                                                  </tr>
+                                                                )
+                                                              )}
+                                                            </tbody>
+                                                          </table>
+                                                        </div>
+                                                      )}
+
+                                                      <p className="mt-3 text-[11px] text-muted-foreground">
+                                                        * Evidence target exceeds currently observed support. Evidence warnings do not make the hard-constraint plan infeasible unless you also set a numeric cap.
+                                                      </p>
+                                                    </>
+                                                  )}
+                                                </div>
+                                              </details>
                                             </>
                                           )}
                                         </div>

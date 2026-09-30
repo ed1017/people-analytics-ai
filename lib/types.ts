@@ -612,6 +612,43 @@ export type TimePhasedWorkforceExecutionResponse = {
   methodology: string[];
 };
 
+export type WorkforceResponseConstraintResponse = {
+  as_of: string;
+  overall_feasible: boolean;
+  hard_constraint_count: number;
+  hard_constraint_breaches: number;
+  hard_constraints: Array<{
+    constraint_code: string;
+    label: string;
+    passed: boolean;
+    actual_value: number | string | boolean;
+    limit_value: number | string | boolean;
+    detail: string;
+  }>;
+  deadline: {
+    deadline_month: string | null;
+    required_coverage_pct: number | null;
+    actual_coverage_pct: number | null;
+    passed: boolean | null;
+  };
+  evidence_checks: Array<{
+    job_profile_code: string;
+    job_profile_name: string;
+    build_target: number;
+    fully_pathway_covered_near_ready: number;
+    build_exceeds_current_path_covered: boolean;
+    move_target: number;
+    role_ready_internal_candidates: number;
+    move_exceeds_role_ready: boolean;
+    buy_target: number;
+    recent_12m_external_fills: number;
+    buy_pct_of_recent_12m_external_fills: number | null;
+  }>;
+  execution: TimePhasedWorkforceExecutionResponse;
+  warnings: string[];
+  methodology: string[];
+};
+
 export type WorkforceResponsePortfolioResponse = {
   as_of: string;
   scenario_positive_role_demand: number;
