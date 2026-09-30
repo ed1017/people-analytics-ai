@@ -30,7 +30,10 @@ export const appNavigationSections: AppNavigationSection[] = [
   {
     key: "talent",
     title: "Talent Management",
-    pages: ["skills"],
+    pages: [
+      "skills",
+      "learning-development",
+    ],
   },  {
     key: "strategy",
     title: "Workforce Strategy & Planning",
@@ -79,6 +82,12 @@ export const appPageMetadata: Record<
     section: "Talent Management",
     description:
       "Workforce skills, proficiency gaps, demand, and external context.",
+  },
+  "learning-development": {
+    label: "Learning & Development",
+    section: "Talent Management",
+    description:
+      "Learning pathway coverage for current skill gaps and job-profile requirements.",
   },
   "workforce-planning": {
     label: "Workforce Planning",

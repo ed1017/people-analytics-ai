@@ -15,6 +15,7 @@ import { WorkforcePage } from "@/components/pages/workforce-page";
 import { AttritionPage } from "@/components/pages/attrition-page";
 import { FinancePage } from "@/components/pages/finance-page";
 import { SkillsPage } from "@/components/pages/skills-page";
+import { LearningDevelopmentPage } from "@/components/pages/learning-development-page";
 import { WorkforcePlanningPage } from "@/components/pages/workforce-planning-page";
 import { PlanningSessionProvider } from "@/components/workforce-planning/planning-session-context";
 import { TalentAcquisitionPage } from "@/components/pages/talent-acquisition-page";
@@ -28,6 +29,7 @@ import type {
   DashboardResponse,
   FinanceResponse,
   HeadcountTrendPoint,
+  LearningDevelopmentResponse,
   OverviewData,
   Persona,
   PositionModelingResponse,
@@ -123,6 +125,21 @@ export default function Home() {
     useState(false);
   const [skillsError, setSkillsError] =
     useState<string | null>(null);
+
+  const [
+    learningDevelopmentData,
+    setLearningDevelopmentData,
+  ] = useState<LearningDevelopmentResponse | null>(
+    null
+  );
+  const [
+    learningDevelopmentLoading,
+    setLearningDevelopmentLoading,
+  ] = useState(false);
+  const [
+    learningDevelopmentError,
+    setLearningDevelopmentError,
+  ] = useState<string | null>(null);
 
   const [talentAcquisitionData, setTalentAcquisitionData] =
     useState<TalentAcquisitionResponse | null>(null);
@@ -561,6 +578,58 @@ export default function Home() {
 
   useEffect(() => {
     if (
+      activePage !==
+        "learning-development" ||
+      learningDevelopmentData
+    ) {
+      return;
+    }
+
+    async function loadLearningDevelopment() {
+      try {
+        setLearningDevelopmentLoading(true);
+        setLearningDevelopmentError(null);
+
+        const response = await fetch(
+          "/api/learning-development",
+          {
+            cache: "no-store",
+          }
+        );
+
+        const payload =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            payload?.error ??
+              "Failed to load Learning & Development data."
+          );
+        }
+
+        setLearningDevelopmentData(
+          payload as LearningDevelopmentResponse
+        );
+      } catch (error) {
+        console.error(error);
+        setLearningDevelopmentError(
+          error instanceof Error
+            ? error.message
+            : "Failed to load Learning & Development data."
+        );
+      } finally {
+        setLearningDevelopmentLoading(false);
+      }
+    }
+
+    loadLearningDevelopment();
+  }, [
+    activePage,
+    learningDevelopmentData,
+  ]);
+
+  useEffect(() => {
+    if (
       activePage !== "skills" ||
       blsData
     ) {
@@ -795,6 +864,13 @@ export default function Home() {
               "Which skills have the highest demand?",
               "Where should we build versus hire capability?",
             ]
+          : activePage ===
+              "learning-development"
+            ? [
+                "Which current skill gaps have active learning pathways?",
+                "Where is learning pathway coverage missing?",
+                "Which job profiles have the broadest required-skill pathway coverage?",
+              ]
           : activePage === "talent-acquisition"
             ? [
                 "Where is the recruiting funnel weakest?",
@@ -978,6 +1054,26 @@ export default function Home() {
                       skillsData.highest_demand,
                     strongestCoverage:
                       skillsData.strongest_coverage,
+                  }
+                : null,
+
+            learningDevelopmentContext:
+              activePage ===
+                "learning-development" &&
+              learningDevelopmentData
+                ? {
+                    summary:
+                      learningDevelopmentData.summary,
+                    skillPathways:
+                      learningDevelopmentData.skill_pathways.slice(
+                        0,
+                        20
+                      ),
+                    jobProfilePathways:
+                      learningDevelopmentData.job_profile_pathways.slice(
+                        0,
+                        15
+                      ),
                   }
                 : null,
 
@@ -1298,6 +1394,13 @@ export default function Home() {
             blsLoading={blsLoading}
             blsError={blsError}
             maxSkillDemand={maxSkillDemand}
+          />
+        ) : activePage ===
+          "learning-development" ? (
+          <LearningDevelopmentPage
+            data={learningDevelopmentData}
+            loading={learningDevelopmentLoading}
+            error={learningDevelopmentError}
           />
         ) : (
           <PlanningSessionProvider>

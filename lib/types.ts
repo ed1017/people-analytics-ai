@@ -45,6 +45,7 @@ export type AppPage =
   | "survey-sentiment"
   | "finance"
   | "skills"
+  | "learning-development"
   | "workforce-planning";
 
 export type PlanningPoint = {
@@ -811,6 +812,46 @@ export type SkillsResponse = {
   largest_gaps: SkillInsightRow[];
   highest_demand: SkillInsightRow[];
   strongest_coverage: SkillInsightRow[];
+};
+
+export type LearningDevelopmentSkillPathway = {
+  skill_id: string | number;
+  skill_code: string;
+  skill_name: string;
+  skill_category: string;
+  employees_in_roles_requiring_skill: number;
+  employees_below_or_missing_requirement: number;
+  requirement_met_pct: number;
+  pathway_available: boolean;
+  active_course_count: number;
+  shortest_catalog_duration_hours: number | null;
+  avg_catalog_duration_hours: number | null;
+};
+
+export type LearningDevelopmentJobProfilePathway = {
+  job_profile_code: string;
+  job_profile_name: string;
+  required_skill_count: number;
+  required_skills_with_active_pathway: number;
+  pathway_coverage_pct: number;
+  active_course_count: number;
+  shortest_catalog_duration_hours: number | null;
+};
+
+export type LearningDevelopmentResponse = {
+  as_of: string;
+  summary: {
+    current_gap_skills: number;
+    gap_skills_with_active_pathway: number;
+    gap_pathway_coverage_pct: number;
+    active_courses_on_gap_skills: number;
+    active_job_profiles: number;
+    job_profiles_with_any_pathway: number;
+    fully_covered_job_profiles: number;
+  };
+  skill_pathways: LearningDevelopmentSkillPathway[];
+  job_profile_pathways: LearningDevelopmentJobProfilePathway[];
+  methodology: string[];
 };
 
 export type BlsMetric = {
