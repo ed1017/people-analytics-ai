@@ -496,6 +496,106 @@ export function WorkforcePlanningPage({
                     </p>
                   </div>
                 </div>
+
+                <div className="mt-5 rounded-md border p-4">
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="font-medium">
+                        Baseline vs Custom Trajectory
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Monthly headcount across the planning horizon
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-2">
+                        <span className="h-0.5 w-5 bg-foreground" />
+                        Custom
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <span className="w-5 border-t border-dashed border-muted-foreground" />
+                        Baseline
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="h-72 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={customScenario.points}
+                        margin={{
+                          top: 8,
+                          right: 16,
+                          left: 8,
+                          bottom: 8,
+                        }}
+                      >
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          opacity={0.25}
+                        />
+                        <XAxis
+                          dataKey="planning_month"
+                          tickFormatter={formatMonth}
+                          minTickGap={24}
+                          tick={{ fontSize: 11 }}
+                        />
+                        <YAxis
+                          domain={[
+                            (dataMin: number) =>
+                              Math.max(
+                                0,
+                                Math.floor(dataMin * 0.97)
+                              ),
+                            (dataMax: number) =>
+                              Math.ceil(dataMax * 1.03),
+                          ]}
+                          tickFormatter={(value: number) =>
+                            value.toLocaleString()
+                          }
+                          width={62}
+                          tick={{ fontSize: 11 }}
+                        />
+                        <Tooltip
+                          labelFormatter={(value) =>
+                            formatLongDate(String(value))
+                          }
+                          formatter={(value, name) => [
+                            Number(value).toLocaleString(),
+                            name === "modeled_headcount"
+                              ? "Custom scenario"
+                              : "Baseline",
+                          ]}
+                          contentStyle={{
+                            backgroundColor:
+                              "var(--background)",
+                            border:
+                              "1px solid var(--border)",
+                            borderRadius:
+                              "0.5rem",
+                          }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="baseline_headcount"
+                          stroke="var(--muted-foreground)"
+                          strokeWidth={2}
+                          strokeDasharray="6 5"
+                          dot={false}
+                          activeDot={{ r: 4 }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="modeled_headcount"
+                          stroke="currentColor"
+                          strokeWidth={3}
+                          dot={false}
+                          activeDot={{ r: 5 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
               </div>
             )}
           </div>
