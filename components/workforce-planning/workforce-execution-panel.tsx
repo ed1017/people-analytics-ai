@@ -33,7 +33,6 @@ type ResponseConstraintDraft = {
 };
 
 type WorkforceExecutionPanelProps = {
-  workflowView: "overview" | "plan" | "design" | "respond" | "execute";
   businessUnitResponseResult: BusinessUnitResponseAllocationResponse;
   responseExecutionDrafts: ResponseExecutionDraft[];
   responseExecutionLoading: boolean;
@@ -97,7 +96,6 @@ function formatMonth(value: string) {
 }
 
 export function WorkforceExecutionPanel({
-  workflowView,
   businessUnitResponseResult,
   responseExecutionDrafts,
   responseExecutionLoading,
@@ -122,15 +120,8 @@ export function WorkforceExecutionPanel({
 }: WorkforceExecutionPanelProps) {
   return (
 <details
-                                        className={
-                                          workflowView === "execute"
-                                            ? "mt-4 rounded-md border"
-                                            : "hidden"
-                                        }
-                                        open={
-                                          workflowView ===
-                                          "execute"
-                                        }
+                                        className="mt-4 rounded-md border"
+                                        open
                                       >
                                         <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
                                           Time-Phased Execution
