@@ -1101,6 +1101,73 @@ function fillVacancies(
     requisitionsClosedAsFilled,
   };
 }
+function buildJobProfileImpact(
+  initialRows: InventoryRow[],
+  modeledRows: InventoryRow[]
+): StructuralPositionScenarioResponse["job_profile_impact"] {
+  const profiles = new Map<
+    string,
+    StructuralPositionScenarioResponse["job_profile_impact"][number]
+  >();
+
+  for (let index = 0; index < modeledRows.length; index += 1) {
+    const modeled = modeledRows[index];
+    const initial = initialRows[index];
+    const existing = profiles.get(modeled.job_profile_code) ?? {
+      job_profile_code: modeled.job_profile_code,
+      job_profile_name: modeled.job_profile_name,
+      current_authorized_positions: 0,
+      modeled_authorized_positions: 0,
+      authorized_position_delta: 0,
+      current_filled_positions: 0,
+      modeled_filled_positions: 0,
+      filled_position_delta: 0,
+      modeled_open_vacancies: 0,
+      modeled_frozen_positions: 0,
+      modeled_active_recruiting_demand: 0,
+    };
+
+    existing.current_authorized_positions +=
+      initial.filled + initial.vacant + initial.frozen;
+    existing.modeled_authorized_positions +=
+      modeled.filled + modeled.vacant + modeled.frozen;
+    existing.current_filled_positions += initial.filled;
+    existing.modeled_filled_positions += modeled.filled;
+    existing.modeled_open_vacancies += modeled.vacant;
+    existing.modeled_frozen_positions += modeled.frozen;
+    existing.modeled_active_recruiting_demand +=
+      modeled.open_req + modeled.uncovered;
+
+    profiles.set(modeled.job_profile_code, existing);
+  }
+
+  return Array.from(profiles.values())
+    .map((profile) => ({
+      ...profile,
+      current_authorized_positions: round1(profile.current_authorized_positions),
+      modeled_authorized_positions: round1(profile.modeled_authorized_positions),
+      authorized_position_delta: round1(
+        profile.modeled_authorized_positions - profile.current_authorized_positions
+      ),
+      current_filled_positions: round1(profile.current_filled_positions),
+      modeled_filled_positions: round1(profile.modeled_filled_positions),
+      filled_position_delta: round1(
+        profile.modeled_filled_positions - profile.current_filled_positions
+      ),
+      modeled_open_vacancies: round1(profile.modeled_open_vacancies),
+      modeled_frozen_positions: round1(profile.modeled_frozen_positions),
+      modeled_active_recruiting_demand: round1(
+        profile.modeled_active_recruiting_demand
+      ),
+    }))
+    .sort(
+      (a, b) =>
+        Math.abs(b.authorized_position_delta) -
+          Math.abs(a.authorized_position_delta) ||
+        a.job_profile_name.localeCompare(b.job_profile_name)
+    );
+}
+
 export async function runStructuralPositionScenario(
   actions: StructuralPositionAction[]
 ): Promise<StructuralPositionScenarioResponse> {
@@ -1330,6 +1397,11 @@ export async function runStructuralPositionScenario(
     inventoryTotals(rows);
   const endingRecruiting =
     recruitingTotals(rows);
+  const jobProfileImpact =
+    buildJobProfileImpact(
+      initialRows,
+      rows
+    );
   const skillDemand =
     buildSkillDemand(
       initialRows,
@@ -1499,6 +1571,8 @@ export async function runStructuralPositionScenario(
           staffedLaborCostDelta
         ),
     },
+    job_profile_impact:
+      jobProfileImpact,
     skill_demand: skillDemand,
     response_strategy:
       responseStrategy,

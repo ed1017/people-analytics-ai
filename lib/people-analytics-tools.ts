@@ -7,6 +7,10 @@ import {
   type WorkforceResponsePlanRequest,
 } from "./workforce-response-plan";
 import {
+  runRoleWorkforceResponsePlan,
+  type RoleWorkforceResponsePlanRequest,
+} from "./role-workforce-response-plan";
+import {
   runPositionActionScenario,
   type PositionActionScenarioRequest,
 } from "./position-action-scenario";
@@ -473,6 +477,80 @@ export const peopleAnalyticsTools: any[] = [
       required: [
         "actions",
         "skill_code",
+        "allocation",
+      ],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
+    name: "run_role_workforce_response_plan",
+    description:
+      "Run a user-directed workforce response plan for one job profile with positive scenario-created authorized-position demand. The planning unit is a role/person-position, so one Build, Move, or Buy unit covers the whole required skill bundle once rather than being counted separately for every skill. This is not an optimizer and allocations must come from the user.",
+    parameters: {
+      type: "object",
+      properties: {
+        actions: {
+          type: "array",
+          minItems: 1,
+          maxItems: 20,
+          items: {
+            type: "object",
+            properties: {
+              action_type: {
+                type: "string",
+                enum: [
+                  "add_positions",
+                  "close_vacant_positions",
+                  "freeze_vacancies",
+                  "fill_vacancies",
+                ],
+              },
+              business_unit: { type: ["string", "null"] },
+              level: { type: ["string", "null"] },
+              job_profile: { type: ["string", "null"] },
+              amount: { type: ["number", "null"] },
+              fill_pct: { type: ["number", "null"] },
+            },
+            required: [
+              "action_type",
+              "business_unit",
+              "level",
+              "job_profile",
+              "amount",
+              "fill_pct",
+            ],
+            additionalProperties: false,
+          },
+        },
+        job_profile: {
+          type: "string",
+          description:
+            "Job-profile code or exact profile name with positive scenario-created role demand.",
+        },
+        allocation: {
+          type: "object",
+          properties: {
+            build: { type: "number" },
+            move: { type: "number" },
+            buy: { type: "number" },
+            borrow: { type: "number" },
+            automate: { type: "number" },
+          },
+          required: [
+            "build",
+            "move",
+            "buy",
+            "borrow",
+            "automate",
+          ],
+          additionalProperties: false,
+        },
+      },
+      required: [
+        "actions",
+        "job_profile",
         "allocation",
       ],
       additionalProperties: false,
@@ -1358,6 +1436,10 @@ export async function runPeopleAnalyticsTool(
     case "run_workforce_response_plan":
       return runWorkforceResponsePlan(
         args as WorkforceResponsePlanRequest
+      );
+    case "run_role_workforce_response_plan":
+      return runRoleWorkforceResponsePlan(
+        args as RoleWorkforceResponsePlanRequest
       );
     case "get_talent_acquisition":
       return getTalentAcquisition();

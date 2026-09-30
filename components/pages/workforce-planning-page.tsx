@@ -27,6 +27,7 @@ import type {
   PositionScenario,
   ScenarioModelAssumptions,
   ScenarioModelResponse,
+  RoleWorkforceResponsePlanResponse,
   StructuralPositionAction,
   StructuralPositionCatalogResponse,
   StructuralPositionScenarioResponse,
@@ -324,6 +325,32 @@ export function WorkforcePlanningPage({
   const [
     responsePlanError,
     setResponsePlanError,
+  ] = useState<string | null>(null);
+  const [
+    roleResponsePlanProfile,
+    setRoleResponsePlanProfile,
+  ] = useState("");
+  const [
+    roleResponsePlanAllocation,
+    setRoleResponsePlanAllocation,
+  ] =
+    useState<WorkforceResponsePlanAllocation>(
+      createResponsePlanAllocation()
+    );
+  const [
+    roleResponsePlanResult,
+    setRoleResponsePlanResult,
+  ] =
+    useState<RoleWorkforceResponsePlanResponse | null>(
+      null
+    );
+  const [
+    roleResponsePlanLoading,
+    setRoleResponsePlanLoading,
+  ] = useState(false);
+  const [
+    roleResponsePlanError,
+    setRoleResponsePlanError,
   ] = useState<string | null>(null);
 
   useEffect(() => {
@@ -711,6 +738,8 @@ export function WorkforcePlanningPage({
     setStructuralPositionError(null);
     setResponsePlanResult(null);
     setResponsePlanError(null);
+    setRoleResponsePlanResult(null);
+    setRoleResponsePlanError(null);
   }
 
   function addStructuralPositionAction() {
@@ -723,6 +752,8 @@ export function WorkforcePlanningPage({
     setStructuralPositionResult(null);
     setResponsePlanResult(null);
     setResponsePlanError(null);
+    setRoleResponsePlanResult(null);
+    setRoleResponsePlanError(null);
   }
 
   function removeStructuralPositionAction(
@@ -740,6 +771,8 @@ export function WorkforcePlanningPage({
     setStructuralPositionResult(null);
     setResponsePlanResult(null);
     setResponsePlanError(null);
+    setRoleResponsePlanResult(null);
+    setRoleResponsePlanError(null);
   }
 
   async function runStructuralPositionActions() {
@@ -783,6 +816,17 @@ export function WorkforcePlanningPage({
       );
       setResponsePlanResult(null);
       setResponsePlanError(null);
+      setRoleResponsePlanProfile(
+        result.job_profile_impact.find(
+          (row) =>
+            row.authorized_position_delta > 0
+        )?.job_profile_code ?? ""
+      );
+      setRoleResponsePlanAllocation(
+        createResponsePlanAllocation()
+      );
+      setRoleResponsePlanResult(null);
+      setRoleResponsePlanError(null);
     } catch (error) {
       setStructuralPositionError(
         error instanceof Error
@@ -806,6 +850,12 @@ export function WorkforcePlanningPage({
     );
     setResponsePlanResult(null);
     setResponsePlanError(null);
+    setRoleResponsePlanProfile("");
+    setRoleResponsePlanAllocation(
+      createResponsePlanAllocation()
+    );
+    setRoleResponsePlanResult(null);
+    setRoleResponsePlanError(null);
   }
 
   async function runResponsePlan() {
@@ -867,6 +917,67 @@ export function WorkforcePlanningPage({
     );
     setResponsePlanResult(null);
     setResponsePlanError(null);
+  }
+
+  async function runRoleResponsePlan() {
+    if (
+      !structuralPositionResult ||
+      !roleResponsePlanProfile
+    ) {
+      return;
+    }
+
+    try {
+      setRoleResponsePlanLoading(true);
+      setRoleResponsePlanError(null);
+
+      const response = await fetch(
+        "/api/role-workforce-response-plan",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            actions:
+              structuralPositionActions,
+            job_profile:
+              roleResponsePlanProfile,
+            allocation:
+              roleResponsePlanAllocation,
+          }),
+        }
+      );
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload?.error ??
+            "Failed to run role workforce response plan."
+        );
+      }
+
+      setRoleResponsePlanResult(
+        payload as RoleWorkforceResponsePlanResponse
+      );
+    } catch (error) {
+      setRoleResponsePlanError(
+        error instanceof Error
+          ? error.message
+          : "Failed to run role workforce response plan."
+      );
+    } finally {
+      setRoleResponsePlanLoading(false);
+    }
+  }
+
+  function resetRoleResponsePlan() {
+    setRoleResponsePlanAllocation(
+      createResponsePlanAllocation()
+    );
+    setRoleResponsePlanResult(null);
+    setRoleResponsePlanError(null);
   }
 
   function persistSavedScenarios(
@@ -3688,6 +3799,259 @@ export function WorkforcePlanningPage({
                           </p>
                         )}
                       </div>
+
+                      {structuralPositionResult.job_profile_impact.some(
+                        (row) =>
+                          row.authorized_position_delta > 0
+                      ) && (
+                        <div className="mt-4 rounded-md border p-4">
+                          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                              <h5 className="font-semibold">
+                                Role Workforce Response Plan
+                              </h5>
+                              <p className="text-sm text-muted-foreground">
+                                Plan Build, Move, and Buy in role units across the full governed skill bundle without double-counting the same role across skills.
+                              </p>
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={resetRoleResponsePlan}
+                                disabled={roleResponsePlanLoading}
+                                className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                Reset
+                              </button>
+                              <button
+                                type="button"
+                                onClick={runRoleResponsePlan}
+                                disabled={
+                                  !roleResponsePlanProfile ||
+                                  roleResponsePlanLoading
+                                }
+                                className="rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                {roleResponsePlanLoading
+                                  ? "Running..."
+                                  : "Run Role Plan"}
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="mb-4 grid gap-3 lg:grid-cols-[1.6fr_repeat(3,minmax(130px,1fr))]">
+                            <label className="rounded-md border p-3">
+                              <span
+                                className="cursor-help border-b border-dotted text-[11px] text-muted-foreground"
+                                title="Only job profiles with positive scenario-created authorized-position demand are available."
+                              >
+                                Job Profile
+                              </span>
+                              <select
+                                value={roleResponsePlanProfile}
+                                onChange={(event) => {
+                                  setRoleResponsePlanProfile(
+                                    event.target.value
+                                  );
+                                  setRoleResponsePlanAllocation(
+                                    createResponsePlanAllocation()
+                                  );
+                                  setRoleResponsePlanResult(null);
+                                  setRoleResponsePlanError(null);
+                                }}
+                                className="mt-1 w-full rounded-md border bg-background px-2 py-2 text-sm"
+                              >
+                                {structuralPositionResult.job_profile_impact
+                                  .filter(
+                                    (row) =>
+                                      row.authorized_position_delta > 0
+                                  )
+                                  .map((row) => (
+                                    <option
+                                      key={row.job_profile_code}
+                                      value={row.job_profile_code}
+                                    >
+                                      {row.job_profile_name +
+                                        " - demand +" +
+                                        formatModeledCount(
+                                          row.authorized_position_delta
+                                        )}
+                                    </option>
+                                  ))}
+                              </select>
+                            </label>
+
+                            {(
+                              [
+                                ["build", "Build"],
+                                ["move", "Move"],
+                                ["buy", "Buy"],
+                              ] as const
+                            ).map(([key, label]) => (
+                              <label
+                                key={key}
+                                className="rounded-md border p-3"
+                              >
+                                <span className="text-[11px] text-muted-foreground">
+                                  {label} roles
+                                </span>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  step={1}
+                                  value={
+                                    roleResponsePlanAllocation[
+                                      key
+                                    ]
+                                  }
+                                  onChange={(event) => {
+                                    setRoleResponsePlanAllocation(
+                                      (current) => ({
+                                        ...current,
+                                        [key]: Number(
+                                          event.target.value
+                                        ),
+                                      })
+                                    );
+                                    setRoleResponsePlanResult(null);
+                                    setRoleResponsePlanError(null);
+                                  }}
+                                  className="mt-1 w-full rounded-md border bg-background px-2 py-2 text-right text-sm tabular-nums"
+                                />
+                              </label>
+                            ))}
+                          </div>
+
+                          <div className="mb-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
+                            One planned role unit is counted once across the entire required-skill bundle. Skill-level learning, mobility, and hiring signals are evidence only and are never summed as unique people.
+                          </div>
+
+                          {roleResponsePlanError && (
+                            <div className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                              {roleResponsePlanError}
+                            </div>
+                          )}
+
+                          {roleResponsePlanResult && (
+                            <>
+                              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                <div className="rounded-md border p-3">
+                                  <p className="text-xs text-muted-foreground">
+                                    Scenario Role Demand
+                                  </p>
+                                  <p className="mt-1 text-2xl font-semibold">
+                                    {formatModeledCount(
+                                      roleResponsePlanResult.scenario_created_role_demand
+                                    )}
+                                  </p>
+                                </div>
+                                <div className="rounded-md border p-3">
+                                  <p className="text-xs text-muted-foreground">
+                                    Planned Coverage
+                                  </p>
+                                  <p className="mt-1 text-2xl font-semibold">
+                                    {formatModeledCount(
+                                      roleResponsePlanResult.planned_role_coverage_if_executed
+                                    )}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {roleResponsePlanResult.coverage_pct_if_executed.toFixed(
+                                      1
+                                    )}% if executed
+                                  </p>
+                                </div>
+                                <div className="rounded-md border p-3">
+                                  <p className="text-xs text-muted-foreground">
+                                    Remaining Role Gap
+                                  </p>
+                                  <p className="mt-1 text-2xl font-semibold">
+                                    {formatModeledCount(
+                                      roleResponsePlanResult.remaining_role_gap_if_executed
+                                    )}
+                                  </p>
+                                </div>
+                                <div className="rounded-md border p-3">
+                                  <p className="text-xs text-muted-foreground">
+                                    Required Skills
+                                  </p>
+                                  <p className="mt-1 text-2xl font-semibold">
+                                    {roleResponsePlanResult.evidence_summary.required_skill_count.toLocaleString()}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {roleResponsePlanResult.evidence_summary.skills_with_build_pathway} build pathways
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="mt-4 overflow-x-auto rounded-md border p-3">
+                                <table className="w-full min-w-[820px] text-sm">
+                                  <thead>
+                                    <tr className="border-b text-left text-xs text-muted-foreground">
+                                      <th className="pb-3 pr-4">Required Skill</th>
+                                      <th className="pb-3 px-3">Importance</th>
+                                      <th className="pb-3 px-3 text-right">Proficiency</th>
+                                      <th className="pb-3 px-3 text-right">Build</th>
+                                      <th className="pb-3 px-3 text-right">Move Signal</th>
+                                      <th className="pb-3 pl-3 text-right">Buy History</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {roleResponsePlanResult.skill_bundle.map(
+                                      (row) => (
+                                        <tr
+                                          key={row.skill_code}
+                                          className="border-b last:border-0"
+                                        >
+                                          <td className="py-3 pr-4 font-medium">
+                                            {row.skill_name}
+                                            <p className="text-[10px] font-normal text-muted-foreground">
+                                              {row.skill_category}
+                                            </p>
+                                          </td>
+                                          <td className="px-3 py-3">
+                                            {row.importance}
+                                          </td>
+                                          <td className="px-3 py-3 text-right tabular-nums">
+                                            {row.required_proficiency}
+                                          </td>
+                                          <td className="px-3 py-3 text-right tabular-nums">
+                                            {row.build_pathway_available
+                                              ? row.active_course_count + " course(s)"
+                                              : "No pathway"}
+                                          </td>
+                                          <td className="px-3 py-3 text-right tabular-nums">
+                                            {row.mobility_candidates.toLocaleString()}
+                                          </td>
+                                          <td className="py-3 pl-3 text-right tabular-nums">
+                                            {row.historical_filled_requisitions.toLocaleString()}
+                                          </td>
+                                        </tr>
+                                      )
+                                    )}
+                                  </tbody>
+                                </table>
+                              </div>
+
+                              {roleResponsePlanResult.warnings.length > 0 && (
+                                <div className="mt-4 rounded-md border p-3">
+                                  <p className="text-xs font-medium">
+                                    Plan warnings
+                                  </p>
+                                  <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                                    {roleResponsePlanResult.warnings.map(
+                                      (warning) => (
+                                        <li key={warning}>
+                                          - {warning}
+                                        </li>
+                                      )
+                                    )}
+                                  </ul>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )}
 
                       {structuralPositionResult.response_strategy.skills.length >
                         0 && (
