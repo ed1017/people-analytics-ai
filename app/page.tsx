@@ -16,6 +16,7 @@ import { AttritionPage } from "@/components/pages/attrition-page";
 import { FinancePage } from "@/components/pages/finance-page";
 import { SkillsPage } from "@/components/pages/skills-page";
 import { LearningDevelopmentPage } from "@/components/pages/learning-development-page";
+import { CareerMobilityPage } from "@/components/pages/career-mobility-page";
 import { WorkforcePlanningPage } from "@/components/pages/workforce-planning-page";
 import { PlanningSessionProvider } from "@/components/workforce-planning/planning-session-context";
 import { TalentAcquisitionPage } from "@/components/pages/talent-acquisition-page";
@@ -24,6 +25,7 @@ import { AiPanel } from "@/components/ai-panel";
 import type {
   AppPage,
   BlsResponse,
+  CareerMobilityResponse,
   ChatMessage,
   DashboardFilterOptions,
   DashboardResponse,
@@ -139,6 +141,21 @@ export default function Home() {
   const [
     learningDevelopmentError,
     setLearningDevelopmentError,
+  ] = useState<string | null>(null);
+
+  const [
+    careerMobilityData,
+    setCareerMobilityData,
+  ] = useState<CareerMobilityResponse | null>(
+    null
+  );
+  const [
+    careerMobilityLoading,
+    setCareerMobilityLoading,
+  ] = useState(false);
+  const [
+    careerMobilityError,
+    setCareerMobilityError,
   ] = useState<string | null>(null);
 
   const [talentAcquisitionData, setTalentAcquisitionData] =
@@ -630,6 +647,58 @@ export default function Home() {
 
   useEffect(() => {
     if (
+      activePage !==
+        "career-mobility" ||
+      careerMobilityData
+    ) {
+      return;
+    }
+
+    async function loadCareerMobility() {
+      try {
+        setCareerMobilityLoading(true);
+        setCareerMobilityError(null);
+
+        const response = await fetch(
+          "/api/career-mobility",
+          {
+            cache: "no-store",
+          }
+        );
+
+        const payload =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            payload?.error ??
+              "Failed to load Career & Mobility data."
+          );
+        }
+
+        setCareerMobilityData(
+          payload as CareerMobilityResponse
+        );
+      } catch (error) {
+        console.error(error);
+        setCareerMobilityError(
+          error instanceof Error
+            ? error.message
+            : "Failed to load Career & Mobility data."
+        );
+      } finally {
+        setCareerMobilityLoading(false);
+      }
+    }
+
+    loadCareerMobility();
+  }, [
+    activePage,
+    careerMobilityData,
+  ]);
+
+  useEffect(() => {
+    if (
       activePage !== "skills" ||
       blsData
     ) {
@@ -871,6 +940,13 @@ export default function Home() {
                 "Where is learning pathway coverage missing?",
                 "Which job profiles have the broadest required-skill pathway coverage?",
               ]
+          : activePage ===
+              "career-mobility"
+            ? [
+                "Which destination roles have the most recorded interest?",
+                "Where are desired locations concentrated?",
+                "What does recorded relocation willingness show?",
+              ]
           : activePage === "talent-acquisition"
             ? [
                 "Where is the recruiting funnel weakest?",
@@ -1074,6 +1150,32 @@ export default function Home() {
                         0,
                         15
                       ),
+                  }
+                : null,
+
+            careerMobilityContext:
+              activePage ===
+                "career-mobility" &&
+              careerMobilityData
+                ? {
+                    summary:
+                      careerMobilityData.summary,
+                    dataQuality:
+                      careerMobilityData.data_quality,
+                    careerInterests:
+                      careerMobilityData.career_interests,
+                    destinationRoles:
+                      careerMobilityData.destination_roles.slice(
+                        0,
+                        10
+                      ),
+                    desiredLocations:
+                      careerMobilityData.desired_locations.slice(
+                        0,
+                        10
+                      ),
+                    currentOrgCoverage:
+                      careerMobilityData.current_org_coverage,
                   }
                 : null,
 
@@ -1401,6 +1503,13 @@ export default function Home() {
             data={learningDevelopmentData}
             loading={learningDevelopmentLoading}
             error={learningDevelopmentError}
+          />
+        ) : activePage ===
+          "career-mobility" ? (
+          <CareerMobilityPage
+            data={careerMobilityData}
+            loading={careerMobilityLoading}
+            error={careerMobilityError}
           />
         ) : (
           <PlanningSessionProvider>

@@ -33,6 +33,7 @@ export const appNavigationSections: AppNavigationSection[] = [
     pages: [
       "skills",
       "learning-development",
+      "career-mobility",
     ],
   },  {
     key: "strategy",
@@ -88,6 +89,12 @@ export const appPageMetadata: Record<
     section: "Talent Management",
     description:
       "Learning pathway coverage for current skill gaps and job-profile requirements.",
+  },
+  "career-mobility": {
+    label: "Career & Mobility",
+    section: "Talent Management",
+    description:
+      "Aggregate recorded career interests, desired destinations, and preference coverage.",
   },
   "workforce-planning": {
     label: "Workforce Planning",

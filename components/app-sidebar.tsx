@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   CalendarDays,
+  Compass,
   DollarSign,
   GraduationCap,
   LayoutDashboard,
@@ -38,6 +39,7 @@ const pageIcons: Record<
   finance: DollarSign,
   skills: Sparkles,
   "learning-development": GraduationCap,
+  "career-mobility": Compass,
   "workforce-planning": CalendarDays,
 };
 
