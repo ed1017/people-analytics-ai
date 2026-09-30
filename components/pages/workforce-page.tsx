@@ -114,7 +114,7 @@ export function WorkforcePage({ data, loading, error }: Props) {
             </div>
           </div>
 
-          <div className="mt-6 grid gap-6 xl:grid-cols-2">
+          <div className="mt-6 grid gap-6">
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">Career Level Mix</h3>
               <p className="mb-4 text-sm text-muted-foreground">Headcount and manager concentration by level</p>
