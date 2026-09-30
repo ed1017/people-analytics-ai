@@ -27,6 +27,9 @@ import type {
   PositionScenario,
   ScenarioModelAssumptions,
   ScenarioModelResponse,
+  StructuralPositionAction,
+  StructuralPositionCatalogResponse,
+  StructuralPositionScenarioResponse,
 } from "@/lib/types";
 
 type WorkforcePlanningPageProps = {
@@ -99,6 +102,28 @@ type SavedScenarioEntry = {
 
 const SAVED_SCENARIOS_STORAGE_KEY =
   "people-analytics.saved-workforce-scenarios.v1";
+
+function createStructuralPositionAction():
+  StructuralPositionAction {
+  return {
+    action_type: "add_positions",
+    business_unit: null,
+    level: null,
+    job_profile: null,
+    amount: 0,
+    fill_pct: null,
+  };
+}
+
+const structuralActionLabels = {
+  add_positions: "Add positions",
+  close_vacant_positions:
+    "Close vacant positions",
+  freeze_vacancies:
+    "Freeze vacancies",
+  fill_vacancies:
+    "Fill vacancies",
+} as const;
 
 const scenarioFields: Array<{
   key: keyof ScenarioModelAssumptions;
@@ -227,6 +252,34 @@ export function WorkforcePlanningPage({
     positionActionError,
     setPositionActionError,
   ] = useState<string | null>(null);
+  const [
+    structuralPositionCatalog,
+    setStructuralPositionCatalog,
+  ] =
+    useState<StructuralPositionCatalogResponse | null>(
+      null
+    );
+  const [
+    structuralPositionActions,
+    setStructuralPositionActions,
+  ] = useState<StructuralPositionAction[]>([
+    createStructuralPositionAction(),
+  ]);
+  const [
+    structuralPositionResult,
+    setStructuralPositionResult,
+  ] =
+    useState<StructuralPositionScenarioResponse | null>(
+      null
+    );
+  const [
+    structuralPositionLoading,
+    setStructuralPositionLoading,
+  ] = useState(false);
+  const [
+    structuralPositionError,
+    setStructuralPositionError,
+  ] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -259,6 +312,47 @@ export function WorkforcePlanningPage({
     } catch {
       // Ignore invalid or unavailable browser storage.
     }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadStructuralPositionCatalog() {
+      try {
+        const response = await fetch(
+          "/api/position-structure",
+          { cache: "no-store" }
+        );
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            payload?.error ??
+              "Failed to load structural position catalog."
+          );
+        }
+
+        if (!cancelled) {
+          setStructuralPositionCatalog(
+            payload as StructuralPositionCatalogResponse
+          );
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setStructuralPositionError(
+            error instanceof Error
+              ? error.message
+              : "Failed to load structural position catalog."
+          );
+        }
+      }
+    }
+
+    loadStructuralPositionCatalog();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -550,6 +644,100 @@ export function WorkforcePlanningPage({
     );
     setPositionActionResult(null);
     setPositionActionError(null);
+  }
+
+  function updateStructuralPositionAction(
+    index: number,
+    patch: Partial<StructuralPositionAction>
+  ) {
+    setStructuralPositionActions(
+      (current) =>
+        current.map(
+          (action, actionIndex) =>
+            actionIndex === index
+              ? {
+                  ...action,
+                  ...patch,
+                }
+              : action
+        )
+    );
+    setStructuralPositionResult(null);
+    setStructuralPositionError(null);
+  }
+
+  function addStructuralPositionAction() {
+    setStructuralPositionActions(
+      (current) => [
+        ...current,
+        createStructuralPositionAction(),
+      ]
+    );
+  }
+
+  function removeStructuralPositionAction(
+    index: number
+  ) {
+    setStructuralPositionActions(
+      (current) =>
+        current.length === 1
+          ? current
+          : current.filter(
+              (_, actionIndex) =>
+                actionIndex !== index
+            )
+    );
+    setStructuralPositionResult(null);
+  }
+
+  async function runStructuralPositionActions() {
+    try {
+      setStructuralPositionLoading(true);
+      setStructuralPositionError(null);
+
+      const response = await fetch(
+        "/api/position-structure",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            actions:
+              structuralPositionActions,
+          }),
+        }
+      );
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload?.error ??
+            "Failed to run structural position scenario."
+        );
+      }
+
+      setStructuralPositionResult(
+        payload as StructuralPositionScenarioResponse
+      );
+    } catch (error) {
+      setStructuralPositionError(
+        error instanceof Error
+          ? error.message
+          : "Failed to run structural position scenario."
+      );
+    } finally {
+      setStructuralPositionLoading(false);
+    }
+  }
+
+  function resetStructuralPositionActions() {
+    setStructuralPositionActions([
+      createStructuralPositionAction(),
+    ]);
+    setStructuralPositionResult(null);
+    setStructuralPositionError(null);
   }
 
   function persistSavedScenarios(
@@ -2349,6 +2537,513 @@ export function WorkforcePlanningPage({
                         </p>
                       </div>
                     </div>
+                  )}
+                </div>
+
+                <div className="mb-5 rounded-md border p-4">
+                  <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <h4 className="font-semibold">
+                        Structural Position Actions
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        Apply ordered actions by business unit, career level, and optional job profile.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={addStructuralPositionAction}
+                        disabled={
+                          structuralPositionActions.length >=
+                          20
+                        }
+                        className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Add Action
+                      </button>
+                      <button
+                        type="button"
+                        onClick={resetStructuralPositionActions}
+                        disabled={structuralPositionLoading}
+                        className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Reset
+                      </button>
+                      <button
+                        type="button"
+                        onClick={runStructuralPositionActions}
+                        disabled={
+                          !structuralPositionCatalog ||
+                          structuralPositionLoading
+                        }
+                        className="rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {structuralPositionLoading
+                          ? "Running…"
+                          : "Run Structural Scenario"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {structuralPositionActions.map(
+                      (action, index) => {
+                        const profileOptions =
+                          structuralPositionCatalog?.job_profiles.filter(
+                            (profile) =>
+                              structuralPositionCatalog.combinations.some(
+                                (combo) =>
+                                  (!action.business_unit ||
+                                    combo.org_code ===
+                                      action.business_unit) &&
+                                  (!action.level ||
+                                    combo.level_code ===
+                                      action.level) &&
+                                  combo.job_profile_code ===
+                                    profile.job_profile_code
+                              )
+                          ) ?? [];
+
+                        return (
+                          <div
+                            key={index}
+                            className="grid gap-3 rounded-md border p-3 xl:grid-cols-[36px_1.1fr_1.2fr_1fr_1.4fr_0.8fr_36px]"
+                          >
+                            <div className="flex items-center justify-center text-sm font-semibold text-muted-foreground">
+                              {index + 1}
+                            </div>
+
+                            <label>
+                              <span className="text-[11px] text-muted-foreground">
+                                Action
+                              </span>
+                              <select
+                                value={action.action_type}
+                                onChange={(event) => {
+                                  const actionType =
+                                    event.target
+                                      .value as StructuralPositionAction["action_type"];
+                                  updateStructuralPositionAction(
+                                    index,
+                                    {
+                                      action_type:
+                                        actionType,
+                                      amount:
+                                        actionType ===
+                                        "fill_vacancies"
+                                          ? null
+                                          : 0,
+                                      fill_pct:
+                                        actionType ===
+                                        "fill_vacancies"
+                                          ? 0
+                                          : null,
+                                    }
+                                  );
+                                }}
+                                className="mt-1 w-full rounded-md border bg-background px-2 py-2 text-sm"
+                              >
+                                {Object.entries(
+                                  structuralActionLabels
+                                ).map(
+                                  ([value, label]) => (
+                                    <option
+                                      key={value}
+                                      value={value}
+                                    >
+                                      {label}
+                                    </option>
+                                  )
+                                )}
+                              </select>
+                            </label>
+
+                            <label>
+                              <span className="text-[11px] text-muted-foreground">
+                                Business Unit
+                              </span>
+                              <select
+                                value={
+                                  action.business_unit ??
+                                  ""
+                                }
+                                onChange={(event) =>
+                                  updateStructuralPositionAction(
+                                    index,
+                                    {
+                                      business_unit:
+                                        event.target
+                                          .value ||
+                                        null,
+                                      job_profile:
+                                        null,
+                                    }
+                                  )
+                                }
+                                className="mt-1 w-full rounded-md border bg-background px-2 py-2 text-sm"
+                              >
+                                <option value="">
+                                  All business units
+                                </option>
+                                {structuralPositionCatalog?.business_units.map(
+                                  (option) => (
+                                    <option
+                                      key={
+                                        option.org_code
+                                      }
+                                      value={
+                                        option.org_code
+                                      }
+                                    >
+                                      {
+                                        option.org_name
+                                      }
+                                    </option>
+                                  )
+                                )}
+                              </select>
+                            </label>
+
+                            <label>
+                              <span className="text-[11px] text-muted-foreground">
+                                Level
+                              </span>
+                              <select
+                                value={
+                                  action.level ?? ""
+                                }
+                                onChange={(event) =>
+                                  updateStructuralPositionAction(
+                                    index,
+                                    {
+                                      level:
+                                        event.target
+                                          .value ||
+                                        null,
+                                      job_profile:
+                                        null,
+                                    }
+                                  )
+                                }
+                                className="mt-1 w-full rounded-md border bg-background px-2 py-2 text-sm"
+                              >
+                                <option value="">
+                                  All levels
+                                </option>
+                                {structuralPositionCatalog?.levels.map(
+                                  (option) => (
+                                    <option
+                                      key={
+                                        option.level_code
+                                      }
+                                      value={
+                                        option.level_code
+                                      }
+                                    >
+                                      {
+                                        option.level_name
+                                      }
+                                    </option>
+                                  )
+                                )}
+                              </select>
+                            </label>
+
+                            <label>
+                              <span className="text-[11px] text-muted-foreground">
+                                Job Profile
+                              </span>
+                              <select
+                                value={
+                                  action.job_profile ??
+                                  ""
+                                }
+                                onChange={(event) =>
+                                  updateStructuralPositionAction(
+                                    index,
+                                    {
+                                      job_profile:
+                                        event.target
+                                          .value ||
+                                        null,
+                                    }
+                                  )
+                                }
+                                className="mt-1 w-full rounded-md border bg-background px-2 py-2 text-sm"
+                              >
+                                <option value="">
+                                  All job profiles
+                                </option>
+                                {profileOptions.map(
+                                  (option) => (
+                                    <option
+                                      key={
+                                        option.job_profile_code
+                                      }
+                                      value={
+                                        option.job_profile_code
+                                      }
+                                    >
+                                      {
+                                        option.job_profile_name
+                                      }
+                                    </option>
+                                  )
+                                )}
+                              </select>
+                            </label>
+
+                            <label>
+                              <span className="text-[11px] text-muted-foreground">
+                                {action.action_type ===
+                                "fill_vacancies"
+                                  ? "Fill %"
+                                  : "Positions"}
+                              </span>
+                              <input
+                                type="number"
+                                min={0}
+                                max={
+                                  action.action_type ===
+                                  "fill_vacancies"
+                                    ? 100
+                                    : undefined
+                                }
+                                step={
+                                  action.action_type ===
+                                  "fill_vacancies"
+                                    ? 5
+                                    : 1
+                                }
+                                value={
+                                  action.action_type ===
+                                  "fill_vacancies"
+                                    ? action.fill_pct ??
+                                      0
+                                    : action.amount ?? 0
+                                }
+                                onChange={(event) =>
+                                  updateStructuralPositionAction(
+                                    index,
+                                    action.action_type ===
+                                      "fill_vacancies"
+                                      ? {
+                                          fill_pct:
+                                            Number(
+                                              event
+                                                .target
+                                                .value
+                                            ),
+                                        }
+                                      : {
+                                          amount:
+                                            Number(
+                                              event
+                                                .target
+                                                .value
+                                            ),
+                                        }
+                                  )
+                                }
+                                className="mt-1 w-full rounded-md border bg-background px-2 py-2 text-right text-sm tabular-nums"
+                              />
+                            </label>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                removeStructuralPositionAction(
+                                  index
+                                )
+                              }
+                              disabled={
+                                structuralPositionActions.length ===
+                                1
+                              }
+                              className="self-end rounded-md border px-2 py-2 text-sm text-muted-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                              title="Remove action"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        );
+                      }
+                    )}
+                  </div>
+
+                  <div className="mt-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
+                    Actions run top-to-bottom. Cost basis comes from the stored Baseline Dec 2027 labor cost per planned position for the matching BU × level × job-profile mix.
+                  </div>
+
+                  {structuralPositionError && (
+                    <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                      {structuralPositionError}
+                    </div>
+                  )}
+
+                  {structuralPositionResult && (
+                    <>
+                      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                        <div className="rounded-md border p-3">
+                          <p className="text-xs text-muted-foreground">
+                            Authorized Positions
+                          </p>
+                          <p className="mt-1 text-2xl font-semibold">
+                            {structuralPositionResult.modeled.authorized_positions.toLocaleString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {structuralPositionResult.modeled.net_authorized_position_change >=
+                            0
+                              ? "+"
+                              : ""}
+                            {structuralPositionResult.modeled.net_authorized_position_change.toLocaleString()}{" "}
+                            vs current
+                          </p>
+                        </div>
+
+                        <div className="rounded-md border p-3">
+                          <p className="text-xs text-muted-foreground">
+                            Filled Positions
+                          </p>
+                          <p className="mt-1 text-2xl font-semibold">
+                            {structuralPositionResult.modeled.filled_positions.toLocaleString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {structuralPositionResult.modeled.net_filled_position_change >=
+                            0
+                              ? "+"
+                              : ""}
+                            {structuralPositionResult.modeled.net_filled_position_change.toLocaleString()}{" "}
+                            vs current
+                          </p>
+                        </div>
+
+                        <div className="rounded-md border p-3">
+                          <p className="text-xs text-muted-foreground">
+                            Open Vacancies
+                          </p>
+                          <p className="mt-1 text-2xl font-semibold">
+                            {structuralPositionResult.modeled.open_vacancies.toLocaleString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {structuralPositionResult.modeled.vacancy_rate_pct.toFixed(
+                              1
+                            )}
+                            % vacancy rate
+                          </p>
+                        </div>
+
+                        <div className="rounded-md border p-3">
+                          <p className="text-xs text-muted-foreground">
+                            Authorized Budget Δ
+                          </p>
+                          <p className="mt-1 text-2xl font-semibold">
+                            {formatCurrencyCompact(
+                              structuralPositionResult.modeled
+                                .authorized_budget_delta_usd
+                            )}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Position authorization, not cash savings
+                          </p>
+                        </div>
+
+                        <div className="rounded-md border p-3">
+                          <p className="text-xs text-muted-foreground">
+                            Staffed Labor Cost Δ
+                          </p>
+                          <p className="mt-1 text-2xl font-semibold">
+                            {formatCurrencyCompact(
+                              structuralPositionResult.modeled
+                                .annualized_staffed_labor_cost_delta_usd
+                            )}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Annualized effect of modeled fills
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 overflow-x-auto rounded-md border p-3">
+                        <table className="w-full min-w-[860px] text-sm">
+                          <thead>
+                            <tr className="border-b text-left text-xs text-muted-foreground">
+                              <th className="pb-3 pr-4">
+                                #
+                              </th>
+                              <th className="pb-3 pr-4">
+                                Action
+                              </th>
+                              <th className="pb-3 pr-4">
+                                Scope
+                              </th>
+                              <th className="pb-3 px-3 text-right">
+                                Applied
+                              </th>
+                              <th className="pb-3 px-3 text-right">
+                                Cost / Position
+                              </th>
+                              <th className="pb-3 px-3 text-right">
+                                Budget Δ
+                              </th>
+                              <th className="pb-3 pl-3 text-right">
+                                Staffed Cost Δ
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {structuralPositionResult.action_results.map(
+                              (row) => (
+                                <tr
+                                  key={
+                                    row.action_index
+                                  }
+                                  className="border-b last:border-0"
+                                >
+                                  <td className="py-3 pr-4">
+                                    {
+                                      row.action_index
+                                    }
+                                  </td>
+                                  <td className="py-3 pr-4 font-medium">
+                                    {
+                                      structuralActionLabels[
+                                        row.action_type
+                                      ]
+                                    }
+                                  </td>
+                                  <td className="py-3 pr-4">
+                                    {
+                                      row.scope_label
+                                    }
+                                  </td>
+                                  <td className="px-3 py-3 text-right tabular-nums">
+                                    {row.applied_value.toLocaleString()}
+                                  </td>
+                                  <td className="px-3 py-3 text-right tabular-nums">
+                                    {formatCurrencyCompact(
+                                      row.annual_cost_basis_per_position_usd
+                                    )}
+                                  </td>
+                                  <td className="px-3 py-3 text-right tabular-nums">
+                                    {formatCurrencyCompact(
+                                      row.authorized_budget_delta_usd
+                                    )}
+                                  </td>
+                                  <td className="py-3 pl-3 text-right tabular-nums">
+                                    {formatCurrencyCompact(
+                                      row.staffed_labor_cost_delta_usd
+                                    )}
+                                  </td>
+                                </tr>
+                              )
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
                   )}
                 </div>
 
