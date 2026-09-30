@@ -7,12 +7,8 @@ import {
 import { WorkforcePlanningWorkflowNavigation } from "@/components/workforce-planning/workflow-navigation";
 import { ScenarioModelingDestination } from "@/components/workforce-planning/scenario-modeling-destination";
 import { PositionWorkforceDesignDestination } from "@/components/workforce-planning/position-workforce-design-destination";
-import { ResponsePortfolioAllocationSection } from "@/components/workforce-planning/response-portfolio-allocation-section";
 import { WorkforceResponseDestination } from "@/components/workforce-planning/workforce-response-destination";
-import { PositionModelingSummary } from "@/components/workforce-planning/position-modeling-summary";
-import { StructuralPositionActionResults } from "@/components/workforce-planning/structural-position-action-results";
-import { StructuralPositionScenarioSummary } from "@/components/workforce-planning/structural-position-scenario-summary";
-import { WorkforceExecutionPanel } from "@/components/workforce-planning/workforce-execution-panel";
+import { ExecutionFeasibilityDestination } from "@/components/workforce-planning/execution-feasibility-destination";
 import { PlanningOverview } from "@/components/workforce-planning/planning-overview";
 import { usePlanningSession } from "@/components/workforce-planning/planning-session-context";
 
@@ -2203,137 +2199,88 @@ export function WorkforcePlanningPage({
                 }}
               />
 
-              <div
-                className={
-                  workflowView === "execute"
-                    ? "mt-6 rounded-lg border p-4"
-                    : "hidden"
-                }
-              >
-                <div className="mb-5 flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="font-semibold">
-                      Execution & Feasibility
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Put the approved response on a timeline and test whether it fits the operating constraints.
-                    </p>
-                  </div>
-
-                  <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
-                    {positionModelingLoading
-                      ? "Loading positions…"
-                      : selectedPlanningScenario}
-                  </span>
-                </div>
-
-                {(!responsePortfolioResult ||
-                  !businessUnitResponseResult) && (
-                  <div className="mb-5 rounded-md border bg-muted/20 p-4">
-                    <p className="font-medium">
-                      Build the response plan first
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Execution starts after Build / Move / Buy has been allocated and reconciled to business-unit destinations.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setWorkflowView("respond")
-                      }
-                      className="mt-3 rounded-md border px-3 py-2 text-sm"
-                    >
-                      Go to Respond
-                    </button>
-                  </div>
+              <ExecutionFeasibilityDestination
+                visible={workflowView === "execute"}
+                selectedPlanningScenario={selectedPlanningScenario}
+                positionModelingLoading={positionModelingLoading}
+                structuralPositionResult={structuralPositionResult}
+                responseReady={Boolean(
+                  responsePortfolioResult &&
+                    businessUnitResponseResult
                 )}
-
-                <div className="mb-5 rounded-md border p-4">
-                  {structuralPositionResult && (
-                    <>
-                      <StructuralPositionScenarioSummary
-                        result={structuralPositionResult}
-                        showDemandDetails={false}
-                      />
-
-                      {structuralPositionResult.job_profile_impact.filter(
-                        (row) =>
-                          row.authorized_position_delta > 0
-                      ).length > 1 && (
-                        <div className="mt-4 rounded-md border p-4">
-                          <ResponsePortfolioAllocationSection
-                            portfolioProps={{
-                              scenario: structuralPositionResult,
-                              allocations: responsePortfolioAllocations,
-                              result: responsePortfolioResult,
-                              loading: responsePortfolioLoading,
-                              error: responsePortfolioError,
-                              onUpdate: updateResponsePortfolioAllocation,
-                              onReset: resetResponsePortfolio,
-                              onRun: runResponsePortfolio,
-                            }}
-                            businessUnitProps={
-                              responsePortfolioResult
-                                ? {
-                                    scenario: structuralPositionResult,
-                                    portfolioResult: responsePortfolioResult,
-                                    allocations: businessUnitResponseAllocations,
-                                    result: businessUnitResponseResult,
-                                    loading: businessUnitResponseLoading,
-                                    error: businessUnitResponseError,
-                                    onUpdate: updateBusinessUnitResponseAllocation,
-                                    onReset: resetBusinessUnitResponseAllocation,
-                                    onRun: runBusinessUnitResponseAllocation,
-                                  }
-                                : null
-                            }
-                          >
-                            {businessUnitResponseResult && (
-                              <WorkforceExecutionPanel
-                                workflowView={workflowView}
-                                businessUnitResponseResult={businessUnitResponseResult}
-                                responseExecutionDrafts={responseExecutionDrafts}
-                                responseExecutionLoading={responseExecutionLoading}
-                                responseExecutionError={responseExecutionError}
-                                responseExecutionResult={responseExecutionResult}
-                                constraintAwareScheduleLoading={constraintAwareScheduleLoading}
-                                constraintAwareScheduleError={constraintAwareScheduleError}
-                                constraintAwareScheduleResult={constraintAwareScheduleResult}
-                                responseConstraintDraft={responseConstraintDraft}
-                                responseConstraintLoading={responseConstraintLoading}
-                                responseConstraintError={responseConstraintError}
-                                responseConstraintResult={responseConstraintResult}
-                                resetResponseExecution={resetResponseExecution}
-                                runConstraintAwareScheduler={runConstraintAwareScheduler}
-                                runResponseExecution={runResponseExecution}
-                                updateResponseExecutionDraft={updateResponseExecutionDraft}
-                                addResponseExecutionPhase={addResponseExecutionPhase}
-                                removeResponseExecutionPhase={removeResponseExecutionPhase}
-                                updateResponseConstraintDraft={updateResponseConstraintDraft}
-                                resetResponseConstraints={resetResponseConstraints}
-                                runResponseConstraints={runResponseConstraints}
-                              />
-                            )}
-                          </ResponsePortfolioAllocationSection>
-                        </div>
-                      )}
-
-                      <StructuralPositionActionResults
-                        result={structuralPositionResult}
-                      />
-                    </>
-                  )}
-                </div>
-
-                <PositionModelingSummary
-                  positionModelingError={positionModelingError}
-                  positionModelingLoading={positionModelingLoading}
-                  positionModelingData={positionModelingData}
-                  activePositionScenario={activePositionScenario}
-                  topPositionBusinessUnits={topPositionBusinessUnits}
-                  positionLevels={positionLevels}
-                />
-              </div>
+                onNavigateResponse={() =>
+                  setWorkflowView("respond")
+                }
+                portfolioSectionProps={
+                  structuralPositionResult &&
+                  structuralPositionResult.job_profile_impact.filter(
+                    (row) =>
+                      row.authorized_position_delta > 0
+                  ).length > 1
+                    ? {
+                        portfolioProps: {
+                          scenario: structuralPositionResult,
+                          allocations: responsePortfolioAllocations,
+                          result: responsePortfolioResult,
+                          loading: responsePortfolioLoading,
+                          error: responsePortfolioError,
+                          onUpdate: updateResponsePortfolioAllocation,
+                          onReset: resetResponsePortfolio,
+                          onRun: runResponsePortfolio,
+                        },
+                        businessUnitProps:
+                          responsePortfolioResult
+                            ? {
+                                scenario: structuralPositionResult,
+                                portfolioResult: responsePortfolioResult,
+                                allocations: businessUnitResponseAllocations,
+                                result: businessUnitResponseResult,
+                                loading: businessUnitResponseLoading,
+                                error: businessUnitResponseError,
+                                onUpdate: updateBusinessUnitResponseAllocation,
+                                onReset: resetBusinessUnitResponseAllocation,
+                                onRun: runBusinessUnitResponseAllocation,
+                              }
+                            : null,
+                      }
+                    : null
+                }
+                executionPanelProps={
+                  businessUnitResponseResult
+                    ? {
+                        businessUnitResponseResult,
+                        responseExecutionDrafts,
+                        responseExecutionLoading,
+                        responseExecutionError,
+                        responseExecutionResult,
+                        constraintAwareScheduleLoading,
+                        constraintAwareScheduleError,
+                        constraintAwareScheduleResult,
+                        responseConstraintDraft,
+                        responseConstraintLoading,
+                        responseConstraintError,
+                        responseConstraintResult,
+                        resetResponseExecution,
+                        runConstraintAwareScheduler,
+                        runResponseExecution,
+                        updateResponseExecutionDraft,
+                        addResponseExecutionPhase,
+                        removeResponseExecutionPhase,
+                        updateResponseConstraintDraft,
+                        resetResponseConstraints,
+                        runResponseConstraints,
+                      }
+                    : null
+                }
+                positionSummaryProps={{
+                  positionModelingError,
+                  positionModelingLoading,
+                  positionModelingData,
+                  activePositionScenario,
+                  topPositionBusinessUnits,
+                  positionLevels,
+                }}
+              />
             </>
           )}
         </section>
