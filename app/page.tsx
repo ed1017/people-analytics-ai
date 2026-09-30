@@ -28,6 +28,7 @@ import type {
   OverviewData,
   Persona,
   PositionModelingResponse,
+  ScenarioModelResponse,
   SkillsResponse,
   WorkforceResponse,
   AttritionResponse,
@@ -1061,6 +1062,39 @@ export default function Home() {
     }
   };
 
+  const explainCustomScenario = async (
+    scenario: ScenarioModelResponse
+  ) => {
+    setAiCollapsed(false);
+
+    const assumptions = scenario.assumptions;
+    const summary = scenario.summary;
+
+    const prompt = [
+      "Explain this deterministic workforce scenario and its business implications.",
+      "",
+      "Use the approved workforce scenario tool to rerun and verify these exact assumptions before explaining the result:",
+      `- Annual enterprise growth: ${assumptions.annual_growth_pct}%`,
+      `- Salary inflation: ${assumptions.salary_inflation_pct}%`,
+      `- Annual attrition: ${assumptions.annual_attrition_pct}%`,
+      `- Fill rate: ${assumptions.fill_rate_pct}%`,
+      `- AI/productivity hiring-demand reduction: ${assumptions.productivity_hiring_reduction_pct}%`,
+      "",
+      "The deterministic UI result currently shows:",
+      `- Ending headcount: ${summary.modeled_end_headcount}`,
+      `- Baseline ending headcount: ${summary.baseline_end_headcount}`,
+      `- Headcount delta vs Baseline: ${summary.headcount_delta_vs_baseline}`,
+      `- Ending FTE: ${summary.modeled_end_fte}`,
+      `- Ending labor cost USD: ${summary.modeled_end_labor_cost_usd}`,
+      `- Labor cost delta vs Baseline USD: ${summary.labor_cost_delta_vs_baseline_usd}`,
+      `- Headcount gap vs target: ${summary.headcount_gap_vs_target}`,
+      "",
+      "Explain the main workforce and cost tradeoffs. Separate modeled facts from interpretation and do not invent causes, savings, or math outside the deterministic tool result.",
+    ].join("\n");
+
+    await sendChatMessage(prompt);
+  };
+
   // Expand AI to approximately 40% of the browser width.
   const toggleAiExpanded = () => {
     if (aiExpanded) {
@@ -1248,6 +1282,7 @@ export default function Home() {
             topPositionBusinessUnits={topPositionBusinessUnits}
             positionLevels={positionLevels}
             onScenarioChange={setSelectedPlanningScenario}
+            onExplainCustomScenario={explainCustomScenario}
           />
         )}
 
