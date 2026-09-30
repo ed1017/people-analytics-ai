@@ -158,7 +158,11 @@
 }
 
 @media (min-width: 768px) {
-  .app-shell {
+  .app-shell.app-ai-left {
+    grid-template-columns: var(--nav-width) var(--ai-width) var(--divider-width) minmax(0, 1fr);
+  }
+
+  .app-shell.app-ai-right {
     grid-template-columns: var(--nav-width) minmax(0, 1fr) var(--divider-width) var(--ai-width);
   }
 
@@ -167,23 +171,47 @@
     grid-row: 1;
   }
 
-  .app-dashboard {
+  .app-ai-left .app-ai-panel {
     grid-column: 2;
     grid-row: 1;
+    border-left-width: 0;
+    border-right-width: 1px;
   }
 
-  .app-ai-resizer {
-    display: block;
+  .app-ai-left .app-ai-resizer {
     grid-column: 3;
     grid-row: 1;
   }
 
-  .app-ai-panel {
+  .app-ai-left .app-dashboard {
     grid-column: 4;
     grid-row: 1;
+  }
+
+  .app-ai-right .app-dashboard {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .app-ai-right .app-ai-resizer {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .app-ai-right .app-ai-panel {
+    grid-column: 4;
+    grid-row: 1;
+    border-left-width: 1px;
+    border-right-width: 0;
+  }
+
+  .app-ai-resizer {
+    display: block;
+  }
+
+  .app-ai-panel {
     position: sticky;
     max-width: none;
-    border-left-width: 1px;
     border-top-width: 0;
   }
 }
