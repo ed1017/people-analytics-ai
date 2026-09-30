@@ -37,7 +37,7 @@ export function SkillsPage({
             <div className="mb-6 flex items-end justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-semibold">
-                  Workforce Skills
+                  Skills Intelligence
                 </h2>
                 <p className="text-muted-foreground">
                   Compare observed employee proficiency with job-required proficiency and external job-skill context.
