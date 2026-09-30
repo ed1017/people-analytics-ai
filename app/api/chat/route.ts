@@ -192,6 +192,36 @@ type SkillsContext = {
   strongestCoverage: SkillContextRow[];
 };
 
+type LearningDevelopmentContext = {
+  summary: {
+    current_gap_skills: number;
+    gap_skills_with_active_pathway: number;
+    gap_pathway_coverage_pct: number;
+    active_courses_on_gap_skills: number;
+    active_job_profiles: number;
+    job_profiles_with_any_pathway: number;
+    fully_covered_job_profiles: number;
+  };
+  skillPathways: Array<{
+    skill_name: string;
+    skill_category: string;
+    employees_below_or_missing_requirement: number;
+    requirement_met_pct: number;
+    pathway_available: boolean;
+    active_course_count: number;
+    shortest_catalog_duration_hours: number | null;
+    avg_catalog_duration_hours: number | null;
+  }>;
+  jobProfilePathways: Array<{
+    job_profile_name: string;
+    required_skill_count: number;
+    required_skills_with_active_pathway: number;
+    pathway_coverage_pct: number;
+    active_course_count: number;
+    shortest_catalog_duration_hours: number | null;
+  }>;
+};
+
 type TalentAcquisitionContext = {
   summary: {
     applications: number;
@@ -356,6 +386,7 @@ export async function POST(
       body?.page === "workforce-planning" ||
       body?.page === "finance" ||
       body?.page === "skills" ||
+      body?.page === "learning-development" ||
       body?.page === "talent-acquisition" ||
       body?.page === "survey-sentiment"
         ? body.page
@@ -389,6 +420,11 @@ export async function POST(
     const skillsContext =
       body?.skillsContext
         ? (body.skillsContext as SkillsContext)
+        : null;
+
+    const learningDevelopmentContext =
+      body?.learningDevelopmentContext
+        ? (body.learningDevelopmentContext as LearningDevelopmentContext)
         : null;
 
     const talentAcquisitionContext =
@@ -675,6 +711,47 @@ Interpretation rules:
 - Missing or stale skill data does not prove an employee lacks a capability.
 - Do not call a gap a verified shortage unless the supplied data supports that conclusion.
 - O*NET is an external reference layer; do not imply O*NET directly measured this company's employees.
+`.trim()
+        : "";
+
+    const learningDevelopmentPrompt =
+      page === "learning-development" &&
+      learningDevelopmentContext
+        ? `
+CURRENT LEARNING & DEVELOPMENT CONTEXT
+Pathway summary:
+- Current gap skills: ${learningDevelopmentContext.summary.current_gap_skills}
+- Gap skills with an active learning pathway: ${learningDevelopmentContext.summary.gap_skills_with_active_pathway}
+- Gap-skill pathway coverage: ${learningDevelopmentContext.summary.gap_pathway_coverage_pct}%
+- Active courses mapped to current gap skills: ${learningDevelopmentContext.summary.active_courses_on_gap_skills}
+- Active job profiles: ${learningDevelopmentContext.summary.active_job_profiles}
+- Job profiles with at least one required-skill pathway: ${learningDevelopmentContext.summary.job_profiles_with_any_pathway}
+- Fully pathway-covered job profiles: ${learningDevelopmentContext.summary.fully_covered_job_profiles}
+
+Current gap skills and pathway evidence:
+${learningDevelopmentContext.skillPathways
+  .map(
+    (row) =>
+      `- ${row.skill_name} (${row.skill_category}): below/missing ${row.employees_below_or_missing_requirement}, meeting requirement ${row.requirement_met_pct}%, active pathway ${row.pathway_available ? "yes" : "no"}, active courses ${row.active_course_count}, shortest catalog hours ${row.shortest_catalog_duration_hours ?? "N/A"}, average catalog hours ${row.avg_catalog_duration_hours ?? "N/A"}`
+  )
+  .join("\n")}
+
+Required-skill pathway coverage by job profile:
+${learningDevelopmentContext.jobProfilePathways
+  .map(
+    (row) =>
+      `- ${row.job_profile_name}: required skills ${row.required_skill_count}, with active pathway ${row.required_skills_with_active_pathway}, coverage ${row.pathway_coverage_pct}%, active course mappings ${row.active_course_count}, shortest catalog hours ${row.shortest_catalog_duration_hours ?? "N/A"}`
+  )
+  .join("\n")}
+
+Interpretation rules:
+- An active pathway means at least one active learning course is mapped to the skill.
+- Course availability is pathway evidence only. It does not prove proficiency gain, completion, role readiness, promotion eligibility, or hiring suitability.
+- Catalog duration is course duration only and is not time-to-readiness.
+- Whenever you discuss course availability or catalog hours, explicitly state that course availability is not proof of employee readiness and catalog duration is not time-to-readiness.
+- Job-profile pathway coverage is coverage of required skills by active mapped courses; it does not measure employee readiness for that profile.
+- Missing or stale skill records are part of the current gap signal and are not proof that an employee lacks a capability.
+- Results are aggregate only. Do not expose, rank, or recommend individual employees.
 `.trim()
         : "";
 
@@ -966,6 +1043,8 @@ ${positionPrompt}
 ${financePrompt}
 
 ${skillsPrompt}
+
+${learningDevelopmentPrompt}
 
 ${talentAcquisitionPrompt}
 
