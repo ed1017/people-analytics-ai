@@ -1,4 +1,5 @@
 export type WorkforcePlanningWorkflowView =
+  | "overview"
   | "plan"
   | "design"
   | "respond"
@@ -22,27 +23,33 @@ const steps: Array<{
   description: string;
 }> = [
   {
+    key: "overview",
+    step: "Overview",
+    title: "Planning Overview",
+    description: "What is the current plan and where does it need attention?",
+  },
+  {
     key: "plan",
     step: "1",
-    title: "Plan",
+    title: "Scenario Modeling",
     description: "What workforce do we need?",
   },
   {
     key: "design",
     step: "2",
-    title: "Design",
+    title: "Position & Workforce Design",
     description: "What positions should change?",
   },
   {
     key: "respond",
     step: "3",
-    title: "Respond",
+    title: "Workforce Response",
     description: "How do we close the gaps?",
   },
   {
     key: "execute",
     step: "4",
-    title: "Execute",
+    title: "Execution & Feasibility",
     description: "Can we actually deliver it?",
   },
 ];
@@ -56,6 +63,7 @@ export function WorkforcePlanningWorkflowNavigation({
   executeReady,
 }: WorkflowNavigationProps) {
   const readiness = {
+    overview: true,
     plan: planReady,
     design: designReady,
     respond: respondReady,
@@ -65,7 +73,7 @@ export function WorkforcePlanningWorkflowNavigation({
   return (
     <>
       <div className="mb-6 rounded-lg border p-3">
-        <div className="grid gap-2 md:grid-cols-4">
+        <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-5">
           {steps.map((item) => {
             const active =
               activeView === item.key;
@@ -87,7 +95,7 @@ export function WorkforcePlanningWorkflowNavigation({
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[10px] font-medium uppercase tracking-wide opacity-70">
-                    Step {item.step}
+                    {item.key === "overview" ? item.step : "Step " + item.step}
                   </span>
                   <span
                     className={
@@ -123,7 +131,7 @@ export function WorkforcePlanningWorkflowNavigation({
         {activeView === "plan"
           ? "Start with the business question: what workforce do we expect to need, and how does that compare with Baseline?"
           : activeView === "design"
-            ? "Now turn the workforce scenario into actual position changes — add, close, freeze, or fill roles."
+            ? "Now turn the workforce scenario into actual position changes â€” add, close, freeze, or fill roles."
             : activeView === "respond"
               ? "Once the role gaps are clear, decide how much to Build internally, Move from inside the company, or Buy through external hiring."
               : "Last step: put the approved response on a timeline, auto-schedule around constraints, and check whether the plan is actually executable."}

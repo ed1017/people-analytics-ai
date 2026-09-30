@@ -28,6 +28,8 @@ import { ScenarioModelingPanel } from "@/components/workforce-planning/scenario-
 import { ScenarioPlanSummary } from "@/components/workforce-planning/scenario-plan-summary";
 import { ScenarioComparisonTable } from "@/components/workforce-planning/scenario-comparison-table";
 import { WorkforceExecutionPanel } from "@/components/workforce-planning/workforce-execution-panel";
+import { PlanningOverview } from "@/components/workforce-planning/planning-overview";
+import { usePlanningSession } from "@/components/workforce-planning/planning-session-context";
 
 import type {
   BusinessUnitResponseAllocationResponse,
@@ -263,13 +265,10 @@ export function WorkforcePlanningPage({
   onScenarioChange,
   onExplainCustomScenario,
 }: WorkforcePlanningPageProps) {
-  const [
-    workflowView,
-    setWorkflowView,
-  ] =
-    useState<WorkforcePlanningWorkflowView>(
-      "plan"
-    );
+  const {
+    activeView: workflowView,
+    setActiveView: setWorkflowView,
+  } = usePlanningSession();
 
   const [scenarioDefaults, setScenarioDefaults] =
     useState<ScenarioModelAssumptions | null>(null);
@@ -2005,8 +2004,10 @@ export function WorkforcePlanningPage({
                 Workforce Planning
               </h2>
               <p className="text-muted-foreground">
-                {workflowView === "plan"
-                  ? "Compare workforce scenarios and decide what future demand looks like."
+                {workflowView === "overview"
+                  ? "See the current workforce plan, biggest demand shifts, approved response, execution risk, and feasibility in one place."
+                  : workflowView === "plan"
+                    ? "Compare workforce scenarios and decide what future demand looks like."
                   : workflowView === "design"
                     ? "Translate the workforce plan into concrete position, recruiting, and skill demand."
                     : workflowView === "respond"
@@ -2039,6 +2040,21 @@ export function WorkforcePlanningPage({
               responseExecutionResult
             )}
           />
+
+          {workflowView === "overview" && (
+            <PlanningOverview
+              activePlanningScenario={activePlanningScenario}
+              activePlanningEnd={activePlanningEnd}
+              baselinePlanningEnd={baselinePlanningEnd}
+              planningHeadcountDeltaVsBaseline={planningHeadcountDeltaVsBaseline}
+              structuralPositionResult={structuralPositionResult}
+              responsePortfolioResult={responsePortfolioResult}
+              businessUnitResponseResult={businessUnitResponseResult}
+              responseExecutionResult={responseExecutionResult}
+              responseConstraintResult={responseConstraintResult}
+              onNavigate={setWorkflowView}
+            />
+          )}
 
           {planningError && (
             <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
@@ -2110,7 +2126,7 @@ export function WorkforcePlanningPage({
 
               <div
                 className={
-                  workflowView === "plan"
+                  workflowView === "overview" || workflowView === "plan"
                     ? "hidden"
                     : "mt-6 rounded-lg border p-4"
                 }

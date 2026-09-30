@@ -33,7 +33,7 @@ type ResponseConstraintDraft = {
 };
 
 type WorkforceExecutionPanelProps = {
-  workflowView: "plan" | "design" | "respond" | "execute";
+  workflowView: "overview" | "plan" | "design" | "respond" | "execute";
   businessUnitResponseResult: BusinessUnitResponseAllocationResponse;
   responseExecutionDrafts: ResponseExecutionDraft[];
   responseExecutionLoading: boolean;
