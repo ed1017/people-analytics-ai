@@ -1,5 +1,9 @@
 import { supabaseServer } from "./supabase-server";
 import {
+  runPositionActionScenario,
+  type PositionActionScenarioRequest,
+} from "./position-action-scenario";
+import {
   runBusinessUnitScenario,
   type BusinessUnitScenarioRequest,
 } from "./business-unit-scenario";
@@ -252,6 +256,45 @@ export const peopleAnalyticsTools: any[] = [
         "additional_attrition_pct_points",
         "fill_rate_pct",
         "productivity_hiring_reduction_pct",
+      ],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
+    name: "run_position_action_scenario",
+    description:
+      "Run a deterministic read-only position-inventory what-if. Use when the user asks about adding authorized positions, closing vacant positions, freezing vacancies, or filling open positions. This first position model does not close filled positions or calculate labor-cost effects.",
+    parameters: {
+      type: "object",
+      properties: {
+        add_positions: {
+          type: ["number", "null"],
+          description:
+            "Number of new authorized positions to add. Added positions start vacant.",
+        },
+        close_vacant_positions: {
+          type: ["number", "null"],
+          description:
+            "Number of currently vacant positions to close. Filled positions are not closed by this model.",
+        },
+        freeze_vacancies: {
+          type: ["number", "null"],
+          description:
+            "Number of open vacancies to freeze. Frozen positions remain authorized but are removed from the fillable vacancy pool.",
+        },
+        vacancy_fill_pct: {
+          type: ["number", "null"],
+          description:
+            "Percent of remaining fillable vacancies expected to be filled in the scenario.",
+        },
+      },
+      required: [
+        "add_positions",
+        "close_vacant_positions",
+        "freeze_vacancies",
+        "vacancy_fill_pct",
       ],
       additionalProperties: false,
     },
@@ -1124,6 +1167,10 @@ export async function runPeopleAnalyticsTool(
     case "run_business_unit_scenario":
       return runBusinessUnitScenario(
         args as BusinessUnitScenarioRequest
+      );
+    case "run_position_action_scenario":
+      return runPositionActionScenario(
+        args as PositionActionScenarioRequest
       );
     case "get_talent_acquisition":
       return getTalentAcquisition();
