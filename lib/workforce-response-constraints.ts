@@ -12,22 +12,24 @@ import type {
   WorkforceResponseConstraintResponse,
 } from "./types";
 
+export type WorkforceResponseHardConstraints = {
+  max_total_build: number | null;
+  max_total_move: number | null;
+  max_total_buy: number | null;
+  max_monthly_build: number | null;
+  max_monthly_move: number | null;
+  max_monthly_buy: number | null;
+  max_monthly_total: number | null;
+  deadline_month: string | null;
+  required_coverage_pct_by_deadline:
+    number | null;
+  require_all_approved_capacity_scheduled:
+    boolean;
+};
+
 export type WorkforceResponseConstraintRequest =
   TimePhasedWorkforceExecutionRequest & {
-    constraints: {
-      max_total_build: number | null;
-      max_total_move: number | null;
-      max_total_buy: number | null;
-      max_monthly_build: number | null;
-      max_monthly_move: number | null;
-      max_monthly_buy: number | null;
-      max_monthly_total: number | null;
-      deadline_month: string | null;
-      required_coverage_pct_by_deadline:
-        number | null;
-      require_all_approved_capacity_scheduled:
-        boolean;
-    };
+    constraints: WorkforceResponseHardConstraints;
   };
 
 function round1(value: number) {

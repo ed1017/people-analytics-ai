@@ -33,6 +33,7 @@ import type {
   StructuralPositionCatalogResponse,
   StructuralPositionScenarioResponse,
   TimePhasedWorkforceExecutionResponse,
+  ConstraintAwareWorkforceScheduleResponse,
   WorkforceResponseConstraintResponse,
   WorkforceResponsePlanAllocation,
   WorkforceResponsePlanResponse,
@@ -539,6 +540,21 @@ export function WorkforcePlanningPage({
   const [
     responseConstraintError,
     setResponseConstraintError,
+  ] = useState<string | null>(null);
+  const [
+    constraintAwareScheduleResult,
+    setConstraintAwareScheduleResult,
+  ] =
+    useState<ConstraintAwareWorkforceScheduleResponse | null>(
+      null
+    );
+  const [
+    constraintAwareScheduleLoading,
+    setConstraintAwareScheduleLoading,
+  ] = useState(false);
+  const [
+    constraintAwareScheduleError,
+    setConstraintAwareScheduleError,
   ] = useState<string | null>(null);
 
   useEffect(() => {
@@ -1458,6 +1474,8 @@ export function WorkforcePlanningPage({
       );
       setResponseConstraintResult(null);
       setResponseConstraintError(null);
+      setConstraintAwareScheduleResult(null);
+      setConstraintAwareScheduleError(null);
     } catch (error) {
       setBusinessUnitResponseError(
         error instanceof Error
@@ -1481,6 +1499,8 @@ export function WorkforcePlanningPage({
     );
     setResponseConstraintResult(null);
     setResponseConstraintError(null);
+    setConstraintAwareScheduleResult(null);
+    setConstraintAwareScheduleError(null);
   }
 
   function updateResponseExecutionDraft(
@@ -1502,6 +1522,8 @@ export function WorkforcePlanningPage({
     setResponseExecutionError(null);
     setResponseConstraintResult(null);
     setResponseConstraintError(null);
+    setConstraintAwareScheduleResult(null);
+    setConstraintAwareScheduleError(null);
   }
 
   function addResponseExecutionPhase(
@@ -1544,6 +1566,8 @@ export function WorkforcePlanningPage({
     setResponseExecutionError(null);
     setResponseConstraintResult(null);
     setResponseConstraintError(null);
+    setConstraintAwareScheduleResult(null);
+    setConstraintAwareScheduleError(null);
   }
 
   function removeResponseExecutionPhase(
@@ -1671,6 +1695,128 @@ export function WorkforcePlanningPage({
     setResponseExecutionError(null);
     setResponseConstraintResult(null);
     setResponseConstraintError(null);
+    setConstraintAwareScheduleResult(null);
+    setConstraintAwareScheduleError(null);
+  }
+
+  async function runConstraintAwareScheduler() {
+    if (
+      !businessUnitResponseResult ||
+      !responsePortfolioResult
+    ) {
+      return;
+    }
+
+    try {
+      setConstraintAwareScheduleLoading(true);
+      setConstraintAwareScheduleError(null);
+
+      const response = await fetch(
+        "/api/constraint-aware-workforce-scheduler",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            actions:
+              structuralPositionActions,
+            allocations:
+              businessUnitResponseResult.business_units.map(
+                (row) => ({
+                  business_unit:
+                    row.org_code,
+                  job_profile:
+                    row.job_profile_code,
+                  allocation:
+                    row.allocation,
+                })
+              ),
+            role_plans:
+              responsePortfolioResult.roles.map(
+                (role) => ({
+                  job_profile:
+                    role.job_profile_code,
+                  allocation:
+                    role.allocation,
+                })
+              ),
+            constraints: {
+              ...responseConstraintDraft,
+              deadline_month:
+                responseConstraintDraft.deadline_month ||
+                null,
+            },
+          }),
+        }
+      );
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload?.error ??
+            "Failed to generate constraint-aware schedule."
+        );
+      }
+
+      const result =
+        payload as ConstraintAwareWorkforceScheduleResponse;
+
+      setConstraintAwareScheduleResult(
+        result
+      );
+      setResponseExecutionDrafts(
+        result.generated_schedule.map(
+          (row, index) => ({
+            id:
+              row.org_code +
+              "::" +
+              row.job_profile_code +
+              "::" +
+              row.response_type +
+              "::" +
+              row.effective_month +
+              "::" +
+              index,
+            org_code: row.org_code,
+            org_name: row.org_name,
+            job_profile_code:
+              row.job_profile_code,
+            job_profile_name:
+              row.job_profile_name,
+            response_type:
+              row.response_type,
+            amount: row.amount,
+            effective_month:
+              row.effective_month,
+          })
+        )
+      );
+
+      if (result.constraint_result) {
+        setResponseExecutionResult(
+          result.constraint_result.execution
+        );
+        setResponseConstraintResult(
+          result.constraint_result
+        );
+      } else {
+        setResponseExecutionResult(null);
+        setResponseConstraintResult(null);
+      }
+
+      setResponseExecutionError(null);
+      setResponseConstraintError(null);
+    } catch (error) {
+      setConstraintAwareScheduleError(
+        error instanceof Error
+          ? error.message
+          : "Failed to generate constraint-aware schedule."
+      );
+    } finally {
+      setConstraintAwareScheduleLoading(false);
+    }
   }
 
   async function runResponseConstraints() {
@@ -1819,6 +1965,8 @@ export function WorkforcePlanningPage({
     );
     setResponseConstraintResult(null);
     setResponseConstraintError(null);
+    setConstraintAwareScheduleResult(null);
+    setConstraintAwareScheduleError(null);
   }
 
   function persistSavedScenarios(
@@ -5185,14 +5333,27 @@ export function WorkforcePlanningPage({
                                             <p className="max-w-3xl text-xs text-muted-foreground">
                                               Assign explicit effective months to approved BU Build, Move, and Buy capacity. Timing is user-supplied; course duration and historical time-to-fill do not set these dates.
                                             </p>
-                                            <div className="flex gap-2">
+                                            <div className="flex flex-wrap gap-2">
                                               <button
                                                 type="button"
                                                 onClick={resetResponseExecution}
-                                                disabled={responseExecutionLoading}
+                                                disabled={
+                                                  responseExecutionLoading ||
+                                                  constraintAwareScheduleLoading
+                                                }
                                                 className="rounded-md border px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
                                               >
                                                 Reset
+                                              </button>
+                                              <button
+                                                type="button"
+                                                onClick={runConstraintAwareScheduler}
+                                                disabled={constraintAwareScheduleLoading}
+                                                className="rounded-md border px-3 py-2 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
+                                              >
+                                                {constraintAwareScheduleLoading
+                                                  ? "Scheduling..."
+                                                  : "Auto Schedule"}
                                               </button>
                                               <button
                                                 type="button"
@@ -5206,6 +5367,169 @@ export function WorkforcePlanningPage({
                                               </button>
                                             </div>
                                           </div>
+
+                                          <div className="mb-3 rounded-md border bg-muted/20 p-3">
+                                            <p className="text-[11px] font-medium">
+                                              Auto-scheduler limits
+                                            </p>
+                                            <p className="mt-1 text-[10px] text-muted-foreground">
+                                              Optional. Blank monthly caps are unconstrained. These values are shared with the detailed Constraint Feasibility panel below.
+                                            </p>
+                                            <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                                              {(
+                                                [
+                                                  ["max_monthly_build", "Monthly Build"],
+                                                  ["max_monthly_move", "Monthly Move"],
+                                                  ["max_monthly_buy", "Monthly Buy"],
+                                                  ["max_monthly_total", "Combined monthly"],
+                                                ] as const
+                                              ).map(([key, label]) => (
+                                                <label
+                                                  key={key}
+                                                  className="rounded-md border bg-background p-2"
+                                                >
+                                                  <span className="text-[10px] text-muted-foreground">
+                                                    {label}
+                                                  </span>
+                                                  <input
+                                                    type="number"
+                                                    min={0}
+                                                    step={0.1}
+                                                    placeholder="No cap"
+                                                    value={
+                                                      responseConstraintDraft[
+                                                        key
+                                                      ] ?? ""
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateResponseConstraintDraft(
+                                                        key,
+                                                        event.target.value === ""
+                                                          ? null
+                                                          : Number(
+                                                              event.target.value
+                                                            )
+                                                      )
+                                                    }
+                                                    className="mt-1 w-full rounded-md border bg-background px-2 py-1.5 text-right text-xs tabular-nums"
+                                                  />
+                                                </label>
+                                              ))}
+                                            </div>
+                                            <div className="mt-2 grid gap-2 md:grid-cols-2">
+                                              <label className="rounded-md border bg-background p-2">
+                                                <span className="text-[10px] text-muted-foreground">
+                                                  Coverage deadline
+                                                </span>
+                                                <input
+                                                  type="month"
+                                                  min={nextMonthValue(
+                                                    businessUnitResponseResult.as_of
+                                                  )}
+                                                  value={
+                                                    responseConstraintDraft.deadline_month
+                                                  }
+                                                  onChange={(event) =>
+                                                    updateResponseConstraintDraft(
+                                                      "deadline_month",
+                                                      event.target.value
+                                                    )
+                                                  }
+                                                  className="mt-1 w-full rounded-md border bg-background px-2 py-1.5 text-xs"
+                                                />
+                                              </label>
+                                              <label className="rounded-md border bg-background p-2">
+                                                <span className="text-[10px] text-muted-foreground">
+                                                  Required coverage by deadline %
+                                                </span>
+                                                <input
+                                                  type="number"
+                                                  min={0}
+                                                  max={100}
+                                                  step={1}
+                                                  placeholder="No target"
+                                                  value={
+                                                    responseConstraintDraft.required_coverage_pct_by_deadline ??
+                                                    ""
+                                                  }
+                                                  onChange={(event) =>
+                                                    updateResponseConstraintDraft(
+                                                      "required_coverage_pct_by_deadline",
+                                                      event.target.value === ""
+                                                        ? null
+                                                        : Number(
+                                                            event.target.value
+                                                          )
+                                                    )
+                                                  }
+                                                  className="mt-1 w-full rounded-md border bg-background px-2 py-1.5 text-right text-xs tabular-nums"
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+
+                                          {constraintAwareScheduleError && (
+                                            <div className="mb-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
+                                              {constraintAwareScheduleError}
+                                            </div>
+                                          )}
+
+                                          {constraintAwareScheduleResult && (
+                                            <div className="mb-3 rounded-md border p-3">
+                                              <div className="grid gap-3 sm:grid-cols-3">
+                                                <div>
+                                                  <p className="text-[10px] text-muted-foreground">
+                                                    Fully Scheduled
+                                                  </p>
+                                                  <p className="mt-1 font-semibold">
+                                                    {constraintAwareScheduleResult.fully_scheduled
+                                                      ? "Yes"
+                                                      : "No"}
+                                                  </p>
+                                                </div>
+                                                <div>
+                                                  <p className="text-[10px] text-muted-foreground">
+                                                    Hard Constraints
+                                                  </p>
+                                                  <p className="mt-1 font-semibold">
+                                                    {constraintAwareScheduleResult.hard_constraint_feasible === null
+                                                      ? "Not checked"
+                                                      : constraintAwareScheduleResult.hard_constraint_feasible
+                                                        ? "Feasible"
+                                                        : "Breach"}
+                                                  </p>
+                                                </div>
+                                                <div>
+                                                  <p className="text-[10px] text-muted-foreground">
+                                                    Generated Window
+                                                  </p>
+                                                  <p className="mt-1 font-semibold">
+                                                    {formatMonth(
+                                                      constraintAwareScheduleResult.scheduling_start_month +
+                                                        "-01"
+                                                    )}{" "}
+                                                    →{" "}
+                                                    {formatMonth(
+                                                      constraintAwareScheduleResult.scheduling_end_month +
+                                                        "-01"
+                                                    )}
+                                                  </p>
+                                                </div>
+                                              </div>
+                                              {constraintAwareScheduleResult.blockers.length >
+                                                0 && (
+                                                <ul className="mt-3 space-y-1 text-[10px] text-muted-foreground">
+                                                  {constraintAwareScheduleResult.blockers.map(
+                                                    (blocker) => (
+                                                      <li key={blocker}>
+                                                        - {blocker}
+                                                      </li>
+                                                    )
+                                                  )}
+                                                </ul>
+                                              )}
+                                            </div>
+                                          )}
 
                                           <div className="max-h-[360px] overflow-auto rounded-md border">
                                             <table className="w-full min-w-[900px] text-xs">
