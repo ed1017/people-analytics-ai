@@ -14,6 +14,10 @@ import {
   type BusinessUnitResponseAllocationRequest,
 } from "./business-unit-response-allocation";
 import {
+  runTimePhasedWorkforceExecution,
+  type TimePhasedWorkforceExecutionRequest,
+} from "./time-phased-workforce-execution";
+import {
   runStructuralPositionScenario,
 } from "./structural-position-scenario";
 import {
@@ -813,6 +817,157 @@ export const peopleAnalyticsTools: any[] = [
         "actions",
         "allocations",
         "role_plans",
+      ],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
+    name: "run_time_phased_workforce_execution",
+    description:
+      "Run a deterministic monthly execution timeline for explicit BU Build / Move / Buy allocations. Every schedule entry has a user-supplied effective month. The tool reconciles scheduled capacity to approved BU/path targets, keeps unscheduled capacity visible, excludes over-scheduled excess from effective coverage, and calculates monthly cumulative coverage and remaining enterprise net role gap. It does not infer timing from learning duration or recruiting history.",
+    parameters: {
+      type: "object",
+      properties: {
+        actions: {
+          type: "array",
+          minItems: 1,
+          maxItems: 20,
+          items: {
+            type: "object",
+            properties: {
+              action_type: {
+                type: "string",
+                enum: [
+                  "add_positions",
+                  "close_vacant_positions",
+                  "freeze_vacancies",
+                  "fill_vacancies",
+                ],
+              },
+              business_unit: { type: ["string", "null"] },
+              level: { type: ["string", "null"] },
+              job_profile: { type: ["string", "null"] },
+              amount: { type: ["number", "null"] },
+              fill_pct: { type: ["number", "null"] },
+            },
+            required: [
+              "action_type",
+              "business_unit",
+              "level",
+              "job_profile",
+              "amount",
+              "fill_pct",
+            ],
+            additionalProperties: false,
+          },
+        },
+        allocations: {
+          type: "array",
+          minItems: 1,
+          maxItems: 40,
+          items: {
+            type: "object",
+            properties: {
+              business_unit: { type: "string" },
+              job_profile: { type: "string" },
+              allocation: {
+                type: "object",
+                properties: {
+                  build: { type: "number" },
+                  move: { type: "number" },
+                  buy: { type: "number" },
+                  borrow: { type: "number" },
+                  automate: { type: "number" },
+                },
+                required: [
+                  "build",
+                  "move",
+                  "buy",
+                  "borrow",
+                  "automate",
+                ],
+                additionalProperties: false,
+              },
+            },
+            required: [
+              "business_unit",
+              "job_profile",
+              "allocation",
+            ],
+            additionalProperties: false,
+          },
+        },
+        role_plans: {
+          type: ["array", "null"],
+          maxItems: 20,
+          items: {
+            type: "object",
+            properties: {
+              job_profile: { type: "string" },
+              allocation: {
+                type: "object",
+                properties: {
+                  build: { type: "number" },
+                  move: { type: "number" },
+                  buy: { type: "number" },
+                  borrow: { type: "number" },
+                  automate: { type: "number" },
+                },
+                required: [
+                  "build",
+                  "move",
+                  "buy",
+                  "borrow",
+                  "automate",
+                ],
+                additionalProperties: false,
+              },
+            },
+            required: [
+              "job_profile",
+              "allocation",
+            ],
+            additionalProperties: false,
+          },
+        },
+        schedule: {
+          type: "array",
+          minItems: 1,
+          maxItems: 120,
+          items: {
+            type: "object",
+            properties: {
+              business_unit: { type: "string" },
+              job_profile: { type: "string" },
+              response_type: {
+                type: "string",
+                enum: ["build", "move", "buy"],
+              },
+              amount: { type: "number" },
+              effective_month: {
+                type: "string",
+                description:
+                  "Explicit effective month in YYYY-MM format. Must be after the workforce snapshot month.",
+              },
+            },
+            required: [
+              "business_unit",
+              "job_profile",
+              "response_type",
+              "amount",
+              "effective_month",
+            ],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: [
+        "actions",
+        "allocations",
+        "role_plans",
+        "schedule",
       ],
       additionalProperties: false,
     },
@@ -1718,6 +1873,10 @@ export async function runPeopleAnalyticsTool(
     case "run_business_unit_response_allocation":
       return runBusinessUnitResponseAllocation(
         args as BusinessUnitResponseAllocationRequest
+      );
+    case "run_time_phased_workforce_execution":
+      return runTimePhasedWorkforceExecution(
+        args as TimePhasedWorkforceExecutionRequest
       );
     case "get_talent_acquisition":
       return getTalentAcquisition();

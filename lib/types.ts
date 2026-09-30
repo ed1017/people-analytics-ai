@@ -563,6 +563,55 @@ export type BusinessUnitResponseAllocationResponse = {
   methodology: string[];
 };
 
+export type TimePhasedWorkforceExecutionResponse = {
+  as_of: string;
+  planning_start_month: string;
+  planning_end_month: string;
+  target_allocation: WorkforceResponsePlanAllocation;
+  scheduled_allocation: WorkforceResponsePlanAllocation;
+  unscheduled_allocation: WorkforceResponsePlanAllocation;
+  overscheduled_allocation: WorkforceResponsePlanAllocation;
+  scenario_net_role_demand: number;
+  final_effective_coverage: number;
+  final_remaining_net_gap: number;
+  final_coverage_pct: number;
+  timeline: Array<{
+    month: string;
+    effective_build: number;
+    effective_move: number;
+    effective_buy: number;
+    cumulative_build: number;
+    cumulative_move: number;
+    cumulative_buy: number;
+    cumulative_effective_coverage: number;
+    remaining_net_gap: number;
+    coverage_pct: number;
+  }>;
+  business_units: Array<{
+    org_code: string;
+    org_name: string;
+    job_profile_code: string;
+    job_profile_name: string;
+    target_allocation: WorkforceResponsePlanAllocation;
+    scheduled_allocation: WorkforceResponsePlanAllocation;
+    unscheduled_allocation: WorkforceResponsePlanAllocation;
+    overscheduled_allocation: WorkforceResponsePlanAllocation;
+  }>;
+  schedule_entries: Array<{
+    org_code: string;
+    org_name: string;
+    job_profile_code: string;
+    job_profile_name: string;
+    response_type: "build" | "move" | "buy";
+    amount: number;
+    effective_month: string;
+    effective_amount_within_target: number;
+    excess_amount: number;
+  }>;
+  warnings: string[];
+  methodology: string[];
+};
+
 export type WorkforceResponsePortfolioResponse = {
   as_of: string;
   scenario_positive_role_demand: number;
