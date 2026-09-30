@@ -14,6 +14,13 @@ import {
   YAxis,
 } from "recharts";
 
+import {
+  WorkforcePlanningWorkflowNavigation,
+  type WorkforcePlanningWorkflowView,
+} from "@/components/workforce-planning/workflow-navigation";
+import { ConstraintAwareScheduleSummary } from "@/components/workforce-planning/constraint-aware-schedule-summary";
+import { ExecutionResultSummary } from "@/components/workforce-planning/execution-result-summary";
+
 import type {
   BusinessUnitResponseAllocationResponse,
   BusinessUnitScenarioOption,
@@ -146,12 +153,6 @@ type ResponseExecutionDraft = {
   amount: number;
   effective_month: string;
 };
-
-type WorkforcePlanningWorkflowView =
-  | "plan"
-  | "design"
-  | "respond"
-  | "execute";
 
 type ResponseConstraintDraft = {
   max_total_build: number | null;
@@ -2221,118 +2222,23 @@ export function WorkforcePlanningPage({
             </span>
           </div>
 
-          <div className="mb-6 rounded-lg border p-3">
-            <div className="grid gap-2 md:grid-cols-4">
-              {(
-                [
-                  {
-                    key: "plan",
-                    step: "1",
-                    title: "Plan",
-                    description:
-                      "What workforce do we need?",
-                    ready: Boolean(
-                      activePlanningScenario
-                    ),
-                  },
-                  {
-                    key: "design",
-                    step: "2",
-                    title: "Design",
-                    description:
-                      "What positions should change?",
-                    ready: Boolean(
-                      structuralPositionResult
-                    ),
-                  },
-                  {
-                    key: "respond",
-                    step: "3",
-                    title: "Respond",
-                    description:
-                      "How do we close the gaps?",
-                    ready: Boolean(
-                      responsePortfolioResult ||
-                        roleResponsePlanResult
-                    ),
-                  },
-                  {
-                    key: "execute",
-                    step: "4",
-                    title: "Execute",
-                    description:
-                      "Can we actually deliver it?",
-                    ready: Boolean(
-                      responseExecutionResult
-                    ),
-                  },
-                ] as Array<{
-                  key: WorkforcePlanningWorkflowView;
-                  step: string;
-                  title: string;
-                  description: string;
-                  ready: boolean;
-                }>
-              ).map((item) => {
-                const active =
-                  workflowView === item.key;
-
-                return (
-                  <button
-                    key={item.key}
-                    type="button"
-                    onClick={() =>
-                      setWorkflowView(item.key)
-                    }
-                    className={
-                      active
-                        ? "rounded-md border bg-foreground p-3 text-left text-background transition-colors"
-                        : "rounded-md border p-3 text-left transition-colors hover:bg-muted/50"
-                    }
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] font-medium uppercase tracking-wide opacity-70">
-                        Step {item.step}
-                      </span>
-                      <span
-                        className={
-                          active
-                            ? "text-[10px] opacity-80"
-                            : "text-[10px] text-muted-foreground"
-                        }
-                      >
-                        {item.ready
-                          ? "Ready"
-                          : "In progress"}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm font-semibold">
-                      {item.title}
-                    </p>
-                    <p
-                      className={
-                        active
-                          ? "mt-1 text-[11px] opacity-80"
-                          : "mt-1 text-[11px] text-muted-foreground"
-                      }
-                    >
-                      {item.description}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="mb-6 rounded-md border bg-muted/20 p-3 text-sm">
-            {workflowView === "plan"
-              ? "Start with the business question: what workforce do we expect to need, and how does that compare with Baseline?"
-              : workflowView === "design"
-                ? "Now turn the workforce scenario into actual position changes — add, close, freeze, or fill roles."
-                : workflowView === "respond"
-                  ? "Once the role gaps are clear, decide how much to Build internally, Move from inside the company, or Buy through external hiring."
-                  : "Last step: put the approved response on a timeline, auto-schedule around constraints, and check whether the plan is actually executable."}
-          </div>
+          <WorkforcePlanningWorkflowNavigation
+            activeView={workflowView}
+            onViewChange={setWorkflowView}
+            planReady={Boolean(
+              activePlanningScenario
+            )}
+            designReady={Boolean(
+              structuralPositionResult
+            )}
+            respondReady={Boolean(
+              responsePortfolioResult ||
+                roleResponsePlanResult
+            )}
+            executeReady={Boolean(
+              responseExecutionResult
+            )}
+          />
 
           {planningError && (
             <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
@@ -5760,60 +5666,11 @@ export function WorkforcePlanningPage({
                                           )}
 
                                           {constraintAwareScheduleResult && (
-                                            <div className="mb-3 rounded-md border p-3">
-                                              <div className="grid gap-3 sm:grid-cols-3">
-                                                <div>
-                                                  <p className="text-[10px] text-muted-foreground">
-                                                    Fully Scheduled
-                                                  </p>
-                                                  <p className="mt-1 font-semibold">
-                                                    {constraintAwareScheduleResult.fully_scheduled
-                                                      ? "Yes"
-                                                      : "No"}
-                                                  </p>
-                                                </div>
-                                                <div>
-                                                  <p className="text-[10px] text-muted-foreground">
-                                                    Hard Constraints
-                                                  </p>
-                                                  <p className="mt-1 font-semibold">
-                                                    {constraintAwareScheduleResult.hard_constraint_feasible === null
-                                                      ? "Not checked"
-                                                      : constraintAwareScheduleResult.hard_constraint_feasible
-                                                        ? "Feasible"
-                                                        : "Breach"}
-                                                  </p>
-                                                </div>
-                                                <div>
-                                                  <p className="text-[10px] text-muted-foreground">
-                                                    Generated Window
-                                                  </p>
-                                                  <p className="mt-1 font-semibold">
-                                                    {formatMonth(
-                                                      constraintAwareScheduleResult.scheduling_start_month +
-                                                        "-01"
-                                                    )}{" "}
-                                                    →{" "}
-                                                    {formatMonth(
-                                                      constraintAwareScheduleResult.scheduling_end_month +
-                                                        "-01"
-                                                    )}
-                                                  </p>
-                                                </div>
-                                              </div>
-                                              {constraintAwareScheduleResult.blockers.length >
-                                                0 && (
-                                                <ul className="mt-3 space-y-1 text-[10px] text-muted-foreground">
-                                                  {constraintAwareScheduleResult.blockers.map(
-                                                    (blocker) => (
-                                                      <li key={blocker}>
-                                                        - {blocker}
-                                                      </li>
-                                                    )
-                                                  )}
-                                                </ul>
-                                              )}
-                                            </div>
+                                            <ConstraintAwareScheduleSummary
+                                              result={
+                                                constraintAwareScheduleResult
+                                              }
+                                            />
                                           )}
 
                                           <div className="max-h-[360px] overflow-auto rounded-md border">
@@ -5958,155 +5815,11 @@ export function WorkforcePlanningPage({
 
                                           {responseExecutionResult && (
                                             <>
-                                              <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                                                <div className="rounded-md border p-3">
-                                                  <p className="text-[11px] text-muted-foreground">
-                                                    Execution Window
-                                                  </p>
-                                                  <p className="mt-1 font-semibold">
-                                                    {formatMonth(
-                                                      responseExecutionResult.planning_start_month +
-                                                        "-01"
-                                                    )}{" "}
-                                                    →{" "}
-                                                    {formatMonth(
-                                                      responseExecutionResult.planning_end_month +
-                                                        "-01"
-                                                    )}
-                                                  </p>
-                                                </div>
-                                                <div className="rounded-md border p-3">
-                                                  <p className="text-[11px] text-muted-foreground">
-                                                    Scheduled B / M / B
-                                                  </p>
-                                                  <p className="mt-1 text-xl font-semibold tabular-nums">
-                                                    {formatModeledCount(
-                                                      responseExecutionResult.scheduled_allocation.build
-                                                    )}{" "}
-                                                    /{" "}
-                                                    {formatModeledCount(
-                                                      responseExecutionResult.scheduled_allocation.move
-                                                    )}{" "}
-                                                    /{" "}
-                                                    {formatModeledCount(
-                                                      responseExecutionResult.scheduled_allocation.buy
-                                                    )}
-                                                  </p>
-                                                </div>
-                                                <div className="rounded-md border p-3">
-                                                  <p className="text-[11px] text-muted-foreground">
-                                                    Unscheduled B / M / B
-                                                  </p>
-                                                  <p className="mt-1 text-xl font-semibold tabular-nums">
-                                                    {formatModeledCount(
-                                                      responseExecutionResult.unscheduled_allocation.build
-                                                    )}{" "}
-                                                    /{" "}
-                                                    {formatModeledCount(
-                                                      responseExecutionResult.unscheduled_allocation.move
-                                                    )}{" "}
-                                                    /{" "}
-                                                    {formatModeledCount(
-                                                      responseExecutionResult.unscheduled_allocation.buy
-                                                    )}
-                                                  </p>
-                                                </div>
-                                                <div className="rounded-md border p-3">
-                                                  <p className="text-[11px] text-muted-foreground">
-                                                    Final Remaining Net Gap
-                                                  </p>
-                                                  <p className="mt-1 text-xl font-semibold">
-                                                    {formatModeledCount(
-                                                      responseExecutionResult.final_remaining_net_gap
-                                                    )}
-                                                  </p>
-                                                  <p className="text-[10px] text-muted-foreground">
-                                                    {responseExecutionResult.final_coverage_pct.toFixed(
-                                                      1
-                                                    )}% coverage
-                                                  </p>
-                                                </div>
-                                              </div>
-
-                                              <div className="mt-4 max-h-[360px] overflow-auto rounded-md border">
-                                                <table className="w-full min-w-[820px] text-xs">
-                                                  <thead className="sticky top-0 bg-background">
-                                                    <tr className="border-b text-left text-muted-foreground">
-                                                      <th className="p-3">Month</th>
-                                                      <th className="p-3 text-right">Effective Build</th>
-                                                      <th className="p-3 text-right">Effective Move</th>
-                                                      <th className="p-3 text-right">Effective Buy</th>
-                                                      <th className="p-3 text-right">Cumulative Coverage</th>
-                                                      <th className="p-3 text-right">Remaining Gap</th>
-                                                      <th className="p-3 text-right">Coverage %</th>
-                                                    </tr>
-                                                  </thead>
-                                                  <tbody>
-                                                    {responseExecutionResult.timeline.map(
-                                                      (point) => (
-                                                        <tr
-                                                          key={point.month}
-                                                          className="border-b last:border-0"
-                                                        >
-                                                          <td className="p-3 font-medium">
-                                                            {formatMonth(
-                                                              point.month +
-                                                                "-01"
-                                                            )}
-                                                          </td>
-                                                          <td className="p-3 text-right tabular-nums">
-                                                            {formatModeledCount(
-                                                              point.effective_build
-                                                            )}
-                                                          </td>
-                                                          <td className="p-3 text-right tabular-nums">
-                                                            {formatModeledCount(
-                                                              point.effective_move
-                                                            )}
-                                                          </td>
-                                                          <td className="p-3 text-right tabular-nums">
-                                                            {formatModeledCount(
-                                                              point.effective_buy
-                                                            )}
-                                                          </td>
-                                                          <td className="p-3 text-right font-medium tabular-nums">
-                                                            {formatModeledCount(
-                                                              point.cumulative_effective_coverage
-                                                            )}
-                                                          </td>
-                                                          <td className="p-3 text-right font-medium tabular-nums">
-                                                            {formatModeledCount(
-                                                              point.remaining_net_gap
-                                                            )}
-                                                          </td>
-                                                          <td className="p-3 text-right tabular-nums">
-                                                            {point.coverage_pct.toFixed(
-                                                              1
-                                                            )}%
-                                                          </td>
-                                                        </tr>
-                                                      )
-                                                    )}
-                                                  </tbody>
-                                                </table>
-                                              </div>
-
-                                              {responseExecutionResult.warnings.length > 0 && (
-                                                <div className="mt-3 rounded-md border p-3">
-                                                  <p className="text-xs font-medium">
-                                                    Execution warnings
-                                                  </p>
-                                                  <ul className="mt-2 space-y-1 text-[11px] text-muted-foreground">
-                                                    {responseExecutionResult.warnings.map(
-                                                      (warning) => (
-                                                        <li key={warning}>
-                                                          - {warning}
-                                                        </li>
-                                                      )
-                                                    )}
-                                                  </ul>
-                                                </div>
-                                              )}
+                                              <ExecutionResultSummary
+                                                result={
+                                                  responseExecutionResult
+                                                }
+                                              />
 
                                               <details className="mt-4 rounded-md border">
                                                 <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
