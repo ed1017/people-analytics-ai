@@ -33,6 +33,7 @@ import type {
   StructuralPositionScenarioResponse,
   WorkforceResponsePlanAllocation,
   WorkforceResponsePlanResponse,
+  WorkforceResponsePortfolioResponse,
 } from "@/lib/types";
 
 type WorkforcePlanningPageProps = {
@@ -351,6 +352,27 @@ export function WorkforcePlanningPage({
   const [
     roleResponsePlanError,
     setRoleResponsePlanError,
+  ] = useState<string | null>(null);
+  const [
+    responsePortfolioAllocations,
+    setResponsePortfolioAllocations,
+  ] = useState<
+    Record<string, WorkforceResponsePlanAllocation>
+  >({});
+  const [
+    responsePortfolioResult,
+    setResponsePortfolioResult,
+  ] =
+    useState<WorkforceResponsePortfolioResponse | null>(
+      null
+    );
+  const [
+    responsePortfolioLoading,
+    setResponsePortfolioLoading,
+  ] = useState(false);
+  const [
+    responsePortfolioError,
+    setResponsePortfolioError,
   ] = useState<string | null>(null);
 
   useEffect(() => {
@@ -740,6 +762,9 @@ export function WorkforcePlanningPage({
     setResponsePlanError(null);
     setRoleResponsePlanResult(null);
     setRoleResponsePlanError(null);
+    setResponsePortfolioAllocations({});
+    setResponsePortfolioResult(null);
+    setResponsePortfolioError(null);
   }
 
   function addStructuralPositionAction() {
@@ -754,6 +779,9 @@ export function WorkforcePlanningPage({
     setResponsePlanError(null);
     setRoleResponsePlanResult(null);
     setRoleResponsePlanError(null);
+    setResponsePortfolioAllocations({});
+    setResponsePortfolioResult(null);
+    setResponsePortfolioError(null);
   }
 
   function removeStructuralPositionAction(
@@ -773,6 +801,9 @@ export function WorkforcePlanningPage({
     setResponsePlanError(null);
     setRoleResponsePlanResult(null);
     setRoleResponsePlanError(null);
+    setResponsePortfolioAllocations({});
+    setResponsePortfolioResult(null);
+    setResponsePortfolioError(null);
   }
 
   async function runStructuralPositionActions() {
@@ -827,6 +858,21 @@ export function WorkforcePlanningPage({
       );
       setRoleResponsePlanResult(null);
       setRoleResponsePlanError(null);
+      setResponsePortfolioAllocations(
+        Object.fromEntries(
+          result.job_profile_impact
+            .filter(
+              (row) =>
+                row.authorized_position_delta > 0
+            )
+            .map((row) => [
+              row.job_profile_code,
+              createResponsePlanAllocation(),
+            ])
+        )
+      );
+      setResponsePortfolioResult(null);
+      setResponsePortfolioError(null);
     } catch (error) {
       setStructuralPositionError(
         error instanceof Error
@@ -856,6 +902,9 @@ export function WorkforcePlanningPage({
     );
     setRoleResponsePlanResult(null);
     setRoleResponsePlanError(null);
+    setResponsePortfolioAllocations({});
+    setResponsePortfolioResult(null);
+    setResponsePortfolioError(null);
   }
 
   async function runResponsePlan() {
@@ -978,6 +1027,111 @@ export function WorkforcePlanningPage({
     );
     setRoleResponsePlanResult(null);
     setRoleResponsePlanError(null);
+  }
+
+  function updateResponsePortfolioAllocation(
+    jobProfileCode: string,
+    key: "build" | "move" | "buy",
+    value: number
+  ) {
+    setResponsePortfolioAllocations(
+      (current) => ({
+        ...current,
+        [jobProfileCode]: {
+          ...(current[jobProfileCode] ??
+            createResponsePlanAllocation()),
+          [key]: value,
+        },
+      })
+    );
+    setResponsePortfolioResult(null);
+    setResponsePortfolioError(null);
+  }
+
+  async function runResponsePortfolio() {
+    if (!structuralPositionResult) return;
+
+    const positiveRoles =
+      structuralPositionResult.job_profile_impact.filter(
+        (row) =>
+          row.authorized_position_delta > 0
+      );
+
+    if (positiveRoles.length === 0) return;
+
+    try {
+      setResponsePortfolioLoading(true);
+      setResponsePortfolioError(null);
+
+      const response = await fetch(
+        "/api/workforce-response-portfolio",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            actions:
+              structuralPositionActions,
+            plans: positiveRoles.map(
+              (role) => ({
+                job_profile:
+                  role.job_profile_code,
+                allocation:
+                  responsePortfolioAllocations[
+                    role.job_profile_code
+                  ] ??
+                  createResponsePlanAllocation(),
+              })
+            ),
+          }),
+        }
+      );
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload?.error ??
+            "Failed to run workforce response portfolio."
+        );
+      }
+
+      setResponsePortfolioResult(
+        payload as WorkforceResponsePortfolioResponse
+      );
+    } catch (error) {
+      setResponsePortfolioError(
+        error instanceof Error
+          ? error.message
+          : "Failed to run workforce response portfolio."
+      );
+    } finally {
+      setResponsePortfolioLoading(false);
+    }
+  }
+
+  function resetResponsePortfolio() {
+    if (!structuralPositionResult) {
+      setResponsePortfolioAllocations({});
+      return;
+    }
+
+    setResponsePortfolioAllocations(
+      Object.fromEntries(
+        structuralPositionResult.job_profile_impact
+          .filter(
+            (row) =>
+              row.authorized_position_delta > 0
+          )
+          .map((row) => [
+            row.job_profile_code,
+            createResponsePlanAllocation(),
+          ])
+      )
+    );
+    setResponsePortfolioResult(null);
+    setResponsePortfolioError(null);
   }
 
   function persistSavedScenarios(
@@ -3799,6 +3953,280 @@ export function WorkforcePlanningPage({
                           </p>
                         )}
                       </div>
+
+                      {structuralPositionResult.job_profile_impact.filter(
+                        (row) =>
+                          row.authorized_position_delta > 0
+                      ).length > 1 && (
+                        <div className="mt-4 rounded-md border p-4">
+                          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                              <h5 className="font-semibold">
+                                Workforce Response Portfolio
+                              </h5>
+                              <p className="text-sm text-muted-foreground">
+                                Allocate Build, Move, and Buy across multiple scenario-created roles and reconcile the portfolio without double-counting interested internal talent.
+                              </p>
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={resetResponsePortfolio}
+                                disabled={responsePortfolioLoading}
+                                className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                Reset
+                              </button>
+                              <button
+                                type="button"
+                                onClick={runResponsePortfolio}
+                                disabled={responsePortfolioLoading}
+                                className="rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                {responsePortfolioLoading
+                                  ? "Running..."
+                                  : "Run Portfolio"}
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="max-h-[360px] overflow-auto rounded-md border">
+                            <table className="w-full min-w-[720px] text-sm">
+                              <thead className="sticky top-0 bg-background">
+                                <tr className="border-b text-left text-xs text-muted-foreground">
+                                  <th className="p-3">Role</th>
+                                  <th className="p-3 text-right">Demand</th>
+                                  <th className="p-3 text-right">Build</th>
+                                  <th className="p-3 text-right">Move</th>
+                                  <th className="p-3 text-right">Buy</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {structuralPositionResult.job_profile_impact
+                                  .filter(
+                                    (row) =>
+                                      row.authorized_position_delta > 0
+                                  )
+                                  .map((row) => {
+                                    const allocation =
+                                      responsePortfolioAllocations[
+                                        row.job_profile_code
+                                      ] ??
+                                      createResponsePlanAllocation();
+
+                                    return (
+                                      <tr
+                                        key={row.job_profile_code}
+                                        className="border-b last:border-0"
+                                      >
+                                        <td className="p-3">
+                                          <p className="font-medium">
+                                            {row.job_profile_name}
+                                          </p>
+                                          <p className="text-[10px] text-muted-foreground">
+                                            {row.job_profile_code}
+                                          </p>
+                                        </td>
+                                        <td className="p-3 text-right font-medium tabular-nums">
+                                          {formatModeledCount(
+                                            row.authorized_position_delta
+                                          )}
+                                        </td>
+                                        {(
+                                          [
+                                            ["build", "Build"],
+                                            ["move", "Move"],
+                                            ["buy", "Buy"],
+                                          ] as const
+                                        ).map(([key, label]) => (
+                                          <td
+                                            key={key}
+                                            className="p-3"
+                                          >
+                                            <input
+                                              aria-label={
+                                                row.job_profile_name +
+                                                " " +
+                                                label
+                                              }
+                                              type="number"
+                                              min={0}
+                                              step={1}
+                                              value={allocation[key]}
+                                              onChange={(event) =>
+                                                updateResponsePortfolioAllocation(
+                                                  row.job_profile_code,
+                                                  key,
+                                                  Number(
+                                                    event.target.value
+                                                  )
+                                                )
+                                              }
+                                              className="w-full min-w-[90px] rounded-md border bg-background px-2 py-1.5 text-right text-sm tabular-nums"
+                                            />
+                                          </td>
+                                        ))}
+                                      </tr>
+                                    );
+                                  })}
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <p className="mt-3 text-[11px] text-muted-foreground">
+                            The governed career-preference model allows one target profile per employee, so interested internal Build/Move pools do not overlap across portfolio roles. Each role is still capped at its own modeled demand.
+                          </p>
+
+                          {responsePortfolioError && (
+                            <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                              {responsePortfolioError}
+                            </div>
+                          )}
+
+                          {responsePortfolioResult && (
+                            <>
+                              <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                <div className="rounded-md border p-3">
+                                  <p className="text-xs text-muted-foreground">
+                                    Positive Role Demand
+                                  </p>
+                                  <p className="mt-1 text-2xl font-semibold">
+                                    {formatModeledCount(
+                                      responsePortfolioResult.scenario_positive_role_demand
+                                    )}
+                                  </p>
+                                </div>
+                                <div className="rounded-md border p-3">
+                                  <p className="text-xs text-muted-foreground">
+                                    Planned Coverage
+                                  </p>
+                                  <p className="mt-1 text-2xl font-semibold">
+                                    {formatModeledCount(
+                                      responsePortfolioResult.planned_coverage_if_executed
+                                    )}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {responsePortfolioResult.coverage_pct_of_all_positive_role_demand.toFixed(
+                                      1
+                                    )}% of positive demand
+                                  </p>
+                                </div>
+                                <div className="rounded-md border p-3">
+                                  <p className="text-xs text-muted-foreground">
+                                    Remaining Gap
+                                  </p>
+                                  <p className="mt-1 text-2xl font-semibold">
+                                    {formatModeledCount(
+                                      responsePortfolioResult.remaining_gap_if_executed +
+                                        responsePortfolioResult.unplanned_role_demand
+                                    )}
+                                  </p>
+                                </div>
+                                <div className="rounded-md border p-3">
+                                  <p className="text-xs text-muted-foreground">
+                                    Internal Supply
+                                  </p>
+                                  <p className="mt-1 text-2xl font-semibold">
+                                    {responsePortfolioResult.internal_supply.role_ready.toLocaleString()}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    role-ready ·{" "}
+                                    {responsePortfolioResult.internal_supply.fully_pathway_covered_near_ready.toLocaleString()} path-covered near-ready
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="mt-3 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
+                                Portfolio allocation: Build{" "}
+                                {formatModeledCount(
+                                  responsePortfolioResult.allocation.build
+                                )}{" "}
+                                · Move{" "}
+                                {formatModeledCount(
+                                  responsePortfolioResult.allocation.move
+                                )}{" "}
+                                · Buy{" "}
+                                {formatModeledCount(
+                                  responsePortfolioResult.allocation.buy
+                                )}{" "}
+                                · {responsePortfolioResult.recruiting_evidence.current_open_requisitions.toLocaleString()} current open reqs ·{" "}
+                                {responsePortfolioResult.recruiting_evidence.recent_12m_external_fills.toLocaleString()} external fills in trailing 12M
+                              </div>
+
+                              <div className="mt-4 overflow-x-auto rounded-md border">
+                                <table className="w-full min-w-[760px] text-sm">
+                                  <thead>
+                                    <tr className="border-b text-left text-xs text-muted-foreground">
+                                      <th className="p-3">Role</th>
+                                      <th className="p-3 text-right">Demand</th>
+                                      <th className="p-3 text-right">Build</th>
+                                      <th className="p-3 text-right">Move</th>
+                                      <th className="p-3 text-right">Buy</th>
+                                      <th className="p-3 text-right">Remaining</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {responsePortfolioResult.roles.map(
+                                      (role) => (
+                                        <tr
+                                          key={role.job_profile_code}
+                                          className="border-b last:border-0"
+                                        >
+                                          <td className="p-3 font-medium">
+                                            {role.job_profile_name}
+                                          </td>
+                                          <td className="p-3 text-right tabular-nums">
+                                            {formatModeledCount(
+                                              role.scenario_created_role_demand
+                                            )}
+                                          </td>
+                                          <td className="p-3 text-right tabular-nums">
+                                            {formatModeledCount(
+                                              role.allocation.build
+                                            )}
+                                          </td>
+                                          <td className="p-3 text-right tabular-nums">
+                                            {formatModeledCount(
+                                              role.allocation.move
+                                            )}
+                                          </td>
+                                          <td className="p-3 text-right tabular-nums">
+                                            {formatModeledCount(
+                                              role.allocation.buy
+                                            )}
+                                          </td>
+                                          <td className="p-3 text-right font-medium tabular-nums">
+                                            {formatModeledCount(
+                                              role.remaining_role_gap_if_executed
+                                            )}
+                                          </td>
+                                        </tr>
+                                      )
+                                    )}
+                                  </tbody>
+                                </table>
+                              </div>
+
+                              {responsePortfolioResult.warnings.length > 0 && (
+                                <div className="mt-4 rounded-md border p-3">
+                                  <p className="text-xs font-medium">
+                                    Portfolio warnings
+                                  </p>
+                                  <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                                    {responsePortfolioResult.warnings.map(
+                                      (warning) => (
+                                        <li key={warning}>
+                                          - {warning}
+                                        </li>
+                                      )
+                                    )}
+                                  </ul>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )}
 
                       {structuralPositionResult.job_profile_impact.some(
                         (row) =>

@@ -494,6 +494,36 @@ export type RoleWorkforceResponsePlanResponse = {
   methodology: string[];
 };
 
+export type WorkforceResponsePortfolioResponse = {
+  as_of: string;
+  scenario_positive_role_demand: number;
+  planned_role_demand: number;
+  unplanned_role_demand: number;
+  allocation: WorkforceResponsePlanAllocation;
+  planned_coverage_if_executed: number;
+  remaining_gap_if_executed: number;
+  overplanned_capacity: number;
+  coverage_pct_of_planned_roles: number;
+  coverage_pct_of_all_positive_role_demand: number;
+  internal_supply: {
+    role_ready: number;
+    near_ready: number;
+    fully_pathway_covered_near_ready: number;
+  };
+  recruiting_evidence: {
+    current_open_requisitions: number;
+    recent_12m_external_fills: number;
+  };
+  roles: RoleWorkforceResponsePlanResponse[];
+  unplanned_roles: Array<{
+    job_profile_code: string;
+    job_profile_name: string;
+    scenario_created_role_demand: number;
+  }>;
+  warnings: string[];
+  methodology: string[];
+};
+
 export type StructuralPositionCatalogResponse = {
   as_of: string;
   business_units: Array<{
