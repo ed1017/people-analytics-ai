@@ -45,6 +45,24 @@ type WorkforceContext = {
 };
 
 
+type WorkforceDetailContext = {
+  summary: Record<string, number>;
+  businessUnits: Array<Record<string, string | number>>;
+  countries: Array<Record<string, string | number>>;
+  levels: Array<Record<string, string | number>>;
+  tenure: Array<Record<string, string | number>>;
+  movements: Array<Record<string, string | number>>;
+};
+
+type AttritionContext = {
+  summary: Record<string, number>;
+  businessUnits: Array<Record<string, string | number>>;
+  levels: Array<Record<string, string | number>>;
+  tenure: Array<Record<string, string | number>>;
+  reasons: Array<Record<string, string | number>>;
+  trend: Array<Record<string, string | number>>;
+};
+
 type PlanningAssumption = {
   assumption_name: string;
   assumption_value: number | null;
@@ -333,6 +351,8 @@ export async function POST(
       body?.context as WorkforceContext;
 
     const page =
+      body?.page === "workforce" ||
+      body?.page === "attrition" ||
       body?.page === "workforce-planning" ||
       body?.page === "finance" ||
       body?.page === "skills" ||
@@ -340,6 +360,16 @@ export async function POST(
       body?.page === "survey-sentiment"
         ? body.page
         : "overview";
+
+    const workforceDetailContext =
+      body?.workforceDetailContext
+        ? (body.workforceDetailContext as WorkforceDetailContext)
+        : null;
+
+    const attritionContext =
+      body?.attritionContext
+        ? (body.attritionContext as AttritionContext)
+        : null;
 
     const planningContext =
       body?.planningContext
@@ -427,6 +457,43 @@ Displayed trend:
         : "Unavailable"
     }
 `.trim();
+
+    const workforceDetailPrompt =
+      page === "workforce" && workforceDetailContext
+        ? `
+CURRENT WORKFORCE DETAIL CONTEXT
+Summary: ${JSON.stringify(workforceDetailContext.summary)}
+Business units: ${JSON.stringify(workforceDetailContext.businessUnits)}
+Countries: ${JSON.stringify(workforceDetailContext.countries)}
+Career levels: ${JSON.stringify(workforceDetailContext.levels)}
+Tenure bands: ${JSON.stringify(workforceDetailContext.tenure)}
+2026 movements: ${JSON.stringify(workforceDetailContext.movements)}
+
+Interpretation rules:
+- Headcount is people; FTE is capacity and should not be treated as identical.
+- Manager counts and span of control are descriptive organizational metrics, not judgments of manager quality.
+- Movement counts describe recorded promotions, transfers, and lateral moves; do not infer causes without evidence.
+`.trim()
+        : "";
+
+    const attritionPrompt =
+      page === "attrition" && attritionContext
+        ? `
+CURRENT ATTRITION CONTEXT
+Summary: ${JSON.stringify(attritionContext.summary)}
+Business units: ${JSON.stringify(attritionContext.businessUnits)}
+Career levels: ${JSON.stringify(attritionContext.levels)}
+Tenure bands: ${JSON.stringify(attritionContext.tenure)}
+Reported reasons: ${JSON.stringify(attritionContext.reasons)}
+Monthly trend: ${JSON.stringify(attritionContext.trend)}
+
+Interpretation rules:
+- Voluntary-turnover rates use average monthly headcount as the denominator.
+- Tenure and career-level tables show exit counts unless a rate is explicitly supplied.
+- Reported separation reasons are administrative records, not proven causal drivers.
+- Regrettable attrition is a supplied flag in the synthetic dataset; do not infer additional regrettability.
+`.trim()
+        : "";
 
     const planningPrompt =
       page === "workforce-planning" &&
@@ -844,6 +911,10 @@ Shared rules:
 CURRENT PAGE: ${page}
 
 ${workforceContext}
+
+${workforceDetailPrompt}
+
+${attritionPrompt}
 
 ${planningPrompt}
 

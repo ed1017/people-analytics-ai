@@ -73,26 +73,36 @@ export function AppSidebar({
         </Button>
 
         <Button
-          variant="ghost"
+          variant={
+            activePage === "workforce"
+              ? "default"
+              : "ghost"
+          }
           className={`w-full gap-3 ${
             navCollapsed
               ? "justify-center px-0"
               : "justify-start"
           }`}
           title="Workforce"
+          onClick={() => onPageChange("workforce")}
         >
           <Users className="h-5 w-5 shrink-0" />
           {!navCollapsed && <span>Workforce</span>}
         </Button>
 
         <Button
-          variant="ghost"
+          variant={
+            activePage === "attrition"
+              ? "default"
+              : "ghost"
+          }
           className={`w-full gap-3 ${
             navCollapsed
               ? "justify-center px-0"
               : "justify-start"
           }`}
           title="Attrition"
+          onClick={() => onPageChange("attrition")}
         >
           <TrendingDown className="h-5 w-5 shrink-0" />
           {!navCollapsed && <span>Attrition</span>}
