@@ -86,6 +86,16 @@ function formatAssumptionName(value: string) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+type SavedScenarioEntry = {
+  id: string;
+  name: string;
+  saved_at: string;
+  scenario: ScenarioModelResponse;
+};
+
+const SAVED_SCENARIOS_STORAGE_KEY =
+  "people-analytics.saved-workforce-scenarios.v1";
+
 const scenarioFields: Array<{
   key: keyof ScenarioModelAssumptions;
   label: string;
@@ -162,6 +172,45 @@ export function WorkforcePlanningPage({
     useState(false);
   const [customScenarioError, setCustomScenarioError] =
     useState<string | null>(null);
+  const [scenarioName, setScenarioName] =
+    useState("");
+  const [savedScenarios, setSavedScenarios] =
+    useState<SavedScenarioEntry[]>([]);
+  const [comparisonScenarioIds, setComparisonScenarioIds] =
+    useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(
+        SAVED_SCENARIOS_STORAGE_KEY
+      );
+
+      if (!stored) return;
+
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) {
+        const validEntries = parsed.filter(
+          (item): item is SavedScenarioEntry =>
+            Boolean(
+              item &&
+                typeof item.id === "string" &&
+                typeof item.name === "string" &&
+                item.scenario?.summary &&
+                item.scenario?.assumptions
+            )
+        );
+
+        setSavedScenarios(validEntries);
+        setComparisonScenarioIds(
+          validEntries
+            .slice(0, 3)
+            .map((entry) => entry.id)
+        );
+      }
+    } catch {
+      // Ignore invalid or unavailable browser storage.
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -245,6 +294,185 @@ export function WorkforcePlanningPage({
     setCustomScenario(null);
     setCustomScenarioError(null);
   }
+
+  function persistSavedScenarios(
+    next: SavedScenarioEntry[]
+  ) {
+    setSavedScenarios(next);
+
+    try {
+      window.localStorage.setItem(
+        SAVED_SCENARIOS_STORAGE_KEY,
+        JSON.stringify(next)
+      );
+    } catch {
+      // Keep the in-session copy if browser storage is unavailable.
+    }
+  }
+
+  function saveCustomScenario() {
+    if (!customScenario) return;
+
+    const name =
+      scenarioName.trim() ||
+      `Scenario ${savedScenarios.length + 1}`;
+
+    const entry: SavedScenarioEntry = {
+      id:
+        typeof crypto !== "undefined" &&
+        "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${savedScenarios.length + 1}`,
+      name,
+      saved_at: new Date().toISOString(),
+      scenario: customScenario,
+    };
+
+    const next = [entry, ...savedScenarios];
+    persistSavedScenarios(next);
+    setScenarioName("");
+
+    setComparisonScenarioIds((current) =>
+      current.length < 3
+        ? [entry.id, ...current]
+        : current
+    );
+  }
+
+  function deleteSavedScenario(id: string) {
+    persistSavedScenarios(
+      savedScenarios.filter(
+        (entry) => entry.id !== id
+      )
+    );
+    setComparisonScenarioIds((current) =>
+      current.filter(
+        (scenarioId) => scenarioId !== id
+      )
+    );
+  }
+
+  function toggleScenarioComparison(id: string) {
+    setComparisonScenarioIds((current) => {
+      if (current.includes(id)) {
+        return current.filter(
+          (scenarioId) => scenarioId !== id
+        );
+      }
+
+      if (current.length >= 3) {
+        return current;
+      }
+
+      return [...current, id];
+    });
+  }
+
+  const comparedSavedScenarios =
+    comparisonScenarioIds
+      .map((id) =>
+        savedScenarios.find(
+          (entry) => entry.id === id
+        )
+      )
+      .filter(
+        (entry): entry is SavedScenarioEntry =>
+          Boolean(entry)
+      );
+
+  const comparisonRows: Array<{
+    label: string;
+    baseline: string;
+    value: (entry: SavedScenarioEntry) => string;
+  }> = [
+    {
+      label: "Ending Headcount",
+      baseline:
+        baselinePlanningEnd?.planned_headcount.toLocaleString() ??
+        "—",
+      value: (entry) =>
+        entry.scenario.summary.modeled_end_headcount.toLocaleString(),
+    },
+    {
+      label: "HC Δ vs Baseline",
+      baseline: "0",
+      value: (entry) => {
+        const value =
+          entry.scenario.summary.headcount_delta_vs_baseline;
+        return `${value > 0 ? "+" : ""}${value.toLocaleString()}`;
+      },
+    },
+    {
+      label: "Ending FTE",
+      baseline:
+        baselinePlanningEnd?.planned_fte.toLocaleString() ??
+        "—",
+      value: (entry) =>
+        entry.scenario.summary.modeled_end_fte.toLocaleString(),
+    },
+    {
+      label: "Ending Labor Cost",
+      baseline:
+        baselinePlanningEnd
+          ? formatCurrencyCompact(
+              baselinePlanningEnd.planned_labor_cost_usd
+            )
+          : "—",
+      value: (entry) =>
+        formatCurrencyCompact(
+          entry.scenario.summary.modeled_end_labor_cost_usd
+        ),
+    },
+    {
+      label: "Labor Cost Δ",
+      baseline: "$0",
+      value: (entry) =>
+        formatCurrencyCompact(
+          entry.scenario.summary
+            .labor_cost_delta_vs_baseline_usd
+        ),
+    },
+    {
+      label: "Enterprise Growth",
+      baseline: scenarioDefaults
+        ? `${scenarioDefaults.annual_growth_pct.toFixed(1)}%`
+        : "—",
+      value: (entry) =>
+        `${entry.scenario.assumptions.annual_growth_pct.toFixed(1)}%`,
+    },
+    {
+      label: "Salary Inflation",
+      baseline: scenarioDefaults
+        ? `${scenarioDefaults.salary_inflation_pct.toFixed(1)}%`
+        : "—",
+      value: (entry) =>
+        `${entry.scenario.assumptions.salary_inflation_pct.toFixed(1)}%`,
+    },
+    {
+      label: "Annual Attrition",
+      baseline: scenarioDefaults
+        ? `${scenarioDefaults.annual_attrition_pct.toFixed(1)}%`
+        : "—",
+      value: (entry) =>
+        `${entry.scenario.assumptions.annual_attrition_pct.toFixed(1)}%`,
+    },
+    {
+      label: "Fill Rate",
+      baseline: scenarioDefaults
+        ? `${scenarioDefaults.fill_rate_pct.toFixed(1)}%`
+        : "—",
+      value: (entry) =>
+        `${entry.scenario.assumptions.fill_rate_pct.toFixed(1)}%`,
+    },
+    {
+      label: "AI / Productivity Reduction",
+      baseline: scenarioDefaults
+        ? `${scenarioDefaults.productivity_hiring_reduction_pct.toFixed(1)}%`
+        : "—",
+      value: (entry) =>
+        `${entry.scenario.assumptions.productivity_hiring_reduction_pct.toFixed(1)}%`,
+    },
+  ];
 
   return (
 <section className="min-w-0 p-6">
@@ -505,6 +733,29 @@ export function WorkforcePlanningPage({
                   </span>
                 </div>
 
+                <div className="mb-4 flex flex-wrap items-center gap-2">
+                  <input
+                    value={scenarioName}
+                    onChange={(event) =>
+                      setScenarioName(
+                        event.target.value
+                      )
+                    }
+                    placeholder="Scenario name"
+                    className="min-w-[220px] flex-1 rounded-md border bg-background px-3 py-2 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={saveCustomScenario}
+                    className="rounded-md border px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    Save Scenario
+                  </button>
+                  <span className="text-[11px] text-muted-foreground">
+                    Saved in this browser
+                  </span>
+                </div>
+
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                   <div className="rounded-md border p-3">
                     <p className="text-xs text-muted-foreground">
@@ -670,6 +921,164 @@ export function WorkforcePlanningPage({
               </div>
             )}
           </div>
+
+          {savedScenarios.length > 0 && (
+            <div className="mb-6 rounded-lg border p-4">
+              <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 className="font-semibold">
+                    Saved Scenario Comparison
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Browser-local scenarios. Select up to three to compare with Baseline.
+                  </p>
+                </div>
+                <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
+                  {comparisonScenarioIds.length}/3 selected
+                </span>
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {savedScenarios.map((entry) => {
+                  const selected =
+                    comparisonScenarioIds.includes(
+                      entry.id
+                    );
+                  const selectionLimitReached =
+                    comparisonScenarioIds.length >= 3 &&
+                    !selected;
+
+                  return (
+                    <div
+                      key={entry.id}
+                      className="rounded-md border p-3"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <label className="flex min-w-0 items-start gap-2">
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            disabled={selectionLimitReached}
+                            onChange={() =>
+                              toggleScenarioComparison(
+                                entry.id
+                              )
+                            }
+                            className="mt-1"
+                          />
+                          <span className="min-w-0">
+                            <span className="block truncate text-sm font-semibold">
+                              {entry.name}
+                            </span>
+                            <span className="block text-[11px] text-muted-foreground">
+                              Saved{" "}
+                              {new Date(
+                                entry.saved_at
+                              ).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                }
+                              )}
+                            </span>
+                          </span>
+                        </label>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            deleteSavedScenario(
+                              entry.id
+                            )
+                          }
+                          className="text-xs text-muted-foreground hover:text-foreground"
+                        >
+                          Delete
+                        </button>
+                      </div>
+
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                        <div className="rounded border p-2">
+                          <p className="text-muted-foreground">
+                            Ending HC
+                          </p>
+                          <p className="mt-1 font-semibold tabular-nums">
+                            {entry.scenario.summary.modeled_end_headcount.toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="rounded border p-2">
+                          <p className="text-muted-foreground">
+                            HC vs Base
+                          </p>
+                          <p className="mt-1 font-semibold tabular-nums">
+                            {entry.scenario.summary.headcount_delta_vs_baseline >
+                            0
+                              ? "+"
+                              : ""}
+                            {entry.scenario.summary.headcount_delta_vs_baseline.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {comparedSavedScenarios.length > 0 && (
+                <div className="mt-5 overflow-x-auto">
+                  <table className="w-full min-w-[760px] text-sm">
+                    <thead>
+                      <tr className="border-b text-left text-xs text-muted-foreground">
+                        <th className="pb-3 pr-4">
+                          Metric
+                        </th>
+                        <th className="pb-3 px-3 text-right">
+                          Baseline
+                        </th>
+                        {comparedSavedScenarios.map(
+                          (entry) => (
+                            <th
+                              key={entry.id}
+                              className="pb-3 px-3 text-right"
+                            >
+                              {entry.name}
+                            </th>
+                          )
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comparisonRows.map((row) => (
+                        <tr
+                          key={row.label}
+                          className="border-b last:border-0"
+                        >
+                          <td className="py-3 pr-4 font-medium">
+                            {row.label}
+                          </td>
+                          <td className="px-3 py-3 text-right tabular-nums">
+                            {row.baseline}
+                          </td>
+                          {comparedSavedScenarios.map(
+                            (entry) => (
+                              <td
+                                key={entry.id}
+                                className="px-3 py-3 text-right tabular-nums"
+                              >
+                                {row.value(entry)}
+                              </td>
+                            )
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
 
           {planningLoading &&
           planningScenarios.length === 0 ? (
