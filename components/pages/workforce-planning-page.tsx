@@ -72,6 +72,12 @@ function formatLongDate(value: string) {
   });
 }
 
+function formatModeledCount(value: number) {
+  return value.toLocaleString("en-US", {
+    maximumFractionDigits: 1,
+  });
+}
+
 function formatCurrencyCompact(value: number) {
   const sign = value < 0 ? "-" : "";
   const absoluteValue = Math.abs(value);
@@ -2963,6 +2969,187 @@ export function WorkforcePlanningPage({
                           <p className="text-xs text-muted-foreground">
                             Annualized effect of modeled fills
                           </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 rounded-md border p-4">
+                        <div className="mb-4">
+                          <h5 className="font-semibold">
+                            Recruiting Demand
+                          </h5>
+                          <p className="text-sm text-muted-foreground">
+                            Position actions translated into linked requisition demand and ATS actions.
+                          </p>
+                        </div>
+
+                        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                          <div className="rounded-md border p-3">
+                            <p className="text-xs text-muted-foreground">
+                              Active Recruiting Demand
+                            </p>
+                            <p className="mt-1 text-2xl font-semibold">
+                              {formatModeledCount(
+                                structuralPositionResult.recruiting_demand
+                                  .active_recruiting_demand
+                              )}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Open reqs + uncovered active vacancies
+                            </p>
+                          </div>
+
+                          <div className="rounded-md border p-3">
+                            <p className="text-xs text-muted-foreground">
+                              Open Requisitions
+                            </p>
+                            <p className="mt-1 text-2xl font-semibold">
+                              {formatModeledCount(
+                                structuralPositionResult.recruiting_demand
+                                  .active_open_requisitions
+                              )}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatModeledCount(
+                                structuralPositionResult.current
+                                  .open_requisitions
+                              )}{" "}
+                              current
+                            </p>
+                          </div>
+
+                          <div className="rounded-md border p-3">
+                            <p className="text-xs text-muted-foreground">
+                              On-Hold Requisitions
+                            </p>
+                            <p className="mt-1 text-2xl font-semibold">
+                              {formatModeledCount(
+                                structuralPositionResult.recruiting_demand
+                                  .on_hold_requisitions
+                              )}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Includes modeled vacancy freezes
+                            </p>
+                          </div>
+
+                          <div className="rounded-md border p-3">
+                            <p className="text-xs text-muted-foreground">
+                              New Requisitions Needed
+                            </p>
+                            <p className="mt-1 text-2xl font-semibold">
+                              {formatModeledCount(
+                                structuralPositionResult.recruiting_demand
+                                  .incremental_requisitions_needed
+                              )}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Active vacancies without a req
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 flex flex-wrap gap-2 text-xs">
+                          <span className="rounded-full border px-3 py-1">
+                            Hold{" "}
+                            {formatModeledCount(
+                              structuralPositionResult.recruiting_demand
+                                .requisitions_to_hold
+                            )}
+                          </span>
+                          <span className="rounded-full border px-3 py-1">
+                            Cancel{" "}
+                            {formatModeledCount(
+                              structuralPositionResult.recruiting_demand
+                                .requisitions_to_cancel
+                            )}
+                          </span>
+                          <span className="rounded-full border px-3 py-1">
+                            Create for fills{" "}
+                            {formatModeledCount(
+                              structuralPositionResult.recruiting_demand
+                                .requisitions_to_create_for_modeled_fills
+                            )}
+                          </span>
+                          <span className="rounded-full border px-3 py-1">
+                            Reactivate for fills{" "}
+                            {formatModeledCount(
+                              structuralPositionResult.recruiting_demand
+                                .requisitions_to_reactivate_for_modeled_fills
+                            )}
+                          </span>
+                          <span className="rounded-full border px-3 py-1">
+                            Close as filled{" "}
+                            {formatModeledCount(
+                              structuralPositionResult.recruiting_demand
+                                .requisitions_closed_as_filled
+                            )}
+                          </span>
+                        </div>
+
+                        <div className="mt-4 overflow-x-auto">
+                          <table className="w-full min-w-[700px] text-sm">
+                            <thead>
+                              <tr className="border-b text-left text-xs text-muted-foreground">
+                                <th className="pb-3 pr-4">
+                                  Business Unit
+                                </th>
+                                <th className="pb-3 px-3 text-right">
+                                  Active Demand
+                                </th>
+                                <th className="pb-3 px-3 text-right">
+                                  Open Reqs
+                                </th>
+                                <th className="pb-3 px-3 text-right">
+                                  On Hold
+                                </th>
+                                <th className="pb-3 px-3 text-right">
+                                  New Reqs
+                                </th>
+                                <th className="pb-3 pl-3 text-right">
+                                  Modeled Fills
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {structuralPositionResult.recruiting_demand.by_business_unit
+                                .slice(0, 8)
+                                .map((row) => (
+                                  <tr
+                                    key={row.org_code}
+                                    className="border-b last:border-0"
+                                  >
+                                    <td className="py-3 pr-4 font-medium">
+                                      {row.org_name}
+                                    </td>
+                                    <td className="px-3 py-3 text-right tabular-nums">
+                                      {formatModeledCount(
+                                        row.active_recruiting_demand
+                                      )}
+                                    </td>
+                                    <td className="px-3 py-3 text-right tabular-nums">
+                                      {formatModeledCount(
+                                        row.active_open_requisitions
+                                      )}
+                                    </td>
+                                    <td className="px-3 py-3 text-right tabular-nums">
+                                      {formatModeledCount(
+                                        row.on_hold_requisitions
+                                      )}
+                                    </td>
+                                    <td className="px-3 py-3 text-right tabular-nums">
+                                      {formatModeledCount(
+                                        row.uncovered_open_vacancies
+                                      )}
+                                    </td>
+                                    <td className="py-3 pl-3 text-right tabular-nums">
+                                      {formatModeledCount(
+                                        row.modeled_fills
+                                      )}
+                                    </td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
                         </div>
                       </div>
 

@@ -4,7 +4,20 @@
 create or replace view public.position_action_structural_inventory
 with (security_invoker = true)
 as
-with current_inventory as (
+with live_requisition as (
+  select
+    r.position_id,
+    bool_or(r.requisition_status = 'open')
+      as has_open_requisition,
+    bool_or(r.requisition_status = 'on_hold')
+      as has_on_hold_requisition
+  from public.requisitions r
+  where r.closed_date is null
+    and r.requisition_status in ('open','on_hold')
+    and r.position_id is not null
+  group by r.position_id
+),
+current_inventory as (
   select
     p.org_unit_id,
     p.job_level_id,
@@ -17,8 +30,24 @@ with current_inventory as (
     )::numeric as vacant_positions,
     count(*) filter (
       where p.position_status in ('filled','vacant')
-    )::numeric as current_positions
+    )::numeric as current_positions,
+    count(*) filter (
+      where p.position_status = 'vacant'
+        and coalesce(
+          lr.has_open_requisition,
+          false
+        )
+    )::numeric as open_requisition_vacancies,
+    count(*) filter (
+      where p.position_status = 'vacant'
+        and coalesce(
+          lr.has_on_hold_requisition,
+          false
+        )
+    )::numeric as on_hold_requisition_vacancies
   from public.positions p
+  left join live_requisition lr
+    on lr.position_id = p.position_id
   where p.position_status in ('filled','vacant')
   group by
     p.org_unit_id,
@@ -62,7 +91,15 @@ select
     cb.planned_labor_cost_usd /
     nullif(cb.planned_headcount, 0),
     2
-  ) as annual_cost_per_position
+  ) as annual_cost_per_position,
+  ci.open_requisition_vacancies,
+  ci.on_hold_requisition_vacancies,
+  greatest(
+    ci.vacant_positions
+      - ci.open_requisition_vacancies
+      - ci.on_hold_requisition_vacancies,
+    0
+  )::numeric as uncovered_vacancies
 from current_inventory ci
 join cost_basis cb
   using (
@@ -80,11 +117,13 @@ join public.job_profiles jp
 grant select
 on public.position_action_structural_inventory
 to service_role;
+
 grant select on
   public.positions,
   public.position_plans,
   public.workforce_scenarios,
   public.org_units,
   public.job_levels,
-  public.job_profiles
+  public.job_profiles,
+  public.requisitions
 to service_role;

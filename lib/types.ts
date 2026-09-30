@@ -187,6 +187,9 @@ export type StructuralPositionScenarioResponse = {
     filled_positions: number;
     open_vacancies: number;
     frozen_positions: number;
+    open_requisitions: number;
+    on_hold_requisitions: number;
+    uncovered_vacancies: number;
   };
   modeled: {
     authorized_positions: number;
@@ -199,6 +202,27 @@ export type StructuralPositionScenarioResponse = {
     authorized_budget_delta_usd: number;
     annualized_staffed_labor_cost_delta_usd: number;
   };
+  recruiting_demand: {
+    active_open_requisitions: number;
+    on_hold_requisitions: number;
+    uncovered_open_vacancies: number;
+    active_recruiting_demand: number;
+    incremental_requisitions_needed: number;
+    requisitions_to_hold: number;
+    requisitions_to_cancel: number;
+    requisitions_to_create_for_modeled_fills: number;
+    requisitions_to_reactivate_for_modeled_fills: number;
+    requisitions_closed_as_filled: number;
+    by_business_unit: Array<{
+      org_code: string;
+      org_name: string;
+      active_open_requisitions: number;
+      on_hold_requisitions: number;
+      uncovered_open_vacancies: number;
+      active_recruiting_demand: number;
+      modeled_fills: number;
+    }>;
+  };
   action_results: Array<{
     action_index: number;
     action_type: StructuralPositionActionType;
@@ -209,6 +233,11 @@ export type StructuralPositionScenarioResponse = {
     annual_cost_basis_per_position_usd: number;
     authorized_budget_delta_usd: number;
     staffed_labor_cost_delta_usd: number;
+    requisitions_to_hold: number;
+    requisitions_to_cancel: number;
+    requisitions_to_create_for_fill: number;
+    requisitions_to_reactivate_for_fill: number;
+    requisitions_closed_as_filled: number;
   }>;
   methodology: string[];
 };
