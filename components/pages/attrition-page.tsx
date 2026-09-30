@@ -52,13 +52,19 @@ export function AttritionPage({ data, loading, error }: Props) {
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              ["Voluntary Turnover YTD", summary.voluntary_turnover_ytd_pct.toFixed(1) + "%", summary.voluntary_exits.toLocaleString() + " voluntary exits"],
-              ["Annualized Voluntary", summary.annualized_voluntary_turnover_pct.toFixed(1) + "%", "Run-rate based on Jan-Sep"],
-              ["Regrettable Exits", summary.regrettable_exits.toLocaleString(), summary.regrettable_share_of_voluntary_pct.toFixed(1) + "% of voluntary exits"],
-              ["Total Exits YTD", summary.total_exits.toLocaleString(), summary.total_turnover_ytd_pct.toFixed(1) + "% total turnover"],
-            ].map(([label, value, note]) => (
+              ["Voluntary Turnover YTD", summary.voluntary_turnover_ytd_pct.toFixed(1) + "%", summary.voluntary_exits.toLocaleString() + " voluntary exits", "Voluntary exits year to date divided by average monthly headcount over the same period."],
+              ["Annualized Voluntary", summary.annualized_voluntary_turnover_pct.toFixed(1) + "%", "Run-rate based on Jan-Sep", "Current year-to-date voluntary turnover converted to a 12-month run rate. It is a pace indicator, not a forecast."],
+              ["Regrettable Exits", summary.regrettable_exits.toLocaleString(), summary.regrettable_share_of_voluntary_pct.toFixed(1) + "% of voluntary exits", "Voluntary exits flagged as regrettable in the synthetic separation data. This is a supplied classification, not an AI judgment."],
+              ["Total Exits YTD", summary.total_exits.toLocaleString(), summary.total_turnover_ytd_pct.toFixed(1) + "% total turnover", "All recorded separations year to date, including voluntary, involuntary, retirement, and other recorded exits."],
+            ].map(([label, value, note, definition]) => (
               <div key={label} className="rounded-lg border p-4">
-                <p className="text-sm text-muted-foreground">{label}</p>
+                <p
+                  className="inline cursor-help border-b border-dotted text-sm text-muted-foreground"
+                  title={definition}
+                  tabIndex={0}
+                >
+                  {label}
+                </p>
                 <p className="mt-2 text-3xl font-semibold">{value}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{note}</p>
               </div>
