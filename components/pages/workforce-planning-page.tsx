@@ -5,12 +5,10 @@ import {
   useState,
 } from "react";
 import { WorkforcePlanningWorkflowNavigation } from "@/components/workforce-planning/workflow-navigation";
-import { ResponseStrategyEvidence } from "@/components/workforce-planning/response-strategy-evidence";
-import { RoleResponseEvidenceSummary } from "@/components/workforce-planning/role-response-evidence-summary";
-import { ResponsePortfolioControls } from "@/components/workforce-planning/response-portfolio-controls";
-import { BusinessUnitResponseAllocationPanel } from "@/components/workforce-planning/business-unit-response-allocation-panel";
 import { ScenarioModelingDestination } from "@/components/workforce-planning/scenario-modeling-destination";
 import { PositionWorkforceDesignDestination } from "@/components/workforce-planning/position-workforce-design-destination";
+import { ResponsePortfolioAllocationSection } from "@/components/workforce-planning/response-portfolio-allocation-section";
+import { WorkforceResponseDestination } from "@/components/workforce-planning/workforce-response-destination";
 import { PositionModelingSummary } from "@/components/workforce-planning/position-modeling-summary";
 import { StructuralPositionActionResults } from "@/components/workforce-planning/structural-position-action-results";
 import { StructuralPositionScenarioSummary } from "@/components/workforce-planning/structural-position-scenario-summary";
@@ -2133,30 +2131,92 @@ export function WorkforcePlanningPage({
                 }}
               />
 
+              <WorkforceResponseDestination
+                visible={workflowView === "respond"}
+                selectedPlanningScenario={selectedPlanningScenario}
+                positionModelingLoading={positionModelingLoading}
+                structuralPositionResult={structuralPositionResult}
+                onNavigateDesign={() => setWorkflowView("design")}
+                portfolioSectionProps={
+                  structuralPositionResult
+                    ? {
+                        portfolioProps: {
+                          scenario: structuralPositionResult,
+                          allocations: responsePortfolioAllocations,
+                          result: responsePortfolioResult,
+                          loading: responsePortfolioLoading,
+                          error: responsePortfolioError,
+                          onUpdate: updateResponsePortfolioAllocation,
+                          onReset: resetResponsePortfolio,
+                          onRun: runResponsePortfolio,
+                        },
+                        businessUnitProps:
+                          responsePortfolioResult
+                            ? {
+                                scenario: structuralPositionResult,
+                                portfolioResult: responsePortfolioResult,
+                                allocations: businessUnitResponseAllocations,
+                                result: businessUnitResponseResult,
+                                loading: businessUnitResponseLoading,
+                                error: businessUnitResponseError,
+                                onUpdate: updateBusinessUnitResponseAllocation,
+                                onReset: resetBusinessUnitResponseAllocation,
+                                onRun: runBusinessUnitResponseAllocation,
+                              }
+                            : null,
+                      }
+                    : null
+                }
+                rolePlanProps={{
+                  roleResponsePlanProfile,
+                  setRoleResponsePlanProfile,
+                  roleResponsePlanAllocation,
+                  setRoleResponsePlanAllocation,
+                  roleResponsePlanResult,
+                  setRoleResponsePlanResult,
+                  roleResponsePlanLoading,
+                  roleResponsePlanError,
+                  setRoleResponsePlanError,
+                  resetRoleResponsePlan,
+                  runRoleResponsePlan,
+                }}
+                skillPlanProps={{
+                  responsePlanSkill,
+                  setResponsePlanSkill,
+                  responsePlanAllocation,
+                  setResponsePlanAllocation,
+                  responsePlanResult,
+                  setResponsePlanResult,
+                  responsePlanLoading,
+                  responsePlanError,
+                  setResponsePlanError,
+                  resetResponsePlan,
+                  runResponsePlan,
+                }}
+                positionSummaryProps={{
+                  positionModelingError,
+                  positionModelingLoading,
+                  positionModelingData,
+                  activePositionScenario,
+                  topPositionBusinessUnits,
+                  positionLevels,
+                }}
+              />
+
               <div
                 className={
-                  workflowView === "overview" ||
-                  workflowView === "plan" ||
-                  workflowView === "design"
-                    ? "hidden"
-                    : "mt-6 rounded-lg border p-4"
+                  workflowView === "execute"
+                    ? "mt-6 rounded-lg border p-4"
+                    : "hidden"
                 }
               >
                 <div className="mb-5 flex items-start justify-between gap-4">
                   <div>
                     <h3 className="font-semibold">
-                      {workflowView === "design"
-                        ? "Workforce Design"
-                        : workflowView === "respond"
-                          ? "Workforce Response"
-                          : "Execution & Feasibility"}
+                      Execution & Feasibility
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {workflowView === "design"
-                        ? "Turn the workforce scenario into concrete position changes and see the recruiting and skill impact."
-                        : workflowView === "respond"
-                          ? "Translate modeled role gaps into Build, Move, and Buy response plans."
-                          : "Put the approved response on a timeline and test whether it fits the operating constraints."}
+                      Put the approved response on a timeline and test whether it fits the operating constraints.
                     </p>
                   </div>
 
@@ -2167,58 +2227,28 @@ export function WorkforcePlanningPage({
                   </span>
                 </div>
 
-                {workflowView === "respond" &&
-                  !structuralPositionResult && (
-                    <div className="mb-5 rounded-md border bg-muted/20 p-4">
-                      <p className="font-medium">
-                        Design the workforce first
-                      </p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        Run a structural position scenario so the app knows which roles and skills actually have new demand.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setWorkflowView(
-                            "design"
-                          )
-                        }
-                        className="mt-3 rounded-md border px-3 py-2 text-sm"
-                      >
-                        Go to Design
-                      </button>
-                    </div>
-                  )}
-
-                {workflowView === "execute" &&
-                  (!responsePortfolioResult ||
-                    !businessUnitResponseResult) && (
-                    <div className="mb-5 rounded-md border bg-muted/20 p-4">
-                      <p className="font-medium">
-                        Build the response plan first
-                      </p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        Execution starts after Build / Move / Buy has been allocated and reconciled to business-unit destinations.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setWorkflowView(
-                            "respond"
-                          )
-                        }
-                        className="mt-3 rounded-md border px-3 py-2 text-sm"
-                      >
-                        Go to Respond
-                      </button>
-                    </div>
-                  )}
-
-
+                {(!responsePortfolioResult ||
+                  !businessUnitResponseResult) && (
+                  <div className="mb-5 rounded-md border bg-muted/20 p-4">
+                    <p className="font-medium">
+                      Build the response plan first
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Execution starts after Build / Move / Buy has been allocated and reconciled to business-unit destinations.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setWorkflowView("respond")
+                      }
+                      className="mt-3 rounded-md border px-3 py-2 text-sm"
+                    >
+                      Go to Respond
+                    </button>
+                  </div>
+                )}
 
                 <div className="mb-5 rounded-md border p-4">
-
-
                   {structuralPositionResult && (
                     <>
                       <StructuralPositionScenarioSummary
@@ -2226,504 +2256,65 @@ export function WorkforcePlanningPage({
                         showDemandDetails={false}
                       />
 
-                      {workflowView === "respond" && (
-                        <ResponseStrategyEvidence
-                          responseStrategy={
-                            structuralPositionResult.response_strategy
-                          }
-                        />
-                      )}
-
                       {structuralPositionResult.job_profile_impact.filter(
                         (row) =>
                           row.authorized_position_delta > 0
                       ).length > 1 && (
-                        <div
-                          className={
-                            workflowView === "respond" ||
-                            workflowView === "execute"
-                              ? "mt-4 rounded-md border p-4"
-                              : "hidden"
-                          }
-                        >
-                          <ResponsePortfolioControls
-                            scenario={structuralPositionResult}
-                            allocations={responsePortfolioAllocations}
-                            result={responsePortfolioResult}
-                            loading={responsePortfolioLoading}
-                            error={responsePortfolioError}
-                            onUpdate={updateResponsePortfolioAllocation}
-                            onReset={resetResponsePortfolio}
-                            onRun={runResponsePortfolio}
-                          >
-                            {responsePortfolioResult && (
-                              <BusinessUnitResponseAllocationPanel
-                                scenario={structuralPositionResult}
-                                portfolioResult={responsePortfolioResult}
-                                allocations={businessUnitResponseAllocations}
-                                result={businessUnitResponseResult}
-                                loading={businessUnitResponseLoading}
-                                error={businessUnitResponseError}
-                                onUpdate={updateBusinessUnitResponseAllocation}
-                                onReset={resetBusinessUnitResponseAllocation}
-                                onRun={runBusinessUnitResponseAllocation}
-                              >
-                                {businessUnitResponseResult && (
-<WorkforceExecutionPanel
-                                  workflowView={workflowView}
-                                  businessUnitResponseResult={businessUnitResponseResult}
-                                  responseExecutionDrafts={responseExecutionDrafts}
-                                  responseExecutionLoading={responseExecutionLoading}
-                                  responseExecutionError={responseExecutionError}
-                                  responseExecutionResult={responseExecutionResult}
-                                  constraintAwareScheduleLoading={constraintAwareScheduleLoading}
-                                  constraintAwareScheduleError={constraintAwareScheduleError}
-                                  constraintAwareScheduleResult={constraintAwareScheduleResult}
-                                  responseConstraintDraft={responseConstraintDraft}
-                                  responseConstraintLoading={responseConstraintLoading}
-                                  responseConstraintError={responseConstraintError}
-                                  responseConstraintResult={responseConstraintResult}
-                                  resetResponseExecution={resetResponseExecution}
-                                  runConstraintAwareScheduler={runConstraintAwareScheduler}
-                                  runResponseExecution={runResponseExecution}
-                                  updateResponseExecutionDraft={updateResponseExecutionDraft}
-                                  addResponseExecutionPhase={addResponseExecutionPhase}
-                                  removeResponseExecutionPhase={removeResponseExecutionPhase}
-                                  updateResponseConstraintDraft={updateResponseConstraintDraft}
-                                  resetResponseConstraints={resetResponseConstraints}
-                                  runResponseConstraints={runResponseConstraints}
-                                />
-                                )}
-                              </BusinessUnitResponseAllocationPanel>
-                            )}
-                          </ResponsePortfolioControls>
-                        </div>
-                      )}
-
-                      {structuralPositionResult.job_profile_impact.some(
-                        (row) =>
-                          row.authorized_position_delta > 0
-                      ) && (
-                        <div
-                          className={
-                            workflowView === "respond"
-                              ? "mt-4 rounded-md border p-4"
-                              : "hidden"
-                          }
-                        >
-                          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-                            <div>
-                              <h5 className="font-semibold">
-                                Role Workforce Response Plan
-                              </h5>
-                              <p className="text-sm text-muted-foreground">
-                                Plan Build, Move, and Buy in role units across the full governed skill bundle without double-counting the same role across skills.
-                              </p>
-                            </div>
-                            <div className="flex gap-2">
-                              <button
-                                type="button"
-                                onClick={resetRoleResponsePlan}
-                                disabled={roleResponsePlanLoading}
-                                className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
-                              >
-                                Reset
-                              </button>
-                              <button
-                                type="button"
-                                onClick={runRoleResponsePlan}
-                                disabled={
-                                  !roleResponsePlanProfile ||
-                                  roleResponsePlanLoading
-                                }
-                                className="rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background disabled:cursor-not-allowed disabled:opacity-50"
-                              >
-                                {roleResponsePlanLoading
-                                  ? "Running..."
-                                  : "Run Role Plan"}
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="mb-4 grid gap-3 lg:grid-cols-[1.6fr_repeat(3,minmax(130px,1fr))]">
-                            <label className="rounded-md border p-3">
-                              <span
-                                className="cursor-help border-b border-dotted text-[11px] text-muted-foreground"
-                                title="Only job profiles with positive scenario-created authorized-position demand are available."
-                              >
-                                Job Profile
-                              </span>
-                              <select
-                                value={roleResponsePlanProfile}
-                                onChange={(event) => {
-                                  setRoleResponsePlanProfile(
-                                    event.target.value
-                                  );
-                                  setRoleResponsePlanAllocation(
-                                    createResponsePlanAllocation()
-                                  );
-                                  setRoleResponsePlanResult(null);
-                                  setRoleResponsePlanError(null);
-                                }}
-                                className="mt-1 w-full rounded-md border bg-background px-2 py-2 text-sm"
-                              >
-                                {structuralPositionResult.job_profile_impact
-                                  .filter(
-                                    (row) =>
-                                      row.authorized_position_delta > 0
-                                  )
-                                  .map((row) => (
-                                    <option
-                                      key={row.job_profile_code}
-                                      value={row.job_profile_code}
-                                    >
-                                      {row.job_profile_name +
-                                        " - demand +" +
-                                        formatModeledCount(
-                                          row.authorized_position_delta
-                                        )}
-                                    </option>
-                                  ))}
-                              </select>
-                            </label>
-
-                            {(
-                              [
-                                ["build", "Build"],
-                                ["move", "Move"],
-                                ["buy", "Buy"],
-                              ] as const
-                            ).map(([key, label]) => (
-                              <label
-                                key={key}
-                                className="rounded-md border p-3"
-                              >
-                                <span className="text-[11px] text-muted-foreground">
-                                  {label} roles
-                                </span>
-                                <input
-                                  type="number"
-                                  min={0}
-                                  step={1}
-                                  value={
-                                    roleResponsePlanAllocation[
-                                      key
-                                    ]
+                        <div className="mt-4 rounded-md border p-4">
+                          <ResponsePortfolioAllocationSection
+                            portfolioProps={{
+                              scenario: structuralPositionResult,
+                              allocations: responsePortfolioAllocations,
+                              result: responsePortfolioResult,
+                              loading: responsePortfolioLoading,
+                              error: responsePortfolioError,
+                              onUpdate: updateResponsePortfolioAllocation,
+                              onReset: resetResponsePortfolio,
+                              onRun: runResponsePortfolio,
+                            }}
+                            businessUnitProps={
+                              responsePortfolioResult
+                                ? {
+                                    scenario: structuralPositionResult,
+                                    portfolioResult: responsePortfolioResult,
+                                    allocations: businessUnitResponseAllocations,
+                                    result: businessUnitResponseResult,
+                                    loading: businessUnitResponseLoading,
+                                    error: businessUnitResponseError,
+                                    onUpdate: updateBusinessUnitResponseAllocation,
+                                    onReset: resetBusinessUnitResponseAllocation,
+                                    onRun: runBusinessUnitResponseAllocation,
                                   }
-                                  onChange={(event) => {
-                                    setRoleResponsePlanAllocation(
-                                      (current) => ({
-                                        ...current,
-                                        [key]: Number(
-                                          event.target.value
-                                        ),
-                                      })
-                                    );
-                                    setRoleResponsePlanResult(null);
-                                    setRoleResponsePlanError(null);
-                                  }}
-                                  className="mt-1 w-full rounded-md border bg-background px-2 py-2 text-right text-sm tabular-nums"
-                                />
-                              </label>
-                            ))}
-                          </div>
-
-                          <div className="mb-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
-                            One planned role unit is counted once across the entire required-skill bundle. Skill-level learning, mobility, and hiring signals are evidence only and are never summed as unique people.
-                          </div>
-
-                          {roleResponsePlanError && (
-                            <div className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-                              {roleResponsePlanError}
-                            </div>
-                          )}
-
-                          {roleResponsePlanResult && (
-                            <RoleResponseEvidenceSummary
-                              result={roleResponsePlanResult}
-                            />
-                          )}
-                        </div>
-                      )}
-
-                      {structuralPositionResult.response_strategy.skills.length >
-                        0 && (
-                        <div
-                          className={
-                            workflowView === "respond"
-                              ? "mt-4 rounded-md border p-4"
-                              : "hidden"
-                          }
-                        >
-                          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-                            <div>
-                              <h5 className="font-semibold">
-                                Workforce Response Plan
-                              </h5>
-                              <p className="text-sm text-muted-foreground">
-                                Allocate one modeled skill gap across explicit Build, Move, and Buy targets.
-                              </p>
-                            </div>
-
-                            <div className="flex gap-2">
-                              <button
-                                type="button"
-                                onClick={resetResponsePlan}
-                                disabled={responsePlanLoading}
-                                className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
-                              >
-                                Reset
-                              </button>
-                              <button
-                                type="button"
-                                onClick={runResponsePlan}
-                                disabled={
-                                  !responsePlanSkill ||
-                                  responsePlanLoading
-                                }
-                                className="rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background disabled:cursor-not-allowed disabled:opacity-50"
-                              >
-                                {responsePlanLoading
-                                  ? "Running…"
-                                  : "Run Response Plan"}
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="mb-4 grid gap-3 lg:grid-cols-[1.4fr_repeat(5,minmax(120px,1fr))]">
-                            <label className="rounded-md border p-3">
-                              <span className="text-[11px] text-muted-foreground">
-                                Skill Gap
-                              </span>
-                              <select
-                                value={responsePlanSkill}
-                                onChange={(event) => {
-                                  setResponsePlanSkill(
-                                    event.target.value
-                                  );
-                                  setResponsePlanAllocation(
-                                    createResponsePlanAllocation()
-                                  );
-                                  setResponsePlanResult(null);
-                                  setResponsePlanError(null);
-                                }}
-                                className="mt-1 w-full rounded-md border bg-background px-2 py-2 text-sm"
-                              >
-                                {structuralPositionResult.response_strategy.skills.map(
-                                  (row) => (
-                                    <option
-                                      key={row.skill_code}
-                                      value={row.skill_code}
-                                    >
-                                      {row.skill_name +
-                                        " · gap " +
-                                        formatModeledCount(
-                                          row.modeled_position_gap
-                                        )}
-                                    </option>
-                                  )
-                                )}
-                              </select>
-                            </label>
-
-                            {(
-                              [
-                                ["build", "Build"],
-                                ["move", "Move"],
-                                ["buy", "Buy"],
-                                ["borrow", "Borrow"],
-                                ["automate", "Automate"],
-                              ] as const
-                            ).map(([key, label]) => {
-                              const selectedSkill =
-                                structuralPositionResult.response_strategy.skills.find(
-                                  (row) =>
-                                    row.skill_code ===
-                                    responsePlanSkill
-                                );
-                              const disabled =
-                                (key === "borrow" &&
-                                  !selectedSkill?.borrow
-                                    .data_available) ||
-                                (key === "automate" &&
-                                  !selectedSkill?.automate
-                                    .data_available);
-
-                              return (
-                                <label
-                                  key={key}
-                                  className="rounded-md border p-3"
-                                >
-                                  <span className="text-[11px] text-muted-foreground">
-                                    {label}
-                                  </span>
-                                  <input
-                                    type="number"
-                                    min={0}
-                                    step={1}
-                                    disabled={disabled}
-                                    value={
-                                      responsePlanAllocation[
-                                        key
-                                      ]
-                                    }
-                                    onChange={(event) => {
-                                      setResponsePlanAllocation(
-                                        (current) => ({
-                                          ...current,
-                                          [key]: Number(
-                                            event.target
-                                              .value
-                                          ),
-                                        })
-                                      );
-                                      setResponsePlanResult(
-                                        null
-                                      );
-                                      setResponsePlanError(
-                                        null
-                                      );
-                                    }}
-                                    className="mt-1 w-full rounded-md border bg-background px-2 py-2 text-right text-sm tabular-nums disabled:cursor-not-allowed disabled:opacity-50"
-                                  />
-                                  {disabled && (
-                                    <p className="mt-1 text-[10px] text-muted-foreground">
-                                      No supporting data
-                                    </p>
-                                  )}
-                                </label>
-                              );
-                            })}
-                          </div>
-
-                          <div className="mb-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
-                            This is a user-directed plan, not an optimizer. Planned coverage assumes each executed action closes one unit of this selected skill gap. Do not sum separate skill plans as unique people because one person or role can satisfy multiple skills.
-                          </div>
-
-                          {responsePlanError && (
-                            <div className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-                              {responsePlanError}
-                            </div>
-                          )}
-
-                          {responsePlanResult && (
-                            <>
-                              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                                <div className="rounded-md border p-3">
-                                  <p className="text-xs text-muted-foreground">
-                                    Modeled Gap
-                                  </p>
-                                  <p className="mt-1 text-2xl font-semibold">
-                                    {formatModeledCount(
-                                      responsePlanResult.modeled_position_gap
-                                    )}
-                                  </p>
-                                </div>
-                                <div className="rounded-md border p-3">
-                                  <p className="text-xs text-muted-foreground">
-                                    Planned Coverage
-                                  </p>
-                                  <p className="mt-1 text-2xl font-semibold">
-                                    {formatModeledCount(
-                                      responsePlanResult.planned_coverage_if_executed
-                                    )}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {responsePlanResult.coverage_pct_if_executed.toFixed(
-                                      1
-                                    )}
-                                    % if executed
-                                  </p>
-                                </div>
-                                <div className="rounded-md border p-3">
-                                  <p className="text-xs text-muted-foreground">
-                                    Remaining Gap
-                                  </p>
-                                  <p className="mt-1 text-2xl font-semibold">
-                                    {formatModeledCount(
-                                      responsePlanResult.remaining_gap_if_executed
-                                    )}
-                                  </p>
-                                </div>
-                                <div className="rounded-md border p-3">
-                                  <p className="text-xs text-muted-foreground">
-                                    Overplanned
-                                  </p>
-                                  <p className="mt-1 text-2xl font-semibold">
-                                    {formatModeledCount(
-                                      responsePlanResult.overplanned_capacity
-                                    )}
-                                  </p>
-                                </div>
-                              </div>
-
-                              <div className="mt-4 grid gap-3 md:grid-cols-3">
-                                <div className="rounded-md border p-3 text-sm">
-                                  <p className="font-medium">
-                                    Build evidence
-                                  </p>
-                                  <p className="mt-1 text-xs text-muted-foreground">
-                                    {responsePlanResult.evidence.build
-                                      .pathway_available
-                                      ? responsePlanResult.evidence.build.active_course_count.toLocaleString() +
-                                        " active course(s) · " +
-                                        responsePlanResult.evidence.build.in_progress_learners.toLocaleString() +
-                                        " in progress · " +
-                                        responsePlanResult.evidence.build.enrolled_learners.toLocaleString() +
-                                        " enrolled"
-                                      : "No active learning pathway in loaded data"}
-                                  </p>
-                                </div>
-                                <div className="rounded-md border p-3 text-sm">
-                                  <p className="font-medium">
-                                    Move evidence
-                                  </p>
-                                  <p className="mt-1 text-xs text-muted-foreground">
-                                    {responsePlanResult.evidence.move.mobility_candidates.toLocaleString()}{" "}
-                                    mobility candidates; not confirmed availability
-                                  </p>
-                                </div>
-                                <div className="rounded-md border p-3 text-sm">
-                                  <p className="font-medium">
-                                    Buy evidence
-                                  </p>
-                                  <p className="mt-1 text-xs text-muted-foreground">
-                                    {formatModeledCount(
-                                      responsePlanResult.evidence.buy.active_recruiting_demand
-                                    )}{" "}
-                                    active demand
-                                    {responsePlanResult.evidence.buy
-                                      .median_time_to_fill_days !==
-                                    null
-                                      ? " · " +
-                                        responsePlanResult.evidence.buy.median_time_to_fill_days.toFixed(
-                                          0
-                                        ) +
-                                        "d historical median TTF"
-                                      : ""}
-                                  </p>
-                                </div>
-                              </div>
-
-                              {responsePlanResult.warnings.length >
-                                0 && (
-                                <div className="mt-4 rounded-md border p-3">
-                                  <p className="text-xs font-medium">
-                                    Plan warnings
-                                  </p>
-                                  <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
-                                    {responsePlanResult.warnings.map(
-                                      (warning) => (
-                                        <li key={warning}>
-                                          • {warning}
-                                        </li>
-                                      )
-                                    )}
-                                  </ul>
-                                </div>
-                              )}
-                            </>
-                          )}
+                                : null
+                            }
+                          >
+                            {businessUnitResponseResult && (
+                              <WorkforceExecutionPanel
+                                workflowView={workflowView}
+                                businessUnitResponseResult={businessUnitResponseResult}
+                                responseExecutionDrafts={responseExecutionDrafts}
+                                responseExecutionLoading={responseExecutionLoading}
+                                responseExecutionError={responseExecutionError}
+                                responseExecutionResult={responseExecutionResult}
+                                constraintAwareScheduleLoading={constraintAwareScheduleLoading}
+                                constraintAwareScheduleError={constraintAwareScheduleError}
+                                constraintAwareScheduleResult={constraintAwareScheduleResult}
+                                responseConstraintDraft={responseConstraintDraft}
+                                responseConstraintLoading={responseConstraintLoading}
+                                responseConstraintError={responseConstraintError}
+                                responseConstraintResult={responseConstraintResult}
+                                resetResponseExecution={resetResponseExecution}
+                                runConstraintAwareScheduler={runConstraintAwareScheduler}
+                                runResponseExecution={runResponseExecution}
+                                updateResponseExecutionDraft={updateResponseExecutionDraft}
+                                addResponseExecutionPhase={addResponseExecutionPhase}
+                                removeResponseExecutionPhase={removeResponseExecutionPhase}
+                                updateResponseConstraintDraft={updateResponseConstraintDraft}
+                                resetResponseConstraints={resetResponseConstraints}
+                                runResponseConstraints={runResponseConstraints}
+                              />
+                            )}
+                          </ResponsePortfolioAllocationSection>
                         </div>
                       )}
 
