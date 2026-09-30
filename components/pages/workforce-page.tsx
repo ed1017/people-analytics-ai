@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { formatWholeCount } from "@/lib/display-format";
 import type { WorkforceResponse } from "@/lib/types";
 
 type Props = {
@@ -86,8 +87,11 @@ export function WorkforcePage({ data, loading, error }: Props) {
                     <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
                     <XAxis dataKey="snapshot_date" tickFormatter={monthLabel} tick={{ fontSize: 11 }} />
                     <YAxis width={58} tick={{ fontSize: 11 }} />
-                    <Tooltip labelFormatter={(v) => monthLabel(String(v))} />
-                    <Line type="monotone" dataKey="headcount" stroke="currentColor" strokeWidth={2.5} dot={false} />
+                    <Tooltip
+                      labelFormatter={(v) => monthLabel(String(v))}
+                      formatter={(value) => formatWholeCount(Number(value))}
+                    />
+                    <Line type="monotone" dataKey="headcount" name="Headcount" stroke="currentColor" strokeWidth={2.5} dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -102,8 +106,8 @@ export function WorkforcePage({ data, loading, error }: Props) {
                     <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
                     <XAxis type="number" tick={{ fontSize: 11 }} />
                     <YAxis type="category" dataKey="org_name" width={120} tick={{ fontSize: 10 }} />
-                    <Tooltip />
-                    <Bar dataKey="headcount" fill="currentColor" opacity={0.8} />
+                    <Tooltip formatter={(value) => formatWholeCount(Number(value))} />
+                    <Bar dataKey="headcount" name="Headcount" fill="currentColor" opacity={0.8} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -141,8 +145,8 @@ export function WorkforcePage({ data, loading, error }: Props) {
                     <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
                     <XAxis dataKey="tenure_band" tick={{ fontSize: 11 }} />
                     <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip />
-                    <Bar dataKey="headcount" fill="currentColor" opacity={0.8} />
+                    <Tooltip formatter={(value) => formatWholeCount(Number(value))} />
+                    <Bar dataKey="headcount" name="Headcount" fill="currentColor" opacity={0.8} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

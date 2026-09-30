@@ -10,6 +10,7 @@ import {
   YAxis,
 } from "recharts";
 
+import { formatPercent } from "@/lib/display-format";
 import type {
   SurveyListeningDimension,
   SurveySentimentResponse,
@@ -226,6 +227,9 @@ export function SurveySentimentPage({
                       labelFormatter={(value) =>
                         formatYear(String(value))
                       }
+                      formatter={(value) =>
+                        formatPercent(Number(value))
+                      }
                       contentStyle={{
                         backgroundColor: "var(--background)",
                         border: "1px solid var(--border)",
@@ -235,6 +239,7 @@ export function SurveySentimentPage({
                     <Line
                       type="monotone"
                       dataKey="favorable_pct"
+                      name="Favorable"
                       stroke="currentColor"
                       strokeWidth={2.5}
                       dot={{ r: 4 }}
@@ -242,6 +247,7 @@ export function SurveySentimentPage({
                     <Line
                       type="monotone"
                       dataKey="participation_pct"
+                      name="Participation"
                       stroke="currentColor"
                       strokeWidth={1.5}
                       strokeDasharray="5 4"
