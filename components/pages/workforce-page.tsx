@@ -58,13 +58,19 @@ export function WorkforcePage({ data, loading, error }: Props) {
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              ["Headcount", summary.headcount.toLocaleString(), summary.fte.toLocaleString() + " FTE"],
-              ["People Managers", summary.people_managers.toLocaleString(), summary.avg_span_of_control.toFixed(1) + " avg span"],
-              ["Average Tenure", summary.avg_tenure_years.toFixed(1) + " yrs", summary.full_time_headcount.toLocaleString() + " full-time"],
-              ["Hybrid Workforce", ((summary.hybrid_headcount / summary.headcount) * 100).toFixed(1) + "%", summary.remote_headcount.toLocaleString() + " remote"],
-            ].map(([label, value, note]) => (
+              ["Headcount", summary.headcount.toLocaleString(), summary.fte.toLocaleString() + " FTE", "Number of active employees in the current workforce snapshot. Headcount counts people; FTE reflects capacity."],
+              ["People Managers", summary.people_managers.toLocaleString(), summary.avg_span_of_control.toFixed(1) + " avg span", "Employees with at least one direct report in the current snapshot. Average span is direct reports per people manager."],
+              ["Average Tenure", summary.avg_tenure_years.toFixed(1) + " yrs", summary.full_time_headcount.toLocaleString() + " full-time", "Average completed years of service among employees in the current workforce snapshot."],
+              ["Hybrid Workforce", ((summary.hybrid_headcount / summary.headcount) * 100).toFixed(1) + "%", summary.remote_headcount.toLocaleString() + " remote", "Share of current employees classified as hybrid under the synthetic work-arrangement field."],
+            ].map(([label, value, note, definition]) => (
               <div key={label} className="rounded-lg border p-4">
-                <p className="text-sm text-muted-foreground">{label}</p>
+                <p
+                  className="inline cursor-help border-b border-dotted text-sm text-muted-foreground"
+                  title={definition}
+                  tabIndex={0}
+                >
+                  {label}
+                </p>
                 <p className="mt-2 text-3xl font-semibold">{value}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{note}</p>
               </div>
