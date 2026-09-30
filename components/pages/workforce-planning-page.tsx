@@ -32,6 +32,7 @@ import type {
   StructuralPositionAction,
   StructuralPositionCatalogResponse,
   StructuralPositionScenarioResponse,
+  TimePhasedWorkforceExecutionResponse,
   WorkforceResponsePlanAllocation,
   WorkforceResponsePlanResponse,
   WorkforceResponsePortfolioResponse,
@@ -75,6 +76,17 @@ function formatLongDate(value: string) {
     day: "numeric",
     year: "numeric",
   });
+}
+
+function nextMonthValue(value: string) {
+  const [year, month] = value
+    .slice(0, 7)
+    .split("-")
+    .map(Number);
+  const date = new Date(
+    Date.UTC(year, month, 1)
+  );
+  return date.toISOString().slice(0, 7);
 }
 
 function formatModeledCount(value: number) {
@@ -122,6 +134,17 @@ type SavedScenarioEntry = {
   scenario: ScenarioModelResponse;
 };
 
+type ResponseExecutionDraft = {
+  id: string;
+  org_code: string;
+  org_name: string;
+  job_profile_code: string;
+  job_profile_name: string;
+  response_type: "build" | "move" | "buy";
+  amount: number;
+  effective_month: string;
+};
+
 const SAVED_SCENARIOS_STORAGE_KEY =
   "people-analytics.saved-workforce-scenarios.v1";
 
@@ -146,6 +169,47 @@ function createResponsePlanAllocation():
     borrow: 0,
     automate: 0,
   };
+}
+
+function createResponseExecutionDrafts(
+  result: BusinessUnitResponseAllocationResponse
+): ResponseExecutionDraft[] {
+  const rows: ResponseExecutionDraft[] = [];
+
+  for (const bu of result.business_units) {
+    for (
+      const responseType of [
+        "build",
+        "move",
+        "buy",
+      ] as const
+    ) {
+      const amount =
+        bu.allocation[responseType];
+      if (amount <= 0) continue;
+
+      rows.push({
+        id:
+          bu.org_code +
+          "::" +
+          bu.job_profile_code +
+          "::" +
+          responseType +
+          "::1",
+        org_code: bu.org_code,
+        org_name: bu.org_name,
+        job_profile_code:
+          bu.job_profile_code,
+        job_profile_name:
+          bu.job_profile_name,
+        response_type: responseType,
+        amount,
+        effective_month: "",
+      });
+    }
+  }
+
+  return rows;
 }
 
 const structuralActionLabels = {
@@ -406,6 +470,25 @@ export function WorkforcePlanningPage({
   const [
     businessUnitResponseError,
     setBusinessUnitResponseError,
+  ] = useState<string | null>(null);
+  const [
+    responseExecutionDrafts,
+    setResponseExecutionDrafts,
+  ] = useState<ResponseExecutionDraft[]>([]);
+  const [
+    responseExecutionResult,
+    setResponseExecutionResult,
+  ] =
+    useState<TimePhasedWorkforceExecutionResponse | null>(
+      null
+    );
+  const [
+    responseExecutionLoading,
+    setResponseExecutionLoading,
+  ] = useState(false);
+  const [
+    responseExecutionError,
+    setResponseExecutionError,
   ] = useState<string | null>(null);
 
   useEffect(() => {
@@ -1212,6 +1295,9 @@ export function WorkforcePlanningPage({
     );
     setBusinessUnitResponseResult(null);
     setBusinessUnitResponseError(null);
+    setResponseExecutionDrafts([]);
+    setResponseExecutionResult(null);
+    setResponseExecutionError(null);
   }
 
   async function runBusinessUnitResponseAllocation() {
@@ -1305,9 +1391,18 @@ export function WorkforcePlanningPage({
         );
       }
 
+      const result =
+        payload as BusinessUnitResponseAllocationResponse;
       setBusinessUnitResponseResult(
-        payload as BusinessUnitResponseAllocationResponse
+        result
       );
+      setResponseExecutionDrafts(
+        createResponseExecutionDrafts(
+          result
+        )
+      );
+      setResponseExecutionResult(null);
+      setResponseExecutionError(null);
     } catch (error) {
       setBusinessUnitResponseError(
         error instanceof Error
@@ -1323,6 +1418,189 @@ export function WorkforcePlanningPage({
     setBusinessUnitResponseAllocations({});
     setBusinessUnitResponseResult(null);
     setBusinessUnitResponseError(null);
+    setResponseExecutionDrafts([]);
+    setResponseExecutionResult(null);
+    setResponseExecutionError(null);
+  }
+
+  function updateResponseExecutionDraft(
+    id: string,
+    patch: Partial<Pick<
+      ResponseExecutionDraft,
+      "amount" | "effective_month"
+    >>
+  ) {
+    setResponseExecutionDrafts(
+      (current) =>
+        current.map((row) =>
+          row.id === id
+            ? { ...row, ...patch }
+            : row
+        )
+    );
+    setResponseExecutionResult(null);
+    setResponseExecutionError(null);
+  }
+
+  function addResponseExecutionPhase(
+    source: ResponseExecutionDraft
+  ) {
+    setResponseExecutionDrafts(
+      (current) => {
+        const matchingCount =
+          current.filter(
+            (row) =>
+              row.org_code ===
+                source.org_code &&
+              row.job_profile_code ===
+                source.job_profile_code &&
+              row.response_type ===
+                source.response_type
+          ).length;
+
+        return [
+          ...current,
+          {
+            ...source,
+            id:
+              source.org_code +
+              "::" +
+              source.job_profile_code +
+              "::" +
+              source.response_type +
+              "::" +
+              (matchingCount + 1) +
+              "::" +
+              Date.now(),
+            amount: 0,
+            effective_month: "",
+          },
+        ];
+      }
+    );
+    setResponseExecutionResult(null);
+    setResponseExecutionError(null);
+  }
+
+  function removeResponseExecutionPhase(
+    id: string
+  ) {
+    setResponseExecutionDrafts(
+      (current) =>
+        current.filter(
+          (row) => row.id !== id
+        )
+    );
+    setResponseExecutionResult(null);
+    setResponseExecutionError(null);
+  }
+
+  async function runResponseExecution() {
+    if (
+      !businessUnitResponseResult ||
+      !responsePortfolioResult
+    ) {
+      return;
+    }
+
+    const schedule =
+      responseExecutionDrafts
+        .filter(
+          (row) =>
+            row.amount > 0 &&
+            Boolean(row.effective_month)
+        )
+        .map((row) => ({
+          business_unit:
+            row.org_code,
+          job_profile:
+            row.job_profile_code,
+          response_type:
+            row.response_type,
+          amount: row.amount,
+          effective_month:
+            row.effective_month,
+        }));
+
+    if (schedule.length === 0) {
+      setResponseExecutionError(
+        "Enter an effective month for at least one positive Build, Move, or Buy phase."
+      );
+      return;
+    }
+
+    try {
+      setResponseExecutionLoading(true);
+      setResponseExecutionError(null);
+
+      const response = await fetch(
+        "/api/time-phased-workforce-execution",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            actions:
+              structuralPositionActions,
+            allocations:
+              businessUnitResponseResult.business_units.map(
+                (row) => ({
+                  business_unit:
+                    row.org_code,
+                  job_profile:
+                    row.job_profile_code,
+                  allocation:
+                    row.allocation,
+                })
+              ),
+            role_plans:
+              responsePortfolioResult.roles.map(
+                (role) => ({
+                  job_profile:
+                    role.job_profile_code,
+                  allocation:
+                    role.allocation,
+                })
+              ),
+            schedule,
+          }),
+        }
+      );
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload?.error ??
+            "Failed to run time-phased execution."
+        );
+      }
+
+      setResponseExecutionResult(
+        payload as TimePhasedWorkforceExecutionResponse
+      );
+    } catch (error) {
+      setResponseExecutionError(
+        error instanceof Error
+          ? error.message
+          : "Failed to run time-phased execution."
+      );
+    } finally {
+      setResponseExecutionLoading(false);
+    }
+  }
+
+  function resetResponseExecution() {
+    setResponseExecutionDrafts(
+      businessUnitResponseResult
+        ? createResponseExecutionDrafts(
+            businessUnitResponseResult
+          )
+        : []
+    );
+    setResponseExecutionResult(null);
+    setResponseExecutionError(null);
   }
 
   function persistSavedScenarios(
@@ -4676,6 +4954,336 @@ export function WorkforcePlanningPage({
                                           </ul>
                                         </div>
                                       )}
+
+                                      <details className="mt-4 rounded-md border">
+                                        <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
+                                          Time-Phased Execution
+                                          <span className="ml-2 text-xs font-normal text-muted-foreground">
+                                            monthly effective capacity
+                                          </span>
+                                        </summary>
+                                        <div className="border-t p-4">
+                                          <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                                            <p className="max-w-3xl text-xs text-muted-foreground">
+                                              Assign explicit effective months to approved BU Build, Move, and Buy capacity. Timing is user-supplied; course duration and historical time-to-fill do not set these dates.
+                                            </p>
+                                            <div className="flex gap-2">
+                                              <button
+                                                type="button"
+                                                onClick={resetResponseExecution}
+                                                disabled={responseExecutionLoading}
+                                                className="rounded-md border px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+                                              >
+                                                Reset
+                                              </button>
+                                              <button
+                                                type="button"
+                                                onClick={runResponseExecution}
+                                                disabled={responseExecutionLoading}
+                                                className="rounded-md bg-foreground px-3 py-2 text-xs font-medium text-background disabled:cursor-not-allowed disabled:opacity-50"
+                                              >
+                                                {responseExecutionLoading
+                                                  ? "Running..."
+                                                  : "Run Timeline"}
+                                              </button>
+                                            </div>
+                                          </div>
+
+                                          <div className="max-h-[360px] overflow-auto rounded-md border">
+                                            <table className="w-full min-w-[900px] text-xs">
+                                              <thead className="sticky top-0 bg-background">
+                                                <tr className="border-b text-left text-muted-foreground">
+                                                  <th className="p-3">Destination / Role</th>
+                                                  <th className="p-3">Path</th>
+                                                  <th className="p-3 text-right">Approved</th>
+                                                  <th className="p-3 text-right">Phase Amount</th>
+                                                  <th className="p-3">Effective Month</th>
+                                                  <th className="p-3 text-right">Actions</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                {responseExecutionDrafts.map(
+                                                  (draft) => {
+                                                    const target =
+                                                      businessUnitResponseResult.business_units.find(
+                                                        (row) =>
+                                                          row.org_code ===
+                                                            draft.org_code &&
+                                                          row.job_profile_code ===
+                                                            draft.job_profile_code
+                                                      );
+                                                    const targetAmount =
+                                                      target?.allocation[
+                                                        draft.response_type
+                                                      ] ?? 0;
+
+                                                    return (
+                                                      <tr
+                                                        key={draft.id}
+                                                        className="border-b last:border-0"
+                                                      >
+                                                        <td className="p-3">
+                                                          <p className="font-medium">
+                                                            {draft.org_name}
+                                                          </p>
+                                                          <p className="text-[10px] text-muted-foreground">
+                                                            {draft.job_profile_name}
+                                                          </p>
+                                                        </td>
+                                                        <td className="p-3 font-medium">
+                                                          {formatAssumptionName(
+                                                            draft.response_type
+                                                          )}
+                                                        </td>
+                                                        <td className="p-3 text-right tabular-nums">
+                                                          {formatModeledCount(
+                                                            targetAmount
+                                                          )}
+                                                        </td>
+                                                        <td className="p-3">
+                                                          <input
+                                                            type="number"
+                                                            min={0}
+                                                            step={1}
+                                                            value={draft.amount}
+                                                            onChange={(event) =>
+                                                              updateResponseExecutionDraft(
+                                                                draft.id,
+                                                                {
+                                                                  amount: Number(
+                                                                    event.target.value
+                                                                  ),
+                                                                }
+                                                              )
+                                                            }
+                                                            className="w-full min-w-[90px] rounded-md border bg-background px-2 py-1.5 text-right tabular-nums"
+                                                          />
+                                                        </td>
+                                                        <td className="p-3">
+                                                          <input
+                                                            type="month"
+                                                            min={nextMonthValue(
+                                                              businessUnitResponseResult.as_of
+                                                            )}
+                                                            value={
+                                                              draft.effective_month
+                                                            }
+                                                            onChange={(event) =>
+                                                              updateResponseExecutionDraft(
+                                                                draft.id,
+                                                                {
+                                                                  effective_month:
+                                                                    event.target.value,
+                                                                }
+                                                              )
+                                                            }
+                                                            className="w-full min-w-[150px] rounded-md border bg-background px-2 py-1.5"
+                                                          />
+                                                        </td>
+                                                        <td className="p-3 text-right">
+                                                          <div className="flex justify-end gap-2">
+                                                            <button
+                                                              type="button"
+                                                              onClick={() =>
+                                                                addResponseExecutionPhase(
+                                                                  draft
+                                                                )
+                                                              }
+                                                              className="rounded-md border px-2 py-1 text-[10px]"
+                                                            >
+                                                              Add phase
+                                                            </button>
+                                                            <button
+                                                              type="button"
+                                                              onClick={() =>
+                                                                removeResponseExecutionPhase(
+                                                                  draft.id
+                                                                )
+                                                              }
+                                                              className="rounded-md border px-2 py-1 text-[10px]"
+                                                            >
+                                                              Remove
+                                                            </button>
+                                                          </div>
+                                                        </td>
+                                                      </tr>
+                                                    );
+                                                  }
+                                                )}
+                                              </tbody>
+                                            </table>
+                                          </div>
+
+                                          <p className="mt-2 text-[11px] text-muted-foreground">
+                                            The first executable month is{" "}
+                                            {formatMonth(
+                                              nextMonthValue(
+                                                businessUnitResponseResult.as_of
+                                              ) + "-01"
+                                            )}. Leave a phase without a month to keep that approved capacity unscheduled.
+                                          </p>
+
+                                          {responseExecutionError && (
+                                            <div className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
+                                              {responseExecutionError}
+                                            </div>
+                                          )}
+
+                                          {responseExecutionResult && (
+                                            <>
+                                              <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                                <div className="rounded-md border p-3">
+                                                  <p className="text-[11px] text-muted-foreground">
+                                                    Execution Window
+                                                  </p>
+                                                  <p className="mt-1 font-semibold">
+                                                    {formatMonth(
+                                                      responseExecutionResult.planning_start_month +
+                                                        "-01"
+                                                    )}{" "}
+                                                    →{" "}
+                                                    {formatMonth(
+                                                      responseExecutionResult.planning_end_month +
+                                                        "-01"
+                                                    )}
+                                                  </p>
+                                                </div>
+                                                <div className="rounded-md border p-3">
+                                                  <p className="text-[11px] text-muted-foreground">
+                                                    Scheduled B / M / B
+                                                  </p>
+                                                  <p className="mt-1 text-xl font-semibold tabular-nums">
+                                                    {formatModeledCount(
+                                                      responseExecutionResult.scheduled_allocation.build
+                                                    )}{" "}
+                                                    /{" "}
+                                                    {formatModeledCount(
+                                                      responseExecutionResult.scheduled_allocation.move
+                                                    )}{" "}
+                                                    /{" "}
+                                                    {formatModeledCount(
+                                                      responseExecutionResult.scheduled_allocation.buy
+                                                    )}
+                                                  </p>
+                                                </div>
+                                                <div className="rounded-md border p-3">
+                                                  <p className="text-[11px] text-muted-foreground">
+                                                    Unscheduled B / M / B
+                                                  </p>
+                                                  <p className="mt-1 text-xl font-semibold tabular-nums">
+                                                    {formatModeledCount(
+                                                      responseExecutionResult.unscheduled_allocation.build
+                                                    )}{" "}
+                                                    /{" "}
+                                                    {formatModeledCount(
+                                                      responseExecutionResult.unscheduled_allocation.move
+                                                    )}{" "}
+                                                    /{" "}
+                                                    {formatModeledCount(
+                                                      responseExecutionResult.unscheduled_allocation.buy
+                                                    )}
+                                                  </p>
+                                                </div>
+                                                <div className="rounded-md border p-3">
+                                                  <p className="text-[11px] text-muted-foreground">
+                                                    Final Remaining Net Gap
+                                                  </p>
+                                                  <p className="mt-1 text-xl font-semibold">
+                                                    {formatModeledCount(
+                                                      responseExecutionResult.final_remaining_net_gap
+                                                    )}
+                                                  </p>
+                                                  <p className="text-[10px] text-muted-foreground">
+                                                    {responseExecutionResult.final_coverage_pct.toFixed(
+                                                      1
+                                                    )}% coverage
+                                                  </p>
+                                                </div>
+                                              </div>
+
+                                              <div className="mt-4 max-h-[360px] overflow-auto rounded-md border">
+                                                <table className="w-full min-w-[820px] text-xs">
+                                                  <thead className="sticky top-0 bg-background">
+                                                    <tr className="border-b text-left text-muted-foreground">
+                                                      <th className="p-3">Month</th>
+                                                      <th className="p-3 text-right">Effective Build</th>
+                                                      <th className="p-3 text-right">Effective Move</th>
+                                                      <th className="p-3 text-right">Effective Buy</th>
+                                                      <th className="p-3 text-right">Cumulative Coverage</th>
+                                                      <th className="p-3 text-right">Remaining Gap</th>
+                                                      <th className="p-3 text-right">Coverage %</th>
+                                                    </tr>
+                                                  </thead>
+                                                  <tbody>
+                                                    {responseExecutionResult.timeline.map(
+                                                      (point) => (
+                                                        <tr
+                                                          key={point.month}
+                                                          className="border-b last:border-0"
+                                                        >
+                                                          <td className="p-3 font-medium">
+                                                            {formatMonth(
+                                                              point.month +
+                                                                "-01"
+                                                            )}
+                                                          </td>
+                                                          <td className="p-3 text-right tabular-nums">
+                                                            {formatModeledCount(
+                                                              point.effective_build
+                                                            )}
+                                                          </td>
+                                                          <td className="p-3 text-right tabular-nums">
+                                                            {formatModeledCount(
+                                                              point.effective_move
+                                                            )}
+                                                          </td>
+                                                          <td className="p-3 text-right tabular-nums">
+                                                            {formatModeledCount(
+                                                              point.effective_buy
+                                                            )}
+                                                          </td>
+                                                          <td className="p-3 text-right font-medium tabular-nums">
+                                                            {formatModeledCount(
+                                                              point.cumulative_effective_coverage
+                                                            )}
+                                                          </td>
+                                                          <td className="p-3 text-right font-medium tabular-nums">
+                                                            {formatModeledCount(
+                                                              point.remaining_net_gap
+                                                            )}
+                                                          </td>
+                                                          <td className="p-3 text-right tabular-nums">
+                                                            {point.coverage_pct.toFixed(
+                                                              1
+                                                            )}%
+                                                          </td>
+                                                        </tr>
+                                                      )
+                                                    )}
+                                                  </tbody>
+                                                </table>
+                                              </div>
+
+                                              {responseExecutionResult.warnings.length > 0 && (
+                                                <div className="mt-3 rounded-md border p-3">
+                                                  <p className="text-xs font-medium">
+                                                    Execution warnings
+                                                  </p>
+                                                  <ul className="mt-2 space-y-1 text-[11px] text-muted-foreground">
+                                                    {responseExecutionResult.warnings.map(
+                                                      (warning) => (
+                                                        <li key={warning}>
+                                                          - {warning}
+                                                        </li>
+                                                      )
+                                                    )}
+                                                  </ul>
+                                                </div>
+                                              )}
+                                            </>
+                                          )}
+                                        </div>
+                                      </details>
                                     </>
                                   )}
                                 </div>
