@@ -10,6 +10,10 @@ import {
   type WorkforceResponsePortfolioRequest,
 } from "./workforce-response-portfolio";
 import {
+  runBusinessUnitResponseAllocation,
+  type BusinessUnitResponseAllocationRequest,
+} from "./business-unit-response-allocation";
+import {
   runStructuralPositionScenario,
 } from "./structural-position-scenario";
 import {
@@ -690,6 +694,126 @@ export const peopleAnalyticsTools: any[] = [
         },
       },
       required: ["actions", "plans"],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
+    name: "run_business_unit_response_allocation",
+    description:
+      "Run explicit destination business-unit allocations of Build, Move, and Buy for net-positive job-profile demand in one structural scenario. BU allocations roll up to enterprise role totals for whole-role evidence checks. Gross positive BU demand, contraction offsets, enterprise net demand, destination gaps, and overallocations are reported separately. Move source BU is not inferred. This is not an optimizer and must not invent allocations.",
+    parameters: {
+      type: "object",
+      properties: {
+        actions: {
+          type: "array",
+          minItems: 1,
+          maxItems: 20,
+          items: {
+            type: "object",
+            properties: {
+              action_type: {
+                type: "string",
+                enum: [
+                  "add_positions",
+                  "close_vacant_positions",
+                  "freeze_vacancies",
+                  "fill_vacancies",
+                ],
+              },
+              business_unit: { type: ["string", "null"] },
+              level: { type: ["string", "null"] },
+              job_profile: { type: ["string", "null"] },
+              amount: { type: ["number", "null"] },
+              fill_pct: { type: ["number", "null"] },
+            },
+            required: [
+              "action_type",
+              "business_unit",
+              "level",
+              "job_profile",
+              "amount",
+              "fill_pct",
+            ],
+            additionalProperties: false,
+          },
+        },
+        allocations: {
+          type: "array",
+          minItems: 1,
+          maxItems: 40,
+          items: {
+            type: "object",
+            properties: {
+              business_unit: { type: "string" },
+              job_profile: { type: "string" },
+              allocation: {
+                type: "object",
+                properties: {
+                  build: { type: "number" },
+                  move: { type: "number" },
+                  buy: { type: "number" },
+                  borrow: { type: "number" },
+                  automate: { type: "number" },
+                },
+                required: [
+                  "build",
+                  "move",
+                  "buy",
+                  "borrow",
+                  "automate",
+                ],
+                additionalProperties: false,
+              },
+            },
+            required: [
+              "business_unit",
+              "job_profile",
+              "allocation",
+            ],
+            additionalProperties: false,
+          },
+        },
+        role_plans: {
+          type: ["array", "null"],
+          maxItems: 20,
+          items: {
+            type: "object",
+            properties: {
+              job_profile: { type: "string" },
+              allocation: {
+                type: "object",
+                properties: {
+                  build: { type: "number" },
+                  move: { type: "number" },
+                  buy: { type: "number" },
+                  borrow: { type: "number" },
+                  automate: { type: "number" },
+                },
+                required: [
+                  "build",
+                  "move",
+                  "buy",
+                  "borrow",
+                  "automate",
+                ],
+                additionalProperties: false,
+              },
+            },
+            required: [
+              "job_profile",
+              "allocation",
+            ],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: [
+        "actions",
+        "allocations",
+        "role_plans",
+      ],
       additionalProperties: false,
     },
     strict: true,
@@ -1590,6 +1714,10 @@ export async function runPeopleAnalyticsTool(
     case "run_workforce_response_portfolio":
       return runWorkforceResponsePortfolio(
         args as WorkforceResponsePortfolioRequest
+      );
+    case "run_business_unit_response_allocation":
+      return runBusinessUnitResponseAllocation(
+        args as BusinessUnitResponseAllocationRequest
       );
     case "get_talent_acquisition":
       return getTalentAcquisition();
