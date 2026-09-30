@@ -277,7 +277,7 @@ export function SurveySentimentPage({
             </div>
           </div>
 
-          <div className="mt-6 grid gap-6 xl:grid-cols-2">
+          <div className="mt-6 grid gap-6">
             <div className="rounded-lg border p-4">
               <div className="mb-4">
                 <h3 className="font-semibold">
@@ -385,7 +385,7 @@ export function SurveySentimentPage({
             </div>
           </div>
 
-          <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+          <div className="mt-6 grid gap-6">
             <div className="rounded-lg border p-4">
               <div className="mb-4">
                 <h3 className="font-semibold">

@@ -112,7 +112,7 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
             </div>
           </div>
 
-          <div className="mt-6 grid gap-6 xl:grid-cols-2">
+          <div className="mt-6 grid gap-6">
             <div className="rounded-lg border p-4">
               <div className="mb-4"><h3 className="font-semibold">Hiring Demand by Business Unit</h3><p className="text-sm text-muted-foreground">Current open positions and historical hiring velocity</p></div>
               <div className="overflow-x-auto">

@@ -105,7 +105,7 @@ export function AttritionPage({ data, loading, error }: Props) {
             </div>
           </div>
 
-          <div className="mt-6 grid gap-6 xl:grid-cols-2">
+          <div className="mt-6 grid gap-6">
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">Reported Separation Reasons</h3>
               <p className="mb-4 text-sm text-muted-foreground">All 2026 YTD separation records</p>
