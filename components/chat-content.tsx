@@ -129,7 +129,7 @@ export function ChatContent({
           key={`table-${index}`}
           className="my-3 overflow-x-auto rounded-lg border"
         >
-          <table className="w-full min-w-[560px] text-xs">
+          <table className="w-full min-w-[560px] text-sm">
             <thead className="bg-muted/40">
               <tr>
                 {headers.map(

@@ -5,6 +5,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type MouseEvent as ReactMouseEvent,
 } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -48,7 +49,7 @@ const EMPTY_FILTER_OPTIONS: DashboardFilterOptions = {
 export default function Home() {
   const [navCollapsed, setNavCollapsed] = useState(false);
   const [aiCollapsed, setAiCollapsed] = useState(false);
-  const [aiWidth, setAiWidth] = useState(320);
+  const [aiWidth, setAiWidth] = useState(400);
 
   const [overviewData, setOverviewData] =
     useState<OverviewData | null>(null);
@@ -1122,13 +1123,17 @@ export default function Home() {
     await sendChatMessage(prompt);
   };
 
-  // Expand AI to approximately 40% of the browser width.
+  // Expand AI to approximately 44% of the browser width.
   const toggleAiExpanded = () => {
     if (aiExpanded) {
-      setAiWidth(320);
+      setAiWidth(400);
     } else {
-      const expandedWidth = Math.round(
-        window.innerWidth * 0.4
+      const expandedWidth = Math.min(
+        window.innerWidth * 0.5,
+        Math.max(
+          560,
+          Math.round(window.innerWidth * 0.44)
+        )
       );
       setAiWidth(expandedWidth);
     }
@@ -1205,16 +1210,20 @@ export default function Home() {
 
       {/* Main application */}
       <div
-        className="grid min-h-[calc(100vh-4rem)]"
-        style={{
-          gridTemplateColumns: `${
-            navCollapsed ? 72 : 252
-          }px minmax(0, 1fr) ${
-            aiCollapsed ? 0 : 6
-          }px ${
-            aiCollapsed ? 64 : aiWidth
-          }px`,
-        }}
+        className="app-shell"
+        style={
+          {
+            "--nav-width": `${
+              navCollapsed ? 72 : 252
+            }px`,
+            "--divider-width": `${
+              aiCollapsed ? 0 : 6
+            }px`,
+            "--ai-width": `${
+              aiCollapsed ? 64 : aiWidth
+            }px`,
+          } as CSSProperties
+        }
       >
         {/* Left navigation */}
         <AppSidebar
@@ -1225,7 +1234,7 @@ export default function Home() {
         />
 
         {/* Dashboard area */}
-        <div className="min-w-0 overflow-x-hidden bg-muted/10">
+        <div className="app-dashboard min-w-0 overflow-x-hidden bg-muted/10">
         {activePage === "overview" ? (
           <OverviewPage
             overviewData={overviewData}

@@ -59,19 +59,25 @@ export function AiPanel({
         <div
           onMouseDown={onResizeStart}
           title="Drag to resize AI panel"
-          className="group relative cursor-col-resize"
+          className="app-ai-resizer group relative cursor-col-resize"
         >
           <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-border transition-colors group-hover:bg-primary" />
           <div className="absolute left-1/2 top-1/2 h-12 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted-foreground/30 transition-colors group-hover:bg-primary" />
         </div>
       )}
 
-      <aside className="sticky top-16 flex h-[calc(100vh-4rem)] min-w-0 flex-col overflow-hidden border-l p-3">
+      <aside
+        className={
+          aiCollapsed
+            ? "app-ai-panel sticky top-16 flex h-[calc(100vh-4rem)] min-w-0 flex-col overflow-hidden border-l p-4 max-md:h-16"
+            : "app-ai-panel sticky top-16 flex h-[calc(100vh-4rem)] min-w-0 flex-col overflow-hidden border-l p-4 max-md:h-[70vh] max-md:min-h-[520px]"
+        }
+      >
         <div className="mb-4 flex items-center justify-between gap-2">
           {!aiCollapsed && (
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
-              <h2 className="font-semibold">
+              <h2 className="text-lg font-semibold">
                 Ask People Analytics AI
               </h2>
             </div>
@@ -118,7 +124,7 @@ export function AiPanel({
           </div>
         ) : (
           <div className="flex min-h-0 flex-1 flex-col">
-            <p className="mb-3 text-sm text-muted-foreground">
+            <p className="mb-3 text-[15px] text-muted-foreground">
               Ask questions about the workforce data currently shown.
             </p>
 
@@ -144,7 +150,7 @@ export function AiPanel({
                         chatLoading ||
                         !dashboardReady
                       }
-                      className="rounded-lg border p-2 text-left text-xs transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                      className="rounded-lg border p-2.5 text-left text-sm leading-snug transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {prompt}
                     </button>
@@ -155,7 +161,7 @@ export function AiPanel({
 
             <div className="mb-3 min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain rounded-lg border p-3 pr-2">
               {chatMessages.length === 0 ? (
-                <div className="flex h-full min-h-28 items-center justify-center text-center text-sm text-muted-foreground">
+                <div className="flex h-full min-h-28 items-center justify-center text-center text-[15px] text-muted-foreground">
                   AI conversation will appear here.
                 </div>
               ) : (
@@ -165,8 +171,8 @@ export function AiPanel({
                       key={`${message.role}-${index}`}
                       className={
                         message.role === "user"
-                          ? "ml-6 rounded-lg bg-muted p-3 text-sm"
-                          : "mr-6 rounded-lg border p-3 text-sm"
+                          ? "ml-4 rounded-lg bg-muted p-3.5 text-[15px] leading-relaxed md:ml-6 md:text-base"
+                          : "mr-4 rounded-lg border p-3.5 text-[15px] leading-relaxed md:mr-6 md:text-base"
                       }
                     >
                       <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
@@ -193,7 +199,7 @@ export function AiPanel({
               )}
 
               {chatLoading && (
-                <div className="mr-6 flex items-center gap-2 rounded-lg border p-3 text-sm text-muted-foreground">
+                <div className="mr-4 flex items-center gap-2 rounded-lg border p-3 text-[15px] text-muted-foreground md:mr-6">
                   <LoaderCircle className="h-4 w-4 animate-spin" />
                   Analyzing current workforce context…
                 </div>
@@ -230,7 +236,7 @@ export function AiPanel({
                 }
                 disabled={previewPage}
                 rows={3}
-                className="min-h-20 flex-1 resize-none rounded-lg border bg-background p-3 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                className="min-h-20 min-w-0 flex-1 resize-none rounded-lg border bg-background p-3 text-base leading-relaxed outline-none disabled:cursor-not-allowed disabled:opacity-60"
               />
 
               <Button
@@ -253,7 +259,7 @@ export function AiPanel({
               </Button>
             </div>
 
-            <p className="mt-2 text-[11px] text-muted-foreground">
+            <p className="mt-2 text-xs text-muted-foreground">
               Answers are grounded in the dashboard context currently loaded.
             </p>
           </div>
