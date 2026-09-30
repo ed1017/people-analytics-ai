@@ -14,6 +14,7 @@ import { AttritionPage } from "@/components/pages/attrition-page";
 import { FinancePage } from "@/components/pages/finance-page";
 import { SkillsPage } from "@/components/pages/skills-page";
 import { WorkforcePlanningPage } from "@/components/pages/workforce-planning-page";
+import { PlanningSessionProvider } from "@/components/workforce-planning/planning-session-context";
 import { TalentAcquisitionPage } from "@/components/pages/talent-acquisition-page";
 import { SurveySentimentPage } from "@/components/pages/survey-sentiment-page";
 import { AiPanel } from "@/components/ai-panel";
@@ -1264,6 +1265,7 @@ export default function Home() {
             maxSkillDemand={maxSkillDemand}
           />
         ) : (
+          <PlanningSessionProvider>
           <WorkforcePlanningPage
             planningScenarios={planningScenarios}
             planningLoading={planningLoading}
@@ -1286,6 +1288,7 @@ export default function Home() {
             onScenarioChange={setSelectedPlanningScenario}
             onExplainCustomScenario={explainCustomScenario}
           />
+          </PlanningSessionProvider>
         )}
         </div>
 
