@@ -4,29 +4,14 @@ import {
   useEffect,
   useState,
 } from "react";
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-
-import {
-  WorkforcePlanningWorkflowNavigation,
-  type WorkforcePlanningWorkflowView,
-} from "@/components/workforce-planning/workflow-navigation";
+import { WorkforcePlanningWorkflowNavigation } from "@/components/workforce-planning/workflow-navigation";
 import { PositionActionSimulator } from "@/components/workforce-planning/position-action-simulator";
 import { StructuralPositionActionsEditor } from "@/components/workforce-planning/structural-position-actions-editor";
 import { ResponseStrategyEvidence } from "@/components/workforce-planning/response-strategy-evidence";
 import { RoleResponseEvidenceSummary } from "@/components/workforce-planning/role-response-evidence-summary";
 import { ResponsePortfolioControls } from "@/components/workforce-planning/response-portfolio-controls";
 import { BusinessUnitResponseAllocationPanel } from "@/components/workforce-planning/business-unit-response-allocation-panel";
-import { ScenarioModelingPanel } from "@/components/workforce-planning/scenario-modeling-panel";
-import { ScenarioPlanSummary } from "@/components/workforce-planning/scenario-plan-summary";
-import { ScenarioComparisonTable } from "@/components/workforce-planning/scenario-comparison-table";
+import { ScenarioModelingDestination } from "@/components/workforce-planning/scenario-modeling-destination";
 import { WorkforceExecutionPanel } from "@/components/workforce-planning/workforce-execution-panel";
 import { PlanningOverview } from "@/components/workforce-planning/planning-overview";
 import { usePlanningSession } from "@/components/workforce-planning/planning-session-context";
@@ -2062,8 +2047,15 @@ export function WorkforcePlanningPage({
             </div>
           )}
 
-          <ScenarioModelingPanel
+          <ScenarioModelingDestination
             visible={workflowView === "plan"}
+            planningLoading={planningLoading}
+            activePlanningStart={activePlanningStart}
+            activePlanningEnd={activePlanningEnd}
+            planningNetChange={planningNetChange}
+            planningHeadcountDeltaVsBaseline={planningHeadcountDeltaVsBaseline}
+            planningTotalHires={planningTotalHires}
+            planningTotalExits={planningTotalExits}
             planningScenarios={planningScenarios}
             baselinePlanningEnd={baselinePlanningEnd}
             activePlanningScenario={activePlanningScenario}
@@ -2100,30 +2092,9 @@ export function WorkforcePlanningPage({
             deleteSavedScenario={deleteSavedScenario}
           />
 
-          <ScenarioPlanSummary
-            visible={workflowView === "plan"}
-            planningLoading={planningLoading}
-            planningScenarios={planningScenarios}
-            activePlanningScenario={activePlanningScenario}
-            activePlanningStart={activePlanningStart}
-            activePlanningEnd={activePlanningEnd}
-            planningNetChange={planningNetChange}
-            planningHeadcountDeltaVsBaseline={planningHeadcountDeltaVsBaseline}
-            planningTotalHires={planningTotalHires}
-            planningTotalExits={planningTotalExits}
-          />
-
           {activePlanningScenario &&
             activePlanningEnd && (
             <>
-              <div className="mt-6 rounded-lg border p-4">
-                <ScenarioComparisonTable
-                  visible={workflowView === "plan"}
-                  planningScenarios={planningScenarios}
-                  baselinePlanningEnd={baselinePlanningEnd}
-                />
-
-
               <div
                 className={
                   workflowView === "overview" || workflowView === "plan"
@@ -3534,7 +3505,6 @@ export function WorkforcePlanningPage({
                       : "No position modeling data returned."}
                   </div>
                 )}
-              </div>
               </div>
             </>
           )}
