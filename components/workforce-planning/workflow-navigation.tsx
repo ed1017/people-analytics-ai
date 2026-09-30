@@ -128,13 +128,15 @@ export function WorkforcePlanningWorkflowNavigation({
       </div>
 
       <div className="mb-6 rounded-md border bg-muted/20 p-3 text-sm">
-        {activeView === "plan"
-          ? "Start with the business question: what workforce do we expect to need, and how does that compare with Baseline?"
-          : activeView === "design"
-            ? "Now turn the workforce scenario into actual position changes â€” add, close, freeze, or fill roles."
-            : activeView === "respond"
-              ? "Once the role gaps are clear, decide how much to Build internally, Move from inside the company, or Buy through external hiring."
-              : "Last step: put the approved response on a timeline, auto-schedule around constraints, and check whether the plan is actually executable."}
+        {activeView === "overview"
+          ? "Use this as the control room for the current workforce plan: see the biggest changes, approved response, execution risk, and current feasibility before drilling into the workflow."
+          : activeView === "plan"
+            ? "Start with the business question: what workforce do we expect to need, and how does that compare with Baseline?"
+            : activeView === "design"
+              ? "Now turn the workforce scenario into actual position changes: add, close, freeze, or fill roles."
+              : activeView === "respond"
+                ? "Once the role gaps are clear, decide how much to Build internally, Move from inside the company, or Buy through external hiring."
+                : "Last step: put the approved response on a timeline, auto-schedule around constraints, and check whether the plan is actually executable."}
       </div>
     </>
   );
