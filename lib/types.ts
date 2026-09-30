@@ -202,6 +202,19 @@ export type StructuralPositionScenarioResponse = {
     authorized_budget_delta_usd: number;
     annualized_staffed_labor_cost_delta_usd: number;
   };
+  job_profile_impact: Array<{
+    job_profile_code: string;
+    job_profile_name: string;
+    current_authorized_positions: number;
+    modeled_authorized_positions: number;
+    authorized_position_delta: number;
+    current_filled_positions: number;
+    modeled_filled_positions: number;
+    filled_position_delta: number;
+    modeled_open_vacancies: number;
+    modeled_frozen_positions: number;
+    modeled_active_recruiting_demand: number;
+  }>;
   skill_demand: {
     skills_with_increased_authorized_demand: number;
     skills_with_reduced_authorized_demand: number;
@@ -372,6 +385,38 @@ export type WorkforceResponsePlanResponse = {
       data_available: boolean;
       reason: string;
     };
+  };
+  warnings: string[];
+  methodology: string[];
+};
+
+export type RoleWorkforceResponsePlanResponse = {
+  job_profile_code: string;
+  job_profile_name: string;
+  scenario_created_role_demand: number;
+  allocation: WorkforceResponsePlanAllocation;
+  planned_role_coverage_if_executed: number;
+  remaining_role_gap_if_executed: number;
+  overplanned_capacity: number;
+  coverage_pct_if_executed: number;
+  skill_bundle: Array<{
+    skill_code: string;
+    skill_name: string;
+    skill_category: string;
+    required_proficiency: number;
+    importance: string;
+    weight: number;
+    build_pathway_available: boolean;
+    active_course_count: number;
+    mobility_candidates: number;
+    historical_filled_requisitions: number;
+    median_time_to_fill_days: number | null;
+  }>;
+  evidence_summary: {
+    required_skill_count: number;
+    skills_with_build_pathway: number;
+    skills_with_move_signal: number;
+    skills_with_buy_history: number;
   };
   warnings: string[];
   methodology: string[];
