@@ -18,6 +18,10 @@ import {
   type TimePhasedWorkforceExecutionRequest,
 } from "./time-phased-workforce-execution";
 import {
+  runWorkforceResponseConstraintCheck,
+  type WorkforceResponseConstraintRequest,
+} from "./workforce-response-constraints";
+import {
   runStructuralPositionScenario,
 } from "./structural-position-scenario";
 import {
@@ -975,6 +979,179 @@ export const peopleAnalyticsTools: any[] = [
   },
   {
     type: "function",
+    name: "run_workforce_response_constraints",
+    description:
+      "Evaluate explicit hard constraints against a deterministic time-phased BU workforce response plan. Supports total Build/Move/Buy caps, monthly Build/Move/Buy caps, a combined monthly execution cap, deadline coverage requirements, and a requirement that all approved capacity be scheduled. Also returns separate evidence checks for Build pathway coverage, Move readiness, and descriptive Buy history. Evidence warnings do not become hard caps automatically. This tool evaluates feasibility; it does not optimize allocations.",
+    parameters: {
+      type: "object",
+      properties: {
+        actions: {
+          type: "array",
+          minItems: 1,
+          maxItems: 20,
+          items: {
+            type: "object",
+            properties: {
+              action_type: {
+                type: "string",
+                enum: [
+                  "add_positions",
+                  "close_vacant_positions",
+                  "freeze_vacancies",
+                  "fill_vacancies",
+                ],
+              },
+              business_unit: { type: ["string", "null"] },
+              level: { type: ["string", "null"] },
+              job_profile: { type: ["string", "null"] },
+              amount: { type: ["number", "null"] },
+              fill_pct: { type: ["number", "null"] },
+            },
+            required: [
+              "action_type",
+              "business_unit",
+              "level",
+              "job_profile",
+              "amount",
+              "fill_pct",
+            ],
+            additionalProperties: false,
+          },
+        },
+        allocations: {
+          type: "array",
+          minItems: 1,
+          maxItems: 40,
+          items: {
+            type: "object",
+            properties: {
+              business_unit: { type: "string" },
+              job_profile: { type: "string" },
+              allocation: {
+                type: "object",
+                properties: {
+                  build: { type: "number" },
+                  move: { type: "number" },
+                  buy: { type: "number" },
+                  borrow: { type: "number" },
+                  automate: { type: "number" },
+                },
+                required: [
+                  "build",
+                  "move",
+                  "buy",
+                  "borrow",
+                  "automate",
+                ],
+                additionalProperties: false,
+              },
+            },
+            required: [
+              "business_unit",
+              "job_profile",
+              "allocation",
+            ],
+            additionalProperties: false,
+          },
+        },
+        role_plans: {
+          type: ["array", "null"],
+          maxItems: 20,
+          items: {
+            type: "object",
+            properties: {
+              job_profile: { type: "string" },
+              allocation: {
+                type: "object",
+                properties: {
+                  build: { type: "number" },
+                  move: { type: "number" },
+                  buy: { type: "number" },
+                  borrow: { type: "number" },
+                  automate: { type: "number" },
+                },
+                required: [
+                  "build",
+                  "move",
+                  "buy",
+                  "borrow",
+                  "automate",
+                ],
+                additionalProperties: false,
+              },
+            },
+            required: ["job_profile", "allocation"],
+            additionalProperties: false,
+          },
+        },
+        schedule: {
+          type: "array",
+          minItems: 1,
+          maxItems: 120,
+          items: {
+            type: "object",
+            properties: {
+              business_unit: { type: "string" },
+              job_profile: { type: "string" },
+              response_type: {
+                type: "string",
+                enum: ["build", "move", "buy"],
+              },
+              amount: { type: "number" },
+              effective_month: { type: "string" },
+            },
+            required: [
+              "business_unit",
+              "job_profile",
+              "response_type",
+              "amount",
+              "effective_month",
+            ],
+            additionalProperties: false,
+          },
+        },
+        constraints: {
+          type: "object",
+          properties: {
+            max_total_build: { type: ["number", "null"] },
+            max_total_move: { type: ["number", "null"] },
+            max_total_buy: { type: ["number", "null"] },
+            max_monthly_build: { type: ["number", "null"] },
+            max_monthly_move: { type: ["number", "null"] },
+            max_monthly_buy: { type: ["number", "null"] },
+            max_monthly_total: { type: ["number", "null"] },
+            deadline_month: { type: ["string", "null"] },
+            required_coverage_pct_by_deadline: { type: ["number", "null"] },
+            require_all_approved_capacity_scheduled: { type: "boolean" },
+          },
+          required: [
+            "max_total_build",
+            "max_total_move",
+            "max_total_buy",
+            "max_monthly_build",
+            "max_monthly_move",
+            "max_monthly_buy",
+            "max_monthly_total",
+            "deadline_month",
+            "required_coverage_pct_by_deadline",
+            "require_all_approved_capacity_scheduled",
+          ],
+          additionalProperties: false,
+        },
+      },
+      required: [
+        "actions",
+        "allocations",
+        "role_plans",
+        "schedule",
+        "constraints",
+      ],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
     name: "get_talent_acquisition",
     description:
       "Get governed Talent Acquisition analytics including funnel conversion, requisition aging, time to fill, source effectiveness, recruiter workload, and business-unit hiring demand.",
@@ -1877,6 +2054,10 @@ export async function runPeopleAnalyticsTool(
     case "run_time_phased_workforce_execution":
       return runTimePhasedWorkforceExecution(
         args as TimePhasedWorkforceExecutionRequest
+      );
+    case "run_workforce_response_constraints":
+      return runWorkforceResponseConstraintCheck(
+        args as WorkforceResponseConstraintRequest
       );
     case "get_talent_acquisition":
       return getTalentAcquisition();
