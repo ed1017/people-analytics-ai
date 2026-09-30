@@ -2,6 +2,12 @@ import type {
   ReactNode,
 } from "react";
 
+import {
+  formatCapacity,
+  formatPercent,
+  formatSignedCapacityDelta,
+  formatWholeCount,
+} from "@/lib/display-format";
 import type {
   StructuralPositionScenarioResponse,
   WorkforceResponsePlanAllocation,
@@ -37,23 +43,6 @@ function emptyAllocation(): WorkforceResponsePlanAllocation {
   };
 }
 
-function formatCount(value: number) {
-  return value.toLocaleString("en-US", {
-    maximumFractionDigits: 1,
-  });
-}
-
-function formatSigned(value: number) {
-  const formatted = formatCount(
-    Math.abs(value)
-  );
-  return value > 0
-    ? "+" + formatted
-    : value < 0
-      ? "-" + formatted
-      : formatted;
-}
-
 export function ResponsePortfolioControls({
   scenario,
   allocations,
@@ -80,6 +69,12 @@ export function ResponsePortfolioControls({
           </h5>
           <p className="text-sm text-muted-foreground">
             Allocate Build, Move, and Buy across multiple scenario-created roles and reconcile the portfolio without double-counting interested internal talent.
+          </p>
+          <p
+            className="mt-1 text-[11px] text-muted-foreground"
+            title="Modeled role capacity can be fractional; display precision does not change the underlying planning units."
+          >
+            Demand and response amounts are modeled role capacity; fractional units are intentional.
           </p>
         </div>
 
@@ -148,7 +143,7 @@ export function ResponsePortfolioControls({
                     </p>
                   </td>
                   <td className="p-3 text-right font-medium tabular-nums">
-                    {formatCount(
+                    {formatCapacity(
                       row.authorized_position_delta
                     )}
                   </td>
@@ -211,24 +206,24 @@ export function ResponsePortfolioControls({
                 Positive Role Demand
               </p>
               <p className="mt-1 text-2xl font-semibold">
-                {formatCount(
+                {formatCapacity(
                   result.scenario_positive_role_demand
                 )}
               </p>
             </div>
             <div className="rounded-md border p-3">
               <p className="text-xs text-muted-foreground">
-                Planned Coverage
+                Planned Coverage Capacity
               </p>
               <p className="mt-1 text-2xl font-semibold">
-                {formatCount(
+                {formatCapacity(
                   result.planned_coverage_if_executed
                 )}
               </p>
               <p className="text-xs text-muted-foreground">
-                {result.coverage_pct_of_all_positive_role_demand.toFixed(
-                  1
-                )}% of positive demand
+                {formatPercent(
+                  result.coverage_pct_of_all_positive_role_demand
+                )} of positive demand
               </p>
             </div>
 
@@ -237,7 +232,7 @@ export function ResponsePortfolioControls({
                 Remaining Gap
               </p>
               <p className="mt-1 text-2xl font-semibold">
-                {formatCount(
+                {formatCapacity(
                   result.remaining_gap_if_executed +
                     result.unplanned_role_demand
                 )}
@@ -248,30 +243,30 @@ export function ResponsePortfolioControls({
                 Internal Supply
               </p>
               <p className="mt-1 text-2xl font-semibold">
-                {result.internal_supply.role_ready.toLocaleString()}
+                {formatWholeCount(result.internal_supply.role_ready)}
               </p>
               <p className="text-xs text-muted-foreground">
                 role-ready ·{" "}
-                {result.internal_supply.fully_pathway_covered_near_ready.toLocaleString()} path-covered near-ready
+                {formatWholeCount(result.internal_supply.fully_pathway_covered_near_ready)} path-covered near-ready
               </p>
             </div>
           </div>
 
           <div className="mt-3 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
             Portfolio allocation: Build{" "}
-            {formatCount(
+            {formatCapacity(
               result.allocation.build
             )}{" "}
             · Move{" "}
-            {formatCount(
+            {formatCapacity(
               result.allocation.move
             )}{" "}
             · Buy{" "}
-            {formatCount(
+            {formatCapacity(
               result.allocation.buy
             )}{" "}
-            · {result.recruiting_evidence.current_open_requisitions.toLocaleString()} current open reqs ·{" "}
-            {result.recruiting_evidence.recent_12m_external_fills.toLocaleString()} external fills in trailing 12M
+            · {formatWholeCount(result.recruiting_evidence.current_open_requisitions)} current open reqs ·{" "}
+            {formatWholeCount(result.recruiting_evidence.recent_12m_external_fills)} external fills in trailing 12M
           </div>
 
           {result.demand_by_business_unit.length >
@@ -316,12 +311,12 @@ export function ResponsePortfolioControls({
                             {bu.org_name}
                           </td>
                           <td className="px-3 py-2 text-right font-medium tabular-nums">
-                            {formatSigned(
+                            {formatSignedCapacityDelta(
                               bu.scenario_role_demand_delta
                             )}
                           </td>
                           <td className="px-3 py-2 text-right tabular-nums">
-                            {formatSigned(
+                            {formatSignedCapacityDelta(
                               bu.portfolio_role_demand_delta
                             )}
                           </td>
@@ -331,7 +326,7 @@ export function ResponsePortfolioControls({
                                 (role) =>
                                   role.job_profile_name +
                                   " " +
-                                  formatSigned(
+                                  formatSignedCapacityDelta(
                                     role.scenario_created_role_demand_delta
                                   ) +
                                   (role.included_in_portfolio
@@ -386,27 +381,27 @@ export function ResponsePortfolioControls({
                       {role.job_profile_name}
                     </td>
                     <td className="p-3 text-right tabular-nums">
-                      {formatCount(
+                      {formatCapacity(
                         role.scenario_created_role_demand
                       )}
                     </td>
                     <td className="p-3 text-right tabular-nums">
-                      {formatCount(
+                      {formatCapacity(
                         role.allocation.build
                       )}
                     </td>
                     <td className="p-3 text-right tabular-nums">
-                      {formatCount(
+                      {formatCapacity(
                         role.allocation.move
                       )}
                     </td>
                     <td className="p-3 text-right tabular-nums">
-                      {formatCount(
+                      {formatCapacity(
                         role.allocation.buy
                       )}
                     </td>
                     <td className="p-3 text-right font-medium tabular-nums">
-                      {formatCount(
+                      {formatCapacity(
                         role.remaining_role_gap_if_executed
                       )}
                     </td>

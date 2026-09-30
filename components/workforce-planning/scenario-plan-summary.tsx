@@ -8,6 +8,11 @@ import {
   YAxis,
 } from "recharts";
 
+import {
+  formatCurrencyCompact,
+  formatSignedWholeDelta,
+  formatWholeCount,
+} from "@/lib/display-format";
 import type {
   PlanningPoint,
   PlanningScenario,
@@ -39,18 +44,6 @@ function formatLongDate(value: string) {
     day: "numeric",
     year: "numeric",
   });
-}
-
-function formatCurrencyCompact(value: number) {
-  const sign = value < 0 ? "-" : "";
-  const absoluteValue = Math.abs(value);
-  if (absoluteValue >= 1_000_000_000) {
-    return sign + "$" + (absoluteValue / 1_000_000_000).toFixed(2) + "B";
-  }
-  if (absoluteValue >= 1_000_000) {
-    return sign + "$" + (absoluteValue / 1_000_000).toFixed(1) + "M";
-  }
-  return sign + "$" + Math.round(absoluteValue).toLocaleString();
 }
 
 function formatAssumptionName(value: string) {
@@ -94,7 +87,7 @@ export function ScenarioPlanSummary({
                   </p>
                   <p className="mt-2 text-3xl font-semibold">
                     {activePlanningStart
-                      ? activePlanningStart.planned_headcount.toLocaleString()
+                      ? formatWholeCount(activePlanningStart.planned_headcount)
                       : "—"}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
@@ -107,16 +100,12 @@ export function ScenarioPlanSummary({
                     Dec 2027 Headcount
                   </p>
                   <p className="mt-2 text-3xl font-semibold">
-                    {activePlanningEnd.planned_headcount.toLocaleString()}
+                    {formatWholeCount(activePlanningEnd.planned_headcount)}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {planningNetChange === null
                       ? "—"
-                      : `${
-                          planningNetChange >= 0
-                            ? "+"
-                            : ""
-                        }${planningNetChange.toLocaleString()} across horizon`}
+                      : `${formatSignedWholeDelta(planningNetChange)} across horizon`}
                   </p>
                 </div>
 
@@ -142,12 +131,7 @@ export function ScenarioPlanSummary({
                     {planningHeadcountDeltaVsBaseline ===
                     null
                       ? "—"
-                      : `${
-                          planningHeadcountDeltaVsBaseline >=
-                          0
-                            ? "+"
-                            : ""
-                        }${planningHeadcountDeltaVsBaseline.toLocaleString()}`}
+                      : formatSignedWholeDelta(planningHeadcountDeltaVsBaseline)}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     Dec 2027 headcount difference
@@ -178,8 +162,8 @@ export function ScenarioPlanSummary({
                         Planned hires / exits
                       </p>
                       <p className="font-semibold">
-                        {planningTotalHires.toLocaleString()} /{" "}
-                        {planningTotalExits.toLocaleString()}
+                        {formatWholeCount(planningTotalHires)} /{" "}
+                        {formatWholeCount(planningTotalExits)}
                       </p>
                     </div>
                   </div>
@@ -237,7 +221,7 @@ export function ScenarioPlanSummary({
                           tickFormatter={(
                             value: number
                           ) =>
-                            value.toLocaleString()
+                            formatWholeCount(value)
                           }
                           width={64}
                           tick={{
@@ -255,9 +239,9 @@ export function ScenarioPlanSummary({
                           formatter={(
                             value
                           ) => [
-                            Number(
-                              value
-                            ).toLocaleString(),
+                            formatWholeCount(
+                              Number(value)
+                            ),
                             "Planned headcount",
                           ]}
                           contentStyle={{

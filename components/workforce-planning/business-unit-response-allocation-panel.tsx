@@ -2,6 +2,10 @@ import type {
   ReactNode,
 } from "react";
 
+import {
+  formatCapacity,
+  formatWholeCount,
+} from "@/lib/display-format";
 import type {
   BusinessUnitResponseAllocationResponse,
   StructuralPositionScenarioResponse,
@@ -38,12 +42,6 @@ function emptyAllocation(): WorkforceResponsePlanAllocation {
     borrow: 0,
     automate: 0,
   };
-}
-
-function formatCount(value: number) {
-  return value.toLocaleString("en-US", {
-    maximumFractionDigits: 1,
-  });
 }
 
 export function BusinessUnitResponseAllocationPanel({
@@ -85,7 +83,7 @@ export function BusinessUnitResponseAllocationPanel({
       <div className="border-t p-4">
         <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
           <p className="max-w-3xl text-xs text-muted-foreground">
-            Allocate the existing role portfolio to destination business units. BU totals must reconcile back to each role's Build / Move / Buy target. A Move row identifies the destination only; source BU is not inferred.
+            Allocate the existing role portfolio to destination business units. BU totals must reconcile back to each role's Build / Move / Buy target. A Move row identifies the destination only; source BU is not inferred. Amounts are modeled role capacity and may be fractional.
           </p>
 
           <div className="flex gap-2">
@@ -156,7 +154,7 @@ export function BusinessUnitResponseAllocationPanel({
                       </p>
                     </td>
                     <td className="p-3 text-right font-medium tabular-nums">
-                      {formatCount(
+                      {formatCapacity(
                         row.authorized_position_delta
                       )}
                     </td>
@@ -218,7 +216,7 @@ export function BusinessUnitResponseAllocationPanel({
                   Enterprise Net Need
                 </p>
                 <p className="mt-1 text-xl font-semibold">
-                  {formatCount(
+                  {formatCapacity(
                     result.scenario_net_role_demand
                   )}
                 </p>
@@ -228,7 +226,7 @@ export function BusinessUnitResponseAllocationPanel({
                   Gross BU Destination Demand
                 </p>
                 <p className="mt-1 text-xl font-semibold">
-                  {formatCount(
+                  {formatCapacity(
                     result.gross_destination_demand
                   )}
                 </p>
@@ -238,7 +236,7 @@ export function BusinessUnitResponseAllocationPanel({
                   Contraction Offset
                 </p>
                 <p className="mt-1 text-xl font-semibold">
-                  {formatCount(
+                  {formatCapacity(
                     result.contraction_offset
                   )}
                 </p>
@@ -248,12 +246,12 @@ export function BusinessUnitResponseAllocationPanel({
                   Remaining Net Gap
                 </p>
                 <p className="mt-1 text-xl font-semibold">
-                  {formatCount(
+                  {formatCapacity(
                     result.remaining_net_gap_if_executed
                   )}
                 </p>
                 <p className="text-[10px] text-muted-foreground">
-                  {formatCount(
+                  {formatCapacity(
                     result.effective_coverage_if_executed
                   )} effective coverage
                 </p>
@@ -289,30 +287,30 @@ export function BusinessUnitResponseAllocationPanel({
                       </td>
                       <td className="p-3 text-right tabular-nums">
                         {role.portfolio_target_allocation
-                          ? formatCount(
+                          ? formatCapacity(
                               role.portfolio_target_allocation.build
                             ) +
                             " / " +
-                            formatCount(
+                            formatCapacity(
                               role.portfolio_target_allocation.move
                             ) +
                             " / " +
-                            formatCount(
+                            formatCapacity(
                               role.portfolio_target_allocation.buy
                             )
                           : "—"}
                       </td>
 
                       <td className="p-3 text-right tabular-nums">
-                        {formatCount(
+                        {formatCapacity(
                           role.allocation.build
                         ) +
                           " / " +
-                          formatCount(
+                          formatCapacity(
                             role.allocation.move
                           ) +
                           " / " +
-                          formatCount(
+                          formatCapacity(
                             role.allocation.buy
                           )}
                       </td>
@@ -331,8 +329,8 @@ export function BusinessUnitResponseAllocationPanel({
             </div>
 
             <div className="mt-3 text-[11px] text-muted-foreground">
-              {result.unallocated_destinations.length.toLocaleString()} positive destination row(s) remain unallocated ·{" "}
-              {result.contractions.length.toLocaleString()} contraction offset row(s). Destination gaps are not automatically treated as enterprise gaps.
+              {formatWholeCount(result.unallocated_destinations.length)} positive destination row(s) remain unallocated ·{" "}
+              {formatWholeCount(result.contractions.length)} contraction offset row(s). Destination gaps are not automatically treated as enterprise gaps.
             </div>
 
             {result.warnings.length > 0 && (

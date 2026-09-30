@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  formatPercent,
+  formatWholeCount,
+} from "@/lib/display-format";
 import type {
   BlsResponse,
   SkillsResponse,
@@ -65,7 +69,7 @@ export function SkillsPage({
                       Active Skills
                     </p>
                     <p className="mt-2 text-3xl font-semibold">
-                      {skillsData.summary.active_skills.toLocaleString()}
+                      {formatWholeCount(skillsData.summary.active_skills)}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Internal skills taxonomy
@@ -77,7 +81,7 @@ export function SkillsPage({
                       Skills Below 60%
                     </p>
                     <p className="mt-2 text-3xl font-semibold">
-                      {skillsData.summary.skills_below_60_pct.toLocaleString()}
+                      {formatWholeCount(skillsData.summary.skills_below_60_pct)}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Requirement attainment below 60%
@@ -89,10 +93,9 @@ export function SkillsPage({
                       Requirement Met
                     </p>
                     <p className="mt-2 text-3xl font-semibold">
-                      {skillsData.summary.weighted_requirement_met_pct.toFixed(
-                        1
+                      {formatPercent(
+                        skillsData.summary.weighted_requirement_met_pct
                       )}
-                      %
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Weighted across required skill assignments
@@ -104,9 +107,9 @@ export function SkillsPage({
                       O*NET Mapping
                     </p>
                     <p className="mt-2 text-3xl font-semibold">
-                      {skillsData.summary.onet_mapped_job_profiles.toLocaleString()}
+                      {formatWholeCount(skillsData.summary.onet_mapped_job_profiles)}
                       /
-                      {skillsData.summary.total_job_profiles.toLocaleString()}
+                      {formatWholeCount(skillsData.summary.total_job_profiles)}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Internal job profiles enriched
@@ -131,10 +134,9 @@ export function SkillsPage({
                       </div>
 
                       <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
-                        {skillsData.summary.average_profile_coverage_pct.toFixed(
-                          1
-                        )}
-                        % profile coverage
+                        {formatPercent(
+                          skillsData.summary.average_profile_coverage_pct
+                        )} profile coverage
                       </span>
                     </div>
 
@@ -336,9 +338,9 @@ export function SkillsPage({
                         Job profiles mapped
                       </p>
                       <p className="mt-2 text-3xl font-semibold">
-                        {skillsData.summary.onet_mapped_job_profiles.toLocaleString()}
+                        {formatWholeCount(skillsData.summary.onet_mapped_job_profiles)}
                         /
-                        {skillsData.summary.total_job_profiles.toLocaleString()}
+                        {formatWholeCount(skillsData.summary.total_job_profiles)}
                       </p>
                       <p className="mt-2 text-sm text-muted-foreground">
                         This gives the model an external occupation and skills reference layer alongside internal workforce data.
@@ -350,7 +352,7 @@ export function SkillsPage({
                         Current workforce
                       </p>
                       <p className="mt-2 text-2xl font-semibold">
-                        {skillsData.summary.current_workforce.toLocaleString()}
+                        {formatWholeCount(skillsData.summary.current_workforce)}
                       </p>
                       <p className="mt-2 text-sm text-muted-foreground">
                         Employees in the September 2026 workforce snapshot.
