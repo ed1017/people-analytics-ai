@@ -1,6 +1,7 @@
 "use client";
 
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { formatWholeCount } from "@/lib/display-format";
 import type { TalentAcquisitionResponse } from "@/lib/types";
 
 type TalentAcquisitionPageProps = {
@@ -92,9 +93,9 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
                     <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
                     <XAxis dataKey="month" tickFormatter={formatMonth} minTickGap={28} tick={{ fontSize: 12 }} />
                     <YAxis tickFormatter={(value) => Number(value).toLocaleString()} width={64} tick={{ fontSize: 12 }} />
-                    <Tooltip labelFormatter={(value) => formatMonth(String(value))} contentStyle={{ backgroundColor: "var(--background)", border: "1px solid var(--border)", borderRadius: "0.5rem" }} />
-                    <Line type="monotone" dataKey="applications" stroke="currentColor" strokeWidth={2.5} dot={false} />
-                    <Line type="monotone" dataKey="hires" stroke="currentColor" strokeWidth={1.5} strokeDasharray="5 4" dot={false} />
+                    <Tooltip labelFormatter={(value) => formatMonth(String(value))} formatter={(value) => formatWholeCount(Number(value))} contentStyle={{ backgroundColor: "var(--background)", border: "1px solid var(--border)", borderRadius: "0.5rem" }} />
+                    <Line type="monotone" dataKey="applications" name="Applications" stroke="currentColor" strokeWidth={2.5} dot={false} />
+                    <Line type="monotone" dataKey="hires" name="Hires" stroke="currentColor" strokeWidth={1.5} strokeDasharray="5 4" dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
