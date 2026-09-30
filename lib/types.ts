@@ -202,6 +202,52 @@ export type StructuralPositionScenarioResponse = {
     authorized_budget_delta_usd: number;
     annualized_staffed_labor_cost_delta_usd: number;
   };
+  skill_demand: {
+    skills_with_increased_authorized_demand: number;
+    skills_with_reduced_authorized_demand: number;
+    top_changed_skills: Array<{
+      skill_code: string;
+      skill_name: string;
+      skill_category: string;
+      current_authorized_position_demand: number;
+      modeled_authorized_position_demand: number;
+      authorized_demand_delta: number;
+      current_employee_supply: number;
+      current_position_gap: number;
+      modeled_position_gap: number;
+      current_active_recruiting_demand: number;
+      modeled_active_recruiting_demand: number;
+      active_recruiting_demand_delta: number;
+    }>;
+    largest_modeled_gaps: Array<{
+      skill_code: string;
+      skill_name: string;
+      skill_category: string;
+      current_authorized_position_demand: number;
+      modeled_authorized_position_demand: number;
+      authorized_demand_delta: number;
+      current_employee_supply: number;
+      current_position_gap: number;
+      modeled_position_gap: number;
+      current_active_recruiting_demand: number;
+      modeled_active_recruiting_demand: number;
+      active_recruiting_demand_delta: number;
+    }>;
+    top_recruiting_skill_demand: Array<{
+      skill_code: string;
+      skill_name: string;
+      skill_category: string;
+      current_authorized_position_demand: number;
+      modeled_authorized_position_demand: number;
+      authorized_demand_delta: number;
+      current_employee_supply: number;
+      current_position_gap: number;
+      modeled_position_gap: number;
+      current_active_recruiting_demand: number;
+      modeled_active_recruiting_demand: number;
+      active_recruiting_demand_delta: number;
+    }>;
+  };
   recruiting_demand: {
     active_open_requisitions: number;
     on_hold_requisitions: number;

@@ -3153,6 +3153,226 @@ export function WorkforcePlanningPage({
                         </div>
                       </div>
 
+                      <div className="mt-4 rounded-md border p-4">
+                        <div className="mb-4">
+                          <h5 className="font-semibold">
+                            Skill Demand
+                          </h5>
+                          <p className="text-sm text-muted-foreground">
+                            Authorized-position skill requirements and active recruiting skill demand implied by this scenario.
+                          </p>
+                        </div>
+
+                        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                          <div className="rounded-md border p-3">
+                            <p className="text-xs text-muted-foreground">
+                              Skills with Higher Demand
+                            </p>
+                            <p className="mt-1 text-2xl font-semibold">
+                              {
+                                structuralPositionResult.skill_demand
+                                  .skills_with_increased_authorized_demand
+                              }
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Authorized-position demand increased
+                            </p>
+                          </div>
+
+                          <div className="rounded-md border p-3">
+                            <p className="text-xs text-muted-foreground">
+                              Skills with Lower Demand
+                            </p>
+                            <p className="mt-1 text-2xl font-semibold">
+                              {
+                                structuralPositionResult.skill_demand
+                                  .skills_with_reduced_authorized_demand
+                              }
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Authorized-position demand decreased
+                            </p>
+                          </div>
+
+                          <div className="rounded-md border p-3">
+                            <p className="text-xs text-muted-foreground">
+                              Largest Modeled Gap
+                            </p>
+                            <p className="mt-1 truncate text-lg font-semibold">
+                              {structuralPositionResult.skill_demand
+                                .largest_modeled_gaps[0]
+                                ?.skill_name ?? "—"}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {structuralPositionResult.skill_demand
+                                .largest_modeled_gaps[0]
+                                ? formatModeledCount(
+                                    structuralPositionResult.skill_demand
+                                      .largest_modeled_gaps[0]
+                                      .modeled_position_gap
+                                  ) +
+                                  " positions above current skill supply"
+                                : "No modeled gap"}
+                            </p>
+                          </div>
+
+                          <div className="rounded-md border p-3">
+                            <p className="text-xs text-muted-foreground">
+                              Top Recruiting Skill
+                            </p>
+                            <p className="mt-1 truncate text-lg font-semibold">
+                              {structuralPositionResult.skill_demand
+                                .top_recruiting_skill_demand[0]
+                                ?.skill_name ?? "—"}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {structuralPositionResult.skill_demand
+                                .top_recruiting_skill_demand[0]
+                                ? formatModeledCount(
+                                    structuralPositionResult.skill_demand
+                                      .top_recruiting_skill_demand[0]
+                                      .modeled_active_recruiting_demand
+                                  ) + " active recruiting positions"
+                                : "No active recruiting demand"}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
+                          Current employee skill supply is held constant. Position-based demand includes filled, vacant, and frozen authorized roles; active recruiting demand excludes frozen/on-hold vacancies.
+                        </div>
+
+                        <div className="mt-4 grid gap-4 xl:grid-cols-2">
+                          <div className="overflow-x-auto rounded-md border p-3">
+                            <div className="mb-3">
+                              <p className="font-medium">
+                                Scenario Skill Changes
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Largest changes in authorized-position skill demand
+                              </p>
+                            </div>
+
+                            {structuralPositionResult.skill_demand
+                              .top_changed_skills.length >
+                            0 ? (
+                              <table className="w-full min-w-[520px] text-sm">
+                                <thead>
+                                  <tr className="border-b text-left text-xs text-muted-foreground">
+                                    <th className="pb-3 pr-4">
+                                      Skill
+                                    </th>
+                                    <th className="pb-3 px-3 text-right">
+                                      Demand Δ
+                                    </th>
+                                    <th className="pb-3 pl-3 text-right">
+                                      Modeled Gap
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {structuralPositionResult.skill_demand.top_changed_skills
+                                    .slice(0, 10)
+                                    .map((row) => (
+                                      <tr
+                                        key={row.skill_code}
+                                        className="border-b last:border-0"
+                                      >
+                                        <td className="py-3 pr-4">
+                                          <p className="font-medium">
+                                            {row.skill_name}
+                                          </p>
+                                          <p className="text-[11px] text-muted-foreground">
+                                            {row.skill_category}
+                                          </p>
+                                        </td>
+                                        <td className="px-3 py-3 text-right tabular-nums">
+                                          {row.authorized_demand_delta >
+                                          0
+                                            ? "+"
+                                            : ""}
+                                          {formatModeledCount(
+                                            row.authorized_demand_delta
+                                          )}
+                                        </td>
+                                        <td className="py-3 pl-3 text-right tabular-nums">
+                                          {formatModeledCount(
+                                            row.modeled_position_gap
+                                          )}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                </tbody>
+                              </table>
+                            ) : (
+                              <p className="py-4 text-sm text-muted-foreground">
+                                This scenario does not change authorized skill demand; it only changes vacancy or staffing state.
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="overflow-x-auto rounded-md border p-3">
+                            <div className="mb-3">
+                              <p className="font-medium">
+                                Active Recruiting Skill Demand
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Skills needed across active open and uncovered vacancies
+                              </p>
+                            </div>
+
+                            <table className="w-full min-w-[520px] text-sm">
+                              <thead>
+                                <tr className="border-b text-left text-xs text-muted-foreground">
+                                  <th className="pb-3 pr-4">
+                                    Skill
+                                  </th>
+                                  <th className="pb-3 px-3 text-right">
+                                    Active Demand
+                                  </th>
+                                  <th className="pb-3 pl-3 text-right">
+                                    Δ vs Current
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {structuralPositionResult.skill_demand.top_recruiting_skill_demand
+                                  .slice(0, 10)
+                                  .map((row) => (
+                                    <tr
+                                      key={row.skill_code}
+                                      className="border-b last:border-0"
+                                    >
+                                      <td className="py-3 pr-4">
+                                        <p className="font-medium">
+                                          {row.skill_name}
+                                        </p>
+                                        <p className="text-[11px] text-muted-foreground">
+                                          {row.skill_category}
+                                        </p>
+                                      </td>
+                                      <td className="px-3 py-3 text-right tabular-nums">
+                                        {formatModeledCount(
+                                          row.modeled_active_recruiting_demand
+                                        )}
+                                      </td>
+                                      <td className="py-3 pl-3 text-right tabular-nums">
+                                        {row.active_recruiting_demand_delta >
+                                        0
+                                          ? "+"
+                                          : ""}
+                                        {formatModeledCount(
+                                          row.active_recruiting_demand_delta
+                                        )}
+                                      </td>
+                                    </tr>
+                                  ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+
                       <div className="mt-4 overflow-x-auto rounded-md border p-3">
                         <table className="w-full min-w-[860px] text-sm">
                           <thead>
