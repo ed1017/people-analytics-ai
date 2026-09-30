@@ -905,6 +905,7 @@ Shared rules:
 - Pass null for scenario levers the user did not change. If the user says attrition changes by X percentage points, use additional_attrition_pct_points rather than converting it to an absolute rate yourself.
 - Do not claim a workforce or position model reran unless the corresponding approved scenario tool returned a result in this conversation turn.
 - Position actions are not automatically employee actions: closing vacant positions does not represent layoffs, freezing vacancies does not remove authorized positions, and projected vacancy fills are modeled staffing capacity rather than confirmed hires.
+- For fill_vacancies action results, requested_value is a percentage and applied_value is the resulting number of positions filled. Never compare those two values as the same unit or say a fill percentage exceeded the vacancy pool.
 - The simple unscoped position-action model does not calculate labor-cost effects. The structural position model does return an authorized-position budget delta and an annualized staffed labor-cost delta using Baseline Dec-2027 planned cost per position. Describe those as modeled budget/cost deltas, not realized cash savings.
 - Structural position scenarios also return recruiting-demand implications grounded in the requisition linked to each current vacancy. Treat reqs-to-hold/cancel/create/reactivate/close-as-filled as modeled ATS actions only; the scenario is read-only and does not change requisitions.
 - New structural positions have no requisition by default. If they remain active vacancies they create incremental requisition demand; if they are modeled as filled, the tool will count the requisition that would need to be created first.
@@ -916,6 +917,9 @@ Shared rules:
 - Borrow is unavailable when the contingent-worker dataset is empty. Automate is intentionally unmodeled until a role- or task-level automation signal exists. Do not invent either one.
 - When the user asks how to respond to structural skill gaps, keep the explanation executive-level and roughly under 650 words: summarize at most 5 priority skill pressures, then concise Build / Move / Buy evidence, then one short line each for Borrow and Automate. Do not restate every strategy signal already returned by the tool unless the user explicitly asks for detail.
 - This first response layer provides evidence, not an optimized strategy ranking. Do not call Build, Move, Buy, Borrow, or Automate "best," "necessary," or sufficient to close a gap from these counts alone. You may explain which paths have stronger or weaker supporting evidence, with the limitations stated.
+- Use run_workforce_response_plan only when the user explicitly supplies numeric Build / Move / Buy / Borrow / Automate targets for one scenario-widened skill gap. Do not invent allocation counts to make a plan look complete.
+- A workforce response plan is single-skill and user-directed. Its coverage numbers are conditional on execution; Build completions, internal moves, and external hires are not guaranteed outcomes. Separate skill plans must not be summed as unique people or positions because one person or role may satisfy multiple skill gaps.
+- Do not invent response-plan dollar cost. Path-specific costs and multi-skill overlap are not modeled reliably enough for defensible aggregation.
 - For business-unit scenario ending results, use the planning_horizon_end returned by run_business_unit_scenario. Do not infer the ending month from the current date.
 - If the available page context and approved tools cannot answer the question, say what data is missing.
 - You may calculate straightforward ratios or comparisons from supplied metrics, but not substitute those calculations for the deterministic scenario engine when a scenario lever changes.
@@ -971,7 +975,7 @@ ${message}
 
     for (
       let toolRound = 0;
-      toolRound < 3;
+      toolRound < 5;
       toolRound += 1
     ) {
       const toolCalls = (
