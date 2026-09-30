@@ -22,6 +22,12 @@ type InventoryRow = {
   filled: number;
   vacant: number;
   frozen: number;
+  open_req: number;
+  on_hold_req: number;
+  uncovered: number;
+  frozen_open_req: number;
+  frozen_on_hold_req: number;
+  frozen_uncovered: number;
   planned_weight: number;
   cost_per_position: number;
 };
@@ -106,6 +112,18 @@ async function loadInventory() {
           row.vacant_positions
         ),
         frozen: 0,
+        open_req: toNumber(
+          row.open_requisition_vacancies
+        ),
+        on_hold_req: toNumber(
+          row.on_hold_requisition_vacancies
+        ),
+        uncovered: toNumber(
+          row.uncovered_vacancies
+        ),
+        frozen_open_req: 0,
+        frozen_on_hold_req: 0,
+        frozen_uncovered: 0,
         planned_weight: toNumber(
           row.planned_headcount
         ),
@@ -234,6 +252,83 @@ function inventoryTotals(
     }
   );
 }
+
+function recruitingTotals(
+  rows: InventoryRow[]
+) {
+  return rows.reduce(
+    (acc, row) => {
+      acc.open += row.open_req;
+      acc.onHold +=
+        row.on_hold_req +
+        row.frozen_open_req +
+        row.frozen_on_hold_req;
+      acc.uncovered += row.uncovered;
+      return acc;
+    },
+    {
+      open: 0,
+      onHold: 0,
+      uncovered: 0,
+    }
+  );
+}
+
+function consumeVacancyCategories(
+  row: InventoryRow,
+  amount: number
+) {
+  const available = Math.max(
+    0,
+    row.vacant
+  );
+  const applied = Math.min(
+    Math.max(0, amount),
+    available
+  );
+
+  if (available <= 0 || applied <= 0) {
+    return {
+      applied: 0,
+      open: 0,
+      onHold: 0,
+      uncovered: 0,
+    };
+  }
+
+  const open =
+    applied *
+    (row.open_req / available);
+  const onHold =
+    applied *
+    (row.on_hold_req / available);
+  const uncovered = Math.max(
+    0,
+    applied - open - onHold
+  );
+
+  row.vacant -= applied;
+  row.open_req = Math.max(
+    0,
+    row.open_req - open
+  );
+  row.on_hold_req = Math.max(
+    0,
+    row.on_hold_req - onHold
+  );
+  row.uncovered = Math.max(
+    0,
+    row.uncovered - uncovered
+  );
+
+  return {
+    applied,
+    open,
+    onHold,
+    uncovered,
+  };
+}
+
 export async function getStructuralPositionCatalog():
   Promise<StructuralPositionCatalogResponse> {
   const inventory =
@@ -374,6 +469,7 @@ function addPositions(
       (weight / totalWeight);
 
     row.vacant += added;
+    row.uncovered += added;
     budgetDelta +=
       added *
       row.cost_per_position;
@@ -389,15 +485,25 @@ function closeVacancies(
   amount: number
 ) {
   let budgetDelta = 0;
+  let requisitionsToCancel = 0;
 
   const applied = distributeAmount(
     rows,
     amount,
     (row) => row.vacant,
     (row, closed) => {
-      row.vacant -= closed;
+      const consumed =
+        consumeVacancyCategories(
+          row,
+          closed
+        );
+
+      requisitionsToCancel +=
+        consumed.open +
+        consumed.onHold;
+
       budgetDelta -=
-        closed *
+        consumed.applied *
         row.cost_per_position;
     }
   );
@@ -405,6 +511,7 @@ function closeVacancies(
   return {
     applied,
     budgetDelta,
+    requisitionsToCancel,
   };
 }
 
@@ -412,17 +519,37 @@ function freezeVacancies(
   rows: InventoryRow[],
   amount: number
 ) {
+  let requisitionsToHold = 0;
+
   const applied = distributeAmount(
     rows,
     amount,
     (row) => row.vacant,
     (row, frozen) => {
-      row.vacant -= frozen;
-      row.frozen += frozen;
+      const consumed =
+        consumeVacancyCategories(
+          row,
+          frozen
+        );
+
+      row.frozen +=
+        consumed.applied;
+      row.frozen_open_req +=
+        consumed.open;
+      row.frozen_on_hold_req +=
+        consumed.onHold;
+      row.frozen_uncovered +=
+        consumed.uncovered;
+
+      requisitionsToHold +=
+        consumed.open;
     }
   );
 
-  return applied;
+  return {
+    applied,
+    requisitionsToHold,
+  };
 }
 function fillVacancies(
   rows: InventoryRow[],
@@ -436,24 +563,43 @@ function fillVacancies(
 
   let filledTotal = 0;
   let staffedCostDelta = 0;
+  let requisitionsToCreate = 0;
+  let requisitionsToReactivate = 0;
+  let requisitionsClosedAsFilled = 0;
 
   for (const row of rows) {
-    const filled =
+    const requestedFill =
       row.vacant *
       (pct / 100);
+    const consumed =
+      consumeVacancyCategories(
+        row,
+        requestedFill
+      );
 
-    row.vacant -= filled;
-    row.filled += filled;
+    row.filled +=
+      consumed.applied;
 
-    filledTotal += filled;
+    filledTotal +=
+      consumed.applied;
     staffedCostDelta +=
-      filled *
+      consumed.applied *
       row.cost_per_position;
+
+    requisitionsToCreate +=
+      consumed.uncovered;
+    requisitionsToReactivate +=
+      consumed.onHold;
+    requisitionsClosedAsFilled +=
+      consumed.applied;
   }
 
   return {
     applied: filledTotal,
     staffedCostDelta,
+    requisitionsToCreate,
+    requisitionsToReactivate,
+    requisitionsClosedAsFilled,
   };
 }
 export async function runStructuralPositionScenario(
@@ -462,15 +608,26 @@ export async function runStructuralPositionScenario(
   const inventory =
     await loadInventory();
 
+  const initialRows =
+    inventory.rows.map(
+      (row) => ({ ...row })
+    );
   const rows = inventory.rows.map(
     (row) => ({ ...row })
   );
 
   const starting =
     inventoryTotals(rows);
+  const startingRecruiting =
+    recruitingTotals(rows);
 
   let authorizedBudgetDelta = 0;
   let staffedLaborCostDelta = 0;
+  let requisitionsToHold = 0;
+  let requisitionsToCancel = 0;
+  let requisitionsToCreateForFills = 0;
+  let requisitionsToReactivateForFills = 0;
+  let requisitionsClosedAsFilled = 0;
 
   const actionResults:
     StructuralPositionScenarioResponse["action_results"] =
@@ -504,6 +661,11 @@ export async function runStructuralPositionScenario(
     let appliedValue = 0;
     let actionBudgetDelta = 0;
     let actionStaffedCostDelta = 0;
+    let actionRequisitionsToHold = 0;
+    let actionRequisitionsToCancel = 0;
+    let actionRequisitionsToCreateForFill = 0;
+    let actionRequisitionsToReactivateForFill = 0;
+    let actionRequisitionsClosedAsFilled = 0;
     let costBasis = 0;
 
     if (
@@ -548,6 +710,8 @@ export async function runStructuralPositionScenario(
       appliedValue = result.applied;
       actionBudgetDelta =
         result.budgetDelta;
+      actionRequisitionsToCancel =
+        result.requisitionsToCancel;
     } else if (
       action.action_type ===
       "freeze_vacancies"
@@ -560,11 +724,14 @@ export async function runStructuralPositionScenario(
         matched,
         (row) => row.vacant
       );
-      appliedValue =
+      const result =
         freezeVacancies(
           matched,
           requestedValue
         );
+      appliedValue = result.applied;
+      actionRequisitionsToHold =
+        result.requisitionsToHold;
     } else if (
       action.action_type ===
       "fill_vacancies"
@@ -587,6 +754,12 @@ export async function runStructuralPositionScenario(
       appliedValue = result.applied;
       actionStaffedCostDelta =
         result.staffedCostDelta;
+      actionRequisitionsToCreateForFill =
+        result.requisitionsToCreate;
+      actionRequisitionsToReactivateForFill =
+        result.requisitionsToReactivate;
+      actionRequisitionsClosedAsFilled =
+        result.requisitionsClosedAsFilled;
     } else {
       throw new Error(
         "Unsupported structural position action."
@@ -597,6 +770,16 @@ export async function runStructuralPositionScenario(
       actionBudgetDelta;
     staffedLaborCostDelta +=
       actionStaffedCostDelta;
+    requisitionsToHold +=
+      actionRequisitionsToHold;
+    requisitionsToCancel +=
+      actionRequisitionsToCancel;
+    requisitionsToCreateForFills +=
+      actionRequisitionsToCreateForFill;
+    requisitionsToReactivateForFills +=
+      actionRequisitionsToReactivateForFill;
+    requisitionsClosedAsFilled +=
+      actionRequisitionsClosedAsFilled;
 
     actionResults.push({
       action_index: index + 1,
@@ -621,11 +804,123 @@ export async function runStructuralPositionScenario(
         round2(
           actionStaffedCostDelta
         ),
+      requisitions_to_hold:
+        round1(
+          actionRequisitionsToHold
+        ),
+      requisitions_to_cancel:
+        round1(
+          actionRequisitionsToCancel
+        ),
+      requisitions_to_create_for_fill:
+        round1(
+          actionRequisitionsToCreateForFill
+        ),
+      requisitions_to_reactivate_for_fill:
+        round1(
+          actionRequisitionsToReactivateForFill
+        ),
+      requisitions_closed_as_filled:
+        round1(
+          actionRequisitionsClosedAsFilled
+        ),
     });
   }
 
   const ending =
     inventoryTotals(rows);
+  const endingRecruiting =
+    recruitingTotals(rows);
+
+  const recruitingByBusinessUnitMap =
+    new Map<
+      string,
+      {
+        org_code: string;
+        org_name: string;
+        active_open_requisitions: number;
+        on_hold_requisitions: number;
+        uncovered_open_vacancies: number;
+        active_recruiting_demand: number;
+        modeled_fills: number;
+      }
+    >();
+
+  for (
+    let index = 0;
+    index < rows.length;
+    index += 1
+  ) {
+    const row = rows[index];
+    const initial = initialRows[index];
+
+    const existing =
+      recruitingByBusinessUnitMap.get(
+        row.org_code
+      ) ?? {
+        org_code: row.org_code,
+        org_name: row.org_name,
+        active_open_requisitions: 0,
+        on_hold_requisitions: 0,
+        uncovered_open_vacancies: 0,
+        active_recruiting_demand: 0,
+        modeled_fills: 0,
+      };
+
+    existing.active_open_requisitions +=
+      row.open_req;
+    existing.on_hold_requisitions +=
+      row.on_hold_req +
+      row.frozen_open_req +
+      row.frozen_on_hold_req;
+    existing.uncovered_open_vacancies +=
+      row.uncovered;
+    existing.active_recruiting_demand +=
+      row.open_req +
+      row.uncovered;
+    existing.modeled_fills +=
+      Math.max(
+        0,
+        row.filled -
+          initial.filled
+      );
+
+    recruitingByBusinessUnitMap.set(
+      row.org_code,
+      existing
+    );
+  }
+
+  const recruitingByBusinessUnit =
+    Array.from(
+      recruitingByBusinessUnitMap.values()
+    )
+      .map((row) => ({
+        ...row,
+        active_open_requisitions:
+          round1(
+            row.active_open_requisitions
+          ),
+        on_hold_requisitions:
+          round1(
+            row.on_hold_requisitions
+          ),
+        uncovered_open_vacancies:
+          round1(
+            row.uncovered_open_vacancies
+          ),
+        active_recruiting_demand:
+          round1(
+            row.active_recruiting_demand
+          ),
+        modeled_fills:
+          round1(row.modeled_fills),
+      }))
+      .sort(
+        (a, b) =>
+          b.active_recruiting_demand -
+          a.active_recruiting_demand
+      );
 
   const currentAuthorized =
     starting.filled +
@@ -648,6 +943,14 @@ export async function runStructuralPositionScenario(
         round1(starting.vacant),
       frozen_positions:
         round1(starting.frozen),
+      open_requisitions:
+        round1(startingRecruiting.open),
+      on_hold_requisitions:
+        round1(startingRecruiting.onHold),
+      uncovered_vacancies:
+        round1(
+          startingRecruiting.uncovered
+        ),
     },
     modeled: {
       authorized_positions:
@@ -685,6 +988,43 @@ export async function runStructuralPositionScenario(
           staffedLaborCostDelta
         ),
     },
+    recruiting_demand: {
+      active_open_requisitions:
+        round1(endingRecruiting.open),
+      on_hold_requisitions:
+        round1(endingRecruiting.onHold),
+      uncovered_open_vacancies:
+        round1(
+          endingRecruiting.uncovered
+        ),
+      active_recruiting_demand:
+        round1(
+          endingRecruiting.open +
+            endingRecruiting.uncovered
+        ),
+      incremental_requisitions_needed:
+        round1(
+          endingRecruiting.uncovered
+        ),
+      requisitions_to_hold:
+        round1(requisitionsToHold),
+      requisitions_to_cancel:
+        round1(requisitionsToCancel),
+      requisitions_to_create_for_modeled_fills:
+        round1(
+          requisitionsToCreateForFills
+        ),
+      requisitions_to_reactivate_for_modeled_fills:
+        round1(
+          requisitionsToReactivateForFills
+        ),
+      requisitions_closed_as_filled:
+        round1(
+          requisitionsClosedAsFilled
+        ),
+      by_business_unit:
+        recruitingByBusinessUnit,
+    },
     action_results: actionResults,
     methodology: [
       "Actions are applied in the order provided, so earlier freezes, closures, additions, or fills change the inventory available to later actions.",
@@ -695,6 +1035,9 @@ export async function runStructuralPositionScenario(
       "Fill actions move remaining vacancies to filled positions and create an annualized staffed labor-cost delta.",
       "Position cost basis uses the stored Baseline December 2027 annual labor cost per planned position for each BU × level × job-profile combination.",
       "Authorized budget delta reflects added or closed authorized positions. It is not the same as cash savings or realized payroll.",
+      "Current vacancy coverage is grounded in the linked requisition record for each vacant position: open requisitions are active recruiting demand and on-hold requisitions are tracked separately.",
+      "New positions enter without a requisition. If they remain open, they create incremental requisition demand; if they are modeled as filled, the model counts the requisition that would need to be created first.",
+      "Freezing a vacancy with an open requisition creates a modeled requisition-to-hold action. Closing a vacancy cancels its linked open/on-hold requisition. Filling a vacancy closes its requisition as filled; on-hold or uncovered vacancies require reactivation or creation first.",
       "The model is read-only and does not change source position, requisition, budget, or employee records.",
     ],
   };
