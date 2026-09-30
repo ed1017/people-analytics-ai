@@ -15,6 +15,8 @@ import {
 } from "recharts";
 
 import type {
+  BusinessUnitScenarioOption,
+  BusinessUnitScenarioResponse,
   PlanningPoint,
   PlanningScenario,
   PositionBusinessUnit,
@@ -182,6 +184,18 @@ export function WorkforcePlanningPage({
     useState<"business-units" | "job-families">(
       "business-units"
     );
+  const [buScenarioOptions, setBuScenarioOptions] =
+    useState<BusinessUnitScenarioOption[]>([]);
+  const [selectedBuScenario, setSelectedBuScenario] =
+    useState("");
+  const [buScenarioAssumptions, setBuScenarioAssumptions] =
+    useState<ScenarioModelAssumptions | null>(null);
+  const [buScenarioResult, setBuScenarioResult] =
+    useState<BusinessUnitScenarioResponse | null>(null);
+  const [buScenarioLoading, setBuScenarioLoading] =
+    useState(false);
+  const [buScenarioError, setBuScenarioError] =
+    useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -214,6 +228,55 @@ export function WorkforcePlanningPage({
     } catch {
       // Ignore invalid or unavailable browser storage.
     }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadBusinessUnitScenarioCatalog() {
+      try {
+        const response = await fetch(
+          "/api/business-unit-scenario",
+          { cache: "no-store" }
+        );
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            payload?.error ??
+              "Failed to load business-unit scenario options."
+          );
+        }
+
+        if (!cancelled) {
+          const options =
+            payload.business_units as
+              BusinessUnitScenarioOption[];
+          setBuScenarioOptions(options);
+          setSelectedBuScenario(
+            options[0]?.org_code ?? ""
+          );
+          setBuScenarioAssumptions(
+            payload.defaults as
+              ScenarioModelAssumptions
+          );
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setBuScenarioError(
+            error instanceof Error
+              ? error.message
+              : "Failed to load business-unit scenario options."
+          );
+        }
+      }
+    }
+
+    loadBusinessUnitScenarioCatalog();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -297,6 +360,65 @@ export function WorkforcePlanningPage({
     setCustomAssumptions(scenarioDefaults);
     setCustomScenario(null);
     setCustomScenarioError(null);
+  }
+
+  async function runBuScenario() {
+    if (
+      !selectedBuScenario ||
+      !buScenarioAssumptions
+    ) {
+      return;
+    }
+
+    try {
+      setBuScenarioLoading(true);
+      setBuScenarioError(null);
+
+      const response = await fetch(
+        "/api/business-unit-scenario",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            business_unit:
+              selectedBuScenario,
+            ...buScenarioAssumptions,
+          }),
+        }
+      );
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload?.error ??
+            "Failed to run business-unit scenario."
+        );
+      }
+
+      setBuScenarioResult(
+        payload as BusinessUnitScenarioResponse
+      );
+    } catch (error) {
+      setBuScenarioError(
+        error instanceof Error
+          ? error.message
+          : "Failed to run business-unit scenario."
+      );
+    } finally {
+      setBuScenarioLoading(false);
+    }
+  }
+
+  function resetBuScenario() {
+    if (!scenarioDefaults) return;
+    setBuScenarioAssumptions(
+      scenarioDefaults
+    );
+    setBuScenarioResult(null);
+    setBuScenarioError(null);
   }
 
   function persistSavedScenarios(
@@ -392,6 +514,13 @@ export function WorkforcePlanningPage({
         : customScenario.segment_breakdown
             .job_families
       : [];
+
+  const selectedBuOption =
+    buScenarioOptions.find(
+      (row) =>
+        row.org_code ===
+        selectedBuScenario
+    ) ?? null;
 
   const visibleSegmentRows =
     [...segmentRows]
@@ -1088,6 +1217,223 @@ export function WorkforcePlanningPage({
                     </p>
                   </div>
                 )}
+              </div>
+            )}
+          </div>
+
+          <div className="mb-6 rounded-lg border p-4">
+            <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="font-semibold">
+                  Business Unit What-if
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  True deterministic rerun of one business unit using its own current workforce and monthly Baseline plan.
+                </p>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={resetBuScenario}
+                  disabled={
+                    !buScenarioAssumptions ||
+                    buScenarioLoading
+                  }
+                  className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Reset
+                </button>
+                <button
+                  type="button"
+                  onClick={runBuScenario}
+                  disabled={
+                    !selectedBuScenario ||
+                    !buScenarioAssumptions ||
+                    buScenarioLoading
+                  }
+                  className="rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {buScenarioLoading
+                    ? "Running…"
+                    : "Run BU Scenario"}
+                </button>
+              </div>
+            </div>
+
+            <div className="mb-4 grid gap-3 lg:grid-cols-[minmax(240px,1fr)_2fr]">
+              <label className="rounded-md border p-3">
+                <span className="text-xs font-medium text-muted-foreground">
+                  Business Unit
+                </span>
+                <select
+                  value={selectedBuScenario}
+                  onChange={(event) => {
+                    setSelectedBuScenario(
+                      event.target.value
+                    );
+                    setBuScenarioResult(null);
+                    setBuScenarioError(null);
+                  }}
+                  className="mt-2 w-full rounded-md border bg-background px-3 py-2 text-sm"
+                >
+                  {buScenarioOptions.map(
+                    (option) => (
+                      <option
+                        key={option.org_code}
+                        value={option.org_code}
+                      >
+                        {option.org_name}
+                      </option>
+                    )
+                  )}
+                </select>
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  {selectedBuOption
+                    ? selectedBuOption.headcount.toLocaleString() +
+                      " current HC · " +
+                      selectedBuOption.fte.toLocaleString() +
+                      " FTE"
+                    : "Loading business units…"}
+                </p>
+              </label>
+
+              {buScenarioAssumptions ? (
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                  {scenarioFields.map(
+                    (field) => (
+                      <label
+                        key={field.key}
+                        className="rounded-md border p-3"
+                      >
+                        <span
+                          className="cursor-help border-b border-dotted text-xs font-medium text-muted-foreground"
+                          title={field.help}
+                        >
+                          {field.label}
+                        </span>
+                        <div className="mt-2 flex items-center gap-2">
+                          <input
+                            type="number"
+                            step={field.step}
+                            value={
+                              buScenarioAssumptions[
+                                field.key
+                              ]
+                            }
+                            onChange={(event) =>
+                              setBuScenarioAssumptions(
+                                (current) =>
+                                  current
+                                    ? {
+                                        ...current,
+                                        [field.key]:
+                                          Number(
+                                            event
+                                              .target
+                                              .value
+                                          ),
+                                      }
+                                    : current
+                              )
+                            }
+                            className="min-w-0 flex-1 rounded-md border bg-background px-2 py-2 text-right text-sm tabular-nums"
+                          />
+                          <span className="text-sm text-muted-foreground">
+                            {field.suffix}
+                          </span>
+                        </div>
+                      </label>
+                    )
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-md border p-4 text-sm text-muted-foreground">
+                  Loading BU scenario assumptions…
+                </div>
+              )}
+            </div>
+
+            <div className="mb-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
+              This is independent from the enterprise scenario above. The selected BU is rerun on its own Baseline curve. Enterprise implied impact holds every other BU at Baseline.
+            </div>
+
+            {buScenarioError && (
+              <div className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                {buScenarioError}
+              </div>
+            )}
+
+            {buScenarioResult && (
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-md border p-3">
+                  <p className="text-xs text-muted-foreground">
+                    BU Ending Headcount
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold">
+                    {buScenarioResult.summary.modeled_end_headcount.toLocaleString()}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {buScenarioResult.summary.headcount_delta_vs_baseline >= 0
+                      ? "+"
+                      : ""}
+                    {buScenarioResult.summary.headcount_delta_vs_baseline.toLocaleString()} vs BU Baseline
+                  </p>
+                </div>
+
+                <div className="rounded-md border p-3">
+                  <p className="text-xs text-muted-foreground">
+                    BU Labor Cost
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold">
+                    {formatCurrencyCompact(
+                      buScenarioResult.summary
+                        .modeled_end_labor_cost_usd
+                    )}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {buScenarioResult.summary.labor_cost_delta_vs_baseline_usd >= 0
+                      ? "+"
+                      : ""}
+                    {formatCurrencyCompact(
+                      buScenarioResult.summary
+                        .labor_cost_delta_vs_baseline_usd
+                    )} vs BU Baseline
+                  </p>
+                </div>
+
+                <div className="rounded-md border p-3">
+                  <p className="text-xs text-muted-foreground">
+                    Enterprise Implied HC
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold">
+                    {buScenarioResult.enterprise_impact.implied_end_headcount.toLocaleString()}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Only {buScenarioResult.scope.org_name} changed
+                  </p>
+                </div>
+
+                <div className="rounded-md border p-3">
+                  <p className="text-xs text-muted-foreground">
+                    Enterprise Implied Cost
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold">
+                    {formatCurrencyCompact(
+                      buScenarioResult.enterprise_impact
+                        .implied_end_labor_cost_usd
+                    )}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {buScenarioResult.enterprise_impact.labor_cost_delta_vs_baseline_usd >= 0
+                      ? "+"
+                      : ""}
+                    {formatCurrencyCompact(
+                      buScenarioResult.enterprise_impact
+                        .labor_cost_delta_vs_baseline_usd
+                    )} vs enterprise Baseline
+                  </p>
+                </div>
               </div>
             )}
           </div>
