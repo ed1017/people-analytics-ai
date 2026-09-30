@@ -3,6 +3,9 @@ import {
   getInternalTalentReadiness,
 } from "./internal-talent-readiness";
 import {
+  getRoleBuyFeasibility,
+} from "./role-buy-feasibility";
+import {
   runStructuralPositionScenario,
 } from "./structural-position-scenario";
 import {
@@ -501,6 +504,33 @@ export const peopleAnalyticsTools: any[] = [
         },
       },
       required: ["job_profile"],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
+    name: "get_role_buy_feasibility",
+    description:
+      "Get descriptive whole-role external recruiting evidence for one governed job profile. Returns current open ATS pipeline, historical external fills, trailing-12-month external fill volume, historical median time-to-fill, weighted offer acceptance, applicants per filled requisition, and requested Buy scale versus recent hiring volume. This is not a hiring forecast or labor-market availability model.",
+    parameters: {
+      type: "object",
+      properties: {
+        job_profile: {
+          type: "string",
+          description:
+            "Exact governed job-profile code or name.",
+        },
+        requested_buy: {
+          type: "number",
+          description:
+            "User-requested external hire units for scale comparison. Use 0 when no numeric Buy target was supplied.",
+        },
+      },
+      required: [
+        "job_profile",
+        "requested_buy",
+      ],
       additionalProperties: false,
     },
     strict: true,
@@ -1462,6 +1492,11 @@ export async function runPeopleAnalyticsTool(
     case "get_internal_talent_readiness":
       return getInternalTalentReadiness(
         String(args.job_profile ?? "")
+      );
+    case "get_role_buy_feasibility":
+      return getRoleBuyFeasibility(
+        String(args.job_profile ?? ""),
+        Number(args.requested_buy ?? 0)
       );
     case "run_role_workforce_response_plan":
       return runRoleWorkforceResponsePlan(
