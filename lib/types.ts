@@ -649,6 +649,29 @@ export type WorkforceResponseConstraintResponse = {
   methodology: string[];
 };
 
+export type ConstraintAwareWorkforceScheduleResponse = {
+  as_of: string;
+  scheduling_start_month: string;
+  scheduling_end_month: string;
+  target_allocation: WorkforceResponsePlanAllocation;
+  generated_schedule: Array<{
+    org_code: string;
+    org_name: string;
+    job_profile_code: string;
+    job_profile_name: string;
+    response_type: "build" | "move" | "buy";
+    amount: number;
+    effective_month: string;
+  }>;
+  scheduled_allocation: WorkforceResponsePlanAllocation;
+  unscheduled_allocation: WorkforceResponsePlanAllocation;
+  fully_scheduled: boolean;
+  hard_constraint_feasible: boolean | null;
+  constraint_result: WorkforceResponseConstraintResponse | null;
+  blockers: string[];
+  methodology: string[];
+};
+
 export type WorkforceResponsePortfolioResponse = {
   as_of: string;
   scenario_positive_role_demand: number;

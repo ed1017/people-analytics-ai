@@ -22,6 +22,10 @@ import {
   type WorkforceResponseConstraintRequest,
 } from "./workforce-response-constraints";
 import {
+  runConstraintAwareWorkforceScheduler,
+  type ConstraintAwareWorkforceScheduleRequest,
+} from "./constraint-aware-workforce-scheduler";
+import {
   runStructuralPositionScenario,
 } from "./structural-position-scenario";
 import {
@@ -1152,6 +1156,152 @@ export const peopleAnalyticsTools: any[] = [
   },
   {
     type: "function",
+    name: "run_constraint_aware_workforce_scheduler",
+    description:
+      "Generate an earliest deterministic monthly schedule for already-approved BU Build / Move / Buy allocations under explicit user-supplied workforce constraints. The scheduler keeps the response mix fixed, applies monthly path and combined monthly caps, preserves fractional BU allocations, and verifies the generated schedule with the governed hard-constraint checker. It reports infeasibility instead of changing allocations. It is not a workforce-strategy optimizer.",
+    parameters: {
+      type: "object",
+      properties: {
+        actions: {
+          type: "array",
+          minItems: 1,
+          maxItems: 20,
+          items: {
+            type: "object",
+            properties: {
+              action_type: {
+                type: "string",
+                enum: [
+                  "add_positions",
+                  "close_vacant_positions",
+                  "freeze_vacancies",
+                  "fill_vacancies",
+                ],
+              },
+              business_unit: { type: ["string", "null"] },
+              level: { type: ["string", "null"] },
+              job_profile: { type: ["string", "null"] },
+              amount: { type: ["number", "null"] },
+              fill_pct: { type: ["number", "null"] },
+            },
+            required: [
+              "action_type",
+              "business_unit",
+              "level",
+              "job_profile",
+              "amount",
+              "fill_pct",
+            ],
+            additionalProperties: false,
+          },
+        },
+        allocations: {
+          type: "array",
+          minItems: 1,
+          maxItems: 40,
+          items: {
+            type: "object",
+            properties: {
+              business_unit: { type: "string" },
+              job_profile: { type: "string" },
+              allocation: {
+                type: "object",
+                properties: {
+                  build: { type: "number" },
+                  move: { type: "number" },
+                  buy: { type: "number" },
+                  borrow: { type: "number" },
+                  automate: { type: "number" },
+                },
+                required: [
+                  "build",
+                  "move",
+                  "buy",
+                  "borrow",
+                  "automate",
+                ],
+                additionalProperties: false,
+              },
+            },
+            required: [
+              "business_unit",
+              "job_profile",
+              "allocation",
+            ],
+            additionalProperties: false,
+          },
+        },
+        role_plans: {
+          type: ["array", "null"],
+          maxItems: 20,
+          items: {
+            type: "object",
+            properties: {
+              job_profile: { type: "string" },
+              allocation: {
+                type: "object",
+                properties: {
+                  build: { type: "number" },
+                  move: { type: "number" },
+                  buy: { type: "number" },
+                  borrow: { type: "number" },
+                  automate: { type: "number" },
+                },
+                required: [
+                  "build",
+                  "move",
+                  "buy",
+                  "borrow",
+                  "automate",
+                ],
+                additionalProperties: false,
+              },
+            },
+            required: ["job_profile", "allocation"],
+            additionalProperties: false,
+          },
+        },
+        constraints: {
+          type: "object",
+          properties: {
+            max_total_build: { type: ["number", "null"] },
+            max_total_move: { type: ["number", "null"] },
+            max_total_buy: { type: ["number", "null"] },
+            max_monthly_build: { type: ["number", "null"] },
+            max_monthly_move: { type: ["number", "null"] },
+            max_monthly_buy: { type: ["number", "null"] },
+            max_monthly_total: { type: ["number", "null"] },
+            deadline_month: { type: ["string", "null"] },
+            required_coverage_pct_by_deadline: { type: ["number", "null"] },
+            require_all_approved_capacity_scheduled: { type: "boolean" },
+          },
+          required: [
+            "max_total_build",
+            "max_total_move",
+            "max_total_buy",
+            "max_monthly_build",
+            "max_monthly_move",
+            "max_monthly_buy",
+            "max_monthly_total",
+            "deadline_month",
+            "required_coverage_pct_by_deadline",
+            "require_all_approved_capacity_scheduled",
+          ],
+          additionalProperties: false,
+        },
+      },
+      required: [
+        "actions",
+        "allocations",
+        "role_plans",
+        "constraints",
+      ],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
     name: "get_talent_acquisition",
     description:
       "Get governed Talent Acquisition analytics including funnel conversion, requisition aging, time to fill, source effectiveness, recruiter workload, and business-unit hiring demand.",
@@ -2058,6 +2208,10 @@ export async function runPeopleAnalyticsTool(
     case "run_workforce_response_constraints":
       return runWorkforceResponseConstraintCheck(
         args as WorkforceResponseConstraintRequest
+      );
+    case "run_constraint_aware_workforce_scheduler":
+      return runConstraintAwareWorkforceScheduler(
+        args as ConstraintAwareWorkforceScheduleRequest
       );
     case "get_talent_acquisition":
       return getTalentAcquisition();
