@@ -1,5 +1,8 @@
 import { supabaseServer } from "./supabase-server";
 import {
+  getInternalTalentReadiness,
+} from "./internal-talent-readiness";
+import {
   runStructuralPositionScenario,
 } from "./structural-position-scenario";
 import {
@@ -479,6 +482,25 @@ export const peopleAnalyticsTools: any[] = [
         "skill_code",
         "allocation",
       ],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
+    name: "get_internal_talent_readiness",
+    description:
+      "Evaluate aggregate internal talent readiness for one governed job profile. Uses active employees who expressed preference for the target profile, excludes employees already in that role, and tests every required skill against required proficiency. Returns role-ready, near-ready, longer-term counts and common near-ready skill gaps. Does not expose or rank individual employees.",
+    parameters: {
+      type: "object",
+      properties: {
+        job_profile: {
+          type: "string",
+          description:
+            "Exact governed job-profile code or name, such as AI-ENG or AI Engineer.",
+        },
+      },
+      required: ["job_profile"],
       additionalProperties: false,
     },
     strict: true,
@@ -1436,6 +1458,10 @@ export async function runPeopleAnalyticsTool(
     case "run_workforce_response_plan":
       return runWorkforceResponsePlan(
         args as WorkforceResponsePlanRequest
+      );
+    case "get_internal_talent_readiness":
+      return getInternalTalentReadiness(
+        String(args.job_profile ?? "")
       );
     case "run_role_workforce_response_plan":
       return runRoleWorkforceResponsePlan(
