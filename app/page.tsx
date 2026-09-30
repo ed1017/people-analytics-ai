@@ -3,6 +3,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type MouseEvent as ReactMouseEvent,
 } from "react";
@@ -146,6 +147,7 @@ export default function Home() {
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [dashboardError, setDashboardError] =
     useState<string | null>(null);
+  const dashboardRequestIdRef = useRef(0);
 
   const [chatMessages, setChatMessages] =
     useState<ChatMessage[]>([]);
@@ -155,6 +157,9 @@ export default function Home() {
     useState<string | null>(null);
 
   useEffect(() => {
+    const requestId = ++dashboardRequestIdRef.current;
+    const controller = new AbortController();
+
     async function loadDashboard() {
       try {
         setDashboardLoading(true);
@@ -181,6 +186,7 @@ export default function Home() {
 
         const response = await fetch(url, {
           cache: "no-store",
+          signal: controller.signal,
         });
 
         const payload = await response.json();
@@ -191,6 +197,10 @@ export default function Home() {
           );
         }
 
+        if (requestId !== dashboardRequestIdRef.current) {
+          return;
+        }
+
         const data = payload as DashboardResponse;
 
         setOverviewData(data.overview);
@@ -199,6 +209,13 @@ export default function Home() {
           data.filter_options ?? EMPTY_FILTER_OPTIONS
         );
       } catch (error) {
+        if (
+          controller.signal.aborted ||
+          requestId !== dashboardRequestIdRef.current
+        ) {
+          return;
+        }
+
         console.error(error);
         setDashboardError(
           error instanceof Error
@@ -206,11 +223,20 @@ export default function Home() {
             : "Failed to load dashboard data."
         );
       } finally {
-        setDashboardLoading(false);
+        if (
+          !controller.signal.aborted &&
+          requestId === dashboardRequestIdRef.current
+        ) {
+          setDashboardLoading(false);
+        }
       }
     }
 
     loadDashboard();
+
+    return () => {
+      controller.abort();
+    };
   }, [selectedCountry, selectedOrg, selectedLevel]);
 
   useEffect(() => {
