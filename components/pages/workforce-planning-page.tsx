@@ -4049,6 +4049,43 @@ export function WorkforcePlanningPage({
                                   </div>
                                 </div>
 
+                                <div className="mt-4 rounded-md border bg-muted/20 p-3">
+                                  <div className="mb-2">
+                                    <p className="text-xs font-medium">
+                                      Development pathway coverage
+                                    </p>
+                                    <p className="text-[11px] text-muted-foreground">
+                                      Checks whether each near-ready candidate's current required-skill gaps have active mapped learning courses. Course availability does not guarantee proficiency gain.
+                                    </p>
+                                  </div>
+                                  <div className="grid gap-2 sm:grid-cols-3">
+                                    <div className="rounded-md border bg-background p-2">
+                                      <p className="text-[10px] text-muted-foreground">
+                                        Fully path-covered
+                                      </p>
+                                      <p className="mt-1 font-semibold tabular-nums">
+                                        {roleResponsePlanResult.internal_talent_readiness.development_pathway_coverage.fully_pathway_covered_candidates.toLocaleString()}
+                                      </p>
+                                    </div>
+                                    <div className="rounded-md border bg-background p-2">
+                                      <p className="text-[10px] text-muted-foreground">
+                                        Partial pathway
+                                      </p>
+                                      <p className="mt-1 font-semibold tabular-nums">
+                                        {roleResponsePlanResult.internal_talent_readiness.development_pathway_coverage.partially_pathway_covered_candidates.toLocaleString()}
+                                      </p>
+                                    </div>
+                                    <div className="rounded-md border bg-background p-2">
+                                      <p className="text-[10px] text-muted-foreground">
+                                        No active pathway
+                                      </p>
+                                      <p className="mt-1 font-semibold tabular-nums">
+                                        {roleResponsePlanResult.internal_talent_readiness.development_pathway_coverage.no_active_pathway_candidates.toLocaleString()}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+
                                 {roleResponsePlanResult.internal_talent_readiness.top_near_ready_skill_gaps.length > 0 && (
                                   <div className="mt-4 border-t pt-4">
                                     <p className="text-xs font-medium">
@@ -4068,6 +4105,15 @@ export function WorkforcePlanningPage({
                                               {" · "}
                                               {gap.candidates_below_requirement} candidate(s) · avg shortfall {gap.avg_proficiency_shortfall.toFixed(1)}
                                             </span>
+                                            <p className="mt-1 text-[10px] text-muted-foreground">
+                                              {gap.active_course_count > 0
+                                                ? `${gap.active_course_count} active course(s)${
+                                                    gap.shortest_active_course_hours !== null
+                                                      ? ` · shortest ${gap.shortest_active_course_hours.toFixed(1)}h`
+                                                      : ""
+                                                  }`
+                                                : "No active mapped learning course"}
+                                            </p>
                                           </div>
                                         )
                                       )}

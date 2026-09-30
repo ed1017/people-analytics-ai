@@ -490,7 +490,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "get_internal_talent_readiness",
     description:
-      "Evaluate aggregate internal talent readiness for one governed job profile. Uses active employees who expressed preference for the target profile, excludes employees already in that role, and tests every required skill against required proficiency. Returns role-ready, near-ready, longer-term counts and common near-ready skill gaps. Does not expose or rank individual employees.",
+      "Evaluate aggregate internal talent readiness for one governed job profile. Uses active employees who expressed preference for the target profile, excludes employees already in that role, and tests every required skill against required proficiency. Returns role-ready, near-ready, longer-term counts, common near-ready skill gaps, and whether those current gaps are covered by active mapped learning courses. Course availability is pathway evidence, not a proficiency-gain forecast. Does not expose or rank individual employees.",
     parameters: {
       type: "object",
       properties: {

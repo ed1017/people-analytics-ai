@@ -21,6 +21,16 @@ function round1(value: number) {
   return Math.round(value * 10) / 10;
 }
 
+function emptyDevelopmentPathwayCoverage() {
+  return {
+    near_ready_candidates: 0,
+    fully_pathway_covered_candidates: 0,
+    partially_pathway_covered_candidates: 0,
+    no_active_pathway_candidates: 0,
+    fully_pathway_covered_pct: 0,
+  };
+}
+
 function emptyCandidatePool(
   activeWithPreference: number,
   alreadyInTargetRole: number
@@ -200,6 +210,8 @@ export async function getInternalTalentReadiness(
       candidate_pool:
         emptyCandidatePool(0, 0),
       top_near_ready_skill_gaps: [],
+      development_pathway_coverage:
+        emptyDevelopmentPathwayCoverage(),
       readiness_rules: {
         required_skills_gate_readiness:
           true,
@@ -256,6 +268,8 @@ export async function getInternalTalentReadiness(
       candidate_pool:
         emptyCandidatePool(0, 0),
       top_near_ready_skill_gaps: [],
+      development_pathway_coverage:
+        emptyDevelopmentPathwayCoverage(),
       readiness_rules: {
         required_skills_gate_readiness:
           true,
@@ -334,6 +348,8 @@ export async function getInternalTalentReadiness(
           alreadyInTargetRole.size
         ),
       top_near_ready_skill_gaps: [],
+      development_pathway_coverage:
+        emptyDevelopmentPathwayCoverage(),
       readiness_rules: {
         required_skills_gate_readiness:
           true,
@@ -355,8 +371,11 @@ export async function getInternalTalentReadiness(
     };
   }
 
-  const employeeSkillResult =
-    await supabaseServer
+  const [
+    employeeSkillResult,
+    learningCourseResult,
+  ] = await Promise.all([
+    supabaseServer
       .from("employee_skill_latest")
       .select(
         "employee_id, skill_id, proficiency"
@@ -370,11 +389,63 @@ export async function getInternalTalentReadiness(
         requirements.map(
           (row) => row.skill_id
         )
-      );
+      ),
+    supabaseServer
+      .from("learning_courses")
+      .select(
+        "skill_id, duration_hours"
+      )
+      .eq("active", true)
+      .in(
+        "skill_id",
+        requirements.map(
+          (row) => row.skill_id
+        )
+      ),
+  ]);
   if (employeeSkillResult.error) {
     throw new Error(
       "Internal talent employee skills: " +
         employeeSkillResult.error.message
+    );
+  }
+  if (learningCourseResult.error) {
+    throw new Error(
+      "Internal talent learning pathways: " +
+        learningCourseResult.error.message
+    );
+  }
+
+  const activeCourseStatsBySkill =
+    new Map<
+      string,
+      {
+        active_course_count: number;
+        shortest_active_course_hours: number | null;
+      }
+    >();
+
+  for (const row of learningCourseResult.data ?? []) {
+    const existing =
+      activeCourseStatsBySkill.get(
+        row.skill_id
+      ) ?? {
+        active_course_count: 0,
+        shortest_active_course_hours: null,
+      };
+    const duration = toNumber(
+      row.duration_hours
+    );
+    existing.active_course_count += 1;
+    existing.shortest_active_course_hours =
+      duration > 0 &&
+      (existing.shortest_active_course_hours === null ||
+        duration < existing.shortest_active_course_hours)
+        ? duration
+        : existing.shortest_active_course_hours;
+    activeCourseStatsBySkill.set(
+      row.skill_id,
+      existing
     );
   }
 
@@ -406,11 +477,15 @@ export async function getInternalTalentReadiness(
   let roleReady = 0;
   let nearReady = 0;
   let longerTerm = 0;
+  let fullyPathwayCovered = 0;
+  let partiallyPathwayCovered = 0;
+  let noActivePathway = 0;
 
   const nearReadyGapMap =
     new Map<
       string,
       {
+        skill_id: string;
         skill_code: string;
         skill_name: string;
         required_proficiency: number;
@@ -472,11 +547,30 @@ export async function getInternalTalentReadiness(
 
     nearReady += 1;
 
+    const gapsWithActivePathway =
+      gaps.filter((gap) =>
+        (activeCourseStatsBySkill.get(
+          gap.skill_id
+        )?.active_course_count ?? 0) > 0
+      ).length;
+
+    if (
+      gapsWithActivePathway === gaps.length
+    ) {
+      fullyPathwayCovered += 1;
+    } else if (gapsWithActivePathway > 0) {
+      partiallyPathwayCovered += 1;
+    } else {
+      noActivePathway += 1;
+    }
+
     for (const gap of gaps) {
       const existing =
         nearReadyGapMap.get(
           gap.skill_code
         ) ?? {
+          skill_id:
+            gap.skill_id,
           skill_code:
             gap.skill_code,
           skill_name:
@@ -506,22 +600,36 @@ export async function getInternalTalentReadiness(
     Array.from(
       nearReadyGapMap.values()
     )
-      .map((row) => ({
-        skill_code: row.skill_code,
-        skill_name: row.skill_name,
-        required_proficiency:
-          row.required_proficiency,
-        candidates_below_requirement:
-          row.candidates_below_requirement,
-        avg_proficiency_shortfall:
-          row.candidates_below_requirement >
-          0
-            ? round1(
-                row.total_shortfall /
-                  row.candidates_below_requirement
-              )
-            : 0,
-      }))
+      .map((row) => {
+        const courseStats =
+          activeCourseStatsBySkill.get(
+            row.skill_id
+          ) ?? {
+            active_course_count: 0,
+            shortest_active_course_hours: null,
+          };
+
+        return {
+          skill_code: row.skill_code,
+          skill_name: row.skill_name,
+          required_proficiency:
+            row.required_proficiency,
+          candidates_below_requirement:
+            row.candidates_below_requirement,
+          avg_proficiency_shortfall:
+            row.candidates_below_requirement >
+            0
+              ? round1(
+                  row.total_shortfall /
+                    row.candidates_below_requirement
+                )
+              : 0,
+          active_course_count:
+            courseStats.active_course_count,
+          shortest_active_course_hours:
+            courseStats.shortest_active_course_hours,
+        };
+      })
       .sort(
         (a, b) =>
           b.candidates_below_requirement -
@@ -574,6 +682,24 @@ export async function getInternalTalentReadiness(
     },
     top_near_ready_skill_gaps:
       topNearReadySkillGaps,
+    development_pathway_coverage: {
+      near_ready_candidates:
+        nearReady,
+      fully_pathway_covered_candidates:
+        fullyPathwayCovered,
+      partially_pathway_covered_candidates:
+        partiallyPathwayCovered,
+      no_active_pathway_candidates:
+        noActivePathway,
+      fully_pathway_covered_pct:
+        nearReady > 0
+          ? round1(
+              (fullyPathwayCovered /
+                nearReady) *
+                100
+            )
+          : 0,
+    },
     readiness_rules: {
       required_skills_gate_readiness:
         true,
@@ -590,6 +716,8 @@ export async function getInternalTalentReadiness(
       "Role-ready means every required skill meets or exceeds the job profile's required proficiency.",
       "Near-ready means no more than two required skills are below proficiency and the total proficiency shortfall across required skills is no more than two points.",
       "Preferred skills are descriptive and do not block role-ready or near-ready classification.",
+      "Development pathway coverage checks whether every current near-ready skill gap has at least one active mapped learning course. Course availability is evidence of a development path, not proof that completion will raise proficiency or make someone role-ready.",
+      "Course duration is catalog duration only and is not used as a time-to-readiness forecast.",
       "Missing employee-skill records are treated as no demonstrated proficiency for that required skill, not as proof the employee lacks the skill.",
       "Readiness is a planning signal based on the loaded synthetic skill data; it is not a promotion, hiring, or performance decision.",
       "Results are aggregate only and do not expose or rank individual employees.",

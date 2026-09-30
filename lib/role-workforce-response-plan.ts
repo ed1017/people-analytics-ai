@@ -270,15 +270,6 @@ export async function runRoleWorkforceResponsePlan(
   const warnings: string[] = [];
 
   if (
-    allocation.build > 0 &&
-    skillsWithBuild < skillBundle.length
-  ) {
-    warnings.push(
-      "Build is planned for the role, but not every required skill has an active learning pathway in the loaded data."
-    );
-  }
-
-  if (
     allocation.move >
     internalTalentReadiness.candidate_pool
       .role_ready
@@ -295,6 +286,15 @@ export async function runRoleWorkforceResponsePlan(
   ) {
     warnings.push(
       "Build target exceeds the current near-ready interested pool; covering the excess would require longer-term development or a broader candidate cohort."
+    );
+  } else if (
+    allocation.build >
+    internalTalentReadiness
+      .development_pathway_coverage
+      .fully_pathway_covered_candidates
+  ) {
+    warnings.push(
+      "Build target exceeds the near-ready candidates whose current required-skill gaps are all covered by active mapped learning courses; some planned Build units need a new or custom development pathway."
     );
   }
 
@@ -348,6 +348,7 @@ export async function runRoleWorkforceResponsePlan(
       "Scenario-created role demand is the positive authorized-position delta for the selected job profile after all structural position actions are applied in order.",
       "The required skill bundle comes from governed job-profile skill requirements, including required proficiency and importance.",
       "Move evidence uses aggregate whole-role readiness among active employees who prefer the target profile and are not already in it; required skills must meet the governed proficiency thresholds.",
+      "Build pathway coverage checks whether each near-ready candidate's current required-skill gaps all have an active mapped learning course. Course availability does not guarantee proficiency gain or eventual role readiness.",
       "Skill-level Build and Buy evidence is shown across the required bundle, but skill-level counts are not added together as unique people.",
       "Role coverage is conditional on executed Build/Move/Buy capacity meeting the full job-profile requirements; readiness remains a planning signal rather than an employment decision.",
       "Borrow is unavailable until governed role-level contingent-capacity evidence exists. Automate is unavailable until governed role- or task-level automation evidence exists.",

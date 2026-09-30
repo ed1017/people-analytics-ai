@@ -410,7 +410,16 @@ export type InternalTalentReadinessResponse = {
     required_proficiency: number;
     candidates_below_requirement: number;
     avg_proficiency_shortfall: number;
+    active_course_count: number;
+    shortest_active_course_hours: number | null;
   }>;
+  development_pathway_coverage: {
+    near_ready_candidates: number;
+    fully_pathway_covered_candidates: number;
+    partially_pathway_covered_candidates: number;
+    no_active_pathway_candidates: number;
+    fully_pathway_covered_pct: number;
+  };
   readiness_rules: {
     required_skills_gate_readiness: true;
     preferred_skills_gate_readiness: false;
