@@ -132,6 +132,38 @@ export type PositionModelingResponse = {
   scenarios: PositionScenario[];
 };
 
+export type PositionActionAssumptions = {
+  add_positions: number;
+  close_vacant_positions: number;
+  freeze_vacancies: number;
+  vacancy_fill_pct: number;
+};
+
+export type PositionActionScenarioResponse = {
+  as_of: string;
+  defaults: PositionActionAssumptions;
+  assumptions: PositionActionAssumptions;
+  current: {
+    authorized_positions: number;
+    filled_positions: number;
+    open_vacancies: number;
+    frozen_positions: number;
+    closed_positions: number;
+  };
+  modeled: {
+    authorized_positions: number;
+    filled_positions: number;
+    open_vacancies: number;
+    frozen_positions: number;
+    projected_fills: number;
+    net_authorized_position_change: number;
+    net_filled_position_change: number;
+    vacancy_rate_pct: number;
+    occupancy_rate_pct: number;
+  };
+  methodology: string[];
+};
+
 export type FinanceBusinessUnit = {
   org_code: string;
   org_name: string;

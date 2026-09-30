@@ -19,6 +19,8 @@ import type {
   BusinessUnitScenarioResponse,
   PlanningPoint,
   PlanningScenario,
+  PositionActionAssumptions,
+  PositionActionScenarioResponse,
   PositionBusinessUnit,
   PositionLevel,
   PositionModelingResponse,
@@ -196,6 +198,35 @@ export function WorkforcePlanningPage({
     useState(false);
   const [buScenarioError, setBuScenarioError] =
     useState<string | null>(null);
+  const [
+    positionActionDefaults,
+    setPositionActionDefaults,
+  ] =
+    useState<PositionActionAssumptions | null>(
+      null
+    );
+  const [
+    positionActionAssumptions,
+    setPositionActionAssumptions,
+  ] =
+    useState<PositionActionAssumptions | null>(
+      null
+    );
+  const [
+    positionActionResult,
+    setPositionActionResult,
+  ] =
+    useState<PositionActionScenarioResponse | null>(
+      null
+    );
+  const [
+    positionActionLoading,
+    setPositionActionLoading,
+  ] = useState(false);
+  const [
+    positionActionError,
+    setPositionActionError,
+  ] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -228,6 +259,52 @@ export function WorkforcePlanningPage({
     } catch {
       // Ignore invalid or unavailable browser storage.
     }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadPositionActionDefaults() {
+      try {
+        const response = await fetch(
+          "/api/position-actions",
+          { cache: "no-store" }
+        );
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            payload?.error ??
+              "Failed to load position action model."
+          );
+        }
+
+        if (!cancelled) {
+          setPositionActionDefaults(
+            payload.defaults as
+              PositionActionAssumptions
+          );
+          setPositionActionAssumptions(
+            payload.defaults as
+              PositionActionAssumptions
+          );
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setPositionActionError(
+            error instanceof Error
+              ? error.message
+              : "Failed to load position action model."
+          );
+        }
+      }
+    }
+
+    loadPositionActionDefaults();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -419,6 +496,60 @@ export function WorkforcePlanningPage({
     );
     setBuScenarioResult(null);
     setBuScenarioError(null);
+  }
+
+  async function runPositionActions() {
+    if (!positionActionAssumptions) {
+      return;
+    }
+
+    try {
+      setPositionActionLoading(true);
+      setPositionActionError(null);
+
+      const response = await fetch(
+        "/api/position-actions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify(
+            positionActionAssumptions
+          ),
+        }
+      );
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload?.error ??
+            "Failed to run position action scenario."
+        );
+      }
+
+      setPositionActionResult(
+        payload as PositionActionScenarioResponse
+      );
+    } catch (error) {
+      setPositionActionError(
+        error instanceof Error
+          ? error.message
+          : "Failed to run position action scenario."
+      );
+    } finally {
+      setPositionActionLoading(false);
+    }
+  }
+
+  function resetPositionActions() {
+    if (!positionActionDefaults) return;
+    setPositionActionAssumptions(
+      positionActionDefaults
+    );
+    setPositionActionResult(null);
+    setPositionActionError(null);
   }
 
   function persistSavedScenarios(
@@ -1951,6 +2082,274 @@ export function WorkforcePlanningPage({
                       ? "Loading positions…"
                       : selectedPlanningScenario}
                   </span>
+                </div>
+
+                <div className="mb-5 rounded-md border p-4">
+                  <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <h4 className="font-semibold">
+                        Position Action Simulator
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        Model changes to the current authorized position inventory without changing source records.
+                      </p>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={resetPositionActions}
+                        disabled={
+                          !positionActionDefaults ||
+                          positionActionLoading
+                        }
+                        className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Reset
+                      </button>
+                      <button
+                        type="button"
+                        onClick={runPositionActions}
+                        disabled={
+                          !positionActionAssumptions ||
+                          positionActionLoading
+                        }
+                        className="rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {positionActionLoading
+                          ? "Running…"
+                          : "Run Position Scenario"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {positionActionAssumptions ? (
+                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                      <label className="rounded-md border p-3">
+                        <span
+                          className="cursor-help border-b border-dotted text-xs font-medium text-muted-foreground"
+                          title="New authorized roles added to the inventory. They enter the model as open vacancies."
+                        >
+                          Add Positions
+                        </span>
+                        <input
+                          type="number"
+                          min={0}
+                          step={1}
+                          value={
+                            positionActionAssumptions.add_positions
+                          }
+                          onChange={(event) =>
+                            setPositionActionAssumptions(
+                              (current) =>
+                                current
+                                  ? {
+                                      ...current,
+                                      add_positions:
+                                        Number(
+                                          event.target
+                                            .value
+                                        ),
+                                    }
+                                  : current
+                            )
+                          }
+                          className="mt-2 w-full rounded-md border bg-background px-3 py-2 text-right text-sm tabular-nums"
+                        />
+                      </label>
+
+                      <label className="rounded-md border p-3">
+                        <span
+                          className="cursor-help border-b border-dotted text-xs font-medium text-muted-foreground"
+                          title="Close currently vacant positions only. Filled positions are not eliminated in this model."
+                        >
+                          Close Vacant Positions
+                        </span>
+                        <input
+                          type="number"
+                          min={0}
+                          step={1}
+                          value={
+                            positionActionAssumptions.close_vacant_positions
+                          }
+                          onChange={(event) =>
+                            setPositionActionAssumptions(
+                              (current) =>
+                                current
+                                  ? {
+                                      ...current,
+                                      close_vacant_positions:
+                                        Number(
+                                          event.target
+                                            .value
+                                        ),
+                                    }
+                                  : current
+                            )
+                          }
+                          className="mt-2 w-full rounded-md border bg-background px-3 py-2 text-right text-sm tabular-nums"
+                        />
+                      </label>
+
+                      <label className="rounded-md border p-3">
+                        <span
+                          className="cursor-help border-b border-dotted text-xs font-medium text-muted-foreground"
+                          title="Freeze open vacancies. Frozen roles remain authorized but are removed from the fillable vacancy pool."
+                        >
+                          Freeze Vacancies
+                        </span>
+                        <input
+                          type="number"
+                          min={0}
+                          step={1}
+                          value={
+                            positionActionAssumptions.freeze_vacancies
+                          }
+                          onChange={(event) =>
+                            setPositionActionAssumptions(
+                              (current) =>
+                                current
+                                  ? {
+                                      ...current,
+                                      freeze_vacancies:
+                                        Number(
+                                          event.target
+                                            .value
+                                        ),
+                                    }
+                                  : current
+                            )
+                          }
+                          className="mt-2 w-full rounded-md border bg-background px-3 py-2 text-right text-sm tabular-nums"
+                        />
+                      </label>
+
+                      <label className="rounded-md border p-3">
+                        <span
+                          className="cursor-help border-b border-dotted text-xs font-medium text-muted-foreground"
+                          title="Share of remaining fillable vacancies expected to be staffed in this position scenario."
+                        >
+                          Fill Open Vacancies
+                        </span>
+                        <div className="mt-2 flex items-center gap-2">
+                          <input
+                            type="number"
+                            min={0}
+                            max={100}
+                            step={5}
+                            value={
+                              positionActionAssumptions.vacancy_fill_pct
+                            }
+                            onChange={(event) =>
+                              setPositionActionAssumptions(
+                                (current) =>
+                                  current
+                                    ? {
+                                        ...current,
+                                        vacancy_fill_pct:
+                                          Number(
+                                            event.target
+                                              .value
+                                          ),
+                                      }
+                                    : current
+                              )
+                            }
+                            className="min-w-0 flex-1 rounded-md border bg-background px-3 py-2 text-right text-sm tabular-nums"
+                          />
+                          <span className="text-sm text-muted-foreground">
+                            %
+                          </span>
+                        </div>
+                      </label>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Loading position action model…
+                    </p>
+                  )}
+
+                  <div className="mt-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
+                    Current inventory:{" "}
+                    {positionModelingData
+                      ? positionModelingData.current.current_positions.toLocaleString()
+                      : "—"}{" "}
+                    active authorized positions, including{" "}
+                    {positionModelingData
+                      ? positionModelingData.current.vacant_positions.toLocaleString()
+                      : "—"}{" "}
+                    open vacancies. Closing positions in this first model is restricted to vacant roles only.
+                  </div>
+
+                  {positionActionError && (
+                    <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                      {positionActionError}
+                    </div>
+                  )}
+
+                  {positionActionResult && (
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                      <div className="rounded-md border p-3">
+                        <p className="text-xs text-muted-foreground">
+                          Authorized Positions
+                        </p>
+                        <p className="mt-1 text-2xl font-semibold">
+                          {positionActionResult.modeled.authorized_positions.toLocaleString()}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {positionActionResult.modeled.net_authorized_position_change >=
+                          0
+                            ? "+"
+                            : ""}
+                          {positionActionResult.modeled.net_authorized_position_change.toLocaleString()}{" "}
+                          vs current
+                        </p>
+                      </div>
+
+                      <div className="rounded-md border p-3">
+                        <p className="text-xs text-muted-foreground">
+                          Filled Positions
+                        </p>
+                        <p className="mt-1 text-2xl font-semibold">
+                          {positionActionResult.modeled.filled_positions.toLocaleString()}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {positionActionResult.modeled.projected_fills.toLocaleString()}{" "}
+                          projected fills
+                        </p>
+                      </div>
+
+                      <div className="rounded-md border p-3">
+                        <p className="text-xs text-muted-foreground">
+                          Open Vacancies
+                        </p>
+                        <p className="mt-1 text-2xl font-semibold">
+                          {positionActionResult.modeled.open_vacancies.toLocaleString()}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {positionActionResult.modeled.vacancy_rate_pct.toFixed(
+                            1
+                          )}
+                          % vacancy rate
+                        </p>
+                      </div>
+
+                      <div className="rounded-md border p-3">
+                        <p className="text-xs text-muted-foreground">
+                          Frozen Positions
+                        </p>
+                        <p className="mt-1 text-2xl font-semibold">
+                          {positionActionResult.modeled.frozen_positions.toLocaleString()}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {positionActionResult.modeled.occupancy_rate_pct.toFixed(
+                            1
+                          )}
+                          % staffed occupancy
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {positionModelingError && (
