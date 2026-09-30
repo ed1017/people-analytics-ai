@@ -5,8 +5,10 @@ import {
 
 import { supabaseServer } from "../../../lib/supabase-server";
 import {
+  buildScenarioSegmentBreakdown,
   runScenarioModel,
   type ScenarioEngineBaselinePoint,
+  type ScenarioEngineSegmentBaseline,
 } from "../../../lib/scenario-engine";
 
 import type {
@@ -68,6 +70,8 @@ async function loadScenarioInputs() {
     defaultsResult,
     baselineResult,
     overviewResult,
+    businessUnitResult,
+    jobFamilyResult,
   ] = await Promise.all([
     supabaseServer
       .from("scenario_modeler_defaults")
@@ -88,6 +92,26 @@ async function loadScenarioInputs() {
       .from("dashboard_overview_current")
       .select("snapshot_date, headcount")
       .single(),
+
+    supabaseServer
+      .from("workforce_scenario_by_org")
+      .select(
+        "planning_month, org_code, org_name, planned_headcount, planned_labor_cost_usd"
+      )
+      .eq("scenario_name", "Baseline")
+      .order("planning_month", {
+        ascending: true,
+      }),
+
+    supabaseServer
+      .from("workforce_scenario_by_job_family")
+      .select(
+        "planning_month, family_code, family_name, planned_headcount, planned_labor_cost_usd"
+      )
+      .eq("scenario_name", "Baseline")
+      .order("planning_month", {
+        ascending: true,
+      }),
   ]);
 
   if (defaultsResult.error) {
@@ -108,6 +132,20 @@ async function loadScenarioInputs() {
     throw new Error(
       "Current workforce: " +
         overviewResult.error.message
+    );
+  }
+
+  if (businessUnitResult.error) {
+    throw new Error(
+      "Baseline business-unit plan: " +
+        businessUnitResult.error.message
+    );
+  }
+
+  if (jobFamilyResult.error) {
+    throw new Error(
+      "Baseline job-family plan: " +
+        jobFamilyResult.error.message
     );
   }
 
@@ -154,6 +192,42 @@ async function loadScenarioInputs() {
       })
     );
 
+  const businessUnitBaseline:
+    ScenarioEngineSegmentBaseline[] =
+    (businessUnitResult.data ?? []).map(
+      (row) => ({
+        planning_month:
+          row.planning_month,
+        segment_code: row.org_code,
+        segment_name: row.org_name,
+        planned_headcount: toNumber(
+          row.planned_headcount
+        ),
+        planned_labor_cost_usd:
+          toNumber(
+            row.planned_labor_cost_usd
+          ),
+      })
+    );
+
+  const jobFamilyBaseline:
+    ScenarioEngineSegmentBaseline[] =
+    (jobFamilyResult.data ?? []).map(
+      (row) => ({
+        planning_month:
+          row.planning_month,
+        segment_code: row.family_code,
+        segment_name: row.family_name,
+        planned_headcount: toNumber(
+          row.planned_headcount
+        ),
+        planned_labor_cost_usd:
+          toNumber(
+            row.planned_labor_cost_usd
+          ),
+      })
+    );
+
   return {
     asOf:
       overviewResult.data
@@ -165,6 +239,8 @@ async function loadScenarioInputs() {
     ),
     defaults,
     baselinePoints,
+    businessUnitBaseline,
+    jobFamilyBaseline,
   };
 }
 
@@ -287,6 +363,13 @@ export async function POST(
       defaults: inputs.defaults,
       assumptions,
     });
+
+    result.segment_breakdown =
+      buildScenarioSegmentBreakdown(
+        result,
+        inputs.businessUnitBaseline,
+        inputs.jobFamilyBaseline
+      );
 
     return NextResponse.json(
       result,

@@ -897,6 +897,7 @@ Shared rules:
 - Never invent employee facts, benchmarks, causes, correlations, budgets, forecasts, survey themes, or scenario reruns that are not supplied.
 - For any NEW workforce-planning what-if that changes growth, salary inflation, attrition, fill rate, or productivity-driven hiring demand, you MUST call run_workforce_scenario.
 - The LLM must not independently invent or approximate scenario math. It may only explain or compare values returned by run_workforce_scenario.
+- Segment breakdowns returned by run_workforce_scenario allocate the enterprise scenario delta using the stored Baseline business-unit or job-family mix. Treat them as a decomposition of the enterprise scenario, not independent segment-specific reruns, and do not infer segment-specific causes from them.
 - Pass null for scenario levers the user did not change. If the user says attrition changes by X percentage points, use additional_attrition_pct_points rather than converting it to an absolute rate yourself.
 - Do not claim the workforce model reran unless run_workforce_scenario returned a result in this conversation turn.
 - If the available page context and approved tools cannot answer the question, say what data is missing.

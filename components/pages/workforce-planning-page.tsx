@@ -178,6 +178,10 @@ export function WorkforcePlanningPage({
     useState<SavedScenarioEntry[]>([]);
   const [comparisonScenarioIds, setComparisonScenarioIds] =
     useState<string[]>([]);
+  const [segmentView, setSegmentView] =
+    useState<"business-units" | "job-families">(
+      "business-units"
+    );
 
   useEffect(() => {
     try {
@@ -378,6 +382,33 @@ export function WorkforcePlanningPage({
       .filter(
         (entry): entry is SavedScenarioEntry =>
           Boolean(entry)
+      );
+
+  const segmentRows =
+    customScenario?.segment_breakdown
+      ? segmentView === "business-units"
+        ? customScenario.segment_breakdown
+            .business_units
+        : customScenario.segment_breakdown
+            .job_families
+      : [];
+
+  const visibleSegmentRows =
+    [...segmentRows]
+      .sort(
+        (a, b) =>
+          Math.abs(
+            b.headcount_delta_vs_baseline
+          ) -
+          Math.abs(
+            a.headcount_delta_vs_baseline
+          )
+      )
+      .slice(
+        0,
+        segmentView === "business-units"
+          ? 8
+          : 12
       );
 
   const comparisonRows: Array<{
@@ -918,6 +949,145 @@ export function WorkforcePlanningPage({
                     </ResponsiveContainer>
                   </div>
                 </div>
+
+                {customScenario.segment_breakdown && (
+                  <div className="mt-5 rounded-md border p-4">
+                    <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="font-medium">
+                          Segment Impact
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Dec 2027 enterprise scenario decomposed using stored Baseline segment mix
+                        </p>
+                      </div>
+
+                      <div className="flex rounded-md border p-1">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSegmentView(
+                              "business-units"
+                            )
+                          }
+                          className={`rounded px-3 py-1.5 text-xs transition-colors ${
+                            segmentView ===
+                            "business-units"
+                              ? "bg-muted font-medium"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          Business Units
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSegmentView(
+                              "job-families"
+                            )
+                          }
+                          className={`rounded px-3 py-1.5 text-xs transition-colors ${
+                            segmentView ===
+                            "job-families"
+                              ? "bg-muted font-medium"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          Job Families
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mb-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
+                      {
+                        customScenario
+                          .segment_breakdown
+                          .allocation_method
+                      }
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[720px] text-sm">
+                        <thead>
+                          <tr className="border-b text-left text-xs text-muted-foreground">
+                            <th className="pb-3 pr-4">
+                              {segmentView ===
+                              "business-units"
+                                ? "Business Unit"
+                                : "Job Family"}
+                            </th>
+                            <th className="pb-3 px-3 text-right">
+                              Baseline HC
+                            </th>
+                            <th className="pb-3 px-3 text-right">
+                              Modeled HC
+                            </th>
+                            <th className="pb-3 px-3 text-right">
+                              HC Δ
+                            </th>
+                            <th className="pb-3 pl-3 text-right">
+                              Labor Cost Δ
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {visibleSegmentRows.map(
+                            (row) => (
+                              <tr
+                                key={
+                                  row.segment_code
+                                }
+                                className="border-b last:border-0"
+                              >
+                                <td className="py-3 pr-4 font-medium">
+                                  {
+                                    row.segment_name
+                                  }
+                                </td>
+                                <td className="px-3 py-3 text-right tabular-nums">
+                                  {row.baseline_headcount.toLocaleString()}
+                                </td>
+                                <td className="px-3 py-3 text-right tabular-nums">
+                                  {row.modeled_headcount.toLocaleString()}
+                                </td>
+                                <td className="px-3 py-3 text-right tabular-nums">
+                                  {row.headcount_delta_vs_baseline >
+                                  0
+                                    ? "+"
+                                    : ""}
+                                  {row.headcount_delta_vs_baseline.toLocaleString()}
+                                </td>
+                                <td className="py-3 pl-3 text-right tabular-nums">
+                                  {row.labor_cost_delta_vs_baseline_usd >=
+                                  0
+                                    ? "+"
+                                    : ""}
+                                  {formatCurrencyCompact(
+                                    row.labor_cost_delta_vs_baseline_usd
+                                  )}
+                                </td>
+                              </tr>
+                            )
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <p className="mt-3 text-[11px] text-muted-foreground">
+                      Showing{" "}
+                      {visibleSegmentRows.length}{" "}
+                      {segmentView ===
+                      "business-units"
+                        ? "business units"
+                        : "job families"}{" "}
+                      ranked by absolute headcount impact.
+                      Minor HC reconciliation differences
+                      reflect rounded source segment
+                      headcount; labor-cost allocations
+                      reconcile to the enterprise result.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
