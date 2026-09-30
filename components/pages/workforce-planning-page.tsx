@@ -3983,6 +3983,103 @@ export function WorkforcePlanningPage({
                                 </div>
                               </div>
 
+                              <div className="mt-4 rounded-md border p-4">
+                                <div className="mb-3">
+                                  <p className="font-medium">
+                                    Internal Talent Readiness
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Active employees who prefer this role, excluding employees already in it. Readiness is evaluated across every required skill and proficiency threshold.
+                                  </p>
+                                </div>
+
+                                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                  <div className="rounded-md border p-3">
+                                    <p
+                                      className="cursor-help border-b border-dotted text-xs text-muted-foreground"
+                                      title="Active employees who prefer the target profile and are not already incumbent in it."
+                                    >
+                                      Eligible Internal Pool
+                                    </p>
+                                    <p className="mt-1 text-xl font-semibold">
+                                      {roleResponsePlanResult.internal_talent_readiness.candidate_pool.eligible_internal_candidates.toLocaleString()}
+                                    </p>
+                                  </div>
+                                  <div className="rounded-md border p-3">
+                                    <p
+                                      className="cursor-help border-b border-dotted text-xs text-muted-foreground"
+                                      title="Meets or exceeds the required proficiency for every required skill in the target job profile."
+                                    >
+                                      Role-ready
+                                    </p>
+                                    <p className="mt-1 text-xl font-semibold">
+                                      {roleResponsePlanResult.internal_talent_readiness.candidate_pool.role_ready.toLocaleString()}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {roleResponsePlanResult.internal_talent_readiness.candidate_pool.role_ready_pct.toFixed(1)}% of eligible pool
+                                    </p>
+                                  </div>
+                                  <div className="rounded-md border p-3">
+                                    <p
+                                      className="cursor-help border-b border-dotted text-xs text-muted-foreground"
+                                      title="Misses no more than two required skills and has no more than two total proficiency points of shortfall."
+                                    >
+                                      Near-ready
+                                    </p>
+                                    <p className="mt-1 text-xl font-semibold">
+                                      {roleResponsePlanResult.internal_talent_readiness.candidate_pool.near_ready.toLocaleString()}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      Build-development pool
+                                    </p>
+                                  </div>
+                                  <div className="rounded-md border p-3">
+                                    <p
+                                      className="cursor-help border-b border-dotted text-xs text-muted-foreground"
+                                      title="Interested internal candidates who need more development than the near-ready threshold."
+                                    >
+                                      Longer-term
+                                    </p>
+                                    <p className="mt-1 text-xl font-semibold">
+                                      {roleResponsePlanResult.internal_talent_readiness.candidate_pool.longer_term.toLocaleString()}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      Development beyond near-ready
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {roleResponsePlanResult.internal_talent_readiness.top_near_ready_skill_gaps.length > 0 && (
+                                  <div className="mt-4 border-t pt-4">
+                                    <p className="text-xs font-medium">
+                                      Most common near-ready gaps
+                                    </p>
+                                    <div className="mt-2 grid gap-2 md:grid-cols-2">
+                                      {roleResponsePlanResult.internal_talent_readiness.top_near_ready_skill_gaps.map(
+                                        (gap) => (
+                                          <div
+                                            key={gap.skill_code}
+                                            className="rounded-md border px-3 py-2 text-xs"
+                                          >
+                                            <span className="font-medium">
+                                              {gap.skill_name}
+                                            </span>
+                                            <span className="text-muted-foreground">
+                                              {" · "}
+                                              {gap.candidates_below_requirement} candidate(s) · avg shortfall {gap.avg_proficiency_shortfall.toFixed(1)}
+                                            </span>
+                                          </div>
+                                        )
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+
+                                <p className="mt-3 text-[11px] text-muted-foreground">
+                                  Aggregate planning signal only. Missing skill records mean no demonstrated proficiency in the loaded data; they do not prove an employee lacks the skill. No individual employees are exposed or ranked.
+                                </p>
+                              </div>
+
                               <div className="mt-4 overflow-x-auto rounded-md border p-3">
                                 <table className="w-full min-w-[820px] text-sm">
                                   <thead>
@@ -3991,7 +4088,12 @@ export function WorkforcePlanningPage({
                                       <th className="pb-3 px-3">Importance</th>
                                       <th className="pb-3 px-3 text-right">Proficiency</th>
                                       <th className="pb-3 px-3 text-right">Build</th>
-                                      <th className="pb-3 px-3 text-right">Move Signal</th>
+                                      <th
+                                        className="pb-3 px-3 text-right"
+                                        title="Skill-level mobility signal. Use the Internal Talent Readiness section above for whole-role Move capacity."
+                                      >
+                                        Skill Move Signal
+                                      </th>
                                       <th className="pb-3 pl-3 text-right">Buy History</th>
                                     </tr>
                                   </thead>

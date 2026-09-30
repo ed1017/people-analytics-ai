@@ -1,5 +1,8 @@
 import { supabaseServer } from "./supabase-server";
 import {
+  getInternalTalentReadiness,
+} from "./internal-talent-readiness";
+import {
   runStructuralPositionScenario,
 } from "./structural-position-scenario";
 import type {
@@ -97,18 +100,26 @@ export async function runRoleWorkforceResponsePlan(
     );
   }
 
-  const bundleResult = await supabaseServer
-    .from("position_skill_requirement_map")
-    .select(
-      "job_profile_code, job_profile_name, skill_code, skill_name, skill_category, required_proficiency, importance, weight"
-    )
-    .eq(
-      "job_profile_code",
+  const [
+    bundleResult,
+    internalTalentReadiness,
+  ] = await Promise.all([
+    supabaseServer
+      .from("position_skill_requirement_map")
+      .select(
+        "job_profile_code, job_profile_name, skill_code, skill_name, skill_category, required_proficiency, importance, weight"
+      )
+      .eq(
+        "job_profile_code",
+        profile.job_profile_code
+      )
+      .order("importance", {
+        ascending: true,
+      }),
+    getInternalTalentReadiness(
       profile.job_profile_code
-    )
-    .order("importance", {
-      ascending: true,
-    });
+    ),
+  ]);
 
   if (bundleResult.error) {
     throw new Error(
@@ -267,9 +278,23 @@ export async function runRoleWorkforceResponsePlan(
     );
   }
 
-  if (allocation.move > 0) {
+  if (
+    allocation.move >
+    internalTalentReadiness.candidate_pool
+      .role_ready
+  ) {
     warnings.push(
-      "Move evidence is skill-level and overlapping; it does not prove that the same internal candidates satisfy the full role skill bundle."
+      "Move target exceeds the whole-role-ready internal candidate pool that both meets every required skill threshold and has expressed preference for this profile."
+    );
+  }
+
+  if (
+    allocation.build >
+    internalTalentReadiness.candidate_pool
+      .near_ready
+  ) {
+    warnings.push(
+      "Build target exceeds the current near-ready interested pool; covering the excess would require longer-term development or a broader candidate cohort."
     );
   }
 
@@ -304,6 +329,8 @@ export async function runRoleWorkforceResponsePlan(
       overplannedCapacity,
     coverage_pct_if_executed:
       coveragePct,
+    internal_talent_readiness:
+      internalTalentReadiness,
     skill_bundle: skillBundle,
     evidence_summary: {
       required_skill_count:
@@ -320,8 +347,9 @@ export async function runRoleWorkforceResponsePlan(
       "The planning unit is one role-capacity unit, not one skill. A single Build, Move, or Buy unit is counted once even though the role requires multiple skills.",
       "Scenario-created role demand is the positive authorized-position delta for the selected job profile after all structural position actions are applied in order.",
       "The required skill bundle comes from governed job-profile skill requirements, including required proficiency and importance.",
-      "Build, Move, and Buy evidence is shown by required skill to test whether the response path is supported across the role bundle; skill-level counts are not added together as unique people.",
-      "Role coverage is conditional on executed Build/Move/Buy capacity meeting the full job-profile requirements. The model does not claim that current candidates or learners already meet every required skill.",
+      "Move evidence uses aggregate whole-role readiness among active employees who prefer the target profile and are not already in it; required skills must meet the governed proficiency thresholds.",
+      "Skill-level Build and Buy evidence is shown across the required bundle, but skill-level counts are not added together as unique people.",
+      "Role coverage is conditional on executed Build/Move/Buy capacity meeting the full job-profile requirements; readiness remains a planning signal rather than an employment decision.",
       "Borrow is unavailable until governed role-level contingent-capacity evidence exists. Automate is unavailable until governed role- or task-level automation evidence exists.",
       "This plan is read-only and does not enroll learners, move employees, open requisitions, hire candidates, or change workforce records.",
     ],

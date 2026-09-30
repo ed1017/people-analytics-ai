@@ -390,6 +390,36 @@ export type WorkforceResponsePlanResponse = {
   methodology: string[];
 };
 
+export type InternalTalentReadinessResponse = {
+  job_profile_code: string;
+  job_profile_name: string;
+  required_skill_count: number;
+  candidate_pool: {
+    active_with_profile_preference: number;
+    already_in_target_role: number;
+    eligible_internal_candidates: number;
+    role_ready: number;
+    near_ready: number;
+    longer_term: number;
+    role_ready_pct: number;
+    ready_or_near_ready_pct: number;
+  };
+  top_near_ready_skill_gaps: Array<{
+    skill_code: string;
+    skill_name: string;
+    required_proficiency: number;
+    candidates_below_requirement: number;
+    avg_proficiency_shortfall: number;
+  }>;
+  readiness_rules: {
+    required_skills_gate_readiness: true;
+    preferred_skills_gate_readiness: false;
+    near_ready_max_missing_required_skills: number;
+    near_ready_max_total_proficiency_shortfall: number;
+  };
+  methodology: string[];
+};
+
 export type RoleWorkforceResponsePlanResponse = {
   job_profile_code: string;
   job_profile_name: string;
@@ -399,6 +429,7 @@ export type RoleWorkforceResponsePlanResponse = {
   remaining_role_gap_if_executed: number;
   overplanned_capacity: number;
   coverage_pct_if_executed: number;
+  internal_talent_readiness: InternalTalentReadinessResponse;
   skill_bundle: Array<{
     skill_code: string;
     skill_name: string;
