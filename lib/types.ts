@@ -381,6 +381,32 @@ export type ScenarioModelPoint = {
   gap_vs_target: number;
 };
 
+export type ScenarioSegmentResult = {
+  segment_code: string;
+  segment_name: string;
+  baseline_headcount: number;
+  modeled_headcount: number;
+  headcount_delta_vs_baseline: number;
+  baseline_labor_cost_usd: number;
+  modeled_labor_cost_usd: number;
+  labor_cost_delta_vs_baseline_usd: number;
+};
+
+export type ScenarioSegmentBreakdown = {
+  planning_month: string;
+  allocation_method: string;
+  business_units: ScenarioSegmentResult[];
+  job_families: ScenarioSegmentResult[];
+  reconciliation: {
+    enterprise_modeled_headcount: number;
+    business_unit_modeled_headcount_total: number;
+    job_family_modeled_headcount_total: number;
+    enterprise_modeled_labor_cost_usd: number;
+    business_unit_modeled_labor_cost_total_usd: number;
+    job_family_modeled_labor_cost_total_usd: number;
+  };
+};
+
 export type ScenarioModelResponse = {
   as_of: string;
   source_scenario: string;
@@ -401,6 +427,7 @@ export type ScenarioModelResponse = {
     cumulative_modeled_exits: number;
   };
   points: ScenarioModelPoint[];
+  segment_breakdown?: ScenarioSegmentBreakdown;
   methodology: string[];
 };
 

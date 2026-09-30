@@ -2,12 +2,22 @@ import type {
   ScenarioModelAssumptions,
   ScenarioModelPoint,
   ScenarioModelResponse,
+  ScenarioSegmentBreakdown,
+  ScenarioSegmentResult,
 } from "@/lib/types";
 
 export type ScenarioEngineBaselinePoint = {
   planning_month: string;
   planned_headcount: number;
   planned_fte: number;
+  planned_labor_cost_usd: number;
+};
+
+export type ScenarioEngineSegmentBaseline = {
+  planning_month: string;
+  segment_code: string;
+  segment_name: string;
+  planned_headcount: number;
   planned_labor_cost_usd: number;
 };
 
@@ -55,6 +65,188 @@ function annualScale(
     newBase / baselineBase,
     elapsedYears
   );
+}
+
+function allocateSegmentDelta(
+  rows: ScenarioEngineSegmentBaseline[],
+  enterpriseHeadcountDelta: number,
+  enterpriseLaborCostDelta: number
+): ScenarioSegmentResult[] {
+  const headcountTotal = rows.reduce(
+    (sum, row) =>
+      sum + row.planned_headcount,
+    0
+  );
+  const laborCostTotal = rows.reduce(
+    (sum, row) =>
+      sum + row.planned_labor_cost_usd,
+    0
+  );
+
+  return rows
+    .map((row) => {
+      const headcountShare =
+        safeRatio(
+          row.planned_headcount,
+          headcountTotal,
+          0
+        );
+      const laborCostShare =
+        safeRatio(
+          row.planned_labor_cost_usd,
+          laborCostTotal,
+          0
+        );
+
+      const modeledHeadcount =
+        Math.max(
+          0,
+          row.planned_headcount +
+            enterpriseHeadcountDelta *
+              headcountShare
+        );
+      const modeledLaborCost =
+        Math.max(
+          0,
+          row.planned_labor_cost_usd +
+            enterpriseLaborCostDelta *
+              laborCostShare
+        );
+
+      return {
+        segment_code: row.segment_code,
+        segment_name: row.segment_name,
+        baseline_headcount: round1(
+          row.planned_headcount
+        ),
+        modeled_headcount: round1(
+          modeledHeadcount
+        ),
+        headcount_delta_vs_baseline:
+          round1(
+            modeledHeadcount -
+              row.planned_headcount
+          ),
+        baseline_labor_cost_usd:
+          round2(
+            row.planned_labor_cost_usd
+          ),
+        modeled_labor_cost_usd:
+          round2(modeledLaborCost),
+        labor_cost_delta_vs_baseline_usd:
+          round2(
+            modeledLaborCost -
+              row.planned_labor_cost_usd
+          ),
+      };
+    })
+    .sort(
+      (a, b) =>
+        b.modeled_headcount -
+        a.modeled_headcount
+    );
+}
+
+export function buildScenarioSegmentBreakdown(
+  scenario: ScenarioModelResponse,
+  businessUnitBaseline: ScenarioEngineSegmentBaseline[],
+  jobFamilyBaseline: ScenarioEngineSegmentBaseline[]
+): ScenarioSegmentBreakdown {
+  const finalPoint =
+    scenario.points[
+      scenario.points.length - 1
+    ];
+
+  if (!finalPoint) {
+    throw new Error(
+      "Segment allocation requires a modeled scenario point."
+    );
+  }
+
+  const planningMonth =
+    finalPoint.planning_month;
+
+  const businessUnitRows =
+    businessUnitBaseline.filter(
+      (row) =>
+        row.planning_month ===
+        planningMonth
+    );
+  const jobFamilyRows =
+    jobFamilyBaseline.filter(
+      (row) =>
+        row.planning_month ===
+        planningMonth
+    );
+
+  const businessUnits =
+    allocateSegmentDelta(
+      businessUnitRows,
+      scenario.summary
+        .headcount_delta_vs_baseline,
+      scenario.summary
+        .labor_cost_delta_vs_baseline_usd
+    );
+  const jobFamilies =
+    allocateSegmentDelta(
+      jobFamilyRows,
+      scenario.summary
+        .headcount_delta_vs_baseline,
+      scenario.summary
+        .labor_cost_delta_vs_baseline_usd
+    );
+
+  return {
+    planning_month: planningMonth,
+    allocation_method:
+      "Enterprise scenario deltas are distributed using each segment's stored Baseline share at the end of the planning horizon. Segment mix is held constant; this is not a segment-specific rerun.",
+    business_units: businessUnits,
+    job_families: jobFamilies,
+    reconciliation: {
+      enterprise_modeled_headcount:
+        scenario.summary
+          .modeled_end_headcount,
+      business_unit_modeled_headcount_total:
+        round1(
+          businessUnits.reduce(
+            (sum, row) =>
+              sum +
+              row.modeled_headcount,
+            0
+          )
+        ),
+      job_family_modeled_headcount_total:
+        round1(
+          jobFamilies.reduce(
+            (sum, row) =>
+              sum +
+              row.modeled_headcount,
+            0
+          )
+        ),
+      enterprise_modeled_labor_cost_usd:
+        scenario.summary
+          .modeled_end_labor_cost_usd,
+      business_unit_modeled_labor_cost_total_usd:
+        round2(
+          businessUnits.reduce(
+            (sum, row) =>
+              sum +
+              row.modeled_labor_cost_usd,
+            0
+          )
+        ),
+      job_family_modeled_labor_cost_total_usd:
+        round2(
+          jobFamilies.reduce(
+            (sum, row) =>
+              sum +
+              row.modeled_labor_cost_usd,
+            0
+          )
+        ),
+    },
+  };
 }
 
 export function runScenarioModel(

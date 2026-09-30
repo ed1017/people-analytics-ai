@@ -1,7 +1,9 @@
 import { supabaseServer } from "./supabase-server";
 import {
+  buildScenarioSegmentBreakdown,
   runScenarioModel,
   type ScenarioEngineBaselinePoint,
+  type ScenarioEngineSegmentBaseline,
 } from "./scenario-engine";
 import type {
   ScenarioModelAssumptions,
@@ -147,7 +149,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "run_workforce_scenario",
     description:
-      "Run the approved deterministic workforce scenario engine for a new what-if. Use only when the user asks to change planning assumptions such as growth, salary inflation, attrition, fill rate, or productivity-driven hiring demand. Pass null for every lever the user did not change. If the user says attrition increases by X percentage points, use additional_attrition_pct_points rather than inventing an absolute rate.",
+      "Run the approved deterministic workforce scenario engine for a new what-if. Use when the user changes growth, salary inflation, attrition, fill rate, or productivity-driven hiring demand. The result also includes a Baseline-mix segment breakdown by business unit and job family. Segment mix is held constant in this breakdown; do not describe it as an independent segment-specific rerun. Pass null for every lever the user did not change. If the user says attrition increases by X percentage points, use additional_attrition_pct_points rather than inventing an absolute rate.",
     parameters: {
       type: "object",
       properties: {
@@ -634,6 +636,8 @@ async function runWorkforceScenario(
     defaultsResult,
     baselineResult,
     overviewResult,
+    businessUnitResult,
+    jobFamilyResult,
   ] = await Promise.all([
     supabaseServer
       .from("scenario_modeler_defaults")
@@ -652,12 +656,32 @@ async function runWorkforceScenario(
       .from("dashboard_overview_current")
       .select("snapshot_date, headcount")
       .single(),
+    supabaseServer
+      .from("workforce_scenario_by_org")
+      .select(
+        "planning_month, org_code, org_name, planned_headcount, planned_labor_cost_usd"
+      )
+      .eq("scenario_name", "Baseline")
+      .order("planning_month", {
+        ascending: true,
+      }),
+    supabaseServer
+      .from("workforce_scenario_by_job_family")
+      .select(
+        "planning_month, family_code, family_name, planned_headcount, planned_labor_cost_usd"
+      )
+      .eq("scenario_name", "Baseline")
+      .order("planning_month", {
+        ascending: true,
+      }),
   ]);
 
   for (const result of [
     defaultsResult,
     baselineResult,
     overviewResult,
+    businessUnitResult,
+    jobFamilyResult,
   ]) {
     if (result.error) {
       throw new Error(
@@ -761,7 +785,43 @@ async function runWorkforceScenario(
       })
     );
 
-  return runScenarioModel({
+  const businessUnitBaseline:
+    ScenarioEngineSegmentBaseline[] =
+    (businessUnitResult.data ?? []).map(
+      (row) => ({
+        planning_month:
+          row.planning_month,
+        segment_code: row.org_code,
+        segment_name: row.org_name,
+        planned_headcount: toNumber(
+          row.planned_headcount
+        ),
+        planned_labor_cost_usd:
+          toNumber(
+            row.planned_labor_cost_usd
+          ),
+      })
+    );
+
+  const jobFamilyBaseline:
+    ScenarioEngineSegmentBaseline[] =
+    (jobFamilyResult.data ?? []).map(
+      (row) => ({
+        planning_month:
+          row.planning_month,
+        segment_code: row.family_code,
+        segment_name: row.family_name,
+        planned_headcount: toNumber(
+          row.planned_headcount
+        ),
+        planned_labor_cost_usd:
+          toNumber(
+            row.planned_labor_cost_usd
+          ),
+      })
+    );
+
+  const result = runScenarioModel({
     asOf:
       overviewResult.data?.snapshot_date ??
       defaultsResult.data?.as_of ??
@@ -773,6 +833,15 @@ async function runWorkforceScenario(
     defaults,
     assumptions,
   });
+
+  result.segment_breakdown =
+    buildScenarioSegmentBreakdown(
+      result,
+      businessUnitBaseline,
+      jobFamilyBaseline
+    );
+
+  return result;
 }
 
 async function getTalentAcquisition() {
