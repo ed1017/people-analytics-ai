@@ -1,5 +1,9 @@
 import { supabaseServer } from "./supabase-server";
 import {
+  runBusinessUnitScenario,
+  type BusinessUnitScenarioRequest,
+} from "./business-unit-scenario";
+import {
   buildScenarioSegmentBreakdown,
   runScenarioModel,
   type ScenarioEngineBaselinePoint,
@@ -185,6 +189,63 @@ export const peopleAnalyticsTools: any[] = [
         },
       },
       required: [
+        "annual_growth_pct",
+        "salary_inflation_pct",
+        "annual_attrition_pct",
+        "additional_attrition_pct_points",
+        "fill_rate_pct",
+        "productivity_hiring_reduction_pct",
+      ],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
+    name: "run_business_unit_scenario",
+    description:
+      "Run a true deterministic what-if for one business unit using that business unit's own current headcount and stored monthly Baseline plan. Use this instead of run_workforce_scenario when the user asks to change assumptions for a specific business unit. Other business units remain at Baseline when the response shows enterprise implied impact.",
+    parameters: {
+      type: "object",
+      properties: {
+        business_unit: {
+          type: "string",
+          description:
+            "Business-unit name or org code, such as Managed Services or BU-MGSVC.",
+        },
+        annual_growth_pct: {
+          type: ["number", "null"],
+          description:
+            "Custom annual growth percentage for this business unit, or null to keep Baseline.",
+        },
+        salary_inflation_pct: {
+          type: ["number", "null"],
+          description:
+            "Custom annual salary inflation percentage for this business unit, or null to keep Baseline.",
+        },
+        annual_attrition_pct: {
+          type: ["number", "null"],
+          description:
+            "Custom total annual attrition percentage for this business unit, or null if unchanged or expressed as additional points.",
+        },
+        additional_attrition_pct_points: {
+          type: ["number", "null"],
+          description:
+            "Percentage-point change added to Baseline annual attrition for this business unit.",
+        },
+        fill_rate_pct: {
+          type: ["number", "null"],
+          description:
+            "Percent of modeled hiring demand filled for this business unit, or null to keep Baseline.",
+        },
+        productivity_hiring_reduction_pct: {
+          type: ["number", "null"],
+          description:
+            "Percent reduction in gross hiring demand for this business unit from AI/productivity, or null to keep Baseline.",
+        },
+      },
+      required: [
+        "business_unit",
         "annual_growth_pct",
         "salary_inflation_pct",
         "annual_attrition_pct",
@@ -1059,6 +1120,10 @@ export async function runPeopleAnalyticsTool(
     case "run_workforce_scenario":
       return runWorkforceScenario(
         args as ScenarioToolArgs
+      );
+    case "run_business_unit_scenario":
+      return runBusinessUnitScenario(
+        args as BusinessUnitScenarioRequest
       );
     case "get_talent_acquisition":
       return getTalentAcquisition();

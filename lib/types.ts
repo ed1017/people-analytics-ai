@@ -431,6 +431,34 @@ export type ScenarioModelResponse = {
   methodology: string[];
 };
 
+export type BusinessUnitScenarioOption = {
+  org_code: string;
+  org_name: string;
+  headcount: number;
+  fte: number;
+};
+
+export type BusinessUnitScenarioResponse =
+  ScenarioModelResponse & {
+    scope: {
+      type: "business_unit";
+      org_code: string;
+      org_name: string;
+      current_headcount: number;
+      current_fte: number;
+      planning_horizon_start: string;
+      planning_horizon_end: string;
+    };
+    enterprise_impact: {
+      baseline_end_headcount: number;
+      implied_end_headcount: number;
+      headcount_delta_vs_baseline: number;
+      baseline_end_labor_cost_usd: number;
+      implied_end_labor_cost_usd: number;
+      labor_cost_delta_vs_baseline_usd: number;
+    };
+  };
+
 export type WorkforceResponse = {
   as_of: string;
   summary: {
