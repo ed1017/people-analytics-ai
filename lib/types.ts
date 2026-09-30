@@ -39,6 +39,8 @@ export type Persona = "HR" | "Leader" | "Finance";
 
 export type AppPage =
   | "overview"
+  | "workforce"
+  | "attrition"
   | "talent-acquisition"
   | "survey-sentiment"
   | "finance"
@@ -400,4 +402,110 @@ export type ScenarioModelResponse = {
   };
   points: ScenarioModelPoint[];
   methodology: string[];
+};
+
+export type WorkforceResponse = {
+  as_of: string;
+  summary: {
+    headcount: number;
+    fte: number;
+    people_managers: number;
+    avg_span_of_control: number;
+    full_time_headcount: number;
+    non_full_time_headcount: number;
+    remote_headcount: number;
+    hybrid_headcount: number;
+    onsite_headcount: number;
+    avg_tenure_years: number;
+  };
+  trend: HeadcountTrendPoint[];
+  business_units: Array<{
+    org_code: string;
+    org_name: string;
+    headcount: number;
+    fte: number;
+    people_managers: number;
+    avg_span_of_control: number;
+    avg_tenure_years: number;
+  }>;
+  countries: Array<{
+    country_code: string;
+    country_name: string;
+    headcount: number;
+    fte: number;
+    avg_tenure_years: number;
+  }>;
+  levels: Array<{
+    level_code: string;
+    level_name: string;
+    level_rank: number;
+    headcount: number;
+    fte: number;
+    people_managers: number;
+    avg_tenure_years: number;
+  }>;
+  tenure: Array<{
+    tenure_band: string;
+    tenure_sort: number;
+    headcount: number;
+    fte: number;
+  }>;
+  movements: Array<{
+    month: string;
+    movement_type: string;
+    movements: number;
+  }>;
+};
+
+export type AttritionResponse = {
+  as_of: string;
+  summary: {
+    total_exits: number;
+    voluntary_exits: number;
+    involuntary_exits: number;
+    regrettable_exits: number;
+    retirements: number;
+    total_turnover_ytd_pct: number;
+    voluntary_turnover_ytd_pct: number;
+    annualized_voluntary_turnover_pct: number;
+    regrettable_share_of_voluntary_pct: number;
+  };
+  trend: Array<{
+    month: string;
+    total_exits: number;
+    voluntary_exits: number;
+    involuntary_exits: number;
+    regrettable_exits: number;
+    monthly_turnover_pct: number;
+    monthly_voluntary_turnover_pct: number;
+  }>;
+  business_units: Array<{
+    org_code: string;
+    org_name: string;
+    exits: number;
+    voluntary_exits: number;
+    regrettable_exits: number;
+    voluntary_turnover_ytd_pct: number;
+  }>;
+  levels: Array<{
+    level_code: string;
+    level_name: string;
+    level_rank: number;
+    exits: number;
+    voluntary_exits: number;
+    regrettable_exits: number;
+  }>;
+  tenure: Array<{
+    tenure_band: string;
+    tenure_sort: number;
+    exits: number;
+    voluntary_exits: number;
+    regrettable_exits: number;
+  }>;
+  reasons: Array<{
+    separation_reason: string;
+    separation_type: string;
+    exits: number;
+    pct_of_exits: number;
+  }>;
 };

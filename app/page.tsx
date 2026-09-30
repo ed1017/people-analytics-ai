@@ -9,6 +9,8 @@ import {
 import { AppSidebar } from "@/components/app-sidebar";
 import { AppHeader } from "@/components/app-header";
 import { OverviewPage } from "@/components/pages/overview-page";
+import { WorkforcePage } from "@/components/pages/workforce-page";
+import { AttritionPage } from "@/components/pages/attrition-page";
 import { FinancePage } from "@/components/pages/finance-page";
 import { SkillsPage } from "@/components/pages/skills-page";
 import { WorkforcePlanningPage } from "@/components/pages/workforce-planning-page";
@@ -27,6 +29,8 @@ import type {
   Persona,
   PositionModelingResponse,
   SkillsResponse,
+  WorkforceResponse,
+  AttritionResponse,
   TalentAcquisitionResponse,
   SurveySentimentResponse,
   WorkforcePlanningResponse,
@@ -59,6 +63,16 @@ export default function Home() {
 
   const [activePage, setActivePage] =
     useState<AppPage>("overview");
+
+  const [workforceData, setWorkforceData] =
+    useState<WorkforceResponse | null>(null);
+  const [workforceLoading, setWorkforceLoading] = useState(false);
+  const [workforceError, setWorkforceError] = useState<string | null>(null);
+
+  const [attritionData, setAttritionData] =
+    useState<AttritionResponse | null>(null);
+  const [attritionLoading, setAttritionLoading] = useState(false);
+  const [attritionError, setAttritionError] = useState<string | null>(null);
 
   const [planningData, setPlanningData] =
     useState<WorkforcePlanningResponse | null>(
@@ -196,6 +210,58 @@ export default function Home() {
 
     loadDashboard();
   }, [selectedCountry, selectedOrg, selectedLevel]);
+
+  useEffect(() => {
+    if (activePage !== "workforce" || workforceData) return;
+
+    async function loadWorkforce() {
+      try {
+        setWorkforceLoading(true);
+        setWorkforceError(null);
+        const response = await fetch("/api/workforce", { cache: "no-store" });
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload?.error ?? "Failed to load workforce analytics.");
+        }
+        setWorkforceData(payload as WorkforceResponse);
+      } catch (error) {
+        console.error(error);
+        setWorkforceError(
+          error instanceof Error ? error.message : "Failed to load workforce analytics."
+        );
+      } finally {
+        setWorkforceLoading(false);
+      }
+    }
+
+    loadWorkforce();
+  }, [activePage, workforceData]);
+
+  useEffect(() => {
+    if (activePage !== "attrition" || attritionData) return;
+
+    async function loadAttrition() {
+      try {
+        setAttritionLoading(true);
+        setAttritionError(null);
+        const response = await fetch("/api/attrition", { cache: "no-store" });
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload?.error ?? "Failed to load attrition analytics.");
+        }
+        setAttritionData(payload as AttritionResponse);
+      } catch (error) {
+        console.error(error);
+        setAttritionError(
+          error instanceof Error ? error.message : "Failed to load attrition analytics."
+        );
+      } finally {
+        setAttritionLoading(false);
+      }
+    }
+
+    loadAttrition();
+  }, [activePage, attritionData]);
 
   useEffect(() => {
     if (
@@ -676,7 +742,19 @@ export default function Home() {
           "What stands out in this scenario?",
           "What are the labor cost implications?",
         ]
-      : activePage === "finance"
+      : activePage === "workforce"
+        ? [
+            "How is our workforce distributed?",
+            "What stands out in workforce composition?",
+            "Where do management layers look unusual?",
+          ]
+        : activePage === "attrition"
+          ? [
+              "Where is attrition highest?",
+              "What are the biggest regrettable-loss risks?",
+              "What separation patterns stand out?",
+            ]
+          : activePage === "finance"
         ? [
             "Where are workforce costs highest?",
             "Compare 2027 labor cost scenarios",
@@ -755,6 +833,28 @@ export default function Home() {
             message,
             persona: selectedPersona,
             page: activePage,
+            workforceDetailContext:
+              activePage === "workforce" && workforceData
+                ? {
+                    summary: workforceData.summary,
+                    businessUnits: workforceData.business_units,
+                    countries: workforceData.countries,
+                    levels: workforceData.levels,
+                    tenure: workforceData.tenure,
+                    movements: workforceData.movements,
+                  }
+                : null,
+            attritionContext:
+              activePage === "attrition" && attritionData
+                ? {
+                    summary: attritionData.summary,
+                    businessUnits: attritionData.business_units,
+                    levels: attritionData.levels,
+                    tenure: attritionData.tenure,
+                    reasons: attritionData.reasons,
+                    trend: attritionData.trend,
+                  }
+                : null,
             planningContext:
               activePage ===
                 "workforce-planning" &&
@@ -1082,6 +1182,18 @@ export default function Home() {
             onOrgChange={setSelectedOrg}
             onLevelChange={setSelectedLevel}
             onResetFilters={resetFilters}
+          />
+        ) : activePage === "workforce" ? (
+          <WorkforcePage
+            data={workforceData}
+            loading={workforceLoading}
+            error={workforceError}
+          />
+        ) : activePage === "attrition" ? (
+          <AttritionPage
+            data={attritionData}
+            loading={attritionLoading}
+            error={attritionError}
           />
         ) : activePage ===
           "talent-acquisition" ? (

@@ -80,6 +80,32 @@ export const peopleAnalyticsTools: any[] = [
   },
   {
     type: "function",
+    name: "get_workforce_composition",
+    description:
+      "Get governed workforce composition analytics including headcount/FTE trend, business units, countries, career levels, tenure, manager span, and internal movement counts.",
+    parameters: {
+      type: "object",
+      properties: {},
+      required: [],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
+    name: "get_attrition",
+    description:
+      "Get governed attrition analytics including YTD voluntary turnover, annualized voluntary turnover, regrettable exits, monthly trend, business-unit rates, career-level exits, tenure exits, and reported separation reasons.",
+    parameters: {
+      type: "object",
+      properties: {},
+      required: [],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
     name: "get_workforce_finance",
     description:
       "Get enterprise workforce finance metrics, business-unit labor economics, vacancy cost exposure, and 2027 labor-cost scenario outcomes.",
@@ -259,6 +285,62 @@ async function getWorkforceOverview() {
         unknown
       >[]
     ),
+  };
+}
+
+async function getWorkforceComposition() {
+  const [current, trend, businessUnits, countries, levels, tenure, movements] =
+    await Promise.all([
+      supabaseServer.from("workforce_current_summary").select("*").single(),
+      supabaseServer.from("dashboard_headcount_trend").select("*").order("snapshot_date"),
+      supabaseServer.from("workforce_business_unit_summary").select("*").order("headcount", { ascending: false }),
+      supabaseServer.from("workforce_country_summary").select("*").order("headcount", { ascending: false }),
+      supabaseServer.from("workforce_level_summary").select("*").order("level_rank"),
+      supabaseServer.from("workforce_tenure_summary").select("*").order("tenure_sort"),
+      supabaseServer.from("workforce_movement_summary").select("*").order("month"),
+    ]);
+
+  for (const result of [current, trend, businessUnits, countries, levels, tenure, movements]) {
+    if (result.error) throw new Error("Workforce composition tool: " + result.error.message);
+  }
+
+  return {
+    as_of: current.data?.as_of ?? "2026-09-30",
+    summary: compactRows([current.data ?? {}])[0],
+    trend: compactRows((trend.data ?? []) as Record<string, unknown>[]),
+    business_units: compactRows((businessUnits.data ?? []) as Record<string, unknown>[]),
+    countries: compactRows((countries.data ?? []) as Record<string, unknown>[]),
+    levels: compactRows((levels.data ?? []) as Record<string, unknown>[]),
+    tenure: compactRows((tenure.data ?? []) as Record<string, unknown>[]),
+    movements: compactRows((movements.data ?? []) as Record<string, unknown>[]),
+  };
+}
+
+async function getAttritionAnalytics() {
+  const [current, trend, businessUnits, levels, tenure, reasons] =
+    await Promise.all([
+      supabaseServer.from("attrition_current_summary").select("*").single(),
+      supabaseServer.from("attrition_monthly_trend").select("*").order("month"),
+      supabaseServer.from("attrition_business_unit_summary").select("*").order("voluntary_turnover_ytd_pct", { ascending: false }),
+      supabaseServer.from("attrition_level_summary").select("*").order("level_rank"),
+      supabaseServer.from("attrition_tenure_summary").select("*").order("tenure_sort"),
+      supabaseServer.from("attrition_reason_summary").select("*").order("exits", { ascending: false }),
+    ]);
+
+  for (const result of [current, trend, businessUnits, levels, tenure, reasons]) {
+    if (result.error) throw new Error("Attrition tool: " + result.error.message);
+  }
+
+  return {
+    as_of: current.data?.as_of ?? "2026-09-30",
+    summary: compactRows([current.data ?? {}])[0],
+    trend: compactRows((trend.data ?? []) as Record<string, unknown>[]),
+    business_units: compactRows((businessUnits.data ?? []) as Record<string, unknown>[]),
+    levels: compactRows((levels.data ?? []) as Record<string, unknown>[]),
+    tenure: compactRows((tenure.data ?? []) as Record<string, unknown>[]),
+    reasons: compactRows((reasons.data ?? []) as Record<string, unknown>[]),
+    interpretation_note:
+      "Reported separation reasons and regrettable flags are descriptive fields in the synthetic dataset; do not treat them as proven causal drivers.",
   };
 }
 
@@ -895,6 +977,10 @@ export async function runPeopleAnalyticsTool(
   switch (name) {
     case "get_workforce_overview":
       return getWorkforceOverview();
+    case "get_workforce_composition":
+      return getWorkforceComposition();
+    case "get_attrition":
+      return getAttritionAnalytics();
     case "get_workforce_finance":
       return getWorkforceFinance();
     case "get_workforce_skills":
