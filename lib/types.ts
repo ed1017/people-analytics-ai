@@ -248,6 +248,47 @@ export type StructuralPositionScenarioResponse = {
       active_recruiting_demand_delta: number;
     }>;
   };
+  response_strategy: {
+    scope: "scenario_widened_skill_gaps";
+    skills_evaluated: number;
+    borrow_data_available: boolean;
+    automate_data_available: boolean;
+    skills: Array<{
+      skill_code: string;
+      skill_name: string;
+      skill_category: string;
+      modeled_position_gap: number;
+      authorized_demand_delta: number;
+      modeled_active_recruiting_demand: number;
+      build: {
+        pathway_available: boolean;
+        active_course_count: number;
+        avg_course_duration_hours: number | null;
+        enrolled_learners: number;
+        in_progress_learners: number;
+        completed_learners_ytd: number;
+      };
+      move: {
+        mobility_candidates: number;
+        evidence_available: boolean;
+      };
+      buy: {
+        active_recruiting_demand: number;
+        historical_filled_requisitions: number;
+        median_time_to_fill_days: number | null;
+        evidence_available: boolean;
+      };
+      borrow: {
+        data_available: boolean;
+        active_contingent_workers: number;
+        avg_active_bill_rate: number | null;
+      };
+      automate: {
+        data_available: boolean;
+        reason: string;
+      };
+    }>;
+  };
   recruiting_demand: {
     active_open_requisitions: number;
     on_hold_requisitions: number;

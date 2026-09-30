@@ -18,6 +18,21 @@ type SkillRequirementRow = {
   skill_category: string;
 };
 
+type ResponseStrategySignal = {
+  skill_code: string;
+  active_course_count: number;
+  avg_course_duration_hours: number | null;
+  enrolled_learners: number;
+  in_progress_learners: number;
+  completed_learners_ytd: number;
+  mobility_candidates: number;
+  historical_filled_requisitions: number;
+  median_time_to_fill_days: number | null;
+  total_contingent_records: number;
+  active_contingent_workers: number;
+  avg_active_bill_rate: number | null;
+};
+
 type InventoryRow = {
   org_code: string;
   org_name: string;
@@ -77,6 +92,7 @@ async function loadInventory() {
     overviewResult,
     skillRequirementResult,
     skillSupplyResult,
+    responseStrategyResult,
   ] = await Promise.all([
     supabaseServer
       .from(
@@ -98,6 +114,13 @@ async function loadInventory() {
       .from("skills_current_supply")
       .select(
         "skill_code, employees_with_skill"
+      ),
+    supabaseServer
+      .from(
+        "workforce_response_strategy_signals"
+      )
+      .select(
+        "skill_code, active_course_count, avg_course_duration_hours, enrolled_learners, in_progress_learners, completed_learners_ytd, mobility_candidates, historical_filled_requisitions, median_time_to_fill_days, total_contingent_records, active_contingent_workers, avg_active_bill_rate"
       ),
   ]);
 
@@ -128,6 +151,68 @@ async function loadInventory() {
         skillSupplyResult.error.message
     );
   }
+
+  if (responseStrategyResult.error) {
+    throw new Error(
+      "Workforce response strategy signals: " +
+        responseStrategyResult.error.message
+    );
+  }
+
+  const responseStrategySignals =
+    new Map<string, ResponseStrategySignal>(
+      (responseStrategyResult.data ?? []).map(
+        (row) => [
+          row.skill_code,
+          {
+            skill_code: row.skill_code,
+            active_course_count: toNumber(
+              row.active_course_count
+            ),
+            avg_course_duration_hours:
+              row.avg_course_duration_hours === null
+                ? null
+                : toNumber(
+                    row.avg_course_duration_hours
+                  ),
+            enrolled_learners: toNumber(
+              row.enrolled_learners
+            ),
+            in_progress_learners: toNumber(
+              row.in_progress_learners
+            ),
+            completed_learners_ytd: toNumber(
+              row.completed_learners_ytd
+            ),
+            mobility_candidates: toNumber(
+              row.mobility_candidates
+            ),
+            historical_filled_requisitions:
+              toNumber(
+                row.historical_filled_requisitions
+              ),
+            median_time_to_fill_days:
+              row.median_time_to_fill_days === null
+                ? null
+                : toNumber(
+                    row.median_time_to_fill_days
+                  ),
+            total_contingent_records: toNumber(
+              row.total_contingent_records
+            ),
+            active_contingent_workers: toNumber(
+              row.active_contingent_workers
+            ),
+            avg_active_bill_rate:
+              row.avg_active_bill_rate === null
+                ? null
+                : toNumber(
+                    row.avg_active_bill_rate
+                  ),
+          },
+        ]
+      )
+    );
 
   const skillRequirements:
     SkillRequirementRow[] =
@@ -205,6 +290,7 @@ async function loadInventory() {
     rows,
     skillRequirements,
     skillSupply,
+    responseStrategySignals,
   };
 }
 function matchesAction(
@@ -563,6 +649,127 @@ function buildSkillDemand(
     largest_modeled_gaps: largestGaps,
     top_recruiting_skill_demand:
       topRecruiting,
+  };
+}
+
+function buildResponseStrategy(
+  skillDemand:
+    StructuralPositionScenarioResponse["skill_demand"],
+  signals: Map<
+    string,
+    ResponseStrategySignal
+  >
+): StructuralPositionScenarioResponse["response_strategy"] {
+  const focusSkills =
+    skillDemand.top_changed_skills
+      .filter(
+        (row) =>
+          row.authorized_demand_delta >
+            0.05 &&
+          row.modeled_position_gap > 0
+      )
+      .slice(0, 10);
+
+  const borrowDataAvailable =
+    Array.from(signals.values()).some(
+      (signal) =>
+        signal.total_contingent_records >
+        0
+    );
+
+  return {
+    scope:
+      "scenario_widened_skill_gaps",
+    skills_evaluated:
+      focusSkills.length,
+    borrow_data_available:
+      borrowDataAvailable,
+    automate_data_available: false,
+    skills: focusSkills.map((skill) => {
+      const signal =
+        signals.get(skill.skill_code);
+
+      const activeCourseCount =
+        signal?.active_course_count ?? 0;
+      const mobilityCandidates =
+        signal?.mobility_candidates ?? 0;
+      const historicalFilledReqs =
+        signal
+          ?.historical_filled_requisitions ??
+        0;
+      const totalContingentRecords =
+        signal?.total_contingent_records ??
+        0;
+
+      return {
+        skill_code: skill.skill_code,
+        skill_name: skill.skill_name,
+        skill_category:
+          skill.skill_category,
+        modeled_position_gap:
+          skill.modeled_position_gap,
+        authorized_demand_delta:
+          skill.authorized_demand_delta,
+        modeled_active_recruiting_demand:
+          skill.modeled_active_recruiting_demand,
+        build: {
+          pathway_available:
+            activeCourseCount > 0,
+          active_course_count:
+            activeCourseCount,
+          avg_course_duration_hours:
+            signal
+              ?.avg_course_duration_hours ??
+            null,
+          enrolled_learners:
+            signal?.enrolled_learners ??
+            0,
+          in_progress_learners:
+            signal
+              ?.in_progress_learners ??
+            0,
+          completed_learners_ytd:
+            signal
+              ?.completed_learners_ytd ??
+            0,
+        },
+        move: {
+          mobility_candidates:
+            mobilityCandidates,
+          evidence_available:
+            mobilityCandidates > 0,
+        },
+        buy: {
+          active_recruiting_demand:
+            skill.modeled_active_recruiting_demand,
+          historical_filled_requisitions:
+            historicalFilledReqs,
+          median_time_to_fill_days:
+            signal
+              ?.median_time_to_fill_days ??
+            null,
+          evidence_available:
+            historicalFilledReqs > 0,
+        },
+        borrow: {
+          data_available:
+            totalContingentRecords > 0,
+          active_contingent_workers:
+            signal
+              ?.active_contingent_workers ??
+            0,
+          avg_active_bill_rate:
+            signal
+              ?.avg_active_bill_rate ??
+            null,
+        },
+        automate: {
+          data_available: false,
+          reason:
+            "No role- or task-level automation potential signal is loaded for this skill.",
+        },
+      };
+    }),
   };
 }
 
@@ -1130,6 +1337,11 @@ export async function runStructuralPositionScenario(
       inventory.skillRequirements,
       inventory.skillSupply
     );
+  const responseStrategy =
+    buildResponseStrategy(
+      skillDemand,
+      inventory.responseStrategySignals
+    );
 
   const recruitingByBusinessUnitMap =
     new Map<
@@ -1288,6 +1500,8 @@ export async function runStructuralPositionScenario(
         ),
     },
     skill_demand: skillDemand,
+    response_strategy:
+      responseStrategy,
     recruiting_demand: {
       active_open_requisitions:
         round1(endingRecruiting.open),
@@ -1342,7 +1556,10 @@ export async function runStructuralPositionScenario(
       "Active recruiting skill demand counts only active open requisition vacancies plus uncovered active vacancies; on-hold and frozen vacancies are excluded from active recruiting demand.",
       "Current employee skill supply is held constant during the scenario. Modeled skill gaps therefore show the gap implied by the new position structure before any reskilling, hiring, or internal mobility response.",
       "Job-skill requirement weights are not treated as percentages because profile-level weight totals are not normalized consistently; skill-demand counts use the existence of a requirement, not its weight.",
-      "The model is read-only and does not change source position, requisition, skill, budget, or employee records.",
+      "Workforce response strategy evidence is shown only for scenario-widened positive skill gaps. Build evidence comes from active learning courses and current learning pipeline; Move evidence counts current employees who already hold the skill and have a career preference for another job profile that also requires it; Buy evidence uses modeled active recruiting demand plus historical filled-requisition time-to-fill; these signals are evidence, not guaranteed capacity.",
+      "Mobility candidate counts and learning counts are skill-level indicators and may overlap across skills, so they must not be added together as unique people.",
+      "Borrow remains unavailable until contingent-worker data is loaded. Automate remains unmodeled until a role- or task-level automation potential signal is available.",
+      "The model is read-only and does not change source position, requisition, skill, learning, mobility, budget, or employee records.",
     ],
   };
 }

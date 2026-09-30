@@ -911,6 +911,11 @@ Shared rules:
 - Structural position scenarios also return position-based skill demand. This demand counts authorized positions whose job profiles require each skill and includes vacant/frozen authorized positions. Do not confuse it with the current Skills page's incumbent-only role demand.
 - Skill supply is held constant in a structural scenario. Treat modeled skill gaps as pre-response capacity gaps before any hiring, reskilling, or internal mobility action; do not claim those actions occurred unless separately modeled.
 - Do not convert job-skill weights into percentages or shares; those weights are not normalized consistently across job profiles.
+- Structural scenarios return workforce-response evidence for scenario-widened positive skill gaps. Build evidence comes from active learning courses and current learning pipeline; Move evidence is a skill-level count of current employees who already hold the skill and have a career preference toward another profile that also requires it; Buy evidence uses modeled recruiting demand plus historical time-to-fill. Treat these as evidence, not guaranteed capacity or an optimized recommendation.
+- Learning and mobility counts may overlap across skills and must not be summed as unique people. Historical time-to-fill is descriptive, not a forecast.
+- Borrow is unavailable when the contingent-worker dataset is empty. Automate is intentionally unmodeled until a role- or task-level automation signal exists. Do not invent either one.
+- When the user asks how to respond to structural skill gaps, keep the explanation executive-level and roughly under 650 words: summarize at most 5 priority skill pressures, then concise Build / Move / Buy evidence, then one short line each for Borrow and Automate. Do not restate every strategy signal already returned by the tool unless the user explicitly asks for detail.
+- This first response layer provides evidence, not an optimized strategy ranking. Do not call Build, Move, Buy, Borrow, or Automate "best," "necessary," or sufficient to close a gap from these counts alone. You may explain which paths have stronger or weaker supporting evidence, with the limitations stated.
 - For business-unit scenario ending results, use the planning_horizon_end returned by run_business_unit_scenario. Do not infer the ending month from the current date.
 - If the available page context and approved tools cannot answer the question, say what data is missing.
 - You may calculate straightforward ratios or comparisons from supplied metrics, but not substitute those calculations for the deterministic scenario engine when a scenario lever changes.
@@ -950,7 +955,7 @@ ${message}
 
     const maxOutputTokens =
       page === "workforce-planning"
-        ? 1100
+        ? 1400
         : 700;
 
     let response: any =
