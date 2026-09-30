@@ -15,6 +15,7 @@ import {
 } from "recharts";
 
 import type {
+  BusinessUnitResponseAllocationResponse,
   BusinessUnitScenarioOption,
   BusinessUnitScenarioResponse,
   PlanningPoint,
@@ -384,6 +385,27 @@ export function WorkforcePlanningPage({
   const [
     responsePortfolioError,
     setResponsePortfolioError,
+  ] = useState<string | null>(null);
+  const [
+    businessUnitResponseAllocations,
+    setBusinessUnitResponseAllocations,
+  ] = useState<
+    Record<string, WorkforceResponsePlanAllocation>
+  >({});
+  const [
+    businessUnitResponseResult,
+    setBusinessUnitResponseResult,
+  ] =
+    useState<BusinessUnitResponseAllocationResponse | null>(
+      null
+    );
+  const [
+    businessUnitResponseLoading,
+    setBusinessUnitResponseLoading,
+  ] = useState(false);
+  const [
+    businessUnitResponseError,
+    setBusinessUnitResponseError,
   ] = useState<string | null>(null);
 
   useEffect(() => {
@@ -1057,6 +1079,9 @@ export function WorkforcePlanningPage({
     );
     setResponsePortfolioResult(null);
     setResponsePortfolioError(null);
+    setBusinessUnitResponseAllocations({});
+    setBusinessUnitResponseResult(null);
+    setBusinessUnitResponseError(null);
   }
 
   async function runResponsePortfolio() {
@@ -1126,6 +1151,9 @@ export function WorkforcePlanningPage({
       setResponsePortfolioResult(
         payload as WorkforceResponsePortfolioResponse
       );
+      setBusinessUnitResponseAllocations({});
+      setBusinessUnitResponseResult(null);
+      setBusinessUnitResponseError(null);
     } catch (error) {
       setResponsePortfolioError(
         error instanceof Error
@@ -1158,6 +1186,143 @@ export function WorkforcePlanningPage({
     );
     setResponsePortfolioResult(null);
     setResponsePortfolioError(null);
+    setBusinessUnitResponseAllocations({});
+    setBusinessUnitResponseResult(null);
+    setBusinessUnitResponseError(null);
+  }
+
+  function updateBusinessUnitResponseAllocation(
+    orgCode: string,
+    jobProfileCode: string,
+    key: "build" | "move" | "buy",
+    value: number
+  ) {
+    const allocationKey =
+      orgCode + "::" + jobProfileCode;
+
+    setBusinessUnitResponseAllocations(
+      (current) => ({
+        ...current,
+        [allocationKey]: {
+          ...(current[allocationKey] ??
+            createResponsePlanAllocation()),
+          [key]: value,
+        },
+      })
+    );
+    setBusinessUnitResponseResult(null);
+    setBusinessUnitResponseError(null);
+  }
+
+  async function runBusinessUnitResponseAllocation() {
+    if (
+      !structuralPositionResult ||
+      !responsePortfolioResult
+    ) {
+      return;
+    }
+
+    const plannedRoleCodes = new Set(
+      responsePortfolioResult.roles.map(
+        (role) => role.job_profile_code
+      )
+    );
+    const destinations =
+      structuralPositionResult.business_unit_job_profile_impact.filter(
+        (row) =>
+          row.authorized_position_delta > 0 &&
+          plannedRoleCodes.has(
+            row.job_profile_code
+          )
+      );
+
+    const allocations = destinations
+      .map((row) => {
+        const allocationKey =
+          row.org_code +
+          "::" +
+          row.job_profile_code;
+        return {
+          business_unit: row.org_code,
+          job_profile:
+            row.job_profile_code,
+          allocation:
+            businessUnitResponseAllocations[
+              allocationKey
+            ] ??
+            createResponsePlanAllocation(),
+        };
+      })
+      .filter(
+        (row) =>
+          row.allocation.build +
+            row.allocation.move +
+            row.allocation.buy >
+          0
+      );
+
+    if (allocations.length === 0) {
+      setBusinessUnitResponseError(
+        "Enter at least one BU Build, Move, or Buy allocation before running."
+      );
+      return;
+    }
+
+    try {
+      setBusinessUnitResponseLoading(true);
+      setBusinessUnitResponseError(null);
+
+      const response = await fetch(
+        "/api/business-unit-response-allocation",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            actions:
+              structuralPositionActions,
+            allocations,
+            role_plans:
+              responsePortfolioResult.roles.map(
+                (role) => ({
+                  job_profile:
+                    role.job_profile_code,
+                  allocation:
+                    role.allocation,
+                })
+              ),
+          }),
+        }
+      );
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload?.error ??
+            "Failed to run BU response allocation."
+        );
+      }
+
+      setBusinessUnitResponseResult(
+        payload as BusinessUnitResponseAllocationResponse
+      );
+    } catch (error) {
+      setBusinessUnitResponseError(
+        error instanceof Error
+          ? error.message
+          : "Failed to run BU response allocation."
+      );
+    } finally {
+      setBusinessUnitResponseLoading(false);
+    }
+  }
+
+  function resetBusinessUnitResponseAllocation() {
+    setBusinessUnitResponseAllocations({});
+    setBusinessUnitResponseResult(null);
+    setBusinessUnitResponseError(null);
   }
 
   function persistSavedScenarios(
@@ -4242,6 +4407,279 @@ export function WorkforcePlanningPage({
                                   </div>
                                 </div>
                               )}
+
+                              <details className="mt-4 rounded-md border">
+                                <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
+                                  Business Unit Response Allocation
+                                  <span className="ml-2 text-xs font-normal text-muted-foreground">
+                                    destination ownership
+                                  </span>
+                                </summary>
+                                <div className="border-t p-4">
+                                  <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                                    <p className="max-w-3xl text-xs text-muted-foreground">
+                                      Allocate the existing role portfolio to destination business units. BU totals must reconcile back to each role's Build / Move / Buy target. A Move row identifies the destination only; source BU is not inferred.
+                                    </p>
+                                    <div className="flex gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={resetBusinessUnitResponseAllocation}
+                                        disabled={businessUnitResponseLoading}
+                                        className="rounded-md border px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+                                      >
+                                        Reset
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={runBusinessUnitResponseAllocation}
+                                        disabled={businessUnitResponseLoading}
+                                        className="rounded-md bg-foreground px-3 py-2 text-xs font-medium text-background disabled:cursor-not-allowed disabled:opacity-50"
+                                      >
+                                        {businessUnitResponseLoading
+                                          ? "Running..."
+                                          : "Run BU Allocation"}
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <div className="max-h-[320px] overflow-auto rounded-md border">
+                                    <table className="w-full min-w-[760px] text-xs">
+                                      <thead className="sticky top-0 bg-background">
+                                        <tr className="border-b text-left text-muted-foreground">
+                                          <th className="p-3">Business Unit / Role</th>
+                                          <th className="p-3 text-right">Gross Demand</th>
+                                          <th className="p-3 text-right">Build</th>
+                                          <th className="p-3 text-right">Move</th>
+                                          <th className="p-3 text-right">Buy</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {structuralPositionResult.business_unit_job_profile_impact
+                                          .filter(
+                                            (row) =>
+                                              row.authorized_position_delta > 0 &&
+                                              responsePortfolioResult.roles.some(
+                                                (role) =>
+                                                  role.job_profile_code ===
+                                                  row.job_profile_code
+                                              )
+                                          )
+                                          .map((row) => {
+                                            const allocationKey =
+                                              row.org_code +
+                                              "::" +
+                                              row.job_profile_code;
+                                            const allocation =
+                                              businessUnitResponseAllocations[
+                                                allocationKey
+                                              ] ??
+                                              createResponsePlanAllocation();
+
+                                            return (
+                                              <tr
+                                                key={allocationKey}
+                                                className="border-b last:border-0"
+                                              >
+                                                <td className="p-3">
+                                                  <p className="font-medium">
+                                                    {row.org_name}
+                                                  </p>
+                                                  <p className="text-[10px] text-muted-foreground">
+                                                    {row.job_profile_name}
+                                                  </p>
+                                                </td>
+                                                <td className="p-3 text-right font-medium tabular-nums">
+                                                  {formatSignedModeledCount(
+                                                    row.authorized_position_delta
+                                                  )}
+                                                </td>
+                                                {(
+                                                  [
+                                                    ["build", "Build"],
+                                                    ["move", "Move"],
+                                                    ["buy", "Buy"],
+                                                  ] as const
+                                                ).map(([key, label]) => (
+                                                  <td
+                                                    key={key}
+                                                    className="p-3"
+                                                  >
+                                                    <input
+                                                      aria-label={
+                                                        row.org_name +
+                                                        " " +
+                                                        row.job_profile_name +
+                                                        " " +
+                                                        label
+                                                      }
+                                                      type="number"
+                                                      min={0}
+                                                      step={1}
+                                                      value={allocation[key]}
+                                                      onChange={(event) =>
+                                                        updateBusinessUnitResponseAllocation(
+                                                          row.org_code,
+                                                          row.job_profile_code,
+                                                          key,
+                                                          Number(
+                                                            event.target.value
+                                                          )
+                                                        )
+                                                      }
+                                                      className="w-full min-w-[80px] rounded-md border bg-background px-2 py-1.5 text-right tabular-nums"
+                                                    />
+                                                  </td>
+                                                ))}
+                                              </tr>
+                                            );
+                                          })}
+                                      </tbody>
+                                    </table>
+                                  </div>
+
+                                  {businessUnitResponseError && (
+                                    <div className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
+                                      {businessUnitResponseError}
+                                    </div>
+                                  )}
+
+                                  {businessUnitResponseResult && (
+                                    <>
+                                      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                        <div className="rounded-md border p-3">
+                                          <p className="text-[11px] text-muted-foreground">
+                                            Enterprise Net Need
+                                          </p>
+                                          <p className="mt-1 text-xl font-semibold">
+                                            {formatModeledCount(
+                                              businessUnitResponseResult.scenario_net_role_demand
+                                            )}
+                                          </p>
+                                        </div>
+                                        <div className="rounded-md border p-3">
+                                          <p className="text-[11px] text-muted-foreground">
+                                            Gross BU Destination Demand
+                                          </p>
+                                          <p className="mt-1 text-xl font-semibold">
+                                            {formatModeledCount(
+                                              businessUnitResponseResult.gross_destination_demand
+                                            )}
+                                          </p>
+                                        </div>
+                                        <div className="rounded-md border p-3">
+                                          <p className="text-[11px] text-muted-foreground">
+                                            Contraction Offset
+                                          </p>
+                                          <p className="mt-1 text-xl font-semibold">
+                                            {formatModeledCount(
+                                              businessUnitResponseResult.contraction_offset
+                                            )}
+                                          </p>
+                                        </div>
+                                        <div className="rounded-md border p-3">
+                                          <p className="text-[11px] text-muted-foreground">
+                                            Remaining Net Gap
+                                          </p>
+                                          <p className="mt-1 text-xl font-semibold">
+                                            {formatModeledCount(
+                                              businessUnitResponseResult.remaining_net_gap_if_executed
+                                            )}
+                                          </p>
+                                          <p className="text-[10px] text-muted-foreground">
+                                            {formatModeledCount(
+                                              businessUnitResponseResult.effective_coverage_if_executed
+                                            )} effective coverage
+                                          </p>
+                                        </div>
+                                      </div>
+
+                                      <div className="mt-4 overflow-x-auto rounded-md border">
+                                        <table className="w-full min-w-[820px] text-xs">
+                                          <thead>
+                                            <tr className="border-b text-left text-muted-foreground">
+                                              <th className="p-3">Role Reconciliation</th>
+                                              <th className="p-3 text-right">Portfolio B / M / B</th>
+                                              <th className="p-3 text-right">BU Sum B / M / B</th>
+                                              <th className="p-3 text-right">Status</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {businessUnitResponseResult.roles.map(
+                                              (role) => (
+                                                <tr
+                                                  key={role.job_profile_code}
+                                                  className="border-b last:border-0"
+                                                >
+                                                  <td className="p-3 font-medium">
+                                                    {role.job_profile_name}
+                                                  </td>
+                                                  <td className="p-3 text-right tabular-nums">
+                                                    {role.portfolio_target_allocation
+                                                      ? formatModeledCount(
+                                                          role.portfolio_target_allocation.build
+                                                        ) +
+                                                        " / " +
+                                                        formatModeledCount(
+                                                          role.portfolio_target_allocation.move
+                                                        ) +
+                                                        " / " +
+                                                        formatModeledCount(
+                                                          role.portfolio_target_allocation.buy
+                                                        )
+                                                      : "—"}
+                                                  </td>
+                                                  <td className="p-3 text-right tabular-nums">
+                                                    {formatModeledCount(
+                                                      role.allocation.build
+                                                    ) +
+                                                      " / " +
+                                                      formatModeledCount(
+                                                        role.allocation.move
+                                                      ) +
+                                                      " / " +
+                                                      formatModeledCount(
+                                                        role.allocation.buy
+                                                      )}
+                                                  </td>
+                                                  <td className="p-3 text-right font-medium">
+                                                    {role.portfolio_allocation_reconciled === null
+                                                      ? "No target"
+                                                      : role.portfolio_allocation_reconciled
+                                                        ? "Reconciled"
+                                                        : "Mismatch"}
+                                                  </td>
+                                                </tr>
+                                              )
+                                            )}
+                                          </tbody>
+                                        </table>
+                                      </div>
+
+                                      <div className="mt-3 text-[11px] text-muted-foreground">
+                                        {businessUnitResponseResult.unallocated_destinations.length.toLocaleString()} positive destination row(s) remain unallocated ·{" "}
+                                        {businessUnitResponseResult.contractions.length.toLocaleString()} contraction offset row(s). Destination gaps are not automatically treated as enterprise gaps.
+                                      </div>
+
+                                      {businessUnitResponseResult.warnings.length > 0 && (
+                                        <div className="mt-3 rounded-md border p-3">
+                                          <p className="text-xs font-medium">
+                                            BU allocation warnings
+                                          </p>
+                                          <ul className="mt-2 space-y-1 text-[11px] text-muted-foreground">
+                                            {businessUnitResponseResult.warnings.map(
+                                              (warning) => (
+                                                <li key={warning}>
+                                                  - {warning}
+                                                </li>
+                                              )
+                                            )}
+                                          </ul>
+                                        </div>
+                                      )}
+                                    </>
+                                  )}
+                                </div>
+                              </details>
 
                               <div className="mt-4 overflow-x-auto rounded-md border">
                                 <table className="w-full min-w-[760px] text-sm">

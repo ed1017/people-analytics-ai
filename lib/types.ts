@@ -509,6 +509,60 @@ export type RoleWorkforceResponsePlanResponse = {
   methodology: string[];
 };
 
+export type BusinessUnitResponseAllocationResponse = {
+  as_of: string;
+  scenario_net_role_demand: number;
+  gross_destination_demand: number;
+  contraction_offset: number;
+  allocation: WorkforceResponsePlanAllocation;
+  effective_coverage_if_executed: number;
+  remaining_net_gap_if_executed: number;
+  overplanned_capacity: number;
+  roles: Array<{
+    job_profile_code: string;
+    job_profile_name: string;
+    enterprise_net_role_demand: number;
+    gross_positive_bu_demand: number;
+    contraction_offset: number;
+    allocation: WorkforceResponsePlanAllocation;
+    portfolio_target_allocation: WorkforceResponsePlanAllocation | null;
+    allocation_delta_vs_portfolio: WorkforceResponsePlanAllocation | null;
+    portfolio_allocation_reconciled: boolean | null;
+    effective_coverage_if_executed: number;
+    remaining_net_gap_if_executed: number;
+    overplanned_capacity: number;
+    role_evidence: RoleWorkforceResponsePlanResponse;
+  }>;
+  business_units: Array<{
+    org_code: string;
+    org_name: string;
+    job_profile_code: string;
+    job_profile_name: string;
+    gross_destination_demand: number;
+    allocation: WorkforceResponsePlanAllocation;
+    raw_allocated_response: number;
+    effective_destination_coverage: number;
+    destination_gap_before_enterprise_offsets: number;
+    destination_overallocation: number;
+  }>;
+  unallocated_destinations: Array<{
+    org_code: string;
+    org_name: string;
+    job_profile_code: string;
+    job_profile_name: string;
+    gross_destination_demand: number;
+  }>;
+  contractions: Array<{
+    org_code: string;
+    org_name: string;
+    job_profile_code: string;
+    job_profile_name: string;
+    contraction_delta: number;
+  }>;
+  warnings: string[];
+  methodology: string[];
+};
+
 export type WorkforceResponsePortfolioResponse = {
   as_of: string;
   scenario_positive_role_demand: number;
