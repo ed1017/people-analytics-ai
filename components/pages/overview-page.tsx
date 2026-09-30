@@ -11,6 +11,13 @@ import {
 } from "recharts";
 
 import { Button } from "@/components/ui/button";
+import {
+  formatCurrencyCompact,
+  formatFte,
+  formatPercent,
+  formatSignedPercent,
+  formatWholeCount,
+} from "@/lib/display-format";
 import type {
   DashboardFilterOptions,
   HeadcountTrendPoint,
@@ -233,14 +240,12 @@ export function OverviewPage({
           </p>
           <p className="mt-2 text-3xl font-semibold">
             {overviewData
-              ? overviewData.headcount.toLocaleString()
+              ? formatWholeCount(overviewData.headcount)
               : "—"}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             {overviewData
-              ? `${Number(
-                  overviewData.fte
-                ).toLocaleString()} FTE`
+              ? `${formatFte(Number(overviewData.fte))} FTE`
               : "Loading"}
           </p>
         </div>
@@ -251,7 +256,7 @@ export function OverviewPage({
           </p>
           <p className="mt-2 text-3xl font-semibold">
             {overviewData
-              ? `${overviewData.voluntary_turnover_ytd_pct}%`
+              ? formatPercent(overviewData.voluntary_turnover_ytd_pct)
               : "—"}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -265,11 +270,9 @@ export function OverviewPage({
           </p>
           <p className="mt-2 text-3xl font-semibold">
             {overviewData
-              ? `$${(
-                  Number(
-                    overviewData.labor_cost_usd
-                  ) / 1_000_000_000
-                ).toFixed(2)}B`
+              ? formatCurrencyCompact(
+                  Number(overviewData.labor_cost_usd)
+                )
               : "—"}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -283,7 +286,7 @@ export function OverviewPage({
           </p>
           <p className="mt-2 text-3xl font-semibold">
             {overviewData
-              ? overviewData.open_positions.toLocaleString()
+              ? formatWholeCount(overviewData.open_positions)
               : "—"}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -317,13 +320,7 @@ export function OverviewPage({
                 </p>
                 <p className="font-semibold">
                   {headcountGrowthPct !== null
-                    ? `${
-                        headcountGrowthPct >= 0
-                          ? "+"
-                          : ""
-                      }${headcountGrowthPct.toFixed(
-                        1
-                      )}%`
+                    ? formatSignedPercent(headcountGrowthPct)
                     : "—"}
                 </p>
               </div>
@@ -333,9 +330,11 @@ export function OverviewPage({
                   Current
                 </p>
                 <p className="font-semibold">
-                  {headcountTrend[
-                    headcountTrend.length - 1
-                  ].headcount.toLocaleString()}
+                  {formatWholeCount(
+                    headcountTrend[
+                      headcountTrend.length - 1
+                    ].headcount
+                  )}
                 </p>
               </div>
             </div>
@@ -383,7 +382,7 @@ export function OverviewPage({
                   ]}
                   tickFormatter={(
                     value: number
-                  ) => value.toLocaleString()}
+                  ) => formatWholeCount(value)}
                   width={64}
                   tick={{ fontSize: 12 }}
                 />
@@ -394,9 +393,9 @@ export function OverviewPage({
                     )
                   }
                   formatter={(value) => [
-                    Number(
-                      value
-                    ).toLocaleString(),
+                    formatWholeCount(
+                      Number(value)
+                    ),
                     "Headcount",
                   ]}
                   contentStyle={{

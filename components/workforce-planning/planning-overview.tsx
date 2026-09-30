@@ -1,3 +1,10 @@
+import {
+  formatCapacity,
+  formatPercent,
+  formatSignedCapacityDelta,
+  formatSignedWholeDelta,
+  formatWholeCount,
+} from "@/lib/display-format";
 import type {
   BusinessUnitResponseAllocationResponse,
   PlanningPoint,
@@ -21,10 +28,6 @@ type PlanningOverviewProps = {
   responseConstraintResult: WorkforceResponseConstraintResponse | null;
   onNavigate: (view: PlanningWorkspaceView) => void;
 };
-
-function formatCount(value: number) {
-  return value.toLocaleString("en-US", { maximumFractionDigits: 1 });
-}
 
 export function PlanningOverview({
   activePlanningScenario,
@@ -70,7 +73,7 @@ export function PlanningOverview({
     ? failedConstraint.detail
     : responseExecutionResult &&
         responseExecutionResult.final_remaining_net_gap > 0
-      ? `${formatCount(responseExecutionResult.final_remaining_net_gap)} roles remain uncovered in the current schedule`
+      ? `${formatCapacity(responseExecutionResult.final_remaining_net_gap)} roles remain uncovered in the current schedule`
       : responseConstraintResult?.overall_feasible
         ? "No hard-constraint breach in the current test"
         : "Execution has not been tested yet";
@@ -80,7 +83,7 @@ export function PlanningOverview({
       title: "Current workforce plan",
       value: activePlanningScenario?.scenario_name ?? "No scenario selected",
       detail: activePlanningEnd
-        ? `Ending headcount: ${formatCount(activePlanningEnd.planned_headcount)}`
+        ? `Ending headcount: ${formatWholeCount(activePlanningEnd.planned_headcount)}`
         : "Run or select a workforce scenario.",
       action: "Scenario Modeling",
       view: "plan" as const,
@@ -90,10 +93,10 @@ export function PlanningOverview({
       value:
         planningHeadcountDeltaVsBaseline === null
           ? "Not available"
-          : `${planningHeadcountDeltaVsBaseline >= 0 ? "+" : ""}${formatCount(planningHeadcountDeltaVsBaseline)} headcount`,
+          : `${formatSignedWholeDelta(planningHeadcountDeltaVsBaseline)} headcount`,
       detail:
         baselinePlanningEnd && activePlanningEnd
-          ? `Baseline ends at ${formatCount(baselinePlanningEnd.planned_headcount)}; current plan ends at ${formatCount(activePlanningEnd.planned_headcount)}.`
+          ? `Baseline ends at ${formatWholeCount(baselinePlanningEnd.planned_headcount)}; current plan ends at ${formatWholeCount(activePlanningEnd.planned_headcount)}.`
           : "Baseline comparison will appear when the plan is loaded.",
       action: "Scenario Modeling",
       view: "plan" as const,
@@ -102,7 +105,7 @@ export function PlanningOverview({
       title: "Approved response",
       value: responseStatus,
       detail: approvedAllocation
-        ? `Build ${formatCount(approvedAllocation.build)} / Move ${formatCount(approvedAllocation.move)} / Buy ${formatCount(approvedAllocation.buy)}`
+        ? `Build ${formatCapacity(approvedAllocation.build)} / Move ${formatCapacity(approvedAllocation.move)} / Buy ${formatCapacity(approvedAllocation.buy)}`
         : "Complete Workforce Response before execution.",
       action: "Workforce Response",
       view: "respond" as const,
@@ -111,7 +114,7 @@ export function PlanningOverview({
       title: "Biggest execution risk",
       value: executionRisk,
       detail: responseExecutionResult
-        ? `Current scheduled coverage: ${responseExecutionResult.final_coverage_pct.toFixed(1)}%`
+        ? `Current scheduled coverage: ${formatPercent(responseExecutionResult.final_coverage_pct)}`
         : "No execution schedule has been run yet.",
       action: "Execution & Feasibility",
       view: "execute" as const,
@@ -168,8 +171,9 @@ export function PlanningOverview({
                   <p className="text-xs text-muted-foreground">{row.org_name}</p>
                 </div>
                 <span className="tabular-nums font-semibold">
-                  {row.authorized_position_delta > 0 ? "+" : ""}
-                  {formatCount(row.authorized_position_delta)}
+                  {formatSignedCapacityDelta(
+                    row.authorized_position_delta
+                  )}
                 </span>
               </button>
             ))}

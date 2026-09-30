@@ -1,3 +1,7 @@
+import {
+  formatCapacity,
+  formatPercent,
+} from "@/lib/display-format";
 import type {
   TimePhasedWorkforceExecutionResponse,
 } from "@/lib/types";
@@ -12,12 +16,6 @@ function formatMonth(value: string) {
   ).toLocaleDateString("en-US", {
     month: "short",
     year: "numeric",
-  });
-}
-
-function formatCount(value: number) {
-  return value.toLocaleString("en-US", {
-    maximumFractionDigits: 1,
   });
 }
 
@@ -42,37 +40,40 @@ export function ExecutionResultSummary({
           </p>
         </div>
         <div className="rounded-md border p-3">
-          <p className="text-[11px] text-muted-foreground">
-            Scheduled B / M / B
+          <p
+            className="text-[11px] text-muted-foreground"
+            title="Modeled execution capacity can be fractional; display precision does not change the underlying schedule."
+          >
+            Scheduled B / M / B capacity
           </p>
           <p className="mt-1 text-xl font-semibold tabular-nums">
-            {formatCount(
+            {formatCapacity(
               result.scheduled_allocation.build
             )}{" "}
             /{" "}
-            {formatCount(
+            {formatCapacity(
               result.scheduled_allocation.move
             )}{" "}
             /{" "}
-            {formatCount(
+            {formatCapacity(
               result.scheduled_allocation.buy
             )}
           </p>
         </div>
         <div className="rounded-md border p-3">
           <p className="text-[11px] text-muted-foreground">
-            Unscheduled B / M / B
+            Unscheduled B / M / B capacity
           </p>
           <p className="mt-1 text-xl font-semibold tabular-nums">
-            {formatCount(
+            {formatCapacity(
               result.unscheduled_allocation.build
             )}{" "}
             /{" "}
-            {formatCount(
+            {formatCapacity(
               result.unscheduled_allocation.move
             )}{" "}
             /{" "}
-            {formatCount(
+            {formatCapacity(
               result.unscheduled_allocation.buy
             )}
           </p>
@@ -82,14 +83,14 @@ export function ExecutionResultSummary({
             Final Remaining Net Gap
           </p>
           <p className="mt-1 text-xl font-semibold">
-            {formatCount(
+            {formatCapacity(
               result.final_remaining_net_gap
             )}
           </p>
           <p className="text-[10px] text-muted-foreground">
-            {result.final_coverage_pct.toFixed(
-              1
-            )}% coverage
+            {formatPercent(
+              result.final_coverage_pct
+            )} coverage
           </p>
         </div>
       </div>
@@ -131,34 +132,34 @@ export function ExecutionResultSummary({
                   {formatMonth(point.month)}
                 </td>
                 <td className="p-3 text-right tabular-nums">
-                  {formatCount(
+                  {formatCapacity(
                     point.effective_build
                   )}
                 </td>
                 <td className="p-3 text-right tabular-nums">
-                  {formatCount(
+                  {formatCapacity(
                     point.effective_move
                   )}
                 </td>
                 <td className="p-3 text-right tabular-nums">
-                  {formatCount(
+                  {formatCapacity(
                     point.effective_buy
                   )}
                 </td>
                 <td className="p-3 text-right font-medium tabular-nums">
-                  {formatCount(
+                  {formatCapacity(
                     point.cumulative_effective_coverage
                   )}
                 </td>
                 <td className="p-3 text-right font-medium tabular-nums">
-                  {formatCount(
+                  {formatCapacity(
                     point.remaining_net_gap
                   )}
                 </td>
                 <td className="p-3 text-right tabular-nums">
-                  {point.coverage_pct.toFixed(
-                    1
-                  )}%
+                  {formatPercent(
+                    point.coverage_pct
+                  )}
                 </td>
               </tr>
             ))}

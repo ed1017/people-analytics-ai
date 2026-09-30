@@ -1,3 +1,8 @@
+import {
+  formatPercent,
+  formatSignedWholeDelta,
+  formatWholeCount,
+} from "@/lib/display-format";
 import type {
   PositionBusinessUnit,
   PositionLevel,
@@ -39,11 +44,11 @@ export function PositionModelingSummary({
                 Current Positions
               </p>
               <p className="mt-2 text-3xl font-semibold">
-                {positionModelingData.current.current_positions.toLocaleString()}
+                {formatWholeCount(positionModelingData.current.current_positions)}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                {positionModelingData.current.filled_positions.toLocaleString()} filled ·{" "}
-                {positionModelingData.current.vacant_positions.toLocaleString()} vacant
+                {formatWholeCount(positionModelingData.current.filled_positions)} filled ·{" "}
+                {formatWholeCount(positionModelingData.current.vacant_positions)} vacant
               </p>
             </div>
 
@@ -52,10 +57,9 @@ export function PositionModelingSummary({
                 Vacancy Rate
               </p>
               <p className="mt-2 text-3xl font-semibold">
-                {positionModelingData.current.vacancy_rate_pct.toFixed(
-                  1
+                {formatPercent(
+                  positionModelingData.current.vacancy_rate_pct
                 )}
-                %
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 Current authorized positions
@@ -67,7 +71,7 @@ export function PositionModelingSummary({
                 Dec 2027 Planned Positions
               </p>
               <p className="mt-2 text-3xl font-semibold">
-                {activePositionScenario.totals.planned_positions.toLocaleString()}
+                {formatWholeCount(activePositionScenario.totals.planned_positions)}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 {activePositionScenario.scenario_name} scenario
@@ -79,11 +83,9 @@ export function PositionModelingSummary({
                 Net Position Change
               </p>
               <p className="mt-2 text-3xl font-semibold">
-                {activePositionScenario.totals.net_position_change >=
-                0
-                  ? "+"
-                  : ""}
-                {activePositionScenario.totals.net_position_change.toLocaleString()}
+                {formatSignedWholeDelta(
+                  activePositionScenario.totals.net_position_change
+                )}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 Planned positions vs current
@@ -137,17 +139,15 @@ export function PositionModelingSummary({
                             {row.org_name}
                           </td>
                           <td className="py-3 pr-4 text-right">
-                            {row.current_positions.toLocaleString()}
+                            {formatWholeCount(row.current_positions)}
                           </td>
                           <td className="py-3 pr-4 text-right">
-                            {row.planned_positions.toLocaleString()}
+                            {formatWholeCount(row.planned_positions)}
                           </td>
                           <td className="py-3 text-right font-semibold">
-                            {row.net_position_change >
-                            0
-                              ? "+"
-                              : ""}
-                            {row.net_position_change.toLocaleString()}
+                            {formatSignedWholeDelta(
+                              row.net_position_change
+                            )}
                           </td>
                         </tr>
                       )
@@ -204,17 +204,15 @@ export function PositionModelingSummary({
                             {row.level_name}
                           </td>
                           <td className="px-1 py-3 text-right tabular-nums whitespace-nowrap">
-                            {row.current_positions.toLocaleString()}
+                            {formatWholeCount(row.current_positions)}
                           </td>
                           <td className="px-1 py-3 text-right tabular-nums whitespace-nowrap">
-                            {row.planned_positions.toLocaleString()}
+                            {formatWholeCount(row.planned_positions)}
                           </td>
                           <td className="py-3 pl-1 text-right font-semibold tabular-nums whitespace-nowrap">
-                            {row.net_position_change >
-                            0
-                              ? "+"
-                              : ""}
-                            {row.net_position_change.toLocaleString()}
+                            {formatSignedWholeDelta(
+                              row.net_position_change
+                            )}
                           </td>
                         </tr>
                       )

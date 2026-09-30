@@ -1,30 +1,16 @@
+import {
+  formatCapacity,
+  formatCurrencyCompact,
+  formatPercent,
+  formatSignedWholeDelta,
+  formatWholeCount,
+} from "@/lib/display-format";
 import type { StructuralPositionScenarioResponse } from "@/lib/types";
 
 type StructuralPositionScenarioSummaryProps = {
   result: StructuralPositionScenarioResponse;
   showDemandDetails: boolean;
 };
-
-function formatModeledCount(value: number) {
-  return value.toLocaleString("en-US", {
-    maximumFractionDigits: 1,
-  });
-}
-
-function formatCurrencyCompact(value: number) {
-  const sign = value < 0 ? "-" : "";
-  const absoluteValue = Math.abs(value);
-
-  if (absoluteValue >= 1_000_000_000) {
-    return sign + "$" + (absoluteValue / 1_000_000_000).toFixed(2) + "B";
-  }
-
-  if (absoluteValue >= 1_000_000) {
-    return sign + "$" + (absoluteValue / 1_000_000).toFixed(1) + "M";
-  }
-
-  return sign + "$" + Math.round(absoluteValue).toLocaleString();
-}
 
 export function StructuralPositionScenarioSummary({
   result,
@@ -40,14 +26,12 @@ export function StructuralPositionScenarioSummary({
             Authorized Positions
           </p>
           <p className="mt-1 text-2xl font-semibold">
-            {structuralPositionResult.modeled.authorized_positions.toLocaleString()}
+            {formatWholeCount(structuralPositionResult.modeled.authorized_positions)}
           </p>
           <p className="text-xs text-muted-foreground">
-            {structuralPositionResult.modeled.net_authorized_position_change >=
-            0
-              ? "+"
-              : ""}
-            {structuralPositionResult.modeled.net_authorized_position_change.toLocaleString()}{" "}
+            {formatSignedWholeDelta(
+              structuralPositionResult.modeled.net_authorized_position_change
+            )}{" "}
             vs current
           </p>
         </div>
@@ -57,14 +41,12 @@ export function StructuralPositionScenarioSummary({
             Filled Positions
           </p>
           <p className="mt-1 text-2xl font-semibold">
-            {structuralPositionResult.modeled.filled_positions.toLocaleString()}
+            {formatWholeCount(structuralPositionResult.modeled.filled_positions)}
           </p>
           <p className="text-xs text-muted-foreground">
-            {structuralPositionResult.modeled.net_filled_position_change >=
-            0
-              ? "+"
-              : ""}
-            {structuralPositionResult.modeled.net_filled_position_change.toLocaleString()}{" "}
+            {formatSignedWholeDelta(
+              structuralPositionResult.modeled.net_filled_position_change
+            )}{" "}
             vs current
           </p>
         </div>
@@ -74,13 +56,12 @@ export function StructuralPositionScenarioSummary({
             Open Vacancies
           </p>
           <p className="mt-1 text-2xl font-semibold">
-            {structuralPositionResult.modeled.open_vacancies.toLocaleString()}
+            {formatWholeCount(structuralPositionResult.modeled.open_vacancies)}
           </p>
           <p className="text-xs text-muted-foreground">
-            {structuralPositionResult.modeled.vacancy_rate_pct.toFixed(
-              1
-            )}
-            % vacancy rate
+            {formatPercent(
+              structuralPositionResult.modeled.vacancy_rate_pct
+            )} vacancy rate
           </p>
         </div>
 
@@ -137,7 +118,7 @@ export function StructuralPositionScenarioSummary({
               Active Recruiting Demand
             </p>
             <p className="mt-1 text-2xl font-semibold">
-              {formatModeledCount(
+              {formatCapacity(
                 structuralPositionResult.recruiting_demand
                   .active_recruiting_demand
               )}
@@ -152,13 +133,13 @@ export function StructuralPositionScenarioSummary({
               Open Requisitions
             </p>
             <p className="mt-1 text-2xl font-semibold">
-              {formatModeledCount(
+              {formatCapacity(
                 structuralPositionResult.recruiting_demand
                   .active_open_requisitions
               )}
             </p>
             <p className="text-xs text-muted-foreground">
-              {formatModeledCount(
+              {formatCapacity(
                 structuralPositionResult.current
                   .open_requisitions
               )}{" "}
@@ -171,7 +152,7 @@ export function StructuralPositionScenarioSummary({
               On-Hold Requisitions
             </p>
             <p className="mt-1 text-2xl font-semibold">
-              {formatModeledCount(
+              {formatCapacity(
                 structuralPositionResult.recruiting_demand
                   .on_hold_requisitions
               )}
@@ -186,7 +167,7 @@ export function StructuralPositionScenarioSummary({
               New Requisitions Needed
             </p>
             <p className="mt-1 text-2xl font-semibold">
-              {formatModeledCount(
+              {formatCapacity(
                 structuralPositionResult.recruiting_demand
                   .incremental_requisitions_needed
               )}
@@ -200,35 +181,35 @@ export function StructuralPositionScenarioSummary({
         <div className="mt-4 flex flex-wrap gap-2 text-xs">
           <span className="rounded-full border px-3 py-1">
             Hold{" "}
-            {formatModeledCount(
+            {formatCapacity(
               structuralPositionResult.recruiting_demand
                 .requisitions_to_hold
             )}
           </span>
           <span className="rounded-full border px-3 py-1">
             Cancel{" "}
-            {formatModeledCount(
+            {formatCapacity(
               structuralPositionResult.recruiting_demand
                 .requisitions_to_cancel
             )}
           </span>
           <span className="rounded-full border px-3 py-1">
             Create for fills{" "}
-            {formatModeledCount(
+            {formatCapacity(
               structuralPositionResult.recruiting_demand
                 .requisitions_to_create_for_modeled_fills
             )}
           </span>
           <span className="rounded-full border px-3 py-1">
             Reactivate for fills{" "}
-            {formatModeledCount(
+            {formatCapacity(
               structuralPositionResult.recruiting_demand
                 .requisitions_to_reactivate_for_modeled_fills
             )}
           </span>
           <span className="rounded-full border px-3 py-1">
             Close as filled{" "}
-            {formatModeledCount(
+            {formatCapacity(
               structuralPositionResult.recruiting_demand
                 .requisitions_closed_as_filled
             )}
@@ -271,27 +252,27 @@ export function StructuralPositionScenarioSummary({
                       {row.org_name}
                     </td>
                     <td className="px-3 py-3 text-right tabular-nums">
-                      {formatModeledCount(
+                      {formatCapacity(
                         row.active_recruiting_demand
                       )}
                     </td>
                     <td className="px-3 py-3 text-right tabular-nums">
-                      {formatModeledCount(
+                      {formatCapacity(
                         row.active_open_requisitions
                       )}
                     </td>
                     <td className="px-3 py-3 text-right tabular-nums">
-                      {formatModeledCount(
+                      {formatCapacity(
                         row.on_hold_requisitions
                       )}
                     </td>
                     <td className="px-3 py-3 text-right tabular-nums">
-                      {formatModeledCount(
+                      {formatCapacity(
                         row.uncovered_open_vacancies
                       )}
                     </td>
                     <td className="py-3 pl-3 text-right tabular-nums">
-                      {formatModeledCount(
+                      {formatCapacity(
                         row.modeled_fills
                       )}
                     </td>
@@ -361,7 +342,7 @@ export function StructuralPositionScenarioSummary({
             <p className="text-xs text-muted-foreground">
               {structuralPositionResult.skill_demand
                 .largest_modeled_gaps[0]
-                ? formatModeledCount(
+                ? formatCapacity(
                     structuralPositionResult.skill_demand
                       .largest_modeled_gaps[0]
                       .modeled_position_gap
@@ -383,7 +364,7 @@ export function StructuralPositionScenarioSummary({
             <p className="text-xs text-muted-foreground">
               {structuralPositionResult.skill_demand
                 .top_recruiting_skill_demand[0]
-                ? formatModeledCount(
+                ? formatCapacity(
                     structuralPositionResult.skill_demand
                       .top_recruiting_skill_demand[0]
                       .modeled_active_recruiting_demand
@@ -446,12 +427,12 @@ export function StructuralPositionScenarioSummary({
                           0
                             ? "+"
                             : ""}
-                          {formatModeledCount(
+                          {formatCapacity(
                             row.authorized_demand_delta
                           )}
                         </td>
                         <td className="py-3 pl-3 text-right tabular-nums">
-                          {formatModeledCount(
+                          {formatCapacity(
                             row.modeled_position_gap
                           )}
                         </td>
@@ -507,7 +488,7 @@ export function StructuralPositionScenarioSummary({
                         </p>
                       </td>
                       <td className="px-3 py-3 text-right tabular-nums">
-                        {formatModeledCount(
+                        {formatCapacity(
                           row.modeled_active_recruiting_demand
                         )}
                       </td>
@@ -516,7 +497,7 @@ export function StructuralPositionScenarioSummary({
                         0
                           ? "+"
                           : ""}
-                        {formatModeledCount(
+                        {formatCapacity(
                           row.active_recruiting_demand_delta
                         )}
                       </td>
