@@ -222,6 +222,52 @@ type LearningDevelopmentContext = {
   }>;
 };
 
+type CareerMobilityContext = {
+  summary: {
+    active_employees: number;
+    employees_with_preference: number;
+    employees_without_preference: number;
+    preference_record_coverage_pct: number;
+    known_relocation_records: number;
+    relocation_willing_employees: number;
+    relocation_willing_pct: number;
+    destination_profile_records: number;
+    destination_location_records: number;
+    career_interest_records: number;
+  };
+  dataQuality: {
+    preference_rows: number;
+    distinct_preference_employees: number;
+    employees_with_multiple_preference_rows: number;
+    missing_desired_profile: number;
+    missing_desired_location: number;
+    missing_relocation_willingness: number;
+    missing_career_interest: number;
+  };
+  careerInterests: Array<{
+    label: string;
+    employees: number;
+    share_pct: number;
+  }>;
+  destinationRoles: Array<{
+    label: string;
+    employees: number;
+    share_pct: number;
+  }>;
+  desiredLocations: Array<{
+    location_name: string;
+    country_code: string;
+    employees: number;
+    share_pct: number;
+  }>;
+  currentOrgCoverage: Array<{
+    org_name: string;
+    active_employees: number;
+    employees_with_preference: number;
+    preference_coverage_pct: number;
+  }>;
+};
+
 type TalentAcquisitionContext = {
   summary: {
     applications: number;
@@ -387,6 +433,7 @@ export async function POST(
       body?.page === "finance" ||
       body?.page === "skills" ||
       body?.page === "learning-development" ||
+      body?.page === "career-mobility" ||
       body?.page === "talent-acquisition" ||
       body?.page === "survey-sentiment"
         ? body.page
@@ -425,6 +472,11 @@ export async function POST(
     const learningDevelopmentContext =
       body?.learningDevelopmentContext
         ? (body.learningDevelopmentContext as LearningDevelopmentContext)
+        : null;
+
+    const careerMobilityContext =
+      body?.careerMobilityContext
+        ? (body.careerMobilityContext as CareerMobilityContext)
         : null;
 
     const talentAcquisitionContext =
@@ -755,6 +807,48 @@ Interpretation rules:
 `.trim()
         : "";
 
+    const careerMobilityPrompt =
+      page === "career-mobility" &&
+      careerMobilityContext
+        ? `
+CURRENT CAREER & MOBILITY CONTEXT
+Preference-record summary:
+- Active employees: ${careerMobilityContext.summary.active_employees}
+- Employees with a recorded career preference: ${careerMobilityContext.summary.employees_with_preference}
+- Employees without a recorded preference row: ${careerMobilityContext.summary.employees_without_preference}
+- Preference-record coverage: ${careerMobilityContext.summary.preference_record_coverage_pct}%
+- Relocation willingness recorded: ${careerMobilityContext.summary.relocation_willing_employees} willing of ${careerMobilityContext.summary.known_relocation_records} known responses (${careerMobilityContext.summary.relocation_willing_pct}%)
+
+Recorded career-interest categories:
+${careerMobilityContext.careerInterests
+  .map((row) => `- ${row.label}: ${row.employees} employees (${row.share_pct}% of known career-interest records)`)
+  .join("\n")}
+
+Top desired job profiles:
+${careerMobilityContext.destinationRoles
+  .map((row) => `- ${row.label}: ${row.employees} preference holders (${row.share_pct}% of known destination-profile records)`)
+  .join("\n")}
+
+Top desired locations:
+${careerMobilityContext.desiredLocations
+  .map((row) => `- ${row.location_name} (${row.country_code}): ${row.employees} preference holders (${row.share_pct}% of known desired-location records)`)
+  .join("\n")}
+
+Current-organization preference coverage:
+${careerMobilityContext.currentOrgCoverage
+  .map((row) => `- ${row.org_name}: ${row.employees_with_preference} of ${row.active_employees} active employees have a recorded preference (${row.preference_coverage_pct}%)`)
+  .join("\n")}
+
+Interpretation rules:
+- A career_preferences row records an expressed preference in the loaded synthetic data; it does not establish suitability, readiness, promotion eligibility, transfer feasibility, or likely movement.
+- Employees without a career_preferences row have no recorded preference in this source. Do not describe them as having no career interest.
+- Desired roles and locations are expressed destinations, not vacancies or recommendations.
+- Relocation willingness is a recorded preference field and does not establish that relocation will occur.
+- Organization-level differences are descriptive coverage patterns only; do not infer engagement, manager quality, mobility opportunity, or employee intent beyond the supplied fields.
+- Results are aggregate only. Do not expose, rank, or recommend individual employees.
+`.trim()
+        : "";
+
     const talentAcquisitionPrompt =
       page === "talent-acquisition" &&
       talentAcquisitionContext
@@ -1045,6 +1139,8 @@ ${financePrompt}
 ${skillsPrompt}
 
 ${learningDevelopmentPrompt}
+
+${careerMobilityPrompt}
 
 ${talentAcquisitionPrompt}
 

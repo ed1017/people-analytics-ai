@@ -46,6 +46,7 @@ export type AppPage =
   | "finance"
   | "skills"
   | "learning-development"
+  | "career-mobility"
   | "workforce-planning";
 
 export type PlanningPoint = {
@@ -851,6 +852,65 @@ export type LearningDevelopmentResponse = {
   };
   skill_pathways: LearningDevelopmentSkillPathway[];
   job_profile_pathways: LearningDevelopmentJobProfilePathway[];
+  methodology: string[];
+};
+
+export type CareerMobilityAggregateItem = {
+  code: string;
+  label: string;
+  employees: number;
+  share_pct: number;
+};
+
+export type CareerMobilityLocationItem = {
+  location_code: string;
+  location_name: string;
+  city: string | null;
+  country_code: string;
+  employees: number;
+  share_pct: number;
+};
+
+export type CareerMobilityOrgCoverageItem = {
+  org_code: string;
+  org_name: string;
+  active_employees: number;
+  employees_with_preference: number;
+  preference_coverage_pct: number;
+};
+
+export type CareerMobilityResponse = {
+  as_of: string | null;
+  summary: {
+    active_employees: number;
+    employees_with_preference: number;
+    employees_without_preference: number;
+    preference_record_coverage_pct: number;
+    known_relocation_records: number;
+    relocation_willing_employees: number;
+    relocation_willing_pct: number;
+    destination_profile_records: number;
+    destination_location_records: number;
+    career_interest_records: number;
+  };
+  data_quality: {
+    preference_rows: number;
+    distinct_preference_employees: number;
+    employees_with_multiple_preference_rows: number;
+    missing_desired_profile: number;
+    missing_desired_location: number;
+    missing_relocation_willingness: number;
+    missing_career_interest: number;
+    unmatched_profile_references: number;
+    unmatched_location_references: number;
+    unmatched_current_org_references: number;
+    earliest_preference_update: string | null;
+    latest_preference_update: string | null;
+  };
+  career_interests: CareerMobilityAggregateItem[];
+  destination_roles: CareerMobilityAggregateItem[];
+  desired_locations: CareerMobilityLocationItem[];
+  current_org_coverage: CareerMobilityOrgCoverageItem[];
   methodology: string[];
 };
 
