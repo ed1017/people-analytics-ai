@@ -329,6 +329,54 @@ export type StructuralPositionScenarioResponse = {
   methodology: string[];
 };
 
+export type WorkforceResponsePlanAllocation = {
+  build: number;
+  move: number;
+  buy: number;
+  borrow: number;
+  automate: number;
+};
+
+export type WorkforceResponsePlanResponse = {
+  skill_code: string;
+  skill_name: string;
+  skill_category: string;
+  modeled_position_gap: number;
+  allocation: WorkforceResponsePlanAllocation;
+  planned_coverage_if_executed: number;
+  remaining_gap_if_executed: number;
+  overplanned_capacity: number;
+  coverage_pct_if_executed: number;
+  evidence: {
+    build: {
+      pathway_available: boolean;
+      active_course_count: number;
+      avg_course_duration_hours: number | null;
+      enrolled_learners: number;
+      in_progress_learners: number;
+    };
+    move: {
+      mobility_candidates: number;
+    };
+    buy: {
+      active_recruiting_demand: number;
+      historical_filled_requisitions: number;
+      median_time_to_fill_days: number | null;
+    };
+    borrow: {
+      data_available: boolean;
+      active_contingent_workers: number;
+      avg_active_bill_rate: number | null;
+    };
+    automate: {
+      data_available: boolean;
+      reason: string;
+    };
+  };
+  warnings: string[];
+  methodology: string[];
+};
+
 export type StructuralPositionCatalogResponse = {
   as_of: string;
   business_units: Array<{

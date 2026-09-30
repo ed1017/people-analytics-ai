@@ -3,6 +3,10 @@ import {
   runStructuralPositionScenario,
 } from "./structural-position-scenario";
 import {
+  runWorkforceResponsePlan,
+  type WorkforceResponsePlanRequest,
+} from "./workforce-response-plan";
+import {
   runPositionActionScenario,
   type PositionActionScenarioRequest,
 } from "./position-action-scenario";
@@ -367,6 +371,110 @@ export const peopleAnalyticsTools: any[] = [
         },
       },
       required: ["actions"],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
+    name: "run_workforce_response_plan",
+    description:
+      "Run a user-directed workforce response plan for one scenario-widened skill gap. Use only after structural position actions create a positive modeled skill gap and the user explicitly allocates that gap across Build, Move, Buy, Borrow, or Automate. This is not an optimizer. It reruns the structural scenario, validates the selected skill and evidence, calculates planned coverage if executed, remaining gap, and warnings. Separate skill plans must not be summed as unique people because skills overlap.",
+    parameters: {
+      type: "object",
+      properties: {
+        actions: {
+          type: "array",
+          minItems: 1,
+          maxItems: 20,
+          items: {
+            type: "object",
+            properties: {
+              action_type: {
+                type: "string",
+                enum: [
+                  "add_positions",
+                  "close_vacant_positions",
+                  "freeze_vacancies",
+                  "fill_vacancies",
+                ],
+              },
+              business_unit: {
+                type: ["string", "null"],
+              },
+              level: {
+                type: ["string", "null"],
+              },
+              job_profile: {
+                type: ["string", "null"],
+              },
+              amount: {
+                type: ["number", "null"],
+              },
+              fill_pct: {
+                type: ["number", "null"],
+              },
+            },
+            required: [
+              "action_type",
+              "business_unit",
+              "level",
+              "job_profile",
+              "amount",
+              "fill_pct",
+            ],
+            additionalProperties: false,
+          },
+        },
+        skill_code: {
+          type: "string",
+          description:
+            "Skill code or exact skill name from the scenario response strategy, such as PYTHON or Python.",
+        },
+        allocation: {
+          type: "object",
+          properties: {
+            build: {
+              type: "number",
+              description:
+                "Planned people to cover through upskilling/reskilling if executed.",
+            },
+            move: {
+              type: "number",
+              description:
+                "Planned internal mobility placements if executed.",
+            },
+            buy: {
+              type: "number",
+              description:
+                "Planned external hires if executed.",
+            },
+            borrow: {
+              type: "number",
+              description:
+                "Planned contingent capacity. Must be zero when no contingent evidence is loaded.",
+            },
+            automate: {
+              type: "number",
+              description:
+                "Planned automated capacity units. Must be zero when no automation signal is loaded.",
+            },
+          },
+          required: [
+            "build",
+            "move",
+            "buy",
+            "borrow",
+            "automate",
+          ],
+          additionalProperties: false,
+        },
+      },
+      required: [
+        "actions",
+        "skill_code",
+        "allocation",
+      ],
       additionalProperties: false,
     },
     strict: true,
@@ -1246,6 +1354,10 @@ export async function runPeopleAnalyticsTool(
     case "run_structural_position_scenario":
       return runStructuralPositionScenario(
         (args.actions ?? []) as StructuralPositionAction[]
+      );
+    case "run_workforce_response_plan":
+      return runWorkforceResponsePlan(
+        args as WorkforceResponsePlanRequest
       );
     case "get_talent_acquisition":
       return getTalentAcquisition();
