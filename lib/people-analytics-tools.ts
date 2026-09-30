@@ -308,7 +308,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "run_structural_position_scenario",
     description:
-      "Run an ordered deterministic structural position scenario by business unit, career level, and optionally job profile. Use for scoped actions such as adding Manager positions in Data & AI, freezing Technology vacancies, closing Corporate vacancies, or filling a percentage of Consulting vacancies. Actions are applied in the order supplied. The model returns position inventory, authorized-position budget delta, annualized staffed labor-cost delta, recruiting-demand implications grounded in linked requisitions, and position-based skill-demand impacts using the skills required by each job profile while holding current employee skill supply constant.",
+      "Run an ordered deterministic structural position scenario by business unit, career level, and optionally job profile. Use for scoped actions such as adding Manager positions in Data & AI, freezing Technology vacancies, closing Corporate vacancies, or filling a percentage of Consulting vacancies. Actions are applied in the order supplied. The model returns position inventory, authorized-position budget delta, annualized staffed labor-cost delta, recruiting-demand implications grounded in linked requisitions, position-based skill-demand impacts, and evidence for Build / Move / Buy / Borrow response paths on scenario-widened skill gaps. Borrow is unavailable when no contingent data is loaded, and Automate is intentionally unmodeled without a role/task automation signal.",
     parameters: {
       type: "object",
       properties: {
