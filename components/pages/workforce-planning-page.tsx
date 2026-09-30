@@ -5542,7 +5542,7 @@ export function WorkforcePlanningPage({
                                                         ["max_monthly_build", "Monthly Build cap"],
                                                         ["max_monthly_move", "Monthly Move cap"],
                                                         ["max_monthly_buy", "Monthly Buy cap"],
-                                                        ["max_monthly_total", "Monthly total cap"],
+                                                        ["max_monthly_total", "Combined monthly cap"],
                                                       ] as const
                                                     ).map(([key, label]) => (
                                                       <label
