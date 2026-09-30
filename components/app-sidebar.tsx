@@ -46,13 +46,13 @@ export function AppSidebar({
   onPageChange,
 }: AppSidebarProps) {
   return (
-    <aside className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto border-r bg-muted/10 p-3">
+    <aside className="app-sidebar sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto border-r bg-muted/10 p-3 max-md:p-2">
       <Button
         variant="ghost"
         className={
           navCollapsed
             ? "mb-3 w-full justify-center px-0"
-            : "mb-3 w-full justify-start gap-2"
+            : "mb-3 w-full justify-start gap-2 max-md:justify-center max-md:px-0"
         }
         onClick={onToggle}
         title={
@@ -70,7 +70,7 @@ export function AppSidebar({
         ) : (
           <>
             <PanelLeftClose className="h-5 w-5" />
-            <span>Collapse navigation</span>
+            <span className="max-md:hidden">Collapse navigation</span>
           </>
         )}
       </Button>
@@ -87,7 +87,7 @@ export function AppSidebar({
               }
             >
               {!navCollapsed && (
-                <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground max-md:hidden">
                   {section.title}
                 </p>
               )}
@@ -109,7 +109,7 @@ export function AppSidebar({
                       className={
                         navCollapsed
                           ? "relative w-full justify-center px-0"
-                          : "relative w-full justify-start gap-3 px-3"
+                          : "relative w-full justify-start gap-3 px-3 max-md:justify-center max-md:px-0"
                       }
                       title={
                         navCollapsed
@@ -127,7 +127,7 @@ export function AppSidebar({
                       )}
                       <Icon className="h-5 w-5 shrink-0" />
                       {!navCollapsed && (
-                        <span className="truncate">
+                        <span className="truncate max-md:hidden">
                           {metadata.label}
                         </span>
                       )}
