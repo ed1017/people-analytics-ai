@@ -1,3 +1,4 @@
+import { calculateRoleBuyScale } from "./role-buy-feasibility-math";
 import { supabaseServer } from "./supabase-server";
 import type {
   RoleBuyFeasibilityResponse,
@@ -239,8 +240,11 @@ export async function getRoleBuyFeasibility(
 
   const recentCount =
     recentExternalFilled.length;
-  const recentAvgMonthly =
-    round1(recentCount / 12);
+  const buyScale =
+    calculateRoleBuyScale(
+      requested,
+      recentCount
+    );
   const peakMonthly =
     Math.max(
       0,
@@ -308,7 +312,7 @@ export async function getRoleBuyFeasibility(
       recent_12m_filled_requisitions:
         recentCount,
       recent_12m_avg_monthly_fills:
-        recentAvgMonthly,
+        buyScale.recent_12m_avg_monthly_fills,
       recent_12m_peak_monthly_fills:
         peakMonthly,
       median_time_to_fill_days:
@@ -336,20 +340,9 @@ export async function getRoleBuyFeasibility(
     requested_buy: requested,
     buy_scale: {
       pct_of_recent_12m_external_fills:
-        recentCount > 0
-          ? round1(
-              (requested /
-                recentCount) *
-                100
-            )
-          : null,
+        buyScale.pct_of_recent_12m_external_fills,
       multiple_of_recent_avg_monthly_fills:
-        recentAvgMonthly > 0
-          ? round1(
-              requested /
-                recentAvgMonthly
-            )
-          : null,
+        buyScale.multiple_of_recent_avg_monthly_fills,
     },
     warnings,
     methodology: [
