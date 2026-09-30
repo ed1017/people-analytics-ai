@@ -147,6 +147,12 @@ type ResponseExecutionDraft = {
   effective_month: string;
 };
 
+type WorkforcePlanningWorkflowView =
+  | "plan"
+  | "design"
+  | "respond"
+  | "execute";
+
 type ResponseConstraintDraft = {
   max_total_build: number | null;
   max_total_move: number | null;
@@ -318,6 +324,14 @@ export function WorkforcePlanningPage({
   onScenarioChange,
   onExplainCustomScenario,
 }: WorkforcePlanningPageProps) {
+  const [
+    workflowView,
+    setWorkflowView,
+  ] =
+    useState<WorkforcePlanningWorkflowView>(
+      "plan"
+    );
+
   const [scenarioDefaults, setScenarioDefaults] =
     useState<ScenarioModelAssumptions | null>(null);
   const [customAssumptions, setCustomAssumptions] =
@@ -2190,7 +2204,13 @@ export function WorkforcePlanningPage({
                 Workforce Planning
               </h2>
               <p className="text-muted-foreground">
-                Compare 2027 workforce scenarios, headcount trajectories, and labor cost implications.
+                {workflowView === "plan"
+                  ? "Compare workforce scenarios and decide what future demand looks like."
+                  : workflowView === "design"
+                    ? "Translate the workforce plan into concrete position, recruiting, and skill demand."
+                    : workflowView === "respond"
+                      ? "Decide how to close role gaps using Build, Move, and Buy."
+                      : "Schedule the approved response and test whether the plan is actually feasible."}
               </p>
             </div>
 
@@ -2201,12 +2221,132 @@ export function WorkforcePlanningPage({
             </span>
           </div>
 
+          <div className="mb-6 rounded-lg border p-3">
+            <div className="grid gap-2 md:grid-cols-4">
+              {(
+                [
+                  {
+                    key: "plan",
+                    step: "1",
+                    title: "Plan",
+                    description:
+                      "What workforce do we need?",
+                    ready: Boolean(
+                      activePlanningScenario
+                    ),
+                  },
+                  {
+                    key: "design",
+                    step: "2",
+                    title: "Design",
+                    description:
+                      "What positions should change?",
+                    ready: Boolean(
+                      structuralPositionResult
+                    ),
+                  },
+                  {
+                    key: "respond",
+                    step: "3",
+                    title: "Respond",
+                    description:
+                      "How do we close the gaps?",
+                    ready: Boolean(
+                      responsePortfolioResult ||
+                        roleResponsePlanResult
+                    ),
+                  },
+                  {
+                    key: "execute",
+                    step: "4",
+                    title: "Execute",
+                    description:
+                      "Can we actually deliver it?",
+                    ready: Boolean(
+                      responseExecutionResult
+                    ),
+                  },
+                ] as Array<{
+                  key: WorkforcePlanningWorkflowView;
+                  step: string;
+                  title: string;
+                  description: string;
+                  ready: boolean;
+                }>
+              ).map((item) => {
+                const active =
+                  workflowView === item.key;
+
+                return (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() =>
+                      setWorkflowView(item.key)
+                    }
+                    className={
+                      active
+                        ? "rounded-md border bg-foreground p-3 text-left text-background transition-colors"
+                        : "rounded-md border p-3 text-left transition-colors hover:bg-muted/50"
+                    }
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] font-medium uppercase tracking-wide opacity-70">
+                        Step {item.step}
+                      </span>
+                      <span
+                        className={
+                          active
+                            ? "text-[10px] opacity-80"
+                            : "text-[10px] text-muted-foreground"
+                        }
+                      >
+                        {item.ready
+                          ? "Ready"
+                          : "In progress"}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm font-semibold">
+                      {item.title}
+                    </p>
+                    <p
+                      className={
+                        active
+                          ? "mt-1 text-[11px] opacity-80"
+                          : "mt-1 text-[11px] text-muted-foreground"
+                      }
+                    >
+                      {item.description}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mb-6 rounded-md border bg-muted/20 p-3 text-sm">
+            {workflowView === "plan"
+              ? "Start with the business question: what workforce do we expect to need, and how does that compare with Baseline?"
+              : workflowView === "design"
+                ? "Now turn the workforce scenario into actual position changes — add, close, freeze, or fill roles."
+                : workflowView === "respond"
+                  ? "Once the role gaps are clear, decide how much to Build internally, Move from inside the company, or Buy through external hiring."
+                  : "Last step: put the approved response on a timeline, auto-schedule around constraints, and check whether the plan is actually executable."}
+          </div>
+
           {planningError && (
             <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
               {planningError}
             </div>
           )}
 
+          <div
+            className={
+              workflowView === "plan"
+                ? ""
+                : "hidden"
+            }
+          >
           <div className="mb-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {planningScenarios.map(
               (scenario) => {
@@ -3143,6 +3283,7 @@ export function WorkforcePlanningPage({
               )}
             </div>
           )}
+          </div>
 
           {planningLoading &&
           planningScenarios.length === 0 ? (
@@ -3152,7 +3293,13 @@ export function WorkforcePlanningPage({
           ) : activePlanningScenario &&
             activePlanningEnd ? (
             <>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div
+                className={
+                  workflowView === "plan"
+                    ? "grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+                    : "hidden"
+                }
+              >
                 <div className="rounded-lg border p-4">
                   <p className="text-sm text-muted-foreground">
                     Starting Headcount
@@ -3220,7 +3367,13 @@ export function WorkforcePlanningPage({
                 </div>
               </div>
 
-              <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+              <div
+                className={
+                  workflowView === "plan"
+                    ? "mt-6 grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]"
+                    : "hidden"
+                }
+              >
                 <div className="rounded-lg border p-4">
                   <div className="mb-4 flex items-start justify-between gap-4">
                     <div>
@@ -3389,7 +3542,13 @@ export function WorkforcePlanningPage({
               </div>
 
               <div className="mt-6 rounded-lg border p-4">
-                <div className="mb-4">
+                <div
+                  className={
+                    workflowView === "plan"
+                      ? "mb-4"
+                      : "hidden"
+                  }
+                >
                   <h3 className="font-semibold">
                     Scenario Comparison
                   </h3>
@@ -3398,7 +3557,13 @@ export function WorkforcePlanningPage({
                   </p>
                 </div>
 
-                <div className="overflow-x-auto">
+                <div
+                  className={
+                    workflowView === "plan"
+                      ? "overflow-x-auto"
+                      : "hidden"
+                  }
+                >
                   <table className="w-full min-w-[720px] text-sm">
                     <thead>
                       <tr className="border-b text-left text-xs text-muted-foreground">
@@ -3483,14 +3648,28 @@ export function WorkforcePlanningPage({
                 </div>
 
 
-              <div className="mt-6 rounded-lg border p-4">
+              <div
+                className={
+                  workflowView === "plan"
+                    ? "hidden"
+                    : "mt-6 rounded-lg border p-4"
+                }
+              >
                 <div className="mb-5 flex items-start justify-between gap-4">
                   <div>
                     <h3 className="font-semibold">
-                      Position Modeling
+                      {workflowView === "design"
+                        ? "Workforce Design"
+                        : workflowView === "respond"
+                          ? "Workforce Response"
+                          : "Execution & Feasibility"}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Authorized positions today versus December 2027 under the selected scenario
+                      {workflowView === "design"
+                        ? "Turn the workforce scenario into concrete position changes and see the recruiting and skill impact."
+                        : workflowView === "respond"
+                          ? "Translate modeled role gaps into Build, Move, and Buy response plans."
+                          : "Put the approved response on a timeline and test whether it fits the operating constraints."}
                     </p>
                   </div>
 
@@ -3501,7 +3680,60 @@ export function WorkforcePlanningPage({
                   </span>
                 </div>
 
-                <div className="mb-5 rounded-md border p-4">
+                {workflowView === "respond" &&
+                  !structuralPositionResult && (
+                    <div className="mb-5 rounded-md border bg-muted/20 p-4">
+                      <p className="font-medium">
+                        Design the workforce first
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Run a structural position scenario so the app knows which roles and skills actually have new demand.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setWorkflowView(
+                            "design"
+                          )
+                        }
+                        className="mt-3 rounded-md border px-3 py-2 text-sm"
+                      >
+                        Go to Design
+                      </button>
+                    </div>
+                  )}
+
+                {workflowView === "execute" &&
+                  (!responsePortfolioResult ||
+                    !businessUnitResponseResult) && (
+                    <div className="mb-5 rounded-md border bg-muted/20 p-4">
+                      <p className="font-medium">
+                        Build the response plan first
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Execution starts after Build / Move / Buy has been allocated and reconciled to business-unit destinations.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setWorkflowView(
+                            "respond"
+                          )
+                        }
+                        className="mt-3 rounded-md border px-3 py-2 text-sm"
+                      >
+                        Go to Respond
+                      </button>
+                    </div>
+                  )}
+
+                <div
+                  className={
+                    workflowView === "design"
+                      ? "mb-5 rounded-md border p-4"
+                      : "hidden"
+                  }
+                >
                   <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <h4 className="font-semibold">
@@ -3770,7 +4002,13 @@ export function WorkforcePlanningPage({
                 </div>
 
                 <div className="mb-5 rounded-md border p-4">
-                  <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                  <div
+                    className={
+                      workflowView === "design"
+                        ? "mb-4 flex flex-wrap items-start justify-between gap-3"
+                        : "hidden"
+                    }
+                  >
                     <div>
                       <h4 className="font-semibold">
                         Structural Position Actions
@@ -3816,7 +4054,13 @@ export function WorkforcePlanningPage({
                     </div>
                   </div>
 
-                  <div className="space-y-3">
+                  <div
+                    className={
+                      workflowView === "design"
+                        ? "space-y-3"
+                        : "hidden"
+                    }
+                  >
                     {structuralPositionActions.map(
                       (action, index) => {
                         const profileOptions =
@@ -4102,7 +4346,13 @@ export function WorkforcePlanningPage({
                     )}
                   </div>
 
-                  <div className="mt-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
+                  <div
+                    className={
+                      workflowView === "design"
+                        ? "mt-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground"
+                        : "hidden"
+                    }
+                  >
                     Actions run top-to-bottom. Cost basis comes from the stored Baseline Dec 2027 labor cost per planned position for the matching BU × level × job-profile mix.
                   </div>
 
@@ -4195,7 +4445,13 @@ export function WorkforcePlanningPage({
                         </div>
                       </div>
 
-                      <div className="mt-4 rounded-md border p-4">
+                      <div
+                        className={
+                          workflowView === "design"
+                            ? "mt-4 rounded-md border p-4"
+                            : "hidden"
+                        }
+                      >
                         <div className="mb-4">
                           <h5 className="font-semibold">
                             Recruiting Demand
@@ -4376,7 +4632,13 @@ export function WorkforcePlanningPage({
                         </div>
                       </div>
 
-                      <div className="mt-4 rounded-md border p-4">
+                      <div
+                        className={
+                          workflowView === "design"
+                            ? "mt-4 rounded-md border p-4"
+                            : "hidden"
+                        }
+                      >
                         <div className="mb-4">
                           <h5 className="font-semibold">
                             Skill Demand
@@ -4596,7 +4858,13 @@ export function WorkforcePlanningPage({
                         </div>
                       </div>
 
-                      <div className="mt-4 rounded-md border p-4">
+                      <div
+                        className={
+                          workflowView === "respond"
+                            ? "mt-4 rounded-md border p-4"
+                            : "hidden"
+                        }
+                      >
                         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                           <div>
                             <h5 className="font-semibold">
@@ -4793,7 +5061,14 @@ export function WorkforcePlanningPage({
                         (row) =>
                           row.authorized_position_delta > 0
                       ).length > 1 && (
-                        <div className="mt-4 rounded-md border p-4">
+                        <div
+                          className={
+                            workflowView === "respond" ||
+                            workflowView === "execute"
+                              ? "mt-4 rounded-md border p-4"
+                              : "hidden"
+                          }
+                        >
                           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                             <div>
                               <h5 className="font-semibold">
@@ -5321,7 +5596,17 @@ export function WorkforcePlanningPage({
                                         </div>
                                       )}
 
-                                      <details className="mt-4 rounded-md border">
+                                      <details
+                                        className={
+                                          workflowView === "execute"
+                                            ? "mt-4 rounded-md border"
+                                            : "hidden"
+                                        }
+                                        open={
+                                          workflowView ===
+                                          "execute"
+                                        }
+                                      >
                                         <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
                                           Time-Phased Execution
                                           <span className="ml-2 text-xs font-normal text-muted-foreground">
@@ -6218,7 +6503,13 @@ export function WorkforcePlanningPage({
                         (row) =>
                           row.authorized_position_delta > 0
                       ) && (
-                        <div className="mt-4 rounded-md border p-4">
+                        <div
+                          className={
+                            workflowView === "respond"
+                              ? "mt-4 rounded-md border p-4"
+                              : "hidden"
+                          }
+                        >
                           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                             <div>
                               <h5 className="font-semibold">
@@ -6692,7 +6983,13 @@ export function WorkforcePlanningPage({
 
                       {structuralPositionResult.response_strategy.skills.length >
                         0 && (
-                        <div className="mt-4 rounded-md border p-4">
+                        <div
+                          className={
+                            workflowView === "respond"
+                              ? "mt-4 rounded-md border p-4"
+                              : "hidden"
+                          }
+                        >
                           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                             <div>
                               <h5 className="font-semibold">
