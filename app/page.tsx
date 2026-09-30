@@ -1171,6 +1171,7 @@ export default function Home() {
     <main className="min-h-screen bg-background text-foreground">
       {/* Top header */}
       <AppHeader
+        activePage={activePage}
         selectedPersona={selectedPersona}
         onPersonaChange={setSelectedPersona}
       />
@@ -1180,7 +1181,7 @@ export default function Home() {
         className="grid min-h-[calc(100vh-4rem)]"
         style={{
           gridTemplateColumns: `${
-            navCollapsed ? 70 : 220
+            navCollapsed ? 72 : 252
           }px minmax(0, 1fr) ${
             aiCollapsed ? 0 : 6
           }px ${
@@ -1197,6 +1198,7 @@ export default function Home() {
         />
 
         {/* Dashboard area */}
+        <div className="min-w-0 overflow-x-hidden bg-muted/10">
         {activePage === "overview" ? (
           <OverviewPage
             overviewData={overviewData}
@@ -1285,6 +1287,7 @@ export default function Home() {
             onExplainCustomScenario={explainCustomScenario}
           />
         )}
+        </div>
 
         <AiPanel
           aiCollapsed={aiCollapsed}

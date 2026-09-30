@@ -40,7 +40,7 @@ export function FinancePage({
             <div className="mb-6 flex items-end justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-semibold">
-                  Workforce Finance
+                  Labor Cost Planning
                 </h2>
                 <p className="text-muted-foreground">
                   Understand labor cost, workforce economics, vacancy exposure, and scenario impact.
