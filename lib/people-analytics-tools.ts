@@ -1,5 +1,8 @@
 import { supabaseServer } from "./supabase-server";
 import {
+  runStructuralPositionScenario,
+} from "./structural-position-scenario";
+import {
   runPositionActionScenario,
   type PositionActionScenarioRequest,
 } from "./position-action-scenario";
@@ -15,6 +18,7 @@ import {
 } from "./scenario-engine";
 import type {
   ScenarioModelAssumptions,
+  StructuralPositionAction,
 } from "./types";
 
 function toNumber(
@@ -296,6 +300,73 @@ export const peopleAnalyticsTools: any[] = [
         "freeze_vacancies",
         "vacancy_fill_pct",
       ],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: "function",
+    name: "run_structural_position_scenario",
+    description:
+      "Run an ordered deterministic structural position scenario by business unit, career level, and optionally job profile. Use for scoped actions such as adding Manager positions in Data & AI, freezing Technology vacancies, closing Corporate vacancies, or filling a percentage of Consulting vacancies. Actions are applied in the order supplied. The model returns authorized-position budget delta and annualized staffed labor-cost delta using the stored Baseline Dec-2027 cost per planned position for each structural combination.",
+    parameters: {
+      type: "object",
+      properties: {
+        actions: {
+          type: "array",
+          minItems: 1,
+          maxItems: 20,
+          items: {
+            type: "object",
+            properties: {
+              action_type: {
+                type: "string",
+                enum: [
+                  "add_positions",
+                  "close_vacant_positions",
+                  "freeze_vacancies",
+                  "fill_vacancies",
+                ],
+              },
+              business_unit: {
+                type: ["string", "null"],
+                description:
+                  "Business-unit name or code. Null means all business units.",
+              },
+              level: {
+                type: ["string", "null"],
+                description:
+                  "Career-level name or code such as Manager or M1. Null means all levels.",
+              },
+              job_profile: {
+                type: ["string", "null"],
+                description:
+                  "Job-profile name or code. Null means all job profiles.",
+              },
+              amount: {
+                type: ["number", "null"],
+                description:
+                  "Position count for add, close, or freeze actions. Null for fill actions.",
+              },
+              fill_pct: {
+                type: ["number", "null"],
+                description:
+                  "Percent of remaining matching vacancies to fill. Null for add, close, or freeze actions.",
+              },
+            },
+            required: [
+              "action_type",
+              "business_unit",
+              "level",
+              "job_profile",
+              "amount",
+              "fill_pct",
+            ],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: ["actions"],
       additionalProperties: false,
     },
     strict: true,
@@ -1171,6 +1242,10 @@ export async function runPeopleAnalyticsTool(
     case "run_position_action_scenario":
       return runPositionActionScenario(
         args as PositionActionScenarioRequest
+      );
+    case "run_structural_position_scenario":
+      return runStructuralPositionScenario(
+        (args.actions ?? []) as StructuralPositionAction[]
       );
     case "get_talent_acquisition":
       return getTalentAcquisition();

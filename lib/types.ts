@@ -164,6 +164,80 @@ export type PositionActionScenarioResponse = {
   methodology: string[];
 };
 
+export type StructuralPositionActionType =
+  | "add_positions"
+  | "close_vacant_positions"
+  | "freeze_vacancies"
+  | "fill_vacancies";
+
+export type StructuralPositionAction = {
+  action_type: StructuralPositionActionType;
+  business_unit: string | null;
+  level: string | null;
+  job_profile: string | null;
+  amount: number | null;
+  fill_pct: number | null;
+};
+
+export type StructuralPositionScenarioResponse = {
+  as_of: string;
+  actions: StructuralPositionAction[];
+  current: {
+    authorized_positions: number;
+    filled_positions: number;
+    open_vacancies: number;
+    frozen_positions: number;
+  };
+  modeled: {
+    authorized_positions: number;
+    filled_positions: number;
+    open_vacancies: number;
+    frozen_positions: number;
+    net_authorized_position_change: number;
+    net_filled_position_change: number;
+    vacancy_rate_pct: number;
+    authorized_budget_delta_usd: number;
+    annualized_staffed_labor_cost_delta_usd: number;
+  };
+  action_results: Array<{
+    action_index: number;
+    action_type: StructuralPositionActionType;
+    scope_label: string;
+    requested_value: number;
+    applied_value: number;
+    affected_vacancies_before: number;
+    annual_cost_basis_per_position_usd: number;
+    authorized_budget_delta_usd: number;
+    staffed_labor_cost_delta_usd: number;
+  }>;
+  methodology: string[];
+};
+
+export type StructuralPositionCatalogResponse = {
+  as_of: string;
+  business_units: Array<{
+    org_code: string;
+    org_name: string;
+  }>;
+  levels: Array<{
+    level_code: string;
+    level_name: string;
+    level_rank: number;
+  }>;
+  job_profiles: Array<{
+    job_profile_code: string;
+    job_profile_name: string;
+  }>;
+  combinations: Array<{
+    org_code: string;
+    level_code: string;
+    job_profile_code: string;
+    current_positions: number;
+    vacant_positions: number;
+    annual_cost_per_position_usd: number;
+  }>;
+};
+
 export type FinanceBusinessUnit = {
   org_code: string;
   org_name: string;
