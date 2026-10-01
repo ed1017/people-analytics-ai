@@ -47,6 +47,7 @@ export type AppPage =
   | "skills"
   | "learning-development"
   | "career-mobility"
+  | "succession-planning"
   | "workforce-planning";
 
 export type PlanningPoint = {
@@ -912,6 +913,26 @@ export type CareerMobilityResponse = {
   desired_locations: CareerMobilityLocationItem[];
   current_org_coverage: CareerMobilityOrgCoverageItem[];
   methodology: string[];
+};
+
+export type SuccessionCoverageResponse = {
+  as_of_date: string | null;
+  small_cell_threshold: number;
+  critical_job_profiles: number;
+  filled_critical_positions: number | null;
+  positions_with_recorded_plan: number | null;
+  positions_without_recorded_plan: number | null;
+  recorded_plan_coverage_pct: number | null;
+  plan_coverage_suppressed: boolean;
+  positions_with_ready_now: number | null;
+  positions_without_ready_now: number | null;
+  ready_now_plan_pct: number | null;
+  ready_now_suppressed: boolean;
+  suppression_reason:
+    | "population_small_cell"
+    | "plan_partition_small_cell"
+    | "readiness_partition_small_cell"
+    | null;
 };
 
 export type BlsMetric = {
