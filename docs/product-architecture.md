@@ -20,6 +20,14 @@ The AI should help across that whole flow, but deterministic analytics and gover
 
 ## Locked product direction
 
+### Workspace journey
+
+The top-level product journey is orientation, not a forced wizard. Users can move freely among three workspaces while the left navigation handles pages inside the active workspace:
+
+1. **Understand Your Workforce** — Workforce Analytics
+2. **Develop Your Talent** — Talent Management
+3. **Plan & Take Action** — Workforce Planning
+
 ### Workforce AI
 
 Workforce AI sits above the functional areas as the cross-domain assistant.
