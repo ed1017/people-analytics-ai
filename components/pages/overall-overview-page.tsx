@@ -100,7 +100,7 @@ export function OverallOverviewPage({ active, persona, onNavigate, workforceQuer
   }
 
   const ready = Boolean(sources?.some(source => source.facts)) && !loading;
-  return <div className="mx-auto grid max-w-7xl items-start gap-5 px-5 py-8 sm:px-8 xl:grid-cols-[minmax(0,1fr)_300px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-7">
+  return <div className="mx-auto grid w-full max-w-none items-start gap-5 px-5 py-8 sm:px-8 xl:grid-cols-[minmax(0,1fr)_340px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-7">
     <header>
       <p className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-primary"><Sparkles size={18} /> Workforce AI</p>
       <h2 id="overall-overview-heading" className="text-3xl font-semibold tracking-tight sm:text-4xl">Your workforce, in perspective.</h2>
