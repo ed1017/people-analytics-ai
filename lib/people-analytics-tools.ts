@@ -169,7 +169,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "get_workforce_skills",
     description:
-      "Get governed enterprise skills intelligence including apparent proficiency gaps, highest-demand skills, profile coverage, and O*NET mapping coverage.",
+      "Get governed enterprise skills intelligence including apparent proficiency gaps, highest-demand skills, profile coverage, and O*NET mapping coverage. This tool is enterprise-only and does not apply selected dashboard country, business-unit, or level filters.",
     parameters: {
       type: "object",
       properties: {},
