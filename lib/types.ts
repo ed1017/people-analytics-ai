@@ -49,6 +49,11 @@ export type AppPage =
   | "career-mobility"
   | "career-growth-mobility"
   | "succession-planning"
+  | "planning-overview"
+  | "scenario-modeling"
+  | "position-workforce-design"
+  | "workforce-response"
+  | "execution-feasibility"
   | "workforce-planning";
 
 export type PlanningPoint = {
