@@ -115,7 +115,7 @@ export function AppSidebar({
                       }
                       title={
                         navCollapsed
-                          ? section.title +
+                          ? activeSection.title +
                             " — " +
                             metadata.label
                           : metadata.description
