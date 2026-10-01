@@ -36,11 +36,20 @@ function unavailable() {
 export async function GET(
   request: NextRequest
 ) {
+  const contentLength = Number(
+    request.headers.get("content-length") ?? "0"
+  );
+  const hasBody =
+    request.body !== null ||
+    (Number.isFinite(contentLength) &&
+      contentLength > 0) ||
+    request.headers.has("transfer-encoding");
+
   const requestValidation =
     validateSuccessionApiRequest({
       method: request.method,
       url: request.url,
-      hasBody: request.body !== null,
+      hasBody,
     });
 
   if ("error" in requestValidation) {
