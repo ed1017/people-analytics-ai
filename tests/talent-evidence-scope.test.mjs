@@ -56,3 +56,23 @@ test("chat grounding contains the scope guard and unsupported-breakdown rule", (
   assert.match(source, /Current-organization preference coverage is the only business-unit-specific breakdown supplied here/);
   assert.match(source, /Succession is intentionally enterprise-summary only/);
 });
+
+test("enterprise Talent planning tools expose unfiltered scope metadata", () => {
+  const source = fs.readFileSync(
+    new URL("../lib/people-analytics-tools.ts", import.meta.url),
+    "utf8"
+  );
+
+  assert.match(
+    source,
+    /Enterprise internal talent pool for the target job profile/
+  );
+  assert.match(
+    source,
+    /Enterprise recruiting evidence for the target job profile/
+  );
+  assert.match(
+    source,
+    /Selected dashboard country, business-unit, and level context does not filter this tool result/
+  );
+});
