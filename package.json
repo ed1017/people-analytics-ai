@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:succession": "node --test tests/succession-public-contract.test.mjs"
+    "test:succession": "node --test tests/succession-public-contract.test.mjs",
+    "test:talent-scope": "node --test tests/talent-evidence-scope.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
