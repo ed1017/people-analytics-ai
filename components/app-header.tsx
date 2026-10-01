@@ -1,3 +1,5 @@
+"use client";
+import { useEffect, useRef, type ReactNode } from "react";
 import {
   ChevronRight,
   Sparkles,
@@ -12,21 +14,29 @@ import type {
 } from "@/lib/types";
 
 type AppHeaderProps = {
+  children?: ReactNode;
   activePage: AppPage;
   selectedPersona: Persona;
   onPersonaChange: (persona: Persona) => void;
 };
 
 export function AppHeader({
+  children,
   activePage,
   selectedPersona,
   onPersonaChange,
 }: AppHeaderProps) {
+  const header = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const element=header.current; if(!element) return;
+    const measure=()=>document.documentElement.style.setProperty("--app-header-height",`${element.getBoundingClientRect().height}px`);
+    measure(); const observer=new ResizeObserver(measure); observer.observe(element); return ()=>observer.disconnect();
+  }, []);
   const page =
     getAppPageMetadata(activePage);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-card/95 px-5 backdrop-blur supports-[backdrop-filter]:bg-card/85">
+    <header ref={header} className="sticky top-0 z-30 border-b bg-card"><div className="flex h-16 items-center justify-between px-5">
       <div className="flex min-w-0 items-center gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border bg-muted/40">
           <Sparkles className="h-4 w-4" />
@@ -76,6 +86,6 @@ export function AppHeader({
           </option>
         </select>
       </div>
-    </header>
+    </div>{children}</header>
   );
 }

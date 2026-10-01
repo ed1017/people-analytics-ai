@@ -11,6 +11,9 @@ import {
 } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { completeScopedChatTurn, getScopedChatHistory, type ScopedChatHistory } from "@/lib/chat-context-history";
+import { buildAggregateExport, downloadAggregateCsv } from "@/lib/aggregate-export";
+import { GlobalWorkforceFilters } from "@/components/global-workforce-filters";
+import { usePageBriefing } from "@/components/use-page-briefing";
 import { AppHeader } from "@/components/app-header";
 import { OverviewPage } from "@/components/pages/overview-page";
 import { OverallOverviewPage } from "@/components/pages/overall-overview-page";
@@ -1411,59 +1414,7 @@ export default function Home() {
     setSelectedLevel("all");
   };
 
-  const sendChatMessage = async (
-    suggestedMessage?: string
-  ) => {
-    const message = (
-      suggestedMessage ?? chatInput
-    ).trim();
-
-    if (
-      !message ||
-      !overviewData ||
-      chatLoading
-    ) {
-      return;
-    }
-
-    const userMessage: ChatMessage = {
-      role: "user",
-      content: message,
-    };
-
-    const modelContextKey = JSON.stringify({
-      page: activePage,
-      persona: selectedPersona,
-      businessContext: selectedBusinessContext,
-      snapshotDate: overviewData.snapshot_date,
-      scenario: planningWorkspaceActive ? selectedPlanningScenario : null,
-      comparison: planningWorkspaceActive ? talentResponseEvidenceContext : null,
-      handoff: planningWorkspaceActive ? planningEvidenceHandoff : null,
-      freshness: planningWorkspaceActive ? planningEvidenceFreshness : null,
-    });
-    const modelHistory = getScopedChatHistory(modelHistoryRef.current, modelContextKey);
-
-    const nextMessages = [
-      ...chatMessages,
-      userMessage,
-    ];
-
-    setChatMessages(nextMessages);
-    setChatInput("");
-    setChatLoading(true);
-    setChatError(null);
-
-    try {
-      const response = await fetch(
-        "/api/chat",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            message,
+  const chatEvidence = overviewData ? {
             persona: selectedPersona,
             page: planningWorkspaceActive
               ? "workforce-planning"
@@ -1797,7 +1748,7 @@ export default function Home() {
 
             talentResponseEvidenceContext: planningWorkspaceActive ? talentResponseEvidenceContext : null,
             planningEvidenceHandoffContext:
-              planningEvidenceHandoff
+              planningWorkspaceActive && planningEvidenceHandoff
                 ? {
                     ...planningEvidenceHandoff,
                     freshness:
@@ -1809,8 +1760,6 @@ export default function Home() {
                   }
                 : null,
 
-            history:
-              modelHistory,
             context: {
               snapshotDate:
                 overviewData.snapshot_date,
@@ -1838,7 +1787,70 @@ export default function Home() {
                   headcountTrend.length - 1
                 ] ?? null,
             },
-          }),
+          } : null;
+  const sourceState = activePage === "workforce" ? [workforceData, workforceLoading, workforceError] : activePage === "attrition" ? [attritionData, attritionLoading, attritionError] : activePage === "skills" ? [skillsData, skillsLoading, skillsError] : activePage === "learning-development" ? [learningDevelopmentData, learningDevelopmentLoading, learningDevelopmentError] : activePage === "career-mobility" ? [careerMobilityData, careerMobilityLoading, careerMobilityError] : activePage === "career-growth-mobility" ? [careerGrowthMobilityData, careerGrowthMobilityLoading, careerGrowthMobilityError] : activePage === "succession-planning" ? [successionCoverageData, successionCoverageLoading, successionCoverageError] : activePage === "talent-acquisition" ? [talentAcquisitionData, talentAcquisitionLoading, talentAcquisitionError] : activePage === "survey-sentiment" ? [surveySentimentData, surveySentimentLoading, surveySentimentError] : activePage === "finance" ? [financeData, financeLoading, financeError] : [planningData, planningLoading || positionModelingLoading, planningError || positionModelingError];
+  const currentSource = sourceState[0];
+  const sourceRecord = currentSource && typeof currentSource === "object" ? currentSource as Record<string, unknown> : null;
+  const movementSource = sourceRecord?.source;
+  const sourceDate = sourceRecord?.as_of ?? sourceRecord?.as_of_date ?? (movementSource && typeof movementSource === "object" && "last_recorded_date" in movementSource ? movementSource.last_recorded_date : null);
+  const pageSourceDate = typeof sourceDate === "string" ? sourceDate : null;
+  const chatEvidenceKey = JSON.stringify({ ...chatEvidence, destination: activePage, pageSourceDate });
+  const hasPageBriefing = !["home", "guide-data", "compensation"].includes(activePage);
+  const pageBriefing = usePageBriefing(chatEvidenceKey, hasPageBriefing && Boolean(chatEvidence), dashboardLoading || Boolean(sourceState[1]) || !sourceState[0], dashboardError || (typeof sourceState[2] === "string" ? sourceState[2] : null));
+
+  const sendChatMessage = async (
+    suggestedMessage?: string
+  ) => {
+    const message = (
+      suggestedMessage ?? chatInput
+    ).trim();
+
+    if (/^(?:please\s+|can you\s+)?(?:export|download)\b/i.test(message)) {
+      const roster = /\b(names?|roster|employees? list|list of employees)\b/i.test(message);
+      const csv = !roster && !dashboardLoading && !sourceState[1] && !sourceState[2] ? buildAggregateExport({page:activePage,filters:JSON.stringify(selectedBusinessContext),snapshot:overviewData,trend:headcountTrend,workforce:workforceData,skills:skillsData}) : null;
+      if (csv) downloadAggregateCsv(csv, activePage);
+      setChatMessages(current => [...current, {role:"user",content:message},{role:"assistant",content:roster ? "Employee-name and roster exports are not available from the current public aggregate views. I have not downloaded a roster. This needs a separate source and access review." : csv ? "Downloaded the available Workforce or Skills aggregate tables as CSV, with source, scope, filters, dates and units. This contains aggregate metrics, not employee names or raw records." : "A CSV export is currently available on Workforce and Skills Intelligence after their data has loaded. This page’s data is not yet supported for export; no file was downloaded."}]);
+      setChatInput("");
+      return;
+    }
+
+    if (
+      !message ||
+      !overviewData || dashboardLoading || Boolean(sourceState[1]) || !sourceState[0] ||
+      chatLoading
+    ) {
+      return;
+    }
+
+    const userMessage: ChatMessage = {
+      role: "user",
+      content: message,
+    };
+
+    const modelContextKey = chatEvidenceKey;
+    const priorHistory = getScopedChatHistory(modelHistoryRef.current, modelContextKey);
+    const modelHistory: ChatMessage[] = priorHistory.length ? priorHistory : pageBriefing.text ? [{ role: "assistant", content: pageBriefing.text }] : [];
+
+    const nextMessages = [
+      ...chatMessages,
+      userMessage,
+    ];
+
+    setChatMessages(nextMessages);
+    setChatInput("");
+    setChatLoading(true);
+    setChatError(null);
+
+    try {
+      const response = await fetch(
+        "/api/chat",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({ ...JSON.parse(chatEvidenceKey), message, history: modelHistory }),
         }
       );
 
@@ -2056,7 +2068,7 @@ export default function Home() {
         activePage={activePage}
         selectedPersona={selectedPersona}
         onPersonaChange={setSelectedPersona}
-      />
+      ><GlobalWorkforceFilters options={filterOptions} country={selectedCountry} org={selectedOrg} level={selectedLevel} loading={dashboardLoading} onCountry={setSelectedCountry} onOrg={setSelectedOrg} onLevel={setSelectedLevel} onReset={resetFilters} /></AppHeader>
 
       {/* Main application */}
       <div
@@ -2087,7 +2099,7 @@ export default function Home() {
 
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
-        <div hidden={activePage !== "home"}><OverallOverviewPage active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} /></div>
+        <div hidden={activePage !== "home"}><OverallOverviewPage active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></div>
         {activePage === "guide-data" ? <GuideDataPage onBack={() => { setActivePage("home"); window.requestAnimationFrame(() => document.getElementById("overall-guide-link")?.focus()); }} /> : activePage === "home" ? null : activePage === "compensation" ? (
           <section className="p-6"><h1 className="text-2xl font-semibold">Compensation</h1><p className="mt-4 text-lg">TBD</p><p className="mt-2 text-muted-foreground">Planned destination. Compensation data and analysis are not available.</p></section>
         ) : activePage === "workforce" ? (
@@ -2276,12 +2288,14 @@ export default function Home() {
           aiSide={aiSide}
           aiWidth={aiWidth}
           previewPage={previewPage}
-          suggestedPrompts={suggestedPrompts}
+          suggestedPrompts={[...suggestedPrompts, "Export current data (CSV)"]}
+          pageBriefing={pageBriefing}
+          scopeNote={activePage === "workforce" ? "Selected filters narrow the workforce snapshot only; company composition stays unfiltered." : planningWorkspaceActive ? "Filters describe workforce context. Planning scenarios and carried evidence keep their own scope, dates and assumptions." : "This page uses company-wide evidence. The shared workforce filters do not narrow these measures."}
           chatMessages={chatMessages}
           chatInput={chatInput}
           chatLoading={chatLoading}
           chatError={chatError}
-          dashboardReady={Boolean(overviewData)}
+          dashboardReady={Boolean(overviewData) && !dashboardLoading && !sourceState[1] && Boolean(sourceState[0]) && !sourceState[2]}
           onResizeStart={startAiResize}
           onResizeKeyDown={resizeAiWithKeyboard}
           onToggleExpanded={toggleAiExpanded}

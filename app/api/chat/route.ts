@@ -555,6 +555,7 @@ export async function POST(
     }
 
     const body = await request.json();
+    const summaryOnly = body?.summaryOnly === true;
 
     const message =
       typeof body?.message === "string"
@@ -1504,14 +1505,14 @@ ${message}
         : 700;
 
     const toolChoice =
-      page === "career-growth-mobility" || page === "home"
+      summaryOnly || page === "career-growth-mobility" || page === "home"
         ? ("none" as const)
         : ("auto" as const);
 
     let response: any =
       await client.responses.create({
         model: CHAT_MODEL,
-        instructions: aiInstructions,
+        instructions: aiInstructions + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\nThis is an automatic page briefing, not a request to take action. Use only supplied evidence. No tools, new queries, models or assumptions. Treat missing context as unavailable. Filters scope the selected workforce snapshot only; all other page contexts retain their supplied company scope. Do not invent metrics for a placeholder. For Planning Overview, give concise how-to steps for Planning Overview, Scenario Modeling, Position & Workforce Design, Workforce Response, and Execution & Feasibility, in that order; describe explicit user actions only. For other Planning destinations, describe available supplied evidence and the next explicit interaction; do not imply local draft inputs or model results absent from the payload have been evaluated. Current destination: " + String(body?.destination ?? page) + "; page source date: " + String(body?.pageSourceDate ?? "unavailable") : ""),
         input: aiInput,
         tools: peopleAnalyticsTools,
         tool_choice: toolChoice,
@@ -1580,7 +1581,7 @@ ${message}
       response =
         await client.responses.create({
           model: CHAT_MODEL,
-          instructions: aiInstructions,
+          instructions: aiInstructions + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\nThis is an automatic page briefing, not a request to take action. Use only supplied evidence. No tools, new queries, models or assumptions. Treat missing context as unavailable. Filters scope the selected workforce snapshot only; all other page contexts retain their supplied company scope. Do not invent metrics for a placeholder. For Planning Overview, give concise how-to steps for Planning Overview, Scenario Modeling, Position & Workforce Design, Workforce Response, and Execution & Feasibility, in that order; describe explicit user actions only. For other Planning destinations, describe available supplied evidence and the next explicit interaction; do not imply local draft inputs or model results absent from the payload have been evaluated. Current destination: " + String(body?.destination ?? page) + "; page source date: " + String(body?.pageSourceDate ?? "unavailable") : ""),
           previous_response_id:
             response.id,
           input: toolOutputs,

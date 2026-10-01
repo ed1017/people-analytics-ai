@@ -10,7 +10,6 @@ import {
   YAxis,
 } from "recharts";
 
-import { Button } from "@/components/ui/button";
 import {
   formatCurrencyCompact,
   formatFte,
@@ -62,21 +61,12 @@ function formatLongDate(value: string) {
 export function OverviewPage({
   overviewData,
   headcountTrend,
-  filterOptions,
-  selectedCountry,
-  selectedOrg,
-  selectedLevel,
   selectedCountryLabel,
   selectedOrgLabel,
   selectedLevelLabel,
   dashboardLoading,
   dashboardError,
-  filtersActive,
   headcountGrowthPct,
-  onCountryChange,
-  onOrgChange,
-  onLevelChange,
-  onResetFilters,
 }: OverviewPageProps) {
   return (
     <section className="min-w-0 p-6">
@@ -100,126 +90,7 @@ export function OverviewPage({
         )}
       </div>
 
-      <div className="mb-6 rounded-lg border p-4">
-        <div className="mb-4 flex items-start justify-between gap-4">
-          <div>
-            <p className="font-medium">
-              Snapshot filters
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {selectedCountryLabel} ·{" "}
-              {selectedOrgLabel} ·{" "}
-              {selectedLevelLabel}
-            </p>
-          </div>
-
-          <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
-            {dashboardLoading
-              ? "Refreshing data…"
-              : "Synthetic workforce data"}
-          </span>
-        </div>
-
-        <div className="grid gap-3 md:grid-cols-4">
-          <label className="space-y-1">
-            <span className="text-xs font-medium text-muted-foreground">
-              Country
-            </span>
-            <select
-              value={selectedCountry}
-              onChange={(event) =>
-                onCountryChange(
-                  event.target.value
-                )
-              }
-              className="h-10 w-full rounded-md border bg-background px-3 text-sm outline-none"
-            >
-              <option value="all">
-                All countries
-              </option>
-              {filterOptions.countries.map(
-                (option) => (
-                  <option
-                    key={option.value}
-                    value={option.value}
-                  >
-                    {option.label}
-                  </option>
-                )
-              )}
-            </select>
-          </label>
-
-          <label className="space-y-1">
-            <span className="text-xs font-medium text-muted-foreground">
-              Business Unit
-            </span>
-            <select
-              value={selectedOrg}
-              onChange={(event) =>
-                onOrgChange(
-                  event.target.value
-                )
-              }
-              className="h-10 w-full rounded-md border bg-background px-3 text-sm outline-none"
-            >
-              <option value="all">
-                All business units
-              </option>
-              {filterOptions.business_units.map(
-                (option) => (
-                  <option
-                    key={option.value}
-                    value={option.value}
-                  >
-                    {option.label}
-                  </option>
-                )
-              )}
-            </select>
-          </label>
-
-          <label className="space-y-1">
-            <span className="text-xs font-medium text-muted-foreground">
-              Level
-            </span>
-            <select
-              value={selectedLevel}
-              onChange={(event) =>
-                onLevelChange(
-                  event.target.value
-                )
-              }
-              className="h-10 w-full rounded-md border bg-background px-3 text-sm outline-none"
-            >
-              <option value="all">
-                All levels
-              </option>
-              {filterOptions.levels.map(
-                (option) => (
-                  <option
-                    key={option.value}
-                    value={option.value}
-                  >
-                    {option.label}
-                  </option>
-                )
-              )}
-            </select>
-          </label>
-
-          <div className="flex items-end">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={onResetFilters}
-              disabled={!filtersActive}
-            >
-              Reset Filters
-            </Button>
-          </div>
-        </div>
-      </div>
+      <p className="mb-6 text-sm text-muted-foreground">{selectedCountryLabel} · {selectedOrgLabel} · {selectedLevelLabel}</p>
 
       {dashboardError && (
         <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
