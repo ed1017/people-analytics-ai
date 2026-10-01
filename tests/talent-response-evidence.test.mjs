@@ -45,7 +45,8 @@ test("chat prompt separates source scope, unsupported timing and user assumption
     assert.ok(prompt.includes(text), text);
 });
 test("chat does not carry comparison to unrelated pages or accept oversized context", () => {
-  assert.equal(talentResponseChatPrompt("skills", "{}"), "");
+  assert.match(talentResponseChatPrompt("skills", "{}"), /NOT ACTIVE ON THIS PAGE/);
+  assert.match(talentResponseChatPrompt("skills", "{}"), /Do not present an earlier Planning comparison/);
   assert.match(talentResponseChatPrompt("workforce-planning", "x".repeat(16001)), /Unavailable; do not claim/);
   assert.match(talentResponseChatPrompt("workforce-planning", null), /Unavailable; do not claim/);
 });
