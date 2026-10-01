@@ -28,6 +28,10 @@ import {
   getWorkspaceForPage,
   type AppWorkspaceKey,
 } from "@/lib/app-navigation";
+import {
+  enterpriseTalentEvidenceScope,
+  evidenceScopeForAi,
+} from "@/lib/talent-evidence-scope";
 import type {
   AppPage,
   BlsResponse,
@@ -909,6 +913,20 @@ export default function Home() {
     [filterOptions.levels, selectedLevel]
   );
 
+  const selectedBusinessContext =
+    useMemo(
+      () => ({
+        country: selectedCountryLabel,
+        businessUnit: selectedOrgLabel,
+        level: selectedLevelLabel,
+      }),
+      [
+        selectedCountryLabel,
+        selectedOrgLabel,
+        selectedLevelLabel,
+      ]
+    );
+
   const headcountGrowthPct =
     headcountTrend.length >= 2 &&
     headcountTrend[0].headcount > 0
@@ -1663,6 +1681,9 @@ export default function Home() {
             blsLoading={blsLoading}
             blsError={blsError}
             maxSkillDemand={maxSkillDemand}
+            selectedContext={
+              selectedBusinessContext
+            }
           />
         ) : activePage ===
           "learning-development" ? (
@@ -1670,6 +1691,9 @@ export default function Home() {
             data={learningDevelopmentData}
             loading={learningDevelopmentLoading}
             error={learningDevelopmentError}
+            selectedContext={
+              selectedBusinessContext
+            }
           />
         ) : activePage ===
           "career-mobility" ? (
@@ -1677,6 +1701,9 @@ export default function Home() {
             data={careerMobilityData}
             loading={careerMobilityLoading}
             error={careerMobilityError}
+            selectedContext={
+              selectedBusinessContext
+            }
           />
         ) : activePage ===
           "succession-planning" ? (
@@ -1684,6 +1711,9 @@ export default function Home() {
             data={successionCoverageData}
             loading={successionCoverageLoading}
             error={successionCoverageError}
+            selectedContext={
+              selectedBusinessContext
+            }
           />
         ) : (
           <WorkforcePlanningPage
