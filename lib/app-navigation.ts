@@ -66,7 +66,7 @@ export const appNavigationSections: AppNavigationSection[] = [
     ],
   },  {
     key: "strategy",
-    title: "Workforce Strategy & Planning",
+    title: "Workforce Planning",
     pages: [
       "workforce-planning",
       "finance",

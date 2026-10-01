@@ -10,7 +10,6 @@ import {
 } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { AppHeader } from "@/components/app-header";
-import { WorkspaceJourneyToolbar } from "@/components/workspace-journey-toolbar";
 import { OverviewPage } from "@/components/pages/overview-page";
 import { WorkforcePage } from "@/components/pages/workforce-page";
 import { AttritionPage } from "@/components/pages/attrition-page";
@@ -1572,13 +1571,6 @@ export default function Home() {
         onPersonaChange={setSelectedPersona}
       />
 
-      <WorkspaceJourneyToolbar
-        activeWorkspace={activeWorkspace}
-        onWorkspaceChange={
-          changeWorkspace
-        }
-      />
-
       {/* Main application */}
       <div
         className={`app-shell app-ai-${aiSide}`}
@@ -1599,9 +1591,11 @@ export default function Home() {
         {/* Left navigation */}
         <AppSidebar
           activePage={activePage}
+          activeWorkspace={activeWorkspace}
           navCollapsed={navCollapsed}
           onToggle={() => setNavCollapsed(!navCollapsed)}
           onPageChange={setActivePage}
+          onWorkspaceChange={changeWorkspace}
         />
 
         {/* Dashboard area */}
