@@ -1,10 +1,12 @@
 import type { AppPage } from "./types";
 
+export type AppWorkspaceKey =
+  | "analytics"
+  | "talent"
+  | "strategy";
+
 export type AppNavigationSection = {
-  key:
-    | "analytics"
-    | "talent"
-    | "strategy";
+  key: AppWorkspaceKey;
   title: string;
   pages: AppPage[];
 };
@@ -14,6 +16,32 @@ export type AppPageMetadata = {
   section: string;
   description: string;
 };
+
+export const appWorkspaceJourneys: Array<{
+  key: AppWorkspaceKey;
+  journeyLabel: string;
+  subtitle: string;
+  defaultPage: AppPage;
+}> = [
+  {
+    key: "analytics",
+    journeyLabel: "Understand Your Workforce",
+    subtitle: "Workforce Analytics",
+    defaultPage: "overview",
+  },
+  {
+    key: "talent",
+    journeyLabel: "Develop Your Talent",
+    subtitle: "Talent Management",
+    defaultPage: "skills",
+  },
+  {
+    key: "strategy",
+    journeyLabel: "Plan & Take Action",
+    subtitle: "Workforce Planning",
+    defaultPage: "workforce-planning",
+  },
+];
 
 export const appNavigationSections: AppNavigationSection[] = [
   {
@@ -120,4 +148,24 @@ export function getAppPageMetadata(
   page: AppPage
 ) {
   return appPageMetadata[page];
+}
+
+export function getWorkspaceForPage(
+  page: AppPage
+): AppWorkspaceKey {
+  return (
+    appNavigationSections.find((section) =>
+      section.pages.includes(page)
+    )?.key ?? "analytics"
+  );
+}
+
+export function getDefaultPageForWorkspace(
+  workspace: AppWorkspaceKey
+): AppPage {
+  return (
+    appWorkspaceJourneys.find(
+      (item) => item.key === workspace
+    )?.defaultPage ?? "overview"
+  );
 }
