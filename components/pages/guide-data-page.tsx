@@ -3,75 +3,44 @@
 import { useEffect, useRef } from "react";
 import { ArrowLeft, BookOpen } from "lucide-react";
 
+const sections = [
+  { title: "Why I built this", text: "I built this app to explore what we can learn about a workforce and how that can help us think through a plan. Start on Home for a short briefing, then explore Workforce, Talent or Planning. The company records are synthetic demonstration data, not records from a real employer." },
+  { title: "Start with a question", text: "Read the briefing, ask a follow-up and check the source details. Keep each source’s date and population in mind. A recorded fact, a modeled result and your own assumption are different things. The AI can be wrong, so I’d check the underlying figures before using an answer." },
+  { title: "Tools I used", text: "I work on the app in VS Code. GitHub keeps the code and its version history, and Vercel hosts the public website. Supabase stores and serves the demonstration data. Next.js is the framework behind the website, and OpenAI powers the chat explanations. These are the tools behind the app, separate from the data sources below." },
+  { title: "Workforce and attrition", text: "These pages use stored demonstration workforce snapshots, positions, organizations and departure records. Headcount counts people; FTE measures working capacity; open positions count vacancies. Country, Business Unit and Level can narrow the selected workforce snapshot. Other breakdowns may still cover the whole company, so their scope stays visible. A pattern does not tell us why it happened." },
+  { title: "Talent Acquisition", text: "This uses demonstration recruiting records and summaries for requisitions, the hiring funnel, offers and completed hires. Time to fill describes recorded hiring activity; it does not predict how quickly a future role will be filled." },
+  { title: "Survey & Sentiment", text: "This uses the synthetic listening dataset: engagement, pulse, manager, onboarding and exit surveys. It shows participation, average scores out of five, favorable-response percentages and recorded exit reasons. Participation uses the eligible population recorded for each survey. I haven’t verified an external survey provider, a published questionnaire standard or the exact rule behind every favorable percentage. The page counts written comments but does not analyze their themes or sentiment." },
+  { title: "Skills Intelligence and O*NET", text: "Skills Intelligence compares recorded proficiency with job-profile requirements. Missing evidence does not mean someone lacks a skill. Some summaries count skills rather than people. The app stores job-profile mappings to O*NET, an occupational reference that includes skills and work information. I’ve verified that the app counts those stored mappings. The imported release, import date and a live O*NET connection are not verified, so I’m not presenting it as a live feed.", link: "https://www.onetcenter.org/database.html", linkLabel: "O*NET database reference" },
+  { title: "Learning & Development", text: "This connects recorded skill gaps and job requirements with the stored learning catalog. A mapped course shows potential learning coverage. Its availability and listed hours do not prove completion, proficiency improvement or time to readiness." },
+  { title: "Career Interests", text: "This summarizes recorded preferences, desired roles and locations, and relocation willingness. A preference is not a commitment to move. Missing preferences are not evidence of no interest." },
+  { title: "Career Growth & Internal Mobility", text: "This counts recorded promotions, transfers and lateral moves. Its percentages use movement events, not total headcount. The current source may omit people who later left, lacks some origin-position information and does not support complete career paths or time-to-next-move predictions." },
+  { title: "Succession Planning", text: "This shows company-level recorded plan coverage and readiness assessments from the demonstration records. They are not AI predictions or recommendations about individuals. Small groups are withheld where required; the app should not guess those hidden values." },
+  { title: "Planning and labor costs", text: "Planning combines stored scenarios, position and skill requirements, recruiting and learning evidence, and assumptions you explicitly enter. Calculations follow defined rules; they are not machine-learning forecasts. Scenario dates describe the planning period, not source freshness. The stored Baseline does not supply a refresh date. Labor-cost figures are in US dollars. Costs and future timing are only supported where the relevant calculation provides them." },
+  { title: "External labor-market context", text: "The app has a working connection to the U.S. Bureau of Labor Statistics for unemployment, labor-force participation and nonfarm employment. These are US-wide measures, not company figures or local hiring forecasts. On October 1, 2026, the app returned August 2026 observations. Each measure keeps its observation date. Nonfarm employment is converted from thousands to millions for display.", link: "https://www.bls.gov/developers/", linkLabel: "BLS public data source" },
+  { title: "Compensation", text: "This is planned and marked TBD. No compensation dataset or analysis is available." },
+  { title: "Dates and gaps", text: "The current Skills and Learning pages use a September 30, 2026 date set in the application, not a verified refresh timestamp. Other pages use dates returned by their sources. I haven’t verified a complete creation or import history for the synthetic dataset, or the origin of every questionnaire and skill scale. Where that history is missing, I’d rather say so than imply a source has been verified." },
+];
+
 export function GuideDataPage({ onBack }: { onBack: () => void }) {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => { heading.current?.focus(); }, []);
-  const card = "rounded-2xl border bg-card p-5 sm:p-7";
-  return <article className="mx-auto max-w-5xl space-y-6 px-5 py-8 text-base leading-relaxed sm:px-10 sm:py-10">
+  const card = "rounded-xl border bg-card p-5 sm:p-6";
+  return <article className="mx-auto max-w-6xl space-y-6 px-5 py-8 text-base leading-relaxed sm:px-8">
     <button type="button" onClick={onBack} className="flex items-center gap-2 rounded-md font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring"><ArrowLeft size={18} /> Back to Home</button>
-    <header>
-      <p className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-primary"><BookOpen size={18} /> Using Workforce AI</p>
-      <h2 ref={heading} tabIndex={-1} className="rounded-sm text-3xl font-semibold tracking-tight focus:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-4xl">Guide &amp; Data</h2>
-      <p className="mt-3 text-lg text-muted-foreground">How to explore the app, understand its evidence, and interpret its limits.</p>
+    <header><p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-primary"><BookOpen size={18} /> Using Workforce AI</p>
+      <h2 ref={heading} tabIndex={-1} className="rounded-sm text-3xl font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">Guide &amp; Data</h2>
+      <p className="mt-3 text-lg text-muted-foreground">How I use the app, where the information comes from, and what it can and cannot tell us.</p>
     </header>
+    <div className="grid items-start gap-5 lg:grid-cols-2">
+      <div className="space-y-5"><section className={card}><h3 className="text-xl font-semibold">What this app is for</h3><p className="mt-2 text-sm text-muted-foreground">A project by Ed Om</p><p className="mt-3">{sections[0].text}</p></section>
+      <section className={card}><h3 className="text-xl font-semibold">What&apos;s coming next</h3><p className="mt-3"><strong>V2:</strong> Compensation and location-based scenario modeling.</p><p className="mt-3"><strong>V3:</strong> Role-based user access and security, with chat agents tailored to each user or role. Authenticated, authorized HR users would have approved person-level detail; other roles would use aggregates. The current public demo remains aggregate-only.</p><p className="mt-3"><strong>V4:</strong> Machine learning and predictive analytics.</p><p className="mt-3 text-muted-foreground">These are planned future capabilities, not features available today. No release dates have been agreed.</p></section></div>
+      <section className={card}><h3 className="text-xl font-semibold">Start with a question</h3><p className="mt-3">{sections[1].text}</p><p className="mt-3">The shared Country, Business Unit and Level selections stay with you as you move between pages. The selected Workforce snapshot follows them; sources that only support company-wide data stay clearly labelled. A page briefing explains the evidence already available without running a Planning scenario.</p></section>
+    </div>
+    <div className="grid gap-5 lg:grid-cols-2">
+      {sections.slice(2).map(section => <section key={section.title} className={card}><h3 className="text-xl font-semibold">{section.title}</h3><p className="mt-3">{section.text}</p>{section.link && <a className="mt-3 inline-block text-primary underline" href={section.link} target="_blank" rel="noreferrer">{section.linkLabel}</a>}</section>)}
+      <section className={card}><h3 className="text-xl font-semibold">From evidence to Planning</h3><p className="mt-3">Explore the workforce and talent evidence, then carry relevant findings into Planning to compare options.</p></section>
+      <section className={card}><h3 className="text-xl font-semibold">How to work through Planning</h3><ol className="mt-3 list-decimal space-y-2 pl-5"><li>Planning Overview: review the current plan and the evidence you have carried.</li><li>Scenario Modeling: choose a stored scenario or enter supported assumptions and explicitly run a comparison.</li><li>Position &amp; Workforce Design: choose the position change you want to model, then run the structural scenario.</li><li>Workforce Response: select a role and goal, compare its evidence, then enter any Build, Move and Buy assumptions.</li><li>Execution &amp; Feasibility: supply the relevant timing and constraints, then run the supported checks.</li></ol><p className="mt-3">No Planning scenario runs just because you open a page. Course coverage is not completed learning; preferences are not available movers; historical hiring time is not a forecast. I would not use these aggregates to rank people or make individual employment decisions.</p></section>
 
-    <section className={card} aria-labelledby="guide-purpose">
-      <h3 id="guide-purpose" className="text-xl font-semibold">What this app is for</h3>
-      <p className="mt-3">Workforce AI brings together People Analytics, Talent evidence and deterministic workforce planning. Use it to understand recorded patterns, explore questions and compare explicitly modeled scenarios. The data is synthetic.</p>
-      <p className="mt-3">The overall overview is a conversational starting point. Existing Workforce, Talent and Planning pages provide the detailed views. An AI interpretation is not a proven cause, an approved plan or an individual employment recommendation.</p>
-    </section>
-
-    <section className={card} aria-labelledby="guide-use">
-      <h3 id="guide-use" className="text-xl font-semibold">Start with a question</h3>
-      <ol className="mt-3 list-decimal space-y-3 pl-5">
-        <li>Read the short briefing. Open <strong>Sources, populations and limitations</strong> to inspect its evidence.</li>
-        <li>Choose a guided question or describe the problem you want to understand. Ask follow-ups about dates, scope or missing evidence.</li>
-        <li>Use the navigation groups to explore the underlying views. Returning to the overview preserves your conversation and unfinished question.</li>
-        <li>Drag the composer’s lower edge to resize it. Refresh the briefing when you want to retrieve the sources again.</li>
-      </ol>
-      <p className="mt-4 text-muted-foreground">Visible messages stay available. Model history is isolated when the active page or evidence context changes, so an older answer is not treated as current evidence.</p>
-    </section>
-
-    <section className={card} aria-labelledby="guide-sources">
-      <h3 id="guide-sources" className="text-xl font-semibold">Data, coverage and source references</h3>
-      <div className="mt-4 space-y-5">
-        <div><h4 className="font-semibold">[W1] Workforce overview</h4><p>Unfiltered enterprise workforce. Headcount counts people, FTE measures capacity, and open positions count positions. The returned snapshot and trend dates define the observation period. Snapshot headcount is not the denominator for every rate.</p></div>
-        <div><h4 className="font-semibold">[T1] Skills Intelligence</h4><p>Enterprise skill requirements. Counts below attainment thresholds refer to skills with recorded role demand, not employee counts. The source supplies its own date and workforce population. Missing proficiency evidence is not proof of inability.</p></div>
-        <div><h4 className="font-semibold">[P1] Stored Planning Baseline</h4><p>An enterprise model under stored assumptions. Horizon dates are model periods, not source refresh dates. The current response does not supply a refresh date. A stored scenario is not a new model run, an observed outcome or an approved decision.</p></div>
-      </div>
-      <p className="mt-4 text-sm text-muted-foreground">At the October 1, 2026 review, Workforce and Skills snapshots reported September 30, 2026. The Baseline horizon ran from October 2026 through December 2027. Always use the dates returned by the app; these review dates are not a promise of continuous freshness.</p>
-    </section>
-
-    <section className={card} aria-labelledby="guide-limits">
-      <h3 id="guide-limits" className="text-xl font-semibold">Read the scope before comparing</h3>
-      <ul className="mt-3 list-disc space-y-3 pl-5">
-        <li>Country, business-unit and level filters elsewhere do not narrow the overall overview or enterprise Talent sources.</li>
-        <li>Keep each source’s population, denominator and date separate. Growth percentages over unequal historical and modeled periods do not establish a faster or slower growth rate.</li>
-        <li>A missing or failed source is <strong>unavailable, not zero</strong>. Other independent sources can still be shown.</li>
-        <li>AI answers should cite supplied evidence. Investigative questions are not causal findings or priority rankings.</li>
-        <li>This overview does not create arbitrary custom charts or unsupported country-level forecasts, hiring costs or readiness timelines.</li>
-      </ul>
-    </section>
-
-    <section className={card} aria-labelledby="guide-planning">
-      <h3 id="guide-planning" className="text-xl font-semibold">From evidence to Planning</h3>
-      <p className="mt-3">Use <strong>Carry to Planning</strong> explicitly with a business goal. Carried Skills evidence is context, not an allocation or a scenario run. Check its freshness status.</p>
-      <p className="mt-3">In Workforce Response, select a role, enter a goal and choose <strong>Compare evidence for this role</strong>. This reads existing aggregate sources without changing allocations or running a scenario. Matching existing role-plan results can be reused.</p>
-      <ul className="mt-3 list-disc space-y-3 pl-5">
-        <li><strong>Build:</strong> course coverage and hours do not establish completion, proficiency improvement or time to readiness.</li>
-        <li><strong>Move:</strong> preference and proficiency thresholds do not establish eligibility, willingness or availability. Historical movement events are enterprise context, not a role-specific pool of movers.</li>
-        <li><strong>Buy:</strong> completed requisitions and median time to fill are historical. The median’s contributing sample count is not supplied; it is not a hiring forecast.</li>
-      </ul>
-      <p className="mt-3">After editing a goal, compare again. Changing roles clears the old comparison. Costs and future readiness, availability and hiring times remain unavailable without supporting evidence. Planning assumptions and effective dates must be supplied explicitly for the relevant model.</p>
-      <p className="mt-3 text-muted-foreground">The overall overview is read-only: it retrieves aggregates and generates explanations. Its chat cannot invoke workforce tools or alter source records. Separate Planning controls require explicit interaction. Do not use aggregate evidence to identify, rank or recommend employment decisions about individual employees.</p>
-    </section>
-
-    <section className={card} aria-labelledby="guide-roadmap">
-      <h3 id="guide-roadmap" className="text-xl font-semibold">What&apos;s coming next</h3>
-      <p className="mt-3"><strong>V2:</strong> Compensation and location-based scenario modeling.</p>
-      <p className="mt-3"><strong>V3:</strong> Role-based user access and security, with chat agents tailored to each user or role.</p>
-      <p className="mt-3"><strong>V4:</strong> Machine learning and predictive analytics.</p>
-      <p className="mt-3 text-muted-foreground">These are planned future capabilities, not features available today. No release dates have been agreed.</p>
-    </section>
+    </div>
   </article>;
 }

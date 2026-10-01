@@ -80,7 +80,7 @@ export function AppSidebar({
   onWorkspaceChange,
 }: AppSidebarProps) {
   return (
-    <aside className="app-sidebar sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto border-r bg-sidebar p-3 max-md:p-2">
+    <aside className="app-sidebar sticky top-[var(--app-header-height)] h-[calc(100vh-var(--app-header-height))] overflow-y-auto border-r bg-sidebar p-3 max-md:p-2">
       <Button
         variant="ghost"
         className={

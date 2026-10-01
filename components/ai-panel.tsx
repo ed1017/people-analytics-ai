@@ -29,6 +29,8 @@ type AiPanelProps = {
   aiWidth: number;
   previewPage: boolean;
   suggestedPrompts: string[];
+  pageBriefing: { text: string; error: string | null; loading: boolean; retry: () => void };
+  scopeNote: string;
   chatMessages: ChatMessage[];
   chatInput: string;
   chatLoading: boolean;
@@ -55,6 +57,8 @@ export function AiPanel({
   aiWidth,
   previewPage,
   suggestedPrompts,
+  pageBriefing,
+  scopeNote,
   chatMessages,
   chatInput,
   chatLoading,
@@ -143,8 +147,8 @@ export function AiPanel({
       <aside
         className={
           aiCollapsed
-            ? "app-ai-panel sticky top-16 flex h-[calc(100vh-4rem)] min-w-0 flex-col overflow-hidden border-l bg-card p-4 max-md:h-16"
-            : "app-ai-panel sticky top-16 flex h-[calc(100vh-4rem)] min-w-0 flex-col overflow-hidden border-l bg-card p-4 max-md:h-[70vh] max-md:min-h-[520px]"
+            ? "app-ai-panel sticky top-[var(--app-header-height)] flex h-[calc(100vh-var(--app-header-height))] min-w-0 flex-col overflow-hidden border-l bg-card p-4 max-md:h-16"
+            : "app-ai-panel sticky top-[var(--app-header-height)] flex h-[calc(100vh-var(--app-header-height))] min-w-0 flex-col overflow-hidden border-l bg-card p-4 max-md:h-[70vh] max-md:min-h-[520px]"
         }
       >
         <div className="mb-4 flex items-center justify-between gap-2">
@@ -152,7 +156,7 @@ export function AiPanel({
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
               <div><h2 className="text-xl font-semibold">
-                Ask People Analytics AI
+                Ask AI
               </h2><p className="mt-1 text-sm text-muted-foreground">Powered by {CHAT_MODEL}</p></div>
             </div>
           )}
@@ -207,7 +211,7 @@ export function AiPanel({
             <div className="mb-3 hidden grid-cols-2 gap-1 rounded-lg border p-1 text-sm md:grid">
               <button
                 type="button"
-                aria-pressed={aiSide === "left"}
+                aria-label="Move AI panel to left" title="Move AI panel to left" aria-pressed={aiSide === "left"}
                 onClick={() =>
                   onAiSideChange("left")
                 }
@@ -217,11 +221,11 @@ export function AiPanel({
                     : "rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
                 }
               >
-                AI on left
+                Left
               </button>
               <button
                 type="button"
-                aria-pressed={aiSide === "right"}
+                aria-label="Move AI panel to right" title="Move AI panel to right" aria-pressed={aiSide === "right"}
                 onClick={() =>
                   onAiSideChange("right")
                 }
@@ -231,7 +235,7 @@ export function AiPanel({
                     : "rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
                 }
               >
-                AI on right
+                Right
               </button>
             </div>
 
@@ -245,35 +249,15 @@ export function AiPanel({
               </div>
             )}
 
-            {chatMessages.length === 0 && (
-              <div className="mb-3 grid gap-2">
-                {suggestedPrompts.map(
-                  (prompt) => (
-                    <button
-                      key={prompt}
-                      type="button"
-                      onClick={() =>
-                        void onSuggestedPrompt(
-                          prompt
-                        )
-                      }
-                      disabled={
-                        chatLoading ||
-                        !dashboardReady
-                      }
-                      className="rounded-lg border p-3 text-left text-[15px] leading-snug transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {prompt}
-                    </button>
-                  )
-                )}
-              </div>
-            )}
-
             <div className="mb-3 min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain rounded-lg border p-3 pr-2">
+              <section aria-label="Current page briefing" className="mb-3 rounded-lg border bg-muted/30 p-3">
+                <h3 className="font-semibold">Current page briefing</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{scopeNote}</p>
+                {pageBriefing.loading ? <p role="status" className="mt-3 text-sm">Preparing this page’s briefing…</p> : pageBriefing.error ? <div role="status" className="mt-3 text-sm"><p>{pageBriefing.error}</p><button type="button" onClick={pageBriefing.retry} className="mt-2 rounded-md border px-3 py-2">Retry briefing</button></div> : pageBriefing.text ? <div className="mt-3"><ChatContent content={pageBriefing.text} /></div> : <p className="mt-3 text-sm">Page evidence is not available yet.</p>}
+              </section>
               {chatMessages.length === 0 ? (
                 <div className="flex h-full min-h-28 items-center justify-center text-center text-base text-muted-foreground">
-                  AI conversation will appear here.
+                  Ask a follow-up about this page.
                 </div>
               ) : (
                 chatMessages.map(
@@ -316,6 +300,31 @@ export function AiPanel({
                 </div>
               )}
             </div>
+
+            {(
+              <div aria-label="Suggested follow-up questions" className="mb-3 flex flex-wrap gap-2">
+                {suggestedPrompts.map(
+                  (prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      onClick={() =>
+                        void onSuggestedPrompt(
+                          prompt
+                        )
+                      }
+                      disabled={
+                        chatLoading ||
+                        !dashboardReady
+                      }
+                      className="rounded-lg border px-3 py-2 text-left text-sm leading-snug transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {prompt}
+                    </button>
+                  )
+                )}
+              </div>
+            )}
 
             {chatError && (
               <div className="mb-3 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">

@@ -24,7 +24,8 @@ async function ask(sources: BriefingSource[], persona: Persona, message: string,
   return data.answer as string;
 }
 
-export function OverallOverviewPage({ active, persona, onNavigate }: {
+export function OverallOverviewPage({ active, persona, onNavigate, workforceQuery, workforceScope }: {
+  workforceQuery: string; workforceScope: string;
   active: boolean; persona: Persona; onNavigate: (page: AppPage) => void;
 }) {
   const [sources, setSources] = useState<BriefingSource[] | null>(null);
@@ -36,42 +37,55 @@ export function OverallOverviewPage({ active, persona, onNavigate }: {
   const [input, setInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
-  const loaded = useRef(false);
+  const loaded = useRef("");
+  const briefingCache = useRef(new Map<string, {sources: BriefingSource[]; answer: string; expires: number}>());
   const modelHistory = useRef<ScopedChatHistory>({ key: "", messages: [] });
   const composer = useRef<HTMLTextAreaElement>(null);
   const lastAnswer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!active || loaded.current) return;
+    const loadKey = JSON.stringify({workforceQuery, workforceScope, refresh, persona});
+    if (!active || (loaded.current === loadKey && (!briefingCache.current.has(loadKey) || briefingCache.current.get(loadKey)!.expires > Date.now()))) return;
     const controller = new AbortController();
     const load = async () => {
       setLoading(true); setBriefingError(null); setBriefing("");
+      const cached = briefingCache.current.get(loadKey);
+      if (cached && cached.expires > Date.now()) {
+        setSources(cached.sources); setBriefing(cached.answer); loaded.current=loadKey; setLoading(false);
+        modelHistory.current={key:JSON.stringify({persona,sources:cached.sources}),messages:[{role:"assistant",content:cached.answer}]};
+        return;
+      }
       const [workforce, skills, planning] = await Promise.all([
-        readSource<DashboardResponse>("/api/dashboard", controller.signal),
+        readSource<DashboardResponse>("/api/dashboard" + workforceQuery, controller.signal),
         readSource<SkillsResponse>("/api/skills", controller.signal),
         readSource<WorkforcePlanningResponse>("/api/workforce-planning", controller.signal),
       ]);
       if (controller.signal.aborted) return;
-      const next = buildOverviewSources(workforce, skills, planning);
+      const next = buildOverviewSources(workforce, skills, planning, workforceScope);
       setSources(next);
       try {
         if (next.every(source => !source.facts)) throw new Error("The evidence sources are unavailable. Retry when the sources are reachable.");
         const answer = await ask(next, persona, "Give a short overall briefing with up to three key findings, each cited to its source ID. Keep observations separate from modeled outcomes. Include dates and distinct populations briefly; source details are shown below. End with one useful question to explore. Use at most 120 words.", [], controller.signal);
         if (!controller.signal.aborted) {
           setBriefing(answer);
+          briefingCache.current.set(loadKey,{sources:next,answer,expires:Date.now()+300000});
+          while(briefingCache.current.size>16) briefingCache.current.delete(briefingCache.current.keys().next().value!);
           modelHistory.current = { key: JSON.stringify({ persona, sources: next }), messages: [{ role: "assistant", content: answer }] };
         }
       } catch (error) {
         if (!controller.signal.aborted) setBriefingError(error instanceof Error ? error.message : "Briefing unavailable.");
-      } finally { if (!controller.signal.aborted) { loaded.current = true; setLoading(false); } }
+      } finally { if (!controller.signal.aborted) { loaded.current = loadKey; setLoading(false); } }
     };
     void load();
     return () => controller.abort();
-  }, [active, persona, refresh]);
+  }, [active, persona, refresh, workforceQuery, workforceScope]);
 
   async function send(question = input) {
     const message = question.trim();
     if (!message || !sources || chatLoading || loading || sources.every(source => !source.facts)) return;
+    if (/^(?:please\s+|can you\s+)?(?:export|download)\b/i.test(message)) {
+      setMessages(current=>[...current,{role:"user",content:message},{role:"assistant",content:"CSV downloads are currently available on Workforce and Skills Intelligence. Open one of those pages and choose Export current data (CSV). Home exports, other modules and employee-name rosters are not available yet; no file was downloaded."}]);setInput("");return;
+    }
     const key = JSON.stringify({ persona, sources });
     const history = getScopedChatHistory(modelHistory.current, key);
     setMessages(current => [...current, { role: "user", content: message }]);
@@ -86,20 +100,21 @@ export function OverallOverviewPage({ active, persona, onNavigate }: {
   }
 
   const ready = Boolean(sources?.some(source => source.facts)) && !loading;
-  return <section aria-labelledby="overall-overview-heading" className="mx-auto flex max-w-5xl flex-col gap-7 px-5 py-8 sm:px-10 sm:py-10">
+  return <div className="mx-auto grid max-w-7xl items-start gap-5 px-5 py-8 sm:px-8 xl:grid-cols-[minmax(0,1fr)_250px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-7">
     <header>
       <p className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-primary"><Sparkles size={18} /> Workforce AI</p>
       <h2 id="overall-overview-heading" className="text-3xl font-semibold tracking-tight sm:text-4xl">Your workforce, in perspective.</h2>
+      <p className="mt-2 text-sm text-muted-foreground">by Ed Om <span aria-hidden="true">·</span> <a className="text-primary underline" href="mailto:edwinom.nyc@gmail.com">edwinom.nyc@gmail.com</a></p>
       <button id="overall-guide-link" type="button" onClick={() => onNavigate("guide-data")} className="mt-3 rounded-sm font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Guide &amp; Data</button>
       <p className="mt-3 max-w-2xl text-lg text-muted-foreground">Start with the evidence. Explore what matters. Work through your next question.</p>
-      <p className="mt-3 text-sm text-muted-foreground">Company overview · Synthetic workforce data · Each source keeps its own date and population</p>
+      <p className="mt-3 text-sm text-muted-foreground">Synthetic workforce data · Workforce snapshot follows selected filters; Skills and Planning remain company-wide</p>
     </header>
 
     <section aria-label="Key findings" className="rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
       <div className="mb-4 flex items-center justify-between gap-3">
         <h3 className="text-xl font-semibold">A brief look across the business</h3>
         <button type="button" aria-label="Refresh overview evidence and briefing" disabled={loading || chatLoading}
-          onClick={() => { loaded.current = false; setRefresh(value => value + 1); }}
+          onClick={() => { loaded.current = ""; setRefresh(value => value + 1); }}
           className="rounded-md p-2 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18} /></button>
       </div>
       {loading && <p role="status" className="text-lg text-muted-foreground">Reading the available evidence and preparing your briefing…</p>}
@@ -121,7 +136,7 @@ export function OverallOverviewPage({ active, persona, onNavigate }: {
     </section>
 
     <div className="flex flex-wrap gap-2" aria-label="Guided overview questions">
-      {["Where should I focus?", "Tell me something interesting", "Help me work through a problem"].map(prompt => <button key={prompt} type="button" disabled={!ready || chatLoading}
+      {["Where should I focus?", "Tell me something interesting", "Help me work through a problem", "Export current data (CSV)"].map(prompt => <button key={prompt} type="button" disabled={!ready || chatLoading}
         onClick={() => void send(prompt)} className="rounded-full border bg-card px-4 py-3 text-base font-medium hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{prompt}</button>)}
     </div>
 
@@ -140,5 +155,16 @@ export function OverallOverviewPage({ active, persona, onNavigate }: {
       <div className="mt-2 flex items-center justify-between gap-3"><p className="text-xs text-muted-foreground">Drag the lower edge to resize. Questions explore evidence; they do not run workforce actions.</p>
         <button type="submit" aria-label="Send overview question" disabled={!ready || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-3 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
     </form>
-  </section>;
+  </section>
+    <aside className="rounded-xl border bg-card p-5 text-sm leading-relaxed" aria-label="How to use this app">
+      <h3 className="text-lg font-semibold">How to use this app</h3>
+      <ol className="mt-3 list-decimal space-y-4 pl-4">
+        <li><button className="text-left font-semibold text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce: identify the problem</button><p>Review the snapshot and trends; narrow supported views with the filters.</p></li>
+        <li><button className="text-left font-semibold text-primary underline" onClick={()=>onNavigate("skills")}>Talent: identify potential</button><p>Open Skills Intelligence to review requirements and learning coverage.</p></li>
+        <li><strong>Carry relevant Skills evidence</strong><p>Choose a Skills observation, enter your goal and select Carry to Planning.</p></li>
+        <li><button className="text-left font-semibold text-primary underline" onClick={()=>onNavigate("planning-overview")}>Planning: develop the plan</button><p>Review your goal and evidence. In Scenario Modeling, run a supported comparison. Use Workforce Response and Execution &amp; Feasibility to compare response and execution options.</p></li>
+      </ol>
+      <p className="mt-4 text-muted-foreground">Navigation does not carry evidence or run models. Scenarios do not make real workforce changes.</p>
+    </aside>
+  </div>;
 }
