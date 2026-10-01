@@ -40,9 +40,9 @@ export function WorkforcePage({ data, loading, error }: Props) {
     <section className="min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold">Workforce Composition</h2>
+          <h2 className="text-2xl font-semibold">Enterprise composition</h2>
           <p className="text-muted-foreground">
-            Deep dive into workforce size, composition, management layers, tenure, and mobility.
+            All countries, business units and levels. Snapshot filters above do not narrow these breakdowns.
           </p>
         </div>
         <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">

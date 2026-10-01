@@ -27,7 +27,7 @@ export const appWorkspaceJourneys: Array<{
     key: "analytics",
     journeyLabel: "Workforce Analytics",
     subtitle: "“Understand Our Workforce”",
-    defaultPage: "overview",
+    defaultPage: "workforce",
   },
   {
     key: "talent",
@@ -48,7 +48,6 @@ export const appNavigationSections: AppNavigationSection[] = [
     key: "analytics",
     title: "Workforce Analytics",
     pages: [
-      "overview",
       "workforce",
       "attrition",
       "talent-acquisition",
@@ -83,14 +82,16 @@ export const appPageMetadata: Record<
   AppPage,
   AppPageMetadata
 > = {
+  home: { label: "Home", section: "Workforce AI", description: "Explore key findings and ask questions across governed workforce evidence." },
+  "guide-data": { label: "Guide & Data", section: "Workforce AI", description: "How to use the app, understand its data, and interpret its limits." },
   overview: {
-    label: "Overview",
+    label: "Workforce",
     section: "Workforce Analytics",
     description:
       "Executive workforce health, trends, and business impact.",
   },
   workforce: {
-    label: "Workforce Composition",
+    label: "Workforce",
     section: "Workforce Analytics",
     description:
       "Workforce size, structure, tenure, management layers, and mobility.",
@@ -211,6 +212,6 @@ export function getDefaultPageForWorkspace(
   return (
     appWorkspaceJourneys.find(
       (item) => item.key === workspace
-    )?.defaultPage ?? "overview"
+    )?.defaultPage ?? "workforce"
   );
 }

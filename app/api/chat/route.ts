@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { overviewBriefingPrompt } from "../../../lib/overview-briefing";
 import { talentResponseChatPrompt } from "../../../lib/talent-response-evidence";
 import { peopleAnalyticsTools, runPeopleAnalyticsTool } from "../../../lib/people-analytics-tools";
 
@@ -583,6 +584,7 @@ export async function POST(
       body?.context as WorkforceContext;
 
     const page =
+      body?.page === "home" ||
       body?.page === "workforce" ||
       body?.page === "attrition" ||
       body?.page === "workforce-planning" ||
@@ -669,7 +671,7 @@ export async function POST(
       );
     }
 
-    if (!context) {
+    if (!context && page !== "home") {
       return NextResponse.json(
         {
           error:
@@ -687,7 +689,7 @@ export async function POST(
         )
         .join("\n\n");
 
-    const workforceContext = `
+    const workforceContext = page === "home" ? overviewBriefingPrompt(body?.overviewBriefingContext ?? []) : `
 CURRENT SELECTED BUSINESS CONTEXT
 Snapshot date: ${context.snapshotDate}
 Country: ${context.country}
@@ -725,6 +727,7 @@ Displayed trend:
       page === "workforce" && workforceDetailContext
         ? `
 CURRENT WORKFORCE DETAIL CONTEXT
+Scope: enterprise-wide, unfiltered composition. The separate dashboard snapshot and its trend use the selected country, business unit and level filters. Never apply those filters to these enterprise breakdowns or combine their denominators.
 Summary: ${JSON.stringify(workforceDetailContext.summary)}
 Business units: ${JSON.stringify(workforceDetailContext.businessUnits)}
 Countries: ${JSON.stringify(workforceDetailContext.countries)}
@@ -1495,12 +1498,12 @@ ${message}
 `.trim();
 
     const maxOutputTokens =
-      page === "workforce-planning"
+      page === "workforce-planning" || page === "home"
         ? 1400
         : 700;
 
     const toolChoice =
-      page === "career-growth-mobility"
+      page === "career-growth-mobility" || page === "home"
         ? ("none" as const)
         : ("auto" as const);
 

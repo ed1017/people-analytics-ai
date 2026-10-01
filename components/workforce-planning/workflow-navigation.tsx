@@ -1,3 +1,5 @@
+import { CalendarDays, LayoutDashboard, ShieldCheck, TrendingUp, Users } from "lucide-react";
+
 export type WorkforcePlanningWorkflowView =
   | "overview"
   | "plan"
@@ -72,7 +74,18 @@ export function WorkforcePlanningWorkflowNavigation({
 
   return (
     <>
-      <div className="mb-6 rounded-lg border p-3">
+      <nav aria-label="Planning destination cards" className="mb-4 flex flex-wrap gap-2">
+        {steps.map((item, index) => {
+          const Icon = [LayoutDashboard, CalendarDays, Users, TrendingUp, ShieldCheck][index];
+          const active = activeView === item.key;
+          return <button key={item.key} type="button" aria-label={`Open ${item.title}`} aria-current={active ? "page" : undefined}
+            onClick={() => onViewChange(item.key)}
+            className={`flex h-24 w-24 shrink-0 flex-col items-center justify-center gap-1 rounded-md border p-2 text-center text-xs font-semibold leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${active ? "bg-foreground text-background" : "bg-card hover:bg-muted"}`}>
+            <Icon size={20} aria-hidden="true" /><span>{item.title}</span>
+          </button>;
+        })}
+      </nav>
+      <div aria-label="Planning destination tabs" role="navigation" className="mb-6 rounded-lg border p-3">
         <div className="grid gap-2">
           {steps.map((item) => {
             const active =
@@ -84,6 +97,7 @@ export function WorkforcePlanningWorkflowNavigation({
               <button
                 key={item.key}
                 type="button"
+                aria-current={active ? "page" : undefined}
                 onClick={() =>
                   onViewChange(item.key)
                 }
