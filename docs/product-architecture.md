@@ -22,11 +22,14 @@ The AI should help across that whole flow, but deterministic analytics and gover
 
 ### Workspace journey
 
-The top-level product journey is orientation, not a forced wizard. Users can move freely among three workspaces while the left navigation handles pages inside the active workspace:
+The left navigation groups the product into three workspaces. Each category heading is primary, with the journey phrase directly underneath. Users can move freely among the groups; this is orientation, not a forced wizard:
 
-1. **Workforce Analytics** — “Understand Our Workforce”
-2. **Talent Management** — “Realize Our Potential”
-3. **Workforce Planning** — “Plan Our Future”
+1. **Workforce Analytics**
+   “Understand Our Workforce”
+2. **Talent Management**
+   “Realize Our Potential”
+3. **Workforce Planning**
+   “Plan Our Future”
 
 ### Workforce AI
 
