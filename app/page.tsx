@@ -540,7 +540,10 @@ export default function Home() {
     }
 
     loadPlanning();
-  }, [activePage, planningData]);
+  }, [
+    planningWorkspaceActive,
+    planningData,
+  ]);
 
   useEffect(() => {
     if (
@@ -589,7 +592,7 @@ export default function Home() {
 
     loadPositionModeling();
   }, [
-    activePage,
+    planningWorkspaceActive,
     positionModelingData,
   ]);
 
@@ -1194,7 +1197,7 @@ export default function Home() {
     // The packet itself is the trigger; source
     // validation is intentionally read-only.
   }, [
-    activePage,
+    planningWorkspaceActive,
     planningEvidenceHandoff,
   ]);
 
