@@ -57,6 +57,7 @@ export async function GET() {
       coursesResult,
       profilesResult,
       requirementsResult,
+      currentWorkforceResult,
     ] = await Promise.all([
       supabaseServer
         .from("skills_proficiency_gap_summary")
@@ -82,6 +83,11 @@ export async function GET() {
         .select(
           "job_profile_id, skill_id, importance"
         ),
+
+      supabaseServer
+        .from("dashboard_overview_current")
+        .select("headcount")
+        .single(),
     ]);
 
     if (gapsResult.error) {
@@ -108,6 +114,13 @@ export async function GET() {
       throw new Error(
         "Learning & Development job requirements: " +
           requirementsResult.error.message
+      );
+    }
+
+    if (currentWorkforceResult.error) {
+      throw new Error(
+        "Learning & Development current workforce: " +
+          currentWorkforceResult.error.message
       );
     }
 
@@ -363,6 +376,10 @@ export async function GET() {
       {
         as_of: "2026-09-30",
         summary: {
+          current_workforce: toNumber(
+            currentWorkforceResult.data
+              ?.headcount
+          ),
           current_gap_skills:
             skillPathways.length,
           gap_skills_with_active_pathway:
