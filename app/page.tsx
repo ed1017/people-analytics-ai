@@ -10,6 +10,7 @@ import {
 } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { AppHeader } from "@/components/app-header";
+import { WorkspaceJourneyToolbar } from "@/components/workspace-journey-toolbar";
 import { OverviewPage } from "@/components/pages/overview-page";
 import { WorkforcePage } from "@/components/pages/workforce-page";
 import { AttritionPage } from "@/components/pages/attrition-page";
@@ -23,6 +24,11 @@ import { PlanningSessionProvider } from "@/components/workforce-planning/plannin
 import { TalentAcquisitionPage } from "@/components/pages/talent-acquisition-page";
 import { SurveySentimentPage } from "@/components/pages/survey-sentiment-page";
 import { AiPanel } from "@/components/ai-panel";
+import {
+  getDefaultPageForWorkspace,
+  getWorkspaceForPage,
+  type AppWorkspaceKey,
+} from "@/lib/app-navigation";
 import type {
   AppPage,
   BlsResponse,
@@ -80,6 +86,40 @@ export default function Home() {
 
   const [activePage, setActivePage] =
     useState<AppPage>("overview");
+
+  const lastPageByWorkspaceRef = useRef<
+    Record<AppWorkspaceKey, AppPage>
+  >({
+    analytics: "overview",
+    talent: "skills",
+    strategy: "workforce-planning",
+  });
+
+  const activeWorkspace =
+    getWorkspaceForPage(activePage);
+
+  useEffect(() => {
+    lastPageByWorkspaceRef.current[
+      activeWorkspace
+    ] = activePage;
+  }, [activePage, activeWorkspace]);
+
+  const changeWorkspace = (
+    workspace: AppWorkspaceKey
+  ) => {
+    if (workspace === activeWorkspace) {
+      return;
+    }
+
+    setActivePage(
+      lastPageByWorkspaceRef.current[
+        workspace
+      ] ??
+        getDefaultPageForWorkspace(
+          workspace
+        )
+    );
+  };
 
   const [workforceData, setWorkforceData] =
     useState<WorkforceResponse | null>(null);
@@ -1523,12 +1563,20 @@ export default function Home() {
   };
 
   return (
+    <PlanningSessionProvider>
     <main className="min-h-screen bg-background text-foreground">
       {/* Top header */}
       <AppHeader
         activePage={activePage}
         selectedPersona={selectedPersona}
         onPersonaChange={setSelectedPersona}
+      />
+
+      <WorkspaceJourneyToolbar
+        activeWorkspace={activeWorkspace}
+        onWorkspaceChange={
+          changeWorkspace
+        }
       />
 
       {/* Main application */}
@@ -1644,7 +1692,6 @@ export default function Home() {
             error={successionCoverageError}
           />
         ) : (
-          <PlanningSessionProvider>
           <WorkforcePlanningPage
             planningScenarios={planningScenarios}
             planningLoading={planningLoading}
@@ -1667,7 +1714,6 @@ export default function Home() {
             onScenarioChange={setSelectedPlanningScenario}
             onExplainCustomScenario={explainCustomScenario}
           />
-          </PlanningSessionProvider>
         )}
         </div>
 
@@ -1696,5 +1742,6 @@ export default function Home() {
         />
       </div>
     </main>
+    </PlanningSessionProvider>
   );
 }
