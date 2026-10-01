@@ -5,6 +5,8 @@ import {
   formatWholeCount,
 } from "@/lib/display-format";
 import { EvidenceScopeNotice } from "@/components/evidence-scope-notice";
+import { SkillsEvidenceHandoffPanel } from "@/components/skills-evidence-handoff-panel";
+import type { PlanningEvidenceHandoff } from "@/lib/evidence-handoff";
 import {
   enterpriseTalentEvidenceScope,
   type SelectedBusinessContext,
@@ -23,6 +25,10 @@ type SkillsPageProps = {
   blsError: string | null;
   maxSkillDemand: number;
   selectedContext: SelectedBusinessContext;
+  activeHandoff: PlanningEvidenceHandoff | null;
+  onCarryToPlanning: (handoff: PlanningEvidenceHandoff) => void;
+  onClearHandoff: () => void;
+  onOpenPlanning: () => void;
 };
 
 function formatLongDate(value: string) {
@@ -42,6 +48,10 @@ export function SkillsPage({
   blsError,
   maxSkillDemand,
   selectedContext,
+  activeHandoff,
+  onCarryToPlanning,
+  onClearHandoff,
+  onOpenPlanning,
 }: SkillsPageProps) {
   return (
 <section className="min-w-0 p-6">
@@ -69,20 +79,37 @@ export function SkillsPage({
             )}
 
             {skillsData && (
-              <EvidenceScopeNotice
-                scope={enterpriseTalentEvidenceScope({
-                  label: "Enterprise workforce",
-                  asOf: skillsData.as_of,
-                  populationLabel: "employees",
-                  populationCount:
-                    skillsData.summary.current_workforce,
-                  supportedBreakdowns: [
-                    "skill",
-                  ],
-                })}
-                selectedContext={selectedContext}
-                note="Skill-level denominators remain the employees in current roles requiring each skill."
-              />
+              <>
+                <EvidenceScopeNotice
+                  scope={enterpriseTalentEvidenceScope({
+                    label: "Enterprise workforce",
+                    asOf: skillsData.as_of,
+                    populationLabel: "employees",
+                    populationCount:
+                      skillsData.summary.current_workforce,
+                    supportedBreakdowns: [
+                      "skill",
+                    ],
+                  })}
+                  selectedContext={selectedContext}
+                  note="Skill-level denominators remain the employees in current roles requiring each skill."
+                />
+
+                <SkillsEvidenceHandoffPanel
+                  skillsData={skillsData}
+                  selectedContext={selectedContext}
+                  activeHandoff={activeHandoff}
+                  onCarryToPlanning={
+                    onCarryToPlanning
+                  }
+                  onClearHandoff={
+                    onClearHandoff
+                  }
+                  onOpenPlanning={
+                    onOpenPlanning
+                  }
+                />
+              </>
             )}
 
             {skillsData ? (
