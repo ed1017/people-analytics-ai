@@ -51,6 +51,11 @@ export function AppSidebar({
   onToggle,
   onPageChange,
 }: AppSidebarProps) {
+  const activeSection =
+    appNavigationSections.find((section) =>
+      section.pages.includes(activePage)
+    ) ?? appNavigationSections[0];
+
   return (
     <aside className="app-sidebar sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto border-r bg-muted/10 p-3 max-md:p-2">
       <Button
@@ -81,25 +86,16 @@ export function AppSidebar({
         )}
       </Button>
 
-      <nav className="space-y-4">
-        {appNavigationSections.map(
-          (section, sectionIndex) => (
-            <div
-              key={section.key}
-              className={
-                sectionIndex === 0
-                  ? ""
-                  : "border-t pt-4"
-              }
-            >
-              {!navCollapsed && (
-                <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground max-md:hidden">
-                  {section.title}
-                </p>
-              )}
+      <nav aria-label="Workspace pages">
+        <div>
+          {!navCollapsed && (
+            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground max-md:hidden">
+              {activeSection.title}
+            </p>
+          )}
 
-              <div className="space-y-1">
-                {section.pages.map((page) => {
+          <div className="space-y-1">
+            {activeSection.pages.map((page) => {
                   const metadata =
                     getAppPageMetadata(page);
                   const Icon = pageIcons[page];
@@ -139,11 +135,9 @@ export function AppSidebar({
                       )}
                     </Button>
                   );
-                })}
-              </div>
-            </div>
-          )
-        )}
+            })}
+          </div>
+        </div>
       </nav>
     </aside>
   );
