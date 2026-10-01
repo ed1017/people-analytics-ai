@@ -12,7 +12,8 @@
     "test:handoff": "node --test tests/evidence-handoff.test.mjs",
     "test:career-growth": "node --test tests/career-growth-mobility.test.mjs",
     "test:a11y": "node --test tests/pre-demo-accessibility.test.mjs",
-    "test:planning-nav": "node --test tests/planning-destinations.test.mjs"
+    "test:planning-nav": "node --test tests/planning-destinations.test.mjs",
+    "test:talent-response": "node --test tests/talent-response-evidence.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
