@@ -83,10 +83,10 @@ export function OverviewPage({
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold">
-            Workforce Overview
+            Selected workforce snapshot
           </h2>
           <p className="text-muted-foreground">
-            Monitor workforce health, trends, and business impact.
+            Filters apply to this snapshot and its trend only. Enterprise composition below remains unfiltered.
           </p>
         </div>
 
@@ -104,7 +104,7 @@ export function OverviewPage({
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
             <p className="font-medium">
-              Dashboard Filters
+              Snapshot filters
             </p>
             <p className="text-sm text-muted-foreground">
               {selectedCountryLabel} ·{" "}
@@ -116,7 +116,7 @@ export function OverviewPage({
           <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
             {dashboardLoading
               ? "Refreshing data…"
-              : "Live Supabase data"}
+              : "Synthetic workforce data"}
           </span>
         </div>
 
@@ -305,7 +305,7 @@ export function OverviewPage({
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
             <h3 className="font-semibold">
-              Headcount Trend
+              Selected-scope Headcount Trend
             </h3>
             <p className="text-sm text-muted-foreground">
               Monthly active workforce from January 2024 through September 2026

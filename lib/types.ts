@@ -39,6 +39,7 @@ export type Persona = "HR" | "Leader" | "Finance";
 
 export type AppPage =
   | "home"
+  | "guide-data"
   | "overview"
   | "workforce"
   | "attrition"

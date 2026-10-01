@@ -50,6 +50,7 @@ const pageIcons: Record<
   LucideIcon
 > = {
   home: Sparkles,
+  "guide-data": Compass,
   overview: LayoutDashboard,
   workforce: Users,
   attrition: TrendingDown,
@@ -114,10 +115,10 @@ export function AppSidebar({
         aria-label="Workforce navigation"
         className="space-y-4"
       >
-        <Button type="button" aria-label="Overall Overview" aria-current={activePage === "home" ? "page" : undefined}
+        <Button type="button" aria-label="Home" aria-current={activePage === "home" ? "page" : undefined}
           variant={activePage === "home" ? "secondary" : "ghost"} onClick={() => onPageChange("home")}
           className="mb-2 w-full justify-start gap-3 text-base max-md:justify-center max-md:px-0">
-          <Sparkles className="h-5 w-5 shrink-0" />{!navCollapsed && <span className="max-md:hidden">Overall Overview</span>}
+          <Sparkles className="h-5 w-5 shrink-0" />{!navCollapsed && <span className="max-md:hidden">Home</span>}
         </Button>
         {appNavigationSections.map(
           (section, sectionIndex) => {
@@ -127,7 +128,7 @@ export function AppSidebar({
                   item.key === section.key
               );
             const sectionActive =
-              activePage !== "home" && activeWorkspace === section.key;
+              activePage !== "home" && activePage !== "guide-data" && activeWorkspace === section.key;
             const groupLabel = journey
               ? `${section.title} — ${journey.subtitle}`
               : section.title;
@@ -179,7 +180,7 @@ export function AppSidebar({
                         {workspaceDisplayTitles[section.key]}
                       </span>
                       {journey && (
-                        <span className="mt-1 block text-sm font-medium leading-tight text-muted-foreground">
+                        <span className="nav-journey-subtitle mt-1 block text-sm font-medium leading-tight text-muted-foreground">
                           {journey.subtitle}
                         </span>
                       )}
@@ -204,6 +205,7 @@ export function AppSidebar({
                       return (
                         <Button
                           key={page}
+                          data-nav-destination={page}
                           variant={
                             active
                               ? "secondary"

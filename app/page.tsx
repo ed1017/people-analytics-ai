@@ -14,6 +14,7 @@ import { completeScopedChatTurn, getScopedChatHistory, type ScopedChatHistory } 
 import { AppHeader } from "@/components/app-header";
 import { OverviewPage } from "@/components/pages/overview-page";
 import { OverallOverviewPage } from "@/components/pages/overall-overview-page";
+import { GuideDataPage } from "@/components/pages/guide-data-page";
 import { WorkforcePage } from "@/components/pages/workforce-page";
 import { AttritionPage } from "@/components/pages/attrition-page";
 import { FinancePage } from "@/components/pages/finance-page";
@@ -123,16 +124,18 @@ export default function Home() {
   const [selectedPersona, setSelectedPersona] =
     useState<Persona>("HR");
 
-  const [activePage, setActivePage] =
+  const [activePage, setActivePageState] =
     useState<AppPage>("home");
 
   const lastPageByWorkspaceRef = useRef<
     Record<AppWorkspaceKey, AppPage>
   >({
-    analytics: "overview",
+    analytics: "workforce",
     talent: "skills",
     strategy: "planning-overview",
   });
+
+  const setActivePage = (page: AppPage) => setActivePageState(page === "overview" ? "workforce" : page);
 
   const activeWorkspace =
     getWorkspaceForPage(activePage);
@@ -143,7 +146,7 @@ export default function Home() {
     planningRequestedView !== null;
 
   useEffect(() => {
-    if (activePage === "home") return;
+    if (activePage === "home" || activePage === "guide-data") return;
     lastPageByWorkspaceRef.current[
       activeWorkspace
     ] = activePage;
@@ -152,7 +155,7 @@ export default function Home() {
   const changeWorkspace = (
     workspace: AppWorkspaceKey
   ) => {
-    if (activePage !== "home" && workspace === activeWorkspace) {
+    if (activePage !== "home" && activePage !== "guide-data" && workspace === activeWorkspace) {
       return;
     }
 
@@ -2047,7 +2050,7 @@ export default function Home() {
 
   return (
     <PlanningSessionProvider onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
-    <main className={`min-h-screen bg-background text-foreground${activePage === "home" ? " app-overview-mode" : ""}`}>
+    <main className={`min-h-screen bg-background text-foreground${activePage === "home" || activePage === "guide-data" ? " app-overview-mode" : ""}`}>
       {/* Top header */}
       <AppHeader
         activePage={activePage}
@@ -2057,7 +2060,7 @@ export default function Home() {
 
       {/* Main application */}
       <div
-        className={`app-shell app-ai-${aiSide}${activePage === "home" ? " app-home" : ""}`}
+        className={`app-shell app-ai-${aiSide}${activePage === "home" || activePage === "guide-data" ? " app-home" : ""}`}
         style={
           {
             "--nav-width": `${
@@ -2085,7 +2088,9 @@ export default function Home() {
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
         <div hidden={activePage !== "home"}><OverallOverviewPage active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} /></div>
-        {activePage === "home" ? null : activePage === "overview" ? (
+        {activePage === "guide-data" ? <GuideDataPage onBack={() => { setActivePage("home"); window.requestAnimationFrame(() => document.getElementById("overall-guide-link")?.focus()); }} /> : activePage === "home" ? null : activePage === "workforce" ? (
+          <>
+          <h1 className="px-6 pt-6 text-2xl font-semibold">Workforce</h1>
           <OverviewPage
             overviewData={overviewData}
             headcountTrend={headcountTrend}
@@ -2105,12 +2110,12 @@ export default function Home() {
             onLevelChange={setSelectedLevel}
             onResetFilters={resetFilters}
           />
-        ) : activePage === "workforce" ? (
           <WorkforcePage
             data={workforceData}
             loading={workforceLoading}
             error={workforceError}
           />
+          </>
         ) : activePage === "attrition" ? (
           <AttritionPage
             data={attritionData}
@@ -2263,7 +2268,7 @@ export default function Home() {
         )}
         </div>
 
-        {activePage !== "home" && <AiPanel
+        {activePage !== "home" && activePage !== "guide-data" && <AiPanel
           aiCollapsed={aiCollapsed}
           aiExpanded={aiExpanded}
           aiSide={aiSide}

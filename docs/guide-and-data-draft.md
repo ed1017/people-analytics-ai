@@ -1,6 +1,6 @@
-# Guide & Data — content draft
+# Guide & Data — content record
 
-This is draft content for the requested user guidance. A dedicated page is proposed; page versus toolbar placement has not been decided. No new guide interface has been published.
+The user confirmed a separate Guide & Data page linked from the overall overview. This content is implemented in the local page; publication remains subject to release checks. No giant toolbar was added.
 
 ## Start with a question
 
@@ -46,3 +46,7 @@ Editing a comparison goal does not silently re-compare it. Compare again to use 
 The overall overview is read-only: it retrieves existing aggregates and generates explanations. Its chat cannot invoke workforce tools or alter source records. Existing Planning controls are separate, explicit interactions; a briefing or carried evidence packet does not trigger them automatically.
 
 Do not use these aggregate views to identify, rank or recommend employment decisions about individual employees. Current source coverage does not establish causes, individual suitability or a complete career path. Check dates, populations, scope and missing evidence before interpreting a finding.
+
+## Version direction
+
+V2 is a proposed direction for machine learning and predictive analytics. It is not implemented and has no agreed release date. V3 is undefined: no features, scope or date have been agreed.

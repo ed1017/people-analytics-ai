@@ -727,6 +727,7 @@ Displayed trend:
       page === "workforce" && workforceDetailContext
         ? `
 CURRENT WORKFORCE DETAIL CONTEXT
+Scope: enterprise-wide, unfiltered composition. The separate dashboard snapshot and its trend use the selected country, business unit and level filters. Never apply those filters to these enterprise breakdowns or combine their denominators.
 Summary: ${JSON.stringify(workforceDetailContext.summary)}
 Business units: ${JSON.stringify(workforceDetailContext.businessUnits)}
 Countries: ${JSON.stringify(workforceDetailContext.countries)}
