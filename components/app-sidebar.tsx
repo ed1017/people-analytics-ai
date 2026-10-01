@@ -6,6 +6,7 @@ import {
   GraduationCap,
   LayoutDashboard,
   MessageSquareText,
+  ShieldCheck,
   PanelLeftClose,
   PanelLeftOpen,
   Sparkles,
@@ -40,6 +41,7 @@ const pageIcons: Record<
   skills: Sparkles,
   "learning-development": GraduationCap,
   "career-mobility": Compass,
+  "succession-planning": ShieldCheck,
   "workforce-planning": CalendarDays,
 };
 

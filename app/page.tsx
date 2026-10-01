@@ -17,6 +17,7 @@ import { FinancePage } from "@/components/pages/finance-page";
 import { SkillsPage } from "@/components/pages/skills-page";
 import { LearningDevelopmentPage } from "@/components/pages/learning-development-page";
 import { CareerMobilityPage } from "@/components/pages/career-mobility-page";
+import { SuccessionPlanningPage } from "@/components/pages/succession-planning-page";
 import { WorkforcePlanningPage } from "@/components/pages/workforce-planning-page";
 import { PlanningSessionProvider } from "@/components/workforce-planning/planning-session-context";
 import { TalentAcquisitionPage } from "@/components/pages/talent-acquisition-page";
@@ -37,6 +38,7 @@ import type {
   PositionModelingResponse,
   ScenarioModelResponse,
   SkillsResponse,
+  SuccessionCoverageResponse,
   WorkforceResponse,
   AttritionResponse,
   TalentAcquisitionResponse,
@@ -163,6 +165,21 @@ export default function Home() {
   const [
     careerMobilityError,
     setCareerMobilityError,
+  ] = useState<string | null>(null);
+
+  const [
+    successionCoverageData,
+    setSuccessionCoverageData,
+  ] = useState<SuccessionCoverageResponse | null>(
+    null
+  );
+  const [
+    successionCoverageLoading,
+    setSuccessionCoverageLoading,
+  ] = useState(false);
+  const [
+    successionCoverageError,
+    setSuccessionCoverageError,
   ] = useState<string | null>(null);
 
   const [talentAcquisitionData, setTalentAcquisitionData] =
@@ -724,6 +741,58 @@ export default function Home() {
 
   useEffect(() => {
     if (
+      activePage !==
+        "succession-planning" ||
+      successionCoverageData
+    ) {
+      return;
+    }
+
+    async function loadSuccessionCoverage() {
+      try {
+        setSuccessionCoverageLoading(true);
+        setSuccessionCoverageError(null);
+
+        const response = await fetch(
+          "/api/succession-coverage",
+          {
+            cache: "no-store",
+          }
+        );
+
+        const payload =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            payload?.error ??
+              "Succession summary is unavailable."
+          );
+        }
+
+        setSuccessionCoverageData(
+          payload as SuccessionCoverageResponse
+        );
+      } catch (error) {
+        console.error(error);
+        setSuccessionCoverageError(
+          error instanceof Error
+            ? error.message
+            : "Succession summary is unavailable."
+        );
+      } finally {
+        setSuccessionCoverageLoading(false);
+      }
+    }
+
+    loadSuccessionCoverage();
+  }, [
+    activePage,
+    successionCoverageData,
+  ]);
+
+  useEffect(() => {
+    if (
       activePage !== "skills" ||
       blsData
     ) {
@@ -972,6 +1041,13 @@ export default function Home() {
                 "Where are desired locations concentrated?",
                 "What does recorded relocation willingness show?",
               ]
+          : activePage ===
+              "succession-planning"
+            ? [
+                "What does recorded succession-plan coverage show?",
+                "How much recorded ready-now coverage do we have?",
+                "How should I interpret this succession summary?",
+              ]
           : activePage === "talent-acquisition"
             ? [
                 "Where is the recruiting funnel weakest?",
@@ -1202,6 +1278,13 @@ export default function Home() {
                     currentOrgCoverage:
                       careerMobilityData.current_org_coverage,
                   }
+                : null,
+
+            successionCoverageContext:
+              activePage ===
+                "succession-planning" &&
+              successionCoverageData
+                ? successionCoverageData
                 : null,
 
             talentAcquisitionContext:
@@ -1552,6 +1635,13 @@ export default function Home() {
             data={careerMobilityData}
             loading={careerMobilityLoading}
             error={careerMobilityError}
+          />
+        ) : activePage ===
+          "succession-planning" ? (
+          <SuccessionPlanningPage
+            data={successionCoverageData}
+            loading={successionCoverageLoading}
+            error={successionCoverageError}
           />
         ) : (
           <PlanningSessionProvider>

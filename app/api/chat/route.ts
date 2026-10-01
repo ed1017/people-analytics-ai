@@ -268,6 +268,26 @@ type CareerMobilityContext = {
   }>;
 };
 
+type SuccessionCoverageContext = {
+  as_of_date: string | null;
+  small_cell_threshold: number;
+  critical_job_profiles: number;
+  filled_critical_positions: number | null;
+  positions_with_recorded_plan: number | null;
+  positions_without_recorded_plan: number | null;
+  recorded_plan_coverage_pct: number | null;
+  plan_coverage_suppressed: boolean;
+  positions_with_ready_now: number | null;
+  positions_without_ready_now: number | null;
+  ready_now_plan_pct: number | null;
+  ready_now_suppressed: boolean;
+  suppression_reason:
+    | "population_small_cell"
+    | "plan_partition_small_cell"
+    | "readiness_partition_small_cell"
+    | null;
+};
+
 type TalentAcquisitionContext = {
   summary: {
     applications: number;
@@ -434,6 +454,7 @@ export async function POST(
       body?.page === "skills" ||
       body?.page === "learning-development" ||
       body?.page === "career-mobility" ||
+      body?.page === "succession-planning" ||
       body?.page === "talent-acquisition" ||
       body?.page === "survey-sentiment"
         ? body.page
@@ -477,6 +498,11 @@ export async function POST(
     const careerMobilityContext =
       body?.careerMobilityContext
         ? (body.careerMobilityContext as CareerMobilityContext)
+        : null;
+
+    const successionCoverageContext =
+      body?.successionCoverageContext
+        ? (body.successionCoverageContext as SuccessionCoverageContext)
         : null;
 
     const talentAcquisitionContext =
@@ -849,6 +875,46 @@ Interpretation rules:
 `.trim()
         : "";
 
+    const successionPrompt =
+      page === "succession-planning"
+        ? successionCoverageContext
+          ? `
+CURRENT SUCCESSION PLANNING CONTEXT
+Assessment date: ${successionCoverageContext.as_of_date ?? "No recorded assessment"}
+Small-cell threshold: k=${successionCoverageContext.small_cell_threshold}
+Active critical job profiles: ${successionCoverageContext.critical_job_profiles}
+Filled critical positions: ${successionCoverageContext.filled_critical_positions ?? "Suppressed"}
+Positions with a recorded succession plan: ${successionCoverageContext.positions_with_recorded_plan ?? "Suppressed"}
+Positions without a recorded succession plan: ${successionCoverageContext.positions_without_recorded_plan ?? "Suppressed"}
+Recorded plan coverage: ${successionCoverageContext.recorded_plan_coverage_pct === null ? "Suppressed or unavailable" : successionCoverageContext.recorded_plan_coverage_pct + "%"}
+Plan coverage suppressed: ${successionCoverageContext.plan_coverage_suppressed ? "yes" : "no"}
+Planned positions with at least one recorded ready-now candidate: ${successionCoverageContext.positions_with_ready_now ?? "Suppressed"}
+Planned positions without a recorded ready-now candidate: ${successionCoverageContext.positions_without_ready_now ?? "Suppressed"}
+Ready-now share of recorded plans: ${successionCoverageContext.ready_now_plan_pct === null ? "Suppressed or unavailable" : successionCoverageContext.ready_now_plan_pct + "%"}
+Readiness coverage suppressed: ${successionCoverageContext.ready_now_suppressed ? "yes" : "no"}
+Suppression reason: ${successionCoverageContext.suppression_reason ?? "None"}
+
+Interpretation rules:
+- This is a company-wide aggregate of recorded source assessments only.
+- Recorded plan coverage means a filled position in an active critical job profile has a recorded succession plan.
+- Ready-now coverage means a recorded succession plan has at least one candidate whose source assessment is ready_now.
+- These are source-record assessments, not model predictions, promotion recommendations, transfer recommendations, suitability scores, or individual employment decisions.
+- No individual candidate, employee, position, or plan details are available in this context. Never infer, rank, identify, or recommend individuals.
+- Null values paired with suppression flags are intentionally suppressed under the k=10 paired-cell rule. Never estimate, reconstruct, or reverse-engineer suppressed values.
+- If plan coverage is suppressed, downstream readiness detail is also suppressed. Do not infer it from percentages or complements.
+- Succession is intentionally enterprise-summary only. Do not suggest or imply that job-profile, business-unit, level, risk, person, candidate, position, or plan breakdowns are available from this public succession context. If asked for those details, state that this governed public summary does not expose them.
+`.trim()
+          : `
+CURRENT SUCCESSION PLANNING CONTEXT
+The governed enterprise succession summary is unavailable.
+
+Interpretation rules:
+- Do not infer succession coverage, readiness counts, candidate information, or hidden values from other dashboard data.
+- Do not substitute generic talent data, profile detail, person-level information, or model-generated estimates.
+- State that the governed succession summary is unavailable if the user asks for its current metrics.
+`.trim()
+        : "";
+
     const talentAcquisitionPrompt =
       page === "talent-acquisition" &&
       talentAcquisitionContext
@@ -1141,6 +1207,8 @@ ${skillsPrompt}
 ${learningDevelopmentPrompt}
 
 ${careerMobilityPrompt}
+
+${successionPrompt}
 
 ${talentAcquisitionPrompt}
 
