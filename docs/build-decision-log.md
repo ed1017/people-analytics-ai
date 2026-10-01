@@ -159,3 +159,12 @@ The user confirmed the dedicated **Guide & Data** page, linked from the overview
 - Initial follow-up test encountered our stale candidate server PID21272 on3094; only that verified agent-owned process was restarted. Candidate now PID16232. Additional harness failures were a viewport measurement before resize settled and an exact dropdown-label selector; corrected harness completed successfully without code changes.
 - Normal Chrome/user windows and unrelated servers were untouched. Latest free disk 13,517,127,680 bytes (~12.59GiB); no cleanup or dependency copies. Target deadline October1 20:00UTC remains feasible. Person-level HR access stays future V3, and exports remain only supported Workforce/Skills aggregates.
 - Follow-up regression replay: all 37 prior scoped UI/filter/CSV/Planning checks also pass on the final candidate.
+
+### Final Home / Guide / AI-toggle polish
+
+- Verified latest main3c454bd479f13b361fa9c6ad7b87920ad13beb4b and clean tracked worktree before creating feature/final-guide-polish. Old PR65 worktrees preserved.
+- Home right guide widened250px to300px on desktop. Exact user purpose and first-step copy applied; merged Talent and explicit Skills carry into one step with Skills Intelligence and Learning & Development navigation. Added larger See Guide & Data for more details button. Navigation still does not carry evidence or run models.
+- Guide retains exactly eight requested sections. Purpose/roadmap left; Start with a question and Planning how-to right. Other module cards removed, app destinations preserved. Necessary fixed-date, synthetic-source, survey, O*NET and modeling limitations consolidated into retained cards. V2 adds future eNPS; V3/V4 unchanged. No data/analytics extension.
+- AI Left/Right controls now28px high with explicit visible keyboard focus, labels, pressed state and existing behavior preserved.
+- Final TypeScript and full placeholder-config Webpack build pass. Targeted lint:0 errors,1 pre-existing separator warning. All22 focused isolated browser checks pass: exact text, three steps,300px guide, eight Guide sections, column arrangement, roadmap/source limits,390/768 mobile containment, draft/navigation persistence, keyboard side switching and all16 grouped app destinations.
+- First focused test caught missing source-limit paragraphs after card removal; restored them and rebuilt/retested successfully before publication. Candidate server5324 on3094 only; no user-window or unrelated process control.

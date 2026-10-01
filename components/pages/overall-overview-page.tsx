@@ -100,7 +100,7 @@ export function OverallOverviewPage({ active, persona, onNavigate, workforceQuer
   }
 
   const ready = Boolean(sources?.some(source => source.facts)) && !loading;
-  return <div className="mx-auto grid max-w-7xl items-start gap-5 px-5 py-8 sm:px-8 xl:grid-cols-[minmax(0,1fr)_250px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-7">
+  return <div className="mx-auto grid max-w-7xl items-start gap-5 px-5 py-8 sm:px-8 xl:grid-cols-[minmax(0,1fr)_300px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-7">
     <header>
       <p className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-primary"><Sparkles size={18} /> Workforce AI</p>
       <h2 id="overall-overview-heading" className="text-3xl font-semibold tracking-tight sm:text-4xl">Your workforce, in perspective.</h2>
@@ -158,14 +158,14 @@ export function OverallOverviewPage({ active, persona, onNavigate, workforceQuer
   </section>
     <aside className="rounded-xl border bg-card p-5 text-sm leading-relaxed" aria-label="How to use this app">
       <h3 className="text-lg font-semibold">How to use this app</h3>
-      <p className="mt-3">I built this decision-making tool to connect workforce evidence with measurable goals, modeled financial costs and tradeoffs. Here is one way to work through a question.</p>
+      <p className="mt-3">This is NOT a standard people analytics dashboard—it’s a decision-making tool that connects workforce insights to talent actions and planning scenarios, with clear costs, tradeoffs, and measurable goals.</p>
       <ol className="mt-3 list-decimal space-y-4 pl-4">
-        <li><button className="text-left font-semibold text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce: find the problem and goal</button><p>Click Workforce, review the snapshot and trends, then narrow the supported view with the filters. Pick a question and a measurable goal you want to explore.</p></li>
-        <li><button className="text-left font-semibold text-primary underline" onClick={()=>onNavigate("skills")}>Talent: explore potential and actions</button><p>Click Skills Intelligence to explore requirements and learning coverage. Consider which capability gaps and possible learning responses relate to your goal.</p></li>
-        <li><strong>Bring Skills evidence with you</strong><p>On Skills Intelligence, choose an Observed skill gap, enter your Business goal, then click Carry to Planning. Review the carried evidence before modeling.</p></li>
+        <li><button className="text-left font-semibold text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce: find the problem and goal</button><p>Start with a question. Review Workforce and use the supporting data to understand the issue, sharpen your question, and decide where to focus.</p></li>
+        <li><button className="text-left font-semibold text-primary underline" onClick={()=>onNavigate("skills")}>Talent: explore potential and actions</button><p>Explore <button className="text-primary underline" onClick={()=>onNavigate("skills")}>Skills Intelligence</button> and <button className="text-primary underline" onClick={()=>onNavigate("learning-development")}>Learning &amp; Development</button> to connect capability gaps with possible learning responses. To bring Skills evidence into Planning, choose an Observed skill gap, enter your Business goal, then click Carry to Planning. Review the carried evidence before modeling; opening a page does not carry it automatically.</p></li>
         <li><button className="text-left font-semibold text-primary underline" onClick={()=>onNavigate("planning-overview")}>Planning: compare options and develop a plan</button><p>Click Planning Overview, then Scenario Modeling to enter assumptions and run a supported comparison. Work through Position &amp; Workforce Design, Workforce Response and Execution &amp; Feasibility. Check Labor Cost Planning for financial context, and compare modeled costs and tradeoffs against your goal.</p></li>
       </ol>
       <p className="mt-4 text-muted-foreground">Navigation does not carry evidence or run models. Scenarios do not make real workforce changes.</p>
+      <button type="button" onClick={()=>onNavigate("guide-data")} className="mt-4 min-h-11 w-full rounded-lg border px-4 py-3 text-left text-base font-semibold text-primary hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">See Guide &amp; Data for more details</button>
     </aside>
   </div>;
 }
