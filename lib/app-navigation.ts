@@ -34,6 +34,7 @@ export const appNavigationSections: AppNavigationSection[] = [
       "skills",
       "learning-development",
       "career-mobility",
+      "succession-planning",
     ],
   },  {
     key: "strategy",
@@ -95,6 +96,12 @@ export const appPageMetadata: Record<
     section: "Talent Management",
     description:
       "Aggregate recorded career interests, desired destinations, and preference coverage.",
+  },
+  "succession-planning": {
+    label: "Succession Planning",
+    section: "Talent Management",
+    description:
+      "Company-wide recorded succession-plan coverage and source-assessment readiness signals.",
   },
   "workforce-planning": {
     label: "Workforce Planning",
