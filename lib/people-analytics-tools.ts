@@ -1556,6 +1556,7 @@ async function getWorkforceSkills() {
     skillCountResult,
     onetResult,
     jobProfilesResult,
+    currentWorkforceResult,
   ] = await Promise.all([
     supabaseServer
       .from(
@@ -1604,6 +1605,10 @@ async function getWorkforceSkills() {
         count: "exact",
         head: true,
       }),
+    supabaseServer
+      .from("dashboard_overview_current")
+      .select("headcount")
+      .single(),
   ]);
 
   for (const result of [
@@ -1612,6 +1617,7 @@ async function getWorkforceSkills() {
     skillCountResult,
     onetResult,
     jobProfilesResult,
+    currentWorkforceResult,
   ]) {
     if (result.error) {
       throw new Error(
@@ -1621,9 +1627,33 @@ async function getWorkforceSkills() {
     }
   }
 
+  const currentWorkforce = Number(
+    currentWorkforceResult.data?.headcount ?? 0
+  );
+
   return {
     as_of: "2026-09-30",
+    evidence_scope: {
+      scope: "enterprise",
+      label: "Enterprise workforce",
+      population_label: "employees",
+      population_count: currentWorkforce,
+      filters_applied: {
+        country: false,
+        business_unit: false,
+        level: false,
+      },
+      supported_breakdowns: ["skill"],
+      unsupported_breakdowns: [
+        "country",
+        "business_unit",
+        "level",
+      ],
+      scope_note:
+        "Selected dashboard country, business-unit, and level context does not filter this tool result.",
+    },
     summary: {
+      current_workforce: currentWorkforce,
       active_skills:
         skillCountResult.count ?? 0,
       onet_mapped_job_profiles:
@@ -1644,7 +1674,7 @@ async function getWorkforceSkills() {
       >[]
     ),
     interpretation_note:
-      "These are apparent proficiency gaps based on observed skill records versus job requirements. Missing or stale records do not prove capability is absent.",
+      "These are enterprise apparent proficiency gaps based on observed skill records versus job requirements. Missing or stale records do not prove capability is absent. Country, business-unit, and level breakdowns are unavailable from this tool.",
   };
 }
 
