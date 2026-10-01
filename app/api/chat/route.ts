@@ -423,6 +423,27 @@ type SurveySentimentContext = {
 };
 
 
+function formatEvidenceScope(
+  scope: EvidenceScopeContext
+) {
+  return `
+EVIDENCE SCOPE
+Evidence population: ${scope.evidence_label}
+Evidence as of: ${scope.evidence_as_of ?? "Unavailable"}
+Population: ${scope.evidence_population_count === null ? scope.evidence_population_label : scope.evidence_population_count + " " + scope.evidence_population_label}
+Selected business context: ${scope.selected_business_context}
+Country filter applied to this evidence: no
+Business-unit filter applied to this evidence: no
+Level filter applied to this evidence: no
+Supported evidence breakdowns: ${scope.supported_breakdowns.length > 0 ? scope.supported_breakdowns.join(", ") : "none"}
+
+Scope rule:
+- The selected business context does NOT narrow this evidence.
+- Never relabel enterprise evidence as country-, business-unit-, or level-specific.
+- If the user asks for an unsupported country, business-unit, or level breakdown, state that the breakdown is unavailable and only offer the enterprise evidence explicitly labeled as enterprise.
+`.trim();
+}
+
 export async function POST(
   request: NextRequest
 ) {
@@ -562,11 +583,13 @@ export async function POST(
         .join("\n\n");
 
     const workforceContext = `
-CURRENT DASHBOARD CONTEXT
+CURRENT SELECTED BUSINESS CONTEXT
 Snapshot date: ${context.snapshotDate}
 Country: ${context.country}
 Business unit: ${context.businessUnit}
 Level: ${context.level}
+
+This selected context scopes the dashboard metrics below. It does not automatically scope other page or tool evidence. Use each evidence block's explicit scope metadata.
 
 Current metrics:
 - Headcount: ${context.headcount}
