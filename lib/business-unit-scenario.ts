@@ -336,7 +336,7 @@ export async function getBusinessUnitScenarioCatalog() {
     methodology: [
       ...result.methodology,
       "This is a true independent rerun of the selected business unit using its own current headcount and stored monthly Baseline curve.",
-      "The enterprise implied impact holds every other business unit at its stored Baseline and replaces only the selected business unit with this modeled result.",
+      "The company implied impact holds every other business unit at its stored Baseline and replaces only the selected business unit with this modeled result.",
     ],
   };
 }

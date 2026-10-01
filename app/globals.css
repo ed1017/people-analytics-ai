@@ -49,72 +49,72 @@
 }
 
 :root {
-  --background: #ACBAC9;
-  --foreground: #172A3F;
-  --card: #D0DAE4;
-  --card-foreground: #172A3F;
-  --popover: #D0DAE4;
-  --popover-foreground: #172A3F;
-  --primary: #2F5FB3;
-  --primary-foreground: #F3F6F8;
-  --secondary: #C5D0DC;
-  --secondary-foreground: #172A3F;
-  --muted: #C7D2DD;
-  --muted-foreground: #354A60;
-  --accent: #AFC4E2;
-  --accent-foreground: #172A3F;
-  --destructive: #8A2A3E;
-  --border: #91A2B3;
-  --input: #91A2B3;
-  --ring: #2F5FB3;
-  --chart-1: #2F5FB3;
-  --chart-2: #56789C;
-  --chart-3: #31506B;
-  --chart-4: #748AA1;
-  --chart-5: #183F67;
+  --background: #0B1426;
+  --foreground: #F2F5FA;
+  --card: #13223A;
+  --card-foreground: #F2F5FA;
+  --popover: #13223A;
+  --popover-foreground: #F2F5FA;
+  --primary: #A5C5EE;
+  --primary-foreground: #0B1426;
+  --secondary: #173C3B;
+  --secondary-foreground: #F2F5FA;
+  --muted: #1A2B45;
+  --muted-foreground: #B6C5D8;
+  --accent: #214D49;
+  --accent-foreground: #F2F5FA;
+  --destructive: #FF9FAF;
+  --border: #536982;
+  --input: #536982;
+  --ring: #A5C5EE;
+  --chart-1: #A5C5EE;
+  --chart-2: #45D6B0;
+  --chart-3: #C4AFF2;
+  --chart-4: #F4C77D;
+  --chart-5: #F096AF;
   --radius: 0.625rem;
-  --sidebar: #C0CCD8;
-  --sidebar-foreground: #172A3F;
-  --sidebar-primary: #2F5FB3;
-  --sidebar-primary-foreground: #F3F6F8;
-  --sidebar-accent: #AFC4E2;
-  --sidebar-accent-foreground: #172A3F;
-  --sidebar-border: #91A2B3;
-  --sidebar-ring: #2F5FB3;
+  --sidebar: #0F1D33;
+  --sidebar-foreground: #F2F5FA;
+  --sidebar-primary: #A5C5EE;
+  --sidebar-primary-foreground: #0B1426;
+  --sidebar-accent: #214D49;
+  --sidebar-accent-foreground: #F2F5FA;
+  --sidebar-border: #536982;
+  --sidebar-ring: #A5C5EE;
 }
 
 .dark {
-  --background: #ACBAC9;
-  --foreground: #172A3F;
-  --card: #D0DAE4;
-  --card-foreground: #172A3F;
-  --popover: #D0DAE4;
-  --popover-foreground: #172A3F;
-  --primary: #2F5FB3;
-  --primary-foreground: #F3F6F8;
-  --secondary: #C5D0DC;
-  --secondary-foreground: #172A3F;
-  --muted: #C7D2DD;
-  --muted-foreground: #354A60;
-  --accent: #AFC4E2;
-  --accent-foreground: #172A3F;
-  --destructive: #8A2A3E;
-  --border: #91A2B3;
-  --input: #91A2B3;
-  --ring: #2F5FB3;
-  --chart-1: #2F5FB3;
-  --chart-2: #56789C;
-  --chart-3: #31506B;
-  --chart-4: #748AA1;
-  --chart-5: #183F67;
-  --sidebar: #C0CCD8;
-  --sidebar-foreground: #172A3F;
-  --sidebar-primary: #2F5FB3;
-  --sidebar-primary-foreground: #F3F6F8;
-  --sidebar-accent: #AFC4E2;
-  --sidebar-accent-foreground: #172A3F;
-  --sidebar-border: #91A2B3;
-  --sidebar-ring: #2F5FB3;
+  --background: #0B1426;
+  --foreground: #F2F5FA;
+  --card: #13223A;
+  --card-foreground: #F2F5FA;
+  --popover: #13223A;
+  --popover-foreground: #F2F5FA;
+  --primary: #A5C5EE;
+  --primary-foreground: #0B1426;
+  --secondary: #173C3B;
+  --secondary-foreground: #F2F5FA;
+  --muted: #1A2B45;
+  --muted-foreground: #B6C5D8;
+  --accent: #214D49;
+  --accent-foreground: #F2F5FA;
+  --destructive: #FF9FAF;
+  --border: #536982;
+  --input: #536982;
+  --ring: #A5C5EE;
+  --chart-1: #A5C5EE;
+  --chart-2: #45D6B0;
+  --chart-3: #C4AFF2;
+  --chart-4: #F4C77D;
+  --chart-5: #F096AF;
+  --sidebar: #0F1D33;
+  --sidebar-foreground: #F2F5FA;
+  --sidebar-primary: #A5C5EE;
+  --sidebar-primary-foreground: #0B1426;
+  --sidebar-accent: #214D49;
+  --sidebar-accent-foreground: #F2F5FA;
+  --sidebar-border: #536982;
+  --sidebar-ring: #A5C5EE;
 }
 
 @layer base {
@@ -216,7 +216,7 @@
   }
 }
 
-/* Slate Mist + Blue application surfaces. */
+/* Approved A + Teal palette; previous Slate Mist palette remains in Git history. */
 .app-shell.app-home { grid-template-columns: 72px minmax(0, 1fr); }
 .app-overview-mode { font-family: Arial, Helvetica, sans-serif; }
 /* Height-aware density keeps desktop destinations visible without fixing an aspect ratio. */
@@ -224,13 +224,13 @@
   .app-sidebar { padding: 8px 10px; }
   .app-sidebar > button { margin-bottom: 4px; }
   .app-sidebar nav { gap: 0; }
-  .app-sidebar nav > section { margin-top: 8px; padding-top: 8px; }
+  .app-sidebar nav > section { margin-top: 5px; padding-top: 5px; }
   .app-sidebar nav > section > button { padding-top: 4px; padding-bottom: 4px; margin-bottom: 2px; }
-  .app-sidebar [data-nav-destination] { min-height: 32px; padding: 5px 8px; column-gap: 8px; }
+  .app-sidebar [data-nav-destination] { min-height: 30px; padding: 4px 8px; column-gap: 8px; }
   .app-sidebar nav > section > div > * + * { margin-top: 1px; }
 }
 @media (min-width: 768px) and (max-height: 850px) {
-  .app-sidebar nav > section { margin-top: 4px; margin-bottom: 0; padding-top: 4px; }
+  .app-sidebar nav > section { margin-top: 2px; margin-bottom: 0; padding-top: 2px; }
   .app-sidebar .nav-journey-subtitle { display: none; }
   .app-sidebar [data-nav-destination] { min-height: 27px; margin-block: 0; padding-top: 3px; padding-bottom: 3px; }
   .app-sidebar [data-nav-destination] > span:not(.absolute) { font-size: 16px; line-height: 1.12; }
@@ -275,3 +275,9 @@
   color: var(--foreground) !important;
 }
 
+
+/* Teal identifies active destinations without replacing semantic chart/status colors. */
+.app-sidebar [data-nav-destination][aria-current="page"] { background: var(--secondary); color: #45D6B0; }
+.app-sidebar [data-nav-destination][aria-current="page"] > .absolute { background: #45D6B0; }
+.recharts-cartesian-axis-tick-value { fill: var(--muted-foreground); }
+.recharts-cartesian-axis-line, .recharts-cartesian-axis-tick-line { stroke: var(--border); }

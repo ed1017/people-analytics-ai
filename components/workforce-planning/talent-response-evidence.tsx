@@ -83,7 +83,7 @@ export function TalentResponseEvidence({ roleCode, roleName, initialGoal = "", r
         <p className="mt-2 whitespace-pre-wrap text-sm">User-stated goal: {comparedGoal}</p>
         {goal.trim() !== comparedGoal && <p className="mt-1 text-sm text-muted-foreground">Goal edited. Compare again to use the new goal.</p>}
         <p className="mt-2 text-xs text-muted-foreground">
-          Enterprise evidence for the selected role where supported. Country, business-unit and level selections do not narrow these sources. The goal and Build/Move/Buy allocations are user assumptions, not observed outcomes. No skill-gap-to-headcount conversion or individual recommendations are made.
+          Company evidence for the selected role where supported. Country, business-unit and level selections do not narrow these sources. The goal and Build/Move/Buy allocations are user assumptions, not observed outcomes. No skill-gap-to-headcount conversion or individual recommendations are made.
         </p>
         <div className="mt-3 grid min-w-0 gap-3 xl:grid-cols-3">
           <article className="min-w-0 rounded-md border p-3">
@@ -118,7 +118,7 @@ export function TalentResponseEvidence({ roleCode, roleName, initialGoal = "", r
           </article>
         </div>
         <div className="mt-3 rounded-md border bg-muted/20 p-3 text-sm">
-          <h6 className="font-semibold">Historical movements · Enterprise context only</h6>
+          <h6 className="font-semibold">Historical movements · Company context only</h6>
           {enterpriseHistory ? <>
             <p className="mt-2">{enterpriseHistory.source.total_recorded_events} recorded movement events · {enterpriseHistory.source.first_recorded_date || "date unavailable"} to {enterpriseHistory.source.last_recorded_date || "date unavailable"}.</p>
             <p className="mt-1">{enterpriseHistory.composition.map((row) => `${row.label}: ${row.events}`).join(" · ")}</p>

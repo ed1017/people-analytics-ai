@@ -199,7 +199,7 @@ export function buildScenarioSegmentBreakdown(
   return {
     planning_month: planningMonth,
     allocation_method:
-      "Enterprise scenario deltas are distributed using each segment's stored Baseline share at the end of the planning horizon. Segment mix is held constant; this is not a segment-specific rerun.",
+      "Company scenario deltas are distributed using each segment's stored Baseline share at the end of the planning horizon. Segment mix is held constant; this is not a segment-specific rerun.",
     business_units: businessUnits,
     job_families: jobFamilies,
     reconciliation: {

@@ -12,17 +12,17 @@ export function buildOverviewSources(
   const baseline = planning?.scenarios.find(row => row.scenario_name === "Baseline");
   const points = baseline?.points ?? [];
   return [
-    { id: "W1", label: "Workforce", page: "workforce", scope: "Enterprise workforce; unfiltered",
+    { id: "W1", label: "Workforce", page: "workforce", scope: "Company workforce; unfiltered",
       date: workforce?.overview.snapshot_date ?? null,
       population: workforce ? `${workforce.overview.headcount.toLocaleString("en-US")} employees at the snapshot date` : "Unavailable",
       limitation: "Headcount is people; FTE is capacity. Open positions are positions, not people. Current observations are not a forecast or causal explanation.",
       facts: workforce ? { ...workforce.overview, trend: workforce.trend } : null },
-    { id: "T1", label: "Skills Intelligence", page: "skills", scope: "Enterprise skill requirements; unfiltered",
+    { id: "T1", label: "Skills Intelligence", page: "skills", scope: "Company skill requirements; unfiltered",
       date: skills?.as_of ?? null,
       population: skills ? `${skills.summary.current_workforce.toLocaleString("en-US")} employees; skill counts refer to the ${skills.summary.skills_with_demand} skills with recorded role demand` : "Unavailable",
       limitation: "Counts below attainment thresholds are counts of skills, not employees. Missing proficiency evidence is not proof of inability. No skill-gap-to-headcount conversion or individual recommendations.",
       facts: skills ? { skills_with_demand: skills.summary.skills_with_demand, skills_below_75_pct_attainment: skills.summary.skills_below_75_pct, skills_below_60_pct_attainment: skills.summary.skills_below_60_pct } : null },
-    { id: "P1", label: "Stored Planning baseline", page: "planning-overview", scope: "Enterprise stored scenario; modeled, not observed",
+    { id: "P1", label: "Stored Planning baseline", page: "planning-overview", scope: "Company stored scenario; modeled, not observed",
       date: null,
       population: points.length ? `Baseline modeled workforce; horizon ${points[0].planning_month} to ${points.at(-1)!.planning_month}` : "Unavailable",
       limitation: "Source refresh date is not supplied. Horizon dates are model periods, not source dates. Stored assumptions are not approved decisions or a model rerun; do not subtract this forecast from unrelated populations or infer response costs or timing.",

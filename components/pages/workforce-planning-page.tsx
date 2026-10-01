@@ -2037,7 +2037,7 @@ export function WorkforcePlanningPage({
             <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
               {planningLoading
                 ? "Loading plan…"
-                : "2027 Enterprise Workforce Plan"}
+                : "2027 Company Workforce Plan"}
             </span>
           </div>
 

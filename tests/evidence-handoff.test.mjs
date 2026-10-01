@@ -138,7 +138,7 @@ test("unsupported or narrowed evidence scope is rejected", () => {
   assert.equal(result.ok, false);
   assert.match(
     result.error,
-    /Only explicitly enterprise-scoped/
+    /Only explicitly company-scoped/
   );
 });
 
@@ -191,7 +191,7 @@ test("unchanged source validates as current", () => {
     {
       status: "current",
       reason:
-        "The carried snapshot matches the currently loaded enterprise Skills source.",
+        "The carried snapshot matches the currently loaded company Skills source.",
     }
   );
 });

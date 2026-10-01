@@ -117,7 +117,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "get_workforce_overview",
     description:
-      "Get current enterprise workforce overview metrics, historical endpoints, and business-unit workforce summaries. Use for overall workforce size, turnover, growth, labor cost, vacancies, or BU comparisons.",
+      "Get current company workforce overview metrics, historical endpoints, and business-unit workforce summaries. Use for overall workforce size, turnover, growth, labor cost, vacancies, or BU comparisons.",
     parameters: {
       type: "object",
       properties: {},
@@ -156,7 +156,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "get_workforce_finance",
     description:
-      "Get enterprise workforce finance metrics, business-unit labor economics, vacancy cost exposure, and 2027 labor-cost scenario outcomes.",
+      "Get company workforce finance metrics, business-unit labor economics, vacancy cost exposure, and 2027 labor-cost scenario outcomes.",
     parameters: {
       type: "object",
       properties: {},
@@ -169,7 +169,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "get_workforce_skills",
     description:
-      "Get governed enterprise skills intelligence including apparent proficiency gaps, highest-demand skills, profile coverage, and O*NET mapping coverage. This tool is enterprise-only and does not apply selected dashboard country, business-unit, or level filters.",
+      "Get governed company skills intelligence including apparent proficiency gaps, highest-demand skills, profile coverage, and O*NET mapping coverage. This tool is company-only and does not apply selected dashboard country, business-unit, or level filters.",
     parameters: {
       type: "object",
       properties: {},
@@ -182,7 +182,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "get_workforce_planning",
     description:
-      "Get 2027 enterprise workforce scenario outcomes and current authorized position totals. Use to compare Baseline, Growth, Hiring Freeze, and AI Productivity scenarios.",
+      "Get 2027 company workforce scenario outcomes and current authorized position totals. Use to compare Baseline, Growth, Hiring Freeze, and AI Productivity scenarios.",
     parameters: {
       type: "object",
       properties: {},
@@ -202,7 +202,7 @@ export const peopleAnalyticsTools: any[] = [
         annual_growth_pct: {
           type: ["number", "null"],
           description:
-            "Custom annual enterprise headcount growth percentage, or null to keep Baseline.",
+            "Custom annual company headcount growth percentage, or null to keep Baseline.",
         },
         salary_inflation_pct: {
           type: ["number", "null"],
@@ -246,7 +246,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "run_business_unit_scenario",
     description:
-      "Run a true deterministic what-if for one business unit using that business unit's own current headcount and stored monthly Baseline plan. Use this instead of run_workforce_scenario when the user asks to change assumptions for a specific business unit. Other business units remain at Baseline when the response shows enterprise implied impact.",
+      "Run a true deterministic what-if for one business unit using that business unit's own current headcount and stored monthly Baseline plan. Use this instead of run_workforce_scenario when the user asks to change assumptions for a specific business unit. Other business units remain at Baseline when the response shows company implied impact.",
     parameters: {
       type: "object",
       properties: {
@@ -513,7 +513,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "get_internal_talent_readiness",
     description:
-      "Evaluate aggregate enterprise internal talent readiness for one governed job profile. Uses active employees who expressed preference for the target profile, excludes employees already in that role, and tests every required skill against required proficiency. Returns role-ready, near-ready, longer-term counts, common near-ready skill gaps, and whether those current gaps are covered by active mapped learning courses. Dashboard country, business-unit, and level filters are not applied. Course availability is pathway evidence, not a proficiency-gain forecast. Does not expose or rank individual employees.",
+      "Evaluate aggregate company internal talent readiness for one governed job profile. Uses active employees who expressed preference for the target profile, excludes employees already in that role, and tests every required skill against required proficiency. Returns role-ready, near-ready, longer-term counts, common near-ready skill gaps, and whether those current gaps are covered by active mapped learning courses. Dashboard country, business-unit, and level filters are not applied. Course availability is pathway evidence, not a proficiency-gain forecast. Does not expose or rank individual employees.",
     parameters: {
       type: "object",
       properties: {
@@ -532,7 +532,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "get_role_buy_feasibility",
     description:
-      "Get descriptive enterprise whole-role external recruiting evidence for one governed job profile. Returns current open ATS pipeline, historical external fills, trailing-12-month external fill volume, historical median time-to-fill, weighted offer acceptance, applicants per filled requisition, and requested Buy scale versus recent hiring volume. Dashboard country, business-unit, and level filters are not applied. This is not a hiring forecast or labor-market availability model.",
+      "Get descriptive company whole-role external recruiting evidence for one governed job profile. Returns current open ATS pipeline, historical external fills, trailing-12-month external fill volume, historical median time-to-fill, weighted offer acceptance, applicants per filled requisition, and requested Buy scale versus recent hiring volume. Dashboard country, business-unit, and level filters are not applied. This is not a hiring forecast or labor-market availability model.",
     parameters: {
       type: "object",
       properties: {
@@ -714,7 +714,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "run_business_unit_response_allocation",
     description:
-      "Run explicit destination business-unit allocations of Build, Move, and Buy for net-positive job-profile demand in one structural scenario. BU allocations roll up to enterprise role totals for whole-role evidence checks. Gross positive BU demand, contraction offsets, enterprise net demand, destination gaps, and overallocations are reported separately. Move source BU is not inferred. This is not an optimizer and must not invent allocations.",
+      "Run explicit destination business-unit allocations of Build, Move, and Buy for net-positive job-profile demand in one structural scenario. BU allocations roll up to company role totals for whole-role evidence checks. Gross positive BU demand, contraction offsets, company net demand, destination gaps, and overallocations are reported separately. Move source BU is not inferred. This is not an optimizer and must not invent allocations.",
     parameters: {
       type: "object",
       properties: {
@@ -834,7 +834,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "run_time_phased_workforce_execution",
     description:
-      "Run a deterministic monthly execution timeline for explicit BU Build / Move / Buy allocations. Every schedule entry has a user-supplied effective month. The tool reconciles scheduled capacity to approved BU/path targets, keeps unscheduled capacity visible, excludes over-scheduled excess from effective coverage, and calculates monthly cumulative coverage and remaining enterprise net role gap. It does not infer timing from learning duration or recruiting history.",
+      "Run a deterministic monthly execution timeline for explicit BU Build / Move / Buy allocations. Every schedule entry has a user-supplied effective month. The tool reconciles scheduled capacity to approved BU/path targets, keeps unscheduled capacity visible, excludes over-scheduled excess from effective coverage, and calculates monthly cumulative coverage and remaining company net role gap. It does not infer timing from learning duration or recruiting history.",
     parameters: {
       type: "object",
       properties: {
@@ -1635,7 +1635,7 @@ async function getWorkforceSkills() {
     as_of: "2026-09-30",
     evidence_scope: {
       scope: "enterprise",
-      label: "Enterprise workforce",
+      label: "Company workforce",
       population_label: "employees",
       population_count: currentWorkforce,
       filters_applied: {
@@ -1674,7 +1674,7 @@ async function getWorkforceSkills() {
       >[]
     ),
     interpretation_note:
-      "These are enterprise apparent proficiency gaps based on observed skill records versus job requirements. Missing or stale records do not prove capability is absent. Country, business-unit, and level breakdowns are unavailable from this tool.",
+      "These are company apparent proficiency gaps based on observed skill records versus job requirements. Missing or stale records do not prove capability is absent. Country, business-unit, and level breakdowns are unavailable from this tool.",
   };
 }
 
@@ -2220,7 +2220,7 @@ export async function runPeopleAnalyticsTool(
         evidence_scope: {
           scope: "enterprise",
           label:
-            "Enterprise internal talent pool for the target job profile",
+            "Company internal talent pool for the target job profile",
           filters_applied: {
             country: false,
             business_unit: false,
@@ -2248,7 +2248,7 @@ export async function runPeopleAnalyticsTool(
         evidence_scope: {
           scope: "enterprise",
           label:
-            "Enterprise recruiting evidence for the target job profile",
+            "Company recruiting evidence for the target job profile",
           filters_applied: {
             country: false,
             business_unit: false,

@@ -57,7 +57,7 @@ export function ScenarioComparisonTable({
           Scenario Comparison
         </h3>
         <p className="text-sm text-muted-foreground">
-          December 2027 outcomes across the enterprise plan
+          December 2027 outcomes across the company plan
         </p>
       </div>
 

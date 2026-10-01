@@ -54,6 +54,7 @@ const pageIcons: Record<
   overview: LayoutDashboard,
   workforce: Users,
   attrition: TrendingDown,
+  compensation: DollarSign,
   "talent-acquisition": UserPlus,
   "survey-sentiment": MessageSquareText,
   finance: DollarSign,

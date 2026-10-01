@@ -73,7 +73,7 @@ export function FinancePage({
                       )}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Annualized enterprise labor cost
+                      Annualized company labor cost
                     </p>
                   </div>
 

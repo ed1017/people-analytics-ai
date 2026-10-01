@@ -135,7 +135,7 @@ export async function runBusinessUnitResponseAllocation(
 
   if (positiveEnterpriseRoles.size === 0) {
     throw new Error(
-      "The structural scenario does not create positive enterprise job-profile demand."
+      "The structural scenario does not create positive company job-profile demand."
     );
   }
 
@@ -163,7 +163,7 @@ export async function runBusinessUnitResponseAllocation(
       throw new Error(
         "Role-plan reconciliation target " +
           plan.job_profile +
-          " does not have positive enterprise demand."
+          " does not have positive company demand."
       );
     }
 
@@ -223,7 +223,7 @@ export async function runBusinessUnitResponseAllocation(
             segment.org_name +
             " / " +
             segment.job_profile_name +
-            " does not belong to a net-positive enterprise role."
+            " does not belong to a net-positive company role."
         );
       }
 
@@ -461,7 +461,7 @@ export async function runBusinessUnitResponseAllocation(
     ) {
       warnings.push(
         evidence.job_profile_name +
-          ": gross positive BU destination demand exceeds enterprise net role demand because other BU contraction offsets exist; unallocated destination demand is not automatically an uncovered enterprise gap."
+          ": gross positive BU destination demand exceeds company net role demand because other BU contraction offsets exist; unallocated destination demand is not automatically an uncovered company gap."
       );
     }
   }
@@ -707,13 +707,13 @@ export async function runBusinessUnitResponseAllocation(
 
   if (unallocatedDestinations.length > 0) {
     warnings.push(
-      "Some positive BU destination demand has no explicit response allocation. Enterprise contraction offsets and response capacity are not automatically assigned to those destinations."
+      "Some positive BU destination demand has no explicit response allocation. Company contraction offsets and response capacity are not automatically assigned to those destinations."
     );
   }
 
   if (contractionOffset > 0) {
     warnings.push(
-      "The scenario includes BU contraction offsets for net-positive roles. These offsets reduce enterprise net response need, but the model does not assume they create transferable employees or automatically route capacity to growing BUs."
+      "The scenario includes BU contraction offsets for net-positive roles. These offsets reduce company net response need, but the model does not assume they create transferable employees or automatically route capacity to growing BUs."
     );
   }
 
@@ -761,10 +761,10 @@ export async function runBusinessUnitResponseAllocation(
     methodology: [
       "Business-unit response allocations are user-directed destination/ownership assignments for Build, Move, and Buy; the model does not optimize or invent BU allocations.",
       "Only BU-job-profile segments with positive modeled authorized-position demand can receive response allocations.",
-      "BU allocations roll up to the enterprise job profile, and the existing whole-role response engine evaluates aggregate Build, Move, and Buy evidence for that role.",
+      "BU allocations roll up to the company job profile, and the existing whole-role response engine evaluates aggregate Build, Move, and Buy evidence for that role.",
       "When role portfolio targets are supplied, BU allocations are reconciled back to those targets separately for Build, Move, Buy, Borrow, and Automate rather than by grand total alone.",
-      "Gross destination demand is the sum of positive BU role deltas. Enterprise net role demand equals gross positive BU demand less signed contraction offsets elsewhere for the same net-positive role.",
-      "Enterprise effective coverage is capped at each role's net enterprise demand. BU destination coverage is tracked separately and does not automatically consume contraction offsets.",
+      "Gross destination demand is the sum of positive BU role deltas. Company net role demand equals gross positive BU demand less signed contraction offsets elsewhere for the same net-positive role.",
+      "Company effective coverage is capped at each role's net company demand. BU destination coverage is tracked separately and does not automatically consume contraction offsets.",
       "A negative BU role delta is a contraction offset only. It does not prove that employees, skills, or positions are transferable to another BU.",
       "Move allocation identifies the destination BU for internal capacity; the source BU of internal movers is not modeled in this layer.",
       "Build allocation identifies the destination BU that owns the development need; learning pathway evidence remains role-level and does not guarantee proficiency gain.",

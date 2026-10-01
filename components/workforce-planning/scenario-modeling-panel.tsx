@@ -91,10 +91,10 @@ const scenarioFields: Array<{
 }> = [
   {
     key: "annual_growth_pct",
-    label: "Enterprise Growth",
+    label: "Company Growth",
     suffix: "%",
     step: 0.5,
-    help: "Annual enterprise headcount growth assumption.",
+    help: "Annual company headcount growth assumption.",
   },
   {
     key: "salary_inflation_pct",
@@ -262,7 +262,7 @@ export function ScenarioModelingPanel({
         ),
     },
     {
-      label: "Enterprise Growth",
+      label: "Company Growth",
       baseline: scenarioDefaults
         ? `${scenarioDefaults.annual_growth_pct.toFixed(1)}%`
         : "—",
@@ -739,7 +739,7 @@ export function ScenarioModelingPanel({
                           Segment Impact
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          Dec 2027 enterprise scenario decomposed using stored Baseline segment mix
+                          Dec 2027 company scenario decomposed using stored Baseline segment mix
                         </p>
                       </div>
 
@@ -865,7 +865,7 @@ export function ScenarioModelingPanel({
                       Minor HC reconciliation differences
                       reflect rounded source segment
                       headcount; labor-cost allocations
-                      reconcile to the enterprise result.
+                      reconcile to the company result.
                     </p>
                   </div>
                 )}
@@ -1007,7 +1007,7 @@ export function ScenarioModelingPanel({
             </div>
 
             <div className="mb-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
-              This is independent from the enterprise scenario above. The selected BU is rerun on its own Baseline curve. Enterprise implied impact holds every other BU at Baseline.
+              This is independent from the company scenario above. The selected BU is rerun on its own Baseline curve. Company implied impact holds every other BU at Baseline.
             </div>
 
             {buScenarioError && (
@@ -1056,7 +1056,7 @@ export function ScenarioModelingPanel({
 
                 <div className="rounded-md border p-3">
                   <p className="text-xs text-muted-foreground">
-                    Enterprise Implied HC
+                    Company Implied HC
                   </p>
                   <p className="mt-1 text-2xl font-semibold">
                     {buScenarioResult.enterprise_impact.implied_end_headcount.toLocaleString()}
@@ -1068,7 +1068,7 @@ export function ScenarioModelingPanel({
 
                 <div className="rounded-md border p-3">
                   <p className="text-xs text-muted-foreground">
-                    Enterprise Implied Cost
+                    Company Implied Cost
                   </p>
                   <p className="mt-1 text-2xl font-semibold">
                     {formatCurrencyCompact(
@@ -1083,7 +1083,7 @@ export function ScenarioModelingPanel({
                     {formatCurrencyCompact(
                       buScenarioResult.enterprise_impact
                         .labor_cost_delta_vs_baseline_usd
-                    )} vs enterprise Baseline
+                    )} vs company Baseline
                   </p>
                 </div>
               </div>

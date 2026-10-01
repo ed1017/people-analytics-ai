@@ -77,7 +77,7 @@ export function SuccessionPlanningPage({
             : data
               ? "Assessment " +
                 formatDate(data.as_of_date)
-              : "Enterprise summary"}
+              : "Company summary"}
         </span>
       </div>
 
@@ -87,7 +87,7 @@ export function SuccessionPlanningPage({
             Succession summary unavailable
           </p>
           <p className="mt-1">
-            The governed enterprise aggregate is not currently available. No fallback or inferred succession data is shown.
+            The governed company aggregate is not currently available. No fallback or inferred succession data is shown.
           </p>
         </div>
       )}
@@ -95,7 +95,7 @@ export function SuccessionPlanningPage({
       {data && (
         <EvidenceScopeNotice
           scope={enterpriseTalentEvidenceScope({
-            label: "Enterprise succession population",
+            label: "Company succession population",
             asOf: data.as_of_date,
             populationLabel:
               "filled critical positions",
@@ -183,7 +183,7 @@ export function SuccessionPlanningPage({
           <div className="mt-6 grid gap-6 lg:grid-cols-2">
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">
-                Enterprise Coverage
+                Company Coverage
               </h3>
               <div className="mt-4 space-y-3 text-sm">
                 <div className="flex items-center justify-between gap-4 border-b pb-3">

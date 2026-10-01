@@ -40,7 +40,7 @@ export function WorkforcePage({ data, loading, error }: Props) {
     <section className="min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold">Enterprise composition</h2>
+          <h2 className="text-2xl font-semibold">Company composition</h2>
           <p className="text-muted-foreground">
             All countries, business units and levels. Snapshot filters above do not narrow these breakdowns.
           </p>

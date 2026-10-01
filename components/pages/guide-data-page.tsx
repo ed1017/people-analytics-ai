@@ -66,19 +66,12 @@ export function GuideDataPage({ onBack }: { onBack: () => void }) {
       <p className="mt-3 text-muted-foreground">The overall overview is read-only: it retrieves aggregates and generates explanations. Its chat cannot invoke workforce tools or alter source records. Separate Planning controls require explicit interaction. Do not use aggregate evidence to identify, rank or recommend employment decisions about individual employees.</p>
     </section>
 
-    <section className={card} aria-labelledby="guide-changes">
-      <h3 id="guide-changes" className="text-xl font-semibold">Recent changes</h3>
-      <ul className="mt-3 space-y-3">
-        <li><strong>This version:</strong> chat-first Home, cited source briefing, guided questions, Guide &amp; Data, compact desktop navigation and square Planning shortcuts alongside the existing tabs.</li>
-        <li><strong>October 1, 2026 — released:</strong> AI model-history isolation preserves visible conversation while excluding obsolete page, role and goal context. Verified in production with 25 checks and six real AI turns. <a className="text-primary underline" href="https://github.com/ed1017/people-analytics-ai/pull/71" target="_blank" rel="noreferrer">PR71</a></li>
-        <li><strong>October 1, 2026 — released:</strong> explicit role-and-goal Talent evidence comparison beside Build, Move and Buy. <a className="text-primary underline" href="https://github.com/ed1017/people-analytics-ai/pull/68" target="_blank" rel="noreferrer">PR68</a></li>
-      </ul>
-    </section>
-
     <section className={card} aria-labelledby="guide-roadmap">
-      <h3 id="guide-roadmap" className="text-xl font-semibold">What is proposed next</h3>
-      <p className="mt-3"><strong>V2 — proposed:</strong> machine learning and predictive analytics. This is a direction to explore, not an implemented capability or a dated release commitment.</p>
-      <p className="mt-3"><strong>V3 — undefined:</strong> no scope, features or release date have been agreed.</p>
+      <h3 id="guide-roadmap" className="text-xl font-semibold">What&apos;s coming next</h3>
+      <p className="mt-3"><strong>V2:</strong> Compensation and location-based scenario modeling.</p>
+      <p className="mt-3"><strong>V3:</strong> Role-based user access and security, with chat agents tailored to each user or role.</p>
+      <p className="mt-3"><strong>V4:</strong> Machine learning and predictive analytics.</p>
+      <p className="mt-3 text-muted-foreground">These are planned future capabilities, not features available today. No release dates have been agreed.</p>
     </section>
   </article>;
 }

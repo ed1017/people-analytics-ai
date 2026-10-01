@@ -82,7 +82,7 @@ export function SkillsPage({
               <>
                 <EvidenceScopeNotice
                   scope={enterpriseTalentEvidenceScope({
-                    label: "Enterprise workforce",
+                    label: "Company workforce",
                     asOf: skillsData.as_of,
                     populationLabel: "employees",
                     populationCount:
