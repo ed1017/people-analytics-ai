@@ -43,7 +43,7 @@ export async function GET(
       hasBody: request.body !== null,
     });
 
-  if (!requestValidation.ok) {
+  if ("error" in requestValidation) {
     return NextResponse.json(
       {
         error: requestValidation.error,
@@ -75,7 +75,7 @@ export async function GET(
     const validation =
       validateSuccessionRows(data ?? []);
 
-    if (!validation.ok) {
+    if ("error" in validation) {
       console.error(
         "Succession summary contract rejected:",
         validation.error
