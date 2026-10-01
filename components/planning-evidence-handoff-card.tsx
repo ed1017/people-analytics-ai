@@ -65,8 +65,10 @@ export function PlanningEvidenceHandoffCard({
 
   return (
     <section
+      id="carried-planning-evidence"
+      tabIndex={-1}
       aria-label="Carried planning evidence"
-      className="mb-6 rounded-lg border bg-card p-4"
+      className="mb-6 rounded-lg border bg-card p-4 focus:outline-none focus:ring-2 focus:ring-ring"
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
@@ -97,8 +99,17 @@ export function PlanningEvidenceHandoffCard({
             type="button"
             variant="outline"
             size="sm"
-            onClick={onRefresh}
-            disabled={freshnessChecking}
+            aria-disabled={freshnessChecking}
+            onClick={() => {
+              if (!freshnessChecking) {
+                onRefresh();
+              }
+            }}
+            className={
+              freshnessChecking
+                ? "cursor-wait opacity-60"
+                : undefined
+            }
           >
             {freshnessChecking
               ? "Checking…"
@@ -124,6 +135,9 @@ export function PlanningEvidenceHandoffCard({
       </div>
 
       <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
         className={
           freshness.status === "current" &&
           !freshnessChecking
@@ -132,7 +146,7 @@ export function PlanningEvidenceHandoffCard({
         }
       >
         <p className="font-medium">
-          Freshness check
+          Freshness check: {statusLabel}
         </p>
         <p className="mt-1 text-muted-foreground">
           {freshnessChecking

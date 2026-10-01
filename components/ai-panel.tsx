@@ -1,7 +1,10 @@
 "use client";
 
-import type {
-  MouseEventHandler,
+import {
+  useEffect,
+  useState,
+  type KeyboardEventHandler,
+  type MouseEventHandler,
 } from "react";
 import {
   LoaderCircle,
@@ -22,6 +25,7 @@ type AiPanelProps = {
   aiCollapsed: boolean;
   aiExpanded: boolean;
   aiSide: "left" | "right";
+  aiWidth: number;
   previewPage: boolean;
   suggestedPrompts: string[];
   chatMessages: ChatMessage[];
@@ -30,6 +34,7 @@ type AiPanelProps = {
   chatError: string | null;
   dashboardReady: boolean;
   onResizeStart: MouseEventHandler<HTMLDivElement>;
+  onResizeKeyDown: KeyboardEventHandler<HTMLDivElement>;
   onToggleExpanded: () => void;
   onToggleCollapsed: () => void;
   onAiSideChange: (
@@ -46,6 +51,7 @@ export function AiPanel({
   aiCollapsed,
   aiExpanded,
   aiSide,
+  aiWidth,
   previewPage,
   suggestedPrompts,
   chatMessages,
@@ -54,6 +60,7 @@ export function AiPanel({
   chatError,
   dashboardReady,
   onResizeStart,
+  onResizeKeyDown,
   onToggleExpanded,
   onToggleCollapsed,
   onAiSideChange,
@@ -61,13 +68,71 @@ export function AiPanel({
   onChatInputChange,
   onSend,
 }: AiPanelProps) {
+  const [viewportWidth, setViewportWidth] =
+    useState(1440);
+
+  useEffect(() => {
+    const syncViewportWidth = () => {
+      setViewportWidth(window.innerWidth);
+    };
+
+    syncViewportWidth();
+    window.addEventListener(
+      "resize",
+      syncViewportWidth
+    );
+
+    return () => {
+      window.removeEventListener(
+        "resize",
+        syncViewportWidth
+      );
+    };
+  }, []);
+
+  const minimumAiWidth = 280;
+  const maximumAiWidth = Math.max(
+    minimumAiWidth,
+    viewportWidth * 0.5
+  );
+  const aiResizePercent =
+    maximumAiWidth === minimumAiWidth
+      ? 0
+      : Math.round(
+          ((Math.min(
+            maximumAiWidth,
+            Math.max(
+              minimumAiWidth,
+              aiWidth
+            )
+          ) -
+            minimumAiWidth) /
+            (maximumAiWidth -
+              minimumAiWidth)) *
+            100
+        );
+
   return (
     <>
       {!aiCollapsed && (
         <div
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize AI panel"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={aiResizePercent}
+          aria-valuetext={`${Math.round(
+            aiWidth
+          )} pixels wide`}
+          aria-description="Use the left and right arrow keys to resize the AI panel. Home sets the minimum width and End sets the maximum width."
+          tabIndex={0}
           onMouseDown={onResizeStart}
-          title="Drag to resize AI panel"
-          className="app-ai-resizer group relative cursor-col-resize"
+          onKeyDown={onResizeKeyDown}
+          title={`Resize AI panel — currently ${Math.round(
+            aiWidth
+          )} pixels wide`}
+          className="app-ai-resizer group relative cursor-col-resize focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset max-md:hidden"
         >
           <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-border transition-colors group-hover:bg-primary" />
           <div className="absolute left-1/2 top-1/2 h-12 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted-foreground/30 transition-colors group-hover:bg-primary" />
@@ -282,7 +347,7 @@ export function AiPanel({
                 disabled={previewPage}
                 rows={5}
                 aria-label="Ask People Analytics AI"
-                className="h-36 min-h-32 max-h-64 min-w-0 flex-1 resize-y rounded-lg border bg-background p-3.5 text-[17px] leading-relaxed outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-36 min-h-32 max-h-64 min-w-0 flex-1 resize-y rounded-lg border bg-background p-3.5 text-[17px] leading-relaxed outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
               />
 
               <Button

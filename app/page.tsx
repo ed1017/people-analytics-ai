@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
 } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -1012,16 +1013,32 @@ export default function Home() {
       ]
     );
 
+  const focusAfterRender = (
+    elementId: string
+  ) => {
+    window.requestAnimationFrame(() => {
+      document
+        .getElementById(elementId)
+        ?.focus();
+    });
+  };
+
   const openPlanningWithHandoff = () => {
     lastPageByWorkspaceRef.current.strategy =
       "workforce-planning";
     setActivePage("workforce-planning");
+    focusAfterRender(
+      "carried-planning-evidence"
+    );
   };
 
   const backToSkillsFromHandoff = () => {
     lastPageByWorkspaceRef.current.talent =
       "skills";
     setActivePage("skills");
+    focusAfterRender(
+      "skills-evidence-handoff"
+    );
   };
 
   const clearPlanningEvidenceHandoff = () => {
@@ -1036,6 +1053,9 @@ export default function Home() {
       reason:
         "No evidence handoff is active.",
     });
+    focusAfterRender(
+      "workforce-planning-heading"
+    );
   };
 
   const carryEvidenceToPlanning = (
@@ -1902,6 +1922,54 @@ export default function Home() {
     );
   };
 
+  const resizeAiWithKeyboard = (
+    event: ReactKeyboardEvent<HTMLDivElement>
+  ) => {
+    if (aiCollapsed) return;
+
+    const minimumWidth = 280;
+    const maximumWidth =
+      window.innerWidth * 0.5;
+    const step = 20;
+
+    let nextWidth: number | null = null;
+
+    if (event.key === "Home") {
+      nextWidth = minimumWidth;
+    } else if (event.key === "End") {
+      nextWidth = maximumWidth;
+    } else if (
+      event.key === "ArrowLeft"
+    ) {
+      nextWidth =
+        aiWidth +
+        (aiSide === "left"
+          ? -step
+          : step);
+    } else if (
+      event.key === "ArrowRight"
+    ) {
+      nextWidth =
+        aiWidth +
+        (aiSide === "left"
+          ? step
+          : -step);
+    }
+
+    if (nextWidth === null) return;
+
+    event.preventDefault();
+    setAiWidth(
+      Math.min(
+        maximumWidth,
+        Math.max(
+          minimumWidth,
+          nextWidth
+        )
+      )
+    );
+  };
+
   const updateAiSide = (
     nextSide: AiSide
   ) => {
@@ -2132,6 +2200,7 @@ export default function Home() {
           aiCollapsed={aiCollapsed}
           aiExpanded={aiExpanded}
           aiSide={aiSide}
+          aiWidth={aiWidth}
           previewPage={previewPage}
           suggestedPrompts={suggestedPrompts}
           chatMessages={chatMessages}
@@ -2140,6 +2209,7 @@ export default function Home() {
           chatError={chatError}
           dashboardReady={Boolean(overviewData)}
           onResizeStart={startAiResize}
+          onResizeKeyDown={resizeAiWithKeyboard}
           onToggleExpanded={toggleAiExpanded}
           onToggleCollapsed={() =>
             setAiCollapsed(!aiCollapsed)

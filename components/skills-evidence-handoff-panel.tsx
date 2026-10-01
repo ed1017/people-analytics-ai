@@ -152,8 +152,10 @@ export function SkillsEvidenceHandoffPanel({
 
   return (
     <section
+      id="skills-evidence-handoff"
+      tabIndex={-1}
       aria-label="Prepare evidence for Planning"
-      className="mb-6 rounded-lg border bg-card p-4"
+      className="mb-6 rounded-lg border bg-card p-4 focus:outline-none focus:ring-2 focus:ring-ring"
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
@@ -333,7 +335,11 @@ export function SkillsEvidenceHandoffPanel({
       </div>
 
       {error && (
-        <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+        <div
+          role="alert"
+          aria-atomic="true"
+          className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive"
+        >
           {error}
         </div>
       )}
