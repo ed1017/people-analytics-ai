@@ -4,6 +4,11 @@ import {
   formatPercent,
   formatWholeCount,
 } from "@/lib/display-format";
+import { EvidenceScopeNotice } from "@/components/evidence-scope-notice";
+import {
+  enterpriseTalentEvidenceScope,
+  type SelectedBusinessContext,
+} from "@/lib/talent-evidence-scope";
 import type {
   CareerMobilityResponse,
 } from "@/lib/types";
@@ -12,6 +17,7 @@ type CareerMobilityPageProps = {
   data: CareerMobilityResponse | null;
   loading: boolean;
   error: string | null;
+  selectedContext: SelectedBusinessContext;
 };
 
 function formatDate(value: string | null) {
@@ -30,6 +36,7 @@ export function CareerMobilityPage({
   data,
   loading,
   error,
+  selectedContext,
 }: CareerMobilityPageProps) {
   return (
     <section className="min-w-0 p-6">
@@ -57,6 +64,23 @@ export function CareerMobilityPage({
         <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
           {error}
         </div>
+      )}
+
+      {data && (
+        <EvidenceScopeNotice
+          scope={enterpriseTalentEvidenceScope({
+            label: "Enterprise active workforce",
+            asOf: data.as_of,
+            populationLabel: "active employees",
+            populationCount:
+              data.summary.active_employees,
+            supportedBreakdowns: [
+              "current_org_preference_coverage",
+            ],
+          })}
+          selectedContext={selectedContext}
+          note="Only Current Organization Coverage contains its own business-unit coverage rows; interest, destination, and relocation distributions remain enterprise-wide."
+        />
       )}
 
       {data ? (

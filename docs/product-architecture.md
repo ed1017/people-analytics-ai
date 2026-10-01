@@ -277,6 +277,14 @@ The AI panel can stay available across pages, but its tools and suggested questi
 
 The assistant should be able to cross domains when the question requires it, while still using governed tools for the calculations.
 
+### Keep selected context separate from evidence scope
+
+A selected dashboard country, business unit, or level is business context. It must not silently relabel evidence from a page or tool that was not filtered to that population.
+
+Current enterprise-only Talent evidence must state its own source date and denominator. Skills and Learning & Development do not currently support country, business-unit, or level cuts. Career Interests only has its own current-organization preference-coverage rows as a business-unit breakdown. The governed public Succession summary is enterprise-only.
+
+If a requested breakdown is unavailable, the AI should say so and may offer the supported enterprise evidence explicitly labeled as enterprise.
+
 ### Preserve deterministic math
 
 LLMs can:

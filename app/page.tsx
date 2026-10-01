@@ -28,6 +28,10 @@ import {
   getWorkspaceForPage,
   type AppWorkspaceKey,
 } from "@/lib/app-navigation";
+import {
+  enterpriseTalentEvidenceScope,
+  evidenceScopeForAi,
+} from "@/lib/talent-evidence-scope";
 import type {
   AppPage,
   BlsResponse,
@@ -909,6 +913,20 @@ export default function Home() {
     [filterOptions.levels, selectedLevel]
   );
 
+  const selectedBusinessContext =
+    useMemo(
+      () => ({
+        country: selectedCountryLabel,
+        businessUnit: selectedOrgLabel,
+        level: selectedLevelLabel,
+      }),
+      [
+        selectedCountryLabel,
+        selectedOrgLabel,
+        selectedLevelLabel,
+      ]
+    );
+
   const headcountGrowthPct =
     headcountTrend.length >= 2 &&
     headcountTrend[0].headcount > 0
@@ -1262,6 +1280,24 @@ export default function Home() {
               activePage === "skills" &&
               skillsData
                 ? {
+                    evidenceScope:
+                      evidenceScopeForAi(
+                        enterpriseTalentEvidenceScope({
+                          label:
+                            "Enterprise workforce",
+                          asOf:
+                            skillsData.as_of,
+                          populationLabel:
+                            "employees",
+                          populationCount:
+                            skillsData.summary
+                              .current_workforce,
+                          supportedBreakdowns: [
+                            "skill",
+                          ],
+                        }),
+                        selectedBusinessContext
+                      ),
                     summary:
                       skillsData.summary,
                     largestGaps:
@@ -1278,6 +1314,25 @@ export default function Home() {
                 "learning-development" &&
               learningDevelopmentData
                 ? {
+                    evidenceScope:
+                      evidenceScopeForAi(
+                        enterpriseTalentEvidenceScope({
+                          label:
+                            "Enterprise workforce",
+                          asOf:
+                            learningDevelopmentData.as_of,
+                          populationLabel:
+                            "employees",
+                          populationCount:
+                            learningDevelopmentData.summary
+                              .current_workforce,
+                          supportedBreakdowns: [
+                            "skill",
+                            "job_profile",
+                          ],
+                        }),
+                        selectedBusinessContext
+                      ),
                     summary:
                       learningDevelopmentData.summary,
                     skillPathways:
@@ -1298,6 +1353,24 @@ export default function Home() {
                 "career-mobility" &&
               careerMobilityData
                 ? {
+                    evidenceScope:
+                      evidenceScopeForAi(
+                        enterpriseTalentEvidenceScope({
+                          label:
+                            "Enterprise active workforce",
+                          asOf:
+                            careerMobilityData.as_of,
+                          populationLabel:
+                            "active employees",
+                          populationCount:
+                            careerMobilityData.summary
+                              .active_employees,
+                          supportedBreakdowns: [
+                            "current_org_preference_coverage",
+                          ],
+                        }),
+                        selectedBusinessContext
+                      ),
                     summary:
                       careerMobilityData.summary,
                     dataQuality:
@@ -1323,7 +1396,25 @@ export default function Home() {
               activePage ===
                 "succession-planning" &&
               successionCoverageData
-                ? successionCoverageData
+                ? {
+                    ...successionCoverageData,
+                    evidenceScope:
+                      evidenceScopeForAi(
+                        enterpriseTalentEvidenceScope({
+                          label:
+                            "Enterprise succession population",
+                          asOf:
+                            successionCoverageData.as_of_date,
+                          populationLabel:
+                            "filled critical positions",
+                          populationCount:
+                            successionCoverageData
+                              .filled_critical_positions,
+                          supportedBreakdowns: [],
+                        }),
+                        selectedBusinessContext
+                      ),
+                  }
                 : null,
 
             talentAcquisitionContext:
@@ -1663,6 +1754,9 @@ export default function Home() {
             blsLoading={blsLoading}
             blsError={blsError}
             maxSkillDemand={maxSkillDemand}
+            selectedContext={
+              selectedBusinessContext
+            }
           />
         ) : activePage ===
           "learning-development" ? (
@@ -1670,6 +1764,9 @@ export default function Home() {
             data={learningDevelopmentData}
             loading={learningDevelopmentLoading}
             error={learningDevelopmentError}
+            selectedContext={
+              selectedBusinessContext
+            }
           />
         ) : activePage ===
           "career-mobility" ? (
@@ -1677,6 +1774,9 @@ export default function Home() {
             data={careerMobilityData}
             loading={careerMobilityLoading}
             error={careerMobilityError}
+            selectedContext={
+              selectedBusinessContext
+            }
           />
         ) : activePage ===
           "succession-planning" ? (
@@ -1684,6 +1784,9 @@ export default function Home() {
             data={successionCoverageData}
             loading={successionCoverageLoading}
             error={successionCoverageError}
+            selectedContext={
+              selectedBusinessContext
+            }
           />
         ) : (
           <WorkforcePlanningPage

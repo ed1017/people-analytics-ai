@@ -169,7 +169,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "get_workforce_skills",
     description:
-      "Get governed enterprise skills intelligence including apparent proficiency gaps, highest-demand skills, profile coverage, and O*NET mapping coverage.",
+      "Get governed enterprise skills intelligence including apparent proficiency gaps, highest-demand skills, profile coverage, and O*NET mapping coverage. This tool is enterprise-only and does not apply selected dashboard country, business-unit, or level filters.",
     parameters: {
       type: "object",
       properties: {},
@@ -513,7 +513,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "get_internal_talent_readiness",
     description:
-      "Evaluate aggregate internal talent readiness for one governed job profile. Uses active employees who expressed preference for the target profile, excludes employees already in that role, and tests every required skill against required proficiency. Returns role-ready, near-ready, longer-term counts, common near-ready skill gaps, and whether those current gaps are covered by active mapped learning courses. Course availability is pathway evidence, not a proficiency-gain forecast. Does not expose or rank individual employees.",
+      "Evaluate aggregate enterprise internal talent readiness for one governed job profile. Uses active employees who expressed preference for the target profile, excludes employees already in that role, and tests every required skill against required proficiency. Returns role-ready, near-ready, longer-term counts, common near-ready skill gaps, and whether those current gaps are covered by active mapped learning courses. Dashboard country, business-unit, and level filters are not applied. Course availability is pathway evidence, not a proficiency-gain forecast. Does not expose or rank individual employees.",
     parameters: {
       type: "object",
       properties: {
@@ -532,7 +532,7 @@ export const peopleAnalyticsTools: any[] = [
     type: "function",
     name: "get_role_buy_feasibility",
     description:
-      "Get descriptive whole-role external recruiting evidence for one governed job profile. Returns current open ATS pipeline, historical external fills, trailing-12-month external fill volume, historical median time-to-fill, weighted offer acceptance, applicants per filled requisition, and requested Buy scale versus recent hiring volume. This is not a hiring forecast or labor-market availability model.",
+      "Get descriptive enterprise whole-role external recruiting evidence for one governed job profile. Returns current open ATS pipeline, historical external fills, trailing-12-month external fill volume, historical median time-to-fill, weighted offer acceptance, applicants per filled requisition, and requested Buy scale versus recent hiring volume. Dashboard country, business-unit, and level filters are not applied. This is not a hiring forecast or labor-market availability model.",
     parameters: {
       type: "object",
       properties: {
@@ -1556,6 +1556,7 @@ async function getWorkforceSkills() {
     skillCountResult,
     onetResult,
     jobProfilesResult,
+    currentWorkforceResult,
   ] = await Promise.all([
     supabaseServer
       .from(
@@ -1604,6 +1605,10 @@ async function getWorkforceSkills() {
         count: "exact",
         head: true,
       }),
+    supabaseServer
+      .from("dashboard_overview_current")
+      .select("headcount")
+      .single(),
   ]);
 
   for (const result of [
@@ -1612,6 +1617,7 @@ async function getWorkforceSkills() {
     skillCountResult,
     onetResult,
     jobProfilesResult,
+    currentWorkforceResult,
   ]) {
     if (result.error) {
       throw new Error(
@@ -1621,9 +1627,33 @@ async function getWorkforceSkills() {
     }
   }
 
+  const currentWorkforce = Number(
+    currentWorkforceResult.data?.headcount ?? 0
+  );
+
   return {
     as_of: "2026-09-30",
+    evidence_scope: {
+      scope: "enterprise",
+      label: "Enterprise workforce",
+      population_label: "employees",
+      population_count: currentWorkforce,
+      filters_applied: {
+        country: false,
+        business_unit: false,
+        level: false,
+      },
+      supported_breakdowns: ["skill"],
+      unsupported_breakdowns: [
+        "country",
+        "business_unit",
+        "level",
+      ],
+      scope_note:
+        "Selected dashboard country, business-unit, and level context does not filter this tool result.",
+    },
     summary: {
+      current_workforce: currentWorkforce,
       active_skills:
         skillCountResult.count ?? 0,
       onet_mapped_job_profiles:
@@ -1644,7 +1674,7 @@ async function getWorkforceSkills() {
       >[]
     ),
     interpretation_note:
-      "These are apparent proficiency gaps based on observed skill records versus job requirements. Missing or stale records do not prove capability is absent.",
+      "These are enterprise apparent proficiency gaps based on observed skill records versus job requirements. Missing or stale records do not prove capability is absent. Country, business-unit, and level breakdowns are unavailable from this tool.",
   };
 }
 
@@ -2180,15 +2210,61 @@ export async function runPeopleAnalyticsTool(
       return runWorkforceResponsePlan(
         args as WorkforceResponsePlanRequest
       );
-    case "get_internal_talent_readiness":
-      return getInternalTalentReadiness(
-        String(args.job_profile ?? "")
-      );
-    case "get_role_buy_feasibility":
-      return getRoleBuyFeasibility(
-        String(args.job_profile ?? ""),
-        Number(args.requested_buy ?? 0)
-      );
+    case "get_internal_talent_readiness": {
+      const result =
+        await getInternalTalentReadiness(
+          String(args.job_profile ?? "")
+        );
+
+      return {
+        evidence_scope: {
+          scope: "enterprise",
+          label:
+            "Enterprise internal talent pool for the target job profile",
+          filters_applied: {
+            country: false,
+            business_unit: false,
+            level: false,
+          },
+          unsupported_breakdowns: [
+            "country",
+            "business_unit",
+            "level",
+          ],
+          scope_note:
+            "Selected dashboard country, business-unit, and level context does not filter this tool result.",
+        },
+        ...result,
+      };
+    }
+    case "get_role_buy_feasibility": {
+      const result =
+        await getRoleBuyFeasibility(
+          String(args.job_profile ?? ""),
+          Number(args.requested_buy ?? 0)
+        );
+
+      return {
+        evidence_scope: {
+          scope: "enterprise",
+          label:
+            "Enterprise recruiting evidence for the target job profile",
+          filters_applied: {
+            country: false,
+            business_unit: false,
+            level: false,
+          },
+          unsupported_breakdowns: [
+            "country",
+            "business_unit",
+            "level",
+          ],
+          scope_note:
+            "Selected dashboard country, business-unit, and level context does not filter this tool result.",
+        },
+        ...result,
+      };
+    }
     case "run_role_workforce_response_plan":
       return runRoleWorkforceResponsePlan(
         args as RoleWorkforceResponsePlanRequest

@@ -4,6 +4,11 @@ import {
   formatPercent,
   formatWholeCount,
 } from "@/lib/display-format";
+import { EvidenceScopeNotice } from "@/components/evidence-scope-notice";
+import {
+  enterpriseTalentEvidenceScope,
+  type SelectedBusinessContext,
+} from "@/lib/talent-evidence-scope";
 import type {
   SuccessionCoverageResponse,
 } from "@/lib/types";
@@ -12,6 +17,7 @@ type SuccessionPlanningPageProps = {
   data: SuccessionCoverageResponse | null;
   loading: boolean;
   error: string | null;
+  selectedContext: SelectedBusinessContext;
 };
 
 function formatDate(value: string | null) {
@@ -48,6 +54,7 @@ export function SuccessionPlanningPage({
   data,
   loading,
   error,
+  selectedContext,
 }: SuccessionPlanningPageProps) {
   const validZeroState =
     data?.filled_critical_positions === 0;
@@ -83,6 +90,22 @@ export function SuccessionPlanningPage({
             The governed enterprise aggregate is not currently available. No fallback or inferred succession data is shown.
           </p>
         </div>
+      )}
+
+      {data && (
+        <EvidenceScopeNotice
+          scope={enterpriseTalentEvidenceScope({
+            label: "Enterprise succession population",
+            asOf: data.as_of_date,
+            populationLabel:
+              "filled critical positions",
+            populationCount:
+              data.filled_critical_positions,
+            supportedBreakdowns: [],
+          })}
+          selectedContext={selectedContext}
+          note="The governed public succession summary exposes no country, business-unit, or level breakdowns."
+        />
       )}
 
       {data ? (

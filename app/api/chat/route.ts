@@ -161,6 +161,22 @@ type FinanceContext = {
   }>;
 };
 
+type EvidenceScopeContext = {
+  evidence_scope: "enterprise";
+  evidence_label: string;
+  evidence_as_of: string | null;
+  evidence_population_label: string;
+  evidence_population_count: number | null;
+  filters_applied: {
+    country: false;
+    businessUnit: false;
+    level: false;
+  };
+  supported_breakdowns: string[];
+  selected_business_context: string;
+  selected_context_narrows_evidence: false;
+};
+
 type SkillContextRow = {
   skill_name: string;
   skill_category: string;
@@ -176,6 +192,7 @@ type SkillContextRow = {
 };
 
 type SkillsContext = {
+  evidenceScope: EvidenceScopeContext;
   summary: {
     active_skills: number;
     current_workforce: number;
@@ -193,7 +210,9 @@ type SkillsContext = {
 };
 
 type LearningDevelopmentContext = {
+  evidenceScope: EvidenceScopeContext;
   summary: {
+    current_workforce: number;
     current_gap_skills: number;
     gap_skills_with_active_pathway: number;
     gap_pathway_coverage_pct: number;
@@ -223,6 +242,7 @@ type LearningDevelopmentContext = {
 };
 
 type CareerMobilityContext = {
+  evidenceScope: EvidenceScopeContext;
   summary: {
     active_employees: number;
     employees_with_preference: number;
@@ -269,6 +289,7 @@ type CareerMobilityContext = {
 };
 
 type SuccessionCoverageContext = {
+  evidenceScope: EvidenceScopeContext;
   as_of_date: string | null;
   small_cell_threshold: number;
   critical_job_profiles: number;
@@ -401,6 +422,27 @@ type SurveySentimentContext = {
   }>;
 };
 
+
+function formatEvidenceScope(
+  scope: EvidenceScopeContext
+) {
+  return `
+EVIDENCE SCOPE
+Evidence population: ${scope.evidence_label}
+Evidence as of: ${scope.evidence_as_of ?? "Unavailable"}
+Population: ${scope.evidence_population_count === null ? scope.evidence_population_label : scope.evidence_population_count + " " + scope.evidence_population_label}
+Selected business context: ${scope.selected_business_context}
+Country filter applied to this evidence: no
+Business-unit filter applied to this evidence: no
+Level filter applied to this evidence: no
+Supported evidence breakdowns: ${scope.supported_breakdowns.length > 0 ? scope.supported_breakdowns.join(", ") : "none"}
+
+Scope rule:
+- The selected business context does NOT narrow this evidence.
+- Never relabel enterprise evidence as country-, business-unit-, or level-specific.
+- If the user asks for an unsupported country, business-unit, or level breakdown, state that the breakdown is unavailable and only offer the enterprise evidence explicitly labeled as enterprise.
+`.trim();
+}
 
 export async function POST(
   request: NextRequest
@@ -541,11 +583,13 @@ export async function POST(
         .join("\n\n");
 
     const workforceContext = `
-CURRENT DASHBOARD CONTEXT
+CURRENT SELECTED BUSINESS CONTEXT
 Snapshot date: ${context.snapshotDate}
 Country: ${context.country}
 Business unit: ${context.businessUnit}
 Level: ${context.level}
+
+This selected context scopes the dashboard metrics below. It does not automatically scope other page or tool evidence. Use each evidence block's explicit scope metadata.
 
 Current metrics:
 - Headcount: ${context.headcount}
@@ -750,6 +794,8 @@ Interpretation rule:
       skillsContext
         ? `
 CURRENT WORKFORCE SKILLS CONTEXT
+${formatEvidenceScope(skillsContext.evidenceScope)}
+
 Skills summary:
 - Active internal skills: ${skillsContext.summary.active_skills}
 - Current workforce: ${skillsContext.summary.current_workforce}
@@ -789,6 +835,7 @@ Interpretation rules:
 - Missing or stale skill data does not prove an employee lacks a capability.
 - Do not call a gap a verified shortage unless the supplied data supports that conclusion.
 - O*NET is an external reference layer; do not imply O*NET directly measured this company's employees.
+- Country, business-unit, and level skill breakdowns are not available in this page evidence. If asked for one, say it is unavailable and optionally provide the enterprise evidence explicitly labeled as enterprise.
 `.trim()
         : "";
 
@@ -797,6 +844,8 @@ Interpretation rules:
       learningDevelopmentContext
         ? `
 CURRENT LEARNING & DEVELOPMENT CONTEXT
+${formatEvidenceScope(learningDevelopmentContext.evidenceScope)}
+
 Pathway summary:
 - Current gap skills: ${learningDevelopmentContext.summary.current_gap_skills}
 - Gap skills with an active learning pathway: ${learningDevelopmentContext.summary.gap_skills_with_active_pathway}
@@ -830,6 +879,7 @@ Interpretation rules:
 - Job-profile pathway coverage is coverage of required skills by active mapped courses; it does not measure employee readiness for that profile.
 - Missing or stale skill records are part of the current gap signal and are not proof that an employee lacks a capability.
 - Results are aggregate only. Do not expose, rank, or recommend individual employees.
+- Country, business-unit, and level L&D breakdowns are not available in this page evidence. If asked for one, say it is unavailable and optionally provide the enterprise evidence explicitly labeled as enterprise.
 `.trim()
         : "";
 
@@ -838,6 +888,8 @@ Interpretation rules:
       careerMobilityContext
         ? `
 CURRENT CAREER INTERESTS CONTEXT
+${formatEvidenceScope(careerMobilityContext.evidenceScope)}
+
 Preference-record summary:
 - Active employees: ${careerMobilityContext.summary.active_employees}
 - Employees with a recorded career preference: ${careerMobilityContext.summary.employees_with_preference}
@@ -871,6 +923,8 @@ Interpretation rules:
 - Desired roles and locations are expressed destinations, not vacancies or recommendations.
 - Relocation willingness is a recorded preference field and does not establish that relocation will occur.
 - Organization-level differences are descriptive coverage patterns only; do not infer engagement, manager quality, mobility opportunity, or employee intent beyond the supplied fields.
+- Current-organization preference coverage is the only business-unit-specific breakdown supplied here. Do not relabel career-interest categories, desired roles, desired locations, relocation willingness, or enterprise summary metrics as business-unit-specific.
+- Country and level breakdowns are unavailable in this evidence. If asked for an unsupported breakdown, say it is unavailable and only use the supported enterprise or current-organization coverage evidence.
 - Results are aggregate only. Do not expose, rank, or recommend individual employees.
 `.trim()
         : "";
@@ -880,6 +934,8 @@ Interpretation rules:
         ? successionCoverageContext
           ? `
 CURRENT SUCCESSION PLANNING CONTEXT
+${formatEvidenceScope(successionCoverageContext.evidenceScope)}
+
 Assessment date: ${successionCoverageContext.as_of_date ?? "No recorded assessment"}
 Small-cell threshold: k=${successionCoverageContext.small_cell_threshold}
 Active critical job profiles: ${successionCoverageContext.critical_job_profiles}
@@ -902,7 +958,7 @@ Interpretation rules:
 - No individual candidate, employee, position, or plan details are available in this context. Never infer, rank, identify, or recommend individuals.
 - Null values paired with suppression flags are intentionally suppressed under the k=10 paired-cell rule. Never estimate, reconstruct, or reverse-engineer suppressed values.
 - If plan coverage is suppressed, downstream readiness detail is also suppressed. Do not infer it from percentages or complements.
-- Succession is intentionally enterprise-summary only. Do not suggest or imply that job-profile, business-unit, level, risk, person, candidate, position, or plan breakdowns are available from this public succession context. If asked for those details, state that this governed public summary does not expose them.
+- Succession is intentionally enterprise-summary only. Do not suggest or imply that country, job-profile, business-unit, level, risk, person, candidate, position, or plan breakdowns are available from this public succession context. If asked for those details, state that this governed public summary does not expose them.
 `.trim()
           : `
 CURRENT SUCCESSION PLANNING CONTEXT
@@ -1128,6 +1184,9 @@ ${personaInstructions[persona]}
 Shared rules:
 - Ground factual claims in the supplied CURRENT PAGE context or in results returned by approved People Analytics tools.
 - Treat the CURRENT PAGE-specific context as primary when the user asks about that page or its visible filters.
+- The CURRENT SELECTED BUSINESS CONTEXT is navigation/business context. Never assume it filters another page or tool result unless that evidence explicitly says the country, business-unit, or level filter was applied.
+- Evidence scope metadata overrides selected-context labels. If evidence says enterprise and filters were not applied, never describe it as specific to the selected country, business unit, or level.
+- If a requested country, business-unit, or level breakdown is not supported by the current page/tool evidence, say the breakdown is unavailable and, when useful, offer the available enterprise evidence with its source date and denominator.
 - For cross-page, cross-business-unit, or overall-company questions that require data outside the current page context, call the relevant People Analytics tool rather than guessing.
 - You may call more than one tool when a question spans domains.
 - Do not call a tool when the current page context already contains everything needed for a simple page-specific answer.

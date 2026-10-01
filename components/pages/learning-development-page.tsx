@@ -5,6 +5,11 @@ import {
   formatPercent,
   formatWholeCount,
 } from "@/lib/display-format";
+import { EvidenceScopeNotice } from "@/components/evidence-scope-notice";
+import {
+  enterpriseTalentEvidenceScope,
+  type SelectedBusinessContext,
+} from "@/lib/talent-evidence-scope";
 import type {
   LearningDevelopmentResponse,
 } from "@/lib/types";
@@ -13,6 +18,7 @@ type LearningDevelopmentPageProps = {
   data: LearningDevelopmentResponse | null;
   loading: boolean;
   error: string | null;
+  selectedContext: SelectedBusinessContext;
 };
 
 function formatLongDate(value: string) {
@@ -37,6 +43,7 @@ export function LearningDevelopmentPage({
   data,
   loading,
   error,
+  selectedContext,
 }: LearningDevelopmentPageProps) {
   return (
     <section className="min-w-0 p-6">
@@ -65,6 +72,25 @@ export function LearningDevelopmentPage({
           {error}
         </div>
       )}
+
+      {data && (
+        <EvidenceScopeNotice
+          scope={enterpriseTalentEvidenceScope({
+            label: "Enterprise workforce",
+            asOf: data.as_of,
+            populationLabel: "employees",
+            populationCount:
+              data.summary.current_workforce,
+            supportedBreakdowns: [
+              "skill",
+              "job_profile",
+            ],
+          })}
+          selectedContext={selectedContext}
+          note="Skill rows use employees in roles requiring each skill; job-profile pathway coverage uses required skills per active profile."
+        />
+      )}
+
       {data ? (
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
