@@ -161,6 +161,22 @@ type FinanceContext = {
   }>;
 };
 
+type EvidenceScopeContext = {
+  evidence_scope: "enterprise";
+  evidence_label: string;
+  evidence_as_of: string | null;
+  evidence_population_label: string;
+  evidence_population_count: number | null;
+  filters_applied: {
+    country: false;
+    businessUnit: false;
+    level: false;
+  };
+  supported_breakdowns: string[];
+  selected_business_context: string;
+  selected_context_narrows_evidence: false;
+};
+
 type SkillContextRow = {
   skill_name: string;
   skill_category: string;
@@ -176,6 +192,7 @@ type SkillContextRow = {
 };
 
 type SkillsContext = {
+  evidenceScope: EvidenceScopeContext;
   summary: {
     active_skills: number;
     current_workforce: number;
@@ -193,7 +210,9 @@ type SkillsContext = {
 };
 
 type LearningDevelopmentContext = {
+  evidenceScope: EvidenceScopeContext;
   summary: {
+    current_workforce: number;
     current_gap_skills: number;
     gap_skills_with_active_pathway: number;
     gap_pathway_coverage_pct: number;
@@ -223,6 +242,7 @@ type LearningDevelopmentContext = {
 };
 
 type CareerMobilityContext = {
+  evidenceScope: EvidenceScopeContext;
   summary: {
     active_employees: number;
     employees_with_preference: number;
@@ -269,6 +289,7 @@ type CareerMobilityContext = {
 };
 
 type SuccessionCoverageContext = {
+  evidenceScope: EvidenceScopeContext;
   as_of_date: string | null;
   small_cell_threshold: number;
   critical_job_profiles: number;
