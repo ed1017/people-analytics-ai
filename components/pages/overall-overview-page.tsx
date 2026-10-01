@@ -158,11 +158,12 @@ export function OverallOverviewPage({ active, persona, onNavigate, workforceQuer
   </section>
     <aside className="rounded-xl border bg-card p-5 text-sm leading-relaxed" aria-label="How to use this app">
       <h3 className="text-lg font-semibold">How to use this app</h3>
+      <p className="mt-3">I built this decision-making tool to connect workforce evidence with measurable goals, modeled financial costs and tradeoffs. Here is one way to work through a question.</p>
       <ol className="mt-3 list-decimal space-y-4 pl-4">
-        <li><button className="text-left font-semibold text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce: identify the problem</button><p>Review the snapshot and trends; narrow supported views with the filters.</p></li>
-        <li><button className="text-left font-semibold text-primary underline" onClick={()=>onNavigate("skills")}>Talent: identify potential</button><p>Open Skills Intelligence to review requirements and learning coverage.</p></li>
-        <li><strong>Carry relevant Skills evidence</strong><p>Choose a Skills observation, enter your goal and select Carry to Planning.</p></li>
-        <li><button className="text-left font-semibold text-primary underline" onClick={()=>onNavigate("planning-overview")}>Planning: develop the plan</button><p>Review your goal and evidence. In Scenario Modeling, run a supported comparison. Use Workforce Response and Execution &amp; Feasibility to compare response and execution options.</p></li>
+        <li><button className="text-left font-semibold text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce: find the problem and goal</button><p>Click Workforce, review the snapshot and trends, then narrow the supported view with the filters. Pick a question and a measurable goal you want to explore.</p></li>
+        <li><button className="text-left font-semibold text-primary underline" onClick={()=>onNavigate("skills")}>Talent: explore potential and actions</button><p>Click Skills Intelligence to explore requirements and learning coverage. Consider which capability gaps and possible learning responses relate to your goal.</p></li>
+        <li><strong>Bring Skills evidence with you</strong><p>On Skills Intelligence, choose an Observed skill gap, enter your Business goal, then click Carry to Planning. Review the carried evidence before modeling.</p></li>
+        <li><button className="text-left font-semibold text-primary underline" onClick={()=>onNavigate("planning-overview")}>Planning: compare options and develop a plan</button><p>Click Planning Overview, then Scenario Modeling to enter assumptions and run a supported comparison. Work through Position &amp; Workforce Design, Workforce Response and Execution &amp; Feasibility. Check Labor Cost Planning for financial context, and compare modeled costs and tradeoffs against your goal.</p></li>
       </ol>
       <p className="mt-4 text-muted-foreground">Navigation does not carry evidence or run models. Scenarios do not make real workforce changes.</p>
     </aside>
