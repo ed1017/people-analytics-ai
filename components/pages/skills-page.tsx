@@ -4,6 +4,11 @@ import {
   formatPercent,
   formatWholeCount,
 } from "@/lib/display-format";
+import { EvidenceScopeNotice } from "@/components/evidence-scope-notice";
+import {
+  enterpriseTalentEvidenceScope,
+  type SelectedBusinessContext,
+} from "@/lib/talent-evidence-scope";
 import type {
   BlsResponse,
   SkillsResponse,
@@ -17,6 +22,7 @@ type SkillsPageProps = {
   blsLoading: boolean;
   blsError: string | null;
   maxSkillDemand: number;
+  selectedContext: SelectedBusinessContext;
 };
 
 function formatLongDate(value: string) {
@@ -35,6 +41,7 @@ export function SkillsPage({
   blsLoading,
   blsError,
   maxSkillDemand,
+  selectedContext,
 }: SkillsPageProps) {
   return (
 <section className="min-w-0 p-6">
@@ -59,6 +66,23 @@ export function SkillsPage({
               <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
                 {skillsError}
               </div>
+            )}
+
+            {skillsData && (
+              <EvidenceScopeNotice
+                scope={enterpriseTalentEvidenceScope({
+                  label: "Enterprise workforce",
+                  asOf: skillsData.as_of,
+                  populationLabel: "employees",
+                  populationCount:
+                    skillsData.summary.current_workforce,
+                  supportedBreakdowns: [
+                    "skill",
+                  ],
+                })}
+                selectedContext={selectedContext}
+                note="Skill-level denominators remain the employees in current roles requiring each skill."
+              />
             )}
 
             {skillsData ? (
