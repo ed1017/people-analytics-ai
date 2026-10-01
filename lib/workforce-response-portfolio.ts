@@ -467,7 +467,7 @@ export async function runWorkforceResponsePortfolio(
       "Current governed career-preference data enforces one preference row per employee, so interested internal Build and Move pools are mutually exclusive across target job profiles.",
       "Within each role, role-ready and near-ready cohorts are mutually exclusive, so Move and Build supply are not double-counted within that role.",
       "Portfolio planned coverage caps each role's contribution at that role's scenario-created demand; overplanned capacity is reported separately.",
-      "Business-unit demand ownership is taken directly from the modeled BU-by-job-profile inventory. Signed BU deltas reconcile to the enterprise role delta, including cases where a role grows in one BU and shrinks in another.",
+      "Business-unit demand ownership is taken directly from the modeled BU-by-job-profile inventory. Signed BU deltas reconcile to the company role delta, including cases where a role grows in one BU and shrinks in another.",
       "Build, Move, and Buy remain role-level allocations in this portfolio. The model does not automatically assign response capacity back to business units.",
       "Unplanned positive role demand remains visible and is treated as uncovered rather than silently excluded.",
       "Recruiting evidence is aggregated only across distinct target job profiles. Historical hiring evidence remains descriptive and is not a forecast.",

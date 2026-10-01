@@ -1,3 +1,4 @@
+import { CHAT_MODEL } from "@/lib/chat-model";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { overviewBriefingPrompt } from "../../../lib/overview-briefing";
@@ -534,8 +535,8 @@ Supported evidence breakdowns: ${scope.supported_breakdowns.length > 0 ? scope.s
 
 Scope rule:
 - The selected business context does NOT narrow this evidence.
-- Never relabel enterprise evidence as country-, business-unit-, or level-specific.
-- If the user asks for an unsupported country, business-unit, or level breakdown, state that the breakdown is unavailable and only offer the enterprise evidence explicitly labeled as enterprise.
+- Never relabel company evidence as country-, business-unit-, or level-specific.
+- If the user asks for an unsupported country, business-unit, or level breakdown, state that the breakdown is unavailable and only offer the company evidence explicitly labeled as company.
 `.trim();
 }
 
@@ -727,7 +728,7 @@ Displayed trend:
       page === "workforce" && workforceDetailContext
         ? `
 CURRENT WORKFORCE DETAIL CONTEXT
-Scope: enterprise-wide, unfiltered composition. The separate dashboard snapshot and its trend use the selected country, business unit and level filters. Never apply those filters to these enterprise breakdowns or combine their denominators.
+Scope: company-wide, unfiltered composition. The separate dashboard snapshot and its trend use the selected country, business unit and level filters. Never apply those filters to these company breakdowns or combine their denominators.
 Summary: ${JSON.stringify(workforceDetailContext.summary)}
 Business units: ${JSON.stringify(workforceDetailContext.businessUnits)}
 Countries: ${JSON.stringify(workforceDetailContext.countries)}
@@ -796,7 +797,7 @@ User-stated assumptions:
 ${planningEvidenceHandoffContext.userAssumptions ?? "No assumptions stated."}
 
 Handoff rules:
-- The observed Skills evidence is enterprise-scoped. The captured or current business context does not make it business-unit-, country-, or level-specific.
+- The observed Skills evidence is company-scoped. The captured or current business context does not make it business-unit-, country-, or level-specific.
 - The business goal is user-stated intent, not an observed workforce fact.
 - The assumptions are user-stated notes, not validated facts, approved decisions, or confirmed model inputs.
 - The handoff is context only. Its existence must NEVER trigger a scenario/tool call, navigation, Build/Move/Buy allocation, approval, or source-data change.
@@ -914,7 +915,7 @@ Interpretation rule:
       financeContext
         ? `
 CURRENT WORKFORCE FINANCE CONTEXT
-Enterprise current:
+Company current:
 - Headcount: ${financeContext.current.headcount}
 - FTE: ${financeContext.current.fte}
 - Annualized labor cost USD: ${financeContext.current.labor_cost_usd}
@@ -926,7 +927,7 @@ Business unit workforce economics:
 ${financeContext.byBusinessUnit
   .map(
     (row) =>
-      `- ${row.org_name}: HC ${row.headcount}, FTE ${row.fte}, labor cost USD ${row.labor_cost_usd}, cost/FTE USD ${row.cost_per_fte_usd}, vacancies ${row.vacant_positions}, estimated vacancy exposure USD ${row.estimated_vacancy_cost_exposure_usd}, ${row.share_of_enterprise_labor_cost_pct}% of enterprise labor cost`
+      `- ${row.org_name}: HC ${row.headcount}, FTE ${row.fte}, labor cost USD ${row.labor_cost_usd}, cost/FTE USD ${row.cost_per_fte_usd}, vacancies ${row.vacant_positions}, estimated vacancy exposure USD ${row.estimated_vacancy_cost_exposure_usd}, ${row.share_of_enterprise_labor_cost_pct}% of company labor cost`
   )
   .join("\n")}
 
@@ -989,7 +990,7 @@ Interpretation rules:
 - Missing or stale skill data does not prove an employee lacks a capability.
 - Do not call a gap a verified shortage unless the supplied data supports that conclusion.
 - O*NET is an external reference layer; do not imply O*NET directly measured this company's employees.
-- Country, business-unit, and level skill breakdowns are not available in this page evidence. If asked for one, say it is unavailable and optionally provide the enterprise evidence explicitly labeled as enterprise.
+- Country, business-unit, and level skill breakdowns are not available in this page evidence. If asked for one, say it is unavailable and optionally provide the company evidence explicitly labeled as company.
 `.trim()
         : "";
 
@@ -1033,7 +1034,7 @@ Interpretation rules:
 - Job-profile pathway coverage is coverage of required skills by active mapped courses; it does not measure employee readiness for that profile.
 - Missing or stale skill records are part of the current gap signal and are not proof that an employee lacks a capability.
 - Results are aggregate only. Do not expose, rank, or recommend individual employees.
-- Country, business-unit, and level L&D breakdowns are not available in this page evidence. If asked for one, say it is unavailable and optionally provide the enterprise evidence explicitly labeled as enterprise.
+- Country, business-unit, and level L&D breakdowns are not available in this page evidence. If asked for one, say it is unavailable and optionally provide the company evidence explicitly labeled as company.
 `.trim()
         : "";
 
@@ -1077,8 +1078,8 @@ Interpretation rules:
 - Desired roles and locations are expressed destinations, not vacancies or recommendations.
 - Relocation willingness is a recorded preference field and does not establish that relocation will occur.
 - Organization-level differences are descriptive coverage patterns only; do not infer engagement, manager quality, mobility opportunity, or employee intent beyond the supplied fields.
-- Current-organization preference coverage is the only business-unit-specific breakdown supplied here. Do not relabel career-interest categories, desired roles, desired locations, relocation willingness, or enterprise summary metrics as business-unit-specific.
-- Country and level breakdowns are unavailable in this evidence. If asked for an unsupported breakdown, say it is unavailable and only use the supported enterprise or current-organization coverage evidence.
+- Current-organization preference coverage is the only business-unit-specific breakdown supplied here. Do not relabel career-interest categories, desired roles, desired locations, relocation willingness, or company summary metrics as business-unit-specific.
+- Country and level breakdowns are unavailable in this evidence. If asked for an unsupported breakdown, say it is unavailable and only use the supported company or current-organization coverage evidence.
 - Results are aggregate only. Do not expose, rank, or recommend individual employees.
 `.trim()
         : "";
@@ -1125,7 +1126,7 @@ Interpretation rules:
 - Origin position IDs are missing in the current source. Do not infer origin job profiles, role-to-role career paths, or multi-step career trajectories from monthly snapshots or destination positions.
 - The current data does not support longitudinal time-to-next-move analysis or a typical employee career path.
 - The latest source month is partial. Do not compare it directly with full months without stating that limitation.
-- Country, business-unit, and level dashboard selections do not filter this enterprise movement-event source. If asked for a BU/country/selected-level mobility breakdown, state that it is unavailable in this page evidence.
+- Country, business-unit, and level dashboard selections do not filter this company movement-event source. If asked for a BU/country/selected-level mobility breakdown, state that it is unavailable in this page evidence.
 - Recorded level transitions are descriptive source events, not promotion recommendations, readiness predictions, or suitability judgments.
 - Results are aggregate only. Do not identify, rank, recommend, or infer individual employees.
 `.trim()
@@ -1169,11 +1170,11 @@ Interpretation rules:
 - No individual candidate, employee, position, or plan details are available in this context. Never infer, rank, identify, or recommend individuals.
 - Null values paired with suppression flags are intentionally suppressed under the k=10 paired-cell rule. Never estimate, reconstruct, or reverse-engineer suppressed values.
 - If plan coverage is suppressed, downstream readiness detail is also suppressed. Do not infer it from percentages or complements.
-- Succession is intentionally enterprise-summary only. Do not suggest or imply that country, job-profile, business-unit, level, risk, person, candidate, position, or plan breakdowns are available from this public succession context. If asked for those details, state that this governed public summary does not expose them.
+- Succession is intentionally company-summary only. Do not suggest or imply that country, job-profile, business-unit, level, risk, person, candidate, position, or plan breakdowns are available from this public succession context. If asked for those details, state that this governed public summary does not expose them.
 `.trim()
           : `
 CURRENT SUCCESSION PLANNING CONTEXT
-The governed enterprise succession summary is unavailable.
+The governed company succession summary is unavailable.
 
 Interpretation rules:
 - Do not infer succession coverage, readiness counts, candidate information, or hidden values from other dashboard data.
@@ -1396,20 +1397,20 @@ Shared rules:
 - Ground factual claims in the supplied CURRENT PAGE context or in results returned by approved People Analytics tools.
 - Treat the CURRENT PAGE-specific context as primary when the user asks about that page or its visible filters.
 - The CURRENT SELECTED BUSINESS CONTEXT is navigation/business context. Never assume it filters another page or tool result unless that evidence explicitly says the country, business-unit, or level filter was applied.
-- Evidence scope metadata overrides selected-context labels. If evidence says enterprise and filters were not applied, never describe it as specific to the selected country, business unit, or level.
-- If a requested country, business-unit, or level breakdown is not supported by the current page/tool evidence, say the breakdown is unavailable and, when useful, offer the available enterprise evidence with its source date and denominator.
+- Evidence scope metadata overrides selected-context labels. If evidence says company and filters were not applied, never describe it as specific to the selected country, business unit, or level.
+- If a requested country, business-unit, or level breakdown is not supported by the current page/tool evidence, say the breakdown is unavailable and, when useful, offer the available company evidence with its source date and denominator.
 - A carried evidence handoff is context only. Never call a planning tool merely because a handoff exists; tool execution still requires an explicit user modeling request with the supported inputs.
 - For cross-page, cross-business-unit, or overall-company questions that require data outside the current page context, call the relevant People Analytics tool rather than guessing.
 - You may call more than one tool when a question spans domains.
 - Do not call a tool when the current page context already contains everything needed for a simple page-specific answer.
 - Never invent employee facts, benchmarks, causes, correlations, budgets, forecasts, survey themes, or scenario reruns that are not supplied.
-- For any NEW enterprise-level workforce-planning what-if that changes growth, salary inflation, attrition, fill rate, or productivity-driven hiring demand, you MUST call run_workforce_scenario.
-- For any NEW what-if that changes assumptions for one named business unit, you MUST call run_business_unit_scenario instead of run_workforce_scenario. That tool reruns the selected BU on its own stored monthly Baseline curve and holds all other BUs at Baseline for the enterprise implied impact.
+- For any NEW company-level workforce-planning what-if that changes growth, salary inflation, attrition, fill rate, or productivity-driven hiring demand, you MUST call run_workforce_scenario.
+- For any NEW what-if that changes assumptions for one named business unit, you MUST call run_business_unit_scenario instead of run_workforce_scenario. That tool reruns the selected BU on its own stored monthly Baseline curve and holds all other BUs at Baseline for the company implied impact.
 - For any NEW unscoped position-inventory what-if about adding positions, closing vacant positions, freezing vacancies, or filling open positions, call run_position_action_scenario.
 - If a position action is scoped by business unit, career level, job profile, or includes multiple structural actions, call run_structural_position_scenario instead. Actions must be passed in the user's intended order.
 - Do not substitute headcount scenario math for position actions.
 - The LLM must not independently invent or approximate scenario math. It may only explain or compare values returned by the approved deterministic scenario tools.
-- Segment breakdowns returned by run_workforce_scenario allocate the enterprise scenario delta using the stored Baseline business-unit or job-family mix. Treat those breakdowns as decomposition only. Do not confuse them with the true BU-specific rerun returned by run_business_unit_scenario.
+- Segment breakdowns returned by run_workforce_scenario allocate the company scenario delta using the stored Baseline business-unit or job-family mix. Treat those breakdowns as decomposition only. Do not confuse them with the true BU-specific rerun returned by run_business_unit_scenario.
 - Pass null for scenario levers the user did not change. If the user says attrition changes by X percentage points, use additional_attrition_pct_points rather than converting it to an absolute rate yourself.
 - Do not claim a workforce or position model reran unless the corresponding approved scenario tool returned a result in this conversation turn.
 - Position actions are not automatically employee actions: closing vacant positions does not represent layoffs, freezing vacancies does not remove authorized positions, and projected vacancy fills are modeled staffing capacity rather than confirmed hires.
@@ -1435,11 +1436,11 @@ Shared rules:
 - Use run_role_workforce_response_plan when the user explicitly supplies numeric Build / Move / Buy targets for one job profile with positive scenario-created role demand and wants a whole-role plan. Its planning unit is one role/person-position, so a single role unit carries the governed skill bundle once rather than being counted independently for every required skill.
 - Use run_workforce_response_portfolio when the user explicitly supplies numeric Build / Move / Buy allocations for two or more target job profiles in the same structural scenario. Do not invent missing role allocations. The portfolio reports unplanned positive role demand instead of silently treating omitted roles as covered.
 - Portfolio internal Build/Move pools can be aggregated across target profiles because the governed career-preference model enforces one preference row per employee; do not generalize that non-overlap rule outside this portfolio model. Portfolio coverage caps each role at its own scenario-created demand and reports excess allocation separately.
-- Workforce response portfolios return signed BU-by-role demand ownership directly from the modeled structural inventory. Those BU deltas reconcile to enterprise role demand and may be negative for a BU even when the enterprise role is net-positive. Build / Move / Buy allocations remain role-level unless the user explicitly provides BU-level response allocations; do not auto-assign response capacity to BUs.
-- Use run_business_unit_response_allocation only when the user explicitly supplies numeric Build / Move / Buy allocations for BU + job-profile destinations. BU allocations roll up to enterprise role totals for evidence checks. Gross positive BU destination demand and enterprise net role demand are different when other BUs contract; never equate an unallocated destination gap with an uncovered enterprise gap without accounting for contraction offsets.
+- Workforce response portfolios return signed BU-by-role demand ownership directly from the modeled structural inventory. Those BU deltas reconcile to company role demand and may be negative for a BU even when the company role is net-positive. Build / Move / Buy allocations remain role-level unless the user explicitly provides BU-level response allocations; do not auto-assign response capacity to BUs.
+- Use run_business_unit_response_allocation only when the user explicitly supplies numeric Build / Move / Buy allocations for BU + job-profile destinations. BU allocations roll up to company role totals for evidence checks. Gross positive BU destination demand and company net role demand are different when other BUs contract; never equate an unallocated destination gap with an uncovered company gap without accounting for contraction offsets.
 - A negative BU role delta is a contraction offset, not proof of transferable workers. BU-level Move identifies the destination BU only; never invent a source BU for internal movers or claim contraction automatically supplies those moves.
 - Use run_time_phased_workforce_execution only when the user explicitly supplies effective months for one or more approved BU Build / Move / Buy allocations. Never infer effective months from course duration, historical time-to-fill, recruiter pipeline, or model intuition.
-- Time-phased execution counts capacity beginning in the user-supplied effective month. Unscheduled approved capacity remains unscheduled. Schedule amounts above the approved BU/path target are excess and must not count toward effective coverage. Monthly enterprise coverage is capped by role net demand.
+- Time-phased execution counts capacity beginning in the user-supplied effective month. Unscheduled approved capacity remains unscheduled. Schedule amounts above the approved BU/path target are excess and must not count toward effective coverage. Monthly company coverage is capped by role net demand.
 - Build effective month means the user says capacity becomes role-ready then; it is not a learning-duration forecast. Buy effective month means the user says the hire is effective then; it is not a historical time-to-fill forecast. Move effective month is destination-effective only and does not establish source BU.
 - Use run_workforce_response_constraints only when the user explicitly supplies one or more hard workforce-response constraints or asks to test a supplied plan against stated caps/deadlines. Do not invent constraint values. Hard feasibility comes only from explicit caps/deadlines plus schedule-integrity checks.
 - Constraint checks may use total Build/Move/Buy caps, monthly path caps, a combined monthly execution cap, deadline coverage, and an all-approved-capacity-scheduled requirement. A failed check means the supplied plan violates the supplied limits; do not silently reschedule or change the response mix.
@@ -1509,7 +1510,7 @@ ${message}
 
     let response: any =
       await client.responses.create({
-        model: "gpt-5.6-luna",
+        model: CHAT_MODEL,
         instructions: aiInstructions,
         input: aiInput,
         tools: peopleAnalyticsTools,
@@ -1578,7 +1579,7 @@ ${message}
 
       response =
         await client.responses.create({
-          model: "gpt-5.6-luna",
+          model: CHAT_MODEL,
           instructions: aiInstructions,
           previous_response_id:
             response.id,

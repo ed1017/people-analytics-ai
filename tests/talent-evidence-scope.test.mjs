@@ -54,7 +54,7 @@ test("chat grounding contains the scope guard and unsupported-breakdown rule", (
   assert.match(source, /Country, business-unit, and level skill breakdowns are not available/);
   assert.match(source, /Country, business-unit, and level L&D breakdowns are not available/);
   assert.match(source, /Current-organization preference coverage is the only business-unit-specific breakdown supplied here/);
-  assert.match(source, /Succession is intentionally enterprise-summary only/);
+  assert.match(source, /Succession is intentionally company-summary only/);
 });
 
 test("enterprise Talent planning tools expose unfiltered scope metadata", () => {
@@ -65,11 +65,11 @@ test("enterprise Talent planning tools expose unfiltered scope metadata", () => 
 
   assert.match(
     source,
-    /Enterprise internal talent pool for the target job profile/
+    /Company internal talent pool for the target job profile/
   );
   assert.match(
     source,
-    /Enterprise recruiting evidence for the target job profile/
+    /Company recruiting evidence for the target job profile/
   );
   assert.match(
     source,

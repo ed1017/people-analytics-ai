@@ -62,7 +62,7 @@ export function SkillsEvidenceHandoffPanel({
   const evidenceScope = useMemo(
     () =>
       enterpriseTalentEvidenceScope({
-        label: "Enterprise workforce",
+        label: "Company workforce",
         asOf: skillsData.as_of,
         populationLabel: "employees",
         populationCount:
@@ -163,7 +163,7 @@ export function SkillsEvidenceHandoffPanel({
             Carry evidence to Planning
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            Select one observed enterprise skill
+            Select one observed company skill
             gap, state the business goal, and
             explicitly carry the context into
             Workforce Planning.
@@ -313,7 +313,7 @@ export function SkillsEvidenceHandoffPanel({
               setError(null);
             }}
             rows={3}
-            placeholder="Example: Explore ways to strengthen AI capability without increasing enterprise authorized positions."
+            placeholder="Example: Explore ways to strengthen AI capability without increasing company authorized positions."
             className="min-h-24 resize-y rounded-md border bg-card p-3 text-sm"
           />
         </label>

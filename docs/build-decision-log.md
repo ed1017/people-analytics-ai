@@ -84,3 +84,39 @@ The user confirmed the dedicated **Guide & Data** page, linked from the overview
 - New explicit authorization: publish all agreed changes in bounded tested stages. First stage is this Home/Guide/navigation/Workforce bundle. Next: selected A+Teal theme (#0B1426 base, #A5C5EE primary, #45D6B0 secondary, off-white text) and user-facing enterprise-to-company wording. The former unselected-theme status is superseded; no chatbot heading was selected.
 - Follow-on behavior: canonical Country / Business Unit / Level shared filters beneath Perspective with Reset; only supported aggregates filter, unsupported sources remain explicitly company-wide. Automatic destination summaries must use current page/filter/goal/evidence, bounded dedupe/cache, loading/error/retry states and follow-up chips between conversation and composer. No erase button. These follow-on changes are requested, not yet implemented or live at this checkpoint.
 - GitHub main verified unchanged at bf1e0775f02c91c06e0c7621b5d95ce5e3a336e4 before publication.
+
+### PR72 published and verified
+
+- Head f1dc12f67386cb80f91017c950efce960104003f, PR72, merge 76632e6c85c63aee5ba6ab3124478318e04eacac. Configured Vercel check and Preview Comments check succeeded; production deployment succeeded 2026-10-01T17:45:25Z.
+- Public production replay: all 39 guide/layout/filter/Planning state checks passed. UI test chat was intentionally mocked; prior configured local real AI checks are separately identified above. User was told this stage is live and can be refreshed.
+
+### A+Teal / company wording / Compensation / model attribution stage
+
+- Branch feature/company-theme-and-guidance from PR72 merge. app/globals.css now uses approved navy #0B1426, primary #A5C5EE, teal active-navigation accent #45D6B0 and off-white text; prior palette remains in version history. Chart axes follow theme contrast; semantic chart colors remain distinct. Sidebar row/group spacing tightened further.
+- User-facing strings in app/components/lib now say company instead of enterprise. TypeScript AST literal/JSX changes preserve internal identifiers, schema keys and literal scope value `enterprise`. Existing copy-sensitive test expectations were updated without changing data assertions.
+- Compensation is a navigation placeholder with TBD and an unavailable explanation. No data endpoint or AI panel is exposed for it.
+- lib/chat-model.ts holds gpt-5.6-luna, the actual existing model used by both response paths. The unchanged Ask People Analytics AI heading now has a small readable Powered by label using that same constant.
+- Validation: node --test --test-reporter=dot tests/*.test.mjs (63 pass), TypeScript and full Webpack placeholder-config build pass. 41 isolated candidate browser checks pass, including all destinations fitting 1366x768/1920x1080, mobile containment, Compensation/model label and preserved Planning inputs/comparison. Text contrast ratios: body 16.82, muted card 9.08, primary button 10.35, active teal 6.59; input border vs background 3.25.
+- Guide copy review boundary arrived after PR72 merge. The new first-person provenance rewrite was shown for review; current Guide source is byte-identical to PR72 and excluded from this follow-on. Its old enterprise terminology is intentionally held pending user approval. Requested orbit:writing-style was unavailable in local and cloud skill catalogs; plain first-person style used instead.
+- Source review confirms stored O*NET mapping counts, not a verified live O*NET API/import version. Live public BLS endpoint returned August 2026 observations on October 1. Skills/Learning as-of dates are application constants, not verified refresh timestamps. Survey favorability threshold and external questionnaire provenance remain unverified. No schema/access/credential changes.
+- Still queued: shared Country/Business Unit/Level row plus Reset and page-grounded automatic summaries with bounded cache/retries; supported aggregate CSV export. The request for a headcount list of names remains a separate roster/access assessment, not fulfilled by aggregates and not authorization to expand public data access. Guide rewrite waits for explicit copy approval.
+
+### Explicit Planning navigation reversal / exact release timeline
+
+- After seeing PR72 live, the user explicitly requested removal of the duplicate full-width controls and five shorter cards stretched equally across available desktop width. This supersedes the earlier keep-both instruction. The next stage retains the same five canonical destinations and handler, with a responsive two-column small-screen fallback and no duplicate strip.
+- Exact PR72 merge timestamp: 17:44:52 UTC; deployment success: 17:45:25 UTC. The reported Guide review request was at 17:45 UTC, after merge but before deployment success. The hold reached this executor after merge. All further Guide copy changes are held, not only the provenance rewrite. No guide rollback/deletion performed.
+- Latest free disk: 14,401,040,384 bytes (13.41GiB). No cleanup performed.
+
+### Reviewed Guide edits, approved separately
+
+- User reviewed the live Guide and said they liked it, then explicitly requested removal of Recent changes. Removed that public section only; this execution history remains intact.
+- User changed roadmap heading to "What's coming next" and V2 to "Compensation and location-based scenario modeling." This supersedes the earlier machine-learning/predictive proposal. It is future copy only, not implementation or a release-date commitment. V3 remains undefined.
+- The unseen provenance expansion remains held for review. Its exact proposed text was provided in commentary; it is not in the application or this release.
+
+- Final explicit roadmap correction: V3 is "Role-based user access and security, with chat agents tailored to each user or role"; V4 is "Machine learning and predictive analytics." These replace undefined V3 and the former V2 ML direction. Copy only; no auth/security/agent/ML implementation or dates authorized by this wording.
+
+### Final UI-stage release gate
+
+- After the explicit Planning reversal and exact approved roadmap changes, full Webpack build passed again. Final isolated browser replay passed 42 checks: no duplicate strip; all five shorter equal-width cards share a desktop row at 1920 and 1366, small-screen fallback contains width; scenario input, handoff and Talent comparison persist; exact V2/V3/V4 copy and removal of public Recent changes pass.
+- Targeted ESLint: zero errors, one pre-existing aria-description/separator warning in AiPanel. Earlier 63 repository tests and TypeScript pass; no application changes after final build except this log.
+- Latest approved Guide readability polish (two-column desktop cards, one-sentence Planning explanation, plain source names) is queued for the next bounded stage after this frozen UI release. W1/T1/P1 are application briefing source references created in lib/overview-briefing.ts, not database storage codes.

@@ -112,7 +112,7 @@ export function CareerGrowthMobilityPage({
         <EvidenceScopeNotice
           scope={enterpriseTalentEvidenceScope({
             label:
-              "Enterprise recorded movement events",
+              "Company recorded movement events",
             asOf:
               data.source.last_recorded_date,
             populationLabel:

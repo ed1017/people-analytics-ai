@@ -1578,7 +1578,7 @@ export default function Home() {
                       evidenceScopeForAi(
                         enterpriseTalentEvidenceScope({
                           label:
-                            "Enterprise workforce",
+                            "Company workforce",
                           asOf:
                             skillsData.as_of,
                           populationLabel:
@@ -1612,7 +1612,7 @@ export default function Home() {
                       evidenceScopeForAi(
                         enterpriseTalentEvidenceScope({
                           label:
-                            "Enterprise workforce",
+                            "Company workforce",
                           asOf:
                             learningDevelopmentData.as_of,
                           populationLabel:
@@ -1651,7 +1651,7 @@ export default function Home() {
                       evidenceScopeForAi(
                         enterpriseTalentEvidenceScope({
                           label:
-                            "Enterprise active workforce",
+                            "Company active workforce",
                           asOf:
                             careerMobilityData.as_of,
                           populationLabel:
@@ -1695,7 +1695,7 @@ export default function Home() {
                       evidenceScopeForAi(
                         enterpriseTalentEvidenceScope({
                           label:
-                            "Enterprise recorded movement events",
+                            "Company recorded movement events",
                           asOf:
                             careerGrowthMobilityData.source
                               .last_recorded_date,
@@ -1735,7 +1735,7 @@ export default function Home() {
                       evidenceScopeForAi(
                         enterpriseTalentEvidenceScope({
                           label:
-                            "Enterprise succession population",
+                            "Company succession population",
                           asOf:
                             successionCoverageData.as_of_date,
                           populationLabel:
@@ -1886,7 +1886,7 @@ export default function Home() {
       "Explain this deterministic workforce scenario and its business implications.",
       "",
       "Use the approved workforce scenario tool to rerun and verify these exact assumptions before explaining the result:",
-      `- Annual enterprise growth: ${assumptions.annual_growth_pct}%`,
+      `- Annual company growth: ${assumptions.annual_growth_pct}%`,
       `- Salary inflation: ${assumptions.salary_inflation_pct}%`,
       `- Annual attrition: ${assumptions.annual_attrition_pct}%`,
       `- Fill rate: ${assumptions.fill_rate_pct}%`,
@@ -2060,7 +2060,7 @@ export default function Home() {
 
       {/* Main application */}
       <div
-        className={`app-shell app-ai-${aiSide}${activePage === "home" || activePage === "guide-data" ? " app-home" : ""}`}
+        className={`app-shell app-ai-${aiSide}${activePage === "home" || activePage === "guide-data" || activePage === "compensation" ? " app-home" : ""}`}
         style={
           {
             "--nav-width": `${
@@ -2088,7 +2088,9 @@ export default function Home() {
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
         <div hidden={activePage !== "home"}><OverallOverviewPage active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} /></div>
-        {activePage === "guide-data" ? <GuideDataPage onBack={() => { setActivePage("home"); window.requestAnimationFrame(() => document.getElementById("overall-guide-link")?.focus()); }} /> : activePage === "home" ? null : activePage === "workforce" ? (
+        {activePage === "guide-data" ? <GuideDataPage onBack={() => { setActivePage("home"); window.requestAnimationFrame(() => document.getElementById("overall-guide-link")?.focus()); }} /> : activePage === "home" ? null : activePage === "compensation" ? (
+          <section className="p-6"><h1 className="text-2xl font-semibold">Compensation</h1><p className="mt-4 text-lg">TBD</p><p className="mt-2 text-muted-foreground">Planned destination. Compensation data and analysis are not available.</p></section>
+        ) : activePage === "workforce" ? (
           <>
           <h1 className="px-6 pt-6 text-2xl font-semibold">Workforce</h1>
           <OverviewPage
@@ -2268,7 +2270,7 @@ export default function Home() {
         )}
         </div>
 
-        {activePage !== "home" && activePage !== "guide-data" && <AiPanel
+        {activePage !== "home" && activePage !== "guide-data" && activePage !== "compensation" && <AiPanel
           aiCollapsed={aiCollapsed}
           aiExpanded={aiExpanded}
           aiSide={aiSide}

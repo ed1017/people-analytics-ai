@@ -86,7 +86,7 @@ export function OverviewPage({
             Selected workforce snapshot
           </h2>
           <p className="text-muted-foreground">
-            Filters apply to this snapshot and its trend only. Enterprise composition below remains unfiltered.
+            Filters apply to this snapshot and its trend only. Company composition below remains unfiltered.
           </p>
         </div>
 

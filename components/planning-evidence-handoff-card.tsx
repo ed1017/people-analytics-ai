@@ -81,7 +81,7 @@ export function PlanningEvidenceHandoffCard({
                 freshness.status === "current" &&
                 !freshnessChecking
                   ? "rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
-                  : "rounded-full border border-amber-700/40 bg-amber-700/10 px-2.5 py-1 text-xs font-medium text-amber-900"
+                  : "rounded-full border border-amber-700/40 bg-amber-700/10 px-2.5 py-1 text-xs font-medium text-amber-300"
               }
             >
               {statusLabel}
@@ -266,7 +266,7 @@ export function PlanningEvidenceHandoffCard({
             The business context above did not
             filter the Skills evidence. The
             carried evidence remains
-            enterprise-wide.
+            company-wide.
           </p>
 
           {contextChanged && (

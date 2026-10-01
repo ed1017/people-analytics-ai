@@ -50,6 +50,7 @@ export const appNavigationSections: AppNavigationSection[] = [
     pages: [
       "workforce",
       "attrition",
+      "compensation",
       "talent-acquisition",
       "survey-sentiment",
     ],
@@ -96,6 +97,7 @@ export const appPageMetadata: Record<
     description:
       "Workforce size, structure, tenure, management layers, and mobility.",
   },
+  compensation: { label: "Compensation", section: "Workforce Analytics", description: "Planned destination. TBD; no compensation data is available." },
   attrition: {
     label: "Attrition",
     section: "Workforce Analytics",
@@ -153,7 +155,7 @@ export const appPageMetadata: Record<
     label: "Scenario Modeling",
     section: "Workforce Strategy & Planning",
     description:
-      "Model enterprise and business-unit workforce demand and compare scenarios.",
+      "Model company and business-unit workforce demand and compare scenarios.",
   },
   "position-workforce-design": {
     label: "Position & Workforce Design",

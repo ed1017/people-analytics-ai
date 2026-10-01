@@ -277,7 +277,7 @@ export function ResponsePortfolioControls({
                   Organizational Demand Ownership
                 </p>
                 <p className="text-[11px] text-muted-foreground">
-                  Signed modeled role-demand deltas by business unit. These reconcile to enterprise role demand; Build / Move / Buy remain role-level allocations.
+                  Signed modeled role-demand deltas by business unit. These reconcile to company role demand; Build / Move / Buy remain role-level allocations.
                 </p>
               </div>
 

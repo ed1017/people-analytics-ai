@@ -378,7 +378,7 @@ export function validateCareerGrowthRequest(
       ok: false as const,
       status: 400,
       error:
-        "Career Growth & Internal Mobility is enterprise-only and does not accept dashboard filters.",
+        "Career Growth & Internal Mobility is company-only and does not accept dashboard filters.",
     };
   }
   return { ok: true as const };

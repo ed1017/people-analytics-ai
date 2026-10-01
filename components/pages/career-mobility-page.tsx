@@ -69,7 +69,7 @@ export function CareerMobilityPage({
       {data && (
         <EvidenceScopeNotice
           scope={enterpriseTalentEvidenceScope({
-            label: "Enterprise active workforce",
+            label: "Company active workforce",
             asOf: data.as_of,
             populationLabel: "active employees",
             populationCount:
@@ -79,7 +79,7 @@ export function CareerMobilityPage({
             ],
           })}
           selectedContext={selectedContext}
-          note="Only Current Organization Coverage contains its own business-unit coverage rows; interest, destination, and relocation distributions remain enterprise-wide."
+          note="Only Current Organization Coverage contains its own business-unit coverage rows; interest, destination, and relocation distributions remain company-wide."
         />
       )}
 

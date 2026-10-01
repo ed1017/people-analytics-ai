@@ -132,7 +132,7 @@ export function createSkillsEvidenceHandoff(
     return {
       ok: false,
       error:
-        "Only explicitly enterprise-scoped Skills evidence can be carried to Planning.",
+        "Only explicitly company-scoped Skills evidence can be carried to Planning.",
     };
   }
 
@@ -252,7 +252,7 @@ export function assessSkillsEvidenceFreshness(
     return {
       status: "stale",
       reason:
-        "The enterprise workforce denominator has changed since this evidence was carried.",
+        "The company workforce denominator has changed since this evidence was carried.",
     };
   }
 
@@ -317,6 +317,6 @@ export function assessSkillsEvidenceFreshness(
   return {
     status: "current",
     reason:
-      "The carried snapshot matches the currently loaded enterprise Skills source.",
+      "The carried snapshot matches the currently loaded company Skills source.",
   };
 }

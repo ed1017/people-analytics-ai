@@ -17,6 +17,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { CHAT_MODEL } from "@/lib/chat-model";
 import { Button } from "@/components/ui/button";
 import { ChatContent } from "@/components/chat-content";
 import type { ChatMessage } from "@/lib/types";
@@ -150,9 +151,9 @@ export function AiPanel({
           {!aiCollapsed && (
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
-              <h2 className="text-xl font-semibold">
+              <div><h2 className="text-xl font-semibold">
                 Ask People Analytics AI
-              </h2>
+              </h2><p className="mt-1 text-sm text-muted-foreground">Powered by {CHAT_MODEL}</p></div>
             </div>
           )}
 

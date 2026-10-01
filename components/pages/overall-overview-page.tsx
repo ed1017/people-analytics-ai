@@ -92,7 +92,7 @@ export function OverallOverviewPage({ active, persona, onNavigate }: {
       <h2 id="overall-overview-heading" className="text-3xl font-semibold tracking-tight sm:text-4xl">Your workforce, in perspective.</h2>
       <button id="overall-guide-link" type="button" onClick={() => onNavigate("guide-data")} className="mt-3 rounded-sm font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Guide &amp; Data</button>
       <p className="mt-3 max-w-2xl text-lg text-muted-foreground">Start with the evidence. Explore what matters. Work through your next question.</p>
-      <p className="mt-3 text-sm text-muted-foreground">Enterprise overview · Synthetic workforce data · Each source keeps its own date and population</p>
+      <p className="mt-3 text-sm text-muted-foreground">Company overview · Synthetic workforce data · Each source keeps its own date and population</p>
     </header>
 
     <section aria-label="Key findings" className="rounded-2xl border bg-card p-5 shadow-sm sm:p-7">

@@ -76,7 +76,7 @@ export function LearningDevelopmentPage({
       {data && (
         <EvidenceScopeNotice
           scope={enterpriseTalentEvidenceScope({
-            label: "Enterprise workforce",
+            label: "Company workforce",
             asOf: data.as_of,
             populationLabel: "employees",
             populationCount:

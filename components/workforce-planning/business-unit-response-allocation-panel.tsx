@@ -213,7 +213,7 @@ export function BusinessUnitResponseAllocationPanel({
             <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-md border p-3">
                 <p className="text-[11px] text-muted-foreground">
-                  Enterprise Net Need
+                  Company Net Need
                 </p>
                 <p className="mt-1 text-xl font-semibold">
                   {formatCapacity(
@@ -330,7 +330,7 @@ export function BusinessUnitResponseAllocationPanel({
 
             <div className="mt-3 text-[11px] text-muted-foreground">
               {formatWholeCount(result.unallocated_destinations.length)} positive destination row(s) remain unallocated ·{" "}
-              {formatWholeCount(result.contractions.length)} contraction offset row(s). Destination gaps are not automatically treated as enterprise gaps.
+              {formatWholeCount(result.contractions.length)} contraction offset row(s). Destination gaps are not automatically treated as company gaps.
             </div>
 
             {result.warnings.length > 0 && (
