@@ -571,7 +571,7 @@ export async function GET() {
     );
   } catch (error) {
     console.error(
-      "Career & Mobility API error:",
+      "Career Interests API error:",
       error
     );
 
@@ -580,7 +580,7 @@ export async function GET() {
         error:
           error instanceof Error
             ? error.message
-            : "Failed to load Career & Mobility data.",
+            : "Failed to load Career Interests data.",
       },
       { status: 500 }
     );

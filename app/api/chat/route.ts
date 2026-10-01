@@ -837,7 +837,7 @@ Interpretation rules:
       page === "career-mobility" &&
       careerMobilityContext
         ? `
-CURRENT CAREER & MOBILITY CONTEXT
+CURRENT CAREER INTERESTS CONTEXT
 Preference-record summary:
 - Active employees: ${careerMobilityContext.summary.active_employees}
 - Employees with a recorded career preference: ${careerMobilityContext.summary.employees_with_preference}

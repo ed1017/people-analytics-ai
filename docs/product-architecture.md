@@ -40,7 +40,7 @@ This is the core measurement layer: what is happening in the workforce, where it
 
 - Skills Intelligence
 - Learning & Development
-- Career & Mobility
+- Career Interests
 - Succession Planning
 - Internal Talent / Readiness
 
