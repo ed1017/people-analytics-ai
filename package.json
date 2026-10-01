@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test:succession": "node --test tests/succession-public-contract.test.mjs",
     "test:talent-scope": "node --test tests/talent-evidence-scope.test.mjs",
-    "test:handoff": "node --test tests/evidence-handoff.test.mjs"
+    "test:handoff": "node --test tests/evidence-handoff.test.mjs",
+    "test:career-growth": "node --test tests/career-growth-mobility.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

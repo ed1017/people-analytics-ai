@@ -17,6 +17,8 @@ import { FinancePage } from "@/components/pages/finance-page";
 import { SkillsPage } from "@/components/pages/skills-page";
 import { LearningDevelopmentPage } from "@/components/pages/learning-development-page";
 import { CareerMobilityPage } from "@/components/pages/career-mobility-page";
+import { CareerGrowthMobilityPage } from "@/components/pages/career-growth-mobility-page";
+import type { CareerGrowthMobilityResponse } from "@/lib/career-growth-mobility";
 import { SuccessionPlanningPage } from "@/components/pages/succession-planning-page";
 import { WorkforcePlanningPage } from "@/components/pages/workforce-planning-page";
 import { PlanningSessionProvider } from "@/components/workforce-planning/planning-session-context";
@@ -206,6 +208,20 @@ export default function Home() {
   ] = useState<CareerMobilityResponse | null>(
     null
   );
+  const [
+    careerGrowthMobilityData,
+    setCareerGrowthMobilityData,
+  ] = useState<CareerGrowthMobilityResponse | null>(
+    null
+  );
+  const [
+    careerGrowthMobilityLoading,
+    setCareerGrowthMobilityLoading,
+  ] = useState(false);
+  const [
+    careerGrowthMobilityError,
+    setCareerGrowthMobilityError,
+  ] = useState<string | null>(null);
   const [
     careerMobilityLoading,
     setCareerMobilityLoading,
@@ -805,6 +821,50 @@ export default function Home() {
   }, [
     activePage,
     careerMobilityData,
+  ]);
+
+  useEffect(() => {
+    if (
+      activePage !==
+        "career-growth-mobility" ||
+      careerGrowthMobilityData
+    ) {
+      return;
+    }
+
+    async function loadCareerGrowthMobility() {
+      try {
+        setCareerGrowthMobilityLoading(true);
+        setCareerGrowthMobilityError(null);
+        const response = await fetch(
+          "/api/career-growth-mobility",
+          { cache: "no-store" }
+        );
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(
+            payload?.error ??
+              "Career Growth & Internal Mobility data is unavailable."
+          );
+        }
+        setCareerGrowthMobilityData(
+          payload as CareerGrowthMobilityResponse
+        );
+      } catch (error) {
+        setCareerGrowthMobilityError(
+          error instanceof Error
+            ? error.message
+            : "Career Growth & Internal Mobility data is unavailable."
+        );
+      } finally {
+        setCareerGrowthMobilityLoading(false);
+      }
+    }
+
+    loadCareerGrowthMobility();
+  }, [
+    activePage,
+    careerGrowthMobilityData,
   ]);
 
   useEffect(() => {
@@ -1545,6 +1605,45 @@ export default function Home() {
                   }
                 : null,
 
+            careerGrowthMobilityContext:
+              activePage ===
+                "career-growth-mobility" &&
+              careerGrowthMobilityData
+                ? {
+                    evidenceScope:
+                      evidenceScopeForAi(
+                        enterpriseTalentEvidenceScope({
+                          label:
+                            "Enterprise recorded movement events",
+                          asOf:
+                            careerGrowthMobilityData.source
+                              .last_recorded_date,
+                          populationLabel:
+                            "recorded movement events",
+                          populationCount:
+                            careerGrowthMobilityData.source
+                              .total_recorded_events,
+                          supportedBreakdowns: [
+                            "movement_type",
+                            "month",
+                            "job_level_transition",
+                          ],
+                        }),
+                        selectedBusinessContext
+                      ),
+                    source:
+                      careerGrowthMobilityData.source,
+                    composition:
+                      careerGrowthMobilityData.composition,
+                    monthly:
+                      careerGrowthMobilityData.monthly,
+                    levelTransitions:
+                      careerGrowthMobilityData.level_transitions,
+                    limitations:
+                      careerGrowthMobilityData.limitations,
+                  }
+                : null,
+
             successionCoverageContext:
               activePage ===
                 "succession-planning" &&
@@ -1952,6 +2051,16 @@ export default function Home() {
             data={careerMobilityData}
             loading={careerMobilityLoading}
             error={careerMobilityError}
+            selectedContext={
+              selectedBusinessContext
+            }
+          />
+        ) : activePage ===
+          "career-growth-mobility" ? (
+          <CareerGrowthMobilityPage
+            data={careerGrowthMobilityData}
+            loading={careerGrowthMobilityLoading}
+            error={careerGrowthMobilityError}
             selectedContext={
               selectedBusinessContext
             }

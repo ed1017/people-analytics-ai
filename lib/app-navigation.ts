@@ -62,6 +62,7 @@ export const appNavigationSections: AppNavigationSection[] = [
       "skills",
       "learning-development",
       "career-mobility",
+      "career-growth-mobility",
       "succession-planning",
     ],
   },  {
@@ -124,6 +125,12 @@ export const appPageMetadata: Record<
     section: "Talent Management",
     description:
       "Recorded career interests, desired destinations, relocation willingness, and preference coverage.",
+  },
+  "career-growth-mobility": {
+    label: "Career Growth & Internal Mobility",
+    section: "Talent Management",
+    description:
+      "Recorded promotions, lateral moves, transfers, monthly movement events, and supported job-level transitions.",
   },
   "succession-planning": {
     label: "Succession Planning",
