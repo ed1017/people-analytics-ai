@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, type ReactNode } from "react";
+import { PageHelp } from "@/components/page-help";
 import {
   ChevronRight,
   Sparkles,
@@ -57,6 +58,7 @@ export function AppHeader({
                 {page.label}
               </span>
             </div>
+            <PageHelp key={activePage} page={activePage} label={page.label} />
           </div>
           <p className="hidden truncate text-xs text-muted-foreground md:block">
             People Analytics & Workforce Planning
