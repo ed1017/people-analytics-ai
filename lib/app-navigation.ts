@@ -92,10 +92,10 @@ export const appPageMetadata: Record<
       "Learning pathway coverage for current skill gaps and job-profile requirements.",
   },
   "career-mobility": {
-    label: "Career & Mobility",
+    label: "Career Interests",
     section: "Talent Management",
     description:
-      "Aggregate recorded career interests, desired destinations, and preference coverage.",
+      "Recorded career interests, desired destinations, relocation willingness, and preference coverage.",
   },
   "succession-planning": {
     label: "Succession Planning",
