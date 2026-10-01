@@ -60,6 +60,11 @@ const pageIcons: Record<
   "career-mobility": Compass,
   "career-growth-mobility": TrendingUp,
   "succession-planning": ShieldCheck,
+  "planning-overview": LayoutDashboard,
+  "scenario-modeling": CalendarDays,
+  "position-workforce-design": Users,
+  "workforce-response": TrendingUp,
+  "execution-feasibility": ShieldCheck,
   "workforce-planning": CalendarDays,
 };
 
