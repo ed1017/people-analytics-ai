@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
 
 import { RoleResponseEvidenceSummary } from "./role-response-evidence-summary";
+import { TalentResponseEvidence } from "./talent-response-evidence";
 import type {
   RoleWorkforceResponsePlanResponse,
   StructuralPositionScenarioResponse,
@@ -8,6 +9,7 @@ import type {
 } from "@/lib/types";
 
 type RoleWorkforceResponsePlanProps = {
+  evidenceGoal?: string;
   scenario: StructuralPositionScenarioResponse;
   roleResponsePlanProfile: string;
   setRoleResponsePlanProfile: Dispatch<SetStateAction<string>>;
@@ -43,6 +45,7 @@ function formatModeledCount(value: number) {
 }
 
 export function RoleWorkforceResponsePlan({
+  evidenceGoal,
   scenario,
   roleResponsePlanProfile,
   setRoleResponsePlanProfile,
@@ -193,6 +196,14 @@ export function RoleWorkforceResponsePlan({
                                     {roleResponsePlanError}
                                   </div>
                                 )}
+
+                                <TalentResponseEvidence
+                                  key={`${roleResponsePlanProfile}:${evidenceGoal ?? ""}`}
+                                  roleCode={roleResponsePlanProfile}
+                                  roleName={scenario.job_profile_impact.find((row) => row.job_profile_code === roleResponsePlanProfile)?.job_profile_name ?? ""}
+                                  initialGoal={evidenceGoal}
+                                  rolePlan={roleResponsePlanResult}
+                                />
 
                                 {roleResponsePlanResult && (
                                   <RoleResponseEvidenceSummary

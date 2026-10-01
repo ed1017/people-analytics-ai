@@ -2235,6 +2235,7 @@ export function WorkforcePlanningPage({
                     : null
                 }
                 rolePlanProps={{
+                  evidenceGoal: evidenceHandoff?.businessGoal,
                   roleResponsePlanProfile,
                   setRoleResponsePlanProfile,
                   roleResponsePlanAllocation,
