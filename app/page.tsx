@@ -24,6 +24,11 @@ import { TalentAcquisitionPage } from "@/components/pages/talent-acquisition-pag
 import { SurveySentimentPage } from "@/components/pages/survey-sentiment-page";
 import { AiPanel } from "@/components/ai-panel";
 import {
+  assessSkillsEvidenceFreshness,
+  type EvidenceFreshness,
+  type PlanningEvidenceHandoff,
+} from "@/lib/evidence-handoff";
+import {
   getDefaultPageForWorkspace,
   getWorkspaceForPage,
   type AppWorkspaceKey,
@@ -257,6 +262,26 @@ export default function Home() {
   const [chatLoading, setChatLoading] = useState(false);
   const [chatError, setChatError] =
     useState<string | null>(null);
+
+  const [
+    planningEvidenceHandoff,
+    setPlanningEvidenceHandoff,
+  ] = useState<PlanningEvidenceHandoff | null>(
+    null
+  );
+  const [
+    planningEvidenceFreshness,
+    setPlanningEvidenceFreshness,
+  ] = useState<EvidenceFreshness>({
+    status: "unavailable",
+    reason: "No evidence handoff is active.",
+  });
+  const [
+    planningEvidenceFreshnessChecking,
+    setPlanningEvidenceFreshnessChecking,
+  ] = useState(false);
+  const handoffValidationRequestIdRef =
+    useRef(0);
 
   useEffect(() => {
     try {
@@ -927,6 +952,134 @@ export default function Home() {
       ]
     );
 
+  const openPlanningWithHandoff = () => {
+    lastPageByWorkspaceRef.current.strategy =
+      "workforce-planning";
+    setActivePage("workforce-planning");
+  };
+
+  const backToSkillsFromHandoff = () => {
+    lastPageByWorkspaceRef.current.talent =
+      "skills";
+    setActivePage("skills");
+  };
+
+  const clearPlanningEvidenceHandoff = () => {
+    handoffValidationRequestIdRef.current +=
+      1;
+    setPlanningEvidenceHandoff(null);
+    setPlanningEvidenceFreshnessChecking(
+      false
+    );
+    setPlanningEvidenceFreshness({
+      status: "unavailable",
+      reason:
+        "No evidence handoff is active.",
+    });
+  };
+
+  const carryEvidenceToPlanning = (
+    handoff: PlanningEvidenceHandoff
+  ) => {
+    setPlanningEvidenceHandoff(handoff);
+    setPlanningEvidenceFreshness(
+      assessSkillsEvidenceFreshness(
+        handoff,
+        skillsData
+      )
+    );
+    openPlanningWithHandoff();
+  };
+
+  const revalidatePlanningEvidenceHandoff =
+    async (
+      handoff: PlanningEvidenceHandoff
+    ) => {
+      const requestId =
+        ++handoffValidationRequestIdRef.current;
+      setPlanningEvidenceFreshnessChecking(
+        true
+      );
+
+      try {
+        const response = await fetch(
+          "/api/skills",
+          {
+            cache: "no-store",
+          }
+        );
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            payload?.error ??
+              "Current Skills evidence is unavailable."
+          );
+        }
+
+        if (
+          requestId !==
+          handoffValidationRequestIdRef.current
+        ) {
+          return;
+        }
+
+        const currentSkills =
+          payload as SkillsResponse;
+
+        setSkillsData(currentSkills);
+        setPlanningEvidenceFreshness(
+          assessSkillsEvidenceFreshness(
+            handoff,
+            currentSkills
+          )
+        );
+      } catch (error) {
+        if (
+          requestId !==
+          handoffValidationRequestIdRef.current
+        ) {
+          return;
+        }
+
+        setPlanningEvidenceFreshness({
+          status: "unavailable",
+          reason:
+            error instanceof Error
+              ? error.message
+              : "Current Skills evidence is unavailable.",
+        });
+      } finally {
+        if (
+          requestId ===
+          handoffValidationRequestIdRef.current
+        ) {
+          setPlanningEvidenceFreshnessChecking(
+            false
+          );
+        }
+      }
+    };
+
+  useEffect(() => {
+    if (
+      activePage !==
+        "workforce-planning" ||
+      !planningEvidenceHandoff
+    ) {
+      return;
+    }
+
+    void revalidatePlanningEvidenceHandoff(
+      planningEvidenceHandoff
+    );
+    // The packet itself is the trigger; source
+    // validation is intentionally read-only.
+  }, [
+    activePage,
+    planningEvidenceHandoff,
+  ]);
+
   const headcountGrowthPct =
     headcountTrend.length >= 2 &&
     headcountTrend[0].headcount > 0
@@ -1462,6 +1615,19 @@ export default function Home() {
                   }
                 : null,
 
+            planningEvidenceHandoffContext:
+              planningEvidenceHandoff
+                ? {
+                    ...planningEvidenceHandoff,
+                    freshness:
+                      planningEvidenceFreshness,
+                    freshnessChecking:
+                      planningEvidenceFreshnessChecking,
+                    currentBusinessContext:
+                      selectedBusinessContext,
+                  }
+                : null,
+
             history:
               nextMessages.slice(-8),
             context: {
@@ -1757,6 +1923,18 @@ export default function Home() {
             selectedContext={
               selectedBusinessContext
             }
+            activeHandoff={
+              planningEvidenceHandoff
+            }
+            onCarryToPlanning={
+              carryEvidenceToPlanning
+            }
+            onClearHandoff={
+              clearPlanningEvidenceHandoff
+            }
+            onOpenPlanning={
+              openPlanningWithHandoff
+            }
           />
         ) : activePage ===
           "learning-development" ? (
@@ -1810,6 +1988,33 @@ export default function Home() {
             positionLevels={positionLevels}
             onScenarioChange={setSelectedPlanningScenario}
             onExplainCustomScenario={explainCustomScenario}
+            evidenceHandoff={
+              planningEvidenceHandoff
+            }
+            evidenceFreshness={
+              planningEvidenceFreshness
+            }
+            evidenceFreshnessChecking={
+              planningEvidenceFreshnessChecking
+            }
+            currentBusinessContext={
+              selectedBusinessContext
+            }
+            onBackToSkills={
+              backToSkillsFromHandoff
+            }
+            onClearEvidenceHandoff={
+              clearPlanningEvidenceHandoff
+            }
+            onRefreshEvidenceHandoff={() => {
+              if (
+                planningEvidenceHandoff
+              ) {
+                void revalidatePlanningEvidenceHandoff(
+                  planningEvidenceHandoff
+                );
+              }
+            }}
           />
         )}
         </div>

@@ -5,6 +5,9 @@ import {
   useState,
 } from "react";
 import { WorkforcePlanningWorkflowNavigation } from "@/components/workforce-planning/workflow-navigation";
+import { PlanningEvidenceHandoffCard } from "@/components/planning-evidence-handoff-card";
+import type { EvidenceFreshness, PlanningEvidenceHandoff } from "@/lib/evidence-handoff";
+import type { SelectedBusinessContext } from "@/lib/talent-evidence-scope";
 import { ScenarioModelingDestination } from "@/components/workforce-planning/scenario-modeling-destination";
 import { PositionWorkforceDesignDestination } from "@/components/workforce-planning/position-workforce-design-destination";
 import { WorkforceResponseDestination } from "@/components/workforce-planning/workforce-response-destination";
@@ -61,6 +64,13 @@ type WorkforcePlanningPageProps = {
   onExplainCustomScenario: (
     scenario: ScenarioModelResponse
   ) => void | Promise<void>;
+  evidenceHandoff: PlanningEvidenceHandoff | null;
+  evidenceFreshness: EvidenceFreshness;
+  evidenceFreshnessChecking: boolean;
+  currentBusinessContext: SelectedBusinessContext;
+  onBackToSkills: () => void;
+  onClearEvidenceHandoff: () => void;
+  onRefreshEvidenceHandoff: () => void;
 };
 
 function formatModeledCount(value: number) {
@@ -235,6 +245,13 @@ export function WorkforcePlanningPage({
   positionLevels,
   onScenarioChange,
   onExplainCustomScenario,
+  evidenceHandoff,
+  evidenceFreshness,
+  evidenceFreshnessChecking,
+  currentBusinessContext,
+  onBackToSkills,
+  onClearEvidenceHandoff,
+  onRefreshEvidenceHandoff,
 }: WorkforcePlanningPageProps) {
   const {
     activeView: workflowView,
@@ -1993,6 +2010,28 @@ export function WorkforcePlanningPage({
                 : "2027 Enterprise Workforce Plan"}
             </span>
           </div>
+
+          {evidenceHandoff && (
+            <PlanningEvidenceHandoffCard
+              handoff={evidenceHandoff}
+              freshness={evidenceFreshness}
+              freshnessChecking={
+                evidenceFreshnessChecking
+              }
+              currentBusinessContext={
+                currentBusinessContext
+              }
+              onBackToSkills={
+                onBackToSkills
+              }
+              onClear={
+                onClearEvidenceHandoff
+              }
+              onRefresh={
+                onRefreshEvidenceHandoff
+              }
+            />
+          )}
 
           <WorkforcePlanningWorkflowNavigation
             activeView={workflowView}

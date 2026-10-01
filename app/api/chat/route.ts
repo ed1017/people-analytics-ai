@@ -177,6 +177,53 @@ type EvidenceScopeContext = {
   selected_context_narrows_evidence: false;
 };
 
+type PlanningEvidenceHandoffContext = {
+  id: string;
+  kind: "skills_gap";
+  createdAt: string;
+  evidence: {
+    sourcePage: "skills";
+    sourceLabel: string;
+    asOf: string;
+    evidenceScope: "enterprise";
+    evidenceLabel: string;
+    populationLabel: string;
+    populationCount: number;
+    selectedBusinessContext: {
+      country: string;
+      businessUnit: string;
+      level: string;
+    };
+    skill: {
+      skillId: string;
+      skillCode: string;
+      skillName: string;
+      skillCategory: string;
+      demandPopulation: number;
+      observedProficiencyRecords: number;
+      employeesMeetingRequirement: number;
+      employeesBelowOrMissingRequirement: number;
+      avgRequiredProficiency: number;
+      avgObservedProficiency: number;
+      avgProficiencyGap: number;
+      profileCoveragePct: number;
+      requirementMetPct: number;
+    };
+  };
+  businessGoal: string;
+  userAssumptions: string | null;
+  freshness: {
+    status: "current" | "stale" | "unavailable";
+    reason: string;
+  };
+  freshnessChecking: boolean;
+  currentBusinessContext: {
+    country: string;
+    businessUnit: string;
+    level: string;
+  };
+};
+
 type SkillContextRow = {
   skill_name: string;
   skill_category: string;
@@ -522,6 +569,11 @@ export async function POST(
         ? (body.positionContext as PositionContext)
         : null;
 
+    const planningEvidenceHandoffContext =
+      body?.planningEvidenceHandoffContext
+        ? (body.planningEvidenceHandoffContext as PlanningEvidenceHandoffContext)
+        : null;
+
     const financeContext =
       body?.financeContext
         ? (body.financeContext as FinanceContext)
@@ -650,6 +702,52 @@ Interpretation rules:
 - Tenure and career-level tables show exit counts unless a rate is explicitly supplied.
 - Reported separation reasons are administrative records, not proven causal drivers.
 - Regrettable attrition is a supplied flag in the synthetic dataset; do not infer additional regrettability.
+`.trim()
+        : "";
+
+    const planningEvidenceHandoffPrompt =
+      planningEvidenceHandoffContext
+        ? `
+CARRIED EVIDENCE HANDOFF
+Handoff freshness: ${planningEvidenceHandoffContext.freshnessChecking ? "checking" : planningEvidenceHandoffContext.freshness.status}
+Freshness detail: ${planningEvidenceHandoffContext.freshness.reason}
+
+Observed evidence:
+- Source: ${planningEvidenceHandoffContext.evidence.sourceLabel}
+- Source date: ${planningEvidenceHandoffContext.evidence.asOf}
+- Evidence scope: ${planningEvidenceHandoffContext.evidence.evidenceLabel}
+- Evidence population: ${planningEvidenceHandoffContext.evidence.populationCount} ${planningEvidenceHandoffContext.evidence.populationLabel}
+- Skill: ${planningEvidenceHandoffContext.evidence.skill.skillName} (${planningEvidenceHandoffContext.evidence.skill.skillCategory})
+- Demand population: ${planningEvidenceHandoffContext.evidence.skill.demandPopulation}
+- Employees below or missing requirement: ${planningEvidenceHandoffContext.evidence.skill.employeesBelowOrMissingRequirement}
+- Requirement attainment: ${planningEvidenceHandoffContext.evidence.skill.requirementMetPct}%
+- Required / observed proficiency: ${planningEvidenceHandoffContext.evidence.skill.avgRequiredProficiency} / ${planningEvidenceHandoffContext.evidence.skill.avgObservedProficiency}
+
+Captured business context when the user carried the evidence:
+- Country: ${planningEvidenceHandoffContext.evidence.selectedBusinessContext.country}
+- Business unit: ${planningEvidenceHandoffContext.evidence.selectedBusinessContext.businessUnit}
+- Level: ${planningEvidenceHandoffContext.evidence.selectedBusinessContext.level}
+
+Current selected business context:
+- Country: ${planningEvidenceHandoffContext.currentBusinessContext.country}
+- Business unit: ${planningEvidenceHandoffContext.currentBusinessContext.businessUnit}
+- Level: ${planningEvidenceHandoffContext.currentBusinessContext.level}
+
+User-stated business goal:
+${planningEvidenceHandoffContext.businessGoal}
+
+User-stated assumptions:
+${planningEvidenceHandoffContext.userAssumptions ?? "No assumptions stated."}
+
+Handoff rules:
+- The observed Skills evidence is enterprise-scoped. The captured or current business context does not make it business-unit-, country-, or level-specific.
+- The business goal is user-stated intent, not an observed workforce fact.
+- The assumptions are user-stated notes, not validated facts, approved decisions, or confirmed model inputs.
+- The handoff is context only. Its existence must NEVER trigger a scenario/tool call, navigation, Build/Move/Buy allocation, approval, or source-data change.
+- Only run an approved deterministic planning tool when the user explicitly asks to model something and supplies the required supported values.
+- Never invent missing numeric assumptions or choose response amounts to make a plan complete.
+- If freshness is stale, unavailable, or still checking, do not present the carried evidence as current. State the freshness problem and ask the user to recheck or replace the packet from Skills.
+- Do not recommend, rank, identify, or infer individual employees from this aggregate evidence.
 `.trim()
         : "";
 
@@ -1187,6 +1285,7 @@ Shared rules:
 - The CURRENT SELECTED BUSINESS CONTEXT is navigation/business context. Never assume it filters another page or tool result unless that evidence explicitly says the country, business-unit, or level filter was applied.
 - Evidence scope metadata overrides selected-context labels. If evidence says enterprise and filters were not applied, never describe it as specific to the selected country, business unit, or level.
 - If a requested country, business-unit, or level breakdown is not supported by the current page/tool evidence, say the breakdown is unavailable and, when useful, offer the available enterprise evidence with its source date and denominator.
+- A carried evidence handoff is context only. Never call a planning tool merely because a handoff exists; tool execution still requires an explicit user modeling request with the supported inputs.
 - For cross-page, cross-business-unit, or overall-company questions that require data outside the current page context, call the relevant People Analytics tool rather than guessing.
 - You may call more than one tool when a question spans domains.
 - Do not call a tool when the current page context already contains everything needed for a simple page-specific answer.
@@ -1254,6 +1353,8 @@ ${workforceContext}
 ${workforceDetailPrompt}
 
 ${attritionPrompt}
+
+${planningEvidenceHandoffPrompt}
 
 ${planningPrompt}
 
