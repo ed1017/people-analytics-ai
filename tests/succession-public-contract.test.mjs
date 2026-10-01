@@ -1,14 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import contract from "../lib/succession-public-contract.js";
-
-const {
+import {
   SUCCESSION_PUBLIC_FIELDS,
   validateSuccessionApiRequest,
   validateSuccessionPublicSummary,
   validateSuccessionRows,
-} = contract;
+} from "../lib/succession-public-contract.mjs";
 
 const normal = {
   as_of_date: "2026-09-30",
