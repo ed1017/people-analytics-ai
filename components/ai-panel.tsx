@@ -217,8 +217,8 @@ export function AiPanel({
                 }
                 className={
                   aiSide === "left"
-                    ? "rounded-md bg-muted px-3 py-2 font-medium"
-                    : "rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+                    ? "h-7 rounded-md bg-muted px-3 py-0.5 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    : "h-7 rounded-md px-3 py-0.5 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 }
               >
                 Left
@@ -231,8 +231,8 @@ export function AiPanel({
                 }
                 className={
                   aiSide === "right"
-                    ? "rounded-md bg-muted px-3 py-2 font-medium"
-                    : "rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+                    ? "h-7 rounded-md bg-muted px-3 py-0.5 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    : "h-7 rounded-md px-3 py-0.5 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 }
               >
                 Right
