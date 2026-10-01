@@ -794,6 +794,8 @@ Interpretation rule:
       skillsContext
         ? `
 CURRENT WORKFORCE SKILLS CONTEXT
+${formatEvidenceScope(skillsContext.evidenceScope)}
+
 Skills summary:
 - Active internal skills: ${skillsContext.summary.active_skills}
 - Current workforce: ${skillsContext.summary.current_workforce}
@@ -833,6 +835,7 @@ Interpretation rules:
 - Missing or stale skill data does not prove an employee lacks a capability.
 - Do not call a gap a verified shortage unless the supplied data supports that conclusion.
 - O*NET is an external reference layer; do not imply O*NET directly measured this company's employees.
+- Country, business-unit, and level skill breakdowns are not available in this page evidence. If asked for one, say it is unavailable and optionally provide the enterprise evidence explicitly labeled as enterprise.
 `.trim()
         : "";
 
@@ -841,6 +844,8 @@ Interpretation rules:
       learningDevelopmentContext
         ? `
 CURRENT LEARNING & DEVELOPMENT CONTEXT
+${formatEvidenceScope(learningDevelopmentContext.evidenceScope)}
+
 Pathway summary:
 - Current gap skills: ${learningDevelopmentContext.summary.current_gap_skills}
 - Gap skills with an active learning pathway: ${learningDevelopmentContext.summary.gap_skills_with_active_pathway}
@@ -874,6 +879,7 @@ Interpretation rules:
 - Job-profile pathway coverage is coverage of required skills by active mapped courses; it does not measure employee readiness for that profile.
 - Missing or stale skill records are part of the current gap signal and are not proof that an employee lacks a capability.
 - Results are aggregate only. Do not expose, rank, or recommend individual employees.
+- Country, business-unit, and level L&D breakdowns are not available in this page evidence. If asked for one, say it is unavailable and optionally provide the enterprise evidence explicitly labeled as enterprise.
 `.trim()
         : "";
 
@@ -882,6 +888,8 @@ Interpretation rules:
       careerMobilityContext
         ? `
 CURRENT CAREER INTERESTS CONTEXT
+${formatEvidenceScope(careerMobilityContext.evidenceScope)}
+
 Preference-record summary:
 - Active employees: ${careerMobilityContext.summary.active_employees}
 - Employees with a recorded career preference: ${careerMobilityContext.summary.employees_with_preference}
@@ -915,6 +923,8 @@ Interpretation rules:
 - Desired roles and locations are expressed destinations, not vacancies or recommendations.
 - Relocation willingness is a recorded preference field and does not establish that relocation will occur.
 - Organization-level differences are descriptive coverage patterns only; do not infer engagement, manager quality, mobility opportunity, or employee intent beyond the supplied fields.
+- Current-organization preference coverage is the only business-unit-specific breakdown supplied here. Do not relabel career-interest categories, desired roles, desired locations, relocation willingness, or enterprise summary metrics as business-unit-specific.
+- Country and level breakdowns are unavailable in this evidence. If asked for an unsupported breakdown, say it is unavailable and only use the supported enterprise or current-organization coverage evidence.
 - Results are aggregate only. Do not expose, rank, or recommend individual employees.
 `.trim()
         : "";
@@ -924,6 +934,8 @@ Interpretation rules:
         ? successionCoverageContext
           ? `
 CURRENT SUCCESSION PLANNING CONTEXT
+${formatEvidenceScope(successionCoverageContext.evidenceScope)}
+
 Assessment date: ${successionCoverageContext.as_of_date ?? "No recorded assessment"}
 Small-cell threshold: k=${successionCoverageContext.small_cell_threshold}
 Active critical job profiles: ${successionCoverageContext.critical_job_profiles}
@@ -946,7 +958,7 @@ Interpretation rules:
 - No individual candidate, employee, position, or plan details are available in this context. Never infer, rank, identify, or recommend individuals.
 - Null values paired with suppression flags are intentionally suppressed under the k=10 paired-cell rule. Never estimate, reconstruct, or reverse-engineer suppressed values.
 - If plan coverage is suppressed, downstream readiness detail is also suppressed. Do not infer it from percentages or complements.
-- Succession is intentionally enterprise-summary only. Do not suggest or imply that job-profile, business-unit, level, risk, person, candidate, position, or plan breakdowns are available from this public succession context. If asked for those details, state that this governed public summary does not expose them.
+- Succession is intentionally enterprise-summary only. Do not suggest or imply that country, job-profile, business-unit, level, risk, person, candidate, position, or plan breakdowns are available from this public succession context. If asked for those details, state that this governed public summary does not expose them.
 `.trim()
           : `
 CURRENT SUCCESSION PLANNING CONTEXT
