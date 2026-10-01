@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CareerGrowthMobilityResponse } from "@/lib/career-growth-mobility";
 import type { LearningDevelopmentResponse, RoleWorkforceResponsePlanResponse } from "@/lib/types";
-import { selectTalentResponseEvidence } from "@/lib/talent-response-evidence";
+import { selectTalentResponseEvidence, talentResponseChatSnapshot } from "@/lib/talent-response-evidence";
+import { usePlanningSession } from "./planning-session-context";
 
 type Props = {
   roleCode: string;
@@ -31,6 +32,10 @@ export function TalentResponseEvidence({ roleCode, roleName, initialGoal = "", r
   const heading = useRef<HTMLHeadingElement>(null);
   const evidence = selectTalentResponseEvidence(roleCode, learning, movements, rolePlan);
   const { pathway, readiness, recruiting, enterpriseHistory } = evidence;
+  const { setTalentEvidenceContext } = usePlanningSession();
+  const chatSnapshot = talentResponseChatSnapshot(roleCode, roleName, goal, comparedGoal, loading, evidence);
+  useEffect(() => { setTalentEvidenceContext(chatSnapshot); }, [chatSnapshot, setTalentEvidenceContext]);
+  useEffect(() => () => setTalentEvidenceContext(null), [setTalentEvidenceContext]);
 
   async function compare() {
     if (loading) return;

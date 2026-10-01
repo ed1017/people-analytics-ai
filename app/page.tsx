@@ -100,6 +100,7 @@ const PLANNING_VIEW_TO_PAGE: Record<
 };
 
 export default function Home() {
+  const [talentResponseEvidenceContext, setTalentResponseEvidenceContext] = useState<string | null>(null);
   const [navCollapsed, setNavCollapsed] = useState(false);
   const [aiCollapsed, setAiCollapsed] = useState(false);
   const [aiWidth, setAiWidth] = useState(460);
@@ -1775,6 +1776,7 @@ export default function Home() {
                   }
                 : null,
 
+            talentResponseEvidenceContext: planningWorkspaceActive ? talentResponseEvidenceContext : null,
             planningEvidenceHandoffContext:
               planningEvidenceHandoff
                 ? {
@@ -2027,7 +2029,7 @@ export default function Home() {
   };
 
   return (
-    <PlanningSessionProvider>
+    <PlanningSessionProvider onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
     <main className="min-h-screen bg-background text-foreground">
       {/* Top header */}
       <AppHeader

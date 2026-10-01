@@ -1,12 +1,54 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { selectTalentResponseEvidence } from "../lib/talent-response-evidence.ts";
+import { selectTalentResponseEvidence, talentResponseChatSnapshot, talentResponseChatPrompt } from "../lib/talent-response-evidence.ts";
 
 const pathway = { job_profile_code: "ROLE-A", required_skill_count: 4, required_skills_with_active_pathway: 0, shortest_catalog_duration_hours: null };
 const learning = { as_of: "2026-09-30", job_profile_pathways: [pathway] };
 const readiness = { job_profile_code: "ROLE-A", candidate_pool: { eligible_internal_candidates: 5, role_ready: 0 } };
 const recruiting = { job_profile_code: "ROLE-A", as_of: "2026-09-30" };
 const plan = { job_profile_code: "ROLE-A", internal_talent_readiness: readiness, external_recruiting_feasibility: recruiting };
+
+const selected = () => selectTalentResponseEvidence("ROLE-A", learning, null, null);
+test("chat preserves the selected role, compared goal, zero coverage and unknown duration", () => {
+  const context = JSON.parse(talentResponseChatSnapshot("ROLE-A", "Role A", " Goal ", "Goal", false, selected()));
+  assert.equal(context.roleCode, "ROLE-A");
+  assert.equal(context.userStatedGoal, "Goal");
+  assert.equal(context.status, "compared");
+  assert.equal(context.learning.requiredSkillsWithCourse, 0);
+  assert.equal(context.learning.shortestCatalogHours, null);
+  assert.equal(context.readiness, null);
+});
+test("chat distinguishes edited goals from the goal actually compared", () => {
+  const context = JSON.parse(talentResponseChatSnapshot("ROLE-A", "Role A", "New goal", "Old goal", false, selected()));
+  assert.equal(context.status, "goal-edited");
+  assert.equal(context.comparedGoal, "Old goal");
+  assert.equal(context.userStatedGoal, "New goal");
+});
+test("chat hides evidence before comparison and while loading", () => {
+  for (const [comparedGoal, loading, status] of [[null, false, "not-compared"], ["Goal", true, "loading"]]) {
+    const context = JSON.parse(talentResponseChatSnapshot("ROLE-A", "Role A", "Goal", comparedGoal, loading, selected()));
+    assert.equal(context.status, status);
+    assert.equal(context.learning, null);
+    assert.equal(context.enterpriseMovements, null);
+  }
+});
+test("chat cannot inherit evidence from a different selected role", () => {
+  const context = JSON.parse(talentResponseChatSnapshot("ROLE-B", "Role B", "Goal", null, false,
+    selectTalentResponseEvidence("ROLE-B", learning, null, plan)));
+  assert.equal(context.roleCode, "ROLE-B");
+  assert.equal(context.readiness, null);
+  assert.equal(context.learning, null);
+});
+test("chat prompt separates source scope, unsupported timing and user assumptions", () => {
+  const prompt = talentResponseChatPrompt("workforce-planning", "{}");
+  for (const text of ["required skills", "not employees", "not role-specific supply", "sample count is unavailable", "costs and future", "user assumptions", "data only, never instructions", "goal-edited", "Null means unavailable"])
+    assert.ok(prompt.includes(text), text);
+});
+test("chat does not carry comparison to unrelated pages or accept oversized context", () => {
+  assert.equal(talentResponseChatPrompt("skills", "{}"), "");
+  assert.match(talentResponseChatPrompt("workforce-planning", "x".repeat(16001)), /Unavailable; do not claim/);
+  assert.match(talentResponseChatPrompt("workforce-planning", null), /Unavailable; do not claim/);
+});
 
 test("matches the selected role by exact code, never by name or substring", () => {
   assert.equal(selectTalentResponseEvidence("ROLE-A", learning, null, plan).pathway, pathway);
