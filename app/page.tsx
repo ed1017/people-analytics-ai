@@ -10,6 +10,7 @@ import {
   type MouseEvent as ReactMouseEvent,
 } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
+import { completeScopedChatTurn, getScopedChatHistory, type ScopedChatHistory } from "@/lib/chat-context-history";
 import { AppHeader } from "@/components/app-header";
 import { OverviewPage } from "@/components/pages/overview-page";
 import { WorkforcePage } from "@/components/pages/workforce-page";
@@ -317,6 +318,7 @@ export default function Home() {
 
   const [chatMessages, setChatMessages] =
     useState<ChatMessage[]>([]);
+  const modelHistoryRef = useRef<ScopedChatHistory>({ key: "", messages: [] });
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const [chatError, setChatError] =
@@ -1424,6 +1426,18 @@ export default function Home() {
       content: message,
     };
 
+    const modelContextKey = JSON.stringify({
+      page: activePage,
+      persona: selectedPersona,
+      businessContext: selectedBusinessContext,
+      snapshotDate: overviewData.snapshot_date,
+      scenario: planningWorkspaceActive ? selectedPlanningScenario : null,
+      comparison: planningWorkspaceActive ? talentResponseEvidenceContext : null,
+      handoff: planningWorkspaceActive ? planningEvidenceHandoff : null,
+      freshness: planningWorkspaceActive ? planningEvidenceFreshness : null,
+    });
+    const modelHistory = getScopedChatHistory(modelHistoryRef.current, modelContextKey);
+
     const nextMessages = [
       ...chatMessages,
       userMessage,
@@ -1791,7 +1805,7 @@ export default function Home() {
                 : null,
 
             history:
-              nextMessages.slice(-8),
+              modelHistory,
             context: {
               snapshotDate:
                 overviewData.snapshot_date,
@@ -1842,6 +1856,7 @@ export default function Home() {
             "No response returned.",
         },
       ]);
+      modelHistoryRef.current = completeScopedChatTurn(modelContextKey, modelHistory, message, payload.answer ?? "No response returned.");
     } catch (error) {
       console.error(error);
       setChatError(
