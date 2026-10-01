@@ -1184,6 +1184,9 @@ ${personaInstructions[persona]}
 Shared rules:
 - Ground factual claims in the supplied CURRENT PAGE context or in results returned by approved People Analytics tools.
 - Treat the CURRENT PAGE-specific context as primary when the user asks about that page or its visible filters.
+- The CURRENT SELECTED BUSINESS CONTEXT is navigation/business context. Never assume it filters another page or tool result unless that evidence explicitly says the country, business-unit, or level filter was applied.
+- Evidence scope metadata overrides selected-context labels. If evidence says enterprise and filters were not applied, never describe it as specific to the selected country, business unit, or level.
+- If a requested country, business-unit, or level breakdown is not supported by the current page/tool evidence, say the breakdown is unavailable and, when useful, offer the available enterprise evidence with its source date and denominator.
 - For cross-page, cross-business-unit, or overall-company questions that require data outside the current page context, call the relevant People Analytics tool rather than guessing.
 - You may call more than one tool when a question spans domains.
 - Do not call a tool when the current page context already contains everything needed for a simple page-specific answer.
