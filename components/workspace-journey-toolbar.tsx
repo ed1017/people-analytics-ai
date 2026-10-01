@@ -47,8 +47,8 @@ export function WorkspaceJourneyToolbar({
                   }
                   className={
                     active
-                      ? "flex min-h-16 w-full min-w-0 items-center gap-2 rounded-lg border bg-foreground px-2.5 py-2 text-left text-background shadow-sm sm:min-h-14 sm:px-3"
-                      : "flex min-h-16 w-full min-w-0 items-center gap-2 rounded-lg border bg-background px-2.5 py-2 text-left transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring sm:min-h-14 sm:px-3"
+                      ? "flex h-full min-h-16 w-full min-w-0 items-center gap-2 rounded-lg border bg-foreground px-2.5 py-2 text-left text-background shadow-sm sm:min-h-14 sm:px-3"
+                      : "flex h-full min-h-16 w-full min-w-0 items-center gap-2 rounded-lg border bg-background px-2.5 py-2 text-left transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring sm:min-h-14 sm:px-3"
                   }
                 >
                   <span
