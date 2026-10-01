@@ -153,11 +153,11 @@ export function AppSidebar({
 
                   {!navCollapsed && (
                     <span className="min-w-0 max-md:hidden">
-                      <span className="block text-sm font-semibold leading-tight">
+                      <span className="block text-lg font-bold leading-tight">
                         {section.title}
                       </span>
                       {journey && (
-                        <span className="mt-0.5 block text-[10px] leading-tight text-muted-foreground">
+                        <span className="mt-1 block text-sm font-medium leading-tight text-muted-foreground">
                           {journey.subtitle}
                         </span>
                       )}
