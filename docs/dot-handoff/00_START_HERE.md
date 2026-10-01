@@ -4,13 +4,13 @@ Snapshot date: 2026-10-01
 
 ## Purpose
 
-This folder is the handoff package for the Public People Analytics / Workforce Planning AI project. It reconstructs the project history from prior project conversations and verifies the current technical state against GitHub.
+This folder is the handoff package for the Public People Analytics / Workforce Planning AI project. It reconstructs the project history from prior project conversations and verifies the current technical state against GitHub and the live Supabase backend.
 
 Do not treat old chat history or an older roadmap statement as more authoritative than the current repository. When sources conflict, use this order:
 
 1. current `main` code and tests;
 2. merged PR history and PR validation notes;
-3. the current-state and governance notes in this handoff;
+3. the current-state, live-reconciliation, and governance notes in this handoff;
 4. older product discussions and superseded decisions.
 
 ## Current source of truth
@@ -23,7 +23,7 @@ Do not treat old chat history or an older roadmap statement as more authoritativ
 - Local Windows project path historically used: `C:\Users\edwin\Projects\people-analytics-project`
 - Development shell convention: PowerShell with `npm.cmd`
 
-PR #67 is merged to `main`. Its PR notes say focused navigation/handoff/accessibility/scope tests, TypeScript, and isolated browser checks passed on the release candidate. Its notes also say deployed-backend and real-AI checks still remained for release verification at PR creation. Do not assume those post-merge runtime checks happened unless you verify them.
+PR #67 is merged to `main`. A read-only post-merge reconciliation confirmed a successful Vercel status for this exact commit, a healthy live Supabase project, the documented data baseline, the approved Succession contract, and successful post-merge backend traffic. A fresh browser end-to-end and real OpenAI response still need to be rechecked when Dot has browser/runtime access; see `07_LIVE_RECONCILIATION_2026-10-01.md`.
 
 ## Product in one paragraph
 
@@ -75,9 +75,10 @@ The five core Planning destinations now share the existing Planning workspace st
 4. `04_DATA_GOVERNANCE.md` — data provenance, Talent scope rules, Succession contract, and security boundaries.
 5. `05_DECISIONS_AND_SUPERSEDED.md` — major decisions, reversals, and things not to accidentally reintroduce.
 6. `06_DOT_BOOTSTRAP_PROMPT.md` — a copy/paste bootstrap prompt for a new Dot session.
+7. `07_LIVE_RECONCILIATION_2026-10-01.md` — verified GitHub/Vercel/Supabase handoff checkpoint and remaining browser-runtime limitation.
 
 ## First action for Dot
 
-Read this entire handoff, inspect current `main`, and verify the live production deployment corresponding to `d128b456…`. Pay particular attention to PR #67's remaining release-verification note: verify the five Planning destinations against the deployed backend and real AI grounding before treating the post-#67 release as fully runtime-verified.
+Read this entire handoff and inspect current `main`. The live handoff reconciliation already verifies the current release commit, successful Vercel status, healthy Supabase state, baseline data, Succession contract, and post-merge backend traffic. Dot's first runtime task is therefore the remaining browser-level verification: navigate the five Planning destinations, confirm shared state, check Skills evidence scope/freshness, and run a fresh real AI planning question against governed deterministic results.
 
 Do not begin a redesign or security change as the first task.
