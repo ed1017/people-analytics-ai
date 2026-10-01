@@ -36,7 +36,7 @@ export function CareerMobilityPage({
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold">
-            Career & Mobility
+            Career Interests
           </h2>
           <p className="text-muted-foreground">
             Describe recorded career interests, desired destinations, and preference coverage without treating preferences as readiness or recommendations.
@@ -49,7 +49,7 @@ export function CareerMobilityPage({
             : data
               ? "Updated through " +
                 formatDate(data.as_of)
-              : "Career & Mobility"}
+              : "Career Interests"}
         </span>
       </div>
 
@@ -489,8 +489,8 @@ export function CareerMobilityPage({
       ) : (
         <div className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
           {loading
-            ? "Loading Career & Mobility preference coverage…"
-            : "No Career & Mobility data returned."}
+            ? "Loading Career Interests preference coverage…"
+            : "No Career Interests data returned."}
         </div>
       )}
     </section>
