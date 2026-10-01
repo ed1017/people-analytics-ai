@@ -8,7 +8,7 @@ import {
   SUCCESSION_PUBLIC_FIELDS,
   validateSuccessionApiRequest,
   validateSuccessionRows,
-} from "@/lib/succession-public-contract";
+} from "@/lib/succession-public-contract.mjs";
 
 export const dynamic = "force-dynamic";
 
