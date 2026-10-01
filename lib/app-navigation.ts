@@ -39,7 +39,7 @@ export const appWorkspaceJourneys: Array<{
     key: "strategy",
     journeyLabel: "Workforce Planning",
     subtitle: "“Plan Our Future”",
-    defaultPage: "workforce-planning",
+    defaultPage: "planning-overview",
   },
 ];
 
@@ -69,7 +69,11 @@ export const appNavigationSections: AppNavigationSection[] = [
     key: "strategy",
     title: "Workforce Planning",
     pages: [
-      "workforce-planning",
+      "planning-overview",
+      "scenario-modeling",
+      "position-workforce-design",
+      "workforce-response",
+      "execution-feasibility",
       "finance",
     ],
   },
@@ -138,6 +142,36 @@ export const appPageMetadata: Record<
     description:
       "Company-wide recorded succession-plan coverage and source-assessment readiness signals.",
   },
+  "planning-overview": {
+    label: "Planning Overview",
+    section: "Workforce Strategy & Planning",
+    description:
+      "Executive control room for the current workforce plan, response, risk, and feasibility.",
+  },
+  "scenario-modeling": {
+    label: "Scenario Modeling",
+    section: "Workforce Strategy & Planning",
+    description:
+      "Model enterprise and business-unit workforce demand and compare scenarios.",
+  },
+  "position-workforce-design": {
+    label: "Position & Workforce Design",
+    section: "Workforce Strategy & Planning",
+    description:
+      "Translate scenarios into authorized-position, recruiting, and skill-demand changes.",
+  },
+  "workforce-response": {
+    label: "Workforce Response",
+    section: "Workforce Strategy & Planning",
+    description:
+      "Plan Build, Move, and Buy responses against modeled role gaps.",
+  },
+  "execution-feasibility": {
+    label: "Execution & Feasibility",
+    section: "Workforce Strategy & Planning",
+    description:
+      "Schedule workforce responses, test constraints, and identify execution blockers.",
+  },
   "workforce-planning": {
     label: "Workforce Planning",
     section: "Workforce Strategy & Planning",
@@ -160,6 +194,10 @@ export function getAppPageMetadata(
 export function getWorkspaceForPage(
   page: AppPage
 ): AppWorkspaceKey {
+  if (page === "workforce-planning") {
+    return "strategy";
+  }
+
   return (
     appNavigationSections.find((section) =>
       section.pages.includes(page)

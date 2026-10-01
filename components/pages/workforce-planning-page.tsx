@@ -13,7 +13,10 @@ import { PositionWorkforceDesignDestination } from "@/components/workforce-plann
 import { WorkforceResponseDestination } from "@/components/workforce-planning/workforce-response-destination";
 import { ExecutionFeasibilityDestination } from "@/components/workforce-planning/execution-feasibility-destination";
 import { PlanningOverview } from "@/components/workforce-planning/planning-overview";
-import { usePlanningSession } from "@/components/workforce-planning/planning-session-context";
+import {
+  type PlanningWorkspaceView,
+  usePlanningSession,
+} from "@/components/workforce-planning/planning-session-context";
 
 import type {
   BusinessUnitResponseAllocationResponse,
@@ -68,6 +71,10 @@ type WorkforcePlanningPageProps = {
   evidenceFreshness: EvidenceFreshness;
   evidenceFreshnessChecking: boolean;
   currentBusinessContext: SelectedBusinessContext;
+  requestedView: PlanningWorkspaceView;
+  onPlanningDestinationChange: (
+    view: PlanningWorkspaceView
+  ) => void;
   onBackToSkills: () => void;
   onClearEvidenceHandoff: () => void;
   onRefreshEvidenceHandoff: () => void;
@@ -249,6 +256,8 @@ export function WorkforcePlanningPage({
   evidenceFreshness,
   evidenceFreshnessChecking,
   currentBusinessContext,
+  requestedView,
+  onPlanningDestinationChange,
   onBackToSkills,
   onClearEvidenceHandoff,
   onRefreshEvidenceHandoff,
@@ -257,6 +266,23 @@ export function WorkforcePlanningPage({
     activeView: workflowView,
     setActiveView: setWorkflowView,
   } = usePlanningSession();
+
+  useEffect(() => {
+    if (workflowView !== requestedView) {
+      setWorkflowView(requestedView);
+    }
+  }, [
+    requestedView,
+    setWorkflowView,
+    workflowView,
+  ]);
+
+  const changeWorkflowView = (
+    view: PlanningWorkspaceView
+  ) => {
+    setWorkflowView(view);
+    onPlanningDestinationChange(view);
+  };
 
   const [scenarioDefaults, setScenarioDefaults] =
     useState<ScenarioModelAssumptions | null>(null);
@@ -2039,7 +2065,7 @@ export function WorkforcePlanningPage({
 
           <WorkforcePlanningWorkflowNavigation
             activeView={workflowView}
-            onViewChange={setWorkflowView}
+            onViewChange={changeWorkflowView}
             planReady={Boolean(
               activePlanningScenario
             )}
@@ -2066,7 +2092,7 @@ export function WorkforcePlanningPage({
               businessUnitResponseResult={businessUnitResponseResult}
               responseExecutionResult={responseExecutionResult}
               responseConstraintResult={responseConstraintResult}
-              onNavigate={setWorkflowView}
+              onNavigate={changeWorkflowView}
             />
           )}
 
@@ -2175,7 +2201,9 @@ export function WorkforcePlanningPage({
                 selectedPlanningScenario={selectedPlanningScenario}
                 positionModelingLoading={positionModelingLoading}
                 structuralPositionResult={structuralPositionResult}
-                onNavigateDesign={() => setWorkflowView("design")}
+                onNavigateDesign={() =>
+                  changeWorkflowView("design")
+                }
                 portfolioSectionProps={
                   structuralPositionResult
                     ? {
@@ -2252,7 +2280,7 @@ export function WorkforcePlanningPage({
                     businessUnitResponseResult
                 )}
                 onNavigateResponse={() =>
-                  setWorkflowView("respond")
+                  changeWorkflowView("respond")
                 }
                 portfolioSectionProps={
                   structuralPositionResult &&

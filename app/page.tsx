@@ -22,7 +22,10 @@ import { CareerGrowthMobilityPage } from "@/components/pages/career-growth-mobil
 import type { CareerGrowthMobilityResponse } from "@/lib/career-growth-mobility";
 import { SuccessionPlanningPage } from "@/components/pages/succession-planning-page";
 import { WorkforcePlanningPage } from "@/components/pages/workforce-planning-page";
-import { PlanningSessionProvider } from "@/components/workforce-planning/planning-session-context";
+import {
+  PlanningSessionProvider,
+  type PlanningWorkspaceView,
+} from "@/components/workforce-planning/planning-session-context";
 import { TalentAcquisitionPage } from "@/components/pages/talent-acquisition-page";
 import { SurveySentimentPage } from "@/components/pages/survey-sentiment-page";
 import { AiPanel } from "@/components/ai-panel";
@@ -74,6 +77,28 @@ type AiSide = "left" | "right";
 const AI_SIDE_STORAGE_KEY =
   "people-analytics.ai-side.v1";
 
+const PLANNING_PAGE_TO_VIEW: Partial<
+  Record<AppPage, PlanningWorkspaceView>
+> = {
+  "workforce-planning": "overview",
+  "planning-overview": "overview",
+  "scenario-modeling": "plan",
+  "position-workforce-design": "design",
+  "workforce-response": "respond",
+  "execution-feasibility": "execute",
+};
+
+const PLANNING_VIEW_TO_PAGE: Record<
+  PlanningWorkspaceView,
+  AppPage
+> = {
+  overview: "planning-overview",
+  plan: "scenario-modeling",
+  design: "position-workforce-design",
+  respond: "workforce-response",
+  execute: "execution-feasibility",
+};
+
 export default function Home() {
   const [navCollapsed, setNavCollapsed] = useState(false);
   const [aiCollapsed, setAiCollapsed] = useState(false);
@@ -103,11 +128,16 @@ export default function Home() {
   >({
     analytics: "overview",
     talent: "skills",
-    strategy: "workforce-planning",
+    strategy: "planning-overview",
   });
 
   const activeWorkspace =
     getWorkspaceForPage(activePage);
+
+  const planningRequestedView =
+    PLANNING_PAGE_TO_VIEW[activePage] ?? null;
+  const planningWorkspaceActive =
+    planningRequestedView !== null;
 
   useEffect(() => {
     lastPageByWorkspaceRef.current[
@@ -130,6 +160,17 @@ export default function Home() {
           workspace
         )
     );
+  };
+
+  const changePlanningDestination = (
+    view: PlanningWorkspaceView
+  ) => {
+    const nextPage =
+      PLANNING_VIEW_TO_PAGE[view];
+
+    lastPageByWorkspaceRef.current.strategy =
+      nextPage;
+    setActivePage(nextPage);
   };
 
   const [workforceData, setWorkforceData] =
@@ -455,8 +496,7 @@ export default function Home() {
 
   useEffect(() => {
     if (
-      activePage !==
-        "workforce-planning" ||
+      !planningWorkspaceActive ||
       planningData
     ) {
       return;
@@ -500,12 +540,14 @@ export default function Home() {
     }
 
     loadPlanning();
-  }, [activePage, planningData]);
+  }, [
+    planningWorkspaceActive,
+    planningData,
+  ]);
 
   useEffect(() => {
     if (
-      activePage !==
-        "workforce-planning" ||
+      !planningWorkspaceActive ||
       positionModelingData
     ) {
       return;
@@ -550,7 +592,7 @@ export default function Home() {
 
     loadPositionModeling();
   }, [
-    activePage,
+    planningWorkspaceActive,
     positionModelingData,
   ]);
 
@@ -1025,8 +1067,8 @@ export default function Home() {
 
   const openPlanningWithHandoff = () => {
     lastPageByWorkspaceRef.current.strategy =
-      "workforce-planning";
-    setActivePage("workforce-planning");
+      "planning-overview";
+    setActivePage("planning-overview");
     focusAfterRender(
       "carried-planning-evidence"
     );
@@ -1143,8 +1185,7 @@ export default function Home() {
 
   useEffect(() => {
     if (
-      activePage !==
-        "workforce-planning" ||
+      !planningWorkspaceActive ||
       !planningEvidenceHandoff
     ) {
       return;
@@ -1156,7 +1197,7 @@ export default function Home() {
     // The packet itself is the trigger; source
     // validation is intentionally read-only.
   }, [
-    activePage,
+    planningWorkspaceActive,
     planningEvidenceHandoff,
   ]);
 
@@ -1287,7 +1328,7 @@ export default function Home() {
   const suggestedPrompts =
     previewPage
       ? []
-      : activePage === "workforce-planning"
+      : planningWorkspaceActive
       ? [
           "Compare all four workforce scenarios",
           "What stands out in this scenario?",
@@ -1404,7 +1445,9 @@ export default function Home() {
           body: JSON.stringify({
             message,
             persona: selectedPersona,
-            page: activePage,
+            page: planningWorkspaceActive
+              ? "workforce-planning"
+              : activePage,
             workforceDetailContext:
               activePage === "workforce" && workforceData
                 ? {
@@ -1428,8 +1471,7 @@ export default function Home() {
                   }
                 : null,
             planningContext:
-              activePage ===
-                "workforce-planning" &&
+              planningWorkspaceActive &&
               activePlanningScenario
                 ? {
                     selectedScenario:
@@ -1478,8 +1520,7 @@ export default function Home() {
                 : null,
 
             positionContext:
-              activePage ===
-                "workforce-planning" &&
+              planningWorkspaceActive &&
               positionModelingData &&
               activePositionScenario
                 ? {
@@ -2176,6 +2217,12 @@ export default function Home() {
             }
             currentBusinessContext={
               selectedBusinessContext
+            }
+            requestedView={
+              planningRequestedView ?? "overview"
+            }
+            onPlanningDestinationChange={
+              changePlanningDestination
             }
             onBackToSkills={
               backToSkillsFromHandoff
