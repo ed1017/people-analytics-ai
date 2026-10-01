@@ -843,6 +843,7 @@ export type LearningDevelopmentJobProfilePathway = {
 export type LearningDevelopmentResponse = {
   as_of: string;
   summary: {
+    current_workforce: number;
     current_gap_skills: number;
     gap_skills_with_active_pathway: number;
     gap_pathway_coverage_pct: number;
