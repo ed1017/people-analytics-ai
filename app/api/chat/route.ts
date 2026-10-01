@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { talentResponseChatPrompt } from "../../../lib/talent-response-evidence";
 import { peopleAnalyticsTools, runPeopleAnalyticsTool } from "../../../lib/people-analytics-tools";
 
 export const dynamic = "force-dynamic";
@@ -1464,6 +1465,7 @@ ${workforceDetailPrompt}
 ${attritionPrompt}
 
 ${planningEvidenceHandoffPrompt}
+${talentResponseChatPrompt(page, body?.talentResponseEvidenceContext)}
 
 ${planningPrompt}
 

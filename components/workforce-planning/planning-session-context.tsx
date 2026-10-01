@@ -17,14 +17,17 @@ export type PlanningWorkspaceView =
 type PlanningSessionContextValue = {
   activeView: PlanningWorkspaceView;
   setActiveView: (view: PlanningWorkspaceView) => void;
+  setTalentEvidenceContext: (snapshot: string | null) => void;
 };
 
 const PlanningSessionContext =
   createContext<PlanningSessionContextValue | null>(null);
 export function PlanningSessionProvider({
   children,
+  onTalentEvidenceContextChange,
 }: {
   children: ReactNode;
+  onTalentEvidenceContextChange: (snapshot: string | null) => void;
 }) {
   const [activeView, setActiveView] =
     useState<PlanningWorkspaceView>("overview");
@@ -34,6 +37,7 @@ export function PlanningSessionProvider({
       value={{
         activeView,
         setActiveView,
+        setTalentEvidenceContext: onTalentEvidenceContextChange,
       }}
     >
       {children}
