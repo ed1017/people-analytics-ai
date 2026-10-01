@@ -35,6 +35,15 @@ type AppSidebarProps = {
   ) => void;
 };
 
+const workspaceDisplayTitles: Record<
+  AppWorkspaceKey,
+  string
+> = {
+  analytics: "Workforce",
+  talent: "Talent",
+  strategy: "Planning",
+};
+
 const pageIcons: Record<
   AppPage,
   LucideIcon
@@ -153,11 +162,11 @@ export function AppSidebar({
 
                   {!navCollapsed && (
                     <span className="min-w-0 max-md:hidden">
-                      <span className="block text-sm font-semibold leading-tight">
-                        {section.title}
+                      <span className="block text-xl font-bold leading-[1.1]">
+                        {workspaceDisplayTitles[section.key]}
                       </span>
                       {journey && (
-                        <span className="mt-0.5 block text-[10px] leading-tight text-muted-foreground">
+                        <span className="mt-1 block text-sm font-medium leading-tight text-muted-foreground">
                           {journey.subtitle}
                         </span>
                       )}
