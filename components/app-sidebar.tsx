@@ -11,6 +11,7 @@ import {
   PanelLeftOpen,
   Sparkles,
   TrendingDown,
+  TrendingUp,
   UserPlus,
   Users,
 } from "lucide-react";
@@ -57,6 +58,7 @@ const pageIcons: Record<
   skills: Sparkles,
   "learning-development": GraduationCap,
   "career-mobility": Compass,
+  "career-growth-mobility": TrendingUp,
   "succession-planning": ShieldCheck,
   "workforce-planning": CalendarDays,
 };

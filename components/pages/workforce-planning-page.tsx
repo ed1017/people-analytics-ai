@@ -1988,7 +1988,11 @@ export function WorkforcePlanningPage({
 <section className="min-w-0 p-6">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-semibold">
+              <h2
+                id="workforce-planning-heading"
+                tabIndex={-1}
+                className="rounded-sm text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-ring"
+              >
                 Workforce Planning
               </h2>
               <p className="text-muted-foreground">

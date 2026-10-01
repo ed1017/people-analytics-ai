@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
 } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -17,6 +18,8 @@ import { FinancePage } from "@/components/pages/finance-page";
 import { SkillsPage } from "@/components/pages/skills-page";
 import { LearningDevelopmentPage } from "@/components/pages/learning-development-page";
 import { CareerMobilityPage } from "@/components/pages/career-mobility-page";
+import { CareerGrowthMobilityPage } from "@/components/pages/career-growth-mobility-page";
+import type { CareerGrowthMobilityResponse } from "@/lib/career-growth-mobility";
 import { SuccessionPlanningPage } from "@/components/pages/succession-planning-page";
 import { WorkforcePlanningPage } from "@/components/pages/workforce-planning-page";
 import { PlanningSessionProvider } from "@/components/workforce-planning/planning-session-context";
@@ -206,6 +209,20 @@ export default function Home() {
   ] = useState<CareerMobilityResponse | null>(
     null
   );
+  const [
+    careerGrowthMobilityData,
+    setCareerGrowthMobilityData,
+  ] = useState<CareerGrowthMobilityResponse | null>(
+    null
+  );
+  const [
+    careerGrowthMobilityLoading,
+    setCareerGrowthMobilityLoading,
+  ] = useState(false);
+  const [
+    careerGrowthMobilityError,
+    setCareerGrowthMobilityError,
+  ] = useState<string | null>(null);
   const [
     careerMobilityLoading,
     setCareerMobilityLoading,
@@ -810,6 +827,50 @@ export default function Home() {
   useEffect(() => {
     if (
       activePage !==
+        "career-growth-mobility" ||
+      careerGrowthMobilityData
+    ) {
+      return;
+    }
+
+    async function loadCareerGrowthMobility() {
+      try {
+        setCareerGrowthMobilityLoading(true);
+        setCareerGrowthMobilityError(null);
+        const response = await fetch(
+          "/api/career-growth-mobility",
+          { cache: "no-store" }
+        );
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(
+            payload?.error ??
+              "Career Growth & Internal Mobility data is unavailable."
+          );
+        }
+        setCareerGrowthMobilityData(
+          payload as CareerGrowthMobilityResponse
+        );
+      } catch (error) {
+        setCareerGrowthMobilityError(
+          error instanceof Error
+            ? error.message
+            : "Career Growth & Internal Mobility data is unavailable."
+        );
+      } finally {
+        setCareerGrowthMobilityLoading(false);
+      }
+    }
+
+    loadCareerGrowthMobility();
+  }, [
+    activePage,
+    careerGrowthMobilityData,
+  ]);
+
+  useEffect(() => {
+    if (
+      activePage !==
         "succession-planning" ||
       successionCoverageData
     ) {
@@ -952,16 +1013,32 @@ export default function Home() {
       ]
     );
 
+  const focusAfterRender = (
+    elementId: string
+  ) => {
+    window.requestAnimationFrame(() => {
+      document
+        .getElementById(elementId)
+        ?.focus();
+    });
+  };
+
   const openPlanningWithHandoff = () => {
     lastPageByWorkspaceRef.current.strategy =
       "workforce-planning";
     setActivePage("workforce-planning");
+    focusAfterRender(
+      "carried-planning-evidence"
+    );
   };
 
   const backToSkillsFromHandoff = () => {
     lastPageByWorkspaceRef.current.talent =
       "skills";
     setActivePage("skills");
+    focusAfterRender(
+      "skills-evidence-handoff"
+    );
   };
 
   const clearPlanningEvidenceHandoff = () => {
@@ -976,6 +1053,9 @@ export default function Home() {
       reason:
         "No evidence handoff is active.",
     });
+    focusAfterRender(
+      "workforce-planning-heading"
+    );
   };
 
   const carryEvidenceToPlanning = (
@@ -1545,6 +1625,45 @@ export default function Home() {
                   }
                 : null,
 
+            careerGrowthMobilityContext:
+              activePage ===
+                "career-growth-mobility" &&
+              careerGrowthMobilityData
+                ? {
+                    evidenceScope:
+                      evidenceScopeForAi(
+                        enterpriseTalentEvidenceScope({
+                          label:
+                            "Enterprise recorded movement events",
+                          asOf:
+                            careerGrowthMobilityData.source
+                              .last_recorded_date,
+                          populationLabel:
+                            "recorded movement events",
+                          populationCount:
+                            careerGrowthMobilityData.source
+                              .total_recorded_events,
+                          supportedBreakdowns: [
+                            "movement_type",
+                            "month",
+                            "job_level_transition",
+                          ],
+                        }),
+                        selectedBusinessContext
+                      ),
+                    source:
+                      careerGrowthMobilityData.source,
+                    composition:
+                      careerGrowthMobilityData.composition,
+                    monthly:
+                      careerGrowthMobilityData.monthly,
+                    levelTransitions:
+                      careerGrowthMobilityData.level_transitions,
+                    limitations:
+                      careerGrowthMobilityData.limitations,
+                  }
+                : null,
+
             successionCoverageContext:
               activePage ===
                 "succession-planning" &&
@@ -1803,6 +1922,54 @@ export default function Home() {
     );
   };
 
+  const resizeAiWithKeyboard = (
+    event: ReactKeyboardEvent<HTMLDivElement>
+  ) => {
+    if (aiCollapsed) return;
+
+    const minimumWidth = 280;
+    const maximumWidth =
+      window.innerWidth * 0.5;
+    const step = 20;
+
+    let nextWidth: number | null = null;
+
+    if (event.key === "Home") {
+      nextWidth = minimumWidth;
+    } else if (event.key === "End") {
+      nextWidth = maximumWidth;
+    } else if (
+      event.key === "ArrowLeft"
+    ) {
+      nextWidth =
+        aiWidth +
+        (aiSide === "left"
+          ? -step
+          : step);
+    } else if (
+      event.key === "ArrowRight"
+    ) {
+      nextWidth =
+        aiWidth +
+        (aiSide === "left"
+          ? step
+          : -step);
+    }
+
+    if (nextWidth === null) return;
+
+    event.preventDefault();
+    setAiWidth(
+      Math.min(
+        maximumWidth,
+        Math.max(
+          minimumWidth,
+          nextWidth
+        )
+      )
+    );
+  };
+
   const updateAiSide = (
     nextSide: AiSide
   ) => {
@@ -1957,6 +2124,16 @@ export default function Home() {
             }
           />
         ) : activePage ===
+          "career-growth-mobility" ? (
+          <CareerGrowthMobilityPage
+            data={careerGrowthMobilityData}
+            loading={careerGrowthMobilityLoading}
+            error={careerGrowthMobilityError}
+            selectedContext={
+              selectedBusinessContext
+            }
+          />
+        ) : activePage ===
           "succession-planning" ? (
           <SuccessionPlanningPage
             data={successionCoverageData}
@@ -2023,6 +2200,7 @@ export default function Home() {
           aiCollapsed={aiCollapsed}
           aiExpanded={aiExpanded}
           aiSide={aiSide}
+          aiWidth={aiWidth}
           previewPage={previewPage}
           suggestedPrompts={suggestedPrompts}
           chatMessages={chatMessages}
@@ -2031,6 +2209,7 @@ export default function Home() {
           chatError={chatError}
           dashboardReady={Boolean(overviewData)}
           onResizeStart={startAiResize}
+          onResizeKeyDown={resizeAiWithKeyboard}
           onToggleExpanded={toggleAiExpanded}
           onToggleCollapsed={() =>
             setAiCollapsed(!aiCollapsed)

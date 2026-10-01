@@ -47,6 +47,7 @@ export type AppPage =
   | "skills"
   | "learning-development"
   | "career-mobility"
+  | "career-growth-mobility"
   | "succession-planning"
   | "workforce-planning";
 

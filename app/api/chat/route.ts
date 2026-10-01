@@ -335,6 +335,52 @@ type CareerMobilityContext = {
   }>;
 };
 
+type CareerGrowthMobilityContext = {
+  evidenceScope: EvidenceScopeContext;
+  source: {
+    first_recorded_date: string | null;
+    last_recorded_date: string | null;
+    total_recorded_events: number;
+    distinct_recorded_employees: number;
+    currently_active_linked_employees: number;
+    currently_nonactive_linked_employees: number;
+    origin_position_recorded_events: number;
+    origin_position_missing_events: number;
+    destination_position_recorded_events: number;
+    recorded_months: number;
+    latest_month_partial: boolean;
+  };
+  composition: Array<{
+    movement_type:
+      | "promotion"
+      | "lateral_move"
+      | "transfer";
+    label: string;
+    events: number;
+    share_pct: number;
+  }>;
+  monthly: Array<{
+    month: string;
+    events: number;
+    promotions: number;
+    lateral_moves: number;
+    transfers: number;
+    is_partial: boolean;
+  }>;
+  levelTransitions: Array<{
+    movement_type:
+      | "promotion"
+      | "lateral_move"
+      | "transfer";
+    from_level: string;
+    to_level: string;
+    from_rank: number;
+    to_rank: number;
+    events: number;
+  }>;
+  limitations: string[];
+};
+
 type SuccessionCoverageContext = {
   evidenceScope: EvidenceScopeContext;
   as_of_date: string | null;
@@ -543,6 +589,7 @@ export async function POST(
       body?.page === "skills" ||
       body?.page === "learning-development" ||
       body?.page === "career-mobility" ||
+      body?.page === "career-growth-mobility" ||
       body?.page === "succession-planning" ||
       body?.page === "talent-acquisition" ||
       body?.page === "survey-sentiment"
@@ -592,6 +639,11 @@ export async function POST(
     const careerMobilityContext =
       body?.careerMobilityContext
         ? (body.careerMobilityContext as CareerMobilityContext)
+        : null;
+
+    const careerGrowthMobilityContext =
+      body?.careerGrowthMobilityContext
+        ? (body.careerGrowthMobilityContext as CareerGrowthMobilityContext)
         : null;
 
     const successionCoverageContext =
@@ -1027,6 +1079,63 @@ Interpretation rules:
 `.trim()
         : "";
 
+    const careerGrowthMobilityPrompt =
+      page === "career-growth-mobility"
+        ? careerGrowthMobilityContext
+          ? `
+CURRENT CAREER GROWTH & INTERNAL MOBILITY CONTEXT
+${formatEvidenceScope(careerGrowthMobilityContext.evidenceScope)}
+
+Recorded source coverage:
+- First recorded event: ${careerGrowthMobilityContext.source.first_recorded_date ?? "Unavailable"}
+- Last recorded event: ${careerGrowthMobilityContext.source.last_recorded_date ?? "Unavailable"}
+- Total recorded movement events: ${careerGrowthMobilityContext.source.total_recorded_events}
+- Distinct employees represented: ${careerGrowthMobilityContext.source.distinct_recorded_employees}
+- Linked employees currently active: ${careerGrowthMobilityContext.source.currently_active_linked_employees}
+- Linked employees currently non-active: ${careerGrowthMobilityContext.source.currently_nonactive_linked_employees}
+- Origin position recorded events: ${careerGrowthMobilityContext.source.origin_position_recorded_events}
+- Origin position missing events: ${careerGrowthMobilityContext.source.origin_position_missing_events}
+- Destination position recorded events: ${careerGrowthMobilityContext.source.destination_position_recorded_events}
+- Recorded months: ${careerGrowthMobilityContext.source.recorded_months}
+- Latest month partial: ${careerGrowthMobilityContext.source.latest_month_partial ? "yes" : "no"}
+
+Recorded movement composition:
+${careerGrowthMobilityContext.composition
+  .map((row) => `- ${row.label}: ${row.events} events (${row.share_pct}% of recorded movement events)`)
+  .join("\n")}
+
+Recorded level transitions:
+${careerGrowthMobilityContext.levelTransitions
+  .map((row) => `- ${row.movement_type}: ${row.from_level} → ${row.to_level}: ${row.events} events`)
+  .join("\n")}
+
+Source limitations:
+${careerGrowthMobilityContext.limitations
+  .map((item) => `- ${item}`)
+  .join("\n")}
+
+Interpretation rules:
+- These are recorded movement-event counts and event shares only. NEVER describe them as promotion rates, mobility rates, transfer rates, or percentages of the workforce.
+- Promotion, lateral_move, and transfer are distinct source classifications. Do not merge lateral moves with transfers.
+- All linked employees in the current movement source are currently active. State the active-survivor limitation when interpreting historical patterns.
+- Origin position IDs are missing in the current source. Do not infer origin job profiles, role-to-role career paths, or multi-step career trajectories from monthly snapshots or destination positions.
+- The current data does not support longitudinal time-to-next-move analysis or a typical employee career path.
+- The latest source month is partial. Do not compare it directly with full months without stating that limitation.
+- Country, business-unit, and level dashboard selections do not filter this enterprise movement-event source. If asked for a BU/country/selected-level mobility breakdown, state that it is unavailable in this page evidence.
+- Recorded level transitions are descriptive source events, not promotion recommendations, readiness predictions, or suitability judgments.
+- Results are aggregate only. Do not identify, rank, recommend, or infer individual employees.
+`.trim()
+          : `
+CURRENT CAREER GROWTH & INTERNAL MOBILITY CONTEXT
+The governed recorded movement-event source is unavailable.
+
+Interpretation rules:
+- Do not infer promotion counts, mobility counts, transfer counts, level transitions, rates, or career paths from other dashboard data.
+- Do not substitute Career Interests preferences for actual recorded movement.
+- State that the recorded movement source is unavailable if the user asks for current Career Growth & Internal Mobility metrics.
+`.trim()
+        : "";
+
     const successionPrompt =
       page === "succession-planning"
         ? successionCoverageContext
@@ -1368,6 +1477,8 @@ ${learningDevelopmentPrompt}
 
 ${careerMobilityPrompt}
 
+${careerGrowthMobilityPrompt}
+
 ${successionPrompt}
 
 ${talentAcquisitionPrompt}
@@ -1386,13 +1497,18 @@ ${message}
         ? 1400
         : 700;
 
+    const toolChoice =
+      page === "career-growth-mobility"
+        ? ("none" as const)
+        : ("auto" as const);
+
     let response: any =
       await client.responses.create({
         model: "gpt-5.6-luna",
         instructions: aiInstructions,
         input: aiInput,
         tools: peopleAnalyticsTools,
-        tool_choice: "auto",
+        tool_choice: toolChoice,
         max_output_tokens:
           maxOutputTokens,
       });
@@ -1463,7 +1579,7 @@ ${message}
             response.id,
           input: toolOutputs,
           tools: peopleAnalyticsTools,
-          tool_choice: "auto",
+          tool_choice: toolChoice,
           max_output_tokens:
           maxOutputTokens,
         });
