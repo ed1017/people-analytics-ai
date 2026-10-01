@@ -73,7 +73,7 @@ export function WorkforcePlanningWorkflowNavigation({
   return (
     <>
       <div className="mb-6 rounded-lg border p-3">
-        <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-2">
           {steps.map((item) => {
             const active =
               activeView === item.key;
@@ -141,3 +141,4 @@ export function WorkforcePlanningWorkflowNavigation({
     </>
   );
 }
+
