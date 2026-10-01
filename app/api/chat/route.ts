@@ -902,6 +902,7 @@ Interpretation rules:
 - No individual candidate, employee, position, or plan details are available in this context. Never infer, rank, identify, or recommend individuals.
 - Null values paired with suppression flags are intentionally suppressed under the k=10 paired-cell rule. Never estimate, reconstruct, or reverse-engineer suppressed values.
 - If plan coverage is suppressed, downstream readiness detail is also suppressed. Do not infer it from percentages or complements.
+- Succession is intentionally enterprise-summary only. Do not suggest or imply that job-profile, business-unit, level, risk, person, candidate, position, or plan breakdowns are available from this public succession context. If asked for those details, state that this governed public summary does not expose them.
 `.trim()
           : `
 CURRENT SUCCESSION PLANNING CONTEXT
