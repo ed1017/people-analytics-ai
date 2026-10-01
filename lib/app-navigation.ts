@@ -25,20 +25,20 @@ export const appWorkspaceJourneys: Array<{
 }> = [
   {
     key: "analytics",
-    journeyLabel: "Understand Your Workforce",
-    subtitle: "Workforce Analytics",
+    journeyLabel: "Workforce Analytics",
+    subtitle: "“Understand Our Workforce”",
     defaultPage: "overview",
   },
   {
     key: "talent",
-    journeyLabel: "Develop Your Talent",
-    subtitle: "Talent Management",
+    journeyLabel: "Talent Management",
+    subtitle: "“Realize Our Potential”",
     defaultPage: "skills",
   },
   {
     key: "strategy",
-    journeyLabel: "Plan & Take Action",
-    subtitle: "Workforce Planning",
+    journeyLabel: "Workforce Planning",
+    subtitle: "“Plan Our Future”",
     defaultPage: "workforce-planning",
   },
 ];
