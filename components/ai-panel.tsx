@@ -257,7 +257,7 @@ export function AiPanel({
               </div>
             )}
 
-            <div className="flex gap-2">
+            <div className="flex items-end gap-2">
               <textarea
                 value={chatInput}
                 onChange={(event) =>
@@ -280,13 +280,14 @@ export function AiPanel({
                     : "Ask about the current workforce…"
                 }
                 disabled={previewPage}
-                rows={3}
-                className="min-h-24 min-w-0 flex-1 resize-none rounded-lg border bg-background p-3.5 text-[17px] leading-relaxed outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                rows={5}
+                aria-label="Ask People Analytics AI"
+                className="h-36 min-h-32 max-h-64 min-w-0 flex-1 resize-y rounded-lg border bg-background p-3.5 text-[17px] leading-relaxed outline-none disabled:cursor-not-allowed disabled:opacity-60"
               />
 
               <Button
                 size="icon"
-                className="h-24 w-12 shrink-0"
+                className="h-12 w-12 shrink-0 self-end"
                 onClick={() => void onSend()}
                 disabled={
                   previewPage ||
@@ -295,6 +296,7 @@ export function AiPanel({
                   !dashboardReady
                 }
                 title="Send"
+                aria-label="Send message"
               >
                 {chatLoading ? (
                   <LoaderCircle className="h-4 w-4 animate-spin" />
