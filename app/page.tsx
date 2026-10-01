@@ -13,6 +13,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { completeScopedChatTurn, getScopedChatHistory, type ScopedChatHistory } from "@/lib/chat-context-history";
 import { AppHeader } from "@/components/app-header";
 import { OverviewPage } from "@/components/pages/overview-page";
+import { OverallOverviewPage } from "@/components/pages/overall-overview-page";
 import { WorkforcePage } from "@/components/pages/workforce-page";
 import { AttritionPage } from "@/components/pages/attrition-page";
 import { FinancePage } from "@/components/pages/finance-page";
@@ -123,7 +124,7 @@ export default function Home() {
     useState<Persona>("HR");
 
   const [activePage, setActivePage] =
-    useState<AppPage>("overview");
+    useState<AppPage>("home");
 
   const lastPageByWorkspaceRef = useRef<
     Record<AppWorkspaceKey, AppPage>
@@ -142,6 +143,7 @@ export default function Home() {
     planningRequestedView !== null;
 
   useEffect(() => {
+    if (activePage === "home") return;
     lastPageByWorkspaceRef.current[
       activeWorkspace
     ] = activePage;
@@ -150,7 +152,7 @@ export default function Home() {
   const changeWorkspace = (
     workspace: AppWorkspaceKey
   ) => {
-    if (workspace === activeWorkspace) {
+    if (activePage !== "home" && workspace === activeWorkspace) {
       return;
     }
 
@@ -2045,7 +2047,7 @@ export default function Home() {
 
   return (
     <PlanningSessionProvider onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
-    <main className="min-h-screen bg-background text-foreground">
+    <main className={`min-h-screen bg-background text-foreground${activePage === "home" ? " app-overview-mode" : ""}`}>
       {/* Top header */}
       <AppHeader
         activePage={activePage}
@@ -2055,7 +2057,7 @@ export default function Home() {
 
       {/* Main application */}
       <div
-        className={`app-shell app-ai-${aiSide}`}
+        className={`app-shell app-ai-${aiSide}${activePage === "home" ? " app-home" : ""}`}
         style={
           {
             "--nav-width": `${
@@ -2082,7 +2084,8 @@ export default function Home() {
 
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
-        {activePage === "overview" ? (
+        <div hidden={activePage !== "home"}><OverallOverviewPage active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} /></div>
+        {activePage === "home" ? null : activePage === "overview" ? (
           <OverviewPage
             overviewData={overviewData}
             headcountTrend={headcountTrend}
@@ -2260,7 +2263,7 @@ export default function Home() {
         )}
         </div>
 
-        <AiPanel
+        {activePage !== "home" && <AiPanel
           aiCollapsed={aiCollapsed}
           aiExpanded={aiExpanded}
           aiSide={aiSide}
@@ -2284,7 +2287,7 @@ export default function Home() {
           }
           onChatInputChange={setChatInput}
           onSend={() => sendChatMessage()}
-        />
+        />}
       </div>
     </main>
     </PlanningSessionProvider>

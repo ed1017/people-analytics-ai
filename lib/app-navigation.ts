@@ -83,6 +83,7 @@ export const appPageMetadata: Record<
   AppPage,
   AppPageMetadata
 > = {
+  home: { label: "Overall Overview", section: "Workforce AI", description: "Explore key findings and ask questions across governed workforce evidence." },
   overview: {
     label: "Overview",
     section: "Workforce Analytics",

@@ -49,6 +49,7 @@ const pageIcons: Record<
   AppPage,
   LucideIcon
 > = {
+  home: Sparkles,
   overview: LayoutDashboard,
   workforce: Users,
   attrition: TrendingDown,
@@ -113,6 +114,11 @@ export function AppSidebar({
         aria-label="Workforce navigation"
         className="space-y-4"
       >
+        <Button type="button" aria-label="Overall Overview" aria-current={activePage === "home" ? "page" : undefined}
+          variant={activePage === "home" ? "secondary" : "ghost"} onClick={() => onPageChange("home")}
+          className="mb-2 w-full justify-start gap-3 text-base max-md:justify-center max-md:px-0">
+          <Sparkles className="h-5 w-5 shrink-0" />{!navCollapsed && <span className="max-md:hidden">Overall Overview</span>}
+        </Button>
         {appNavigationSections.map(
           (section, sectionIndex) => {
             const journey =
@@ -121,7 +127,7 @@ export function AppSidebar({
                   item.key === section.key
               );
             const sectionActive =
-              activeWorkspace === section.key;
+              activePage !== "home" && activeWorkspace === section.key;
             const groupLabel = journey
               ? `${section.title} — ${journey.subtitle}`
               : section.title;
