@@ -714,7 +714,7 @@ export default function Home() {
         if (!response.ok) {
           throw new Error(
             payload?.error ??
-              "Failed to load Career & Mobility data."
+              "Failed to load Career Interests data."
           );
         }
 
@@ -726,7 +726,7 @@ export default function Home() {
         setCareerMobilityError(
           error instanceof Error
             ? error.message
-            : "Failed to load Career & Mobility data."
+            : "Failed to load Career Interests data."
         );
       } finally {
         setCareerMobilityLoading(false);
