@@ -1690,7 +1690,7 @@ export default function Home() {
         />
 
         {/* Dashboard area */}
-        <div className="app-dashboard min-w-0 overflow-x-hidden bg-muted/10">
+        <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
         {activePage === "overview" ? (
           <OverviewPage
             overviewData={overviewData}

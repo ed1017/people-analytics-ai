@@ -26,7 +26,7 @@ export function AppHeader({
     getAppPageMetadata(activePage);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-5 backdrop-blur supports-[backdrop-filter]:bg-background/85">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-card/95 px-5 backdrop-blur supports-[backdrop-filter]:bg-card/85">
       <div className="flex min-w-0 items-center gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border bg-muted/40">
           <Sparkles className="h-4 w-4" />
@@ -64,7 +64,7 @@ export function AppHeader({
               event.target.value as Persona
             )
           }
-          className="h-9 min-w-28 cursor-pointer rounded-md border border-input bg-background px-3 pr-8 text-sm font-medium shadow-sm outline-none"
+          className="h-9 min-w-28 cursor-pointer rounded-md border border-input bg-card px-3 pr-8 text-sm font-medium shadow-sm outline-none"
           aria-label="Select persona"
         >
           <option value="HR">HR</option>

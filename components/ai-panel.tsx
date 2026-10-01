@@ -77,8 +77,8 @@ export function AiPanel({
       <aside
         className={
           aiCollapsed
-            ? "app-ai-panel sticky top-16 flex h-[calc(100vh-4rem)] min-w-0 flex-col overflow-hidden border-l p-4 max-md:h-16"
-            : "app-ai-panel sticky top-16 flex h-[calc(100vh-4rem)] min-w-0 flex-col overflow-hidden border-l p-4 max-md:h-[70vh] max-md:min-h-[520px]"
+            ? "app-ai-panel sticky top-16 flex h-[calc(100vh-4rem)] min-w-0 flex-col overflow-hidden border-l bg-card p-4 max-md:h-16"
+            : "app-ai-panel sticky top-16 flex h-[calc(100vh-4rem)] min-w-0 flex-col overflow-hidden border-l bg-card p-4 max-md:h-[70vh] max-md:min-h-[520px]"
         }
       >
         <div className="mb-4 flex items-center justify-between gap-2">

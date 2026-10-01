@@ -70,7 +70,7 @@ export function AppSidebar({
   onWorkspaceChange,
 }: AppSidebarProps) {
   return (
-    <aside className="app-sidebar sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto border-r bg-muted/10 p-3 max-md:p-2">
+    <aside className="app-sidebar sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto border-r bg-sidebar p-3 max-md:p-2">
       <Button
         variant="ghost"
         className={
@@ -199,7 +199,7 @@ export function AppSidebar({
                           className={
                             navCollapsed
                               ? "relative w-full justify-center px-0"
-                              : "relative w-full justify-start gap-3 px-3 max-md:justify-center max-md:px-0"
+                              : "relative h-auto min-h-10 w-full justify-start gap-3 px-3 py-2.5 max-md:justify-center max-md:px-0"
                           }
                           title={
                             `${metadata.label} — ${metadata.description}`
@@ -219,11 +219,11 @@ export function AppSidebar({
                           }
                         >
                           {active && (
-                            <span className="absolute left-0 h-5 w-0.5 rounded-full bg-foreground" />
+                            <span className="absolute left-0 h-6 w-1 rounded-full bg-primary" />
                           )}
                           <Icon className="h-5 w-5 shrink-0" />
                           {!navCollapsed && (
-                            <span className="truncate max-md:hidden">
+                            <span className="min-w-0 whitespace-normal text-left text-[17px] font-medium leading-[1.15] max-md:hidden">
                               {metadata.label}
                             </span>
                           )}
