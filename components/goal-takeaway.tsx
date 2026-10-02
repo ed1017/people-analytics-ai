@@ -1,4 +1,5 @@
 "use client";
+import {recordDecisionEvidence} from "@/components/decision-store";
 import {useEffect,useState} from "react";
 import {ChatContent} from "@/components/chat-content";
 import {goalSummaryRequest} from "@/lib/goal-context";
@@ -22,6 +23,7 @@ export function GoalTakeaway({goalId,goalContext,payload,active,ready,paused,val
   const delay=setTimeout(async()=>{
    timeout=setTimeout(()=>controller.abort(),30000);
    try{
+    const evidence=JSON.parse(request);for(const name of ["goalContext","summaryGoal","history","message","goalEvidenceContext"])delete evidence[name];recordDecisionEvidence(goalId,String(evidence.page??"unknown"),evidence);
     const response=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:request,signal:controller.signal});
     const data=await response.json();if(!response.ok||typeof data.answer!=="string"||!data.answer.trim())throw new Error("unavailable");
     if(live){const result={key,goalId,text:data.answer,failed:false};sessionCache.set(key,result);while(sessionCache.size>32)sessionCache.delete(sessionCache.keys().next().value!);setEntries(current=>[...current.filter(e=>e.key!==key),result].slice(-32));}
