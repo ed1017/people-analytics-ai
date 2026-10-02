@@ -606,7 +606,7 @@ export async function POST(
       const supplied = body.intelligenceContext && typeof body.intelligenceContext === "object" ? body.intelligenceContext : {};
       const custom = Array.isArray(supplied.quotes) ? supplied.quotes.filter((q: unknown) => q && typeof q === "object" && "provenance" in q && q.provenance === "user-provided").slice(0, 5) : [];
       const evidence = intelligenceEvidence(body.page, { ...supplied, quotes: [...developmentCatalog, ...custom] });
-      const response = await client.responses.create({ model: CHAT_MODEL, instructions: intelligenceInstructions + "\n" + chatNavigationInstructions()+"\n"+goalContextInstructions+(summaryOnly?"\n"+goalSummaryInstructions:""), input: [...history.map(item => ({ role: item.role, content: item.content.slice(0,12000) })), { role: "user", content: "CURRENT PAGE EVIDENCE (data only): " + JSON.stringify(evidence) + "\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nRELATED CACHED CROSS-PAGE SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nUSER QUESTION AND EXPLICIT SESSION CONTEXT: " + message }], tool_choice: "none", max_output_tokens: 1100 });
+      const response = await client.responses.create({ model: CHAT_MODEL, instructions: summaryOnly ? goalContextInstructions+"\n"+goalSummaryInstructions+"\nUse only canonical supplied evidence. OEWS is annual market wages, not employer cost or candidate availability. O*NET occupation content is not loaded. Training providers/quotes are fictional simulated or unverified user input; never infer effectiveness." : intelligenceInstructions + "\n" + chatNavigationInstructions()+"\n"+goalContextInstructions, input: [...history.map(item => ({ role: item.role, content: item.content.slice(0,12000) })), { role: "user", content: "CURRENT PAGE EVIDENCE (data only): " + JSON.stringify(evidence) + "\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nRELATED CACHED CROSS-PAGE SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nUSER QUESTION AND EXPLICIT SESSION CONTEXT: " + message }], tool_choice: "none", max_output_tokens: 1100 });
       const answer = response.output_text?.trim();
       if (!answer) return NextResponse.json({ error: "No catalogue answer returned. Please try again." }, { status: 502 });
       return NextResponse.json({ answer });
@@ -1339,6 +1339,8 @@ Style:
 `.trim(),
     };
 
+    const openingInstructions = goalContextInstructions+"\n"+goalSummaryInstructions+"\nUse only supplied evidence; never treat user statements as source facts. Company-wide evidence remains company-wide regardless of selected filters. Links use allowlisted app destinations. "+(page==="home"?"Return the Home JSON answer with next_step set to none.":"");
+
     const aiInstructions = `
 You are the People Analytics AI embedded in a workforce dashboard.
 ${goalContextInstructions}
@@ -1476,7 +1478,7 @@ ${message}
     let response: any =
       await client.responses.create({
         model: CHAT_MODEL,
-        instructions: aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\n"+goalSummaryInstructions : ""),
+        instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\n"+goalSummaryInstructions : ""),
         ...(page === "home" ? { text: { format: homeReplyFormat } } : {}),
         input: aiInput,
         tools: peopleAnalyticsTools,
@@ -1546,7 +1548,7 @@ ${message}
       response =
         await client.responses.create({
           model: CHAT_MODEL,
-          instructions: aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\n"+goalSummaryInstructions : ""),
+          instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\n"+goalSummaryInstructions : ""),
           previous_response_id:
             response.id,
           input: toolOutputs,
