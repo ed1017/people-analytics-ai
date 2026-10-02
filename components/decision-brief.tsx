@@ -1,13 +1,14 @@
 "use client";
+import {CapabilityJourney} from "@/components/capability-journey";
 import {useState} from "react";
 import {decisionStore,useDecisionStorage} from "@/components/decision-store";
 import {briefFields,emptyDecisionBrief,recordExplicitApproval,type DecisionBrief as Brief} from "@/lib/decision-brief";
 import {developmentCost,type DevelopmentOption} from "@/lib/development-costs";
 import type {ProblemConversation} from "@/components/problem-conversation";
-import type {ScenarioModelResponse} from "@/lib/types";
+import type {AppPage,ScenarioModelResponse} from "@/lib/types";
 import {type Json} from "@/lib/local-decisions";
 const readable=(s:string)=>s.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase());
-export function DecisionBrief({conversation}:{conversation:ProblemConversation}){
+export function DecisionBrief({conversation,onNavigate}:{conversation:ProblemConversation;onNavigate:(p:AppPage)=>void}){
  const storage=useDecisionStorage(),id=conversation.activeGoalId;
  const [approval,setApproval]=useState("");
  if(!id)return <section className="p-6"><h1 className="text-2xl font-semibold">Decision brief</h1><p className="mt-3">Select or create a goal above to keep a separate decision brief.</p></section>;
@@ -19,6 +20,7 @@ export function DecisionBrief({conversation}:{conversation:ProblemConversation})
  const development=fields.development as unknown as {options:DevelopmentOption[]}|undefined;
  const results=Object.keys(fields).filter(k=>k.startsWith('planning.')&&/Result$|customScenario$/.test(k)&&fields[k]);
  return <section aria-label="Decision brief" className="mx-auto max-w-5xl space-y-6 p-6"><header><h1 className="text-2xl font-semibold">Decision brief</h1><p className="mt-2 break-words font-medium">{conversation.focusedIssue}</p><p className="mt-2 text-sm text-muted-foreground">Your editable decision record. Notes are user-authored; evidence and calculations retain their own sources and dates. Nothing here approves or executes an action automatically.</p></header>
+ <CapabilityJourney key={id+conversation.focusedIssue} goalId={id} goal={conversation.focusedIssue} onNavigate={onNavigate}/>
  <label className="block text-sm font-semibold">Decision owner (optional)<input value={brief.owner} maxLength={120} onChange={e=>save({...brief,owner:e.target.value})} className="mt-2 block w-full rounded border bg-background p-2 font-normal"/><span className="mt-1 block text-xs font-normal text-muted-foreground">Saved locally with this goal. Brief fields are not sent to AI automatically.</span></label>
  <div className="grid gap-5 md:grid-cols-2">{Object.entries(briefFields).map(([key,label])=><label key={key} className="block text-sm font-semibold">{label}<textarea rows={4} maxLength={3000} value={brief[key as keyof typeof briefFields]} onChange={e=>save({...brief,[key]:e.target.value})} className="mt-2 block w-full rounded border bg-background p-3 font-normal"/>{key==="observed"&&<span className="text-xs font-normal text-muted-foreground">Reference source, period and population. Company evidence is synthetic; BLS observations are real public data.</span>}{key==="calculations"&&<span className="text-xs font-normal text-muted-foreground">Your interpretation, separate from the calculated values below. Modeled costs are not realized results.</span>}{key==="proposals"&&<span className="text-xs font-normal text-muted-foreground">Options for review, not approved actions.</span>}</label>)}</div>
  <section aria-label="Explicit approvals" className="rounded-lg border p-4"><h2 className="text-lg font-semibold">Explicit approvals</h2><p className="mt-1 text-sm text-muted-foreground">Only statements you deliberately record below appear here. This is your local note, not an authorization workflow or proof of organizational approval.</p>{!brief.approvals.length&&<p className="my-3 text-sm">No approvals recorded.</p>}<ol className="my-3 space-y-2">{brief.approvals.map((item,i)=><li key={i} className="break-words text-sm">{item.text}<span className="ml-2 text-xs text-muted-foreground">Recorded {new Date(item.recordedAt).toLocaleDateString()}</span><button className="ml-3 min-h-9 text-primary underline" onClick={()=>save({...brief,approvals:brief.approvals.filter((_,n)=>n!==i)})}>Remove approval {i+1}</button></li>)}</ol><label className="block text-sm">Approval to record<textarea value={approval} onChange={e=>setApproval(e.target.value)} maxLength={1000} rows={2} className="mt-2 w-full rounded border bg-background p-2"/></label><button disabled={!approval.trim()||brief.approvals.length>=20} className="mt-2 min-h-10 rounded border px-3 font-semibold text-primary disabled:opacity-50" onClick={()=>{save(recordExplicitApproval(brief,approval,new Date().toISOString()));setApproval("")}}>Record this approval</button></section>
