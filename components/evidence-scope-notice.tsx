@@ -42,7 +42,7 @@ export function EvidenceScopeNotice({
         scope.populationLabel;
 
   return (
-    <div className="mb-6 rounded-lg border bg-muted/20 p-4 text-sm">
+    <div className="evidence-scope-notice mb-6 rounded-lg border bg-muted/20 p-4 text-sm">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <span className="font-semibold">
           Evidence scope: {scope.label}

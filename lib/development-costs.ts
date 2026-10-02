@@ -29,6 +29,14 @@ export function validateQuote(q: DevelopmentQuote): string[] {
   }
   return errors;
 }
+// Called only after validation: decimal inputs contain at most two places.
+function hundredths(value: string): bigint {
+  const [whole, fraction = ""] = value.split(".");
+  return BigInt(whole) * BigInt(100) + BigInt(fraction.padEnd(2, "0"));
+}
+function fromHundredths(value: bigint | null): number | null {
+  return value === null ? null : Number(value / BigInt(100)) + Number(value % BigInt(100)) / 100;
+}
 export function developmentCost(q: DevelopmentQuote, input: DevelopmentInputs) {
   const errors: string[] = [];
   const read = (v: string, label: string, max: number, integer = false, positive = false) => { try { return numberInput(v,label,max,integer,positive); } catch(e) { errors.push((e as Error).message); return null; } };
@@ -40,12 +48,17 @@ export function developmentCost(q: DevelopmentQuote, input: DevelopmentInputs) {
   const additional = read(input.additionalFees,"Additional fees",1000000);
   const hourlyCost = read(input.hourlyCost,"Loaded hourly cost",1000000);
   const cohorts = participants !== null && capacity !== null ? Math.ceil(participants / capacity) : null;
-  const round = (n: number) => Math.round(n * 100) / 100;
   const units = q.basis === "person" ? participants : cohorts;
-  const quoteTotal = units !== null && sessions !== null && fee !== null ? round(units * sessions * fee) : null;
-  const employeeHours = participants !== null && sessions !== null && hours !== null ? round(participants * sessions * hours) : null;
-  const timeCost = employeeHours !== null && hourlyCost !== null ? round(employeeHours * hourlyCost) : null;
-  const cashCost = quoteTotal !== null && additional !== null ? round(quoteTotal + additional) : null;
-  const total = cashCost !== null && timeCost !== null ? round(cashCost + timeCost) : null;
+  const quoteCents = units !== null && sessions !== null && fee !== null ? BigInt(units) * BigInt(sessions) * hundredths(input.fee) : null;
+  const hourHundredths = participants !== null && sessions !== null && hours !== null ? BigInt(participants) * BigInt(sessions) * hundredths(input.hours) : null;
+  // Nonnegative amounts round half up once, at the employee-time subtotal.
+  const timeCents = hourHundredths !== null && hourlyCost !== null ? (hourHundredths * hundredths(input.hourlyCost) + BigInt(50)) / BigInt(100) : null;
+  const cashCents = quoteCents !== null && additional !== null ? quoteCents + hundredths(input.additionalFees) : null;
+  const totalCents = cashCents !== null && timeCents !== null ? cashCents + timeCents : null;
+  const quoteTotal = fromHundredths(quoteCents);
+  const employeeHours = fromHundredths(hourHundredths);
+  const timeCost = fromHundredths(timeCents);
+  const cashCost = fromHundredths(cashCents);
+  const total = fromHundredths(totalCents);
   return { errors, cohorts, quoteTotal, employeeHours, timeCost, cashCost, total };
 }

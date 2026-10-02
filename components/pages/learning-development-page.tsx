@@ -48,7 +48,7 @@ export function LearningDevelopmentPage({
   selectedContext,
 }: LearningDevelopmentPageProps) {
   return (
-    <section className="min-w-0 p-6">
+    <section className="learning-development-page min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold">

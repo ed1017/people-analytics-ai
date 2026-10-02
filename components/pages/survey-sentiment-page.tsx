@@ -112,7 +112,7 @@ export function SurveySentimentPage({
     data?.onboarding_dimensions.filter((row) => row.survey_code === "ONB-90") ?? [];
 
   return (
-    <section className="min-w-0 p-6">
+    <section className="evidence-workspace min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold">
