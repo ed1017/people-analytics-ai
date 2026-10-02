@@ -1264,10 +1264,10 @@ Interpretation rules:
 
     const surveySentimentPrompt = page === "survey-sentiment" ? `CURRENT EMPLOYEE LISTENING CONTEXT (normalized aggregate evidence):
 ${JSON.stringify(employeeListeningEvidence(surveySentimentContext))}
-Use each survey's population and dates. Exit feedback belongs to Attrition and is not included on this page. No causal claims or raw-comment themes.` : "";
+Answer the scope and causality questions first. Use at most 180 words, at most three representative observations, and no tables or exhaustive lists so the answer finishes within the response budget. Use each survey's population and dates. Exit feedback belongs to Attrition and is not included on this page. No causal claims or raw-comment themes.` : "";
     const exitSurveyPrompt = page === "attrition" ? `EXIT SURVEY FEEDBACK (separate from administrative separation records):
 ${JSON.stringify(exitSurveyEvidence(body?.exitSurveyContext))}
-Cite this as exit-survey evidence. Do not combine its respondent denominator with employee headcount or all separations, claim a fieldwork period from an as-of date, infer causal drivers, or reconstruct unavailable/suppressed values.` : "";
+Answer the scope and causality questions first. Use at most 180 words, at most three representative observations, and no tables or exhaustive lists so the answer finishes within the response budget. Cite this as exit-survey evidence. Do not combine its respondent denominator with employee headcount or all separations, claim a fieldwork period from an as-of date, infer causal drivers, or reconstruct unavailable/suppressed values.` : "";
 
     const personaInstructions: Record<
       Persona,
