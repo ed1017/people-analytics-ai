@@ -72,3 +72,4 @@ test('finish schema exposes only conclusions and preferences supported by return
  assert.deepEqual(finishSchema(1).conclusion.enum,['no_feasible_option']);assert.deepEqual(finishSchema(1).preferred_id.enum,[null]);assert.deepEqual(finishSchema(1).reviewed_ids.items.enum,['R1']);
  assert.deepEqual(finishSchema(2).conclusion.enum,['constraints_met_outcomes_unknown']);assert.deepEqual(finishSchema(2).preferred_id.enum,[null,'R2']);assert.equal(finishSchema(2).reviewed_ids.minItems,2);assert.equal(finishSchema(2).reviewed_ids.maxItems,2);
 });
+
