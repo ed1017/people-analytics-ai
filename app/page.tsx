@@ -13,7 +13,6 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { completeScopedChatTurn, getScopedChatHistory, type ScopedChatHistory } from "@/lib/chat-context-history";
 import { buildAggregateExport, downloadAggregateCsv } from "@/lib/aggregate-export";
 import { GlobalWorkforceFilters } from "@/components/global-workforce-filters";
-import { usePageBriefing } from "@/components/use-page-briefing";
 import { AppHeader } from "@/components/app-header";
 import { OverviewPage } from "@/components/pages/overview-page";
 import { OverallOverviewPage } from "@/components/pages/overall-overview-page";
@@ -22,6 +21,8 @@ import { WorkforcePage } from "@/components/pages/workforce-page";
 import { AttritionPage } from "@/components/pages/attrition-page";
 import { FinancePage } from "@/components/pages/finance-page";
 import { SkillsPage } from "@/components/pages/skills-page";
+import { GuidedDemo, DEVELOPMENT_DEMO_GOAL } from "@/components/guided-demo";
+import { DevelopmentCatalog, DevelopmentPlanning, emptyDevelopmentSession } from "@/components/development-workspace";
 import { LearningDevelopmentPage } from "@/components/pages/learning-development-page";
 import { CareerMobilityPage } from "@/components/pages/career-mobility-page";
 import { CareerGrowthMobilityPage } from "@/components/pages/career-growth-mobility-page";
@@ -78,11 +79,6 @@ const EMPTY_FILTER_OPTIONS: DashboardFilterOptions = {
   levels: [],
 };
 
-type AiSide = "left" | "right";
-
-const AI_SIDE_STORAGE_KEY =
-  "people-analytics.ai-side.v1";
-
 const PLANNING_PAGE_TO_VIEW: Partial<
   Record<AppPage, PlanningWorkspaceView>
 > = {
@@ -106,12 +102,12 @@ const PLANNING_VIEW_TO_PAGE: Record<
 };
 
 export default function Home() {
+  const [demoActive, setDemoActive] = useState(false);
+  const [developmentSession, setDevelopmentSession] = useState(emptyDevelopmentSession);
   const [talentResponseEvidenceContext, setTalentResponseEvidenceContext] = useState<string | null>(null);
   const [navCollapsed, setNavCollapsed] = useState(false);
   const [aiCollapsed, setAiCollapsed] = useState(false);
   const [aiWidth, setAiWidth] = useState(460);
-  const [aiSide, setAiSide] =
-    useState<AiSide>("left");
 
   const [overviewData, setOverviewData] =
     useState<OverviewData | null>(null);
@@ -352,23 +348,7 @@ export default function Home() {
   const handoffValidationRequestIdRef =
     useRef(0);
 
-  useEffect(() => {
-    try {
-      const savedSide =
-        window.localStorage.getItem(
-          AI_SIDE_STORAGE_KEY
-        );
 
-      if (
-        savedSide === "left" ||
-        savedSide === "right"
-      ) {
-        setAiSide(savedSide);
-      }
-    } catch {
-      // Local preference persistence is optional.
-    }
-  }, []);
 
   useEffect(() => {
     const requestId = ++dashboardRequestIdRef.current;
@@ -1789,14 +1769,13 @@ export default function Home() {
             },
           } : null;
   const sourceState = activePage === "workforce" ? [workforceData, workforceLoading, workforceError] : activePage === "attrition" ? [attritionData, attritionLoading, attritionError] : activePage === "skills" ? [skillsData, skillsLoading, skillsError] : activePage === "learning-development" ? [learningDevelopmentData, learningDevelopmentLoading, learningDevelopmentError] : activePage === "career-mobility" ? [careerMobilityData, careerMobilityLoading, careerMobilityError] : activePage === "career-growth-mobility" ? [careerGrowthMobilityData, careerGrowthMobilityLoading, careerGrowthMobilityError] : activePage === "succession-planning" ? [successionCoverageData, successionCoverageLoading, successionCoverageError] : activePage === "talent-acquisition" ? [talentAcquisitionData, talentAcquisitionLoading, talentAcquisitionError] : activePage === "survey-sentiment" ? [surveySentimentData, surveySentimentLoading, surveySentimentError] : activePage === "finance" ? [financeData, financeLoading, financeError] : [planningData, planningLoading || positionModelingLoading, planningError || positionModelingError];
+  const chatEvidenceReady = Boolean(overviewData) && !dashboardLoading && !dashboardError && !sourceState[1] && Boolean(sourceState[0]) && !sourceState[2];
   const currentSource = sourceState[0];
   const sourceRecord = currentSource && typeof currentSource === "object" ? currentSource as Record<string, unknown> : null;
   const movementSource = sourceRecord?.source;
   const sourceDate = sourceRecord?.as_of ?? sourceRecord?.as_of_date ?? (movementSource && typeof movementSource === "object" && "last_recorded_date" in movementSource ? movementSource.last_recorded_date : null);
   const pageSourceDate = typeof sourceDate === "string" ? sourceDate : null;
   const chatEvidenceKey = JSON.stringify({ ...chatEvidence, destination: activePage, pageSourceDate });
-  const hasPageBriefing = !["home", "guide-data", "compensation"].includes(activePage);
-  const pageBriefing = usePageBriefing(chatEvidenceKey, hasPageBriefing && Boolean(chatEvidence), dashboardLoading || Boolean(sourceState[1]) || !sourceState[0], dashboardError || (typeof sourceState[2] === "string" ? sourceState[2] : null));
 
   const sendChatMessage = async (
     suggestedMessage?: string
@@ -1807,7 +1786,7 @@ export default function Home() {
 
     if (/^(?:please\s+|can you\s+)?(?:export|download)\b/i.test(message)) {
       const roster = /\b(names?|roster|employees? list|list of employees)\b/i.test(message);
-      const csv = !roster && !dashboardLoading && !sourceState[1] && !sourceState[2] ? buildAggregateExport({page:activePage,filters:JSON.stringify(selectedBusinessContext),snapshot:overviewData,trend:headcountTrend,workforce:workforceData,skills:skillsData}) : null;
+      const csv = !roster && chatEvidenceReady ? buildAggregateExport({page:activePage,filters:JSON.stringify(selectedBusinessContext),snapshot:overviewData,trend:headcountTrend,workforce:workforceData,skills:skillsData}) : null;
       if (csv) downloadAggregateCsv(csv, activePage);
       setChatMessages(current => [...current, {role:"user",content:message},{role:"assistant",content:roster ? "Employee-name and roster exports are not available from the current public aggregate views. I have not downloaded a roster. This needs a separate source and access review." : csv ? "Downloaded the available Workforce or Skills aggregate tables as CSV, with source, scope, filters, dates and units. This contains aggregate metrics, not employee names or raw records." : "A CSV export is currently available on Workforce and Skills Intelligence after their data has loaded. This page’s data is not yet supported for export; no file was downloaded."}]);
       setChatInput("");
@@ -1816,7 +1795,7 @@ export default function Home() {
 
     if (
       !message ||
-      !overviewData || dashboardLoading || Boolean(sourceState[1]) || !sourceState[0] ||
+      !chatEvidenceReady ||
       chatLoading
     ) {
       return;
@@ -1829,7 +1808,7 @@ export default function Home() {
 
     const modelContextKey = chatEvidenceKey;
     const priorHistory = getScopedChatHistory(modelHistoryRef.current, modelContextKey);
-    const modelHistory: ChatMessage[] = priorHistory.length ? priorHistory : pageBriefing.text ? [{ role: "assistant", content: pageBriefing.text }] : [];
+    const modelHistory: ChatMessage[] = priorHistory;
 
     const nextMessages = [
       ...chatMessages,
@@ -1953,9 +1932,7 @@ export default function Home() {
       moveEvent: MouseEvent
     ) => {
       const movement =
-        aiSide === "left"
-          ? moveEvent.clientX - startX
-          : startX - moveEvent.clientX;
+        moveEvent.clientX - startX;
       const newWidth =
         startWidth + movement;
 
@@ -2018,17 +1995,13 @@ export default function Home() {
     ) {
       nextWidth =
         aiWidth +
-        (aiSide === "left"
-          ? -step
-          : step);
+        -step;
     } else if (
       event.key === "ArrowRight"
     ) {
       nextWidth =
         aiWidth +
-        (aiSide === "left"
-          ? step
-          : -step);
+        step;
     }
 
     if (nextWidth === null) return;
@@ -2045,21 +2018,6 @@ export default function Home() {
     );
   };
 
-  const updateAiSide = (
-    nextSide: AiSide
-  ) => {
-    setAiSide(nextSide);
-
-    try {
-      window.localStorage.setItem(
-        AI_SIDE_STORAGE_KEY,
-        nextSide
-      );
-    } catch {
-      // Local preference persistence is optional.
-    }
-  };
-
   return (
     <PlanningSessionProvider onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
     <main className={`min-h-screen bg-background text-foreground${activePage === "home" || activePage === "guide-data" ? " app-overview-mode" : ""}`}>
@@ -2072,7 +2030,7 @@ export default function Home() {
 
       {/* Main application */}
       <div
-        className={`app-shell app-ai-${aiSide}${activePage === "home" || activePage === "guide-data" || activePage === "compensation" ? " app-home" : ""}`}
+        className={`app-shell app-ai-left${activePage === "home" || activePage === "guide-data" || activePage === "compensation" || activePage === "development-planning" ? " app-home" : ""}`}
         style={
           {
             "--nav-width": `${
@@ -2099,10 +2057,13 @@ export default function Home() {
 
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
-        <div hidden={activePage !== "home"}><OverallOverviewPage active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></div>
+        {demoActive && <GuidedDemo page={activePage} onNavigate={setActivePage} onClose={() => setDemoActive(false)} onUseGoal={() => setDevelopmentSession(current => ({ ...current, goal: DEVELOPMENT_DEMO_GOAL }))} hasOptions={developmentSession.options.length > 0} />}
+        <div hidden={activePage !== "home"}><OverallOverviewPage onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></div>
         {activePage === "guide-data" ? <GuideDataPage onBack={() => { setActivePage("home"); window.requestAnimationFrame(() => document.getElementById("overall-guide-link")?.focus()); }} /> : activePage === "home" ? null : activePage === "compensation" ? (
           <section className="p-6"><h1 className="text-2xl font-semibold">Compensation</h1><p className="mt-4 text-lg">TBD</p><p className="mt-2 text-muted-foreground">Planned destination. Compensation data and analysis are not available.</p></section>
-        ) : activePage === "workforce" ? (
+        ) : activePage === "development-planning" ? (
+          <DevelopmentPlanning session={developmentSession} onChange={setDevelopmentSession} onCatalog={() => setActivePage("learning-development")} />
+          ) : activePage === "workforce" ? (
           <>
           <h1 className="px-6 pt-6 text-2xl font-semibold">Workforce</h1>
           <OverviewPage
@@ -2186,6 +2147,7 @@ export default function Home() {
         ) : activePage ===
           "learning-development" ? (
           <LearningDevelopmentPage
+            catalog={<DevelopmentCatalog session={developmentSession} onChange={setDevelopmentSession} onOpen={() => setActivePage("development-planning")} />}
             data={learningDevelopmentData}
             loading={learningDevelopmentLoading}
             error={learningDevelopmentError}
@@ -2282,27 +2244,24 @@ export default function Home() {
         )}
         </div>
 
-        {activePage !== "home" && activePage !== "guide-data" && activePage !== "compensation" && <AiPanel
+        {activePage !== "home" && activePage !== "guide-data" && activePage !== "compensation" && activePage !== "development-planning" && <AiPanel
           aiCollapsed={aiCollapsed}
           aiExpanded={aiExpanded}
-          aiSide={aiSide}
           aiWidth={aiWidth}
           previewPage={previewPage}
           suggestedPrompts={[...suggestedPrompts, "Export current data (CSV)"]}
-          pageBriefing={pageBriefing}
           scopeNote={activePage === "workforce" ? "Selected filters narrow the workforce snapshot only; company composition stays unfiltered." : planningWorkspaceActive ? "Filters describe workforce context. Planning scenarios and carried evidence keep their own scope, dates and assumptions." : "This page uses company-wide evidence. The shared workforce filters do not narrow these measures."}
           chatMessages={chatMessages}
           chatInput={chatInput}
           chatLoading={chatLoading}
           chatError={chatError}
-          dashboardReady={Boolean(overviewData) && !dashboardLoading && !sourceState[1] && Boolean(sourceState[0]) && !sourceState[2]}
+          dashboardReady={chatEvidenceReady}
           onResizeStart={startAiResize}
           onResizeKeyDown={resizeAiWithKeyboard}
           onToggleExpanded={toggleAiExpanded}
           onToggleCollapsed={() =>
             setAiCollapsed(!aiCollapsed)
           }
-          onAiSideChange={updateAiSide}
           onSuggestedPrompt={(prompt) =>
             sendChatMessage(prompt)
           }

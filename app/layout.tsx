@@ -13,10 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 const productTitle =
-  "Workforce AI | People Analytics & Strategic Workforce Planning";
+  "Insights to Action | People Analytics & Strategic Workforce Planning";
 
 const productDescription =
-  "Public portfolio MVP for People Analytics and Strategic Workforce Planning, with workforce dashboards, skills intelligence, scenario planning, workforce response and execution feasibility, and grounded AI assistance.";
+  "Insights to Action is a public portfolio demo for people analytics and workforce planning, connecting workforce evidence, talent responses and planning scenarios with grounded AI assistance.";
 
 export const metadata: Metadata = {
   title: productTitle,

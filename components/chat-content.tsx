@@ -1,15 +1,23 @@
 "use client";
 
 import type { ReactNode } from "react";
+import type { AppPage } from "@/lib/types";
+import { getChatNavigationAction } from "@/lib/chat-navigation";
 
 function renderInlineMarkdown(
-  value: string
+  value: string,
+  onNavigate?: (page: AppPage) => void,
 ) {
   const parts = value.split(
-    /(\*\*\*.*?\*\*\*|\*\*.*?\*\*|\*.*?\*)/g
+    /(\[[^\]\n]+\]\(app:[a-z-]+\)|\*\*\*.*?\*\*\*|\*\*.*?\*\*|\*.*?\*)/g
   );
 
   return parts.map((part, index) => {
+    const link = part.match(/^\[[^\]\n]+\]\((app:[a-z-]+)\)$/);
+    const action = link ? getChatNavigationAction(link[1]) : null;
+    if (action && onNavigate) {
+      return <button key={index} type="button" onClick={() => onNavigate(action.page)} className="rounded-sm text-left font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Open {action.label}</button>;
+    }
     if (
       part.startsWith("***") &&
       part.endsWith("***")
@@ -19,7 +27,7 @@ function renderInlineMarkdown(
           key={index}
           className="italic"
         >
-          {part.slice(3, -3)}
+          {renderInlineMarkdown(part.slice(3, -3), onNavigate)}
         </strong>
       );
     }
@@ -30,7 +38,7 @@ function renderInlineMarkdown(
     ) {
       return (
         <strong key={index}>
-          {part.slice(2, -2)}
+          {renderInlineMarkdown(part.slice(2, -2), onNavigate)}
         </strong>
       );
     }
@@ -42,7 +50,7 @@ function renderInlineMarkdown(
     ) {
       return (
         <em key={index}>
-          {part.slice(1, -1)}
+          {renderInlineMarkdown(part.slice(1, -1), onNavigate)}
         </em>
       );
     }
@@ -82,8 +90,10 @@ function isMarkdownTableSeparator(
 
 export function ChatContent({
   content,
+  onNavigate,
 }: {
   content: string;
+  onNavigate?: (page: AppPage) => void;
 }) {
   const lines = content.split("\n");
   const rendered: ReactNode[] = [];
@@ -139,7 +149,7 @@ export function ChatContent({
                       className="border-b px-3 py-2 text-left font-semibold"
                     >
                       {renderInlineMarkdown(
-                        header
+                        header, onNavigate
                       )}
                     </th>
                   )
@@ -166,7 +176,7 @@ export function ChatContent({
                           {renderInlineMarkdown(
                             row[
                               cellIndex
-                            ] ?? ""
+                            ] ?? "", onNavigate
                           )}
                         </td>
                       )
@@ -205,7 +215,7 @@ export function ChatContent({
           className="font-semibold"
         >
           {renderInlineMarkdown(
-            headingMatch[2]
+            headingMatch[2], onNavigate
           )}
         </p>
       );
@@ -230,7 +240,7 @@ export function ChatContent({
           </span>
           <span>
             {renderInlineMarkdown(
-              bulletMatch[1]
+              bulletMatch[1], onNavigate
             )}
           </span>
         </div>
@@ -256,7 +266,7 @@ export function ChatContent({
           </span>
           <span>
             {renderInlineMarkdown(
-              numberedMatch[2]
+              numberedMatch[2], onNavigate
             )}
           </span>
         </div>
@@ -269,7 +279,7 @@ export function ChatContent({
     rendered.push(
       <p key={`text-${index}`}>
         {renderInlineMarkdown(
-          trimmed
+          trimmed, onNavigate
         )}
       </p>
     );

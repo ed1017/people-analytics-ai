@@ -3,7 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { overviewBriefingPrompt } from "../../../lib/overview-briefing";
 import { talentResponseChatPrompt } from "../../../lib/talent-response-evidence";
-import { peopleAnalyticsTools, runPeopleAnalyticsTool } from "../../../lib/people-analytics-tools";
+import { peopleAnalyticsTools, runPeopleAnalyticsTool, getSurveySentiment } from "../../../lib/people-analytics-tools";
+import { localExitEnpsEnabled } from "../../../lib/exit-enps";
+import { chatNavigationInstructions } from "../../../lib/chat-navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -691,7 +693,7 @@ export async function POST(
         )
         .join("\n\n");
 
-    const workforceContext = page === "home" ? overviewBriefingPrompt(body?.overviewBriefingContext ?? []) : `
+    const workforceContext = page === "home" ? overviewBriefingPrompt(body?.overviewBriefingContext ?? []) + "\n" + chatNavigationInstructions() : `
 CURRENT SELECTED BUSINESS CONTEXT
 Snapshot date: ${context.snapshotDate}
 Country: ${context.country}
@@ -1241,7 +1243,11 @@ Interpretation rules:
         : "";
 
     const surveySentimentPrompt =
-      page === "survey-sentiment" &&
+      page === "survey-sentiment" && localExitEnpsEnabled()
+        ? `CURRENT SURVEY & SENTIMENT CONTEXT (fresh server retrieval; client survey payload excluded):
+${JSON.stringify(await getSurveySentiment())}
+The exit eNPS is explicitly SIMULATED exit-survey response data, not current-employee sentiment or observed historical responses. Always label it simulated. Promoters 9–10, passives 7–8, detractors 0–6; score = percentage promoters minus percentage detractors using all valid responses. Keep it separate from the other 1–5 measures. No inferred causal claims, business priorities, individual recommendations or invented trend. Source refresh date is unavailable.`
+        : page === "survey-sentiment" &&
       surveySentimentContext
         ? `
 CURRENT SURVEY & SENTIMENT CONTEXT

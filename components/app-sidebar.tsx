@@ -49,6 +49,7 @@ const pageIcons: Record<
   AppPage,
   LucideIcon
 > = {
+  "development-planning": GraduationCap,
   home: Sparkles,
   "guide-data": Compass,
   overview: LayoutDashboard,
