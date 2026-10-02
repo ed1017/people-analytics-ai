@@ -1,7 +1,10 @@
 "use client";
 
+import { intelligenceEvidence, isIntelligencePage } from "@/lib/intelligence-chat";
+import { developmentCatalog } from "@/lib/development-costs";
 import {
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -1316,13 +1319,15 @@ export default function Home() {
       : 0;
 
   const intelligencePage = activePage === "occupational-references" || activePage === "labor-market" || activePage === "training-coaching";
-  const readOnlyChatPage = intelligencePage || activePage === "guide-data" || activePage === "compensation" || activePage === "development-planning";
-  const readOnlyReason = intelligencePage ? "AI does not analyze these reference links, BLS observations or provider quotes. Your earlier conversation stays available for reference." : readOnlyChatPage ? "AI does not analyze the local content on this page. Your earlier conversation stays available for reference." : undefined;
+  const readOnlyChatPage = activePage === "guide-data" || activePage === "compensation" || activePage === "development-planning";
+  const readOnlyReason = readOnlyChatPage ? "AI does not analyze the local content on this page. Your earlier conversation stays available for reference." : undefined;
   const previewPage = readOnlyChatPage;
 
   const suggestedPrompts =
     previewPage
       ? []
+      : intelligencePage
+      ? activePage === "occupational-references" ? ["Explain the stored mapping coverage and its limits", "What should I verify before using these references?"] : activePage === "labor-market" ? ["Explain the available observations, dates and scope", "What can these indicators not tell us?"] : ["Compare the simulated quotes for my goal", "What information do I need for a cost comparison?"]
       : planningWorkspaceActive
       ? [
           "Compare all four workforce scenarios",
@@ -1398,7 +1403,8 @@ export default function Home() {
     setSelectedLevel("all");
   };
 
-  const chatEvidence = overviewData ? {
+  const catalogueContext = activePage === "occupational-references" ? { loading: skillsLoading, unavailable: Boolean(skillsError) || !skillsData, mappedJobProfiles: skillsData?.summary.onet_mapped_job_profiles, totalJobProfiles: skillsData?.summary.total_job_profiles } : activePage === "labor-market" ? { loading: blsLoading, unavailable: Boolean(blsError) || !blsData, metrics: blsData?.metrics } : activePage === "training-coaching" ? { quotes: [...developmentCatalog, ...developmentSession.custom], selected: developmentSession.selected, goal: developmentSession.goal } : null;
+  const chatEvidence = intelligencePage ? { page: activePage, persona: selectedPersona, intelligenceContext: catalogueContext } : overviewData ? {
             persona: selectedPersona,
             page: planningWorkspaceActive
               ? "workforce-planning"
@@ -1773,13 +1779,16 @@ export default function Home() {
             },
           } : null;
   const sourceState = activePage === "workforce" ? [workforceData, workforceLoading, workforceError] : activePage === "attrition" ? [attritionData, attritionLoading, attritionError] : activePage === "skills" ? [skillsData, skillsLoading, skillsError] : activePage === "learning-development" ? [learningDevelopmentData, learningDevelopmentLoading, learningDevelopmentError] : activePage === "career-mobility" ? [careerMobilityData, careerMobilityLoading, careerMobilityError] : activePage === "career-growth-mobility" ? [careerGrowthMobilityData, careerGrowthMobilityLoading, careerGrowthMobilityError] : activePage === "succession-planning" ? [successionCoverageData, successionCoverageLoading, successionCoverageError] : activePage === "talent-acquisition" ? [talentAcquisitionData, talentAcquisitionLoading, talentAcquisitionError] : activePage === "survey-sentiment" ? [surveySentimentData, surveySentimentLoading, surveySentimentError] : activePage === "finance" ? [financeData, financeLoading, financeError] : [planningData, planningLoading || positionModelingLoading, planningError || positionModelingError];
-  const chatEvidenceReady = !readOnlyChatPage && Boolean(overviewData) && !dashboardLoading && !dashboardError && !sourceState[1] && Boolean(sourceState[0]) && !sourceState[2];
+  const chatEvidenceReady = intelligencePage ? true : !readOnlyChatPage && Boolean(overviewData) && !dashboardLoading && !dashboardError && !sourceState[1] && Boolean(sourceState[0]) && !sourceState[2];
   const currentSource = sourceState[0];
   const sourceRecord = currentSource && typeof currentSource === "object" ? currentSource as Record<string, unknown> : null;
   const movementSource = sourceRecord?.source;
   const sourceDate = sourceRecord?.as_of ?? sourceRecord?.as_of_date ?? (movementSource && typeof movementSource === "object" && "last_recorded_date" in movementSource ? movementSource.last_recorded_date : null);
-  const pageSourceDate = typeof sourceDate === "string" ? sourceDate : null;
+  const pageSourceDate = intelligencePage ? null : typeof sourceDate === "string" ? sourceDate : null;
   const chatEvidenceKey = JSON.stringify({ ...chatEvidence, destination: activePage, pageSourceDate });
+
+  const currentChatEvidenceKey = useRef(chatEvidenceKey);
+  useLayoutEffect(() => { currentChatEvidenceKey.current = chatEvidenceKey; }, [chatEvidenceKey]);
 
   const sendChatMessage = async (
     suggestedMessage?: string
@@ -1850,7 +1859,7 @@ export default function Home() {
         );
       }
 
-      if (!request.current()) return;
+      if (!request.current() || (intelligencePage && currentChatEvidenceKey.current !== modelContextKey)) return;
       setChatMessages((current) => [
         ...current,
         {
@@ -2260,8 +2269,8 @@ export default function Home() {
           aiExpanded={aiExpanded}
           aiWidth={aiWidth}
           previewPage={previewPage}
-          suggestedPrompts={readOnlyChatPage ? [] : [...suggestedPrompts, "Export current data (CSV)"]}
-          scopeNote={readOnlyReason ?? (activePage === "workforce" ? "Selected filters narrow the workforce snapshot only; company composition stays unfiltered." : planningWorkspaceActive ? "Filters describe workforce context. Planning scenarios and carried evidence keep their own scope, dates and assumptions." : "This page uses company-wide evidence. The shared workforce filters do not narrow these measures.")}
+          suggestedPrompts={readOnlyChatPage ? [] : intelligencePage ? suggestedPrompts : [...suggestedPrompts, "Export current data (CSV)"]}
+          scopeNote={readOnlyReason ?? (isIntelligencePage(activePage) ? `${intelligenceEvidence(activePage, catalogueContext).scope}. Workforce filters do not narrow this evidence. AI uses only this page; no external lookup.` : activePage === "workforce" ? "Selected filters narrow the workforce snapshot only; company composition stays unfiltered." : planningWorkspaceActive ? "Filters describe workforce context. Planning scenarios and carried evidence keep their own scope, dates and assumptions." : "This page uses company-wide evidence. The shared workforce filters do not narrow these measures.")}
           chatMessages={chatMessages}
           chatInput={chatInput}
           chatLoading={chatLoading}
