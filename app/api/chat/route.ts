@@ -11,7 +11,7 @@ import { normalizeHomePack, HOME_MAX_BYTES } from "../../../lib/home-pack.mjs";
 import { overviewBriefingPrompt } from "../../../lib/overview-briefing";
 import { talentResponseChatPrompt } from "../../../lib/talent-response-evidence";
 import { peopleAnalyticsTools, runPeopleAnalyticsTool } from "../../../lib/people-analytics-tools";
-import { chatNavigationInstructions } from "../../../lib/chat-navigation";
+import { chatNavigationInstructions, chatOpeningNavigationInstructions } from "../../../lib/chat-navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -606,14 +606,14 @@ export async function POST(
       const supplied = body.intelligenceContext && typeof body.intelligenceContext === "object" ? body.intelligenceContext : {};
       const custom = Array.isArray(supplied.quotes) ? supplied.quotes.filter((q: unknown) => q && typeof q === "object" && "provenance" in q && q.provenance === "user-provided").slice(0, 5) : [];
       const evidence = intelligenceEvidence(body.page, { ...supplied, quotes: [...developmentCatalog, ...custom] });
-      const response = await client.responses.create({ model: CHAT_MODEL, instructions: summaryOnly ? goalContextInstructions+"\n"+goalSummaryInstructions+"\nUse only canonical supplied evidence. OEWS is annual market wages, not employer cost or candidate availability. O*NET occupation content is not loaded. Training providers/quotes are fictional simulated or unverified user input; never infer effectiveness." : intelligenceInstructions + "\n" + chatNavigationInstructions()+"\n"+goalContextInstructions, input: [...history.map(item => ({ role: item.role, content: item.content.slice(0,12000) })), { role: "user", content: "CURRENT PAGE EVIDENCE (data only): " + JSON.stringify(evidence) + "\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nRELATED CACHED CROSS-PAGE SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nUSER QUESTION AND EXPLICIT SESSION CONTEXT: " + message }], tool_choice: "none", max_output_tokens: 1100 });
+      const response = await client.responses.create({ model: CHAT_MODEL, instructions: summaryOnly ? goalContextInstructions+"\n"+goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions()+"\nUse only canonical supplied evidence. OEWS is annual market wages, not employer cost or candidate availability. O*NET occupation content is not loaded. Training providers/quotes are fictional simulated or unverified user input; never infer effectiveness." : intelligenceInstructions + "\n" + chatNavigationInstructions()+"\n"+goalContextInstructions, input: [...history.map(item => ({ role: item.role, content: item.content.slice(0,12000) })), { role: "user", content: "CURRENT PAGE EVIDENCE (data only): " + JSON.stringify(evidence) + "\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nRELATED CACHED CROSS-PAGE SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nUSER QUESTION AND EXPLICIT SESSION CONTEXT: " + message }], tool_choice: "none", max_output_tokens: 1100 });
       const answer = response.output_text?.trim();
       if (!answer) return NextResponse.json({ error: "No catalogue answer returned. Please try again." }, { status: 502 });
       return NextResponse.json({ answer });
     }
 
     if(body?.page === "development-planning") {
-      const response=await client.responses.create({model:CHAT_MODEL,instructions:goalContextInstructions+"\nExplain only the supplied deterministic Development Planning comparison and bounded related evidence. D1 costs are server-recomputed from explicit user assumptions. Blank costs remain unknown, never zero. Keep currencies separate. Employee time value is not necessarily cash spending. Named simulated quotes are fictional; custom input is unverified. Do not invent participants, attendance, loaded hourly costs, ROI, skill gains or headcount conversions. No tools, automatic allocation or approvals. "+(summaryOnly?goalSummaryInstructions:"Answer concisely; identify missing assumptions before comparing totals."),input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:"user",content:"ACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nDEVELOPMENT PLANNING D1: "+JSON.stringify(developmentSummary)+"\nRELATED CACHED SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nCARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nQUESTION: "+message}],tool_choice:"none",max_output_tokens:summaryOnly?1100:1400});
+      const response=await client.responses.create({model:CHAT_MODEL,instructions:goalContextInstructions+"\nExplain only the supplied deterministic Development Planning comparison and bounded related evidence. D1 costs are server-recomputed from explicit user assumptions. Blank costs remain unknown, never zero. Keep currencies separate. Employee time value is not necessarily cash spending. Named simulated quotes are fictional; custom input is unverified. Do not invent participants, attendance, loaded hourly costs, ROI, skill gains or headcount conversions. No tools, automatic allocation or approvals. "+(summaryOnly?goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions():"Answer concisely; identify missing assumptions before comparing totals."),input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:"user",content:"ACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nDEVELOPMENT PLANNING D1: "+JSON.stringify(developmentSummary)+"\nRELATED CACHED SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nCARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nQUESTION: "+message}],tool_choice:"none",max_output_tokens:summaryOnly?1100:1400});
       const answer=response.output_text?.trim();
       return answer?NextResponse.json({answer}):NextResponse.json({error:"No Development Planning answer returned. Please try again."},{status:502});
     }
@@ -1339,7 +1339,7 @@ Style:
 `.trim(),
     };
 
-    const openingInstructions = goalContextInstructions+"\n"+goalSummaryInstructions+"\nUse only supplied evidence; never treat user statements as source facts. Company-wide evidence remains company-wide regardless of selected filters. Links use allowlisted app destinations. "+(page==="home"?"Return the Home JSON answer with next_step set to none.":"");
+    const openingInstructions = goalContextInstructions+"\n"+goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions()+"\nUse only supplied evidence; never treat user statements as source facts. Company-wide evidence remains company-wide regardless of selected filters. Links use allowlisted app destinations. "+(page==="home"?"Return the Home JSON answer with next_step set to none.":"");
 
     const aiInstructions = `
 You are the People Analytics AI embedded in a workforce dashboard.
