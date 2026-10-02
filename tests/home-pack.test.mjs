@@ -51,7 +51,7 @@ test("Employee Listening excludes exit and comments; Attrition preserves respond
  assert.equal(hidden.reasons[0].exits,null);assert.equal(hidden.dimensions[0].avg_score,null);assert.match(hidden.period,/not supplied/);
 });
 test("cross-source prompt requires citations, separate populations and honest unavailable coverage",()=>{
- const prompt=overviewBriefingPrompt(buildHomePack({},"all"));for(const term of ["Cite exact source IDs","Coverage is partial","No tool calls","Do not combine denominators","S2 is the sole exit-survey block","salary benchmarks","not independently refreshed"])assert.ok(prompt.includes(term),term);
+ const prompt=overviewBriefingPrompt(buildHomePack({},"all"));for(const term of ["Cite exact source IDs","Coverage is partial","No tool calls","Do not combine denominators","S2 is the sole exit-survey block","market pay requires an explicitly supplied reference","not independently refreshed"])assert.ok(prompt.includes(term),term);
 });
 
 test("Canada goal surfaces existing country composition without changing the filtered snapshot",()=>{

@@ -15,6 +15,10 @@ import {
 import { SiteFooter } from "@/components/site-footer";
 import { employeeListeningEvidence, exitSurveyEvidence } from "@/lib/employee-listening";
 import { FocusedIssue } from "@/components/focused-issue";
+import { buildHomePack } from "@/lib/home-pack.mjs";
+import {MarketComparison,CarriedMarketReference,type MarketCarry} from "@/components/market-reference";
+import {defaultMarketSelection} from "@/lib/oews-reference.mjs";
+import { GoalTakeaway } from "@/components/goal-takeaway";
 import { useGoalWorkspace } from "@/components/use-goal-workspace";
 import { useProblemConversation, SessionProblemSummary } from "@/components/problem-conversation";
 import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
@@ -113,9 +117,12 @@ const PLANNING_VIEW_TO_PAGE: Record<
 
 export default function Home() {
   const conversation = useProblemConversation();
+  const [homeEvidencePacket,setHomeEvidencePacket]=useState("");
   const goalWorkspaceKeys = ["", ...conversation.goals.map(g=>g.id)].map(id=>conversation.workspaceKey.split(":")[0]+":"+id);
   const [demoActive, setDemoActive] = useState(false);
   const [developmentSession, setDevelopmentSession] = useGoalWorkspace(conversation.workspaceKey, goalWorkspaceKeys, emptyDevelopmentSession);
+  const [marketSelection,setMarketSelection]=useGoalWorkspace(conversation.workspaceKey,goalWorkspaceKeys,defaultMarketSelection);
+  const [marketCarry,setMarketCarry]=useGoalWorkspace<MarketCarry|null>(conversation.workspaceKey,goalWorkspaceKeys,emptyMarketCarry);
   const [talentResponseEvidenceContext, setTalentResponseEvidenceContext] = useGoalWorkspace<string | null>(conversation.workspaceKey, goalWorkspaceKeys, emptyTalentContext);
   const [navCollapsed, setNavCollapsed] = useState(false);
   const [aiCollapsed, setAiCollapsed] = useState(false);
@@ -1317,7 +1324,7 @@ export default function Home() {
       : 0;
 
   const intelligencePage = activePage === "occupational-references" || activePage === "labor-market" || activePage === "training-coaching";
-  const readOnlyChatPage = activePage === "guide-data" || activePage === "compensation" || activePage === "development-planning";
+  const readOnlyChatPage = activePage === "guide-data" || activePage === "compensation";
   const readOnlyReason = readOnlyChatPage ? "AI does not analyze the local content on this page. Your earlier conversation stays available for reference." : undefined;
   const previewPage = readOnlyChatPage;
 
@@ -1401,7 +1408,7 @@ export default function Home() {
     setSelectedLevel("all");
   };
 
-  const catalogueContext = activePage === "occupational-references" ? { loading: skillsLoading, unavailable: Boolean(skillsError) || !skillsData, mappedJobProfiles: skillsData?.summary.onet_mapped_job_profiles, totalJobProfiles: skillsData?.summary.total_job_profiles } : activePage === "labor-market" ? { loading: blsLoading, unavailable: Boolean(blsError) || !blsData, metrics: blsData?.metrics } : activePage === "training-coaching" ? { quotes: [...developmentCatalog, ...developmentSession.custom], selected: developmentSession.selected, goal: developmentSession.goal } : null;
+  const catalogueContext = activePage === "occupational-references" ? { loading: skillsLoading, unavailable: Boolean(skillsError) || !skillsData, mappedJobProfiles: skillsData?.summary.onet_mapped_job_profiles, totalJobProfiles: skillsData?.summary.total_job_profiles } : activePage === "labor-market" ? { loading: blsLoading, unavailable: Boolean(blsError) || !blsData, metrics: blsData?.metrics,marketSelection } : activePage === "training-coaching" ? { quotes: [...developmentCatalog, ...developmentSession.custom], selected: developmentSession.selected, goal: developmentSession.goal } : null;
   const chatEvidence = intelligencePage ? { page: activePage, persona: selectedPersona, intelligenceContext: catalogueContext } : overviewData ? {
             persona: selectedPersona,
             page: planningWorkspaceActive
@@ -1754,14 +1761,24 @@ export default function Home() {
             },
           } : null;
   const sourceState = activePage === "workforce" ? [workforceData, workforceLoading, workforceError] : activePage === "attrition" ? [attritionData, attritionLoading, attritionError] : activePage === "skills" ? [skillsData, skillsLoading, skillsError] : activePage === "learning-development" ? [learningDevelopmentData, learningDevelopmentLoading, learningDevelopmentError] : activePage === "career-mobility" ? [careerMobilityData, careerMobilityLoading, careerMobilityError] : activePage === "career-growth-mobility" ? [careerGrowthMobilityData, careerGrowthMobilityLoading, careerGrowthMobilityError] : activePage === "succession-planning" ? [successionCoverageData, successionCoverageLoading, successionCoverageError] : activePage === "talent-acquisition" ? [talentAcquisitionData, talentAcquisitionLoading, talentAcquisitionError] : activePage === "survey-sentiment" ? [surveySentimentData, surveySentimentLoading, surveySentimentError] : activePage === "finance" ? [financeData, financeLoading, financeError] : [planningData, planningLoading || positionModelingLoading, planningError || positionModelingError];
-  const chatEvidenceReady = intelligencePage ? true : !readOnlyChatPage && Boolean(overviewData) && !dashboardLoading && !dashboardError && !sourceState[1] && Boolean(sourceState[0]) && !sourceState[2];
+  const chatEvidenceReady = activePage === "development-planning" ? true : intelligencePage ? true : !readOnlyChatPage && Boolean(overviewData) && !dashboardLoading && !dashboardError && !sourceState[1] && Boolean(sourceState[0]) && !sourceState[2];
   const currentSource = sourceState[0];
   const sourceRecord = currentSource && typeof currentSource === "object" ? currentSource as Record<string, unknown> : null;
   const movementSource = sourceRecord?.source;
   const sourceDate = sourceRecord?.as_of ?? sourceRecord?.as_of_date ?? (movementSource && typeof movementSource === "object" && "last_recorded_date" in movementSource ? movementSource.last_recorded_date : null);
   const pageSourceDate = intelligencePage ? null : typeof sourceDate === "string" ? sourceDate : null;
-  const chatEvidenceKey = JSON.stringify({ goalId:conversation.activeGoalId, ...chatEvidence, destination: activePage, pageSourceDate });
+  const developmentSummaryContext=buildHomePack({},"User-entered Development Planning",conversation.focusedIssue,developmentSession).sources.find(source=>source.id==="D1");
+  const chatEvidenceKey = JSON.stringify(activePage==="development-planning" ? {goalId:conversation.activeGoalId,page:"development-planning",persona:selectedPersona,destination:activePage,developmentSummaryContext,pageSourceDate:null} : { goalId:conversation.activeGoalId, ...chatEvidence, destination: activePage, pageSourceDate });
 
+  const relatedGoalEvidence = useMemo(()=>{
+    if(!homeEvidencePacket)return [];
+    const packet=JSON.parse(homeEvidencePacket);
+    if(packet.goalKey!==conversation.workspaceKey||packet.goal!==conversation.focusedIssue)return [];
+    const priority=/turnover|retention|attrition/i.test(conversation.focusedIssue)?["A1","S1","T1","T2"]:["T1","T2","A1","S1"];
+    return priority.map(id=>packet.pack.sources.find((source:{id:string})=>source.id===id)).filter((source:{page:string;facts:unknown}|undefined)=>source&&source.page!==activePage&&source.facts).slice(0,3);
+  },[homeEvidencePacket,conversation.workspaceKey,conversation.focusedIssue,activePage]);
+  const summaryEvidenceReady = intelligencePage ? activePage!=="occupational-references"||(!skillsLoading&&Boolean(skillsData)) : chatEvidenceReady;
+  const goalSummaryPayload = {...JSON.parse(chatEvidenceKey),goalEvidenceContext:relatedGoalEvidence,marketReference:marketCarry};
   const currentChatEvidenceKey = useRef(chatEvidenceKey);
   useLayoutEffect(() => { currentChatEvidenceKey.current = chatEvidenceKey; }, [chatEvidenceKey]);
 
@@ -1820,7 +1837,7 @@ export default function Home() {
               "application/json",
           },
           signal: request.signal,
-          body: JSON.stringify({ ...JSON.parse(chatEvidenceKey), message: withProblemContext(message, conversation.problem, conversation.focusedIssue), history: modelHistory }),
+          body: JSON.stringify({ ...JSON.parse(chatEvidenceKey), goalContext:conversation.recordGoalStatement(message,activePage,JSON.stringify(selectedBusinessContext)),goalEvidenceContext:relatedGoalEvidence,marketReference:marketCarry, message: withProblemContext(message, conversation.problem, conversation.focusedIssue), history: modelHistory }),
         }
       );
 
@@ -2051,8 +2068,9 @@ export default function Home() {
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
         {demoActive && <GuidedDemo page={activePage} onNavigate={setActivePage} onClose={() => setDemoActive(false)} onUseGoal={() => setDevelopmentSession(current => ({ ...current, goal: DEVELOPMENT_DEMO_GOAL }))} hasOptions={developmentSession.options.length > 0} />}
-        <div hidden={activePage !== "home"}><OverallOverviewPage countryOptions={filterOptions.countries} onCountry={setSelectedCountry} developmentSession={developmentSession} conversation={conversation} onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></div>
-        {activePage === "guide-data" ? <GuideDataPage onBack={() => { setActivePage("home"); window.requestAnimationFrame(() => document.getElementById("overall-guide-link")?.focus()); }} /> : activePage === "home" ? null : intelligencePage ? <IntelligencePage page={activePage as "occupational-references" | "labor-market" | "training-coaching"} skills={skillsData} skillsLoading={skillsLoading} bls={blsData} blsLoading={blsLoading} blsError={blsError} catalog={<DevelopmentCatalog session={developmentSession} onChange={setDevelopmentSession} onOpen={() => setActivePage("development-planning")} />} /> : activePage === "compensation" ? (
+        <div hidden={activePage !== "home"}><OverallOverviewPage marketReference={marketCarry} onEvidencePack={setHomeEvidencePacket} countryOptions={filterOptions.countries} onCountry={setSelectedCountry} developmentSession={developmentSession} conversation={conversation} onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></div>
+        {planningWorkspaceActive && marketCarry && <CarriedMarketReference carry={marketCarry} onClear={()=>setMarketCarry(null)}/>}
+        {activePage === "guide-data" ? <GuideDataPage onBack={() => { setActivePage("home"); window.requestAnimationFrame(() => document.getElementById("overall-guide-link")?.focus()); }} /> : activePage === "home" ? null : intelligencePage ? <IntelligencePage page={activePage as "occupational-references" | "labor-market" | "training-coaching"} skills={skillsData} skillsLoading={skillsLoading} bls={blsData} blsLoading={blsLoading} blsError={blsError} market={<MarketComparison selection={marketSelection} onChange={setMarketSelection} goal={conversation.focusedIssue} onCarry={carry=>{setMarketCarry(carry);setActivePage("planning-overview");}} />} catalog={<DevelopmentCatalog session={developmentSession} onChange={setDevelopmentSession} onOpen={() => setActivePage("development-planning")} />} /> : activePage === "compensation" ? (
           <section className="p-6"><h1 className="text-2xl font-semibold">Compensation</h1><p className="mt-4 text-lg">TBD</p><p className="mt-2 text-muted-foreground">Planned destination. Compensation data and analysis are not available.</p></section>
         ) : activePage === "development-planning" ? (
           <DevelopmentPlanning session={developmentSession} onChange={setDevelopmentSession} onCatalog={() => setActivePage("training-coaching")} />
@@ -2232,10 +2250,13 @@ export default function Home() {
             }}
           />
         )}
-          <SiteFooter planning={planningWorkspaceActive || activePage === "finance" || activePage === "development-planning"} />
+          <SiteFooter planning={planningWorkspaceActive || activePage === "finance"} />
         </div>
 
         {activePage !== "home" && <AiPanel
+          goalViewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,activePage,selectedPersona,selectedBusinessContext])}
+          hasGoal={Boolean(conversation.focusedIssue)}
+          goalTakeaway={<GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:JSON.stringify(selectedBusinessContext)}} payload={goalSummaryPayload} active={true} ready={summaryEvidenceReady} paused={chatLoading||Boolean(chatInput.trim())||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} unavailable={activePage==="compensation"?"Compensation evidence is not available yet. Use the supported Workforce or Planning evidence for this goal.":activePage==="guide-data"?"Use this guide to understand source coverage, then open a data page for a goal-specific takeaway.":undefined} onNavigate={setActivePage}/>}
           sessionControls={<SessionProblemSummary conversation={conversation} />}
           readOnlyReason={readOnlyReason}
           aiCollapsed={aiCollapsed}
@@ -2243,7 +2264,7 @@ export default function Home() {
           aiWidth={aiWidth}
           previewPage={previewPage}
           suggestedPrompts={readOnlyChatPage ? [] : intelligencePage ? suggestedPrompts : [...suggestedPrompts, "Export current data (CSV)"]}
-          scopeNote={readOnlyReason ?? (isIntelligencePage(activePage) ? `${intelligenceEvidence(activePage, catalogueContext).scope}. Workforce filters do not narrow this evidence. AI uses only this page; no external lookup.` : activePage === "workforce" ? "Selected filters narrow the workforce snapshot only; company composition stays unfiltered." : planningWorkspaceActive ? "Filters describe workforce context. Planning scenarios and carried evidence keep their own scope, dates and assumptions." : "This page uses company-wide evidence. The shared workforce filters do not narrow these measures.")}
+          scopeNote={readOnlyReason ?? (isIntelligencePage(activePage) ? `${intelligenceEvidence(activePage, catalogueContext).scope}. Workforce filters do not narrow this evidence. AI uses only this page; no external lookup.` : activePage === "workforce" ? "Selected filters narrow the workforce snapshot only; company composition stays unfiltered." : activePage==="development-planning" ? "Selected quotes and user-entered assumptions; modeled costs, not approved budgets or measured outcomes. Missing costs stay unknown." : planningWorkspaceActive ? "Filters describe workforce context. Planning scenarios and carried evidence keep their own scope, dates and assumptions." : "This page uses company-wide evidence. The shared workforce filters do not narrow these measures.")}
           chatMessages={chatMessages}
           chatInput={chatInput}
           chatLoading={chatLoading}
@@ -2270,3 +2291,5 @@ export default function Home() {
 function emptyTalentContext(): string | null { return null; }
 function emptyHandoff(): PlanningEvidenceHandoff | null { return null; }
 function emptyFreshness(): EvidenceFreshness { return {status:"unavailable",reason:"No evidence handoff is active."}; }
+
+function emptyMarketCarry():MarketCarry|null {return null;}
