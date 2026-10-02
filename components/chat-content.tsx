@@ -9,10 +9,16 @@ function renderInlineMarkdown(
   onNavigate?: (page: AppPage) => void,
 ) {
   const parts = value.split(
-    /(\[[^\]\n]+\]\(app:[a-z-]+\)|\*\*\*.*?\*\*\*|\*\*.*?\*\*|\*.*?\*)/g
+    /(\(?\[[A-Z]+\d+\](?:[, ]+\[[A-Z]+\d+\])*\s+See\s+\[[^\]\n]+\]\(app:[a-z-]+\)\.?\)?|\[[^\]\n]+\]\(app:[a-z-]+\)|\*\*\*.*?\*\*\*|\*\*.*?\*\*|\*.*?\*)/g
   );
 
   return parts.map((part, index) => {
+    // Only source-navigation references become secondary text; answer prose stays intact.
+    const reference = part.match(/^\(?((?:\[[A-Z]+\d+\](?:[, ]+\[[A-Z]+\d+\])*)\s+See\s+)(\[[^\]\n]+\]\((app:[a-z-]+)\))(\.?)\)?$/);
+    const referenceAction = reference ? getChatNavigationAction(reference[3]) : null;
+    if (reference && referenceAction && onNavigate) {
+      return <span key={index} data-chat-source-reference className="text-[12px] font-normal leading-relaxed text-muted-foreground">({reference[1]}<button type="button" onClick={() => onNavigate(referenceAction.page)} className="inline-flex min-h-6 items-center rounded-sm text-left font-medium text-primary underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-ring">{referenceAction.label}</button>{reference[4]})</span>;
+    }
     const link = part.match(/^\[[^\]\n]+\]\((app:[a-z-]+)\)$/);
     const action = link ? getChatNavigationAction(link[1]) : null;
     if (action && onNavigate) {
