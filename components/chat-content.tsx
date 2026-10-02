@@ -16,7 +16,7 @@ function renderInlineMarkdown(
     const link = part.match(/^\[[^\]\n]+\]\((app:[a-z-]+)\)$/);
     const action = link ? getChatNavigationAction(link[1]) : null;
     if (action && onNavigate) {
-      return <button key={index} type="button" onClick={() => onNavigate(action.page)} className="rounded-sm text-left font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Open {action.label}</button>;
+      return <button key={index} type="button" onClick={() => onNavigate(action.page)} className="rounded-sm text-left font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">{action.label}</button>;
     }
     if (
       part.startsWith("***") &&
