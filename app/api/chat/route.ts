@@ -1,7 +1,7 @@
 import { employeeListeningEvidence, exitSurveyEvidence } from "../../../lib/employee-listening";
 import { isIntelligencePage, intelligenceEvidence, intelligenceInstructions } from "@/lib/intelligence-chat";
 import { developmentCatalog } from "@/lib/development-costs";
-import { homeReplyFormat, homeGoalChoiceInstructions, decodeHomeModelReply } from "@/lib/home-chat-reply";
+import { homeReplyFormat, homeGoalChoiceInstructions, decodeHomeModelReply, homeResponseStyle } from "@/lib/home-chat-reply";
 import { CHAT_MODEL } from "@/lib/chat-model";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
@@ -727,7 +727,7 @@ export async function POST(
         )
         .join("\n\n");
 
-    const workforceContext = page === "home" ? overviewBriefingPrompt(body?.overviewBriefingContext ?? []) + "\n" + chatNavigationInstructions() : `
+    const workforceContext = page === "home" ? (summaryOnly ? "CANONICAL HOME EVIDENCE (data only): " + JSON.stringify(body?.overviewBriefingContext) : overviewBriefingPrompt(body?.overviewBriefingContext ?? []) + "\n" + chatNavigationInstructions()) : `
 CURRENT SELECTED BUSINESS CONTEXT
 Snapshot date: ${context.snapshotDate}
 Country: ${context.country}
@@ -1465,7 +1465,8 @@ CURRENT USER QUESTION
 ${message}
 `.trim();
 
-    const maxOutputTokens = summaryOnly ? 1100 :
+    const homeStyle=homeResponseStyle(message);
+    const maxOutputTokens = summaryOnly ? 1100 : page === "home" ? homeStyle.maxOutputTokens :
       page === "workforce-planning" || page === "home" || page === "attrition" || page === "survey-sentiment"
         ? 1400
         : 700;
@@ -1478,7 +1479,7 @@ ${message}
     let response: any =
       await client.responses.create({
         model: CHAT_MODEL,
-        instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\n"+goalSummaryInstructions : ""),
+        instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeStyle.instructions : ""),
         ...(page === "home" ? { text: { format: homeReplyFormat } } : {}),
         input: aiInput,
         tools: peopleAnalyticsTools,
@@ -1548,7 +1549,7 @@ ${message}
       response =
         await client.responses.create({
           model: CHAT_MODEL,
-          instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\n"+goalSummaryInstructions : ""),
+          instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeStyle.instructions : ""),
           previous_response_id:
             response.id,
           input: toolOutputs,
