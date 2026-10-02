@@ -63,3 +63,12 @@ test('invalid source and mixed-currency inputs fail before any model or calculat
   assert.equal(models,0);assert.equal(calculations,0);
  }
 });
+
+
+test('finish schema exposes only conclusions and preferences supported by returned calculations',async()=>{
+ const {seen}=await scripted(normal());
+ const finishSchema=i=>seen[i].tools.find(t=>t.name==='finish_capability_review').parameters.properties;
+ assert.deepEqual(finishSchema(0).conclusion.enum,['insufficient_inputs']);assert.deepEqual(finishSchema(0).preferred_id.enum,[null]);
+ assert.deepEqual(finishSchema(1).conclusion.enum,['no_feasible_option']);assert.deepEqual(finishSchema(1).preferred_id.enum,[null]);assert.deepEqual(finishSchema(1).reviewed_ids.items.enum,['R1']);
+ assert.deepEqual(finishSchema(2).conclusion.enum,['constraints_met_outcomes_unknown']);assert.deepEqual(finishSchema(2).preferred_id.enum,[null,'R2']);assert.equal(finishSchema(2).reviewed_ids.minItems,2);assert.equal(finishSchema(2).reviewed_ids.maxItems,2);
+});
