@@ -1439,7 +1439,7 @@ ${message}
 `.trim();
 
     const maxOutputTokens =
-      page === "workforce-planning" || page === "home"
+      page === "workforce-planning" || page === "home" || page === "attrition" || page === "survey-sentiment"
         ? 1400
         : 700;
 

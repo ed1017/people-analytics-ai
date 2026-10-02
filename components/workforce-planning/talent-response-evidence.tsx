@@ -22,7 +22,11 @@ async function readEvidence<T>(url: string): Promise<T | null> {
   }
 }
 
-export function TalentResponseEvidence({ roleCode, roleName, initialGoal = "", rolePlan }: Props) {
+export function TalentResponseEvidence(props: Props) {
+  const {goalKey} = usePlanningSession();
+  return <GoalTalentResponseEvidence key={goalKey} {...props} />;
+}
+function GoalTalentResponseEvidence({ roleCode, roleName, initialGoal = "", rolePlan }: Props) {
   const [goal, setGoal] = useState(initialGoal);
   const [comparedGoal, setComparedGoal] = useState<string | null>(null);
   const [learning, setLearning] = useState<LearningDevelopmentResponse | null>(null);

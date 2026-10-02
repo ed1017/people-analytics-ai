@@ -11,7 +11,6 @@ export const chatNavigationTargets = {
   skills: "Skills Intelligence",
   "learning-development": "Learning & Development",
   "development-planning": "Development Planning",
-  "career-mobility": "Career Interests",
   "career-growth-mobility": "Career Growth & Internal Mobility",
   "succession-planning": "Succession Planning",
   "talent-acquisition": "Talent Acquisition",
@@ -24,6 +23,7 @@ export const chatNavigationTargets = {
 } as const satisfies Partial<Record<AppPage, string>>;
 
 export function getChatNavigationAction(href: string) {
+  if (href === "app:career-mobility") return {page:"workforce" as const,label:"Workforce"};
   if (!href.startsWith("app:")) return null;
   const page = href.slice(4);
   if (!Object.prototype.hasOwnProperty.call(chatNavigationTargets, page)) return null;

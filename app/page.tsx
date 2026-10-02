@@ -15,6 +15,7 @@ import {
 import { SiteFooter } from "@/components/site-footer";
 import { employeeListeningEvidence, exitSurveyEvidence } from "@/lib/employee-listening";
 import { FocusedIssue } from "@/components/focused-issue";
+import { useGoalWorkspace } from "@/components/use-goal-workspace";
 import { useProblemConversation, SessionProblemSummary } from "@/components/problem-conversation";
 import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -111,9 +112,11 @@ const PLANNING_VIEW_TO_PAGE: Record<
 };
 
 export default function Home() {
+  const conversation = useProblemConversation();
+  const goalWorkspaceKeys = ["", ...conversation.goals.map(g=>g.id)].map(id=>conversation.workspaceKey.split(":")[0]+":"+id);
   const [demoActive, setDemoActive] = useState(false);
-  const [developmentSession, setDevelopmentSession] = useState(emptyDevelopmentSession);
-  const [talentResponseEvidenceContext, setTalentResponseEvidenceContext] = useState<string | null>(null);
+  const [developmentSession, setDevelopmentSession] = useGoalWorkspace(conversation.workspaceKey, goalWorkspaceKeys, emptyDevelopmentSession);
+  const [talentResponseEvidenceContext, setTalentResponseEvidenceContext] = useGoalWorkspace<string | null>(conversation.workspaceKey, goalWorkspaceKeys, emptyTalentContext);
   const [navCollapsed, setNavCollapsed] = useState(false);
   const [aiCollapsed, setAiCollapsed] = useState(false);
   const [aiWidth, setAiWidth] = useState(500);
@@ -143,7 +146,7 @@ export default function Home() {
     strategy: "planning-overview",
   });
 
-  const setActivePage = (page: AppPage) => { if(page !== activePage) conversation.cancelPending(); setActivePageState(page === "overview" ? "workforce" : page); };
+  const setActivePage = (page: AppPage) => { if(page !== activePage) conversation.cancelPending(); setActivePageState(page === "overview" || page === "career-mobility" ? "workforce" : page); };
 
   const activeWorkspace =
     getWorkspaceForPage(activePage);
@@ -329,22 +332,17 @@ export default function Home() {
     useState<string | null>(null);
   const dashboardRequestIdRef = useRef(0);
 
-  const conversation = useProblemConversation();
+
   const { messages: chatMessages, setMessages: setChatMessages, input: chatInput, setInput: setChatInput, loading: chatLoading, setLoading: setChatLoading, error: chatError, setError: setChatError, history: modelHistoryRef } = conversation;
 
   const [
     planningEvidenceHandoff,
     setPlanningEvidenceHandoff,
-  ] = useState<PlanningEvidenceHandoff | null>(
-    null
-  );
+  ] = useGoalWorkspace<PlanningEvidenceHandoff | null>(conversation.workspaceKey, goalWorkspaceKeys, emptyHandoff);
   const [
     planningEvidenceFreshness,
     setPlanningEvidenceFreshness,
-  ] = useState<EvidenceFreshness>({
-    status: "unavailable",
-    reason: "No evidence handoff is active.",
-  });
+  ] = useGoalWorkspace<EvidenceFreshness>(conversation.workspaceKey, goalWorkspaceKeys, emptyFreshness);
   const [
     planningEvidenceFreshnessChecking,
     setPlanningEvidenceFreshnessChecking,
@@ -1762,7 +1760,7 @@ export default function Home() {
   const movementSource = sourceRecord?.source;
   const sourceDate = sourceRecord?.as_of ?? sourceRecord?.as_of_date ?? (movementSource && typeof movementSource === "object" && "last_recorded_date" in movementSource ? movementSource.last_recorded_date : null);
   const pageSourceDate = intelligencePage ? null : typeof sourceDate === "string" ? sourceDate : null;
-  const chatEvidenceKey = JSON.stringify({ ...chatEvidence, destination: activePage, pageSourceDate });
+  const chatEvidenceKey = JSON.stringify({ goalId:conversation.activeGoalId, ...chatEvidence, destination: activePage, pageSourceDate });
 
   const currentChatEvidenceKey = useRef(chatEvidenceKey);
   useLayoutEffect(() => { currentChatEvidenceKey.current = chatEvidenceKey; }, [chatEvidenceKey]);
@@ -2016,7 +2014,7 @@ export default function Home() {
   };
 
   return (
-    <PlanningSessionProvider onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
+    <PlanningSessionProvider goalKey={conversation.workspaceKey} onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
     <main className={`min-h-screen bg-background text-foreground${activePage === "home" || activePage === "guide-data" ? " app-overview-mode" : ""}`}>
       {/* Top header */}
       <AppHeader
@@ -2268,3 +2266,7 @@ export default function Home() {
     </PlanningSessionProvider>
   );
 }
+
+function emptyTalentContext(): string | null { return null; }
+function emptyHandoff(): PlanningEvidenceHandoff | null { return null; }
+function emptyFreshness(): EvidenceFreshness { return {status:"unavailable",reason:"No evidence handoff is active."}; }
