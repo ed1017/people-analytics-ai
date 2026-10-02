@@ -17,7 +17,7 @@ function renderInlineMarkdown(
     const reference = part.match(/^\(?((?:\[[A-Z]+\d+\](?:[, ]+\[[A-Z]+\d+\])*)\s+See\s+)(\[[^\]\n]+\]\((app:[a-z-]+)\))(\.?)\)?$/);
     const referenceAction = reference ? getChatNavigationAction(reference[3]) : null;
     if (reference && referenceAction && onNavigate) {
-      return <span key={index} data-chat-source-reference className="text-[12px] font-normal leading-relaxed text-muted-foreground">({reference[1]}<button type="button" onClick={() => onNavigate(referenceAction.page)} className="inline-flex min-h-6 items-center rounded-sm text-left font-medium text-primary underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-ring">{referenceAction.label}</button>{reference[4]})</span>;
+      return <span key={index} data-chat-source-reference className="text-[11px] font-normal leading-relaxed text-muted-foreground">({reference[1]}<button type="button" onClick={() => onNavigate(referenceAction.page)} className="inline-flex min-h-6 items-center rounded-sm text-left font-medium text-primary underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-ring">{referenceAction.label}</button>{reference[4]})</span>;
     }
     const link = part.match(/^\[[^\]\n]+\]\((app:[a-z-]+)\)$/);
     const action = link ? getChatNavigationAction(link[1]) : null;
@@ -101,7 +101,14 @@ export function ChatContent({
   content: string;
   onNavigate?: (page: AppPage) => void;
 }) {
-  const lines = content.split("\n");
+  const references: string[] = [];
+  const answer = content.replace(/\(?\[[A-Z]+\d+\](?:[, ]+\[[A-Z]+\d+\])*\s+See\s+\[[^\]\n]+\]\(app:[a-z-]+\)\.?\)?/g, reference => {
+    const href = reference.match(/\]\((app:[a-z-]+)\)/)?.[1];
+    if (!onNavigate || !href || !getChatNavigationAction(href)) return reference;
+    references.push(reference);
+    return "";
+  });
+  const lines = answer.trim().split("\n");
   const rendered: ReactNode[] = [];
 
   let index = 0;
@@ -296,6 +303,9 @@ export function ChatContent({
   return (
     <div className="space-y-2 leading-relaxed">
       {rendered}
+      {references.length > 0 && <aside aria-label="Answer sources" className="mt-2 space-y-0.5 border-t border-border/40 pt-1">
+        {references.map((reference, referenceIndex) => <div key={referenceIndex} className="text-[11px] leading-relaxed">{renderInlineMarkdown(reference, onNavigate)}</div>)}
+      </aside>}
     </div>
   );
 }
