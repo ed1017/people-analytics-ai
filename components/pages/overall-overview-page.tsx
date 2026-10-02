@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUp, RefreshCw } from "lucide-react";
 import { ChatContent } from "@/components/chat-content";
 import { buildHomePack, homeDefinitions, readHomeSource } from "@/lib/home-pack.mjs";
@@ -8,6 +8,7 @@ import type { DevelopmentSession } from "@/components/development-workspace";
 import { homeGoalReplies } from "@/lib/home-chat-reply";
 import { buildHomeActionPlanRequest, DEVELOPMENT_DEMO_GOAL, HOME_ACTION_PLAN_LABEL, HOME_FIND_ISSUE_PROMPT } from "@/lib/home-decision-journey";
 import { completeScopedChatTurn } from "@/lib/chat-context-history";
+import { requestedHomeCountries, type CountryOption } from "@/lib/home-country-scope";
 import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
 import type { ProblemConversation } from "@/components/problem-conversation";
 import type { AppPage, ChatMessage, Persona } from "@/lib/types";
@@ -23,7 +24,9 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
   return { answer: data.answer, chooseGoal: data.nextStep === "choose_goal" };
 }
 
-export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession }: {
+export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry }: {
+  countryOptions: CountryOption[];
+  onCountry: (country:string) => void;
   conversation: ProblemConversation;
   developmentSession: DevelopmentSession;
   onStartDemo: () => void;
@@ -44,10 +47,28 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
   const composer = useRef<HTMLTextAreaElement>(null);
   const goalChoiceSubmittedRef = useRef(false);
   const conversationViewport = useRef<HTMLDivElement>(null);
+  const selectedCountry = new URLSearchParams(workforceQuery).get("country") ?? "all";
+  const scopeIdentity = JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,persona]);
+  type ScopeChoice = {message:string; query:string; identity:string; kind:"apply"|"ambiguous"|"unsupported"; options:CountryOption[]};
+  type PendingScope = {message:string; query:string; identity:string};
+  const [scopeChoice,setScopeChoice] = useState<ScopeChoice|null>(null);
+  const [pendingScope,setPendingScope] = useState<PendingScope|null>(null);
+  const pendingScopeRef = useRef<PendingScope|null>(null);
+  const visibleScopeChoice = scopeChoice?.identity===scopeIdentity && scopeChoice.query===workforceQuery && scopeChoice.message===input.trim() ? scopeChoice : null;
+  function applyCountry(option:CountryOption) {
+    if (!visibleScopeChoice || pendingScopeRef.current) return;
+    conversation.cancelPending();
+    const query=new URLSearchParams(workforceQuery);query.set("country",option.value);
+    const pending={message:visibleScopeChoice.message,query:"?"+query.toString(),identity:scopeIdentity};
+    pendingScopeRef.current=pending;setPendingScope(pending);setScopeChoice(null);onCountry(option.value);
+  }
+
 
   useEffect(() => {
     const loadKey = JSON.stringify({workforceQuery, workforceScope, refresh, persona});
     if (!active || (loaded.current === loadKey && Date.now() - loadedAt.current < 300000)) return;
+    // An interrupted scope load must not leave an older cache key suppressing its reload.
+    loaded.current = "";
     const controller = new AbortController();
     const load = async () => {
       setLoading(true); setEvidenceError(null);
@@ -81,13 +102,18 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
     focusQuestion();
   }
 
-  async function send(question = input, actionPlan = false) {
+  async function send(question = input, actionPlan = false, scopeConfirmed = false) {
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
     if (!message || !sources || loadedScope !== workforceQuery || chatLoading || loading || sources.every(source => !source.facts)) return;
     if (/^(?:please\s+|can you\s+)?(?:export|download)\b/i.test(message)) {
       setMessages(current=>[...current,{role:"user",content:message},{role:"assistant",content:"CSV downloads are currently available on Workforce and Skills Intelligence. Open one of those pages and choose Export current data (CSV). Home exports, other modules and employee-name rosters are not available yet; no file was downloaded."}]);setInput("");return;
     }
+    if (!actionPlan && !scopeConfirmed) {
+      const requested=requestedHomeCountries(message,countryOptions,selectedCountry);
+      if(requested.kind!=="none") { setInput(message);setScopeChoice({message,query:workforceQuery,identity:scopeIdentity,...requested});return; }
+    }
+    setScopeChoice(null);
     const request = conversation.beginRequest();
     const key = contextKey;
     const history = getProblemChatHistory(modelHistoryRef.current, key);
@@ -109,6 +135,17 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
   }
 
   const ready = Boolean(sources?.some(source => source.facts)) && !loading && loadedScope === workforceQuery;
+  const finishScopeRequest = useEffectEvent((pending:PendingScope, cancel:boolean) => {
+    if (pendingScopeRef.current!==pending) return;
+    pendingScopeRef.current=null;setPendingScope(null);
+    if(!cancel) void send(pending.message,false,true);
+  });
+  useEffect(()=>{
+    if(!pendingScope) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Finish or cancel one explicit user-requested asynchronous scope transition.
+    if(!active || pendingScope.identity!==scopeIdentity || pendingScope.query!==workforceQuery || input.trim()!==pendingScope.message) finishScopeRequest(pendingScope,true);
+    else if(ready) finishScopeRequest(pendingScope,false);
+  },[pendingScope,active,scopeIdentity,workforceQuery,input,ready]);
   return <div className="home-workspace mx-auto grid w-full max-w-none items-start gap-5 px-5 py-8 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-4 xl:h-[calc(100dvh-var(--app-header-height)-4rem)] xl:min-h-[42rem]">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-4 gap-y-1"><h2 id="overall-overview-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl xl:text-2xl 2xl:text-3xl">From Insight to Action</h2><p className="w-full text-sm text-muted-foreground sm:w-auto">by Ed Om <span aria-hidden="true">·</span> <a className="text-primary underline" href="mailto:edwinom.nyc@gmail.com">edwinom.nyc@gmail.com</a></p></div>
@@ -188,6 +225,8 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
       </div>}
       {(messages.length > 0 || input) && <button type="button" onClick={() => startNewIssue()} className="mb-3 rounded-sm text-sm font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Start new problem</button>}
       {!conversation.focusedIssue && (journey || input.trim()) && <div className="mb-3"><button type="button" onClick={() => conversation.setIssueEditor({draft:input.trim().slice(0,240) || journey?.latestQuestion?.slice(0,240) || ""})} className="min-h-11 w-full rounded-lg bg-primary px-4 py-3 text-base font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring">Pin as goal</button><p className="mt-2 text-xs text-muted-foreground">Keep this issue as the shared focus across every page and AI conversation. Review before pinning; data filters stay unchanged.</p></div>}
+      {visibleScopeChoice && <div aria-label="Requested country scope" className="mb-3 text-sm"><p>{visibleScopeChoice.kind==="ambiguous" ? "Which country should this workforce snapshot use?" : visibleScopeChoice.kind==="unsupported" ? "That country scope is not fully supported. Choose an available country or keep the current scope; missing evidence stays unavailable." : "Use country-specific workforce evidence for this question?"}</p><div className="mt-2 flex flex-wrap gap-2">{visibleScopeChoice.options.map(option=><button key={option.value} type="button" onClick={()=>applyCountry(option)} className="min-h-11 rounded border border-primary px-3 py-2 font-semibold text-primary">Apply {option.label} and answer</button>)}<button type="button" onClick={()=>void send(visibleScopeChoice.message,false,true)} className="min-h-11 px-2 text-primary underline">Answer with current scope</button></div><p className="mt-1 text-xs text-muted-foreground">Only the workforce snapshot changes. Other filters stay selected; company-wide sources retain their scope.</p></div>}
+      {pendingScope && <p role="status" className="mb-3 text-sm">Refreshing the selected workforce evidence before answering. Edit your question to cancel.</p>}
       <label htmlFor="overview-question" className="mb-2 block text-sm font-semibold">Describe a business issue, and I’ll help you explore the evidence, compare options, and build a plan.</label>
       <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" value={input} onChange={event => setInput(event.target.value)} rows={2}
         placeholder="Type your business issue here…" className="max-h-80 min-h-20 w-full resize-y rounded-lg border bg-background/40 p-3 text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
