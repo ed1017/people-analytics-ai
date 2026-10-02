@@ -24,7 +24,7 @@ export function DevelopmentCatalog({ session, onChange, onOpen }: { session: Dev
   };
   return <section aria-label="Development quote catalog" className="development-catalog mb-6 min-w-0 rounded-lg border p-4">
     <h2 className="text-xl font-semibold">Explore training and coaching</h2>
-    <p className="mt-2 text-sm text-muted-foreground">All named providers below are fictional; their quotes are simulated examples, not vendor offers or evidence of results. Custom quotes are unverified user input. Everything here is session only: navigation preserves it, reloading clears it. Workforce filters do not select participants.</p>
+    <p className="mt-2 text-sm text-muted-foreground">All named providers below are fictional; their quotes are simulated examples, not vendor offers or evidence of results. Custom quotes are unverified user input. With a selected goal, quotes and inputs are saved in this browser; without a goal they last only in this tab. Workforce filters do not select participants.</p>
     <div className="development-quotes my-4 grid min-w-0 gap-3 xl:grid-cols-3">{quotes.map(q => <label key={q.id} className="development-quote min-w-0 rounded border p-3 text-sm">
       <span className="flex items-start gap-2"><input type="radio" name="development-quote" checked={session.selected === q.id} onChange={() => onChange({ ...session, selected: q.id })} /><strong className="break-words">{q.provider}</strong></span>
       <span className="mt-2 block">{q.provenance === "simulated" ? "Simulated quote · Fictional provider" : "User-provided · Unverified"}</span>
@@ -47,14 +47,14 @@ export function DevelopmentCatalog({ session, onChange, onOpen }: { session: Dev
       </div>
       <p className="mt-2 text-xs">Numeric blanks stay unknown. Quote fees exclude additional costs until you enter them in Planning.</p>
       {errors.length > 0 && <p role="alert" className="mt-2 text-sm text-destructive">{errors.join(" ")}</p>}
-      <button className={`${button} mt-3`} disabled={session.custom.length >= 5} onClick={() => { const issues = validateQuote(session.draft); setErrors(issues); if (!issues.length) { const quote = { ...session.draft, id: `custom-${session.custom.length + 1}` }; onChange({ ...session, custom: [...session.custom, quote], selected: quote.id, draft: blankDevelopmentQuote() }); } }}>Add session-only quote</button><span className="ml-2 text-xs">Maximum five custom quotes.</span>
+      <button className={`${button} mt-3`} disabled={session.custom.length >= 5} onClick={() => { const issues = validateQuote(session.draft); setErrors(issues); if (!issues.length) { const quote = { ...session.draft, id: `custom-${session.custom.length + 1}` }; onChange({ ...session, custom: [...session.custom, quote], selected: quote.id, draft: blankDevelopmentQuote() }); } }}>Add custom quote</button><span className="ml-2 text-xs">Maximum five custom quotes.</span>
     </details>
   </section>;
 }
 
 export function DevelopmentPlanning({ session, onChange, onCatalog }: { session: DevelopmentSession; onChange: (session: DevelopmentSession) => void; onCatalog: () => void }) {
   return <section className="development-planning min-w-0 p-6"><div className="flex flex-wrap items-center gap-3"><h1 className="text-2xl font-semibold">Development Planning</h1><PlanningGuide page="development-planning" /></div>
-    <p className="my-3 text-sm text-muted-foreground">Compare selected quotes against your stated goals. These are editable cost assumptions, not approved budgets, training outcomes or staffing decisions. No ROI, proficiency gains or headcount conversion is estimated. Session only; reload clears all quotes and inputs.</p>
+    <p className="my-3 text-sm text-muted-foreground">Compare selected quotes against your stated goals. These are editable cost assumptions, not approved budgets, training outcomes or staffing decisions. No ROI, proficiency gains or headcount conversion is estimated. Saved with a selected goal in this browser; without a goal, quotes and inputs remain in this tab.</p>
     <button className={button} onClick={onCatalog}>Choose another quote in Intelligence → Training & Coaching</button>
     {!session.options.length && <p className="mt-6">Select a quote and enter a development goal in Intelligence → Training & Coaching, then explicitly carry them here.</p>}
     <div className="development-options mt-4 grid min-w-0 gap-4 xl:grid-cols-3">{session.options.map((option,index) => {

@@ -1,5 +1,6 @@
 "use client";
 
+import {recordDecisionEvidence} from "@/components/decision-store";
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUp, RefreshCw, Info } from "lucide-react";
 import { GoalTakeaway } from "@/components/goal-takeaway";
@@ -124,6 +125,7 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
     const request = conversation.beginRequest();
     const key = contextKey;
     const history = getProblemChatHistory(modelHistoryRef.current, key);
+    recordDecisionEvidence(conversation.activeGoalId,"home",pack);
     const goalContext=actionPlan?conversation.goalContext:conversation.recordGoalStatement(message,"home",workforceScope);
     setMessages(current => [...current, { role: "user", content: actionPlan ? HOME_ACTION_PLAN_LABEL : message }]);
     setInput(""); setChatLoading(true); setChatError(null);
@@ -162,7 +164,7 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
           <button id="overall-guide-link" type="button" onClick={() => onNavigate("guide-data")} className="rounded-sm font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Guide &amp; Data</button>
 
         </div>
-      <div className="basis-full"><p className="text-sm font-semibold text-primary">Interactive prototype · In development</p></div>
+      <div className="basis-full"><p className="text-sm font-semibold text-primary">Interactive prototype · Synthetic company evidence + public BLS</p></div>
       </header>
       <div id="home-data-details" popover="auto" role="dialog" aria-label="Data details" className="fixed inset-0 m-auto max-h-[80dvh] w-[min(60rem,92vw)] overflow-y-auto rounded-xl border bg-background p-5 text-sm text-foreground shadow-xl">
         <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">Data details</h2><button type="button" popoverTarget="home-data-details" popoverTargetAction="hide" className="min-h-11 rounded border px-3 focus-visible:ring-2 focus-visible:ring-ring">Close data details</button></div>
@@ -242,11 +244,11 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
         <li><strong>Start with a question</strong><p>Ask AI to find an issue, or explore <button className="text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce</button> to investigate your own.</p></li>
         <li><strong>Pin your goal</strong><p>Pin a goal to keep the app and AI focused as you explore and build a plan. You can pin multiple goals and switch between them at the top.</p></li>
         <li><strong>Plan and execute</strong><p>Bring HR, business leaders, and Finance together to compare options, agree on costs, and define next steps.</p></li>
-        <li><strong>Evaluate <span className="font-normal text-muted-foreground">· Coming soon</span></strong><p>Track progress and assess whether the plan worked.</p></li>
+        <li><strong>Assess &amp; Evaluate <span className="font-normal text-muted-foreground">· Coming soon</span></strong><p>Track progress and assess whether the plan worked.</p></li>
       </ol>
       <p className="mt-4 text-xs text-muted-foreground">Demo only. Real-world actions happen outside this app.</p>
       <details className="mt-5"><summary className="cursor-pointer rounded-sm font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring">How it works</summary>
-        <p className="mt-3">Review a concise issue before choosing Pin as goal. Your selected goal stays in focus across pages without changing filters. Goals are saved in this browser; conversations and carried evidence clear on reload. Use <button className="text-primary underline" onClick={()=>onNavigate("planning-overview")}>Planning</button> to compare scenarios and costs. Explore <button className="text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce</button> evidence and <button className="text-primary underline" onClick={()=>onNavigate("occupational-references")}>Intelligence</button> references and simulated options. Carry evidence or quotes only when you explicitly choose to; navigation does not carry them or run models.</p>
+        <p className="mt-3">Review a concise issue before choosing Pin as goal. Your selected goal stays in focus across pages without changing filters. Goals, their conversations, carried evidence and independent Planning inputs are saved in this browser within the limits shown in Browser storage details. Use <button className="text-primary underline" onClick={()=>onNavigate("planning-overview")}>Planning</button> to compare scenarios and costs. Explore <button className="text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce</button> evidence and <button className="text-primary underline" onClick={()=>onNavigate("occupational-references")}>Intelligence</button> references and simulated options. Carry evidence or quotes only when you explicitly choose to; navigation does not carry them or run models.</p>
         <button type="button" disabled={chatLoading} onClick={() => { startNewIssue(DEVELOPMENT_DEMO_GOAL); onStartDemo(); }} className="mt-3 min-h-11 rounded border px-4 py-2 font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring">Try a guided example</button>
         <p className="mt-3">This is NOT a people analytics dashboard. It’s an AI-powered decision tool that helps you identify workforce challenges, explore solutions, and build actionable plans with clear costs, tradeoffs, and measurable goals.</p>
         <p className="mt-3">This platform is designed to help business leaders, HR, and Finance make decisions, own the outcomes, and measure the return on workforce investments.</p>

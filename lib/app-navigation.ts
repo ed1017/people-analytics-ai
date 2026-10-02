@@ -3,7 +3,8 @@ import type { AppPage } from "./types";
 export type AppWorkspaceKey =
   | "analytics"
   | "talent"
-  | "strategy";
+  | "strategy"
+  | "evaluate";
 
 export type AppNavigationSection = {
   key: AppWorkspaceKey;
@@ -21,20 +22,24 @@ export const appWorkspaceJourneys: Array<{key: AppWorkspaceKey; journeyLabel: st
   {key:"analytics", journeyLabel:"Workforce", subtitle:"Understand Our Workforce", defaultPage:"workforce"},
   {key:"talent", journeyLabel:"Intelligence", subtitle:"Realize your potential", defaultPage:"occupational-references"},
   {key:"strategy", journeyLabel:"Planning", subtitle:"Plan Our Future", defaultPage:"planning-overview"},
+  {key:"evaluate",journeyLabel:"Assess & Evaluate",subtitle:"Coming soon",defaultPage:"assess-evaluate"},
 ];
 export const appNavigationSections: AppNavigationSection[] = [
   {key:"analytics", title:"Workforce", pages:["workforce","attrition","compensation","talent-acquisition","survey-sentiment","skills","learning-development","career-growth-mobility","succession-planning"]},
   {key:"talent", title:"Intelligence", pages:["occupational-references","labor-market","training-coaching"]},
-  {key:"strategy", title:"Planning", pages:["planning-overview","scenario-modeling","position-workforce-design","workforce-response","execution-feasibility","finance","development-planning"]},
+  {key:"strategy", title:"Planning", pages:["planning-overview","scenario-modeling","position-workforce-design","workforce-response","execution-feasibility","finance","development-planning","decision-brief"]},
+  {key:"evaluate",title:"Assess & Evaluate",pages:["assess-evaluate"]},
 ];
 
 export const appPageMetadata: Record<
   AppPage,
   AppPageMetadata
 > = {
+  "decision-brief":{label:"Decision brief",section:"Planning",description:"Your browser-local evidence, assumptions, proposals and explicit approval notes."},
+  "assess-evaluate":{label:"Coming soon",section:"Assess & Evaluate",description:"Placeholder only; no outcomes, scorecard or ROI calculation."},
   "occupational-references": {label:"Occupational References",section:"Intelligence",description:"O*NET reference and stored mapping provenance, not a live occupational feed."},
   "labor-market": {label:"Labor Market",section:"Intelligence",description:"Available US national BLS observations with dates and limitations."},
-  "training-coaching": {label:"Training & Coaching",section:"Intelligence",description:"Fictional simulated provider examples and unverified session-only custom quotes."},
+  "training-coaching": {label:"Training & Coaching",section:"Intelligence",description:"Fictional simulated provider examples and unverified user-provided quotes."},
   "development-planning": { label: "Development Planning", section: "Planning", description: "Compare explicitly selected development quotes and user-entered cost assumptions." },
   home: { label: "Home", section: "Insights to Action", description: "Explore key findings and ask questions across governed workforce evidence." },
   "guide-data": { label: "Guide & Data", section: "Insights to Action", description: "How to use the app, understand its data, and interpret its limits." },

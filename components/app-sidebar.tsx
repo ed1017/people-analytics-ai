@@ -1,3 +1,5 @@
+"use client";
+import {useState} from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   CalendarDays,
@@ -43,12 +45,15 @@ const workspaceDisplayTitles: Record<
   analytics: "Workforce",
   talent: "Intelligence",
   strategy: "Planning",
+  evaluate: "Assess & Evaluate",
 };
 
 const pageIcons: Record<
   AppPage,
   LucideIcon
 > = {
+  "decision-brief": MessageSquareText,
+  "assess-evaluate": ShieldCheck,
   "occupational-references": Compass,
   "labor-market": TrendingUp,
   "training-coaching": GraduationCap,
@@ -81,6 +86,9 @@ export function AppSidebar({
   onToggle,
   onPageChange,
 }: AppSidebarProps) {
+  const [openGroups,setOpenGroups]=useState<Record<string,boolean>>({analytics:true,talent:false,strategy:false,evaluate:false});
+  const [previousPage,setPreviousPage]=useState(activePage);
+  if(previousPage!==activePage){setPreviousPage(activePage);const section=appNavigationSections.find(s=>s.pages.includes(activePage));if(section)setOpenGroups(current=>({...current,[section.key]:true}));}
   return (
     <aside className="app-sidebar sticky top-[var(--app-header-height)] h-[calc(100vh-var(--app-header-height))] overflow-y-auto border-r bg-sidebar p-3 max-md:p-2">
       <Button
@@ -134,6 +142,8 @@ export function AppSidebar({
               ? `${section.title} — ${journey.subtitle}`
               : section.title;
 
+            const expanded=Boolean(openGroups[section.key]);
+            const groupId="navigation-"+section.key;
             return (
               <section
                 key={section.key}
@@ -144,7 +154,7 @@ export function AppSidebar({
                     : "border-t pt-4"
                 }
               >
-                <h2 aria-label={groupLabel} className="nav-group-label mb-1.5 flex w-full items-center px-2 py-2 text-left max-md:justify-center max-md:px-0">
+                <h2 className="mb-1.5"><button type="button" aria-label={groupLabel} aria-expanded={expanded} aria-controls={groupId} onClick={()=>setOpenGroups(current=>({...current,[section.key]:!expanded}))} className="nav-group-label flex min-h-11 w-full items-center rounded px-2 py-2 text-left hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring max-md:justify-center max-md:px-0">
                   <span
                     aria-hidden="true"
                     className={
@@ -168,9 +178,10 @@ export function AppSidebar({
                       )}
                     </span>
                   )}
-                </h2>
+                  <span aria-hidden="true" className="ml-auto px-1 text-sm">{expanded?"−":"+"}</span>
+                </button></h2>
 
-                <div className="space-y-1">
+                <div id={groupId} hidden={!expanded} className="space-y-1">
                   {section.pages.map(
                     (page) => {
                       const metadata =

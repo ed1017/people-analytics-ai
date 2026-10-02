@@ -1,4 +1,5 @@
 "use client";
+import {usePlanningDecisionState} from "@/components/workforce-planning/use-planning-decision-state";
 import { PlanningGuide } from "@/components/planning-guide";
 
 import {
@@ -264,6 +265,7 @@ export function WorkforcePlanningPage({
   onRefreshEvidenceHandoff,
 }: WorkforcePlanningPageProps) {
   const {
+    goalKey,
     activeView: workflowView,
     setActiveView: setWorkflowView,
   } = usePlanningSession();
@@ -288,31 +290,31 @@ export function WorkforcePlanningPage({
   const [scenarioDefaults, setScenarioDefaults] =
     useState<ScenarioModelAssumptions | null>(null);
   const [customAssumptions, setCustomAssumptions] =
-    useState<ScenarioModelAssumptions | null>(null);
+    usePlanningDecisionState<ScenarioModelAssumptions | null>("customAssumptions",null);
   const [customScenario, setCustomScenario] =
-    useState<ScenarioModelResponse | null>(null);
+    usePlanningDecisionState<ScenarioModelResponse | null>("customScenario",null);
   const [customScenarioLoading, setCustomScenarioLoading] =
     useState(false);
   const [customScenarioError, setCustomScenarioError] =
     useState<string | null>(null);
   const [scenarioName, setScenarioName] =
-    useState("");
+    usePlanningDecisionState("scenarioName","");
   const [savedScenarios, setSavedScenarios] =
-    useState<SavedScenarioEntry[]>([]);
+    usePlanningDecisionState<SavedScenarioEntry[]>("savedScenarios",[]);
   const [comparisonScenarioIds, setComparisonScenarioIds] =
-    useState<string[]>([]);
+    usePlanningDecisionState<string[]>("comparisonScenarioIds",[]);
   const [segmentView, setSegmentView] =
-    useState<"business-units" | "job-families">(
+    usePlanningDecisionState<"business-units" | "job-families">("segmentView",
       "business-units"
     );
   const [buScenarioOptions, setBuScenarioOptions] =
     useState<BusinessUnitScenarioOption[]>([]);
   const [selectedBuScenario, setSelectedBuScenario] =
-    useState("");
+    usePlanningDecisionState("selectedBuScenario","");
   const [buScenarioAssumptions, setBuScenarioAssumptions] =
-    useState<ScenarioModelAssumptions | null>(null);
+    usePlanningDecisionState<ScenarioModelAssumptions | null>("buScenarioAssumptions",null);
   const [buScenarioResult, setBuScenarioResult] =
-    useState<BusinessUnitScenarioResponse | null>(null);
+    usePlanningDecisionState<BusinessUnitScenarioResponse | null>("buScenarioResult",null);
   const [buScenarioLoading, setBuScenarioLoading] =
     useState(false);
   const [buScenarioError, setBuScenarioError] =
@@ -328,14 +330,14 @@ export function WorkforcePlanningPage({
     positionActionAssumptions,
     setPositionActionAssumptions,
   ] =
-    useState<PositionActionAssumptions | null>(
+    usePlanningDecisionState<PositionActionAssumptions | null>("positionActionAssumptions",
       null
     );
   const [
     positionActionResult,
     setPositionActionResult,
   ] =
-    useState<PositionActionScenarioResponse | null>(
+    usePlanningDecisionState<PositionActionScenarioResponse | null>("positionActionResult",
       null
     );
   const [
@@ -356,14 +358,14 @@ export function WorkforcePlanningPage({
   const [
     structuralPositionActions,
     setStructuralPositionActions,
-  ] = useState<StructuralPositionAction[]>([
+  ] = usePlanningDecisionState<StructuralPositionAction[]>("structuralPositionActions",[
     createStructuralPositionAction(),
   ]);
   const [
     structuralPositionResult,
     setStructuralPositionResult,
   ] =
-    useState<StructuralPositionScenarioResponse | null>(
+    usePlanningDecisionState<StructuralPositionScenarioResponse | null>("structuralPositionResult",
       null
     );
   const [
@@ -377,19 +379,19 @@ export function WorkforcePlanningPage({
   const [
     responsePlanSkill,
     setResponsePlanSkill,
-  ] = useState("");
+  ] = usePlanningDecisionState("responsePlanSkill","");
   const [
     responsePlanAllocation,
     setResponsePlanAllocation,
   ] =
-    useState<WorkforceResponsePlanAllocation>(
+    usePlanningDecisionState<WorkforceResponsePlanAllocation>("responsePlanAllocation",
       createResponsePlanAllocation()
     );
   const [
     responsePlanResult,
     setResponsePlanResult,
   ] =
-    useState<WorkforceResponsePlanResponse | null>(
+    usePlanningDecisionState<WorkforceResponsePlanResponse | null>("responsePlanResult",
       null
     );
   const [
@@ -403,19 +405,19 @@ export function WorkforcePlanningPage({
   const [
     roleResponsePlanProfile,
     setRoleResponsePlanProfile,
-  ] = useState("");
+  ] = usePlanningDecisionState("roleResponsePlanProfile","");
   const [
     roleResponsePlanAllocation,
     setRoleResponsePlanAllocation,
   ] =
-    useState<WorkforceResponsePlanAllocation>(
+    usePlanningDecisionState<WorkforceResponsePlanAllocation>("roleResponsePlanAllocation",
       createResponsePlanAllocation()
     );
   const [
     roleResponsePlanResult,
     setRoleResponsePlanResult,
   ] =
-    useState<RoleWorkforceResponsePlanResponse | null>(
+    usePlanningDecisionState<RoleWorkforceResponsePlanResponse | null>("roleResponsePlanResult",
       null
     );
   const [
@@ -429,14 +431,14 @@ export function WorkforcePlanningPage({
   const [
     responsePortfolioAllocations,
     setResponsePortfolioAllocations,
-  ] = useState<
+  ] = usePlanningDecisionState<
     Record<string, WorkforceResponsePlanAllocation>
-  >({});
+  >("responsePortfolioAllocations",{});
   const [
     responsePortfolioResult,
     setResponsePortfolioResult,
   ] =
-    useState<WorkforceResponsePortfolioResponse | null>(
+    usePlanningDecisionState<WorkforceResponsePortfolioResponse | null>("responsePortfolioResult",
       null
     );
   const [
@@ -450,14 +452,14 @@ export function WorkforcePlanningPage({
   const [
     businessUnitResponseAllocations,
     setBusinessUnitResponseAllocations,
-  ] = useState<
+  ] = usePlanningDecisionState<
     Record<string, WorkforceResponsePlanAllocation>
-  >({});
+  >("businessUnitResponseAllocations",{});
   const [
     businessUnitResponseResult,
     setBusinessUnitResponseResult,
   ] =
-    useState<BusinessUnitResponseAllocationResponse | null>(
+    usePlanningDecisionState<BusinessUnitResponseAllocationResponse | null>("businessUnitResponseResult",
       null
     );
   const [
@@ -471,12 +473,12 @@ export function WorkforcePlanningPage({
   const [
     responseExecutionDrafts,
     setResponseExecutionDrafts,
-  ] = useState<ResponseExecutionDraft[]>([]);
+  ] = usePlanningDecisionState<ResponseExecutionDraft[]>("responseExecutionDrafts",[]);
   const [
     responseExecutionResult,
     setResponseExecutionResult,
   ] =
-    useState<TimePhasedWorkforceExecutionResponse | null>(
+    usePlanningDecisionState<TimePhasedWorkforceExecutionResponse | null>("responseExecutionResult",
       null
     );
   const [
@@ -490,14 +492,14 @@ export function WorkforcePlanningPage({
   const [
     responseConstraintDraft,
     setResponseConstraintDraft,
-  ] = useState<ResponseConstraintDraft>(
+  ] = usePlanningDecisionState<ResponseConstraintDraft>("responseConstraintDraft",
     createResponseConstraintDraft()
   );
   const [
     responseConstraintResult,
     setResponseConstraintResult,
   ] =
-    useState<WorkforceResponseConstraintResponse | null>(
+    usePlanningDecisionState<WorkforceResponseConstraintResponse | null>("responseConstraintResult",
       null
     );
   const [
@@ -512,7 +514,7 @@ export function WorkforcePlanningPage({
     constraintAwareScheduleResult,
     setConstraintAwareScheduleResult,
   ] =
-    useState<ConstraintAwareWorkforceScheduleResponse | null>(
+    usePlanningDecisionState<ConstraintAwareWorkforceScheduleResponse | null>("constraintAwareScheduleResult",
       null
     );
   const [
@@ -525,6 +527,7 @@ export function WorkforcePlanningPage({
   ] = useState<string | null>(null);
 
   useEffect(() => {
+    if(goalKey.slice(goalKey.indexOf(":")+1))return; // Legacy global scenarios stay unassigned.
     try {
       const stored = window.localStorage.getItem(
         SAVED_SCENARIOS_STORAGE_KEY
@@ -621,10 +624,7 @@ export function WorkforcePlanningPage({
             payload.defaults as
               PositionActionAssumptions
           );
-          setPositionActionAssumptions(
-            payload.defaults as
-              PositionActionAssumptions
-          );
+          setPositionActionAssumptions(current=>current??payload.defaults as PositionActionAssumptions);
         }
       } catch (error) {
         if (!cancelled) {
@@ -667,13 +667,8 @@ export function WorkforcePlanningPage({
             payload.business_units as
               BusinessUnitScenarioOption[];
           setBuScenarioOptions(options);
-          setSelectedBuScenario(
-            options[0]?.org_code ?? ""
-          );
-          setBuScenarioAssumptions(
-            payload.defaults as
-              ScenarioModelAssumptions
-          );
+          setSelectedBuScenario(current=>current||options[0]?.org_code||"");
+          setBuScenarioAssumptions(current=>current??payload.defaults as ScenarioModelAssumptions);
         }
       } catch (error) {
         if (!cancelled) {
@@ -712,7 +707,7 @@ export function WorkforcePlanningPage({
 
         if (!cancelled) {
           setScenarioDefaults(payload.defaults);
-          setCustomAssumptions(payload.defaults);
+          setCustomAssumptions(current=>current??payload.defaults);
         }
       } catch (error) {
         if (!cancelled) {
@@ -1940,6 +1935,7 @@ export function WorkforcePlanningPage({
     next: SavedScenarioEntry[]
   ) {
     setSavedScenarios(next);
+    if(goalKey.slice(goalKey.indexOf(":")+1))return;
 
     try {
       window.localStorage.setItem(
@@ -2013,6 +2009,7 @@ export function WorkforcePlanningPage({
 
   return (
 <section className="evidence-workspace min-w-0 p-6">
+          <p className="mb-3 text-xs text-muted-foreground">{goalKey.slice(goalKey.indexOf(":")+1)?"Saved with this goal. Completed results retain their recorded inputs; changes require an explicit model run.":"General exploration: select a goal to save this decision workspace."} Model allocations are assumptions, not organizational approvals.</p>
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
               <div className="flex flex-wrap items-center gap-3"><h2

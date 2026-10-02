@@ -1,25 +1,27 @@
 "use client";
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
-import { boundSessionTranscript, rememberProblemQuestion, ProblemRequestGate } from "@/lib/problem-session";
+import { rememberProblemQuestion, ProblemRequestGate } from "@/lib/problem-session";
 import type { HomeDecisionContext } from "@/lib/home-decision-journey";
 import type { ScopedChatHistory } from "@/lib/chat-context-history";
 import type { ChatMessage } from "@/lib/types";
 
 import { addGoalNote, emptyGoalRequirements, normalizeGoalRequirements, type GoalRequirements } from "@/lib/goal-context";
-import { GOALS_STORAGE_KEY, MAX_GOALS, emptyLocalGoals, parseLocalGoals, type LocalGoals } from "@/lib/local-goals";
+import { MAX_GOALS, emptyLocalGoals, type LocalGoals } from "@/lib/local-goals";
+
+import {decisionStore,useDecisionStorage} from "@/components/decision-store";
 
 type GoalChat = { messages: ChatMessage[]; input: string; problem: HomeDecisionContext | null; questionUnanswered: boolean };
 export function useProblemConversation() {
   const [localGoals, setLocalGoals] = useState(emptyLocalGoals);
   const goalsRef = useRef(localGoals);
   const [storageReady, setStorageReady] = useState(false);
-  const [storageNotice, setStorageNotice] = useState<string | null>(null);
+  const decisionStorage=useDecisionStorage();
+  const storageNotice=decisionStorage.notice;
   const chats = useRef(new Map<string, GoalChat>());
   const [workspaceRevision, setWorkspaceRevision] = useState(0);
   const persist = (next: LocalGoals, remove = false) => {
     goalsRef.current = next; setLocalGoals(next);
-    try { if (remove) localStorage.removeItem(GOALS_STORAGE_KEY); else localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(next)); setStorageNotice(null); }
-    catch { setStorageNotice("Browser storage unavailable. Changes last only in this tab; previously saved goals may remain. Retry Clear all saved goals when storage is available."); }
+    if(remove)decisionStore.clearAll();else decisionStore.saveGoals(next);
   };
   const [homeGoalChoiceKey, setHomeGoalChoiceKey] = useState<string | null>(null);
   const [focusedIssue, setFocusedIssue] = useState("");
@@ -34,18 +36,23 @@ export function useProblemConversation() {
   const history = useRef<ScopedChatHistory>({ key: "", messages: [] });
   useEffect(() => {
     // Restore browser-owned state after hydration; never write defaults over unread storage.
+    const saved=decisionStore.initialize({getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),removeItem:key=>localStorage.removeItem(key)}).goals;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- One-time hydration from browser storage, with SSR-safe initial state.
-    try { const saved = parseLocalGoals(localStorage.getItem(GOALS_STORAGE_KEY)); goalsRef.current = saved; setLocalGoals(saved); setFocusedIssue(saved.goals.find(g=>g.id===saved.activeId)?.statement ?? ""); }
-    catch { setStorageNotice("Saved goals could not be loaded. Continue in this tab or use Clear all saved goals to remove the saved copy."); }
+    goalsRef.current=saved;setLocalGoals(saved);setFocusedIssue(saved.goals.find(g=>g.id===saved.activeId)?.statement??"");
+    const chat=decisionStore.getField<GoalChat|null>(saved.activeId,"chat",null);
+    if(chat){setStoredMessages(chat.messages);setInput(chat.input);setProblem(chat.problem);}
     setStorageReady(true);
   }, []);
-  const setMessages: Dispatch<SetStateAction<ChatMessage[]>> = update => setStoredMessages(current => boundSessionTranscript(typeof update === "function" ? update(current) : update));
+  const setMessages: Dispatch<SetStateAction<ChatMessage[]>> = update => setStoredMessages(current => typeof update === "function" ? update(current) : update);
+  useEffect(()=>{
+    if(storageReady&&localGoals.activeId)decisionStore.setField(localGoals.activeId,"chat",{messages,input,problem,questionUnanswered:false});
+  },[storageReady,localGoals.activeId,messages,input,problem]);
   const rememberQuestion = (key: string, question: string) => setProblem(current => rememberProblemQuestion(current, key, question));
   const cancelPending = () => { requestGate.current.invalidate(); setHomeGoalChoiceKey(null); setLoading(false); };
   const snapshot = () => { chats.current.set(goalsRef.current.activeId, {messages,input,problem,questionUnanswered}); };
   const activate = (next: LocalGoals, saveCurrent = true) => {
     cancelPending(); if (saveCurrent) snapshot();
-    const chat = chats.current.get(next.activeId);
+    const chat = chats.current.get(next.activeId) ?? decisionStore.getField<GoalChat|null>(next.activeId,"chat",null);
     setMessages(chat?.messages ?? []); setInput(chat?.input ?? ""); setProblem(chat?.problem ?? null); setQuestionUnanswered(false);
     history.current = {key:"", messages:[]}; setError(null); setIssueEditor(null);
     setFocusedIssue(next.goals.find(g=>g.id===next.activeId)?.statement ?? ""); persist(next);
@@ -104,7 +111,7 @@ export function useProblemConversation() {
   const clearAllGoals = () => {
     cancelPending(); chats.current.clear(); history.current={key:"",messages:[]}; setMessages([]); setInput(""); setProblem(null); setQuestionUnanswered(false); setFocusedIssue(""); setIssueEditor(null); setError(null); setWorkspaceRevision(v=>v+1); persist(emptyLocalGoals(),true);
   };
-  return { goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
+  return { saved:decisionStorage.saved, retrySave:()=>decisionStore.retry(), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
 }
 export type ProblemConversation = ReturnType<typeof useProblemConversation>;
 
@@ -113,7 +120,7 @@ export function SessionProblemSummary({ conversation }: { conversation: ProblemC
   return <section aria-label="Session conversation context" className="mb-3 min-w-0 text-sm">
     <details><summary className="cursor-pointer rounded-sm font-semibold focus-visible:ring-2 focus-visible:ring-ring">{conversation.focusedIssue ? "Focused issue" : "Conversation context"}</summary>
     <p className="mt-1 break-words">{conversation.focusedIssue || conversation.problem?.firstQuestion || "No active problem. Ask a question to start."}</p>
-    <p className="mt-2 text-xs text-muted-foreground">Earlier-page messages are context, not current-page evidence. Navigation does not run models or change assumptions. Selected goals receive a fresh page takeaway using saved requirements and current evidence. Conversations stay separate in this tab; reload clears them. Goals and their user-stated context are saved only in this browser.</p></details>
+    <p className="mt-2 text-xs text-muted-foreground">Earlier-page messages are context, not current-page evidence. Navigation does not run models or change assumptions. Selected goals receive a fresh page takeaway using saved requirements and current evidence. Saved-goal conversations and decision inputs stay separate and are saved only in this browser. General exploration remains in this tab. Reload starts fresh AI transport context.</p></details>
     <button type="button" onClick={() => conversation.startNewProblem()} className="mt-2 min-h-11 rounded border px-3 py-2 text-sm font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring">Start new problem</button>
   </section>;
 }
