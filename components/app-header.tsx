@@ -43,8 +43,8 @@ export function AppHeader({
           <Sparkles className="h-4 w-4" />
         </div>        <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <h1 className="shrink-0 text-base font-semibold">
-              Workforce AI
+            <h1 className="min-w-0 text-sm font-semibold leading-tight sm:text-base">
+              Insights to Action
             </h1>
             <span className="hidden text-muted-foreground sm:inline">
               /
@@ -66,7 +66,7 @@ export function AppHeader({
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex shrink-0 items-center gap-3">
         <span className="hidden text-xs font-medium text-muted-foreground sm:inline">
           Perspective
         </span>

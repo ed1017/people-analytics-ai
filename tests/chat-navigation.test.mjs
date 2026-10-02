@@ -1,0 +1,18 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { chatNavigationTargets, getChatNavigationAction, chatNavigationInstructions } from "../lib/chat-navigation.ts";
+import { appPageMetadata } from "../lib/app-navigation.ts";
+
+test("chat destinations match real canonical app pages and labels", () => {
+  for (const [page,label] of Object.entries(chatNavigationTargets)) {
+    assert.equal(appPageMetadata[page].label,label);
+    assert.deepEqual(getChatNavigationAction('app:'+page),{page,label});
+  }
+});
+test("unsupported, external, parameterized and executable destinations are inert", () => {
+  for(const href of ['https://example.com','javascript:alert(1)','/api/scenario-model','app:unknown','app:skills?carry=true','app:skills#run','app:__proto__','app:constructor','APP:skills','app:skills/../../api/chat',' app:skills']) assert.equal(getChatNavigationAction(href),null);
+});
+test("navigation guidance distinguishes opening pages from explicit carry and calculation", () => {
+  const text=chatNavigationInstructions();
+  assert.match(text,/navigation buttons only/);assert.match(text,/explicitly click Carry to Planning/);assert.match(text,/do not invent a handoff/);assert.match(text,/not a proven solution/);
+});

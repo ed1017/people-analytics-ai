@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
+import { generateExitEnpsScores, localExitEnpsEnabled, summarizeExitEnps, surveyDimensionsForRetrieval } from "../../../lib/exit-enps";
 
 export const dynamic = "force-dynamic";
 
@@ -60,7 +61,8 @@ export async function GET() {
       throw new Error("Listening current summary returned no data.");
     }
 
-    const dimensions = (dimensionsResult.data ?? []).map((row) => ({
+    const replacementEnabled = localExitEnpsEnabled();
+    const dimensions = surveyDimensionsForRetrieval(dimensionsResult.data ?? [], replacementEnabled).map((row) => ({
       survey_code: row.survey_code,
       survey_name: row.survey_name,
       survey_type: row.survey_type,
@@ -77,6 +79,7 @@ export async function GET() {
     return NextResponse.json(
       {
         as_of: current.as_of,
+        exit_enps: replacementEnabled ? summarizeExitEnps(generateExitEnpsScores()) : null,
         summary: {
           engagement_respondents: toNumber(current.engagement_respondents),
           engagement_eligible_population: toNumber(current.engagement_eligible_population),

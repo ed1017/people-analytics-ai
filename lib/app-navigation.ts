@@ -75,6 +75,7 @@ export const appNavigationSections: AppNavigationSection[] = [
       "workforce-response",
       "execution-feasibility",
       "finance",
+      "development-planning",
     ],
   },
 ];
@@ -83,8 +84,9 @@ export const appPageMetadata: Record<
   AppPage,
   AppPageMetadata
 > = {
-  home: { label: "Home", section: "Workforce AI", description: "Explore key findings and ask questions across governed workforce evidence." },
-  "guide-data": { label: "Guide & Data", section: "Workforce AI", description: "How to use the app, understand its data, and interpret its limits." },
+  "development-planning": { label: "Development Planning", section: "Workforce Strategy & Planning", description: "Compare explicitly selected development quotes and user-entered cost assumptions." },
+  home: { label: "Home", section: "Insights to Action", description: "Explore key findings and ask questions across governed workforce evidence." },
+  "guide-data": { label: "Guide & Data", section: "Insights to Action", description: "How to use the app, understand its data, and interpret its limits." },
   overview: {
     label: "Workforce",
     section: "Workforce Analytics",

@@ -2,6 +2,7 @@
 
 import {
   useEffect,
+  useId,
   useState,
   type KeyboardEventHandler,
   type MouseEventHandler,
@@ -11,8 +12,6 @@ import {
   Maximize2,
   PanelLeftClose,
   PanelLeftOpen,
-  PanelRightClose,
-  PanelRightOpen,
   Send,
   Sparkles,
 } from "lucide-react";
@@ -25,11 +24,9 @@ import type { ChatMessage } from "@/lib/types";
 type AiPanelProps = {
   aiCollapsed: boolean;
   aiExpanded: boolean;
-  aiSide: "left" | "right";
   aiWidth: number;
   previewPage: boolean;
   suggestedPrompts: string[];
-  pageBriefing: { text: string; error: string | null; loading: boolean; retry: () => void };
   scopeNote: string;
   chatMessages: ChatMessage[];
   chatInput: string;
@@ -40,9 +37,6 @@ type AiPanelProps = {
   onResizeKeyDown: KeyboardEventHandler<HTMLDivElement>;
   onToggleExpanded: () => void;
   onToggleCollapsed: () => void;
-  onAiSideChange: (
-    side: "left" | "right"
-  ) => void;
   onSuggestedPrompt: (
     prompt: string
   ) => void | Promise<void>;
@@ -53,11 +47,9 @@ type AiPanelProps = {
 export function AiPanel({
   aiCollapsed,
   aiExpanded,
-  aiSide,
   aiWidth,
   previewPage,
   suggestedPrompts,
-  pageBriefing,
   scopeNote,
   chatMessages,
   chatInput,
@@ -68,7 +60,6 @@ export function AiPanel({
   onResizeKeyDown,
   onToggleExpanded,
   onToggleCollapsed,
-  onAiSideChange,
   onSuggestedPrompt,
   onChatInputChange,
   onSend,
@@ -95,6 +86,7 @@ export function AiPanel({
     };
   }, []);
 
+  const resizeHelpId = useId();
   const minimumAiWidth = 280;
   const maximumAiWidth = Math.max(
     minimumAiWidth,
@@ -130,7 +122,7 @@ export function AiPanel({
           aria-valuetext={`${Math.round(
             aiWidth
           )} pixels wide`}
-          aria-description="Use the left and right arrow keys to resize the AI panel. Home sets the minimum width and End sets the maximum width."
+          aria-describedby={resizeHelpId}
           tabIndex={0}
           onMouseDown={onResizeStart}
           onKeyDown={onResizeKeyDown}
@@ -139,6 +131,7 @@ export function AiPanel({
           )} pixels wide`}
           className="app-ai-resizer group relative cursor-col-resize focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset max-md:hidden"
         >
+          <span id={resizeHelpId} className="sr-only">Use the left and right arrow keys to resize the AI panel. Home sets the minimum width and End sets the maximum width.</span>
           <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-border transition-colors group-hover:bg-primary" />
           <div className="absolute left-1/2 top-1/2 h-12 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted-foreground/30 transition-colors group-hover:bg-primary" />
         </div>
@@ -187,17 +180,7 @@ export function AiPanel({
                   : "Collapse AI panel"
               }
             >
-              {aiSide === "left" ? (
-                aiCollapsed ? (
-                  <PanelLeftOpen className="h-5 w-5" />
-                ) : (
-                  <PanelLeftClose className="h-5 w-5" />
-                )
-              ) : aiCollapsed ? (
-                <PanelRightOpen className="h-5 w-5" />
-              ) : (
-                <PanelRightClose className="h-5 w-5" />
-              )}
+              {aiCollapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
             </Button>
           </div>
         </div>
@@ -208,37 +191,6 @@ export function AiPanel({
           </div>
         ) : (
           <div className="flex min-h-0 flex-1 flex-col">
-            <div className="mb-3 hidden grid-cols-2 gap-1 rounded-lg border p-1 text-sm md:grid">
-              <button
-                type="button"
-                aria-label="Move AI panel to left" title="Move AI panel to left" aria-pressed={aiSide === "left"}
-                onClick={() =>
-                  onAiSideChange("left")
-                }
-                className={
-                  aiSide === "left"
-                    ? "h-7 rounded-md bg-muted px-3 py-0.5 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    : "h-7 rounded-md px-3 py-0.5 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                }
-              >
-                Left
-              </button>
-              <button
-                type="button"
-                aria-label="Move AI panel to right" title="Move AI panel to right" aria-pressed={aiSide === "right"}
-                onClick={() =>
-                  onAiSideChange("right")
-                }
-                className={
-                  aiSide === "right"
-                    ? "h-7 rounded-md bg-muted px-3 py-0.5 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    : "h-7 rounded-md px-3 py-0.5 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                }
-              >
-                Right
-              </button>
-            </div>
-
             <p className="mb-3 text-base text-muted-foreground">
               Ask questions about the workforce data currently shown.
             </p>
@@ -250,14 +202,14 @@ export function AiPanel({
             )}
 
             <div className="mb-3 min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain rounded-lg border p-3 pr-2">
-              <section aria-label="Current page briefing" className="mb-3 rounded-lg border bg-muted/30 p-3">
-                <h3 className="font-semibold">Current page briefing</h3>
+              <section aria-label="Current evidence scope" className="mb-3 rounded-lg border bg-muted/30 p-3">
+                <h3 className="font-semibold">Evidence scope</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{scopeNote}</p>
-                {pageBriefing.loading ? <p role="status" className="mt-3 text-sm">Preparing this page’s briefing…</p> : pageBriefing.error ? <div role="status" className="mt-3 text-sm"><p>{pageBriefing.error}</p><button type="button" onClick={pageBriefing.retry} className="mt-2 rounded-md border px-3 py-2">Retry briefing</button></div> : pageBriefing.text ? <div className="mt-3"><ChatContent content={pageBriefing.text} /></div> : <p className="mt-3 text-sm">Page evidence is not available yet.</p>}
+                {!dashboardReady && <p role="status" className="mt-2 text-sm">Page evidence is loading or unavailable. Sending will be available when the data is ready.</p>}
               </section>
               {chatMessages.length === 0 ? (
                 <div className="flex h-full min-h-28 items-center justify-center text-center text-base text-muted-foreground">
-                  Ask a follow-up about this page.
+                  {dashboardReady ? "Ask a question about this page." : "You can keep drafting while the page data loads or recovers."}
                 </div>
               ) : (
                 chatMessages.map(

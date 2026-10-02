@@ -49,6 +49,7 @@ export type AppPage =
   | "finance"
   | "skills"
   | "learning-development"
+  | "development-planning"
   | "career-mobility"
   | "career-growth-mobility"
   | "succession-planning"
@@ -1071,6 +1072,7 @@ export type SurveyExitReason = {
 
 export type SurveySentimentResponse = {
   as_of: string;
+  exit_enps?: import("./exit-enps").ExitEnpsSummary | null;
   summary: {
     engagement_respondents: number;
     engagement_eligible_population: number;

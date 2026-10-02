@@ -43,8 +43,10 @@ function stageLabel(code: string) {
 
 function DimensionList({
   rows,
+  showExitDetails = false,
 }: {
   rows: SurveyListeningDimension[];
+  showExitDetails?: boolean;
 }) {
   return (
     <div className="space-y-3">
@@ -64,8 +66,15 @@ function DimensionList({
             </div>
             <p className="text-sm font-semibold">
               {row.favorable_pct.toFixed(1)}%
+              {showExitDetails && <span className="block text-xs font-normal text-muted-foreground">favorable</span>}
             </p>
           </div>
+          {showExitDetails && (
+            <div className="mt-2 text-xs text-muted-foreground">
+              <p>{row.question_text}</p>
+              <p className="mt-1">{row.separation_respondents.toLocaleString()} exit-survey respondents · 1–5 scale</p>
+            </div>
+          )}
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
             <div
               className="h-full rounded-full bg-foreground"
@@ -385,14 +394,32 @@ export function SurveySentimentPage({
             </div>
           </div>
 
-          <div className="mt-6 grid gap-6">
-            <div className="rounded-lg border p-4">
+          <div className="mt-6 grid grid-cols-1 gap-6">
+            {data.exit_enps && (
+              <section aria-labelledby="exit-enps-heading" className="min-w-0 rounded-lg border p-4">
+                <h3 id="exit-enps-heading" className="font-semibold">Simulated Exit eNPS</h3>
+                <p className="mt-2 text-sm">{data.exit_enps.question_text}</p>
+                <p className="mt-3 text-3xl font-semibold">{data.exit_enps.score === null ? "Unavailable" : data.exit_enps.score.toFixed(1)}</p>
+                <p className="mt-1 text-sm text-muted-foreground">Score from −100 to +100; 0–10 response scale</p>
+                <dl className="mt-3 grid grid-cols-1 gap-2 text-sm">
+                  <div><dt className="inline">Promoters (9–10): </dt><dd className="inline">{data.exit_enps.promoters.toLocaleString()} ({data.exit_enps.promoter_pct ?? "unavailable"}%)</dd></div>
+                  <div><dt className="inline">Passives (7–8): </dt><dd className="inline">{data.exit_enps.passives.toLocaleString()} ({data.exit_enps.passive_pct ?? "unavailable"}%)</dd></div>
+                  <div><dt className="inline">Detractors (0–6): </dt><dd className="inline">{data.exit_enps.detractors.toLocaleString()} ({data.exit_enps.detractor_pct ?? "unavailable"}%)</dd></div>
+                </dl>
+                <p className="mt-3 text-xs text-muted-foreground">{data.exit_enps.respondents.toLocaleString()} independent simulated exit-survey responses. These are not current employees or linked historical respondents. Score = % promoters − % detractors, with passives included in the denominator.</p>
+                <p className="mt-2 text-xs text-muted-foreground">Company-wide demonstration; no filtered breakdown or trend. Source refresh date unavailable. This distribution is arbitrary, not measured sentiment or a conversion of the old 1–5 item.</p>
+              </section>
+            )}
+            <div className="min-w-0 rounded-lg border p-4">
               <div className="mb-4">
                 <h3 className="font-semibold">
                   Exit Reasons
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   Primary reason reported by {summary.exit_respondents.toLocaleString()} exit-survey respondents
+                </p>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Company-wide recorded responses; dashboard filters do not narrow this exit-survey data. Shares describe reported reasons, not proven causes of turnover. A monthly exit-survey trend is not available.
                 </p>
               </div>
 
@@ -433,17 +460,18 @@ export function SurveySentimentPage({
                   Exit Experience
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Favorability on structured exit-survey items
+                  Favorable means a score of 4 or 5 on the 1–5 scale. These results describe exit-survey respondents, not the current workforce.
                 </p>
               </div>
               <DimensionList
                 rows={data.exit_dimensions}
+                showExitDetails
               />
             </div>
           </div>
 
           <div className="mt-6 rounded-md border bg-muted/20 p-4 text-xs text-muted-foreground">
-            {summary.open_text_comments.toLocaleString()} open-text survey comments are available in the synthetic listening dataset. This version does not yet run qualitative theme or sentiment analysis on those comments, so no themes are inferred here.
+            {summary.open_text_comments.toLocaleString()} open-text survey comments across all surveys are available in the synthetic listening dataset; this is not an exit-only count. This version does not yet run qualitative theme or sentiment analysis on those comments, so no themes are inferred here.
           </div>
         </>
       ) : (

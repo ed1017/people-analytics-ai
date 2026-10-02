@@ -1,4 +1,5 @@
 import { supabaseServer } from "./supabase-server";
+import { generateExitEnpsScores, localExitEnpsEnabled, summarizeExitEnps, surveyDimensionsForRetrieval } from "./exit-enps";
 import {
   getInternalTalentReadiness,
 } from "./internal-talent-readiness";
@@ -2069,7 +2070,7 @@ async function getTalentAcquisition() {
   };
 }
 
-async function getSurveySentiment() {
+export async function getSurveySentiment() {
   const [
     currentResult,
     trendResult,
@@ -2097,7 +2098,7 @@ async function getSurveySentiment() {
         "survey_listening_dimension_summary"
       )
       .select(
-        "survey_code, survey_type, dimension, avg_score, favorable_pct"
+        "survey_code, survey_type, question_code, dimension, avg_score, favorable_pct"
       ),
     supabaseServer
       .from(
@@ -2150,8 +2151,7 @@ async function getSurveySentiment() {
       >[]
     ),
     dimensions: compactRows(
-      (dimensionsResult.data ??
-        []) as Record<
+      surveyDimensionsForRetrieval(dimensionsResult.data ?? [], localExitEnpsEnabled()) as Record<
         string,
         unknown
       >[]
@@ -2170,6 +2170,7 @@ async function getSurveySentiment() {
     ),
     interpretation_note:
       "Survey results are aggregate listening signals, not causal proof. Raw open-text comments are not returned by this tool.",
+    exit_enps: localExitEnpsEnabled() ? summarizeExitEnps(generateExitEnpsScores()) : null,
   };
 }
 
