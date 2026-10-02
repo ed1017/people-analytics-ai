@@ -2131,7 +2131,7 @@ export async function getSurveySentiment() {
   ]) {
     if (result.error) {
       throw new Error(
-        "Survey & Sentiment tool: " +
+        "Employee Listening tool: " +
           result.error.message
       );
     }

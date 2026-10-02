@@ -13,8 +13,8 @@ import {
   type MouseEvent as ReactMouseEvent,
 } from "react";
 import { SiteFooter } from "@/components/site-footer";
+import { employeeListeningEvidence, exitSurveyEvidence } from "@/lib/employee-listening";
 import { FocusedIssue } from "@/components/focused-issue";
-import { PlanningGuide } from "@/components/planning-guide";
 import { useProblemConversation, SessionProblemSummary } from "@/components/problem-conversation";
 import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -116,7 +116,7 @@ export default function Home() {
   const [talentResponseEvidenceContext, setTalentResponseEvidenceContext] = useState<string | null>(null);
   const [navCollapsed, setNavCollapsed] = useState(false);
   const [aiCollapsed, setAiCollapsed] = useState(false);
-  const [aiWidth, setAiWidth] = useState(460);
+  const [aiWidth, setAiWidth] = useState(500);
 
   const [overviewData, setOverviewData] =
     useState<OverviewData | null>(null);
@@ -666,7 +666,7 @@ export default function Home() {
   }, [activePage, talentAcquisitionData]);
   useEffect(() => {
     if (
-      activePage !== "survey-sentiment" ||
+      (activePage !== "survey-sentiment" && activePage !== "attrition") ||
       surveySentimentData
     ) {
       return;
@@ -687,7 +687,7 @@ export default function Home() {
         if (!response.ok) {
           throw new Error(
             payload?.error ??
-              "Failed to load Survey & Sentiment data."
+              "Failed to load Employee Listening data."
           );
         }
 
@@ -699,7 +699,7 @@ export default function Home() {
         setSurveySentimentError(
           error instanceof Error
             ? error.message
-            : "Failed to load Survey & Sentiment data."
+            : "Failed to load Employee Listening data."
         );
       } finally {
         setSurveySentimentLoading(false);
@@ -1710,31 +1710,8 @@ export default function Home() {
                   }
                 : null,
 
-            surveySentimentContext:
-              activePage ===
-                "survey-sentiment" &&
-              surveySentimentData
-                ? {
-                    summary:
-                      surveySentimentData.summary,
-                    engagementTrend:
-                      surveySentimentData.engagement_trend,
-                    engagementDimensions:
-                      surveySentimentData.engagement_dimensions,
-                    pulseDimensions:
-                      surveySentimentData.pulse_dimensions,
-                    managerDimensions:
-                      surveySentimentData.manager_dimensions,
-                    onboardingDimensions:
-                      surveySentimentData.onboarding_dimensions,
-                    exitDimensions:
-                      surveySentimentData.exit_dimensions,
-                    businessUnits:
-                      surveySentimentData.business_units,
-                    exitReasons:
-                      surveySentimentData.exit_reasons,
-                  }
-                : null,
+            surveySentimentContext: activePage === "survey-sentiment" ? employeeListeningEvidence(surveySentimentData) : null,
+            exitSurveyContext: activePage === "attrition" ? exitSurveyEvidence(surveySentimentData) : null,
 
             talentResponseEvidenceContext: planningWorkspaceActive ? talentResponseEvidenceContext : null,
             planningEvidenceHandoffContext:
@@ -1921,7 +1898,7 @@ export default function Home() {
   // Expand AI to approximately 44% of the browser width.
   const toggleAiExpanded = () => {
     if (aiExpanded) {
-      setAiWidth(460);
+      setAiWidth(500);
     } else {
       const expandedWidth = Math.min(
         window.innerWidth * 0.5,
@@ -2054,14 +2031,12 @@ export default function Home() {
         style={
           {
             "--nav-width": `${
-              navCollapsed ? 72 : 252
+              navCollapsed ? 72 : 280
             }px`,
             "--divider-width": `${
               aiCollapsed ? 0 : 6
             }px`,
-            "--ai-width": `${
-              aiCollapsed ? 64 : aiWidth
-            }px`,
+            "--ai-width": aiCollapsed ? "64px" : `min(${aiWidth}px, max(280px, calc(100vw - var(--nav-width) - 486px)))`,
           } as CSSProperties
         }
       >
@@ -2077,9 +2052,8 @@ export default function Home() {
 
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
-          <PlanningGuide key={activePage} page={activePage} />
         {demoActive && <GuidedDemo page={activePage} onNavigate={setActivePage} onClose={() => setDemoActive(false)} onUseGoal={() => setDevelopmentSession(current => ({ ...current, goal: DEVELOPMENT_DEMO_GOAL }))} hasOptions={developmentSession.options.length > 0} />}
-        <div hidden={activePage !== "home"}><OverallOverviewPage conversation={conversation} onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></div>
+        <div hidden={activePage !== "home"}><OverallOverviewPage developmentSession={developmentSession} conversation={conversation} onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></div>
         {activePage === "guide-data" ? <GuideDataPage onBack={() => { setActivePage("home"); window.requestAnimationFrame(() => document.getElementById("overall-guide-link")?.focus()); }} /> : activePage === "home" ? null : intelligencePage ? <IntelligencePage page={activePage as "occupational-references" | "labor-market" | "training-coaching"} skills={skillsData} skillsLoading={skillsLoading} bls={blsData} blsLoading={blsLoading} blsError={blsError} catalog={<DevelopmentCatalog session={developmentSession} onChange={setDevelopmentSession} onOpen={() => setActivePage("development-planning")} />} /> : activePage === "compensation" ? (
           <section className="p-6"><h1 className="text-2xl font-semibold">Compensation</h1><p className="mt-4 text-lg">TBD</p><p className="mt-2 text-muted-foreground">Planned destination. Compensation data and analysis are not available.</p></section>
         ) : activePage === "development-planning" ? (
@@ -2114,6 +2088,7 @@ export default function Home() {
           </>
         ) : activePage === "attrition" ? (
           <AttritionPage
+            exitData={surveySentimentData} exitLoading={surveySentimentLoading} exitError={surveySentimentError}
             data={attritionData}
             loading={attritionLoading}
             error={attritionError}

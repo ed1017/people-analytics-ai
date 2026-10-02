@@ -135,14 +135,14 @@ export async function GET() {
       }
     );
   } catch (error) {
-    console.error("Survey & Sentiment API error:", error);
+    console.error("Employee Listening API error:", error);
 
     return NextResponse.json(
       {
         error:
           error instanceof Error
             ? error.message
-            : "Failed to load Survey & Sentiment data.",
+            : "Failed to load Employee Listening data.",
       },
       { status: 500 }
     );

@@ -1,4 +1,5 @@
 "use client";
+import { PlanningGuide } from "@/components/planning-guide";
 
 import {
   useEffect,
@@ -2014,13 +2015,13 @@ export function WorkforcePlanningPage({
 <section className="evidence-workspace min-w-0 p-6">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
-              <h2
+              <div className="flex flex-wrap items-center gap-3"><h2
                 id="workforce-planning-heading"
                 tabIndex={-1}
                 className="rounded-sm text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 Workforce Planning
-              </h2>
+              </h2><PlanningGuide key={requestedView} page={({overview:"planning-overview",plan:"scenario-modeling",design:"position-workforce-design",respond:"workforce-response",execute:"execution-feasibility"} as const)[requestedView]} /></div>
               <p className="text-muted-foreground">
                 {workflowView === "overview"
                   ? "See the current workforce plan, biggest demand shifts, approved response, execution risk, and feasibility in one place."

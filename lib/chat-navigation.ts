@@ -7,7 +7,7 @@ export const chatNavigationTargets = {
   "training-coaching": "Training & Coaching",
   workforce: "Workforce",
   attrition: "Attrition",
-  "survey-sentiment": "Survey & Sentiment",
+  "survey-sentiment": "Employee Listening",
   skills: "Skills Intelligence",
   "learning-development": "Learning & Development",
   "development-planning": "Development Planning",
