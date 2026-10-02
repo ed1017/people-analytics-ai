@@ -21,7 +21,7 @@ export function GuidedDemo({ page, onNavigate, onClose, onUseGoal, hasOptions }:
       {stage === 1 && <button className={button} onClick={() => onNavigate("training-coaching")}>Explore Training &amp; Coaching</button>}
       {stage === 2 && <button className={button} onClick={onUseGoal}>Use example development goal</button>}
       {stage === 3 && <button className={button} onClick={() => onNavigate("training-coaching")}>{hasOptions ? "Choose another quote" : "Choose a quote first"}</button>}
-      {stage === 3 && <button className={button} onClick={onClose}>Finish demo</button>}
+      {stage === 3 && <button className={button} onClick={() => { onClose(); onNavigate("decision-brief"); }}>Compare constraints and build the brief</button>}
     </div>
   </section>;
 }
