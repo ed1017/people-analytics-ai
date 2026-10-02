@@ -16,3 +16,9 @@ test("navigation guidance distinguishes opening pages from explicit carry and ca
   const text=chatNavigationInstructions();
   assert.match(text,/navigation buttons only/);assert.match(text,/explicitly click Carry to Planning/);assert.match(text,/do not invent a handoff/);assert.match(text,/not a proven solution/);
 });
+
+test("retired Career Interests navigation keeps safe legacy links and mobility destination",()=>{
+ assert.equal(chatNavigationTargets['career-mobility'],undefined);
+ assert.deepEqual(getChatNavigationAction('app:career-mobility'),{page:'workforce',label:'Workforce'});
+ assert.equal(getChatNavigationAction('app:career-growth-mobility').page,'career-growth-mobility');
+});

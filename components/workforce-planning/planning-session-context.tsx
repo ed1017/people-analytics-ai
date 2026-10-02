@@ -15,6 +15,7 @@ export type PlanningWorkspaceView =
   | "execute";
 
 type PlanningSessionContextValue = {
+  goalKey: string;
   activeView: PlanningWorkspaceView;
   setActiveView: (view: PlanningWorkspaceView) => void;
   setTalentEvidenceContext: (snapshot: string | null) => void;
@@ -24,9 +25,11 @@ const PlanningSessionContext =
   createContext<PlanningSessionContextValue | null>(null);
 export function PlanningSessionProvider({
   children,
+  goalKey,
   onTalentEvidenceContextChange,
 }: {
   children: ReactNode;
+  goalKey: string;
   onTalentEvidenceContextChange: (snapshot: string | null) => void;
 }) {
   const [activeView, setActiveView] =
@@ -35,6 +38,7 @@ export function PlanningSessionProvider({
   return (
     <PlanningSessionContext.Provider
       value={{
+        goalKey,
         activeView,
         setActiveView,
         setTalentEvidenceContext: onTalentEvidenceContextChange,

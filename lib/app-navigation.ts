@@ -23,7 +23,7 @@ export const appWorkspaceJourneys: Array<{key: AppWorkspaceKey; journeyLabel: st
   {key:"strategy", journeyLabel:"Planning", subtitle:"Plan Our Future", defaultPage:"planning-overview"},
 ];
 export const appNavigationSections: AppNavigationSection[] = [
-  {key:"analytics", title:"Workforce", pages:["workforce","attrition","compensation","talent-acquisition","survey-sentiment","skills","learning-development","career-mobility","career-growth-mobility","succession-planning"]},
+  {key:"analytics", title:"Workforce", pages:["workforce","attrition","compensation","talent-acquisition","survey-sentiment","skills","learning-development","career-growth-mobility","succession-planning"]},
   {key:"talent", title:"Intelligence", pages:["occupational-references","labor-market","training-coaching"]},
   {key:"strategy", title:"Planning", pages:["planning-overview","scenario-modeling","position-workforce-design","workforce-response","execution-feasibility","finance","development-planning"]},
 ];
