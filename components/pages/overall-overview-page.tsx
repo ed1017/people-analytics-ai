@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
-import { ArrowUp, RefreshCw } from "lucide-react";
-import { ChatContent } from "@/components/chat-content";
+import { ArrowUp, RefreshCw, Info } from "lucide-react";
+import { GoalTakeaway } from "@/components/goal-takeaway";
+import { GoalConversationMessages } from "@/components/goal-conversation-messages";
 import { buildHomePack, homeDefinitions, readHomeSource } from "@/lib/home-pack.mjs";
 import type { DevelopmentSession } from "@/components/development-workspace";
 import { homeGoalReplies } from "@/lib/home-chat-reply";
@@ -13,10 +14,10 @@ import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session
 import type { ProblemConversation } from "@/components/problem-conversation";
 import type { AppPage, ChatMessage, Persona } from "@/lib/types";
 
-async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, message: string, history: ChatMessage[], signal?: AbortSignal, hasFocusedIssue = false) {
+async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, message: string, history: ChatMessage[], signal?: AbortSignal, hasFocusedIssue = false, goalContext:unknown = null, marketReference:unknown = null) {
   const response = await fetch("/api/chat", {
     method: "POST", headers: { "Content-Type": "application/json" }, signal,
-    body: JSON.stringify({ page: "home", persona, message, history, hasFocusedIssue, overviewBriefingContext: sources }),
+    body: JSON.stringify({ page: "home", persona, message, history, goalContext, marketReference, hasFocusedIssue, overviewBriefingContext: sources }),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "The answer is unavailable. Please try again.");
@@ -24,7 +25,9 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
   return { answer: data.answer, chooseGoal: data.nextStep === "choose_goal" };
 }
 
-export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry }: {
+export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry, onEvidencePack, marketReference }: {
+  marketReference:unknown;
+  onEvidencePack:(value:string)=>void;
   countryOptions: CountryOption[];
   onCountry: (country:string) => void;
   conversation: ProblemConversation;
@@ -33,11 +36,14 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
   workforceQuery: string; workforceScope: string;
   active: boolean; persona: Persona; onNavigate: (page: AppPage) => void;
 }) {
+  const [explorePrompts, setExplorePrompts] = useState(false);
   const [sourceResults, setSourceResults] = useState<Record<string, unknown>>({});
   const [loadedScope, setLoadedScope] = useState("");
   const [evidenceRevision, setEvidenceRevision] = useState(0);
   const pack = buildHomePack(sourceResults, workforceScope, conversation.focusedIssue || conversation.problem?.latestQuestion || "", developmentSession);
   const sources = pack.sources;
+  const evidencePacket=JSON.stringify({goalKey:conversation.workspaceKey,goal:conversation.focusedIssue,pack});
+  useEffect(()=>{onEvidencePack(evidencePacket);},[onEvidencePack,evidencePacket]);
   const [loading, setLoading] = useState(false);
   const [evidenceError, setEvidenceError] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(0);
@@ -117,11 +123,12 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
     const request = conversation.beginRequest();
     const key = contextKey;
     const history = getProblemChatHistory(modelHistoryRef.current, key);
+    const goalContext=actionPlan?conversation.goalContext:conversation.recordGoalStatement(message,"home",workforceScope);
     setMessages(current => [...current, { role: "user", content: actionPlan ? HOME_ACTION_PLAN_LABEL : message }]);
     setInput(""); setChatLoading(true); setChatError(null);
     if (!actionPlan) setQuestionUnanswered(true);
     try {
-      const reply = await ask(buildHomePack(sourceResults, workforceScope, conversation.focusedIssue || message, developmentSession), persona, withProblemContext(message, journey, conversation.focusedIssue), history, request.signal, Boolean(conversation.focusedIssue));
+      const reply = await ask(buildHomePack(sourceResults, workforceScope, conversation.focusedIssue || message, developmentSession), persona, withProblemContext(message, journey, conversation.focusedIssue), history, request.signal, Boolean(conversation.focusedIssue),goalContext,marketReference);
       if (!request.current() || currentEvidenceKey.current !== key) return;
       const answer = reply.answer;
       goalChoiceSubmittedRef.current = false;
@@ -150,47 +157,15 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-4 gap-y-1"><h2 id="overall-overview-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl xl:text-2xl 2xl:text-3xl">From Insight to Action</h2><p className="w-full text-sm text-muted-foreground sm:w-auto">by Ed Om <span aria-hidden="true">·</span> <a className="text-primary underline" href="mailto:edwinom.nyc@gmail.com">edwinom.nyc@gmail.com</a></p></div>
         <div className="ml-auto flex items-center gap-3 text-xs">
+          <button type="button" popoverTarget="home-data-details" aria-label="Open data details" className="flex min-h-11 items-center gap-1 rounded px-2 text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"><Info size={16}/><span>Data details</span></button>
           <button id="overall-guide-link" type="button" onClick={() => onNavigate("guide-data")} className="rounded-sm font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Guide &amp; Data</button>
 
         </div>
-      <div className="basis-full"><p className="text-sm font-semibold text-primary">Interactive prototype · In development</p><p className="mt-1 text-sm text-muted-foreground">Explore with synthetic workforce data. Features are being refined.</p></div>
+      <div className="basis-full"><p className="text-sm font-semibold text-primary">Interactive prototype · In development</p></div>
       </header>
-
-    <div ref={conversationViewport} aria-label="Home chat workspace" role="region" className="min-h-[20rem] max-h-[70dvh] space-y-5 overflow-y-auto pr-1 xl:min-h-0 xl:max-h-none xl:flex-1">
-    <details open={!journey && !conversation.focusedIssue}>
-      <summary className="mb-3 cursor-pointer rounded-sm text-sm font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring">Start or explore a new question</summary>
-    <section aria-label="Starting guide" data-testid="overview-starting-guide" className="py-2">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h3 className="text-xl font-semibold">Start with an issue worth working on</h3>
-        <button type="button" aria-label="Refresh overview evidence" disabled={loading || chatLoading}
-          onClick={() => { loaded.current = ""; setRefresh(value => value + 1); }}
-          className="rounded-md p-2 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18} /></button>
-      </div>
-      <p className="text-base text-muted-foreground">Explore a signal in the available evidence, or tell me the business issue you already have.</p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2" aria-label="Choose a starting point">
-        <button type="button" disabled={!ready || chatLoading} onClick={() => void send(HOME_FIND_ISSUE_PROMPT)} className="min-h-11 rounded-lg border border-primary bg-secondary px-4 py-3 text-left text-base font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{HOME_FIND_ISSUE_PROMPT}</button>
-        <button type="button" disabled={chatLoading} onClick={focusQuestion} className="min-h-11 rounded-lg border px-4 py-3 text-left text-base font-semibold hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Bring your own issue</button>
-      </div>
-      <p className="mt-4 text-sm">Discuss the issue, then review and pin a concise goal to keep the same focus across pages.</p>
-      {loading && <p role="status" className="mt-3 text-sm text-muted-foreground">Loading available evidence for your questions.</p>}
-
-
-
-    </section>
-
-    <details className="mt-3">
-      <summary className="cursor-pointer rounded-sm text-sm text-primary focus-visible:ring-2 focus-visible:ring-ring">More prompts</summary>
-      <div className="mt-3 flex flex-wrap gap-2" aria-label="Additional Home prompts">
-        {["Summarize my workforce", "Export current data (CSV)"].map(prompt => <button key={prompt} type="button" disabled={!ready || chatLoading} onClick={() => void send(prompt)} className="rounded-lg border bg-card px-4 py-3 text-base font-medium hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{prompt}</button>)}
-      </div>
-    </details>
-
-    </details>
-
-
-      {evidenceError && <p role="alert" className="mt-3 text-base text-destructive">{evidenceError}</p>}
-      <details className="text-sm" aria-label="Data details">
-        <summary className="cursor-pointer rounded-sm text-sm font-semibold focus-visible:ring-2 focus-visible:ring-ring">Data details</summary>
+      <div id="home-data-details" popover="auto" role="dialog" aria-label="Data details" className="fixed inset-0 m-auto max-h-[80dvh] w-[min(60rem,92vw)] overflow-y-auto rounded-xl border bg-background p-5 text-sm text-foreground shadow-xl">
+        <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">Data details</h2><button type="button" popoverTarget="home-data-details" popoverTargetAction="hide" className="min-h-11 rounded border px-3 focus-visible:ring-2 focus-visible:ring-ring">Close data details</button></div>
+      {Boolean(marketReference)&&<p className="mt-2 text-xs">An explicitly carried market reference [M1] is also available for this goal. Its selected geography and source period remain separate from workforce filters.</p>}
       <p role="status" className="text-xs text-muted-foreground" aria-label="Home evidence coverage">{pack.coverage.available} of {pack.coverage.total} source summaries available · detail rows are sampled. Open evidence sources for scope and unavailable data.</p>
         <p className="mt-3 text-xs">Synthetic workforce evidence. Only the workforce snapshot follows shared filters; other company sources remain company-wide. BLS is US national. Quotes are fictional or unverified; comparisons use your assumptions.</p>
         <p className="mt-3 text-xs">{pack.coverage.selection}</p><p className="mt-2 text-xs">{pack.coverage.unavailable.join(". ")}</p><div className="mt-4 grid gap-4 md:grid-cols-3">
@@ -202,12 +177,38 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
             {source.id === "T3" ? <p className="mt-3 text-xs">Aggregate evidence retained; standalone page retired.</p> : <button type="button" onClick={() => onNavigate(source.page as AppPage)} className="mt-3 rounded-sm font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Open {source.label}</button>}
           </article>)}
         </div>
-      </details>
+      </div>
 
+    <div ref={conversationViewport} aria-label="Home chat workspace" role="region" className="min-h-[20rem] max-h-[70dvh] space-y-5 overflow-y-auto pr-1 xl:min-h-0 xl:max-h-none xl:flex-1">
+    <section aria-label="Starting guide" data-testid="overview-starting-guide" className="py-2">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h3 className="text-xl font-semibold">Start with an issue worth working on</h3>
+        <button type="button" aria-label="Refresh overview evidence" disabled={loading || chatLoading}
+          onClick={() => { loaded.current = ""; setRefresh(value => value + 1); }}
+          className="rounded-md p-2 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18} /></button>
+      </div>
+      <p className="text-base text-muted-foreground">Find an issue or bring your own, then discuss it with AI and pin your goal.</p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-3" aria-label="Choose a starting point">
+        <button type="button" disabled={!ready || chatLoading} onClick={() => void send(HOME_FIND_ISSUE_PROMPT)} className="min-h-11 rounded-lg border px-4 py-3 text-left text-base font-semibold hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{HOME_FIND_ISSUE_PROMPT}</button>
+        <button type="button" disabled={chatLoading} onClick={focusQuestion} className="min-h-11 rounded-lg border px-4 py-3 text-left text-base font-semibold hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Bring your own issue</button>
+        <button type="button" disabled={chatLoading} onClick={()=>setExplorePrompts(value=>!value)} aria-expanded={explorePrompts} aria-controls="home-explore-prompts" className="min-h-11 rounded-lg border px-4 py-3 text-left text-base font-semibold hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Explore the workforce first</button>
+      </div>
+      {explorePrompts && <div id="home-explore-prompts" aria-label="Explore workforce prompts" className="mt-3 flex flex-wrap gap-2">{["How is our workforce changing?", "Where is turnover highest?", "Which skills need attention?"].map(prompt=><button key={prompt} type="button" disabled={!ready||chatLoading} onClick={()=>void send(prompt)} className="min-h-11 rounded-lg border px-3 py-2 text-sm hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{prompt}</button>)}</div>}
+      {loading && <p role="status" className="mt-3 text-sm text-muted-foreground">Loading available evidence for your questions.</p>}
+
+
+
+    </section>
+
+
+
+
+      {evidenceError && <p role="alert" className="mt-3 text-base text-destructive">{evidenceError}</p>}
+
+
+    <GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:workforceScope}} payload={{page:"home",persona,overviewBriefingContext:pack,marketReference}} active={active} ready={ready} paused={chatLoading||Boolean(input.trim())||Boolean(pendingScope)||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} onNavigate={onNavigate}/>
     {messages.length > 0 && <section aria-label="Overview conversation" className="space-y-6">
-      {messages.map((message, index) => <div key={index} className={message.role === "user" ? "ml-auto max-w-[90%] rounded-2xl bg-accent px-5 py-4 text-lg" : "text-lg"}>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{message.role === "user" ? "You" : "Workforce AI"}</p><ChatContent content={message.content} onNavigate={message.role === "assistant" ? onNavigate : undefined} />
-      </div>)}
+      <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona])} onNavigate={onNavigate} home/>
       {conversation.homeGoalChoiceKey === contextKey && !conversation.focusedIssue && <div role="group" aria-label="Choose a goal" className="flex flex-wrap gap-2">
         {(Object.keys(homeGoalReplies) as Array<keyof typeof homeGoalReplies>).map(goal => <button key={goal} type="button" disabled={chatLoading || !ready || Boolean(input.trim())} onClick={() => { if (goalChoiceSubmittedRef.current) return; goalChoiceSubmittedRef.current = true; void send(homeGoalReplies[goal]); }} className="min-h-11 rounded-lg border border-primary px-4 py-2 font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{goal}</button>)}
         <button type="button" disabled={chatLoading} onClick={() => { conversation.setHomeGoalChoiceKey(null); focusQuestion(); }} className="min-h-11 rounded-lg border px-4 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Another goal</button>

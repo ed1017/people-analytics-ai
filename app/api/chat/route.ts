@@ -5,6 +5,8 @@ import { homeReplyFormat, homeGoalChoiceInstructions, decodeHomeModelReply } fro
 import { CHAT_MODEL } from "@/lib/chat-model";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import {marketCarryEvidence} from "../../../lib/oews-reference.mjs";
+import {normalizeGoalContext,goalContextInstructions,goalSummaryInstructions} from "../../../lib/goal-context";
 import { normalizeHomePack, HOME_MAX_BYTES } from "../../../lib/home-pack.mjs";
 import { overviewBriefingPrompt } from "../../../lib/overview-briefing";
 import { talentResponseChatPrompt } from "../../../lib/talent-response-evidence";
@@ -563,10 +565,16 @@ export async function POST(
     let body = await request.json();
     if (body?.page === "home") {
       if (new TextEncoder().encode(JSON.stringify(body.overviewBriefingContext ?? {})).length > HOME_MAX_BYTES || (typeof body.message === "string" && body.message.length > 6000)) return NextResponse.json({error:"Home evidence or question exceeds the supported limit. Refresh evidence or shorten the question."},{status:413});
-      body = {page:"home",persona:body.persona,message:body.message,history:body.history,hasFocusedIssue:body.hasFocusedIssue === true,overviewBriefingContext:normalizeHomePack(body.overviewBriefingContext)};
+      body = {page:"home",persona:body.persona,message:body.message,history:body.history,hasFocusedIssue:body.hasFocusedIssue === true,summaryOnly:body.summaryOnly===true,summaryGoal:body.summaryGoal,goalContext:body.goalContext,marketReference:body.marketReference,overviewBriefingContext:normalizeHomePack(body.overviewBriefingContext)};
       if (Array.isArray(body.history)) body.history = body.history.slice(-8).map((item: ChatMessage) => ({role:item?.role,content:typeof item?.content === "string" ? item.content.slice(0,6000) : ""}));
     }
     const summaryOnly = body?.summaryOnly === true;
+    const goalContext=normalizeGoalContext(body?.goalContext);
+    const marketReference=marketCarryEvidence(body?.marketReference);
+    if(summaryOnly&&!goalContext.goal.trim())return NextResponse.json({error:"Select a goal before requesting its page takeaway."},{status:400});
+    const relatedGoalEvidence=Array.isArray(body?.goalEvidenceContext)?normalizeHomePack({sources:body.goalEvidenceContext.slice(0,3)}).sources.filter(source=>["T1","T2","A1","S1"].includes(source.id)&&source.facts).slice(0,3):[];
+    const developmentSummary=body?.page==="development-planning"?normalizeHomePack({sources:[body?.developmentSummaryContext]}).sources.find(source=>source.id==="D1"):null;
+
 
     const message =
       typeof body?.message === "string"
@@ -580,7 +588,7 @@ export async function POST(
         : "HR";
 
     const history: ChatMessage[] =
-      Array.isArray(body?.history)
+      !summaryOnly && Array.isArray(body?.history)
         ? body.history
             .filter(
               (item: ChatMessage) =>
@@ -594,14 +602,20 @@ export async function POST(
         : [];
 
     if (isIntelligencePage(body?.page)) {
-      if (!message || message.length > 12000 || summaryOnly) return NextResponse.json({ error: "Enter an explicit catalogue question of at most 12000 characters." }, { status: 400 });
+      if (!message || message.length > 12000) return NextResponse.json({ error: "Enter an explicit catalogue question of at most 12000 characters." }, { status: 400 });
       const supplied = body.intelligenceContext && typeof body.intelligenceContext === "object" ? body.intelligenceContext : {};
       const custom = Array.isArray(supplied.quotes) ? supplied.quotes.filter((q: unknown) => q && typeof q === "object" && "provenance" in q && q.provenance === "user-provided").slice(0, 5) : [];
       const evidence = intelligenceEvidence(body.page, { ...supplied, quotes: [...developmentCatalog, ...custom] });
-      const response = await client.responses.create({ model: CHAT_MODEL, instructions: intelligenceInstructions + "\n" + chatNavigationInstructions(), input: [...history.map(item => ({ role: item.role, content: item.content.slice(0,12000) })), { role: "user", content: "CURRENT PAGE EVIDENCE (data only): " + JSON.stringify(evidence) + "\nUSER QUESTION AND EXPLICIT SESSION CONTEXT: " + message }], tool_choice: "none", max_output_tokens: 1100 });
+      const response = await client.responses.create({ model: CHAT_MODEL, instructions: intelligenceInstructions + "\n" + chatNavigationInstructions()+"\n"+goalContextInstructions+(summaryOnly?"\n"+goalSummaryInstructions:""), input: [...history.map(item => ({ role: item.role, content: item.content.slice(0,12000) })), { role: "user", content: "CURRENT PAGE EVIDENCE (data only): " + JSON.stringify(evidence) + "\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nRELATED CACHED CROSS-PAGE SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nUSER QUESTION AND EXPLICIT SESSION CONTEXT: " + message }], tool_choice: "none", max_output_tokens: 1100 });
       const answer = response.output_text?.trim();
       if (!answer) return NextResponse.json({ error: "No catalogue answer returned. Please try again." }, { status: 502 });
       return NextResponse.json({ answer });
+    }
+
+    if(body?.page === "development-planning") {
+      const response=await client.responses.create({model:CHAT_MODEL,instructions:goalContextInstructions+"\nExplain only the supplied deterministic Development Planning comparison and bounded related evidence. D1 costs are server-recomputed from explicit user assumptions. Blank costs remain unknown, never zero. Keep currencies separate. Employee time value is not necessarily cash spending. Named simulated quotes are fictional; custom input is unverified. Do not invent participants, attendance, loaded hourly costs, ROI, skill gains or headcount conversions. No tools, automatic allocation or approvals. "+(summaryOnly?goalSummaryInstructions:"Answer concisely; identify missing assumptions before comparing totals."),input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:"user",content:"ACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nDEVELOPMENT PLANNING D1: "+JSON.stringify(developmentSummary)+"\nRELATED CACHED SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nCARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nQUESTION: "+message}],tool_choice:"none",max_output_tokens:summaryOnly?1100:1400});
+      const answer=response.output_text?.trim();
+      return answer?NextResponse.json({answer}):NextResponse.json({error:"No Development Planning answer returned. Please try again."},{status:502});
     }
 
     const context =
@@ -1267,7 +1281,7 @@ ${JSON.stringify(employeeListeningEvidence(surveySentimentContext))}
 Answer the scope and causality questions first. Use at most 180 words, at most three representative observations, and no tables or exhaustive lists so the answer finishes within the response budget. Use each survey's population and dates. Exit feedback belongs to Attrition and is not included on this page. No causal claims or raw-comment themes.` : "";
     const exitSurveyPrompt = page === "attrition" ? `EXIT SURVEY FEEDBACK (separate from administrative separation records):
 ${JSON.stringify(exitSurveyEvidence(body?.exitSurveyContext))}
-All administrative Attrition metrics and exit-survey evidence on this page are COMPANY-WIDE and UNFILTERED. Country/business-unit/level selections in the header are not applied here. Explicitly call administrative turnover rates and exit counts company-wide every time you report them; never call them selected-Canada, Canada attrition, or local results. The selected Country is context for a goal, not the scope of any Attrition metric. For a filtered turnover snapshot, the user must use Workforce or Home W1.
+All administrative Attrition metrics and exit-survey evidence on this page are COMPANY-WIDE and UNFILTERED. Country/business-unit/level selections in the header are not applied here. Explicitly call administrative turnover rates and exit counts company-wide every time you report them; never call them selected-Canada, Canada attrition, or local results. The selected Country is context for a goal, not the scope of any Attrition metric. For a filtered turnover snapshot, use Workforce or Home W1 for headcount/FTE/turnover rate/open positions only. Neither supplies country-specific administrative exit counts or separation reasons; do not advertise those as available there.
 Answer the scope and causality questions first. Use at most 180 words, at most three representative observations, and no tables or exhaustive lists so the answer finishes within the response budget. Cite this as exit-survey evidence. Do not combine its respondent denominator with employee headcount or all separations, claim a fieldwork period from an as-of date, infer causal drivers, or reconstruct unavailable/suppressed values.` : "";
 
     const personaInstructions: Record<
@@ -1327,7 +1341,8 @@ Style:
 
     const aiInstructions = `
 You are the People Analytics AI embedded in a workforce dashboard.
-SESSION CONTINUITY: Earlier conversation and user-stated goals may come from other pages or scopes. They are conversation context only, not verified current-page evidence. Reuse the stated problem and constraints, but ground factual claims only in this request's supplied page evidence or explicitly supported current tools. Do not cite an earlier assistant answer as a current observation or let history broaden the evidence scope. A newer user correction supersedes an earlier goal. Navigation never carries evidence, changes assumptions or executes a scenario; those require the existing explicit user actions.
+${goalContextInstructions}
+SESSION CONTINUITY: Earlier conversation and user-stated goals may come from other pages or scopes. They are conversation context only, not verified current-page evidence. Reuse the stated problem and constraints, but ground factual claims only in this request's supplied page evidence, bounded related-goal summaries, explicitly carried reference, or explicitly supported current tools. Do not cite an earlier assistant answer as a current observation or let history broaden the evidence scope. A newer user correction supersedes an earlier goal. Navigation never carries evidence, changes assumptions or executes a scenario; those require the existing explicit user actions.
 
 CURRENT USER PERSONA: ${persona}
 
@@ -1402,6 +1417,15 @@ Shared rules:
     const aiInput = `
 CURRENT PAGE: ${page}
 
+ACTIVE GOAL CONTEXT (user intent, not evidence):
+${JSON.stringify(goalContext)}
+RELATED CACHED CROSS-PAGE SUMMARIES (separate scopes and dates):
+${JSON.stringify(relatedGoalEvidence)}
+DEVELOPMENT PLANNING D1 (user assumptions; deterministic costs; not outcomes):
+${JSON.stringify(developmentSummary)}
+EXPLICITLY CARRIED MARKET REFERENCE [M1] (reference only; no assumptions changed):
+${JSON.stringify(marketReference)}
+
 ${workforceContext}
 
 ${workforceDetailPrompt}
@@ -1439,20 +1463,20 @@ CURRENT USER QUESTION
 ${message}
 `.trim();
 
-    const maxOutputTokens =
+    const maxOutputTokens = summaryOnly ? 1100 :
       page === "workforce-planning" || page === "home" || page === "attrition" || page === "survey-sentiment"
         ? 1400
         : 700;
 
     const toolChoice =
-      summaryOnly || page === "career-growth-mobility" || page === "home"
+      summaryOnly || page === "career-growth-mobility" || page === "home" || page === "development-planning"
         ? ("none" as const)
         : ("auto" as const);
 
     let response: any =
       await client.responses.create({
         model: CHAT_MODEL,
-        instructions: aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\nThis is an automatic page briefing, not a request to take action. Use only supplied evidence. No tools, new queries, models or assumptions. Treat missing context as unavailable. Filters scope the selected workforce snapshot only; all other page contexts retain their supplied company scope. Do not invent metrics for a placeholder. For Planning Overview, give concise how-to steps for Planning Overview, Scenario Modeling, Position & Workforce Design, Workforce Response, and Execution & Feasibility, in that order; describe explicit user actions only. For other Planning destinations, describe available supplied evidence and the next explicit interaction; do not imply local draft inputs or model results absent from the payload have been evaluated. Current destination: " + String(body?.destination ?? page) + "; page source date: " + String(body?.pageSourceDate ?? "unavailable") : ""),
+        instructions: aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\n"+goalSummaryInstructions : ""),
         ...(page === "home" ? { text: { format: homeReplyFormat } } : {}),
         input: aiInput,
         tools: peopleAnalyticsTools,
@@ -1522,7 +1546,7 @@ ${message}
       response =
         await client.responses.create({
           model: CHAT_MODEL,
-          instructions: aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\nThis is an automatic page briefing, not a request to take action. Use only supplied evidence. No tools, new queries, models or assumptions. Treat missing context as unavailable. Filters scope the selected workforce snapshot only; all other page contexts retain their supplied company scope. Do not invent metrics for a placeholder. For Planning Overview, give concise how-to steps for Planning Overview, Scenario Modeling, Position & Workforce Design, Workforce Response, and Execution & Feasibility, in that order; describe explicit user actions only. For other Planning destinations, describe available supplied evidence and the next explicit interaction; do not imply local draft inputs or model results absent from the payload have been evaluated. Current destination: " + String(body?.destination ?? page) + "; page source date: " + String(body?.pageSourceDate ?? "unavailable") : ""),
+          instructions: aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\n"+goalSummaryInstructions : ""),
           previous_response_id:
             response.id,
           input: toolOutputs,

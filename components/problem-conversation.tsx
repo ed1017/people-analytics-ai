@@ -5,6 +5,7 @@ import type { HomeDecisionContext } from "@/lib/home-decision-journey";
 import type { ScopedChatHistory } from "@/lib/chat-context-history";
 import type { ChatMessage } from "@/lib/types";
 
+import { addGoalNote, emptyGoalRequirements, normalizeGoalRequirements, type GoalRequirements } from "@/lib/goal-context";
 import { GOALS_STORAGE_KEY, MAX_GOALS, emptyLocalGoals, parseLocalGoals, type LocalGoals } from "@/lib/local-goals";
 
 type GoalChat = { messages: ChatMessage[]; input: string; problem: HomeDecisionContext | null; questionUnanswered: boolean };
@@ -85,10 +86,25 @@ export function useProblemConversation() {
     chats.current.delete(current.activeId);
     activate({...current,activeId:"",goals:current.goals.filter(g=>g.id!==current.activeId)},false);
   };
+  const recordGoalStatement = (text:string,page:string,scope:string) => {
+    const current=goalsRef.current, goal=current.goals.find(g=>g.id===current.activeId);
+    if(!goal)return null;
+    const context=addGoalNote(normalizeGoalRequirements(goal.context),text,page,scope);
+    persist({...current,goals:current.goals.map(g=>g.id===goal.id?{...g,context}:g)});
+    return {goal:goal.statement,...context,currentScope:scope};
+  };
+  const updateGoalRequirements = (context:GoalRequirements) => {
+    const current=goalsRef.current;
+    persist({...current,goals:current.goals.map(g=>g.id===current.activeId?{...g,context:normalizeGoalRequirements(context)}:g)});
+    cancelPending();
+  };
+  const activeGoal=localGoals.goals.find(g=>g.id===localGoals.activeId);
+  const goalRequirements=activeGoal?.context ?? emptyGoalRequirements();
+  const goalContext=activeGoal?{goal:activeGoal.statement,...goalRequirements}:null;
   const clearAllGoals = () => {
     cancelPending(); chats.current.clear(); history.current={key:"",messages:[]}; setMessages([]); setInput(""); setProblem(null); setQuestionUnanswered(false); setFocusedIssue(""); setIssueEditor(null); setError(null); setWorkspaceRevision(v=>v+1); persist(emptyLocalGoals(),true);
   };
-  return { goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
+  return { goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
 }
 export type ProblemConversation = ReturnType<typeof useProblemConversation>;
 
@@ -97,7 +113,7 @@ export function SessionProblemSummary({ conversation }: { conversation: ProblemC
   return <section aria-label="Session conversation context" className="mb-3 min-w-0 text-sm">
     <details><summary className="cursor-pointer rounded-sm font-semibold focus-visible:ring-2 focus-visible:ring-ring">{conversation.focusedIssue ? "Focused issue" : "Conversation context"}</summary>
     <p className="mt-1 break-words">{conversation.focusedIssue || conversation.problem?.firstQuestion || "No active problem. Ask a question to start."}</p>
-    <p className="mt-2 text-xs text-muted-foreground">Earlier-page messages are context, not current-page evidence. Navigation does not run models or change assumptions. Switching goals starts fresh AI context. Conversations stay separate in this tab; reload clears them. Goal names are saved only in this browser.</p></details>
+    <p className="mt-2 text-xs text-muted-foreground">Earlier-page messages are context, not current-page evidence. Navigation does not run models or change assumptions. Selected goals receive a fresh page takeaway using saved requirements and current evidence. Conversations stay separate in this tab; reload clears them. Goals and their user-stated context are saved only in this browser.</p></details>
     <button type="button" onClick={() => conversation.startNewProblem()} className="mt-2 min-h-11 rounded border px-3 py-2 text-sm font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring">Start new problem</button>
   </section>;
 }

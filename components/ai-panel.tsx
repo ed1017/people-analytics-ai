@@ -19,10 +19,13 @@ import {
 
 import { CHAT_MODEL } from "@/lib/chat-model";
 import { Button } from "@/components/ui/button";
-import { ChatContent } from "@/components/chat-content";
+import { GoalConversationMessages } from "@/components/goal-conversation-messages";
 import type { ChatMessage } from "@/lib/types";
 
 type AiPanelProps = {
+  goalTakeaway?:ReactNode;
+  goalViewKey?:string;
+  hasGoal?:boolean;
   sessionControls?: ReactNode;
   readOnlyReason?: string;
   aiCollapsed: boolean;
@@ -48,6 +51,7 @@ type AiPanelProps = {
 };
 
 export function AiPanel({
+  goalTakeaway,goalViewKey="",hasGoal=false,
   sessionControls,
   readOnlyReason,
   aiCollapsed,
@@ -207,49 +211,15 @@ export function AiPanel({
             )}
 
             <div aria-label="AI conversation" className="mb-3 min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain pr-2">
+              {goalTakeaway}
               {sessionControls}
               <section aria-label="Current evidence scope" className="mb-3 text-sm">
                 <h3 className="font-semibold">Evidence scope</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{scopeNote}</p>
                 {!dashboardReady && !readOnlyReason && <p role="status" className="mt-2 text-sm">Page evidence is loading or unavailable. Sending will be available when the data is ready.</p>}
               </section>
-              {chatMessages.length === 0 ? (
-                <div className="flex h-full min-h-28 items-center justify-center text-center text-base text-muted-foreground">
-                  {readOnlyReason ? "Your session conversation stays available here." : dashboardReady ? "Ask a question about this page." : "You can keep drafting while the page data loads or recovers."}
-                </div>
-              ) : (
-                chatMessages.map(
-                  (message, index) => (
-                    <div
-                      key={`${message.role}-${index}`}
-                      className={
-                        message.role === "user"
-                          ? "py-2 text-[17px] leading-relaxed"
-                          : "py-2 text-[17px] leading-relaxed"
-                      }
-                    >
-                      <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                        {message.role === "user"
-                          ? "You"
-                          : "People Analytics AI"}
-                      </p>
-
-                      {message.role ===
-                      "assistant" ? (
-                        <ChatContent
-                          content={
-                            message.content
-                          }
-                        />
-                      ) : (
-                        <p className="whitespace-pre-wrap leading-relaxed">
-                          {message.content}
-                        </p>
-                      )}
-                    </div>
-                  )
-                )
-              )}
+              <GoalConversationMessages messages={chatMessages} viewKey={goalViewKey} hasGoal={hasGoal}/>
+              {!chatMessages.length&&!hasGoal&&<p className="text-base text-muted-foreground">{readOnlyReason?"Your session conversation stays available here.":dashboardReady?"Ask a question about this page.":"You can keep drafting while page evidence loads."}</p>}
 
               {chatLoading && (
                 <div className="flex items-center gap-2 py-2 text-[17px] text-muted-foreground">
