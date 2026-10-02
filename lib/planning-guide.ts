@@ -8,7 +8,7 @@ export const planningGuideSteps = [
 ] as const;
 const additional = [
   { page: "finance", title: "Labor Cost Planning", first: "Review the available aggregate labor-cost context and stored scenarios. Confirm the period, population and assumptions with Finance before using costs in a plan." },
-  { page: "development-planning", title: "Development Planning", first: "Explicitly carry a quote and goal from Learning & Development. Enter participants, sessions, fees and hours; add a loaded hourly cost only if known. Compare like currencies and goals; unknown costs stay unknown." },
+  { page: "development-planning", title: "Development Planning", first: "Explicitly carry a quote and goal from Intelligence → Training & Coaching. Enter participants, sessions, fees and hours; add a loaded hourly cost only if known. Compare like currencies and goals; unknown costs stay unknown." },
 ] as const;
 
 export function getPlanningGuide(page: AppPage) { return [...planningGuideSteps, ...additional].find(step => step.page === (page === "workforce-planning" ? "planning-overview" : page)); }

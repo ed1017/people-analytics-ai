@@ -1,3 +1,4 @@
+import { homeReplyFormat, homeGoalChoiceInstructions, decodeHomeModelReply } from "@/lib/home-chat-reply";
 import { CHAT_MODEL } from "@/lib/chat-model";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
@@ -1519,7 +1520,8 @@ ${message}
     let response: any =
       await client.responses.create({
         model: CHAT_MODEL,
-        instructions: aiInstructions + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\nThis is an automatic page briefing, not a request to take action. Use only supplied evidence. No tools, new queries, models or assumptions. Treat missing context as unavailable. Filters scope the selected workforce snapshot only; all other page contexts retain their supplied company scope. Do not invent metrics for a placeholder. For Planning Overview, give concise how-to steps for Planning Overview, Scenario Modeling, Position & Workforce Design, Workforce Response, and Execution & Feasibility, in that order; describe explicit user actions only. For other Planning destinations, describe available supplied evidence and the next explicit interaction; do not imply local draft inputs or model results absent from the payload have been evaluated. Current destination: " + String(body?.destination ?? page) + "; page source date: " + String(body?.pageSourceDate ?? "unavailable") : ""),
+        instructions: aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\nThis is an automatic page briefing, not a request to take action. Use only supplied evidence. No tools, new queries, models or assumptions. Treat missing context as unavailable. Filters scope the selected workforce snapshot only; all other page contexts retain their supplied company scope. Do not invent metrics for a placeholder. For Planning Overview, give concise how-to steps for Planning Overview, Scenario Modeling, Position & Workforce Design, Workforce Response, and Execution & Feasibility, in that order; describe explicit user actions only. For other Planning destinations, describe available supplied evidence and the next explicit interaction; do not imply local draft inputs or model results absent from the payload have been evaluated. Current destination: " + String(body?.destination ?? page) + "; page source date: " + String(body?.pageSourceDate ?? "unavailable") : ""),
+        ...(page === "home" ? { text: { format: homeReplyFormat } } : {}),
         input: aiInput,
         tools: peopleAnalyticsTools,
         tool_choice: toolChoice,
@@ -1588,7 +1590,7 @@ ${message}
       response =
         await client.responses.create({
           model: CHAT_MODEL,
-          instructions: aiInstructions + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\nThis is an automatic page briefing, not a request to take action. Use only supplied evidence. No tools, new queries, models or assumptions. Treat missing context as unavailable. Filters scope the selected workforce snapshot only; all other page contexts retain their supplied company scope. Do not invent metrics for a placeholder. For Planning Overview, give concise how-to steps for Planning Overview, Scenario Modeling, Position & Workforce Design, Workforce Response, and Execution & Feasibility, in that order; describe explicit user actions only. For other Planning destinations, describe available supplied evidence and the next explicit interaction; do not imply local draft inputs or model results absent from the payload have been evaluated. Current destination: " + String(body?.destination ?? page) + "; page source date: " + String(body?.pageSourceDate ?? "unavailable") : ""),
+          instructions: aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (summaryOnly ? "\nThis is an automatic page briefing, not a request to take action. Use only supplied evidence. No tools, new queries, models or assumptions. Treat missing context as unavailable. Filters scope the selected workforce snapshot only; all other page contexts retain their supplied company scope. Do not invent metrics for a placeholder. For Planning Overview, give concise how-to steps for Planning Overview, Scenario Modeling, Position & Workforce Design, Workforce Response, and Execution & Feasibility, in that order; describe explicit user actions only. For other Planning destinations, describe available supplied evidence and the next explicit interaction; do not imply local draft inputs or model results absent from the payload have been evaluated. Current destination: " + String(body?.destination ?? page) + "; page source date: " + String(body?.pageSourceDate ?? "unavailable") : ""),
           previous_response_id:
             response.id,
           input: toolOutputs,
@@ -1598,6 +1600,8 @@ ${message}
           maxOutputTokens,
         });
     }
+
+    if (page === "home") return NextResponse.json(decodeHomeModelReply(response.output_text || "", body?.hasFocusedIssue === true));
 
     return NextResponse.json({
       answer:
