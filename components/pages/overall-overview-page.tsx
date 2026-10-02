@@ -3,7 +3,7 @@
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUp, RefreshCw, Info } from "lucide-react";
 import { GoalTakeaway } from "@/components/goal-takeaway";
-import { GoalConversationMessages } from "@/components/goal-conversation-messages";
+import { GoalConversationMessages, ConversationMessages } from "@/components/goal-conversation-messages";
 import { buildHomePack, homeDefinitions, readHomeSource } from "@/lib/home-pack.mjs";
 import type { DevelopmentSession } from "@/components/development-workspace";
 import { homeGoalReplies } from "@/lib/home-chat-reply";
@@ -154,11 +154,11 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
     if(!active || pendingScope.identity!==scopeIdentity || pendingScope.query!==workforceQuery || input.trim()!==pendingScope.message) finishScopeRequest(pendingScope,true);
     else if(ready) finishScopeRequest(pendingScope,false);
   },[pendingScope,active,scopeIdentity,workforceQuery,input,ready]);
-  return <div className="home-workspace mx-auto grid w-full max-w-none items-start gap-5 px-5 py-8 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-4 xl:h-[calc(100dvh-var(--app-header-height)-4rem)] xl:min-h-[42rem]">
+  return <div className="home-workspace mx-auto grid w-full max-w-none items-start gap-5 px-5 pt-6 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-4 xl:min-h-[calc(100dvh-var(--app-header-height)-2rem)]">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-4 gap-y-1"><h2 id="overall-overview-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl xl:text-2xl 2xl:text-3xl">From Insight to Action</h2><p className="w-full text-sm text-muted-foreground sm:w-auto">by Ed Om <span aria-hidden="true">·</span> <a className="text-primary underline" href="mailto:edwinom.nyc@gmail.com">edwinom.nyc@gmail.com</a></p></div>
         <div className="ml-auto flex items-center gap-3 text-xs">
-          <button type="button" popoverTarget="home-data-details" aria-label="Open data details" className="flex min-h-11 items-center gap-1 rounded px-2 text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"><Info size={16}/><span>Data details</span></button>
+          <button type="button" popoverTarget="home-data-details" aria-label="Open data details" title="Data, scope and conversation history" className="flex min-h-11 items-center gap-1 rounded px-2 text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"><Info size={16}/><span>Data details</span></button>
           <button id="overall-guide-link" type="button" onClick={() => onNavigate("guide-data")} className="rounded-sm font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Guide &amp; Data</button>
 
         </div>
@@ -166,6 +166,7 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
       </header>
       <div id="home-data-details" popover="auto" role="dialog" aria-label="Data details" className="fixed inset-0 m-auto max-h-[80dvh] w-[min(60rem,92vw)] overflow-y-auto rounded-xl border bg-background p-5 text-sm text-foreground shadow-xl">
         <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">Data details</h2><button type="button" popoverTarget="home-data-details" popoverTargetAction="hide" className="min-h-11 rounded border px-3 focus-visible:ring-2 focus-visible:ring-ring">Close data details</button></div>
+        <section aria-label="Conversation history" className="my-4"><h3 className="font-semibold">Conversation history</h3><p className="mt-1 text-xs text-muted-foreground">Reference only. Current findings use current evidence and saved goal context.</p>{messages.length?<ConversationMessages messages={messages} onNavigate={page=>{document.getElementById("home-data-details")?.hidePopover();onNavigate(page);}}/>:<p className="mt-2 text-sm">No conversation yet.</p>}</section>
       {Boolean(marketReference)&&<p className="mt-2 text-xs">An explicitly carried market reference [M1] is also available for this goal. Its selected geography and source period remain separate from workforce filters.</p>}
       <p role="status" className="text-xs text-muted-foreground" aria-label="Home evidence coverage">{pack.coverage.available} of {pack.coverage.total} source summaries available · detail rows are sampled. Open evidence sources for scope and unavailable data.</p>
         <p className="mt-3 text-xs">Synthetic workforce evidence. Only the workforce snapshot follows shared filters; other company sources remain company-wide. BLS is US national. Quotes are fictional or unverified; comparisons use your assumptions.</p>
@@ -180,16 +181,16 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
         </div>
       </div>
 
-    <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" className="min-h-[20rem] max-h-[70dvh] space-y-5 overflow-y-auto pr-1 xl:min-h-0 xl:max-h-none xl:flex-1">
+    <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" className="min-h-[20rem] max-h-[70dvh] space-y-5 overflow-y-auto pr-1 xl:flex-1">
     <GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:workforceScope}} payload={{page:"home",persona,overviewBriefingContext:pack,marketReference}} active={active} ready={ready} paused={chatLoading||Boolean(input.trim())||Boolean(pendingScope)||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} onNavigate={onNavigate}/>
     <section aria-label="Starting guide" data-testid="overview-starting-guide" className="py-2">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h3 className="text-xl font-semibold">Start with an issue worth working on</h3>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <h3 className="text-lg font-semibold">Choose a starting point</h3>
+        <p className="text-sm text-muted-foreground">Discuss with AI, then pin a goal.</p>
         <button type="button" aria-label="Refresh overview evidence" disabled={loading || chatLoading}
           onClick={() => { loaded.current = ""; setRefresh(value => value + 1); }}
-          className="rounded-md p-2 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18} /></button>
+          className="ml-auto rounded-md p-2 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18} /></button>
       </div>
-      <p className="text-base text-muted-foreground">Find an issue or bring your own, then discuss it with AI and pin your goal.</p>
       <div className="mt-4 grid gap-3 sm:grid-cols-3" aria-label="Choose a starting point">
         <button type="button" disabled={!ready || chatLoading} onClick={() => void send(HOME_FIND_ISSUE_PROMPT)} className="min-h-11 rounded-lg border px-4 py-3 text-left text-base font-semibold hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{HOME_FIND_ISSUE_PROMPT}</button>
         <button type="button" disabled={chatLoading} onClick={focusQuestion} className="min-h-11 rounded-lg border px-4 py-3 text-left text-base font-semibold hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Bring your own issue</button>
@@ -209,7 +210,7 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
 
 
     {messages.length > 0 && <section aria-label="Overview conversation" className="space-y-6">
-      <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona])} onNavigate={onNavigate} home/>
+      <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona])} onNavigate={onNavigate} home hideHistory/>
       {conversation.homeGoalChoiceKey === contextKey && !conversation.focusedIssue && <div role="group" aria-label="Choose a goal" className="flex flex-wrap gap-2">
         {(Object.keys(homeGoalReplies) as Array<keyof typeof homeGoalReplies>).map(goal => <button key={goal} type="button" disabled={chatLoading || !ready || Boolean(input.trim())} onClick={() => { if (goalChoiceSubmittedRef.current) return; goalChoiceSubmittedRef.current = true; void send(homeGoalReplies[goal]); }} className="min-h-11 rounded-lg border border-primary px-4 py-2 font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{goal}</button>)}
         <button type="button" disabled={chatLoading} onClick={() => { conversation.setHomeGoalChoiceKey(null); focusQuestion(); }} className="min-h-11 rounded-lg border px-4 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Another goal</button>
@@ -220,19 +221,18 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
 
     </div>
 
-    <form onSubmit={event => { event.preventDefault(); void send(); }} className="sticky bottom-3 shrink-0 rounded-2xl border bg-card p-4 shadow-lg">
-      {conversation.focusedIssue && <div className="mb-3 border-b pb-3">
+    <form onSubmit={event => { event.preventDefault(); void send(); }} className="mt-auto shrink-0 rounded-2xl border bg-card p-3 shadow-lg">
+      {conversation.focusedIssue && <div className="mb-2">
         <button type="button" disabled={!ready || chatLoading || !planRequest || Boolean(input.trim())} onClick={() => void send("", true)} className="min-h-11 w-full rounded-lg bg-primary px-4 py-3 text-base font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{HOME_ACTION_PLAN_LABEL}</button>
-        <p className="mt-2 text-xs text-muted-foreground">{questionUnanswered ? "Complete or retry your current question before developing a plan." : !planRequest ? "Evidence or perspective changed. Ask a question in the current scope before developing a plan." : input.trim() ? "Send your new question first so the plan uses the updated conversation." : "Continues this conversation with its current evidence and stated goal. Missing costs and assumptions stay explicit."}</p>
+        {(questionUnanswered || !planRequest || Boolean(input.trim())) && <p className="mt-2 text-xs text-muted-foreground">{questionUnanswered ? "Complete or retry your current question before developing a plan." : !planRequest ? "Evidence or perspective changed. Ask a question in the current scope before developing a plan." : input.trim() ? "Send your new question first so the plan uses the updated conversation." : ""}</p>}
       </div>}
-      {(messages.length > 0 || input) && <button type="button" onClick={() => startNewIssue()} className="mb-3 rounded-sm text-sm font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Start new problem</button>}
-      {!conversation.focusedIssue && (journey || input.trim()) && <div className="mb-3"><button type="button" onClick={() => conversation.setIssueEditor({draft:input.trim().slice(0,240) || journey?.latestQuestion?.slice(0,240) || ""})} className="min-h-11 w-full rounded-lg bg-primary px-4 py-3 text-base font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring">Pin as goal</button><p className="mt-2 text-xs text-muted-foreground">Keep this issue as the shared focus across every page and AI conversation. Review before pinning; data filters stay unchanged.</p></div>}
+      {!conversation.focusedIssue && (journey || input.trim()) && <div className="mb-3"><button type="button" onClick={() => conversation.setIssueEditor({draft:input.trim().slice(0,240) || journey?.latestQuestion?.slice(0,240) || ""})} className="min-h-11 w-full rounded-lg bg-primary px-4 py-3 text-base font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring">Pin as goal</button><p className="mt-2 text-xs text-muted-foreground">Keep this focus across pages.</p></div>}
       {visibleScopeChoice && <div aria-label="Requested country scope" className="mb-3 text-sm"><p>{visibleScopeChoice.kind==="ambiguous" ? "Which country should this workforce snapshot use?" : visibleScopeChoice.kind==="unsupported" ? "That country scope is not fully supported. Choose an available country or keep the current scope; missing evidence stays unavailable." : "Use country-specific workforce evidence for this question?"}</p><div className="mt-2 flex flex-wrap gap-2">{visibleScopeChoice.options.map(option=><button key={option.value} type="button" onClick={()=>applyCountry(option)} className="min-h-11 rounded border border-primary px-3 py-2 font-semibold text-primary">Apply {option.label} and answer</button>)}<button type="button" onClick={()=>void send(visibleScopeChoice.message,false,true)} className="min-h-11 px-2 text-primary underline">Answer with current scope</button></div><p className="mt-1 text-xs text-muted-foreground">Only the workforce snapshot changes. Other filters stay selected; company-wide sources retain their scope.</p></div>}
       {pendingScope && <p role="status" className="mb-3 text-sm">Refreshing the selected workforce evidence before answering. Edit your question to cancel.</p>}
       <label htmlFor="overview-question" className="mb-2 block text-sm font-semibold">Describe a business issue, and I’ll help you explore the evidence, compare options, and build a plan.</label>
       <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" value={input} onChange={event => setInput(event.target.value)} rows={2}
         placeholder="Type your business issue here…" className="max-h-80 min-h-20 w-full resize-y rounded-lg border bg-background/40 p-3 text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
-      <div className="mt-2 flex items-center justify-between gap-3"><p className="text-xs text-muted-foreground">Explore evidence here. Run calculations in Planning with explicit assumptions.</p>
+      <div className="mt-2 flex items-center justify-end gap-3">
         <button type="submit" aria-label="Send overview question" disabled={!ready || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
     </form>
   </section>

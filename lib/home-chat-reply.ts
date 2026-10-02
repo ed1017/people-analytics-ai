@@ -22,3 +22,11 @@ export const homeGoalReplies = {
   Retention: "My goal is retention. Continue our current investigation with that goal; identify missing scope and assumptions without inventing them.",
   "Capability building": "My goal is capability building. Continue our current investigation with that goal; identify missing scope and assumptions without inventing them.",
 } as const;
+
+export function homeResponseStyle(message:string) {
+  const current=message.split(/\n\n(?:Focused issue|Session problem context)/)[0];
+  const expanded=/\b(full action plan|full plan|detailed|in detail|step.by.step|comprehensive)\b/i.test(current);
+  return {expanded,maxOutputTokens:expanded?2400:1400,instructions:expanded
+    ? "The user explicitly requested detail or a full plan. Finish the requested plan in concise sections/bullets, up to350words when needed. For a full action plan retain Evidence and scope; Options and tradeoffs; Costs and unknown assumptions; Proposed next steps; Suggested success measures. Reuse known goal, scope and constraints. State missing inputs as unknown, not a questionnaire; ask at most one essential question. Keep citations accurate, costs unverified when absent, and proposals distinct from approved actions."
+    : "DEFAULT HOME ANSWER FORMAT: one short takeaway sentence, then3-4brief Markdown bullets, then one next step OR one essential question. Target80-120words; do not exceed140unless the user explicitly asks for detail. Each bullet makes one point; use only relevant supplied evidence, not extra metrics to fill space. No long preamble, repeated known goal/scope, multiple-question questionnaire or repeated boilerplate caveats. Keep material source scope/date/uncertainty beside the affected claim and accurate source-ID citations. A missing business goal needs only one short question; do not re-ask an already supplied goal. Do not call this model fine-tuning."};
+}

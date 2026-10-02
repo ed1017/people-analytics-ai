@@ -6,7 +6,8 @@ import type {AppPage} from "@/lib/types";
 type Entry={key:string;goalId:string;text:string;failed:boolean};
 const sessionCache=new Map<string,Entry>();
 export function GoalTakeaway({goalId,goalContext,payload,active,ready,paused,validGoalIds,unavailable,onNavigate}:{goalId:string;goalContext:unknown;payload:Record<string,unknown>;active:boolean;ready:boolean;paused:boolean;validGoalIds:string[];unavailable?:string;onNavigate?:(page:AppPage)=>void}) {
- const request=JSON.stringify(goalSummaryRequest(payload,goalContext));
+ const summaryRequest=goalSummaryRequest(payload,goalContext);
+ const request=JSON.stringify(summaryRequest);
  const key=goalId+":"+request;
  const allowed=JSON.stringify(validGoalIds);
  const [entries,setEntries]=useState<Entry[]>(()=>[...sessionCache.values()]);
@@ -30,5 +31,5 @@ export function GoalTakeaway({goalId,goalContext,payload,active,ready,paused,val
   return()=>{live=false;clearTimeout(delay);clearTimeout(timeout);controller.abort();};
  },[active,goalId,ready,paused,entry,key,request]);
  if(!goalId||!active)return null;
- return <section aria-label="Goal takeaway" className="mb-4 space-y-2 text-base"><h3 className="text-sm font-semibold text-primary">For your goal</h3>{!ready?<p className="text-sm text-muted-foreground">{unavailable||"This page's evidence is loading or unavailable. No finding is inferred."}</p>:entry?<div role={entry.failed?"status":undefined}><ChatContent content={entry.text} onNavigate={onNavigate}/></div>:<p role="status" className="text-sm text-muted-foreground">{paused?"Your goal context is retained while you work on this question.":"Preparing a fresh takeaway from this page's evidence…"}</p>}</section>;
+ return <section aria-label="Focused issue" className="mb-4 space-y-2 text-base"><h3 className="text-sm font-semibold text-primary">Focused issue</h3><p className="break-words text-sm font-medium">{summaryRequest.goalContext.goal}</p>{!ready?<p className="text-sm text-muted-foreground">{unavailable||"This page's evidence is loading or unavailable. No finding is inferred."}</p>:entry?<div role={entry.failed?"status":undefined}><ChatContent content={entry.text} onNavigate={onNavigate}/></div>:<p role="status" className="text-sm text-muted-foreground">{paused?"Your goal context is retained while you work on this question.":"Preparing a fresh takeaway from this page's evidence…"}</p>}</section>;
 }

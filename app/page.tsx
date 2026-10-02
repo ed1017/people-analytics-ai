@@ -20,7 +20,7 @@ import {MarketComparison,CarriedMarketReference,type MarketCarry} from "@/compon
 import {defaultMarketSelection} from "@/lib/oews-reference.mjs";
 import { GoalTakeaway } from "@/components/goal-takeaway";
 import { useGoalWorkspace } from "@/components/use-goal-workspace";
-import { useProblemConversation, SessionProblemSummary } from "@/components/problem-conversation";
+import { useProblemConversation } from "@/components/problem-conversation";
 import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
 import { AppSidebar } from "@/components/app-sidebar";
 import { completeScopedChatTurn } from "@/lib/chat-context-history";
@@ -2257,7 +2257,6 @@ export default function Home() {
           goalViewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,activePage,selectedPersona,selectedBusinessContext])}
           hasGoal={Boolean(conversation.focusedIssue)}
           goalTakeaway={<GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:JSON.stringify(selectedBusinessContext)}} payload={goalSummaryPayload} active={true} ready={summaryEvidenceReady} paused={chatLoading||Boolean(chatInput.trim())||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} unavailable={activePage==="compensation"?"Compensation evidence is not available yet. Use the supported Workforce or Planning evidence for this goal.":activePage==="guide-data"?"Use this guide to understand source coverage, then open a data page for a goal-specific takeaway.":undefined} onNavigate={setActivePage}/>}
-          sessionControls={<SessionProblemSummary conversation={conversation} />}
           readOnlyReason={readOnlyReason}
           aiCollapsed={aiCollapsed}
           aiExpanded={aiExpanded}

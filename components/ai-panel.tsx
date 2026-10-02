@@ -9,6 +9,7 @@ import {
   type MouseEventHandler,
 } from "react";
 import {
+  Info,
   LoaderCircle,
   Maximize2,
   PanelLeftClose,
@@ -17,16 +18,14 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { CHAT_MODEL } from "@/lib/chat-model";
 import { Button } from "@/components/ui/button";
-import { GoalConversationMessages } from "@/components/goal-conversation-messages";
+import { GoalConversationMessages, ConversationMessages } from "@/components/goal-conversation-messages";
 import type { ChatMessage } from "@/lib/types";
 
 type AiPanelProps = {
   goalTakeaway?:ReactNode;
   goalViewKey?:string;
   hasGoal?:boolean;
-  sessionControls?: ReactNode;
   readOnlyReason?: string;
   aiCollapsed: boolean;
   aiExpanded: boolean;
@@ -52,7 +51,6 @@ type AiPanelProps = {
 
 export function AiPanel({
   goalTakeaway,goalViewKey="",hasGoal=false,
-  sessionControls,
   readOnlyReason,
   aiCollapsed,
   aiExpanded,
@@ -96,6 +94,7 @@ export function AiPanel({
   }, []);
 
   const resizeHelpId = useId();
+  const detailsId = useId();
   const minimumAiWidth = 280;
   const maximumAiWidth = Math.max(
     minimumAiWidth,
@@ -159,11 +158,12 @@ export function AiPanel({
               <Sparkles className="h-5 w-5" />
               <div><h2 className="text-xl font-semibold">
                 Ask AI
-              </h2><p className="mt-1 text-sm text-muted-foreground">Powered by {CHAT_MODEL}</p></div>
+              </h2></div>
             </div>
           )}
 
           <div className="ml-auto flex gap-1">
+            {!aiCollapsed&&<button type="button" popoverTarget={detailsId} aria-label="Open conversation details" className="flex h-9 w-9 items-center justify-center rounded hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"><Info size={18}/></button>}
             {!aiCollapsed && (
               <Button
                 variant="ghost"
@@ -194,32 +194,29 @@ export function AiPanel({
           </div>
         </div>
 
+        <div id={detailsId} popover="auto" role="dialog" aria-label="Conversation details" className="fixed inset-0 m-auto max-h-[80dvh] w-[min(42rem,92vw)] overflow-y-auto rounded-xl border bg-background p-5 text-foreground shadow-xl">
+          <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">Conversation details</h2><button type="button" popoverTarget={detailsId} popoverTargetAction="hide" className="min-h-11 rounded border px-3 focus-visible:ring-2 focus-visible:ring-ring">Close conversation details</button></div>
+          <section aria-label="Current evidence scope"><h3 className="font-semibold">Evidence scope</h3><p className="mt-1 text-sm">{scopeNote}</p>{readOnlyReason&&<p className="mt-2 text-sm">{readOnlyReason}</p>}</section>
+          <section aria-label="Conversation history" className="mt-5"><h3 className="font-semibold">Conversation history</h3><p className="my-2 text-xs text-muted-foreground">Reference only. Current findings use current evidence and saved goal context.</p>{chatMessages.length?<ConversationMessages messages={chatMessages}/>:<p className="text-sm">No conversation yet.</p>}</section>
+        </div>
+
         {aiCollapsed ? (
           <div className="flex justify-center pt-4">
             <Sparkles className="h-5 w-5 text-muted-foreground" />
           </div>
         ) : (
           <div className="flex min-h-0 flex-1 flex-col">
-            <p className="mb-3 text-base text-muted-foreground">
-              {readOnlyReason ? "Your session conversation." : "Ask questions about the workforce data currently shown."}
-            </p>
-
             {previewPage && !readOnlyReason && (
               <div className="mb-3 rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
                 This page does not yet support AI analysis.
               </div>
             )}
 
+            <div className="shrink-0">{goalTakeaway}</div>
+            {!dashboardReady&&!hasGoal&&<p role="status" className="mb-2 text-sm text-muted-foreground">{readOnlyReason?"AI analysis is not available on this page.":"Page evidence is loading or unavailable."}</p>}
             <div key={goalViewKey} aria-label="AI conversation" className="mb-3 min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain pr-2">
-              {goalTakeaway}
-              {sessionControls}
-              <section aria-label="Current evidence scope" className="mb-3 text-sm">
-                <h3 className="font-semibold">Evidence scope</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{scopeNote}</p>
-                {!dashboardReady && !readOnlyReason && <p role="status" className="mt-2 text-sm">Page evidence is loading or unavailable. Sending will be available when the data is ready.</p>}
-              </section>
-              <GoalConversationMessages messages={chatMessages} viewKey={goalViewKey} hasGoal={hasGoal}/>
-              {!chatMessages.length&&!hasGoal&&<p className="text-base text-muted-foreground">{readOnlyReason?"Your session conversation stays available here.":dashboardReady?"Ask a question about this page.":"You can keep drafting while page evidence loads."}</p>}
+              <GoalConversationMessages messages={chatMessages} viewKey={goalViewKey} hasGoal={hasGoal} hideHistory/>
+              {!chatMessages.length&&!hasGoal&&!readOnlyReason&&<p className="text-base text-muted-foreground">{readOnlyReason?"Your session conversation stays available here.":dashboardReady?"Ask a question about this page.":"You can keep drafting while page evidence loads."}</p>}
 
               {chatLoading && (
                 <div className="flex items-center gap-2 py-2 text-[17px] text-muted-foreground">
@@ -309,9 +306,7 @@ export function AiPanel({
               </Button>
             </div>
 
-            <p className="mt-2 text-xs text-muted-foreground">
-              {readOnlyReason ? "Open Home or a supported Workforce or Planning page to continue chatting with its evidence." : "Answers are grounded in the dashboard context currently loaded."}
-            </p>
+
           </div>
         )}
       </aside>
