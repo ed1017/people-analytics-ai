@@ -210,7 +210,7 @@ export function AiPanel({
               </div>
             )}
 
-            <div aria-label="AI conversation" className="mb-3 min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain pr-2">
+            <div key={goalViewKey} aria-label="AI conversation" className="mb-3 min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain pr-2">
               {goalTakeaway}
               {sessionControls}
               <section aria-label="Current evidence scope" className="mb-3 text-sm">

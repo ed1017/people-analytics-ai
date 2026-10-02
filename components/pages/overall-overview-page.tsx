@@ -55,6 +55,7 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
   const conversationViewport = useRef<HTMLDivElement>(null);
   const selectedCountry = new URLSearchParams(workforceQuery).get("country") ?? "all";
   const scopeIdentity = JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,persona]);
+  useLayoutEffect(()=>{if(active&&conversationViewport.current)conversationViewport.current.scrollTop=0;},[active,scopeIdentity,workforceQuery]);
   type ScopeChoice = {message:string; query:string; identity:string; kind:"apply"|"ambiguous"|"unsupported"; options:CountryOption[]};
   type PendingScope = {message:string; query:string; identity:string};
   const [scopeChoice,setScopeChoice] = useState<ScopeChoice|null>(null);
@@ -179,7 +180,8 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
         </div>
       </div>
 
-    <div ref={conversationViewport} aria-label="Home chat workspace" role="region" className="min-h-[20rem] max-h-[70dvh] space-y-5 overflow-y-auto pr-1 xl:min-h-0 xl:max-h-none xl:flex-1">
+    <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" className="min-h-[20rem] max-h-[70dvh] space-y-5 overflow-y-auto pr-1 xl:min-h-0 xl:max-h-none xl:flex-1">
+    <GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:workforceScope}} payload={{page:"home",persona,overviewBriefingContext:pack,marketReference}} active={active} ready={ready} paused={chatLoading||Boolean(input.trim())||Boolean(pendingScope)||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} onNavigate={onNavigate}/>
     <section aria-label="Starting guide" data-testid="overview-starting-guide" className="py-2">
       <div className="mb-4 flex items-center justify-between gap-3">
         <h3 className="text-xl font-semibold">Start with an issue worth working on</h3>
@@ -206,7 +208,6 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
       {evidenceError && <p role="alert" className="mt-3 text-base text-destructive">{evidenceError}</p>}
 
 
-    <GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:workforceScope}} payload={{page:"home",persona,overviewBriefingContext:pack,marketReference}} active={active} ready={ready} paused={chatLoading||Boolean(input.trim())||Boolean(pendingScope)||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} onNavigate={onNavigate}/>
     {messages.length > 0 && <section aria-label="Overview conversation" className="space-y-6">
       <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona])} onNavigate={onNavigate} home/>
       {conversation.homeGoalChoiceKey === contextKey && !conversation.focusedIssue && <div role="group" aria-label="Choose a goal" className="flex flex-wrap gap-2">
