@@ -19,7 +19,7 @@ export type AppPageMetadata = {
 
 export const appWorkspaceJourneys: Array<{key: AppWorkspaceKey; journeyLabel: string; subtitle: string; defaultPage: AppPage}> = [
   {key:"analytics", journeyLabel:"Workforce", subtitle:"Understand Our Workforce", defaultPage:"workforce"},
-  {key:"talent", journeyLabel:"Intelligence", subtitle:"Explore External Context", defaultPage:"occupational-references"},
+  {key:"talent", journeyLabel:"Intelligence", subtitle:"Realize your potential", defaultPage:"occupational-references"},
   {key:"strategy", journeyLabel:"Planning", subtitle:"Plan Our Future", defaultPage:"planning-overview"},
 ];
 export const appNavigationSections: AppNavigationSection[] = [
@@ -63,7 +63,7 @@ export const appPageMetadata: Record<
       "Recruiting demand, funnel performance, hiring outcomes, and speed.",
   },
   "survey-sentiment": {
-    label: "Survey & Sentiment",
+    label: "Employee Listening",
     section: "Workforce",
     description:
       "Employee sentiment, participation, themes, and workforce signals.",

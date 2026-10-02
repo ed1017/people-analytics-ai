@@ -11,9 +11,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { AttritionResponse } from "@/lib/types";
+import { ExitSurveyFeedback } from "@/components/exit-survey-feedback";
+import type { SurveySentimentResponse, AttritionResponse } from "@/lib/types";
 
 type Props = {
+  exitData: SurveySentimentResponse | null; exitLoading: boolean; exitError: string | null;
   data: AttritionResponse | null;
   loading: boolean;
   error: string | null;
@@ -25,7 +27,7 @@ function monthLabel(value: string) {
     year: "2-digit",
   });
 }
-export function AttritionPage({ data, loading, error }: Props) {
+export function AttritionPage({ data, loading, error, exitData, exitLoading, exitError }: Props) {
   const summary = data?.summary;
   const trend2026 = (data?.trend ?? []).filter((row) => row.month >= "2026-01-01");
 
@@ -177,6 +179,7 @@ export function AttritionPage({ data, loading, error }: Props) {
           {loading ? "Loading attrition analytics…" : "No attrition data returned."}
         </div>
       )}
+      <ExitSurveyFeedback data={exitData} loading={exitLoading} error={exitError} />
     </section>
   );
 }

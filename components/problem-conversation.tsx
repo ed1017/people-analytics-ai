@@ -40,9 +40,10 @@ export type ProblemConversation = ReturnType<typeof useProblemConversation>;
 
 export function SessionProblemSummary({ conversation }: { conversation: ProblemConversation }) {
   if (!conversation.focusedIssue && !conversation.problem && !conversation.messages.length) return null;
-  return <section aria-label="Session conversation context" className="mb-3 min-w-0 rounded-lg border border-primary/40 bg-card p-3 text-sm">
-    <p className="font-semibold text-primary">{conversation.focusedIssue ? "Focused issue" : "Conversation context"}</p><p className="mt-1 break-words">{conversation.focusedIssue || conversation.problem?.firstQuestion || "No active problem. Ask a question to start."}</p>
-    <button type="button" onClick={() => conversation.startNewProblem()} className="mt-2 min-h-11 rounded border px-3 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring">Start new problem</button>
-    <p className="mt-2 text-xs text-muted-foreground">This session conversation is shown below. Earlier-page messages are context, not current-page evidence. Navigation does not run models or change assumptions. Reload clears the session.</p>
+  return <section aria-label="Session conversation context" className="mb-3 min-w-0 text-sm">
+    <details><summary className="cursor-pointer rounded-sm font-semibold focus-visible:ring-2 focus-visible:ring-ring">{conversation.focusedIssue ? "Focused issue" : "Conversation context"}</summary>
+    <p className="mt-1 break-words">{conversation.focusedIssue || conversation.problem?.firstQuestion || "No active problem. Ask a question to start."}</p>
+    <p className="mt-2 text-xs text-muted-foreground">Earlier-page messages are context, not current-page evidence. Navigation does not run models or change assumptions. Reload clears the session.</p></details>
+    <button type="button" onClick={() => conversation.startNewProblem()} className="mt-2 min-h-11 rounded border px-3 py-2 text-sm font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring">Start new problem</button>
   </section>;
 }

@@ -1,4 +1,5 @@
 "use client";
+import { PlanningGuide } from "@/components/planning-guide";
 
 import type {
   FinanceBusinessUnit,
@@ -39,9 +40,9 @@ export function FinancePage({
 <section className="evidence-workspace min-w-0 p-6">
             <div className="mb-6 flex items-end justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-semibold">
+                <div className="flex flex-wrap items-center gap-3"><h2 className="text-2xl font-semibold">
                   Labor Cost Planning
-                </h2>
+                </h2><PlanningGuide page="finance" /></div>
                 <p className="text-muted-foreground">
                   Understand labor cost, workforce economics, vacancy exposure, and scenario impact.
                 </p>

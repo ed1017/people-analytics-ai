@@ -1,13 +1,14 @@
+import { employeeListeningEvidence, exitSurveyEvidence } from "../../../lib/employee-listening";
 import { isIntelligencePage, intelligenceEvidence, intelligenceInstructions } from "@/lib/intelligence-chat";
 import { developmentCatalog } from "@/lib/development-costs";
 import { homeReplyFormat, homeGoalChoiceInstructions, decodeHomeModelReply } from "@/lib/home-chat-reply";
 import { CHAT_MODEL } from "@/lib/chat-model";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { normalizeHomePack, HOME_MAX_BYTES } from "../../../lib/home-pack.mjs";
 import { overviewBriefingPrompt } from "../../../lib/overview-briefing";
 import { talentResponseChatPrompt } from "../../../lib/talent-response-evidence";
-import { peopleAnalyticsTools, runPeopleAnalyticsTool, getSurveySentiment } from "../../../lib/people-analytics-tools";
-import { localExitEnpsEnabled } from "../../../lib/exit-enps";
+import { peopleAnalyticsTools, runPeopleAnalyticsTool } from "../../../lib/people-analytics-tools";
 import { chatNavigationInstructions } from "../../../lib/chat-navigation";
 
 export const dynamic = "force-dynamic";
@@ -559,7 +560,12 @@ export async function POST(
       );
     }
 
-    const body = await request.json();
+    let body = await request.json();
+    if (body?.page === "home") {
+      if (new TextEncoder().encode(JSON.stringify(body.overviewBriefingContext ?? {})).length > HOME_MAX_BYTES || (typeof body.message === "string" && body.message.length > 6000)) return NextResponse.json({error:"Home evidence or question exceeds the supported limit. Refresh evidence or shorten the question."},{status:413});
+      body = {page:"home",persona:body.persona,message:body.message,history:body.history,hasFocusedIssue:body.hasFocusedIssue === true,overviewBriefingContext:normalizeHomePack(body.overviewBriefingContext)};
+      if (Array.isArray(body.history)) body.history = body.history.slice(-8).map((item: ChatMessage) => ({role:item?.role,content:typeof item?.content === "string" ? item.content.slice(0,6000) : ""}));
+    }
     const summaryOnly = body?.summaryOnly === true;
 
     const message =
@@ -1256,101 +1262,12 @@ Interpretation rules:
 `.trim()
         : "";
 
-    const surveySentimentPrompt =
-      page === "survey-sentiment" && localExitEnpsEnabled()
-        ? `CURRENT SURVEY & SENTIMENT CONTEXT (fresh server retrieval; client survey payload excluded):
-${JSON.stringify(await getSurveySentiment())}
-The exit eNPS is explicitly SIMULATED exit-survey response data, not current-employee sentiment or observed historical responses. Always label it simulated. Promoters 9–10, passives 7–8, detractors 0–6; score = percentage promoters minus percentage detractors using all valid responses. Keep it separate from the other 1–5 measures. No inferred causal claims, business priorities, individual recommendations or invented trend. Source refresh date is unavailable.`
-        : page === "survey-sentiment" &&
-      surveySentimentContext
-        ? `
-CURRENT SURVEY & SENTIMENT CONTEXT
-Current listening summary:
-- 2026 engagement favorable: ${surveySentimentContext.summary.engagement_favorable_pct}%
-- 2026 engagement participation: ${surveySentimentContext.summary.engagement_participation_pct}%
-- 2026 engagement average score: ${surveySentimentContext.summary.engagement_avg_score}/5
-- Q2 pulse favorable: ${surveySentimentContext.summary.pulse_favorable_pct}%
-- Q2 pulse average score: ${surveySentimentContext.summary.pulse_avg_score}/5
-- Manager effectiveness favorable: ${surveySentimentContext.summary.manager_favorable_pct}%
-- Manager effectiveness average score: ${surveySentimentContext.summary.manager_avg_score}/5
-- 90-day onboarding favorable: ${surveySentimentContext.summary.onboarding_90_favorable_pct}%
-- Exit survey respondents: ${surveySentimentContext.summary.exit_respondents}
-- Open-text comments available: ${surveySentimentContext.summary.open_text_comments}
-
-Engagement trend:
-${surveySentimentContext.engagementTrend
-  .map(
-    (row) =>
-      `- ${row.survey_name}: favorable ${row.favorable_pct}%, participation ${row.participation_pct}%, avg score ${row.avg_score}/5, respondents ${row.respondents}`
-  )
-  .join("\n")}
-
-2026 engagement dimensions:
-${surveySentimentContext.engagementDimensions
-  .map(
-    (row) =>
-      `- ${row.dimension}: favorable ${row.favorable_pct}%, avg score ${row.avg_score}/5`
-  )
-  .join("\n")}
-
-Q2 pulse dimensions:
-${surveySentimentContext.pulseDimensions
-  .map(
-    (row) =>
-      `- ${row.dimension}: favorable ${row.favorable_pct}%, avg score ${row.avg_score}/5`
-  )
-  .join("\n")}
-
-Manager effectiveness dimensions:
-${surveySentimentContext.managerDimensions
-  .map(
-    (row) =>
-      `- ${row.dimension}: favorable ${row.favorable_pct}%, avg score ${row.avg_score}/5`
-  )
-  .join("\n")}
-
-Onboarding dimensions:
-${surveySentimentContext.onboardingDimensions
-  .map(
-    (row) =>
-      `- ${row.survey_code} / ${row.dimension}: favorable ${row.favorable_pct}%, avg score ${row.avg_score}/5`
-  )
-  .join("\n")}
-
-Business unit engagement:
-${surveySentimentContext.businessUnits
-  .map(
-    (row) =>
-      `- ${row.org_name}: favorable ${row.favorable_pct}%, avg score ${row.avg_score}/5, respondents ${row.respondents}`
-  )
-  .join("\n")}
-
-Exit reasons:
-${surveySentimentContext.exitReasons
-  .map(
-    (row) =>
-      `- ${row.primary_reason}: ${row.exits} responses, ${row.pct_of_exit_responses}% of exit responses`
-  )
-  .join("\n")}
-
-Structured exit experience:
-${surveySentimentContext.exitDimensions
-  .map(
-    (row) =>
-      `- ${row.dimension}: favorable ${row.favorable_pct}%, avg score ${row.avg_score}/5`
-  )
-  .join("\n")}
-
-Interpretation rules:
-- Favorable means a numeric response of 4 or 5 on a 1-to-5 item.
-- Participation uses the nearest available workforce snapshot to the annual survey close date.
-- Survey results are aggregate listening signals, not proof of causality.
-- Business-unit differences are descriptive. Do not infer manager quality, leadership intent, or root cause without additional evidence.
-- Do not claim qualitative themes or sentiment from open-text comments; the comments are not supplied to you in this context.
-- Exit reasons are reported reasons among exit-survey respondents and should not be treated as causal attrition drivers without further analysis.
-`.trim()
-        : "";
-
+    const surveySentimentPrompt = page === "survey-sentiment" ? `CURRENT EMPLOYEE LISTENING CONTEXT (normalized aggregate evidence):
+${JSON.stringify(employeeListeningEvidence(surveySentimentContext))}
+Use each survey's population and dates. Exit feedback belongs to Attrition and is not included on this page. No causal claims or raw-comment themes.` : "";
+    const exitSurveyPrompt = page === "attrition" ? `EXIT SURVEY FEEDBACK (separate from administrative separation records):
+${JSON.stringify(exitSurveyEvidence(body?.exitSurveyContext))}
+Cite this as exit-survey evidence. Do not combine its respondent denominator with employee headcount or all separations, claim a fieldwork period from an as-of date, infer causal drivers, or reconstruct unavailable/suppressed values.` : "";
 
     const personaInstructions: Record<
       Persona,
@@ -1512,6 +1429,7 @@ ${successionPrompt}
 ${talentAcquisitionPrompt}
 
 ${surveySentimentPrompt}
+${exitSurveyPrompt}
 
 RECENT CONVERSATION
 ${conversation || "No prior conversation."}
@@ -1582,7 +1500,7 @@ ${message}
                   type: "function_call_output",
                   call_id: call.call_id,
                   output:
-                    JSON.stringify(result),
+                    JSON.stringify(call.name === "get_survey_sentiment" && page === "survey-sentiment" ? employeeListeningEvidence(result) : result),
                 };
               } catch (error) {
                 return {
