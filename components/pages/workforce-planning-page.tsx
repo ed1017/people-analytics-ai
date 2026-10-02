@@ -2011,7 +2011,7 @@ export function WorkforcePlanningPage({
 
 
   return (
-<section className="min-w-0 p-6">
+<section className="evidence-workspace min-w-0 p-6">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
               <h2

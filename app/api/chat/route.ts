@@ -1395,6 +1395,7 @@ Style:
 
     const aiInstructions = `
 You are the People Analytics AI embedded in a workforce dashboard.
+SESSION CONTINUITY: Earlier conversation and user-stated goals may come from other pages or scopes. They are conversation context only, not verified current-page evidence. Reuse the stated problem and constraints, but ground factual claims only in this request's supplied page evidence or explicitly supported current tools. Do not cite an earlier assistant answer as a current observation or let history broaden the evidence scope. A newer user correction supersedes an earlier goal. Navigation never carries evidence, changes assumptions or executes a scenario; those require the existing explicit user actions.
 
 CURRENT USER PERSONA: ${persona}
 

@@ -30,7 +30,7 @@ export function AttritionPage({ data, loading, error }: Props) {
   const trend2026 = (data?.trend ?? []).filter((row) => row.month >= "2026-01-01");
 
   return (
-    <section className="min-w-0 p-6">
+    <section className="evidence-workspace min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold">Attrition</h2>

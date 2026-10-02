@@ -54,7 +54,7 @@ export function SkillsPage({
   onOpenPlanning,
 }: SkillsPageProps) {
   return (
-<section className="min-w-0 p-6">
+<section className="evidence-workspace min-w-0 p-6">
             <div className="mb-6 flex items-end justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-semibold">
@@ -425,7 +425,7 @@ export function SkillsPage({
                     <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
                       {blsLoading
                         ? "Refreshing BLS…"
-                        : "Live BLS data"}
+                        : blsData?.metrics.some(metric => metric.raw_value !== null) ? "BLS observations" : "BLS unavailable"}
                     </span>
                   </div>
 

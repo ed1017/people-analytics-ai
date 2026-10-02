@@ -9,8 +9,13 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
 } from "react";
+import { SiteFooter } from "@/components/site-footer";
+import { FocusedIssue } from "@/components/focused-issue";
+import { PlanningGuide } from "@/components/planning-guide";
+import { useProblemConversation, SessionProblemSummary } from "@/components/problem-conversation";
+import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
 import { AppSidebar } from "@/components/app-sidebar";
-import { completeScopedChatTurn, getScopedChatHistory, type ScopedChatHistory } from "@/lib/chat-context-history";
+import { completeScopedChatTurn } from "@/lib/chat-context-history";
 import { buildAggregateExport, downloadAggregateCsv } from "@/lib/aggregate-export";
 import { GlobalWorkforceFilters } from "@/components/global-workforce-filters";
 import { AppHeader } from "@/components/app-header";
@@ -134,7 +139,7 @@ export default function Home() {
     strategy: "planning-overview",
   });
 
-  const setActivePage = (page: AppPage) => setActivePageState(page === "overview" ? "workforce" : page);
+  const setActivePage = (page: AppPage) => { if(page !== activePage) conversation.cancelPending(); setActivePageState(page === "overview" ? "workforce" : page); };
 
   const activeWorkspace =
     getWorkspaceForPage(activePage);
@@ -320,13 +325,8 @@ export default function Home() {
     useState<string | null>(null);
   const dashboardRequestIdRef = useRef(0);
 
-  const [chatMessages, setChatMessages] =
-    useState<ChatMessage[]>([]);
-  const modelHistoryRef = useRef<ScopedChatHistory>({ key: "", messages: [] });
-  const [chatInput, setChatInput] = useState("");
-  const [chatLoading, setChatLoading] = useState(false);
-  const [chatError, setChatError] =
-    useState<string | null>(null);
+  const conversation = useProblemConversation();
+  const { messages: chatMessages, setMessages: setChatMessages, input: chatInput, setInput: setChatInput, loading: chatLoading, setLoading: setChatLoading, error: chatError, setError: setChatError, history: modelHistoryRef } = conversation;
 
   const [
     planningEvidenceHandoff,
@@ -1806,8 +1806,9 @@ export default function Home() {
       content: message,
     };
 
+    const request = conversation.beginRequest();
     const modelContextKey = chatEvidenceKey;
-    const priorHistory = getScopedChatHistory(modelHistoryRef.current, modelContextKey);
+    const priorHistory = getProblemChatHistory(modelHistoryRef.current, modelContextKey);
     const modelHistory: ChatMessage[] = priorHistory;
 
     const nextMessages = [
@@ -1819,6 +1820,7 @@ export default function Home() {
     setChatInput("");
     setChatLoading(true);
     setChatError(null);
+    conversation.setQuestionUnanswered(true);
 
     try {
       const response = await fetch(
@@ -1829,7 +1831,8 @@ export default function Home() {
             "Content-Type":
               "application/json",
           },
-          body: JSON.stringify({ ...JSON.parse(chatEvidenceKey), message, history: modelHistory }),
+          signal: request.signal,
+          body: JSON.stringify({ ...JSON.parse(chatEvidenceKey), message: withProblemContext(message, conversation.problem, conversation.focusedIssue), history: modelHistory }),
         }
       );
 
@@ -1843,6 +1846,7 @@ export default function Home() {
         );
       }
 
+      if (!request.current()) return;
       setChatMessages((current) => [
         ...current,
         {
@@ -1853,15 +1857,18 @@ export default function Home() {
         },
       ]);
       modelHistoryRef.current = completeScopedChatTurn(modelContextKey, modelHistory, message, payload.answer ?? "No response returned.");
+      conversation.rememberQuestion(modelContextKey, message); conversation.setQuestionUnanswered(false);
     } catch (error) {
+      if (!request.current()) return;
       console.error(error);
+      setChatInput(message);
       setChatError(
         error instanceof Error
           ? error.message
           : "AI request failed."
       );
     } finally {
-      setChatLoading(false);
+      if (request.current()) setChatLoading(false);
     }
   };
 
@@ -2026,7 +2033,7 @@ export default function Home() {
         activePage={activePage}
         selectedPersona={selectedPersona}
         onPersonaChange={setSelectedPersona}
-      ><GlobalWorkforceFilters options={filterOptions} country={selectedCountry} org={selectedOrg} level={selectedLevel} loading={dashboardLoading} onCountry={setSelectedCountry} onOrg={setSelectedOrg} onLevel={setSelectedLevel} onReset={resetFilters} /></AppHeader>
+      ><GlobalWorkforceFilters focusedIssue={<FocusedIssue conversation={conversation} />} options={filterOptions} country={selectedCountry} org={selectedOrg} level={selectedLevel} loading={dashboardLoading} onCountry={setSelectedCountry} onOrg={setSelectedOrg} onLevel={setSelectedLevel} onReset={resetFilters} /></AppHeader>
 
       {/* Main application */}
       <div
@@ -2057,8 +2064,10 @@ export default function Home() {
 
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
+          {activePage !== "home" && <SessionProblemSummary conversation={conversation} onNavigate={setActivePage} />}
+          <PlanningGuide key={activePage} page={activePage} />
         {demoActive && <GuidedDemo page={activePage} onNavigate={setActivePage} onClose={() => setDemoActive(false)} onUseGoal={() => setDevelopmentSession(current => ({ ...current, goal: DEVELOPMENT_DEMO_GOAL }))} hasOptions={developmentSession.options.length > 0} />}
-        <div hidden={activePage !== "home"}><OverallOverviewPage onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></div>
+        <div hidden={activePage !== "home"}><OverallOverviewPage conversation={conversation} onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></div>
         {activePage === "guide-data" ? <GuideDataPage onBack={() => { setActivePage("home"); window.requestAnimationFrame(() => document.getElementById("overall-guide-link")?.focus()); }} /> : activePage === "home" ? null : activePage === "compensation" ? (
           <section className="p-6"><h1 className="text-2xl font-semibold">Compensation</h1><p className="mt-4 text-lg">TBD</p><p className="mt-2 text-muted-foreground">Planned destination. Compensation data and analysis are not available.</p></section>
         ) : activePage === "development-planning" ? (
@@ -2242,6 +2251,7 @@ export default function Home() {
             }}
           />
         )}
+          <SiteFooter planning={planningWorkspaceActive || activePage === "finance" || activePage === "development-planning"} />
         </div>
 
         {activePage !== "home" && activePage !== "guide-data" && activePage !== "compensation" && activePage !== "development-planning" && <AiPanel

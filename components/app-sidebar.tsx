@@ -74,11 +74,9 @@ const pageIcons: Record<
 
 export function AppSidebar({
   activePage,
-  activeWorkspace,
   navCollapsed,
   onToggle,
   onPageChange,
-  onWorkspaceChange,
 }: AppSidebarProps) {
   return (
     <aside className="app-sidebar sticky top-[var(--app-header-height)] h-[calc(100vh-var(--app-header-height))] overflow-y-auto border-r bg-sidebar p-3 max-md:p-2">
@@ -129,8 +127,6 @@ export function AppSidebar({
                 (item) =>
                   item.key === section.key
               );
-            const sectionActive =
-              activePage !== "home" && activePage !== "guide-data" && activeWorkspace === section.key;
             const groupLabel = journey
               ? `${section.title} — ${journey.subtitle}`
               : section.title;
@@ -145,26 +141,7 @@ export function AppSidebar({
                     : "border-t pt-4"
                 }
               >
-                <button
-                  type="button"
-                  aria-current={
-                    sectionActive
-                      ? "true"
-                      : undefined
-                  }
-                  aria-label={groupLabel}
-                  title={groupLabel}
-                  onClick={() =>
-                    onWorkspaceChange(
-                      section.key
-                    )
-                  }
-                  className={
-                    sectionActive
-                      ? "mb-1.5 flex w-full items-center rounded-md bg-muted/70 px-2 py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring max-md:justify-center max-md:px-0"
-                      : "mb-1.5 flex w-full items-center rounded-md px-2 py-2 text-left hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring max-md:justify-center max-md:px-0"
-                  }
-                >
+                <h2 aria-label={groupLabel} className="nav-group-label mb-1.5 flex w-full items-center px-2 py-2 text-left max-md:justify-center max-md:px-0">
                   <span
                     aria-hidden="true"
                     className={
@@ -188,7 +165,7 @@ export function AppSidebar({
                       )}
                     </span>
                   )}
-                </button>
+                </h2>
 
                 <div className="space-y-1">
                   {section.pages.map(
