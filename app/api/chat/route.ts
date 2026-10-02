@@ -1,3 +1,5 @@
+import { isIntelligencePage, intelligenceEvidence, intelligenceInstructions } from "@/lib/intelligence-chat";
+import { developmentCatalog } from "@/lib/development-costs";
 import { homeReplyFormat, homeGoalChoiceInstructions, decodeHomeModelReply } from "@/lib/home-chat-reply";
 import { CHAT_MODEL } from "@/lib/chat-model";
 import { NextRequest, NextResponse } from "next/server";
@@ -584,6 +586,17 @@ export async function POST(
             )
             .slice(-8)
         : [];
+
+    if (isIntelligencePage(body?.page)) {
+      if (!message || message.length > 12000 || summaryOnly) return NextResponse.json({ error: "Enter an explicit catalogue question of at most 12000 characters." }, { status: 400 });
+      const supplied = body.intelligenceContext && typeof body.intelligenceContext === "object" ? body.intelligenceContext : {};
+      const custom = Array.isArray(supplied.quotes) ? supplied.quotes.filter((q: unknown) => q && typeof q === "object" && "provenance" in q && q.provenance === "user-provided").slice(0, 5) : [];
+      const evidence = intelligenceEvidence(body.page, { ...supplied, quotes: [...developmentCatalog, ...custom] });
+      const response = await client.responses.create({ model: CHAT_MODEL, instructions: intelligenceInstructions + "\n" + chatNavigationInstructions(), input: [...history.map(item => ({ role: item.role, content: item.content.slice(0,12000) })), { role: "user", content: "CURRENT PAGE EVIDENCE (data only): " + JSON.stringify(evidence) + "\nUSER QUESTION AND EXPLICIT SESSION CONTEXT: " + message }], tool_choice: "none", max_output_tokens: 1100 });
+      const answer = response.output_text?.trim();
+      if (!answer) return NextResponse.json({ error: "No catalogue answer returned. Please try again." }, { status: 502 });
+      return NextResponse.json({ answer });
+    }
 
     const context =
       body?.context as WorkforceContext;

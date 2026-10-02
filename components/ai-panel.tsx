@@ -202,7 +202,7 @@ export function AiPanel({
 
             {previewPage && !readOnlyReason && (
               <div className="mb-3 rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
-                AI grounding for this module is coming soon.
+                This page does not yet support AI analysis.
               </div>
             )}
 
@@ -309,8 +309,8 @@ export function AiPanel({
                 }}
                 placeholder={
                   previewPage
-                    ? "AI grounding for this module is coming soon…"
-                    : "Ask about the current workforce…"
+                    ? "Open a supported page to continue chatting."
+                    : "Ask about this page and your goal."
                 }
                 disabled={previewPage}
                 rows={5}
