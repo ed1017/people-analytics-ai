@@ -22,5 +22,7 @@ test('Home detail mode follows current request, not an older full-plan question 
  assert.equal(homeResponseStyle('Develop a full action plan continuing our current conversation.').expanded,true);
  assert.equal(homeResponseStyle('Explain in detail').expanded,true);
  assert.ok(homeResponseStyle('Develop a full action plan').maxOutputTokens>=2400);
+ assert.match(homeResponseStyle('Develop a full action plan').instructions,/Target250-300words/);
+ assert.match(homeResponseStyle('Develop a full action plan').instructions,/never cut off an unfinished answer/);
  assert.equal(homeResponseStyle('What next?').maxOutputTokens,1400);
 });
