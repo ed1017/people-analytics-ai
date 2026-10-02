@@ -15,7 +15,6 @@ import type {
 } from "@/lib/types";
 
 type LearningDevelopmentPageProps = {
-  catalog?: import("react").ReactNode;
   data: LearningDevelopmentResponse | null;
   loading: boolean;
   error: string | null;
@@ -41,7 +40,6 @@ function durationLabel(
 }
 
 export function LearningDevelopmentPage({
-  catalog,
   data,
   loading,
   error,
@@ -69,7 +67,6 @@ export function LearningDevelopmentPage({
         </span>
       </div>
 
-      {catalog}
 
       {error && (
         <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">

@@ -25,6 +25,7 @@ import { GuideDataPage } from "@/components/pages/guide-data-page";
 import { WorkforcePage } from "@/components/pages/workforce-page";
 import { AttritionPage } from "@/components/pages/attrition-page";
 import { FinancePage } from "@/components/pages/finance-page";
+import { IntelligencePage } from "@/components/pages/intelligence-page";
 import { SkillsPage } from "@/components/pages/skills-page";
 import { GuidedDemo, DEVELOPMENT_DEMO_GOAL } from "@/components/guided-demo";
 import { DevelopmentCatalog, DevelopmentPlanning, emptyDevelopmentSession } from "@/components/development-workspace";
@@ -135,7 +136,7 @@ export default function Home() {
     Record<AppWorkspaceKey, AppPage>
   >({
     analytics: "workforce",
-    talent: "skills",
+    talent: "occupational-references",
     strategy: "planning-overview",
   });
 
@@ -707,7 +708,7 @@ export default function Home() {
 
   useEffect(() => {
     if (
-      activePage !== "skills" ||
+      (activePage !== "skills" && activePage !== "occupational-references") ||
       skillsData
     ) {
       return;
@@ -955,7 +956,7 @@ export default function Home() {
 
   useEffect(() => {
     if (
-      activePage !== "skills" ||
+      activePage !== "labor-market" ||
       blsData
     ) {
       return;
@@ -1066,7 +1067,7 @@ export default function Home() {
   };
 
   const backToSkillsFromHandoff = () => {
-    lastPageByWorkspaceRef.current.talent =
+    lastPageByWorkspaceRef.current.analytics =
       "skills";
     setActivePage("skills");
     focusAfterRender(
@@ -1314,7 +1315,10 @@ export default function Home() {
         )
       : 0;
 
-  const previewPage = false;
+  const intelligencePage = activePage === "occupational-references" || activePage === "labor-market" || activePage === "training-coaching";
+  const readOnlyChatPage = intelligencePage || activePage === "guide-data" || activePage === "compensation" || activePage === "development-planning";
+  const readOnlyReason = intelligencePage ? "AI does not analyze these reference links, BLS observations or provider quotes. Your earlier conversation stays available for reference." : readOnlyChatPage ? "AI does not analyze the local content on this page. Your earlier conversation stays available for reference." : undefined;
+  const previewPage = readOnlyChatPage;
 
   const suggestedPrompts =
     previewPage
@@ -1769,7 +1773,7 @@ export default function Home() {
             },
           } : null;
   const sourceState = activePage === "workforce" ? [workforceData, workforceLoading, workforceError] : activePage === "attrition" ? [attritionData, attritionLoading, attritionError] : activePage === "skills" ? [skillsData, skillsLoading, skillsError] : activePage === "learning-development" ? [learningDevelopmentData, learningDevelopmentLoading, learningDevelopmentError] : activePage === "career-mobility" ? [careerMobilityData, careerMobilityLoading, careerMobilityError] : activePage === "career-growth-mobility" ? [careerGrowthMobilityData, careerGrowthMobilityLoading, careerGrowthMobilityError] : activePage === "succession-planning" ? [successionCoverageData, successionCoverageLoading, successionCoverageError] : activePage === "talent-acquisition" ? [talentAcquisitionData, talentAcquisitionLoading, talentAcquisitionError] : activePage === "survey-sentiment" ? [surveySentimentData, surveySentimentLoading, surveySentimentError] : activePage === "finance" ? [financeData, financeLoading, financeError] : [planningData, planningLoading || positionModelingLoading, planningError || positionModelingError];
-  const chatEvidenceReady = Boolean(overviewData) && !dashboardLoading && !dashboardError && !sourceState[1] && Boolean(sourceState[0]) && !sourceState[2];
+  const chatEvidenceReady = !readOnlyChatPage && Boolean(overviewData) && !dashboardLoading && !dashboardError && !sourceState[1] && Boolean(sourceState[0]) && !sourceState[2];
   const currentSource = sourceState[0];
   const sourceRecord = currentSource && typeof currentSource === "object" ? currentSource as Record<string, unknown> : null;
   const movementSource = sourceRecord?.source;
@@ -2037,7 +2041,7 @@ export default function Home() {
 
       {/* Main application */}
       <div
-        className={`app-shell app-ai-left${activePage === "home" || activePage === "guide-data" || activePage === "compensation" || activePage === "development-planning" ? " app-home" : ""}`}
+        className={`app-shell app-ai-left${activePage === "home" ? " app-home" : ""}`}
         style={
           {
             "--nav-width": `${
@@ -2064,14 +2068,13 @@ export default function Home() {
 
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
-          {activePage !== "home" && <SessionProblemSummary conversation={conversation} onNavigate={setActivePage} />}
           <PlanningGuide key={activePage} page={activePage} />
         {demoActive && <GuidedDemo page={activePage} onNavigate={setActivePage} onClose={() => setDemoActive(false)} onUseGoal={() => setDevelopmentSession(current => ({ ...current, goal: DEVELOPMENT_DEMO_GOAL }))} hasOptions={developmentSession.options.length > 0} />}
         <div hidden={activePage !== "home"}><OverallOverviewPage conversation={conversation} onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></div>
-        {activePage === "guide-data" ? <GuideDataPage onBack={() => { setActivePage("home"); window.requestAnimationFrame(() => document.getElementById("overall-guide-link")?.focus()); }} /> : activePage === "home" ? null : activePage === "compensation" ? (
+        {activePage === "guide-data" ? <GuideDataPage onBack={() => { setActivePage("home"); window.requestAnimationFrame(() => document.getElementById("overall-guide-link")?.focus()); }} /> : activePage === "home" ? null : intelligencePage ? <IntelligencePage page={activePage as "occupational-references" | "labor-market" | "training-coaching"} skills={skillsData} skillsLoading={skillsLoading} bls={blsData} blsLoading={blsLoading} blsError={blsError} catalog={<DevelopmentCatalog session={developmentSession} onChange={setDevelopmentSession} onOpen={() => setActivePage("development-planning")} />} /> : activePage === "compensation" ? (
           <section className="p-6"><h1 className="text-2xl font-semibold">Compensation</h1><p className="mt-4 text-lg">TBD</p><p className="mt-2 text-muted-foreground">Planned destination. Compensation data and analysis are not available.</p></section>
         ) : activePage === "development-planning" ? (
-          <DevelopmentPlanning session={developmentSession} onChange={setDevelopmentSession} onCatalog={() => setActivePage("learning-development")} />
+          <DevelopmentPlanning session={developmentSession} onChange={setDevelopmentSession} onCatalog={() => setActivePage("training-coaching")} />
           ) : activePage === "workforce" ? (
           <>
           <h1 className="px-6 pt-6 text-2xl font-semibold">Workforce</h1>
@@ -2133,9 +2136,6 @@ export default function Home() {
             skillsData={skillsData}
             skillsLoading={skillsLoading}
             skillsError={skillsError}
-            blsData={blsData}
-            blsLoading={blsLoading}
-            blsError={blsError}
             maxSkillDemand={maxSkillDemand}
             selectedContext={
               selectedBusinessContext
@@ -2156,7 +2156,6 @@ export default function Home() {
         ) : activePage ===
           "learning-development" ? (
           <LearningDevelopmentPage
-            catalog={<DevelopmentCatalog session={developmentSession} onChange={setDevelopmentSession} onOpen={() => setActivePage("development-planning")} />}
             data={learningDevelopmentData}
             loading={learningDevelopmentLoading}
             error={learningDevelopmentError}
@@ -2254,13 +2253,15 @@ export default function Home() {
           <SiteFooter planning={planningWorkspaceActive || activePage === "finance" || activePage === "development-planning"} />
         </div>
 
-        {activePage !== "home" && activePage !== "guide-data" && activePage !== "compensation" && activePage !== "development-planning" && <AiPanel
+        {activePage !== "home" && <AiPanel
+          sessionControls={<SessionProblemSummary conversation={conversation} />}
+          readOnlyReason={readOnlyReason}
           aiCollapsed={aiCollapsed}
           aiExpanded={aiExpanded}
           aiWidth={aiWidth}
           previewPage={previewPage}
-          suggestedPrompts={[...suggestedPrompts, "Export current data (CSV)"]}
-          scopeNote={activePage === "workforce" ? "Selected filters narrow the workforce snapshot only; company composition stays unfiltered." : planningWorkspaceActive ? "Filters describe workforce context. Planning scenarios and carried evidence keep their own scope, dates and assumptions." : "This page uses company-wide evidence. The shared workforce filters do not narrow these measures."}
+          suggestedPrompts={readOnlyChatPage ? [] : [...suggestedPrompts, "Export current data (CSV)"]}
+          scopeNote={readOnlyReason ?? (activePage === "workforce" ? "Selected filters narrow the workforce snapshot only; company composition stays unfiltered." : planningWorkspaceActive ? "Filters describe workforce context. Planning scenarios and carried evidence keep their own scope, dates and assumptions." : "This page uses company-wide evidence. The shared workforce filters do not narrow these measures.")}
           chatMessages={chatMessages}
           chatInput={chatInput}
           chatLoading={chatLoading}

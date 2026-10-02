@@ -54,8 +54,8 @@ export function DevelopmentCatalog({ session, onChange, onOpen }: { session: Dev
 export function DevelopmentPlanning({ session, onChange, onCatalog }: { session: DevelopmentSession; onChange: (session: DevelopmentSession) => void; onCatalog: () => void }) {
   return <section className="development-planning min-w-0 p-6"><h1 className="text-2xl font-semibold">Development Planning</h1>
     <p className="my-3 text-sm text-muted-foreground">Compare selected quotes against your stated goals. These are editable cost assumptions, not approved budgets, training outcomes or staffing decisions. No ROI, proficiency gains or headcount conversion is estimated. Session only; reload clears all quotes and inputs.</p>
-    <button className={button} onClick={onCatalog}>Choose another quote in Learning & Development</button>
-    {!session.options.length && <p className="mt-6">Select a quote and enter a development goal in Learning & Development, then explicitly carry them here.</p>}
+    <button className={button} onClick={onCatalog}>Choose another quote in Intelligence → Training & Coaching</button>
+    {!session.options.length && <p className="mt-6">Select a quote and enter a development goal in Intelligence → Training & Coaching, then explicitly carry them here.</p>}
     <div className="development-options mt-4 grid min-w-0 gap-4 xl:grid-cols-3">{session.options.map((option,index) => {
       const q = option.quote, result = developmentCost(q, option.inputs);
       const money = (n: number | null) => n === null ? "Unknown" : new Intl.NumberFormat("en-US", { style: "currency", currency: q.currency }).format(n);

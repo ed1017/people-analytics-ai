@@ -41,7 +41,7 @@ const workspaceDisplayTitles: Record<
   string
 > = {
   analytics: "Workforce",
-  talent: "Talent",
+  talent: "Intelligence",
   strategy: "Planning",
 };
 
@@ -49,6 +49,9 @@ const pageIcons: Record<
   AppPage,
   LucideIcon
 > = {
+  "occupational-references": Compass,
+  "labor-market": TrendingUp,
+  "training-coaching": GraduationCap,
   "development-planning": GraduationCap,
   home: Sparkles,
   "guide-data": Compass,

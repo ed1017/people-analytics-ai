@@ -38,6 +38,9 @@ export type ChatMessage = {
 export type Persona = "HR" | "Leader" | "Finance";
 
 export type AppPage =
+  | "occupational-references"
+  | "labor-market"
+  | "training-coaching"
   | "home"
   | "guide-data"
   | "compensation"

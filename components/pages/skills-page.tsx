@@ -12,7 +12,6 @@ import {
   type SelectedBusinessContext,
 } from "@/lib/talent-evidence-scope";
 import type {
-  BlsResponse,
   SkillsResponse,
 } from "@/lib/types";
 
@@ -20,9 +19,6 @@ type SkillsPageProps = {
   skillsData: SkillsResponse | null;
   skillsLoading: boolean;
   skillsError: string | null;
-  blsData: BlsResponse | null;
-  blsLoading: boolean;
-  blsError: string | null;
   maxSkillDemand: number;
   selectedContext: SelectedBusinessContext;
   activeHandoff: PlanningEvidenceHandoff | null;
@@ -31,21 +27,10 @@ type SkillsPageProps = {
   onOpenPlanning: () => void;
 };
 
-function formatLongDate(value: string) {
-  return new Date(value + "T00:00:00").toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
 export function SkillsPage({
   skillsData,
   skillsLoading,
   skillsError,
-  blsData,
-  blsLoading,
-  blsError,
   maxSkillDemand,
   selectedContext,
   activeHandoff,
@@ -61,7 +46,7 @@ export function SkillsPage({
                   Skills Intelligence
                 </h2>
                 <p className="text-muted-foreground">
-                  Compare observed employee proficiency with job-required proficiency and external job-skill context.
+                  Compare observed employee proficiency with recorded job-required proficiency. External references are in Intelligence.
                 </p>
               </div>
 
@@ -320,7 +305,7 @@ export function SkillsPage({
                   </div>
                 </div>
 
-                <div className="mt-6 grid gap-6 xl:grid-cols-2">
+                <div className="mt-6 grid gap-6">
                   <div className="rounded-lg border p-4">
                     <h3 className="font-semibold">
                       AI Capability Watchlist
@@ -376,109 +361,6 @@ export function SkillsPage({
                     </div>
                   </div>
 
-                  <div className="rounded-lg border p-4">
-                    <h3 className="font-semibold">
-                      External Skills Intelligence
-                    </h3>
-                    <p className="mb-4 text-sm text-muted-foreground">
-                      Internal job architecture is linked to O*NET occupation and skills data.
-                    </p>
-
-                    <div className="rounded-lg border p-4">
-                      <p className="text-xs font-medium text-muted-foreground">
-                        Job profiles mapped
-                      </p>
-                      <p className="mt-2 text-3xl font-semibold">
-                        {formatWholeCount(skillsData.summary.onet_mapped_job_profiles)}
-                        /
-                        {formatWholeCount(skillsData.summary.total_job_profiles)}
-                      </p>
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        This gives the model an external occupation and skills reference layer alongside internal workforce data.
-                      </p>
-                    </div>
-
-                    <div className="mt-4 rounded-lg border p-4">
-                      <p className="text-xs font-medium text-muted-foreground">
-                        Current workforce
-                      </p>
-                      <p className="mt-2 text-2xl font-semibold">
-                        {formatWholeCount(skillsData.summary.current_workforce)}
-                      </p>
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        Employees in the September 2026 workforce snapshot.
-                      </p>
-                    </div>
-
-
-                <div className="mt-6 rounded-lg border p-4">
-                  <div className="mb-4 flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="font-semibold">
-                        External Labor Market
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        National labor-market context from the U.S. Bureau of Labor Statistics.
-                      </p>
-                    </div>
-
-                    <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
-                      {blsLoading
-                        ? "Refreshing BLS…"
-                        : blsData?.metrics.some(metric => metric.raw_value !== null) ? "BLS observations" : "BLS unavailable"}
-                    </span>
-                  </div>
-
-                  {blsError && (
-                    <div className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
-                      {blsError}
-                    </div>
-                  )}
-
-                  {blsData ? (
-                    <>
-                      <div className="grid gap-4 md:grid-cols-3">
-                        {blsData.metrics.map(
-                          (metric) => (
-                            <div
-                              key={
-                                metric.series_id
-                              }
-                              className="rounded-lg border p-4"
-                            >
-                              <p className="text-xs font-medium text-muted-foreground">
-                                {metric.short_name}
-                              </p>
-
-                              <p className="mt-2 text-3xl font-semibold">
-                                {metric.display_value}
-                              </p>
-
-                              <p className="mt-2 text-xs text-muted-foreground">
-                                {metric.observation_date
-                                  ? `Latest observation: ${formatLongDate(
-                                      metric.observation_date
-                                    )}`
-                                  : "Latest observation unavailable"}
-                              </p>
-                            </div>
-                          )
-                        )}
-                      </div>
-
-                      <p className="mt-4 text-xs text-muted-foreground">
-                        BLS provides macro labor-market context. These national indicators should inform workforce assumptions, not be treated as company-specific talent or wage measures.
-                      </p>
-                    </>
-                  ) : (
-                    !blsLoading && (
-                      <p className="text-sm text-muted-foreground">
-                        No BLS data returned.
-                      </p>
-                    )
-                  )}
-                </div>
-                  </div>
                 </div>
               </>
             ) : (

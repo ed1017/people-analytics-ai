@@ -4,6 +4,7 @@ import {
   useEffect,
   useId,
   useState,
+  type ReactNode,
   type KeyboardEventHandler,
   type MouseEventHandler,
 } from "react";
@@ -22,6 +23,8 @@ import { ChatContent } from "@/components/chat-content";
 import type { ChatMessage } from "@/lib/types";
 
 type AiPanelProps = {
+  sessionControls?: ReactNode;
+  readOnlyReason?: string;
   aiCollapsed: boolean;
   aiExpanded: boolean;
   aiWidth: number;
@@ -45,6 +48,8 @@ type AiPanelProps = {
 };
 
 export function AiPanel({
+  sessionControls,
+  readOnlyReason,
   aiCollapsed,
   aiExpanded,
   aiWidth,
@@ -192,24 +197,25 @@ export function AiPanel({
         ) : (
           <div className="flex min-h-0 flex-1 flex-col">
             <p className="mb-3 text-base text-muted-foreground">
-              Ask questions about the workforce data currently shown.
+              {readOnlyReason ? "Your session conversation." : "Ask questions about the workforce data currently shown."}
             </p>
 
-            {previewPage && (
+            {previewPage && !readOnlyReason && (
               <div className="mb-3 rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
                 AI grounding for this module is coming soon.
               </div>
             )}
 
             <div className="mb-3 min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain rounded-lg border p-3 pr-2">
+              {sessionControls}
               <section aria-label="Current evidence scope" className="mb-3 rounded-lg border bg-muted/30 p-3">
                 <h3 className="font-semibold">Evidence scope</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{scopeNote}</p>
-                {!dashboardReady && <p role="status" className="mt-2 text-sm">Page evidence is loading or unavailable. Sending will be available when the data is ready.</p>}
+                {!dashboardReady && !readOnlyReason && <p role="status" className="mt-2 text-sm">Page evidence is loading or unavailable. Sending will be available when the data is ready.</p>}
               </section>
               {chatMessages.length === 0 ? (
                 <div className="flex h-full min-h-28 items-center justify-center text-center text-base text-muted-foreground">
-                  {dashboardReady ? "Ask a question about this page." : "You can keep drafting while the page data loads or recovers."}
+                  {readOnlyReason ? "Your session conversation stays available here." : dashboardReady ? "Ask a question about this page." : "You can keep drafting while the page data loads or recovers."}
                 </div>
               ) : (
                 chatMessages.map(
@@ -334,7 +340,7 @@ export function AiPanel({
             </div>
 
             <p className="mt-2 text-xs text-muted-foreground">
-              Answers are grounded in the dashboard context currently loaded.
+              {readOnlyReason ? "Open Home or a supported Workforce or Planning page to continue chatting with its evidence." : "Answers are grounded in the dashboard context currently loaded."}
             </p>
           </div>
         )}

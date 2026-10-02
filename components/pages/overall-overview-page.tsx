@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUp, RefreshCw } from "lucide-react";
 import { ChatContent } from "@/components/chat-content";
 import { buildOverviewSources, type BriefingSource } from "@/lib/overview-briefing";
+import { homeGoalReplies } from "@/lib/home-chat-reply";
 import { buildHomeActionPlanRequest, DEVELOPMENT_DEMO_GOAL, HOME_ACTION_PLAN_LABEL, HOME_FIND_ISSUE_PROMPT } from "@/lib/home-decision-journey";
 import { completeScopedChatTurn } from "@/lib/chat-context-history";
 import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
@@ -17,14 +18,15 @@ async function readSource<T>(url: string, signal: AbortSignal): Promise<T | null
   } catch { return null; }
 }
 
-async function ask(sources: BriefingSource[], persona: Persona, message: string, history: ChatMessage[], signal?: AbortSignal) {
+async function ask(sources: BriefingSource[], persona: Persona, message: string, history: ChatMessage[], signal?: AbortSignal, hasFocusedIssue = false) {
   const response = await fetch("/api/chat", {
     method: "POST", headers: { "Content-Type": "application/json" }, signal,
-    body: JSON.stringify({ page: "home", persona, message, history, overviewBriefingContext: sources }),
+    body: JSON.stringify({ page: "home", persona, message, history, hasFocusedIssue, overviewBriefingContext: sources }),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "The answer is unavailable. Please try again.");
-  return data.answer as string;
+  if (typeof data.answer !== "string") throw new Error("Answer unavailable. Please try again.");
+  return { answer: data.answer, chooseGoal: data.nextStep === "choose_goal" };
 }
 
 export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, workforceQuery, workforceScope, conversation }: {
@@ -41,6 +43,7 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
   const loaded = useRef("");
   const loadedAt = useRef(0);
   const composer = useRef<HTMLTextAreaElement>(null);
+  const goalChoiceSubmittedRef = useRef(false);
   const conversationViewport = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -90,8 +93,11 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
     setInput(""); setChatLoading(true); setChatError(null);
     if (!actionPlan) setQuestionUnanswered(true);
     try {
-      const answer = await ask(sources, persona, withProblemContext(message, journey, conversation.focusedIssue), history, request.signal);
+      const reply = await ask(sources, persona, withProblemContext(message, journey, conversation.focusedIssue), history, request.signal, Boolean(conversation.focusedIssue));
       if (!request.current()) return;
+      const answer = reply.answer;
+      goalChoiceSubmittedRef.current = false;
+      conversation.setHomeGoalChoiceKey(reply.chooseGoal && !conversation.focusedIssue ? key : null);
       setMessages(current => [...current, { role: "assistant", content: answer }]);
       modelHistoryRef.current = completeScopedChatTurn(key, history, message, answer);
       if (!actionPlan) { conversation.rememberQuestion(key, message); setQuestionUnanswered(false); }
@@ -158,6 +164,10 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
       {messages.map((message, index) => <div key={index} className={message.role === "user" ? "ml-auto max-w-[90%] rounded-2xl bg-accent px-5 py-4 text-lg" : "text-lg"}>
         <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{message.role === "user" ? "You" : "Workforce AI"}</p><ChatContent content={message.content} onNavigate={message.role === "assistant" ? onNavigate : undefined} />
       </div>)}
+      {conversation.homeGoalChoiceKey === contextKey && !conversation.focusedIssue && <div role="group" aria-label="Choose a goal" className="flex flex-wrap gap-2">
+        {(Object.keys(homeGoalReplies) as Array<keyof typeof homeGoalReplies>).map(goal => <button key={goal} type="button" disabled={chatLoading || !ready || Boolean(input.trim())} onClick={() => { if (goalChoiceSubmittedRef.current) return; goalChoiceSubmittedRef.current = true; void send(homeGoalReplies[goal]); }} className="min-h-11 rounded-lg border border-primary px-4 py-2 font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{goal}</button>)}
+        <button type="button" disabled={chatLoading} onClick={() => { conversation.setHomeGoalChoiceKey(null); focusQuestion(); }} className="min-h-11 rounded-lg border px-4 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Another goal</button>
+      </div>}
       {chatLoading && <p role="status" className="text-base text-muted-foreground">Thinking with the available evidence…</p>}
       {chatError && <p role="alert" className="text-destructive">{chatError}</p>}
     </section>}
@@ -186,7 +196,7 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
       <ol className="mt-3 list-decimal space-y-4 pl-4">
         <li><strong className="text-primary">Start with a question.</strong><p>Choose Find a problem worth investigating for an evidence-backed signal, or Bring your own issue to describe your business question. A signal is a reason to investigate, not proof of a problem.</p></li>
         <li><strong className="text-primary">Develop a full action plan.</strong><p>After discussing the issue, use the action-plan button beside your question input. It continues the current conversation: evidence, options, costs and unknown assumptions, next steps and success measures. Clarify an essential missing goal first; proposals are not commitments or results.</p></li>
-        <li><strong className="text-primary">Check the evidence and compare options.</strong><p>HR, business leaders and Finance can inspect <button className="text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce</button>, <button className="text-primary underline" onClick={()=>onNavigate("skills")}>Skills Intelligence</button> and <button className="text-primary underline" onClick={()=>onNavigate("learning-development")}>Learning &amp; Development</button>. In Skills, explicitly select evidence and a business goal before carrying them to <button className="text-primary underline" onClick={()=>onNavigate("planning-overview")}>Planning</button>. Enter supported assumptions and run comparisons yourself; Home does not calculate or execute a workforce plan.</p></li>
+        <li><strong className="text-primary">Check the evidence and compare options.</strong><p>HR, business leaders and Finance can inspect <button className="text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce</button>, <button className="text-primary underline" onClick={()=>onNavigate("skills")}>Skills Intelligence</button> and <button className="text-primary underline" onClick={()=>onNavigate("learning-development")}>Learning &amp; Development</button>. Browse external references and simulated provider options in <button className="text-primary underline" onClick={()=>onNavigate("occupational-references")}>Intelligence</button>. In Skills, explicitly select evidence and a business goal before carrying them to <button className="text-primary underline" onClick={()=>onNavigate("planning-overview")}>Planning</button>. Enter supported assumptions and run comparisons yourself; Home does not calculate or execute a workforce plan.</p></li>
       </ol>
       <p className="mt-4 text-muted-foreground">Navigation does not carry evidence or run models. Scenarios do not make real workforce changes.</p>
       <button type="button" onClick={()=>onNavigate("guide-data")} className="mt-4 min-h-11 w-full rounded-lg border px-4 py-3 text-left text-base font-semibold text-primary hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">See Guide &amp; Data for more details</button>
