@@ -67,14 +67,14 @@ try {
   const alternatives=workspace.getByRole('region',{name:'Local workforce alternatives',exact:true});
   const baseBeforeAlternatives=JSON.stringify((await state()).workspaces['goal-a'].fields.workforceSolution);
   await alternatives.getByLabel('Alternative 1: Training cash (USD)',{exact:true}).fill('0');
-  await alternatives.getByRole('button',{name:'Preview alternatives locally',exact:true}).click();
+  await alternatives.getByRole('button',{name:'Calculate alternatives locally',exact:true}).click();
   check(width+' alternative preview is local and unsaved',modelCalls===1&&calculationCalls===2&&!(await state()).workspaces['goal-a'].fields.workforceAlternativeReviews&&(await alternatives.innerText()).includes('$19,500'));
   await alternatives.getByLabel('Alternative 1: Training cash (USD)',{exact:true}).fill('100');
   check(width+' changed alternative requires fresh preview',await alternatives.getByRole('button',{name:'Save reviewed alternatives',exact:true}).count()===0);
   await alternatives.getByLabel('Alternative 1: Training cash (USD)',{exact:true}).fill('0');
   await alternatives.getByRole('button',{name:'Add second alternative',exact:true}).click();
   await alternatives.getByLabel('Alternative 2: Training cash (USD)',{exact:true}).fill('1000');
-  await alternatives.getByRole('button',{name:'Preview alternatives locally',exact:true}).click();
+  await alternatives.getByRole('button',{name:'Calculate alternatives locally',exact:true}).click();
   await alternatives.getByRole('button',{name:'Save reviewed alternatives',exact:true}).click();
   const localHistory=(await state()).workspaces['goal-a'].fields.workforceAlternativeReviews;
   check(width+' two alternatives retained with four deterministic comparisons',localHistory.length===1&&localHistory[0].reviewedRevisions.length===2&&localHistory[0].comparisons.length===4);
@@ -85,7 +85,7 @@ try {
   check(width+' approval version-specific',saved.workforceSolution.approvals[0].version===3);
   await workspace.getByRole('combobox',{name:/^Inspect a saved calculation/}).selectOption(saved.workforceSolution.results[0].id);
   await workspace.locator('summary').filter({hasText:'Review local alternatives'}).click();
-  check(width+' historical base blocks alternative preview',await alternatives.getByRole('button',{name:'Preview alternatives locally',exact:true}).isDisabled());
+  check(width+' historical base blocks alternative preview',await alternatives.getByRole('button',{name:'Calculate alternatives locally',exact:true}).isDisabled());
   check(width+' historic Skills snapshot restored',(await workspace.innerText()).includes('Whole-role ready: 2.'));
   await workspace.getByRole('button',{name:'Inspect L&D pathways',exact:true}).click();
   check(width+' L&D snapshot gaps',(await workspace.innerText()).includes('shortest course 12 hours')&&(await workspace.innerText()).includes('Training cash: USD 3000'));

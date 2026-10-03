@@ -14,15 +14,16 @@ export function createWorkforceSelectionSession<Context, Proposal>(verify: (cont
     getState: () => structuredClone(state),
     async select(snapshot: unknown, ids: string[]) {
       cancel();
-      if (context === undefined) {state = {status: "rejected", proposal: null}; return}
+      if (context === undefined) {state = {status: "rejected", proposal: null}; return false}
       const ticket = generation;
       state = {status: "checking", proposal: null};
       try {
         const proposal = await verify(structuredClone(context), structuredClone(snapshot), [...ids]);
-        if (ticket === generation) state = {status: "staged", proposal: structuredClone(proposal)};
+        if (ticket === generation) {state = {status: "staged", proposal: structuredClone(proposal)}; return true}
       } catch {
         if (ticket === generation) state = {status: "rejected", proposal: null};
       }
+      return false;
     },
   };
 }

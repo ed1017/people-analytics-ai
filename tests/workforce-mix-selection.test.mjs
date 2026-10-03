@@ -72,3 +72,19 @@ test('session discards cancelled, superseded and A-B-A late replies without pers
 test('rejects same-ID referenced evidence content changes, not just evidence IDs',()=>{
  const f=setup({}, {}, true);stage(f);f.context.solution.evidence[0].payload.candidatePool=999;assert.throws(()=>stage(f));
 });
+test('each async selection reports its own acceptance, never a newer identical proposal',async()=>{
+ const pending=[],session=createWorkforceSelectionSession(()=>new Promise(resolve=>pending.push(resolve)));
+ session.setContext({goal:'A'});
+ const old=session.select({},['same']);session.cancel();const next=session.select({},['same']);
+ pending[1]({id:'same'});assert.equal(await next,true);pending[0]({id:'same'});assert.equal(await old,false);
+ assert.deepEqual(session.getState(),{status:'staged',proposal:{id:'same'}});
+});
+test('late verifier rejection cannot clear a newer stage; copies isolate callers',async()=>{
+ let reject;const session=createWorkforceSelectionSession(async(_context,_snapshot,ids)=>ids[0]==='old'?new Promise((_resolve,fail)=>{reject=fail}):{ids});
+ session.setContext({goal:'A'});const old=session.select({},['old']);assert.equal(await session.select({},['new']),true);
+ reject(Error('Late failure'));assert.equal(await old,false);const copy=session.getState();copy.proposal.ids[0]='mutated';assert.deepEqual(session.getState().proposal.ids,['new']);
+});
+test('selection is rejected before a context is published',async()=>{
+ let invoked=false;const session=createWorkforceSelectionSession(async()=>{invoked=true;return null});
+ assert.equal(await session.select({},['mix']),false);assert.equal(invoked,false);assert.equal(session.getState().status,'rejected');
+});
