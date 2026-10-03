@@ -463,6 +463,7 @@ export type InternalTalentReadinessResponse = {
 };
 
 export type RoleBuyFeasibilityResponse = {
+  timing_evidence?: import("./recruiting-timing").RecruitingTimingEvidence;
   as_of: string;
   job_profile_code: string;
   job_profile_name: string;
