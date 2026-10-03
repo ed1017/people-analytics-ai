@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {workforceReviewEvidence, workforceLimitSummary, selectedWorkforceBrief} from '../lib/workforce-solution-review.ts';
+import {readWorkforceReview, workforceReviewEvidence, workforceLimitSummary, selectedWorkforceBrief} from '../lib/workforce-solution-review.ts';
 import {workforceReviewFixture} from './fixtures/workforce-review.mjs';
 import {createWorkforceSolution, emptySolutionInputs, beginSolutionRun, completeSolutionRun, reviseWorkforceSolution, recordSolutionApproval} from '../lib/workforce-solution.ts';
 
@@ -67,7 +67,7 @@ test('brief distinguishes unmet and unknown constraints from conditional passing
 const goal='Compare additional Engineer positions';
 const at='2026-10-03T01:00:00.000Z';
 function completedBrief() {
-  const solution=createWorkforceSolution('s','g',{...emptySolutionInputs(),scope:{goalStatement:goal}},at);
+  const solution=createWorkforceSolution('s','g',{...emptySolutionInputs(),scope:{...workforceReviewFixture().input,goalStatement:goal}},at);
   const started=beginSolutionRun(solution,1,'run-a',['brief'],at);
   return completeSolutionRun(started.state,started.ticket,[{id:'result-a',kind:'brief',calculator:{name:'single-role-workforce-review',version:'1'},payload:workforceReviewFixture()}],at);
 }
@@ -81,9 +81,9 @@ test('decision brief recognizes the saved workforce calculation without copying 
 test('changed goal or inputs mark the notes-page comparison historical and preserve the selected result',()=>{
   const old=completedBrief();
   assert.equal(selectedWorkforceBrief(old,'result-a','Different goal').current,false);
-  const changed=reviseWorkforceSolution(old,1,{training:{trainingCash:4000}},'sidebar','Changed training cash',at);
+  const changed=reviseWorkforceSolution(old,1,{scope:{...workforceReviewFixture().input,goalStatement:goal,trainingCash:'4000'}},'sidebar','Changed training cash',at);
   const started=beginSolutionRun(changed,2,'run-b',['brief'],at);
-  const payload=workforceReviewFixture();payload.proposed.totalCash=23500;
+  const payload=workforceReviewFixture();payload.proposed.totalCash=23500;payload.input.trainingCash='4000';payload.proposed.input.trainingCash='4000';
   const next=completeSolutionRun(started.state,started.ticket,[{id:'result-b',kind:'brief',calculator:{name:'single-role-workforce-review',version:'1'},payload}],at);
   const historical=selectedWorkforceBrief(next,'result-a',goal),current=selectedWorkforceBrief(next,'result-b',goal);
   assert.equal(historical.current,false);assert.equal(historical.review.proposed.totalCash,22500);
@@ -95,4 +95,22 @@ test('no completed workforce brief stays empty; unrelated calculator outputs are
   const solution=completedBrief();solution.results[0].calculator.name='different-calculator';
   assert.equal(selectedWorkforceBrief(solution,'result-a',goal),null);
   solution.results=[];assert.equal(selectedWorkforceBrief(solution,null,goal),null);
+});
+test('malformed nested workforce result shapes fail closed without crashing or changing saved bytes',()=>{
+ for(const mutate of [r=>r.input=null,r=>r.proposed=null,r=>r.proposed.rows=null,r=>r.proposed.rows[0].incrementalCash={},r=>r.proposed.checks=[null],r=>r.proposed.input.buy='99',r=>r.hireOnly.input.buy='1',r=>r.limitations={},r=>r.response.warnings=[{}],r=>r.structural.authorizedAnnualBudgetDelta={},r=>r.proposed.totalCash='0']){
+  const solution=completedBrief();mutate(solution.results[0].payload);const before=JSON.stringify(solution);
+  assert.equal(readWorkforceReview(solution.results[0].payload),null);assert.equal(selectedWorkforceBrief(solution,'result-a',goal),null);assert.equal(JSON.stringify(solution),before);
+ }
+});
+test('valid historical rounding snapshots stay verbatim; another goal cannot borrow their brief',()=>{
+ const solution=completedBrief();solution.results[0].payload.proposed.totalCash=22500.01;
+ assert.equal(readWorkforceReview(solution.results[0].payload).proposed.totalCash,22500.01);
+ assert.equal(selectedWorkforceBrief(solution,'result-a',goal,'other-goal'),null);
+ assert.equal(selectedWorkforceBrief(solution,'result-a',goal,'g').review.proposed.totalCash,22500.01);
+});
+test('internally consistent forged payload inputs cannot borrow another saved version or approval',()=>{
+ const solution=completedBrief(),payload=solution.results[0].payload;
+ for(const input of [payload.input,payload.proposed.input,payload.hireOnly.input])input.jobProfile='OTHER';
+ assert.ok(readWorkforceReview(payload));assert.equal(selectedWorkforceBrief(solution,'result-a',goal),null);
+ const ambiguous=completedBrief();ambiguous.versions[0].inputs.costs.trainingCash='3000';assert.equal(selectedWorkforceBrief(ambiguous,'result-a',goal),null);
 });

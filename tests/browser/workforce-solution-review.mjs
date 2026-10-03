@@ -106,6 +106,21 @@ try {
   await workspace.getByRole('heading',{name:'Calculated decision brief — version 2',exact:true}).waitFor();
   check(width+' notes navigation retains selection',(await state()).workspaces['goal-a'].fields.workforceInspection===saved.workforceInspection);
   check(width+' decision writing preserved',(await state()).workspaces['goal-a'].fields.brief.calculations==='Keep this user-authored interpretation.');
+  const intact=await state();
+  for(const [name,mutate,message] of [
+   ['broken lifecycle',solution=>{solution.versions=[]},'This saved workforce solution cannot be read safely.'],
+   ['malformed result',solution=>{solution.results[0].payload.input=null},'This saved workforce calculation cannot be read safely.'],
+   ['forged role',solution=>{const payload=solution.results[0].payload;for(const input of [payload.input,payload.proposed.input,payload.hireOnly.input])input.jobProfile='OTHER'},'This saved workforce calculation cannot be read safely.'],
+   ['wrong goal',solution=>{solution.goalId='goal-b'},'This saved workforce solution cannot be read safely.'],
+  ]){
+   const damaged=structuredClone(intact);mutate(damaged.workspaces['goal-a'].fields.workforceSolution);
+   const before=JSON.stringify(damaged.workspaces['goal-a'].fields.workforceSolution);
+   await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key,value:encodeDecisions(damaged)});
+   await page.reload({waitUntil:'domcontentloaded'});
+   await page.getByRole('status').filter({hasText:message}).waitFor();
+   check(width+' '+name+' guarded after checksum-valid reload',await page.getByRole('button',{name:'Record version-specific approval note',exact:true}).count()===0&&await page.getByRole('button',{name:'Start guided workforce plan',exact:true}).count()===0);
+   check(width+' '+name+' retained original record',JSON.stringify((await state()).workspaces['goal-a'].fields.workforceSolution)===before);
+  }
   check(width+' only explicit fixture calls',modelCalls===1&&calculationCalls===2);
   check(width+' no browser runtime errors',errors.length===0);
   results.push({name:width+' blocked nonlocal browser requests',count:unmocked});

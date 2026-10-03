@@ -3,20 +3,24 @@
 // @ts-expect-error Native Node tests share the TypeScript implementation.
 import {calculateWorkforceIncrement, validateWorkforcePlanInput, workforcePlanFields, type WorkforcePlanInput, type WorkforceIncrement} from "./workforce-increment.ts";
 // @ts-expect-error Native Node tests share the TypeScript implementation.
-import {currentSolutionVersion, solutionDependencyKey, solutionSections, type WorkforceSolution} from "./workforce-solution.ts";
+import {currentSolutionVersion, solutionDependencyKey, solutionSections, solutionResultIsCurrent, readWorkforceSolution, type WorkforceSolution} from "./workforce-solution.ts";
 import type {RecruitingTimingEvidence} from "./recruiting-timing";
+// @ts-expect-error Native Node tests share the TypeScript implementation.
+import {validateJson} from "./local-decisions.ts";
 
 export type WorkforceOptionId = "reviewed-mix" | "hiring-only" | "revision-1" | "revision-2";
+// @ts-expect-error Native Node tests share the TypeScript implementation.
+import {readWorkforceReview} from "./workforce-solution-review.ts";
 type Option = {id: WorkforceOptionId; input: WorkforcePlanInput};
 type ConstraintStatus = "met" | "not-met" | "unknown";
 export type WorkforceOptionEvaluation = {optionId: WorkforceOptionId; plan: WorkforceIncrement; status: ConstraintStatus};
 export type WorkforceAgentConclusion = "constraints_met_outcomes_unknown" | "no_evaluated_option_meets_entered_constraints" | "constraints_incomplete";
-type Binding = {goalId: string; solutionId: string; version: number; dependencyKey: string};
+type Binding = {goalId: string; solutionId: string; version: number; dependencyKey: string; evidenceResultId: string; timingKey: string};
 export type WorkforceAgentReview = {
   schemaVersion: 1; id: string; binding: Binding; startedAt: string; completedAt: string;
   evaluations: WorkforceOptionEvaluation[]; conclusion: WorkforceAgentConclusion;
   preferredOptionId: WorkforceOptionId | null; modelTurns: number; revisionEvaluations: number;
-  requiresUserReview: true;
+  requiresUserReview: true; reviewedOptions: Option[]; allowRevision: boolean;
 };
 export type WorkforceAgentTurn = {
   goal: string;
@@ -31,12 +35,29 @@ const invariant = (condition: unknown, message: string): void => {if (!condition
 const coreIds: WorkforceOptionId[] = ["reviewed-mix", "hiring-only"];
 const sharedFields = ["businessUnit", "jobProfile", "intent", "roles", "planningMonth", "months", "budget", "maxAddedEmployees", "deadlineMonth", "annualHireCost", "hireFee", "recruitingStart", "arrivalMode", "arrivalDate", "loadedHourlyCost"] as const;
 
-function binding(solution: WorkforceSolution): Binding {
+function savedTiming(solution: WorkforceSolution, evidenceResultId: string): RecruitingTimingEvidence | null {
+  const result = solution.results.find(item => item.id === evidenceResultId);
+  invariant(result && result.kind === "brief" && result.calculator.name === "single-role-workforce-review" && solutionResultIsCurrent(solution, result), "Choose a current saved workforce calculation as the evidence reference.");
+  const input = savedInput(solution), payload = readWorkforceReview(result!.payload);
+  invariant(payload, "Saved workforce evidence is unreadable.");
+  const sourceInput = payload!.input as WorkforcePlanInput | undefined;
+  invariant(sourceInput && workforcePlanFields.every(field => sourceInput[field] === input[field]), "Saved evidence does not match the reviewed inputs.");
+  const timing = payload!.timing;
+  invariant(timing === null || timing !== undefined && typeof timing === "object" && !Array.isArray(timing), "Saved timing evidence is unreadable.");
+  if (timing !== null) {
+    const evidence = timing as unknown as RecruitingTimingEvidence;
+    invariant(evidence.scope?.job_profile_code === input.jobProfile && evidence.scope.business_unit === null && evidence.scope.country === null, "Saved timing evidence has a different scope.");
+    const sample = evidence.opening_to_start?.valid_sample_count, median = evidence.opening_to_start?.median_days;
+    invariant(Number.isSafeInteger(sample) && sample >= 0 && (median === null || typeof median === "number" && Number.isFinite(median) && median >= 0), "Saved timing evidence is unreadable.");
+  }
+  return timing as RecruitingTimingEvidence | null;
+}
+function binding(solution: WorkforceSolution, evidenceResultId: string): Binding {
   const version = currentSolutionVersion(solution);
-  return {goalId: solution.goalId, solutionId: solution.id, version: version.version, dependencyKey: solutionDependencyKey(solution, version, "brief")};
+  return {goalId: solution.goalId, solutionId: solution.id, version: version.version, dependencyKey: solutionDependencyKey(solution, version, "brief"), evidenceResultId, timingKey: JSON.stringify(savedTiming(solution, evidenceResultId))};
 }
 export function workforceAgentReviewIsCurrent(solution: WorkforceSolution, review: Pick<WorkforceAgentReview, "binding">) {
-  return JSON.stringify(binding(solution)) === JSON.stringify(review.binding);
+  try {return JSON.stringify(binding(solution, review.binding.evidenceResultId)) === JSON.stringify(review.binding)} catch {return false}
 }
 function savedInput(solution: WorkforceSolution): WorkforcePlanInput {
   const inputs = currentSolutionVersion(solution).inputs;
@@ -57,7 +78,7 @@ function optionsFor(solution: WorkforceSolution, revisions: WorkforcePlanInput[]
   revisions.forEach((raw, i) => {
     const revision = validateWorkforcePlanInput(raw);
     invariant(sharedFields.every(field => revision[field] === input[field]), "A revision cannot change the reviewed demand, horizon, constraints or common hiring cost/timing basis.");
-    invariant(!options.some(option => JSON.stringify(option.input) === JSON.stringify(revision)), "Revision duplicates an existing reviewed option.");
+    invariant(!options.some(option => workforcePlanFields.every(field => option.input[field] === revision[field])), "Revision duplicates an existing reviewed option.");
     options.push({id: i === 0 ? "revision-1" : "revision-2", input: revision});
   });
   return options;
@@ -108,16 +129,18 @@ async function abortable<T>(promise: Promise<T>, signal: AbortSignal): Promise<T
 export async function runWorkforcePlanningAgent(args: {
   solution: WorkforceSolution; currentSolution: () => WorkforceSolution;
   reviewedRevisions: WorkforcePlanInput[]; allowRevision: boolean;
-  timing: RecruitingTimingEvidence | null; runId: string; model: Model; signal: AbortSignal;
+  evidenceResultId: string; runId: string; model: Model; signal: AbortSignal;
   timeoutMs?: number;
 }): Promise<WorkforceAgentReview> {
   const timeout = args.timeoutMs ?? 30000;
   invariant(Number.isInteger(timeout) && timeout > 0 && timeout <= 30000, "Invalid agent time limit.");
   invariant(/^[a-zA-Z0-9-]{1,80}$/.test(args.runId), "Invalid agent run identifier.");
-  const initial = clone(args.solution), captured = binding(initial), options = optionsFor(initial, clone(args.reviewedRevisions), args.allowRevision);
+  invariant(readWorkforceSolution(args.solution), "Saved workforce solution is unreadable.");
+  savedInput(args.solution);
+  const initial = clone(args.solution), captured = binding(initial, args.evidenceResultId), options = optionsFor(initial, clone(args.reviewedRevisions), args.allowRevision);
   const goal = currentSolutionVersion(initial).inputs.scope.goalStatement;
   invariant(typeof goal === "string" && goal.trim().length > 0 && goal.length <= 240, "A reviewed goal is required.");
-  const timing = clone(args.timing), signal = AbortSignal.any([args.signal, AbortSignal.timeout(timeout)]);
+  const timing = clone(savedTiming(initial, args.evidenceResultId)), signal = AbortSignal.any([args.signal, AbortSignal.timeout(timeout)]);
   const requireCurrent = () => {signal.throwIfAborted();invariant(workforceAgentReviewIsCurrent(args.currentSolution(), {binding: captured}), "The saved solution changed; this agent run cannot become current.")};
   requireCurrent();
   const startedAt = new Date().toISOString(), evaluations: WorkforceOptionEvaluation[] = [];
@@ -150,16 +173,58 @@ export async function runWorkforcePlanningAgent(args: {
     requireCurrent();
     return clone({schemaVersion: 1, id: args.runId, binding: captured, startedAt, completedAt: new Date().toISOString(), evaluations,
       conclusion: finish.conclusion as WorkforceAgentConclusion, preferredOptionId: finish.preferred_option_id as WorkforceOptionId | null,
-      modelTurns, revisionEvaluations: revisionCount, requiresUserReview: true});
+      modelTurns, revisionEvaluations: revisionCount, requiresUserReview: true, reviewedOptions: options, allowRevision: args.allowRevision});
   }
   throw new Error("Workforce agent turn limit reached; no final review was accepted.");
+}
+
+function canonical(value: unknown): string {
+  const sorted = (item: unknown): unknown => Array.isArray(item) ? item.map(sorted) : item !== null && typeof item === "object"
+    ? Object.fromEntries(Object.entries(item).sort(([a], [b]) => a.localeCompare(b)).map(([key, child]) => [key, sorted(child)])) : item;
+  return JSON.stringify(sorted(value));
+}
+
+// Browser JSON is untrusted after reload. Replay deterministic calculations,
+// never infer authenticity from a matching solution ID or TypeScript cast.
+export function readWorkforceAgentReview(raw: unknown, solution: WorkforceSolution): WorkforceAgentReview | null {
+  try {
+    invariant(readWorkforceSolution(solution), "Invalid saved solution.");
+    invariant(validateJson(raw), "Invalid stored agent review.");
+    const review = exactObject(raw, ["schemaVersion", "id", "binding", "startedAt", "completedAt", "evaluations", "conclusion", "preferredOptionId", "modelTurns", "revisionEvaluations", "requiresUserReview", "reviewedOptions", "allowRevision"]) as unknown as WorkforceAgentReview;
+    invariant(review.schemaVersion === 1 && /^[a-zA-Z0-9-]{1,80}$/.test(review.id) && review.requiresUserReview === true && typeof review.allowRevision === "boolean", "Invalid stored agent review.");
+    invariant(typeof review.startedAt === "string" && typeof review.completedAt === "string" && Number.isFinite(Date.parse(review.startedAt)) && Number.isFinite(Date.parse(review.completedAt)) && Date.parse(review.startedAt) <= Date.parse(review.completedAt), "Invalid review timestamps.");
+    invariant(Number.isInteger(review.binding.version) && solution.versions.some(version => version.version === review.binding.version), "Missing reviewed version.");
+    const historical = {...solution, versions: solution.versions.filter(version => version.version <= review.binding.version), pending: null};
+    invariant(workforceAgentReviewIsCurrent(historical, review), "Stored review evidence or inputs changed.");
+    invariant(Array.isArray(review.reviewedOptions) && review.reviewedOptions.length >= 2 && review.reviewedOptions.length <= 4, "Invalid reviewed alternatives.");
+    const options = optionsFor(historical, review.reviewedOptions.slice(2).map(option => option.input), review.allowRevision);
+    invariant(canonical(options) === canonical(review.reviewedOptions), "Reviewed alternatives do not match the saved scope.");
+    invariant(Array.isArray(review.evaluations) && review.evaluations.length >= 2 && review.evaluations.length <= 3, "Invalid calculation count.");
+    const ids = review.evaluations.map(result => result.optionId);
+    invariant(new Set(ids).size === ids.length && coreIds.every(id => ids.slice(0, 2).includes(id)), "Missing or repeated original comparisons.");
+    invariant(review.modelTurns === review.evaluations.length + 1 && review.revisionEvaluations === review.evaluations.length - 2, "Invalid execution limits.");
+    const timing = savedTiming(historical, review.binding.evidenceResultId);
+    for (const result of review.evaluations) {
+      exactObject(result, ["optionId", "plan", "status"]);
+      const option = options.find(item => item.id === result.optionId);
+      invariant(option, "Unreviewed option.");
+      const expected = calculateWorkforceIncrement(option!.input, timing);
+      invariant(canonical(expected) === canonical(result.plan) && result.status === status(expected), "Stored calculation does not match the reviewed inputs.");
+    }
+    invariant(review.conclusion === conclusion(review.evaluations), "Stored conclusion contradicts results.");
+    invariant(review.preferredOptionId === null || review.evaluations.some(result => result.optionId === review.preferredOptionId && result.status === "met"), "Stored preference is unsupported.");
+    return clone(review);
+  } catch {return null}
 }
 
 // Explicit local retention only: use a separate goal-owned field, never replace
 // single-role result payloads, user notes or approvals. No caller is wired yet.
 export function retainWorkforceAgentReview(previous: WorkforceAgentReview[], review: WorkforceAgentReview, solution: WorkforceSolution) {
   invariant(workforceAgentReviewIsCurrent(solution, review), "Cannot retain a stale agent review as current.");
+  invariant(readWorkforceAgentReview(review, solution), "Cannot retain an invalid or corrupted agent review.");
   invariant(previous.length < 10 && !previous.some(item => item.id === review.id), "Agent review history limit or duplicate run.");
   invariant(previous.every(item => item.binding.goalId === solution.goalId && item.binding.solutionId === solution.id), "Agent history belongs to another goal or solution.");
+  invariant(previous.every(item => readWorkforceAgentReview(item, solution)), "Existing agent history is unreadable; retain the original stored record.");
+  invariant(new TextEncoder().encode(JSON.stringify([...previous, review])).length <= 256 * 1024, "Agent review history reached its storage limit.");
   return clone([...previous, review]);
 }

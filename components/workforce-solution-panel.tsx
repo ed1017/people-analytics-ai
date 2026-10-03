@@ -1,11 +1,11 @@
 "use client";
 import {useEffect,useRef,useState} from "react";
 import {decisionStore,useDecisionStorage} from "@/components/decision-store";
-import {createWorkforceSolution,currentSolutionVersion,emptySolutionInputs,reviseWorkforceSolution,beginSolutionRun,completeSolutionRun,cancelSolutionRun,solutionResultIsCurrent,recordSolutionApproval,type WorkforceSolution,type SolutionInputs,type SolutionSection} from "@/lib/workforce-solution";
+import {readWorkforceSolution,createWorkforceSolution,currentSolutionVersion,emptySolutionInputs,reviseWorkforceSolution,beginSolutionRun,completeSolutionRun,cancelSolutionRun,solutionResultIsCurrent,recordSolutionApproval,type WorkforceSolution,type SolutionInputs,type SolutionSection} from "@/lib/workforce-solution";
 import {emptyWorkforcePlanInput,workforcePlanFields,validateWorkforcePlanInput,type WorkforcePlanInput,type WorkforcePlanField,type WorkforceIncrement} from "@/lib/workforce-increment";
 import type {AppPage,StructuralPositionCatalogResponse} from "@/lib/types";
 import {WorkforceSolutionEvidence} from "@/components/workforce-solution-evidence";
-import {workforceReviewEvidence,workforceLimitSummary,type WorkforceReview} from "@/lib/workforce-solution-review";
+import {readSavedWorkforceReview,readWorkforceReview,workforceReviewEvidence,workforceLimitSummary} from "@/lib/workforce-solution-review";
 import type {WorkforceClarification} from "@/lib/workforce-clarification";
 const button='min-h-10 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50';
 const control='mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm';
@@ -25,8 +25,9 @@ const shown=(value:number|null)=>value===null?'Unknown':value.toLocaleString(und
 export function WorkforceSolutionPanel({page,onNavigate}:{page:AppPage;onNavigate:(page:AppPage)=>void}){
  const storage=useDecisionStorage(),goalId=storage.data.goals.activeId;
  const goalStatement=storage.data.goals.goals.find(goal=>goal.id===goalId)?.statement??'';
- const solution=storage.data.workspaces[goalId]?.fields[field] as unknown as WorkforceSolution|undefined;
+ const rawSolution=storage.data.workspaces[goalId]?.fields[field],solution=readWorkforceSolution(rawSolution);
  if(!goalId||!['home','skills','learning-development','talent-acquisition','scenario-modeling','workforce-response','decision-brief','development-planning'].includes(page))return null;
+ if(rawSolution!==undefined&&(!solution||solution.goalId!==goalId))return <section role="status" className="m-6 rounded-lg border p-4">This saved workforce solution cannot be read safely. The original record is retained; editing and approval are unavailable.</section>;
  if(!solution)return page==='home'?<section className="m-6 rounded-lg border p-4"><h2 className="text-lg font-semibold">Plan one workforce decision</h2><p className="my-2 text-sm">Guided inputs for one additional role requirement and business unit. Compare internal development, moves and external hiring without leaving this page. Clarify a planning statement with AI, review the proposed inputs, then calculate saved assumptions.</p><button className={button} onClick={()=>decisionStore.setField(goalId,field,createWorkforceSolution(crypto.randomUUID(),goalId,{...emptySolutionInputs(),scope:{goalStatement}},new Date().toISOString()))}>Start guided workforce plan</button></section>:null;
  return <Workspace key={goalId} goalId={goalId} goalStatement={goalStatement} solution={solution} page={page} onNavigate={onNavigate}/>;
 }
@@ -34,7 +35,8 @@ function Workspace({goalId,goalStatement,solution,page,onNavigate}:{goalId:strin
  const storage=useDecisionStorage(),version=currentSolutionVersion(solution);
  const catalog=storage.data.workspaces[goalId]?.fields.workforceCatalog as unknown as Pick<StructuralPositionCatalogResponse,'as_of'|'business_units'|'job_profiles'>|undefined;
  const selected=storage.data.workspaces[goalId]?.fields.workforceInspection as unknown as string|undefined;
- const result=solution.results.find(item=>item.id===selected)??solution.results.at(-1),review=result?.payload as unknown as WorkforceReview|undefined;
+ const results=solution.results.filter(item=>item.kind==='brief'&&item.calculator.name==='single-role-workforce-review');
+ const result=results.find(item=>item.id===selected)??results.at(-1),review=result?readSavedWorkforceReview(solution,result):null;
  const [notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[dirty,setDirty]=useState(false),[approval,setApproval]=useState('');const controller=useRef<AbortController|null>(null);
  const [editorSection,setEditorSection]=useState<SolutionSection|undefined>();
  const [statement,setStatement]=useState(''),[proposal,setProposal]=useState<{baseVersion:number;result:WorkforceClarification}|null>(null),[editorDraft,setEditorDraft]=useState<WorkforcePlanInput|undefined>(),[editorRevision,setEditorRevision]=useState(0);
@@ -47,7 +49,7 @@ function Workspace({goalId,goalStatement,solution,page,onNavigate}:{goalId:strin
  async function calculate(){if(controller.current)return;let started;try{validateWorkforcePlanInput(fromInputs(version.inputs));started=beginSolutionRun(current(),version.version,crypto.randomUUID(),['brief'],new Date().toISOString());save(started.state);}catch(e){setNotice((e as Error).message);return}
   const c=new AbortController();controller.current=c;setBusy(true);setNotice('');const timer=setTimeout(()=>c.abort(),65000);
   try{const input=fromInputs(version.inputs),r=await fetch('/api/workforce-solution',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input),signal:c.signal});const body=await r.json();if(!r.ok)throw Error(body.error||'Workforce comparison unavailable.');if(!isHere()||c.signal.aborted)return;
-   if(body.version!==1||!body.input||Object.keys(body.input).length!==workforcePlanFields.length||workforcePlanFields.some(key=>body.input[key]!==input[key])||!Array.isArray(body.proposed?.rows)||!Array.isArray(body.hireOnly?.rows))throw Error('Calculation did not match reviewed inputs.');
+   if(!readWorkforceReview(body)||body.version!==1||!body.input||Object.keys(body.input).length!==workforcePlanFields.length||workforcePlanFields.some(key=>body.input[key]!==input[key])||!Array.isArray(body.proposed?.rows)||!Array.isArray(body.hireOnly?.rows))throw Error('Calculation did not match reviewed inputs.');
    const next=completeSolutionRun(current(),started.ticket,[{id:crypto.randomUUID(),kind:'brief',calculator:{name:'single-role-workforce-review',version:'1'},payload:body}],new Date().toISOString());save(next);decisionStore.setField(goalId,'workforceInspection',next.results.at(-1)!.id);setNotice('Calculated comparison saved. Evidence and inputs are retained with this result; no real-world action occurred.');
   }catch(e){if(isHere())setNotice(c.signal.aborted?'Cancelled or timed out; prior results retained.':(e as Error).message)}finally{clearTimeout(timer);if(isHere())save(cancelSolutionRun(current(),started.ticket.id));controller.current=null;setBusy(false)}
  }
@@ -67,10 +69,11 @@ function Workspace({goalId,goalStatement,solution,page,onNavigate}:{goalId:strin
   {goalChanged&&<p className="text-sm">The goal wording changed. Review and save the inputs to bind them to the current goal before calculating or recording approval.</p>}
   {dirty&&<p className="text-sm">Unsaved input changes: save reviewed inputs before recalculating, inspecting another destination or recording approval.</p>}
   {notice&&<p role="status" className="text-sm">{notice}</p>}
+  {result&&!review&&<p role="status" className="text-sm">This saved workforce calculation cannot be read safely. The original record is retained; approval is unavailable. Review saved inputs and calculate explicitly to create a new result.</p>}
   {result&&review&&<section aria-label="Workforce solution calculation" className="space-y-3 border-t pt-4"><h3 className="font-semibold">Calculated decision brief — version {result.version}</h3><p className="text-sm">{currentResult?'Matches current saved inputs.':'Historical result: assumptions changed; recalculate before approval.'} Calculated {new Date(result.completedAt).toLocaleString()}. Outcomes and operational availability remain unverified.</p>
    <p className="text-sm font-medium">{review.input.roles} additional {evidence?.role} positions in {evidence?.businessUnit} · {review.input.planningMonth}, {review.input.months} months. {workforceLimitSummary(review.proposed)}</p>
    <p className="text-xs">This brief describes the selected saved calculation. Customize current inputs to create a new version; no result or approval is updated automatically.</p>
-   <label className="block text-sm">Inspect a saved calculation<select className={control} disabled={dirty||busy} value={result.id} onChange={e=>decisionStore.setField(goalId,'workforceInspection',e.target.value)}>{solution.results.map(item=><option key={item.id} value={item.id}>Version {item.version} — {new Date(item.completedAt).toLocaleString()}</option>)}</select></label>
+   <label className="block text-sm">Inspect a saved calculation<select className={control} disabled={dirty||busy} value={result.id} onChange={e=>decisionStore.setField(goalId,'workforceInspection',e.target.value)}>{results.map(item=><option key={item.id} value={item.id}>Version {item.version} — {new Date(item.completedAt).toLocaleString()}</option>)}</select></label>
    <div className="grid gap-3 lg:grid-cols-2">{[['Your response mix',review.proposed],['Hiring-only comparison',review.hireOnly]].map(([title,raw])=>{const plan=raw as WorkforceIncrement;return <article key={title as string} className="space-y-2 rounded border p-3 text-sm"><h4 className="font-semibold">{title as string}</h4><p>Build {plan.input.build}, Move {plan.input.move}, Buy {plan.input.buy}; external backfills {plan.input.backfills||'0'}.</p><p>Incremental cash: USD {shown(plan.totalCash)}. Employee time value: USD {shown(plan.totalTime)} (separate).</p><p>Hire arrival assumption: {plan.arrivalDate??'Unknown'}. Planned additional employees including backfills: {plan.maxAddedEmployees}.</p><ul className="list-disc pl-5">{plan.checks.map(check=><li key={check.name}>{check.name}: {check.status}</li>)}</ul></article>})}</div>
    <p className="text-sm">Modeled structural annual budget reference: USD {shown(review.structural.authorizedAnnualBudgetDelta as number|null)}. {String(review.structural.costBasisPeriod)}. This is not added to incremental cash.</p>
    <details><summary className="cursor-pointer font-medium">Monthly incremental plan</summary><div className="max-h-80 overflow-auto" tabIndex={0}><table className="min-w-[700px] text-left text-sm"><caption>Proposed mix: conditional role coverage, incremental employees and USD cash. Existing workforce/payroll and unrelated hiring or departures are excluded.</caption><thead><tr>{['Month','Conditional role coverage','Added employees','Incremental cash','Employee time value'].map(x=><th className="p-2" key={x}>{x}</th>)}</tr></thead><tbody>{review.proposed.rows.map(row=><tr key={row.month}><th className="p-2">{row.month}</th><td className="p-2">{shown(row.conditionalRoleCoverage)}</td><td className="p-2">{shown(row.addedEmployees)}</td><td className="p-2">{shown(row.incrementalCash)}</td><td className="p-2">{shown(row.employeeTimeValue)}</td></tr>)}</tbody></table></div></details>

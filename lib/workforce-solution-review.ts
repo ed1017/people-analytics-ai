@@ -1,7 +1,11 @@
 import type {Json} from "./local-decisions";
 import type {WorkforceIncrement, WorkforcePlanInput} from "./workforce-increment";
 // @ts-expect-error Native Node tests use the same TypeScript source.
-import {currentSolutionVersion, solutionResultIsCurrent, type WorkforceSolution} from "./workforce-solution.ts";
+import {currentSolutionVersion, solutionResultIsCurrent, readWorkforceSolution, solutionSections, type WorkforceSolution, type ResultSnapshot} from "./workforce-solution.ts";
+// @ts-expect-error Native Node tests use the same TypeScript source.
+import {validateWorkforcePlanInput, workforcePlanFields, planDate} from "./workforce-increment.ts";
+// @ts-expect-error Native Node tests use the same TypeScript source.
+import {validateJson} from "./local-decisions.ts";
 
 export type WorkforceReview = {
   version: number;
@@ -22,6 +26,41 @@ const record = (value: unknown): Record<string, unknown> =>
 const rows = (value: unknown) => Array.isArray(value) ? value.map(record) : [];
 const count = (value: unknown) => typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
 const text = (value: unknown) => typeof value === "string" && value.trim() ? value : null;
+
+export function readWorkforceReview(raw: unknown): WorkforceReview | null {
+  try {
+    if (!validateJson(raw)) return null;
+    const value = record(raw), input = validateWorkforcePlanInput(value.input);
+    const object = (item: unknown) => item !== null && typeof item === "object" && !Array.isArray(item);
+    const amount = (item: unknown) => item === null || typeof item === "number" && Number.isFinite(item) && item >= 0;
+    const strings = (item: unknown) => Array.isArray(item) && item.length <= 100 && item.every(part => typeof part === "string");
+    const date = (item: unknown) => item === null || typeof item === "string" && planDate(item) !== null;
+    if (value.version !== 1 || typeof value.calculatedAt !== "string" || !Number.isFinite(Date.parse(value.calculatedAt)) || !object(value.source) || !object(value.response) || !object(value.structural) || value.timing !== null && !object(value.timing) || !strings(value.limitations)) return null;
+    const structural = record(value.structural), response = record(value.response);
+    if (!amount(structural.authorizedAnnualBudgetDelta) || typeof structural.costBasisPeriod !== "string" || response.warnings !== undefined && !strings(response.warnings)) return null;
+    const checkNames = ["Incremental cash budget", "Maximum added employees", "Conditional role coverage by deadline"];
+    const rowFields = ["externalHires", "externalBackfills", "addedEmployees", "conditionalRoleCoverage", "remainingRoles", "hireStaffingCost", "backfillStaffingCost", "internalSalaryUplift", "recruitingFees", "trainingCash", "employeeTimeValue", "incrementalCash"];
+    for (const [key, expectedInput] of [["proposed", input], ["hireOnly", {...input, build: "0", move: "0", buy: input.roles, backfills: "0", internalAnnualCostChange: "0", trainingCash: "0", trainingHours: "0"}]] as const) {
+      const plan = record(value[key]), planInput = validateWorkforcePlanInput(plan.input);
+      if (plan.version !== 1 || workforcePlanFields.some(field => planInput[field] !== expectedInput[field]) || !["totalCash", "totalTime", "totalWithTime"].every(field => amount(plan[field])) || typeof plan.maxAddedEmployees !== "number" || !Number.isSafeInteger(plan.maxAddedEmployees) || plan.maxAddedEmployees < 0 || !date(plan.arrivalDate) || !date(plan.backfillArrival) || !["unknown", "explicit", "historical-median"].includes(String(plan.arrivalBasis)) || !strings(plan.warnings)) return null;
+      if (!Array.isArray(plan.checks) || plan.checks.length !== 3 || !plan.checks.every((check, i) => object(check) && check.name === checkNames[i] && ["met", "not met", "unknown"].includes(check.status))) return null;
+      if (!Array.isArray(plan.rows) || plan.rows.length !== Number(input.months) || !plan.rows.every(row => object(row) && typeof row.month === "string" && planDate(row.month + "-01") !== null && rowFields.every(field => amount(row[field])))) return null;
+    }
+    // Historical cash snapshots keep their original rounding conventions. This
+    // reader validates shape; it never silently recomputes or rewrites them.
+    return raw as WorkforceReview;
+  } catch {return null}
+}
+
+export function readSavedWorkforceReview(solution: WorkforceSolution, result: ResultSnapshot): WorkforceReview | null {
+  const review = readWorkforceReview(result.payload), version = solution.versions.find(item => item.version === result.version);
+  if (!review || !version || result.kind !== "brief" || result.calculator.name !== "single-role-workforce-review") return null;
+  for (const field of workforcePlanFields) {
+    const matches = solutionSections.filter(section => Object.hasOwn(version.inputs[section], field));
+    if (matches.length !== 1 || version.inputs[matches[0]][field] !== review.input[field]) return null;
+  }
+  return review;
+}
 
 // Present only the selected, immutable calculation payload. No current page
 // data or global filters may silently replace evidence in a saved decision.
@@ -72,12 +111,14 @@ export function workforceLimitSummary(plan: WorkforceIncrement) {
 
 // The decision-notes page inspects the same selected calculation as Home.
 // It does not copy outputs into editable notes or create a second approval.
-export function selectedWorkforceBrief(solution: WorkforceSolution | undefined, selectedId: unknown, goalStatement: string) {
-  if (!solution) return null;
+export function selectedWorkforceBrief(raw: unknown, selectedId: unknown, goalStatement: string, expectedGoalId?: string) {
+  const solution = readWorkforceSolution(raw);
+  if (!solution || expectedGoalId !== undefined && solution.goalId !== expectedGoalId) return null;
   const results = solution.results.filter(result => result.kind === "brief" && result.calculator.name === "single-role-workforce-review");
   const result = results.find(item => item.id === selectedId) ?? results.at(-1);
   if (!result) return null;
-  const review = result.payload as unknown as WorkforceReview;
+  const review = readSavedWorkforceReview(solution, result);
+  if (!review) return null;
   return {
     result, review, evidence: workforceReviewEvidence(review), count: results.length,
     current: currentSolutionVersion(solution).inputs.scope.goalStatement === goalStatement && solutionResultIsCurrent(solution, result),

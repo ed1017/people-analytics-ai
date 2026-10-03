@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createWorkforceSolution,emptySolutionInputs,currentSolutionVersion,reviseWorkforceSolution,attachSolutionEvidence,beginSolutionRun,completeSolutionRun,cancelSolutionRun,solutionResultIsCurrent,recordSolutionApproval,solutionInspection} from '../lib/workforce-solution.ts';
+import {readWorkforceSolution,createWorkforceSolution,emptySolutionInputs,currentSolutionVersion,reviseWorkforceSolution,attachSolutionEvidence,beginSolutionRun,completeSolutionRun,cancelSolutionRun,solutionResultIsCurrent,recordSolutionApproval,solutionInspection} from '../lib/workforce-solution.ts';
 import {DecisionStore,encodeDecisions,parseDecisions} from '../lib/local-decisions.ts';
 const at='2026-10-03T01:00:00.000Z';
 const make=()=>createWorkforceSolution('solution-a','goal-a',{...emptySolutionInputs(),scope:{jobProfile:'ENGINEER',businessUnit:'TECH'},demand:{additionalRoles:3,intent:'additional'},response:{build:1,move:1,buy:1},costs:{annualHireCost:null,currency:'USD'},timing:{startLagDays:null},constraints:{budget:null},training:{}},at);
@@ -101,4 +101,29 @@ test('inspection retains a still-valid cost result after a timing-only edit',()=
  const view=solutionInspection(next,2);
  assert.deepEqual(view.results.map(r=>r.kind),['costs']);assert.equal(view.results[0].version,1);
  assert.equal(solutionInspection(next,1).results.length,3);
+});
+test('reload reader validates lifecycle references without rewriting valid historical state',()=>{
+ let state=attachSolutionEvidence(make(),1,evidence('e'),null,at);state=run(state);
+ state=recordSolutionApproval(state,2,'approval-a',state.results.map(r=>r.id),'Reviewed',at);
+ state=reviseWorkforceSolution(state,2,{timing:{startLagDays:14}},'sidebar','Changed timing',at);
+ state=recordSolutionApproval(state,3,'approval-b',['run-a-costs'],'Cost unchanged',at);
+ const raw=JSON.parse(JSON.stringify(state));assert.deepEqual(readWorkforceSolution(raw),state);
+ assert.deepEqual(readWorkforceSolution(beginSolutionRun(state,3,'pending',['brief'],at).state)?.pending.id,'pending');
+ for(const mutate of [s=>s.versions=[],s=>s.results=null,s=>s.versions[0].inputs=null,s=>s.versions[1].version=9,s=>s.versions[1].evidenceIds=['missing'],s=>s.evidence[0].asOf='2026-02-30',s=>s.evidence[0].limitations=null,s=>s.results[0].dependencyKey='forged',s=>s.results[0].runId='missing',s=>s.results[1].id=s.results[0].id,s=>s.results[1].kind=s.results[0].kind,s=>s.approvals[0].resultIds=['missing'],s=>s.runs[0].goalId='other',s=>s.pending=s.runs[0]]){
+  const bad=structuredClone(state);mutate(bad);const before=JSON.stringify(bad);assert.equal(readWorkforceSolution(bad),null);assert.equal(JSON.stringify(bad),before);
+ }
+});
+test('checksum-valid malformed workforce JSON is rejected by domain reader and retained in storage',()=>{
+ const bad={schemaVersion:1,id:'solution-a',goalId:'goal-a',versions:[]};
+ const data={version:1,revision:1,goals:{version:1,activeId:'goal-a',goals:[{id:'goal-a',statement:'Workforce decision'}]},workspaces:{'goal-a':{savedAt:at,fields:{workforceSolution:bad,brief:{owner:'Keep owner'}}}}};
+ const restored=parseDecisions(encodeDecisions(data));assert.deepEqual(restored,data);assert.equal(readWorkforceSolution(restored.workspaces['goal-a'].fields.workforceSolution),null);
+});
+test('reload cannot approve a future result whose old input values happen to recur',()=>{
+ let s=run(make());s=reviseWorkforceSolution(s,1,{timing:{startLagDays:14}},'sidebar','Change timing',at);
+ s=reviseWorkforceSolution(s,2,{timing:{startLagDays:null}},'sidebar','Restore timing',at);s=run(s,['timing'],'run-b');
+ s.approvals.push({id:'forged',version:1,resultIds:['run-b-timing'],text:'Future approval',recordedAt:at});assert.equal(readWorkforceSolution(s),null);
+});
+test('a cancelled run cannot complete over a newer pending run even when inputs match',()=>{
+ const a=beginSolutionRun(make(),1,'a',['costs'],at),cancelled=cancelSolutionRun(a.state,'a'),b=beginSolutionRun(cancelled,1,'b',['costs'],at);
+ assert.throws(()=>completeSolutionRun(b.state,a.ticket,[{id:'late',kind:'costs',calculator:{name:'fixture',version:'1'},payload:{value:1}}],at),/superseded/);assert.equal(b.state.pending.id,'b');assert.equal(b.state.results.length,0);
 });
