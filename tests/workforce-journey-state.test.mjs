@@ -69,3 +69,10 @@ test('projection is deterministic, non-mutating and does not repair ambiguous sa
  const r=records(true),before=structuredClone(r);assert.deepEqual(select(r),select(r));assert.deepEqual(r,before);
  const duplicate=records();duplicate.solution.versions[0].inputs.costs.budget='2';assert.equal(select(duplicate).step,'unavailable');
 });
+
+test('tailoring mix-total corrections target an editable count while main drafts can edit demand',()=>{
+ const r=records(true),input={...base,build:'2'},before=structuredClone(r);
+ assert.deepEqual(select(r,transient(r,{kind:'tailoring',input,preview:'needed'}),context(r)).focus,{kind:'field',field:'build'});
+ assert.deepEqual(select(r,transient(r,{kind:'input-draft',input})).focus,{kind:'field',field:'roles'});
+ assert.deepEqual(r,before);
+});

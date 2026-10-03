@@ -111,3 +111,50 @@ explicitly open the new assumptions disclosure when exercising its controls.
 All browser APIs were synthetic/intercepted; no live agent, model, authentication or
 database requests were used. No push, PR update, merge or deployment is part of this
 slice. Independent review and hosted/physical-device acceptance remain release gates.
+
+## Independent review against the release candidate
+
+Reviewed exact `c2943d0540621d65d67f1d85fab8c7c407699477` against
+`134c04def4b60036955c78b57559782e94b7f9d9` on the separate local branch
+`review/workforce-journey-independent`. Two P2 defects were reproduced before fixing:
+
+- A what-if whose Build + Move + Buy exceeded demand directed Continue to the
+  fixed role-demand field, which does not exist in that editor. The selector now
+  chooses an editable correction field. A unit regression distinguishes the
+  what-if target (Build) from the main-input target (role demand); keyboard browser
+  regressions exercise both tested widths without saving anything.
+- A delayed calculation could append a result after a synchronous A → B → A goal
+  switch. React batched away the intermediate goal, bypassing the existing unmount
+  cancellation. The workspace now observes store transitions and aborts the pending
+  request when its goal or wording changes. The browser regression originally
+  produced two results; after the fix it retains one and clears the pending ticket.
+  This closes an existing cancellation weakness exposed by the journey review.
+
+Final local validation: 457 unit tests; ESLint; standalone TypeScript; genuine
+optimized Next build; whitespace checks. All 563 combined browser assertions passed:
+62 journey, 100 cards, 54 intake, 98 built workspace, 48 readiness, 44 goal copy,
+62 local search, 50 handoff, 11 selection, 24 lifecycle and 10 portable fixture.
+The portable fixture first timed out waiting for its save control while the suites
+ran concurrently; an isolated rerun passed all ten checks. No product change was
+made for that timeout. The original failure and successful rerun were retained.
+
+Evidence in this execution workspace: `/tmp/journey-independent-unit.log`,
+`/tmp/journey-independent-{lint,ts,build}.log`,
+`/tmp/journey-independent-browser-*.log`, and
+`/tmp/journey-independent-workspace/results.json`. Before-fix reproductions are
+`/tmp/journey-independent-before.log` and
+`/tmp/journey-independent-roundtrip-before.log`.
+
+Source inspection and synthetic browser coverage support explicit-only actions,
+optional unknowns, historical/missing selection honesty, mounted draft preservation,
+alternative review, and retained result/pin/approval boundaries. No new API, auth,
+model, storage schema, permissions or eNPS changes were introduced. Browser requests
+were intercepted synthetic fixtures; no live service acceptance was performed.
+Linux Chromium desktop and Pixel viewport/touch emulation are not physical Windows
+or Android validation. Hosted and physical-device acceptance remain outstanding.
+The release branch and PR99 were not updated, pushed, merged or deployed by this review.
+
+For acceptance, repeat the six steps above, additionally entering an invalid what-if
+mix and checking Continue focuses an editable count; cancel or switch goals during a
+delayed mocked calculation and verify no new result; then explicitly save, pin,
+reload and reopen the exact saved version while checking original approval notes.
