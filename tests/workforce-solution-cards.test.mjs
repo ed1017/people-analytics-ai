@@ -113,5 +113,5 @@ test('verified count replay preserves invalid attempts and output cap without co
  const context={solution,activeGoalId:solution.goalId,activeGoalStatement:'Synthetic bounded workforce comparison',evidenceResultId:'source-result',expectedSearchFingerprint:report.searchFingerprint,hasUnsavedPlanEdits:false};
  const review=await previewWorkforceSearchReview(context,revisions,originForSelection(report,ids,revisions),'count-review',at),cards=await loadSolutionCards(solution,'source-result',[review]);
  assert.equal(cards.searchSummary.enumerated,10);assert.equal(cards.searchSummary.calculatorInvocations,11);assert.equal(cards.searchSummary.counts.invalid,1);assert.equal(cards.searchSummary.omittedByCap,6);
- const copy=workforceSearchCountCopy(cards.searchSummary,cards.cards.length);assert.equal(copy.headline,'2 options to review • Output capped');assert.match(copy.detail,/9 calculated, 1 invalid/);assert.equal(JSON.stringify(solution),before);
+ const copy=workforceSearchCountCopy(cards.searchSummary);assert.equal(copy.headline,'Saved search output capped');assert.match(copy.detail,/9 calculated, 1 invalid/);assert.equal(JSON.stringify(solution),before);
 });

@@ -73,24 +73,24 @@ function Cards({solution,resultId,blocked,onDraftChange,onVerified,onReviewScope
   catch(error){if(!controller.signal.aborted)setNotice((error as Error).message)}finally{if(operation.current===controller){operation.current=null;setWorking(false)}}
  }
  const shown=preview?.cards??snapshot?.cards??[],ranked=rankSolutionCards(shown,priority);
- const countCopy=workforceSearchCountCopy(snapshot?.searchSummary??null,shown.length);
+ const countCopy=workforceSearchCountCopy(snapshot?.searchSummary??null);
  const sourceResult=solution.results.find(r=>r.id===resultId),historical=!sourceResult||sourceResult.version!==solution.versions.at(-1)?.version||!solutionResultIsCurrent(solution,sourceResult)||storage.data.goals.goals.find(g=>g.id===solution.goalId)?.statement!==solution.versions.at(-1)?.inputs.scope.goalStatement;
  return <section aria-label="Workforce solution options" className="min-w-0 space-y-3 text-sm">
-  <h4 className="font-semibold">Compare solution options</h4>
-  {snapshot&&<div className="rounded-lg bg-muted p-3"><p className="text-lg font-semibold">{draft?`${shown.length} options to review • Temporary what-if`:countCopy.headline}</p>{snapshot.searchSummary&&<details><summary className="min-h-11 cursor-pointer py-2 text-sm">Saved search count and scope</summary><p>{countCopy.detail}</p><p>Counts describe the original saved search before any later edits. Saved alternatives may have been customized after selection; a what-if does not rerun these bounds.</p></details>}</div>}
+  <h4 className="font-semibold">{(!draft||preview)&&ranked.preferred?'Recommended option and alternatives':'Suggested options'}</h4>
+  {snapshot&&<p>{shown.length} options to review{draft?' • Temporary what-if':''}</p>}
   {!storage.saved&&<p role="alert">This working copy is not saved. The previous durable record remains intact. {storage.notice}</p>}
-  <p>{historical?'Historical saved options — tailoring unavailable.':'Saved options with retained evidence.'} Candidate pools are not assignable capacity. Preference and pins do not record approval.</p>
+  <p>{historical?'Historical saved options — tailoring unavailable.':'Saved options with retained evidence.'} Preference and pins do not record approval.</p>
   <label className="block">Your comparison priority<select aria-label="Your comparison priority" className={control} value={priority} disabled={invalid||blocked||!storage.saved} onChange={e=>{cancelOperation();setPreview(null);if(draft)setWorking(true);setPriority(e.target.value as CardPriority)}}><option value="">Choose a priority — neutral options</option>{Object.entries(cardPriorities).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
   <p>{draft&&!preview?'Temporary inputs are not yet verified. Saved baseline amounts below are not current what-if results.':ranked.message}</p>
+  <p>Scenario estimate under user assumptions — not a validated forecast.</p>
   <div className="space-y-3">{ranked.cards.map((card,index)=>{
    const baseline=snapshot?.cards.find(c=>c.id===card.id),plan=card.plan,outcome=workforceScenarioOutcomes(plan);
    const editBlocked=blocked||invalid||!storage.saved||historical||!!draft&&draft.cardId!==card.id;
    const editField=(field:WorkforcePlanField)=>{if(editBlocked)return;draftTrigger.current=document.activeElement as HTMLButtonElement;if(!draft)edit(card.id,{...card.input});setFocusRequest(before=>({field,sequence:(before?.sequence??0)+1}))};
    return <article key={card.id} aria-label={card.title} className="min-w-0 space-y-2 rounded-lg border p-3">
-    <h5 className="font-semibold">Option {index+1}: {card.title}{(!draft||preview)&&ranked.preferred===card.id?' — Preferred under your selected priority':''}</h5>
+    <h5 className="font-semibold">Option {index+1}: {card.title}{(!draft||preview)&&ranked.preferred===card.id&&priority?` — Recommended for ${cardPriorities[priority].toLowerCase()}`:''}</h5>
     <p>{preview?'Temporary recalculation':'Saved baseline'} · Build {plan.input.build}, Move {plan.input.move}, Buy {plan.input.buy}; backfills {plan.input.backfills||'0'}.</p>
     <p>Incremental cash: USD {amount(plan.totalCash)} · Employee time value: USD {amount(plan.totalTime)} (separate).</p>
-    <p className="font-medium">Scenario estimate under user assumptions — not a validated forecast.</p>
     <p>Coverage by {outcome.deadline??'an unspecified deadline'}: {amount(outcome.covered)} of {outcome.roles} roles; remaining gap: {amount(outcome.remaining)}.</p>
     <p>Added employees including backfills: {plan.maxAddedEmployees} · Full conditional coverage: {fullCoverage(plan)??'Unknown / not reached'}.</p>
     {preview&&baseline&&<p>Change from this option&apos;s saved baseline: cash {plan.totalCash===null||baseline.plan.totalCash===null?'Unknown':`USD ${amount(plan.totalCash-baseline.plan.totalCash)}`}; employee time {plan.totalTime===null||baseline.plan.totalTime===null?'Unknown':`USD ${amount(plan.totalTime-baseline.plan.totalTime)}`}; added employees {plan.maxAddedEmployees-baseline.plan.maxAddedEmployees}; coverage {fullCoverage(baseline.plan)??'Unknown'} → {fullCoverage(plan)??'Unknown'}.</p>}
@@ -108,6 +108,7 @@ function Cards({solution,resultId,blocked,onDraftChange,onVerified,onReviewScope
 
    </article>;
   })}</div>
+  {snapshot?.searchSummary&&<div className="text-sm text-foreground">{!draft&&countCopy.headline&&<p>{countCopy.headline}</p>}<details><summary className="min-h-11 cursor-pointer py-2">Saved search count and scope</summary><p>{countCopy.detail}</p><p>Counts describe the original saved search before any later edits. Saved alternatives may have been customized after selection; a what-if does not rerun these bounds.</p></details></div>}
   {snapshot?.alternative&&<details><summary className="min-h-11 cursor-pointer py-2">Hiring-only benchmark</summary><p>Incremental cash USD {amount((preview?.benchmark??snapshot.benchmark).plan.totalCash)}; employees {(preview?.benchmark??snapshot.benchmark).plan.maxAddedEmployees}; conditional coverage {fullCoverage((preview?.benchmark??snapshot.benchmark).plan)??'Unknown'}.</p><ul>{(preview?.benchmark??snapshot.benchmark).plan.checks.map(check=><li key={check.name}>{check.name}: {check.status}</li>)}</ul></details>}
   {draft&&<section aria-label="Tailor selected option" className="space-y-3 rounded border p-3">
    <h5 className="font-semibold">Temporary what-if — {snapshot?.cards.find(c=>c.id===draft.cardId)?.title}</h5><p>Role, BU, additional-role demand and horizon stay fixed. Shared fields apply to every compared option. Blank values stay unknown. Counts must sum to the saved role demand.</p>
