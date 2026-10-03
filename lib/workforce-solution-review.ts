@@ -1,9 +1,10 @@
+import type {RecruitingTimingEvidence} from "./recruiting-timing";
 import type {Json} from "./local-decisions";
 import type {WorkforceIncrement, WorkforcePlanInput} from "./workforce-increment";
 // @ts-expect-error Native Node tests use the same TypeScript source.
 import {currentSolutionVersion, solutionResultIsCurrent, readWorkforceSolution, solutionSections, type WorkforceSolution, type ResultSnapshot} from "./workforce-solution.ts";
 // @ts-expect-error Native Node tests use the same TypeScript source.
-import {validateWorkforcePlanInput, workforcePlanFields, planDate} from "./workforce-increment.ts";
+import {validateWorkforcePlanInput, workforcePlanFields, planDate, calculateWorkforceIncrement, workforceIncrementMethodVersion} from "./workforce-increment.ts";
 // @ts-expect-error Native Node tests use the same TypeScript source.
 import {validateJson} from "./local-decisions.ts";
 
@@ -58,6 +59,25 @@ export function readSavedWorkforceReview(solution: WorkforceSolution, result: Re
   for (const field of workforcePlanFields) {
     const matches = solutionSections.filter(section => Object.hasOwn(version.inputs[section], field));
     if (matches.length !== 1 || version.inputs[matches[0]][field] !== review.input[field]) return null;
+  }
+  if (Object.hasOwn(result.payload, "localWhatIf")) {
+    try {
+      const origin = record(result.payload.localWhatIf);
+      const keys = ["schemaVersion","kind","sourceGoalId","sourceSolutionId","sourceVersion","sourceResultId","sourceHash","alternativeReviewId","alternativeSlot","alternativeHash","searchFingerprint","method","changedFields","priority"];
+      if (Object.keys(origin).length !== keys.length || !keys.every(key => Object.hasOwn(origin,key)) || origin.schemaVersion !== 1 || origin.kind !== "local-what-if" || origin.sourceGoalId !== solution.goalId || origin.sourceSolutionId !== solution.id || origin.method !== workforceIncrementMethodVersion || !["","cash","employees","coverage"].includes(String(origin.priority))) return null;
+      const source = solution.results.find(item => item.id === origin.sourceResultId);
+      if (!source || source.version !== origin.sourceVersion || source.version >= result.version) return null;
+      const previous = readSavedWorkforceReview(solution, source);
+      if (!previous || !["businessUnit","jobProfile","intent","roles","planningMonth","months"].every(key => previous.input[key as keyof WorkforcePlanInput] === review.input[key as keyof WorkforcePlanInput])) return null;
+      const equal = (a:unknown,b:unknown) => JSON.stringify(a) === JSON.stringify(b);
+      if (!["source","structural","response","timing","limitations"].every(key => equal(previous[key as keyof WorkforceReview],review[key as keyof WorkforceReview])) || !equal(source.evidenceIds,result.evidenceIds)) return null;
+      if (!equal(origin.changedFields,workforcePlanFields.filter(key => previous.input[key] !== review.input[key])) || !(origin.changedFields as unknown[]).length) return null;
+      const hash = (value:unknown) => typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
+      if (!hash(origin.sourceHash) || origin.alternativeHash !== null && !hash(origin.alternativeHash) || origin.searchFingerprint !== null && !hash(origin.searchFingerprint)) return null;
+      if (origin.alternativeReviewId === null ? origin.alternativeSlot !== null : typeof origin.alternativeReviewId !== "string" || !/^[a-zA-Z0-9-]{1,80}$/.test(origin.alternativeReviewId) || ![0,1].includes(Number(origin.alternativeSlot))) return null;
+      const timing = review.timing as RecruitingTimingEvidence|null;
+      if (!equal(review.proposed,calculateWorkforceIncrement(review.input,timing)) || !equal(review.hireOnly,calculateWorkforceIncrement({...review.input,build:"0",move:"0",buy:review.input.roles,backfills:"0",internalAnnualCostChange:"0",trainingCash:"0",trainingHours:"0"},timing))) return null;
+    } catch {return null}
   }
   return review;
 }
