@@ -111,3 +111,44 @@ tests), full ESLint and standalone TypeScript pass, and the genuine optimized Ne
 production build passes. No browser behavior changed, so no browser coverage is
 claimed for this Node-only addition. The four new files leave the existing evaluator,
 journey/release branches, routes, schemas and held eNPS files unchanged.
+
+## Independent local review
+
+Reviewed exact `e0b61a8b497164a653c914d999631056f0aa982d` against
+`134c04def4b60036955c78b57559782e94b7f9d9` on the separate local branch
+`review/hiring-acceptance-independent`. No correctness defect requiring a production
+code change was found. The acceptance module and existing evaluator remain unchanged.
+
+Five additional adversarial tests establish that:
+
+- Improving against each baseline on two different sets of development folds is
+  insufficient: two of the same folds must improve against both. A constructed
+  crossing-baseline fixture fails only the paired development-improvement gate.
+- Either penalty 0.1 or 10 can win when uniquely selected by development MAE;
+  penalty 1 is not implicitly preferred.
+- Changing holdout labels changes holdout metrics but cannot change development
+  selection, development metrics, frozen windows or training baselines.
+- Missing rolling-baseline evidence blocks acceptance while retaining the available
+  expanding baseline; no fallback makes the missing comparison pass.
+- Malformed nested artifacts and cross-fold scoring/training IDs fail closed.
+
+These complement the original threshold, zero-error, nonfinite, leakage, provenance,
+immutability and exact-cohort tests. Source inspection confirms that thresholds match
+the held specification and no product module imports this gate. The acceptance result
+still cannot verify source declarations, actual fitting/preprocessing, a prior settings
+lock or an untouched holdout. It keeps `modelTrained` and `deploymentValidated` false.
+
+Independent validation: 48 focused evaluation/acceptance tests and all 468 repository
+unit tests pass; full ESLint, standalone TypeScript, genuine optimized Next build and
+whitespace checks pass. Logs are `/tmp/hiring-independent-focused.log`,
+`/tmp/hiring-independent-unit.log`, `/tmp/hiring-independent-lint.log`,
+`/tmp/hiring-independent-ts.log` and `/tmp/hiring-independent-build.log` in the review
+workspace. This Node-only review has no browser/device or live-service validation.
+
+Acceptance: run the focused command above, then inspect a passing fixture's synthetic
+status and false training/deployment flags; change the selected holdout penalty or
+inject a scored ID into training and confirm rejection; remove rolling-window evidence
+and confirm a blocked retained-baseline report. These are mechanics checks, not model
+performance evidence. No fitting, data acquisition, live API/auth/model/database calls,
+push, PR update, merge or deployment occurred. PR99, the release branch, the verified
+journey candidate and held eNPS work are preserved.
