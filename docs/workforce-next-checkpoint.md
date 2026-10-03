@@ -102,3 +102,41 @@ Publication is a new branch and draft PR only. Do not merge until the exact new 
 hosted preview and required-check evidence are verified. The earlier hosted results
 support runtime equivalence but do not replace that release gate. No denied status API
 is retried and no production deployment is part of this preparation.
+
+## PR100 integration of reviewed contextual prompts
+
+The prior PR100 head `be582c66b183c3d590d0b515e4d5a110d282139e` is preserved locally
+as `preserved/pr100-be582c66`. Integration starts directly from that head. Patch-identity
+inspection found only `2e38e7a40a77a0f0253e85cc595ab81d34136235` and
+`7bc8bf4688300ef2f94d6fc124975706ba016c93` unique to the reviewed prompt branch;
+the eight earlier journey/ML checkpoint patches were already present. The two prompt
+commits applied without conflicts. There is no duplicate integration of those patches.
+
+The resulting app/components and contextual selector are byte-identical to the
+hosted-accepted prompt review `7bc8bf4`. The parent reports acceptance passed at
+`https://people-analytics-5fpr5fjcf-ed-56dc.vercel.app/` for goal/page relevance,
+missing evidence, draft-only examples, protected typing, rapid goal draft restoration
+and Continue focus. That supports source equivalence; it does not replace acceptance
+of the new exact PR100 preview. PR100's existing isolated ML acceptance/preflight
+source remains unchanged. Ridge fitting and subsequent holdout work are not included.
+
+The prompt UI proposes editable questions rather than executing requests. The reviewed
+fix rechecks goal ownership and actual queued draft state so a stale example cannot
+overwrite a newly restored or typed draft. Existing Send, Calculate, Save and approval
+actions remain explicit. See [prompt review](contextual-prompt-suggestions.md).
+
+Combined validation: 495 unit tests, 643 browser assertions, full ESLint, standalone
+TypeScript, genuine optimized Next build, whitespace and cumulative privacy/held-file
+audits pass. Logs are `/tmp/pr100-integrated-{unit,lint,ts,build}.log`,
+`/tmp/pr100-integrated-browser-*.log`, and
+`/tmp/pr100-integrated-workspace/results.json`. Tests use intercepted synthetic APIs
+and Linux Chromium/Pixel emulation; no physical-device or actual-model claim is made.
+The portable fixture initially timed out waiting for Save reviewed alternatives during
+the concurrent run; its isolated rerun passed all ten checks. Both logs are retained
+(`workforce-device-fixture` and `workforce-device-fixture-rerun`); no product change
+was made for that timeout.
+
+Publication is a normal fast-forward of PR100's branch plus an updated draft description,
+not a merge. All source branches remain preserved. Wait for the new exact hosted
+preview and required-check screenshot before merging. No denied check-status API is
+retried, and no production change is authorized by this checkpoint update alone.
