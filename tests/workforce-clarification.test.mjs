@@ -43,3 +43,26 @@ test('echoed saved assumptions are validated but do not create reviewable change
  const r=validateClarificationResult(response([{field:'roles',value:'4',evidence:'4'}]),saved,catalog);
  assert.deepEqual(r.changes,[]);assert.equal(r.draft.roles,'4');
 });
+
+test('reported sparse natural-month intake retains explicit zeros and missing assumptions without calculating',()=>{
+ const input={goal:'Review synthetic additional positions',statement:'SYNTHETIC DISPOSABLE TEST, review only. Plan 2 additional AI Engineer positions in Data & AI, starting January 2027 over 12 months, with coverage required by December 2027. Compare 0 Build, 0 Move and 2 external hires; assume 0 backfills. Hiring arrival dates, costs and budget are unknown. Propose inputs and ask about missing assumptions. Do not save inputs, run calculations or approve actions.',inputs:emptyWorkforcePlanInput()};
+ const source={business_units:[{org_code:'DATA_AI',org_name:'Data & AI'}],job_profiles:[{job_profile_code:'AI_ENGINEER',job_profile_name:'AI Engineer'}],combinations:[{org_code:'DATA_AI',job_profile_code:'AI_ENGINEER'}]};
+ const changes=[['businessUnit','DATA_AI','Data & AI'],['jobProfile','AI_ENGINEER','AI Engineer'],['intent','additional','additional'],['roles','2','2 additional'],['planningMonth','2027-01','January 2027'],['months','12','12 months'],['deadlineMonth','2027-12','December 2027'],['build','0','0 Build'],['move','0','0 Move'],['buy','2','2 external hires'],['backfills','0','0 backfills']].map(([field,value,evidence])=>({field,value,evidence}));
+ const before=structuredClone(input),result=validateClarificationResult(response(changes),input,source);
+ assert.equal(result.draft.planningMonth,'2027-01');assert.equal(result.draft.deadlineMonth,'2027-12');
+ for(const key of ['build','move','backfills'])assert.equal(result.draft[key],'0');
+ for(const key of ['arrivalMode','arrivalDate','recruitingStart','annualHireCost','hireFee','budget','maxAddedEmployees','trainingCash'])assert.equal(result.draft[key],'');
+ assert.deepEqual(input,before);assert.ok(!Object.hasOwn(result,'proposed'));assert.match(clarificationRequest(input,source).instructions,/Omit unknown fields/);
+});
+test('natural-month normalization never infers a year, quarter, day or ambiguous date',()=>{
+ for(const [evidence,field,value] of [['January','planningMonth','2027-01'],['Q1 2027','planningMonth','2027-01'],['01/02/2027','planningMonth','2027-01'],['January 2027 or February 2027','planningMonth','2027-01'],['January 2027','arrivalDate','2027-01-01'],['January 2027','planningMonth','2027-02']]){
+  assert.throws(()=>validateClarificationResult(response([{field,value,evidence}]),{...request,statement:evidence},catalog),/grounded/);
+ }
+ assert.equal(validateClarificationResult(response([{field:'planningMonth',value:'2027-01',evidence:'2027-01'}]),{...request,statement:'Start 2027-01'},catalog).draft.planningMonth,'2027-01');
+});
+test('only fixed non-sensitive diagnostic stages can appear in clarification errors',async()=>{
+ const {clarificationFailureMessage}=await import('../lib/workforce-clarification.ts');
+ for(const diagnostic of ['model-unavailable','invalid-model-json','invalid-model-proposal-5-planningMonth-value-not-supported'])assert.ok(clarificationFailureMessage({diagnostic}).includes(`Diagnostic: ${diagnostic}`));
+ for(const diagnostic of ['secret-value','invalid-model-proposal-5-apiKey-value-not-supported','model-unavailable secret'])assert.ok(!clarificationFailureMessage({diagnostic,error:'private payload'}).includes('Diagnostic:'));
+ assert.ok(!clarificationFailureMessage({error:'private payload'}).includes('private payload'));
+});

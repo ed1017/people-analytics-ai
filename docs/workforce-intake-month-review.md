@@ -1,0 +1,11 @@
+# Sparse intake month review
+
+A reported one-submit failure on the `aae644b` preview was reproduced locally at the grounding-validator boundary with synthetic model responses. No live request, preview log, authentication diagnosis or source-data change was used.
+
+The exact English date phrases “January 2027” and “December 2027” were rejected when a valid model proposal represented them as `2027-01` and `2027-12`. The old validator required the ISO value to occur literally in the exact evidence quote. The prompt asked the model to emit ISO months, creating a representation mismatch. This is a proven defect, not proof of the deployed response or sole cause of its failure. A model/schema/transport failure remains distinguishable only with the existing fixed server diagnostic stage; the UI previously hid that stage.
+
+The fix accepts a full English month name plus explicit four-digit year only when the exact evidence quote identifies one unique month. It does not infer years, days, quarters or ambiguous numeric dates. Unknown fields remain omitted and blank; explicitly stated zero Build, Move and backfills survive. No input is saved or calculated. The existing planning envelope and catalog projection are unchanged. The prompt now explicitly says to omit unknown/empty changes. The UI displays only allowlisted fixed stage/field codes, never response bodies or arbitrary errors.
+
+Validation: 11 clarification unit tests pass. The regression uses the reported statement with rendered `Data & AI` and a synthetic supported catalog; the delegation's `&amp;` is treated as the HTML representation of that label. No actual deployed response was available. A separate test proves missing timing/cost/budget remain blank and that source input is immutable; ambiguous dates, missing years and day inference are rejected. Diagnostic allowlist tests reject arbitrary payload strings.
+
+Parent acceptance after review: submit the same synthetic statement once; inspect tentative January/December month proposals, 12-month horizon, 2 additional roles and explicit 0/0/2 mix with 0 backfills. Missing cost, budget and arrival fields must remain blank. If it fails, report only the fixed diagnostic code. Do not save, calculate or approve as part of this intake check. Parent controls any new preview test.
