@@ -1,3 +1,4 @@
+import { summarizeRecruitingTiming } from "./recruiting-timing";
 import { calculateRoleBuyScale } from "./role-buy-feasibility-math";
 import { supabaseServer } from "./supabase-server";
 import type {
@@ -110,7 +111,7 @@ export async function getRoleBuyFeasibility(
     await supabaseServer
       .from("ta_requisition_metrics")
       .select(
-        "requisition_status, opened_date, closed_date, applicants, advanced_candidates, interviews, offers, accepted_offers, time_to_fill_days, external_internal"
+        "requisition_id, requisition_status, opened_date, closed_date, applicants, advanced_candidates, interviews, offers, accepted_offers, time_to_fill_days, external_internal, start_date"
       )
       .eq(
         "job_profile_code",
@@ -337,6 +338,7 @@ export async function getRoleBuyFeasibility(
       recent_12m_window_start:
         recentStart,
     },
+    timing_evidence: summarizeRecruitingTiming(rows, profile.job_profile_code, asOf, recentStart),
     requested_buy: requested,
     buy_scale: {
       pct_of_recent_12m_external_fills:
@@ -350,7 +352,8 @@ export async function getRoleBuyFeasibility(
       "Current pipeline includes requisitions already open on or before the workforce snapshot date. It is context only and is not subtracted from scenario-created Buy demand because those requisitions may support existing vacancies.",
       "Historical external fill evidence uses filled requisitions marked external and excludes closes after the workforce snapshot date.",
       "Trailing-12-month external fills are measured from the day after the same date one year earlier through the workforce snapshot date.",
-      "Median time-to-fill is historical for completed external requisitions and must not be presented as a promised future fill time.",
+      "Legacy median time-to-fill uses opening to accepted offer for all historical completed external requisitions. The TA dashboard uses opening to closure; these are different metrics, neither a promised arrival date.",
+      "The separate timing evidence uses a closure-defined trailing-year cohort, reports valid sample counts and paired opening-to-start durations, and excludes duplicate, invalid and future-start records. Its quartiles are historical spread, not forecast confidence.",
       "Offer acceptance is calculated from historical external accepted offers divided by offers when offer evidence exists.",
       "Buy target scale compares the requested Buy units with recent external hiring volume; it does not establish labor-market availability.",
       "The model is read-only and does not create requisitions, contact candidates, make offers, or change ATS records.",
