@@ -6,14 +6,14 @@ import type {WorkforceSelectionContext,StagedWorkforceMixSelection} from "@/lib/
 import type {WorkforceMixSearch} from "@/lib/workforce-mix-search";
 import type {WorkforcePlanInput} from "@/lib/workforce-increment";
 
-/** Internal host injection only. No production caller, endpoint or model transport. */
+/** Host contract for locally generated selections; no endpoint or model transport. */
 export type WorkforceSelectionOffer = {
  snapshot: WorkforceMixSearch;
  selectedIds: string[];
- verify: (context: WorkforceSelectionContext, snapshot: unknown, ids: string[]) => Promise<StagedWorkforceMixSelection>;
+ verify: (context: WorkforceSelectionContext, snapshot: unknown, ids: string[], signal?: AbortSignal) => Promise<StagedWorkforceMixSelection>;
 };
 const button="min-h-10 rounded border px-3 py-2 text-sm disabled:opacity-50";
-export function WorkforceSelectionHandoff({offer,currentContext,onReplace}:{offer:WorkforceSelectionOffer;currentContext:()=>WorkforceSelectionContext;onReplace:(drafts:WorkforcePlanInput[])=>void}) {
+export function WorkforceSelectionHandoff({offer,currentContext,onReplace}:{offer:WorkforceSelectionOffer;currentContext:()=>WorkforceSelectionContext;onReplace:(drafts:WorkforcePlanInput[],offer:WorkforceSelectionOffer)=>void}) {
  const [session]=useState(()=>createWorkforceSelectionSession(offer.verify));
  const [view,setView]=useState(session.getState),[notice,setNotice]=useState('');
  const refreshContext=useEffectEvent(()=>{try{session.setContext(currentContext())}catch{session.cancel()}setView(session.getState())});
@@ -35,7 +35,7 @@ export function WorkforceSelectionHandoff({offer,currentContext,onReplace}:{offe
   const request=session.select(offer.snapshot,staged.selectedIds);setView(session.getState());const applied=await request;
   const next=session.getState();
   if(applied&&next.status==='staged'&&JSON.stringify(next.proposal)===JSON.stringify(staged)) {
-   try{currentContext();onReplace(structuredClone(staged.revisions));session.cancel();setNotice('Selected mixes opened as temporary drafts. Calculate explicitly after reviewing or editing.')}catch{session.cancel();setNotice('Saved inputs or evidence changed; select again.')}
+   try{currentContext();onReplace(structuredClone(staged.revisions),offer);session.cancel();setNotice('Selected mixes opened as temporary drafts. Calculate explicitly after reviewing or editing.')}catch{session.cancel();setNotice('Saved inputs or evidence changed; select again.')}
   }
   setView(session.getState());
  }

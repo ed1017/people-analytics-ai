@@ -11,7 +11,7 @@ import {calculateWorkforceIncrement} from '../../lib/workforce-increment.ts';
 import {encodeDecisions} from '../../lib/local-decisions.ts';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const output=await fs.mkdtemp('/tmp/workforce-handoff-');
-const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/workforce-handoff.tsx'),output:{path:output,filename:'fixture.js'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/workforce-handoff.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
 const bundle=await fs.readFile(path.join(output,'fixture.js'),'utf8');
 const cssFiles=(await fs.readdir('.next/static/chunks')).filter(name=>name.endsWith('.css'));
@@ -32,6 +32,7 @@ try {for(const width of [1366,390]){
  page.on('pageerror',error=>errors.push(error.message));
  await page.route('**/*',async route=>{
   const url=new URL(route.request().url());
+  if(url.pathname.startsWith('/assets/'))return route.fulfill({contentType:'application/javascript',body:await fs.readFile(path.join(output,path.basename(url.pathname)))});
   if(url.pathname==='/__fixture-only-selection-verification'){
    calls++;const {context,snapshot,ids}=route.request().postDataJSON();
    const reply=async()=>{try{await route.fulfill({json:stageWorkforceMixSelection(context,snapshot,ids)})}catch{await route.fulfill({status:400,json:{error:'Rejected'}})}};
@@ -63,7 +64,7 @@ try {for(const width of [1366,390]){
  await button('Calculate alternatives locally').click();await button('Save reviewed alternatives').waitFor();
  check(width+' calculate remains separate from save',(await state()).workspaces['goal-search'].fields.workforceAlternativeReviews.length===1);
  await drafts().fill('100');check(width+' edit invalidates calculated preview',await button('Save reviewed alternatives').count()===0);
- await button('Calculate alternatives locally').click();await button('Save reviewed alternatives').click();
+ await button('Calculate alternatives locally').click();await button('Save reviewed alternatives').click();await page.waitForFunction(()=>window.handoffFixture.saved().workspaces['goal-search'].fields.workforceAlternativeReviews.length===2);
  let fields=(await state()).workspaces['goal-search'].fields;
  check(width+' explicit save retains old review and adds edited calculation',fields.workforceAlternativeReviews.length===2&&JSON.stringify(fields.workforceAlternativeReviews[0])===JSON.stringify(oldReview)&&fields.workforceAlternativeReviews[1].reviewedRevisions[0].trainingCash==='100');
  check(width+' saved plan and old versioned approval unchanged',JSON.stringify(fields.workforceSolution)===JSON.stringify(solution)&&fields.owner==='Keep owner');

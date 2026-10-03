@@ -1,5 +1,7 @@
 # Proposed local search and lineage contract
 
+> Historical contract/checkpoint: the authorized browser-local implementation now supersedes the unwired-search and proposed-lineage sections below. See [implemented local search](workforce-browser-local-search.md) for current behavior on the unpublished implementation branch.
+
 Status: proposal, not a new persistence format or enabled product feature. Based on released source checkpoint `3a6a14dfb310193524dd24f0990ae3aac5fd15f5`. That branch remains unchanged; this contract and regression coverage live on a separate local branch.
 
 ## Exact missing callsite and runtime boundary

@@ -1,5 +1,7 @@
 # Local selection and unpublished release split
 
+> Historical contract/checkpoint: the authorized browser-local implementation now supersedes the unwired-search and proposed-lineage sections below. See [implemented local search](workforce-browser-local-search.md) for current behavior on the unpublished implementation branch.
+
 ## Selection boundary
 
 `lib/workforce-mix-selection.ts` is internal and Node-only, like the bounded search. There is no public route or search entry. The alternatives panel accepts an optional internal host injection for the explicit handoff; only the mocked development harness supplies it. The caller supplies the current saved solution, independently active goal ID/text, selected saved evidence ID, displayed search fingerprint, and explicit unsaved-edit status. These must come from the current workflow, not from the imported search report.

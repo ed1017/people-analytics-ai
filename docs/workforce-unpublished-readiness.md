@@ -66,3 +66,7 @@ Final disposition checks: 375 full unit tests, repository lint and standalone Ty
 ## Concrete local wiring and lineage proposal
 
 See [local search and lineage contract](workforce-local-search-contract.md) for exact callsites, authoritative inputs, a no-service browser/Node verification approach, and the proposed v2 review extension within the existing `workforceAlternativeReviews` field. Existing saved evidence is sufficient: the missing product decision is explicit confirmation of search ranges, not authentication or additional data. Persistent lineage is not implemented because the current strict v1 codec rejects extra fields; the proposal preserves v1 history and the existing history/size boundaries rather than silently inventing storage.
+
+## Authorized local implementation after `1b6f97b`
+
+The user explicitly defined the previously missing range-confirmation interaction and authorized browser-local verification plus minimal inspectable lineage. Those two gaps are implemented on the separate unpublished `cloud-browser-local-search` branch; see [implemented behavior, verification and remaining gates](workforce-browser-local-search.md). The published `cloud-search-selection-review` checkpoint remains at `3a6a14df`. This supersedes the earlier “unwired public search” disposition for the new local source only, not for the deployed/published product. No external data/model capability was enabled.

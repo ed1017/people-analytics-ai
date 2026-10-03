@@ -16,6 +16,7 @@ function runtimeSpecifiers(source){
   }
   if(ts.isExportDeclaration(node)&&!node.isTypeOnly&&node.moduleSpecifier&&ts.isStringLiteral(node.moduleSpecifier))names.push(node.moduleSpecifier.text);
   if(ts.isCallExpression(node)&&(node.expression.kind===ts.SyntaxKind.ImportKeyword||ts.isIdentifier(node.expression)&&node.expression.text==='require')&&node.arguments[0]&&ts.isStringLiteral(node.arguments[0]))names.push(node.arguments[0].text);
+  if(ts.isNewExpression(node)&&ts.isIdentifier(node.expression)&&node.expression.text==='URL'&&node.arguments?.[0]&&ts.isStringLiteral(node.arguments[0])&&node.arguments[0].text.endsWith('.worker.ts'))names.push(node.arguments[0].text);
   ts.forEachChild(node,visit);
  }
  visit(source);return names;
@@ -30,14 +31,15 @@ function reachable(entries){
  while(pending.length){const file=pending.pop();if(seen.has(file))continue;seen.add(file);for(const specifier of runtimeSpecifiers(sourceFile(file))){const next=resolveLocal(file,specifier);if(next)pending.push(next)}}
  return new Set([...seen].map(file=>path.relative(root,file)));
 }
-test('production runtime graph excludes offline search, ML, live agent adapter and development hosts',()=>{
+test('production local-search graph excludes Node facades, ML, live agent adapter and fixtures',()=>{
  const entries=fs.readdirSync(path.join(root,'app'),{recursive:true}).filter(name=>/\.(tsx?|m?js)$/.test(name)).map(name=>path.join(root,'app',name));
  assert.ok(entries.length>0);const graph=reachable(entries);
  assert.ok(graph.has('components/workforce-alternatives.tsx'));
+ assert.ok(graph.has('lib/workforce-search.worker.ts'));assert.ok(graph.has('lib/workforce-local-search.ts'));
  for(const file of ['lib/workforce-mix-search.ts','lib/workforce-mix-selection.ts','lib/ml/hiring-evaluation.ts','lib/workforce-agent-openai.ts'])assert.equal(graph.has(file),false,file+' must remain internal');
  assert.ok([...graph].every(file=>!file.startsWith('tests/')),'No fixture transport is reachable from app code');
 });
-test('production alternatives caller does not supply a search source or verifier',()=>{
+test('production caller does not inject untrusted reports; local form owns search generation',()=>{
  const source=sourceFile(path.join(root,'components/workforce-solution-panel.tsx'));let calls=0;
  function visit(node){
   if((ts.isJsxSelfClosingElement(node)||ts.isJsxOpeningElement(node))&&node.tagName.getText(source)==='WorkforceAlternatives'){

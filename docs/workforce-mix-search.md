@@ -1,6 +1,6 @@
 # Bounded deterministic workforce mix search
 
-`lib/workforce-mix-search.ts` is an offline foundation for comparing Build/Move/Buy combinations with the existing single-role incremental calculator. It is not imported by the UI, product routes, or live agent. It performs no model request, data acquisition, storage write, approval, or real-world action.
+`lib/workforce-mix-search.ts` is an offline foundation for comparing Build/Move/Buy combinations with the existing single-role incremental calculator. The Node facade is not imported by the UI or live agent. The browser-local worker uses the same pure search core with Web Crypto; see [implemented local search](workforce-browser-local-search.md). It performs no model request, data acquisition, storage write, approval, or real-world action.
 
 ## Source and explicit search contract
 

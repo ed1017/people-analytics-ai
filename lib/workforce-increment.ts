@@ -1,5 +1,7 @@
 // Incremental single-role planning. Historical evidence is not a hiring promise.
 import type {RecruitingTimingEvidence} from "./recruiting-timing";
+// Increment on any arithmetic/assumption semantic change; distinct from result schema version.
+export const workforceIncrementMethodVersion = "workforce-increment-v1" as const;
 export const workforcePlanFields = ["businessUnit", "jobProfile", "intent", "roles", "build", "move", "buy", "backfills", "planningMonth", "months", "recruitingStart", "arrivalMode", "arrivalDate", "buildMonth", "moveMonth", "backfillDate", "annualHireCost", "hireFee", "annualBackfillCost", "backfillFee", "internalAnnualCostChange", "trainingCash", "trainingHours", "loadedHourlyCost", "budget", "maxAddedEmployees", "deadlineMonth"] as const;
 export type WorkforcePlanField = typeof workforcePlanFields[number];
 export type WorkforcePlanInput = Record<WorkforcePlanField,string>;

@@ -88,6 +88,13 @@ export function currentSolutionVersion(state: WorkforceSolution): SolutionVersio
   assert(state.versions.length > 0, "Solution version is missing.");
   return state.versions[state.versions.length - 1];
 }
+/** Reconstruct a valid read-only historical graph without future runs/results/approvals. */
+export function workforceSolutionAtVersion(state: WorkforceSolution, version: number): WorkforceSolution {
+  assert(state.versions.some(item => item.version === version), "Saved source version is missing.");
+  return {...state, versions: state.versions.filter(item => item.version <= version),
+    results: state.results.filter(item => item.version <= version), runs: state.runs.filter(item => item.version <= version),
+    approvals: state.approvals.filter(item => item.version <= version), pending: null};
+}
 export function createWorkforceSolution(id: string, goalId: string, inputs: SolutionInputs, at: string): WorkforceSolution {
   identifier(id); identifier(goalId); timestamp(at); validateInputs(inputs);
   return bounded({schemaVersion: 1, id, goalId,

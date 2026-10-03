@@ -47,6 +47,19 @@ try {
   await workspace.getByRole('button',{name:'Calculate saved assumptions and compare hiring-only',exact:true}).click();
   await workspace.getByRole('heading',{name:'Calculated decision brief — version 2',exact:true}).waitFor();
   check(width+' Home scope and limits',(await workspace.innerText()).includes('3 additional Engineer positions in Technology')&&(await workspace.innerText()).includes('Entered limits met; operational feasibility remains unverified.'));
+  await workspace.locator('summary').filter({hasText:'Review local alternatives'}).click();
+  const localSearch=workspace.getByRole('region',{name:'Bounded local scenario search',exact:true});
+  check(width+' production bounds are blank before explicit search',await localSearch.getByLabel('build min bound',{exact:true}).inputValue()==='');
+  for(const path of ['build','move','buy']){await localSearch.getByLabel(path+' min bound',{exact:true}).fill('0');await localSearch.getByLabel(path+' max bound',{exact:true}).fill('3');}
+  await localSearch.getByRole('checkbox',{name:'I confirm these bounds and the unchanged cost/timing assumptions for this comparison.',exact:true}).check();
+  await localSearch.getByRole('button',{name:'Run local mix search',exact:true}).click();
+  await localSearch.getByLabel('Select build-0-move-3-buy-0',{exact:true}).waitFor();
+  check(width+' built Next worker completes without API requests',modelCalls===1&&calculationCalls===1&&(await localSearch.innerText()).includes('10 mixes evaluated'));
+  await localSearch.getByLabel('Select build-0-move-3-buy-0',{exact:true}).check();
+  await workspace.getByRole('button',{name:'Review selected mixes',exact:true}).click();await workspace.getByRole('button',{name:'Replace alternative drafts',exact:true}).waitFor();
+  await workspace.getByRole('button',{name:'Cancel selected mixes',exact:true}).click();
+  check(width+' built worker selection cancel leaves original draft',await workspace.getByLabel('Alternative 1: Build count',{exact:true}).inputValue()==='1');
+  await workspace.locator('summary').filter({hasText:'Review local alternatives'}).click();
   await workspace.getByRole('button',{name:'Inspect Skills evidence',exact:true}).click();
   await workspace.getByRole('button',{name:'Review response assumptions',exact:true}).waitFor();
   check(width+' saved skills visible',(await workspace.innerText()).includes('Whole-role ready: 2. Near ready: 4.')&&(await workspace.innerText()).includes('Synthetic analysis'));
@@ -68,6 +81,7 @@ try {
   const baseBeforeAlternatives=JSON.stringify((await state()).workspaces['goal-a'].fields.workforceSolution);
   await alternatives.getByLabel('Alternative 1: Training cash (USD)',{exact:true}).fill('0');
   await alternatives.getByRole('button',{name:'Calculate alternatives locally',exact:true}).click();
+  await alternatives.getByRole('button',{name:'Save reviewed alternatives',exact:true}).waitFor();
   check(width+' alternative preview is local and unsaved',modelCalls===1&&calculationCalls===2&&!(await state()).workspaces['goal-a'].fields.workforceAlternativeReviews&&(await alternatives.innerText()).includes('$19,500'));
   await alternatives.getByLabel('Alternative 1: Training cash (USD)',{exact:true}).fill('100');
   check(width+' changed alternative requires fresh preview',await alternatives.getByRole('button',{name:'Save reviewed alternatives',exact:true}).count()===0);
@@ -75,7 +89,9 @@ try {
   await alternatives.getByRole('button',{name:'Add second alternative',exact:true}).click();
   await alternatives.getByLabel('Alternative 2: Training cash (USD)',{exact:true}).fill('1000');
   await alternatives.getByRole('button',{name:'Calculate alternatives locally',exact:true}).click();
+  await alternatives.getByRole('button',{name:'Save reviewed alternatives',exact:true}).waitFor();
   await alternatives.getByRole('button',{name:'Save reviewed alternatives',exact:true}).click();
+  await alternatives.getByRole('heading',{name:'Saved local alternative reviews (1)',exact:true}).waitFor();
   const localHistory=(await state()).workspaces['goal-a'].fields.workforceAlternativeReviews;
   check(width+' two alternatives retained with four deterministic comparisons',localHistory.length===1&&localHistory[0].reviewedRevisions.length===2&&localHistory[0].comparisons.length===4);
   check(width+' alternatives preserve base evidence and approvals',JSON.stringify((await state()).workspaces['goal-a'].fields.workforceSolution)===baseBeforeAlternatives);

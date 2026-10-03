@@ -3,7 +3,7 @@
 // @ts-expect-error Native Node tests share the TypeScript implementation.
 import {calculateWorkforceIncrement, validateWorkforcePlanInput, workforcePlanFields, type WorkforcePlanInput, type WorkforceIncrement} from "./workforce-increment.ts";
 // @ts-expect-error Native Node tests share the TypeScript implementation.
-import {currentSolutionVersion, solutionDependencyKey, solutionSections, solutionResultIsCurrent, readWorkforceSolution, type WorkforceSolution} from "./workforce-solution.ts";
+import {currentSolutionVersion, workforceSolutionAtVersion, solutionDependencyKey, solutionSections, solutionResultIsCurrent, readWorkforceSolution, type WorkforceSolution} from "./workforce-solution.ts";
 import type {RecruitingTimingEvidence} from "./recruiting-timing";
 // @ts-expect-error Native Node tests share the TypeScript implementation.
 import {validateJson} from "./local-decisions.ts";
@@ -206,7 +206,7 @@ export function readWorkforceAlternativeReview(raw: unknown, solution: Workforce
     invariant(validateJson(raw) && readWorkforceSolution(solution), "Invalid local review.");
     const review = exactObject(raw, ["schemaVersion", "kind", "id", "createdAt", "binding", "reviewedRevisions", "comparisons"]) as unknown as WorkforceAlternativeReview;
     invariant(solution.versions.some(version => version.version === review.binding.version), "Missing reviewed version.");
-    const historical = {...solution, versions: solution.versions.filter(version => version.version <= review.binding.version), pending: null};
+    const historical = workforceSolutionAtVersion(solution, review.binding.version);
     const expected = previewWorkforceAlternatives(historical, review.binding.evidenceResultId, review.reviewedRevisions, review.id, review.createdAt);
     invariant(canonical(expected) === canonical(review), "Local review does not match saved evidence or calculations.");
     return clone(review);
@@ -234,7 +234,7 @@ export function readWorkforceAgentReview(raw: unknown, solution: WorkforceSoluti
     invariant(review.schemaVersion === 1 && /^[a-zA-Z0-9-]{1,80}$/.test(review.id) && review.requiresUserReview === true && typeof review.allowRevision === "boolean", "Invalid stored agent review.");
     invariant(typeof review.startedAt === "string" && typeof review.completedAt === "string" && Number.isFinite(Date.parse(review.startedAt)) && Number.isFinite(Date.parse(review.completedAt)) && Date.parse(review.startedAt) <= Date.parse(review.completedAt), "Invalid review timestamps.");
     invariant(Number.isInteger(review.binding.version) && solution.versions.some(version => version.version === review.binding.version), "Missing reviewed version.");
-    const historical = {...solution, versions: solution.versions.filter(version => version.version <= review.binding.version), pending: null};
+    const historical = workforceSolutionAtVersion(solution, review.binding.version);
     invariant(workforceAgentReviewIsCurrent(historical, review), "Stored review evidence or inputs changed.");
     invariant(Array.isArray(review.reviewedOptions) && review.reviewedOptions.length >= 2 && review.reviewedOptions.length <= 4, "Invalid reviewed alternatives.");
     const options = optionsFor(historical, review.reviewedOptions.slice(2).map(option => option.input), review.allowRevision);
