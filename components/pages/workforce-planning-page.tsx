@@ -82,44 +82,6 @@ type WorkforcePlanningPageProps = {
   onRefreshEvidenceHandoff: () => void;
 };
 
-function formatModeledCount(value: number) {
-  return value.toLocaleString("en-US", {
-    maximumFractionDigits: 1,
-  });
-}
-
-function formatSignedModeledCount(value: number) {
-  const formatted = formatModeledCount(
-    Math.abs(value)
-  );
-  return value > 0
-    ? "+" + formatted
-    : value < 0
-      ? "-" + formatted
-      : formatted;
-}
-
-function formatCurrencyCompact(value: number) {
-  const sign = value < 0 ? "-" : "";
-  const absoluteValue = Math.abs(value);
-
-  if (absoluteValue >= 1_000_000_000) {
-    return sign + "$" + (absoluteValue / 1_000_000_000).toFixed(2) + "B";
-  }
-
-  if (absoluteValue >= 1_000_000) {
-    return sign + "$" + (absoluteValue / 1_000_000).toFixed(1) + "M";
-  }
-
-  return sign + "$" + Math.round(absoluteValue).toLocaleString();
-}
-
-function formatAssumptionName(value: string) {
-  return value
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
 type SavedScenarioEntry = {
   id: string;
   name: string;

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {DecisionStore,DECISIONS_STORAGE_KEY,parseDecisions,encodeDecisions,validateJson} from '../lib/local-decisions.ts';
+import {DecisionStore,DECISIONS_STORAGE_KEY,parseDecisions,validateJson} from '../lib/local-decisions.ts';
 const legacy={version:1,activeId:'a',goals:[{id:'a',statement:'Goal A'},{id:'b',statement:'Goal B'}]};
 function port(){const map=new Map([['insights-to-action.goals.v1',JSON.stringify(legacy)]]);return {map,getItem:k=>map.get(k)??null,setItem:(k,v)=>map.set(k,v),removeItem:k=>map.delete(k)}}
 function setup(){const p=port(),s=new DecisionStore();s.initialize(p);return {p,s}}

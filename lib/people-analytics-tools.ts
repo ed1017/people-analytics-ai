@@ -1,3 +1,4 @@
+import type { FunctionTool } from "openai/resources/responses/responses";
 import { supabaseServer } from "./supabase-server";
 import { generateExitEnpsScores, localExitEnpsEnabled, summarizeExitEnps, surveyDimensionsForRetrieval } from "./exit-enps";
 import {
@@ -113,7 +114,7 @@ function overrideOrDefault(
     : fallback;
 }
 
-export const peopleAnalyticsTools: any[] = [
+export const peopleAnalyticsTools: FunctionTool[] = [
   {
     type: "function",
     name: "get_workforce_overview",
