@@ -78,13 +78,22 @@ function grounded(change:ClarificationChange,input:ClarificationInput,catalog:Wo
   if(change.field==='intent')return change.value==='additional'?/\b(additional|new|add|increase|net growth)\b/.test(quote):/\b(replacement|replace|backfill)\b/.test(quote);
   if(change.field==='arrivalMode')return change.value==='historical-median'?/historical/.test(quote)&&/median/.test(quote):/\bexplicit\b|\d{4}-\d{2}-\d{2}/.test(quote);
   if(months.has(change.field)) {
-    if(quote.includes(change.value))return true;
-    // A named month plus explicit year is a representation change, not a date
-    // inference. Require one unambiguous month in the exact supporting quote.
+    // Representation only: every explicit date in the supporting phrase must
+    // identify the same month/year. Never choose one side of an alternative.
     const names=['january','february','march','april','may','june','july','august','september','october','november','december'];
-    const matches=[...quote.matchAll(/\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})\b/g)];
-    const values=new Set(matches.map(match=>`${match[2]}-${String(names.indexOf(match[1])+1).padStart(2,'0')}`));
-    return values.size===1&&values.has(change.value);
+    const unambiguous=(phrase:string)=>{
+      const named=[...phrase.matchAll(/\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})\b/g)];
+      const iso=[...phrase.matchAll(/\b(\d{4}-\d{2})(?:-\d{2})?\b/g)];
+      const values=new Set([...named.map(match=>`${match[2]}-${String(names.indexOf(match[1])+1).padStart(2,'0')}`),...iso.map(match=>match[1])]);
+      const years=new Set(phrase.match(/\b\d{4}\b/g)??[]);
+      return values.size===1&&values.has(change.value)&&years.size===1&&years.has(change.value.slice(0,4))&&!/\b(or|not|unknown|unspecified|undecided|either|between|perhaps|possibly|maybe|around|quarter|q[1-4])\b|\d{1,2}[/]\d{1,2}[/]\d{2,4}/.test(phrase);
+    };
+    if(!unambiguous(quote))return false;
+    // An exact short quote must not strip an adjacent alternative or negation
+    // from its source clause. Commas/semicolons separate distinct assumptions.
+    const source=input.statement.includes(change.evidence)?input.statement:input.goal;
+    const clauses=source.toLowerCase().split(/[,](?!\s*(?:or|not|rather|instead)\b)|[.!?;\n]/);
+    return clauses.some(clause=>clause.includes(quote)&&unambiguous(clause));
   }
   if(dates.has(change.field))return quote.includes(change.value);
   const normalized=quote.replace(/(\d),(?=\d{3}(?:\D|$))/g,'$1').replace(/(\d),(?=\d{3})/g,'$1');
