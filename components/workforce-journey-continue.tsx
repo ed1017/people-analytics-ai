@@ -1,4 +1,5 @@
 "use client";
+import {workforceStageExample} from '@/lib/contextual-prompts';
 import type {RefObject} from 'react';
 import type {JourneyState,JourneyStep} from '@/lib/workforce-journey-state';
 const guidance:Record<JourneyStep,string>={
@@ -31,6 +32,7 @@ export function WorkforceJourneyContinue({journey,root,tailoring=false}:{journey
  };
  return <section aria-label="Continue this workforce decision" className="space-y-2 rounded border border-primary/40 bg-muted/30 p-3">
   <p className="text-sm" aria-live="polite">{guidance[journey.step]}</p>
+  {workforceStageExample[journey.step]&&<p className="text-sm">{workforceStageExample[journey.step]}</p>}
   <button type="button" className="min-h-11 rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50" disabled={journey.step==='loading'} onClick={next}>Continue this decision</button>
   <p className="text-xs">Opens the next review step. Calculation, saving and approval each remain explicit.</p>
  </section>;

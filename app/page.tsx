@@ -1,5 +1,6 @@
 "use client";
 
+import { contextualPrompts, hasKnownNumericEvidence } from "@/lib/contextual-prompts";
 import {usePlanningEvidenceValidation} from "@/components/use-planning-evidence-validation";
 
 import {WorkforceSolutionPanel} from "@/components/workforce-solution-panel";
@@ -1221,80 +1222,6 @@ export default function Home() {
   const readOnlyReason = readOnlyChatPage ? "AI does not analyze the local content on this page. Your earlier conversation stays available for reference." : undefined;
   const previewPage = readOnlyChatPage;
 
-  const suggestedPrompts =
-    previewPage
-      ? []
-      : intelligencePage
-      ? activePage === "occupational-references" ? ["Explain the stored mapping coverage and its limits", "What should I verify before using these references?"] : activePage === "labor-market" ? ["Explain the available observations, dates and scope", "What can these indicators not tell us?"] : ["Compare the simulated quotes for my goal", "What information do I need for a cost comparison?"]
-      : planningWorkspaceActive
-      ? [
-          "Compare all four workforce scenarios",
-          "What stands out in this scenario?",
-          "What are the labor cost implications?",
-        ]
-      : activePage === "workforce"
-        ? [
-            "How is our workforce distributed?",
-            "What stands out in workforce composition?",
-            "Where do management layers look unusual?",
-          ]
-        : activePage === "attrition"
-          ? [
-              "Where is attrition highest?",
-              "What are the biggest regrettable-loss risks?",
-              "What separation patterns stand out?",
-            ]
-          : activePage === "finance"
-        ? [
-            "Where are workforce costs highest?",
-            "Compare 2027 labor cost scenarios",
-            "What is our vacancy cost exposure?",
-          ]
-        : activePage === "skills"
-          ? [
-              "What are our largest skill gaps?",
-              "Which skills have the highest demand?",
-              "Where should we build versus hire capability?",
-            ]
-          : activePage ===
-              "learning-development"
-            ? [
-                "Which current skill gaps have active learning pathways?",
-                "Where is learning pathway coverage missing?",
-                "Which job profiles have the broadest required-skill pathway coverage?",
-              ]
-          : activePage ===
-              "career-mobility"
-            ? [
-                "Which destination roles have the most recorded interest?",
-                "Where are desired locations concentrated?",
-                "What does recorded relocation willingness show?",
-              ]
-          : activePage ===
-              "succession-planning"
-            ? [
-                "What does recorded succession-plan coverage show?",
-                "How much recorded ready-now coverage do we have?",
-                "How should I interpret this succession summary?",
-              ]
-          : activePage === "talent-acquisition"
-            ? [
-                "Where is the recruiting funnel weakest?",
-                "Which business units have the greatest hiring pressure?",
-                "Which recruiting sources are most effective?",
-              ]
-            : activePage === "survey-sentiment"
-              ? [
-                  "What are the biggest engagement risks?",
-                  "Which business units stand out most?",
-                  "What do onboarding and exit results suggest?",
-                ]
-              : [
-              "Summarize this workforce",
-              "What stands out?",
-              "Are there workforce risks?",
-            ];
-
   const resetFilters = () => {
     setSelectedCountry("all");
     setSelectedOrg("all");
@@ -1655,6 +1582,7 @@ export default function Home() {
           } : null;
   const sourceState = activePage === "workforce" ? [workforceData, workforceLoading, workforceError] : activePage === "attrition" ? [attritionData, attritionLoading, attritionError] : activePage === "skills" ? [skillsData, skillsLoading, skillsError] : activePage === "learning-development" ? [learningDevelopmentData, learningDevelopmentLoading, learningDevelopmentError] : activePage === "career-mobility" ? [careerMobilityData, careerMobilityLoading, careerMobilityError] : activePage === "career-growth-mobility" ? [careerGrowthMobilityData, careerGrowthMobilityLoading, careerGrowthMobilityError] : activePage === "succession-planning" ? [successionCoverageData, successionCoverageLoading, successionCoverageError] : activePage === "talent-acquisition" ? [talentAcquisitionData, talentAcquisitionLoading, talentAcquisitionError] : activePage === "survey-sentiment" ? [surveySentimentData, surveySentimentLoading, surveySentimentError] : activePage === "finance" ? [financeData, financeLoading, financeError] : [planningData, planningLoading || positionModelingLoading, planningError || positionModelingError];
   const chatEvidenceReady = activePage === "development-planning" ? true : intelligencePage ? true : !readOnlyChatPage && Boolean(overviewData) && !dashboardLoading && !dashboardError && !sourceState[1] && Boolean(sourceState[0]) && !sourceState[2];
+  const suggestedPrompts = contextualPrompts({page:activePage,goal:conversation.focusedIssue,hasConversation:chatMessages.some(message=>message.role==="user"),evidenceReady:intelligencePage ? activePage==="occupational-references" ? !skillsLoading&&!skillsError&&Boolean(skillsData) : activePage==="labor-market" ? !blsLoading&&!blsError&&Boolean(blsData) : developmentSession.selected.length>0 : activePage==="development-planning" ? developmentSession.options.length>0 : chatEvidenceReady&&hasKnownNumericEvidence(sourceState[0])});
   const currentSource = sourceState[0];
   const sourceRecord = currentSource && typeof currentSource === "object" ? currentSource as Record<string, unknown> : null;
   const movementSource = sourceRecord?.source;
@@ -2150,7 +2078,7 @@ export default function Home() {
           aiExpanded={aiExpanded}
           aiWidth={aiWidth}
           previewPage={previewPage}
-          suggestedPrompts={readOnlyChatPage ? [] : intelligencePage ? suggestedPrompts : [...suggestedPrompts, "Export current data (CSV)"]}
+          suggestedPrompts={activePage==="workforce"||activePage==="skills" ? [...suggestedPrompts.slice(0,2),"Export current data (CSV)"] : suggestedPrompts}
           scopeNote={readOnlyReason ?? (isIntelligencePage(activePage) ? `${intelligenceEvidence(activePage, catalogueContext).scope}. Workforce filters do not narrow this evidence. AI uses only this page; no external lookup.` : activePage === "workforce" ? "Selected filters narrow the workforce snapshot only; company composition stays unfiltered." : activePage==="development-planning" ? "Selected quotes and user-entered assumptions; modeled costs, not approved budgets or measured outcomes. Missing costs stay unknown." : planningWorkspaceActive ? "Filters describe workforce context. Planning scenarios and carried evidence keep their own scope, dates and assumptions." : "This page uses company-wide evidence. The shared workforce filters do not narrow these measures.")}
           chatMessages={chatMessages}
           chatInput={chatInput}
@@ -2162,9 +2090,6 @@ export default function Home() {
           onToggleExpanded={toggleAiExpanded}
           onToggleCollapsed={() =>
             setAiCollapsed(!aiCollapsed)
-          }
-          onSuggestedPrompt={(prompt) =>
-            sendChatMessage(prompt)
           }
           onChatInputChange={setChatInput}
           onSend={() => sendChatMessage()}
