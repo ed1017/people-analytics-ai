@@ -1,9 +1,10 @@
 "use client";
-import {useEffect,useId,useRef,useState} from "react";
+import {useCallback,useEffect,useId,useRef,useState} from "react";
+import {cancelOwnedWorkforceRequest} from "@/lib/workforce-request-cleanup";
 import {WorkforceJourneyContinue,revealJourneyTarget} from "@/components/workforce-journey-continue";
 import {selectWorkforceJourney,workforceJourneyContext,type JourneyTransient} from "@/lib/workforce-journey-state";
 import {decisionStore,useDecisionStorage} from "@/components/decision-store";
-import {readWorkforceSolution,createWorkforceSolution,currentSolutionVersion,emptySolutionInputs,reviseWorkforceSolution,beginSolutionRun,completeSolutionRun,cancelSolutionRun,solutionResultIsCurrent,recordSolutionApproval,type WorkforceSolution,type SolutionInputs,type SolutionSection} from "@/lib/workforce-solution";
+import {readWorkforceSolution,createWorkforceSolution,currentSolutionVersion,emptySolutionInputs,reviseWorkforceSolution,beginSolutionRun,completeSolutionRun,solutionResultIsCurrent,recordSolutionApproval,type RunTicket,type WorkforceSolution,type SolutionInputs,type SolutionSection} from "@/lib/workforce-solution";
 import {emptyWorkforcePlanInput,workforcePlanFields,validateWorkforcePlanInput,type WorkforcePlanInput,type WorkforcePlanField} from "@/lib/workforce-increment";
 import type {AppPage,StructuralPositionCatalogResponse} from "@/lib/types";
 import {WorkforceGoalStatementCopy} from "@/components/workforce-goal-statement-copy";
@@ -18,6 +19,13 @@ import {clarificationFailureMessage,type WorkforceClarification} from "@/lib/wor
 const button='min-h-10 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50';
 const control='mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm';
 const field='workforceSolution';
+function clearOwnedCalculation(ticket:RunTicket|null){
+ if(!ticket)return;
+ const snapshot=decisionStore.getSnapshot();
+ if(!snapshot.data.goals.goals.some(goal=>goal.id===ticket.goalId))return;
+ const next=cancelOwnedWorkforceRequest(snapshot.data.workspaces[ticket.goalId]?.fields[field],ticket);
+ if(next)decisionStore.setField(ticket.goalId,field,next);
+}
 const groups:[keyof SolutionInputs,string,[WorkforcePlanField,string][]][]=[
  ['scope','1. Which additional role requirement?',[['businessUnit','Business unit'],['jobProfile','Job profile'],['intent','Demand type'],['planningMonth','Planning start month (YYYY-MM)'],['months','Planning horizon (months)']]],
  ['demand','2. How many additional roles?',[['roles','Additional roles']]],
@@ -46,7 +54,7 @@ function Workspace({goalId,goalStatement,solution,page,onNavigate}:{goalId:strin
  const selected=storage.data.workspaces[goalId]?.fields.workforceInspection as unknown as string|undefined;
  const results=solution.results.filter(item=>item.kind==='brief'&&item.calculator.name==='single-role-workforce-review');
  const result=selected?results.find(item=>item.id===selected):results.at(-1),review=result?readSavedWorkforceReview(solution,result):null;
- const [notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[dirty,setDirty]=useState(false),[approval,setApproval]=useState('');const controller=useRef<AbortController|null>(null);
+ const [notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[dirty,setDirty]=useState(false),[approval,setApproval]=useState('');const controller=useRef<AbortController|null>(null),calculation=useRef<RunTicket|null>(null);
  const [editorSection,setEditorSection]=useState<SolutionSection|undefined>();
  const statementControl=useRef<HTMLTextAreaElement|null>(null),[statementRevision,setStatementRevision]=useState(0);
  const [statement,setStatement]=useState(''),[proposal,setProposal]=useState<{baseVersion:number;result:WorkforceClarification}|null>(null),[editorDraft,setEditorDraft]=useState<WorkforcePlanInput|undefined>(),[editorRevision,setEditorRevision]=useState(0);
@@ -61,24 +69,30 @@ function Workspace({goalId,goalStatement,solution,page,onNavigate}:{goalId:strin
  const verifiedResult=!result?.payload.localWhatIf||verifiedCardSource===cardVerificationIdentity(solution,result.id,storage.data.workspaces[goalId]?.fields.workforceAlternativeReviews??[]);
  const current=()=>decisionStore.getField<WorkforceSolution>(goalId,field,solution);
  const save=(next:WorkforceSolution)=>decisionStore.setField(goalId,field,next);
+ const interruptCurrentRequest=useCallback(()=>{
+  const request=controller.current,ticket=calculation.current;
+  // Release ownership before abort/store notifications can reenter cleanup.
+  controller.current=null;calculation.current=null;request?.abort();
+  clearOwnedCalculation(ticket);setBusy(false);
+ },[]);
  // Observe store transitions directly: React may batch an A → B → A switch
  // into one render, so unmount cleanup and final-goal equality are insufficient.
  useEffect(()=>{
   const off=decisionStore.subscribe(()=>{
    const goals=decisionStore.getSnapshot().data.goals;
-   if(goals.activeId!==goalId||!goals.goals.some(goal=>goal.id===goalId&&goal.statement===goalStatement))controller.current?.abort();
+   if(goals.activeId!==goalId||!goals.goals.some(goal=>goal.id===goalId&&goal.statement===goalStatement))interruptCurrentRequest();
   });
-  return()=>{off();controller.current?.abort()};
- },[goalId,goalStatement]);
+  return()=>{off();interruptCurrentRequest()};
+ },[goalId,goalStatement,interruptCurrentRequest]);
  const isHere=()=>{const goals=decisionStore.getSnapshot().data.goals;return goals.activeId===goalId&&goals.goals.some(goal=>goal.id===goalId&&goal.statement===goalStatement)};
- async function clarify(){if(controller.current||dirty)return;const baseVersion=version.version,c=new AbortController();controller.current=c;setBusy(true);setNotice('');setProposal(null);let failureMessage=clarificationFailureMessage(null);const timer=setTimeout(()=>c.abort(),45000);try{const r=await fetch('/api/workforce-solution/intake',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({goal:goalStatement,statement,inputs:fromInputs(version.inputs)}),signal:c.signal});const body=await r.json();if(!r.ok){failureMessage=clarificationFailureMessage(body);throw Error('Intake failed.');}if(!isHere()||c.signal.aborted||currentSolutionVersion(current()).version!==baseVersion)return;setProposal({baseVersion,result:body});setNotice('Review the proposed inputs. Saved assumptions and calculations have not changed.');}catch{if(isHere())setNotice(c.signal.aborted?'Clarification cancelled or timed out; saved inputs retained.':failureMessage)}finally{clearTimeout(timer);controller.current=null;setBusy(false)}}
- async function loadCatalog(){if(controller.current)return;const c=new AbortController();controller.current=c;setBusy(true);setNotice('');try{const r=await fetch('/api/position-structure',{signal:c.signal,cache:'no-store'});const body=await r.json();if(!r.ok)throw Error(body.error||'Governed catalog unavailable.');if(isHere()&&!c.signal.aborted)decisionStore.setField(goalId,'workforceCatalog',{as_of:body.as_of,business_units:body.business_units,job_profiles:body.job_profiles});}catch(e){setNotice((e as Error).message)}finally{controller.current=null;setBusy(false)}}
- async function calculate(){if(controller.current)return;let started;try{validateWorkforcePlanInput(fromInputs(version.inputs));started=beginSolutionRun(current(),version.version,crypto.randomUUID(),['brief'],new Date().toISOString());save(started.state);}catch(e){setNotice((e as Error).message);return}
-  const c=new AbortController();controller.current=c;setBusy(true);setNotice('');const timer=setTimeout(()=>c.abort(),65000);
-  try{const input=fromInputs(version.inputs),r=await fetch('/api/workforce-solution',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input),signal:c.signal});const body=await r.json();if(!r.ok)throw Error(body.error||'Workforce comparison unavailable.');if(!isHere()||c.signal.aborted)return;
+ async function clarify(){if(controller.current||dirty)return;const baseVersion=version.version,c=new AbortController();controller.current=c;setBusy(true);setNotice('');setProposal(null);let failureMessage=clarificationFailureMessage(null);const timer=setTimeout(()=>c.abort(),45000);try{const r=await fetch('/api/workforce-solution/intake',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({goal:goalStatement,statement,inputs:fromInputs(version.inputs)}),signal:c.signal});const body=await r.json();if(!r.ok){failureMessage=clarificationFailureMessage(body);throw Error('Intake failed.');}if(controller.current!==c||!isHere()||c.signal.aborted||currentSolutionVersion(current()).version!==baseVersion)return;setProposal({baseVersion,result:body});setNotice('Review the proposed inputs. Saved assumptions and calculations have not changed.');}catch{if(controller.current===c&&isHere())setNotice(c.signal.aborted?'Clarification cancelled or timed out; saved inputs retained.':failureMessage)}finally{clearTimeout(timer);if(controller.current===c){controller.current=null;setBusy(false)}}}
+ async function loadCatalog(){if(controller.current)return;const c=new AbortController();controller.current=c;setBusy(true);setNotice('');try{const r=await fetch('/api/position-structure',{signal:c.signal,cache:'no-store'});const body=await r.json();if(!r.ok)throw Error(body.error||'Governed catalog unavailable.');if(controller.current===c&&isHere()&&!c.signal.aborted)decisionStore.setField(goalId,'workforceCatalog',{as_of:body.as_of,business_units:body.business_units,job_profiles:body.job_profiles});}catch(e){if(controller.current===c&&isHere())setNotice((e as Error).message)}finally{if(controller.current===c){controller.current=null;setBusy(false)}}}
+ async function calculate(){if(controller.current||current().pending)return;let started;try{validateWorkforcePlanInput(fromInputs(version.inputs));started=beginSolutionRun(current(),version.version,crypto.randomUUID(),['brief'],new Date().toISOString());}catch(e){setNotice((e as Error).message);return}
+  const c=new AbortController();controller.current=c;calculation.current=started.ticket;setBusy(true);setNotice('');const timer=setTimeout(()=>{if(controller.current===c){interruptCurrentRequest();setNotice('Cancelled or timed out; prior results retained.')}},65000);
+  try{save(started.state);if(c.signal.aborted)return;const input=fromInputs(version.inputs),r=await fetch('/api/workforce-solution',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input),signal:c.signal});const body=await r.json();if(!r.ok)throw Error(body.error||'Workforce comparison unavailable.');if(controller.current!==c||!isHere()||c.signal.aborted)return;
    if(!readWorkforceReview(body)||body.version!==1||!body.input||Object.keys(body.input).length!==workforcePlanFields.length||workforcePlanFields.some(key=>body.input[key]!==input[key])||!Array.isArray(body.proposed?.rows)||!Array.isArray(body.hireOnly?.rows))throw Error('Calculation did not match reviewed inputs.');
    const next=completeSolutionRun(current(),started.ticket,[{id:crypto.randomUUID(),kind:'brief',calculator:{name:'single-role-workforce-review',version:'1'},payload:body}],new Date().toISOString());save(next);decisionStore.setField(goalId,'workforceInspection',next.results.at(-1)!.id);setNotice('Calculated comparison saved. Evidence and inputs are retained with this result; no real-world action occurred.');
-  }catch(e){if(isHere())setNotice(c.signal.aborted?'Cancelled or timed out; prior results retained.':(e as Error).message)}finally{clearTimeout(timer);if(isHere())save(cancelSolutionRun(current(),started.ticket.id));controller.current=null;setBusy(false)}
+  }catch(e){if(controller.current===c&&isHere())setNotice(c.signal.aborted?'Cancelled or timed out; prior results retained.':(e as Error).message)}finally{clearTimeout(timer);clearOwnedCalculation(started.ticket);if(calculation.current?.id===started.ticket.id)calculation.current=null;if(controller.current===c){controller.current=null;setBusy(false)}}
  }
  const goalChanged=version.inputs.scope.goalStatement!==goalStatement;
  const currentResult=!goalChanged&&result?result.version===version.version&&solutionResultIsCurrent(solution,result):false;
@@ -103,7 +117,7 @@ function Workspace({goalId,goalStatement,solution,page,onNavigate}:{goalId:strin
   <InputEditor key={`${version.version}:${editorRevision}`} initialDraft={editorDraft} focusSection={editorSection} inputs={version.inputs} catalog={catalog} version={version.version} dirty={dirty} goalChanged={goalChanged} selectedVersion={result?.version} selectedCurrent={!!currentResult} disabled={busy||cardsDirty||alternativeDirty} onDirty={(changed,draft)=>{setDirty(changed);setInputJourney({context:journeyContext,kind:'input-draft',input:draft})}} onSave={draft=>{try{save(reviseWorkforceSolution(current(),version.version,{...toInputs(draft),scope:{...toInputs(draft).scope,goalStatement}},page==='home'?'conversation':'sidebar','Updated workforce assumptions',new Date().toISOString()));if(!decisionStore.getSnapshot().saved)throw Error('Browser storage did not save; keep this working copy for review.');setDirty(false);setInputJourney(undefined);setEditorDraft(undefined);setEditorSection(undefined);setProposal(null);setNotice('Inputs saved; dependent prior results need explicit recalculation.')}catch(e){setNotice((e as Error).message)}}}/>
   <p className="text-xs text-muted-foreground">Review before running: all cash amounts are USD; budget excludes employee time value. Each path uses one common arrival/effective date. Annual costs are divided by 12 with calendar-day arrival-month proration. Training cash/time is placed in the first planning month. Blank amounts stay unknown. Source-team backfills require an explicit count, including 0 if none. Replacement-only demand is not supported by this initial workflow.</p>
   </details>
-  <div className="flex flex-wrap gap-2"><button data-journey="calculate" className={button} disabled={busy||editsDirty||goalChanged} onClick={()=>void calculate()}>Calculate saved assumptions and compare hiring-only</button>{(busy||solution.pending)&&<button data-journey="working" className={button} onClick={()=>{controller.current?.abort();if(solution.pending)save(cancelSolutionRun(current(),solution.pending.id));setNotice('Request cancelled; saved inputs and previous results retained.')}}>Cancel pending request</button>}</div>
+  <div className="flex flex-wrap gap-2"><button data-journey="calculate" className={button} disabled={busy||editsDirty||goalChanged||!!solution.pending} onClick={()=>void calculate()}>Calculate saved assumptions and compare hiring-only</button>{(busy||solution.pending)&&<button data-journey="working" className={button} onClick={()=>{const pending=readWorkforceSolution(decisionStore.getSnapshot().data.workspaces[goalId]?.fields[field])?.pending;interruptCurrentRequest();clearOwnedCalculation(pending??null);setNotice('Request cancelled; saved inputs and previous results retained.')}}>Cancel pending request</button>}</div>
   {selected&&!result&&<p role="status">The selected saved calculation is unavailable. Its reference and history are retained.</p>}
   {goalChanged&&<p className="text-sm">The goal wording changed. Review and save the inputs to bind them to the current goal before calculating or recording approval.</p>}
   {dirty&&<p className="text-sm">Unsaved input changes: save reviewed inputs before recalculating, inspecting another destination or recording approval.</p>}
