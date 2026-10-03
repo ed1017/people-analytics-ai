@@ -100,3 +100,63 @@ test('shuffling artifact/input rows is deterministic and inputs are not mutated'
  f.rows.reverse();f.artifact.trials.reverse();for(const trial of f.artifact.trials){trial.folds.reverse();for(const fold of trial.folds){fold.trainingIds.reverse();fold.preprocessingIds.reverse();fold.predictions.reverse()}}
  f.artifact.holdout.fold.predictions.reverse();assert.deepEqual(run(f),first);
 });
+
+test('improvement against each baseline on different folds cannot satisfy paired-fold acceptance',()=>{
+ const rows=syntheticHiringHistory().map(row=>{
+  const d=row.openedDate,days=d<'2024-07-01'?50:d<'2025-07-01'?20:d<'2025-10-01'?50:d<'2026-01-01'?20:d<'2026-04-01'?80:60;
+  const opened=Date.parse(d);
+  return {...row,startDate:new Date(opened+days*86400000).toISOString().slice(0,10),labelFirstObservedAt:new Date(opened+(days+1)*86400000).toISOString()};
+ });
+ const r=run(syntheticAcceptanceFixture({rows,errors:{.1:8,1:index=>index<2?0:1,10:12}})).report;
+ const dev=r.candidate.folds.slice(0,3);
+ assert.equal(dev.filter(fold=>fold.checks.rolling.maeImproves).length,2);
+ assert.equal(dev.filter(fold=>fold.checks.expanding.maeImproves).length,2);
+ assert.equal(r.candidate.improvingDevelopmentFolds,1);
+ assert.deepEqual(r.failedGates,['developmentImprovement']);
+ assert.equal(r.status,'rejected');
+});
+
+test('either nondefault penalty can win solely from its development predictions',()=>{
+ for(const penalty of [.1,10]){
+  const errors={.1:8,1:6,10:12};errors[penalty]=1;
+  const f=syntheticAcceptanceFixture({errors});f.artifact.holdout.penalty=penalty;
+  const r=run(f).report;
+  assert.equal(r.candidate.selectedPenalty,penalty);
+  assert.equal(r.status,'passed-synthetic-method-validation');
+  assert.equal(r.modelTrained,false);assert.equal(r.deploymentValidated,false);
+ }
+});
+
+test('changing holdout labels cannot change development selection or training baselines',()=>{
+ const f=syntheticAcceptanceFixture(),before=run(f).report;
+ const rows=f.rows.map(row=>row.openedDate>='2026-04-01'&&row.openedDate<'2026-07-01'
+  ?{...row,startDate:'2026-09-01',labelFirstObservedAt:'2026-09-02T00:00:00.000Z'}:row);
+ const changed=syntheticAcceptanceFixture({rows});
+ changed.artifact.holdout=structuredClone(f.artifact.holdout);
+ const after=run(changed).report;
+ assert.deepEqual(after.contract,before.contract);
+ assert.deepEqual(after.candidate.selection,before.candidate.selection);
+ assert.deepEqual(after.candidate.folds.slice(0,3),before.candidate.folds.slice(0,3));
+ assert.deepEqual(after.baseline.folds.map(fold=>[fold.rolling.medianDays,fold.expanding.medianDays]),before.baseline.folds.map(fold=>[fold.rolling.medianDays,fold.expanding.medianDays]));
+ assert.notDeepEqual(after.candidate.folds[3].candidate,before.candidate.folds[3].candidate);
+ assert.equal(after.status,'rejected');
+});
+
+test('an unavailable rolling baseline blocks the gate without substituting expanding history',()=>{
+ const rows=syntheticHiringHistory().filter(row=>row.openedDate<'2024-06-01'||row.openedDate>='2025-07-01');
+ const r=gate(manifest,rows,null).report;
+ assert.equal(r.status,'blocked');assert.equal(r.candidate,null);
+ assert.ok(r.failedGates.includes('development-1:rollingBaselineAvailable'));
+ assert.equal(r.baseline.folds[0].rolling.metrics,null);
+ assert.ok(r.baseline.folds[0].expanding.metrics);
+});
+
+test('malformed evidence at each candidate boundary and cross-fold IDs fail closed',()=>{
+ const mutations=[a=>a.trials=null,a=>a.trials[0]=null,a=>a.trials[0].folds=null,
+  a=>a.trials[0].folds[0]=null,a=>a.holdout=null,a=>a.holdout.fold=null,
+  a=>a.holdout.fold.predictions=null,a=>a.holdout.fold.predictions[0]=null,
+  a=>a.holdout.fold.trainingIds.push(a.holdout.fold.predictions[0].id),
+  a=>a.holdout.fold.predictions[0].id=a.trials[0].folds[0].predictions[0].id];
+ for(const mutate of mutations){const f=syntheticAcceptanceFixture();mutate(f.artifact);assert.throws(()=>run(f))}
+ for(const artifact of [null,[],{},'candidate']){const f=syntheticAcceptanceFixture();assert.throws(()=>gate(f.manifest,f.rows,artifact))}
+});
