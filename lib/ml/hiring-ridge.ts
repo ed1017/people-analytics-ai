@@ -105,6 +105,7 @@ type Development=ReturnType<typeof evaluateHiringDevelopment>;
 type Trial={penalty:number;folds:ReturnType<typeof fitRidgeFold>['localCandidateFold'][];meanDevelopmentMaeDays:number};
 type SelectionState={evaluation:Development;contract:ReturnType<typeof freezeHiringAcceptanceContract>;trials:Trial[];penalty:number};
 const selections=new WeakMap<object,SelectionState>();
+const issuingSelections=new WeakSet<object>();
 const locks=new WeakMap<object,{state:SelectionState;provenance:Record<string,string>;used:boolean}>();
 function requireBoundary(ok:unknown,message:string):asserts ok{if(!ok)throw Error(message)}
 /** All fixed trials, development metrics and selection; no held-out outcomes or baselines. */
@@ -139,7 +140,11 @@ function fixedRecord(raw:unknown,keys:string[]){
 /** Requires an actual selection from this process, explicit fixed settings and provenance. */
 export function lockHiringRidgeSettings(selection:unknown,settings:unknown,provenance:unknown){
  const state=selection&&typeof selection==='object'?selections.get(selection):undefined;
- requireBoundary(state,'Selection must be an issued development result, not a reconstructed artifact.');
+ requireBoundary(state&&!issuingSelections.has(selection as object),'Selection must be an issued development result, not a reconstructed artifact or an issuance already in progress.');
+ // Descriptor inspection can execute Proxy traps. Reserve identity before touching
+ // caller-owned settings/provenance, so reentrant calls cannot issue another lock.
+ issuingSelections.add(selection as object);
+ try {
  const fixed=fixedRecord(settings,['penalty','methodVersion','contractFingerprint']);
  requireBoundary(fixed.penalty===state.penalty&&fixed.methodVersion===hiringRidgeMethod.version&&fixed.contractFingerprint===state.contract.fingerprint,'Settings differ from the frozen method or development selection.');
  const source=fixedRecord(provenance,['experimentId','sourceDefinitionSha256','evaluatorGitSha','candidateCodeSha256']);
@@ -151,6 +156,9 @@ export function lockHiringRidgeSettings(selection:unknown,settings:unknown,prove
  // A selection can issue only one local lock. Frozen snapshots, never caller-owned rows, are retained.
  selections.delete(selection as object);locks.set(lock,{state,provenance:source as Record<string,string>,used:false});
  return lock;
+ } finally {
+  issuingSelections.delete(selection as object);
+ }
 }
 /**
  * Single-use in-process boundary. Loader is called only after validating and consuming
