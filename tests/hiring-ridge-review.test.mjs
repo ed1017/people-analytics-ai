@@ -53,8 +53,8 @@ test('excluded populations do not enter fitting, preprocessing or scoring',()=>{
  const excluded=rows.slice(0,100).map(row=>({...duration(row,100),requisitionId:'other-'+row.requisitionId,externalInternal:'internal'}));
  assert.deepEqual(fit(manifest,[...excluded,...rows],'development-1',1),before);
 });
-test('holdout eligibility still gates the wrapper: do not claim an untouched-holdout execution',()=>{
+test('development fitting is independent of holdout eligibility; final evaluation owns that gate',()=>{
  const rows=history(),evaluation=evaluateHiringBaselines(manifest,rows),holdoutIds=new Set(evaluation.localAudit.folds.at(-1).scoreIds);
  const changed=rows.map(row=>holdoutIds.has(row.requisitionId)?{...row,status:'open'}:row);
- assert.throws(()=>fit(manifest,changed,'development-1',1),/eligibility/);
+ assert.deepEqual(fit(manifest,changed,'development-1',1),fit(manifest,rows,'development-1',1));
 });

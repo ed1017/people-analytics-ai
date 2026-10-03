@@ -1,6 +1,6 @@
-# Synthetic development-fold ridge method
+# Synthetic ridge method
 
-This is an isolated mathematical implementation on a local branch after PR100 head
+The original numerical implementation was an isolated local slice after PR100 head
 `be582c66b183c3d590d0b515e4d5a110d282139e`. It does not change PR100, the production
 workforce calculator, AI clarification, source adapters or any acceptance thresholds.
 No company-history model has been fitted. Synthetic tests exercise the actual solver;
@@ -35,8 +35,8 @@ candidates, calendar windows, sample gates and acceptance thresholds remain unch
 ## Numerical implementation and boundaries
 
 `fitHiringDevelopmentRidge(manifest, observations, foldName, penalty)` in
-`lib/ml/hiring-ridge.ts` validates through the existing synthetic-only evaluator and
-requires its candidate eligibility gates. It sorts training IDs for reproducible
+`lib/ml/hiring-ridge.ts` now validates through the development-only evaluator described
+in [the holdout boundary](hiring-holdout-boundary.md), requiring all development eligibility gates. It sorts training IDs for reproducible
 accumulation, uses compensated sums for centering/scaling, centers standardized columns
 and log targets, then appends two `sqrt(λ)` penalty rows. A two-column Givens QR solve
 with `Math.hypot` avoids matrix inversion and forming normal equations. Positive ridge
@@ -59,15 +59,12 @@ are local alignment data, not a public report. `syntheticFitPerformed` is true;
 `deploymentValidated` are false. Calling this function performs a synthetic numerical
 fit, so describing it as “no fitting whatsoever” would be inaccurate.
 
-This slice does not choose a penalty, construct a full acceptance artifact, fit the
-final holdout model, or create a settings lock. The existing evaluator still checks
-all fold eligibility and computes baseline reports, including holdout baselines;
-this is not an audited untouched-holdout execution. The fitting solver uses only the
-selected training rows. Changing validation/holdout targets while preserving
-eligibility cannot change its coefficients, preprocessing or predictions. Actual
-company-history provenance, authorized rows, verified opening-time features and an
-auditable final experiment remain absent. No network, files, database, model service,
-storage or product integration is used by the fitter.
+The next [holdout-boundary slice](hiring-holdout-boundary.md) adds development-only
+selection, an immutable in-process settings lock, and an explicit final-evaluation
+entry. Development operations never read held-out outcomes or calculate holdout
+baselines. Final evaluation retains all original eligibility and acceptance gates.
+This does not establish real provenance, durable experiment custody or a globally
+untouched holdout. No company-history fitting or deployment readiness is claimed.
 
 ## Tests and concise method explanation
 
@@ -88,10 +85,10 @@ cohorts against rolling and expanding historical medians across three temporal
 development folds and a reserved final holdout, using MAE and p90-error gates. No
 company-trained regression, validated hiring forecast or production ML is claimed.
 
-Local validation: 504 repository unit tests pass, including 14 ridge-method tests;
+Original numerical-slice validation: 504 repository unit tests pass, including 14 ridge-method tests;
 full ESLint, standalone TypeScript, genuine optimized Next build and whitespace checks
 pass. Logs are `/tmp/hiring-ridge-{unit,lint,ts,build}.log` in the execution workspace.
 No browser behavior changed, so browser/device validation is not claimed for this
 Node-only slice. Existing evaluator, acceptance and preflight source bytes are unchanged,
 as are PR100's branch, product code, model-input boundaries and held eNPS work.
-No push, merge, live query or external fitting service was used.
+No push, merge, live query or external fitting service was used for that slice. Current boundary validation is recorded in [the follow-up review](hiring-holdout-boundary.md).

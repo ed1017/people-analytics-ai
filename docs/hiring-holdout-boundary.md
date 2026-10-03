@@ -1,0 +1,29 @@
+# Development outcomes and explicit final-evaluation boundary
+
+Local slice based on independent review `735c6f888430519cb86b1b4751bdc06e7333ae64`. Synthetic method mechanics only: no company history, service calls, UI forecast or production model integration.
+
+## Data boundary
+
+`evaluateHiringDevelopment` in `lib/ml/hiring-development.ts` takes the existing manifest and observations. It freezes the existing calendar split metadata before inspecting outcomes. It first reads only each row's requisition ID, opening date, role code and external/internal designation. These four fields and the manifest must be own data properties; accessor metadata is rejected. Duplicate/invalid opening identities and out-of-coverage dates fail closed.
+
+Rows opened on or after the reserved holdout's training cutoff are never passed to outcome parsing, hashing, baseline computation, fitting or development scoring. Those rows may contain metadata only, or throwing getters for every outcome field. Rows before the cutoff must likewise use data properties (outcome accessors are rejected before invocation) and are copied into an immutable development snapshot; the existing label-observability, chronology, scope, sample-size, coverage and calendar-diversity rules apply to all three development folds. Reports explicitly say `evaluationScope: development-only` and `holdoutGatesDeferred: true`. A development pass is not a final eligibility pass.
+
+`fitHiringDevelopmentRidge` now uses that path, with the same numerical estimator and fixed penalties. `selectHiringDevelopmentRidge` fits all nine prescribed development fold/penalty combinations, computes MAE with the existing aligned scorer, and selects the unique minimum mean development-fold MAE. Exact ties reject under the existing no-tie-policy rule. It does not use holdout eligibility, baselines or metrics. Selection records bind the canonical development snapshot, opening metadata and frozen contract.
+
+The original `hiring-evaluation.ts` and `hiring-acceptance.ts` are byte-for-byte unchanged, preserving their full-evaluation APIs, thresholds and pinned fixture-preflight identities. The new evaluator intentionally retains equivalent parsing and development gate logic separately; parity tests compare its three fold reports and memberships with the legacy evaluator. Future changes to these rules must keep that parity explicit.
+
+## Settings lock and final entry
+
+1. Obtain an actual selection result from `selectHiringDevelopmentRidge`. Reconstructed or modified copies cannot serve as issued selections.
+2. Call `lockHiringRidgeSettings(selection, settings, provenance)`. Settings must explicitly supply the selected penalty, frozen method version and contract fingerprint. Provenance must supply a nonempty experiment ID, source-definition and candidate-code SHA-256 values, and evaluator Git SHA. Missing, extra, accessor-based or malformed fields reject. These hashes are declarations, not independently authenticated provenance.
+3. An issued selection may create only one immutable lock. Its private state retains copied development observations, trial predictions, split/cohort metadata and fixed settings. Later mutation of caller-owned rows, settings or provenance cannot affect it. Serialized/cloned locks are deliberately not resumable.
+4. Call `evaluateLockedHiringRidge(lock, loadHoldoutOutcomes)` explicitly. The lock is validated and consumed before the loader runs, preventing reuse and reentrant evaluation; loader failure, wrong cohort or failed gates also consumes it. The loader must return exactly the locked **reserved opening partition** (all openings on or after the holdout training cutoff), including unfilled/cancelled rows, with matching opening metadata. Later openings outside the scored holdout window are included for the legacy global label-history/integrity checks; they do not become scored predictions. Omitting them would weaken those existing gates.
+5. Holdout outcome fields are snapshotted once, then the unchanged full evaluator checks **all** existing gates. Only after passing eligibility is the final ridge fitted using the selected penalty and labels observable by the holdout training cutoff. The unchanged acceptance gate scores the retained development trials and final predictions against both baselines and all existing performance thresholds. Rejected results remain rejected; no gate is relaxed.
+
+This is an in-process boundary, not durable experiment custody. A caller can start another process/selection or read its own data elsewhere. Hash formats cannot establish true provenance, and this API cannot prove that a holdout was globally untouched. `provenanceVerified`, `untouchedExperimentEstablished`, company-model training, performance and deployment readiness remain false. A real experiment still needs authorized verified data, independently bound source/code identities, controlled holdout custody and a durable reviewed settings-lock record. Synthetic tests do not supply those prerequisites.
+
+## Validation
+
+Instrumented tests put throwing getters on every holdout outcome while running development evaluation, all nine fits, selection and locking. They also cover fold parity; absent holdout outcomes; selected-setting/provenance requirements; forged, mutated, reused and reentrant handles; input reordering; frozen caller snapshots; exact cohort alignment; outcome access only in the explicit final entry; preserved final gates; and selection ties. The historical review test now expects development fitting to be independent of holdout eligibility.
+
+Validation passes: **523 repository unit tests**, full lint, standalone TypeScript and genuine production build. This includes 14 new boundary tests; logs are `/tmp/holdout-{unit,lint,ts,build}.log`. The final baseline report also matches the unchanged full evaluator exactly. No browser behavior changes. No browser/device or real-company performance claim is made.

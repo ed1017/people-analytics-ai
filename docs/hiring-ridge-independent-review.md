@@ -1,5 +1,7 @@
 # Independent ridge candidate review
 
+Historical review of the original candidate. The subsequent [holdout-boundary slice](hiring-holdout-boundary.md) addresses the development wrapper limitation below; it still does not establish globally untouched data or real performance.
+
 Reviewed remote candidate `8f1b4d172b4f61396f2d28338a19a6e567502851` against its direct base `be582c66b183c3d590d0b515e4d5a110d282139e`. The exact candidate was present at `refs/heads/cloud-hiring-ridge-review` and was fetched without modifying remote refs. Review occurred in the separate `local-hiring-ridge-review` worktree. The contextual-prompt branch was left at `2e38e7a40a77a0f0253e85cc595ab81d34136235`.
 
 No concrete implementation defect found. No solver, evaluator, protocol, product, database or dependency source changes were needed. The candidate's sum-squared log-duration loss plus lambda times squared coefficients, population-standardized opening-month sine/cosine predictors, unpenalized intercept and augmented Givens QR agree with the described estimator. Only the fixed penalties 0.1, 1 and 10 are accepted. Calendar constants, finite arithmetic and output range checks match the declared method.

@@ -101,7 +101,7 @@ execution boundary. Do not request private rows as part of this infrastructure s
 
 The separate [synthetic development-fold fitter](hiring-ridge-method.md) implements
 train-only standardization and ridge coefficients for numerical-method tests. It does
-not construct a complete acceptance artifact or fit a final holdout model.
+not itself construct a complete acceptance artifact or fit a final holdout model. The subsequent [holdout boundary](hiring-holdout-boundary.md) adds a separate explicit settings-lock/final-evaluation path for synthetic methods.
 Company-history fitting and preprocessing, reproducible authorized fitted artifacts,
 independent provenance verification, and an auditable settings lock before a genuinely
 untouched holdout remain unimplemented. Subsequent out-of-time/deployment validation,
