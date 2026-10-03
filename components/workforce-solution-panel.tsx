@@ -2,7 +2,7 @@
 import {useEffect,useRef,useState} from "react";
 import {decisionStore,useDecisionStorage} from "@/components/decision-store";
 import {createWorkforceSolution,currentSolutionVersion,emptySolutionInputs,reviseWorkforceSolution,beginSolutionRun,completeSolutionRun,cancelSolutionRun,solutionResultIsCurrent,recordSolutionApproval,type WorkforceSolution,type SolutionInputs} from "@/lib/workforce-solution";
-import {emptyWorkforcePlanInput,validateWorkforcePlanInput,type WorkforcePlanInput,type WorkforcePlanField,type WorkforceIncrement} from "@/lib/workforce-increment";
+import {emptyWorkforcePlanInput,workforcePlanFields,validateWorkforcePlanInput,type WorkforcePlanInput,type WorkforcePlanField,type WorkforceIncrement} from "@/lib/workforce-increment";
 import type {AppPage,StructuralPositionCatalogResponse} from "@/lib/types";
 import type {Json} from "@/lib/local-decisions";
 import type {WorkforceClarification} from "@/lib/workforce-clarification";
@@ -46,7 +46,7 @@ function Workspace({goalId,goalStatement,solution,page,onNavigate}:{goalId:strin
  async function calculate(){if(controller.current)return;let started;try{validateWorkforcePlanInput(fromInputs(version.inputs));started=beginSolutionRun(current(),version.version,crypto.randomUUID(),['brief'],new Date().toISOString());save(started.state);}catch(e){setNotice((e as Error).message);return}
   const c=new AbortController();controller.current=c;setBusy(true);setNotice('');const timer=setTimeout(()=>c.abort(),65000);
   try{const input=fromInputs(version.inputs),r=await fetch('/api/workforce-solution',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input),signal:c.signal});const body=await r.json();if(!r.ok)throw Error(body.error||'Workforce comparison unavailable.');if(!isHere()||c.signal.aborted)return;
-   if(body.version!==1||JSON.stringify(body.input)!==JSON.stringify(input)||!Array.isArray(body.proposed?.rows)||!Array.isArray(body.hireOnly?.rows))throw Error('Calculation did not match reviewed inputs.');
+   if(body.version!==1||!body.input||Object.keys(body.input).length!==workforcePlanFields.length||workforcePlanFields.some(key=>body.input[key]!==input[key])||!Array.isArray(body.proposed?.rows)||!Array.isArray(body.hireOnly?.rows))throw Error('Calculation did not match reviewed inputs.');
    const next=completeSolutionRun(current(),started.ticket,[{id:crypto.randomUUID(),kind:'brief',calculator:{name:'single-role-workforce-review',version:'1'},payload:body}],new Date().toISOString());save(next);decisionStore.setField(goalId,'workforceInspection',next.results.at(-1)!.id);setNotice('Calculated comparison saved. Evidence and inputs are retained with this result; no real-world action occurred.');
   }catch(e){if(isHere())setNotice(c.signal.aborted?'Cancelled or timed out; prior results retained.':(e as Error).message)}finally{clearTimeout(timer);if(isHere())save(cancelSolutionRun(current(),started.ticket.id));controller.current=null;setBusy(false)}
  }
