@@ -69,3 +69,40 @@ emulation. Physical Windows/Android Chrome and hosted acceptance remain unverifi
 Local verification: 460 full unit tests; 605 combined browser assertions (including
 30 new lifecycle-fixture and 12 new built-app assertions); full ESLint, standalone
 TypeScript and genuine optimized production build passed. No push or deployment.
+
+## Independent review
+
+Reviewed exact `8ee488e4f19ebb88ab678982580c3410a3f90c0d` against
+`a7d0f7276c29e805ade1665aa5ef16fdea4c1f97` on the separate local branch
+`review/workforce-pending-independent`. No additional production-code defect was
+found. The originating-ticket cleanup and request-identity guards are unchanged.
+
+Independent browser execution confirms the historical v2/current v3 A–B–A recovery
+through the production app's actual goal selector, plus the fixture's batched switch,
+old response after a newer request, deletion, timeout and retained-orphan cancellation.
+Four additional assertions at each viewport cover explicit Cancel followed immediately
+by retry: the old signal is aborted, its late response cannot clear the new ticket or
+append a result, and only the retry completes. Changing goal wording also cancels the
+owned ticket, rejects its late response and keeps Calculate disabled until goal/input
+alignment is reviewed.
+
+Validation: 460 unit tests and 613 combined browser assertions pass (38 pending
+fixture, 12 pending built app, 62 journey, 100 cards, 98 built workspace, 54 intake,
+48 readiness, 44 goal copy, 62 local search, 50 handoff, 11 selection, 24 lifecycle,
+10 portable fixture). Full ESLint, standalone TypeScript, the genuine production build
+and whitespace checks pass. The initial browser setup started while the build was
+recreating `.next/static/chunks` and failed before assertions with ENOENT; rerunning
+after the completed build passed. No product change was made for this setup ordering.
+
+Execution evidence: `/tmp/pending-independent-{unit,lint,ts,build}.log`,
+`/tmp/pending-independent-browser-*.log`, and
+`/tmp/pending-independent-workspace/results.json`. The built app's background API
+requests, including chat, received intercepted synthetic unavailable responses;
+no live API, model, authentication or database service was contacted.
+
+Coverage remains Linux Chromium desktop and Pixel viewport/touch emulation, not
+physical Windows/Android or hosted validation. Hosted retesting is independent of
+this review. The ML review remains at `6c054e90874e3c2f187a1a68c39b4d1178955522`,
+the verified journey source at `a7d0f7276c29e805ade1665aa5ef16fdea4c1f97`, and the
+release branch at `134c04def4b60036955c78b57559782e94b7f9d9`. PR99 and held eNPS
+work are unchanged. No push, PR update, merge or deployment was performed.
