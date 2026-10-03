@@ -72,7 +72,9 @@ export function calculateWorkforceIncrement(raw:unknown,evidence:RecruitingTimin
   const covered=add(hires,buildReady,moveReady),salary=monthlyRecurring(arrival,month,buy,hireAnnual),backfillSalary=monthlyRecurring(backfillArrival,month,backfills,backfillAnnual);
   // Total user-entered internal salary uplift (not existing payroll), allocated
   // evenly per internal role from each explicitly supplied effective month.
-  const internalCost=build+move===0?0:internalAnnual===null||internalUnknownTiming?null:add(monthlyRecurring(input.buildMonth+'-01',month,build,internalAnnual/(build+move)),monthlyRecurring(input.moveMonth+'-01',month,move,internalAnnual/(build+move)));
+  // Build/Move dates are month starts. Combine their shares before rounding so
+  // splitting the same internal cohort cannot create an extra cent of uplift.
+  const internalCost=build+move===0?0:internalAnnual===null||internalUnknownTiming?null:round(internalAnnual/12*((buildReady??0)+(moveReady??0))/(build+move));
   const fees=add(oneTime(arrival,month,buy,hireFee),oneTime(backfillArrival,month,backfills,backfillFee));
   const programCash=i===0?trainingCash:0,programTime=i===0?trainingTime:0;
   return {month,externalHires:hires,externalBackfills:backfill,addedEmployees:add(hires,backfill),conditionalRoleCoverage:covered,remainingRoles:covered===null?null:Math.max(0,roles-covered),hireStaffingCost:salary,backfillStaffingCost:backfillSalary,internalSalaryUplift:internalCost,recruitingFees:fees,trainingCash:programCash,employeeTimeValue:programTime,incrementalCash:add(salary,backfillSalary,internalCost,fees,programCash)};
