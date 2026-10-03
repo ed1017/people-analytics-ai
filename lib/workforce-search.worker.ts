@@ -13,8 +13,8 @@ self.onmessage=async(event: MessageEvent)=>{
    case "cards": value=await loadSolutionCards(args.solution,args.resultId,args.history);break;
    case "what-if": value=await previewSolutionWhatIf(args.solution,args.resultId,args.history,args.cardId,args.draft,args.priority);break;
    case "save-what-if": value=await saveSolutionWhatIf(args.solution,args.resultId,args.history,args.preview,args.runId,args.newResultId,args.at);break;
-   case "pin": value=await pinSavedSolution(args.pins,args.solution,args.resultId,args.id,args.at);break;
-   case "resolve-pin": value=await resolveSolutionPin(args.pin,args.solution);break;
+   case "pin": value=await pinSavedSolution(args.pins,args.solution,args.resultId,args.id,args.at,args.history);break;
+   case "resolve-pin": value=await resolveSolutionPin(args.pin,args.solution,args.history);break;
    default: throw Error("Unsupported local operation.");
   }
   self.postMessage({ok:true,value});

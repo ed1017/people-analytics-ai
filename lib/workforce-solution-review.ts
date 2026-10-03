@@ -74,7 +74,7 @@ export function readSavedWorkforceReview(solution: WorkforceSolution, result: Re
       if (!equal(origin.changedFields,workforcePlanFields.filter(key => previous.input[key] !== review.input[key])) || !(origin.changedFields as unknown[]).length) return null;
       const hash = (value:unknown) => typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
       if (!hash(origin.sourceHash) || origin.alternativeHash !== null && !hash(origin.alternativeHash) || origin.searchFingerprint !== null && !hash(origin.searchFingerprint)) return null;
-      if (origin.alternativeReviewId === null ? origin.alternativeSlot !== null : typeof origin.alternativeReviewId !== "string" || !/^[a-zA-Z0-9-]{1,80}$/.test(origin.alternativeReviewId) || ![0,1].includes(Number(origin.alternativeSlot))) return null;
+      if (origin.alternativeReviewId === null ? origin.alternativeSlot !== null || origin.alternativeHash !== null || origin.searchFingerprint !== null : origin.alternativeHash === null || typeof origin.alternativeSlot !== "number" || typeof origin.alternativeReviewId !== "string" || !/^[a-zA-Z0-9-]{1,80}$/.test(origin.alternativeReviewId) || ![0,1].includes(origin.alternativeSlot as number)) return null;
       const timing = review.timing as RecruitingTimingEvidence|null;
       if (!equal(review.proposed,calculateWorkforceIncrement(review.input,timing)) || !equal(review.hireOnly,calculateWorkforceIncrement({...review.input,build:"0",move:"0",buy:review.input.roles,backfills:"0",internalAnnualCostChange:"0",trainingCash:"0",trainingHours:"0"},timing))) return null;
     } catch {return null}

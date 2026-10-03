@@ -30,3 +30,7 @@ Existing limits remain: two alternatives per review, ten alternative reviews, 50
 6. On actual target devices, check touch targets, wrapping, expandable details and keyboard focus. If workers/Web Crypto are unsupported, confirm a local error with retained data and no API fallback. No credentials are needed for the synthetic local harness.
 
 Sparse natural-month intake was diagnosed separately in `workforce-intake-month-review.md`. The proven representation mismatch is fixed; the original deployed model response and actual failure stage were not available. Parent controls any new hosted test.
+
+## Subsequent local review and outcomes refinement
+
+`local-workforce-outcomes-review` fixes three concrete lineage/draft-preservation defects and adds the requested scenario outcome summary and a single expandable, editable calculation breakdown. See `workforce-outcomes-review.md` for reproducers, fixes, current acceptance checks and the explicit unavailable-forecast boundary. The original `5b73b50` checkpoint is retained.

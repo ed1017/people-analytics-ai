@@ -18,6 +18,7 @@ export type CardsSnapshot={cards:SolutionCard[];benchmark:SolutionCard;sourceHas
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 function requireValue(value:unknown,message:string):asserts value {if(!value)throw Error(message)}
 export function cardSourceIdentity(solution:WorkforceSolution,resultId:string){return JSON.stringify({id:solution.id,goalId:solution.goalId,versions:solution.versions,evidence:solution.evidence,result:solution.results.find(r=>r.id===resultId),pending:solution.pending})}
+export function cardVerificationIdentity(solution:WorkforceSolution,resultId:string,history:unknown){return JSON.stringify([cardSourceIdentity(solution,resultId),history])}
 export function fullCoverage(plan:WorkforceIncrement):string|null{return plan.rows.find(row=>row.conditionalRoleCoverage!==null&&row.conditionalRoleCoverage>=Number(plan.input.roles))?.month??null}
 export function rankSolutionCards(cards:SolutionCard[],priority:CardPriority){
  requireValue(priority===''||Object.hasOwn(cardPriorities,priority),'Choose a supported comparison priority.');
@@ -37,7 +38,7 @@ function savedReview(solution:WorkforceSolution,resultId:string){
  requireValue(result&&review,'Saved calculation is unavailable or unreadable.');return {result,review};
 }
 export async function loadSolutionCards(solution:WorkforceSolution,resultId:string,history:unknown):Promise<CardsSnapshot>{
- const {review}=savedReview(solution,resultId);await pinFingerprint(solution,resultId);let alternative:LocalWorkforceReview|null=null,historyNotice='';
+ const {review}=savedReview(solution,resultId);await pinFingerprint(solution,resultId,history);let alternative:LocalWorkforceReview|null=null,historyNotice='';
  if(!Array.isArray(history)||history.length>10)historyNotice='Alternative history is unreadable; original records retained.';
  else for(const raw of history){const item=await readLocalWorkforceReview(raw,solution);if(!item){historyNotice='Some alternative history is unreadable; original records retained.';continue}if(item.binding.evidenceResultId===resultId)alternative=item}
  const make=(id:string,title:string,input:WorkforcePlanInput,plan:WorkforceIncrement,slot:number|null=null):SolutionCard=>({id,title,input,plan,reviewId:slot===null?null:alternative!.id,slot});
@@ -63,7 +64,7 @@ export async function saveSolutionWhatIf(solution:WorkforceSolution,resultId:str
  const snapshot=await loadSolutionCards(solution,resultId,history),card=preview.cards.find(item=>item.id===preview.cardId)!;
  const prior=currentSolutionVersion(solution),inputs=structuredClone(prior.inputs);
  for(const key of workforcePlanFields){const sections=solutionSections.filter(section=>Object.hasOwn(inputs[section],key));requireValue(sections.length===1,'Saved input sections are ambiguous.');inputs[sections[0]][key]=preview.draft[key]}
- const origin={schemaVersion:1,kind:'local-what-if',sourceGoalId:solution.goalId,sourceSolutionId:solution.id,sourceVersion:prior.version,sourceResultId:resultId,sourceHash:await pinFingerprint(solution,resultId),alternativeReviewId:card.reviewId,alternativeSlot:card.slot,alternativeHash:card.reviewId&&snapshot.alternative?await localFingerprint(snapshot.alternative):null,searchFingerprint:card.reviewId&&snapshot.alternative?.schemaVersion===2?snapshot.alternative.selectionOrigin.search.fingerprint:null,method:workforceIncrementMethodVersion,changedFields:preview.changedFields,priority:preview.priority};
+ const origin={schemaVersion:1,kind:'local-what-if',sourceGoalId:solution.goalId,sourceSolutionId:solution.id,sourceVersion:prior.version,sourceResultId:resultId,sourceHash:await pinFingerprint(solution,resultId,history),alternativeReviewId:card.reviewId,alternativeSlot:card.slot,alternativeHash:card.reviewId&&snapshot.alternative?await localFingerprint(snapshot.alternative):null,searchFingerprint:card.reviewId&&snapshot.alternative?.schemaVersion===2?snapshot.alternative.selectionOrigin.search.fingerprint:null,method:workforceIncrementMethodVersion,changedFields:preview.changedFields,priority:preview.priority};
  const hireOnly=calculateWorkforceIncrement({...preview.draft,build:'0',move:'0',buy:preview.draft.roles,backfills:'0',internalAnnualCostChange:'0',trainingCash:'0',trainingHours:'0'},snapshot.review.timing as RecruitingTimingEvidence|null);
  const payload={...snapshot.review,calculatedAt:at,input:preview.draft,proposed:card.plan,hireOnly,localWhatIf:origin};
  const revised=reviseWorkforceSolution(solution,prior.version,inputs,'sidebar','Saved reviewed local what-if; retained source evidence',at),run=beginSolutionRun(revised,currentSolutionVersion(revised).version,runId,['brief'],at);
@@ -77,14 +78,23 @@ export function readSolutionPins(raw:unknown):SolutionPin[]|null{
  if(raw.some(p=>!p||typeof p!=='object'||Object.keys(p).length!==keys.length||!keys.every(k=>Object.hasOwn(p,k))||p.schemaVersion!==1||!['id','goalId','solutionId','resultId'].every(k=>typeof p[k]==='string'&&/^[a-zA-Z0-9-]{1,80}$/.test(p[k]))||!Number.isSafeInteger(p.version)||p.version<1||typeof p.createdAt!=='string'||!Number.isFinite(Date.parse(p.createdAt))||typeof p.fingerprint!=='string'||! /^[a-f0-9]{64}$/.test(p.fingerprint)))return null;
  if(new Set(raw.map(p=>p.id)).size!==raw.length||new Set(raw.map(p=>`${p.goalId}:${p.solutionId}:${p.resultId}`)).size!==raw.length)return null;return raw;
 }
-async function pinFingerprint(solution:WorkforceSolution,resultId:string):Promise<string>{const {result}=savedReview(solution,resultId);
+async function pinFingerprint(solution:WorkforceSolution,resultId:string,history:unknown=[]):Promise<string>{const {result}=savedReview(solution,resultId);
  const origin=result.payload.localWhatIf as Record<string,Json>|undefined;
- if(origin)requireValue(await pinFingerprint(solution,String(origin.sourceResultId))===origin.sourceHash,'Local what-if source evidence or lineage changed; original records retained.');
+ if(origin){
+  requireValue(await pinFingerprint(solution,String(origin.sourceResultId),history)===origin.sourceHash,'Local what-if source evidence or lineage changed; original records retained.');
+  if(origin.alternativeReviewId!==null){
+   requireValue(Array.isArray(history)&&history.length<=10,'Saved alternative lineage is unavailable; original records retained.');
+   const matches=history.filter(raw=>raw&&typeof raw==='object'&&!Array.isArray(raw)&&raw.id===origin.alternativeReviewId);
+   requireValue(matches.length===1,'Saved alternative lineage is missing or ambiguous; original records retained.');
+   const review=await readLocalWorkforceReview(matches[0],solution);
+   requireValue(review&&review.binding.evidenceResultId===origin.sourceResultId&&review.binding.goalId===solution.goalId&&review.binding.solutionId===solution.id&&review.reviewedRevisions[Number(origin.alternativeSlot)]&&await localFingerprint(review)===origin.alternativeHash&&(review.schemaVersion===2?review.selectionOrigin.search.fingerprint:null)===origin.searchFingerprint,'Saved alternative lineage changed; original records retained.');
+  }
+ }
  return localFingerprint({goalId:solution.goalId,solutionId:solution.id,result,version:solution.versions.find(v=>v.version===result.version),evidence:solution.evidence.filter(e=>result.evidenceIds.includes(e.id))})}
-export async function pinSavedSolution(raw:unknown,solution:WorkforceSolution,resultId:string,id:string,at:string){
+export async function pinSavedSolution(raw:unknown,solution:WorkforceSolution,resultId:string,id:string,at:string,history:unknown=[]){
  const pins=readSolutionPins(raw);requireValue(pins,'Pin history is unreadable; records retained.');const {result}=savedReview(solution,resultId);
  requireValue(pins.length<10,'Ten-pin limit reached; unpin explicitly before adding another.');requireValue(!pins.some(p=>p.solutionId===solution.id&&p.resultId===resultId),'This saved calculation is already pinned.');
- const next=[...pins,{schemaVersion:1 as const,id,createdAt:at,goalId:solution.goalId,solutionId:solution.id,version:result.version,resultId,fingerprint:await pinFingerprint(solution,resultId)}];requireValue(readSolutionPins(next),'Invalid pin identity.');return next;
+ const next=[...pins,{schemaVersion:1 as const,id,createdAt:at,goalId:solution.goalId,solutionId:solution.id,version:result.version,resultId,fingerprint:await pinFingerprint(solution,resultId,history)}];requireValue(readSolutionPins(next),'Invalid pin identity.');return next;
 }
-export async function resolveSolutionPin(pin:SolutionPin,solution:WorkforceSolution|null){try{requireValue(readSolutionPins([pin])&&solution&&pin.goalId===solution.goalId&&pin.solutionId===solution.id,'Unavailable');const {result}=savedReview(solution,pin.resultId);requireValue(result.version===pin.version&&await pinFingerprint(solution,pin.resultId)===pin.fingerprint,'Unavailable');return {resultId:result.id,historical:currentSolutionVersion(solution).version!==result.version||!solutionResultIsCurrent(solution,result)}}catch{return null}}
+export async function resolveSolutionPin(pin:SolutionPin,solution:WorkforceSolution|null,history:unknown=[]){try{requireValue(readSolutionPins([pin])&&solution&&pin.goalId===solution.goalId&&pin.solutionId===solution.id,'Unavailable');const {result}=savedReview(solution,pin.resultId);requireValue(result.version===pin.version&&await pinFingerprint(solution,pin.resultId,history)===pin.fingerprint,'Unavailable');return {resultId:result.id,historical:currentSolutionVersion(solution).version!==result.version||!solutionResultIsCurrent(solution,result)}}catch{return null}}
 export function unpinSolution(raw:unknown,id:string){const pins=readSolutionPins(raw);requireValue(pins,'Pin history is unreadable; records retained.');return pins.filter(pin=>pin.id!==id)}

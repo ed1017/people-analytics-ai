@@ -77,3 +77,28 @@ test('pin cap never evicts and corrupted history is retained',async()=>{
  const state=fixture(),[pin]=await pinSavedSolution([],state,'result','pin',at);const full=Array.from({length:10},(_,i)=>({...pin,id:`pin-${i}`,resultId:`result-${i}`}));
  await assert.rejects(pinSavedSolution(full,state,'result','extra',at),/Ten-pin/);await assert.rejects(pinSavedSolution([{}],state,'result','extra',at),/unreadable/);assert.throws(()=>unpinSolution([{}],'anything'),/unreadable/);assert.equal(full.length,10);
 });
+
+test('saved alternative provenance is verified against exact retained history before display or pinning',async()=>{
+ const state=fixture(),base=workforceReviewFixture().input,review=previewWorkforceAlternatives(state,'result',[revision(base)],'actual-review',at),history=[review];
+ const p=await makePreview(state,revision(base),history,'alternative-1'),next=await saveSolutionWhatIf(state,'result',history,p,'next-run','next-result',at);
+ assert.equal((await loadSolutionCards(next,'next-result',history)).cards.length,2);const pins=await pinSavedSolution([],next,'next-result','pin',at,history);assert.ok(await resolveSolutionPin(pins[0],next,history));
+ for(const patch of [{alternativeReviewId:'missing'},{alternativeHash:'0'.repeat(64)},{alternativeSlot:1},{searchFingerprint:'0'.repeat(64)}]){
+  const bad=structuredClone(next);Object.assign(bad.results[1].payload.localWhatIf,patch);await assert.rejects(loadSolutionCards(bad,'next-result',history),/lineage/);await assert.rejects(pinSavedSolution([],bad,'next-result','bad-pin',at,history));
+ }
+ for(const missing of [[],[review,review],[{...review,createdAt:'2026-10-04T01:00:00.000Z'}]]){await assert.rejects(loadSolutionCards(next,'next-result',missing),/lineage/);assert.equal(await resolveSolutionPin(pins[0],next,missing),null)}
+});
+test('local origin rejects inapplicable or incorrectly typed provenance instead of accepting a cast',async()=>{
+ const state=fixture(),p=await makePreview(state,{trainingCash:'5000'}),next=await saveSolutionWhatIf(state,'result',[],p,'new','revised',at);
+ for(const patch of [{alternativeHash:'0'.repeat(64)},{alternativeSlot:true},{searchFingerprint:'0'.repeat(64)}]){const bad=structuredClone(next);Object.assign(bad.results[1].payload.localWhatIf,patch);assert.equal(readSavedWorkforceReview(bad,bad.results[1]),null)}
+});
+
+test('v2 search origin survives revised saves and pins without inheriting forged search metadata',async()=>{
+ const {selectionFixture,selectionSpec}=await import('./fixtures/workforce-selection.mjs');
+ const {searchWorkforceMixesLocally,stageWorkforceMixSelectionLocally,originForSelection,previewWorkforceSearchReview}=await import('../lib/workforce-local-search.ts');
+ const {solution}=selectionFixture(),report=await searchWorkforceMixesLocally(solution,'source-result',selectionSpec()),ids=['build-0-move-3-buy-0'];
+ const context={solution,activeGoalId:solution.goalId,activeGoalStatement:'Synthetic bounded workforce comparison',evidenceResultId:'source-result',expectedSearchFingerprint:report.searchFingerprint,hasUnsavedPlanEdits:false};
+ const selected=await stageWorkforceMixSelectionLocally(context,report,ids),review=await previewWorkforceSearchReview(context,selected.revisions,originForSelection(report,ids,selected.revisions),'search-review',at),history=[review],before=structuredClone(history);
+ const preview=await previewSolutionWhatIf(solution,'source-result',history,'alternative-1',selected.revisions[0],'employees'),next=await saveSolutionWhatIf(solution,'source-result',history,preview,'next-run','next-result',at);
+ assert.equal(next.results.at(-1).payload.localWhatIf.searchFingerprint,report.searchFingerprint);assert.equal((await loadSolutionCards(next,'next-result',history)).cards.length,2);const pins=await pinSavedSolution([],next,'next-result','pin',at,history);assert.ok(await resolveSolutionPin(pins[0],next,history));assert.deepEqual(history,before);
+ const corrupt=structuredClone(history);corrupt[0].selectionOrigin.search.fingerprint='0'.repeat(64);await assert.rejects(loadSolutionCards(next,'next-result',corrupt),/lineage/);assert.equal(await resolveSolutionPin(pins[0],next,corrupt),null);
+});
