@@ -1,5 +1,7 @@
 import type {Json} from "./local-decisions";
 import type {WorkforceIncrement, WorkforcePlanInput} from "./workforce-increment";
+// @ts-expect-error Native Node tests use the same TypeScript source.
+import {currentSolutionVersion, solutionResultIsCurrent, type WorkforceSolution} from "./workforce-solution.ts";
 
 export type WorkforceReview = {
   version: number;
@@ -66,4 +68,19 @@ export function workforceLimitSummary(plan: WorkforceIncrement) {
   if (plan.checks.some(check => check.status === "not met")) return "One or more entered limits are not met.";
   if (plan.checks.length !== 3 || plan.checks.some(check => check.status !== "met")) return "Some entered limits cannot be checked.";
   return "Entered limits met; operational feasibility remains unverified.";
+}
+
+// The decision-notes page inspects the same selected calculation as Home.
+// It does not copy outputs into editable notes or create a second approval.
+export function selectedWorkforceBrief(solution: WorkforceSolution | undefined, selectedId: unknown, goalStatement: string) {
+  if (!solution) return null;
+  const results = solution.results.filter(result => result.kind === "brief" && result.calculator.name === "single-role-workforce-review");
+  const result = results.find(item => item.id === selectedId) ?? results.at(-1);
+  if (!result) return null;
+  const review = result.payload as unknown as WorkforceReview;
+  return {
+    result, review, evidence: workforceReviewEvidence(review), count: results.length,
+    current: currentSolutionVersion(solution).inputs.scope.goalStatement === goalStatement && solutionResultIsCurrent(solution, result),
+    reviewNotes: solution.approvals.filter(note => note.resultIds.includes(result.id)),
+  };
 }

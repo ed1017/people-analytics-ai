@@ -4,12 +4,13 @@ import {workforceReviewFixture} from '../fixtures/workforce-review.mjs';
 import {calculateWorkforceIncrement} from '../../lib/workforce-increment.ts';
 import fs from 'node:fs/promises';
 import {encodeDecisions} from '../../lib/local-decisions.ts';
+import {emptyDecisionBrief} from '../../lib/decision-brief.ts';
 const output=process.env.WORKFORCE_QA_OUTPUT ?? '/tmp/workforce-evidence-qa';
 await fs.mkdir(output,{recursive:true});
 const results=[];
 const check=(name,ok)=>{console.log(name+': '+Boolean(ok));results.push({name,pass:Boolean(ok)});if(!ok)throw Error(name)};
 const fixture=workforceReviewFixture(),key='insights-to-action.decisions.v1',goal='Compare three additional Engineer positions in Technology';
-const seed={version:1,revision:1,goals:{version:1,activeId:'goal-a',goals:[{id:'goal-a',statement:goal},{id:'goal-b',statement:'Unrelated goal'}]},workspaces:{'goal-a':{savedAt:fixture.calculatedAt,fields:{brief:{owner:'Keep local owner',observed:'Keep local notes'},chat:{messages:[],input:''}}}}};
+const seed={version:1,revision:1,goals:{version:1,activeId:'goal-a',goals:[{id:'goal-a',statement:goal},{id:'goal-b',statement:'Unrelated goal'}]},workspaces:{'goal-a':{savedAt:fixture.calculatedAt,fields:{brief:{...emptyDecisionBrief(),owner:'Keep local owner',observed:'Keep local notes'},chat:{messages:[],input:''}}}}};
 const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH ?? '/usr/bin/chromium',headless:true,args:['--no-sandbox']});
 try {
  for(const width of [1366,390]) {
@@ -94,6 +95,17 @@ try {
   await page.getByLabel('Selected goal',{exact:true}).selectOption('goal-a');
   await workspace.getByRole('heading',{name:'Calculated decision brief — version 2',exact:true}).waitFor();
   check(width+' switching back restores historical inspection',(await state()).workspaces['goal-a'].fields.workforceInspection===saved.workforceInspection);
+  await workspace.getByRole('button',{name:'Open decision notes for this calculation',exact:true}).click();
+  const notes=page.getByRole('region',{name:'Decision brief',exact:true}),savedComparison=notes.getByRole('region',{name:'Saved workforce comparison',exact:true});
+  await savedComparison.waitFor();
+  check(width+' notes page recognizes workforce result',!(await notes.innerText()).includes('No completed calculations saved for this goal.')&&(await savedComparison.innerText()).includes('Workforce comparison · version 2'));
+  check(width+' notes page marks historical snapshot',(await savedComparison.innerText()).includes('Historical workforce comparison')&&(await savedComparison.innerText()).includes('$22,500'));
+  await notes.getByRole('textbox',{name:/^Calculation notes/}).fill('Keep this user-authored interpretation.');
+  check(width+' notes cannot rewrite calculations',(await state()).workspaces['goal-a'].fields.workforceSolution.results.length===2);
+  await savedComparison.getByRole('button',{name:'Review this workforce calculation on Home',exact:true}).click();
+  await workspace.getByRole('heading',{name:'Calculated decision brief — version 2',exact:true}).waitFor();
+  check(width+' notes navigation retains selection',(await state()).workspaces['goal-a'].fields.workforceInspection===saved.workforceInspection);
+  check(width+' decision writing preserved',(await state()).workspaces['goal-a'].fields.brief.calculations==='Keep this user-authored interpretation.');
   check(width+' only explicit fixture calls',modelCalls===1&&calculationCalls===2);
   check(width+' no browser runtime errors',errors.length===0);
   results.push({name:width+' blocked nonlocal browser requests',count:unmocked});
