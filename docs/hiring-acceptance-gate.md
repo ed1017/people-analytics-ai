@@ -99,12 +99,16 @@ opening-known features, source-definition hashes and sufficient counts/coverage 
 every frozen fold. Retain the local exclusion and membership audits within the approved
 execution boundary. Do not request private rows as part of this infrastructure slice.
 
-Actual ridge fitting, training-only preprocessing, reproducible fitted artifacts,
+The separate [synthetic development-fold fitter](hiring-ridge-method.md) implements
+train-only standardization and ridge coefficients for numerical-method tests. It does
+not construct a complete acceptance artifact or fit a final holdout model.
+Company-history fitting and preprocessing, reproducible authorized fitted artifacts,
 independent provenance verification, and an auditable settings lock before a genuinely
 untouched holdout remain unimplemented. Subsequent out-of-time/deployment validation,
 monitoring and any product forecast integration need separate review. Passing these
-synthetic mechanics closes none of those evidence gaps. No demonstration-data fitting,
-authentication work, employee-level decisions or eNPS changes are part of this work.
+synthetic mechanics closes none of those evidence gaps. The acceptance module itself
+performs no fitting; authentication work, employee-level decisions and eNPS changes
+remain outside these offline methods.
 
 Validation for this slice: all 463 repository unit tests pass (including 15 new gate
 tests), full ESLint and standalone TypeScript pass, and the genuine optimized Next
