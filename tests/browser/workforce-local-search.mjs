@@ -8,7 +8,7 @@ import {recordSolutionApproval,reviseWorkforceSolution,beginSolutionRun,complete
 import {previewWorkforceAlternatives} from '../../lib/workforce-planning-agent.ts';
 import {calculateWorkforceIncrement} from '../../lib/workforce-increment.ts';
 import {encodeDecisions} from '../../lib/local-decisions.ts';
-const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
+const {chromium,devices}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const output=await fs.mkdtemp('/tmp/workforce-local-search-');
 const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/workforce-handoff.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
@@ -27,12 +27,12 @@ const seed={version:1,revision:1,goals:{version:1,activeId:'goal-search',goals:[
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});let checks=0;
 const check=(name,value)=>{assert.ok(value,name);checks++;console.log('PASS '+name)};
 try {for(const width of [1366,390]){
- const context=await browser.newContext({viewport:{width,height:950}}),page=await context.newPage(),errors=[];let unexpected=0;
+ const context=await browser.newContext({...width===390?devices['Pixel 7']:{},viewport:{width,height:950}}),page=await context.newPage(),errors=[];let unexpected=0,disableWorkerCrypto=false;
  page.on('pageerror',error=>errors.push(error.message));
  await page.route('**/*',async route=>{
   const url=new URL(route.request().url());
-  if(url.origin==='http://127.0.0.1:3100'&&url.pathname.startsWith('/assets/'))return route.fulfill({contentType:'application/javascript',body:await fs.readFile(path.join(output,path.basename(url.pathname)))});
-  if(url.href==='http://127.0.0.1:3100/')return route.fulfill({contentType:'text/html',body:'<div id="root"></div>'});
+  if(url.origin==='http://127.0.0.1:3100'&&url.pathname.startsWith('/assets/'))return route.fulfill({contentType:'application/javascript',body:(disableWorkerCrypto?'Object.defineProperty(globalThis.crypto,"subtle",{value:undefined});\n':'')+await fs.readFile(path.join(output,path.basename(url.pathname)),'utf8')});
+  if(url.href==='http://127.0.0.1:3100/')return route.fulfill({contentType:'text/html',body:'<meta name="viewport" content="width=device-width, initial-scale=1"><div id="root"></div>'});
   unexpected++;return route.abort();
  });
  await page.addInitScript(()=>{
@@ -83,7 +83,7 @@ try {for(const width of [1366,390]){
  await page.reload();await init();await open();check(width+' reload resets search/drafts but retains history',await field('build min bound').inputValue()===''&&await field('Alternative 1: Build count').inputValue()==='1'&&(await state()).workspaces['goal-search'].fields.workforceAlternativeReviews.length===2);
  await button('Verify saved review 2 locally').click();await page.locator('summary').filter({hasText:'Review 2 · version 1'}).waitFor();await page.locator('summary').filter({hasText:'Review 2 · version 1'}).click();await page.locator('summary').filter({hasText:'Search origin and conditional assumptions'}).click();
  check(width+' lineage locally reverified and inspectable after reload',(await page.locator('main').innerText()).includes('workforce-increment-v1')&&(await page.locator('main').innerText()).includes('Bounds: Build 0–3'));
- check(width+' mobile/desktop has no horizontal overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
+ check(width+' mobile/desktop has no horizontal overflow',await page.evaluate(width=>window.innerWidth===width&&document.documentElement.scrollWidth<=window.innerWidth,width));
  await page.screenshot({path:path.join(output,`local-search-${width}.png`),fullPage:true});
  await bounds();await confirm();await hold();await button('Run local mix search').click();await pending();await button('Cancel local search').click();await release();check(width+' cancelled late worker reply cannot restore results',await field('Select build-0-move-3-buy-0').count()===0);
  await confirm();await hold();await button('Run local mix search').click();await pending();await button('Goal B').click();await button('Goal A').click();await open();await release();check(width+' old-goal worker reply cannot cross into new session',await field('build min bound').inputValue()===''&&await field('Select build-0-move-3-buy-0').count()===0);
@@ -93,6 +93,14 @@ try {for(const width of [1366,390]){
  const large=selectionFixture({roles:'43',build:'0',move:'0',buy:'43'}).solution;await page.evaluate(solution=>window.handoffFixture.publishSolution(solution),large);await open();await bounds(43);await confirm();await button('Run local mix search').click();await page.getByText('990 mixes evaluated;',{exact:false}).waitFor();
  check(width+' large case completes under cap with explicit truncation',(await page.locator('main').innerText()).includes('926 omitted by the output cap'));
  const tooLarge=selectionFixture({roles:'44',build:'0',move:'0',buy:'44'}).solution;await page.evaluate(solution=>window.handoffFixture.publishSolution(solution),tooLarge);await open();await bounds(44);check(width+' over-cap domain blocked before run',await button('Run local mix search').isDisabled()&&(await page.locator('main').innerText()).includes('Too many combinations'));
+ await page.evaluate(solution=>window.handoffFixture.publishSolution(solution),solution);await open();await bounds();await confirm();
+ const unsupportedBefore=JSON.stringify(await state());
+ await page.evaluate(()=>{window.supportedWorker=window.Worker;window.Worker=undefined});
+ await button('Run local mix search').click();await page.getByText('Local worker unavailable; saved records are retained and no service fallback is used.',{exact:true}).waitFor();
+ check(width+' unsupported Worker fails gracefully and preserves saved state',JSON.stringify(await state())===unsupportedBefore&&await field('Select build-0-move-3-buy-0').count()===0);
+ await page.evaluate(()=>{window.Worker=window.supportedWorker});disableWorkerCrypto=true;
+ await button('Run local mix search').click();await page.getByText('Local verification needs Web Crypto; no service fallback is available.',{exact:true}).waitFor();
+ check(width+' missing worker Web Crypto fails gracefully and preserves saved state',JSON.stringify(await state())===unsupportedBefore&&await field('Select build-0-move-3-buy-0').count()===0);
  check(width+' no API calls or browser errors',unexpected===0&&errors.length===0);check(width+' workers terminated after completed/cancelled operations',await page.evaluate(()=>window.workerQA.created>0&&window.workerQA.terminated===window.workerQA.created));
  await context.close();
  }console.log(`${checks} local-search browser checks passed; screenshots: ${output}`);

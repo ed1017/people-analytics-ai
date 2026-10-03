@@ -2,7 +2,9 @@
 export function localWorkforceTask<T>(action: "search"|"select"|"preview"|"read"|"retain",args: unknown,signal: AbortSignal): Promise<T> {
  return new Promise((resolve,reject)=>{
   if(signal.aborted){reject(Error("Local operation cancelled."));return}
-  const worker=new Worker(new URL("./workforce-search.worker.ts",import.meta.url),{type:"module"});
+  let worker: Worker;
+  try{worker=new Worker(new URL("./workforce-search.worker.ts",import.meta.url),{type:"module"})}
+  catch{reject(Error("Local worker unavailable; saved records are retained and no service fallback is used."));return}
   let done=false;
   const finish=(error: Error|null,value?:T)=>{if(done)return;done=true;signal.removeEventListener("abort",cancel);worker.terminate();if(error)reject(error);else resolve(value!)};
   const cancel=()=>finish(Error("Local operation cancelled."));signal.addEventListener("abort",cancel,{once:true});

@@ -18,3 +18,12 @@ test('already cancelled tasks do not create a worker',()=>withWorker(async worke
 test('worker failure terminates locally without a transport fallback',()=>withWorker(async workers=>{
  const request=localWorkforceTask('search',{},new AbortController().signal),rejected=assert.rejects(request,/no service fallback/);workers[0].onerror({message:'fixture'});await rejected;assert.equal(workers[0].terminations,1);
 }));
+test('missing or blocked Worker reports local unavailability without exposing browser errors',async()=>{
+ const previous=globalThis.Worker;
+ try{
+  for(const implementation of [undefined,class {constructor(){throw Error('browser-specific construction failure')}}]){
+   globalThis.Worker=implementation;
+   await assert.rejects(localWorkforceTask('search',{},new AbortController().signal),{message:'Local worker unavailable; saved records are retained and no service fallback is used.'});
+  }
+ }finally{if(previous===undefined)delete globalThis.Worker;else globalThis.Worker=previous}
+});
