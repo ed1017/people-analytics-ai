@@ -34,3 +34,7 @@ test('saved assumptions survive a question-only response and incompatible pair i
  const mixed={...catalog,business_units:[...catalog.business_units,{org_code:'OPS',org_name:'Operations'}]};
  assert.throws(()=>clarificationRequest({...request,inputs:{...request.inputs,businessUnit:'OPS',jobProfile:'ENG'}},mixed));
 });
+test('an explicitly stated arrival mode does not require its evidence quote to repeat the date',()=>{
+ const r=validateClarificationResult(response([{field:'arrivalMode',value:'explicit',evidence:'explicit hire arrival'}]),{...request,statement:'Use explicit hire arrival 2026-11-16.'},catalog);
+ assert.equal(r.draft.arrivalMode,'explicit');assert.equal(r.draft.arrivalDate,'');
+});

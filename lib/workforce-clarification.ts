@@ -75,7 +75,7 @@ function grounded(change:ClarificationChange,input:ClarificationInput,catalog:Wo
     return names.some(name=>quote.includes(name.toLowerCase()));
   }
   if(change.field==='intent')return change.value==='additional'?/\b(additional|new|add|increase|net growth)\b/.test(quote):/\b(replacement|replace|backfill)\b/.test(quote);
-  if(change.field==='arrivalMode')return change.value==='historical-median'?/historical/.test(quote)&&/median/.test(quote):/\d{4}-\d{2}-\d{2}/.test(quote);
+  if(change.field==='arrivalMode')return change.value==='historical-median'?/historical/.test(quote)&&/median/.test(quote):/\bexplicit\b|\d{4}-\d{2}-\d{2}/.test(quote);
   if(months.has(change.field)||dates.has(change.field))return quote.includes(change.value);
   const normalized=quote.replace(/(\d),(?=\d{3}(?:\D|$))/g,'$1').replace(/(\d),(?=\d{3})/g,'$1');
   const numbers=normalized.match(/\b\d+(?:\.\d+)?\b/g)??[];
@@ -86,7 +86,7 @@ export function validateClarificationResult(raw:unknown,request:unknown,source:W
   const input=validateClarificationInput(request),catalog=clarificationCatalog(source),r=record(raw);exact(r,['summary','questions','changes']);
   if(!Array.isArray(r.questions)||r.questions.length>3||!Array.isArray(r.changes)||r.changes.length>workforcePlanFields.length)throw Error('Invalid clarification response.');
   const summary=text(r.summary,1000),questions=r.questions.map(q=>text(q,400)),seen=new Set<string>(),draft={...input.inputs};
-  const changes=r.changes.map(raw=>{const c=record(raw);exact(c,['field','value','evidence']);if(!workforcePlanFields.includes(c.field as WorkforcePlanField)||seen.has(c.field as string))throw Error('Unknown or repeated proposed field.');const field=c.field as WorkforcePlanField;seen.add(field);const change={field,value:fieldValue(field,c.value),evidence:text(c.evidence,500)};if(!change.value||!grounded(change,input,catalog))throw Error('Proposed input is not grounded in the supplied planning statement.');draft[field]=change.value;return change;});
+  const changes=r.changes.map(raw=>{const c=record(raw);exact(c,['field','value','evidence']);if(!workforcePlanFields.includes(c.field as WorkforcePlanField)||seen.has(c.field as string))throw Error('Unknown or repeated proposed field.');const field=c.field as WorkforcePlanField;seen.add(field);const change={field,value:fieldValue(field,c.value),evidence:text(c.evidence,500)};if(!change.value||!grounded(change,input,catalog))throw new Error('Proposed input is not grounded in the supplied planning statement.',{cause:field});draft[field]=change.value;return change;});
   catalogSelection(draft,catalog);
   return {version:1,summary,questions,changes,draft};
 }

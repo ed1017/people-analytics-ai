@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import {CHAT_MODEL} from "@/lib/chat-model";
 import {supabaseServer} from "@/lib/supabase-server";
 import {clarificationRequest,validateClarificationInput,validateClarificationResult} from "@/lib/workforce-clarification";
+import {workforcePlanFields} from "@/lib/workforce-increment";
 export const dynamic='force-dynamic';
 export const maxDuration=60;
 const client=process.env.OPENAI_API_KEY?new OpenAI({apiKey:process.env.OPENAI_API_KEY,maxRetries:0,timeout:30000}):null;
@@ -31,5 +32,5 @@ export async function POST(request:NextRequest) {
     diagnostic='invalid-model-json';const parsed=JSON.parse(response.output_text);
     diagnostic='invalid-model-proposal';const result=validateClarificationResult(parsed,input,catalog);
     return NextResponse.json(result,{headers:{'Cache-Control':'no-store'}});
-  }catch(error){const known=['Unexpected clarification fields.','Invalid clarification response.','Missing or excessive planning text.','Unknown or repeated proposed field.','Proposed input is not grounded in the supplied planning statement.','This role and BU combination is unavailable.'];if(diagnostic==='invalid-model-proposal'&&error instanceof Error&&known.includes(error.message))diagnostic+='-'+known.indexOf(error.message);return NextResponse.json({error:signal.aborted?'Clarification cancelled or timed out. Saved inputs and results are retained.':'Clarification could not be validated. No proposed input was saved; retry or use the input editor.',diagnostic:signal.aborted?'cancelled':diagnostic},{status:signal.aborted?408:502,headers:{'Cache-Control':'no-store'}});}finally{clearTimeout(timer);}
+  }catch(error){const known=['Unexpected clarification fields.','Invalid clarification response.','Missing or excessive planning text.','Unknown or repeated proposed field.','Proposed input is not grounded in the supplied planning statement.','This role and BU combination is unavailable.'];if(diagnostic==='invalid-model-proposal'&&error instanceof Error&&known.includes(error.message))diagnostic+='-'+known.indexOf(error.message);if(error instanceof Error&&workforcePlanFields.includes(error.cause as typeof workforcePlanFields[number]))diagnostic+='-'+error.cause;return NextResponse.json({error:signal.aborted?'Clarification cancelled or timed out. Saved inputs and results are retained.':'Clarification could not be validated. No proposed input was saved; retry or use the input editor.',diagnostic:signal.aborted?'cancelled':diagnostic},{status:signal.aborted?408:502,headers:{'Cache-Control':'no-store'}});}finally{clearTimeout(timer);}
 }
