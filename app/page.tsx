@@ -2092,6 +2092,7 @@ export default function Home() {
             setAiCollapsed(!aiCollapsed)
           }
           onChatInputChange={setChatInput}
+          onDraftExample={conversation.draftExample}
           onSend={() => sendChatMessage()}
         />}
       </div>

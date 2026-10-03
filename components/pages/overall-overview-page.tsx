@@ -107,8 +107,7 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
 
   function draftQuestion(prompt: string) {
     if (chatLoading || input.trim()) return;
-    setInput(prompt);
-    focusQuestion();
+    if(conversation.draftExample(prompt))focusQuestion();
   }
 
   function startNewIssue(draft = "") {

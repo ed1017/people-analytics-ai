@@ -32,3 +32,41 @@ The full browser regression run passed **637 assertions**: 24 new contextual-exa
 3. With missing/all-unknown goal evidence, check that examples ask what is missing rather than asserting a finding. On a forecast goal, check the unavailable-forecast wording.
 4. In the guided workforce plan, review the example beside Continue as you review inputs, calculate explicitly, and compare saved options. Continue must only reveal/focus the existing step. Reopen a saved/pinned version with its existing control; histories and approvals must remain intact.
 5. Repeat at mobile width and use Tab/Enter. Check readable wrapping, visible focus and no horizontal overflow. Verify the ordinary explicit Send, Calculate, Save and approval controls still determine execution.
+
+## Independent review
+
+Reviewed exact `2e38e7a40a77a0f0253e85cc595ab81d34136235` against
+`1f068eda8d6d1733860d2f709e7bcc19f1bb8664` on the separate local branch
+`review/contextual-prompts-independent`.
+
+Fixed one P2 draft-protection defect. An example click queued in the same event as
+a goal switch used the prior render's empty-draft check and overwrote the newly
+restored goal's unfinished question. The regression failed before the fix. Home and
+the side panel now use a goal-owned `draftExample` operation that checks the current
+goal ID/wording and uses a functional state update to preserve a draft already queued
+by typing. Ordinary typing and explicit Send behavior remain unchanged.
+
+The fixture now uses the real goal-owned conversation input for both composers.
+Six additional browser assertions cover queued old-goal examples on Home and the side
+panel and a queued current-goal draft, at desktop and mobile widths. Source review
+confirmed that goal text selects fixed local examples rather than being interpolated
+into their instructions; unsupported pages, unknown evidence and forecast wording
+retain their stated limits. Examples do not invoke models, calculations, solution
+saves or approvals. Existing automatic goal takeaways are separate from suggestions.
+
+Final validation: 485 unit tests; 643 browser assertions (30 contextual examples and
+613 existing suites); full ESLint; standalone TypeScript; genuine optimized production
+build; whitespace checks. Evidence is `/tmp/prompts-independent-repro.log` for the
+before-fix failure, `/tmp/prompts-independent-{unit,lint,ts,build}.log`,
+`/tmp/prompts-independent-browser-*.log` and
+`/tmp/prompts-independent-workspace/results.json` in the execution workspace.
+
+Browser coverage uses intercepted synthetic APIs and Linux Chromium desktop/Pixel
+emulation. This is not hosted, physical Windows/Android, or actual-model validation.
+The new prompt interactions were exercised through real Home/side-panel components;
+the existing built-app suites cover the combined app's workforce workflow. No live
+service calls, held eNPS, model-envelope, database, authentication or permission changes
+were introduced. PR100 remains at `be582c66b183c3d590d0b515e4d5a110d282139e`.
+The separately published ridge candidate remains at
+`8f1b4d172b4f61396f2d28338a19a6e567502851` on `cloud-hiring-ridge-review`.
+This prompt review is local only: no push, merge or deployment.

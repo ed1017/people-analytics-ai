@@ -45,6 +45,7 @@ type AiPanelProps = {
   onToggleExpanded: () => void;
   onToggleCollapsed: () => void;
   onChatInputChange: (value: string) => void;
+  onDraftExample: (prompt: string) => void;
   onSend: () => void | Promise<void>;
 };
 
@@ -67,6 +68,7 @@ export function AiPanel({
   onToggleExpanded,
   onToggleCollapsed,
   onChatInputChange,
+  onDraftExample,
   onSend,
 }: AiPanelProps) {
   const composer = useRef<HTMLTextAreaElement>(null);
@@ -225,7 +227,7 @@ export function AiPanel({
               )}
             </div>
 
-            <div className="mb-3"><PromptExamples prompts={suggestedPrompts} draft={chatInput} busy={chatLoading} onDraft={prompt=>{onChatInputChange(prompt);composer.current?.focus();composer.current?.scrollIntoView({block:"nearest"});}}/></div>
+            <div className="mb-3"><PromptExamples prompts={suggestedPrompts} draft={chatInput} busy={chatLoading} onDraft={prompt=>{onDraftExample(prompt);composer.current?.focus();composer.current?.scrollIntoView({block:"nearest"});}}/></div>
 
             {chatError && (
               <div className="mb-3 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
