@@ -29,6 +29,14 @@ export function useProblemConversation() {
   const requestGate = useRef(new ProblemRequestGate());
   const [messages, setStoredMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
+  const draftExample = (prompt:string) => {
+    const currentGoalMatches = () => goalsRef.current.activeId===localGoals.activeId &&
+      (goalsRef.current.goals.find(goal=>goal.id===goalsRef.current.activeId)?.statement??"")===focusedIssue;
+    if(!storageReady||!currentGoalMatches())return false;
+    // Recheck the actual queued state, not the empty draft from an earlier render.
+    setInput(current=>currentGoalMatches()&&!current.trim()?prompt:current);
+    return true;
+  };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [problem, setProblem] = useState<HomeDecisionContext | null>(null);
@@ -111,7 +119,7 @@ export function useProblemConversation() {
   const clearAllGoals = () => {
     cancelPending(); chats.current.clear(); history.current={key:"",messages:[]}; setMessages([]); setInput(""); setProblem(null); setQuestionUnanswered(false); setFocusedIssue(""); setIssueEditor(null); setError(null); setWorkspaceRevision(v=>v+1); persist(emptyLocalGoals(),true);
   };
-  return { saved:decisionStorage.saved, retrySave:()=>decisionStore.retry(), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
+  return { saved:decisionStorage.saved, retrySave:()=>decisionStore.retry(), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
 }
 export type ProblemConversation = ReturnType<typeof useProblemConversation>;
 

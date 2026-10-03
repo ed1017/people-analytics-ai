@@ -37,14 +37,14 @@ try{for(const width of [1366,390]){
  await page.keyboard.press('Tab');check(width+' focus can leave the linked field without a trap',await field('Job profile').evaluate(el=>el===document.activeElement));
  check(width+' focus does not alter storage',JSON.stringify(await state())===before);
  await field('Business unit').selectOption('TECH');check(width+' corrected field leaves the correction list',await summary.getByRole('button',{name:'Review Business unit',exact:true}).count()===0);
- await button('Load complete saved inputs').click();const original=JSON.stringify((await state()).workspaces[goalId].fields.workforceSolution);
+ await button('Load complete saved inputs').click();await page.getByText('Review assumptions and goal statement',{exact:true}).click();const original=JSON.stringify((await state()).workspaces[goalId].fields.workforceSolution);
  check(width+' complete inputs have no fabricated readiness claim',(await summary.innerText()).includes('Corrections before calculation (0)')&&(await summary.innerText()).includes('Operational capacity remains unverified'));
  await page.locator('summary').filter({hasText:'Review and customize inputs'}).click();
  await field('Build: existing employees after development').fill('3');await field('Move: existing employees already ready').fill('0');await field('Buy: external hires').fill('0');await field('Hiring arrival assumption').selectOption('historical-median');await field('Proposed recruiting launch (YYYY-MM-DD)').fill('');
  check(width+' required hiring-only launch is a correction even with no planned Buy',(await summary.innerText()).includes('Hiring-only comparison: Enter the proposed recruiting launch date'));
  await field('Hiring arrival assumption').selectOption('explicit');await field('Explicit hire arrival (YYYY-MM-DD)').fill('2027-01-01');
  check(width+' hiring-only out-of-horizon arrival is a correction',(await summary.innerText()).includes('Hiring-only comparison: Hire arrival must fall within'));
- await button('Load complete saved inputs').click();
+ await button('Load complete saved inputs').click();await page.getByText('Review assumptions and goal statement',{exact:true}).click();
  await page.locator('summary').filter({hasText:'Review and customize inputs'}).click();await field('Annual loaded cost per external hire (USD)').fill('');
  check(width+' optional cost blank remains unknown without a validation error',(await summary.innerText()).includes('External hires: annual hire cost is unknown.')&&await field('Annual loaded cost per external hire (USD)').getAttribute('aria-invalid')==='false');
  check(width+' unsaved changes distinguish selected evidence and block calculation',(await summary.innerText()).includes('Unsaved draft')&&(await summary.innerText()).includes('does not validate this draft')&&await button('Calculate saved assumptions and compare hiring-only').isDisabled());
@@ -61,10 +61,10 @@ try{for(const width of [1366,390]){
  check(width+' readiness never saves inputs or changes approvals',JSON.stringify((await state()).workspaces[goalId].fields.workforceSolution)===original);
  await page.screenshot({path:path.join(output,`readiness-${width}.png`),fullPage:true});
  check(width+' summary fits target CSS viewport',await page.evaluate(width=>window.innerWidth===width&&document.documentElement.scrollWidth<=width,width));
- await button('Save reviewed inputs').click();check(width+' explicit save creates version while old calculation stays historical',(await summary.innerText()).includes('Saved inputs · plan version 2')&&(await summary.innerText()).includes('Selected calculation: version 1 · historical'));
- await button('Publish newer input version').click();check(width+' selected older evidence cannot validate newer saved inputs',(await summary.innerText()).includes('Saved inputs · plan version 2')&&(await summary.innerText()).includes('historical'));
+ await button('Save reviewed inputs').click();await page.getByText('Review assumptions and goal statement',{exact:true}).click();check(width+' explicit save creates version while old calculation stays historical',(await summary.innerText()).includes('Saved inputs · plan version 2')&&(await summary.innerText()).includes('Selected calculation: version 1 · historical'));
+ await button('Publish newer input version').click();await page.getByText('Review assumptions and goal statement',{exact:true}).click();check(width+' selected older evidence cannot validate newer saved inputs',(await summary.innerText()).includes('Saved inputs · plan version 2')&&(await summary.innerText()).includes('historical'));
  await button('Change goal wording').click();check(width+' changed goal requires explicit rebinding',(await summary.innerText()).includes('goal wording changed')&&await button('Calculate saved assumptions and compare hiring-only').isDisabled());
- await button('Goal B').click();check(width+' goal transition removes previous summary',await summary.count()===0);await button('Goal A').click();check(width+' returning goal restores saved inputs not old draft',(await summary.innerText()).includes('Saved inputs · plan version 2'));
+ await button('Goal B').click();check(width+' goal transition removes previous summary',await summary.count()===0);await button('Goal A').click();await page.getByText('Review assumptions and goal statement',{exact:true}).click();check(width+' returning goal restores saved inputs not old draft',(await summary.innerText()).includes('Saved inputs · plan version 2'));
  check(width+' no API calls or runtime errors',unwanted===0&&errors.length===0);
  await context.close();
 }console.log(`${checks} readiness browser checks passed; screenshots: ${output}`)}finally{await browser.close()}

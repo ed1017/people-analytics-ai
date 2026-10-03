@@ -7,8 +7,10 @@ import { GoalTakeaway } from "@/components/goal-takeaway";
 import { GoalConversationMessages, ConversationMessages } from "@/components/goal-conversation-messages";
 import { buildHomePack, homeDefinitions, readHomeSource } from "@/lib/home-pack.mjs";
 import type { DevelopmentSession } from "@/components/development-workspace";
+import { PromptExamples } from "@/components/prompt-examples";
+import { contextualPrompts } from "@/lib/contextual-prompts";
 import { homeGoalReplies } from "@/lib/home-chat-reply";
-import { buildHomeActionPlanRequest, DEVELOPMENT_DEMO_GOAL, HOME_ACTION_PLAN_LABEL, HOME_FIND_ISSUE_PROMPT } from "@/lib/home-decision-journey";
+import { buildHomeActionPlanRequest, DEVELOPMENT_DEMO_GOAL, HOME_ACTION_PLAN_LABEL } from "@/lib/home-decision-journey";
 import { completeScopedChatTurn } from "@/lib/chat-context-history";
 import { requestedHomeCountries, type CountryOption } from "@/lib/home-country-scope";
 import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
@@ -37,7 +39,6 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
   workforceQuery: string; workforceScope: string;
   active: boolean; persona: Persona; onNavigate: (page: AppPage) => void;
 }) {
-  const [explorePrompts, setExplorePrompts] = useState(false);
   const [sourceResults, setSourceResults] = useState<Record<string, unknown>>({});
   const [loadedScope, setLoadedScope] = useState("");
   const [evidenceRevision, setEvidenceRevision] = useState(0);
@@ -52,7 +53,6 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
   const loaded = useRef("");
   const loadedAt = useRef(0);
   const composer = useRef<HTMLTextAreaElement>(null);
-  const goalChoiceSubmittedRef = useRef(false);
   const conversationViewport = useRef<HTMLDivElement>(null);
   const selectedCountry = new URLSearchParams(workforceQuery).get("country") ?? "all";
   const scopeIdentity = JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,persona]);
@@ -105,6 +105,11 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
     window.requestAnimationFrame(() => { composer.current?.focus(); composer.current?.scrollIntoView({ block: "nearest" }); });
   }
 
+  function draftQuestion(prompt: string) {
+    if (chatLoading || input.trim()) return;
+    if(conversation.draftExample(prompt))focusQuestion();
+  }
+
   function startNewIssue(draft = "") {
     conversation.startNewProblem(draft);
     focusQuestion();
@@ -115,7 +120,7 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
     const message = (actionPlan ? planRequest! : question).trim();
     if (!message || !sources || loadedScope !== workforceQuery || chatLoading || loading || sources.every(source => !source.facts)) return;
     if (/^(?:please\s+|can you\s+)?(?:export|download)\b/i.test(message)) {
-      setMessages(current=>[...current,{role:"user",content:message},{role:"assistant",content:"CSV downloads are currently available on Workforce and Skills Intelligence. Open one of those pages and choose Export current data (CSV). Home exports, other modules and employee-name rosters are not available yet; no file was downloaded."}]);setInput("");return;
+      setMessages(current=>[...current,{role:"user",content:message},{role:"assistant",content:"CSV downloads are currently available on Workforce and Skills Intelligence. Open one of those pages and choose Export current data (CSV), then Send. Home exports, other modules and employee-name rosters are not available yet; no file was downloaded."}]);setInput("");return;
     }
     if (!actionPlan && !scopeConfirmed) {
       const requested=requestedHomeCountries(message,countryOptions,selectedCountry);
@@ -134,7 +139,6 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
       const reply = await ask(buildHomePack(sourceResults, workforceScope, conversation.focusedIssue || message, developmentSession), persona, withProblemContext(message, journey, conversation.focusedIssue), history, request.signal, Boolean(conversation.focusedIssue),goalContext,marketReference);
       if (!request.current() || currentEvidenceKey.current !== key) return;
       const answer = reply.answer;
-      goalChoiceSubmittedRef.current = false;
       conversation.setHomeGoalChoiceKey(reply.chooseGoal && !conversation.focusedIssue ? key : null);
       setMessages(current => [...current, { role: "assistant", content: answer }]);
       modelHistoryRef.current = completeScopedChatTurn(key, history, message, answer);
@@ -187,18 +191,13 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
     <GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:workforceScope}} payload={{page:"home",persona,overviewBriefingContext:pack,marketReference}} active={active} ready={ready} paused={chatLoading||Boolean(input.trim())||Boolean(pendingScope)||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} onNavigate={onNavigate}/>
     <section aria-label="Starting guide" data-testid="overview-starting-guide" className="py-2">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <h3 className="text-lg font-semibold">Choose a starting point</h3>
-        <p className="text-sm text-muted-foreground">Discuss with AI, then pin a goal.</p>
+        <h3 className="text-lg font-semibold">Questions to explore</h3>
+        <p className="text-sm text-muted-foreground">Use an example or write your own question.</p>
         <button type="button" aria-label="Refresh overview evidence" disabled={loading || chatLoading}
           onClick={() => { loaded.current = ""; setRefresh(value => value + 1); }}
           className="ml-auto rounded-md p-2 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18} /></button>
       </div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-3" aria-label="Choose a starting point">
-        <button type="button" disabled={!ready || chatLoading} onClick={() => void send(HOME_FIND_ISSUE_PROMPT)} className="min-h-11 rounded-lg border px-4 py-3 text-left text-base font-semibold hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{HOME_FIND_ISSUE_PROMPT}</button>
-        <button type="button" disabled={chatLoading} onClick={focusQuestion} className="min-h-11 rounded-lg border px-4 py-3 text-left text-base font-semibold hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Bring your own issue</button>
-        <button type="button" disabled={chatLoading} onClick={()=>setExplorePrompts(value=>!value)} aria-expanded={explorePrompts} aria-controls="home-explore-prompts" className="min-h-11 rounded-lg border px-4 py-3 text-left text-base font-semibold hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Explore the workforce first</button>
-      </div>
-      {explorePrompts && <div id="home-explore-prompts" aria-label="Explore workforce prompts" className="mt-3 flex flex-wrap gap-2">{["How is our workforce changing?", "Where is turnover highest?", "Which skills need attention?"].map(prompt=><button key={prompt} type="button" disabled={!ready||chatLoading} onClick={()=>void send(prompt)} className="min-h-11 rounded-lg border px-3 py-2 text-sm hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{prompt}</button>)}</div>}
+      <div className="mt-3"><PromptExamples prompts={contextualPrompts({page:"home",goal:conversation.focusedIssue,hasConversation:messages.some(message=>message.role==="user"),evidenceReady:ready,sources})} draft={input} busy={chatLoading} onDraft={draftQuestion}/></div>
       {loading && <p role="status" className="mt-3 text-sm text-muted-foreground">Loading available evidence for your questions.</p>}
 
 
@@ -214,7 +213,7 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
     {messages.length > 0 && <section aria-label="Overview conversation" className="space-y-6">
       <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona])} onNavigate={onNavigate} home hideHistory/>
       {conversation.homeGoalChoiceKey === contextKey && !conversation.focusedIssue && <div role="group" aria-label="Choose a goal" className="flex flex-wrap gap-2">
-        {(Object.keys(homeGoalReplies) as Array<keyof typeof homeGoalReplies>).map(goal => <button key={goal} type="button" disabled={chatLoading || !ready || Boolean(input.trim())} onClick={() => { if (goalChoiceSubmittedRef.current) return; goalChoiceSubmittedRef.current = true; void send(homeGoalReplies[goal]); }} className="min-h-11 rounded-lg border border-primary px-4 py-2 font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{goal}</button>)}
+        {(Object.keys(homeGoalReplies) as Array<keyof typeof homeGoalReplies>).map(goal => <button key={goal} type="button" disabled={chatLoading || !ready || Boolean(input.trim())} onClick={() => draftQuestion(homeGoalReplies[goal])} className="min-h-11 rounded-lg border border-primary px-4 py-2 font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{goal}</button>)}
         <button type="button" disabled={chatLoading} onClick={() => { conversation.setHomeGoalChoiceKey(null); focusQuestion(); }} className="min-h-11 rounded-lg border px-4 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Another goal</button>
       </div>}
       {chatLoading && <p role="status" className="text-base text-muted-foreground">Thinking with the available evidence…</p>}
