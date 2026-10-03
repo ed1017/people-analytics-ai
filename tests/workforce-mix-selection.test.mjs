@@ -4,8 +4,8 @@ import {selectionFixture,selectionSpec} from './fixtures/workforce-selection.mjs
 import {searchWorkforceMixes} from '../lib/workforce-mix-search.ts';
 import {stageWorkforceMixSelection,previewSelectedWorkforceMixes} from '../lib/workforce-mix-selection.ts';
 import {createWorkforceSelectionSession} from '../lib/workforce-selection-session.ts';
-import {recordSolutionApproval} from '../lib/workforce-solution.ts';
-import {retainWorkforceAlternativeReview} from '../lib/workforce-planning-agent.ts';
+import {recordSolutionApproval,reviseWorkforceSolution} from '../lib/workforce-solution.ts';
+import {retainWorkforceAlternativeReview,readWorkforceAlternativeReview} from '../lib/workforce-planning-agent.ts';
 import {workforcePlanFields} from '../lib/workforce-increment.ts';
 const at='2026-10-03T01:00:00.000Z',ids=['build-0-move-3-buy-0','build-1-move-2-buy-0'];
 function setup(patch={},specPatch={},withEvidence=false) {
@@ -87,4 +87,32 @@ test('late verifier rejection cannot clear a newer stage; copies isolate callers
 test('selection is rejected before a context is published',async()=>{
  let invoked=false;const session=createWorkforceSelectionSession(async()=>{invoked=true;return null});
  assert.equal(await session.select({},['mix']),false);assert.equal(invoked,false);assert.equal(session.getState().status,'rejected');
+});
+test('staging exposes only reviewed inputs and fingerprint references, not raw source or private notes',()=>{
+ const f=setup({}, {}, true);
+ f.context.solution=recordSolutionApproval(f.context.solution,2,'private-approval',['source-result'],'PRIVATE APPROVAL MARKER',at);
+ const proposal=stage(f),text=JSON.stringify(proposal);
+ assert.deepEqual(Object.keys(proposal).sort(),['schemaVersion','kind','binding','searchFingerprint','selectedIds','revisions','feasibility','operationalFeasibilityVerified','requiresUserReview','capacityNotice'].sort());
+ for(const marker of ['KEEP PRIVATE NOTES','PRIVATE APPROVAL MARKER','candidatePool','Synthetic aggregate','dependencyKey'])assert.equal(text.includes(marker),false,marker);
+ for(const key of ['inputFingerprint','timingFingerprint','sourceResultFingerprint','evidenceFingerprint','dependencyFingerprint'])assert.match(proposal.binding[key],/^[a-f0-9]{64}$/);
+ assert.deepEqual(Object.keys(proposal.revisions[0]).sort(),[...workforcePlanFields].sort());
+});
+test('selected result calculator metadata is part of the bound source identity',()=>{
+ const f=setup();f.context.solution.results[0].calculator.version='2';assert.throws(()=>stage(f));
+});
+test('v1 review reader refuses undeclared lineage without mutating existing history',()=>{
+ const f=setup(),review=previewSelectedWorkforceMixes(f.context,f.snapshot,stage(f),'ordinary-review',at),before=structuredClone(review);
+ assert.deepEqual(readWorkforceAlternativeReview(review,f.context.solution),review);
+ for(const extra of [{selectionOrigin:{searchFingerprint:f.snapshot.searchFingerprint}},{schemaVersion:2,selectionOrigin:null}]){
+  const unrecognized={...review,...extra};assert.equal(readWorkforceAlternativeReview(unrecognized,f.context.solution),null);
+  assert.throws(()=>retainWorkforceAlternativeReview([review],unrecognized,f.context.solution));
+ }
+ assert.deepEqual(review,before);
+});
+test('historical review remains inspectable while old search cannot stage against a newer saved version',()=>{
+ const f=setup(),review=previewSelectedWorkforceMixes(f.context,f.snapshot,stage(f),'historical-review',at);
+ const next=reviseWorkforceSolution(f.context.solution,1,{scope:{...f.context.solution.versions[0].inputs.scope,budget:'26000'}},'sidebar','Customize saved budget',at);
+ assert.deepEqual(readWorkforceAlternativeReview(review,next),review);
+ assert.throws(()=>stage({...f,context:{...f.context,solution:next}}));
+ assert.equal(review.binding.version,1);assert.equal(review.reviewedRevisions[0].budget,'25000');
 });
