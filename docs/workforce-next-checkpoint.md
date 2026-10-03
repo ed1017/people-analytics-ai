@@ -65,3 +65,40 @@ Publication is limited to a new `cloud-workforce-next-checkpoint` branch after c
 PR99 and `release/workforce-workflow-integration-20261003` remain at `134c04d`.
 No PR update, merge or production deployment is included, and denied check-status APIs
 are not retried.
+
+## Next release prepared after PR99 merged
+
+PR99 merged as `fb9806d8c2973656062ec83c815622b2d6ed1f22`; the parent reports
+production smoke passed that exact commit. Its tree equals the former release head
+`134c04d`. The new `release/workforce-journey-ml-next` branch starts directly at
+`fb9806d` and replays only the ten later reviewed commits through preflight review
+`61f3a25996118ae46d998df64406757e14e788e8`. There were no conflicts. Before this
+release-note addition, its entire tree was byte-identical to that reviewed source;
+PR99's commits are inherited from main, not duplicated as outgoing changes.
+
+This includes the preflight's reviewed fix rejecting cached fixture dataset/protocol
+identity drift. Relative to hosted-tested `8ee488e`, all product app/component/route,
+asset, configuration, dependency and workforce runtime source remains identical.
+The only added runtime-directory files are `lib/ml/hiring-acceptance.ts` and
+`lib/ml/hiring-fixture-preflight.ts`, used only by offline tests/manual fixture reporting.
+Tests and documentation also differ. Repository-tree or binary-build identity is not
+claimed; the exact new preview still needs acceptance.
+
+Final combined local checks pass: 490 unit tests; 613 browser assertions across the
+same suites listed above; full ESLint; standalone TypeScript after the genuine
+optimized build; whitespace checks; and the preflight CLI's computed source/reporter
+hashes and false readiness/training/performance/deployment flags. Logs are
+`/tmp/next-release-{unit,lint,ts,build}.log`,
+`/tmp/next-release-browser-*.log`, `/tmp/next-release-workspace/results.json` and
+`/tmp/next-release-preflight.json` in this execution workspace.
+
+The outgoing history/file audit found no held eNPS, source-adapter, model-envelope,
+route, schema, authentication, permissions, dependency or credential-pattern changes.
+All source review branches are retained. No fitting, company-data acquisition or live
+service tests were performed; browser APIs were intercepted synthetic fixtures.
+Linux Chromium/Pixel emulation does not establish physical Windows/Android coverage.
+
+Publication is a new branch and draft PR only. Do not merge until the exact new head's
+hosted preview and required-check evidence are verified. The earlier hosted results
+support runtime equivalence but do not replace that release gate. No denied status API
+is retried and no production deployment is part of this preparation.
