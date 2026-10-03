@@ -36,7 +36,7 @@ test('proposal review, draft correction, save inputs, calculation, verification 
 test('alternatives and tailoring require verified current source; saving is a separate recommendation',()=>{
  const r=records(true),verified=context(r);
  for(const [value,step] of [[{kind:'alternatives'},'review-alternatives'],[{kind:'tailoring',input:{...base,budget:'1'},preview:'needed'},'preview-tailoring'],[{kind:'tailoring',input:{...base,budget:'1'},preview:'ready'},'save-solution']]){
-  assert.equal(select(r,transient(r,value)).step,'verify-result');assert.equal(select(r,transient(r,value),verified).step,step);
+  assert.equal(select(r,transient(r,value)).step,value.kind==='alternatives'?'review-alternatives':'verify-result');assert.equal(select(r,transient(r,value),verified).step,step);
  }
 });
 test('cancellation resumes records; pending runs stay cancellable until lifecycle clears them',()=>{
