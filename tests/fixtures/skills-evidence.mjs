@@ -43,4 +43,3 @@ export const skillsData = {
   highest_demand: [skill],
   strongest_coverage: [],
 };
-
