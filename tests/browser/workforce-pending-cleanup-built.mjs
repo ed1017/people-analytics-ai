@@ -45,7 +45,8 @@ try{for(const width of [1366,390]){
  const after=(await state()).workspaces[goalId].fields;
  check(width+' native UI A-B-A leaves no orphan pending',after.workforceSolution.pending===null&&await button('Cancel pending request').count()===0);
  check(width+' versions, results, approval and pin records survive',JSON.stringify(after.workforceSolution.versions)===JSON.stringify(before.workforceSolution.versions)&&JSON.stringify(after.workforceSolution.results)===JSON.stringify(before.workforceSolution.results)&&JSON.stringify(after.workforceSolution.approvals)===JSON.stringify(before.workforceSolution.approvals)&&JSON.stringify(after.workforceSolutionPins)===JSON.stringify(before.workforceSolutionPins)&&after.workforceInspection==='result-v2');
- await page.waitForFunction(()=>!document.querySelector('select[aria-label="Your comparison priority"]')?.disabled);
+ // Pin controls recover only after the restored source finishes local verification.
+ await page.waitForFunction(()=>{const pin=[...document.querySelectorAll('button')].find(button=>button.textContent==='Open pinned version 2');return pin&&!pin.disabled});
  check(width+' controls recover without Cancel and historical approval stays gated',await button('Calculate saved assumptions and compare hiring-only').isEnabled()&&await button('Open pinned version 2').isEnabled()&&await button('Record version-specific approval note').isDisabled()&&!(await workspace.getByRole('region',{name:'Continue this workforce decision',exact:true}).innerText()).includes('request is in progress'));
  check(width+' only synthetic intercepted APIs and no live traffic '+JSON.stringify({calculations,blockedModelRequests:modelCalls,blockedModelPaths:modelPaths,nonlocal,errors}),calculations===1&&nonlocal===0&&errors.length===0);
  await context.close();
