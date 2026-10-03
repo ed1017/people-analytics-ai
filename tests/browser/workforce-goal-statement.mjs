@@ -26,7 +26,8 @@ const check=(name,value)=>{assert.ok(value,name);checks++;console.log('PASS '+na
 try{for(const width of [1366,390]){
  const context=await browser.newContext({...width===390?devices['Pixel 7']:{},viewport:{width,height:844}}),page=await context.newPage(),errors=[];let unwanted=0;
  page.on('pageerror',error=>{errors.push(error.message);console.error(error.message)});
- await page.route('**/*',route=>route.request().url()==='http://127.0.0.1:3100/'?route.fulfill({contentType:'text/html',body:'<meta name="viewport" content="width=device-width, initial-scale=1"><div id="root"></div>'}):(unwanted++,route.abort()));
+ const assets=new Map(await Promise.all((await fs.readdir(output)).filter(name=>name.endsWith('.js')).map(async name=>['http://127.0.0.1:3100/assets/'+name,await fs.readFile(path.join(output,name),'utf8')])));
+ await page.route('**/*',route=>route.request().url()==='http://127.0.0.1:3100/'?route.fulfill({contentType:'text/html',body:'<meta name="viewport" content="width=device-width, initial-scale=1"><div id="root"></div>'}):assets.has(route.request().url())?route.fulfill({contentType:'text/javascript',body:assets.get(route.request().url())}):(unwanted++,route.abort()));
  const init=async(reset=true)=>{await page.goto('http://127.0.0.1:3100/');if(reset)await page.evaluate(key=>localStorage.removeItem(key),DECISIONS_STORAGE_KEY);await page.evaluate(seed=>window.readinessSeed=seed,{encoded:encodeDecisions(data),empty,complete,newer});await page.addStyleTag({content:css});await page.addScriptTag({content:bundle})};
  await init();
  const button=name=>page.getByRole('button',{name,exact:true}),field=page.getByLabel('Planning statement',{exact:true}),copy=button('Use current goal as planning statement'),confirm=button('Replace planning statement with current goal'),cancel=button('Keep my planning statement');

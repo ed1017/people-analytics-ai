@@ -9,6 +9,7 @@ import type {AppPage} from '../../lib/types';
 declare global {interface Window {readinessSeed:{encoded:string;empty:WorkforceSolution;complete:WorkforceSolution;newer:WorkforceSolution};readinessSaved:()=>DecisionData}}
 if(!localStorage.getItem(DECISIONS_STORAGE_KEY))localStorage.setItem(DECISIONS_STORAGE_KEY,window.readinessSeed.encoded);decisionStore.initialize(localStorage);
 window.readinessSaved=()=>decisionStore.getSnapshot().data;
+Object.assign(window,{fixtureSetField:(field:string,value:unknown)=>decisionStore.setField('goal-readiness',field,value),deleteFixtureGoal:()=>{const goals=decisionStore.getSnapshot().data.goals;decisionStore.saveGoals({...goals,activeId:'goal-other',goals:goals.goals.filter(goal=>goal.id!=='goal-readiness')})}});
 function Harness(){
  const storage=useDecisionStorage(),[page,setPage]=useState<AppPage>('home'),[revision,setRevision]=useState(0);
  const publish=(solution:WorkforceSolution)=>{decisionStore.setField('goal-readiness','workforceSolution',solution);setRevision(value=>value+1)};

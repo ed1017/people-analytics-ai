@@ -1,6 +1,6 @@
 # Compact solution cards, local what-ifs and saved-solution pins
 
-Proposed next implementation contract after local goal-copy checkpoint `d31dd15c8bcadceb3d00a7e161e47ee099bd7eba`. The user explicitly requested this direction. It supersedes the old standalone priority-3 Decision Brief summary plan; no card/pin product implementation is included yet. Parent owns source review/publication and separate live preview validation.
+Implementation contract established after local goal-copy checkpoint `d31dd15c8bcadceb3d00a7e161e47ee099bd7eba`. The user explicitly requested this direction. It supersedes the old standalone priority-3 Decision Brief summary plan; the local implementation is now described in `workforce-solution-cards.md`. Parent owns source review/publication and separate live preview validation.
 
 ## Existing architecture and concrete gaps
 
