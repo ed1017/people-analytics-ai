@@ -11,9 +11,9 @@ const revision=(input)=>({...input,build:'2',move:'0',buy:'1'});
 const makePreview=(state,patch={},history=[],cardId='saved',priority='')=>previewSolutionWhatIf(state,'result',history,cardId,{...workforceReviewFixture().input,...patch},priority);
 test('two honest cards with no reviews; base plus two saved alternatives remains three with hiring benchmark',async()=>{
  const state=fixture(),base=workforceReviewFixture().input;
- assert.equal((await loadSolutionCards(state,'result',[])).cards.length,2);
+ assert.equal((await loadSolutionCards(state,'result',[])).cards.length,2);assert.equal((await loadSolutionCards(state,'result',[])).searchSummary,null);
  const review=previewWorkforceAlternatives(state,'result',[revision(base),{...base,build:'0',move:'2',buy:'1'}],'alternatives',at);
- const snapshot=await loadSolutionCards(state,'result',[review]);assert.equal(snapshot.cards.length,3);assert.equal(snapshot.benchmark.id,'hiring-only');
+ const snapshot=await loadSolutionCards(state,'result',[review]);assert.equal(snapshot.searchSummary,null);assert.equal(snapshot.cards.length,3);assert.equal(snapshot.benchmark.id,'hiring-only');
  assert.throws(()=>previewWorkforceAlternatives(state,'result',[revision(base),revision(base),revision(base)],'many',at));
  assert.match((await loadSolutionCards(state,'result',[{broken:true}])).historyNotice,/unreadable/);
 });
@@ -98,7 +98,20 @@ test('v2 search origin survives revised saves and pins without inheriting forged
  const {solution}=selectionFixture(),report=await searchWorkforceMixesLocally(solution,'source-result',selectionSpec()),ids=['build-0-move-3-buy-0'];
  const context={solution,activeGoalId:solution.goalId,activeGoalStatement:'Synthetic bounded workforce comparison',evidenceResultId:'source-result',expectedSearchFingerprint:report.searchFingerprint,hasUnsavedPlanEdits:false};
  const selected=await stageWorkforceMixSelectionLocally(context,report,ids),review=await previewWorkforceSearchReview(context,selected.revisions,originForSelection(report,ids,selected.revisions),'search-review',at),history=[review],before=structuredClone(history);
+ const cards=await loadSolutionCards(solution,'source-result',history);assert.deepEqual(cards.searchSummary,report.summary);
  const preview=await previewSolutionWhatIf(solution,'source-result',history,'alternative-1',selected.revisions[0],'employees'),next=await saveSolutionWhatIf(solution,'source-result',history,preview,'next-run','next-result',at);
  assert.equal(next.results.at(-1).payload.localWhatIf.searchFingerprint,report.searchFingerprint);assert.equal((await loadSolutionCards(next,'next-result',history)).cards.length,2);const pins=await pinSavedSolution([],next,'next-result','pin',at,history);assert.ok(await resolveSolutionPin(pins[0],next,history));assert.deepEqual(history,before);
  const corrupt=structuredClone(history);corrupt[0].selectionOrigin.search.fingerprint='0'.repeat(64);await assert.rejects(loadSolutionCards(next,'next-result',corrupt),/lineage/);assert.equal(await resolveSolutionPin(pins[0],next,corrupt),null);
+});
+
+test('verified count replay preserves invalid attempts and output cap without counting them as calculated scenarios',async()=>{
+ const {selectionFixture,selectionSpec}=await import('./fixtures/workforce-selection.mjs');
+ const {searchWorkforceMixesLocally,originForSelection,previewWorkforceSearchReview}=await import('../lib/workforce-local-search.ts');
+ const {workforceSearchCountCopy}=await import('../lib/workforce-scenario-outcomes.ts');
+ const {solution}=selectionFixture({backfills:'1',backfillDate:'2026-11-01',annualBackfillCost:'0',backfillFee:'0'}),before=JSON.stringify(solution);
+ const report=await searchWorkforceMixesLocally(solution,'source-result',selectionSpec({maxResults:4})),ids=['build-0-move-3-buy-0'],revisions=[report.results.find(item=>item.id===ids[0]).plan.input];
+ const context={solution,activeGoalId:solution.goalId,activeGoalStatement:'Synthetic bounded workforce comparison',evidenceResultId:'source-result',expectedSearchFingerprint:report.searchFingerprint,hasUnsavedPlanEdits:false};
+ const review=await previewWorkforceSearchReview(context,revisions,originForSelection(report,ids,revisions),'count-review',at),cards=await loadSolutionCards(solution,'source-result',[review]);
+ assert.equal(cards.searchSummary.enumerated,10);assert.equal(cards.searchSummary.calculatorInvocations,11);assert.equal(cards.searchSummary.counts.invalid,1);assert.equal(cards.searchSummary.omittedByCap,6);
+ const copy=workforceSearchCountCopy(cards.searchSummary,cards.cards.length);assert.equal(copy.headline,'2 options to review • Output capped');assert.match(copy.detail,/9 calculated, 1 invalid/);assert.equal(JSON.stringify(solution),before);
 });

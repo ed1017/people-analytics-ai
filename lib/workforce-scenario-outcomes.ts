@@ -16,3 +16,14 @@ export function workforceCostBreakdown(plan:WorkforceIncrement){
  const columns=['hireStaffingCost','backfillStaffingCost','internalSalaryUplift','recruitingFees','trainingCash'] as const;
  return columns.map(key=>({key,value:plan.rows.some(row=>row[key]===null)?null:Math.round((plan.rows.reduce((sum,row)=>sum+row[key]!,0)+Number.EPSILON)*100)/100}));
 }
+
+/** Counts describe a completed verified search, never the number of displayed cards. */
+export function workforceSearchCountCopy(summary: {enumerated:number;calculatorInvocations:number;enumerationComplete:boolean;counts:{invalid:number};emitted:number;omittedByCap:number;excludedByFilter:number;truncated:boolean}|null, options:number){
+ const suffix=`${options} option${options===1?'':'s'} to review`;
+ if(!summary)return {headline:suffix,detail:'No verified search count is attached to these options.'};
+ const calculated=summary.enumerated-summary.counts.invalid;
+ return {
+  headline:`${calculated>=100?`${summary.enumerationComplete?'Compared':'Partial search: compared'} ${calculated.toLocaleString('en-US')} scenarios • `:summary.enumerationComplete?'':'Partial search • '}${suffix}${summary.truncated?' • Output capped':''}`,
+  detail:`${summary.enumerated} combinations enumerated; ${summary.enumerated} candidate calculation attempts: ${calculated} calculated, ${summary.counts.invalid} invalid. ${summary.calculatorInvocations} total calculator calls including the separate reference. ${summary.emitted} search results returned; ${summary.omittedByCap} omitted by the output cap; ${summary.excludedByFilter} excluded by the filter. ${summary.enumerationComplete?'Complete within the explicit bounds.':'Search incomplete.'} Displayed options are not a global top ranking.`,
+ };
+}

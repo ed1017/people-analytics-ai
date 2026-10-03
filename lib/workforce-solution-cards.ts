@@ -4,9 +4,9 @@ import {calculateWorkforceIncrement,validateWorkforcePlanInput,workforcePlanFiel
 // @ts-expect-error Native Node tests share TypeScript.
 import {readSavedWorkforceReview,type WorkforceReview} from './workforce-solution-review.ts';
 // @ts-expect-error Native Node tests share TypeScript.
-import {readWorkforceSolution,currentSolutionVersion,solutionResultIsCurrent,reviseWorkforceSolution,beginSolutionRun,completeSolutionRun,solutionSections,type WorkforceSolution} from './workforce-solution.ts';
+import {readWorkforceSolution,currentSolutionVersion,solutionResultIsCurrent,reviseWorkforceSolution,beginSolutionRun,completeSolutionRun,solutionSections,workforceSolutionAtVersion,type WorkforceSolution} from './workforce-solution.ts';
 // @ts-expect-error Native Node tests share TypeScript.
-import {localFingerprint,readLocalWorkforceReview,type LocalWorkforceReview} from './workforce-local-search.ts';
+import {localFingerprint,readLocalWorkforceReview,searchWorkforceMixesLocally,type LocalWorkforceReview} from './workforce-local-search.ts';
 import type {RecruitingTimingEvidence} from './recruiting-timing';
 import type {Json} from './local-decisions';
 export type CardPriority=''|'cash'|'employees'|'coverage';
@@ -14,7 +14,7 @@ export const cardPriorities={cash:'Lower incremental cash',employees:'Fewer adde
 export const sharedWhatIfFields=['budget','maxAddedEmployees','deadlineMonth','annualHireCost','hireFee','recruitingStart','arrivalMode','arrivalDate','loadedHourlyCost'] as const;
 const fixedFields=['businessUnit','jobProfile','intent','roles','planningMonth','months'] as const;
 export type SolutionCard={id:string;title:string;input:WorkforcePlanInput;plan:WorkforceIncrement;reviewId:string|null;slot:number|null};
-export type CardsSnapshot={cards:SolutionCard[];benchmark:SolutionCard;sourceHash:string;review:WorkforceReview;alternative:LocalWorkforceReview|null;historyNotice:string};
+export type CardsSnapshot={searchSummary:Awaited<ReturnType<typeof searchWorkforceMixesLocally>>['summary']|null;cards:SolutionCard[];benchmark:SolutionCard;sourceHash:string;review:WorkforceReview;alternative:LocalWorkforceReview|null;historyNotice:string};
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 function requireValue(value:unknown,message:string):asserts value {if(!value)throw Error(message)}
 export function cardSourceIdentity(solution:WorkforceSolution,resultId:string){return JSON.stringify({id:solution.id,goalId:solution.goalId,versions:solution.versions,evidence:solution.evidence,result:solution.results.find(r=>r.id===resultId),pending:solution.pending})}
@@ -45,7 +45,8 @@ export async function loadSolutionCards(solution:WorkforceSolution,resultId:stri
  const base=make('saved','Saved response mix',review.input,review.proposed),benchmark=make('hiring-only','Hiring-only benchmark',review.hireOnly.input,review.hireOnly);
  const cards=alternative?[base,...alternative.reviewedRevisions.map((input,i)=>make(`alternative-${i+1}`,`Saved alternative ${i+1}`,input,alternative!.comparisons.find(c=>c.optionId===`revision-${i+1}`)!.plan,i))]:[base,benchmark];
  requireValue(cards.length<=3,'At most two saved alternatives are supported.');
- return {cards,benchmark,sourceHash:await localFingerprint(cardSourceIdentity(solution,resultId)),review,alternative,historyNotice};
+ const searchSummary=alternative?.schemaVersion===2?(await searchWorkforceMixesLocally(workforceSolutionAtVersion(solution,alternative.binding.version),resultId,alternative.selectionOrigin.search.spec)).summary:null;
+ return {searchSummary,cards,benchmark,sourceHash:await localFingerprint(cardSourceIdentity(solution,resultId)),review,alternative,historyNotice};
 }
 export type WhatIfPreview={schemaVersion:1;sourceHash:string;historyHash:string;cardId:string;priority:CardPriority;draft:WorkforcePlanInput;cards:SolutionCard[];benchmark:SolutionCard;changedFields:WorkforcePlanField[]};
 export async function previewSolutionWhatIf(solution:WorkforceSolution,resultId:string,history:unknown,cardId:string,raw:unknown,priority:CardPriority):Promise<WhatIfPreview>{
