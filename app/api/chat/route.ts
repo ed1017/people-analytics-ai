@@ -5,6 +5,7 @@ import { homeReplyFormat, homeGoalChoiceInstructions, decodeHomeModelReply, home
 import { CHAT_MODEL } from "@/lib/chat-model";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import {openAIProxyTransport} from "@/lib/openai-proxy-transport";
 import {marketCarryEvidence} from "../../../lib/oews-reference.mjs";
 import {normalizeGoalContext,goalContextInstructions,goalSummaryInstructions} from "../../../lib/goal-context";
 import { normalizeHomePack, HOME_MAX_BYTES } from "../../../lib/home-pack.mjs";
@@ -18,7 +19,7 @@ export const dynamic = "force-dynamic";
 const apiKey = process.env.OPENAI_API_KEY;
 
 const client = apiKey
-  ? new OpenAI({ apiKey })
+  ? new OpenAI({ ...openAIProxyTransport(), apiKey })
   : null;
 
 type ChatMessage = {
