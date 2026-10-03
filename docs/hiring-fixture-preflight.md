@@ -40,6 +40,13 @@ reference requires a separately reviewed code change, not an automatic re-pin. T
 report also hashes its own executing module's on-disk source; this identifies the
 reporter bytes, not a signed execution attestation or repository-wide clean-tree claim.
 
+The computed dataset, protocol and acceptance-contract fingerprints must also match
+the reviewed outputs of those exact checkpoint bytes. This detects altered cached
+fixture declarations or stale Node imports even when the files on disk have been
+restored. These output identities are fixed in the reporter, cannot be overridden by
+callers, and require review alongside source references if the fixture changes. They
+are reproducibility checks, not a sandbox or proof of execution in a trusted process.
+
 The artifact separates:
 
 | Section | Meaning |
@@ -84,3 +91,38 @@ checks; full ESLint, standalone TypeScript and genuine optimized Next build pass
 The CLI JSON was generated and its reporter/source identities and false readiness
 flags checked. No browser behavior changed or browser validation is claimed for this
 Node-only slice. Publication remains gated on independent review; no push occurred.
+
+## Independent review
+
+Reviewed exact `4180689db12d0bb72ace737f0568a86b700046b6` against checkpoint
+`1f068eda8d6d1733860d2f709e7bcc19f1bb8664` on the separate local branch
+`review/hiring-preflight-independent`.
+
+Fixed one P2 identity defect: source-byte verification alone allowed a different
+protocol or dataset to be reported after cached fixture code/declarations changed.
+Two regressions reproduced it: mutating the imported manifest's as-of date, and
+importing an altered generator before restoring its original file bytes. Both
+previously returned a report under the unchanged source hashes; both now reject
+with a constructed-identity mismatch. No evaluator, fixture recipe, thresholds,
+performance policy or report readiness flag was changed.
+
+The four pinned source hashes were independently compared with both current file
+bytes and Git blobs at the checkpoint. The final CLI report's reporter hash also
+matches its source bytes. Constructed declarations remain explicitly unverified as
+historical provenance; label-derived predictions remain rejected and unexecuted.
+Training, trained-model, performance-validation and deployment flags remain false.
+
+Passed: all 490 repository unit tests, including ten preflight tests; full ESLint;
+standalone TypeScript; genuine optimized Next build; whitespace checks; CLI JSON
+identity and false-flag checks. Before-fix failures are recorded in
+`/tmp/preflight-independent-repro.log`; final evidence is
+`/tmp/preflight-independent-{focused,unit,lint,ts,build}.log` and
+`/tmp/preflight-independent-report.json` in the execution workspace.
+
+Acceptance: run the two commands above, confirm the four false flags and blocked
+company-history readiness, then run the cached-input regressions and confirm they
+reject. No browser behavior changed; no browser/device validation is claimed. No
+fitting, live query/API/auth/model call, push, merge or deployment occurred. The
+checkpoint, PR99/release branch, earlier review branches and held eNPS work remain
+unchanged. This completes the bounded fixture-readiness infrastructure review;
+actual historical evidence and execution validation remain separate prerequisites.

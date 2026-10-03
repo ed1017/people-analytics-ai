@@ -19,6 +19,13 @@ export const hiringFixtureIdentityReference=freeze({
   'tests/fixtures/hiring-acceptance.mjs':'b7ef434c2e729c7021ad318e160f44aa842d7c4afd5d4fe7834638d407148177',
  },
 });
+// Reviewed outputs of those exact fixture bytes, not company-history attestations.
+// Checking outputs also rejects stale Node imports or mutated cached declarations.
+const constructedIdentityReference=freeze({
+ datasetFingerprint:'a829c5fc001efec39a03b7b5e3bb7da8816cb262e6aca473d9a84a9b248a06bf',
+ protocolFingerprint:'4286d9532a495bef72c558ccb26c05d0ffae40a3c6baf3783970d44801a4c5bc',
+ acceptanceContractFingerprint:'d75366c9239d00f8ee32c3360983f6dc4aa89a5c6c599c09915780871aab3825',
+});
 const digest=(bytes:string|Buffer)=>createHash('sha256').update(bytes).digest('hex');
 function requireValue(value:unknown,message:string):asserts value{if(!value)throw Error(message)}
 function object(value:unknown):Record<string,unknown>{
@@ -56,6 +63,10 @@ export async function buildHiringFixturePreflight(options:{root?:string;identiti
  const rows=generator.syntheticHiringHistory(),evaluation=evaluator.evaluateHiringBaselines(generator.syntheticHiringManifest,rows);
  requireValue(JSON.stringify(contract.protocol)===JSON.stringify(evaluation.report.protocol),'Frozen evaluator/acceptance protocol mismatch.');
  requireValue(JSON.stringify(await readSources())===JSON.stringify(sourceHashes),'Fixture sources changed while preparing the report.');
+ const constructedIdentities={datasetFingerprint:evaluation.report.datasetFingerprint,
+  protocolFingerprint:digest(JSON.stringify(evaluation.report.protocol)),acceptanceContractFingerprint:contract.fingerprint};
+ for(const key of Object.keys(constructedIdentityReference) as (keyof typeof constructedIdentityReference)[])
+  requireValue(constructedIdentities[key]===constructedIdentityReference[key],`Fixture constructed identity mismatch: ${key}`);
  const reporterSha256=digest(await readFile(fileURLToPath(import.meta.url)));
  const statusCounts=rows.reduce<Record<string,number>>((counts,row)=>{counts[row.status]=(counts[row.status]??0)+1;return counts},{});
  const observationLags=[...new Set(rows.map(row=>(Date.parse(row.labelFirstObservedAt!)-Date.parse(row.startDate!))/86400000))].sort((a,b)=>a-b);
@@ -64,7 +75,7 @@ export async function buildHiringFixturePreflight(options:{root?:string;identiti
   schemaVersion:1,reportType:'hiring-fixture-provenance-preflight',status:'fixture-method-validation-only',
   trainingReady:false,modelTrained:false,performanceValidated:false,deploymentValidated:false,
   identities:{reviewedSourceCheckpoint:hiringFixtureIdentityReference.checkpoint,sourceHashes,reporterSha256,
-   datasetFingerprint:evaluation.report.datasetFingerprint,protocolFingerprint:digest(JSON.stringify(evaluation.report.protocol)),acceptanceContractFingerprint:contract.fingerprint,
+   ...constructedIdentities,
    meaning:'Byte equality and reproducible fixture identities; not independent company-history provenance or a signed attestation.'},
   constructedFacts:{evidenceClass:'constructed-fixture-only',rowCount:rows.length,statusCounts,coverageMonths:evaluation.report.coverageMonths,
    labelObservationLagDays:observationLags,observationTimeBasis:'Invented by the tracked generator; never inferred for company records.',

@@ -5,6 +5,7 @@ import {createHash} from 'node:crypto';
 import {readFile,mkdtemp,mkdir,copyFile,writeFile,rm,unlink} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {resolve,dirname} from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {buildHiringFixturePreflight,hiringFixtureIdentityReference as reference} from '../lib/ml/hiring-fixture-preflight.ts';
 import {evaluateHiringBaselines} from '../lib/ml/hiring-evaluation.ts';
 import {freezeHiringAcceptanceContract} from '../lib/ml/hiring-acceptance.ts';
@@ -65,6 +66,21 @@ test('tampered source bytes cannot execute or be blessed by a replacement hash',
 test('byte-identical isolated copies have identical reports without mutating supplied identities',async()=>{
  const original=await buildHiringFixturePreflight(),identities=structuredClone(reference),before=structuredClone(identities);
  await copySources(async root=>assert.deepEqual(await buildHiringFixturePreflight({root,identities}),original));assert.deepEqual(identities,before);
+});
+
+test('mutated cached fixture declarations cannot change the reviewed protocol',async()=>{
+ const prior=syntheticHiringManifest.asOf;
+ try{syntheticHiringManifest.asOf='2026-10-04';await assert.rejects(buildHiringFixturePreflight(),/constructed identity mismatch/)}
+ finally{syntheticHiringManifest.asOf=prior}
+});
+
+test('restored source bytes cannot bless a previously cached altered generator',async()=>{
+ await copySources(async root=>{
+  const path=resolve(root,'tests/fixtures/hiring-evaluation.mjs'),original=await readFile(path,'utf8');
+  const altered=original.replace('20 + Math.floor(month / 12)','21 + Math.floor(month / 12)');assert.notEqual(altered,original);
+  await writeFile(path,altered);await import(pathToFileURL(path).href);await writeFile(path,original);
+  await assert.rejects(buildHiringFixturePreflight({root}),/constructed identity mismatch/);
+ });
 });
 
 test('CLI emits an auditable JSON report and refuses arbitrary input overrides',()=>{
