@@ -66,3 +66,22 @@ test('only fixed non-sensitive diagnostic stages can appear in clarification err
  for(const diagnostic of ['secret-value','invalid-model-proposal-5-apiKey-value-not-supported','model-unavailable secret'])assert.ok(!clarificationFailureMessage({diagnostic,error:'private payload'}).includes('Diagnostic:'));
  assert.ok(!clarificationFailureMessage({error:'private payload'}).includes('private payload'));
 });
+
+test('mixed date notations, contradictory years and negated short quotes cannot choose a month',()=>{
+ for(const [statement,evidence,value] of [
+  ['Start January 2027 or 2028.','January 2027','2027-01'],
+  ['Start January 2027, or February 2027.','January 2027','2027-01'],
+  ['Start January 2027 or 2028.','January 2027 or 2028','2027-01'],
+  ['Start January 2027 or 2027-02.','January 2027 or 2027-02','2027-01'],
+  ['Start 2027-01 or February 2027.','2027-01 or February 2027','2027-01'],
+  ['Not January 2027.','January 2027','2027-01'],
+  ['Start January 2027 or February 2027.','January 2027','2027-01'],
+  ['January 2027 is unknown.','January 2027','2027-01'],
+  ['Start 2027-010.','2027-010','2027-01'],
+  ['Start January 20270.','January 20270','2027-01'],
+  ['Start January 2027 / 02/01/2027.','January 2027 / 02/01/2027','2027-01'],
+ ])assert.throws(()=>validateClarificationResult(response([{field:'planningMonth',value,evidence}]),{...request,statement},catalog),/grounded/);
+ const statement='Start January 2027 (2027-01); coverage by December 2027.';
+ const result=validateClarificationResult(response([{field:'planningMonth',value:'2027-01',evidence:'January 2027 (2027-01)'},{field:'deadlineMonth',value:'2027-12',evidence:'December 2027'}]),{...request,statement},catalog);
+ assert.equal(result.draft.planningMonth,'2027-01');assert.equal(result.draft.deadlineMonth,'2027-12');
+});
