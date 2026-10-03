@@ -16,7 +16,6 @@ export function workforceInputReadiness(input:WorkforcePlanInput){
   blank('arrivalMode',`${basis}: no hiring arrival assumption is selected.`);
   if(input.arrivalMode==='explicit')blank('arrivalDate',`${basis}: explicit hire arrival is unknown.`);
   if(input.arrivalMode==='historical-median'){
-   if(!active('buy'))blank('recruitingStart','Hiring-only comparison: a recruiting launch date is needed to use historical timing.');
    evidenceChecks.push({field:'arrivalMode',message:'Historical arrival requires comparable role evidence during explicit calculation. This input check does not refresh or verify that evidence.'});
   }
  }
@@ -37,6 +36,12 @@ export function workforceInputReadiness(input:WorkforcePlanInput){
  if(!corrections.length){
   const arrivals:WorkforceInputIssue[]=workforceArrivalIssues(input,active('buy')&&input.arrivalMode==='explicit'?input.arrivalDate||null:null,internal&&active('backfills')?input.backfillDate||null:null);
   corrections.push(...arrivals);
+  if(!active('buy')){
+   const hireOnly={...input,build:'0',move:'0',buy:input.roles,backfills:'0',internalAnnualCostChange:'0',trainingCash:'0',trainingHours:'0'};
+   const comparisonIssues=workforcePlanInputIssues(hireOnly);
+   if(!comparisonIssues.length)comparisonIssues.push(...workforceArrivalIssues(hireOnly,input.arrivalMode==='explicit'?input.arrivalDate||null:null,null));
+   corrections.push(...comparisonIssues.map(issue=>({...issue,message:`Hiring-only comparison: ${issue.message}`})));
+  }
  }
  return {corrections,unknowns,evidenceChecks,capacity:'Operational capacity remains unverified. Candidate pools, courses and entered counts do not establish assignable employees or readiness.'};
 }

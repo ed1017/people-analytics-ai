@@ -2,6 +2,11 @@
 
 Standing user instruction: record every meaningful app request, correction, implementation/test milestone and release here. Separate confirmed intent from proposals and local work from live verification. Include exact commits, PRs, test outcomes and next steps when known; never record credentials or private notes.
 
+## 2026-10-03 — Priority-1 exact-diff review
+
+- Reviewed `a14f8d0` against `b93e42f` (ten files). Corrected the all-internal-mix guidance to expose mandatory hiring-only historical-launch/arrival-horizon errors through the same validators; these must not appear as merely optional unknowns. Keyboard focus can leave the target field without a trap. No arithmetic, persistence or API behavior changed.
+- 416 full unit tests, 48 focused desktop/mobile readiness assertions, lint/TypeScript/genuine build pass. Source-only publication to new `cloud-input-readiness` is authorized; no PR/merge/production action. Priority 2 remains a separate local commit after this checkpoint.
+
 ## 2026-10-03 — Priority-1 input readiness implemented locally
 
 - User authorized the input-readiness summary only, from preserved `b93e42f`; published `aae644b` remains unchanged. Added required/invalid corrections versus optional unknowns in the existing workforce editor, exact-field keyboard focus and linked error descriptions, explicit zero/inactive-path treatment, historical-evidence/goal/draft labels and capacity caveats. No autofill, save, approval, API/model call or new source is triggered by the summary.

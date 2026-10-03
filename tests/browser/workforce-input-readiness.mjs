@@ -33,10 +33,17 @@ try{for(const width of [1366,390]){
  check(width+' missing inputs appear before opening editor',(await summary.innerText()).includes('Missing input')&&!await field('Business unit').isVisible());
  await summary.getByRole('button',{name:'Review Business unit',exact:true}).focus();await page.keyboard.press('Enter');
  check(width+' keyboard action opens editor and focuses exact field',await field('Business unit').evaluate(el=>el===document.activeElement)&&await field('Business unit').getAttribute('aria-invalid')==='true');
+ await page.keyboard.press('Tab');check(width+' focus can leave the linked field without a trap',await field('Job profile').evaluate(el=>el===document.activeElement));
  check(width+' focus does not alter storage',JSON.stringify(await state())===before);
  await field('Business unit').selectOption('TECH');check(width+' corrected field leaves the correction list',await summary.getByRole('button',{name:'Review Business unit',exact:true}).count()===0);
  await button('Load complete saved inputs').click();const original=JSON.stringify((await state()).workspaces[goalId].fields.workforceSolution);
  check(width+' complete inputs have no fabricated readiness claim',(await summary.innerText()).includes('Corrections before calculation (0)')&&(await summary.innerText()).includes('Operational capacity remains unverified'));
+ await page.locator('summary').filter({hasText:'Review and customize inputs'}).click();
+ await field('Build: existing employees after development').fill('3');await field('Move: existing employees already ready').fill('0');await field('Buy: external hires').fill('0');await field('Hiring arrival assumption').selectOption('historical-median');await field('Proposed recruiting launch (YYYY-MM-DD)').fill('');
+ check(width+' required hiring-only launch is a correction even with no planned Buy',(await summary.innerText()).includes('Hiring-only comparison: Enter the proposed recruiting launch date'));
+ await field('Hiring arrival assumption').selectOption('explicit');await field('Explicit hire arrival (YYYY-MM-DD)').fill('2027-01-01');
+ check(width+' hiring-only out-of-horizon arrival is a correction',(await summary.innerText()).includes('Hiring-only comparison: Hire arrival must fall within'));
+ await button('Load complete saved inputs').click();
  await page.locator('summary').filter({hasText:'Review and customize inputs'}).click();await field('Annual loaded cost per external hire (USD)').fill('');
  check(width+' optional cost blank remains unknown without a validation error',(await summary.innerText()).includes('External hires: annual hire cost is unknown.')&&await field('Annual loaded cost per external hire (USD)').getAttribute('aria-invalid')==='false');
  check(width+' unsaved changes distinguish selected evidence and block calculation',(await summary.innerText()).includes('Unsaved draft')&&(await summary.innerText()).includes('does not validate this draft')&&await button('Calculate saved assumptions and compare hiring-only').isDisabled());

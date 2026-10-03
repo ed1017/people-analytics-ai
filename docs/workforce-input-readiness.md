@@ -29,3 +29,9 @@ No changes to APIs, external transmission, source data, settings, authentication
 - A local characterization comparison against `b93e42f` covered 459 field/value variants: validation acceptance and complete deterministic calculator outputs remained identical. This specifically checks the shared-validator refactor rather than introducing new arithmetic behavior.
 
 Logs: `/tmp/readiness-{focused,unit,lint,ts,build,browser,search-browser,handoff-browser,workspace,selection,lifecycle}.log`. New screenshots: `/tmp/workforce-readiness-iLnaHE/`. No file-navigation policy was retried or changed; browser testing used the existing permitted mocked HTTP-origin mechanism.
+
+## Exact-diff review after `a14f8d0`
+
+Reviewed all ten files against `b93e42f` for focus/accessibility, validation, unknown-versus-zero wording, stale context and side effects. Found and fixed one mismatch: an all-internal mix could label the historical recruiting launch as optional unknown, or omit an out-of-horizon explicit arrival error, although the required hiring-only comparison rejects those inputs. Guidance now runs the same input/arrival validators on that comparison's existing projection and labels its corrections explicitly. No calculator/API/storage changes were needed.
+
+Added unit and desktop/mobile regressions for both cases, plus keyboard Tab departure from a focused field (no trap). Final review checks: 416 full unit tests, 48 readiness browser assertions, full lint, standalone TypeScript and genuine production build pass. Earlier 245 workflow regressions remain the preceding integrated evidence; they were not relabeled as newly rerun in this review. Logs: `/tmp/readiness-review-{unit,lint,ts,build,browser}.log`. Publication, if authorized, is a source checkpoint on `cloud-input-readiness`, not a production release.

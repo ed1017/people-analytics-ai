@@ -45,6 +45,15 @@ test('hiring-only unknowns are distinct from an inactive Buy path',()=>{
  const r=workforceInputReadiness({...base,build:'3',move:'0',buy:'0',annualHireCost:'',hireFee:'',arrivalMode:'',arrivalDate:''});
  assert.deepEqual(r.corrections,[]);assert.ok(r.unknowns.filter(item=>['annualHireCost','hireFee','arrivalMode'].includes(item.field)).every(item=>item.message.startsWith('Hiring-only comparison')));
 });
+test('inactive Buy still reports required timing corrections for the mandatory hiring-only comparison',()=>{
+ const internal={...base,build:'3',move:'0',buy:'0'};
+ const missing=workforceInputReadiness({...internal,arrivalMode:'historical-median',recruitingStart:''});
+ assert.ok(missing.corrections.some(issue=>issue.fields.includes('recruitingStart')&&issue.message.startsWith('Hiring-only comparison:')));
+ assert.ok(!missing.unknowns.some(issue=>issue.field==='recruitingStart'));
+ const outside=workforceInputReadiness({...internal,arrivalMode:'explicit',arrivalDate:'2027-01-01'});
+ assert.ok(outside.corrections.some(issue=>issue.fields.includes('arrivalDate')&&issue.message.startsWith('Hiring-only comparison:')));
+ assert.deepEqual(workforceInputReadiness({...internal,arrivalMode:'historical-median'}).corrections,[]);
+});
 test('independent issues accumulate without inventing cross-field errors from invalid operands',()=>{
  const input={...base,build:'bad',backfills:'',budget:'bad',planningMonth:'',annualHireCost:''};
  const r=workforceInputReadiness(input);
