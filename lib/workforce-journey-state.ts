@@ -80,9 +80,9 @@ export function selectWorkforceJourney(records:JourneyRecords, transient?:Journe
   resultId=result.id;
   if(!readSavedWorkforceReview(solution,result))return state('unavailable');
   if(result.version!==version.version||!solutionResultIsCurrent(solution,result))return state('historical');
+  if(active?.kind==='alternatives')return state('review-alternatives');
   // All card comparisons need their existing asynchronous validation, including history/lineage.
   if(verificationContext!==context)return state('verify-result');
-  if(active?.kind==='alternatives')return state('review-alternatives');
   if(active?.kind==='tailoring')return state(active.preview==='ready'?'save-solution':'preview-tailoring');
   return state('compare');
 }
