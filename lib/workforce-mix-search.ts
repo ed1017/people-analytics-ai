@@ -73,7 +73,7 @@ function sourceFor(raw: WorkforceSolution, evidenceResultId: string) {
   // are never copied into search results. This is identity, not authentication.
   const binding = {goalId: solution.goalId, solutionId: solution.id, version: version.version, evidenceResultId,
     inputFingerprint: fingerprint(review.input), timingFingerprint: fingerprint(timing),
-    sourceResultFingerprint: fingerprint(result.payload), dependencyFingerprint: fingerprint(result.dependencyKey)};
+    sourceResultFingerprint: fingerprint(result), evidenceFingerprint: fingerprint(result.evidenceIds.map(id => solution.evidence.find(item => item.id === id))), dependencyFingerprint: fingerprint(result.dependencyKey)};
   return {binding, input: structuredClone(review.input), timing: structuredClone(timing)};
 }
 function constraintStatus(plan: WorkforceIncrement): ConstraintStatus {
@@ -139,7 +139,7 @@ export function searchWorkforceMixes(solution: WorkforceSolution, evidenceResult
   const filtered = candidates.filter(candidate => spec.resultFilter === "all" || candidate.status === "met");
   const results = filtered.slice(0, spec.maxResults);
   const conclusion = enumerated === 0 ? "no-mix-within-bounds" : counts.met ? "entered-constraint-matches-found" : counts.unknown ? "entered-constraints-incomplete" : counts.invalid === enumerated ? "no-calculable-mix" : "no-entered-constraint-match";
-  return freeze({schemaVersion: 1 as const, kind: "bounded-workforce-mix-search" as const, methodVersion: "workforce-mix-search-v1",
+  return freeze({schemaVersion: 1 as const, kind: "bounded-workforce-mix-search" as const, methodVersion: "workforce-mix-search-v2",
     searchFingerprint: fingerprint({binding: source.binding, spec}), binding: source.binding, spec,
     reference: {plan: referencePlan, status: constraintStatus(referencePlan), tradeOffs: tradeOffs(referencePlan)},
     summary: {conclusion, enumerated, calculatorInvocations: enumerated + 1, enumerationComplete: true, counts, invalidReasons, matchingFilter: filtered.length,
