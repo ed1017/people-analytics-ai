@@ -61,7 +61,15 @@ function Workspace({goalId,goalStatement,solution,page,onNavigate}:{goalId:strin
  const verifiedResult=!result?.payload.localWhatIf||verifiedCardSource===cardVerificationIdentity(solution,result.id,storage.data.workspaces[goalId]?.fields.workforceAlternativeReviews??[]);
  const current=()=>decisionStore.getField<WorkforceSolution>(goalId,field,solution);
  const save=(next:WorkforceSolution)=>decisionStore.setField(goalId,field,next);
- useEffect(()=>()=>controller.current?.abort(),[]);
+ // Observe store transitions directly: React may batch an A → B → A switch
+ // into one render, so unmount cleanup and final-goal equality are insufficient.
+ useEffect(()=>{
+  const off=decisionStore.subscribe(()=>{
+   const goals=decisionStore.getSnapshot().data.goals;
+   if(goals.activeId!==goalId||!goals.goals.some(goal=>goal.id===goalId&&goal.statement===goalStatement))controller.current?.abort();
+  });
+  return()=>{off();controller.current?.abort()};
+ },[goalId,goalStatement]);
  const isHere=()=>{const goals=decisionStore.getSnapshot().data.goals;return goals.activeId===goalId&&goals.goals.some(goal=>goal.id===goalId&&goal.statement===goalStatement)};
  async function clarify(){if(controller.current||dirty)return;const baseVersion=version.version,c=new AbortController();controller.current=c;setBusy(true);setNotice('');setProposal(null);let failureMessage=clarificationFailureMessage(null);const timer=setTimeout(()=>c.abort(),45000);try{const r=await fetch('/api/workforce-solution/intake',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({goal:goalStatement,statement,inputs:fromInputs(version.inputs)}),signal:c.signal});const body=await r.json();if(!r.ok){failureMessage=clarificationFailureMessage(body);throw Error('Intake failed.');}if(!isHere()||c.signal.aborted||currentSolutionVersion(current()).version!==baseVersion)return;setProposal({baseVersion,result:body});setNotice('Review the proposed inputs. Saved assumptions and calculations have not changed.');}catch{if(isHere())setNotice(c.signal.aborted?'Clarification cancelled or timed out; saved inputs retained.':failureMessage)}finally{clearTimeout(timer);controller.current=null;setBusy(false)}}
  async function loadCatalog(){if(controller.current)return;const c=new AbortController();controller.current=c;setBusy(true);setNotice('');try{const r=await fetch('/api/position-structure',{signal:c.signal,cache:'no-store'});const body=await r.json();if(!r.ok)throw Error(body.error||'Governed catalog unavailable.');if(isHere()&&!c.signal.aborted)decisionStore.setField(goalId,'workforceCatalog',{as_of:body.as_of,business_units:body.business_units,job_profiles:body.job_profiles});}catch(e){setNotice((e as Error).message)}finally{controller.current=null;setBusy(false)}}

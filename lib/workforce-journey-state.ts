@@ -71,7 +71,11 @@ export function selectWorkforceJourney(records:JourneyRecords, transient?:Journe
   }
   const draft=active?.kind==='input-draft'||active?.kind==='tailoring'?active.input:input;
   readiness=workforceInputReadiness(draft);
-  if(readiness.corrections.length)return state('correct-inputs',readiness.corrections[0].fields[0]);
+  if(readiness.corrections.length){
+    const fixed=['businessUnit','jobProfile','intent','roles','planningMonth','months'];
+    const field=readiness.corrections[0].fields.find(key=>active?.kind!=='tailoring'||!fixed.includes(key));
+    return state('correct-inputs',field);
+  }
   if(active?.kind==='input-draft')return state('save-inputs');
   const results=solution.results.filter(item=>item.kind==='brief'&&item.calculator.name==='single-role-workforce-review');
   const result=records.selectedResultId?results.find(item=>item.id===records.selectedResultId):results.at(-1);
