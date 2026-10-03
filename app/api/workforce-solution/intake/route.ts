@@ -17,16 +17,19 @@ export async function POST(request:NextRequest) {
   let input;try{input=await limitedBody(request);}catch{return NextResponse.json({error:'Use only a planning goal, statement and supported workforce inputs; extra fields are not accepted.'},{status:400});}
   if(!client)return NextResponse.json({error:'The existing model connection is unavailable. Saved inputs and results are retained.'},{status:503});
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),40000),signal=AbortSignal.any([controller.signal,request.signal]);
+  let diagnostic='catalog-unavailable';
   try {
     signal.throwIfAborted();
     // Only synthetic role/BU codes and names. No employee or cost/readiness rows.
     const {data,error}=await supabaseServer.from('position_action_structural_inventory').select('org_code, org_name, job_profile_code, job_profile_name');
     if(error||!data?.length)throw Error('Catalog unavailable');signal.throwIfAborted();
     const catalog={business_units:Array.from(new Map(data.map(r=>[r.org_code,{org_code:r.org_code,org_name:r.org_name}])).values()),job_profiles:Array.from(new Map(data.map(r=>[r.job_profile_code,{job_profile_code:r.job_profile_code,job_profile_name:r.job_profile_name}])).values()),combinations:data.map(r=>({org_code:r.org_code,job_profile_code:r.job_profile_code}))};
-    const spec=clarificationRequest(input,catalog);
+    diagnostic='invalid-catalog-or-input';const spec=clarificationRequest(input,catalog);
+    diagnostic='model-unavailable';
     const response=await client.responses.create({model:CHAT_MODEL,...spec},{signal});
-    signal.throwIfAborted();if(response.status!=='completed'||!response.output_text)throw Error('Model response incomplete');
-    const result=validateClarificationResult(JSON.parse(response.output_text),input,catalog);
+    diagnostic='model-incomplete';signal.throwIfAborted();if(response.status!=='completed'||!response.output_text)throw Error('Model response incomplete');
+    diagnostic='invalid-model-json';const parsed=JSON.parse(response.output_text);
+    diagnostic='invalid-model-proposal';const result=validateClarificationResult(parsed,input,catalog);
     return NextResponse.json(result,{headers:{'Cache-Control':'no-store'}});
-  }catch{return NextResponse.json({error:signal.aborted?'Clarification cancelled or timed out. Saved inputs and results are retained.':'Clarification could not be validated. No proposed input was saved; retry or use the input editor.'},{status:signal.aborted?408:502,headers:{'Cache-Control':'no-store'}});}finally{clearTimeout(timer);}
+  }catch(error){const known=['Unexpected clarification fields.','Invalid clarification response.','Missing or excessive planning text.','Unknown or repeated proposed field.','Proposed input is not grounded in the supplied planning statement.','This role and BU combination is unavailable.'];if(diagnostic==='invalid-model-proposal'&&error instanceof Error&&known.includes(error.message))diagnostic+='-'+known.indexOf(error.message);return NextResponse.json({error:signal.aborted?'Clarification cancelled or timed out. Saved inputs and results are retained.':'Clarification could not be validated. No proposed input was saved; retry or use the input editor.',diagnostic:signal.aborted?'cancelled':diagnostic},{status:signal.aborted?408:502,headers:{'Cache-Control':'no-store'}});}finally{clearTimeout(timer);}
 }
