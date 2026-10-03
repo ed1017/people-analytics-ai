@@ -142,7 +142,7 @@ export function RoleResponseEvidenceSummary({
               Development pathway coverage
             </p>
             <p className="text-[11px] text-muted-foreground">
-              Checks whether each near-ready candidate's current required-skill gaps have active mapped learning courses. Course availability does not guarantee proficiency gain.
+              Checks whether each near-ready candidate&apos;s current required-skill gaps have active mapped learning courses. Course availability does not guarantee proficiency gain.
             </p>
           </div>
           <div className="grid gap-2 sm:grid-cols-3">

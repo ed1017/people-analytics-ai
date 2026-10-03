@@ -5,6 +5,7 @@ import { homeReplyFormat, homeGoalChoiceInstructions, decodeHomeModelReply, home
 import { CHAT_MODEL } from "@/lib/chat-model";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import {openAIProxyTransport} from "@/lib/openai-proxy-transport";
 import {marketCarryEvidence} from "../../../lib/oews-reference.mjs";
 import {normalizeGoalContext,goalContextInstructions,goalSummaryInstructions} from "../../../lib/goal-context";
 import { normalizeHomePack, HOME_MAX_BYTES } from "../../../lib/home-pack.mjs";
@@ -18,7 +19,7 @@ export const dynamic = "force-dynamic";
 const apiKey = process.env.OPENAI_API_KEY;
 
 const client = apiKey
-  ? new OpenAI({ apiKey })
+  ? new OpenAI({ ...openAIProxyTransport(), apiKey })
   : null;
 
 type ChatMessage = {
@@ -1476,7 +1477,7 @@ ${message}
         ? ("none" as const)
         : ("auto" as const);
 
-    let response: any =
+    let response =
       await client.responses.create({
         model: CHAT_MODEL,
         instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeStyle.instructions : ""),
@@ -1496,7 +1497,7 @@ ${message}
       const toolCalls = (
         response.output ?? []
       ).filter(
-        (item: any) =>
+        (item) =>
           item.type === "function_call"
       );
 
@@ -1507,7 +1508,7 @@ ${message}
       const toolOutputs =
         await Promise.all(
           toolCalls.map(
-            async (call: any) => {
+            async (call) => {
               try {
                 const toolArgs =
                   typeof call.arguments ===
@@ -1525,14 +1526,14 @@ ${message}
                   );
 
                 return {
-                  type: "function_call_output",
+                  type: "function_call_output" as const,
                   call_id: call.call_id,
                   output:
                     JSON.stringify(call.name === "get_survey_sentiment" && page === "survey-sentiment" ? employeeListeningEvidence(result) : result),
                 };
               } catch (error) {
                 return {
-                  type: "function_call_output",
+                  type: "function_call_output" as const,
                   call_id: call.call_id,
                   output: JSON.stringify({
                     error:

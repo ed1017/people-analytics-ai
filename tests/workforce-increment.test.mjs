@@ -43,3 +43,20 @@ test('arrival-month proration respects leap-year calendar days',()=>{
  const r=calculateWorkforceIncrement({...input,planningMonth:'2028-02',months:'1',recruitingStart:'2028-02-01',arrivalDate:'2028-02-29',buildMonth:'2028-02',moveMonth:'2028-02',deadlineMonth:'2028-02'},null);
  assert.equal(r.rows[0].hireStaffingCost,344.83);
 });
+test('annual cohort uplift is invariant to same-month Build/Move partitions before cents rounding',()=>{
+ for(const cents of [1,6,12,18,36,12001,120012])for(let roles=1;roles<=12;roles++)for(let build=0;build<=roles;build++){
+  const r=calculateWorkforceIncrement({...input,roles:String(roles),build:String(build),move:String(roles-build),buy:'0',buildMonth:'2026-10',moveMonth:'2026-10',internalAnnualCostChange:String(cents/100),trainingCash:'0',trainingHours:'0'},null);
+  const expected=Math.round(cents/12)/100;
+  assert.ok(r.rows.every(row=>row.internalSalaryUplift===expected),`cents=${cents}, roles=${roles}, build=${build}`);
+  assert.equal(r.totalCash,Math.round(expected*3*100)/100);assert.equal(r.maxAddedEmployees,0);
+ }
+});
+test('staggered cohort uplift charges only active shares of an annual total once per month',()=>{
+ const r=calculateWorkforceIncrement({...input,roles:'3',build:'1',move:'2',buy:'0',internalAnnualCostChange:'0.18',trainingCash:'0',trainingHours:'0'},null);
+ assert.deepEqual(r.rows.map(row=>row.internalSalaryUplift),[0.01,0.02,0.02]);assert.equal(r.totalCash,0.05);
+});
+test('annual hire/backfill rates and one-time fees stay separate over a twelve-month horizon',()=>{
+ const r=calculateWorkforceIncrement({...input,planningMonth:'2026-01',months:'12',recruitingStart:'2026-01-01',arrivalDate:'2026-01-01',buildMonth:'2026-01',moveMonth:'2026-01',backfills:'1',backfillDate:'2026-07-01',annualBackfillCost:'60000',backfillFee:'1000',deadlineMonth:'2026-12',budget:'168000',maxAddedEmployees:'2'},null);
+ assert.equal(r.totalCash,168000);assert.equal(r.totalTime,1000);assert.equal(r.totalWithTime,169000);
+ assert.equal(r.rows.reduce((n,row)=>n+row.recruitingFees,0),3000);assert.equal(r.rows.at(-1).addedEmployees,2);assert.equal(r.rows.at(-1).conditionalRoleCoverage,3);
+});

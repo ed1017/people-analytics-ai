@@ -1,0 +1,36 @@
+# Local solution cards, what-ifs and exact-result pins
+
+Implemented on `local-workforce-solution-cards`, based on reviewed checkpoint `af347dd`. This is a browser-local release candidate, not live agent/ML validation or production publication.
+
+## Behavior
+
+- One compact vertical list shows the saved response mix and hiring-only benchmark when no alternatives have been saved. With a verified saved alternative review, it shows the saved mix plus its one or two alternatives; hiring-only remains expandable. Existing alternative limits are unchanged. Invalid history is retained with a notice.
+- Ranking starts neutral. The user explicitly chooses lower incremental cash, fewer added employees or earlier full conditional coverage. Only options meeting all three entered constraints with the chosen metric known qualify. Ties, missing comparison metrics and no qualifying options produce no unique preferred label. No composite weights, capacity inference or universal best claim is used.
+- Each card expands to costs, timing, evidence dates/scope, assumptions, constraints, warnings and exact lineage. Employee-time value stays separate from cash. Candidate pools/pathways are not assignable capacity. All outcomes remain conditional; source-team impact and operational availability are unverified.
+- Tailoring creates a temporary draft. Valid changes debounce into a cancellable worker using the existing deterministic calculator; invalid changes clear the usable preview. Every card displays deltas against its own saved baseline. Shared budget, added-employee cap, deadline, common hiring cost/timing and loaded hourly rate apply to every compared option. Path counts/readiness, backfills and training assumptions apply to the selected option. Fixed role, BU, role demand and horizon cannot change through this adapter.
+- Explicit **Save revised solution to this goal** replays the draft and validates source/history identity, then appends version/run/result in one solution-field write. No-op saves are refused. Earlier versions, calculations, source dates, approvals and v1/v2 alternative reviews remain intact. The new `localWhatIf` origin contains exact source references and SHA-256 content fingerprints, optional alternative review/slot/search fingerprint, calculator method, changed fields and chosen priority. This is local recomputation on retained evidence, not a source refresh. Saved local payloads replay calculator arithmetic and validate their inherited scope/evidence chain.
+- **Pin saved solution** creates a bookmark of the selected saved result, including exact goal/solution/version/result and a content fingerprint. Alternative cards must first be explicitly saved as a revised solution. Pins never approve or silently promote drafts. Pins are goal-local `fields.workforceSolutionPins` records in the existing store, capped at ten without eviction. Open verifies the exact result; missing or changed references are retained and reported unavailable. Historical pins are labelled. Unpin deletes only the bookmark. Existing goal deletion removes that goal's workspace, including pins.
+- Main calculate/input/inspection/approval actions are disabled while a what-if is open. Pin navigation refuses unsaved work. Goal/selection/version/history transitions and stale asynchronous completions cannot save a previous draft. No worker/Web Crypto support produces a graceful local error without service fallback. Failed durable writes retain the old stored copy and show an explicit unsaved-working-copy notice.
+
+## Validation and limits
+
+435 unit tests pass, including 11 card/what-if/pin tests and 11 clarification tests. Full lint, standalone TypeScript and production build pass. Browser checks: 62 cards, 48 readiness, 44 goal-copy, 98 built workspace, 62 local search, 50 handoff, 11 selection and 24 lifecycle (399 total). Tests cover two/three-card caps, priority/ties/unknowns, shared assumptions and exact deltas, edit/cancel/save/history, source corruption, pin/reload/unpin, goal deletion/renaming, new versions, delayed worker replies, quota failure and unsupported Worker. The intake error mapping is exercised with a mocked 502 response.
+
+All test data are synthetic. Network requests are locally mocked; the built workspace test exercises the actual Next worker bundle. Actual engine coverage is installed Linux Chromium 151. Narrow-viewport runs use Pixel 7 emulation where configured; these are not actual Windows Chrome or Android Chrome runs. Real-device/hosted acceptance and live agent/ML behavior remain unvalidated. No API/model integration, new source, schema/database, employee action or held eNPS change is part of this slice.
+
+Existing limits remain: two alternatives per review, ten alternative reviews, 50 solution versions, 100 results/runs/evidence records, 30 approval notes, 384 KiB solution, 512 KiB goal and 3 MiB store. The priority selector is temporary; its explicit basis is retained in a revised result's origin on save. Goal pins remain separate from solution pins; use the existing goal selector to return to another goal's pin list. Scope/demand/horizon editing continues through the existing governed input workflow.
+
+## Concise acceptance script
+
+1. In a synthetic saved goal with a current workforce calculation, inspect **Compare solution options**. Expect two neutral cards, or at most three with saved alternatives. Expand evidence and check the old source date and capacity caveat.
+2. Select each priority. Verify the preferred label names that basis; tied or ineligible options must not invent a winner.
+3. Tailor an option. Change training cash, a shared budget and an added-employee cap. Confirm calculator deltas and common constraints on all cards. Enter an invalid amount: saving must disable and old amounts must be labelled saved baseline. Cancel: prior records stay unchanged.
+4. Tailor again and explicitly save. Expect one appended version/result and the original approval still attached only to the prior version. Reopen the older calculation to inspect the original evidence and alternatives.
+5. Pin a saved result, reload, then save a newer revision. Open the historical pin: it must return to its exact old calculation, not latest. Unpin: the underlying calculation remains. An unsaved option cannot be pinned.
+6. On actual target devices, check touch targets, wrapping, expandable details and keyboard focus. If workers/Web Crypto are unsupported, confirm a local error with retained data and no API fallback. No credentials are needed for the synthetic local harness.
+
+Sparse natural-month intake was diagnosed separately in `workforce-intake-month-review.md`. The proven representation mismatch is fixed; the original deployed model response and actual failure stage were not available. Parent controls any new hosted test.
+
+## Subsequent local review and outcomes refinement
+
+`local-workforce-outcomes-review` fixes three concrete lineage/draft-preservation defects and adds the requested scenario outcome summary and a single expandable, editable calculation breakdown. See `workforce-outcomes-review.md` for reproducers, fixes, current acceptance checks and the explicit unavailable-forecast boundary. The original `5b73b50` checkpoint is retained.

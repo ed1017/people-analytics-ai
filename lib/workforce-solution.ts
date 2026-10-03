@@ -88,6 +88,13 @@ export function currentSolutionVersion(state: WorkforceSolution): SolutionVersio
   assert(state.versions.length > 0, "Solution version is missing.");
   return state.versions[state.versions.length - 1];
 }
+/** Reconstruct a valid read-only historical graph without future runs/results/approvals. */
+export function workforceSolutionAtVersion(state: WorkforceSolution, version: number): WorkforceSolution {
+  assert(state.versions.some(item => item.version === version), "Saved source version is missing.");
+  return {...state, versions: state.versions.filter(item => item.version <= version),
+    results: state.results.filter(item => item.version <= version), runs: state.runs.filter(item => item.version <= version),
+    approvals: state.approvals.filter(item => item.version <= version), pending: null};
+}
 export function createWorkforceSolution(id: string, goalId: string, inputs: SolutionInputs, at: string): WorkforceSolution {
   identifier(id); identifier(goalId); timestamp(at); validateInputs(inputs);
   return bounded({schemaVersion: 1, id, goalId,
@@ -205,4 +212,63 @@ export function inspectSolutionResult(state: WorkforceSolution, resultId: string
   const result = state.results.find(item => item.id === resultId);
   assert(result, "The requested calculation is unavailable.");
   return clone({result, inspection: solutionInspection(state, result.version)});
+}
+
+// Generic browser storage validates JSON/checksum, not this lifecycle. Keep
+// unreadable records intact and return no actionable state after reload.
+export function readWorkforceSolution(raw: unknown): WorkforceSolution | null {
+  try {
+    object(raw);
+    const state = raw as WorkforceSolution;
+    assert(state.schemaVersion === 1, "Unknown solution format.");
+    identifier(state.id); identifier(state.goalId);
+    for (const [items, limit] of [[state.versions, 50], [state.evidence, 100], [state.results, 100], [state.runs, 100], [state.approvals, 30]] as const) {
+      assert(Array.isArray(items) && items.length <= limit, "Invalid solution history.");
+      items.forEach(object);
+    }
+    assert(state.versions.length > 0, "Missing solution version.");
+    const uniqueIds = (items: Array<{id: string}>) => {
+      items.forEach(item => identifier(item.id));
+      assert(new Set(items.map(item => item.id)).size === items.length, "Duplicate history identity.");
+    };
+    uniqueIds(state.evidence); uniqueIds(state.results); uniqueIds(state.runs); uniqueIds(state.approvals);
+    state.evidence.forEach(item => {
+      object(item.scope); object(item.payload); timestamp(item.capturedAt);
+      limitedText(item.source, 160); limitedText(item.sourceVersion, 80);
+      assert(["positions", "skills", "learning", "recruiting", "cost-basis", "quote"].includes(item.kind), "Unknown evidence kind.");
+      assert(["synthetic", "user-provided", "fictional"].includes(item.provenance), "Unknown evidence provenance.");
+      assert(Array.isArray(item.limitations) && item.limitations.length <= 20, "Invalid evidence limitations.");
+      item.limitations.forEach(text => limitedText(text, 500));
+      for (const date of [item.asOf, item.periodStart, item.periodEnd]) assert(date === null || typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date) && Number.isFinite(Date.parse(date)) && new Date(date).toISOString().slice(0, 10) === date, "Invalid evidence date.");
+      assert(item.periodStart === null || item.periodEnd === null || item.periodStart <= item.periodEnd, "Reversed evidence period.");
+    });
+    state.versions.forEach((version, index) => {
+      assert(version.version === index + 1 && ["conversation", "sidebar"].includes(version.origin), "Invalid version sequence.");
+      timestamp(version.createdAt); limitedText(version.change, 500); validateInputs(version.inputs);
+      assert(Array.isArray(version.evidenceIds) && new Set(version.evidenceIds).size === version.evidenceIds.length && version.evidenceIds.every(id => state.evidence.some(item => item.id === id)), "Broken evidence reference.");
+    });
+    state.runs.forEach(run => {
+      timestamp(run.startedAt); object(run.keys);
+      const version = state.versions.find(item => item.version === run.version);
+      assert(version && run.goalId === state.goalId && run.solutionId === state.id && Array.isArray(run.kinds) && run.kinds.length > 0 && new Set(run.kinds).size === run.kinds.length, "Invalid run reference.");
+      run.kinds.forEach(kind => assert(run.keys[kind] === solutionDependencyKey(state, version, kind), "Broken run dependency."));
+      const completed = state.results.filter(result => result.runId === run.id);
+      assert(completed.length === 0 || completed.length === run.kinds.length && new Set(completed.map(result => result.kind)).size === completed.length, "Incomplete or duplicated run results.");
+    });
+    assert(state.pending === null || state.runs.some(run => JSON.stringify(run) === JSON.stringify(state.pending)) && state.pending.version === currentSolutionVersion(state).version && !state.results.some(result => result.runId === state.pending!.id), "Invalid pending run.");
+    state.results.forEach(result => {
+      const version = state.versions.find(item => item.version === result.version), run = state.runs.find(item => item.id === result.runId);
+      assert(version && run && run.version === version.version && run.kinds.includes(result.kind), "Broken calculation reference.");
+      timestamp(result.completedAt); object(result.calculator); object(result.payload);
+      limitedText(result.calculator.name, 100); limitedText(result.calculator.version, 80);
+      assert(result.dependencyKey === solutionDependencyKey(state, version, result.kind) && JSON.stringify(result.evidenceIds) === JSON.stringify(version.evidenceIds), "Broken calculation dependency.");
+    });
+    state.approvals.forEach(approval => {
+      timestamp(approval.recordedAt); limitedText(approval.text, 1000);
+      const version = state.versions.find(item => item.version === approval.version);
+      assert(version && Array.isArray(approval.resultIds) && approval.resultIds.length > 0 && new Set(approval.resultIds).size === approval.resultIds.length && approval.resultIds.every(id => state.results.some(result => result.id === id && result.version <= version.version && result.dependencyKey === solutionDependencyKey(state, version, result.kind))), "Broken approval reference.");
+    });
+    bounded(state);
+    return state;
+  } catch {return null}
 }

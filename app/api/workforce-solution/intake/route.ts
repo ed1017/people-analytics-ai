@@ -1,12 +1,13 @@
 import {NextRequest,NextResponse} from "next/server";
 import OpenAI from "openai";
+import {openAIProxyTransport} from "@/lib/openai-proxy-transport";
 import {CHAT_MODEL} from "@/lib/chat-model";
 import {supabaseServer} from "@/lib/supabase-server";
 import {clarificationRequest,validateClarificationInput,validateClarificationResult} from "@/lib/workforce-clarification";
 import {workforcePlanFields} from "@/lib/workforce-increment";
 export const dynamic='force-dynamic';
 export const maxDuration=60;
-const client=process.env.OPENAI_API_KEY?new OpenAI({apiKey:process.env.OPENAI_API_KEY,maxRetries:0,timeout:30000}):null;
+const client=process.env.OPENAI_API_KEY?new OpenAI({...openAIProxyTransport(),apiKey:process.env.OPENAI_API_KEY,maxRetries:0,timeout:30000}):null;
 async function limitedBody(request:NextRequest) {
   const reader=request.body?.getReader();if(!reader)throw Error('Empty clarification request.');
   const chunks:Uint8Array[]=[];let size=0;

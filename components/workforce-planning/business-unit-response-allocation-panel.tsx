@@ -83,7 +83,7 @@ export function BusinessUnitResponseAllocationPanel({
       <div className="border-t p-4">
         <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
           <p className="max-w-3xl text-xs text-muted-foreground">
-            Allocate the existing role portfolio to destination business units. BU totals must reconcile back to each role's Build / Move / Buy target. A Move row identifies the destination only; source BU is not inferred. Amounts are modeled role capacity and may be fractional.
+            Allocate the existing role portfolio to destination business units. BU totals must reconcile back to each role&apos;s Build / Move / Buy target. A Move row identifies the destination only; source BU is not inferred. Amounts are modeled role capacity and may be fractional.
           </p>
 
           <div className="flex gap-2">
