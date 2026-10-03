@@ -1,3 +1,4 @@
+import { TrainingTimingPanel } from "@/components/training-timing-panel";
 import type { ComponentProps } from "react";
 
 import { ScenarioComparisonTable } from "./scenario-comparison-table";
@@ -42,6 +43,8 @@ export function ScenarioModelingDestination({
         {...panelProps}
         visible
       />
+
+      <TrainingTimingPanel suggestedMonth={activePlanningStart?.planning_month.slice(0,7)??""} />
 
       <ScenarioPlanSummary
         visible
