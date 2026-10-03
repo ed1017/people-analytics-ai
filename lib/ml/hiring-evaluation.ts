@@ -78,7 +78,7 @@ function readManifest(input: unknown): HiringManifest {
     if (typeof raw[key] !== "string" || !raw[key].trim() || raw[key].length > 200) throw Error("Invalid evaluation provenance or scope.");
   }
   if (raw.provenance !== "synthetic" || raw.purpose !== "method-validation-only") throw Error("Only explicitly synthetic method validation is supported.");
-  if (!["all-openings", "completed-fills-only"].includes(String(raw.cohortCoverage)) || typeof raw.openingScopeVerified !== "boolean" || typeof raw.statusHistoryVerified !== "boolean") throw Error("Invalid cohort provenance declarations.");
+  if (typeof raw.cohortCoverage !== "string" || !["all-openings", "completed-fills-only"].includes(raw.cohortCoverage) || typeof raw.openingScopeVerified !== "boolean" || typeof raw.statusHistoryVerified !== "boolean") throw Error("Invalid cohort provenance declarations.");
   const asOf = day(raw.asOf), start = day(raw.openingCoverageStart);
   if (asOf === null || start === null || start > asOf || new Date(start).getUTCDate() !== 1) throw Error("Invalid extraction date or complete-month coverage start.");
   return Object.fromEntries(manifestKeys.map(key => [key, raw[key]])) as HiringManifest;
@@ -113,7 +113,8 @@ export function scoreAlignedPredictions(actual: AlignedValue[], predicted: Align
     values.set(row.id, row.days);
   }
   const seen = new Set<string>(), errors: number[] = [];
-  for (const row of actual) {
+  // Canonical ID order also fixes floating-point accumulation order.
+  for (const row of [...actual].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0)) {
     if (typeof row.id !== "string" || !row.id.trim() || seen.has(row.id) || !Number.isSafeInteger(row.days) || row.days < 0 || !values.has(row.id)) throw Error("Invalid labels or mismatched scored IDs.");
     seen.add(row.id); errors.push(values.get(row.id)! - row.days);
   }
@@ -129,7 +130,7 @@ function readRow(input: unknown): HiringObservation {
   for (const key of ["requisitionId", "openedDate", "closedDate", "startDate", "labelFirstObservedAt"]) {
     if (raw[key] !== null && typeof raw[key] !== "string") throw Error("Dates and local IDs must be strings or null.");
   }
-  if (typeof raw.jobProfileCode !== "string" || !["external", "internal"].includes(String(raw.externalInternal)) || !["filled", "open", "cancelled"].includes(String(raw.status))) throw Error("Invalid observation population fields.");
+  if (typeof raw.jobProfileCode !== "string" || typeof raw.externalInternal !== "string" || !["external", "internal"].includes(raw.externalInternal) || typeof raw.status !== "string" || !["filled", "open", "cancelled"].includes(raw.status)) throw Error("Invalid observation population fields.");
   if (raw.timeToFillDays !== null && (typeof raw.timeToFillDays !== "number" || !Number.isFinite(raw.timeToFillDays))) throw Error("Acceptance duration must be numeric or null.");
   // Canonical field order makes the fingerprint insensitive to object property order.
   return Object.fromEntries(rowKeys.map(key => [key, raw[key]])) as HiringObservation;

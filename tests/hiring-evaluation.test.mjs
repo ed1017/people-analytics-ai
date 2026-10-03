@@ -212,3 +212,25 @@ test('sample and observation thresholds include their exact boundary values', ()
   assert.equal(evaluate([...noHoldout, ...holdout.slice(0, 30)]).report.folds[3].gates.enoughScoredLabels, true);
   assert.equal(evaluate([...noHoldout, ...holdout.slice(0, 29)]).report.folds[3].gates.enoughScoredLabels, false);
 });
+test('metric accumulation is deterministic across actual and prediction row order', () => {
+  const actual = [{id: 'a', days: 0}, {id: 'b', days: 0}, {id: 'c', days: 0}];
+  const predicted = [{id: 'a', days: Number.MAX_SAFE_INTEGER}, {id: 'b', days: 0.25}, {id: 'c', days: 0.25}];
+  assert.deepEqual(scoreAlignedPredictions(actual, predicted), scoreAlignedPredictions([...actual].reverse(), [...predicted].reverse()));
+});
+test('enum contracts reject coercible arrays rather than quietly changing cohort eligibility', () => {
+  assert.throws(() => evaluate([row()], {cohortCoverage: ['all-openings']}));
+  assert.throws(() => evaluate([row({externalInternal: ['external']})]));
+  assert.throws(() => evaluate([row({status: ['filled']})]));
+});
+test('a known start cannot train before its closure and historical status eligibility', () => {
+  const result = evaluate([row({closedDate: '2025-07-02', labelFirstObservedAt: '2025-06-21T00:00:00.000Z'})]);
+  assert.equal(result.localAudit.folds[0].trainIds.length, 0);
+  assert.equal(result.localAudit.folds[0].unavailableTrainingIds.length, 1);
+  assert.equal(result.localAudit.folds[1].trainIds.length, 1);
+});
+test('empty data and calendar-underflow dates cannot produce a passing experiment', () => {
+  const result = evaluate([]);
+  assert.equal(result.report.candidateReviewGatesPassed, false);
+  assert.ok(result.report.folds.every(f => f.observedFraction === null && f.expanding.metrics === null));
+  assert.throws(() => freezeHiringProtocol({...manifest, asOf: '0000-01-01', openingCoverageStart: '0000-01-01'}));
+});
