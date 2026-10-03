@@ -85,3 +85,33 @@ test('mixed date notations, contradictory years and negated short quotes cannot 
  const result=validateClarificationResult(response([{field:'planningMonth',value:'2027-01',evidence:'January 2027 (2027-01)'},{field:'deadlineMonth',value:'2027-12',evidence:'December 2027'}]),{...request,statement},catalog);
  assert.equal(result.draft.planningMonth,'2027-01');assert.equal(result.draft.deadlineMonth,'2027-12');
 });
+
+test('prompt and strict schema distinguish planning start, recruiting launch and employee arrival',()=>{
+ const spec=clarificationRequest(request,catalog),variants=spec.text.format.schema.properties.changes.items.anyOf;
+ const property=field=>variants.find(item=>item.properties.field.enum[0]===field).properties;
+ assert.match(spec.instructions,/does not support recruitingStart, arrivalDate or arrivalMode/);
+ assert.match(spec.instructions,/omit recruitingStart from changes and ask/);
+ assert.match(spec.instructions,/Missing optional timing is a valid partial proposal/);
+ assert.match(property('planningMonth').value.description,/Not the recruiting launch/);
+ assert.match(property('recruitingStart').value.description,/explicit recruiting-launch statement/);
+ assert.match(property('recruitingStart').evidence.description,/never quote a generic planning start/);
+ assert.match(property('arrivalDate').value.description,/distinct from recruiting launch/);
+ assert.equal(property('recruitingStart').value.pattern,'^\\d{4}-\\d{2}-\\d{2}$');
+ assert.deepEqual(Object.keys(property('recruitingStart')),['field','value','evidence']);
+ assert.equal(spec.store,false);assert.equal(spec.tool_choice,'none');assert.equal(spec.text.format.strict,true);
+});
+test('generic January planning start cannot ground a recruiting date; omission with a question stays valid',()=>{
+ const statement='Plan 2 additional Engineer roles in Technology, starting January 2027 over 12 months, with coverage required by December 2027. Compare 0 Build, 0 Move and 2 external hires; assume 0 backfills. Hiring arrival dates, costs and budget are unknown.';
+ const input={...request,statement},before=structuredClone(input);
+ // These are deliberately fabricated test proposals, not the deployed model output.
+ for(const value of ['2027-01-01','2027-01-15',''])assert.throws(()=>validateClarificationResult(response([{field:'recruitingStart',value,evidence:'starting January 2027'}]),input,catalog),error=>error.message==='Proposed input is not grounded in the supplied planning statement.'&&error.cause?.field==='recruitingStart'&&error.cause?.reason==='value-not-supported');
+ const proposed={summary:'Review the known planning horizon; recruitment timing is unspecified.',questions:['When should recruitment launch (YYYY-MM-DD), or should it remain unknown?'],changes:[{field:'planningMonth',value:'2027-01',evidence:'January 2027'},{field:'months',value:'12',evidence:'12 months'},{field:'deadlineMonth',value:'2027-12',evidence:'December 2027'}]};
+ const result=validateClarificationResult(proposed,input,catalog);assert.equal(result.draft.planningMonth,'2027-01');assert.equal(result.draft.months,'12');assert.equal(result.draft.recruitingStart,'');assert.equal(result.draft.arrivalDate,'');assert.equal(result.draft.arrivalMode,'');assert.match(result.questions[0],/recruitment launch/);assert.deepEqual(input,before);
+});
+test('explicit ISO recruiting launch is accepted without inventing arrival; omitted saved timing remains intact',()=>{
+ const input={...request,statement:'Plan starting January 2027. Recruiting launches on 2026-11-15. Hire arrival remains unknown.'};
+ const result=validateClarificationResult(response([{field:'recruitingStart',value:'2026-11-15',evidence:'Recruiting launches on 2026-11-15'}]),input,catalog);
+ assert.equal(result.draft.recruitingStart,'2026-11-15');assert.equal(result.draft.arrivalDate,'');assert.equal(result.draft.arrivalMode,'');
+ const saved={...input,inputs:{...input.inputs,recruitingStart:'2026-11-15'}};assert.equal(validateClarificationResult(response([]),saved,catalog).draft.recruitingStart,'2026-11-15');
+ assert.throws(()=>validateClarificationResult(response([{field:'recruitingStart',value:'2027-01-01',evidence:'Recruiting launches in January 2027'}]),{...request,statement:'Recruiting launches in January 2027.'},catalog),/grounded/);
+});
