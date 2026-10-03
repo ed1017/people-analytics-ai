@@ -82,7 +82,7 @@ function Cards({solution,resultId,blocked,onDraftChange,onVerified,onReviewScope
   {snapshot&&<p>{shown.length} options to review{draft?' • Temporary what-if':''}</p>}
   {!storage.saved&&<p role="alert">This working copy is not saved. The previous durable record remains intact. {storage.notice}</p>}
   <p>{historical?'Historical saved options — tailoring unavailable.':'Saved options with retained evidence.'} Preference and pins do not record approval.</p>
-  <label className="block">Your comparison priority<select data-journey="compare" aria-label="Your comparison priority" className={control} value={priority} disabled={invalid||blocked||!storage.saved} onChange={e=>{cancelOperation();setPreview(null);if(draft)setWorking(true);setPriority(e.target.value as CardPriority)}}><option value="">Choose a priority — neutral options</option>{Object.entries(cardPriorities).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
+  <label className="block">Your comparison priority<select data-journey="compare" aria-label="Your comparison priority" className={control} value={priority} disabled={invalid||blocked||!storage.saved} onChange={e=>{cancelOperation();setPreview(null);setWorking(!!draft);setPriority(e.target.value as CardPriority)}}><option value="">Choose a priority — neutral options</option>{Object.entries(cardPriorities).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
   <p>{draft&&!preview?'Temporary inputs are not yet verified. Saved baseline amounts below are not current what-if results.':ranked.message}</p>
   <p>Scenario estimate under user assumptions — not a validated forecast.</p>
   <div className="space-y-3">{ranked.cards.map((card,index)=>{

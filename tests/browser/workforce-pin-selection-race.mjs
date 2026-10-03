@@ -40,7 +40,7 @@ try{for(const width of [1366,390]){
   window.Worker=class extends NativeWorker{
    postMessage(message){this.action=message.action;super.postMessage(message)}
    set onmessage(handler){super.onmessage=e=>{
-    if(this.action==='cards'&&window.holdPinVerification||this.action==='resolve-pin'&&window.holdPinResolve)window.pinReplies.push({action:this.action,release:()=>handler(e)});
+    if(this.action==='cards'&&window.holdPinVerification||this.action==='resolve-pin'&&window.holdPinResolve)window.pinReplies.push({action:this.action,release:override=>handler(override??e)});
     else handler(e);
    }}
   };
@@ -74,6 +74,12 @@ try{for(const width of [1366,390]){
  await workspace.getByLabel('Inspect a saved calculation',{exact:true}).selectOption('ready-result');await heading(1).waitFor();
  await page.evaluate(()=>{window.pinReplies.shift().release();window.holdPinResolve=false});
  check(width+' newer explicit inspection wins over pending pin',(await state()).workspaces[goalId].fields.workforceInspection==='ready-result'&&await preserved());
+ // Priority remains editable while a pin resolves. Cancelling that work must
+ // release its busy state even when no what-if draft needs recalculation.
+ await page.evaluate(()=>{window.holdPinResolve=true});await button('Open pinned version 3').click();await page.waitForFunction(()=>window.pinReplies.some(item=>item.action==='resolve-pin'));
+ await workspace.getByLabel('Your comparison priority',{exact:true}).selectOption('cash');
+ await page.evaluate(()=>{window.pinReplies.shift().release();window.holdPinResolve=false});
+ check(width+' priority change cancels pending pin without leaving controls disabled',await button('Open pinned version 3').isEnabled()&&(await state()).workspaces[goalId].fields.workforceInspection==='ready-result');
  await button('Open pinned version 3').click();await heading(3).waitFor();
  const calculate=button('Calculate saved assumptions and compare hiring-only'),cancel=()=>button('Cancel pending request');
  await calculate.click();await cancel().waitFor();await page.waitForFunction(()=>JSON.parse(localStorage.getItem('insights-to-action.decisions.v1')).payload.workspaces['goal-readiness'].fields.workforceSolution.pending!==null);
@@ -83,7 +89,24 @@ try{for(const width of [1366,390]){
  check(width+' late cancelled calculation cannot clear the newer pending request',JSON.stringify((await state()).workspaces[goalId].fields.workforceSolution.pending)===JSON.stringify(pending)&&await calculate.isDisabled());
  await cancel().click();releases[1]();await page.waitForTimeout(100);
  check(width+' cancellations retain pins, versions, approvals and newest selection',await preserved()&&(await state()).workspaces[goalId].fields.workforceInspection==='result-v3');
+ // A failed verification must settle readiness, retain records and permit a
+ // later explicit pin resolution to verify a different saved source normally.
+ await page.reload({waitUntil:'domcontentloaded'});await heading(3).waitFor();
+ await page.waitForFunction(()=>window.pinReplies.some(item=>item.action==='cards'));
+ await page.evaluate(()=>{window.holdPinVerification=false;const replies=window.pinReplies;window.pinReplies=[];replies.forEach(item=>item.release({data:{ok:false,error:'Synthetic verification failure'}}))});
+ await workspace.getByRole('status').filter({hasText:'Synthetic verification failure'}).waitFor();
+ check(width+' failed verification settles pin readiness without erasing records',await button('Open pinned version 2').isEnabled()&&await preserved());
+ await button('Open pinned version 2').click();await heading(2).waitFor();
+ await button('Open pinned version 3').click();await heading(3).waitFor();
+ check(width+' explicit pin navigation recovers after verification failure',(await state()).workspaces[goalId].fields.workforceInspection==='result-v3'&&await preserved());
  check(width+' only local mocked APIs and no browser errors',nonlocal===0&&calculations===2&&errors.length===0);
  check(width+' mobile and desktop content fits viewport',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await page.evaluate(()=>{window.holdPinResolve=true});await button('Open pinned version 2').click();await page.waitForFunction(()=>window.pinReplies.some(item=>item.action==='resolve-pin'));
+ await page.getByRole('button',{name:'Read or edit Focused issue: '+goalStatement,exact:true}).click();
+ page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'Remove goal',exact:true}).click();
+ await page.evaluate(()=>{window.pinReplies.shift().release();window.holdPinResolve=false});
+ check(width+' deleting goal during pin resolution cannot resurrect its workspace',!(await state()).workspaces[goalId]&&!(await state()).goals.goals.some(goal=>goal.id===goalId));
+ await page.reload({waitUntil:'domcontentloaded'});await goal.waitFor();
+ check(width+' deletion stays durable after reload and preserves the other goal',!(await state()).workspaces[goalId]&&(await state()).goals.goals.some(goal=>goal.id==='goal-other'));
  await context.close();
 }console.log(`${checks} pin-selection browser checks passed; built UI, Linux Chromium desktop and Pixel emulation`)}finally{await browser.close()}
