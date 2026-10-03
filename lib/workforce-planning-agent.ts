@@ -184,6 +184,46 @@ function canonical(value: unknown): string {
   return JSON.stringify(sorted(value));
 }
 
+export type WorkforceAlternativeReview = {
+  schemaVersion: 1; kind: "local-alternative-review"; id: string; createdAt: string;
+  binding: Binding; reviewedRevisions: WorkforcePlanInput[]; comparisons: WorkforceOptionEvaluation[];
+};
+
+// Local preflight for explicitly entered alternatives. No model invocation or
+// permission to transmit these inputs is implied by previewing or saving them.
+export function previewWorkforceAlternatives(solution: WorkforceSolution, evidenceResultId: string, revisions: WorkforcePlanInput[], id: string, createdAt: string): WorkforceAlternativeReview {
+  invariant(readWorkforceSolution(solution), "Saved workforce solution is unreadable.");
+  invariant(/^[a-zA-Z0-9-]{1,80}$/.test(id) && typeof createdAt === "string" && Number.isFinite(Date.parse(createdAt)), "Invalid local review identity.");
+  invariant(Array.isArray(revisions) && revisions.length >= 1 && revisions.length <= 2, "Review one or two alternatives.");
+  const options = optionsFor(solution, revisions, true), captured = binding(solution, evidenceResultId), timing = savedTiming(solution, evidenceResultId);
+  return clone({schemaVersion: 1, kind: "local-alternative-review", id, createdAt, binding: captured,
+    reviewedRevisions: options.slice(2).map(option => option.input),
+    comparisons: options.map(option => {const plan = calculateWorkforceIncrement(option.input, timing); return {optionId: option.id, plan, status: status(plan)}})});
+}
+
+export function readWorkforceAlternativeReview(raw: unknown, solution: WorkforceSolution): WorkforceAlternativeReview | null {
+  try {
+    invariant(validateJson(raw) && readWorkforceSolution(solution), "Invalid local review.");
+    const review = exactObject(raw, ["schemaVersion", "kind", "id", "createdAt", "binding", "reviewedRevisions", "comparisons"]) as unknown as WorkforceAlternativeReview;
+    invariant(solution.versions.some(version => version.version === review.binding.version), "Missing reviewed version.");
+    const historical = {...solution, versions: solution.versions.filter(version => version.version <= review.binding.version), pending: null};
+    const expected = previewWorkforceAlternatives(historical, review.binding.evidenceResultId, review.reviewedRevisions, review.id, review.createdAt);
+    invariant(canonical(expected) === canonical(review), "Local review does not match saved evidence or calculations.");
+    return clone(review);
+  } catch {return null}
+}
+
+export function retainWorkforceAlternativeReview(previous: unknown, review: WorkforceAlternativeReview, solution: WorkforceSolution): WorkforceAlternativeReview[] {
+  invariant(workforceAgentReviewIsCurrent(solution, review) && readWorkforceAlternativeReview(review, solution), "Preview the current saved inputs and evidence before saving alternatives.");
+  invariant(Array.isArray(previous) && previous.length < 10, "Alternative review history is unreadable or at its ten-review limit; existing records retained.");
+  const history = previous as WorkforceAlternativeReview[];
+  invariant(history.every(item => readWorkforceAlternativeReview(item, solution)), "Existing alternative history is unreadable; original records retained.");
+  invariant(!history.some(item => item.id === review.id), "This alternative review is already saved.");
+  const next = [...history, review];
+  invariant(new TextEncoder().encode(JSON.stringify(next)).length <= 256 * 1024, "Alternative review history reached its storage limit; existing records retained.");
+  return clone(next);
+}
+
 // Browser JSON is untrusted after reload. Replay deterministic calculations,
 // never infer authenticity from a matching solution ID or TypeScript cast.
 export function readWorkforceAgentReview(raw: unknown, solution: WorkforceSolution): WorkforceAgentReview | null {

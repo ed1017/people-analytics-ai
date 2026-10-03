@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {runWorkforcePlanningAgent, retainWorkforceAgentReview, workforceAgentReviewIsCurrent, readWorkforceAgentReview} from '../lib/workforce-planning-agent.ts';
+import {previewWorkforceAlternatives, readWorkforceAlternativeReview, retainWorkforceAlternativeReview, runWorkforcePlanningAgent, retainWorkforceAgentReview, workforceAgentReviewIsCurrent, readWorkforceAgentReview} from '../lib/workforce-planning-agent.ts';
 import {createWorkforceSolution, emptySolutionInputs, reviseWorkforceSolution, beginSolutionRun, completeSolutionRun} from '../lib/workforce-solution.ts';
 import {encodeDecisions, parseDecisions} from '../lib/local-decisions.ts';
 import {calculateWorkforceIncrement} from '../lib/workforce-increment.ts';
@@ -170,4 +170,37 @@ test('model failure and repeated invalid finish cannot extend execution or retai
  await assert.rejects(run(solution,[],{model:async()=>{calls++;throw Error('fixture model failure')}}),/fixture model failure/);assert.equal(calls,1);
  calls=0;const actions=[evaluate('reviewed-mix'),evaluate('hiring-only'),evaluate('revision-1'),evaluate('revision-2')];
  await assert.rejects(run(solution,[],{allowRevision:true,reviewedRevisions:[{...input,trainingCash:'0'},{...input,trainingCash:'1'}],model:async()=>actions[calls++]}));assert.equal(calls,4);assert.equal(solution.approvals.length,0);
+});
+test('local alternatives compare against frozen evidence without changing the base solution or invoking a model',()=>{
+ const {solution,input}=make({budget:'20000'}),before=JSON.stringify(solution);
+ const review=previewWorkforceAlternatives(solution,'evidence-result',[{...input,trainingCash:'0'},{...input,trainingCash:'1000'}],'local-a',at);
+ assert.deepEqual(review.comparisons.map(item=>[item.optionId,item.plan.totalCash,item.status]),[['reviewed-mix',22500,'not-met'],['hiring-only',51000,'not-met'],['revision-1',19500,'met'],['revision-2',20500,'not-met']]);
+ assert.equal(review.kind,'local-alternative-review');assert.equal(JSON.stringify(solution),before);assert.ok(!('modelTurns' in review));assert.ok(!('allowRevision' in review));
+ assert.equal(retainWorkforceAlternativeReview([],review,solution).length,1);
+ review.reviewedRevisions[0].trainingCash='999';assert.equal(input.trainingCash,'3000');assert.equal(solution.results[0].payload.input.trainingCash,'3000');
+});
+test('local alternatives enforce the agent scope, duplicate and option-count boundaries',()=>{
+ const {solution,input}=make(),valid={...input,trainingCash:'0'};
+ for(const revisions of [[],[input],[valid,valid],[valid,{...input,trainingCash:'1'},{...input,trainingCash:'2'}],[{...valid,budget:'999999'}],[{...valid,annualHireCost:'0'}],[{...valid,roles:'4',buy:'2'}]])assert.throws(()=>previewWorkforceAlternatives(solution,'evidence-result',revisions,'local-a',at));
+ const review=previewWorkforceAlternatives(solution,'evidence-result',[{...input,trainingCash:''}],'local-a',at);
+ assert.equal(review.comparisons[2].plan.totalCash,null);assert.equal(review.comparisons[2].status,'unknown');
+});
+test('local alternative reload validates math; edits preserve historical review but prevent stale saving',()=>{
+ const {solution,input}=make(),review=previewWorkforceAlternatives(solution,'evidence-result',[{...input,trainingCash:'0'}],'local-a',at);
+ assert.deepEqual(readWorkforceAlternativeReview(JSON.parse(JSON.stringify(review)),solution),review);
+ for(const mutate of [r=>r.comparisons[2].plan.totalCash=0,r=>r.reviewedRevisions[0].budget='999',r=>r.kind='agent-review',r=>r.binding.evidenceResultId='invented',r=>r.comparisons=[]]){
+  const bad=structuredClone(review);mutate(bad);assert.equal(readWorkforceAlternativeReview(bad,solution),null);assert.throws(()=>retainWorkforceAlternativeReview([],bad,solution));
+ }
+ const next=reviseWorkforceSolution(solution,1,{scope:{...input,goalStatement:goal,budget:'1000'}},'sidebar','Changed budget',at);
+ assert.deepEqual(readWorkforceAlternativeReview(review,next),review);assert.throws(()=>retainWorkforceAlternativeReview([],review,next),/current saved/);
+});
+test('local alternative history preserves previous reviews and rejects corruption, duplicate saves and overflow',()=>{
+ const {solution,input}=make();let history=[];
+ for(let i=0;i<10;i++)history=retainWorkforceAlternativeReview(history,previewWorkforceAlternatives(solution,'evidence-result',[{...input,trainingCash:String(i)}],'local-'+i,at),solution);
+ assert.equal(history.length,10);assert.equal(history[0].reviewedRevisions[0].trainingCash,'0');
+ const next=previewWorkforceAlternatives(solution,'evidence-result',[{...input,trainingCash:'100'}],'extra',at);
+ assert.throws(()=>retainWorkforceAlternativeReview(history,next,solution),/limit/);
+ assert.throws(()=>retainWorkforceAlternativeReview([history[0]],history[0],solution),/already saved/);
+ assert.throws(()=>retainWorkforceAlternativeReview([{}],next,solution),/unreadable/);
+ const other=createWorkforceSolution('other','other',emptySolutionInputs(),at);assert.equal(readWorkforceAlternativeReview(history[0],other),null);
 });
