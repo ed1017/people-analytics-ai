@@ -2,6 +2,8 @@
 
 Assessment at published checkpoint `aae644b2340dd14cd22c813272ec3cb90d191f21`. This is a proposed implementation order within the agreed conversation-first single-role/BU direction, not a new roadmap or implemented product work.
 
+Update: priority 1 was subsequently authorized and implemented locally after `b93e42f`; see `workforce-input-readiness.md`. Review that slice before starting priorities 2/3. The assessment below records the reasoning at the earlier checkpoint.
+
 ## What is already done
 
 The later entries in `build-decision-log.md` supersede the older broad architecture roadmap. PR97 established training timing; the subsequent workforce direction explicitly requested Home-led planning with optional sidebar inspection/customization. The current source already provides reviewed inputs, deterministic monthly cash/employee-time/headcount/coverage, hiring-only comparison, explicit hiring timing assumptions, same-result Skills/L&D/TA evidence, shared sidebar edits, version-specific approvals, Decision Brief linkage, two local alternatives, bounded search and saved lineage. Do not rebuild those or treat their previously passed unit/build/browser checks as new progress.

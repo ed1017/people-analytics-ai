@@ -2,6 +2,13 @@
 
 Standing user instruction: record every meaningful app request, correction, implementation/test milestone and release here. Separate confirmed intent from proposals and local work from live verification. Include exact commits, PRs, test outcomes and next steps when known; never record credentials or private notes.
 
+## 2026-10-03 — Priority-1 input readiness implemented locally
+
+- User authorized the input-readiness summary only, from preserved `b93e42f`; published `aae644b` remains unchanged. Added required/invalid corrections versus optional unknowns in the existing workforce editor, exact-field keyboard focus and linked error descriptions, explicit zero/inactive-path treatment, historical-evidence/goal/draft labels and capacity caveats. No autofill, save, approval, API/model call or new source is triggered by the summary.
+- Extracted structured issues from the existing calculator validator and shared its active-arrival horizon checks. Public validation signature, arithmetic, method/schema versions and persistence remain unchanged. Compared 459 field/value variants against `b93e42f`: validation acceptance and exact calculator outputs match.
+- Validation: 415 full unit tests; 42 new readiness browser checks plus 245 existing search/handoff/workspace/selection/lifecycle checks; full lint (zero errors/warnings), standalone TypeScript, genuine production build and whitespace checks pass. Mocked local browser only; physical Windows/Android and live AI remain unvalidated. No file-navigation denial bypass/retry, secret/access/settings/schema changes, eNPS-held edits or push/PR/merge.
+- Review this bounded slice before priority 2/3. Details, limitations and evidence: `docs/workforce-input-readiness.md`.
+
 ## 2026-10-03 — Post-search independent continuation (local test/documentation only)
 
 - Published source checkpoint remains `aae644b2340dd14cd22c813272ec3cb90d191f21` on `cloud-browser-local-search`; no publication in this continuation. Earlier release validation remains 407 unit/245 browser checks plus lint/TypeScript/build; those checks were not repeated for this test/documentation-only work.

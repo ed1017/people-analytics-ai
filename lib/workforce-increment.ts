@@ -19,28 +19,54 @@ function number(value:string,label:string,max=100000000,whole=false,required=fal
  if(!/^\d+(\.\d{1,2})?$/.test(value))throw Error(`${label}: use a nonnegative number, with at most two decimals.`);
  const n=Number(value);if(!Number.isFinite(n)||n>max||whole&&!Number.isInteger(n))throw Error(`${label}: invalid amount.`);return n;
 }
-export function validateWorkforcePlanInput(raw:unknown):WorkforcePlanInput {
- if(!raw||typeof raw!=='object'||Array.isArray(raw))throw Error('Missing workforce inputs.');
+export type WorkforceInputIssue = {fields: WorkforcePlanField[]; message: string; kind: "missing"|"invalid"};
+/** The calculator and input editor share this contract; collecting issues never changes inputs. */
+export function workforcePlanInputIssues(raw:unknown):WorkforceInputIssue[] {
+ const issues:WorkforceInputIssue[]=[];
+ if(!raw||typeof raw!=='object'||Array.isArray(raw))return [{fields:[],message:'Missing workforce inputs.',kind:'missing'}];
  const input=raw as WorkforcePlanInput;
- if(Object.keys(input).length!==workforcePlanFields.length||workforcePlanFields.some(key=>typeof input[key]!=='string'||input[key].length>100))throw Error('Unexpected or missing workforce inputs.');
- if(!input.businessUnit.trim()||!input.jobProfile.trim())throw Error('Select one governed business unit and job profile.');
- if(input.intent!=='additional')throw Error('This workflow models additional positions only. Replacement hiring must be separated from additional demand before calculation.');
- const roles=number(input.roles,'additional roles',1000,true,true)!;
- if(roles<1)throw Error('Enter at least one additional role.');
- const build=number(input.build,'Build count',1000,true,true)!,move=number(input.move,'Move count',1000,true,true)!,buy=number(input.buy,'Buy count',1000,true,true)!;
- if(build+move+buy!==roles)throw Error('Build, Move and Buy must sum to the additional role requirement.');
- const backfills=number(input.backfills,'external backfills',1000,true,build+move>0);
- if(backfills!==null&&backfills>build+move)throw Error('External backfills cannot exceed the internal Build and Move count in this bounded workflow.');
- const start=monthIndex(input.planningMonth),months=number(input.months,'planning months',24,true,true)!;
- if(months<1)throw Error('Planning horizon must contain at least one month.');
- for(const key of ['buildMonth','moveMonth','deadlineMonth'] as const)if(input[key]){const month=monthIndex(input[key]);if(month<start||month>=start+months)throw Error(`${key} must be within the planning horizon.`)}
- for(const key of ['recruitingStart','arrivalDate','backfillDate'] as const)if(input[key]&&planDate(input[key])===null)throw Error(`${key}: use a valid YYYY-MM-DD date.`);
- if(!['','historical-median','explicit'].includes(input.arrivalMode))throw Error('Choose an explicit date or the historical opening-to-start median assumption.');
- if(buy>0&&input.arrivalMode==='historical-median'&&!input.recruitingStart)throw Error('Enter the proposed recruiting launch date to use a historical timing assumption.');
- if(input.arrivalDate&&input.recruitingStart&&input.arrivalDate<input.recruitingStart)throw Error('Arrival cannot precede the supplied recruiting launch date.');
- for(const key of ['annualHireCost','hireFee','annualBackfillCost','backfillFee','internalAnnualCostChange','trainingCash','trainingHours','loadedHourlyCost','budget'] as const)number(input[key],key);
- number(input.maxAddedEmployees,'maximum added employees',2000,true);
- return {...input};
+ if(Object.keys(input).length!==workforcePlanFields.length||workforcePlanFields.some(key=>typeof input[key]!=='string'||input[key].length>100))return [{fields:[],message:'Unexpected or missing workforce inputs.',kind:'invalid'}];
+ const add=(fields:WorkforcePlanField[],message:string)=>issues.push({fields,message,kind:fields.some(key=>!input[key].trim())?'missing':'invalid'});
+ const attempt=<T>(fields:WorkforcePlanField[],read:()=>T):T|undefined=>{try{return read()}catch(error){add(fields,(error as Error).message);return undefined}};
+ const numeric=(key:WorkforcePlanField,label:string,max=100000000,whole=false,required=false)=>attempt([key],()=>number(input[key],label,max,whole,required));
+ if(!input.businessUnit.trim()||!input.jobProfile.trim())add((['businessUnit','jobProfile'] as const).filter(key=>!input[key].trim()),'Select one governed business unit and job profile.');
+ if(input.intent!=='additional')add(['intent'],'This workflow models additional positions only. Replacement hiring must be separated from additional demand before calculation.');
+ const roles=numeric('roles','additional roles',1000,true,true);
+ if(roles!==undefined&&roles!==null&&roles<1)add(['roles'],'Enter at least one additional role.');
+ const build=numeric('build','Build count',1000,true,true),move=numeric('move','Move count',1000,true,true),buy=numeric('buy','Buy count',1000,true,true);
+ const countsKnown=[roles,build,move,buy].every(value=>typeof value==='number');
+ if(countsKnown&&build!+move!+buy! !== roles)add(['roles','build','move','buy'],'Build, Move and Buy must sum to the additional role requirement.');
+ const internal=typeof build==='number'&&typeof move==='number'?build+move:null;
+ const backfills=numeric('backfills','external backfills',1000,true,internal!==null&&internal>0);
+ if(typeof backfills==='number'&&internal!==null&&backfills>internal)add(['backfills'],'External backfills cannot exceed the internal Build and Move count in this bounded workflow.');
+ const start=attempt(['planningMonth'],()=>monthIndex(input.planningMonth)),months=numeric('months','planning months',24,true,true);
+ if(typeof months==='number'&&months<1)add(['months'],'Planning horizon must contain at least one month.');
+ for(const key of ['buildMonth','moveMonth','deadlineMonth'] as const)if(input[key]){
+  const month=attempt([key],()=>monthIndex(input[key]));
+  if(month!==undefined&&start!==undefined&&typeof months==='number'&&months>0&&(month<start||month>=start+months))add([key],`${key} must be within the planning horizon.`);
+ }
+ for(const key of ['recruitingStart','arrivalDate','backfillDate'] as const)if(input[key]&&planDate(input[key])===null)add([key],`${key}: use a valid YYYY-MM-DD date.`);
+ if(!['','historical-median','explicit'].includes(input.arrivalMode))add(['arrivalMode'],'Choose an explicit date or the historical opening-to-start median assumption.');
+ if(typeof buy==='number'&&buy>0&&input.arrivalMode==='historical-median'&&!input.recruitingStart)add(['recruitingStart'],'Enter the proposed recruiting launch date to use a historical timing assumption.');
+ if(input.arrivalDate&&input.recruitingStart&&planDate(input.arrivalDate)!==null&&planDate(input.recruitingStart)!==null&&input.arrivalDate<input.recruitingStart)add(['arrivalDate','recruitingStart'],'Arrival cannot precede the supplied recruiting launch date.');
+ for(const key of ['annualHireCost','hireFee','annualBackfillCost','backfillFee','internalAnnualCostChange','trainingCash','trainingHours','loadedHourlyCost','budget'] as const)numeric(key,key);
+ numeric('maxAddedEmployees','maximum added employees',2000,true);
+ return issues;
+}
+export function validateWorkforcePlanInput(raw:unknown):WorkforcePlanInput {
+ const issue=workforcePlanInputIssues(raw)[0];if(issue)throw Error(issue.message);
+ return {...raw as WorkforcePlanInput};
+}
+/** Shared active-arrival checks, after input validation and any evidence-based date resolution. */
+export function workforceArrivalIssues(input:WorkforcePlanInput,arrival:string|null,backfillArrival:string|null):WorkforceInputIssue[] {
+ const start=monthIndex(input.planningMonth),count=Number(input.months),issues:WorkforceInputIssue[]=[];
+ for(const [label,when,fields] of [
+  ['Hire arrival',arrival,[input.arrivalMode==='historical-median'?'recruitingStart':'arrivalDate','planningMonth','months']],
+  ['Backfill arrival',backfillArrival,['backfillDate','planningMonth','months']],
+ ] as [string,string|null,WorkforcePlanField[]][]){
+  if(when&&(monthIndex(when.slice(0,7))<start||monthIndex(when.slice(0,7))>=start+count))issues.push({fields,message:`${label} must fall within the planning horizon; extend the horizon or revise the assumption.`,kind:'invalid'});
+ }
+ return issues;
 }
 export function calculateWorkforceIncrement(raw:unknown,evidence:RecruitingTimingEvidence|null) {
  const input=validateWorkforcePlanInput(raw),roles=Number(input.roles),build=Number(input.build),move=Number(input.move),buy=Number(input.buy),backfills=build+move===0?0:Number(input.backfills);
@@ -54,7 +80,7 @@ export function calculateWorkforceIncrement(raw:unknown,evidence:RecruitingTimin
   else warnings.push('Comparable completed-start history is insufficient; arrival stays unknown. Enter an explicit assumption to calculate timing.');
  }
  const backfillArrival=backfills===0?null:input.backfillDate||null;
- for(const [label,when] of [['Hire arrival',arrival],['Backfill arrival',backfillArrival]] as const)if(when&&(monthIndex(when.slice(0,7))<start||monthIndex(when.slice(0,7))>=start+count))throw Error(`${label} must fall within the planning horizon; extend the horizon or revise the assumption.`);
+ const arrivalIssue=workforceArrivalIssues(input,arrival,backfillArrival)[0];if(arrivalIssue)throw Error(arrivalIssue.message);
  const cost=(key:WorkforcePlanField)=>input[key]===''?null:Number(input[key]);
  const hireAnnual=buy===0?0:cost('annualHireCost'),hireFee=buy===0?0:cost('hireFee'),backfillAnnual=backfills===0?0:cost('annualBackfillCost'),backfillFee=backfills===0?0:cost('backfillFee');
  const internalAnnual=build+move===0?0:cost('internalAnnualCostChange');
