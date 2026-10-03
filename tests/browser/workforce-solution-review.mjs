@@ -5,6 +5,7 @@ import {calculateWorkforceIncrement} from '../../lib/workforce-increment.ts';
 import fs from 'node:fs/promises';
 import {encodeDecisions} from '../../lib/local-decisions.ts';
 import {emptyDecisionBrief} from '../../lib/decision-brief.ts';
+const baseURL=process.env.WORKFORCE_QA_BASE_URL ?? 'http://127.0.0.1:3100';
 const output=process.env.WORKFORCE_QA_OUTPUT ?? '/tmp/workforce-evidence-qa';
 await fs.mkdir(output,{recursive:true});
 const results=[];
@@ -33,7 +34,7 @@ try {
    return route.fulfill({status:503,json:{error:'Deliberately unavailable in fixture-only QA.'}});
   });
   await page.addInitScript(({key,seed})=>{if(!localStorage.getItem(key))localStorage.setItem(key,seed);},{key,seed:encodeDecisions(seed)});
-  await page.goto('http://127.0.0.1:3100',{waitUntil:'domcontentloaded',timeout:120000});
+  await page.goto(baseURL,{waitUntil:'domcontentloaded',timeout:120000});
   await page.getByRole('button',{name:'Start guided workforce plan',exact:true}).click();
   const workspace=page.getByRole('region',{name:'Workforce solution workspace',exact:true});
   const state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,key);

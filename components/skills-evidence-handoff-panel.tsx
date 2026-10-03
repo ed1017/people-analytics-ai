@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -51,11 +50,11 @@ export function SkillsEvidenceHandoffPanel({
   onOpenPlanning,
 }: SkillsEvidenceHandoffPanelProps) {
   const [selectedSkillCode, setSelectedSkillCode] =
-    useState("");
+    useState(activeHandoff?.evidence.skill.skillCode ?? "");
   const [businessGoal, setBusinessGoal] =
-    useState("");
+    useState(activeHandoff?.businessGoal ?? "");
   const [userAssumptions, setUserAssumptions] =
-    useState("");
+    useState(activeHandoff?.userAssumptions ?? "");
   const [error, setError] =
     useState<string | null>(null);
 
@@ -84,7 +83,11 @@ export function SkillsEvidenceHandoffPanel({
     ]
   );
 
-  useEffect(() => {
+  const [previousHandoff, setPreviousHandoff] = useState(activeHandoff);
+  // Reset only when the carried packet changes, before committing a stale draft.
+  // Unrelated renders and source refreshes preserve edits in progress.
+  if (previousHandoff !== activeHandoff) {
+    setPreviousHandoff(activeHandoff);
     if (
       activeHandoff?.kind === "skills_gap"
     ) {
@@ -98,14 +101,13 @@ export function SkillsEvidenceHandoffPanel({
         activeHandoff.userAssumptions ?? ""
       );
       setError(null);
-      return;
+    } else {
+      setSelectedSkillCode("");
+      setBusinessGoal("");
+      setUserAssumptions("");
+      setError(null);
     }
-
-    setSelectedSkillCode("");
-    setBusinessGoal("");
-    setUserAssumptions("");
-    setError(null);
-  }, [activeHandoff]);
+  }
 
   const resetDraft = () => {
     if (
