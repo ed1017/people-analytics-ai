@@ -3,6 +3,7 @@
 import {
   useEffect,
   useId,
+  useRef,
   useState,
   type ReactNode,
   type KeyboardEventHandler,
@@ -18,6 +19,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { PromptExamples } from "@/components/prompt-examples";
 import { Button } from "@/components/ui/button";
 import { GoalConversationMessages, ConversationMessages } from "@/components/goal-conversation-messages";
 import type { ChatMessage } from "@/lib/types";
@@ -42,9 +44,6 @@ type AiPanelProps = {
   onResizeKeyDown: KeyboardEventHandler<HTMLDivElement>;
   onToggleExpanded: () => void;
   onToggleCollapsed: () => void;
-  onSuggestedPrompt: (
-    prompt: string
-  ) => void | Promise<void>;
   onChatInputChange: (value: string) => void;
   onSend: () => void | Promise<void>;
 };
@@ -67,10 +66,10 @@ export function AiPanel({
   onResizeKeyDown,
   onToggleExpanded,
   onToggleCollapsed,
-  onSuggestedPrompt,
   onChatInputChange,
   onSend,
 }: AiPanelProps) {
+  const composer = useRef<HTMLTextAreaElement>(null);
   const [viewportWidth, setViewportWidth] =
     useState(1440);
 
@@ -226,30 +225,7 @@ export function AiPanel({
               )}
             </div>
 
-            {(
-              <div aria-label="Suggested follow-up questions" className="mb-3 flex flex-wrap gap-2">
-                {suggestedPrompts.map(
-                  (prompt) => (
-                    <button
-                      key={prompt}
-                      type="button"
-                      onClick={() =>
-                        void onSuggestedPrompt(
-                          prompt
-                        )
-                      }
-                      disabled={
-                        chatLoading ||
-                        !dashboardReady
-                      }
-                      className="rounded-lg border px-3 py-2 text-left text-sm leading-snug transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {prompt}
-                    </button>
-                  )
-                )}
-              </div>
-            )}
+            <div className="mb-3"><PromptExamples prompts={suggestedPrompts} draft={chatInput} busy={chatLoading} onDraft={prompt=>{onChatInputChange(prompt);composer.current?.focus();composer.current?.scrollIntoView({block:"nearest"});}}/></div>
 
             {chatError && (
               <div className="mb-3 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
@@ -259,6 +235,7 @@ export function AiPanel({
 
             <div className="flex items-end gap-2">
               <textarea
+                ref={composer}
                 value={chatInput}
                 onChange={(event) =>
                   onChatInputChange(
