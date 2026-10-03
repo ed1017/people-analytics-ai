@@ -38,3 +38,8 @@ test('an explicitly stated arrival mode does not require its evidence quote to r
  const r=validateClarificationResult(response([{field:'arrivalMode',value:'explicit',evidence:'explicit hire arrival'}]),{...request,statement:'Use explicit hire arrival 2026-11-16.'},catalog);
  assert.equal(r.draft.arrivalMode,'explicit');assert.equal(r.draft.arrivalDate,'');
 });
+test('echoed saved assumptions are validated but do not create reviewable changes',()=>{
+ const saved={...request,inputs:{...request.inputs,roles:'4'}};
+ const r=validateClarificationResult(response([{field:'roles',value:'4',evidence:'4'}]),saved,catalog);
+ assert.deepEqual(r.changes,[]);assert.equal(r.draft.roles,'4');
+});
