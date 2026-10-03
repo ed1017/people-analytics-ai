@@ -2,6 +2,14 @@
 
 Standing user instruction: record every meaningful app request, correction, implementation/test milestone and release here. Separate confirmed intent from proposals and local work from live verification. Include exact commits, PRs, test outcomes and next steps when known; never record credentials or private notes.
 
+## 2026-10-03 — Post-search independent continuation (local test/documentation only)
+
+- Published source checkpoint remains `aae644b2340dd14cd22c813272ec3cb90d191f21` on `cloud-browser-local-search`; no publication in this continuation. Earlier release validation remains 407 unit/245 browser checks plus lint/TypeScript/build; those checks were not repeated for this test/documentation-only work.
+- User requested roadmap-based useful work while live validation is blocked. `docs/workforce-next-local-slice.md` identifies an input-readiness/unknown-assumption summary as the smallest next product slice; explicit current-goal carry and read-only alternative summaries follow. Those changes are proposals, not implemented features. Costs/timing/evidence/sidebar/search foundations already exist; training-to-role conversion and live AI/ML remain separate gates.
+- Closed the concrete device-acceptance fixture-delivery omission. `tests/manual/build-workforce-device-fixture.mjs` packages the existing synthetic seed, real alternatives component, built CSS and worker into one HTML file. `tests/browser/workforce-device-fixture.mjs` supports in-memory intercepted checks and an interactive installed-Chrome mode with no server/API. The test-only host supplies reset, newer-result and unavailable/held-worker controls; no product route imports it.
+- Focused verification: 10 new artifact-packaging assertions, changed-file lint and TypeScript passed. All navigations were synthetic/intercepted; no external request/browser error. Managed Linux Chromium denied direct file navigation with `ERR_BLOCKED_BY_ADMINISTRATOR`; no bypass/retry/settings change. Physical Windows/Android and direct-file delivery remain unvalidated, distinct from the successful intercepted artifact check. Exact commands and conditional Android instructions are in `docs/workforce-device-acceptance.md`.
+- No product/source-service changes, model/data calls, credential inspection, desktop use, security/settings/DB changes, push/PR/merge or held eNPS-file changes.
+
 ## 2026-10-01 — Talent evidence, AI context and overall overview
 
 ### Confirmed requirements
