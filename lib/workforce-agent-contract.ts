@@ -1,5 +1,5 @@
-// Prepared offline only. Do not connect this larger envelope to OpenAI until
-// the explicit calculated-result fields have been approved for transmission.
+// This projected envelope is approved for bounded synthetic agent testing.
+// Product activation and real-data transmission are not implied by that approval.
 import type {WorkforceAgentTurn} from "./workforce-planning-agent";
 // @ts-expect-error Native Node tests share the TypeScript implementation.
 import {workforcePlanFields} from "./workforce-increment.ts";
