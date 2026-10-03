@@ -4,9 +4,10 @@ import {decisionStore,useDecisionStorage} from '../../components/decision-store'
 import {WorkforceSolutionPanel} from '../../components/workforce-solution-panel';
 import {DECISIONS_STORAGE_KEY,type DecisionData} from '../../lib/local-decisions';
 import type {WorkforceSolution} from '../../lib/workforce-solution';
+import {beginSolutionRun} from '../../lib/workforce-solution';
 import type {AppPage} from '../../lib/types';
 declare global {interface Window {readinessSeed:{encoded:string;empty:WorkforceSolution;complete:WorkforceSolution;newer:WorkforceSolution};readinessSaved:()=>DecisionData}}
-localStorage.setItem(DECISIONS_STORAGE_KEY,window.readinessSeed.encoded);decisionStore.initialize(localStorage);
+if(!localStorage.getItem(DECISIONS_STORAGE_KEY))localStorage.setItem(DECISIONS_STORAGE_KEY,window.readinessSeed.encoded);decisionStore.initialize(localStorage);
 window.readinessSaved=()=>decisionStore.getSnapshot().data;
 function Harness(){
  const storage=useDecisionStorage(),[page,setPage]=useState<AppPage>('home'),[revision,setRevision]=useState(0);
@@ -15,6 +16,10 @@ function Harness(){
   <button onClick={()=>publish(window.readinessSeed.empty)}>Load empty saved inputs</button>
   <button onClick={()=>publish(window.readinessSeed.complete)}>Load complete saved inputs</button>
   <button onClick={()=>publish(window.readinessSeed.newer)}>Publish newer input version</button>
+  <button onClick={()=>decisionStore.setField('goal-readiness','workforceSolution',window.readinessSeed.newer)}>Advance current inputs</button>
+  <button onClick={()=>{decisionStore.saveGoals({...storage.data.goals,activeId:'goal-other'});decisionStore.saveGoals({...storage.data.goals,activeId:'goal-readiness'})}}>Batched goal roundtrip</button>
+  <button onClick={()=>decisionStore.setField('goal-readiness','workforceInspection','ready-result')}>Select saved calculation</button>
+  <button onClick={()=>decisionStore.setField('goal-readiness','workforceSolution',beginSolutionRun(window.readinessSeed.complete,1,'pending-fixture',['brief'],'2026-10-03T02:00:00.000Z').state)}>Publish pending calculation</button>
   <button onClick={()=>decisionStore.saveGoals({...storage.data.goals,goals:storage.data.goals.goals.map(goal=>goal.id==='goal-readiness'?{...goal,statement:'Changed synthetic goal'}:goal)})}>Change goal wording</button>
   <button onClick={()=>decisionStore.saveGoals({...storage.data.goals,activeId:'goal-other'})}>Goal B</button>
   <button onClick={()=>decisionStore.saveGoals({...storage.data.goals,activeId:'goal-readiness'})}>Goal A</button>

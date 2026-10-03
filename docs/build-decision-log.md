@@ -2,6 +2,13 @@
 
 Standing user instruction: record every meaningful app request, correction, implementation/test milestone and release here. Separate confirmed intent from proposals and local work from live verification. Include exact commits, PRs, test outcomes and next steps when known; never record credentials or private notes.
 
+## 2026-10-03 — Priority-1 source checkpoint and local explicit goal copy
+
+- Reviewed priority 1 published by normal push to new `cloud-input-readiness`, remote exact Git SHA `c84fb17d4dfa21998154a12b5ef1e25023fef3f5`. No PR, merge or manual deployment; original search branch retained. No GitHub status API retry.
+- Priority 2 adds an explicit current-goal-to-temporary-statement action. Nonempty text requires visible replacement confirmation; cancel preserves text. Exact text only, no numeric parsing, API/model call, persistence, calculation or approval. Confirmation is bound to current goal/solution/version/inputs/selection and rejected on stale transitions or edits; unsaved/pending/unbound-goal guards remain. Details: `docs/workforce-goal-statement.md`.
+- Final local checks: 421 unit tests, 337 mocked browser assertions (44 new goal-copy, 48 readiness, 245 existing), lint/TypeScript/genuine build and whitespace pass. Browser reload test retains actual stored data rather than reseeding it. Physical-device/live-AI gates unchanged; no denied file navigation retried.
+- New explicit user request replaces the earlier standalone priority-3 summary plan: 2–3 compact recommendation cards with expandable evidence/cost/timing/assumptions, transparent user-priority/constraint ranking, local what-if calculations, explicit save preserving prior versions/lineage, and exact-saved-solution pins distinct from approval. Finish/review this goal-copy checkpoint before that product implementation; parent separately owns live preview validation and release decisions.
+
 ## 2026-10-03 — Priority-1 exact-diff review
 
 - Reviewed `a14f8d0` against `b93e42f` (ten files). Corrected the all-internal-mix guidance to expose mandatory hiring-only historical-launch/arrival-horizon errors through the same validators; these must not appear as merely optional unknowns. Keyboard focus can leave the target field without a trap. No arithmetic, persistence or API behavior changed.
