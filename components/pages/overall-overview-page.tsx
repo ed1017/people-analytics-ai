@@ -1,11 +1,11 @@
 "use client";
-import {emptyOptionActions,isOptionActionLabel,type WorkforceOptionActions,type OptionAction,type StagedOptionAction} from "@/lib/workforce-option-actions";
+import {emptyOptionActions,isOptionActionLabel,type WorkforceOptionActions,type OptionAction} from "@/lib/workforce-option-actions";
 
 import {HomeCapacityReview,type HomeCapacityRequest} from "@/components/home-capacity-review";
 import {RetentionWhatIfPanel} from "@/components/retention-what-if-panel";
 import {WorkforceSolutionPanel} from "@/components/workforce-solution-panel";
 import {revealJourneyTarget} from "@/components/workforce-journey-continue";
-import {recordDecisionEvidence,useDecisionStorage} from "@/components/decision-store";
+import {decisionStore,recordDecisionEvidence,useDecisionStorage} from "@/components/decision-store";
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUp, RefreshCw, Info } from "lucide-react";
 import { GoalTakeaway } from "@/components/goal-takeaway";
@@ -14,7 +14,6 @@ import { buildHomePack, homeDefinitions, readHomeSource } from "@/lib/home-pack.
 import type { DevelopmentSession } from "@/components/development-workspace";
 import { PromptExamples } from "@/components/prompt-examples";
 import { contextualPrompts } from "@/lib/contextual-prompts";
-import { homeGoalReplies } from "@/lib/home-chat-reply";
 import { buildHomeActionPlanRequest, DEVELOPMENT_DEMO_GOAL, HOME_ACTION_PLAN_LABEL } from "@/lib/home-decision-journey";
 import { completeScopedChatTurn } from "@/lib/chat-context-history";
 import { requestedHomeCountries, type CountryOption } from "@/lib/home-country-scope";
@@ -77,28 +76,16 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const { messages, setMessages, input, setInput, loading: chatLoading, setLoading: setChatLoading, error: chatError, setError: setChatError, problem: journey, questionUnanswered, setQuestionUnanswered, history: modelHistoryRef } = conversation;
   const hasAnswer=messages.some(message=>message.role==="assistant");
   const optionSnapshot=useSyncExternalStore(optionActions?.subscribe??noActionSubscription,optionActions?.getSnapshot??noActionSnapshot,noActionSnapshot);
-  const [stagedOptions,setStagedOptions]=useState(()=>new Map<string,StagedOptionAction>());
-  const forgetOption=(goalId:string)=>setStagedOptions(before=>{const next=new Map(before);next.delete(goalId);return next});
-  const keepOption=(command:StagedOptionAction)=>setStagedOptions(before=>new Map(before).set(command.goalId,command));
+  const [suggestionPending,setSuggestionPending]=useState(false);
   const [localAction,setLocalAction]=useState<{goalId:string;notice:string}|null>(null);
-  const activeStage=stagedOptions.get(conversation.activeGoalId);
-  const localCandidate=Boolean(optionActions&&((activeStage&&(activeStage.edited||activeStage.label===input.trim()))||isOptionActionLabel(input)));
+  const localCandidate=Boolean(optionActions&&isOptionActionLabel(input));
   const hasVerifiedOptions=Boolean(optionSnapshot.goalId&&optionSnapshot.goalId===conversation.activeGoalId);
   const actionOffers=hasVerifiedOptions?optionSnapshot.offers:[];
-  function changeQuestion(value:string){
-    const staged=stagedOptions.get(conversation.activeGoalId);
-    if(!value.trim()||!input.trim()||staged&&!staged.edited&&input.trim()!==staged.label){forgetOption(conversation.activeGoalId);setLocalAction(null)}
-    else if(staged&&value!==input)keepOption({...staged,edited:true});
-    setInput(value);
-  }
-  function draftOption(id:OptionAction){
-    if(chatLoading||input.trim()||!active)return;
-    const command=optionActions?.stage(id);
-    if(!command||command.goalId!==conversation.activeGoalId)return;
-    if(conversation.draftExample(command.label)){
-      keepOption(command);setLocalAction({goalId:command.goalId,notice:'Ready to open this action locally. Send when ready; no AI request will be made.'});focusQuestion();
-    }
-  }
+  const liveActive=useRef(active),promptEpoch=useRef(0),queuedSuggestion=useRef<symbol|null>(null);
+  const renderedPromptEpoch=promptEpoch.current;
+  const recentSuggestions=useRef(new Set<string>());
+  const sending=useRef<symbol|null>(null);
+  function changeQuestion(value:string){setLocalAction(null);setInput(value)}
   const loaded = useRef("");
   const loadedAt = useRef(0);
   const composer = useRef<HTMLTextAreaElement>(null);
@@ -152,18 +139,18 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const cancelPending = useRef(conversation.cancelPending);
   useLayoutEffect(() => { cancelPending.current = conversation.cancelPending; });
   useLayoutEffect(() => {
-    if (currentEvidenceKey.current !== contextKey) { currentEvidenceKey.current = contextKey; cancelPending.current(); }
+    if (currentEvidenceKey.current !== contextKey) { currentEvidenceKey.current = contextKey; cancelPending.current();sending.current=null; }
   }, [contextKey]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- Cancel the queued user action on explicit page exit; preserve its draft.
+  useLayoutEffect(()=>{liveActive.current=active;if(!active){queuedSuggestion.current=null;setSuggestionPending(false);sending.current=null;cancelPending.current();}return()=>{liveActive.current=false;queuedSuggestion.current=null;}},[active]);
+  useEffect(()=>{const identity=()=>{const goals=decisionStore.getSnapshot().data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement])};let prior=identity();return decisionStore.subscribe(()=>{const next=identity();if(next!==prior){prior=next;promptEpoch.current++;queuedSuggestion.current=null;setSuggestionPending(false);}})},[]);
   const planRequest = questionUnanswered ? null : buildHomeActionPlanRequest(conversation.focusedIssue ? {key:contextKey,firstQuestion:conversation.focusedIssue,latestQuestion:journey?.latestQuestion ?? conversation.focusedIssue} : journey, contextKey);
 
   function focusQuestion() {
     window.requestAnimationFrame(() => { composer.current?.focus(); composer.current?.scrollIntoView({ block: "nearest" }); });
   }
 
-  function draftQuestion(prompt: string) {
-    if (chatLoading || input.trim()) return;
-    if(conversation.draftExample(prompt))focusQuestion();
-  }
+  function submitQuestion(prompt:string){if(ready)queueSuggestion("question:"+prompt,()=>void send(prompt))}
 
   function startNewIssue(draft = "") {
     conversation.startNewProblem(draft);
@@ -173,13 +160,9 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   async function send(question = input, actionPlan = false, scopeConfirmed = false) {
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
-    if(!actionPlan&&optionActions&&localCandidate){
-      if(!message||chatLoading||!active)return;
-      const command=stagedOptions.get(conversation.activeGoalId);
-      const error=command?optionActions.execute(command,message,conversation.activeGoalId):'Choose an option suggestion again before sending. Restored or typed action text cannot select a saved option by itself.';
-      setLocalAction({goalId:conversation.activeGoalId,notice:error||({compare:'Comparison opened using the existing calculated options.',adjust:'Selected option opened for adjustment. Review and save explicitly.',explore:'Local search controls opened. Review bounds and run the search explicitly.'}[command!.id])});
-      if(!error){forgetOption(conversation.activeGoalId);setInput('')}
-      return;
+    if(!active||sending.current||currentEvidenceKey.current!==contextKey)return;
+    if(!actionPlan&&optionActions&&isOptionActionLabel(message)){
+      setLocalAction({goalId:conversation.activeGoalId,notice:'Choose the current option action button to open it. Typed or restored action text cannot select an option.'});return;
     }
     if (!message || !sources || loadedScope !== workforceQuery || chatLoading || loading || sources.every(source => !source.facts)) return;
     if (/^(?:please\s+|can you\s+)?(?:export|download)\b/i.test(message)) {
@@ -190,6 +173,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       if(requested.kind!=="none") { setInput(message);setScopeChoice({message,query:workforceQuery,identity:scopeIdentity,...requested});return; }
     }
     setScopeChoice(null);setLocalAction(null);
+    const sendTicket=Symbol();sending.current=sendTicket;
     const request = conversation.beginRequest();
     const key = contextKey;
     const history = getProblemChatHistory(modelHistoryRef.current, key);
@@ -207,11 +191,27 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       modelHistoryRef.current = completeScopedChatTurn(key, history, message, answer);
       if (!actionPlan) { conversation.rememberQuestion(key, message); setQuestionUnanswered(false); }
       window.requestAnimationFrame(() => { const viewport=conversationViewport.current,answers=viewport?.querySelectorAll<HTMLElement>('[data-chat-role="assistant"]'),answer=answers?.[answers.length-1]; if(viewport&&answer)viewport.scrollTop+=answer.getBoundingClientRect().top-viewport.getBoundingClientRect().top; });
-    } catch (error) { if (!request.current() || currentEvidenceKey.current !== key) return; setChatError(error instanceof Error ? error.message : "Answer unavailable. Please try again."); if (!actionPlan) setInput(message); }
-    finally { if (request.current() && currentEvidenceKey.current === key) setChatLoading(false); }
+    } catch (error) { if (!request.current() || currentEvidenceKey.current !== key) return; setChatError(error instanceof Error ? error.message : "Answer unavailable. Please try again."); if (!actionPlan) setInput(current=>current.trim()?current:message); }
+    finally { if(sending.current===sendTicket)sending.current=null; if (request.current() && currentEvidenceKey.current === key) setChatLoading(false); }
   }
 
   const ready = Boolean(sources?.some(source => source.facts)) && !loading && loadedScope === workforceQuery;
+  function allowSuggestion(key:string){
+    if(!active||!liveActive.current||renderedPromptEpoch!==promptEpoch.current||queuedSuggestion.current||chatLoading||sending.current||!conversation.canSubmitPrompt()||currentEvidenceKey.current!==contextKey)return false;
+    if(recentSuggestions.current.has(key))return false;
+    recentSuggestions.current.add(key);setTimeout(()=>recentSuggestions.current.delete(key),1000);return true;
+  }
+  function queueSuggestion(key:string,run:()=>void){
+    if(!allowSuggestion(key))return;
+    const ticket=Symbol();queuedSuggestion.current=ticket;setSuggestionPending(true);
+    requestAnimationFrame(()=>{if(queuedSuggestion.current!==ticket)return;queuedSuggestion.current=null;setSuggestionPending(false);if(!liveActive.current||renderedPromptEpoch!==promptEpoch.current||!conversation.canSubmitPrompt()||currentEvidenceKey.current!==contextKey||sending.current)return;run()});
+  }
+  function submitOption(id:OptionAction){
+    const command=optionActions?.stage(id);
+    if(!command||command.generation!==optionSnapshot.generation||command.goalId!==conversation.activeGoalId)return;
+    queueSuggestion('option:'+id,()=>{const error=optionActions!.execute(command,command.label,conversation.activeGoalId);
+    setLocalAction({goalId:command.goalId,notice:error?'This action is no longer available for the current option. Review the options and choose again.':({compare:'Comparison opened using the existing calculated options.',adjust:'Selected option opened for adjustment. Review and save explicitly.',explore:'Local search controls opened. Review bounds and run the search explicitly.'}[id])});});
+  }
   const finishScopeRequest = useEffectEvent((pending:PendingScope, cancel:boolean) => {
     if (pendingScopeRef.current!==pending) return;
     pendingScopeRef.current=null;setPendingScope(null);
@@ -219,7 +219,6 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   });
   useEffect(()=>{
     if(!pendingScope) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Finish or cancel one explicit user-requested asynchronous scope transition.
     if(!active || pendingScope.identity!==scopeIdentity || pendingScope.query!==workforceQuery || input.trim()!==pendingScope.message) finishScopeRequest(pendingScope,true);
     else if(ready) finishScopeRequest(pendingScope,false);
   },[pendingScope,active,scopeIdentity,workforceQuery,input,ready]);
@@ -227,13 +226,13 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     <section aria-label="Starting guide" data-testid="overview-starting-guide" className="py-2">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <h3 className="text-lg font-semibold">Questions to explore</h3>
-        <p className="text-sm text-muted-foreground">Use an example or write your own question.</p>
+        <p className="text-sm text-muted-foreground">Click a question to send it, or write your own.</p>
         <button type="button" aria-label="Refresh overview evidence" disabled={loading || chatLoading}
           onClick={() => { loaded.current = ""; setRefresh(value => value + 1); }}
           className="ml-auto rounded-md p-2 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18} /></button>
       </div>
 
-      <div className="mt-3"><PromptExamples prompts={contextualPrompts({page:"home",goal:conversation.focusedIssue,hasConversation:messages.some(message=>message.role==="user"),evidenceReady:ready,sources})} draft={input} busy={chatLoading} onDraft={draftQuestion}/></div>
+      <div className="mt-3"><PromptExamples prompts={contextualPrompts({page:"home",goal:conversation.focusedIssue,hasConversation:messages.some(message=>message.role==="user"),evidenceReady:ready,sources})} draft={input} busy={suggestionPending||chatLoading||!ready||!active} onDraft={submitQuestion}/></div>
 
     </section>
   );
@@ -265,7 +264,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       </div>
 
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
-    <GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:workforceScope}} payload={{page:"home",persona,overviewBriefingContext:pack,marketReference}} active={active} ready={ready} paused={planningActive||localCandidate||localAction?.goalId===conversation.activeGoalId||chatLoading||Boolean(input.trim())||Boolean(pendingScope)||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} onNavigate={onNavigate}/>
+    <GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:workforceScope}} payload={{page:"home",persona,overviewBriefingContext:pack,marketReference}} active={active} ready={ready} paused={suggestionPending||planningActive||localCandidate||localAction?.goalId===conversation.activeGoalId||chatLoading||Boolean(input.trim())||Boolean(pendingScope)||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} onNavigate={onNavigate}/>
     {!hasAnswer&&startingGuide}
     {loading && <p role="status" className="text-sm text-muted-foreground">Loading available evidence for your questions.</p>}
 
@@ -274,9 +273,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     {messages.length > 0 && <section aria-label="Overview conversation" className="space-y-3">
       <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona])} onNavigate={onNavigate} home hideHistory latestOnly/>
       {conversation.homeGoalChoiceKey === contextKey && !conversation.focusedIssue && <div role="group" aria-label="Choose a goal" className="flex flex-wrap gap-2">
-        <p className="w-full text-sm text-muted-foreground">Examples of goals you can choose — not evidence-based priorities. You can also write your own.</p>
-        {(Object.keys(homeGoalReplies) as Array<keyof typeof homeGoalReplies>).map(goal => <button key={goal} type="button" disabled={chatLoading || !ready || Boolean(input.trim())} onClick={() => draftQuestion(homeGoalReplies[goal])} className="min-h-11 rounded-lg border border-primary px-4 py-2 font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{goal}</button>)}
-        <button type="button" disabled={chatLoading} onClick={() => { conversation.setHomeGoalChoiceKey(null); focusQuestion(); }} className="min-h-11 rounded-lg border px-4 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Another goal</button>
+        <p className="w-full text-sm text-muted-foreground">State your goal in your own words.</p>
+        <button type="button" disabled={chatLoading} onClick={() => { conversation.setHomeGoalChoiceKey(null); focusQuestion(); }} className="min-h-11 rounded-lg border px-4 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">State my goal</button>
       </div>}
       {chatLoading && <p role="status" className="text-base text-muted-foreground">Thinking with the available evidence…</p>}
       {chatError && <p role="alert" className="text-destructive">{chatError}</p>}
@@ -296,14 +294,14 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
 
       {visibleScopeChoice && <div aria-label="Requested country scope" className="mb-3 text-sm"><p>{visibleScopeChoice.kind==="ambiguous" ? "Which country should this workforce snapshot use?" : visibleScopeChoice.kind==="unsupported" ? "That country scope is not fully supported. Choose an available country or keep the current scope; missing evidence stays unavailable." : "Use country-specific workforce evidence for this question?"}</p><div className="mt-2 flex flex-wrap gap-2">{visibleScopeChoice.options.map(option=><button key={option.value} type="button" onClick={()=>applyCountry(option)} className="min-h-11 rounded border border-primary px-3 py-2 font-semibold text-primary">Apply {option.label} and answer</button>)}<button type="button" onClick={()=>void send(visibleScopeChoice.message,false,true)} className="min-h-11 px-2 text-primary underline">Answer with current scope</button></div><p className="mt-1 text-xs text-muted-foreground">Only the workforce snapshot changes. Other filters stay selected; company-wide sources retain their scope.</p></div>}
       {pendingScope && <p role="status" className="mb-3 text-sm">Refreshing the selected workforce evidence before answering. Edit your question to cancel.</p>}
-      {localAction?.goalId===conversation.activeGoalId&&(!activeStage||localCandidate)&&<p role="status" className="mb-3 text-sm">{localAction.notice}</p>}
+      {localAction?.goalId===conversation.activeGoalId&&<p role="status" className="mb-3 text-sm">{localAction.notice}</p>}
       <label htmlFor="overview-question" className="sr-only">Ask Workforce AI</label>
       <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" value={input} onChange={event => changeQuestion(event.target.value)} rows={2}
         placeholder="Describe a business issue, and I’ll help you explore the evidence, compare options, and build or adjust a plan." className="max-h-80 min-h-20 w-full resize-y rounded-lg border bg-background/40 p-3 text-lg placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
       <div className="mt-2 flex items-center justify-end gap-3">
         <button type="submit" aria-label="Send overview question" disabled={(!localCandidate&&!ready) || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
     </form>
-      {actionOffers.length>0&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2 text-sm">Option action suggestions</summary><section aria-label="Workforce option actions" className="mt-3 space-y-2"><p className="text-sm text-muted-foreground">{input.trim()?'Your draft is kept. Clear it to choose an option action.':'Choose an option action, then Send to open it locally.'}</p><div className="flex flex-wrap gap-2">{actionOffers.map(offer=><button key={offer.id} type="button" disabled={chatLoading||Boolean(input.trim())} onClick={()=>draftOption(offer.id)} className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{offer.label}</button>)}</div></section></details>}
+      {actionOffers.length>0&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2 text-sm">Option action suggestions</summary><section aria-label="Workforce option actions" className="mt-3 space-y-2"><p className="text-sm text-muted-foreground">{input.trim()?'Your draft is kept. Clear it to choose an option action.':'Click to open the local action. Saving, calculation and search remain explicit.'}</p><div className="flex flex-wrap gap-2">{actionOffers.map(offer=><button key={offer.id} type="button" disabled={suggestionPending||chatLoading||Boolean(input.trim())} onClick={()=>submitOption(offer.id)} className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{offer.label}</button>)}</div></section></details>}
     {hasAnswer&&<details key={conversation.workspaceKey} className="text-sm"><summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">More questions</summary>{startingGuide}</details>}
   </section>
     <aside className="order-3 p-5 text-sm leading-relaxed xl:order-none" aria-label="How to use this app">

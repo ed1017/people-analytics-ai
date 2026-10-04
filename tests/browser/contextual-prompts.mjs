@@ -45,8 +45,8 @@ try{for(const width of [1366,390]){
  check(width+' Home has no horizontal overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await details.click();check(width+' source disclosure remains accessible',await page.getByText('Synthetic workforce evidence.',{exact:false}).isVisible());await page.getByRole('button',{name:'Close data details',exact:true}).click();
  await page.screenshot({path:path.join(output,`home-copy-${width}.png`),fullPage:true});
- const baseline=posts;const first=suggestions().getByRole('button').first(),text=await first.innerText();await first.focus();await page.keyboard.press('Enter');
- check(width+' keyboard example drafts and focuses without model',await home.inputValue()===text&&await home.evaluate(el=>el===document.activeElement)&&posts===baseline);
+ const baseline=posts;const first=suggestions().getByRole('button').first();await first.focus();await page.keyboard.press('Enter');
+ await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('Synthetic response',{exact:true}).waitFor();await page.getByText('More questions',{exact:true}).click();check(width+' keyboard example sends exactly once',await home.inputValue()===''&&posts===baseline+1);
  await home.fill('Keep my unfinished question');check(width+' draft prevents replacement',await suggestions().getByRole('button').first().isDisabled());
  await page.getByRole('button',{name:'Previous discussion',exact:true}).click();check(width+' stage changes examples while retaining draft',await home.inputValue()==='Keep my unfinished question'&&await suggestions().getByRole('button',{name:/revise/}).count()===1);
  await page.getByRole('button',{name:'skills goal',exact:true}).click();await suggestions().getByRole('button',{name:/skill requirements/}).waitFor();
