@@ -46,6 +46,7 @@ export function HomeActionOptions({goalId,goal,pack,active,ready,busy,pin,person
   if(pin?.id!==goalId||pin.sequence===consumed.current)return;
   if(pinContext.current?.sequence!==pin.sequence)pinContext.current={sequence:pin.sequence,identity};
   if(pinContext.current.identity!==identity||!active||!ready){consumed.current=pin.sequence;return;}
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- A newly received explicit Pin event starts its one coordinated external request.
   if(binding&&!busy&&storage.saved){consumed.current=pin.sequence;void prepare('new-pin');}
  // Only a fresh user Pin authorizes this call; reload and toggles never do.
  // eslint-disable-next-line react-hooks/exhaustive-deps
