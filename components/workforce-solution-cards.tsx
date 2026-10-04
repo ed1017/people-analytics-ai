@@ -1,9 +1,9 @@
 "use client";
 import {OptionSwitcher} from '@/components/option-switcher';
 import type {JourneyTransient} from '@/lib/workforce-journey-state';
-import {useEffect,useEffectEvent,useRef,useState} from 'react';
+import {useEffect,useEffectEvent,useId,useRef,useState} from 'react';
 import {WorkforceCalculationBreakdown} from '@/components/workforce-calculation-breakdown';
-import {workforceScenarioOutcomes,workforceSearchCountCopy,workforceOptionBullets} from '@/lib/workforce-scenario-outcomes';
+import {workforceScenarioOutcomes,workforceSearchCountCopy,workforceOptionBullets,workforceOptionsLead} from '@/lib/workforce-scenario-outcomes';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
 import {localWorkforceTask} from '@/lib/workforce-search-client';
 import {cardPriorities,rankSolutionCards,fullCoverage,cardSourceIdentity,cardVerificationIdentity,readSolutionPins,unpinSolution,type CardsSnapshot,type CardPriority,type WhatIfPreview,type SolutionPin} from '@/lib/workforce-solution-cards';
@@ -13,6 +13,12 @@ const button='min-h-11 rounded border px-3 py-2 text-sm disabled:opacity-50';
 const control='mt-1 min-h-11 w-full min-w-0 rounded border bg-background p-2';
 const amount=(n:number|null)=>n===null?'Unknown':n.toLocaleString('en-US',{maximumFractionDigits:2});
 const fields:[WorkforcePlanField,string][]=[['budget','Shared cash budget (USD)'],['maxAddedEmployees','Shared maximum additional employees, including backfills'],['deadlineMonth','Shared coverage deadline (YYYY-MM)'],['annualHireCost','Shared annual cost per hire (USD)'],['hireFee','Shared fee per hire (USD)'],['recruitingStart','Shared recruiting launch (YYYY-MM-DD)'],['arrivalMode','Shared hiring arrival mode'],['arrivalDate','Shared hire arrival (YYYY-MM-DD)'],['loadedHourlyCost','Shared loaded hourly cost (USD/hour)'],['build','Build count'],['move','Move count'],['buy','Buy count'],['backfills','External backfills'],['buildMonth','Build readiness month (YYYY-MM)'],['moveMonth','Move effective month (YYYY-MM)'],['backfillDate','Backfill arrival (YYYY-MM-DD)'],['annualBackfillCost','Annual cost per backfill (USD)'],['backfillFee','Fee per backfill (USD)'],['internalAnnualCostChange','Annual internal cohort uplift (USD)'],['trainingCash','Training cash (USD)'],['trainingHours','Employee training hours']];
+function OptionBulletText({bullet}:{bullet:ReturnType<typeof workforceOptionBullets>[number]}){
+ const emphasis=[...new Set(bullet.emphasis)].filter(value=>bullet.text.includes(value)).sort((a,b)=>b.length-a.length);
+ if(!emphasis.length)return bullet.text;
+ const escape=(value:string)=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+ return bullet.text.split(new RegExp(`(${emphasis.map(escape).join('|')})`,'g')).map((part,index)=>emphasis.includes(part)?<strong key={index}>{part}</strong>:part);
+}
 type Props={journeyContext?:string;onJourneyChange?:(state:JourneyTransient|undefined)=>void;solution:WorkforceSolution;resultId:string;blocked:boolean;onDraftChange:(dirty:boolean)=>void;onVerified:(identity:string|null)=>void;onReviewScope:()=>void};
 export function WorkforceSolutionCards(props:Props){
  const storage=useDecisionStorage(),ws=storage.data.workspaces[props.solution.goalId],goal=storage.data.goals.goals.find(g=>g.id===props.solution.goalId);
@@ -22,7 +28,8 @@ export function WorkforceSolutionCards(props:Props){
 function Cards({solution,resultId,blocked,onDraftChange,onVerified,onReviewScope,journeyContext,onJourneyChange}:Props){
  const storage=useDecisionStorage(),workspace=storage.data.workspaces[solution.goalId],history=workspace?.fields.workforceAlternativeReviews??[],rawPins=workspace?.fields.workforceSolutionPins??[],pins=readSolutionPins(rawPins);
  const [snapshot,setSnapshot]=useState<CardsSnapshot|null>(null),[priority,setPriority]=useState<CardPriority>(''),[notice,setNotice]=useState('Verifying saved options locally before opening pinned versions…'),[invalid,setInvalid]=useState(false),[restoring,setRestoring]=useState(true);
- const [selectedCardId,setSelectedCardId]=useState('saved');
+ const [selectedCardId,setSelectedCardId]=useState('saved'),[compareOpen,setCompareOpen]=useState(false);
+ const comparisonId=useId();
  const [draft,setDraft]=useState<{cardId:string;input:WorkforcePlanInput}|null>(null),[preview,setPreview]=useState<WhatIfPreview|null>(null),[working,setWorking]=useState(false);
  useEffect(()=>{onJourneyChange?.(draft&&journeyContext?{context:journeyContext,kind:'tailoring',input:draft.input,preview:preview?.changedFields.length&&!working?'ready':'needed'}:undefined)},[draft,preview,working,journeyContext,onJourneyChange]);
  const editControls=useRef<Partial<Record<WorkforcePlanField,HTMLInputElement|HTMLSelectElement>>>({}),draftTrigger=useRef<HTMLButtonElement|null>(null),[focusRequest,setFocusRequest]=useState<{field:WorkforcePlanField;sequence:number}|null>(null);
@@ -78,26 +85,32 @@ function Cards({solution,resultId,blocked,onDraftChange,onVerified,onReviewScope
  const shown=preview?.cards??snapshot?.cards??[],ranked=rankSolutionCards(shown,priority);
  const activeCardId=ranked.cards.some(card=>card.id===selectedCardId)?selectedCardId:ranked.cards[0]?.id??'';
  const countCopy=workforceSearchCountCopy(snapshot?.searchSummary??null);
+ const optionLead=draft?null:workforceOptionsLead(snapshot?.searchSummary??null,shown.length);
  const sourceResult=solution.results.find(r=>r.id===resultId),historical=!sourceResult||sourceResult.version!==solution.versions.at(-1)?.version||!solutionResultIsCurrent(solution,sourceResult)||storage.data.goals.goals.find(g=>g.id===solution.goalId)?.statement!==solution.versions.at(-1)?.inputs.scope.goalStatement;
  return <section data-journey="verify-result" tabIndex={-1} aria-label="Workforce solution options" className="min-w-0 space-y-3 text-sm">
   <h4 className="font-semibold">{(!draft||preview)&&ranked.preferred?'Recommended option and alternatives':'Suggested options'}</h4>
-  {snapshot&&<p>{shown.length} options to review{draft?' • Temporary what-if':''}</p>}
+  {snapshot&&<p>{optionLead??`${shown.length} options to review${draft?' • Temporary what-if':''}`}</p>}
   {!storage.saved&&<p role="alert">This working copy is not saved. The previous durable record remains intact. {storage.notice}</p>}
   {historical&&<p>Historical saved options — tailoring unavailable.</p>}
   <details><summary className="min-h-11 cursor-pointer py-2">Comparison preference</summary><label className="block">Your comparison priority<select data-journey="compare" aria-label="Your comparison priority" className={control} value={priority} disabled={invalid||blocked||!storage.saved} onChange={e=>{cancelOperation();setPreview(null);setWorking(!!draft);setPriority(e.target.value as CardPriority)}}><option value="">Choose a priority — neutral options</option>{Object.entries(cardPriorities).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label></details>
   {(draft||priority)&&<p>{draft&&!preview?'Temporary inputs are not yet verified. Saved baseline amounts below are not current what-if results.':ranked.message}</p>}
   <p>Estimates under your assumptions, not forecasts. Save does not approve or execute a plan.</p>
   {ranked.cards.some(card=>card.plan.checks.some(check=>check.status!=='met'))&&<p role="status">Some options have unmet or unknown limits. Check each option’s Why summary before saving.</p>}
-  <OptionSwitcher options={ranked.cards} selectedId={activeCardId} onSelect={setSelectedCardId}>{(card,index)=>{
+  <OptionSwitcher options={ranked.cards} selectedId={activeCardId} onSelect={setSelectedCardId} toolbar={ranked.cards.length>1?<div>
+   <button type="button" className={button} aria-expanded={compareOpen} aria-controls={comparisonId} onClick={()=>setCompareOpen(value=>!value)}>Compare options</button>
+   {compareOpen&&<div id={comparisonId} role="region" aria-label="Compare calculated options" className="mt-3 overflow-x-auto" tabIndex={0}>
+    <table className="w-full min-w-[32rem] text-left text-xs"><caption className="mb-2 text-left">{draft&&!preview?'Saved baseline comparison; temporary edits are not verified.':'Existing calculated options; no new calculation or approval.'} Skills availability and hiring starts remain unverified.</caption><thead><tr><th scope="col" className="p-2">Compare</th>{ranked.cards.map((card,index)=><th scope="col" className="p-2" key={card.id}>Option {index+1}</th>)}</tr></thead><tbody>{['Expected result','Cost','Timing','Staffing','Why'].map(label=><tr key={label}><th scope="row" className="p-2 align-top">{label}</th>{ranked.cards.map(card=><td className="p-2 align-top" key={card.id}>{workforceOptionBullets(card.plan).filter(item=>item.label===label).map(item=><OptionBulletText key={item.label} bullet={item}/>)}</td>)}</tr>)}</tbody></table>
+   </div>}
+  </div>:undefined}>{(card,index)=>{
    const baseline=snapshot?.cards.find(c=>c.id===card.id),plan=card.plan,outcome=workforceScenarioOutcomes(plan);
    const editBlocked=blocked||invalid||!storage.saved||historical||!!draft&&draft.cardId!==card.id;
    const editField=(field:WorkforcePlanField)=>{if(editBlocked)return;draftTrigger.current=document.activeElement as HTMLButtonElement;if(!draft)edit(card.id,{...card.input});setFocusRequest(before=>({field,sequence:(before?.sequence??0)+1}))};
    return <article key={card.id} aria-label={card.title} className="min-w-0 space-y-2 rounded-lg border p-3">
     <h5 className="font-semibold">Option {index+1}{(!draft||preview)&&ranked.preferred===card.id&&priority?` — Recommended for ${cardPriorities[priority].toLowerCase()}`:''}</h5>
-    <ul className="list-disc space-y-1 pl-5">{workforceOptionBullets(plan).map(item=><li key={item.label}><strong>{item.label}:</strong> {item.text}</li>)}</ul>
+    <ul className="list-disc space-y-1 pl-5">{workforceOptionBullets(plan).map(item=><li key={item.label}><span className="font-medium">{item.label}:</span> <OptionBulletText bullet={item}/></li>)}</ul>
     {preview&&baseline&&<p>Change from this option&apos;s saved baseline: cash {plan.totalCash===null||baseline.plan.totalCash===null?'Unknown':`USD ${amount(plan.totalCash-baseline.plan.totalCash)}`}; employee time {plan.totalTime===null||baseline.plan.totalTime===null?'Unknown':`USD ${amount(plan.totalTime-baseline.plan.totalTime)}`}; added employees {plan.maxAddedEmployees-baseline.plan.maxAddedEmployees}; coverage {fullCoverage(baseline.plan)??'Unknown'} → {fullCoverage(plan)??'Unknown'}.</p>}
     {preview&&baseline&&<p>Deadline coverage: {baseline.plan.input.deadlineMonth||'Unspecified'}: {amount(workforceScenarioOutcomes(baseline.plan).covered)} of {outcome.roles} → {outcome.deadline??'Unspecified'}: {amount(outcome.covered)} of {outcome.roles}.</p>}
-    <button aria-label={`Adjust ${card.title.toLowerCase()}`} className={`${button} bg-primary text-primary-foreground`} disabled={blocked||invalid||!storage.saved||historical||!!draft||working} onClick={event=>{draftTrigger.current=event.currentTarget;edit(card.id,{...card.input});setFocusRequest(before=>({field:'budget',sequence:(before?.sequence??0)+1}))}}>Adjust</button>
+    <button aria-label={`Adjust ${card.title.toLowerCase()}`} className={`${button} bg-primary text-primary-foreground`} disabled={blocked||invalid||!storage.saved||historical||!!draft||working} onClick={event=>{draftTrigger.current=event.currentTarget;edit(card.id,{...card.input});setFocusRequest(before=>({field:'budget',sequence:(before?.sequence??0)+1}))}}>Adjust this option</button>
     {card.id==='saved'?<button aria-label={pins?.some(p=>p.resultId===resultId&&p.solutionId===solution.id)?'Saved calculation pinned':'Pin saved solution'} className={button} disabled={blocked||invalid||!storage.saved||!!draft||working||!pins||pins.some(p=>p.resultId===resultId&&p.solutionId===solution.id)} onClick={()=>void pin()}>{pins?.some(p=>p.resultId===resultId&&p.solutionId===solution.id)?'Saved':'Save'}</button>:<button aria-label={`Review and save ${card.title.toLowerCase()}`} className={button} disabled={blocked||invalid||!storage.saved||historical||!!draft||working} onClick={event=>{draftTrigger.current=event.currentTarget;edit(card.id,{...card.input});setFocusRequest(before=>({field:'budget',sequence:(before?.sequence??0)+1}))}}>Save</button>}
     <details><summary className="min-h-11 cursor-pointer py-2 font-medium">Details</summary>
      <p>{preview?'Temporary recalculation':'Saved baseline'} · {card.title}: Build {plan.input.build}, Move {plan.input.move}, Buy {plan.input.buy}; backfills {plan.input.backfills||'0'}.</p>

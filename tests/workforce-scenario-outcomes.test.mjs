@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {workforceOptionBullets,workforceScenarioOutcomes,workforceCostBreakdown,calculationStepFields,workforceSearchCountCopy} from '../lib/workforce-scenario-outcomes.ts';
+import {workforceOptionsLead,workforceOptionBullets,workforceScenarioOutcomes,workforceCostBreakdown,calculationStepFields,workforceSearchCountCopy} from '../lib/workforce-scenario-outcomes.ts';
 import {calculateWorkforceIncrement} from '../lib/workforce-increment.ts';
 import {workforceReviewFixture} from './fixtures/workforce-review.mjs';
 const fixture=workforceReviewFixture();
@@ -35,12 +35,19 @@ test('scenario footer uses 100 calculated scenarios threshold, never options or 
 
 test('concise option bullets report calculations without invented skills or predictions',()=>{
  const bullets=workforceOptionBullets(fixture.proposed),by=Object.fromEntries(bullets.map(b=>[b.label,b.text]));
- assert.equal(bullets.length,7);assert.match(by.Skills,/Readiness unverified/);assert.match(by.Hiring,/Starts are assumptions/);
+ assert.deepEqual(bullets.map(b=>b.label),['Expected result','Cost','Timing','Staffing','Why']);assert.match(by.Staffing,/Train 1; move 1; hire 1/);
  assert.ok(by.Cost.includes(fixture.proposed.totalCash.toLocaleString('en-US')));assert.match(by['Expected result'],/3 of 3 roles by 2026-12; gap 0/);
  assert.ok(bullets.every(b=>b.text.length<125));
  const hireOnly=calculateWorkforceIncrement({...fixture.input,build:'0',move:'0',buy:'3',backfills:'0',annualHireCost:'',arrivalDate:'',arrivalMode:'',deadlineMonth:''},fixture.timing);
  const unknown=Object.fromEntries(workforceOptionBullets(hireOnly).map(b=>[b.label,b.text]));
- assert.equal(unknown.Skills,undefined);assert.match(unknown.Cost,/Unknown/);assert.match(unknown.Timing,/unknown/);assert.match(unknown['Expected result'],/no deadline/);
+ assert.match(unknown.Staffing,/Train 0; move 0; hire 3/);assert.match(unknown.Cost,/Unknown/);assert.match(unknown.Timing,/unknown/);assert.match(unknown['Expected result'],/no deadline/);
  const missed=Object.fromEntries(workforceOptionBullets(calculateWorkforceIncrement({...fixture.input,deadlineMonth:'2026-10',budget:'0'},fixture.timing)).map(b=>[b.label,b.text]));
  assert.match(missed.Why,/not met/);assert.match(missed['Expected result'],/1 of 3.*gap 2/);
+});
+
+test('option lead uses verified calculated count and actual option count without ranking claims',()=>{
+ const summary={enumerated:130,calculatorInvocations:131,enumerationComplete:true,counts:{invalid:10},emitted:64,omittedByCap:56,excludedByFilter:0,truncated:true};
+ assert.equal(workforceOptionsLead(summary,2),'Original search: 120 scenarios calculated. Here are 2 options to consider.');
+ assert.equal(workforceOptionsLead({...summary,enumerationComplete:false},1),'Original partial search: 120 scenarios calculated. Here is 1 option to consider.');
+ assert.equal(workforceOptionsLead({...summary,enumerated:109},3),null);assert.equal(workforceOptionsLead(null,3),null);assert.equal(workforceOptionsLead(summary,0),null);
 });
