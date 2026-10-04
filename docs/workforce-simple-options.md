@@ -18,7 +18,7 @@ Compare options, beside navigation, toggles a local table of the existing option
 
 Adjust this option is the primary per-card action. Explore more options is secondary and opens the existing bounded local search/review flow on current saved results. Users must enter and confirm bounds and explicitly run the search; selection, replacement, calculation and saving retain their separate review steps. Historical results instead expose Saved alternative reviews. No selectable results produces guidance to review Build/Move/Buy bounds or the saved budget, employee cap, deadline and readiness assumptions. The UI never promises more feasible options or relabels the current options as new ones.
 
-The Home composer has no verified option-snapshot adapter: its `/api/chat` request uses overview context, and the solution panel has no goal-owned composer callback. Accordingly these are functioning local controls, not chat suggestions. A future explicit-Send adapter must bind goal/result/option identities and preserve existing drafts. No nonfunctional prompt or unconstrained backend was added.
+PR102 candidate `3eb6778` ships these as direct controls. The separate follow-up adds an in-memory adapter for explicit-Send suggestions without changing model inputs; see [Local option suggestions](workforce-option-composer.md) for its boundaries, stale-context behavior and validation. No unconstrained model backend was added.
 
 ## Validation
 

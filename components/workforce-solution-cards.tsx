@@ -1,7 +1,8 @@
 "use client";
+import type {WorkforceOptionActions,OptionActionOffer} from "@/lib/workforce-option-actions";
 import {OptionSwitcher} from '@/components/option-switcher';
 import type {JourneyTransient} from '@/lib/workforce-journey-state';
-import {useEffect,useEffectEvent,useId,useRef,useState} from 'react';
+import {useEffect,useLayoutEffect,useEffectEvent,useId,useRef,useState} from 'react';
 import {WorkforceCalculationBreakdown} from '@/components/workforce-calculation-breakdown';
 import {workforceScenarioOutcomes,workforceSearchCountCopy,workforceOptionBullets,workforceOptionsLead} from '@/lib/workforce-scenario-outcomes';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
@@ -19,17 +20,19 @@ function OptionBulletText({bullet}:{bullet:ReturnType<typeof workforceOptionBull
  const escape=(value:string)=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
  return bullet.text.split(new RegExp(`(${emphasis.map(escape).join('|')})`,'g')).map((part,index)=>emphasis.includes(part)?<strong key={index}>{part}</strong>:part);
 }
-type Props={journeyContext?:string;onJourneyChange?:(state:JourneyTransient|undefined)=>void;solution:WorkforceSolution;resultId:string;blocked:boolean;onDraftChange:(dirty:boolean)=>void;onVerified:(identity:string|null)=>void;onReviewScope:()=>void};
+type Props={optionActions?:WorkforceOptionActions;onExplore?:()=>void;journeyContext?:string;onJourneyChange?:(state:JourneyTransient|undefined)=>void;solution:WorkforceSolution;resultId:string;blocked:boolean;onDraftChange:(dirty:boolean)=>void;onVerified:(identity:string|null)=>void;onReviewScope:()=>void};
 export function WorkforceSolutionCards(props:Props){
  const storage=useDecisionStorage(),ws=storage.data.workspaces[props.solution.goalId],goal=storage.data.goals.goals.find(g=>g.id===props.solution.goalId);
  const key=JSON.stringify([cardSourceIdentity(props.solution,props.resultId),ws?.fields.workforceAlternativeReviews,storage.data.goals.activeId,goal?.statement,ws?.fields.workforceInspection,props.blocked]);
  return <Cards key={key} {...props}/>;
 }
-function Cards({solution,resultId,blocked,onDraftChange,onVerified,onReviewScope,journeyContext,onJourneyChange}:Props){
+function Cards({optionActions,onExplore,solution,resultId,blocked,onDraftChange,onVerified,onReviewScope,journeyContext,onJourneyChange}:Props){
  const storage=useDecisionStorage(),workspace=storage.data.workspaces[solution.goalId],history=workspace?.fields.workforceAlternativeReviews??[],rawPins=workspace?.fields.workforceSolutionPins??[],pins=readSolutionPins(rawPins);
  const [snapshot,setSnapshot]=useState<CardsSnapshot|null>(null),[priority,setPriority]=useState<CardPriority>(''),[notice,setNotice]=useState('Verifying saved options locally before opening pinned versions…'),[invalid,setInvalid]=useState(false),[restoring,setRestoring]=useState(true);
  const [selectedCardId,setSelectedCardId]=useState('saved'),[compareOpen,setCompareOpen]=useState(false);
- const comparisonId=useId();
+ const comparisonId=useId(),actionOwner=useId();
+ const comparisonRegion=useRef<HTMLDivElement|null>(null);
+ useLayoutEffect(()=>()=>optionActions?.clear(actionOwner),[optionActions,actionOwner]);
  const [draft,setDraft]=useState<{cardId:string;input:WorkforcePlanInput}|null>(null),[preview,setPreview]=useState<WhatIfPreview|null>(null),[working,setWorking]=useState(false);
  useEffect(()=>{onJourneyChange?.(draft&&journeyContext?{context:journeyContext,kind:'tailoring',input:draft.input,preview:preview?.changedFields.length&&!working?'ready':'needed'}:undefined)},[draft,preview,working,journeyContext,onJourneyChange]);
  const editControls=useRef<Partial<Record<WorkforcePlanField,HTMLInputElement|HTMLSelectElement>>>({}),draftTrigger=useRef<HTMLButtonElement|null>(null),[focusRequest,setFocusRequest]=useState<{field:WorkforcePlanField;sequence:number}|null>(null);
@@ -41,7 +44,7 @@ function Cards({solution,resultId,blocked,onDraftChange,onVerified,onReviewScope
   if(invalid||blocked||!state.saved||state.data.goals.activeId!==solution.goalId||!saved||!goal||goal.statement!==initial.current.goal||cardSourceIdentity(saved,resultId)!==initial.current.source||JSON.stringify(ws?.fields.workforceAlternativeReviews??[])!==initial.current.history||ws?.fields.workforceInspection!==initial.current.selected)throw Error('Context changed or work is unsaved. Return to a saved calculation before continuing.');
   return {state,ws,saved};
  };
- const invalidate=useEffectEvent(()=>{try{context()}catch{cancelOperation();setPreview(null);setWorking(false);setInvalid(true);setNotice('Context changed; temporary results cannot be saved. Saved history is retained.')}});
+ const invalidate=useEffectEvent(()=>{try{context()}catch{optionActions?.clear(actionOwner);cancelOperation();setPreview(null);setWorking(false);setInvalid(true);setNotice('Context changed; temporary results cannot be saved. Saved history is retained.')}});
  useEffect(()=>{const off=decisionStore.subscribe(()=>invalidate());return()=>{off();cancelOperation();onDraftChange(false)}},[onDraftChange]);
  useEffect(()=>{
   const controller=new AbortController();
@@ -87,6 +90,19 @@ function Cards({solution,resultId,blocked,onDraftChange,onVerified,onReviewScope
  const countCopy=workforceSearchCountCopy(snapshot?.searchSummary??null);
  const optionLead=draft?null:workforceOptionsLead(snapshot?.searchSummary??null,shown.length);
  const sourceResult=solution.results.find(r=>r.id===resultId),historical=!sourceResult||sourceResult.version!==solution.versions.at(-1)?.version||!solutionResultIsCurrent(solution,sourceResult)||storage.data.goals.goals.find(g=>g.id===solution.goalId)?.statement!==solution.versions.at(-1)?.inputs.scope.goalStatement;
+ useLayoutEffect(()=>{
+  if(!optionActions)return;
+  if(!snapshot||!ranked.cards.length||blocked||invalid||!storage.saved||historical||working||draft){optionActions.clear(actionOwner);return}
+  const offers:OptionActionOffer[]=[...(ranked.cards.length>1?[{id:'compare' as const,label:`Compare all ${ranked.cards.length} options`}]:[]),{id:'adjust',label:'Adjust this option'},...(onExplore?[{id:'explore' as const,label:'Explore more options'}]:[])];
+  const identity=JSON.stringify([cardVerificationIdentity(solution,resultId,history),activeCardId,priority,workspace?.fields.workforceInspection,storage.data.goals.goals.find(goal=>goal.id===solution.goalId)?.statement]);
+  optionActions.publish(actionOwner,identity,solution.goalId,offers,action=>{
+   context();
+   if(blocked||invalid||historical||working||draft)throw Error('Unavailable');
+   if(action==='compare'){setCompareOpen(true);requestAnimationFrame(()=>{comparisonRegion.current?.focus();comparisonRegion.current?.scrollIntoView({block:'nearest'})})}
+   else if(action==='adjust'){const card=ranked.cards.find(item=>item.id===activeCardId);if(!card)throw Error('Unavailable');draftTrigger.current=document.activeElement as HTMLButtonElement;edit(card.id,{...card.input});setFocusRequest(before=>({field:'budget',sequence:(before?.sequence??0)+1}))}
+   else {if(!onExplore)throw Error('Unavailable');onExplore()}
+  });
+ });
  return <section data-journey="verify-result" tabIndex={-1} aria-label="Workforce solution options" className="min-w-0 space-y-3 text-sm">
   <h4 className="font-semibold">{(!draft||preview)&&ranked.preferred?'Recommended option and alternatives':'Suggested options'}</h4>
   {snapshot&&<p>{optionLead??`${shown.length} options to review${draft?' • Temporary what-if':''}`}</p>}
@@ -98,7 +114,7 @@ function Cards({solution,resultId,blocked,onDraftChange,onVerified,onReviewScope
   {ranked.cards.some(card=>card.plan.checks.some(check=>check.status!=='met'))&&<p role="status">Some options have unmet or unknown limits. Check each option’s Why summary before saving.</p>}
   <OptionSwitcher options={ranked.cards} selectedId={activeCardId} onSelect={setSelectedCardId} toolbar={ranked.cards.length>1?<div>
    <button type="button" className={button} aria-expanded={compareOpen} aria-controls={comparisonId} onClick={()=>setCompareOpen(value=>!value)}>Compare options</button>
-   {compareOpen&&<div id={comparisonId} role="region" aria-label="Compare calculated options" className="mt-3 overflow-x-auto" tabIndex={0}>
+   {compareOpen&&<div ref={comparisonRegion} id={comparisonId} role="region" aria-label="Compare calculated options" className="mt-3 overflow-x-auto" tabIndex={0}>
     <table className="w-full min-w-[32rem] text-left text-xs"><caption className="mb-2 text-left">{draft&&!preview?'Saved baseline comparison; temporary edits are not verified.':'Existing calculated options; no new calculation or approval.'} Skills availability and hiring starts remain unverified.</caption><thead><tr><th scope="col" className="p-2">Compare</th>{ranked.cards.map((card,index)=><th scope="col" className="p-2" key={card.id}>Option {index+1}</th>)}</tr></thead><tbody>{['Expected result','Cost','Timing','Staffing','Why'].map(label=><tr key={label}><th scope="row" className="p-2 align-top">{label}</th>{ranked.cards.map(card=><td className="p-2 align-top" key={card.id}>{workforceOptionBullets(card.plan).filter(item=>item.label===label).map(item=><OptionBulletText key={item.label} bullet={item}/>)}</td>)}</tr>)}</tbody></table>
    </div>}
   </div>:undefined}>{(card,index)=>{
