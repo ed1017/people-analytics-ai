@@ -1,0 +1,36 @@
+// Built Home shell: resume actions must only navigate existing local work.
+import assert from 'node:assert/strict';
+import {emptyRetentionInput,calculateRetentionWhatIf} from '../../lib/retention-what-if.ts';
+import {retainRetentionReview} from '../../lib/retention-what-if-record.ts';
+import {createWorkforceSolution,emptySolutionInputs} from '../../lib/workforce-solution.ts';
+import {encodeDecisions,DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
+const at='2026-10-04T05:00:00.000Z',goals=[{id:'retention',statement:'Review retention in Technology'},{id:'fresh',statement:'Investigate a different workforce issue'},{id:'both',statement:'Review capacity and retention separately'},{id:'corrupt',statement:'Inspect retained invalid record'}],input={...emptyRetentionInput(),population:'Technology employees',startMonth:'2027-01',months:'12',baselineExpectedExits:'24',lagMonths:'3',activeBaselineMode:'uniform',effectLowPct:'10',effectHighPct:'20'};
+const review=goal=>retainRetentionReview(undefined,{id:'review-'+goal.id,goalId:goal.id,goalStatement:goal.statement,savedAt:at,input,result:calculateRetentionWhatIf(input)},{goalId:goal.id,goalStatement:goal.statement,input});
+const workspaces=Object.fromEntries(goals.map(goal=>[goal.id,{savedAt:at,fields:{chat:{messages:[],input:'Keep '+goal.id+' chat draft',problem:null,questionUnanswered:false}}}]));
+workspaces.retention.fields.retentionWhatIfV1=review(goals[0]);workspaces.both.fields.retentionWhatIfV1=review(goals[2]);workspaces.corrupt.fields.retentionWhatIfV1={broken:true};
+const capacityInputs=emptySolutionInputs();capacityInputs.scope.goalStatement=goals[2].statement;workspaces.both.fields.workforceSolution=createWorkforceSolution('capacity-both','both',capacityInputs,at);
+const seed={version:1,revision:1,goals:{version:1,activeId:'retention',goals},workspaces};
+let checks=0;const check=(label,value)=>{assert.ok(value,label);checks++;console.log('PASS '+label)};
+const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['200-percent',683,450]]){
+ const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:mode==='200-percent'?2:1}),page=await context.newPage();let posts=0,external=0;const errors=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.route('**/*',route=>{const request=route.request(),url=new URL(request.url());if(url.origin!=='http://127.0.0.1:3100'){external++;return route.abort()}if(url.pathname.startsWith('/api/')){if(request.method()==='POST')posts++;return route.fulfill({json:{summary:{total_exits:0,current_workforce:10},as_of:'2026-09-30'}})}return route.continue()});
+ await page.addInitScript(({key,seed})=>{if(!localStorage.getItem(key))localStorage.setItem(key,seed)},{key:DECISIONS_STORAGE_KEY,seed:encodeDecisions(seed)});
+ const button=name=>page.getByRole('button',{name,exact:true}),panel=page.getByRole('region',{name:'Retention what-if',exact:true}),scope=page.getByRole('region',{name:'Review workforce planning scope',exact:true}),state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY),goal=page.getByLabel('Selected goal',{exact:true});
+ await page.goto('http://127.0.0.1:3100/');await button('Continue retention what-if').waitFor();
+ check(mode+' primary action recognizes saved retention',await button('Compare workforce options').count()===0&&await button('Continue workforce options').count()===0);
+ await button('Continue retention what-if').click();await panel.getByLabel('Which aggregate population?',{exact:true}).waitFor();
+ check(mode+' one click resumes saved assumptions without scope review',await scope.count()===0&&await panel.getByLabel('Which aggregate population?',{exact:true}).inputValue()==='Technology employees');
+ check(mode+' resume focuses readable current step',await panel.getByRole('heading',{name:'1 of 4 — Scope and baseline',exact:true}).evaluate(node=>{const rect=node.getBoundingClientRect(),header=document.querySelector('main > header').getBoundingClientRect();return node===document.activeElement&&rect.top>=header.bottom&&rect.bottom<=innerHeight}));
+ await panel.getByLabel('Which aggregate population?',{exact:true}).fill('Keep unsaved retention draft');await panel.getByRole('button',{name:'Continue',exact:true}).click();await button('Continue retention what-if').click();
+ check(mode+' repeat resume keeps draft and current step',await panel.getByRole('heading',{name:'2 of 4 — Effect and timing',exact:true}).evaluate(node=>node===document.activeElement));await panel.getByRole('button',{name:'Back',exact:true}).click();check(mode+' repeat resume does not replace unsaved inputs',await panel.getByLabel('Which aggregate population?',{exact:true}).inputValue()==='Keep unsaved retention draft');
+ await page.screenshot({path:`/tmp/home-next-resume-${mode}.png`});
+ check(mode+' resume does not calculate save or alter chat',JSON.stringify((await state()).workspaces.retention.fields.retentionWhatIfV1)===JSON.stringify(seed.workspaces.retention.fields.retentionWhatIfV1)&&!(await state()).workspaces.retention.fields.workforceSolution&&await page.getByLabel('Ask Workforce AI',{exact:true}).inputValue()==='Keep retention chat draft'&&posts===0);
+ await goal.selectOption('fresh');await button('Compare workforce options').waitFor();check(mode+' unrelated goal requires initial scope review',await button('Continue retention what-if').count()===0&&await panel.count()===0);await button('Compare workforce options').click();check(mode+' new goal still opens explicit scope review',await scope.isVisible());await button('Return to conversation').click();
+ await goal.selectOption('both');await button('Continue workforce options').click();check(mode+' existing capacity route keeps precedence when both records exist',await button('Continue retention what-if').count()===0&&await page.getByRole('region',{name:'Workforce solution workspace',exact:true}).isVisible()&&JSON.stringify((await state()).workspaces.both.fields.workforceSolution)===JSON.stringify(seed.workspaces.both.fields.workforceSolution));
+ await goal.selectOption('corrupt');await button('Continue retention what-if').click();check(mode+' invalid retention record stays blocked and unchanged',await panel.getByRole('alert').filter({hasText:'Original data is retained'}).isVisible()&&(await state()).workspaces.corrupt.fields.retentionWhatIfV1.broken===true&&await panel.getByLabel('Which aggregate population?',{exact:true}).isDisabled());
+ await goal.selectOption('retention');await page.reload();await button('Continue retention what-if').click();check(mode+' reload resumes saved review with no new scope or implicit work',await scope.count()===0&&await panel.getByLabel('Which aggregate population?',{exact:true}).inputValue()==='Technology employees'&&posts===0);
+ check(mode+' no overflow external requests or runtime errors',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&external===0&&errors.length===0);
+ await context.close();
+}console.log(`${checks} Home resume browser assertions passed`)}finally{await browser.close()}
