@@ -35,6 +35,9 @@ try{for(const width of [1366,390]){
  const placeholder='Describe a business issue, and I’ll help you explore the evidence, compare options, and build or adjust a plan.';
  check(width+' Home guidance is an empty accessible placeholder',await home.getAttribute('placeholder')===placeholder&&await home.inputValue()===''&&await page.getByRole('textbox',{name:'Ask Workforce AI',exact:true}).count()===1);
  check(width+' placeholder fits the composer',await home.evaluate(el=>el.scrollHeight<=el.clientHeight));
+ const sizing=await home.evaluate(el=>{const height=el.getBoundingClientRect().height,minHeight=getComputedStyle(el).minHeight;el.style.minHeight='80px';const baselineHeight=el.getBoundingClientRect().height;el.style.removeProperty('min-height');return {viewport:innerWidth,rows:el.rows,height,baselineHeight,change:height-baselineHeight,lineHeight:getComputedStyle(el).lineHeight,minHeight}});
+ check(width+' sizing retains desktop baseline and adds only mobile room',sizing.rows===2&&(width===390?sizing.change===56:sizing.change===0));
+ console.log('COMPOSER '+JSON.stringify(sizing));
  check(width+' redundant helper copy removed',await page.getByText('Keep this focus across pages.',{exact:true}).count()===0&&await page.getByText('Choose an example to edit, then send when ready.',{exact:true}).count()===0);
  const development=page.getByText('In development',{exact:true}),details=page.getByRole('button',{name:'Open data details',exact:true});
  const developmentBox=await development.boundingBox(),detailsBox=await details.boundingBox();
