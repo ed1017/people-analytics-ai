@@ -229,6 +229,8 @@ export function ChatContent({
         <p
           key={`heading-${index}`}
           data-chat-heading={compact || undefined}
+          role={compact ? "heading" : undefined}
+          aria-level={compact ? 3 : undefined}
           className="font-semibold"
         >
           {renderInlineMarkdown(
