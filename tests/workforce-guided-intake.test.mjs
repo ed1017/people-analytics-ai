@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {nextRequiredWorkforceStep,workforceInputGroups} from '../lib/workforce-guided-intake.ts';
+import {nextRequiredWorkforceStep,workforceInputGroups,workforceInputDisplayValue} from '../lib/workforce-guided-intake.ts';
 import {emptyWorkforcePlanInput,workforcePlanFields} from '../lib/workforce-increment.ts';
 const scope={...emptyWorkforcePlanInput(),businessUnit:'TECH',jobProfile:'ENGINEER',intent:'additional',planningMonth:'2027-01',months:'12',roles:'3'};
 test('guide covers existing supported fields without changing the calculator contract',()=>assert.deepEqual(workforceInputGroups.flatMap(group=>group[2].map(([field])=>field)).sort(),[...workforcePlanFields].sort()));
@@ -10,3 +10,6 @@ test('optional blank costs and dates do not produce forced questions or zero def
 test('active internal paths require an explicit backfill count, then optional unknowns stay blank',()=>{const input={...scope,build:'1',move:'1',buy:'1'};assert.deepEqual(nextRequiredWorkforceStep(input),{section:'response',fields:['backfills']});assert.equal(nextRequiredWorkforceStep({...input,backfills:'0'}),null)});
 test('invalid totals route back to fields involved rather than advancing to review',()=>{const step=nextRequiredWorkforceStep({...scope,build:'1',move:'1',buy:'3',backfills:'0'});assert.ok(step);assert.ok(step.fields.includes('roles')||step.fields.includes('buy'))});
 test('historical arrival mode surfaces required launch date without deriving it from the planning month',()=>{const input={...scope,build:'0',move:'0',buy:'3',arrivalMode:'historical-median'};assert.deepEqual(nextRequiredWorkforceStep(input),{section:'timing',fields:['recruitingStart']});assert.equal(input.recruitingStart,'')});
+
+test('review uses exact matching catalog names without changing canonical inputs',()=>{const catalog={business_units:[{org_code:'BU-DATAAI',org_name:'Data & AI'}],job_profiles:[{job_profile_code:'AI-ENG',job_profile_name:'AI Engineer'}]},input={businessUnit:'BU-DATAAI',jobProfile:'AI-ENG'};assert.equal(workforceInputDisplayValue('businessUnit',input.businessUnit,catalog),'Data & AI');assert.equal(workforceInputDisplayValue('jobProfile',input.jobProfile,catalog),'AI Engineer');assert.deepEqual(input,{businessUnit:'BU-DATAAI',jobProfile:'AI-ENG'});assert.equal(workforceInputDisplayValue('roles','3',catalog),'3')});
+test('review falls back to canonical ID when catalog match or valid name is unavailable',()=>{for(const catalog of [undefined,null,[],{}, {business_units:{}},{business_units:[null,{org_code:'OTHER',org_name:'Wrong'},{org_code:'BU-DATAAI',org_name:' '}]},{business_units:[{org_code:'BU-DATAAI',org_name:42}]}])assert.equal(workforceInputDisplayValue('businessUnit','BU-DATAAI',catalog),'BU-DATAAI');assert.equal(workforceInputDisplayValue('jobProfile','AI-ENG',{job_profiles:[]}), 'AI-ENG')});

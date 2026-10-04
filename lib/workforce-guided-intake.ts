@@ -18,3 +18,14 @@ export function nextRequiredWorkforceStep(input:WorkforcePlanInput){
  const group=workforceInputGroups.find(([, ,fields])=>fields.some(([field])=>required.has(field)));
  return group?{section:group[0],fields:group[2].filter(([field])=>required.has(field)).map(([field])=>field)}:null;
 }
+
+// Presentation only: accept a nonempty display name for the exact canonical ID.
+export function workforceInputDisplayValue(field:WorkforcePlanField,value:string,catalog:unknown):string {
+ if(field!=='businessUnit'&&field!=='jobProfile')return value;
+ if(!catalog||typeof catalog!=='object'||Array.isArray(catalog))return value;
+ const unit=field==='businessUnit',rows=(catalog as Record<string,unknown>)[unit?'business_units':'job_profiles'];
+ if(!Array.isArray(rows))return value;
+ const code=unit?'org_code':'job_profile_code',name=unit?'org_name':'job_profile_name';
+ const match=rows.find(row=>row&&typeof row==='object'&&!Array.isArray(row)&&row[code]===value&&typeof row[name]==='string'&&row[name].trim());
+ return match?match[name].trim():value;
+}
