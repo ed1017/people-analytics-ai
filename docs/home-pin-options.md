@@ -1,6 +1,6 @@
 # Home problem → pin → options
 
-## Local dynamic-schema checkpoint — not deployed
+## Dynamic-schema correction
 
 The hosted `c087e78` attempt failed with `invalid_investigation`, three candidates and zero missing fields. The actual offending reference remains unknown; no raw response/log was inspected. Audit reproduced multiple schema-valid/runtime-invalid cases: the static schema allowed all 21 catalog IDs regardless of actual availability and allowed every operation with every metric. A synthetic packet with 11/18 loaded sources had only three resolvable catalog metrics.
 
@@ -11,6 +11,12 @@ Runtime inspection now reports fixed reasons for reference shape, duplicates, un
 Explicit problem references remain strict. Automatically unioning all candidate references into them would change the current binding rule and the meaning of the model-selected problem evidence; the current field also supports clarification-only proposals and is capped at three references, while a candidate union can contain six. Such derivation could be a separately versioned candidate-context design, explicitly not semantic proof. This narrow checkpoint does not silently fill or reinterpret missing bindings. Cross-field mismatch, duplicate references and nonempty-problem/empty-reference cases remain precise runtime failures rather than falsely claiming complete schema equivalence.
 
 Focused validation: 138 tests pass, including all 126 operation/metric pairs through the actual production decoder, missing/invalid values for all 21 metrics, the sparse 11/18 packet, suppressed/unavailable sources, legitimate empty fallback, exact remaining diagnostic reasons and packet immutability. Targeted lint and TypeScript pass. No full suite, browser rerun, build, push or live model call was performed for this checkpoint. The capability remains investigation cards, not intervention recommendations or solution predictions; hosted acceptance and the broader solution-options goal are unmet.
+
+The checkpoint was subsequently approved for full validation and an affected-browser run before publication. An offline harness now executes the actual Home `POST` handler with empty, sparse and fully populated synthetic packets, intercepting its Responses client and prohibiting network transport. It verifies the exact constructed `text.format`, the unchanged model/tool choice, packet-derived choices and null/empty fallback. It does not inspect real credentials or assert remote provider acceptance.
+
+The generated schemas were checked against [OpenAI’s Structured Outputs requirements](https://developers.openai.com/api/docs/guides/structured-outputs): object root (never root anyOf), all properties required, additionalProperties false, supported nested anyOf, nullable/null fields and minItems/maxItems for the non-fine-tuned model. The request tests also check the documented subset and conservative size/depth bounds. Strict problem/source binding remains unchanged; no candidate-reference union was introduced.
+
+Release-candidate validation after approval: 671 unit tests pass, including the three actual-route request-construction tests; lint, TypeScript and production build pass. All nine affected browser runs pass with 672 assertions (120 fixture/114 built Home pin assertions, fixture/built capacity flow, prompt auto-send, compact layout, planner resume, option composer and guided intake). Desktop/mobile/200% reflow are covered. No live model call or hosted acceptance attempt was made; the PR stays draft and unmerged pending exact-head acceptance.
 
 ## Current: reference-only investigation contract v2
 
