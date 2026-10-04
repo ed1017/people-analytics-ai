@@ -13,7 +13,7 @@ import {HomeActionOptions} from '@/components/home-action-options';
 import {homeCandidateVerification} from '@/lib/home-candidate-verification';
 import {HomeCandidateOptions} from '@/components/home-candidate-options';
 import {inspectHomeCandidateProposal,readHomePreparationDiagnostic,type HomePreparationDiagnostic,readHomeCandidateRecord,candidateSourceKey,candidateSelectionGoal,type HomeCandidateProposal} from '@/lib/home-candidate-options';
-import {createWorkforceSolution,emptySolutionInputs,readWorkforceSolution,currentSolutionVersion,solutionResultIsCurrent} from '@/lib/workforce-solution';
+import {readWorkforceSolution,currentSolutionVersion,solutionResultIsCurrent} from '@/lib/workforce-solution';
 import {readSavedWorkforceReview} from '@/lib/workforce-solution-review';
 import { GoalConversationMessages, ConversationMessages } from "@/components/goal-conversation-messages";
 import { buildHomePack, homeDefinitions, readHomeSource } from "@/lib/home-pack.mjs";
@@ -69,16 +69,6 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     if(hasPlan){revealJourneyTarget(planner.current?.querySelector<HTMLElement>('[aria-label="Workforce solution calculation"]')??planner.current?.querySelector<HTMLElement>('[data-home-planner-heading]')??planner.current);return;}
     if(hasRetention){setRetentionEntry(previous=>({id:conversation.activeGoalId,sequence:(previous?.sequence??0)+1}));return;}
     setPlanningReview({context:planningContext,goalId:conversation.activeGoalId,goal:conversation.focusedIssue||conversation.input.trim()||[...conversation.messages].reverse().find(message=>message.role==='user')?.content||''});
-  }
-  function reviewActionInputs(route:'capacity'|'retention_what_if'){
-    const snapshot=decisionStore.getSnapshot(),id=conversation.activeGoalId;
-    if(!id||snapshot.data.goals.activeId!==id||!snapshot.saved||conversation.loading)return;
-    if(route==='retention_what_if'){setRetentionEntry(previous=>({id,sequence:(previous?.sequence??0)+1}));return;}
-    if(snapshot.data.workspaces[id]?.fields.workforceSolution===undefined){
-      const inputs=emptySolutionInputs();inputs.scope={goalStatement:conversation.focusedIssue,intent:'additional'};
-      decisionStore.setField(id,'workforceSolution',createWorkforceSolution(crypto.randomUUID(),id,inputs,new Date().toISOString()));
-    }
-    requestAnimationFrame(()=>revealJourneyTarget(planner.current?.querySelector<HTMLElement>('[data-home-planner-heading]')??planner.current));
   }
   const [sourceResults, setSourceResults] = useState<Record<string, unknown>>({});
   const [loadedScope, setLoadedScope] = useState("");
@@ -322,7 +312,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       {active&&<WorkforceSolutionPanel hideEntry optionActions={optionActions} page="home" onNavigate={onNavigate}/>}
     </div>
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
-    <HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onReview={reviewActionInputs}/>
+    <HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/>
     {!hasAnswer&&!conversation.focusedIssue&&startingGuide}
     {loading && <p role="status" className="text-sm text-muted-foreground">Loading available evidence for your questions.</p>}
 
@@ -372,7 +362,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       <ol className="mt-4 list-decimal space-y-4 pl-4">
         <li><strong>Start with a question</strong><p>Ask AI to find an issue, or explore <button className="text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce</button> to investigate your own.</p></li>
         <li><strong>Pin the problem</strong><p>Review the concise problem and choose Pin as goal to see candidate actions. Pin makes one AI request for proposed pilots. Costs, timing, staffing and effects remain unknown until separately reviewed and calculated.</p></li>
-        <li><strong>Compare options</strong><p>Switch between proposed actions and open Evidence and limitations. To explore numbers, choose Review numerical assumptions and confirm the supported scope. Save reviewed inputs and Calculate remain explicit actions. Review assumptions with HR, business leaders and Finance before agreeing on action.</p></li>
+        <li><strong>Compare options</strong><p>Switch between proposed actions and open Evidence and limitations. To explore numbers, choose Tailor assumptions and confirm the supported scope. Calculate proposal runs local math; Save proposal saves the draft separately from confirmed plans. Review assumptions with HR, business leaders and Finance before agreeing on action.</p></li>
         <li><strong>Assess &amp; Evaluate <span className="font-normal text-muted-foreground">· Coming soon</span></strong><p>Track progress and assess whether the plan worked.</p></li>
       </ol>
       <p className="mt-4 text-xs text-muted-foreground">Demo only. Real-world actions happen outside this app.</p>

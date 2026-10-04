@@ -99,7 +99,7 @@ export function saveActionScenarioPatch(previous:unknown,scenario:ActionScenario
  const store=readActionScenarioStore(previous),valid=parseScenario(scenario);if(!store||!valid)throw Error('Saved action assumptions cannot be verified. Existing records are kept.');
  const index=store.entries.findIndex(item=>same(item.binding,valid.binding)&&item.actionSignature===valid.actionSignature);
  if(store.entries.some(item=>item.binding.goalId!==valid.binding.goalId))throw Error('The proposal store belongs to another goal.');
- if(index>=0){const latest=store.entries[index];if(valid.revision<latest.revision||valid.revision===latest.revision&&(!same(valid.inputs,latest.inputs)||!same(valid.origins,latest.origins)))throw Error('Saved assumptions changed. Reopen this proposal before replacing them.');}
+ if(index>=0){const latest=store.entries[index];if(valid.revision<latest.revision||valid.revision===latest.revision&&(!same(valid.inputs,latest.inputs)||!same(valid.origins,latest.origins)||!!latest.calculation&&(!valid.calculation||valid.calculation.revision<latest.calculation.revision)))throw Error('Saved assumptions changed. Reopen this proposal before replacing them.');}
  if(index<0)store.entries.push(valid);else store.entries[index]=valid;
  if(!readActionScenarioStore(store))throw Error('Action proposal storage limit reached. Existing records are kept.');
  return {field:homeActionScenarioField,value:store};
