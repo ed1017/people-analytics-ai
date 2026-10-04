@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
-const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});let checks=0;const output='/tmp/home-docked-layout';await fs.mkdir(output,{recursive:true});
+const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});let checks=0;const geometry=[];const output='/tmp/home-docked-layout';await fs.mkdir(output,{recursive:true});
 const check=(name,value)=>{assert.ok(value,name);checks++;console.log('PASS '+name)};
-try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['zoom',683,450]]){
+try{for(const [mode,width,height] of [['desktop',1366,900],['mid-desktop',1180,757],['mobile',390,900],['zoom',683,450]]){
  const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage();page.setDefaultTimeout(15000);const errors=[];let posts=0;
  page.on('pageerror',error=>errors.push(error.message));
  await page.addInitScript(()=>{const view=new EventTarget();Object.assign(view,{height:innerHeight,width:innerWidth,offsetTop:0});Object.defineProperty(window,'visualViewport',{value:view});window.resizeTestViewport=height=>{view.height=height;view.dispatchEvent(new Event('resize'));};});
@@ -14,6 +14,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  if(mode==='desktop')check('desktop storage precedes wider goal control on same row',await page.evaluate(()=>{const a=document.querySelector('.goal-storage summary').getBoundingClientRect(),b=document.querySelector('[aria-label="Selected goal"]').getBoundingClientRect();return a.right<b.left&&Math.abs(a.top-b.top)<10&&b.width>256;}));
  check(mode+' dock bottom aligned',await dock.evaluate(node=>Math.abs(node.getBoundingClientRect().bottom-innerHeight)<2));
  check(mode+' input and Send in same dock',await dock.getByLabel('Ask Workforce AI',{exact:true}).count()===1&&await dock.getByRole('button',{name:'Send overview question',exact:true}).count()===1);
+ check(mode+' default goal label has sufficient visible width',await page.getByLabel('Selected goal').evaluate(node=>{const canvas=document.createElement('canvas'),context=canvas.getContext('2d');context.font=getComputedStyle(node).font;return node.clientWidth>=context.measureText('General exploration').width+36;}));
  check(mode+' compact Questions section',await page.getByTestId('overview-starting-guide').evaluate(node=>parseFloat(getComputedStyle(node).paddingTop)===0));
  await input.fill('Explain the evidence');await send.click();await page.getByRole('heading',{name:'Issue A — Capacity',exact:true}).waitFor();check(mode+' supplied Issue headings and individual details render intact',await page.getByRole('heading',{name:'Issue A — Capacity',exact:true}).count()===1&&await page.getByRole('heading',{name:'Issue B — Support',exact:true}).count()===1&&(await page.getByRole('region',{name:'Overview conversation',exact:true}).innerText()).includes('Effects are not established.'));const next=page.getByRole('button',{name:'Compare workforce options',exact:true});await next.focus();await page.waitForTimeout(100);
  check(mode+' focused next action is above composer',await next.evaluate(node=>{const r=node.getBoundingClientRect(),d=document.querySelector('.home-composer-dock').getBoundingClientRect();return r.bottom<=d.top&&r.top>=document.querySelector('main > header').getBoundingClientRect().bottom;}));
@@ -21,6 +22,8 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  check(mode+' simulated keyboard keeps Send in visual viewport',await send.evaluate(node=>{const r=node.getBoundingClientRect();return r.bottom<=visualViewport.height&&r.top>=0;}));
  check(mode+' keyboard preserves text',await input.inputValue()==='Keep this draft');await page.evaluate(()=>window.resizeTestViewport(innerHeight));
  check(mode+' no horizontal overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));await page.waitForTimeout(100);check(mode+' footer links clear dock at page bottom',await page.evaluate(()=>{const dock=document.querySelector('.home-composer-dock').getBoundingClientRect();return [...document.querySelectorAll('footer a')].every(node=>{const box=node.getBoundingClientRect();return box.right<=dock.left||box.left>=dock.right||box.bottom<dock.top;});}));
+ geometry.push(await page.evaluate(mode=>{const rect=node=>{const r=node.getBoundingClientRect();return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,width:r.width}};return {mode,viewport:[innerWidth,innerHeight],scrollY,documentHeight:document.documentElement.scrollHeight,dock:rect(document.querySelector('.home-composer-dock')),email:rect(document.querySelector('footer a')),goal:rect(document.querySelector('[aria-label="Selected goal"]'))}},mode));
  await page.screenshot({path:output+'/'+mode+'.png',fullPage:true});check(mode+' no unexpected model calls or errors',posts===1&&errors.length===0);await context.close();
 }}finally{await browser.close()}
-console.log(JSON.stringify({checks,output}));
+console.log(JSON.stringify({checks,output,geometry}));

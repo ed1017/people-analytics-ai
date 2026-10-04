@@ -458,3 +458,12 @@
 }
 .home-keyboard-open .app-home-composer > header { position: relative; }
 .home-keyboard-open .home-workspace { --home-reading-header-height: 0px; }
+
+/* The dock also covers the page footer, so reserve clearance after the whole dashboard. */
+.app-home-composer .app-dashboard { padding-bottom: calc(var(--home-composer-height, 180px) + 1rem); }
+.app-home-composer .home-workspace { padding-bottom: 1rem; }
+.goal-toolbar [aria-label="Goal controls"] > label { min-width: min(100%, 14rem); }
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .global-workforce-filters > div { flex-wrap: wrap; }
+  .global-workforce-filters > div > div:first-child { flex-basis: 100%; }
+}
