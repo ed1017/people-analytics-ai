@@ -46,44 +46,46 @@ try{for(const width of [1366,390]){
   };
  },{key:DECISIONS_STORAGE_KEY,seed:encodeDecisions(data)});
  const workspace=page.getByRole('region',{name:'Workforce solution workspace',exact:true}),goal=page.getByLabel('Selected goal',{exact:true});
- const button=name=>workspace.getByRole('button',{name,exact:true}),heading=v=>workspace.getByRole('heading',{name:'Calculated decision brief — version '+v,exact:true});
+ const button=name=>workspace.getByRole('button',{name,exact:true,includeHidden:true}),heading=v=>workspace.getByRole('heading',{name:'Calculated decision brief — version '+v,exact:true});
+ const openPin=async version=>{const summary=workspace.getByText('Saved pins',{exact:true});if(!await summary.evaluate(el=>el.parentElement.open))await summary.click();await button('Open pinned version '+version).click()};
  const state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
  const releaseCards=async()=>{await page.waitForFunction(()=>window.pinReplies.some(item=>item.action==='cards'));await page.evaluate(()=>{window.holdPinVerification=false;const saved=window.pinReplies;window.pinReplies=[];saved.forEach(item=>item.release())})};
  const preserved=async()=>{const fields=(await state()).workspaces[goalId].fields;return ['versions','results','evidence','approvals'].every(key=>JSON.stringify(fields.workforceSolution[key])===JSON.stringify(history[key]))&&JSON.stringify(fields.workforceSolution.runs.slice(0,history.runs.length))===JSON.stringify(history.runs)&&fields.workforceSolution.pending===null&&JSON.stringify(fields.workforceSolutionPins)===JSON.stringify(data.workspaces[goalId].fields.workforceSolutionPins)&&fields.owner==='Keep owner'};
- await page.goto('http://127.0.0.1:3100/',{waitUntil:'domcontentloaded'});await heading(2).waitFor();
+ await page.goto('http://127.0.0.1:3100/',{waitUntil:'domcontentloaded'});await heading(2).waitFor();await workspace.getByText('Saved pins',{exact:true}).click();
  check(width+' reload restoration visibly blocks pin clicks',await button('Open pinned version 3').isDisabled()&&await workspace.getByRole('status').filter({hasText:'before opening pinned versions'}).isVisible());
- await releaseCards();await button('Open pinned version 3').click();await heading(3).waitFor();
+ await releaseCards();await openPin(3);await heading(3).waitFor();
  check(width+' normal pin opens exact v3', (await state()).workspaces[goalId].fields.workforceInspection==='result-v3');
- await button('Open pinned version 2').click();await heading(2).waitFor();
+ await openPin(2);await heading(2).waitFor();
  // Real goal selector with no settling delay between B and A.
  await page.evaluate(()=>{window.holdPinVerification=true});await goal.selectOption('goal-other');await goal.selectOption(goalId);await heading(2).waitFor();
  check(width+' rapid A-B-A blocks enabled-click restoration window',await button('Open pinned version 3').isDisabled());
- await releaseCards();await button('Open pinned version 3').click();await heading(3).waitFor();
+ await releaseCards();await openPin(3);await heading(3).waitFor();
  check(width+' first accepted pin click after restoration wins',(await state()).workspaces[goalId].fields.workforceInspection==='result-v3'&&await preserved());
  await page.reload({waitUntil:'domcontentloaded'});await heading(3).waitFor();check(width+' reload retains selected v3 and every saved record',await preserved());await releaseCards();
- await button('Open pinned version 2').click();await heading(2).waitFor();
+ await openPin(2);await heading(2).waitFor();
  // Hold an old pin resolution, leave its owner, then start a new pin request.
- await page.evaluate(()=>{window.holdPinResolve=true});await button('Open pinned version 3').click();await page.waitForFunction(()=>window.pinReplies.some(item=>item.action==='resolve-pin'));
- await goal.selectOption('goal-other');await goal.selectOption(goalId);await heading(2).waitFor();await button('Open pinned version 3').click();
+ await page.evaluate(()=>{window.holdPinResolve=true});await openPin(3);await page.waitForFunction(()=>window.pinReplies.some(item=>item.action==='resolve-pin'));
+ await goal.selectOption('goal-other');await goal.selectOption(goalId);await heading(2).waitFor();await openPin(3);
  await page.waitForFunction(()=>window.pinReplies.filter(item=>item.action==='resolve-pin').length===2);
  await page.evaluate(()=>{window.pinReplies.pop().release()});await heading(3).waitFor();
  await page.evaluate(()=>{window.pinReplies.shift().release();window.holdPinResolve=false});
  check(width+' older cancelled resolution cannot replace newer pin choice',(await state()).workspaces[goalId].fields.workforceInspection==='result-v3'&&await preserved());
  // A direct newer saved-result selection also cancels the older asynchronous pin.
- await button('Open pinned version 2').click();await heading(2).waitFor();await page.evaluate(()=>{window.holdPinResolve=true});await button('Open pinned version 3').click();await page.waitForFunction(()=>window.pinReplies.some(item=>item.action==='resolve-pin'));
- await workspace.getByLabel('Inspect a saved calculation',{exact:true}).selectOption('ready-result');await heading(1).waitFor();
+ await openPin(2);await heading(2).waitFor();await page.evaluate(()=>{window.holdPinResolve=true});await openPin(3);await page.waitForFunction(()=>window.pinReplies.some(item=>item.action==='resolve-pin'));
+ await workspace.getByText('Saved calculations',{exact:true}).click();await workspace.getByLabel('Inspect a saved calculation',{exact:true}).selectOption('ready-result');await heading(1).waitFor();
  await page.evaluate(()=>{window.pinReplies.shift().release();window.holdPinResolve=false});
  check(width+' newer explicit inspection wins over pending pin',(await state()).workspaces[goalId].fields.workforceInspection==='ready-result'&&await preserved());
  // Priority remains editable while a pin resolves. Cancelling that work must
  // release its busy state even when no what-if draft needs recalculation.
- await page.evaluate(()=>{window.holdPinResolve=true});await button('Open pinned version 3').click();await page.waitForFunction(()=>window.pinReplies.some(item=>item.action==='resolve-pin'));
- await workspace.getByLabel('Your comparison priority',{exact:true}).selectOption('cash');
+ await page.evaluate(()=>{window.holdPinResolve=true});await openPin(3);await page.waitForFunction(()=>window.pinReplies.some(item=>item.action==='resolve-pin'));
+ await workspace.getByText('Comparison preference',{exact:true}).click();await workspace.getByLabel('Your comparison priority',{exact:true}).selectOption('cash');
  await page.evaluate(()=>{window.pinReplies.shift().release();window.holdPinResolve=false});
  check(width+' priority change cancels pending pin without leaving controls disabled',await button('Open pinned version 3').isEnabled()&&(await state()).workspaces[goalId].fields.workforceInspection==='ready-result');
- await button('Open pinned version 3').click();await heading(3).waitFor();
- const calculate=button('Calculate saved assumptions and compare hiring-only'),cancel=()=>button('Cancel pending request');
- await calculate.click();await cancel().waitFor();await page.waitForFunction(()=>JSON.parse(localStorage.getItem('insights-to-action.decisions.v1')).payload.workspaces['goal-readiness'].fields.workforceSolution.pending!==null);
- await cancel().click();await calculate.click();await cancel().waitFor();
+ await openPin(3);await heading(3).waitFor();
+ const calculate=button(/^Calculate (options|saved assumptions and compare hiring-only)$/),cancel=()=>button('Cancel pending request');
+ const openCalculate=async()=>{const summary=workspace.getByText('Calculate or update options',{exact:true});if(!await summary.evaluate(el=>el.parentElement.open))await summary.click();await calculate.click()};
+ await openCalculate();await cancel().waitFor();await page.waitForFunction(()=>JSON.parse(localStorage.getItem('insights-to-action.decisions.v1')).payload.workspaces['goal-readiness'].fields.workforceSolution.pending!==null);
+ await cancel().click();await openCalculate();await cancel().waitFor();
  const pending=(await state()).workspaces[goalId].fields.workforceSolution.pending;
  for(let attempt=0;releases.length<2&&attempt<200;attempt++)await page.waitForTimeout(10);assert.equal(releases.length,2,'Both synthetic calculations reached the mocked route');releases[0]();await page.waitForTimeout(100);
  check(width+' late cancelled calculation cannot clear the newer pending request',JSON.stringify((await state()).workspaces[goalId].fields.workforceSolution.pending)===JSON.stringify(pending)&&await calculate.isDisabled());
@@ -96,12 +98,12 @@ try{for(const width of [1366,390]){
  await page.evaluate(()=>{window.holdPinVerification=false;const replies=window.pinReplies;window.pinReplies=[];replies.forEach(item=>item.release({data:{ok:false,error:'Synthetic verification failure'}}))});
  await workspace.getByRole('status').filter({hasText:'Synthetic verification failure'}).waitFor();
  check(width+' failed verification settles pin readiness without erasing records',await button('Open pinned version 2').isEnabled()&&await preserved());
- await button('Open pinned version 2').click();await heading(2).waitFor();
- await button('Open pinned version 3').click();await heading(3).waitFor();
+ await openPin(2);await heading(2).waitFor();
+ await openPin(3);await heading(3).waitFor();
  check(width+' explicit pin navigation recovers after verification failure',(await state()).workspaces[goalId].fields.workforceInspection==='result-v3'&&await preserved());
  check(width+' only local mocked APIs and no browser errors',nonlocal===0&&calculations===2&&errors.length===0);
  check(width+' mobile and desktop content fits viewport',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
- await page.evaluate(()=>{window.holdPinResolve=true});await button('Open pinned version 2').click();await page.waitForFunction(()=>window.pinReplies.some(item=>item.action==='resolve-pin'));
+ await page.evaluate(()=>{window.holdPinResolve=true});await openPin(2);await page.waitForFunction(()=>window.pinReplies.some(item=>item.action==='resolve-pin'));
  await page.getByRole('button',{name:'Read or edit Focused issue: '+goalStatement,exact:true}).click();
  page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'Remove goal',exact:true}).click();
  await page.evaluate(()=>{window.pinReplies.shift().release();window.holdPinResolve=false});

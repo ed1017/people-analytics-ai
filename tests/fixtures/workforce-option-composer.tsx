@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
-import {WorkforceSolutionPanel} from '@/components/workforce-solution-panel';
 import {OverallOverviewPage} from '@/components/pages/overall-overview-page';
 import {useProblemConversation} from '@/components/problem-conversation';
 import {emptyDevelopmentSession} from '@/components/development-workspace';
@@ -21,7 +20,6 @@ function Fixture(){
  <button onClick={()=>conversation.updateFocusedIssue('Changed synthetic goal')}>Change goal wording</button>
  <button onClick={()=>conversation.removeGoal()}>Delete goal</button>
  <button onClick={()=>{const prior=document.querySelector<HTMLButtonElement>('[aria-label="Workforce option actions"] button');conversation.setInput('Keep queued draft');prior?.click()}}>Queue draft then suggestion</button>
- <WorkforceSolutionPanel page="home" onNavigate={noop} optionActions={actions}/>
  <OverallOverviewPage optionActions={actions} onStartDemo={noop} active persona="HR" onNavigate={noop} workforceQuery="?country=all" workforceScope="Synthetic all countries" conversation={conversation} developmentSession={development} countryOptions={[]} onCountry={noop} onEvidencePack={noop} marketReference={null}/>
  </main>;
 }

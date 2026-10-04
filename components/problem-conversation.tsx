@@ -96,6 +96,22 @@ export function useProblemConversation() {
     setMessages(previous=>previous.length ? [...previous,{role:"assistant",content:"Goal edited. Earlier messages remain for reference and will not be reused as AI context."}] : previous);
     persist({...current,goals:current.goals.map(g=>g.id===current.activeId ? {...g,statement:clean} : g)});
   };
+  // Explicit local planner handoff: retain the entire transcript and unfinished draft.
+  const confirmWorkforceGoal = (statement: string): string => {
+    const clean = statement.trim(), current = goalsRef.current;
+    if (!storageReady || !decisionStore.getSnapshot().saved || loading || issueEditor) throw Error("Finish the current edit or request and make sure browser storage is available.");
+    if (!clean || clean.length > 240) throw Error("Review a goal between 1 and 240 characters; nothing has been shortened automatically.");
+    if (current.activeId) {
+      if (current.goals.find(goal=>goal.id===current.activeId)?.statement !== clean) throw Error("The saved goal changed. Reopen the scope review.");
+      return current.activeId;
+    }
+    if (current.goals.some(goal=>goal.statement.toLocaleLowerCase()===clean.toLocaleLowerCase())) throw Error("This goal is already saved. Select it from your goals to continue; your draft is retained.");
+    if (current.goals.length >= MAX_GOALS) throw Error("Your saved goals are full. Select an existing goal to continue; your draft is retained.");
+    const id = crypto.randomUUID();
+    chats.current.set(id,{messages,input,problem,questionUnanswered});
+    activate({...current,activeId:id,goals:[...current.goals,{id,statement:clean}]});
+    return id;
+  };
   const removeGoal = () => {
     const current = goalsRef.current; if (!current.activeId) return;
     chats.current.delete(current.activeId);
@@ -119,7 +135,7 @@ export function useProblemConversation() {
   const clearAllGoals = () => {
     cancelPending(); chats.current.clear(); history.current={key:"",messages:[]}; setMessages([]); setInput(""); setProblem(null); setQuestionUnanswered(false); setFocusedIssue(""); setIssueEditor(null); setError(null); setWorkspaceRevision(v=>v+1); persist(emptyLocalGoals(),true);
   };
-  return { saved:decisionStorage.saved, retrySave:()=>decisionStore.retry(), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
+  return { confirmWorkforceGoal, saved:decisionStorage.saved, retrySave:()=>decisionStore.retry(), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
 }
 export type ProblemConversation = ReturnType<typeof useProblemConversation>;
 

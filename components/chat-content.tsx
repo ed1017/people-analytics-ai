@@ -97,8 +97,10 @@ function isMarkdownTableSeparator(
 export function ChatContent({
   content,
   onNavigate,
+  compact = false,
 }: {
   content: string;
+  compact?: boolean;
   onNavigate?: (page: AppPage) => void;
 }) {
   const references: string[] = [];
@@ -152,7 +154,7 @@ export function ChatContent({
           key={`table-${index}`}
           className="my-3 overflow-x-auto rounded-lg border"
         >
-          <table className="w-full min-w-[560px] text-[15px]">
+          <table className={compact ? "w-full min-w-[560px] text-sm" : "w-full min-w-[560px] text-[15px]"}>
             <thead className="bg-muted/40">
               <tr>
                 {headers.map(
@@ -206,6 +208,7 @@ export function ChatContent({
     }
 
     if (!trimmed) {
+      if (compact) { index += 1; continue; }
       rendered.push(
         <div
           key={`space-${index}`}
@@ -225,6 +228,7 @@ export function ChatContent({
       rendered.push(
         <p
           key={`heading-${index}`}
+          data-chat-heading={compact || undefined}
           className="font-semibold"
         >
           {renderInlineMarkdown(
@@ -246,6 +250,7 @@ export function ChatContent({
       rendered.push(
         <div
           key={`bullet-${index}`}
+          data-chat-item={compact || undefined}
           className="flex gap-2"
         >
           <span className="text-muted-foreground">
@@ -272,6 +277,7 @@ export function ChatContent({
       rendered.push(
         <div
           key={`number-${index}`}
+          data-chat-item={compact || undefined}
           className="flex gap-2"
         >
           <span className="min-w-5 text-muted-foreground">
@@ -301,7 +307,7 @@ export function ChatContent({
   }
 
   return (
-    <div className="space-y-2 leading-relaxed">
+    <div className={compact ? "home-answer text-sm leading-[1.5]" : "space-y-2 leading-relaxed"}>
       {rendered}
       {references.length > 0 && <aside aria-label="Answer sources" className="mt-2 space-y-0.5 border-t border-border/40 pt-1">
         {references.map((reference, referenceIndex) => <div key={referenceIndex} className="text-[11px] leading-relaxed">{renderInlineMarkdown(reference, onNavigate)}</div>)}
