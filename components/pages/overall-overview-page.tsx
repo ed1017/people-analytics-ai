@@ -204,7 +204,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       const answer = reply.answer;
       if(reply.proposal){
         const captured={proposal:reply.proposal,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack),context:key,epoch:candidateEpoch,originGoalId:conversation.activeGoalId};
-        if(conversation.activeGoalId)decisionStore.setField(conversation.activeGoalId,'homeCandidateOptions',{version:1,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:captured.sourceKey,proposal:reply.proposal});
+        if(conversation.activeGoalId)decisionStore.setField(conversation.activeGoalId,'homeCandidateOptions',{version:2,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:captured.sourceKey,proposal:reply.proposal});
         else setCandidate(captured);
       }
       setPreparationUnavailable(reply.proposal?null:{context:key,diagnostic:reply.diagnostic,stage:reply.diagnosticStage});
@@ -213,7 +213,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       setMessages(current => [...current, { role: "assistant", content: answer }]);
       modelHistoryRef.current = completeScopedChatTurn(key, history, message, answer);
       if (!actionPlan) { conversation.rememberQuestion(key, message); setQuestionUnanswered(false); }
-      window.requestAnimationFrame(() => { if(reply.proposal&&conversation.focusedIssue){const heading=conversationViewport.current?.querySelector<HTMLElement>('[aria-label="Options for your goal"] h2');heading?.focus({preventScroll:true});heading?.scrollIntoView({block:'start'});return;} const viewport=conversationViewport.current,answers=viewport?.querySelectorAll<HTMLElement>('[data-chat-role="assistant"]'),answer=answers?.[answers.length-1]; if(viewport&&answer)viewport.scrollTop+=answer.getBoundingClientRect().top-viewport.getBoundingClientRect().top; });
+      window.requestAnimationFrame(() => { if(reply.proposal&&conversation.focusedIssue){const heading=conversationViewport.current?.querySelector<HTMLElement>('[aria-label="Investigation options for your goal"] h2');heading?.focus({preventScroll:true});heading?.scrollIntoView({block:'start'});return;} const viewport=conversationViewport.current,answers=viewport?.querySelectorAll<HTMLElement>('[data-chat-role="assistant"]'),answer=answers?.[answers.length-1]; if(viewport&&answer)viewport.scrollTop+=answer.getBoundingClientRect().top-viewport.getBoundingClientRect().top; });
       return Boolean(reply.proposal);
     } catch (error) { if (!request.current() || currentEvidenceKey.current !== key || candidateEpoch!==promptEpoch.current) return; setChatError(error instanceof Error ? error.message : "Answer unavailable. Please try again."); if (!actionPlan&&!preserveDraft) setInput(current=>current.trim()?current:message); }
     finally { if(sending.current===sendTicket)sending.current=null; if (request.current() && currentEvidenceKey.current === key) setChatLoading(false); }
@@ -242,11 +242,11 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     try{
       const id=conversation.confirmWorkforceGoal(problem);
       if(!decisionStore.getSnapshot().saved)throw Error('Goal remains unsaved in this tab. Resolve browser storage before continuing.');
-      if(problem===candidate.proposal.problem)decisionStore.setField(id,'homeCandidateOptions',{version:1,goalId:id,goal:problem,selectionGoal:candidate.selectionGoal,sourceKey:candidate.sourceKey,proposal:candidate.proposal});
+      if(problem===candidate.proposal.problem)decisionStore.setField(id,'homeCandidateOptions',{version:2,goalId:id,goal:problem,selectionGoal:candidate.selectionGoal,sourceKey:candidate.sourceKey,proposal:candidate.proposal});
       setCandidate(null);
     }catch(error){setCandidateNotice(error instanceof Error?error.message:'The goal could not be pinned. Your draft is kept.')}
   }
-  const candidatePanel=!hasCalculatedPlan&&(conversation.focusedIssue||candidateCurrent)?<HomeCandidateOptions goal={conversation.focusedIssue} proposal={conversation.focusedIssue?savedCandidate?.proposal??null:candidateCurrent?candidate!.proposal:null} sources={conversation.focusedIssue?savedCandidatePack.sources:buildHomePack(sourceResults,workforceScope,candidate?.selectionGoal??'',developmentSession).sources} busy={chatLoading||suggestionPending||!conversation.saved} ready={ready&&active} stale={Boolean(conversation.focusedIssue&&storedCandidate&&!savedCandidate)} onPin={pinProblem} onGenerate={()=>void send('Generate qualitative candidate options for my pinned goal using the current supplied evidence. Keep unsupported costs, timing and staffing unknown.',false,false,true)} onRefine={answer=>send(answer,false,false,true)} onQuantify={compareWorkforceOptions} onNavigate={onNavigate}/>:null;
+  const candidatePanel=!hasCalculatedPlan&&(conversation.focusedIssue||candidateCurrent)?<HomeCandidateOptions goal={conversation.focusedIssue} proposal={conversation.focusedIssue?savedCandidate?.proposal??null:candidateCurrent?candidate!.proposal:null} pack={conversation.focusedIssue?savedCandidatePack:buildHomePack(sourceResults,workforceScope,candidate?.selectionGoal??'',developmentSession)} busy={chatLoading||suggestionPending||!conversation.saved} ready={ready&&active} stale={Boolean(conversation.focusedIssue&&storedCandidate&&!savedCandidate)} onPin={pinProblem} onGenerate={()=>void send('Generate qualitative candidate options for my pinned goal using the current supplied evidence. Keep unsupported costs, timing and staffing unknown.',false,false,true)} onRefine={answer=>send(answer,false,false,true)} onQuantify={compareWorkforceOptions} onNavigate={onNavigate}/>:null;
   const finishScopeRequest = useEffectEvent((pending:PendingScope, cancel:boolean) => {
     if (pendingScopeRef.current!==pending) return;
     pendingScopeRef.current=null;setPendingScope(null);

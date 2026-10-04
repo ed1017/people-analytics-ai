@@ -1340,7 +1340,7 @@ Style:
 `.trim(),
     };
 
-    const openingInstructions = goalContextInstructions+"\n"+goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions()+"\nUse only supplied evidence; never treat user statements as source facts. Company-wide evidence remains company-wide regardless of selected filters. Links use allowlisted app destinations. "+(page==="home"?"Return the Home JSON answer with next_step set to none, problem:null, options:[] and question:null.":"");
+    const openingInstructions = goalContextInstructions+"\n"+goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions()+"\nUse only supplied evidence; never treat user statements as source facts. Company-wide evidence remains company-wide regardless of selected filters. Links use allowlisted app destinations. "+(page==="home"?"Return the Home JSON answer with next_step set to none, problem:null, problem_evidence:[], options:[] and question:null.":"");
 
     const aiInstructions = `
 You are the People Analytics AI embedded in a workforce dashboard.

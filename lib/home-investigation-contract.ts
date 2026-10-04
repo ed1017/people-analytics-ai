@@ -1,6 +1,6 @@
 import {normalizeHomePack} from './home-pack.mjs';
 
-// Output-only v2 prototype. Not connected to the live decoder until contract review.
+// Output-only v2 contract. The model selects operations/references, never card claims or values.
 // References address this catalog, never user-supplied object paths or values.
 export const investigationOperations = [
  'review_capacity','review_hiring_pipeline','review_recorded_exits',
@@ -38,6 +38,8 @@ export type InvestigationProposal={version:2;problem:string;problem_evidence:Inv
 export type InvestigationEvidence={id:InvestigationMetricId;sourceId:string;label:string;value:number;unit:string;scope:string;date:string|null;population:string;limitation:string;sourceLabel:string;page:string};
 const object=(raw:unknown):Record<string,unknown>|null=>raw!==null&&typeof raw==='object'&&!Array.isArray(raw)?raw as Record<string,unknown>:null;
 const exact=(raw:Record<string,unknown>,keys:string[])=>Object.keys(raw).length===keys.length&&keys.every(key=>Object.hasOwn(raw,key));
+const numbers=/\p{N}|[$€£%]|\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|dozen|half|quarter|double[sd]?|doubling|triple[sd]?|tripling|twofold|threefold|fourfold|tenfold|percent|percentage|per cent)\b/iu;
+export const nonquantitativeProblem=(raw:unknown)=>typeof raw==='string'&&!numbers.test(raw);
 const text=(raw:unknown,max:number)=>typeof raw==='string'&&raw.trim()&&raw.length<=max?raw.trim():null;
 const isMetric=(raw:unknown):raw is InvestigationMetricId=>typeof raw==='string'&&Object.hasOwn(investigationMetrics,raw);
 function resolve(raw:unknown,pack:ReturnType<typeof normalizeHomePack>):InvestigationEvidence|null{
@@ -56,7 +58,7 @@ function refs(raw:unknown,max:number,pack:ReturnType<typeof normalizeHomePack>):
 export function readInvestigationProposal(raw:unknown,input:unknown):InvestigationProposal|null{
  const value=object(raw);if(!value||!exact(value,['version','problem','problem_evidence','options','question'])||value.version!==2)return null;
  const problem=text(value.problem,240),question=value.question===null?null:text(value.question,200);
- if(!problem||value.question!==null&&!question||question&&(question.match(/\?/g)?.length??0)>1)return null;
+ if(!problem||!nonquantitativeProblem(problem)||value.question!==null&&!question||question&&(question.match(/\?/g)?.length??0)>1)return null;
  const pack=normalizeHomePack(input),problemEvidence=refs(value.problem_evidence,3,pack);
  if(!problemEvidence||!Array.isArray(value.options)||value.options.length>3)return null;
  const problemSources=new Set(problemEvidence.map(id=>investigationMetrics[id].source));
@@ -96,3 +98,10 @@ export function readInvestigationRecord(raw:unknown,goalId:string,goal:string,so
  return proposal?{version:2 as const,goalId,goal,sourceKey,selectionGoal:record.selectionGoal,proposal}:null;
 }
 export const investigationCandidateSchema={type:'object',additionalProperties:false,required:['operation','evidence'],properties:{operation:{type:'string',enum:[...investigationOperations]},evidence:{type:'array',minItems:1,maxItems:2,items:{type:'string',enum:Object.keys(investigationMetrics)}}}};
+
+// This catalog describes existing packet fields; no new evidence is sent to the model.
+export const investigationCatalogInstructions=Object.entries(investigationMetrics).map(([id,m])=>`${id}: source ${m.source}, facts.${m.field}, ${m.label} (${m.unit}; ${m.kind}); operation ${m.operation}`).join('\n');
+export function resolveInvestigationEvidence(ids:InvestigationMetricId[],input:unknown){
+ const pack=normalizeHomePack(input);
+ return ids.map(id=>resolve(id,pack)).filter((item):item is InvestigationEvidence=>item!==null);
+}

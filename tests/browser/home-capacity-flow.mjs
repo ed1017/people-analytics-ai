@@ -71,7 +71,7 @@ try{for(const mode of [{name:'desktop',width:1366},{name:'mobile',width:390},{na
   if(await control.evaluate(el=>el.tagName==='SELECT'))await control.selectOption(value);else await control.fill(value);
  }
  checkHere('draft blocks calculation until explicit save',await button('Calculate options').isDisabled());
- await page.getByText('Quantify an option',{exact:true}).click();await button('Review numbers').click();checkHere('return to existing planner preserves edited assumptions',await page.locator('[data-journey-field="roles"]').inputValue()==='3');
+ await page.getByText('Compare workforce numbers',{exact:true}).click();await button('Review numbers').click();checkHere('return to existing planner preserves edited assumptions',await page.locator('[data-journey-field="roles"]').inputValue()==='3');
  await button('Save reviewed inputs').click();checkHere('save makes a version without calculating',(await solution()).versions.length===2&&posts.length===baseline&&(await solution()).results.length===0);
  await button('Calculate options').click();await page.getByRole('region',{name:'Workforce solution calculation',exact:true}).waitFor();await page.waitForTimeout(500);
  checkHere('explicit Calculate uses unchanged payload and existing calculator',posts.length===baseline+1&&posts.at(-1).path==='/api/workforce-solution'&&JSON.stringify(posts.at(-1).body)===JSON.stringify(plan));

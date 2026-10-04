@@ -27,3 +27,23 @@ test('old freeform v1 proposals and records cannot be interpreted as v2',()=>{as
 test('saved v2 candidates preserve exact goal and evidence snapshot binding',()=>{const record={version:2,goalId:'a',goal:proposal.problem,sourceKey:'snapshot',selectionGoal:'original',proposal};assert.deepEqual(readInvestigationRecord(record,'a',proposal.problem,'snapshot',pack),record);assert.equal(readInvestigationRecord(record,'b',proposal.problem,'snapshot',pack),null);assert.equal(readInvestigationRecord(record,'a','Changed','snapshot',pack),null);assert.equal(readInvestigationRecord(record,'a',proposal.problem,'changed',pack),null)});
 test('normalization round-trip preserves server/client contract and metadata',()=>{assert.deepEqual(readInvestigationProposal(proposal,normalizeHomePack(pack)),proposal);assert.deepEqual(renderInvestigationCandidate(capacity,normalizeHomePack(pack)),renderInvestigationCandidate(capacity,pack))});
 test('schema accepts only operation and catalog IDs, not free-form claims',()=>{assert.deepEqual(investigationCandidateSchema.required,['operation','evidence']);assert.equal(investigationCandidateSchema.additionalProperties,false);assert.deepEqual(investigationCandidateSchema.properties.evidence.items.enum,Object.keys(investigationMetrics))});
+const contracts=[
+ ['W1.headcount','employees','count'],['W1.fte','FTE','number'],['W1.open_positions','positions','count'],['P2.vacant_positions','positions','count'],
+ ['R1.open_requisitions','requisitions','count'],['R1.median_time_to_fill_days','days','number'],['R1.offer_acceptance_pct','%','percent'],
+ ['A1.voluntary_exits','exits','count'],['A1.regrettable_exits','exits','count'],['A1.voluntary_turnover_ytd_pct','%','percent'],
+ ['S1.engagement_favorable_pct','%','percent'],['S1.manager_favorable_pct','%','percent'],['S1.pulse_favorable_pct','%','percent'],['S2.exit_respondents','respondents','count'],
+ ['T1.skills_below_75_pct','skills','count'],['T1.weighted_requirement_met_pct','%','percent'],['T2.gap_pathway_coverage_pct','%','percent'],['T2.active_courses_on_gap_skills','courses','count'],
+ ['T3.preference_record_coverage_pct','%','percent'],['T3.relocation_willing_pct','%','percent'],['T4.total_recorded_events','events','count'],
+];
+for(const [id,unit,kind] of contracts)test('metric contract: '+id,()=>{
+ const [source,field]=id.split('.'),operation=investigationMetrics[id].operation,candidate={operation,evidence:[id]};
+ const input=value=>({workforceScope:'UK engineering',sources:[{id:source,status:'loaded',date:'2026-09-30',facts:{[field]:value}}]});
+ const card=renderInvestigationCandidate(candidate,input(12));assert.equal(card.evidence[0].unit,unit);assert.equal(card.evidence[0].date,'2026-09-30');assert.equal(card.evidence[0].value,12);assert.equal(card.evidence[0].scope,source==='W1'?'Selected workforce snapshot: UK engineering':homeDefinitions.find(d=>d[0]===source)[4]);assert.equal(card.evidence[0].limitation,homeDefinitions.find(d=>d[0]===source)[6]);
+ for(const value of [null,undefined,'12',NaN,-1])assert.equal(renderInvestigationCandidate(candidate,input(value)),null);
+ assert.equal(renderInvestigationCandidate(candidate,input(0)).evidence[0].value,0);
+ assert.equal(renderInvestigationCandidate(candidate,{sources:[{id:source,status:'loaded',facts:{[field]:12}}]}).evidence[0].date,null);
+ assert.equal(renderInvestigationCandidate(candidate,input(kind==='count'?1.5:kind==='percent'?101:Infinity)),null);
+ assert.equal(renderInvestigationCandidate(candidate,{sources:[{id:source,status:'loaded',facts:{[field]:12,suppressed:true}}]}),null);
+});
+test('bounded exact problem has no numerical claims; user-confirmed goals are untouched',()=>{for(const problem of ['Investigate 12 departures','Investigate twelve departures','Investigate ２０％ savings'])assert.equal(readInvestigationProposal({...proposal,problem},pack),null);assert.equal(readInvestigationProposal({...proposal,problem:'Investigate the recorded engineering constraint'},pack).problem,'Investigate the recorded engineering constraint')});
+test('three distinct metrics remain three and repeated refs are not fabricated alternatives',()=>{const options=[capacity,{...capacity,evidence:['W1.fte']},{...capacity,evidence:['W1.open_positions']}];assert.equal(readInvestigationProposal({...proposal,options},pack).options.length,3);assert.equal(readInvestigationProposal({...proposal,options:Array(4).fill(capacity)},pack),null);assert.equal(readInvestigationProposal({...proposal,options:[{...capacity,evidence:['W1.headcount','W1.headcount']}]},pack),null)});

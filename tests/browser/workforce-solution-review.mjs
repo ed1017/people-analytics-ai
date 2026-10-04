@@ -35,7 +35,7 @@ try {
   });
   await page.addInitScript(({key,seed})=>{if(!localStorage.getItem(key))localStorage.setItem(key,seed);},{key,seed:encodeDecisions(seed)});
   await page.goto(baseURL,{waitUntil:'domcontentloaded',timeout:120000});
-  await page.getByText('Quantify an option',{exact:true}).click();await page.getByRole('button',{name:'Review numbers',exact:true}).click();
+  await page.getByText('Compare workforce numbers',{exact:true}).click();await page.getByRole('button',{name:'Review numbers',exact:true}).click();
   await page.getByRole('radio',{name:/^Yes/}).check();
   await page.getByRole('button',{name:'Confirm goal and review inputs',exact:true}).click();
   const workspace=page.getByRole('region',{name:'Workforce solution workspace',exact:true});
