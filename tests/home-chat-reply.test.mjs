@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {decodeHomeModelReply, homeReplyFormat, homeGoalChoiceInstructions,homeResponseStyle} from '../lib/home-chat-reply.ts';
+import {decodeHomeModelReply, buildHomeReplyFormat, homeGoalChoiceInstructions,homeResponseStyle} from '../lib/home-chat-reply.ts';
+const homeReplyFormat=buildHomeReplyFormat();
 test('goal options follow explicit structured state, never prose matching',()=>{
   assert.equal(decodeHomeModelReply(JSON.stringify({answer:'Retention or capability building?',next_step:'none'}),false).nextStep,'none');
   assert.equal(decodeHomeModelReply(JSON.stringify({answer:'Which business goal should guide us?',next_step:'choose_goal'}),false).nextStep,'choose_goal');

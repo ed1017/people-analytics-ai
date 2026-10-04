@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readInvestigationProposal,renderInvestigationCandidate,readInvestigationRecord,investigationMetrics,investigationOperations,investigationCandidateSchema} from '../lib/home-investigation-contract.ts';
+import {readInvestigationProposal,renderInvestigationCandidate,readInvestigationRecord,investigationMetrics,investigationOperations,buildInvestigationCandidateSchema,availableInvestigationMetrics} from '../lib/home-investigation-contract.ts';
 import {normalizeHomePack,homeDefinitions} from '../lib/home-pack.mjs';
 const pack={workforceScope:'Engineering / UK',sources:[
  {id:'W1',status:'loaded',date:'2026-09-30',facts:{headcount:12,fte:10.5,open_positions:0}},
@@ -26,7 +26,7 @@ test('problem evidence must resolve; selection is binding not proof of causal re
 test('old freeform v1 proposals and records cannot be interpreted as v2',()=>{assert.equal(readInvestigationProposal({...proposal,version:1},pack),null);assert.equal(readInvestigationProposal({...proposal,options:[{title:'Review capacity',outcome:'Clarify capacity',why:'12 employees',source_ids:['W1']}]},pack),null);const record={version:1,goalId:'a',goal:proposal.problem,sourceKey:'snapshot',selectionGoal:'',proposal};const snapshot=structuredClone(record);assert.equal(readInvestigationRecord(record,'a',proposal.problem,'snapshot',pack),null);assert.deepEqual(record,snapshot)});
 test('saved v2 candidates preserve exact goal and evidence snapshot binding',()=>{const record={version:2,goalId:'a',goal:proposal.problem,sourceKey:'snapshot',selectionGoal:'original',proposal};assert.deepEqual(readInvestigationRecord(record,'a',proposal.problem,'snapshot',pack),record);assert.equal(readInvestigationRecord(record,'b',proposal.problem,'snapshot',pack),null);assert.equal(readInvestigationRecord(record,'a','Changed','snapshot',pack),null);assert.equal(readInvestigationRecord(record,'a',proposal.problem,'changed',pack),null)});
 test('normalization round-trip preserves server/client contract and metadata',()=>{assert.deepEqual(readInvestigationProposal(proposal,normalizeHomePack(pack)),proposal);assert.deepEqual(renderInvestigationCandidate(capacity,normalizeHomePack(pack)),renderInvestigationCandidate(capacity,pack))});
-test('schema accepts only operation and catalog IDs, not free-form claims',()=>{assert.deepEqual(investigationCandidateSchema.required,['operation','evidence']);assert.equal(investigationCandidateSchema.additionalProperties,false);assert.deepEqual(investigationCandidateSchema.properties.evidence.items.enum,Object.keys(investigationMetrics))});
+test('schema accepts only operation and catalog IDs, not free-form claims',()=>{const schema=buildInvestigationCandidateSchema(availableInvestigationMetrics(pack));for(const branch of schema.anyOf){assert.deepEqual(branch.required,['operation','evidence']);assert.equal(branch.additionalProperties,false);assert.ok(branch.properties.evidence.items.enum.every(id=>availableInvestigationMetrics(pack).includes(id)))}});
 const contracts=[
  ['W1.headcount','employees','count'],['W1.fte','FTE','number'],['W1.open_positions','positions','count'],['P2.vacant_positions','positions','count'],
  ['R1.open_requisitions','requisitions','count'],['R1.median_time_to_fill_days','days','number'],['R1.offer_acceptance_pct','%','percent'],

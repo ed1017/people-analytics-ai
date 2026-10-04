@@ -35,7 +35,7 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
   const inspected=inspectHomeCandidateProposal(data.candidateProposal,sources),proposal=inspected.proposal;
   const serverDiagnostic=readHomePreparationDiagnostic(data.candidateDiagnostic);
   const useServer=!data.candidateProposal&&serverDiagnostic&&serverDiagnostic.reason!=='ready';
-  const diagnostic=useServer?serverDiagnostic:data.candidateProposal?inspected.diagnostic:{reason:'diagnostic_unavailable' as const,optionCount:0,missingFieldCount:0};
+  const diagnostic=useServer?serverDiagnostic:data.candidateProposal?inspected.diagnostic:{reason:'diagnostic_unavailable' as const,field:'none' as const,optionCount:0,missingFieldCount:0};
   return { answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal, diagnostic, diagnosticStage:useServer?'server' as const:'client' as const };
 }
 
@@ -321,7 +321,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     </section>}
 
     {!conversation.focusedIssue&&candidatePanel}
-    {preparationUnavailable?.context===contextKey&&<section role="status" aria-label="Problem and options not prepared" className="space-y-1 rounded border p-3 text-sm"><p className="font-semibold">Problem and options not prepared</p><p>This answer has no validated problem and options to pin. Your work and drafts are kept; nothing was pinned or calculated. No retry runs automatically.</p><details><summary className="cursor-pointer py-1">Preparation details</summary><p>Stage: {preparationUnavailable.stage}. Reason: {preparationUnavailable.diagnostic.reason}. Candidate count (4 means 4 or more): {preparationUnavailable.diagnostic.optionCount}. Missing fields: {preparationUnavailable.diagnostic.missingFieldCount}.</p></details></section>}
+    {preparationUnavailable?.context===contextKey&&<section role="status" aria-label="Problem and options not prepared" className="space-y-1 rounded border p-3 text-sm"><p className="font-semibold">Problem and options not prepared</p><p>This answer has no validated problem and options to pin. Your work and drafts are kept; nothing was pinned or calculated. No retry runs automatically.</p><details><summary className="cursor-pointer py-1">Preparation details</summary><p>Stage: {preparationUnavailable.stage}. Reason: {preparationUnavailable.diagnostic.reason}. Field: {preparationUnavailable.diagnostic.field}. Candidate count (4 means 4 or more): {preparationUnavailable.diagnostic.optionCount}. Missing fields: {preparationUnavailable.diagnostic.missingFieldCount}.</p></details></section>}
     {candidateNotice&&<p role="status">{candidateNotice}</p>}
     </div>
 

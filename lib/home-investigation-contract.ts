@@ -42,38 +42,59 @@ const numbers=/\p{N}|[$€£%]|\b(zero|one|two|three|four|five|six|seven|eight|n
 export const nonquantitativeProblem=(raw:unknown)=>typeof raw==='string'&&!numbers.test(raw);
 const text=(raw:unknown,max:number)=>typeof raw==='string'&&raw.trim()&&raw.length<=max?raw.trim():null;
 const isMetric=(raw:unknown):raw is InvestigationMetricId=>typeof raw==='string'&&Object.hasOwn(investigationMetrics,raw);
-function resolve(raw:unknown,pack:ReturnType<typeof normalizeHomePack>):InvestigationEvidence|null{
- if(!isMetric(raw))return null;
+export const investigationFailureReasons=['reference_shape','duplicate_reference','unknown_metric','source_unavailable','metric_unavailable','metric_invalid','option_shape','operation_unknown','operation_mismatch','problem_source_mismatch'] as const;
+export type InvestigationFailureReason=typeof investigationFailureReasons[number];
+export const investigationDiagnosticFields=['none','proposal','problem','question','problem_evidence','options','options.operation','options.evidence'] as const;
+export type InvestigationDiagnosticField=typeof investigationDiagnosticFields[number];
+function metricFailure(raw:unknown,pack:ReturnType<typeof normalizeHomePack>):InvestigationFailureReason|null{
+ if(!isMetric(raw))return 'unknown_metric';
  const def=investigationMetrics[raw],source=pack.sources.find(item=>item.id===def.source);
- if(!source||source.status!=='loaded')return null;
- const facts=object(source.facts),value=facts?.[def.field];
- if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>1e15||def.kind==='count'&&!Number.isInteger(value)||def.kind==='percent'&&value>100)return null;
- // Scope, population, date and limitations come only from canonical packet normalization.
- return {id:raw,sourceId:def.source,label:def.label,value,unit:def.unit,scope:source.scope,date:source.date,population:source.population,limitation:source.limitation,sourceLabel:source.label,page:source.page};
+ if(!source||source.status!=='loaded')return 'source_unavailable';
+ const value=object(source.facts)?.[def.field];
+ if(value===null||value===undefined)return 'metric_unavailable';
+ if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>1e15||def.kind==='count'&&!Number.isInteger(value)||def.kind==='percent'&&value>100)return 'metric_invalid';
+ return null;
 }
-function refs(raw:unknown,max:number,pack:ReturnType<typeof normalizeHomePack>):InvestigationMetricId[]|null{
- if(!Array.isArray(raw)||!raw.length||raw.length>max||new Set(raw).size!==raw.length)return null;
- return raw.every(id=>resolve(id,pack))?raw as InvestigationMetricId[]:null;
+function resolve(raw:unknown,pack:ReturnType<typeof normalizeHomePack>):InvestigationEvidence|null{
+ if(metricFailure(raw,pack)||!isMetric(raw))return null;
+ const def=investigationMetrics[raw],source=pack.sources.find(item=>item.id===def.source)!;
+ return {id:raw,sourceId:def.source,label:def.label,value:object(source.facts)![def.field] as number,unit:def.unit,scope:source.scope,date:source.date,population:source.population,limitation:source.limitation,sourceLabel:source.label,page:source.page};
 }
-export function readInvestigationProposal(raw:unknown,input:unknown):InvestigationProposal|null{
- const value=object(raw);if(!value||!exact(value,['version','problem','problem_evidence','options','question'])||value.version!==2)return null;
+function inspectRefs(raw:unknown,max:number,pack:ReturnType<typeof normalizeHomePack>):{ids:InvestigationMetricId[]|null;reason:InvestigationFailureReason|null}{
+ if(!Array.isArray(raw)||!raw.length||raw.length>max)return {ids:null,reason:'reference_shape'};
+ if(new Set(raw).size!==raw.length)return {ids:null,reason:'duplicate_reference'};
+ for(const id of raw){const reason=metricFailure(id,pack);if(reason)return {ids:null,reason};}
+ return {ids:raw as InvestigationMetricId[],reason:null};
+}
+const refs=(raw:unknown,max:number,pack:ReturnType<typeof normalizeHomePack>)=>inspectRefs(raw,max,pack).ids;
+type ProposalFailure=InvestigationFailureReason|'invalid_envelope'|'invalid_problem'|'invalid_question'|'invalid_options'|'too_many_options'|'no_options_or_question';
+export function inspectInvestigationProposal(raw:unknown,input:unknown):{proposal:InvestigationProposal|null;reason:ProposalFailure|'ready';field:InvestigationDiagnosticField}{
+ const fail=(reason:ProposalFailure,field:InvestigationDiagnosticField)=>({proposal:null,reason,field});
+ const value=object(raw);if(!value||!exact(value,['version','problem','problem_evidence','options','question'])||value.version!==2)return fail('invalid_envelope','proposal');
  const problem=text(value.problem,240),question=value.question===null?null:text(value.question,200);
- if(!problem||!nonquantitativeProblem(problem)||value.question!==null&&!question||question&&(question.match(/\?/g)?.length??0)>1)return null;
- const pack=normalizeHomePack(input),problemEvidence=refs(value.problem_evidence,3,pack);
- if(!problemEvidence||!Array.isArray(value.options)||value.options.length>3)return null;
+ if(!problem||!nonquantitativeProblem(problem))return fail('invalid_problem','problem');
+ if(value.question!==null&&!question||question&&(question.match(/\?/g)?.length??0)>1)return fail('invalid_question','question');
+ const pack=normalizeHomePack(input),problemRefs=inspectRefs(value.problem_evidence,3,pack),problemEvidence=problemRefs.ids;
+ if(!problemEvidence)return fail(problemRefs.reason!,'problem_evidence');
+ if(!Array.isArray(value.options))return fail('invalid_options','options');
+ if(value.options.length>3)return fail('too_many_options','options');
  const problemSources=new Set(problemEvidence.map(id=>investigationMetrics[id].source));
  const options:InvestigationCandidate[]=[],seen=new Set<string>();
  for(const candidate of value.options){
-  const option=object(candidate);if(!option||!exact(option,['operation','evidence'])||!investigationOperations.includes(option.operation as InvestigationOperation))return null;
-  const operation=option.operation as InvestigationOperation,evidence=refs(option.evidence,2,pack);
-  if(!evidence||evidence.some(id=>investigationMetrics[id].operation!==operation||!problemSources.has(investigationMetrics[id].source)))return null;
+  const option=object(candidate);if(!option||!exact(option,['operation','evidence']))return fail('option_shape','options');
+  if(!investigationOperations.includes(option.operation as InvestigationOperation))return fail('operation_unknown','options.operation');
+  const operation=option.operation as InvestigationOperation,checked=inspectRefs(option.evidence,2,pack),evidence=checked.ids;
+  if(!evidence)return fail(checked.reason!,'options.evidence');
+  if(evidence.some(id=>investigationMetrics[id].operation!==operation))return fail('operation_mismatch','options.operation');
+  if(evidence.some(id=>!problemSources.has(investigationMetrics[id].source)))return fail('problem_source_mismatch','options.evidence');
   const identity=JSON.stringify([operation,[...evidence].sort()]);
   if(seen.has(identity))continue;
   seen.add(identity);options.push({operation,evidence});
  }
- if(!options.length&&!question)return null;
- return {version:2,problem,problem_evidence:problemEvidence,options,question};
+ if(!options.length&&!question)return fail('no_options_or_question','options');
+ return {proposal:{version:2,problem,problem_evidence:problemEvidence,options,question},reason:'ready',field:'none'};
 }
+export function readInvestigationProposal(raw:unknown,input:unknown){return inspectInvestigationProposal(raw,input).proposal;}
 const purpose:Record<InvestigationOperation,string>={
  review_capacity:'Clarify the recorded capacity baseline and what still needs verification.',
  review_hiring_pipeline:'Identify hiring-pipeline questions to investigate before estimating future capacity.',
@@ -97,7 +118,18 @@ export function readInvestigationRecord(raw:unknown,goalId:string,goal:string,so
  const proposal=readInvestigationProposal(record.proposal,input);
  return proposal?{version:2 as const,goalId,goal,sourceKey,selectionGoal:record.selectionGoal,proposal}:null;
 }
-export const investigationCandidateSchema={type:'object',additionalProperties:false,required:['operation','evidence'],properties:{operation:{type:'string',enum:[...investigationOperations]},evidence:{type:'array',minItems:1,maxItems:2,items:{type:'string',enum:Object.keys(investigationMetrics)}}}};
+// All generation constraints and runtime resolution share metricFailure/normalizeHomePack.
+export function availableInvestigationMetrics(input:unknown){
+ const pack=normalizeHomePack(input);
+ return (Object.keys(investigationMetrics) as InvestigationMetricId[]).filter(id=>!metricFailure(id,pack));
+}
+export function buildInvestigationCandidateSchema(available:InvestigationMetricId[]){
+ const anyOf=investigationOperations.flatMap(operation=>{
+  const ids=available.filter(id=>investigationMetrics[id].operation===operation);
+  return ids.length?[{type:'object',additionalProperties:false,required:['operation','evidence'],properties:{operation:{type:'string',enum:[operation]},evidence:{type:'array',minItems:1,maxItems:2,items:{type:'string',enum:ids}}}}]:[];
+ });
+ return anyOf.length?{anyOf}:{type:'null'};
+}
 
 // This catalog describes existing packet fields; no new evidence is sent to the model.
 export const investigationCatalogInstructions=Object.entries(investigationMetrics).map(([id,m])=>`${id}: source ${m.source}, facts.${m.field}, ${m.label} (${m.unit}; ${m.kind}); operation ${m.operation}`).join('\n');

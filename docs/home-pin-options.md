@@ -1,5 +1,17 @@
 # Home problem → pin → options
 
+## Local dynamic-schema checkpoint — not deployed
+
+The hosted `c087e78` attempt failed with `invalid_investigation`, three candidates and zero missing fields. The actual offending reference remains unknown; no raw response/log was inspected. Audit reproduced multiple schema-valid/runtime-invalid cases: the static schema allowed all 21 catalog IDs regardless of actual availability and allowed every operation with every metric. A synthetic packet with 11/18 loaded sources had only three resolvable catalog metrics.
+
+The local correction builds the Home output schema from the same normalized packet and metric resolver used by runtime validation. Candidate items use per-operation `anyOf` branches with a singleton operation and only currently resolvable metric IDs. Empty operations are omitted; problem references use the same availability set. With no eligible metric, the schema requires null problem/question and empty reference/options arrays. No empty enums, new input fields or new source data are introduced. The route builds one format for that request's packet and applies it to the initial and any existing follow-up Responses call; Home still uses tool_choice none and no new calls are introduced.
+
+Runtime inspection now reports fixed reasons for reference shape, duplicates, unknown metric, unavailable source, unavailable/invalid metric, option shape, unknown/incompatible operation, and problem/source mismatch. Diagnostics contain only these enums, a fixed field enum and bounded structural counts. No reference ID, value, token or text is exposed. Existing outer shape/problem/question checks remain.
+
+Explicit problem references remain strict. Automatically unioning all candidate references into them would change the current binding rule and the meaning of the model-selected problem evidence; the current field also supports clarification-only proposals and is capped at three references, while a candidate union can contain six. Such derivation could be a separately versioned candidate-context design, explicitly not semantic proof. This narrow checkpoint does not silently fill or reinterpret missing bindings. Cross-field mismatch, duplicate references and nonempty-problem/empty-reference cases remain precise runtime failures rather than falsely claiming complete schema equivalence.
+
+Focused validation: 138 tests pass, including all 126 operation/metric pairs through the actual production decoder, missing/invalid values for all 21 metrics, the sparse 11/18 packet, suppressed/unavailable sources, legitimate empty fallback, exact remaining diagnostic reasons and packet immutability. Targeted lint and TypeScript pass. No full suite, browser rerun, build, push or live model call was performed for this checkpoint. The capability remains investigation cards, not intervention recommendations or solution predictions; hosted acceptance and the broader solution-options goal are unmet.
+
 ## Current: reference-only investigation contract v2
 
 The hosted `568d908` attempt still failed with `numeric_or_effect_token`; that combined code did not identify whether a number, effect verb, causal phrase or character check failed. The v2 integration replaces candidate prose validation with structural references, rather than expanding the regex heuristics. The old free-form language validator is removed.
