@@ -32,7 +32,8 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "The answer is unavailable. Please try again.");
   if (typeof data.answer !== "string") throw new Error("Answer unavailable. Please try again.");
-  return { answer: data.answer, chooseGoal: data.nextStep === "choose_goal", proposal:readHomeCandidateProposal(data.candidateProposal,sources) };
+  const proposal=readHomeCandidateProposal(data.candidateProposal,sources);
+  return { answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal };
 }
 
 const noActionSubscription=()=>()=>{};
@@ -70,6 +71,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const sources = pack.sources;
   const [candidate,setCandidate]=useState<{proposal:HomeCandidateProposal;selectionGoal:string;sourceKey:string;context:string;epoch:number;originGoalId:string}|null>(null);
   const [candidateNotice,setCandidateNotice]=useState('');
+  const [preparationUnavailable,setPreparationUnavailable]=useState<string|null>(null);
   const storedCandidate=storage.data.workspaces[conversation.activeGoalId]?.fields.homeCandidateOptions;
   const selectionGoal=candidateSelectionGoal(storedCandidate)??conversation.focusedIssue;
   const savedCandidatePack=buildHomePack(sourceResults,workforceScope,selectionGoal,developmentSession);
@@ -153,7 +155,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   }, [contextKey]);
   // eslint-disable-next-line react-hooks/set-state-in-effect -- Cancel the queued user action on explicit page exit; preserve its draft.
   useLayoutEffect(()=>{liveActive.current=active;if(!active){queuedSuggestion.current=null;setSuggestionPending(false);sending.current=null;cancelPending.current();}return()=>{liveActive.current=false;queuedSuggestion.current=null;}},[active]);
-  useEffect(()=>{const identity=()=>{const goals=decisionStore.getSnapshot().data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement])};let prior=identity();return decisionStore.subscribe(()=>{const next=identity();if(next!==prior){prior=next;promptEpoch.current++;setCandidate(null);queuedSuggestion.current=null;setSuggestionPending(false);}})},[]);
+  useEffect(()=>{const identity=()=>{const goals=decisionStore.getSnapshot().data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement])};let prior=identity();return decisionStore.subscribe(()=>{const next=identity();if(next!==prior){prior=next;promptEpoch.current++;setCandidate(null);setPreparationUnavailable(null);queuedSuggestion.current=null;setSuggestionPending(false);}})},[]);
   const planRequest = questionUnanswered ? null : buildHomeActionPlanRequest(conversation.focusedIssue ? {key:contextKey,firstQuestion:conversation.focusedIssue,latestQuestion:journey?.latestQuestion ?? conversation.focusedIssue} : journey, contextKey);
 
   function focusQuestion() {
@@ -183,7 +185,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       if(requested.kind!=="none") { if(preserveDraft){setCandidateNotice("This clarification requests different country evidence. Your drafts are kept. Change the workforce country filter before updating options.");return false;} setInput(message);setScopeChoice({message,query:workforceQuery,identity:scopeIdentity,...requested});return; }
     }
     setScopeChoice(null);setLocalAction(null);
-    const sendTicket=Symbol();sending.current=sendTicket;const candidateEpoch=promptEpoch.current;setCandidate(null);setCandidateNotice('');
+    const sendTicket=Symbol();sending.current=sendTicket;const candidateEpoch=promptEpoch.current;setCandidate(null);setCandidateNotice('');setPreparationUnavailable(null);
     const request = conversation.beginRequest();
     const key = contextKey;
     const history = getProblemChatHistory(modelHistoryRef.current, key);
@@ -202,6 +204,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
         if(conversation.activeGoalId)decisionStore.setField(conversation.activeGoalId,'homeCandidateOptions',{version:1,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:captured.sourceKey,proposal:reply.proposal});
         else setCandidate(captured);
       }
+      setPreparationUnavailable(reply.proposal?null:key);
       if(preserveDraft&&!reply.proposal)setCandidateNotice("No new candidate options could be verified from this reply. Your existing work and drafts are kept.");
       conversation.setHomeGoalChoiceKey(reply.chooseGoal && !conversation.focusedIssue ? key : null);
       setMessages(current => [...current, { role: "assistant", content: answer }]);
@@ -315,6 +318,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     </section>}
 
     {!conversation.focusedIssue&&candidatePanel}
+    {preparationUnavailable===contextKey&&<section role="status" aria-label="Problem and options not prepared" className="space-y-1 rounded border p-3 text-sm"><p className="font-semibold">Problem and options not prepared</p><p>This answer has no validated problem and options to pin. Your work and drafts are kept; nothing was pinned or calculated. No retry runs automatically.</p></section>}
     {candidateNotice&&<p role="status">{candidateNotice}</p>}
     </div>
 
