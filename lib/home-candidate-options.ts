@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share the TypeScript source.
+import {homeCandidateLanguage} from "./home-candidate-language.ts";
 // Qualitative proposals only. These records never enter model inputs or calculators.
 export type HomeCandidate={title:string;outcome:string;why:string;source_ids:string[]};
 export type HomeCandidateProposal={version:1;problem:string;options:HomeCandidate[];question:string|null};
@@ -38,9 +40,7 @@ export function inspectHomeCandidateProposal(raw:unknown,pack:CandidatePack|null
   if(!title||!outcome||!why)return result('invalid_option_text');
   if(!Array.isArray(ids)||!ids.length||ids.length>3||ids.some(id=>typeof id!=='string'))return result('invalid_source_refs');
   if(ids.some(id=>!available.has(id)))return result('source_unavailable');
-  if(!/^(Investigate|Test|Consider|Review|Assess|Explore)\b/i.test(title)||! /^(Investigate|Test|Consider|Review|Assess|Explore)\b/i.test(outcome))return result('wording_rejected');
-  // Preserve the existing conservative validator, including its rejection of negated efficacy language.
-  if(/[\d$€£%]|\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|hundred|thousand|million|percent|guarantee[ds]?|will|proven|caus(?:e[ds]?|al))\b/i.test(title+' '+outcome+' '+why))return result('numeric_or_effect_token');
+  const languageFailure=homeCandidateLanguage(title,outcome,why);if(languageFailure)return result(languageFailure);
   const titleKey=title.toLocaleLowerCase().replace(/\W/g,''),outcomeKey=outcome.toLocaleLowerCase().replace(/\W/g,'');
   if(titles.has(titleKey)||outcomes.has(outcomeKey))continue;
   titles.add(titleKey);outcomes.add(outcomeKey);options.push({title,outcome,why,source_ids:[...new Set(ids as string[])]});

@@ -16,8 +16,8 @@ const cases=[
  ['invalid_option_shape',changed({PRIVATE:'PRIVATE_PAYLOAD_SENTINEL'}),pack],['invalid_option_shape',{...valid,options:[null]},pack],
  ['invalid_option_text',changed({why:''}),pack],['invalid_source_refs',changed({source_ids:[]}),pack],['invalid_source_refs',changed({source_ids:[17]}),pack],
  ['source_unavailable',changed({source_ids:['PRIVATE_SOURCE_SENTINEL']}),pack],['source_unavailable',changed({source_ids:['S1']}),pack],
- ['wording_rejected',changed({outcome:'Improve capacity'}),pack],['numeric_or_effect_token',changed({why:'Review 17 PRIVATE_PAYLOAD_SENTINEL entries.'}),pack],
- ['numeric_or_effect_token',changed({why:'This is not proof of a cause.'}),pack],
+ ['wording_rejected',changed({outcome:'Capacity information'}),pack],['numeric_or_effect_token',changed({why:'Review 17 PRIVATE_PAYLOAD_SENTINEL entries.'}),pack],
+ ['ready',changed({why:'This is not proof of a cause.'}),pack],
  ['no_options_or_question',{...valid,options:[]},pack],['ready',valid,pack],
 ];
 for(const [index,[reason,raw,evidence]] of cases.entries())test(`diagnostic branch ${index}: ${reason}`,()=>{
