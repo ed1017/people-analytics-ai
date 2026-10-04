@@ -6,7 +6,7 @@ The existing Home request envelope is reused: the fixed preparation message sele
 
 `homeActionDraftV1` is a separate, bounded browser-storage field. Existing goals, conversations, investigation records and calculator plans/results retain their identities. Cache identity binds the exact goal, normalized evidence and local planning/request context. Goal transitions invalidate late responses, including switching away and back. Stored drafts are revalidated before reuse. Unverifiable records remain saved; stale references are not relabeled with current evidence provenance.
 
-Each card contains a proposed first step, evidence references and a limitation. Cost, timing, staffing and effect are app-owned **Unknown** values. No existing calculation is automatically attached to a proposal. Scope selection must match the proposed route before opening a planner; the user must explicitly review its assumptions and use the existing Save/Calculate workflow. Existing planner results remain separate, so program A's result is never displayed as program B's effect. No action-specific numeric result attachment is implemented in this slice.
+Each card contains a proposed first step, evidence references and a limitation. Cost, timing, staffing and effect start **Unknown**. **Tailor assumptions** opens a compatible scope review and progressive input groups. **Calculate proposal** uses the existing local calculator; **Save proposal** explicitly persists that action’s inputs, provenance and calculation. Confirmed planning records remain separate.
 
 ## Semantic release gate
 
@@ -21,20 +21,23 @@ Strict parsing establishes shape, bounds and reference availability, not factual
 
 The action browser suite replaces the old investigation-only post-Pin assertions in `home-pin-options.mjs` and `home-candidate-reload.mjs`. It checks discovery/edit cancellation, double Pin, exact envelope, storage isolation, reload, scope mismatch, failed stale replacement, explicit old-goal preparation, late-response rejection, no automatic retry, mobile/desktop/200% equivalent layout, and runtime errors. All requests are intercepted. Production quality of generated prose remains unverified.
 
-## Next bounded increment: editable assumptions and full calculated proposals
+## Per-action assumptions and provisional calculations
 
-This checkpoint is not the full calculated-solution target. It does not yet provide per-action editable assumption records or attach calculator outputs to action cards. The goal is up to three useful proposals, each with its reviewed cost, timing, staffing and tradeoffs where the existing calculators support them; fewer proposals are valid.
+`homeActionScenariosV1` stores up to twelve bounded proposal records per goal. Each is bound to the exact action signature, goal, evidence/planning snapshot and input revision. Unsaved edits survive card switches in the current tab; only explicit Save proposal persists them. Edits retain an earlier calculation as stale and remove its numbers from the current summary. Reload verifies stored calculation snapshots against the existing pure calculator. Conflicting saves cannot overwrite a newer revision or downgrade its calculation.
 
-Proposed default policy before extending the numeric/storage contract:
+Scope, staffing/baseline, and cost/timing groups progressively expose relevant inputs. One prioritized missing input links to its field. Empty values remain Unknown; zero is an explicit assumption. User-entered and illustrative assumptions retain distinct editable provenance. Observed aggregate evidence does not automatically supply population, staffing availability, costs or effects. The model output contract has no numeric assumption fields and is unchanged.
 
-1. Observed evidence is read-only context with source, scope and date. Aggregate headcount is not automatically a program population, additional demand, available staffing or a causal effect.
-2. Existing saved planning inputs may be offered for explicit adoption into a named action draft only after compatible scope review. Program A's assumptions never silently become program B's assumptions. The original confirmed plan remains unchanged.
-3. A selected catalogue quote or benchmark may prefill only its directly corresponding field, preserving currency, period, geography, fictional/unverified status and limitations. Wages are not total employer costs. No cross-role or cross-population substitution.
-4. Illustrative planning assumptions must be visibly editable and labeled as scenario choices with an explicit basis. Unknown monetary inputs remain unknown rather than zero. No default efficacy, arbitrary retention benchmark, guaranteed saving or inferred ML performance.
-5. Retention proposals must preserve the no-intervention and program-with-no-effect cases. Any effect range is a user-adopted what-if assumption, never a prediction.
-6. Ask one essential scope/input question at a time and progressively reveal remaining assumptions. Edits and recalculation stay local. Bind each calculation to the exact action signature, goal, evidence snapshot and reviewed input version; edits make only that proposal's calculation stale.
+Compatible saved planning inputs are offered with their values for explicit adoption into the named action. Confirmation is bound to the exact source snapshot. Inputs must match the current goal and compatible scope; confirmed source plans/results remain unchanged. Adoption copies assumptions with their unverified basis, never a saved result. No quote or benchmark automatic-prefill adapter is implemented.
 
-The model's output contract currently supplies no numeric assumption fields. This policy is a proposal for the next reviewed implementation slice, not an implemented calculation or a release claim.
+Capacity proposals use `calculateWorkforceIncrement` for additional capacity only. Partial costs remain Unknown. Historical-median timing is not calculated in this local slice: an explicit arrival assumption is required. Retention proposals use the existing `calculateRetentionWhatIf`, preserving no-intervention and program-with-no-effect cases. Effect ranges are entered what-if assumptions, never forecasts or defaults. No cross-action ranking or arbitrary efficacy is supplied.
+
+All editing, adoption and calculation is local, without model or calculator API calls. Opening capacity assumptions reads the existing role catalogue endpoint. Invalid stored records are retained with saving blocked. No confirmed plan, model input boundary, database, or authorization change is included.
+
+Additional validation: `HOME_BUILT=1 HOME_BASE_URL=http://127.0.0.1:3101 PLAYWRIGHT_MODULE=/tmp/people-browser-tools/node_modules/playwright/index.mjs node tests/browser/home-action-calculations.mjs`. Synthetic network-intercepted browser tests cover partial/full arithmetic, scope mismatch, draft separation, stale edits, explicit adoption, reload, storage isolation and responsive layouts. Hosted generated prose still needs independent acceptance.
+
+## First-step readability release hold
+
+Hosted QA reported incomplete first-step sentences. Source inspection found no CSS clamp, substring truncation or storage clipping. The separately approved narrow completeness correction below is integrated from PR110, including a 360-character bound, rewrite instruction and rejection of bare dangling separators/ellipses. Other grammatical failures can still pass; hosted prose acceptance remains required. No live model evaluation was performed in the executor.
 
 ## Discovery reference correction after hosted QA
 
@@ -43,3 +46,7 @@ Problem references and each candidate's references are independently validated a
 ## First-step completeness correction
 
 First steps now request one complete concise sentence, normally under 240 characters, with a 360-character allowance for grammatical completion. The prompt explicitly requires rewriting rather than cutting words or sentences to fit the schema. The parser rejects only obvious bare trailing hyphens/dashes or ellipses; it does not require terminal punctuation or attempt broad grammar validation. Internal punctuation and quoted punctuation remain valid. Full bounded text is stored and rendered unchanged; overflow is rejected, never clipped. Invalid older drafts are retained without automatic migration or model retries. This narrow guard does not prove grammatical or factual correctness; hosted prose acceptance is still required.
+
+## Capacity scenario labeling
+
+All capacity numbers appear in a separate **Additional-capacity what-if for this goal** section, with a disclaimer before the metrics that they are not the action’s cost or effect. The action’s estimates stay Unknown, including when its suggested route is capacity. Existing saved inputs/results remain readable without migration or recalculation. An optional link requires the user to identify an actual staffing change and review its exact scope, mix and timing; diagnosis/unsure cannot confirm that link. This review stays in the current tab and expires on edits, option remount or reload. Even linked numbers retain scenario-specific labels rather than claiming total action cost or proven effects. Model route alone never supplies semantic compatibility.

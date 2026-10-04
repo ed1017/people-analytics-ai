@@ -1,3 +1,4 @@
+const baseUrl=process.env.HOME_BASE_URL??'http://127.0.0.1:3100';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -20,7 +21,7 @@ try{for(const mode of [{name:'desktop',width:1366},{name:'mobile',width:390},{na
  page.on('pageerror',error=>errors.push(error.message));
  await page.route('**/*',async route=>{
   const request=route.request(),url=new URL(request.url());
-  if(url.origin!=='http://127.0.0.1:3100'){unexpected.push(url.href);return route.abort()}
+  if(url.origin!==baseUrl){unexpected.push(url.href);return route.abort()}
   if(built&&!url.pathname.startsWith('/api/'))return route.continue();
   if(url.pathname==='/')return route.fulfill({contentType:'text/html',body:'<meta name="viewport" content="width=device-width, initial-scale=1"><div id="root"></div>'});
   if(assets.has(url.pathname))return route.fulfill({contentType:'text/javascript',body:assets.get(url.pathname)});
@@ -37,7 +38,7 @@ try{for(const mode of [{name:'desktop',width:1366},{name:'mobile',width:390},{na
   unexpected.push(url.href);return route.abort();
  });
  const button=name=>page.getByRole('button',{name,exact:true}),input=page.getByLabel('Ask Workforce AI',{exact:true}),scope=()=>page.getByRole('region',{name:'Review workforce planning scope',exact:true}),state=()=>page.evaluate(()=>window.capacityState?window.capacityState():{data:JSON.parse(localStorage.getItem('insights-to-action.decisions.v1')).payload}),solution=async()=>{const s=await state();return s.data.workspaces[s.data.goals.activeId]?.fields.workforceSolution};
- const init=async()=>{await page.goto('http://127.0.0.1:3100/');await page.evaluate(()=>localStorage.clear());if(built)await page.reload();else{await page.addStyleTag({content:css});await page.addScriptTag({content:assets.get('/assets/fixture.js')});}await input.fill('Investigate capacity for three additional engineer roles in Technology');await button('Send overview question').click();await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('A synthetic capacity question is ready for review.',{exact:true}).waitFor();};
+ const init=async()=>{await page.goto(baseUrl+'/');await page.evaluate(()=>localStorage.clear());if(built)await page.reload();else{await page.addStyleTag({content:css});await page.addScriptTag({content:assets.get('/assets/fixture.js')});}await input.fill('Investigate capacity for three additional engineer roles in Technology');await button('Send overview question').click();await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('A synthetic capacity question is ready for review.',{exact:true}).waitFor();};
  const open=()=>button('Compare workforce options').click(),confirm=()=>button('Confirm goal and review inputs'),close=()=>button('Return to conversation').click();
  const checkHere=(name,value)=>check(mode.name+' '+name,value);
  await init();const baseline=posts.length;
