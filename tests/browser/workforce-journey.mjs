@@ -40,7 +40,7 @@ try{for(const width of [1366,390]){
   const seed=structuredClone(data);if(mode==='fresh')delete seed.workspaces[goalId].fields.workforceSolution;
   if(mode==='empty')seed.workspaces[goalId].fields.workforceSolution=empty;
   await page.evaluate(({seed,unsupported})=>{window.readinessSeed=seed;if(unsupported)window.Worker=class{constructor(){throw Error('Unsupported worker')}};else{const NativeWorker=window.Worker;window.Worker=class extends NativeWorker{set onmessage(handler){super.onmessage=event=>setTimeout(()=>handler?.(event),window.workerDelay??0)}}}}, {seed:{encoded:encodeDecisions(seed),empty,complete,newer},unsupported:mode==='unsupported'});
-  await page.addStyleTag({content:css});await page.addScriptTag({content:bundle});if(mode==='complete')await comparisonReady();else await button('Continue this decision').waitFor();
+  await page.addStyleTag({content:css});await page.addScriptTag({content:bundle});if(mode==='complete')await comparisonReady();else if(mode==='empty')await button('Use details from my statement').waitFor();else await button('Continue this decision').waitFor();
  };
  const button=name=>page.getByRole('button',{name,exact:true}),state=()=>page.evaluate(()=>window.readinessSaved()),solution=async()=>(await state()).workspaces[goalId].fields.workforceSolution;
  const next=()=>button('Continue this decision'),field=name=>page.getByLabel(name,{exact:true});
@@ -51,10 +51,10 @@ try{for(const width of [1366,390]){
  const openAssumptions=async()=>{const summary=page.getByText('Review assumptions and goal statement',{exact:true});if(!await summary.evaluate(el=>el.parentElement.open))await summary.click()};
  await init('fresh');const untouched=JSON.stringify(await state());await continueByKeyboard();
  check(width+' fresh Continue focuses existing start without writing',await focus(button('Start guided workforce plan'))&&JSON.stringify(await state())===untouched);
- await button('Start guided workforce plan').click();await continueByKeyboard();
+ await button('Start guided workforce plan').click();await button('Enter inputs manually').click();await continueByKeyboard();
  check(width+' missing input gets exact keyboard focus',await focus(field('Business unit')));
  await page.keyboard.press('Tab');check(width+' no keyboard focus trap',await focus(field('Job profile')));
- await field('Planning statement').fill('Synthetic three roles');await button('Clarify statement with AI').click();await button('Review proposed changes').waitFor();
+ await field('Planning statement').fill('Synthetic three roles');await button(/^(Clarify statement with AI|Use details from my statement)$/).click();await button('Review proposed changes').waitFor();
  await continueByKeyboard();check(width+' proposal is reviewed explicitly',await focus(button('Review proposed changes'))&&(await solution()).versions.length===1&&calculations===0);
  await button('Review proposed changes').click();await continueByKeyboard();
  check(width+' reviewed draft points to Save without saving',await focus(button('Save reviewed inputs'))&&(await solution()).versions.length===1);
@@ -89,7 +89,7 @@ try{for(const width of [1366,390]){
  await init();await comparisonReady();await button('Adjust saved response mix').click();await page.getByRole('status').filter({hasText:'Temporary local comparison ready'}).waitFor();await continueByKeyboard();check(width+' unchanged what-if never directs to disabled Save',await page.getByRole('region',{name:'Tailor selected option',exact:true}).evaluate(el=>el===document.activeElement)&&await button('Save changes to this goal').isDisabled());await button('Cancel what-if').click();
  await init();await comparisonReady();await button('Adjust saved response mix').click();await field('Build count').fill('2');await continueByKeyboard();check(width+' mix-total correction focuses an editable what-if count instead of fixed role demand',await focus(field('Build count'))&&(await solution()).versions.length===1);await button('Cancel what-if').click();
  await init();await disclose('Calculate or update options');release=true;await button(/^Calculate (options|saved assumptions and compare hiring-only)$/).click();await button('Cancel pending request').waitFor();await page.waitForFunction(()=>window.readinessSaved().workspaces['goal-readiness'].fields.workforceSolution.pending!==null);await button('Batched goal roundtrip').click();if(typeof release==='function')release();release=undefined;await page.waitForTimeout(250);check(width+` batched goal roundtrip cancels pending calculation without adding a result (actual results: ${(await solution()).results.length}, pending: ${!!(await solution()).pending})`,(await solution()).pending===null&&(await solution()).results.length===1);
- await init('empty');questionsOnly=true;await field('Planning statement').fill('Synthetic question only');await button('Clarify statement with AI').click();await button('Review proposed changes').waitFor();await continueByKeyboard();check(width+' questions-only proposal guides an editable input',await focus(field('Business unit'))&&await button('Review proposed changes').isDisabled());
+ await init('empty');questionsOnly=true;await field('Planning statement').fill('Synthetic question only');await button(/^(Clarify statement with AI|Use details from my statement)$/).click();await button('Review proposed changes').waitFor();await continueByKeyboard();check(width+' questions-only proposal guides an editable input',await focus(field('Business unit'))&&await button('Review proposed changes').isDisabled());
  await init('unsupported');await page.getByRole('status').filter({hasText:/unavailable|supported|worker/i}).first().waitFor();await continueByKeyboard();check(width+' unsupported worker path remains reviewable without saving',await page.getByRole('region',{name:'Workforce solution options',exact:true}).evaluate(el=>el===document.activeElement)&&(await solution()).versions.length===1);
  check(width+' no unmocked network or runtime errors',unexpected===0&&errors.length===0);check(width+' only explicit model and calculation calls',model===2&&calculations===3);
  await context.close();

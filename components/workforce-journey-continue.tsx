@@ -20,6 +20,7 @@ const guidance:Record<JourneyStep,string>={
 export function revealJourneyTarget(target:HTMLElement|null){
  if(!target)return;
  for(let parent=target.parentElement;parent;parent=parent.parentElement)if(parent instanceof HTMLDetailsElement)parent.open=true;
+ if(target.hasAttribute('data-intake-choice')){target.style.scrollMarginTop=`${(document.querySelector('main > header')?.getBoundingClientRect().height??0)+12}px`;target.focus({preventScroll:true});target.scrollIntoView({block:'start'});return;}
  target.focus();target.scrollIntoView({block:'center'});
 }
 export function WorkforceJourneyContinue({journey,root,tailoring=false,onContinue}:{journey:JourneyState;root:RefObject<HTMLElement|null>;tailoring?:boolean;onContinue?:()=>boolean}){

@@ -42,7 +42,7 @@ try {
   const expandSupporting=async()=>{for(const label of ['Explore more options','Saved alternative reviews','Source evidence and supporting pages','Calculation evidence and methodology','Approval records','Saved calculations']){const summary=workspace.locator('summary').filter({hasText:new RegExp('^'+label+'$')});if(await summary.count()&&!await summary.evaluate(el=>el.parentElement.open))await summary.click()}};
   const state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,key);
   await workspace.getByLabel('Planning statement',{exact:true}).fill('Plan three additional Engineer positions in Technology.');
-  await workspace.getByRole('button',{name:'Clarify statement with AI',exact:true}).click();
+  await workspace.getByRole('button',{name:/^(Clarify statement with AI|Use details from my statement)$/,exact:true}).click();
   await workspace.getByRole('button',{name:'Review proposed changes',exact:true}).click();
   check(width+' proposal does not save or calculate',(await state()).workspaces['goal-a'].fields.workforceSolution.versions.length===1&&calculationCalls===0);
   check(width+' draft blocks calculate',await workspace.getByRole('button',{name:/^Calculate (options|saved assumptions and compare hiring-only)$/,exact:true}).isDisabled());
