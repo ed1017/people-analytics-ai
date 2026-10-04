@@ -4,9 +4,9 @@ import {validateClarificationResult} from '../../lib/workforce-clarification.ts'
 import {encodeDecisions,DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
 import {workforceReviewFixture} from '../fixtures/workforce-review.mjs';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
-const statement='Add three Engineer roles in Technology starting January 2027 over 12 months.',goalId='guided-capacity',at='2026-10-04T00:00:00.000Z';
+const statement='Add three Engineer roles in Technology. Planning starts 2027-01 for 12 months.',goalId='guided-capacity',at='2026-10-04T00:00:00.000Z';
 const catalog={business_units:[{org_code:'TECH',org_name:'Technology'}],job_profiles:[{job_profile_code:'ENGINEER',job_profile_name:'Engineer'}],combinations:[{org_code:'TECH',job_profile_code:'ENGINEER'}]};
-const changes=[{field:'roles',value:'3',evidence:'three'},{field:'businessUnit',value:'TECH',evidence:'Technology'},{field:'jobProfile',value:'ENGINEER',evidence:'Engineer'},{field:'planningMonth',value:'2027-01',evidence:'January 2027'},{field:'months',value:'12',evidence:'12 months'}];
+const changes=[{field:'roles',value:'3',evidence:'three'},{field:'businessUnit',value:'TECH',evidence:'Technology'},{field:'jobProfile',value:'ENGINEER',evidence:'Engineer'},{field:'planningMonth',value:'2027-01',evidence:'Planning starts 2027-01 for 12 months.'},{field:'months',value:'12',evidence:'12 months'}];
 const seed={version:1,revision:1,goals:{version:1,activeId:goalId,goals:[{id:goalId,statement},{id:'other',statement:'Other goal'}]},workspaces:{[goalId]:{savedAt:at,fields:{owner:'Keep local owner',chat:{messages:[],input:'Keep conversation draft',problem:null,questionUnanswered:false}}},other:{savedAt:at,fields:{chat:{messages:[],input:'Other draft',problem:null,questionUnanswered:false}}}}};
 let checks=0;const check=(label,value)=>{assert.ok(value,label);checks++;console.log('PASS '+label)};
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});

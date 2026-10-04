@@ -10,8 +10,14 @@ Retention uses a separate model and is unchanged in this slice. No retention eff
 
 ## Validation
 
-- 530 unit tests, lint, TypeScript and production build passed.
+- 534 unit tests, lint, TypeScript and production build passed.
 - 904 browser assertions across guided intake and existing Home capacity, retention, resume, journey, readiness, goal-copy, solution-review, option-card, composer, contextual-prompt, race and cleanup coverage passed.
 - Guided intake explicitly covers request boundaries, proposal acceptance, only-missing fields, required corrections, optional unknowns, editing prior answers, separate save/calculation, exact calculator payload, stale goal changes, persistence and card focus.
 - Desktop, mobile emulation and 200% reflow were checked with intercepted synthetic APIs. These are Chromium checks, not physical-device testing. Long reviews and answers can require scrolling.
 - Browser focus assertions wait for the existing deferred focus transition. Structured extraction remains mocked in local tests; separate hosted acceptance must validate a real model proposal before release.
+
+## Punctuated month evidence regression
+
+Hosted acceptance at `5d01df8` rejected a planning month with `invalid-model-proposal-4-planningMonth-value-not-supported`. No model output was inspected or live request retried. A synthetic proposal with the reported statement reproduces that diagnostic when the exact supporting quote includes its terminal period: `Planning starts 2027-01 for 12 months.` The same quote without the period passed. Source clause splitting removed the period, then attempted containment with the unchanged quote.
+
+The fix removes trailing clause punctuation only for that containment comparison. Original exact evidence, proposed-value checks and full source-clause ambiguity checks still apply. Tests retain the original evidence, reject nonexact quotes, negation, alternative dates, missing years, quarters and mismatched months, and keep optional assumptions blank. Schema regexes were verified with valid/invalid examples and are unchanged. This is a reproducible validator defect consistent with the reported diagnostic, not confirmation of the unseen live model response. A new hosted acceptance run is still required.
