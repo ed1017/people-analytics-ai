@@ -37,8 +37,12 @@ Additional validation: `HOME_BUILT=1 HOME_BASE_URL=http://127.0.0.1:3101 PLAYWRI
 
 ## First-step readability release hold
 
-Hosted QA reported incomplete first-step sentences. Source inspection found no CSS clamp, substring truncation or storage clipping: the parser accepts up to 240 characters verbatim and rejects longer strings. Synthetic unfinished sentences within the limit are currently accepted. The root cause of hosted prose is unverified. A prompt/complete-sentence validation adjustment requires separate review; this calculation slice does not alter that contract or claim the issue resolved.
+Hosted QA reported incomplete first-step sentences. Source inspection found no CSS clamp, substring truncation or storage clipping. The separately approved narrow completeness correction below is integrated from PR110, including a 360-character bound, rewrite instruction and rejection of bare dangling separators/ellipses. Other grammatical failures can still pass; hosted prose acceptance remains required. No live model evaluation was performed in the executor.
 
 ## Discovery reference correction after hosted QA
 
 Problem references and each candidate's references are independently validated against available metrics; candidate operations must still match their metrics. Candidates need not duplicate their sources into `problem_evidence`. Problem references support the provisional problem; candidate references support the investigation, not causal proof or effectiveness. The whole normalized packet remains bound to the exact goal, so changes to either reference set's underlying evidence invalidate the preparation. v2 shapes and field meanings are unchanged, valid saved records are not migrated or rewritten, and the legacy `problem_source_mismatch` diagnostic remains readable but is no longer emitted for this redundant relationship.
+
+## First-step completeness correction
+
+First steps now request one complete concise sentence, normally under 240 characters, with a 360-character allowance for grammatical completion. The prompt explicitly requires rewriting rather than cutting words or sentences to fit the schema. The parser rejects only obvious bare trailing hyphens/dashes or ellipses; it does not require terminal punctuation or attempt broad grammar validation. Internal punctuation and quoted punctuation remain valid. Full bounded text is stored and rendered unchanged; overflow is rejected, never clipped. Invalid older drafts are retained without automatic migration or model retries. This narrow guard does not prove grammatical or factual correctness; hosted prose acceptance is still required.
