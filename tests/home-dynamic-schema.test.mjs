@@ -41,7 +41,9 @@ test('no eligible metric explicitly allows only null/empty preparation',()=>{
 });
 test('precise remaining runtime reasons expose only fixed fields and structural counts',()=>{
  const base=raw('W1.headcount','review_capacity');
- const cases=[['problem_source_mismatch','options.evidence',{...base,problem_evidence:['R1.open_requisitions']}],['duplicate_reference','options.evidence',{...base,options:[{operation:'review_capacity',evidence:['W1.headcount','W1.headcount']}]}],['reference_shape','problem_evidence',{...base,problem_evidence:[]}]];
+ const cases=[['duplicate_reference','options.evidence',{...base,options:[{operation:'review_capacity',evidence:['W1.headcount','W1.headcount']}]}],['reference_shape','problem_evidence',{...base,problem_evidence:[]}]];
  for(const [reason,field,reply] of cases){assert.equal(fullSchema(reply),true);const result=decodeHomeModelReply(JSON.stringify(reply),false,full);assert.equal(result.candidateProposal,null);assert.deepEqual(result.candidateDiagnostic,{reason,field,optionCount:1,missingFieldCount:0});assert.ok(readHomePreparationDiagnostic(result.candidateDiagnostic));assert.ok(!JSON.stringify(result.candidateDiagnostic).includes('W1'));}
 });
 test('the packet and model input evidence are never mutated when deriving constraints',()=>{const before=structuredClone(full);buildHomeReplyFormat(full);assert.deepEqual(full,before);assert.deepEqual(buildHomeReplyFormat(full),buildHomeReplyFormat(normalizeHomePack(full)))});
+
+test('independent available problem and candidate sources pass schema and decoder',()=>{const reply={...raw('W1.headcount','review_capacity'),problem_evidence:['R1.open_requisitions']};assert.equal(fullSchema(reply),true);assert.equal(decodeHomeModelReply(JSON.stringify(reply),false,full).candidateDiagnostic.reason,'ready');});

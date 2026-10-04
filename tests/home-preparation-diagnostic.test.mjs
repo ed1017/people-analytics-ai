@@ -18,7 +18,7 @@ const cases=[
  ['reference_shape',changed({evidence:[]}),pack],['duplicate_reference',changed({evidence:['W1.headcount','W1.headcount']}),pack],
  ['metric_unavailable',changed({evidence:['W1.fte']}),pack],['metric_invalid',valid,{sources:[{id:'W1',status:'loaded',facts:{headcount:1.5}}]}],
  ['operation_unknown',changed({operation:'invent'}),pack],['operation_mismatch',changed({operation:'review_recorded_exits'}),pack],
- ['problem_source_mismatch',{...valid,problem_evidence:['R1.open_requisitions']},{sources:[...pack.sources,{id:'R1',status:'loaded',facts:{open_requisitions:2}}]}],
+ ['ready',{...valid,problem_evidence:['R1.open_requisitions']},{sources:[...pack.sources,{id:'R1',status:'loaded',facts:{open_requisitions:2}}]}],
  ['no_options_or_question',{...valid,options:[]},pack],['ready',valid,pack],
 ];
 for(const [index,[reason,raw,evidence]] of cases.entries())test(`diagnostic branch ${index}: ${reason}`,()=>{
@@ -31,7 +31,7 @@ for(const [index,[reason,raw,evidence]] of cases.entries())test(`diagnostic bran
  assert.equal(Boolean(result.proposal),reason==='ready');
 });
 test('each inspect reason is covered and structural counts are bounded',()=>{
- assert.deepEqual([...new Set(cases.map(c=>c[0]))].sort(),homePreparationReasons.filter(reason=>reason!=='diagnostic_unavailable').slice().sort());
+ assert.deepEqual([...new Set(cases.map(c=>c[0]))].sort(),homePreparationReasons.filter(reason=>reason!=='diagnostic_unavailable'&&reason!=='problem_source_mismatch').slice().sort());
  assert.equal(inspectHomeCandidateProposal({version:2},pack).diagnostic.missingFieldCount,4);
  assert.equal(inspectHomeCandidateProposal({...valid,options:Array(100).fill(option)},pack).diagnostic.optionCount,4);
  assert.equal(inspectHomeCandidateProposal({...valid,options:[],question:'Which outcome matters?'},pack).diagnostic.reason,'ready');
@@ -62,3 +62,5 @@ test('Responses JSON schema requires all fields but allows legitimate empty prep
  assert.equal(homeReplyFormat.schema.properties.options.minItems,undefined);
  assert.deepEqual(homeReplyFormat.schema.properties.options.items.anyOf[0].required.slice().sort(),['evidence','operation']);
 });
+
+test('old source-subset diagnostic remains readable without being emitted for independent references',()=>{assert.ok(readHomePreparationDiagnostic({reason:'problem_source_mismatch',field:'options.evidence',optionCount:3,missingFieldCount:0}));});

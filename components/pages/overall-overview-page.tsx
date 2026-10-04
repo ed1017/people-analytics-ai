@@ -8,10 +8,12 @@ import {revealJourneyTarget} from "@/components/workforce-journey-continue";
 import {decisionStore,recordDecisionEvidence,useDecisionStorage} from "@/components/decision-store";
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUp, RefreshCw, Info } from "lucide-react";
+import {useHomeComposerDock} from '@/components/use-home-composer-dock';
+import {HomeActionOptions} from '@/components/home-action-options';
 import {homeCandidateVerification} from '@/lib/home-candidate-verification';
 import {HomeCandidateOptions} from '@/components/home-candidate-options';
 import {inspectHomeCandidateProposal,readHomePreparationDiagnostic,type HomePreparationDiagnostic,readHomeCandidateRecord,candidateSourceKey,candidateSelectionGoal,type HomeCandidateProposal} from '@/lib/home-candidate-options';
-import {readWorkforceSolution,currentSolutionVersion,solutionResultIsCurrent} from '@/lib/workforce-solution';
+import {createWorkforceSolution,emptySolutionInputs,readWorkforceSolution,currentSolutionVersion,solutionResultIsCurrent} from '@/lib/workforce-solution';
 import {readSavedWorkforceReview} from '@/lib/workforce-solution-review';
 import { GoalConversationMessages, ConversationMessages } from "@/components/goal-conversation-messages";
 import { buildHomePack, homeDefinitions, readHomeSource } from "@/lib/home-pack.mjs";
@@ -68,6 +70,16 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     if(hasRetention){setRetentionEntry(previous=>({id:conversation.activeGoalId,sequence:(previous?.sequence??0)+1}));return;}
     setPlanningReview({context:planningContext,goalId:conversation.activeGoalId,goal:conversation.focusedIssue||conversation.input.trim()||[...conversation.messages].reverse().find(message=>message.role==='user')?.content||''});
   }
+  function reviewActionInputs(route:'capacity'|'retention_what_if'){
+    const snapshot=decisionStore.getSnapshot(),id=conversation.activeGoalId;
+    if(!id||snapshot.data.goals.activeId!==id||!snapshot.saved||conversation.loading)return;
+    if(route==='retention_what_if'){setRetentionEntry(previous=>({id,sequence:(previous?.sequence??0)+1}));return;}
+    if(snapshot.data.workspaces[id]?.fields.workforceSolution===undefined){
+      const inputs=emptySolutionInputs();inputs.scope={goalStatement:conversation.focusedIssue,intent:'additional'};
+      decisionStore.setField(id,'workforceSolution',createWorkforceSolution(crypto.randomUUID(),id,inputs,new Date().toISOString()));
+    }
+    requestAnimationFrame(()=>revealJourneyTarget(planner.current?.querySelector<HTMLElement>('[data-home-planner-heading]')??planner.current));
+  }
   const [sourceResults, setSourceResults] = useState<Record<string, unknown>>({});
   const [loadedScope, setLoadedScope] = useState("");
   const [settledEvidenceKey,setSettledEvidenceKey]=useState("");
@@ -76,6 +88,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const sources = pack.sources;
   const [candidate,setCandidate]=useState<{proposal:HomeCandidateProposal;selectionGoal:string;sourceKey:string;context:string;epoch:number;originGoalId:string}|null>(null);
   const [candidateNotice,setCandidateNotice]=useState('');
+  const [actionPin,setActionPin]=useState<{id:string;sequence:number}|null>(null);
   const [preparationUnavailable,setPreparationUnavailable]=useState<{context:string;diagnostic:HomePreparationDiagnostic;stage:'server'|'client'}|null>(null);
   const storedCandidate=storage.data.workspaces[conversation.activeGoalId]?.fields.homeCandidateOptions;
   const selectionGoal=candidateSelectionGoal(storedCandidate)??conversation.focusedIssue;
@@ -107,6 +120,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const loadedAt = useRef(0);
   const composer = useRef<HTMLTextAreaElement>(null);
   const conversationViewport = useRef<HTMLDivElement>(null);
+  const composerSlot=useRef<HTMLDivElement>(null),composerDock=useRef<HTMLDivElement>(null);
+  useHomeComposerDock(active,composerSlot,composerDock,composer);
   useLayoutEffect(()=>{
     const node=composer.current;if(!node||!active)return;
     const resize=()=>{node.style.height='auto';node.style.height=`${Math.min(320,Math.max(80,node.scrollHeight+2))}px`;};
@@ -245,7 +260,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       const id=conversation.confirmWorkforceGoal(problem);
       if(!decisionStore.getSnapshot().saved)throw Error('Goal remains unsaved in this tab. Resolve browser storage before continuing.');
       if(problem===candidate.proposal.problem)decisionStore.setField(id,'homeCandidateOptions',{version:2,goalId:id,goal:problem,selectionGoal:candidate.selectionGoal,sourceKey:candidate.sourceKey,proposal:candidate.proposal});
-      setCandidate(null);
+      setCandidate(null);setActionPin(previous=>({id,sequence:(previous?.sequence??0)+1}));
     }catch(error){setCandidateNotice(error instanceof Error?error.message:'The goal could not be pinned. Your draft is kept.')}
   }
   const candidateVerification=homeCandidateVerification(loading||settledEvidenceKey!==JSON.stringify({workforceQuery,workforceScope,refresh,persona}),storedCandidate,Boolean(savedCandidate),conversation.activeGoalId,conversation.focusedIssue,savedCandidatePack);
@@ -261,7 +276,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     else if(ready) finishScopeRequest(pendingScope,false);
   },[pendingScope,active,scopeIdentity,workforceQuery,input,ready]);
   const startingGuide=(
-    <section aria-label="Starting guide" data-testid="overview-starting-guide" className="py-2">
+    <section aria-label="Starting guide" data-testid="overview-starting-guide" className="pt-0 pb-1">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <h3 className="text-lg font-semibold">Questions to explore</h3>
         <p className="text-sm text-muted-foreground">Click a question to send it, or write your own.</p>
@@ -274,7 +289,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
 
     </section>
   );
-  return <div className="home-workspace mx-auto grid w-full max-w-none items-start gap-5 px-5 pt-6 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-3">
+  return <div className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-3">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-4 gap-y-1"><h2 id="overall-overview-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl xl:text-2xl 2xl:text-3xl">From Insight to Action</h2><p className="w-full text-sm text-muted-foreground sm:w-auto">by Ed Om <span aria-hidden="true">·</span> <a className="text-primary underline" href="mailto:edwinom.nyc@gmail.com">edwinom.nyc@gmail.com</a></p></div>
         <div className="ml-auto flex items-center gap-3 text-xs">
@@ -307,7 +322,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       {active&&<WorkforceSolutionPanel hideEntry optionActions={optionActions} page="home" onNavigate={onNavigate}/>}
     </div>
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
-    {conversation.focusedIssue&&candidatePanel}
+    <HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onReview={reviewActionInputs}/>
     {!hasAnswer&&!conversation.focusedIssue&&startingGuide}
     {loading && <p role="status" className="text-sm text-muted-foreground">Loading available evidence for your questions.</p>}
 
@@ -328,7 +343,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     {candidateNotice&&<p role="status">{candidateNotice}</p>}
     </div>
 
-    <form onSubmit={event => { event.preventDefault(); void send(); }} className="shrink-0 rounded-2xl border bg-card p-3 shadow-lg">
+    <form onSubmit={event => { event.preventDefault(); void send(); }} className="home-chat-form shrink-0">
       {!conversation.focusedIssue&&!candidateCurrent&&(messages.some(message=>message.role==='user')||input.trim())&&<div className="mb-2">
         <button type="button" disabled={chatLoading||!conversation.storageReady||!conversation.saved||Boolean(conversation.issueEditor)||Boolean(planningReview)} onClick={compareWorkforceOptions} className="min-h-11 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{hasPlan?'Continue workforce options':hasRetention?'Continue retention what-if':'Compare workforce options'}</button>
         <p className="mt-1 text-xs text-muted-foreground">{hasPlan?'Continue reviewing your saved assumptions and options. Your chat draft is kept.':hasRetention?'Return to your retention assumptions. Your drafts are kept; Calculate and Save remain separate actions.':'Review your goal and choose additional role capacity or a retention what-if.'}</p>
@@ -341,11 +356,13 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       {visibleScopeChoice && <div aria-label="Requested country scope" className="mb-3 text-sm"><p>{visibleScopeChoice.kind==="ambiguous" ? "Which country should this workforce snapshot use?" : visibleScopeChoice.kind==="unsupported" ? "That country scope is not fully supported. Choose an available country or keep the current scope; missing evidence stays unavailable." : "Use country-specific workforce evidence for this question?"}</p><div className="mt-2 flex flex-wrap gap-2">{visibleScopeChoice.options.map(option=><button key={option.value} type="button" onClick={()=>applyCountry(option)} className="min-h-11 rounded border border-primary px-3 py-2 font-semibold text-primary">Apply {option.label} and answer</button>)}<button type="button" onClick={()=>void send(visibleScopeChoice.message,false,true)} className="min-h-11 px-2 text-primary underline">Answer with current scope</button></div><p className="mt-1 text-xs text-muted-foreground">Only the workforce snapshot changes. Other filters stay selected; company-wide sources retain their scope.</p></div>}
       {pendingScope && <p role="status" className="mb-3 text-sm">Refreshing the selected workforce evidence before answering. Edit your question to cancel.</p>}
       {localAction?.goalId===conversation.activeGoalId&&<p role="status" className="mb-3 text-sm">{localAction.notice}</p>}
+      <div ref={composerSlot} className="home-composer-slot"><div ref={composerDock} className="home-composer-dock rounded-t-2xl border bg-card p-3 shadow-lg">
       <label htmlFor="overview-question" className="sr-only">Ask Workforce AI</label>
       <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" value={input} onChange={event => changeQuestion(event.target.value)} rows={2}
         placeholder="Describe a business issue, and I’ll help you explore the evidence, compare options, and build or adjust a plan." className="max-h-80 min-h-20 w-full resize-y rounded-lg border bg-background/40 p-3 text-lg placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
       <div className="mt-2 flex items-center justify-end gap-3">
         <button type="submit" aria-label="Send overview question" disabled={(!localCandidate&&!ready) || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
+      </div></div>
     </form>
       {actionOffers.length>0&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2 text-sm">Option action suggestions</summary><section aria-label="Workforce option actions" className="mt-3 space-y-2"><p className="text-sm text-muted-foreground">{input.trim()?'Your draft is kept. Clear it to choose an option action.':'Click to open the local action. Saving, calculation and search remain explicit.'}</p><div className="flex flex-wrap gap-2">{actionOffers.map(offer=><button key={offer.id} type="button" disabled={suggestionPending||chatLoading||Boolean(input.trim())} onClick={()=>submitOption(offer.id)} className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{offer.label}</button>)}</div></section></details>}
     {(hasAnswer||conversation.focusedIssue)&&<details key={conversation.workspaceKey} className="text-sm"><summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">More questions</summary>{startingGuide}</details>}
@@ -354,8 +371,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       <details><summary className="min-h-11 cursor-pointer py-2 font-semibold">How this works</summary><h3 className="text-lg font-semibold">From question to plan</h3>
       <ol className="mt-4 list-decimal space-y-4 pl-4">
         <li><strong>Start with a question</strong><p>Ask AI to find an issue, or explore <button className="text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce</button> to investigate your own.</p></li>
-        <li><strong>Pin the problem</strong><p>Review the concise problem and choose Pin as goal to see candidate actions. These are ideas to investigate; costs, timing and staffing stay unknown until reviewed.</p></li>
-        <li><strong>Compare options</strong><p>Switch between candidates, open Details for their evidence, or Adjust an option. To explore numbers, open Quantify an option and review the supported scope. Save reviewed inputs and Calculate remain explicit actions. Review assumptions with HR, business leaders and Finance before agreeing on action.</p></li>
+        <li><strong>Pin the problem</strong><p>Review the concise problem and choose Pin as goal to see candidate actions. Pin makes one AI request for proposed pilots. Costs, timing, staffing and effects remain unknown until separately reviewed and calculated.</p></li>
+        <li><strong>Compare options</strong><p>Switch between proposed actions and open Evidence and limitations. To explore numbers, choose Review numerical assumptions and confirm the supported scope. Save reviewed inputs and Calculate remain explicit actions. Review assumptions with HR, business leaders and Finance before agreeing on action.</p></li>
         <li><strong>Assess &amp; Evaluate <span className="font-normal text-muted-foreground">· Coming soon</span></strong><p>Track progress and assess whether the plan worked.</p></li>
       </ol>
       <p className="mt-4 text-xs text-muted-foreground">Demo only. Real-world actions happen outside this app.</p>
