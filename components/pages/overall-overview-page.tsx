@@ -9,7 +9,7 @@ import {decisionStore,recordDecisionEvidence,useDecisionStorage} from "@/compone
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUp, RefreshCw, Info } from "lucide-react";
 import {HomeCandidateOptions} from '@/components/home-candidate-options';
-import {readHomeCandidateProposal,readHomeCandidateRecord,candidateSourceKey,candidateSelectionGoal,type HomeCandidateProposal} from '@/lib/home-candidate-options';
+import {inspectHomeCandidateProposal,readHomePreparationDiagnostic,type HomePreparationDiagnostic,readHomeCandidateRecord,candidateSourceKey,candidateSelectionGoal,type HomeCandidateProposal} from '@/lib/home-candidate-options';
 import {readWorkforceSolution,currentSolutionVersion,solutionResultIsCurrent} from '@/lib/workforce-solution';
 import {readSavedWorkforceReview} from '@/lib/workforce-solution-review';
 import { GoalConversationMessages, ConversationMessages } from "@/components/goal-conversation-messages";
@@ -32,8 +32,11 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "The answer is unavailable. Please try again.");
   if (typeof data.answer !== "string") throw new Error("Answer unavailable. Please try again.");
-  const proposal=readHomeCandidateProposal(data.candidateProposal,sources);
-  return { answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal };
+  const inspected=inspectHomeCandidateProposal(data.candidateProposal,sources),proposal=inspected.proposal;
+  const serverDiagnostic=readHomePreparationDiagnostic(data.candidateDiagnostic);
+  const useServer=!data.candidateProposal&&serverDiagnostic&&serverDiagnostic.reason!=='ready';
+  const diagnostic=useServer?serverDiagnostic:data.candidateProposal?inspected.diagnostic:{reason:'diagnostic_unavailable' as const,optionCount:0,missingFieldCount:0};
+  return { answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal, diagnostic, diagnosticStage:useServer?'server' as const:'client' as const };
 }
 
 const noActionSubscription=()=>()=>{};
@@ -71,7 +74,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const sources = pack.sources;
   const [candidate,setCandidate]=useState<{proposal:HomeCandidateProposal;selectionGoal:string;sourceKey:string;context:string;epoch:number;originGoalId:string}|null>(null);
   const [candidateNotice,setCandidateNotice]=useState('');
-  const [preparationUnavailable,setPreparationUnavailable]=useState<string|null>(null);
+  const [preparationUnavailable,setPreparationUnavailable]=useState<{context:string;diagnostic:HomePreparationDiagnostic;stage:'server'|'client'}|null>(null);
   const storedCandidate=storage.data.workspaces[conversation.activeGoalId]?.fields.homeCandidateOptions;
   const selectionGoal=candidateSelectionGoal(storedCandidate)??conversation.focusedIssue;
   const savedCandidatePack=buildHomePack(sourceResults,workforceScope,selectionGoal,developmentSession);
@@ -204,7 +207,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
         if(conversation.activeGoalId)decisionStore.setField(conversation.activeGoalId,'homeCandidateOptions',{version:1,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:captured.sourceKey,proposal:reply.proposal});
         else setCandidate(captured);
       }
-      setPreparationUnavailable(reply.proposal?null:key);
+      setPreparationUnavailable(reply.proposal?null:{context:key,diagnostic:reply.diagnostic,stage:reply.diagnosticStage});
       if(preserveDraft&&!reply.proposal)setCandidateNotice("No new candidate options could be verified from this reply. Your existing work and drafts are kept.");
       conversation.setHomeGoalChoiceKey(reply.chooseGoal && !conversation.focusedIssue ? key : null);
       setMessages(current => [...current, { role: "assistant", content: answer }]);
@@ -318,7 +321,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     </section>}
 
     {!conversation.focusedIssue&&candidatePanel}
-    {preparationUnavailable===contextKey&&<section role="status" aria-label="Problem and options not prepared" className="space-y-1 rounded border p-3 text-sm"><p className="font-semibold">Problem and options not prepared</p><p>This answer has no validated problem and options to pin. Your work and drafts are kept; nothing was pinned or calculated. No retry runs automatically.</p></section>}
+    {preparationUnavailable?.context===contextKey&&<section role="status" aria-label="Problem and options not prepared" className="space-y-1 rounded border p-3 text-sm"><p className="font-semibold">Problem and options not prepared</p><p>This answer has no validated problem and options to pin. Your work and drafts are kept; nothing was pinned or calculated. No retry runs automatically.</p><details><summary className="cursor-pointer py-1">Preparation details</summary><p>Stage: {preparationUnavailable.stage}. Reason: {preparationUnavailable.diagnostic.reason}. Candidate count (4 means 4 or more): {preparationUnavailable.diagnostic.optionCount}. Missing fields: {preparationUnavailable.diagnostic.missingFieldCount}.</p></details></section>}
     {candidateNotice&&<p role="status">{candidateNotice}</p>}
     </div>
 
