@@ -115,3 +115,42 @@ test('explicit ISO recruiting launch is accepted without inventing arrival; omit
  const saved={...input,inputs:{...input.inputs,recruitingStart:'2026-11-15'}};assert.equal(validateClarificationResult(response([]),saved,catalog).draft.recruitingStart,'2026-11-15');
  assert.throws(()=>validateClarificationResult(response([{field:'recruitingStart',value:'2027-01-01',evidence:'Recruiting launches in January 2027'}]),{...request,statement:'Recruiting launches in January 2027.'},catalog),/grounded/);
 });
+
+// Synthetic proposals reproduce the reported stage; they are not captured model output.
+test('reported ISO planning sentence accepts exact evidence including its terminal period',()=>{
+ const statement='SYNTHETIC TEST: Add 2 AI Engineer roles in Data & AI. Planning starts 2027-01 for 12 months. Build 0, Move 1, Buy 1. Other inputs unknown; no operational action.';
+ const source={business_units:[{org_code:'BU-DATAAI',org_name:'Data & AI'}],job_profiles:[{job_profile_code:'AI-ENG',job_profile_name:'AI Engineer'}],combinations:[{org_code:'BU-DATAAI',job_profile_code:'AI-ENG'}]};
+ const input={goal:statement,statement,inputs:{...emptyWorkforcePlanInput(),intent:'additional'}},before=structuredClone(input);
+ const changes=[['businessUnit','BU-DATAAI','Data & AI'],['jobProfile','AI-ENG','AI Engineer'],['roles','2','Add 2 AI Engineer roles'],['planningMonth','2027-01','Planning starts 2027-01 for 12 months.'],['months','12','12 months'],['build','0','Build 0'],['move','1','Move 1'],['buy','1','Buy 1']].map(([field,value,evidence])=>({field,value,evidence}));
+ const result=validateClarificationResult(response(changes),input,source);
+ assert.equal(result.draft.planningMonth,'2027-01');assert.equal(result.draft.months,'12');assert.equal(result.changes[3].evidence,'Planning starts 2027-01 for 12 months.');
+ for(const field of ['backfills','recruitingStart','arrivalDate','arrivalMode','annualHireCost','budget'])assert.equal(result.draft[field],'');
+ assert.deepEqual(input,before);
+});
+test('month context matching tolerates exact trailing clause punctuation without changing evidence',()=>{
+ for(const field of ['planningMonth','buildMonth','moveMonth','deadlineMonth'])for(const end of ['.','!','?',';',',','\n','. ']){
+  const evidence='January 2027'+end,statement='Start '+evidence+' Costs unknown.';
+  const result=validateClarificationResult(response([{field,value:'2027-01',evidence}]),{...request,statement},catalog);
+  assert.equal(result.draft[field],'2027-01');assert.equal(result.changes[0].evidence,evidence);
+ }
+});
+test('punctuated month evidence still rejects nonexact, negated, uncertain and unsupported values',()=>{
+ for(const [statement,evidence,value] of [
+  ['Start 2027-01.','2027-01!','2027-01'],
+  ['Not 2027-01.','2027-01.','2027-01'],
+  ['Start 2027-01, or February 2027.','2027-01,','2027-01'],
+  ['Start January 2027 or 2028.','January 2027 or 2028.','2027-01'],
+  ['Start 2027-01 is unknown.','2027-01 is unknown.','2027-01'],
+  ['Start 2027-01.','2027-01.','2027-02'],
+  ['Start January.','January.','2027-01'],
+  ['Start Q1 2027.','Q1 2027.','2027-01'],
+  ['Start 01/02/2027.','01/02/2027.','2027-01'],
+ ])assert.throws(()=>validateClarificationResult(response([{field:'planningMonth',value,evidence}]),{...request,statement},catalog),/grounded/);
+});
+test('model schema patterns accept supported numeric and calendar representations',()=>{
+ const variants=clarificationRequest(request,catalog).text.format.schema.properties.changes.items.anyOf;
+ for(const [field,valid,invalid] of [['planningMonth','2027-01','January 2027'],['recruitingStart','2027-01-01','2027-01'],['roles','2','2.5'],['annualHireCost','120000.50','USD 120000']]){
+  const pattern=new RegExp(variants.find(item=>item.properties.field.enum[0]===field).properties.value.pattern);
+  assert.ok(pattern.test(valid));assert.ok(!pattern.test(invalid));
+ }
+});

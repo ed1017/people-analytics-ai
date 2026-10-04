@@ -101,7 +101,11 @@ function grounded(change:ClarificationChange,input:ClarificationInput,catalog:Wo
     // from its source clause. Commas/semicolons separate distinct assumptions.
     const source=input.statement.includes(change.evidence)?input.statement:input.goal;
     const clauses=source.toLowerCase().split(/[,](?!\s*(?:or|not|rather|instead)\b)|[.!?;\n]/);
-    return clauses.some(clause=>clause.includes(quote)&&unambiguous(clause));
+    // The source split removes clause terminators. Ignore those only for this
+    // containment comparison; exact evidence and ambiguity checks above still
+    // use the original quote, and the full source clause must remain supported.
+    const contextQuote=quote.replace(/[.!?;,\s]+$/,'').trimStart();
+    return clauses.some(clause=>clause.includes(contextQuote)&&unambiguous(clause));
   }
   if(dates.has(change.field))return quote.includes(change.value);
   const normalized=quote.replace(/(\d),(?=\d{3}(?:\D|$))/g,'$1').replace(/(\d),(?=\d{3})/g,'$1');

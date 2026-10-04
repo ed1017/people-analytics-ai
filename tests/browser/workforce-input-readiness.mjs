@@ -30,8 +30,9 @@ try{for(const width of [1366,390]){
  await page.goto('http://127.0.0.1:3100/');await page.evaluate(seed=>window.readinessSeed=seed,{encoded:encodeDecisions(data),empty,complete,newer});await page.addStyleTag({content:css});await page.addScriptTag({content:bundle});
  const summary=page.getByRole('region',{name:'Workforce input readiness',exact:true}),button=name=>page.getByRole('button',{name,exact:true,includeHidden:true}),field=name=>page.getByLabel(name,{exact:true});
  const state=()=>page.evaluate(()=>window.readinessSaved());
+ await page.getByText(/Input status and unknowns/).click();
  const before=JSON.stringify(await state());
- check(width+' missing inputs appear before opening editor',(await summary.innerText()).includes('Missing input')&&!await field('Business unit').isVisible());
+ check(width+' missing inputs have guided controls and accessible detail',(await summary.innerText()).includes('Missing input')&&await field('Business unit').isVisible());
  await summary.getByRole('button',{name:'Review Business unit',exact:true}).focus();await page.keyboard.press('Enter');
  check(width+' keyboard action opens editor and focuses exact field',await field('Business unit').evaluate(el=>el===document.activeElement)&&await field('Business unit').getAttribute('aria-invalid')==='true');
  await page.keyboard.press('Tab');check(width+' focus can leave the linked field without a trap',await field('Job profile').evaluate(el=>el===document.activeElement));
