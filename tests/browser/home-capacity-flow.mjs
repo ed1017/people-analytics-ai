@@ -42,7 +42,7 @@ try{for(const mode of [{name:'desktop',width:1366},{name:'mobile',width:390},{na
  const checkHere=(name,value)=>check(mode.name+' '+name,value);
  await init();const baseline=posts.length;
  const body=page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('A synthetic capacity question is ready for review.',{exact:true}).locator('../..');
- checkHere('Home body is 14px, readable and compact',await body.evaluate(el=>getComputedStyle(el).fontSize==='14px'&&parseFloat(getComputedStyle(el).lineHeight)>=21&&getComputedStyle(el.children[0]).marginBlockEnd==='4px'));
+ checkHere('Home body is 14px, readable and compact',await body.evaluate(el=>getComputedStyle(el).fontSize==='14px'&&getComputedStyle(el).lineHeight==='21px'&&getComputedStyle(el.children[1]).marginBlockStart==='6px'));
  checkHere('text uncertainty and source link retained',await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('Costs and operational availability remain unknown.',{exact:false}).count()===1&&await page.getByRole('region',{name:'Overview conversation',exact:true}).getByRole('complementary',{name:'Answer sources'}).getByRole('button',{name:'Workforce',exact:true}).count()===1);
  if(!built)checkHere('other page body remains 16px',await page.getByRole('region',{name:'Other page typography'}).getByText('Other page body.',{exact:true}).evaluate(el=>getComputedStyle(el).fontSize==='16px'));
  checkHere('fixed goal examples are labeled as examples',await page.getByText('Examples of goals you can choose — not evidence-based priorities. You can also write your own.',{exact:true}).isVisible());

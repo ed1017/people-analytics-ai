@@ -71,6 +71,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const [evidenceError, setEvidenceError] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(0);
   const { messages, setMessages, input, setInput, loading: chatLoading, setLoading: setChatLoading, error: chatError, setError: setChatError, problem: journey, questionUnanswered, setQuestionUnanswered, history: modelHistoryRef } = conversation;
+  const hasAnswer=messages.some(message=>message.role==="assistant");
   const optionSnapshot=useSyncExternalStore(optionActions?.subscribe??noActionSubscription,optionActions?.getSnapshot??noActionSnapshot,noActionSnapshot);
   const [stagedOptions,setStagedOptions]=useState(()=>new Map<string,StagedOptionAction>());
   const forgetOption=(goalId:string)=>setStagedOptions(before=>{const next=new Map(before);next.delete(goalId);return next});
@@ -98,6 +99,13 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const loadedAt = useRef(0);
   const composer = useRef<HTMLTextAreaElement>(null);
   const conversationViewport = useRef<HTMLDivElement>(null);
+  useLayoutEffect(()=>{
+    const node=composer.current;if(!node||!active)return;
+    const resize=()=>{node.style.height='auto';node.style.height=`${Math.min(320,Math.max(80,node.scrollHeight+2))}px`;};
+    resize();let width=node.clientWidth;
+    const observer=new ResizeObserver(()=>{if(node.clientWidth!==width){width=node.clientWidth;resize();}});
+    observer.observe(node);return()=>observer.disconnect();
+  },[input,active]);
   const selectedCountry = new URLSearchParams(workforceQuery).get("country") ?? "all";
   const scopeIdentity = JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,persona]);
   useLayoutEffect(()=>{if(active&&conversationViewport.current)conversationViewport.current.scrollTop=0;},[active,scopeIdentity,workforceQuery]);
@@ -114,7 +122,6 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     const pending={message:visibleScopeChoice.message,query:"?"+query.toString(),identity:scopeIdentity};
     pendingScopeRef.current=pending;setPendingScope(pending);setScopeChoice(null);onCountry(option.value);
   }
-
 
   useEffect(() => {
     const loadKey = JSON.stringify({workforceQuery, workforceScope, refresh, persona});
@@ -195,7 +202,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       setMessages(current => [...current, { role: "assistant", content: answer }]);
       modelHistoryRef.current = completeScopedChatTurn(key, history, message, answer);
       if (!actionPlan) { conversation.rememberQuestion(key, message); setQuestionUnanswered(false); }
-      window.requestAnimationFrame(() => { const viewport = conversationViewport.current; if (viewport) viewport.scrollTop = viewport.scrollHeight; });
+      window.requestAnimationFrame(() => { const viewport=conversationViewport.current,answers=viewport?.querySelectorAll<HTMLElement>('[data-chat-role="assistant"]'),answer=answers?.[answers.length-1]; if(viewport&&answer)viewport.scrollTop+=answer.getBoundingClientRect().top-viewport.getBoundingClientRect().top; });
     } catch (error) { if (!request.current() || currentEvidenceKey.current !== key) return; setChatError(error instanceof Error ? error.message : "Answer unavailable. Please try again."); if (!actionPlan) setInput(message); }
     finally { if (request.current() && currentEvidenceKey.current === key) setChatLoading(false); }
   }
@@ -212,7 +219,21 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     if(!active || pendingScope.identity!==scopeIdentity || pendingScope.query!==workforceQuery || input.trim()!==pendingScope.message) finishScopeRequest(pendingScope,true);
     else if(ready) finishScopeRequest(pendingScope,false);
   },[pendingScope,active,scopeIdentity,workforceQuery,input,ready]);
-  return <div className="home-workspace mx-auto grid w-full max-w-none items-start gap-5 px-5 pt-6 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-4 xl:min-h-[calc(100dvh-var(--app-header-height)-2rem)]">
+  const startingGuide=(
+    <section aria-label="Starting guide" data-testid="overview-starting-guide" className="py-2">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <h3 className="text-lg font-semibold">Questions to explore</h3>
+        <p className="text-sm text-muted-foreground">Use an example or write your own question.</p>
+        <button type="button" aria-label="Refresh overview evidence" disabled={loading || chatLoading}
+          onClick={() => { loaded.current = ""; setRefresh(value => value + 1); }}
+          className="ml-auto rounded-md p-2 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18} /></button>
+      </div>
+
+      <div className="mt-3"><PromptExamples prompts={contextualPrompts({page:"home",goal:conversation.focusedIssue,hasConversation:messages.some(message=>message.role==="user"),evidenceReady:ready,sources})} draft={input} busy={chatLoading} onDraft={draftQuestion}/></div>
+
+    </section>
+  );
+  return <div className="home-workspace mx-auto grid w-full max-w-none items-start gap-5 px-5 pt-6 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-3">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-4 gap-y-1"><h2 id="overall-overview-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl xl:text-2xl 2xl:text-3xl">From Insight to Action</h2><p className="w-full text-sm text-muted-foreground sm:w-auto">by Ed Om <span aria-hidden="true">·</span> <a className="text-primary underline" href="mailto:edwinom.nyc@gmail.com">edwinom.nyc@gmail.com</a></p></div>
         <div className="ml-auto flex items-center gap-3 text-xs">
@@ -239,32 +260,15 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
         </div>
       </div>
 
-    <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" className="min-h-[20rem] max-h-[70dvh] space-y-5 overflow-y-auto pr-1 xl:flex-1">
+    <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
     <GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:workforceScope}} payload={{page:"home",persona,overviewBriefingContext:pack,marketReference}} active={active} ready={ready} paused={planningActive||localCandidate||localAction?.goalId===conversation.activeGoalId||chatLoading||Boolean(input.trim())||Boolean(pendingScope)||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} onNavigate={onNavigate}/>
-    <section aria-label="Starting guide" data-testid="overview-starting-guide" className="py-2">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <h3 className="text-lg font-semibold">Questions to explore</h3>
-        <p className="text-sm text-muted-foreground">Use an example or write your own question.</p>
-        <button type="button" aria-label="Refresh overview evidence" disabled={loading || chatLoading}
-          onClick={() => { loaded.current = ""; setRefresh(value => value + 1); }}
-          className="ml-auto rounded-md p-2 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18} /></button>
-      </div>
-      {actionOffers.length>0&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2 text-sm">Option action suggestions</summary><section aria-label="Workforce option actions" className="mt-3 space-y-2"><p className="text-sm text-muted-foreground">{input.trim()?'Your draft is kept. Clear it to choose an option action.':'Choose an option action, then Send to open it locally.'}</p><div className="flex flex-wrap gap-2">{actionOffers.map(offer=><button key={offer.id} type="button" disabled={chatLoading||Boolean(input.trim())} onClick={()=>draftOption(offer.id)} className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{offer.label}</button>)}</div></section></details>}
-      <div className="mt-3"><PromptExamples prompts={contextualPrompts({page:"home",goal:conversation.focusedIssue,hasConversation:messages.some(message=>message.role==="user"),evidenceReady:ready,sources})} draft={input} busy={chatLoading} onDraft={draftQuestion}/></div>
-      {loading && <p role="status" className="mt-3 text-sm text-muted-foreground">Loading available evidence for your questions.</p>}
-
-
-
-    </section>
-
-
-
+    {!hasAnswer&&startingGuide}
+    {loading && <p role="status" className="text-sm text-muted-foreground">Loading available evidence for your questions.</p>}
 
       {evidenceError && <p role="alert" className="mt-3 text-base text-destructive">{evidenceError}</p>}
 
-
-    {messages.length > 0 && <section aria-label="Overview conversation" className="space-y-6">
-      <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona])} onNavigate={onNavigate} home hideHistory/>
+    {messages.length > 0 && <section aria-label="Overview conversation" className="space-y-3">
+      <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona])} onNavigate={onNavigate} home hideHistory latestOnly/>
       {conversation.homeGoalChoiceKey === contextKey && !conversation.focusedIssue && <div role="group" aria-label="Choose a goal" className="flex flex-wrap gap-2">
         <p className="w-full text-sm text-muted-foreground">Examples of goals you can choose — not evidence-based priorities. You can also write your own.</p>
         {(Object.keys(homeGoalReplies) as Array<keyof typeof homeGoalReplies>).map(goal => <button key={goal} type="button" disabled={chatLoading || !ready || Boolean(input.trim())} onClick={() => draftQuestion(homeGoalReplies[goal])} className="min-h-11 rounded-lg border border-primary px-4 py-2 font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{goal}</button>)}
@@ -276,7 +280,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
 
     </div>
 
-    <form onSubmit={event => { event.preventDefault(); void send(); }} className="mt-auto shrink-0 rounded-2xl border bg-card p-3 shadow-lg">
+    <form onSubmit={event => { event.preventDefault(); void send(); }} className="shrink-0 rounded-2xl border bg-card p-3 shadow-lg">
       {(conversation.focusedIssue||messages.some(message=>message.role==='user')||input.trim())&&<div className="mb-2">
         <button type="button" disabled={chatLoading||!conversation.storageReady||!conversation.saved||Boolean(conversation.issueEditor)||Boolean(planningReview)} onClick={compareWorkforceOptions} className="min-h-11 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{hasPlan?'Continue workforce options':'Compare workforce options'}</button>
         <p className="mt-1 text-xs text-muted-foreground">{hasPlan?'Continue reviewing your saved assumptions and options. Your chat draft is kept.':'Review whether your goal needs additional role capacity, then choose assumptions to compare.'}</p>
@@ -291,10 +295,12 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       {localAction?.goalId===conversation.activeGoalId&&(!activeStage||localCandidate)&&<p role="status" className="mb-3 text-sm">{localAction.notice}</p>}
       <label htmlFor="overview-question" className="sr-only">Ask Workforce AI</label>
       <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" value={input} onChange={event => changeQuestion(event.target.value)} rows={2}
-        placeholder="Describe a business issue, and I’ll help you explore the evidence, compare options, and build or adjust a plan." className="max-h-80 min-h-[calc(4lh+1.5rem+2px)] w-full resize-y sm:min-h-20 rounded-lg border bg-background/40 p-3 text-lg placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+        placeholder="Describe a business issue, and I’ll help you explore the evidence, compare options, and build or adjust a plan." className="max-h-80 min-h-20 w-full resize-y rounded-lg border bg-background/40 p-3 text-lg placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
       <div className="mt-2 flex items-center justify-end gap-3">
         <button type="submit" aria-label="Send overview question" disabled={(!localCandidate&&!ready) || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
     </form>
+      {actionOffers.length>0&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2 text-sm">Option action suggestions</summary><section aria-label="Workforce option actions" className="mt-3 space-y-2"><p className="text-sm text-muted-foreground">{input.trim()?'Your draft is kept. Clear it to choose an option action.':'Choose an option action, then Send to open it locally.'}</p><div className="flex flex-wrap gap-2">{actionOffers.map(offer=><button key={offer.id} type="button" disabled={chatLoading||Boolean(input.trim())} onClick={()=>draftOption(offer.id)} className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{offer.label}</button>)}</div></section></details>}
+    {hasAnswer&&<details key={conversation.workspaceKey} className="text-sm"><summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">More questions</summary>{startingGuide}</details>}
   </section>
     <aside className="order-3 p-5 text-sm leading-relaxed xl:order-none" aria-label="How to use this app">
       <h3 className="text-lg font-semibold">From question to plan</h3>

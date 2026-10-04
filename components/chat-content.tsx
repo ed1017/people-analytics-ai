@@ -208,6 +208,7 @@ export function ChatContent({
     }
 
     if (!trimmed) {
+      if (compact) { index += 1; continue; }
       rendered.push(
         <div
           key={`space-${index}`}
@@ -227,6 +228,7 @@ export function ChatContent({
       rendered.push(
         <p
           key={`heading-${index}`}
+          data-chat-heading={compact || undefined}
           className="font-semibold"
         >
           {renderInlineMarkdown(
@@ -248,6 +250,7 @@ export function ChatContent({
       rendered.push(
         <div
           key={`bullet-${index}`}
+          data-chat-item={compact || undefined}
           className="flex gap-2"
         >
           <span className="text-muted-foreground">
@@ -274,6 +277,7 @@ export function ChatContent({
       rendered.push(
         <div
           key={`number-${index}`}
+          data-chat-item={compact || undefined}
           className="flex gap-2"
         >
           <span className="min-w-5 text-muted-foreground">
@@ -303,7 +307,7 @@ export function ChatContent({
   }
 
   return (
-    <div className={compact ? "space-y-1 text-sm leading-relaxed" : "space-y-2 leading-relaxed"}>
+    <div className={compact ? "home-answer text-sm leading-[1.5]" : "space-y-2 leading-relaxed"}>
       {rendered}
       {references.length > 0 && <aside aria-label="Answer sources" className="mt-2 space-y-0.5 border-t border-border/40 pt-1">
         {references.map((reference, referenceIndex) => <div key={referenceIndex} className="text-[11px] leading-relaxed">{renderInlineMarkdown(reference, onNavigate)}</div>)}
