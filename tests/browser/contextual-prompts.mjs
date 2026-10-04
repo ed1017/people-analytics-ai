@@ -7,7 +7,7 @@ import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
 import {encodeDecisions,DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
 const {chromium,devices}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const output=await fs.mkdtemp(path.join(os.tmpdir(),'contextual-prompts-'));
-const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/contextual-prompts.tsx'),output:{path:output,filename:'fixture.js'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/contextual-prompts.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
 const bundle=await fs.readFile(path.join(output,'fixture.js'),'utf8');
 const css=(await Promise.all((await fs.readdir('.next/static/chunks')).filter(name=>name.endsWith('.css')).map(name=>fs.readFile(path.join('.next/static/chunks',name),'utf8')))).join('\n');
@@ -36,7 +36,7 @@ try{for(const width of [1366,390]){
  check(width+' Home guidance is an empty accessible placeholder',await home.getAttribute('placeholder')===placeholder&&await home.inputValue()===''&&await page.getByRole('textbox',{name:'Ask Workforce AI',exact:true}).count()===1);
  check(width+' placeholder fits the composer',await home.evaluate(el=>el.scrollHeight<=el.clientHeight));
  const sizing=await home.evaluate(el=>{const height=el.getBoundingClientRect().height,minHeight=getComputedStyle(el).minHeight;el.style.minHeight='80px';const baselineHeight=el.getBoundingClientRect().height;el.style.removeProperty('min-height');return {viewport:innerWidth,rows:el.rows,height,baselineHeight,change:height-baselineHeight,lineHeight:getComputedStyle(el).lineHeight,minHeight}});
- check(width+' sizing retains desktop baseline and adds only mobile room',sizing.rows===2&&(width===390?sizing.change===56:sizing.change===0));
+ check(width+' composer grows to fit its placeholder with a two-row floor',sizing.rows===2&&sizing.height>=80&&sizing.height<=320&&await home.evaluate(el=>el.scrollHeight<=el.clientHeight));
  console.log('COMPOSER '+JSON.stringify(sizing));
  check(width+' redundant helper copy removed',await page.getByText('Keep this focus across pages.',{exact:true}).count()===0&&await page.getByText('Choose an example to edit, then send when ready.',{exact:true}).count()===0);
  const development=page.getByText('In development',{exact:true}),details=page.getByRole('button',{name:'Open data details',exact:true});

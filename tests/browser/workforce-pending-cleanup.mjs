@@ -45,11 +45,11 @@ try{for(const width of [1366,390]){
   if(url==='http://127.0.0.1:3100/api/workforce-solution'){await new Promise(resolve=>releaseNative=resolve);return route.fulfill({json:history.results.at(-1).payload}).catch(()=>{})}
   unexpected++;return route.abort();
  });
- const button=name=>page.getByRole('button',{name,exact:true}),calculate=()=>button('Calculate saved assumptions and compare hiring-only'),state=()=>page.evaluate(()=>window.readinessSaved()),solution=async()=>(await state()).workspaces[goalId]?.fields.workforceSolution;
+ const button=name=>page.getByRole('button',{name,exact:true,includeHidden:true}),calculate=()=>button(/^Calculate (options|saved assumptions and compare hiring-only)$/),state=()=>page.evaluate(()=>window.readinessSaved()),solution=async()=>(await state()).workspaces[goalId]?.fields.workforceSolution;
  const init=async(held=false,fastTimeout=false)=>{
   await page.goto('http://127.0.0.1:3100/');await page.evaluate(key=>localStorage.removeItem(key),DECISIONS_STORAGE_KEY);
   await page.evaluate(({seed,held,response,fastTimeout})=>{if(fastTimeout){const nativeTimer=window.setTimeout;window.setTimeout=(fn,delay,...args)=>nativeTimer(fn,delay===65000?30:delay,...args)}window.readinessSeed=seed;window.requests=[];if(held){const native=window.fetch;window.fetch=(url,options)=>String(url)==='/api/workforce-solution'?new Promise(resolve=>window.requests.push({signal:options.signal,release:()=>resolve(new Response(JSON.stringify(response),{status:200,headers:{'Content-Type':'application/json'}}))})):native(url,options)}},{seed:{encoded:encodeDecisions(data),empty,complete:history,newer},held,fastTimeout,response:history.results.at(-1).payload});
-  await page.addStyleTag({content:css});await page.addScriptTag({content:bundle});await button('Open pinned version 2').click();await page.getByRole('heading',{name:'Calculated decision brief — version 2',exact:true}).waitFor();
+  await page.addStyleTag({content:css});await page.addScriptTag({content:bundle});await page.getByText('Saved pins',{exact:true}).click();await button('Open pinned version 2').click();await page.getByRole('heading',{name:'Calculated decision brief — version 2',exact:true}).waitFor();
   await page.waitForFunction(()=>!document.querySelector('select[aria-label="Your comparison priority"]')?.disabled);
  };
  await init();const before=await solution(),pins=(await state()).workspaces[goalId].fields.workforceSolutionPins;

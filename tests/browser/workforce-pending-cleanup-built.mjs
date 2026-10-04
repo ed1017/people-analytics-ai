@@ -36,10 +36,10 @@ try{for(const width of [1366,390]){
  });
  await page.addInitScript(({key,seed})=>localStorage.setItem(key,seed),{key:DECISIONS_STORAGE_KEY,seed:encodeDecisions(data)});
  await page.goto('http://127.0.0.1:3100/',{waitUntil:'domcontentloaded'});
- const workspace=page.getByRole('region',{name:'Workforce solution workspace',exact:true}),button=name=>workspace.getByRole('button',{name,exact:true}),state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
- await button('Open pinned version 2').click();await workspace.getByRole('heading',{name:'Calculated decision brief — version 2',exact:true}).waitFor();const before=(await state()).workspaces[goalId].fields;
+ const workspace=page.getByRole('region',{name:'Workforce solution workspace',exact:true}),button=name=>workspace.getByRole('button',{name,exact:true,includeHidden:true}),state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
+ await workspace.getByText('Saved pins',{exact:true}).click();await button('Open pinned version 2').click();await workspace.getByRole('heading',{name:'Calculated decision brief — version 2',exact:true}).waitFor();const before=(await state()).workspaces[goalId].fields;
  check(width+' built app opens exact historical pin with current v3',before.workforceInspection==='result-v2'&&before.workforceSolution.versions.at(-1).version===3);
- await button('Calculate saved assumptions and compare hiring-only').click();await button('Cancel pending request').waitFor();check(width+' Calculate disabled while request is pending',await button('Calculate saved assumptions and compare hiring-only').isDisabled());
+ await button(/^Calculate (options|saved assumptions and compare hiring-only)$/).click();await button('Cancel pending request').waitFor();check(width+' Calculate disabled while request is pending',await button(/^Calculate (options|saved assumptions and compare hiring-only)$/).isDisabled());
  await page.getByLabel('Selected goal',{exact:true}).selectOption('goal-other');await page.waitForTimeout(150);if(release)release();await page.waitForTimeout(100);
  await page.getByLabel('Selected goal',{exact:true}).selectOption(goalId);await workspace.getByRole('heading',{name:'Calculated decision brief — version 2',exact:true}).waitFor();
  const after=(await state()).workspaces[goalId].fields;
@@ -47,7 +47,7 @@ try{for(const width of [1366,390]){
  check(width+' versions, results, approval and pin records survive',JSON.stringify(after.workforceSolution.versions)===JSON.stringify(before.workforceSolution.versions)&&JSON.stringify(after.workforceSolution.results)===JSON.stringify(before.workforceSolution.results)&&JSON.stringify(after.workforceSolution.approvals)===JSON.stringify(before.workforceSolution.approvals)&&JSON.stringify(after.workforceSolutionPins)===JSON.stringify(before.workforceSolutionPins)&&after.workforceInspection==='result-v2');
  // Pin controls recover only after the restored source finishes local verification.
  await page.waitForFunction(()=>{const pin=[...document.querySelectorAll('button')].find(button=>button.textContent==='Open pinned version 2');return pin&&!pin.disabled});
- check(width+' controls recover without Cancel and historical approval stays gated',await button('Calculate saved assumptions and compare hiring-only').isEnabled()&&await button('Open pinned version 2').isEnabled()&&await button('Record version-specific approval note').isDisabled()&&!(await workspace.getByRole('region',{name:'Continue this workforce decision',exact:true}).innerText()).includes('request is in progress'));
+ check(width+' controls recover without Cancel and historical approval stays gated',await button(/^Calculate (options|saved assumptions and compare hiring-only)$/).isEnabled()&&await button('Open pinned version 2').isEnabled()&&await button('Record version-specific approval note').isDisabled()&&!(await workspace.getByRole('region',{name:'Continue this workforce decision',exact:true}).innerText()).includes('request is in progress'));
  check(width+' only synthetic intercepted APIs and no live traffic '+JSON.stringify({calculations,blockedModelRequests:modelCalls,blockedModelPaths:modelPaths,nonlocal,errors}),calculations===1&&nonlocal===0&&errors.length===0);
  await context.close();
 }console.log(`${checks} built pending-cleanup browser checks passed; real goal selector, Chromium desktop + Pixel emulation`)}finally{await browser.close()}
