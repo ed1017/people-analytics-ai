@@ -8,7 +8,7 @@ import {revealJourneyTarget} from "@/components/workforce-journey-continue";
 export type HomeCapacityRequest={context:string;goalId:string;goal:string};
 const button="min-h-11 rounded border px-3 py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50";
 
-export function HomeCapacityReview({request,context,conversation,onClose,onConfirmed}:{request:HomeCapacityRequest;context:string;conversation:ProblemConversation;onClose:()=>void;onConfirmed:(goalId:string,goal:string)=>void}){
+export function HomeCapacityReview({request,context,conversation,onClose,onConfirmed,onRetention}:{request:HomeCapacityRequest;context:string;conversation:ProblemConversation;onClose:()=>void;onConfirmed:(goalId:string,goal:string)=>void;onRetention?:(goalId:string,goal:string)=>void}){
  const root=useRef<HTMLElement>(null);
  const [goal,setGoal]=useState(request.goal),[scope,setScope]=useState(''),[notice,setNotice]=useState(''),[invalidated,setInvalidated]=useState(false);
  const invalid=useRef(false);
@@ -45,6 +45,15 @@ export function HomeCapacityReview({request,context,conversation,onClose,onConfi
    requestAnimationFrame(()=>revealJourneyTarget(document.querySelector<HTMLElement>('[data-home-planner-heading]')));
   }catch(error){setNotice((error as Error).message)}
  }
+ function confirmRetention(){
+  if(blocked||invalid.current||scope!=='retention'||!onRetention)return;
+  try{
+   if(decisionStore.getSnapshot().data.goals.activeId!==request.goalId)throw Error('The selected goal changed. Reopen the scope review.');
+   const id=conversation.confirmWorkforceGoal(goal);
+   if(!decisionStore.getSnapshot().saved)throw Error('Browser storage could not save the goal. Your draft is retained.');
+   onRetention(id,goal.trim());
+  }catch(error){setNotice((error as Error).message)}
+ }
  return <section ref={root} tabIndex={-1} aria-label="Review workforce planning scope" className="space-y-3 rounded-lg border border-primary/40 p-4 text-sm">
   <h2 className="text-lg font-semibold">Review the goal and planning scope</h2>
   <p>Compare development, internal moves and external hiring for <strong>additional role capacity in one business unit</strong>. Costs and timing depend on assumptions you review next. This does not estimate retention improvements or replacement-only hiring.</p>
@@ -60,10 +69,11 @@ export function HomeCapacityReview({request,context,conversation,onClose,onConfi
   </fieldset>
   {scope==='additional'&&<p>Confirm only the additional-capacity part of your goal. Retention effects remain unknown. Next: choose a role and business unit, fill missing demand, timing and cost assumptions, <strong>Save reviewed inputs</strong>, then <strong>Calculate options</strong>.</p>}
   {(scope==='retention'||scope==='replacement')&&<p role="status">This scope is not supported by the additional-capacity calculator. Continue the conversation to investigate evidence and next steps. No workforce plan or calculation has been created.</p>}
+  {scope==='retention'&&onRetention&&<p>Retention what-if explores one program using your own expected-exit baseline, effect range, timing and costs. It is conditional arithmetic, not a forecast. Page filters do not supply its population or assumptions.</p>}
   {scope==='unknown'&&<p role="status">Clarify whether you need additional roles before using this calculator. You can continue the conversation; your draft is kept.</p>}
   {stale&&<p role="status">Your goal or context changed. Close and reopen Compare workforce options to review the current context. Your review text is retained here for reference.</p>}
   {notice&&<p role="alert">{notice}</p>}
-  <div className="flex flex-wrap gap-2"><button type="button" className={button} disabled={blocked||scope!=='additional'||!goal.trim()||goal.trim().length>240} onClick={confirm}>Confirm goal and review inputs</button><button type="button" className={button} onClick={onClose}>Return to conversation</button></div>
+  <div className="flex flex-wrap gap-2">{scope==='retention'&&onRetention&&<button type="button" className={button} disabled={blocked||!goal.trim()||goal.trim().length>240} onClick={confirmRetention}>Confirm goal and open Retention what-if</button>}{!(scope==='retention'&&onRetention)&&<button type="button" className={button} disabled={blocked||scope!=='additional'||!goal.trim()||goal.trim().length>240} onClick={confirm}>Confirm goal and review inputs</button>}<button type="button" className={button} onClick={onClose}>Return to conversation</button></div>
   <p className="text-xs text-muted-foreground">Confirmation saves this goal and opens local inputs. It does not send to AI or calculate. Your conversation draft is kept.</p>
  </section>;
 }

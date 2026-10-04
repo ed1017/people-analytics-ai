@@ -2,6 +2,7 @@
 import {emptyOptionActions,isOptionActionLabel,type WorkforceOptionActions,type OptionAction,type StagedOptionAction} from "@/lib/workforce-option-actions";
 
 import {HomeCapacityReview,type HomeCapacityRequest} from "@/components/home-capacity-review";
+import {RetentionWhatIfPanel} from "@/components/retention-what-if-panel";
 import {WorkforceSolutionPanel} from "@/components/workforce-solution-panel";
 import {revealJourneyTarget} from "@/components/workforce-journey-continue";
 import {recordDecisionEvidence,useDecisionStorage} from "@/components/decision-store";
@@ -50,6 +51,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const storage=useDecisionStorage();
   const planner=useRef<HTMLDivElement>(null);
   const [planningReview,setPlanningReview]=useState<HomeCapacityRequest|null>(null);
+  const [retentionEntry,setRetentionEntry]=useState<{id:string;sequence:number}|null>(null);
   const [planningGoal,setPlanningGoal]=useState<{id:string;goal:string}|null>(null);
   const planningActive=Boolean(planningReview)||(planningGoal?.id===conversation.activeGoalId&&planningGoal?.goal===conversation.focusedIssue);
   const hasPlan=storage.data.workspaces[conversation.activeGoalId]?.fields.workforceSolution!==undefined;
@@ -322,7 +324,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       </details>
     </aside>
     <div ref={planner} tabIndex={-1} className="order-2 min-w-0 xl:order-none xl:col-span-2">
-      {planningReview&&<HomeCapacityReview request={planningReview} context={planningContext} conversation={conversation} onClose={()=>{setPlanningReview(null);focusQuestion();}} onConfirmed={(id,goal)=>{setPlanningGoal({id,goal});setPlanningReview(null);}}/>}
+      {planningReview&&<HomeCapacityReview request={planningReview} context={planningContext} conversation={conversation} onClose={()=>{setPlanningReview(null);focusQuestion();}} onRetention={(id,goal)=>{setPlanningGoal({id,goal});setPlanningReview(null);setRetentionEntry(previous=>({id,sequence:(previous?.sequence??0)+1}));}} onConfirmed={(id,goal)=>{setPlanningGoal({id,goal});setPlanningReview(null);}}/>}
+      {active&&(retentionEntry?.id===conversation.activeGoalId||storage.data.workspaces[conversation.activeGoalId]?.fields.retentionWhatIfV1!==undefined)&&<RetentionWhatIfPanel key={conversation.activeGoalId} openSequence={retentionEntry?.sequence??0} initiallyOpen={retentionEntry?.id===conversation.activeGoalId}/>}
       {active&&<WorkforceSolutionPanel hideEntry optionActions={optionActions} page="home" onNavigate={onNavigate}/>}
     </div>
   </div>;
