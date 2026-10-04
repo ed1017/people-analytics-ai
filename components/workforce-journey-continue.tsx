@@ -22,8 +22,9 @@ export function revealJourneyTarget(target:HTMLElement|null){
  for(let parent=target.parentElement;parent;parent=parent.parentElement)if(parent instanceof HTMLDetailsElement)parent.open=true;
  target.focus();target.scrollIntoView({block:'center'});
 }
-export function WorkforceJourneyContinue({journey,root,tailoring=false}:{journey:JourneyState;root:RefObject<HTMLElement|null>;tailoring?:boolean}){
+export function WorkforceJourneyContinue({journey,root,tailoring=false,onContinue}:{journey:JourneyState;root:RefObject<HTMLElement|null>;tailoring?:boolean;onContinue?:()=>boolean}){
  const next=()=>{
+  if(onContinue?.())return;
   const scope=root.current;if(!scope)return;
   const fields=tailoring?scope.querySelector<HTMLElement>('[data-journey="preview-tailoring"]')??scope:scope;
   const field=journey.focus.kind==='field'?fields.querySelector<HTMLElement>(`[data-journey-field="${journey.focus.field}"]`):null;

@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {nextRequiredWorkforceStep,workforceInputGroups} from '../lib/workforce-guided-intake.ts';
+import {emptyWorkforcePlanInput,workforcePlanFields} from '../lib/workforce-increment.ts';
+const scope={...emptyWorkforcePlanInput(),businessUnit:'TECH',jobProfile:'ENGINEER',intent:'additional',planningMonth:'2027-01',months:'12',roles:'3'};
+test('guide covers existing supported fields without changing the calculator contract',()=>assert.deepEqual(workforceInputGroups.flatMap(group=>group[2].map(([field])=>field)).sort(),[...workforcePlanFields].sort()));
+test('known scope details are skipped and no input is inferred or mutated',()=>{const before=structuredClone(scope),step=nextRequiredWorkforceStep(scope);assert.equal(step.section,'response');assert.deepEqual(step.fields,['build','move','buy']);assert.deepEqual(scope,before)});
+test('partially known scope asks only missing required fields',()=>{const input={...scope,jobProfile:'',months:''};assert.deepEqual(nextRequiredWorkforceStep(input),{section:'scope',fields:['jobProfile','months']})});
+test('optional blank costs and dates do not produce forced questions or zero defaults',()=>{const input={...scope,build:'0',move:'0',buy:'3'};assert.equal(nextRequiredWorkforceStep(input),null);assert.equal(input.annualHireCost,'');assert.equal(input.arrivalMode,'')});
+test('active internal paths require an explicit backfill count, then optional unknowns stay blank',()=>{const input={...scope,build:'1',move:'1',buy:'1'};assert.deepEqual(nextRequiredWorkforceStep(input),{section:'response',fields:['backfills']});assert.equal(nextRequiredWorkforceStep({...input,backfills:'0'}),null)});
+test('invalid totals route back to fields involved rather than advancing to review',()=>{const step=nextRequiredWorkforceStep({...scope,build:'1',move:'1',buy:'3',backfills:'0'});assert.ok(step);assert.ok(step.fields.includes('roles')||step.fields.includes('buy'))});
+test('historical arrival mode surfaces required launch date without deriving it from the planning month',()=>{const input={...scope,build:'0',move:'0',buy:'3',arrivalMode:'historical-median'};assert.deepEqual(nextRequiredWorkforceStep(input),{section:'timing',fields:['recruitingStart']});assert.equal(input.recruitingStart,'')});
