@@ -1,7 +1,8 @@
 "use client";
+import {emptyOptionActions,isOptionActionLabel,type WorkforceOptionActions,type OptionAction,type StagedOptionAction} from "@/lib/workforce-option-actions";
 
 import {recordDecisionEvidence} from "@/components/decision-store";
-import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUp, RefreshCw, Info } from "lucide-react";
 import { GoalTakeaway } from "@/components/goal-takeaway";
 import { GoalConversationMessages, ConversationMessages } from "@/components/goal-conversation-messages";
@@ -28,7 +29,11 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
   return { answer: data.answer, chooseGoal: data.nextStep === "choose_goal" };
 }
 
-export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry, onEvidencePack, marketReference }: {
+const noActionSubscription=()=>()=>{};
+const noActionSnapshot=()=>emptyOptionActions;
+
+export function OverallOverviewPage({ optionActions, onStartDemo, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry, onEvidencePack, marketReference }: {
+  optionActions?:WorkforceOptionActions;
   marketReference:unknown;
   onEvidencePack:(value:string)=>void;
   countryOptions: CountryOption[];
@@ -50,6 +55,29 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
   const [evidenceError, setEvidenceError] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(0);
   const { messages, setMessages, input, setInput, loading: chatLoading, setLoading: setChatLoading, error: chatError, setError: setChatError, problem: journey, questionUnanswered, setQuestionUnanswered, history: modelHistoryRef } = conversation;
+  const optionSnapshot=useSyncExternalStore(optionActions?.subscribe??noActionSubscription,optionActions?.getSnapshot??noActionSnapshot,noActionSnapshot);
+  const [stagedOptions,setStagedOptions]=useState(()=>new Map<string,StagedOptionAction>());
+  const forgetOption=(goalId:string)=>setStagedOptions(before=>{const next=new Map(before);next.delete(goalId);return next});
+  const keepOption=(command:StagedOptionAction)=>setStagedOptions(before=>new Map(before).set(command.goalId,command));
+  const [localAction,setLocalAction]=useState<{goalId:string;notice:string}|null>(null);
+  const activeStage=stagedOptions.get(conversation.activeGoalId);
+  const localCandidate=Boolean(optionActions&&((activeStage&&(activeStage.edited||activeStage.label===input.trim()))||isOptionActionLabel(input)));
+  const hasVerifiedOptions=Boolean(optionSnapshot.goalId&&optionSnapshot.goalId===conversation.activeGoalId);
+  const actionOffers=hasVerifiedOptions?optionSnapshot.offers:[];
+  function changeQuestion(value:string){
+    const staged=stagedOptions.get(conversation.activeGoalId);
+    if(!value.trim()||!input.trim()||staged&&!staged.edited&&input.trim()!==staged.label){forgetOption(conversation.activeGoalId);setLocalAction(null)}
+    else if(staged&&value!==input)keepOption({...staged,edited:true});
+    setInput(value);
+  }
+  function draftOption(id:OptionAction){
+    if(chatLoading||input.trim()||!active)return;
+    const command=optionActions?.stage(id);
+    if(!command||command.goalId!==conversation.activeGoalId)return;
+    if(conversation.draftExample(command.label)){
+      keepOption(command);setLocalAction({goalId:command.goalId,notice:'Ready to open this action locally. Send when ready; no AI request will be made.'});focusQuestion();
+    }
+  }
   const loaded = useRef("");
   const loadedAt = useRef(0);
   const composer = useRef<HTMLTextAreaElement>(null);
@@ -118,6 +146,14 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
   async function send(question = input, actionPlan = false, scopeConfirmed = false) {
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
+    if(!actionPlan&&optionActions&&localCandidate){
+      if(!message||chatLoading||!active)return;
+      const command=stagedOptions.get(conversation.activeGoalId);
+      const error=command?optionActions.execute(command,message,conversation.activeGoalId):'Choose an option suggestion again before sending. Restored or typed action text cannot select a saved option by itself.';
+      setLocalAction({goalId:conversation.activeGoalId,notice:error||({compare:'Comparison opened using the existing calculated options.',adjust:'Selected option opened for adjustment. Review and save explicitly.',explore:'Local search controls opened. Review bounds and run the search explicitly.'}[command!.id])});
+      if(!error){forgetOption(conversation.activeGoalId);setInput('')}
+      return;
+    }
     if (!message || !sources || loadedScope !== workforceQuery || chatLoading || loading || sources.every(source => !source.facts)) return;
     if (/^(?:please\s+|can you\s+)?(?:export|download)\b/i.test(message)) {
       setMessages(current=>[...current,{role:"user",content:message},{role:"assistant",content:"CSV downloads are currently available on Workforce and Skills Intelligence. Open one of those pages and choose Export current data (CSV), then Send. Home exports, other modules and employee-name rosters are not available yet; no file was downloaded."}]);setInput("");return;
@@ -126,7 +162,7 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
       const requested=requestedHomeCountries(message,countryOptions,selectedCountry);
       if(requested.kind!=="none") { setInput(message);setScopeChoice({message,query:workforceQuery,identity:scopeIdentity,...requested});return; }
     }
-    setScopeChoice(null);
+    setScopeChoice(null);setLocalAction(null);
     const request = conversation.beginRequest();
     const key = contextKey;
     const history = getProblemChatHistory(modelHistoryRef.current, key);
@@ -164,11 +200,11 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-4 gap-y-1"><h2 id="overall-overview-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl xl:text-2xl 2xl:text-3xl">From Insight to Action</h2><p className="w-full text-sm text-muted-foreground sm:w-auto">by Ed Om <span aria-hidden="true">·</span> <a className="text-primary underline" href="mailto:edwinom.nyc@gmail.com">edwinom.nyc@gmail.com</a></p></div>
         <div className="ml-auto flex items-center gap-3 text-xs">
+          <span className="text-muted-foreground">In development</span>
           <button type="button" popoverTarget="home-data-details" aria-label="Open data details" title="Data, scope and conversation history" className="flex min-h-11 items-center gap-1 rounded px-2 text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"><Info size={16}/><span>Data details</span></button>
           <button id="overall-guide-link" type="button" onClick={() => onNavigate("guide-data")} className="rounded-sm font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Guide &amp; Data</button>
 
         </div>
-      <div className="basis-full"><p className="text-sm font-semibold text-primary">Interactive prototype · Synthetic company evidence + public BLS</p></div>
       </header>
       <div id="home-data-details" popover="auto" role="dialog" aria-label="Data details" className="fixed inset-0 m-auto max-h-[80dvh] w-[min(60rem,92vw)] overflow-y-auto rounded-xl border bg-background p-5 text-sm text-foreground shadow-xl">
         <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">Data details</h2><button type="button" popoverTarget="home-data-details" popoverTargetAction="hide" className="min-h-11 rounded border px-3 focus-visible:ring-2 focus-visible:ring-ring">Close data details</button></div>
@@ -188,7 +224,7 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
       </div>
 
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" className="min-h-[20rem] max-h-[70dvh] space-y-5 overflow-y-auto pr-1 xl:flex-1">
-    <GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:workforceScope}} payload={{page:"home",persona,overviewBriefingContext:pack,marketReference}} active={active} ready={ready} paused={chatLoading||Boolean(input.trim())||Boolean(pendingScope)||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} onNavigate={onNavigate}/>
+    <GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:workforceScope}} payload={{page:"home",persona,overviewBriefingContext:pack,marketReference}} active={active} ready={ready} paused={localCandidate||localAction?.goalId===conversation.activeGoalId||chatLoading||Boolean(input.trim())||Boolean(pendingScope)||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} onNavigate={onNavigate}/>
     <section aria-label="Starting guide" data-testid="overview-starting-guide" className="py-2">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <h3 className="text-lg font-semibold">Questions to explore</h3>
@@ -197,6 +233,7 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
           onClick={() => { loaded.current = ""; setRefresh(value => value + 1); }}
           className="ml-auto rounded-md p-2 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18} /></button>
       </div>
+      {actionOffers.length>0&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2 text-sm">Option action suggestions</summary><section aria-label="Workforce option actions" className="mt-3 space-y-2"><p className="text-sm text-muted-foreground">{input.trim()?'Your draft is kept. Clear it to choose an option action.':'Choose an option action, then Send to open it locally.'}</p><div className="flex flex-wrap gap-2">{actionOffers.map(offer=><button key={offer.id} type="button" disabled={chatLoading||Boolean(input.trim())} onClick={()=>draftOption(offer.id)} className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{offer.label}</button>)}</div></section></details>}
       <div className="mt-3"><PromptExamples prompts={contextualPrompts({page:"home",goal:conversation.focusedIssue,hasConversation:messages.some(message=>message.role==="user"),evidenceReady:ready,sources})} draft={input} busy={chatLoading} onDraft={draftQuestion}/></div>
       {loading && <p role="status" className="mt-3 text-sm text-muted-foreground">Loading available evidence for your questions.</p>}
 
@@ -224,17 +261,18 @@ export function OverallOverviewPage({ onStartDemo, active, persona, onNavigate, 
 
     <form onSubmit={event => { event.preventDefault(); void send(); }} className="mt-auto shrink-0 rounded-2xl border bg-card p-3 shadow-lg">
       {conversation.focusedIssue && <div className="mb-2">
-        <button type="button" disabled={!ready || chatLoading || !planRequest || Boolean(input.trim())} onClick={() => void send("", true)} className="min-h-11 w-full rounded-lg bg-primary px-4 py-3 text-base font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{HOME_ACTION_PLAN_LABEL}</button>
+        <button type="button" disabled={!ready || chatLoading || !planRequest || Boolean(input.trim())} onClick={() => void send("", true)} className={hasVerifiedOptions?"min-h-11 rounded px-2 py-2 text-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50":"min-h-11 w-full rounded-lg bg-primary px-4 py-3 text-base font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"}>{hasVerifiedOptions?"Draft a goal action plan":HOME_ACTION_PLAN_LABEL}</button>
         {(questionUnanswered || !planRequest || Boolean(input.trim())) && <p className="mt-2 text-xs text-muted-foreground">{questionUnanswered ? "Complete or retry your current question before developing a plan." : !planRequest ? "Evidence or perspective changed. Ask a question in the current scope before developing a plan." : input.trim() ? "Send your new question first so the plan uses the updated conversation." : ""}</p>}
       </div>}
-      {!conversation.focusedIssue && (journey || input.trim()) && <div className="mb-3"><button type="button" onClick={() => conversation.setIssueEditor({draft:input.trim().slice(0,240) || journey?.latestQuestion?.slice(0,240) || ""})} className="min-h-11 w-full rounded-lg bg-primary px-4 py-3 text-base font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring">Pin as goal</button><p className="mt-2 text-xs text-muted-foreground">Keep this focus across pages.</p></div>}
+      {!conversation.focusedIssue && (journey || input.trim()) && <div className="mb-3"><button type="button" onClick={() => conversation.setIssueEditor({draft:input.trim().slice(0,240) || journey?.latestQuestion?.slice(0,240) || ""})} className="min-h-11 w-full rounded-lg bg-primary px-4 py-3 text-base font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring">Pin as goal</button></div>}
       {visibleScopeChoice && <div aria-label="Requested country scope" className="mb-3 text-sm"><p>{visibleScopeChoice.kind==="ambiguous" ? "Which country should this workforce snapshot use?" : visibleScopeChoice.kind==="unsupported" ? "That country scope is not fully supported. Choose an available country or keep the current scope; missing evidence stays unavailable." : "Use country-specific workforce evidence for this question?"}</p><div className="mt-2 flex flex-wrap gap-2">{visibleScopeChoice.options.map(option=><button key={option.value} type="button" onClick={()=>applyCountry(option)} className="min-h-11 rounded border border-primary px-3 py-2 font-semibold text-primary">Apply {option.label} and answer</button>)}<button type="button" onClick={()=>void send(visibleScopeChoice.message,false,true)} className="min-h-11 px-2 text-primary underline">Answer with current scope</button></div><p className="mt-1 text-xs text-muted-foreground">Only the workforce snapshot changes. Other filters stay selected; company-wide sources retain their scope.</p></div>}
       {pendingScope && <p role="status" className="mb-3 text-sm">Refreshing the selected workforce evidence before answering. Edit your question to cancel.</p>}
-      <label htmlFor="overview-question" className="mb-2 block text-sm font-semibold">Describe a business issue, and I’ll help you explore the evidence, compare options, and build a plan.</label>
-      <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" value={input} onChange={event => setInput(event.target.value)} rows={2}
-        placeholder="Type your business issue here…" className="max-h-80 min-h-20 w-full resize-y rounded-lg border bg-background/40 p-3 text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+      {localAction?.goalId===conversation.activeGoalId&&(!activeStage||localCandidate)&&<p role="status" className="mb-3 text-sm">{localAction.notice}</p>}
+      <label htmlFor="overview-question" className="sr-only">Ask Workforce AI</label>
+      <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" value={input} onChange={event => changeQuestion(event.target.value)} rows={2}
+        placeholder="Describe a business issue, and I’ll help you explore the evidence, compare options, and build or adjust a plan." className="max-h-80 min-h-[calc(4lh+1.5rem+2px)] w-full resize-y sm:min-h-20 rounded-lg border bg-background/40 p-3 text-lg placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
       <div className="mt-2 flex items-center justify-end gap-3">
-        <button type="submit" aria-label="Send overview question" disabled={!ready || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
+        <button type="submit" aria-label="Send overview question" disabled={(!localCandidate&&!ready) || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
     </form>
   </section>
     <aside className="p-5 text-sm leading-relaxed" aria-label="How to use this app">

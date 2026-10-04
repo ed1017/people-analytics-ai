@@ -48,6 +48,7 @@ export function WorkforceLocalSearch({currentContext,roles,savedMix,onOffer}:{cu
   {busy&&<p role="status">Comparing saved assumptions locally…</p>}{notice&&<p role="status">{notice}</p>}
   {report&&<>
    <p>{report.summary.enumerated} mixes evaluated; {report.summary.counts.met} meet entered constraints. Showing {report.summary.emitted}; {report.summary.omittedByCap} omitted by the output cap. Ascending Build/Move order, not a quality ranking.</p>
+   {!report.results.some(candidate=>!candidate.isSavedMix&&candidate.mix.build+candidate.mix.move>0&&candidate.status==='met'&&candidate.tradeOffs&&Object.values(candidate.tradeOffs).every(value=>value!==null))&&<p role="status">No selectable additional options in these returned results. Review Build, Move and Buy bounds, or review the saved budget, employee cap, deadline and readiness assumptions before a new calculation. Widening bounds does not guarantee a feasible option.</p>}
    <p>Compare cash, separate employee-time value, added employees and conditional coverage month. Nondominated means no other eligible mix within these bounds improves one of those measures without worsening another; it does not prove capacity or a best choice. Choose at most two, then review below.</p>
    <div className="grid gap-3 lg:grid-cols-2">{report.results.map(candidate=>{
     const eligible=!candidate.isSavedMix&&candidate.mix.build+candidate.mix.move>0&&candidate.status==='met'&&candidate.tradeOffs&&Object.values(candidate.tradeOffs).every(value=>value!==null);

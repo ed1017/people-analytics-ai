@@ -57,13 +57,14 @@ try {for(const width of [1366,390]){
  check(width+' bounds start blank and no worker runs on mount',await field('build min bound').inputValue()===''&&await page.evaluate(()=>window.workerQA.replies.length===0));
  check(width+' no implicit confirmation',await button('Run local mix search').isDisabled());
  await button('Use saved mix as exact bounds').click();check(width+' copied mix is labeled and still requires confirmation',await field('build min bound').inputValue()==='1'&&await button('Run local mix search').isDisabled()&&(await page.locator('main').innerText()).includes('not capacity evidence'));
+ await confirm();await button('Run local mix search').click();await page.getByText('1 mixes evaluated;',{exact:false}).waitFor();check(width+' exhausted exact bounds explain adjustments without inventing options',(await page.locator('main').innerText()).includes('No selectable additional options in these returned results.')&&await page.getByRole('checkbox',{name:/^Select /}).count()===1&&await page.getByRole('checkbox',{name:/^Select /}).isDisabled());
  await bounds();check(width+' finite count shown before running',(await page.locator('main').innerText()).includes('10 combinations; 11 evaluations'));
  await field('build min bound').fill('-1');check(width+' negative bounds blocked',await button('Run local mix search').isDisabled());
  await field('build min bound').fill('0.5');check(width+' fractional bounds blocked',await button('Run local mix search').isDisabled());
  await field('build min bound').fill('3');await field('build max bound').fill('1');check(width+' reversed bounds blocked',await button('Run local mix search').isDisabled());
  await bounds(0);check(width+' impossible mix rejected before worker',(await page.locator('main').innerText()).includes('no mix that sums')&&await button('Run local mix search').isDisabled());
  await bounds();await run();
- const report=await page.evaluate(()=>window.workerQA.replies.find(reply=>reply.ok&&reply.value?.kind==='bounded-workforce-mix-search').value);
+ const report=await page.evaluate(()=>window.workerQA.replies.findLast(reply=>reply.ok&&reply.value?.kind==='bounded-workforce-mix-search').value);
  assert.deepEqual(report,searchWorkforceMixes(solution,'source-result',report.spec));check(width+' actual browser worker matches entire Node report',true);
  check(width+' original and unknown/failed options cannot be selected',await field('Select build-1-move-1-buy-1').isDisabled()&&await field('Select build-0-move-0-buy-3').isDisabled());
  await field('Select build-0-move-3-buy-0').check();await field('Select build-1-move-2-buy-0').check();check(width+' selection stops at two',await field('Select build-2-move-1-buy-0').isDisabled());

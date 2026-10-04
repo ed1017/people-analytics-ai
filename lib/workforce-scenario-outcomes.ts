@@ -26,3 +26,26 @@ export function workforceSearchCountCopy(summary: {enumerated:number;calculatorI
   detail:`${summary.enumerated} combinations enumerated; ${summary.enumerated} candidate calculation attempts: ${calculated} calculated, ${summary.counts.invalid} invalid. ${summary.calculatorInvocations} total calculator calls including the separate reference. ${summary.emitted} search results returned; ${summary.omittedByCap} omitted by the output cap; ${summary.excludedByFilter} excluded by the filter. ${summary.enumerationComplete?'Complete within the explicit bounds.':'Search incomplete.'} Displayed options are not a global top ranking.`,
  };
 }
+
+/** Short card copy from calculated values only; no inferred skill or hiring evidence. */
+export function workforceOptionBullets(plan:WorkforceIncrement){
+ const outcome=workforceScenarioOutcomes(plan);
+ const number=(value:number|null)=>value===null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:2});
+ const bullets=[
+  {label:'Expected result',text:outcome.deadline?`${number(outcome.covered)} of ${outcome.roles} roles by ${outcome.deadline}; gap ${number(outcome.remaining)}. Conditional.`:'Deadline coverage unknown; no deadline specified.'},
+  {label:'Cost',text:`USD ${number(plan.totalCash)} cash / ${plan.input.months} months; time USD ${number(plan.totalTime)} separately.`},
+  {label:'Timing',text:outcome.fullCoverageMonth?`Full coverage ${outcome.fullCoverageMonth}, if assumptions hold.`:outcome.coverageTiming==='unknown'?'Full coverage timing unknown.':'Full coverage not reached within this plan.'},
+  {label:'Staffing',text:`Train ${plan.input.build}; move ${plan.input.move}; hire ${plan.input.buy}. Added employees: ${number(plan.maxAddedEmployees)}.`},
+  {label:'Why',text:plan.checks.some(check=>check.status==='not met')?'Some entered limits are not met.':plan.checks.length!==3||plan.checks.some(check=>check.status!=='met')?'Some entered limits cannot be checked.':'Meets entered limits; feasibility unverified.'},
+ ];
+ if(Number(plan.input.backfills)>0)bullets.push({label:'Backfills',text:`${plan.input.backfills} external backfills included; source-team impact needs review.`});
+ return bullets.map(item=>({...item,emphasis:item.label==='Expected result'?[`${number(outcome.covered)} of ${outcome.roles} roles`,`gap ${number(outcome.remaining)}`]:item.label==='Cost'?[`USD ${number(plan.totalCash)}`,`${plan.input.months} months`,`USD ${number(plan.totalTime)}`]:item.label==='Timing'&&outcome.fullCoverageMonth?[outcome.fullCoverageMonth]:item.label==='Staffing'?[`Train ${plan.input.build}`,`move ${plan.input.move}`,`hire ${plan.input.buy}`,`Added employees: ${number(plan.maxAddedEmployees)}`]:item.label==='Backfills'?[`${plan.input.backfills} external backfills`]:[]}));
+}
+
+/** Report original verified enumeration, never a new run or an unsupported ranking. */
+export function workforceOptionsLead(summary:Parameters<typeof workforceSearchCountCopy>[0],options:number):string|null{
+ if(!summary||!Number.isSafeInteger(options)||options<1)return null;
+ const calculated=summary.enumerated-summary.counts.invalid;
+ if(calculated<100)return null;
+ return `Original ${summary.enumerationComplete?'search':'partial search'}: ${calculated.toLocaleString('en-US')} scenarios calculated. Here ${options===1?'is 1 option':`are ${options} options`} to consider.`;
+}
