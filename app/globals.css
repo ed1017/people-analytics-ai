@@ -437,3 +437,24 @@
 .home-answer > [data-chat-heading] { margin-block-start: 8px; margin-block-end: 4px; }
 .home-answer > [data-chat-heading] + * { margin-block-start: 0; }
 .home-answer > :first-child { margin-block-start: 0; }
+
+/* Home's input and Send travel together; reserved space keeps the last content reachable. */
+.home-workspace { padding-bottom: calc(var(--home-composer-height, 180px) + 1rem); }
+.home-composer-slot { min-height: var(--home-composer-height, 180px); }
+.home-composer-dock { position: fixed; z-index: 20; bottom: 0; overflow-y: auto; padding-bottom: max(.75rem, env(safe-area-inset-bottom)); }
+.home-workspace :is(button, summary, [tabindex], h2, h3) { scroll-margin-bottom: calc(var(--home-composer-height, 180px) + 1rem); }
+.home-workspace .home-chat-form { background: transparent; }
+.goal-toolbar > .goal-storage { flex: 0 0 auto; }
+.goal-storage[open] { flex-basis: 100%; }
+@media (max-width: 639px) {
+  .goal-toolbar > [aria-label="Goal controls"] { flex-basis: 100%; }
+}
+.home-workspace [aria-label="Home chat workspace"] { max-height: max(4rem, calc(var(--home-visible-height, 100dvh) - var(--home-reading-header-height, var(--app-header-height, 120px)) - var(--home-composer-height, 180px) - 1rem)); }
+.home-workspace :is(button, summary, [tabindex], h2, h3) { scroll-margin-top: calc(var(--app-header-height, 120px) + .75rem); }
+
+@media (max-height: 600px) {
+  .app-home-composer > header { position: relative; }
+  .home-workspace { --home-reading-header-height: 0px; }
+}
+.home-keyboard-open .app-home-composer > header { position: relative; }
+.home-keyboard-open .home-workspace { --home-reading-header-height: 0px; }
