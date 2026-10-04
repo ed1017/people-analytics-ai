@@ -97,8 +97,10 @@ function isMarkdownTableSeparator(
 export function ChatContent({
   content,
   onNavigate,
+  compact = false,
 }: {
   content: string;
+  compact?: boolean;
   onNavigate?: (page: AppPage) => void;
 }) {
   const references: string[] = [];
@@ -152,7 +154,7 @@ export function ChatContent({
           key={`table-${index}`}
           className="my-3 overflow-x-auto rounded-lg border"
         >
-          <table className="w-full min-w-[560px] text-[15px]">
+          <table className={compact ? "w-full min-w-[560px] text-sm" : "w-full min-w-[560px] text-[15px]"}>
             <thead className="bg-muted/40">
               <tr>
                 {headers.map(
@@ -301,7 +303,7 @@ export function ChatContent({
   }
 
   return (
-    <div className="space-y-2 leading-relaxed">
+    <div className={compact ? "space-y-1 text-sm leading-relaxed" : "space-y-2 leading-relaxed"}>
       {rendered}
       {references.length > 0 && <aside aria-label="Answer sources" className="mt-2 space-y-0.5 border-t border-border/40 pt-1">
         {references.map((reference, referenceIndex) => <div key={referenceIndex} className="text-[11px] leading-relaxed">{renderInlineMarkdown(reference, onNavigate)}</div>)}

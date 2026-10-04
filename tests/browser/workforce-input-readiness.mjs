@@ -28,7 +28,7 @@ try{for(const width of [1366,390]){
  const assets=new Map(await Promise.all((await fs.readdir(output)).filter(name=>name.endsWith('.js')).map(async name=>['http://127.0.0.1:3100/assets/'+name,await fs.readFile(path.join(output,name),'utf8')])));
  await page.route('**/*',route=>route.request().url()==='http://127.0.0.1:3100/'?route.fulfill({contentType:'text/html',body:'<meta name="viewport" content="width=device-width, initial-scale=1"><div id="root"></div>'}):assets.has(route.request().url())?route.fulfill({contentType:'text/javascript',body:assets.get(route.request().url())}):(unwanted++,route.abort()));
  await page.goto('http://127.0.0.1:3100/');await page.evaluate(seed=>window.readinessSeed=seed,{encoded:encodeDecisions(data),empty,complete,newer});await page.addStyleTag({content:css});await page.addScriptTag({content:bundle});
- const summary=page.getByRole('region',{name:'Workforce input readiness',exact:true}),button=name=>page.getByRole('button',{name,exact:true}),field=name=>page.getByLabel(name,{exact:true});
+ const summary=page.getByRole('region',{name:'Workforce input readiness',exact:true}),button=name=>page.getByRole('button',{name,exact:true,includeHidden:true}),field=name=>page.getByLabel(name,{exact:true});
  const state=()=>page.evaluate(()=>window.readinessSaved());
  const before=JSON.stringify(await state());
  check(width+' missing inputs appear before opening editor',(await summary.innerText()).includes('Missing input')&&!await field('Business unit').isVisible());
@@ -47,7 +47,7 @@ try{for(const width of [1366,390]){
  await button('Load complete saved inputs').click();await page.getByText('Review assumptions and goal statement',{exact:true}).click();
  await page.locator('summary').filter({hasText:'Review and customize inputs'}).click();await field('Annual loaded cost per external hire (USD)').fill('');
  check(width+' optional cost blank remains unknown without a validation error',(await summary.innerText()).includes('External hires: annual hire cost is unknown.')&&await field('Annual loaded cost per external hire (USD)').getAttribute('aria-invalid')==='false');
- check(width+' unsaved changes distinguish selected evidence and block calculation',(await summary.innerText()).includes('Unsaved draft')&&(await summary.innerText()).includes('does not validate this draft')&&await button('Calculate saved assumptions and compare hiring-only').isDisabled());
+ check(width+' unsaved changes distinguish selected evidence and block calculation',(await summary.innerText()).includes('Unsaved draft')&&(await summary.innerText()).includes('does not validate this draft')&&await button(/^Calculate (options|saved assumptions and compare hiring-only)$/).isDisabled());
  await field('Incremental cash budget over this horizon (USD)').fill('bad');
  check(width+' malformed optional amount is a correction',await field('Incremental cash budget over this horizon (USD)').getAttribute('aria-invalid')==='true');
  await summary.getByRole('button',{name:'Review Incremental cash budget over this horizon (USD)',exact:true}).click();
@@ -63,7 +63,7 @@ try{for(const width of [1366,390]){
  check(width+' summary fits target CSS viewport',await page.evaluate(width=>window.innerWidth===width&&document.documentElement.scrollWidth<=width,width));
  await button('Save reviewed inputs').click();await page.getByText('Review assumptions and goal statement',{exact:true}).click();check(width+' explicit save creates version while old calculation stays historical',(await summary.innerText()).includes('Saved inputs · plan version 2')&&(await summary.innerText()).includes('Selected calculation: version 1 · historical'));
  await button('Publish newer input version').click();await page.getByText('Review assumptions and goal statement',{exact:true}).click();check(width+' selected older evidence cannot validate newer saved inputs',(await summary.innerText()).includes('Saved inputs · plan version 2')&&(await summary.innerText()).includes('historical'));
- await button('Change goal wording').click();check(width+' changed goal requires explicit rebinding',(await summary.innerText()).includes('goal wording changed')&&await button('Calculate saved assumptions and compare hiring-only').isDisabled());
+ await button('Change goal wording').click();check(width+' changed goal requires explicit rebinding',(await summary.innerText()).includes('goal wording changed')&&await button(/^Calculate (options|saved assumptions and compare hiring-only)$/).isDisabled());
  await button('Goal B').click();check(width+' goal transition removes previous summary',await summary.count()===0);await button('Goal A').click();await page.getByText('Review assumptions and goal statement',{exact:true}).click();check(width+' returning goal restores saved inputs not old draft',(await summary.innerText()).includes('Saved inputs · plan version 2'));
  check(width+' no API calls or runtime errors',unwanted===0&&errors.length===0);
  await context.close();
