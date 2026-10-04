@@ -29,9 +29,9 @@ try{for(const width of [1366,390]){
  await page.goto('http://127.0.0.1:3100/');await page.addStyleTag({content:css});await page.addScriptTag({content:bundle});
  const suggestions=()=>page.getByRole('region',{name:'Suggested questions',exact:true});
  const home=page.getByLabel('Ask Workforce AI',{exact:true});
+ await page.getByText('More questions',{exact:true}).click();
  await suggestions().getByRole('button',{name:/recorded separation/}).waitFor();
- // Let the pre-existing automatic goal takeaway settle, then measure suggestion effects separately.
- await page.getByText('Synthetic response',{exact:true}).waitFor();
+ check(width+' no automatic takeaway request',posts===0);
  const placeholder='Describe a business issue, and I’ll help you explore the evidence, compare options, and build or adjust a plan.';
  check(width+' Home guidance is an empty accessible placeholder',await home.getAttribute('placeholder')===placeholder&&await home.inputValue()===''&&await page.getByRole('textbox',{name:'Ask Workforce AI',exact:true}).count()===1);
  check(width+' placeholder fits the composer',await home.evaluate(el=>el.scrollHeight<=el.clientHeight));
@@ -46,15 +46,15 @@ try{for(const width of [1366,390]){
  await details.click();check(width+' source disclosure remains accessible',await page.getByText('Synthetic workforce evidence.',{exact:false}).isVisible());await page.getByRole('button',{name:'Close data details',exact:true}).click();
  await page.screenshot({path:path.join(output,`home-copy-${width}.png`),fullPage:true});
  const baseline=posts;const first=suggestions().getByRole('button').first();await first.focus();await page.keyboard.press('Enter');
- await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('Synthetic response',{exact:true}).waitFor();await page.getByText('More questions',{exact:true}).click();check(width+' keyboard example sends exactly once',await home.inputValue()===''&&posts===baseline+1);
+ await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('Synthetic response',{exact:true}).waitFor();check(width+' keyboard example sends exactly once',await home.inputValue()===''&&posts===baseline+1);
  await home.fill('Keep my unfinished question');check(width+' draft prevents replacement',await suggestions().getByRole('button').first().isDisabled());
  await page.getByRole('button',{name:'Previous discussion',exact:true}).click();check(width+' stage changes examples while retaining draft',await home.inputValue()==='Keep my unfinished question'&&await suggestions().getByRole('button',{name:/revise/}).count()===1);
- await page.getByRole('button',{name:'skills goal',exact:true}).click();await suggestions().getByRole('button',{name:/skill requirements/}).waitFor();
+ await page.getByRole('button',{name:'skills goal',exact:true}).click();await page.getByText('More questions',{exact:true}).click();await suggestions().getByRole('button',{name:/skill requirements/}).waitFor();
  check(width+' goal changes evidence topic',await home.inputValue()==='');await home.fill('Keep skills draft');
- await page.getByRole('button',{name:'retention goal',exact:true}).click();check(width+' return restores goal draft',await home.inputValue()==='Keep my unfinished question');
+ await page.getByRole('button',{name:'retention goal',exact:true}).click();await page.getByText('More questions',{exact:true}).click();check(width+' return restores goal draft',await home.inputValue()==='Keep my unfinished question');
  await home.fill('');await page.getByRole('button',{name:'Switch goal with queued example',exact:true}).click();
  check(width+' queued prior-goal example cannot overwrite restored goal draft',await home.inputValue()==='Keep skills draft');
- await page.getByRole('button',{name:'retention goal',exact:true}).click();
+ await page.getByRole('button',{name:'retention goal',exact:true}).click();await page.getByText('More questions',{exact:true}).click();
  await home.fill('');await page.getByRole('button',{name:'Queue draft with example',exact:true}).click();
  check(width+' queued current-goal draft wins over stale empty-draft render',await home.inputValue()==='Queued unfinished question');
  await home.fill('');missing=true;await page.getByRole('button',{name:'Refresh overview evidence',exact:true}).click();await suggestions().getByRole('button',{name:/missing for my goal/}).waitFor();

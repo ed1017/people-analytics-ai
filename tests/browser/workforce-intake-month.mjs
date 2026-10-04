@@ -31,16 +31,16 @@ try{for(const width of [1366,390]){
   return route.fulfill({status:503,json:{error:'Fixture unavailable'}});
  });
  await page.addInitScript(({key,encoded})=>{if(!localStorage.getItem(key))localStorage.setItem(key,encoded)},{key:DECISIONS_STORAGE_KEY,encoded:encodeDecisions(seed)});
- await page.goto('http://127.0.0.1:3100/',{waitUntil:'domcontentloaded'});await page.getByRole('button',{name:'Start guided workforce plan',exact:true}).click();
+ await page.goto('http://127.0.0.1:3100/',{waitUntil:'domcontentloaded'});await page.getByText('Compare workforce numbers',{exact:true}).click();await page.getByRole('button',{name:'Review numbers',exact:true}).click();await page.getByRole('radio',{name:/^Yes — additional roles/}).check();await page.getByRole('button',{name:'Confirm goal and review inputs',exact:true}).click();
  const workspace=page.getByRole('region',{name:'Workforce solution workspace',exact:true}),button=name=>workspace.getByRole('button',{name,exact:true}),state=()=>page.evaluate(key=>{const data=JSON.parse(localStorage.getItem(key)).payload;return {goals:data.goals,solution:data.workspaces['goal-intake'].fields.workforceSolution,owner:data.workspaces['goal-intake'].fields.owner,other:data.workspaces['goal-other']}},DECISIONS_STORAGE_KEY);
- const before=JSON.stringify(await state());await workspace.getByLabel('Planning statement',{exact:true}).fill(statement);await button('Clarify statement with AI').click();await button('Review proposed changes').waitFor();
+ const before=JSON.stringify(await state());await workspace.getByLabel('Planning statement',{exact:true}).fill(statement);await button(/^(Clarify statement with AI|Use details from my statement)$/).click();await button('Review proposed changes').waitFor();
  check(width+' successful sparse proposal neither saves nor calculates',JSON.stringify(await state())===before&&calculations===0);
- await button('Review proposed changes').click();
+ await button('Review proposed changes').click();await button('Show all input fields').click();
  for(const [label,value] of [['Planning start month (YYYY-MM)','2027-01'],['Required coverage month (YYYY-MM)','2027-12'],['Planning horizon (months)','12'],['Build: existing employees after development','0'],['Move: existing employees already ready','0'],['Buy: external hires','2'],['Additional external backfills for internal moves (explicit 0 if none)','0'],['Explicit hire arrival (YYYY-MM-DD)',''],['Incremental cash budget over this horizon (USD)',''],['Annual loaded cost per external hire (USD)','']])check(width+' exact reviewed draft '+label,await workspace.getByLabel(label,{exact:true}).inputValue()===value);
  check(width+' review remains temporary, other goal preserved',JSON.stringify(await state())===before);
  await page.screenshot({path:output+`/intake-${width}.png`,fullPage:true});
  for(const failure of ['known','unknown','malformed','network']){
-  await page.reload({waitUntil:'domcontentloaded'});mode=failure;await workspace.getByLabel('Planning statement',{exact:true}).fill(statement);await button('Clarify statement with AI').click();await workspace.getByRole('status').filter({hasText:'Clarification could not be validated'}).waitFor();
+  await page.reload({waitUntil:'domcontentloaded'});mode=failure;await workspace.getByLabel('Planning statement',{exact:true}).fill(statement);await button(/^(Clarify statement with AI|Use details from my statement)$/).click();await workspace.getByRole('status').filter({hasText:'Clarification could not be validated'}).waitFor();
   const text=await workspace.innerText();check(width+' '+failure+' failure is safe and leaves prior records',!text.includes('PRIVATE_')&&JSON.stringify(await state())===before&&await button('Review proposed changes').count()===0);
   check(width+' '+failure+' only allowlisted diagnostics displayed',failure==='known'?text.includes('Diagnostic: invalid-model-proposal-5-planningMonth-value-not-supported.'):!text.includes('Diagnostic:'));
  }

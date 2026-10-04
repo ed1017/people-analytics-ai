@@ -43,8 +43,8 @@ try{for(const width of [1366,390,683]){
   if(restored)seed.workspaces[goalId].fields.chat={messages:[],input:restored,problem:null,questionUnanswered:false};
   await page.evaluate(({key,encoded,empty,complete,newer})=>{localStorage.setItem(key,encoded);window.readinessSeed={encoded,empty,complete,newer};window.workerActions=[];const Native=window.Worker;window.Worker=class extends Native{postMessage(value){window.workerActions.push(value.action);super.postMessage(value)}}},{key:DECISIONS_STORAGE_KEY,encoded:encodeDecisions(seed),empty,complete,newer});
   await page.addStyleTag({content:css});await page.addScriptTag({content:bundle});await page.getByText('Option action suggestions',{exact:true}).click();await actions().getByRole('button',{name:three?'Compare all 3 options':'Compare all 2 options',exact:true}).waitFor();
-  if(!restored&&!unavailable)await page.getByText('Synthetic response',{exact:true}).first().waitFor();
-  // Settle the existing automatic takeaway before isolating the local click.
+  await page.getByLabel('Ask Workforce AI',{exact:true}).waitFor();
+  // Home no longer makes an automatic post-pin model request.
   if(unavailable)await page.waitForTimeout(450);
  };
  const button=name=>page.getByRole('button',{name,exact:true}),actions=()=>page.getByRole('region',{name:'Workforce option actions',exact:true,includeHidden:true}),input=page.getByLabel('Ask Workforce AI',{exact:true}),send=()=>button('Send overview question').click(),state=()=>page.evaluate(()=>window.readinessSaved()),worker=()=>page.evaluate(()=>window.workerActions);
