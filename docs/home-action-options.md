@@ -20,3 +20,18 @@ Strict parsing establishes shape, bounds and reference availability, not factual
 - Same browser command with `HOME_BUILT=1`, against the local production server on port 3100.
 
 The action browser suite replaces the old investigation-only post-Pin assertions in `home-pin-options.mjs` and `home-candidate-reload.mjs`. It checks discovery/edit cancellation, double Pin, exact envelope, storage isolation, reload, scope mismatch, failed stale replacement, explicit old-goal preparation, late-response rejection, no automatic retry, mobile/desktop/200% equivalent layout, and runtime errors. All requests are intercepted. Production quality of generated prose remains unverified.
+
+## Next bounded increment: editable assumptions and full calculated proposals
+
+This checkpoint is not the full calculated-solution target. It does not yet provide per-action editable assumption records or attach calculator outputs to action cards. The goal is up to three useful proposals, each with its reviewed cost, timing, staffing and tradeoffs where the existing calculators support them; fewer proposals are valid.
+
+Proposed default policy before extending the numeric/storage contract:
+
+1. Observed evidence is read-only context with source, scope and date. Aggregate headcount is not automatically a program population, additional demand, available staffing or a causal effect.
+2. Existing saved planning inputs may be offered for explicit adoption into a named action draft only after compatible scope review. Program A's assumptions never silently become program B's assumptions. The original confirmed plan remains unchanged.
+3. A selected catalogue quote or benchmark may prefill only its directly corresponding field, preserving currency, period, geography, fictional/unverified status and limitations. Wages are not total employer costs. No cross-role or cross-population substitution.
+4. Illustrative planning assumptions must be visibly editable and labeled as scenario choices with an explicit basis. Unknown monetary inputs remain unknown rather than zero. No default efficacy, arbitrary retention benchmark, guaranteed saving or inferred ML performance.
+5. Retention proposals must preserve the no-intervention and program-with-no-effect cases. Any effect range is a user-adopted what-if assumption, never a prediction.
+6. Ask one essential scope/input question at a time and progressively reveal remaining assumptions. Edits and recalculation stay local. Bind each calculation to the exact action signature, goal, evidence snapshot and reviewed input version; edits make only that proposal's calculation stale.
+
+The model's output contract currently supplies no numeric assumption fields. This policy is a proposal for the next reviewed implementation slice, not an implemented calculation or a release claim.
