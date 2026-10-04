@@ -1,27 +1,21 @@
-# Local option suggestions
+# Home prompt actions
 
-This follow-up starts from PR102 candidate `3eb67788258552121a3a8cd8d291b91809243f12` on the separate local branch `fix/workforce-option-composer-20261004`. It does not move the PR102 or PR101 branches.
+Home question examples submit through the existing chat handler with one click or keyboard activation. The helper says clicking sends. Contextual examples remain selected from available evidence and the user's existing goal. Other pages retain their editable-example behavior.
 
-Home offers Compare all N options, Adjust this option, and Explore more options only when the option panel has a verified current source and usable local handlers. Compare requires multiple displayed options. Busy, temporary-draft, historical, unsaved and unavailable contexts remove action offers. Exploration opens the existing confirmed bounded-search flow; it does not promise another eligible result.
+The model's existing `answer` / `next_step` output contract is unchanged. When a goal is missing, the model instruction asks one open question about the desired business outcome. The fixed Retention / Capability building reply chips and the instruction that named those choices are removed. “State my goal” focuses the composer without sending empty text. It does not claim to select, pin or support a calculator for every possible goal.
 
-Choosing a suggestion only drafts its exact label and captures an in-memory generation and goal identity. The registered handler is bound to the selected option, saved result, complete source/alternative-history identity and comparison order. Explicit Send dispatches locally before Home's ordinary model request path. Compare opens/focuses the existing table; Adjust opens the captured option's existing temporary editor; Explore opens/focuses search bounds. Search, review, replacement and saving keep their separate explicit controls.
+Home offers Compare all N options, Adjust this option and Explore more options only when current verified local handlers are available. A click captures the current action generation and dispatches through the existing bridge after rechecking context. Compare opens the calculated table; Adjust opens the current option's temporary editor; Explore opens the existing search bounds. Assumption acceptance, search, saving, calculation and operational approval remain explicit separate actions. Local actions do not call the model or alter its envelope.
 
-The bridge and action acknowledgments are never included in model payloads or transport history. Existing goal requirements, approvals and plan records are not changed by these actions. Home's automatic takeaway remains paused through local staging/completion so clearing a successful command cannot start a model request. Ordinary questions retain the existing request path and payload shape.
+## Drafts and request ownership
 
-## Stale text and draft behavior
+Suggestions are disabled while the composer contains text, with a concise explanation. A synchronous draft reference also protects queued input updates before React renders. Failed requests restore their prompt only if the user has not already typed a new draft. Goal switching snapshots the latest draft.
 
-Occupied drafts are not overwritten, including queued input updates. Changed goal/result/alternative history or selected option invalidates staged commands; direct store subscriptions catch a batched goal A-to-B-to-A transition. A consumed command cannot execute twice. Reloaded or typed action labels have no trusted capture and require choosing a suggestion again.
+Queued suggestions recheck active page, goal identity, evidence context and draft state before dispatch. Goal transitions invalidate queued clicks even for a batched A-to-B-to-A change. The local action bridge also checks result/option generation. Repeated clicks within one second are suppressed; a synchronous in-flight guard blocks duplicate chat requests. Navigation cancels pending work and returning does not resend. No automatic retry is introduced.
 
-Editing a staged suggestion invalidates it, even if its original text is later restored. Send keeps the text and explains the problem; it neither changes target nor falls through to AI. The intentional UX cost is that users must clear and reselect after an edit or context change, or clear and write a normal question. Existing goal rename/delete behavior still clears the goal-owned draft. These three commands are exact staged actions, not a new natural-language intent parser.
+Typed or restored exact local-action labels cannot select an option or silently fall through to the model; the user must choose the current action button. Ordinary typed questions retain the existing chat path.
 
-## Validation
+## Validation scope
 
-502 unit tests passed. 264 browser assertions passed: 52 integrated composer/action checks, 30 existing contextual-prompt checks, 120 option-card checks and 62 journey checks. Full lint, TypeScript, production build and diff whitespace checks passed. Fixtures intercept all network traffic; no live service/model call was made.
+Synthetic intercepted browser tests cover click/keyboard submission, repeated clicks, busy requests, failure restoration, newer drafts, queued drafts, back/return, goal and result changes, custom-goal entry, local actions without saving or search, and desktop/mobile/200% reflow. Existing non-Home example behavior remains covered. No live model request, production diagnostics, data-schema change or model-input expansion is part of this work. Hosted acceptance is required before release.
 
-Coverage includes explicit keyboard Send; actual two/three-option labels; no effect at suggestion click; unchanged saved solution/approval and model-history data; current-option Adjust; retained adjustment drafts; Explore without implicit search; edited/restored command rejection; missing overview evidence; stale result/history/version; goal roundtrip; queued ordinary drafts; normal chat request shape; focus and mobile overflow. Bridge unit checks cover replay, stale-owner cleanup and unavailable actions.
-
-Logs: `/tmp/option-composer-final-*.log`.
-
-Screenshots: `/tmp/workforce-option-composer-IdhM7I/`, `/tmp/contextual-prompts-3WcDpg/`, `/tmp/workforce-solution-cards-1SVgRL/`, `/tmp/workforce-journey-olB0cu/`. The integrated mobile screenshot was visually inspected.
-
-Publication is intentionally held for integration review. PR101 also edits Home's composer copy/layout; any integration must preserve its approved placeholder and responsive sizing while retaining this branch's input handler and Send gate. Hosted acceptance applies to PR102's unchanged candidate, not this unpublished follow-up.
+Local validation: 534 unit tests and 959 browser assertions passed, including 42 new auto-send assertions and 69 immediate local-action assertions. Lint, TypeScript, production build and whitespace checks passed. Desktop, mobile emulation and 200% reflow were exercised; mobile custom-goal entry and local-action screenshots were inspected. Tests isolate the pre-existing automatic takeaway before counting requests caused by a local action. This is mocked service validation, not live-model acceptance.
