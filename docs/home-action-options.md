@@ -35,3 +35,7 @@ Proposed default policy before extending the numeric/storage contract:
 6. Ask one essential scope/input question at a time and progressively reveal remaining assumptions. Edits and recalculation stay local. Bind each calculation to the exact action signature, goal, evidence snapshot and reviewed input version; edits make only that proposal's calculation stale.
 
 The model's output contract currently supplies no numeric assumption fields. This policy is a proposal for the next reviewed implementation slice, not an implemented calculation or a release claim.
+
+## Discovery reference correction after hosted QA
+
+Problem references and each candidate's references are independently validated against available metrics; candidate operations must still match their metrics. Candidates need not duplicate their sources into `problem_evidence`. Problem references support the provisional problem; candidate references support the investigation, not causal proof or effectiveness. The whole normalized packet remains bound to the exact goal, so changes to either reference set's underlying evidence invalidate the preparation. v2 shapes and field meanings are unchanged, valid saved records are not migrated or rewritten, and the legacy `problem_source_mismatch` diagnostic remains readable but is no longer emitted for this redundant relationship.

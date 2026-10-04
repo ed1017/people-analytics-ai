@@ -6,6 +6,7 @@ export type HomeCandidateRecord={version:2;goalId:string;goal:string;selectionGo
 type Source={id:string;status:string;facts:unknown;[key:string]:unknown};
 export type CandidatePack={version?:number;workforceScope?:string|null;sources:Source[]};
 const obj=(value:unknown):Record<string,unknown>|null=>value&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:null;
+// Bind the whole supplied snapshot, including the union of problem and option evidence.
 export function candidateSourceKey(pack:CandidatePack){return JSON.stringify({version:pack.version,workforceScope:pack.workforceScope,sources:pack.sources})}
 export const homePreparationReasons=['ready','empty','missing_fields','invalid_envelope','invalid_problem','invalid_question','invalid_options','too_many_options','evidence_unavailable',...investigationFailureReasons,'no_options_or_question','diagnostic_unavailable'] as const;
 export type HomePreparationReason=typeof homePreparationReasons[number];

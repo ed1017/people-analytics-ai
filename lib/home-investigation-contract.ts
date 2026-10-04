@@ -78,7 +78,6 @@ export function inspectInvestigationProposal(raw:unknown,input:unknown):{proposa
  if(!problemEvidence)return fail(problemRefs.reason!,'problem_evidence');
  if(!Array.isArray(value.options))return fail('invalid_options','options');
  if(value.options.length>3)return fail('too_many_options','options');
- const problemSources=new Set(problemEvidence.map(id=>investigationMetrics[id].source));
  const options:InvestigationCandidate[]=[],seen=new Set<string>();
  for(const candidate of value.options){
   const option=object(candidate);if(!option||!exact(option,['operation','evidence']))return fail('option_shape','options');
@@ -86,7 +85,6 @@ export function inspectInvestigationProposal(raw:unknown,input:unknown):{proposa
   const operation=option.operation as InvestigationOperation,checked=inspectRefs(option.evidence,2,pack),evidence=checked.ids;
   if(!evidence)return fail(checked.reason!,'options.evidence');
   if(evidence.some(id=>investigationMetrics[id].operation!==operation))return fail('operation_mismatch','options.operation');
-  if(evidence.some(id=>!problemSources.has(investigationMetrics[id].source)))return fail('problem_source_mismatch','options.evidence');
   const identity=JSON.stringify([operation,[...evidence].sort()]);
   if(seen.has(identity))continue;
   seen.add(identity);options.push({operation,evidence});
