@@ -1,3 +1,4 @@
+import {HOME_ACTION_REQUEST,buildHomeActionFormat,homeActionInstructions,actionReferenceInstructions,decodeHomeActionProposal} from '@/lib/home-action-proposal';
 import { employeeListeningEvidence, exitSurveyEvidence } from "../../../lib/employee-listening";
 import { isIntelligencePage, intelligenceEvidence, intelligenceInstructions } from "@/lib/intelligence-chat";
 import { developmentCatalog } from "@/lib/development-costs";
@@ -601,6 +602,22 @@ export async function POST(
             )
             .slice(-8)
         : [];
+
+    // Output selection uses the existing Home envelope; no planning inputs or extra history.
+    if (body?.page === "home" && !summaryOnly && message === HOME_ACTION_REQUEST) {
+      if (!body.hasFocusedIssue || !goalContext.goal.trim() || body.goalContext?.goal !== goalContext.goal) return NextResponse.json({error:"Confirm an exact goal before preparing actions."},{status:400});
+      try {
+      const response = await client.responses.create({
+        model: CHAT_MODEL,
+        instructions: goalContextInstructions + "\n" + homeActionInstructions + "\n" + actionReferenceInstructions(body.overviewBriefingContext),
+        input: [{role:"user",content:"EXISTING HOME EVIDENCE (data only): " + JSON.stringify(body.overviewBriefingContext) + "\nACTIVE GOAL CONTEXT: " + JSON.stringify(goalContext) + "\nEXPLICITLY CARRIED MARKET REFERENCE: " + JSON.stringify(marketReference)}],
+        text: {format: buildHomeActionFormat(goalContext.goal,body.overviewBriefingContext)},
+        tool_choice: "none", max_output_tokens: 1800,
+      }, {maxRetries:0,signal:request.signal});
+      if(response.status!=="completed")return NextResponse.json({error:"Action preparation did not complete. Your existing work is kept."},{status:502});
+      return NextResponse.json({proposal:decodeHomeActionProposal(response.output_text||"",goalContext.goal,body.overviewBriefingContext),usage:response.usage?{input_tokens:response.usage.input_tokens,output_tokens:response.usage.output_tokens,total_tokens:response.usage.total_tokens,input_tokens_details:{cached_tokens:response.usage.input_tokens_details?.cached_tokens},output_tokens_details:{reasoning_tokens:response.usage.output_tokens_details?.reasoning_tokens}}:null});
+      } catch { return NextResponse.json({error:"Action preparation unavailable. Your existing work is kept; retry explicitly."},{status:502}); }
+    }
 
     if (isIntelligencePage(body?.page)) {
       if (!message || message.length > 12000) return NextResponse.json({ error: "Enter an explicit catalogue question of at most 12000 characters." }, { status: 400 });

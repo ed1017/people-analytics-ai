@@ -50,3 +50,5 @@ export function decodeHomeActionProposal(text:string,goal:string,input:unknown){
 }
 // Structural validity is NOT semantic validation. Free text can still contain unsupported claims.
 export function proposedActionPresentation(action:HomeAction){return {action,status:'AI-proposed pilot — not validated',semanticReviewRequired:true,cost:null,timing:null,staffing:null,effect:null} as const}
+
+export const HOME_ACTION_REQUEST = 'Prepare action options for my exact pinned goal.';

@@ -29,3 +29,16 @@ test('passive old-goal/reload and exact cache hits never call preparation',async
 test('failed preparation keeps prior work, has no automatic retry, permits explicit retry',async()=>{const h=harness();const args={...h.args,prepare:async()=>{throw Error('PRIVATE_RAW_FAILURE')}};assert.equal((await h.coordinator.run(args)).status,'failed');assert.equal((await h.coordinator.run(args)).status,'explicit_required');assert.equal((await h.coordinator.run({...args,mode:'explicit'})).status,'failed');assert.equal(h.commits.length,0)});
 test('goal switch and switch-back invalidate late output even when binding matches again',async()=>{const h=harness(),pending=h.coordinator.run(h.args);await Promise.resolve();h.coordinator.invalidate();h.release();assert.equal((await pending).status,'stale');assert.equal(h.commits.length,0)});
 test('changed evidence cannot automatically re-prepare an already pinned goal',async()=>{const h=harness(),pending=h.coordinator.run(h.args);await Promise.resolve();h.release();await pending;assert.equal((await h.coordinator.run({...h.args,binding:{...binding,evidenceDigest:'a'.repeat(64)}})).status,'explicit_required');assert.equal(h.calls,1)});
+
+test('action draft round-trips through legacy goal migration without changing plans or other goals',async()=>{
+ const {DecisionStore}=await import('../lib/local-decisions.ts');
+ const values=new Map([['insights-to-action.goals.v1',JSON.stringify({version:1,activeId:'goal-a',goals:[{id:'goal-a',statement:goal},{id:'goal-b',statement:'Other goal'}]})]]);
+ const port={getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,value),removeItem:key=>values.delete(key)};
+ const store=new DecisionStore();store.initialize(port);store.setField('goal-a','workforceSolution',{sentinel:'Existing confirmed plan'});store.setField('goal-b','chat',{messages:[],input:'Keep another goal draft'});
+ const patch=actionDraftPatch(draft);store.setField('goal-a',patch.field,patch.value);
+ const reload=new DecisionStore();reload.initialize(port);
+ assert.deepEqual(readActionDraft(reload.getField('goal-a',patch.field,null),binding,packet),draft);
+ assert.deepEqual(reload.getField('goal-a','workforceSolution',null),{sentinel:'Existing confirmed plan'});
+ assert.equal(reload.getField('goal-b','chat',null).input,'Keep another goal draft');
+ assert.equal(reload.getField('goal-b',patch.field,null),null);
+});
