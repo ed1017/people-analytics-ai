@@ -34,7 +34,7 @@ function RetentionEditor({goalId,goalStatement,initiallyOpen,onRestart,openSeque
  if(openedSequence!==openSequence){setOpenedSequence(openSequence);if(initiallyOpen){setOpen(true);setNotice('');}}
  const invalid=useRef(false),heading=useRef<HTMLHeadingElement>(null),resultHeading=useRef<HTMLHeadingElement>(null);
  useEffect(()=>decisionStore.subscribe(()=>{const state=decisionStore.getSnapshot(),goal=state.data.goals.goals.find(g=>g.id===goalId);if(state.data.goals.activeId!==goalId||goal?.statement!==goalStatement){invalid.current=true;setStale(true);}}),[goalId,goalStatement]);
- useEffect(()=>{if(open)focusRetentionStep(heading.current)},[open,step]);
+ useEffect(()=>{if(open)focusRetentionStep(heading.current)},[open,step,openSequence]);
  useEffect(()=>{if(review)focusRetentionStep(resultHeading.current)},[review]);
  const current=()=>{const state=decisionStore.getSnapshot();if(invalid.current||state.data.goals.activeId!==goalId||state.data.goals.goals.find(g=>g.id===goalId)?.statement!==goalStatement)throw Error('Goal changed. Reopen Retention what-if for the current goal.');if(!state.ready||!state.saved)throw Error('Browser storage is unavailable. Your draft is retained; no review was saved.');return state;};
  const change=(field:RetentionField,value:string)=>{setDraft(previous=>({...previous,[field]:value}));setReview(null);setNotice('Assumptions changed. Calculate again before saving.');};
