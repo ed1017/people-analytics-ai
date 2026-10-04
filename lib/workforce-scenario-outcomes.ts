@@ -26,3 +26,19 @@ export function workforceSearchCountCopy(summary: {enumerated:number;calculatorI
   detail:`${summary.enumerated} combinations enumerated; ${summary.enumerated} candidate calculation attempts: ${calculated} calculated, ${summary.counts.invalid} invalid. ${summary.calculatorInvocations} total calculator calls including the separate reference. ${summary.emitted} search results returned; ${summary.omittedByCap} omitted by the output cap; ${summary.excludedByFilter} excluded by the filter. ${summary.enumerationComplete?'Complete within the explicit bounds.':'Search incomplete.'} Displayed options are not a global top ranking.`,
  };
 }
+
+/** Short card copy from calculated values only; no inferred skill or hiring evidence. */
+export function workforceOptionBullets(plan:WorkforceIncrement){
+ const outcome=workforceScenarioOutcomes(plan);
+ const number=(value:number|null)=>value===null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:2});
+ const bullets=[{label:'Headcount',text:`${number(plan.maxAddedEmployees)} added employees, including backfills.`}];
+ if(Number(plan.input.build)>0||Number(plan.input.move)>0)bullets.push({label:'Skills',text:`Train ${plan.input.build}; move ${plan.input.move}. Readiness unverified.`});
+ if(Number(plan.input.buy)>0||Number(plan.input.backfills)>0)bullets.push({label:'Hiring',text:`${plan.input.buy} hires; ${plan.input.backfills||'0'} backfills. Starts are assumptions.`});
+ bullets.push(
+  {label:'Cost',text:`USD ${number(plan.totalCash)} cash over ${plan.input.months} months; time value ${number(plan.totalTime)} separately.`},
+  {label:'Why',text:plan.checks.some(check=>check.status==='not met')?'Some entered limits are not met.':plan.checks.length!==3||plan.checks.some(check=>check.status!=='met')?'Some entered limits cannot be checked.':'Meets entered limits; feasibility unverified.'},
+  {label:'Timing',text:outcome.fullCoverageMonth?`Full coverage ${outcome.fullCoverageMonth}, if assumptions hold.`:outcome.coverageTiming==='unknown'?'Full coverage timing unknown.':'Full coverage not reached within this plan.'},
+  {label:'Expected result',text:outcome.deadline?`${number(outcome.covered)} of ${outcome.roles} roles by ${outcome.deadline}; gap ${number(outcome.remaining)}. Conditional.`:'Deadline coverage unknown; no deadline specified.'},
+ );
+ return bullets;
+}

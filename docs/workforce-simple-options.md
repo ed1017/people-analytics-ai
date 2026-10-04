@@ -1,0 +1,15 @@
+# Concise workforce options
+
+Based on main `514651a97ba8e431d13d43fa8f0399202a0250af`. PR101's copy-cleanup branch remains separate and unchanged.
+
+The comparison shows only existing calculated options, numbered Option 1–3. Each has five to seven short bullets drawn from its own deterministic calculation: headcount, relevant internal training/moves, relevant hiring, cash and separate employee time, entered-limit status, conditional timing, and deadline coverage/gap. No skills availability, recruitment prediction, benefit or validated ML outcome is inferred. Missing values remain unknown; limits that fail or cannot be checked remain on the card.
+
+Adjust opens the existing temporary comparison with six common fields; advanced costs/timing stay mounted in a disclosure. Calculation-step edit links reveal and focus their exact field. Save on the existing saved result bookmarks that exact result. Save on an alternative opens its temporary review without persisting; explicit Save in that review appends the existing governed version/result. Neither action records approval. Existing cancellation, late-response guards, source verification and save handlers are retained.
+
+Details retains the calculation steps, input/source snapshots and lineage. Existing verified search counts are in Search methodology and count, including invalid candidates, reference calls, output caps and original-search versus later-edits distinctions. Offline ML is not connected to this view. Comparison preference, pins, saved-calculation inspection, further alternatives, supporting evidence and approval records are expandable. Incomplete inputs remain open and require explicit review/save before calculation. Historical/unverified/unsaved records retain their blocking notices.
+
+This is a presentation simplification of the existing comparison, not completed conversational extraction/routing or new scenario generation. It does not create a third option when only two are calculated. Existing lifecycle unit tests and real-component browser regression exercise calculation values, draft protection, repeated edits, cancellation, goal roundtrips, exact historical pins and explicit alternative saves with synthetic intercepted inputs. Hosted and physical-device acceptance are separate.
+
+Validation: 496 unit tests, 168 real-component browser assertions (106 option-card checks plus 62 journey checks, at 1366px and 390px), full ESLint, standalone TypeScript, optimized Next production build and whitespace checks passed. Browser evidence: `/tmp/workforce-solution-cards-pG9CDE/`; logs: `/tmp/simple-options-{all-unit,lint,final-lint,ts,build,browser-final}.log`. The visual fixtures intercept service requests and use synthetic saved records; no live model or company-data request was used.
+
+Journey regression evidence: `/tmp/simple-options-journey.log` and `/tmp/workforce-journey-IoTRZ7/`. Updated journey assertions confirm that completed comparison controls are directly reachable without Continue, while incomplete/review/calculate/cancel states retain their original focus and explicit-action behavior.
