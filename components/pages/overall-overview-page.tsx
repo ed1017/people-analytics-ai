@@ -2,6 +2,7 @@
 import {emptyOptionActions,isOptionActionLabel,type WorkforceOptionActions,type OptionAction,type StagedOptionAction} from "@/lib/workforce-option-actions";
 
 import {HomeCapacityReview,type HomeCapacityRequest} from "@/components/home-capacity-review";
+import {RetentionWhatIfPanel} from "@/components/retention-what-if-panel";
 import {WorkforceSolutionPanel} from "@/components/workforce-solution-panel";
 import {revealJourneyTarget} from "@/components/workforce-journey-continue";
 import {recordDecisionEvidence,useDecisionStorage} from "@/components/decision-store";
@@ -50,6 +51,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const storage=useDecisionStorage();
   const planner=useRef<HTMLDivElement>(null);
   const [planningReview,setPlanningReview]=useState<HomeCapacityRequest|null>(null);
+  const [retentionEntry,setRetentionEntry]=useState<{id:string;sequence:number}|null>(null);
   const [planningGoal,setPlanningGoal]=useState<{id:string;goal:string}|null>(null);
   const planningActive=Boolean(planningReview)||(planningGoal?.id===conversation.activeGoalId&&planningGoal?.goal===conversation.focusedIssue);
   const hasPlan=storage.data.workspaces[conversation.activeGoalId]?.fields.workforceSolution!==undefined;
@@ -306,8 +308,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       <h3 className="text-lg font-semibold">From question to plan</h3>
       <ol className="mt-4 list-decimal space-y-4 pl-4">
         <li><strong>Start with a question</strong><p>Ask AI to find an issue, or explore <button className="text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce</button> to investigate your own.</p></li>
-        <li><strong>Review your goal and scope</strong><p>Choose Compare workforce options to confirm the goal and whether it needs additional role capacity. For retention-only or replacement-only goals, continue the conversation.</p></li>
-        <li><strong>Review inputs and compare</strong><p>Fill missing assumptions, Save reviewed inputs, then Calculate options. Review costs, timing and unknowns with HR, business leaders and Finance before agreeing on action.</p></li>
+        <li><strong>Review your goal and scope</strong><p>Choose Compare workforce options to confirm the goal and whether it needs additional role capacity. For retention-only goals, confirm your goal to open Retention what-if and enter your own assumptions. For replacement-only goals or unsure scope, continue the conversation.</p></li>
+        <li><strong>Review inputs and compare</strong><p>For additional capacity, fill missing assumptions, Save reviewed inputs, then Calculate options. For retention, review your assumptions, Calculate retention what-if, then Save retention review. Review costs, timing and unknowns with HR, business leaders and Finance before agreeing on action.</p></li>
         <li><strong>Assess &amp; Evaluate <span className="font-normal text-muted-foreground">· Coming soon</span></strong><p>Track progress and assess whether the plan worked.</p></li>
       </ol>
       <p className="mt-4 text-xs text-muted-foreground">Demo only. Real-world actions happen outside this app.</p>
@@ -322,7 +324,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       </details>
     </aside>
     <div ref={planner} tabIndex={-1} className="order-2 min-w-0 xl:order-none xl:col-span-2">
-      {planningReview&&<HomeCapacityReview request={planningReview} context={planningContext} conversation={conversation} onClose={()=>{setPlanningReview(null);focusQuestion();}} onConfirmed={(id,goal)=>{setPlanningGoal({id,goal});setPlanningReview(null);}}/>}
+      {planningReview&&<HomeCapacityReview request={planningReview} context={planningContext} conversation={conversation} onClose={()=>{setPlanningReview(null);focusQuestion();}} onRetention={(id,goal)=>{setPlanningGoal({id,goal});setPlanningReview(null);setRetentionEntry(previous=>({id,sequence:(previous?.sequence??0)+1}));}} onConfirmed={(id,goal)=>{setPlanningGoal({id,goal});setPlanningReview(null);}}/>}
+      {active&&(retentionEntry?.id===conversation.activeGoalId||storage.data.workspaces[conversation.activeGoalId]?.fields.retentionWhatIfV1!==undefined)&&<RetentionWhatIfPanel key={conversation.activeGoalId} openSequence={retentionEntry?.sequence??0} initiallyOpen={retentionEntry?.id===conversation.activeGoalId}/>}
       {active&&<WorkforceSolutionPanel hideEntry optionActions={optionActions} page="home" onNavigate={onNavigate}/>}
     </div>
   </div>;

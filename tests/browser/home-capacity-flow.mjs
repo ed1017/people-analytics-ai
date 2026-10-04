@@ -49,7 +49,7 @@ try{for(const mode of [{name:'desktop',width:1366},{name:'mobile',width:390},{na
  await input.fill('Keep this unfinished question');await open();
  checkHere('entry focuses explicit scope review and makes no request',await scope().evaluate(el=>el===document.activeElement)&&posts.length===baseline&&await confirm().isDisabled());
  await page.getByLabel('Goal to carry into the plan',{exact:true}).fill('Reduce avoidable departures');await page.getByRole('radio',{name:'No — retain current employees only',exact:true}).check();
- checkHere('retention-only scope cannot create a plan',await confirm().isDisabled()&&(await state()).data.goals.goals.length===0&&posts.length===baseline);
+ checkHere('retention-only scope cannot create a plan',(await confirm().count()===0||await confirm().isDisabled())&&(await state()).data.goals.goals.length===0&&posts.length===baseline);
  await page.getByRole('radio',{name:'No — replace departures only',exact:true}).check();checkHere('replacement-only scope cannot create a plan',await confirm().isDisabled()&&!(await solution()));
  await page.getByRole('radio',{name:'Not sure yet',exact:true}).check();checkHere('uncertain scope stays in conversation',await confirm().isDisabled());
  await close();await page.waitForFunction(()=>document.activeElement?.id==='overview-question');checkHere('return preserves and focuses the exact chat draft',await input.inputValue()==='Keep this unfinished question'&&await input.evaluate(el=>el===document.activeElement));
