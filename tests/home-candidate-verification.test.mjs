@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {homeCandidateVerification as verify} from '../lib/home-candidate-verification.ts';
+const pack={sources:[{id:'W1',status:'loaded',facts:{headcount:12}}]},record={version:2,goalId:'a',goal:'Investigate capacity',sourceKey:JSON.stringify(pack)};
+const check=(checking,valid,current=pack,goalId='a',goal=record.goal)=>verify(checking,record,valid,goalId,goal,current);
+test('unsettled evidence never labels the saved record stale, even before the loading effect',()=>{assert.equal(check(true,false,{sources:[]}), 'checking');assert.equal(check(true,true),'checking')});
+test('matching completed packet restores current cards',()=>assert.equal(check(false,true),'current'));
+test('completed changed packet yields actual stale state',()=>assert.equal(check(false,false,{sources:[{id:'W1',status:'loaded',facts:{headcount:13}}]}),'stale'));
+test('failed source is unverified, not a claimed evidence change',()=>{for(const status of ['unavailable','timeout','invalid','budget-excluded'])assert.equal(check(false,false,{sources:[{id:'W1',status,facts:null}]}),'unavailable')});
+test('goal changes cannot restore another goal record after the load settles',()=>{assert.equal(check(true,false,pack,'b'),'checking');assert.equal(check(false,false,pack,'b'),'stale');assert.equal(check(false,false,pack,'a','Changed goal'),'stale')});
+test('verification never alters records, drafts or results',()=>{const saved=structuredClone(record);check(true,false);check(false,false,{sources:[]});assert.deepEqual(record,saved);assert.equal(verify(true,null,false,'a','Goal',pack),'empty')});

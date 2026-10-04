@@ -1,5 +1,13 @@
 # Home problem → pin → options
 
+## Reload verification correction
+
+Hosted core acceptance passed at `44bade79e50d0800a94c325fca7d4d5853d08723`: one question → single Pin → investigation cards, with Details, toggles, Cancel and draft preservation. The remaining reload issue was a temporary stale warning while the new evidence packet was still loading.
+
+The candidate panel now waits for the exact evidence load key to settle before deciding whether saved candidates are stale. During that interval it shows “Checking evidence for your saved options…” and disables Generate. A matching packet restores cards; a completed changed packet shows the existing stale warning. A previously loaded source that is now unavailable instead produces an unverified-evidence message and keeps Generate disabled until evidence can be checked. The original candidate record, drafts and calculator results are retained. No automatic model request, calculation, storage migration or changed input boundary is introduced.
+
+Focused validation: 64 relevant unit tests, 51 reload browser assertions, 114 production-built discovery-to-Pin assertions and 36 planner-resume assertions pass (201 browser assertions). Reload tests delay evidence and cover matching, changed, failed and goal-change cases on desktop/mobile/200% reflow, including exact saved-record and prior-calculation preservation. Lint, TypeScript and production build pass. No unrelated full-suite rerun or live model call was made. Final hosted reload smoke at the new exact head remains required before release. The cards remain investigations, not solution predictions.
+
 ## Dynamic-schema correction
 
 The hosted `c087e78` attempt failed with `invalid_investigation`, three candidates and zero missing fields. The actual offending reference remains unknown; no raw response/log was inspected. Audit reproduced multiple schema-valid/runtime-invalid cases: the static schema allowed all 21 catalog IDs regardless of actual availability and allowed every operation with every metric. A synthetic packet with 11/18 loaded sources had only three resolvable catalog metrics.
