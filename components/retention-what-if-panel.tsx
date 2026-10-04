@@ -31,7 +31,7 @@ function RetentionEditor({goalId,goalStatement,initiallyOpen,onRestart,openSeque
  const latest=record?.revisions.at(-1);
  const [open,setOpen]=useState(initiallyOpen),[step,setStep]=useState(0),[draft,setDraft]=useState<RetentionInput>(()=>latest?.input??emptyRetentionInput()),[review,setReview]=useState<{input:RetentionInput;result:RetentionResult;raw:unknown}|null>(null),[notice,setNotice]=useState(''),[stale,setStale]=useState(false);
  const [openedSequence,setOpenedSequence]=useState(openSequence);
- if(openedSequence!==openSequence){setOpenedSequence(openSequence);if(initiallyOpen)setOpen(true);}
+ if(openedSequence!==openSequence){setOpenedSequence(openSequence);if(initiallyOpen){setOpen(true);setNotice('');}}
  const invalid=useRef(false),heading=useRef<HTMLHeadingElement>(null),resultHeading=useRef<HTMLHeadingElement>(null);
  useEffect(()=>decisionStore.subscribe(()=>{const state=decisionStore.getSnapshot(),goal=state.data.goals.goals.find(g=>g.id===goalId);if(state.data.goals.activeId!==goalId||goal?.statement!==goalStatement){invalid.current=true;setStale(true);}}),[goalId,goalStatement]);
  useEffect(()=>{if(open)focusRetentionStep(heading.current)},[open,step]);
@@ -45,7 +45,7 @@ function RetentionEditor({goalId,goalStatement,initiallyOpen,onRestart,openSeque
  return <section aria-label="Retention what-if" className="mx-auto my-4 max-w-3xl space-y-3 rounded-lg border p-4 text-sm">
   <h2 className="text-lg font-semibold">Retention what-if</h2><p>Explore one program using your own baseline, effect and cost assumptions. This is conditional arithmetic, not a forecast or evidence of what works.</p>
   <p>Goal: {goalStatement}</p><p className="text-xs text-muted-foreground">The population and horizon below define this what-if. Page filters do not fill or change these assumptions.</p>{latest&&latest.goalStatement!==goalStatement&&<p role="status">The saved inputs came from an earlier goal statement. Review their scope before calculating for this goal.</p>}
-  {!open&&<button className={button} disabled={disabled} onClick={()=>setOpen(true)}>{latest?'Review retention assumptions':'Start retention what-if'}</button>}
+  {!open&&<button className={button} disabled={disabled} onClick={()=>{setOpen(true);setNotice('');}}>{latest?'Review retention assumptions':'Start retention what-if'}</button>}
   {readError&&<p role="alert">{readError} Original data is retained; editing is blocked.</p>}
   {stale&&<p role="alert">The goal changed. Close and reopen this review for the current goal. No stale result can be saved. <button className={button} onClick={onRestart}>Reopen for current goal</button></p>}
   {!storage.saved&&<p role="alert">{storage.notice??'Browser storage is unavailable. Your draft is kept in this view.'}</p>}

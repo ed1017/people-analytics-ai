@@ -68,8 +68,8 @@ export function HomeCapacityReview({request,context,conversation,onClose,onConfi
    ].map(([value,label])=><label key={value} className="flex min-h-11 items-center gap-2"><input type="radio" name="home-capacity-scope" value={value} checked={scope===value} onChange={()=>setScope(value)}/><span>{label}</span></label>)}
   </fieldset>
   {scope==='additional'&&<p>Confirm only the additional-capacity part of your goal. Retention effects remain unknown. Next: choose a role and business unit, fill missing demand, timing and cost assumptions, <strong>Save reviewed inputs</strong>, then <strong>Calculate options</strong>.</p>}
-  {(scope==='retention'||scope==='replacement')&&<p role="status">This scope is not supported by the additional-capacity calculator. Continue the conversation to investigate evidence and next steps. No workforce plan or calculation has been created.</p>}
-  {scope==='retention'&&onRetention&&<p>Retention what-if explores one program using your own expected-exit baseline, effect range, timing and costs. It is conditional arithmetic, not a forecast. Page filters do not supply its population or assumptions.</p>}
+  {((scope==='retention'&&!onRetention)||scope==='replacement')&&<p role="status">This scope is not supported by the additional-capacity calculator. Continue the conversation to investigate evidence and next steps. No workforce plan or calculation has been created.</p>}
+  {scope==='retention'&&onRetention&&<p role="status">Retention what-if explores one program using your own expected-exit baseline, effect range, timing and costs. It is conditional arithmetic, not a forecast. Page filters do not supply its population or assumptions.</p>}
   {scope==='unknown'&&<p role="status">Clarify whether you need additional roles before using this calculator. You can continue the conversation; your draft is kept.</p>}
   {stale&&<p role="status">Your goal or context changed. Close and reopen Compare workforce options to review the current context. Your review text is retained here for reference.</p>}
   {notice&&<p role="alert">{notice}</p>}

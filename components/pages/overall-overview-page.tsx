@@ -308,8 +308,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       <h3 className="text-lg font-semibold">From question to plan</h3>
       <ol className="mt-4 list-decimal space-y-4 pl-4">
         <li><strong>Start with a question</strong><p>Ask AI to find an issue, or explore <button className="text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce</button> to investigate your own.</p></li>
-        <li><strong>Review your goal and scope</strong><p>Choose Compare workforce options to confirm the goal and whether it needs additional role capacity. For retention-only or replacement-only goals, continue the conversation.</p></li>
-        <li><strong>Review inputs and compare</strong><p>Fill missing assumptions, Save reviewed inputs, then Calculate options. Review costs, timing and unknowns with HR, business leaders and Finance before agreeing on action.</p></li>
+        <li><strong>Review your goal and scope</strong><p>Choose Compare workforce options to confirm the goal and whether it needs additional role capacity. For retention-only goals, confirm your goal to open Retention what-if and enter your own assumptions. For replacement-only goals or unsure scope, continue the conversation.</p></li>
+        <li><strong>Review inputs and compare</strong><p>For additional capacity, fill missing assumptions, Save reviewed inputs, then Calculate options. For retention, review your assumptions, Calculate retention what-if, then Save retention review. Review costs, timing and unknowns with HR, business leaders and Finance before agreeing on action.</p></li>
         <li><strong>Assess &amp; Evaluate <span className="font-normal text-muted-foreground">· Coming soon</span></strong><p>Track progress and assess whether the plan worked.</p></li>
       </ol>
       <p className="mt-4 text-xs text-muted-foreground">Demo only. Real-world actions happen outside this app.</p>
