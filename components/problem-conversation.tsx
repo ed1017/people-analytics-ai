@@ -111,7 +111,7 @@ export function useProblemConversation() {
     if (current.goals.some(goal=>goal.statement.toLocaleLowerCase()===clean.toLocaleLowerCase())) throw Error("This goal is already saved. Select it from your goals to continue; your draft is retained.");
     if (current.goals.length >= MAX_GOALS) throw Error("Your saved goals are full. Select an existing goal to continue; your draft is retained.");
     const id = crypto.randomUUID();
-    chats.current.set(id,{messages,input,problem,questionUnanswered});
+    chats.current.set(id,{messages,input:inputRef.current,problem,questionUnanswered});
     activate({...current,activeId:id,goals:[...current.goals,{id,statement:clean}]});
     return id;
   };

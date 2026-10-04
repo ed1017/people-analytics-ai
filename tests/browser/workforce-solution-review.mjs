@@ -11,7 +11,7 @@ await fs.mkdir(output,{recursive:true});
 const results=[];
 const check=(name,ok)=>{console.log(name+': '+Boolean(ok));results.push({name,pass:Boolean(ok)});if(!ok)throw Error(name)};
 const fixture=workforceReviewFixture(),key='insights-to-action.decisions.v1',goal='Compare three additional Engineer positions in Technology';
-const seed={version:1,revision:1,goals:{version:1,activeId:'goal-a',goals:[{id:'goal-a',statement:goal},{id:'goal-b',statement:'Unrelated goal'}]},workspaces:{'goal-a':{savedAt:fixture.calculatedAt,fields:{brief:{...emptyDecisionBrief(),owner:'Keep local owner',observed:'Keep local notes'},chat:{messages:[],input:''}}}}};
+const seed={version:1,revision:1,goals:{version:1,activeId:'goal-a',goals:[{id:'goal-a',statement:goal},{id:'goal-b',statement:'Unrelated goal'}]},workspaces:{'goal-a':{savedAt:fixture.calculatedAt,fields:{brief:{...emptyDecisionBrief(),owner:'Keep local owner',observed:'Keep local notes'},chat:{messages:[],input:'',problem:null,questionUnanswered:false}}}}};
 const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH ?? '/usr/bin/chromium',headless:true,args:['--no-sandbox']});
 try {
  for(const width of [1366,390]) {
@@ -35,7 +35,7 @@ try {
   });
   await page.addInitScript(({key,seed})=>{if(!localStorage.getItem(key))localStorage.setItem(key,seed);},{key,seed:encodeDecisions(seed)});
   await page.goto(baseURL,{waitUntil:'domcontentloaded',timeout:120000});
-  await page.getByRole('button',{name:'Compare workforce options',exact:true}).click();
+  await page.getByText('Quantify an option',{exact:true}).click();await page.getByRole('button',{name:'Review numbers',exact:true}).click();
   await page.getByRole('radio',{name:/^Yes/}).check();
   await page.getByRole('button',{name:'Confirm goal and review inputs',exact:true}).click();
   const workspace=page.getByRole('region',{name:'Workforce solution workspace',exact:true});
@@ -129,7 +129,7 @@ try {
   check(width+' reload preserves separate alternative history',saved.workforceAlternativeReviews.length===1&&saved.workforceAlternativeReviews[0].reviewedRevisions[0].trainingCash==='0');
   check(width+' no writes to unrelated goal',!(await state()).workspaces['goal-b']);
   await page.getByLabel('Selected goal',{exact:true}).selectOption('goal-b');
-  await page.getByRole('button',{name:'Compare workforce options',exact:true}).waitFor();
+  await page.getByRole('button',{name:'Generate options for this goal',exact:true}).waitFor();
   check(width+' other goal has no selected solution',await workspace.count()===0);
   await page.getByLabel('Selected goal',{exact:true}).selectOption('goal-a');
   await workspace.getByRole('heading',{name:'Calculated decision brief — version 2',exact:true}).waitFor();await expandSupporting();

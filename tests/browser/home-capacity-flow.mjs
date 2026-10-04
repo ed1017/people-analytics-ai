@@ -71,7 +71,7 @@ try{for(const mode of [{name:'desktop',width:1366},{name:'mobile',width:390},{na
   if(await control.evaluate(el=>el.tagName==='SELECT'))await control.selectOption(value);else await control.fill(value);
  }
  checkHere('draft blocks calculation until explicit save',await button('Calculate options').isDisabled());
- await button('Continue workforce options').click();checkHere('return to existing planner preserves edited assumptions',await page.locator('[data-journey-field="roles"]').inputValue()==='3');
+ await page.getByText('Quantify an option',{exact:true}).click();await button('Review numbers').click();checkHere('return to existing planner preserves edited assumptions',await page.locator('[data-journey-field="roles"]').inputValue()==='3');
  await button('Save reviewed inputs').click();checkHere('save makes a version without calculating',(await solution()).versions.length===2&&posts.length===baseline&&(await solution()).results.length===0);
  await button('Calculate options').click();await page.getByRole('region',{name:'Workforce solution calculation',exact:true}).waitFor();await page.waitForTimeout(500);
  checkHere('explicit Calculate uses unchanged payload and existing calculator',posts.length===baseline+1&&posts.at(-1).path==='/api/workforce-solution'&&JSON.stringify(posts.at(-1).body)===JSON.stringify(plan));
@@ -79,7 +79,7 @@ try{for(const mode of [{name:'desktop',width:1366},{name:'mobile',width:390},{na
  await button('Compare options').click();checkHere('PR103 comparison remains usable',await page.getByRole('region',{name:'Compare calculated options',exact:true}).isVisible());
  await page.screenshot({path:path.join(output,(built?'built-':'')+mode.name+'-options.png'),fullPage:true});
  checkHere('viewport has no horizontal page overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
- const beforeReload=posts.length;await page.reload();if(!built){await page.addStyleTag({content:css});await page.addScriptTag({content:assets.get('/assets/fixture.js')});}await button('Continue workforce options').waitFor();await page.waitForTimeout(500);
+ const beforeReload=posts.length;await page.reload();if(!built){await page.addStyleTag({content:css});await page.addScriptTag({content:assets.get('/assets/fixture.js')});}await page.getByRole('region',{name:'Workforce solution calculation',exact:true}).waitFor();await page.waitForTimeout(500);
  checkHere('reload retains chat draft, confirmed goal and calculated plan without requesting AI',await input.inputValue()==='Keep this unfinished question'&&(await state()).data.goals.goals[0].statement===goal&&(await solution()).results.length===1&&posts.length===beforeReload);
  if(!built){await page.evaluate(()=>window.capacityRename());await page.getByText('The goal wording changed. Review and save the inputs to bind them to the current goal before calculating or recording approval.',{exact:true}).waitFor();checkHere('changed goal blocks old calculation',await button('Calculate options').isDisabled());
  await init();await open();await page.getByLabel('Goal to carry into the plan',{exact:true}).fill(goal);await page.getByRole('radio',{name:/^Yes/}).check();await page.evaluate(()=>window.capacityRoundtrip());await page.getByText('Your goal or context changed.',{exact:false}).waitFor();checkHere('batched goal roundtrip invalidates confirmation',await confirm().isDisabled());}
