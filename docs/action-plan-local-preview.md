@@ -1,6 +1,6 @@
 # Local Action Plan application preview
 
-This checkpoint implements `lib/action-plan-application-preview.ts`. It is a pure, bounded local mapper and validator, with no UI integration, destination writes, storage patches, new options, model calls, vendor contact or operational approvals. It builds on `action-plan-application-audit.md`; it does not change attachment, Development or workforce storage formats.
+The pure mapper in `lib/action-plan-application-preview.ts` now supports an explicit application panel in `HomeBundlePlans`, coordinated by `lib/action-plan-application.ts`. Existing attachment, Development and workforce formats remain unchanged; a bounded `actionPlanApplicationsV1` goal field records application history. There are no source dataset/catalogue writes, new options, model calls, vendor contact or operational approvals.
 
 ## Contract
 
@@ -39,16 +39,26 @@ Capacity review separately confirms additional capacity against the exact attach
 
 `missing` lists rows without usable proposed values, `conflicts` lists occupied fields with different proposed values, and `blockers` lists invalid attempted selections. Row status/reason also reports unresolved restrictions when no changes were selected. Attachment issues and limitations remain visible; acknowledging unknowns during attachment does not resolve those missing fields.
 
-## Review boundary and remaining integration
+## Explicit application and storage boundary
 
-There is intentionally no `apply` function. A future implementation needs a reviewed atomicity/history/provenance contract, especially because Development does not keep prior versions. It must re-read saved state plus working edits, recompute the current evidence/planning binding, check freshness immediately before commit, preserve replaced inputs and historical results, obtain explicit confirmation of the exact selected rows, and record a receipt with destination revisions and skipped fields. A preview being current is not permission to commit. No planning/source store has been changed by this foundation.
+The current attached Action Plan exposes **Preview application**. The user chooses an existing Development option/component and explicitly reviews quote compatibility or additional capacity as applicable. Every field defaults to Preserve. Changing choices requires updating the preview; **Apply selected fields** remains disabled until the preview is current, contains actual changes and has no selected-field blockers. Existing `useGoalWorkspace` subscriptions update planning fields after persistence. Receipt/history remains visible when applying workforce inputs makes the original source planning binding stale; no preparation or calculation runs automatically.
+
+`applyActionPlanPreview` re-reads saved source/destinations, checks the exact preview, and rechecks the live source/working-draft guard after asynchronous fingerprinting and immediately before commit. A per-store in-flight gate, UI ref and destination-revision check prevent double-click/replay writes. All changed fields use allowlisted mappings. Workforce changes append via `reviseWorkforceSolution` without replacing previous versions/results/evidence/approvals. Development changes record complete before/after session snapshots. Receipts include source binding, selected changes/provenance, skipped-field reasons, store revisions and workforce version references. History allows at most 20 receipts and 192 KiB; history and existing 512 KiB goal/3 MiB envelope limits block the transaction without pruning.
+
+`DecisionStore.commitGoalFields` builds and validates one complete goal-store envelope containing both selected destinations and the receipt. It compares the expected persisted bytes before and after candidate validation, checks the active goal/exact statement/revision, then calls `setItem` once. It publishes candidate memory state only after successful persistence. Stale state, invalid history, unsupported mappings, quota/write failures and capacity limits save neither destination. Ordinary existing `setField` edit semantics remain unchanged.
+
+The panel listens for actual `storage` events and invalidates application when persisted bytes differ, preserving this tab's state and requiring reload. These are **optimistic conflict checks**, not strict cross-tab CAS: localStorage has no native compare-and-swap and simultaneous writes in the remaining read/write window cannot be strictly serialized. No global lock or storage backend migration is introduced. No partial receipt is necessary because supported destination changes and their receipt use one envelope write.
+
+New quote/options or workforce-solution creation are outside this milestone. Missing destinations or source values remain explicit blockers/missing fields. No total-to-fee, aggregate-hours-to-sessions, source-headcount or Action-Plan-ID-to-catalogue mapping is added.
 
 Existing Home finding-followup prompts, `app/page.tsx`, source datasets, database/schema/access/security/billing/domain settings, model request envelopes and held eNPS files are outside this change.
 
 ## Checks
 
-Focused: `node --test tests/action-plan-application-preview.test.mjs`
+Focused: `node --test tests/action-plan-application-preview.test.mjs tests/action-plan-application.test.mjs`
 
 Related: `node --test tests/home-bundle-foundation.test.mjs tests/home-bundle-delivery.test.mjs tests/home-action-plan-pilot.test.mjs tests/development-costs.test.mjs tests/workforce-solution.test.mjs tests/workforce-solution-review.test.mjs tests/workforce-increment.test.mjs tests/local-decisions.test.mjs`
 
-Static: `./node_modules/.bin/tsc --noEmit --incremental false` and `./node_modules/.bin/eslint lib/action-plan-application-preview.ts tests/action-plan-application-preview.test.mjs`.
+Browser: `PLAYWRIGHT_MODULE=/path/to/playwright/index.mjs node tests/browser/action-plan-application.mjs`. Uses the real `HomeBundlePlans`, application panel, store and planning hook with synthetic fixtures, intercepted network requests, desktop/mobile viewports, write-failure injection and a second browser tab.
+
+Static: TypeScript, ESLint on changed code, and production Next build with the existing local font fixture.
