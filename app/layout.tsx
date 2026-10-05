@@ -29,7 +29,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" data-workspace-preference="light" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{__html: `(function(){var p='light';try{var s=localStorage.getItem('people-analytics-workspace-palette-v1');if(s==='slate-blue'||s==='original-navy-teal')p='slate-blue'}catch(e){}document.documentElement.dataset.workspacePreference=p})()`}} /></head>
       <body>
         {children}
         <Analytics />
