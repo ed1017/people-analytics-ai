@@ -1,0 +1,48 @@
+{
+  "base": "1266eedef2db36fbe7e1fcaa0ee9ef699dfcb6a2",
+  "ml": "69188f79035d7faf8e9241ddd6aed75cdb653106",
+  "merge": "bbcfa97629b284f6cd0d90b73e82a27761fbe339",
+  "beforeWritesPayloadAssertions": true,
+  "payloads": {
+    "turnover": {
+      "deepEqual": true,
+      "before": "a5ae7887ce1f55e12905e24432d9778b5883c398bef988639b2d4e6a521a874f",
+      "after": "a5ae7887ce1f55e12905e24432d9778b5883c398bef988639b2d4e6a521a874f"
+    },
+    "hiring": {
+      "deepEqual": true,
+      "before": "48415b5b0fa50370a127911e50bfb8978f02b03e58f9d2f9365390dcae5a95e3",
+      "after": "48415b5b0fa50370a127911e50bfb8978f02b03e58f9d2f9365390dcae5a95e3"
+    },
+    "satisfaction": {
+      "deepEqual": true,
+      "before": "6be0f2bb8f60ed235b47afe8ade7d13cc9bd6446066dab68fbafdb3c0ab59c30",
+      "after": "6be0f2bb8f60ed235b47afe8ade7d13cc9bd6446066dab68fbafdb3c0ab59c30"
+    }
+  },
+  "implementationBefore": "12de492b9f2e78fa200c7647fcc7db6e7b6f728174133962a0534f08b979ca3b",
+  "implementationAfter": "12de492b9f2e78fa200c7647fcc7db6e7b6f728174133962a0534f08b979ca3b",
+  "analysisBefore": "3179a661882157c30cd3afd10d0ac68b1acfd6d6562923f9874402ea816eadcd",
+  "analysisAfter": "3179a661882157c30cd3afd10d0ac68b1acfd6d6562923f9874402ea816eadcd",
+  "evidenceIdentities": {
+    "source": "4427f73fc730c5e3217bdddb645a943f7708e4ed5b9030255ff9892211ef45a3",
+    "hiring": "1a2e1c99b68057d12e72606fca03a3ae4a3ffd987c62e4b3ae80aa97438e9e5c",
+    "satisfaction": "d1fe0fffd999aa769c45792449bb0de759787ac9e6a7181c3f854041797473dc"
+  },
+  "fullArtifactIdentical": true,
+  "displayArtifactIdentical": true,
+  "displayBefore": "59894722d159ce55825a4a2279d6d9e00df3853ee2f482e32b30bd7f3bbc1411",
+  "displayAfter": "59894722d159ce55825a4a2279d6d9e00df3853ee2f482e32b30bd7f3bbc1411",
+  "artifactFiles": {
+    "docs/evidence/action-plan-analysis-demo-v1.json": {
+      "byteIdentical": true,
+      "beforeSha256": "b0299a7462819dabcbbd8ebd367e7bef6b6678659e9e1a89cd29600f9d5eb0fe",
+      "afterSha256": "b0299a7462819dabcbbd8ebd367e7bef6b6678659e9e1a89cd29600f9d5eb0fe"
+    },
+    "lib/data/analysis-demo-display-v1.json": {
+      "byteIdentical": true,
+      "beforeSha256": "e460c153f0c769990101c7b9ffccce3834ad37f1c0e0ece6e5eb6f7a1f4ce413",
+      "afterSha256": "e460c153f0c769990101c7b9ffccce3834ad37f1c0e0ece6e5eb6f7a1f4ce413"
+    }
+  }
+}
