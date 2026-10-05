@@ -1,7 +1,9 @@
 # Attrition analysis consumer integration
 
 This local change consumes the tested three-domain analysis result in the existing
-Attrition **Synthetic count example → Methods and evaluation** disclosure. The
+Attrition **Synthetic count example → Source, version and reproduction** disclosure.
+Hiring and satisfaction are explicitly separate demonstrations that do not inform
+the exit estimate; **Methods and evaluation** contains turnover methods only. The
 default collapsed surface and existing turnover output are unchanged. No Home,
 navigation, source, model, database, eNPS or plan-persistence file is changed.
 
@@ -38,10 +40,14 @@ independently checked original turnover example remains available.
 
 ## Dependency and release handoff
 
-Local branch: `feat/attrition-analysis-integration`.
-Exact parent: `038ae4867dc631affa9e0c10ecd6ae993ca974f8`
+Published source branch: `feat/attrition-analysis-integration` at
+`44394f70a232a39c81f56ba86cd1b065022704c9`.
+Consumer prerequisite: `038ae4867dc631affa9e0c10ecd6ae993ca974f8`
 (`feat/analysis-demo-consumer`), including its existing offline ML prerequisites.
-This is a separate local integration commit; no main merge or production release.
+The corrected combined branch is `integration/analysis-demo-pr129`, based on exact
+PR 129 head `7d2d2d9b723a822720b70645ad9f003575670e05`, with the published source
+branch merged locally. Both source branches are preserved. No main merge or
+production release is included.
 
 Read-only refs inspected for this handoff:
 
@@ -52,11 +58,14 @@ Read-only refs inspected for this handoff:
 The original Attrition page and count-example component match PR 129 at those
 heads, so this insertion does not overlap its edits. PR 129 changes
 `lib/home-bundle-reconciliation.ts`, which participates in the analysis producer's
-implementation fingerprint. The release owner must first combine the prerequisite
-consumer/ML branch with PR 129, then regenerate and review the unified artifact
-with the existing `action-plan-analysis-demo.mjs --write` entry point. Project
-that freshly checked result using `projectAnalysisDisplay` and replace only
-`lib/data/analysis-demo-display-v1.json`; rerun the checks below. Do not accept old
+implementation fingerprint. The combined branch regenerates the unified and display artifacts against that
+exact PR 129 head. Assertions confirmed identical turnover, hiring and satisfaction
+model payloads before writing either artifact. Only implementation/result identity
+fields changed: full analysis identity is now
+`3179a661882157c30cd3afd10d0ac68b1acfd6d6562923f9874402ea816eadcd`.
+If the release owner adds a later Home fix that changes hashed producer inputs,
+regenerate the unified artifact through the existing public producer, assert
+unchanged domain payloads, and project it with `projectAnalysisDisplay` again. Do not accept old
 identity values or relax the equality check to bypass integration drift.
 
 The old foundation ref `feat/aggregate-exit-forecast-foundation` and object
@@ -74,7 +83,8 @@ node tests/browser/analysis-demo-display.mjs
 
 The browser fixture compiles the real app stylesheet and imported production
 component, without introducing a product route. It exercises collapsed/expanded,
-altered hiring, stale satisfaction and missing evidence at desktop, 390px, 320px
+altered hiring, stale satisfaction, missing evidence, and missing/stale source
+readiness at desktop, 390px, 320px
 and a 200%-zoom-equivalent viewport. It checks keyboard access, semantic table
 headers, contained scrolling, automated WCAG A/AA rules, original count retention,
 no horizontal page overflow, no new network requests, no storage writes and no
@@ -83,3 +93,9 @@ This is component integration verification, not a live source or production test
 
 Astra/high reviewed the design and implementation. Its Brier-description
 correction is included. No substantive review blocker remains.
+
+Combined verification: 1,159 unit tests and 102 browser checks pass. Full ESLint
+and the optimized Next.js 16.3.6 production build pass. The build uses inert,
+explicitly supplied API placeholders and does not validate live source access. Dependencies are local to this worktree because Turbopack rejects
+the shared dependency symlink. Home and shared navigation match the exact PR 129
+base; original model outputs, disabled eNPS and held SQL/contracts are unchanged.

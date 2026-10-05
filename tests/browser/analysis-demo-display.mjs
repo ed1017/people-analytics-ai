@@ -45,13 +45,17 @@ try {
     const root = page.locator('details[aria-label="Synthetic count example"]');
     const summary = root.locator('summary').first();
     const methods = page.getByText('Methods and evaluation', {exact: true});
+    const source = page.getByText('Source, version and reproduction', {exact: true});
     const comparisons = page.getByRole('region', {name: 'Experimental synthetic comparisons'});
     await summary.waitFor();
     check(name + ' default compact disclosure retains operational-unavailable status', await root.evaluate(n => !n.open) && await summary.getByText(/Operational forecast unavailable/).isVisible() && !await comparisons.isVisible());
     await summary.focus(); await page.keyboard.press('Enter');
     check(name + ' comparisons remain hidden inside existing methods disclosure', !await comparisons.isVisible());
     await methods.focus(); await page.keyboard.press('Enter');
-    check(name + ' keyboard reveals named comparisons and touch-size summary', await comparisons.isVisible() && (await methods.boundingBox()).height >= 44);
+    check(name + ' turnover methods exclude other-domain demonstrations', !await comparisons.isVisible());
+    await source.focus(); await page.keyboard.press('Enter');
+    check(name + ' keyboard reveals comparisons only inside source disclosure', await comparisons.isVisible() && (await source.boundingBox()).height >= 44 && await comparisons.locator('xpath=ancestor::details[1]').locator('summary').first().textContent() === 'Source, version and reproduction');
+    check(name + ' explicit separation from exit estimate', await comparisons.getByRole('heading', {name: 'Separate hiring and satisfaction demonstrations'}).isVisible() && await comparisons.getByText(/do not inform the exit estimate/).isVisible());
     const hiring = comparisons.getByRole('region', {name: 'Synthetic hiring method comparisons'});
     check(name + ' all nine comparisons and column/row headers render', await hiring.locator('tbody tr').count() === 9 && await hiring.locator('th[scope="col"]').count() === 4 && await hiring.locator('th[scope="row"]').count() === 9);
     check(name + ' loss direction, losing cases and abstentions remain visible', await comparisons.getByText(/lower is better/).isVisible() && await comparisons.getByText(/loses to fixed logistic trend in 4 of 9 cases/).isVisible() && await comparisons.getByText(/All 7 support checks abstain/).isVisible());
@@ -73,10 +77,15 @@ try {
     await comparisons.screenshot({path: path.join(output, name + '-comparisons.png')});
     for (const mode of ['altered', 'stale-satisfaction', 'missing']) {
       await page.getByLabel('Fixture evidence').selectOption(mode);
-      await summary.click(); await methods.click();
+      await summary.click(); await source.click();
       check(name + ' ' + mode + ' withholds new numeric comparisons', !await comparisons.count() && await page.getByRole('status').getByText(/Experimental comparison evidence/).isVisible() && !await page.getByText('999', {exact: true}).count());
       check(name + ' ' + mode + ' preserves original conditional count', await page.getByRole('heading', {name: 'Conditional remaining-year estimate', exact: true}).locator('..').getByText('201', {exact: true}).isVisible());
       check(name + ' ' + mode + ' no page overflow', await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    }
+    for (const mode of ['source-missing', 'source-stale']) {
+      await page.getByLabel('Fixture evidence').selectOption(mode);
+      await summary.click(); await source.click();
+      check(name + ' ' + mode + ' gates all numeric examples after relocation', !await comparisons.count() && !await page.getByRole('heading', {name: 'Conditional remaining-year estimate', exact: true}).count() && await page.getByText(/Source-readiness detail is unavailable/).isVisible());
     }
     check(name + ' no requests, storage writes or runtime errors', requests === 0 && await page.evaluate(() => window.storageWrites) === 0 && errors.length === 0);
     await context.close();

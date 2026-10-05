@@ -14,8 +14,8 @@ export function AnalysisDemoComparison({evidence = artifact}: {evidence?: unknow
   const {hiring, satisfaction} = view.data;
   const losses = hiring.cases.filter(c => c.selectedBrier > c.logisticBrier).length;
   return <section aria-label="Experimental synthetic comparisons" className="min-w-0 space-y-3 text-xs">
-    <h3 className="font-semibold">Experimental methods · fixed synthetic examples</h3>
-    <p>Operational forecasts remain unavailable for all three domains. The tested analysis result retains the recent three-month mean for turnover above. Hiring and satisfaction use separate constructed fixtures; selected goals and workforce filters do not narrow these examples.</p>
+    <h3 className="font-semibold">Separate hiring and satisfaction demonstrations</h3>
+    <p>These hiring and satisfaction demonstrations do not inform the exit estimate. They use separate constructed fixtures; selected goals and workforce filters do not narrow these examples. Operational forecasts remain unavailable for all three domains.</p>
     <p><strong>Hiring · aggregate cohort benchmark.</strong> Brier loss scores predicted 90-day start probabilities against start/non-start outcomes, aggregated across openings; lower is better. Each case tests Jul–Sep 2025 opening cohorts, scored through Jan 2026. Selection uses earlier validation only; these retrospective synthetic comparisons do not establish real-world accuracy.</p>
     <div role="region" aria-label="Synthetic hiring method comparisons" tabIndex={0} className="overflow-x-auto">
       <table className="w-full min-w-[560px] text-xs">
