@@ -10,7 +10,7 @@ import {calculateWorkforceIncrement} from '../../lib/workforce-increment.ts';
 import {encodeDecisions} from '../../lib/local-decisions.ts';
 const {chromium,devices}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const output=await fs.mkdtemp('/tmp/workforce-local-search-');
-const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/workforce-handoff.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/workforce-handoff.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd(),react:path.resolve('node_modules/react')}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
 const bundle=await fs.readFile(path.join(output,'fixture.js'),'utf8');
 const cssFiles=(await fs.readdir('.next/static/chunks')).filter(name=>name.endsWith('.css'));
@@ -28,7 +28,7 @@ const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless
 const check=(name,value)=>{assert.ok(value,name);checks++;console.log('PASS '+name)};
 try {for(const width of [1366,390]){
  const context=await browser.newContext({...width===390?devices['Pixel 7']:{},viewport:{width,height:950}}),page=await context.newPage(),errors=[];let unexpected=0,disableWorkerCrypto=false;
- page.on('pageerror',error=>errors.push(error.message));
+ page.on('pageerror',error=>{errors.push(error.message);console.error('Fixture runtime:',error.message)});
  await page.route('**/*',async route=>{
   const url=new URL(route.request().url());
   if(url.origin==='http://127.0.0.1:3100'&&url.pathname.startsWith('/assets/'))return route.fulfill({contentType:'application/javascript',body:(disableWorkerCrypto?'Object.defineProperty(globalThis.crypto,"subtle",{value:undefined});\n':'')+await fs.readFile(path.join(output,path.basename(url.pathname)),'utf8')});
