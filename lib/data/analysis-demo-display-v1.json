@@ -1,0 +1,349 @@
+{
+  "version": "analysis-demo-display-v1",
+  "status": "fixed-synthetic-demo",
+  "operationallyQualified": false,
+  "analysisIdentity": "3179a661882157c30cd3afd10d0ac68b1acfd6d6562923f9874402ea816eadcd",
+  "evidenceIdentities": {
+    "source": "4427f73fc730c5e3217bdddb645a943f7708e4ed5b9030255ff9892211ef45a3",
+    "hiring": "1a2e1c99b68057d12e72606fca03a3ae4a3ffd987c62e4b3ae80aa97438e9e5c",
+    "satisfaction": "d1fe0fffd999aa769c45792449bb0de759787ac9e6a7181c3f854041797473dc"
+  },
+  "turnover": {
+    "method": "recent-mean-3",
+    "methodVersion": "aggregate-exit-demo-v1",
+    "identities": {
+      "fixtureSha256": "64acf5cbb0cddbaa0614e20ee3895cd026ebe3ec9c91fed622820b53b44d63cd",
+      "evaluatorSha256": "095003fd6731eab87030f91c38fb698e71b3e0c92a0bc7bcd3450d0d2c9fea4e",
+      "datasetFingerprint": "7887ad425425356be28dc143c2776069309ced0cf05a602a842ee8216b75c280",
+      "protocolFingerprint": "268252ee00c4e2413811879b3225e40261c5014ce7378c2d81a764359a01a354"
+    }
+  },
+  "hiring": {
+    "protocolVersion": "hiring-selection-v1",
+    "generatorVersion": "hiring-selection-extension-v1",
+    "cases": [
+      {
+        "id": "gradual-improvement:17",
+        "scenario": "gradual-improvement",
+        "seed": 17,
+        "selectedMethod": "recent-3-fraction",
+        "dates": {
+          "origin": "2025-07-01T00:00:00.000Z",
+          "trainingStart": "2021-01",
+          "trainingEnd": "2025-03",
+          "testMonths": [
+            "2025-07",
+            "2025-08",
+            "2025-09"
+          ],
+          "scoredThrough": "2026-01-01T00:00:00.000Z"
+        },
+        "sample": {
+          "trainingCohorts": 51,
+          "trainingOpenings": 4071,
+          "testCohorts": 3,
+          "testOpenings": 238
+        },
+        "recentBrier": 0.2190522383418725,
+        "logisticBrier": 0.21043684414959057,
+        "selectedBrier": 0.2190522383418725
+      },
+      {
+        "id": "gradual-improvement:29",
+        "scenario": "gradual-improvement",
+        "seed": 29,
+        "selectedMethod": "recent-3-fraction",
+        "dates": {
+          "origin": "2025-07-01T00:00:00.000Z",
+          "trainingStart": "2021-01",
+          "trainingEnd": "2025-03",
+          "testMonths": [
+            "2025-07",
+            "2025-08",
+            "2025-09"
+          ],
+          "scoredThrough": "2026-01-01T00:00:00.000Z"
+        },
+        "sample": {
+          "trainingCohorts": 51,
+          "trainingOpenings": 4071,
+          "testCohorts": 3,
+          "testOpenings": 238
+        },
+        "recentBrier": 0.21052021414591124,
+        "logisticBrier": 0.20439614589042326,
+        "selectedBrier": 0.21052021414591124
+      },
+      {
+        "id": "gradual-improvement:43",
+        "scenario": "gradual-improvement",
+        "seed": 43,
+        "selectedMethod": "logistic-trend",
+        "dates": {
+          "origin": "2025-07-01T00:00:00.000Z",
+          "trainingStart": "2021-01",
+          "trainingEnd": "2025-03",
+          "testMonths": [
+            "2025-07",
+            "2025-08",
+            "2025-09"
+          ],
+          "scoredThrough": "2026-01-01T00:00:00.000Z"
+        },
+        "sample": {
+          "trainingCohorts": 51,
+          "trainingOpenings": 4071,
+          "testCohorts": 3,
+          "testOpenings": 238
+        },
+        "recentBrier": 0.21824145426482464,
+        "logisticBrier": 0.2035331740366831,
+        "selectedBrier": 0.2035331740366831
+      },
+      {
+        "id": "stationary:17",
+        "scenario": "stationary",
+        "seed": 17,
+        "selectedMethod": "recent-3-fraction",
+        "dates": {
+          "origin": "2025-07-01T00:00:00.000Z",
+          "trainingStart": "2021-01",
+          "trainingEnd": "2025-03",
+          "testMonths": [
+            "2025-07",
+            "2025-08",
+            "2025-09"
+          ],
+          "scoredThrough": "2026-01-01T00:00:00.000Z"
+        },
+        "sample": {
+          "trainingCohorts": 51,
+          "trainingOpenings": 4071,
+          "testCohorts": 3,
+          "testOpenings": 238
+        },
+        "recentBrier": 0.25036248401813965,
+        "logisticBrier": 0.24962308082437373,
+        "selectedBrier": 0.25036248401813965
+      },
+      {
+        "id": "stationary:29",
+        "scenario": "stationary",
+        "seed": 29,
+        "selectedMethod": "recent-3-fraction",
+        "dates": {
+          "origin": "2025-07-01T00:00:00.000Z",
+          "trainingStart": "2021-01",
+          "trainingEnd": "2025-03",
+          "testMonths": [
+            "2025-07",
+            "2025-08",
+            "2025-09"
+          ],
+          "scoredThrough": "2026-01-01T00:00:00.000Z"
+        },
+        "sample": {
+          "trainingCohorts": 51,
+          "trainingOpenings": 4071,
+          "testCohorts": 3,
+          "testOpenings": 238
+        },
+        "recentBrier": 0.25910494726414546,
+        "logisticBrier": 0.2541573861259526,
+        "selectedBrier": 0.25910494726414546
+      },
+      {
+        "id": "stationary:43",
+        "scenario": "stationary",
+        "seed": 43,
+        "selectedMethod": "recent-3-fraction",
+        "dates": {
+          "origin": "2025-07-01T00:00:00.000Z",
+          "trainingStart": "2021-01",
+          "trainingEnd": "2025-03",
+          "testMonths": [
+            "2025-07",
+            "2025-08",
+            "2025-09"
+          ],
+          "scoredThrough": "2026-01-01T00:00:00.000Z"
+        },
+        "sample": {
+          "trainingCohorts": 51,
+          "trainingOpenings": 4071,
+          "testCohorts": 3,
+          "testOpenings": 238
+        },
+        "recentBrier": 0.259930666515193,
+        "logisticBrier": 0.26011324199649394,
+        "selectedBrier": 0.259930666515193
+      },
+      {
+        "id": "assessment-reversal:17",
+        "scenario": "assessment-reversal",
+        "seed": 17,
+        "selectedMethod": "recent-3-fraction",
+        "dates": {
+          "origin": "2025-07-01T00:00:00.000Z",
+          "trainingStart": "2021-01",
+          "trainingEnd": "2025-03",
+          "testMonths": [
+            "2025-07",
+            "2025-08",
+            "2025-09"
+          ],
+          "scoredThrough": "2026-01-01T00:00:00.000Z"
+        },
+        "sample": {
+          "trainingCohorts": 51,
+          "trainingOpenings": 4071,
+          "testCohorts": 3,
+          "testOpenings": 238
+        },
+        "recentBrier": 0.2004113048983943,
+        "logisticBrier": 0.29236910241394026,
+        "selectedBrier": 0.2004113048983943
+      },
+      {
+        "id": "assessment-reversal:29",
+        "scenario": "assessment-reversal",
+        "seed": 29,
+        "selectedMethod": "recent-3-fraction",
+        "dates": {
+          "origin": "2025-07-01T00:00:00.000Z",
+          "trainingStart": "2021-01",
+          "trainingEnd": "2025-03",
+          "testMonths": [
+            "2025-07",
+            "2025-08",
+            "2025-09"
+          ],
+          "scoredThrough": "2026-01-01T00:00:00.000Z"
+        },
+        "sample": {
+          "trainingCohorts": 51,
+          "trainingOpenings": 4071,
+          "testCohorts": 3,
+          "testOpenings": 238
+        },
+        "recentBrier": 0.22399039447956792,
+        "logisticBrier": 0.2750638003388141,
+        "selectedBrier": 0.22399039447956792
+      },
+      {
+        "id": "assessment-reversal:43",
+        "scenario": "assessment-reversal",
+        "seed": 43,
+        "selectedMethod": "recent-3-fraction",
+        "dates": {
+          "origin": "2025-07-01T00:00:00.000Z",
+          "trainingStart": "2021-01",
+          "trainingEnd": "2025-03",
+          "testMonths": [
+            "2025-07",
+            "2025-08",
+            "2025-09"
+          ],
+          "scoredThrough": "2026-01-01T00:00:00.000Z"
+        },
+        "sample": {
+          "trainingCohorts": 51,
+          "trainingOpenings": 4071,
+          "testCohorts": 3,
+          "testOpenings": 238
+        },
+        "recentBrier": 0.21608148532998653,
+        "logisticBrier": 0.2728415136349063,
+        "selectedBrier": 0.21608148532998653
+      }
+    ],
+    "abstentions": [
+      {
+        "id": "short-history",
+        "reason": "Insufficient mature training cohorts."
+      },
+      {
+        "id": "sparse-calendar",
+        "reason": "Sparse training calendar."
+      },
+      {
+        "id": "small-cohort",
+        "reason": "Undersized training cohort; subgroup pooling is unsupported."
+      },
+      {
+        "id": "censored-followup",
+        "reason": "Complete constructed aggregate follow-up is required."
+      },
+      {
+        "id": "partial-cohort-release",
+        "reason": "Partially observed aggregate cohort; await all declared buckets."
+      },
+      {
+        "id": "stale-history",
+        "reason": "Stale mature-cohort history."
+      },
+      {
+        "id": "rare-outcome",
+        "reason": "Insufficient outcome support."
+      }
+    ]
+  },
+  "satisfaction": {
+    "methodVersion": "satisfaction-wave-change-v1",
+    "baselineComparison": {
+      "status": "not-applicable",
+      "reason": "Descriptive adjacent-wave arithmetic; no predictive model benchmark."
+    },
+    "nonrespondentMeanRange": [
+      0,
+      1
+    ],
+    "waves": [
+      {
+        "date": "2024-10-31T00:00:00.000Z",
+        "scorePct": 75,
+        "respondents": 80,
+        "eligible": 100,
+        "participationPct": 80
+      },
+      {
+        "date": "2025-10-31T00:00:00.000Z",
+        "scorePct": 80,
+        "respondents": 60,
+        "eligible": 100,
+        "participationPct": 60
+      },
+      {
+        "date": "2026-06-30T00:00:00.000Z",
+        "scorePct": 78,
+        "respondents": 90,
+        "eligible": 120,
+        "participationPct": 75
+      }
+    ],
+    "changes": [
+      {
+        "fromDate": "2024-10-31T00:00:00.000Z",
+        "toDate": "2025-10-31T00:00:00.000Z",
+        "respondentScoreChangePp": 5,
+        "responseRateChangePp": -20.000000000000007,
+        "nonresponseChangeBounds": {
+          "kind": "assumption-dependent-identification-bounds",
+          "lowerPp": -32,
+          "upperPp": 27.999999999999993
+        }
+      },
+      {
+        "fromDate": "2025-10-31T00:00:00.000Z",
+        "toDate": "2026-06-30T00:00:00.000Z",
+        "respondentScoreChangePp": -2,
+        "responseRateChangePp": 15.000000000000002,
+        "nonresponseChangeBounds": {
+          "kind": "assumption-dependent-identification-bounds",
+          "lowerPp": -29.5,
+          "upperPp": 35.5
+        }
+      }
+    ]
+  }
+}
