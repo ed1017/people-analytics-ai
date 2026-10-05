@@ -31,7 +31,7 @@ import { buildHomePack, homeDefinitions, readHomeSource } from "@/lib/home-pack.
 import type { DevelopmentSession } from "@/components/development-workspace";
 import { PromptExamples } from "@/components/prompt-examples";
 import { contextualPrompts } from "@/lib/contextual-prompts";
-import { HOME_ACTION_PLAN_LABEL, buildHomeActionPlanRequest, DEVELOPMENT_DEMO_GOAL } from "@/lib/home-decision-journey";
+import { HOME_ACTION_PLAN_LABEL, buildHomeActionPlanRequest } from "@/lib/home-decision-journey";
 import { completeScopedChatTurn } from "@/lib/chat-context-history";
 import { requestedHomeCountries, type CountryOption } from "@/lib/home-country-scope";
 import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
@@ -197,11 +197,6 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
 
   function submitQuestion(prompt:string){if(ready)queueSuggestion("question:"+prompt,()=>void send(prompt))}
 
-  function startNewIssue(draft = "") {
-    conversation.startNewProblem(draft);
-    focusQuestion();
-  }
-
   async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false, responseIntent:'default'|'explanation'='default') {
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
@@ -359,7 +354,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   return <div className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-3">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <h2 id="overall-overview-heading" className="sr-only">Home overview</h2>
-        <HomeGettingStarted busy={chatLoading} onNavigate={onNavigate} onStartDemo={() => { startNewIssue(DEVELOPMENT_DEMO_GOAL); onStartDemo(); }} status={
+        <HomeGettingStarted busy={chatLoading} onNavigate={onNavigate} onStartDemo={onStartDemo} status={
         <div className="ml-auto flex items-center gap-3 text-xs">
           <span className="text-muted-foreground">In development</span>
           <button type="button" popoverTarget="home-data-details" aria-label="Open data details" title="Data, scope and conversation history" className="flex min-h-11 items-center gap-1 rounded px-2 text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"><Info size={16}/><span>Data details</span></button>
