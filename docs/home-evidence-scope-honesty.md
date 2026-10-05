@@ -50,3 +50,9 @@ Evidence: `/tmp/home-scope-{unit,lint,tsc,build,browser,artifact}.log`, `/tmp/ho
 | Separate cloud OpenAI401 | Outside this task; no diagnostics, retries or credential investigation. Intercepted local checks and owner-hosted acceptance remain distinct. |
 
 No DB/schema, auth/security, billing, permissions, domain or model-input boundary changes. Palette blockage does not stop source-bound clarity, regression maintenance or the queued prose-completeness audit.
+
+## Follow-up: remove the Home scope banner
+
+The main Home scope banner is removed entirely, with no replacement notice. Its complete explanation now lives inside the existing Data details disclosure. Selected workforce scope, per-source scope and Department limits remain available there and in the existing response/plan reference context. During refresh, the existing Data details control briefly shows an accessible “Refreshing…” status; its details withhold the previous selected scope until settled. Filtering, source packets and planning boundaries are unchanged.
+
+This separate branch starts from main `f35f628a2ed41f0233b20531ee963c663ecd587f`; it excludes tradeoff PR133 and all palette work. Validation: 1,192 unit tests; 48 scope browser checks and 57 compact-layout checks across desktop, mobile and 200% reflow; lint, standalone TypeScript, production build and whitespace checks pass. The scope test gates all requests sharing the same delayed snapshot, then releases them together; it verifies no banner, keyboard Data details access, temporary refresh feedback, exact scopes, unsupported Department handling and stale plans/immutable attachments. APIs are intercepted synthetic fixtures, with no live model calls. Logs: `/tmp/compact-scope-{unit,lint,tsc,build,browser,layout}.log`. Compact screenshots and metrics: `/tmp/home-compact-shell-4AS0bN/`.
