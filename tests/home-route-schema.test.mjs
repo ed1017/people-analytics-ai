@@ -82,7 +82,7 @@ test('actual Home POST distinguishes token-limited, incomplete and malformed out
 test('actual bundle POST distinguishes incomplete causes and preserves one bounded request',async()=>{
  const goal=aiSkillsGoalPrompt,packet=packets[1][1],wire=deliveryAcceptanceWire(goal);
  wire.bundles[0].components.c1.limitation=completeComponentLimitation;
- const clipped=structuredClone(wire);clipped.bundles[0].limitation='Delivery timing within the 90-day goal is';
+ const clipped=structuredClone(wire);clipped.bundles[1].limitation='Review cost against the USD 20,000 planning budget; feasibility is not';
  const cases=[
   [{status:'incomplete',incomplete_details:{reason:'max_output_tokens'},output_text:'SECRET_SENTINEL'},'output_token_limit'],
   [{status:'incomplete',incomplete_details:{reason:'content_filter'},output_text:'SECRET_SENTINEL'},'content_filter'],

@@ -29,12 +29,13 @@ try{
      for(const [index,bundle] of wire.bundles.entries()){
       bundle.name=['AI practice sessions','AI peer learning','AI workflow pilot'][index];
       bundle.objective='Propose an internal AI skills pilot using reviewed existing capacity.';
+      bundle.limitation='Review cost against the USD 20,000 planning budget; feasibility is not established. Delivery within 90 days and existing capacity remains unverified.';
       bundle.components.c1.limitation=completeComponentLimitation;
       bundle.components.c1.name=bundle.name;bundle.components.c1.domain='learning';
       bundle.components.c1.firstStep='Run reviewed AI practice sessions for the pilot group using existing capacity.';
      }
      if(failureKind==='token'){const result=await inspectBundleResponse(async()=>({status:'incomplete',incomplete_details:{reason:'max_output_tokens'},output_text:'PRIVATE partial JSON',usage:{output_tokens:5000,output_tokens_details:{reasoning_tokens:4000}}}),body.goalContext.goal,body.overviewBriefingContext,homeBundleTask(body.goalContext));return route.fulfill({status:502,json:result});}
-     if(failureKind==='clipped')wire.bundles[0].limitation='Delivery timing within the 90-day goal is';
+     if(failureKind==='clipped')wire.bundles[1].limitation='Review cost against the USD 20,000 planning budget; feasibility is not';
      const result=await inspectBundleResponse(async()=>({status:'completed',output_text:JSON.stringify(wire)}),body.goalContext.goal,body.overviewBriefingContext,homeBundleTask(body.goalContext));
      return route.fulfill({status:result.proposal?200:502,json:result});
     }
@@ -68,7 +69,7 @@ try{
   const initial=await state(),id=initial.goals.activeId;
   check(mode+' complete maximum-bound limitation is preserved in the saved proposal',JSON.stringify(initial.workspaces[id].fields.homeBundlePreparationV1).includes(completeComponentLimitation));
   await panel.getByText('Why these plans',{exact:true}).click();
-  check(mode+' complete limitation is readable without clipping',await panel.getByText(completeComponentLimitation,{exact:true}).isVisible());
+  check(mode+' complete limitation is readable without clipping',await panel.getByText(completeComponentLimitation,{exact:true}).isVisible()&&(await panel.innerText()).includes('Review cost against the USD 20,000 planning budget; feasibility is not established. Delivery within 90 days and existing capacity remains unverified.'));
   await panel.getByText('Why these plans',{exact:true}).click();
   check(mode+' explicit Pin prepares once with unchanged complete user context',posts.length===3&&posts[2].goalContext.goal===aiSkillsGoalPrompt&&posts[2].goalContext.notes.map(note=>note.text).join(' ')===aiSkillsGoalPrompt&&initial.goals.goals.find(goal=>goal.id===id).statement===aiSkillsGoalPrompt);
   check(mode+' rejected investigation is never stored and warning clears',!initial.workspaces[id].fields.homeCandidateOptions&&await status.count()===0);
