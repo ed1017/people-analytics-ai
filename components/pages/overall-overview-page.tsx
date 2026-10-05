@@ -184,7 +184,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     focusQuestion();
   }
 
-  async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false) {
+  async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false, responseIntent:'default'|'explanation'='default') {
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
     if(!active||sending.current||currentEvidenceKey.current!==contextKey)return;
@@ -220,8 +220,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
         if(conversation.activeGoalId)decisionStore.setField(conversation.activeGoalId,'homeCandidateOptions',{version:2,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:captured.sourceKey,proposal:reply.proposal});
         else setCandidate(captured);
       }
-      setPreparationUnavailable(reply.proposal?null:{context:key,diagnostic:reply.diagnostic,stage:reply.diagnosticStage});
-      if(preserveDraft&&!reply.proposal)setCandidateNotice("No new candidate options could be verified from this reply. Your existing work and drafts are kept.");
+      setPreparationUnavailable(reply.proposal||responseIntent==='explanation'?null:{context:key,diagnostic:reply.diagnostic,stage:reply.diagnosticStage});
+      if(preserveDraft&&!reply.proposal&&responseIntent!=='explanation')setCandidateNotice("No new candidate options could be verified from this reply. Your existing work and drafts are kept.");
       conversation.setHomeGoalChoiceKey(reply.chooseGoal && !conversation.focusedIssue ? key : null);
       const assistantMessage:ChatMessage={role:"assistant",content:answer};
       const capturedFinding:FindingTurn={message:assistantMessage,findings:reply.findingFollowups,context:key,epoch:candidateEpoch,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack)};
@@ -241,17 +241,17 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     return liveFindingTurn.current===turn&&active&&liveActive.current&&ready&&conversation.storageReady&&conversation.saved&&!conversation.issueEditor&&turn.context===contextKey&&currentEvidenceKey.current===turn.context&&turn.epoch===promptEpoch.current&&goals.activeId===turn.goalId&&(goals.goals.find(goal=>goal.id===goals.activeId)?.statement??'')===turn.goal&&messages.at(-1)===turn.message&&turn.sourceKey===candidateSourceKey(buildHomePack(sourceResults,workforceScope,turn.selectionGoal,developmentSession));
   }
   function exploreFinding(turn:FindingTurn,item:HomeFindingFollowup){
-    if(!findingCurrent(turn)||sending.current||queuedSuggestion.current||chatLoading)return;
+    if(!findingCurrent(turn)||!conversation.canSubmitPrompt()||sending.current||queuedSuggestion.current||chatLoading)return;
     const verified=readHomeFindingFollowups(turn.findings,turn.message.content,buildHomePack(sourceResults,workforceScope,turn.selectionGoal,developmentSession)).find(finding=>finding.id===item.id);
     if(!verified||JSON.stringify(verified)!==JSON.stringify(item))return;
     // Consume this exact response synchronously. Double clicks and stale closures cannot send twice.
     liveFindingTurn.current=null;setFindingTurn(null);
-    void send(buildHomeFindingPrompt(verified),false,false,true,true);
+    void send(buildHomeFindingPrompt(verified),false,false,true,true,'explanation');
   }
   function renderFindingAction(message:ChatMessage,text:string){
     if(!findingTurn||findingTurn.message!==message||!findingCurrent(findingTurn))return null;
     const item=findingTurn.findings.find(finding=>finding.text===text);if(!item)return null;
-    return <span className="mt-1 flex flex-wrap items-center gap-x-2"><button type="button" disabled={chatLoading||suggestionPending} onClick={()=>exploreFinding(findingTurn,item)} aria-label={`Explore this finding: ${item.text}`} className="min-h-11 rounded border px-2 text-xs font-medium focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Explore this finding</button><span className="text-xs text-muted-foreground">Ask: {item.prompt}</span></span>;
+    return <span className="mt-1 flex flex-wrap items-center gap-x-2"><button type="button" disabled={chatLoading||suggestionPending||Boolean(input.trim())} aria-describedby={input.trim()?'home-finding-draft-note':undefined} onClick={()=>exploreFinding(findingTurn,item)} aria-label={`Explore this finding: ${item.text}`} className="min-h-11 rounded border px-2 text-xs font-medium focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Explore this finding</button><span className="text-xs text-muted-foreground">Ask: {item.prompt}</span>{input.trim()&&item.id===findingTurn.findings[0].id&&<span id="home-finding-draft-note" role="status" className="basis-full text-xs text-muted-foreground">Your draft is kept. Send or clear it before exploring a finding.</span>}</span>;
   }
   function allowSuggestion(key:string){
     if(!active||!liveActive.current||renderedPromptEpoch!==promptEpoch.current||queuedSuggestion.current||chatLoading||sending.current||!conversation.canSubmitPrompt()||currentEvidenceKey.current!==contextKey)return false;
