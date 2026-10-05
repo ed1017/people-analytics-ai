@@ -1,3 +1,4 @@
+import {inspectHomeChatResponse} from "@/lib/home-chat-response";
 import {homeFindingInstructions} from "@/lib/home-finding-followups";
 import {inspectBundleResponse} from '@/lib/home-bundle-response';
 import {HOME_BUNDLE_REQUEST,homeBundleOutputTokens} from '@/lib/home-bundle-preparation';
@@ -6,7 +7,7 @@ import {HOME_ACTION_REQUEST,buildHomeActionFormat,homeActionInstructions,actionR
 import { employeeListeningEvidence, exitSurveyEvidence } from "../../../lib/employee-listening";
 import { isIntelligencePage, intelligenceEvidence, intelligenceInstructions } from "@/lib/intelligence-chat";
 import { developmentCatalog } from "@/lib/development-costs";
-import { buildHomeReplyFormat, homeGoalChoiceInstructions, homeCandidateInstructions, decodeHomeModelReply, homeResponseStyle } from "@/lib/home-chat-reply";
+import { buildHomeReplyFormat, homeGoalChoiceInstructions, homeCandidateInstructions, homeResponseStyle } from "@/lib/home-chat-reply";
 import { CHAT_MODEL } from "@/lib/chat-model";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
@@ -1591,7 +1592,10 @@ ${message}
         });
     }
 
-    if (page === "home") return NextResponse.json(decodeHomeModelReply(response.output_text || "", body?.hasFocusedIssue === true, body?.overviewBriefingContext));
+    if (page === "home") {
+      const inspected=inspectHomeChatResponse(response,body?.hasFocusedIssue===true,body?.overviewBriefingContext,maxOutputTokens);
+      return NextResponse.json(inspected.body,{status:inspected.ok?200:502});
+    }
 
     return NextResponse.json({
       answer:

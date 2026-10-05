@@ -55,3 +55,20 @@ test('actual POST returns validated finding pairs in the existing single Home ca
   assert.match(sandbox.__requests.at(-1).instructions,/finding_followups/);
  }
 });
+test('actual Home POST distinguishes token-limited, incomplete and malformed output without retry or payload logging',async()=>{
+ const priorConsole=sandbox.console,logs=[];sandbox.console={...console,error:(...items)=>logs.push(items)};
+ try{for(const [status,reason,text,expected] of [
+  ['incomplete','max_output_tokens','{"answer":"SECRET_SENTINEL','token_limit'],
+  ['incomplete','content_filter','SECRET_SENTINEL','incomplete_output'],
+  ['completed',null,'SECRET_SENTINEL','invalid_json'],
+  ['failed',null,'SECRET_SENTINEL','response_not_completed'],
+ ]){
+  sandbox.__replies.push({status,incomplete_details:reason?{reason}:null,output:[],output_text:text,usage:{input_tokens:999,output_tokens:4000,total_tokens:4999,output_tokens_details:{reasoning_tokens:2000}}});
+  const before=sandbox.__requests.length;
+  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',persona:'HR',message:'Review supplied evidence',history:[],overviewBriefingContext:packets[1][1]})}));
+  assert.equal(response.status,502);assert.equal(sandbox.__requests.length,before+1);assert.equal(sandbox.__requests.at(-1).max_output_tokens,4000);
+  const data=await response.json();assert.equal(data.homeReplyDiagnostic.reason,expected);assert.equal(data.homeReplyDiagnostic.usage.reasoning_tokens,2000);assert.ok(!JSON.stringify(data).includes('SECRET_SENTINEL'));assert.equal(data.answer,undefined);assert.equal(data.findingFollowups,undefined);
+ }
+ assert.deepEqual(logs,[]);
+ }finally{sandbox.console=priorConsole;}
+});

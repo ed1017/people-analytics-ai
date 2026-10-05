@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import {inspectHomeChatResponse} from '../../lib/home-chat-response.ts';
 import {decodeHomeModelReply} from '../../lib/home-chat-reply.ts';
 import {encodeDecisions,DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
@@ -16,7 +17,7 @@ const raw={answer,finding_followups:findings,next_step:'none',problem:null,probl
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});let checks=0;
 const check=(label,value)=>{assert.ok(value,label);checks++;console.log('PASS '+label)};
 try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['zoom',683,450]]){
- const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),posts=[],errors=[];let unexpected=0,malformed=false,delay=false,release=null;
+ const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),posts=[],errors=[];let unexpected=0,malformed=false,delay=false,release=null,failure=null;
  page.setDefaultTimeout(15000);page.on('pageerror',error=>errors.push(error.message));
  const oldMessage={role:'assistant',content:answer,findingFollowups:findings};
  const seed={version:1,revision:1,goals:{version:1,activeId:'first',goals:[{id:'first',statement:'Review recorded workforce context'},{id:'second',statement:'A separate investigation'}]},workspaces:{first:{savedAt:'2026-10-05T00:00:00Z',fields:{chat:{messages:[oldMessage],input:'Saved unfinished draft',problem:null,questionUnanswered:false},sentinel:{preserve:true}}},second:{savedAt:'2026-10-05T00:00:00Z',fields:{chat:{messages:[oldMessage],input:'Second goal draft',problem:null,questionUnanswered:false}}}}};
@@ -25,6 +26,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
   const request=route.request(),url=new URL(request.url());if(url.origin!==baseUrl){unexpected++;return route.abort();}
   if(url.pathname==='/api/chat'){
    const body=request.postDataJSON();posts.push(body);
+   if(failure){const inspected=inspectHomeChatResponse(failure,body.hasFocusedIssue,body.overviewBriefingContext,4000);return route.fulfill({status:502,json:inspected.body});}
    const isExplore=body.message.startsWith('Explore this finding:'),reply=isExplore?{...raw,answer:'Follow-up uses the supplied aggregate evidence. Unavailable breakdowns remain unknown.',finding_followups:[]}:structuredClone(raw);
    if(malformed)reply.finding_followups=[{...findings[0],text:'A different visible finding. [W1]'}];
    const decoded=decodeHomeModelReply(JSON.stringify(reply),body.hasFocusedIssue,body.overviewBriefingContext);
@@ -54,6 +56,9 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  await ask();delay=true;await input.fill('Draft during request');await actions.first().click();await page.waitForFunction(()=>document.querySelector('[aria-label="Send overview question"]').disabled);await page.getByLabel('Selected goal',{exact:true}).selectOption('second');release?.();delay=false;await page.getByLabel('Selected goal',{exact:true}).selectOption('first');check(mode+' in-flight reply after goal change stays stale and preserves draft',posts.length===10&&await actions.count()===0&&await input.inputValue()==='Draft during request');
  await ask();const replaced=await actions.first().elementHandle();await ask();await replaced.evaluate(node=>node.click());check(mode+' a superseded response cannot activate an identical newer finding',posts.length===12&&await actions.count()===2);
  const personaStale=await actions.first().elementHandle();await input.fill('Perspective-change draft');await page.getByLabel('Select persona',{exact:true}).selectOption('Finance');await personaStale.evaluate(node=>node.click());check(mode+' perspective change invalidates the response while retaining typed text',posts.length===12&&await actions.count()===0&&await input.inputValue()==='Perspective-change draft');
+ await ask();failure={status:'incomplete',incomplete_details:{reason:'max_output_tokens'},output:[],output_text:'{\"answer\":\"DO_NOT_DISPLAY'};await input.fill('Draft before failed follow-up');await actions.first().click();await page.getByRole('alert').filter({hasText:'Preparation diagnostic: token_limit.'}).waitFor();check(mode+' failed follow-up preserves draft and surfaces safe token-limit reason without retry',posts.length===14&&await input.inputValue()==='Draft before failed follow-up'&&await actions.count()===0&&!await page.getByText('DO_NOT_DISPLAY',{exact:false}).count());
+ failure=null;await ask();check(mode+' only an explicit new Send retries and restores finding controls',posts.length===15&&await actions.count()===2);
+ failure={status:'completed',output:[],output_text:'MALFORMED_SECRET_OUTPUT'};await input.fill('Restore this initial question');await send.click();await page.getByRole('alert').filter({hasText:'Preparation diagnostic: invalid_json.'}).waitFor();check(mode+' malformed completed output remains distinct, safe and recoverable',posts.length===16&&await input.inputValue()==='Restore this initial question'&&await actions.count()===0&&!await page.getByText('MALFORMED_SECRET_OUTPUT',{exact:false}).count());failure=null;
  check(mode+' responsive runtime and network boundaries',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&unexpected===0);await context.close();
 }}finally{await browser.close();}
 console.log(JSON.stringify({checks,output}));
