@@ -1,0 +1,314 @@
+{
+  "schemaVersion": 1,
+  "manifest": {
+    "source": "public.attrition_monthly_trend",
+    "extractedOn": "2026-10-05",
+    "provenance": "user-declared-synthetic",
+    "population": "all-recorded-voluntary-separations",
+    "sourceDefinitionVersion": "inspected-2026-10-05",
+    "sourceInsertedAt": "2026-09-28T01:50:05.925Z",
+    "completionEvidence": "calendar-boundaries-only",
+    "vintageHistory": false,
+    "denominatorBasis": "month-end-stock-only",
+    "generatorVersion": null
+  },
+  "months": [
+    {
+      "month": "2024-01",
+      "voluntaryExits": 0,
+      "totalExits": 0,
+      "firstEvent": null,
+      "lastEvent": null,
+      "monthEndHeadcount": 8400,
+      "snapshotDate": "2024-01-31"
+    },
+    {
+      "month": "2024-02",
+      "voluntaryExits": 60,
+      "totalExits": 79,
+      "firstEvent": "2024-02-01",
+      "lastEvent": "2024-02-29",
+      "monthEndHeadcount": 8455,
+      "snapshotDate": "2024-02-29"
+    },
+    {
+      "month": "2024-03",
+      "voluntaryExits": 58,
+      "totalExits": 84,
+      "firstEvent": "2024-03-01",
+      "lastEvent": "2024-03-31",
+      "monthEndHeadcount": 8516,
+      "snapshotDate": "2024-03-31"
+    },
+    {
+      "month": "2024-04",
+      "voluntaryExits": 58,
+      "totalExits": 82,
+      "firstEvent": "2024-04-01",
+      "lastEvent": "2024-04-30",
+      "monthEndHeadcount": 8570,
+      "snapshotDate": "2024-04-30"
+    },
+    {
+      "month": "2024-05",
+      "voluntaryExits": 61,
+      "totalExits": 85,
+      "firstEvent": "2024-05-01",
+      "lastEvent": "2024-05-31",
+      "monthEndHeadcount": 8625,
+      "snapshotDate": "2024-05-31"
+    },
+    {
+      "month": "2024-06",
+      "voluntaryExits": 60,
+      "totalExits": 82,
+      "firstEvent": "2024-06-01",
+      "lastEvent": "2024-06-30",
+      "monthEndHeadcount": 8673,
+      "snapshotDate": "2024-06-30"
+    },
+    {
+      "month": "2024-07",
+      "voluntaryExits": 60,
+      "totalExits": 85,
+      "firstEvent": "2024-07-01",
+      "lastEvent": "2024-07-31",
+      "monthEndHeadcount": 8732,
+      "snapshotDate": "2024-07-31"
+    },
+    {
+      "month": "2024-08",
+      "voluntaryExits": 61,
+      "totalExits": 85,
+      "firstEvent": "2024-08-01",
+      "lastEvent": "2024-08-31",
+      "monthEndHeadcount": 8783,
+      "snapshotDate": "2024-08-31"
+    },
+    {
+      "month": "2024-09",
+      "voluntaryExits": 58,
+      "totalExits": 81,
+      "firstEvent": "2024-09-01",
+      "lastEvent": "2024-09-30",
+      "monthEndHeadcount": 8834,
+      "snapshotDate": "2024-09-30"
+    },
+    {
+      "month": "2024-10",
+      "voluntaryExits": 65,
+      "totalExits": 86,
+      "firstEvent": "2024-10-01",
+      "lastEvent": "2024-10-31",
+      "monthEndHeadcount": 8888,
+      "snapshotDate": "2024-10-31"
+    },
+    {
+      "month": "2024-11",
+      "voluntaryExits": 57,
+      "totalExits": 81,
+      "firstEvent": "2024-11-01",
+      "lastEvent": "2024-11-30",
+      "monthEndHeadcount": 8940,
+      "snapshotDate": "2024-11-30"
+    },
+    {
+      "month": "2024-12",
+      "voluntaryExits": 63,
+      "totalExits": 86,
+      "firstEvent": "2024-12-01",
+      "lastEvent": "2024-12-31",
+      "monthEndHeadcount": 8994,
+      "snapshotDate": "2024-12-31"
+    },
+    {
+      "month": "2025-01",
+      "voluntaryExits": 56,
+      "totalExits": 84,
+      "firstEvent": "2025-01-01",
+      "lastEvent": "2025-01-31",
+      "monthEndHeadcount": 9050,
+      "snapshotDate": "2025-01-31"
+    },
+    {
+      "month": "2025-02",
+      "voluntaryExits": 65,
+      "totalExits": 87,
+      "firstEvent": "2025-02-01",
+      "lastEvent": "2025-02-28",
+      "monthEndHeadcount": 9094,
+      "snapshotDate": "2025-02-28"
+    },
+    {
+      "month": "2025-03",
+      "voluntaryExits": 70,
+      "totalExits": 97,
+      "firstEvent": "2025-03-01",
+      "lastEvent": "2025-03-31",
+      "monthEndHeadcount": 9140,
+      "snapshotDate": "2025-03-31"
+    },
+    {
+      "month": "2025-04",
+      "voluntaryExits": 68,
+      "totalExits": 96,
+      "firstEvent": "2025-04-01",
+      "lastEvent": "2025-04-30",
+      "monthEndHeadcount": 9184,
+      "snapshotDate": "2025-04-30"
+    },
+    {
+      "month": "2025-05",
+      "voluntaryExits": 71,
+      "totalExits": 97,
+      "firstEvent": "2025-05-01",
+      "lastEvent": "2025-05-31",
+      "monthEndHeadcount": 9230,
+      "snapshotDate": "2025-05-31"
+    },
+    {
+      "month": "2025-06",
+      "voluntaryExits": 66,
+      "totalExits": 95,
+      "firstEvent": "2025-06-01",
+      "lastEvent": "2025-06-30",
+      "monthEndHeadcount": 9277,
+      "snapshotDate": "2025-06-30"
+    },
+    {
+      "month": "2025-07",
+      "voluntaryExits": 73,
+      "totalExits": 100,
+      "firstEvent": "2025-07-01",
+      "lastEvent": "2025-07-31",
+      "monthEndHeadcount": 9321,
+      "snapshotDate": "2025-07-31"
+    },
+    {
+      "month": "2025-08",
+      "voluntaryExits": 70,
+      "totalExits": 97,
+      "firstEvent": "2025-08-01",
+      "lastEvent": "2025-08-31",
+      "monthEndHeadcount": 9369,
+      "snapshotDate": "2025-08-31"
+    },
+    {
+      "month": "2025-09",
+      "voluntaryExits": 73,
+      "totalExits": 95,
+      "firstEvent": "2025-09-01",
+      "lastEvent": "2025-09-30",
+      "monthEndHeadcount": 9415,
+      "snapshotDate": "2025-09-30"
+    },
+    {
+      "month": "2025-10",
+      "voluntaryExits": 70,
+      "totalExits": 98,
+      "firstEvent": "2025-10-01",
+      "lastEvent": "2025-10-31",
+      "monthEndHeadcount": 9459,
+      "snapshotDate": "2025-10-31"
+    },
+    {
+      "month": "2025-11",
+      "voluntaryExits": 66,
+      "totalExits": 93,
+      "firstEvent": "2025-11-01",
+      "lastEvent": "2025-11-30",
+      "monthEndHeadcount": 9507,
+      "snapshotDate": "2025-11-30"
+    },
+    {
+      "month": "2025-12",
+      "voluntaryExits": 71,
+      "totalExits": 97,
+      "firstEvent": "2025-12-01",
+      "lastEvent": "2025-12-31",
+      "monthEndHeadcount": 9553,
+      "snapshotDate": "2025-12-31"
+    },
+    {
+      "month": "2026-01",
+      "voluntaryExits": 67,
+      "totalExits": 98,
+      "firstEvent": "2026-01-01",
+      "lastEvent": "2026-01-31",
+      "monthEndHeadcount": 9600,
+      "snapshotDate": "2026-01-31"
+    },
+    {
+      "month": "2026-02",
+      "voluntaryExits": 69,
+      "totalExits": 85,
+      "firstEvent": "2026-02-01",
+      "lastEvent": "2026-02-28",
+      "monthEndHeadcount": 9646,
+      "snapshotDate": "2026-02-28"
+    },
+    {
+      "month": "2026-03",
+      "voluntaryExits": 64,
+      "totalExits": 94,
+      "firstEvent": "2026-03-01",
+      "lastEvent": "2026-03-31",
+      "monthEndHeadcount": 9698,
+      "snapshotDate": "2026-03-31"
+    },
+    {
+      "month": "2026-04",
+      "voluntaryExits": 73,
+      "totalExits": 91,
+      "firstEvent": "2026-04-01",
+      "lastEvent": "2026-04-30",
+      "monthEndHeadcount": 9749,
+      "snapshotDate": "2026-04-30"
+    },
+    {
+      "month": "2026-05",
+      "voluntaryExits": 70,
+      "totalExits": 94,
+      "firstEvent": "2026-05-01",
+      "lastEvent": "2026-05-31",
+      "monthEndHeadcount": 9800,
+      "snapshotDate": "2026-05-31"
+    },
+    {
+      "month": "2026-06",
+      "voluntaryExits": 61,
+      "totalExits": 90,
+      "firstEvent": "2026-06-01",
+      "lastEvent": "2026-06-30",
+      "monthEndHeadcount": 9850,
+      "snapshotDate": "2026-06-30"
+    },
+    {
+      "month": "2026-07",
+      "voluntaryExits": 70,
+      "totalExits": 93,
+      "firstEvent": "2026-07-01",
+      "lastEvent": "2026-07-31",
+      "monthEndHeadcount": 9900,
+      "snapshotDate": "2026-07-31"
+    },
+    {
+      "month": "2026-08",
+      "voluntaryExits": 65,
+      "totalExits": 93,
+      "firstEvent": "2026-08-01",
+      "lastEvent": "2026-08-31",
+      "monthEndHeadcount": 9951,
+      "snapshotDate": "2026-08-31"
+    },
+    {
+      "month": "2026-09",
+      "voluntaryExits": 66,
+      "totalExits": 90,
+      "firstEvent": "2026-09-01",
+      "lastEvent": "2026-09-30",
+      "monthEndHeadcount": 10000,
+      "snapshotDate": "2026-09-30"
+    }
+  ]
+}
