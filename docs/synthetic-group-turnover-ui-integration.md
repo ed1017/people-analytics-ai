@@ -27,3 +27,16 @@ An isolated temporary copy passed the build check unchanged, then failed after e
 - The integrated production build passes 470 additional browser checks: palette scope 43, evidence scope 48, compact Home 57, unified attachment 117, tradeoff prose 21, phone workspace 80, composer space 36 and palette selector 68. Combined browser total: 669. All API responses are intercepted fixtures; no live model call is used.
 
 The separate main-background Light redesign and removal of Original from the palette selector are held for user preview approval and are not included. Hosted ML acceptance and release coordination remain outstanding; no push, PR or deployment is performed for this checkpoint.
+
+## Release integration after Dark / Light
+
+PR139's accepted palette head `cfabf86887046bbcb1b1f3b06b0053b5ad99bbb6` was merged as main `7333c4e4b39e4c6e11d754084df14c68b77c6739`. Integration checkpoint `0babbdfb51a37872a25465e2ccd754bae77c2e00` merges that release without conflicts or changes to the ML implementation/evidence. The earlier local-only/palette-hold notes above describe the prior checkpoint and are superseded by this release integration.
+
+Hosted acceptance supplied by the parent thread:
+
+- PR139 exact accepted preview: https://people-analytics-aaciv9ncf-ed-56dc.vercel.app/ — new-origin Light default, exactly Dark/Light beside Perspective, full Home/Workforce Light canvas/cards, dark text/navigation, keyboard and persistence in both modes; restored Light.
+- PR138 original tested head `725b92da4da5e73ca2c5d0abde4e951670eb1572`: https://people-analytics-ihraiyh0v-ed-56dc.vercel.app/ — Home/core Attrition hydrate and original 605/201/806 exit totals and limitations pass. The new group disclosure was not expanded because of the prior functional approval denial; local component tests cover it. No restricted disclosure or rules/status routes were retried.
+
+Known hosted source limitation: Exit Survey Feedback remains unavailable; Listening dimensions reported a statement timeout in the console. This is not a successful data-source validation and is not presented as one. The UI retains honest unavailable states. No database, access, permissions or model-boundary change is included, and no attempt was made to bypass or repair the source timeout.
+
+Combined release validation passes: 1,258 unit tests; 718 browser checks (519 production-shell Home/palette/mobile checks plus 64 group-disclosure, 102 analysis-demo and 33 readiness checks); mandatory prebuild evidence guard, production build, ESLint, TypeScript, consumer projection verification, existing analysis-artifact reproduction and whitespace checks. No evidence regeneration or model request was performed. The tested implementation at `0babbdfb51a37872a25465e2ccd754bae77c2e00` is unchanged by the release-report commit.
