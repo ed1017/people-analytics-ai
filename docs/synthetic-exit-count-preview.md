@@ -1,0 +1,11 @@
+# Separate synthetic count presentation preview
+
+This checkpoint adds one default-collapsed panel to Attrition after the existing evidence. It presents the fixed aggregate artifact reproduced by `node tests/manual/generate-exit-demo-presentation.mjs --check`; it does not run a forecast service, refresh with live page data, follow selected goals/filters or transfer values into planning.
+
+Recorded Jan–Sep 2026 events are displayed separately from conditional Oct–Dec expected events and their full-year sum. The company-wide, retrospective synthetic source, fixed extract date, unverified completeness/generator/availability, excluded unverified joined zero and baseline selection are explicit. Rates and calibrated uncertainty intervals remain unavailable. Fitted smoothing is shown as a compared candidate, not the selected winner. Assessment results do not select a new model/window and are not an untouched holdout.
+
+This presentation does not change the offline evaluator's operational-qualification flags or enable a runtime model integration. It does not estimate individual risk, causal retention effects, satisfaction improvement or a staffing commitment. SQL documents in the separate foundation are read-only reproduction records; this preview runs no database queries or writes. eNPS and held files remain untouched.
+
+The preview branch includes the isolated aggregate foundation plus the released Home tree at `aed1b160b903a210370f44821ebf51eebea797e6`. Contextual Home edit examples remain a separate PR. No production merge is part of this checkpoint. Exact-head hosted acceptance remains required.
+
+Validation: 964 unit tests, including exact artifact reproduction and qualification checks; 144 browser assertions (63 panel checks plus 81 released Home retention/edit checks) across desktop/mobile/200% reflow; lint, TypeScript and production build pass. Browser APIs are intercepted local fixtures. Panel checks cover keyboard expansion and table scrolling, fixed counts under filter/goal changes, source failure, collapsed reload, preserved chat drafts and no forecast/planner writes or external/model requests. Mobile expanded screenshot inspected; detailed comparison tables scroll horizontally within their own regions. Long expanded content requires scrolling.

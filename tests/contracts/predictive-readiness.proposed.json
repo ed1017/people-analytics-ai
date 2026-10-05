@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "artifactType": "proposed-test-contract",
+  "executionStatus": "local-contract-checks-implemented",
+  "proposal": "../../docs/predictive-readiness-proposal.md",
+  "recordContracts": [
+    "history_provenance",
+    "turnover_period_history",
+    "satisfaction_wave_history",
+    "hiring_event_history",
+    "intervention_study",
+    "intervention_group_period"
+  ],
+  "scope": {
+    "databaseExecution": false,
+    "sourceCapture": false,
+    "modelFitting": false,
+    "accessChanges": false,
+    "productIntegration": false,
+    "existingArtifactModification": false
+  },
+  "statusMeaning": "All 25 IDs have local contract-mechanics tests using constructed synthetic fixtures. C02/G02 check selected-history invariance only: no model fitting, settings selection or predictions exist here. G03 checks a small seeded fixture set, not a realistic workforce simulator. Source capture, source truth, privacy review, model performance, calibration and causal identification remain unvalidated.",
+  "cases": [
+    {
+      "id": "C01",
+      "domain": "shared",
+      "title": "Unknown availability",
+      "given": "A retrospective row has effective_at but source_first_observed_at=null.",
+      "when": "Build a historical training set.",
+      "expectedStatus": "block-point-in-time-evaluation",
+      "assertion": "Do not copy event_at or bulk ingested_at into source_first_observed_at."
+    },
+    {
+      "id": "C02",
+      "domain": "shared",
+      "title": "Late correction isolation",
+      "given": "Revision A was observed before cutoff; revision B corrects it after cutoff.",
+      "when": "Reconstruct as-known data and mutate revision B.",
+      "expectedStatus": "preserve-precutoff-value",
+      "assertion": "Earlier training data, settings and predictions remain unchanged."
+    },
+    {
+      "id": "C03",
+      "domain": "shared",
+      "title": "Completion is scoped",
+      "given": "An extract date is current but the relevant population/period has completion_status=unknown.",
+      "when": "Score or publish that period as complete.",
+      "expectedStatus": "block-completeness-claim",
+      "assertion": "Max event date and calendar closure cannot establish completeness."
+    },
+    {
+      "id": "C04",
+      "domain": "shared",
+      "title": "Boundary and duplicate identity",
+      "given": "Two revisions conflict at the same identity/version, or an outcome arrives one millisecond after cutoff.",
+      "when": "Select one revision per record at an inclusive cutoff.",
+      "expectedStatus": "reject-conflict-or-exclude-late",
+      "assertion": "Exactly-at-cutoff availability is eligible; duplicates are not arbitrarily selected."
+    },
+    {
+      "id": "T01",
+      "domain": "turnover",
+      "title": "Missing versus zero",
+      "given": "Two closed-looking months contain null count/unknown completion and zero count/verified completion respectively.",
+      "when": "Construct the monthly series.",
+      "expectedStatus": "retain-unknown-and-confirmed-zero",
+      "assertion": "Never coalesce absence to zero or interpolate a target."
+    },
+    {
+      "id": "T02",
+      "domain": "turnover",
+      "title": "Exposure mismatch",
+      "given": "Voluntary exits cover population A; the supplied denominator covers population B or only month-end stock.",
+      "when": "Compute a rate forecast.",
+      "expectedStatus": "block-rate",
+      "assertion": "Counts may remain separately eligible; future exposure is not inferred."
+    },
+    {
+      "id": "T03",
+      "domain": "turnover",
+      "title": "Classification revision",
+      "given": "A separation was initially involuntary and later corrected to voluntary.",
+      "when": "Backtest at a cutoff before the correction.",
+      "expectedStatus": "use-original-known-classification",
+      "assertion": "Current final counts must not rewrite the older training vintage."
+    },
+    {
+      "id": "S01",
+      "domain": "satisfaction",
+      "title": "Estimand identity",
+      "given": "The source metric is mean respondent favorable-answer share.",
+      "when": "Label it percent of satisfied employees or derive unfavorable=100-favorable.",
+      "expectedStatus": "reject-metric-relabeling",
+      "assertion": "Neutral share, item rules and employee-level classification are not inferred."
+    },
+    {
+      "id": "S02",
+      "domain": "satisfaction",
+      "title": "Nonresponse and denominator",
+      "given": "A wave has 100 eligible people, 60 respondents and variable answered-item counts.",
+      "when": "Compute participation and a respondent-share measure.",
+      "expectedStatus": "use-distinct-denominators",
+      "assertion": "Participation uses eligible people; respondent-share mean uses valid respondents under the scoring specification."
+    },
+    {
+      "id": "S03",
+      "domain": "satisfaction",
+      "title": "Missing score preservation",
+      "given": "The metric is null because scoring rules are unverified or the cell is suppressed.",
+      "when": "Serialize it or fit a wave model.",
+      "expectedStatus": "retain-null-status",
+      "assertion": "Null must never become numeric zero."
+    },
+    {
+      "id": "S04",
+      "domain": "satisfaction",
+      "title": "Instrument and population break",
+      "given": "Two waves have changed items/scales or eligibility with no verified bridge.",
+      "when": "Pool them or interpolate monthly observations.",
+      "expectedStatus": "block-comparability",
+      "assertion": "Retain separate versions and report insufficient comparable waves."
+    },
+    {
+      "id": "S05",
+      "domain": "satisfaction",
+      "title": "Suppression and cross-query reconstruction",
+      "given": "A proposed group is below the approved minimum or can be reconstructed by subtracting released totals.",
+      "when": "Prepare aggregate outputs.",
+      "expectedStatus": "withhold-reconstructing-output",
+      "assertion": "A minimum cell count alone does not make related totals or overlapping queries releasable."
+    },
+    {
+      "id": "S06",
+      "domain": "satisfaction",
+      "title": "Synthetic eNPS isolation",
+      "given": "Independent arbitrary eNPS responses are presented as a new wave of employee satisfaction.",
+      "when": "Attach them to a goal or historical trend.",
+      "expectedStatus": "reject-source-substitution",
+      "assertion": "The held eNPS source and its disabled gate remain outside this proposal."
+    },
+    {
+      "id": "H01",
+      "domain": "hiring",
+      "title": "Open search is censored",
+      "given": "A requisition has no observed actual start and is open/cancelled or status is unknown.",
+      "when": "Construct lead-time labels and cohort accounting.",
+      "expectedStatus": "retain-unresolved-disposition",
+      "assertion": "Do not create zero duration or substitute a planned/hire date; retain denominator dispositions."
+    },
+    {
+      "id": "H02",
+      "domain": "hiring",
+      "title": "Stage availability",
+      "given": "An opening exists at cutoff; accepted offer/actual start and final pipeline counts occur later.",
+      "when": "Fit an opening-time model.",
+      "expectedStatus": "exclude-future-labels-and-features",
+      "assertion": "Calendar features may be known; final pipeline counts and revised target dates are not opening-known."
+    },
+    {
+      "id": "H03",
+      "domain": "hiring",
+      "title": "Decision/start/capacity separation",
+      "given": "hire_date matches accepted response while actual start is later; capacity-ready time is absent.",
+      "when": "Produce expected hiring and capacity outcomes.",
+      "expectedStatus": "keep-separate-targets",
+      "assertion": "No start-date substitution and no inferred productive-capacity date."
+    },
+    {
+      "id": "E01",
+      "domain": "effects",
+      "title": "Trend without comparison",
+      "given": "Training completion and an improving outcome trend exist, but no assignment/comparison design.",
+      "when": "Estimate program effect.",
+      "expectedStatus": "effect-unavailable",
+      "assertion": "Permit explicitly labeled descriptive change or user-assumed scenario only."
+    },
+    {
+      "id": "E02",
+      "domain": "effects",
+      "title": "Post-outcome assignment",
+      "given": "Treatment groups were chosen using later outcomes or post-treatment variables.",
+      "when": "Define an effect contrast.",
+      "expectedStatus": "reject-design",
+      "assertion": "Assignment, eligibility and adjustment inputs must respect the target design and timing."
+    },
+    {
+      "id": "E03",
+      "domain": "effects",
+      "title": "Nonadherence and attrition",
+      "given": "Assigned intervention units include nonparticipants; follow-up/nonresponse differs between arms.",
+      "when": "Calculate an effect under the registered assignment contrast.",
+      "expectedStatus": "retain-assigned-groups-and-report-missingness",
+      "assertion": "Do not silently drop nonparticipants or treat nonresponders as satisfied."
+    },
+    {
+      "id": "E04",
+      "domain": "effects",
+      "title": "Confounded comparison",
+      "given": "Intervention and comparison groups differ in pre-intervention trends, overlap or concurrent changes.",
+      "when": "Apply an observational contrast.",
+      "expectedStatus": "withhold-causal-claim-pending-design",
+      "assertion": "A descriptive difference or passing trend test alone is not causal identification."
+    },
+    {
+      "id": "E05",
+      "domain": "effects",
+      "title": "Independent units and overlapping benefits",
+      "given": "Repeated rows come from very few assigned groups; two interventions affect the same population/window.",
+      "when": "Compute uncertainty and combine benefits.",
+      "expectedStatus": "block-unsupported-precision-and-double-counting",
+      "assertion": "Use assignment-unit dependence; do not count repeated rows as independent groups or sum overlapping effects."
+    },
+    {
+      "id": "G01",
+      "domain": "synthetic",
+      "title": "Fabricated historical availability",
+      "given": "A generator creates observed_at values for an existing bulk-loaded company extract.",
+      "when": "Label the result as verified company history.",
+      "expectedStatus": "reject-provenance-upgrade",
+      "assertion": "Only separate constructed-synthetic records may carry simulated observation times."
+    },
+    {
+      "id": "G02",
+      "domain": "synthetic",
+      "title": "Frozen final assessment",
+      "given": "Future synthetic outcomes or generator-only true effects are modified after a development fit.",
+      "when": "Repeat development and selection.",
+      "expectedStatus": "preserve-development-result",
+      "assertion": "Outcome-based generated predictions, final-block tuning and ground-truth sidecar access fail."
+    },
+    {
+      "id": "G03",
+      "domain": "synthetic",
+      "title": "Realistic failure scenarios",
+      "given": "Pinned generator cases include zero/adverse/delayed effects, censoring, nonresponse and source revisions.",
+      "when": "Validate the generator and demonstration report.",
+      "expectedStatus": "preserve-failures-and-synthetic-label",
+      "assertion": "No guaranteed improvement; valid stage order, bounded scores, nonnegative counts/exposure and reproducibility must hold."
+    },
+    {
+      "id": "G04",
+      "domain": "synthetic",
+      "title": "Insufficient calibration",
+      "given": "A few overlapping folds or correlated groups are available and model disagreement exists.",
+      "when": "Construct a prediction/effect confidence range.",
+      "expectedStatus": "uncertainty-unavailable",
+      "assertion": "Prediction uncertainty and causal-effect uncertainty require separate method and coverage/design evidence."
+    }
+  ],
+  "implementation": "../../lib/ml/predictive-readiness.ts",
+  "executableTests": "../predictive-readiness.test.mjs"
+}

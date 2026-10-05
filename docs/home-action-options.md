@@ -14,6 +14,8 @@ Strict parsing establishes shape, bounds and reference availability, not factual
 
 ## Validation
 
+The two browser modes now exercise current coordinated Action Plans **and** supported previous per-action records. See [coverage reconciliation](home-action-options-browser-coverage.md) for the preserved requirements, fixture repair and current commands. The per-action storage description above records the earlier product checkpoint, not the current ordinary Pin preparation path.
+
 - `node --test tests/*.test.mjs`
 - `npm run lint`; `npx tsc --noEmit`; `npm run build`
 - `PLAYWRIGHT_MODULE=/tmp/people-browser-tools/node_modules/playwright/index.mjs node tests/browser/home-action-options.mjs`

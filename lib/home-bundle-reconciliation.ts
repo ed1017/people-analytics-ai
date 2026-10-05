@@ -1,3 +1,4 @@
+import type {SuccessMeasure} from './home-success-measures';
 // Local, aggregate planning arithmetic. No services, model calls or operational writes.
 // @ts-expect-error Native Node tests share TypeScript source.
 import {componentOrder,bundleSignature,bundleDomains,type SolutionBundle} from './home-solution-bundles.ts';
@@ -24,7 +25,7 @@ export type ExpenseAllocation={componentId:string;percent:number};
 export type ExpenseLink={expenseId:string;componentIds:string[];allocations:ExpenseAllocation[]|null};
 export type ManualExpense={id:string;label:string;kind:'cash'|'employee_time';amount:Assumption<number>;startMonth:Assumption<string>;months:Assumption<number>};
 export type ComponentCostReview={componentId:string;complete:Assumption<boolean>};
-export type BundleInputs={scope:BundleScope;capacity:CapacityMix|null;timing:ComponentTiming[];dependenciesConfirmed:Assumption<boolean>;groups:PopulationGroup[];memberships:PopulationMembership[];groupsDisjoint:Assumption<boolean>;expenses:ManualExpense[];expenseLinks:ExpenseLink[];costReviews:ComponentCostReview[];costsDistinct:Assumption<boolean>};
+export type BundleInputs={successMeasure?:SuccessMeasure;scope:BundleScope;capacity:CapacityMix|null;timing:ComponentTiming[];dependenciesConfirmed:Assumption<boolean>;groups:PopulationGroup[];memberships:PopulationMembership[];groupsDisjoint:Assumption<boolean>;expenses:ManualExpense[];expenseLinks:ExpenseLink[];costReviews:ComponentCostReview[];costsDistinct:Assumption<boolean>};
 export type BundleDraft={pilot?:{version:'illustrative-pilot-v1';preparedAt:string;timezone:'UTC'};version:1;status:'proposal';binding:ActionBinding;bundle:SolutionBundle;signature:string;revision:number;inputs:BundleInputs};
 export type LedgerLine={id:string;label:string;kind:'cash'|'employee_time';monthly:(number|null)[];total:number|null;componentIds:string[];allocations:ExpenseAllocation[]|null};
 export type BundleResult={method:typeof bundleMethod;revision:number;signature:string;bindingKey:string;scope:BundleScope;ledger:LedgerLine[];knownCashSubtotal:number|null;cashTotal:number|null;knownEmployeeTimeSubtotal:number|null;employeeTimeTotal:number|null;componentCash:Record<string,number|null>;uniqueParticipants:number|null;componentReady:Record<string,string|null>;planFinish:string|null;capacityReadyMonth:string|null;conditionalCoverage:(number|null)[]|null;plannedAddedEmployees:number|null;issues:string[];limitations:string[];inputKey:string};
@@ -64,7 +65,8 @@ function validateDraft(draft:BundleDraft){
  fail(exactKeys(bundle as unknown as Record<string,unknown>,['id','name','objective','coordination','components','limitation'])&&['A','B','C'].includes(bundle.id)&&bounded(bundle.name,80)&&bounded(bundle.objective,160)&&bounded(bundle.coordination)&&bounded(bundle.limitation),'Invalid saved bundle structure.');
  for(const item of bundle.components)fail(exactKeys(item as unknown as Record<string,unknown>,['id','name','domain','firstStep','evidence','ownerRole','dependsOn','limitation'])&&/^c[1-6]$/.test(item.id)&&bounded(item.name,80)&&bundleDomains.includes(item.domain)&&bounded(item.firstStep,360)&&bounded(item.ownerRole,80)&&bounded(item.limitation,200)&&Array.isArray(item.evidence)&&item.evidence.length>0&&item.evidence.length<=3&&new Set(item.evidence).size===item.evidence.length&&item.evidence.every(id=>bounded(id,100)),'Invalid saved component structure.');
  const order=componentOrder(draft.bundle.components),ids=new Set(order),input=draft.inputs,scope=input.scope;
- fail(exactKeys(input as unknown as Record<string,unknown>,['scope','capacity','timing','dependenciesConfirmed','groups','memberships','groupsDisjoint','expenses','expenseLinks','costReviews','costsDistinct']),'Unsupported bundle inputs.');
+ fail(exactKeys(input as unknown as Record<string,unknown>,['scope','capacity','timing','dependenciesConfirmed','groups','memberships','groupsDisjoint','expenses','expenseLinks','costReviews','costsDistinct',...(input.successMeasure!==undefined?['successMeasure']:[])]),'Unsupported bundle inputs.');
+ if(input.successMeasure!==undefined){const measure=input.successMeasure;fail(plain(measure)&&exactKeys(measure as unknown as Record<string,unknown>,['goal','scopeKey','name','baseline','target'])&&measure.goal===draft.binding.goal&&bounded(measure.scopeKey,1000)&&bounded(measure.name),'Review the measure for this exact goal.');assumption(measure.baseline,value=>bounded(value));assumption(measure.target,value=>bounded(value));fail(measure.target.kind!=='adopted','Targets are user or illustrative assumptions, not observed outcomes.');}
  fail(exactKeys(scope as unknown as Record<string,unknown>,['population','businessUnit','jobProfile','startMonth','months','demand','capacityRequired','requirements','comparisonConfirmed','currency'])&&scope.currency==='USD','Use the supported shared USD scope.');
  for(const key of ['population','businessUnit','jobProfile','requirements'] as const)assumption(scope[key],value=>bounded(value));
  assumption(scope.startMonth,value=>typeof value==='string'&&Number.isFinite(monthIndex(value)));numeric(scope.months,24,true,1);numeric(scope.demand,1000,true,1);bool(scope.comparisonConfirmed);bool(scope.capacityRequired);
@@ -113,6 +115,7 @@ export function reviseBundleProposal(draft:BundleDraft,bundle:SolutionBundle):Bu
 }
 export function reconcileBundle(draft:BundleDraft):BundleResult{
  const order=validateDraft(draft),input=draft.inputs,scope=input.scope,issues:string[]=[];
+ if(input.successMeasure&&input.successMeasure.scopeKey!==JSON.stringify([scope.population.value,scope.startMonth.value,scope.months.value]))issues.push('Success measure population or horizon changed; review the baseline and target again.');
  fail(scope.population.value&&scope.startMonth.value&&scope.months.value,'Confirm the aggregate population and shared planning horizon.');
  const start=monthIndex(scope.startMonth.value),months=scope.months.value,end=monthName(start+months),componentReady:Record<string,string|null>={};
  const timings=new Map(input.timing.map(item=>[item.componentId,item]));
@@ -187,7 +190,7 @@ export function compareBundleDrafts(leftDraft:BundleDraft,rightDraft:BundleDraft
 /** Compare only explicitly calculated current snapshots; do not calculate during rendering. */
 export function compareCurrentBundleResults(left:BundleResult,right:BundleResult,leftDraft:BundleDraft,rightDraft:BundleDraft){
  const keys=['population','businessUnit','jobProfile','startMonth','months','demand','capacityRequired','requirements'] as const;
- const matched=left.inputKey===bundleInputKey(leftDraft)&&right.inputKey===bundleInputKey(rightDraft)&&left.bindingKey===right.bindingKey&&left.scope.currency===right.scope.currency&&left.scope.comparisonConfirmed.value===true&&right.scope.comparisonConfirmed.value===true&&left.scope.requirements.value!==null&&keys.every(key=>JSON.stringify(left.scope[key].value)===JSON.stringify(right.scope[key].value));
+ const matched=JSON.stringify(leftDraft.inputs.successMeasure??null)===JSON.stringify(rightDraft.inputs.successMeasure??null)&&left.inputKey===bundleInputKey(leftDraft)&&right.inputKey===bundleInputKey(rightDraft)&&left.bindingKey===right.bindingKey&&left.scope.currency===right.scope.currency&&left.scope.comparisonConfirmed.value===true&&right.scope.comparisonConfirmed.value===true&&left.scope.requirements.value!==null&&keys.every(key=>JSON.stringify(left.scope[key].value)===JSON.stringify(right.scope[key].value));
  if(!matched)return {comparable:false,cashDifference:null,capacityMonthsDifference:null,reason:'Confirm matching goal, evidence, target scope, requirements and horizon before comparing.'};
  return {comparable:true,cashDifference:left.cashTotal===null||right.cashTotal===null?null:cents(left.cashTotal-right.cashTotal),capacityMonthsDifference:left.capacityReadyMonth&&right.capacityReadyMonth?monthIndex(left.capacityReadyMonth)-monthIndex(right.capacityReadyMonth):null,reason:'Differences are conditional on reviewed assumptions; objectives are not proven outcomes.'};
 }

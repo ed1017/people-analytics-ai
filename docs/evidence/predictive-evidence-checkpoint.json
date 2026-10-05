@@ -1,0 +1,1323 @@
+{
+  "schemaVersion": 1,
+  "status": "offline-evidence-checkpoint",
+  "operationallyValidated": false,
+  "files": {
+    "tests/fixtures/aggregate-exit-history.json": "64acf5cbb0cddbaa0614e20ee3895cd026ebe3ec9c91fed622820b53b44d63cd",
+    "lib/ml/aggregate-exit-forecast.ts": "095003fd6731eab87030f91c38fb698e71b3e0c92a0bc7bcd3450d0d2c9fea4e",
+    "lib/ml/predictive-readiness.ts": "ae0ef0f265afa1bb0ce447912aff1d4a9339570708022d7ff62eed7454754de7",
+    "lib/ml/turnover-vintage-evaluation.mjs": "a9de0ea0e9edda53191b0b70b9d6dc6787083e069e150f107bd4aed9076ef490",
+    "tests/fixtures/turnover-vintage-generator.mjs": "1d144db22ea09f3afc6beba78293829da69a751ba585a7362e1ac73eba545a7b",
+    "tests/manual/predictive-evidence-checkpoint.mjs": "d0d76fa507d128f89e94eec45d0a23d0945b80fbf7225340238a5f6efc41da46",
+    "tests/manual/generate-exit-demo-presentation.mjs": "cba369b1ccf00144cf468b679c042f718d4e401b9342aa8cc99d70a4baf6a7f8",
+    "docs/predictive-readiness-proposal.md": "1b80d2b9bd250576e1fddd1cc88c1141a926a3c56a45dbcfbf72ca919efac3a6"
+  },
+  "sourceEvidence": {
+    "basis": "Existing local audits and captured aggregates only; no fresh database access.",
+    "turnover": {
+      "originalDataClass": "user-declared-synthetic",
+      "readinessAdapterClass": "company-extract means an existing source extract, not verified real-world data",
+      "manifest": {
+        "source": "public.attrition_monthly_trend",
+        "extractedOn": "2026-10-05",
+        "provenance": "user-declared-synthetic",
+        "population": "all-recorded-voluntary-separations",
+        "sourceDefinitionVersion": "inspected-2026-10-05",
+        "sourceInsertedAt": "2026-09-28T01:50:05.925Z",
+        "completionEvidence": "calendar-boundaries-only",
+        "vintageHistory": false,
+        "denominatorBasis": "month-end-stock-only",
+        "generatorVersion": null
+      },
+      "checks": {
+        "inputStatus": "valid",
+        "forecast": {
+          "status": "blocked",
+          "reasons": [
+            "availability-unknown",
+            "availability-unverified",
+            "completeness-unknown",
+            "no-available-history"
+          ]
+        },
+        "causalEffect": {
+          "status": "blocked",
+          "reasons": [
+            "availability-unverified",
+            "completeness-unknown",
+            "missing-comparison-design"
+          ]
+        },
+        "availableHistoryRows": 0,
+        "sourceTruthVerified": false
+      },
+      "minimumMissingInputs": [
+        "Versioned population and monthly count definitions; reconcile every month, including event-empty months, against scoped source completion evidence.",
+        "Actual first-observed timestamps, revision predecessors and recorded corrections for every monthly label; event and bulk insertion dates are not substitutes.",
+        "Completion declarations with population, covered period, actual observation time and evidence reference at every forecast origin and scoring cutoff.",
+        "Generator/version lineage if asserting synthetic completeness. Person-time at risk plus explicit future exposure assumptions before rates."
+      ]
+    },
+    "satisfaction": {
+      "checks": {
+        "inputStatus": "valid",
+        "forecast": {
+          "status": "blocked",
+          "reasons": [
+            "availability-unverified",
+            "completeness-unknown",
+            "no-available-history"
+          ]
+        },
+        "causalEffect": {
+          "status": "blocked",
+          "reasons": [
+            "availability-unverified",
+            "completeness-unknown",
+            "missing-comparison-design"
+          ]
+        },
+        "availableHistoryRows": 0,
+        "sourceTruthVerified": false
+      },
+      "minimumMissingInputs": [
+        "Comparable observed waves with versioned population, eligibility, instrument/items and scoring rules; no interpolated monthly targets.",
+        "Mean respondent favorable-answer share with valid respondent denominator, eligible population for participation, and missing/nonresponse counts.",
+        "Wave closure, actual observation/revision times, scoped completion, and reviewed cell/complementary/query-set suppression status."
+      ]
+    },
+    "hiring": {
+      "checks": {
+        "inputStatus": "valid",
+        "forecast": {
+          "status": "blocked",
+          "reasons": [
+            "availability-unverified",
+            "completeness-unknown",
+            "no-available-history"
+          ]
+        },
+        "causalEffect": {
+          "status": "blocked",
+          "reasons": [
+            "availability-unverified",
+            "completeness-unknown",
+            "missing-comparison-design"
+          ]
+        },
+        "availableHistoryRows": 0,
+        "sourceTruthVerified": false
+      },
+      "minimumMissingInputs": [
+        "One role/population with every opening retained, including open, cancelled and no-show dispositions; maturity/censoring at the scoring cutoff.",
+        "Separate opening, accepted-offer, actual-start and capacity-ready definitions; no hire or planned-start substitution.",
+        "Actual first-observed stage/status/revision times, opening-known features only, scoped cohort completion and a common fixed follow-up horizon or censoring-aware estimator."
+      ]
+    },
+    "effects": {
+      "status": "unavailable",
+      "minimumMissingInputs": [
+        "Dated intervention assignment and intended comparison design, eligible/assigned/exposed units, and aligned outcome observations in both arms.",
+        "Pre-outcome design/adjustment history, adherence, missing follow-up and contamination, with identification and independent-unit uncertainty analysis. Ordinary forecasts supply none of these."
+      ]
+    }
+  },
+  "existingPreviewBenchmark": {
+    "status": "conditional-retrospective-synthetic-demo",
+    "dataClass": "user-declared-synthetic",
+    "qualification": {
+      "manifest": {
+        "source": "public.attrition_monthly_trend",
+        "extractedOn": "2026-10-05",
+        "provenance": "user-declared-synthetic",
+        "population": "all-recorded-voluntary-separations",
+        "sourceDefinitionVersion": "inspected-2026-10-05",
+        "sourceInsertedAt": "2026-09-28T01:50:05.925Z",
+        "completionEvidence": "calendar-boundaries-only",
+        "vintageHistory": false,
+        "denominatorBasis": "month-end-stock-only",
+        "generatorVersion": null
+      },
+      "extractedMonths": 33,
+      "usableMonths": 32,
+      "historyStart": "2024-02",
+      "historyEnd": "2026-09",
+      "excluded": [
+        {
+          "month": "2024-01",
+          "reason": "unverified-join-zero"
+        }
+      ],
+      "countForecastQualified": false,
+      "rateForecastQualified": false,
+      "pointInTimeValidated": false,
+      "completenessVerified": false,
+      "generatorProvenanceVerified": false,
+      "assumptions": [
+        "Included recorded counts are treated as complete solely for this retrospective synthetic demonstration.",
+        "Future counts follow a similar process to these synthetic monthly aggregates."
+      ],
+      "blockers": [
+        "No source completion watermark or versioned generator.",
+        "History loaded retrospectively; no as-known-at-origin vintages.",
+        "Month-end headcount is a stock, not average at-risk exposure; future exposure is unknown."
+      ]
+    },
+    "protocol": {
+      "methodVersion": "aggregate-exit-demo-v1",
+      "minimumTrainingMonths": 12,
+      "comparisonOriginMinimumMonths": 24,
+      "horizonMonths": 3,
+      "methods": [
+        "recent-mean-3",
+        "seasonal-naive-12",
+        "simple-exponential-smoothing"
+      ],
+      "alphaGrid": [
+        0.2,
+        0.5,
+        0.8
+      ],
+      "historyWindows": [
+        "last-12-months",
+        "last-24-months",
+        "all-available"
+      ],
+      "historyComparison": "Paired retrospective 12/24/all sensitivity; no window selection using the already-visible assessment. Main selection retains all-available candidate fit and fixed-lookback baselines.",
+      "candidateFit": "Training-only one-step SSE; lowest alpha wins exact ties; first training count initializes level.",
+      "selection": "Development-only monthly MAE; candidate requires at least 10% improvement against each baseline; baseline ties favor recent mean.",
+      "assessment": "Final chronological three-month block is excluded from fitting and selection at its origin; visible during source qualification, not an untouched confirmatory holdout.",
+      "developmentOrigins": [
+        "2026-01",
+        "2026-02",
+        "2026-03"
+      ],
+      "holdoutOrigin": "2026-06",
+      "forecastOrigin": "2026-09"
+    },
+    "datasetFingerprint": "7887ad425425356be28dc143c2776069309ced0cf05a602a842ee8216b75c280",
+    "protocolFingerprint": "268252ee00c4e2413811879b3225e40261c5014ce7378c2d81a764359a01a354",
+    "development": [
+      {
+        "method": "recent-mean-3",
+        "folds": [
+          {
+            "method": "recent-mean-3",
+            "historyWindow": "all-available",
+            "origin": "2026-01",
+            "trainStart": "2024-02",
+            "trainMonths": 24,
+            "effectiveLookbackMonths": 3,
+            "alpha": null,
+            "points": [
+              {
+                "month": "2026-02",
+                "horizon": 1,
+                "expectedExits": 68,
+                "actualExits": 69,
+                "error": -1
+              },
+              {
+                "month": "2026-03",
+                "horizon": 2,
+                "expectedExits": 68,
+                "actualExits": 64,
+                "error": 4
+              },
+              {
+                "month": "2026-04",
+                "horizon": 3,
+                "expectedExits": 68,
+                "actualExits": 73,
+                "error": -5
+              }
+            ],
+            "expectedTotal": 204,
+            "actualTotal": 206,
+            "totalError": -2
+          },
+          {
+            "method": "recent-mean-3",
+            "historyWindow": "all-available",
+            "origin": "2026-02",
+            "trainStart": "2024-02",
+            "trainMonths": 25,
+            "effectiveLookbackMonths": 3,
+            "alpha": null,
+            "points": [
+              {
+                "month": "2026-03",
+                "horizon": 1,
+                "expectedExits": 69,
+                "actualExits": 64,
+                "error": 5
+              },
+              {
+                "month": "2026-04",
+                "horizon": 2,
+                "expectedExits": 69,
+                "actualExits": 73,
+                "error": -4
+              },
+              {
+                "month": "2026-05",
+                "horizon": 3,
+                "expectedExits": 69,
+                "actualExits": 70,
+                "error": -1
+              }
+            ],
+            "expectedTotal": 207,
+            "actualTotal": 207,
+            "totalError": 0
+          },
+          {
+            "method": "recent-mean-3",
+            "historyWindow": "all-available",
+            "origin": "2026-03",
+            "trainStart": "2024-02",
+            "trainMonths": 26,
+            "effectiveLookbackMonths": 3,
+            "alpha": null,
+            "points": [
+              {
+                "month": "2026-04",
+                "horizon": 1,
+                "expectedExits": 66.66666666666667,
+                "actualExits": 73,
+                "error": -6.333333333333329
+              },
+              {
+                "month": "2026-05",
+                "horizon": 2,
+                "expectedExits": 66.66666666666667,
+                "actualExits": 70,
+                "error": -3.3333333333333286
+              },
+              {
+                "month": "2026-06",
+                "horizon": 3,
+                "expectedExits": 66.66666666666667,
+                "actualExits": 61,
+                "error": 5.666666666666671
+              }
+            ],
+            "expectedTotal": 200,
+            "actualTotal": 204,
+            "totalError": -4
+          }
+        ],
+        "metrics": {
+          "origins": 3,
+          "distinctTargetMonths": 5,
+          "overall": {
+            "count": 9,
+            "mae": 3.9259259259259256,
+            "rmse": 4.311912869318279,
+            "bias": -0.6666666666666651
+          },
+          "byHorizon": [
+            {
+              "horizon": 1,
+              "count": 3,
+              "mae": 4.11111111111111,
+              "rmse": 4.6943622609505775,
+              "bias": -0.7777777777777762
+            },
+            {
+              "horizon": 2,
+              "count": 3,
+              "mae": 3.7777777777777763,
+              "rmse": 3.790827135384883,
+              "bias": -1.1111111111111096
+            },
+            {
+              "horizon": 3,
+              "count": 3,
+              "mae": 3.8888888888888906,
+              "rmse": 4.401178293408527,
+              "bias": -0.11111111111110954
+            }
+          ],
+          "threeMonthTotal": {
+            "count": 3,
+            "mae": 2,
+            "rmse": 2.581988897471611,
+            "bias": -2
+          }
+        }
+      },
+      {
+        "method": "seasonal-naive-12",
+        "folds": [
+          {
+            "method": "seasonal-naive-12",
+            "historyWindow": "all-available",
+            "origin": "2026-01",
+            "trainStart": "2024-02",
+            "trainMonths": 24,
+            "effectiveLookbackMonths": 12,
+            "alpha": null,
+            "points": [
+              {
+                "month": "2026-02",
+                "horizon": 1,
+                "expectedExits": 65,
+                "actualExits": 69,
+                "error": -4
+              },
+              {
+                "month": "2026-03",
+                "horizon": 2,
+                "expectedExits": 70,
+                "actualExits": 64,
+                "error": 6
+              },
+              {
+                "month": "2026-04",
+                "horizon": 3,
+                "expectedExits": 68,
+                "actualExits": 73,
+                "error": -5
+              }
+            ],
+            "expectedTotal": 203,
+            "actualTotal": 206,
+            "totalError": -3
+          },
+          {
+            "method": "seasonal-naive-12",
+            "historyWindow": "all-available",
+            "origin": "2026-02",
+            "trainStart": "2024-02",
+            "trainMonths": 25,
+            "effectiveLookbackMonths": 12,
+            "alpha": null,
+            "points": [
+              {
+                "month": "2026-03",
+                "horizon": 1,
+                "expectedExits": 70,
+                "actualExits": 64,
+                "error": 6
+              },
+              {
+                "month": "2026-04",
+                "horizon": 2,
+                "expectedExits": 68,
+                "actualExits": 73,
+                "error": -5
+              },
+              {
+                "month": "2026-05",
+                "horizon": 3,
+                "expectedExits": 71,
+                "actualExits": 70,
+                "error": 1
+              }
+            ],
+            "expectedTotal": 209,
+            "actualTotal": 207,
+            "totalError": 2
+          },
+          {
+            "method": "seasonal-naive-12",
+            "historyWindow": "all-available",
+            "origin": "2026-03",
+            "trainStart": "2024-02",
+            "trainMonths": 26,
+            "effectiveLookbackMonths": 12,
+            "alpha": null,
+            "points": [
+              {
+                "month": "2026-04",
+                "horizon": 1,
+                "expectedExits": 68,
+                "actualExits": 73,
+                "error": -5
+              },
+              {
+                "month": "2026-05",
+                "horizon": 2,
+                "expectedExits": 71,
+                "actualExits": 70,
+                "error": 1
+              },
+              {
+                "month": "2026-06",
+                "horizon": 3,
+                "expectedExits": 66,
+                "actualExits": 61,
+                "error": 5
+              }
+            ],
+            "expectedTotal": 205,
+            "actualTotal": 204,
+            "totalError": 1
+          }
+        ],
+        "metrics": {
+          "origins": 3,
+          "distinctTargetMonths": 5,
+          "overall": {
+            "count": 9,
+            "mae": 4.222222222222222,
+            "rmse": 4.594682917363407,
+            "bias": 0
+          },
+          "byHorizon": [
+            {
+              "horizon": 1,
+              "count": 3,
+              "mae": 5,
+              "rmse": 5.066228051190222,
+              "bias": -1
+            },
+            {
+              "horizon": 2,
+              "count": 3,
+              "mae": 4,
+              "rmse": 4.546060565661952,
+              "bias": 0.6666666666666666
+            },
+            {
+              "horizon": 3,
+              "count": 3,
+              "mae": 3.6666666666666665,
+              "rmse": 4.123105625617661,
+              "bias": 0.3333333333333333
+            }
+          ],
+          "threeMonthTotal": {
+            "count": 3,
+            "mae": 2,
+            "rmse": 2.160246899469287,
+            "bias": 0
+          }
+        }
+      },
+      {
+        "method": "simple-exponential-smoothing",
+        "folds": [
+          {
+            "method": "simple-exponential-smoothing",
+            "historyWindow": "all-available",
+            "origin": "2026-01",
+            "trainStart": "2024-02",
+            "trainMonths": 24,
+            "effectiveLookbackMonths": 24,
+            "alpha": 0.5,
+            "points": [
+              {
+                "month": "2026-02",
+                "horizon": 1,
+                "expectedExits": 68.34756827354431,
+                "actualExits": 69,
+                "error": -0.6524317264556885
+              },
+              {
+                "month": "2026-03",
+                "horizon": 2,
+                "expectedExits": 68.34756827354431,
+                "actualExits": 64,
+                "error": 4.3475682735443115
+              },
+              {
+                "month": "2026-04",
+                "horizon": 3,
+                "expectedExits": 68.34756827354431,
+                "actualExits": 73,
+                "error": -4.6524317264556885
+              }
+            ],
+            "expectedTotal": 205.04270482063293,
+            "actualTotal": 206,
+            "totalError": -0.9572951793670654
+          },
+          {
+            "method": "simple-exponential-smoothing",
+            "historyWindow": "all-available",
+            "origin": "2026-02",
+            "trainStart": "2024-02",
+            "trainMonths": 25,
+            "effectiveLookbackMonths": 25,
+            "alpha": 0.5,
+            "points": [
+              {
+                "month": "2026-03",
+                "horizon": 1,
+                "expectedExits": 68.67378413677216,
+                "actualExits": 64,
+                "error": 4.673784136772156
+              },
+              {
+                "month": "2026-04",
+                "horizon": 2,
+                "expectedExits": 68.67378413677216,
+                "actualExits": 73,
+                "error": -4.326215863227844
+              },
+              {
+                "month": "2026-05",
+                "horizon": 3,
+                "expectedExits": 68.67378413677216,
+                "actualExits": 70,
+                "error": -1.3262158632278442
+              }
+            ],
+            "expectedTotal": 206.02135241031647,
+            "actualTotal": 207,
+            "totalError": -0.9786475896835327
+          },
+          {
+            "method": "simple-exponential-smoothing",
+            "historyWindow": "all-available",
+            "origin": "2026-03",
+            "trainStart": "2024-02",
+            "trainMonths": 26,
+            "effectiveLookbackMonths": 26,
+            "alpha": 0.5,
+            "points": [
+              {
+                "month": "2026-04",
+                "horizon": 1,
+                "expectedExits": 66.33689206838608,
+                "actualExits": 73,
+                "error": -6.663107931613922
+              },
+              {
+                "month": "2026-05",
+                "horizon": 2,
+                "expectedExits": 66.33689206838608,
+                "actualExits": 70,
+                "error": -3.663107931613922
+              },
+              {
+                "month": "2026-06",
+                "horizon": 3,
+                "expectedExits": 66.33689206838608,
+                "actualExits": 61,
+                "error": 5.336892068386078
+              }
+            ],
+            "expectedTotal": 199.01067620515823,
+            "actualTotal": 204,
+            "totalError": -4.989323794841766
+          }
+        ],
+        "metrics": {
+          "origins": 3,
+          "distinctTargetMonths": 5,
+          "overall": {
+            "count": 9,
+            "mae": 3.9601950579219394,
+            "rmse": 4.340880253345991,
+            "bias": -0.7694740626547072
+          },
+          "byHorizon": [
+            {
+              "horizon": 1,
+              "count": 3,
+              "mae": 3.9964412649472556,
+              "rmse": 4.714054610883125,
+              "bias": -0.8805851737658182
+            },
+            {
+              "horizon": 2,
+              "count": 3,
+              "mae": 4.112297356128693,
+              "rmse": 4.1245546550315035,
+              "bias": -1.2139185070991516
+            },
+            {
+              "horizon": 3,
+              "count": 3,
+              "mae": 3.7718465526898703,
+              "rmse": 4.1587813293003215,
+              "bias": -0.2139185070991516
+            }
+          ],
+          "threeMonthTotal": {
+            "count": 3,
+            "mae": 2.3084221879641214,
+            "rmse": 2.9870563600869144,
+            "bias": -2.3084221879641214
+          }
+        }
+      }
+    ],
+    "assessment": [
+      {
+        "method": "recent-mean-3",
+        "fold": {
+          "method": "recent-mean-3",
+          "historyWindow": "all-available",
+          "origin": "2026-06",
+          "trainStart": "2024-02",
+          "trainMonths": 29,
+          "effectiveLookbackMonths": 3,
+          "alpha": null,
+          "points": [
+            {
+              "month": "2026-07",
+              "horizon": 1,
+              "expectedExits": 68,
+              "actualExits": 70,
+              "error": -2
+            },
+            {
+              "month": "2026-08",
+              "horizon": 2,
+              "expectedExits": 68,
+              "actualExits": 65,
+              "error": 3
+            },
+            {
+              "month": "2026-09",
+              "horizon": 3,
+              "expectedExits": 68,
+              "actualExits": 66,
+              "error": 2
+            }
+          ],
+          "expectedTotal": 204,
+          "actualTotal": 201,
+          "totalError": 3
+        },
+        "metrics": {
+          "origins": 1,
+          "distinctTargetMonths": 3,
+          "overall": {
+            "count": 3,
+            "mae": 2.3333333333333335,
+            "rmse": 2.3804761428476167,
+            "bias": 1
+          },
+          "byHorizon": [
+            {
+              "horizon": 1,
+              "count": 1,
+              "mae": 2,
+              "rmse": 2,
+              "bias": -2
+            },
+            {
+              "horizon": 2,
+              "count": 1,
+              "mae": 3,
+              "rmse": 3,
+              "bias": 3
+            },
+            {
+              "horizon": 3,
+              "count": 1,
+              "mae": 2,
+              "rmse": 2,
+              "bias": 2
+            }
+          ],
+          "threeMonthTotal": {
+            "count": 1,
+            "mae": 3,
+            "rmse": 3,
+            "bias": 3
+          }
+        }
+      },
+      {
+        "method": "seasonal-naive-12",
+        "fold": {
+          "method": "seasonal-naive-12",
+          "historyWindow": "all-available",
+          "origin": "2026-06",
+          "trainStart": "2024-02",
+          "trainMonths": 29,
+          "effectiveLookbackMonths": 12,
+          "alpha": null,
+          "points": [
+            {
+              "month": "2026-07",
+              "horizon": 1,
+              "expectedExits": 73,
+              "actualExits": 70,
+              "error": 3
+            },
+            {
+              "month": "2026-08",
+              "horizon": 2,
+              "expectedExits": 70,
+              "actualExits": 65,
+              "error": 5
+            },
+            {
+              "month": "2026-09",
+              "horizon": 3,
+              "expectedExits": 73,
+              "actualExits": 66,
+              "error": 7
+            }
+          ],
+          "expectedTotal": 216,
+          "actualTotal": 201,
+          "totalError": 15
+        },
+        "metrics": {
+          "origins": 1,
+          "distinctTargetMonths": 3,
+          "overall": {
+            "count": 3,
+            "mae": 5,
+            "rmse": 5.259911279353167,
+            "bias": 5
+          },
+          "byHorizon": [
+            {
+              "horizon": 1,
+              "count": 1,
+              "mae": 3,
+              "rmse": 3,
+              "bias": 3
+            },
+            {
+              "horizon": 2,
+              "count": 1,
+              "mae": 5,
+              "rmse": 5,
+              "bias": 5
+            },
+            {
+              "horizon": 3,
+              "count": 1,
+              "mae": 7,
+              "rmse": 7,
+              "bias": 7
+            }
+          ],
+          "threeMonthTotal": {
+            "count": 1,
+            "mae": 15,
+            "rmse": 15,
+            "bias": 15
+          }
+        }
+      },
+      {
+        "method": "simple-exponential-smoothing",
+        "fold": {
+          "method": "simple-exponential-smoothing",
+          "historyWindow": "all-available",
+          "origin": "2026-06",
+          "trainStart": "2024-02",
+          "trainMonths": 29,
+          "effectiveLookbackMonths": 29,
+          "alpha": 0.5,
+          "points": [
+            {
+              "month": "2026-07",
+              "horizon": 1,
+              "expectedExits": 65.41711150854826,
+              "actualExits": 70,
+              "error": -4.58288849145174
+            },
+            {
+              "month": "2026-08",
+              "horizon": 2,
+              "expectedExits": 65.41711150854826,
+              "actualExits": 65,
+              "error": 0.41711150854825974
+            },
+            {
+              "month": "2026-09",
+              "horizon": 3,
+              "expectedExits": 65.41711150854826,
+              "actualExits": 66,
+              "error": -0.5828884914517403
+            }
+          ],
+          "expectedTotal": 196.25133452564478,
+          "actualTotal": 201,
+          "totalError": -4.748665474355221
+        },
+        "metrics": {
+          "origins": 1,
+          "distinctTargetMonths": 3,
+          "overall": {
+            "count": 3,
+            "mae": 1.8609628304839134,
+            "rmse": 2.678096832274187,
+            "bias": -1.5828884914517403
+          },
+          "byHorizon": [
+            {
+              "horizon": 1,
+              "count": 1,
+              "mae": 4.58288849145174,
+              "rmse": 4.58288849145174,
+              "bias": -4.58288849145174
+            },
+            {
+              "horizon": 2,
+              "count": 1,
+              "mae": 0.41711150854825974,
+              "rmse": 0.41711150854825974,
+              "bias": 0.41711150854825974
+            },
+            {
+              "horizon": 3,
+              "count": 1,
+              "mae": 0.5828884914517403,
+              "rmse": 0.5828884914517403,
+              "bias": -0.5828884914517403
+            }
+          ],
+          "threeMonthTotal": {
+            "count": 1,
+            "mae": 4.748665474355221,
+            "rmse": 4.748665474355221,
+            "bias": -4.748665474355221
+          }
+        }
+      }
+    ],
+    "selection": {
+      "method": "recent-mean-3",
+      "candidateSelected": false,
+      "basis": "development-only-monthly-mae"
+    },
+    "previewAgreement": {
+      "selectedMethod": true,
+      "protocolFingerprint": true
+    },
+    "limitations": [
+      "Final-data retrospective benchmark only; historical label availability and completeness are unverified.",
+      "The assessment was visible during qualification and previous iterations; it is not untouched or confirmatory.",
+      "Overlapping development folds have nine errors but only five distinct target months.",
+      "No real-world predictive validation, rates, causal effects or calibrated intervals."
+    ]
+  },
+  "constructedVintageEvaluation": {
+    "generatorVersion": "turnover-vintages-v1-seed-20261005",
+    "generatedAt": "2026-10-05T00:00:00.000Z",
+    "inputFingerprint": "b6003cbe0e781ec31fe846c4d653ee334c159ccd422ee58b57c7faddaa8f61af",
+    "status": "evaluated-constructed-fixture",
+    "protocol": {
+      "version": "constructed-turnover-vintages-v1",
+      "trainingStart": "2023-01",
+      "origins": [
+        "2024-12",
+        "2025-03",
+        "2025-06",
+        "2025-09"
+      ],
+      "cutoffs": [
+        "2025-01-01T00:00:00.000Z",
+        "2025-04-01T00:00:00.000Z",
+        "2025-07-01T00:00:00.000Z",
+        "2025-10-01T00:00:00.000Z"
+      ],
+      "assessmentCutoff": "2026-02-01T00:00:00.000Z",
+      "assessmentEnd": "2025-12",
+      "horizon": 3,
+      "methods": [
+        "recent-mean-3",
+        "seasonal-naive-12"
+      ],
+      "selection": "none; paired baseline comparison only",
+      "custody": "fully visible constructed fixture; no untouched holdout claim"
+    },
+    "protocolFingerprint": "5d1d55c3942828907b66f17b405ee9e5e7f5d7133f1a93b73261e465ca53a231",
+    "folds": [
+      {
+        "origin": "2024-12",
+        "trainingCutoff": "2025-01-01T00:00:00.000Z",
+        "trainingStart": "2023-01",
+        "trainingEnd": "2024-12",
+        "trainingMonths": 24,
+        "targets": [
+          "2025-01",
+          "2025-02",
+          "2025-03"
+        ],
+        "trainingFingerprint": "087c34cc3f600849deb53c194ff55eb42b90a9ede6d652ce64fd79a9a764023f",
+        "scoringCutoff": "2026-02-01T00:00:00.000Z",
+        "status": "evaluated-constructed-fixture",
+        "predictionReasons": [],
+        "scoringReasons": [],
+        "methods": [
+          {
+            "method": "recent-mean-3",
+            "effectiveLookbackMonths": 3,
+            "points": [
+              {
+                "month": "2025-01",
+                "horizon": 1,
+                "prediction": 26,
+                "actual": 36,
+                "error": -10
+              },
+              {
+                "month": "2025-02",
+                "horizon": 2,
+                "prediction": 26,
+                "actual": 40,
+                "error": -14
+              },
+              {
+                "month": "2025-03",
+                "horizon": 3,
+                "prediction": 26,
+                "actual": 36,
+                "error": -10
+              }
+            ],
+            "quarterError": -34
+          },
+          {
+            "method": "seasonal-naive-12",
+            "effectiveLookbackMonths": 12,
+            "points": [
+              {
+                "month": "2025-01",
+                "horizon": 1,
+                "prediction": 27,
+                "actual": 36,
+                "error": -9
+              },
+              {
+                "month": "2025-02",
+                "horizon": 2,
+                "prediction": 35,
+                "actual": 40,
+                "error": -5
+              },
+              {
+                "month": "2025-03",
+                "horizon": 3,
+                "prediction": 32,
+                "actual": 36,
+                "error": -4
+              }
+            ],
+            "quarterError": -18
+          }
+        ]
+      },
+      {
+        "origin": "2025-03",
+        "trainingCutoff": "2025-04-01T00:00:00.000Z",
+        "trainingStart": "2023-01",
+        "trainingEnd": "2025-03",
+        "trainingMonths": 27,
+        "targets": [
+          "2025-04",
+          "2025-05",
+          "2025-06"
+        ],
+        "trainingFingerprint": "7cf8f85e0a0a0bc0301001088dff618dd71bafb1a44a48a71dc5e223d18731c2",
+        "scoringCutoff": "2026-02-01T00:00:00.000Z",
+        "status": "evaluated-constructed-fixture",
+        "predictionReasons": [],
+        "scoringReasons": [],
+        "methods": [
+          {
+            "method": "recent-mean-3",
+            "effectiveLookbackMonths": 3,
+            "points": [
+              {
+                "month": "2025-04",
+                "horizon": 1,
+                "prediction": 37.333333333333336,
+                "actual": 40,
+                "error": -2.6666666666666643
+              },
+              {
+                "month": "2025-05",
+                "horizon": 2,
+                "prediction": 37.333333333333336,
+                "actual": 41,
+                "error": -3.6666666666666643
+              },
+              {
+                "month": "2025-06",
+                "horizon": 3,
+                "prediction": 37.333333333333336,
+                "actual": 38,
+                "error": -0.6666666666666643
+              }
+            ],
+            "quarterError": -6.999999999999993
+          },
+          {
+            "method": "seasonal-naive-12",
+            "effectiveLookbackMonths": 12,
+            "points": [
+              {
+                "month": "2025-04",
+                "horizon": 1,
+                "prediction": 35,
+                "actual": 40,
+                "error": -5
+              },
+              {
+                "month": "2025-05",
+                "horizon": 2,
+                "prediction": 42,
+                "actual": 41,
+                "error": 1
+              },
+              {
+                "month": "2025-06",
+                "horizon": 3,
+                "prediction": 39,
+                "actual": 38,
+                "error": 1
+              }
+            ],
+            "quarterError": -3
+          }
+        ]
+      },
+      {
+        "origin": "2025-06",
+        "trainingCutoff": "2025-07-01T00:00:00.000Z",
+        "trainingStart": "2023-01",
+        "trainingEnd": "2025-06",
+        "trainingMonths": 30,
+        "targets": [
+          "2025-07",
+          "2025-08",
+          "2025-09"
+        ],
+        "trainingFingerprint": "7134284170faa81105dde232086579600994d412e0c573c47a90bfff60d5ba0c",
+        "scoringCutoff": "2026-02-01T00:00:00.000Z",
+        "status": "evaluated-constructed-fixture",
+        "predictionReasons": [],
+        "scoringReasons": [],
+        "methods": [
+          {
+            "method": "recent-mean-3",
+            "effectiveLookbackMonths": 3,
+            "points": [
+              {
+                "month": "2025-07",
+                "horizon": 1,
+                "prediction": 39.666666666666664,
+                "actual": 30,
+                "error": 9.666666666666664
+              },
+              {
+                "month": "2025-08",
+                "horizon": 2,
+                "prediction": 39.666666666666664,
+                "actual": 35,
+                "error": 4.666666666666664
+              },
+              {
+                "month": "2025-09",
+                "horizon": 3,
+                "prediction": 39.666666666666664,
+                "actual": 25,
+                "error": 14.666666666666664
+              }
+            ],
+            "quarterError": 28.999999999999993
+          },
+          {
+            "method": "seasonal-naive-12",
+            "effectiveLookbackMonths": 12,
+            "points": [
+              {
+                "month": "2025-07",
+                "horizon": 1,
+                "prediction": 33,
+                "actual": 30,
+                "error": 3
+              },
+              {
+                "month": "2025-08",
+                "horizon": 2,
+                "prediction": 28,
+                "actual": 35,
+                "error": -7
+              },
+              {
+                "month": "2025-09",
+                "horizon": 3,
+                "prediction": 26,
+                "actual": 25,
+                "error": 1
+              }
+            ],
+            "quarterError": -3
+          }
+        ]
+      },
+      {
+        "origin": "2025-09",
+        "trainingCutoff": "2025-10-01T00:00:00.000Z",
+        "trainingStart": "2023-01",
+        "trainingEnd": "2025-09",
+        "trainingMonths": 33,
+        "targets": [
+          "2025-10",
+          "2025-11",
+          "2025-12"
+        ],
+        "trainingFingerprint": "4faddd7a531f94ea1f3e3f944bda3c321a56614ce18f3c4d0dc54d153473bcdb",
+        "scoringCutoff": "2026-02-01T00:00:00.000Z",
+        "status": "evaluated-constructed-fixture",
+        "predictionReasons": [],
+        "scoringReasons": [],
+        "methods": [
+          {
+            "method": "recent-mean-3",
+            "effectiveLookbackMonths": 3,
+            "points": [
+              {
+                "month": "2025-10",
+                "horizon": 1,
+                "prediction": 30,
+                "actual": 32,
+                "error": -2
+              },
+              {
+                "month": "2025-11",
+                "horizon": 2,
+                "prediction": 30,
+                "actual": 26,
+                "error": 4
+              },
+              {
+                "month": "2025-12",
+                "horizon": 3,
+                "prediction": 30,
+                "actual": 33,
+                "error": -3
+              }
+            ],
+            "quarterError": -1
+          },
+          {
+            "method": "seasonal-naive-12",
+            "effectiveLookbackMonths": 12,
+            "points": [
+              {
+                "month": "2025-10",
+                "horizon": 1,
+                "prediction": 26,
+                "actual": 32,
+                "error": -6
+              },
+              {
+                "month": "2025-11",
+                "horizon": 2,
+                "prediction": 31,
+                "actual": 26,
+                "error": 5
+              },
+              {
+                "month": "2025-12",
+                "horizon": 3,
+                "prediction": 26,
+                "actual": 33,
+                "error": -7
+              }
+            ],
+            "quarterError": -8
+          }
+        ]
+      }
+    ],
+    "comparisons": [
+      {
+        "method": "recent-mean-3",
+        "monthly": {
+          "count": 12,
+          "mae": 6.583333333333332,
+          "rmse": 8.043285674675767,
+          "bias": -1.0833333333333333
+        },
+        "byHorizon": [
+          {
+            "horizon": 1,
+            "count": 4,
+            "mae": 6.083333333333332,
+            "rmse": 7.15114598430831,
+            "bias": -1.25
+          },
+          {
+            "horizon": 2,
+            "count": 4,
+            "mae": 6.583333333333332,
+            "rmse": 7.861650943380503,
+            "bias": -2.25
+          },
+          {
+            "horizon": 3,
+            "count": 4,
+            "mae": 7.083333333333332,
+            "rmse": 9.007712744581106,
+            "bias": 0.25
+          }
+        ],
+        "quarterly": {
+          "count": 4,
+          "mae": 17.749999999999996,
+          "rmse": 22.621892051727237,
+          "bias": -3.25
+        }
+      },
+      {
+        "method": "seasonal-naive-12",
+        "monthly": {
+          "count": 12,
+          "mae": 4.5,
+          "rmse": 5.1478150704935,
+          "bias": -2.6666666666666665
+        },
+        "byHorizon": [
+          {
+            "horizon": 1,
+            "count": 4,
+            "mae": 5.75,
+            "rmse": 6.144102863722254,
+            "bias": -4.25
+          },
+          {
+            "horizon": 2,
+            "count": 4,
+            "mae": 4.5,
+            "rmse": 5,
+            "bias": -1.5
+          },
+          {
+            "horizon": 3,
+            "count": 4,
+            "mae": 3.25,
+            "rmse": 4.092676385936225,
+            "bias": -2.25
+          }
+        ],
+        "quarterly": {
+          "count": 4,
+          "mae": 8,
+          "rmse": 10.074720839804943,
+          "bias": -8
+        }
+      }
+    ],
+    "distinctTargetMonths": 12,
+    "evidenceKind": "constructed-synthetic-vintage-mechanics",
+    "realWorldPerformanceValidated": false,
+    "sourceTruthVerified": false,
+    "causalEffect": null,
+    "predictionInterval": null,
+    "rate": null,
+    "limitations": [
+      "Observation and completion times are simulated.",
+      "Four disjoint target quarters share overlapping training history; independence is not established.",
+      "Fixed baselines only; no tuning, selection, causal estimation or calibrated intervals.",
+      "Passing synthetic checks does not validate an operational source adapter."
+    ]
+  }
+}
