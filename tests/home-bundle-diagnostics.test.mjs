@@ -17,7 +17,7 @@ test('distinguishes API, incomplete, JSON and contract rejection without respons
 });
 test('source reference, dependency and size rejections are separately classified',()=>{
  const invalid=fixture();invalid.bundles[0].components[0].evidence=['S999:summary'];assert.equal(inspectHomeBundleProposal(invalid,goal,pack).diagnostic,'reference_rejected');
- const cycle=fixture();cycle.bundles[0].components[0].dependsOn=['c1'];assert.equal(inspectHomeBundleProposal(cycle,goal,pack).diagnostic,'dependency_rejected');
+ const cycle=fixture();cycle.bundles[0].components[0].dependsOn=['c1'];assert.equal(inspectHomeBundleProposal(cycle,goal,pack).diagnostic,'dependency_self_reference');
  assert.equal(inspectHomeBundleOutput(' '.repeat(32769),goal,pack).diagnostic,'response_too_large');
 });
 test('accepts schema-valid nonsequential stable IDs without relabelling storage identity',()=>{
@@ -38,4 +38,21 @@ test('production decoder preserves unordered IDs and accepts schema-valid option
  }
  const duplicate=fixture();duplicate.bundles[1].id='A';assert.equal(inspectHomeBundleProposal(duplicate,goal,pack).diagnostic,'schema_rejected');
  const questions=fixture();questions.question='One? Two?';assert.equal(validate(questions),false);assert.equal(inspectHomeBundleProposal(questions,goal,pack).diagnostic,'schema_rejected');
+});
+
+for(const [name,change,expected,schemaValid] of [
+ ['unknown target present only in another bundle',p=>{p.bundles[0].components=p.bundles[0].components.slice(0,1);p.bundles[0].components[0].dependsOn=['c6'];},'dependency_unknown_reference',true],
+ ['self prerequisite',p=>{p.bundles[0].components[0].dependsOn=['c1'];},'dependency_self_reference',true],
+ ['two-component cycle',p=>{p.bundles[0].components[0].dependsOn=['c2'];p.bundles[0].components[1].dependsOn=['c1'];},'dependency_cycle',true],
+ ['three-component cycle',p=>{p.bundles[0].components[0].dependsOn=['c2'];p.bundles[0].components[1].dependsOn=['c3'];p.bundles[0].components[2].dependsOn=['c1'];},'dependency_cycle',true],
+ ['duplicate component identity',p=>{p.bundles[0].components[1].id='c1';},'dependency_duplicate_component',true],
+ ['duplicate prerequisite',p=>{p.bundles[0].components[1].dependsOn=['c1','c1'];},'dependency_duplicate_reference',true],
+ ['qualified cross-bundle ID',p=>{p.bundles[0].components[0].dependsOn=['B:c1'];},'dependency_unknown_reference',false],
+ ['invalid dependency shape',p=>{p.bundles[0].components[0].dependsOn=null;},'dependency_shape',false],
+])test('raw production output classifies '+name,()=>{
+ const p=fixture();change(p);const validate=new Ajv({strict:false}).compile(buildHomeBundleFormat(goal,pack).schema);assert.equal(validate(p),schemaValid,JSON.stringify(validate.errors));
+ assert.deepEqual(inspectHomeBundleOutput(JSON.stringify(p),goal,pack),{proposal:null,diagnostic:expected});
+});
+test('valid unordered components and repeated IDs across distinct bundles are accepted unchanged',()=>{
+ const p=fixture();for(const bundle of p.bundles)bundle.components.reverse();assert.deepEqual(inspectHomeBundleOutput(JSON.stringify(p),goal,pack),{proposal:p,diagnostic:null});
 });

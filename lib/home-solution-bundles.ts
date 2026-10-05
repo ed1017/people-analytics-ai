@@ -28,7 +28,21 @@ export function componentOrder(components:Pick<BundleComponent,'id'|'dependsOn'>
  }
  for(const item of components)visit(item.id);return order;
 }
-export const bundleDiagnosticStages=['api_error','incomplete_output','parse_error','schema_rejected','reference_rejected','dependency_rejected','response_too_large','invalid_context','client_transport','client_response','storage_failure'] as const;
+export type DependencyDiagnostic='dependency_shape'|'dependency_duplicate_component'|'dependency_duplicate_reference'|'dependency_unknown_reference'|'dependency_self_reference'|'dependency_cycle';
+/** IDs are scoped to one bundle. Array order is not a dependency constraint. */
+export function inspectComponentDependencies(components:Pick<BundleComponent,'id'|'dependsOn'>[]):DependencyDiagnostic|null{
+ const present=new Set(components.map(item=>item.id));
+ if(present.size!==components.length)return 'dependency_duplicate_component';
+ for(const item of components){
+  if(!Array.isArray(item.dependsOn)||item.dependsOn.length>5||item.dependsOn.some(id=>typeof id!=='string'))return 'dependency_shape';
+  if(new Set(item.dependsOn).size!==item.dependsOn.length)return 'dependency_duplicate_reference';
+  if(item.dependsOn.some(id=>!present.has(id)))return 'dependency_unknown_reference';
+  if(item.dependsOn.includes(item.id))return 'dependency_self_reference';
+ }
+ try{componentOrder(components)}catch{return 'dependency_cycle'}
+ return null;
+}
+export const bundleDiagnosticStages=['api_error','incomplete_output','parse_error','schema_rejected','reference_rejected','dependency_rejected','dependency_shape','dependency_duplicate_component','dependency_duplicate_reference','dependency_unknown_reference','dependency_self_reference','dependency_cycle','response_too_large','invalid_context','client_transport','client_response','storage_failure'] as const;
 export type BundleDiagnostic=typeof bundleDiagnosticStages[number];
 export const readBundleDiagnostic=(raw:unknown):BundleDiagnostic|null=>bundleDiagnosticStages.includes(raw as BundleDiagnostic)?raw as BundleDiagnostic:null;
 export type BundleInspection={proposal:BundleProposal;diagnostic:null}|{proposal:null;diagnostic:BundleDiagnostic};
@@ -49,10 +63,10 @@ export function inspectHomeBundleProposal(raw:unknown,goal:string,pack:unknown):
     const component=plain(rawComponent);
     if(!component||!exactKeys(component,['id','name','domain','firstStep','evidence','ownerRole','dependsOn','limitation'])||!ids.includes(String(component.id))||!text(component.name,80)||!bundleDomains.includes(component.domain as BundleComponent['domain'])||!text(component.firstStep,360)||!text(component.ownerRole,80)||!text(component.limitation,200))return rejected('schema_rejected');
     if(!Array.isArray(component.evidence)||!component.evidence.length||component.evidence.length>3||new Set(component.evidence).size!==component.evidence.length||component.evidence.some(id=>typeof id!=='string'||!allowed.has(id)))return rejected('reference_rejected');
-    if(!Array.isArray(component.dependsOn)||component.dependsOn.length>5||component.dependsOn.some(id=>typeof id!=='string'||!ids.includes(id)))return rejected('dependency_rejected');
+    if(!Array.isArray(component.dependsOn)||component.dependsOn.length>5||component.dependsOn.some(id=>typeof id!=='string'))return rejected('dependency_shape');
     components.push(structuredClone(component) as BundleComponent);
    }
-   try{componentOrder(components)}catch{return rejected('dependency_rejected')}bundles.push({...item,components} as SolutionBundle);
+   const dependencyIssue=inspectComponentDependencies(components);if(dependencyIssue)return rejected(dependencyIssue);bundles.push({...item,components} as SolutionBundle);
   }
   return {proposal:{version:1,goal,bundles,question:value.question as string|null,unavailableReason:value.unavailableReason as string|null},diagnostic:null};
  }catch{return rejected('schema_rejected')}
