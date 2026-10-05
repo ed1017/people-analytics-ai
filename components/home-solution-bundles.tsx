@@ -79,6 +79,7 @@ export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,
   {pending&&<p role="status">Preparing coordinated Action Plans in one response…</p>}
   {!ready&&<p role="status">Checking current evidence. Saved work is kept.</p>}
   {notice&&<p role="alert">{notice}</p>}
+  {current&&current.proposal.bundles.length===0&&<p role="status">{current.proposal.unavailableReason??'No coordinated Action Plans were prepared.'} {current.proposal.question} Your goal and constraints are kept. No plan was calculated or attached.</p>}
   {stale&&<p role="status">Previous Action Plan proposal — goal, evidence or planning inputs changed. Preserved for reference; prepare the current context explicitly.</p>}
   {!draft&&raw&&<p role="status">The saved bundle preparation cannot be verified with current evidence. Its record is kept.</p>}
   {!draft&&retained&&(retained.drafts.length>0||retained.attachments.length>0)&&<section aria-label="Saved Action Plan records" className="space-y-2 rounded border p-3">

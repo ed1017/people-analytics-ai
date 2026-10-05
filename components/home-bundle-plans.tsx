@@ -59,8 +59,8 @@ export function HomeBundlePlans({chatChange,planningContext,proposal,binding,pre
    accept:preview=>{guard();if(!current())throw Error('The selected plan changed. Review a new proposal.');const next=acceptBundleChatEdit(liveSession.current.drafts[selected],preview),raw=decisionStore.getSnapshot().data.workspaces[binding.goalId]?.fields[bundleWorkspaceField],patch=saveBundleDraftPatch(raw,next);decisionStore.setField(binding.goalId,patch.field,patch.value);if(!decisionStore.getSnapshot().saved)throw Error('The reviewed draft could not be saved. Your proposed changes are kept for retry.');remember({...liveSession.current,drafts:{...liveSession.current.drafts,[selected]:next}});saveView({appliedId:next.bundle.id});setNotice('Reviewed changes applied and saved to this goal. Recalculate and review before replacing an attachment; prior versions stay in history.');}
   });}
  useLayoutEffect(()=>{if(draft&&contextCurrent&&!disabled&&!pendingInput)registerChatTarget();});
- const canApply=!!chatChange&&chatChange.goalId===binding.goalId&&chatChange.planId===selected&&chatChange.inputKey===bundleInputKey(draft)&&chatChange.ready&&chatChange.isCurrent()&&!disabled&&contextCurrent;
- const whatIf=calculatePlanWhatIf(draft.inputs);
+ const canApply=!!draft&&!!chatChange&&chatChange.goalId===binding.goalId&&chatChange.planId===selected&&chatChange.inputKey===bundleInputKey(draft)&&chatChange.ready&&chatChange.isCurrent()&&!disabled&&contextCurrent;
+ const whatIf=draft?calculatePlanWhatIf(draft.inputs):null;
  const suggestedMeasure=suggestSuccessMeasure(binding.goal,measurePack);
  const activeAttachments=workspace?.attachments.filter(item=>!workspace.attachments.some(next=>next.supersedes===item.id))??[],existing=activeAttachments.find(item=>item.draft.bundle.id===selected);
  if(!draft)return <p>{proposal.unavailableReason??'No coordinated options were prepared.'}</p>;
