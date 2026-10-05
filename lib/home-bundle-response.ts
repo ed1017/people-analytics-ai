@@ -5,10 +5,12 @@ import {inspectHomeBundleOutput,type BundleDiagnostic,type BundleProposal} from 
 import {homeBundleOutputTokens,bundleResponseDiagnostic,type BundleResponseDiagnostic} from './home-bundle-response-diagnostic.ts';
 /** Narrow fresh-response check: no grammar inference or rewriting of saved text. */
 function incompleteBundleField(proposal:BundleProposal):BundleResponseDiagnostic['textField']{
- const incomplete=(text:string,max:number)=>{const value=text.trim();return (value.length===max&&!/[.!?]["'”’)\]]*$/.test(value))||/(?:[,:;—–-]|\.\.\.|…|(?:^|\s)(?:and|or|but|because|including))$/.test(value);};
+ // Hitting a schema bound without a final full stop is not evidence of truncation.
+ // Keep only visible unfinished endings; never infer missing prose or rewrite it.
+ const incomplete=(text:string)=>/(?:[,:;—–-]|\.\.\.|…|(?:^|\s)(?:and|or|but|because|including))$/.test(text.trim());
  for(const bundle of proposal.bundles){
-  for(const [field,max] of [['objective',160],['coordination',240],['limitation',240]] as const)if(incomplete(bundle[field],max))return field;
-  for(const component of bundle.components){if(incomplete(component.firstStep,360))return 'firstStep';if(incomplete(component.limitation,200))return 'component_limitation';}
+  for(const field of ['objective','coordination','limitation'] as const)if(incomplete(bundle[field]))return field;
+  for(const component of bundle.components){if(incomplete(component.firstStep))return 'firstStep';if(incomplete(component.limitation))return 'component_limitation';}
  }
  return null;
 }
