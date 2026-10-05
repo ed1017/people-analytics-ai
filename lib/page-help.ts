@@ -11,7 +11,6 @@ export const pageHelp: Record<AppPage, string> = {
   "training-coaching": "Compare fictional simulated training/coaching examples or enter your own unverified quote. Select a quote and enter your goal before explicitly carrying it to Development Planning. Nothing enrolls employees or changes assumptions automatically.",
   "development-planning": "I kept this comparison separate from workforce modeling. Carry a selected development quote and your goal, then enter attendance and cost assumptions. Fictional quotes are simulated; blank costs remain unknown and nothing enrolls employees or changes staffing.",
   home: "I built this decision-making tool to connect workforce evidence with goals, modeled costs and tradeoffs. Start with a question, explore the supporting pages, then compare possible plans without changing the real workforce.",
-  "guide-data": "I put the app's workflow, sources and limits here so you can see what sits behind the numbers. You'll also find the tools I used and ideas for later versions, clearly separated from what's available today.",
   overview: workforce,
   workforce,
   attrition: "I brought the recorded separation measures together to help you explore turnover patterns. These are descriptive aggregates, so a difference between groups doesn't tell us why someone left or predict who will leave next.",

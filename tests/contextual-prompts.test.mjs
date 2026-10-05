@@ -34,6 +34,6 @@ test('page examples use only the active capability and remain small',()=>{
  }
  assert.match(contextualPrompts({...base,page:'career-mobility'})[0],/not treating interest|without treating interest/);
  assert.match(contextualPrompts({...base,page:'scenario-modeling'})[0],/assumptions and modeled costs/);
- for(const page of ['compensation','guide-data','decision-brief','assess-evaluate'])assert.deepEqual(contextualPrompts({...base,page}),[]);
+ for(const page of ['compensation','decision-brief','assess-evaluate'])assert.deepEqual(contextualPrompts({...base,page}),[]);
  assert.match(contextualPrompts({...base,page:'unsupported'})[0],/missing/);
 });
