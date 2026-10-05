@@ -1873,7 +1873,7 @@ export default function Home() {
         activePage={activePage}
         selectedPersona={selectedPersona}
         onPersonaChange={setSelectedPersona}
-      ><GlobalWorkforceFilters focusedIssue={<FocusedIssue conversation={conversation} />} options={filterOptions} country={selectedCountry} org={selectedOrg} level={selectedLevel} loading={dashboardLoading} onCountry={setSelectedCountry} onOrg={setSelectedOrg} onLevel={setSelectedLevel} onReset={resetFilters} /></AppHeader>
+      ><GlobalWorkforceFilters focusedIssue={<FocusedIssue conversation={conversation} page={activePage} scope={JSON.stringify(selectedBusinessContext)} />} options={filterOptions} country={selectedCountry} org={selectedOrg} level={selectedLevel} loading={dashboardLoading} onCountry={setSelectedCountry} onOrg={setSelectedOrg} onLevel={setSelectedLevel} onReset={resetFilters} /></AppHeader>
 
       {/* Main application */}
       <div

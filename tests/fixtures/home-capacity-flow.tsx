@@ -14,7 +14,7 @@ function Fixture(){
   capacityPinGoal:(goal:string)=>conversation.confirmWorkforceGoal(goal),
   capacityState:()=>decisionStore.getSnapshot(),
   changeCapacityScope:()=>setQuery('?country=US'),
-  capacityRename:()=>conversation.updateFocusedIssue('A changed additional-role goal'),
+  capacityRename:()=>{const id=conversation.openIssueEditor(false,{page:'workforce',scope:'Synthetic fixture'});if(id){conversation.updateIssueDraft('A changed additional-role goal',id);conversation.updateFocusedIssue('A changed additional-role goal',id)}},
   capacityRoundtrip:()=>{const goals=decisionStore.getSnapshot().data.goals;decisionStore.saveGoals({...goals,activeId:'other',goals:[...goals.goals,{id:'other',statement:'Other goal'}]});decisionStore.saveGoals(goals)},
  });
  return <main>

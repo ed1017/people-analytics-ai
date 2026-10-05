@@ -28,7 +28,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
   return route.continue();
  });
  const button=name=>page.getByRole('button',{name,exact:true}),home=page.getByLabel('Ask Workforce AI',{exact:true}),chat=page.getByLabel('Ask People Analytics AI',{exact:true}),goal=page.getByLabel('Selected goal',{exact:true}),panel=page.locator('.app-ai-panel');
- const navigate=async name=>{await button(name==='Home'?'Home':'Workforce — '+name).click();await page.getByRole('heading',{name:name==='Home'?'Insight to Action':name,exact:true,level:1}).waitFor();};
+ const navigate=async name=>{await button(name==='Home'?'Action Planning':'Workforce — '+name).click();await page.getByRole('heading',{name:name==='Home'?'Insight to Action':name,exact:true,level:1}).waitFor();};
  const send=async message=>{await chat.fill(message);await button('Send message').click();};
  const pending=async message=>{delay=true;release=null;await send(message);for(let i=0;!release&&i<100;i++)await page.waitForTimeout(10);assert.ok(release);};
  const finish=()=>{delay=false;release();};
