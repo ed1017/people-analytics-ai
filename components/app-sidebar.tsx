@@ -125,10 +125,10 @@ export function AppSidebar({
         aria-label="Workforce navigation"
         className="space-y-4"
       >
-        <Button type="button" aria-label="Home" aria-current={activePage === "home" ? "page" : undefined}
+        <Button type="button" aria-label="Action Planning" title="Action Planning" aria-current={activePage === "home" ? "page" : undefined}
           variant={activePage === "home" ? "secondary" : "ghost"} onClick={() => onPageChange("home")}
-          className="mb-2 w-full justify-start gap-3 text-base max-md:justify-center max-md:px-0">
-          <Sparkles className="h-5 w-5 shrink-0" />{!navCollapsed && <span className="max-md:hidden">Home</span>}
+          className="mb-2 min-h-11 h-auto w-full justify-start gap-3 px-3 py-2 text-lg font-semibold max-md:justify-center max-md:px-0">
+          <Sparkles className="h-5 w-5 shrink-0" />{!navCollapsed && <span className="max-md:hidden">Action Planning</span>}
         </Button>
         {appNavigationSections.map(
           (section, sectionIndex) => {

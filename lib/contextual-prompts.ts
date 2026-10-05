@@ -33,6 +33,13 @@ const pageExamples:Record<string,string> = {
 };
 const planningPages = new Set(['planning-overview','scenario-modeling','position-workforce-design','workforce-response','execution-feasibility','workforce-planning']);
 const readOnlyPages = new Set(['compensation','decision-brief','assess-evaluate']);
+export const homeGoalStarters = [
+  'Reduce employee turnover',
+  'Build AI skills without adding headcount',
+  'Compare hiring, training, and internal moves',
+  'Plan within a fixed workforce budget',
+  'Which skills do we need, and where are the gaps?',
+] as const;
 export function hasKnownNumericEvidence(value:unknown):boolean {
   if(typeof value==='number')return Number.isFinite(value);
   if(!value||typeof value!=='object')return false;
@@ -48,10 +55,12 @@ export function contextualPrompts(context:PromptContext):string[] {
   const boundary='What historical evidence can inform my goal, and why is a validated forecast unavailable?';
   if(page==='home'||page==='overview'){
     if(!sources.some(source=>source.status==='loaded'&&hasKnownNumericEvidence(source.facts)))return [missing];
+    if(page==='home'&&!focused)return [...homeGoalStarters];
     const topic=topics.find(topic=>topic.match.test(goal));
     const available=(ids:string[])=>sources.some(source=>ids.includes(source.id)&&source.status==='loaded'&&hasKnownNumericEvidence(source.facts));
     // Do not replace unavailable goal evidence with an unrelated confident example.
     const investigation=topic ? available(topic.ids)?topic.question:missing : focused?'Which available evidence relates to my goal, and what does it not establish?':'Which recorded workforce pattern is worth investigating, and what evidence supports it?';
+    if(page==='home'&&!forecast&&topic?.ids.includes('T1')&&available(topic.ids))return [investigation,'What mix of training, internal moves and hiring would close our skills gaps?',hasConversation?'Which assumptions should I revise before comparing options?':'What would I need to specify before comparing Build, Move and Buy scenarios?'];
     return [forecast?boundary:investigation,focused?'Which supported options could address my goal, and what evidence would distinguish them?':'What can I investigate with the available workforce evidence?',hasConversation?'Which assumptions should I revise before comparing options?':'What would I need to specify before comparing Build, Move and Buy scenarios?'];
   }
   if(planningPages.has(page))return [forecast?boundary:'How do the available planning scenarios differ in assumptions and modeled costs?', 'Which budget, timing or headcount assumptions should I review for my goal?', 'What would make this scenario comparison incomplete or misleading?'];

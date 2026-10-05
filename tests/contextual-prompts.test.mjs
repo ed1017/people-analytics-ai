@@ -1,8 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {contextualPrompts,hasKnownNumericEvidence,workforceStageExample} from '../lib/contextual-prompts.ts';
+import {contextualPrompts,hasKnownNumericEvidence,homeGoalStarters,workforceStageExample} from '../lib/contextual-prompts.ts';
 const source=(id,facts={count:0},status='loaded')=>({id,facts,status});
 const base={page:'home',goal:'Improve retention',hasConversation:false,evidenceReady:true,sources:[source('A1'),source('T1')]};
+test('Home starters remain simple while skills follow-ups are contextual and permit combined methods',()=>{
+ assert.deepEqual(contextualPrompts({...base,goal:''}),[...homeGoalStarters]);
+ assert.equal(homeGoalStarters.length,5);
+ assert.match(contextualPrompts({...base,goal:'Build AI skills without adding headcount'})[1],/mix of training, internal moves and hiring/);
+ for(const context of [base,{...base,goal:''},{...base,goal:'Build skills',sources:[source('A1')]},{...base,page:'overview',goal:'Build skills'}])assert.doesNotMatch(contextualPrompts(context).join(' '),/mix of training/);
+ assert.equal(contextualPrompts({...base,goal:'',sources:[]}).length,1);
+});
 test('goal changes choose relevant supported evidence without executing anything',()=>{
  assert.match(contextualPrompts(base)[0],/separation/);
  assert.match(contextualPrompts({...base,goal:'Improve AI skills'})[0],/skill/);
