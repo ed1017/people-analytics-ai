@@ -9,6 +9,7 @@ import {decisionStore,recordDecisionEvidence,useDecisionStorage} from "@/compone
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUp, RefreshCw, Info } from "lucide-react";
 import {useHomeComposerDock} from '@/components/use-home-composer-dock';
+import {HomeSolutionBundles} from '@/components/home-solution-bundles';
 import {HomeActionOptions} from '@/components/home-action-options';
 import {homeCandidateVerification} from '@/lib/home-candidate-verification';
 import {HomeCandidateOptions} from '@/components/home-candidate-options';
@@ -179,7 +180,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     focusQuestion();
   }
 
-  async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false) {
+  async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false) {
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
     if(!active||sending.current||currentEvidenceKey.current!==contextKey)return;
@@ -200,7 +201,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     const key = contextKey;
     const history = getProblemChatHistory(modelHistoryRef.current, key);
     recordDecisionEvidence(conversation.activeGoalId,"home",pack);
-    const goalContext=actionPlan?conversation.goalContext:conversation.recordGoalStatement(message,"home",workforceScope);
+    const goalContext=actionPlan||retainGoalContext?conversation.goalContext:conversation.recordGoalStatement(message,"home",workforceScope);
     setMessages(current => [...current, { role: "user", content: actionPlan ? HOME_ACTION_PLAN_LABEL : message }]);
     if(!preserveDraft)setInput(""); setChatLoading(true); setChatError(null);
     if (!actionPlan) setQuestionUnanswered(true);
@@ -281,7 +282,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   );
   return <div className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-3">
       <header className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex min-w-0 flex-wrap items-baseline gap-x-4 gap-y-1"><h2 id="overall-overview-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl xl:text-2xl 2xl:text-3xl">From Insight to Action</h2><p className="w-full text-sm text-muted-foreground sm:w-auto">by Ed Om <span aria-hidden="true">·</span> <a className="text-primary underline" href="mailto:edwinom.nyc@gmail.com">edwinom.nyc@gmail.com</a></p></div>
+        <h2 id="overall-overview-heading" className="sr-only">Home overview</h2>
         <div className="ml-auto flex items-center gap-3 text-xs">
           <span className="text-muted-foreground">In development</span>
           <button type="button" popoverTarget="home-data-details" aria-label="Open data details" title="Data, scope and conversation history" className="flex min-h-11 items-center gap-1 rounded px-2 text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"><Info size={16}/><span>Data details</span></button>
@@ -312,7 +313,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       {active&&<WorkforceSolutionPanel hideEntry optionActions={optionActions} page="home" onNavigate={onNavigate}/>}
     </div>
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
-    <HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/>
+    <HomeSolutionBundles goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={request=>{if(request.isCurrent())void send(`Help me discuss changes to Action Plan option ${request.option}, “${request.name}”. Ask what I want to adjust; do not change saved assumptions or calculate automatically.`,false,false,true,true);}}/>
+    {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!hasAnswer&&!conversation.focusedIssue&&startingGuide}
     {loading && <p role="status" className="text-sm text-muted-foreground">Loading available evidence for your questions.</p>}
 
@@ -361,8 +363,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       <details><summary className="min-h-11 cursor-pointer py-2 font-semibold">How this works</summary><h3 className="text-lg font-semibold">From question to plan</h3>
       <ol className="mt-4 list-decimal space-y-4 pl-4">
         <li><strong>Start with a question</strong><p>Ask AI to find an issue, or explore <button className="text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce</button> to investigate your own.</p></li>
-        <li><strong>Pin the problem</strong><p>Review the concise problem and choose Pin as goal to see candidate actions. Pin makes one AI request for proposed pilots. Costs, timing, staffing and effects remain unknown until separately reviewed and calculated.</p></li>
-        <li><strong>Compare options</strong><p>Switch between proposed actions and open Evidence and limitations. To explore numbers, choose Tailor assumptions and confirm the supported scope. Calculate proposal runs local math; Save proposal saves the draft separately from confirmed plans. Review assumptions with HR, business leaders and Finance before agreeing on action.</p></li>
+        <li><strong>Pin the problem</strong><p>Review the concise problem and choose Pin as goal to prepare coordinated solution bundles in one AI request. Costs, staffing and timing remain Unknown until assumptions are reviewed and calculated.</p></li>
+        <li><strong>Compare options</strong><p>Compare coordinated options, then open Details or Edit assumptions and plan. Calculate combined plan runs local math; Save bundle draft preserves edits. Attach solution to goal saves an explicitly reviewed version, without operational approval. Review assumptions with HR, business leaders and Finance before agreeing on action.</p></li>
         <li><strong>Assess &amp; Evaluate <span className="font-normal text-muted-foreground">· Coming soon</span></strong><p>Track progress and assess whether the plan worked.</p></li>
       </ol>
       <p className="mt-4 text-xs text-muted-foreground">Demo only. Real-world actions happen outside this app.</p>

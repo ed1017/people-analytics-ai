@@ -1,0 +1,19 @@
+export function bundleProposalFixture(goal){
+ const definitions=[['A','Develop internally with targeted hiring','Prioritize internal capability with targeted hiring'],['B','Hiring-led coordinated delivery','Prioritize earlier deployment where hiring assumptions support it'],['C','Stage the workforce transition','Prioritize phased spending and workload continuity']];
+ return {version:1,goal,bundles:definitions.map(([id,name,objective])=>({id,name,objective,coordination:'Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.',components:[
+  {id:'c1',name:'Manager and workload review',domain:'manager_workload',firstStep:'Review workload and manager support with the business owner before choosing the staffing response.',ownerRole:'Business owner',dependsOn:[]},
+  {id:'c2',name:'Learning and readiness',domain:'learning',firstStep:'Define a learning pilot and a separate readiness review for the internal transition.',ownerRole:'Learning lead',dependsOn:['c1']},
+  {id:'c3',name:'Internal transition',domain:'mobility',firstStep:'Review the proposed internal transition and source-team coverage with HR after readiness is assessed.',ownerRole:'HR partner',dependsOn:['c2']},
+  {id:'c4',name:'Compensation review',domain:'compensation',firstStep:'Review any relevant compensation change and record its cost once in the shared budget.',ownerRole:'Compensation partner',dependsOn:['c1']},
+  {id:'c5',name:'Targeted hiring',domain:'hiring',firstStep:'Review targeted hiring alongside the internal response and its explicit arrival assumptions.',ownerRole:'Recruiting lead',dependsOn:['c1']},
+  {id:'c6',name:'Finance and execution checkpoints',domain:'execution',firstStep:'Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.',ownerRole:'Finance partner',dependsOn:['c3','c4','c5']},
+ ].map(component=>({...component,...(id==='B'&&component.id==='c2'?{name:'Hiring onboarding and readiness',firstStep:'Prepare onboarding and readiness review for the proposed hires after recruiting review.',dependsOn:['c5']}:{}),...(id==='B'&&component.id==='c3'?{name:'Internal continuity review',firstStep:'Review source-team continuity without assuming an internal transfer is required.'}:{}),...(id==='C'&&component.id==='c5'?{firstStep:'Review a later hiring stage after the internal transition assumptions are reviewed.',dependsOn:['c3']}:{}),evidence:['W1:summary'],limitation:'Aggregate context does not establish availability, causes or intervention effectiveness.'})),limitation:'The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.'})),question:null,unavailableReason:null};
+}
+// Encode a valid legacy graph as the current request's exact-count wire slots.
+export function bundleWireFixture(proposal){
+ return {...structuredClone(proposal),bundles:proposal.bundles.map(bundle=>{
+  const order=[],done=new Set();function visit(id){if(done.has(id))return;const component=bundle.components.find(item=>item.id===id);for(const parent of component.dependsOn)visit(parent);done.add(id);order.push(id)}for(const component of bundle.components)visit(component.id);
+  const mapping=Object.fromEntries(order.map((id,index)=>[id,`c${index+1}`]));
+  return {...structuredClone(bundle),components:Object.fromEntries(order.map(id=>{const source=structuredClone(bundle.components.find(item=>item.id===id));delete source.id;source.dependsOn=source.dependsOn.map(parent=>mapping[parent]);return [mapping[id],source]}))};
+ })};
+}

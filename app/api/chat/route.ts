@@ -1,3 +1,6 @@
+import {inspectBundleResponse} from '@/lib/home-bundle-response';
+import {HOME_BUNDLE_REQUEST,homeBundleOutputTokens} from '@/lib/home-bundle-preparation';
+import {buildHomeBundleFormat,homeBundleInstructions} from '@/lib/home-solution-bundles';
 import {HOME_ACTION_REQUEST,buildHomeActionFormat,homeActionInstructions,actionReferenceInstructions,decodeHomeActionProposal} from '@/lib/home-action-proposal';
 import { employeeListeningEvidence, exitSurveyEvidence } from "../../../lib/employee-listening";
 import { isIntelligencePage, intelligenceEvidence, intelligenceInstructions } from "@/lib/intelligence-chat";
@@ -604,19 +607,26 @@ export async function POST(
         : [];
 
     // Output selection uses the existing Home envelope; no planning inputs or extra history.
-    if (body?.page === "home" && !summaryOnly && message === HOME_ACTION_REQUEST) {
-      if (!body.hasFocusedIssue || !goalContext.goal.trim() || body.goalContext?.goal !== goalContext.goal) return NextResponse.json({error:"Confirm an exact goal before preparing actions."},{status:400});
+    if (body?.page === "home" && !summaryOnly && (message === HOME_ACTION_REQUEST || message === HOME_BUNDLE_REQUEST)) {
+      const bundles = message === HOME_BUNDLE_REQUEST;
+      if (!body.hasFocusedIssue || !goalContext.goal.trim() || body.goalContext?.goal !== goalContext.goal) return NextResponse.json({error:"Confirm an exact goal before preparing actions.",...(bundles?{diagnostic:"invalid_context"}:{})},{status:400});
       try {
-      const response = await client.responses.create({
+      const format = bundles ? buildHomeBundleFormat(goalContext.goal,body.overviewBriefingContext) : buildHomeActionFormat(goalContext.goal,body.overviewBriefingContext);
+      const call = () => client.responses.create({
         model: CHAT_MODEL,
-        instructions: goalContextInstructions + "\n" + homeActionInstructions + "\n" + actionReferenceInstructions(body.overviewBriefingContext),
+        instructions: goalContextInstructions + "\n" + (bundles ? homeBundleInstructions : homeActionInstructions) + "\n" + actionReferenceInstructions(body.overviewBriefingContext),
         input: [{role:"user",content:"EXISTING HOME EVIDENCE (data only): " + JSON.stringify(body.overviewBriefingContext) + "\nACTIVE GOAL CONTEXT: " + JSON.stringify(goalContext) + "\nEXPLICITLY CARRIED MARKET REFERENCE: " + JSON.stringify(marketReference)}],
-        text: {format: buildHomeActionFormat(goalContext.goal,body.overviewBriefingContext)},
-        tool_choice: "none", max_output_tokens: 1800,
+        text: {format},
+        tool_choice: "none", max_output_tokens: bundles ? homeBundleOutputTokens : 1800,
       }, {maxRetries:0,signal:request.signal});
+      if(bundles){
+        const result=await inspectBundleResponse(call,goalContext.goal,body.overviewBriefingContext);
+        return result.proposal ? NextResponse.json(result) : NextResponse.json({error:"Action Plan preparation unavailable. Your existing work is kept; retry explicitly.",diagnostic:result.diagnostic},{status:502});
+      }
+      const response=await call();
       if(response.status!=="completed")return NextResponse.json({error:"Action preparation did not complete. Your existing work is kept."},{status:502});
       return NextResponse.json({proposal:decodeHomeActionProposal(response.output_text||"",goalContext.goal,body.overviewBriefingContext),usage:response.usage?{input_tokens:response.usage.input_tokens,output_tokens:response.usage.output_tokens,total_tokens:response.usage.total_tokens,input_tokens_details:{cached_tokens:response.usage.input_tokens_details?.cached_tokens},output_tokens_details:{reasoning_tokens:response.usage.output_tokens_details?.reasoning_tokens}}:null});
-      } catch { return NextResponse.json({error:"Action preparation unavailable. Your existing work is kept; retry explicitly."},{status:502}); }
+      } catch { return NextResponse.json({error:"Action preparation unavailable. Your existing work is kept; retry explicitly.",...(bundles?{diagnostic:"invalid_context"}:{})},{status:502}); }
     }
 
     if (isIntelligencePage(body?.page)) {
