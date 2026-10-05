@@ -2,7 +2,7 @@
 import {successMeasureText,measurementScope} from '@/lib/home-success-measures';
 import {preferredSavedBundleId,restoredBundleDraft,restoredBundleResult} from "@/lib/home-pinned-goals";
 import {prepareIllustrativePilot,pilotAllowances} from '@/lib/home-action-plan-pilot';
-import {useLayoutEffect,useRef,useState} from 'react';
+import {useId,useLayoutEffect,useRef,useState} from 'react';
 import {previewBundleChatEdit,acceptBundleChatEdit,bundleChatEditExamples,type BundleEditExample,type BundleEditPreview} from '@/lib/home-bundle-chat-edit';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
 import {bundleDisplayText,bundleComponentLabels,bundleDisplayName,bundleAssumptionText,bundleHorizonEnd} from '@/lib/home-bundle-display';
@@ -71,7 +71,7 @@ export function HomeBundlePlans({proposal,binding,preparedAt,contextCurrent,disa
     <li><strong>Expected outcome:</strong> Intended contribution to “{binding.goal}”; impact not yet assessed. Retention effects are not established.</li>
     <li><strong>How success is measured:</strong> {successMeasureText(draft.inputs.successMeasure,!draft.inputs.successMeasure||draft.inputs.successMeasure.scopeKey===measurementScope(draft.inputs))}{draft.inputs.successMeasure?.baseline.value!==null&&draft.inputs.successMeasure?.baseline.basis&&<span className="block text-xs">{contextCurrent?'Saved baseline provenance:':'Historical baseline; current context needs review: '}{draft.inputs.successMeasure.baseline.basis}</span>}</li>
    </ul>
-   <PlanAssumptions draft={draft}/>
+   <PlanAssumptions key={key+selected} draft={draft}/>
    {currentResult&&proposal.bundles.filter(bundle=>bundle.id!==selected&&session.results[bundle.id]).map(other=>{const comparison=compareCurrentBundleResults(currentResult,session.results[other.id],draft,session.drafts[other.id]);if(!comparison.comparable)return null;return <p key={other.id} className="text-xs">Compared with {bundleDisplayName(session.drafts[other.id].bundle.name)} under matching reviewed assumptions: {comparison.cashDifference===null?'cash difference unknown':`${money(Math.abs(comparison.cashDifference))} ${comparison.cashDifference<0?'lower':comparison.cashDifference>0?'higher':'difference in'} incremental cash`}; {comparison.capacityMonthsDifference===null?'capacity timing difference unknown':`${Math.abs(comparison.capacityMonthsDifference)} months ${comparison.capacityMonthsDifference<0?'earlier':comparison.capacityMonthsDifference>0?'later':'difference in capacity timing'}`}. Conditional estimates.</p>;})}
    {result&&!currentResult&&<p role="status">The previous calculation is retained as stale. Calculate this reviewed revision to show current totals.</p>}
    <details><summary className="min-h-11 cursor-pointer py-2 font-medium">Why these plans</summary><div className="space-y-3"><p className="text-xs">Plans start with one preparation response and can include reviewed local edits. Calculate checks the selected draft; the separate local staffing search reports its own executed combinations.</p><p className="text-xs">References describe observed context; they do not establish causes, effectiveness or a ranking. Availability and combined retention impact are not established. Proposed roles are not assigned people or operational approvals.</p><ul className="list-disc space-y-2 pl-5">
@@ -101,13 +101,16 @@ export function HomeBundlePlans({proposal,binding,preparedAt,contextCurrent,disa
 }
 
 function PlanAssumptions({draft}:{draft:BundleDraft}){
+ const [expanded,setExpanded]=useState(false),contentId=useId();
  const input=draft.inputs,end=bundleHorizonEnd(input.scope).value,lastFinish=input.timing.map(item=>item.finish.value).filter((date):date is string=>!!date).sort().at(-1);
  return <section aria-label={draft.pilot?'Editable illustrative starting assumptions':'Plan assumptions'} className="space-y-2 text-xs">
-  <h4 className="font-semibold">Assumptions</h4>
+  <h4><button type="button" aria-expanded={expanded} aria-controls={contentId} onClick={()=>setExpanded(value=>!value)} className="min-h-11 rounded px-2 py-2 text-left font-semibold underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">{expanded?'Hide assumptions':'Show assumptions'}</button></h4>
+  <div id={contentId} hidden={!expanded} className="space-y-2">
   <p><span>{draft.pilot?'Illustrative pilot assumptions · editable, not observed facts or market estimates.':'Editable planning assumptions; not observed outcomes.'}</span> Review before calculating or applying.</p>
   <p>Population: {bundleAssumptionText(input.scope.population)}.</p>
   {input.expenses.length>0&&<ul className="list-disc space-y-1 pl-5" aria-label="Individual cost assumptions">{input.expenses.map(expense=><li key={expense.id}>{pilotAllowances[expense.id.slice(6) as keyof typeof pilotAllowances]?.label??expense.label}: {bundleAssumptionText(expense.amount,money)} · {bundleAssumptionText(expense.months,value=>value>1?`Monthly × ${value}`:'One-time')}. {expense.kind==='employee_time'?'Employee time, separate from cash.':'Cash allowance.'}</li>)}</ul>}
   <p>Individual allowances are not a complete budget. Participants are hypothetical or reviewed assumptions, not selected employees. Evidence, exclusions and provenance are in Why these plans.</p>
   {lastFinish&&end&&lastFinish>end&&<p role="alert">Proposed component dates extend beyond the shared horizon. Review the actual dates before calculating.</p>}
+  </div>
  </section>;
 }
