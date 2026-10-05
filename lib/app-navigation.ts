@@ -25,7 +25,7 @@ export const appWorkspaceJourneys: Array<{key: AppWorkspaceKey; journeyLabel: st
   {key:"evaluate",journeyLabel:"Assess & Evaluate",subtitle:"Coming soon",defaultPage:"assess-evaluate"},
 ];
 export const appNavigationSections: AppNavigationSection[] = [
-  {key:"analytics", title:"Workforce", pages:["workforce","attrition","compensation","talent-acquisition","survey-sentiment","skills","learning-development","career-growth-mobility","succession-planning"]},
+  {key:"analytics", title:"Workforce", pages:["workforce","attrition","talent-acquisition","compensation","survey-sentiment","skills","learning-development","career-growth-mobility","succession-planning"]},
   {key:"talent", title:"Intelligence", pages:["occupational-references","labor-market","training-coaching"]},
   {key:"strategy", title:"Planning", pages:["planning-overview","scenario-modeling","position-workforce-design","workforce-response","execution-feasibility","finance","development-planning","decision-brief"]},
   {key:"evaluate",title:"Assess & Evaluate",pages:["assess-evaluate"]},

@@ -428,7 +428,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" aria-describedby="overview-question-context-tip" value={input} onChange={event => changeQuestion(event.target.value)} rows={3}
         placeholder="Describe a goal, compare options, build or adjust a plan, or ask a general workforce question." className="max-h-80 min-h-28 w-full resize-y rounded-lg border bg-background/40 p-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
       <div className="mt-2 flex items-end justify-between gap-3">
-        <p hidden={showCandidatePin} id="overview-question-context-tip" className="min-w-0 text-xs leading-4 text-muted-foreground">Best practice: Add context like your timeline, budget, stakeholders and relevant sources to help shape a more precise goal.</p>
+        <p hidden={showCandidatePin} id="overview-question-context-tip" className="min-w-0 text-xs leading-4 text-muted-foreground">Best practice: Include your desired outcome, timeline, budget, stakeholders and relevant sources to help shape a more precise goal.</p>
         <button type="submit" aria-label="Send overview question" disabled={(!localCandidate&&!ready) || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
       </div></div>
     </form>
