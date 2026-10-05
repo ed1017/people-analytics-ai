@@ -98,8 +98,10 @@ export function ChatContent({
   content,
   onNavigate,
   compact = false,
+  bulletAction,
 }: {
   content: string;
+  bulletAction?: (text:string)=>ReactNode;
   compact?: boolean;
   onNavigate?: (page: AppPage) => void;
 }) {
@@ -262,6 +264,7 @@ export function ChatContent({
             {renderInlineMarkdown(
               bulletMatch[1], onNavigate
             )}
+            {bulletAction?.(bulletMatch[1])}
           </span>
         </div>
       );

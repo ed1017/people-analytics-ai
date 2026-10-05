@@ -1,17 +1,18 @@
 "use client";
-import {useState} from "react";
+import {useState,type ReactNode} from "react";
+type BulletAction=(message:ChatMessage,text:string)=>ReactNode;
 import {ChatContent} from "@/components/chat-content";
 import type {AppPage,ChatMessage} from "@/lib/types";
-export function GoalConversationMessages({messages,viewKey,hasGoal,onNavigate,home=false,hideHistory=false,latestOnly=false}:{messages:ChatMessage[];viewKey:string;hasGoal:boolean;onNavigate?:(page:AppPage)=>void;home?:boolean;hideHistory?:boolean;latestOnly?:boolean}) {
+export function GoalConversationMessages({messages,viewKey,hasGoal,onNavigate,home=false,hideHistory=false,latestOnly=false,renderBulletAction}:{renderBulletAction?:BulletAction;messages:ChatMessage[];viewKey:string;hasGoal:boolean;onNavigate?:(page:AppPage)=>void;home?:boolean;hideHistory?:boolean;latestOnly?:boolean}) {
  const [boundary,setBoundary]=useState({key:viewKey,last:messages.at(-1)});
  if(boundary.key!==viewKey)setBoundary({key:viewKey,last:messages.at(-1)});
  const last=boundary.key===viewKey?boundary.last:messages.at(-1);
  const end=(hasGoal||hideHistory)&&last?messages.indexOf(last)+1:0;
  const history=messages.slice(0,end),current=messages.slice(end);
- const render=(items:ChatMessage[])=><ConversationMessages messages={items} onNavigate={onNavigate} home={home}/>;
+ const render=(items:ChatMessage[])=><ConversationMessages messages={items} onNavigate={onNavigate} home={home} renderBulletAction={renderBulletAction}/>;
  return <>{!hideHistory&&history.length>0&&<details aria-label="Conversation history" className="mb-4 text-sm"><summary className="cursor-pointer font-semibold text-primary">Conversation history</summary><p className="my-2 text-xs text-muted-foreground">Reference only. Current findings use current page evidence and your saved goal context.</p>{render(history)}</details>}{render(latestOnly?current.slice(-1):current)}</>;
 }
 
-export function ConversationMessages({messages,onNavigate,home=false,compactAssistant=home}:{messages:ChatMessage[];onNavigate?:(page:AppPage)=>void;home?:boolean;compactAssistant?:boolean}) {
- return messages.map((message,index)=><div key={index} data-chat-role={message.role} className={message.role==="assistant"?(compactAssistant?"py-2 text-sm leading-relaxed":"py-2 text-base leading-relaxed"):home?"py-2 text-lg":"py-2 text-[17px] leading-relaxed"}><p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{message.role==="user"?"You":"Workforce AI"}</p><ChatContent compact={compactAssistant&&message.role==="assistant"} content={message.content} onNavigate={message.role==="assistant"?onNavigate:undefined}/></div>);
+export function ConversationMessages({messages,onNavigate,home=false,compactAssistant=home,renderBulletAction}:{renderBulletAction?:BulletAction;messages:ChatMessage[];onNavigate?:(page:AppPage)=>void;home?:boolean;compactAssistant?:boolean}) {
+ return messages.map((message,index)=><div key={index} data-chat-role={message.role} className={message.role==="assistant"?(compactAssistant?"py-2 text-sm leading-relaxed":"py-2 text-base leading-relaxed"):home?"py-2 text-lg":"py-2 text-[17px] leading-relaxed"}><p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{message.role==="user"?"You":"Workforce AI"}</p><ChatContent compact={compactAssistant&&message.role==="assistant"} content={message.content} bulletAction={home&&message.role==="assistant"&&renderBulletAction?text=>renderBulletAction(message,text):undefined} onNavigate={message.role==="assistant"?onNavigate:undefined}/></div>);
 }
