@@ -29,3 +29,10 @@ test('Home detail mode follows current request, not an older full-plan question 
 });
 
 test('distinct Home issues get explicit headings without changing alternative option semantics',()=>{for(const message of ['What issues should we investigate?','Develop a full action plan']){const text=homeResponseStyle(message).instructions;assert.match(text,/Issue A/);assert.match(text,/Issue B/);assert.match(text,/Preserve the individual bullet details/);assert.match(text,/Do not invent, split or infer extra issues/);assert.match(text,/same issue remain Option 1, Option 2/);}});
+
+test('a valid clarification survives invalid quantified problem without validating or pinning it',()=>{
+ const pack={sources:[{id:'W1',status:'loaded',facts:{headcount:100}}]},question='Does the target mean fewer exits or a lower turnover rate?';
+ const reply=decodeHomeModelReply(JSON.stringify({answer:'Three proposed packages remain unproven.',next_step:'none',problem:'Reduce turnover by 20% in 12 months',problem_evidence:['W1.headcount'],options:[{operation:'review_capacity',evidence:['W1.headcount']}],question}),false,pack);
+ assert.equal(reply.candidateProposal,null);assert.equal(reply.candidateDiagnostic.reason,'invalid_problem');assert.equal(reply.clarification,question);assert.equal(reply.nextStep,'none');
+ for(const question of ['','x'.repeat(201),'Which? What?',42])assert.equal(decodeHomeModelReply(JSON.stringify({answer:'Answer',next_step:'none',question}),false,pack).clarification,null);
+});

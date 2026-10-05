@@ -1,9 +1,11 @@
 "use client";
+import {assumptionsFallbackField,readAssumptionsFallback} from '@/lib/home-assumptions-fallback';
+import {HomeAssumptionsFallback} from '@/components/home-assumptions-fallback';
 import {readBundleWorkspace,bundleWorkspaceField} from "@/lib/home-bundle-records";
 import {revealJourneyTarget} from "@/components/workforce-journey-continue";
 import {useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
-import {HomeBundlePlans,type BundleSession,type BundleDiscussion} from '@/components/home-bundle-plans';
+import {HomeBundlePlans,type BundleSession,type BundleDiscussion,type PlanChatChange} from '@/components/home-bundle-plans';
 import {actionBinding,actionBindingKey,validActionBinding,type ActionBinding} from '@/lib/home-action-drafts';
 import {linkedAttachmentField,resolveAttachedSourceBinding,type PlanningDestination,type ProjectPlanningBinding} from '@/lib/home-linked-attachment';
 import {HOME_BUNDLE_REQUEST,bundlePreparationField,readBundlePreparation,createHomeBundlePreparation} from '@/lib/home-bundle-preparation';
@@ -11,7 +13,7 @@ import {normalizeHomePack} from '@/lib/home-pack.mjs';
 import type {Persona} from '@/lib/types';
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring';
 const localInputs=(id:string)=>{const fields=decisionStore.getSnapshot().data.workspaces[id]?.fields;return {capacity:fields?.workforceSolution??null,retention:fields?.retentionWhatIfV1??null}};
-export function HomeSolutionBundles({openRequest,goalId,goal,pack,projectEvidence,active,ready,busy,pin,persona,goalContext,marketReference,hasPlanningWork,onResume,onDiscuss}:{projectEvidence?:(destination:PlanningDestination)=>unknown;openRequest?:{goalId:string;goal:string;sequence:number}|null;goalId:string;goal:string;pack:unknown;active:boolean;ready:boolean;busy:boolean;pin:{id:string;sequence:number}|null;persona:Persona;goalContext:unknown;marketReference:unknown;hasPlanningWork:boolean;onResume:()=>void;onDiscuss:(request:BundleDiscussion)=>void}){
+export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,pack,projectEvidence,active,ready,busy,pin,persona,goalContext,marketReference,hasPlanningWork,onResume,onDiscuss}:{chatChange?:PlanChatChange|null;settled:boolean;projectEvidence?:(destination:PlanningDestination)=>unknown;openRequest?:{goalId:string;goal:string;sequence:number}|null;goalId:string;goal:string;pack:unknown;active:boolean;ready:boolean;busy:boolean;pin:{id:string;sequence:number}|null;persona:Persona;goalContext:unknown;marketReference:unknown;hasPlanningWork:boolean;onResume:()=>void;onDiscuss:(request:BundleDiscussion)=>void}){
  const storage=useDecisionStorage(),coordinator=useRef(createHomeBundlePreparation()),consumed=useRef(0),pinContext=useRef<{sequence:number;identity:string}|null>(null),heading=useRef<HTMLHeadingElement>(null);
  const openedRequest=useRef(0);
  useLayoutEffect(()=>{
@@ -25,7 +27,7 @@ export function HomeSolutionBundles({openRequest,goalId,goal,pack,projectEvidenc
  const plans=localInputs(goalId),planningKey=JSON.stringify(plans);
  const linkState=()=>{const current=decisionStore.getSnapshot().data.workspaces[goalId]?.fields;return JSON.stringify([current?.development??null,current?.[linkedAttachmentField]??null]);},linkKey=linkState();
  const project:ProjectPlanningBinding=destination=>actionBinding(goalId,goal,projectEvidence?projectEvidence(destination):pack,{plans:{capacity:destination.workforceSolution,retention:plans.retention},request:{persona,goalContext,marketReference}});
- const packet=normalizeHomePack(pack),identity=JSON.stringify([goalId,goal,packet,plans,persona,goalContext,marketReference,active,ready,linkKey,raw&&typeof raw==='object'&&'preparedAt' in raw?raw.preparedAt:null]);
+ const packet=normalizeHomePack(pack),identity=JSON.stringify([goalId,goal,packet,plans,persona,goalContext,marketReference,active,ready,settled,linkKey,raw&&typeof raw==='object'&&'preparedAt' in raw?raw.preparedAt:null]);
  const live=useRef(identity);const [bound,setBound]=useState<{identity:string;binding:ActionBinding;sourceRejected:boolean}|null>(null),[pending,setPending]=useState(false),[notice,setNotice]=useState('');
  // Immediately invalidate on store transitions, including a goal switch away and back.
  useEffect(()=>{let prior=JSON.stringify([decisionStore.getSnapshot().data.goals,localInputs(goalId)]);return decisionStore.subscribe(()=>{const next=JSON.stringify([decisionStore.getSnapshot().data.goals,localInputs(goalId)]);if(next!==prior){prior=next;coordinator.current.invalidate();}})},[goalId]);
@@ -33,7 +35,7 @@ export function HomeSolutionBundles({openRequest,goalId,goal,pack,projectEvidenc
   live.current=identity;const worker=coordinator.current;worker.invalidate();let cancelled=false;
   // eslint-disable-next-line react-hooks/set-state-in-effect -- New evidence invalidates an in-flight preparation and scope review.
   setPending(false);setNotice('');
-  if(goalId&&goal&&active&&ready)void actionBinding(goalId,goal,packet,{plans,request:{persona,goalContext,marketReference}}).then(async physical=>{
+  if(goalId&&goal&&active&&settled)void actionBinding(goalId,goal,packet,{plans,request:{persona,goalContext,marketReference}}).then(async physical=>{
    const original=raw&&typeof raw==='object'&&'binding' in raw&&validActionBinding(raw.binding)?raw.binding:null;
    const resolved=original&&projectEvidence?await resolveAttachedSourceBinding(original,physical,fields,project,raw&&typeof raw==='object'&&'preparedAt' in raw&&typeof raw.preparedAt==='string'?raw.preparedAt:undefined):null;
    if(!cancelled)setBound({identity,binding:resolved??physical,sourceRejected:Boolean(original&&projectEvidence&&!resolved)});
@@ -46,8 +48,8 @@ export function HomeSolutionBundles({openRequest,goalId,goal,pack,projectEvidenc
  // Preserve a previous valid proposal for reference only; never treat its snapshot as current.
  const old=raw&&typeof raw==='object'&&'binding' in raw&&raw.binding&&typeof raw.binding==='object'&&'goalId' in raw.binding&&raw.binding.goalId===goalId?readBundlePreparation(raw,raw.binding as ActionBinding,packet):null;
  const draft=current??old,stale=!!draft&&!current;
- const retained=!draft?readBundleWorkspace(storage.data.workspaces[goalId]?.fields[bundleWorkspaceField],goalId):null;
- const currentCheck=(key:string)=>JSON.stringify(localInputs(goalId))===planningKey&&linkState()===linkKey&&live.current===key&&active&&ready&&decisionStore.getSnapshot().saved&&decisionStore.getSnapshot().data.goals.activeId===goalId&&decisionStore.getSnapshot().data.goals.goals.find(item=>item.id===goalId)?.statement===goal;
+ const retained=!draft&&!readAssumptionsFallback(fields[assumptionsFallbackField],goalId)?readBundleWorkspace(storage.data.workspaces[goalId]?.fields[bundleWorkspaceField],goalId):null;
+ const currentCheck=(key:string,local=false)=>JSON.stringify(localInputs(goalId))===planningKey&&linkState()===linkKey&&live.current===key&&active&&(ready||local&&settled)&&decisionStore.getSnapshot().saved&&decisionStore.getSnapshot().data.goals.activeId===goalId&&decisionStore.getSnapshot().data.goals.goals.find(item=>item.id===goalId)?.statement===goal;
  async function prepare(mode:'new-pin'|'explicit'){
   if(!binding||busy||!storage.saved||!currentCheck(identity))return;
   setPending(true);setNotice('');
@@ -59,7 +61,7 @@ export function HomeSolutionBundles({openRequest,goalId,goal,pack,projectEvidenc
   if(live.current!==identity)return;
   setPending(false);
   if(outcome.status==='ready'||outcome.status==='cached'){requestAnimationFrame(()=>{heading.current?.focus({preventScroll:true});heading.current?.scrollIntoView({block:'start'});});}
-  else setNotice(outcome.status==='failed'?`Action Plan preparation failed. Stage: ${outcome.diagnostic??'client_response'}. Your goal, previous draft and results are kept. No retry runs automatically.`:'The context changed. Your saved work is kept; prepare again explicitly.');
+  else setNotice(outcome.status==='failed'?`Action Plan preparation failed. ${outcome.diagnostic==='delivery_required'?'A proposed plan contained only diagnostic activities; this goal requires a concrete proposed intervention. ':''}Stage: ${outcome.diagnostic??'client_response'}. Your goal, previous draft and results are kept. No retry runs automatically.`:'The context changed. Your saved work is kept; prepare again explicitly.');
  }
  useEffect(()=>{
   if(pin?.id!==goalId||pin.sequence===consumed.current)return;
@@ -77,6 +79,7 @@ export function HomeSolutionBundles({openRequest,goalId,goal,pack,projectEvidenc
   {pending&&<p role="status">Preparing coordinated Action Plans in one response…</p>}
   {!ready&&<p role="status">Checking current evidence. Saved work is kept.</p>}
   {notice&&<p role="alert">{notice}</p>}
+  {current&&current.proposal.bundles.length===0&&<p role="status">{current.proposal.unavailableReason??'No coordinated Action Plans were prepared.'} {current.proposal.question} Your goal and constraints are kept. No plan was calculated or attached.</p>}
   {stale&&<p role="status">Previous Action Plan proposal — goal, evidence or planning inputs changed. Preserved for reference; prepare the current context explicitly.</p>}
   {!draft&&raw&&<p role="status">The saved bundle preparation cannot be verified with current evidence. Its record is kept.</p>}
   {!draft&&retained&&(retained.drafts.length>0||retained.attachments.length>0)&&<section aria-label="Saved Action Plan records" className="space-y-2 rounded border p-3">
@@ -85,9 +88,10 @@ export function HomeSolutionBundles({openRequest,goalId,goal,pack,projectEvidenc
    {retained.attachments.map(item=><p key={item.id}>{item.draft.bundle.name} · attached revision {item.draft.revision} · {retained.attachments.some(next=>next.supersedes===item.id)?'Previous attached version':'Attached snapshot'}. Snapshot cash: {item.result.cashTotal===null?'Unknown':`$${item.result.cashTotal.toLocaleString()} USD`}. Not a current calculation or operational approval.</p>)}
   </section>}
   {(!current||current.proposal.bundles.length===0)&&<button className={button} disabled={disabled} onClick={()=>void prepare('explicit')}>{!raw||current?.proposal.bundles.length===0?'Create Action Plan':'Prepare Action Plans'}</button>}
-  {draft&&<>
-   <HomeBundlePlans measurePack={packet} key={JSON.stringify([actionBindingKey(draft.binding),draft.preparedAt])} proposal={draft.proposal} preparedAt={draft.preparedAt} binding={draft.binding} contextCurrent={!stale} disabled={disabled||stale} isCurrent={()=>!!current&&currentCheck(identity)} cache={bundleCache} onDiscuss={onDiscuss} projectBinding={projectEvidence?project:undefined}/>
-   <details><summary className="min-h-11 cursor-pointer py-2">Preparation details</summary>{draft.proposal.question&&<p>{draft.proposal.question}</p>}{draft.proposal.unavailableReason&&<p>{draft.proposal.unavailableReason}</p>}<p>One preparation response. Input tokens: {draft.usage.inputTokens??'Unavailable'}. Output tokens: {draft.usage.outputTokens??'Unavailable'}. Latency: {draft.usage.latencyMs===null?'Unavailable':`${draft.usage.latencyMs} ms`}. Reopening, editing and calculating do not call the model.</p></details>
+  {!draft?.proposal.bundles.length&&<HomeAssumptionsFallback chatChange={chatChange} goalId={goalId} goal={goal} binding={binding} pack={packet} planningContext={goalContext} disabled={busy||pending||!storage.saved||!active||!settled} isCurrent={()=>currentCheck(identity,true)} onDiscuss={onDiscuss}/>}
+  {!!draft?.proposal.bundles.length&&draft&&<>
+   <HomeBundlePlans chatChange={chatChange} planningContext={goalContext} measurePack={packet} key={JSON.stringify([actionBindingKey(draft.binding),draft.preparedAt])} proposal={draft.proposal} preparedAt={draft.preparedAt} binding={draft.binding} contextCurrent={!stale} disabled={disabled||stale} isCurrent={()=>!!current&&currentCheck(identity)} cache={bundleCache} onDiscuss={onDiscuss} projectBinding={projectEvidence?project:undefined}/>
+
   </>}
   {hasPlanningWork&&<details><summary className="min-h-11 cursor-pointer py-2">Existing workforce planning work</summary><p>Review saved workforce inputs and calculated options. Changed inputs require an explicit new calculation.</p><button className={button} disabled={busy||pending} onClick={onResume}>Review existing numbers</button></details>}
  </section>;

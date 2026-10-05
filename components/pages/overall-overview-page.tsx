@@ -1,4 +1,6 @@
 "use client";
+import {assumptionsGoalFromStatements,assumptionsOnlyBundle,unavailableSourceLabels} from '@/lib/home-assumptions-fallback';
+import {homeGoalForPin,homePlanningNoteParts,homeUserGoalForPin} from '@/lib/home-planning-intent';
 import {explicitHomeGoal} from "@/lib/home-explicit-goal";
 import {HomePinnedGoals} from "@/components/home-pinned-goals";
 import type {LocalGoal} from "@/lib/local-goals";
@@ -18,12 +20,10 @@ import {HomeSolutionBundles} from '@/components/home-solution-bundles';
 import type {BundleDiscussion} from '@/components/home-bundle-plans';
 import type {BundleEditPreview} from '@/lib/home-bundle-chat-edit';
 import {HomeBundleChatReview} from '@/components/home-bundle-chat-review';
-import {bundlePreparationField,readBundlePreparation} from '@/lib/home-bundle-preparation';
-import type {ActionBinding} from '@/lib/home-action-drafts';
 import {HomeActionOptions} from '@/components/home-action-options';
 import {homeCandidateVerification} from '@/lib/home-candidate-verification';
 import {HomeCandidateOptions} from '@/components/home-candidate-options';
-import {inspectHomeCandidateProposal,readHomePreparationDiagnostic,type HomePreparationDiagnostic,readHomeCandidateRecord,candidateSourceKey,candidateSelectionGoal,type HomeCandidateProposal} from '@/lib/home-candidate-options';
+import {readHomeClarification,inspectHomeCandidateProposal,readHomePreparationDiagnostic,type HomePreparationDiagnostic,readHomeCandidateRecord,candidateSourceKey,candidateSelectionGoal,type HomeCandidateProposal} from '@/lib/home-candidate-options';
 import {readWorkforceSolution,currentSolutionVersion,solutionResultIsCurrent} from '@/lib/workforce-solution';
 import {readSavedWorkforceReview} from '@/lib/workforce-solution-review';
 import { GoalConversationMessages, ConversationMessages } from "@/components/goal-conversation-messages";
@@ -31,7 +31,7 @@ import { buildHomePack, homeDefinitions, readHomeSource } from "@/lib/home-pack.
 import type { DevelopmentSession } from "@/components/development-workspace";
 import { PromptExamples } from "@/components/prompt-examples";
 import { contextualPrompts } from "@/lib/contextual-prompts";
-import { buildHomeActionPlanRequest, DEVELOPMENT_DEMO_GOAL, HOME_ACTION_PLAN_LABEL } from "@/lib/home-decision-journey";
+import { HOME_ACTION_PLAN_LABEL, buildHomeActionPlanRequest, DEVELOPMENT_DEMO_GOAL } from "@/lib/home-decision-journey";
 import { completeScopedChatTurn } from "@/lib/chat-context-history";
 import { requestedHomeCountries, type CountryOption } from "@/lib/home-country-scope";
 import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
@@ -50,7 +50,7 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
   const serverDiagnostic=readHomePreparationDiagnostic(data.candidateDiagnostic);
   const useServer=!data.candidateProposal&&serverDiagnostic&&serverDiagnostic.reason!=='ready';
   const diagnostic=useServer?serverDiagnostic:data.candidateProposal?inspected.diagnostic:{reason:'diagnostic_unavailable' as const,field:'none' as const,optionCount:0,missingFieldCount:0};
-  return { findingFollowups:readHomeFindingFollowups(data.findingFollowups,data.answer,sources), answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal, diagnostic, diagnosticStage:useServer?'server' as const:'client' as const };
+  return { clarification:readHomeClarification(data.clarification??proposal?.question), findingFollowups:readHomeFindingFollowups(data.findingFollowups,data.answer,sources), answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal, diagnostic, diagnosticStage:useServer?'server' as const:'client' as const };
 }
 
 const noActionSubscription=()=>()=>{};
@@ -89,16 +89,15 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const [settledEvidenceKey,setSettledEvidenceKey]=useState("");
   const [evidenceRevision, setEvidenceRevision] = useState(0);
   const pack = buildHomePack(sourceResults, workforceScope, conversation.focusedIssue || conversation.problem?.latestQuestion || "", developmentSession);
-  const storedPreparation=storage.data.workspaces[conversation.activeGoalId]?.fields[bundlePreparationField];
-  const preparedPlan=storedPreparation&&typeof storedPreparation==='object'&&'binding' in storedPreparation?readBundlePreparation(storedPreparation,storedPreparation.binding as ActionBinding,pack):null;
-  const hasPreparedPlan=preparedPlan?.binding.goalId===conversation.activeGoalId&&preparedPlan.binding.goal===conversation.focusedIssue&&preparedPlan.proposal.bundles.length>0;
+  const selectedPlanForChat=useRef<BundleDiscussion|null>(null);
   const [planEdit,setPlanEdit]=useState<BundleDiscussion|null>(null),[editPreview,setEditPreview]=useState<BundleEditPreview|null>(null),[editNotice,setEditNotice]=useState('');
   const editReview=useRef<HTMLDivElement>(null);
   const sources = pack.sources;
-  const [candidate,setCandidate]=useState<{proposal:HomeCandidateProposal;selectionGoal:string;sourceKey:string;context:string;epoch:number;originGoalId:string;rationale:ChatMessage;userGoal:string|null}|null>(null);
+  const [candidate,setCandidate]=useState<{proposal:HomeCandidateProposal|null;selectionGoal:string;sourceKey:string;context:string;epoch:number;originGoalId:string;rationale:ChatMessage;userGoal:string|null;userStatements:string[]}|null>(null);
   const [candidateNotice,setCandidateNotice]=useState('');
   const [actionPin,setActionPin]=useState<{id:string;sequence:number}|null>(null);
   const [planOpen,setPlanOpen]=useState<{goalId:string;goal:string;sequence:number}|null>(null);
+  const [clarification,setClarification]=useState<{context:string;question:string;statements:string[]}|null>(null);
   const [preparationUnavailable,setPreparationUnavailable]=useState<{context:string;diagnostic:HomePreparationDiagnostic;stage:'server'|'client'}|null>(null);
   const storedCandidate=storage.data.workspaces[conversation.activeGoalId]?.fields.homeCandidateOptions;
   const selectionGoal=candidateSelectionGoal(storedCandidate)??conversation.focusedIssue;
@@ -137,7 +136,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   useHomeComposerDock(active,composerSlot,composerDock,composer);
   useLayoutEffect(()=>{
     const node=composer.current;if(!node||!active)return;
-    const resize=()=>{node.style.height='auto';node.style.height=`${Math.min(320,Math.max(48,node.scrollHeight+2))}px`;};
+    const resize=()=>{node.style.height='auto';node.style.height=`${Math.min(320,Math.max(112,node.scrollHeight+2))}px`;};
     resize();let width=node.clientWidth;
     const observer=new ResizeObserver(()=>{if(node.clientWidth!==width){width=node.clientWidth;resize();}});
     observer.observe(node);return()=>observer.disconnect();
@@ -188,9 +187,10 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   }, [contextKey]);
   // eslint-disable-next-line react-hooks/set-state-in-effect -- Cancel the queued user action on explicit page exit; preserve its draft.
   useLayoutEffect(()=>{liveActive.current=active;if(!active){liveFindingTurn.current=null;queuedSuggestion.current=null;setSuggestionPending(false);sending.current=null;cancelPending.current();}return()=>{liveActive.current=false;queuedSuggestion.current=null;}},[active]);
-  useEffect(()=>{const identity=()=>{const goals=decisionStore.getSnapshot().data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement])};let prior=identity();return decisionStore.subscribe(()=>{const next=identity();if(next!==prior){prior=next;promptEpoch.current++;liveFindingTurn.current=null;setCandidate(null);setPreparationUnavailable(null);queuedSuggestion.current=null;setSuggestionPending(false);}})},[]);
+  useEffect(()=>{const identity=()=>{const goals=decisionStore.getSnapshot().data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement])};let prior=identity();return decisionStore.subscribe(()=>{const next=identity();if(next!==prior){prior=next;promptEpoch.current++;liveFindingTurn.current=null;setCandidate(null);setClarification(null);setPreparationUnavailable(null);queuedSuggestion.current=null;setSuggestionPending(false);}})},[]);
   const planRequest = questionUnanswered ? null : buildHomeActionPlanRequest(conversation.focusedIssue ? {key:contextKey,firstQuestion:conversation.focusedIssue,latestQuestion:journey?.latestQuestion ?? conversation.focusedIssue} : journey, contextKey);
 
+  function applyPlanChanges(){try{if(!active||chatLoading||!ready||!conversation.saved||!planEdit||!editPreview||input.trim()!==editPreview.request||!planEdit.isCurrent())throw Error('The request or current context changed. Review it again.');planEdit.accept(editPreview);setInput('');setPlanEdit(null);setEditPreview(null);setEditNotice('');}catch(error){setEditNotice((error as Error).message);}}
   function focusQuestion() {
     window.requestAnimationFrame(() => { composer.current?.focus(); composer.current?.scrollIntoView({ block: "nearest" }); });
   }
@@ -206,12 +206,16 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
     if(!active||sending.current||currentEvidenceKey.current!==contextKey)return;
-    if(!actionPlan&&!preserveDraft&&planEdit?.goalId===conversation.activeGoalId){
+    const localEdit=/^(?:(?:please|can you|could you|could we|would you|i[’']?d like to)\s+)?(?:set|change|update|assume|lower|raise|increase|decrease|reduce|start|move|make|run|use|budget|add|remove)\b/i.test(message);
+    if(!actionPlan&&!preserveDraft&&selectedPlanForChat.current?.goalId===conversation.activeGoalId&&localEdit){
       if(chatLoading||!conversation.saved||!ready)return;
-      try{if(!planEdit.isCurrent())throw Error('The selected plan or context changed. Choose Discuss changes on the current plan.');setEditPreview(planEdit.preview(message));setEditNotice('Review these changes before accepting. Nothing is saved or calculated.');}
+      const target=selectedPlanForChat.current;setPlanEdit(target);
+      try{if(!target.isCurrent())throw Error('The selected plan or context changed. Select the intended Plan tab and send the change again.');setEditPreview(target.preview(message));setEditNotice('Review these changes before accepting. Nothing is saved or calculated.');}
       catch(error){setEditPreview(null);setEditNotice((error as Error).message);}
       requestAnimationFrame(()=>{editReview.current?.focus({preventScroll:true});editReview.current?.scrollIntoView({block:'nearest'});});return;
     }
+    if(!localEdit&&planEdit){setPlanEdit(null);setEditPreview(null);setEditNotice('');}
+    if(!actionPlan&&!preserveDraft&&activePinnedGoal&&/^(?:compare workforce options|review workforce numbers)[.!]?$/i.test(message)){compareWorkforceOptions();return;}
     if(!actionPlan&&optionActions&&isOptionActionLabel(message)){
       setLocalAction({goalId:conversation.activeGoalId,notice:'Choose the current option action button to open it. Typed or restored action text cannot select an option.'});return;
     }
@@ -225,6 +229,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     }
     setScopeChoice(null);setLocalAction(null);
     liveFindingTurn.current=null;setFindingTurn(null);
+    const clarificationStatements=clarification?.context===contextKey?clarification.statements:[];
     const sendTicket=Symbol();sending.current=sendTicket;const candidateEpoch=promptEpoch.current;setCandidate(null);setCandidateNotice('');setPreparationUnavailable(null);
     const request = conversation.beginRequest();
     const key = contextKey;
@@ -241,25 +246,29 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       const answer = reply.answer;
       const assistantMessage:ChatMessage={role:"assistant",content:answer};
       if(actionPlan)planRationale.current.set(assistantMessage,conversation.activeGoalId);
-      if(reply.proposal){
-        const captured={proposal:reply.proposal,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack),context:key,epoch:candidateEpoch,originGoalId:conversation.activeGoalId,rationale:assistantMessage,userGoal:conversation.focusedIssue?null:explicitHomeGoal(message)};
-        if(conversation.activeGoalId)decisionStore.setField(conversation.activeGoalId,'homeCandidateOptions',{version:2,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:captured.sourceKey,proposal:reply.proposal});
+      const userStatements=[...new Set([...history.filter(item=>item.role==='user').map(item=>item.content),...clarificationStatements,message])].slice(-6);
+      setClarification(reply.clarification?{context:key,question:reply.clarification,statements:userStatements}:null);
+      const userGoal=conversation.focusedIssue?null:reply.proposal?homeGoalForPin(userStatements)??explicitHomeGoal(message):homeUserGoalForPin(userStatements);
+      if((reply.proposal||userGoal)&&!reply.clarification){
+        const captured={proposal:reply.proposal,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack),context:key,epoch:candidateEpoch,originGoalId:conversation.activeGoalId,rationale:assistantMessage,userGoal,userStatements};
+        if(conversation.activeGoalId&&reply.proposal)decisionStore.setField(conversation.activeGoalId,'homeCandidateOptions',{version:2,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:captured.sourceKey,proposal:reply.proposal});
         else setCandidate(captured);
       }
-      setPreparationUnavailable(reply.proposal||responseIntent==='explanation'?null:{context:key,diagnostic:reply.diagnostic,stage:reply.diagnosticStage});
+      setPreparationUnavailable(reply.proposal||reply.clarification||responseIntent==='explanation'?null:{context:key,diagnostic:reply.diagnostic,stage:reply.diagnosticStage});
       if(preserveDraft&&!reply.proposal&&responseIntent!=='explanation')setCandidateNotice("No new candidate options could be verified from this reply. Your existing work and drafts are kept.");
       conversation.setHomeGoalChoiceKey(reply.chooseGoal && !conversation.focusedIssue ? key : null);
       const capturedFinding:FindingTurn={message:assistantMessage,findings:reply.findingFollowups,context:key,epoch:candidateEpoch,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack)};
       liveFindingTurn.current=capturedFinding;setFindingTurn(capturedFinding);
       setMessages(current => [...current, assistantMessage]);
-      modelHistoryRef.current = completeScopedChatTurn(key, history, message, answer);
+      modelHistoryRef.current = completeScopedChatTurn(key, history, message, reply.clarification?answer+'\n\n'+reply.clarification:answer);
       if (!actionPlan) { conversation.rememberQuestion(key, message); setQuestionUnanswered(false); }
       window.requestAnimationFrame(() => { if(reply.proposal&&conversation.focusedIssue){const heading=conversationViewport.current?.querySelector<HTMLElement>('[aria-label="Investigation options for your goal"] h2');heading?.focus({preventScroll:true});heading?.scrollIntoView({block:'start'});return;} const viewport=conversationViewport.current,answers=viewport?.querySelectorAll<HTMLElement>('[data-chat-role="assistant"]'),answer=answers?.[answers.length-1]; if(viewport&&answer)viewport.scrollTop+=answer.getBoundingClientRect().top-viewport.getBoundingClientRect().top; });
-      return Boolean(reply.proposal);
+      return Boolean(reply.proposal&&!reply.clarification);
     } catch (error) { if (!request.current() || currentEvidenceKey.current !== key || candidateEpoch!==promptEpoch.current) return; setChatError(error instanceof Error ? error.message : "Answer unavailable. Please try again."); if (!actionPlan&&!preserveDraft) setInput(current=>current.trim()?current:message); }
     finally { if(sending.current===sendTicket)sending.current=null; if (request.current() && currentEvidenceKey.current === key) setChatLoading(false); }
   }
 
+  const sourcesSettled=!loading&&loadedScope===workforceQuery&&settledEvidenceKey===JSON.stringify({workforceQuery,workforceScope,refresh,persona});
   const ready = Boolean(sources?.some(source => source.facts)) && !loading && loadedScope === workforceQuery;
   function findingCurrent(turn:FindingTurn){
     const goals=decisionStore.getSnapshot().data.goals;
@@ -296,18 +305,27 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   }
   const candidateCurrent=!!candidate&&candidate.context===contextKey&&candidate.sourceKey===candidateSourceKey(buildHomePack(sourceResults,workforceScope,candidate.selectionGoal,developmentSession));
   function pinProblem(problem:string){
-    if(!candidate||candidate.epoch!==promptEpoch.current||!candidateCurrent||chatLoading||!active||!conversation.saved||decisionStore.getSnapshot().data.goals.activeId!==candidate.originGoalId)return;
+    if(!candidate||candidate.epoch!==promptEpoch.current||!candidateCurrent||currentEvidenceKey.current!==contextKey||chatLoading||!active||!ready||!conversation.saved||!conversation.storageReady||conversation.issueEditor||decisionStore.getSnapshot().data.goals.activeId!==candidate.originGoalId)return;
     try{
       const id=conversation.confirmWorkforceGoal(problem);
+      for(const statement of candidate.userStatements.flatMap(homePlanningNoteParts))conversation.recordGoalStatement(statement,'home',workforceScope);
       if(!decisionStore.getSnapshot().saved)throw Error('Goal remains unsaved in this tab. Resolve browser storage before continuing.');
-      if(problem===candidate.proposal.problem)decisionStore.setField(id,'homeCandidateOptions',{version:2,goalId:id,goal:problem,selectionGoal:candidate.selectionGoal,sourceKey:candidate.sourceKey,proposal:candidate.proposal});
+      if(candidate.proposal&&problem===candidate.proposal.problem)decisionStore.setField(id,'homeCandidateOptions',{version:2,goalId:id,goal:problem,selectionGoal:candidate.selectionGoal,sourceKey:candidate.sourceKey,proposal:candidate.proposal});
       planRationale.current.set(candidate.rationale,id);
-      setCandidate(null);setActionPin(previous=>({id,sequence:(previous?.sequence??0)+1}));
+      setPreparationUnavailable(null);setCandidate(null);setActionPin(previous=>({id,sequence:(previous?.sequence??0)+1}));
     }catch(error){setCandidateNotice(error instanceof Error?error.message:'The goal could not be pinned. Your draft is kept.')}
+  }
+  const fallbackStatements=[...messages.filter(item=>item.role==='user').map(item=>item.content),...(input.trim()?[input.trim()]:[])].slice(-6);
+  const fallbackGoal=assumptionsGoalFromStatements(fallbackStatements);
+  const showFallbackPin=!conversation.focusedIssue&&(!candidateCurrent||!ready)&&!clarification&&sourcesSettled&&unavailableSourceLabels(pack).length>0&&fallbackGoal&&assumptionsOnlyBundle(fallbackGoal);
+  function pinAssumptionsGoal(){
+    if(currentEvidenceKey.current!==contextKey||renderedPromptEpoch!==promptEpoch.current||decisionStore.getSnapshot().data.goals.activeId!==conversation.activeGoalId||!showFallbackPin||!fallbackGoal||chatLoading||!active||!conversation.saved||!conversation.storageReady||conversation.issueEditor)return;
+    try{conversation.confirmWorkforceGoal(fallbackGoal);for(const statement of fallbackStatements.flatMap(homePlanningNoteParts))conversation.recordGoalStatement(statement,'home',workforceScope);if(!decisionStore.getSnapshot().saved)throw Error('The goal could not be saved. Your draft is kept.');setInput('');setCandidate(null);setActionPin(null);}catch(error){setCandidateNotice((error as Error).message);}
   }
   const candidateVerification=homeCandidateVerification(loading||settledEvidenceKey!==JSON.stringify({workforceQuery,workforceScope,refresh,persona}),storedCandidate,Boolean(savedCandidate),conversation.activeGoalId,conversation.focusedIssue,savedCandidatePack);
   const explorationChoices=candidateCurrent&&findingTurn?.message===candidate?.rationale&&findingTurn?.context===contextKey&&findingTurn.findings.length>0?<div className="flex flex-wrap items-center" aria-label="Optional finding exploration">{findingTurn.findings.map((item,index)=>{const sourceIds=[...new Set(item.evidence.map(reference=>reference.split(':')[0]))],label=sourceIds.map(id=>pack.sources.find(source=>source.id===id)?.label??id).join(' & ');return <span key={item.id} className="inline-flex items-center">{index>0&&<span aria-hidden="true" className="mx-2 h-3 border-l"/>}<button type="button" aria-label={`Explore finding: ${item.prompt}`} title={item.prompt} disabled={chatLoading||Boolean(input.trim())} onClick={()=>exploreFinding(findingTurn,item)} className="min-h-11 rounded text-xs text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Explore {label}</button></span>})}</div>:undefined;
-  const candidatePanel=!hasCalculatedPlan&&(conversation.focusedIssue||candidateCurrent)?<HomeCandidateOptions explorationChoices={!conversation.focusedIssue?explorationChoices:undefined} proposedGoal={!conversation.focusedIssue&&candidateCurrent?candidate!.userGoal:undefined} supportingNarrative={!conversation.focusedIssue&&candidateCurrent?<ConversationMessages messages={[candidate!.rationale]} home onNavigate={onNavigate}/>:undefined} goal={conversation.focusedIssue} proposal={conversation.focusedIssue?savedCandidate?.proposal??null:candidateCurrent?candidate!.proposal:null} pack={conversation.focusedIssue?savedCandidatePack:buildHomePack(sourceResults,workforceScope,candidate?.selectionGoal??'',developmentSession)} busy={chatLoading||suggestionPending||!conversation.saved} ready={ready&&active} verification={candidateVerification==='checking'||candidateVerification==='unavailable'?candidateVerification:null} stale={candidateVerification==='stale'} onPin={pinProblem} onGenerate={()=>void send('Generate qualitative candidate options for my pinned goal using the current supplied evidence. Keep unsupported costs, timing and staffing unknown.',false,false,true)} onRefine={answer=>send(answer,false,false,true)} onQuantify={compareWorkforceOptions} onNavigate={onNavigate}/>:null;
+  const showCandidatePin=!conversation.focusedIssue&&!hasCalculatedPlan&&candidateCurrent&&!showFallbackPin;
+  const candidatePanel=!hasCalculatedPlan&&(conversation.focusedIssue||showCandidatePin)?<HomeCandidateOptions explorationChoices={!conversation.focusedIssue?explorationChoices:undefined} proposedGoal={!conversation.focusedIssue&&candidateCurrent?candidate!.userGoal:undefined} supportingNarrative={!conversation.focusedIssue&&candidateCurrent&&candidate?.proposal?<ConversationMessages messages={[candidate!.rationale]} home onNavigate={onNavigate}/>:undefined} goal={conversation.focusedIssue} proposal={conversation.focusedIssue?savedCandidate?.proposal??null:candidateCurrent?candidate!.proposal:null} pack={conversation.focusedIssue?savedCandidatePack:buildHomePack(sourceResults,workforceScope,candidate?.selectionGoal??'',developmentSession)} busy={chatLoading||suggestionPending||!conversation.saved} ready={ready&&active} verification={candidateVerification==='checking'||candidateVerification==='unavailable'?candidateVerification:null} stale={candidateVerification==='stale'} onPin={pinProblem} onGenerate={()=>void send('Generate qualitative candidate options for my pinned goal using the current supplied evidence. Keep unsupported costs, timing and staffing unknown.',false,false,true)} onRefine={answer=>send(answer,false,false,true)} onQuantify={compareWorkforceOptions} onNavigate={onNavigate}/>:null;
   const finishScopeRequest = useEffectEvent((pending:PendingScope, cancel:boolean) => {
     if (pendingScopeRef.current!==pending) return;
     pendingScopeRef.current=null;setPendingScope(null);
@@ -375,8 +393,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       {active&&<WorkforceSolutionPanel hideEntry optionActions={optionActions} page="home" onNavigate={onNavigate}/>}
     </div>
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
-    <HomeSolutionBundles openRequest={planOpen} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} projectEvidence={destination=>buildHomePack(sourceResults,workforceScope,conversation.focusedIssue||conversation.problem?.latestQuestion||'',destination.development??developmentSession)} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={request=>{if(request.isCurrent()){setPlanEdit(request);setEditPreview(null);setEditNotice('');focusQuestion();}}}/>
-    {planEdit?.goalId===conversation.activeGoalId&&<div ref={editReview} tabIndex={-1}><HomeBundleChatReview target={planEdit} preview={editPreview} text={input} busy={chatLoading||!ready||!conversation.saved} notice={editNotice} onClose={()=>{setPlanEdit(null);setEditPreview(null);setEditNotice('');focusQuestion();}} onAccept={()=>{try{if(!active||chatLoading||!ready||!conversation.saved||!editPreview||input.trim()!==editPreview.request||!planEdit.isCurrent())throw Error('The request or current context changed. Review it again.');planEdit.accept(editPreview);setInput('');setPlanEdit(null);setEditPreview(null);setEditNotice('');}catch(error){setEditNotice((error as Error).message);}}}/></div>}
+    <HomeSolutionBundles settled={sourcesSettled} chatChange={planEdit&&editPreview?{goalId:planEdit.goalId,planId:planEdit.id,inputKey:editPreview.inputKey,ready:!chatLoading&&ready&&conversation.saved&&input.trim()===editPreview.request,isCurrent:planEdit.isCurrent,apply:applyPlanChanges}:null} openRequest={planOpen} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} projectEvidence={destination=>buildHomePack(sourceResults,workforceScope,conversation.focusedIssue||conversation.problem?.latestQuestion||'',destination.development??developmentSession)} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={request=>{selectedPlanForChat.current=request;}}/>
+    {planEdit?.goalId===conversation.activeGoalId&&<div ref={editReview} tabIndex={-1}><HomeBundleChatReview target={planEdit} preview={editPreview} text={input} busy={chatLoading||!ready||!conversation.saved} notice={editNotice} onClose={()=>{setPlanEdit(null);setEditPreview(null);setEditNotice('');focusQuestion();}}/></div>}
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!hasAnswer&&!conversation.focusedIssue&&startingGuide}
     {loading && <p role="status" className="text-sm text-muted-foreground">Loading available evidence for your questions.</p>}
@@ -384,8 +402,9 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       {evidenceError && <p role="alert" className="mt-3 text-base text-destructive">{evidenceError}</p>}
 
     {!conversation.focusedIssue&&candidatePanel}
+    {showFallbackPin&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
     {messages.length > 0 && <section aria-label="Overview conversation" className="space-y-3">
-      <GoalConversationMessages messages={!conversation.focusedIssue&&candidateCurrent?messages.filter(message=>message!==candidate!.rationale):messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona])} onNavigate={onNavigate} home hideHistory latestOnly collapsedRationale={message=>activePinnedGoal&&(planRationale.current.get(message)===conversation.activeGoalId||messages[messages.indexOf(message)-1]?.content===HOME_ACTION_PLAN_LABEL)} renderBulletAction={renderFindingAction}/>
+      <GoalConversationMessages messages={showCandidatePin&&candidate?.proposal?messages.filter(message=>message!==candidate!.rationale):messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona])} onNavigate={onNavigate} home hideHistory latestOnly collapsedRationale={message=>activePinnedGoal&&(planRationale.current.get(message)===conversation.activeGoalId||messages[messages.indexOf(message)-1]?.content===HOME_ACTION_PLAN_LABEL)} renderBulletAction={renderFindingAction}/>
       {conversation.homeGoalChoiceKey === contextKey && !conversation.focusedIssue && <div role="group" aria-label="Choose a goal" className="flex flex-wrap gap-2">
         <p className="w-full text-sm text-muted-foreground">State your goal in your own words.</p>
         <button type="button" disabled={chatLoading} onClick={() => { conversation.setHomeGoalChoiceKey(null); focusQuestion(); }} className="min-h-11 rounded-lg border px-4 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">State my goal</button>
@@ -394,30 +413,22 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       {chatError && <p role="alert" className="text-destructive">{chatError}</p>}
     </section>}
 
-    {preparationUnavailable?.context===contextKey&&<section role="status" aria-label="Problem and options not prepared" className="space-y-1 rounded border p-3 text-sm"><p className="font-semibold">Problem and options not prepared</p><p>This answer has no validated problem and options to pin. Your work and drafts are kept; nothing was pinned or calculated. No retry runs automatically.</p><details><summary className="cursor-pointer py-1">Preparation details</summary><p>Stage: {preparationUnavailable.stage}. Reason: {preparationUnavailable.diagnostic.reason}. Field: {preparationUnavailable.diagnostic.field}. Candidate count (4 means 4 or more): {preparationUnavailable.diagnostic.optionCount}. Missing fields: {preparationUnavailable.diagnostic.missingFieldCount}.</p></details></section>}
+    {clarification?.context===contextKey&&<section aria-label="Clarify your goal" className="space-y-2 rounded border border-primary/40 p-3 text-sm"><p className="font-semibold">{clarification.question}</p><p>Reply in the chat below. Your original goal and constraints are kept; nothing is pinned or calculated.</p><button type="button" className="min-h-11 rounded border px-3 py-2 focus-visible:ring-2 focus-visible:ring-ring" onClick={focusQuestion}>Answer in chat</button></section>}
+    {preparationUnavailable?.context===contextKey&&<section role="status" aria-label="Problem and options not prepared" className="space-y-1 rounded border p-3 text-sm"><p className="font-semibold">Problem and options not prepared</p><p>{showCandidatePin&&candidate?.userGoal&&!candidate.proposal?'No validated investigation options were prepared. You can still pin your own stated goal above to request Action Plan drafts.':'This answer has no validated problem and options to pin.'} Your work and drafts are kept; nothing was pinned or calculated. No retry runs automatically.</p><details><summary className="cursor-pointer py-1">Preparation details</summary><p>Stage: {preparationUnavailable.stage}. Reason: {preparationUnavailable.diagnostic.reason}. Field: {preparationUnavailable.diagnostic.field}. Candidate count (4 means 4 or more): {preparationUnavailable.diagnostic.optionCount}. Missing fields: {preparationUnavailable.diagnostic.missingFieldCount}.</p></details></section>}
     {candidateNotice&&<p role="status">{candidateNotice}</p>}
     </div>
 
     <form onSubmit={event => { event.preventDefault(); void send(); }} className="home-chat-form shrink-0">
-      {activePinnedGoal&&<div className="mb-2">
-        <button type="button" disabled={chatLoading||!conversation.storageReady||!conversation.saved||Boolean(conversation.issueEditor)||Boolean(planningReview)} onClick={compareWorkforceOptions} className="min-h-11 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{hasPlan?'Continue workforce options':hasRetention?'Continue retention what-if':'Compare workforce options'}</button>
-        <p className="mt-1 text-xs text-muted-foreground">{hasPlan?'Continue reviewing your saved assumptions and options. Your chat draft is kept.':hasRetention?'Return to your retention assumptions. Your drafts are kept; Calculate and Save remain separate actions.':'Review your goal and choose additional role capacity or a retention what-if.'}</p>
-      </div>}
-      {conversation.focusedIssue&&!hasPreparedPlan&&!hasPlan&&!hasRetention && <div className="mb-2">
-        <button type="button" disabled={!ready || chatLoading || !planRequest || Boolean(input.trim())} onClick={() => void send("", true)} className="min-h-11 rounded px-2 py-2 text-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{hasVerifiedOptions?"Draft a goal action plan":HOME_ACTION_PLAN_LABEL}</button>
-        {(questionUnanswered || !planRequest || Boolean(input.trim())) && <p className="mt-2 text-xs text-muted-foreground">{questionUnanswered ? "Complete or retry your current question before developing a plan." : !planRequest ? "Evidence or perspective changed. Ask a question in the current scope before developing a plan." : input.trim() ? "Send your new question first so the plan uses the updated conversation." : ""}</p>}
-      </div>}
-
       {visibleScopeChoice && <div aria-label="Requested country scope" className="mb-3 text-sm"><p>{visibleScopeChoice.kind==="ambiguous" ? "Which country should this workforce snapshot use?" : visibleScopeChoice.kind==="unsupported" ? "That country scope is not fully supported. Choose an available country or keep the current scope; missing evidence stays unavailable." : "Use country-specific workforce evidence for this question?"}</p><div className="mt-2 flex flex-wrap gap-2">{visibleScopeChoice.options.map(option=><button key={option.value} type="button" onClick={()=>applyCountry(option)} className="min-h-11 rounded border border-primary px-3 py-2 font-semibold text-primary">Apply {option.label} and answer</button>)}<button type="button" onClick={()=>void send(visibleScopeChoice.message,false,true)} className="min-h-11 px-2 text-primary underline">Answer with current scope</button></div><p className="mt-1 text-xs text-muted-foreground">Only the workforce snapshot changes. Other filters stay selected; company-wide sources retain their scope.</p></div>}
       {pendingScope && <p role="status" className="mb-3 text-sm">Refreshing the selected workforce evidence before answering. Edit your question to cancel.</p>}
       {localAction?.goalId===conversation.activeGoalId&&<p role="status" className="mb-3 text-sm">{localAction.notice}</p>}
       <div ref={composerSlot} className="home-composer-slot"><div ref={composerDock} className="home-composer-dock rounded-t-2xl border bg-card p-2 shadow-lg">
-      {planEdit?.goalId===conversation.activeGoalId&&<p className="mb-1 text-xs font-medium">Editing Plan #{planEdit.option}. Send previews changes for your review.</p>}
+      {planEdit?.goalId===conversation.activeGoalId&&<p className="mb-1 text-xs font-medium">Editing Action Plan #{planEdit.option}. Send previews changes for your review.</p>}
       <label htmlFor="overview-question" className="sr-only">Ask Workforce AI</label>
-      <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" aria-describedby="overview-question-context-tip" value={input} onChange={event => changeQuestion(event.target.value)} rows={1}
-        placeholder="Describe a goal, compare options, build or adjust a plan, or ask a general workforce question." className="max-h-80 min-h-12 w-full resize-y rounded-lg border bg-background/40 p-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+      <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" aria-describedby="overview-question-context-tip" value={input} onChange={event => changeQuestion(event.target.value)} rows={3}
+        placeholder="Describe a goal, compare options, build or adjust a plan, or ask a general workforce question." className="max-h-80 min-h-28 w-full resize-y rounded-lg border bg-background/40 p-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
       <div className="mt-2 flex items-end justify-between gap-3">
-        <p hidden={!conversation.focusedIssue&&candidateCurrent} id="overview-question-context-tip" className="min-w-0 text-xs leading-4 text-muted-foreground">Best practice: Add context like your timeline, budget, stakeholders and relevant sources to help shape a more precise goal.</p>
+        <p hidden={showCandidatePin} id="overview-question-context-tip" className="min-w-0 text-xs leading-4 text-muted-foreground">Best practice: Add context like your timeline, budget, stakeholders and relevant sources to help shape a more precise goal.</p>
         <button type="submit" aria-label="Send overview question" disabled={(!localCandidate&&!ready) || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
       </div></div>
     </form>

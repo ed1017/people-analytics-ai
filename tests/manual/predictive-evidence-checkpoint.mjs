@@ -2,13 +2,16 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
+import { assessTurnoverDomain } from '../../lib/ml/turnover-domain-adapter.mjs';
+import { evaluateHiringDomain } from '../../lib/ml/hiring-domain-adapter.mjs';
+import { satisfactionDomainEvidence } from '../../lib/ml/satisfaction-domain-adapter.mjs';
 import { validatePredictiveReadiness } from '../../lib/ml/predictive-readiness.ts';
 import { evaluateAggregateExitDemo } from '../../lib/ml/aggregate-exit-forecast.ts';
 import { evaluateTurnoverReadinessSnapshots } from '../../lib/ml/turnover-vintage-evaluation.mjs';
 import { generateTurnoverVintages } from '../fixtures/turnover-vintage-generator.mjs';
 import { exitDemoPresentation } from './generate-exit-demo-presentation.mjs';
 const root = new URL('../../', import.meta.url);
-const paths = ['tests/fixtures/aggregate-exit-history.json', 'lib/ml/aggregate-exit-forecast.ts', 'lib/ml/predictive-readiness.ts', 'lib/ml/turnover-vintage-evaluation.mjs', 'tests/fixtures/turnover-vintage-generator.mjs', 'tests/manual/predictive-evidence-checkpoint.mjs', 'tests/manual/generate-exit-demo-presentation.mjs', 'docs/predictive-readiness-proposal.md'];
+const paths = ['lib/ml/turnover-domain-adapter.mjs', 'lib/ml/hiring-domain-adapter.mjs', 'lib/ml/satisfaction-domain-adapter.mjs', 'tests/fixtures/aggregate-exit-history.json', 'lib/ml/aggregate-exit-forecast.ts', 'lib/ml/predictive-readiness.ts', 'lib/ml/turnover-vintage-evaluation.mjs', 'tests/fixtures/turnover-vintage-generator.mjs', 'tests/manual/predictive-evidence-checkpoint.mjs', 'tests/manual/generate-exit-demo-presentation.mjs', 'docs/predictive-readiness-proposal.md'];
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 function unavailableContract(domain, cutoff) {
   return { schemaVersion: 1, cutoff, manifest: { dataClass: 'company-extract', observationBasis: 'unknown', generatorVersion: null, generatedAt: null, sourceEvidence: 'prior-local-audit-only', sourceDefinitionVersion: 'unverified', populationVersion: 'unverified', metricVersion: 'unverified', completion: null },
@@ -16,7 +19,7 @@ function unavailableContract(domain, cutoff) {
 }
 export async function evidenceCheckpoint() {
   const contents = await Promise.all(paths.map(path => readFile(new URL(path, root))));
-  const dataset = JSON.parse(contents[0].toString('utf8'));
+  const dataset = JSON.parse(contents[paths.indexOf('tests/fixtures/aggregate-exit-history.json')].toString('utf8'));
   // Existing strict evaluator validates the captured source contract first.
   const retrospective = evaluateAggregateExitDemo(dataset), preview = await exitDemoPresentation();
   const sourceContract = unavailableContract('turnover', '2026-07-01T00:00:00.000Z');
@@ -32,6 +35,10 @@ export async function evidenceCheckpoint() {
     return { inputStatus: result.inputStatus, forecast: result.forecastEligibility, causalEffect: result.causalEffectEligibility,
       availableHistoryRows: result.history.length, sourceTruthVerified: result.sourceTruthVerified };
   };
+  const satisfactionContract = unavailableContract('satisfaction', sourceContract.cutoff);
+  const hiringContract = unavailableContract('hiring', sourceContract.cutoff);
+  // Fixed audit setting, not an empirically validated company horizon. No coverage is inferred.
+  const horizonDays = 90;
   const snapshots = generateTurnoverVintages();
   return {
     schemaVersion: 1, status: 'offline-evidence-checkpoint', operationallyValidated: false,
@@ -39,10 +46,10 @@ export async function evidenceCheckpoint() {
     sourceEvidence: {
       basis: 'Existing local audits and captured aggregates only; no fresh database access.',
       turnover: { originalDataClass: dataset.manifest.provenance, readinessAdapterClass: 'company-extract means an existing source extract, not verified real-world data', manifest: dataset.manifest,
-        checks: summarize(sourceContract), minimumMissingInputs: ['Versioned population and monthly count definitions; reconcile every month, including event-empty months, against scoped source completion evidence.', 'Actual first-observed timestamps, revision predecessors and recorded corrections for every monthly label; event and bulk insertion dates are not substitutes.', 'Completion declarations with population, covered period, actual observation time and evidence reference at every forecast origin and scoring cutoff.', 'Generator/version lineage if asserting synthetic completeness. Person-time at risk plus explicit future exposure assumptions before rates.'] },
-      satisfaction: { checks: summarize(unavailableContract('satisfaction', sourceContract.cutoff)),
+        checks: summarize(sourceContract), domainEvaluation: assessTurnoverDomain({ sourceContract }), minimumMissingInputs: ['Versioned population and monthly count definitions; reconcile every month, including event-empty months, against scoped source completion evidence.', 'Actual first-observed timestamps, revision predecessors and recorded corrections for every monthly label; event and bulk insertion dates are not substitutes.', 'Completion declarations with population, covered period, actual observation time and evidence reference at every forecast origin and scoring cutoff.', 'Generator/version lineage if asserting synthetic completeness. Person-time at risk plus explicit future exposure assumptions before rates.'] },
+      satisfaction: { checks: summarize(satisfactionContract), domainEvaluation: satisfactionDomainEvidence(satisfactionContract, null),
         minimumMissingInputs: ['Comparable observed waves with versioned population, eligibility, instrument/items and scoring rules; no interpolated monthly targets.', 'Mean respondent favorable-answer share with valid respondent denominator, eligible population for participation, and missing/nonresponse counts.', 'Wave closure, actual observation/revision times, scoped completion, and reviewed cell/complementary/query-set suppression status.'] },
-      hiring: { checks: summarize(unavailableContract('hiring', sourceContract.cutoff)),
+      hiring: { checks: summarize(hiringContract), domainEvaluation: evaluateHiringDomain(hiringContract, { horizonDays, coverage: null }),
         minimumMissingInputs: ['One role/population with every opening retained, including open, cancelled and no-show dispositions; maturity/censoring at the scoring cutoff.', 'Separate opening, accepted-offer, actual-start and capacity-ready definitions; no hire or planned-start substitution.', 'Actual first-observed stage/status/revision times, opening-known features only, scoped cohort completion and a common fixed follow-up horizon or censoring-aware estimator.'] },
       effects: { status: 'unavailable', minimumMissingInputs: ['Dated intervention assignment and intended comparison design, eligible/assigned/exposed units, and aligned outcome observations in both arms.', 'Pre-outcome design/adjustment history, adherence, missing follow-up and contamination, with identification and independent-unit uncertainty analysis. Ordinary forecasts supply none of these.'] },
     },

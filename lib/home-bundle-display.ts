@@ -1,3 +1,5 @@
+/** Reader-facing copy only; stored provenance identifiers and kinds stay unchanged. */
+export function bundleAssumptionCopy(text:string){return text.replaceAll('illustrative-pilot-v1','Starting estimate preset').replace(/\billustrative\b/gi,word=>word[0]==='I'?'Assumed':'assumed');}
 import type {SolutionBundle} from './home-solution-bundles';
 /** Presentation-only resolution of this contract's exact internal reference tokens.
  * No semantic classification or editing of the stored model text. Unknown tokens stay literal.
@@ -22,8 +24,8 @@ type DisplayAssumption<T>={value:T|null;kind:'unknown'|'user-entered'|'illustrat
 /** Label every hypothetical value; never render missing inputs as zero or verified facts. */
 export function bundleAssumptionText<T>(assumption:DisplayAssumption<T>,format:(value:T)=>string=value=>String(value)):string{
  if(assumption.value===null)return 'Not yet assessed';
- const label=assumption.kind==='illustrative'?'Illustrative':assumption.kind==='adopted'?'Adopted assumption':'User assumption';
- return `${label}: ${format(assumption.value)}`;
+ const label=assumption.kind==='illustrative'?'Assumed':assumption.kind==='adopted'?'Adopted assumption':'User assumption';
+ return `${label}: ${bundleAssumptionCopy(format(assumption.value))}`;
 }
 /** Shared horizon end, not a forecast or a component readiness date. */
 export function bundleHorizonEnd(scope:{startMonth:DisplayAssumption<string>;months:DisplayAssumption<number>}):DisplayAssumption<string>{
@@ -32,3 +34,6 @@ export function bundleHorizonEnd(scope:{startMonth:DisplayAssumption<string>;mon
  const value=new Date(Date.UTC(year,month-1+scope.months.value,0)).toISOString().slice(0,10);
  return {value,kind:scope.startMonth.kind==='illustrative'||scope.months.kind==='illustrative'?'illustrative':scope.startMonth.kind==='adopted'&&scope.months.kind==='adopted'?'adopted':'user-entered'};
 }
+
+/** Conservative label: recognized analysis verbs only; other drafts are not certified interventions. */
+export function bundleIsAnalysisOnly(bundle:SolutionBundle){return bundle.components.length>0&&bundle.components.every(component=>/^(?:propose(?: to)?\s+)?(?:review|investigate|analy[zs]e|assess|compare|examine|audit|diagnose|summarize|summarise|triangulate|identify|define)\b/i.test(component.firstStep.trim()));}

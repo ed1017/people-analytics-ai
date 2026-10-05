@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {readHomePlanPanel} from '../lib/home-plan-panel.ts';
+test('goal panel view restores collapsed state and latest explicitly applied option',()=>{const view={version:1,collapsed:true,appliedId:'B'};assert.deepEqual(readHomePlanPanel(JSON.parse(JSON.stringify(view))),view);assert.notEqual(readHomePlanPanel(view),view)});
+test('corrupt or unsupported panel preferences cannot select an arbitrary option',()=>{for(const value of [null,[],{version:2,collapsed:true,appliedId:'A'},{version:1,collapsed:'yes',appliedId:'A'},{version:1,collapsed:true,appliedId:['A']},{version:1,collapsed:true,appliedId:'D'},{version:1,collapsed:true,appliedId:'A',unexpected:true}])assert.deepEqual(readHomePlanPanel(value),{version:1,collapsed:false,appliedId:null});});

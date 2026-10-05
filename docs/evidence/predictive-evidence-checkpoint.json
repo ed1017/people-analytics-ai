@@ -3,12 +3,15 @@
   "status": "offline-evidence-checkpoint",
   "operationallyValidated": false,
   "files": {
+    "lib/ml/turnover-domain-adapter.mjs": "29ab2f7159c1b8f3649ced9e990b32f873460a776aee517d69e398f59ab7921e",
+    "lib/ml/hiring-domain-adapter.mjs": "48e3ac56b960088d42ad22331a29ad32d974515a864b77dbd7fa279d8152dd07",
+    "lib/ml/satisfaction-domain-adapter.mjs": "e5854d6fa9c46ae6504a9e240bdbabad8077efeffcc08066b2483701189f31e4",
     "tests/fixtures/aggregate-exit-history.json": "64acf5cbb0cddbaa0614e20ee3895cd026ebe3ec9c91fed622820b53b44d63cd",
     "lib/ml/aggregate-exit-forecast.ts": "095003fd6731eab87030f91c38fb698e71b3e0c92a0bc7bcd3450d0d2c9fea4e",
     "lib/ml/predictive-readiness.ts": "ae0ef0f265afa1bb0ce447912aff1d4a9339570708022d7ff62eed7454754de7",
     "lib/ml/turnover-vintage-evaluation.mjs": "a9de0ea0e9edda53191b0b70b9d6dc6787083e069e150f107bd4aed9076ef490",
     "tests/fixtures/turnover-vintage-generator.mjs": "1d144db22ea09f3afc6beba78293829da69a751ba585a7362e1ac73eba545a7b",
-    "tests/manual/predictive-evidence-checkpoint.mjs": "d0d76fa507d128f89e94eec45d0a23d0945b80fbf7225340238a5f6efc41da46",
+    "tests/manual/predictive-evidence-checkpoint.mjs": "f511e4134cc6c422e3a782327ab3b2faddd795ed8e41b66ff9ff4c9a9cf6997a",
     "tests/manual/generate-exit-demo-presentation.mjs": "cba369b1ccf00144cf468b679c042f718d4e401b9342aa8cc99d70a4baf6a7f8",
     "docs/predictive-readiness-proposal.md": "1b80d2b9bd250576e1fddd1cc88c1141a926a3c56a45dbcfbf72ca919efac3a6"
   },
@@ -51,6 +54,62 @@
         "availableHistoryRows": 0,
         "sourceTruthVerified": false
       },
+      "domainEvaluation": {
+        "domain": "turnover",
+        "status": "unqualified",
+        "contractStatus": "blocked",
+        "reasonCodes": [
+          "availability-unknown",
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history",
+          "no-history"
+        ],
+        "missingInputs": [
+          {
+            "code": "availability-unknown",
+            "requirement": "Provide an actual first-observed timestamp for every label and correction, retaining revision predecessors."
+          },
+          {
+            "code": "availability-unverified",
+            "requirement": "Provide evidenced first-observed history; current extraction or bulk insertion time is not historical availability."
+          },
+          {
+            "code": "completeness-unknown",
+            "requirement": "Provide scoped completion status, covered-through time, observation time and evidence reference."
+          },
+          {
+            "code": "no-available-history",
+            "requirement": "Resolve readiness contract condition: no-available-history."
+          },
+          {
+            "code": "no-history",
+            "requirement": "Provide revisioned monthly counts with source-observed availability and scoped completeness."
+          }
+        ],
+        "selectedHistory": [],
+        "excludedLateRecords": 0,
+        "coverage": {
+          "firstMonth": null,
+          "lastMonth": null,
+          "selectedMonths": 0,
+          "recordedZeroMonths": []
+        },
+        "mechanicsBenchmark": null,
+        "operationalForecast": null,
+        "rate": null,
+        "predictionInterval": null,
+        "causalEffect": null,
+        "sourceTruthVerified": false,
+        "realWorldPerformanceValidated": false,
+        "nextStep": "Resolve the listed source contract gaps before a source-based temporal evaluation.",
+        "limitations": [
+          "Selected history is an audit view, not a qualified forecast.",
+          "The optional benchmark evaluates constructed snapshots only and cannot qualify the supplied source.",
+          "Completion and observation declarations are checked for consistency, not independently authenticated.",
+          "No model selection, causal effect, rate or calibrated uncertainty is produced."
+        ]
+      },
       "minimumMissingInputs": [
         "Versioned population and monthly count definitions; reconcile every month, including event-empty months, against scoped source completion evidence.",
         "Actual first-observed timestamps, revision predecessors and recorded corrections for every monthly label; event and bulk insertion dates are not substitutes.",
@@ -80,6 +139,39 @@
         "availableHistoryRows": 0,
         "sourceTruthVerified": false
       },
+      "domainEvaluation": {
+        "domain": "satisfaction",
+        "status": "unqualified",
+        "contractStatus": "blocked",
+        "evidenceKind": "declared-source-contract-only",
+        "sourceTruthVerified": false,
+        "forecastingPerformanceValidated": false,
+        "causalEffectValidated": false,
+        "missingInputs": [
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history",
+          "score-definition-unavailable-or-unsupported"
+        ],
+        "excludedLateRecords": 0,
+        "scoreUnit": "mean-respondent-favorable-answer-share",
+        "coverageUnit": "respondents / eligible employees",
+        "waves": [],
+        "forecast": null,
+        "forecastMissingInputs": [
+          "validated-observed-wave-forecast-protocol",
+          "independent-temporal-evaluation",
+          "nonresponse-and-population-shift-assessment"
+        ],
+        "causalEffect": null,
+        "uncertainty": null,
+        "limitations": [
+          "Contract qualification checks declarations and aggregate arithmetic; it does not verify source truth or answer-level scoring.",
+          "Participation describes response coverage, not representativeness or a percentage of satisfied employees.",
+          "No monthly interpolation, unfavorable-share complement, eNPS substitution or cross-wave pooling is performed.",
+          "Release declarations are checked; complementary suppression and query-set privacy are not independently audited."
+        ]
+      },
       "minimumMissingInputs": [
         "Comparable observed waves with versioned population, eligibility, instrument/items and scoring rules; no interpolated monthly targets.",
         "Mean respondent favorable-answer share with valid respondent denominator, eligible population for participation, and missing/nonresponse counts.",
@@ -107,6 +199,73 @@
         },
         "availableHistoryRows": 0,
         "sourceTruthVerified": false
+      },
+      "domainEvaluation": {
+        "methodVersion": "hiring-domain-audit-v1",
+        "status": "blocked",
+        "reasons": [
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history",
+          "no-mature-openings",
+          "opening-and-followup-coverage-required"
+        ],
+        "dataClass": "company-extract",
+        "horizonDays": 90,
+        "asOf": "2026-07-01T00:00:00.000Z",
+        "operationallyQualified": false,
+        "sourceTruthVerified": false,
+        "forecastingPerformanceValidated": false,
+        "causalEffectValidated": false,
+        "evaluationKind": "as-of-conditional-completed-case-description",
+        "qualificationBasis": "declared-all-opening-and-status-coverage",
+        "limitation": "Observed at the supplied cutoff, not necessarily known at each opening horizon. Cancelled and unresolved openings stay in the denominator. No independent-censoring assumption, survival estimate, forecast error, capacity estimate, or causal effect.",
+        "audit": {
+          "selectedOpeningCount": 0,
+          "matureOpeningCount": 0,
+          "immatureOpeningCount": 0,
+          "matureStartedByHorizon": 0,
+          "matureStartedAfterHorizon": 0,
+          "matureCancelled": 0,
+          "matureUnresolved": 0,
+          "completedByHorizonMeanDays": null,
+          "observedStartFraction": null
+        },
+        "forecastMetrics": null,
+        "readiness": {
+          "schemaVersion": 1,
+          "inputStatus": "valid",
+          "dataClass": "company-extract",
+          "sourceTruthVerified": false,
+          "modelAdequacyAssessed": false,
+          "forecastingPerformanceValidated": false,
+          "causalEffectValidated": false,
+          "uncertainty": {
+            "predictionInterval": null,
+            "effectInterval": null,
+            "goalAttainmentProbability": null,
+            "reason": "No fitted/calibrated distribution or validated causal analysis is supplied by this contract checker."
+          },
+          "forecastEligibility": {
+            "status": "blocked",
+            "reasons": [
+              "availability-unverified",
+              "completeness-unknown",
+              "no-available-history"
+            ]
+          },
+          "causalEffectEligibility": {
+            "status": "blocked",
+            "reasons": [
+              "availability-unverified",
+              "completeness-unknown",
+              "missing-comparison-design"
+            ]
+          },
+          "history": [],
+          "excludedLateRecords": 0,
+          "causalAudit": null
+        }
       },
       "minimumMissingInputs": [
         "One role/population with every opening retained, including open, cancelled and no-show dispositions; maturity/censoring at the scoring cutoff.",

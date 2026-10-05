@@ -35,3 +35,6 @@ export function inspectHomeCandidateProposal(raw:unknown,pack:CandidatePack|null
 export function readHomeCandidateProposal(raw:unknown,pack:CandidatePack|null|undefined){return inspectHomeCandidateProposal(raw,pack).proposal}
 export function readHomeCandidateRecord(raw:unknown,goalId:string,goal:string,pack:CandidatePack):HomeCandidateRecord|null{return readInvestigationRecord(raw,goalId,goal,candidateSourceKey(pack),pack)}
 export function candidateSelectionGoal(raw:unknown){const value=obj(raw)?.selectionGoal;return typeof value==='string'&&value.length<=12000?value:null}
+
+/** A bounded clarification is conversational text, not a validated problem or evidence claim. */
+export function readHomeClarification(value:unknown):string|null{return typeof value==='string'&&!!value.trim()&&value.length<=200&&(value.match(/\?/g)?.length??0)<=1?value.trim():null}

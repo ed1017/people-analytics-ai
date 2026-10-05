@@ -49,3 +49,34 @@ test('new source-evidence identity invalidates an earlier result even with ident
   const after = composeForecastConsumer(c, p, 'a'.repeat(64));
   assert.deepEqual(before.conditionalDemo, after.conditionalDemo); assert.equal(resolveForecastConsumerCache(before, after).status, 'stale');
 });
+test('actual adapter path keeps unavailable histories and metrics null across domains', async () => {
+  const checkpoint = await evidenceCheckpoint(), consumer = await exitForecastForConsumer();
+  assert(checkpoint.sourceEvidence.turnover.domainEvaluation.reasonCodes.includes('no-history'));
+  assert(checkpoint.sourceEvidence.hiring.domainEvaluation.reasons.includes('opening-and-followup-coverage-required'));
+  assert(checkpoint.sourceEvidence.satisfaction.domainEvaluation.missingInputs.includes('score-definition-unavailable-or-unsupported'));
+  for (const domain of ['turnover', 'hiring', 'satisfaction']) {
+    const result = consumer.domains[domain].evaluation;
+    assert.equal(result.status, 'unavailable'); assert.equal(result.history, null); assert.equal(result.metrics, null);
+    assert(result.reasonCodes.length); assert.equal(consumer.domains[domain].operationalForecast, null);
+    assert(checkpoint.files[`lib/ml/${domain}-domain-adapter.mjs`]);
+  }
+  assert.equal(checkpoint.sourceEvidence.turnover.domainEvaluation.mechanicsBenchmark, null);
+});
+test('missing or promoted domain evaluations and changed hiring horizon fail closed', async () => {
+  const source = await evidenceCheckpoint(), preview = await exitDemoPresentation();
+  for (const change of [
+    c => { delete c.sourceEvidence.turnover.domainEvaluation; },
+    c => { c.sourceEvidence.turnover.domainEvaluation.contractStatus = 'passed'; },
+    c => { c.sourceEvidence.hiring.domainEvaluation.operationallyQualified = true; },
+    c => { c.sourceEvidence.hiring.domainEvaluation.horizonDays = 180; },
+    c => { c.sourceEvidence.satisfaction.domainEvaluation.forecast = 0; },
+  ]) { const copy = structuredClone(source); change(copy); assert.throws(() => composeForecastConsumer(copy, preview, 'a'.repeat(64))); }
+});
+test('adapter implementation change invalidates a cached consumer without changing demo totals', async () => {
+  const source = await evidenceCheckpoint(), preview = await exitDemoPresentation();
+  const before = composeForecastConsumer(source, preview, 'a'.repeat(64));
+  source.files['lib/ml/hiring-domain-adapter.mjs'] = 'b'.repeat(64);
+  const after = composeForecastConsumer(source, preview, 'a'.repeat(64));
+  assert.deepEqual(before.conditionalDemo, after.conditionalDemo);
+  assert.equal(resolveForecastConsumerCache(before, after).status, 'stale');
+});

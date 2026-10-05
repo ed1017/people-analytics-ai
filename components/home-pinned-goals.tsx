@@ -16,7 +16,7 @@ export function HomePinnedGoals({goals,activeGoalId,ready,disabled,packet,onSele
         {goals.map(goal=>{const status=pinnedGoalPlanStatus(goal.id,storage.data.workspaces[goal.id]?.fields,packet);return <li key={goal.id}>
           <button type="button" disabled={disabled} aria-pressed={activeGoalId===goal.id} aria-label={`Open goal: ${goal.statement}`} aria-describedby={`pinned-goal-status-${goal.id}`} title={goal.statement} onClick={()=>onSelect(goal)} className="min-h-11 w-full rounded-md border p-3 text-left text-sm hover:bg-accent aria-pressed:border-primary aria-pressed:bg-accent disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring">
             <span className="line-clamp-2 break-words font-medium">{goal.statement}</span>
-            <span id={`pinned-goal-status-${goal.id}`} className="mt-1 block text-xs text-muted-foreground">{status==='saved'?'Plan saved':status==='review'?'Saved plan needs review':'No plan yet'}</span>
+            <span id={`pinned-goal-status-${goal.id}`} className="mt-1 block text-xs text-muted-foreground">{status==='saved'?'Draft prepared':status==='review'?'Saved plan needs review':'No plan yet'}</span>
           </button>
         </li>})}
       </ul>
