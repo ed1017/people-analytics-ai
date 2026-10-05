@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { CompensationResponse } from "@/lib/compensation";
+import { CompensationBenchmarks } from "@/components/compensation-benchmarks";
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const number = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
@@ -38,19 +39,20 @@ export function CompensationPage() {
     setAttempt(value => value + 1);
   };
 
-  return (
+  return (<>
+    <div className="min-w-0 px-4 pt-4 sm:px-6 sm:pt-6"><CompensationBenchmarks /></div>
     <section className="evidence-workspace min-w-0 space-y-5 p-4 sm:p-6" aria-label="Compensation cost context" aria-busy={loading}>
       <div className="space-y-2">
         <p className="text-xs font-medium text-primary">Synthetic aggregate evidence · USD</p>
         <h2 className="text-lg font-semibold">Workforce cost context</h2>
-        <p className="max-w-3xl text-sm text-muted-foreground">Compare reported labor cost across business units. Salary ranges, pay equity and market-pay benchmarks are unavailable.</p>
+        <p className="max-w-3xl text-sm text-muted-foreground">Compare reported synthetic labor cost across business units. This internal source has no salary ranges or pay-equity measures.</p>
       </div>
 
       {loading ? <p role="status" className="rounded-lg border p-6 text-sm text-muted-foreground">Loading compensation cost context…</p>
         : error ? <div role="alert" className="rounded-lg border p-5"><p className="text-sm">Compensation cost context is unavailable. Try again.</p><button type="button" onClick={retry} className="mt-3 rounded-md border px-3 py-2 text-sm font-medium">Try again</button></div>
         : data && data.by_business_unit.length === 0 ? <div className="rounded-lg border p-5"><p role="status" className="text-sm">No business-unit cost aggregates were returned. Company totals are unavailable.</p><button type="button" onClick={retry} className="mt-3 rounded-md border px-3 py-2 text-sm font-medium">Try again</button></div>
         : data ? <CompensationEvidence data={data} /> : null}
-    </section>
+    </section></>
   );
 }
 
