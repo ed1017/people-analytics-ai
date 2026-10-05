@@ -3,7 +3,7 @@
 import {inspectHomeBundleOutput,type BundleDiagnostic,type BundleProposal} from './home-solution-bundles.ts';
 /** Narrow fresh-response check: no grammar inference or rewriting of saved text. */
 export function visiblyIncompleteBundleText(proposal:BundleProposal):boolean{
- const incomplete=(text:string,max:number)=>{const value=text.trim();return (value.length===max&&!/[.!?]["'”’)]?$/.test(value))||/(?:[,:;—–-]|\.\.\.|…|\b(?:and|or|but|because|including|with|without|for|to|of|the|a|an))$/i.test(value);};
+ const incomplete=(text:string,max:number)=>{const value=text.trim();return (value.length===max&&!/[.!?]["'”’)\]]*$/.test(value))||/(?:[,:;—–-]|\.\.\.|…|(?:^|\s)(?:and|or|but|because|including))$/.test(value);};
  return proposal.bundles.some(bundle=>incomplete(bundle.objective,160)||incomplete(bundle.coordination,240)||incomplete(bundle.limitation,240)||bundle.components.some(component=>incomplete(component.firstStep,360)||incomplete(component.limitation,200)));
 }
 export async function inspectBundleResponse(call:()=>Promise<{status?:string;output_text?:string;usage?:unknown}>,goal:string,pack:unknown,task?:'delivery'|'diagnostic'):Promise<{proposal:BundleProposal;usage:unknown;diagnostic:null}|{proposal:null;diagnostic:BundleDiagnostic}>{
