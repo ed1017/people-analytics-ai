@@ -1,4 +1,5 @@
 "use client";
+import {HomeAssumptionsFallback} from '@/components/home-assumptions-fallback';
 import {readBundleWorkspace,bundleWorkspaceField} from "@/lib/home-bundle-records";
 import {revealJourneyTarget} from "@/components/workforce-journey-continue";
 import {useEffect,useLayoutEffect,useRef,useState} from 'react';
@@ -11,7 +12,7 @@ import {normalizeHomePack} from '@/lib/home-pack.mjs';
 import type {Persona} from '@/lib/types';
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring';
 const localInputs=(id:string)=>{const fields=decisionStore.getSnapshot().data.workspaces[id]?.fields;return {capacity:fields?.workforceSolution??null,retention:fields?.retentionWhatIfV1??null}};
-export function HomeSolutionBundles({openRequest,goalId,goal,pack,projectEvidence,active,ready,busy,pin,persona,goalContext,marketReference,hasPlanningWork,onResume,onDiscuss}:{projectEvidence?:(destination:PlanningDestination)=>unknown;openRequest?:{goalId:string;goal:string;sequence:number}|null;goalId:string;goal:string;pack:unknown;active:boolean;ready:boolean;busy:boolean;pin:{id:string;sequence:number}|null;persona:Persona;goalContext:unknown;marketReference:unknown;hasPlanningWork:boolean;onResume:()=>void;onDiscuss:(request:BundleDiscussion)=>void}){
+export function HomeSolutionBundles({settled,openRequest,goalId,goal,pack,projectEvidence,active,ready,busy,pin,persona,goalContext,marketReference,hasPlanningWork,onResume,onDiscuss}:{settled:boolean;projectEvidence?:(destination:PlanningDestination)=>unknown;openRequest?:{goalId:string;goal:string;sequence:number}|null;goalId:string;goal:string;pack:unknown;active:boolean;ready:boolean;busy:boolean;pin:{id:string;sequence:number}|null;persona:Persona;goalContext:unknown;marketReference:unknown;hasPlanningWork:boolean;onResume:()=>void;onDiscuss:(request:BundleDiscussion)=>void}){
  const storage=useDecisionStorage(),coordinator=useRef(createHomeBundlePreparation()),consumed=useRef(0),pinContext=useRef<{sequence:number;identity:string}|null>(null),heading=useRef<HTMLHeadingElement>(null);
  const openedRequest=useRef(0);
  useLayoutEffect(()=>{
@@ -25,7 +26,7 @@ export function HomeSolutionBundles({openRequest,goalId,goal,pack,projectEvidenc
  const plans=localInputs(goalId),planningKey=JSON.stringify(plans);
  const linkState=()=>{const current=decisionStore.getSnapshot().data.workspaces[goalId]?.fields;return JSON.stringify([current?.development??null,current?.[linkedAttachmentField]??null]);},linkKey=linkState();
  const project:ProjectPlanningBinding=destination=>actionBinding(goalId,goal,projectEvidence?projectEvidence(destination):pack,{plans:{capacity:destination.workforceSolution,retention:plans.retention},request:{persona,goalContext,marketReference}});
- const packet=normalizeHomePack(pack),identity=JSON.stringify([goalId,goal,packet,plans,persona,goalContext,marketReference,active,ready,linkKey,raw&&typeof raw==='object'&&'preparedAt' in raw?raw.preparedAt:null]);
+ const packet=normalizeHomePack(pack),identity=JSON.stringify([goalId,goal,packet,plans,persona,goalContext,marketReference,active,ready,settled,linkKey,raw&&typeof raw==='object'&&'preparedAt' in raw?raw.preparedAt:null]);
  const live=useRef(identity);const [bound,setBound]=useState<{identity:string;binding:ActionBinding;sourceRejected:boolean}|null>(null),[pending,setPending]=useState(false),[notice,setNotice]=useState('');
  // Immediately invalidate on store transitions, including a goal switch away and back.
  useEffect(()=>{let prior=JSON.stringify([decisionStore.getSnapshot().data.goals,localInputs(goalId)]);return decisionStore.subscribe(()=>{const next=JSON.stringify([decisionStore.getSnapshot().data.goals,localInputs(goalId)]);if(next!==prior){prior=next;coordinator.current.invalidate();}})},[goalId]);
@@ -33,7 +34,7 @@ export function HomeSolutionBundles({openRequest,goalId,goal,pack,projectEvidenc
   live.current=identity;const worker=coordinator.current;worker.invalidate();let cancelled=false;
   // eslint-disable-next-line react-hooks/set-state-in-effect -- New evidence invalidates an in-flight preparation and scope review.
   setPending(false);setNotice('');
-  if(goalId&&goal&&active&&ready)void actionBinding(goalId,goal,packet,{plans,request:{persona,goalContext,marketReference}}).then(async physical=>{
+  if(goalId&&goal&&active&&settled)void actionBinding(goalId,goal,packet,{plans,request:{persona,goalContext,marketReference}}).then(async physical=>{
    const original=raw&&typeof raw==='object'&&'binding' in raw&&validActionBinding(raw.binding)?raw.binding:null;
    const resolved=original&&projectEvidence?await resolveAttachedSourceBinding(original,physical,fields,project,raw&&typeof raw==='object'&&'preparedAt' in raw&&typeof raw.preparedAt==='string'?raw.preparedAt:undefined):null;
    if(!cancelled)setBound({identity,binding:resolved??physical,sourceRejected:Boolean(original&&projectEvidence&&!resolved)});
@@ -47,7 +48,7 @@ export function HomeSolutionBundles({openRequest,goalId,goal,pack,projectEvidenc
  const old=raw&&typeof raw==='object'&&'binding' in raw&&raw.binding&&typeof raw.binding==='object'&&'goalId' in raw.binding&&raw.binding.goalId===goalId?readBundlePreparation(raw,raw.binding as ActionBinding,packet):null;
  const draft=current??old,stale=!!draft&&!current;
  const retained=!draft?readBundleWorkspace(storage.data.workspaces[goalId]?.fields[bundleWorkspaceField],goalId):null;
- const currentCheck=(key:string)=>JSON.stringify(localInputs(goalId))===planningKey&&linkState()===linkKey&&live.current===key&&active&&ready&&decisionStore.getSnapshot().saved&&decisionStore.getSnapshot().data.goals.activeId===goalId&&decisionStore.getSnapshot().data.goals.goals.find(item=>item.id===goalId)?.statement===goal;
+ const currentCheck=(key:string,local=false)=>JSON.stringify(localInputs(goalId))===planningKey&&linkState()===linkKey&&live.current===key&&active&&(ready||local&&settled)&&decisionStore.getSnapshot().saved&&decisionStore.getSnapshot().data.goals.activeId===goalId&&decisionStore.getSnapshot().data.goals.goals.find(item=>item.id===goalId)?.statement===goal;
  async function prepare(mode:'new-pin'|'explicit'){
   if(!binding||busy||!storage.saved||!currentCheck(identity))return;
   setPending(true);setNotice('');
@@ -85,6 +86,7 @@ export function HomeSolutionBundles({openRequest,goalId,goal,pack,projectEvidenc
    {retained.attachments.map(item=><p key={item.id}>{item.draft.bundle.name} · attached revision {item.draft.revision} · {retained.attachments.some(next=>next.supersedes===item.id)?'Previous attached version':'Attached snapshot'}. Snapshot cash: {item.result.cashTotal===null?'Unknown':`$${item.result.cashTotal.toLocaleString()} USD`}. Not a current calculation or operational approval.</p>)}
   </section>}
   {(!current||current.proposal.bundles.length===0)&&<button className={button} disabled={disabled} onClick={()=>void prepare('explicit')}>{!raw||current?.proposal.bundles.length===0?'Create Action Plan':'Prepare Action Plans'}</button>}
+  {!draft?.proposal.bundles.length&&<HomeAssumptionsFallback goalId={goalId} goal={goal} binding={binding} pack={packet} planningContext={goalContext} disabled={busy||pending||!storage.saved||!active||!settled} isCurrent={()=>currentCheck(identity,true)} onDiscuss={onDiscuss}/>}
   {draft&&<>
    <HomeBundlePlans planningContext={goalContext} measurePack={packet} key={JSON.stringify([actionBindingKey(draft.binding),draft.preparedAt])} proposal={draft.proposal} preparedAt={draft.preparedAt} binding={draft.binding} contextCurrent={!stale} disabled={disabled||stale} isCurrent={()=>!!current&&currentCheck(identity)} cache={bundleCache} onDiscuss={onDiscuss} projectBinding={projectEvidence?project:undefined}/>
 

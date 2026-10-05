@@ -1,4 +1,6 @@
 // @ts-expect-error Native Node tests share TypeScript source.
+import {validAssumptionsOnlyBundle} from './home-assumptions-fallback.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
 import {validWhatIf,calculatePlanWhatIf,type PlanWhatIf} from './home-plan-what-if.ts';
 import type {SuccessMeasure} from './home-success-measures';
 // Local, aggregate planning arithmetic. No services, model calls or operational writes.
@@ -63,9 +65,10 @@ function validateDraft(draft:BundleDraft){
  fail(validateJson(draft)&&new TextEncoder().encode(JSON.stringify(draft)).length<=65536,'Bundle draft exceeds the bounded local contract.');
  fail(exactKeys(draft as unknown as Record<string,unknown>,['version','status','binding','bundle','signature','revision','inputs',...(draft.pilot?['pilot']:[])])&&draft.version===1&&draft.status==='proposal'&&validActionBinding(draft.binding)&&draft.signature===bundleSignature(draft.bundle)&&Number.isSafeInteger(draft.revision)&&draft.revision>=1&&draft.revision<=100000,'Invalid bundle identity or revision.');
  if(draft.pilot)fail(exactKeys(draft.pilot as unknown as Record<string,unknown>,['version','preparedAt','timezone'])&&draft.pilot.version==='illustrative-pilot-v1'&&draft.pilot.timezone==='UTC'&&typeof draft.pilot.preparedAt==='string'&&/^\d{4}-\d\d-\d\dT/.test(draft.pilot.preparedAt)&&Number.isFinite(Date.parse(draft.pilot.preparedAt)),'Invalid frozen illustrative preset.');
- const bundle=draft.bundle;
- fail(exactKeys(bundle as unknown as Record<string,unknown>,['id','name','objective','coordination','components','limitation'])&&['A','B','C'].includes(bundle.id)&&bounded(bundle.name,80)&&bounded(bundle.objective,160)&&bounded(bundle.coordination)&&bounded(bundle.limitation),'Invalid saved bundle structure.');
- for(const item of bundle.components)fail(exactKeys(item as unknown as Record<string,unknown>,['id','name','domain','firstStep','evidence','ownerRole','dependsOn','limitation'])&&/^c[1-6]$/.test(item.id)&&bounded(item.name,80)&&bundleDomains.includes(item.domain)&&bounded(item.firstStep,360)&&bounded(item.ownerRole,80)&&bounded(item.limitation,200)&&Array.isArray(item.evidence)&&item.evidence.length>0&&item.evidence.length<=3&&new Set(item.evidence).size===item.evidence.length&&item.evidence.every(id=>bounded(id,100)),'Invalid saved component structure.');
+ const bundle=draft.bundle,local=validAssumptionsOnlyBundle(draft.bundle,draft.binding.goal);
+ fail(bundle.origin===undefined||local,'Only the exact local assumptions-only template may omit evidence.');
+ fail(exactKeys(bundle as unknown as Record<string,unknown>,['id','name','objective','coordination','components','limitation',...(local?['origin']:[])])&&['A','B','C'].includes(bundle.id)&&bounded(bundle.name,80)&&bounded(bundle.objective,160)&&bounded(bundle.coordination)&&bounded(bundle.limitation),'Invalid saved bundle structure.');
+ for(const item of bundle.components)fail(exactKeys(item as unknown as Record<string,unknown>,['id','name','domain','firstStep','evidence','ownerRole','dependsOn','limitation'])&&/^c[1-6]$/.test(item.id)&&bounded(item.name,80)&&bundleDomains.includes(item.domain)&&bounded(item.firstStep,360)&&bounded(item.ownerRole,80)&&bounded(item.limitation,200)&&Array.isArray(item.evidence)&&(local?item.evidence.length===0:item.evidence.length>0)&&item.evidence.length<=3&&new Set(item.evidence).size===item.evidence.length&&item.evidence.every(id=>bounded(id,100)),'Invalid saved component structure.');
  const order=componentOrder(draft.bundle.components),ids=new Set(order),input=draft.inputs,scope=input.scope;
  fail(exactKeys(input as unknown as Record<string,unknown>,['scope','capacity','timing','dependenciesConfirmed','groups','memberships','groupsDisjoint','expenses','expenseLinks','costReviews','costsDistinct',...(input.successMeasure!==undefined?['successMeasure']:[]),...(input.whatIf!==undefined?['whatIf']:[])]),'Unsupported bundle inputs.');
  if(input.whatIf!==undefined)fail(validWhatIf(input.whatIf,draft.binding.goal),'Review a supported what-if with valid units and assumptions.');

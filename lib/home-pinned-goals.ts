@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {assumptionsFallbackField,readAssumptionsFallback} from './home-assumptions-fallback.ts';
 // Navigation status only. Opening a plan still uses the existing current-context guards.
 // @ts-expect-error Native Node tests share TypeScript source.
 import {readBundlePreparation,bundlePreparationField} from './home-bundle-preparation.ts';
@@ -18,6 +20,7 @@ export function pinnedGoalPlanStatus(goalId:string,fields:Record<string,unknown>
     if(!preparation)return 'review';
     if(preparation.proposal.bundles.length)return 'saved';
   }
+  if(fields?.[assumptionsFallbackField]!==undefined)return readAssumptionsFallback(fields[assumptionsFallbackField],goalId)?'saved':'review';
   const stored=fields?.[bundleWorkspaceField];
   if(stored!==undefined){
     const workspace=readBundleWorkspace(stored,goalId);
