@@ -30,3 +30,10 @@ test('browser path imports only projections, not evaluator, raw fixture or sourc
   assert.doesNotMatch(source + helper, /fetch\(|supabase|node:|lib\/ml|tests\/fixtures|exitForecastForConsumer/);
   assert.doesNotMatch(JSON.stringify(artifact), /employee_id|manager_employee_id|base_salary|monthEndHeadcount|"months":\[/);
 });
+test('missing domain projection or numeric fallback cannot be displayed as verified evidence', () => {
+  for (const change of [a => { delete a.domains.turnover.evaluation; }, a => { a.domains.hiring.evaluation.metrics = 0; }, a => { a.domains.satisfaction.evaluation.history = []; }]) {
+    const copy = structuredClone(artifact); change(copy);
+    assert.notEqual(resolve(copy, copy, preview).status, 'ready');
+    assert.equal(resolve(copy, artifact, preview).status, 'stale');
+  }
+});

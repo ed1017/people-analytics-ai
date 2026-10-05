@@ -27,7 +27,21 @@
         "availability-unverified",
         "completeness-unknown",
         "missing-comparison-design"
-      ]
+      ],
+      "evaluation": {
+        "status": "unavailable",
+        "contractStatus": "blocked",
+        "reasonCodes": [
+          "availability-unknown",
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history",
+          "no-history"
+        ],
+        "history": null,
+        "metrics": null,
+        "note": "Monthly source evaluation unavailable: verified observation history and complete monthly coverage are missing. The retrospective synthetic benchmark does not qualify this source."
+      }
     },
     "satisfaction": {
       "status": "unqualified",
@@ -51,7 +65,20 @@
         "availability-unverified",
         "completeness-unknown",
         "missing-comparison-design"
-      ]
+      ],
+      "evaluation": {
+        "status": "unavailable",
+        "contractStatus": "blocked",
+        "reasonCodes": [
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history",
+          "score-definition-unavailable-or-unsupported"
+        ],
+        "history": null,
+        "metrics": null,
+        "note": "Wave evaluation unavailable: no qualified comparable waves or supported scoring definition. Satisfaction scores and response coverage remain unknown."
+      }
     },
     "hiring": {
       "status": "unqualified",
@@ -75,7 +102,21 @@
         "availability-unverified",
         "completeness-unknown",
         "missing-comparison-design"
-      ]
+      ],
+      "evaluation": {
+        "status": "unavailable",
+        "contractStatus": "blocked",
+        "reasonCodes": [
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history",
+          "no-mature-openings",
+          "opening-and-followup-coverage-required"
+        ],
+        "history": null,
+        "metrics": null,
+        "note": "Opening-cohort evaluation unavailable: no qualified opening history or follow-up coverage. The configured 90-day audit horizon is not validated on company outcomes; completed-start durations remain unknown."
+      }
     }
   },
   "conditionalDemo": {
@@ -507,7 +548,7 @@
     "constructedFixture": "evaluated-constructed-fixture",
     "operationallyValidated": false
   },
-  "evidenceIdentity": "ebcdefd3ba0bbd2e8136e6b4353cd141e31fc9bb5d00abaeaaaf860f880406e8",
-  "implementationIdentity": "14bad2b635d6c8461b8e3ed66b65eb725688bf651fea06f53bbbbc16c22b28be",
-  "identity": "94e6347f454caa9d19ba43b5f087bc91203d27c2aa02e6b544386384f1592e68"
+  "evidenceIdentity": "a481ae937a5777e34336bd7e32de41847da1e7d47b9e97951d70b9aeb4ae4492",
+  "implementationIdentity": "88ad4b01bf6341d5aa1723fb92509ec534dd6272d71afba14206118379a63912",
+  "identity": "4427f73fc730c5e3217bdddb645a943f7708e4ed5b9030255ff9892211ef45a3"
 }
