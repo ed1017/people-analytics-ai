@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {buildHomeFindingSchema,readHomeFindingFollowups} from './home-finding-followups.ts';
 // @ts-expect-error Native Node tests share the TypeScript source.
 import {inspectHomeCandidateProposal,type CandidatePack} from "./home-candidate-options.ts";
 // @ts-expect-error Native Node tests share the TypeScript source.
@@ -12,13 +14,14 @@ export function buildHomeReplyFormat(pack?:CandidatePack){
     type: "object",
     properties: {
       answer: { type: "string" },
+      finding_followups: buildHomeFindingSchema(pack),
       next_step: { type: "string", enum: ["none", "choose_goal"] },
       problem: eligible?{type:['string','null']}:{type:'null'},
       problem_evidence:{type:'array',maxItems:eligible?3:0,items:eligible?{type:'string',enum:available}:{type:'null'}},
       options:{type:'array',maxItems:eligible?3:0,items:buildInvestigationCandidateSchema(available)},
       question:eligible?{type:['string','null']}:{type:'null'},
     },
-    required: ["answer", "next_step", "problem", "problem_evidence", "options", "question"],
+    required: ["answer", "finding_followups", "next_step", "problem", "problem_evidence", "options", "question"],
     additionalProperties: false,
   },
 };
@@ -35,7 +38,7 @@ export function decodeHomeModelReply(text: string, hasFocusedIssue: boolean, pac
   if (!value || typeof value !== "object" || !("answer" in value) || typeof value.answer !== "string" || !value.answer.trim() || !("next_step" in value) || !["none", "choose_goal"].includes(String(value.next_step))) throw new Error("Home answer unavailable. Preparation diagnostic: invalid_reply.");
   const fields=value as unknown as Record<string,unknown>;
   const {proposal:candidateProposal,diagnostic:candidateDiagnostic}=inspectHomeCandidateProposal({version:2,problem:fields.problem,problem_evidence:fields.problem_evidence,options:fields.options,question:fields.question},pack);
-  return { candidateProposal, candidateDiagnostic, answer: value.answer, nextStep: !candidateProposal && !hasFocusedIssue && value.next_step === "choose_goal" ? "choose_goal" : "none" };
+  return { findingFollowups:readHomeFindingFollowups(fields.finding_followups,value.answer,pack), candidateProposal, candidateDiagnostic, answer: value.answer, nextStep: !candidateProposal && !hasFocusedIssue && value.next_step === "choose_goal" ? "choose_goal" : "none" };
 }
 export const homeIssuePresentation = "When the answer discusses multiple distinct supported problems, group them under Markdown headings such as ### Issue A — [problem] and ### Issue B — [problem]. Preserve the individual bullet details, citations and uncertainty under their own issue heading. Do not invent, split or infer extra issues to fill this format. Alternative ways to address the same issue remain Option 1, Option 2 and so on, not separate issues. For one issue keep the ordinary concise format. This is presentation only; it does not create or pin additional goals.";
 export function homeResponseStyle(message:string) {
