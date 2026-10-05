@@ -550,3 +550,39 @@
   .home-workspace :is(button, summary, [tabindex], h2, h3) { scroll-margin: .75rem 0; }
   .app-ai-panel { position: static; width: 100%; min-width: 0; }
 }
+
+/* Light changes the same workspace surfaces; page title/navigation stay intact. */
+[data-workspace-palette="light"] {
+  --workspace-panel: #DEECFA;
+  --workspace-send: #205CAC;
+  --workspace-home-send: #205CAC;
+  --workspace-send-text: #FFFFFF;
+  --workspace-action-edge: #205CAC;
+}
+[data-workspace-palette="light"] :is(.global-workforce-filters, .home-composer-dock, .app-ai-panel) {
+  --foreground: #182B43;
+  --muted-foreground: #41566F;
+  --background: #F3F7FC;
+  --card: #F3F7FC;
+  --card-foreground: #182B43;
+  --muted: #D9E2ED;
+  --primary: #205CAC;
+  --primary-foreground: #FFFFFF;
+  --border: #71849A;
+  --input: #71849A;
+  --ring: #174D90;
+  --accent: #CDDDF0;
+  --accent-foreground: #182B43;
+  color: var(--foreground);
+}
+[data-workspace-palette="light"] .global-workforce-filters { background-color: #E8ECF1; }
+[data-workspace-palette="light"] .home-composer-dock textarea { background-color: #F3F7FC; color: #182B43; border-color: #71849A; }
+[data-workspace-palette="light"] :is(.global-workforce-filters, .home-composer-dock, .app-ai-panel) :is(button, select, textarea, summary):focus-visible {
+  outline: 3px solid #174D90;
+  outline-offset: 3px;
+}
+
+@media (max-width: 767px), (max-width: 950px) and (max-height: 500px) {
+  .header-preferences select { width: 6rem; min-width: 0; min-height: 44px; font-size: 16px; padding-left: .5rem; padding-right: .5rem; }
+  .header-preferences { gap: .375rem; }
+}

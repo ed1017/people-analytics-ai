@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, type ReactNode } from "react";
 import {usePhoneLayout} from "@/components/use-phone-layout";
+import {WorkspacePaletteControl} from "@/components/workspace-palette-control";
 import { PageHelp } from "@/components/page-help";
 
 import {
@@ -63,7 +64,7 @@ export function AppHeader({
           {phone?<details className="header-contact"><summary className="min-h-11 cursor-pointer py-3 text-xs">About &amp; contact</summary><div className="header-contact-content">
 {contact}</div></details>:contact}
         </div>
-        <div className="col-start-2 row-start-2 flex items-center justify-self-end gap-3 sm:row-start-1">
+        <div className="header-preferences col-start-2 row-start-2 flex min-w-0 items-center justify-self-end gap-2 sm:row-start-1">
           <span className="hidden text-xs font-medium text-muted-foreground md:inline">
             Perspective
           </span>
@@ -77,6 +78,7 @@ export function AppHeader({
             <option value="Leader">Leader</option>
             <option value="Finance">Finance</option>
           </select>
+          <WorkspacePaletteControl/>
         </div>
       </div>
       {children}
