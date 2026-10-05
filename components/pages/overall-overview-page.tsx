@@ -18,8 +18,6 @@ import {HomeSolutionBundles} from '@/components/home-solution-bundles';
 import type {BundleDiscussion} from '@/components/home-bundle-plans';
 import type {BundleEditPreview} from '@/lib/home-bundle-chat-edit';
 import {HomeBundleChatReview} from '@/components/home-bundle-chat-review';
-import {bundlePreparationField,readBundlePreparation} from '@/lib/home-bundle-preparation';
-import type {ActionBinding} from '@/lib/home-action-drafts';
 import {HomeActionOptions} from '@/components/home-action-options';
 import {homeCandidateVerification} from '@/lib/home-candidate-verification';
 import {HomeCandidateOptions} from '@/components/home-candidate-options';
@@ -31,7 +29,7 @@ import { buildHomePack, homeDefinitions, readHomeSource } from "@/lib/home-pack.
 import type { DevelopmentSession } from "@/components/development-workspace";
 import { PromptExamples } from "@/components/prompt-examples";
 import { contextualPrompts } from "@/lib/contextual-prompts";
-import { buildHomeActionPlanRequest, DEVELOPMENT_DEMO_GOAL, HOME_ACTION_PLAN_LABEL } from "@/lib/home-decision-journey";
+import { HOME_ACTION_PLAN_LABEL, buildHomeActionPlanRequest, DEVELOPMENT_DEMO_GOAL } from "@/lib/home-decision-journey";
 import { completeScopedChatTurn } from "@/lib/chat-context-history";
 import { requestedHomeCountries, type CountryOption } from "@/lib/home-country-scope";
 import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
@@ -89,9 +87,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const [settledEvidenceKey,setSettledEvidenceKey]=useState("");
   const [evidenceRevision, setEvidenceRevision] = useState(0);
   const pack = buildHomePack(sourceResults, workforceScope, conversation.focusedIssue || conversation.problem?.latestQuestion || "", developmentSession);
-  const storedPreparation=storage.data.workspaces[conversation.activeGoalId]?.fields[bundlePreparationField];
-  const preparedPlan=storedPreparation&&typeof storedPreparation==='object'&&'binding' in storedPreparation?readBundlePreparation(storedPreparation,storedPreparation.binding as ActionBinding,pack):null;
-  const hasPreparedPlan=preparedPlan?.binding.goalId===conversation.activeGoalId&&preparedPlan.binding.goal===conversation.focusedIssue&&preparedPlan.proposal.bundles.length>0;
+  const selectedPlanForChat=useRef<BundleDiscussion|null>(null);
   const [planEdit,setPlanEdit]=useState<BundleDiscussion|null>(null),[editPreview,setEditPreview]=useState<BundleEditPreview|null>(null),[editNotice,setEditNotice]=useState('');
   const editReview=useRef<HTMLDivElement>(null);
   const sources = pack.sources;
@@ -206,12 +202,16 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
     if(!active||sending.current||currentEvidenceKey.current!==contextKey)return;
-    if(!actionPlan&&!preserveDraft&&planEdit?.goalId===conversation.activeGoalId){
+    const localEdit=/^(?:(?:please|can you|could you|could we|would you|i[’']?d like to)\s+)?(?:set|change|update|start|move|make|run|use|budget|add|remove)\b/i.test(message);
+    if(!actionPlan&&!preserveDraft&&selectedPlanForChat.current?.goalId===conversation.activeGoalId&&localEdit){
       if(chatLoading||!conversation.saved||!ready)return;
-      try{if(!planEdit.isCurrent())throw Error('The selected plan or context changed. Choose Discuss changes on the current plan.');setEditPreview(planEdit.preview(message));setEditNotice('Review these changes before accepting. Nothing is saved or calculated.');}
+      const target=selectedPlanForChat.current;setPlanEdit(target);
+      try{if(!target.isCurrent())throw Error('The selected plan or context changed. Select the intended Plan tab and send the change again.');setEditPreview(target.preview(message));setEditNotice('Review these changes before accepting. Nothing is saved or calculated.');}
       catch(error){setEditPreview(null);setEditNotice((error as Error).message);}
       requestAnimationFrame(()=>{editReview.current?.focus({preventScroll:true});editReview.current?.scrollIntoView({block:'nearest'});});return;
     }
+    if(!localEdit&&planEdit){setPlanEdit(null);setEditPreview(null);setEditNotice('');}
+    if(!actionPlan&&!preserveDraft&&activePinnedGoal&&/^(?:compare workforce options|review workforce numbers)[.!]?$/i.test(message)){compareWorkforceOptions();return;}
     if(!actionPlan&&optionActions&&isOptionActionLabel(message)){
       setLocalAction({goalId:conversation.activeGoalId,notice:'Choose the current option action button to open it. Typed or restored action text cannot select an option.'});return;
     }
@@ -375,7 +375,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       {active&&<WorkforceSolutionPanel hideEntry optionActions={optionActions} page="home" onNavigate={onNavigate}/>}
     </div>
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
-    <HomeSolutionBundles openRequest={planOpen} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} projectEvidence={destination=>buildHomePack(sourceResults,workforceScope,conversation.focusedIssue||conversation.problem?.latestQuestion||'',destination.development??developmentSession)} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={request=>{if(request.isCurrent()){setPlanEdit(request);setEditPreview(null);setEditNotice('');focusQuestion();}}}/>
+    <HomeSolutionBundles openRequest={planOpen} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} projectEvidence={destination=>buildHomePack(sourceResults,workforceScope,conversation.focusedIssue||conversation.problem?.latestQuestion||'',destination.development??developmentSession)} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={request=>{selectedPlanForChat.current=request;}}/>
     {planEdit?.goalId===conversation.activeGoalId&&<div ref={editReview} tabIndex={-1}><HomeBundleChatReview target={planEdit} preview={editPreview} text={input} busy={chatLoading||!ready||!conversation.saved} notice={editNotice} onClose={()=>{setPlanEdit(null);setEditPreview(null);setEditNotice('');focusQuestion();}} onAccept={()=>{try{if(!active||chatLoading||!ready||!conversation.saved||!editPreview||input.trim()!==editPreview.request||!planEdit.isCurrent())throw Error('The request or current context changed. Review it again.');planEdit.accept(editPreview);setInput('');setPlanEdit(null);setEditPreview(null);setEditNotice('');}catch(error){setEditNotice((error as Error).message);}}}/></div>}
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!hasAnswer&&!conversation.focusedIssue&&startingGuide}
@@ -399,20 +399,11 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     </div>
 
     <form onSubmit={event => { event.preventDefault(); void send(); }} className="home-chat-form shrink-0">
-      {activePinnedGoal&&<div className="mb-2">
-        <button type="button" disabled={chatLoading||!conversation.storageReady||!conversation.saved||Boolean(conversation.issueEditor)||Boolean(planningReview)} onClick={compareWorkforceOptions} className="min-h-11 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{hasPlan?'Continue workforce options':hasRetention?'Continue retention what-if':'Compare workforce options'}</button>
-        <p className="mt-1 text-xs text-muted-foreground">{hasPlan?'Continue reviewing your saved assumptions and options. Your chat draft is kept.':hasRetention?'Return to your retention assumptions. Your drafts are kept; Calculate and Save remain separate actions.':'Review your goal and choose additional role capacity or a retention what-if.'}</p>
-      </div>}
-      {conversation.focusedIssue&&!hasPreparedPlan&&!hasPlan&&!hasRetention && <div className="mb-2">
-        <button type="button" disabled={!ready || chatLoading || !planRequest || Boolean(input.trim())} onClick={() => void send("", true)} className="min-h-11 rounded px-2 py-2 text-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{hasVerifiedOptions?"Draft a goal action plan":HOME_ACTION_PLAN_LABEL}</button>
-        {(questionUnanswered || !planRequest || Boolean(input.trim())) && <p className="mt-2 text-xs text-muted-foreground">{questionUnanswered ? "Complete or retry your current question before developing a plan." : !planRequest ? "Evidence or perspective changed. Ask a question in the current scope before developing a plan." : input.trim() ? "Send your new question first so the plan uses the updated conversation." : ""}</p>}
-      </div>}
-
       {visibleScopeChoice && <div aria-label="Requested country scope" className="mb-3 text-sm"><p>{visibleScopeChoice.kind==="ambiguous" ? "Which country should this workforce snapshot use?" : visibleScopeChoice.kind==="unsupported" ? "That country scope is not fully supported. Choose an available country or keep the current scope; missing evidence stays unavailable." : "Use country-specific workforce evidence for this question?"}</p><div className="mt-2 flex flex-wrap gap-2">{visibleScopeChoice.options.map(option=><button key={option.value} type="button" onClick={()=>applyCountry(option)} className="min-h-11 rounded border border-primary px-3 py-2 font-semibold text-primary">Apply {option.label} and answer</button>)}<button type="button" onClick={()=>void send(visibleScopeChoice.message,false,true)} className="min-h-11 px-2 text-primary underline">Answer with current scope</button></div><p className="mt-1 text-xs text-muted-foreground">Only the workforce snapshot changes. Other filters stay selected; company-wide sources retain their scope.</p></div>}
       {pendingScope && <p role="status" className="mb-3 text-sm">Refreshing the selected workforce evidence before answering. Edit your question to cancel.</p>}
       {localAction?.goalId===conversation.activeGoalId&&<p role="status" className="mb-3 text-sm">{localAction.notice}</p>}
       <div ref={composerSlot} className="home-composer-slot"><div ref={composerDock} className="home-composer-dock rounded-t-2xl border bg-card p-2 shadow-lg">
-      {planEdit?.goalId===conversation.activeGoalId&&<p className="mb-1 text-xs font-medium">Editing Plan #{planEdit.option}. Send previews changes for your review.</p>}
+      {planEdit?.goalId===conversation.activeGoalId&&<p className="mb-1 text-xs font-medium">Editing Action Plan #{planEdit.option}. Send previews changes for your review.</p>}
       <label htmlFor="overview-question" className="sr-only">Ask Workforce AI</label>
       <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" aria-describedby="overview-question-context-tip" value={input} onChange={event => changeQuestion(event.target.value)} rows={1}
         placeholder="Describe a goal, compare options, build or adjust a plan, or ask a general workforce question." className="max-h-80 min-h-12 w-full resize-y rounded-lg border bg-background/40 p-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />

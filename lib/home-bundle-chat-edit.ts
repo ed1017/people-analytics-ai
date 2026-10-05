@@ -34,10 +34,10 @@ const monthNames=['january','february','march','april','may','june','july','augu
 function everydayClause(raw:string,available:Map<string,Target[]>,draft:BundleDraft):{name:string;value:string}{
  const clause=raw.trim().replace(/[.?]$/,'').replace(/^(?:please\s+|(?:can|could|would)\s+(?:you|we)\s+|i(?:’|')?d like to\s+)/i,'');
  if(/\b(?:not|never|don[’']?t|do not|avoid|except|unless|instead|rather than)\b/i.test(clause))fail('Which change should I make? Restate the desired value without a negation or exception; no changes have been proposed.');
- if(/\b(?:plan\s*#?\s*\d+|(?:both|all|other|another|each)\s+plans?)\b/i.test(clause))fail('Which plan should I edit? Choose Discuss changes on that plan, then describe its changes without referring to other plans.');
+ if(/\b(?:plan\s*#?\s*\d+|(?:both|all|other|another|each)\s+plans?)\b/i.test(clause))fail('Which plan should I edit? Select that Plan tab, then describe its changes without referring to other plans.');
  let match=clause.match(/^(?:set|change|update)\s+(.+?)\s+to\s+(.+)$/i);
  if(match&&available.has(normalize(match[1]))&&!/^(?:(?:total|overall|plan)\s+)?budget(?:\s+(?:ceiling|limit))?$/i.test(match[1]))return {name:match[1],value:match[2]};
- if(/\bbudget(?=\b|\d)/i.test(clause))fail('Does this budget mean a total plan ceiling or an amount for a specific expense? Use Edit assumptions and plan for a total ceiling. For an expense, name the allowance and its amount in USD, using its displayed cost basis. No budget has been changed.');
+ if(/\bbudget(?=\b|\d)/i.test(clause))fail('Does this budget mean a total plan ceiling or an amount for a specific expense? Use Review plan fields for a total ceiling. For an expense, name the allowance and its amount in USD, using its displayed cost basis. No budget has been changed.');
  if(match)return {name:match[1],value:match[2]};
  match=clause.match(/^(?:start(?:\s+(?:it|the plan))?\s+in|move\s+(?:the\s+)?start\s+to)\s+(.+)$/i);
  if(match)return {name:'Shared start month',value:match[1]};
@@ -45,10 +45,10 @@ function everydayClause(raw:string,available:Map<string,Target[]>,draft:BundleDr
  if(match)return {name:'Shared horizon',value:match[1]};
  match=clause.match(/^use\s+(.+?)\s+participants(?:\s+for\s+(.+))?$/i);
  if(match){
-  if(!match[2]&&draft.inputs.groups.length!==1)fail(draft.inputs.groups.length?'Which participant group should use this count? Choose '+draft.inputs.groups.map(group=>`“${group.label}”`).join(' or ')+'. Say “use 20 participants for [group]”.':'Which participant group should this count describe? Add a group in Edit assumptions and plan first.');
+  if(!match[2]&&draft.inputs.groups.length!==1)fail(draft.inputs.groups.length?'Which participant group should use this count? Choose '+draft.inputs.groups.map(group=>`“${group.label}”`).join(' or ')+'. Say “use 20 participants for [group]”.':'Which participant group should this count describe? Add a group in Review plan fields first.');
   return {name:match[2]?match[2]+' participants':'participants',value:match[1]};
  }
- fail('Which assumption should change? Try “start in December 2026”, “make it three months”, or “use 20 participants”. For another existing assumption, say “change [name] to [value]”, or use Edit assumptions and plan.');
+ fail('Which assumption should change? Try “start in December 2026”, “make it three months”, or “use 20 participants”. For another existing assumption, say “change [name] to [value]”, or use Attach Action Plan → Review plan fields.');
 }
 function parseValue(raw:string,target:Target):Assumption<string|number>{
  if(/^unknown$/i.test(raw))return unknownAssumption();
