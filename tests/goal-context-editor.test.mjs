@@ -13,3 +13,20 @@ test('user-edited context and explicit decisions remain separate while typing th
 test('a different explicit exploration goal replaces the old context; clarifications retain source-bound notes',()=>{const next=recordExplorationGoalContext(notes,'Improve manager support','home','Canada');assert.equal(next.notes.length,1);assert.ok(!JSON.stringify(next).includes('AI capability'));const clarified=recordExplorationGoalContext(notes,'Maximum budget $5000','finance','All countries');assert.equal(clarified.notes.length,2);assert.equal(clarified.notes[1].page,'finance');assert.equal(clarified.decisions,'');});
 test('unbound exploratory questions and model-shaped stored problem text cannot prefill a New Goal',()=>{const questions=addGoalNote(emptyGoalRequirements(),'What do the records show?','home','All');assert.deepEqual(openGoalContextEditor(empty,false,questions,source,'8').requirements,emptyGoalRequirements());const unknown={version:1,activeId:'a',goals:[{id:'a',statement:'Model suggested problem'}]};assert.deepEqual(openGoalContextEditor(unknown,false,emptyGoalRequirements(),source,'9').requirements,emptyGoalRequirements());});
 test('saved-goal id, statement and context changes invalidate an editor without mutation',()=>{const editor=openGoalContextEditor(active,false,notes,source,'10');assert.equal(goalContextEditorCurrent(editor,active),true);for(const current of [{...active,activeId:''},{...active,goals:[{...active.goals[0],statement:'Other goal'}]},{...active,goals:[{...active.goals[0],context:{...notes,constraints:'New saved context'}}]}])assert.equal(goalContextEditorCurrent(editor,current),false);});
+test('uncertain and oversized requests enter the existing editor with exact source context',()=>{
+ for(const text of ['Can we build AI skills?','Build '+ 'specific AI skills '.repeat(20)]){
+  const context=addGoalNote(emptyGoalRequirements(),text,'skills','US workforce');
+  const editor=openGoalContextEditor(empty,false,context,source,'review');assert.equal(editor.reviewRequired,true);assert.equal(editor.draft,text.length<=240?text:'');
+  assert.deepEqual(editor.requirements.notes,context.notes);
+  const edited=changeGoalEditorStatement(editor,'Build AI skills');assert.deepEqual(edited.requirements.notes[0],context.notes[0]);assert.equal(edited.requirements.notes.at(-1).page,'home');assert.equal(edited.requirements.decisions,'');
+ }
+});
+test('withdrawal clears earlier exploration context and does not prefill a goal',()=>{
+ const context=recordExplorationGoalContext(notes,'Cancel that goal','home','All countries');assert.equal(context.notes.length,1);
+ const editor=openGoalContextEditor(empty,false,context,source,'withdrawn');assert.equal(editor.draft,'');assert.deepEqual(editor.requirements,emptyGoalRequirements());
+});
+test('requirement grouping does not discard a later budget or its original source',()=>{
+ const goal=recordExplorationGoalContext(emptyGoalRequirements(),'Build AI skills','home','All countries');
+ const context=recordExplorationGoalContext(goal,'Budget USD20000','finance','US workforce');
+ const editor=openGoalContextEditor(empty,false,context,source,'budget');assert.equal(editor.draft,'Build AI skills');assert.equal(editor.requirements.notes.length,2);assert.ok(editor.requirements.notes.some(note=>note.text==='Budget USD20000'&&note.page==='finance'&&note.scope==='US workforce'));
+});

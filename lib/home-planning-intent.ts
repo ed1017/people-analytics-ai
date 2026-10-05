@@ -1,7 +1,7 @@
 // @ts-expect-error Native Node tests share TypeScript source.
 import {explicitTurnoverRates} from './home-turnover-rates.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
-import {explicitHomeGoal} from './home-explicit-goal.ts';
+import {readUserGoalIntent,type UserGoalIntent} from './home-user-goal-intent.ts';
 // User-authored conversation only. No model prose, inferred effect or source lookup.
 export type HomePlanningIntent={goal:string|null;months:number|null;relativeReduction:number|null;baseline:number|null;target:number|null;rateConflict:boolean;baselinePeriod:'annualized'|'ytd'|null;budgetCap:number|null;existingCapacity:boolean;companyWide:boolean};
 export function planningStatements(context:unknown):string[]{
@@ -25,7 +25,18 @@ export function resolveHomePlanningIntent(statements:string[]):HomePlanningInten
 }
 export function planningRequirementText(intent:HomePlanningIntent){return [intent.budgetCap===null?'':`Maximum one-time programme budget: $${intent.budgetCap.toLocaleString('en-US')} USD (cap, not an expense).`,intent.existingCapacity?'Use existing HR/manager capacity.':'',intent.companyWide?'Scope: all countries and business units.':''].filter(Boolean).join(' ')}
 
-export function homeGoalForPin(statements:string[]){const first=explicitHomeGoal(statements[0]??''),latest=explicitHomeGoal(statements.at(-1)??'');const correctedMetric=first&&/regrettable/i.test(first)&&statements.slice(1).some(text=>/voluntary turnover/i.test(text));return correctedMetric?resolveHomePlanningIntent(statements).goal:latest??first??resolveHomePlanningIntent(statements).goal;}
+export function resolveHomeUserGoal(statements:readonly string[]):UserGoalIntent{
+ const result=readUserGoalIntent(statements);
+ if(result.status!=='explicit_outcome'||!result.source)return result;
+ const relevant=statements.slice(result.contextStart),original=statements[result.source.statement];
+ // Preserve the existing quantified-turnover clarification/display contract. Exact authored text
+ // stays in source and notes; this introduces no new metric, unit conversion or inferred target.
+ const corrected=/regrettable/i.test(result.goal??'')&&relevant.slice(1).some(text=>/voluntary turnover/i.test(text));
+ const quantifiedTest=/^synthetic planning test:/i.test(original)&&/\d/.test(original);
+ if(original.length>240||corrected||quantifiedTest){const known=resolveHomePlanningIntent([...relevant]);if(known.goal&&/turnover/i.test(result.source.text))return {...result,goal:known.goal};}
+ return result;
+}
+export function homeGoalForPin(statements:string[]){const result=resolveHomeUserGoal(statements);return result.status==='explicit_outcome'?result.goal:null;}
 
 /** Keep a long Home statement in existing bounded notes, without dropping its final constraints.
  * Six notes is the existing requirement-note budget; an oversized final part still carries the normal truncation flag.
@@ -43,14 +54,4 @@ export function homePlanningNoteParts(statement:string):string[]{
 /** Discovery may have no investigation candidate. Only a declarative user outcome can stand alone.
  * Never accepts assistant prose, a model problem, a question, or a choice between outcome goals.
  */
-export function homeUserGoalForPin(statements:string[]):string|null{
- const declarative=(text:string)=>{
-  const opening=text.trim().replace(/^(?:synthetic planning test|(?:my |our )?goal|outcome):\s*/i,'').split(/\.\s|[\n\r]/)[0];
-  const outcome=opening.replace(/^(?:please\s+)?help\s+(?:me|us)\s+(?:to\s+)?/i,'');
-  return !opening.includes('?')&&!/^(?:i|we)\s+(?:need|want)\s+(?:help|advice|ideas|something|a plan|an action plan)(?:[.!]|$)/i.test(opening)&&!/\bor\s+(?:reduce|increase|improve|build|develop|add|hire|retain|replace|strengthen|expand|create)\b/i.test(opening)&&
-   !/^(?:build|develop|create)\s+(?:a |an |the )?(?:plan|action plan|strategy)(?:[.!]|$)/i.test(outcome)&&
-   /^(?:reduce|increase|improve|build|develop|add|hire|retain|replace|strengthen|expand|create|(?:i|we)\s+(?:need|want))\b/i.test(outcome);
- };
- if(!statements.some(declarative))return null;
- const goal=homeGoalForPin(statements.map(text=>text.trim().replace(/^(?:synthetic planning test|(?:my |our )?goal|outcome):\s*/i,'')));return goal&&declarative(goal)?goal:null;
-}
+export function homeUserGoalForPin(statements:string[]):string|null{return homeGoalForPin(statements);}

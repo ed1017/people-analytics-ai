@@ -1,10 +1,10 @@
 // @ts-expect-error Native Node tests share TypeScript source.
-import {planningStatements} from './home-planning-intent.ts';
+import {planningStatements,resolveHomeUserGoal} from './home-planning-intent.ts';
 /** Select the requested task from the existing user-authored goal envelope; adds no model inputs. */
 export type HomeBundleTask='delivery'|'diagnostic';
 export function homeBundleTask(context:unknown):HomeBundleTask{
- const statements=planningStatements(context),goal=statements[0]??'';
- const outcome=/\b(?:reduce|lower|decrease|improve|increase|retain|implement|launch)\b/i.test(goal)||statements.some(text=>/\b(?:reduce|lower|decrease)\s+(?:(?:regrettable|employee|voluntary|company-wide|annualized|annualised|YTD)\s+)*turnover\b|\b(?:propose|develop|create)\b[^.!?]{0,60}\b(?:interventions|action plans?|delivery)\b/i.test(text));
+ const statements=planningStatements(context),intent=resolveHomeUserGoal(statements);
+ const outcome=intent.status==='explicit_outcome'||intent.reason!=='withdrawn'&&intent.status!=='needs_review'&&statements.some(text=>text.split(/(?<=[.!?])\s+|[\n\r]+/).some(part=>!part.includes('?')&&/^(?:propose|develop|create)\b[^.!?]{0,60}\b(?:interventions|action plans?|delivery)\b/i.test(part.trim())));
  return outcome?'delivery':'diagnostic';
 }
 export function homeBundleTaskInstructions(context:unknown):string{
