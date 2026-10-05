@@ -92,6 +92,32 @@ export class DecisionStore {
   if(JSON.stringify(before?.fields[field])===JSON.stringify(value))return;
   this.save({...this.state.data,workspaces:{...this.state.data.workspaces,[id]:{savedAt:new Date().toISOString(),fields:{...before?.fields,[field]:value as Json}}}});
  }
+ // One-envelope optimistic transaction. Unlike ordinary field editing, a failed
+ // transaction never publishes its candidate as an unsaved working copy.
+ commitGoalFields(id:string,goal:string,revision:number,at:string,build:(fields:Record<string,Json>)=>Record<string,Json>):number{
+  try{
+   if(!this.state.ready||!this.state.saved||this.blocked||!this.port)throw Error('Saved planning state is unavailable; reload or resolve storage before applying.');
+   if(this.state.data.revision!==revision||this.state.data.goals.activeId!==id||this.state.data.goals.goals.find(item=>item.id===id)?.statement!==goal)throw Error('The goal or destination revision changed; preview again.');
+   if(!/^\d{4}-\d\d-\d\dT/.test(at)||!Number.isFinite(Date.parse(at)))throw Error('Invalid application timestamp.');
+   if(this.port.getItem(DECISIONS_STORAGE_KEY)!==this.expected){this.blocked=true;throw Error('Another tab changed saved decisions. Reload before applying.');}
+   const original=this.state.data,expected=this.expected,before=original.workspaces[id],patch=build(structuredClone(before?.fields??{}));
+   if(!validateJson(patch)||!patch||Array.isArray(patch)||typeof patch!=='object'||!Object.keys(patch).length)throw Error('Invalid or empty application transaction.');
+   const next={...original,revision:revision+1,workspaces:{...original.workspaces,[id]:{savedAt:at,fields:{...before?.fields,...structuredClone(patch)}}}};
+   const raw=encodeDecisions(next);parseDecisions(raw);
+   // Recheck after candidate validation. localStorage has no native cross-tab CAS.
+   if(this.state.data!==original||this.expected!==expected)throw Error('Planning state changed during candidate validation; preview again.');
+   if(this.port.getItem(DECISIONS_STORAGE_KEY)!==expected){this.blocked=true;throw Error('Another tab changed saved decisions. Reload before applying.');}
+   this.port.setItem(DECISIONS_STORAGE_KEY,raw);
+   this.expected=raw;this.state={ready:true,data:next,notice:null,saved:true};this.emit();return next.revision;
+  }catch(error){this.state={...this.state,saved:false,notice:(error instanceof Error?error.message:'Application failed.')+' Application inputs were not published; previous planning values are retained.'};this.emit();throw error;}
+ }
+ // Called by application UI storage-event listeners. Never import another tab's
+ // state over this tab's edits, and never treat an event alone as a write receipt.
+ invalidateExternalChange(){
+  if(!this.port||!this.state.ready)return;
+  try{if(this.port.getItem(DECISIONS_STORAGE_KEY)===this.expected)return;this.blocked=true;this.fail(Error('Another tab changed saved decisions. Reload before applying.'));}
+  catch(error){this.blocked=true;this.fail(error)}
+ }
  retry(){this.save(this.state.data);if(this.state.saved)try{this.cleanLegacy()}catch(error){this.fail(error)}}
  clearAll(){
   // Explicit destructive UI action only; never used as automatic corruption recovery.
