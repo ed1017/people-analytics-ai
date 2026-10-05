@@ -1,0 +1,5158 @@
+{
+  "kind": "synthetic-observable-signals-held-out",
+  "protocol": {
+    "version": "synthetic-observable-turnover-signals-v1",
+    "sourceCommit": "5679107bdcea1275afd1741376ff1a92386d6e5c",
+    "dataClass": "constructed-synthetic",
+    "family": "stationary",
+    "startMonth": "2021-01",
+    "training": {
+      "firstSeed": 4001,
+      "lastSeed": 4100,
+      "months": 57,
+      "origin": "2025-06-30T23:59:59.999Z",
+      "targets": [
+        "2025-07",
+        "2025-08",
+        "2025-09"
+      ],
+      "labelsAsOf": "2025-10-31T23:59:59.999Z"
+    },
+    "test": {
+      "firstSeed": 5001,
+      "lastSeed": 5100,
+      "months": 69,
+      "origin": "2026-06-30T23:59:59.999Z",
+      "targets": [
+        "2026-07",
+        "2026-08",
+        "2026-09"
+      ],
+      "labelsAsOf": "2026-10-31T23:59:59.999Z"
+    },
+    "signal": {
+      "name": "announced-workload-pressure",
+      "type": "binary",
+      "probabilityOne": 0.5,
+      "stream": "observable-pressure-v1",
+      "measured": "May31 at month end of the origin year",
+      "available": "June03 at 23:59:59.999Z of the origin year",
+      "sourceObservedAt": null,
+      "interpretation": "An invented aggregate leading indicator with an explicitly imposed association, not a verified real workload measure or a future outcome proxy constructed from labels."
+    },
+    "assignment": {
+      "stream": "observable-shock-assignment-v1",
+      "draw": "One independent-by-design uniform per seed, after signal generation and before generating outcomes; shared across scenarios and groups",
+      "probabilitiesBySignal": {
+        "informative": [
+          0.2,
+          0.8
+        ],
+        "no-signal": [
+          0.5,
+          0.5
+        ],
+        "reversed": [
+          0.8,
+          0.2
+        ]
+      }
+    },
+    "shock": {
+      "monthlyExtraProbability": 0.007,
+      "stream": "observable-extra-exits-v1",
+      "rule": "For each target-quarter day, after original scheduled company flows, draw binomial extra voluntary exits from remaining stock with probability 1-(1-.007)^(1/calendar-days-in-month). Reconcile stocks and person-days; never clip or reroll. Preserve pre-target vintages. Group allocation may change after extra events."
+    },
+    "models": {
+      "baselines": [
+        "recent-mean-3",
+        "seasonal-naive-12"
+      ],
+      "intercept": "recent-mean-3 plus training mean residual",
+      "signal": "recent-mean-3 plus training mean residual separately for signal 0 and 1; two fixed cell means, no tuning",
+      "clip": "Clamp adjusted total predictions at zero, without rounding",
+      "missingSignal": "Use intercept-only residual correction",
+      "minimumCellSupport": 10,
+      "trainingScenarios": [
+        "informative",
+        "no-signal"
+      ],
+      "reversedModel": "Reuse informative training fit unchanged",
+      "fitCustody": "Freeze fitted models and training evidence in a separate commit before generating any test seed. Each fit sees only its own scenario and training rows with labels available by training.labelsAsOf, before test.origin."
+    },
+    "hypotheses": {
+      "informative": "Observable signal adjustment reduces held-out count MAE versus intercept-only and both original baselines under the declared stable association",
+      "noSignal": "Without imposed signal association, additional cell means need not improve and can worsen error",
+      "reversed": "A reversed signal relationship can erase or reverse any informative benefit",
+      "primaryDescriptiveCriterion": "For each of groups A and B separately, at least 10% lower MAE than intercept-only and both original baselines in informative test histories. This is a descriptive synthetic criterion, never an operational gate or significance test."
+    },
+    "controls": [
+      "No-signal scenario, separately trained on no-signal histories",
+      "Reversed test relationship, using informative trained model without retraining",
+      "Signal release delayed until July01: forecast must equal intercept-only correction exactly",
+      "Future outcome mutation must leave pre-origin feature and point forecasts unchanged",
+      "Unexpected target, assignment, seed, truth or shock fields in feature records reject; future-effective or late-available records cannot be selected"
+    ],
+    "evaluation": {
+      "unit": "100 test company histories per scenario, shared across groups and scenarios; no pooling them as independent units",
+      "metrics": [
+        "intended",
+        "forecasted",
+        "scored",
+        "unavailable",
+        "MAE",
+        "RMSE",
+        "prediction-minus-actual bias",
+        "paired absolute-error delta versus each comparator",
+        "wins/ties/losses",
+        "signal-stratum metrics",
+        "shock/no-shock-stratum metrics"
+      ],
+      "pairedSupport": "Compare methods only on common scored histories and show missing support explicitly",
+      "intervals": "No new prediction or metric confidence intervals; no calibration or promotion",
+      "failurePolicy": "Retain every frozen seed and failed invariant; no rerolls, tuning, favorable subset selection, extra features or follow-on heuristic experiments."
+    },
+    "inputBoundary": "Strict offline-only synthetic signal record plus existing validated aggregate release snapshot; model never receives seed, scenario, assignment, shock schedule, true probability or future outcome. Production inputs and consumers are unchanged.",
+    "privacy": "Unchanged group allocation, minimum headcount 50, minimum positive exits 5 and complementary suppression. Suppressed groups remain unavailable and their actual totals are not emitted in score artifacts.",
+    "reservedQuarter": "No October–December workforce outcomes generated or scored; labelsAsOf is a retrospective availability cutoff, not an outcome window.",
+    "limitations": [
+      "The signal-outcome association and its stability are imposed, not discovered real evidence",
+      "PRNG domain separation is a design implementation, not statistical or cryptographic proof of independence",
+      "Training and test histories are different simulated companies and different calendar origins; this is not a claim of real-company transfer",
+      "No causal intervention, rates, person-level risk or real-world accuracy",
+      "Prior negative evidence, consumers, UI, database, security and held eNPS files remain unchanged"
+    ],
+    "publishedInterval": null,
+    "causalEffect": null,
+    "operationallyQualified": false,
+    "realWorldPerformanceValidated": false
+  },
+  "protocolSha256": "f4f49dad493c96cdd47dff9d5da024107c8d56fcc60e12b86fb8e00efa5d9861",
+  "protocolFrozenCommit": "5794c64b0b7857df0d1d0b26529ae54513f831b7",
+  "priorReports": {
+    "docs/evidence/synthetic-paired-prefix-v1/report.json": "fb17a87d61ad74b20f188ec1f9cc4e4b90c4d8bb30cdf2b561566e39203015fe",
+    "docs/evidence/synthetic-turnover-adaptation-v1/report.json": "18876092e44d00c849536351d3c37e51b1729ff52a279b44af450832e58883d6"
+  },
+  "priorConsumerIdentity": "6f76782c3da5b1c326f4a6b55e04792c1f5258e2f8712aa26205439a098265e8",
+  "implementationFiles": {
+    "lib/ml/synthetic-workforce/common.mjs": "60c9349a01e839e1a6fb6f6c67eb46a64f7ed6f5744e9a7757c9c4642783fc03",
+    "lib/ml/synthetic-workforce/turnover.mjs": "77a8784aef330e1a023c451cf65e25e01d8bd659351d1e6c1f580118ebaef1fe",
+    "lib/ml/synthetic-workforce/hiring.mjs": "df97ca224fb3cca017b37973367f197242bf9b526575bd5e4fc7de7344cb4865",
+    "lib/ml/synthetic-workforce/satisfaction.mjs": "1c605ff2badeb4c0c084d1284ec462fc50826bf2518106acc12a5a7f63c7b33e",
+    "lib/ml/synthetic-workforce/pipeline.mjs": "a80c5618beeb9ca54f69ab7c5bdb8e7a0fecc0ac075db59d23b881437b2532ff",
+    "lib/ml/synthetic-workforce/protocol.json": "8cd79a0fc146557b16a7c62b5c2d130e1c4c0d1064f565b574dfe1dfd726fc1c",
+    "lib/ml/synthetic-workforce/provenance.json": "0b2c024003715585b53eb69419aa481653371165c4d166b87b18bc3001fad51d",
+    "tests/manual/generate-synthetic-workforce.mjs": "523fc54cfe26904af63b9b87ca372047307c15d0b952d065b48265497b88d42c",
+    "lib/ml/synthetic-workforce/groups.mjs": "c097d4bec1fc04420bebc17514f87f60c7d48d7798c906a1c17fcc9a79ac967b",
+    "lib/ml/group-turnover/protocol.json": "8621ba887b3843618ccc5fd57ccd85c760687544da61d73baf3b345c6fa6ba4b",
+    "lib/ml/group-turnover/evaluation.mjs": "0c61f0b941506c19b0eddc09c4fcded8f67f20992a72cdd9b14b89105fc17ba4",
+    "lib/ml/turnover-vintage-evaluation.mjs": "a9de0ea0e9edda53191b0b70b9d6dc6787083e069e150f107bd4aed9076ef490",
+    "tests/manual/generate-group-turnover.mjs": "00d662584ef226b57c8cfc14cbf43a7ded20df53dcbb02c66a01f9e81f3a5c6b",
+    "lib/ml/turnover-adaptation/protocol.json": "79070b7db057786ba92beefba465731e7c22cee394e06da801fe8111804dfbd5",
+    "lib/ml/turnover-adaptation/evaluation.mjs": "cae56771f6a2bbc1c6fb501e31dbf3f1f9fd58827adab1e63a9219b42c40a7e3",
+    "tests/manual/generate-turnover-adaptation.mjs": "b55ebf21ad876ae7119ff8c4c9ab1e4c6eaae476bd729f20ae616ba92d62ba3e",
+    "lib/ml/paired-prefix-turnover/protocol.json": "9079bdd6b1e9cf04519748e23c52022c386083936ffe9938c07f72bf4c73edec",
+    "lib/ml/paired-prefix-turnover/generator.mjs": "5c483dcf1ceea0fba8bd1846bd438da4c64c4cafe35c6c5f28e832e14b2b42ec",
+    "lib/ml/paired-prefix-turnover/evaluation.mjs": "a8c289dd317f1472643461689906a8126c8b6c33e82682bb3976085c2cc73247",
+    "tests/manual/generate-paired-prefix-turnover.mjs": "93e1375682fe2c19bdb1faab5f07a9ccf9551dd34566a266c3e9ddc1f593dcdc",
+    "lib/ml/observable-turnover-signals/protocol.json": "10b8a06077c62cb78a47e60c561496d7ee58abf1976601830d767d3c8c1fc340",
+    "lib/ml/observable-turnover-signals/generator.mjs": "eed0b792653fd167471474784ace53e07b60d061c012dabda2f6df25441e8fc6",
+    "lib/ml/observable-turnover-signals/model.mjs": "6f20a6ad48ad51260211a9a4f3336f7056205a0e7c8d3d00aab7ee5d24173744",
+    "tests/manual/generate-observable-turnover-signals.mjs": "3d46c2ba26cb2706809999578da9be9cc74ca81076d63a8afd902e75bd5f3d0f"
+  },
+  "implementationSha256": "d23eaf3bf5782eee7da9b6baefb75592a897d3b3b3f154bd1c10ca46d76e904e",
+  "runtime": {
+    "node": "24.19.0",
+    "timezone": "UTC",
+    "compression": "gzip-level-9-zero-mtime"
+  },
+  "trainingFreeze": {
+    "commit": "5fe71914c3f8bc337fffb125e40da59d905125a3",
+    "protocolFrozenCommit": "5794c64b0b7857df0d1d0b26529ae54513f831b7",
+    "trainingReportSha256": "456f74d203e93a0292fd6a55ab74e9906498336e77f82ec5403e95f74d2284eb"
+  },
+  "trainingArtifactSha256": "86c93d7be0008c3d191bbbb8e7e3d3effc282781fa4c85a54813e980730ee77b",
+  "histories": 100,
+  "scenarioGroupRows": 1200,
+  "fingerprints": [
+    {
+      "seed": 5001,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "9806abfe22ab3b8cdef3cc364c2979c717368f054fb1315a1d13346a0b72d6bc",
+          "releasesSha256": "e632af82d3f95bce2cba2561a7cb4ee8ffd6183cf5b72884dacd5eea925a6b80"
+        },
+        "shock": {
+          "truthSha256": "95a99248a1b0ee3a65bb2c007edbd349a5f7eaeaf045b8746a6494bdc3b65029",
+          "releasesSha256": "3a0a981ebfadc0b1367437f1cbea73997dc6e026d7fe37c2cfc8b8a6eec718c3"
+        }
+      }
+    },
+    {
+      "seed": 5002,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "7e15a6a5250046182f834b02f4c1ca4c231dea9903c21813b88c386554428c65",
+          "releasesSha256": "4f75a7b691b9dd74a1187e2c25cede8c4753805f6cfaff0e1ec26701544800c4"
+        },
+        "shock": {
+          "truthSha256": "4a18978fe6193cdae404eb1573f4389c4e84f2c6b8b81dbc0a46511dff727ca7",
+          "releasesSha256": "257e955a9a924f89556660afbfec163dff48fc9f2897189da4d16caff8e59d3f"
+        }
+      }
+    },
+    {
+      "seed": 5003,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "91a369ff2912328b25c147d99a13b58f1a8d486e5e2054051f4c242b3189b876",
+          "releasesSha256": "ef17db00f1442a45587adbf35beaf7fddbdc6ae9cc9acb818ba3c391130dcb9b"
+        },
+        "shock": {
+          "truthSha256": "3372c1b78b732543b817247b2ded53e09cfdd3c54d7613e28ec83f27e33373a7",
+          "releasesSha256": "c1030927d6e7173289a3e99649d31bd83fb8b18c0d40e81f67fa4a1e84a90b95"
+        }
+      }
+    },
+    {
+      "seed": 5004,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "95459af56827400d81c2b68457fe7049d9ac103b1d7cc9f507fe9907ff40b0e8",
+          "releasesSha256": "4da746eab632ed0e60d4865284db3a797e9f98d1199ca227211a6849b473aec2"
+        },
+        "shock": {
+          "truthSha256": "5a09e808e573756deea63db34159af006a472b17ca4ae995cd202851b48748e2",
+          "releasesSha256": "f511694ff821b3b5f675b94343944f0f879e637736a94b7621f45728c1b1f831"
+        }
+      }
+    },
+    {
+      "seed": 5005,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "7577cbe2ce5729e98c7df21330644a7700d4ada970e79de61c017b835b9f8f95",
+          "releasesSha256": "64eec2044108399641135aced4d7576e2893569abfaee11eed2434424cd8038a"
+        },
+        "shock": {
+          "truthSha256": "d87cb211452956785bc8a1e8fa40394adc2878beabfe89d755477ac6774d759c",
+          "releasesSha256": "2b7dcf70443c7ceaffc5f5b3030493a7b269a5b835308dc59b51398bb32185e6"
+        }
+      }
+    },
+    {
+      "seed": 5006,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "3db2b65f9e188e370fc62285532c92294fbf9f9ba722d0729c7cb9016aa6585f",
+          "releasesSha256": "93fad4a1c50db36f939b4d645dbf8a8326c76666fb705a8d891672397b1659c3"
+        },
+        "shock": {
+          "truthSha256": "5e70e57d5694cc06c260eef2d5dd90a4ef1f0d1a9a3b948251c1e22eacc9effa",
+          "releasesSha256": "5b99f6b96aff55efdaccbe2f64cecba97612c223ece04155baab6ce994f9dfd3"
+        }
+      }
+    },
+    {
+      "seed": 5007,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "62342c9bddb228b75686bf326a675815db7d07652f7ade6dcc1509c1a9d54f40",
+          "releasesSha256": "834c3ff736f19a0159a5f1043b4fec619f65d14a14f9a98229059e65b016ec23"
+        },
+        "shock": {
+          "truthSha256": "2f9d5297c9df078695d417c69216be2a1e0d4e5a514dc52af31654566100bc8a",
+          "releasesSha256": "33521eb124c33642e0b136492f26c0fc0f24023abfa6a07ca5be68270a905f72"
+        }
+      }
+    },
+    {
+      "seed": 5008,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "97733c4693ec67277761007d310eef1cea341156cdb057067241af29e29c8960",
+          "releasesSha256": "c6ca7cda4eb129b05c23c03dfe288b69548af4aca8bb7e68be2856340f360554"
+        },
+        "shock": {
+          "truthSha256": "3e3d7ec56a7c6a9d399edcb4f8e1c5ae9cecd777750c6be6ea0646aa5a3d4606",
+          "releasesSha256": "24a71d24649c765059ed7197baaf1d329f4a1bf641b1af8ac9235b8db5da51b6"
+        }
+      }
+    },
+    {
+      "seed": 5009,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "2980d9f48bbf4a49d54aa9f5ab1590ba174f21ed1b55bcc5c2f610735b89bcfe",
+          "releasesSha256": "bde7ca24c42cb02bfea39957966fa68ab2f3cb3fd7b09d237853e4789ff2b5dc"
+        },
+        "shock": {
+          "truthSha256": "7cb2b73da34f93f7615a6e2cb2be154b01cbf1944c81b0d016483ab90e399fb8",
+          "releasesSha256": "32f8576181bfed2043156dd7d513ce682750a3fd8dc8ea568f5171336586a36b"
+        }
+      }
+    },
+    {
+      "seed": 5010,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "d42ab80caa5b1ebbdc0b431398399f1baaa1b9c75a890a9cca3d4fb5c857f33e",
+          "releasesSha256": "cdf5855a62d47dcb64f38b178c80f2ae4362d64acf3166c8e15133aa5c94027c"
+        },
+        "shock": {
+          "truthSha256": "fb36a482384c975e63214e639378285200a24432de7767000eee4f0f81f60198",
+          "releasesSha256": "1340b129db85f1167d017641304f9ed74d2923e1044a00cd42e959764737af84"
+        }
+      }
+    },
+    {
+      "seed": 5011,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "8d5d89695398b3852eb99ed8f77db024a3a99f2890ba2771b01af1c9edb5ce16",
+          "releasesSha256": "cb511efb9604af8707501a7a6726f442befdd651bd0587c3838de2495273ebad"
+        },
+        "shock": {
+          "truthSha256": "4a0719b158a448a7087e082d88ca35151cc74173d278141b8c28de65dfc7645f",
+          "releasesSha256": "f76bb89037bec798404758dbafb867c2da8710a17ae12831a3a3762f2c6b3307"
+        }
+      }
+    },
+    {
+      "seed": 5012,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "f3a4d9fa0b297d16bd9b3ca98486620c99d58db094facde27ebc719db50850a7",
+          "releasesSha256": "d7e1b8bdcb66696e9fb8fb8598d478a26cfcafa00f1cd1520d8103e42c699eb8"
+        },
+        "shock": {
+          "truthSha256": "27443a65385af30111162a989f424e7335bdc26d1f0173b8cff27f4da39bdaad",
+          "releasesSha256": "cdbf7ee6ba839894f019deb3e507ef51ad4a85bc1708ba5c0cc9f376c9b76e61"
+        }
+      }
+    },
+    {
+      "seed": 5013,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "3ee4370125c9906f9757dac65f889ed3759cef1d87d8189b74d7e87713deada1",
+          "releasesSha256": "f07c4c24a2ea45642870d9b840336bf286c91e4c4d375414f04a8f830e503964"
+        },
+        "shock": {
+          "truthSha256": "453e68570acc04505fdda91fce942ddf5c9d25627eafa8ec04352bddbc68497f",
+          "releasesSha256": "e55daadeb4fe098ff1545be29f2880daf65f009d93ac048149deddaa34f75733"
+        }
+      }
+    },
+    {
+      "seed": 5014,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "8ed7c1cfc92d5785eae4426171437df598757fa0fc9dd7353c33e8f7abeb11ee",
+          "releasesSha256": "c147dc979085fa51859baf0357db0c8debac677d76f7348c0f12e8ea5e931dac"
+        },
+        "shock": {
+          "truthSha256": "a545e87695a94796444ec72809ded697af8d5a3ad7c19ab3506c82b58ec2f99a",
+          "releasesSha256": "ca63120e9d3207b9e5509a7b80799dfc4bfda40bca13bde3ea10f2fca1bf8d02"
+        }
+      }
+    },
+    {
+      "seed": 5015,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "8980f2028fa88dbd964adf640bdfd591048234cdce30e3642dcce0a2ae5edf19",
+          "releasesSha256": "b3ed1611fbde21dd492f99d1f232b67f32461b380da2a2fe0850899dcf6c7d49"
+        },
+        "shock": {
+          "truthSha256": "5d15f803f56531f17f8f979a22dbc8951c48f26582a11a67a2ee58a5c0c274ab",
+          "releasesSha256": "4845248a25d364a39d3bab5938896183d0602fef236c182ff9b143f998229f93"
+        }
+      }
+    },
+    {
+      "seed": 5016,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "8f7b790fd1b16723108447a61ce3e77f2bbae9f0a83c6a5cbdbed26f672d966e",
+          "releasesSha256": "99a7ccbbb1f93423ed7e48aedcca6545777499793ad72132cb41d1854bed9675"
+        },
+        "shock": {
+          "truthSha256": "8fd1d5d72659d44f0e08c2ef3bc3eeed9ceb6e1431ca078b903438d17718fe1e",
+          "releasesSha256": "58fa763d3cac20d8c815dadaedc97d3bbcf4f58a007a2f09a8c1d6a575a4eb41"
+        }
+      }
+    },
+    {
+      "seed": 5017,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "776f00532ea68dc528168be9ac2ce48d7c791bab409c73ceec12eb954a1a4d40",
+          "releasesSha256": "27bf2d8f3e04959c29d9ae793008943d50bca19c835aec1a73a6e21b087ce1ea"
+        },
+        "shock": {
+          "truthSha256": "59f57ef232be0e6caab4a59961e08e654d3a3213d3eaa1e59336f2c3c065aae0",
+          "releasesSha256": "c861e82a9a45a9bebb040c2363f06c998ccd0bccb6240704de14198f010a002b"
+        }
+      }
+    },
+    {
+      "seed": 5018,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "2c2d5aafc86bd50c47d578232d375151860bdef0472f5e36dc7777acd806d166",
+          "releasesSha256": "bd93c49157dbb525af20556af79ef2c58100dc579fb5a95422396ca94cc21a0f"
+        },
+        "shock": {
+          "truthSha256": "2ab473f3badb7947da875fc917d5aac52083384304e5d88aa388c0fd66ba0947",
+          "releasesSha256": "6765a890898461c85093aba42f06bb54c98ffb27a2aa10e7a284029ef5bbf60e"
+        }
+      }
+    },
+    {
+      "seed": 5019,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "28075d6b6b937e9018ddf945f2b6c3b13438332bea35b7322edfe4a785ca6675",
+          "releasesSha256": "5677227bbc483c2a529a7ce39546070acdadd2b613c21529935c61eaaf33b5bd"
+        },
+        "shock": {
+          "truthSha256": "58a106618c78b5d06e71899e145a9b023591a3dd6a2b1de93cc90b32063f1d8b",
+          "releasesSha256": "9148989337b160c91a4c3483a72d36d89169eff2dd7f69aa17723180fb8c565a"
+        }
+      }
+    },
+    {
+      "seed": 5020,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "ae7b1148b5cf1fa5cf38d340a6894e7c92546c5937f9d8474598d547008fdda8",
+          "releasesSha256": "5a08581c7bfcbe891db597a8e9e356232f549f82e618a0e7b6ac077cbaae64dd"
+        },
+        "shock": {
+          "truthSha256": "903e26f8f0808f04610ca4ccac27dbb6ab29a76c8149f254701a3b22931ed287",
+          "releasesSha256": "2c787644ad1f4a90f415a28ba71b44660a828cefcbdceb7d39c658ac1430a4d0"
+        }
+      }
+    },
+    {
+      "seed": 5021,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "fe8486cce3194bea9b2cba9696d5eb87ea78240d416858c284df8d7b4a999d45",
+          "releasesSha256": "03de7b06d921806b18cfec661f865bc76e6bc8f88dde5c3ee7db30c1e897ead0"
+        },
+        "shock": {
+          "truthSha256": "4e5059ecbb8598d5ebf1a0be31e5e4d9287f4a17b61e3b4b56eec6c2cce5cbdd",
+          "releasesSha256": "12f01d92586f58457fa8cf9b9f154c5a24fdfb8c7d820499133b286c2daf6de4"
+        }
+      }
+    },
+    {
+      "seed": 5022,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "17544c34095f81f5807feb63f2c867bba523484da673ac6989b36bb9c578e05c",
+          "releasesSha256": "215b1a1ea14957c7d42b69f6f153cc423cccff95ee376cb431b4a0241892c856"
+        },
+        "shock": {
+          "truthSha256": "4dbe3a4b8503aca61c809708f45c66a570800bf24209a31acdf266143d534d15",
+          "releasesSha256": "2e3da7dedcc6181d4cd1c5b26454c9001de25bf93124d86b49c68fc0341ce26b"
+        }
+      }
+    },
+    {
+      "seed": 5023,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "276f9f172b301ccfb5d569636dd9cbe367b7d7f7ee900f240eb61a28fab2cbca",
+          "releasesSha256": "88a8026ea4743bcdba5b9dfdda08a7a3762f7b321750a2507aac7d41e5490b65"
+        },
+        "shock": {
+          "truthSha256": "7c761598b4206aeec34699a035e3619fb176cf4e9d40df5c92d61affdee7dc80",
+          "releasesSha256": "aab570e9393cfdbea34f003c863bbc38e179c3d8a9f022762ff98bc889a2bb8a"
+        }
+      }
+    },
+    {
+      "seed": 5024,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "0e8cf869d2e058387d4a1fb7e9b3510a1d437cce053c065d3c8486a6b45b7ddc",
+          "releasesSha256": "bd41c3b5543c4637ab077fe66f31f09536a022dbf5f275001b077ef09a7c294a"
+        },
+        "shock": {
+          "truthSha256": "f16b024a058dd481cf209c2a0fc6786ce28af54313766396917dc7ab170bc28d",
+          "releasesSha256": "0fb32f20ac5af404471e7a72565364abb415af72042859d0de0a5603a844edc8"
+        }
+      }
+    },
+    {
+      "seed": 5025,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "6e4008dcb6f3b3dbbd4f25a09215b7c142f04c0ed87ebac774f21e26748f60fc",
+          "releasesSha256": "4b0ac69f5b0de88a64af0f280bf2a2cc38158f8aaaa171e019167492cda2d035"
+        },
+        "shock": {
+          "truthSha256": "b28f1a95c898a2d6229584bf08ec8a1dee3b4fc94fd81e2b0c3526fd0a651908",
+          "releasesSha256": "050062e54c58866a7189243f1cb0e27fffc2b846cda94a65a7a3705d472d0f4a"
+        }
+      }
+    },
+    {
+      "seed": 5026,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "fd6670e5d1e1e910501453efecbe9952707c75a17261361bb5d990d408c023e3",
+          "releasesSha256": "950bb2e593ada2c297c952e383a90e037b39eefb947c6c6b0694c990fc05bc0f"
+        },
+        "shock": {
+          "truthSha256": "77611e732eea1e81cccce973f5d395d71869e9b3d5e68e6a0317fc46f66278a7",
+          "releasesSha256": "48717bb5cb86bfd13c9456227c692efc223e764a8c6fbe23a9830232f8b70003"
+        }
+      }
+    },
+    {
+      "seed": 5027,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "9378c973e8618320d61d4cdede861e74c8c04529f9ed911614039a43ca3898dd",
+          "releasesSha256": "39d123516580fe312d9c0d930de90154159492e32b84b19c359bdbf5fa725781"
+        },
+        "shock": {
+          "truthSha256": "60dd9ec1a2e428c5997cb0cdaa4829d8b037629bdf0c927b5160811ec0244cc0",
+          "releasesSha256": "5ba31728aa9e84fc9b45caba999de799390eeb56707fcfc9dd49d210bc08b2d2"
+        }
+      }
+    },
+    {
+      "seed": 5028,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "e73f8e84c74d8550cae122ad9561a4c1de5a30f664882fd50aceb314be0bb1b0",
+          "releasesSha256": "a3a2dc5cc9d9a01f84df969d061646b666b818e99a3fc6df9dd99d06737c8511"
+        },
+        "shock": {
+          "truthSha256": "faa85921a0278c5461a29f31fb8a5b94711b5d296ba35affb7f960dd34f8a177",
+          "releasesSha256": "69d318ab2d3911a54cc3c78eab63693040cc6b989a63a8e0b815f3b68a62dc78"
+        }
+      }
+    },
+    {
+      "seed": 5029,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "c6b63c7eb0e6fdc5b5c87cf64f5e04eb1df0d76badcc941c0a61f9272ece5491",
+          "releasesSha256": "76e734f6e35518490f95e71d2ebfe093a0d2b17e3b43a7ca43c83b15c185561a"
+        },
+        "shock": {
+          "truthSha256": "95bee81229b91551bbf80b20e88a427c40fd1e63fdfab1f2fde9e1e79cf29f42",
+          "releasesSha256": "060441268e0bffd05c955f36870f83dfb12bad6ffd3a779279be81c299c20d4a"
+        }
+      }
+    },
+    {
+      "seed": 5030,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "304f4b83c0a8448896b33f36d8c78a9d0d6effe82a86c19170910921ff993c8d",
+          "releasesSha256": "91eb0fc1be8b2277581a1573f83acfbcb9d622549871e6cac5b8ab6500e4c789"
+        },
+        "shock": {
+          "truthSha256": "76e0143a1669ef9da85fd0d7edd0d17fb86408094c69ded1f9f37fda13542757",
+          "releasesSha256": "b7aae2ed15af1aa95ee58578d55bcbc279db987da90e3b6ac754ad24650a703a"
+        }
+      }
+    },
+    {
+      "seed": 5031,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "7f3c4eca44a25d5fdfdec2da5bd2cec62015453f36ff75518cd2cc026bc6453c",
+          "releasesSha256": "fb6356877109b9b51d54ee5fdc2a6636d892cfbd32aeb14b4591d0d5531bc87e"
+        },
+        "shock": {
+          "truthSha256": "f263440f85fe51a1c04bdba34d1f057bbb2aa0e71521fe334083cde4c2cff80f",
+          "releasesSha256": "448596a6ca6263707e71c14bae978031487954de07eb2a2c7895ab5beb5ccded"
+        }
+      }
+    },
+    {
+      "seed": 5032,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "ad44b4c1f749622be96e2e1a7014de87cb1552bea076c87315a50d3d052e35ff",
+          "releasesSha256": "f6da6fc51899530457c222851c1e503de8166cd1f5a16ef9830fbd8e6513bb15"
+        },
+        "shock": {
+          "truthSha256": "c2da0ef4587fd664553f08e92006f7ecca7f3287cfeab8909cbeb185a35ebf38",
+          "releasesSha256": "e4929ec777bc787128f14a10b8866d633f597cb16ac57d9d32cb1a4ed75e1331"
+        }
+      }
+    },
+    {
+      "seed": 5033,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "f0bb96b7376e4563be19ba0fcaf5474df48ee5926c60480117f463f01d8a3f1d",
+          "releasesSha256": "961a45fc33236d198e292efcf006786c57ca99e9c15ff9c2e0eb6575d959ea58"
+        },
+        "shock": {
+          "truthSha256": "ce14cf291ff20537416d6758e13561d9e8b8c0d4a81e2e7bed52707c0573541d",
+          "releasesSha256": "18ca8a4250de476b7d7f7d853803f30d6cecb1e57ce78f160337280713cdb9fe"
+        }
+      }
+    },
+    {
+      "seed": 5034,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "e06d1a30eab07352bae74fedbf756a88be717326a1d8a51d589852b0292480c1",
+          "releasesSha256": "916018034fc5ff274b812c3b8a907f7df90770c8c7ee46b73cd0acece9e59d15"
+        },
+        "shock": {
+          "truthSha256": "67b8ad743732d7b24a36ae538d718d369c921a889d1ce42db525bb22518531bb",
+          "releasesSha256": "0fc5a491ee414b4689df7b790ee57fb9d4aa7689d53d8a67fbddf0dc8337d57f"
+        }
+      }
+    },
+    {
+      "seed": 5035,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "dd2707f51cb736701706f2d01b10eeb971b95a08fb8b2d0c71c1f2fecdf44da6",
+          "releasesSha256": "7cc489f70022d60ba4d7a834314797d72beb3f6ee13a4ab38b6fb3189bf1d65a"
+        },
+        "shock": {
+          "truthSha256": "ee405a73fdd2d4bb5041f63ec7ed3f6e0a47918cd563f0cc9ec62b282604faed",
+          "releasesSha256": "854171e2af6b8c4c7013973f8a15ef2fe9a2d66d8558e96d0c1a519ead3c0159"
+        }
+      }
+    },
+    {
+      "seed": 5036,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "aeefe80a863c55786720f2ef63263c61b7274eb481659e731032ed0c2780e99d",
+          "releasesSha256": "514597d7b4dc7204a0a944e2d166147435163e11cb665ff56a6005d73f31392b"
+        },
+        "shock": {
+          "truthSha256": "13dcb65d0a690fbceee55b0c95d74911c1f7f34d5b49faaf4dc1023db883d23a",
+          "releasesSha256": "a1d3b3c8fdb53f17a4c975ca5097cb8a7ca7065373ec8d44d49a1046ce52af6b"
+        }
+      }
+    },
+    {
+      "seed": 5037,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "9da2dcfda0570b1516eb092a2ebc31da974b57b8241c72745f64cf4c0ead9ef9",
+          "releasesSha256": "3f3945da11fd9f2bf143204155bee0aca427a9bf2bd3c3ea93cde25875426ebb"
+        },
+        "shock": {
+          "truthSha256": "9cb274a6f77d25909e2737c64b7e6302ed4c31b7303f436c61214c9e49813919",
+          "releasesSha256": "7fb8efc40dbfa356936b3a35adbf14cfa5e5dab010a1754bb1acb49ee98ab26a"
+        }
+      }
+    },
+    {
+      "seed": 5038,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "36a2adb9aeabc75cbf9d4d106a5d68f23896dc81f0267709976976c7754b153a",
+          "releasesSha256": "e2f79c6dfe933ad2a3b5387e2be78ef2b0721e69960045d7f03b8b51fedc5843"
+        },
+        "shock": {
+          "truthSha256": "82bdf93443426cc8f833e8120fe353053811a499e7311797b0b5d26e766aa390",
+          "releasesSha256": "9abec0b749b53fbf15f666eee9d7722c3a7f420fb2b09161ca905dcaf6d6b7b3"
+        }
+      }
+    },
+    {
+      "seed": 5039,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "aa302852b8a45612c5b93fed9ad90bf60d4ab0233a0ed25f6e3f893c406339af",
+          "releasesSha256": "6e31dcf0522cd70c295f7152acb52f4f5a35c69e17e61d6382784c1eda6b6bb5"
+        },
+        "shock": {
+          "truthSha256": "33d61135be428b35368f93ac032fe2115a368bba2cf087d15acf0e31d8bf4b19",
+          "releasesSha256": "a6651b35325a9fdf7e1e9cb94ec27796dcbbf47ffccf28b283595698a31d29d5"
+        }
+      }
+    },
+    {
+      "seed": 5040,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "c2d3df3b7ea22420b6533d88b0753718fdc0bf06cf25c96e3d704e3a52ead2ff",
+          "releasesSha256": "00afeec42080605c7f651543670fe0b46a3b321ae6e82fb5043bf475a47654a8"
+        },
+        "shock": {
+          "truthSha256": "b71f91af4fb45e7cdb32ce50a8f0e16492124e5e7f36a979824f115b2936377a",
+          "releasesSha256": "e40cb2453f4eb77acebe879cb73f9435129432a2fb16e2328c3425a1738e66fd"
+        }
+      }
+    },
+    {
+      "seed": 5041,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "ddf5e43a549320df90feb8a1e148037ff93c6abb12eb51ca5550da2ed8536052",
+          "releasesSha256": "d37c1e7a98c65f59a1bc329cac0ec4546fbde545806ad92c55d3ddabe79cd08d"
+        },
+        "shock": {
+          "truthSha256": "a0a08cb8c61317a46f2d11e03312e13c1faadb1f12647d9b763faa1b4b76bd66",
+          "releasesSha256": "418df61108ad57c88f86dd24d1e9adafe98dc13ff8ccb357d26a0db986c2fd59"
+        }
+      }
+    },
+    {
+      "seed": 5042,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "34c0bc42e0d40c2fdd1284ac0ed0286003846ee555ca7fedb69f38e16ddfb4c2",
+          "releasesSha256": "5282dcb10abc5272372cd712e5b84cc5bd942adb68045ff7ca64473b801c5e08"
+        },
+        "shock": {
+          "truthSha256": "db08cbf6d6776666a52f317c1f57e7fef2b48c570392d38af286085c1bf86c22",
+          "releasesSha256": "c58c216f43d717df9e7e28f8fd8d2f0e4191a0ce81eb76425733c6e4605fb3a4"
+        }
+      }
+    },
+    {
+      "seed": 5043,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "f6528efd054ca354fdb95c47db9c024fac85b818a4599d778f9458bef913a2f3",
+          "releasesSha256": "e6202fe2e11c2365779d3347c502a3e02790e783f18ecd4cb52a6bd136f98159"
+        },
+        "shock": {
+          "truthSha256": "2dc2f58e42443514d6f92214499217d1f311e68ff9ad3872fbd10af2b58dd225",
+          "releasesSha256": "bf18a7a4f4d9730d51648e3bad8ed2ed4d3de0dce437cdd6f533dc4bd4e80c36"
+        }
+      }
+    },
+    {
+      "seed": 5044,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "16a47a2028445fd2507ad00b8729ff32fb02a5375a80ecfb856422c6f61f2372",
+          "releasesSha256": "1796c9b4af7b2b2715745450ad4cd62da8d7af44ba573091ebf8788ee09d234d"
+        },
+        "shock": {
+          "truthSha256": "2627583185ee309395c7cbbf69da81c68555e61548f0ace925751e189581255b",
+          "releasesSha256": "5e544372410b4d7e4fa925074af46333649d8dde0cf7addf215457ff3bf72e84"
+        }
+      }
+    },
+    {
+      "seed": 5045,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "7bdc50f532bbc83e13fcbf4f136cd393df469eabffb92cbd1ece69bae716f08c",
+          "releasesSha256": "cc9bc2e2d913e82138cb89a078665f2d6da56b2baead91a363bc97afa81ddcc5"
+        },
+        "shock": {
+          "truthSha256": "ca7530b8e879a107a3c2937cf2fbd8410223dfae9f480a77bee3d9725e9c21e9",
+          "releasesSha256": "ecafc37e3ca0ee72c85f83c44572b71a0bd4e44fc50910c942a7cb0d022db174"
+        }
+      }
+    },
+    {
+      "seed": 5046,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "34fdcd2f51c202352fdd018b65820303eac42e16f7cb48bc56869ed59b26f5c2",
+          "releasesSha256": "4152d2f75cbbec3d677f45e000efd5b78ce90fea281ee8759c58b0d84f9722f2"
+        },
+        "shock": {
+          "truthSha256": "cee232f111834021e6a6a2ed581d3afb5b5f3428de161c8c1e5827f8518c4239",
+          "releasesSha256": "91ae2b09d5353b7071db5c2dc8d41b1b39522a96b34dff79ce0977a7f652479a"
+        }
+      }
+    },
+    {
+      "seed": 5047,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "0da112c260d032d4c9784859b57040168101ec0a69fa4068062cba7bc26b91bd",
+          "releasesSha256": "3e05cc7ee7f0490e4d7bf6c388db87df7fd03e1e2347ee454edff88bf8f569d8"
+        },
+        "shock": {
+          "truthSha256": "345dd685102ebf6272d2b4b3c74d2b6036956b47b6ba84f9c76ff554d5c2ffd2",
+          "releasesSha256": "2d72893256c840a62faf7cf59e78c89b13a4e255e3801f89b0cf3e148af1514d"
+        }
+      }
+    },
+    {
+      "seed": 5048,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "89673e07b932dfa48d5a51f4434c4f063b4d352bbecdd23e8c7c7845e42f8f1a",
+          "releasesSha256": "7a36c48fdaedf695812fd050d3d8e9712156f9569cc28b5e4d3842347a7b9cbe"
+        },
+        "shock": {
+          "truthSha256": "040eb240d383f591f8056b6462f58d98b207afae0d7dc3fe045b716fd05d1b16",
+          "releasesSha256": "16c00a71a71faae9f9daa3ef0aaec36ab40289b675cb9a29aae57dad9e176f20"
+        }
+      }
+    },
+    {
+      "seed": 5049,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "f087c9fbccef3dce1f8f298a776e2e8186687ede0e76a13fbb4160ed6dbaf5e9",
+          "releasesSha256": "86b86f1147ed45555e556afcc461f954b2f6d91a6a93431a5b8239192fb1d65f"
+        },
+        "shock": {
+          "truthSha256": "0f43f71f7c863287ac485567068f418338e031f7a1a9a5210004de8f1b580c6d",
+          "releasesSha256": "26b248c8b956f731e11d7aab6bef0c1f40886190acbfb97cf6b73fbd1f20b2a0"
+        }
+      }
+    },
+    {
+      "seed": 5050,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "eb7d08f4974f3bcf23825b9ef77fdc9b9c99f4adf6e35189df03b5e811c02cc9",
+          "releasesSha256": "bf26beb3ab67e4fecdf8f591d5c7d82d5161c127f7073d7a6b4d2ba572eb8b0a"
+        },
+        "shock": {
+          "truthSha256": "b66aea0adf5c9d10b3b0a95b94ec57c3c38a7ddbfd32f9a4a9d5fe4f25d731cd",
+          "releasesSha256": "c639be25248d2ed99b4adec4e2e53ebe8a27de04c1004c7e2c87cc27f61c49f8"
+        }
+      }
+    },
+    {
+      "seed": 5051,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "e1f55b5484066da7fd9591bf8ffedebb520b14986407ac2814270ef4638fe143",
+          "releasesSha256": "b23d6df9c7a0d6ff251767b30577770f48435357978bdcb28689c2748d2ca8aa"
+        },
+        "shock": {
+          "truthSha256": "2ec99dc0877be528c293756a17d918f3ef78b2277c0e1e2bd40f1609bd23fdd9",
+          "releasesSha256": "82a8632b67f7d963c5f27564ae39aa90616e8391b211a4e78a0ec2d47443d218"
+        }
+      }
+    },
+    {
+      "seed": 5052,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "17c2a4c57811ad51f9b5c2825aeead6e964c7a39701d81f7864b3c834f182383",
+          "releasesSha256": "a922f8bbfc80afb4839ec609ddd315a8da5c16b89e2d56e14023cff49ecb3306"
+        },
+        "shock": {
+          "truthSha256": "6476ff225a413da2878a3ce0787abe587be349f76b1438dce2a210149244b914",
+          "releasesSha256": "7d90dbc4b80dd63c53bec9aedf199809641bc52197e5dfdb930ffd0bf05b73f1"
+        }
+      }
+    },
+    {
+      "seed": 5053,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "812f8822ba5b34536c8313dab1e36949c1181b73b34e4f6cc4ee4eff3814d040",
+          "releasesSha256": "8d4eec114a3a14bb8f62dc29164372f1b1f0c2c28bc9f2a723d20f6c470ff8ea"
+        },
+        "shock": {
+          "truthSha256": "7e39939062cee7a7c02ae48f443f552973a8695611adaa0bf36a9b160290aff4",
+          "releasesSha256": "9e21da28956fa3ac7b74e117df1e7c28f5e0c495d56155d76710fcc50ad25491"
+        }
+      }
+    },
+    {
+      "seed": 5054,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "c39d1b2fa46f7378a4546bf352a34431e565a4596e2dc442d9e03a3027bb8ff6",
+          "releasesSha256": "34eaa96dabd37bd8e06703bc82ad828e59af910951b23e8dd0e95bb24dc7a9c5"
+        },
+        "shock": {
+          "truthSha256": "f496240bd5413e3462fb55df81d8ae653798630bcbe151b90014fd008db40741",
+          "releasesSha256": "ff53c1f1a2151b899f0834b499d49e925be68b5889d801ad46841d320922b626"
+        }
+      }
+    },
+    {
+      "seed": 5055,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "daae54c506c0492f0e1978016518a876d85a99e85da472be17ab18469df1cd87",
+          "releasesSha256": "1f2bd7dcf0f5edee503bfb4095b5c2e59656ac71de5369012a50400afe2434c3"
+        },
+        "shock": {
+          "truthSha256": "6b7c9c8d4c4df50d22d2c60bfe92b51f54f82fdf0e88e8b593d6b9576bf73150",
+          "releasesSha256": "865ecc6fdaa89c7a8d8db7d159fa20bffba440a77749b9051822ae3db131c417"
+        }
+      }
+    },
+    {
+      "seed": 5056,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "d8931e2f8182e676887a5f49cbcfd0382f9d35e4dbd5b19ac781a4993fd0c3dc",
+          "releasesSha256": "8375bead1e2ee4811f6a0b7c6d6b270b52fd760b1b5fe8d11cbdfef03079f141"
+        },
+        "shock": {
+          "truthSha256": "2c2f55a6d42d0c4194857c2af59c15365ed0932c1f77199143efca9501d7455c",
+          "releasesSha256": "2e364be7147039bbb2ba6c29baf2ef624d3b9e626ea825866934e3b6b9dfbdce"
+        }
+      }
+    },
+    {
+      "seed": 5057,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "77eb0cf41fd753af14178ab961efa948a5cbceb02d1a57047b6684f599aab321",
+          "releasesSha256": "9adf84b8f6e6d9efbc780db7b9c8be678e2bfb16d64be26c0a99fd04334c2c71"
+        },
+        "shock": {
+          "truthSha256": "215d228ff0794d891da36d9826acbec438ab2aa0de4a33d794e1665119642beb",
+          "releasesSha256": "d5fce5e423aef3f2cea194a7befde765623869fa5b6338852b2485ebbaabc385"
+        }
+      }
+    },
+    {
+      "seed": 5058,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "29d69b1ca906911d5d592a953e681422ed3a52f0f85c2e7239c35caa9dbf1352",
+          "releasesSha256": "a472da37aa43a247e92eb7db099772ddacd6cbac77a7d236452e010b84381f2a"
+        },
+        "shock": {
+          "truthSha256": "47993ff3190c6d73a7f6ed544a7695b272212c25e4065fcd9e9c53f4b88534de",
+          "releasesSha256": "7cad264d3dcb06d40366422f25333f1067bf80a1c8d5de36a54f5924a842a640"
+        }
+      }
+    },
+    {
+      "seed": 5059,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "944ab2ee4482ad5af133b27db5af737101dfc8221f86b7d81852796bd451e39d",
+          "releasesSha256": "18771207456e5570c89468c26d10b9574f902ef9b21ea040146e8c08a3106426"
+        },
+        "shock": {
+          "truthSha256": "2be64fe0c2353b4a36852a1ea5d0a34a6d9f765f95604380d5a25b38fed4ded9",
+          "releasesSha256": "227d5920c0eaa37bd07840cea7964b18c3a5a13db1b45c64d9e407dc5a01f1e7"
+        }
+      }
+    },
+    {
+      "seed": 5060,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "788e55c4fc960baf7df9ae2f06603be8f4a0c2377c983926c012ed1cb663a8da",
+          "releasesSha256": "792e57ac46e69e5734bcdccebc3b4f228fa2d0522be63caaf9db56b3d144a28c"
+        },
+        "shock": {
+          "truthSha256": "e6e12bd23a369b0c2bac1f63dd772f7d45c32ef94055f31d18b841dfc1932dd9",
+          "releasesSha256": "64736056abf956fcf51ea80ee445c33a37a3c47ebb8db34379607745490b3d35"
+        }
+      }
+    },
+    {
+      "seed": 5061,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "0fb65ceed461d10274a6df5b8196ff532d556814e96193c7d626f63df49fbc82",
+          "releasesSha256": "8b5f134acb66853cecef40773eb555443f15dd15be05ff850296343c22aac10d"
+        },
+        "shock": {
+          "truthSha256": "333ec2cf2b0ac7ecd8ec2704de87e800d5ecb73da5cb5d8a2ffc377d9e39738b",
+          "releasesSha256": "23ddbd4518f3646236aa2ccebdd47e7a41b794271172668cc0f8b9278947d600"
+        }
+      }
+    },
+    {
+      "seed": 5062,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "f81714e9e94940e5eb649f2ad348b0e9342c2ba9812c64681b7b75cf84cabc78",
+          "releasesSha256": "87a0095e88bd30424becdf6f7ae8fd565a0a854962dbfd6ff2bc4869e29a4154"
+        },
+        "shock": {
+          "truthSha256": "05f3a3e69805507b235abc52a214f3a0f55bd3cf46bdd5c7d8a9c73220f4bec8",
+          "releasesSha256": "dbb58342de03e6833068deb9c39034c1fb2c7b41f10a0d7af82c961e559ac7a8"
+        }
+      }
+    },
+    {
+      "seed": 5063,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "f2064a507396d2c1b0abe58ddeb169f875ec6716292b2b43eb0345e88739e692",
+          "releasesSha256": "659e77139a43c863a2a896115be41c8950c276b178c62256d9137c7b8bd13a43"
+        },
+        "shock": {
+          "truthSha256": "decd153dd4ee04d9e0f0fe2c00057844aec27fed27a5f89d87fb9c9d015edc79",
+          "releasesSha256": "56bfb2c74b5db9f91ed9df22c1121e430105558b159b348241576c48286d62ac"
+        }
+      }
+    },
+    {
+      "seed": 5064,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "f649b713b51904a5a99cc17bcd035592652c4e1a5d100c9ca46f59b4b4452dd8",
+          "releasesSha256": "3a892345f0f514026af25d32fd371ccc7de37ed8d1e12cd2ae2b0f8ba507e62b"
+        },
+        "shock": {
+          "truthSha256": "3b148e4f72c6ec3fc6d080a4804b0b7bf501fad702493c43c35e01b66e715a65",
+          "releasesSha256": "b7445e15c249bbb3cbd27b5dd7b1059d3d52bf8f195cae93e45c2ae89285ada4"
+        }
+      }
+    },
+    {
+      "seed": 5065,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "958871df2347818cef2d2d1f36e1d1f478eadbbecc189bf9058f2408921c709e",
+          "releasesSha256": "bdfbd41090f49b505af598e26cfe00c94ee7cdeba332ed922c231770d0241438"
+        },
+        "shock": {
+          "truthSha256": "91e7bddf53977794802b4bd7aa1938f0bedb7ff41a11a2b5ae56c8b1c69e53ea",
+          "releasesSha256": "412094fdbd75a1345536de3d9f920706dc6a29050490e189742d758b842994a7"
+        }
+      }
+    },
+    {
+      "seed": 5066,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "772e4f638fbf74f6d3e3f12c73fbc064bfeb614e70bbc26996d25a666911e98c",
+          "releasesSha256": "8cf37ff8ef521352e78da0b533807d6843e4023bdd1e9262f5d6bff75b7789ae"
+        },
+        "shock": {
+          "truthSha256": "6bb064884a1618d9c08f6a5db1494c3b45493c1538e1f1c033877f3430c31792",
+          "releasesSha256": "e99be173b2bcbd24a1c5699c853895de297f9443b684f15de3a0415130173718"
+        }
+      }
+    },
+    {
+      "seed": 5067,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "fa58a613c04de99a08f7fb8f850e4712e43f7adfa0cfcf2a1b93cd1ee6b9e9b4",
+          "releasesSha256": "925ae7ceccc4cc91b28790a413cdf93a846942cd32d88838d897857bbe7b7829"
+        },
+        "shock": {
+          "truthSha256": "7cd765f69f2ab808410b39702ff7c88f9fd28a7a5a0a5aaca36c3509c266792f",
+          "releasesSha256": "52c59cb14f92e51b97b9409fd5c38874b24d90de89e90bd149eb7f4133e2ec1f"
+        }
+      }
+    },
+    {
+      "seed": 5068,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "6c001cab4ef21eb59416f88b4f35596be0e61c70247abc37ad6f535269772b56",
+          "releasesSha256": "1c05f506c3dd457b62fe41ef78b78cfc91dd530c8ff7d76ce56651b344a8f42d"
+        },
+        "shock": {
+          "truthSha256": "79223b9950e7cb87f48d43cd52c53d0f087d586de922e964e0a4cb917d79f093",
+          "releasesSha256": "eb929f71246ebe955a7dbb474e140fa2e290517c744ef07102e10d84e7ffc00d"
+        }
+      }
+    },
+    {
+      "seed": 5069,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "7544cd54f151a981f70423181a6627311105529672c6b29b8b9c57c27344ca04",
+          "releasesSha256": "51b33375b6ac715882d48f5ab62ab7dc30b6b17ad4cc651b3c00a84799b2d45c"
+        },
+        "shock": {
+          "truthSha256": "11d61a6761230b3b34c875c12aa99ca0e4fb99d2eb53eab164de5f4a9e0cbe14",
+          "releasesSha256": "c2ca8ea352457b16c3b2563df83e2b5608a0a22666305438ab18503b621423ca"
+        }
+      }
+    },
+    {
+      "seed": 5070,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "7abd0afa7f80907591a66c1269d548dac35f1d749aa678c7f1dd501b116f6350",
+          "releasesSha256": "03606f8de8ea7d43e13e0116b97d204d654c129654d27d56b87b783864b63f85"
+        },
+        "shock": {
+          "truthSha256": "805ec28d5f5ad819c876d550a12c089bb2b7d5e7f2cf4a95c062196bc6b61984",
+          "releasesSha256": "f028e033881397a8b40ca1a385413c45e1eef0505f749e862283618e128ae60f"
+        }
+      }
+    },
+    {
+      "seed": 5071,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "f4acf52b6beb1c1bf7b3464fb58835f71e63a2e5494f0f852f6a8597f8be7cef",
+          "releasesSha256": "f93f8e607a81f3f881d4bf2a67163426fa784b0baea61f6892215cb1e4050ff0"
+        },
+        "shock": {
+          "truthSha256": "f97f34e7d955a04235d8c53d176abae3c88c6ed511c57db1f8c71476b93fd1bd",
+          "releasesSha256": "94db634d87e737b99bfa5a8c0d6a60a3a0e814e53a4d868cbce26b37d227301d"
+        }
+      }
+    },
+    {
+      "seed": 5072,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "1b2b183c2706f7d6aceefcfcdb29ef0b7893b1d4cf7f684a0ac1e7504e23385a",
+          "releasesSha256": "a3e2a8b4c7f6036299b13f1b1405284e06d03f89a04d92ef1987d537ffa6a200"
+        },
+        "shock": {
+          "truthSha256": "0caba8cd0afb2fb9c89e3dcd558516a9b101f54ad1049b6d56b30550db52f0ea",
+          "releasesSha256": "e51582a076e6cc4d532a64efa146790e4e503365728e98725727be2a890cf16d"
+        }
+      }
+    },
+    {
+      "seed": 5073,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "89d2b09f4986dc3651e63b59a13b0b276cf8311658c0dca9fb77cb4e2bed0b75",
+          "releasesSha256": "8ceb5ca7caf8c60caf4222dd7e0a97f97b2a0331b78a97d310b7383225b02e39"
+        },
+        "shock": {
+          "truthSha256": "8865304475577e9c035d97ec79f05a144b4a59d0c1e54f1614dab848aa2579f8",
+          "releasesSha256": "f64fdaa246006e995843de8b3673d8a80d1c40e0b9e87595e31ede1a6a16aa39"
+        }
+      }
+    },
+    {
+      "seed": 5074,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "b4b5cdc12c5e25782f448b37758451e2945d34e72a50e075a7dbd1a952617c74",
+          "releasesSha256": "5a83830546b1a42168a8c94bab300fd5f85464984ff78ed2947c997e2c1e5b96"
+        },
+        "shock": {
+          "truthSha256": "f5428825242ae72244ea6f2268c2b95c636d00609559bd41b4a17be70e1c291d",
+          "releasesSha256": "faec9ef123f303e46f554874077909fe2cc584f55dc6f9f2772b3e6dacf2403b"
+        }
+      }
+    },
+    {
+      "seed": 5075,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "eca6846217e6e86b1138b489d4c54e8fce35971e38aeb1aba5c304bb0958118e",
+          "releasesSha256": "640f990ce40d576ba0211162a137217352ef458b9c123e55253ac7183eab20a1"
+        },
+        "shock": {
+          "truthSha256": "9dd36486784b6b0ee11db3626b508051f62809e6ca6d2fa9ac44c51a407c9009",
+          "releasesSha256": "912eac9b162834ad50eed9865369f3b20af0336f92c16058405f644a96807261"
+        }
+      }
+    },
+    {
+      "seed": 5076,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "31d3a129fadb933d949956d2b206df13b5b6872bab3e9d09c80dac9a6d5b50a2",
+          "releasesSha256": "aad77338904ff18bffe294296f352c1f564c538e578a585b897a798e835eabda"
+        },
+        "shock": {
+          "truthSha256": "a1a5cab056470cfa4fcd55491ca17c1e23c6d5b5641455d82563c82bfc6e6398",
+          "releasesSha256": "d71b7c802f45968c28d9b277028831378036c258624e5ddad43f41ca3fcf57b0"
+        }
+      }
+    },
+    {
+      "seed": 5077,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "95d87b3f29b7ef375ab620870d46314a4f2e7a742eb42159ccb44a9cf47bd018",
+          "releasesSha256": "14c98940e1b2d7351fd370cd8bc73040ea792f633c491ee2e85cb83842af7ee4"
+        },
+        "shock": {
+          "truthSha256": "ca462c2655ac9b90873269c45be80aa332fc2ec0337d4727857e360e1fa62953",
+          "releasesSha256": "4576ca125798179221080572335505113e41fd294c87b13ff56d3f074be68b94"
+        }
+      }
+    },
+    {
+      "seed": 5078,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "02d4987fefd96298ff2fbc932e5cd95670c6ebb439708c55967f8fdf4d74ccc9",
+          "releasesSha256": "17805c795b2095cae887eb49786db309fb38cb674f996b443b5f7dd3a14ef5c9"
+        },
+        "shock": {
+          "truthSha256": "6b41ae20706a964c746a46f221e0e9674fbca1cfdd92df26fb8b378ccc763097",
+          "releasesSha256": "63a09a1f9ad35d86306448d06dd5163d15f6fe1b74530cc164fdf5e58f1fd058"
+        }
+      }
+    },
+    {
+      "seed": 5079,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "3248a541b68a736adfc5817693c63997dc2e372a6a3c71a31cc62e994f81f05c",
+          "releasesSha256": "4e578fe5be3ed57c2c9e3ad0011509ffd7193b9159987bac23d837b12d528262"
+        },
+        "shock": {
+          "truthSha256": "32f59dd377c1d0c451c1e1ba79726d258504d4bfc38ea8c97ab93c9b1dd932a1",
+          "releasesSha256": "49fba041de5b7c73b2d7e994c12bb3704fbbffb3b3f53c3c047b23c3b3ead935"
+        }
+      }
+    },
+    {
+      "seed": 5080,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "0c222e54ab91839fdf1966360e3eec94f6ba97b238e17855fce66733a442bb7d",
+          "releasesSha256": "36b3cded1d0170239b028c7f75705f1226ca91d577dd29cefd558b6139259b26"
+        },
+        "shock": {
+          "truthSha256": "5f30b5c11ba888a9d3263869692547f8c43447ac889b65d5a18d791f0ea9048c",
+          "releasesSha256": "c2c7f7e789b474dfd8a34dd6a7e2ac0a9c78b9fa5128c3b59870fc94e012767b"
+        }
+      }
+    },
+    {
+      "seed": 5081,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "b3d382d109be6044db5e4c01ed8ba629fcfda9461f53303579fb2d54239ba8d5",
+          "releasesSha256": "d1a7c7e7d84c8435a1f2ee8798f8b7cb85096f18781ae1df3021c85b2461f527"
+        },
+        "shock": {
+          "truthSha256": "ed991b5917df437c4b9f47c1cf7ab19c06430aa55c7b86c0fa97cdf59a7f71df",
+          "releasesSha256": "beb38d821f42be79307754b1b370e3b4cb3d822f767f31165e9a03fdc71549c9"
+        }
+      }
+    },
+    {
+      "seed": 5082,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "f0afe7a6928ca0f9f9f2197b429d9f2dfc6c14ca3f4db64f03cc6e6e2c349330",
+          "releasesSha256": "e355018fec36f34f3866bb1e8059513c181589dc20a2337fed52c1f7d44896c1"
+        },
+        "shock": {
+          "truthSha256": "5516039f3cd60270ae6dec3996e60fa1146df2e5a40dd90d707f964fed1f7170",
+          "releasesSha256": "b71bbfe8fa10380ccf038466ca8de55597487fb7dfa1b69799ba938506358c0b"
+        }
+      }
+    },
+    {
+      "seed": 5083,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "810c774c93f539be383614f66e9576f432faff904ddc819e470ae3f6e6f3ab4f",
+          "releasesSha256": "40bc3b57f4384e2f3359f989ab7eec0540bb9ce8b58693a0ed093ea1c190f1dc"
+        },
+        "shock": {
+          "truthSha256": "ea4e48d45f233f67842eaa22ad536b64f9a61f71b19e37d5fbe60d7920ac3967",
+          "releasesSha256": "0857104fd1a22c4c816f00dfd9a7bab5dd0b4265c7cdb50017b5f0fa76073324"
+        }
+      }
+    },
+    {
+      "seed": 5084,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "7feb81d24db0138f56ba853d0e127ca9971555dbb5a6360c9a6243a6da27e638",
+          "releasesSha256": "83d41d847da13bdab81e54b9d91fb5ddfa80c3f7f22fd6f6db8f080a37a7fbd8"
+        },
+        "shock": {
+          "truthSha256": "4a6b5758060bddd274977114c32d88d4c58a955bd72c7cbdada551b8e41e664c",
+          "releasesSha256": "fe43a4dc5a80bad13061796a77a4f8f515e70f6bb7262fd87bbea3ca12646589"
+        }
+      }
+    },
+    {
+      "seed": 5085,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "56aa504ebf54447dc8b66ea67261878ce79c117e1463c239947551792f85244b",
+          "releasesSha256": "a8db1c6b646247388939b4e4a67a5fb629953633d6ff0656cc6dc56785afffd7"
+        },
+        "shock": {
+          "truthSha256": "ba7e4c1c85d8e49e9955017e1cbcf227f7fdbe5a049b031c66737c16b740db57",
+          "releasesSha256": "6d5346bfe31809b2a539cefe1cdb72058acf5a790b76ed4b9c3cdc955100f880"
+        }
+      }
+    },
+    {
+      "seed": 5086,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "fbe613c685722b471f76b7b719ef3c459833a571cbbf6ce2c5fd2fb9d4713e15",
+          "releasesSha256": "93ada818286fc077c9fbfa53ab12a21ef44b2df0c857ea9031db1f23cfa9ba23"
+        },
+        "shock": {
+          "truthSha256": "dbca933d7ae306f6fa880da6a7837f49458cb5410b86904ad00a1b8ff0575c3b",
+          "releasesSha256": "5a009c4ab475a1c76e0a206ad7a84ee7408cb87000b89c858e61a7229c167a9f"
+        }
+      }
+    },
+    {
+      "seed": 5087,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "a03bcf7089ac64c0e305d8b862293a64fa9ad76e7ab947b583d8f5dbeb0256d1",
+          "releasesSha256": "8492cfa2ea82a06f28f56e90c1a17e431a48cd22e057f14421a8dc21d6cd1a81"
+        },
+        "shock": {
+          "truthSha256": "48a1a271e3ae7447d51e4557e2543e5b8b63577d00ec1d57c370dbb2c1f7089f",
+          "releasesSha256": "ba14455f653f2294c778c670ec24bfa151814896d75e932c2a87f8b62485894e"
+        }
+      }
+    },
+    {
+      "seed": 5088,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "1ee99dda6bbf2b4a2e93df4ed0a5e02444e26b311e41774743ba25030069f7c2",
+          "releasesSha256": "6a4275af483f5cf386c7ab434afccab5f0e7c17137629708f792cb32c0f0d9c4"
+        },
+        "shock": {
+          "truthSha256": "7dccf10a8913da11d7d8c438bcb9fbadb0b5979c4d78d63e378d6c8af34a8a7e",
+          "releasesSha256": "bd6a0b66937571a17337eaef4dbb0bb8bf8cb13fdd64f3f2c8dd5aedf62e168f"
+        }
+      }
+    },
+    {
+      "seed": 5089,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "2aa0b92668f92481f3ccf300056cb15b394be6924e5bc26a0fa6f9fe6c360218",
+          "releasesSha256": "3a267f6215f2e5815290cb76e888caaed714beb9033674529f93da82fd909172"
+        },
+        "shock": {
+          "truthSha256": "98ab3b0d313340e2a1628a73a183bd680b96afb6cf701687c7d993b1bac8a1f5",
+          "releasesSha256": "07894dc43afa77ac6bc3696b666ac47c3a69b730e9abd63516284e75633f2ca9"
+        }
+      }
+    },
+    {
+      "seed": 5090,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "9d6a2f9d5d9ff219390f9455e90a6bc347a3dd040067aba8ad5a1f9c08c46733",
+          "releasesSha256": "04ff396d6152b8b9084251bfd688de8bc9b97160f31733cb9ff0bdcdc7713f33"
+        },
+        "shock": {
+          "truthSha256": "a5c28e5c1304df7e0810286f1a756bd008d208dddfd6c6cf53067962b54fbd64",
+          "releasesSha256": "8a9f17078f29501eb8d863f030fed611fcd4c5f56b34f410e05d591489c732b6"
+        }
+      }
+    },
+    {
+      "seed": 5091,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "b6307f1836ba5c515909a844c3dce008fa18e51e9ed99aa9a9562d0d2e897d9a",
+          "releasesSha256": "dffc425addff542dcf9122c66efd49aa1e2bf8a9ea0a4c67331956414a039d80"
+        },
+        "shock": {
+          "truthSha256": "2e7a4c074046f31417431bf889e6a773eb6e73e7cdd67691055c378aaaa5f363",
+          "releasesSha256": "c0b606063a96c805397d6cb38d582cdfb127c098e13010868aa103444cc44a6f"
+        }
+      }
+    },
+    {
+      "seed": 5092,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "6fff69b44469c1e4e52a3d0db90cf048537e2fd22686f27c0f0eccf5ace69844",
+          "releasesSha256": "754f30e3336c99033d7d467f281a32a6a2e94e100fa3669d0fa543f10ff3fa94"
+        },
+        "shock": {
+          "truthSha256": "d1074b4a52c5f0644e475fc34f315da62df0b71388c1472f9f5c8754275beee1",
+          "releasesSha256": "ad3c4c9e42be5b6761c0d13daad15fab9f0213eeeb114168d8a0c9827dd845f0"
+        }
+      }
+    },
+    {
+      "seed": 5093,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "268a53c060457fca745e98613c79b83c0a6cf15249ef883a22b95a0c41418709",
+          "releasesSha256": "5e62775a6b640c2cee662518dac6fe3ce0c510db7059be0cbf0872b5be7e33f7"
+        },
+        "shock": {
+          "truthSha256": "2a4a25fb35c79024492107b48da8399470b8eed9362be59f3a24646a977733f8",
+          "releasesSha256": "e99baf9fa9e74d8a79793da4b13199926951c3c879325044e76fcaa5dc65d2ff"
+        }
+      }
+    },
+    {
+      "seed": 5094,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "b1bb6a4e3d5446c5024e6bee2b68866fa15e32b6c82a188e327aaa17d6d6ab46",
+          "releasesSha256": "cd3553eed249793ac5169875e2a6c8f7a2ab02dd65edd9873c4fcb507b9f09b8"
+        },
+        "shock": {
+          "truthSha256": "fdae194b1d8c41c0a608676ca1974f4efcf26f3a7f04db7e7d303e9bd3630407",
+          "releasesSha256": "37af1835e63b3f69e33481c0b377c1985096624706496ce5284c1ea22c56961b"
+        }
+      }
+    },
+    {
+      "seed": 5095,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "e9152f5ebeb81492e2337f681bd670cd1e131faa14c4ec80ce2af3f5ec54a22a",
+          "releasesSha256": "b4e4dd275d447a06bf185475a2ce1352a24fffe8bbea14c1703fada51d525d78"
+        },
+        "shock": {
+          "truthSha256": "a263157705f8568a615a364ed7f9bda4dd26d48ede64cb30b9d85ba5edcb1463",
+          "releasesSha256": "0104265481be89be8c5ceeb72af4324e63714f6222fc04222f2579b28d57cf44"
+        }
+      }
+    },
+    {
+      "seed": 5096,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "c1a19a8922d0fa22c2e75cac8587519a2553338450a6a6fab0f45ef76d877bd0",
+          "releasesSha256": "e5e4877331c068699b5422687b62a234cd4f443275bb32e7aedaff811b870d98"
+        },
+        "shock": {
+          "truthSha256": "3daa28d2e9530e07c40d260070725ff6846a833283979d4db99da219c91c11f5",
+          "releasesSha256": "86044d25e9425800288c4bb422618f4cd8b4f3acaa696f71cdb4f6159af179ad"
+        }
+      }
+    },
+    {
+      "seed": 5097,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "no-shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "fec886fbcbc3ea52eef4904bba31b7fe9bbc6950d0d0c97735e7a975b0e21a43",
+          "releasesSha256": "941369c84d522983a6a2a8a8f00755863ef716c54b14b02a0a5a4cb9027493b7"
+        },
+        "shock": {
+          "truthSha256": "3f84a60b8f9c2b3d917ae1f201a51ad9d0d61cd7fd6f6a5a4bb9034cad63e0cd",
+          "releasesSha256": "400d898cf6211140e017c31ea6aceaf6bd2046589fcbfb5bdc01ca7f016865ca"
+        }
+      }
+    },
+    {
+      "seed": 5098,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "fc1b23736b86d0442af4ad7e1703d274a3435a7c834a1ffeb6b99f33d3ae24e4",
+          "releasesSha256": "71e2fd2f5ee356ef960c43ef52a78fd539deb6efdb9bf405307f7e1fc823dff1"
+        },
+        "shock": {
+          "truthSha256": "fe6e0169f731d49af376bca3139dee02239a144e1c2730721e3cae13667e4dce",
+          "releasesSha256": "89a40a657b107dcffec601fea32e1ce054e2b70eda68554f136565d32ed592df"
+        }
+      }
+    },
+    {
+      "seed": 5099,
+      "signalSha256": "67204db3e74689f83cc18c81bdd2a5eb1f7acbb474d3734c96f6f2196a4bce95",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "shock",
+        "reversed": "shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "36256d70553e4da82ffd1b23af9ab9653440b1ad1e59a333763199f22b86911b",
+          "releasesSha256": "23c4d230d09c284cf981d286308a5bf245aa7cf738e7d7b8b740589ed053b472"
+        },
+        "shock": {
+          "truthSha256": "76f10d570ff5ecf676b86ab15b49636e4a7a9040429df4b69b20485a04620781",
+          "releasesSha256": "dc5dcfe987beba174b4e3d8d47b06b21c4e815fb54df15b36c48ad0853b98a95"
+        }
+      }
+    },
+    {
+      "seed": 5100,
+      "signalSha256": "df6157cb1b4dfc1df8cfb2a404d9e1dba3e2423521eb3c5c1b411322bc57423e",
+      "assignments": {
+        "informative": "shock",
+        "no-signal": "no-shock",
+        "reversed": "no-shock"
+      },
+      "branches": {
+        "no-shock": {
+          "truthSha256": "9b331f1c2eb97ca82c207bdbad101953cc226e0719acb2669b1d5fba339ecbe6",
+          "releasesSha256": "6bba10cbf15875bc1de2598e9921a9240963b8fe5408ef3c9f6d06ce5cac5656"
+        },
+        "shock": {
+          "truthSha256": "b4b82793dcdd22658499d9f5bb1ef0d64ae62bc9c1cc35efaf531bc9e2941476",
+          "releasesSha256": "f8c712258b1e466d603760b5523b6906d01e8bb6f2c47414ed7c6f1eb3c4a82e"
+        }
+      }
+    }
+  ],
+  "artifacts": {
+    "scores.json.gz": {
+      "sha256": "79d79696351318e29cb80bf8879332868b00ae52fc2526d8a69a8f9e79b9b80e",
+      "bytes": 26557
+    }
+  },
+  "summaries": [
+    {
+      "scenario": "informative",
+      "groupId": "group-a",
+      "intendedHistories": 100,
+      "methods": {
+        "recent-mean-3": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 54.08,
+          "rmse": 67.4029672937327,
+          "bias": -37.2
+        },
+        "seasonal-naive-12": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 60.75,
+          "rmse": 79.70388949104053,
+          "bias": -57.21
+        },
+        "intercept-only": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 54.013599999999975,
+          "rmse": 56.227310090382225,
+          "bias": 1.4800000000000069
+        },
+        "signal-adjusted": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 36.2949350649351,
+          "rmse": 46.75335200204604,
+          "bias": 0.8850649350649451
+        }
+      },
+      "comparisons": {
+        "recent-mean-3": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": -17.785064935064945,
+          "relativeMaeReduction": 0.328865845692768,
+          "wins": 55,
+          "ties": 0,
+          "losses": 45
+        },
+        "seasonal-naive-12": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": -24.455064935064932,
+          "relativeMaeReduction": 0.4025525092191753,
+          "wins": 60,
+          "ties": 0,
+          "losses": 40
+        },
+        "intercept-only": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": -17.718664935064922,
+          "relativeMaeReduction": 0.328040807038688,
+          "wins": 80,
+          "ties": 0,
+          "losses": 20
+        }
+      },
+      "strata": {
+        "signal": {
+          "0": {
+            "recent-mean-3": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 29.133333333333333,
+              "rmse": 43.03409501004214,
+              "bias": -2.6444444444444444
+            },
+            "seasonal-naive-12": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 29.177777777777777,
+              "rmse": 49.03853360142183,
+              "bias": -22.733333333333334
+            },
+            "intercept-only": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 53.91288888888891,
+              "rmse": 56.066937771837615,
+              "bias": 36.035555555555604
+            },
+            "signal-adjusted": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 31.325252525252534,
+              "rmse": 43.03875290487607,
+              "bias": 2.719191919191927
+            }
+          },
+          "1": {
+            "recent-mean-3": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 74.49090909090908,
+              "rmse": 82.12839172462058,
+              "bias": -65.47272727272727
+            },
+            "seasonal-naive-12": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 86.58181818181818,
+              "rmse": 97.89196271214692,
+              "bias": -85.41818181818182
+            },
+            "intercept-only": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 54.09600000000001,
+              "rmse": 56.35818436974834,
+              "bias": -26.792727272727237
+            },
+            "signal-adjusted": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 40.36103896103895,
+              "rmse": 49.58602277775978,
+              "bias": -0.6155844155844058
+            }
+          }
+        },
+        "branch": {
+          "no-shock": {
+            "recent-mean-3": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 17.372549019607842,
+              "rmse": 20.574112803400755,
+              "bias": 15.72549019607843
+            },
+            "seasonal-naive-12": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 11.862745098039216,
+              "rmse": 14.515036152548982,
+              "bias": -4.921568627450981
+            },
+            "intercept-only": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 54.405490196078425,
+              "rmse": 55.99964677759751,
+              "bias": 54.405490196078425
+            },
+            "signal-adjusted": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 36.57499363381716,
+              "rmse": 47.58420715402104,
+              "bias": 36.25413801884389
+            }
+          },
+          "shock": {
+            "recent-mean-3": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 92.28571428571429,
+              "rmse": 93.97437774983875,
+              "bias": -92.28571428571429
+            },
+            "seasonal-naive-12": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 111.63265306122449,
+              "rmse": 112.89565346561652,
+              "bias": -111.63265306122449
+            },
+            "intercept-only": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 53.605714285714285,
+              "rmse": 56.463290874040716,
+              "bias": -53.605714285714285
+            },
+            "signal-adjusted": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 36.00344553405776,
+              "rmse": 45.87260465823515,
+              "bias": -35.92764378478662
+            }
+          }
+        }
+      },
+      "informativeDescriptiveCriterion": true,
+      "delayedSignalFallbacks": 100,
+      "publishedInterval": null,
+      "causalEffect": null,
+      "operationallyQualified": false
+    },
+    {
+      "scenario": "informative",
+      "groupId": "group-b",
+      "intendedHistories": 100,
+      "methods": {
+        "recent-mean-3": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 54.02,
+          "rmse": 67.14536469481718,
+          "bias": -37.12
+        },
+        "seasonal-naive-12": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 57.07,
+          "rmse": 76.04386891788187,
+          "bias": -53.63
+        },
+        "intercept-only": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 54.4048,
+          "rmse": 55.96302350659763,
+          "bias": 1.120000000000009
+        },
+        "signal-adjusted": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 36.5525,
+          "rmse": 45.59760821578254,
+          "bias": 0.5175
+        }
+      },
+      "comparisons": {
+        "recent-mean-3": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": -17.4675,
+          "relativeMaeReduction": 0.32335246205109214,
+          "wins": 51,
+          "ties": 0,
+          "losses": 49
+        },
+        "seasonal-naive-12": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": -20.5175,
+          "relativeMaeReduction": 0.35951463115472226,
+          "wins": 57,
+          "ties": 0,
+          "losses": 43
+        },
+        "intercept-only": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": -17.8523,
+          "relativeMaeReduction": 0.3281383260300561,
+          "wins": 80,
+          "ties": 0,
+          "losses": 20
+        }
+      },
+      "strata": {
+        "signal": {
+          "0": {
+            "recent-mean-3": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 29.333333333333332,
+              "rmse": 42.33884478558405,
+              "bias": -1.1555555555555554
+            },
+            "seasonal-naive-12": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 25.377777777777776,
+              "rmse": 45.98985395352617,
+              "bias": -18.355555555555554
+            },
+            "intercept-only": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 54.831999999999994,
+              "rmse": 56.271649068504196,
+              "bias": 37.08444444444445
+            },
+            "signal-adjusted": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 31.81111111111111,
+              "rmse": 42.455008865595325,
+              "bias": 3.3444444444444446
+            }
+          },
+          "1": {
+            "recent-mean-3": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 74.21818181818182,
+              "rmse": 82.0403448421457,
+              "bias": -66.54545454545455
+            },
+            "seasonal-naive-12": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 83,
+              "rmse": 93.7199891359168,
+              "bias": -82.49090909090908
+            },
+            "intercept-only": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 54.055272727272744,
+              "rmse": 55.709239971317295,
+              "bias": -28.305454545454538
+            },
+            "signal-adjusted": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 40.43181818181818,
+              "rmse": 48.016083953002855,
+              "bias": -1.7954545454545454
+            }
+          }
+        },
+        "branch": {
+          "no-shock": {
+            "recent-mean-3": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 16.941176470588236,
+              "rmse": 19.61192114455879,
+              "bias": 16.19607843137255
+            },
+            "seasonal-naive-12": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 9.431372549019608,
+              "rmse": 11.691290540817294,
+              "bias": -2.6862745098039214
+            },
+            "intercept-only": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 54.43607843137251,
+              "rmse": 55.54818745388336,
+              "bias": 54.43607843137251
+            },
+            "signal-adjusted": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 36.25,
+              "rmse": 45.96424708187791,
+              "bias": 36.05392156862745
+            }
+          },
+          "shock": {
+            "recent-mean-3": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 92.61224489795919,
+              "rmse": 93.81201350334094,
+              "bias": -92.61224489795919
+            },
+            "seasonal-naive-12": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 106.65306122448979,
+              "rmse": 107.97732188203376,
+              "bias": -106.65306122448979
+            },
+            "intercept-only": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 54.37224489795921,
+              "rmse": 56.391550676986185,
+              "bias": -54.37224489795921
+            },
+            "signal-adjusted": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 36.86734693877551,
+              "rmse": 45.212846964245074,
+              "bias": -36.46938775510204
+            }
+          }
+        }
+      },
+      "informativeDescriptiveCriterion": true,
+      "delayedSignalFallbacks": 100,
+      "publishedInterval": null,
+      "causalEffect": null,
+      "operationallyQualified": false
+    },
+    {
+      "scenario": "informative",
+      "groupId": "group-c",
+      "intendedHistories": 100,
+      "methods": {
+        "recent-mean-3": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "seasonal-naive-12": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "intercept-only": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "signal-adjusted": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        }
+      },
+      "comparisons": {
+        "recent-mean-3": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        },
+        "seasonal-naive-12": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        },
+        "intercept-only": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        }
+      },
+      "strata": {
+        "signal": {
+          "0": {
+            "recent-mean-3": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          },
+          "1": {
+            "recent-mean-3": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          }
+        },
+        "branch": {
+          "no-shock": {
+            "recent-mean-3": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          },
+          "shock": {
+            "recent-mean-3": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          }
+        }
+      },
+      "informativeDescriptiveCriterion": null,
+      "delayedSignalFallbacks": 100,
+      "publishedInterval": null,
+      "causalEffect": null,
+      "operationallyQualified": false
+    },
+    {
+      "scenario": "informative",
+      "groupId": "group-d",
+      "intendedHistories": 100,
+      "methods": {
+        "recent-mean-3": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "seasonal-naive-12": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "intercept-only": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "signal-adjusted": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        }
+      },
+      "comparisons": {
+        "recent-mean-3": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        },
+        "seasonal-naive-12": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        },
+        "intercept-only": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        }
+      },
+      "strata": {
+        "signal": {
+          "0": {
+            "recent-mean-3": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          },
+          "1": {
+            "recent-mean-3": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          }
+        },
+        "branch": {
+          "no-shock": {
+            "recent-mean-3": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          },
+          "shock": {
+            "recent-mean-3": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          }
+        }
+      },
+      "informativeDescriptiveCriterion": null,
+      "delayedSignalFallbacks": 100,
+      "publishedInterval": null,
+      "causalEffect": null,
+      "operationallyQualified": false
+    },
+    {
+      "scenario": "no-signal",
+      "groupId": "group-a",
+      "intendedHistories": 100,
+      "methods": {
+        "recent-mean-3": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 57.34,
+          "rmse": 70.98844976473285,
+          "bias": -40.82
+        },
+        "seasonal-naive-12": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 64.17,
+          "rmse": 83.63330676231809,
+          "bias": -60.83
+        },
+        "intercept-only": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 56.363000000000014,
+          "rmse": 59.29897553921145,
+          "bias": -11.970000000000026
+        },
+        "signal-adjusted": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 56.34183441558438,
+          "rmse": 59.64681955405027,
+          "bias": -11.793620129870103
+        }
+      },
+      "comparisons": {
+        "recent-mean-3": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": -0.9981655844155845,
+          "relativeMaeReduction": 0.017407840676938013,
+          "wins": 51,
+          "ties": 0,
+          "losses": 49
+        },
+        "seasonal-naive-12": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": -7.828165584415578,
+          "relativeMaeReduction": 0.12199104853382614,
+          "wins": 52,
+          "ties": 0,
+          "losses": 48
+        },
+        "intercept-only": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": -0.021165584415584533,
+          "relativeMaeReduction": 0.0003755226729527106,
+          "wins": 50,
+          "ties": 0,
+          "losses": 50
+        }
+      },
+      "strata": {
+        "signal": {
+          "0": {
+            "recent-mean-3": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 60.977777777777774,
+              "rmse": 75.13336291037572,
+              "bias": -42.8
+            },
+            "seasonal-naive-12": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 67.11111111111111,
+              "rmse": 87.33282442599817,
+              "bias": -62.888888888888886
+            },
+            "intercept-only": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 60.025555555555556,
+              "rmse": 63.307066921649614,
+              "bias": -13.95
+            },
+            "signal-adjusted": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 59.80606060606062,
+              "rmse": 61.88513011750268,
+              "bias": -4.07272727272728
+            }
+          },
+          "1": {
+            "recent-mean-3": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 54.36363636363637,
+              "rmse": 67.40784955639946,
+              "bias": -39.2
+            },
+            "seasonal-naive-12": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 61.763636363636365,
+              "rmse": 80.4800370504162,
+              "bias": -59.14545454545455
+            },
+            "intercept-only": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 53.36636363636364,
+              "rmse": 55.80591977396468,
+              "bias": -10.349999999999989
+            },
+            "signal-adjusted": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 53.50746753246753,
+              "rmse": 57.75098400682845,
+              "bias": -18.11071428571425
+            }
+          }
+        },
+        "branch": {
+          "no-shock": {
+            "recent-mean-3": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 17.26530612244898,
+              "rmse": 20.089595235710796,
+              "bias": 16.448979591836736
+            },
+            "seasonal-naive-12": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 11.183673469387756,
+              "rmse": 13.460448486933403,
+              "bias": -4.36734693877551
+            },
+            "intercept-only": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 45.2989795918367,
+              "rmse": 46.74420241253104,
+              "bias": 45.2989795918367
+            },
+            "signal-adjusted": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 45.457361516035014,
+              "rmse": 48.012959928959454,
+              "bias": 45.457361516035014
+            }
+          },
+          "shock": {
+            "recent-mean-3": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 95.84313725490196,
+              "rmse": 97.43373816770726,
+              "bias": -95.84313725490196
+            },
+            "seasonal-naive-12": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 115.07843137254902,
+              "rmse": 116.36445451472629,
+              "bias": -115.07843137254902
+            },
+            "intercept-only": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 66.99313725490201,
+              "rmse": 69.24959793186882,
+              "bias": -66.99313725490201
+            },
+            "signal-adjusted": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 66.79946524064174,
+              "rmse": 69.00090032880786,
+              "bias": -66.79946524064174
+            }
+          }
+        }
+      },
+      "informativeDescriptiveCriterion": null,
+      "delayedSignalFallbacks": 100,
+      "publishedInterval": null,
+      "causalEffect": null,
+      "operationallyQualified": false
+    },
+    {
+      "scenario": "no-signal",
+      "groupId": "group-b",
+      "intendedHistories": 100,
+      "methods": {
+        "recent-mean-3": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 54.15,
+          "rmse": 67.28261291002305,
+          "bias": -39.15
+        },
+        "seasonal-naive-12": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 60.68,
+          "rmse": 78.72852088030106,
+          "bias": -55.66
+        },
+        "intercept-only": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 53.45439999999998,
+          "rmse": 55.88832078350539,
+          "bias": -11.370000000000019
+        },
+        "signal-adjusted": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 53.43566558441562,
+          "rmse": 56.346400570613945,
+          "bias": -11.213879870129897
+        }
+      },
+      "comparisons": {
+        "recent-mean-3": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": -0.7143344155844156,
+          "relativeMaeReduction": 0.013191771294263743,
+          "wins": 51,
+          "ties": 0,
+          "losses": 49
+        },
+        "seasonal-naive-12": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": -7.244334415584417,
+          "relativeMaeReduction": 0.11938586709928123,
+          "wins": 52,
+          "ties": 0,
+          "losses": 48
+        },
+        "intercept-only": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": -0.01873441558441556,
+          "relativeMaeReduction": 0.00035047471460458723,
+          "wins": 50,
+          "ties": 0,
+          "losses": 50
+        }
+      },
+      "strata": {
+        "signal": {
+          "0": {
+            "recent-mean-3": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 54.68888888888889,
+              "rmse": 67.86375239322453,
+              "bias": -39.53333333333333
+            },
+            "seasonal-naive-12": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 61.22222222222222,
+              "rmse": 80.3139672369217,
+              "bias": -56.733333333333334
+            },
+            "intercept-only": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 53.76044444444443,
+              "rmse": 56.398096500581374,
+              "bias": -11.753333333333336
+            },
+            "signal-adjusted": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 53.5661616161616,
+              "rmse": 55.24190613380935,
+              "bias": -3.0106060606060527
+            }
+          },
+          "1": {
+            "recent-mean-3": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 53.70909090909091,
+              "rmse": 66.80337498278743,
+              "bias": -38.836363636363636
+            },
+            "seasonal-naive-12": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 60.236363636363635,
+              "rmse": 77.40718782692423,
+              "bias": -54.78181818181818
+            },
+            "intercept-only": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 53.20400000000003,
+              "rmse": 55.467746893618674,
+              "bias": -11.05636363636365
+            },
+            "signal-adjusted": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 53.328896103896106,
+              "rmse": 57.23422641424864,
+              "bias": -17.925649350649387
+            }
+          }
+        },
+        "branch": {
+          "no-shock": {
+            "recent-mean-3": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 15.448979591836734,
+              "rmse": 18.194527098183414,
+              "bias": 15.16326530612245
+            },
+            "seasonal-naive-12": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 10.795918367346939,
+              "rmse": 13.302600635720422,
+              "bias": -0.5510204081632653
+            },
+            "intercept-only": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 42.943265306122434,
+              "rmse": 44.104877697763705,
+              "bias": 42.943265306122434
+            },
+            "signal-adjusted": {
+              "intended": 49,
+              "forecasted": 49,
+              "scored": 49,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 43.08345481049559,
+              "rmse": 44.92059268465184,
+              "bias": 43.08345481049559
+            }
+          },
+          "shock": {
+            "recent-mean-3": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 91.33333333333333,
+              "rmse": 92.51115460035182,
+              "bias": -91.33333333333333
+            },
+            "seasonal-naive-12": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 108.6078431372549,
+              "rmse": 109.46814381272719,
+              "bias": -108.6078431372549
+            },
+            "intercept-only": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 63.55333333333326,
+              "rmse": 65.23466965878035,
+              "bias": -63.55333333333326
+            },
+            "signal-adjusted": {
+              "intended": 51,
+              "forecasted": 51,
+              "scored": 51,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 63.38190730837788,
+              "rmse": 65.47212593794325,
+              "bias": -63.38190730837788
+            }
+          }
+        }
+      },
+      "informativeDescriptiveCriterion": null,
+      "delayedSignalFallbacks": 100,
+      "publishedInterval": null,
+      "causalEffect": null,
+      "operationallyQualified": false
+    },
+    {
+      "scenario": "no-signal",
+      "groupId": "group-c",
+      "intendedHistories": 100,
+      "methods": {
+        "recent-mean-3": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "seasonal-naive-12": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "intercept-only": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "signal-adjusted": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        }
+      },
+      "comparisons": {
+        "recent-mean-3": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        },
+        "seasonal-naive-12": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        },
+        "intercept-only": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        }
+      },
+      "strata": {
+        "signal": {
+          "0": {
+            "recent-mean-3": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          },
+          "1": {
+            "recent-mean-3": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          }
+        },
+        "branch": {
+          "no-shock": {
+            "recent-mean-3": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          },
+          "shock": {
+            "recent-mean-3": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          }
+        }
+      },
+      "informativeDescriptiveCriterion": null,
+      "delayedSignalFallbacks": 100,
+      "publishedInterval": null,
+      "causalEffect": null,
+      "operationallyQualified": false
+    },
+    {
+      "scenario": "no-signal",
+      "groupId": "group-d",
+      "intendedHistories": 100,
+      "methods": {
+        "recent-mean-3": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "seasonal-naive-12": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "intercept-only": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "signal-adjusted": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        }
+      },
+      "comparisons": {
+        "recent-mean-3": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        },
+        "seasonal-naive-12": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        },
+        "intercept-only": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        }
+      },
+      "strata": {
+        "signal": {
+          "0": {
+            "recent-mean-3": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          },
+          "1": {
+            "recent-mean-3": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          }
+        },
+        "branch": {
+          "no-shock": {
+            "recent-mean-3": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 49,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 49,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          },
+          "shock": {
+            "recent-mean-3": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 51,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 51,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          }
+        }
+      },
+      "informativeDescriptiveCriterion": null,
+      "delayedSignalFallbacks": 100,
+      "publishedInterval": null,
+      "causalEffect": null,
+      "operationallyQualified": false
+    },
+    {
+      "scenario": "reversed",
+      "groupId": "group-a",
+      "intendedHistories": 100,
+      "methods": {
+        "recent-mean-3": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 57.07,
+          "rmse": 70.84497159290841,
+          "bias": -41.93
+        },
+        "seasonal-naive-12": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 66.1,
+          "rmse": 85.21267511350644,
+          "bias": -61.94
+        },
+        "intercept-only": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 55.02280000000003,
+          "rmse": 57.19656982721952,
+          "bias": -3.249999999999986
+        },
+        "signal-adjusted": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 70.07610389610397,
+          "rmse": 76.44516378610463,
+          "bias": -3.8449350649350538
+        }
+      },
+      "comparisons": {
+        "recent-mean-3": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": 13.006103896103898,
+          "relativeMaeReduction": -0.22789738735069176,
+          "wins": 53,
+          "ties": 0,
+          "losses": 47
+        },
+        "seasonal-naive-12": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": 3.9761038961038957,
+          "relativeMaeReduction": -0.06015285773228407,
+          "wins": 54,
+          "ties": 0,
+          "losses": 46
+        },
+        "intercept-only": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": 15.05330389610389,
+          "relativeMaeReduction": -0.2735830218764572,
+          "wins": 25,
+          "ties": 0,
+          "losses": 75
+        }
+      },
+      "strata": {
+        "signal": {
+          "0": {
+            "recent-mean-3": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 79.31111111111112,
+              "rmse": 87.32404530762926,
+              "bias": -73.53333333333333
+            },
+            "seasonal-naive-12": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 96.11111111111111,
+              "rmse": 105.81356770807376,
+              "bias": -93.62222222222222
+            },
+            "intercept-only": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 55.79200000000001,
+              "rmse": 58.592598698318724,
+              "bias": -34.853333333333296
+            },
+            "signal-adjusted": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 75.78181818181815,
+              "rmse": 82.85798309588576,
+              "bias": -68.16969696969694
+            }
+          },
+          "1": {
+            "recent-mean-3": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 38.872727272727275,
+              "rmse": 53.72556527051496,
+              "bias": -16.072727272727274
+            },
+            "seasonal-naive-12": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 41.54545454545455,
+              "rmse": 63.57200641791952,
+              "bias": -36.018181818181816
+            },
+            "intercept-only": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 54.39345454545452,
+              "rmse": 56.02849794361956,
+              "bias": 22.607272727272754
+            },
+            "signal-adjusted": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 65.40779220779216,
+              "rmse": 70.76738659556295,
+              "bias": 48.78441558441558
+            }
+          }
+        },
+        "branch": {
+          "no-shock": {
+            "recent-mean-3": {
+              "intended": 48,
+              "forecasted": 48,
+              "scored": 48,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 16.291666666666668,
+              "rmse": 19.512816301087856,
+              "bias": 15.25
+            },
+            "seasonal-naive-12": {
+              "intended": 48,
+              "forecasted": 48,
+              "scored": 48,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 11.791666666666666,
+              "rmse": 13.979151142564653,
+              "bias": -3.125
+            },
+            "intercept-only": {
+              "intended": 48,
+              "forecasted": 48,
+              "scored": 48,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 53.93000000000001,
+              "rmse": 55.28681940571369,
+              "bias": 53.93000000000001
+            },
+            "signal-adjusted": {
+              "intended": 48,
+              "forecasted": 48,
+              "scored": 48,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 68.95211038961034,
+              "rmse": 74.00758436709208,
+              "bias": 68.95211038961034
+            }
+          },
+          "shock": {
+            "recent-mean-3": {
+              "intended": 52,
+              "forecasted": 52,
+              "scored": 52,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 94.71153846153847,
+              "rmse": 96.43900025005843,
+              "bias": -94.71153846153847
+            },
+            "seasonal-naive-12": {
+              "intended": 52,
+              "forecasted": 52,
+              "scored": 52,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 116.23076923076923,
+              "rmse": 117.40298777484983,
+              "bias": -116.23076923076923
+            },
+            "intercept-only": {
+              "intended": 52,
+              "forecasted": 52,
+              "scored": 52,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 56.031538461538474,
+              "rmse": 58.904486703867924,
+              "bias": -56.031538461538474
+            },
+            "signal-adjusted": {
+              "intended": 52,
+              "forecasted": 52,
+              "scored": 52,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 71.11363636363635,
+              "rmse": 78.62819328522448,
+              "bias": -71.04220779220776
+            }
+          }
+        }
+      },
+      "informativeDescriptiveCriterion": null,
+      "delayedSignalFallbacks": 100,
+      "publishedInterval": null,
+      "causalEffect": null,
+      "operationallyQualified": false
+    },
+    {
+      "scenario": "reversed",
+      "groupId": "group-b",
+      "intendedHistories": 100,
+      "methods": {
+        "recent-mean-3": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 54.8,
+          "rmse": 68.12811460770068,
+          "bias": -40.62
+        },
+        "seasonal-naive-12": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 61.91,
+          "rmse": 80.163395636662,
+          "bias": -57.13
+        },
+        "intercept-only": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 53.130400000000016,
+          "rmse": 54.74595875496199,
+          "bias": -2.379999999999991
+        },
+        "signal-adjusted": {
+          "intended": 100,
+          "forecasted": 100,
+          "scored": 100,
+          "unavailable": 0,
+          "missingOutcome": 0,
+          "mae": 68.5425,
+          "rmse": 74.4967239212571,
+          "bias": -2.9825
+        }
+      },
+      "comparisons": {
+        "recent-mean-3": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": 13.7425,
+          "relativeMaeReduction": -0.25077554744525554,
+          "wins": 53,
+          "ties": 0,
+          "losses": 47
+        },
+        "seasonal-naive-12": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": 6.6325,
+          "relativeMaeReduction": -0.10713131965756761,
+          "wins": 55,
+          "ties": 0,
+          "losses": 45
+        },
+        "intercept-only": {
+          "commonScored": 100,
+          "unpaired": 0,
+          "meanAbsoluteErrorDelta": 15.4121,
+          "relativeMaeReduction": -0.2900806318040139,
+          "wins": 25,
+          "ties": 0,
+          "losses": 75
+        }
+      },
+      "strata": {
+        "signal": {
+          "0": {
+            "recent-mean-3": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 76.44444444444444,
+              "rmse": 83.8639109245184,
+              "bias": -71.06666666666666
+            },
+            "seasonal-naive-12": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 89.77777777777777,
+              "rmse": 99.67190621679154,
+              "bias": -88.26666666666667
+            },
+            "intercept-only": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 53.189333333333366,
+              "rmse": 55.319747729801584,
+              "bias": -32.82666666666666
+            },
+            "signal-adjusted": {
+              "intended": 45,
+              "forecasted": 45,
+              "scored": 45,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 73.45555555555555,
+              "rmse": 80.08623824075866,
+              "bias": -66.56666666666666
+            }
+          },
+          "1": {
+            "recent-mean-3": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 37.09090909090909,
+              "rmse": 51.81295029412838,
+              "bias": -15.709090909090909
+            },
+            "seasonal-naive-12": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 39.10909090909091,
+              "rmse": 59.62991927486799,
+              "bias": -31.654545454545456
+            },
+            "intercept-only": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 53.08218181818177,
+              "rmse": 54.271983061746944,
+              "bias": 22.5309090909091
+            },
+            "signal-adjusted": {
+              "intended": 55,
+              "forecasted": 55,
+              "scored": 55,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 64.52272727272727,
+              "rmse": 69.59035166928348,
+              "bias": 49.04090909090909
+            }
+          }
+        },
+        "branch": {
+          "no-shock": {
+            "recent-mean-3": {
+              "intended": 48,
+              "forecasted": 48,
+              "scored": 48,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 14.916666666666666,
+              "rmse": 17.516658737708322,
+              "bias": 14.625
+            },
+            "seasonal-naive-12": {
+              "intended": 48,
+              "forecasted": 48,
+              "scored": 48,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 10.354166666666666,
+              "rmse": 12.875202263783406,
+              "bias": -0.3958333333333333
+            },
+            "intercept-only": {
+              "intended": 48,
+              "forecasted": 48,
+              "scored": 48,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 52.864999999999974,
+              "rmse": 53.73686754299449,
+              "bias": 52.864999999999974
+            },
+            "signal-adjusted": {
+              "intended": 48,
+              "forecasted": 48,
+              "scored": 48,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 68.09895833333333,
+              "rmse": 72.97148237211118,
+              "bias": 68.078125
+            }
+          },
+          "shock": {
+            "recent-mean-3": {
+              "intended": 52,
+              "forecasted": 52,
+              "scored": 52,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 91.61538461538461,
+              "rmse": 92.96566777372917,
+              "bias": -91.61538461538461
+            },
+            "seasonal-naive-12": {
+              "intended": 52,
+              "forecasted": 52,
+              "scored": 52,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 109.5,
+              "rmse": 110.47624178980746,
+              "bias": -109.5
+            },
+            "intercept-only": {
+              "intended": 52,
+              "forecasted": 52,
+              "scored": 52,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 53.37538461538466,
+              "rmse": 55.66119266805885,
+              "bias": -53.37538461538466
+            },
+            "signal-adjusted": {
+              "intended": 52,
+              "forecasted": 52,
+              "scored": 52,
+              "unavailable": 0,
+              "missingOutcome": 0,
+              "mae": 68.95192307692308,
+              "rmse": 75.87743152864766,
+              "bias": -68.57692307692308
+            }
+          }
+        }
+      },
+      "informativeDescriptiveCriterion": null,
+      "delayedSignalFallbacks": 100,
+      "publishedInterval": null,
+      "causalEffect": null,
+      "operationallyQualified": false
+    },
+    {
+      "scenario": "reversed",
+      "groupId": "group-c",
+      "intendedHistories": 100,
+      "methods": {
+        "recent-mean-3": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "seasonal-naive-12": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "intercept-only": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "signal-adjusted": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        }
+      },
+      "comparisons": {
+        "recent-mean-3": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        },
+        "seasonal-naive-12": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        },
+        "intercept-only": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        }
+      },
+      "strata": {
+        "signal": {
+          "0": {
+            "recent-mean-3": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          },
+          "1": {
+            "recent-mean-3": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          }
+        },
+        "branch": {
+          "no-shock": {
+            "recent-mean-3": {
+              "intended": 48,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 48,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 48,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 48,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 48,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 48,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 48,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 48,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          },
+          "shock": {
+            "recent-mean-3": {
+              "intended": 52,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 52,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 52,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 52,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 52,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 52,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 52,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 52,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          }
+        }
+      },
+      "informativeDescriptiveCriterion": null,
+      "delayedSignalFallbacks": 100,
+      "publishedInterval": null,
+      "causalEffect": null,
+      "operationallyQualified": false
+    },
+    {
+      "scenario": "reversed",
+      "groupId": "group-d",
+      "intendedHistories": 100,
+      "methods": {
+        "recent-mean-3": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "seasonal-naive-12": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "intercept-only": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        },
+        "signal-adjusted": {
+          "intended": 100,
+          "forecasted": 0,
+          "scored": 0,
+          "unavailable": 100,
+          "missingOutcome": 0,
+          "mae": null,
+          "rmse": null,
+          "bias": null
+        }
+      },
+      "comparisons": {
+        "recent-mean-3": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        },
+        "seasonal-naive-12": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        },
+        "intercept-only": {
+          "commonScored": 0,
+          "unpaired": 100,
+          "meanAbsoluteErrorDelta": null,
+          "relativeMaeReduction": null,
+          "wins": 0,
+          "ties": 0,
+          "losses": 0
+        }
+      },
+      "strata": {
+        "signal": {
+          "0": {
+            "recent-mean-3": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 45,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 45,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          },
+          "1": {
+            "recent-mean-3": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 55,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 55,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          }
+        },
+        "branch": {
+          "no-shock": {
+            "recent-mean-3": {
+              "intended": 48,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 48,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 48,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 48,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 48,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 48,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 48,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 48,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          },
+          "shock": {
+            "recent-mean-3": {
+              "intended": 52,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 52,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "seasonal-naive-12": {
+              "intended": 52,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 52,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "intercept-only": {
+              "intended": 52,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 52,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            },
+            "signal-adjusted": {
+              "intended": 52,
+              "forecasted": 0,
+              "scored": 0,
+              "unavailable": 52,
+              "missingOutcome": 0,
+              "mae": null,
+              "rmse": null,
+              "bias": null
+            }
+          }
+        }
+      },
+      "informativeDescriptiveCriterion": null,
+      "delayedSignalFallbacks": 100,
+      "publishedInterval": null,
+      "causalEffect": null,
+      "operationallyQualified": false
+    }
+  ],
+  "controls": {
+    "prefixEqualityHistories": 100,
+    "lateSignalExactFallbacks": 1200
+  },
+  "publishedInterval": null,
+  "rateForecast": null,
+  "individualRisk": null,
+  "causalEffect": null,
+  "reservedQuarterScore": null,
+  "operationallyQualified": false,
+  "realWorldPerformanceValidated": false
+}
