@@ -18,7 +18,7 @@ import {PHONE_LAYOUT_QUERY} from "@/components/use-phone-layout";
 import {useHomeComposerDock} from '@/components/use-home-composer-dock';
 import {HomeSolutionBundles} from '@/components/home-solution-bundles';
 import type {BundleDiscussion} from '@/components/home-bundle-plans';
-import type {BundleEditPreview} from '@/lib/home-bundle-chat-edit';
+import {bundleChatEditIntent,type BundleEditPreview} from '@/lib/home-bundle-chat-edit';
 import {HomeBundleChatReview} from '@/components/home-bundle-chat-review';
 import {HomeActionOptions} from '@/components/home-action-options';
 import {homeCandidateVerification} from '@/lib/home-candidate-verification';
@@ -202,10 +202,12 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
     if(!active||sending.current||currentEvidenceKey.current!==contextKey)return;
-    const localEdit=/^(?:(?:please|can you|could you|could we|would you|i[’']?d like to)\s+)?(?:set|change|update|assume|lower|raise|increase|decrease|reduce|start|move|make|run|use|budget|add|remove)\b/i.test(message);
-    if(!actionPlan&&!preserveDraft&&selectedPlanForChat.current?.goalId===conversation.activeGoalId&&localEdit){
+    const editIntent=bundleChatEditIntent(message),localEdit=editIntent.edit;
+    if(!actionPlan&&!preserveDraft&&localEdit&&(selectedPlanForChat.current?.goalId===conversation.activeGoalId||editIntent.planReference)){
       if(chatLoading||!conversation.saved||!ready)return;
-      const target=selectedPlanForChat.current;setPlanEdit(target);
+      const target=selectedPlanForChat.current;
+      if(!target||target.goalId!==conversation.activeGoalId){setLocalAction({goalId:conversation.activeGoalId,notice:'Select the intended Action Plan tab, then send this change again for review. Your request is kept; nothing has changed.'});return;}
+      setLocalAction(null);setPlanEdit(target);
       try{if(!target.isCurrent())throw Error('The selected plan or context changed. Select the intended Plan tab and send the change again.');setEditPreview(target.preview(message));setEditNotice('Review these changes before accepting. Nothing is saved or calculated.');}
       catch(error){setEditPreview(null);setEditNotice((error as Error).message);}
       requestAnimationFrame(()=>{editReview.current?.focus({preventScroll:true});editReview.current?.scrollIntoView({block:'nearest'});});return;
