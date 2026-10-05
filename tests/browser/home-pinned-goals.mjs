@@ -72,7 +72,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  emptyReply=true;await button('Create Action Plan').click();await panel.getByText(/No supported combination is available/).first().waitFor();
  check(mode+' a valid empty preparation still exposes explicit Create Action Plan',posts.length===3&&await button('Create Action Plan').isEnabled());
  emptyReply=false;await button('Create Action Plan').evaluate(node=>{node.click();node.click();});await panel.getByRole('article').waitFor();check(mode+' duplicate explicit creation starts one request',posts.length===4);
- await select(0);count=21;await page.getByText('More questions',{exact:true}).click();await button('Refresh overview evidence').click();await panel.getByText(/Previous Action Plan proposal/).waitFor();
+ await select(0);count=21;await button('Open data details').click();await button('Refresh overview evidence').click();await panel.getByText(/Previous Action Plan proposal/).waitFor();
  check(mode+' evidence change keeps stale guards and all saved versions',await button('Edit assumptions and plan').isDisabled()&&JSON.stringify((await state()).workspaces.saved.fields.homeSolutionBundlesV1)===savedBytes&&posts.length===4);
  await page.screenshot({path:path.join(output,mode+'-saved-plan.png')});
  check(mode+' responsive layout and runtime/network boundaries',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&unexpected===0);
