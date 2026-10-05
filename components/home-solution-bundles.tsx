@@ -61,7 +61,7 @@ export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,
   if(live.current!==identity)return;
   setPending(false);
   if(outcome.status==='ready'||outcome.status==='cached'){requestAnimationFrame(()=>{heading.current?.focus({preventScroll:true});heading.current?.scrollIntoView({block:'start'});});}
-  else setNotice(outcome.status==='failed'?`Action Plan preparation failed. Stage: ${outcome.diagnostic??'client_response'}. Your goal, previous draft and results are kept. No retry runs automatically.`:'The context changed. Your saved work is kept; prepare again explicitly.');
+  else setNotice(outcome.status==='failed'?`Action Plan preparation failed. ${outcome.diagnostic==='delivery_required'?'A proposed plan contained only diagnostic activities; this goal requires a concrete proposed intervention. ':''}Stage: ${outcome.diagnostic??'client_response'}. Your goal, previous draft and results are kept. No retry runs automatically.`:'The context changed. Your saved work is kept; prepare again explicitly.');
  }
  useEffect(()=>{
   if(pin?.id!==goalId||pin.sequence===consumed.current)return;

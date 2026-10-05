@@ -1,4 +1,4 @@
-import {homeBundleTaskInstructions} from '@/lib/home-bundle-task';
+import {homeBundleTask,homeBundleTaskInstructions} from '@/lib/home-bundle-task';
 import {inspectHomeChatResponse} from "@/lib/home-chat-response";
 import {homeFindingInstructions} from "@/lib/home-finding-followups";
 import {inspectBundleResponse} from '@/lib/home-bundle-response';
@@ -614,7 +614,7 @@ export async function POST(
       const bundles = message === HOME_BUNDLE_REQUEST;
       if (!body.hasFocusedIssue || !goalContext.goal.trim() || body.goalContext?.goal !== goalContext.goal) return NextResponse.json({error:"Confirm an exact goal before preparing actions.",...(bundles?{diagnostic:"invalid_context"}:{})},{status:400});
       try {
-      const format = bundles ? buildHomeBundleFormat(goalContext.goal,body.overviewBriefingContext) : buildHomeActionFormat(goalContext.goal,body.overviewBriefingContext);
+      const format = bundles ? buildHomeBundleFormat(goalContext.goal,body.overviewBriefingContext,homeBundleTask(goalContext)) : buildHomeActionFormat(goalContext.goal,body.overviewBriefingContext);
       const call = () => client.responses.create({
         model: CHAT_MODEL,
         instructions: (bundles ? homeBundleTaskInstructions(goalContext)+"\n" : "") + goalContextInstructions + "\n" + (bundles ? homeBundleInstructions : homeActionInstructions) + "\n" + actionReferenceInstructions(body.overviewBriefingContext),
@@ -623,7 +623,7 @@ export async function POST(
         tool_choice: "none", max_output_tokens: bundles ? homeBundleOutputTokens : 1800,
       }, {maxRetries:0,signal:request.signal});
       if(bundles){
-        const result=await inspectBundleResponse(call,goalContext.goal,body.overviewBriefingContext);
+        const result=await inspectBundleResponse(call,goalContext.goal,body.overviewBriefingContext,homeBundleTask(goalContext));
         return result.proposal ? NextResponse.json(result) : NextResponse.json({error:"Action Plan preparation unavailable. Your existing work is kept; retry explicitly.",diagnostic:result.diagnostic},{status:502});
       }
       const response=await call();

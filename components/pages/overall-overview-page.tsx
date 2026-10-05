@@ -1,6 +1,6 @@
 "use client";
 import {assumptionsGoalFromStatements,assumptionsOnlyBundle,unavailableSourceLabels} from '@/lib/home-assumptions-fallback';
-import {homeGoalForPin} from '@/lib/home-planning-intent';
+import {homeGoalForPin,homePlanningNoteParts} from '@/lib/home-planning-intent';
 import {explicitHomeGoal} from "@/lib/home-explicit-goal";
 import {HomePinnedGoals} from "@/components/home-pinned-goals";
 import type {LocalGoal} from "@/lib/local-goals";
@@ -307,7 +307,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     if(!candidate||candidate.epoch!==promptEpoch.current||!candidateCurrent||chatLoading||!active||!conversation.saved||decisionStore.getSnapshot().data.goals.activeId!==candidate.originGoalId)return;
     try{
       const id=conversation.confirmWorkforceGoal(problem);
-      for(const statement of candidate.userStatements)conversation.recordGoalStatement(statement,'home',workforceScope);
+      for(const statement of candidate.userStatements.flatMap(homePlanningNoteParts))conversation.recordGoalStatement(statement,'home',workforceScope);
       if(!decisionStore.getSnapshot().saved)throw Error('Goal remains unsaved in this tab. Resolve browser storage before continuing.');
       if(problem===candidate.proposal.problem)decisionStore.setField(id,'homeCandidateOptions',{version:2,goalId:id,goal:problem,selectionGoal:candidate.selectionGoal,sourceKey:candidate.sourceKey,proposal:candidate.proposal});
       planRationale.current.set(candidate.rationale,id);
@@ -319,7 +319,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const showFallbackPin=!conversation.focusedIssue&&!candidateCurrent&&!clarification&&sourcesSettled&&unavailableSourceLabels(pack).length>0&&fallbackGoal&&assumptionsOnlyBundle(fallbackGoal);
   function pinAssumptionsGoal(){
     if(currentEvidenceKey.current!==contextKey||renderedPromptEpoch!==promptEpoch.current||decisionStore.getSnapshot().data.goals.activeId!==conversation.activeGoalId||!showFallbackPin||!fallbackGoal||chatLoading||!active||!conversation.saved||!conversation.storageReady||conversation.issueEditor)return;
-    try{conversation.confirmWorkforceGoal(fallbackGoal);for(const statement of fallbackStatements)conversation.recordGoalStatement(statement,'home',workforceScope);if(!decisionStore.getSnapshot().saved)throw Error('The goal could not be saved. Your draft is kept.');setInput('');setCandidate(null);setActionPin(null);}catch(error){setCandidateNotice((error as Error).message);}
+    try{conversation.confirmWorkforceGoal(fallbackGoal);for(const statement of fallbackStatements.flatMap(homePlanningNoteParts))conversation.recordGoalStatement(statement,'home',workforceScope);if(!decisionStore.getSnapshot().saved)throw Error('The goal could not be saved. Your draft is kept.');setInput('');setCandidate(null);setActionPin(null);}catch(error){setCandidateNotice((error as Error).message);}
   }
   const candidateVerification=homeCandidateVerification(loading||settledEvidenceKey!==JSON.stringify({workforceQuery,workforceScope,refresh,persona}),storedCandidate,Boolean(savedCandidate),conversation.activeGoalId,conversation.focusedIssue,savedCandidatePack);
   const explorationChoices=candidateCurrent&&findingTurn?.message===candidate?.rationale&&findingTurn?.context===contextKey&&findingTurn.findings.length>0?<div className="flex flex-wrap items-center" aria-label="Optional finding exploration">{findingTurn.findings.map((item,index)=>{const sourceIds=[...new Set(item.evidence.map(reference=>reference.split(':')[0]))],label=sourceIds.map(id=>pack.sources.find(source=>source.id===id)?.label??id).join(' & ');return <span key={item.id} className="inline-flex items-center">{index>0&&<span aria-hidden="true" className="mx-2 h-3 border-l"/>}<button type="button" aria-label={`Explore finding: ${item.prompt}`} title={item.prompt} disabled={chatLoading||Boolean(input.trim())} onClick={()=>exploreFinding(findingTurn,item)} className="min-h-11 rounded text-xs text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Explore {label}</button></span>})}</div>:undefined;

@@ -15,6 +15,7 @@ export function explicitTurnoverRates(statement:string):TurnoverRates{
  for(const match of statement.matchAll(new RegExp(`\\bannual(?:ized|ised)\\s+(${number})\\s*%`,'gi')))if(!targetClause(match.index))add(baselines,match[1]);
  for(const match of statement.matchAll(new RegExp(`\\b(?:YTD|year.to.date)\\s+(${number})\\s*%`,'gi')))if(!targetClause(match.index))add(baselines,match[1]);
  for(const match of statement.matchAll(new RegExp(`\\btarget\\s*${terms}(?:is\\s+|of\\s+|at\\s+)?[:=]?\\s*\\(?(${number})\\s*%(?!\\s*(?:relative|reduction|decrease|lower|→|->|to\\b))`,'gi')))add(targets,match[1]);
+ for(const match of statement.matchAll(new RegExp(`(?<![\\d.])(${number})\\s*%\\s+${terms}target\\b`,'gi')))add(targets,match[1]);
  const distinct=(values:number[])=>[...new Set(values)],conflict=invalid||distinct(baselines).length>1||distinct(targets).length>1;
  const period=baselines.length?(/\b(?:YTD|year.to.date)\b/i.test(statement)?'ytd':/\bannual(?:ized|ised)\b/i.test(statement)?'annualized':null):null;
  return {baseline:conflict?null:baselines.at(-1)??null,target:conflict?null:targets.at(-1)??null,period,conflict};
