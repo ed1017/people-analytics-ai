@@ -1,0 +1,751 @@
+{
+  "status": "constructed-satisfaction-wave-change-report",
+  "sourceEvidence": {
+    "checks": {
+      "inputStatus": "valid",
+      "forecast": {
+        "status": "blocked",
+        "reasons": [
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history"
+        ]
+      },
+      "causalEffect": {
+        "status": "blocked",
+        "reasons": [
+          "availability-unverified",
+          "completeness-unknown",
+          "missing-comparison-design"
+        ]
+      },
+      "availableHistoryRows": 0,
+      "sourceTruthVerified": false
+    },
+    "domainEvaluation": {
+      "domain": "satisfaction",
+      "status": "unqualified",
+      "contractStatus": "blocked",
+      "evidenceKind": "declared-source-contract-only",
+      "sourceTruthVerified": false,
+      "forecastingPerformanceValidated": false,
+      "causalEffectValidated": false,
+      "missingInputs": [
+        "availability-unverified",
+        "completeness-unknown",
+        "no-available-history",
+        "score-definition-unavailable-or-unsupported"
+      ],
+      "excludedLateRecords": 0,
+      "scoreUnit": "mean-respondent-favorable-answer-share",
+      "coverageUnit": "respondents / eligible employees",
+      "waves": [],
+      "forecast": null,
+      "forecastMissingInputs": [
+        "validated-observed-wave-forecast-protocol",
+        "independent-temporal-evaluation",
+        "nonresponse-and-population-shift-assessment"
+      ],
+      "causalEffect": null,
+      "uncertainty": null,
+      "limitations": [
+        "Contract qualification checks declarations and aggregate arithmetic; it does not verify source truth or answer-level scoring.",
+        "Participation describes response coverage, not representativeness or a percentage of satisfied employees.",
+        "No monthly interpolation, unfavorable-share complement, eNPS substitution or cross-wave pooling is performed.",
+        "Release declarations are checked; complementary suppression and query-set privacy are not independently audited."
+      ]
+    },
+    "minimumMissingInputs": [
+      "Comparable observed waves with versioned population, eligibility, instrument/items and scoring rules; no interpolated monthly targets.",
+      "Mean respondent favorable-answer share with valid respondent denominator, eligible population for participation, and missing/nonresponse counts.",
+      "Wave closure, actual observation/revision times, scoped completion, and reviewed cell/complementary/query-set suppression status."
+    ]
+  },
+  "sourceQualification": "No qualified local comparable-wave extract or supported scoring definition is available in the existing checkpoint.",
+  "fixturePurpose": "Three irregular illustrative waves; no reconstructed company outcomes or invented monthly history.",
+  "files": {
+    "lib/ml/satisfaction-wave-change.mjs": "07652261e22cc20e5939c1aaa93c08adbf721db66dfe073f46b5c91cace55032",
+    "lib/ml/satisfaction-domain-adapter.mjs": "e5854d6fa9c46ae6504a9e240bdbabad8077efeffcc08066b2483701189f31e4",
+    "lib/ml/predictive-readiness.ts": "ae0ef0f265afa1bb0ce447912aff1d4a9339570708022d7ff62eed7454754de7",
+    "tests/fixtures/satisfaction-wave-change.mjs": "2771d074d19cae23cd3ec53957314fcc42a7b558dc870ac232131e8b314a614f",
+    "tests/fixtures/predictive-readiness.mjs": "7196da3d462913742a7f8d20c352deadd3272f9f4827e05eaf721b97995eef5e",
+    "tests/manual/report-satisfaction-wave-change.mjs": "8389c984b1c43362c8f08e2b236f4193e7b500fc93c82b9e31739199d33b68a5"
+  },
+  "example": {
+    "schemaVersion": 1,
+    "methodVersion": "satisfaction-wave-change-v1",
+    "domain": "satisfaction",
+    "evidenceKind": "synthetic-mechanics-only",
+    "sourceTruthVerified": false,
+    "operationallyQualified": false,
+    "forecast": null,
+    "causalEffect": null,
+    "confidenceInterval": null,
+    "withinPersonChange": null,
+    "compositionEffect": null,
+    "source": {
+      "domain": "satisfaction",
+      "status": "unqualified",
+      "contractStatus": "passed",
+      "evidenceKind": "synthetic-mechanics-only",
+      "sourceTruthVerified": false,
+      "forecastingPerformanceValidated": false,
+      "causalEffectValidated": false,
+      "missingInputs": [],
+      "excludedLateRecords": 0,
+      "scoreUnit": "mean-respondent-favorable-answer-share",
+      "coverageUnit": "respondents / eligible employees",
+      "waves": [
+        {
+          "waveId": "constructed-wave-1",
+          "revision": 1,
+          "effectiveAt": "2024-10-31T00:00:00.000Z",
+          "scorePct": 75,
+          "respondents": 80,
+          "eligible": 100,
+          "participationPct": 80
+        },
+        {
+          "waveId": "constructed-wave-2",
+          "revision": 1,
+          "effectiveAt": "2025-10-31T00:00:00.000Z",
+          "scorePct": 80,
+          "respondents": 60,
+          "eligible": 100,
+          "participationPct": 60
+        },
+        {
+          "waveId": "constructed-wave-3",
+          "revision": 1,
+          "effectiveAt": "2026-06-30T00:00:00.000Z",
+          "scorePct": 78,
+          "respondents": 90,
+          "eligible": 120,
+          "participationPct": 75
+        }
+      ],
+      "forecast": null,
+      "forecastMissingInputs": [
+        "validated-observed-wave-forecast-protocol",
+        "independent-temporal-evaluation",
+        "nonresponse-and-population-shift-assessment"
+      ],
+      "causalEffect": null,
+      "uncertainty": null,
+      "limitations": [
+        "Contract qualification checks declarations and aggregate arithmetic; it does not verify source truth or answer-level scoring.",
+        "Participation describes response coverage, not representativeness or a percentage of satisfied employees.",
+        "No monthly interpolation, unfavorable-share complement, eNPS substitution or cross-wave pooling is performed.",
+        "Release declarations are checked; complementary suppression and query-set privacy are not independently audited."
+      ]
+    },
+    "assumptions": {
+      "nonrespondentMeanRange": [
+        0,
+        1
+      ],
+      "constantNonrespondentMeans": [
+        0,
+        0.5,
+        1
+      ],
+      "populationInterpretation": "repeated-cross-section-not-matched"
+    },
+    "limitations": [
+      "Contract qualification checks declarations and aggregate arithmetic; it does not verify source truth or answer-level scoring.",
+      "Participation describes response coverage, not representativeness or a percentage of satisfied employees.",
+      "No monthly interpolation, unfavorable-share complement, eNPS substitution or cross-wave pooling is performed.",
+      "Release declarations are checked; complementary suppression and query-set privacy are not independently audited.",
+      "Observed cross-sectional score and coverage changes do not identify within-person, workforce-composition or causal effects.",
+      "Nonresponse bounds assume each eligible person has a comparable latent favorable-answer share in [0,1].",
+      "Range bounds allow a different nonrespondent mean in each wave; fixed-mean scenarios explicitly assume the same mean across waves.",
+      "These are arithmetic identification/sensitivity bounds, not sampling confidence intervals or forecasts.",
+      "Missing-item scoring remains conditional on answered items; this calculation does not resolve item-level missingness.",
+      "No monthly interpolation, annualization, trend fit, independent-wave sample claim or person-level estimate."
+    ],
+    "status": "descriptive-observed-wave-change",
+    "reasonCodes": [],
+    "waves": [
+      {
+        "waveId": "constructed-wave-1",
+        "revision": 1,
+        "effectiveAt": "2024-10-31T00:00:00.000Z",
+        "scorePct": 75,
+        "respondents": 80,
+        "eligible": 100,
+        "participationPct": 80,
+        "nonrespondents": 20,
+        "respondentContributionPct": 60.00000000000001,
+        "nonresponseBounds": {
+          "kind": "assumption-dependent-identification-bounds",
+          "lowerPct": 60.00000000000001,
+          "upperPct": 80
+        },
+        "fixedMeanScenarios": [
+          {
+            "nonrespondentMean": 0,
+            "eligibleMeanPct": 60.00000000000001
+          },
+          {
+            "nonrespondentMean": 0.5,
+            "eligibleMeanPct": 70
+          },
+          {
+            "nonrespondentMean": 1,
+            "eligibleMeanPct": 80
+          }
+        ]
+      },
+      {
+        "waveId": "constructed-wave-2",
+        "revision": 1,
+        "effectiveAt": "2025-10-31T00:00:00.000Z",
+        "scorePct": 80,
+        "respondents": 60,
+        "eligible": 100,
+        "participationPct": 60,
+        "nonrespondents": 40,
+        "respondentContributionPct": 48,
+        "nonresponseBounds": {
+          "kind": "assumption-dependent-identification-bounds",
+          "lowerPct": 48,
+          "upperPct": 88
+        },
+        "fixedMeanScenarios": [
+          {
+            "nonrespondentMean": 0,
+            "eligibleMeanPct": 48
+          },
+          {
+            "nonrespondentMean": 0.5,
+            "eligibleMeanPct": 68
+          },
+          {
+            "nonrespondentMean": 1,
+            "eligibleMeanPct": 88
+          }
+        ]
+      },
+      {
+        "waveId": "constructed-wave-3",
+        "revision": 1,
+        "effectiveAt": "2026-06-30T00:00:00.000Z",
+        "scorePct": 78,
+        "respondents": 90,
+        "eligible": 120,
+        "participationPct": 75,
+        "nonrespondents": 30,
+        "respondentContributionPct": 58.5,
+        "nonresponseBounds": {
+          "kind": "assumption-dependent-identification-bounds",
+          "lowerPct": 58.5,
+          "upperPct": 83.5
+        },
+        "fixedMeanScenarios": [
+          {
+            "nonrespondentMean": 0,
+            "eligibleMeanPct": 58.5
+          },
+          {
+            "nonrespondentMean": 0.5,
+            "eligibleMeanPct": 71
+          },
+          {
+            "nonrespondentMean": 1,
+            "eligibleMeanPct": 83.5
+          }
+        ]
+      }
+    ],
+    "changes": [
+      {
+        "from": "constructed-wave-1",
+        "to": "constructed-wave-2",
+        "fromDate": "2024-10-31T00:00:00.000Z",
+        "toDate": "2025-10-31T00:00:00.000Z",
+        "elapsedDays": 365,
+        "respondentScoreChangePp": 5,
+        "responseRateChangePp": -20.000000000000007,
+        "respondentCountChange": -20,
+        "eligibleCountChange": 0,
+        "respondentContributionChangePp": -12.000000000000007,
+        "decomposition": {
+          "method": "symmetric-product-identity",
+          "scoreTermPp": 3.500000000000003,
+          "responseRateTermPp": -15.500000000000005,
+          "reconciledChangePp": -12.000000000000002,
+          "interpretation": "Arithmetic terms in change of response-rate times respondent score; not effects."
+        },
+        "nonresponseChangeBounds": {
+          "kind": "assumption-dependent-identification-bounds",
+          "lowerPp": -32,
+          "upperPp": 27.999999999999993
+        },
+        "fixedMeanScenarios": [
+          {
+            "nonrespondentMean": 0,
+            "eligibleMeanChangePp": -12.00000000000001,
+            "scoreTermPp": 3.500000000000003,
+            "responseRateTermPp": -15.500000000000005
+          },
+          {
+            "nonrespondentMean": 0.5,
+            "eligibleMeanChangePp": -2.000000000000013,
+            "scoreTermPp": 3.500000000000003,
+            "responseRateTermPp": -5.500000000000003
+          },
+          {
+            "nonrespondentMean": 1,
+            "eligibleMeanChangePp": 7.9999999999999964,
+            "scoreTermPp": 3.500000000000003,
+            "responseRateTermPp": 4.500000000000001
+          }
+        ]
+      },
+      {
+        "from": "constructed-wave-2",
+        "to": "constructed-wave-3",
+        "fromDate": "2025-10-31T00:00:00.000Z",
+        "toDate": "2026-06-30T00:00:00.000Z",
+        "elapsedDays": 242,
+        "respondentScoreChangePp": -2,
+        "responseRateChangePp": 15.000000000000002,
+        "respondentCountChange": 30,
+        "eligibleCountChange": 20,
+        "respondentContributionChangePp": 10.5,
+        "decomposition": {
+          "method": "symmetric-product-identity",
+          "scoreTermPp": -1.3500000000000012,
+          "responseRateTermPp": 11.850000000000001,
+          "reconciledChangePp": 10.5,
+          "interpretation": "Arithmetic terms in change of response-rate times respondent score; not effects."
+        },
+        "nonresponseChangeBounds": {
+          "kind": "assumption-dependent-identification-bounds",
+          "lowerPp": -29.5,
+          "upperPp": 35.5
+        },
+        "fixedMeanScenarios": [
+          {
+            "nonrespondentMean": 0,
+            "eligibleMeanChangePp": 10.499999999999998,
+            "scoreTermPp": -1.3500000000000012,
+            "responseRateTermPp": 11.850000000000001
+          },
+          {
+            "nonrespondentMean": 0.5,
+            "eligibleMeanChangePp": 2.9999999999999973,
+            "scoreTermPp": -1.3500000000000012,
+            "responseRateTermPp": 4.350000000000001
+          },
+          {
+            "nonrespondentMean": 1,
+            "eligibleMeanChangePp": -4.5000000000000036,
+            "scoreTermPp": -1.3500000000000012,
+            "responseRateTermPp": -3.15
+          }
+        ]
+      }
+    ]
+  },
+  "restrictedAssumptionExample": {
+    "schemaVersion": 1,
+    "methodVersion": "satisfaction-wave-change-v1",
+    "domain": "satisfaction",
+    "evidenceKind": "synthetic-mechanics-only",
+    "sourceTruthVerified": false,
+    "operationallyQualified": false,
+    "forecast": null,
+    "causalEffect": null,
+    "confidenceInterval": null,
+    "withinPersonChange": null,
+    "compositionEffect": null,
+    "source": {
+      "domain": "satisfaction",
+      "status": "unqualified",
+      "contractStatus": "passed",
+      "evidenceKind": "synthetic-mechanics-only",
+      "sourceTruthVerified": false,
+      "forecastingPerformanceValidated": false,
+      "causalEffectValidated": false,
+      "missingInputs": [],
+      "excludedLateRecords": 0,
+      "scoreUnit": "mean-respondent-favorable-answer-share",
+      "coverageUnit": "respondents / eligible employees",
+      "waves": [
+        {
+          "waveId": "constructed-wave-1",
+          "revision": 1,
+          "effectiveAt": "2024-10-31T00:00:00.000Z",
+          "scorePct": 75,
+          "respondents": 80,
+          "eligible": 100,
+          "participationPct": 80
+        },
+        {
+          "waveId": "constructed-wave-2",
+          "revision": 1,
+          "effectiveAt": "2025-10-31T00:00:00.000Z",
+          "scorePct": 80,
+          "respondents": 60,
+          "eligible": 100,
+          "participationPct": 60
+        },
+        {
+          "waveId": "constructed-wave-3",
+          "revision": 1,
+          "effectiveAt": "2026-06-30T00:00:00.000Z",
+          "scorePct": 78,
+          "respondents": 90,
+          "eligible": 120,
+          "participationPct": 75
+        }
+      ],
+      "forecast": null,
+      "forecastMissingInputs": [
+        "validated-observed-wave-forecast-protocol",
+        "independent-temporal-evaluation",
+        "nonresponse-and-population-shift-assessment"
+      ],
+      "causalEffect": null,
+      "uncertainty": null,
+      "limitations": [
+        "Contract qualification checks declarations and aggregate arithmetic; it does not verify source truth or answer-level scoring.",
+        "Participation describes response coverage, not representativeness or a percentage of satisfied employees.",
+        "No monthly interpolation, unfavorable-share complement, eNPS substitution or cross-wave pooling is performed.",
+        "Release declarations are checked; complementary suppression and query-set privacy are not independently audited."
+      ]
+    },
+    "assumptions": {
+      "nonrespondentMeanRange": [
+        0,
+        0.5
+      ],
+      "constantNonrespondentMeans": [
+        0,
+        0.5
+      ],
+      "populationInterpretation": "repeated-cross-section-not-matched"
+    },
+    "limitations": [
+      "Contract qualification checks declarations and aggregate arithmetic; it does not verify source truth or answer-level scoring.",
+      "Participation describes response coverage, not representativeness or a percentage of satisfied employees.",
+      "No monthly interpolation, unfavorable-share complement, eNPS substitution or cross-wave pooling is performed.",
+      "Release declarations are checked; complementary suppression and query-set privacy are not independently audited.",
+      "Observed cross-sectional score and coverage changes do not identify within-person, workforce-composition or causal effects.",
+      "Nonresponse bounds assume each eligible person has a comparable latent favorable-answer share in [0,1].",
+      "Range bounds allow a different nonrespondent mean in each wave; fixed-mean scenarios explicitly assume the same mean across waves.",
+      "These are arithmetic identification/sensitivity bounds, not sampling confidence intervals or forecasts.",
+      "Missing-item scoring remains conditional on answered items; this calculation does not resolve item-level missingness.",
+      "No monthly interpolation, annualization, trend fit, independent-wave sample claim or person-level estimate."
+    ],
+    "status": "descriptive-observed-wave-change",
+    "reasonCodes": [],
+    "waves": [
+      {
+        "waveId": "constructed-wave-1",
+        "revision": 1,
+        "effectiveAt": "2024-10-31T00:00:00.000Z",
+        "scorePct": 75,
+        "respondents": 80,
+        "eligible": 100,
+        "participationPct": 80,
+        "nonrespondents": 20,
+        "respondentContributionPct": 60.00000000000001,
+        "nonresponseBounds": {
+          "kind": "assumption-dependent-identification-bounds",
+          "lowerPct": 60.00000000000001,
+          "upperPct": 70
+        },
+        "fixedMeanScenarios": [
+          {
+            "nonrespondentMean": 0,
+            "eligibleMeanPct": 60.00000000000001
+          },
+          {
+            "nonrespondentMean": 0.5,
+            "eligibleMeanPct": 70
+          }
+        ]
+      },
+      {
+        "waveId": "constructed-wave-2",
+        "revision": 1,
+        "effectiveAt": "2025-10-31T00:00:00.000Z",
+        "scorePct": 80,
+        "respondents": 60,
+        "eligible": 100,
+        "participationPct": 60,
+        "nonrespondents": 40,
+        "respondentContributionPct": 48,
+        "nonresponseBounds": {
+          "kind": "assumption-dependent-identification-bounds",
+          "lowerPct": 48,
+          "upperPct": 68
+        },
+        "fixedMeanScenarios": [
+          {
+            "nonrespondentMean": 0,
+            "eligibleMeanPct": 48
+          },
+          {
+            "nonrespondentMean": 0.5,
+            "eligibleMeanPct": 68
+          }
+        ]
+      },
+      {
+        "waveId": "constructed-wave-3",
+        "revision": 1,
+        "effectiveAt": "2026-06-30T00:00:00.000Z",
+        "scorePct": 78,
+        "respondents": 90,
+        "eligible": 120,
+        "participationPct": 75,
+        "nonrespondents": 30,
+        "respondentContributionPct": 58.5,
+        "nonresponseBounds": {
+          "kind": "assumption-dependent-identification-bounds",
+          "lowerPct": 58.5,
+          "upperPct": 71
+        },
+        "fixedMeanScenarios": [
+          {
+            "nonrespondentMean": 0,
+            "eligibleMeanPct": 58.5
+          },
+          {
+            "nonrespondentMean": 0.5,
+            "eligibleMeanPct": 71
+          }
+        ]
+      }
+    ],
+    "changes": [
+      {
+        "from": "constructed-wave-1",
+        "to": "constructed-wave-2",
+        "fromDate": "2024-10-31T00:00:00.000Z",
+        "toDate": "2025-10-31T00:00:00.000Z",
+        "elapsedDays": 365,
+        "respondentScoreChangePp": 5,
+        "responseRateChangePp": -20.000000000000007,
+        "respondentCountChange": -20,
+        "eligibleCountChange": 0,
+        "respondentContributionChangePp": -12.000000000000007,
+        "decomposition": {
+          "method": "symmetric-product-identity",
+          "scoreTermPp": 3.500000000000003,
+          "responseRateTermPp": -15.500000000000005,
+          "reconciledChangePp": -12.000000000000002,
+          "interpretation": "Arithmetic terms in change of response-rate times respondent score; not effects."
+        },
+        "nonresponseChangeBounds": {
+          "kind": "assumption-dependent-identification-bounds",
+          "lowerPp": -22,
+          "upperPp": 7.999999999999993
+        },
+        "fixedMeanScenarios": [
+          {
+            "nonrespondentMean": 0,
+            "eligibleMeanChangePp": -12.00000000000001,
+            "scoreTermPp": 3.500000000000003,
+            "responseRateTermPp": -15.500000000000005
+          },
+          {
+            "nonrespondentMean": 0.5,
+            "eligibleMeanChangePp": -2.000000000000013,
+            "scoreTermPp": 3.500000000000003,
+            "responseRateTermPp": -5.500000000000003
+          }
+        ]
+      },
+      {
+        "from": "constructed-wave-2",
+        "to": "constructed-wave-3",
+        "fromDate": "2025-10-31T00:00:00.000Z",
+        "toDate": "2026-06-30T00:00:00.000Z",
+        "elapsedDays": 242,
+        "respondentScoreChangePp": -2,
+        "responseRateChangePp": 15.000000000000002,
+        "respondentCountChange": 30,
+        "eligibleCountChange": 20,
+        "respondentContributionChangePp": 10.5,
+        "decomposition": {
+          "method": "symmetric-product-identity",
+          "scoreTermPp": -1.3500000000000012,
+          "responseRateTermPp": 11.850000000000001,
+          "reconciledChangePp": 10.5,
+          "interpretation": "Arithmetic terms in change of response-rate times respondent score; not effects."
+        },
+        "nonresponseChangeBounds": {
+          "kind": "assumption-dependent-identification-bounds",
+          "lowerPp": -9.5,
+          "upperPp": 23
+        },
+        "fixedMeanScenarios": [
+          {
+            "nonrespondentMean": 0,
+            "eligibleMeanChangePp": 10.499999999999998,
+            "scoreTermPp": -1.3500000000000012,
+            "responseRateTermPp": 11.850000000000001
+          },
+          {
+            "nonrespondentMean": 0.5,
+            "eligibleMeanChangePp": 2.9999999999999973,
+            "scoreTermPp": -1.3500000000000012,
+            "responseRateTermPp": 4.350000000000001
+          }
+        ]
+      }
+    ]
+  },
+  "blockedExamples": {
+    "incompatibleInstrument": {
+      "schemaVersion": 1,
+      "methodVersion": "satisfaction-wave-change-v1",
+      "domain": "satisfaction",
+      "evidenceKind": "synthetic-mechanics-only",
+      "sourceTruthVerified": false,
+      "operationallyQualified": false,
+      "forecast": null,
+      "causalEffect": null,
+      "confidenceInterval": null,
+      "withinPersonChange": null,
+      "compositionEffect": null,
+      "source": {
+        "domain": "satisfaction",
+        "status": "unqualified",
+        "contractStatus": "blocked",
+        "evidenceKind": "synthetic-mechanics-only",
+        "sourceTruthVerified": false,
+        "forecastingPerformanceValidated": false,
+        "causalEffectValidated": false,
+        "missingInputs": [
+          "incomparable-survey-waves"
+        ],
+        "excludedLateRecords": 0,
+        "scoreUnit": "mean-respondent-favorable-answer-share",
+        "coverageUnit": "respondents / eligible employees",
+        "waves": [],
+        "forecast": null,
+        "forecastMissingInputs": [
+          "validated-observed-wave-forecast-protocol",
+          "independent-temporal-evaluation",
+          "nonresponse-and-population-shift-assessment"
+        ],
+        "causalEffect": null,
+        "uncertainty": null,
+        "limitations": [
+          "Contract qualification checks declarations and aggregate arithmetic; it does not verify source truth or answer-level scoring.",
+          "Participation describes response coverage, not representativeness or a percentage of satisfied employees.",
+          "No monthly interpolation, unfavorable-share complement, eNPS substitution or cross-wave pooling is performed.",
+          "Release declarations are checked; complementary suppression and query-set privacy are not independently audited."
+        ]
+      },
+      "assumptions": {
+        "nonrespondentMeanRange": [
+          0,
+          1
+        ],
+        "constantNonrespondentMeans": [
+          0,
+          0.5,
+          1
+        ],
+        "populationInterpretation": "repeated-cross-section-not-matched"
+      },
+      "limitations": [
+        "Contract qualification checks declarations and aggregate arithmetic; it does not verify source truth or answer-level scoring.",
+        "Participation describes response coverage, not representativeness or a percentage of satisfied employees.",
+        "No monthly interpolation, unfavorable-share complement, eNPS substitution or cross-wave pooling is performed.",
+        "Release declarations are checked; complementary suppression and query-set privacy are not independently audited.",
+        "Observed cross-sectional score and coverage changes do not identify within-person, workforce-composition or causal effects.",
+        "Nonresponse bounds assume each eligible person has a comparable latent favorable-answer share in [0,1].",
+        "Range bounds allow a different nonrespondent mean in each wave; fixed-mean scenarios explicitly assume the same mean across waves.",
+        "These are arithmetic identification/sensitivity bounds, not sampling confidence intervals or forecasts.",
+        "Missing-item scoring remains conditional on answered items; this calculation does not resolve item-level missingness.",
+        "No monthly interpolation, annualization, trend fit, independent-wave sample claim or person-level estimate."
+      ],
+      "status": "unavailable",
+      "reasonCodes": [
+        "incomparable-survey-waves"
+      ],
+      "waves": [],
+      "changes": []
+    },
+    "suppressedWave": {
+      "schemaVersion": 1,
+      "methodVersion": "satisfaction-wave-change-v1",
+      "domain": "satisfaction",
+      "evidenceKind": "synthetic-mechanics-only",
+      "sourceTruthVerified": false,
+      "operationallyQualified": false,
+      "forecast": null,
+      "causalEffect": null,
+      "confidenceInterval": null,
+      "withinPersonChange": null,
+      "compositionEffect": null,
+      "source": {
+        "domain": "satisfaction",
+        "status": "unqualified",
+        "contractStatus": "blocked",
+        "evidenceKind": "synthetic-mechanics-only",
+        "sourceTruthVerified": false,
+        "forecastingPerformanceValidated": false,
+        "causalEffectValidated": false,
+        "missingInputs": [
+          "release-withheld"
+        ],
+        "excludedLateRecords": 0,
+        "scoreUnit": "mean-respondent-favorable-answer-share",
+        "coverageUnit": "respondents / eligible employees",
+        "waves": [],
+        "forecast": null,
+        "forecastMissingInputs": [
+          "validated-observed-wave-forecast-protocol",
+          "independent-temporal-evaluation",
+          "nonresponse-and-population-shift-assessment"
+        ],
+        "causalEffect": null,
+        "uncertainty": null,
+        "limitations": [
+          "Contract qualification checks declarations and aggregate arithmetic; it does not verify source truth or answer-level scoring.",
+          "Participation describes response coverage, not representativeness or a percentage of satisfied employees.",
+          "No monthly interpolation, unfavorable-share complement, eNPS substitution or cross-wave pooling is performed.",
+          "Release declarations are checked; complementary suppression and query-set privacy are not independently audited."
+        ]
+      },
+      "assumptions": {
+        "nonrespondentMeanRange": [
+          0,
+          1
+        ],
+        "constantNonrespondentMeans": [
+          0,
+          0.5,
+          1
+        ],
+        "populationInterpretation": "repeated-cross-section-not-matched"
+      },
+      "limitations": [
+        "Contract qualification checks declarations and aggregate arithmetic; it does not verify source truth or answer-level scoring.",
+        "Participation describes response coverage, not representativeness or a percentage of satisfied employees.",
+        "No monthly interpolation, unfavorable-share complement, eNPS substitution or cross-wave pooling is performed.",
+        "Release declarations are checked; complementary suppression and query-set privacy are not independently audited.",
+        "Observed cross-sectional score and coverage changes do not identify within-person, workforce-composition or causal effects.",
+        "Nonresponse bounds assume each eligible person has a comparable latent favorable-answer share in [0,1].",
+        "Range bounds allow a different nonrespondent mean in each wave; fixed-mean scenarios explicitly assume the same mean across waves.",
+        "These are arithmetic identification/sensitivity bounds, not sampling confidence intervals or forecasts.",
+        "Missing-item scoring remains conditional on answered items; this calculation does not resolve item-level missingness.",
+        "No monthly interpolation, annualization, trend fit, independent-wave sample claim or person-level estimate."
+      ],
+      "status": "unavailable",
+      "reasonCodes": [
+        "release-withheld"
+      ],
+      "waves": [],
+      "changes": []
+    }
+  }
+}

@@ -1,0 +1,2204 @@
+{
+  "schemaVersion": 1,
+  "kind": "offline-action-plan-analysis-demo",
+  "inputKey": "[\"{\\\"evidenceDigest\\\":\\\"0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0\\\",\\\"goal\\\":\\\"Review voluntary exits\\\",\\\"goalId\\\":\\\"scenario\\\",\\\"planningDigest\\\":\\\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\\\",\\\"version\\\":1}\",\"{\\\"id\\\":\\\"A\\\",\\\"name\\\":\\\"Develop internally with targeted hiring\\\",\\\"objective\\\":\\\"Prioritize internal capability with targeted hiring\\\",\\\"coordination\\\":\\\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\\\",\\\"components\\\":[{\\\"id\\\":\\\"c1\\\",\\\"name\\\":\\\"Manager and workload review\\\",\\\"domain\\\":\\\"manager_workload\\\",\\\"firstStep\\\":\\\"Review workload and manager support with the business owner before choosing the staffing response.\\\",\\\"ownerRole\\\":\\\"Business owner\\\",\\\"dependsOn\\\":[],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c2\\\",\\\"name\\\":\\\"Learning and readiness\\\",\\\"domain\\\":\\\"learning\\\",\\\"firstStep\\\":\\\"Define a learning pilot and a separate readiness review for the internal transition.\\\",\\\"ownerRole\\\":\\\"Learning lead\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c3\\\",\\\"name\\\":\\\"Internal transition\\\",\\\"domain\\\":\\\"mobility\\\",\\\"firstStep\\\":\\\"Review the proposed internal transition and source-team coverage with HR after readiness is assessed.\\\",\\\"ownerRole\\\":\\\"HR partner\\\",\\\"dependsOn\\\":[\\\"c2\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c4\\\",\\\"name\\\":\\\"Compensation review\\\",\\\"domain\\\":\\\"compensation\\\",\\\"firstStep\\\":\\\"Review any relevant compensation change and record its cost once in the shared budget.\\\",\\\"ownerRole\\\":\\\"Compensation partner\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c5\\\",\\\"name\\\":\\\"Targeted hiring\\\",\\\"domain\\\":\\\"hiring\\\",\\\"firstStep\\\":\\\"Review targeted hiring alongside the internal response and its explicit arrival assumptions.\\\",\\\"ownerRole\\\":\\\"Recruiting lead\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c6\\\",\\\"name\\\":\\\"Finance and execution checkpoints\\\",\\\"domain\\\":\\\"execution\\\",\\\"firstStep\\\":\\\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\\\",\\\"ownerRole\\\":\\\"Finance partner\\\",\\\"dependsOn\\\":[\\\"c3\\\",\\\"c4\\\",\\\"c5\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"}],\\\"limitation\\\":\\\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\\\"}\",1,{\"scope\":{\"population\":{\"value\":\"all-recorded-voluntary-separations\",\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"},\"businessUnit\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"jobProfile\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"startMonth\":{\"value\":\"2026-10\",\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"},\"months\":{\"value\":3,\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"},\"demand\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"capacityRequired\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"requirements\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"comparisonConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"currency\":\"USD\"},\"capacity\":null,\"timing\":[{\"componentId\":\"c1\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c3\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c4\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c5\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c6\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"dependenciesConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"groups\":[],\"memberships\":[],\"groupsDisjoint\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"expenses\":[],\"expenseLinks\":[],\"costReviews\":[{\"componentId\":\"c1\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c3\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c4\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c5\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c6\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"costsDistinct\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"successMeasure\":{\"goal\":\"Review voluntary exits\",\"scopeKey\":\"[\\\"all-recorded-voluntary-separations\\\",\\\"2026-10\\\",3]\",\"name\":\"Voluntary exits (count)\",\"baseline\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"target\":{\"value\":\"150\",\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"}}}]",
+  "implementationIdentity": "42005c604fe4ebf0d459d6324303d187443a2db8760f45eeee79cc7d08bfbedb",
+  "planAssumptions": {
+    "whatIf": null,
+    "successMeasure": {
+      "goal": "Review voluntary exits",
+      "scopeKey": "[\"all-recorded-voluntary-separations\",\"2026-10\",3]",
+      "name": "Voluntary exits (count)",
+      "baseline": {
+        "value": null,
+        "kind": "unknown",
+        "basis": null
+      },
+      "target": {
+        "value": "150",
+        "kind": "illustrative",
+        "basis": "Constructed offline demonstration input; not verified plan evidence."
+      }
+    }
+  },
+  "operationallyQualified": false,
+  "forecastBaseline": null,
+  "causalEffect": null,
+  "interval": null,
+  "status": "current",
+  "domains": {
+    "turnover": {
+      "operationallyQualified": false,
+      "forecastBaseline": null,
+      "causalEffect": null,
+      "interval": null,
+      "kind": "conditional-count-reference",
+      "planContext": {
+        "inputKey": "[\"{\\\"evidenceDigest\\\":\\\"0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0\\\",\\\"goal\\\":\\\"Review voluntary exits\\\",\\\"goalId\\\":\\\"scenario\\\",\\\"planningDigest\\\":\\\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\\\",\\\"version\\\":1}\",\"{\\\"id\\\":\\\"A\\\",\\\"name\\\":\\\"Develop internally with targeted hiring\\\",\\\"objective\\\":\\\"Prioritize internal capability with targeted hiring\\\",\\\"coordination\\\":\\\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\\\",\\\"components\\\":[{\\\"id\\\":\\\"c1\\\",\\\"name\\\":\\\"Manager and workload review\\\",\\\"domain\\\":\\\"manager_workload\\\",\\\"firstStep\\\":\\\"Review workload and manager support with the business owner before choosing the staffing response.\\\",\\\"ownerRole\\\":\\\"Business owner\\\",\\\"dependsOn\\\":[],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c2\\\",\\\"name\\\":\\\"Learning and readiness\\\",\\\"domain\\\":\\\"learning\\\",\\\"firstStep\\\":\\\"Define a learning pilot and a separate readiness review for the internal transition.\\\",\\\"ownerRole\\\":\\\"Learning lead\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c3\\\",\\\"name\\\":\\\"Internal transition\\\",\\\"domain\\\":\\\"mobility\\\",\\\"firstStep\\\":\\\"Review the proposed internal transition and source-team coverage with HR after readiness is assessed.\\\",\\\"ownerRole\\\":\\\"HR partner\\\",\\\"dependsOn\\\":[\\\"c2\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c4\\\",\\\"name\\\":\\\"Compensation review\\\",\\\"domain\\\":\\\"compensation\\\",\\\"firstStep\\\":\\\"Review any relevant compensation change and record its cost once in the shared budget.\\\",\\\"ownerRole\\\":\\\"Compensation partner\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c5\\\",\\\"name\\\":\\\"Targeted hiring\\\",\\\"domain\\\":\\\"hiring\\\",\\\"firstStep\\\":\\\"Review targeted hiring alongside the internal response and its explicit arrival assumptions.\\\",\\\"ownerRole\\\":\\\"Recruiting lead\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c6\\\",\\\"name\\\":\\\"Finance and execution checkpoints\\\",\\\"domain\\\":\\\"execution\\\",\\\"firstStep\\\":\\\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\\\",\\\"ownerRole\\\":\\\"Finance partner\\\",\\\"dependsOn\\\":[\\\"c3\\\",\\\"c4\\\",\\\"c5\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"}],\\\"limitation\\\":\\\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\\\"}\",1,{\"scope\":{\"population\":{\"value\":\"all-recorded-voluntary-separations\",\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"},\"businessUnit\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"jobProfile\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"startMonth\":{\"value\":\"2026-10\",\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"},\"months\":{\"value\":3,\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"},\"demand\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"capacityRequired\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"requirements\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"comparisonConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"currency\":\"USD\"},\"capacity\":null,\"timing\":[{\"componentId\":\"c1\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c3\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c4\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c5\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c6\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"dependenciesConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"groups\":[],\"memberships\":[],\"groupsDisjoint\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"expenses\":[],\"expenseLinks\":[],\"costReviews\":[{\"componentId\":\"c1\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c3\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c4\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c5\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c6\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"costsDistinct\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"successMeasure\":{\"goal\":\"Review voluntary exits\",\"scopeKey\":\"[\\\"all-recorded-voluntary-separations\\\",\\\"2026-10\\\",3]\",\"name\":\"Voluntary exits (count)\",\"baseline\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"target\":{\"value\":\"150\",\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"}}}]",
+        "evidenceIdentity": "4427f73fc730c5e3217bdddb645a943f7708e4ed5b9030255ff9892211ef45a3",
+        "status": "conditional-reference-only",
+        "source": {
+          "status": "unqualified",
+          "contractStatus": "blocked",
+          "reasonCodes": [
+            "availability-unknown",
+            "availability-unverified",
+            "completeness-unknown",
+            "no-available-history"
+          ],
+          "missingInputs": [
+            "Versioned population and monthly count definitions; reconcile every month, including event-empty months, against scoped source completion evidence.",
+            "Actual first-observed timestamps, revision predecessors and recorded corrections for every monthly label; event and bulk insertion dates are not substitutes.",
+            "Completion declarations with population, covered period, actual observation time and evidence reference at every forecast origin and scoring cutoff.",
+            "Generator/version lineage if asserting synthetic completeness. Person-time at risk plus explicit future exposure assumptions before rates."
+          ]
+        },
+        "reasonCodes": [
+          "availability-unknown",
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history"
+        ]
+      },
+      "scopeRelationship": "exact-count-scope-review-only",
+      "status": "available",
+      "payload": {
+        "status": "conditional-retrospective-synthetic-demo",
+        "metric": "voluntary-exit-count",
+        "provenance": {
+          "sources": [
+            "public.attrition_monthly_trend"
+          ],
+          "sourceDefinitionVersion": "inspected-2026-10-05",
+          "extractedOn": "2026-10-05",
+          "population": "all-recorded-voluntary-separations",
+          "dataClass": "user-declared-synthetic",
+          "completeness": "unverified",
+          "temporalAvailability": "retrospective-final-data",
+          "generatorVersion": null,
+          "datasetFingerprint": "7887ad425425356be28dc143c2776069309ced0cf05a602a842ee8216b75c280",
+          "exposureDefinition": null
+        },
+        "method": "recent-mean-3",
+        "methodVersion": "aggregate-exit-demo-v1",
+        "identities": {
+          "fixtureSha256": "64acf5cbb0cddbaa0614e20ee3895cd026ebe3ec9c91fed622820b53b44d63cd",
+          "evaluatorSha256": "095003fd6731eab87030f91c38fb698e71b3e0c92a0bc7bcd3450d0d2c9fea4e",
+          "datasetFingerprint": "7887ad425425356be28dc143c2776069309ced0cf05a602a842ee8216b75c280",
+          "protocolFingerprint": "268252ee00c4e2413811879b3225e40261c5014ce7378c2d81a764359a01a354"
+        },
+        "evaluation": {
+          "developmentOrigins": [
+            "2026-01",
+            "2026-02",
+            "2026-03"
+          ],
+          "distinctDevelopmentMonths": 5,
+          "assessmentOrigin": "2026-06",
+          "assessmentCustody": "not-untouched"
+        },
+        "baselineComparisons": [
+          {
+            "id": "recent-mean-3",
+            "kind": "baseline",
+            "development": {
+              "origins": 3,
+              "distinctTargetMonths": 5,
+              "overall": {
+                "count": 9,
+                "mae": 3.9259259259259256,
+                "rmse": 4.311912869318279,
+                "bias": -0.6666666666666651
+              },
+              "byHorizon": [
+                {
+                  "horizon": 1,
+                  "count": 3,
+                  "mae": 4.11111111111111,
+                  "rmse": 4.6943622609505775,
+                  "bias": -0.7777777777777762
+                },
+                {
+                  "horizon": 2,
+                  "count": 3,
+                  "mae": 3.7777777777777763,
+                  "rmse": 3.790827135384883,
+                  "bias": -1.1111111111111096
+                },
+                {
+                  "horizon": 3,
+                  "count": 3,
+                  "mae": 3.8888888888888906,
+                  "rmse": 4.401178293408527,
+                  "bias": -0.11111111111110954
+                }
+              ],
+              "threeMonthTotal": {
+                "count": 3,
+                "mae": 2,
+                "rmse": 2.581988897471611,
+                "bias": -2
+              }
+            },
+            "assessment": {
+              "origins": 1,
+              "distinctTargetMonths": 3,
+              "overall": {
+                "count": 3,
+                "mae": 2.3333333333333335,
+                "rmse": 2.3804761428476167,
+                "bias": 1
+              },
+              "byHorizon": [
+                {
+                  "horizon": 1,
+                  "count": 1,
+                  "mae": 2,
+                  "rmse": 2,
+                  "bias": -2
+                },
+                {
+                  "horizon": 2,
+                  "count": 1,
+                  "mae": 3,
+                  "rmse": 3,
+                  "bias": 3
+                },
+                {
+                  "horizon": 3,
+                  "count": 1,
+                  "mae": 2,
+                  "rmse": 2,
+                  "bias": 2
+                }
+              ],
+              "threeMonthTotal": {
+                "count": 1,
+                "mae": 3,
+                "rmse": 3,
+                "bias": 3
+              }
+            }
+          },
+          {
+            "id": "seasonal-naive-12",
+            "kind": "baseline",
+            "development": {
+              "origins": 3,
+              "distinctTargetMonths": 5,
+              "overall": {
+                "count": 9,
+                "mae": 4.222222222222222,
+                "rmse": 4.594682917363407,
+                "bias": 0
+              },
+              "byHorizon": [
+                {
+                  "horizon": 1,
+                  "count": 3,
+                  "mae": 5,
+                  "rmse": 5.066228051190222,
+                  "bias": -1
+                },
+                {
+                  "horizon": 2,
+                  "count": 3,
+                  "mae": 4,
+                  "rmse": 4.546060565661952,
+                  "bias": 0.6666666666666666
+                },
+                {
+                  "horizon": 3,
+                  "count": 3,
+                  "mae": 3.6666666666666665,
+                  "rmse": 4.123105625617661,
+                  "bias": 0.3333333333333333
+                }
+              ],
+              "threeMonthTotal": {
+                "count": 3,
+                "mae": 2,
+                "rmse": 2.160246899469287,
+                "bias": 0
+              }
+            },
+            "assessment": {
+              "origins": 1,
+              "distinctTargetMonths": 3,
+              "overall": {
+                "count": 3,
+                "mae": 5,
+                "rmse": 5.259911279353167,
+                "bias": 5
+              },
+              "byHorizon": [
+                {
+                  "horizon": 1,
+                  "count": 1,
+                  "mae": 3,
+                  "rmse": 3,
+                  "bias": 3
+                },
+                {
+                  "horizon": 2,
+                  "count": 1,
+                  "mae": 5,
+                  "rmse": 5,
+                  "bias": 5
+                },
+                {
+                  "horizon": 3,
+                  "count": 1,
+                  "mae": 7,
+                  "rmse": 7,
+                  "bias": 7
+                }
+              ],
+              "threeMonthTotal": {
+                "count": 1,
+                "mae": 15,
+                "rmse": 15,
+                "bias": 15
+              }
+            }
+          },
+          {
+            "id": "simple-exponential-smoothing",
+            "kind": "fitted-statistical-model",
+            "development": {
+              "origins": 3,
+              "distinctTargetMonths": 5,
+              "overall": {
+                "count": 9,
+                "mae": 3.9601950579219394,
+                "rmse": 4.340880253345991,
+                "bias": -0.7694740626547072
+              },
+              "byHorizon": [
+                {
+                  "horizon": 1,
+                  "count": 3,
+                  "mae": 3.9964412649472556,
+                  "rmse": 4.714054610883125,
+                  "bias": -0.8805851737658182
+                },
+                {
+                  "horizon": 2,
+                  "count": 3,
+                  "mae": 4.112297356128693,
+                  "rmse": 4.1245546550315035,
+                  "bias": -1.2139185070991516
+                },
+                {
+                  "horizon": 3,
+                  "count": 3,
+                  "mae": 3.7718465526898703,
+                  "rmse": 4.1587813293003215,
+                  "bias": -0.2139185070991516
+                }
+              ],
+              "threeMonthTotal": {
+                "count": 3,
+                "mae": 2.3084221879641214,
+                "rmse": 2.9870563600869144,
+                "bias": -2.3084221879641214
+              }
+            },
+            "assessment": {
+              "origins": 1,
+              "distinctTargetMonths": 3,
+              "overall": {
+                "count": 3,
+                "mae": 1.8609628304839134,
+                "rmse": 2.678096832274187,
+                "bias": -1.5828884914517403
+              },
+              "byHorizon": [
+                {
+                  "horizon": 1,
+                  "count": 1,
+                  "mae": 4.58288849145174,
+                  "rmse": 4.58288849145174,
+                  "bias": -4.58288849145174
+                },
+                {
+                  "horizon": 2,
+                  "count": 1,
+                  "mae": 0.41711150854825974,
+                  "rmse": 0.41711150854825974,
+                  "bias": 0.41711150854825974
+                },
+                {
+                  "horizon": 3,
+                  "count": 1,
+                  "mae": 0.5828884914517403,
+                  "rmse": 0.5828884914517403,
+                  "bias": -0.5828884914517403
+                }
+              ],
+              "threeMonthTotal": {
+                "count": 1,
+                "mae": 4.748665474355221,
+                "rmse": 4.748665474355221,
+                "bias": -4.748665474355221
+              }
+            }
+          }
+        ],
+        "assumptions": [
+          "Included recorded counts are treated as complete solely for this retrospective synthetic demonstration.",
+          "Future counts follow a similar process to these synthetic monthly aggregates."
+        ],
+        "points": [
+          {
+            "month": "2026-10",
+            "horizon": 1,
+            "expectedExits": 67
+          },
+          {
+            "month": "2026-11",
+            "horizon": 2,
+            "expectedExits": 67
+          },
+          {
+            "month": "2026-12",
+            "horizon": 3,
+            "expectedExits": 67
+          }
+        ],
+        "total": 201,
+        "uncertainty": {
+          "status": "unavailable",
+          "interval": null,
+          "reason": "Insufficient independent calibration and no verified stochastic generator or historical vintages. Overlapping backtest errors do not establish coverage."
+        },
+        "operationallyQualified": false
+      },
+      "reasonCodes": []
+    },
+    "hiring": {
+      "operationallyQualified": false,
+      "forecastBaseline": null,
+      "causalEffect": null,
+      "interval": null,
+      "kind": "experimental-hiring-benchmark",
+      "planContext": {
+        "inputKey": "[\"{\\\"evidenceDigest\\\":\\\"0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0\\\",\\\"goal\\\":\\\"Review voluntary exits\\\",\\\"goalId\\\":\\\"scenario\\\",\\\"planningDigest\\\":\\\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\\\",\\\"version\\\":1}\",\"{\\\"id\\\":\\\"A\\\",\\\"name\\\":\\\"Develop internally with targeted hiring\\\",\\\"objective\\\":\\\"Prioritize internal capability with targeted hiring\\\",\\\"coordination\\\":\\\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\\\",\\\"components\\\":[{\\\"id\\\":\\\"c1\\\",\\\"name\\\":\\\"Manager and workload review\\\",\\\"domain\\\":\\\"manager_workload\\\",\\\"firstStep\\\":\\\"Review workload and manager support with the business owner before choosing the staffing response.\\\",\\\"ownerRole\\\":\\\"Business owner\\\",\\\"dependsOn\\\":[],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c2\\\",\\\"name\\\":\\\"Learning and readiness\\\",\\\"domain\\\":\\\"learning\\\",\\\"firstStep\\\":\\\"Define a learning pilot and a separate readiness review for the internal transition.\\\",\\\"ownerRole\\\":\\\"Learning lead\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c3\\\",\\\"name\\\":\\\"Internal transition\\\",\\\"domain\\\":\\\"mobility\\\",\\\"firstStep\\\":\\\"Review the proposed internal transition and source-team coverage with HR after readiness is assessed.\\\",\\\"ownerRole\\\":\\\"HR partner\\\",\\\"dependsOn\\\":[\\\"c2\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c4\\\",\\\"name\\\":\\\"Compensation review\\\",\\\"domain\\\":\\\"compensation\\\",\\\"firstStep\\\":\\\"Review any relevant compensation change and record its cost once in the shared budget.\\\",\\\"ownerRole\\\":\\\"Compensation partner\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c5\\\",\\\"name\\\":\\\"Targeted hiring\\\",\\\"domain\\\":\\\"hiring\\\",\\\"firstStep\\\":\\\"Review targeted hiring alongside the internal response and its explicit arrival assumptions.\\\",\\\"ownerRole\\\":\\\"Recruiting lead\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c6\\\",\\\"name\\\":\\\"Finance and execution checkpoints\\\",\\\"domain\\\":\\\"execution\\\",\\\"firstStep\\\":\\\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\\\",\\\"ownerRole\\\":\\\"Finance partner\\\",\\\"dependsOn\\\":[\\\"c3\\\",\\\"c4\\\",\\\"c5\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"}],\\\"limitation\\\":\\\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\\\"}\",1,{\"scope\":{\"population\":{\"value\":\"all-recorded-voluntary-separations\",\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"},\"businessUnit\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"jobProfile\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"startMonth\":{\"value\":\"2026-10\",\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"},\"months\":{\"value\":3,\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"},\"demand\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"capacityRequired\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"requirements\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"comparisonConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"currency\":\"USD\"},\"capacity\":null,\"timing\":[{\"componentId\":\"c1\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c3\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c4\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c5\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c6\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"dependenciesConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"groups\":[],\"memberships\":[],\"groupsDisjoint\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"expenses\":[],\"expenseLinks\":[],\"costReviews\":[{\"componentId\":\"c1\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c3\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c4\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c5\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c6\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"costsDistinct\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"successMeasure\":{\"goal\":\"Review voluntary exits\",\"scopeKey\":\"[\\\"all-recorded-voluntary-separations\\\",\\\"2026-10\\\",3]\",\"name\":\"Voluntary exits (count)\",\"baseline\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"target\":{\"value\":\"150\",\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"}}}]",
+        "evidenceIdentity": "4427f73fc730c5e3217bdddb645a943f7708e4ed5b9030255ff9892211ef45a3",
+        "status": "unavailable",
+        "source": {
+          "status": "unqualified",
+          "contractStatus": "blocked",
+          "reasonCodes": [
+            "availability-unverified",
+            "completeness-unknown",
+            "no-available-history"
+          ],
+          "missingInputs": [
+            "One role/population with every opening retained, including open, cancelled and no-show dispositions; maturity/censoring at the scoring cutoff.",
+            "Separate opening, accepted-offer, actual-start and capacity-ready definitions; no hire or planned-start substitution.",
+            "Actual first-observed stage/status/revision times, opening-known features only, scoped cohort completion and a common fixed follow-up horizon or censoring-aware estimator."
+          ]
+        },
+        "reasonCodes": [
+          "no-domain-forecast-reference",
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history"
+        ]
+      },
+      "scopeRelationship": "separate-fixture-not-plan-population",
+      "status": "available",
+      "payload": {
+        "protocolVersion": "hiring-selection-v1",
+        "generatorVersion": "hiring-selection-extension-v1",
+        "population": "Constructed aggregate opening cohorts",
+        "metric": "actual-start-within-90-days-fraction",
+        "scopeRelationship": "separate-fixture-not-plan-population",
+        "planBaselineEligible": false,
+        "cases": [
+          {
+            "id": "gradual-improvement:17",
+            "scenario": "gradual-improvement",
+            "seed": 17,
+            "status": "benchmarked",
+            "evaluationStatus": "retrospective-constructed-test-comparison",
+            "model": {
+              "identity": "0bd51f7603d50931984f2298f58dbae9d388903db7978f4efc1acfd81c714cf8",
+              "version": "hiring-cohort-logistic-v1",
+              "selectedMethod": "recent-3-fraction",
+              "selectionReason": "no-consistent-past-improvement"
+            },
+            "dates": {
+              "origin": "2025-07-01T00:00:00.000Z",
+              "trainingStart": "2021-01",
+              "trainingEnd": "2025-03",
+              "testMonths": [
+                "2025-07",
+                "2025-08",
+                "2025-09"
+              ],
+              "scoredThrough": "2026-01-01T00:00:00.000Z"
+            },
+            "sample": {
+              "trainingCohorts": 51,
+              "trainingOpenings": 4071,
+              "testCohorts": 3,
+              "testOpenings": 238
+            },
+            "validation": [
+              {
+                "origin": "2024-07-01",
+                "scoreThrough": "2025-01-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.27658333793571727,
+                    "logLoss": 0.7477233029728064,
+                    "weightedMaePercentagePoints": 16.98832846743381,
+                    "biasPercentagePoints": -16.98832846743381
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24796769128276183,
+                    "logLoss": 0.6890783895510884,
+                    "weightedMaePercentagePoints": 2.3690597353793175,
+                    "biasPercentagePoints": -1.5642370625538253
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24783901980416406,
+                    "logLoss": 0.6888211892375133,
+                    "weightedMaePercentagePoints": 1.824147505372821,
+                    "biasPercentagePoints": 1.82414750537282
+                  }
+                },
+                "logisticImproves": true
+              },
+              {
+                "origin": "2025-01-01",
+                "scoreThrough": "2025-07-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.2781458882199848,
+                    "logLoss": 0.7502133108960346,
+                    "weightedMaePercentagePoints": 19.73066443093691,
+                    "biasPercentagePoints": -19.73066443093691
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.23926509132730134,
+                    "logLoss": 0.6715235881574316,
+                    "weightedMaePercentagePoints": 1.6889632107023393,
+                    "biasPercentagePoints": -0.7008209182122235
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.23982335866230378,
+                    "logLoss": 0.672710263081959,
+                    "weightedMaePercentagePoints": 2.906777928770783,
+                    "biasPercentagePoints": 1.8187118649030865
+                  }
+                },
+                "logisticImproves": false
+              }
+            ],
+            "baselineComparison": {
+              "recent": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.2190522383418725,
+                "logLoss": 0.6305078468092442,
+                "weightedMaePercentagePoints": 9.862723715440373,
+                "biasPercentagePoints": -9.862723715440376
+              },
+              "logistic": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.21043684414959057,
+                "logLoss": 0.6119816369033001,
+                "weightedMaePercentagePoints": 3.368064620921313,
+                "biasPercentagePoints": -3.3680646209213156
+              },
+              "selected": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.2190522383418725,
+                "logLoss": 0.6305078468092442,
+                "weightedMaePercentagePoints": 9.862723715440373,
+                "biasPercentagePoints": -9.862723715440376
+              },
+              "selectedMinusRecentBrier": 0,
+              "selectedMinusLogisticBrier": 0.008615394192281939
+            },
+            "predictions": [
+              {
+                "month": "2025-07",
+                "fraction": 0.6030534351145038
+              },
+              {
+                "month": "2025-08",
+                "fraction": 0.6030534351145038
+              },
+              {
+                "month": "2025-09",
+                "fraction": 0.6030534351145038
+              }
+            ],
+            "interval": null
+          },
+          {
+            "id": "gradual-improvement:29",
+            "scenario": "gradual-improvement",
+            "seed": 29,
+            "status": "benchmarked",
+            "evaluationStatus": "retrospective-constructed-test-comparison",
+            "model": {
+              "identity": "2315d29fd13cba41d9c482a0500230702e60f8dfd0887af80a0447fdb789f0ae",
+              "version": "hiring-cohort-logistic-v1",
+              "selectedMethod": "recent-3-fraction",
+              "selectionReason": "no-consistent-past-improvement"
+            },
+            "dates": {
+              "origin": "2025-07-01T00:00:00.000Z",
+              "trainingStart": "2021-01",
+              "trainingEnd": "2025-03",
+              "testMonths": [
+                "2025-07",
+                "2025-08",
+                "2025-09"
+              ],
+              "scoredThrough": "2026-01-01T00:00:00.000Z"
+            },
+            "sample": {
+              "trainingCohorts": 51,
+              "trainingOpenings": 4071,
+              "testCohorts": 3,
+              "testOpenings": 238
+            },
+            "validation": [
+              {
+                "origin": "2024-07-01",
+                "scoreThrough": "2025-01-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.2865056294880813,
+                    "logLoss": 0.7680476284468546,
+                    "weightedMaePercentagePoints": 20.914400367891155,
+                    "biasPercentagePoints": -20.914400367891158
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.2434704691056755,
+                    "logLoss": 0.6800438339508867,
+                    "weightedMaePercentagePoints": 6.390041493775935,
+                    "biasPercentagePoints": -2.657167462616458
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24384236447173593,
+                    "logLoss": 0.6807953140512466,
+                    "weightedMaePercentagePoints": 6.414596933672601,
+                    "biasPercentagePoints": -2.6849744936919717
+                  }
+                },
+                "logisticImproves": false
+              },
+              {
+                "origin": "2025-01-01",
+                "scoreThrough": "2025-07-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.2828085726833954,
+                    "logLoss": 0.7597036739229688,
+                    "weightedMaePercentagePoints": 21.89897296164326,
+                    "biasPercentagePoints": -21.89897296164326
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.23734751242914154,
+                    "logLoss": 0.6676982328417257,
+                    "weightedMaePercentagePoints": 4.995439343265425,
+                    "biasPercentagePoints": -4.995439343265427
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.2345986540227904,
+                    "logLoss": 0.6620019420287134,
+                    "weightedMaePercentagePoints": 2.181739910206236,
+                    "biasPercentagePoints": -0.9172171644811573
+                  }
+                },
+                "logisticImproves": true
+              }
+            ],
+            "baselineComparison": {
+              "recent": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.21052021414591124,
+                "logLoss": 0.6128699464180462,
+                "weightedMaePercentagePoints": 10.055167105009945,
+                "biasPercentagePoints": -10.055167105009945
+              },
+              "logistic": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.20439614589042326,
+                "logLoss": 0.5995758559571396,
+                "weightedMaePercentagePoints": 6.437302681372275,
+                "biasPercentagePoints": -6.437302681372274
+              },
+              "selected": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.21052021414591124,
+                "logLoss": 0.6128699464180462,
+                "weightedMaePercentagePoints": 10.055167105009945,
+                "biasPercentagePoints": -10.055167105009945
+              },
+              "selectedMinusRecentBrier": 0,
+              "selectedMinusLogisticBrier": 0.006124068255487974
+            },
+            "predictions": [
+              {
+                "month": "2025-07",
+                "fraction": 0.6221374045801527
+              },
+              {
+                "month": "2025-08",
+                "fraction": 0.6221374045801527
+              },
+              {
+                "month": "2025-09",
+                "fraction": 0.6221374045801527
+              }
+            ],
+            "interval": null
+          },
+          {
+            "id": "gradual-improvement:43",
+            "scenario": "gradual-improvement",
+            "seed": 43,
+            "status": "benchmarked",
+            "evaluationStatus": "retrospective-constructed-test-comparison",
+            "model": {
+              "identity": "328dfe853c50521b2828f3121533c586000b476ab51f0d311e9355ef6504acfb",
+              "version": "hiring-cohort-logistic-v1",
+              "selectedMethod": "logistic-trend",
+              "selectionReason": "consistent-past-improvement"
+            },
+            "dates": {
+              "origin": "2025-07-01T00:00:00.000Z",
+              "trainingStart": "2021-01",
+              "trainingEnd": "2025-03",
+              "testMonths": [
+                "2025-07",
+                "2025-08",
+                "2025-09"
+              ],
+              "scoredThrough": "2026-01-01T00:00:00.000Z"
+            },
+            "sample": {
+              "trainingCohorts": 51,
+              "trainingOpenings": 4071,
+              "testCohorts": 3,
+              "testOpenings": 238
+            },
+            "validation": [
+              {
+                "origin": "2024-07-01",
+                "scoreThrough": "2025-01-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.2822044086710433,
+                    "logLoss": 0.7593390095824165,
+                    "weightedMaePercentagePoints": 19.06328231538185,
+                    "biasPercentagePoints": -19.06328231538185
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24647326539324546,
+                    "logLoss": 0.6860821935698764,
+                    "weightedMaePercentagePoints": 4.357629374461757,
+                    "biasPercentagePoints": -2.469271118766147
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24526111281972282,
+                    "logLoss": 0.6836276884179173,
+                    "weightedMaePercentagePoints": 4.7298713356202615,
+                    "biasPercentagePoints": -0.4397104431526577
+                  }
+                },
+                "logisticImproves": true
+              },
+              {
+                "origin": "2025-01-01",
+                "scoreThrough": "2025-07-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.27702375900721715,
+                    "logLoss": 0.7480765420778995,
+                    "weightedMaePercentagePoints": 18.48878641794173,
+                    "biasPercentagePoints": -18.48878641794173
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.24297232240177766,
+                    "logLoss": 0.6790290988146624,
+                    "weightedMaePercentagePoints": 6.096077835208273,
+                    "biasPercentagePoints": -1.149285497111581
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.24244196928702225,
+                    "logLoss": 0.677919376948551,
+                    "weightedMaePercentagePoints": 6.557558451360847,
+                    "biasPercentagePoints": 2.132237719748192
+                  }
+                },
+                "logisticImproves": true
+              }
+            ],
+            "baselineComparison": {
+              "recent": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.21824145426482464,
+                "logLoss": 0.6290904584461853,
+                "weightedMaePercentagePoints": 14.712297132593493,
+                "biasPercentagePoints": -14.712297132593495
+              },
+              "logistic": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.2035331740366831,
+                "logLoss": 0.5980336950630042,
+                "weightedMaePercentagePoints": 8.601935785727608,
+                "biasPercentagePoints": -8.601935785727605
+              },
+              "selected": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.2035331740366831,
+                "logLoss": 0.5980336950630042,
+                "weightedMaePercentagePoints": 8.601935785727608,
+                "biasPercentagePoints": -8.601935785727605
+              },
+              "selectedMinusRecentBrier": -0.014708280228141524,
+              "selectedMinusLogisticBrier": 0
+            },
+            "predictions": [
+              {
+                "month": "2025-07",
+                "fraction": 0.6380301568615522
+              },
+              {
+                "month": "2025-08",
+                "fraction": 0.6453063964038519
+              },
+              {
+                "month": "2025-09",
+                "fraction": 0.6525160296077116
+              }
+            ],
+            "interval": null
+          },
+          {
+            "id": "stationary:17",
+            "scenario": "stationary",
+            "seed": 17,
+            "status": "benchmarked",
+            "evaluationStatus": "retrospective-constructed-test-comparison",
+            "model": {
+              "identity": "2948842b953cea66239e5dae5d570a7eebeba3f4a5c98baf0139c7bf9be0e83c",
+              "version": "hiring-cohort-logistic-v1",
+              "selectedMethod": "recent-3-fraction",
+              "selectionReason": "no-consistent-past-improvement"
+            },
+            "dates": {
+              "origin": "2025-07-01T00:00:00.000Z",
+              "trainingStart": "2021-01",
+              "trainingEnd": "2025-03",
+              "testMonths": [
+                "2025-07",
+                "2025-08",
+                "2025-09"
+              ],
+              "scoredThrough": "2026-01-01T00:00:00.000Z"
+            },
+            "sample": {
+              "trainingCohorts": 51,
+              "trainingOpenings": 4071,
+              "testCohorts": 3,
+              "testOpenings": 238
+            },
+            "validation": [
+              {
+                "origin": "2024-07-01",
+                "scoreThrough": "2025-01-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24172556026186254,
+                    "logLoss": 0.6765184941346126,
+                    "weightedMaePercentagePoints": 2.1603003560963763,
+                    "biasPercentagePoints": 2.1019890772372634
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24143327094741415,
+                    "logLoss": 0.6759199426926217,
+                    "weightedMaePercentagePoints": 1.8429499725984488,
+                    "biasPercentagePoints": 1.2228920378924324
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24190697858067303,
+                    "logLoss": 0.6768886525647627,
+                    "weightedMaePercentagePoints": 2.4905499268276152,
+                    "biasPercentagePoints": 2.490549926827617
+                  }
+                },
+                "logisticImproves": false
+              },
+              {
+                "origin": "2025-01-01",
+                "scoreThrough": "2025-07-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.24352431841558647,
+                    "logLoss": 0.6801407525976352,
+                    "weightedMaePercentagePoints": 3.237686019702368,
+                    "biasPercentagePoints": 0.6927268916369764
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.24347639815074082,
+                    "logLoss": 0.6800426354128875,
+                    "weightedMaePercentagePoints": 3.5527515962298573,
+                    "biasPercentagePoints": -0.02584372149589133
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.24350363994643512,
+                    "logLoss": 0.6800984527655174,
+                    "weightedMaePercentagePoints": 3.308285710871225,
+                    "biasPercentagePoints": 0.5315051464481749
+                  }
+                },
+                "logisticImproves": false
+              }
+            ],
+            "baselineComparison": {
+              "recent": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.25036248401813965,
+                "logLoss": 0.6939346428136635,
+                "weightedMaePercentagePoints": 4.233754570530504,
+                "biasPercentagePoints": -4.233754570530504
+              },
+              "logistic": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.24962308082437373,
+                "logLoss": 0.692421344850722,
+                "weightedMaePercentagePoints": 3.2453263521807667,
+                "biasPercentagePoints": -3.245326352180769
+              },
+              "selected": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.25036248401813965,
+                "logLoss": 0.6939346428136635,
+                "weightedMaePercentagePoints": 4.233754570530504,
+                "biasPercentagePoints": -4.233754570530504
+              },
+              "selectedMinusRecentBrier": 0,
+              "selectedMinusLogisticBrier": 0.0007394031937659196
+            },
+            "predictions": [
+              {
+                "month": "2025-07",
+                "fraction": 0.4198473282442748
+              },
+              {
+                "month": "2025-08",
+                "fraction": 0.4198473282442748
+              },
+              {
+                "month": "2025-09",
+                "fraction": 0.4198473282442748
+              }
+            ],
+            "interval": null
+          },
+          {
+            "id": "stationary:29",
+            "scenario": "stationary",
+            "seed": 29,
+            "status": "benchmarked",
+            "evaluationStatus": "retrospective-constructed-test-comparison",
+            "model": {
+              "identity": "16bca6248c11c7bb9778768f1887904d1f972b37c6a3d30699cd69f43e6fdd1d",
+              "version": "hiring-cohort-logistic-v1",
+              "selectedMethod": "recent-3-fraction",
+              "selectionReason": "no-consistent-past-improvement"
+            },
+            "dates": {
+              "origin": "2025-07-01T00:00:00.000Z",
+              "trainingStart": "2021-01",
+              "trainingEnd": "2025-03",
+              "testMonths": [
+                "2025-07",
+                "2025-08",
+                "2025-09"
+              ],
+              "scoredThrough": "2026-01-01T00:00:00.000Z"
+            },
+            "sample": {
+              "trainingCohorts": 51,
+              "trainingOpenings": 4071,
+              "testCohorts": 3,
+              "testOpenings": 238
+            },
+            "validation": [
+              {
+                "origin": "2024-07-01",
+                "scoreThrough": "2025-01-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24656102996054496,
+                    "logLoss": 0.6862587374889341,
+                    "weightedMaePercentagePoints": 7.220659155997248,
+                    "biasPercentagePoints": -1.345267708406501
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24977651857027425,
+                    "logLoss": 0.6927002155957986,
+                    "weightedMaePercentagePoints": 6.76739998434197,
+                    "biasPercentagePoints": 5.8279182650904255
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24637031820881422,
+                    "logLoss": 0.6858699706855077,
+                    "weightedMaePercentagePoints": 6.920972384861144,
+                    "biasPercentagePoints": 0.023407835793560917
+                  }
+                },
+                "logisticImproves": true
+              },
+              {
+                "origin": "2025-01-01",
+                "scoreThrough": "2025-07-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.24140885812729837,
+                    "logLoss": 0.6758830215655532,
+                    "weightedMaePercentagePoints": 5.637602179836512,
+                    "biasPercentagePoints": 2.5581639069377498
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.24171150210847753,
+                    "logLoss": 0.6764996575794844,
+                    "weightedMaePercentagePoints": 5.501672240802677,
+                    "biasPercentagePoints": 3.093645484949832
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.24260695133281915,
+                    "logLoss": 0.6783158064815692,
+                    "weightedMaePercentagePoints": 5.649985208661401,
+                    "biasPercentagePoints": 4.389033044150618
+                  }
+                },
+                "logisticImproves": false
+              }
+            ],
+            "baselineComparison": {
+              "recent": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.25910494726414546,
+                "logLoss": 0.7116969530802948,
+                "weightedMaePercentagePoints": 9.541984732824428,
+                "biasPercentagePoints": -9.541984732824428
+              },
+              "logistic": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.2541573861259526,
+                "logLoss": 0.7015318673369335,
+                "weightedMaePercentagePoints": 6.443151923967941,
+                "biasPercentagePoints": -6.443151923967939
+              },
+              "selected": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.25910494726414546,
+                "logLoss": 0.7116969530802948,
+                "weightedMaePercentagePoints": 9.541984732824428,
+                "biasPercentagePoints": -9.541984732824428
+              },
+              "selectedMinusRecentBrier": 0,
+              "selectedMinusLogisticBrier": 0.004947561138192835
+            },
+            "predictions": [
+              {
+                "month": "2025-07",
+                "fraction": 0.40458015267175573
+              },
+              {
+                "month": "2025-08",
+                "fraction": 0.40458015267175573
+              },
+              {
+                "month": "2025-09",
+                "fraction": 0.40458015267175573
+              }
+            ],
+            "interval": null
+          },
+          {
+            "id": "stationary:43",
+            "scenario": "stationary",
+            "seed": 43,
+            "status": "benchmarked",
+            "evaluationStatus": "retrospective-constructed-test-comparison",
+            "model": {
+              "identity": "d013afff7206182866aeac7bc281213f11bde66493ea570b9dda0213a65f1b86",
+              "version": "hiring-cohort-logistic-v1",
+              "selectedMethod": "recent-3-fraction",
+              "selectionReason": "no-consistent-past-improvement"
+            },
+            "dates": {
+              "origin": "2025-07-01T00:00:00.000Z",
+              "trainingStart": "2021-01",
+              "trainingEnd": "2025-03",
+              "testMonths": [
+                "2025-07",
+                "2025-08",
+                "2025-09"
+              ],
+              "scoredThrough": "2026-01-01T00:00:00.000Z"
+            },
+            "sample": {
+              "trainingCohorts": 51,
+              "trainingOpenings": 4071,
+              "testCohorts": 3,
+              "testOpenings": 238
+            },
+            "validation": [
+              {
+                "origin": "2024-07-01",
+                "scoreThrough": "2025-01-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.2460901059832212,
+                    "logLoss": 0.6853146986921499,
+                    "weightedMaePercentagePoints": 3.105340650515325,
+                    "biasPercentagePoints": -1.505226148367749
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.2458677428360826,
+                    "logLoss": 0.6848598356345594,
+                    "weightedMaePercentagePoints": 3.8221247944883747,
+                    "biasPercentagePoints": 0.20512017536992336
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.2465495866537321,
+                    "logLoss": 0.6862613419772168,
+                    "weightedMaePercentagePoints": 3.069190699472705,
+                    "biasPercentagePoints": -2.569140148325036
+                  }
+                },
+                "logisticImproves": false
+              },
+              {
+                "origin": "2025-01-01",
+                "scoreThrough": "2025-07-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.24159088429927178,
+                    "logLoss": 0.6762374929166267,
+                    "weightedMaePercentagePoints": 2.869419408928947,
+                    "biasPercentagePoints": 1.0563823097883056
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.24149067979623054,
+                    "logLoss": 0.6760311563252657,
+                    "weightedMaePercentagePoints": 2.6482213438735185,
+                    "biasPercentagePoints": 0.337488598358164
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.241520705286037,
+                    "logLoss": 0.6760936062260251,
+                    "weightedMaePercentagePoints": 2.4581989438416736,
+                    "biasPercentagePoints": -0.4066385882757992
+                  }
+                },
+                "logisticImproves": false
+              }
+            ],
+            "baselineComparison": {
+              "recent": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.259930666515193,
+                "logLoss": 0.7133317825449518,
+                "weightedMaePercentagePoints": 10.00064147796523,
+                "biasPercentagePoints": -10.00064147796523
+              },
+              "logistic": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.26011324199649394,
+                "logLoss": 0.7137097567046312,
+                "weightedMaePercentagePoints": 10.087554973203009,
+                "biasPercentagePoints": -10.08755497320301
+              },
+              "selected": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.259930666515193,
+                "logLoss": 0.7133317825449518,
+                "weightedMaePercentagePoints": 10.00064147796523,
+                "biasPercentagePoints": -10.00064147796523
+              },
+              "selectedMinusRecentBrier": 0,
+              "selectedMinusLogisticBrier": -0.00018257548130096168
+            },
+            "predictions": [
+              {
+                "month": "2025-07",
+                "fraction": 0.4083969465648855
+              },
+              {
+                "month": "2025-08",
+                "fraction": 0.4083969465648855
+              },
+              {
+                "month": "2025-09",
+                "fraction": 0.4083969465648855
+              }
+            ],
+            "interval": null
+          },
+          {
+            "id": "assessment-reversal:17",
+            "scenario": "assessment-reversal",
+            "seed": 17,
+            "status": "benchmarked",
+            "evaluationStatus": "retrospective-constructed-test-comparison",
+            "model": {
+              "identity": "eda189882bea0619c2ceeb584fd32958125d120234889bfa90af02deaf01e718",
+              "version": "hiring-cohort-logistic-v1",
+              "selectedMethod": "recent-3-fraction",
+              "selectionReason": "no-consistent-past-improvement"
+            },
+            "dates": {
+              "origin": "2025-07-01T00:00:00.000Z",
+              "trainingStart": "2021-01",
+              "trainingEnd": "2025-03",
+              "testMonths": [
+                "2025-07",
+                "2025-08",
+                "2025-09"
+              ],
+              "scoredThrough": "2026-01-01T00:00:00.000Z"
+            },
+            "sample": {
+              "trainingCohorts": 51,
+              "trainingOpenings": 4071,
+              "testCohorts": 3,
+              "testOpenings": 238
+            },
+            "validation": [
+              {
+                "origin": "2024-07-01",
+                "scoreThrough": "2025-01-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.27658333793571727,
+                    "logLoss": 0.7477233029728064,
+                    "weightedMaePercentagePoints": 16.98832846743381,
+                    "biasPercentagePoints": -16.98832846743381
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24796769128276183,
+                    "logLoss": 0.6890783895510884,
+                    "weightedMaePercentagePoints": 2.3690597353793175,
+                    "biasPercentagePoints": -1.5642370625538253
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24783901980416406,
+                    "logLoss": 0.6888211892375133,
+                    "weightedMaePercentagePoints": 1.824147505372821,
+                    "biasPercentagePoints": 1.82414750537282
+                  }
+                },
+                "logisticImproves": true
+              },
+              {
+                "origin": "2025-01-01",
+                "scoreThrough": "2025-07-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.2170371059940364,
+                    "logLoss": 0.6265417361576424,
+                    "weightedMaePercentagePoints": 12.961643261370783,
+                    "biasPercentagePoints": 12.961643261370783
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.3025822089922451,
+                    "logLoss": 0.7997778073886067,
+                    "weightedMaePercentagePoints": 31.99148677409547,
+                    "biasPercentagePoints": 31.99148677409547
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.3199994150737161,
+                    "logLoss": 0.8364306660923367,
+                    "weightedMaePercentagePoints": 34.51101955721078,
+                    "biasPercentagePoints": 34.51101955721079
+                  }
+                },
+                "logisticImproves": false
+              }
+            ],
+            "baselineComparison": {
+              "recent": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.2004113048983943,
+                "logLoss": 0.5903999251642384,
+                "weightedMaePercentagePoints": 3.34530758868433,
+                "biasPercentagePoints": 0.13150298287254092
+              },
+              "logistic": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.29236910241394026,
+                "logLoss": 0.7786956610405469,
+                "weightedMaePercentagePoints": 30.2725901120672,
+                "biasPercentagePoints": 30.272590112067206
+              },
+              "selected": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.2004113048983943,
+                "logLoss": 0.5903999251642384,
+                "weightedMaePercentagePoints": 3.34530758868433,
+                "biasPercentagePoints": 0.13150298287254092
+              },
+              "selectedMinusRecentBrier": 0,
+              "selectedMinusLogisticBrier": -0.09195779751554597
+            },
+            "predictions": [
+              {
+                "month": "2025-07",
+                "fraction": 0.2786259541984733
+              },
+              {
+                "month": "2025-08",
+                "fraction": 0.2786259541984733
+              },
+              {
+                "month": "2025-09",
+                "fraction": 0.2786259541984733
+              }
+            ],
+            "interval": null
+          },
+          {
+            "id": "assessment-reversal:29",
+            "scenario": "assessment-reversal",
+            "seed": 29,
+            "status": "benchmarked",
+            "evaluationStatus": "retrospective-constructed-test-comparison",
+            "model": {
+              "identity": "a4a552bddf5f1435df7c529cba78c9ee5008d0d51a7cf6691aadeb7249ce1279",
+              "version": "hiring-cohort-logistic-v1",
+              "selectedMethod": "recent-3-fraction",
+              "selectionReason": "no-consistent-past-improvement"
+            },
+            "dates": {
+              "origin": "2025-07-01T00:00:00.000Z",
+              "trainingStart": "2021-01",
+              "trainingEnd": "2025-03",
+              "testMonths": [
+                "2025-07",
+                "2025-08",
+                "2025-09"
+              ],
+              "scoredThrough": "2026-01-01T00:00:00.000Z"
+            },
+            "sample": {
+              "trainingCohorts": 51,
+              "trainingOpenings": 4071,
+              "testCohorts": 3,
+              "testOpenings": 238
+            },
+            "validation": [
+              {
+                "origin": "2024-07-01",
+                "scoreThrough": "2025-01-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.2865056294880813,
+                    "logLoss": 0.7680476284468546,
+                    "weightedMaePercentagePoints": 20.914400367891155,
+                    "biasPercentagePoints": -20.914400367891158
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.2434704691056755,
+                    "logLoss": 0.6800438339508867,
+                    "weightedMaePercentagePoints": 6.390041493775935,
+                    "biasPercentagePoints": -2.657167462616458
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24384236447173593,
+                    "logLoss": 0.6807953140512466,
+                    "weightedMaePercentagePoints": 6.414596933672601,
+                    "biasPercentagePoints": -2.6849744936919717
+                  }
+                },
+                "logisticImproves": false
+              },
+              {
+                "origin": "2025-01-01",
+                "scoreThrough": "2025-07-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.21419402646666935,
+                    "logLoss": 0.6207532042917699,
+                    "weightedMaePercentagePoints": 13.87025780758751,
+                    "biasPercentagePoints": 13.87025780758751
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.28965824517465694,
+                    "logLoss": 0.7730752863900372,
+                    "weightedMaePercentagePoints": 30.773791425965342,
+                    "biasPercentagePoints": 30.773791425965342
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.3158137521831666,
+                    "logLoss": 0.8273464551865723,
+                    "weightedMaePercentagePoints": 34.852013604749615,
+                    "biasPercentagePoints": 34.852013604749615
+                  }
+                },
+                "logisticImproves": false
+              }
+            ],
+            "baselineComparison": {
+              "recent": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.22399039447956792,
+                "logLoss": 0.6415298466001932,
+                "weightedMaePercentagePoints": 6.055551991789083,
+                "biasPercentagePoints": -6.055551991789081
+              },
+              "logistic": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.2750638003388141,
+                "logLoss": 0.7435555698113024,
+                "weightedMaePercentagePoints": 23.37622133586689,
+                "biasPercentagePoints": 23.376221335866894
+              },
+              "selected": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.22399039447956792,
+                "logLoss": 0.6415298466001932,
+                "weightedMaePercentagePoints": 6.055551991789083,
+                "biasPercentagePoints": -6.055551991789081
+              },
+              "selectedMinusRecentBrier": 0,
+              "selectedMinusLogisticBrier": -0.05107340585924619
+            },
+            "predictions": [
+              {
+                "month": "2025-07",
+                "fraction": 0.26717557251908397
+              },
+              {
+                "month": "2025-08",
+                "fraction": 0.26717557251908397
+              },
+              {
+                "month": "2025-09",
+                "fraction": 0.26717557251908397
+              }
+            ],
+            "interval": null
+          },
+          {
+            "id": "assessment-reversal:43",
+            "scenario": "assessment-reversal",
+            "seed": 43,
+            "status": "benchmarked",
+            "evaluationStatus": "retrospective-constructed-test-comparison",
+            "model": {
+              "identity": "44f12cb8edb6cac844be590c89869da5cc516fb5127eb596d0d75819662a8618",
+              "version": "hiring-cohort-logistic-v1",
+              "selectedMethod": "recent-3-fraction",
+              "selectionReason": "no-consistent-past-improvement"
+            },
+            "dates": {
+              "origin": "2025-07-01T00:00:00.000Z",
+              "trainingStart": "2021-01",
+              "trainingEnd": "2025-03",
+              "testMonths": [
+                "2025-07",
+                "2025-08",
+                "2025-09"
+              ],
+              "scoredThrough": "2026-01-01T00:00:00.000Z"
+            },
+            "sample": {
+              "trainingCohorts": 51,
+              "trainingOpenings": 4071,
+              "testCohorts": 3,
+              "testOpenings": 238
+            },
+            "validation": [
+              {
+                "origin": "2024-07-01",
+                "scoreThrough": "2025-01-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.2822044086710433,
+                    "logLoss": 0.7593390095824165,
+                    "weightedMaePercentagePoints": 19.06328231538185,
+                    "biasPercentagePoints": -19.06328231538185
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24647326539324546,
+                    "logLoss": 0.6860821935698764,
+                    "weightedMaePercentagePoints": 4.357629374461757,
+                    "biasPercentagePoints": -2.469271118766147
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 241,
+                    "brier": 0.24526111281972282,
+                    "logLoss": 0.6836276884179173,
+                    "weightedMaePercentagePoints": 4.7298713356202615,
+                    "biasPercentagePoints": -0.4397104431526577
+                  }
+                },
+                "logisticImproves": true
+              },
+              {
+                "origin": "2025-01-01",
+                "scoreThrough": "2025-07-01T00:00:00.000Z",
+                "metrics": {
+                  "pooled-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.20914700361002583,
+                    "logLoss": 0.6104578880701157,
+                    "weightedMaePercentagePoints": 15.357367428212118,
+                    "biasPercentagePoints": 15.357367428212116
+                  },
+                  "recent-3-fraction": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.292470650160975,
+                    "logLoss": 0.7787407193765056,
+                    "weightedMaePercentagePoints": 32.69686834904227,
+                    "biasPercentagePoints": 32.69686834904227
+                  },
+                  "logistic-trend": {
+                    "cohorts": 3,
+                    "openings": 260,
+                    "brier": 0.3149475017835893,
+                    "logLoss": 0.8252382361887628,
+                    "weightedMaePercentagePoints": 35.978391565902044,
+                    "biasPercentagePoints": 35.97839156590204
+                  }
+                },
+                "logisticImproves": false
+              }
+            ],
+            "baselineComparison": {
+              "recent": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.21608148532998653,
+                "logLoss": 0.6252399409705524,
+                "weightedMaePercentagePoints": 5.863108602219515,
+                "biasPercentagePoints": -5.863108602219515
+              },
+              "logistic": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.2728415136349063,
+                "logLoss": 0.7390099742845312,
+                "weightedMaePercentagePoints": 24.53306932155197,
+                "biasPercentagePoints": 24.53306932155197
+              },
+              "selected": {
+                "cohorts": 3,
+                "openings": 238,
+                "brier": 0.21608148532998653,
+                "logLoss": 0.6252399409705524,
+                "weightedMaePercentagePoints": 5.863108602219515,
+                "biasPercentagePoints": -5.863108602219515
+              },
+              "selectedMinusRecentBrier": 0,
+              "selectedMinusLogisticBrier": -0.056760028304919746
+            },
+            "predictions": [
+              {
+                "month": "2025-07",
+                "fraction": 0.2480916030534351
+              },
+              {
+                "month": "2025-08",
+                "fraction": 0.2480916030534351
+              },
+              {
+                "month": "2025-09",
+                "fraction": 0.2480916030534351
+              }
+            ],
+            "interval": null
+          }
+        ],
+        "abstentions": [
+          {
+            "id": "short-history",
+            "status": "abstained",
+            "reason": "Insufficient mature training cohorts.",
+            "predictions": null,
+            "interval": null
+          },
+          {
+            "id": "sparse-calendar",
+            "status": "abstained",
+            "reason": "Sparse training calendar.",
+            "predictions": null,
+            "interval": null
+          },
+          {
+            "id": "small-cohort",
+            "status": "abstained",
+            "reason": "Undersized training cohort; subgroup pooling is unsupported.",
+            "predictions": null,
+            "interval": null
+          },
+          {
+            "id": "censored-followup",
+            "status": "abstained",
+            "reason": "Complete constructed aggregate follow-up is required.",
+            "predictions": null,
+            "interval": null
+          },
+          {
+            "id": "partial-cohort-release",
+            "status": "abstained",
+            "reason": "Partially observed aggregate cohort; await all declared buckets.",
+            "predictions": null,
+            "interval": null
+          },
+          {
+            "id": "stale-history",
+            "status": "abstained",
+            "reason": "Stale mature-cohort history.",
+            "predictions": null,
+            "interval": null
+          },
+          {
+            "id": "rare-outcome",
+            "status": "abstained",
+            "reason": "Insufficient outcome support.",
+            "predictions": null,
+            "interval": null
+          }
+        ],
+        "supportLimits": {
+          "minimumCohorts": 24,
+          "minimumCohortOpenings": 30,
+          "minimumTrainingStarts": 20,
+          "minimumTrainingNonStarts": 20
+        },
+        "selectionRule": "Logistic only when Brier is strictly lower than recent cohorts in both past validation windows; otherwise recent cohorts.",
+        "uncertaintyReason": "No independent calibration; missing intervals remain unknown, not zero-width bounds.",
+        "limitations": [
+          "Rule informed by inspected prior benchmark; later synthetic test values were not used to tune it.",
+          "Three seeds share one planted generator; no real-world calibration, significance, source qualification or causal inference.",
+          "Support thresholds are experiment abstention rules, not statistical sufficiency or privacy certification. No subgroup prediction release.",
+          "Historical synthetic test results do not match the plan population or establish a plan baseline.",
+          "Selection loses to fixed logistic in four cases. All nine cases and seven abstentions are retained."
+        ]
+      },
+      "reasonCodes": []
+    },
+    "satisfaction": {
+      "operationallyQualified": false,
+      "forecastBaseline": null,
+      "causalEffect": null,
+      "interval": null,
+      "kind": "descriptive-satisfaction-wave-change",
+      "planContext": {
+        "inputKey": "[\"{\\\"evidenceDigest\\\":\\\"0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0\\\",\\\"goal\\\":\\\"Review voluntary exits\\\",\\\"goalId\\\":\\\"scenario\\\",\\\"planningDigest\\\":\\\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\\\",\\\"version\\\":1}\",\"{\\\"id\\\":\\\"A\\\",\\\"name\\\":\\\"Develop internally with targeted hiring\\\",\\\"objective\\\":\\\"Prioritize internal capability with targeted hiring\\\",\\\"coordination\\\":\\\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\\\",\\\"components\\\":[{\\\"id\\\":\\\"c1\\\",\\\"name\\\":\\\"Manager and workload review\\\",\\\"domain\\\":\\\"manager_workload\\\",\\\"firstStep\\\":\\\"Review workload and manager support with the business owner before choosing the staffing response.\\\",\\\"ownerRole\\\":\\\"Business owner\\\",\\\"dependsOn\\\":[],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c2\\\",\\\"name\\\":\\\"Learning and readiness\\\",\\\"domain\\\":\\\"learning\\\",\\\"firstStep\\\":\\\"Define a learning pilot and a separate readiness review for the internal transition.\\\",\\\"ownerRole\\\":\\\"Learning lead\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c3\\\",\\\"name\\\":\\\"Internal transition\\\",\\\"domain\\\":\\\"mobility\\\",\\\"firstStep\\\":\\\"Review the proposed internal transition and source-team coverage with HR after readiness is assessed.\\\",\\\"ownerRole\\\":\\\"HR partner\\\",\\\"dependsOn\\\":[\\\"c2\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c4\\\",\\\"name\\\":\\\"Compensation review\\\",\\\"domain\\\":\\\"compensation\\\",\\\"firstStep\\\":\\\"Review any relevant compensation change and record its cost once in the shared budget.\\\",\\\"ownerRole\\\":\\\"Compensation partner\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c5\\\",\\\"name\\\":\\\"Targeted hiring\\\",\\\"domain\\\":\\\"hiring\\\",\\\"firstStep\\\":\\\"Review targeted hiring alongside the internal response and its explicit arrival assumptions.\\\",\\\"ownerRole\\\":\\\"Recruiting lead\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c6\\\",\\\"name\\\":\\\"Finance and execution checkpoints\\\",\\\"domain\\\":\\\"execution\\\",\\\"firstStep\\\":\\\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\\\",\\\"ownerRole\\\":\\\"Finance partner\\\",\\\"dependsOn\\\":[\\\"c3\\\",\\\"c4\\\",\\\"c5\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"}],\\\"limitation\\\":\\\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\\\"}\",1,{\"scope\":{\"population\":{\"value\":\"all-recorded-voluntary-separations\",\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"},\"businessUnit\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"jobProfile\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"startMonth\":{\"value\":\"2026-10\",\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"},\"months\":{\"value\":3,\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"},\"demand\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"capacityRequired\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"requirements\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"comparisonConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"currency\":\"USD\"},\"capacity\":null,\"timing\":[{\"componentId\":\"c1\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c3\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c4\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c5\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c6\",\"start\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"finish\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"dependenciesConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"groups\":[],\"memberships\":[],\"groupsDisjoint\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"expenses\":[],\"expenseLinks\":[],\"costReviews\":[{\"componentId\":\"c1\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c3\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c4\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c5\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c6\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"costsDistinct\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"successMeasure\":{\"goal\":\"Review voluntary exits\",\"scopeKey\":\"[\\\"all-recorded-voluntary-separations\\\",\\\"2026-10\\\",3]\",\"name\":\"Voluntary exits (count)\",\"baseline\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"target\":{\"value\":\"150\",\"kind\":\"illustrative\",\"basis\":\"Constructed offline demonstration input; not verified plan evidence.\"}}}]",
+        "evidenceIdentity": "4427f73fc730c5e3217bdddb645a943f7708e4ed5b9030255ff9892211ef45a3",
+        "status": "unavailable",
+        "source": {
+          "status": "unqualified",
+          "contractStatus": "blocked",
+          "reasonCodes": [
+            "availability-unverified",
+            "completeness-unknown",
+            "no-available-history"
+          ],
+          "missingInputs": [
+            "Comparable observed waves with versioned population, eligibility, instrument/items and scoring rules; no interpolated monthly targets.",
+            "Mean respondent favorable-answer share with valid respondent denominator, eligible population for participation, and missing/nonresponse counts.",
+            "Wave closure, actual observation/revision times, scoped completion, and reviewed cell/complementary/query-set suppression status."
+          ]
+        },
+        "reasonCodes": [
+          "no-domain-forecast-reference",
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history"
+        ]
+      },
+      "scopeRelationship": "separate-fixture-not-plan-population",
+      "status": "available",
+      "payload": {
+        "methodVersion": "satisfaction-wave-change-v1",
+        "analysis": {
+          "schemaVersion": 1,
+          "methodVersion": "satisfaction-wave-change-v1",
+          "domain": "satisfaction",
+          "status": "descriptive-observed-wave-change",
+          "evidenceKind": "synthetic-mechanics-only",
+          "sourceTruthVerified": false,
+          "operationallyQualified": false,
+          "forecast": null,
+          "causalEffect": null,
+          "confidenceInterval": null,
+          "withinPersonChange": null,
+          "compositionEffect": null,
+          "assumptions": {
+            "nonrespondentMeanRange": [
+              0,
+              1
+            ],
+            "constantNonrespondentMeans": [
+              0,
+              0.5,
+              1
+            ],
+            "populationInterpretation": "repeated-cross-section-not-matched"
+          },
+          "waves": [
+            {
+              "waveId": "constructed-wave-1",
+              "revision": 1,
+              "effectiveAt": "2024-10-31T00:00:00.000Z",
+              "scorePct": 75,
+              "respondents": 80,
+              "eligible": 100,
+              "participationPct": 80,
+              "nonrespondents": 20,
+              "respondentContributionPct": 60.00000000000001,
+              "nonresponseBounds": {
+                "kind": "assumption-dependent-identification-bounds",
+                "lowerPct": 60.00000000000001,
+                "upperPct": 80
+              },
+              "fixedMeanScenarios": [
+                {
+                  "nonrespondentMean": 0,
+                  "eligibleMeanPct": 60.00000000000001
+                },
+                {
+                  "nonrespondentMean": 0.5,
+                  "eligibleMeanPct": 70
+                },
+                {
+                  "nonrespondentMean": 1,
+                  "eligibleMeanPct": 80
+                }
+              ]
+            },
+            {
+              "waveId": "constructed-wave-2",
+              "revision": 1,
+              "effectiveAt": "2025-10-31T00:00:00.000Z",
+              "scorePct": 80,
+              "respondents": 60,
+              "eligible": 100,
+              "participationPct": 60,
+              "nonrespondents": 40,
+              "respondentContributionPct": 48,
+              "nonresponseBounds": {
+                "kind": "assumption-dependent-identification-bounds",
+                "lowerPct": 48,
+                "upperPct": 88
+              },
+              "fixedMeanScenarios": [
+                {
+                  "nonrespondentMean": 0,
+                  "eligibleMeanPct": 48
+                },
+                {
+                  "nonrespondentMean": 0.5,
+                  "eligibleMeanPct": 68
+                },
+                {
+                  "nonrespondentMean": 1,
+                  "eligibleMeanPct": 88
+                }
+              ]
+            },
+            {
+              "waveId": "constructed-wave-3",
+              "revision": 1,
+              "effectiveAt": "2026-06-30T00:00:00.000Z",
+              "scorePct": 78,
+              "respondents": 90,
+              "eligible": 120,
+              "participationPct": 75,
+              "nonrespondents": 30,
+              "respondentContributionPct": 58.5,
+              "nonresponseBounds": {
+                "kind": "assumption-dependent-identification-bounds",
+                "lowerPct": 58.5,
+                "upperPct": 83.5
+              },
+              "fixedMeanScenarios": [
+                {
+                  "nonrespondentMean": 0,
+                  "eligibleMeanPct": 58.5
+                },
+                {
+                  "nonrespondentMean": 0.5,
+                  "eligibleMeanPct": 71
+                },
+                {
+                  "nonrespondentMean": 1,
+                  "eligibleMeanPct": 83.5
+                }
+              ]
+            }
+          ],
+          "changes": [
+            {
+              "from": "constructed-wave-1",
+              "to": "constructed-wave-2",
+              "fromDate": "2024-10-31T00:00:00.000Z",
+              "toDate": "2025-10-31T00:00:00.000Z",
+              "elapsedDays": 365,
+              "respondentScoreChangePp": 5,
+              "responseRateChangePp": -20.000000000000007,
+              "respondentCountChange": -20,
+              "eligibleCountChange": 0,
+              "respondentContributionChangePp": -12.000000000000007,
+              "decomposition": {
+                "method": "symmetric-product-identity",
+                "scoreTermPp": 3.500000000000003,
+                "responseRateTermPp": -15.500000000000005,
+                "reconciledChangePp": -12.000000000000002,
+                "interpretation": "Arithmetic terms in change of response-rate times respondent score; not effects."
+              },
+              "nonresponseChangeBounds": {
+                "kind": "assumption-dependent-identification-bounds",
+                "lowerPp": -32,
+                "upperPp": 27.999999999999993
+              },
+              "fixedMeanScenarios": [
+                {
+                  "nonrespondentMean": 0,
+                  "eligibleMeanChangePp": -12.00000000000001,
+                  "scoreTermPp": 3.500000000000003,
+                  "responseRateTermPp": -15.500000000000005
+                },
+                {
+                  "nonrespondentMean": 0.5,
+                  "eligibleMeanChangePp": -2.000000000000013,
+                  "scoreTermPp": 3.500000000000003,
+                  "responseRateTermPp": -5.500000000000003
+                },
+                {
+                  "nonrespondentMean": 1,
+                  "eligibleMeanChangePp": 7.9999999999999964,
+                  "scoreTermPp": 3.500000000000003,
+                  "responseRateTermPp": 4.500000000000001
+                }
+              ]
+            },
+            {
+              "from": "constructed-wave-2",
+              "to": "constructed-wave-3",
+              "fromDate": "2025-10-31T00:00:00.000Z",
+              "toDate": "2026-06-30T00:00:00.000Z",
+              "elapsedDays": 242,
+              "respondentScoreChangePp": -2,
+              "responseRateChangePp": 15.000000000000002,
+              "respondentCountChange": 30,
+              "eligibleCountChange": 20,
+              "respondentContributionChangePp": 10.5,
+              "decomposition": {
+                "method": "symmetric-product-identity",
+                "scoreTermPp": -1.3500000000000012,
+                "responseRateTermPp": 11.850000000000001,
+                "reconciledChangePp": 10.5,
+                "interpretation": "Arithmetic terms in change of response-rate times respondent score; not effects."
+              },
+              "nonresponseChangeBounds": {
+                "kind": "assumption-dependent-identification-bounds",
+                "lowerPp": -29.5,
+                "upperPp": 35.5
+              },
+              "fixedMeanScenarios": [
+                {
+                  "nonrespondentMean": 0,
+                  "eligibleMeanChangePp": 10.499999999999998,
+                  "scoreTermPp": -1.3500000000000012,
+                  "responseRateTermPp": 11.850000000000001
+                },
+                {
+                  "nonrespondentMean": 0.5,
+                  "eligibleMeanChangePp": 2.9999999999999973,
+                  "scoreTermPp": -1.3500000000000012,
+                  "responseRateTermPp": 4.350000000000001
+                },
+                {
+                  "nonrespondentMean": 1,
+                  "eligibleMeanChangePp": -4.5000000000000036,
+                  "scoreTermPp": -1.3500000000000012,
+                  "responseRateTermPp": -3.15
+                }
+              ]
+            }
+          ],
+          "reasonCodes": [],
+          "limitations": [
+            "Contract qualification checks declarations and aggregate arithmetic; it does not verify source truth or answer-level scoring.",
+            "Participation describes response coverage, not representativeness or a percentage of satisfied employees.",
+            "No monthly interpolation, unfavorable-share complement, eNPS substitution or cross-wave pooling is performed.",
+            "Release declarations are checked; complementary suppression and query-set privacy are not independently audited.",
+            "Observed cross-sectional score and coverage changes do not identify within-person, workforce-composition or causal effects.",
+            "Nonresponse bounds assume each eligible person has a comparable latent favorable-answer share in [0,1].",
+            "Range bounds allow a different nonrespondent mean in each wave; fixed-mean scenarios explicitly assume the same mean across waves.",
+            "These are arithmetic identification/sensitivity bounds, not sampling confidence intervals or forecasts.",
+            "Missing-item scoring remains conditional on answered items; this calculation does not resolve item-level missingness.",
+            "No monthly interpolation, annualization, trend fit, independent-wave sample claim or person-level estimate."
+          ]
+        },
+        "restrictedAssumptionAnalysis": {
+          "schemaVersion": 1,
+          "methodVersion": "satisfaction-wave-change-v1",
+          "domain": "satisfaction",
+          "status": "descriptive-observed-wave-change",
+          "evidenceKind": "synthetic-mechanics-only",
+          "sourceTruthVerified": false,
+          "operationallyQualified": false,
+          "forecast": null,
+          "causalEffect": null,
+          "confidenceInterval": null,
+          "withinPersonChange": null,
+          "compositionEffect": null,
+          "assumptions": {
+            "nonrespondentMeanRange": [
+              0,
+              0.5
+            ],
+            "constantNonrespondentMeans": [
+              0,
+              0.5
+            ],
+            "populationInterpretation": "repeated-cross-section-not-matched"
+          },
+          "waves": [
+            {
+              "waveId": "constructed-wave-1",
+              "revision": 1,
+              "effectiveAt": "2024-10-31T00:00:00.000Z",
+              "scorePct": 75,
+              "respondents": 80,
+              "eligible": 100,
+              "participationPct": 80,
+              "nonrespondents": 20,
+              "respondentContributionPct": 60.00000000000001,
+              "nonresponseBounds": {
+                "kind": "assumption-dependent-identification-bounds",
+                "lowerPct": 60.00000000000001,
+                "upperPct": 70
+              },
+              "fixedMeanScenarios": [
+                {
+                  "nonrespondentMean": 0,
+                  "eligibleMeanPct": 60.00000000000001
+                },
+                {
+                  "nonrespondentMean": 0.5,
+                  "eligibleMeanPct": 70
+                }
+              ]
+            },
+            {
+              "waveId": "constructed-wave-2",
+              "revision": 1,
+              "effectiveAt": "2025-10-31T00:00:00.000Z",
+              "scorePct": 80,
+              "respondents": 60,
+              "eligible": 100,
+              "participationPct": 60,
+              "nonrespondents": 40,
+              "respondentContributionPct": 48,
+              "nonresponseBounds": {
+                "kind": "assumption-dependent-identification-bounds",
+                "lowerPct": 48,
+                "upperPct": 68
+              },
+              "fixedMeanScenarios": [
+                {
+                  "nonrespondentMean": 0,
+                  "eligibleMeanPct": 48
+                },
+                {
+                  "nonrespondentMean": 0.5,
+                  "eligibleMeanPct": 68
+                }
+              ]
+            },
+            {
+              "waveId": "constructed-wave-3",
+              "revision": 1,
+              "effectiveAt": "2026-06-30T00:00:00.000Z",
+              "scorePct": 78,
+              "respondents": 90,
+              "eligible": 120,
+              "participationPct": 75,
+              "nonrespondents": 30,
+              "respondentContributionPct": 58.5,
+              "nonresponseBounds": {
+                "kind": "assumption-dependent-identification-bounds",
+                "lowerPct": 58.5,
+                "upperPct": 71
+              },
+              "fixedMeanScenarios": [
+                {
+                  "nonrespondentMean": 0,
+                  "eligibleMeanPct": 58.5
+                },
+                {
+                  "nonrespondentMean": 0.5,
+                  "eligibleMeanPct": 71
+                }
+              ]
+            }
+          ],
+          "changes": [
+            {
+              "from": "constructed-wave-1",
+              "to": "constructed-wave-2",
+              "fromDate": "2024-10-31T00:00:00.000Z",
+              "toDate": "2025-10-31T00:00:00.000Z",
+              "elapsedDays": 365,
+              "respondentScoreChangePp": 5,
+              "responseRateChangePp": -20.000000000000007,
+              "respondentCountChange": -20,
+              "eligibleCountChange": 0,
+              "respondentContributionChangePp": -12.000000000000007,
+              "decomposition": {
+                "method": "symmetric-product-identity",
+                "scoreTermPp": 3.500000000000003,
+                "responseRateTermPp": -15.500000000000005,
+                "reconciledChangePp": -12.000000000000002,
+                "interpretation": "Arithmetic terms in change of response-rate times respondent score; not effects."
+              },
+              "nonresponseChangeBounds": {
+                "kind": "assumption-dependent-identification-bounds",
+                "lowerPp": -22,
+                "upperPp": 7.999999999999993
+              },
+              "fixedMeanScenarios": [
+                {
+                  "nonrespondentMean": 0,
+                  "eligibleMeanChangePp": -12.00000000000001,
+                  "scoreTermPp": 3.500000000000003,
+                  "responseRateTermPp": -15.500000000000005
+                },
+                {
+                  "nonrespondentMean": 0.5,
+                  "eligibleMeanChangePp": -2.000000000000013,
+                  "scoreTermPp": 3.500000000000003,
+                  "responseRateTermPp": -5.500000000000003
+                }
+              ]
+            },
+            {
+              "from": "constructed-wave-2",
+              "to": "constructed-wave-3",
+              "fromDate": "2025-10-31T00:00:00.000Z",
+              "toDate": "2026-06-30T00:00:00.000Z",
+              "elapsedDays": 242,
+              "respondentScoreChangePp": -2,
+              "responseRateChangePp": 15.000000000000002,
+              "respondentCountChange": 30,
+              "eligibleCountChange": 20,
+              "respondentContributionChangePp": 10.5,
+              "decomposition": {
+                "method": "symmetric-product-identity",
+                "scoreTermPp": -1.3500000000000012,
+                "responseRateTermPp": 11.850000000000001,
+                "reconciledChangePp": 10.5,
+                "interpretation": "Arithmetic terms in change of response-rate times respondent score; not effects."
+              },
+              "nonresponseChangeBounds": {
+                "kind": "assumption-dependent-identification-bounds",
+                "lowerPp": -9.5,
+                "upperPp": 23
+              },
+              "fixedMeanScenarios": [
+                {
+                  "nonrespondentMean": 0,
+                  "eligibleMeanChangePp": 10.499999999999998,
+                  "scoreTermPp": -1.3500000000000012,
+                  "responseRateTermPp": 11.850000000000001
+                },
+                {
+                  "nonrespondentMean": 0.5,
+                  "eligibleMeanChangePp": 2.9999999999999973,
+                  "scoreTermPp": -1.3500000000000012,
+                  "responseRateTermPp": 4.350000000000001
+                }
+              ]
+            }
+          ],
+          "reasonCodes": [],
+          "limitations": [
+            "Contract qualification checks declarations and aggregate arithmetic; it does not verify source truth or answer-level scoring.",
+            "Participation describes response coverage, not representativeness or a percentage of satisfied employees.",
+            "No monthly interpolation, unfavorable-share complement, eNPS substitution or cross-wave pooling is performed.",
+            "Release declarations are checked; complementary suppression and query-set privacy are not independently audited.",
+            "Observed cross-sectional score and coverage changes do not identify within-person, workforce-composition or causal effects.",
+            "Nonresponse bounds assume each eligible person has a comparable latent favorable-answer share in [0,1].",
+            "Range bounds allow a different nonrespondent mean in each wave; fixed-mean scenarios explicitly assume the same mean across waves.",
+            "These are arithmetic identification/sensitivity bounds, not sampling confidence intervals or forecasts.",
+            "Missing-item scoring remains conditional on answered items; this calculation does not resolve item-level missingness.",
+            "No monthly interpolation, annualization, trend fit, independent-wave sample claim or person-level estimate."
+          ]
+        },
+        "blockedExamples": {
+          "incompatibleInstrument": {
+            "status": "unavailable",
+            "reasonCodes": [
+              "incomparable-survey-waves"
+            ]
+          },
+          "suppressedWave": {
+            "status": "unavailable",
+            "reasonCodes": [
+              "release-withheld"
+            ]
+          }
+        },
+        "baselineComparison": {
+          "status": "not-applicable",
+          "reason": "Descriptive adjacent-wave arithmetic; no predictive model benchmark."
+        }
+      },
+      "reasonCodes": []
+    }
+  },
+  "evidenceIdentities": {
+    "source": "4427f73fc730c5e3217bdddb645a943f7708e4ed5b9030255ff9892211ef45a3",
+    "hiring": "1a2e1c99b68057d12e72606fca03a3ae4a3ffd987c62e4b3ae80aa97438e9e5c",
+    "satisfaction": "d1fe0fffd999aa769c45792449bb0de759787ac9e6a7181c3f854041797473dc"
+  },
+  "reasonCodes": [],
+  "identity": "aef027ba6a2be4bb596525bdd5c465b17a2e65b36919d91764adda7d9777536e"
+}
