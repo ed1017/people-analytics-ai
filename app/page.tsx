@@ -20,6 +20,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
 } from "react";
+import {readSurveySource} from "@/lib/survey-source-client";
 import { employeeListeningEvidence, exitSurveyEvidence } from "@/lib/employee-listening";
 import { FocusedIssue } from "@/components/focused-issue";
 import { buildHomePack } from "@/lib/home-pack.mjs";
@@ -672,48 +673,29 @@ export default function Home() {
   }, [activePage, talentAcquisitionData]);
   useEffect(() => {
     if (
-      (activePage !== "survey-sentiment" && activePage !== "attrition") ||
-      surveySentimentData
+      activePage !== "survey-sentiment" && activePage !== "attrition"
     ) {
       return;
     }
 
+    let current = true;
     async function loadSurveySentiment() {
-      try {
-        setSurveySentimentLoading(true);
-        setSurveySentimentError(null);
-
-        const response = await fetch(
-          "/api/survey-sentiment",
-          { cache: "no-store" }
-        );
-
-        const payload = await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            payload?.error ??
-              "Failed to load Employee Listening data."
-          );
-        }
-
-        setSurveySentimentData(
-          payload as SurveySentimentResponse
-        );
-      } catch (error) {
-        console.error(error);
-        setSurveySentimentError(
-          error instanceof Error
-            ? error.message
-            : "Failed to load Employee Listening data."
-        );
-      } finally {
-        setSurveySentimentLoading(false);
+      setSurveySentimentLoading(true);
+      setSurveySentimentError(null);
+      setSurveySentimentData(null);
+      const result = await readSurveySource();
+      if (!current) return;
+      if (result.status === "loaded") {
+        setSurveySentimentData(result.data as SurveySentimentResponse);
+      } else {
+        setSurveySentimentData(null);
+        setSurveySentimentError("Employee Listening data unavailable. Exit-survey feedback remains separate from administrative attrition.");
       }
+      setSurveySentimentLoading(false);
     }
-
-    loadSurveySentiment();
-  }, [activePage, surveySentimentData]);
+    void loadSurveySentiment();
+    return () => { current = false; };
+  }, [activePage]);
 
   useEffect(() => {
     if (
