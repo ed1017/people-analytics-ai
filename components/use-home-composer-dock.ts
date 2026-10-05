@@ -17,7 +17,9 @@ export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement
    element.style.setProperty('left',`${box.left}px`);element.style.setProperty('width',`${box.width}px`);
    element.style.setProperty('bottom',`${Math.max(0,innerHeight-height-(viewport?.offsetTop??0))}px`);
    element.style.setProperty('max-height',`${Math.max(100,height*.65)}px`);
-   textarea.style.setProperty('max-height',`${Math.max(48,Math.min(320,height*.4))}px`);
+   const inputMax=Math.max(48,Math.min(320,height*.4));
+   textarea.style.setProperty('max-height',`${inputMax}px`);
+   textarea.style.setProperty('min-height',`${Math.min(112,inputMax)}px`);
    root.style.setProperty('--home-visible-height',`${height}px`);
    const composerHeight=`${element.getBoundingClientRect().height}px`;
    root.style.setProperty('--home-composer-height',composerHeight);
