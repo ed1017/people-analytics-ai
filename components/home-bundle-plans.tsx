@@ -6,7 +6,7 @@ import {prepareIllustrativePilot,pilotAllowances} from '@/lib/home-action-plan-p
 import {useId,useLayoutEffect,useRef,useState} from 'react';
 import {previewBundleChatEdit,acceptBundleChatEdit,bundleChatEditExamples,type BundleEditExample,type BundleEditPreview} from '@/lib/home-bundle-chat-edit';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
-import {bundleDisplayText,bundleComponentLabels,bundleDisplayName,bundleAssumptionText,bundleHorizonEnd} from '@/lib/home-bundle-display';
+import {bundleIsAnalysisOnly,bundleDisplayText,bundleComponentLabels,bundleDisplayName,bundleAssumptionText,bundleHorizonEnd} from '@/lib/home-bundle-display';
 import {HomePlanIntegration} from '@/components/home-plan-integration';
 import {HomeBundleEditor} from '@/components/home-bundle-editor';
 import {HomeActionPlanApplication} from '@/components/home-action-plan-application';
@@ -20,12 +20,12 @@ export const bundleButton='min-h-11 rounded border px-3 py-2 text-sm font-medium
 export type BundleSession={drafts:Record<string,BundleDraft>;results:Record<string,BundleResult>};
 export type BundleDiscussion={examples:BundleEditExample[];option:number;id:string;revision:number;name:string;goalId:string;goal:string;subscribe:(listener:()=>void)=>()=>void;isCurrent:()=>boolean;preview:(text:string)=>BundleEditPreview;accept:(preview:BundleEditPreview)=>void};
 const money=(value:number|null|undefined)=>value==null?'Unknown':`$${value.toLocaleString(undefined,{maximumFractionDigits:2})} USD`;
-export function HomeBundlePlans({proposal,binding,preparedAt,contextCurrent,disabled,isCurrent,cache,onDiscuss,projectBinding,measurePack}:{measurePack?:unknown;projectBinding?:ProjectPlanningBinding;preparedAt:string;proposal:BundleProposal;binding:ActionBinding;contextCurrent:boolean;disabled:boolean;isCurrent:()=>boolean;cache:Map<string,BundleSession>;onDiscuss:(request:BundleDiscussion)=>void}){
+export function HomeBundlePlans({planningContext,proposal,binding,preparedAt,contextCurrent,disabled,isCurrent,cache,onDiscuss,projectBinding,measurePack}:{planningContext?:unknown;measurePack?:unknown;projectBinding?:ProjectPlanningBinding;preparedAt:string;proposal:BundleProposal;binding:ActionBinding;contextCurrent:boolean;disabled:boolean;isCurrent:()=>boolean;cache:Map<string,BundleSession>;onDiscuss:(request:BundleDiscussion)=>void}){
  const optionNumber=(id:string)=>proposal.bundles.findIndex(bundle=>bundle.id===id)+1;
  const storage=useDecisionStorage(),raw=storage.data.workspaces[binding.goalId]?.fields[bundleWorkspaceField],workspace=readBundleWorkspace(raw,binding.goalId),key=actionBindingKey(binding);
  const [session,setSession]=useState<BundleSession>(()=>{
   const cached=cache.get(key);if(cached)return cached;
-  const drafts=Object.fromEntries(proposal.bundles.map(bundle=>[bundle.id,restoredBundleDraft(workspace,binding,bundle.id)??prepareIllustrativePilot(createBundleDraft(bundle,binding),preparedAt)]));
+  const drafts=Object.fromEntries(proposal.bundles.map(bundle=>[bundle.id,restoredBundleDraft(workspace,binding,bundle.id)??prepareIllustrativePilot(createBundleDraft(bundle,binding),preparedAt,{goalContext:planningContext})]));
   const results:Record<string,BundleResult>={};for(const [id,draft] of Object.entries(drafts)){const result=restoredBundleResult(workspace,draft);if(result)results[id]=result;}
   return {drafts,results};
  });
@@ -65,6 +65,7 @@ export function HomeBundlePlans({proposal,binding,preparedAt,contextCurrent,disa
   </section>
   <section id="selected-home-plan" role="tabpanel" aria-labelledby={`plan-tab-${selected}`}><article aria-label={`Action Plan option ${optionNumber(selected)}`} className="space-y-3 border-t pt-3"><h3 ref={heading} tabIndex={-1} className="text-base font-semibold">{bundleDisplayName(draft.bundle.name)}</h3>
    <p aria-label="Plan description" className="text-sm leading-relaxed">{bundleDisplayText(draft.bundle.objective,draft.bundle)}</p>
+   {bundleIsAnalysisOnly(draft.bundle)&&<p className="text-sm font-medium">The listed first steps are analytical; a delivery intervention still needs review.</p>}
    <ul aria-label="Selected plan summary" className="list-disc space-y-1.5 pl-5 text-sm">
     <li><strong>Approach:</strong> {bundleDisplayText(draft.bundle.coordination,draft.bundle)}</li>
     <li><strong>Stakeholders:</strong> {[...new Set(draft.bundle.components.map(item=>item.ownerRole))].slice(0,2).join('; ')} (proposed roles){new Set(draft.bundle.components.map(item=>item.ownerRole)).size>2?`; ${new Set(draft.bundle.components.map(item=>item.ownerRole)).size-2} more in details`:''}. Owners are not assigned.</li>
@@ -74,6 +75,7 @@ export function HomeBundlePlans({proposal,binding,preparedAt,contextCurrent,disa
     <li><strong>Expected outcome:</strong> {draft.inputs.whatIf&&<span>{whatIfOutcomeText(draft.inputs)} </span>}Intended contribution to “{binding.goal}”. This is a proposed outcome, not a predicted effect. Retention effects are not established.</li>
     <li><strong>How success is measured:</strong> {whatIf?.status==='ready'&&!draft.inputs.successMeasure&&<span>Proposed target: {whatIf.target}{whatIf.kind==='turnover'?'% turnover using voluntary exits / average workforce for the same period':' additional roles covered from the planning start'}, over {whatIf.months} months from {whatIf.start}. Track the same population and period; this is a target, not a prediction. </span>}{!draft.inputs.successMeasure&&!draft.inputs.whatIf&&<span>Suggested measure: {suggestedMeasure.name}. {suggestedMeasure.baseline?'A recorded contextual baseline is available for review; confirm the plan population and period before adopting it.':'No matching recorded baseline is available.'} Set a target as a planning assumption, not a prediction. </span>}{(draft.inputs.successMeasure||!draft.inputs.whatIf)&&successMeasureText(draft.inputs.successMeasure,!draft.inputs.successMeasure||draft.inputs.successMeasure.scopeKey===measurementScope(draft.inputs))}{draft.inputs.successMeasure?.baseline.value!==null&&draft.inputs.successMeasure?.baseline.basis&&<span className="block text-xs">{contextCurrent?'Saved baseline provenance:':'Historical baseline; current context needs review: '}{draft.inputs.successMeasure.baseline.basis}</span>}</li>
    </ul>
+   {draft.inputs.scope.requirements.value&&<p className="text-sm"><strong>Planning constraints:</strong> {draft.inputs.scope.requirements.value}</p>}
    <PlanAssumptions key={key+selected} draft={draft}/>
    {currentResult&&proposal.bundles.filter(bundle=>bundle.id!==selected&&session.results[bundle.id]).map(other=>{const comparison=compareCurrentBundleResults(currentResult,session.results[other.id],draft,session.drafts[other.id]);if(!comparison.comparable)return null;return <p key={other.id} className="text-xs">Compared with {bundleDisplayName(session.drafts[other.id].bundle.name)} under matching reviewed assumptions: {comparison.cashDifference===null?'cash difference unknown':`${money(Math.abs(comparison.cashDifference))} ${comparison.cashDifference<0?'lower':comparison.cashDifference>0?'higher':'difference in'} incremental cash`}; {comparison.capacityMonthsDifference===null?'capacity timing difference unknown':`${Math.abs(comparison.capacityMonthsDifference)} months ${comparison.capacityMonthsDifference<0?'earlier':comparison.capacityMonthsDifference>0?'later':'difference in capacity timing'}`}. Conditional estimates.</p>;})}
    {result&&!currentResult&&<p role="status">The previous calculation is retained as stale. Calculate this reviewed revision to show current totals.</p>}

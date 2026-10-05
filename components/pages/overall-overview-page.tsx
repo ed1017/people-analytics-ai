@@ -1,4 +1,5 @@
 "use client";
+import {homeGoalForPin} from '@/lib/home-planning-intent';
 import {explicitHomeGoal} from "@/lib/home-explicit-goal";
 import {HomePinnedGoals} from "@/components/home-pinned-goals";
 import type {LocalGoal} from "@/lib/local-goals";
@@ -243,10 +244,10 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       const answer = reply.answer;
       const assistantMessage:ChatMessage={role:"assistant",content:answer};
       if(actionPlan)planRationale.current.set(assistantMessage,conversation.activeGoalId);
-      const userStatements=[...clarificationStatements,message].slice(-6);
+      const userStatements=[...new Set([...history.filter(item=>item.role==='user').map(item=>item.content),...clarificationStatements,message])].slice(-6);
       setClarification(reply.clarification?{context:key,question:reply.clarification,statements:userStatements}:null);
       if(reply.proposal&&!reply.clarification){
-        const captured={proposal:reply.proposal,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack),context:key,epoch:candidateEpoch,originGoalId:conversation.activeGoalId,rationale:assistantMessage,userGoal:conversation.focusedIssue?null:explicitHomeGoal(message)??explicitHomeGoal(clarificationStatements[0]??''),userStatements};
+        const captured={proposal:reply.proposal,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack),context:key,epoch:candidateEpoch,originGoalId:conversation.activeGoalId,rationale:assistantMessage,userGoal:conversation.focusedIssue?null:homeGoalForPin(userStatements)??explicitHomeGoal(message),userStatements};
         if(conversation.activeGoalId)decisionStore.setField(conversation.activeGoalId,'homeCandidateOptions',{version:2,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:captured.sourceKey,proposal:reply.proposal});
         else setCandidate(captured);
       }

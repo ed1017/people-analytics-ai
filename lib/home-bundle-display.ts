@@ -32,3 +32,6 @@ export function bundleHorizonEnd(scope:{startMonth:DisplayAssumption<string>;mon
  const value=new Date(Date.UTC(year,month-1+scope.months.value,0)).toISOString().slice(0,10);
  return {value,kind:scope.startMonth.kind==='illustrative'||scope.months.kind==='illustrative'?'illustrative':scope.startMonth.kind==='adopted'&&scope.months.kind==='adopted'?'adopted':'user-entered'};
 }
+
+/** Conservative label: recognized analysis verbs only; other drafts are not certified interventions. */
+export function bundleIsAnalysisOnly(bundle:SolutionBundle){return bundle.components.length>0&&bundle.components.every(component=>/^(?:propose(?: to)?\s+)?(?:review|investigate|analy[zs]e|assess|compare|examine|audit|diagnose|summarize|summarise|triangulate|identify|define)\b/i.test(component.firstStep.trim()));}
