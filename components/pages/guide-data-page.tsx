@@ -12,19 +12,18 @@ const sections = [
 ];
 
 export function GuideDataPage({ onBack }: { onBack: () => void }) {
-  const heading = useRef<HTMLHeadingElement>(null);
-  useEffect(() => { heading.current?.focus(); }, []);
+  const content = useRef<HTMLElement>(null);
+  useEffect(() => { content.current?.focus(); }, []);
   const card = "rounded-xl border bg-card p-5 sm:p-6";
-  return <article className="mx-auto max-w-6xl space-y-6 px-5 py-8 text-base leading-relaxed sm:px-8">
+  return <article ref={content} tabIndex={-1} aria-labelledby="app-page-title" className="mx-auto max-w-6xl space-y-6 px-5 py-8 text-base leading-relaxed outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-8">
     <button type="button" onClick={onBack} className="flex items-center gap-2 rounded-md font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring"><ArrowLeft size={18} /> Back to Home</button>
     <header><p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-primary"><BookOpen size={18} /> Using Insights to Action</p>
-      <h2 ref={heading} tabIndex={-1} className="rounded-sm text-3xl font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">Guide &amp; Data</h2>
       <p className="mt-3 text-lg text-muted-foreground">How I use the app, where the information comes from, and what it can and cannot tell us.</p>
     </header>
     <div className="grid items-start gap-5 lg:grid-cols-2">
-      <section className={card}><h3 className="text-xl font-semibold">What this app is for</h3><p className="mt-2 text-sm text-muted-foreground">A project by Ed Om</p><p className="mt-3">{sections[0].text}</p></section>
-      <section className={card}><h3 className="text-xl font-semibold">What&apos;s coming next</h3><p className="mt-3"><strong>V2:</strong> Compensation, location-based scenario modeling, and employee NPS (eNPS).</p><p className="mt-3"><strong>V3:</strong> Role-based user access and security, with chat agents tailored to each user or role. Authenticated, authorized HR users would have approved person-level detail; other roles would use aggregates. The current public demo remains aggregate-only.</p><p className="mt-3"><strong>V4:</strong> Machine learning and predictive analytics.</p><p className="mt-3 text-muted-foreground">These are planned future capabilities, not features available today. No release dates have been agreed.</p></section>
-      {[sections[2], sections[4], sections[3]].map(section => <section key={section.title} className={card}><h3 className="text-xl font-semibold">{section.title}</h3><p className="mt-3">{section.text}</p>{section.link && <a className="mt-3 inline-block text-primary underline" href={section.link} target="_blank" rel="noreferrer">{section.linkLabel}</a>}</section>)}
+      <section className={card}><h2 className="text-xl font-semibold">What this app is for</h2><p className="mt-2 text-sm text-muted-foreground">A project by Ed Om</p><p className="mt-3">{sections[0].text}</p></section>
+      <section className={card}><h2 className="text-xl font-semibold">What&apos;s coming next</h2><p className="mt-3"><strong>V2:</strong> Compensation, location-based scenario modeling, and employee NPS (eNPS).</p><p className="mt-3"><strong>V3:</strong> Role-based user access and security, with chat agents tailored to each user or role. Authenticated, authorized HR users would have approved person-level detail; other roles would use aggregates. The current public demo remains aggregate-only.</p><p className="mt-3"><strong>V4:</strong> Machine learning and predictive analytics.</p><p className="mt-3 text-muted-foreground">These are planned future capabilities, not features available today. No release dates have been agreed.</p></section>
+      {[sections[2], sections[4], sections[3]].map(section => <section key={section.title} className={card}><h2 className="text-xl font-semibold">{section.title}</h2><p className="mt-3">{section.text}</p>{section.link && <a className="mt-3 inline-block text-primary underline" href={section.link} target="_blank" rel="noreferrer">{section.linkLabel}</a>}</section>)}
 
     </div>
 

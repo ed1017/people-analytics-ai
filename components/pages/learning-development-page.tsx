@@ -49,9 +49,6 @@ export function LearningDevelopmentPage({
     <section className="learning-development-page min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold">
-            Learning & Development
-          </h2>
           <p className="text-muted-foreground">
             Connect current skill-gap signals to active learning pathways without treating course availability as readiness.
           </p>

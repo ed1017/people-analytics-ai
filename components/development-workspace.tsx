@@ -53,7 +53,7 @@ export function DevelopmentCatalog({ session, onChange, onOpen }: { session: Dev
 }
 
 export function DevelopmentPlanning({ session, onChange, onCatalog }: { session: DevelopmentSession; onChange: (session: DevelopmentSession) => void; onCatalog: () => void }) {
-  return <section className="development-planning min-w-0 p-6"><div className="flex flex-wrap items-center gap-3"><h1 className="text-2xl font-semibold">Development Planning</h1><PlanningGuide page="development-planning" /></div>
+  return <section className="development-planning min-w-0 p-6"><div className="flex flex-wrap items-center gap-3"><PlanningGuide page="development-planning" /></div>
     <p className="my-3 text-sm text-muted-foreground">Compare selected quotes against your stated goals. These are editable cost assumptions, not approved budgets, training outcomes or staffing decisions. No ROI, proficiency gains or headcount conversion is estimated. Saved with a selected goal in this browser; without a goal, quotes and inputs remain in this tab.</p>
     <button className={button} onClick={onCatalog}>Choose another quote in Intelligence → Training & Coaching</button>
     {!session.options.length && <p className="mt-6">Select a quote and enter a development goal in Intelligence → Training & Coaching, then explicitly carry them here.</p>}
