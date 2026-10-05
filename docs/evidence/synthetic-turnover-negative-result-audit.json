@@ -1,0 +1,33 @@
+{
+  "status": "verified",
+  "experimentCommit": "88c45787f0eec363ce7edbbe418e4bd004542acd",
+  "reportSha256": "18876092e44d00c849536351d3c37e51b1729ff52a279b44af450832e58883d6",
+  "histories": 500,
+  "groupCases": 2000,
+  "calibrationFolds": 22000,
+  "methodSummaries": 60,
+  "target": "July–September 2026 group voluntary-exit count total",
+  "origin": "2026-06-30T23:59:59.999Z",
+  "ordinaryLastReleasedMonth": "2026-05",
+  "stressLastReleasedMonth": "2026-04",
+  "originHorizons": [
+    1,
+    2,
+    3
+  ],
+  "ordinaryLeadsFromReleasedMonth": [
+    2,
+    3,
+    4
+  ],
+  "stressLeadsFromReleasedMonth": [
+    3,
+    4,
+    5
+  ],
+  "unit": "exit-event-counts",
+  "calibrationLabelsAvailableBy": "2026-06-30T23:59:59.999Z",
+  "retrospectiveScoringCutoff": "2027-07-01T00:00:00.000Z",
+  "reservedQuarterScored": false,
+  "scope": "Regenerated existing seeds only; independent count sums, vintage selection and coverage arithmetic. No new fitting or general proof of correctness."
+}
