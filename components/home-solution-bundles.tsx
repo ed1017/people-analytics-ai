@@ -54,15 +54,15 @@ export function HomeSolutionBundles({goalId,goal,pack,active,ready,busy,pin,pers
  },[pin,goalId,binding,busy,active,ready,storage.saved,identity]);
  if(!goalId||!goal)return null;
  const disabled=busy||pending||!binding||!storage.saved||!active||!ready;
- return <section aria-label="Combined solutions for your goal" className="space-y-3 break-words rounded-xl border border-primary/40 p-4 text-sm leading-relaxed">
-  <h2 ref={heading} tabIndex={-1} className="text-lg font-semibold">Combined solutions for your goal</h2><p>{goal}</p>
-  {pending&&<p role="status">Preparing coordinated solution bundles in one response…</p>}
+ return <section aria-label="Action Plans for your goal" className="space-y-3 break-words rounded-xl border border-primary/40 p-4 text-sm leading-relaxed">
+  <h2 ref={heading} tabIndex={-1} className="text-lg font-semibold">Action Plans for your goal</h2><p>{goal}</p>
+  {pending&&<p role="status">Preparing coordinated Action Plans in one response…</p>}
   {!ready&&<p role="status">Checking current evidence. Saved work is kept.</p>}
   {notice&&<p role="alert">{notice}</p>}
-  {stale&&<p role="status">Previous combined proposal — goal, evidence or planning inputs changed. Preserved for reference; prepare the current context explicitly.</p>}
+  {stale&&<p role="status">Previous Action Plan proposal — goal, evidence or planning inputs changed. Preserved for reference; prepare the current context explicitly.</p>}
   {!draft&&raw&&<p role="status">The saved bundle preparation cannot be verified with current evidence. Its record is kept.</p>}
-  {!current&&<button className={button} disabled={disabled} onClick={()=>void prepare('explicit')}>Prepare combined solutions</button>}
-  {draft&&<><p className="font-medium">Proposed coordinated plans — review before acting</p><p className="text-xs">Components share one budget, staffing flow and dependency review. References do not establish causes or combined effectiveness. No operational actions are taken.</p>
+  {!current&&<button className={button} disabled={disabled} onClick={()=>void prepare('explicit')}>Prepare Action Plans</button>}
+  {draft&&<><p className="font-medium">Proposed Action Plans — review before acting</p><p className="text-xs">Components share one budget, staffing flow and dependency review. References do not establish causes or combined effectiveness. No operational actions are taken.</p>
    <HomeBundlePlans key={actionBindingKey(draft.binding)} proposal={draft.proposal} binding={draft.binding} contextCurrent={!stale} disabled={disabled||stale} isCurrent={()=>!!current&&currentCheck(identity)} cache={bundleCache} onDiscuss={onDiscuss}/>
    <details><summary className="min-h-11 cursor-pointer py-2">Preparation details</summary>{draft.proposal.question&&<p>{draft.proposal.question}</p>}<p>One preparation response. Input tokens: {draft.usage.inputTokens??'Unavailable'}. Output tokens: {draft.usage.outputTokens??'Unavailable'}. Latency: {draft.usage.latencyMs===null?'Unavailable':`${draft.usage.latencyMs} ms`}. Reopening, editing and calculating do not call the model.</p></details>
   </>}
