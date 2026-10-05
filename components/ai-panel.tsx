@@ -28,6 +28,7 @@ type AiPanelProps = {
   goalTakeaway?:ReactNode;
   goalViewKey?:string;
   hasGoal?:boolean;
+  goalStatement?:string;
   readOnlyReason?: string;
   aiCollapsed: boolean;
   aiExpanded: boolean;
@@ -50,7 +51,7 @@ type AiPanelProps = {
 };
 
 export function AiPanel({
-  goalTakeaway,goalViewKey="",hasGoal=false,
+  goalTakeaway,goalViewKey="",hasGoal=false,goalStatement="",
   readOnlyReason,
   aiCollapsed,
   aiExpanded,
@@ -96,6 +97,7 @@ export function AiPanel({
 
   const resizeHelpId = useId();
   const detailsId = useId();
+  const goalHelpId = useId();
   const minimumAiWidth = 280;
   const maximumAiWidth = Math.max(
     minimumAiWidth,
@@ -207,6 +209,10 @@ export function AiPanel({
           </div>
         ) : (
           <div className="flex min-h-0 flex-1 flex-col">
+            <div id={goalHelpId} className="mb-3 space-y-1 text-sm leading-5 text-muted-foreground">
+              <p>{readOnlyReason ? "AI analysis is not available on this page." : goalStatement ? "Ask a question about this topic. Responses will use your selected goal as context." : "Select a goal to give your questions context."}</p>
+              <p className="break-words text-foreground">Goal: {goalStatement || "General exploration"}</p>
+            </div>
             {previewPage && !readOnlyReason && (
               <div className="mb-3 rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
                 This page does not yet support AI analysis.
@@ -217,7 +223,7 @@ export function AiPanel({
             {!dashboardReady&&!hasGoal&&<p role="status" className="mb-2 text-sm text-muted-foreground">{readOnlyReason?"AI analysis is not available on this page.":"Page evidence is loading or unavailable."}</p>}
             <div key={goalViewKey} aria-label="AI conversation" className="mb-3 min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain pr-2">
               <GoalConversationMessages messages={chatMessages} viewKey={goalViewKey} hasGoal={hasGoal} hideHistory/>
-              {!chatMessages.length&&!hasGoal&&!readOnlyReason&&<p className="text-base text-muted-foreground">{readOnlyReason?"Your session conversation stays available here.":dashboardReady?"Ask a question about this page.":"You can keep drafting while page evidence loads."}</p>}
+              {!chatMessages.length&&!hasGoal&&!readOnlyReason&&!dashboardReady&&<p className="text-base text-muted-foreground">You can keep drafting while page evidence loads.</p>}
 
               {chatLoading && (
                 <div className="flex items-center gap-2 py-2 text-[17px] text-muted-foreground">
@@ -261,6 +267,7 @@ export function AiPanel({
                 disabled={previewPage}
                 rows={5}
                 aria-label="Ask People Analytics AI"
+                aria-describedby={goalHelpId}
                 className="h-36 min-h-32 max-h-64 min-w-0 flex-1 resize-y rounded-lg border bg-background p-3.5 text-[17px] leading-relaxed outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
               />
 

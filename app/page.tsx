@@ -7,7 +7,7 @@ import {WorkforceOptionActions} from "@/lib/workforce-option-actions";
 import {WorkforceSolutionPanel} from "@/components/workforce-solution-panel";
 import {evidenceTrustLabel} from "@/lib/evidence-trust";
 import {DecisionBrief} from "@/components/decision-brief";
-import {recordDecisionEvidence} from "@/components/decision-store";
+import {decisionStore,recordDecisionEvidence} from "@/components/decision-store";
 import { intelligenceEvidence, isIntelligencePage } from "@/lib/intelligence-chat";
 import { developmentCatalog } from "@/lib/development-costs";
 import {
@@ -1600,8 +1600,17 @@ export default function Home() {
   },[homeEvidencePacket,conversation.workspaceKey,conversation.focusedIssue,activePage]);
   const summaryEvidenceReady = intelligencePage ? activePage!=="occupational-references"||(!skillsLoading&&Boolean(skillsData)) : chatEvidenceReady;
   const goalSummaryPayload = {...JSON.parse(chatEvidenceKey),goalEvidenceContext:relatedGoalEvidence,marketReference:marketCarry};
-  const currentChatEvidenceKey = useRef(chatEvidenceKey);
-  useLayoutEffect(() => { currentChatEvidenceKey.current = chatEvidenceKey; }, [chatEvidenceKey]);
+  // This client-only key tracks request validity; it adds nothing to model inputs.
+  const sectionRequestContextKey = JSON.stringify([chatEvidenceKey, relatedGoalEvidence, marketCarry, conversation.focusedIssue, chatEvidenceReady]);
+  const currentChatEvidenceKey = useRef(sectionRequestContextKey);
+  const sectionSending = useRef<symbol | null>(null);
+  useLayoutEffect(() => {
+    if (currentChatEvidenceKey.current !== sectionRequestContextKey) {
+      currentChatEvidenceKey.current = sectionRequestContextKey;
+      sectionSending.current = null;
+      if (activePage !== "home") conversation.cancelPending();
+    }
+  }, [sectionRequestContextKey, activePage, conversation]);
 
   const sendChatMessage = async (
     suggestedMessage?: string
@@ -1609,6 +1618,14 @@ export default function Home() {
     const message = (
       suggestedMessage ?? chatInput
     ).trim();
+    const currentContext = () => {
+      const goals = decisionStore.getSnapshot().data.goals;
+      return currentChatEvidenceKey.current === sectionRequestContextKey &&
+        goals.activeId === conversation.activeGoalId &&
+        (goals.goals.find(goal => goal.id === goals.activeId)?.statement ?? "") === conversation.focusedIssue;
+    };
+    if (!message || !chatEvidenceReady || chatLoading || sectionSending.current ||
+      readOnlyChatPage || !conversation.storageReady || conversation.issueEditor || !currentContext()) return;
 
     if (/^(?:please\s+|can you\s+)?(?:export|download)\b/i.test(message)) {
       const roster = /\b(names?|roster|employees? list|list of employees)\b/i.test(message);
@@ -1619,19 +1636,13 @@ export default function Home() {
       return;
     }
 
-    if (
-      !message ||
-      !chatEvidenceReady ||
-      chatLoading
-    ) {
-      return;
-    }
-
     const userMessage: ChatMessage = {
       role: "user",
       content: message,
     };
 
+    const sending = Symbol();
+    sectionSending.current = sending;
     const request = conversation.beginRequest();
     recordDecisionEvidence(conversation.activeGoalId,activePage,JSON.parse(chatEvidenceKey));
     const modelContextKey = chatEvidenceKey;
@@ -1673,7 +1684,7 @@ export default function Home() {
         );
       }
 
-      if (!request.current() || (intelligencePage && currentChatEvidenceKey.current !== modelContextKey)) return;
+      if (!request.current() || !currentContext()) return;
       setChatMessages((current) => [
         ...current,
         {
@@ -1686,15 +1697,16 @@ export default function Home() {
       modelHistoryRef.current = completeScopedChatTurn(modelContextKey, modelHistory, message, payload.answer ?? "No response returned.");
       conversation.rememberQuestion(modelContextKey, message); conversation.setQuestionUnanswered(false);
     } catch (error) {
-      if (!request.current()) return;
+      if (!request.current() || !currentContext()) return;
       console.error(error);
-      setChatInput(message);
+      setChatInput(current => current.trim() ? current : message);
       setChatError(
         error instanceof Error
           ? error.message
           : "AI request failed."
       );
     } finally {
+      if (sectionSending.current === sending) sectionSending.current = null;
       if (request.current()) setChatLoading(false);
     }
   };
@@ -2070,6 +2082,7 @@ export default function Home() {
         {activePage !== "home" && activePage!=="decision-brief" && activePage!=="assess-evaluate" && <AiPanel
           goalViewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,activePage,selectedPersona,selectedBusinessContext])}
           hasGoal={Boolean(conversation.focusedIssue)}
+          goalStatement={conversation.focusedIssue}
           goalTakeaway={<GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:JSON.stringify(selectedBusinessContext)}} payload={goalSummaryPayload} active={true} ready={summaryEvidenceReady} paused={chatLoading||Boolean(chatInput.trim())||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} unavailable={activePage==="compensation"?"Compensation evidence is not available yet. Use the supported Workforce or Planning evidence for this goal.":undefined} onNavigate={setActivePage}/>}
           readOnlyReason={readOnlyReason}
           aiCollapsed={aiCollapsed}
