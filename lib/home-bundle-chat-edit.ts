@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {whatIfScope} from './home-plan-what-if.ts';
 // Local, bounded text edits. No model call, calculation, persistence or inferred values.
 // @ts-expect-error Native Node tests share TypeScript source.
 import {bundleInputKey,readBundleDraft,reviseBundleDraft,unknownAssumption,type Assumption,type BundleDraft,type BundleInputs} from './home-bundle-reconciliation.ts';
@@ -8,7 +10,7 @@ import {planDate} from './workforce-increment.ts';
 
 export type BundleEditChange={field:string;before:Assumption<string|number>;after:Assumption<string|number>};
 export type BundleEditPreview={inputKey:string;request:string;changes:BundleEditChange[];inputs:BundleInputs};
-type Target={key:string;label:string;type:'text'|'money'|'count'|'months'|'month'|'date';read:()=>Assumption<string|number>;write:(value:Assumption<string|number>)=>void};
+type Target={key:string;label:string;type:'text'|'money'|'percent'|'count'|'months'|'month'|'date';read:()=>Assumption<string|number>;write:(value:Assumption<string|number>)=>void};
 const normalize=(value:string)=>value.trim().toLowerCase().replace(/\s+/g,' ');
 function fail(message:string):never{throw Error(message)}
 function targets(input:BundleInputs,draft:BundleDraft){
@@ -19,6 +21,9 @@ function targets(input:BundleInputs,draft:BundleDraft){
    if(input.capacity&&(key==='startMonth'||key==='months')){const field=key==='startMonth'?'planningMonth':'months';input.capacity.input[field]=value.value===null?'':String(value.value);input.capacity.origins[field]={kind:value.kind,basis:value.basis};}
   }},[...aliases]);
  }
+ if(input.whatIf){const scenario=input.whatIf;for(const [key,label,type,aliases] of (scenario.kind==='turnover'?[
+  ['baseline','Baseline turnover','percent',['baseline turnover rate','baseline rate']],['target','Target turnover','percent',['target turnover rate','turnover target','success target']],['population','Average workforce','count',['outcome population','denominator']],
+ ]:[['baseline','Baseline additional roles','count',['baseline coverage']],['target','Target additional roles','count',['additional roles','capacity target','success target']],['unitCost','Monthly cost per role','money',['monthly role cost','role monthly cost']]]) as [keyof Pick<typeof scenario,'baseline'|'target'|'population'|'unitCost'>,string,Target['type'],string[]][]){add({key:'whatIf.'+key,label,type,read:()=>scenario[key],write:value=>{scenario[key]=value as Assumption<number>;}},aliases);}}
  for(const group of input.groups)add({key:'group.'+group.id,label:group.id==='pilot-group'&&draft.pilot&&input.groups.length===1?'Pilot participants':group.label+' participants',type:'count',read:()=>group.count,write:value=>{group.count=value as Assumption<number>;}},[group.label+' participants',group.id+' participants',...(input.groups.length===1?['participants','pilot participants']:[])]);
  for(const expense of input.expenses){
   const pilot=pilotAllowances[expense.id.slice(6) as keyof typeof pilotAllowances],label=pilot?.label??expense.label;
@@ -35,9 +40,10 @@ function everydayClause(raw:string,available:Map<string,Target[]>,draft:BundleDr
  const clause=raw.trim().replace(/[.?]$/,'').replace(/^(?:please\s+|(?:can|could|would)\s+(?:you|we)\s+|i(?:’|')?d like to\s+)/i,'');
  if(/\b(?:not|never|don[’']?t|do not|avoid|except|unless|instead|rather than)\b/i.test(clause))fail('Which change should I make? Restate the desired value without a negation or exception; no changes have been proposed.');
  if(/\b(?:plan\s*#?\s*\d+|(?:both|all|other|another|each)\s+plans?)\b/i.test(clause))fail('Which plan should I edit? Select that Plan tab, then describe its changes without referring to other plans.');
- let match=clause.match(/^(?:set|change|update)\s+(.+?)\s+to\s+(.+)$/i);
+ let match=clause.match(/^(?:set|change|update|lower|raise|increase|decrease|reduce)\s+(.+?)\s+to\s+(.+)$/i);
+ if(!match)match=clause.match(/^assume\s+(.+?)\s+(?:is|equals|of)\s+(.+)$/i);
  if(match&&available.has(normalize(match[1]))&&!/^(?:(?:total|overall|plan)\s+)?budget(?:\s+(?:ceiling|limit))?$/i.test(match[1]))return {name:match[1],value:match[2]};
- if(/\bbudget(?=\b|\d)/i.test(clause))fail('Does this budget mean a total plan ceiling or an amount for a specific expense? Use Review plan fields for a total ceiling. For an expense, name the allowance and its amount in USD, using its displayed cost basis. No budget has been changed.');
+ if(/\bbudget(?=\b|\d)/i.test(clause))fail('Is this a total spending limit or a specific allowance? Name the allowance and its USD amount; a total limit is not a cost estimate. Nothing has changed.');
  if(match)return {name:match[1],value:match[2]};
  match=clause.match(/^(?:start(?:\s+(?:it|the plan))?\s+in|move\s+(?:the\s+)?start\s+to)\s+(.+)$/i);
  if(match)return {name:'Shared start month',value:match[1]};
@@ -48,17 +54,17 @@ function everydayClause(raw:string,available:Map<string,Target[]>,draft:BundleDr
   if(!match[2]&&draft.inputs.groups.length!==1)fail(draft.inputs.groups.length?'Which participant group should use this count? Choose '+draft.inputs.groups.map(group=>`“${group.label}”`).join(' or ')+'. Say “use 20 participants for [group]”.':'Which participant group should this count describe? Add a group in Review plan fields first.');
   return {name:match[2]?match[2]+' participants':'participants',value:match[1]};
  }
- fail('Which assumption should change? Try “start in December 2026”, “make it three months”, or “use 20 participants”. For another existing assumption, say “change [name] to [value]”, or use Attach Action Plan → Review plan fields.');
+ fail('Which assumption should change? Try “start in December 2026”, “make it three months”, or “use 20 participants”. For a scenario, say “set target turnover to 12%” or “set target additional roles to 3”. Which displayed assumption should change?');
 }
 function parseValue(raw:string,target:Target):Assumption<string|number>{
  if(/^unknown$/i.test(raw))return unknownAssumption();
  let value:string|number=raw,kind:'user-entered'|'illustrative'='user-entered';
  if(/^illustrative\s+/i.test(raw)){kind='illustrative';raw=raw.replace(/^illustrative\s+/i,'');value=raw;}
- if(target.type==='count'||target.type==='months'||target.type==='money'){
-  let cleaned=raw.replace(target.type==='money'?/^(?:\$|USD\s+)/i:/^$/,'').replace(target.type==='months'?/\s+months?$/i:target.type==='count'?/\s+(?:people|participants)$/i:/\s+USD$/i,'');
+ if(target.type==='count'||target.type==='months'||target.type==='money'||target.type==='percent'){
+  let cleaned=(target.type==='percent'?raw.replace(/\s*(?:%|percent)$/i,''):raw).replace(target.type==='money'?/^(?:\$|USD\s+)/i:/^$/,'').replace(target.type==='months'?/\s+months?$/i:target.type==='count'?/\s+(?:people|participants)$/i:/\s+USD$/i,'');
   const word=numberWords.indexOf(cleaned.toLowerCase());if(word>=0)cleaned=String(word);
   if(!/^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d{1,2})?$/.test(cleaned))fail(`Use an explicit ${target.type==='money'?'USD amount':'whole count'} for ${target.label}, or Unknown.`);
-  value=Number(cleaned.replaceAll(',',''));if(target.type!=='money'&&!Number.isInteger(value))fail(`${target.label} needs a whole count.`);
+  value=Number(cleaned.replaceAll(',',''));if(target.type!=='money'&&target.type!=='percent'&&!Number.isInteger(value))fail(`${target.label} needs a whole count.`);
  }else if(target.type==='month'){const named=raw.match(/^([A-Za-z]+)\s+(\d{4})$/),month=named?monthNames.findIndex(name=>name===named[1].toLowerCase()||name.slice(0,3)===named[1].toLowerCase()):-1;if(named&&month>=0){raw=`${named[2]}-${String(month+1).padStart(2,'0')}`;value=raw;}if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(raw)||!planDate(raw+'-01'))fail(`Which month and year should ${target.label} use? Say December 2026 or 2026-12, or Unknown.`);}
  else if(target.type==='date'){if(!planDate(raw))fail(`Use YYYY-MM-DD for ${target.label}, or Unknown.`);}
  return {value,kind,basis:kind==='illustrative'?'Explicit illustrative assumption accepted from a reviewed text edit; not evidence.':'Explicit user assumption accepted from a reviewed text edit; not independently verified.'};
@@ -71,9 +77,10 @@ export function previewBundleChatEdit(draft:BundleDraft,request:string):BundleEd
  if(!clauses.length||clauses.length>6)fail('Use up to six changes, separated by semicolons.');
  const inputs=structuredClone(draft.inputs),available=targets(inputs,draft),changes:BundleEditChange[]=[],seen=new Set<string>();
  for(const clause of clauses){
+  if(/^use this period for the what-if[.!]?$/i.test(clause)&&inputs.whatIf){const before={value:inputs.whatIf.scopeKey,kind:'user-entered' as const,basis:'Previous what-if scope'},after={value:whatIfScope(inputs),kind:'user-entered' as const,basis:'Explicitly reviewed population and period; rates or roles remain assumptions.'};if(before.value!==after.value){changes.push({field:'What-if population and period',before,after});inputs.whatIf.scopeKey=after.value;}continue;}
   const parsed=everydayClause(clause,available,draft),matches=available.get(normalize(parsed.name));
-  if(!matches?.length)fail(`“${parsed.name}” is not a supported exact assumption name. A budget ceiling is not an expense, and a deadline is not a readiness date. Use the form for staffing, budget limits or plan wording.`);
-  if(matches.length!==1)fail(`“${parsed.name}” matches more than one assumption. Use its unique field name from the form.`);
+  if(!matches?.length)fail(`“${parsed.name}” is not a supported exact assumption name. Which displayed assumption and value do you mean? A spending limit is not an expense; a deadline is not a readiness date. Nothing has changed.`);
+  if(matches.length!==1)fail(`“${parsed.name}” matches more than one assumption. Which displayed assumption do you mean? Name its specific label.`);
   const target=matches[0];if(seen.has(target.key))fail(`Review one value for ${target.label} in each request.`);seen.add(target.key);
   const before=structuredClone(target.read()),after=parseValue(parsed.value,target);
   if(before.value===after.value&&(before.kind===after.kind||after.value===null))continue;

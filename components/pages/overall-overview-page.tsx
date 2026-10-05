@@ -203,7 +203,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
     if(!active||sending.current||currentEvidenceKey.current!==contextKey)return;
-    const localEdit=/^(?:(?:please|can you|could you|could we|would you|i[’']?d like to)\s+)?(?:set|change|update|start|move|make|run|use|budget|add|remove)\b/i.test(message);
+    const localEdit=/^(?:(?:please|can you|could you|could we|would you|i[’']?d like to)\s+)?(?:set|change|update|assume|lower|raise|increase|decrease|reduce|start|move|make|run|use|budget|add|remove)\b/i.test(message);
     if(!actionPlan&&!preserveDraft&&selectedPlanForChat.current?.goalId===conversation.activeGoalId&&localEdit){
       if(chatLoading||!conversation.saved||!ready)return;
       const target=selectedPlanForChat.current;setPlanEdit(target);

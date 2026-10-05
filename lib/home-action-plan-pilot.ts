@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {initialWhatIf,normalizeWhatIfQuantities} from './home-plan-what-if.ts';
 // Deterministic local DEMO assumptions. Never a quote, staffing forecast or model input.
 // @ts-expect-error Native Node tests share TypeScript source.
 import {readBundleDraft,reviseBundleDraft,unknownAssumption,type Assumption,type BundleDraft} from './home-bundle-reconciliation.ts';
@@ -18,7 +20,7 @@ export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string):Bu
  const demo=<T>(value:T):Assumption<T>=>({value,kind:'illustrative',basis});
  const input=structuredClone(draft.inputs);
  if(input.scope.startMonth.value===null)input.scope.startMonth=demo(calendar.startMonth);
- if(input.scope.months.value===null)input.scope.months=demo(3);
+ if(input.scope.months.value===null){const stated=normalizeWhatIfQuantities(draft.binding.goal).match(/\b(?:over|within|for|in)\s+(\d+)\s*[- ]?months?\b/i),months=stated?Number(stated[1]):null;input.scope.months=months&&months<=24?{value:months,kind:'user-entered',basis:'Explicit planning horizon in the pinned goal; not an observed result.'}:demo(3);}
  if(input.scope.population.value===null)input.scope.population=demo('Hypothetical shared pilot group — not selected employees');
  // Existing exact-draft assumptions always win. No adoption from a different option/goal.
  const start=Date.parse(input.scope.startMonth.value+'-01T00:00:00Z'),finishById=new Map<string,number>();
@@ -42,6 +44,7 @@ export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string):Bu
   input.expenseLinks.push({expenseId:id,componentIds:ids,allocations:null});
  }
  input.dependenciesConfirmed=unknownAssumption();input.groupsDisjoint=unknownAssumption();input.costsDistinct=unknownAssumption();input.scope.comparisonConfirmed=unknownAssumption();input.costReviews=input.costReviews.map(item=>({...item,complete:unknownAssumption()}));
+ const scenario=initialWhatIf(draft.binding.goal,input);if(scenario&&!input.whatIf)input.whatIf=scenario;
  const next=reviseBundleDraft(draft,input);next.pilot={version:pilotVersion,preparedAt:calendar.preparedAt,timezone:'UTC'};
  if(!readBundleDraft(next))throw Error('Illustrative pilot could not be validated.');return next;
 }

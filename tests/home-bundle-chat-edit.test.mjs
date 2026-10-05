@@ -62,8 +62,8 @@ test('everyday start, duration and participant phrases produce the same reviewed
 });
 test('vague and total budgets ask for clarification without converting a ceiling into an expense',()=>{
  const draft=base(),before=structuredClone(draft);
- for(const phrase of ['budget20k','budget 20k','make the budget $20,000','Set budget to 20000','use 20 participants; budget20k','change total budget ceiling to 20000','use $20000 for the total budget'])assert.throws(()=>previewBundleChatEdit(draft,phrase),/total plan ceiling or an amount for a specific expense/);
- const inputs=structuredClone(draft.inputs);inputs.expenses.push({...structuredClone(inputs.expenses[0]),id:'custom-budget',label:'Budget'});const named=reviseBundleDraft(draft,inputs);assert.throws(()=>previewBundleChatEdit(named,'Set budget to 20000'),/total plan ceiling/);
+ for(const phrase of ['budget20k','budget 20k','make the budget $20,000','Set budget to 20000','use 20 participants; budget20k','change total budget ceiling to 20000','use $20000 for the total budget'])assert.throws(()=>previewBundleChatEdit(draft,phrase),/total spending limit or a specific allowance/);
+ const inputs=structuredClone(draft.inputs);inputs.expenses.push({...structuredClone(inputs.expenses[0]),id:'custom-budget',label:'Budget'});const named=reviseBundleDraft(draft,inputs);assert.throws(()=>previewBundleChatEdit(named,'Set budget to 20000'),/total spending limit/);
  assert.deepEqual(draft,before);
 });
 test('negation, exceptions, approximate values and multi-plan requests never create partial edits',()=>{
