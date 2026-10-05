@@ -61,5 +61,5 @@ test('only repeated identical edges normalize; original proposal is not mutated'
 test('objective text reaches normalized proposal verbatim; over-bound text rejects instead of clipping',()=>{
  const p=fixture();p.bundles[0].objective='Review '+ 'x'.repeat(153);assert.equal(p.bundles[0].objective.length,160);assert.equal(inspectHomeBundleOutput(JSON.stringify(p),goal,pack).proposal.bundles[0].objective,p.bundles[0].objective);
  p.bundles[0].objective+='x';assert.equal(inspectHomeBundleOutput(JSON.stringify(p),goal,pack).diagnostic,'schema_rejected');
- p.bundles[0].objective='Coordinate a manager-support pilot without treating them';assert.equal(inspectHomeBundleOutput(JSON.stringify(p),goal,pack).proposal.bundles[0].objective,p.bundles[0].objective);
+ p.bundles[0].objective='Examine whether manager experience and workload context should be investigated together as potential areas of employee-experience concern, without treating them';assert.equal(p.bundles[0].objective.length,160);assert.equal(inspectHomeBundleOutput(JSON.stringify(p),goal,pack).proposal.bundles[0].objective,p.bundles[0].objective);
 });
