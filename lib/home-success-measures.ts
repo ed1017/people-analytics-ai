@@ -25,6 +25,6 @@ export const measurementScope=(inputs:BundleInputs)=>JSON.stringify([inputs.scop
 export function successMeasureText(measure:SuccessMeasure|undefined,current=true):string{
  if(measure&&!current)return 'Saved measure needs renewed review: the plan population or horizon changed. Review it in Scope.';
  if(!measure)return 'Not yet reviewed. Review a suggested measure and baseline in Attach Action Plan → Review plan fields → Scope.';
- const display=(value:Assumption<string>,target=false)=>value.value===null?(target?'Target: Unknown':'Baseline: Unknown'):`${value.kind==='adopted'?'Recorded baseline':value.kind==='illustrative'?(target?'Illustrative target':'Illustrative baseline'):target?'User target':'User-entered baseline'}: ${value.value}`;
+ const display=(value:Assumption<string>,target=false)=>value.value===null?(target?'Target: Unknown':'Baseline: Unknown'):`${value.kind==='adopted'?'Recorded baseline':value.kind==='illustrative'?(target?'Assumed target':'Assumed baseline'):target?'User target':'User-entered baseline'}: ${value.value}`;
  return `${measure.name}. ${display(measure.baseline)}; ${display(measure.target,true)}. Targets are not predicted effects.`;
 }

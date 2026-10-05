@@ -13,7 +13,7 @@ export function HomeAssumptionsFallback({chatChange,goalId,goal,binding,pack,pla
  return <section aria-label="Assumptions-only planning" className="space-y-3 rounded border p-3">
   <h3 ref={heading} tabIndex={-1} className="font-semibold">Assumptions-only proposal</h3>
   <p>This local starting template does not use evidence to recommend a priority or claim an effect. Review every assumption before attaching or calculating; no model request runs here.</p>
-  <p role="status">{missing.length?'Unavailable sources: '+missing.join(', '):'Sources have changed since this draft was prepared.'} Missing metrics remain unavailable unless explicitly entered or labeled illustrative.</p>
+  <p role="status">{missing.length?'Unavailable sources: '+missing.join(', '):'Sources have changed since this draft was prepared.'} Missing metrics remain unavailable unless explicitly entered or labeled assumed.</p>
   {saved&&<p className="text-xs">Unavailable when prepared: {saved.missingSources.join(', ')}. Source recovery never upgrades these assumptions into facts.</p>}
   {saved&&!current&&<p role="status">Previous assumptions-only draft — context changed. Kept for reference; review and prepare the current context explicitly.</p>}
   {raw&&!saved&&<p role="alert">The saved local proposal cannot be verified. Its record is kept.</p>}
