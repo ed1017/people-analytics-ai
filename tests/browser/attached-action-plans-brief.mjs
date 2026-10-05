@@ -1,0 +1,40 @@
+// Built Decision Brief with validated synthetic attachment history; no live services.
+import assert from 'node:assert/strict';
+import {bundleProposalFixture} from '../fixtures/home-bundles.mjs';
+import {createBundleDraft,reviseBundleDraft,bundleInputKey} from '../../lib/home-bundle-reconciliation.ts';
+import {attachBundlePatch,saveBundleDraftPatch} from '../../lib/home-bundle-records.ts';
+import {actionBindingKey} from '../../lib/home-action-drafts.ts';
+import {encodeDecisions,DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
+import {emptyDecisionBrief} from '../../lib/decision-brief.ts';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright'),base=process.env.HOME_BASE_URL??'http://127.0.0.1:3145';
+const binding={version:1,goalId:'a',goal:'Reduce turnover',evidenceDigest:'a'.repeat(64),planningDigest:'b'.repeat(64)};
+const empty=createBundleDraft(bundleProposalFixture(binding.goal).bundles[0],binding);
+const entered=value=>({value,kind:'user-entered',basis:'Synthetic reviewer assumption'});
+const initial=structuredClone(empty.inputs);initial.scope.population=entered('Pilot population');initial.scope.startMonth=entered('2026-11');initial.scope.months=entered(6);
+const first=reviseBundleDraft(empty,initial);
+const confirm=draft=>({confirmed:true,bindingKey:actionBindingKey(draft.binding),inputKey:bundleInputKey(draft),acknowledgeUnknowns:true});
+let workspace=attachBundlePatch(undefined,first,confirm(first),'v1','2026-10-05T00:00:00.000Z').value;
+const inputs=structuredClone(first.inputs);inputs.scope.population={value:'Reviewed pilot population',kind:'user-entered',basis:'Reviewer input'};
+const second=reviseBundleDraft(first,inputs);workspace=attachBundlePatch(workspace,second,confirm(second),'v2','2026-10-05T01:00:00.000Z','v1').value;
+workspace=saveBundleDraftPatch(workspace,second).value;
+const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});let checks=0;
+const check=(name,value)=>{assert.ok(value,name);checks++;console.log('PASS '+name)};
+try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['zoom',683,450]]){
+ const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),errors=[];let posts=0;page.on('pageerror',e=>errors.push(e.message));
+ await page.route('**/*',route=>{const req=route.request(),url=new URL(req.url());if(url.origin!==base)return route.abort();if(url.pathname.startsWith('/api/')){if(req.method()!=='GET'){posts++;return route.abort()}return route.fulfill({json:{as_of:'2026-09-30',overview:{headcount:100,fte:100,open_positions:3},summary:{current_workforce:100}}})}return route.continue()});
+ const seed={version:1,revision:1,goals:{version:1,activeId:'a',goals:[{id:'a',statement:'Reduce turnover with a revised scope'},{id:'b',statement:'Other goal'}]},workspaces:{a:{savedAt:'2026-10-05T00:00:00Z',fields:{homeSolutionBundlesV1:workspace,brief:{...emptyDecisionBrief(),owner:'Keep owner',approvals:[{text:'A separate review note',recordedAt:'2026-10-05T00:00:00Z'}]}}}}};
+ const open=async()=>{const nav=page.getByRole('navigation',{name:'Workforce navigation'}),link=nav.getByRole('button',{name:'Planning — Decision brief',exact:true});if(!await link.isVisible())await nav.getByRole('button',{name:/^Planning —/}).click();await link.click();await page.getByRole('region',{name:'Attached Action Plans',exact:true}).waitFor()};
+ const panel=()=>page.getByRole('region',{name:'Attached Action Plans',exact:true});
+ const load=async value=>{await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:DECISIONS_STORAGE_KEY,value:encodeDecisions(value)});await page.reload();await open()};
+ await page.goto(base);await load(seed);
+ check(mode+' latest snapshot is visible and prior version collapsed',await panel().getByRole('article').filter({visible:true}).count()===1&&await panel().getByText('Attached 2026-10-05 · Latest attached version',{exact:true}).isVisible());
+ check(mode+' changed goal is historical and missing totals remain unknown',await panel().getByText('Goal wording has changed since this attachment.',{exact:true}).first().isVisible()&&await panel().getByText(/Snapshot cash: Unknown. Employee time value: Unknown/).first().isVisible());
+ await panel().getByText('Previous attached versions',{exact:true}).click();check(mode+' prior immutable version can be inspected',await panel().getByRole('article').filter({visible:true}).count()===2&&await panel().getByText('Attached 2026-10-05 · Previous attached version',{exact:true}).isVisible());
+ check(mode+' decision owner and explicit notes preserved',await page.getByLabel(/^Decision owner \(optional\)/).inputValue()==='Keep owner'&&await page.getByRole('region',{name:'Explicit approvals'}).getByText(/A separate review note/).isVisible());
+ check(mode+' responsive snapshot and history fit page',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ const bad=structuredClone(seed);bad.workspaces.a.fields.homeSolutionBundlesV1.attachments[1].result.cashTotal=123;
+ await load(bad);check(mode+' corrupt result withheld and saved bytes retained',await panel().getByRole('status').getByText(/cannot be verified/).isVisible()&&await panel().getByRole('article').count()===0&&await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload.workspaces.a.fields.homeSolutionBundlesV1.attachments[1].result.cashTotal,DECISIONS_STORAGE_KEY)===123);
+ const wrong=structuredClone(seed);wrong.workspaces.a.fields.homeSolutionBundlesV1.goalId='b';await load(wrong);check(mode+' cross-goal records are withheld',await panel().getByRole('status').isVisible()&&await panel().getByRole('article').count()===0);
+ check(mode+' no model calls or runtime errors',posts===0&&errors.length===0);await context.close();
+}}finally{await browser.close()}
+console.log(JSON.stringify({checks}));
