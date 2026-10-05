@@ -467,3 +467,37 @@
   .global-workforce-filters > div { flex-wrap: wrap; }
   .global-workforce-filters > div > div:first-child { flex-basis: 100%; }
 }
+
+/* Named, source-selectable palettes. Roll back by setting data-workspace-palette
+   to original-navy-teal on the app main; no user settings or global recolor. */
+[data-workspace-palette="original-navy-teal"] {
+  --workspace-panel: #13223A;
+  --workspace-send: #A5C5EE;
+  --workspace-home-send: #82D9C7;
+  --workspace-send-text: #0B1426;
+  --workspace-action-edge: transparent;
+}
+[data-workspace-palette="slate-blue"] {
+  --workspace-panel: #243B5A;
+  --workspace-send: #3979D5;
+  --workspace-home-send: #3979D5;
+  --workspace-send-text: #000000;
+  --workspace-action-edge: #A5C5EE;
+}
+[data-workspace-palette] :is(.global-workforce-filters, .home-composer-dock, .app-ai-panel) {
+  background-color: var(--workspace-panel);
+}
+[data-workspace-palette] .home-workspace button[aria-label="Send overview question"] {
+  background-color: var(--workspace-home-send);
+  color: var(--workspace-send-text);
+  box-shadow: inset 0 0 0 1px var(--workspace-action-edge);
+}
+[data-workspace-palette] .app-ai-panel button[aria-label="Send message"] {
+  background-color: var(--workspace-send);
+  color: var(--workspace-send-text);
+  box-shadow: inset 0 0 0 1px var(--workspace-action-edge);
+}
+[data-workspace-palette="slate-blue"] :is(.global-workforce-filters, .app-ai-panel) :is(button, select, textarea):focus-visible {
+  outline: 3px solid #B7D4FB;
+  outline-offset: 3px;
+}
