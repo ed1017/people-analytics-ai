@@ -1,4 +1,5 @@
 "use client";
+import {preferredSavedBundleId,restoredBundleDraft,restoredBundleResult} from "@/lib/home-pinned-goals";
 import {prepareIllustrativePilot,pilotAllowances} from '@/lib/home-action-plan-pilot';
 import {useRef,useState} from 'react';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
@@ -16,10 +17,15 @@ const money=(value:number|null|undefined)=>value==null?'Unknown':`$${value.toLoc
 export function HomeBundlePlans({proposal,binding,preparedAt,contextCurrent,disabled,isCurrent,cache,onDiscuss}:{preparedAt:string;proposal:BundleProposal;binding:ActionBinding;contextCurrent:boolean;disabled:boolean;isCurrent:()=>boolean;cache:Map<string,BundleSession>;onDiscuss:(request:BundleDiscussion)=>void}){
  const optionNumber=(id:string)=>proposal.bundles.findIndex(bundle=>bundle.id===id)+1;
  const storage=useDecisionStorage(),raw=storage.data.workspaces[binding.goalId]?.fields[bundleWorkspaceField],workspace=readBundleWorkspace(raw,binding.goalId),key=actionBindingKey(binding);
- const [session,setSession]=useState<BundleSession>(()=>cache.get(key)??{drafts:Object.fromEntries(proposal.bundles.map(bundle=>{const saved=workspace?.drafts.filter(item=>actionBindingKey(item.binding)===key&&item.bundle.id===bundle.id).sort((a,b)=>b.revision-a.revision)[0];return [bundle.id,prepareIllustrativePilot(saved??createBundleDraft(bundle,binding),preparedAt)]})),results:Object.fromEntries((workspace?.calculations??[]).filter(item=>actionBindingKey(item.draft.binding)===key).map(item=>[item.draft.bundle.id,item.result]))});
+ const [session,setSession]=useState<BundleSession>(()=>{
+  const cached=cache.get(key);if(cached)return cached;
+  const drafts=Object.fromEntries(proposal.bundles.map(bundle=>[bundle.id,restoredBundleDraft(workspace,binding,bundle.id)??prepareIllustrativePilot(createBundleDraft(bundle,binding),preparedAt)]));
+  const results:Record<string,BundleResult>={};for(const [id,draft] of Object.entries(drafts)){const result=restoredBundleResult(workspace,draft);if(result)results[id]=result;}
+  return {drafts,results};
+ });
  const liveSession=useRef(session);
  const [pendingInput,setPendingInput]=useState(false);
- const [selected,setSelected]=useState(proposal.bundles[0]?.id??'A'),[editor,setEditor]=useState(false),[notice,setNotice]=useState(''),[reviewed,setReviewed]=useState<string|null>(null),[unknowns,setUnknowns]=useState<string|null>(null);
+ const [selected,setSelected]=useState(()=>preferredSavedBundleId(workspace,binding,proposal.bundles.map(bundle=>bundle.id))),[editor,setEditor]=useState(false),[notice,setNotice]=useState(''),[reviewed,setReviewed]=useState<string|null>(null),[unknowns,setUnknowns]=useState<string|null>(null);
  const heading=useRef<HTMLHeadingElement>(null),draft=session.drafts[selected],result=session.results[selected],currentResult=draft&&contextCurrent&&result?.inputKey===bundleInputKey(draft)?result:null;
  function guard(){if(disabled||!contextCurrent||!isCurrent()||!decisionStore.getSnapshot().saved)throw Error('The goal, evidence or saved planning context changed. Your draft is kept; review the current context first.');}
  function remember(next:BundleSession){if(!cache.has(key)&&cache.size>=12)throw Error('This tab already holds twelve bundle contexts. Save your work before opening more.');cache.set(key,next);liveSession.current=next;setSession(next);setNotice('');}

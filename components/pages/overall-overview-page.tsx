@@ -1,4 +1,7 @@
 "use client";
+import {HomePinnedGoals} from "@/components/home-pinned-goals";
+import type {LocalGoal} from "@/lib/local-goals";
+import {HomeGettingStarted} from "@/components/home-getting-started";
 import {readHomeFindingFollowups,buildHomeFindingPrompt,type HomeFindingFollowup} from "@/lib/home-finding-followups";
 import {emptyOptionActions,isOptionActionLabel,type WorkforceOptionActions,type OptionAction} from "@/lib/workforce-option-actions";
 
@@ -81,6 +84,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const [candidate,setCandidate]=useState<{proposal:HomeCandidateProposal;selectionGoal:string;sourceKey:string;context:string;epoch:number;originGoalId:string}|null>(null);
   const [candidateNotice,setCandidateNotice]=useState('');
   const [actionPin,setActionPin]=useState<{id:string;sequence:number}|null>(null);
+  const [planOpen,setPlanOpen]=useState<{goalId:string;goal:string;sequence:number}|null>(null);
   const [preparationUnavailable,setPreparationUnavailable]=useState<{context:string;diagnostic:HomePreparationDiagnostic;stage:'server'|'client'}|null>(null);
   const storedCandidate=storage.data.workspaces[conversation.activeGoalId]?.fields.homeCandidateOptions;
   const selectionGoal=candidateSelectionGoal(storedCandidate)??conversation.focusedIssue;
@@ -291,8 +295,18 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     if(!active || pendingScope.identity!==scopeIdentity || pendingScope.query!==workforceQuery || input.trim()!==pendingScope.message) finishScopeRequest(pendingScope,true);
     else if(ready) finishScopeRequest(pendingScope,false);
   },[pendingScope,active,scopeIdentity,workforceQuery,input,ready]);
+  function openPinnedGoal(goal:LocalGoal){
+    const current=decisionStore.getSnapshot();
+    if(!active||!conversation.storageReady||!current.saved||conversation.issueEditor||current.data.goals.goals.find(item=>item.id===goal.id)?.statement!==goal.statement)return;
+    // Selecting a saved goal is not a new Pin event and never prepares another response.
+    setActionPin(previous=>previous?{...previous,id:""}:null);
+    conversation.selectGoal(goal.id);
+    if(decisionStore.getSnapshot().data.goals.activeId!==goal.id)return;
+    setPlanOpen(previous=>({goalId:goal.id,goal:goal.statement,sequence:(previous?.sequence??0)+1}));
+  }
   const startingGuide=(
-    <section aria-label="Starting guide" data-testid="overview-starting-guide" className="pt-0 pb-1">
+    <section aria-label="Starting guide" data-testid="overview-starting-guide" className="space-y-3 pt-0 pb-1">
+      <HomeGettingStarted busy={chatLoading} onNavigate={onNavigate} onStartDemo={() => { startNewIssue(DEVELOPMENT_DEMO_GOAL); onStartDemo(); }}/>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <h3 className="text-lg font-semibold">Questions to explore</h3>
         <p className="text-sm text-muted-foreground">Click a question to send it, or write your own.</p>
@@ -311,7 +325,6 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
         <div className="ml-auto flex items-center gap-3 text-xs">
           <span className="text-muted-foreground">In development</span>
           <button type="button" popoverTarget="home-data-details" aria-label="Open data details" title="Data, scope and conversation history" className="flex min-h-11 items-center gap-1 rounded px-2 text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"><Info size={16}/><span>Data details</span></button>
-          <button id="overall-guide-link" type="button" onClick={() => onNavigate("guide-data")} className="rounded-sm font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Guide &amp; Data</button>
 
         </div>
       </header>
@@ -320,7 +333,9 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
         <section aria-label="Conversation history" className="my-4"><h3 className="font-semibold">Conversation history</h3><p className="mt-1 text-xs text-muted-foreground">Reference only. Current findings use current evidence and saved goal context.</p>{messages.length?<ConversationMessages compactAssistant messages={messages} onNavigate={page=>{document.getElementById("home-data-details")?.hidePopover();onNavigate(page);}}/>:<p className="mt-2 text-sm">No conversation yet.</p>}</section>
       {Boolean(marketReference)&&<p className="mt-2 text-xs">An explicitly carried market reference [M1] is also available for this goal. Its selected geography and source period remain separate from workforce filters.</p>}
       <p role="status" className="text-xs text-muted-foreground" aria-label="Home evidence coverage">{pack.coverage.available} of {pack.coverage.total} source summaries available · detail rows are sampled. Open evidence sources for scope and unavailable data.</p>
-        <p className="mt-3 text-xs">Synthetic workforce evidence. Only the workforce snapshot follows shared filters; other company sources remain company-wide. BLS is US national. Quotes are fictional or unverified; comparisons use your assumptions.</p>
+        <p className="mt-3 text-xs">Demo only: company records are synthetic, not real employee data. AI can be wrong; plans are not approvals. Real-world actions happen outside this app.</p>
+        <p className="mt-3 text-xs">Only the workforce snapshot follows shared filters; other company sources remain company-wide. BLS is US national. Quotes are fictional or unverified; comparisons use your assumptions.</p>
+        <p className="mt-3 text-xs">Source creation/import history, survey provenance and scoring thresholds are not fully verified. Comment counts are not sentiment analysis; movement history has gaps. Course coverage is not proven skill improvement, and assessments are not individual predictions. Missing costs and impacts stay unknown.</p>
         <p className="mt-3 text-xs">{pack.coverage.selection}</p><p className="mt-2 text-xs">{pack.coverage.unavailable.join(". ")}</p><div className="mt-4 grid gap-4 md:grid-cols-3">
           {sources?.map(source => <article key={source.id} id={`overview-source-${source.id}`} className="min-w-0 text-sm">
             <h4 className="font-semibold">[{source.id}] {source.label}</h4>
@@ -338,7 +353,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       {active&&<WorkforceSolutionPanel hideEntry optionActions={optionActions} page="home" onNavigate={onNavigate}/>}
     </div>
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
-    <HomeSolutionBundles goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={request=>{if(request.isCurrent())void send(`Help me discuss changes to Action Plan option ${request.option}, “${request.name}”. Ask what I want to adjust; do not change saved assumptions or calculate automatically.`,false,false,true,true);}}/>
+    <HomeSolutionBundles openRequest={planOpen} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={request=>{if(request.isCurrent())void send(`Help me discuss changes to Action Plan option ${request.option}, “${request.name}”. Ask what I want to adjust; do not change saved assumptions or calculate automatically.`,false,false,true,true);}}/>
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!hasAnswer&&!conversation.focusedIssue&&startingGuide}
     {loading && <p role="status" className="text-sm text-muted-foreground">Loading available evidence for your questions.</p>}
@@ -375,34 +390,17 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       {localAction?.goalId===conversation.activeGoalId&&<p role="status" className="mb-3 text-sm">{localAction.notice}</p>}
       <div ref={composerSlot} className="home-composer-slot"><div ref={composerDock} className="home-composer-dock rounded-t-2xl border bg-card p-3 shadow-lg">
       <label htmlFor="overview-question" className="sr-only">Ask Workforce AI</label>
-      <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" value={input} onChange={event => changeQuestion(event.target.value)} rows={2}
+      <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" aria-describedby="overview-question-context-tip" value={input} onChange={event => changeQuestion(event.target.value)} rows={2}
         placeholder="Describe a business issue, and I’ll help you explore the evidence, compare options, and build or adjust a plan." className="max-h-80 min-h-20 w-full resize-y rounded-lg border bg-background/40 p-3 text-lg placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
-      <div className="mt-2 flex items-center justify-end gap-3">
+      <div className="mt-2 flex items-end justify-between gap-3">
+        <p id="overview-question-context-tip" className="min-w-0 text-xs leading-4 text-muted-foreground">Best practice: Add context like your timeline, budget and relevant sources to help shape a more precise goal.</p>
         <button type="submit" aria-label="Send overview question" disabled={(!localCandidate&&!ready) || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
       </div></div>
     </form>
       {actionOffers.length>0&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2 text-sm">Option action suggestions</summary><section aria-label="Workforce option actions" className="mt-3 space-y-2"><p className="text-sm text-muted-foreground">{input.trim()?'Your draft is kept. Clear it to choose an option action.':'Click to open the local action. Saving, calculation and search remain explicit.'}</p><div className="flex flex-wrap gap-2">{actionOffers.map(offer=><button key={offer.id} type="button" disabled={suggestionPending||chatLoading||Boolean(input.trim())} onClick={()=>submitOption(offer.id)} className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{offer.label}</button>)}</div></section></details>}
     {(hasAnswer||conversation.focusedIssue)&&<details key={conversation.workspaceKey} className="text-sm"><summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">More questions</summary>{startingGuide}</details>}
   </section>
-    <aside className="order-3 p-5 text-sm leading-relaxed xl:order-none" aria-label="How to use this app">
-      <details><summary className="min-h-11 cursor-pointer py-2 font-semibold">How this works</summary><h3 className="text-lg font-semibold">From question to plan</h3>
-      <ol className="mt-4 list-decimal space-y-4 pl-4">
-        <li><strong>Start with a question</strong><p>Ask AI to find an issue, or explore <button className="text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce</button> to investigate your own.</p></li>
-        <li><strong>Pin the problem</strong><p>Review the concise problem and choose Pin as goal to prepare coordinated solution bundles in one AI request. Costs, staffing and timing remain Unknown until assumptions are reviewed and calculated.</p></li>
-        <li><strong>Compare options</strong><p>Compare coordinated options, then open Details or Edit assumptions and plan. Calculate combined plan runs local math; Save bundle draft preserves edits. Attach solution to goal saves an explicitly reviewed version, without operational approval. Review assumptions with HR, business leaders and Finance before agreeing on action.</p></li>
-        <li><strong>Assess &amp; Evaluate <span className="font-normal text-muted-foreground">· Coming soon</span></strong><p>Track progress and assess whether the plan worked.</p></li>
-      </ol>
-      <p className="mt-4 text-xs text-muted-foreground">Demo only. Real-world actions happen outside this app.</p>
-      <details className="mt-5"><summary className="cursor-pointer rounded-sm font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring">How it works</summary>
-        <p className="mt-3">Review a concise issue before choosing Pin as goal. Your selected goal stays in focus across pages without changing filters. Goals, their conversations, carried evidence and independent Planning inputs are saved in this browser within the limits shown in Browser storage details. Use <button className="text-primary underline" onClick={()=>onNavigate("planning-overview")}>Planning</button> to compare scenarios and costs. Explore <button className="text-primary underline" onClick={()=>onNavigate("workforce")}>Workforce</button> evidence and <button className="text-primary underline" onClick={()=>onNavigate("occupational-references")}>Intelligence</button> references and simulated options. Carry evidence or quotes only when you explicitly choose to; navigation does not carry them or run models.</p>
-        <button type="button" disabled={chatLoading} onClick={() => { startNewIssue(DEVELOPMENT_DEMO_GOAL); onStartDemo(); }} className="mt-3 min-h-11 rounded border px-4 py-2 font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring">Try a guided example</button>
-        <button type="button" onClick={()=>onNavigate("decision-brief")} className="ml-2 mt-3 min-h-11 rounded border px-4 py-2 font-semibold text-primary">Build AI capability without net headcount</button>
-        <p className="mt-3">This is NOT a people analytics dashboard. It’s an AI-powered decision tool that helps you identify workforce challenges, explore solutions, and build actionable plans with clear costs, tradeoffs, and measurable goals.</p>
-        <p className="mt-3">This platform is designed to help business leaders, HR, and Finance make decisions, own the outcomes, and measure the return on workforce investments.</p>
-        <p className="mt-3">Home discusses available evidence and options. Course coverage is not proven skill improvement; provider quotes are fictional or unverified. Planning comparisons require explicit selections and assumptions. Missing costs and impacts remain unknown.</p>
-        <button type="button" onClick={()=>onNavigate("guide-data")} className="mt-3 min-h-11 rounded-sm font-semibold text-primary underline focus-visible:ring-2 focus-visible:ring-ring">See Guide &amp; Data</button>
-      </details>
-    </details></aside>
+    <HomePinnedGoals goals={conversation.goals} activeGoalId={conversation.activeGoalId} ready={conversation.storageReady} disabled={!active||!conversation.storageReady||!conversation.saved||Boolean(conversation.issueEditor)} packet={pack} onSelect={openPinnedGoal}/>
 
   </div>;
 }

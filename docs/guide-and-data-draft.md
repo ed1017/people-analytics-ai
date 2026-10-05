@@ -1,5 +1,7 @@
 # Guide & Data — content record
 
+Historical content record. The Guide & Data page was retired at the user’s request on October 5, 2026. Essential demo and provenance disclosures remain in Home → Data details. The distinct Home onboarding flow and its optional example controls remain available. The material below records the former page, not current navigation.
+
 The user confirmed a separate Guide & Data page linked from the overall overview. This content is implemented in the local page; publication remains subject to release checks. No giant toolbar was added.
 
 ## Start with a question

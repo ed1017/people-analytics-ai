@@ -32,7 +32,7 @@ const pageExamples:Record<string,string> = {
   'development-planning':'Which costs come from selected quotes and which are my assumptions?',
 };
 const planningPages = new Set(['planning-overview','scenario-modeling','position-workforce-design','workforce-response','execution-feasibility','workforce-planning']);
-const readOnlyPages = new Set(['guide-data','compensation','decision-brief','assess-evaluate']);
+const readOnlyPages = new Set(['compensation','decision-brief','assess-evaluate']);
 export function hasKnownNumericEvidence(value:unknown):boolean {
   if(typeof value==='number')return Number.isFinite(value);
   if(!value||typeof value!=='object')return false;

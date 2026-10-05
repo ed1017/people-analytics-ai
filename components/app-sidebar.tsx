@@ -59,7 +59,6 @@ const pageIcons: Record<
   "training-coaching": GraduationCap,
   "development-planning": GraduationCap,
   home: Sparkles,
-  "guide-data": Compass,
   overview: LayoutDashboard,
   workforce: Users,
   attrition: TrendingDown,

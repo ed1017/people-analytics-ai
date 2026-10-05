@@ -42,7 +42,6 @@ export const appPageMetadata: Record<
   "training-coaching": {label:"Training & Coaching",section:"Intelligence",description:"Fictional simulated provider examples and unverified user-provided quotes."},
   "development-planning": { label: "Development Planning", section: "Planning", description: "Compare explicitly selected development quotes and user-entered cost assumptions." },
   home: { label: "Home", section: "Insights to Action", description: "Explore key findings and ask questions across governed workforce evidence." },
-  "guide-data": { label: "Guide & Data", section: "Insights to Action", description: "How to use the app, understand its data, and interpret its limits." },
   overview: {
     label: "Workforce",
     section: "Workforce",

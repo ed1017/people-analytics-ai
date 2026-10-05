@@ -44,7 +44,6 @@ export type AppPage =
   | "labor-market"
   | "training-coaching"
   | "home"
-  | "guide-data"
   | "compensation"
   | "overview"
   | "workforce"
