@@ -5,11 +5,13 @@ import os from 'node:os';
 import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
 const {chromium} = await import(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
 const output = await fs.mkdtemp(path.join(os.tmpdir(),'forecast-readiness-display-'));
-const cssDirectory = path.resolve('.next/static/css');
-const cssNames = (await fs.readdir(cssDirectory)).filter(n=>n.endsWith('.css'));
-assert(cssNames.length,'Build current app CSS first');
-const css = (await Promise.all(cssNames.map(n=>fs.readFile(path.join(cssDirectory,n),'utf8')))).join('\n');
-const compiler = webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/forecast-readiness-display.tsx'),output:{path:output,filename:'fixture.js'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+const cssFiles = (await Promise.all(['.next/static/chunks', '.next/static/css'].map(async directory =>
+  (await fs.readdir(directory).catch(error => { if (error.code === 'ENOENT') return []; throw error; }))
+    .filter(name => name.endsWith('.css')).map(name => path.join(directory, name))
+))).flat();
+assert(cssFiles.length,'Build current app CSS first');
+const css = (await Promise.all(cssFiles.map(file=>fs.readFile(file,'utf8')))).join('\n');
+const compiler = webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/forecast-readiness-display.tsx'),output:{path:output,filename:'fixture.js'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd(),react:path.resolve('node_modules/react')}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
 const js = await fs.readFile(path.join(output,'fixture.js'),'utf8');
 assert(!js.includes('aggregate-exit-history.json')&&!js.includes('evaluateAggregateExitDemo'),'No evaluator or raw fixture in browser bundle');
