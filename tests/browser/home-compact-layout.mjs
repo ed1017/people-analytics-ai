@@ -21,7 +21,7 @@ try{for(const mode of [{name:'desktop',width:1366,height:900,scale:1},{name:'mob
  const here=(name,ok)=>check(mode.name+' '+name,ok);
  await input.waitFor();await page.getByTestId('overview-starting-guide').waitFor();
  here('empty-state questions remain visible',await page.getByTestId('overview-starting-guide').isVisible()&&await more.count()===0);
- here('full agreed placeholder fits without scrolling',await input.getAttribute('placeholder')==='Ask a question or refine this goal…'&&await input.evaluate(el=>el.scrollHeight<=el.clientHeight));
+ here('full agreed placeholder fits without scrolling',await input.getAttribute('placeholder')==='Describe a goal, compare options, build or adjust a plan, or ask a general workforce question.'&&await input.evaluate(el=>el.scrollHeight<=el.clientHeight));
  await input.fill('Explain the evidence for additional capacity');await send.click();await conversation.getByText(lead,{exact:true}).waitFor();await page.waitForTimeout(100);
  here('examples collapse after reply with no additional request',!await page.getByTestId('overview-starting-guide').isVisible()&&await more.isVisible()&&posts===1);
  const body=conversation.locator('.home-answer').last();

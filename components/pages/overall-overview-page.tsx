@@ -314,8 +314,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const startingGuide=(
     <section aria-label="Starting guide" data-testid="overview-starting-guide" className="space-y-3 pt-0 pb-1">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <h3 className="text-lg font-semibold">Questions to explore</h3>
-        <p className="text-sm text-muted-foreground">Click a question to send it, or write your own.</p>
+        <h3 className="text-lg font-semibold">What do you want to achieve?</h3>
+        <p className="text-sm text-muted-foreground">Describe a goal, compare options, build or adjust a plan, or ask a general workforce question.</p>
         <button type="button" aria-label="Refresh overview evidence" disabled={loading || chatLoading}
           onClick={() => { liveFindingTurn.current=null; loaded.current = ""; setRefresh(value => value + 1); }}
           className="ml-auto rounded-md p-2 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18} /></button>
@@ -399,7 +399,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       <div ref={composerSlot} className="home-composer-slot"><div ref={composerDock} className="home-composer-dock rounded-t-2xl border bg-card p-2 shadow-lg">
       <label htmlFor="overview-question" className="sr-only">Ask Workforce AI</label>
       <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" aria-describedby="overview-question-context-tip" value={input} onChange={event => changeQuestion(event.target.value)} rows={1}
-        placeholder="Ask a question or refine this goal…" className="max-h-80 min-h-12 w-full resize-y rounded-lg border bg-background/40 p-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+        placeholder="Describe a goal, compare options, build or adjust a plan, or ask a general workforce question." className="max-h-80 min-h-12 w-full resize-y rounded-lg border bg-background/40 p-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
       <div className="mt-2 flex items-end justify-between gap-3">
         <p hidden={!conversation.focusedIssue&&candidateCurrent} id="overview-question-context-tip" className="min-w-0 text-xs leading-4 text-muted-foreground">Best practice: Add context like your timeline, budget, stakeholders and relevant sources to help shape a more precise goal.</p>
         <button type="submit" aria-label="Send overview question" disabled={(!localCandidate&&!ready) || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
