@@ -362,6 +362,10 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
         </div>
         }/>
       </header>
+      <section aria-label="Home evidence scope" className="space-y-1 text-xs text-muted-foreground">
+        <p><strong>Workforce snapshot [W1]:</strong> {sourcesSettled?workforceScope.replace(/^Selected workforce snapshot:\s*/, ''):'Refreshing scope; previous figures are not current.'} Only this source follows Country, Business Unit and Level.</p>
+        <p>Other company evidence remains company-wide or survey-specific. A goal names planning intent; it does not filter sources or set a what-if population. Department scope is unknown: Home has no Department filter or department-scoped evidence.</p>
+      </section>
       <div id="home-data-details" popover="auto" role="dialog" aria-label="Data details" className="fixed inset-0 m-auto max-h-[80dvh] w-[min(60rem,92vw)] overflow-y-auto rounded-xl border bg-background p-5 text-sm text-foreground shadow-xl">
         <button type="button" aria-label="Refresh overview evidence" disabled={loading||chatLoading} onClick={event=>{event.currentTarget.closest<HTMLElement>('[popover]')?.hidePopover();liveFindingTurn.current=null;loaded.current='';setRefresh(value=>value+1);}} className="mb-3 flex min-h-11 items-center gap-2 rounded border px-3 py-2 focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18}/>Refresh evidence</button>
         <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">Data details</h2><button type="button" popoverTarget="home-data-details" popoverTargetAction="hide" className="min-h-11 rounded border px-3 focus-visible:ring-2 focus-visible:ring-ring">Close data details</button></div>
