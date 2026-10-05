@@ -29,6 +29,7 @@ import { GoalTakeaway } from "@/components/goal-takeaway";
 import { useGoalWorkspace } from "@/components/use-goal-workspace";
 import { useProblemConversation } from "@/components/problem-conversation";
 import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
+import {useWorkspacePalette} from "@/components/use-workspace-palette";
 import { AppSidebar } from "@/components/app-sidebar";
 import { completeScopedChatTurn } from "@/lib/chat-context-history";
 import { buildAggregateExport, downloadAggregateCsv } from "@/lib/aggregate-export";
@@ -122,6 +123,7 @@ const PLANNING_VIEW_TO_PAGE: Record<
 
 export default function Home() {
   const conversation = useProblemConversation();
+  const [workspacePalette]=useWorkspacePalette();
   const [optionActions] = useState(()=>new WorkforceOptionActions());
   const [homeEvidencePacket,setHomeEvidencePacket]=useState("");
   const goalWorkspaceKeys = ["", ...conversation.goals.map(g=>g.id)].map(id=>conversation.workspaceKey.split(":")[0]+":"+id);
@@ -1867,7 +1869,7 @@ export default function Home() {
 
   return (
     <PlanningSessionProvider goalKey={conversation.workspaceKey} onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
-    <main data-workspace-palette="slate-blue" className={`min-h-screen bg-background text-foreground${activePage === "home" ? " app-home-composer" : ""}${["home","decision-brief","assess-evaluate"].includes(activePage) ? " app-overview-mode" : ""}`}>
+    <main data-workspace-palette={workspacePalette} className={`min-h-screen bg-background text-foreground${activePage === "home" ? " app-home-composer" : ""}${["home","decision-brief","assess-evaluate"].includes(activePage) ? " app-overview-mode" : ""}`}>
       {/* Top header */}
       <AppHeader
         activePage={activePage}
