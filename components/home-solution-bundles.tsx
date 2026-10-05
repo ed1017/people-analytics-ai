@@ -1,4 +1,5 @@
 "use client";
+import {assumptionsFallbackField,readAssumptionsFallback} from '@/lib/home-assumptions-fallback';
 import {HomeAssumptionsFallback} from '@/components/home-assumptions-fallback';
 import {readBundleWorkspace,bundleWorkspaceField} from "@/lib/home-bundle-records";
 import {revealJourneyTarget} from "@/components/workforce-journey-continue";
@@ -47,7 +48,7 @@ export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,
  // Preserve a previous valid proposal for reference only; never treat its snapshot as current.
  const old=raw&&typeof raw==='object'&&'binding' in raw&&raw.binding&&typeof raw.binding==='object'&&'goalId' in raw.binding&&raw.binding.goalId===goalId?readBundlePreparation(raw,raw.binding as ActionBinding,packet):null;
  const draft=current??old,stale=!!draft&&!current;
- const retained=!draft?readBundleWorkspace(storage.data.workspaces[goalId]?.fields[bundleWorkspaceField],goalId):null;
+ const retained=!draft&&!readAssumptionsFallback(fields[assumptionsFallbackField],goalId)?readBundleWorkspace(storage.data.workspaces[goalId]?.fields[bundleWorkspaceField],goalId):null;
  const currentCheck=(key:string,local=false)=>JSON.stringify(localInputs(goalId))===planningKey&&linkState()===linkKey&&live.current===key&&active&&(ready||local&&settled)&&decisionStore.getSnapshot().saved&&decisionStore.getSnapshot().data.goals.activeId===goalId&&decisionStore.getSnapshot().data.goals.goals.find(item=>item.id===goalId)?.statement===goal;
  async function prepare(mode:'new-pin'|'explicit'){
   if(!binding||busy||!storage.saved||!currentCheck(identity))return;
@@ -86,8 +87,8 @@ export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,
    {retained.attachments.map(item=><p key={item.id}>{item.draft.bundle.name} · attached revision {item.draft.revision} · {retained.attachments.some(next=>next.supersedes===item.id)?'Previous attached version':'Attached snapshot'}. Snapshot cash: {item.result.cashTotal===null?'Unknown':`$${item.result.cashTotal.toLocaleString()} USD`}. Not a current calculation or operational approval.</p>)}
   </section>}
   {(!current||current.proposal.bundles.length===0)&&<button className={button} disabled={disabled} onClick={()=>void prepare('explicit')}>{!raw||current?.proposal.bundles.length===0?'Create Action Plan':'Prepare Action Plans'}</button>}
-  {!draft?.proposal.bundles.length&&<HomeAssumptionsFallback goalId={goalId} goal={goal} binding={binding} pack={packet} planningContext={goalContext} disabled={busy||pending||!storage.saved||!active||!settled} isCurrent={()=>currentCheck(identity,true)} onDiscuss={onDiscuss}/>}
-  {draft&&<>
+  {!draft?.proposal.bundles.length&&<HomeAssumptionsFallback chatChange={chatChange} goalId={goalId} goal={goal} binding={binding} pack={packet} planningContext={goalContext} disabled={busy||pending||!storage.saved||!active||!settled} isCurrent={()=>currentCheck(identity,true)} onDiscuss={onDiscuss}/>}
+  {!!draft?.proposal.bundles.length&&draft&&<>
    <HomeBundlePlans chatChange={chatChange} planningContext={goalContext} measurePack={packet} key={JSON.stringify([actionBindingKey(draft.binding),draft.preparedAt])} proposal={draft.proposal} preparedAt={draft.preparedAt} binding={draft.binding} contextCurrent={!stale} disabled={disabled||stale} isCurrent={()=>!!current&&currentCheck(identity)} cache={bundleCache} onDiscuss={onDiscuss} projectBinding={projectEvidence?project:undefined}/>
 
   </>}

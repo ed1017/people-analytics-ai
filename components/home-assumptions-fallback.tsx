@@ -1,10 +1,10 @@
 'use client';
 import {useRef,useState} from 'react';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
-import {HomeBundlePlans,bundleButton,type BundleSession,type BundleDiscussion} from '@/components/home-bundle-plans';
+import {HomeBundlePlans,bundleButton,type BundleSession,type BundleDiscussion,type PlanChatChange} from '@/components/home-bundle-plans';
 import {actionBinding,actionBindingKey,type ActionBinding} from '@/lib/home-action-drafts';
 import {readAssumptionsFallback,assumptionsOnlyBundle,assumptionsFallbackField,unavailableSourceLabels} from '@/lib/home-assumptions-fallback';
-export function HomeAssumptionsFallback({goalId,goal,binding,pack,planningContext,disabled,isCurrent,onDiscuss}:{goalId:string;goal:string;binding:ActionBinding|null;pack:unknown;planningContext:unknown;disabled:boolean;isCurrent:()=>boolean;onDiscuss:(request:BundleDiscussion)=>void}){
+export function HomeAssumptionsFallback({chatChange,goalId,goal,binding,pack,planningContext,disabled,isCurrent,onDiscuss}:{chatChange?:PlanChatChange|null;goalId:string;goal:string;binding:ActionBinding|null;pack:unknown;planningContext:unknown;disabled:boolean;isCurrent:()=>boolean;onDiscuss:(request:BundleDiscussion)=>void}){
  const storage=useDecisionStorage(),raw=storage.data.workspaces[goalId]?.fields[assumptionsFallbackField],saved=readAssumptionsFallback(raw,goalId),missing=unavailableSourceLabels(pack),bundle=assumptionsOnlyBundle(goal),[cache]=useState(()=>new Map<string,BundleSession>()),[notice,setNotice]=useState(''),heading=useRef<HTMLHeadingElement>(null);
  const current=!!saved&&!!binding&&actionBindingKey(saved.sourceBinding)===actionBindingKey(binding),eligible=!!bundle&&missing.length>0;
  if(!saved&&!eligible)return null;
@@ -19,6 +19,6 @@ export function HomeAssumptionsFallback({goalId,goal,binding,pack,planningContex
   {raw&&!saved&&<p role="alert">The saved local proposal cannot be verified. Its record is kept.</p>}
   {(!saved||!current)&&eligible&&<button className={bundleButton} disabled={disabled||!binding||!!raw&&!saved} onClick={prepare}>Prepare assumptions-only draft</button>}
   {notice&&<p role="alert">{notice}</p>}
-  {saved&&selected&&<HomeBundlePlans key={actionBindingKey(saved.binding)+saved.preparedAt} proposal={{version:1,goal:saved.binding.goal,bundles:[selected],question:null,unavailableReason:null}} binding={saved.binding} preparedAt={saved.preparedAt} planningContext={saved.planningContext} measurePack={{sources:[]}} contextCurrent={current} disabled={disabled||!current} isCurrent={()=>current&&isCurrent()} cache={cache} onDiscuss={onDiscuss}/>}
+  {saved&&selected&&<HomeBundlePlans chatChange={chatChange} key={actionBindingKey(saved.binding)+saved.preparedAt} proposal={{version:1,goal:saved.binding.goal,bundles:[selected],question:null,unavailableReason:null}} binding={saved.binding} preparedAt={saved.preparedAt} planningContext={saved.planningContext} measurePack={{sources:[]}} contextCurrent={current} disabled={disabled||!current} isCurrent={()=>current&&isCurrent()} cache={cache} onDiscuss={onDiscuss}/>}
  </section>;
 }
