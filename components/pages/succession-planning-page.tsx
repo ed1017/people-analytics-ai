@@ -63,9 +63,6 @@ export function SuccessionPlanningPage({
     <section className="min-w-0 p-4 sm:p-6">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold">
-            Succession Planning
-          </h2>
           <p className="max-w-3xl text-muted-foreground">
             Company-wide recorded succession-plan coverage and source-assessment readiness signals. No individual candidate records are shown.
           </p>

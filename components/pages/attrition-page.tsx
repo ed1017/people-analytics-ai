@@ -35,7 +35,6 @@ export function AttritionPage({ data, loading, error, exitData, exitLoading, exi
     <section className="evidence-workspace min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold">Attrition</h2>
           <p className="text-muted-foreground">
             Diagnose turnover patterns, regrettable losses, workforce segments, and reported separation reasons.
           </p>

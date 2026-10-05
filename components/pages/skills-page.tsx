@@ -42,9 +42,6 @@ export function SkillsPage({
 <section className="evidence-workspace min-w-0 p-6">
             <div className="mb-6 flex items-end justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-semibold">
-                  Skills Intelligence
-                </h2>
                 <p className="text-muted-foreground">
                   Compare observed employee proficiency with recorded job-required proficiency. External references are in Intelligence.
                 </p>

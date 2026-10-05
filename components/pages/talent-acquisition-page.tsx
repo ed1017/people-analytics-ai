@@ -25,7 +25,6 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
     <section className="evidence-workspace min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold">Talent Acquisition</h2>
           <p className="text-muted-foreground">Monitor recruiting demand, funnel conversion, hiring velocity, and source effectiveness.</p>
         </div>
         <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">

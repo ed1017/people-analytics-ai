@@ -115,9 +115,6 @@ export function SurveySentimentPage({
     <section className="evidence-workspace min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold">
-            Employee Listening
-          </h2>
           <p className="text-muted-foreground">
             Track engagement, pulse, manager feedback and onboarding experience. Exit-survey feedback is in Attrition.
           </p>
