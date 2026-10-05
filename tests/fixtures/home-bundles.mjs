@@ -9,3 +9,11 @@ export function bundleProposalFixture(goal){
   {id:'c6',name:'Finance and execution checkpoints',domain:'execution',firstStep:'Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.',ownerRole:'Finance partner',dependsOn:['c3','c4','c5']},
  ].map(component=>({...component,...(id==='B'&&component.id==='c2'?{name:'Hiring onboarding and readiness',firstStep:'Prepare onboarding and readiness review for the proposed hires after recruiting review.',dependsOn:['c5']}:{}),...(id==='B'&&component.id==='c3'?{name:'Internal continuity review',firstStep:'Review source-team continuity without assuming an internal transfer is required.'}:{}),...(id==='C'&&component.id==='c5'?{firstStep:'Review a later hiring stage after the internal transition assumptions are reviewed.',dependsOn:['c3']}:{}),evidence:['W1:summary'],limitation:'Aggregate context does not establish availability, causes or intervention effectiveness.'})),limitation:'The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.'})),question:null,unavailableReason:null};
 }
+// Encode a valid legacy graph as the current request's exact-count wire slots.
+export function bundleWireFixture(proposal){
+ return {...structuredClone(proposal),bundles:proposal.bundles.map(bundle=>{
+  const order=[],done=new Set();function visit(id){if(done.has(id))return;const component=bundle.components.find(item=>item.id===id);for(const parent of component.dependsOn)visit(parent);done.add(id);order.push(id)}for(const component of bundle.components)visit(component.id);
+  const mapping=Object.fromEntries(order.map((id,index)=>[id,`c${index+1}`]));
+  return {...structuredClone(bundle),components:Object.fromEntries(order.map(id=>{const source=structuredClone(bundle.components.find(item=>item.id===id));delete source.id;source.dependsOn=source.dependsOn.map(parent=>mapping[parent]);return [mapping[id],source]}))};
+ })};
+}
