@@ -320,7 +320,7 @@
 .home-workspace aside li { padding-left: 0.4rem; }
 .home-workspace aside li::marker { color: var(--development-teal); font-weight: 700; }
 .home-workspace form { border-color: #6f8aa8; }
-.home-workspace textarea { border-color: #6f8aa8; background: #0b1426; }
+.home-workspace textarea { border-color: #6f8aa8; background: var(--background); color: var(--foreground); }
 .home-workspace button[type="submit"] { background: var(--development-teal); color: #0b1426; }
 .learning-development-page > div:first-child { align-items: flex-start; flex-wrap: wrap; }
 .development-catalog { padding: clamp(1rem, 2vw, 1.5rem); border-color: var(--development-line); }
