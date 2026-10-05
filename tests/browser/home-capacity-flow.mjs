@@ -64,7 +64,7 @@ try{for(const mode of [{name:'desktop',width:1366},{name:'mobile',width:390},{na
  await page.locator('[data-home-planner-heading]').waitFor();await page.waitForTimeout(500);
  checkHere('confirmation saves exact goal and preserves draft without model/calculator calls',(await state()).data.goals.goals[0].statement===goal&&(await solution()).versions[0].inputs.scope.goalStatement===goal&&await input.inputValue()==='Keep this unfinished question'&&posts.length===baseline);
  checkHere('confirmation focuses planner',await page.locator('[data-home-planner-heading]').evaluate(el=>el===document.activeElement));
- checkHere('prose planning CTA is smaller and secondary',await button('Develop a full action plan').evaluate(el=>getComputedStyle(el).fontSize==='14px'&&!el.classList.contains('bg-primary')));
+ checkHere('existing capacity plan hides redundant prose planning CTA',await button('Develop a full action plan').count()===0);
  await page.getByText(/Input status and unknowns/).click();await button('Calculate options').click();checkHere('missing required assumptions do not call calculator',posts.length===baseline&&await page.getByRole('region',{name:'Workforce input readiness',exact:true}).getByText('Missing input:',{exact:false}).count()>0);
  await button('Load governed role and BU choices').click();await page.getByText('Catalog snapshot 2026-09-30',{exact:false}).waitFor();
  await button('Review Business unit').click();checkHere('missing-input guidance opens and focuses exact field',await page.getByLabel('Business unit',{exact:true}).evaluate(el=>el===document.activeElement));
