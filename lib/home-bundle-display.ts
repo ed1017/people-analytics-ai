@@ -9,3 +9,11 @@ export function bundleDisplayText(text:string,bundle:SolutionBundle):string{
 export function bundleComponentLabels(ids:string[],bundle:SolutionBundle):string{
  return ids.map(id=>bundle.components.find(component=>component.id===id)?.name??'Unavailable component').join(', ');
 }
+
+/** Exact presentation aliases only; arbitrary model titles keep their meaning. */
+export function bundleDisplayName(name:string):string{
+ return ({
+  "Retention Signal Diagnosis":"Retention diagnosis",
+  "Manager Experience Review":"Manager & workload review",
+ } as Record<string,string>)[name]??name;
+}

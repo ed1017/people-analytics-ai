@@ -47,17 +47,20 @@ try{for(const mode of [{name:'desktop',width:1366},{name:'mobile',width:390},{na
  checkHere('text uncertainty and source link retained',await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('Costs and operational availability remain unknown.',{exact:false}).count()===1&&await page.getByRole('region',{name:'Overview conversation',exact:true}).getByRole('complementary',{name:'Answer sources'}).getByRole('button',{name:'Workforce',exact:true}).count()===1);
  if(!built)checkHere('other page body remains 16px',await page.getByRole('region',{name:'Other page typography'}).getByText('Other page body.',{exact:true}).evaluate(el=>getComputedStyle(el).fontSize==='16px'));
  checkHere('goal prompt accepts a custom outcome without fixed pair',await page.getByRole('button',{name:'State my goal',exact:true}).isVisible()&&await page.getByRole('button',{name:'Retention',exact:true}).count()===0&&await page.getByRole('button',{name:'Capability building',exact:true}).count()===0);
- await input.fill('Keep this unfinished question');await open();
+ const goal='Add three engineer roles in Technology within three months';
+ const pinGoal=async()=>{if(built){await button('New goal').click();await page.getByLabel('Problem statement',{exact:true}).fill(goal);await button('Pin Focused issue').click();}else await page.evaluate(value=>window.capacityPinGoal(value),goal);};
+ checkHere('General exploration cannot compare even after an answer',await button('Compare workforce options').count()===0);
+ await pinGoal();await input.fill('Keep this unfinished question');await open();
  checkHere('entry focuses explicit scope review and makes no request',await scope().evaluate(el=>el===document.activeElement)&&posts.length===baseline&&await confirm().isDisabled());
- await page.getByLabel('Goal to carry into the plan',{exact:true}).fill('Reduce avoidable departures');await page.getByRole('radio',{name:'No — retain current employees only',exact:true}).check();
- checkHere('retention-only scope cannot create a plan',(await confirm().count()===0||await confirm().isDisabled())&&(await state()).data.goals.goals.length===0&&posts.length===baseline);
+ checkHere('scope review carries the exact pinned goal read-only',await page.getByLabel('Goal to carry into the plan',{exact:true}).inputValue()===goal&&await page.getByLabel('Goal to carry into the plan',{exact:true}).getAttribute('readonly')!==null);
+ await page.getByRole('radio',{name:'No — retain current employees only',exact:true}).check();
+ checkHere('retention-only scope cannot create a capacity plan',(await confirm().count()===0||await confirm().isDisabled())&&!(await solution())&&posts.length===baseline);
  await page.getByRole('radio',{name:'No — replace departures only',exact:true}).check();checkHere('replacement-only scope cannot create a plan',await confirm().isDisabled()&&!(await solution()));
  await page.getByRole('radio',{name:'Not sure yet',exact:true}).check();checkHere('uncertain scope stays in conversation',await confirm().isDisabled());
  await close();await page.waitForFunction(()=>document.activeElement?.id==='overview-question');checkHere('return preserves and focuses the exact chat draft',await input.inputValue()==='Keep this unfinished question'&&await input.evaluate(el=>el===document.activeElement));
- await open();await page.getByLabel('Goal to carry into the plan',{exact:true}).fill('x'.repeat(241));await page.getByRole('radio',{name:/^Yes/}).check();checkHere('long goal is not silently truncated',await confirm().isDisabled()&&(await page.getByLabel('Goal to carry into the plan',{exact:true}).inputValue()).length===241);
- const goal='Add three engineer roles in Technology within three months';await page.getByLabel('Goal to carry into the plan',{exact:true}).fill(goal);checkHere('editing a goal clears prior capacity confirmation',await confirm().isDisabled());await page.getByRole('radio',{name:/^Yes/}).check();
- if(!built){await page.evaluate(()=>window.changeCapacityScope());await page.getByText('Your goal or context changed.',{exact:false}).waitFor();checkHere('scope change invalidates review without discarding its text',await confirm().isDisabled()&&await page.getByLabel('Goal to carry into the plan',{exact:true}).inputValue()===goal);}await close();await open();
- await page.getByLabel('Goal to carry into the plan',{exact:true}).fill(goal);await page.getByRole('radio',{name:/^Yes/}).check();await confirm().click();
+ await open();await page.getByRole('radio',{name:/^Yes/}).check();
+ if(!built){await page.evaluate(()=>window.changeCapacityScope());await page.getByText('Your goal or context changed.',{exact:false}).waitFor();checkHere('scope change invalidates review without discarding its text',await confirm().isDisabled()&&await page.getByLabel('Goal to carry into the plan',{exact:true}).inputValue()===goal);await close();await open();await page.getByRole('radio',{name:/^Yes/}).check();}
+ await confirm().click();
  await page.locator('[data-home-planner-heading]').waitFor();await page.waitForTimeout(500);
  checkHere('confirmation saves exact goal and preserves draft without model/calculator calls',(await state()).data.goals.goals[0].statement===goal&&(await solution()).versions[0].inputs.scope.goalStatement===goal&&await input.inputValue()==='Keep this unfinished question'&&posts.length===baseline);
  checkHere('confirmation focuses planner',await page.locator('[data-home-planner-heading]').evaluate(el=>el===document.activeElement));
@@ -83,7 +86,7 @@ try{for(const mode of [{name:'desktop',width:1366},{name:'mobile',width:390},{na
  const beforeReload=posts.length;await page.reload();if(!built){await page.addStyleTag({content:css});await page.addScriptTag({content:assets.get('/assets/fixture.js')});}await page.getByRole('region',{name:'Workforce solution calculation',exact:true}).waitFor();await page.waitForTimeout(500);
  checkHere('reload retains chat draft, confirmed goal and calculated plan without requesting AI',await input.inputValue()==='Keep this unfinished question'&&(await state()).data.goals.goals[0].statement===goal&&(await solution()).results.length===1&&posts.length===beforeReload);
  if(!built){await page.evaluate(()=>window.capacityRename());await page.getByText('The goal wording changed. Review and save the inputs to bind them to the current goal before calculating or recording approval.',{exact:true}).waitFor();checkHere('changed goal blocks old calculation',await button('Calculate options').isDisabled());
- await init();await open();await page.getByLabel('Goal to carry into the plan',{exact:true}).fill(goal);await page.getByRole('radio',{name:/^Yes/}).check();await page.evaluate(()=>window.capacityRoundtrip());await page.getByText('Your goal or context changed.',{exact:false}).waitFor();checkHere('batched goal roundtrip invalidates confirmation',await confirm().isDisabled());}
+ await init();await pinGoal();await open();await page.getByRole('radio',{name:/^Yes/}).check();await page.evaluate(()=>window.capacityRoundtrip());await page.getByText('Your goal or context changed.',{exact:false}).waitFor();checkHere('batched goal roundtrip invalidates confirmation',await confirm().isDisabled());}
  checkHere('no unexpected services or runtime errors',unexpected.length===0&&errors.length===0);
  await context.close();
 }}finally{await browser.close()}
