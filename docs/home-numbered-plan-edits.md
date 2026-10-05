@@ -1,0 +1,7 @@
+# Numbered Action Plan edits
+
+The previous parser rejected every numbered-plan reference, even when it named the selected tab. A single explicit reference to the active Action Plan is now resolved using its current displayed number and the actual proposal count. Other-plan references require selecting that tab and resending for review. Multiple, ambiguous, absent-selection and out-of-range references cannot create an edit. Existing selection-epoch, goal, evidence and input guards still reject stale Apply attempts.
+
+For example, “Increase the unallocated learning pilot in Action Plan #1 from USD 2,000 to USD 2,500” previews one change when Plan 1 is selected and its current allowance is 2,000. An explicit starting value must match the current assumption. The original user request is retained and reparsed on Apply; no model request, calculation or attachment happens implicitly. The parser also accepts the reference before or after the change. It does not infer a total budget, create unknown fields or silently switch plans.
+
+Validation: 17 chat-edit unit tests; 45 browser checks across desktop/mobile/200%-equivalent reflow, including selected-plan preview, tab-switch invalidation, other-plan rejection, explicit Apply, calculation/review/attachment, reload and goal return. Build with evidence precheck, lint, TypeScript and whitespace checks pass. Browser responses are intercepted synthetic fixtures, never live model calls.

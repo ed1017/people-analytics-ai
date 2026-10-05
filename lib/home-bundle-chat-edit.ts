@@ -10,6 +10,7 @@ import {planDate} from './workforce-increment.ts';
 
 export type BundleEditChange={field:string;before:Assumption<string|number>;after:Assumption<string|number>};
 export type BundleEditPreview={inputKey:string;request:string;changes:BundleEditChange[];inputs:BundleInputs};
+export type BundleEditSelection={option:number;count:number};
 type Target={key:string;label:string;type:'text'|'money'|'percent'|'count'|'months'|'month'|'date';read:()=>Assumption<string|number>;write:(value:Assumption<string|number>)=>void};
 const normalize=(value:string)=>value.trim().toLowerCase().replace(/\s+/g,' ');
 function fail(message:string):never{throw Error(message)}
@@ -36,11 +37,25 @@ function targets(input:BundleInputs,draft:BundleDraft){
 }
 const numberWords=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
 const monthNames=['january','february','march','april','may','june','july','august','september','october','november','december'];
-function everydayClause(raw:string,available:Map<string,Target[]>,draft:BundleDraft):{name:string;value:string}{
+function selectedPlanRequest(request:string,selection?:BundleEditSelection):string{
+ const references=[...request.matchAll(/\b(?:action\s+)?plan\s*#?\s*(\d+)\b/gi)];
+ if(!references.length)return request;
+ if(references.length!==1||/\b(?:both|all|other|another|each)\s+(?:action\s+)?plans?\b|\b(?:and|or)\s*#?\d+\b/i.test(request))fail('Name one Action Plan and one set of changes. Nothing has changed.');
+ if(!selection||!Number.isInteger(selection.option)||!Number.isInteger(selection.count)||selection.count<1||selection.count>3||selection.option<1||selection.option>selection.count)fail('Select the intended Action Plan tab before reviewing this change.');
+ const number=Number(references[0][1]);
+ if(number<1||number>selection.count)fail(`Choose an available Action Plan from 1 to ${selection.count}. Nothing has changed.`);
+ if(number!==selection.option)fail(`Select Action Plan #${number}, then send this change again for review. Nothing has changed.`);
+ const stripped=request.replace(/\b(?:in|for|on)\s+(?:action\s+)?plan\s*#?\s*\d+\b\s*[:,]?\s*/i,' ').replace(/^(?:action\s+)?plan\s*#?\s*\d+\s*[:,]\s*/i,'').trim();
+ if(/\bplan\s*#?\s*\d+/i.test(stripped))fail('Use “in Action Plan #'+selection.option+'” with the assumption and desired value. Nothing has changed.');
+ return stripped;
+}
+function everydayClause(raw:string,available:Map<string,Target[]>,draft:BundleDraft):{name:string;value:string;previous?:string}{
  const clause=raw.trim().replace(/[.?]$/,'').replace(/^(?:please\s+|(?:can|could|would)\s+(?:you|we)\s+|i(?:’|')?d like to\s+)/i,'');
  if(/\b(?:not|never|don[’']?t|do not|avoid|except|unless|instead|rather than)\b/i.test(clause))fail('Which change should I make? Restate the desired value without a negation or exception; no changes have been proposed.');
  if(/\b(?:plan\s*#?\s*\d+|(?:both|all|other|another|each)\s+plans?)\b/i.test(clause))fail('Which plan should I edit? Select that Plan tab, then describe its changes without referring to other plans.');
- let match=clause.match(/^(?:set|change|update|lower|raise|increase|decrease|reduce)\s+(.+?)\s+to\s+(.+)$/i);
+ const transition=clause.match(/^(?:set|change|update|lower|raise|increase|decrease|reduce)\s+(?:the\s+)?(.+?)\s+from\s+(.+?)\s+to\s+(.+)$/i);
+ if(transition&&available.has(normalize(transition[1])))return {name:transition[1],previous:transition[2],value:transition[3]};
+ let match=clause.match(/^(?:set|change|update|lower|raise|increase|decrease|reduce)\s+(?:the\s+)?(.+?)\s+to\s+(.+)$/i);
  if(!match)match=clause.match(/^assume\s+(.+?)\s+(?:is|equals|of)\s+(.+)$/i);
  if(match&&available.has(normalize(match[1]))&&!/^(?:(?:total|overall|plan)\s+)?budget(?:\s+(?:ceiling|limit))?$/i.test(match[1]))return {name:match[1],value:match[2]};
  if(/\bbudget(?=\b|\d)/i.test(clause))fail('Is this a total spending limit or a specific allowance? Name the allowance and its USD amount; a total limit is not a cost estimate. Nothing has changed.');
@@ -70,10 +85,10 @@ function parseValue(raw:string,target:Target):Assumption<string|number>{
  return {value,kind,basis:kind==='illustrative'?'Explicit illustrative assumption accepted from a reviewed text edit; not evidence.':'Explicit user assumption accepted from a reviewed text edit; not independently verified.'};
 }
 /** Review only; all clauses must be unambiguous and valid before any proposal is returned. */
-export function previewBundleChatEdit(draft:BundleDraft,request:string):BundleEditPreview{
+export function previewBundleChatEdit(draft:BundleDraft,request:string,selection?:BundleEditSelection):BundleEditPreview{
  if(!readBundleDraft(draft))fail('This plan draft cannot be verified. Your work is kept.');
  if(!request.trim()||request.length>1200)fail('Describe up to six edits in 1,200 characters.');
- const clauses=request.trim().split(/;|\n|\s+and\s+(?=(?:start|make|use|set|change|update|move|run)\b)/i).map(value=>value.trim()).filter(Boolean);
+ const clauses=selectedPlanRequest(request,selection).trim().split(/;|\n|\s+and\s+(?=(?:start|make|use|set|change|update|move|run)\b)/i).map(value=>value.trim()).filter(Boolean);
  if(!clauses.length||clauses.length>6)fail('Use up to six changes, separated by semicolons.');
  const inputs=structuredClone(draft.inputs),available=targets(inputs,draft),changes:BundleEditChange[]=[],seen=new Set<string>();
  for(const clause of clauses){
@@ -83,6 +98,7 @@ export function previewBundleChatEdit(draft:BundleDraft,request:string):BundleEd
   if(matches.length!==1)fail(`“${parsed.name}” matches more than one assumption. Which displayed assumption do you mean? Name its specific label.`);
   const target=matches[0];if(seen.has(target.key))fail(`Review one value for ${target.label} in each request.`);seen.add(target.key);
   const before=structuredClone(target.read()),after=parseValue(parsed.value,target);
+  if(parsed.previous!==undefined&&parseValue(parsed.previous,target).value!==before.value)fail(`The current ${target.label} differs from the stated starting value. Review it before proposing a change.`);
   if(before.value===after.value&&(before.kind===after.kind||after.value===null))continue;
   changes.push({field:target.label,before,after});target.write(after);
  }
@@ -94,9 +110,9 @@ export function previewBundleChatEdit(draft:BundleDraft,request:string):BundleEd
  return {inputKey:bundleInputKey(draft),request,changes,inputs};
 }
 /** Reconstruct the proposal from its original text; never trust a mutated preview payload. */
-export function acceptBundleChatEdit(draft:BundleDraft,preview:BundleEditPreview):BundleDraft{
+export function acceptBundleChatEdit(draft:BundleDraft,preview:BundleEditPreview,selection?:BundleEditSelection):BundleDraft{
  if(bundleInputKey(draft)!==preview.inputKey)fail('The selected plan, goal or assumptions changed. Review a fresh edit proposal.');
- const checked=previewBundleChatEdit(draft,preview.request);
+ const checked=previewBundleChatEdit(draft,preview.request,selection);
  if(JSON.stringify(checked)!==JSON.stringify(preview))fail('The edit proposal changed. Review it again before accepting.');
  return reviseBundleDraft(draft,checked.inputs);
 }

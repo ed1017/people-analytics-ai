@@ -8,6 +8,21 @@ import {bundleProposalFixture} from './fixtures/home-bundles.mjs';
 import {emptyWorkforcePlanInput} from '../lib/workforce-increment.ts';
 const binding=await actionBinding('goal-a','Build skills without adding headcount',{sources:[{id:'W1',status:'loaded',facts:{headcount:20}}]},{});
 const base=()=>prepareIllustrativePilot(createBundleDraft(bundleProposalFixture(binding.goal).bundles[0],binding),'2026-10-05T00:00:00Z');
+test('a numbered active plan reference preserves the original request and verifies an explicit starting value',()=>{
+ const draft=base(),selection={option:1,count:3},request='Increase the unallocated learning pilot in Action Plan #1 from USD 2,000 to USD 2,500.';
+ const before=structuredClone(draft),preview=previewBundleChatEdit(draft,request,selection);
+ assert.equal(preview.request,request);assert.equal(preview.changes.length,1);assert.equal(preview.changes[0].before.value,2000);assert.equal(preview.changes[0].after.value,2500);assert.deepEqual(draft,before);
+ assert.equal(acceptBundleChatEdit(draft,preview,selection).inputs.expenses.find(item=>item.id==='pilot-learning').amount.value,2500);
+ assert.throws(()=>acceptBundleChatEdit(draft,preview,{option:2,count:3}),/Select Action Plan #1/);
+ assert.throws(()=>previewBundleChatEdit(draft,request.replace('2,000','1,000'),selection),/starting value/);
+ for(const request of ['In Action Plan #1, use twelve participants','Use twelve participants for Action Plan #1','Action Plan #1: use twelve participants'])assert.equal(previewBundleChatEdit(draft,request,selection).inputs.groups[0].count.value,12);
+});
+test('another, missing, ambiguous, multiple or out-of-range plan never causes an edit',()=>{
+ const draft=base(),before=structuredClone(draft),selection={option:1,count:3};
+ assert.throws(()=>previewBundleChatEdit(draft,'Use 12 participants in Action Plan #2',selection),/Select Action Plan #2/);
+ for(const request of ['Use 12 participants in Action Plan #0','Use 12 participants in Action Plan #4','Use 12 participants in Action Plan #1 and #2','Use 12 participants in Action Plan #1; use 15 participants in Action Plan #2','Use 12 participants in all Action Plans','Use 12 participants in Action Plan #1 or another plan'])assert.throws(()=>previewBundleChatEdit(draft,request,selection),request);
+ assert.throws(()=>previewBundleChatEdit(draft,'Use 12 participants in Action Plan #1'),/Select the intended/);assert.deepEqual(draft,before);
+});
 test('preview is nonmutating and acceptance changes only named assumptions with a new revision',()=>{
  const draft=base(),before=structuredClone(draft),preview=previewBundleChatEdit(draft,'Set pilot participants to 12; Set manager facilitation and materials to $1,500');
  assert.deepEqual(draft,before);assert.equal(preview.changes.length,2);const accepted=acceptBundleChatEdit(draft,preview);
