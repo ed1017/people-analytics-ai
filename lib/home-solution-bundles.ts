@@ -28,29 +28,41 @@ export function componentOrder(components:Pick<BundleComponent,'id'|'dependsOn'>
  }
  for(const item of components)visit(item.id);return order;
 }
-export function readHomeBundleProposal(raw:unknown,goal:string,pack:unknown):BundleProposal|null{
+export const bundleDiagnosticStages=['api_error','incomplete_output','parse_error','schema_rejected','reference_rejected','dependency_rejected','response_too_large','invalid_context','client_transport','client_response','storage_failure'] as const;
+export type BundleDiagnostic=typeof bundleDiagnosticStages[number];
+export const readBundleDiagnostic=(raw:unknown):BundleDiagnostic|null=>bundleDiagnosticStages.includes(raw as BundleDiagnostic)?raw as BundleDiagnostic:null;
+export type BundleInspection={proposal:BundleProposal;diagnostic:null}|{proposal:null;diagnostic:BundleDiagnostic};
+export function inspectHomeBundleProposal(raw:unknown,goal:string,pack:unknown):BundleInspection{
+ const rejected=(diagnostic:BundleDiagnostic):BundleInspection=>({proposal:null,diagnostic});
  try{
-  if(new TextEncoder().encode(JSON.stringify(raw)).length>32768)return null;
-  const value=plain(raw);if(!value||!exactKeys(value,['version','goal','bundles','question','unavailableReason'])||value.version!==1||!text(goal,240)||value.goal!==goal||!Array.isArray(value.bundles)||value.bundles.length>3)return null;
-  if(value.question!==null&&(!text(value.question,200)||(value.question.match(/\?/g)?.length??0)>1))return null;
-  if(value.bundles.length?value.unavailableReason!==null:!text(value.unavailableReason,240))return null;
+  if(new TextEncoder().encode(JSON.stringify(raw)).length>32768)return rejected('response_too_large');
+  const value=plain(raw);if(!value||!exactKeys(value,['version','goal','bundles','question','unavailableReason'])||value.version!==1||!text(goal,240)||value.goal!==goal||!Array.isArray(value.bundles)||value.bundles.length>3)return rejected('schema_rejected');
+  if(value.question!==null&&(!text(value.question,200)||(value.question.match(/\?/g)?.length??0)>1))return rejected('schema_rejected');
+  if(value.bundles.length?value.unavailableReason!==null:!text(value.unavailableReason,240))return rejected('schema_rejected');
   const allowed=new Set(actionEvidenceCatalog(pack).map(item=>item.id)),names=new Set<string>();
   const bundles:SolutionBundle[]=[];
   for(const [index,rawBundle] of value.bundles.entries()){
-   const item=plain(rawBundle);if(!item||!exactKeys(item,['id','name','objective','coordination','components','limitation'])||item.id!==['A','B','C'][index]||!text(item.name,80)||!text(item.objective,160)||!text(item.coordination,240)||!text(item.limitation,240)||!Array.isArray(item.components)||!item.components.length||item.components.length>6)return null;
-   const name=item.name.trim().toLowerCase();if(names.has(name))return null;names.add(name);
+   const item=plain(rawBundle);if(!item||!exactKeys(item,['id','name','objective','coordination','components','limitation'])||item.id!==['A','B','C'][index]||!text(item.name,80)||!text(item.objective,160)||!text(item.coordination,240)||!text(item.limitation,240)||!Array.isArray(item.components)||!item.components.length||item.components.length>6)return rejected('schema_rejected');
+   const name=item.name.trim().toLowerCase();if(names.has(name))return rejected('schema_rejected');names.add(name);
    const components:BundleComponent[]=[];
    for(const rawComponent of item.components){
     const component=plain(rawComponent);
-    if(!component||!exactKeys(component,['id','name','domain','firstStep','evidence','ownerRole','dependsOn','limitation'])||!ids.includes(String(component.id))||!text(component.name,80)||!bundleDomains.includes(component.domain as BundleComponent['domain'])||!text(component.firstStep,360)||/(?:[-‐‑–—]|…|\.{3})\s*$/u.test(component.firstStep)||!text(component.ownerRole,80)||!text(component.limitation,200))return null;
-    if(!Array.isArray(component.evidence)||!component.evidence.length||component.evidence.length>3||new Set(component.evidence).size!==component.evidence.length||component.evidence.some(id=>typeof id!=='string'||!allowed.has(id)))return null;
-    if(!Array.isArray(component.dependsOn)||component.dependsOn.length>5||component.dependsOn.some(id=>typeof id!=='string'||!ids.includes(id)))return null;
+    if(!component||!exactKeys(component,['id','name','domain','firstStep','evidence','ownerRole','dependsOn','limitation'])||!ids.includes(String(component.id))||!text(component.name,80)||!bundleDomains.includes(component.domain as BundleComponent['domain'])||!text(component.firstStep,360)||/(?:[-‐‑–—]|…|\.{3})\s*$/u.test(component.firstStep)||!text(component.ownerRole,80)||!text(component.limitation,200))return rejected('schema_rejected');
+    if(!Array.isArray(component.evidence)||!component.evidence.length||component.evidence.length>3||new Set(component.evidence).size!==component.evidence.length||component.evidence.some(id=>typeof id!=='string'||!allowed.has(id)))return rejected('reference_rejected');
+    if(!Array.isArray(component.dependsOn)||component.dependsOn.length>5||component.dependsOn.some(id=>typeof id!=='string'||!ids.includes(id)))return rejected('dependency_rejected');
     components.push(structuredClone(component) as BundleComponent);
    }
-   componentOrder(components);bundles.push({...item,components} as SolutionBundle);
+   try{componentOrder(components)}catch{return rejected('dependency_rejected')}bundles.push({...item,components} as SolutionBundle);
   }
-  return {version:1,goal,bundles,question:value.question as string|null,unavailableReason:value.unavailableReason as string|null};
- }catch{return null}
+  return {proposal:{version:1,goal,bundles,question:value.question as string|null,unavailableReason:value.unavailableReason as string|null},diagnostic:null};
+ }catch{return rejected('schema_rejected')}
+}
+export function readHomeBundleProposal(raw:unknown,goal:string,pack:unknown):BundleProposal|null{return inspectHomeBundleProposal(raw,goal,pack).proposal;}
+export function inspectHomeBundleOutput(raw:unknown,goal:string,pack:unknown):BundleInspection{
+ if(typeof raw!=='string')return {proposal:null,diagnostic:'parse_error'};
+ if(new TextEncoder().encode(raw).length>32768)return {proposal:null,diagnostic:'response_too_large'};
+ let parsed:unknown;try{parsed=JSON.parse(raw)}catch{return {proposal:null,diagnostic:'parse_error'}}
+ return inspectHomeBundleProposal(parsed,goal,pack);
 }
 export function decodeHomeBundleProposal(raw:string,goal:string,pack:unknown):BundleProposal{
  if(typeof raw!=='string'||new TextEncoder().encode(raw).length>32768)throw Error('Bundle preparation rejected: size.');

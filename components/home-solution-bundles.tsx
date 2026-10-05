@@ -36,12 +36,13 @@ export function HomeSolutionBundles({goalId,goal,pack,active,ready,busy,pin,pers
   setPending(true);setNotice('');
   const outcome=await coordinator.current.run({mode,binding,packet,stored:raw,isCurrent:()=>currentCheck(identity),prepare:async signal=>{
    const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},signal,body:JSON.stringify({page:'home',persona,message:HOME_BUNDLE_REQUEST,history:[],goalContext,marketReference,hasFocusedIssue:true,overviewBriefingContext:packet})});
-   if(!response.ok)throw Error('Bundle preparation unavailable.');return await response.json();
+   let reply;try{reply=await response.json()}catch{return {proposal:null,diagnostic:'client_response'}}
+   if(!response.ok)return {proposal:null,diagnostic:reply?.diagnostic??'client_response'};return reply;
   },commit:patch=>{decisionStore.setField(goalId,patch.field,patch.value);if(!decisionStore.getSnapshot().saved)throw Error('Draft could not be saved.');}});
   if(live.current!==identity)return;
   setPending(false);
   if(outcome.status==='ready'||outcome.status==='cached'){requestAnimationFrame(()=>{heading.current?.focus({preventScroll:true});heading.current?.scrollIntoView({block:'start'});});}
-  else setNotice(outcome.status==='failed'?'Bundle preparation failed. Your goal, previous draft and results are kept. No retry runs automatically.':'The context changed. Your saved work is kept; prepare again explicitly.');
+  else setNotice(outcome.status==='failed'?`Action Plan preparation failed. Stage: ${outcome.diagnostic??'client_response'}. Your goal, previous draft and results are kept. No retry runs automatically.`:'The context changed. Your saved work is kept; prepare again explicitly.');
  }
  useEffect(()=>{
   if(pin?.id!==goalId||pin.sequence===consumed.current)return;
