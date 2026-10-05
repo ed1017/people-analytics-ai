@@ -18,8 +18,8 @@ const labels: Record<string, string> = {goal: 'Development goal', selected: 'Sel
   sessions: 'Sessions per participant', hours: 'Hours per participant per session', fee: 'Fee per unit per session', additionalFees: 'Additional fees', hourlyCost: 'Loaded hourly cost',
   goalStatement: 'Workforce goal', selectedPlanningScenario: 'Catalogue scenario', headcount: 'Source headcount',
   ...Object.fromEntries(workforceInputGroups.flatMap(([, , fields]) => fields))};
-const labelFor = (path: string) => labels[path.split('.').at(-1)!] ?? path;
-const display = (value: unknown): string => value === null || value === '' ? 'Unknown' : typeof value === 'object' && value && 'provider' in value ?
+export const labelFor = (path: string) => labels[path.split('.').at(-1)!] ?? path;
+export const display = (value: unknown): string => value === null || value === '' ? 'Unknown' : typeof value === 'object' && value && 'provider' in value ?
   `${value.provider} · ${'currency' in value ? value.currency : ''} · ${'provenance' in value ? value.provenance : ''}` : String(value);
 type Props = {binding: ActionBinding; draft: BundleDraft; attachmentId: string; disabled: boolean; isCurrent: () => boolean};
 
