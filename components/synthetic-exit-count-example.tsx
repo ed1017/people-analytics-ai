@@ -1,15 +1,19 @@
 "use client";
 
 import report from '@/lib/data/aggregate-exit-demo-v1.json';
+import consumerArtifact from '@/lib/data/forecast-consumer-view-v1.json';
+import { resolveForecastConsumerView } from '@/lib/forecast-consumer-view';
 
 const number=(value:number)=>new Intl.NumberFormat('en-US',{maximumFractionDigits:3}).format(value);
 const methodName=(id:string)=>id==='recent-mean-3'?'Recent three-month mean':id==='seasonal-naive-12'?'Same month in the prior year':'Simple exponential smoothing';
 const month=(value:string)=>new Date(value+'-01T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'});
 
-export function SyntheticExitCountExample(){
+export function SyntheticExitCountExample({consumer = consumerArtifact}: {consumer?: unknown} = {}){
+ const readiness = resolveForecastConsumerView(consumer, consumerArtifact, report);
  return <details className="mt-6 min-w-0 rounded-lg border bg-muted/10 p-3 text-sm" aria-label="Synthetic count example">
-  <summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Synthetic count example <span className="ml-2 text-xs font-normal text-muted-foreground">Conditional retrospective demo · 2026</span></summary>
+  <summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Synthetic count example <span className="ml-2 text-xs font-normal text-muted-foreground">Conditional retrospective demo · 2026</span><span className="mt-1 block text-xs font-normal">Operational forecast unavailable{readiness.status === 'ready' ? ' · conditional synthetic example only' : ' · example evidence unavailable'}</span></summary>
   <section aria-label="Conditional synthetic exit counts" className="min-w-0 space-y-4 pt-3">
+   {readiness.status !== 'ready' ? <p role="status">{readiness.message}</p> : <>
    <div className="space-y-2">
     <h2 className="text-lg font-semibold">Recorded counts and conditional estimates</h2>
     <p className="font-medium">Synthetic retrospective example · operational forecasting is not qualified.</p>
@@ -32,7 +36,8 @@ export function SyntheticExitCountExample(){
     <p className="text-xs">Total error is predicted minus recorded exits for the assessment quarter. The later assessment does not change the selected method. Expected totals sum unrounded estimates.</p>
     <details><summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">12 / 24 / all-history sensitivity</summary><div role="region" aria-label="History window sensitivity" tabIndex={0} className="overflow-x-auto"><table className="w-full min-w-[560px] text-xs"><caption className="mb-2 text-left">Descriptive sensitivity at matched origins · no window is selected from the already-visible assessment</caption><thead><tr className="border-b text-left"><th scope="col" className="py-2">Window and method</th><th scope="col" className="p-2 text-right">Development MAE</th><th scope="col" className="p-2 text-right">Assessment MAE</th><th scope="col" className="p-2 text-right">Oct–Dec expected total</th></tr></thead><tbody>{report.historyWindows.flatMap(window=>window.rows.map(row=><tr key={window.id+row.method} className="border-b"><th scope="row" className="py-2 text-left font-normal">{window.id==='all-available'?'All available':window.id==='last-12-months'?'12 months':'24 months'} · {methodName(row.method)}</th><td className="p-2 text-right">{number(row.developmentMae)}</td><td className="p-2 text-right">{number(row.assessmentMae)}</td><td className="p-2 text-right">{number(row.remainingTotal)}</td></tr>))}</tbody></table></div></details>
    </div></details>
-   <details className="border-t pt-2"><summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Source, version and reproduction</summary><div className="space-y-2 break-words pt-2 text-xs text-muted-foreground"><p>Source: {report.provenance.sources.join(', ')} · {report.provenance.sourceDefinitionVersion} · user-declared synthetic. History was loaded retrospectively; event dates do not establish availability at historical forecast origins.</p>{report.blockers.map(value=><p key={value}>{value}</p>)}<p>Dataset fingerprint: {report.identities.datasetFingerprint}</p><p>Protocol fingerprint: {report.identities.protocolFingerprint}</p><a href="https://github.com/ed1017/people-analytics-ai/blob/ff81aa036544dd326de87433ca4636f068ca1c98/docs/aggregate-exit-forecast.md" target="_blank" rel="noreferrer" className="inline-block min-h-11 py-2 text-primary underline">Read source qualification and offline reproduction</a></div></details>
+   </>}
+   <details className="border-t pt-2"><summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Source, version and reproduction</summary><div className="space-y-2 break-words pt-2 text-xs text-muted-foreground"><h3 className="font-semibold text-foreground">Missing inputs for operational forecasts</h3>{readiness.status === 'ready' ? readiness.domains.map(domain=><div key={domain.name}><h4 className="font-medium text-foreground">{domain.name} · unavailable</h4><ul className="mt-1 list-disc space-y-1 pl-5">{domain.missingInputs.map(input=><li key={input}>{input}</li>)}</ul></div>) : <p>Source-readiness detail is unavailable. The local evidence report must be regenerated and checked before showing this example.</p>}<p>No causal effect, rate or prediction interval is established.</p><p>Source: {report.provenance.sources.join(', ')} · {report.provenance.sourceDefinitionVersion} · user-declared synthetic. History was loaded retrospectively; event dates do not establish availability at historical forecast origins.</p>{report.blockers.map(value=><p key={value}>{value}</p>)}<p>Dataset fingerprint: {report.identities.datasetFingerprint}</p><p>Protocol fingerprint: {report.identities.protocolFingerprint}</p><a href="https://github.com/ed1017/people-analytics-ai/blob/ff81aa036544dd326de87433ca4636f068ca1c98/docs/aggregate-exit-forecast.md" target="_blank" rel="noreferrer" className="inline-block min-h-11 py-2 text-primary underline">Read source qualification and offline reproduction</a></div></details>
   </section>
  </details>;
 }
