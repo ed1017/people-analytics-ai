@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, type ReactNode } from "react";
+import {usePhoneLayout} from "@/components/use-phone-layout";
 import { PageHelp } from "@/components/page-help";
 
 import {
@@ -23,6 +24,7 @@ export function AppHeader({
   selectedPersona,
   onPersonaChange,
 }: AppHeaderProps) {
+  const phone=usePhoneLayout();
   const header = useRef<HTMLElement>(null);
   useEffect(() => {
     const element=header.current; if(!element) return;
@@ -36,16 +38,7 @@ export function AppHeader({
       ? "Assess & Evaluate"
       : page.label;
 
-  return (
-    <header ref={header} className="sticky top-0 z-30 border-b bg-card">
-      <div className="grid min-h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-0.5 px-4 py-1.5 sm:px-5">
-        <div className="col-span-2 flex min-w-0 flex-wrap items-center gap-x-5 gap-y-1 sm:col-span-1">
-          <div className="flex min-w-0 items-center gap-2">
-            <h1 id="app-page-title" className="min-w-0 break-words text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
-              {title}
-            </h1>
-            <PageHelp key={activePage} page={activePage} label={page.label} />
-          </div>
+  const contact=<>
           <p className="flex flex-wrap items-center gap-x-1.5 text-xs leading-5 text-muted-foreground sm:text-sm">
             <span>By Ed Om</span>
             <span aria-hidden="true">·</span>
@@ -56,6 +49,19 @@ export function AppHeader({
           <p className="text-xs leading-4 text-muted-foreground">
           Please reach out with any questions, feedback, or comments.
           </p>
+  </>;
+  return (
+    <header ref={header} className="sticky top-0 z-30 border-b bg-card">
+      <div className="grid min-h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-0.5 px-4 py-1.5 sm:px-5">
+        <div className="col-span-2 flex min-w-0 flex-wrap items-center gap-x-5 gap-y-1 sm:col-span-1">
+          <div className="flex min-w-0 items-center gap-2">
+            <h1 id="app-page-title" className="min-w-0 break-words text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
+              {title}
+            </h1>
+            <PageHelp key={activePage} page={activePage} label={page.label} />
+          </div>
+          {phone?<details className="header-contact"><summary className="min-h-11 cursor-pointer py-3 text-xs">About &amp; contact</summary><div className="header-contact-content">
+{contact}</div></details>:contact}
         </div>
         <div className="col-start-2 row-start-2 flex items-center justify-self-end gap-3 sm:row-start-1">
           <span className="hidden text-xs font-medium text-muted-foreground md:inline">
