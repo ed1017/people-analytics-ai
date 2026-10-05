@@ -1,12 +1,12 @@
-# Coordinated solution bundles: local foundation checkpoint
+# Coordinated solution bundles: foundation and Home integration
 
-This branch starts from production `9d4e1f0dac522dd4dc3a044601bbef9a38f817bb`. The foundation is not connected to the Home UI, preparation endpoint or model transport yet. No live model calls, full-suite run or deployment form part of this checkpoint.
+This branch starts from production `9d4e1f0dac522dd4dc3a044601bbef9a38f817bb`. The Home integration uses a single explicit preparation request, compact coordinated proposals, local assumption editing, explicit calculation and reviewed immutable attachments. No live model calls were made during implementation.
 
 ## Proposal contract
 
 `home-solution-bundles.ts` defines one to three coordinated bundles, with up to six relevant components each. A bundle has an objective and a coordination statement. Components have stable local IDs, a relevant domain, a complete first step, existing Home source references, a proposed owner role, limitations and prerequisite IDs. The validator checks bounds, exact goal, source availability, unique IDs and an acyclic dependency graph. It does not prove relevance, factual accuracy or causal effectiveness. Fewer bundles, including an honest unavailable result, are valid.
 
-There are no numeric model fields. The existing Home input envelope, its source catalogue and private-data boundary are unchanged. This foundation does not invoke the governed portfolio service. UI integration must separately review the bounded output-token allowance needed for the richer response; the existing action response allowance is not assumed sufficient for three six-component bundles.
+There are no numeric model fields. The existing Home input envelope, its source catalogue and private-data boundary are unchanged. This foundation does not invoke the governed portfolio service. The new bundle response has a 5,000-output-token ceiling; the legacy action response remains at 1,800. A realistic three-bundle/eighteen-component fixture is 7,759 UTF-8 bytes. This is a byte measurement, not measured model tokens. Actual usage, prose quality and truncation still require hosted QA. The existing request envelope is unchanged; no automatic retry or fan-out is added.
 
 ## Local reconciliation
 
@@ -27,14 +27,14 @@ Synthetic acceptance example: one targeted hire plus one internal development/tr
 
 Save draft does not attach a solution. Attach requires confirmation of the exact binding and input revision; unresolved assumptions require explicit acknowledgement. Attachments retain a deep snapshot of the proposal, inputs, provenance and recomputable result. Later edits create draft revisions; explicit replacement creates another immutable attachment with a predecessor link. Reload validates snapshots, rejects tampering, preserves old records on failure and labels changed context or draft versions separately. Proposal-text edits preserve entered values but reset combined cost, dependency and comparison review. Adding/removing components is blocked pending explicit reconciliation of their assumptions rather than dropping values silently.
 
-## Integration acceptance still to implement
+## Integrated interaction and remaining acceptance
 
-Show the actual option count and compact A/B/C comparison at the top. Every option is a coordinated bundle, with roughly six summary bullets and Details for components, assumptions, shared costs and dependencies. A pro/con may cite a verified comparable calculation; otherwise show its intended objective without declaring a winner.
+The UI shows the actual option count and compact A/B/C comparison at the top. Every option is a coordinated bundle, with roughly six summary bullets and Details for components, assumptions, shared costs and dependencies. A pro/con may cite a verified comparable calculation; otherwise show its intended objective without declaring a winner.
 
-Close each bundle with: “Want to change anything, including the assumptions? Tell me what you’d like to adjust.” Edit assumptions must route to that exact bundle/revision. Discussion routing must preserve typed text and bind the local selection safely; existing simple action-chip auto-send behavior must remain. No numeric local assumptions are automatically added to the model envelope. Do not render a promise of conversational editing before its handler is supported.
+Each bundle closes with: “Want to change anything, including the assumptions? Tell me what you’d like to adjust.” Edit assumptions must route to that exact bundle/revision. Discussion routing must preserve typed text and bind the local selection safely; existing simple action-chip auto-send behavior must remain. No numeric local assumptions are automatically added to the model envelope. Do not render a promise of conversational editing before its handler is supported.
 
 Attach solution to goal is a separate explicit action on the reviewed version. Subsequent changes stay drafts until an explicit replacement. Attached proposals never mean operational approval.
 
-Remaining gaps: UI and transport integration; actual-count comparative summaries and edit routing; guided reconciliation when changing the component set; output-budget review; realistic bundle-prose QA. Multi-role optimization, source-team availability, automatic efficacy, and person-level assignments are outside this bounded implementation.
+Remaining gaps: provenance-labelled starting assumptions (new numeric fields currently begin unknown); guided reconciliation when changing the component set; actual model-token and realistic bundle-prose QA. Multi-role optimization, source-team availability, automatic efficacy, and person-level assignments are outside this bounded implementation.
 
-Focused validation: `node --test tests/home-bundle-foundation.test.mjs`, TypeScript, and ESLint on the new files. Broader tests, browser validation and publishing follow foundation review.
+Validation: 779 unit tests; lint, TypeScript and production build; 48 coordinated-bundle, 84 existing capacity-flow, 57 existing retention-flow, 53 docked-layout and 42 auto-send browser assertions. Browser endpoints are synthetic/intercepted and cover desktop, mobile and 200% reflow. Calculated snapshots are saved separately from draft revisions, and stale calculations remain reference-only. Valid empty proposals do not offer a preparation button that would only reopen their cache.

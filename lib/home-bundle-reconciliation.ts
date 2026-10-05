@@ -180,8 +180,12 @@ export function reconcileBundle(draft:BundleDraft):BundleResult{
 }
 export function compareBundleDrafts(leftDraft:BundleDraft,rightDraft:BundleDraft){
  const left=reconcileBundle(leftDraft),right=reconcileBundle(rightDraft);
+ return compareCurrentBundleResults(left,right,leftDraft,rightDraft);
+}
+/** Compare only explicitly calculated current snapshots; do not calculate during rendering. */
+export function compareCurrentBundleResults(left:BundleResult,right:BundleResult,leftDraft:BundleDraft,rightDraft:BundleDraft){
  const keys=['population','businessUnit','jobProfile','startMonth','months','demand','capacityRequired','requirements'] as const;
- const matched=left.bindingKey===right.bindingKey&&left.scope.currency===right.scope.currency&&left.scope.comparisonConfirmed.value===true&&right.scope.comparisonConfirmed.value===true&&left.scope.requirements.value!==null&&keys.every(key=>JSON.stringify(left.scope[key].value)===JSON.stringify(right.scope[key].value));
+ const matched=left.inputKey===bundleInputKey(leftDraft)&&right.inputKey===bundleInputKey(rightDraft)&&left.bindingKey===right.bindingKey&&left.scope.currency===right.scope.currency&&left.scope.comparisonConfirmed.value===true&&right.scope.comparisonConfirmed.value===true&&left.scope.requirements.value!==null&&keys.every(key=>JSON.stringify(left.scope[key].value)===JSON.stringify(right.scope[key].value));
  if(!matched)return {comparable:false,cashDifference:null,capacityMonthsDifference:null,reason:'Confirm matching goal, evidence, target scope, requirements and horizon before comparing.'};
  return {comparable:true,cashDifference:left.cashTotal===null||right.cashTotal===null?null:cents(left.cashTotal-right.cashTotal),capacityMonthsDifference:left.capacityReadyMonth&&right.capacityReadyMonth?monthIndex(left.capacityReadyMonth)-monthIndex(right.capacityReadyMonth):null,reason:'Differences are conditional on reviewed assumptions; objectives are not proven outcomes.'};
 }

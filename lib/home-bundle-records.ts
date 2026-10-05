@@ -9,7 +9,7 @@ import {plain,exactKeys} from './home-action-proposal.ts';
 import {validateJson} from './local-decisions.ts';
 export const bundleWorkspaceField='homeSolutionBundlesV1';
 export type BundleAttachment={id:string;status:'attached_proposal';attachedAt:string;supersedes:string|null;draft:BundleDraft;result:BundleResult;unknownsAcknowledged:boolean};
-export type BundleWorkspace={version:1;goalId:string;drafts:BundleDraft[];attachments:BundleAttachment[]};
+export type BundleWorkspace={version:1;goalId:string;drafts:BundleDraft[];calculations:{draft:BundleDraft;result:BundleResult}[];attachments:BundleAttachment[]};
 export type AttachConfirmation={confirmed:true;bindingKey:string;inputKey:string;acknowledgeUnknowns:boolean};
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 const id=(value:unknown):value is string=>typeof value==='string'&&/^[A-Za-z0-9_-]{1,80}$/.test(value);
@@ -22,15 +22,17 @@ function attachmentValid(raw:unknown):raw is BundleAttachment{
  }catch{return false}
 }
 export function readBundleWorkspace(raw:unknown,goalId:string):BundleWorkspace|null{
- if(raw===undefined)return {version:1,goalId,drafts:[],attachments:[]};
+ if(raw===undefined)return {version:1,goalId,drafts:[],calculations:[],attachments:[]};
  try{
   if(!validateJson(raw)||new TextEncoder().encode(JSON.stringify(raw)).length>192*1024)return null;
-  const value=plain(raw);if(!value||!exactKeys(value,['version','goalId','drafts','attachments'])||value.version!==1||value.goalId!==goalId||!id(value.goalId)||!Array.isArray(value.drafts)||value.drafts.length>12||!Array.isArray(value.attachments)||value.attachments.length>12)return null;
+  const value=plain(raw);if(!value||!exactKeys(value,['version','goalId','drafts','calculations','attachments'])||value.version!==1||value.goalId!==goalId||!id(value.goalId)||!Array.isArray(value.drafts)||value.drafts.length>12||!Array.isArray(value.calculations)||value.calculations.length>12||!Array.isArray(value.attachments)||value.attachments.length>12)return null;
   const drafts=value.drafts.map(readBundleDraft);if(drafts.some(draft=>!draft||draft.binding.goalId!==goalId)||new Set(drafts.map(draft=>draftKey(draft!))).size!==drafts.length)return null;
   if(value.attachments.some(item=>!attachmentValid(item)||item.draft.binding.goalId!==goalId)||new Set(value.attachments.map(item=>(item as BundleAttachment).id)).size!==value.attachments.length)return null;
+  const calculations=value.calculations as {draft:BundleDraft;result:BundleResult}[];
+  if(calculations.some(item=>!plain(item)||!exactKeys(item,['draft','result'])||!readBundleDraft(item.draft)||item.draft.binding.goalId!==goalId||!same(reconcileBundle(item.draft),item.result))||new Set(calculations.map(item=>draftKey(item.draft))).size!==calculations.length)return null;
   const attachments=value.attachments as BundleAttachment[],seen=new Map<string,BundleAttachment>(),replaced=new Set<string>();
   for(const item of attachments){if(item.supersedes){const prior=seen.get(item.supersedes);if(!prior||replaced.has(prior.id)||prior.draft.bundle.id!==item.draft.bundle.id)return null;replaced.add(prior.id);}seen.set(item.id,item);}
-  return structuredClone({version:1,goalId,drafts:drafts as BundleDraft[],attachments});
+  return structuredClone({version:1,goalId,drafts:drafts as BundleDraft[],calculations,attachments});
  }catch{return null}
 }
 function workspace(raw:unknown,goalId:string){const value=readBundleWorkspace(raw,goalId);if(!value)throw Error('Saved bundle records cannot be verified; existing work is kept.');return value}
@@ -58,4 +60,12 @@ export function attachedBundleState(attachment:BundleAttachment,currentBinding:A
  if(actionBindingKey(attachment.draft.binding)!==actionBindingKey(currentBinding))return 'context_changed';
  if(draft&&bundleInputKey(draft)!==bundleInputKey(attachment.draft))return 'draft_changed';
  return 'current';
+}
+
+export function saveBundleCalculationPatch(raw:unknown,draft:BundleDraft,result:BundleResult){
+ if(!same(reconcileBundle(draft),result))throw Error('Calculate the current reviewed inputs before saving the result.');
+ const value=saveBundleDraftPatch(raw,draft).value,index=value.calculations.findIndex(item=>draftKey(item.draft)===draftKey(draft));
+ const snapshot={draft:structuredClone(draft),result:structuredClone(result)};
+ if(index>=0)value.calculations[index]=snapshot;else value.calculations.push(snapshot);
+ return patch(value);
 }
