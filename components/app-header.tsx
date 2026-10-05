@@ -53,10 +53,10 @@ export function AppHeader({
             <span aria-hidden="true">·</span>
             <a className="rounded-sm text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring" href="https://www.linkedin.com/in/ed-om-62a57818" target="_blank" rel="noreferrer">LinkedIn</a>
           </p>
-        </div>
-        <p className="col-start-1 row-start-2 text-xs leading-4 text-muted-foreground sm:col-span-2">
+          <p className="text-xs leading-4 text-muted-foreground">
           Please reach out with any questions, feedback, or comments.
-        </p>
+          </p>
+        </div>
         <div className="col-start-2 row-start-2 flex items-center justify-self-end gap-3 sm:row-start-1">
           <span className="hidden text-xs font-medium text-muted-foreground md:inline">
             Perspective

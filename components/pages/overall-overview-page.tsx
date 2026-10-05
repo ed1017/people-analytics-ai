@@ -306,7 +306,6 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   }
   const startingGuide=(
     <section aria-label="Starting guide" data-testid="overview-starting-guide" className="space-y-3 pt-0 pb-1">
-      <HomeGettingStarted busy={chatLoading} onNavigate={onNavigate} onStartDemo={() => { startNewIssue(DEVELOPMENT_DEMO_GOAL); onStartDemo(); }}/>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <h3 className="text-lg font-semibold">Questions to explore</h3>
         <p className="text-sm text-muted-foreground">Click a question to send it, or write your own.</p>
@@ -322,11 +321,13 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   return <div className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-3">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <h2 id="overall-overview-heading" className="sr-only">Home overview</h2>
+        <HomeGettingStarted busy={chatLoading} onNavigate={onNavigate} onStartDemo={() => { startNewIssue(DEVELOPMENT_DEMO_GOAL); onStartDemo(); }} status={
         <div className="ml-auto flex items-center gap-3 text-xs">
           <span className="text-muted-foreground">In development</span>
           <button type="button" popoverTarget="home-data-details" aria-label="Open data details" title="Data, scope and conversation history" className="flex min-h-11 items-center gap-1 rounded px-2 text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"><Info size={16}/><span>Data details</span></button>
 
         </div>
+        }/>
       </header>
       <div id="home-data-details" popover="auto" role="dialog" aria-label="Data details" className="fixed inset-0 m-auto max-h-[80dvh] w-[min(60rem,92vw)] overflow-y-auto rounded-xl border bg-background p-5 text-sm text-foreground shadow-xl">
         <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">Data details</h2><button type="button" popoverTarget="home-data-details" popoverTargetAction="hide" className="min-h-11 rounded border px-3 focus-visible:ring-2 focus-visible:ring-ring">Close data details</button></div>
@@ -393,7 +394,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" aria-describedby="overview-question-context-tip" value={input} onChange={event => changeQuestion(event.target.value)} rows={2}
         placeholder="Describe a business issue, and I’ll help you explore the evidence, compare options, and build or adjust a plan." className="max-h-80 min-h-20 w-full resize-y rounded-lg border bg-background/40 p-3 text-lg placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
       <div className="mt-2 flex items-end justify-between gap-3">
-        <p id="overview-question-context-tip" className="min-w-0 text-xs leading-4 text-muted-foreground">Best practice: Add context like your timeline, budget and relevant sources to help shape a more precise goal.</p>
+        <p id="overview-question-context-tip" className="min-w-0 text-xs leading-4 text-muted-foreground">Best practice: Add context like your timeline, budget, stakeholders and relevant sources to help shape a more precise goal.</p>
         <button type="submit" aria-label="Send overview question" disabled={(!localCandidate&&!ready) || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
       </div></div>
     </form>
