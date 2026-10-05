@@ -1,5 +1,5 @@
 // @ts-expect-error Native Node tests share TypeScript source.
-import {readHomeBundleProposal,type BundleProposal} from './home-solution-bundles.ts';
+import {readHomeBundleProposal,inspectHomeBundleProposal,readBundleDiagnostic,type BundleDiagnostic,type BundleProposal} from './home-solution-bundles.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {actionBindingKey,validActionBinding,actionUsage,type ActionBinding,type ActionUsage} from './home-action-drafts.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -18,8 +18,8 @@ export function readBundlePreparation(raw:unknown,binding:ActionBinding,packet:u
   const proposal=readHomeBundleProposal(value.proposal,binding.goal,packet);return proposal?structuredClone({...value,proposal}) as BundlePreparation:null;
  }catch{return null}
 }
-type Outcome={status:'ready'|'cached';draft:BundlePreparation}|{status:'explicit_required'|'stale'|'failed'};
-type Args={mode:'new-pin'|'explicit'|'passive';binding:ActionBinding;packet:unknown;stored:unknown;isCurrent:()=>boolean;prepare:(signal:AbortSignal)=>Promise<{proposal:unknown;usage?:unknown}>;commit:(patch:{field:string;value:BundlePreparation})=>void};
+type Outcome={status:'ready'|'cached';draft:BundlePreparation}|{status:'explicit_required'|'stale'|'failed';diagnostic?:BundleDiagnostic};
+type Args={mode:'new-pin'|'explicit'|'passive';binding:ActionBinding;packet:unknown;stored:unknown;isCurrent:()=>boolean;prepare:(signal:AbortSignal)=>Promise<{proposal:unknown;usage?:unknown;diagnostic?:unknown}>;commit:(patch:{field:string;value:BundlePreparation})=>void};
 export function createHomeBundlePreparation(){
  let epoch=0;const attemptedGoals=new Set<string>(),flights=new Map<string,{promise:Promise<Outcome>;abort:AbortController}>();
  return {
@@ -35,11 +35,12 @@ export function createHomeBundlePreparation(){
    const ticket=epoch,abort=new AbortController(),start=Date.now(),current=()=>ticket===epoch&&!abort.signal.aborted&&args.isCurrent();
    const promise=Promise.resolve().then(async():Promise<Outcome>=>{
     try{if(!current())return {status:'stale'};const reply=await args.prepare(abort.signal);if(!current())return {status:'stale'};
-     const proposal=readHomeBundleProposal(reply.proposal,binding.goal,packet);if(!proposal)return {status:'failed'};
+     const remote=readBundleDiagnostic(reply.diagnostic);if(remote)return {status:'failed',diagnostic:remote};
+     const inspected=inspectHomeBundleProposal(reply.proposal,binding.goal,packet),proposal=inspected.proposal;if(!proposal)return {status:'failed',diagnostic:inspected.diagnostic};
      const draft:BundlePreparation={version:1,binding,proposal,preparedAt:new Date().toISOString(),usage:actionUsage(reply.usage,Date.now()-start)};
      if(!readBundlePreparation(draft,binding,packet))return {status:'failed'};if(!current())return {status:'stale'};
-     args.commit({field:bundlePreparationField,value:draft});return {status:'ready',draft:structuredClone(draft)};
-    }catch{return {status:current()?'failed':'stale'}}finally{if(flights.get(key)?.promise===promise)flights.delete(key);}
+     try{args.commit({field:bundlePreparationField,value:draft})}catch{return {status:'failed',diagnostic:'storage_failure'}}return {status:'ready',draft:structuredClone(draft)};
+    }catch{return {status:current()?'failed':'stale',diagnostic:'client_transport'}}finally{if(flights.get(key)?.promise===promise)flights.delete(key);}
    });flights.set(key,{promise,abort});return promise;
   },
  };
