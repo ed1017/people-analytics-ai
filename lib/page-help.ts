@@ -14,7 +14,7 @@ export const pageHelp: Record<AppPage, string> = {
   overview: workforce,
   workforce,
   attrition: "I brought the recorded separation measures together to help you explore turnover patterns. These are descriptive aggregates, so a difference between groups doesn't tell us why someone left or predict who will leave next.",
-  compensation: "I've reserved this page for a future compensation view. It's still TBD, so there isn't compensation analysis or an AI briefing here yet.",
+  compensation: "Explore public US occupation wage references and synthetic workforce-cost context. Select a reference explicitly and read its dates, units and scope limits. Internal salary analysis and an AI briefing are unavailable.",
   "talent-acquisition": "I organized the recruiting measures so you can explore demand, the hiring funnel and recorded outcomes. Read the dates and populations alongside each measure before comparing hiring speed or conversion.",
   "survey-sentiment": "I used synthetic structured survey responses to show participation and recorded scores. The original questionnaire framework and favorability threshold aren't verified, and comment counts don't represent an analysis of what people wrote.",
   skills: "I connected recorded skill requirements, job profiles and learning coverage to help you explore capability gaps. Stored O*NET mappings add context, not a verified live O*NET feed; choose an observation and add your goal if you want to carry evidence into Planning.",

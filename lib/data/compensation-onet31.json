@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "database_version": "31.0",
+  "release_month": "August 2026",
+  "verified_at": "2026-10-05",
+  "taxonomy": "O*NET-SOC 2019",
+  "target_taxonomy": "2018 SOC",
+  "occupation_source": "https://www.onetcenter.org/dl_files/database/db_31_0_json/occupation_data.json",
+  "crosswalk_source": "https://www.onetcenter.org/taxonomy/2019/soc.html",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "attribution": "O*NET 31.0 Database, U.S. Department of Labor, Employment and Training Administration (USDOL/ETA). O*NET® is a trademark of USDOL/ETA.",
+  "modifications": "Selected three official occupation titles and crosswalk pairs; descriptions condensed for this application. USDOL/ETA has not approved, endorsed, or tested these modifications.",
+  "review_method": "Exact titles/codes checked against the versioned occupation file and published crosswalk. This verifies public taxonomy relationships, not internal job-role matches.",
+  "records": [
+    {
+      "onet_code": "15-1252.00",
+      "onet_title": "Software Developers",
+      "soc_code": "15-1252",
+      "soc_title": "Software Developers",
+      "scope_summary": "Research, design and develop software; analyze user needs, build solutions and improve existing software capabilities.",
+      "mapping_basis": "official_crosswalk_exact",
+      "scope_note": "Published wages cover the SOC occupation across included industries and employers; an internal software role still needs a duties-based match."
+    },
+    {
+      "onet_code": "15-2051.00",
+      "onet_title": "Data Scientists",
+      "soc_code": "15-2051",
+      "soc_title": "Data Scientists",
+      "scope_summary": "Develop analytical techniques and applications to turn data into information using programming, modeling, machine learning and visualization.",
+      "mapping_basis": "official_crosswalk_exact",
+      "scope_note": "This BLS SOC also includes O*NET Business Intelligence Analysts and Clinical Data Managers. Its wages are not specialty-specific."
+    },
+    {
+      "onet_code": "29-1141.00",
+      "onet_title": "Registered Nurses",
+      "soc_code": "29-1141",
+      "soc_title": "Registered Nurses",
+      "scope_summary": "Assess patient needs, plan and provide nursing care, and maintain medical records. Licensing or registration is required.",
+      "mapping_basis": "official_crosswalk_exact",
+      "scope_note": "This BLS SOC also includes several O*NET nursing specialties. Its wages are not specialty-specific."
+    }
+  ]
+}

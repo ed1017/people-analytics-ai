@@ -54,7 +54,7 @@ export const appPageMetadata: Record<
     description:
       "Workforce size, structure, tenure, management layers, and mobility.",
   },
-  compensation: { label: "Compensation", section: "Workforce", description: "Planned destination. TBD; no compensation data is available." },
+  compensation: { label: "Compensation", section: "Workforce", description: "Public US occupation wage references and synthetic workforce-cost context. Internal salary analysis is unavailable." },
   attrition: {
     label: "Attrition",
     section: "Workforce",
