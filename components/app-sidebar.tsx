@@ -1,5 +1,6 @@
 "use client";
-import {useState} from "react";
+import {useRef,useState} from "react";
+import {usePhoneLayout} from "@/components/use-phone-layout";
 import type { LucideIcon } from "lucide-react";
 import {
   CalendarDays,
@@ -81,15 +82,17 @@ const pageIcons: Record<
 
 export function AppSidebar({
   activePage,
-  navCollapsed,
+  navCollapsed: desktopNavCollapsed,
   onToggle,
   onPageChange,
 }: AppSidebarProps) {
+  const phone=usePhoneLayout(),drawer=useRef<HTMLElement>(null),navCollapsed=phone?false:desktopNavCollapsed;
   const [openGroups,setOpenGroups]=useState<Record<string,boolean>>({analytics:true,talent:false,strategy:false,evaluate:false});
   const [previousPage,setPreviousPage]=useState(activePage);
   if(previousPage!==activePage){setPreviousPage(activePage);const section=appNavigationSections.find(s=>s.pages.includes(activePage));if(section)setOpenGroups(current=>({...current,[section.key]:true}));}
   return (
-    <aside className="app-sidebar sticky top-[var(--app-header-height)] h-[calc(100vh-var(--app-header-height))] overflow-y-auto border-r bg-sidebar p-3 max-md:p-2">
+    <><div className="phone-navigation-trigger"><button type="button" popoverTarget="phone-navigation" className="min-h-11 rounded border px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring">Open navigation</button></div>
+    <aside ref={drawer} id="phone-navigation" popover={phone?"auto":undefined} aria-label="Navigation drawer" onClick={event=>{if(phone&&(event.target as HTMLElement).closest('[data-nav-destination], [aria-label="Action Planning"]'))drawer.current?.hidePopover();}} className="app-sidebar sticky top-[var(--app-header-height)] h-[calc(100vh-var(--app-header-height))] overflow-y-auto border-r bg-sidebar p-3 max-md:p-2">
       <Button
         variant="ghost"
         className={
@@ -97,13 +100,13 @@ export function AppSidebar({
             ? "mb-3 w-full justify-center px-0"
             : "mb-3 w-full justify-start gap-2 max-md:justify-center max-md:px-0"
         }
-        onClick={onToggle}
-        title={
+        onClick={()=>phone?drawer.current?.hidePopover():onToggle()}
+        title={phone?"Close navigation":
           navCollapsed
             ? "Expand navigation"
             : "Collapse navigation"
         }
-        aria-label={
+        aria-label={phone?"Close navigation":
           navCollapsed
             ? "Expand navigation"
             : "Collapse navigation"
@@ -115,7 +118,7 @@ export function AppSidebar({
           <>
             <PanelLeftClose className="h-5 w-5" />
             <span className="max-md:hidden">
-              Collapse navigation
+              {phone?"Close navigation":"Collapse navigation"}
             </span>
           </>
         )}
@@ -244,6 +247,6 @@ export function AppSidebar({
           }
         )}
       </nav>
-    </aside>
+    </aside></>
   );
 }

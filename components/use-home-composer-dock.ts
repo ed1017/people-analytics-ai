@@ -1,4 +1,5 @@
 "use client";
+import {PHONE_LAYOUT_QUERY} from './use-phone-layout';
 import {useLayoutEffect,type RefObject} from 'react';
 /** Keep the Home input/Send group aligned with its content column and visible viewport. */
 export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement|null>,dock:RefObject<HTMLDivElement|null>,input:RefObject<HTMLTextAreaElement|null>){
@@ -10,6 +11,14 @@ export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement
   const measure=()=>{
    const box=anchor.getBoundingClientRect(),height=viewport?.height??innerHeight;
    if(!box.width)return;
+   if(window.matchMedia(PHONE_LAYOUT_QUERY).matches){
+    document.documentElement.classList.remove('home-keyboard-open');
+    for(const property of ['left','width','bottom','max-height'])element.style.removeProperty(property);
+    textarea.style.setProperty('max-height',`${Math.max(96,Math.min(240,height*.4))}px`);
+    textarea.style.setProperty('min-height','96px');
+    root.style.setProperty('--home-composer-height','0px');page.style.setProperty('--home-composer-height','0px');
+    return;
+   }
    const keyboard=height<innerHeight*.75;
    document.documentElement.classList.toggle('home-keyboard-open',keyboard);
    if(keyboard&&!keyboardOpen){const header=document.querySelector('main > header');if(header)window.scrollBy(0,Math.max(0,header.getBoundingClientRect().bottom));}
@@ -26,6 +35,7 @@ export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement
    page.style.setProperty('--home-composer-height',composerHeight);
   };
   const keepFocusVisible=(event:FocusEvent)=>{
+   if(window.matchMedia(PHONE_LAYOUT_QUERY).matches)return;
    const target=event.target;if(!(target instanceof HTMLElement)||element.contains(target))return;
    requestAnimationFrame(()=>{const box=target.getBoundingClientRect(),cover=element.getBoundingClientRect();if(box.right>cover.left&&box.left<cover.right&&box.bottom>cover.top-8&&box.top<cover.bottom)target.scrollIntoView({block:'center',behavior:'instant'});});
   };
