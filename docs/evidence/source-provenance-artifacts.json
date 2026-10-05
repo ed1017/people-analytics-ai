@@ -1,0 +1,76 @@
+{
+  "artifactType": "read-only-artifact-inventory",
+  "investigatedHead": "8d452186b69867cf40872f687eb8d25da567f973",
+  "reachableCommitCountAtInvestigation": 334,
+  "freshDatabaseQueries": false,
+  "sqlExecuted": false,
+  "sourceGeneratorRecovered": false,
+  "absenceScope": "Tracked tree and path history reachable from locally available refs; no external source storage inspected.",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "6a3bb95dc5bdea913798260764d954d999bca92d1467c42a814085410d86a2e7"
+    },
+    {
+      "path": "docs/aggregate-exit-forecast.md",
+      "sha256": "b696747e52b3e32c1f54fb598813a57b1a4117bee35d6bc265601975313e84c5"
+    },
+    {
+      "path": "tests/fixtures/aggregate-exit-history.json",
+      "sha256": "64acf5cbb0cddbaa0614e20ee3895cd026ebe3ec9c91fed622820b53b44d63cd"
+    },
+    {
+      "path": "docs/predictive-analytics-roadmap.md",
+      "sha256": "04d22a495683961c9348d58df68e3ffd0947a8860aebc994b4c53eb7f3235c4b"
+    },
+    {
+      "path": "docs/predictive-data-inventory.sql",
+      "sha256": "6f460042810bd864aded6374814c19bc5ce8193d51678b94908f7d81337472bc"
+    },
+    {
+      "path": "docs/build-decision-log.md",
+      "sha256": "6f675d3c09ada567fb9aefd64e4ebd6d8d8fa304826a19c8b0163d7f2df34581"
+    },
+    {
+      "path": "app/api/survey-sentiment/route.ts",
+      "sha256": "958519c6a5975afe25947723a684c808502b62b2086f11140fbd39bdaddd3a03"
+    },
+    {
+      "path": "lib/exit-enps.ts",
+      "sha256": "9953824b7c3f5891a14bbf1a1876695e605ca2e2e16b8af1796cd472ef5f31dc"
+    },
+    {
+      "path": "tests/fixtures/hiring-evaluation.mjs",
+      "sha256": "9d178cacbe1fd253ba562c375b74d859a67782ce66699045b1ac5c91ffd14d50"
+    },
+    {
+      "path": "docs/hiring-fixture-preflight.md",
+      "sha256": "c98ce7e2b04ad77c768165a0d0b79e0369e9b2dbf389758ce33a6001718707c5"
+    },
+    {
+      "path": "tests/fixtures/turnover-vintage-generator.mjs",
+      "sha256": "1d144db22ea09f3afc6beba78293829da69a751ba585a7362e1ac73eba545a7b"
+    },
+    {
+      "path": "database/position_action_structural_inventory.sql",
+      "sha256": "c98d0f8857a9e3691bde6c741873600fbdbcf6cf72470768094d7cadaa618055"
+    },
+    {
+      "path": "database/position_skill_requirement_map.sql",
+      "sha256": "ed768447e5c9b5e5e140c74c29def69d9760cc31af73f73c52bcd61bb021dacb"
+    },
+    {
+      "path": "database/ta_requisition_metrics_server_access.sql",
+      "sha256": "b37dbfd08c5499824127ea634239d479ac917396c9503d08800ff83bd6ef939a"
+    },
+    {
+      "path": "database/workforce_response_strategy_signals.sql",
+      "sha256": "6693fb6e2a3c21980be609455ff876678e2f381c27f14da0a69092812f200ca0"
+    },
+    {
+      "path": "docs/hiring-lead-time-source-qualification.md",
+      "sourceHead": "d464f28cee3d4e90279d2b39547856be702fb06d",
+      "sha256": "7164e1f75173227b7f1317c622a8c8668487f338e81faca850517006146d313d"
+    }
+  ]
+}

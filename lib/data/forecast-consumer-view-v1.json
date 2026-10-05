@@ -1,0 +1,513 @@
+{
+  "schemaVersion": 1,
+  "status": "unqualified",
+  "operationalForecast": null,
+  "domains": {
+    "turnover": {
+      "status": "unqualified",
+      "contractStatus": "blocked",
+      "label": "Forecast unavailable: source evidence incomplete or invalid",
+      "reasonCodes": [
+        "availability-unknown",
+        "availability-unverified",
+        "completeness-unknown",
+        "no-available-history"
+      ],
+      "missingInputs": [
+        "Versioned population and monthly count definitions; reconcile every month, including event-empty months, against scoped source completion evidence.",
+        "Actual first-observed timestamps, revision predecessors and recorded corrections for every monthly label; event and bulk insertion dates are not substitutes.",
+        "Completion declarations with population, covered period, actual observation time and evidence reference at every forecast origin and scoring cutoff.",
+        "Generator/version lineage if asserting synthetic completeness. Person-time at risk plus explicit future exposure assumptions before rates."
+      ],
+      "causalEffectStatus": "unavailable",
+      "operationalForecast": null,
+      "interval": null,
+      "sourceTruthVerified": false,
+      "causalReasonCodes": [
+        "availability-unverified",
+        "completeness-unknown",
+        "missing-comparison-design"
+      ]
+    },
+    "satisfaction": {
+      "status": "unqualified",
+      "contractStatus": "blocked",
+      "label": "Forecast unavailable: source evidence incomplete or invalid",
+      "reasonCodes": [
+        "availability-unverified",
+        "completeness-unknown",
+        "no-available-history"
+      ],
+      "missingInputs": [
+        "Comparable observed waves with versioned population, eligibility, instrument/items and scoring rules; no interpolated monthly targets.",
+        "Mean respondent favorable-answer share with valid respondent denominator, eligible population for participation, and missing/nonresponse counts.",
+        "Wave closure, actual observation/revision times, scoped completion, and reviewed cell/complementary/query-set suppression status."
+      ],
+      "causalEffectStatus": "unavailable",
+      "operationalForecast": null,
+      "interval": null,
+      "sourceTruthVerified": false,
+      "causalReasonCodes": [
+        "availability-unverified",
+        "completeness-unknown",
+        "missing-comparison-design"
+      ]
+    },
+    "hiring": {
+      "status": "unqualified",
+      "contractStatus": "blocked",
+      "label": "Forecast unavailable: source evidence incomplete or invalid",
+      "reasonCodes": [
+        "availability-unverified",
+        "completeness-unknown",
+        "no-available-history"
+      ],
+      "missingInputs": [
+        "One role/population with every opening retained, including open, cancelled and no-show dispositions; maturity/censoring at the scoring cutoff.",
+        "Separate opening, accepted-offer, actual-start and capacity-ready definitions; no hire or planned-start substitution.",
+        "Actual first-observed stage/status/revision times, opening-known features only, scoped cohort completion and a common fixed follow-up horizon or censoring-aware estimator."
+      ],
+      "causalEffectStatus": "unavailable",
+      "operationalForecast": null,
+      "interval": null,
+      "sourceTruthVerified": false,
+      "causalReasonCodes": [
+        "availability-unverified",
+        "completeness-unknown",
+        "missing-comparison-design"
+      ]
+    }
+  },
+  "conditionalDemo": {
+    "status": "conditional-retrospective-synthetic-demo",
+    "assumptions": [
+      "Included recorded counts are treated as complete solely for this retrospective synthetic demonstration.",
+      "Future counts follow a similar process to these synthetic monthly aggregates."
+    ],
+    "preview": {
+      "schemaVersion": 1,
+      "status": "conditional-retrospective-synthetic-demo",
+      "operationallyQualified": false,
+      "methodVersion": "aggregate-exit-demo-v1",
+      "identities": {
+        "fixtureSha256": "64acf5cbb0cddbaa0614e20ee3895cd026ebe3ec9c91fed622820b53b44d63cd",
+        "evaluatorSha256": "095003fd6731eab87030f91c38fb698e71b3e0c92a0bc7bcd3450d0d2c9fea4e",
+        "datasetFingerprint": "7887ad425425356be28dc143c2776069309ced0cf05a602a842ee8216b75c280",
+        "protocolFingerprint": "268252ee00c4e2413811879b3225e40261c5014ce7378c2d81a764359a01a354"
+      },
+      "provenance": {
+        "sources": [
+          "public.attrition_monthly_trend"
+        ],
+        "sourceDefinitionVersion": "inspected-2026-10-05",
+        "extractedOn": "2026-10-05",
+        "population": "all-recorded-voluntary-separations",
+        "dataClass": "user-declared-synthetic",
+        "completeness": "unverified",
+        "temporalAvailability": "retrospective-final-data",
+        "generatorVersion": null,
+        "datasetFingerprint": "7887ad425425356be28dc143c2776069309ced0cf05a602a842ee8216b75c280",
+        "exposureDefinition": null
+      },
+      "history": {
+        "start": "2024-02",
+        "end": "2026-09",
+        "usableMonths": 32,
+        "excluded": [
+          {
+            "month": "2024-01",
+            "reason": "unverified-join-zero"
+          }
+        ]
+      },
+      "qualification": {
+        "countForecastQualified": false,
+        "rateForecastQualified": false,
+        "pointInTimeValidated": false,
+        "completenessVerified": false,
+        "generatorProvenanceVerified": false
+      },
+      "assumptions": [
+        "Included recorded counts are treated as complete solely for this retrospective synthetic demonstration.",
+        "Future counts follow a similar process to these synthetic monthly aggregates."
+      ],
+      "blockers": [
+        "No source completion watermark or versioned generator.",
+        "History loaded retrospectively; no as-known-at-origin vintages.",
+        "Month-end headcount is a stock, not average at-risk exposure; future exposure is unknown."
+      ],
+      "recordedSubtotal": {
+        "start": "2026-01",
+        "end": "2026-09",
+        "value": 605,
+        "completenessVerified": false
+      },
+      "conditional": {
+        "points": [
+          {
+            "month": "2026-10",
+            "horizon": 1,
+            "expectedExits": 67
+          },
+          {
+            "month": "2026-11",
+            "horizon": 2,
+            "expectedExits": 67
+          },
+          {
+            "month": "2026-12",
+            "horizon": 3,
+            "expectedExits": 67
+          }
+        ],
+        "remainingTotal": 201,
+        "yearEndTotal": 806
+      },
+      "selectedMethod": "recent-mean-3",
+      "selectionRule": "Development-only monthly MAE; candidate requires at least 10% improvement against each baseline; baseline ties favor recent mean.",
+      "evaluation": {
+        "developmentOrigins": [
+          "2026-01",
+          "2026-02",
+          "2026-03"
+        ],
+        "distinctDevelopmentMonths": 5,
+        "assessmentOrigin": "2026-06",
+        "assessmentCustody": "not-untouched"
+      },
+      "methods": [
+        {
+          "id": "recent-mean-3",
+          "kind": "baseline",
+          "development": {
+            "origins": 3,
+            "distinctTargetMonths": 5,
+            "overall": {
+              "count": 9,
+              "mae": 3.9259259259259256,
+              "rmse": 4.311912869318279,
+              "bias": -0.6666666666666651
+            },
+            "byHorizon": [
+              {
+                "horizon": 1,
+                "count": 3,
+                "mae": 4.11111111111111,
+                "rmse": 4.6943622609505775,
+                "bias": -0.7777777777777762
+              },
+              {
+                "horizon": 2,
+                "count": 3,
+                "mae": 3.7777777777777763,
+                "rmse": 3.790827135384883,
+                "bias": -1.1111111111111096
+              },
+              {
+                "horizon": 3,
+                "count": 3,
+                "mae": 3.8888888888888906,
+                "rmse": 4.401178293408527,
+                "bias": -0.11111111111110954
+              }
+            ],
+            "threeMonthTotal": {
+              "count": 3,
+              "mae": 2,
+              "rmse": 2.581988897471611,
+              "bias": -2
+            }
+          },
+          "assessment": {
+            "origins": 1,
+            "distinctTargetMonths": 3,
+            "overall": {
+              "count": 3,
+              "mae": 2.3333333333333335,
+              "rmse": 2.3804761428476167,
+              "bias": 1
+            },
+            "byHorizon": [
+              {
+                "horizon": 1,
+                "count": 1,
+                "mae": 2,
+                "rmse": 2,
+                "bias": -2
+              },
+              {
+                "horizon": 2,
+                "count": 1,
+                "mae": 3,
+                "rmse": 3,
+                "bias": 3
+              },
+              {
+                "horizon": 3,
+                "count": 1,
+                "mae": 2,
+                "rmse": 2,
+                "bias": 2
+              }
+            ],
+            "threeMonthTotal": {
+              "count": 1,
+              "mae": 3,
+              "rmse": 3,
+              "bias": 3
+            }
+          }
+        },
+        {
+          "id": "seasonal-naive-12",
+          "kind": "baseline",
+          "development": {
+            "origins": 3,
+            "distinctTargetMonths": 5,
+            "overall": {
+              "count": 9,
+              "mae": 4.222222222222222,
+              "rmse": 4.594682917363407,
+              "bias": 0
+            },
+            "byHorizon": [
+              {
+                "horizon": 1,
+                "count": 3,
+                "mae": 5,
+                "rmse": 5.066228051190222,
+                "bias": -1
+              },
+              {
+                "horizon": 2,
+                "count": 3,
+                "mae": 4,
+                "rmse": 4.546060565661952,
+                "bias": 0.6666666666666666
+              },
+              {
+                "horizon": 3,
+                "count": 3,
+                "mae": 3.6666666666666665,
+                "rmse": 4.123105625617661,
+                "bias": 0.3333333333333333
+              }
+            ],
+            "threeMonthTotal": {
+              "count": 3,
+              "mae": 2,
+              "rmse": 2.160246899469287,
+              "bias": 0
+            }
+          },
+          "assessment": {
+            "origins": 1,
+            "distinctTargetMonths": 3,
+            "overall": {
+              "count": 3,
+              "mae": 5,
+              "rmse": 5.259911279353167,
+              "bias": 5
+            },
+            "byHorizon": [
+              {
+                "horizon": 1,
+                "count": 1,
+                "mae": 3,
+                "rmse": 3,
+                "bias": 3
+              },
+              {
+                "horizon": 2,
+                "count": 1,
+                "mae": 5,
+                "rmse": 5,
+                "bias": 5
+              },
+              {
+                "horizon": 3,
+                "count": 1,
+                "mae": 7,
+                "rmse": 7,
+                "bias": 7
+              }
+            ],
+            "threeMonthTotal": {
+              "count": 1,
+              "mae": 15,
+              "rmse": 15,
+              "bias": 15
+            }
+          }
+        },
+        {
+          "id": "simple-exponential-smoothing",
+          "kind": "fitted-statistical-model",
+          "development": {
+            "origins": 3,
+            "distinctTargetMonths": 5,
+            "overall": {
+              "count": 9,
+              "mae": 3.9601950579219394,
+              "rmse": 4.340880253345991,
+              "bias": -0.7694740626547072
+            },
+            "byHorizon": [
+              {
+                "horizon": 1,
+                "count": 3,
+                "mae": 3.9964412649472556,
+                "rmse": 4.714054610883125,
+                "bias": -0.8805851737658182
+              },
+              {
+                "horizon": 2,
+                "count": 3,
+                "mae": 4.112297356128693,
+                "rmse": 4.1245546550315035,
+                "bias": -1.2139185070991516
+              },
+              {
+                "horizon": 3,
+                "count": 3,
+                "mae": 3.7718465526898703,
+                "rmse": 4.1587813293003215,
+                "bias": -0.2139185070991516
+              }
+            ],
+            "threeMonthTotal": {
+              "count": 3,
+              "mae": 2.3084221879641214,
+              "rmse": 2.9870563600869144,
+              "bias": -2.3084221879641214
+            }
+          },
+          "assessment": {
+            "origins": 1,
+            "distinctTargetMonths": 3,
+            "overall": {
+              "count": 3,
+              "mae": 1.8609628304839134,
+              "rmse": 2.678096832274187,
+              "bias": -1.5828884914517403
+            },
+            "byHorizon": [
+              {
+                "horizon": 1,
+                "count": 1,
+                "mae": 4.58288849145174,
+                "rmse": 4.58288849145174,
+                "bias": -4.58288849145174
+              },
+              {
+                "horizon": 2,
+                "count": 1,
+                "mae": 0.41711150854825974,
+                "rmse": 0.41711150854825974,
+                "bias": 0.41711150854825974
+              },
+              {
+                "horizon": 3,
+                "count": 1,
+                "mae": 0.5828884914517403,
+                "rmse": 0.5828884914517403,
+                "bias": -0.5828884914517403
+              }
+            ],
+            "threeMonthTotal": {
+              "count": 1,
+              "mae": 4.748665474355221,
+              "rmse": 4.748665474355221,
+              "bias": -4.748665474355221
+            }
+          }
+        }
+      ],
+      "historyWindows": [
+        {
+          "id": "last-12-months",
+          "rows": [
+            {
+              "method": "recent-mean-3",
+              "developmentMae": 3.9259259259259256,
+              "assessmentMae": 2.3333333333333335,
+              "remainingTotal": 201
+            },
+            {
+              "method": "seasonal-naive-12",
+              "developmentMae": 4.222222222222222,
+              "assessmentMae": 5,
+              "remainingTotal": 207
+            },
+            {
+              "method": "simple-exponential-smoothing",
+              "developmentMae": 3.712154887041107,
+              "assessmentMae": 2.304652438186674,
+              "remainingTotal": 201.47631919104
+            }
+          ]
+        },
+        {
+          "id": "last-24-months",
+          "rows": [
+            {
+              "method": "recent-mean-3",
+              "developmentMae": 3.9259259259259256,
+              "assessmentMae": 2.3333333333333335,
+              "remainingTotal": 201
+            },
+            {
+              "method": "seasonal-naive-12",
+              "developmentMae": 4.222222222222222,
+              "assessmentMae": 5,
+              "remainingTotal": 207
+            },
+            {
+              "method": "simple-exponential-smoothing",
+              "developmentMae": 3.9601950777901544,
+              "assessmentMae": 1.8609628280003865,
+              "remainingTotal": 201.25968715576164
+            }
+          ]
+        },
+        {
+          "id": "all-available",
+          "rows": [
+            {
+              "method": "recent-mean-3",
+              "developmentMae": 3.9259259259259256,
+              "assessmentMae": 2.3333333333333335,
+              "remainingTotal": 201
+            },
+            {
+              "method": "seasonal-naive-12",
+              "developmentMae": 4.222222222222222,
+              "assessmentMae": 5,
+              "remainingTotal": 207
+            },
+            {
+              "method": "simple-exponential-smoothing",
+              "developmentMae": 3.9601950579219394,
+              "assessmentMae": 1.8609628304839134,
+              "remainingTotal": 198.5314168157056
+            }
+          ]
+        }
+      ],
+      "uncertainty": {
+        "status": "unavailable",
+        "interval": null,
+        "reason": "Insufficient independent calibration and no verified stochastic generator or historical vintages. Overlapping backtest errors do not establish coverage."
+      },
+      "rate": null
+    }
+  },
+  "evaluation": {
+    "existingBenchmark": "Retrospective final-data synthetic benchmark; assessment already inspected, not untouched.",
+    "constructedFixture": "evaluated-constructed-fixture",
+    "operationallyValidated": false
+  },
+  "evidenceIdentity": "ebcdefd3ba0bbd2e8136e6b4353cd141e31fc9bb5d00abaeaaaf860f880406e8",
+  "implementationIdentity": "14bad2b635d6c8461b8e3ed66b65eb725688bf651fea06f53bbbbc16c22b28be",
+  "identity": "94e6347f454caa9d19ba43b5f087bc91203d27c2aa02e6b544386384f1592e68"
+}

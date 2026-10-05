@@ -12,6 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import { ExitSurveyFeedback } from "@/components/exit-survey-feedback";
+import { SyntheticExitCountExample } from "@/components/synthetic-exit-count-example";
 import type { SurveySentimentResponse, AttritionResponse } from "@/lib/types";
 
 type Props = {
@@ -179,6 +180,7 @@ export function AttritionPage({ data, loading, error, exitData, exitLoading, exi
         </div>
       )}
       <ExitSurveyFeedback data={exitData} loading={exitLoading} error={exitError} />
+      <SyntheticExitCountExample />
     </section>
   );
 }
