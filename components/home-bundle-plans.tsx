@@ -1,4 +1,5 @@
 "use client";
+import {prepareIllustrativePilot,pilotAllowances} from '@/lib/home-action-plan-pilot';
 import {useRef,useState} from 'react';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
 import {bundleDisplayText,bundleComponentLabels} from '@/lib/home-bundle-display';
@@ -11,10 +12,10 @@ export const bundleButton='min-h-11 rounded border px-3 py-2 text-sm font-medium
 export type BundleSession={drafts:Record<string,BundleDraft>;results:Record<string,BundleResult>};
 export type BundleDiscussion={option:number;id:string;revision:number;name:string;isCurrent:()=>boolean};
 const money=(value:number|null|undefined)=>value==null?'Unknown':`$${value.toLocaleString(undefined,{maximumFractionDigits:2})} USD`;
-export function HomeBundlePlans({proposal,binding,contextCurrent,disabled,isCurrent,cache,onDiscuss}:{proposal:BundleProposal;binding:ActionBinding;contextCurrent:boolean;disabled:boolean;isCurrent:()=>boolean;cache:Map<string,BundleSession>;onDiscuss:(request:BundleDiscussion)=>void}){
+export function HomeBundlePlans({proposal,binding,preparedAt,contextCurrent,disabled,isCurrent,cache,onDiscuss}:{preparedAt:string;proposal:BundleProposal;binding:ActionBinding;contextCurrent:boolean;disabled:boolean;isCurrent:()=>boolean;cache:Map<string,BundleSession>;onDiscuss:(request:BundleDiscussion)=>void}){
  const optionNumber=(id:string)=>proposal.bundles.findIndex(bundle=>bundle.id===id)+1;
  const storage=useDecisionStorage(),raw=storage.data.workspaces[binding.goalId]?.fields[bundleWorkspaceField],workspace=readBundleWorkspace(raw,binding.goalId),key=actionBindingKey(binding);
- const [session,setSession]=useState<BundleSession>(()=>cache.get(key)??{drafts:Object.fromEntries(proposal.bundles.map(bundle=>{const saved=workspace?.drafts.filter(item=>actionBindingKey(item.binding)===key&&item.bundle.id===bundle.id).sort((a,b)=>b.revision-a.revision)[0];return [bundle.id,saved??createBundleDraft(bundle,binding)]})),results:Object.fromEntries((workspace?.calculations??[]).filter(item=>actionBindingKey(item.draft.binding)===key).map(item=>[item.draft.bundle.id,item.result]))});
+ const [session,setSession]=useState<BundleSession>(()=>cache.get(key)??{drafts:Object.fromEntries(proposal.bundles.map(bundle=>{const saved=workspace?.drafts.filter(item=>actionBindingKey(item.binding)===key&&item.bundle.id===bundle.id).sort((a,b)=>b.revision-a.revision)[0];return [bundle.id,prepareIllustrativePilot(saved??createBundleDraft(bundle,binding),preparedAt)]})),results:Object.fromEntries((workspace?.calculations??[]).filter(item=>actionBindingKey(item.draft.binding)===key).map(item=>[item.draft.bundle.id,item.result]))});
  const liveSession=useRef(session);
  const [pendingInput,setPendingInput]=useState(false);
  const [selected,setSelected]=useState(proposal.bundles[0]?.id??'A'),[editor,setEditor]=useState(false),[notice,setNotice]=useState(''),[reviewed,setReviewed]=useState<string|null>(null),[unknowns,setUnknowns]=useState<string|null>(null);
@@ -44,6 +45,7 @@ export function HomeBundlePlans({proposal,binding,contextCurrent,disabled,isCurr
    })}
   </section>
   <article aria-label={`Action Plan option ${optionNumber(selected)}`} className="space-y-3 border-t pt-3"><h3 ref={heading} tabIndex={-1} className="text-base font-semibold">Option {optionNumber(selected)}: {draft.bundle.name}</h3>
+   {draft.pilot&&<PilotAssumptions draft={draft}/>}
    <ul className="list-disc space-y-2 pl-5">
     <li><strong>Approach:</strong> {bundleDisplayText(draft.bundle.coordination,draft.bundle)}</li>
     <li><strong>Working together:</strong> {draft.bundle.components.map(item=>item.name).join('; ')}. Details show which steps can run in parallel.</li>
@@ -66,4 +68,18 @@ export function HomeBundlePlans({proposal,binding,contextCurrent,disabled,isCurr
   </article>
   {!!workspace?.attachments.length&&<details><summary className="min-h-11 cursor-pointer py-2 font-medium">Attached Action Plans and version history ({workspace.attachments.length})</summary>{workspace.attachments.map(item=><div key={item.id} className="mb-3 rounded border p-3"><p>{item.draft.bundle.name} · revision {item.draft.revision} · {workspace.attachments.some(next=>next.supersedes===item.id)?'Previous attached version':contextCurrent?attachedBundleState(item,binding,session.drafts[item.draft.bundle.id]??null).replaceAll('_',' '):'context changed'}</p><p>Snapshot cash: {money(item.result.cashTotal)}. Timeline: {item.result.planFinish??'Unknown'}. Attached {item.attachedAt.slice(0,10)}.</p><p className="text-xs">{bundleDisplayText(item.draft.bundle.coordination,item.draft.bundle)} This preserved proposal is not operational approval.</p></div>)}</details>}
  </div>;
+}
+
+function PilotAssumptions({draft}:{draft:BundleDraft}){
+ const input=draft.inputs,pilotGroup=draft.inputs.groups.find(group=>group.id==='pilot-group'),allowances=input.expenses.filter(expense=>expense.id.startsWith('pilot-'));
+ const end=input.scope.startMonth.value&&input.scope.months.value?new Date(Date.UTC(Number(input.scope.startMonth.value.slice(0,4)),Number(input.scope.startMonth.value.slice(5))-1+input.scope.months.value,0)).toISOString().slice(0,10):null;
+ const lastFinish=input.timing.map(item=>item.finish.value).filter((date):date is string=>!!date).sort().at(-1);
+ return <section aria-label="Editable illustrative starting assumptions" className="space-y-2 rounded border bg-muted/20 p-3 text-xs">
+  <p className="font-semibold">Illustrative pilot — editable assumptions, not observed facts or market estimates</p>
+  <p>Shared start: {input.scope.startMonth.value??'Unknown'} · horizon: {input.scope.months.value??'Unknown'} months · finish: {end??'Unknown'}. {pilotGroup?`${pilotGroup.count.value??'Unknown'} hypothetical pilot participants; not workforce headcount or selected employees.`:'Existing participant assumptions retained; review Participants.'}</p>
+  {allowances.length>0&&<div className="grid gap-1 sm:grid-cols-2">{allowances.map(expense=><p key={expense.id}>{pilotAllowances[expense.id.slice(6) as keyof typeof pilotAllowances]?.label??expense.label}: {money(expense.amount.value)}{expense.months.value&&expense.months.value>1?` per month × ${expense.months.value}`:' one-time'} · {expense.amount.kind}</p>)}</div>}
+  <p>Allowances exclude salaries, pay changes, backfill, recruiting fees and vendor quotes. Employee time, availability and retention effects remain unresolved. Review overlap and cost completeness before treating any total as a budget.</p>
+  {lastFinish&&end&&lastFinish>end&&<p role="alert">Proposed component dates extend beyond the shared horizon. Review the actual dates before calculating.</p>}
+  <details><summary className="cursor-pointer py-1">Assumption provenance and dates</summary><p>{draft.pilot!.version} · frozen at {draft.pilot!.preparedAt} · UTC calendar. New demo dates begin next full month; two-week dependency stages are activity assumptions, not readiness guarantees. Existing values and later edits take precedence.</p>{input.timing.map(item=><p key={item.componentId}>{bundleComponentLabels([item.componentId],draft.bundle)}: {item.start.value??'Unknown'}–{item.finish.value??'Unknown'} ({item.start.kind}/{item.finish.kind})</p>)}</details>
+ </section>;
 }

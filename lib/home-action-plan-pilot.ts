@@ -25,9 +25,9 @@ export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string):Bu
  for(const id of componentOrder(draft.bundle.components)){
   const component=draft.bundle.components.find(item=>item.id===id)!,timing=input.timing.find(item=>item.componentId===id)!;
   const earliest=Math.max(start,...component.dependsOn.map(parent=>(finishById.get(parent)??start-day)+day));
-  if(timing.start.value===null)timing.start=demo(new Date(earliest).toISOString().slice(0,10));
-  if(timing.finish.value===null)timing.finish=demo(new Date(Date.parse(timing.start.value+'T00:00:00Z')+13*day).toISOString().slice(0,10));
-  finishById.set(id,Date.parse(timing.finish.value+'T00:00:00Z'));
+  if(timing.start.value===null){const proposed=new Date(earliest).toISOString().slice(0,10);if(!timing.finish.value||proposed<=timing.finish.value)timing.start=demo(proposed);}
+  if(timing.finish.value===null&&timing.start.value)timing.finish=demo(new Date(Date.parse(timing.start.value+'T00:00:00Z')+13*day).toISOString().slice(0,10));
+  finishById.set(id,timing.finish.value?Date.parse(timing.finish.value+'T00:00:00Z'):earliest+13*day);
  }
  if(input.groups.length===0&&input.memberships.length===0){
   input.groups.push({id:'pilot-group',label:'Illustrative shared pilot group; not selected employees',count:demo(10)});

@@ -71,7 +71,7 @@ function validateDraft(draft:BundleDraft){
  bool(input.dependenciesConfirmed);bool(input.groupsDisjoint);bool(input.costsDistinct);
  const unique=(items:{id:string}[],max:number)=>items.length<=max&&new Set(items.map(item=>item.id)).size===items.length&&items.every(item=>identifier(item.id));
  fail(Array.isArray(input.timing)&&input.timing.length===ids.size&&new Set(input.timing.map(item=>item.componentId)).size===ids.size,'Review timing for each component once.');
- for(const item of input.timing){fail(exactKeys(item as unknown as Record<string,unknown>,['componentId','start','finish'])&&ids.has(item.componentId),'Unknown timing component.');for(const value of [item.start,item.finish])assumption(value,date=>typeof date==='string'&&planDate(date)!==null);if(item.start.value&&item.finish.value)fail(item.start.value<=item.finish.value,'Component finish cannot precede its start.');}
+ for(const item of input.timing){fail(exactKeys(item as unknown as Record<string,unknown>,['componentId','start','finish'])&&ids.has(item.componentId),'Unknown timing component.');for(const value of [item.start,item.finish])assumption(value,date=>typeof date==='string'&&planDate(date)!==null);}
  fail(Array.isArray(input.groups)&&unique(input.groups,12),'Use at most twelve distinct aggregate population groups.');
  for(const group of input.groups){fail(exactKeys(group as unknown as Record<string,unknown>,['id','label','count'])&&bounded(group.label),'Invalid population group.');numeric(group.count,1000000,true);}
  const groups=new Set(input.groups.map(item=>item.id));
@@ -118,6 +118,7 @@ export function reconcileBundle(draft:BundleDraft):BundleResult{
  const timings=new Map(input.timing.map(item=>[item.componentId,item]));
  for(const id of order){
   const component=draft.bundle.components.find(item=>item.id===id)!,timing=timings.get(id)!;
+  if(timing.start.value&&timing.finish.value)fail(timing.start.value<=timing.finish.value,'Component finish cannot precede its start.');
   for(const date of [timing.start.value,timing.finish.value])if(date)fail(date>=scope.startMonth.value+'-01'&&date<end+'-01','Component dates must fit the shared horizon.');
   const predecessors=component.dependsOn.map(dependency=>componentReady[dependency]);
   for(const predecessor of component.dependsOn){const finish=timings.get(predecessor)!.finish.value;if(finish&&timing.start.value)fail(timing.start.value>=finish,'A component cannot start before its prerequisite finishes.');}
