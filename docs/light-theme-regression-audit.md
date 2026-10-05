@@ -1,26 +1,29 @@
-# Expanded Light theme regression audit
+# Theme contrast audit and bounded corrections
 
-Bounded local audit based on production main `0f1005cb994f424a7f87a46ccede664bf4c1bd93`. All data requests were intercepted with synthetic fixtures; no model request, live database query or external write was made.
+Based on main `0f1005cb994f424a7f87a46ccede664bf4c1bd93`. All data requests were intercepted with synthetic fixtures; no model request, live database query or external data write was made.
 
-## Reproduced Light defects and fixes
+## Confirmed defects: before and after
 
-| Surface | Before | Correction |
-| --- | --- | --- |
-| Career Growth & Internal Mobility chart legend | Lateral moves 4.01:1 and Transfers 4.27:1, below the 4.5:1 requirement for normal text | Light legend text uses the foreground token; series bars and colored legend markers stay unchanged |
-| Development Planning total, including Unknown | Teal total text 3.78:1 against its secondary surface | Light total text uses the existing darker teal `#075A49` |
+| Surface | Theme | Before fix | After fix |
+| --- | --- | --- | --- |
+| Career Growth chart legend: Lateral moves | Light | 4.01:1 | 10.28:1 |
+| Career Growth chart legend: Transfers | Light | 4.27:1 | 10.28:1 |
+| Development Planning total, including Unknown | Light | 3.78:1 | 5.53:1 minimum |
+| Enabled Carry selected quote and goal button | Dark | 1.15:1 | 11.12:1 normal; 13.38:1 hover |
+| Development goal input focus outline against its card | Light | 1.09:1 | 6.02:1 |
 
-Production diff is exactly two CSS declarations, both inside the existing Light-only scope. No calculation, source, label, unit, selection, layout or Dark palette change. The audit first recorded the failures in `/tmp/light-theme-audit-before.json`; the corrected report is `/tmp/light-theme-audit.json`.
+The first four rows are normal text and exceed 4.5:1 after correction. Focus indication exceeds 3:1. Light's carry button remains 6.59:1 normal and 8.40:1 hover. Disabled controls retain their disabled behavior and 0.5 opacity; disabled text is not incorrectly held to the enabled-text contrast threshold.
+
+Four bounded stylesheet edits: Light legend text uses the foreground token while bars and colored markers remain unchanged; Light development total uses the existing darker teal `#075A49`; the quote-carry button gets its intended `--development-teal: #82D9C7` token (previously absent from the catalog), restoring Dark without changing Light's more specific blue style; inputs join the existing Light focus rule. No calculation, evidence, label, unit, selection or layout change.
 
 ## Coverage and results
 
-The audit checks Home, Workforce, Attrition, Talent Acquisition, Employee Listening, Career Growth & Internal Mobility, Training & Coaching (expanded custom quote form and selected quote) and Development Planning with a carried synthetic quote. Desktop 1366px and mobile 390px are tested in Light and Dark. Nonempty line/bar charts exercise axis labels, legends and hovered tooltips. Native form inputs and placeholders are inspected, and disabled quote-carry controls remain disabled and dimmed before explicit selection. Disabled text is not incorrectly held to the enabled-text WCAG threshold.
+The audit checks Home, Workforce, Attrition, Talent Acquisition, Employee Listening, Career Growth & Internal Mobility, Training & Coaching (expanded custom form and selected quote) and Development Planning with an explicitly carried synthetic quote. Widths 1366, 390 and 320 are tested in Light and Dark. Nonempty line/bar charts exercise axis labels, legends and hovered tooltips. Form values/placeholders, disabled controls, enabled hover, keyboard focus and Enter activation are covered; carrying preserves the synthetic goal and quoted fee.
 
-60 page/state/tooltip samples contain 7,204 rendered text/control samples. No Light text-contrast failures remain in these states. This is a bounded rendered-style contrast audit, not a complete accessibility certification or coverage of every destination/condition. Additional existing suites pass 216 checks: palette selector 117, retained planning inputs/goal editor/disclosures 56, Dark/source rollback 43. They include 320px phones and 683px reflow. All 1,265 unit tests, build with mandatory evidence verification, TypeScript, ESLint and whitespace checks pass.
+102 page/state/tooltip samples contain 11,794 rendered text/control/focus samples. No failures remain in either theme in these states: normal text is at least 4.5:1, applicable large text at least 3:1, and audited focus outlines at least 3:1. This is a bounded rendered-style audit, not a full accessibility certification or coverage of every destination/condition.
 
-Screenshot examples: `/tmp/theme-audit-legend-1366-light.png`, `/tmp/theme-audit-legend-390-light.png`, `/tmp/theme-audit-development-1366-light.png`. Audit outputs and screenshots are local supporting evidence, not production data.
+Additional suites pass 333 checks: palette selector 117, retained planning-input/editor/disclosure contrast 56, Dark/source rollback 43, and the unified Home adjustment/attachment flow 117. All 1,265 unit tests, production build with mandatory evidence guard, TypeScript, ESLint and whitespace checks pass. No runtime errors, overflow, model requests or network escape occurred.
 
-## Separate pre-existing Dark finding
+Original failure evidence: `/tmp/light-theme-audit-before.json`; corrected report: `/tmp/light-theme-audit.json`. Screenshot examples: `/tmp/theme-audit-legend-1366-light.png`, `/tmp/theme-audit-legend-390-light.png`, `/tmp/theme-audit-development-1366-light.png`. These are local synthetic supporting artifacts.
 
-The enabled Training & Coaching **Carry selected quote and goal to Development Planning** button measures 1.15:1 in Dark. Its catalog does not inherit `--development-teal`, so the existing button rule retains dark text without the intended teal background. This was discovered only when adding the selected-quote state. The two new Light-only rules cannot affect it. It remains explicitly reported, not presented as a passing Dark state and not bundled into this Light-only correction. Other audited Dark text states show no failures; existing Dark palette regression checks still pass.
-
-No push, PR or production release is part of this local review checkpoint.
+The Dark button defect was originally reported separately at checkpoint `4ff10bd`; its repair was subsequently explicitly authorized and is included here. Draft publication is authorized; main merge remains gated on exact-head hosted QA.
