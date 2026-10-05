@@ -136,3 +136,19 @@ test('unknown transition field, ambiguous allowance and recurring basis never pi
  assert.throws(()=>previewBundleChatEdit(ambiguous,'In Action Plan #1, set Unallocated learning pilot cash allowance to USD 2500',selection),/more than one assumption/);assert.deepEqual(ambiguous,before);
  const recurring=structuredClone(draft.inputs);recurring.expenses.find(x=>x.id==='pilot-learning').months={value:3,kind:'user-entered',basis:'Reviewed recurring expense'};assert.throws(()=>previewBundleChatEdit(reviseBundleDraft(draft,recurring),'In Action Plan #1, set Unallocated learning pilot one-time cash allowance to USD 2500',selection),/not a supported/);
 });
+
+test('exact hosted amount transition permits an explicit instruction to preserve other assumptions',()=>{
+ const draft=base(),before=structuredClone(draft),selection={option:1,count:2};
+ for(const request of ['Change the Unallocated learning pilot one-time cash allowance in Action Plan #1 from USD 2,000 to USD 2,500. Keep other assumptions unchanged.','In Action Plan #1, set Unallocated learning pilot amount (USD) to $2500.']){
+  const preview=previewBundleChatEdit(draft,request,selection);assert.equal(preview.request,request);assert.equal(preview.changes.length,1);assert.equal(preview.changes[0].before.value,2000);assert.equal(preview.changes[0].after.value,2500);
+  const next=acceptBundleChatEdit(draft,preview,selection),expected=structuredClone(before.inputs);expected.expenses.find(x=>x.id==='pilot-learning').amount={value:2500,kind:'user-entered',basis:preview.changes[0].after.basis};assert.deepEqual(next.inputs,expected);assert.deepEqual(draft,before);
+ }
+});
+
+test('preservation suffix never hides extra changes, ambiguity or a wrong starting value',()=>{
+ const draft=base(),before=structuredClone(draft),selection={option:1,count:2};
+ const start='Change the Unallocated learning pilot one-time cash allowance in Action Plan #1 from USD 2,000 to ';
+ for(const ending of ['USD 2,500. Keep other assumptions unchanged except participants.','USD 2,500. Keep other assumptions unchanged. Increase participants to 20.','USD 2,500. Keep other assumptions unchanged; set pilot participants to 20','USD 2,500. Keep other assumptions unchanged and hire three people.','USD 2,500 or USD 3,000. Keep other assumptions unchanged.','EUR 2,500. Keep other assumptions unchanged.','USD 2,500, keeping other assumptions unchanged.'])assert.throws(()=>previewBundleChatEdit(draft,start+ending,selection),ending);
+ assert.throws(()=>previewBundleChatEdit(draft,start.replace('2,000','1,000')+'USD 2,500. Keep other assumptions unchanged.',selection),/starting value/);
+ const preview=previewBundleChatEdit(draft,start+'USD 2,500. Keep all other assumptions unchanged.',selection);assert.equal(preview.changes.length,1);assert.equal(preview.changes[0].after.value,2500);assert.deepEqual(draft,before);
+});

@@ -3,11 +3,19 @@
 import {inspectHomeBundleOutput,type BundleDiagnostic,type BundleProposal} from './home-solution-bundles.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {homeBundleOutputTokens,bundleResponseDiagnostic,type BundleResponseDiagnostic} from './home-bundle-response-diagnostic.ts';
-/** Narrow fresh-response check: no grammar inference or rewriting of saved text. */
+/** Bounded fresh-response check for visible unfinished endings; saved text is never rewritten. */
 function incompleteBundleField(proposal:BundleProposal):BundleResponseDiagnostic['textField']{
  // Hitting a schema bound without a final full stop is not evidence of truncation.
  // Keep only visible unfinished endings; never infer missing prose or rewrite it.
- const incomplete=(text:string)=>/(?:[,:;—–-]|\.\.\.|…|(?:^|\s)(?:and|or|but|because|including))$/.test(text.trim());
+ const incomplete=(text:string)=>{
+  const value=text.trim();
+  if(/(?:[,:;—–-]|\.\.\.|…|(?:^|\s)(?:and|or|but|because|including))$/.test(value))return true;
+  // Bare predicates such as “Delivery timing ... is” omit the limitation itself.
+  // Preserve common complete endings: “as is”, “as they are” and indirect review questions.
+  return /\s(?:is|are)$/.test(value)
+   &&!(/\bas (?:is|(?:it|they) (?:is|are))$/.test(value)
+    ||/\b(?:review|clarify|explain|describe|identify|understand) (?:what|where|who) (?:[\w’-]+ ){1,12}(?:is|are)$/i.test(value));
+ };
  for(const bundle of proposal.bundles){
   for(const field of ['objective','coordination','limitation'] as const)if(incomplete(bundle[field]))return field;
   for(const component of bundle.components){if(incomplete(component.firstStep))return 'firstStep';if(incomplete(component.limitation))return 'component_limitation';}

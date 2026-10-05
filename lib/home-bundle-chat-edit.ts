@@ -96,7 +96,9 @@ function parseValue(raw:string,target:Target):Assumption<string|number>{
 export function previewBundleChatEdit(draft:BundleDraft,request:string,selection?:BundleEditSelection):BundleEditPreview{
  if(!readBundleDraft(draft))fail('This plan draft cannot be verified. Your work is kept.');
  if(!request.trim()||request.length>1200)fail('Describe up to six edits in 1,200 characters.');
- const clauses=selectedPlanRequest(request,selection).trim().split(/;|\n|\s+and\s+(?=(?:start|make|use|set|change|update|move|run)\b)/i).map(value=>value.trim()).filter(Boolean);
+ // Only a final complete preservation instruction is optional; never discard intervening requests.
+ const editRequest=selectedPlanRequest(request,selection).trim().replace(/\.\s+Keep (?:all )?other assumptions unchanged\.?$/i,'');
+ const clauses=editRequest.split(/;|\n|\s+and\s+(?=(?:start|make|use|set|change|update|move|run)\b)/i).map(value=>value.trim()).filter(Boolean);
  if(!clauses.length||clauses.length>6)fail('Use up to six changes, separated by semicolons.');
  const inputs=structuredClone(draft.inputs),available=targets(inputs,draft),changes:BundleEditChange[]=[],seen=new Set<string>();
  for(const clause of clauses){
