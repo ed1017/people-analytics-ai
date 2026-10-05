@@ -54,8 +54,8 @@ export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string,con
  const scenario=initialWhatIf(draft.binding.goal,input);if(scenario&&!input.whatIf){
   if(intent.baseline!==null){scenario.baseline=entered(intent.baseline,'Explicit baseline accepted in the user conversation; used conditionally, not a predicted effect.');scenario.population=unknownAssumption();if(intent.baselinePeriod)scenario.ratePeriod=intent.baselinePeriod;}
   if(intent.relativeReduction!==null&&scenario.baseline.value!==null)scenario.target={value:Math.round(scenario.baseline.value*(1-intent.relativeReduction/100)*1e6)/1e6,kind:scenario.baseline.kind==='illustrative'?'illustrative':'user-entered',basis:`User-stated ${intent.relativeReduction}% relative reduction applied to the retained baseline; not a predicted effect.`};
-  const explicitTargets=[draft.binding.goal,...planningStatements(context?.goalContext)].flatMap(text=>[...text.matchAll(/\btarget(?: turnover(?: rate)?)?\s*(?:is|of|:)\s*(\d+(?:\.\d+)?)\s*%/gi)].map(match=>Number(match[1])));
-  if(intent.relativeReduction!==null&&explicitTargets.some(value=>value!==scenario.target.value))scenario.target=unknownAssumption();
+  if(intent.target!==null){const derived=scenario.target.value;scenario.target=intent.relativeReduction!==null&&derived!==null&&Math.abs(intent.target-derived)>1e-6?unknownAssumption():entered(intent.target,'Explicit target rate retained from the user conversation; not a predicted effect.');}
+  if(intent.rateConflict){scenario.baseline=unknownAssumption();scenario.target=unknownAssumption();scenario.population=unknownAssumption();}
   input.whatIf=scenario;
  }
  const next=reviseBundleDraft(draft,input);next.pilot={version:pilotVersion,preparedAt:calendar.preparedAt,timezone:'UTC'};

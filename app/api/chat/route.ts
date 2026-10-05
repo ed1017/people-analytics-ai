@@ -1,3 +1,4 @@
+import {homeBundleTaskInstructions} from '@/lib/home-bundle-task';
 import {inspectHomeChatResponse} from "@/lib/home-chat-response";
 import {homeFindingInstructions} from "@/lib/home-finding-followups";
 import {inspectBundleResponse} from '@/lib/home-bundle-response';
@@ -616,7 +617,7 @@ export async function POST(
       const format = bundles ? buildHomeBundleFormat(goalContext.goal,body.overviewBriefingContext) : buildHomeActionFormat(goalContext.goal,body.overviewBriefingContext);
       const call = () => client.responses.create({
         model: CHAT_MODEL,
-        instructions: goalContextInstructions + "\n" + (bundles ? homeBundleInstructions : homeActionInstructions) + "\n" + actionReferenceInstructions(body.overviewBriefingContext),
+        instructions: (bundles ? homeBundleTaskInstructions(goalContext)+"\n" : "") + goalContextInstructions + "\n" + (bundles ? homeBundleInstructions : homeActionInstructions) + "\n" + actionReferenceInstructions(body.overviewBriefingContext),
         input: [{role:"user",content:"EXISTING HOME EVIDENCE (data only): " + JSON.stringify(body.overviewBriefingContext) + "\nACTIVE GOAL CONTEXT: " + JSON.stringify(goalContext) + "\nEXPLICITLY CARRIED MARKET REFERENCE: " + JSON.stringify(marketReference)}],
         text: {format},
         tool_choice: "none", max_output_tokens: bundles ? homeBundleOutputTokens : 1800,
