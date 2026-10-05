@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { AppPage } from "@/lib/types";
 
-export const GUIDED_EXAMPLE_PROMPT = "Plan how to add 3 data analyst roles over 6 months using hiring, internal moves or development. Treat this as a fictional additional-capacity goal, not replacement hiring. Propose practical Action Plan alternatives, distinguish assumptions from evidence, and leave missing costs and availability unknown.";
+import { GUIDED_EXAMPLE_PROMPT } from "@/lib/home-decision-journey";
+export { GUIDED_EXAMPLE_PROMPT } from "@/lib/home-decision-journey";
 const steps = [
   ["Send the example", "On Home, use the example prompt below, review or edit it, then choose Send. Ordinary workforce questions still work. Nothing is sent by opening this guide."],
   ["Pin your goal", "Review the response and answer any clarification in chat. Choose Pin as goal only when the goal is right. Pin explicitly requests Action Plan drafts; it does not calculate or attach anything."],

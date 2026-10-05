@@ -197,11 +197,6 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
 
   function submitQuestion(prompt:string){if(ready)queueSuggestion("question:"+prompt,()=>void send(prompt))}
 
-  function startNewIssue(draft = "") {
-    conversation.startNewProblem(draft);
-    focusQuestion();
-  }
-
   async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false, responseIntent:'default'|'explanation'='default') {
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
