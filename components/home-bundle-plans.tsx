@@ -2,7 +2,7 @@
 import {preferredSavedBundleId,restoredBundleDraft,restoredBundleResult} from "@/lib/home-pinned-goals";
 import {prepareIllustrativePilot,pilotAllowances} from '@/lib/home-action-plan-pilot';
 import {useLayoutEffect,useRef,useState} from 'react';
-import {previewBundleChatEdit,acceptBundleChatEdit,type BundleEditPreview} from '@/lib/home-bundle-chat-edit';
+import {previewBundleChatEdit,acceptBundleChatEdit,bundleChatEditExamples,type BundleEditExample,type BundleEditPreview} from '@/lib/home-bundle-chat-edit';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
 import {bundleDisplayText,bundleComponentLabels,bundleDisplayName,bundleAssumptionText,bundleHorizonEnd} from '@/lib/home-bundle-display';
 import {HomePlanIntegration} from '@/components/home-plan-integration';
@@ -16,7 +16,7 @@ import {createBundleDraft,reviseBundleDraft,reviseBundleProposal,reconcileBundle
 import {readBundleWorkspace,saveBundleDraftPatch,saveBundleCalculationPatch,attachBundlePatch,attachedBundleState,bundleWorkspaceField} from '@/lib/home-bundle-records';
 export const bundleButton='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring';
 export type BundleSession={drafts:Record<string,BundleDraft>;results:Record<string,BundleResult>};
-export type BundleDiscussion={option:number;id:string;revision:number;name:string;goalId:string;goal:string;subscribe:(listener:()=>void)=>()=>void;isCurrent:()=>boolean;preview:(text:string)=>BundleEditPreview;accept:(preview:BundleEditPreview)=>void};
+export type BundleDiscussion={examples:BundleEditExample[];option:number;id:string;revision:number;name:string;goalId:string;goal:string;subscribe:(listener:()=>void)=>()=>void;isCurrent:()=>boolean;preview:(text:string)=>BundleEditPreview;accept:(preview:BundleEditPreview)=>void};
 const money=(value:number|null|undefined)=>value==null?'Unknown':`$${value.toLocaleString(undefined,{maximumFractionDigits:2})} USD`;
 export function HomeBundlePlans({proposal,binding,preparedAt,contextCurrent,disabled,isCurrent,cache,onDiscuss,projectBinding}:{projectBinding?:ProjectPlanningBinding;preparedAt:string;proposal:BundleProposal;binding:ActionBinding;contextCurrent:boolean;disabled:boolean;isCurrent:()=>boolean;cache:Map<string,BundleSession>;onDiscuss:(request:BundleDiscussion)=>void}){
  const optionNumber=(id:string)=>proposal.bundles.findIndex(bundle=>bundle.id===id)+1;
@@ -45,7 +45,7 @@ export function HomeBundlePlans({proposal,binding,preparedAt,contextCurrent,disa
   decisionStore.setField(binding.goalId,patch.field,patch.value);if(!decisionStore.getSnapshot().saved)throw Error('Browser storage could not save. Your working draft is kept in this tab.');setNotice(attach?'Reviewed Action Plan attached to this goal. It is not operational approval.':'Action Plan draft and any current calculation saved locally. Existing plans and pins are unchanged.');return true;
  }catch(error){setNotice((error as Error).message);return false}}
  function discuss(){try{guard();if(pendingInput)throw Error('Complete the month entry before reviewing a chat edit.');const inputKey=bundleInputKey(draft),epoch=selectionEpoch.current,current=()=>mounted.current&&liveAvailable.current&&!livePending.current&&selectionEpoch.current===epoch&&liveSelection.current===selected&&isCurrent()&&bundleInputKey(liveSession.current.drafts[selected])===inputKey;
-  onDiscuss({option:optionNumber(selected),id:selected,revision:draft.revision,name:draft.bundle.name,goalId:binding.goalId,goal:binding.goal,isCurrent:current,subscribe:listener=>{editListeners.current.add(listener);return()=>{editListeners.current.delete(listener);};},
+  onDiscuss({examples:bundleChatEditExamples(draft),option:optionNumber(selected),id:selected,revision:draft.revision,name:draft.bundle.name,goalId:binding.goalId,goal:binding.goal,isCurrent:current,subscribe:listener=>{editListeners.current.add(listener);return()=>{editListeners.current.delete(listener);};},
    preview:text=>{guard();if(!current())throw Error('The selected plan changed. Choose Discuss changes on the current plan.');return previewBundleChatEdit(liveSession.current.drafts[selected],text);},
    accept:preview=>{guard();if(!current())throw Error('The selected plan changed. Review a new proposal.');const next=acceptBundleChatEdit(liveSession.current.drafts[selected],preview);remember({...liveSession.current,drafts:{...liveSession.current.drafts,[selected]:next}});setEditor(true);setNotice('Reviewed changes accepted into the working draft. Save explicitly; calculate again to update results.');}
   });}catch(error){setNotice((error as Error).message)}}
