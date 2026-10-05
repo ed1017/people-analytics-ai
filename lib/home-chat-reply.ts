@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {buildHomeFindingSchema,readHomeFindingFollowups} from './home-finding-followups.ts';
 // @ts-expect-error Native Node tests share the TypeScript source.
 import {inspectHomeCandidateProposal,type CandidatePack} from "./home-candidate-options.ts";
 // @ts-expect-error Native Node tests share the TypeScript source.
@@ -12,13 +14,14 @@ export function buildHomeReplyFormat(pack?:CandidatePack){
     type: "object",
     properties: {
       answer: { type: "string" },
+      finding_followups: buildHomeFindingSchema(pack),
       next_step: { type: "string", enum: ["none", "choose_goal"] },
       problem: eligible?{type:['string','null']}:{type:'null'},
       problem_evidence:{type:'array',maxItems:eligible?3:0,items:eligible?{type:'string',enum:available}:{type:'null'}},
       options:{type:'array',maxItems:eligible?3:0,items:buildInvestigationCandidateSchema(available)},
       question:eligible?{type:['string','null']}:{type:'null'},
     },
-    required: ["answer", "next_step", "problem", "problem_evidence", "options", "question"],
+    required: ["answer", "finding_followups", "next_step", "problem", "problem_evidence", "options", "question"],
     additionalProperties: false,
   },
 };
@@ -29,19 +32,25 @@ Each option contains ONLY operation and evidence (one or two catalog IDs). No ti
 If one essential clarification prevents useful options, return options:[] and one question (max 200 characters); do not repeat it in answer. For unrelated requests or no supported investigation, return problem:null, problem_evidence:[], options:[], question:null. Do not extract claims into card fields. Pin is explicit and prepares proposed action pilots in a separate request; it does not calculate. Numerical workforce options require supported additional-capacity scope, reviewed assumptions, Save and Calculate. Replacement-only and retention-effect calculations are not provided by this contract.
 Catalog IDs below are exact references to fields ALREADY in the supplied normalized Home packet, not new evidence. Scope/date/population/limitations come from that source unchanged. The request-specific JSON schema permits ONLY currently available metrics and compatible operations. If it permits no candidates, return the explicit null/empty preparation and explain the missing evidence in answer. Catalog membership alone does not imply availability:
 ${investigationCatalogInstructions}`;
+export class HomeReplyError extends Error {
+ readonly reason:'invalid_json'|'invalid_reply';
+ constructor(reason:'invalid_json'|'invalid_reply'){super(`Home answer unavailable. Preparation diagnostic: ${reason}.`);this.name='HomeReplyError';this.reason=reason;}
+}
 export function decodeHomeModelReply(text: string, hasFocusedIssue: boolean, pack?:CandidatePack) {
   let value:unknown;
-  try{value=JSON.parse(text)}catch{throw new Error("Home answer unavailable. Preparation diagnostic: invalid_json.")}
-  if (!value || typeof value !== "object" || !("answer" in value) || typeof value.answer !== "string" || !value.answer.trim() || !("next_step" in value) || !["none", "choose_goal"].includes(String(value.next_step))) throw new Error("Home answer unavailable. Preparation diagnostic: invalid_reply.");
+  try{value=JSON.parse(text)}catch{throw new HomeReplyError('invalid_json')}
+  if (!value || typeof value !== "object" || !("answer" in value) || typeof value.answer !== "string" || !value.answer.trim() || !("next_step" in value) || !["none", "choose_goal"].includes(String(value.next_step))) throw new HomeReplyError('invalid_reply');
   const fields=value as unknown as Record<string,unknown>;
   const {proposal:candidateProposal,diagnostic:candidateDiagnostic}=inspectHomeCandidateProposal({version:2,problem:fields.problem,problem_evidence:fields.problem_evidence,options:fields.options,question:fields.question},pack);
-  return { candidateProposal, candidateDiagnostic, answer: value.answer, nextStep: !candidateProposal && !hasFocusedIssue && value.next_step === "choose_goal" ? "choose_goal" : "none" };
+  return { findingFollowups:readHomeFindingFollowups(fields.finding_followups,value.answer,pack), candidateProposal, candidateDiagnostic, answer: value.answer, nextStep: !candidateProposal && !hasFocusedIssue && value.next_step === "choose_goal" ? "choose_goal" : "none" };
 }
 export const homeIssuePresentation = "When the answer discusses multiple distinct supported problems, group them under Markdown headings such as ### Issue A — [problem] and ### Issue B — [problem]. Preserve the individual bullet details, citations and uncertainty under their own issue heading. Do not invent, split or infer extra issues to fill this format. Alternative ways to address the same issue remain Option 1, Option 2 and so on, not separate issues. For one issue keep the ordinary concise format. This is presentation only; it does not create or pin additional goals.";
 export function homeResponseStyle(message:string) {
   const current=message.split(/\n\n(?:Focused issue|Session problem context)/)[0];
   const expanded=/\b(full action plan|full plan|detailed|in detail|step.by.step|comprehensive)\b/i.test(current);
-  return {expanded,maxOutputTokens:expanded?2400:1400,instructions:(expanded
+  // This ceiling covers structured metadata AND reasoning tokens, not just visible prose.
+  // Keep the same answer word targets; headroom is not an instruction to write more.
+  return {expanded,maxOutputTokens:expanded?6000:4000,instructions:(expanded
     ? "The user explicitly requested detail or a full plan. Finish the requested plan in concise sections/bullets. Target250-300words and stay below350words including headings and link labels. Keep each of the five required sections to1-3short bullets; combine repeated constraints/caveats and omit closing recaps. Preserve essential evidence, uncertainty and all required sections; never cut off an unfinished answer. For a full action plan retain Evidence and scope; Options and tradeoffs; Costs and unknown assumptions; Proposed next steps; Suggested success measures. Reuse known goal, scope and constraints. State missing inputs as unknown, not a questionnaire; ask at most one essential question. Keep citations accurate, costs unverified when absent, and proposals distinct from approved actions."
     : "DEFAULT HOME ANSWER FORMAT: one short takeaway sentence, then3-4brief Markdown bullets, then one next step OR one essential question. Target80-120words; do not exceed140unless the user explicitly asks for detail. Each bullet makes one point; use only relevant supplied evidence, not extra metrics to fill space. No long preamble, repeated known goal/scope, multiple-question questionnaire or repeated boilerplate caveats. Keep material source scope/date/uncertainty beside the affected claim and accurate source-ID citations. Ask one short question only when an essential detail prevents a supported provisional investigation; an unpinned goal is not itself a blocker. Do not re-ask an already supplied goal. Do not call this model fine-tuning.") + "\n" + homeIssuePresentation};
 }

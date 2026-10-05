@@ -9,7 +9,7 @@ const require=createRequire(import.meta.url),Ajv=require('ajv');
 const ajv=new Ajv({allErrors:true});
 const sourceMap={};for(const m of Object.values(investigationMetrics)){sourceMap[m.source]??={id:m.source,status:'loaded',facts:{}};sourceMap[m.source].facts[m.field]=24;}
 const full=normalizeHomePack({sources:Object.values(sourceMap)});
-const raw=(id,operation)=>({answer:'Synthetic investigation context.',next_step:'none',problem:'Investigate recorded workforce context',problem_evidence:[id],options:[{operation,evidence:[id]}],question:null});
+const raw=(id,operation)=>({answer:'Synthetic investigation context.',finding_followups:[],next_step:'none',problem:'Investigate recorded workforce context',problem_evidence:[id],options:[{operation,evidence:[id]}],question:null});
 const fullSchema=ajv.compile(buildHomeReplyFormat(full).schema);
 for(const [id,m] of Object.entries(investigationMetrics))test('all operations agree with decoder for '+id,()=>{
  for(const operation of investigationOperations){const reply=raw(id,operation),expected=operation===m.operation;assert.equal(fullSchema(reply),expected);const result=decodeHomeModelReply(JSON.stringify(reply),false,full);assert.equal(!!result.candidateProposal,expected);assert.equal(result.candidateDiagnostic.reason,expected?'ready':'operation_mismatch');}
@@ -34,7 +34,7 @@ test('unavailable sources and suppressed facts never enter the output choices',(
 });
 test('no eligible metric explicitly allows only null/empty preparation',()=>{
  const packet={sources:[{id:'W2',status:'loaded',facts:{headcount:12}}]},format=buildHomeReplyFormat(packet),validate=ajv.compile(format.schema);
- const empty={answer:'The selected catalog evidence is unavailable.',next_step:'none',problem:null,problem_evidence:[],options:[],question:null};
+ const empty={answer:'The selected catalog evidence is unavailable.',finding_followups:[],next_step:'none',problem:null,problem_evidence:[],options:[],question:null};
  assert.equal(validate(empty),true);assert.equal(decodeHomeModelReply(JSON.stringify(empty),false,packet).candidateDiagnostic.reason,'empty');
  for(const changed of [{problem:'Invented investigation'},{problem_evidence:['W1.headcount']},{options:raw('W1.headcount','review_capacity').options},{question:'An investigation question?'}])assert.equal(validate({...empty,...changed}),false);
  assert.equal(JSON.stringify(format).includes('"enum":[]'),false);

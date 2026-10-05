@@ -1,4 +1,5 @@
 "use client";
+import {readHomeFindingFollowups,buildHomeFindingPrompt,type HomeFindingFollowup} from "@/lib/home-finding-followups";
 import {emptyOptionActions,isOptionActionLabel,type WorkforceOptionActions,type OptionAction} from "@/lib/workforce-option-actions";
 
 import {HomeCapacityReview,type HomeCapacityRequest} from "@/components/home-capacity-review";
@@ -40,7 +41,7 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
   const serverDiagnostic=readHomePreparationDiagnostic(data.candidateDiagnostic);
   const useServer=!data.candidateProposal&&serverDiagnostic&&serverDiagnostic.reason!=='ready';
   const diagnostic=useServer?serverDiagnostic:data.candidateProposal?inspected.diagnostic:{reason:'diagnostic_unavailable' as const,field:'none' as const,optionCount:0,missingFieldCount:0};
-  return { answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal, diagnostic, diagnosticStage:useServer?'server' as const:'client' as const };
+  return { findingFollowups:readHomeFindingFollowups(data.findingFollowups,data.answer,sources), answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal, diagnostic, diagnosticStage:useServer?'server' as const:'client' as const };
 }
 
 const noActionSubscription=()=>()=>{};
@@ -106,6 +107,9 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const renderedPromptEpoch=promptEpoch.current;
   const recentSuggestions=useRef(new Set<string>());
   const sending=useRef<symbol|null>(null);
+  type FindingTurn={message:ChatMessage;findings:HomeFindingFollowup[];context:string;epoch:number;goalId:string;goal:string;selectionGoal:string;sourceKey:string};
+  const [findingTurn,setFindingTurn]=useState<FindingTurn|null>(null);
+  const liveFindingTurn=useRef<FindingTurn|null>(null);
   function changeQuestion(value:string){setLocalAction(null);setInput(value)}
   const loaded = useRef("");
   const loadedAt = useRef(0);
@@ -157,16 +161,16 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     return () => controller.abort();
   }, [active, persona, refresh, workforceQuery, workforceScope]);
 
-  const contextKey = JSON.stringify({ goalId:conversation.activeGoalId, persona, workforceQuery, workforceScope, evidenceRevision, developmentSession, focusedIssue:conversation.focusedIssue });
+  const contextKey = JSON.stringify({ goalId:conversation.activeGoalId, persona, workforceQuery, workforceScope, evidenceRevision, refresh, developmentSession, focusedIssue:conversation.focusedIssue });
   const currentEvidenceKey = useRef(contextKey);
   const cancelPending = useRef(conversation.cancelPending);
   useLayoutEffect(() => { cancelPending.current = conversation.cancelPending; });
   useLayoutEffect(() => {
-    if (currentEvidenceKey.current !== contextKey) { currentEvidenceKey.current = contextKey; cancelPending.current();sending.current=null; }
+    if (currentEvidenceKey.current !== contextKey) { currentEvidenceKey.current = contextKey; liveFindingTurn.current=null; cancelPending.current();sending.current=null; }
   }, [contextKey]);
   // eslint-disable-next-line react-hooks/set-state-in-effect -- Cancel the queued user action on explicit page exit; preserve its draft.
-  useLayoutEffect(()=>{liveActive.current=active;if(!active){queuedSuggestion.current=null;setSuggestionPending(false);sending.current=null;cancelPending.current();}return()=>{liveActive.current=false;queuedSuggestion.current=null;}},[active]);
-  useEffect(()=>{const identity=()=>{const goals=decisionStore.getSnapshot().data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement])};let prior=identity();return decisionStore.subscribe(()=>{const next=identity();if(next!==prior){prior=next;promptEpoch.current++;setCandidate(null);setPreparationUnavailable(null);queuedSuggestion.current=null;setSuggestionPending(false);}})},[]);
+  useLayoutEffect(()=>{liveActive.current=active;if(!active){liveFindingTurn.current=null;queuedSuggestion.current=null;setSuggestionPending(false);sending.current=null;cancelPending.current();}return()=>{liveActive.current=false;queuedSuggestion.current=null;}},[active]);
+  useEffect(()=>{const identity=()=>{const goals=decisionStore.getSnapshot().data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement])};let prior=identity();return decisionStore.subscribe(()=>{const next=identity();if(next!==prior){prior=next;promptEpoch.current++;liveFindingTurn.current=null;setCandidate(null);setPreparationUnavailable(null);queuedSuggestion.current=null;setSuggestionPending(false);}})},[]);
   const planRequest = questionUnanswered ? null : buildHomeActionPlanRequest(conversation.focusedIssue ? {key:contextKey,firstQuestion:conversation.focusedIssue,latestQuestion:journey?.latestQuestion ?? conversation.focusedIssue} : journey, contextKey);
 
   function focusQuestion() {
@@ -180,7 +184,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     focusQuestion();
   }
 
-  async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false) {
+  async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false, responseIntent:'default'|'explanation'='default') {
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
     if(!active||sending.current||currentEvidenceKey.current!==contextKey)return;
@@ -196,6 +200,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       if(requested.kind!=="none") { if(preserveDraft){setCandidateNotice("This clarification requests different country evidence. Your drafts are kept. Change the workforce country filter before updating options.");return false;} setInput(message);setScopeChoice({message,query:workforceQuery,identity:scopeIdentity,...requested});return; }
     }
     setScopeChoice(null);setLocalAction(null);
+    liveFindingTurn.current=null;setFindingTurn(null);
     const sendTicket=Symbol();sending.current=sendTicket;const candidateEpoch=promptEpoch.current;setCandidate(null);setCandidateNotice('');setPreparationUnavailable(null);
     const request = conversation.beginRequest();
     const key = contextKey;
@@ -215,10 +220,13 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
         if(conversation.activeGoalId)decisionStore.setField(conversation.activeGoalId,'homeCandidateOptions',{version:2,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:captured.sourceKey,proposal:reply.proposal});
         else setCandidate(captured);
       }
-      setPreparationUnavailable(reply.proposal?null:{context:key,diagnostic:reply.diagnostic,stage:reply.diagnosticStage});
-      if(preserveDraft&&!reply.proposal)setCandidateNotice("No new candidate options could be verified from this reply. Your existing work and drafts are kept.");
+      setPreparationUnavailable(reply.proposal||responseIntent==='explanation'?null:{context:key,diagnostic:reply.diagnostic,stage:reply.diagnosticStage});
+      if(preserveDraft&&!reply.proposal&&responseIntent!=='explanation')setCandidateNotice("No new candidate options could be verified from this reply. Your existing work and drafts are kept.");
       conversation.setHomeGoalChoiceKey(reply.chooseGoal && !conversation.focusedIssue ? key : null);
-      setMessages(current => [...current, { role: "assistant", content: answer }]);
+      const assistantMessage:ChatMessage={role:"assistant",content:answer};
+      const capturedFinding:FindingTurn={message:assistantMessage,findings:reply.findingFollowups,context:key,epoch:candidateEpoch,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack)};
+      liveFindingTurn.current=capturedFinding;setFindingTurn(capturedFinding);
+      setMessages(current => [...current, assistantMessage]);
       modelHistoryRef.current = completeScopedChatTurn(key, history, message, answer);
       if (!actionPlan) { conversation.rememberQuestion(key, message); setQuestionUnanswered(false); }
       window.requestAnimationFrame(() => { if(reply.proposal&&conversation.focusedIssue){const heading=conversationViewport.current?.querySelector<HTMLElement>('[aria-label="Investigation options for your goal"] h2');heading?.focus({preventScroll:true});heading?.scrollIntoView({block:'start'});return;} const viewport=conversationViewport.current,answers=viewport?.querySelectorAll<HTMLElement>('[data-chat-role="assistant"]'),answer=answers?.[answers.length-1]; if(viewport&&answer)viewport.scrollTop+=answer.getBoundingClientRect().top-viewport.getBoundingClientRect().top; });
@@ -228,6 +236,23 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   }
 
   const ready = Boolean(sources?.some(source => source.facts)) && !loading && loadedScope === workforceQuery;
+  function findingCurrent(turn:FindingTurn){
+    const goals=decisionStore.getSnapshot().data.goals;
+    return liveFindingTurn.current===turn&&active&&liveActive.current&&ready&&conversation.storageReady&&conversation.saved&&!conversation.issueEditor&&turn.context===contextKey&&currentEvidenceKey.current===turn.context&&turn.epoch===promptEpoch.current&&goals.activeId===turn.goalId&&(goals.goals.find(goal=>goal.id===goals.activeId)?.statement??'')===turn.goal&&messages.at(-1)===turn.message&&turn.sourceKey===candidateSourceKey(buildHomePack(sourceResults,workforceScope,turn.selectionGoal,developmentSession));
+  }
+  function exploreFinding(turn:FindingTurn,item:HomeFindingFollowup){
+    if(!findingCurrent(turn)||!conversation.canSubmitPrompt()||sending.current||queuedSuggestion.current||chatLoading)return;
+    const verified=readHomeFindingFollowups(turn.findings,turn.message.content,buildHomePack(sourceResults,workforceScope,turn.selectionGoal,developmentSession)).find(finding=>finding.id===item.id);
+    if(!verified||JSON.stringify(verified)!==JSON.stringify(item))return;
+    // Consume this exact response synchronously. Double clicks and stale closures cannot send twice.
+    liveFindingTurn.current=null;setFindingTurn(null);
+    void send(buildHomeFindingPrompt(verified),false,false,true,true,'explanation');
+  }
+  function renderFindingAction(message:ChatMessage,text:string){
+    if(!findingTurn||findingTurn.message!==message||!findingCurrent(findingTurn))return null;
+    const item=findingTurn.findings.find(finding=>finding.text===text);if(!item)return null;
+    return <span className="mt-1 flex flex-wrap items-center gap-x-2"><button type="button" disabled={chatLoading||suggestionPending||Boolean(input.trim())} aria-describedby={input.trim()?'home-finding-draft-note':undefined} onClick={()=>exploreFinding(findingTurn,item)} aria-label={`Explore this finding: ${item.text}`} className="min-h-11 rounded border px-2 text-xs font-medium focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Explore this finding</button><span className="text-xs text-muted-foreground">Ask: {item.prompt}</span>{input.trim()&&item.id===findingTurn.findings[0].id&&<span id="home-finding-draft-note" role="status" className="basis-full text-xs text-muted-foreground">Your draft is kept. Send or clear it before exploring a finding.</span>}</span>;
+  }
   function allowSuggestion(key:string){
     if(!active||!liveActive.current||renderedPromptEpoch!==promptEpoch.current||queuedSuggestion.current||chatLoading||sending.current||!conversation.canSubmitPrompt()||currentEvidenceKey.current!==contextKey)return false;
     if(recentSuggestions.current.has(key))return false;
@@ -272,7 +297,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
         <h3 className="text-lg font-semibold">Questions to explore</h3>
         <p className="text-sm text-muted-foreground">Click a question to send it, or write your own.</p>
         <button type="button" aria-label="Refresh overview evidence" disabled={loading || chatLoading}
-          onClick={() => { loaded.current = ""; setRefresh(value => value + 1); }}
+          onClick={() => { liveFindingTurn.current=null; loaded.current = ""; setRefresh(value => value + 1); }}
           className="ml-auto rounded-md p-2 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18} /></button>
       </div>
 
@@ -321,7 +346,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       {evidenceError && <p role="alert" className="mt-3 text-base text-destructive">{evidenceError}</p>}
 
     {messages.length > 0 && <section aria-label="Overview conversation" className="space-y-3">
-      <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona])} onNavigate={onNavigate} home hideHistory latestOnly/>
+      <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona])} onNavigate={onNavigate} home hideHistory latestOnly renderBulletAction={renderFindingAction}/>
       {conversation.homeGoalChoiceKey === contextKey && !conversation.focusedIssue && <div role="group" aria-label="Choose a goal" className="flex flex-wrap gap-2">
         <p className="w-full text-sm text-muted-foreground">State your goal in your own words.</p>
         <button type="button" disabled={chatLoading} onClick={() => { conversation.setHomeGoalChoiceKey(null); focusQuestion(); }} className="min-h-11 rounded-lg border px-4 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">State my goal</button>

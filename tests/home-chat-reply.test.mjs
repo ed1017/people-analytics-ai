@@ -25,7 +25,7 @@ test('Home detail mode follows current request, not an older full-plan question 
  assert.ok(homeResponseStyle('Develop a full action plan').maxOutputTokens>=2400);
  assert.match(homeResponseStyle('Develop a full action plan').instructions,/Target250-300words/);
  assert.match(homeResponseStyle('Develop a full action plan').instructions,/never cut off an unfinished answer/);
- assert.equal(homeResponseStyle('What next?').maxOutputTokens,1400);
+ assert.equal(homeResponseStyle('What next?').maxOutputTokens,4000);
 });
 
 test('distinct Home issues get explicit headings without changing alternative option semantics',()=>{for(const message of ['What issues should we investigate?','Develop a full action plan']){const text=homeResponseStyle(message).instructions;assert.match(text,/Issue A/);assert.match(text,/Issue B/);assert.match(text,/Preserve the individual bullet details/);assert.match(text,/Do not invent, split or infer extra issues/);assert.match(text,/same issue remain Option 1, Option 2/);}});
