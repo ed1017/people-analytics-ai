@@ -8,6 +8,10 @@ import {createRequire} from 'node:module';
 import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
 import {buildHomeReplyFormat} from '../lib/home-chat-reply.ts';
 import {normalizeHomePack} from '../lib/home-pack.mjs';
+import {deliveryAcceptanceWire} from './fixtures/home-exact-acceptance.mjs';
+import {aiSkillsGoalPrompt} from './fixtures/home-ai-skills-goal.mjs';
+import {HOME_BUNDLE_REQUEST,homeBundleOutputTokens} from '../lib/home-bundle-preparation.ts';
+import {buildHomeBundleFormat} from '../lib/home-solution-bundles.ts';
 import {investigationMetrics} from '../lib/home-investigation-contract.ts';
 const require=createRequire(import.meta.url),Ajv=require('ajv'),ajv=new Ajv();
 // Features checked against https://developers.openai.com/api/docs/guides/structured-outputs
@@ -27,8 +31,9 @@ function strictSubset(format){
 const out=await fs.mkdtemp(path.join(os.tmpdir(),'home-route-schema-')),isolation=path.resolve('tests/fixtures/home-route-isolation.ts');
 const compiler=webpackPackage.webpack({mode:'development',devtool:false,target:'node',entry:path.resolve('app/api/chat/route.ts'),output:{path:out,filename:'route.cjs',library:{type:'commonjs2'}},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'openai$':isolation,'next/server$':isolation,'@/lib/openai-proxy-transport$':isolation,'../../../lib/people-analytics-tools$':isolation,'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
-const sandbox={exports:{},require,Response,Request,URL,URLSearchParams,TextEncoder,TextDecoder,AbortController,console,process:{env:{OPENAI_API_KEY:'synthetic-harness-only'}},__requests:[],__replies:[],fetch:()=>{throw Error('Network is forbidden in the route harness')}};
-sandbox.module={exports:sandbox.exports};vm.runInNewContext(await fs.readFile(path.join(out,'route.cjs'),'utf8'),sandbox);
+const sandbox={exports:{},require,Response,Request,URL,URLSearchParams,TextEncoder,TextDecoder,AbortController,console,process:{env:{OPENAI_API_KEY:'synthetic-harness-only'}},__requests:[],__replies:[],__requestOptions:[],fetch:()=>{throw Error('Network is forbidden in the route harness')}};
+sandbox.module={exports:sandbox.exports};// Bundle fixtures are JSON-only; clone within the VM realm for strict plain-object checks.
+vm.runInNewContext('globalThis.structuredClone=value=>JSON.parse(JSON.stringify(value));\n'+await fs.readFile(path.join(out,'route.cjs'),'utf8'),sandbox);
 const all={};for(const metric of Object.values(investigationMetrics)){all[metric.source]??={id:metric.source,status:'loaded',facts:{}};all[metric.source].facts[metric.field]=24;}
 const packets=[['empty',{sources:[]}],['sparse',{sources:[{id:'W1',status:'loaded',facts:{headcount:12}}]}],['full',{sources:Object.values(all)}]];
 for(const [name,packet] of packets)test('actual POST constructs strict Responses format for '+name,async()=>{
@@ -71,4 +76,30 @@ test('actual Home POST distinguishes token-limited, incomplete and malformed out
  }
  assert.deepEqual(logs,[]);
  }finally{sandbox.console=priorConsole;}
+});
+
+test('actual bundle POST distinguishes incomplete causes and preserves one bounded request',async()=>{
+ const goal=aiSkillsGoalPrompt,packet=packets[1][1],wire=deliveryAcceptanceWire(goal);
+ const clipped=structuredClone(wire);clipped.bundles[0].coordination='Coordinate the practice and';
+ const cases=[
+  [{status:'incomplete',incomplete_details:{reason:'max_output_tokens'},output_text:'SECRET_SENTINEL'},'output_token_limit'],
+  [{status:'incomplete',incomplete_details:{reason:'content_filter'},output_text:'SECRET_SENTINEL'},'content_filter'],
+  [{status:'incomplete',incomplete_details:{reason:'SECRET_SENTINEL'},output_text:'SECRET_SENTINEL'},'incomplete_response'],
+  [{status:'failed',error:{message:'SECRET_SENTINEL'}},'response_not_completed'],
+  [{status:'completed',output_text:''},'empty_output'],
+  [{status:'completed',output:[{content:[{type:'refusal',refusal:'SECRET_SENTINEL'}]}]},'refusal'],
+  [{status:'completed',output_text:JSON.stringify(clipped)},'incomplete_text'],
+  [{status:'completed',output_text:'SECRET_SENTINEL'},'invalid_output'],
+ ];
+ for(const [reply,reason] of cases){
+  sandbox.__replies.push({...reply,usage:{output_tokens:5000,output_tokens_details:{reasoning_tokens:4000}},secret:'SECRET_SENTINEL'});const before=sandbox.__requests.length;
+  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',persona:'HR',message:HOME_BUNDLE_REQUEST,hasFocusedIssue:true,goalContext:{goal},overviewBriefingContext:packet})}));
+  assert.equal(response.status,502);assert.equal(sandbox.__requests.length,before+1);const sent=sandbox.__requests.at(-1);assert.equal(sent.max_output_tokens,homeBundleOutputTokens);assert.equal(sent.max_output_tokens,10000);assert.equal(sent.tool_choice,'none');assert.equal(sandbox.__requestOptions.at(-1).maxRetries,0);assert.ok(sandbox.__requestOptions.at(-1).signal);
+  assert.deepEqual(JSON.parse(JSON.stringify(sent.text.format)),buildHomeBundleFormat(goal,normalizeHomePack(packet),'delivery'));
+  const body=await response.json();assert.equal(body.responseDiagnostic.reason,reason);assert.equal(body.responseDiagnostic.outputTokenLimit,10000);assert.equal(body.responseDiagnostic.outputTokens,5000);assert.equal(body.responseDiagnostic.reasoningTokens,4000);assert.ok(!JSON.stringify(body).includes('SECRET_SENTINEL'));assert.equal(body.proposal,undefined);
+  if(reason==='incomplete_text'){assert.equal(body.responseDiagnostic.status,'completed');assert.equal(body.responseDiagnostic.textField,'coordination');}
+ }
+ sandbox.__replies.push({status:'completed',output_text:JSON.stringify(wire)});const before=sandbox.__requests.length;
+ const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',persona:'HR',message:HOME_BUNDLE_REQUEST,hasFocusedIssue:true,goalContext:{goal},overviewBriefingContext:packet})}));
+ assert.equal(response.status,200);assert.equal(sandbox.__requests.length,before+1);const body=await response.json();assert.equal(body.proposal.goal,goal);assert.equal(body.proposal.bundles.length,3);assert.equal(body.responseDiagnostic,undefined);
 });
