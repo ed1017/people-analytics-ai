@@ -1,0 +1,13 @@
+# Preregistered paired-prefix information control
+
+Freeze this design before generating seeds 3001–3100. The executable protocol is `lib/ml/paired-prefix-turnover/protocol.json`; source commit is `1c8c435178956c404291740e761ffd73428cfb2d`.
+
+Construct 100 stationary-family histories using the unchanged Hiring→Turnover generator, ending September2026 (69months from January2021). Each history forks into no-shock and shock continuations after June30. Preserve every earlier truth value and release vintage, not merely final counts. For July–September, the shock continuation adds daily voluntary exits drawn from stock remaining after scheduled starts/exits. Its fixed daily probability is `1-(1-.007)^(1/days-in-month)`. The .007 value is borrowed from prior generator parameters; this is not an exact replay of the earlier reversal. Recompute daily/monthly stocks and exposure without clipping or rerolling. Original company scheduled flows stay fixed; changed event streams can change subsequent group allocations, so paired differences are constructed contrasts, not real causal effects.
+
+Use the unchanged group partition and suppression. With the same seed and family, branches must have identical as-of June30 aggregate input bytes. The unchanged recent-mean point baseline and eleven-quarter range calibration must give identical forecasts, calibration and candidate ranges for both branches. Branch labels, assignment, seed and shock schedule remain outside the model input.
+
+One independent-by-design, domain-separated Bernoulli(.5) stream assigns the realized continuation at July1. Retain both potential outcomes for audit; do not reroll to balance assignments. Pseudo-random stream separation is a reproducibility mechanism, not a proof of statistical independence. The experimental unit is a paired history, not each branch or each group independently.
+
+Report coverage, count errors, widths and interval scores conditionally by branch, for the realized assignments and for the predeclared50/50 mixture. Compute mixtures from per-seed losses; square-root averaged MSE for RMSE. Preserve suppressed/missing denominators. October–December workforce observations are not generated or scored; no new selection, model complexity or qualification gate is introduced. All published intervals/causal effects remain null and operational qualification false. Preserve existing reports and consumers.
+
+This is a control showing whether the pipeline respects a deliberately signal-free branch boundary. It cannot demonstrate that real workforce changes or the earlier simulator's different family prefixes are universally unpredictable. Example artifacts use seed3001 chosen here in advance.

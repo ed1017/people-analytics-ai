@@ -1,0 +1,55 @@
+{
+  "version":"synthetic-paired-prefix-turnover-v1",
+  "sourceCommit":"1c8c435178956c404291740e761ffd73428cfb2d",
+  "priorNegativeReportSha256":"18876092e44d00c849536351d3c37e51b1729ff52a279b44af450832e58883d6",
+  "seeds":{"first":3001,"last":3100},
+  "exampleSeed":3001,
+  "baseFamily":"stationary",
+  "startMonth":"2021-01",
+  "months":69,
+  "endMonth":"2026-09",
+  "origin":"2026-06-30T23:59:59.999Z",
+  "targets":["2026-07","2026-08","2026-09"],
+  "scoringCutoff":"2027-07-01T00:00:00.000Z",
+  "branches":["no-shock","shock"],
+  "prefix":"Reuse original stationary Hiring→Turnover generator through June2026; both branches preserve every pre-July truth value, release revision and availability timestamp. Model inputs are only the identical June30-visible aggregate releases.",
+  "shock":{
+    "startsAt":"2026-07-01T00:00:00.000Z",
+    "endsAt":"2026-09-30T23:59:59.999Z",
+    "monthlyExtraProbability":0.007,
+    "dailyExtraProbability":"1-(1-0.007)^(1/calendar-days-in-month)",
+    "eligibleStock":"Branch stock after each day's original scheduled starts, voluntary exits and other exits; draw extra voluntary exits binomially from remaining nonnegative stock.",
+    "stream":"paired-prefix-extra-exits-v1",
+    "ordinaryFlows":"Keep original company scheduled flows fixed; recompute shock branch stocks and person-days. Assert feasibility without clipping or rerolling.",
+    "interpretation":"Borrowed .007 parameter value, not a reconstruction of the prior reversal or an identified causal effect. Extra events can change later group allocations under the existing partition algorithm."
+  },
+  "assignment":{
+    "probabilityShock":0.5,
+    "stream":"paired-prefix-assignment-v1",
+    "assignedAt":"2026-07-01T00:00:00.000Z",
+    "rule":"One domain-separated Bernoulli draw per seed chooses the realized company continuation, independent by design of the prefix and both potential outcomes. No balancing, outcome-dependent draw or reroll.",
+    "caveat":"Reproducible pseudo-random stream separation implements the design; it is not an empirical proof or cryptographic guarantee of independence."
+  },
+  "forecast":{
+    "method":"recent-mean-3",
+    "calibration":"Unchanged original eleven-quarter count-range procedure from group-turnover/evaluation.mjs; no refitting of method choices, adaptive rule or parameter tuning.",
+    "inputBoundary":"No branch, assignment, seed, truth or shock schedule enters forecastGroup; wrapper family metadata remains stationary for both branches.",
+    "invariants":["all June30 snapshot bytes match","group point forecasts match","calibration results match","candidate ranges match"]
+  },
+  "evaluation":{
+    "unit":"100 paired histories per group; two potential outcomes are not200 independent histories. Groups share the company assignment.",
+    "metrics":["intended","forecasted-and-scored","issued-and-scored","coverage","MAE","RMSE","prediction-minus-actual-bias","mean-width","interval-score-alpha0.1","misses-below","misses-above","unavailability"],
+    "branches":"Report both conditional branch metrics, one realized Bernoulli-assigned mixture and a prespecified50/50 design-weighted mixture.",
+    "mixture":"Average per-seed losses with branch weight0.5; RMSE=sqrt(weighted MSE), never mean of branch RMSEs. Preserve suppressed/missing denominators; report null if neither branch is scoreable.",
+    "paired":"Report differences of observed quarter totals and absolute count errors within each pair; simulation contrasts are not identified real-world causal effects.",
+    "gate":"No promotion or new qualification gate; all ranges are offline diagnostics. Original published gates remain unchanged."
+  },
+  "privacy":"Unchanged group partition, minimum headcount/positive-count and complementary suppression rules; assert daily stock/flow/exposure reconciliation.",
+  "reservedQuarter":"October–December workforce data are not generated, retained, scored or used for selection in this control. Hiring follow-up after September is not a workforce outcome input.",
+  "custody":"Freeze before any seed3001–3100 generation. No new model. Known synthetic assumptions and two potential continuations test implementation boundaries, not universal unpredictability or real accuracy.",
+  "failurePolicy":"Report every seed and invariant failure; do not silently drop, widen, tune or regenerate favorable cases.",
+  "publishedInterval":null,
+  "causalEffect":null,
+  "operationallyQualified":false,
+  "realWorldPerformanceValidated":false
+}
