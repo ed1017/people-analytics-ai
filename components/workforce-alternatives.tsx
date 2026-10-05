@@ -1,6 +1,6 @@
 "use client";
 import type {JourneyTransient} from '@/lib/workforce-journey-state';
-import {useEffect,useEffectEvent,useRef,useState} from "react";
+import {useEffect,useEffectEvent,useRef,useState,type ReactNode} from "react";
 import {decisionStore,useDecisionStorage} from "@/components/decision-store";
 import {readWorkforceAlternativeReview,workforceAgentReviewIsCurrent} from "@/lib/workforce-planning-agent";
 import {readWorkforceSolution,solutionResultIsCurrent,type WorkforceSolution} from "@/lib/workforce-solution";
@@ -14,7 +14,7 @@ const field="workforceAlternativeReviews";
 const edits:[WorkforcePlanField,string][]=[['build','Build count'],['move','Move count'],['buy','External hires'],['backfills','External backfills'],['buildMonth','Build readiness month'],['moveMonth','Move effective month'],['backfillDate','Backfill arrival date'],['annualBackfillCost','Annual cost per backfill (USD)'],['backfillFee','One-time fee per backfill (USD)'],['internalAnnualCostChange','Annual internal cohort uplift (USD)'],['trainingCash','Training cash (USD)'],['trainingHours','Employee training hours']];
 const button="min-h-10 rounded border px-3 py-2 text-sm disabled:opacity-50";
 const money=(value:number|null)=>value===null?'Unknown':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}).format(value);
-type Props={journeyContext?:string;onJourneyChange?:(state:JourneyTransient|undefined)=>void;solution:WorkforceSolution;evidenceResultId:string;input:WorkforcePlanInput;blocked:boolean;selection?:WorkforceSelectionOffer;onDirty?:(dirty:boolean)=>void};
+type Props={renderBundleAdoption?:(offer:WorkforceSelectionOffer,currentContext:()=>import('@/lib/workforce-mix-selection-core').WorkforceSelectionContext)=>ReactNode;journeyContext?:string;onJourneyChange?:(state:JourneyTransient|undefined)=>void;solution:WorkforceSolution;evidenceResultId:string;input:WorkforcePlanInput;blocked:boolean;selection?:WorkforceSelectionOffer;onDirty?:(dirty:boolean)=>void};
 function sourceIdentity(solution:WorkforceSolution|null,evidenceResultId:string){
  return JSON.stringify(solution&&{id:solution.id,goalId:solution.goalId,versions:solution.versions,evidence:solution.evidence,result:solution.results.find(item=>item.id===evidenceResultId),pending:solution.pending});
 }
@@ -25,7 +25,7 @@ export function WorkforceAlternatives(props:Props){
  const identity=JSON.stringify([storage.data.goals.activeId,goal?.statement,sourceIdentity(saved,props.evidenceResultId),props.blocked]);
  return <AlternativeDrafts key={identity} {...props}/>;
 }
-function AlternativeDrafts({solution,evidenceResultId,input,blocked,selection,onDirty,journeyContext,onJourneyChange}:Props){
+function AlternativeDrafts({renderBundleAdoption,solution,evidenceResultId,input,blocked,selection,onDirty,journeyContext,onJourneyChange}:Props){
  const storage=useDecisionStorage(),raw=storage.data.workspaces[solution.goalId]?.fields[field]??[];
  const history=Array.isArray(raw)?raw:[];
  const unreadable=!Array.isArray(raw)||history.some(item=>!readWorkforceAlternativeReview(item,solution)&&!(item&&typeof item==='object'&&!Array.isArray(item)&&item.schemaVersion===2));
@@ -65,13 +65,15 @@ function AlternativeDrafts({solution,evidenceResultId,input,blocked,selection,on
   }catch(error){if(!controller.signal.aborted)setNotice((error as Error).message)}finally{if(operation.current===controller){operation.current=null;setWorking(false)}}
  }
  return <details className="space-y-3 rounded border p-3"><summary className="cursor-pointer font-semibold">Review local alternatives</summary><section data-journey="review-alternatives" tabIndex={-1} aria-label="Local workforce alternatives" className="space-y-3 text-sm">
-  <p>Compare up to two alternatives using this calculation&apos;s saved evidence. Demand, budget, employee limit, deadline, hire cost and hiring timing stay fixed. Calculations run locally; no AI request or real-world action occurs.</p>
+  <p>{renderBundleAdoption?'Select up to two mixes, then review one for adoption into this plan.':'Compare up to two alternatives using this calculation’s saved evidence.'} Demand, budget, employee limit, deadline, hire cost and hiring timing stay fixed. Calculations run locally; no AI request or real-world action occurs.</p>
   <p>{input.roles} additional {input.jobProfile} roles in {input.businessUnit}; {input.planningMonth}, {input.months} months. Cash budget: {input.budget?money(Number(input.budget)):'Unknown'}. Employee cap: {input.maxAddedEmployees||'Unknown'}. Deadline: {input.deadlineMonth||'Unknown'}.</p>
   <p className="text-xs">Fixed hiring basis: annual cost per hire {input.annualHireCost?money(Number(input.annualHireCost)):'Unknown'}, fee per hire {input.hireFee?money(Number(input.hireFee)):'Unknown'}; recruiting launch {input.recruitingStart||'Unknown'}, arrival mode {input.arrivalMode||'Unknown'}{input.arrivalMode==='explicit'?`, arrival ${input.arrivalDate||'Unknown'}`:''}. Loaded hourly cost: {input.loadedHourlyCost?money(Number(input.loadedHourlyCost)):'Unknown'}.</p>
   {blocked&&<p role="status">Select a current calculation and save any main-plan edits before previewing or saving alternatives. Historical alternative reviews remain below.</p>}
-  {unreadable&&<p role="status">Saved alternative history is unreadable. Original records are retained; saving is unavailable.</p>}
+  {unreadable&&!renderBundleAdoption&&<p role="status">Saved alternative history is unreadable. Original records are retained; saving is unavailable.</p>}
   {!selection&&!blocked&&<WorkforceLocalSearch currentContext={selectionContext} roles={Number(input.roles)} savedMix={input} onOffer={setLocalOffer}/>}
-  {offer&&!blocked&&<WorkforceSelectionHandoff key={JSON.stringify([draftRevision,offer.snapshot.searchFingerprint,offer.selectedIds])} offer={offer} currentContext={selectionContext} onReplace={(next,selected)=>{current();stop();markDirty(true);setOrigin(originForSelection(selected.snapshot,selected.selectedIds,next));setDrafts(next);setDraftRevision(value=>value+1);setPreview(null);setNotice('Selected mixes opened as temporary drafts. Review assumptions, then calculate explicitly.')}}/>}
+  {offer&&!blocked&&!renderBundleAdoption&&<WorkforceSelectionHandoff key={JSON.stringify([draftRevision,offer.snapshot.searchFingerprint,offer.selectedIds])} offer={offer} currentContext={selectionContext} onReplace={(next,selected)=>{current();stop();markDirty(true);setOrigin(originForSelection(selected.snapshot,selected.selectedIds,next));setDrafts(next);setDraftRevision(value=>value+1);setPreview(null);setNotice('Selected mixes opened as temporary drafts. Review assumptions, then calculate explicitly.')}}/>}
+  {offer&&!blocked&&renderBundleAdoption?.(offer,selectionContext)}
+  {!renderBundleAdoption&&<>
   {drafts.map((draft,index)=><fieldset key={index} disabled={blocked||working} className="rounded border p-3"><legend>Alternative {index+1}</legend><div className="grid gap-3 sm:grid-cols-2">{edits.map(([key,label])=><label key={key} className="min-w-0">{label}<input aria-label={`Alternative ${index+1}: ${label}`} className="mt-1 min-h-10 w-full min-w-0 rounded border bg-background p-2" maxLength={100} value={draft[key]} onChange={event=>{stop();markDirty(true);setDrafts(before=>before.map((item,i)=>i===index?{...item,[key]:event.target.value}:item));setDraftRevision(value=>value+1);setPreview(null);setNotice('Alternative draft changed; preview again before saving.')}}/></label>)}</div></fieldset>)}
   <div className="flex flex-wrap gap-2"><button className={button} disabled={blocked||working} onClick={()=>{stop();markDirty(true);if(drafts.length===2&&origin){const selections=origin.selections.filter(item=>item.revisionSlot===0);setOrigin(selections.length?{...origin,selections}:null)}setDrafts(before=>before.length===1?[...before,{...input}]:before.slice(0,1));setDraftRevision(value=>value+1);setPreview(null);setNotice('Drafts changed; preview again before saving.')}}>{drafts.length===1?'Add second alternative':'Remove second draft'}</button><button className={button} disabled={blocked||working} onClick={()=>void calculate()}>Calculate alternatives locally</button><button className={button} disabled={blocked||working} onClick={()=>{stop();markDirty(false);setOrigin(null);setDrafts([{...input}]);setDraftRevision(value=>value+1);setPreview(null);setNotice('Temporary alternative edits cancelled. Saved reviews and approvals are unchanged.')}}>Cancel alternative edits</button></div>
   <p className="text-xs">Drafts are temporary until explicitly saved. Build + Move + external hires must equal the role requirement; backfills are additional employees. Training time stays separate from cash. Saving an alternative does not authorize an AI run or change the saved solution version.</p>
@@ -81,6 +83,7 @@ function AlternativeDrafts({solution,evidenceResultId,input,blocked,selection,on
   <h4 className="font-semibold">Saved local alternative reviews ({history.length})</h4>
   {history.length>=10&&<p role="status">The ten-review limit is reached. Existing reviews are retained.</p>}
   {history.map((rawReview,index)=><SavedReview key={JSON.stringify([index,rawReview])} raw={rawReview} solution={solution} index={index}/>)}
+ </>}
  </section></details>;
 }
 function Comparison({review}:{review:LocalWorkforceReview}){

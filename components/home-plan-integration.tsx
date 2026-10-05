@@ -1,6 +1,7 @@
 "use client";
 import {useState} from 'react';
 import {useDecisionStorage} from '@/components/decision-store';
+import {HomeCapacityAdoption} from '@/components/home-capacity-adoption';
 import {WorkforceAlternatives} from '@/components/workforce-alternatives';
 import {previewDeliveryMix,acceptDeliveryMix,matchedBundleSearch,type DeliveryMixPreview} from '@/lib/home-plan-integration';
 import {bundleInputKey,type BundleDraft} from '@/lib/home-bundle-reconciliation';
@@ -17,7 +18,7 @@ export function HomePlanIntegration({draft,disabled,isCurrent,onAccept}:{draft:B
    {notice&&<p role="status">{notice}</p>}
    <h4 className="font-semibold">Staffing combinations for this plan</h4>
    <p>Only a matching reviewed additional-capacity calculation supports this local search. Its counts and tradeoffs describe staffing assumptions, not complete intervention plans or predicted retention outcomes. No intervention optimum is established.</p>
-   {!current?<p>Review the current plan context before searching.</p>:search?<WorkforceAlternatives key={bundleInputKey(draft)} {...search} blocked={false}/>:<p role="status">{searchNotice}</p>}
+   {!current?<p>Review the current plan context before searching.</p>:search?<WorkforceAlternatives key={bundleInputKey(draft)} {...search} blocked={false} renderBundleAdoption={(offer,currentContext)=><HomeCapacityAdoption key={JSON.stringify([offer.snapshot.searchFingerprint,offer.selectedIds,bundleInputKey(draft)])} draft={draft} offer={offer} currentContext={currentContext} isCurrent={isCurrent} onAccept={onAccept}/>}/>:<p role="status">{searchNotice}</p>}
   </section>
  </details>;
 }
