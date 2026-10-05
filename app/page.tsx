@@ -1867,7 +1867,7 @@ export default function Home() {
 
   return (
     <PlanningSessionProvider goalKey={conversation.workspaceKey} onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
-    <main className={`min-h-screen bg-background text-foreground${activePage === "home" ? " app-home-composer" : ""}${["home","decision-brief","assess-evaluate"].includes(activePage) ? " app-overview-mode" : ""}`}>
+    <main data-workspace-palette="slate-blue" className={`min-h-screen bg-background text-foreground${activePage === "home" ? " app-home-composer" : ""}${["home","decision-brief","assess-evaluate"].includes(activePage) ? " app-overview-mode" : ""}`}>
       {/* Top header */}
       <AppHeader
         activePage={activePage}
