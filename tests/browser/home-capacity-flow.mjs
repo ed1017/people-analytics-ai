@@ -9,7 +9,7 @@ import {calculateWorkforceIncrement} from '../../lib/workforce-increment.ts';
 const built=process.env.HOME_BUILT==='1';
 const {chromium,devices}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const output=await fs.mkdtemp(path.join(os.tmpdir(),'home-capacity-flow-'));
-const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/home-capacity-flow.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/home-capacity-flow.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd(),react:path.resolve('node_modules/react')}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
 const assets=new Map(await Promise.all((await fs.readdir(output)).filter(name=>name.endsWith('.js')).map(async name=>['/assets/'+name,await fs.readFile(path.join(output,name),'utf8')])));
 const css=(await Promise.all((await fs.readdir('.next/static/chunks')).filter(name=>name.endsWith('.css')).map(name=>fs.readFile(path.join('.next/static/chunks',name),'utf8')))).join('\n');
@@ -18,7 +18,7 @@ const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless
 const check=(name,value)=>{assert.ok(value,name);checks++;console.log('PASS '+name)};
 try{for(const mode of [{name:'desktop',width:1366},{name:'mobile',width:390},{name:'200-percent-reflow',width:683,scale:2}]){
  const context=await browser.newContext({...mode.width===390?devices['Pixel 7']:{},viewport:{width:mode.width,height:900},deviceScaleFactor:mode.scale??1}),page=await context.newPage(),errors=[];let posts=[],unexpected=[];
- page.on('pageerror',error=>errors.push(error.message));
+ page.on('pageerror',error=>{errors.push(error.message);console.error(error.stack)});
  await page.route('**/*',async route=>{
   const request=route.request(),url=new URL(request.url());
   if(url.origin!==baseUrl){unexpected.push(url.href);return route.abort()}

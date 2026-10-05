@@ -18,7 +18,7 @@ function Fixture(){
  <button onClick={()=>conversation.selectGoal('goal-other')}>Goal B</button><button onClick={()=>conversation.selectGoal('goal-readiness')}>Goal A</button>
  <button onClick={()=>{decisionStore.saveGoals({...storage.data.goals,activeId:'goal-other'});decisionStore.saveGoals({...storage.data.goals,activeId:'goal-readiness'})}}>Batched goal roundtrip</button>
  <button onClick={()=>decisionStore.setField('goal-readiness','workforceSolution',window.readinessSeed.newer)}>Advance current inputs</button>
- <button onClick={()=>conversation.updateFocusedIssue('Changed synthetic goal')}>Change goal wording</button>
+ <button onClick={()=>{const id=conversation.openIssueEditor(false,{page:'workforce',scope:'Synthetic fixture'});if(id){conversation.updateIssueDraft('Changed synthetic goal',id);conversation.updateFocusedIssue('Changed synthetic goal',id)}}}>Change goal wording</button>
  <button onClick={()=>conversation.removeGoal()}>Delete goal</button>
  <button onClick={()=>{const prior=document.querySelector<HTMLButtonElement>('[aria-label="Workforce option actions"] button');conversation.setInput('Keep queued draft');prior?.click()}}>Queue draft then suggestion</button>
  <button onClick={()=>{const prior=document.querySelector<HTMLButtonElement>('[aria-label="Workforce option actions"] button');prior?.click();decisionStore.saveGoals({...storage.data.goals,activeId:'goal-other'});decisionStore.saveGoals({...storage.data.goals,activeId:'goal-readiness'})}}>Click then goal roundtrip</button>

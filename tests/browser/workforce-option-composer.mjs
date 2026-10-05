@@ -9,7 +9,7 @@ import {createWorkforceSolution,emptySolutionInputs,beginSolutionRun,completeSol
 import {encodeDecisions,DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
 const {chromium,devices}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const output=await fs.mkdtemp(path.join(os.tmpdir(),'workforce-option-composer-'));
-const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/workforce-option-composer.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/workforce-option-composer.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd(),react:path.resolve('node_modules/react')}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
 const bundle=await fs.readFile(path.join(output,'fixture.js'),'utf8');
 const css=(await Promise.all((await fs.readdir('.next/static/chunks')).filter(name=>name.endsWith('.css')).map(name=>fs.readFile(path.join('.next/static/chunks',name),'utf8')))).join('\n');
@@ -27,7 +27,7 @@ const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless
 const check=(name,value)=>{assert.ok(value,name);checks++;console.log('PASS '+name)};
 try{for(const width of [1366,390,683]){
  const context=await browser.newContext({...width===390?devices['Pixel 7']:{},viewport:{width,height:width===683?450:900},...(width===683?{deviceScaleFactor:2}:{})}),page=await context.newPage(),errors=[];let posts=[],unexpected=0,missing=false;
- page.on('pageerror',error=>errors.push(error.message));
+ page.on('pageerror',error=>{errors.push(error.message);console.error(error.stack)});
  const assets=new Map(await Promise.all((await fs.readdir(output)).filter(name=>name.endsWith('.js')).map(async name=>['http://127.0.0.1:3100/assets/'+name,await fs.readFile(path.join(output,name),'utf8')])));
  await page.route('**/*',route=>{
   const request=route.request(),url=new URL(request.url());
@@ -51,7 +51,7 @@ try{for(const width of [1366,390,683]){
  const choose=async name=>{const summary=page.getByText('Option action suggestions',{exact:true});await summary.waitFor();if(!await summary.evaluate(el=>el.parentElement.open))await summary.click();await actions().getByRole('button',{name,exact:true}).click()};
  const solution=async()=>JSON.stringify((await state()).workspaces[goalId].fields.workforceSolution);
  await init();const saved=await solution(),baseline=posts.length,history=await page.evaluate(()=>JSON.stringify(window.optionQA())),workers=await worker();
- await page.getByText('Option action suggestions',{exact:true}).click();check(width+' duplicate suggestions are secondary and collapsed',!await actions().isVisible()&&await button('Compare options').isVisible());check(width+' existing options demote general planning action',await button('Draft a goal action plan').isVisible()&&!await button('Draft a goal action plan').evaluate(el=>el.classList.contains('bg-primary'))&&await button('Develop a full action plan').count()===0);await page.getByText('Option action suggestions',{exact:true}).click();
+ await page.getByText('Option action suggestions',{exact:true}).click();check(width+' duplicate suggestions are secondary and collapsed',!await actions().isVisible()&&await button('Compare options').isVisible());check(width+' existing options demote general planning action',await button('Create Action Plan').isVisible()&&!await button('Create Action Plan').evaluate(el=>el.classList.contains('bg-primary'))&&await button('Develop a full action plan').count()===0);await page.getByText('Option action suggestions',{exact:true}).click();
  await actions().getByRole('button',{name:'Compare all 2 options',exact:true}).focus();await page.keyboard.press('Enter');
  await page.getByRole('region',{name:'Compare calculated options',exact:true}).waitFor();await page.waitForTimeout(100);
  check(width+' keyboard suggestion compares immediately without chat or writes',await input.inputValue()===''&&await page.getByRole('region',{name:'Compare calculated options',exact:true}).evaluate(el=>el===document.activeElement)&&posts.length===baseline&&await solution()===saved&&await page.evaluate(()=>JSON.stringify(window.optionQA()))===history&&JSON.stringify(await worker())===JSON.stringify(workers));

@@ -6,6 +6,7 @@ import type { ScopedChatHistory } from "@/lib/chat-context-history";
 import type { ChatMessage } from "@/lib/types";
 
 import { addGoalNote, emptyGoalRequirements, normalizeGoalRequirements, type GoalRequirements } from "@/lib/goal-context";
+import {openGoalContextEditor,changeGoalEditorStatement,goalContextEditorCurrent,recordExplorationGoalContext,type GoalContextEditor,type GoalEditorSource} from '@/lib/goal-context-editor';
 import { MAX_GOALS, emptyLocalGoals, type LocalGoals } from "@/lib/local-goals";
 
 import {decisionStore,useDecisionStorage} from "@/components/decision-store";
@@ -25,7 +26,10 @@ export function useProblemConversation() {
   };
   const [homeGoalChoiceKey, setHomeGoalChoiceKey] = useState<string | null>(null);
   const [focusedIssue, setFocusedIssue] = useState("");
-  const [issueEditor, setIssueEditor] = useState<{draft:string; create?:boolean} | null>(null);
+  const [issueEditor, setIssueEditorState] = useState<GoalContextEditor | null>(null);
+  const issueEditorRef=useRef<GoalContextEditor|null>(null);
+  const setIssueEditor:Dispatch<SetStateAction<GoalContextEditor|null>>=update=>{const next=typeof update==='function'?update(issueEditorRef.current):update;issueEditorRef.current=next;setIssueEditorState(next)};
+  const explorationContext=useRef(emptyGoalRequirements());
   const requestGate = useRef(new ProblemRequestGate());
   const [messages, setStoredMessages] = useState<ChatMessage[]>([]);
   const [input, setInputState] = useState("");
@@ -62,7 +66,7 @@ export function useProblemConversation() {
   const cancelPending = () => { requestGate.current.invalidate(); setHomeGoalChoiceKey(null); setLoading(false); };
   const snapshot = () => { chats.current.set(goalsRef.current.activeId, {messages,input:inputRef.current,problem,questionUnanswered}); };
   const activate = (next: LocalGoals, saveCurrent = true) => {
-    cancelPending(); if (saveCurrent) snapshot();
+    cancelPending(); if(next.activeId!==goalsRef.current.activeId)explorationContext.current=emptyGoalRequirements(); if (saveCurrent) snapshot();
     const chat = chats.current.get(next.activeId) ?? decisionStore.getField<GoalChat|null>(next.activeId,"chat",null);
     setMessages(chat?.messages ?? []); setInput(chat?.input ?? ""); setProblem(chat?.problem ?? null); setQuestionUnanswered(false);
     history.current = {key:"", messages:[]}; setError(null); setIssueEditor(null);
@@ -74,30 +78,42 @@ export function useProblemConversation() {
     activate({...current,activeId:id});
   };
   const startNewProblem = (draft = "") => {
+    explorationContext.current=emptyGoalRequirements();setIssueEditor(null);
     const current = goalsRef.current;
     if (current.activeId) activate({...current,activeId:""});
     else { cancelPending(); history.current={key:"",messages:[]}; setProblem(null); setError(null); setQuestionUnanswered(false); setMessages(previous=>previous.length ? [...previous,{role:"assistant",content:"Starting a new problem. Earlier messages remain for reference and will not be used as AI context."}] : previous); }
     setInput(draft);
   };
-  const updateFocusedIssue = (value: string) => {
-    if (!storageReady) return;
+  const openIssueEditor=(create=false,source:GoalEditorSource={page:'',scope:''})=>{
+    if(!storageReady||!decisionStore.getSnapshot().saved)return;
+    cancelPending();const editor=openGoalContextEditor(goalsRef.current,create,explorationContext.current,source,crypto.randomUUID());setIssueEditor(editor);return editor.id;
+  };
+  const editorCurrent=(id:string)=>{const editor=issueEditorRef.current;return !!editor&&editor.id===id&&goalContextEditorCurrent(editor,goalsRef.current)&&goalContextEditorCurrent(editor,decisionStore.getSnapshot().data.goals)};
+  const closeIssueEditor=(id:string)=>{if(issueEditorRef.current?.id===id)setIssueEditor(null)};
+  const updateIssueDraft=(draft:string,id:string)=>{if(editorCurrent(id))setIssueEditor(current=>current?changeGoalEditorStatement(current,draft):null)};
+  const updateIssueContext=(requirements:GoalRequirements,id:string)=>{if(editorCurrent(id))setIssueEditor(current=>current?{...current,requirements:normalizeGoalRequirements(requirements),contextEdited:current.contextEdited||requirements.constraints!==current.requirements.constraints}:null)};
+  const updateFocusedIssue = (value: string,editorId:string):string|null => {
+    if (!storageReady||!decisionStore.getSnapshot().saved) return 'Browser storage must be available before saving.';
+    if(!editorCurrent(editorId))return 'The goal or editor changed. Close and reopen this editor before saving.';
+    const editor=issueEditorRef.current!;
     const clean = value.trim(), current = goalsRef.current;
-    if (!clean) { selectGoal(""); setProblem(null); setInput(""); setQuestionUnanswered(false); setIssueEditor(null); return; }
-    if (clean.length > 240) return;
-    if (!current.activeId || issueEditor?.create) {
+    if (!clean) { selectGoal(""); setProblem(null); setInput(""); setQuestionUnanswered(false); setIssueEditor(null); return null; }
+    if (clean.length > 240) return 'Use 240 characters or fewer.';
+    if (!current.activeId || editor.create) {
       const duplicate = current.goals.find(g=>g.statement.toLocaleLowerCase() === clean.toLocaleLowerCase());
-      if (duplicate) { selectGoal(duplicate.id); setIssueEditor(null); return; }
-      if (current.goals.length >= MAX_GOALS) return;
+      if (duplicate) return 'A goal with this statement already exists. Select it to review its saved context; this draft has not changed it.';
+      if (current.goals.length >= MAX_GOALS) return 'The 20-goal limit is reached.';
       const id = crypto.randomUUID();
-      const next = {...current,activeId:id,goals:[...current.goals,{id,statement:clean}]};
+      const next = {...current,activeId:id,goals:[...current.goals,{id,statement:clean,...(editor?{context:normalizeGoalRequirements(editor.requirements)}:{})}]};
       // Pinning general exploration retains its visible transcript for reference, never model history.
-      if (!current.activeId && !issueEditor?.create) chats.current.set(id,{messages,input:"",problem:null,questionUnanswered:false});
-      activate(next); return;
+      if (!current.activeId) chats.current.set(id,{messages,input:"",problem:null,questionUnanswered:false});
+      activate(next); return null;
     }
     cancelPending(); history.current={key:"",messages:[]}; setProblem(null); setQuestionUnanswered(false); setInput(""); setError(null);
     setFocusedIssue(clean); setIssueEditor(null);
     setMessages(previous=>previous.length ? [...previous,{role:"assistant",content:"Goal edited. Earlier messages remain for reference and will not be reused as AI context."}] : previous);
-    persist({...current,goals:current.goals.map(g=>g.id===current.activeId ? {...g,statement:clean} : g)});
+    persist({...current,goals:current.goals.map(g=>g.id===current.activeId ? {...g,statement:clean,...(editor?{context:normalizeGoalRequirements(editor.requirements)}:{})} : g)});
+    return null;
   };
   // Explicit local planner handoff: retain the entire transcript and unfinished draft.
   const confirmWorkforceGoal = (statement: string): string => {
@@ -115,14 +131,15 @@ export function useProblemConversation() {
     activate({...current,activeId:id,goals:[...current.goals,{id,statement:clean}]});
     return id;
   };
-  const removeGoal = () => {
+  const removeGoal = (editorId?:string) => {
+    if(editorId&&!editorCurrent(editorId))return;
     const current = goalsRef.current; if (!current.activeId) return;
     chats.current.delete(current.activeId);
     activate({...current,activeId:"",goals:current.goals.filter(g=>g.id!==current.activeId)},false);
   };
   const recordGoalStatement = (text:string,page:string,scope:string) => {
     const current=goalsRef.current, goal=current.goals.find(g=>g.id===current.activeId);
-    if(!goal)return null;
+    if(!goal){explorationContext.current=recordExplorationGoalContext(explorationContext.current,text,page,scope);return null;}
     const context=addGoalNote(normalizeGoalRequirements(goal.context),text,page,scope);
     persist({...current,goals:current.goals.map(g=>g.id===goal.id?{...g,context}:g)});
     return {goal:goal.statement,...context,currentScope:scope};
@@ -136,9 +153,9 @@ export function useProblemConversation() {
   const goalRequirements=activeGoal?.context ?? emptyGoalRequirements();
   const goalContext=activeGoal?{goal:activeGoal.statement,...goalRequirements}:null;
   const clearAllGoals = () => {
-    cancelPending(); chats.current.clear(); history.current={key:"",messages:[]}; setMessages([]); setInput(""); setProblem(null); setQuestionUnanswered(false); setFocusedIssue(""); setIssueEditor(null); setError(null); setWorkspaceRevision(v=>v+1); persist(emptyLocalGoals(),true);
+    explorationContext.current=emptyGoalRequirements();cancelPending(); chats.current.clear(); history.current={key:"",messages:[]}; setMessages([]); setInput(""); setProblem(null); setQuestionUnanswered(false); setFocusedIssue(""); setIssueEditor(null); setError(null); setWorkspaceRevision(v=>v+1); persist(emptyLocalGoals(),true);
   };
-  return { canSubmitPrompt, confirmWorkforceGoal, saved:decisionStorage.saved, retrySave:()=>decisionStore.retry(), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
+  return { canSubmitPrompt, confirmWorkforceGoal, saved:decisionStorage.saved, retrySave:()=>decisionStore.retry(), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, closeIssueEditor, openIssueEditor, updateIssueDraft, updateIssueContext, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
 }
 export type ProblemConversation = ReturnType<typeof useProblemConversation>;
 
