@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "artifactType": "proposed-test-contract",
-  "executionStatus": "not-implemented",
+  "executionStatus": "local-contract-checks-implemented",
   "proposal": "../../docs/predictive-readiness-proposal.md",
   "recordContracts": [
     "history_provenance",
@@ -19,7 +19,7 @@
     "productIntegration": false,
     "existingArtifactModification": false
   },
-  "statusMeaning": "Expected behaviors for a future implementation. Structural checks on this file are not behavioral tests or evidence of readiness.",
+  "statusMeaning": "All 25 IDs have local contract-mechanics tests using constructed synthetic fixtures. C02/G02 check selected-history invariance only: no model fitting, settings selection or predictions exist here. G03 checks a small seeded fixture set, not a realistic workforce simulator. Source capture, source truth, privacy review, model performance, calibration and causal identification remain unvalidated.",
   "cases": [
     {
       "id": "C01",
@@ -246,5 +246,7 @@
       "expectedStatus": "uncertainty-unavailable",
       "assertion": "Prediction uncertainty and causal-effect uncertainty require separate method and coverage/design evidence."
     }
-  ]
+  ],
+  "implementation": "../../lib/ml/predictive-readiness.ts",
+  "executableTests": "../predictive-readiness.test.mjs"
 }
