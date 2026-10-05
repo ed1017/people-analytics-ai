@@ -673,8 +673,7 @@ export default function Home() {
   }, [activePage, talentAcquisitionData]);
   useEffect(() => {
     if (
-      (activePage !== "survey-sentiment" && activePage !== "attrition") ||
-      surveySentimentData
+      activePage !== "survey-sentiment" && activePage !== "attrition"
     ) {
       return;
     }
@@ -683,6 +682,7 @@ export default function Home() {
     async function loadSurveySentiment() {
       setSurveySentimentLoading(true);
       setSurveySentimentError(null);
+      setSurveySentimentData(null);
       const result = await readSurveySource();
       if (!current) return;
       if (result.status === "loaded") {
@@ -695,7 +695,7 @@ export default function Home() {
     }
     void loadSurveySentiment();
     return () => { current = false; };
-  }, [activePage, surveySentimentData]);
+  }, [activePage]);
 
   useEffect(() => {
     if (
