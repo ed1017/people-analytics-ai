@@ -57,3 +57,9 @@ test('valid unordered components and repeated IDs across distinct bundles are ac
 });
 
 test('only repeated identical edges normalize; original proposal is not mutated',()=>{const p=fixture();p.bundles[0].components[1].dependsOn=['c1','c1'];const before=JSON.stringify(p),result=inspectHomeBundleOutput(before,goal,pack);assert.deepEqual(result.proposal.bundles[0].components[1].dependsOn,['c1']);assert.equal(JSON.stringify(p),before);});
+
+test('objective text reaches normalized proposal verbatim; over-bound text rejects instead of clipping',()=>{
+ const p=fixture();p.bundles[0].objective='Review '+ 'x'.repeat(153);assert.equal(p.bundles[0].objective.length,160);assert.equal(inspectHomeBundleOutput(JSON.stringify(p),goal,pack).proposal.bundles[0].objective,p.bundles[0].objective);
+ p.bundles[0].objective+='x';assert.equal(inspectHomeBundleOutput(JSON.stringify(p),goal,pack).diagnostic,'schema_rejected');
+ p.bundles[0].objective='Coordinate a manager-support pilot without treating them';assert.equal(inspectHomeBundleOutput(JSON.stringify(p),goal,pack).proposal.bundles[0].objective,p.bundles[0].objective);
+});
