@@ -145,7 +145,7 @@ function sourceFor(context: ApplicationContext) {
   requireValue(actionBindingKey(context.binding) === actionBindingKey(attachment.draft.binding), 'Goal, evidence or planning context changed; prepare a fresh preview.');
   const current = readBundleDraft(context.currentDraft);
   requireValue(current && same(current, attachment.draft), 'The current Action Plan draft differs from the attachment; attach the reviewed revision first.');
-  requireValue(!workspace.drafts.some(draft => draft.bundle.id === current.bundle.id &&
+  requireValue(!workspace.drafts.some(draft => draft.bundle.id === current.bundle.id && actionBindingKey(draft.binding) === actionBindingKey(current.binding) && draft.signature === current.signature &&
     (draft.revision > current.revision || draft.revision === current.revision && !same(draft, current))),
   'A newer or different Action Plan draft is saved; review it first.');
   const destination = context.destination;

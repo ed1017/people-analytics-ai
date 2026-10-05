@@ -11,6 +11,7 @@ decisionStore.initialize(localStorage);
 function Fixture(){
  const conversation=useProblemConversation(),[actions]=useState(()=>new WorkforceOptionActions()),[query,setQuery]=useState('?country=all');
  Object.assign(window,{
+  capacityPinGoal:(goal:string)=>conversation.confirmWorkforceGoal(goal),
   capacityState:()=>decisionStore.getSnapshot(),
   changeCapacityScope:()=>setQuery('?country=US'),
   capacityRename:()=>conversation.updateFocusedIssue('A changed additional-role goal'),

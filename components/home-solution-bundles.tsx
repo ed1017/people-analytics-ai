@@ -4,13 +4,14 @@ import {revealJourneyTarget} from "@/components/workforce-journey-continue";
 import {useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
 import {HomeBundlePlans,type BundleSession,type BundleDiscussion} from '@/components/home-bundle-plans';
-import {actionBinding,actionBindingKey,type ActionBinding} from '@/lib/home-action-drafts';
+import {actionBinding,actionBindingKey,validActionBinding,type ActionBinding} from '@/lib/home-action-drafts';
+import {linkedAttachmentField,resolveAttachedSourceBinding,type PlanningDestination,type ProjectPlanningBinding} from '@/lib/home-linked-attachment';
 import {HOME_BUNDLE_REQUEST,bundlePreparationField,readBundlePreparation,createHomeBundlePreparation} from '@/lib/home-bundle-preparation';
 import {normalizeHomePack} from '@/lib/home-pack.mjs';
 import type {Persona} from '@/lib/types';
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring';
 const localInputs=(id:string)=>{const fields=decisionStore.getSnapshot().data.workspaces[id]?.fields;return {capacity:fields?.workforceSolution??null,retention:fields?.retentionWhatIfV1??null}};
-export function HomeSolutionBundles({openRequest,goalId,goal,pack,active,ready,busy,pin,persona,goalContext,marketReference,hasPlanningWork,onResume,onDiscuss}:{openRequest?:{goalId:string;goal:string;sequence:number}|null;goalId:string;goal:string;pack:unknown;active:boolean;ready:boolean;busy:boolean;pin:{id:string;sequence:number}|null;persona:Persona;goalContext:unknown;marketReference:unknown;hasPlanningWork:boolean;onResume:()=>void;onDiscuss:(request:BundleDiscussion)=>void}){
+export function HomeSolutionBundles({openRequest,goalId,goal,pack,projectEvidence,active,ready,busy,pin,persona,goalContext,marketReference,hasPlanningWork,onResume,onDiscuss}:{projectEvidence?:(destination:PlanningDestination)=>unknown;openRequest?:{goalId:string;goal:string;sequence:number}|null;goalId:string;goal:string;pack:unknown;active:boolean;ready:boolean;busy:boolean;pin:{id:string;sequence:number}|null;persona:Persona;goalContext:unknown;marketReference:unknown;hasPlanningWork:boolean;onResume:()=>void;onDiscuss:(request:BundleDiscussion)=>void}){
  const storage=useDecisionStorage(),coordinator=useRef(createHomeBundlePreparation()),consumed=useRef(0),pinContext=useRef<{sequence:number;identity:string}|null>(null),heading=useRef<HTMLHeadingElement>(null);
  const openedRequest=useRef(0);
  useLayoutEffect(()=>{
@@ -20,31 +21,37 @@ export function HomeSolutionBundles({openRequest,goalId,goal,pack,active,ready,b
   if(active&&openRequest.goalId===goalId&&openRequest.goal===goal&&goals.activeId===goalId&&goals.goals.find(item=>item.id===goalId)?.statement===goal)revealJourneyTarget(heading.current);
  },[openRequest,active,goalId,goal]);
  const [bundleCache]=useState(()=>new Map<string,BundleSession>());
- const raw=storage.data.workspaces[goalId]?.fields[bundlePreparationField];
+ const fields=storage.data.workspaces[goalId]?.fields??{},raw=fields[bundlePreparationField];
  const plans=localInputs(goalId),planningKey=JSON.stringify(plans);
- const packet=normalizeHomePack(pack),identity=JSON.stringify([goalId,goal,packet,plans,persona,goalContext,marketReference,active,ready]);
- const live=useRef(identity);const [bound,setBound]=useState<{identity:string;binding:ActionBinding}|null>(null),[pending,setPending]=useState(false),[notice,setNotice]=useState('');
+ const linkState=()=>{const current=decisionStore.getSnapshot().data.workspaces[goalId]?.fields;return JSON.stringify([current?.development??null,current?.[linkedAttachmentField]??null]);},linkKey=linkState();
+ const project:ProjectPlanningBinding=destination=>actionBinding(goalId,goal,projectEvidence?projectEvidence(destination):pack,{plans:{capacity:destination.workforceSolution,retention:plans.retention},request:{persona,goalContext,marketReference}});
+ const packet=normalizeHomePack(pack),identity=JSON.stringify([goalId,goal,packet,plans,persona,goalContext,marketReference,active,ready,linkKey,raw&&typeof raw==='object'&&'preparedAt' in raw?raw.preparedAt:null]);
+ const live=useRef(identity);const [bound,setBound]=useState<{identity:string;binding:ActionBinding;sourceRejected:boolean}|null>(null),[pending,setPending]=useState(false),[notice,setNotice]=useState('');
  // Immediately invalidate on store transitions, including a goal switch away and back.
  useEffect(()=>{let prior=JSON.stringify([decisionStore.getSnapshot().data.goals,localInputs(goalId)]);return decisionStore.subscribe(()=>{const next=JSON.stringify([decisionStore.getSnapshot().data.goals,localInputs(goalId)]);if(next!==prior){prior=next;coordinator.current.invalidate();}})},[goalId]);
  useLayoutEffect(()=>{
   live.current=identity;const worker=coordinator.current;worker.invalidate();let cancelled=false;
   // eslint-disable-next-line react-hooks/set-state-in-effect -- New evidence invalidates an in-flight preparation and scope review.
   setPending(false);setNotice('');
-  if(goalId&&goal&&active&&ready)void actionBinding(goalId,goal,packet,{plans,request:{persona,goalContext,marketReference}}).then(binding=>{if(!cancelled)setBound({identity,binding})}).catch(()=>{if(!cancelled)setNotice('The current context is too large or unavailable. Your saved work is kept.');});
+  if(goalId&&goal&&active&&ready)void actionBinding(goalId,goal,packet,{plans,request:{persona,goalContext,marketReference}}).then(async physical=>{
+   const original=raw&&typeof raw==='object'&&'binding' in raw&&validActionBinding(raw.binding)?raw.binding:null;
+   const resolved=original&&projectEvidence?await resolveAttachedSourceBinding(original,physical,fields,project,raw&&typeof raw==='object'&&'preparedAt' in raw&&typeof raw.preparedAt==='string'?raw.preparedAt:undefined):null;
+   if(!cancelled)setBound({identity,binding:resolved??physical,sourceRejected:Boolean(original&&projectEvidence&&!resolved)});
+  }).catch(()=>{if(!cancelled)setNotice('The current context is too large or unavailable. Your saved work is kept.');});
   return()=>{cancelled=true;worker.invalidate();};
  // The serialized identity includes every input used above.
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[identity]);
- const binding=bound?.identity===identity?bound.binding:null,current=binding?readBundlePreparation(raw,binding,packet):null;
+ const binding=bound?.identity===identity?bound.binding:null,current=binding&&!bound?.sourceRejected?readBundlePreparation(raw,binding,packet):null;
  // Preserve a previous valid proposal for reference only; never treat its snapshot as current.
  const old=raw&&typeof raw==='object'&&'binding' in raw&&raw.binding&&typeof raw.binding==='object'&&'goalId' in raw.binding&&raw.binding.goalId===goalId?readBundlePreparation(raw,raw.binding as ActionBinding,packet):null;
  const draft=current??old,stale=!!draft&&!current;
  const retained=!draft?readBundleWorkspace(storage.data.workspaces[goalId]?.fields[bundleWorkspaceField],goalId):null;
- const currentCheck=(key:string)=>JSON.stringify(localInputs(goalId))===planningKey&&live.current===key&&active&&ready&&decisionStore.getSnapshot().saved&&decisionStore.getSnapshot().data.goals.activeId===goalId&&decisionStore.getSnapshot().data.goals.goals.find(item=>item.id===goalId)?.statement===goal;
+ const currentCheck=(key:string)=>JSON.stringify(localInputs(goalId))===planningKey&&linkState()===linkKey&&live.current===key&&active&&ready&&decisionStore.getSnapshot().saved&&decisionStore.getSnapshot().data.goals.activeId===goalId&&decisionStore.getSnapshot().data.goals.goals.find(item=>item.id===goalId)?.statement===goal;
  async function prepare(mode:'new-pin'|'explicit'){
   if(!binding||busy||!storage.saved||!currentCheck(identity))return;
   setPending(true);setNotice('');
-  const outcome=await coordinator.current.run({mode,binding,packet,stored:mode==='explicit'&&current?.proposal.bundles.length===0?undefined:raw,isCurrent:()=>currentCheck(identity),prepare:async signal=>{
+  const outcome=await coordinator.current.run({mode,binding,packet,stored:mode==='explicit'&&(current?.proposal.bundles.length===0||bound?.sourceRejected)?undefined:raw,isCurrent:()=>currentCheck(identity),prepare:async signal=>{
    const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},signal,body:JSON.stringify({page:'home',persona,message:HOME_BUNDLE_REQUEST,history:[],goalContext,marketReference,hasFocusedIssue:true,overviewBriefingContext:packet})});
    let reply;try{reply=await response.json()}catch{return {proposal:null,diagnostic:'client_response'}}
    if(!response.ok)return {proposal:null,diagnostic:reply?.diagnostic??'client_response'};return reply;
@@ -78,10 +85,10 @@ export function HomeSolutionBundles({openRequest,goalId,goal,pack,active,ready,b
    {retained.attachments.map(item=><p key={item.id}>{item.draft.bundle.name} · attached revision {item.draft.revision} · {retained.attachments.some(next=>next.supersedes===item.id)?'Previous attached version':'Attached snapshot'}. Snapshot cash: {item.result.cashTotal===null?'Unknown':`$${item.result.cashTotal.toLocaleString()} USD`}. Not a current calculation or operational approval.</p>)}
   </section>}
   {(!current||current.proposal.bundles.length===0)&&<button className={button} disabled={disabled} onClick={()=>void prepare('explicit')}>{!raw||current?.proposal.bundles.length===0?'Create Action Plan':'Prepare Action Plans'}</button>}
-  {draft&&<><p className="font-medium">Proposed Action Plans — review before acting</p><p className="text-xs">Components share one budget, staffing flow and dependency review. References do not establish causes or combined effectiveness. No operational actions are taken.</p>
-   <HomeBundlePlans key={JSON.stringify([actionBindingKey(draft.binding),draft.preparedAt])} proposal={draft.proposal} preparedAt={draft.preparedAt} binding={draft.binding} contextCurrent={!stale} disabled={disabled||stale} isCurrent={()=>!!current&&currentCheck(identity)} cache={bundleCache} onDiscuss={onDiscuss}/>
+  {draft&&<>
+   <HomeBundlePlans key={JSON.stringify([actionBindingKey(draft.binding),draft.preparedAt])} proposal={draft.proposal} preparedAt={draft.preparedAt} binding={draft.binding} contextCurrent={!stale} disabled={disabled||stale} isCurrent={()=>!!current&&currentCheck(identity)} cache={bundleCache} onDiscuss={onDiscuss} projectBinding={projectEvidence?project:undefined}/>
    <details><summary className="min-h-11 cursor-pointer py-2">Preparation details</summary>{draft.proposal.question&&<p>{draft.proposal.question}</p>}{draft.proposal.unavailableReason&&<p>{draft.proposal.unavailableReason}</p>}<p>One preparation response. Input tokens: {draft.usage.inputTokens??'Unavailable'}. Output tokens: {draft.usage.outputTokens??'Unavailable'}. Latency: {draft.usage.latencyMs===null?'Unavailable':`${draft.usage.latencyMs} ms`}. Reopening, editing and calculating do not call the model.</p></details>
   </>}
-  {hasPlanningWork&&<details><summary className="min-h-11 cursor-pointer py-2">Existing workforce planning work</summary><p>Existing plans and calculated option pins remain separate and unchanged.</p><button className={button} disabled={busy||pending} onClick={onResume}>Review existing numbers</button></details>}
+  {hasPlanningWork&&<details><summary className="min-h-11 cursor-pointer py-2">Existing workforce planning work</summary><p>Review saved workforce inputs and calculated options. Changed inputs require an explicit new calculation.</p><button className={button} disabled={busy||pending} onClick={onResume}>Review existing numbers</button></details>}
  </section>;
 }
