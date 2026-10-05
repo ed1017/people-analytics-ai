@@ -39,3 +39,16 @@ export function homePlanningNoteParts(statement:string):string[]{
  }
  if(remaining)parts.push(remaining);return parts;
 }
+
+/** Discovery may have no investigation candidate. Only a declarative user outcome can stand alone.
+ * Never accepts assistant prose, a model problem, a question, or a choice between outcome goals.
+ */
+export function homeUserGoalForPin(statements:string[]):string|null{
+ const declarative=(text:string)=>{
+  const opening=text.trim().replace(/^(?:synthetic planning test|(?:my |our )?goal|outcome):\s*/i,'').split(/\.\s|[\n\r]/)[0];
+  return !opening.includes('?')&&!/^(?:i|we)\s+(?:need|want)\s+(?:help|advice|ideas|something|a plan|an action plan)(?:[.!]|$)/i.test(opening)&&!/\bor\s+(?:reduce|increase|improve|build|develop|add|hire|retain|replace|strengthen|expand|create)\b/i.test(opening)&&
+   /^(?:reduce|increase|improve|build|develop|add|hire|retain|replace|strengthen|expand|create|(?:i|we)\s+(?:need|want))\b/i.test(opening);
+ };
+ if(!statements.some(declarative))return null;
+ const goal=homeGoalForPin(statements.map(text=>text.trim().replace(/^(?:synthetic planning test|(?:my |our )?goal|outcome):\s*/i,'')));return goal&&declarative(goal)?goal:null;
+}
