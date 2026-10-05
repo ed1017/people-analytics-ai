@@ -20,7 +20,6 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
 } from "react";
-import { SiteFooter } from "@/components/site-footer";
 import { employeeListeningEvidence, exitSurveyEvidence } from "@/lib/employee-listening";
 import { FocusedIssue } from "@/components/focused-issue";
 import { buildHomePack } from "@/lib/home-pack.mjs";
@@ -2068,7 +2067,6 @@ export default function Home() {
             onRefreshEvidenceHandoff={refreshPlanningEvidence}
           />
         )}
-          <SiteFooter planning={planningWorkspaceActive || activePage === "finance"} />
         </div>
 
         {activePage !== "home" && activePage!=="decision-brief" && activePage!=="assess-evaluate" && <AiPanel
