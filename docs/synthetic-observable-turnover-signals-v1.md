@@ -47,15 +47,36 @@ The low-signal stratum also exposes a tradeoff: signal MAE is 31.33 versus recen
 
 No-signal comparisons split exactly 50 wins and 50 losses versus intercept, with no ties. In the reversed scenario, both groups lose on 75 histories and win on 25 versus intercept. Informative, no-signal and reversed assignments contain 49, 51 and 52 shock histories respectively; assignments were not balanced or rerolled. Test signal prevalence is 45 zeros and 55 ones.
 
-Groups C and D remain unavailable on all 100 histories in each scenario. All four method predictions and their scored actual totals remain null. Their error metrics are null, with explicit zero scored denominators; they are not counted as successes. No prediction intervals, metric confidence intervals, significance claims, rates, individual scores or causal effects are produced. October–December workforce outcomes are never generated or scored.
+Groups C and D remain unavailable on all 100 histories in each scenario. All four method predictions and their scored actual totals remain null. Their error metrics are null, with explicit zero scored denominators; they are not counted as successes. No prediction intervals, metric confidence intervals, significance claims, rates, individual scores or causal effects are produced. The reserved October–December 2026 workforce outcomes are never generated or scored; historical fourth-quarter months remain part of the earlier observed histories.
 
 ## What this supports and what comes next
 
-We can demonstrate a reproducible aggregate forecasting pipeline that uses a genuinely pre-origin constructed variable, learns a small fixed relationship from earlier training labels, beats simple baselines under the declared stable association, and visibly fails when that association disappears or reverses. The earlier adaptation and paired-prefix failures remain intact: adding an observable signal under a new stated premise does not invalidate their no-signal evidence.
+We can demonstrate a reproducible aggregate forecasting pipeline that uses a pre-origin constructed variable, learns a small fixed relationship from earlier training labels, beats simple baselines under the declared stable association, and visibly fails when that association disappears or reverses. The earlier adaptation and paired-prefix failures remain intact: adding an observable signal under a new stated premise does not invalidate their no-signal evidence.
 
 For Wednesday, describe this as an offline synthetic research result: “A constructed leading indicator improves average count error when its assumed relationship holds; the same model fails when that relationship reverses.” It does not justify promoting uncertainty, changing the product's operational gates, or promising real retention benefits. The app and existing consumer outputs are unchanged.
 
 The next meaningful evidence would be authorized aggregate observations with actual pre-forecast availability and revision histories, consistently defined voluntary exits, complete-month and cohort coverage, and enough independent periods or organizations to test signal stability. A proposed real leading variable would need a defensible measurement process and evidence that it is known before exits, rather than a downstream proxy or backfilled label. Exposure denominators are additionally required before interpreting rates. A separately frozen future evaluation should compare any proposed signal with the same simple and intercept-only baselines, retain no-signal and temporal leakage controls, and show performance during relationship changes. No new access or experiment is performed here, and this result alone does not justify extra model complexity.
+
+## Next evidence qualification checklist
+
+No real signal is qualified by this experiment. Its availability clocks are simulated and `sourceObservedAt` is null. The following are candidate aggregate measurements to inventory only within existing authorization; their existence, historical availability and predictive value are not established here.
+
+Existing [count qualification](aggregate-exit-forecast.md) and [readiness documentation](predictive-readiness-proposal.md) report synthetic monthly exit counts and aggregate survey contracts, but leave historical availability, completion or metric-definition gaps unresolved. This is a read of prior repository evidence, not a fresh source-system audit. Those documented fields provide an inventory starting point, not qualified real training data.
+
+| Candidate measurement | Required pre-forecast evidence |
+| --- | --- |
+| Planned workload or staffing demand by existing group | A dated approved plan version published before the origin, its measurement period and units, and the staffing capacity known then. Later actual workload cannot replace the earlier plan. |
+| Prior completed-period overtime or workload hours | Period closure, first report availability, revision history, covered population and observed hours or FTE denominator. Reports finalized after the origin must be excluded from that origin. |
+| Existing aggregate vacancies or requisition age | Archived as-of open counts and age bands, creation/closure definitions and publication timestamps. Future fills, final time-to-fill and later status backfills cannot enter earlier features. |
+| Existing approved aggregate satisfaction results | Instrument/version, fieldwork dates, release timestamp, respondent and eligible counts, cohort coverage and response rate. Do not substitute exit-survey answers or activate the held exit-eNPS feature. |
+
+- **Target and cohort:** Verify recorded monthly voluntary exits, definition/version, complete-month status, source provenance, group membership rules and coverage. Headcount snapshots or stock differences alone do not establish voluntary exit counts. Retain missing and suppressed months explicitly.
+- **Availability and revisions:** For every target and candidate, retain the observation period, real source recording time, first availability to the forecasting process, extraction time, revision ID and replacement time. Observation dates alone are insufficient. Replay only versions demonstrably available at each forecast origin; exclude unreconstructable backfills.
+- **Denominators and privacy:** Reconcile hires, exits, transfers and group changes where relevant. Validate historical person-time or mean headcount before rates; future exposure would need a separately stated assumption or model. Keep approved aggregation and suppression rules; no person-level features or scores.
+- **Evaluation support:** Inventory usable complete periods, temporal gaps, independent cohorts and relationship changes before choosing a split. Freeze labels' maturation cutoff, earlier training windows, later untouched test windows, baseline comparisons, common scoring support and failure criteria. Do not treat repeated months or overlapping groups as independent companies.
+- **Boundary and decision:** Keep any new real-data adapter separate from this synthetic-only contract. Qualification does not itself authorize expanded access, production input changes, consumer promotion or calibrated intervals. If timing or coverage evidence is absent, report that specific gap rather than infer it from current totals.
+
+A feasible independent next step is a read-only qualification inventory of already authorized aggregate exports or documented contracts: map the fields above, record source-backed availability evidence and missingness, and identify whether even one candidate supports a valid historical replay. This can precede any new fit or product change. No additional synthetic experiment is needed to perform that inventory.
 
 ## Reproduction
 
