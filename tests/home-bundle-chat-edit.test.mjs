@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {previewBundleChatEdit,acceptBundleChatEdit} from '../lib/home-bundle-chat-edit.ts';
+import {previewBundleChatEdit,acceptBundleChatEdit,bundleChatEditExamples} from '../lib/home-bundle-chat-edit.ts';
 import {prepareIllustrativePilot} from '../lib/home-action-plan-pilot.ts';
 import {createBundleDraft,reviseBundleDraft,reconcileBundle,bundleInputKey} from '../lib/home-bundle-reconciliation.ts';
 import {actionBinding} from '../lib/home-action-drafts.ts';
@@ -83,4 +83,21 @@ test('everyday edits preserve illustrative and unknown provenance and reject sta
  const inputs=structuredClone(draft.inputs);inputs.scope.population={value:'Other population',kind:'user-entered',basis:'Explicit new scope'};const changed=reviseBundleDraft(draft,inputs);
  assert.throws(()=>acceptBundleChatEdit(changed,preview),/changed/);const other=prepareIllustrativePilot(createBundleDraft(bundleProposalFixture(binding.goal).bundles[1],binding),'2026-10-05T00:00:00Z');assert.throws(()=>acceptBundleChatEdit(other,preview),/changed/);
  assert.equal(acceptBundleChatEdit(draft,preview).revision,draft.revision+1);
+});
+
+test('selected-plan examples roundtrip through the parser without mutating known or unknown drafts',()=>{
+ for(const draft of [base(),createBundleDraft(bundleProposalFixture(binding.goal).bundles[0],binding)]){
+  const before=structuredClone(draft),examples=bundleChatEditExamples(draft);
+  assert.ok(examples.length>0);assert.ok(examples.length<=4);
+  for(const example of examples){const preview=previewBundleChatEdit(draft,example.command);assert.equal(preview.changes.length,1);assert.deepEqual(preview.changes[0].before,example.current);assert.equal(preview.changes[0].field,example.field);}
+  assert.deepEqual(draft,before);
+ }
+ assert.ok(bundleChatEditExamples(base()).some(example=>example.unit==='USD per occurrence'));
+});
+test('multiple groups use exact names, ambiguous labels are omitted, and no-group plans invent none',()=>{
+ const draft=base();draft.inputs.groups[0].label='Engineers';draft.inputs.groups.push({...structuredClone(draft.inputs.groups[0]),id:'another',label:'Designers'});
+ const examples=bundleChatEditExamples(draft),group=examples.find(item=>item.unit==='participants');assert.match(group.command,/Engineers participants/);
+ const next=acceptBundleChatEdit(draft,previewBundleChatEdit(draft,group.command));assert.equal(next.inputs.groups[1].count.value,draft.inputs.groups[1].count.value);
+ draft.inputs.groups[1].label='Engineers';assert.equal(bundleChatEditExamples(draft).filter(item=>item.unit==='participants').length,0);
+ draft.inputs.groups=[];assert.equal(bundleChatEditExamples(draft).filter(item=>item.unit==='participants').length,0);
 });

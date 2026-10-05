@@ -93,3 +93,23 @@ export function acceptBundleChatEdit(draft:BundleDraft,preview:BundleEditPreview
  if(JSON.stringify(checked)!==JSON.stringify(preview))fail('The edit proposal changed. Review it again before accepting.');
  return reviseBundleDraft(draft,checked.inputs);
 }
+
+export type BundleEditExample={field:string;current:Assumption<string|number>;command:string;unit:string};
+/** Display-only syntax examples, validated by the same parser as Send. Never adopted automatically. */
+export function bundleChatEditExamples(draft:BundleDraft):BundleEditExample[]{
+ const available=targets(structuredClone(draft.inputs),draft),examples:BundleEditExample[]=[],used=new Set<string>();
+ for(const matches of available.values())for(const target of matches){
+  if(used.has(target.key))continue;used.add(target.key);
+  if(!target.key.startsWith('group.')&&!target.key.endsWith('.amount')&&!target.key.startsWith('timing.')&&target.key!=='scope.months')continue;
+  const category=target.key.split('.')[0];
+  if(examples.some(item=>item.unit.startsWith(category==='group'?'participants':category==='expense'?'USD':category==='timing'?'date':'months')))continue;
+  const current=target.read();let value:string,unit:string;
+  if(target.type==='count'){value='Illustrative '+(current.value===20?21:20);unit='participants';}
+  else if(target.type==='money'){value='Illustrative $'+(current.value===1500?1600:1500);unit='USD per occurrence';}
+  else if(target.type==='months'){value='Illustrative '+(current.value===3?4:3);unit='months';}
+  else {if(!current.value)continue;value=(current.kind==='illustrative'?'':'Illustrative ')+String(current.value);unit='date · YYYY-MM-DD';}
+  const command=`Set ${target.label} to ${value}`;
+  try{const preview=previewBundleChatEdit(draft,command);if(preview.changes.length===1)examples.push({field:target.label,current:structuredClone(current),command,unit});}catch{/* Ambiguous names or invalid clauses must never appear as usable examples. */}
+ }
+ return examples;
+}
