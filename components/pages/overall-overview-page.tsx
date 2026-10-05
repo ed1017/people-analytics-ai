@@ -21,7 +21,7 @@ import {HomeBundleChatReview} from '@/components/home-bundle-chat-review';
 import {HomeActionOptions} from '@/components/home-action-options';
 import {homeCandidateVerification} from '@/lib/home-candidate-verification';
 import {HomeCandidateOptions} from '@/components/home-candidate-options';
-import {inspectHomeCandidateProposal,readHomePreparationDiagnostic,type HomePreparationDiagnostic,readHomeCandidateRecord,candidateSourceKey,candidateSelectionGoal,type HomeCandidateProposal} from '@/lib/home-candidate-options';
+import {readHomeClarification,inspectHomeCandidateProposal,readHomePreparationDiagnostic,type HomePreparationDiagnostic,readHomeCandidateRecord,candidateSourceKey,candidateSelectionGoal,type HomeCandidateProposal} from '@/lib/home-candidate-options';
 import {readWorkforceSolution,currentSolutionVersion,solutionResultIsCurrent} from '@/lib/workforce-solution';
 import {readSavedWorkforceReview} from '@/lib/workforce-solution-review';
 import { GoalConversationMessages, ConversationMessages } from "@/components/goal-conversation-messages";
@@ -48,7 +48,7 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
   const serverDiagnostic=readHomePreparationDiagnostic(data.candidateDiagnostic);
   const useServer=!data.candidateProposal&&serverDiagnostic&&serverDiagnostic.reason!=='ready';
   const diagnostic=useServer?serverDiagnostic:data.candidateProposal?inspected.diagnostic:{reason:'diagnostic_unavailable' as const,field:'none' as const,optionCount:0,missingFieldCount:0};
-  return { findingFollowups:readHomeFindingFollowups(data.findingFollowups,data.answer,sources), answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal, diagnostic, diagnosticStage:useServer?'server' as const:'client' as const };
+  return { clarification:readHomeClarification(data.clarification??proposal?.question), findingFollowups:readHomeFindingFollowups(data.findingFollowups,data.answer,sources), answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal, diagnostic, diagnosticStage:useServer?'server' as const:'client' as const };
 }
 
 const noActionSubscription=()=>()=>{};
@@ -91,10 +91,11 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const [planEdit,setPlanEdit]=useState<BundleDiscussion|null>(null),[editPreview,setEditPreview]=useState<BundleEditPreview|null>(null),[editNotice,setEditNotice]=useState('');
   const editReview=useRef<HTMLDivElement>(null);
   const sources = pack.sources;
-  const [candidate,setCandidate]=useState<{proposal:HomeCandidateProposal;selectionGoal:string;sourceKey:string;context:string;epoch:number;originGoalId:string;rationale:ChatMessage;userGoal:string|null}|null>(null);
+  const [candidate,setCandidate]=useState<{proposal:HomeCandidateProposal;selectionGoal:string;sourceKey:string;context:string;epoch:number;originGoalId:string;rationale:ChatMessage;userGoal:string|null;userStatements:string[]}|null>(null);
   const [candidateNotice,setCandidateNotice]=useState('');
   const [actionPin,setActionPin]=useState<{id:string;sequence:number}|null>(null);
   const [planOpen,setPlanOpen]=useState<{goalId:string;goal:string;sequence:number}|null>(null);
+  const [clarification,setClarification]=useState<{context:string;question:string;statements:string[]}|null>(null);
   const [preparationUnavailable,setPreparationUnavailable]=useState<{context:string;diagnostic:HomePreparationDiagnostic;stage:'server'|'client'}|null>(null);
   const storedCandidate=storage.data.workspaces[conversation.activeGoalId]?.fields.homeCandidateOptions;
   const selectionGoal=candidateSelectionGoal(storedCandidate)??conversation.focusedIssue;
@@ -184,7 +185,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   }, [contextKey]);
   // eslint-disable-next-line react-hooks/set-state-in-effect -- Cancel the queued user action on explicit page exit; preserve its draft.
   useLayoutEffect(()=>{liveActive.current=active;if(!active){liveFindingTurn.current=null;queuedSuggestion.current=null;setSuggestionPending(false);sending.current=null;cancelPending.current();}return()=>{liveActive.current=false;queuedSuggestion.current=null;}},[active]);
-  useEffect(()=>{const identity=()=>{const goals=decisionStore.getSnapshot().data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement])};let prior=identity();return decisionStore.subscribe(()=>{const next=identity();if(next!==prior){prior=next;promptEpoch.current++;liveFindingTurn.current=null;setCandidate(null);setPreparationUnavailable(null);queuedSuggestion.current=null;setSuggestionPending(false);}})},[]);
+  useEffect(()=>{const identity=()=>{const goals=decisionStore.getSnapshot().data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement])};let prior=identity();return decisionStore.subscribe(()=>{const next=identity();if(next!==prior){prior=next;promptEpoch.current++;liveFindingTurn.current=null;setCandidate(null);setClarification(null);setPreparationUnavailable(null);queuedSuggestion.current=null;setSuggestionPending(false);}})},[]);
   const planRequest = questionUnanswered ? null : buildHomeActionPlanRequest(conversation.focusedIssue ? {key:contextKey,firstQuestion:conversation.focusedIssue,latestQuestion:journey?.latestQuestion ?? conversation.focusedIssue} : journey, contextKey);
 
   function focusQuestion() {
@@ -225,6 +226,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     }
     setScopeChoice(null);setLocalAction(null);
     liveFindingTurn.current=null;setFindingTurn(null);
+    const clarificationStatements=clarification?.context===contextKey?clarification.statements:[];
     const sendTicket=Symbol();sending.current=sendTicket;const candidateEpoch=promptEpoch.current;setCandidate(null);setCandidateNotice('');setPreparationUnavailable(null);
     const request = conversation.beginRequest();
     const key = contextKey;
@@ -241,21 +243,23 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       const answer = reply.answer;
       const assistantMessage:ChatMessage={role:"assistant",content:answer};
       if(actionPlan)planRationale.current.set(assistantMessage,conversation.activeGoalId);
-      if(reply.proposal){
-        const captured={proposal:reply.proposal,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack),context:key,epoch:candidateEpoch,originGoalId:conversation.activeGoalId,rationale:assistantMessage,userGoal:conversation.focusedIssue?null:explicitHomeGoal(message)};
+      const userStatements=[...clarificationStatements,message].slice(-6);
+      setClarification(reply.clarification?{context:key,question:reply.clarification,statements:userStatements}:null);
+      if(reply.proposal&&!reply.clarification){
+        const captured={proposal:reply.proposal,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack),context:key,epoch:candidateEpoch,originGoalId:conversation.activeGoalId,rationale:assistantMessage,userGoal:conversation.focusedIssue?null:explicitHomeGoal(message)??explicitHomeGoal(clarificationStatements[0]??''),userStatements};
         if(conversation.activeGoalId)decisionStore.setField(conversation.activeGoalId,'homeCandidateOptions',{version:2,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:captured.sourceKey,proposal:reply.proposal});
         else setCandidate(captured);
       }
-      setPreparationUnavailable(reply.proposal||responseIntent==='explanation'?null:{context:key,diagnostic:reply.diagnostic,stage:reply.diagnosticStage});
+      setPreparationUnavailable(reply.proposal||reply.clarification||responseIntent==='explanation'?null:{context:key,diagnostic:reply.diagnostic,stage:reply.diagnosticStage});
       if(preserveDraft&&!reply.proposal&&responseIntent!=='explanation')setCandidateNotice("No new candidate options could be verified from this reply. Your existing work and drafts are kept.");
       conversation.setHomeGoalChoiceKey(reply.chooseGoal && !conversation.focusedIssue ? key : null);
       const capturedFinding:FindingTurn={message:assistantMessage,findings:reply.findingFollowups,context:key,epoch:candidateEpoch,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack)};
       liveFindingTurn.current=capturedFinding;setFindingTurn(capturedFinding);
       setMessages(current => [...current, assistantMessage]);
-      modelHistoryRef.current = completeScopedChatTurn(key, history, message, answer);
+      modelHistoryRef.current = completeScopedChatTurn(key, history, message, reply.clarification?answer+'\n\n'+reply.clarification:answer);
       if (!actionPlan) { conversation.rememberQuestion(key, message); setQuestionUnanswered(false); }
       window.requestAnimationFrame(() => { if(reply.proposal&&conversation.focusedIssue){const heading=conversationViewport.current?.querySelector<HTMLElement>('[aria-label="Investigation options for your goal"] h2');heading?.focus({preventScroll:true});heading?.scrollIntoView({block:'start'});return;} const viewport=conversationViewport.current,answers=viewport?.querySelectorAll<HTMLElement>('[data-chat-role="assistant"]'),answer=answers?.[answers.length-1]; if(viewport&&answer)viewport.scrollTop+=answer.getBoundingClientRect().top-viewport.getBoundingClientRect().top; });
-      return Boolean(reply.proposal);
+      return Boolean(reply.proposal&&!reply.clarification);
     } catch (error) { if (!request.current() || currentEvidenceKey.current !== key || candidateEpoch!==promptEpoch.current) return; setChatError(error instanceof Error ? error.message : "Answer unavailable. Please try again."); if (!actionPlan&&!preserveDraft) setInput(current=>current.trim()?current:message); }
     finally { if(sending.current===sendTicket)sending.current=null; if (request.current() && currentEvidenceKey.current === key) setChatLoading(false); }
   }
@@ -299,6 +303,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     if(!candidate||candidate.epoch!==promptEpoch.current||!candidateCurrent||chatLoading||!active||!conversation.saved||decisionStore.getSnapshot().data.goals.activeId!==candidate.originGoalId)return;
     try{
       const id=conversation.confirmWorkforceGoal(problem);
+      for(const statement of candidate.userStatements)conversation.recordGoalStatement(statement,'home',workforceScope);
       if(!decisionStore.getSnapshot().saved)throw Error('Goal remains unsaved in this tab. Resolve browser storage before continuing.');
       if(problem===candidate.proposal.problem)decisionStore.setField(id,'homeCandidateOptions',{version:2,goalId:id,goal:problem,selectionGoal:candidate.selectionGoal,sourceKey:candidate.sourceKey,proposal:candidate.proposal});
       planRationale.current.set(candidate.rationale,id);
@@ -394,6 +399,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       {chatError && <p role="alert" className="text-destructive">{chatError}</p>}
     </section>}
 
+    {clarification?.context===contextKey&&<section aria-label="Clarify your goal" className="space-y-2 rounded border border-primary/40 p-3 text-sm"><p className="font-semibold">{clarification.question}</p><p>Reply in the chat below. Your original goal and constraints are kept; nothing is pinned or calculated.</p><button type="button" className="min-h-11 rounded border px-3 py-2 focus-visible:ring-2 focus-visible:ring-ring" onClick={focusQuestion}>Answer in chat</button></section>}
     {preparationUnavailable?.context===contextKey&&<section role="status" aria-label="Problem and options not prepared" className="space-y-1 rounded border p-3 text-sm"><p className="font-semibold">Problem and options not prepared</p><p>This answer has no validated problem and options to pin. Your work and drafts are kept; nothing was pinned or calculated. No retry runs automatically.</p><details><summary className="cursor-pointer py-1">Preparation details</summary><p>Stage: {preparationUnavailable.stage}. Reason: {preparationUnavailable.diagnostic.reason}. Field: {preparationUnavailable.diagnostic.field}. Candidate count (4 means 4 or more): {preparationUnavailable.diagnostic.optionCount}. Missing fields: {preparationUnavailable.diagnostic.missingFieldCount}.</p></details></section>}
     {candidateNotice&&<p role="status">{candidateNotice}</p>}
     </div>
