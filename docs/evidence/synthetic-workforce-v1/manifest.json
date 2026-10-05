@@ -1,0 +1,3172 @@
+{
+  "schemaVersion": 1,
+  "kind": "synthetic-workforce-run-manifest",
+  "generatorVersion": "synthetic-workforce-generator-v1",
+  "protocolVersion": "synthetic-workforce-protocol-v1",
+  "protocolFrozenCommit": "527e09be222eb9a4d8acc5cb8d5b430ab97adc56",
+  "baseCommit": "f35f628a2ed41f0233b20531ee963c663ecd587f",
+  "generatedAt": "2026-10-05T00:00:00.000Z",
+  "timestampBasis": "fixed-reproducibility-label-not-observation-or-real-execution-time",
+  "runtime": {
+    "node": "24.19.0",
+    "timezone": "UTC",
+    "compression": "gzip-level-9-zero-mtime"
+  },
+  "dataClass": "constructed-synthetic",
+  "observationBasis": "simulated",
+  "sourceObservedAt": null,
+  "config": {
+    "schemaVersion": 1,
+    "version": "synthetic-workforce-protocol-v1",
+    "generatorVersion": "synthetic-workforce-generator-v1",
+    "dataClass": "constructed-synthetic",
+    "observationBasis": "simulated",
+    "startMonth": "2021-01",
+    "months": 72,
+    "initialHeadcount": 8400,
+    "seeds": [
+      17,
+      29,
+      43
+    ],
+    "families": [
+      "stationary",
+      "gradual-improvement",
+      "regime-reversal",
+      "reporting-stress",
+      "survey-break"
+    ],
+    "regimeChangeMonth": "2026-07",
+    "finalScoringCutoff": "2027-07-01T00:00:00.000Z",
+    "fixedRunTimestamp": "2026-10-05T00:00:00.000Z",
+    "windows": {
+      "developmentOrigins": [
+        "2024-12-31T23:59:59.999Z",
+        "2025-03-31T23:59:59.999Z",
+        "2025-06-30T23:59:59.999Z"
+      ],
+      "assessmentOrigin": "2026-06-30T23:59:59.999Z",
+      "assessmentMonths": [
+        "2026-07",
+        "2026-08",
+        "2026-09"
+      ],
+      "reservedMonths": [
+        "2026-10",
+        "2026-11",
+        "2026-12"
+      ],
+      "hiringHorizonDays": 90
+    },
+    "custody": "Protocol committed before dataset generation or model evaluation; constructed holdouts are not independently blinded real-world validation.",
+    "evaluation": "This checkpoint generates, reconciles and replays aggregates only. No predictive performance, causal effect or calibrated interval is claimed.",
+    "operationallyQualified": false
+  },
+  "configSha256": "23ad9a03f3cce56dad21701af0af7327bc2ef8de29ce0bd00de90ddacd1f70df",
+  "provenance": {
+    "schemaVersion": 1,
+    "experiment": "New synthetic aggregate experiment; not reconstruction or replacement of existing workforce data",
+    "recoveredEvidence": {
+      "commit": "c9ace41df024c4fb186e32ebf4da05b88597a799",
+      "path": "docs/evidence/recovered-construction-constraints.json",
+      "sha256": "33dddfd7d66cb4836d5e51ab0aa21c54e2b5f44eaf2d99806bc6c00eef499bd9",
+      "basis": "Previously preserved attributed construction evidence. No new source or database query in this workstream.",
+      "reusedConventions": [
+        "Initial workforce anchor 8400",
+        "Hires on snapshot date included; departures on snapshot date excluded",
+        "Engagement 1–5 answer scale and favorable values 4/5",
+        "Mean respondent favorable-answer shares rather than pooled-item satisfaction"
+      ],
+      "notRecovered": [
+        "Complete executable original generator",
+        "Original seed and sequence allocation",
+        "Former employee entry rules",
+        "Actual historical availability and revision logs",
+        "Complete original hiring stage and survey instrument semantics"
+      ]
+    },
+    "newAssumptions": [
+      "72 new months and quarterly waves, company-wide aggregate population",
+      "Seeded independent domain random streams and five frozen scenario families",
+      "Monthly all-external opening cohorts, competing hiring outcomes and reporting-delay bounds",
+      "Generated actual external starts within the 72-month workforce window feed daily stock; later starts remain hiring follow-up, with explicit boundary reconciliation",
+      "Explicit five-item scoring, missing/invalid answers and independent within-wave nonresponse",
+      "Simulated availability, classifications and eligibility corrections, missing and suppressed releases",
+      "Forced early true-zero mechanics cases do not describe observed source patterns"
+    ],
+    "sourceObservedAt": null,
+    "sourceTruthVerified": false,
+    "operationallyQualified": false,
+    "causalEffect": null,
+    "calibratedInterval": null
+  },
+  "implementationFiles": {
+    "lib/ml/synthetic-workforce/common.mjs": "60c9349a01e839e1a6fb6f6c67eb46a64f7ed6f5744e9a7757c9c4642783fc03",
+    "lib/ml/synthetic-workforce/turnover.mjs": "77a8784aef330e1a023c451cf65e25e01d8bd659351d1e6c1f580118ebaef1fe",
+    "lib/ml/synthetic-workforce/hiring.mjs": "df97ca224fb3cca017b37973367f197242bf9b526575bd5e4fc7de7344cb4865",
+    "lib/ml/synthetic-workforce/satisfaction.mjs": "1c605ff2badeb4c0c084d1284ec462fc50826bf2518106acc12a5a7f63c7b33e",
+    "lib/ml/synthetic-workforce/pipeline.mjs": "a80c5618beeb9ca54f69ab7c5bdb8e7a0fecc0ac075db59d23b881437b2532ff",
+    "lib/ml/synthetic-workforce/protocol.json": "8cd79a0fc146557b16a7c62b5c2d130e1c4c0d1064f565b574dfe1dfd726fc1c",
+    "lib/ml/synthetic-workforce/provenance.json": "0b2c024003715585b53eb69419aa481653371165c4d166b87b18bc3001fad51d",
+    "tests/manual/generate-synthetic-workforce.mjs": "523fc54cfe26904af63b9b87ca372047307c15d0b952d065b48265497b88d42c"
+  },
+  "implementationSha256": "be64aa9d2a4ff0471d33390bbaac25469c6d9814ca9d0830e055d99fb47df37b",
+  "cases": [
+    {
+      "id": "stationary-17",
+      "family": "stationary",
+      "seed": 17,
+      "artifacts": {
+        "releases": {
+          "path": "releases/stationary-17.json.gz",
+          "sha256": "487218463388e30315c4e99c65822385ead5ba89164b9f41a96b2abcde1af8d3",
+          "jsonSha256": "f7d8c794c46d5e4c89a5598ef9be9eed4cc59c59fddfffbaf1f427bf1eb80fae",
+          "bytes": 38112
+        },
+        "truth": {
+          "path": "truth/stationary-17.json.gz",
+          "sha256": "c4be23dc6765791757457bd4038ca716da8bd98fcec65778dfca956940569fcd",
+          "jsonSha256": "db0cd79d8040fcd0d3b974d0065787004148746608a9a53e7cb8534996265b14",
+          "bytes": 32543
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8085,
+        "workforceWindowStarts": 7971,
+        "postWindowStarts": 114,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "32e57b3ec93b9aaaa45cd02d37679dfda86f9ee135473612e363d3f8a87e8783",
+              "records": 47,
+              "complete": 47,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-11-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "da1302b1a3c6fe85b9f324ef6c2791b2970c7c9a50d53137d0aafd07037f1b12",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 45,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "60c73b488617d5858dac441aedaa250e64ff0b3d339d2046e9d1af087073098a",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "096ece61fe830ef0e10094847559e644214382d42b28856d974149b3e82a7215",
+              "records": 50,
+              "complete": 50,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-02-28T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "c2466a29936bb5a7de80b941f12d1f466483bb0d72c2da10684a24180e135d95",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 48,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "1d0f3e1dc4a0e3229683917c84c80ef7387f9f065865df697d8583836d24e9ab",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "c4798243f6e7cfb76ff481e1d093ddf5c7539725d2f1abb59c1fcecb8385e74e",
+              "records": 53,
+              "complete": 53,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "ce15e8003f5c107dbb97b570458a461a2e6130e7e7ca0f715d841cdf0e255755",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 51,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "dedd02b7a0f5fa06e7de95189af10bf26ae1f06bbef323352e0b71a607a8f09c",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "bd5c0927388d6fc3e36547eebc481eb53f27bb77d0f5afb149f3e36f861e2968",
+              "records": 65,
+              "complete": 65,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "2ac6cb8013f3959bcb3659501051a60f7ab7ab58fc053c71c3e6e0f1e019d390",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 63,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "091c097c44004080850a001d03e9534a1f1f184d1831c2f630d6953523a8cb5a",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "cbdea586c6826898b0190d0a08349e6ab2087c109fd74e07de27457aaf1c7c95",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "ab02293b699ff5ccbd521ffd493e03e7def7fbbafd1eaba86b716d421754a82d",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "438faa6aa18998fb44167ce2b4dcf99e8526a6428fcceb74a2c9f7883477858d",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    },
+    {
+      "id": "stationary-29",
+      "family": "stationary",
+      "seed": 29,
+      "artifacts": {
+        "releases": {
+          "path": "releases/stationary-29.json.gz",
+          "sha256": "367a6cb7ea89ee4cbfb6c25100e338a082981812dd19f94c4b91198b4ef81c43",
+          "jsonSha256": "762ebb2e5901b6b541f48fb8e55e0698b4d157c37e912c3afd7bdb17ac4c59f2",
+          "bytes": 38102
+        },
+        "truth": {
+          "path": "truth/stationary-29.json.gz",
+          "sha256": "12a2e4519525188d79068752bc7347e3b33eade0f81038995a47b73a79c72ff7",
+          "jsonSha256": "32496572c5c8cd11a56c6c6f8dd68ccd621995f7b02626d54c5b387a6867217e",
+          "bytes": 32567
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8368,
+        "workforceWindowStarts": 8260,
+        "postWindowStarts": 108,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "fc788acea9ceab03d446678701b0eac8d7e618eb92b95f4474f143e47ecafacc",
+              "records": 47,
+              "complete": 47,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-11-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "6696c806fd515282ec2da899ba22b7b75f69e283882da1bcbe327d9931788db2",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 45,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "2636a96fc0269afd60f2721bdeff2622c12fe85518d3851e2cff7ec1c9738dc6",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "ce8de828aa4c54c0993bb82c50efcb3d56e7cfe4169382c6efac577d81b0008c",
+              "records": 50,
+              "complete": 50,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-02-28T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "aa7c81e0a7fefaa0e001e7d242dea7e95f2a6b0d42c7d6a9cca0b0d03dee87de",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 48,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "c4639211de8649291de2e21d7c03259d40696cb803576d651047631e8212c7be",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "1b3117780f196be658357f223a6887aeb8e7dae0fb4289e2dec63f17383cd222",
+              "records": 53,
+              "complete": 53,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "545c2482a61d990c8bc154f97dca27fe050d2a18e0330b6305137f86b90f0b2d",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 51,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "e2f9629dd19d9a83092b4e22091af6c50b7e57ef9c52a3d76f8b7d382bbec0c6",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "b4a065b6d20c022246b89946799aeda7a8a3a516da98a74a0eec6f9c0caf33f0",
+              "records": 65,
+              "complete": 65,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "e5ced39b05ac4a3a27f3fe886d9c3057eaa4c04e71ad05376638697e2d887f0b",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 63,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "d8969ccd7d1e7c44cd09c00b89c20d8d1deba9bd227d95062d7fb0136be15398",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "c5747db16a742eae820d0e68c25748efb9ea061b7ab57c5f2d9ce1a56d97d0b4",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "cef86e3b4e7c49bf43284401c48a8d28ba8e9a966d05aa66fe2665d9d27162f9",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "4efb0ee3d2dc0b43b3ccd7e59ecb9dc5b407c9c1b0fe97a1bcc86bbf21e2a217",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    },
+    {
+      "id": "stationary-43",
+      "family": "stationary",
+      "seed": 43,
+      "artifacts": {
+        "releases": {
+          "path": "releases/stationary-43.json.gz",
+          "sha256": "3e420289eb8e4335356f70df3567d28581348e73aec21f3ef807639c6e26285f",
+          "jsonSha256": "6f7f20a3a3ba252d97a03742babac13dc836e993ea292165a65a22c2107dfc06",
+          "bytes": 38034
+        },
+        "truth": {
+          "path": "truth/stationary-43.json.gz",
+          "sha256": "71691f57e7cfd3a9c4aa81b0a15a5994afa85a6a348b81e1aa310541d53750da",
+          "jsonSha256": "b6478e4b4b1e060543fb996f1d46868597d32ff7a5657d0f8936b536a84fc7a0",
+          "bytes": 32388
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8141,
+        "workforceWindowStarts": 8016,
+        "postWindowStarts": 125,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "8c1442175e44e4a311acf8c5e3e28d4334af1901e7dd47cec53aedd1af873480",
+              "records": 47,
+              "complete": 47,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-11-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "d6e54b52511ef64c13c57f8a54473dcd9267df4887b60238fbe85062c91cccaa",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 45,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "924f6e6a798db00d32b5744c9809e0bf98da983fd68e85ccb2cde731cbc4c4bc",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "9d83572987e156640e4334939d6a2a87d622e32a16bcdb99e360377fc85bf197",
+              "records": 50,
+              "complete": 50,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-02-28T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "390e28a031c14bf30f95c86426bea5e4a1791e3b08759c3ef6d3472163d15db5",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 48,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "6f6a6d9a3239ec363c869fca4bf418195a8aa503bc74c7fb169330b475f2111d",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "f59991568b550d32cead8f89f58a9b6cc1343e957dec9ff17395c3e7b74e12b7",
+              "records": 53,
+              "complete": 53,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "14c4469e3d1a7ba6fd26f5961bee7849c2bb47bb879b91f485f3065bc4cad10d",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 51,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "91bb8e1e0f8021767ed21f4516a7551e66e133126a09f026dacca9e2417b0546",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "687bf787d59ce47daa6397e828e559731788659bbc2943da79ab3bba142912c7",
+              "records": 65,
+              "complete": 65,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "42cdbf397a4afa640603601013970bce2e6154a077086dd71e1f7b4d2f2db724",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 63,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "027f20295892a0e26fae36e797317e149a32b95a6d8d038e9d004ea3616f3de5",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "28b9e628e94e26d747cc7e9ade0927621bc3a38aac5f677eee921452a322a1ee",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "6d4b9f72e50d2e71b9f0a14d1894d0c9a6f7ad963a0a2c2ccb5a09d6b8c92b21",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "9f54738d22df775075fcc56e437bda0cba90144b057f6b910824283f6670f65d",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    },
+    {
+      "id": "gradual-improvement-17",
+      "family": "gradual-improvement",
+      "seed": 17,
+      "artifacts": {
+        "releases": {
+          "path": "releases/gradual-improvement-17.json.gz",
+          "sha256": "58377a3e33319133270a7eb9caf22dcac29f73b07ad0487e113212fad5dde1eb",
+          "jsonSha256": "0bfdd7d5e36eba932f4822d342da9e79a6916fa23b324f984ecb84142f960f87",
+          "bytes": 38262
+        },
+        "truth": {
+          "path": "truth/gradual-improvement-17.json.gz",
+          "sha256": "8cbb7ee47aeff596f7f9847e57a7820c0b4df8de4f166c847fee7f02d56c4dd1",
+          "jsonSha256": "873fc2f7981099a0908c0dab3a2c7037d4065459be0978e7dfdcac3b71036a24",
+          "bytes": 32707
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8077,
+        "workforceWindowStarts": 7948,
+        "postWindowStarts": 129,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "04783a68f614e9b5f508daf5e4f6a4a388023338065d461b57ca610f5e5cbbe9",
+              "records": 47,
+              "complete": 47,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-11-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "28cc135027ae286c08df123ef181fd4c77808d3dabb909aeb855ac6a36b4d231",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 45,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "e063be8393529d403bce6af9d817c3962080745207a60b4395080c51e42f6393",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "ad1e297f6173e6dd2e0a66386f39dfbfb0699aedc32a674b46a770ce8bf0698d",
+              "records": 50,
+              "complete": 50,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-02-28T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "9ecefaf1d7724b6839f925385c4b0e2831217aad684f5068c4291cd233bd766f",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 48,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "31e8f9e9c48253d41921b596bf1705b7df04b77f4323f0f931f523a1214230d2",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "38fc490a19ae049b96f428ed4cd74e0d2ee6320ed12ebb38cc74d86bd31b4019",
+              "records": 53,
+              "complete": 53,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "e48e286220b5d6f72bb82eeda54ce4e310f7ea62be214b81510caf87bb61c1f1",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 51,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "1f33bc763b25af3da414b6ce45adc79ddb3ec2207bda8b6ed3f5ba4b4e4b5ee3",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "9c54d1a86c3fcf3239bfb061c3c084d0a4c31ab2c3c0a59c1cd50f5e69047f18",
+              "records": 65,
+              "complete": 65,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "426402b5f64befd69b71620316b4791ce23b93078222c0427cd75361e7f9e870",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 63,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "b55c0c1949714f51175d0141d80c25cb930637d9c4a29ac8442c3a73970c4a33",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "09f485ffbb8f92f656c9b22790af5c4eb2e1ec475bbeb9fa98e29f066e990acf",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "cd574bbd9be90d57212e543ae83829b58d8b7e67b000b66d0637961e0859a58a",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "12c181c6834dc0a7f4d4db6a27594c1ae41564cd59254c647ab9b1c2a19fa2d2",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    },
+    {
+      "id": "gradual-improvement-29",
+      "family": "gradual-improvement",
+      "seed": 29,
+      "artifacts": {
+        "releases": {
+          "path": "releases/gradual-improvement-29.json.gz",
+          "sha256": "ca187df50681ea9f31884707ba8ceaf01cadeb5de9bac25bdbd081950fa9bbad",
+          "jsonSha256": "6bbdb4e0db5fcd527b6a6cc500b8349ff45c866e6b983aec268d15873b314fda",
+          "bytes": 38229
+        },
+        "truth": {
+          "path": "truth/gradual-improvement-29.json.gz",
+          "sha256": "4c0d9456a0e278eb85177691f939c347798c931cb8632244670ee4949e48ca43",
+          "jsonSha256": "39b07004af77cb12d5a8c7ffe2d2d4aa76205fc2943937935d6c6faa97022450",
+          "bytes": 32684
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8154,
+        "workforceWindowStarts": 8034,
+        "postWindowStarts": 120,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "008a92daa58ace01b3d77240f80af6b760ba0f3b029dcdb382ccc0c03caeb4dd",
+              "records": 47,
+              "complete": 47,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-11-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "2ff734f9b9e3019f4a5f2ce49363212078b0cf6559582438026b04d349ce6552",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 45,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "9c13e05ad87080edf9f62962e8ae10d942dcda46224d30871811151099890020",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "6d62a47cadf990f3fb57461d1a9abc5c6bf6c392f4b15d061f00ab9870a9ec03",
+              "records": 50,
+              "complete": 50,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-02-28T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "6cc402a8388f6e05a09a175fb2df82c36a04df9fdfca0c40c2a0f65580a0580b",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 48,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "9dc71a47747707fce05c9d7a05df4f85e55cb002a06ef728d8310c581e71cf0a",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "71f216cd52909e3e387c70de0def702dada53e815d3d68f1c223bf59446313b4",
+              "records": 53,
+              "complete": 53,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "28a8b9a2424c9a4cd48a34283e8648c42049b0cd383e664658f6162e5d06c168",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 51,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "4e7c52429908bdc9648c54a1915c5b0a8f001263c14fe4c6026518b7218243e7",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "ed2e8ca0617aab0dcff3ff0c027517c83d04907897acc7fc7edfd5465bf50f53",
+              "records": 65,
+              "complete": 65,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "d87134810e74849e0aa24fd430c4fac78171aab2a2fc24e633cc4a38c38ca006",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 63,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "da6d24b18ea7d5e7955f01588d891036c0be6db5e6d5702be5230fffa4e85d0e",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "86d47c094e2b493e7d4489351d6ee2c5461bf42a6cd7a223b325db13df8d7919",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "28fb265153bc2264dd5090a04ab272732d132a47a6ded4ef6485cb34ab7480a5",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "af940ec493b183319646ceb381a385324fbce553edb8c18784f5de77328be1f3",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    },
+    {
+      "id": "gradual-improvement-43",
+      "family": "gradual-improvement",
+      "seed": 43,
+      "artifacts": {
+        "releases": {
+          "path": "releases/gradual-improvement-43.json.gz",
+          "sha256": "553b5f7e35b9723ad9c05154af87f41df8181ab09720d1b0b53e54b3b3631440",
+          "jsonSha256": "c4ea8196598fdbf2bda9600f4afef3df84458f3d24b607db121da9d5feaf35ff",
+          "bytes": 38159
+        },
+        "truth": {
+          "path": "truth/gradual-improvement-43.json.gz",
+          "sha256": "afd5b0150d93dc114528381ffe1b43671885d5e5a77502d6f41b519a656f2db8",
+          "jsonSha256": "c140206eb397a5f5b8ec0d8ff12ecf7679987f5026b5dd907d0262bbaf4e4309",
+          "bytes": 32710
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8209,
+        "workforceWindowStarts": 8068,
+        "postWindowStarts": 141,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "002f7f146b4db09aef0c37793e76b618769a56aa0eb282981947d6f983dc5584",
+              "records": 47,
+              "complete": 47,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-11-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "1deba3cdd516f77064b3bd58173494348f1f0c752886a05db30bf16521d1f826",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 45,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "b0af912647c7610e1b74c8c11d35fc0e407a082b29f1e3bc98cdd13b280d1806",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "beb4ddbe216e5b749c13f7c373151f0c58f75cbb4ec8b75ddb9a9957d23e026a",
+              "records": 50,
+              "complete": 50,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-02-28T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "4851c3380c172a185106deb6203070133f9fc3cb489d0cc8895edbf5997bd8ec",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 48,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "f8d8bd86294ebcf2b311a09d1631a0ba553e59b7084138a995fa7bc1bee57682",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "f0a35cfbee5c20fef066ba73019b42a4b258d0434bf99541482c06ffb357d98e",
+              "records": 53,
+              "complete": 53,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "bc0b489533c7ab375ac3f87481f03c9341cd44696e49ee0a75f26df9b2f35a66",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 51,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "f814240d9f07bdebcc49631d5e1bcbc00d948a6b78edeba3e5a819aea4d0a4c1",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "577c5ffab40da461218ef81fd6f44b5242eeddb0338eb8f6e144383f92e88746",
+              "records": 65,
+              "complete": 65,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "60845cc483061b6a419da14021efc310e3255acca12ecb711569af8719bf83a2",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 63,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "f866f0a17f506440cf2c36c4f759bc01733b7eec6a02b9ff28383d1277d5cdce",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "346048d33706b5cfd4f8d9e373cc5b350f463484ff04dd9b02a60dcafd00e90a",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "e08215c3402057a1fce662c87136a20d9536700bbb5665ffa5666770e49516c7",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "c72d3a75b452b74292c32ff6faf87827174ad7b2f5dc05cc42cba97f01f0aa4a",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    },
+    {
+      "id": "regime-reversal-17",
+      "family": "regime-reversal",
+      "seed": 17,
+      "artifacts": {
+        "releases": {
+          "path": "releases/regime-reversal-17.json.gz",
+          "sha256": "52221711b44d97cdf082dc87f96e866aa3230a0b418a5aa92b84da25050a4ebd",
+          "jsonSha256": "7337e84c8d3e6497267958d46a327b0f302e2e3845e0a50c5125e74be56293b7",
+          "bytes": 38275
+        },
+        "truth": {
+          "path": "truth/regime-reversal-17.json.gz",
+          "sha256": "e6a10fa0d16d7971de80ff0bb93ee93c635fc4445558612c03d39bb82a105389",
+          "jsonSha256": "cd5992b8076452da8b6af68664ff02264e1c3af612d5e0afc305144805be7868",
+          "bytes": 32912
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8041,
+        "workforceWindowStarts": 7762,
+        "postWindowStarts": 279,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "0d813904d9714d7e975a0b2d619d70dfd5763a97cdc6918ce38709db7193ce1b",
+              "records": 47,
+              "complete": 47,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-11-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "113997ef4df989305c18950658f66bfaa9804ea261e72cf6e60c7d428d363510",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 45,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "b8b074ef3a87c6cff1d1fbde5363e72dd4e86875bb5430bfca6742185c8552fc",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "429f93ee810c6726d090b2e5143adabd5ea24c24e17a3cf24379908f81e604dc",
+              "records": 50,
+              "complete": 50,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-02-28T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "1e81a2e6d055a96f30e96435f517912a03276767fcca7b24f53d7f95ae449a27",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 48,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "f9ff3651d8b4478a27e03e5cd8197e46b6d9d650214acdc266c492af2a770596",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "12c651b72713fef935dad84e63509e805c862e098cdc02f06c7f8227321d2fdc",
+              "records": 53,
+              "complete": 53,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "7da6305d051e630e4547521c593334850632bd8db5c1525c17d68147695f18a8",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 51,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "e99db0128f8ec9ad20d75851e89ebce0dc533263e7e56713d0f9e59593e3a996",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "1d6e569c52b5b40606394964027e4341526f46c3e05fb5a993a59ceb6e192c2c",
+              "records": 65,
+              "complete": 65,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "435a62ac4c297bb3b2d0c0bf065072607a796dd84ae39b74a3ad73db11456e17",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 63,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "f4ab6b2f110ed3d16d2b145fd0da64e510ef8250bb6050fec38fb54000de46a9",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "1a79b8d413f2440c6877a3928837d745a7370d6723d2d94fa5fe9d0ac2f81467",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "8c5180d0071b755e5a79ba25d05c0c83270f0a0d5b8fb2d277464d9305bd9dd9",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "dbbe9b085a730f806b5b2a1dcf60b3ddece1b8270f3be4fdbed26a236f7a5d26",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    },
+    {
+      "id": "regime-reversal-29",
+      "family": "regime-reversal",
+      "seed": 29,
+      "artifacts": {
+        "releases": {
+          "path": "releases/regime-reversal-29.json.gz",
+          "sha256": "9cb08dcf24c5c2424ce070a4f964553e628099c795bb12651e4cbc49b43797dd",
+          "jsonSha256": "271f6b0bf0ef9f8e9ae1189f9239d081801ce7c6b60be013b339dd3e23d294bf",
+          "bytes": 38250
+        },
+        "truth": {
+          "path": "truth/regime-reversal-29.json.gz",
+          "sha256": "2eef623f00847737f87927316e28f1a382e7ee7ed7a2e89b17dcea01fbd05333",
+          "jsonSha256": "2f7792a766eb4f2da965993c94ac7482a72186a516253a2c60868793e9a17c0f",
+          "bytes": 32779
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8000,
+        "workforceWindowStarts": 7700,
+        "postWindowStarts": 300,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "8f042c78edfcccaa6dae4f50b3e2e1cfbc9b5955180d227ddb425e302f6c4fe3",
+              "records": 47,
+              "complete": 47,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-11-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "81da3e6dd05633aa2bbf93ecb83c842b16efae6585c84ef6a1cab77a8f099e66",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 45,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "da5a8e378a105ee2ec13efff44ff67629bb9df72b1a6ef5e34cf3e853518385a",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "5d5f3007cba051957aba91af275aa00d181dea913396a100228475daeb103da5",
+              "records": 50,
+              "complete": 50,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-02-28T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "e8c5156f43b6584b3adc84010dab2cb19d51c9028c0c09f1a4036a6a658609fa",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 48,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "db9786d67990481b5edf07b89f8a01cda9a9738348e01571a1b9b8cf63a02884",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "48a1ce9d2afbf95117e68b461114d88ce65e2e2fdd2c9a99c20f26d6ee56823c",
+              "records": 53,
+              "complete": 53,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "09b4d48974abd4bb8fce60aaefa4a02fcdb9aca8aae5742da4362fd6b3627a9d",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 51,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "54c80679b2a616ba13377ef52b90d58674b508959ce219b65a51d0ed1f12a609",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "24ee83577183b9519f3658609c43fdef150fb142c557f690cc2f2a9bd3ce985c",
+              "records": 65,
+              "complete": 65,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "384382d7fea56669a162d358d725eefe52e0763c7edfe7455f5702fcb733d7e8",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 63,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "2d1da3d602aa762eba223bc9e9866e380de822c7de8a986b3bfe133502fa2d7c",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "c8deac0823df3ba196da287b756baba4e10e237c64c9efed0f961457d9fc0d1f",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "db3a9e7607b9e16e2726192957d05edc74f041d711b2d3744d03416355c395ed",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "3068bd9fed5e01582a03d4dfa72c7836ff5743d9060161c8616f5d0bbf784e99",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    },
+    {
+      "id": "regime-reversal-43",
+      "family": "regime-reversal",
+      "seed": 43,
+      "artifacts": {
+        "releases": {
+          "path": "releases/regime-reversal-43.json.gz",
+          "sha256": "e07cc2a63f768c6d28aa50170c6c2325fd05f686a585f1740034166d532c04cf",
+          "jsonSha256": "1878ab231924936fd8cc7eff83fba855ca0762a9844635de9a25188a4c7ada3b",
+          "bytes": 38122
+        },
+        "truth": {
+          "path": "truth/regime-reversal-43.json.gz",
+          "sha256": "21fe21e1b920c9b0ab58e64191008b76fdfc305ee7b3462c9aae3e65ae734129",
+          "jsonSha256": "b05643d4c8d8e44fe006d8277573b8c2e23061c366f12df1576f2c1c9ce06ccd",
+          "bytes": 32788
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8131,
+        "workforceWindowStarts": 7803,
+        "postWindowStarts": 328,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "e75478e254295cc896a2c0178653f4541298054c7a739d3e4eabb60d02c5f831",
+              "records": 47,
+              "complete": 47,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-11-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "cd7bbd0a7c98684fcd76e7a38e904340cf32de37d8abc4e136ac784ae0403707",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 45,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "15e1035eddf14513b7759dad13956e5379daf3709ad77c9423e54de8a0a3042b",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "1df5d35a5991e4c3fbb67b405f9e8c3a452e4ea9729eaeee57cf06c6e0b12e4a",
+              "records": 50,
+              "complete": 50,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-02-28T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "cb9c559ba3b9303585f98e6bbca2fec8239cd533bef09641c122e70202e77d6a",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 48,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "7e5d784c6133a895bbd50ae2c2dad56130ce897830a746d6061a91fb9cb2fad3",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "ef6f924e1f513f2053ff0caf94e00626602ea62a4b12a90890660e99faa2538f",
+              "records": 53,
+              "complete": 53,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "95e037136e1e15e1e57ee280086f74252de033d19a99d5e5ac54ee5ece5be0ba",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 51,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "eabf5ebbbeae7bab68fab7bafcc58efc4293527c8383451009741620c2363431",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "11c6b2f4dc002aa2672e8cb3f7eef03388eaeab1d567e4b7ec98c0487ca5aa67",
+              "records": 65,
+              "complete": 65,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "f396b8ec98e16565b035a30cdd1110bd05cc05abf471a669fa56969e53079ccb",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 63,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "41a2a25af56ed2fa1d83d57beff5700d3593ad37d36f6f1677bb97488aa4bd44",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "f0ee6698eaabb4f683818e17de7f4a824d672c35304c5eb9e6ab05768375dd33",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "aaecf01d84878c025b728baa1be45cfd60b5d0cd95208abd8eb388c10cc51de5",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "5f1c16bd7290d45823b554185e1952f312857bf543d2e9a301c17dd2f2730b17",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    },
+    {
+      "id": "reporting-stress-17",
+      "family": "reporting-stress",
+      "seed": 17,
+      "artifacts": {
+        "releases": {
+          "path": "releases/reporting-stress-17.json.gz",
+          "sha256": "c0cf49c90d3d544f028fc481102c023a5d8ea54f9741c56693b460e60e327051",
+          "jsonSha256": "642d7371a8d97b2b96ac76f56cfe5ec1d1796bd3d346f07f42aac8803e5f3ba3",
+          "bytes": 40887
+        },
+        "truth": {
+          "path": "truth/reporting-stress-17.json.gz",
+          "sha256": "858c1c08610dd610fa500b98cb8cb77e559f834c692fd9ceb3ef99c289cc6867",
+          "jsonSha256": "e6ff6a846fc3e8f50f5a519769038661224683ae8642540df5f525f296900b75",
+          "bytes": 32403
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8219,
+        "workforceWindowStarts": 8087,
+        "postWindowStarts": 132,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "367c8c19e53375e0c6313859e8886f31f8dc34dea80294210b75a459eacf06af",
+              "records": 46,
+              "complete": 46,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-10-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "904dc788fb67bf980e8d7c367ca367587dd4dd817bb4eff5c5ef19bf9d8baa9f",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 44,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "dab79f236b3f1b7eab7197b54caa4df3a3749a5a8dd7b2bbf0fcc1dc8759f692",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "ff0f3a251881ee4e66f3e643f1f32dfdfa501fb323e56ca647dcddf068c45f36",
+              "records": 49,
+              "complete": 48,
+              "withheld": 1,
+              "latestEffectiveAt": "2025-01-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "1910b0b0b6f9682b453c737bba5837999d13a9a9f11717f680239107dbe36593",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 47,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "e125602de69ca03629559fa7a8633aaf6ca0cf26b710b1401828f9e462538dd0",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "d5cce3644d8878cb10ba084f2923b2bcbbd680d16361b6ccfeff739405b14d6f",
+              "records": 52,
+              "complete": 52,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-04-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "3a2662584737d93912a767d99bb8faf0512b76448ea5d8c000c1cc5b26c60490",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 50,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "ba3d38ca4e063b14fb1f522c62c4b1966612217f312a236f75f9af80566d8ccf",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "b503b80366cca08bea8872213aec853661ecdea75b041dd19d2c646e4aac8a51",
+              "records": 64,
+              "complete": 64,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-04-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "7c7f0a75156f85a68e04a372131afb6ad163f3e3a5e4cf42eea272a821d946ab",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 62,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "e205e9300d7cdb82c9adb525fe041f1cb341e0cca99d1cc9db5ce6775f79f753",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "c18dd47e93e9ccbc49623a7584b9766b17be86a21de2fd12186fd68cecf5950b",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "7cc36ce230f64e2d7084a545700990d1c365cea8b5c325f8c12a97a72879c12e",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "d7fd2fa4825f5482f2083488169b030568cc7ab56cfa310416999d166977fdcf",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    },
+    {
+      "id": "reporting-stress-29",
+      "family": "reporting-stress",
+      "seed": 29,
+      "artifacts": {
+        "releases": {
+          "path": "releases/reporting-stress-29.json.gz",
+          "sha256": "7e5736dc008c16d5ffac35cc20cba6d4fe9c3d01dc1d6aace5756c51270ed5a6",
+          "jsonSha256": "ff208d9c5dea8fa2af08864121e90ce469a172e792920c68720feaab8fd670d1",
+          "bytes": 40928
+        },
+        "truth": {
+          "path": "truth/reporting-stress-29.json.gz",
+          "sha256": "bd9de1369dcd6d0879e52df4f12e46b766fbdb43947d1dbaca07257188460a64",
+          "jsonSha256": "211475a2f465acf3507ed2ae657067730386a634c5527be1ffb3bccd1f9d6e3a",
+          "bytes": 32639
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8116,
+        "workforceWindowStarts": 8022,
+        "postWindowStarts": 94,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "7ba308ff2e204204a6b3d19dd688b24c5a6cc05799cac8cd4761efabfb9c7321",
+              "records": 46,
+              "complete": 46,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-10-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "bf3b0b09d3c5e0bd09e3aba79763d691c4f4895d80c8ec0f37c00650e3c454ee",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 44,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "0fa85fa64de23479f456770441ebf1359e99e0dd9939fc5f2d23032f9f6976a8",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "ee50023f557d559fc23dc19fb8214ad55d098b874c4bd62cc242e7e7ce31addb",
+              "records": 49,
+              "complete": 48,
+              "withheld": 1,
+              "latestEffectiveAt": "2025-01-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "1e2d8a0e35cd5e4af8e8336c1eeab14f44e74f8611acb88e0679b289f586b518",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 47,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "facefc605066620afbac576cc89b7007d83b00d948b3ba497e14ee091448d26f",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "671e79974fa5ae605b937083c977b510717bc64095ba15d98bed1e1ec355e2eb",
+              "records": 52,
+              "complete": 52,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-04-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "c7525fe920ab559a9223d58722ec84c9e6f48c244e46f0f50ce73f2d3e822c99",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 50,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "0417cb9004833d74369a7017923e5ecc6b47ff51d2b947dd5baeb5d29a07c102",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "fb862f8fc84ebfeb6d1d739444b2bd2e13d703c5bd017c288c81a5b2f559f058",
+              "records": 64,
+              "complete": 64,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-04-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "7ad72396a675b56acf23a7d82e6dd44e55b3521b647b72ee13e43c5decfbcb69",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 62,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "8830e4f3c4b2e8640de8f7482e3e32419efd24a71f85f1ece3b80c86f4768fd1",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "615f1d13c9035249990be47111198d793ab52f3b0ea52d263885517a7ec9d8e8",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "3be46f59920fd1594f69733e0ce1fd612ae3b12bc5ba43cd0b40c16c42805c27",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "89853a2832d9b935f936f952c1f2919ce57f4c09e393c6597bcf4dc2c73f3c73",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    },
+    {
+      "id": "reporting-stress-43",
+      "family": "reporting-stress",
+      "seed": 43,
+      "artifacts": {
+        "releases": {
+          "path": "releases/reporting-stress-43.json.gz",
+          "sha256": "82d52346adec1db4dc1dbfdf53ddb7c940833e1a6056de5d4121ac8dd731678d",
+          "jsonSha256": "20b2a749ce6a3549fcee9967559b875d0bb9fafd0a8048474c658b0993fed4af",
+          "bytes": 40839
+        },
+        "truth": {
+          "path": "truth/reporting-stress-43.json.gz",
+          "sha256": "2162c666f556b1048fe77bc2f1da8fc76f7fdefe1be82e57d2b76b180b66be9b",
+          "jsonSha256": "5827bfc02ed390bce73ac009473bb4d888cbf20ef6bd5477d4be6d0a7df0e550",
+          "bytes": 32508
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8300,
+        "workforceWindowStarts": 8165,
+        "postWindowStarts": 135,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "ad553f38b2f529f396d62ab1a25720dd40ef7c7e8fa718cd0822739975a353f1",
+              "records": 46,
+              "complete": 46,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-10-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "3fcb0217cd910254c709237baa617a7e89c4c1a18d2f5c5fc673a2429696d59a",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 44,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "43563a083be18c2837693a297d7e86ab6b90c200e8074548725c521f447d2d84",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "63584bc7e876c7dec580bf80277842e44b625dcfa41fa6007dea0420f93cef29",
+              "records": 49,
+              "complete": 48,
+              "withheld": 1,
+              "latestEffectiveAt": "2025-01-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "37bfbf78947e2d02159cd2a2979ff5ee82bc6c4fab9cdff38f4c4d963569f6b7",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 47,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "4cd46ec54667747c7596deaa69b00040d27f0f452cc504805b6073b88953d3f9",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "f31ce38891e3287f6f3063cdc95c08dc910c9ae755ad451fb0863a4a295f3c14",
+              "records": 52,
+              "complete": 52,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-04-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "66d09e44abba62ee838a954d59b920ef5e40e73e247e7faa0c5a5cbe890de2a2",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 50,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "78bda6d0527c3562fe7bdabcb4bad09ff054d98ee7e9c2d9e1ae1cc747434a4a",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "10d3ac175da43d50b81c5596716ae4e16b8e67002e1ebf9794e31472d53bcc4b",
+              "records": 64,
+              "complete": 64,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-04-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "a475ee66ca7aea3dec6ad7b36eb712414236300f11c5279670f69e32d33fec46",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 62,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "a41de39043b49db2c9c69075913a96eb11191ad546111f4fafecc186066cce71",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "4ed756cb7365c7db34547312d507e6c0e3a96def67f573e2c0b69d4bf8d52436",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "d5437b456cf03c03aa56106abf7a1f67d9ff230d559183df4a4c607a943f02a1",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "585b9131e4c07ac4a6104c650c7ef9427fcb5abfc1733b0ef960ef4a6b493107",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    },
+    {
+      "id": "survey-break-17",
+      "family": "survey-break",
+      "seed": 17,
+      "artifacts": {
+        "releases": {
+          "path": "releases/survey-break-17.json.gz",
+          "sha256": "7a74b5fcf4d78e741114ece894ee26efb42a27515d1b45bd3fed8f4220949db5",
+          "jsonSha256": "580d135afce21039ca0ea4d33a16fa08cf291c0298026589d48439cc114cef39",
+          "bytes": 38051
+        },
+        "truth": {
+          "path": "truth/survey-break-17.json.gz",
+          "sha256": "0da7d8d26a7be08adaaf65bf64844860ff6960b6045a2923980fe8270ea586ca",
+          "jsonSha256": "096f3093fe724a2f830ee186dfbc3762707ae085193820ec610dcc6f6309285e",
+          "bytes": 32553
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8322,
+        "workforceWindowStarts": 8184,
+        "postWindowStarts": 138,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "4331ad7a78481258d3f630a694b1953c3abac29b6703fdbfe0ea379823ff9dcd",
+              "records": 47,
+              "complete": 47,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-11-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "89fe112e0fd5a34cc463fcd1b6de83f5063b1aa11710e2a083abc06f9b34b7ea",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 45,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "2d5abc547b52fa009f750678ac8c93d464a8f651524b11320c5c71d0dd80f2cc",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "a9bddeac950210664f250e623d50fdb0a950d18f90cddba7f2a36e12e6dbd601",
+              "records": 50,
+              "complete": 50,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-02-28T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "6358e0b7cd8a18e78e1c88ca9d18c22930292c626ace829bf608e917bbd5e71e",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 48,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "563b2748ea7f48bfd1ae89a41012c96afb05a6d94fde0e29c659bc17cdd5a351",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "c97e4773417e7a098f0a5061f1462be317a36ca54b6047728def9d8381d9b88a",
+              "records": 53,
+              "complete": 53,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "9bd5d1697f7711778676833631ad8b09b0017b08c7b581f590bcf466d1a8b18e",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 51,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "9d499addfcccec5faf8faccf068bccd39f7dc9baa23be5d572d0527cb538018b",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "80d5117b8298ccce08b4e595dfc20f161a328ac52c46b1b0e43ea6a0204e898f",
+              "records": 65,
+              "complete": 65,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "392f2c8fed99e316a4023fba9e428d4941862da0c70961c62f14f6d821606d2d",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 63,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "50dcd2dfb7eb65a84d8321728ac436f0bd3cf42781e5637133e5937f03974b34",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "4b6f572e7dd768256307265610a8354be8ed7add2980d2e82cb0f73c947e1131",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "72db655ccbf05abc7eda2776e3b1cbafa7b5551a1b4c214783add33192f91bce",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "0d4e32905e4b87e783c1c85aeba280b480c4fdfd4d2a1af97726f30974d862c9",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1",
+                "synthetic-quarterly-instrument-v2"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    },
+    {
+      "id": "survey-break-29",
+      "family": "survey-break",
+      "seed": 29,
+      "artifacts": {
+        "releases": {
+          "path": "releases/survey-break-29.json.gz",
+          "sha256": "cffe67aa2f71b057c3560a4164f88b87e32c8099321148378f5ec641e69e8cd7",
+          "jsonSha256": "0ab4c2cf9068814157b3dac47aedb4132ce630711e3b852e14d60e63956546be",
+          "bytes": 38035
+        },
+        "truth": {
+          "path": "truth/survey-break-29.json.gz",
+          "sha256": "677675010031e269a6ef4f2257f326eff7b09f7764933281a3ea70a7879b3a2b",
+          "jsonSha256": "048e0ea194c885ad873280de642cb68ee333973a47074baba61e42b3809692f5",
+          "bytes": 32463
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8178,
+        "workforceWindowStarts": 8076,
+        "postWindowStarts": 102,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "4d8100534a4be2a76ed6f7070daf3de0ddb6ebe9553dd05f91423aee44d8071a",
+              "records": 47,
+              "complete": 47,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-11-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "9326800c6e32a767d4c93477a48e90cc4d987688cf86815792745e4a38b76458",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 45,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "8247b804444d2b5f02e51356226d6f13324b71e672af3c8a3352f5bd01ebd4cb",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "b2ef668b84141d8a6e8f243faf77be7464b0b9b067ba0f1d882f60ddfc999f51",
+              "records": 50,
+              "complete": 50,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-02-28T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "ac25e1c56d737272807ae5e7ae0858754ea9ccc8ef601d770c1cedef1bab1e40",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 48,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "589d421da5e625619fa7695d4284c7da5d7eafb5c4c23c7e8a92d0a11c7efd6d",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "0c3d033a4f45216fb679b3ed6ac9cc0a4f8809fe9e5cd4b0d5675f5d494a0c63",
+              "records": 53,
+              "complete": 53,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "70aafd3d326a42544f67e7de2d2205b6cedcf3607719b60b802968ce43056714",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 51,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "f506c121442bc80014b828f3b6ed1afdb90fa47a39f204415a529f83215b8946",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "3ba11cfbf2659e79cc4d11562cdb96f675ed867d5e11344d1180f2244684222a",
+              "records": 65,
+              "complete": 65,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "c3fba0d064e6a05685614519e0984444045fcabeb057f9be44d2e5624c97fafb",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 63,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "c2812cb7babf2abe08530c497eeec2b1425bb32174e2e44ef70600227e74fd11",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "639a606d8b9914146fe383306a2c5467973c2480cd5d460f7f3f04c9524af911",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "f57771de7da7928c49c7e9b69d11890c4e8d7745bb36e6ba21b2b6c37939fe53",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "ebbf16d74e407bd928d31b6faed5a3c1b752daf0eda4afe216e499b7996af2e7",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1",
+                "synthetic-quarterly-instrument-v2"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    },
+    {
+      "id": "survey-break-43",
+      "family": "survey-break",
+      "seed": 43,
+      "artifacts": {
+        "releases": {
+          "path": "releases/survey-break-43.json.gz",
+          "sha256": "7fc99d4d0be1ebda1f76eaaff95d20417ac5e71ed6c0b36b9f24727cc09e4155",
+          "jsonSha256": "52f8bdd665a7d026bb97280a5835990db3bdbd465289b499816800cbd875700c",
+          "bytes": 38084
+        },
+        "truth": {
+          "path": "truth/survey-break-43.json.gz",
+          "sha256": "70cf3bfd940153c1343d6108f97cf22292a4640abab5c69fcfbc39fffedc6642",
+          "jsonSha256": "ef32b7c6297d93eb3d2d5c760124410f7bbbbe3ad10b67cc3cd6a971561b1175",
+          "bytes": 32533
+        }
+      },
+      "boundaryReconciliation": {
+        "allActualStarts": 8203,
+        "workforceWindowStarts": 8079,
+        "postWindowStarts": 124,
+        "beforeWindowStarts": 0,
+        "workforceWindowStart": "2021-01",
+        "workforceWindowEnd": "2026-12"
+      },
+      "turnoverMonths": 72,
+      "hiringCohorts": 72,
+      "satisfactionWaves": 24,
+      "replay": [
+        {
+          "cutoff": "2024-12-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "f498cc753f8a1970e9613d8f6db393ea97b0d1505e2efcdd9179bc4ef10fb8b8",
+              "records": 47,
+              "complete": 47,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-11-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "3beeeb35c1359fcd2abe86be99850607538908d185075f8c2799cec6ddc6d205",
+              "records": 48,
+              "complete": 48,
+              "withheld": 0,
+              "latestEffectiveAt": "2024-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 45,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "7eedee5c52f630b052f1b9f65a305b897172dac2385d9459bad2d0d8ee185b23",
+              "records": 15,
+              "complete": 13,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-09-30T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-03-31T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "cf8864dd4cdf0b0613ae3fa45f8c64928aa46c2442f40c831034995d14ba01e9",
+              "records": 50,
+              "complete": 50,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-02-28T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "89235c4fd3cf10564eab90ca6aed10d6710e47ab209d2c0cd959276ee571daf5",
+              "records": 51,
+              "complete": 51,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-03-01T00:00:00.000Z",
+              "completeHiringHorizons": 48,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "9b26f1ef1520ff1524278c7c718600d6ead41f8f0a289f4824234c72243310be",
+              "records": 16,
+              "complete": 14,
+              "withheld": 2,
+              "latestEffectiveAt": "2024-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2025-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "f7fe28f11940d36a095922ef6b9f2ec9bd23afb4094c95ea197b878b91a0e859",
+              "records": 53,
+              "complete": 53,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "1b5ac882daaf11103e967f866a154ce50534424b331589a103bc306e5053d817",
+              "records": 54,
+              "complete": 54,
+              "withheld": 0,
+              "latestEffectiveAt": "2025-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 51,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "7a8fe39b0157da1363aacbeb0d22a72334157334e27d3931916c31eee23e7c32",
+              "records": 17,
+              "complete": 15,
+              "withheld": 2,
+              "latestEffectiveAt": "2025-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2026-06-30T23:59:59.999Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "b17947f3228e89edbed2fea24c2d5ee083782adf7cc6002e809ae580f1b6471e",
+              "records": 65,
+              "complete": 65,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-05-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "725a6c7706e2eee0b771ead4a0039e99d82a4c3fdfa60adafa9d491c20d896df",
+              "records": 66,
+              "complete": 66,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-06-01T00:00:00.000Z",
+              "completeHiringHorizons": 63,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "93d2d29a51feac87bd4f94f3a25a0ff14fb148813360cf1dd3271777b434cfee",
+              "records": 21,
+              "complete": 19,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-03-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1"
+              ]
+            }
+          }
+        },
+        {
+          "cutoff": "2027-07-01T00:00:00.000Z",
+          "domains": {
+            "turnover": {
+              "snapshotSha256": "715498928d671781a0234f55e089247ff54783476ea40b3de57c5c18c82f524d",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": null
+            },
+            "hiring": {
+              "snapshotSha256": "c938d2f66f9661b4ed2b95cc145cc9318bbccea06485fd8e08ed9828e5e14a01",
+              "records": 72,
+              "complete": 72,
+              "withheld": 0,
+              "latestEffectiveAt": "2026-12-01T00:00:00.000Z",
+              "completeHiringHorizons": 72,
+              "instrumentVersions": null
+            },
+            "satisfaction": {
+              "snapshotSha256": "ced3af0d8a2695ca30bd1df8738550aaf233b5e2a2d0a0cdc8a656df855eee9a",
+              "records": 24,
+              "complete": 22,
+              "withheld": 2,
+              "latestEffectiveAt": "2026-12-31T23:59:59.999Z",
+              "completeHiringHorizons": null,
+              "instrumentVersions": [
+                "synthetic-quarterly-instrument-v1",
+                "synthetic-quarterly-instrument-v2"
+              ]
+            }
+          }
+        }
+      ],
+      "validation": "generated-universe-accounting-and-release-checks-pass"
+    }
+  ],
+  "modelEvaluation": {
+    "status": "not-run",
+    "metrics": null,
+    "holdoutCustody": "Protocol committed before dataset generation or model evaluation; constructed holdouts are not independently blinded real-world validation."
+  },
+  "operationallyQualified": false,
+  "causalEffect": null,
+  "calibratedInterval": null
+}
