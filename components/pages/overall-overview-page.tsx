@@ -357,18 +357,18 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
         <HomeGettingStarted busy={chatLoading} onNavigate={onNavigate} onStartDemo={onStartDemo} status={
         <div className="ml-auto flex items-center gap-3 text-xs">
           <span className="text-muted-foreground">In development</span>
-          <button type="button" popoverTarget="home-data-details" aria-label="Open data details" title="Data, scope and conversation history" className="flex min-h-11 items-center gap-1 rounded px-2 text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"><Info size={16}/><span>Data details</span></button>
+          <button type="button" popoverTarget="home-data-details" aria-label="Open data details" title="Data, scope and conversation history" className="flex min-h-11 items-center gap-1 rounded px-2 text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"><Info size={16}/><span>Data details</span>{!sourcesSettled&&<span role="status" aria-label="Evidence refresh status">Refreshing…</span>}</button>
 
         </div>
         }/>
       </header>
-      <section aria-label="Home evidence scope" className="space-y-1 text-xs text-muted-foreground">
-        <p><strong>Workforce snapshot [W1]:</strong> {sourcesSettled?workforceScope.replace(/^Selected workforce snapshot:\s*/, ''):'Refreshing scope; previous figures are not current.'} Only this source follows Country, Business Unit and Level.</p>
-        <p>Other company evidence remains company-wide or survey-specific. A goal names planning intent; it does not filter sources or set a what-if population. Department scope is unknown: Home has no Department filter or department-scoped evidence.</p>
-      </section>
       <div id="home-data-details" popover="auto" role="dialog" aria-label="Data details" className="fixed inset-0 m-auto max-h-[80dvh] w-[min(60rem,92vw)] overflow-y-auto rounded-xl border bg-background p-5 text-sm text-foreground shadow-xl">
         <button type="button" aria-label="Refresh overview evidence" disabled={loading||chatLoading} onClick={event=>{event.currentTarget.closest<HTMLElement>('[popover]')?.hidePopover();liveFindingTurn.current=null;loaded.current='';setRefresh(value=>value+1);}} className="mb-3 flex min-h-11 items-center gap-2 rounded border px-3 py-2 focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18}/>Refresh evidence</button>
         <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">Data details</h2><button type="button" popoverTarget="home-data-details" popoverTargetAction="hide" className="min-h-11 rounded border px-3 focus-visible:ring-2 focus-visible:ring-ring">Close data details</button></div>
+      <section aria-label="How filters affect evidence" className="mb-3 space-y-1 text-xs text-muted-foreground">
+        <p><strong>Workforce snapshot [W1]:</strong> {sourcesSettled?workforceScope.replace(/^Selected workforce snapshot:\s*/, ''):'Refreshing scope; previous figures are not current.'} Only this source follows Country, Business Unit and Level.</p>
+        <p>Other company evidence remains company-wide or survey-specific. A goal names planning intent; it does not filter sources or set a what-if population. Department scope is unknown: Home has no Department filter or department-scoped evidence.</p>
+      </section>
         <section aria-label="Conversation history" className="my-4"><h3 className="font-semibold">Conversation history</h3><p className="mt-1 text-xs text-muted-foreground">Reference only. Current findings use current evidence and saved goal context.</p>{messages.length?<ConversationMessages compactAssistant messages={messages} onNavigate={page=>{document.getElementById("home-data-details")?.hidePopover();onNavigate(page);}}/>:<p className="mt-2 text-sm">No conversation yet.</p>}</section>
       {Boolean(marketReference)&&<p className="mt-2 text-xs">An explicitly carried market reference [M1] is also available for this goal. Its selected geography and source period remain separate from workforce filters.</p>}
       <p role="status" className="text-xs text-muted-foreground" aria-label="Home evidence coverage">{pack.coverage.available} of {pack.coverage.total} source summaries available · detail rows are sampled. Open evidence sources for scope and unavailable data.</p>
