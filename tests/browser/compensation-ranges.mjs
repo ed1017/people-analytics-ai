@@ -16,6 +16,8 @@ const css=(await postcss([tailwind()]).process(await fs.readFile('app/globals.cs
 // Catalog fixtures exercise the real UI; these are not shipped demo employees.
 const catalog={jobs:releaseManifest.jobCodes.map(job=>({job_profile_code:job,job_profile_name:job})),levels:[{level_code:'L1',level_rank:1},{level_code:'L2',level_rank:2}],combinations:[{org_code:'BU1',job_profile_code:'AI-ARCH',level_code:'L1'}]};
 const releaseRows=releaseManifest.jobCodes.map(job=>({release_id:releaseManifest.releaseId,snapshot_date:releaseManifest.snapshotDate,job_profile_code:job,job_profile_name:job,status:['AI-ARCH','COMMS-GEN'].includes(job)?'withheld':'published',mean_compa_pct:['AI-ARCH','COMMS-GEN'].includes(job)?null:105,coverage:['AI-ARCH','COMMS-GEN'].includes(job)?'withheld':'partial',base_pay_provenance:releaseManifest.basePayProvenance,range_provenance:releaseManifest.rangeProvenance,range_policy_version:releaseManifest.rangePolicyVersion}));
+const plottedCases=releaseRows.filter(row=>row.status==='published').slice(0,4);
+for(const [index,value] of [70,100,139.2,250].entries())plottedCases[index].mean_compa_pct=value;
 const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH??'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
 let checks=0;
 const check=(condition)=>{assert.ok(condition);checks++;};
@@ -41,8 +43,18 @@ try {
     check(await panel.getByRole('combobox').count()===0);
     check(await page.getByText('Separate simulated workforce').count()===0);
     check(await panel.locator('svg circle').count()===0);
-    await panel.getByText('1 more level ranges',{exact:true}).first().click();
-    check(await panel.getByText(/L1 · \$/).first().isVisible());
+    const firstRow=panel.locator('tbody tr').first();
+    const disclosure=firstRow.getByText('1 more level ranges',{exact:true});
+    await disclosure.focus();await page.keyboard.press('Enter');
+    check(await firstRow.getByText('L2',{exact:true}).isVisible());
+    check(await firstRow.locator('dl').first().locator('dt').allTextContents().then(labels=>labels.join('/')==='Min/Mid/Max'));
+    check((await firstRow.locator('dd').allTextContents()).every(amount=>/^\$\d{1,3}(,\d{3})*$/.test(amount)));
+    check(await firstRow.locator('dd').first().evaluate(node=>parseFloat(getComputedStyle(node).fontSize)>=16));
+    check(await firstRow.locator('dt').first().evaluate(node=>parseFloat(getComputedStyle(node).fontSize)>=14));
+    if(width===390) {
+      check(await firstRow.evaluate(node=>getComputedStyle(node).display==='grid'));
+      check(await firstRow.locator('dd').evaluateAll(nodes=>nodes.every(node=>node.getBoundingClientRect().right<=innerWidth)));
+    }
     if(width===390)await page.getByRole('region',{name:'Shared workforce filters'}).getByText('Filters',{exact:true}).click();
     await page.getByLabel('Business Unit',{exact:true}).selectOption('BU1');
     check(await panel.locator('tbody tr').count()===1);
@@ -59,13 +71,28 @@ try {
     check(await page.getByText('PRIVATE').count()===0);
     failed=false;await panel.getByRole('button',{name:'Try again'}).click();await panel.getByRole('table').waitFor();
     check(await panel.locator('tbody tr').count()===50);
-    released=true;await mount();await panel.getByText('105.0%',{exact:true}).first().waitFor();
+    released=true;await mount();await panel.getByText('Current: 105.0%',{exact:true}).first().waitFor();
     check(await panel.locator('svg circle').count()===48);
     check(await panel.getByText('Partial USD inputs',{exact:true}).count()===48);
     check(await panel.getByText(/Exact counts are not published/).isVisible());
     check(await panel.getByText(/USD-pay subset only · Partial job coverage/).isVisible());
     for(const job of ['AI-ARCH','COMMS-GEN'])check(await panel.getByRole('row').filter({has:page.getByText(job,{exact:true})}).locator('svg circle').count()===0);
-    check(await panel.getByText('100%',{exact:true}).count()===50);
+    check(await panel.getByText('Mid 100%',{exact:true}).count()===50);
+    for(const item of plottedCases) {
+      const row=panel.getByRole('row').filter({has:page.getByText(item.job_profile_code,{exact:true})});
+      const graph=row.getByRole('img');
+      const geometry=await graph.evaluate(svg=>({point:+svg.querySelector('circle').getAttribute('cx'),min:+svg.querySelector('[data-reference="80"]').getAttribute('x1'),mid:+svg.querySelector('[data-reference="100"]').getAttribute('x1'),max:+svg.querySelector('[data-reference="120"]').getAttribute('x1')}));
+      check(item.mean_compa_pct<80 ? geometry.point<geometry.min : item.mean_compa_pct>120 ? geometry.point>geometry.max : geometry.point===geometry.mid);
+      check(geometry.point>12&&geometry.point<308);
+      check(await graph.evaluate(svg=>{const bounds=svg.getBoundingClientRect();const labels=[...svg.querySelectorAll('text')].map(node=>node.getBoundingClientRect());return labels.every(label=>label.left>=bounds.left&&label.right<=bounds.right)&&labels.every((a,i)=>labels.slice(i+1).every(b=>a.right<=b.left||a.bottom<=b.top||b.bottom<=a.top));}));
+      check(Math.abs((geometry.point-geometry.mid)/(geometry.max-geometry.mid)-(item.mean_compa_pct-100)/20)<0.00001);
+      check(await row.getByText(`Current: ${item.mean_compa_pct.toFixed(1)}%`,{exact:true}).isVisible());
+      await graph.focus();check(await graph.evaluate(svg=>document.activeElement===svg));
+      check((await graph.getAttribute('aria-label')).includes('across matched levels'));
+      check((await graph.locator('title').textContent()).includes(`Current: ${item.mean_compa_pct.toFixed(1)}%`));
+    }
+    check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    await panel.getByRole('row').filter({has:page.getByText(plottedCases[2].job_profile_code,{exact:true})}).screenshot({path:path.join(output,`above-max-card-${width}.png`)});
     await page.screenshot({path:path.join(output,`released-${width}.png`),fullPage:true});
     if(width===390)await page.getByRole('region',{name:'Shared workforce filters'}).getByText('Filters',{exact:true}).click();
     await page.getByLabel('Country',{exact:true}).selectOption('US');

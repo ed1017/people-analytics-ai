@@ -8,16 +8,23 @@ const usd = (value: number) => new Intl.NumberFormat('en-US', {style: 'currency'
 
 export function JobCompaGraph({result}: {result?: JobCompa}) {
   const value = result?.status === 'published' && result.meanPct !== null && Number.isFinite(result.meanPct) && result.meanPct > 0 ? result.meanPct : null;
-  const maximum = Math.max(150, value ?? 0);
-  const position = (n: number) => 8 + n / maximum * 144;
-  return <div className="min-w-24 max-w-40">
-    <svg viewBox="0 0 160 32" className="h-8 w-full" role="img" aria-label={value === null ? 'Compa-ratio unavailable; reference at 100 percent' : `Mean compa-ratio ${value.toFixed(1)} percent; reference at 100 percent`}>
-      <line x1="8" x2="152" y1="10" y2="10" stroke="currentColor" opacity=".2" />
-      <line x1={position(100)} x2={position(100)} y1="3" y2="17" stroke="currentColor" strokeDasharray="2 2" />
-      {value !== null && <circle cx={position(value)} cy="10" r="4" fill="currentColor" />}
-      <text x={position(100)} y="29" textAnchor="middle" fill="currentColor" fontSize="9">100%</text>
+  const minimum = Math.max(0, Math.min(60, (value ?? 100) - 10));
+  const maximum = Math.max(140, (value ?? 100) + 10);
+  const position = (n: number) => 12 + (n - minimum) / (maximum - minimum) * 296;
+  const staggerLabels = maximum - minimum > 125;
+  const current = value === null ? result?.status === 'suppressed' ? 'Withheld' : 'Unavailable' : `${value.toFixed(1)}%`;
+  const description = `Job-average compa-ratio across matched levels. Assumed band: Min 80%, Mid 100%, Max 120%. Current: ${current}. Not a current salary for any single level.`;
+  return <div className="w-full min-w-0 max-w-sm space-y-1.5">
+    <p className="text-base font-medium tabular-nums">Current: {current}</p>
+    <svg viewBox={`0 0 320 ${staggerLabels ? 88 : 56}`} className="w-full rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" role="img" tabIndex={0} aria-label={description}>
+      <title>{description}</title>
+      <line x1="12" x2="308" y1="16" y2="16" stroke="currentColor" opacity=".2" />
+      <line x1={position(80)} x2={position(120)} y1="16" y2="16" stroke="currentColor" strokeWidth="6" opacity=".2" />
+      {[80, 100, 120].map(reference => <line key={reference} data-reference={reference} x1={position(reference)} x2={position(reference)} y1="7" y2="25" stroke="currentColor" strokeDasharray={reference === 100 ? '3 3' : undefined} />)}
+      {([['Min', 80], ['Mid', 100], ['Max', 120]] as const).map(([label, reference], index) => <text key={label} x={position(reference)} y={staggerLabels ? 44 + index * 17 : 46} textAnchor={staggerLabels ? 'start' : 'middle'} fill="currentColor" fontSize="13">{label} {reference}%</text>)}
+      {value !== null && <circle cx={position(value)} cy="16" r="5" fill="currentColor" />}
     </svg>
-    <p className="text-xs tabular-nums">{value === null ? result?.status === 'suppressed' ? 'Withheld' : 'Unavailable' : `${value.toFixed(1)}%`}</p>
+    <p className="text-sm text-muted-foreground">Job average across matched levels</p>
   </div>;
 }
 
@@ -73,13 +80,13 @@ export function JobRangeTable({catalog, scope, releaseRows}: {catalog: RangeCata
   const jobs = catalog.jobs.filter(job => ranges.some(range => range.job === job.job_profile_code));
   if (!jobs.length) return <p role="status" className="text-sm">No catalog job/level combinations match these filters. No pay coverage is implied.</p>;
   return <div className="overflow-x-auto" role="region" aria-label="Job range comparison" tabIndex={0}>
-    <table className="w-full min-w-[340px] text-left text-sm">
+    <table className="w-full text-left text-sm">
       <caption className="pb-2 text-left text-xs text-muted-foreground">{jobs.length} catalog jobs · Ranges are assumptions · Exact pay counts are not published</caption>
-      <thead><tr className="border-b text-xs text-muted-foreground"><th scope="col" className="py-2 pr-3">Job</th><th scope="col" className="py-2 pr-3">Min / midpoint / max · USD</th><th scope="col" className="py-2">Mean compa-ratio</th></tr></thead>
-      <tbody>{jobs.map(job => <tr key={job.job_profile_code} className="border-b last:border-0">
-        <th scope="row" className="py-3 pr-3 font-medium">{job.job_profile_name}</th>
-        <td className="py-3 pr-3"><RangeValues ranges={ranges.filter(range => range.job === job.job_profile_code)}/></td>
-        <td className="py-3"><ReleasedJobGraph job={job.job_profile_code} rows={scope.country === 'all' && scope.org === 'all' && scope.level === 'all' ? releaseRows : null}/></td>
+      <thead className="sr-only md:not-sr-only"><tr className="border-b text-sm text-muted-foreground"><th scope="col" className="py-2 pr-3">Job</th><th scope="col" className="py-2 pr-3">Min / midpoint / max · USD</th><th scope="col" className="py-2">Mean compa-ratio</th></tr></thead>
+      <tbody className="grid gap-4 md:table-row-group">{jobs.map(job => <tr key={job.job_profile_code} className="grid min-w-0 gap-3 rounded-lg border p-3 md:table-row md:rounded-none md:border-x-0 md:border-t-0 md:p-0">
+        <th scope="row" className="min-w-0 break-words text-base font-medium md:py-4 md:pr-4">{job.job_profile_name}</th>
+        <td className="min-w-0 md:py-4 md:pr-6"><RangeValues ranges={ranges.filter(range => range.job === job.job_profile_code)}/></td>
+        <td className="min-w-0 md:py-4"><ReleasedJobGraph job={job.job_profile_code} rows={scope.country === 'all' && scope.org === 'all' && scope.level === 'all' ? releaseRows : null}/></td>
       </tr>)}</tbody>
     </table>
   </div>;
@@ -88,10 +95,18 @@ export function JobRangeTable({catalog, scope, releaseRows}: {catalog: RangeCata
 function ReleasedJobGraph({job, rows}: {job:string; rows?:ReleaseRow[]|null}) {
   const row=rows?.find(item=>item.job_profile_code===job);
   const result:JobCompa|undefined=row ? {job,status:row.status==='published'?'published':'suppressed',meanPct:row.mean_compa_pct,eligible:null,missing:null,coveragePct:null} : undefined;
-  return <><JobCompaGraph result={result}/>{row?.status==='published'&&<p className="mt-1 text-xs text-muted-foreground">{row.coverage==='complete'?'Complete USD inputs':'Partial USD inputs'}</p>}</>;
+  return <><JobCompaGraph result={result}/>{row?.status==='published'&&<p className="mt-2 text-sm text-muted-foreground">{row.coverage==='complete'?'Complete USD inputs':'Partial USD inputs'}</p>}</>;
 }
 
 function RangeValues({ranges}: {ranges: ReturnType<typeof rangesForScope>}) {
-  const line = (range: typeof ranges[number]) => <span>{range.level} · {usd(range.minimum)} / {usd(range.midpoint)} / {usd(range.maximum)}</span>;
-  return <div className="text-xs"><p>{line(ranges[0])}</p>{ranges.length > 1 && <details><summary className="min-h-11 cursor-pointer py-3">{ranges.length - 1} more level ranges</summary><ul className="space-y-2">{ranges.slice(1).map(range => <li key={range.level}>{line(range)}</li>)}</ul></details>}</div>;
+  const line = (range: typeof ranges[number]) => <div className="space-y-1.5">
+    <p className="text-sm font-medium">{range.level}</p>
+    <dl className="flex flex-wrap gap-x-5 gap-y-2 tabular-nums">
+      {([['Min', range.minimum], ['Mid', range.midpoint], ['Max', range.maximum]] as const).map(([label, value]) => <div key={label}>
+        <dt className="text-sm text-muted-foreground">{label}</dt>
+        <dd className="whitespace-nowrap text-base font-medium">{usd(value)}</dd>
+      </div>)}
+    </dl>
+  </div>;
+  return <div className="min-w-0">{line(ranges[0])}{ranges.length > 1 && <details><summary className="min-h-11 cursor-pointer py-3 text-sm">{ranges.length - 1} more level ranges</summary><ul className="space-y-3">{ranges.slice(1).map(range => <li key={range.level}>{line(range)}</li>)}</ul></details>}</div>;
 }
