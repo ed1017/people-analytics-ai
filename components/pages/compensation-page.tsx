@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { CompensationResponse } from "@/lib/compensation";
+import {SyntheticPayDemoPanel} from "@/components/synthetic-pay-demo";
 import { CompensationBenchmarks } from "@/components/compensation-benchmarks";
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -40,7 +41,7 @@ export function CompensationPage() {
   };
 
   return (<>
-    <div className="min-w-0 px-4 pt-4 sm:px-6 sm:pt-6"><CompensationBenchmarks /></div>
+    <div className="min-w-0 space-y-4 px-4 pt-4 sm:px-6 sm:pt-6"><SyntheticPayDemoPanel/><CompensationBenchmarks /></div>
     <section className="evidence-workspace min-w-0 space-y-5 p-4 sm:p-6" aria-label="Compensation cost context" aria-busy={loading}>
       <div className="space-y-2">
         <p className="text-xs font-medium text-primary">Synthetic aggregate evidence · USD</p>
