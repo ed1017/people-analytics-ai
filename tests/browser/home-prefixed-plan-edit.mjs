@@ -78,11 +78,8 @@ try{
   await button('Apply changes').waitFor();
   check(mode+' chat edit needs Apply and no further model request',await button('Apply changes').isEnabled()&&await review.getByRole('listitem').count()===1&&posts.length===2&&(await state()).workspaces[id].fields.homeSolutionBundlesV1.attachments.length===0);
   await button('Apply changes').click();await button('Attach Action Plan').click();
-  const flow=page.getByRole('region',{name:'Review Action Plan attachment'});
-  check(mode+' attachment requires explicit calculation and review',await button('Continue to attachment').isDisabled());
-  await button('Review calculation').click();await flow.getByLabel(/I reviewed this Action Plan for/).check();
-  const unknown=flow.getByLabel(/I acknowledge the unresolved/);if(await unknown.count())await unknown.check();
-  await button('Continue to attachment').click();await button('Confirm attachment').click();await flow.waitFor({state:'hidden'});
+  await page.getByRole('status').filter({hasText:/Action Plan attached\./}).waitFor();
+  check(mode+' one-click attachment has no routine confirmation or manual editor',await button('Continue to attachment').count()===0&&await button('Review calculation').count()===0&&await page.getByRole('region',{name:'Action Plan editor'}).count()===0);
   const snapshot=(await state()).workspaces[id].fields.homeSolutionBundlesV1.attachments[0];
   check(mode+' reviewed attachment retains exact goal and explicitly applied edit',snapshot.draft.binding.goal===aiSkillsGoalPrompt&&snapshot.draft.inputs.groups[0].count.value===12&&snapshot.draft.inputs.groups[0].count.kind==='user-entered'&&posts.length===2);
   await page.reload();await page.locator('[data-plan-current="true"]').waitFor();
