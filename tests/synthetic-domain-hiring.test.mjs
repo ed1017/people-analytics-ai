@@ -7,13 +7,20 @@ import {dayAdd} from '../lib/ml/synthetic-workforce/common.mjs';
 import {fitHiringCohorts, predictHiringCohorts, scoreHiringCohorts} from '../lib/ml/hiring-cohort-model.mjs';
 import {forecastHiring, scoreHiring} from '../lib/ml/synthetic-domain-predictions/hiring.mjs';
 
-// Existing generator qualification seed only; do not inspect frozen assessment seeds here.
+// Existing qualification seed and one observed development regression; no assessment seeds.
 const config=JSON.parse(readFileSync(new URL('../lib/ml/synthetic-workforce/protocol.json',import.meta.url)));
 const history=family=>generateHiring(config,{seed:17,family}).releases;
 const ordinary=history('stationary'), stress=history('reporting-stress');
 const origin='2026-06-30T23:59:59.999Z', months=['2026-07','2026-08','2026-09'];
 const snapshot=(rows=ordinary,cutoff=origin)=>replaySynthetic('hiring',rows,cutoff);
 const values=row=>({month:row.value.month,openings:row.value.openingCount,started:row.value.actualStartEvents.filter(e=>e.at<=dayAdd(row.effectiveAt,90)).reduce((s,e)=>s+e.count,0)});
+
+test('observed development optimizer failure abstains without retuning or retry',()=>{
+  const rows=generateHiring({...config,seeds:[6006]},{seed:6006,family:'reporting-stress'}).releases;
+  const result=forecastHiring(snapshot(rows,'2024-12-31T23:59:59.999Z'),['2025-01','2025-02','2025-03']);
+  assert.equal(result.status,'blocked'); assert.deepEqual(result.reasons,['fixed-optimizer-failed']);
+  assert.deepEqual(result.predictions,[]); assert.equal(result.interval,null);
+});
 
 test('hiring adapter uses 36 calendar months and reproduces unchanged aggregate models',()=>{
   const input=snapshot(), before=structuredClone(input), result=forecastHiring(input,months);
