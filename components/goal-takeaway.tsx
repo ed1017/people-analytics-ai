@@ -2,11 +2,11 @@
 import {recordDecisionEvidence} from "@/components/decision-store";
 import {useEffect,useState} from "react";
 import {ChatContent} from "@/components/chat-content";
-import {goalSummaryRequest} from "@/lib/goal-context";
+import {goalSummaryRequest,hasDistinctFocusedIssue} from "@/lib/goal-context";
 import type {AppPage} from "@/lib/types";
 type Entry={key:string;goalId:string;text:string;failed:boolean};
 const sessionCache=new Map<string,Entry>();
-export function GoalTakeaway({goalId,goalContext,payload,active,ready,paused,validGoalIds,unavailable,onNavigate}:{goalId:string;goalContext:unknown;payload:Record<string,unknown>;active:boolean;ready:boolean;paused:boolean;validGoalIds:string[];unavailable?:string;onNavigate?:(page:AppPage)=>void}) {
+export function GoalTakeaway({goalId,goalContext,displayedGoal='',payload,active,ready,paused,validGoalIds,unavailable,onNavigate}:{goalId:string;goalContext:unknown;displayedGoal?:string;payload:Record<string,unknown>;active:boolean;ready:boolean;paused:boolean;validGoalIds:string[];unavailable?:string;onNavigate?:(page:AppPage)=>void}) {
  const summaryRequest=goalSummaryRequest(payload,goalContext);
  const request=JSON.stringify(summaryRequest);
  const key=goalId+":"+request;
@@ -33,5 +33,6 @@ export function GoalTakeaway({goalId,goalContext,payload,active,ready,paused,val
   return()=>{live=false;clearTimeout(delay);clearTimeout(timeout);controller.abort();};
  },[active,goalId,ready,paused,entry,key,request]);
  if(!goalId||!active)return null;
- return <section aria-label="Focused issue" className="mb-4 space-y-2 text-base"><h3 className="text-sm font-semibold text-primary">Focused issue</h3><p className="break-words text-sm font-medium">{summaryRequest.goalContext.goal}</p>{!ready?<p className="text-sm text-muted-foreground">{unavailable||"This page's evidence is loading or unavailable. No finding is inferred."}</p>:entry?<div role={entry.failed?"status":undefined}><ChatContent compact={payload.page==="home"} content={entry.text} onNavigate={onNavigate}/></div>:<p role="status" className="text-sm text-muted-foreground">{paused?"Your goal context is retained while you work on this question.":"Preparing a fresh takeaway from this page's evidence…"}</p>}</section>;
+ const distinctIssue=hasDistinctFocusedIssue(displayedGoal,summaryRequest.goalContext.goal);
+ return <section aria-label={distinctIssue?"Focused issue":"Goal takeaway"} className="mb-4 space-y-2 text-base">{distinctIssue&&<><h3 className="text-sm font-semibold text-primary">Focused issue</h3><p className="break-words text-sm font-medium">{summaryRequest.goalContext.goal}</p></>}{!ready?<p className="text-sm text-muted-foreground">{unavailable||"This page's evidence is loading or unavailable. No finding is inferred."}</p>:entry?<div role={entry.failed?"status":undefined}><ChatContent compact={payload.page==="home"} content={entry.text} onNavigate={onNavigate}/></div>:<p role="status" className="text-sm text-muted-foreground">{paused?"Your goal context is retained while you work on this question.":"Preparing a fresh takeaway from this page's evidence…"}</p>}</section>;
 }

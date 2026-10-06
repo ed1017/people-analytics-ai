@@ -1,6 +1,11 @@
 export type GoalNote = {text:string; page:string; scope:string; truncated:boolean; kind:"requirement"|"context"};
 export type GoalRequirements = {constraints:string; decisions:string; notes:GoalNote[]};
 export const emptyGoalRequirements = ():GoalRequirements=>({constraints:"",decisions:"",notes:[]});
+/** Display comparison only. Keep stored goal text, scope and model context unchanged. */
+export function hasDistinctFocusedIssue(selectedGoal:string,focusedIssue:string):boolean {
+ const comparable=(text:string)=>text.normalize('NFC').trim().replace(/\s+/g,' ').replace(/\.+$/,'').toLowerCase();
+ return Boolean(comparable(focusedIssue))&&comparable(selectedGoal)!==comparable(focusedIssue);
+}
 const clean=(value:unknown,max:number)=>typeof value==="string"?value.slice(0,max):"";
 export function normalizeGoalRequirements(value:unknown):GoalRequirements {
  const raw=value&&typeof value==="object"?value as Record<string,unknown>:{};

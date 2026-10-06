@@ -1,0 +1,63 @@
+/** Display contract for the frozen aggregate release; never individual snapshot ratings. */
+export type PerformanceFilters = { country: string; org: string; level: string };
+export const PERFORMANCE_VERSION = 'workforce-performance-2026-ytd-bu-v1';
+export const PERFORMANCE_DIGEST = '191ff33a4dd66c0e6484627441928a77fbb3ef883b428261964d768a65e9535c';
+export const PERFORMANCE_BUS = ['BU-CLIENTOPS', 'BU-CONS', 'BU-CORP', 'BU-DATAAI', 'BU-DIGITAL', 'BU-MGSVC', 'BU-SALES', 'BU-TECH'] as const;
+export type WorkforcePerformance = {
+  version: typeof PERFORMANCE_VERSION;
+  source: 'employee_snapshots JOIN performance_reviews';
+  snapshotDate: '2026-09-30';
+  reviewPeriod: '2026 YTD';
+  filters: PerformanceFilters;
+  status: 'available';
+  release?: { contentSha256: typeof PERFORMANCE_DIGEST; extractedAt: string; publishedAt: string };
+  availabilityKind: 'simulated_convention';
+  simulatedAvailableAt: '2026-09-30T23:59:59.999Z';
+  originalAvailableAt: null;
+  contentDigest: typeof PERFORMANCE_DIGEST;
+  counts: { population: number; rated: number; ratings: number[]; notRated: null; notRatedStatus: 'not_collected'; unavailable: 0 };
+};
+const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
+const keys = (value: Record<string, unknown>, expected: string[]) => Object.keys(value).length === expected.length && expected.every(key => Object.hasOwn(value, key));
+const count = (value: unknown): value is number => typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
+export function supportsPerformanceFilters(filters: PerformanceFilters) {
+  return filters.country === 'all' && filters.level === 'all' && (filters.org === 'all' || PERFORMANCE_BUS.some(bu => bu === filters.org));
+}
+/** Reject duplicate/unknown parameters before any aggregate release lookup. */
+export function parsePerformanceFilters(params: URLSearchParams): PerformanceFilters | null {
+  if ([...params.keys()].some(key => !['country', 'org', 'level'].includes(key) || params.getAll(key).length !== 1)) return null;
+  const filters = { country: params.get('country') ?? 'all', org: params.get('org') ?? 'all', level: params.get('level') ?? 'all' };
+  return Object.values(filters).every(value => value.length > 0 && value.length <= 80 && /^[\w-]+$/.test(value)) ? filters : null;
+}
+/** Internal display shape, projected from the verified staged RPC by adaptPerformanceRelease.
+ * Projection prevents additional response fields reaching the browser. A row validator cannot prove
+ * the global nine-row gate: that remains the frozen database release's responsibility.
+ */
+export function resolveWorkforcePerformance(value: unknown, filters: PerformanceFilters, population?: number | null): WorkforcePerformance | null {
+  if (!supportsPerformanceFilters(filters) || !record(value) || value.status !== 'available' || value.active === false || value.version !== PERFORMANCE_VERSION || value.contentDigest !== PERFORMANCE_DIGEST || value.source !== 'employee_snapshots JOIN performance_reviews' || value.snapshotDate !== '2026-09-30' || value.reviewPeriod !== '2026 YTD' || value.availabilityKind !== 'simulated_convention' || value.simulatedAvailableAt !== '2026-09-30T23:59:59.999Z' || value.originalAvailableAt !== null || !record(value.filters) || !keys(value.filters, ['country', 'org', 'level']) || Object.entries(filters).some(([key, item]) => (value.filters as Record<string, unknown>)[key] !== item)) return null;
+  const c = value.counts;
+  if (!record(c) || !keys(c, ['population', 'rated', 'ratings', 'notRated', 'notRatedStatus', 'unavailable']) || !count(c.population) || !count(c.rated) || c.rated !== c.population || c.notRated !== null || c.notRatedStatus !== 'not_collected' || c.unavailable !== 0 || population !== undefined && c.population !== population || !Array.isArray(c.ratings) || c.ratings.length !== 5 || !c.ratings.every(count)) return null;
+  const ratings: number[] = c.ratings;
+  if (ratings.some(n => n < 10 || (c.population as number) - n < 10) || ratings.reduce((a,b) => a+b,0) !== c.population) return null;
+  if (filters.org === 'all' && (c.population !== 10000 || ratings.some((n,i) => n !== [400,1200,5200,2600,600][i]))) return null;
+  return { version: PERFORMANCE_VERSION, source: 'employee_snapshots JOIN performance_reviews', snapshotDate: '2026-09-30', reviewPeriod: '2026 YTD', filters: { ...filters }, status: 'available', availabilityKind: 'simulated_convention', simulatedAvailableAt: '2026-09-30T23:59:59.999Z', originalAvailableAt: null, contentDigest: PERFORMANCE_DIGEST, counts: { population: c.population, rated: c.rated, ratings: [...ratings], notRated: null, notRatedStatus: 'not_collected', unavailable: 0 } };
+}
+
+/** Accept only the verified wire envelope; release time is actual publication, never simulated. */
+export function adaptPerformanceRelease(value: unknown, filters: PerformanceFilters, population?: number | null): WorkforcePerformance | null {
+  if (!record(value) || value.periodKind !== 'ytd' || value.provenance !== 'Synthetic workforce; exact rating generation unverified' || value.notRatedStatus !== 'not_collected' || !record(value.release) || !keys(value.release, ['contentSha256', 'extractedAt', 'publishedAt']) || value.release.contentSha256 !== PERFORMANCE_DIGEST || value.release.extractedAt !== '2026-10-06T14:23:25.171Z' || typeof value.release.publishedAt !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|\+00:00)$/.test(value.release.publishedAt) || !Number.isFinite(Date.parse(value.release.publishedAt)) || Date.parse(value.release.publishedAt) < Date.parse(value.release.extractedAt) || !record(value.counts) || !keys(value.counts, ['population','rated','ratings','notRated','unavailable'])) return null;
+  const result = resolveWorkforcePerformance({ ...value, contentDigest: value.release.contentSha256, counts: { ...value.counts, notRatedStatus: value.notRatedStatus } }, filters, population);
+  return result ? { ...result, release: { contentSha256: PERFORMANCE_DIGEST, extractedAt: value.release.extractedAt, publishedAt: value.release.publishedAt } } : null;
+}
+/** Error/null containment: only the aggregate invoker RPC, no private-store/source fallback. */
+export async function loadPerformanceRelease(
+  rpc: (name: string, args: {p_country_code: string; p_org_code: string; p_level_code: string}) => PromiseLike<{data: unknown; error: unknown}>,
+  filters: PerformanceFilters | null,
+  population: number | null,
+): Promise<WorkforcePerformance | null> {
+  if (!filters || !supportsPerformanceFilters(filters)) return null;
+  try {
+    const { data, error } = await rpc('workforce_performance_release_v1', {p_country_code:filters.country, p_org_code:filters.org, p_level_code:filters.level});
+    return error ? null : adaptPerformanceRelease(data, filters, population);
+  } catch { return null; }
+}

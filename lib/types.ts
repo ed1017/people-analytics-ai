@@ -25,6 +25,8 @@ export type DashboardFilterOptions = {
 };
 
 export type DashboardResponse = {
+  // Validated aggregate-only release; inactive/error/unsupported scopes remain null.
+  performance_rating?: unknown;
   overview: OverviewData;
   trend: HeadcountTrendPoint[];
   filter_options: DashboardFilterOptions;

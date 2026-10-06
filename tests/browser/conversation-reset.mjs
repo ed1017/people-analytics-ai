@@ -23,7 +23,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
    if(hold)await new Promise(resolve=>release=resolve);
    return route.fulfill({json:body.message==='Prepare coordinated solution bundles for my exact pinned goal.'?{proposal:proposal(body.goalContext.goal)}:{answer:'Synthetic reply '+number,nextStep:'none'}}).catch(()=>{});
   }
-  if(url.pathname==='/api/dashboard')return route.fulfill({json:{overview:{headcount:100,fte:90,open_positions:3,snapshot_date:'2026-09-30'},trend:[],filter_options:{countries:[{value:'UK',label:'United Kingdom'}],business_units:[],levels:[]}}});
+  if(url.pathname==='/api/dashboard')return route.fulfill({json:{overview:{headcount:100,fte:90,open_positions:3,snapshot_date:'2026-09-30'},trend:[],filter_options:{countries:[{value:'UK',label:'United Kingdom'},{value:'US',label:'United States'}],business_units:[],levels:[]}}});
   if(url.pathname==='/api/attrition')return route.fulfill({json:attrition});
   if(url.pathname==='/api/workforce')return route.fulfill({json:workforce});
   if(url.pathname.startsWith('/api/'))return route.fulfill({json:{overview:{headcount:100},summary:{headcount:100,total_employees:100,open_requisitions:4},trend:[],business_units:[],levels:[],tenure:[],reasons:[]}});
@@ -49,6 +49,16 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  check(mode+' fresh request carries no previous goal or transport history',posts.at(-1).history.length===0&&posts.at(-1).goalContext===null&&!posts.at(-1).hasFocusedIssue);
  await reset();await button('Open goal: '+goal).click();await page.locator('[data-plan-current="true"]').waitFor();
  check(mode+' saved goal explicitly reopens its existing attached plan',await panel.isVisible()&&JSON.stringify((await state()).workspaces.a.fields.homeSolutionBundlesV1)===JSON.stringify(savedFields.homeSolutionBundlesV1));
+ // Hosted regression: restore a saved goal after a scoped Home reset, then type each character.
+ await page.getByLabel('Country',{exact:true}).evaluate(n=>n.closest('details')?.setAttribute('open',''));await page.getByLabel('Country',{exact:true}).selectOption('US');
+ await reset();await button('Open goal: '+goal).click();await navigate('Attrition');await chat.fill('');await page.waitForTimeout(2000);
+ await page.evaluate(()=>{window.chartMutations=0;window.chartObserver=new MutationObserver(records=>window.chartMutations+=records.length);for(const chart of document.querySelectorAll('.recharts-wrapper'))window.chartObserver.observe(chart,{subtree:true,attributes:true,childList:true,characterData:true});});
+ const scopedDraft='Synthetic preview test draft to be cleared by Reset.';
+ await chat.pressSequentially(scopedDraft,{delay:20});await page.waitForTimeout(1000);
+ check(mode+' restored scoped goal accepts character-by-character draft without a subscriber loop',errors.length===0&&await chat.inputValue()===scopedDraft&&await page.getByLabel('Country',{exact:true}).inputValue()==='US');
+ check(mode+' editing only the draft leaves settled Attrition charts unchanged',await page.evaluate(()=>{window.chartObserver.disconnect();return window.chartMutations===0;}));
+ await reset();check(mode+' restored scoped goal draft Reset keeps saved work and selected country',await chat.inputValue()===''&&await selected.inputValue()===''&&await page.getByLabel('Country',{exact:true}).inputValue()==='US'&&(await state()).goals.goals.length===2);
+ await navigate('Home');await button('Open goal: '+goal).click();
  // Both reset entry points must invalidate even a response whose transport ignores abort.
  await page.evaluate(()=>{
   const original=window.fetch;
