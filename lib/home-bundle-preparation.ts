@@ -8,8 +8,11 @@ import {plain,exactKeys} from './home-action-proposal.ts';
 import {validateJson} from './local-decisions.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {evidenceFingerprint,readEvidenceFingerprint,type EvidenceFingerprint} from './home-evidence-identity.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {readBundleResponseDiagnostic,type BundleResponseDiagnostic} from './home-bundle-response-diagnostic.ts';
 export const HOME_BUNDLE_REQUEST='Prepare coordinated solution bundles for my exact pinned goal.';
-export const homeBundleOutputTokens=5000;
+// @ts-expect-error Native Node tests share TypeScript source.
+export {homeBundleOutputTokens} from './home-bundle-response-diagnostic.ts';
 export const bundlePreparationField='homeBundlePreparationV1';
 export type BundlePreparation={version:1;binding:ActionBinding;proposal:BundleProposal;preparedAt:string;usage:ActionUsage;evidenceFingerprint?:EvidenceFingerprint};
 export function readBundlePreparation(raw:unknown,binding:ActionBinding,packet:unknown):BundlePreparation|null{
@@ -21,8 +24,8 @@ export function readBundlePreparation(raw:unknown,binding:ActionBinding,packet:u
   const proposal=readHomeBundleProposal(value.proposal,binding.goal,packet);return proposal?structuredClone({...value,proposal}) as BundlePreparation:null;
  }catch{return null}
 }
-type Outcome={status:'ready'|'cached';draft:BundlePreparation}|{status:'explicit_required'|'stale'|'failed';diagnostic?:BundleDiagnostic};
-type Args={mode:'new-pin'|'explicit'|'passive';binding:ActionBinding;packet:unknown;stored:unknown;isCurrent:()=>boolean;prepare:(signal:AbortSignal)=>Promise<{proposal:unknown;usage?:unknown;diagnostic?:unknown}>;commit:(patch:{field:string;value:BundlePreparation})=>void};
+type Outcome={status:'ready'|'cached';draft:BundlePreparation}|{status:'explicit_required'|'stale'|'failed';diagnostic?:BundleDiagnostic;responseDiagnostic?:BundleResponseDiagnostic};
+type Args={mode:'new-pin'|'explicit'|'passive';binding:ActionBinding;packet:unknown;stored:unknown;isCurrent:()=>boolean;prepare:(signal:AbortSignal)=>Promise<{proposal:unknown;usage?:unknown;diagnostic?:unknown;responseDiagnostic?:unknown}>;commit:(patch:{field:string;value:BundlePreparation})=>void};
 export function createHomeBundlePreparation(){
  let epoch=0;const attemptedGoals=new Set<string>(),flights=new Map<string,{promise:Promise<Outcome>;abort:AbortController}>();
  return {
@@ -38,7 +41,7 @@ export function createHomeBundlePreparation(){
    const ticket=epoch,abort=new AbortController(),start=Date.now(),current=()=>ticket===epoch&&!abort.signal.aborted&&args.isCurrent();
    const promise=Promise.resolve().then(async():Promise<Outcome>=>{
     try{if(!current())return {status:'stale'};const reply=await args.prepare(abort.signal);if(!current())return {status:'stale'};
-     const remote=readBundleDiagnostic(reply.diagnostic);if(remote)return {status:'failed',diagnostic:remote};
+     const remote=readBundleDiagnostic(reply.diagnostic);if(remote){const responseDiagnostic=readBundleResponseDiagnostic(reply.responseDiagnostic);return {status:'failed',diagnostic:remote,...(responseDiagnostic?{responseDiagnostic}:{})};}
      const inspected=inspectHomeBundleProposal(reply.proposal,binding.goal,packet),proposal=inspected.proposal;if(!proposal)return {status:'failed',diagnostic:inspected.diagnostic};
      const fingerprint=await evidenceFingerprint(packet,'canonical');
      if(binding.evidenceDigest!==fingerprint.canonical)fingerprint.mode='ordered';

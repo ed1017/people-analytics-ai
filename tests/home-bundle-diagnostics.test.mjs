@@ -13,7 +13,7 @@ test('distinguishes API, incomplete, JSON and contract rejection without respons
   [async()=>({status:'incomplete',output_text:'SECRET partial answer'}),'incomplete_output'],
   [async()=>({status:'completed',output_text:'SECRET invalid json'}),'parse_error'],
   [async()=>({status:'completed',output_text:'{}'}),'schema_rejected'],
- ]){const result=await inspectBundleResponse(call,goal,pack);assert.deepEqual(result,{proposal:null,diagnostic:expected});assert.ok(!JSON.stringify(result).includes('SECRET'));}
+ ]){const result=await inspectBundleResponse(call,goal,pack);assert.equal(result.proposal,null);assert.equal(result.diagnostic,expected);assert.ok(!JSON.stringify(result).includes('SECRET'));}
 });
 test('source reference, dependency and size rejections are separately classified',()=>{
  const invalid=fixture();invalid.bundles[0].components[0].evidence=['S999:summary'];assert.equal(inspectHomeBundleProposal(invalid,goal,pack).diagnostic,'reference_rejected');

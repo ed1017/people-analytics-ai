@@ -623,8 +623,8 @@ export async function POST(
         tool_choice: "none", max_output_tokens: bundles ? homeBundleOutputTokens : 1800,
       }, {maxRetries:0,signal:request.signal});
       if(bundles){
-        const result=await inspectBundleResponse(call,goalContext.goal,body.overviewBriefingContext,homeBundleTask(goalContext));
-        return result.proposal ? NextResponse.json(result) : NextResponse.json({error:"Action Plan preparation unavailable. Your existing work is kept; retry explicitly.",diagnostic:result.diagnostic},{status:502});
+        const result=await inspectBundleResponse(call,goalContext.goal,body.overviewBriefingContext,homeBundleTask(goalContext),homeBundleOutputTokens);
+        return result.proposal ? NextResponse.json(result) : NextResponse.json({error:"Action Plan preparation unavailable. Your existing work is kept; retry explicitly.",diagnostic:result.diagnostic,responseDiagnostic:result.responseDiagnostic},{status:502});
       }
       const response=await call();
       if(response.status!=="completed")return NextResponse.json({error:"Action preparation did not complete. Your existing work is kept."},{status:502});
