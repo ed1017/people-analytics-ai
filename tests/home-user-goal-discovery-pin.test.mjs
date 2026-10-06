@@ -8,6 +8,12 @@ import {buildHomeReplyFormat,decodeHomeModelReply} from '../lib/home-chat-reply.
 import {inspectHomeChatResponse} from '../lib/home-chat-response.ts';
 const pack={sources:[{id:'W1',status:'loaded',facts:{headcount:5000}}]},require=createRequire(import.meta.url),Ajv=require('ajv');
 const empty={answer:'Three intervention mixes are proposed for review; effectiveness remains unproven.',finding_followups:[],next_step:'none',problem:null,problem_evidence:[],options:[],question:null};
+test('an optional model scope question does not erase an explicit user-authored AI skills goal',()=>{
+ const reply=decodeHomeModelReply(JSON.stringify({...empty,answer:'Sources are unavailable. ಸ',question:'Which employee population and AI skill should the pilot cover?'}),false,{sources:[{id:'I3',status:'loaded',facts:{rows:[]}}]});
+ assert.equal(reply.candidateProposal,null);assert.equal(reply.clarification,'Which employee population and AI skill should the pilot cover?');
+ assert.equal(homeUserGoalForPin([aiSkillsGoalPrompt]),aiSkillsGoalPrompt);assert.equal(reply.answer,'Sources are unavailable. ಸ');
+ assert.equal(homeUserGoalForPin(['Which population should learn AI skills?']),null);
+});
 test('schema-valid empty discovery has the exact reported diagnostic while the authored goal remains independently available',()=>{
  const validate=new Ajv({strict:false}).compile(buildHomeReplyFormat(pack).schema);assert.equal(validate(empty),true,JSON.stringify(validate.errors));
  const result=inspectHomeChatResponse({status:'completed',output_text:JSON.stringify(empty)},false,pack,4000);assert.equal(result.ok,true);assert.equal(result.body.candidateProposal,null);assert.deepEqual(result.body.candidateDiagnostic,{reason:'empty',field:'none',optionCount:0,missingFieldCount:0});assert.equal(homeUserGoalForPin([exactAcceptancePrompt]),exactAcceptanceGoal);
