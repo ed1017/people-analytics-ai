@@ -54,9 +54,14 @@ with cohort as (
  ) p on true
  left join lateral (
    select m.movement_date::date, m.to_job_level_id::text to_level_id,
-          m.from_job_level_id::text from_level_id, count(*) over(partition by m.movement_date) at_date_count
+          m.from_job_level_id::text from_level_id,
+          (select count(*) from public.employee_movements same_day
+           where same_day.employee_id=m.employee_id and same_day.movement_date=m.movement_date) at_date_count
    from public.employee_movements m
    where m.employee_id::text=c.employee_id and m.movement_date<p.promotion_date
+     -- An unchanged-level lateral/transfer is not a new level-entry date.
+     and (m.from_job_level_id is distinct from m.to_job_level_id
+          or m.from_job_level_id is null or m.to_job_level_id is null)
    order by m.movement_date desc,m.movement_id::text desc limit 1
  ) entry on true
  left join lateral (
@@ -72,19 +77,39 @@ with cohort as (
       and s.snapshot_date>coalesce(e.last_different,date '0001-01-01')
       and s.snapshot_date<=date '2025-12-31') entry_upper
  from evidence e
-), prepared as (
+), candidates as (
  select b.*,
    case when baseline_level_id is null then null else generated_eligibility end eligible,
+   -- Known resets, including after opening, must never fall back to an invented older date.
    case when event_count<>1 or prior_level_id is distinct from baseline_level_id then null
-     when recorded_entry_date is not null and (at_date_count<>1 or to_level_id is distinct from prior_level_id) then null
-     when recorded_entry_date<=date '2025-12-31' and to_level_id=prior_level_id
-       and from_level_id is not null and from_level_id<>to_level_id
-       and (last_different is null or recorded_entry_date>last_different)
-       and recorded_entry_date<=entry_upper then recorded_entry_date
+     when recorded_entry_date is not null then
+       case when at_date_count=1 and to_level_id=prior_level_id
+         and from_level_id is not null and from_level_id<>to_level_id
+         then recorded_entry_date else null end
      when entry_lower<=entry_upper then entry_lower +
        (get_byte(decode(md5('career-level-entry-v1:'||employee_id),'hex'),0) % (entry_upper-entry_lower+1))
-     else null end prior_level_started_on
+     else null end candidate_started_on,
+   case when recorded_entry_date is not null then 'recorded_movement_entry'
+     else 'generated_within_observed_snapshot_bounds_v1' end candidate_provenance
  from bounded b
+), prepared as (
+ select c.*,
+   -- Validate the entire candidate spell up to the promotion, not only the opening snapshot.
+   -- Unknown levels and same-day event ordering are ambiguous, so durations stay unavailable.
+   case when candidate_started_on is null then null
+     when exists(select 1 from public.employee_snapshots s
+       where s.employee_id::text=c.employee_id
+         and s.snapshot_date>=c.candidate_started_on and s.snapshot_date<c.promotion_date
+         and s.job_level_id::text is distinct from c.prior_level_id) then null
+     when exists(select 1 from public.employee_movements m
+       where m.employee_id::text=c.employee_id
+         and m.movement_date>c.candidate_started_on and m.movement_date<c.promotion_date
+         and (m.from_job_level_id::text is distinct from c.prior_level_id
+           or m.to_job_level_id::text is distinct from c.prior_level_id)) then null
+     when (select count(*) from public.employee_movements m
+       where m.employee_id::text=c.employee_id and m.movement_date=c.promotion_date)<>1 then null
+     else candidate_started_on end prior_level_started_on
+ from candidates c
 )
 select employee_id,country_code,org_code,level_code,baseline_level_id,
  eligible,case when eligible is null then 'unavailable_no_opening_snapshot' else 'generated_demo_policy_v1' end eligibility_provenance,
@@ -92,12 +117,7 @@ select employee_id,country_code,org_code,level_code,baseline_level_id,
  case when event_count=1 then promotion_date else null end promotion_date,
  case when event_count=1 then prior_level_id else null end prior_level_id,
  prior_level_started_on,
- case when prior_level_started_on is null then 'unavailable'
-      when prior_level_started_on=recorded_entry_date and at_date_count=1 and to_level_id=prior_level_id
-       and from_level_id is not null and from_level_id<>to_level_id
-       and (last_different is null or recorded_entry_date>last_different)
-       and recorded_entry_date<=entry_upper then 'recorded_movement_entry'
-      else 'generated_within_observed_snapshot_bounds_v1' end duration_provenance,
+ case when prior_level_started_on is null then 'unavailable' else candidate_provenance end duration_provenance,
  case when prior_level_started_on is not null then round((promotion_date-prior_level_started_on)::numeric/30.4375,2) else null end prior_level_months,
  case when event_count>1 then 'multiple_promotions_unsupported'
       when event_count=0 then 'no_recorded_promotion_outcome_coverage_unknown'

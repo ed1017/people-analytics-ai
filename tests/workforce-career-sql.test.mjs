@@ -7,9 +7,7 @@ const PGlite=modulePath?(await import(modulePath)).PGlite:null;
 const preparation=await fs.readFile(new URL('../database/workforce_career_demo_history.proposed.sql',import.meta.url),'utf8');
 const rollback=await fs.readFile(new URL('../database/workforce_career_demo_history.rollback.proposed.sql',import.meta.url),'utf8');
 const commit=sql=>sql.replace(/rollback;\s*$/,'commit;');
-test('private SQL is deterministic, reversible, source-preserving and never claims outcome completeness',{skip:!PGlite && 'Set PGLITE_MODULE to run local PostgreSQL verification'},async()=>{
- const db=new PGlite();try{
- await db.exec(`create role anon;create role authenticated;create role service_role;
+const fixtureSql=`create role anon;create role authenticated;create role service_role;
  create table locations(location_id text primary key,country_code text);insert into locations values('loc','US');
  create table org_units(org_unit_id text primary key,org_code text);insert into org_units select n::text,v from unnest(array['BU-CLIENTOPS','BU-CONS','BU-CORP','BU-DATAAI','BU-DIGITAL','BU-MGSVC','BU-SALES','BU-TECH']) with ordinality as x(v,n);
  create table job_levels(job_level_id text primary key,level_code text);insert into job_levels values('l1','IC1'),('l2','IC2');
@@ -19,7 +17,10 @@ test('private SQL is deterministic, reversible, source-preserving and never clai
  create index on employee_movements(employee_id,movement_date);
  insert into employee_movements select 'promotion-'||i,'fixture-'||i,date '2026-03-15','promotion','l1','l2' from generate_series(1,10000)i where i%5=0;
  insert into employee_movements select 'entry-'||i,'fixture-'||i,date '2023-12-01','promotion','l0','l1' from generate_series(1,10000)i where i%10=0;
- insert into employee_movements values('october','fixture-1',date '2026-10-01','promotion','l1','l2');`);
+ insert into employee_movements values('october','fixture-1',date '2026-10-01','promotion','l1','l2');`;
+test('private SQL is deterministic, reversible, source-preserving and never claims outcome completeness',{skip:!PGlite && 'Set PGLITE_MODULE to run local PostgreSQL verification'},async()=>{
+ const db=new PGlite();try{
+ await db.exec(fixtureSql);
  const scalar=async sql=>(await db.query(sql)).rows[0];
  const sourceBefore=await scalar(`select (select count(*) from employee_snapshots) snapshots,(select count(*) from employee_movements) movements`);
  await db.exec(preparation);assert.equal((await scalar(`select to_regnamespace('career_demo_preparation_v1') n`)).n,null,'default dry-run rolls back schema');
@@ -37,5 +38,48 @@ test('private SQL is deterministic, reversible, source-preserving and never clai
  await db.exec(`delete from employee_snapshots where employee_id='fixture-1' and snapshot_date=date '2025-12-31'`);
  await db.exec(commit(preparation));assert.equal((await scalar(`select eligible from career_demo_preparation_v1.career_history where employee_id='fixture-1'`)).eligible,null);
  assert.equal((await scalar(`select count(*)::int n from career_demo_preparation_v1.aggregate_candidates where private_candidate_counts is not null`)).n,0,'one incomplete BU withholds every aggregate candidate');
+ }finally{await db.close()}
+});
+
+test('promotion spell regressions respect later resets and fail closed on contradictory lineage',{skip:!PGlite && 'Set PGLITE_MODULE to run local PostgreSQL verification'},async(t)=>{
+ const db=new PGlite();try{
+ await db.exec(fixtureSql);
+ await db.exec(`
+ insert into employee_movements values
+ ('reentry-5','fixture-5',date '2026-01-15','transfer','l0','l1'),
+ ('reentry-25','fixture-25',date '2026-01-15','transfer','l0','l1'),
+ ('tie-a','fixture-35',date '2026-01-15','transfer','l0','l1'),
+ ('tie-b','fixture-35',date '2026-01-15','transfer','l2','l1'),
+ ('unknown-45','fixture-45',date '2026-01-15','transfer','l1',null),
+ ('unchanged-55','fixture-55',date '2026-01-15','transfer','l1','l1'),
+ ('conflict-65','fixture-65',date '2026-01-15','transfer','l0','l0'),
+ ('same-promotion-day','fixture-85',date '2026-03-15','transfer','l1','l1'),
+ ('reentry-95','fixture-95',date '2026-01-15','transfer','l0','l1'),
+ ('reentry-105','fixture-105',date '2026-01-15','transfer','l0','l1'),
+ ('unchanged-105','fixture-105',date '2026-02-01','transfer','l1','l1');
+ insert into employee_snapshots values
+ ('fixture-15',date '2026-02-28','l0','loc','8'),
+ ('fixture-25',date '2026-02-28','l0','loc','2'),
+ ('fixture-75',date '2026-02-28',null,'loc','4'),
+ ('fixture-95',date '2026-01-14','l0','loc','8');`);
+ await db.exec(commit(preparation));
+ const cases=[
+  [5,'known January re-entry is reused instead of fabricating an older start','2026-01-15','recorded_movement_entry'],
+  [15,'conflicting February snapshot withholds generated duration',null,'unavailable'],
+  [25,'snapshot conflict also invalidates a recorded entry',null,'unavailable'],
+  [35,'ambiguous same-day entries withhold duration',null,'unavailable'],
+  [45,'unknown reset destination withholds duration',null,'unavailable'],
+  [55,'unchanged-level transfer does not reset a valid generated spell','2024-01-31','generated_within_observed_snapshot_bounds_v1'],
+  [65,'unchanged event at a different level contradicts generated spell',null,'unavailable'],
+  [75,'unknown later snapshot level withholds duration',null,'unavailable'],
+  [85,'unresolved promotion-day event ordering withholds duration',null,'unavailable'],
+  [95,'known re-entry after an earlier different-level snapshot is valid','2026-01-15','recorded_movement_entry'],
+  [105,'unchanged transfer preserves the preceding actual re-entry date','2026-01-15','recorded_movement_entry'],
+ ];
+ for(const [id,name,date,provenance] of cases)await t.test(name,async()=>{
+  const row=(await db.query(`select prior_level_started_on::text start,duration_provenance,prior_level_months from career_demo_preparation_v1.career_history where employee_id=$1`,['fixture-'+id])).rows[0];
+  assert.equal(row.start,date);assert.equal(row.duration_provenance,provenance);if(date===null)assert.equal(row.prior_level_months,null);
+ });
+ assert.equal((await db.query(`select count(*)::int n from career_demo_preparation_v1.aggregate_candidates where active or promotion_rate_pct is not null or median_prior_level_months is not null`)).rows[0].n,0);
  }finally{await db.close()}
 });

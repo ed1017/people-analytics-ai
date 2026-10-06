@@ -24,7 +24,8 @@ export function HomeGettingStarted({ busy, onNavigate, onStartDemo, status }: {
         <li><strong>Find a problem</strong> — Ask AI or <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => onNavigate("workforce")}>explore your data</button>.</li>
         <li><strong>Pin your goals</strong> — Save multiple goals and get proposed Action Plans for each.</li>
         <li><strong>Choose a plan</strong> — Tailor it to your needs, adjust assumptions, calculate and attach it to your goal.</li>
-        <li><strong>Track results</strong> — Coming soon.</li>
+        <li><strong>Share (TBD)</strong> — Share your Action Plan with owners and stakeholders.</li>
+        <li><strong>Track (TBD)</strong> — Monitor progress and outcomes.</li>
       </ol>
       <p className="text-xs text-muted-foreground">You can also use this as a traditional dashboard—explore workforce data through the left-hand menu.</p>
       <p className="text-xs text-muted-foreground">Goals and drafts are saved in this browser within the limits in Browser storage details. Explore <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => onNavigate("workforce")}>Workforce</button>, <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => onNavigate("occupational-references")}>Intelligence</button> or <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => onNavigate("planning-overview")}>Planning</button>. Opening a page does not carry evidence or run a model. Source coverage and limitations are in Data details.</p>
