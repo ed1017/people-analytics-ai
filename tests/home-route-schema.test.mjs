@@ -9,6 +9,7 @@ import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
 import {buildHomeReplyFormat} from '../lib/home-chat-reply.ts';
 import {normalizeHomePack} from '../lib/home-pack.mjs';
 import {deliveryAcceptanceWire} from './fixtures/home-exact-acceptance.mjs';
+import {completeComponentLimitation} from './fixtures/home-complete-limitation.mjs';
 import {aiSkillsGoalPrompt} from './fixtures/home-ai-skills-goal.mjs';
 import {HOME_BUNDLE_REQUEST,homeBundleOutputTokens} from '../lib/home-bundle-preparation.ts';
 import {buildHomeBundleFormat} from '../lib/home-solution-bundles.ts';
@@ -80,6 +81,7 @@ test('actual Home POST distinguishes token-limited, incomplete and malformed out
 
 test('actual bundle POST distinguishes incomplete causes and preserves one bounded request',async()=>{
  const goal=aiSkillsGoalPrompt,packet=packets[1][1],wire=deliveryAcceptanceWire(goal);
+ wire.bundles[0].components.c1.limitation=completeComponentLimitation;
  const clipped=structuredClone(wire);clipped.bundles[0].coordination='Coordinate the practice and';
  const cases=[
   [{status:'incomplete',incomplete_details:{reason:'max_output_tokens'},output_text:'SECRET_SENTINEL'},'output_token_limit'],
@@ -101,5 +103,5 @@ test('actual bundle POST distinguishes incomplete causes and preserves one bound
  }
  sandbox.__replies.push({status:'completed',output_text:JSON.stringify(wire)});const before=sandbox.__requests.length;
  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',persona:'HR',message:HOME_BUNDLE_REQUEST,hasFocusedIssue:true,goalContext:{goal},overviewBriefingContext:packet})}));
- assert.equal(response.status,200);assert.equal(sandbox.__requests.length,before+1);const body=await response.json();assert.equal(body.proposal.goal,goal);assert.equal(body.proposal.bundles.length,3);assert.equal(body.responseDiagnostic,undefined);
+ assert.equal(response.status,200);assert.equal(sandbox.__requests.length,before+1);const body=await response.json();assert.equal(body.proposal.goal,goal);assert.equal(body.proposal.bundles.length,3);assert.equal(body.proposal.bundles[0].components[0].limitation,completeComponentLimitation);assert.equal(body.responseDiagnostic,undefined);
 });

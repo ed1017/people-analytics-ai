@@ -1,5 +1,6 @@
 // Exact reported prompt; synthetic malformed discovery and plan fixtures, never live generation.
 import assert from 'node:assert/strict';
+import {completeComponentLimitation} from '../fixtures/home-complete-limitation.mjs';
 import {aiSkillsGoalPrompt} from '../fixtures/home-ai-skills-goal.mjs';
 import {deliveryAcceptanceWire} from '../fixtures/home-exact-acceptance.mjs';
 import {decodeHomeModelReply} from '../../lib/home-chat-reply.ts';
@@ -28,11 +29,12 @@ try{
      for(const [index,bundle] of wire.bundles.entries()){
       bundle.name=['AI practice sessions','AI peer learning','AI workflow pilot'][index];
       bundle.objective='Propose an internal AI skills pilot using reviewed existing capacity.';
+      bundle.components.c1.limitation=completeComponentLimitation;
       bundle.components.c1.name=bundle.name;bundle.components.c1.domain='learning';
       bundle.components.c1.firstStep='Run reviewed AI practice sessions for the pilot group using existing capacity.';
      }
      if(failureKind==='token'){const result=await inspectBundleResponse(async()=>({status:'incomplete',incomplete_details:{reason:'max_output_tokens'},output_text:'PRIVATE partial JSON',usage:{output_tokens:5000,output_tokens_details:{reasoning_tokens:4000}}}),body.goalContext.goal,body.overviewBriefingContext,homeBundleTask(body.goalContext));return route.fulfill({status:502,json:result});}
-     if(failureKind==='clipped')wire.bundles[0].coordination='Combine the practice and';
+     if(failureKind==='clipped')wire.bundles[0].components.c1.limitation='This pilot requires approval and';
      const result=await inspectBundleResponse(async()=>({status:'completed',output_text:JSON.stringify(wire)}),body.goalContext.goal,body.overviewBriefingContext,homeBundleTask(body.goalContext));
      return route.fulfill({status:result.proposal?200:502,json:result});
     }
@@ -64,6 +66,10 @@ try{
   failureKind=null;await button('Retry Action Plans').evaluate(node=>{node.click();node.click();});await page.locator('[data-plan-current="true"]').waitFor();
   check(mode+' one explicit retry recovers and clears stale failure details',posts.length===3&&await panel.getByText('Preparation details',{exact:true}).count()===0&&await button('Retry Action Plans').count()===0);
   const initial=await state(),id=initial.goals.activeId;
+  check(mode+' complete maximum-bound limitation is preserved in the saved proposal',JSON.stringify(initial.workspaces[id].fields.homeBundlePreparationV1).includes(completeComponentLimitation));
+  await panel.getByText('Why these plans',{exact:true}).click();
+  check(mode+' complete limitation is readable without clipping',await panel.getByText(completeComponentLimitation,{exact:true}).isVisible());
+  await panel.getByText('Why these plans',{exact:true}).click();
   check(mode+' explicit Pin prepares once with unchanged complete user context',posts.length===3&&posts[2].goalContext.goal===aiSkillsGoalPrompt&&posts[2].goalContext.notes.map(note=>note.text).join(' ')===aiSkillsGoalPrompt&&initial.goals.goals.find(goal=>goal.id===id).statement===aiSkillsGoalPrompt);
   check(mode+' rejected investigation is never stored and warning clears',!initial.workspaces[id].fields.homeCandidateOptions&&await status.count()===0);
   check(mode+' three synthetic plans render without an automatic attachment',await panel.getByRole('tab').count()===3&&!initial.workspaces[id].fields.homeSolutionBundlesV1);
@@ -89,7 +95,7 @@ try{
   const beforeRetry=(await state()).workspaces[id].fields;
   await button('Prepare Action Plans').click();await button('Retry Action Plans').waitFor();await panel.getByText('Preparation details',{exact:true}).click();
   const afterRetry=(await state()).workspaces[id].fields;
-  check(mode+' completed but clipped output is a distinct local rejection',(await panel.innerText()).includes('Reason: incomplete_text. Response status: completed.')&&(await panel.innerText()).includes('Incomplete field: coordination.')&&posts.length===4);
+  check(mode+' completed but clipped output is a distinct local rejection',(await panel.innerText()).includes('Reason: incomplete_text. Response status: completed.')&&(await panel.innerText()).includes('Incomplete field: component_limitation.')&&posts.length===4);
   check(mode+' failed re-preparation preserves prior proposal drafts calculations and immutable attachment',JSON.stringify(beforeRetry.homeBundlePreparationV1)===JSON.stringify(afterRetry.homeBundlePreparationV1)&&JSON.stringify(beforeRetry.homeSolutionBundlesV1)===JSON.stringify(afterRetry.homeSolutionBundlesV1)&&await panel.getByRole('tab').count()===3&&await button('Attach Action Plan').isDisabled());
   await page.reload();await panel.getByText(/Previous Action Plan proposal/).waitFor();check(mode+' reload does not retry the failed preparation',posts.length===4&&JSON.stringify((await state()).workspaces[id].fields.homeSolutionBundlesV1.attachments[0])===JSON.stringify(snapshot));
   failureKind=null;await button('Prepare Action Plans').click();await page.locator('[data-plan-current="true"]').waitFor();
