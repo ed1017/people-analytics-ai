@@ -1,7 +1,28 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import artifact from '../lib/data/synthetic-domain-demo-v1.json' with {type:'json'};
-import {forecastScale, forecastDateTicks, historySegments, monthIndex} from '../lib/forecast-chart-layout.ts';
+import {forecastScale, forecastDateTicks, historySegments, monthIndex, forecastPointFeedback, forecastTooltipPosition} from '../lib/forecast-chart-layout.ts';
+
+test('point feedback includes the exact supplied number, native unit, date and series',()=>{
+  const february=artifact.domains.turnover.history.find(row=>row.month==='2026-02');
+  assert.deepEqual(forecastPointFeedback('turnover',february.month,february.value),{date:'Feb 2026',value:'80 voluntary exits',series:'Demo history'});
+  const projection=artifact.domains.turnover.rows[0];
+  assert.equal(forecastPointFeedback('turnover',projection.month,projection.values[2],'Linear Regression').value,projection.values[2]+' voluntary exits');
+  assert.equal(forecastPointFeedback('turnover',projection.month,projection.values[2],'Linear Regression').series,'Projection · Linear Regression');
+  assert.equal(forecastPointFeedback('hiring','2026-10',.805).value,'80.5% within 90 days');
+  assert.equal(forecastPointFeedback('satisfaction','2026-12',64.51217292377801).value,'64.51217292377801% favorable-answer share');
+  assert.equal(forecastPointFeedback('turnover','2026-09',null).value,'Unavailable');
+  assert.equal(forecastPointFeedback('turnover','2026-01',0).value,'0 voluntary exits');
+});
+test('compact tooltips remain inside narrow, offset and short viewports at every edge',()=>{
+  for(const viewport of [{left:0,top:0,width:320,height:740},{left:0,top:0,width:390,height:844},{left:20,top:40,width:280,height:300}]){
+    for(const anchor of [{left:-20,right:0,top:0,bottom:10},{left:viewport.width-5,right:viewport.width+5,top:viewport.height-10,bottom:viewport.height+10},{left:100,right:110,top:180,bottom:190}]){
+      const card={width:230,height:90},position=forecastTooltipPosition(anchor,card,viewport);
+      assert(position.left>=viewport.left+8&&position.left+card.width<=viewport.left+viewport.width-8);
+      assert(position.top>=viewport.top+8&&position.top+card.height<=viewport.top+viewport.height-8);
+    }
+  }
+});
 
 for (const [domain, expected] of [['turnover',[40,120]],['hiring',[.76,.86]],['satisfaction',[62,68]]]) {
   test(`${domain}: padded domain contains every displayed source value in native units`, () => {

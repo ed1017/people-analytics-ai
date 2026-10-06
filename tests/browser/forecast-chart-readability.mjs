@@ -23,7 +23,7 @@ const check=(name,yes)=>{assert(yes,name);checks++;console.log('PASS '+name)};
 const screenshotDirectory='/tmp/forecast-chart-readability';await fs.mkdir(screenshotDirectory,{recursive:true});
 try {
  for(const [name,width,height] of [['desktop',1366,900],['mobile',390,844],['small-mobile',320,740],['zoom',683,450]]) for(const palette of ['light','slate-blue']) {
-  const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),errors=[];let requests=0;
+  const context=await browser.newContext({viewport:{width,height},hasTouch:true}),page=await context.newPage(),errors=[];let requests=0;
   page.on('pageerror',error=>errors.push(error.message));
   await page.route('**/*',route=>{if(route.request().url()==='http://fixture.local/')return route.fulfill({contentType:'text/html',body:html});requests++;return route.abort()});
   await page.goto('http://fixture.local/');
@@ -33,7 +33,7 @@ try {
    await page.waitForFunction(title=>{const node=document.querySelector(`figure[aria-label^="${title}"]`);return Math.abs(node.querySelector('svg').viewBox.baseVal.width-node.getBoundingClientRect().width)<2},title);
    const geometry=await figure.evaluate(node=>{
     const svg=node.querySelector('svg[role=img]');
-    return {min:Number(svg.dataset.yMin),max:Number(svg.dataset.yMax),width:svg.viewBox.baseVal.width,ticks:[...node.querySelectorAll('[data-axis=x]')].map(t=>({month:t.dataset.month,text:t.textContent,rect:t.getBoundingClientRect().toJSON()})),history:[...node.querySelectorAll('[data-series=history]')].map(p=>p.getAttribute('d')),points:[...node.querySelectorAll('[data-point=history]')].map(p=>({month:p.dataset.month,x:Number(p.getAttribute('cx')),y:Number(p.getAttribute('cy'))})),forecast:[...node.querySelectorAll('[data-point=forecast]')].map(p=>{const shape=p.children[1],box=shape.getBBox();return {month:p.dataset.month,method:p.dataset.method,label:p.getAttribute('aria-label'),shape:shape.tagName,x:box.x+box.width/2,y:box.y+box.height/2}}),missing:[...node.querySelectorAll('[data-missing]')].map(p=>p.dataset.missing),textSize:parseFloat(getComputedStyle(node.querySelector('[data-axis=y]')).fontSize)*svg.getBoundingClientRect().width/svg.viewBox.baseVal.width};
+    return {min:Number(svg.dataset.yMin),max:Number(svg.dataset.yMax),width:svg.viewBox.baseVal.width,ticks:[...node.querySelectorAll('[data-axis=x]')].map(t=>({month:t.dataset.month,text:t.textContent,rect:t.getBoundingClientRect().toJSON()})),history:[...node.querySelectorAll('[data-series=history]')].map(p=>p.getAttribute('d')),points:[...node.querySelectorAll('[data-point=history]')].map(p=>({month:p.dataset.month,x:Number(p.getAttribute('cx')),y:Number(p.getAttribute('cy'))})),forecast:[...node.querySelectorAll('[data-point=forecast]')].map(p=>{const shape=p.children[0],box=shape.getBBox();return {value:Number(p.dataset.value),month:p.dataset.month,method:p.dataset.method,label:p.getAttribute('aria-label'),shape:shape.tagName,x:box.x+box.width/2,y:box.y+box.height/2}}),missing:[...node.querySelectorAll('[data-missing]')].map(p=>p.dataset.missing),textSize:parseFloat(getComputedStyle(node.querySelector('[data-axis=y]')).fontSize)*svg.getBoundingClientRect().width/svg.viewBox.baseVal.width};
    });
    const prefix=`${name} ${palette} ${domain}`;
    check(prefix+' denser ticks with endpoint and boundary years',geometry.ticks.length>=6&&geometry.ticks[0].text.includes(geometry.ticks[0].month.slice(0,4))&&geometry.ticks.at(-1).text.includes('2026')&&(domain!=='satisfaction'||geometry.ticks.some(t=>t.text.includes('2025'))));
@@ -43,9 +43,24 @@ try {
    const start=domain==='turnover'?'2026-01':history[0].month,index=month=>Number(month.slice(0,4))*12+Number(month.slice(5,7)),span=index(data.rows.at(-1).month)-index(start);
    check(prefix+' original historical values and dates preserved',geometry.points.length===expectedPoints&&geometry.points.every(p=>{const row=history.find(r=>r.month===p.month);return row&&Math.abs(p.x-(58+(index(p.month)-index(start))/span*(geometry.width-78)))<1e-8&&Math.abs(p.y-(186-(row.value-geometry.min)/(geometry.max-geometry.min)*156))<1e-8}));
    check(prefix+' only consecutive native cadence joined',geometry.history.length===expectedSegments&&geometry.history.reduce((n,d)=>n+(d.match(/L/g)||[]).length,0)===expectedPoints-expectedSegments);
-   check(prefix+' all methods and values keep their dates',geometry.forecast.length===data.rows.length*data.methods.length&&geometry.forecast.every(p=>{const row=data.rows.find(r=>r.month===p.month),method=data.methods.indexOf(p.method),value=row?.values[method];return value!==undefined&&Math.abs(p.x-(58+(index(p.month)-index(start))/span*(geometry.width-78)))<.001&&Math.abs(p.y-(186-(value-geometry.min)/(geometry.max-geometry.min)*156))<.001&&p.label.includes((domain==='hiring'?100*value:value).toFixed(1))})&&new Set(geometry.forecast.map(p=>p.shape)).size===3);
+   check(prefix+' all methods and values keep their dates',geometry.forecast.length===data.rows.length*data.methods.length&&geometry.forecast.every(p=>{const row=data.rows.find(r=>r.month===p.month),method=data.methods.indexOf(p.method),value=row?.values[method];return value!==undefined&&Math.abs(p.x-(58+(index(p.month)-index(start))/span*(geometry.width-78)))<.001&&Math.abs(p.y-(186-(value-geometry.min)/(geometry.max-geometry.min)*156))<.001&&p.value===value&&p.label.includes('Projection')})&&new Set(geometry.forecast.map(p=>p.shape)).size===3);
    check(prefix+' projection boundary in all charts',await figure.locator('[data-region=projection]').count()===1&&await figure.getByLabel('Chart legend').count()===1);
    check(prefix+' missing periods remain missing',data.gaps.every(month=>geometry.missing.includes(month)&&!geometry.points.some(p=>p.month===month))&&(domain!=='hiring'||geometry.missing.includes('2025-11'))&&await figure.locator('[data-series=forecast-bridge]').count()===(domain==='turnover'?3:0));
+   const historyPoint=figure.locator(domain==='turnover'?'[data-point=history][data-month="2026-02"]':'[data-point=history]').first();
+   await historyPoint.hover();const tooltip=page.getByRole('tooltip');await tooltip.waitFor();
+   check(prefix+' compact hover reads the exact historical point',(await tooltip.innerText()).includes('Demo history')&&(domain!=='turnover'||(await tooltip.innerText()).replace(/\n+/g,'\n')==='Feb 2026\n80 voluntary exits\nDemo history')&&await tooltip.locator('p').count()===3&&await figure.locator('title').count()===0&&await figure.locator('desc').count()===1);
+   const bounded=()=>tooltip.evaluate(node=>{const b=node.getBoundingClientRect();return b.left>=7&&b.top>=7&&b.right<=innerWidth-7&&b.bottom<=innerHeight-7&&b.width<=231&&b.height<130});
+   check(prefix+' hover tooltip fits viewport',await bounded());
+   if(domain==='turnover')await page.screenshot({path:`${screenshotDirectory}/${name}-${palette}-february-tooltip.png`});
+   await page.keyboard.press('Escape');await tooltip.waitFor({state:'hidden'});await historyPoint.tap();await tooltip.waitFor();
+   check(prefix+' tap opens the same bounded history feedback',(await tooltip.innerText()).includes('Demo history')&&await bounded());
+   const methodPoint=figure.locator(domain==='hiring'?'[data-point=forecast][data-method=logistic-trend]':'[data-point=forecast][data-method^=linear-trend]').last();
+   await methodPoint.focus();await tooltip.waitFor();
+   const method=domain==='hiring'?'Logistic trend':'Linear Regression';
+   check(prefix+' keyboard projection has date value unit and exact method',(await tooltip.innerText()).includes('Dec 2026')&&(await tooltip.innerText()).includes('Projection · '+method)&&await methodPoint.getAttribute('aria-describedby')===await tooltip.getAttribute('id')&&await bounded());
+   check(prefix+' method names agree across table and legend',await figure.getByLabel('Chart legend').getByText(method,{exact:true}).count()===1&&await figure.locator('..').getByRole('rowheader',{name:method,exact:true}).count()===1&&!(await figure.innerText()).includes('Linear trend'));
+   await page.screenshot({path:`${screenshotDirectory}/${name}-${palette}-${domain}-tooltip.png`});
+   await page.keyboard.press('Escape');await tooltip.waitFor({state:'hidden'});
    await figure.locator('[data-point=forecast]').first().focus();check(prefix+' keyboard forecast tooltip',(await figure.getByRole('status').innerText()).includes(data.rows[0].month.endsWith('12')?'Dec 2026':'Oct 2026'));
    await figure.locator('[data-missing]').first().focus();check(prefix+' keyboard missing-value explanation',/unreleased|rate unavailable/.test(await figure.getByRole('status').innerText()));
    await figure.screenshot({path:`${screenshotDirectory}/${name}-${palette}-${domain}.png`});

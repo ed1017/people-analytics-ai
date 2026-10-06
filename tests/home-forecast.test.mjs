@@ -3,6 +3,14 @@ import assert from 'node:assert/strict';
 import {homeForecastAnswer,homeForecastChartDomain} from '../lib/home-forecast.ts';
 import {homeForecastIntent} from '../lib/home-forecast-intent.ts';
 import artifact from '../lib/data/synthetic-domain-demo-v1.json' with {type:'json'};
+import {demoMethodLabels} from '../lib/synthetic-domain-demo.ts';
+test('only the OLS methods display as Linear Regression in forecasts and comparisons',()=>{
+ assert.equal(demoMethodLabels['linear-trend-12'],'Linear Regression');assert.equal(demoMethodLabels['linear-trend-8'],'Linear Regression');
+ assert.equal(demoMethodLabels['logistic-trend'],'Logistic trend');
+ const comparison=homeForecastAnswer('Compare prediction methods');assert.equal((comparison.match(/\*\*Linear Regression\*\*/g)||[]).length,2);assert.match(comparison,/\*\*Logistic trend\*\*/);assert.doesNotMatch(comparison,/Linear trend/);
+ for(const question of ['Forecast turnover','Forecast employee listening'])assert.match(homeForecastAnswer(question),/\| Linear Regression \|/);
+ assert.doesNotMatch(homeForecastAnswer('Forecast hiring'),/Linear Regression/);
+});
 for(const [question,metric] of [['Forecast turnover','monthly voluntary-exit counts'],['Predict talent acquisition','opening-cohort start percentage'],['Forecast employee listening','quarterly mean respondent favorable-answer share']])test(question,()=>{const answer=homeForecastAnswer(question);assert.match(answer,new RegExp(metric));assert.match(answer,/SIMULATED DEMO/);assert.match(answer,/30 Sep 2026/);assert.match(answer,/Confidence intervals.*unavailable/);assert.match(answer,/none is selected as best/);});
 test('generic method comparison covers implemented domains without a clarification',()=>{assert.match(homeForecastAnswer('Compare prediction methods'),/Implemented prediction methods/);const a=homeForecastAnswer('Compare forecasts across all three domains');for(const unit of ['monthly voluntary-exit counts','opening-cohort start percentage','quarterly mean respondent favorable-answer share'])assert.ok(a.includes(unit));assert.match(a,/cannot be ranked or combined/);});
 test('unrelated questions and goal appendices do not activate forecasting',()=>{for(const q of ['Reduce turnover','What skills do we need?','Should we hire, train, or both?','Do not forecast turnover','What happened?\n\nFocused issue: Forecast turnover'])assert.equal(homeForecastIntent(q),null,q);});

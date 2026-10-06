@@ -6,6 +6,20 @@ const monthAt = (index: number) => `${Math.floor(index / 12)}-${String(index % 1
 export const chartPeriod = (month: string) => new Date(month + '-01T00:00:00Z').toLocaleDateString('en-US', {month: 'short', year: 'numeric', timeZone: 'UTC'});
 export const hasChartValue = (value: number | null | undefined): value is number => typeof value === 'number' && Number.isFinite(value);
 
+/** Point feedback reads the supplied value; no rounding, filling or interpolation. */
+export function forecastPointFeedback(domain: Domain, month: string, value: number | null, method?: string) {
+  const date = chartPeriod(month);
+  const displayValue = value === null ? 'Unavailable' : (domain === 'hiring' ? value * 100 : value).toLocaleString('en-US', {maximumSignificantDigits:21}) + (domain === 'turnover' ? ' voluntary exits' : domain === 'hiring' ? '% within 90 days' : '% favorable-answer share');
+  return {date, value:displayValue, series:method ? `Projection · ${method}` : 'Demo history'};
+}
+
+/** Place the compact point card near its anchor without escaping the viewport. */
+export function forecastTooltipPosition(anchor: {left:number;right:number;top:number;bottom:number}, card: {width:number;height:number}, viewport: {left:number;top:number;width:number;height:number}) {
+  const pad=8, left=Math.max(viewport.left+pad,Math.min((anchor.left+anchor.right-card.width)/2,viewport.left+viewport.width-card.width-pad));
+  const above=anchor.top-card.height-pad, preferred=above>=viewport.top+pad?above:anchor.bottom+pad;
+  return {left,top:Math.max(viewport.top+pad,Math.min(preferred,viewport.top+viewport.height-card.height-pad))};
+}
+
 /** Work in display units so both percentage domains have the same safeguards. */
 export function forecastScale(domain: Domain, values: readonly (number | null | undefined)[]) {
   const factor = domain === 'hiring' ? 100 : 1;
