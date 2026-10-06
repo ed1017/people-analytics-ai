@@ -1,0 +1,113 @@
+{
+  "version": "synthetic-tree-benchmarks-v1",
+  "parentCommit": "8269a0a36d6f0cf5b7af1e0497020885398f9461",
+  "trainSeeds": [
+    12501,
+    12530
+  ],
+  "tuningSeeds": [
+    13501,
+    13512
+  ],
+  "testSeeds": [
+    14501,
+    14520
+  ],
+  "scenarios": [
+    "stable",
+    "gradual-drift",
+    "reversal",
+    "missingness",
+    "small-sample",
+    "no-signal",
+    "instrument-break"
+  ],
+  "domains": [
+    "turnover",
+    "hiring",
+    "satisfaction"
+  ],
+  "firstTrainingOrigin": "2021-03",
+  "lastInitialTrainingOrigin": "2023-09",
+  "lastRefitTrainingOrigin": "2024-12",
+  "initialFitCutoff": "2024-06-30T23:59:59.999Z",
+  "tuningOrigins": [
+    "2024-06",
+    "2024-09"
+  ],
+  "selectionAndRefitCutoff": "2025-06-30T23:59:59.999Z",
+  "testOrigins": [
+    "2025-06",
+    "2025-09",
+    "2025-12",
+    "2026-03",
+    "2026-06"
+  ],
+  "testLabelsAsOf": "2027-02-28T23:59:59.999Z",
+  "targets": "Next three calendar months, or the final quarter-end month for satisfaction. No October-December 2026 target labels are evaluated. Hiring labels use complete 90-day follow-up of ALL openings.",
+  "predictors": "Only released, dated historical aggregates at each origin: fixed lag-window summary/calendar/support features; enriched arms additionally receive three lagged domain indicators with release age and missing indicators, historical headcount for counts and historical denominators for hiring/survey. No seed, scenario, future target value, future exposure/openings/respondents or availability metadata from unpublished releases enters features.",
+  "modelArms": [
+    "ridge-lags",
+    "ridge-enriched",
+    "random-forest-lags",
+    "random-forest-enriched",
+    "gradient-boosting-lags",
+    "gradient-boosting-enriched"
+  ],
+  "trainingSizes": {
+    "full": 30,
+    "small": 3
+  },
+  "randomForestGrid": [
+    {
+      "n_estimators": 100,
+      "max_depth": 4,
+      "min_samples_leaf": 20,
+      "max_features": 1.0
+    },
+    {
+      "n_estimators": 100,
+      "max_depth": 8,
+      "min_samples_leaf": 10,
+      "max_features": 1.0
+    }
+  ],
+  "gradientBoostingGrid": [
+    {
+      "n_estimators": 100,
+      "learning_rate": 0.05,
+      "max_depth": 2,
+      "min_samples_leaf": 20,
+      "loss": "squared_error"
+    },
+    {
+      "n_estimators": 150,
+      "learning_rate": 0.05,
+      "max_depth": 3,
+      "min_samples_leaf": 10,
+      "loss": "squared_error"
+    }
+  ],
+  "ridgeGrid": [
+    {
+      "alpha": 1.0
+    },
+    {
+      "alpha": 100.0
+    }
+  ],
+  "randomState": 1729,
+  "minimumTrainingRows": 30,
+  "selection": "Independent tuning seeds select the minimum mean history-quarter MAE per domain/arm, ties by grid order. All preprocessors fit only on training seeds and training labels released by fit cutoff. Final refit uses training seeds only through December 2024 origins and labels released by June 2025; no tuning/test seeds enter fit. Frozen chosen parameters also apply to the first-three-training-seeds stress arm. All models then remain frozen across test origins.",
+  "baselines": "Existing recent/seasonal/trend count, pooled/recent/logistic hiring and last/recent/trend survey formulas; exact JS baseline implementation parity checked. All arms use identical current support guards and identical paired scoring cases. Ridge and trees have the same pooled training rows/features in each feature tier. Baseline local-only information and cross-history learned-model information are reported separately.",
+  "eligibility": "Require 24 consecutive complete released count months, 36 consecutive complete mature hiring cohorts with at least24 positive-opening cohorts, or8 consecutive complete comparable survey waves. Never shift anchor backward past a visible partial/missing label. Gaps, immature labels, zero denominators and instrument changes remain explicit. Missing added predictors may be train-only imputed, not missing outcomes.",
+  "evaluation": "Paired per-history-origin MAE, RMSE; hiring opening-weighted percentage-point MAE, aggregate binomial Brier/log loss. Summarize domain/scenario/origin, worst strata, availability and per-seed paired deltas. Bootstrap intervals only for paired mean error differences by independent test-seed clusters across scenarios/origins, not forecast uncertainty; 1000 resamples fixed seed1729. No significance or real-world efficacy claim.",
+  "recommendation": "Choose one simple comparator per domain/tier on tuning: minimum-MAE current baseline or matching-tier Ridge. A full-size tree is only a candidate for separate review if test aggregate MAE improves by at least5%, no scored scenario-origin mean worsens by over10%, and prediction/scoring availability is not reduced. All others reject replacement. Even passing is synthetic-only, never automatic adoption. Small-training arm is diagnostic. No tuning after opening test results.",
+  "publishedInterval": null,
+  "operationallyQualified": false,
+  "realWorldPerformanceValidated": false,
+  "construction": "Fresh generator data.py uses three-month-lagged autocorrelated indicators to generate nonlinear aggregate outcomes. No-signal disables all indicator coefficients while retaining predictor marginals; reversal changes outcome relationship July2026 without an advance predictor flag. Small history startsJan2023. No original source history is backfilled.",
+  "fitWeights": "All hiring learned arms use the same historical target all-opening counts as sample weights, never as future predictors. Other domains use equal target-row weights. Entire quarters require all scoring labels released and complete before training inclusion; zero-opening target rows have zero training/scoring weight.",
+  "freezeBoundary": "Every training label and preprocessing observation must be available by its fit cutoff. The final model information boundary is June30,2025 end-of-day, shared with the first test feature cutoff; this is an offline as-of simulation, not a historical deployment claim.",
+  "relativeDegradationFloor": 1e-08
+}
