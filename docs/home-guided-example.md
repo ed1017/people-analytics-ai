@@ -32,3 +32,11 @@ Browser checks intercept source and chat requests with synthetic fixtures. They 
 Home shows a visible, indeterminate **Loading data…** status while its existing source requests are pending. Once settled, unavailable or partial sources replace the spinner with actual available-source counts and **Refresh data**, using the existing refresh path. The shared page status uses the selected page’s existing loading flag. AI answer and Action Plan preparation have separate labels. This presentation does not change timeouts, request concurrency or source validation.
 
 `tests/browser/home-loading-status.mjs` exercises delayed success, partial data, failure, actual source timeout, refresh, local demo editing without evidence, separate answer preparation and navigation cancellation on desktop and mobile.
+
+## Submission visibility and demo budgets
+
+Submitting a question collapses the intro, hides unused starters and reveals the pending response once after layout settles. Home disables browser scroll anchoring for that workspace so a growing answer cannot keep the lower Pinned Goals rail in view. The reveal preserves keyboard focus, uses an immediate movement for reduced motion, and is cancelled by subsequent user navigation. Response completion does not trigger another scroll. Assumptions-only suggestions wait until the request finishes, avoiding a transient block above the answer.
+
+New first-run example plans explicitly mark their listed component costs complete within the fictional pilot scope. This keeps the card and attached snapshot on the same assumed cash total ($3,000 for Manager check-ins; $5,000 for Build AI skills). Real-world costs and funding remain unverified; existing stored snapshots are not rewritten.
+
+`tests/browser/home-response-scroll.mjs` measures actual outer/inner scroll position and reading-area geometry at desktop, 390px and compact reflow sizes, including focus/draft preservation and no later automatic jump.

@@ -24,6 +24,9 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  await select('Reduce turnover');await panel.getByRole('heading',{name:'Manager check-ins',exact:true}).waitFor();
  check(mode+' demo selection is local and preserves filters',posts.length===0&&await page.getByLabel('Country',{exact:true}).inputValue()==='CA'&&await panel.getByText('Demo example',{exact:true}).isVisible());
  const first=(await state()).workspaces['demo-reduce-turnover'].fields.homeSolutionBundlesV1.attachments[0];
+ await panel.getByText('Attached Action Plans and version history (1)',{exact:true}).click();
+ check(mode+' demo card and saved history agree on assumed cash',first.result.cashTotal===3000&&await panel.getByText(/Assumed cash \$3,000 USD/).count()>0&&await panel.getByText(/Snapshot cash: \$3,000 USD/).isVisible());
+ await panel.getByText('Attached Action Plans and version history (1)',{exact:true}).click();
  await chat.fill('set participants to 14');await button('Send overview question').click();await button('Apply changes').waitFor();await button('Apply changes').click();await button('Attach Action Plan').click();await page.getByRole('status').filter({hasText:/Action Plan attached/}).waitFor();
  let data=await state(),versions=data.workspaces['demo-reduce-turnover'].fields.homeSolutionBundlesV1.attachments;
  check(mode+' chat edit and one-click attach keep history without requests',posts.length===0&&versions.length===2&&versions[1].draft.inputs.groups[0].count.value===14&&JSON.stringify(versions[0])===JSON.stringify(first));

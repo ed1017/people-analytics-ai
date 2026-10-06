@@ -19,6 +19,7 @@ export function createHomeDemoGoals(now=new Date().toISOString()):Pick<DecisionD
   input.groups=[{id:'demo-group',label:'Fictional pilot participants',count:assumed(example.participants)}];
   input.memberships=[{componentId:'c1',groupIds:['demo-group'],complete:assumed(true)}];
   input.groupsDisjoint=assumed(true);input.dependenciesConfirmed=assumed(true);input.costsDistinct=assumed(true);
+  input.costReviews=[{componentId:'c1',complete:{value:true,kind:'illustrative',basis:'Fictional demo assumes the listed pilot allowance covers this component; real costs and funding remain unverified.'}}];
   input.expenses=[{id:'demo-budget',label:'Pilot allowance',kind:'cash',amount:assumed(example.budget),startMonth:assumed(start.slice(0,7)),months:assumed(1)}];
   input.expenseLinks=[{expenseId:'demo-budget',componentIds:['c1'],allocations:null}];
   input.deliveryEstimate={hoursPerParticipant:assumed(4),coordinationHours:assumed(8),hourlyRate:assumed(60),acceptance:assumed(example.acceptance)};
