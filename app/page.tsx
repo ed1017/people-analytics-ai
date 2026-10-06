@@ -138,6 +138,7 @@ export default function Home() {
   const [aiCollapsed, setAiCollapsed] = useState(false);
   const [aiWidth, setAiWidth] = useState(500);
 
+  const [workforcePerformance, setWorkforcePerformance] = useState<unknown>(null);
   const [overviewData, setOverviewData] =
     useState<OverviewData | null>(null);
   const [headcountTrend, setHeadcountTrend] =
@@ -367,6 +368,7 @@ export default function Home() {
     async function loadDashboard() {
       try {
         setDashboardLoading(true);
+        setWorkforcePerformance(null);
         setDashboardError(null);
 
         const params = new URLSearchParams();
@@ -408,6 +410,7 @@ export default function Home() {
         const data = payload as DashboardResponse;
 
         setOverviewData(data.overview);
+        setWorkforcePerformance(data.performance_rating ?? null);
         setHeadcountTrend(data.trend ?? []);
         setFilterOptions(
           data.filter_options ?? EMPTY_FILTER_OPTIONS
@@ -1995,6 +1998,10 @@ export default function Home() {
         ) : activePage ===
           "career-growth-mobility" ? (
           <CareerGrowthMobilityPage
+            performance={overviewData?.snapshot_date === "2026-09-30" ? workforcePerformance : null}
+            workforceHeadcount={overviewData?.headcount ?? null}
+            performanceFilters={{ country: selectedCountry, org: selectedOrg, level: selectedLevel }}
+            performanceLoading={dashboardLoading}
             data={careerGrowthMobilityData}
             loading={careerGrowthMobilityLoading}
             error={careerGrowthMobilityError}
@@ -2067,14 +2074,14 @@ export default function Home() {
           goalViewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,activePage,selectedPersona,selectedBusinessContext,conversation.resetEpoch])}
           hasGoal={Boolean(conversation.focusedIssue)}
           goalStatement={conversation.focusedIssue}
-          goalTakeaway={!conversation.wasReset&&<GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:JSON.stringify(selectedBusinessContext)}} payload={goalSummaryPayload} active={true} ready={summaryEvidenceReady} paused={chatLoading||Boolean(chatInput.trim())||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} unavailable={activePage==="compensation"?"Public US wage references and reported workforce-cost context are available on this page. Internal salary analysis and a goal-specific AI briefing are unavailable.":undefined} onNavigate={setActivePage}/>}
+          goalTakeaway={!conversation.wasReset&&<GoalTakeaway goalId={conversation.activeGoalId} displayedGoal={conversation.focusedIssue} goalContext={{...conversation.goalContext,currentScope:JSON.stringify(selectedBusinessContext)}} payload={goalSummaryPayload} active={true} ready={summaryEvidenceReady} paused={chatLoading||Boolean(chatInput.trim())||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} unavailable={activePage==="compensation"?"Public US wage references and reported workforce-cost context are available on this page. Internal salary analysis and a goal-specific AI briefing are unavailable.":undefined} onNavigate={setActivePage}/>}
           readOnlyReason={readOnlyReason}
           aiCollapsed={aiCollapsed}
           aiExpanded={aiExpanded}
           aiWidth={aiWidth}
           previewPage={previewPage}
           suggestedPrompts={activePage==="workforce"||activePage==="skills" ? [...suggestedPrompts.slice(0,2),"Export current data (CSV)"] : suggestedPrompts}
-          scopeNote={activePage === "compensation" ? "Demo job ranges use catalog business-unit and level filters; country is an assumed policy location, not verified workforce membership. Pay coverage and compa-ratios remain unavailable. Public wage benchmarks and company cost aggregates retain separate unfiltered scopes." : readOnlyReason ?? (isIntelligencePage(activePage) ? `${intelligenceEvidence(activePage, catalogueContext).scope}. Workforce filters do not narrow this evidence. AI uses only this page; no external lookup.` : activePage === "workforce" ? "Selected filters narrow the workforce snapshot only; company composition stays unfiltered." : activePage==="development-planning" ? "Selected quotes and user-entered assumptions; modeled costs, not approved budgets or measured outcomes. Missing costs stay unknown." : planningWorkspaceActive ? "Filters describe workforce context. Planning scenarios and carried evidence keep their own scope, dates and assumptions." : "This page uses company-wide evidence. The shared workforce filters do not narrow these measures.")}
+          scopeNote={activePage === "compensation" ? "Demo job ranges use catalog business-unit and level filters; country is an assumed policy location, not verified workforce membership. Pay coverage and compa-ratios remain unavailable. Public wage benchmarks and company cost aggregates retain separate unfiltered scopes." : readOnlyReason ?? (isIntelligencePage(activePage) ? `${intelligenceEvidence(activePage, catalogueContext).scope}. Workforce filters do not narrow this evidence. AI uses only this page; no external lookup.` : activePage === "workforce" ? "Selected filters narrow the workforce snapshot only; company composition stays unfiltered." : activePage === "career-growth-mobility" ? "This conversation uses company-wide recorded movement events. Performance ratings are not included in the conversation evidence." : activePage==="development-planning" ? "Selected quotes and user-entered assumptions; modeled costs, not approved budgets or measured outcomes. Missing costs stay unknown." : planningWorkspaceActive ? "Filters describe workforce context. Planning scenarios and carried evidence keep their own scope, dates and assumptions." : "This page uses company-wide evidence. The shared workforce filters do not narrow these measures.")}
           chatMessages={chatMessages}
           chatInput={chatInput}
           chatLoading={chatLoading}

@@ -4,8 +4,8 @@ import {buildHomeFindingSchema,readHomeFindingFollowups} from './home-finding-fo
 import {inspectHomeCandidateProposal,readHomeClarification,type CandidatePack} from "./home-candidate-options.ts";
 // @ts-expect-error Native Node tests share the TypeScript source.
 import {buildInvestigationCandidateSchema,availableInvestigationMetrics,investigationCatalogInstructions} from "./home-investigation-contract.ts";
-export function buildHomeReplyFormat(pack?:CandidatePack){
- const available=availableInvestigationMetrics(pack),eligible=available.length>0;
+export function buildHomeReplyFormat(pack?:CandidatePack,prepareGoal=true){
+ const available=prepareGoal?availableInvestigationMetrics(pack):[],eligible=available.length>0;
  return {
   type: "json_schema" as const,
   name: "home_reply",
@@ -15,7 +15,7 @@ export function buildHomeReplyFormat(pack?:CandidatePack){
     properties: {
       answer: { type: "string" },
       finding_followups: buildHomeFindingSchema(pack),
-      next_step: { type: "string", enum: ["none", "choose_goal"] },
+      next_step: { type: "string", enum: prepareGoal?["none", "choose_goal"]:["none"] },
       problem: eligible?{type:['string','null'],minLength:1,maxLength:240,description:'Qualitative investigation only. Do not copy quantified user targets, budgets or dates here; retain those in the conversation.'}:{type:'null'},
       problem_evidence:{type:'array',maxItems:eligible?3:0,items:eligible?{type:'string',enum:available}:{type:'null'}},
       options:{type:'array',maxItems:eligible?3:0,items:buildInvestigationCandidateSchema(available)},
@@ -36,11 +36,13 @@ export class HomeReplyError extends Error {
  readonly reason:'invalid_json'|'invalid_reply';
  constructor(reason:'invalid_json'|'invalid_reply'){super(`Home answer unavailable. Preparation diagnostic: ${reason}.`);this.name='HomeReplyError';this.reason=reason;}
 }
-export function decodeHomeModelReply(text: string, hasFocusedIssue: boolean, pack?:CandidatePack) {
+export function decodeHomeModelReply(text: string, hasFocusedIssue: boolean, pack?:CandidatePack,prepareGoal=true) {
   let value:unknown;
   try{value=JSON.parse(text)}catch{throw new HomeReplyError('invalid_json')}
   if (!value || typeof value !== "object" || !("answer" in value) || typeof value.answer !== "string" || !value.answer.trim() || !("next_step" in value) || !["none", "choose_goal"].includes(String(value.next_step))) throw new HomeReplyError('invalid_reply');
   const fields=value as unknown as Record<string,unknown>;
+  // Enforce conversational routing even if a model returns unsolicited preparation.
+  if(!prepareGoal){fields.problem=null;fields.problem_evidence=[];fields.options=[];fields.question=null;value.next_step='none';}
   const {proposal:candidateProposal,diagnostic:candidateDiagnostic}=inspectHomeCandidateProposal({version:2,problem:fields.problem,problem_evidence:fields.problem_evidence,options:fields.options,question:fields.question},pack);
   return { clarification:readHomeClarification(fields.question), findingFollowups:readHomeFindingFollowups(fields.finding_followups,value.answer,pack), candidateProposal, candidateDiagnostic, answer: value.answer, nextStep: !candidateProposal && !hasFocusedIssue && value.next_step === "choose_goal" ? "choose_goal" : "none" };
 }

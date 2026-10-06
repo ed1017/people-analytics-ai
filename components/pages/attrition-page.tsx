@@ -1,5 +1,6 @@
 "use client";
 
+import {memo, useMemo} from "react";
 import {SyntheticDomainDemo} from "@/components/synthetic-domain-demo";
 
 import {
@@ -30,9 +31,11 @@ function monthLabel(value: string) {
     year: "2-digit",
   });
 }
-export function AttritionPage({ data, loading, error, exitData, exitLoading, exitError }: Props) {
+// Draft edits update the application shell. Keep unchanged chart inputs out of
+// that render path: Recharts registers data and axes through store subscriptions.
+export const AttritionPage = memo(function AttritionPage({ data, loading, error, exitData, exitLoading, exitError }: Props) {
   const summary = data?.summary;
-  const trend2026 = (data?.trend ?? []).filter((row) => row.month >= "2026-01-01");
+  const trend2026 = useMemo(() => (data?.trend ?? []).filter((row) => row.month >= "2026-01-01"), [data?.trend]);
 
   return (
     <section className="evidence-workspace min-w-0 p-6">
@@ -187,4 +190,4 @@ export function AttritionPage({ data, loading, error, exitData, exitLoading, exi
       <SyntheticExitCountExample />
     </section>
   );
-}
+});

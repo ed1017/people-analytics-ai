@@ -7,7 +7,7 @@ const record=(raw:unknown):Record<string,unknown>=>raw!==null&&typeof raw==='obj
 const count=(raw:unknown):number|null=>Number.isSafeInteger(raw)&&Number(raw)>=0?Number(raw):null;
 const statuses=['completed','incomplete','failed','cancelled','queued','in_progress'] as const;
 const incompleteReasons=['max_output_tokens','max_messages','content_filter','steered'] as const;
-export function inspectHomeChatResponse(raw:unknown,hasFocusedIssue:boolean,pack:CandidatePack|undefined,outputTokenLimit:number){
+export function inspectHomeChatResponse(raw:unknown,hasFocusedIssue:boolean,pack:CandidatePack|undefined,outputTokenLimit:number,prepareGoal=true){
  const response=record(raw),usage=record(response.usage),status=statuses.find(value=>value===response.status)??'unknown';
  const incomplete=record(response.incomplete_details).reason,incompleteReason=incomplete==null?null:incompleteReasons.find(value=>value===incomplete)??'other';
  const text=typeof response.output_text==='string'?response.output_text:'',outputBytes=new TextEncoder().encode(text).length;
@@ -19,6 +19,6 @@ export function inspectHomeChatResponse(raw:unknown,hasFocusedIssue:boolean,pack
  if(refusal)return rejected('refusal');
  if(!text.trim())return rejected('empty_output');
  if(outputBytes>48000)return rejected('output_too_large');
- try{return {ok:true as const,body:{...decodeHomeModelReply(text,hasFocusedIssue,pack),homeReplyDiagnostic:diagnostic('ready')}}}
+ try{return {ok:true as const,body:{...decodeHomeModelReply(text,hasFocusedIssue,pack,prepareGoal),homeReplyDiagnostic:diagnostic('ready')}}}
  catch(error){return rejected(error instanceof HomeReplyError?error.reason:'invalid_reply')}
 }
