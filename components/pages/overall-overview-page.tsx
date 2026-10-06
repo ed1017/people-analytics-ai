@@ -1,4 +1,5 @@
 "use client";
+import {homeForecastIntent} from '@/lib/home-forecast-intent';
 import {assumptionsGoalFromStatements,assumptionsOnlyBundle,unavailableSourceLabels} from '@/lib/home-assumptions-fallback';
 import {homePlanningNoteParts,resolveHomeUserGoal} from '@/lib/home-planning-intent';
 import {HomePinnedGoals} from "@/components/home-pinned-goals";
@@ -203,6 +204,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false, responseIntent:'default'|'explanation'='default') {
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
+    const forecastQuestion = !actionPlan && Boolean(homeForecastIntent(message));
+    if(forecastQuestion)responseIntent = 'explanation';
     if(!active||sending.current||currentEvidenceKey.current!==contextKey)return;
     const editIntent=bundleChatEditIntent(message),localEdit=editIntent.edit;
     if(!actionPlan&&!preserveDraft&&localEdit&&(selectedPlanForChat.current?.goalId===conversation.activeGoalId||editIntent.planReference)){
@@ -223,7 +226,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     if (/^(?:please\s+|can you\s+)?(?:export|download)\b/i.test(message)) {
       setMessages(current=>[...current,{role:"user",content:message},{role:"assistant",content:"CSV downloads are currently available on Workforce and Skills Intelligence. Open one of those pages and choose Export current data (CSV), then Send. Home exports, other modules and employee-name rosters are not available yet; no file was downloaded."}]);if(!preserveDraft)setInput("");return;
     }
-    if (!actionPlan && !scopeConfirmed) {
+    if (!actionPlan && !scopeConfirmed && !forecastQuestion) {
       const requested=requestedHomeCountries(message,countryOptions,selectedCountry);
       if(requested.kind!=="none") { if(preserveDraft){setCandidateNotice("This clarification requests different country evidence. Your drafts are kept. Change the workforce country filter before updating options.");return false;} setInput(message);setScopeChoice({message,query:workforceQuery,identity:scopeIdentity,...requested});return; }
     }
@@ -235,7 +238,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     const key = contextKey;
     const history = getProblemChatHistory(modelHistoryRef.current, key);
     recordDecisionEvidence(conversation.activeGoalId,"home",pack);
-    const goalContext=actionPlan||retainGoalContext?conversation.goalContext:conversation.recordGoalStatement(message,"home",workforceScope);
+    const goalContext=actionPlan||retainGoalContext||forecastQuestion?conversation.goalContext:conversation.recordGoalStatement(message,"home",workforceScope);
     setMessages(current => [...current, { role: "user", content: actionPlan ? HOME_ACTION_PLAN_LABEL : message }]);
     if(!preserveDraft)setInput(""); setChatLoading(true); setChatError(null);
     if (!actionPlan) setQuestionUnanswered(true);
@@ -250,8 +253,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       // Preserve chronological repetitions (including a restated goal after withdrawal).
       const userStatements=[...(clarificationStatements.length>priorStatements.length?clarificationStatements:priorStatements),message].slice(-6);
       setClarification(reply.clarification?{context:key,question:reply.clarification,statements:userStatements}:null);
-      const intent=resolveHomeUserGoal(userStatements),userGoal=conversation.focusedIssue?null:intent.status==='explicit_outcome'?intent.goal:null;
-      const reviewRequired=!conversation.focusedIssue&&intent.status==='needs_review';
+      const intent=resolveHomeUserGoal(userStatements),userGoal=conversation.focusedIssue||forecastQuestion?null:intent.status==='explicit_outcome'?intent.goal:null;
+      const reviewRequired=!forecastQuestion&&!conversation.focusedIssue&&intent.status==='needs_review';
       const proposal=reply.clarification||reviewRequired||!conversation.focusedIssue&&intent.reason==='withdrawn'?null:reply.proposal;
       if(userGoal||(proposal||reviewRequired)&&!reply.clarification){
         const captured={proposal,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack),context:key,authoredContext:authoredGoalKey,epoch:candidateEpoch,originGoalId:conversation.activeGoalId,rationale:assistantMessage,userGoal,userStatements:userStatements.slice(intent.contextStart),reviewRequired};

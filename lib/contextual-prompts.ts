@@ -53,7 +53,7 @@ export function contextualPrompts(context:PromptContext):string[] {
   const missing=focused?'What evidence is missing for my goal, and what should I verify first?':'What evidence is available, missing or outside this page’s scope?';
   if(!evidenceReady)return [missing];
   const forecast=/\b(forecast|predict|prediction|predictive)\b/i.test(goal);
-  const boundary='What historical evidence can inform my goal, and why is a validated forecast unavailable?';
+  const boundary=page==='home'?'Compare prediction methods':'What historical evidence can inform my goal, and why is a validated forecast unavailable?';
   if(page==='home'||page==='overview'){
     if(!sources.some(source=>source.status==='loaded'&&hasKnownNumericEvidence(source.facts)))return [missing];
     if(page==='home'&&!focused)return [...homeGoalStarters];
