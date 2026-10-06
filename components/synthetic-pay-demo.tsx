@@ -7,7 +7,7 @@ const percent=(value:number)=>value.toFixed(1)+'%';
 const selectClass='mt-1 min-h-11 w-full min-w-0 rounded-md border bg-background px-2 text-sm';
 export function SyntheticPayDemoPanel({evidence=artifact}:{evidence?:unknown}){
  const view=resolveSyntheticPayDemo(evidence);
- return <section aria-label="Synthetic pay demo" className="min-w-0 space-y-3 rounded-lg border bg-muted/10 p-4 sm:p-5">
+ return <section aria-label="Synthetic pay demo" className="@container min-w-0 space-y-3 rounded-lg border bg-muted/10 p-4 sm:p-5">
   <div className="flex flex-wrap items-center gap-2"><h2 className="text-lg font-semibold">Synthetic pay comparison</h2><span className="rounded-full border px-2 py-1 text-xs font-semibold">DEMO ONLY</span></div>
   <p className="text-xs text-muted-foreground">Separate simulated workforce · Dashboard filters excluded.</p>
   {view.status==='ready'?<PayResults data={view.data}/>:<p role="status">{view.message}</p>}
@@ -18,8 +18,8 @@ function PayResults({data}:{data:SyntheticPayDemo}){
  const cohort=selectSyntheticPayCohort(data,job,level,location),metrics=cohort?.status==='published'?cohort.metrics:null,coverage=cohort?.coverage;
  return <>
   <p className="text-xs">Annual base pay at 1.0 FTE · USD · 30 Sep 2026</p>
-  <div className="grid min-w-0 gap-2 sm:grid-cols-3">
-   <label className="min-w-0 text-xs font-medium">Demo job<select aria-label="Demo job" className={selectClass} value={job} onChange={event=>setJob(event.target.value)}>{data.jobs.map(item=><option key={item.code} value={item.code}>{item.label}</option>)}</select></label>
+  <div className="grid min-w-0 grid-cols-2 gap-2 @min-[32rem]:grid-cols-[minmax(16rem,2fr)_minmax(5rem,1fr)_minmax(7rem,1fr)]">
+   <label className="col-span-2 min-w-0 text-xs font-medium @min-[32rem]:col-span-1">Demo job<select aria-label="Demo job" className={selectClass} value={job} onChange={event=>setJob(event.target.value)}>{data.jobs.map(item=><option key={item.code} value={item.code}>{item.label}</option>)}</select></label>
    <label className="min-w-0 text-xs font-medium">Demo level<select aria-label="Demo level" className={selectClass} value={level} onChange={event=>setLevel(event.target.value)}>{data.levels.map(item=><option key={item.code} value={item.code}>{item.label}</option>)}</select></label>
    <label className="min-w-0 text-xs font-medium">Demo location<select aria-label="Demo location" className={selectClass} value={location} onChange={event=>setLocation(event.target.value)}>{data.locations.map(item=><option key={item.code} value={item.code}>{item.label}</option>)}</select></label>
   </div>

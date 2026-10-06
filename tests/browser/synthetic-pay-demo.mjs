@@ -6,7 +6,7 @@ import {scopeDashboard} from '../fixtures/home-scope-evidence.mjs';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright'),base=process.env.HOME_BASE_URL??'http://127.0.0.1:3231';
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});let checks=0;
 const check=(name,value)=>{assert.ok(value,name);checks++;console.log('PASS '+name)},usd=value=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(value),directory='/tmp/synthetic-pay-demo-screenshots';await fs.mkdir(directory,{recursive:true});
-try{for(const [mode,width,height] of [['desktop',1440,900],['mobile',390,844],['zoom',720,450]])for(const palette of ['light','slate-blue']){
+try{for(const [mode,width,height] of [['desktop',1440,900],['compact',1165,747],['mobile',390,844],['zoom',720,450]])for(const palette of ['light','slate-blue']){
  const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),errors=[],requests=[];let external=0,posts=0;
  page.setDefaultTimeout(15000);page.on('pageerror',e=>errors.push(e.message));await page.addInitScript(p=>localStorage.setItem('people-analytics-workspace-palette-v1',p),palette);
  await page.route('**/*',route=>{const req=route.request(),url=new URL(req.url());if(url.origin!==base){external++;return route.abort()}if(url.pathname.startsWith('/api/')){requests.push(url.pathname);if(req.method()!=='GET'){posts++;return route.abort()}if(url.pathname==='/api/compensation')return route.fulfill({status:503,json:{error:'Synthetic cost source unavailable'}});return route.fulfill({json:url.pathname==='/api/dashboard'?scopeDashboard(url.search):{overview:{headcount:100,fte:100,snapshot_date:'2026-09-30'}}})}return route.continue()});
@@ -17,6 +17,10 @@ try{for(const [mode,width,height] of [['desktop',1440,900],['mobile',390,844],['
  const beforeRequests=requests.length;
  for(const cohort of artifact.cohorts){
   await panel.getByLabel('Demo job',{exact:true}).selectOption(cohort.job);await panel.getByLabel('Demo level',{exact:true}).selectOption(cohort.level);await panel.getByLabel('Demo location',{exact:true}).selectOption(cohort.location);
+  if(cohort.level==='L2'&&cohort.location==='austin'){
+   check(mode+palette+cohort.job+' full selected role fits',await panel.getByLabel('Demo job',{exact:true}).evaluate(node=>{const style=getComputedStyle(node),context=document.createElement('canvas').getContext('2d');context.font=style.font;const available=node.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight)-24;return context.measureText(node.selectedOptions[0].text).width<=available;}));
+   if(mode==='compact')await panel.screenshot({path:`${directory}/${mode}-${palette}-${cohort.job}.png`});
+  }
   if(cohort.status==='suppressed'){check(mode+palette+cohort.id+' full suppression',await panel.locator('dl').count()===0&&await panel.getByRole('figure').count()===0&&(await panel.innerText()).includes('counts withheld')&&!(await panel.innerText()).includes('eligible synthetic records'));continue;}
   const values=await panel.locator('dl > div > dd:first-of-type').allTextContents(),m=cohort.metrics;
   check(mode+palette+cohort.id+' exact qualified aggregate statistics',JSON.stringify(values)===JSON.stringify([m.compaRatioPct.toFixed(1)+'%',usd(m.mean),usd(m.median),usd(m.sd)])&&(await panel.innerText()).includes(`Middle 50%: ${usd(m.q1)}–${usd(m.q3)}`)&&(await panel.innerText()).includes(`${cohort.coverage.eligible} eligible synthetic records`));
