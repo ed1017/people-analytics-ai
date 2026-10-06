@@ -113,9 +113,11 @@ def generate_history(seed: int, scenario: str) -> dict:
                 # Publish only the complement: rare exit counts are not a released subgroup.
                 details = dict(promotedWithin90=promoted, nonPromotedBy90=eligible-promoted,
                                knownOutcomeThrough=_iso(first+timedelta(days=90)), eligibleKnownAt=_iso(first+timedelta(days=3)))
-                initial = _record(period, first, first+timedelta(days=3), "suppressed" if suppressed else "partial", None, None if suppressed else eligible, domain)
+                # Opening release cannot depend on any eventual outcome or its suppression.
+                opening_suppressed = eligible < 20
+                initial = _record(period, first, first+timedelta(days=3), "suppressed" if opening_suppressed else "partial", None, None if opening_suppressed else eligible, domain)
                 initial.update({key: None for key in details})
-                if not suppressed:
+                if not opening_suppressed:
                     initial["eligibleKnownAt"] = details["eligibleKnownAt"]
                 releases.append(initial)
                 status = "suppressed" if suppressed else "missing" if stress and index % 9 == 2 else "complete"
@@ -143,7 +145,7 @@ def generate_history(seed: int, scenario: str) -> dict:
     return dict(seed=seed, scenario=scenario, dataClass="constructed-synthetic", operationallyQualified=False,
                 domains=domains, constructionAssumptions={"version":"performance-promotion-v1", "timeline":["2023-01" if start else "2018-01","2026-09"],
                 "ratingTarget":"fraction ordinal ratings4/5; no mean rating", "promotionTarget":"90-day first-promotion cohort fraction; exits remain denominator",
-                "independence":"Independent of existing turnover/hiring/survey simulator; not evidence that performance predicts those outcomes",
+                "independence":"Separate RNG streams and no direct response-law link to existing turnover/hiring/survey panels; shared scenario and calendar structure can induce association, not evidence of real workforce predictive value",
                 "driver":"hypothetical shared AR1(.90) state drives same-month auxiliary outcomes; historical persistence, not a demonstrated causal lead; state never exposed as a feature",
                 "smallCells":"withhold all outcome details if denominator<20 or any relevant positive category count<5",
                 "delayedAuxiliary":"delayed-predictors adds60days only to auxiliary-feed publication, leaving native outcome release intact"})

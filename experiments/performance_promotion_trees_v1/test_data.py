@@ -1,7 +1,9 @@
 """Boundary tests use only development seed17, never intended study seeds."""
 import copy
 import unittest
+from unittest.mock import patch
 
+from . import data
 from .data import AUXILIARY_NAMES, DOMAINS, SCENARIOS, aux_features, generate_history, labels_for, make_case, valid_record
 from experiments.synthetic_tree_v1.features import stamp
 
@@ -130,6 +132,25 @@ class DataBoundaryTests(unittest.TestCase):
         for name in AUXILIARY_NAMES:
             self.assertIsNone(features[name])
             self.assertEqual(features[name+"_missing"],1)
+
+    def test_opening_publication_never_depends_on_future_outcome_suppression(self):
+        normal=generate_history(17,"stable")
+        original_rng=data._rng
+        class TinyOutcome:
+            def binomial(self,n,p): return 3
+        def forced_rng(seed,stream):
+            return TinyOutcome() if stream=="promotion:outcomes" else original_rng(seed,stream)
+        with patch.object(data,"_rng",side_effect=forced_rng):
+            changed=generate_history(17,"stable")
+        def openings(history):
+            return [row for row in history["domains"]["promotion"]["observations"] if row["revision"]==1]
+        self.assertEqual(openings(normal),openings(changed))
+        for row in changed["domains"]["promotion"]["observations"]:
+            self.assertEqual(row["status"],"partial" if row["revision"]==1 else "suppressed")
+            if row["revision"]==1:
+                self.assertGreaterEqual(row["denominator"],20)
+            else:
+                self.assertIsNone(row["denominator"])
 
     def test_instrument_change_is_unscorable_and_auxiliary_unavailable(self):
         history = generate_history(17,"instrument-break")
