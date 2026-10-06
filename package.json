@@ -14,7 +14,7 @@
     "test:a11y": "node --test tests/pre-demo-accessibility.test.mjs",
     "test:planning-nav": "node --test tests/planning-destinations.test.mjs",
     "test:talent-response": "node --test tests/talent-response-evidence.test.mjs",
-    "prebuild": "node tests/manual/generate-group-turnover-consumer.mjs --check && node tests/manual/generate-synthetic-domain-demo.mjs --check && node tests/manual/generate-synthetic-pay-demo.mjs --check"
+    "prebuild": "node tests/manual/generate-group-turnover-consumer.mjs --check && node tests/manual/generate-synthetic-domain-demo.mjs --check && node tests/manual/generate-synthetic-pay-demo.mjs --check && node tests/manual/generate-synthetic-career-demo.mjs --check"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
