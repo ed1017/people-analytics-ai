@@ -25,7 +25,7 @@ export type DashboardFilterOptions = {
 };
 
 export type DashboardResponse = {
-  // Optional future aggregate; current RPC does not release performance ratings.
+  // Validated aggregate-only release; inactive/error/unsupported scopes remain null.
   performance_rating?: unknown;
   overview: OverviewData;
   trend: HeadcountTrendPoint[];

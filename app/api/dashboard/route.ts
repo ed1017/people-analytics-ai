@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
 
+import { loadPerformanceRelease, parsePerformanceFilters } from "../../../lib/workforce-performance";
+
 export const dynamic = "force-dynamic";
 
 function normalizeFilter(value: string | null) {
@@ -38,7 +40,12 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  return NextResponse.json(data, {
+  const filters = parsePerformanceFilters(request.nextUrl.searchParams);
+  const performance_rating = data?.overview?.snapshot_date === "2026-09-30"
+    ? await loadPerformanceRelease((name, args) => supabaseServer.rpc(name, args), filters, data?.overview?.headcount ?? null)
+    : null;
+
+  return NextResponse.json({ ...data, performance_rating }, {
     headers: {
       "Cache-Control": "no-store",
     },
