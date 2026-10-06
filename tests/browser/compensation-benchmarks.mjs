@@ -9,7 +9,7 @@ import {benchmarkAreas,benchmarkOccupations,compensationBenchmark,formatOewsEsti
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const output=process.env.COMPENSATION_QA_OUTPUT??await fs.mkdtemp(path.join(os.tmpdir(),'compensation-benchmarks-ui-'));
 await fs.mkdir(output,{recursive:true});
-const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/compensation.tsx'),output:{path:output,filename:'fixture.js'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/compensation.tsx'),output:{path:output,filename:'fixture.js'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd(),react:path.resolve('node_modules/react')}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
 const bundle=await fs.readFile(path.join(output,'fixture.js'),'utf8');
 const cssFiles=await fs.readdir('.next/static',{recursive:true});
@@ -30,7 +30,7 @@ try{
     });
     await page.goto('http://compensation.test/');await page.addStyleTag({content:css});await page.addScriptTag({content:bundle});
     const panel=page.getByRole('region',{name:'US occupation wage benchmarks'});
-    await page.getByRole('alert').waitFor();
+    await page.getByRole('alert').waitFor().catch(error=>{throw new Error(error.message+'\nFixture diagnostics: '+JSON.stringify({errors,requests}));});
     check(width+' no occupation guessed from internal data or goal',await panel.getByLabel('Reference occupation').inputValue()===''&&await panel.getByRole('table').count()===0);
     check(width+' available reference independent of internal failure',await panel.isVisible()&&await page.getByText('Compensation cost context is unavailable. Try again.').isVisible());
     check(width+' only three official occupation choices',await panel.getByLabel('Reference occupation').locator('option').count()===4);
