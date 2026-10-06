@@ -1,0 +1,6 @@
+{
+  "commit": "aae522062b5964b29257a55c413ffd97ffee6680",
+  "trainingReportSha256": "ea16b950f6ab45c6a486261254832037b5b6b91dac0a68d87149026e973d3eb4",
+  "trainingArtifactSha256": "e644b65576d1a3f2be89c98daa6de5d80e2c4f318aead89927c1cbce0a0328d5",
+  "custody": "Training and calibration committed before first test generation. Named Git commit contents and ancestry independently checked before test stage. No independent external blinding."
+}
