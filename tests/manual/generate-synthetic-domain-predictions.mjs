@@ -14,7 +14,7 @@ const base=JSON.parse(await readFile(new URL('lib/ml/synthetic-workforce/protoco
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const domains={turnover:[forecastTurnover,scoreTurnover],hiring:[forecastHiring,scoreHiring],satisfaction:[forecastSatisfaction,scoreSatisfaction]};
 const implementationPaths=['lib/ml/synthetic-workforce/protocol.json',...['common','pipeline','hiring','turnover','satisfaction'].map(n=>`lib/ml/synthetic-workforce/${n}.mjs`),
-  'lib/ml/hiring-cohort-model.mjs',...['boundary','turnover','hiring','satisfaction'].map(n=>`lib/ml/synthetic-domain-predictions/${n}.mjs`),
+  'lib/ml/hiring-cohort-model.mjs','lib/ml/hiring-domain-adapter.mjs','lib/ml/predictive-readiness.ts',...['boundary','turnover','hiring','satisfaction'].map(n=>`lib/ml/synthetic-domain-predictions/${n}.mjs`),
   'lib/ml/synthetic-domain-predictions/protocol.json','tests/manual/generate-synthetic-domain-predictions.mjs'];
 function evaluate(result,origin,months) {
   return Object.entries(domains).map(([domain,[forecast,score]])=>{
@@ -22,7 +22,8 @@ function evaluate(result,origin,months) {
     const snapshot=replaySynthetic(domain,releases,origin);
     const targets=domain==='satisfaction'?[months.at(-1)]:months;
     const prediction=forecast(snapshot,targets);
-    // Labels are supplied only to the scorer, never to any model. Reserve quarter excluded.
+    // Target periods/cohorts in the reserve quarter are excluded. A Q3 hiring cohort's
+    // required 90-day follow-up can overlap Q4 calendar dates; see protocol clarifications.
     const labelSnapshot=replaySynthetic(domain,releases.filter(row=>row.effectiveAt<=monthEnd(months.at(-1))),protocol.scoringCutoff);
     const scoring=prediction.status==='predicted'?score(labelSnapshot,prediction.predictions):{status:'blocked',reasons:['forecast-abstained'],methods:{}};
     return {domain,origin,months:targets,inputSha256:digest(snapshot),prediction,scoring};
@@ -62,7 +63,12 @@ export async function runDomainPredictions(mode,{onProgress=()=>{}}={}) {
   }
   const evidence=gzipSync(Buffer.from(canonical({rows,fingerprints})+'\n'),{level:9});
   const implementationFiles=Object.fromEntries(await Promise.all(implementationPaths.map(async path=>[path,sha(await readFile(new URL(path,root)))])));
-  const report={version:protocol.version,protocol,protocolFrozenCommit:'113971a',implementationFiles,
+  const report={version:protocol.version,protocol,protocolFrozenCommit:'113971aef92d391ab25ce1ead7af373c234e02fc',implementationFiles,
+    protocolClarifications:[
+      'The frozen reserve wording refers to target periods/cohorts: no October–December turnover counts, opening cohorts or survey waves are scored. July–September hiring cohorts require 90-day follow-up that overlaps October–December calendar dates. Reserve calendar events are therefore not wholly untouched.',
+      'Stationary denotes a stable generating mechanism, not stationary turnover counts: changing stock and seasonality create count signal. Stationary hiring fractions and survey scores have no expected trend. Earlier paired-prefix turnover controls separately test a shock with no pre-origin signal.',
+      'An existing hiring optimizer failed during training before test evaluation. Commit 279c9e4d4125550bc6656336cea269dde76037f9 converts only its known numerical failures to case abstention; optimizer settings and candidates were not changed.'
+    ],
     dataClass:'constructed-synthetic',observationBasis:'simulated',operationallyQualified:false,realWorldPerformanceValidated:false,
     custody:'Protocol committed before generation; no independent blinding. Fixed methods are fitted only to each origin history; no fitting or method selection across assessment outcomes.',
     historyCases:fingerprints.length,evaluationRows:rows.length,summaries:summaries(rows),demo,
