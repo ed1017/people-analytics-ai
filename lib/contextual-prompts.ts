@@ -34,11 +34,12 @@ const pageExamples:Record<string,string> = {
 const planningPages = new Set(['planning-overview','scenario-modeling','position-workforce-design','workforce-response','execution-feasibility','workforce-planning']);
 const readOnlyPages = new Set(['compensation','decision-brief','assess-evaluate']);
 export const homeGoalStarters = [
-  'Reduce employee turnover',
-  'Build AI skills without adding headcount',
-  'Compare hiring, training, and internal moves',
-  'Plan within a fixed workforce budget',
-  'Which skills do we need, and where are the gaps?',
+  'Find issues worth tackling',
+  'Reduce turnover',
+  'What skills do we need?',
+  'Should we hire, train, or both?',
+  'Forecast turnover',
+  'Compare prediction methods',
 ] as const;
 export function hasKnownNumericEvidence(value:unknown):boolean {
   if(typeof value==='number')return Number.isFinite(value);

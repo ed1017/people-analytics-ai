@@ -5,7 +5,7 @@ const source=(id,facts={count:0},status='loaded')=>({id,facts,status});
 const base={page:'home',goal:'Improve retention',hasConversation:false,evidenceReady:true,sources:[source('A1'),source('T1')]};
 test('Home starters remain simple while skills follow-ups are contextual and permit combined methods',()=>{
  assert.deepEqual(contextualPrompts({...base,goal:''}),[...homeGoalStarters]);
- assert.equal(homeGoalStarters.length,5);
+ assert.deepEqual(homeGoalStarters,['Find issues worth tackling','Reduce turnover','What skills do we need?','Should we hire, train, or both?','Forecast turnover','Compare prediction methods']);
  assert.match(contextualPrompts({...base,goal:'Build AI skills without adding headcount'})[1],/mix of training, internal moves and hiring/);
  for(const context of [base,{...base,goal:''},{...base,goal:'Build skills',sources:[source('A1')]},{...base,page:'overview',goal:'Build skills'}])assert.doesNotMatch(contextualPrompts(context).join(' '),/mix of training/);
  assert.equal(contextualPrompts({...base,goal:'',sources:[]}).length,1);
