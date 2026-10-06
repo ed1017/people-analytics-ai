@@ -9,7 +9,19 @@ import {previewBundleChatEdit,acceptBundleChatEdit} from '../lib/home-bundle-cha
 import {bundleProposalFixture} from './fixtures/home-bundles.mjs';import {actionBinding} from '../lib/home-action-drafts.ts';
 const binding=await actionBinding('test','Investigate skills and career pathways',{sources:[{id:'W1',status:'loaded',facts:{headcount:20}}]},{});
 const base=()=>{const bundle=bundleProposalFixture(binding.goal).bundles[0];bundle.components=bundle.components.slice(0,2).map((c,i)=>({...c,name:i?'Career pathways':'Skills assessment',domain:i?'mobility':'learning',firstStep:i?'Audit career pathways':'Assess skill gaps',dependsOn:[]}));return createBundleDraft(bundle,binding)};
-test('reset boundaries are scoped, repeatable and do not alter archived messages',()=>{const history=['a','b','c'];let marks=resetConversationMarks({},'home',2);assert.equal(conversationBoundary(marks,'home',3),2);assert.equal(conversationBoundary(marks,'workforce',3),0);marks=resetConversationMarks(marks,'workforce',3);marks=resetConversationMarks(marks,'home',3);assert.deepEqual(history,['a','b','c']);assert.equal(conversationBoundary(marks,'home',3),3);for(const value of [-1,4,'2',NaN])assert.equal(conversationBoundary({home:value},'home',3),0)});
+test('reset boundaries follow the conversation across topics without altering its archive',()=>{
+ const history=['a','b','c'];let marks=resetConversationMarks({},'home',2);
+ assert.equal(conversationBoundary(marks,'home',3),2);assert.equal(conversationBoundary(marks,'workforce',3),2);
+ marks=resetConversationMarks(marks,'workforce',3);marks=resetConversationMarks(marks,'home',3);
+ assert.deepEqual(history,['a','b','c']);assert.equal(conversationBoundary(marks,'home',3),3);assert.equal(conversationBoundary(marks,'attrition',3),3);
+ assert.deepEqual(history.slice(conversationBoundary(marks,'attrition',3)),[]);
+ assert.deepEqual([...history,'fresh'].slice(conversationBoundary(marks,'attrition',4)),['fresh']);
+});
+test('legacy reset boundaries remain readable and malformed boundaries cannot hide new messages',()=>{
+ assert.equal(conversationBoundary({home:2},'home',3),2);assert.equal(conversationBoundary({home:2},'workforce',3),0);
+ for(const key of ['home','*'])for(const value of [-1,4,'2',NaN])assert.equal(conversationBoundary({[key]:value},'home',3),0);
+ assert.equal(conversationBoundary({'*':2,home:3},'home',3),3);
+});
 test('hire/train question becomes a proposed decision goal without turning informational questions into goals',()=>{for(const q of ['Should we hire, train, or both?','Could we recruit or upskill?','Help us decide between hiring and training'])assert.equal(workforceChoiceDiscoveryGoal(q),'Choose a hiring, training, or combined approach for our workforce needs');for(const q of ['What is training?','How does hiring compare with training?','Do not hire or train','Should we hire?'])assert.equal(workforceChoiceDiscoveryGoal(q),null)});
 test('another issue requires changed focus and supporting evidence',()=>{const old={problem:'Investigate retention and exit patterns',problem_evidence:['A1.voluntary_exits']};assert.equal(isDifferentHomeIssue(old,{problem:'Review retention and exit patterns',problem_evidence:['A1.voluntary_exits']}),false);assert.equal(isDifferentHomeIssue(old,{problem:'Investigate hiring pipeline bottlenecks',problem_evidence:['R1.open_requisitions']}),true)});
 test('analysis plan has concrete deliverables, reconciled staffing and costs, preserved in calculation',()=>{const draft=prepareIllustrativePilot(base(),'2026-10-06T00:00:00Z',{includeDeliveryEstimate:true}),e=planDeliveryEstimate(draft);assert.equal(e.participants,10);assert.equal(e.hours,36);assert.equal(e.employeeTime,2160);assert.equal(e.cash,3000);assert.equal(e.finish,'2026-11-14');assert.deepEqual(e.deliverables,['10 skills assessments and one evidence-ranked skill-gap list','one documented pathway audit']);assert.deepEqual(reconcileBundle(draft).deliveryEstimate,e);assert.equal(draft.inputs.scope.startMonth.value,'2026-11');assert.equal(draft.inputs.scope.months.value,3);assert.equal(draft.inputs.capacity,null);assert.equal(draft.inputs.whatIf,undefined)});

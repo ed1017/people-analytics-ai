@@ -132,8 +132,6 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const [findingTurn,setFindingTurn]=useState<FindingTurn|null>(null);
   const liveFindingTurn=useRef<FindingTurn|null>(null);
   function resetHomeConversation(){
-    promptEpoch.current++;queuedSuggestion.current=null;sending.current=null;recentSuggestions.current.clear();liveFindingTurn.current=null;pendingScopeRef.current=null;
-    setCandidate(null);setCandidateNotice('');setClarification(null);setPreparationUnavailable(null);setFindingTurn(null);setScopeChoice(null);setPendingScope(null);setSuggestionPending(false);setLocalAction(null);setPlanningReview(null);setPlanEdit(null);setEditPreview(null);setEditNotice('');
     conversation.resetConversation();requestAnimationFrame(()=>composer.current?.focus());
   }
   function changeQuestion(value:string){setLocalAction(null);setInput(value)}
@@ -159,6 +157,14 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const [pendingScope,setPendingScope] = useState<PendingScope|null>(null);
   const pendingScopeRef = useRef<PendingScope|null>(null);
   const visibleScopeChoice = scopeChoice?.identity===scopeIdentity && scopeChoice.query===workforceQuery && scopeChoice.message===input.trim() ? scopeChoice : null;
+  const clearResetState=useEffectEvent(()=>{
+    promptEpoch.current++;queuedSuggestion.current=null;sending.current=null;recentSuggestions.current.clear();liveFindingTurn.current=null;pendingScopeRef.current=null;
+    setCandidate(null);setCandidateNotice('');setClarification(null);setPreparationUnavailable(null);setFindingTurn(null);setScopeChoice(null);setPendingScope(null);setSuggestionPending(false);setLocalAction(null);setPlanningReview(null);setPlanEdit(null);setEditPreview(null);setEditNotice('');setActionPin(null);setPlanOpen(null);selectedPlanForChat.current=null;
+  });
+  // Home stays mounted during topic navigation; either Reset entry point must
+  // discard its queued prompts, goal suggestions and unfinished chat edits.
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- Synchronize retained Home state with an explicit conversation reset from any page.
+  useLayoutEffect(()=>{clearResetState();},[conversation.resetEpoch]);
   function applyCountry(option:CountryOption) {
     if (!visibleScopeChoice || pendingScopeRef.current) return;
     conversation.cancelPending();
