@@ -7,6 +7,8 @@ import {validActionBinding,type ActionBinding} from './home-action-drafts.ts';
 import type {SolutionBundle} from './home-solution-bundles';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {whatIfKind} from './home-plan-what-if.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {validDemoBundle} from './home-demo-catalog.ts';
 export const assumptionsFallbackField='homeAssumptionsFallbackV1';
 export const assumptionsOrigin='local-assumptions-v1' as const;
 /** Keep mixed/replacement scope out even if a long request has a shorter display goal. */
@@ -21,8 +23,8 @@ export function assumptionsOnlyBundle(goal:string):SolutionBundle|null{
  const capacity=kind==='capacity';
  return {origin:assumptionsOrigin,id:'A',name:capacity?'Assumptions-only capacity review':'Assumptions-only retention pilot',objective:capacity?'Review additional role capacity and compare staffing paths using explicitly reviewed planning assumptions.':'Select and review one retention intervention before running a bounded pilot and measuring the agreed turnover target.',coordination:capacity?'Review the role need, then compare build, move and hire assumptions before any staffing decision.':'Choose the intervention and pilot scope together, then review the same turnover measure and period.',components:[{id:'c1',name:capacity?'Review additional capacity':'Review and run a retention pilot',domain:capacity?'hiring':'execution',firstStep:capacity?'Confirm the additional role and business-unit need, then review build, move and hire inputs before calculating options.':'Agree one retention intervention and a bounded pilot scope, then review feasibility and measurement before running it.',evidence:[],ownerRole:capacity?'Workforce planning lead':'HR programme lead',dependsOn:[],limitation:'Local starting proposal only; relevance, feasibility, funding and effectiveness are unproven.'}],limitation:'Assumptions-only local template, not evidence-based advice. Missing sources remain unavailable. No execution or causal effect is established.'};
 }
-/** Local origin grants empty references only to this exact immutable template. */
-export function validAssumptionsOnlyBundle(bundle:SolutionBundle,goal:string){const expected=assumptionsOnlyBundle(goal);return !!expected&&JSON.stringify(bundle)===JSON.stringify(expected);}
+/** Empty references belong only to exact immutable local templates, including the two fictional first-run examples. */
+export function validAssumptionsOnlyBundle(bundle:SolutionBundle,goal:string){const expected=assumptionsOnlyBundle(goal);return !!expected&&JSON.stringify(bundle)===JSON.stringify(expected)||validDemoBundle(bundle,goal);}
 export function unavailableSourceLabels(pack:unknown):string[]{
  if(!pack||typeof pack!=='object'||!('sources' in pack)||!Array.isArray(pack.sources))return [];
  return pack.sources.filter(source=>source&&typeof source==='object'&&['timeout','unavailable','invalid'].includes(source.status)).map(source=>String(source.label??source.id)).slice(0,18);

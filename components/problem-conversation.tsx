@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import {conversationBoundary,resetConversationMarks} from "@/lib/conversation-reset";
+import {createHomeDemoGoals} from "@/lib/home-demo-goals";
 import { rememberProblemQuestion, ProblemRequestGate } from "@/lib/problem-session";
 import type { HomeDecisionContext } from "@/lib/home-decision-journey";
 import type { ScopedChatHistory } from "@/lib/chat-context-history";
@@ -60,7 +61,7 @@ export function useProblemConversation(scope = "home") {
   const history = useRef<ScopedChatHistory>({ key: "", messages: [] });
   useEffect(() => {
     // Restore browser-owned state after hydration; never write defaults over unread storage.
-    const saved=decisionStore.initialize({getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),removeItem:key=>localStorage.removeItem(key)}).goals;
+    const saved=decisionStore.initialize({getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),removeItem:key=>localStorage.removeItem(key)},createHomeDemoGoals).goals;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- One-time hydration from browser storage, with SSR-safe initial state.
     goalsRef.current=saved;setLocalGoals(saved);setFocusedIssue(saved.goals.find(g=>g.id===saved.activeId)?.statement??"");
     const chat=decisionStore.getField<GoalChat|null>(saved.activeId,"chat",null);

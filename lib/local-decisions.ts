@@ -53,10 +53,13 @@ export class DecisionStore {
  subscribe=(listener:()=>void)=>{this.listeners.add(listener);return()=>{this.listeners.delete(listener)}};
  private emit(){for(const fn of this.listeners)fn()}
  private fail(error:unknown){this.state={...this.state,saved:false,notice:(error instanceof Error?error.message:"Browser storage unavailable.")+" Changes are not saved; the previous saved copy remains intact."};this.emit()}
- initialize(port:StoragePort){
+ initialize(port:StoragePort,firstRun?:()=>Pick<DecisionData,'goals'|'workspaces'>){
   if(this.state.ready)return this.state.data;
   this.port=port;
-  try{this.expected=port.getItem(DECISIONS_STORAGE_KEY);const data=this.expected===null?{...empty(),goals:parseLocalGoals(port.getItem(GOALS_STORAGE_KEY))}:parseDecisions(this.expected);this.state={ready:true,data,notice:null,saved:this.expected!==null};if(this.expected===null)this.save(data);else this.emit();try{this.cleanLegacy()}catch(error){this.fail(error)}}
+  try{this.expected=port.getItem(DECISIONS_STORAGE_KEY);let data:DecisionData;
+   if(this.expected===null){const legacy=port.getItem(GOALS_STORAGE_KEY);data={...empty(),...(legacy===null&&firstRun?firstRun():{goals:parseLocalGoals(legacy)})};}
+   else data=parseDecisions(this.expected);
+   this.state={ready:true,data,notice:null,saved:this.expected!==null};if(this.expected===null)this.save(data);else this.emit();try{this.cleanLegacy()}catch(error){this.fail(error)}}
   catch(error){this.blocked=true;this.state={...this.state,ready:true};this.fail(error)}
   return this.state.data;
  }
