@@ -1,0 +1,24 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+const {PGlite}=await import(process.env.PGLITE_MODULE ?? '@electric-sql/pglite');
+const db=new PGlite();let checks=0;
+const check=(name,ok)=>{assert(ok,name);checks++;console.log('PASS '+name)};
+const up=await readFile('database/workforce_performance_rating.proposed.sql','utf8'),down=await readFile('database/workforce_performance_rating.rollback.proposed.sql','utf8'),aggregate=await readFile('database/workforce_performance_aggregate.proposed.sql','utf8');
+await db.exec(`create role anon;create role authenticated;create role service_role;create table employee_snapshots(employee_id integer,snapshot_date date,location_id integer,org_unit_id integer,job_level_id integer,primary key(employee_id,snapshot_date));alter table employee_snapshots enable row level security;grant select on employee_snapshots to service_role;create table locations(location_id integer,country_code text);create table org_units(org_unit_id integer,org_code text);create table job_levels(job_level_id integer,level_code text);insert into locations values(1,'US'),(2,'GB');insert into org_units values(1,'ENG'),(2,'OPS');insert into job_levels values(1,'L2'),(2,'L3');insert into employee_snapshots select n,'2026-09-30',1,1,1 from generate_series(1,70)n;insert into employee_snapshots values(71,'2026-09-30',2,2,2);`);
+const access=async()=>JSON.stringify((await db.query("select rolname,has_table_privilege(rolname,'employee_snapshots','SELECT') s from pg_roles where rolname in ('anon','authenticated','service_role') order by rolname")).rows);
+const before=await access();await db.exec(up);
+check('field migration preserves population and nullable unknowns',(await db.query('select count(*) n from employee_snapshots where performance_rating_status is null and performance_rating is null')).rows[0].n===71);
+check('unchanged role access and RLS',await access()===before&&(await db.query("select relrowsecurity from pg_class where oid='employee_snapshots'::regclass")).rows[0].relrowsecurity);
+for(const statement of ["performance_rating=0", "performance_rating_status='rated'", "performance_rating_status='not_rated',performance_rating=3", "performance_rating_status='invented'"]){await assert.rejects(db.exec(`update employee_snapshots set ${statement} where employee_id=1`));checks++;}
+await db.exec("update employee_snapshots set performance_rating_status=case when employee_id<=50 then 'rated' else 'not_rated' end,performance_rating=case when employee_id<=50 then (employee_id-1)/10+1 else null end,performance_review_date='2026-09-30',performance_review_period='2026 YTD',performance_available_at='2026-09-30 12:00Z' where employee_id<=60;");
+const query=async(filters)=> (await db.query(aggregate,filters)).rows[0].performance_rating;
+let result=await query(['US','ENG','L2']);check('same scalar country/org/level population and exact categories',JSON.stringify(result.counts)===JSON.stringify({ratings:[10,10,10,10,10],notRated:10,population:70,unavailable:10}));
+check('small selected population withholds every count',(await query(['GB',null,null])).counts===null&&(await query(['GB',null,null])).status==='suppressed');
+check('intersection matching excludes other workforce',(await query(['GB','ENG','L2'])).status==='unavailable');
+await db.exec("update employee_snapshots set performance_available_at='2026-10-01' where employee_id<=10");result=await query(['US','ENG','L2']);check('late releases remain unavailable rather than September observations',result.counts.ratings[0]===0&&result.counts.unavailable===20);
+await db.exec("update employee_snapshots set performance_review_period='2025 Annual' where employee_id between 11 and 20");result=await query(['US','ENG','L2']);check('different review periods never carry forward implicitly',result.counts.ratings[1]===0&&result.counts.unavailable===30);
+await assert.rejects(db.exec("update employee_snapshots set performance_review_date='2026-10-01' where employee_id=21"));checks++;
+await assert.rejects(db.exec(down),/preserve populated/);await db.exec('rollback;');check('rollback refuses data loss',(await db.query('select performance_rating from employee_snapshots where employee_id=21')).rows[0].performance_rating===3);
+await db.exec('update employee_snapshots set performance_rating=null,performance_review_date=null,performance_review_period=null,performance_available_at=null,performance_rating_status=null');await db.exec(down);
+check('empty-field rollback preserves original rows and access',(await db.query('select count(*) n from employee_snapshots')).rows[0].n===71&&await access()===before);
+await db.close();console.log(JSON.stringify({checks,engine:'local PGlite PostgreSQL; no remote writes'}));

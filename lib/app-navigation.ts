@@ -94,7 +94,7 @@ export const appPageMetadata: Record<
     label: "Career Growth & Internal Mobility",
     section: "Workforce",
     description:
-      "Recorded movement events and level transitions, plus a separate synthetic performance and promotion demo with explicit eligible cohorts.",
+      "Recorded movement events and performance ratings for the selected workforce, when available.",
   },
   "succession-planning": {
     label: "Succession Planning",

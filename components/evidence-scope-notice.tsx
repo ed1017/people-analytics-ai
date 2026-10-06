@@ -10,6 +10,7 @@ type EvidenceScopeNoticeProps = {
   scope: TalentEvidenceScope;
   selectedContext: SelectedBusinessContext;
   note?: string;
+  filterScopeLabel?: string;
 };
 
 function formatDate(value: string | null) {
@@ -28,6 +29,7 @@ export function EvidenceScopeNotice({
   scope,
   selectedContext,
   note,
+  filterScopeLabel = "the evidence shown on this page",
 }: EvidenceScopeNoticeProps) {
   const selectedNarrow =
     hasNarrowBusinessSelection(
@@ -64,8 +66,8 @@ export function EvidenceScopeNotice({
 
       <p className="mt-1 text-muted-foreground">
         {selectedNarrow
-          ? "These dashboard selections do not narrow the evidence shown on this page."
-          : "Country, business-unit, and level dashboard filters do not narrow the evidence shown on this page."}
+          ? `These dashboard selections do not narrow ${filterScopeLabel}.`
+          : `Country, business-unit, and level dashboard filters do not narrow ${filterScopeLabel}.`}
         {note ? " " + note : ""}
       </p>
     </div>
