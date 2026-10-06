@@ -14,8 +14,8 @@ export function planDeliveryEstimate(draft:BundleDraft){
  const hours=participants!==null&&e.hoursPerParticipant.value!==null&&e.coordinationHours.value!==null?participants*e.hoursPerParticipant.value+e.coordinationHours.value:null;
  const cost=(kind:'cash'|'employee_time')=>{const rows=input.expenses.filter(row=>row.kind===kind);return rows.every(row=>row.amount.value!==null&&row.months.value!==null)?rows.reduce((n,row)=>n+row.amount.value!*row.months.value!,0):null;};
  const hasEnteredTime=input.expenses.some(row=>row.kind==='employee_time');
- const employeeTime=hasEnteredTime?cost('employee_time'):hours!==null&&e.hourlyRate.value!==null?Math.round(hours*e.hourlyRate.value*100)/100:null;
- const cash=cost('cash'),finish=input.timing.map(row=>row.finish.value).every(Boolean)?input.timing.map(row=>row.finish.value!).sort().at(-1)??null:null;
+ const employeeTime=hasEnteredTime?(input.costsDistinct.value===false?null:cost('employee_time')):hours!==null&&e.hourlyRate.value!==null?Math.round(hours*e.hourlyRate.value*100)/100:null;
+ const cash=input.costsDistinct.value===false||input.capacity?null:cost('cash'),finish=input.timing.map(row=>row.finish.value).every(Boolean)?input.timing.map(row=>row.finish.value!).sort().at(-1)??null:null;
  const deliverables=draft.bundle.components.map(component=>{
   const text=component.name+' '+component.firstStep;
   if(!/^(?:propose(?: to)?\s+)?(?:review|investigate|analy[zs]e|assess|compare|examine|audit|diagnose|summari[sz]e|triangulate|identify|define)\b/i.test(component.firstStep.trim()))return `one completed work package: ${component.name}`;
