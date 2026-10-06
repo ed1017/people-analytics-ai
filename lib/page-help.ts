@@ -20,7 +20,7 @@ export const pageHelp: Record<AppPage, string> = {
   skills: "I connected recorded skill requirements, job profiles and learning coverage to help you explore capability gaps. Stored O*NET mappings add context, not a verified live O*NET feed; choose an observation and add your goal if you want to carry evidence into Planning.",
   "learning-development": "I connected learning pathways with recorded skill gaps and job-profile requirements. Coverage shows where learning is mapped, not proof that someone completed training or gained proficiency.",
   "career-mobility": "I brought recorded career interests and destination preferences together to show what people have expressed. These aggregates describe preferences, not readiness assessments or recommendations about individual employees.",
-  "career-growth-mobility": "I grouped recorded promotions, lateral moves and transfers so you can explore internal movement over time. Some origin-position details are missing, so I keep the view to supported aggregate counts and transitions.",
+  "career-growth-mobility": "Explore recorded promotions, lateral moves and transfers, plus a separate synthetic performance and promotion demo. The demo defines its own eligibility, rating coverage and prior-level duration; it does not change recorded-source counts or the AI briefing context.",
   "succession-planning": "I brought recorded succession coverage and source-assessment readiness signals into one view. These company-wide aggregates reflect the source records, not my assessment of individual employees or a decision about who should succeed someone.",
   "planning-overview": planning,
   "workforce-planning": planning,

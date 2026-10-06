@@ -94,7 +94,7 @@ export const appPageMetadata: Record<
     label: "Career Growth & Internal Mobility",
     section: "Workforce",
     description:
-      "Recorded promotions, lateral moves, transfers, monthly movement events, and supported job-level transitions.",
+      "Recorded movement events and level transitions, plus a separate synthetic performance and promotion demo with explicit eligible cohorts.",
   },
   "succession-planning": {
     label: "Succession Planning",
