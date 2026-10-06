@@ -74,11 +74,8 @@ try{
   const changed=(await state()).workspaces[id].fields.homeSolutionBundlesV1;
   check(mode+' explicit Apply changes only the selected plan and makes no model request',changed.drafts.length===1&&changed.drafts[0].bundle.id==='A'&&changed.drafts[0].inputs.expenses.find(item=>item.id==='pilot-learning').amount.value===2500&&posts.length===2);
   await button('Attach Action Plan').click();
-  const flow=page.getByRole('region',{name:'Review Action Plan attachment'});
-  check(mode+' attachment requires explicit calculation and review',await button('Continue to attachment').isDisabled());
-  await button('Review calculation').click();await flow.getByLabel(/I reviewed this Action Plan for/).check();
-  const unknown=flow.getByLabel(/I acknowledge the unresolved/);if(await unknown.count())await unknown.check();
-  await button('Continue to attachment').click();await button('Confirm attachment').click();await flow.waitFor({state:'hidden'});
+  await page.getByRole('status').filter({hasText:/Action Plan attached\./}).waitFor();
+  check(mode+' one-click attachment has no routine confirmation or manual editor',await button('Continue to attachment').count()===0&&await button('Review calculation').count()===0&&await page.getByRole('region',{name:'Action Plan editor'}).count()===0);
   const snapshot=(await state()).workspaces[id].fields.homeSolutionBundlesV1.attachments[0];
   check(mode+' reviewed attachment retains exact goal and explicitly applied edit',snapshot.draft.binding.goal===aiSkillsGoalPrompt&&snapshot.draft.inputs.expenses.find(item=>item.id==='pilot-learning').amount.value===2500&&snapshot.draft.inputs.expenses.find(item=>item.id==='pilot-learning').amount.kind==='user-entered'&&posts.length===2);
   await page.reload();await page.locator('[data-plan-current="true"]').waitFor();
