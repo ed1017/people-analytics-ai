@@ -1,0 +1,127 @@
+{
+  "version": "group-turnover-trees-v1-generator",
+  "sourceCommit": "5679107bdcea1275afd1741376ff1a92386d6e5c",
+  "dataClass": "constructed-synthetic",
+  "family": "stationary",
+  "startMonth": "2021-01",
+  "training": {
+    "firstSeed": 18101,
+    "lastSeed": 18220,
+    "months": 57,
+    "origin": "2025-06-30T23:59:59.999Z",
+    "targets": [
+      "2025-07",
+      "2025-08",
+      "2025-09"
+    ],
+    "labelsAsOf": "2025-10-31T23:59:59.999Z"
+  },
+  "test": {
+    "firstSeed": 18301,
+    "lastSeed": 18360,
+    "months": 69,
+    "origin": "2026-06-30T23:59:59.999Z",
+    "targets": [
+      "2026-07",
+      "2026-08",
+      "2026-09"
+    ],
+    "labelsAsOf": "2026-10-31T23:59:59.999Z"
+  },
+  "signal": {
+    "name": "announced-workload-pressure",
+    "type": "binary",
+    "probabilityOne": 0.5,
+    "stream": "observable-pressure-v1",
+    "measured": "May31 at month end of the origin year",
+    "available": "June03 at 23:59:59.999Z of the origin year",
+    "sourceObservedAt": null,
+    "interpretation": "An invented aggregate leading indicator with an explicitly imposed association, not a verified real workload measure or a future outcome proxy constructed from labels."
+  },
+  "assignment": {
+    "stream": "observable-shock-assignment-v1",
+    "draw": "One independent-by-design uniform per seed, after signal generation and before generating outcomes; shared across scenarios and groups",
+    "probabilitiesBySignal": {
+      "informative": [
+        0.2,
+        0.8
+      ],
+      "no-signal": [
+        0.5,
+        0.5
+      ],
+      "reversed": [
+        0.8,
+        0.2
+      ]
+    }
+  },
+  "shock": {
+    "monthlyExtraProbability": 0.007,
+    "stream": "observable-extra-exits-v1",
+    "rule": "For each target-quarter day, after original scheduled company flows, draw binomial extra voluntary exits from remaining stock with probability 1-(1-.007)^(1/calendar-days-in-month). Reconcile stocks and person-days; never clip or reroll. Preserve pre-target vintages. Group allocation may change after extra events."
+  },
+  "models": {
+    "baselines": [
+      "recent-mean-3",
+      "seasonal-naive-12"
+    ],
+    "intercept": "recent-mean-3 plus training mean residual",
+    "signal": "recent-mean-3 plus training mean residual separately for signal 0 and 1; two fixed cell means, no tuning",
+    "clip": "Clamp adjusted total predictions at zero, without rounding",
+    "missingSignal": "Use intercept-only residual correction",
+    "minimumCellSupport": 10,
+    "trainingScenarios": [
+      "informative",
+      "no-signal"
+    ],
+    "reversedModel": "Reuse informative training fit unchanged",
+    "fitCustody": "Freeze fitted models and training evidence in a separate commit before generating any test seed. Each fit sees only its own scenario and training rows with labels available by training.labelsAsOf, before test.origin."
+  },
+  "hypotheses": {
+    "informative": "Observable signal adjustment reduces held-out count MAE versus intercept-only and both original baselines under the declared stable association",
+    "noSignal": "Without imposed signal association, additional cell means need not improve and can worsen error",
+    "reversed": "A reversed signal relationship can erase or reverse any informative benefit",
+    "primaryDescriptiveCriterion": "For each of groups A and B separately, at least 10% lower MAE than intercept-only and both original baselines in informative test histories. This is a descriptive synthetic criterion, never an operational gate or significance test."
+  },
+  "controls": [
+    "No-signal scenario, separately trained on no-signal histories",
+    "Reversed test relationship, using informative trained model without retraining",
+    "Signal release delayed until July01: forecast must equal intercept-only correction exactly",
+    "Future outcome mutation must leave pre-origin feature and point forecasts unchanged",
+    "Unexpected target, assignment, seed, truth or shock fields in feature records reject; future-effective or late-available records cannot be selected"
+  ],
+  "evaluation": {
+    "unit": "100 test company histories per scenario, shared across groups and scenarios; no pooling them as independent units",
+    "metrics": [
+      "intended",
+      "forecasted",
+      "scored",
+      "unavailable",
+      "MAE",
+      "RMSE",
+      "prediction-minus-actual bias",
+      "paired absolute-error delta versus each comparator",
+      "wins/ties/losses",
+      "signal-stratum metrics",
+      "shock/no-shock-stratum metrics"
+    ],
+    "pairedSupport": "Compare methods only on common scored histories and show missing support explicitly",
+    "intervals": "No new prediction or metric confidence intervals; no calibration or promotion",
+    "failurePolicy": "Retain every frozen seed and failed invariant; no rerolls, tuning, favorable subset selection, extra features or follow-on heuristic experiments."
+  },
+  "inputBoundary": "Strict offline-only synthetic signal record plus existing validated aggregate release snapshot; model never receives seed, scenario, assignment, shock schedule, true probability or future outcome. Production inputs and consumers are unchanged.",
+  "privacy": "Unchanged group allocation, minimum headcount 50, minimum positive exits 5 and complementary suppression. Suppressed groups remain unavailable and their actual totals are not emitted in score artifacts.",
+  "reservedQuarter": "No October\u2013December workforce outcomes generated or scored; labelsAsOf is a retrospective availability cutoff, not an outcome window.",
+  "limitations": [
+    "The signal-outcome association and its stability are imposed, not discovered real evidence",
+    "PRNG domain separation is a design implementation, not statistical or cryptographic proof of independence",
+    "Training and test histories are different simulated companies and different calendar origins; this is not a claim of real-company transfer",
+    "No causal intervention, rates, person-level risk or real-world accuracy",
+    "Prior negative evidence, consumers, UI, database, security and held eNPS files remain unchanged"
+  ],
+  "publishedInterval": null,
+  "causalEffect": null,
+  "operationallyQualified": false,
+  "realWorldPerformanceValidated": false
+}

@@ -1,0 +1,99 @@
+{
+  "version": "group-turnover-trees-v1",
+  "baseCommit": "bc0a6fa82044e2fdc606104365895116fa15afa8",
+  "generator": "Exact local copy of original signal generator with explicit new seed ranges; imports original stock/flow/group/replay primitives unchanged. Source copy is pinned and tests check byte parity after import rewriting.",
+  "trainSeeds": [
+    18101,
+    18220
+  ],
+  "testSeeds": [
+    18301,
+    18360
+  ],
+  "trainOrigin": "2025-06-30T23:59:59.999Z",
+  "trainLabelsAsOf": "2025-10-31T23:59:59.999Z",
+  "testOrigin": "2026-06-30T23:59:59.999Z",
+  "testLabelsAsOf": "2026-10-31T23:59:59.999Z",
+  "targets": [
+    "month-1",
+    "month-2",
+    "month-3",
+    "quarter-total"
+  ],
+  "groups": [
+    "group-a",
+    "group-b",
+    "group-c",
+    "group-d"
+  ],
+  "features": [
+    "latest-released-count",
+    "previous-released-count",
+    "third-latest-released-count",
+    "target1-calendar-lag12",
+    "target2-calendar-lag12",
+    "target3-calendar-lag12"
+  ],
+  "arms": [
+    "lag-only",
+    "released-signal"
+  ],
+  "additionalSignalFeature": "Existing strictly validated binary released aggregate announced-workload-pressure flag only; late or absent uses identical lag-only model predictions.",
+  "models": {
+    "ridge": {
+      "alpha": 10,
+      "standardize": true
+    },
+    "random-forest": {
+      "n_estimators": 120,
+      "max_depth": 3,
+      "min_samples_leaf": 10,
+      "random_state": 2718,
+      "n_jobs": 1
+    },
+    "gradient-boosting": {
+      "n_estimators": 80,
+      "max_depth": 2,
+      "min_samples_leaf": 10,
+      "learning_rate": 0.05,
+      "loss": "squared_error",
+      "random_state": 2718
+    }
+  },
+  "fitTarget": "Per-group, per-target residual from unchanged recent-three baseline; all model predictions clamped nonnegative. Direct quarter fit separately from individual monthly fits. Fit informative and no-signal training sets separately, reversal and missing/delayed signals reuse informative fit.",
+  "comparators": [
+    "recent-mean-3",
+    "seasonal-naive-12",
+    "ridge-same-arm",
+    "intercept-or-signal-cell-means"
+  ],
+  "signalCellComparator": "Original quarter signal cell means; extend identical fixed residual-mean definition to monthly labels. Require >=10 training cases per cell; absent signal falls back to intercept-only.",
+  "scenarios": [
+    "informative",
+    "no-signal",
+    "reversed",
+    "delayed-signal",
+    "missing-signal",
+    "reporting-incomplete",
+    "short-history"
+  ],
+  "controlConstruction": "Reporting control masks latest released period fields and exposure using original missing contract. Short support removes released months >=2022-01 (12 dense starting months retained). All methods must block both controls. Scoring actuals withheld whenever base forecast blocked, including all C/D rows.",
+  "decisions": {
+    "minimumTrainingHistories": 100,
+    "minimumTestHistoriesPerScenario": 60,
+    "informativeMinimumRelativeMaeImprovementAgainstEveryComparator": 0.05,
+    "worstScenarioMaximumMaeRatioAgainstEveryComparator": 1.1,
+    "supportFailure": "unsupported",
+    "candidateFailure": "reject",
+    "allPass": "adopt-for-synthetic-demo",
+    "scope": "Per target, group, arm and tree method. No favorable subgroup promotion after broader failures. Controls must preserve blocking; numeric stress checks cover informative, no-signal, reversed, delayed-signal, missing-signal."
+  },
+  "evaluation": "MAE, RMSE, prediction-minus-actual bias and paired error deltas on common histories. Independent unit is seed company; groups/scenarios/targets correlated. No uncertainty or p-values.",
+  "custody": "Commit protocol and implementation before any new generator seed. Generate and commit training input/fit audit before test seeds. Never tune after test generation.",
+  "limitations": [
+    "Entire signal/outcome link imposed by one synthetic generator; changed no-signal/reversal and missing availability are stress checks, not independent real-world validation.",
+    "Counts only; no rate target or future headcount forecast. C/D suppressed truth never persisted or scored.",
+    "No person-level employment/promotion scoring, production/UI/DB/security/access changes, external data or model input boundary.",
+    "Test labels available Oct31 after historical origin; generated outcomes end Sep2026. Oct-Dec forecasts remain unsupported/unscored."
+  ]
+}
