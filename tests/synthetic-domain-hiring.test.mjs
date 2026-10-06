@@ -92,6 +92,17 @@ test('zero target cohorts remain in audit and contribute no likelihood',()=>{
   assert.equal(result.audit.scoredCohorts,2);
   assert.equal(scoreHiring(input,[predictions[1]]).reasons[0],'zero-target-exposure');
 });
+test('calendar zeros do not count toward minimum positive training support',()=>{
+  const input=snapshot();
+  for(const row of input.records.filter(r=>r.value.month>='2023-04'&&r.value.month<='2026-03').slice(0,13)) {
+    row.value.openingCount=0;
+    row.value.dispositions={open:0,accepted:0,started:0,cancelled:0,noShow:0};
+    row.value.actualStartEvents=[]; row.value.plannedStartEvents=[]; row.value.rightCensoredCount=0;
+  }
+  const result=forecastHiring(input,months);
+  assert.equal(result.status,'blocked'); assert.deepEqual(result.reasons,['insufficient-positive-cohorts']);
+  assert(result.audit.positiveCohorts<24); assert.equal(result.audit.selectedRevisions.length,36);
+});
 test('selected revised aggregate labels are used without averaging vintages',()=>{
   const before=snapshot(stress,'2026-06-30T23:59:59.999Z'), target=before.records.find(r=>r.value.month==='2024-01');
   const full=stress.filter(r=>r.recordKey===target.recordKey&&r.simulatedAvailableAt<=origin);
