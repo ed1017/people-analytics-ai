@@ -1,0 +1,1066 @@
+{
+  "custody": {
+    "experiments/group_turnover_trees_v1/__init__.py": "ae36f3fc6e12b4c32ffe28045a81422ecaba392e93c0338d1c0f3e9cd7173e1d",
+    "experiments/group_turnover_trees_v1/extract.mjs": "f1ddf437bb65e429a77061e1134afffd6301876f5f39455d5e4249b77631f00c",
+    "experiments/group_turnover_trees_v1/generator-protocol.json": "28773d20287612318d659bd3f608e4ed1a5bf35a2b2e151e78529107af521c8b",
+    "experiments/group_turnover_trees_v1/generator.mjs": "0e3dd771b675cbff0b49058da4ae1ebf85a2ceb02b037735fb128deadfaf59ef",
+    "experiments/group_turnover_trees_v1/protocol.json": "9b7cb7e1f2b07deecb8607b34e789ee1d60a88e1cd634abc9027c41d2579afba",
+    "experiments/group_turnover_trees_v1/run.py": "09166c421993fa881736a6e9c6d232c7f74d0772c10e0f898ef67b6056bcda2f",
+    "experiments/group_turnover_trees_v1/test_extract.mjs": "f5e28a33726dd7df5c8589679243edf497b0be8c0ca3882bf3a694b5a03ca0f6",
+    "experiments/group_turnover_trees_v1/test_run.py": "97e9a82d775d5044d0f7c9388bc72bdddebb42a1f0e1974892fe3882f038ed54",
+    "lib/ml/group-turnover/evaluation.mjs": "0c61f0b941506c19b0eddc09c4fcded8f67f20992a72cdd9b14b89105fc17ba4",
+    "lib/ml/group-turnover/protocol.json": "8621ba887b3843618ccc5fd57ccd85c760687544da61d73baf3b345c6fa6ba4b",
+    "lib/ml/observable-turnover-signals/model.mjs": "6f20a6ad48ad51260211a9a4f3336f7056205a0e7c8d3d00aab7ee5d24173744",
+    "lib/ml/observable-turnover-signals/protocol.json": "10b8a06077c62cb78a47e60c561496d7ee58abf1976601830d767d3c8c1fc340",
+    "lib/ml/synthetic-workforce/common.mjs": "60c9349a01e839e1a6fb6f6c67eb46a64f7ed6f5744e9a7757c9c4642783fc03",
+    "lib/ml/synthetic-workforce/groups.mjs": "c097d4bec1fc04420bebc17514f87f60c7d48d7798c906a1c17fcc9a79ac967b",
+    "lib/ml/synthetic-workforce/hiring.mjs": "df97ca224fb3cca017b37973367f197242bf9b526575bd5e4fc7de7344cb4865",
+    "lib/ml/synthetic-workforce/pipeline.mjs": "a80c5618beeb9ca54f69ab7c5bdb8e7a0fecc0ac075db59d23b881437b2532ff",
+    "lib/ml/synthetic-workforce/protocol.json": "8cd79a0fc146557b16a7c62b5c2d130e1c4c0d1064f565b574dfe1dfd726fc1c",
+    "lib/ml/synthetic-workforce/satisfaction.mjs": "1c605ff2badeb4c0c084d1284ec462fc50826bf2518106acc12a5a7f63c7b33e",
+    "lib/ml/synthetic-workforce/turnover.mjs": "77a8784aef330e1a023c451cf65e25e01d8bd659351d1e6c1f580118ebaef1fe",
+    "lib/ml/turnover-vintage-evaluation.mjs": "a9de0ea0e9edda53191b0b70b9d6dc6787083e069e150f107bd4aed9076ef490"
+  },
+  "fits": [
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 6.333333333333333,
+        "1": 22.053763440860216
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "669b37eb8de2de34154b7edd427683070458bbd562691d909a5cbad59fd20d92",
+      "groupId": "group-a",
+      "intercept": 14.455555555555554,
+      "n": 120,
+      "residualSha256": "9d5c5b118160627ee5f1ce204280056c9e599b43803e4be7d5281bdee2b16824",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-1",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "9889e441e71f221a8feb2f9dfd13b069cf62c1a79fabbd0b57727ceb16fa5556",
+        "random-forest": "bc94b4b560e8da97a53ae80dcae3a1713bb6b787e183c2e27ea11dc83a22fcdc",
+        "ridge": "68bae4ce65856d9473cef3a3f7a9e62de7fe9a0ecacbe90edb90c992bef4eb2e"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 6.333333333333333,
+        "1": 22.053763440860216
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "5683bcb63461f39fc6ebfabbbae8a6822cec81bd24b17b02b64ee7041bba5141",
+      "groupId": "group-a",
+      "intercept": 14.455555555555554,
+      "n": 120,
+      "residualSha256": "9d5c5b118160627ee5f1ce204280056c9e599b43803e4be7d5281bdee2b16824",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-1",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "6c5522dec94decd3552ed294ddde71f7c0c06524912e6fdfb53eb5dab9631b17",
+        "random-forest": "a7be459efc6121bf5ac953f7f8a258921500ff930e192e78fd3fcce22d0391c8",
+        "ridge": "b3630d742cf2217bfc81e8518715fb12ca218865a69e22e5ec3c0f6ca62fd394"
+      }
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 2.2816091954022992,
+        "1": 20.48924731182796
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "669b37eb8de2de34154b7edd427683070458bbd562691d909a5cbad59fd20d92",
+      "groupId": "group-a",
+      "intercept": 11.688888888888888,
+      "n": 120,
+      "residualSha256": "549a4e72ad40729d9e5467a912ed925a3eee5c9204e3b1e8d2677f4b3a4e0731",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-2",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "62f190a06c8da6e11c1900b4d6726c3d31c1981b8a866e7deedd9ed547569f17",
+        "random-forest": "4546df86434a41e1f96f0f4ec6b3d603ded8cd86bfdb929fb0b7bbe375b4382d",
+        "ridge": "76cb1e0b7677bf420a4d5808fe335452a2b000e361d8333faaae54e1b9bfb449"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 2.2816091954022992,
+        "1": 20.48924731182796
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "5683bcb63461f39fc6ebfabbbae8a6822cec81bd24b17b02b64ee7041bba5141",
+      "groupId": "group-a",
+      "intercept": 11.688888888888888,
+      "n": 120,
+      "residualSha256": "549a4e72ad40729d9e5467a912ed925a3eee5c9204e3b1e8d2677f4b3a4e0731",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-2",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "1ee3ccfc498cfccced18a2df9174c7c4124e0630ada56e541b7ce79e1b9348a9",
+        "random-forest": "9852e24c7eb0dd1aa60153f877918bb41ebce3ea320e478cd6f4b60a3858e004",
+        "ridge": "a7d2287ea99b603a553bb8d04fc0ff1b8fdafd223c06df243538ec8bfe0e7d97"
+      }
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 1.8678160919540228,
+        "1": 17.74731182795699
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "669b37eb8de2de34154b7edd427683070458bbd562691d909a5cbad59fd20d92",
+      "groupId": "group-a",
+      "intercept": 10.072222222222221,
+      "n": 120,
+      "residualSha256": "e27404685411ddc9bca4b0eee3967a8743e8a802fb15d21a17f59f4cef84ada6",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-3",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "1b306fe1bc2046761893511ead692fccb029570bb12be1ed15a5022bd5060388",
+        "random-forest": "924fb31cf3dcf0265e2145f462fa337703c7c8d0b57878578884705a542e1aed",
+        "ridge": "129374597057f3f8e73ef4f08f722db7e0b7be83666fe85839cb40d0cf9e5d05"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 1.8678160919540228,
+        "1": 17.74731182795699
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "5683bcb63461f39fc6ebfabbbae8a6822cec81bd24b17b02b64ee7041bba5141",
+      "groupId": "group-a",
+      "intercept": 10.072222222222221,
+      "n": 120,
+      "residualSha256": "e27404685411ddc9bca4b0eee3967a8743e8a802fb15d21a17f59f4cef84ada6",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-3",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "03649be664b326de57a4fc018b301fce805f20d7aa897bcc797bfe30718c6fda",
+        "random-forest": "3f75cb5e817b00eda50dec57341dd1f05dd319c8bb45ef4e9cf065ce843350c0",
+        "ridge": "085c3d687345136508c9286a15eb4c78ee3c65ba8b9d8c5aa4ffa863e4757fdb"
+      }
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 10.482758620689655,
+        "1": 60.29032258064516
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "669b37eb8de2de34154b7edd427683070458bbd562691d909a5cbad59fd20d92",
+      "groupId": "group-a",
+      "intercept": 36.21666666666667,
+      "n": 120,
+      "residualSha256": "f592ad8a1aa58ecd7e8f625a890143acbc88cbc94e77747304dbd956394c664b",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "quarter-total",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "847ebe4965baf0c0b8b1c95b0c0f987ba864da879a925b1dec90736fe1889b1c",
+        "random-forest": "3a1c3381416ffb0cf8f30144ec7f6e5b60091dbc6d018bf388affe17c14973a3",
+        "ridge": "7e6742d15df2dce291350e9309b242ae7105eef620076f593b2ad708192b82a8"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 10.482758620689655,
+        "1": 60.29032258064516
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "5683bcb63461f39fc6ebfabbbae8a6822cec81bd24b17b02b64ee7041bba5141",
+      "groupId": "group-a",
+      "intercept": 36.21666666666667,
+      "n": 120,
+      "residualSha256": "f592ad8a1aa58ecd7e8f625a890143acbc88cbc94e77747304dbd956394c664b",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "quarter-total",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "eec97f411dd7e8db0260e85667747aae8d7d35e9a2445c3dc61a1841499a9f61",
+        "random-forest": "78b84c082d99fdab0d2a76a628c5775a6d4a93dfe2c8db1500b3b49cd9dd3bd5",
+        "ridge": "f0d94317547df38d4329d01afe72c25bddb4084b4af548084cda05b7220e1488"
+      }
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 7.718390804597701,
+        "1": 19.913978494623652
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "b782fddd519471b9745d12fedb0228c6665e9aa8b9525d92cf1af2008303c7b2",
+      "groupId": "group-b",
+      "intercept": 14.019444444444444,
+      "n": 120,
+      "residualSha256": "fecfc3f85d7fdc3f90bbeaba23c2a4585649227c8729ea019889e454947fe645",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-1",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "146188a519d9677a8446dbd1c6d926120670367a3bf6bbbf92a164507e99c815",
+        "random-forest": "192f85151c84d3e51bf681acaad4ff8d937641e9fad79a408db0d3452977bb2e",
+        "ridge": "ee0156acc12432b308de0ec9b964395684ad2d8e71f7bf97f1156517e3c9485b"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 7.718390804597701,
+        "1": 19.913978494623652
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "c75991674e83123816da180ee9432a73f295bf52cd7fa16a7f2d68aad9f8dd62",
+      "groupId": "group-b",
+      "intercept": 14.019444444444444,
+      "n": 120,
+      "residualSha256": "fecfc3f85d7fdc3f90bbeaba23c2a4585649227c8729ea019889e454947fe645",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-1",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "852fe14a1619ed00d30d67fee7b6b11f77bdc4c4f12870d7301772b199e5972a",
+        "random-forest": "41e8224e645f6289c16069f07e8d74b8966fe533f1f9ca213ef6e32a2ddec809",
+        "ridge": "11a0b99bb586105bf1c9c0877c2b4e8238dbfa2720dad88ce05c3c4510c41cff"
+      }
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 4.701149425287356,
+        "1": 19.978494623655916
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "b782fddd519471b9745d12fedb0228c6665e9aa8b9525d92cf1af2008303c7b2",
+      "groupId": "group-b",
+      "intercept": 12.594444444444443,
+      "n": 120,
+      "residualSha256": "e7ff41e00b40493cc9e064e05c99291bb5289630ff502cea74a4fa88ac8c37da",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-2",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "3e184ddda321b9bcaf833a16c33583cfdde86f5cc299329da48e6ee467d4122b",
+        "random-forest": "0ca04b2f8daee6f4b3b8afc2636f0aa6dd3905da4ad4b5e67ea74645caa52b97",
+        "ridge": "19a96db955df2429b59f5ccf518314ac6f16d1edbaddf8768e46cc9fccb6b33d"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 4.701149425287356,
+        "1": 19.978494623655916
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "c75991674e83123816da180ee9432a73f295bf52cd7fa16a7f2d68aad9f8dd62",
+      "groupId": "group-b",
+      "intercept": 12.594444444444443,
+      "n": 120,
+      "residualSha256": "e7ff41e00b40493cc9e064e05c99291bb5289630ff502cea74a4fa88ac8c37da",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-2",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "f9645e7d0f6d5545914f6a3453522a571a689b286518b45a78bb32506493c7fe",
+        "random-forest": "97e55b94dd26bcc00affa8dd6f4e4327b8dddf488d6f1ad43b7b34d51f212f38",
+        "ridge": "f5160438dc61090c00806c0d5c6b2301b06288a303e4888b815407cb13ee7f8c"
+      }
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 2.9597701149425286,
+        "1": 17.768817204301076
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "b782fddd519471b9745d12fedb0228c6665e9aa8b9525d92cf1af2008303c7b2",
+      "groupId": "group-b",
+      "intercept": 10.61111111111111,
+      "n": 120,
+      "residualSha256": "d09344d05642e9f51e4c5b4cbd523157c9d4a30f842b6bd14bd1deb49c65a9c5",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-3",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "ff297ceb02a58615d21026c9c555f2d0b2818d51ea8dc0eaf282e223271b8d1a",
+        "random-forest": "90becadefc96627559a1fc8c6dd876d562997e69d3085d14e8b6b2c6c1f7cd25",
+        "ridge": "c262a62defd398a139e4a9359752b890bd24bf162966a4306319fe4bc4e1c019"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 2.9597701149425286,
+        "1": 17.768817204301076
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "c75991674e83123816da180ee9432a73f295bf52cd7fa16a7f2d68aad9f8dd62",
+      "groupId": "group-b",
+      "intercept": 10.61111111111111,
+      "n": 120,
+      "residualSha256": "d09344d05642e9f51e4c5b4cbd523157c9d4a30f842b6bd14bd1deb49c65a9c5",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-3",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "b04c79d318a9dcb14e21de40c911fbf3d5a26873d1dc334dd6668dceb6415e87",
+        "random-forest": "2a93687d8f827b95d56a4a6047570b9ecd67ff8b47dae6b56b9867a95cc0be10",
+        "ridge": "2066dab31d2c7228ff9de681f0dcf36a0375bcb6fbfabc8b70f829505c2bbd17"
+      }
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 15.379310344827585,
+        "1": 57.66129032258065
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "b782fddd519471b9745d12fedb0228c6665e9aa8b9525d92cf1af2008303c7b2",
+      "groupId": "group-b",
+      "intercept": 37.225,
+      "n": 120,
+      "residualSha256": "14b2240a9b1278557b5b1ecb47764e21a2c8c8066d1a28d2ad36a557dd008679",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "quarter-total",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "c58974a2e7b33fc3cc53514851ed275449b8bf36510086f67ec0e9773044cf2b",
+        "random-forest": "7996c208ceea1910e41d34a0d202dd018a3329571ed9ded19c28b6c61c1b08fd",
+        "ridge": "68430ea5bf480ab2ac0f0240b31b127e53e3cb9a6c1092da358531ba16a5dd76"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 15.379310344827585,
+        "1": 57.66129032258065
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "c75991674e83123816da180ee9432a73f295bf52cd7fa16a7f2d68aad9f8dd62",
+      "groupId": "group-b",
+      "intercept": 37.225,
+      "n": 120,
+      "residualSha256": "14b2240a9b1278557b5b1ecb47764e21a2c8c8066d1a28d2ad36a557dd008679",
+      "scenario": "informative",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "quarter-total",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "bf744c8790316c31637127bafb9e48a9325307edb288533504872c347ad2f847",
+        "random-forest": "10af010f016ddfb1a10632e4c076091d9021b8ee9f580fe41f3f3d7403042878",
+        "ridge": "f7e58499b9c537d10a6704eaeb14ea70029f85be44e4889b908d161edcec7ede"
+      }
+    },
+    {
+      "groupId": "group-c",
+      "n": 0,
+      "scenario": "informative",
+      "status": "unsupported"
+    },
+    {
+      "groupId": "group-d",
+      "n": 0,
+      "scenario": "informative",
+      "status": "unsupported"
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 15.505747126436782,
+        "1": 13.779569892473116
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "669b37eb8de2de34154b7edd427683070458bbd562691d909a5cbad59fd20d92",
+      "groupId": "group-a",
+      "intercept": 14.613888888888889,
+      "n": 120,
+      "residualSha256": "2b9aaee51112243e4d74b18af608d1beab8feb18b2d7ca980d3fe8fb00427203",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-1",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "118f0308d51fa0a31a97be486254822627efd3ca8e5dcff6e3fd901ad56e9d7d",
+        "random-forest": "bc44a4ada908869abf7071218adac5dc9d9cf0811a5bd874e585f95037b369c7",
+        "ridge": "148236ab520772e8987b7f716b27b60670cf29505bc85fc278c4b2f3243bd5b0"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 15.505747126436782,
+        "1": 13.779569892473116
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "5683bcb63461f39fc6ebfabbbae8a6822cec81bd24b17b02b64ee7041bba5141",
+      "groupId": "group-a",
+      "intercept": 14.613888888888889,
+      "n": 120,
+      "residualSha256": "2b9aaee51112243e4d74b18af608d1beab8feb18b2d7ca980d3fe8fb00427203",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-1",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "2cfdeb44bb3e7b331aac97b6540fd03ad807ff7cf9abbd179c24b6ef86212fc7",
+        "random-forest": "dda6665f4d97092b6610a141edb045465fd5ac9e91a53c2490ea971a1e7a5172",
+        "ridge": "295dc70464ff5381434874e7cbf0b7ccec6288979161785251f817f3115f544e"
+      }
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 12.21264367816092,
+        "1": 12.311827956989246
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "669b37eb8de2de34154b7edd427683070458bbd562691d909a5cbad59fd20d92",
+      "groupId": "group-a",
+      "intercept": 12.263888888888888,
+      "n": 120,
+      "residualSha256": "bd3f17a775c5d77fc00f114668f67f1b130ec9ab889130514aab7c06c12758fa",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-2",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "d5095eb27e62046f447195fdfc8c779100f1ffc20e5b3ffd1d32d31ebbed27fe",
+        "random-forest": "c8323f68e4cada77bd36799255a03aace63bb7394c6665ede8e9fb0319cbaaae",
+        "ridge": "5f77974b72b535fd3d29b8332404fd5f39a18010e9a6d7cf6ec1617e524e48a6"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 12.21264367816092,
+        "1": 12.311827956989246
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "5683bcb63461f39fc6ebfabbbae8a6822cec81bd24b17b02b64ee7041bba5141",
+      "groupId": "group-a",
+      "intercept": 12.263888888888888,
+      "n": 120,
+      "residualSha256": "bd3f17a775c5d77fc00f114668f67f1b130ec9ab889130514aab7c06c12758fa",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-2",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "3a5fe1c968551d3b4da149f8e322e5e08321545fe94274eb1157fc9fc2de0927",
+        "random-forest": "ac5b86d3b89a2a6736ba26812b379fc48cc00eb690be642ef0d8b2d10197e5a5",
+        "ridge": "a804a523d7da801cb6f73a6955f9c9c32cdbda60f6c862eb29d83d2a427e2eec"
+      }
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 11.919540229885058,
+        "1": 10.279569892473116
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "669b37eb8de2de34154b7edd427683070458bbd562691d909a5cbad59fd20d92",
+      "groupId": "group-a",
+      "intercept": 11.072222222222221,
+      "n": 120,
+      "residualSha256": "3c7070f9374f0c48f75fbe292c9dd8184af95128fb25f570214b95a56855eb5e",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-3",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "9890a80db24c88663d9bf1115e2ad74e647d74757e1d8012c56629dec4198e21",
+        "random-forest": "1ee6083621bb604a58b78045e75eb91d35312ffc572361759e647499c7bd9b42",
+        "ridge": "cbf1c30a3e9175fcb4280e0e52376409384aef6d21f43687af18d5e65c578ee5"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 11.919540229885058,
+        "1": 10.279569892473116
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "5683bcb63461f39fc6ebfabbbae8a6822cec81bd24b17b02b64ee7041bba5141",
+      "groupId": "group-a",
+      "intercept": 11.072222222222221,
+      "n": 120,
+      "residualSha256": "3c7070f9374f0c48f75fbe292c9dd8184af95128fb25f570214b95a56855eb5e",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-3",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "09173eea48aa4ab1935f75057cbc34a77937239d5ab9265f0816baab122b65f1",
+        "random-forest": "f282223bebc49f2de29996448315edec64e74c27aee578cfd5fdb82f786ed827",
+        "ridge": "479cea723ce371fc8073b327e7ae972d9619aab92be3d939a4ebaa1b80551847"
+      }
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 39.63793103448276,
+        "1": 36.37096774193548
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "669b37eb8de2de34154b7edd427683070458bbd562691d909a5cbad59fd20d92",
+      "groupId": "group-a",
+      "intercept": 37.95,
+      "n": 120,
+      "residualSha256": "cd269799b8e1e505109cc47db9c4b689fad7937a7eb97b69be699d33fc4237ef",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "quarter-total",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "8d24e2f17bc754a1900fa5b9ea0d734495420a2ef5fd64a1179e4c27e4dcf329",
+        "random-forest": "8e656ab8ae6fefb73ec07d6a667b2921208393e596898d2102e3591b8ffd7b55",
+        "ridge": "56318f50858e4e137126623f1779a7aa0da0b3faa98a95cf57c8ce9f1e9c7f57"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 39.63793103448276,
+        "1": 36.37096774193548
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "5683bcb63461f39fc6ebfabbbae8a6822cec81bd24b17b02b64ee7041bba5141",
+      "groupId": "group-a",
+      "intercept": 37.95,
+      "n": 120,
+      "residualSha256": "cd269799b8e1e505109cc47db9c4b689fad7937a7eb97b69be699d33fc4237ef",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "quarter-total",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "633c7dd75c4e709da58da1d4fd22202ca8c7cc3f96f0825b7cef82aa84b3e1cd",
+        "random-forest": "0fa5bc53d24c003bee7169655962476c658f32d507d5ad6a37c98d607419d613",
+        "ridge": "c7876590b3f7335f838eb5688999f4d483f48a72ee881437bcc17cd5797c5079"
+      }
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 16.49425287356322,
+        "1": 11.897849462365592
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "b782fddd519471b9745d12fedb0228c6665e9aa8b9525d92cf1af2008303c7b2",
+      "groupId": "group-b",
+      "intercept": 14.119444444444444,
+      "n": 120,
+      "residualSha256": "d9b6bd46e49c6cd8c8bd7395df045084843eba997de8b98c8da8d62c3f70ce0c",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-1",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "e7297854dac2e9d689b793aebeff56d62161dea06de207445ec82db3800d6e56",
+        "random-forest": "522aea9e3fed9dc6a25bc37f3e8a5d42e89be1ddae326cc7e1cb5ce4797a5b39",
+        "ridge": "5966241736604c7a2b4a0de95e77551a5d9585c5e61c93bb0b898edda8a9ebf0"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 16.49425287356322,
+        "1": 11.897849462365592
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "c75991674e83123816da180ee9432a73f295bf52cd7fa16a7f2d68aad9f8dd62",
+      "groupId": "group-b",
+      "intercept": 14.119444444444444,
+      "n": 120,
+      "residualSha256": "d9b6bd46e49c6cd8c8bd7395df045084843eba997de8b98c8da8d62c3f70ce0c",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-1",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "3884543bc6972b85827bd2a25b5b1d57e0ac9fe33f1d640898139db7ed04da03",
+        "random-forest": "38cdf870b6c91a4ab84002300c5b56b00d427d2a2b9d46645e3859f434630130",
+        "ridge": "f6f5e6ca9663bf6c643e600cf711fb658b89a397bca51fc39d27156dd03b8efc"
+      }
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 13.873563218390803,
+        "1": 12.236559139784948
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "b782fddd519471b9745d12fedb0228c6665e9aa8b9525d92cf1af2008303c7b2",
+      "groupId": "group-b",
+      "intercept": 13.027777777777777,
+      "n": 120,
+      "residualSha256": "aa124ec07ee1ad8dd1a91a1a1ec4ea92e47ddf8bd9d3a9ed568982c301915b8c",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-2",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "d949424eb11024f0f076ad1a98eb72959d89aefec5bc29833c86685f11c3db0d",
+        "random-forest": "5f56e6708603a70eb0e899f268e242331f90a0d6be717418a997d91cf63ef0b1",
+        "ridge": "b9133f25b5d0b123a6f4d1c4b9b497f9e9c3f922117b406fbf91cb88cd8169fb"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 13.873563218390803,
+        "1": 12.236559139784948
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "c75991674e83123816da180ee9432a73f295bf52cd7fa16a7f2d68aad9f8dd62",
+      "groupId": "group-b",
+      "intercept": 13.027777777777777,
+      "n": 120,
+      "residualSha256": "aa124ec07ee1ad8dd1a91a1a1ec4ea92e47ddf8bd9d3a9ed568982c301915b8c",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-2",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "0777e41dbccea840680d70c453f4616046e483080d597cbd8fe31ba700f9d33b",
+        "random-forest": "44e0e5d364dcb69d7526cf45da0ba989590802e8e5573a369c07d0925bfcd6cb",
+        "ridge": "f7a3cb13889f5c935ab168b7e4312abc80f70db7d09082f403cab6191b372508"
+      }
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 11.166666666666666,
+        "1": 9.99462365591398
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "b782fddd519471b9745d12fedb0228c6665e9aa8b9525d92cf1af2008303c7b2",
+      "groupId": "group-b",
+      "intercept": 10.56111111111111,
+      "n": 120,
+      "residualSha256": "f546aa3de415c92a39abe8c97b2ed8c74510f21620e113c2417fb753de005e00",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-3",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "62465836296baf0858363972bf273549d611022a39afbcc959e95005dc25e50b",
+        "random-forest": "4f5c22c4e60fc833248bc229aed74b39c139e172075ed642bead02e9f4721a1c",
+        "ridge": "5edff1f39c666ee7c38b4311d3d9fe872ea96abdf52183b31fd48fac75ab47ed"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 11.166666666666666,
+        "1": 9.99462365591398
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "c75991674e83123816da180ee9432a73f295bf52cd7fa16a7f2d68aad9f8dd62",
+      "groupId": "group-b",
+      "intercept": 10.56111111111111,
+      "n": 120,
+      "residualSha256": "f546aa3de415c92a39abe8c97b2ed8c74510f21620e113c2417fb753de005e00",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "month-3",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "a9aba06f34a29f3df9d3f7c9302a216d8f76899b22b098357cb61e1b3f8a41c0",
+        "random-forest": "22b330d4daec94263ed60c079d7e7305c091487833a15734bb7d719b4542329b",
+        "ridge": "e9093e2ed2362a7c61a15bddec5c301d9b371f9f5ec205c6719dda9df6e8443b"
+      }
+    },
+    {
+      "arm": "lag-only",
+      "cells": {
+        "0": 41.53448275862069,
+        "1": 34.12903225806452
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12"
+      ],
+      "featureSha256": "b782fddd519471b9745d12fedb0228c6665e9aa8b9525d92cf1af2008303c7b2",
+      "groupId": "group-b",
+      "intercept": 37.708333333333336,
+      "n": 120,
+      "residualSha256": "73d14c6943d5e884b5be576280787a1fe25b911837ec362d2bbe972b8329dbec",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "quarter-total",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "91fb459864d1d838b8e4f49af236ac052bb1be421e9d79b2de9e83289ae24e05",
+        "random-forest": "289461ac8da4848c024a1f0cebe78c975ac185ef21be26ddcf5f243426f6098c",
+        "ridge": "93246f061e08922cf66a534d3212aaba53c8e35cd937e188331124de41f8ea97"
+      }
+    },
+    {
+      "arm": "released-signal",
+      "cells": {
+        "0": 41.53448275862069,
+        "1": 34.12903225806452
+      },
+      "featureNames": [
+        "latest-released-count",
+        "previous-released-count",
+        "third-latest-released-count",
+        "target1-calendar-lag12",
+        "target2-calendar-lag12",
+        "target3-calendar-lag12",
+        "released-signal"
+      ],
+      "featureSha256": "c75991674e83123816da180ee9432a73f295bf52cd7fa16a7f2d68aad9f8dd62",
+      "groupId": "group-b",
+      "intercept": 37.708333333333336,
+      "n": 120,
+      "residualSha256": "73d14c6943d5e884b5be576280787a1fe25b911837ec362d2bbe972b8329dbec",
+      "scenario": "no-signal",
+      "signalSupport": {
+        "0": 58,
+        "1": 62
+      },
+      "target": "quarter-total",
+      "trainingPredictionsSha256": {
+        "gradient-boosting": "dcb6c4fc87c983fb5036c9fdca16b53dc2068c1252a90d6229db86061331614b",
+        "random-forest": "091cdcf360e9a22fc25fbbd7360a22233129c874d1861ada9c4ec579460ee077",
+        "ridge": "c60f1d5e3ccba3f0fab9b02cb38b7df5818d24d3a07eca0633359ff3d446961f"
+      }
+    },
+    {
+      "groupId": "group-c",
+      "n": 0,
+      "scenario": "no-signal",
+      "status": "unsupported"
+    },
+    {
+      "groupId": "group-d",
+      "n": 0,
+      "scenario": "no-signal",
+      "status": "unsupported"
+    }
+  ],
+  "protocolSha256": "9b7cb7e1f2b07deecb8607b34e789ee1d60a88e1cd634abc9027c41d2579afba",
+  "runtime": {
+    "node": "v24.19.0",
+    "numpy": "2.3.5",
+    "python": "3.12.14",
+    "sklearn": "1.8.0"
+  },
+  "trainingRowsSha256": "a6bb32078efb90baa829313af273b08c0b6c6eee1e527893521fdf6c5711f9ea"
+}
