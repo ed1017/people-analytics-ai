@@ -113,3 +113,14 @@ test('domain demo reaches the actual route only after an explicit matching-page 
   const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page,context,message,summaryOnly,goalContext:{goal:'Review the synthetic demonstration'},history:[],syntheticDemo:{values:[999999999]}})}));assert.equal(response.status,200);const input=sandbox.__requests.at(-1).input;assert.equal(input.includes('SEPARATE CONSTRUCTED SYNTHETIC DEMONSTRATION'),include);assert.ok(!input.includes('999999999'));if(include){assert.match(input,/independent of the selected country/);assert.match(input,/No real-world accuracy/);assert.match(input,/Country: France/);}
  }
 });
+
+test('actual bundle POST rejects renamed duplicate activities with one request and unchanged model schema',async()=>{
+ const goal=aiSkillsGoalPrompt,packet=packets[1][1],wire=deliveryAcceptanceWire(goal);
+ wire.bundles[1]={...structuredClone(wire.bundles[0]),id:'B',name:'Different title only'};
+ sandbox.__replies.push({status:'completed',output_text:JSON.stringify(wire)});const before=sandbox.__requests.length;
+ const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',persona:'HR',message:HOME_BUNDLE_REQUEST,hasFocusedIssue:true,goalContext:{goal},overviewBriefingContext:packet})}));
+ assert.equal(response.status,502);assert.equal(sandbox.__requests.length,before+1);const sent=sandbox.__requests.at(-1);
+ assert.deepEqual(JSON.parse(JSON.stringify(sent.text.format)),buildHomeBundleFormat(goal,normalizeHomePack(packet),'delivery'));
+ assert.equal(sent.tool_choice,'none');assert.equal(sandbox.__requestOptions.at(-1).maxRetries,0);
+ const body=await response.json();assert.equal(body.diagnostic,'duplicate_plans');assert.equal(body.proposal,undefined);assert.ok(!JSON.stringify(body).includes('Different title only'));
+});

@@ -25,9 +25,10 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
   return route.continue();
  });
  const button=name=>page.getByRole('button',{name,exact:true}),home=page.getByLabel('Ask Workforce AI',{exact:true}),goal=page.getByLabel('Selected goal',{exact:true});
- const enter=async()=>{await button('Workforce — Compensation').click();await page.getByRole('heading',{name:'Compensation',level:1,exact:true}).waitFor();};
+ const nav=async key=>{const trigger=button('Open navigation');if(await trigger.isVisible())await trigger.click();if(key==='home'){await button('Action Planning').click();return;}const target=page.locator('[data-nav-destination="'+key+'"]');if(!await target.isVisible())await target.evaluate(el=>el.closest('section').querySelector('.nav-group-label').click());await target.click()};
+ const enter=async()=>{await nav('compensation');await page.getByRole('heading',{name:'Compensation',level:1,exact:true}).waitFor();};
  await page.goto(base);await goal.waitFor();await home.waitFor();await page.waitForFunction(()=>document.querySelector('[aria-label="Selected goal"]').value==='cost');
- await page.getByLabel('Country',{exact:true}).selectOption('UK');
+ const filters=page.locator('.workforce-filter-disclosure');if(!await page.getByLabel('Country',{exact:true}).isVisible())await filters.locator('summary').click();await page.getByLabel('Country',{exact:true}).selectOption('UK');
  check(mode+' Home does not fetch Compensation or start model work',requests.length===0&&posts===0);
  await enter();const cost=page.getByRole('region',{name:'Compensation cost context',exact:true}),benchmarks=page.getByRole('region',{name:'US occupation wage benchmarks',exact:true});await cost.getByText('$12,000,000',{exact:true}).waitFor();
  check(mode+' Compensation route mounts cost and public reference sections',await cost.getByRole('heading',{name:'Workforce cost context',exact:true}).isVisible()&&await benchmarks.getByRole('heading',{name:'US occupation wage benchmarks',exact:true}).isVisible()&&await page.getByText('TBD',{exact:true}).count()===0);
@@ -43,10 +44,10 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  const wageTable=benchmarks.getByRole('region',{name:'Annual wage percentile comparison',exact:true});await wageTable.focus();await page.keyboard.press('ArrowRight');await page.waitForTimeout(80);
  check(mode+' nested reference table scrolls by keyboard within the page',await wageTable.evaluate(n=>n===document.activeElement&&n.scrollLeft>0)&&await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await benchmarks.scrollIntoViewIfNeeded();await page.screenshot({path:path.join(output,mode+'-compensation.png')});
- await button('Home').click();check(mode+' Home draft and goal survive return',await home.inputValue()==='Keep my goal draft'&&await goal.inputValue()==='cost');
+ await nav('home');check(mode+' Home draft and goal survive return',await home.inputValue()==='Keep my goal draft'&&await goal.inputValue()==='cost');
  bad=true;await enter();await cost.getByRole('alert').waitFor();check(mode+' source error is sanitized while public references remain usable',await page.getByText('PRIVATE_SOURCE_ERROR',{exact:true}).count()===0&&await benchmarks.getByRole('combobox',{name:/Reference occupation/}).isEnabled());
  bad=false;await cost.getByRole('button',{name:'Try again',exact:true}).click();await cost.getByText('$12,000,000',{exact:true}).waitFor();check(mode+' explicit retry recovers the cost context',requests.length===3&&posts===0);
- await button('Home').click();hold=true;release=null;await enter();for(let i=0;!release&&i<100;i++)await page.waitForTimeout(10);assert.ok(release);await button('Home').click();hold=false;release();await page.waitForTimeout(80);check(mode+' leaving a pending page keeps Home and its draft intact',await home.inputValue()==='Keep my goal draft'&&await cost.count()===0);
+ await nav('home');hold=true;release=null;await enter();for(let i=0;!release&&i<100;i++)await page.waitForTimeout(10);assert.ok(release);await nav('home');hold=false;release();await page.waitForTimeout(80);check(mode+' leaving a pending page keeps Home and its draft intact',await home.inputValue()==='Keep my goal draft'&&await cost.count()===0);
  const stored=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);check(mode+' no plans or private-field changes are created',stored.workspaces.cost.fields.sentinel.keep&&Object.keys(stored.workspaces.cost.fields).every(key=>['chat','sentinel'].includes(key)));
  check(mode+' responsive layout and runtime/model boundaries',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&posts===0&&unexpected===0);
  await context.close();

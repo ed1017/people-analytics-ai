@@ -12,6 +12,8 @@ import {evidenceFingerprint,readEvidenceFingerprint,type EvidenceFingerprint} fr
 import {readBundleResponseDiagnostic,bundleResponseDiagnostic,homeBundleOutputTokens,type BundleResponseDiagnostic} from './home-bundle-response-diagnostic.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {incompleteBundleTextField} from './home-bundle-text-completeness.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {hasDuplicatePlanActivities} from './home-bundle-distinctness.ts';
 export const HOME_BUNDLE_REQUEST='Prepare coordinated solution bundles for my exact pinned goal.';
 // @ts-expect-error Native Node tests share TypeScript source.
 export {homeBundleOutputTokens} from './home-bundle-response-diagnostic.ts';
@@ -47,6 +49,7 @@ export function createHomeBundlePreparation(){
      const inspected=inspectHomeBundleProposal(reply.proposal,binding.goal,packet),proposal=inspected.proposal;if(!proposal)return {status:'failed',diagnostic:inspected.diagnostic};
      const incompleteField=incompleteBundleTextField(proposal);
      if(incompleteField)return {status:'failed',diagnostic:'incomplete_output',responseDiagnostic:bundleResponseDiagnostic(null,'incomplete_text',homeBundleOutputTokens,incompleteField)};
+     if(hasDuplicatePlanActivities(proposal))return {status:'failed',diagnostic:'duplicate_plans'};
      const fingerprint=await evidenceFingerprint(packet,'canonical');
      if(binding.evidenceDigest!==fingerprint.canonical)fingerprint.mode='ordered';
      const draft:BundlePreparation={version:1,binding,proposal,preparedAt:new Date().toISOString(),usage:actionUsage(reply.usage,Date.now()-start),evidenceFingerprint:fingerprint};
