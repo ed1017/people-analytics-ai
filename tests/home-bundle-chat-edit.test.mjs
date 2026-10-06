@@ -35,7 +35,7 @@ test('unknown, explicit zero and illustrative provenance remain distinct after a
 });
 test('unsupported, duplicate or invalid clauses reject the whole proposal without a partial edit',()=>{
  const draft=base(),before=structuredClone(draft);
- for(const request of ['Set pilot participants to 12; Set budget to $50000','Set pilot participants to 12; set pilot participants to 13','Set pilot participants to -1','Set pilot participants to 1.5','Set pilot participants to 1000001','Set shared horizon to 0 months','Set shared horizon to 25 months','Set shared start month to 2027-13','Set c1 finish to 2026-02-30','Set c1 finish to 2026-01-01','Set deadline to 2027-01-01','Set hiring to 3','Reduce expenses by 20%','Set pilot participants to 12 and hire 3'])assert.throws(()=>previewBundleChatEdit(draft,request),request);
+ for(const request of ['Set pilot participants to 12; Set budget to EUR 50000','Set pilot participants to 12; set pilot participants to 13','Set pilot participants to -1','Set pilot participants to 1.5','Set pilot participants to 1000001','Set shared horizon to 0 months','Set shared horizon to 25 months','Set shared start month to 2027-13','Set c1 finish to 2026-02-30','Set c1 finish to 2026-01-01','Set deadline to 2027-01-01','Set hiring to 3','Reduce expenses by 20%','Set pilot participants to 12 and hire 3'])assert.throws(()=>previewBundleChatEdit(draft,request),request);
  assert.deepEqual(draft,before);
 });
 test('goal, plan, evidence and revision changes invalidate an old preview; tampered patches are rejected',async()=>{
@@ -75,10 +75,12 @@ test('everyday start, duration and participant phrases produce the same reviewed
  for(const phrase of ['use 20 participants','please use twenty participants','use zero participants','change participants to 14'])assert.equal(previewBundleChatEdit(draft,phrase).inputs.groups[0].count.value,phrase.includes('zero')?0:phrase.includes('14')?14:20);
  const combined=previewBundleChatEdit(draft,'start in December 2026 and make it three months and use 20 participants');assert.equal(combined.changes.length,3);assert.equal(combined.inputs.scope.comparisonConfirmed.value,null);assert.deepEqual(draft,before);
 });
-test('vague and total budgets ask for clarification without converting a ceiling into an expense',()=>{
+test('total budget limits remain separate from expense estimates',()=>{
  const draft=base(),before=structuredClone(draft);
- for(const phrase of ['budget20k','budget 20k','make the budget $20,000','Set budget to 20000','use 20 participants; budget20k','change total budget ceiling to 20000','use $20000 for the total budget'])assert.throws(()=>previewBundleChatEdit(draft,phrase),/total spending limit or a specific allowance/);
- const inputs=structuredClone(draft.inputs);inputs.expenses.push({...structuredClone(inputs.expenses[0]),id:'custom-budget',label:'Budget'});const named=reviseBundleDraft(draft,inputs);assert.throws(()=>previewBundleChatEdit(named,'Set budget to 20000'),/total spending limit/);
+ for(const phrase of ['have a budget of 6000','Set budget to 6000','change total budget ceiling to 6000']){
+  const preview=previewBundleChatEdit(draft,phrase);assert.equal(preview.inputs.budget.amount.value,6000);assert.equal(preview.inputs.budget.basis.value,'cash');assert.deepEqual(preview.inputs.expenses,draft.inputs.expenses);
+ }
+ for(const phrase of ['budget20k','budget 20k','make the budget $20,000','use 20 participants; budget20k','use $20000 for the total budget'])assert.throws(()=>previewBundleChatEdit(draft,phrase),/total spending limit or a specific allowance/);
  assert.deepEqual(draft,before);
 });
 test('negation, exceptions, approximate values and multi-plan requests never create partial edits',()=>{

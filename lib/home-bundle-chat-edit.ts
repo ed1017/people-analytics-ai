@@ -40,13 +40,26 @@ function targets(input:BundleInputs,draft:BundleDraft){
 }
 const numberWords=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
 const monthNames=['january','february','march','april','may','june','july','august','september','october','november','december'];
+function budgetClause(raw:string):{amount:string;basis:'cash'|'all-in'|null}|null{
+ const clause=raw.trim().replace(/[.!?]$/,'').replace(/^(?:please\s+|(?:can|could|would)\s+(?:you|we)\s+)/i,'');
+ const match=clause.match(/^(?:(?:(?:i|we)\s+)?(?:have|only have)\s+(?:a\s+)?|(?:(?:my|our|the)\s+)?|(?:set|change|update|lower|raise|increase|decrease|reduce)\s+(?:the\s+)?)(?:(cash|all-in|total|overall|plan)\s+)?budget(?:\s+(?:ceiling|limit))?\s*(?:of|is|to|=|:)\s*(.+)$/i)
+  ??clause.match(/^(?:(?:i|we)\s+)?(?:can spend|can afford)\s+()(.+)$/i);
+ if(!match)return null;
+ let amount=match[2],basis:'cash'|'all-in'|null=match[1]?.toLowerCase()==='cash'?'cash':match[1]?.toLowerCase()==='all-in'?'all-in':null;
+ const suffix=amount.match(/\s+(all[- ]in|including (?:staff|employee) time|cash(?: only)?|excluding (?:staff|employee) time)$/i);
+ if(suffix){const explicit=/^(?:cash|excluding)/i.test(suffix[1])?'cash':'all-in';if(basis&&basis!==explicit)fail('Choose one budget basis: cash only or including staff time.');basis=explicit;amount=amount.slice(0,-suffix[0].length);}
+ const short=amount.match(/^(\$|USD\s*)?(\d+(?:\.\d{1,2})?)k(?:\s+USD)?$/i);if(short)amount=String(Number(short[2])*1000);
+ return {amount,basis};
+}
 /** Routing only: recognize a local edit before general chat can append it to goal context. */
 export function bundleChatEditIntent(request:string){
  const courtesy=(value:string)=>value.trim().replace(/^(?:please\s+|(?:can|could|would)\s+(?:you|we)\s+|i(?:’|')?d like to\s+)/i,'');
  const planReference=/\b(?:action\s+)?plan\s*#?\s*\d+\b/i.test(request);
  const body=courtesy(courtesy(request).replace(/^(?:(?:in|for|on)\s+)?(?:action\s+)?plan\s*#?\s*\d+(?:\s*(?:and|or|,)\s*(?:(?:action\s+)?plan\s*)?#?\s*\d+)*\s*[:,]?\s*/i,''));
  const edit=/^(?:(?:do not|don[’']?t|never|avoid)\s+)?(?:set|change|update|assume|lower|raise|increase|decrease|reduce|start|move|make|run|use|budget|add|remove|fill|complete)\b/i.test(body);
- return {edit,planReference};
+ const statement=/^(?:(?:i|we)\s+)?(?:have|has|only have|need|want)\b.*\b(?:budget|participants?|months?|hours?)\b|^(?:(?:i|we)\s+)?(?:can spend|can afford)\s+(?:\$|USD\s*)?\d|^(?:my|our|the)\s+(?:cash\s+|total\s+|all-in\s+)?budget\b/i.test(body);
+ const question=/^(?:what|why|how|when|where|which|does|is|are|will|would|could|can)\b/i.test(body)&&!edit;
+ return {edit:!question&&(edit||statement),planReference};
 }
 function selectedPlanRequest(request:string,selection?:BundleEditSelection):string{
  const references=[...request.matchAll(/\b(?:action\s+)?plan\s*#?\s*(\d+)\b/gi)];
@@ -75,7 +88,7 @@ function everydayClause(raw:string,available:Map<string,Target[]>,draft:BundleDr
  if(match)return {name:'Shared start month',value:match[1]};
  match=clause.match(/^(?:make\s+(?:it|the plan)|run\s+(?:it|the plan)\s+for)\s+(.+?)\s+months?$/i);
  if(match)return {name:'Shared horizon',value:match[1]};
- match=clause.match(/^use\s+(.+?)\s+participants(?:\s+for\s+(.+))?$/i);
+ match=clause.match(/^(?:use|(?:(?:i|we)\s+)?(?:have|need|want|only have))\s+(.+?)\s+participants(?:\s+for\s+(.+))?$/i);
  if(match){
   if(!match[2]&&draft.inputs.groups.length!==1)fail(draft.inputs.groups.length?'Which participant group should use this count? Choose '+draft.inputs.groups.map(group=>`“${group.label}”`).join(' or ')+'. Say “use 20 participants for [group]”.':'This plan has no participant group, so that change cannot be applied.');
   return {name:match[2]?match[2]+' participants':'participants',value:match[1]};
@@ -110,6 +123,19 @@ export function previewBundleChatEdit(draft:BundleDraft,request:string,selection
  if(!clauses.length||clauses.length>6)fail('Use up to six changes, separated by semicolons.');
  const inputs=structuredClone(draft.inputs),available=targets(inputs,draft),changes:BundleEditChange[]=[],seen=new Set<string>();
  for(const clause of clauses){
+  const budget=budgetClause(clause);
+  if(budget){
+   if(seen.has('budget'))fail('Review one budget value per request.');seen.add('budget');
+   const target:Target={key:'budget',label:'Budget limit',type:'money',read:()=>inputs.budget?.amount??unknownAssumption(),write:()=>{}};
+   const amount=parseValue(budget.amount,target) as Assumption<number>;
+   const before=inputs.budget;
+   const basis=budget.basis?{value:budget.basis,kind:'user-entered' as const,basis:'Explicit user budget basis; not an expense.'}:before?.basis??{value:'cash' as const,kind:'illustrative' as const,basis:'Proposed cash ceiling, retaining this plan’s separate cash and employee-time convention for its shared planning horizon.'};
+   if(before?.amount.value!==amount.value||JSON.stringify(before?.basis)!==JSON.stringify(basis)){
+    inputs.budget={amount,basis};changes.push({field:'Budget limit (USD)',before:before?.amount??unknownAssumption(),after:amount});
+    if(before?.basis.value!==basis.value)changes.push({field:'Budget basis',before:before?.basis??unknownAssumption(),after:basis});
+   }
+   continue;
+  }
   if(/^use this period for the what-if[.!]?$/i.test(clause)&&inputs.whatIf){const before={value:inputs.whatIf.scopeKey,kind:'user-entered' as const,basis:'Previous what-if scope'},after={value:whatIfScope(inputs),kind:'user-entered' as const,basis:'Explicitly reviewed population and period; rates or roles remain assumptions.'};if(before.value!==after.value){changes.push({field:'What-if population and period',before,after});inputs.whatIf.scopeKey=after.value;}continue;}
   const parsed=everydayClause(clause,available,draft),matches=available.get(normalize(parsed.name));
   if(!matches?.length)fail(`“${parsed.name}” is not a supported exact assumption name. Which displayed assumption and value do you mean? A spending limit is not an expense; a deadline is not a readiness date. Nothing has changed.`);
