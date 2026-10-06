@@ -64,3 +64,8 @@ test('monthly finding follow-ups bind exact available period rows, never YTD sum
  const format=buildHomeReplyFormat({sources:[source]},false);
  assert.equal(ajv.compile(format.schema)({...reply([finding]),answer:text}),true);
 });
+test('an indented sub-bullet keeps the exact visible finding binding without accepting duplicate appearances',()=>{
+ const nested='- Recorded context:\n  - '+item.text;
+ assert.deepEqual(readHomeFindingFollowups([item],nested,pack),[item]);
+ assert.deepEqual(readHomeFindingFollowups([item],nested+'\n    - '+item.text,pack),[]);
+});
