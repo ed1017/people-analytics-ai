@@ -1,5 +1,7 @@
 "use client";
 
+import {SyntheticDomainDemo} from "@/components/synthetic-domain-demo";
+
 import {
   Bar,
   BarChart,
@@ -50,6 +52,8 @@ export function AttritionPage({ data, loading, error, exitData, exitLoading, exi
           {error}
         </div>
       )}
+      <SyntheticDomainDemo domain="turnover" />
+
       {summary ? (
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">

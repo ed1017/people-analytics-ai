@@ -1,5 +1,7 @@
 "use client";
 
+import {SyntheticDomainDemo} from "@/components/synthetic-domain-demo";
+
 import {
   CartesianGrid,
   Line,
@@ -134,6 +136,8 @@ export function SurveySentimentPage({
           {error}
         </div>
       )}
+
+      <SyntheticDomainDemo domain="satisfaction" />
 
       {summary ? (
         <>

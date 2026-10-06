@@ -105,3 +105,11 @@ test('actual bundle POST distinguishes incomplete causes and preserves one bound
  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',persona:'HR',message:HOME_BUNDLE_REQUEST,hasFocusedIssue:true,goalContext:{goal},overviewBriefingContext:packet})}));
  assert.equal(response.status,200);assert.equal(sandbox.__requests.length,before+1);const body=await response.json();assert.equal(body.proposal.goal,goal);assert.equal(body.proposal.bundles.length,3);assert.equal(body.proposal.bundles[0].components[0].limitation,completeComponentLimitation);assert.equal(body.responseDiagnostic,undefined);
 });
+
+test('domain demo reaches the actual route only after an explicit matching-page request',async()=>{
+ const context={snapshotDate:'2026-09-30',country:'France',businessUnit:'Technology',level:'L2',headcount:12,fte:11,voluntaryTurnoverYtdPct:3,laborCostUsd:500000,openPositions:2,headcountGrowthPct:null,trendStart:null,trendEnd:null};
+ for(const [page,message,include,summaryOnly=false] of [['attrition','Explain the synthetic projections',true],['talent-acquisition','Explain the simulated demo',true],['survey-sentiment','Explain the simulated models',true],['attrition','Predict exits for the selected cohort',false],['workforce','Explain the simulated demo',false],['attrition','Explain the simulated demo',false,true]]){
+  sandbox.__replies.push({status:'completed',output:[],output_text:'Synthetic harness response.'});
+  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page,context,message,summaryOnly,goalContext:{goal:'Review the synthetic demonstration'},history:[],syntheticDemo:{values:[999999999]}})}));assert.equal(response.status,200);const input=sandbox.__requests.at(-1).input;assert.equal(input.includes('SEPARATE CONSTRUCTED SYNTHETIC DEMONSTRATION'),include);assert.ok(!input.includes('999999999'));if(include){assert.match(input,/independent of the selected country/);assert.match(input,/No real-world accuracy/);assert.match(input,/Country: France/);}
+ }
+});
