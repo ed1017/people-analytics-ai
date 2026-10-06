@@ -1,0 +1,57 @@
+# Performance and promotion synthetic history contract v1
+
+This offline experiment creates separate invented aggregate histories. It does not qualify operational performance or promotion data, change the Career Mobility release, or expose a production model input. Only development seed `17` was generated while implementing this contract; training and test seed ranges belong to the frozen experiment protocol.
+
+## Existing Career Mobility source qualification
+
+The exact local Git object `633caa3cde2923400ff0b3a0a2547d7c058a6d7a` was inspected, including `components/synthetic-career-demo.tsx` and `lib/data/synthetic-career-demo-v1.json`. Its separate synthetic release has nine department × starting-level cohort series across **2023–2025**, giving 27 annual cells: 21 published and six withheld. Each period contains `year`, `status`, and `metrics`; there is no dated release/revision history. Three observations per series cannot supply the required training windows, chronological validation, or instrument/release-clock audit. These cells are not training data here.
+
+That release's performance target is the share rated **3–5**, not an interval-scale average. Its rating categories are ordinal. Its median time in prior level describes observed promotees only, excludes non-promotees, and is explicitly not a future waiting-time prediction. The new experiment forecasts the **4–5 share** on its own fixed ordinal rubric; it does not silently relabel the existing descriptive target or manufacture an arithmetic mean of rating numbers. Prediction of the existing 3–5 descriptive measure is not established by this experiment.
+
+## Separate longitudinal histories
+
+`experiments/performance_promotion_trees_v1/data.py` supplies `generate_history(seed, scenario)`. The ordinary timeline is January 2018–September 2026: 35 quarterly rating waves and 105 monthly promotion cohorts. Small-sample histories start January 2023 and contain suppressed groups. The full generated object contains eventual releases and must never be passed directly to a model. `make_case` and `aux_features` replay records with both `effectiveAt <= cutoff` and `availableAt <= cutoff`, selecting the highest released revision per period.
+
+Every record carries period, event/effective time, publication time, release status, revision, instrument, population, eligibility rule, scoring definition, and horizon. There are no employee rows, identifiers, demographic fields, sensitive-trait selectors, or individual recommendations. All event information is aggregate counts over a dated event window; no event-level source is asserted to exist.
+
+### Performance: next quarterly share rated 4 or 5
+
+Each quarter-end wave represents a newly rated aggregate population, with 1,000–1,400 rated people among 1,600 eligible people. Five integer category counts reconcile exactly to the rated denominator, and the numerator is categories 4 plus 5. Missing ratings equal eligible minus rated. Missing or incompatible ratings are excluded rather than treated as a low score. This is a proportion among rated people, not a claim about all eligible people or individual improvement.
+
+The ordinary complete release arrives 15 days after quarter close. Missingness stress uses a 45-day initial release; periodic partial waves expose no outcome or denominator and receive a complete correction after 95 days. The instrument-break scenario changes rubric identity and the response law from July 2026. A forecast whose target uses a different identity is unscored; mixed-instrument historical windows are blocked. The historical input window requires eight consecutive, complete, comparable quarterly waves. At a June origin, June's rating wave is not yet published, so the latest ordinary historical wave is March and the target wave is September. This publication gap is preserved.
+
+### Promotion: next three monthly cohorts' 90-day fractions
+
+Every cohort opens on the first day of a month. Its invented eligibility rule is active at opening with at least 12 months in the starting job level. Ordinary opening cohorts contain 400–600 eligible people. A first move to a higher level within 90 days counts once. Lateral moves are outside the event definition. Opening eligible members who exit before a promotion remain in the denominator and cannot subsequently contribute a promotion. Promoted, exited before promotion, and remaining without promotion at day 90 reconcile to the opening denominator.
+
+The opening-denominator release arrives after three days and exposes no outcome counts or fraction. `knownOutcomeThrough` must cover opening plus 90 days. Complete ordinary outcome publication arrives after 105 days; missingness stress uses 135 days, with selected missing releases corrected after 165 days. A cohort without the complete horizon never becomes a negative outcome. The validator rejects immature follow-up, inconsistent counts, and unavailable labels.
+
+The history window is 24 consecutive mature monthly cohorts, ending at the last period guaranteed mature under the declared reporting lag. Future target cohort denominators are used only for eventual scoring and historical training-label weights, never as prediction features. This is an opening-cohort proportion, not a person-time rate, count forecast, or time-to-promotion/survival model. No independent-censoring assumption is used: a complete observed exit is an absorbing competing outcome and incomplete observation blocks the label.
+
+### Suppression and qualification
+
+The invented offline disclosure rule withholds outcomes and denominators whenever a denominator is below 20, a positive rating-category count is below five, or a positive promoted/non-promoted count is below five. Small-sample cohorts deliberately fall below these thresholds. Suppressed releases stay suppressed; they are not converted to zero or reconstructed from aggregate totals. Historical qualification blocks incomplete calendar windows, incomplete/suppressed released history, and incompatible identities. Synthetic suppression is a demonstration rule, not a privacy guarantee for real workforce records.
+
+## Simulation law and stress scenarios
+
+The performance and promotion panels share a hypothetical two-dimensional stationary AR(1) state with coefficient 0.90. Their nonlinear response laws depend on the same month's state; persistent observed histories can contain predictive information. The state never enters model features, and this is not a demonstrated causal or three-month leading relationship. Category/event counts are drawn using separate outcome RNG streams; exposure counts use separate support streams. All streams are distinct from the existing turnover, hiring, and survey generator streams.
+
+The seven primary scenarios are stable, gradual drift, an unannounced July 2026 response reversal, missing/delayed releases, small sample, no signal, and instrument break. No-signal removes dependence on the hidden state while retaining calendar seasonality. The instrument break applies to ratings only; promotion keeps its original definition. Scenario and seed IDs are audit metadata, never predictors. Scenarios sharing one seed are not independent replications.
+
+The generator additionally supports `delayed-predictors` for boundary testing: an auxiliary analytics feed receives an extra 60-day publication delay while the native outcome feed is unchanged. That scenario is not part of the seven-scenario main protocol unless explicitly reported by the evaluation. Auxiliary copies retain original effective dates and reconcile to their native source; delay is not fabricated missing outcomes.
+
+Adding these histories to existing turnover, hiring, or survey predictors is an **independent auxiliary-data control**. It does not assume that ratings or promotion behavior drive those targets. Deterministic calendar trends may still overlap across panels; RNG independence does not make every feature mathematically uncorrelated. A held-out ablation can show benefit or harm under these invented laws, not real organizational efficacy or causation.
+
+## Boundary API
+
+- `make_case(history, domain, origin)` supports `performance` and `promotion`, returning the existing experiment case shape: status/reasons, released history, per-target `lags`/`enriched` vectors, target months, identity, and release audit. Histories include `month`, `value`, `denominator`, and `successes`.
+- `labels_for(history, case, labels_cutoff)` supplies mature comparable labels separately. Labels include integer `successes`, denominator, value, and timestamps; future-label mutations do not alter model inputs.
+- `aux_features(history, cutoff)` returns `performance_favorable_share`, `promotion_rate`, and a `_missing` and `_age_days` field for each. Performance is the latest released wave; promotion is the latest cohort expected mature under the reporting bound. A missing/suppressed expected record does not silently fall back to an older convenient value. Post-break rating values are missing for the frozen v1 auxiliary feature.
+
+Lag vectors contain released target values, target-month sine/cosine, absolute calendar position, and elapsed months from the last observation. The enriched vector adds only released auxiliary fields and historical last/mean-three denominators. The parent runner constructs base, performance-only, promotion-only, and both-feature arms with identical information for Ridge, random forest, and gradient boosting in each arm. No hidden state, scenario flag, seed, future event, future count, or future denominator enters a vector.
+
+Blocking reasons are `missing-calendar-history`, `incomplete-released-history`, and `incomparable-instrument-history`. Label-only blocking reasons are `forecast-abstained`, `incomplete-target-labels`, and `future-instrument-identity-mismatch`. Unsupported and unscorable cases remain in evidence and must not be counted as successful forecasts.
+
+## Development verification
+
+`python -m unittest experiments.performance_promotion_trees_v1.test_data -v` passes eleven tests using seed 17 only. They cover count reconciliation, ordinal target arithmetic, maturity and publication clocks, post-origin mutation invariance, suppression, full instrument/eligibility identity, delayed auxiliary feeds, reproducibility, and metadata exclusion. Auxiliary release selection uses source-declared publication bounds, never the scenario label. Training/test outcome evaluation is owned by the separately frozen protocol and runner; this data contract makes no efficacy claim.
