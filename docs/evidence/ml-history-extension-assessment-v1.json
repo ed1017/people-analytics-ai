@@ -1,0 +1,804 @@
+{
+  "kind": "bounded-ml-history-extension-assessment",
+  "schemaVersion": 1,
+  "assessmentDate": "2026-10-06",
+  "baseHead": "e0dd52c17a9153b45f8eb1c21140c4aff3a022ad",
+  "decision": "do-not-run-on-current-evidence",
+  "activeExperiment": false,
+  "newSeedsGenerated": 0,
+  "newFits": 0,
+  "newModelInputs": [],
+  "realWorldPerformanceValidated": false,
+  "operationallyQualified": false,
+  "publishedInterval": null,
+  "sourceBoundary": "Authorized saved repository artifacts and attributed prior audits only; no fresh database query, external source, credentials, raw person data or original-dataset mutation.",
+  "inputSha256": {
+    "docs/aggregate-signal-qualification-inventory-v1.md": "c1cc85adb32f7f3da508d3a8e9c164584f350e689b9843efca8e3bf9a1e0de43",
+    "docs/aggregate-custody-readiness-assessment-v1.md": "0ebc3a0c8f22f73f4973237f509e52815c9ff69a89bd7bb8d16195ff63dbdc77",
+    "docs/source-provenance-investigation.md": "5eb25899ee047ccbd8d520962180316acbe4c8d2badb5c22fb44a52050230f64",
+    "docs/predictive-analytics-roadmap.md": "04d22a495683961c9348d58df68e3ffd0947a8860aebc994b4c53eb7f3235c4b",
+    "docs/evidence/source-provenance-artifacts.json": "592379646b50ce4f91cfb30ab6ed659eccb7d44dd9029816b194400ef6e630bb",
+    "docs/evidence/aggregate-custody-readiness-assessment-v1.json": "b8effe2251654665e7d371cc008fce0a97a416ae0af36f7fd64e2fea3f4e9024",
+    "lib/ml/synthetic-workforce/provenance.json": "0b2c024003715585b53eb69419aa481653371165c4d166b87b18bc3001fad51d",
+    "tests/fixtures/aggregate-exit-history.json": "64acf5cbb0cddbaa0614e20ee3895cd026ebe3ec9c91fed622820b53b44d63cd",
+    "docs/synthetic-history-length-v1.md": "51811dedac0d1ef045d7f83297ed66a74c285f86b0d3e0ff5aea6e3d6ed9b1d3",
+    "docs/synthetic-window-policy-v1.md": "c90bf6349009edc56868cd504fa48b5a48aff3ed1db9d7aa10f2c253592741b2",
+    "docs/synthetic-tree-benchmarks-v1.md": "18f8460c73d41279ad57ad5f9974e146b75d880f974461ab5a254170da391bcf",
+    "docs/synthetic-tree-review-v1.md": "4b0b943191ddb1b8845b088bdfdd6941041098f2c7b38c0a11b2371e51006af4",
+    "docs/performance-promotion-data-contract-v1.md": "8df71c4818834dd5a6ac01fe336a821e63e663ccb382713baae75f1feb20fc67",
+    "docs/performance-promotion-trees-v1.md": "97419ab18c4e939540238c94b015caf0b9ba869c426a89d062aa37e8bc58524b",
+    "docs/company-count-rf-final-review-v1.md": "8359c566a10feb1f0870a4ca087734dddbfdc6d4155546fd3425c49411c219a8",
+    "docs/evidence/synthetic-history-length-v1/report.json": "7ce316d0243f2a955e335a91acfd73802a673bd41cf22eff4c1e30078a0ae789",
+    "docs/evidence/synthetic-window-policy-v1/report.json": "92fb23eeff1af0b525126b9c33dc41613355e3d6bd8b6c9bc68baec8cf187762",
+    "docs/evidence/synthetic-tree-benchmarks-v1/report.json": "b45bcb2c1ee670b52ee4a4325f9baa2011f9d51c97ae3682f0e6c88bd14ca40e",
+    "docs/evidence/synthetic-tree-review-v1/report.json": "73fef82c676318773166888c3f133bc24b3625965bab6c820c018a14a7e5f67a",
+    "docs/evidence/performance-promotion-trees-v1/test.json": "a5b06ab4683fc64e53d31249e7bcc4d9b7519ffd4745923372380ad2f4fc3b19",
+    "docs/evidence/company-count-rf-final-review-v1/report.json": "04584290ecde1d81446460463d2e7a41b9511ecd2abd1f675308fc7989db9b51"
+  },
+  "evidenceCopies": [
+    {
+      "source": "docs/evidence/aggregate-custody-readiness-assessment-v1.json",
+      "pointer": "/verification",
+      "value": {
+        "status": "verified",
+        "captureId": "425c2a7c2871292bef7fcaf00e41f9aa59d95ac4fec9cfca071d47471040c8f7",
+        "payloadSha256": "64acf5cbb0cddbaa0614e20ee3895cd026ebe3ec9c91fed622820b53b44d63cd",
+        "capturedAt": "2026-10-06T00:04:56.093Z",
+        "declaredProvenance": "user-declared-synthetic",
+        "observationBasis": "unknown",
+        "reporting": {
+          "periods": [
+            "2024-01",
+            "2024-02",
+            "2024-03",
+            "2024-04",
+            "2024-05",
+            "2024-06",
+            "2024-07",
+            "2024-08",
+            "2024-09",
+            "2024-10",
+            "2024-11",
+            "2024-12",
+            "2025-01",
+            "2025-02",
+            "2025-03",
+            "2025-04",
+            "2025-05",
+            "2025-06",
+            "2025-07",
+            "2025-08",
+            "2025-09",
+            "2025-10",
+            "2025-11",
+            "2025-12",
+            "2026-01",
+            "2026-02",
+            "2026-03",
+            "2026-04",
+            "2026-05",
+            "2026-06",
+            "2026-07",
+            "2026-08",
+            "2026-09"
+          ],
+          "firstPeriod": "2024-01",
+          "lastPeriod": "2026-09",
+          "recordCount": 33,
+          "recordedCountRows": 32,
+          "unknownCountPeriods": [
+            "2024-01"
+          ],
+          "missingCalendarPeriods": []
+        },
+        "inputStatus": "valid",
+        "forecastEligibility": {
+          "status": "blocked",
+          "reasons": [
+            "availability-unknown",
+            "availability-unverified",
+            "completeness-unknown",
+            "no-available-history"
+          ]
+        },
+        "causalEffectEligibility": {
+          "status": "blocked",
+          "reasons": [
+            "availability-unverified",
+            "completeness-unknown",
+            "missing-comparison-design"
+          ]
+        },
+        "availableHistoryRows": 0,
+        "operationallyQualified": false,
+        "sourceTruthVerified": false
+      }
+    },
+    {
+      "source": "docs/evidence/aggregate-custody-readiness-assessment-v1.json",
+      "pointer": "/custody/capture",
+      "value": {
+        "capturedAt": "2026-10-06T00:04:56.093Z",
+        "meaning": "Local packaging clock; not historical source availability or authenticated time",
+        "sourceFirstObservedAt": null,
+        "sourceRevision": null,
+        "sourceRevisionHistory": null,
+        "completion": null
+      }
+    },
+    {
+      "source": "docs/evidence/aggregate-custody-readiness-assessment-v1.json",
+      "pointer": "/custody/source",
+      "value": {
+        "name": "public.attrition_monthly_trend",
+        "definitionVersion": "inspected-2026-10-05",
+        "population": "all-recorded-voluntary-separations",
+        "declaredProvenance": "user-declared-synthetic",
+        "observationBasis": "unknown",
+        "extractedOn": "2026-10-05",
+        "extractionPrecision": "calendar-day",
+        "insertedAt": "2026-09-28T01:50:05.925Z",
+        "generatorVersion": null,
+        "completeness": "unknown",
+        "denominatorBasis": "month-end-stock-only"
+      }
+    },
+    {
+      "source": "docs/evidence/aggregate-custody-readiness-assessment-v1.json",
+      "pointer": "/assessments/hiring/suppliedRecordCount",
+      "value": 0
+    },
+    {
+      "source": "docs/evidence/aggregate-custody-readiness-assessment-v1.json",
+      "pointer": "/assessments/satisfaction/suppliedRecordCount",
+      "value": 0
+    },
+    {
+      "source": "docs/evidence/synthetic-history-length-v1/report.json",
+      "pointer": "/summaries/0/windows/1/methods/linear-trend/mae",
+      "value": 14.649999999999997
+    },
+    {
+      "source": "docs/evidence/synthetic-history-length-v1/report.json",
+      "pointer": "/summaries/0/windows/3/methods/linear-trend/mae",
+      "value": 10.178573811907148
+    },
+    {
+      "source": "docs/evidence/synthetic-history-length-v1/report.json",
+      "pointer": "/summaries/0/windows/4/methods/linear-trend/mae",
+      "value": 10.455473536887817
+    },
+    {
+      "source": "docs/evidence/synthetic-window-policy-v1/report.json",
+      "pointer": "/summaries/overall/0/domain",
+      "value": "turnover"
+    },
+    {
+      "source": "docs/evidence/synthetic-window-policy-v1/report.json",
+      "pointer": "/summaries/overall/0/currentMae",
+      "value": 18.889831002330997
+    },
+    {
+      "source": "docs/evidence/synthetic-window-policy-v1/report.json",
+      "pointer": "/summaries/overall/0/policyMae",
+      "value": 14.98675105461441
+    },
+    {
+      "source": "docs/evidence/synthetic-window-policy-v1/report.json",
+      "pointer": "/summaries/overall/0/pairedCases",
+      "value": 280
+    },
+    {
+      "source": "docs/evidence/synthetic-window-policy-v1/report.json",
+      "pointer": "/summaries/overall/1/domain",
+      "value": "hiring"
+    },
+    {
+      "source": "docs/evidence/synthetic-window-policy-v1/report.json",
+      "pointer": "/summaries/overall/1/currentMae",
+      "value": 6.974835925399248
+    },
+    {
+      "source": "docs/evidence/synthetic-window-policy-v1/report.json",
+      "pointer": "/summaries/overall/1/policyMae",
+      "value": 6.974835925399248
+    },
+    {
+      "source": "docs/evidence/synthetic-window-policy-v1/report.json",
+      "pointer": "/summaries/overall/1/pairedCases",
+      "value": 298
+    },
+    {
+      "source": "docs/evidence/synthetic-window-policy-v1/report.json",
+      "pointer": "/summaries/overall/2/domain",
+      "value": "satisfaction"
+    },
+    {
+      "source": "docs/evidence/synthetic-window-policy-v1/report.json",
+      "pointer": "/summaries/overall/2/currentMae",
+      "value": 2.628131928759091
+    },
+    {
+      "source": "docs/evidence/synthetic-window-policy-v1/report.json",
+      "pointer": "/summaries/overall/2/policyMae",
+      "value": 2.628131928759091
+    },
+    {
+      "source": "docs/evidence/synthetic-window-policy-v1/report.json",
+      "pointer": "/summaries/overall/2/pairedCases",
+      "value": 280
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/0/domain",
+      "value": "turnover"
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/0/methods/random-forest-enriched-full/mae",
+      "value": 20.724517885636168
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/0/methods/random-forest-enriched-small/mae",
+      "value": 23.87743342304453
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/0/methods/gradient-boosting-enriched-full/mae",
+      "value": 20.141028353877125
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/0/methods/gradient-boosting-enriched-small/mae",
+      "value": 24.01265018267227
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/1/domain",
+      "value": "hiring"
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/1/methods/random-forest-enriched-full/mae",
+      "value": 10.471735774621177
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/1/methods/random-forest-enriched-small/mae",
+      "value": 15.230339203968526
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/1/methods/gradient-boosting-enriched-full/mae",
+      "value": 10.749959274687367
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/1/methods/gradient-boosting-enriched-small/mae",
+      "value": 14.756511869135826
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/2/domain",
+      "value": "satisfaction"
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/2/methods/random-forest-enriched-full/mae",
+      "value": 5.36118325615484
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/2/methods/random-forest-enriched-small/mae",
+      "value": 7.064820524576037
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/2/methods/gradient-boosting-enriched-full/mae",
+      "value": 5.797838859606933
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-benchmarks-v1/report.json",
+      "pointer": "/summaries/overall/2/methods/gradient-boosting-enriched-small/mae",
+      "value": 6.967413284700179
+    },
+    {
+      "source": "docs/evidence/performance-promotion-trees-v1/test.json",
+      "pointer": "/domains/0/domain",
+      "value": "performance"
+    },
+    {
+      "source": "docs/evidence/performance-promotion-trees-v1/test.json",
+      "pointer": "/domains/0/ablations",
+      "value": [
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [
+            "no-signal:2025-09",
+            "no-signal:2026-03"
+          ],
+          "method": "ridge-performance",
+          "relativeMaeImprovement": -0.01146793204845764
+        },
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "ridge-promotion",
+          "relativeMaeImprovement": -0.0022904084607802133
+        },
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [
+            "no-signal:2025-09",
+            "no-signal:2026-03"
+          ],
+          "method": "ridge-both",
+          "relativeMaeImprovement": -0.01395242113996531
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-performance",
+          "relativeMaeImprovement": -0.0002589282632621259
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-promotion",
+          "relativeMaeImprovement": -0.00013537263726881577
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-both",
+          "relativeMaeImprovement": -0.00029408612604542306
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-performance",
+          "relativeMaeImprovement": 0.0003947232137314627
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-promotion",
+          "relativeMaeImprovement": -0.0016551660201591378
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-both",
+          "relativeMaeImprovement": -0.00166647469897363
+        }
+      ]
+    },
+    {
+      "source": "docs/evidence/performance-promotion-trees-v1/test.json",
+      "pointer": "/domains/1/domain",
+      "value": "promotion"
+    },
+    {
+      "source": "docs/evidence/performance-promotion-trees-v1/test.json",
+      "pointer": "/domains/1/ablations",
+      "value": [
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "ridge-performance",
+          "relativeMaeImprovement": -0.0049350525329787676
+        },
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "ridge-promotion",
+          "relativeMaeImprovement": 4.373896469422878e-05
+        },
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "ridge-both",
+          "relativeMaeImprovement": -0.004895616948361603
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-performance",
+          "relativeMaeImprovement": 0.015556072150889277
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-promotion",
+          "relativeMaeImprovement": 6.053470917866122e-06
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-both",
+          "relativeMaeImprovement": 0.015533436501200537
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-performance",
+          "relativeMaeImprovement": 0.0027283288174799747
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-promotion",
+          "relativeMaeImprovement": -0.0007862755886030026
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-both",
+          "relativeMaeImprovement": 0.002767806954485863
+        }
+      ]
+    },
+    {
+      "source": "docs/evidence/performance-promotion-trees-v1/test.json",
+      "pointer": "/domains/2/domain",
+      "value": "turnover"
+    },
+    {
+      "source": "docs/evidence/performance-promotion-trees-v1/test.json",
+      "pointer": "/domains/2/ablations",
+      "value": [
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "ridge-performance",
+          "relativeMaeImprovement": 0.00023621510118621014
+        },
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "ridge-promotion",
+          "relativeMaeImprovement": 0.0017415565222046459
+        },
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "ridge-both",
+          "relativeMaeImprovement": 0.0006516209705672571
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-performance",
+          "relativeMaeImprovement": 0.0008815489889865136
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-promotion",
+          "relativeMaeImprovement": 0.0003655075945706576
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-both",
+          "relativeMaeImprovement": 0.0009484706611427862
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-performance",
+          "relativeMaeImprovement": 0.0006161451591940592
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-promotion",
+          "relativeMaeImprovement": -0.00021115425716922154
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-both",
+          "relativeMaeImprovement": 0.0006161451591940592
+        }
+      ]
+    },
+    {
+      "source": "docs/evidence/performance-promotion-trees-v1/test.json",
+      "pointer": "/domains/3/domain",
+      "value": "hiring"
+    },
+    {
+      "source": "docs/evidence/performance-promotion-trees-v1/test.json",
+      "pointer": "/domains/3/ablations",
+      "value": [
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "ridge-performance",
+          "relativeMaeImprovement": 0.02002246556045051
+        },
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "ridge-promotion",
+          "relativeMaeImprovement": 0.019294174415849463
+        },
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "ridge-both",
+          "relativeMaeImprovement": 0.023727941200254787
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-performance",
+          "relativeMaeImprovement": 0.01006651753872534
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-promotion",
+          "relativeMaeImprovement": -0.00014159685175929582
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-both",
+          "relativeMaeImprovement": 0.009521263340428243
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-performance",
+          "relativeMaeImprovement": -0.006170007780062159
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-promotion",
+          "relativeMaeImprovement": -0.0009025726310400994
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-both",
+          "relativeMaeImprovement": -0.0019567859954243705
+        }
+      ]
+    },
+    {
+      "source": "docs/evidence/performance-promotion-trees-v1/test.json",
+      "pointer": "/domains/4/domain",
+      "value": "satisfaction"
+    },
+    {
+      "source": "docs/evidence/performance-promotion-trees-v1/test.json",
+      "pointer": "/domains/4/ablations",
+      "value": [
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "ridge-performance",
+          "relativeMaeImprovement": -0.00651410147391962
+        },
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "ridge-promotion",
+          "relativeMaeImprovement": -0.006055650767248233
+        },
+        {
+          "base": "ridge-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "ridge-both",
+          "relativeMaeImprovement": -0.008915795474527588
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-performance",
+          "relativeMaeImprovement": 0.004731809919230057
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-promotion",
+          "relativeMaeImprovement": -0.0010548777794128217
+        },
+        {
+          "base": "random-forest-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "random-forest-both",
+          "relativeMaeImprovement": 0.00410571487213951
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-performance",
+          "relativeMaeImprovement": 0.0011135315853078032
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-promotion",
+          "relativeMaeImprovement": -0.011931294096840128
+        },
+        {
+          "base": "gradient-boosting-base",
+          "decision": "no-demonstrated-robust-value",
+          "failedCells": [],
+          "method": "gradient-boosting-both",
+          "relativeMaeImprovement": -0.00670120397054963
+        }
+      ]
+    },
+    {
+      "source": "docs/evidence/company-count-rf-final-review-v1/report.json",
+      "pointer": "/decision",
+      "value": "reject"
+    },
+    {
+      "source": "docs/evidence/company-count-rf-final-review-v1/report.json",
+      "pointer": "/decisionFinal",
+      "value": true
+    },
+    {
+      "source": "docs/evidence/company-count-rf-final-review-v1/report.json",
+      "pointer": "/decisiveFailure",
+      "value": {
+        "candidateError": 33.11835057847253,
+        "comparator": "seasonal-naive-12",
+        "comparatorError": 20.8,
+        "losses": 32,
+        "meanPairedErrorDifference": 12.318350578472533,
+        "metric": "quarterTotalAbsoluteError",
+        "origin": "2025-09",
+        "ratio": 1.5922283931957946,
+        "relativeWorsening": 0.5922283931957946,
+        "scenario": "no-signal",
+        "seeds": 40,
+        "ties": 0,
+        "wins": 8
+      }
+    },
+    {
+      "source": "docs/evidence/company-count-rf-final-review-v1/report.json",
+      "pointer": "/newFits",
+      "value": 0
+    },
+    {
+      "source": "docs/evidence/company-count-rf-final-review-v1/report.json",
+      "pointer": "/newSeedsGenerated",
+      "value": 0
+    },
+    {
+      "source": "docs/evidence/company-count-rf-final-review-v1/report.json",
+      "pointer": "/newHoldout",
+      "value": false
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-review-v1/report.json",
+      "pointer": "/domainResults/0/domain",
+      "value": "turnover"
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-review-v1/report.json",
+      "pointer": "/domainResults/0/candidate",
+      "value": "gradient-boosting-enriched-full"
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-review-v1/report.json",
+      "pointer": "/domainResults/0/verdict",
+      "value": "reject"
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-review-v1/report.json",
+      "pointer": "/domainResults/1/domain",
+      "value": "hiring"
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-review-v1/report.json",
+      "pointer": "/domainResults/1/candidate",
+      "value": "random-forest-enriched-full"
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-review-v1/report.json",
+      "pointer": "/domainResults/1/verdict",
+      "value": "reject"
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-review-v1/report.json",
+      "pointer": "/domainResults/2/domain",
+      "value": "satisfaction"
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-review-v1/report.json",
+      "pointer": "/domainResults/2/candidate",
+      "value": "random-forest-enriched-full"
+    },
+    {
+      "source": "docs/evidence/synthetic-tree-review-v1/report.json",
+      "pointer": "/domainResults/2/verdict",
+      "value": "reject"
+    }
+  ],
+  "ablationSummary": {
+    "total": 45,
+    "demonstratedRobustValue": 0
+  },
+  "qualification": {
+    "recordedPeriods": 33,
+    "eventBearingMonths": 32,
+    "historicallyReplayableRows": 0,
+    "unknownCountPeriods": [
+      "2024-01"
+    ],
+    "qualifiedNewSourceSeries": 0,
+    "pre2024ExitSourceHistory": "not-established-in-inspected-evidence",
+    "pre2023HiringSourceHistory": "not-established-in-inspected-evidence",
+    "loadedProjectProvenance": "user-declared-synthetic-with-unrecovered-original-generator",
+    "generatedOlderYears": "constructed-assumptions-not-recovered-source-history"
+  },
+  "minimumNextEvidence": [
+    "Actual first-known releases, revisions, independently supported completeness and stable population/metric definitions for existing aggregate targets.",
+    "Older comparable recorded monthly voluntary-count history, if retained, with enough common earlier validation and later untouched assessment; no universal year-count sufficiency rule.",
+    "At most one independently recorded leading workload/demand aggregate after source qualification and separate explicit boundary review; none admitted now."
+  ],
+  "conditionalPlanStatus": "Eligibility requirements only; no active preregistration, source access request, generation run or adoption authorization.",
+  "stoppingRule": "Without genuinely qualified new history or signal and an untouched assessment boundary, retain existing baselines and close RF/GB reliability expansion; do not synthesize a pass.",
+  "limits": [
+    "Historical studies test different estimators and designs; window results do not numerically establish an RF history-length effect.",
+    "Thirty-versus-three generated training histories is not a longer-calendar-history comparison.",
+    "Failed synthetic ablations do not establish that real measured performance/promotion history can never help.",
+    "Missing and suppressed old waves cannot be repaired by appending earlier years or reconstructing withheld values.",
+    "Source hashes verify consistency, not source authenticity or complete universe.",
+    "Current original-dataset performance-rating design belongs to the main workstream and is untouched."
+  ]
+}
