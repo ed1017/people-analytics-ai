@@ -1,0 +1,24 @@
+{
+  "status": "proposal_not_authorized_or_applied",
+  "version": "workforce-performance-2026-ytd-bu-v1",
+  "project": {"id": "noykvmztefmmhyuwuppv", "name": "Ed's People Analytics Database", "database": "postgres"},
+  "source": {"population": "public.employee_snapshots", "ratings": "public.performance_reviews", "snapshotDate": "2026-09-30", "reviewPeriod": "2026 YTD", "join": ["employee_id"], "provenance": "synthetic context; exact rating generator unverified", "numericScale": [1,2,3,4,5], "categoryLabels": "excluded: inconsistent mapping", "notRated": "not_collected; null, never inferred from missing review"},
+  "availability": {"kind": "new_simulated_convention", "simulatedAvailableAt": "2026-09-30T23:59:59.999Z", "originalAvailableAt": null, "proposedOn": "2026-10-06", "historicalOrPredictiveUse": false},
+  "partition": "business_unit_only",
+  "minimumCategoryAndComplement": 10,
+  "releaseGate": "all_eight_business_units_pass_or_withhold_all_nine_outputs",
+  "allowedFilters": [
+    {"country":"all","org":"all","level":"all"},
+    {"country":"all","org":"BU-CLIENTOPS","level":"all"},
+    {"country":"all","org":"BU-CONS","level":"all"},
+    {"country":"all","org":"BU-CORP","level":"all"},
+    {"country":"all","org":"BU-DATAAI","level":"all"},
+    {"country":"all","org":"BU-DIGITAL","level":"all"},
+    {"country":"all","org":"BU-MGSVC","level":"all"},
+    {"country":"all","org":"BU-SALES","level":"all"},
+    {"country":"all","org":"BU-TECH","level":"all"}
+  ],
+  "allOtherFilters": "unavailable_without_rating_counts_or_rates",
+  "readOnlyEvidence": {"observedOn":"2026-10-06","snapshotRows":10000,"snapshotDistinctEmployees":10000,"reviewRows":10000,"reviewDistinctEmployees":10000,"matchedRows":10000,"snapshotWithoutReview":0,"reviewWithoutSnapshot":0,"duplicateEmployeePeriodGroups":0,"invalidOrMissingNumericRatings":0,"missingOrWrongReviewDates":0,"missingDimensions":0,"businessUnitsPassingCategoryAndComplementGate":8,"businessUnitsTotal":8,"fineCellsPassingGate":1,"fineCellsTotal":590,"numericRatingsWithMultipleCategoryLabels":5,"sourceJoinDriftMd5":"3566a2384bc99c6978958b7645e9ea71","sourceJoinDriftMd5IsSecurityProof":false},
+  "recommendedAccess": {"executor":"postgres via authorized Supabase administration","rawTransfer":"none","releaseStore":"workforce_release.performance_rating_v1 (nine aggregate rows only)","newDatabaseReader":"service_role: SELECT aggregate store and EXECUTE exact invoker RPC only","publicReader":"any visitor: approved aggregate response only","rawReviewGrants":"unchanged; service_role, anon, authenticated remain without SELECT","snapshotRatingPopulation":"none"}
+}

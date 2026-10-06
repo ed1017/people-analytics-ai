@@ -12,7 +12,8 @@ import {
 } from "recharts";
 
 import { EvidenceScopeNotice } from "@/components/evidence-scope-notice";
-import { SyntheticCareerDemoPanel } from "@/components/synthetic-career-demo";
+import { WorkforcePerformanceField } from "@/components/workforce-performance";
+import type { PerformanceFilters } from "@/lib/workforce-performance";
 import { formatWholeCount } from "@/lib/display-format";
 import {
   enterpriseTalentEvidenceScope,
@@ -28,6 +29,10 @@ type CareerGrowthMobilityPageProps = {
   loading: boolean;
   error: string | null;
   selectedContext: SelectedBusinessContext;
+  performance?: unknown;
+  performanceFilters?: PerformanceFilters;
+  performanceLoading?: boolean;
+  workforceHeadcount?: number | null;
 };
 
 function formatDate(value: string | null) {
@@ -64,6 +69,10 @@ export function CareerGrowthMobilityPage({
   loading,
   error,
   selectedContext,
+  performance,
+  performanceFilters = { country: "all", org: "all", level: "all" },
+  performanceLoading = false,
+  workforceHeadcount = null,
 }: CareerGrowthMobilityPageProps) {
   const transitionsByType = (
     type: MovementType
@@ -75,8 +84,10 @@ export function CareerGrowthMobilityPage({
 
   return (
     <section className="min-w-0 p-6">
-      <SyntheticCareerDemoPanel />
-      <div className="mb-6 flex items-end justify-between gap-4">
+      <WorkforcePerformanceField value={performance} population={workforceHeadcount} filters={performanceFilters} selectedContext={selectedContext} loading={performanceLoading} />
+      <details className="mt-6">
+        <summary className="cursor-pointer text-sm font-medium">Recorded movement history · company-wide context</summary>
+      <div className="mt-4 mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">
             Descriptive recorded promotions,
@@ -109,6 +120,7 @@ export function CareerGrowthMobilityPage({
 
       {data && (
         <EvidenceScopeNotice
+          filterScopeLabel="these recorded movement events"
           scope={enterpriseTalentEvidenceScope({
             label:
               "Company recorded movement events",
@@ -401,6 +413,7 @@ export function CareerGrowthMobilityPage({
           </div>
         )
       )}
+      </details>
     </section>
   );
 }
