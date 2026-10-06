@@ -1,0 +1,78 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import postcss from 'postcss';
+import tailwind from '@tailwindcss/postcss';
+import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
+import {compensationRelease as releaseManifest} from '../../lib/compensation-release.ts';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
+const output=process.env.COMPENSATION_QA_OUTPUT??await fs.mkdtemp(path.join(os.tmpdir(),'compensation-ranges-ui-'));
+await fs.mkdir(output,{recursive:true});
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/compensation-ranges.tsx'),output:{path:output,filename:'fixture.js'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
+const bundle=await fs.readFile(path.join(output,'fixture.js'),'utf8');
+const css=(await postcss([tailwind()]).process(await fs.readFile('app/globals.css','utf8'),{from:path.resolve('app/globals.css')})).css;
+// Catalog fixtures exercise the real UI; these are not shipped demo employees.
+const catalog={jobs:releaseManifest.jobCodes.map(job=>({job_profile_code:job,job_profile_name:job})),levels:[{level_code:'L1',level_rank:1},{level_code:'L2',level_rank:2}],combinations:[{org_code:'BU1',job_profile_code:'AI-ARCH',level_code:'L1'}]};
+const releaseRows=releaseManifest.jobCodes.map(job=>({release_id:releaseManifest.releaseId,snapshot_date:releaseManifest.snapshotDate,job_profile_code:job,job_profile_name:job,status:['AI-ARCH','COMMS-GEN'].includes(job)?'withheld':'published',mean_compa_pct:['AI-ARCH','COMMS-GEN'].includes(job)?null:105,coverage:['AI-ARCH','COMMS-GEN'].includes(job)?'withheld':'partial',base_pay_provenance:releaseManifest.basePayProvenance,range_provenance:releaseManifest.rangeProvenance,range_policy_version:releaseManifest.rangePolicyVersion}));
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH??'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+let checks=0;
+const check=(condition)=>{assert.ok(condition);checks++;};
+try {
+  for(const width of [1366,390]) {
+    const page=await browser.newPage({viewport:{width,height:900}}), errors=[], calls=[];
+    let failed=false,released=false;
+    page.on('pageerror',error=>errors.push(error.message));
+    await page.route('**/*',route=>{
+      const pathname=new URL(route.request().url()).pathname;
+      if(pathname==='/')return route.fulfill({contentType:'text/html',body:'<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><div id="root"></div></body></html>'});
+      calls.push(pathname);
+      if(pathname==='/api/compensation-job-release')return released ? route.fulfill({json:{release_id:releaseManifest.releaseId,snapshot_date:releaseManifest.snapshotDate,scope:{country:null,org:null,level:null},rows:releaseRows}}) : route.fulfill({status:503,json:{status:'release_not_enabled'}});
+      if(pathname==='/api/compensation-ranges')return route.fulfill({status:failed?503:200,json:failed?{error:'PRIVATE'}:catalog});
+      if(pathname==='/api/compensation')return route.fulfill({status:503,json:{error:'unavailable'}});
+      throw Error('Unexpected request '+pathname);
+    });
+    const mount=async()=>{await page.goto('http://compensation.test/');await page.addStyleTag({content:css});await page.addScriptTag({content:bundle});};
+    await mount();
+    const panel=page.getByRole('region',{name:'Job salary ranges and compa-ratios'});
+    await panel.getByRole('table').waitFor();
+    check(await panel.locator('tbody tr').count()===50);
+    check(await panel.getByRole('combobox').count()===0);
+    check(await page.getByText('Separate simulated workforce').count()===0);
+    check(await panel.locator('svg circle').count()===0);
+    await panel.getByText('1 more level ranges',{exact:true}).first().click();
+    check(await panel.getByText(/L1 · \$/).first().isVisible());
+    if(width===390)await page.getByRole('region',{name:'Shared workforce filters'}).getByText('Filters',{exact:true}).click();
+    await page.getByLabel('Business Unit',{exact:true}).selectOption('BU1');
+    check(await panel.locator('tbody tr').count()===1);
+    await page.getByLabel('Level',{exact:true}).selectOption('L2');
+    await panel.getByText(/No catalog job\/level/).waitFor();check(true);
+    await page.getByRole('button',{name:'Reset',exact:true}).click();
+    await page.getByLabel('Country',{exact:true}).selectOption('US');
+    check(await panel.getByText(/US range assumption/).isVisible());
+    check(calls.filter(p=>p==='/api/compensation-ranges').length===1);
+    check(await page.getByRole('region',{name:'US occupation wage benchmarks'}).isVisible());
+    check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    await page.screenshot({path:path.join(output,`ranges-${width}.png`),fullPage:true});
+    failed=true;await mount();await panel.getByRole('alert').waitFor();
+    check(await page.getByText('PRIVATE').count()===0);
+    failed=false;await panel.getByRole('button',{name:'Try again'}).click();await panel.getByRole('table').waitFor();
+    check(await panel.locator('tbody tr').count()===50);
+    released=true;await mount();await panel.getByText('105.0%',{exact:true}).first().waitFor();
+    check(await panel.locator('svg circle').count()===48);
+    check(await panel.getByText('Partial USD inputs',{exact:true}).count()===48);
+    check(await panel.getByText(/Exact counts are not published/).isVisible());
+    check(await panel.getByText(/USD-pay subset only · Partial job coverage/).isVisible());
+    for(const job of ['AI-ARCH','COMMS-GEN'])check(await panel.getByRole('row').filter({has:page.getByText(job,{exact:true})}).locator('svg circle').count()===0);
+    check(await panel.getByText('100%',{exact:true}).count()===50);
+    await page.screenshot({path:path.join(output,`released-${width}.png`),fullPage:true});
+    if(width===390)await page.getByRole('region',{name:'Shared workforce filters'}).getByText('Filters',{exact:true}).click();
+    await page.getByLabel('Country',{exact:true}).selectOption('US');
+    check(await panel.locator('svg circle').count()===0);
+    check(await panel.getByText(/not released for these filters/).isVisible());
+    check(errors.length===0);
+    await page.close();
+  }
+  console.log(`PASS ${checks} browser checks; screenshots: ${output}`);
+} finally {await browser.close();}

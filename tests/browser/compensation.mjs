@@ -28,18 +28,20 @@ try{
     await page.route('**/*',async route=>{
       const url=new URL(route.request().url());requests.push(url.pathname);
       if(url.href==='http://compensation.test/')return route.fulfill({contentType:'text/html',body:'<!doctype html><html class="dark"><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><div id="root"></div></body></html>'});
+      if(url.pathname==='/api/compensation-job-release')return route.fulfill({status:503,json:{status:'release_not_enabled'}});
+      if(url.pathname==='/api/compensation-ranges')return route.fulfill({json:{jobs:[],levels:[],combinations:[]}});
       assert.equal(url.pathname,'/api/compensation','no unrelated APIs or model calls');
       if(state==='held')await new Promise(resolve=>{release=resolve});
       return route.fulfill({status:state==='error'?503:200,json:state==='error'?{error:'Internal source detail must not be rendered'}:state==='partial'?partial:state==='empty'?empty:good});
     });
     const mount=async()=>{await page.goto('http://compensation.test/');await page.addStyleTag({content:css});await page.addScriptTag({content:bundle});};
     await mount();
-    await page.getByRole('status').filter({hasText:'Loading'}).waitFor();
+    await page.getByRole('status').filter({hasText:'Loading compensation cost context'}).waitFor();
     check(width+' loading is announced without showing placeholder money',await page.getByRole('table').count()===0);
     state='good';release();
     await page.getByRole('table').waitFor();
     check(width+' weighted total and ratio displayed',await page.getByText('$12,000,000',{exact:true}).count()===1&&await page.getByText('$120,000',{exact:true}).count()===1);
-    check(width+' snapshot, synthetic provenance, scope and unknown period visible',await page.getByText(/Snapshot: September 30, 2026/).isVisible()&&await page.getByText(/Cost period and source refresh date are not supplied/).isVisible()&&await page.getByText(/Synthetic aggregate evidence/).isVisible());
+    check(width+' snapshot, synthetic provenance, scope and unknown period visible',await page.getByText(/Snapshot: September 30, 2026/).isVisible()&&await page.getByText(/Cost period and source refresh date are not supplied/).isVisible()&&await page.getByText(/Demo data · Aggregate evidence/).isVisible());
     await page.getByText('Source and limits',{exact:true}).click();
     check(width+' missing coverage and no annualization explained',await page.getByText(/Source sums can omit missing employee costs/).isVisible()&&await page.getByText(/no conversion or annualization/).isVisible());
     const tableRegion=page.getByRole('region',{name:'Business-unit cost comparison'});
@@ -56,7 +58,7 @@ try{
     check(width+' failure sanitized with usable retry',await page.getByText('Internal source detail must not be rendered').count()===0&&await page.getByRole('button',{name:'Try again'}).isEnabled());
     state='good';await page.getByRole('button',{name:'Try again'}).click();await page.getByRole('table').waitFor();
     check(width+' retry recovers real page',await page.getByRole('alert').count()===0&&await page.getByText('$12,000,000',{exact:true}).count()===1);
-    check(width+' no runtime errors or extra data/model calls',errors.length===0&&requests.filter(p=>p==='/api/compensation').length===5&&requests.every(p=>p==='/'||p==='/api/compensation'));
+    check(width+' no runtime errors or extra data/model calls',errors.length===0&&requests.filter(p=>p==='/api/compensation').length===5&&requests.every(p=>p==='/'||p==='/api/compensation'||p==='/api/compensation-ranges'||p==='/api/compensation-job-release'));
     await context.close();
   }
   await fs.writeFile(path.join(output,'results.json'),JSON.stringify({checks:results.length,results},null,2));
