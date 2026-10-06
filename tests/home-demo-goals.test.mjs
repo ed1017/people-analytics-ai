@@ -6,7 +6,7 @@ import {DecisionStore,DECISIONS_STORAGE_KEY,encodeDecisions,parseDecisions} from
 import {GOALS_STORAGE_KEY} from '../lib/local-goals.ts';
 import {actionBinding,actionBindingKey} from '../lib/home-action-drafts.ts';
 import {bundleWorkspaceField,readBundleWorkspace,saveBundleDraftPatch,attachBundlePatch} from '../lib/home-bundle-records.ts';
-import {readBundleDraft,bundleInputKey} from '../lib/home-bundle-reconciliation.ts';
+import {readBundleDraft,bundleInputKey,reconcileBundle} from '../lib/home-bundle-reconciliation.ts';
 import {previewBundleChatEdit,acceptBundleChatEdit} from '../lib/home-bundle-chat-edit.ts';
 import {pinnedGoalPlanStatus,restoredBundleDraft,restoredBundleResult} from '../lib/home-pinned-goals.ts';
 const now='2026-10-06T00:00:00.000Z',seed=()=>createHomeDemoGoals(now);
@@ -20,7 +20,8 @@ test('first run has two clearly identifiable attached examples and starts in Gen
   assert.deepEqual(demoBinding(example),await actionBinding(example.id,example.goal,{sources:[]},{origin:homeDemoOrigin,key:example.key}));
   assert.ok(draft.bundle.name.split(' ').length<=5);assert.equal(draft.bundle.origin,homeDemoOrigin);assert.deepEqual(draft.bundle.components[0].evidence,[]);
   assert.equal(draft.inputs.expenses[0].amount.kind,'illustrative');assert.equal(draft.inputs.groups[0].count.kind,'illustrative');assert.equal(draft.inputs.scope.startMonth.value,'2026-11');assert.equal(draft.inputs.whatIf,undefined);
-  assert.equal(workspace.attachments[0].result.cashTotal,null); // Complete real-world budget remains unknown.
+  assert.equal(draft.inputs.costReviews[0].complete.kind,'illustrative');
+  assert.equal(workspace.attachments[0].result.cashTotal,example.budget); // Complete only within the fictional example scope.
  }
 });
 test('existing current, empty, legacy, invalid and deleted state never trigger seeding',()=>{
@@ -36,6 +37,12 @@ test('reload, repeated hydration, remove and clear all never duplicate or resurr
  store.saveGoals({...store.getSnapshot().data.goals,goals:[store.getSnapshot().data.goals.goals[1]]});
  const reopened=new DecisionStore();reopened.initialize(p,()=>assert.fail());assert.deepEqual(reopened.getSnapshot().data.goals.goals.map(item=>item.id),[homeDemoExamples[1].id]);
  reopened.clearAll();const cleared=new DecisionStore();cleared.initialize(p,()=>assert.fail());assert.deepEqual(cleared.getSnapshot().data.goals.goals,[]);
+});
+test('older saved examples keep their original unknown-cost snapshot on reload',()=>{
+ const data={version:1,revision:1,...seed()},example=homeDemoExamples[0],attachment=data.workspaces[example.id].fields[bundleWorkspaceField].attachments[0];
+ attachment.draft.inputs.costReviews[0].complete={value:null,kind:'unknown',basis:null};attachment.result=reconcileBundle(attachment.draft);
+ const raw=encodeDecisions(data),p=port([[DECISIONS_STORAGE_KEY,raw]]),store=new DecisionStore();store.initialize(p,seed);
+ assert.equal(p.getItem(DECISIONS_STORAGE_KEY),raw);assert.equal(store.getSnapshot().data.workspaces[example.id].fields[bundleWorkspaceField].attachments[0].result.cashTotal,null);
 });
 test('supported chat edits persist as latest drafts and attachments preserve the original example',()=>{
  const data=seed(),example=homeDemoExamples[1],binding=demoBinding(example),fields=data.workspaces[example.id].fields,original=structuredClone(fields[bundleWorkspaceField]),before=original.attachments[0],draft=before.draft;

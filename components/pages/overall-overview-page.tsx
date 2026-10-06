@@ -20,7 +20,7 @@ import {revealJourneyTarget} from "@/components/workforce-journey-continue";
 import {decisionStore,recordDecisionEvidence,useDecisionStorage} from "@/components/decision-store";
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUp, RefreshCw, Info } from "lucide-react";
-import {PHONE_LAYOUT_QUERY} from "@/components/use-phone-layout";
+import {queueHomeResponseReveal} from '@/components/home-response-reveal';
 import {useHomeComposerDock} from '@/components/use-home-composer-dock';
 import {HomeSolutionBundles} from '@/components/home-solution-bundles';
 import type {BundleDiscussion} from '@/components/home-bundle-plans';
@@ -123,7 +123,6 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
   const [evidenceError, setEvidenceError] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(0);
   const { messages, setMessages, input, setInput, loading: chatLoading, setLoading: setChatLoading, error: chatError, setError: setChatError, problem: journey, questionUnanswered, setQuestionUnanswered, history: modelHistoryRef } = conversation;
-  const hasAnswer=messages.some(message=>message.role==="assistant");
   const optionSnapshot=useSyncExternalStore(optionActions?.subscribe??noActionSubscription,optionActions?.getSnapshot??noActionSnapshot,noActionSnapshot);
   const [suggestionPending,setSuggestionPending]=useState(false);
   const [localAction,setLocalAction]=useState<{goalId:string;notice:string}|null>(null);
@@ -145,6 +144,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
   const loadedAt = useRef(0);
   const composer = useRef<HTMLTextAreaElement>(null);
   const conversationViewport = useRef<HTMLDivElement>(null);
+  const cancelResponseReveal=useRef<()=>void>(()=>{});
+  useLayoutEffect(()=>()=>cancelResponseReveal.current(),[]);
   const composerSlot=useRef<HTMLDivElement>(null),composerDock=useRef<HTMLDivElement>(null);
   useHomeComposerDock(active,composerSlot,composerDock,composer);
   useLayoutEffect(()=>{
@@ -263,6 +264,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
     const goalContext=actionPlan||retainGoalContext||forecastQuestion?conversation.goalContext:conversation.recordGoalStatement(message,"home",workforceScope);
     setMessages(current => [...current, { role: "user", content: actionPlan ? HOME_ACTION_PLAN_LABEL : message }]);
     if(!preserveDraft)setInput(""); setChatLoading(true); setChatError(null);
+    cancelResponseReveal.current();
+    cancelResponseReveal.current=queueHomeResponseReveal(()=>conversationViewport.current,()=>liveActive.current&&request.current()&&currentEvidenceKey.current===key&&candidateEpoch===promptEpoch.current);
     if (!actionPlan) setQuestionUnanswered(true);
     try {
       const requestSelection=homeEvidenceSelection(message,history,conversation.focusedIssue),requestPack=buildHomePack(sourceResults,workforceScope,requestSelection,developmentSession);
@@ -294,7 +297,6 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
       setMessages(current => [...current, assistantMessage]);
       modelHistoryRef.current = completeScopedChatTurn(key, history, message, reply.clarification?answer+'\n\n'+reply.clarification:answer);
       if (!actionPlan) { conversation.rememberQuestion(key, message); setQuestionUnanswered(false); }
-      window.requestAnimationFrame(() => { if(reply.proposal&&conversation.focusedIssue){const heading=conversationViewport.current?.querySelector<HTMLElement>('[aria-label="Investigation options for your goal"] h2');heading?.focus({preventScroll:true});heading?.scrollIntoView({block:'start'});return;} const viewport=conversationViewport.current,answers=viewport?.querySelectorAll<HTMLElement>('[data-chat-role="assistant"]'),answer=answers?.[answers.length-1]; if(viewport&&answer){if(window.matchMedia(PHONE_LAYOUT_QUERY).matches)requestAnimationFrame(()=>requestAnimationFrame(()=>answer.scrollIntoView({block:'start'})));else viewport.scrollTop+=answer.getBoundingClientRect().top-viewport.getBoundingClientRect().top;} });
       return Boolean(reply.proposal&&!reply.clarification);
     } catch (error) { if (!request.current() || currentEvidenceKey.current !== key || candidateEpoch!==promptEpoch.current) return; setChatError(error instanceof Error ? error.message : "Answer unavailable. Please try again."); if (!actionPlan&&!preserveDraft) setInput(current=>current.trim()?current:message); }
     finally { if(sending.current===sendTicket)sending.current=null; if (request.current() && currentEvidenceKey.current === key) setChatLoading(false); }
@@ -403,7 +405,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
 
     </section>
   );
-  return <div className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-3">
+  return <div style={{overflowAnchor:'none'}} className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-3">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <button type="button" onClick={resetHomeConversation} className="min-h-11 rounded px-2 text-xs font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Reset conversation</button>
         <h2 id="overall-overview-heading" className="sr-only">Home overview</h2>
@@ -449,8 +451,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
     <HomeSolutionBundles settled={sourcesSettled} chatChange={planEdit&&editPreview?{goalId:planEdit.goalId,planId:planEdit.id,inputKey:editPreview.inputKey,ready:!chatLoading&&planEditReady&&conversation.saved&&input.trim()===editPreview.request,isCurrent:planEdit.isCurrent,apply:applyPlanChanges}:null} openRequest={planOpen} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} projectEvidence={destination=>buildHomePack(sourceResults,workforceScope,conversation.focusedIssue||conversation.problem?.latestQuestion||'',destination.development??developmentSession)} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={request=>{selectedPlanForChat.current=request;}}/>
     {planEdit?.goalId===conversation.activeGoalId&&<div ref={editReview} tabIndex={-1}><HomeBundleChatReview target={planEdit} preview={editPreview} text={input} busy={chatLoading||!planEditReady||!conversation.saved} notice={editNotice} onClose={()=>{setPlanEdit(null);setEditPreview(null);setEditNotice('');focusQuestion();}}/></div>}
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
-    {!guidedExampleActive&&!hasAnswer&&!conversation.focusedIssue&&startingGuide}
-    {showFallbackPin&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
+    {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&startingGuide}
+    {showFallbackPin&&!chatLoading&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
     {messages.length > 0 && <section aria-label="Overview conversation" className="space-y-3">
       <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona,conversation.resetEpoch])} onNavigate={onNavigate} home hideHistory collapsedRationale={message=>activePinnedGoal&&(planRationale.current.get(message)===conversation.activeGoalId||messages[messages.indexOf(message)-1]?.content===HOME_ACTION_PLAN_LABEL)} renderBulletAction={renderFindingAction} renderMessageSupplement={message=><HomeForecastChart question={messages[messages.indexOf(message)-1]?.role==='user'?messages[messages.indexOf(message)-1].content:''} answer={message.content}/>}/>
       {conversation.homeGoalChoiceKey === contextKey && !conversation.focusedIssue && <div role="group" aria-label="Choose a goal" className="flex flex-wrap gap-2">
