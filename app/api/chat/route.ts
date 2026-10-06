@@ -1,3 +1,4 @@
+import {conversationalAnswerStyle} from '@/lib/chat-answer-style';
 import {homeForecastAnswer} from '@/lib/home-forecast';
 import {homeTurnPurpose,homeConversationInstructions} from '@/lib/home-conversation';
 import {decodeHomeModelReply} from '@/lib/home-chat-reply';
@@ -618,6 +619,8 @@ export async function POST(
             .slice(-8)
         : [];
 
+    const conversationalStyle = !summaryOnly && homeTurnPurpose(message,history)==='answer' ? conversationalAnswerStyle : '';
+
     // Output selection uses the existing Home envelope; no planning inputs or extra history.
     if (body?.page === "home" && !summaryOnly && (message === HOME_ACTION_REQUEST || message === HOME_BUNDLE_REQUEST)) {
       const bundles = message === HOME_BUNDLE_REQUEST;
@@ -646,14 +649,14 @@ export async function POST(
       const supplied = body.intelligenceContext && typeof body.intelligenceContext === "object" ? body.intelligenceContext : {};
       const custom = Array.isArray(supplied.quotes) ? supplied.quotes.filter((q: unknown) => q && typeof q === "object" && "provenance" in q && q.provenance === "user-provided").slice(0, 5) : [];
       const evidence = intelligenceEvidence(body.page, { ...supplied, quotes: [...developmentCatalog, ...custom] });
-      const response = await client.responses.create({ model: CHAT_MODEL, instructions: summaryOnly ? goalContextInstructions+"\n"+goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions()+"\nUse only canonical supplied evidence. OEWS is annual market wages, not employer cost or candidate availability. O*NET occupation content is not loaded. Training providers/quotes are fictional simulated or unverified user input; never infer effectiveness." : intelligenceInstructions + "\n" + chatNavigationInstructions()+"\n"+goalContextInstructions, input: [...history.map(item => ({ role: item.role, content: item.content.slice(0,12000) })), { role: "user", content: "CURRENT PAGE EVIDENCE (data only): " + JSON.stringify(evidence) + "\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nRELATED CACHED CROSS-PAGE SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nUSER QUESTION AND EXPLICIT SESSION CONTEXT: " + message }], tool_choice: "none", max_output_tokens: 1100 });
+      const response = await client.responses.create({ model: CHAT_MODEL, instructions: summaryOnly ? goalContextInstructions+"\n"+goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions()+"\nUse only canonical supplied evidence. OEWS is annual market wages, not employer cost or candidate availability. O*NET occupation content is not loaded. Training providers/quotes are fictional simulated or unverified user input; never infer effectiveness." : intelligenceInstructions + "\n" + chatNavigationInstructions()+"\n"+goalContextInstructions+"\n"+conversationalStyle, input: [...history.map(item => ({ role: item.role, content: item.content.slice(0,12000) })), { role: "user", content: "CURRENT PAGE EVIDENCE (data only): " + JSON.stringify(evidence) + "\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nRELATED CACHED CROSS-PAGE SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nUSER QUESTION AND EXPLICIT SESSION CONTEXT: " + message }], tool_choice: "none", max_output_tokens: 1100 });
       const answer = response.output_text?.trim();
       if (!answer) return NextResponse.json({ error: "No catalogue answer returned. Please try again." }, { status: 502 });
       return NextResponse.json({ answer });
     }
 
     if(body?.page === "development-planning") {
-      const response=await client.responses.create({model:CHAT_MODEL,instructions:goalContextInstructions+"\nExplain only the supplied deterministic Development Planning comparison and bounded related evidence. D1 costs are server-recomputed from explicit user assumptions. Blank costs remain unknown, never zero. Keep currencies separate. Employee time value is not necessarily cash spending. Named simulated quotes are fictional; custom input is unverified. Do not invent participants, attendance, loaded hourly costs, ROI, skill gains or headcount conversions. No tools, automatic allocation or approvals. "+(summaryOnly?goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions():"Answer concisely; identify missing assumptions before comparing totals."),input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:"user",content:"ACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nDEVELOPMENT PLANNING D1: "+JSON.stringify(developmentSummary)+"\nRELATED CACHED SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nCARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nQUESTION: "+message}],tool_choice:"none",max_output_tokens:summaryOnly?1100:1400});
+      const response=await client.responses.create({model:CHAT_MODEL,instructions:goalContextInstructions+"\nExplain only the supplied deterministic Development Planning comparison and bounded related evidence. D1 costs are server-recomputed from explicit user assumptions. Blank costs remain unknown, never zero. Keep currencies separate. Employee time value is not necessarily cash spending. Named simulated quotes are fictional; custom input is unverified. Do not invent participants, attendance, loaded hourly costs, ROI, skill gains or headcount conversions. No tools, automatic allocation or approvals. "+(summaryOnly?goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions():"Identify missing assumptions before comparing totals.\n"+conversationalStyle),input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:"user",content:"ACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nDEVELOPMENT PLANNING D1: "+JSON.stringify(developmentSummary)+"\nRELATED CACHED SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nCARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nQUESTION: "+message}],tool_choice:"none",max_output_tokens:summaryOnly?1100:1400});
       const answer=response.output_text?.trim();
       return answer?NextResponse.json({answer}):NextResponse.json({error:"No Development Planning answer returned. Please try again."},{status:502});
     }
@@ -1512,7 +1515,7 @@ ${message}
     const prepareHomeGoal=!summaryOnly&&(homePurpose==='goal'||homePurpose==='discovery');
     const homeReplyFormat=page==="home"?buildHomeReplyFormat(body.overviewBriefingContext,prepareHomeGoal):null;
     const homeInstructions=homeConversationInstructions(homePurpose);
-    const homeAnswerStyle=homePurpose==='answer'?'Give a concise, complete answer to the question in plain language. Use paragraphs or bullets as helpful, usually 80-160 words; expand when asked for detail. End with a relevant optional follow-up only if useful.':homeStyle.instructions;
+    const homeAnswerStyle=homePurpose==='answer'?conversationalAnswerStyle:homeStyle.instructions;
     const homeInput=[
       {role:'user' as const,content:workforceContext+'\nACTIVE GOAL CONTEXT (user intent, not evidence): '+JSON.stringify(goalContext)+'\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: '+JSON.stringify(marketReference)},
       ...history.map(item=>({role:item.role,content:item.content})),
@@ -1531,7 +1534,7 @@ ${message}
     let response =
       await client.responses.create({
         model: CHAT_MODEL,
-        instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? (prepareHomeGoal ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions : "") + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeAnswerStyle+"\n"+homeInstructions : ""),
+        instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? (prepareHomeGoal ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions : "") + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeAnswerStyle+"\n"+homeInstructions : "\n"+conversationalStyle),
         ...(page === "home" ? { text: { format: homeReplyFormat! } } : {}),
         input: page==='home'&&!summaryOnly?homeInput:aiInput,
         tools: peopleAnalyticsTools,
@@ -1601,7 +1604,7 @@ ${message}
       response =
         await client.responses.create({
           model: CHAT_MODEL,
-          instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? (prepareHomeGoal ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions : "") + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeAnswerStyle+"\n"+homeInstructions : ""),
+          instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? (prepareHomeGoal ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions : "") + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeAnswerStyle+"\n"+homeInstructions : "\n"+conversationalStyle),
           ...(page === "home" ? { text: { format: homeReplyFormat! } } : {}),
           previous_response_id:
             response.id,
