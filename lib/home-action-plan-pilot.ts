@@ -2,6 +2,8 @@
 import {planningStatements,resolveHomePlanningIntent,planningRequirementText} from './home-planning-intent.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {initialWhatIf,normalizeWhatIfQuantities} from './home-plan-what-if.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {withDeliveryAssumptions} from "./home-plan-delivery-estimate.ts";
 // Deterministic local DEMO assumptions. Never a quote, staffing forecast or model input.
 // @ts-expect-error Native Node tests share TypeScript source.
 import {readBundleDraft,reviseBundleDraft,unknownAssumption,type Assumption,type BundleDraft} from './home-bundle-reconciliation.ts';
@@ -15,7 +17,7 @@ export function pilotCalendar(preparedAt:string){
  const start=new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+1,1)),end=new Date(Date.UTC(start.getUTCFullYear(),start.getUTCMonth()+3,0));
  return {preparedAt:date.toISOString(),timezone:'UTC' as const,startMonth:start.toISOString().slice(0,7),endDate:end.toISOString().slice(0,10)};
 }
-export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string,context?:{goalContext?:unknown}):BundleDraft{
+export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string,context?:{goalContext?:unknown;includeDeliveryEstimate?:boolean}):BundleDraft{
  if(!readBundleDraft(draft))throw Error('Invalid Action Plan draft.');
  if(draft.pilot)return structuredClone(draft); // Never refresh frozen dates or overwrite edits.
  const calendar=pilotCalendar(preparedAt),basis=`${pilotVersion}; prepared ${calendar.preparedAt}; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.`;
@@ -58,6 +60,6 @@ export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string,con
   if(intent.rateConflict){scenario.baseline=unknownAssumption();scenario.target=unknownAssumption();scenario.population=unknownAssumption();}
   input.whatIf=scenario;
  }
- const next=reviseBundleDraft(draft,input);next.pilot={version:pilotVersion,preparedAt:calendar.preparedAt,timezone:'UTC'};
+ const next=reviseBundleDraft(draft,context?.includeDeliveryEstimate?withDeliveryAssumptions(input,draft.bundle.components.length):input);next.pilot={version:pilotVersion,preparedAt:calendar.preparedAt,timezone:'UTC'};
  if(!readBundleDraft(next))throw Error('Illustrative pilot could not be validated.');return next;
 }

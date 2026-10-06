@@ -55,3 +55,12 @@ export function homePlanningNoteParts(statement:string):string[]{
  * Never accepts assistant prose, a model problem, a question, or a choice between outcome goals.
  */
 export function homeUserGoalForPin(statements:string[]):string|null{return homeGoalForPin(statements);}
+
+/** A choice about staffing is an explicit request to plan a decision, not a claim of a skill gap. */
+export function workforceChoiceDiscoveryGoal(message:string):string|null {
+ const question=message.split(/\n\n(?:Focused issue|Session problem context)/)[0].trim();
+ if(!/\b(?:hir(?:e|ing)|recruit(?:ing)?)\b/i.test(question)||!/\b(?:train(?:ing)?|upskill(?:ing)?)\b/i.test(question))return null;
+ if(/\b(?:do not|don't|don’t|cancel|forget)\b/i.test(question))return null;
+ if(!/^(?:(?:please\s+)?(?:help (?:me|us) )?(?:decide|choose|compare)\b|(?:should|could|can|do)\s+(?:we|i)\b)/i.test(question))return null;
+ return 'Choose a hiring, training, or combined approach for our workforce needs';
+}

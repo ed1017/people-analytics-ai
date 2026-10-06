@@ -1,5 +1,7 @@
 // @ts-expect-error Native Node tests share TypeScript source.
 import {whatIfScope} from './home-plan-what-if.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {withDeliveryAssumptions} from "./home-plan-delivery-estimate.ts";
 // Local, bounded text edits. No model call, calculation, persistence or inferred values.
 // @ts-expect-error Native Node tests share TypeScript source.
 import {bundleInputKey,readBundleDraft,reviseBundleDraft,unknownAssumption,type Assumption,type BundleDraft,type BundleInputs} from './home-bundle-reconciliation.ts';
@@ -25,6 +27,7 @@ function targets(input:BundleInputs,draft:BundleDraft){
  if(input.whatIf){const scenario=input.whatIf;for(const [key,label,type,aliases] of (scenario.kind==='turnover'?[
   ['baseline','Baseline turnover','percent',['baseline turnover rate','baseline rate']],['target','Target turnover','percent',['target turnover rate','turnover target','success target']],['population','Average workforce','count',['outcome population','denominator']],
  ]:[['baseline','Baseline additional roles','count',['baseline coverage']],['target','Target additional roles','count',['additional roles','capacity target','success target']],['unitCost','Monthly cost per role','money',['monthly role cost','role monthly cost']]]) as [keyof Pick<typeof scenario,'baseline'|'target'|'population'|'unitCost'>,string,Target['type'],string[]][]){add({key:'whatIf.'+key,label,type,read:()=>scenario[key],write:value=>{scenario[key]=value as Assumption<number>;}},aliases);}}
+ if(input.deliveryEstimate){const delivery=input.deliveryEstimate;for(const [key,label,type,aliases] of [['hoursPerParticipant','Hours per participant','count',['assessment hours per participant']],['coordinationHours','Coordination hours','count',['staff coordination hours']],['hourlyRate','Staff hourly rate','money',['hourly rate','staff rate']],['acceptance','Acceptance criteria','text',['success criteria']]] as const)add({key:'deliveryEstimate.'+key,label,type,read:()=>delivery[key],write:value=>{if(key==='acceptance')delivery.acceptance=value as Assumption<string>;else delivery[key]=value as Assumption<number>;}},[...aliases]);}
  for(const group of input.groups)add({key:'group.'+group.id,label:group.id==='pilot-group'&&draft.pilot&&input.groups.length===1?'Pilot participants':group.label+' participants',type:'count',read:()=>group.count,write:value=>{group.count=value as Assumption<number>;}},[group.label+' participants',group.id+' participants',...(input.groups.length===1?['participants','pilot participants']:[])]);
  for(const expense of input.expenses){
   const pilot=pilotAllowances[expense.id.slice(6) as keyof typeof pilotAllowances],label=pilot?.label??expense.label;
@@ -42,7 +45,7 @@ export function bundleChatEditIntent(request:string){
  const courtesy=(value:string)=>value.trim().replace(/^(?:please\s+|(?:can|could|would)\s+(?:you|we)\s+|i(?:’|')?d like to\s+)/i,'');
  const planReference=/\b(?:action\s+)?plan\s*#?\s*\d+\b/i.test(request);
  const body=courtesy(courtesy(request).replace(/^(?:(?:in|for|on)\s+)?(?:action\s+)?plan\s*#?\s*\d+(?:\s*(?:and|or|,)\s*(?:(?:action\s+)?plan\s*)?#?\s*\d+)*\s*[:,]?\s*/i,''));
- const edit=/^(?:(?:do not|don[’']?t|never|avoid)\s+)?(?:set|change|update|assume|lower|raise|increase|decrease|reduce|start|move|make|run|use|budget|add|remove)\b/i.test(body);
+ const edit=/^(?:(?:do not|don[’']?t|never|avoid)\s+)?(?:set|change|update|assume|lower|raise|increase|decrease|reduce|start|move|make|run|use|budget|add|remove|fill|complete)\b/i.test(body);
  return {edit,planReference};
 }
 function selectedPlanRequest(request:string,selection?:BundleEditSelection):string{
@@ -97,6 +100,11 @@ export function previewBundleChatEdit(draft:BundleDraft,request:string,selection
  if(!readBundleDraft(draft))fail('This plan draft cannot be verified. Your work is kept.');
  if(!request.trim()||request.length>1200)fail('Describe up to six edits in 1,200 characters.');
  // Only a final complete preservation instruction is optional; never discard intervening requests.
+ if(/^(?:please\s+)?(?:make|fill(?: in)?|complete|add|use)\s+(?:(?:all|the|missing|remaining|needed|necessary|starting|reasonable)\s+)*assumptions(?:\s+(?:so (?:you|we) (?:have|get|can see) an outcome|to (?:show|give|have) an outcome))?[.!]?$/i.test(selectedPlanRequest(request,selection))){
+  const completed=withDeliveryAssumptions(draft.inputs,draft.bundle.components.length);
+  if(draft.inputs.deliveryEstimate)fail('Starting assumptions are already shown. Change hours per participant, coordination hours, staff hourly rate or acceptance criteria in chat.');
+  return {inputKey:bundleInputKey(draft),request,inputs:completed,changes:[{field:'Delivery estimate assumptions',before:{value:null,kind:'unknown',basis:null},after:{value:'2 hours per participant, 8 coordination hours per component, $60 per hour and proposed acceptance criteria',kind:'illustrative',basis:'Proposed local assumptions; review before applying.'}}]};
+ }
  const editRequest=selectedPlanRequest(request,selection).trim().replace(/\.\s+Keep (?:all )?other assumptions unchanged\.?$/i,'');
  const clauses=editRequest.split(/;|\n|\s+and\s+(?=(?:start|make|use|set|change|update|move|run)\b)/i).map(value=>value.trim()).filter(Boolean);
  if(!clauses.length||clauses.length>6)fail('Use up to six changes, separated by semicolons.');
