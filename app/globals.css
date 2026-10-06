@@ -444,7 +444,8 @@
 .home-composer-slot { min-height: var(--home-composer-height, 180px); }
 .home-composer-dock { position: fixed; z-index: 20; bottom: 0; overflow-y: auto; padding-bottom: max(.75rem, env(safe-area-inset-bottom)); }
 .home-workspace :is(button, summary, [tabindex], h2, h3) { scroll-margin-bottom: calc(var(--home-composer-height, 180px) + 1rem); }
-.home-workspace .home-chat-form { background: transparent; }
+/* The fixed composer owns its surface; its in-flow clearance must not look like an empty card. */
+.home-workspace .home-chat-form { background: transparent; box-shadow: none; }
 .goal-toolbar > .goal-storage { flex: 0 0 auto; }
 .goal-storage[open] { flex-basis: 100%; }
 @media (max-width: 639px) {
