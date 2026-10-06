@@ -41,3 +41,11 @@ The user authorized a new isolated branch and draft PR for preview acceptance. O
 - Requested Home instructions: exact five-step text and unchanged steps 1–3 checked and screenshots visually reviewed at 1440px and 375px; no external requests or sharing actions.
 
 Local evidence is retained under `/workspace/ratings-review-evidence/`. Hosted preview receipt and acceptance belong in the parent handoff after the exact reviewed commit is pushed; they are not claimed by these local checks.
+
+## Confirmed blank Home panel and correction
+
+The user-reported empty raised pale-blue rectangle was reproduced at 1366×900 with an empty Home conversation. DOM inspection located it in `.home-chat-form`: the generic `.home-workspace :is(aside, form)` rule gave the form a `0 10px 28px` shadow while its textarea/Send dock was fixed elsewhere. The 189px in-flow reserve therefore painted a second empty raised surface below the guided pill controls. This was not an unidentified input or a missing-content panel.
+
+The narrowly scoped `.home-workspace .home-chat-form` rule now removes that shadow and keeps its background transparent. The actual composer retains its border/background/shadow, input, Send button and layout/keyboard clearance. No input, controls or working wrapper were deleted. Home steps retain the latest exact “Share Action Plan (TBD)” / “Track results (TBD)” wording.
+
+An empty-state browser regression was added to `tests/browser/home-composer-space.mjs` at all four existing viewport sizes. It checks the form/slot have no shadow while the real composer surface, input, Send button and guided questions remain. Final checks on the combined copy/blank-panel state: **1,435 recursive unit/PostgreSQL tests**, production build/TypeScript, full lint and diff checks pass; **40 composer + 57 compact-layout + 48 Home-conversation browser checks** pass (145 total). These verify typing, resizing, keyboard/Send reachability, reset, saved plans and attachments without live model/data calls. Before/after screenshots were visually inspected.
