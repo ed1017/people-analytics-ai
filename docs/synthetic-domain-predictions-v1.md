@@ -12,7 +12,7 @@ December. Every operational qualification flag remains false.
 The source fixture still has 33 monthly snapshot periods but only 32 event-bearing
 months; January's joined zero remains unverified. Bulk September 28 insertion is
 not historical first availability, and month-end stock is not person-time exposure.
-The [custody assessment](aggregate-custody-readiness-assessment-v1.md) remains
+The [custody assessment](https://github.com/ed1017/people-analytics-ai/blob/978b3bb0b9b8db2ae3291af9df564f4886bae6c1/docs/aggregate-custody-readiness-assessment-v1.md) remains
 unchanged and blocked. New simulated timestamps cannot repair those unknowns.
 
 Local commit `c9ace41df024c4fb186e32ebf4da05b88597a799` was directly inspected.
@@ -92,7 +92,7 @@ without rewriting the protocol or changing methods:
 - “Stationary” means stable generating mechanism. Turnover counts still have
   seasonality and changing workforce stock. Hiring fractions and survey scores
   in this family have no expected trend. The earlier
-  [paired-prefix control](synthetic-paired-prefix-turnover-v1.md) separately tests
+  [paired-prefix control](https://github.com/ed1017/people-analytics-ai/blob/978b3bb0b9b8db2ae3291af9df564f4886bae6c1/docs/synthetic-paired-prefix-turnover-v1.md) separately tests
   a turnover shock with no pre-origin signal. Reversal, reporting stress and
   instrument breaks here are simplified shift controls, not validated shift rates.
 - The unscored reserve is October–December **target periods/cohorts**. July–September

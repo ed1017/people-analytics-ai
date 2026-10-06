@@ -1,5 +1,7 @@
 "use client";
 
+import {SyntheticDomainDemo} from "@/components/synthetic-domain-demo";
+
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatWholeCount } from "@/lib/display-format";
 import type { TalentAcquisitionResponse } from "@/lib/types";
@@ -33,6 +35,8 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
       </div>
 
       {error && <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">{error}</div>}
+
+      <SyntheticDomainDemo domain="hiring" />
 
       {summary ? (
         <>

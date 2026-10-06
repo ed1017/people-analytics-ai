@@ -1,3 +1,4 @@
+import {syntheticDomainDemoPrompt} from '@/lib/synthetic-domain-demo';
 import {homeBundleTask,homeBundleTaskInstructions} from '@/lib/home-bundle-task';
 import {inspectHomeChatResponse} from "@/lib/home-chat-response";
 import {homeFindingInstructions} from "@/lib/home-finding-followups";
@@ -1464,6 +1465,8 @@ ${workforceContext}
 ${workforceDetailPrompt}
 
 ${attritionPrompt}
+
+${summaryOnly ? "" : syntheticDomainDemoPrompt(page,message)}
 
 ${planningEvidenceHandoffPrompt}
 ${talentResponseChatPrompt(page, body?.talentResponseEvidenceContext)}

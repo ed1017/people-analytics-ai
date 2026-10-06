@@ -1,0 +1,561 @@
+{
+  "version": 1,
+  "status": "verified",
+  "dataClass": "constructed-synthetic",
+  "label": "Constructed synthetic demonstration",
+  "scope": "Fixed simulated company-wide population; independent of dashboard filters and recorded-data cohorts.",
+  "cutoff": "2026-09-30T23:59:59.999Z",
+  "seed": 7001,
+  "family": "stationary",
+  "historyCases": 150,
+  "monthsPerHistory": 72,
+  "domains": {
+    "turnover": {
+      "status": "predicted",
+      "reasonCodes": [],
+      "methods": [
+        "recent-mean-3",
+        "seasonal-naive-12",
+        "linear-trend-12"
+      ],
+      "rows": [
+        {
+          "month": "2026-10",
+          "values": [
+            79.66666666666667,
+            78,
+            87.22377622377623
+          ]
+        },
+        {
+          "month": "2026-11",
+          "values": [
+            79.66666666666667,
+            64,
+            88.72027972027972
+          ]
+        },
+        {
+          "month": "2026-12",
+          "values": [
+            79.66666666666667,
+            63,
+            90.21678321678321
+          ]
+        }
+      ],
+      "support": {
+        "lastPeriod": "2026-08",
+        "periods": 24,
+        "reportingGapMonths": 2
+      },
+      "interval": null,
+      "operationallyQualified": false,
+      "assessment": [
+        {
+          "stage": "training",
+          "family": "stationary",
+          "cases": 30,
+          "predicted": 30,
+          "scored": 30,
+          "blocked": []
+        },
+        {
+          "stage": "training",
+          "family": "gradual-improvement",
+          "cases": 30,
+          "predicted": 30,
+          "scored": 30,
+          "blocked": []
+        },
+        {
+          "stage": "training",
+          "family": "regime-reversal",
+          "cases": 30,
+          "predicted": 30,
+          "scored": 30,
+          "blocked": []
+        },
+        {
+          "stage": "training",
+          "family": "reporting-stress",
+          "cases": 30,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": [
+            {
+              "reasons": [
+                "complete-released-months-required",
+                "forecast-abstained"
+              ]
+            },
+            {
+              "reasons": [
+                "complete-released-months-required",
+                "forecast-abstained"
+              ]
+            },
+            {
+              "reasons": [
+                "complete-released-months-required",
+                "forecast-abstained"
+              ]
+            },
+            {
+              "reasons": [
+                "complete-released-months-required",
+                "forecast-abstained"
+              ]
+            },
+            {
+              "reasons": [
+                "complete-released-months-required",
+                "forecast-abstained"
+              ]
+            },
+            {
+              "reasons": [
+                "complete-released-months-required",
+                "forecast-abstained"
+              ]
+            },
+            {
+              "reasons": [
+                "complete-released-months-required",
+                "forecast-abstained"
+              ]
+            },
+            {
+              "reasons": [
+                "complete-released-months-required",
+                "forecast-abstained"
+              ]
+            },
+            {
+              "reasons": [
+                "complete-released-months-required",
+                "forecast-abstained"
+              ]
+            },
+            {
+              "reasons": [
+                "complete-released-months-required",
+                "forecast-abstained"
+              ]
+            }
+          ]
+        },
+        {
+          "stage": "training",
+          "family": "survey-break",
+          "cases": 30,
+          "predicted": 30,
+          "scored": 30,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "stationary",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "gradual-improvement",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "regime-reversal",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "reporting-stress",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "survey-break",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": []
+        }
+      ]
+    },
+    "hiring": {
+      "status": "predicted",
+      "reasonCodes": [],
+      "methods": [
+        "pooled-fraction",
+        "recent-3-fraction",
+        "logistic-trend"
+      ],
+      "rows": [
+        {
+          "month": "2026-10",
+          "values": [
+            0.8054585152838428,
+            0.8217592592592593,
+            0.8148656317977788
+          ]
+        },
+        {
+          "month": "2026-11",
+          "values": [
+            0.8054585152838428,
+            0.8217592592592593,
+            0.815293038502715
+          ]
+        },
+        {
+          "month": "2026-12",
+          "values": [
+            0.8054585152838428,
+            0.8217592592592593,
+            0.8157196816295513
+          ]
+        }
+      ],
+      "support": {
+        "firstPeriod": "2023-07",
+        "lastPeriod": "2026-06",
+        "calendarPeriods": 36,
+        "positiveCohorts": 34,
+        "openings": 4578
+      },
+      "interval": null,
+      "operationallyQualified": false,
+      "assessment": [
+        {
+          "stage": "training",
+          "family": "stationary",
+          "cases": 30,
+          "predicted": 30,
+          "scored": 30,
+          "blocked": []
+        },
+        {
+          "stage": "training",
+          "family": "gradual-improvement",
+          "cases": 30,
+          "predicted": 30,
+          "scored": 30,
+          "blocked": []
+        },
+        {
+          "stage": "training",
+          "family": "regime-reversal",
+          "cases": 30,
+          "predicted": 30,
+          "scored": 30,
+          "blocked": []
+        },
+        {
+          "stage": "training",
+          "family": "reporting-stress",
+          "cases": 30,
+          "predicted": 29,
+          "scored": 29,
+          "blocked": [
+            {
+              "reasons": [
+                "fixed-optimizer-failed",
+                "forecast-abstained"
+              ]
+            }
+          ]
+        },
+        {
+          "stage": "training",
+          "family": "survey-break",
+          "cases": 30,
+          "predicted": 30,
+          "scored": 30,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "stationary",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "gradual-improvement",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "regime-reversal",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "reporting-stress",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "survey-break",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": []
+        }
+      ]
+    },
+    "satisfaction": {
+      "status": "predicted",
+      "reasonCodes": [],
+      "methods": [
+        "last-wave",
+        "recent-mean-3",
+        "linear-trend-8"
+      ],
+      "rows": [
+        {
+          "month": "2026-12",
+          "values": [
+            64.51217292377801,
+            64.7804543842691,
+            64.67468010445955
+          ]
+        }
+      ],
+      "support": {
+        "firstPeriod": "2024-09",
+        "lastPeriod": "2026-06",
+        "comparableWaves": 8,
+        "identity": {
+          "instrumentVersion": "synthetic-quarterly-instrument-v1",
+          "itemSetVersion": "synthetic-five-items-v1",
+          "scoringVersion": "synthetic-respondent-shares-v1",
+          "eligibilityVersion": "synthetic-quarter-end-stock-v1",
+          "populationVersion": "synthetic-company-v1",
+          "sourceKind": "employee-wave",
+          "responseUnit": "mean-respondent-favorable-answer-share"
+        }
+      },
+      "interval": null,
+      "operationallyQualified": false,
+      "assessment": [
+        {
+          "stage": "training",
+          "family": "stationary",
+          "cases": 30,
+          "predicted": 30,
+          "scored": 30,
+          "blocked": []
+        },
+        {
+          "stage": "training",
+          "family": "gradual-improvement",
+          "cases": 30,
+          "predicted": 30,
+          "scored": 30,
+          "blocked": []
+        },
+        {
+          "stage": "training",
+          "family": "regime-reversal",
+          "cases": 30,
+          "predicted": 30,
+          "scored": 30,
+          "blocked": []
+        },
+        {
+          "stage": "training",
+          "family": "reporting-stress",
+          "cases": 30,
+          "predicted": 30,
+          "scored": 30,
+          "blocked": []
+        },
+        {
+          "stage": "training",
+          "family": "survey-break",
+          "cases": 30,
+          "predicted": 30,
+          "scored": 30,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "stationary",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "gradual-improvement",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "regime-reversal",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "reporting-stress",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 20,
+          "blocked": []
+        },
+        {
+          "stage": "test",
+          "family": "survey-break",
+          "cases": 20,
+          "predicted": 20,
+          "scored": 0,
+          "blocked": [
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            },
+            {
+              "reasons": [
+                "future-wave-identity-mismatch"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "interval": null,
+  "operationallyQualified": false,
+  "realWorldPerformanceValidated": false,
+  "causalEffect": null,
+  "evidence": {
+    "commit": "978b3bb0b9b8db2ae3291af9df564f4886bae6c1",
+    "reportSha256": "5e4a2f441b9577d51deb7a6605b96503e8a5e5706f1c025d888ae7f58c0bc6e5",
+    "protocolCommit": "113971aef92d391ab25ce1ead7af373c234e02fc",
+    "reportPath": "docs/evidence/synthetic-domain-predictions-v1/report.json",
+    "verifiedImplementationFiles": 15
+  }
+}
