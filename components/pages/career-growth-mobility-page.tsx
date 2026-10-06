@@ -12,6 +12,7 @@ import {
 } from "recharts";
 
 import { EvidenceScopeNotice } from "@/components/evidence-scope-notice";
+import { SyntheticCareerDemoPanel } from "@/components/synthetic-career-demo";
 import { formatWholeCount } from "@/lib/display-format";
 import {
   enterpriseTalentEvidenceScope,
@@ -74,6 +75,7 @@ export function CareerGrowthMobilityPage({
 
   return (
     <section className="min-w-0 p-6">
+      <SyntheticCareerDemoPanel />
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">

@@ -1,0 +1,707 @@
+{
+  "version": 1,
+  "status": "verified",
+  "dataset": "separate-synthetic-career-v1",
+  "dataClass": "constructed-synthetic",
+  "seed": 51007,
+  "years": [
+    2023,
+    2024,
+    2025
+  ],
+  "departments": [
+    {
+      "code": "engineering",
+      "label": "Engineering"
+    },
+    {
+      "code": "operations",
+      "label": "Operations"
+    },
+    {
+      "code": "commercial",
+      "label": "Commercial"
+    }
+  ],
+  "levels": [
+    {
+      "code": "L2",
+      "label": "L2"
+    },
+    {
+      "code": "L3",
+      "label": "L3"
+    },
+    {
+      "code": "L4",
+      "label": "L4"
+    }
+  ],
+  "ratingLabels": [
+    "Below expectations",
+    "Partly meets expectations",
+    "Meets expectations",
+    "Exceeds expectations",
+    "Far exceeds expectations"
+  ],
+  "definitions": {
+    "population": "Separate invented annual cohorts, not the recorded workforce, movement-event source or synthetic pay population. Department and job level are fixed at 1 January. Dashboard filters do not apply.",
+    "eligibility": "Active salaried at 1 January, hired by that date, at least 12 completed calendar months in the starting job level, and complete promotion-event coverage through 31 December or recorded exit. This is an invented demo eligibility rule, not company promotion policy. Later hires and incomplete or inconsistent inputs are excluded. Exits remain in the start-of-year denominator.",
+    "promotionRate": "Distinct eligible people with at least one recorded move to a higher level during the year, on or before exit, divided by all eligible people at the start of that year. Each person counts once; transfers and lateral moves do not count. This is a cohort proportion, not an event share or person-time incidence rate.",
+    "performance": "Share rated 3–5 divided by eligible people with one valid in-year rating on the unchanged synthetic 1–5 ordinal rubric. Missing or incompatible ratings are excluded, never zero. Rating categories are ordered, not assumed equally spaced; no mean rating or normal curve is used. Trends compare annual cohorts, not individual improvement.",
+    "duration": "Median and interpolated Q1–Q3 of completed calendar months from the start of the prior level to the first observed promotion, among eligible promotees only. Unpromoted people are excluded from this duration statistic. This selected subset is not a survival estimate, typical future wait, probability of promotion or prediction.",
+    "disclosure": "Only fixed department × starting-level × year cells are published. If any year has a small eligible, rated, rating-category, missing-rating, promoted or nonpromoted group (1–4), the whole cell series is withheld; eligible groups below five are withheld even at zero. A sole suppressed department within a level gets a complementary suppressed department, fixed across every year. No overall totals, overlapping marginals, individual rows, identifiers or rankings are shipped.",
+    "interpretation": "Descriptive invented aggregates only. Differences do not establish performance fairness, promotion fairness, causation, merit or individual readiness. No individual promotion recommendations. Deterministic suppression limits displayed detail; reproducible invented data is not a general privacy guarantee for real records."
+  },
+  "cohorts": [
+    {
+      "id": "engineering:L2",
+      "department": "engineering",
+      "level": "L2",
+      "periods": [
+        {
+          "year": 2023,
+          "status": "published",
+          "metrics": {
+            "eligible": 70,
+            "promoted": 8,
+            "promotionRatePct": 11.43,
+            "rated": 70,
+            "missingRatings": 0,
+            "meets": 42,
+            "meetsPct": 60,
+            "ratingCounts": [
+              5,
+              23,
+              24,
+              13,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 8,
+              "median": 36,
+              "q1": 28,
+              "q3": 53.25
+            }
+          }
+        },
+        {
+          "year": 2024,
+          "status": "published",
+          "metrics": {
+            "eligible": 70,
+            "promoted": 9,
+            "promotionRatePct": 12.86,
+            "rated": 65,
+            "missingRatings": 5,
+            "meets": 43,
+            "meetsPct": 66.15,
+            "ratingCounts": [
+              5,
+              17,
+              22,
+              16,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 9,
+              "median": 42,
+              "q1": 40,
+              "q3": 44
+            }
+          }
+        },
+        {
+          "year": 2025,
+          "status": "published",
+          "metrics": {
+            "eligible": 70,
+            "promoted": 10,
+            "promotionRatePct": 14.29,
+            "rated": 70,
+            "missingRatings": 0,
+            "meets": 45,
+            "meetsPct": 64.29,
+            "ratingCounts": [
+              5,
+              20,
+              24,
+              16,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 10,
+              "median": 32.5,
+              "q1": 28.75,
+              "q3": 33.75
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "engineering:L3",
+      "department": "engineering",
+      "level": "L3",
+      "periods": [
+        {
+          "year": 2023,
+          "status": "published",
+          "metrics": {
+            "eligible": 75,
+            "promoted": 9,
+            "promotionRatePct": 12,
+            "rated": 70,
+            "missingRatings": 5,
+            "meets": 43,
+            "meetsPct": 61.43,
+            "ratingCounts": [
+              5,
+              22,
+              16,
+              22,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 9,
+              "median": 36,
+              "q1": 32,
+              "q3": 42
+            }
+          }
+        },
+        {
+          "year": 2024,
+          "status": "published",
+          "metrics": {
+            "eligible": 75,
+            "promoted": 10,
+            "promotionRatePct": 13.33,
+            "rated": 75,
+            "missingRatings": 0,
+            "meets": 49,
+            "meetsPct": 65.33,
+            "ratingCounts": [
+              5,
+              21,
+              22,
+              22,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 10,
+              "median": 34.5,
+              "q1": 23.25,
+              "q3": 49
+            }
+          }
+        },
+        {
+          "year": 2025,
+          "status": "published",
+          "metrics": {
+            "eligible": 75,
+            "promoted": 11,
+            "promotionRatePct": 14.67,
+            "rated": 70,
+            "missingRatings": 5,
+            "meets": 38,
+            "meetsPct": 54.29,
+            "ratingCounts": [
+              5,
+              27,
+              17,
+              16,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 11,
+              "median": 39,
+              "q1": 27,
+              "q3": 43
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "engineering:L4",
+      "department": "engineering",
+      "level": "L4",
+      "periods": [
+        {
+          "year": 2023,
+          "status": "suppressed",
+          "metrics": null
+        },
+        {
+          "year": 2024,
+          "status": "suppressed",
+          "metrics": null
+        },
+        {
+          "year": 2025,
+          "status": "suppressed",
+          "metrics": null
+        }
+      ]
+    },
+    {
+      "id": "operations:L2",
+      "department": "operations",
+      "level": "L2",
+      "periods": [
+        {
+          "year": 2023,
+          "status": "published",
+          "metrics": {
+            "eligible": 75,
+            "promoted": 10,
+            "promotionRatePct": 13.33,
+            "rated": 70,
+            "missingRatings": 5,
+            "meets": 49,
+            "meetsPct": 70,
+            "ratingCounts": [
+              5,
+              16,
+              25,
+              19,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 10,
+              "median": 32.5,
+              "q1": 27.75,
+              "q3": 46.75
+            }
+          }
+        },
+        {
+          "year": 2024,
+          "status": "published",
+          "metrics": {
+            "eligible": 75,
+            "promoted": 11,
+            "promotionRatePct": 14.67,
+            "rated": 75,
+            "missingRatings": 0,
+            "meets": 52,
+            "meetsPct": 69.33,
+            "ratingCounts": [
+              5,
+              18,
+              23,
+              24,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 11,
+              "median": 42,
+              "q1": 32,
+              "q3": 47.5
+            }
+          }
+        },
+        {
+          "year": 2025,
+          "status": "published",
+          "metrics": {
+            "eligible": 75,
+            "promoted": 12,
+            "promotionRatePct": 16,
+            "rated": 70,
+            "missingRatings": 5,
+            "meets": 45,
+            "meetsPct": 64.29,
+            "ratingCounts": [
+              5,
+              20,
+              18,
+              22,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 12,
+              "median": 39.5,
+              "q1": 30.75,
+              "q3": 50.25
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "operations:L3",
+      "department": "operations",
+      "level": "L3",
+      "periods": [
+        {
+          "year": 2023,
+          "status": "published",
+          "metrics": {
+            "eligible": 80,
+            "promoted": 11,
+            "promotionRatePct": 13.75,
+            "rated": 80,
+            "missingRatings": 0,
+            "meets": 47,
+            "meetsPct": 58.75,
+            "ratingCounts": [
+              5,
+              28,
+              26,
+              16,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 11,
+              "median": 34,
+              "q1": 31.5,
+              "q3": 47
+            }
+          }
+        },
+        {
+          "year": 2024,
+          "status": "published",
+          "metrics": {
+            "eligible": 80,
+            "promoted": 12,
+            "promotionRatePct": 15,
+            "rated": 75,
+            "missingRatings": 5,
+            "meets": 51,
+            "meetsPct": 68,
+            "ratingCounts": [
+              5,
+              19,
+              25,
+              21,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 12,
+              "median": 30,
+              "q1": 25.25,
+              "q3": 39.25
+            }
+          }
+        },
+        {
+          "year": 2025,
+          "status": "published",
+          "metrics": {
+            "eligible": 80,
+            "promoted": 13,
+            "promotionRatePct": 16.25,
+            "rated": 80,
+            "missingRatings": 0,
+            "meets": 53,
+            "meetsPct": 66.25,
+            "ratingCounts": [
+              5,
+              22,
+              23,
+              25,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 13,
+              "median": 38,
+              "q1": 34,
+              "q3": 45
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "operations:L4",
+      "department": "operations",
+      "level": "L4",
+      "periods": [
+        {
+          "year": 2023,
+          "status": "suppressed",
+          "metrics": null
+        },
+        {
+          "year": 2024,
+          "status": "suppressed",
+          "metrics": null
+        },
+        {
+          "year": 2025,
+          "status": "suppressed",
+          "metrics": null
+        }
+      ]
+    },
+    {
+      "id": "commercial:L2",
+      "department": "commercial",
+      "level": "L2",
+      "periods": [
+        {
+          "year": 2023,
+          "status": "published",
+          "metrics": {
+            "eligible": 80,
+            "promoted": 12,
+            "promotionRatePct": 15,
+            "rated": 80,
+            "missingRatings": 0,
+            "meets": 49,
+            "meetsPct": 61.25,
+            "ratingCounts": [
+              5,
+              26,
+              18,
+              26,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 12,
+              "median": 35,
+              "q1": 25.75,
+              "q3": 39.5
+            }
+          }
+        },
+        {
+          "year": 2024,
+          "status": "published",
+          "metrics": {
+            "eligible": 80,
+            "promoted": 13,
+            "promotionRatePct": 16.25,
+            "rated": 75,
+            "missingRatings": 5,
+            "meets": 53,
+            "meetsPct": 70.67,
+            "ratingCounts": [
+              5,
+              17,
+              23,
+              25,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 13,
+              "median": 35,
+              "q1": 33,
+              "q3": 48
+            }
+          }
+        },
+        {
+          "year": 2025,
+          "status": "published",
+          "metrics": {
+            "eligible": 80,
+            "promoted": 14,
+            "promotionRatePct": 17.5,
+            "rated": 80,
+            "missingRatings": 0,
+            "meets": 55,
+            "meetsPct": 68.75,
+            "ratingCounts": [
+              5,
+              20,
+              25,
+              25,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 14,
+              "median": 41,
+              "q1": 35,
+              "q3": 52.25
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "commercial:L3",
+      "department": "commercial",
+      "level": "L3",
+      "periods": [
+        {
+          "year": 2023,
+          "status": "published",
+          "metrics": {
+            "eligible": 85,
+            "promoted": 13,
+            "promotionRatePct": 15.29,
+            "rated": 80,
+            "missingRatings": 5,
+            "meets": 49,
+            "meetsPct": 61.25,
+            "ratingCounts": [
+              5,
+              26,
+              19,
+              25,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 13,
+              "median": 31,
+              "q1": 25,
+              "q3": 46
+            }
+          }
+        },
+        {
+          "year": 2024,
+          "status": "published",
+          "metrics": {
+            "eligible": 85,
+            "promoted": 14,
+            "promotionRatePct": 16.47,
+            "rated": 85,
+            "missingRatings": 0,
+            "meets": 52,
+            "meetsPct": 61.18,
+            "ratingCounts": [
+              5,
+              28,
+              22,
+              25,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 14,
+              "median": 39,
+              "q1": 31.25,
+              "q3": 44.75
+            }
+          }
+        },
+        {
+          "year": 2025,
+          "status": "published",
+          "metrics": {
+            "eligible": 85,
+            "promoted": 15,
+            "promotionRatePct": 17.65,
+            "rated": 80,
+            "missingRatings": 5,
+            "meets": 54,
+            "meetsPct": 67.5,
+            "ratingCounts": [
+              5,
+              21,
+              27,
+              22,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 15,
+              "median": 41,
+              "q1": 27,
+              "q3": 44
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "commercial:L4",
+      "department": "commercial",
+      "level": "L4",
+      "periods": [
+        {
+          "year": 2023,
+          "status": "published",
+          "metrics": {
+            "eligible": 90,
+            "promoted": 14,
+            "promotionRatePct": 15.56,
+            "rated": 90,
+            "missingRatings": 0,
+            "meets": 59,
+            "meetsPct": 65.56,
+            "ratingCounts": [
+              5,
+              26,
+              32,
+              22,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 14,
+              "median": 38.5,
+              "q1": 33.75,
+              "q3": 44
+            }
+          }
+        },
+        {
+          "year": 2024,
+          "status": "published",
+          "metrics": {
+            "eligible": 90,
+            "promoted": 15,
+            "promotionRatePct": 16.67,
+            "rated": 85,
+            "missingRatings": 5,
+            "meets": 52,
+            "meetsPct": 61.18,
+            "ratingCounts": [
+              5,
+              28,
+              25,
+              22,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 15,
+              "median": 43,
+              "q1": 38.5,
+              "q3": 49.5
+            }
+          }
+        },
+        {
+          "year": 2025,
+          "status": "published",
+          "metrics": {
+            "eligible": 90,
+            "promoted": 16,
+            "promotionRatePct": 17.78,
+            "rated": 90,
+            "missingRatings": 0,
+            "meets": 57,
+            "meetsPct": 63.33,
+            "ratingCounts": [
+              5,
+              28,
+              23,
+              29,
+              5
+            ],
+            "timeToPromotion": {
+              "n": 16,
+              "median": 31.5,
+              "q1": 27.75,
+              "q3": 34.75
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "evidence": {
+    "sourceHashes": {
+      "lib/simulation/career-demo-protocol.json": "02920ff92f72e189a3439c72318072eb34e39d30cd6db7e2a9486f3fc852eb6e",
+      "lib/simulation/career-demo.mjs": "08153977dded0e4e5ba270ab73b692b5646b2dcdab175900ffc5f6217473ccdd",
+      "lib/ml/synthetic-workforce/common.mjs": "60c9349a01e839e1a6fb6f6c67eb46a64f7ed6f5744e9a7757c9c4642783fc03"
+    },
+    "rowRecordsPublished": false,
+    "overallTotalsPublished": false,
+    "operationallyQualified": false
+  }
+}
