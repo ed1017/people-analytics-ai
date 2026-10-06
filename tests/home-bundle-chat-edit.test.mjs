@@ -116,3 +116,23 @@ test('multiple groups use exact names, ambiguous labels are omitted, and no-grou
  draft.inputs.groups[1].label='Engineers';assert.equal(bundleChatEditExamples(draft).filter(item=>item.unit==='participants').length,0);
  draft.inputs.groups=[];assert.equal(bundleChatEditExamples(draft).filter(item=>item.unit==='participants').length,0);
 });
+
+test('plan-prefixed mutation requests route locally while explanatory questions remain chat',async()=>{
+ const {bundleChatEditIntent}=await import('../lib/home-bundle-chat-edit.ts');
+ for(const request of ['In Action Plan #1, set Unallocated learning pilot amount (USD) to $2500.','For Action Plan #2, increase pilot participants to 12.','Action Plan #1: use twelve participants','Please in Action Plan #1, set Unallocated learning pilot amount to $2500','In Action Plan #1 and #2, set participants to 12','In Action Plan #99, set participants to 12',"In Action Plan #1, do not set participants to 12"]){assert.equal(bundleChatEditIntent(request).edit,true,request);assert.equal(bundleChatEditIntent(request).planReference,true,request);}
+ for(const request of ['Why might turnover have changed?','In Action Plan #1, why did you use that allowance?','Can you explain Action Plan #1?'])assert.equal(bundleChatEditIntent(request).edit,false,request);
+});
+test('natural one-time allowance transition and prefixed exact label preserve explicit old-value review',()=>{
+ const draft=base(),before=structuredClone(draft),selection={option:1,count:2};
+ for(const request of ['Increase the Unallocated learning pilot one-time cash allowance in Action Plan #1 from USD 2,000 to USD 2,500.','In Action Plan #1, set Unallocated learning pilot amount (USD) to $2500.','In Action Plan #1, increase the Unallocated learning pilot cash allowance from $2000 to $2500.']){
+  const preview=previewBundleChatEdit(draft,request,selection);assert.equal(preview.changes.length,1);assert.equal(preview.changes[0].before.value,2000);assert.equal(preview.changes[0].after.value,2500);assert.equal(preview.inputs.expenses.find(x=>x.id==='pilot-learning').amount.value,2500);assert.equal(acceptBundleChatEdit(draft,preview,selection).revision,draft.revision+1);
+ }
+ assert.throws(()=>previewBundleChatEdit(draft,'Increase Unallocated learning pilot one-time cash allowance from USD 1000 to USD 2500',selection),/differs from the stated starting value/);assert.deepEqual(draft,before);
+});
+test('unknown transition field, ambiguous allowance and recurring basis never pick a target',()=>{
+ const draft=base(),selection={option:1,count:2};
+ assert.throws(()=>previewBundleChatEdit(draft,'In Action Plan #1, increase nonexistent allowance from USD 2000 to USD 2500',selection),error=>error.message.includes('“nonexistent allowance”')&&!error.message.includes('allowance from USD'));
+ const inputs=structuredClone(draft.inputs),learning=inputs.expenses.find(x=>x.id==='pilot-learning');inputs.expenses.push({...structuredClone(learning),id:'custom-learning',label:'Unallocated learning pilot'});const ambiguous=reviseBundleDraft(draft,inputs),before=structuredClone(ambiguous);
+ assert.throws(()=>previewBundleChatEdit(ambiguous,'In Action Plan #1, set Unallocated learning pilot cash allowance to USD 2500',selection),/more than one assumption/);assert.deepEqual(ambiguous,before);
+ const recurring=structuredClone(draft.inputs);recurring.expenses.find(x=>x.id==='pilot-learning').months={value:3,kind:'user-entered',basis:'Reviewed recurring expense'};assert.throws(()=>previewBundleChatEdit(reviseBundleDraft(draft,recurring),'In Action Plan #1, set Unallocated learning pilot one-time cash allowance to USD 2500',selection),/not a supported/);
+});

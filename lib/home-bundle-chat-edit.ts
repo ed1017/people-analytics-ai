@@ -28,7 +28,7 @@ function targets(input:BundleInputs,draft:BundleDraft){
  for(const group of input.groups)add({key:'group.'+group.id,label:group.id==='pilot-group'&&draft.pilot&&input.groups.length===1?'Pilot participants':group.label+' participants',type:'count',read:()=>group.count,write:value=>{group.count=value as Assumption<number>;}},[group.label+' participants',group.id+' participants',...(input.groups.length===1?['participants','pilot participants']:[])]);
  for(const expense of input.expenses){
   const pilot=pilotAllowances[expense.id.slice(6) as keyof typeof pilotAllowances],label=pilot?.label??expense.label;
-  add({key:'expense.'+expense.id+'.amount',label:label+' amount (USD)',type:'money',read:()=>expense.amount,write:value=>{expense.amount=value as Assumption<number>;}},[label,label+' amount',expense.label,expense.id+' amount']);
+  add({key:'expense.'+expense.id+'.amount',label:label+' amount (USD)',type:'money',read:()=>expense.amount,write:value=>{expense.amount=value as Assumption<number>;}},[label,label+' amount',expense.label,expense.id+' amount',...(expense.kind==='cash'?[label+' allowance',label+' cash allowance',label+' cash amount',...(expense.months.value===1?[label+' one-time allowance',label+' one-time cash allowance']:[])]:[])]);
   add({key:'expense.'+expense.id+'.months',label:label+' occurrences',type:'months',read:()=>expense.months,write:value=>{expense.months=value as Assumption<number>;}},[expense.id+' occurrences']);
   add({key:'expense.'+expense.id+'.startMonth',label:label+' funding month',type:'month',read:()=>expense.startMonth,write:value=>{expense.startMonth=value as Assumption<string>;}},[expense.id+' funding month']);
  }
@@ -37,6 +37,14 @@ function targets(input:BundleInputs,draft:BundleDraft){
 }
 const numberWords=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
 const monthNames=['january','february','march','april','may','june','july','august','september','october','november','december'];
+/** Routing only: recognize a local edit before general chat can append it to goal context. */
+export function bundleChatEditIntent(request:string){
+ const courtesy=(value:string)=>value.trim().replace(/^(?:please\s+|(?:can|could|would)\s+(?:you|we)\s+|i(?:’|')?d like to\s+)/i,'');
+ const planReference=/\b(?:action\s+)?plan\s*#?\s*\d+\b/i.test(request);
+ const body=courtesy(courtesy(request).replace(/^(?:(?:in|for|on)\s+)?(?:action\s+)?plan\s*#?\s*\d+(?:\s*(?:and|or|,)\s*(?:(?:action\s+)?plan\s*)?#?\s*\d+)*\s*[:,]?\s*/i,''));
+ const edit=/^(?:(?:do not|don[’']?t|never|avoid)\s+)?(?:set|change|update|assume|lower|raise|increase|decrease|reduce|start|move|make|run|use|budget|add|remove)\b/i.test(body);
+ return {edit,planReference};
+}
 function selectedPlanRequest(request:string,selection?:BundleEditSelection):string{
  const references=[...request.matchAll(/\b(?:action\s+)?plan\s*#?\s*(\d+)\b/gi)];
  if(!references.length)return request;
@@ -54,7 +62,7 @@ function everydayClause(raw:string,available:Map<string,Target[]>,draft:BundleDr
  if(/\b(?:not|never|don[’']?t|do not|avoid|except|unless|instead|rather than)\b/i.test(clause))fail('Which change should I make? Restate the desired value without a negation or exception; no changes have been proposed.');
  if(/\b(?:plan\s*#?\s*\d+|(?:both|all|other|another|each)\s+plans?)\b/i.test(clause))fail('Which plan should I edit? Select that Plan tab, then describe its changes without referring to other plans.');
  const transition=clause.match(/^(?:set|change|update|lower|raise|increase|decrease|reduce)\s+(?:the\s+)?(.+?)\s+from\s+(.+?)\s+to\s+(.+)$/i);
- if(transition&&available.has(normalize(transition[1])))return {name:transition[1],previous:transition[2],value:transition[3]};
+ if(transition&&!/\bbudget\b/i.test(transition[1]))return {name:transition[1],previous:transition[2],value:transition[3]};
  let match=clause.match(/^(?:set|change|update|lower|raise|increase|decrease|reduce)\s+(?:the\s+)?(.+?)\s+to\s+(.+)$/i);
  if(!match)match=clause.match(/^assume\s+(.+?)\s+(?:is|equals|of)\s+(.+)$/i);
  if(match&&available.has(normalize(match[1]))&&!/^(?:(?:total|overall|plan)\s+)?budget(?:\s+(?:ceiling|limit))?$/i.test(match[1]))return {name:match[1],value:match[2]};
