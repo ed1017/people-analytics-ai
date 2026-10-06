@@ -47,6 +47,8 @@ type AiPanelProps = {
   onToggleCollapsed: () => void;
   onChatInputChange: (value: string) => void;
   onDraftExample: (prompt: string) => void;
+  onResetConversation?:()=>void;
+  conversationHistory?:ChatMessage[];
   onSend: () => void | Promise<void>;
 };
 
@@ -70,7 +72,7 @@ export function AiPanel({
   onToggleCollapsed,
   onChatInputChange,
   onDraftExample,
-  onSend,
+  onSend,onResetConversation,conversationHistory=chatMessages,
 }: AiPanelProps) {
   const composer = useRef<HTMLTextAreaElement>(null);
   const [viewportWidth, setViewportWidth] =
@@ -155,7 +157,7 @@ export function AiPanel({
             : "app-ai-panel sticky top-[var(--app-header-height)] flex h-[calc(100vh-var(--app-header-height))] min-w-0 flex-col overflow-hidden border-l bg-card p-4 max-md:h-[70vh] max-md:min-h-[520px]"
         }
       >
-        <div className="mb-4 flex items-center justify-between gap-2">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           {!aiCollapsed && (
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
@@ -165,6 +167,7 @@ export function AiPanel({
             </div>
           )}
 
+          {!aiCollapsed&&onResetConversation&&<button type="button" onClick={()=>{onResetConversation();requestAnimationFrame(()=>composer.current?.focus());}} className="min-h-11 rounded px-2 text-xs font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Reset conversation</button>}
           <div className="ml-auto flex gap-1">
             {!aiCollapsed&&<button type="button" popoverTarget={detailsId} aria-label="Open conversation details" className="flex h-9 w-9 items-center justify-center rounded hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"><Info size={18}/></button>}
             {!aiCollapsed && (
@@ -200,7 +203,7 @@ export function AiPanel({
         <div id={detailsId} popover="auto" role="dialog" aria-label="Conversation details" className="fixed inset-0 m-auto max-h-[80dvh] w-[min(42rem,92vw)] overflow-y-auto rounded-xl border bg-background p-5 text-foreground shadow-xl">
           <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">Conversation details</h2><button type="button" popoverTarget={detailsId} popoverTargetAction="hide" className="min-h-11 rounded border px-3 focus-visible:ring-2 focus-visible:ring-ring">Close conversation details</button></div>
           <section aria-label="Current evidence scope"><h3 className="font-semibold">Evidence scope</h3><p className="mt-1 text-sm">{scopeNote}</p>{readOnlyReason&&<p className="mt-2 text-sm">{readOnlyReason}</p>}</section>
-          <section aria-label="Conversation history" className="mt-5"><h3 className="font-semibold">Conversation history</h3><p className="my-2 text-xs text-muted-foreground">Reference only. Current findings use current evidence and saved goal context.</p>{chatMessages.length?<ConversationMessages messages={chatMessages}/>:<p className="text-sm">No conversation yet.</p>}</section>
+          <section aria-label="Conversation history" className="mt-5"><h3 className="font-semibold">Conversation history</h3><p className="my-2 text-xs text-muted-foreground">Reference only, including conversations cleared with Reset. Current findings use current evidence and saved goal context.</p>{conversationHistory.length?<ConversationMessages messages={conversationHistory}/>:<p className="text-sm">No conversation yet.</p>}</section>
         </div>
 
         {aiCollapsed ? (

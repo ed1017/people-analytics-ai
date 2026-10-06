@@ -28,7 +28,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
   return route.continue();
  });
  const button=name=>page.getByRole('button',{name,exact:true}),home=page.getByLabel('Ask Workforce AI',{exact:true}),chat=page.getByLabel('Ask People Analytics AI',{exact:true}),goal=page.getByLabel('Selected goal',{exact:true}),panel=page.locator('.app-ai-panel');
- const navigate=async name=>{await button(name==='Home'?'Action Planning':'Workforce — '+name).click();await page.getByRole('heading',{name:name==='Home'?'Insight to Action':name,exact:true,level:1}).waitFor();};
+ const navigate=async name=>{if(width<768)await button('Open navigation').click();await button(name==='Home'?'Action Planning':'Workforce — '+name).click();await page.getByRole('heading',{name:name==='Home'?'Insight to Action':name,exact:true,level:1}).waitFor();};
  const send=async message=>{await chat.fill(message);await button('Send message').click();};
  const pending=async message=>{delay=true;release=null;await send(message);for(let i=0;!release&&i<100;i++)await page.waitForTimeout(10);assert.ok(release);};
  const finish=()=>{delay=false;release();};
@@ -58,7 +58,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  check(mode+' stale A handler cannot dispatch against selected B',posts.length===before&&await panel.getByText('Goal: '+goalB,{exact:true}).isVisible());
  await goal.selectOption('a');await pending('Pending A question');await chat.fill('A draft typed while pending');await goal.selectOption('b');finish();await page.waitForTimeout(80);await goal.selectOption('a');
  check(mode+' switched-goal late reply is rejected and pending draft survives',await chat.inputValue()==='A draft typed while pending'&&await panel.getByLabel('AI conversation',{exact:true}).getByText('Synthetic reply 3 for '+goalA,{exact:true}).count()===0);
- await pending('Pending evidence question');await chat.fill('Draft after evidence change');await page.getByLabel('Country',{exact:true}).selectOption('UK');finish();await page.waitForTimeout(150);
+ await pending('Pending evidence question');await chat.fill('Draft after evidence change');await page.getByLabel('Country',{exact:true}).evaluate(n=>n.closest('details')?.setAttribute('open',''));await page.getByLabel('Country',{exact:true}).selectOption('UK');finish();await page.waitForTimeout(150);
  check(mode+' changed workforce scope rejects section reply and keeps draft',await chat.inputValue()==='Draft after evidence change'&&await panel.getByLabel('AI conversation',{exact:true}).getByText('Synthetic reply 4 for '+goalA,{exact:true}).count()===0&&await button('Send message').isEnabled());
  await button('Open conversation details').click();check(mode+' selected goal does not redefine enterprise evidence scope',await page.getByRole('dialog',{name:'Conversation details',exact:true}).getByText('This page uses company-wide evidence. The shared workforce filters do not narrow these measures.',{exact:true}).isVisible());await button('Close conversation details').click();
  await send('Review company evidence with UK context');await panel.getByLabel('AI conversation',{exact:true}).getByText('Synthetic reply 5 for '+goalA,{exact:true}).waitFor();

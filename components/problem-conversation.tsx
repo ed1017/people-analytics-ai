@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
+import {conversationBoundary,resetConversationMarks} from "@/lib/conversation-reset";
 import { rememberProblemQuestion, ProblemRequestGate } from "@/lib/problem-session";
 import type { HomeDecisionContext } from "@/lib/home-decision-journey";
 import type { ScopedChatHistory } from "@/lib/chat-context-history";
@@ -11,8 +12,8 @@ import { MAX_GOALS, emptyLocalGoals, type LocalGoals } from "@/lib/local-goals";
 
 import {decisionStore,useDecisionStorage} from "@/components/decision-store";
 
-type GoalChat = { messages: ChatMessage[]; input: string; problem: HomeDecisionContext | null; questionUnanswered: boolean };
-export function useProblemConversation() {
+type GoalChat = { messages: ChatMessage[]; input: string; problem: HomeDecisionContext | null; questionUnanswered: boolean; resetMarks?:Record<string,number> };
+export function useProblemConversation(scope = "home") {
   const [localGoals, setLocalGoals] = useState(emptyLocalGoals);
   const goalsRef = useRef(localGoals);
   const [storageReady, setStorageReady] = useState(false);
@@ -31,7 +32,11 @@ export function useProblemConversation() {
   const setIssueEditor:Dispatch<SetStateAction<GoalContextEditor|null>>=update=>{const next=typeof update==='function'?update(issueEditorRef.current):update;issueEditorRef.current=next;setIssueEditorState(next)};
   const explorationContext=useRef(emptyGoalRequirements());
   const requestGate = useRef(new ProblemRequestGate());
-  const [messages, setStoredMessages] = useState<ChatMessage[]>([]);
+  const [storedMessages, setStoredMessages] = useState<ChatMessage[]>([]);
+  const [resetMarks,setResetMarks]=useState<Record<string,number>>({});
+  const [resetEpoch,setResetEpoch]=useState(0);
+  const boundary=conversationBoundary(resetMarks,scope,storedMessages.length);
+  const messages=storedMessages.slice(boundary);
   const [input, setInputState] = useState("");
   const inputRef=useRef("");
   const setInput:Dispatch<SetStateAction<string>>=update=>{const next=typeof update==='function'?update(inputRef.current):update;inputRef.current=next;setInputState(next)};
@@ -55,20 +60,20 @@ export function useProblemConversation() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- One-time hydration from browser storage, with SSR-safe initial state.
     goalsRef.current=saved;setLocalGoals(saved);setFocusedIssue(saved.goals.find(g=>g.id===saved.activeId)?.statement??"");
     const chat=decisionStore.getField<GoalChat|null>(saved.activeId,"chat",null);
-    if(chat){setStoredMessages(chat.messages);setInput(chat.input);setProblem(chat.problem);}
+    if(chat){setResetMarks(chat.resetMarks??{});setStoredMessages(chat.messages);setInput(chat.input);setProblem(chat.problem);}
     setStorageReady(true);
   }, []);
-  const setMessages: Dispatch<SetStateAction<ChatMessage[]>> = update => setStoredMessages(current => typeof update === "function" ? update(current) : update);
+  const setMessages: Dispatch<SetStateAction<ChatMessage[]>> = update => setStoredMessages(current => {const start=conversationBoundary(resetMarks,scope,current.length);return [...current.slice(0,start),...(typeof update === "function" ? update(current.slice(start)) : update)];});
   useEffect(()=>{
-    if(storageReady&&localGoals.activeId)decisionStore.setField(localGoals.activeId,"chat",{messages,input,problem,questionUnanswered:false});
-  },[storageReady,localGoals.activeId,messages,input,problem]);
+    if(storageReady&&localGoals.activeId)decisionStore.setField(localGoals.activeId,"chat",{messages:storedMessages,input,problem,questionUnanswered:false,resetMarks});
+  },[storageReady,localGoals.activeId,storedMessages,input,problem,resetMarks]);
   const rememberQuestion = (key: string, question: string) => setProblem(current => rememberProblemQuestion(current, key, question));
   const cancelPending = () => { requestGate.current.invalidate(); setHomeGoalChoiceKey(null); setLoading(false); };
-  const snapshot = () => { chats.current.set(goalsRef.current.activeId, {messages,input:inputRef.current,problem,questionUnanswered}); };
+  const snapshot = () => { chats.current.set(goalsRef.current.activeId, {messages:storedMessages,input:inputRef.current,problem,questionUnanswered,resetMarks}); };
   const activate = (next: LocalGoals, saveCurrent = true) => {
     cancelPending(); if(next.activeId!==goalsRef.current.activeId)explorationContext.current=emptyGoalRequirements(); if (saveCurrent) snapshot();
     const chat = chats.current.get(next.activeId) ?? decisionStore.getField<GoalChat|null>(next.activeId,"chat",null);
-    setMessages(chat?.messages ?? []); setInput(chat?.input ?? ""); setProblem(chat?.problem ?? null); setQuestionUnanswered(false);
+    setStoredMessages(chat?.messages ?? []);setResetMarks(chat?.resetMarks??{}); setInput(chat?.input ?? ""); setProblem(chat?.problem ?? null); setQuestionUnanswered(false);
     history.current = {key:"", messages:[]}; setError(null); setIssueEditor(null);
     setFocusedIssue(next.goals.find(g=>g.id===next.activeId)?.statement ?? ""); persist(next);
   };
@@ -106,7 +111,7 @@ export function useProblemConversation() {
       const id = crypto.randomUUID();
       const next = {...current,activeId:id,goals:[...current.goals,{id,statement:clean,...(editor?{context:normalizeGoalRequirements(editor.requirements)}:{})}]};
       // Pinning general exploration retains its visible transcript for reference, never model history.
-      if (!current.activeId) chats.current.set(id,{messages,input:"",problem:null,questionUnanswered:false});
+      if (!current.activeId) chats.current.set(id,{messages:storedMessages,input:"",problem:null,questionUnanswered:false,resetMarks});
       activate(next); return null;
     }
     cancelPending(); history.current={key:"",messages:[]}; setProblem(null); setQuestionUnanswered(false); setInput(""); setError(null);
@@ -127,7 +132,7 @@ export function useProblemConversation() {
     if (current.goals.some(goal=>goal.statement.toLocaleLowerCase()===clean.toLocaleLowerCase())) throw Error("This goal is already saved. Select it from your goals to continue; your draft is retained.");
     if (current.goals.length >= MAX_GOALS) throw Error("Your saved goals are full. Select an existing goal to continue; your draft is retained.");
     const id = crypto.randomUUID();
-    chats.current.set(id,{messages,input:inputRef.current,problem,questionUnanswered});
+    chats.current.set(id,{messages:storedMessages,input:inputRef.current,problem,questionUnanswered,resetMarks});
     activate({...current,activeId:id,goals:[...current.goals,{id,statement:clean}]});
     return id;
   };
@@ -153,9 +158,14 @@ export function useProblemConversation() {
   const goalRequirements=activeGoal?.context ?? emptyGoalRequirements();
   const goalContext=activeGoal?{goal:activeGoal.statement,...goalRequirements}:null;
   const clearAllGoals = () => {
-    explorationContext.current=emptyGoalRequirements();cancelPending(); chats.current.clear(); history.current={key:"",messages:[]}; setMessages([]); setInput(""); setProblem(null); setQuestionUnanswered(false); setFocusedIssue(""); setIssueEditor(null); setError(null); setWorkspaceRevision(v=>v+1); persist(emptyLocalGoals(),true);
+    explorationContext.current=emptyGoalRequirements();cancelPending(); chats.current.clear(); history.current={key:"",messages:[]}; setStoredMessages([]);setResetMarks({}); setInput(""); setProblem(null); setQuestionUnanswered(false); setFocusedIssue(""); setIssueEditor(null); setError(null); setWorkspaceRevision(v=>v+1); persist(emptyLocalGoals(),true);
   };
-  return { canSubmitPrompt, confirmWorkforceGoal, saved:decisionStorage.saved, retrySave:()=>decisionStore.retry(), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, closeIssueEditor, openIssueEditor, updateIssueDraft, updateIssueContext, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
+  const resetConversation=()=>{
+    if(!goalsRef.current.activeId)explorationContext.current=emptyGoalRequirements();
+    cancelPending();history.current={key:"",messages:[]};setInput("");setProblem(null);setQuestionUnanswered(false);setError(null);
+    setResetMarks(current=>resetConversationMarks(current,scope,storedMessages.length));setResetEpoch(value=>value+1);
+  };
+  return { resetConversation,resetEpoch,wasReset:Object.hasOwn(resetMarks,scope),historyMessages:storedMessages, canSubmitPrompt, confirmWorkforceGoal, saved:decisionStorage.saved, retrySave:()=>decisionStore.retry(), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, closeIssueEditor, openIssueEditor, updateIssueDraft, updateIssueContext, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
 }
 export type ProblemConversation = ReturnType<typeof useProblemConversation>;
 

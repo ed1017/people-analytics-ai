@@ -123,7 +123,8 @@ const PLANNING_VIEW_TO_PAGE: Record<
 };
 
 export default function Home() {
-  const conversation = useProblemConversation();
+  const [activePage, setActivePageState] = useState<AppPage>("home");
+  const conversation = useProblemConversation(activePage);
   const [workspacePalette]=useWorkspacePalette();
   const [optionActions] = useState(()=>new WorkforceOptionActions());
   const [homeEvidencePacket,setHomeEvidencePacket]=useState("");
@@ -151,8 +152,6 @@ export default function Home() {
   const [selectedPersona, setSelectedPersona] =
     useState<Persona>("HR");
 
-  const [activePage, setActivePageState] =
-    useState<AppPage>("home");
 
   const lastPageByWorkspaceRef = useRef<
     Record<AppWorkspaceKey, AppPage>
@@ -1586,7 +1585,7 @@ export default function Home() {
   const summaryEvidenceReady = intelligencePage ? activePage!=="occupational-references"||(!skillsLoading&&Boolean(skillsData)) : chatEvidenceReady;
   const goalSummaryPayload = {...JSON.parse(chatEvidenceKey),goalEvidenceContext:relatedGoalEvidence,marketReference:marketCarry};
   // This client-only key tracks request validity; it adds nothing to model inputs.
-  const sectionRequestContextKey = JSON.stringify([chatEvidenceKey, relatedGoalEvidence, marketCarry, conversation.focusedIssue, chatEvidenceReady]);
+  const sectionRequestContextKey = JSON.stringify([chatEvidenceKey, relatedGoalEvidence, marketCarry, conversation.focusedIssue, chatEvidenceReady, conversation.resetEpoch]);
   const currentChatEvidenceKey = useRef(sectionRequestContextKey);
   const sectionSending = useRef<symbol | null>(null);
   useLayoutEffect(() => {
@@ -2065,10 +2064,10 @@ export default function Home() {
         </div>
 
         {activePage !== "home" && activePage!=="decision-brief" && activePage!=="assess-evaluate" && <AiPanel
-          goalViewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,activePage,selectedPersona,selectedBusinessContext])}
+          goalViewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,activePage,selectedPersona,selectedBusinessContext,conversation.resetEpoch])}
           hasGoal={Boolean(conversation.focusedIssue)}
           goalStatement={conversation.focusedIssue}
-          goalTakeaway={<GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:JSON.stringify(selectedBusinessContext)}} payload={goalSummaryPayload} active={true} ready={summaryEvidenceReady} paused={chatLoading||Boolean(chatInput.trim())||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} unavailable={activePage==="compensation"?"Public US wage references and reported workforce-cost context are available on this page. Internal salary analysis and a goal-specific AI briefing are unavailable.":undefined} onNavigate={setActivePage}/>}
+          goalTakeaway={!conversation.wasReset&&<GoalTakeaway goalId={conversation.activeGoalId} goalContext={{...conversation.goalContext,currentScope:JSON.stringify(selectedBusinessContext)}} payload={goalSummaryPayload} active={true} ready={summaryEvidenceReady} paused={chatLoading||Boolean(chatInput.trim())||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} unavailable={activePage==="compensation"?"Public US wage references and reported workforce-cost context are available on this page. Internal salary analysis and a goal-specific AI briefing are unavailable.":undefined} onNavigate={setActivePage}/>}
           readOnlyReason={readOnlyReason}
           aiCollapsed={aiCollapsed}
           aiExpanded={aiExpanded}
@@ -2089,6 +2088,8 @@ export default function Home() {
           }
           onChatInputChange={setChatInput}
           onDraftExample={conversation.draftExample}
+          onResetConversation={()=>{sectionSending.current=null;conversation.resetConversation();}}
+          conversationHistory={conversation.historyMessages}
           onSend={() => sendChatMessage()}
         />}
       </div>
