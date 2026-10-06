@@ -18,7 +18,7 @@ Checkpoint 8afdb5c added 16 top-level tests, explaining **1,364 = 1,348 + 16**; 
 
 PGlite was installed locally outside package manifests. Without PGLITE_MODULE, its two test groups skip; such a run must not be reported as the same count/coverage.
 
-No preexisting `.test.mjs` file was deleted or reduced. The old standalone synthetic-career browser script was deliberately replaced by the original-workforce ratings-page browser script when that panel was removed. It is outside both unit selections. Other Home/PR159 code remains present; the only subsequent Home change is requested instruction copy: step 4 “Share (TBD)” and step 5 “Track (TBD)”, preserving steps 1–3 and layout. This does not implement sharing/tracking.
+No preexisting `.test.mjs` file was deleted or reduced. The old standalone synthetic-career browser script was deliberately replaced by the original-workforce ratings-page browser script when that panel was removed. It is outside both unit selections. Other Home/PR159 code remains present; the only subsequent Home change is requested instruction copy: step 4 “Share Action Plan (TBD) - Directly share action plan with other owners” and step 5 “Track results (TBD) - Track, monitor, and adjust action plans in real time”, preserving steps 1–3 and layout. This does not implement sharing/tracking.
 
 ## SQL audit correction
 
