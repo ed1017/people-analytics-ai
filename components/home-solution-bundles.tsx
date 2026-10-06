@@ -71,7 +71,7 @@ export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,
   if(live.current!==identity)return;
   setPending(false);
   if(outcome.status==='ready'||outcome.status==='cached'){requestAnimationFrame(()=>{heading.current?.focus({preventScroll:true});heading.current?.scrollIntoView({block:'start'});});}
-  else {if(outcome.status==='failed')setFailure({stage:outcome.diagnostic??'client_response',details:readBundleResponseDiagnostic(outcome.responseDiagnostic)});setNotice(outcome.status==='failed'?`Action Plan preparation failed. ${outcome.diagnostic==='delivery_required'?'A proposed plan contained only diagnostic activities; this goal requires a concrete proposed intervention. ':''}Stage: ${outcome.diagnostic??'client_response'}. Your goal, previous draft and results are kept. No retry runs automatically.`:'The context changed. Your saved work is kept; prepare again explicitly.');}
+  else {if(outcome.status==='failed')setFailure({stage:outcome.diagnostic??'client_response',details:readBundleResponseDiagnostic(outcome.responseDiagnostic)});setNotice(outcome.status==='failed'?`Action Plan preparation failed. ${outcome.diagnostic==='delivery_required'?'A proposed plan contained only diagnostic activities; this goal requires a concrete proposed intervention. ':outcome.diagnostic==='duplicate_plans'?'The proposed alternatives repeated the same activities, responsible roles and sequence. Different titles alone are not distinct plans. ':''}Stage: ${outcome.diagnostic??'client_response'}. Your goal, previous draft and results are kept. No retry runs automatically.`:'The context changed. Your saved work is kept; prepare again explicitly.');}
  }
  useEffect(()=>{
   if(pin?.id!==goalId||pin.sequence===consumed.current)return;
