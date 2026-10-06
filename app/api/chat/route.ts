@@ -1,3 +1,5 @@
+import {homeForecastAnswer} from '@/lib/home-forecast';
+import {decodeHomeModelReply} from '@/lib/home-chat-reply';
 import {syntheticDomainDemoPrompt} from '@/lib/synthetic-domain-demo';
 import {homeBundleTask,homeBundleTaskInstructions} from '@/lib/home-bundle-task';
 import {inspectHomeChatResponse} from "@/lib/home-chat-response";
@@ -561,16 +563,6 @@ export async function POST(
   request: NextRequest
 ) {
   try {
-    if (!client) {
-      return NextResponse.json(
-        {
-          error:
-            "Missing OPENAI_API_KEY in .env.local.",
-        },
-        { status: 500 }
-      );
-    }
-
     let body = await request.json();
     if (body?.page === "home") {
       if (new TextEncoder().encode(JSON.stringify(body.overviewBriefingContext ?? {})).length > HOME_MAX_BYTES || (typeof body.message === "string" && body.message.length > 6000)) return NextResponse.json({error:"Home evidence or question exceeds the supported limit. Refresh evidence or shorten the question."},{status:413});
@@ -589,6 +581,21 @@ export async function POST(
       typeof body?.message === "string"
         ? body.message.trim()
         : "";
+
+    if (body?.page === "home" && !summaryOnly) {
+      const answer = homeForecastAnswer(message);
+      if (answer) return NextResponse.json(decodeHomeModelReply(JSON.stringify({answer,next_step:"none",problem:null,problem_evidence:[],options:[],question:null,finding_followups:[]}),body.hasFocusedIssue,body.overviewBriefingContext));
+    }
+
+    if (!client) {
+      return NextResponse.json(
+        {
+          error:
+            "Missing OPENAI_API_KEY in .env.local.",
+        },
+        { status: 500 }
+      );
+    }
 
     const persona: Persona =
       body?.persona === "Leader" ||

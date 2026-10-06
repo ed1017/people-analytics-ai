@@ -1,0 +1,19 @@
+// Real Home shell, offline precomputed route responses, no live model or data access.
+import assert from 'node:assert/strict';
+import {homeForecastAnswer} from '../../lib/home-forecast.ts';
+import {decodeHomeModelReply} from '../../lib/home-chat-reply.ts';
+import {scopeDashboard} from '../fixtures/home-scope-evidence.mjs';
+import {workforce,attrition,survey,talent,career} from '../fixtures/theme-audit-data.mjs';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright'),base=process.env.HOME_BASE_URL??'http://127.0.0.1:3224';
+const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});let checks=0;
+const check=(name,value)=>{assert.ok(value,name);checks++;console.log('PASS '+name)};
+try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['zoom',683,450]]){
+ const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),errors=[];let unexpected=0,posts=0;page.on('pageerror',e=>errors.push(e.message));
+ await page.route('**/*',r=>{const req=r.request(),u=new URL(req.url());if(u.origin!==base){unexpected++;return r.abort()}if(u.pathname==='/api/chat'){posts++;const b=req.postDataJSON(),answer=homeForecastAnswer(b.message);assert.ok(answer);return r.fulfill({json:decodeHomeModelReply(JSON.stringify({answer,next_step:'none',problem:null,problem_evidence:[],options:[],question:null,finding_followups:[]}),b.hasFocusedIssue,b.overviewBriefingContext)})}if(u.pathname.startsWith('/api/'))return r.fulfill({json:u.pathname==='/api/dashboard'?scopeDashboard(u.search):({'/api/workforce':workforce,'/api/attrition':attrition,'/api/survey-sentiment':survey,'/api/talent-acquisition':talent,'/api/career-growth-mobility':career}[u.pathname]??{})});return r.continue()});
+ await page.goto(base);const input=page.getByLabel('Ask Workforce AI',{exact:true});await input.waitFor();await page.getByRole('button',{name:'Forecast turnover',exact:true}).click();await page.locator('[data-chat-role="assistant"]').last().getByText(/monthly voluntary-exit counts/).waitFor();
+ check(mode+' starter autosends a bounded response with no goal pin or preparation error',posts===1&&await page.getByRole('button',{name:'Pin as goal',exact:true}).count()===0&&await page.getByText(/Problem\/options not prepared/).count()===0);
+ for(const [question,expected] of [['Predict talent acquisition','opening-cohort start percentage'],['Forecast employee listening','quarterly mean respondent favorable-answer share'],['Compare prediction methods','Which prediction domain'],['Forecast turnover rate in Canada','future workforce denominators'],['Compare forecasts across all three domains','cannot be ranked or combined']]){
+  await input.fill(question);await page.getByRole('button',{name:'Send overview question',exact:true}).click();const answer=page.locator('[data-chat-role="assistant"]').last();await answer.getByText(new RegExp(expected)).first().waitFor();check(mode+' '+question,(await answer.innerText()).includes(expected)&&await page.getByRole('region',{name:'Requested country scope'}).count()===0&&await page.getByRole('button',{name:'Pin as goal',exact:true}).count()===0);
+ }
+ check(mode+' responsive and isolated',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&unexpected===0&&errors.length===0&&posts===6);await context.close();
+}}finally{await browser.close()}console.log(JSON.stringify({checks}));

@@ -91,7 +91,7 @@ test('missing years and ambiguous groups ask focused questions; named groups res
  const inputs=structuredClone(draft.inputs);inputs.groups[0].label='Managers';inputs.groups.push({...structuredClone(inputs.groups[0]),id:'engineers',label:'Engineers'});const multi=reviseBundleDraft(draft,inputs);
  assert.throws(()=>previewBundleChatEdit(multi,'use 20 participants'),/Which participant group.*Managers.*Engineers/);
  const next=previewBundleChatEdit(multi,'use 20 participants for Engineers');assert.equal(next.inputs.groups[1].count.value,20);assert.deepEqual(next.inputs.groups[0],multi.inputs.groups[0]);
- const empty=createBundleDraft(bundleProposalFixture(binding.goal).bundles[0],binding);assert.throws(()=>previewBundleChatEdit(empty,'use 20 participants'),/Add a group/);
+ const empty=createBundleDraft(bundleProposalFixture(binding.goal).bundles[0],binding);assert.throws(()=>previewBundleChatEdit(empty,'use 20 participants'),/has no participant group/);
 });
 test('everyday edits preserve illustrative and unknown provenance and reject stale scope or another plan',()=>{
  const draft=base(),preview=previewBundleChatEdit(draft,'use illustrative twenty participants; start in Unknown');assert.equal(preview.inputs.groups[0].count.kind,'illustrative');assert.equal(preview.inputs.scope.startMonth.kind,'unknown');

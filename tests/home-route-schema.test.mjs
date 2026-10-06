@@ -124,3 +124,18 @@ test('actual bundle POST rejects renamed duplicate activities with one request a
  assert.equal(sent.tool_choice,'none');assert.equal(sandbox.__requestOptions.at(-1).maxRetries,0);
  const body=await response.json();assert.equal(body.diagnostic,'duplicate_plans');assert.equal(body.proposal,undefined);assert.ok(!JSON.stringify(body).includes('Different title only'));
 });
+
+test('Home explicit forecasts use only server-owned verified evidence without a model request',async()=>{
+ for(const message of ['Forecast turnover','Predict talent acquisition','Forecast employee listening','Compare prediction methods','Compare forecasts across all three domains','Forecast turnover rate in Canada']){
+  const before=sandbox.__requests.length;
+  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',message,overviewBriefingContext:packets[1][1],projection:{value:999999},hasFocusedIssue:true})}));
+  assert.equal(response.status,200);assert.equal(sandbox.__requests.length,before);const decoded=await response.json();assert.equal(decoded.candidateProposal,null);assert.equal(decoded.clarification,null);assert.equal(decoded.nextStep,'none');assert.ok(!decoded.answer.includes('999999'));assert.match(decoded.answer,/simulated/i);
+ }
+});
+
+test('verified local Home forecasts work with no configured model client',async()=>{
+ const local={...sandbox,exports:{},process:{env:{}},__requests:[],__replies:[],__requestOptions:[]};local.module={exports:local.exports};
+ vm.runInNewContext('globalThis.structuredClone=value=>JSON.parse(JSON.stringify(value));\n'+await fs.readFile(path.join(out,'route.cjs'),'utf8'),local);
+ const response=await local.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',message:'Forecast turnover',overviewBriefingContext:packets[1][1]})}));
+ assert.equal(response.status,200);assert.match((await response.json()).answer,/monthly voluntary-exit counts/);assert.equal(local.__requests.length,0);
+});

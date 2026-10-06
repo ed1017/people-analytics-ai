@@ -9,7 +9,7 @@ import {benchmarkAreas,benchmarkOccupations,compensationBenchmark,formatOewsEsti
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const output=process.env.COMPENSATION_QA_OUTPUT??await fs.mkdtemp(path.join(os.tmpdir(),'compensation-benchmarks-ui-'));
 await fs.mkdir(output,{recursive:true});
-const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/compensation.tsx'),output:{path:output,filename:'fixture.js'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,entry:path.resolve('tests/fixtures/compensation.tsx'),output:{path:output,filename:'fixture.js'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd(),react:path.resolve('node_modules/react')}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
 const bundle=await fs.readFile(path.join(output,'fixture.js'),'utf8');
 const cssFiles=await fs.readdir('.next/static',{recursive:true});
@@ -30,7 +30,7 @@ try{
     });
     await page.goto('http://compensation.test/');await page.addStyleTag({content:css});await page.addScriptTag({content:bundle});
     const panel=page.getByRole('region',{name:'US occupation wage benchmarks'});
-    await page.getByRole('alert').waitFor();
+    await page.getByRole('alert').waitFor().catch(error=>{throw new Error(error.message+'\nFixture diagnostics: '+JSON.stringify({errors,requests}));});
     check(width+' no occupation guessed from internal data or goal',await panel.getByLabel('Reference occupation').inputValue()===''&&await panel.getByRole('table').count()===0);
     check(width+' available reference independent of internal failure',await panel.isVisible()&&await page.getByText('Compensation cost context is unavailable. Try again.').isVisible());
     check(width+' only three official occupation choices',await panel.getByLabel('Reference occupation').locator('option').count()===4);
@@ -44,14 +44,14 @@ try{
       check(width+' exact published five percentiles '+occupation.onet_code+'/'+area.code,JSON.stringify(cells)===JSON.stringify(expected.percentiles.map(p=>formatOewsEstimate(p.estimate,true))));
       check(width+' correct comparison scope '+occupation.onet_code+'/'+area.code,await panel.getByRole('table').locator('tbody tr').count()===(area.code==='99'?1:2));
     }
-    check(width+' no seniority or specialty inference',await panel.getByText(/not seniority levels, salary bands or total compensation/).isVisible()&&await panel.getByText(/not specialty-specific/).isVisible());
+    check(width+' no seniority or specialty inference',await panel.getByText(/3 occupations · 3 US geographies · No internal role matched/).isVisible()&&await panel.getByText(/not specialty-specific/).isVisible());
     check(width+' metro boundary explicit',await panel.getByText(/broader than New York City/).isVisible());
     const region=panel.getByRole('region',{name:'Annual wage percentile comparison'});await region.focus();
     check(width+' keyboard scrolling available',await region.evaluate(el=>el===document.activeElement));
     if(width===390){await page.keyboard.press('ArrowRight');await page.waitForFunction(()=>document.activeElement.scrollLeft>0);await region.evaluate(el=>el.scrollLeft=0);}
     check(width+' page fits viewport',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
     await panel.getByText('Benchmark sources and limits',{exact:true}).click();
-    check(width+' dates, coverage, licensing, threshold and attribution available',await panel.getByText(/released May 15, 2026/).isVisible()&&await panel.getByText(/≥ \$239,200 annually/).isVisible()&&await panel.getByRole('link',{name:'CC BY 4.0'}).isVisible()&&await panel.getByText(/Release: August 2026/).isVisible());
+    check(width+' dates, coverage, licensing, threshold and attribution available',await panel.getByText(/released May 15, 2026/).isVisible()&&await panel.getByText(/not seniority levels, salary bands or total compensation/).isVisible()&&await panel.getByText(/cannot supply a compa-ratio/).isVisible()&&await panel.getByText(/≥ \$239,200 annually/).isVisible()&&await panel.getByRole('link',{name:'CC BY 4.0'}).isVisible()&&await panel.getByText(/Release: August 2026/).isVisible());
     check(width+' source links official and selected workbook accurate',await panel.getByRole('link',{name:'Official BLS source workbook'}).getAttribute('href')==='https://www.bls.gov/oes/special-requests/oesm25ma.zip');
     await panel.getByText('Benchmark sources and limits',{exact:true}).click();
     await page.screenshot({path:path.join(output,`benchmarks-${width}.png`),fullPage:true});

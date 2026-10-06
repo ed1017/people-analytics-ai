@@ -15,7 +15,7 @@ export function CompensationBenchmarks() {
     <div>
       <p className="text-xs font-medium text-primary">Public market reference · BLS OEWS</p>
       <h2 className="mt-1 text-lg font-semibold">US occupation wage benchmarks</h2>
-      <p className="mt-2 text-sm text-muted-foreground">Published annual wages in USD · {benchmarkProvenance.period}. These occupation percentiles are not seniority levels, salary bands or total compensation.</p>
+      <p className="mt-2 text-sm text-muted-foreground">Annual wages · USD · {benchmarkProvenance.period}</p>
     </div>
     <div className="grid min-w-0 gap-3 sm:grid-cols-2">
       <label className="min-w-0 text-sm font-medium">Reference occupation
@@ -30,8 +30,8 @@ export function CompensationBenchmarks() {
         </select>
       </label>
     </div>
-    <p className="text-xs text-muted-foreground">Coverage: three occupations in three US geographies. No internal role has been matched. Workforce filters do not change this reference.</p>
-    {!selected ? <p role="status" className="rounded-md bg-muted/20 p-4 text-sm">Choose a reference occupation to view published wages. A job title alone does not verify a match to your role.</p> : <div className="space-y-3" aria-live="polite">
+    <p className="text-xs text-muted-foreground">3 occupations · 3 US geographies · No internal role matched</p>
+    {!selected ? <p role="status" className="rounded-md bg-muted/20 p-4 text-sm">Choose an occupation to view wage percentiles.</p> : <div className="space-y-3" aria-live="polite">
       <div className="rounded-md bg-muted/20 p-3 text-sm">
         <h3 className="font-semibold">{selected.occupation.onet_title} · {selected.area.label}</h3>
         <p className="mt-1 text-xs text-muted-foreground">O*NET® {selected.occupation.onet_code} → BLS SOC {selected.occupation.soc_code} · Published crosswalk</p>
@@ -53,6 +53,7 @@ export function CompensationBenchmarks() {
     <details className="border-t pt-3 text-sm">
       <summary className="cursor-pointer font-medium">Benchmark sources and limits</summary>
       <div className="mt-3 space-y-2 text-xs leading-relaxed text-muted-foreground">
+        <p>Occupation percentiles are not seniority levels, salary bands or total compensation. A job title alone does not verify an internal role match. Workforce filters do not change this public reference. A market median is not an internal salary-range midpoint and cannot supply a compa-ratio.</p>
         <p>BLS OEWS May 2025, released May 15, 2026. Versioned subset checked October 5, 2026; no automatic refresh or inflation adjustment. US nonfarm wage and salary employment, including full- and part-time workers; self-employed workers are excluded.</p>
         <p>OEWS wages include base rates and some incentive pay. Overtime premiums, nonproduction bonuses and employer benefit costs are excluded. These are published annual wage estimates, not take-home pay or total employer cost. The percentile range is not a confidence interval.</p>
         <p>Missing/suppressed estimates stay unavailable. A BLS “#” is shown as ≥ $239,200 annually, not an exact wage; “*” means wage unavailable and “**” means employment unavailable. The nine included records have published numeric estimates.</p>

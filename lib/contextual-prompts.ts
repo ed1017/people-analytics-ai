@@ -34,11 +34,12 @@ const pageExamples:Record<string,string> = {
 const planningPages = new Set(['planning-overview','scenario-modeling','position-workforce-design','workforce-response','execution-feasibility','workforce-planning']);
 const readOnlyPages = new Set(['compensation','decision-brief','assess-evaluate']);
 export const homeGoalStarters = [
-  'Reduce employee turnover',
-  'Build AI skills without adding headcount',
-  'Compare hiring, training, and internal moves',
-  'Plan within a fixed workforce budget',
-  'Which skills do we need, and where are the gaps?',
+  'Find issues worth tackling',
+  'Reduce turnover',
+  'What skills do we need?',
+  'Should we hire, train, or both?',
+  'Forecast turnover',
+  'Compare prediction methods',
 ] as const;
 export function hasKnownNumericEvidence(value:unknown):boolean {
   if(typeof value==='number')return Number.isFinite(value);
@@ -52,7 +53,7 @@ export function contextualPrompts(context:PromptContext):string[] {
   const missing=focused?'What evidence is missing for my goal, and what should I verify first?':'What evidence is available, missing or outside this page’s scope?';
   if(!evidenceReady)return [missing];
   const forecast=/\b(forecast|predict|prediction|predictive)\b/i.test(goal);
-  const boundary='What historical evidence can inform my goal, and why is a validated forecast unavailable?';
+  const boundary=page==='home'?'Compare prediction methods':'What historical evidence can inform my goal, and why is a validated forecast unavailable?';
   if(page==='home'||page==='overview'){
     if(!sources.some(source=>source.status==='loaded'&&hasKnownNumericEvidence(source.facts)))return [missing];
     if(page==='home'&&!focused)return [...homeGoalStarters];

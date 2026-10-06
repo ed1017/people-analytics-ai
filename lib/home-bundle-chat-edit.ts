@@ -74,7 +74,7 @@ function everydayClause(raw:string,available:Map<string,Target[]>,draft:BundleDr
  if(match)return {name:'Shared horizon',value:match[1]};
  match=clause.match(/^use\s+(.+?)\s+participants(?:\s+for\s+(.+))?$/i);
  if(match){
-  if(!match[2]&&draft.inputs.groups.length!==1)fail(draft.inputs.groups.length?'Which participant group should use this count? Choose '+draft.inputs.groups.map(group=>`“${group.label}”`).join(' or ')+'. Say “use 20 participants for [group]”.':'Which participant group should this count describe? Add a group in Review plan fields first.');
+  if(!match[2]&&draft.inputs.groups.length!==1)fail(draft.inputs.groups.length?'Which participant group should use this count? Choose '+draft.inputs.groups.map(group=>`“${group.label}”`).join(' or ')+'. Say “use 20 participants for [group]”.':'This plan has no participant group, so that change cannot be applied.');
   return {name:match[2]?match[2]+' participants':'participants',value:match[1]};
  }
  fail('Which assumption should change? Try “start in December 2026”, “make it three months”, or “use 20 participants”. For a scenario, say “set target turnover to 12%” or “set target additional roles to 3”. Which displayed assumption should change?');

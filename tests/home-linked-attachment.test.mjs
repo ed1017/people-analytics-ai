@@ -78,3 +78,15 @@ test('a freshly prepared context does not inherit automatic field ownership from
  const f=await setup();await attach(f);const request=revised(f);request.preparedAt='2026-10-06T14:00:00Z';request.draft.binding=await f.project(planningDestination(f.fields()));request.draft.revision=1;request.result=reconcileBundle(request.draft);
  const preview=await previewLinkedAttachment(f.store,request,{},f.project);assert.equal(preview.choices['development.options[0].inputs.participants'],undefined);assert.equal(preview.application.rows.find(row=>row.destination==='development.options[0].inputs.participants').after,'10');await commitLinkedAttachment(f.store,preview,{},f.project,()=>true,'unused');assert.equal(f.fields().development.options[0].inputs.participants,'10');assert.equal(f.fields().homeSolutionBundlesV1.attachments.length,2);
 });
+
+test('direct attachment commits once without routine confirmation and repeats are idempotent',async()=>{
+ const {attachCurrentPlan}=await import('../lib/home-direct-attachment.ts');const f=await setup();f.request.development=null;f.request.capacityReviewed=false;
+ const result=await attachCurrentPlan(f.store,f.request,f.project,()=>true,'direct-1');assert.equal(result.status,'attached');assert.equal(f.writes.length,1);
+ const repeated=await attachCurrentPlan(f.store,{...f.request,attachmentId:'attachment-2',replaceId:'attachment-1'},f.project,()=>true,'direct-2');assert.equal(repeated.status,'already-attached');assert.equal(f.fields().homeSolutionBundlesV1.attachments.length,1);assert.equal(f.writes.length,1);
+});
+test('direct attachment interrupts genuine conflicts and rejects stale or concurrent clicks',async()=>{
+ const {attachCurrentPlan}=await import('../lib/home-direct-attachment.ts');const f=await setup();const conflict=await attachCurrentPlan(f.store,f.request,f.project,()=>true,'direct-1');assert.equal(conflict.status,'review');assert.equal(f.writes.length,0);
+ f.request.development=null;f.request.capacityReviewed=false;await assert.rejects(attachCurrentPlan(f.store,f.request,f.project,()=>false,'stale'),/changed/);
+ const runs=await Promise.allSettled([attachCurrentPlan(f.store,f.request,f.project,()=>true,'once'),attachCurrentPlan(f.store,f.request,f.project,()=>true,'twice')]);assert.equal(runs.filter(row=>row.status==='fulfilled').length,1);assert.equal(f.writes.length,1);
+ const manual=revised(f);const development=structuredClone(f.fields().development);development.options[0].inputs.participants='99';f.store.setField(f.id,'development',development);await assert.rejects(attachCurrentPlan(f.store,manual,f.project,()=>true,'manual'));assert.equal(f.fields().development.options[0].inputs.participants,'99');
+});

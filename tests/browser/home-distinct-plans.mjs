@@ -33,11 +33,9 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  await page.reload();await button('Create Action Plan').waitFor();check(mode+' reload never retries rejected preparation',posts.length===1);
  kind='one';await button('Create Action Plan').focus();await page.keyboard.press('Enter');await page.locator('[data-plan-current="true"]').waitFor();
  check(mode+' one supported option is accepted without invented alternatives',await panel.getByRole('tab').count()===1&&posts.length===2);
- await button('Attach Action Plan').click();await button('Review calculation').click();const flow=page.getByRole('region',{name:'Review Action Plan attachment'});
- await flow.getByLabel(/I reviewed this Action Plan for/).check();const unknown=flow.getByLabel(/I acknowledge the unresolved/);if(await unknown.count())await unknown.check();
- await button('Continue to attachment').click();await button('Confirm attachment').click();await flow.waitFor({state:'hidden'});
+ await button('Attach Action Plan').click();await panel.getByRole('status').filter({hasText:/Action Plan attached/}).waitFor();
  const original=(await state()).workspaces.g.fields;
- check(mode+' explicit review attaches only the actual returned option',original.homeSolutionBundlesV1.attachments.length===1&&posts.length===2);
+ check(mode+' one click attaches only the actual returned option',original.homeSolutionBundlesV1.attachments.length===1&&posts.length===2);
  headcount=101;kind='server-duplicate';await page.reload();await panel.getByText(/Previous Action Plan proposal/).waitFor();await button('Prepare Action Plans').click();await button('Retry Action Plans').waitFor();
  const failed=(await state()).workspaces.g.fields;
  check(mode+' server duplicate diagnostic is explained without another request',await panel.getByRole('alert').innerText().then(text=>text.includes('duplicate_plans')&&text.includes('Different titles alone'))&&posts.length===3);
