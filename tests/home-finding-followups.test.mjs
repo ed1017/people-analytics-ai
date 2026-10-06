@@ -53,3 +53,14 @@ test('follow-up sends the exact selected text and question with bounded existing
  assert.ok(prompt.length<1000);
  assert.doesNotMatch(prompt,/homeSolutionBundlesV1|overviewBriefingContext|employee_name/);
 });
+
+
+test('monthly finding follow-ups bind exact available period rows, never YTD summary totals',()=>{
+ const source={id:'A1',status:'loaded',facts:{monthly:[{month:'2026-04-01',total_exits:12,monthly_turnover_pct:2.4}]}};
+ const finding={id:'f1',text:'April 2026 company turnover was 2.4%; the monthly denominator is unavailable. [A1]',evidence:['A1:monthly:0'],prompt:'How does April compare with March in the supplied company series?'};
+ const text='- '+finding.text;
+ assert.deepEqual(readHomeFindingFollowups([finding],text,{sources:[source]}),[finding]);
+ for(const changed of [{...source,status:'unavailable'},{...source,facts:{...source.facts,suppressed:true}},{...source,facts:{monthly:[{month:'2026-04-01',suppressed:true,total_exits:12}]}},{...source,facts:{voluntary_exits:60}}])assert.deepEqual(readHomeFindingFollowups([finding],text,{sources:[changed]}),[]);
+ const format=buildHomeReplyFormat({sources:[source]},false);
+ assert.equal(ajv.compile(format.schema)({...reply([finding]),answer:text}),true);
+});

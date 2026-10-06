@@ -1,4 +1,5 @@
 import {homeForecastAnswer} from '@/lib/home-forecast';
+import {homeTurnPurpose,homeConversationInstructions} from '@/lib/home-conversation';
 import {decodeHomeModelReply} from '@/lib/home-chat-reply';
 import {syntheticDomainDemoPrompt} from '@/lib/synthetic-domain-demo';
 import {homeBundleTask,homeBundleTaskInstructions} from '@/lib/home-bundle-task';
@@ -1507,7 +1508,16 @@ ${message}
 `.trim();
 
     const homeStyle=homeResponseStyle(message);
-    const homeReplyFormat=page==="home"?buildHomeReplyFormat(body.overviewBriefingContext):null;
+    const homePurpose=homeTurnPurpose(message,history);
+    const prepareHomeGoal=!summaryOnly&&(homePurpose==='goal'||homePurpose==='discovery');
+    const homeReplyFormat=page==="home"?buildHomeReplyFormat(body.overviewBriefingContext,prepareHomeGoal):null;
+    const homeInstructions=homeConversationInstructions(homePurpose);
+    const homeAnswerStyle=homePurpose==='answer'?'Give a concise, complete answer to the question in plain language. Use paragraphs or bullets as helpful, usually 80-160 words; expand when asked for detail. End with a relevant optional follow-up only if useful.':homeStyle.instructions;
+    const homeInput=[
+      {role:'user' as const,content:workforceContext+'\nACTIVE GOAL CONTEXT (user intent, not evidence): '+JSON.stringify(goalContext)+'\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: '+JSON.stringify(marketReference)},
+      ...history.map(item=>({role:item.role,content:item.content})),
+      {role:'user' as const,content:message},
+    ];
     const maxOutputTokens = summaryOnly ? 1100 : page === "home" ? homeStyle.maxOutputTokens :
       page === "workforce-planning" || page === "home" || page === "attrition" || page === "survey-sentiment"
         ? 1400
@@ -1521,9 +1531,9 @@ ${message}
     let response =
       await client.responses.create({
         model: CHAT_MODEL,
-        instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeStyle.instructions : ""),
+        instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? (prepareHomeGoal ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions : "") + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeAnswerStyle+"\n"+homeInstructions : ""),
         ...(page === "home" ? { text: { format: homeReplyFormat! } } : {}),
-        input: aiInput,
+        input: page==='home'&&!summaryOnly?homeInput:aiInput,
         tools: peopleAnalyticsTools,
         tool_choice: toolChoice,
         max_output_tokens:
@@ -1591,7 +1601,7 @@ ${message}
       response =
         await client.responses.create({
           model: CHAT_MODEL,
-          instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeStyle.instructions : ""),
+          instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? (prepareHomeGoal ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions : "") + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeAnswerStyle+"\n"+homeInstructions : ""),
           ...(page === "home" ? { text: { format: homeReplyFormat! } } : {}),
           previous_response_id:
             response.id,
@@ -1604,7 +1614,7 @@ ${message}
     }
 
     if (page === "home") {
-      const inspected=inspectHomeChatResponse(response,body?.hasFocusedIssue===true,body?.overviewBriefingContext,maxOutputTokens);
+      const inspected=inspectHomeChatResponse(response,body?.hasFocusedIssue===true,body?.overviewBriefingContext,maxOutputTokens,prepareHomeGoal);
       return NextResponse.json(inspected.body,{status:inspected.ok?200:502});
     }
 
