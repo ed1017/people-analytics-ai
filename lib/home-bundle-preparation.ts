@@ -9,7 +9,9 @@ import {validateJson} from './local-decisions.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {evidenceFingerprint,readEvidenceFingerprint,type EvidenceFingerprint} from './home-evidence-identity.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
-import {readBundleResponseDiagnostic,type BundleResponseDiagnostic} from './home-bundle-response-diagnostic.ts';
+import {readBundleResponseDiagnostic,bundleResponseDiagnostic,homeBundleOutputTokens,type BundleResponseDiagnostic} from './home-bundle-response-diagnostic.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {incompleteBundleTextField} from './home-bundle-text-completeness.ts';
 export const HOME_BUNDLE_REQUEST='Prepare coordinated solution bundles for my exact pinned goal.';
 // @ts-expect-error Native Node tests share TypeScript source.
 export {homeBundleOutputTokens} from './home-bundle-response-diagnostic.ts';
@@ -43,6 +45,8 @@ export function createHomeBundlePreparation(){
     try{if(!current())return {status:'stale'};const reply=await args.prepare(abort.signal);if(!current())return {status:'stale'};
      const remote=readBundleDiagnostic(reply.diagnostic);if(remote){const responseDiagnostic=readBundleResponseDiagnostic(reply.responseDiagnostic);return {status:'failed',diagnostic:remote,...(responseDiagnostic?{responseDiagnostic}:{})};}
      const inspected=inspectHomeBundleProposal(reply.proposal,binding.goal,packet),proposal=inspected.proposal;if(!proposal)return {status:'failed',diagnostic:inspected.diagnostic};
+     const incompleteField=incompleteBundleTextField(proposal);
+     if(incompleteField)return {status:'failed',diagnostic:'incomplete_output',responseDiagnostic:bundleResponseDiagnostic(null,'incomplete_text',homeBundleOutputTokens,incompleteField)};
      const fingerprint=await evidenceFingerprint(packet,'canonical');
      if(binding.evidenceDigest!==fingerprint.canonical)fingerprint.mode='ordered';
      const draft:BundlePreparation={version:1,binding,proposal,preparedAt:new Date().toISOString(),usage:actionUsage(reply.usage,Date.now()-start),evidenceFingerprint:fingerprint};
