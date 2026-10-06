@@ -1,0 +1,944 @@
+{
+  "kind": "aggregate-custody-readiness-assessment",
+  "schemaVersion": 1,
+  "assessedAt": "2026-10-06T00:04:56.093Z",
+  "sourceHead": "f7b134cb2b40f772cb1c6c4b1b69d158490f8ca2",
+  "identities": {
+    "lib/ml/aggregate-export-custody.mjs": "98f4eca0dddfa895bd73505f302af207baeabae0f4206e46edfdd3a1361b7241",
+    "tests/manual/aggregate-export-custody.mjs": "648f6574e07d33550c70106341d7d26d1a4a5fa1772de9468cddd59526f0c1b7",
+    "lib/ml/predictive-readiness.ts": "ae0ef0f265afa1bb0ce447912aff1d4a9339570708022d7ff62eed7454754de7",
+    "tests/fixtures/aggregate-exit-history.json": "64acf5cbb0cddbaa0614e20ee3895cd026ebe3ec9c91fed622820b53b44d63cd",
+    "docs/aggregate-signal-qualification-inventory-v1.md": "c1cc85adb32f7f3da508d3a8e9c164584f350e689b9843efca8e3bf9a1e0de43"
+  },
+  "inputFile": "tests/fixtures/aggregate-exit-history.json",
+  "custody": {
+    "schemaVersion": 1,
+    "kind": "local-aggregate-export-custody",
+    "custodyVersion": "aggregate-export-custody-v1",
+    "payload": {
+      "sha256": "64acf5cbb0cddbaa0614e20ee3895cd026ebe3ec9c91fed622820b53b44d63cd",
+      "byteLength": 7955,
+      "contract": "aggregate-exit-history-json",
+      "contractVersion": 1
+    },
+    "capture": {
+      "capturedAt": "2026-10-06T00:04:56.093Z",
+      "meaning": "Local packaging clock; not historical source availability or authenticated time",
+      "sourceFirstObservedAt": null,
+      "sourceRevision": null,
+      "sourceRevisionHistory": null,
+      "completion": null
+    },
+    "source": {
+      "name": "public.attrition_monthly_trend",
+      "definitionVersion": "inspected-2026-10-05",
+      "population": "all-recorded-voluntary-separations",
+      "declaredProvenance": "user-declared-synthetic",
+      "observationBasis": "unknown",
+      "extractedOn": "2026-10-05",
+      "extractionPrecision": "calendar-day",
+      "insertedAt": "2026-09-28T01:50:05.925Z",
+      "generatorVersion": null,
+      "completeness": "unknown",
+      "denominatorBasis": "month-end-stock-only"
+    },
+    "reporting": {
+      "periods": [
+        "2024-01",
+        "2024-02",
+        "2024-03",
+        "2024-04",
+        "2024-05",
+        "2024-06",
+        "2024-07",
+        "2024-08",
+        "2024-09",
+        "2024-10",
+        "2024-11",
+        "2024-12",
+        "2025-01",
+        "2025-02",
+        "2025-03",
+        "2025-04",
+        "2025-05",
+        "2025-06",
+        "2025-07",
+        "2025-08",
+        "2025-09",
+        "2025-10",
+        "2025-11",
+        "2025-12",
+        "2026-01",
+        "2026-02",
+        "2026-03",
+        "2026-04",
+        "2026-05",
+        "2026-06",
+        "2026-07",
+        "2026-08",
+        "2026-09"
+      ],
+      "firstPeriod": "2024-01",
+      "lastPeriod": "2026-09",
+      "recordCount": 33,
+      "recordedCountRows": 32,
+      "unknownCountPeriods": [
+        "2024-01"
+      ],
+      "missingCalendarPeriods": []
+    },
+    "adapter": {
+      "dataClassMeaning": "Existing source extract, not verified real-world observations",
+      "revisionMeaning": "Revision 1 is a local adapter envelope only; no source revision history is established",
+      "validator": "validatePredictiveReadiness",
+      "contractVersion": 1
+    },
+    "readinessContract": {
+      "schemaVersion": 1,
+      "cutoff": "2026-10-06T00:04:56.093Z",
+      "manifest": {
+        "dataClass": "company-extract",
+        "observationBasis": "unknown",
+        "generatorVersion": null,
+        "generatedAt": null,
+        "sourceEvidence": null,
+        "sourceDefinitionVersion": "inspected-2026-10-05",
+        "populationVersion": "all-recorded-voluntary-separations",
+        "metricVersion": "monthly-voluntary-count",
+        "completion": null
+      },
+      "target": {
+        "domain": "turnover",
+        "measure": "voluntary-count",
+        "cadence": "monthly"
+      },
+      "records": [
+        {
+          "recordKey": "aggregate-2024-01",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2024-01-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2024-01",
+            "voluntaryExits": null,
+            "countStatus": "unknown",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2024-02",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2024-02-29T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2024-02",
+            "voluntaryExits": 60,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2024-03",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2024-03-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2024-03",
+            "voluntaryExits": 58,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2024-04",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2024-04-30T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2024-04",
+            "voluntaryExits": 58,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2024-05",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2024-05-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2024-05",
+            "voluntaryExits": 61,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2024-06",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2024-06-30T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2024-06",
+            "voluntaryExits": 60,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2024-07",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2024-07-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2024-07",
+            "voluntaryExits": 60,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2024-08",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2024-08-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2024-08",
+            "voluntaryExits": 61,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2024-09",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2024-09-30T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2024-09",
+            "voluntaryExits": 58,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2024-10",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2024-10-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2024-10",
+            "voluntaryExits": 65,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2024-11",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2024-11-30T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2024-11",
+            "voluntaryExits": 57,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2024-12",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2024-12-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2024-12",
+            "voluntaryExits": 63,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2025-01",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2025-01-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2025-01",
+            "voluntaryExits": 56,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2025-02",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2025-02-28T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2025-02",
+            "voluntaryExits": 65,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2025-03",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2025-03-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2025-03",
+            "voluntaryExits": 70,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2025-04",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2025-04-30T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2025-04",
+            "voluntaryExits": 68,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2025-05",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2025-05-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2025-05",
+            "voluntaryExits": 71,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2025-06",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2025-06-30T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2025-06",
+            "voluntaryExits": 66,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2025-07",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2025-07-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2025-07",
+            "voluntaryExits": 73,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2025-08",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2025-08-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2025-08",
+            "voluntaryExits": 70,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2025-09",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2025-09-30T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2025-09",
+            "voluntaryExits": 73,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2025-10",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2025-10-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2025-10",
+            "voluntaryExits": 70,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2025-11",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2025-11-30T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2025-11",
+            "voluntaryExits": 66,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2025-12",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2025-12-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2025-12",
+            "voluntaryExits": 71,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2026-01",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2026-01-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2026-01",
+            "voluntaryExits": 67,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2026-02",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2026-02-28T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2026-02",
+            "voluntaryExits": 69,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2026-03",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2026-03-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2026-03",
+            "voluntaryExits": 64,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2026-04",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2026-04-30T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2026-04",
+            "voluntaryExits": 73,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2026-05",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2026-05-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2026-05",
+            "voluntaryExits": 70,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2026-06",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2026-06-30T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2026-06",
+            "voluntaryExits": 61,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2026-07",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2026-07-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2026-07",
+            "voluntaryExits": 70,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2026-08",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2026-08-31T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2026-08",
+            "voluntaryExits": 65,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        },
+        {
+          "recordKey": "aggregate-2026-09",
+          "revision": 1,
+          "supersedes": null,
+          "effectiveAt": "2026-09-30T00:00:00.000Z",
+          "observedAt": null,
+          "populationVersion": "all-recorded-voluntary-separations",
+          "metricVersion": "monthly-voluntary-count",
+          "value": {
+            "period": "2026-09",
+            "voluntaryExits": 66,
+            "countStatus": "recorded",
+            "exposure": null
+          }
+        }
+      ],
+      "study": null,
+      "groups": []
+    },
+    "readiness": {
+      "schemaVersion": 1,
+      "inputStatus": "valid",
+      "dataClass": "company-extract",
+      "sourceTruthVerified": false,
+      "modelAdequacyAssessed": false,
+      "forecastingPerformanceValidated": false,
+      "causalEffectValidated": false,
+      "uncertainty": {
+        "predictionInterval": null,
+        "effectInterval": null,
+        "goalAttainmentProbability": null,
+        "reason": "No fitted/calibrated distribution or validated causal analysis is supplied by this contract checker."
+      },
+      "forecastEligibility": {
+        "status": "blocked",
+        "reasons": [
+          "availability-unknown",
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history"
+        ]
+      },
+      "causalEffectEligibility": {
+        "status": "blocked",
+        "reasons": [
+          "availability-unverified",
+          "completeness-unknown",
+          "missing-comparison-design"
+        ]
+      },
+      "history": [],
+      "excludedLateRecords": 0,
+      "causalAudit": null
+    },
+    "operationallyQualified": false,
+    "sourceTruthVerified": false,
+    "captureId": "425c2a7c2871292bef7fcaf00e41f9aa59d95ac4fec9cfca071d47471040c8f7"
+  },
+  "verification": {
+    "status": "verified",
+    "captureId": "425c2a7c2871292bef7fcaf00e41f9aa59d95ac4fec9cfca071d47471040c8f7",
+    "payloadSha256": "64acf5cbb0cddbaa0614e20ee3895cd026ebe3ec9c91fed622820b53b44d63cd",
+    "capturedAt": "2026-10-06T00:04:56.093Z",
+    "declaredProvenance": "user-declared-synthetic",
+    "observationBasis": "unknown",
+    "reporting": {
+      "periods": [
+        "2024-01",
+        "2024-02",
+        "2024-03",
+        "2024-04",
+        "2024-05",
+        "2024-06",
+        "2024-07",
+        "2024-08",
+        "2024-09",
+        "2024-10",
+        "2024-11",
+        "2024-12",
+        "2025-01",
+        "2025-02",
+        "2025-03",
+        "2025-04",
+        "2025-05",
+        "2025-06",
+        "2025-07",
+        "2025-08",
+        "2025-09",
+        "2025-10",
+        "2025-11",
+        "2025-12",
+        "2026-01",
+        "2026-02",
+        "2026-03",
+        "2026-04",
+        "2026-05",
+        "2026-06",
+        "2026-07",
+        "2026-08",
+        "2026-09"
+      ],
+      "firstPeriod": "2024-01",
+      "lastPeriod": "2026-09",
+      "recordCount": 33,
+      "recordedCountRows": 32,
+      "unknownCountPeriods": [
+        "2024-01"
+      ],
+      "missingCalendarPeriods": []
+    },
+    "inputStatus": "valid",
+    "forecastEligibility": {
+      "status": "blocked",
+      "reasons": [
+        "availability-unknown",
+        "availability-unverified",
+        "completeness-unknown",
+        "no-available-history"
+      ]
+    },
+    "causalEffectEligibility": {
+      "status": "blocked",
+      "reasons": [
+        "availability-unverified",
+        "completeness-unknown",
+        "missing-comparison-design"
+      ]
+    },
+    "availableHistoryRows": 0,
+    "operationallyQualified": false,
+    "sourceTruthVerified": false
+  },
+  "assessments": {
+    "turnoverCount": {
+      "target": {
+        "domain": "turnover",
+        "measure": "voluntary-count",
+        "cadence": "monthly"
+      },
+      "suppliedRecordCount": 33,
+      "inputStatus": "valid",
+      "forecastEligibility": {
+        "status": "blocked",
+        "reasons": [
+          "availability-unknown",
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history"
+        ]
+      },
+      "causalEffectEligibility": {
+        "status": "blocked",
+        "reasons": [
+          "availability-unverified",
+          "completeness-unknown",
+          "missing-comparison-design"
+        ]
+      },
+      "availableHistoryRows": 0,
+      "sourceTruthVerified": false,
+      "uncertainty": {
+        "predictionInterval": null,
+        "effectInterval": null,
+        "goalAttainmentProbability": null,
+        "reason": "No fitted/calibrated distribution or validated causal analysis is supplied by this contract checker."
+      }
+    },
+    "turnoverRate": {
+      "target": {
+        "domain": "turnover",
+        "measure": "voluntary-rate",
+        "cadence": "monthly"
+      },
+      "suppliedRecordCount": 33,
+      "inputStatus": "valid",
+      "forecastEligibility": {
+        "status": "blocked",
+        "reasons": [
+          "availability-unknown",
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history"
+        ]
+      },
+      "causalEffectEligibility": {
+        "status": "blocked",
+        "reasons": [
+          "availability-unverified",
+          "completeness-unknown",
+          "missing-comparison-design"
+        ]
+      },
+      "availableHistoryRows": 0,
+      "sourceTruthVerified": false,
+      "uncertainty": {
+        "predictionInterval": null,
+        "effectInterval": null,
+        "goalAttainmentProbability": null,
+        "reason": "No fitted/calibrated distribution or validated causal analysis is supplied by this contract checker."
+      }
+    },
+    "hiring": {
+      "target": {
+        "domain": "hiring",
+        "measure": "opening-to-actual-start",
+        "cadence": "opening-cohorts"
+      },
+      "suppliedRecordCount": 0,
+      "inputStatus": "valid",
+      "forecastEligibility": {
+        "status": "blocked",
+        "reasons": [
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history"
+        ]
+      },
+      "causalEffectEligibility": {
+        "status": "blocked",
+        "reasons": [
+          "availability-unverified",
+          "completeness-unknown",
+          "missing-comparison-design"
+        ]
+      },
+      "availableHistoryRows": 0,
+      "sourceTruthVerified": false,
+      "uncertainty": {
+        "predictionInterval": null,
+        "effectInterval": null,
+        "goalAttainmentProbability": null,
+        "reason": "No fitted/calibrated distribution or validated causal analysis is supplied by this contract checker."
+      }
+    },
+    "satisfaction": {
+      "target": {
+        "domain": "satisfaction",
+        "measure": "mean-respondent-favorable-answer-share",
+        "cadence": "observed-waves"
+      },
+      "suppliedRecordCount": 0,
+      "inputStatus": "valid",
+      "forecastEligibility": {
+        "status": "blocked",
+        "reasons": [
+          "availability-unverified",
+          "completeness-unknown",
+          "no-available-history"
+        ]
+      },
+      "causalEffectEligibility": {
+        "status": "blocked",
+        "reasons": [
+          "availability-unverified",
+          "completeness-unknown",
+          "missing-comparison-design"
+        ]
+      },
+      "availableHistoryRows": 0,
+      "sourceTruthVerified": false,
+      "uncertainty": {
+        "predictionInterval": null,
+        "effectInterval": null,
+        "goalAttainmentProbability": null,
+        "reason": "No fitted/calibrated distribution or validated causal analysis is supplied by this contract checker."
+      }
+    }
+  },
+  "emptyDomainContracts": {
+    "hiring": {
+      "schemaVersion": 1,
+      "cutoff": "2026-10-06T00:04:56.093Z",
+      "manifest": {
+        "dataClass": "company-extract",
+        "observationBasis": "unknown",
+        "generatorVersion": null,
+        "generatedAt": null,
+        "sourceEvidence": "prior-local-audit-only",
+        "sourceDefinitionVersion": "unverified",
+        "populationVersion": "unverified",
+        "metricVersion": "unverified",
+        "completion": null
+      },
+      "target": {
+        "domain": "hiring",
+        "measure": "opening-to-actual-start",
+        "cadence": "opening-cohorts"
+      },
+      "records": [],
+      "study": null,
+      "groups": []
+    },
+    "satisfaction": {
+      "schemaVersion": 1,
+      "cutoff": "2026-10-06T00:04:56.093Z",
+      "manifest": {
+        "dataClass": "company-extract",
+        "observationBasis": "unknown",
+        "generatorVersion": null,
+        "generatedAt": null,
+        "sourceEvidence": "prior-local-audit-only",
+        "sourceDefinitionVersion": "unverified",
+        "populationVersion": "unverified",
+        "metricVersion": "unverified",
+        "completion": null
+      },
+      "target": {
+        "domain": "satisfaction",
+        "measure": "mean-respondent-favorable-answer-share",
+        "cadence": "observed-waves"
+      },
+      "records": [],
+      "study": null,
+      "groups": []
+    }
+  },
+  "minimumMissingEvidence": {
+    "turnoverCount": [
+      "Source-observed availability and preserved count/classification revisions at each historical origin; capture and bulk insertion times do not substitute.",
+      "Population/voluntary-count definitions and independently supported monthly completeness, including whether January 2024 is truly zero.",
+      "Established source provenance for any real-world claim; recovered synthetic lineage alone would not establish real observations."
+    ],
+    "turnoverRate": [
+      "All count prerequisites.",
+      "Matched measured risk population/person-time or justified average exposure; month-end stock alone is insufficient.",
+      "Explicit qualified future exposure basis before a rate forecast."
+    ],
+    "hiring": [
+      "A populated approved aggregate opening cohort for one defined role/population, reconciled across open, accepted, started, cancelled and no-show dispositions.",
+      "Unambiguous opening/accepted-offer/actual-start semantics, actual first availability, source revisions and cohort completeness.",
+      "A frozen follow-up horizon or censoring treatment with enough matured earlier cohorts and later scored cohorts; completed hires alone are selected.",
+      "An aggregate adapter must preserve cohort/status semantics without exporting raw people; capacity-ready time requires its own observed target."
+    ],
+    "satisfaction": [
+      "Populated comparable company-wide wave aggregates with instrument, scoring, eligibility and population versions.",
+      "Actual publication/first observation and correction history, wave completion and release/suppression status.",
+      "Respondent favorable-share numerator and valid respondent denominator, separate eligible denominator for participation, plus invalid/missing/nonresponse accounting.",
+      "Enough comparable completed waves to define an earlier-training/later-test evaluation; do not invent monthly interpolation or use exit eNPS."
+    ]
+  },
+  "limits": [
+    "No fresh source queries, source writes, raw person exports, invented histories, model fitting or new synthetic experiments.",
+    "Hiring and satisfaction empty contracts encode absence of qualified records; they are not extracts, source observations or failed model predictions.",
+    "Turnover rate is a readiness probe over the same count contract, not a fitted rate forecast.",
+    "Custody consistency and structurally valid contracts do not authenticate source truth or establish predictive adequacy."
+  ],
+  "operationallyQualified": false,
+  "realWorldPerformanceValidated": false
+}
