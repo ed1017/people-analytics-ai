@@ -1,5 +1,6 @@
 // @ts-expect-error Native Node tests share the TypeScript source.
 import {exitSurveyEvidence} from './employee-listening.ts';
+import {normalizeHomePack} from './home-pack.mjs';
 const record=(value:unknown):Record<string,unknown>=>value&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:{};
 const count=(value:unknown):value is number=>typeof value==='number'&&Number.isSafeInteger(value)&&value>=0;
 export type HomeExitReasonChart={source:'S2';date:string;respondents:number;rows:{reason:string;count:number;percentage:number}[]};
@@ -17,9 +18,19 @@ export function homeExitReasonChart(result:unknown):HomeExitReasonChart|null {
  if(rows.reduce((sum,item)=>sum+item.count,0)>source.respondents||rows.filter(item=>item.count>0).length<2)return null;
  return {source:'S2',date:source.as_of,respondents:source.respondents,rows:rows.sort((a,b)=>b.count-a.count||a.reason.localeCompare(b.reason)).slice(0,3)};
 }
+/** The answer and chart must use the same bounded request packet, never raw rows
+ * which were absent, sampled out, suppressed or unavailable in that request. */
+export function homeExitReasonChartFromPacket(packet:unknown):HomeExitReasonChart|null {
+ const source=normalizeHomePack(packet).sources.find((item:{id:string})=>item.id==='S2');
+ if(source?.status!=='loaded'||!source.facts)return null;
+ const facts=record(source.facts),rows=Array.isArray(facts.rows)?facts.rows.filter(row=>record(row).kind==='Reported primary reason'):[];
+ return homeExitReasonChart({status:source.status,data:{as_of:source.date,summary:{exit_respondents:facts.exit_respondents},exit_reasons:rows}});
+}
 /** Match the subject/citation only; chart values never come from assistant-authored prose or arrays. */
 export function homeExitReasonChartMatches(answer:string,chart:HomeExitReasonChart|null){
  if(!chart||!answer.match(/\[S2\]/i))return false;
+ // A missing fieldwork period is a valid limitation, not a missing source.
+ if(/\b(?:S2|exit[- ]survey (?:data|feedback|reasons|responses))\b[^.!?\n]{0,70}\b(?:unavailable|not available|timed out|not loaded)\b/i.test(answer))return false;
  const words=(text:string)=>text.toLowerCase().replace(/[^a-z0-9]/g,'');
  const text=words(answer);
  return chart.rows.filter(row=>text.includes(words(row.reason))).length>=2;

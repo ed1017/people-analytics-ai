@@ -15,3 +15,18 @@ test('rounded supplied percentages remain valid without turning primary-reason s
  const raw={status:'loaded',data:{as_of:'2026-09-30',summary:{exit_respondents:19},exit_reasons:[{primary_reason:'A',exits:6,pct_of_exit_responses:31.6},{primary_reason:'B',exits:5,pct_of_exit_responses:26.3}]}};
  assert.equal(homeExitReasonChart(raw).rows[0].percentage,31.6);assert.equal(homeExitReasonChartMatches('A and B [S2]',null),false);
 });
+
+test('chart uses only the same normalized request snapshot as the answer across timeout and refresh',async()=>{
+ const {homeExitReasonChartFromPacket}=await import('../lib/home-exit-reason-chart.ts');
+ const {buildHomePack}=await import('../lib/home-pack.mjs');
+ const raw=fixture(),packet=buildHomePack({'survey-sentiment':raw},'Company','Work-Life Balance Manager New Opportunity');
+ const chart=homeExitReasonChartFromPacket(packet);
+ assert.deepEqual(chart.rows.map(row=>row.reason),['Work-Life Balance','Manager','New Opportunity']);
+ const timeout=buildHomePack({'survey-sentiment':{status:'timeout',data:raw.data}},'Company');
+ assert.equal(homeExitReasonChartFromPacket(timeout),null);
+ assert.equal(homeExitReasonChartFromPacket(packet).respondents,50);
+ assert.equal(homeExitReasonChartMatches('Exit-survey feedback is unavailable. Work-Life Balance and Manager were earlier reasons. [S2]',chart),false);
+ assert.equal(homeExitReasonChartMatches('Work-Life Balance and Manager were reported. Fieldwork dates are unavailable. [S2]',chart),true);
+ const sampled=structuredClone(packet);sampled.sources.find(row=>row.id==='S2').facts.rows=sampled.sources.find(row=>row.id==='S2').facts.rows.slice(0,1);
+ assert.equal(homeExitReasonChartFromPacket(sampled),null);
+});

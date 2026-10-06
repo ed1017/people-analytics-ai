@@ -66,9 +66,9 @@ try{
   check(mode+' rejected investigation is never stored and warning clears',!initial.workspaces[id].fields.homeCandidateOptions&&await status.count()===0);
   check(mode+' three synthetic plans render without an automatic attachment',await panel.getByRole('tab').count()===3&&!initial.workspaces[id].fields.homeSolutionBundlesV1);
   await chat.fill('use twelve participants');await button('Send overview question').click();
-  const review=page.getByRole('region',{name:'Review chat changes'});
+  const review=page.getByRole('region',{name:'Overview conversation'});
   await button('Apply changes').waitFor();
-  check(mode+' chat edit needs Apply and no further model request',await button('Apply changes').isEnabled()&&await review.getByRole('listitem').count()===1&&posts.length===2&&!(await state()).workspaces[id].fields.homeSolutionBundlesV1);
+  check(mode+' chat edit needs Apply and no further model request',await button('Apply changes').isEnabled()&&await review.getByText(/I recalculated Action Plan/).count()===1&&posts.length===2&&!(await state()).workspaces[id].fields.homeSolutionBundlesV1);
   await button('Apply changes').click();await button('Attach Action Plan').click();
   await page.getByRole('status').filter({hasText:/Action Plan attached\./}).waitFor();
   check(mode+' one-click attachment has no routine confirmation or manual editor',await button('Continue to attachment').count()===0&&await button('Review calculation').count()===0&&await page.getByRole('region',{name:'Action Plan editor'}).count()===0);
@@ -81,7 +81,7 @@ try{
   await page.getByLabel('Selected goal',{exact:true}).selectOption(id);await page.locator('[data-plan-current="true"]').waitFor();
   check(mode+' goal return restores exact saved plan and no calls',JSON.stringify((await state()).workspaces[id].fields.homeSolutionBundlesV1.attachments[0])===JSON.stringify(snapshot)&&posts.length===2);
   const baseline=await page.evaluate(key=>localStorage.getItem(key),DECISIONS_STORAGE_KEY);
-  const reload=async()=>{await page.reload();await page.getByRole('status',{name:'Home evidence coverage',includeHidden:true}).waitFor({state:'attached'});await panel.getByText('Why these plans',{exact:true}).click();await panel.getByLabel('Action Plan context check',{exact:true}).waitFor()};
+  const reload=async()=>{await page.reload();await page.getByRole('status',{name:'Home data status',includeHidden:true}).waitFor({state:'attached'});await panel.getByText('Why these plans',{exact:true}).click();await panel.getByLabel('Action Plan context check',{exact:true}).waitFor()};
   dataMode='order';await reload();await page.locator('[data-plan-current="true"]').waitFor();
   check(mode+' categorical row order alone survives attachment reload as current',await button('Attach Action Plan').isEnabled()&&(await panel.getByLabel('Action Plan context check').innerText()).includes('Evidence: unchanged. Planning: unchanged. Only unordered detail-row order changed.')&&posts.length===2&&JSON.stringify((await state()).workspaces[id].fields.homeSolutionBundlesV1.attachments[0])===JSON.stringify(snapshot));
   for(const [change,copy] of [['content','Source content, scope, dates, selection or meaningful order changed.'],['availability','Source availability changed.']]){

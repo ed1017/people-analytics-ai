@@ -25,7 +25,8 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  const pending=await page.evaluate(geometry,'[aria-label="AI answer status"]');console.log(JSON.stringify({mode,before,pending,starters:await page.getByRole('region',{name:'Starting guide'}).count()}));await page.screenshot({path:'/tmp/home-response-pending-'+mode+'.png'});
  check(mode+' starter collapse reveals pending answer in the actual reading viewport',pending.visible&&before>0&&await button('Show instructions').count()===1);
  release();await status.waitFor({state:'hidden'});await page.locator('[aria-label="Overview conversation"] [data-chat-role="assistant"]').last().waitFor();
- const answerBox=await page.evaluate(geometry,'[aria-label="Overview conversation"] [data-chat-role="assistant"]');console.log(JSON.stringify({mode,answerBox}));if(!answerBox.visible)await page.screenshot({path:'/tmp/home-response-scroll-failure-'+mode+'.png'});check(mode+' answer remains visible without a second jump',answerBox.visible);await page.screenshot({path:'/tmp/home-response-answer-'+mode+'.png'});
+ await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+ const answerBox=await page.evaluate(geometry,'[aria-label="Overview conversation"] [data-chat-role="assistant"]');console.log(JSON.stringify({mode,answerBox}));if(!answerBox.visible)await page.screenshot({path:'/tmp/home-response-scroll-failure-'+mode+'.png'});check(mode+' answer remains visible when goal details expand',answerBox.visible);await page.screenshot({path:'/tmp/home-response-answer-'+mode+'.png'});
  // Submit from the keyboard while keeping composer focus, then deliberately scroll away.
  await button('Show instructions').click();await chat.fill('What should I check next?');await chat.focus();
  await chat.evaluate(node=>node.form.requestSubmit());await status.waitFor();

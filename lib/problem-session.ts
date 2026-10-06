@@ -8,6 +8,12 @@ export function getProblemChatHistory(previous: ScopedChatHistory, key: string):
   return previous.messages.slice(-8).map(message => message.role === "assistant" && !message.content.startsWith(historical)
     ? { ...message, content: historical + message.content } : { ...message });
 }
+/** Keep user context across Home evidence refreshes without reusing stale
+ * assistant claims. The visible, persisted transcript is retained separately.
+ */
+export function getHomeChatHistory(previous: ScopedChatHistory, key: string): ChatMessage[] {
+  return previous.key === key ? previous.messages.slice(-8) : previous.messages.filter(message => message.role === "user").slice(-8);
+}
 export function rememberProblemQuestion(previous: HomeDecisionContext | null, key: string, question: string): HomeDecisionContext {
   return { key, firstQuestion: previous?.firstQuestion ?? question, latestQuestion: question };
 }

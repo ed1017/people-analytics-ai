@@ -1,5 +1,5 @@
 "use client";
-import {homeExitReasonChart,homeExitReasonChartMatches,type HomeExitReasonChart as ExitReasonChartData} from '@/lib/home-exit-reason-chart';
+import {homeExitReasonChartFromPacket,homeExitReasonChartMatches,type HomeExitReasonChart as ExitReasonChartData} from '@/lib/home-exit-reason-chart';
 import {HomeExitReasonChart} from '@/components/home-exit-reason-chart';
 import {homeTurnoverFocus} from '@/lib/home-turnover-focus';
 import {homeTurnPurpose,homeEvidenceSelection} from '@/lib/home-conversation';
@@ -45,7 +45,7 @@ import { contextualPrompts, homeStarterGroups } from "@/lib/contextual-prompts";
 import { HOME_ACTION_PLAN_LABEL, buildHomeActionPlanRequest } from "@/lib/home-decision-journey";
 import { completeScopedChatTurn } from "@/lib/chat-context-history";
 import { requestedHomeCountries, type CountryOption } from "@/lib/home-country-scope";
-import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
+import { getHomeChatHistory, withProblemContext } from "@/lib/problem-session";
 import type { ProblemConversation } from "@/components/problem-conversation";
 import type { AppPage, ChatMessage, Persona } from "@/lib/types";
 
@@ -148,8 +148,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
   const loadedAt = useRef(0);
   const composer = useRef<HTMLTextAreaElement>(null);
   const conversationViewport = useRef<HTMLDivElement>(null);
-  const cancelResponseReveal=useRef<()=>void>(()=>{});
-  useLayoutEffect(()=>()=>cancelResponseReveal.current(),[]);
+  const responseReveal=useRef<ReturnType<typeof queueHomeResponseReveal>|null>(null);
+  useLayoutEffect(()=>()=>responseReveal.current?.cancel(),[]);
   const composerSlot=useRef<HTMLDivElement>(null),composerDock=useRef<HTMLDivElement>(null);
   useHomeComposerDock(active,composerSlot,composerDock,composer);
   useLayoutEffect(()=>{
@@ -264,14 +264,15 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
     const sendTicket=Symbol();sending.current=sendTicket;const candidateEpoch=promptEpoch.current;if(!previousCandidate)setCandidate(null);setCandidateNotice('');setPreparationUnavailable(null);
     const request = conversation.beginRequest();
     const key = contextKey;
-    const history = getProblemChatHistory(modelHistoryRef.current, key);
+    const history = getHomeChatHistory(modelHistoryRef.current, key);
     const purpose=homeTurnPurpose(message,history),prepareGoal=responseIntent!=='explanation'&&(purpose==='goal'||purpose==='discovery');
     recordDecisionEvidence(conversation.activeGoalId,"home",pack);
     const goalContext=actionPlan||retainGoalContext||forecastQuestion||Boolean(selectedPlanForChat.current?.goalId===conversation.activeGoalId)?conversation.goalContext:conversation.recordGoalStatement(message,"home",workforceScope);
     setMessages(current => [...current, { role: "user", content: actionPlan ? HOME_ACTION_PLAN_LABEL : message }]);
     if(!preserveDraft)setInput(""); setChatLoading(true); setChatError(null);
-    cancelResponseReveal.current();
-    cancelResponseReveal.current=queueHomeResponseReveal(()=>conversationViewport.current,()=>liveActive.current&&request.current()&&currentEvidenceKey.current===key&&candidateEpoch===promptEpoch.current);
+    responseReveal.current?.cancel();
+    const reveal=queueHomeResponseReveal(()=>conversationViewport.current,()=>liveActive.current&&request.current()&&currentEvidenceKey.current===key&&candidateEpoch===promptEpoch.current);
+    responseReveal.current=reveal;
     if (!actionPlan) setQuestionUnanswered(true);
     try {
       const requestSelection=homeEvidenceSelection(message,history,conversation.focusedIssue),requestPack=buildHomePack(sourceResults,workforceScope,requestSelection,developmentSession);
@@ -279,7 +280,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
       if (!request.current() || currentEvidenceKey.current !== key || candidateEpoch!==promptEpoch.current) return;
       const answer = reply.answer;
       const assistantMessage:ChatMessage={role:"assistant",content:answer};
-      const chart=homeExitReasonChart(sourceResults['survey-sentiment']);
+      const chart=homeExitReasonChartFromPacket(requestPack);
       if(chart&&homeExitReasonChartMatches(answer,chart))exitReasonCharts.current.set(assistantMessage,{context:key,source:sourceResults['survey-sentiment'],chart});
       if(actionPlan)planRationale.current.set(assistantMessage,conversation.activeGoalId);
       const priorStatements=history.filter(item=>item.role==='user').map(item=>item.content);
@@ -307,7 +308,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
       if (!actionPlan) { conversation.rememberQuestion(key, message); setQuestionUnanswered(false); }
       return Boolean(reply.proposal&&!reply.clarification);
     } catch (error) { if (!request.current() || currentEvidenceKey.current !== key || candidateEpoch!==promptEpoch.current) return; setChatError(error instanceof Error ? error.message : "Answer unavailable. Please try again."); if (!actionPlan&&!preserveDraft) setInput(current=>current.trim()?current:message); }
-    finally { if(sending.current===sendTicket)sending.current=null; if (request.current() && currentEvidenceKey.current === key) setChatLoading(false); }
+    finally { if(sending.current===sendTicket)sending.current=null; if (request.current() && currentEvidenceKey.current === key) { setChatLoading(false); reveal.complete(); } else reveal.cancel(); }
   }
 
   const sourcesSettled=!loading&&loadedScope===workforceQuery&&settledEvidenceKey===JSON.stringify({workforceQuery,workforceScope,refresh,persona});
@@ -466,15 +467,15 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
     {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&startingGuide}
     {showFallbackPin&&!chatLoading&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
     {prioritizeGoal&&candidatePanel}
-    {messages.length > 0 && <section aria-label="Overview conversation" className="space-y-3">
-      <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona,conversation.resetEpoch])} onNavigate={onNavigate} home hideHistory collapsedRationale={message=>activePinnedGoal&&(planRationale.current.get(message)===conversation.activeGoalId||messages[messages.indexOf(message)-1]?.content===HOME_ACTION_PLAN_LABEL)} renderBulletAction={renderFindingAction} renderMessageSupplement={message=><><HomeForecastChart question={messages[messages.indexOf(message)-1]?.role==='user'?messages[messages.indexOf(message)-1].content:''} answer={message.content}/>{renderExitReasonChart(message)}</>}/>
+    <section hidden={messages.length === 0} aria-label="Overview conversation" className="space-y-3">
+      <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona,conversation.resetEpoch,conversation.storageReady])} onNavigate={onNavigate} home hideHistory collapsedRationale={message=>activePinnedGoal&&(planRationale.current.get(message)===conversation.activeGoalId||messages[messages.indexOf(message)-1]?.content===HOME_ACTION_PLAN_LABEL)} renderBulletAction={renderFindingAction} renderMessageSupplement={message=><><HomeForecastChart question={messages[messages.indexOf(message)-1]?.role==='user'?messages[messages.indexOf(message)-1].content:''} answer={message.content}/>{renderExitReasonChart(message)}</>}/>
       {conversation.homeGoalChoiceKey === contextKey && !conversation.focusedIssue && <div role="group" aria-label="Choose a goal" className="flex flex-wrap gap-2">
         <p className="w-full text-sm text-muted-foreground">State your goal in your own words.</p>
         <button type="button" disabled={chatLoading} onClick={() => { conversation.setHomeGoalChoiceKey(null); focusQuestion(); }} className="min-h-11 rounded-lg border px-4 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">State my goal</button>
       </div>}
       {chatLoading && <DataLoadingStatus name="AI answer status" label="Preparing your answer…" detail="Using the available evidence and your question."/>}
       {chatError && <p role="alert" className="text-destructive">{chatError}</p>}
-    </section>}
+    </section>
 
     <HomeSolutionBundles settled={sourcesSettled} chatChange={planEdit&&editPreview?{goalId:planEdit.goalId,planId:planEdit.id,inputKey:editPreview.inputKey,ready:!chatLoading&&planEditReady&&conversation.saved&&input.trim()===editPreview.request,isCurrent:planEdit.isCurrent,apply:applyPlanChanges}:null} openRequest={planOpen} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} projectEvidence={destination=>buildHomePack(sourceResults,workforceScope,conversation.focusedIssue||conversation.problem?.latestQuestion||'',destination.development??developmentSession)} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={request=>{selectedPlanForChat.current=request;}}/>
     {planEdit?.goalId===conversation.activeGoalId&&<div ref={editReview} tabIndex={-1}><HomeBundleChatReview target={planEdit} preview={editPreview} text={input} busy={chatLoading||!planEditReady||!conversation.saved} notice={editNotice} onClose={()=>{setPlanEdit(null);setEditPreview(null);setEditNotice('');focusQuestion();}}/></div>}
