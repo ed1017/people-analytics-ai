@@ -25,3 +25,12 @@ test('AI demo is explicit, matching-page only and never a cohort baseline or int
  for(const request of ['Forecast turnover for France','Use current hiring as a planning baseline','Summarize my goal'])assert.equal(syntheticDomainDemoPrompt('attrition',request),'');
  for(const [page,domain] of [['attrition','turnover'],['talent-acquisition','hiring'],['survey-sentiment','satisfaction']]){const p=syntheticDomainDemoPrompt(page,'Explain the simulated demo projections');assert.match(p,new RegExp('"domain":"'+domain+'"'));assert.match(p,/independent of the selected country/);assert.match(p,/Never use these outputs as a filtered plan baseline/);assert.match(p,/avoided exits, added capacity, savings, ROI or an intervention effect/);assert.match(p,/interval.*null/);assert.match(p,/do not infer a winner/);}
 });
+
+test('verified history preserves original population, release cutoff, gaps and native units',async()=>{
+ const data=await buildSyntheticDomainDemo();assert.equal(data.status,'verified');
+ for(const [domain,count,last,gaps] of [['turnover',24,'2026-08',['2026-09']],['hiring',36,'2026-06',['2026-07','2026-08','2026-09']],['satisfaction',8,'2026-06',['2026-09']]]){
+  const d=data.domains[domain];assert.equal(d.history.length,count);assert.equal(d.history.at(-1).month,last);assert.deepEqual(d.gaps,gaps);assert.ok(d.history.every(row=>row.availableAt<=data.cutoff));assert.ok(!d.history.some(row=>gaps.includes(row.month)));
+  if(domain==='hiring')assert.ok(d.history.every(row=>row.value===null?row.openings===0:row.value>=0&&row.value<=1));
+  if(domain==='satisfaction')assert.ok(d.history.every(row=>/-(03|06|09|12)$/.test(row.month)&&row.value>=0&&row.value<=100));
+ }
+});
