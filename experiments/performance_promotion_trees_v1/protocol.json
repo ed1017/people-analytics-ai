@@ -20,7 +20,7 @@
   },
   "featureTiers": ["base","performance","promotion","both"],
   "features":"New targets base uses released target lags, calendar and historical denominators. Existing domains base reuses original enriched features exactly. Performance/promotion/both add only released historical aggregate fields and availability/missing flags. Every Ridge/RF/GB in a tier uses identical rows, target weights and features. No scenario/seed/target denominators or future events enter predictors.",
-  "association":"New performance/promotion panels share explicitly hypothetical lagged drivers. Auxiliary panels have independent RNG streams from existing turnover/hiring/survey panels: their addition is a negative-control ablation, not a planted cross-domain benefit or a test of real-world predictive value.",
+  "association":"New performance/promotion panels share hypothetical persistent drivers observed through released historical outcomes, not a guaranteed causal leading indicator. Auxiliary panels have separate RNG streams and no direct coefficient link to existing turnover/hiring/survey panels. They still share calendar, scenario drift, reversal and reporting patterns; ablations measure these constructed associations, not strict statistical independence, causality or real-world predictive value.",
   "estimators": {
     "ridge":{"alpha":100.0},
     "random-forest":{"n_estimators":100,"max_depth":4,"min_samples_leaf":20,"max_features":1.0},
@@ -32,7 +32,7 @@
   "nativePrimary":{"performance":"recent-mean-3","promotion":"recent-3-pooled","turnover":"recent-mean-3","hiring":"recent-3-fraction","satisfaction":"recent-mean-3"},
   "additionalBaselines":"Existing native baseline bridge unchanged. Turnover also includes original SES alpha grid[0.2,0.5,0.8], minimum training-only one-step SSE with first-grid tie; same24month history as trees, flat level at each fixed target. Performance/promotion have last, recent and clipped OLS trend; promotion has pooled24cohort fraction.",
   "fitWeights":"Historical target denominators for performance/promotion/hiring; equal rows turnover/satisfaction. Zero-exposure rows have zero weight, never become positive labels.",
-  "scoring":"Per-history-origin MAE/RMSE; fraction targets use target-denominator-weighted percentage points and exact aggregate-binomial Brier/logloss. Also pooled bias/reliability with fixed10probability bins. Target denominators used only in fitting past labels/scoring, not future features. Turnover also reports quarter-total absolute error. Months, scenarios and domains sharing a seed are not independent samples.",
+  "scoring":"Per-history-origin MAE/RMSE; fraction targets use target-denominator-weighted percentage points and exact aggregate-binomial Brier/logloss within each case. Overall MAE and proper scores are equal-case means; separately pooled denominator-weighted bias/reliability use fixed10probability bins. Target denominators used only in fitting past labels/scoring, not future features. Turnover also reports quarter-total absolute error. Months, scenarios and domains sharing a seed are not independent samples.",
   "adoptionGate":{
     "minimumRelativeMaeImprovement":0.05,
     "maximumScenarioOriginDegradation":0.10,
