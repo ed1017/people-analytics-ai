@@ -76,6 +76,48 @@ class DataBoundaryTests(unittest.TestCase):
         changed["seed"] = 999
         self.assertEqual(aux_features(history,stamp("2025-06",True)),aux_features(changed,stamp("2025-06",True)))
 
+    def test_each_published_promotion_disposition_respects_small_cell_rule(self):
+        history=generate_history(17,"stable")
+        cutoff="2027-02-28T23:59:59.999Z"
+        complete=[]
+        for row in history["domains"]["promotion"]["observations"]:
+            if row["status"]=="complete":
+                complete.append(row)
+                for key in ("promotedWithin90","nonPromotedBy90"):
+                    self.assertFalse(0<row[key]<5)
+            elif row["status"]=="suppressed":
+                self.assertIsNone(row["denominator"])
+                for key in ("promotedWithin90","nonPromotedBy90"):
+                    self.assertIsNone(row[key])
+            self.assertNotIn("exitsBeforePromotion",row)
+            self.assertNotIn("noPromotionBy90",row)
+        row=complete[0]
+        malformed=dict(row,nonPromotedBy90=3,promotedWithin90=row["denominator"]-3,value=(row["denominator"]-3)/row["denominator"])
+        self.assertFalse(valid_record(malformed,"promotion",cutoff))
+
+    def test_promotion_cohort_denominator_and_identity_frozen_at_opening(self):
+        history=generate_history(17,"stable")
+        for mutation in ("denominator","eligibleKnownAt","identity"):
+            changed=copy.deepcopy(history)
+            for key in ("observations","auxiliary"):
+                for row in changed["domains"]["promotion"][key]:
+                    if row["period"]=="2025-01" and row["status"]=="complete":
+                        if mutation=="denominator":
+                            row["denominator"]+=1
+                            row["nonPromotedBy90"]+=1
+                            row["value"]=row["promotedWithin90"]/row["denominator"]
+                        elif mutation=="eligibleKnownAt":
+                            row["eligibleKnownAt"]="2025-03-01T00:00:00.000Z"
+                    if mutation=="identity" and row["period"]=="2025-01" and row["revision"]==1:
+                        row["eligibilityRule"]="different-opening-cohort"
+            self.assertEqual(make_case(changed,"promotion","2025-06")["status"],"blocked")
+        changed=copy.deepcopy(history)
+        for row in changed["domains"]["promotion"]["observations"]:
+            if row["period"]=="2025-07" and row["revision"]==1:
+                row["denominator"]+=1
+        case=make_case(changed,"promotion","2025-06")
+        self.assertEqual(labels_for(changed,case,"2027-02-28T23:59:59.999Z")["status"],"blocked")
+
     def test_small_cells_withhold_outcomes_and_block_history(self):
         history = generate_history(17,"small-sample")
         for domain in DOMAINS:

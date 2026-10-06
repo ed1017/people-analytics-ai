@@ -109,8 +109,9 @@ def generate_history(seed: int, scenario: str) -> dict:
                     eligible = 14
                     promoted = int(outcomes.binomial(eligible, probability))
                     exited = int(outcomes.binomial(eligible-promoted, .025))
-                suppressed = eligible < 20 or 0 < promoted < 5 or 0 < eligible-promoted < 5
-                details = dict(promotedWithin90=promoted, exitsBeforePromotion=exited, noPromotionBy90=eligible-promoted-exited,
+                suppressed = eligible < 20 or any(0 < count < 5 for count in (promoted, eligible-promoted))
+                # Publish only the complement: rare exit counts are not a released subgroup.
+                details = dict(promotedWithin90=promoted, nonPromotedBy90=eligible-promoted,
                                knownOutcomeThrough=_iso(first+timedelta(days=90)), eligibleKnownAt=_iso(first+timedelta(days=3)))
                 initial = _record(period, first, first+timedelta(days=3), "suppressed" if suppressed else "partial", None, None if suppressed else eligible, domain)
                 initial.update({key: None for key in details})
@@ -137,6 +138,7 @@ def generate_history(seed: int, scenario: str) -> dict:
             auxiliary.append(release)
         domains[domain] = {"observations": observations, "auxiliary": auxiliary,
                            "maximumReportingLagDays": 45 if stress else 15,
+                           "openingReportingLagDays": 3,
                            "auxiliaryPublicationDelayDays": 60 if scenario == "delayed-predictors" else 0}
     return dict(seed=seed, scenario=scenario, dataClass="constructed-synthetic", operationallyQualified=False,
                 domains=domains, constructionAssumptions={"version":"performance-promotion-v1", "timeline":["2023-01" if start else "2018-01","2026-09"],
@@ -170,12 +172,26 @@ def valid_record(row, domain, cutoff):
                 and sum(counts)==n and row.get("rated")==n and type(row.get("eligible")) is int and row["eligible"]>=n and row.get("missingRatings")==row["eligible"]-n
                 and row.get("favorableCount")==sum(counts[3:]) and abs(value-sum(counts[3:])/n)<1e-12
                 and row.get("scoring")=="share-rating-4-or-5")
-    promoted, exited, remaining = (row.get(k) for k in ("promotedWithin90","exitsBeforePromotion","noPromotionBy90"))
-    return (all(type(v) is int and v>=0 for v in (promoted,exited,remaining)) and promoted+exited+remaining==n
-            and not 0<promoted<5 and not 0<n-promoted<5 and abs(value-promoted/n)<1e-12 and row.get("horizonDays")==90
+    promoted, nonpromoted = (row.get(k) for k in ("promotedWithin90","nonPromotedBy90"))
+    return (all(type(v) is int and v>=0 for v in (promoted,nonpromoted)) and promoted+nonpromoted==n
+            and all(not 0<count<5 for count in (promoted,nonpromoted)) and abs(value-promoted/n)<1e-12 and row.get("horizonDays")==90
             and row.get("knownOutcomeThrough") is not None and row.get("eligibleKnownAt") is not None
             and date(row["knownOutcomeThrough"])>=date(row["effectiveAt"])+timedelta(days=90)
             and row["knownOutcomeThrough"]<=row["availableAt"] and row["eligibleKnownAt"]<=row["availableAt"])
+
+
+def _source_valid(row, source, domain, cutoff):
+    if not valid_record(row,domain,cutoff):
+        return False
+    if domain != "promotion":
+        return True
+    # Membership is frozen in the opening release; final outcomes cannot redefine it.
+    opening = next((r for r in source["observations"] if r["period"]==row["period"] and r["revision"]==1),None)
+    expected_known = _iso(date(row["effectiveAt"])+timedelta(days=source["openingReportingLagDays"]))
+    return (opening is not None and opening["status"]=="partial" and opening["effectiveAt"]==stamp(row["period"])
+            and opening["availableAt"]==expected_known and row["eligibleKnownAt"]==expected_known
+            and opening.get("eligibleKnownAt")==expected_known and opening["availableAt"]<=cutoff
+            and opening["denominator"]==row["denominator"] and _same_identity(opening,row))
 
 
 def aux_features(history, cutoff):
@@ -191,7 +207,7 @@ def aux_features(history, cutoff):
             while date(stamp(end))+timedelta(days=90+lag+delay)>date(cutoff):
                 end = month_add(end,-1)
             latest = next((row for row in reversed(rows) if row["period"]<=end),None)
-        valid = latest is not None and valid_record(latest,domain,cutoff)
+        valid = latest is not None and _source_valid(latest,history["domains"][domain],domain,cutoff)
         # Cross-instrument auxiliary values cannot be assumed comparable with the frozen v1 feature.
         valid = valid and latest["instrument"] == _identity(domain)["instrument"]
         result[name] = latest["value"] if valid else None
@@ -216,7 +232,7 @@ def make_case(history, domain, origin):
     expected = [month_add(end, step*(i-size+1)) for i in range(size)]
     indexed = {row["period"]:row for row in rows}
     support = [indexed.get(period) for period in expected]
-    reason = "missing-calendar-history" if any(row is None for row in support) else "incomplete-released-history" if any(not valid_record(row,domain,cutoff) for row in support) else "incomparable-instrument-history" if any(not _same_identity(row,support[-1]) for row in support) else None
+    reason = "missing-calendar-history" if any(row is None for row in support) else "incomplete-released-history" if any(not _source_valid(row,source,domain,cutoff) for row in support) else "incomparable-instrument-history" if any(not _same_identity(row,support[-1]) for row in support) else None
     months = [month_add(origin,i) for i in ([3] if domain=="performance" else [1,2,3])]
     case = dict(id=f"{history['seed']}:{history['scenario']}:{domain}:{origin}", seed=history["seed"],scenario=history["scenario"],domain=domain,origin=origin,cutoff=cutoff,months=months,
                 status="blocked" if reason else "predicted",reasons=[reason] if reason else [],history=[],features=[],identity=None,
@@ -241,7 +257,7 @@ def labels_for(history, case, cutoff):
     domain = case["domain"]
     rows = {row["period"]:row for row in replay(history["domains"][domain]["observations"],cutoff)}
     labels = [rows.get(month) for month in case["months"]]
-    if any(row is None or not valid_record(row,domain,cutoff) for row in labels):
+    if any(row is None or not _source_valid(row,history["domains"][domain],domain,cutoff) for row in labels):
         return dict(status="blocked",reasons=["incomplete-target-labels"],labels=[])
     if any(not _same_identity(row,case["identity"]) for row in labels):
         return dict(status="blocked",reasons=["future-instrument-identity-mismatch"],labels=[])
