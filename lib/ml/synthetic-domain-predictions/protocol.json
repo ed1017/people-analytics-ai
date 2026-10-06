@@ -1,0 +1,23 @@
+{
+  "version": "synthetic-domain-predictions-v1",
+  "generatorVersion": "synthetic-workforce-generator-v1",
+  "trainingSeeds": [6001,6002,6003,6004,6005,6006,6007,6008,6009,6010],
+  "testSeeds": [7001,7002,7003,7004,7005,7006,7007,7008,7009,7010,7011,7012,7013,7014,7015,7016,7017,7018,7019,7020],
+  "families": ["stationary","gradual-improvement","regime-reversal","reporting-stress","survey-break"],
+  "trainingOrigins": ["2024-12-31T23:59:59.999Z","2025-03-31T23:59:59.999Z","2025-06-30T23:59:59.999Z"],
+  "testOrigin": "2026-06-30T23:59:59.999Z",
+  "testMonths": ["2026-07","2026-08","2026-09"],
+  "demoOrigin": "2026-09-30T23:59:59.999Z",
+  "demoMonths": ["2026-10","2026-11","2026-12"],
+  "demoSeed": 7001,
+  "demoFamily": "stationary",
+  "scoringCutoff": "2027-07-01T00:00:00.000Z",
+  "turnover": {"methods":["recent-mean-3","seasonal-naive-12","linear-trend-12"],"minimumConsecutiveMonths":24,"metric":"monthly-count-MAE-and-RMSE"},
+  "hiring": {"methods":["pooled-fraction","recent-3-fraction","logistic-trend"],"horizonDays":90,"trainingCalendarMonths":36,"minimumPositiveCohorts":24,"zeroPolicy":"Keep zero-opening cohorts in audit and calendar support; they contribute zero binomial likelihood. Fit existing fixed-penalty model to positive-exposure cohorts only.","metric":"opening-weighted-Brier-logloss-and-percentage-point-MAE"},
+  "satisfaction": {"methods":["last-wave","recent-mean-3","linear-trend-8"],"minimumConsecutiveWaves":8,"metric":"wave-score-percentage-point-MAE-and-RMSE","targetIdentity":"Predict continuation of latest observed instrument, item set, scoring and eligibility versions; score only matching future waves. An unseen instrument break cannot be known at forecast time."},
+  "selection":"No winner selection, parameter search or promotion. All fixed candidates and abstentions reported. Training seeds and origins provide development comparisons; test seeds are never fitted jointly or used to change methods.",
+  "controls":"Stationary case is the no-trend-signal control. Reversal changes outcomes after the test origin without supplying its family or change date to models. Reporting stress and instrument break test release and comparability guards. These controls are simplified simulations, not validated real-world shift frequencies.",
+  "reserve":"October–December outcomes are not scored or read by this evaluator. Demo projection uses September as-of releases only and one prespecified stationary case.",
+  "uncertainty":"All intervals null: no calibrated cross-scenario uncertainty is established.",
+  "operationallyQualified":false
+}
