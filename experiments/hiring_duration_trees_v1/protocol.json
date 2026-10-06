@@ -1,0 +1,33 @@
+{
+  "version": "hiring-duration-trees-v1",
+  "referenceCommit": "9efd7eff9593c3c2447674b7fa098651ecee931c",
+  "target": "opening-to-actual-start days conditional on completed external fill; log1p training",
+  "features": ["opening-month-sine", "opening-month-cosine"],
+  "asOf": "2026-10-03",
+  "openingCoverageStart": "2021-01-01",
+  "seeds": {"start": 28501, "stopExclusive": 28521},
+  "scenarios": ["seasonal", "nonlinear-seasonal", "no-signal", "gradual-drift", "delayed-labels", "missing-labels", "small-support"],
+  "models": {
+    "ridge": {"penalties": [0.1, 1, 10], "selection": "native mean development MAE; ties block"},
+    "random-forest": {"n_estimators": 100, "max_depth": 5, "min_samples_leaf": 20, "max_features": 1.0, "random_state": 3187, "n_jobs": 1},
+    "gradient-boosting": {"n_estimators": 100, "learning_rate": 0.05, "max_depth": 2, "min_samples_leaf": 20, "loss": "squared_error", "random_state": 3187}
+  },
+  "eligibility": "Exact native evaluator: all four folds and calendar coverage must pass; blocked histories receive no candidate score or fit",
+  "testBoundary": "Native development windows July 2025 through March 2026; train before April 2026; holdout opening cohort April-June 2026 observed through October 3 2026. Training labels must be started, closed and first-observed by origin. No holdout tuning.",
+  "criteria": {
+    "qualifiedScenarioSeedMinimum": 20,
+    "referenceComparators": ["ridge", "expanding", "rolling"],
+    "referenceScenario": "seasonal",
+    "referenceRelativeMaeGain": 0.10,
+    "referenceAbsoluteMaeGainDays": 2,
+    "referenceBootstrapUpperBelowZero": true,
+    "referenceDevelopmentImprovingFoldsMinimum": 2,
+    "developmentMaximumMaeWorsening": 0.05,
+    "holdoutP90MaximumWorsening": 0.05,
+    "stressMaximumMeanMaeWorsening": 0.10,
+    "bootstrap": {"unit": "history seed", "resamples": 2000, "random_state": 8831, "interval": [0.025, 0.975]},
+    "decision": "Each tree adopted for synthetic demo only if all criteria pass versus every comparator in reference and every eligible stress scenario. Missing-label and small-support must remain blocked. Insufficient scenario support is unsupported, never evidence of efficacy. No second tuning attempt."
+  },
+  "publication": "Aggregate seed/scenario/fold metrics and provenance only; no requisition rows or IDs persisted",
+  "limitations": ["Synthetic independent scenario histories, not company evidence", "Calendar-only conditional duration regression, not all-opening completion probability or survival model", "Unresolved/cancelled/missing labels remain unscored and eligible histories require at least 90 percent observed; no censoring adjustment", "No person scoring, staffing availability, deployment or production changes"]
+}
