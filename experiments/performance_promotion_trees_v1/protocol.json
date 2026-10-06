@@ -1,0 +1,51 @@
+{
+  "version": "performance-promotion-trees-v1",
+  "parentCommit": "bc0a6fa82044e2fdc606104365895116fa15afa8",
+  "appInventoryCommit": "a73a645394f7322a731b4e7f9b20de528f66133c",
+  "careerMobilityReference": "633caa3cde2923400ff0b3a0a2547d7c058a6d7a",
+  "trainSeeds": [19101,19130],
+  "testSeeds": [19301,19340],
+  "trainingOrigins": {"first":"2021-03","last":"2024-12","stepMonths":3},
+  "fitLabelsAsOf": "2025-06-30T23:59:59.999Z",
+  "testOrigins": ["2025-06","2025-09","2025-12","2026-03","2026-06"],
+  "testLabelsAsOf": "2027-02-28T23:59:59.999Z",
+  "scenarios": ["stable","gradual-drift","reversal","missingness","small-sample","no-signal","instrument-break"],
+  "domains": ["performance","promotion","turnover","hiring","satisfaction"],
+  "targets": {
+    "performance":"Share of completed ratings in ordinal categories4/5 at the next quarter-end wave. No arithmetic mean of ordinal scores, individual rating prediction or employee-wide inference.",
+    "promotion":"Fraction of the known eligible population at each next monthly cohort opening promoted within90days. All eligible members, including exits and non-promotions, remain denominator; full followup required.",
+    "turnover":"Existing monthly voluntary-exit counts for the next3calendar months, plus derived quarter-total error. Rate remains unsupported.",
+    "hiring":"Existing all-opening monthly cohorts' fraction starting within90days for next3calendar months.",
+    "satisfaction":"Existing next quarterly mean respondent favorable-answer share in score points."
+  },
+  "featureTiers": ["base","performance","promotion","both"],
+  "features":"New targets base uses released target lags, calendar and historical denominators. Existing domains base reuses original enriched features exactly. Performance/promotion/both add only released historical aggregate fields and availability/missing flags. Every Ridge/RF/GB in a tier uses identical rows, target weights and features. No scenario/seed/target denominators or future events enter predictors.",
+  "association":"New performance/promotion panels share explicitly hypothetical lagged drivers. Auxiliary panels have independent RNG streams from existing turnover/hiring/survey panels: their addition is a negative-control ablation, not a planted cross-domain benefit or a test of real-world predictive value.",
+  "estimators": {
+    "ridge":{"alpha":100.0},
+    "random-forest":{"n_estimators":100,"max_depth":4,"min_samples_leaf":20,"max_features":1.0},
+    "gradient-boosting":{"n_estimators":100,"learning_rate":0.05,"max_depth":2,"min_samples_leaf":20,"loss":"squared_error"}
+  },
+  "randomState":1729,
+  "minimumTrainingRows":30,
+  "selection":"No tuning. All hyperparameters fixed before any intended training or test seeds. Fit once using training seeds and labels available by fitLabelsAsOf, then freeze audits in a commit before generating test histories. No test-selected champion or narrower scenario adoption after overall rejection.",
+  "nativePrimary":{"performance":"recent-mean-3","promotion":"recent-3-pooled","turnover":"recent-mean-3","hiring":"recent-3-fraction","satisfaction":"recent-mean-3"},
+  "additionalBaselines":"Existing native baseline bridge unchanged. Turnover also includes original SES alpha grid[0.2,0.5,0.8], minimum training-only one-step SSE with first-grid tie; same24month history as trees, flat level at each fixed target. Performance/promotion have last, recent and clipped OLS trend; promotion has pooled24cohort fraction.",
+  "fitWeights":"Historical target denominators for performance/promotion/hiring; equal rows turnover/satisfaction. Zero-exposure rows have zero weight, never become positive labels.",
+  "scoring":"Per-history-origin MAE/RMSE; fraction targets use target-denominator-weighted percentage points and exact aggregate-binomial Brier/logloss. Also pooled bias/reliability with fixed10probability bins. Target denominators used only in fitting past labels/scoring, not future features. Turnover also reports quarter-total absolute error. Months, scenarios and domains sharing a seed are not independent samples.",
+  "adoptionGate":{
+    "minimumRelativeMaeImprovement":0.05,
+    "maximumScenarioOriginDegradation":0.10,
+    "minimumSeedsPerSupportedScenarioOrigin":20,
+    "maximumHorizonDegradation":0.10,
+    "maximumProbabilityBiasPercentagePoints":3,
+    "maximumProbabilityEcePercentagePoints":5,
+    "maximumProperScoreDegradation":0.02,
+    "comparison":"Each full RF/GB tier must satisfy aggregate, scenario/origin and per-horizon gates against BOTH its matching-feature Ridge and fixed native primary. Turnover must additionally satisfy aggregate and scenario/origin quarter-total gates, including against SES for monthly and quarter-total errors. Probability targets must pass bias/ECE/proper-score gates. Native unsupported cells retained outside accuracy scope; instrument-incomparable targets unscored. Every other low-support scored cell fails. Any failure rejects adoption across the declared scope."
+  },
+  "ablationGate":"Performance-only, promotion-only and both additions evaluated against the SAME estimator's base arm on identical cases. Useful-for-this-simulation only if meanMAE improves5% and no scenario/origin worsens>10%; otherwise no demonstrated robust value. Not a causal or real-data result. Report all failures and unchanged support.",
+  "reserve":"No October–December2026 labels evaluated; no person-level decisions, sensitive traits, real source qualification, production model/input-boundary or database changes.",
+  "publishedInterval":null,
+  "operationallyQualified":false,
+  "realWorldPerformanceValidated":false
+}
