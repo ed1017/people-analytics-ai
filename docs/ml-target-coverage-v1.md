@@ -3,9 +3,11 @@
 **Coverage is complete for the implemented targets and the requested new
 performance/promotion targets.** Reject the new trees for performance,
 promotion, group counts, conditional hiring duration, hiring-start fractions
-and survey scores. Company-count RF passes only the new study's declared
-synthetic-demo gate; prior failures and untested transport conditions remain
-explicit. No added performance/promotion field passes its robust-value criterion.
+and survey scores. **The company-count RF exception is now rejected in the
+[final baseline review](company-count-rf-final-review-v1.md).** Its historical
+narrow gate pass remains recorded, but an existing seasonal-naive comparison
+shows 59.22% worse quarter-total error. No added performance/promotion field
+passes its robust-value criterion. No candidate remains approved for adoption.
 
 This inventory distinguishes fitted targets, derived forecast quantities and
 descriptive/scenario outputs. It was checked against app commit
@@ -22,16 +24,16 @@ qualification, real-world performance and operational readiness remain absent.
 
 | Target/path | Horizon and baseline | RF / boosting evidence | Decision |
 |---|---|---|---|
-| Company voluntary-exit count | Next three monthly counts; recent mean, seasonal naive, OLS, matching-feature Ridge | [Original tree benchmark](synthetic-tree-benchmarks-v1.md), lag-only/enriched and full/small training arms; [fresh review](synthetic-tree-review-v1.md); [new fixed-fit study](performance-promotion-trees-v1.md) | Earlier candidates reject; new RF fits pass only the new limited synthetic-demo scope; new GB rejects |
-| Company count with fitted exponential smoothing | Same target/horizon; original alpha grid 0.2/0.5/0.8, training-only SSE | Added equal-24-month-history SES comparator in the performance/promotion study, with native implementation parity | New RF conditional demo pass; GB rejects |
-| Company quarter/year-end total | Sum next three counts; observed year-to-date plus forecast sum for year-end | Derived quantity, not a separate estimator; new study explicitly scores quarter-total absolute errors | RF conditional demo pass for assessed quarter totals; no year-end accuracy claim; October–December 2026 target periods stay reserved |
+| Company voluntary-exit count | Next three monthly counts; recent mean, seasonal naive, OLS, matching-feature Ridge | [Original benchmark](synthetic-tree-benchmarks-v1.md), [fresh review](synthetic-tree-review-v1.md), [coverage study](performance-promotion-trees-v1.md), and [final exact-RF review](company-count-rf-final-review-v1.md) | Reject RF/GB adoption; final review closes the limited RF exception |
+| Company count with fitted exponential smoothing | Same target/horizon; original alpha grid 0.2/0.5/0.8, training-only SSE | Equal-24-month-history SES with native parity; final review includes already-scored seasonal/OLS baselines | Reject adoption; the historical RF pass against SES does not override the seasonal failure |
+| Company quarter/year-end total | Sum next three counts; observed year-to-date plus forecast sum for year-end | Derived quantity; final review recomputes saved monthly predictions' quarter-total errors | Reject RF: 59.22% worse quarter-total MAE in a supported no-signal cell; no year-end accuracy claim; October–December 2026 target periods remain reserved |
 | Group monthly count and quarter total | Groups A/B; recent mean, seasonal naive; signal experiment adds residual cell means | [Group tree comparison](group-turnover-trees-v1.md): monthly horizons1–3 and direct quarter total, lag-only/signal RF/GB, equal-feature Ridge and original comparators | Reject all supported RF/GB replacements |
 | Suppressed groups C/D | Same horizons; native guards block forecasts | Same group comparison preserves all withheld rows | Unsupported; no reconstructed suppressed counts |
-| All-opening hiring-start fraction | Each of next three monthly opening cohorts, fully followed90-days; pooled/recent fractions, fitted logistic trend | Original and fresh three-domain tree evidence; new auxiliary-field ablations | Reject original RF/GB replacements; no duration/count interpretation |
+| All-opening hiring-start fraction | Each of next three monthly opening cohorts, fully followed for 90 days; pooled/recent fractions, fitted logistic trend | Original and fresh three-domain tree evidence; new auxiliary-field ablations | Reject original RF/GB replacements; no duration/count interpretation |
 | Completed-fill opening-to-actual-start duration | At opening, next held-out quarterly opening block; rolling/expanding median and calendar-only log-duration Ridge | [Duration tree comparison](hiring-duration-trees-v1.md): exact same opening-month sine/cosine features and native eligibility gates | Reject both; conditional on completed fills, not a survival model for unresolved openings |
 | Survey favorable-answer score | Next quarterly wave, consistent instrument; last/recent/OLS/Ridge | Original RF/GB benchmark and fresh stability-gated RF review | Reject both; observable gate fails to repair drift |
 | Performance rating 4/5 share | New quarterly aggregate ordinal target, among valid completed ratings | [New longitudinal study](performance-promotion-trees-v1.md); static Career Mobility data insufficient | Reject RF and GB in all four feature tiers |
-| Eligible-cohort promotion fraction | New next-three-month opening cohorts, promotion within 90-days | Same new study with frozen opening denominator | Reject RF and GB in all four feature tiers |
+| Eligible-cohort promotion fraction | New next-three-month opening cohorts, promotion within 90 days | Same new study with frozen opening denominator | Reject RF and GB in all four feature tiers |
 
 History-window selection, turnover adaptation and uncertainty experiments wrap
 these same count/probability/score targets. They do not create extra fitted target
@@ -117,7 +119,9 @@ No DB/schema/security, held eNPS, shared UI or release-integration files change.
 
 The new work adds 32 rejected supported group decisions (plus32 suppressed-group
 unsupported decisions), two rejected duration candidates, and 40 five-domain
-feature-tier decisions (four limited count-RF passes and 36 rejects). All45
+feature-tier decisions (historically four limited count-RF passes and 36 rejects).
+The final exact-candidate review rejects the count-RF adoption exception while
+preserving those historical gate values in the earlier numerical evidence. All 45
 performance/promotion input ablations fail their fixed robust-value gate. These
 are distinct model/scope comparisons, not independent statistical replications.
 

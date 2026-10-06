@@ -1,0 +1,28 @@
+{
+  "version":"company-count-rf-final-review-v1",
+  "parentCommit":"8e39279498c2add5061e2dbf10bfa276a2fc04ee",
+  "mode":"existing-evidence-retrospective-rejection-only",
+  "candidate":"random-forest-base",
+  "domain":"turnover",
+  "candidateFitFreeze":"db92e1b",
+  "candidateTrainingPredictionSha256":"49063fb06fb41936b337791548d27aeef9ffe3a0f4bfdf8c23a67f7c976262a4",
+  "candidateInputSha256":"53e9cea59b8a0fc24411ae7d467562c2f2b99f932903a8b9b5bfa2ffebd59ed7",
+  "inputDirectory":"docs/evidence/performance-promotion-trees-v1",
+  "inputs":{
+    "training.json":"83b561d6de77d32fde4b282e0904eae485db1df96aa16d02295663e64e76d834",
+    "training-cases.json.gz":"3088612ec2c7ecff28513261225f4b782b05222c4767db2acf0ee7feb8eff5e5",
+    "test.json":"a5b06ab4683fc64e53d31249e7bcc4d9b7519ffd4745923372380ad2f4fc3b19",
+    "test-cases.json.gz":"3009e61071cce4b877400c8f41b48591d33f264e24b96dca75869aa3709ff481"
+  },
+  "comparators":["ridge-base","recent-mean-3","simple-exponential-smoothing","seasonal-naive-12","linear-trend"],
+  "metrics":["mae","quarterTotalAbsoluteError"],
+  "maximumScenarioOriginRatio":1.10,
+  "minimumDistinctSeeds":20,
+  "reviewRule":"The existing10% scenario/origin degradation tolerance is applied to every fixed existing native baseline, including seasonal naive and OLS that were scored but excluded from the prior adoption gate. A verified material failure against a same-available-history baseline suffices to reject the exact candidate. All comparators and cells remain visible; no per-cell winning model is selected. This is an expanded retrospective review, not the original preregistered adoption result or a new confirmatory holdout.",
+  "decisionBoundary":"This audit can only verify final rejection. If no supported failure exists, stop without adoption; broader untouched testing would then be required. No new seed histories, model fits, parameter search, added fields or alternative candidates are generated here.",
+  "unperformedBroaderHoldout":["new weak-signal world","new level shifts","new seasonality shifts","new predictor-missingness or publication-delay worlds","new reversal timings","new out-of-training-range count worlds"],
+  "unperformedReason":"An existing exact-candidate failure already prevents adoption; do not run unnecessary tests to search for a favorable result or re-scope the candidate after rejection.",
+  "publishedInterval":null,
+  "operationallyQualified":false,
+  "productionChanges":false
+}

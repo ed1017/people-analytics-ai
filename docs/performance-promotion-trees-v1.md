@@ -2,9 +2,12 @@
 
 **Reject RF and gradient boosting for both new targets. None of the 45
 performance/promotion feature ablations demonstrates robust added value.**
-The new company-count RF fits pass this experiment's limited synthetic-demo
-gate; all other tree fits reject. This is separate from the earlier candidates'
-negative reviews, and no app or production model changes.
+The company-count RF fits passed this experiment's limited synthetic-demo
+gate; all other tree fits rejected. **The subsequent
+[final baseline review](company-count-rf-final-review-v1.md) rejects the RF
+adoption exception** using its already-saved predictions against seasonal naive.
+The original gate values below remain historical evidence, not current approval.
+No app or production model changes.
 
 The [coverage matrix](ml-target-coverage-v1.md) maps every implemented prediction
 path. The [data contract](performance-promotion-data-contract-v1.md) documents
@@ -69,7 +72,7 @@ within a fraction case, target denominators weight its monthly errors.
 |---|---|---:|---:|---:|---:|---|
 | Rating4–5 share | Recent3-wave mean | 10.803 | 11.128 | 11.063 | 11.069 | Reject both |
 | Promotion fraction | Recent3-cohort pooled fraction | 3.538 | 3.369 | 3.526 | 3.413 | Reject both |
-| Company exit count | Recent3-month mean | 26.499 | 22.757 | 19.885 | 19.809 | RF passes this limited demo gate; reject boosting |
+| Company exit count | Recent3-month mean | 26.499 | 22.757 | 19.885 | 19.809 | Historical RF gate pass; final review rejects adoption; reject boosting |
 | Hiring-start fraction | Recent3-cohort fraction | 12.847 | 13.774 | 11.169 | 10.946 | Reject both |
 | Survey score | Recent3-wave mean | 6.272 | 6.028 | 5.563 | 5.638 | Reject both |
 
@@ -121,7 +124,7 @@ mostly repeats its existing recent outcome lag plus availability flags. The
 results give no basis to expand an app's input contract or assume these fields
 help external hiring or survey forecasts.
 
-## Count RF pass: limited and distinct from previous evidence
+## Historical count RF pass and final rejection
 
 The legacy fitted SES comparator is now covered. It selects alpha0.2/0.5/0.8
 using training-only one-step SSE on the same24 months supplied to the count
@@ -154,6 +157,14 @@ their qualification for these new fits. The pass is therefore exactly
 real-workforce adoption, or a reversal of earlier decisions. No production model
 or UI changes are made. The added performance/promotion inputs are unnecessary
 for the pass and fail their own added-value criterion.
+
+**Final disposition:** reject this RF for the claimed monthly/quarter-total demo
+scope. Seasonal naive was present in the saved results but absent from the
+limited adoption comparator set. At September 2025's no-signal origin, the exact
+RF's quarter-total MAE is 33.11835 versus seasonal naive's 20.8 across the same
+40 histories, a 59.22% deterioration. The final review independently verifies
+this existing failure; no new fit or holdout generation is necessary. The
+earlier gate pass is preserved rather than silently reclassified as an error.
 
 ## Probability diagnostics and verification
 
