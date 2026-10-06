@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { chatNavigationTargets, getChatNavigationAction, chatNavigationInstructions, chatOpeningNavigationInstructions } from "../lib/chat-navigation.ts";
 import { appPageMetadata } from "../lib/app-navigation.ts";
+import { pageHelp } from "../lib/page-help.ts";
 
 test("chat destinations match real canonical app pages and labels", () => {
   for (const [page,label] of Object.entries(chatNavigationTargets)) {
@@ -29,4 +30,17 @@ test("brief opening link instructions preserve the exact existing destination al
  assert.match(text,/at most one exact Markdown token/);
  assert.match(text,/never \/skills/);
  assert.doesNotMatch(text,/180 words|two option bullets|finding an issue/);
+});
+
+test("Compensation tooltip and About describe current demo ranges and bounded USD analysis",()=>{
+ for(const copy of [appPageMetadata.compensation.description,pageHelp.compensation]) {
+  assert.match(copy,/demo.*salary ranges/i);
+  assert.match(copy,/USD.*compa-ratios|compa-ratios.*USD/);
+  assert.match(copy,/partial coverage/);
+  assert.match(copy,/separate scopes/);
+  assert.doesNotMatch(copy,/separate synthetic pay demo|select each cohort|recorded-workforce salary analysis/i);
+ }
+ assert.match(pageHelp.compensation,/When available/);
+ assert.match(pageHelp.compensation,/filtered pay breakdowns are not released/);
+ assert.match(pageHelp.compensation,/AI briefing is unavailable/);
 });

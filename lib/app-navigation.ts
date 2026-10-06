@@ -54,7 +54,7 @@ export const appPageMetadata: Record<
     description:
       "Workforce size, structure, tenure, management layers, and mobility.",
   },
-  compensation: { label: "Compensation", section: "Workforce", description: "Separate synthetic pay demo, public US wage references and workforce-cost context. Recorded-workforce salary analysis is unavailable." },
+  compensation: { label: "Compensation", section: "Workforce", description: "Demo job salary ranges and USD-subset compa-ratios with partial coverage. Public US wage references and workforce-cost context have separate scopes." },
   attrition: {
     label: "Attrition",
     section: "Workforce",
