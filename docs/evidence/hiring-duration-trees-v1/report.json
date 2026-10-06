@@ -1,0 +1,743 @@
+{
+  "caseCount": 140,
+  "decisions": {
+    "gradient-boosting": {
+      "decision": "reject",
+      "failures": [
+        "seasonal:ridge:holdout-mae-improvement",
+        "seasonal:ridge:bootstrap",
+        "seasonal:ridge:development-improvement",
+        "nonlinear-seasonal:ridge:holdout-p90",
+        "nonlinear-seasonal:expanding:holdout-p90",
+        "nonlinear-seasonal:expanding:stress-mae",
+        "nonlinear-seasonal:rolling:holdout-p90",
+        "nonlinear-seasonal:rolling:stress-mae"
+      ],
+      "referencePairedSeedBootstrap95": {
+        "expanding": [
+          -4.063565160344799,
+          -3.422199973478893
+        ],
+        "ridge": [
+          0.004111573229447494,
+          0.07953193780671237
+        ],
+        "rolling": [
+          -4.342634461089237,
+          -3.5772106986014967
+        ]
+      }
+    },
+    "random-forest": {
+      "decision": "reject",
+      "failures": [
+        "seasonal:ridge:holdout-mae-improvement",
+        "seasonal:ridge:bootstrap",
+        "seasonal:ridge:development-improvement",
+        "nonlinear-seasonal:ridge:holdout-p90",
+        "nonlinear-seasonal:expanding:holdout-p90",
+        "nonlinear-seasonal:expanding:stress-mae",
+        "nonlinear-seasonal:rolling:holdout-p90",
+        "nonlinear-seasonal:rolling:stress-mae"
+      ],
+      "referencePairedSeedBootstrap95": {
+        "expanding": [
+          -4.063129936823523,
+          -3.3987535305442393
+        ],
+        "ridge": [
+          0.011421789290112346,
+          0.08653292339032102
+        ],
+        "rolling": [
+          -4.340314355471903,
+          -3.5600584809885936
+        ]
+      }
+    }
+  },
+  "maximumNativeRidgeParityAbsoluteDays": 2.6290081223123707e-13,
+  "protocol": {
+    "asOf": "2026-10-03",
+    "criteria": {
+      "bootstrap": {
+        "interval": [
+          0.025,
+          0.975
+        ],
+        "random_state": 8831,
+        "resamples": 2000,
+        "unit": "history seed"
+      },
+      "decision": "Each tree adopted for synthetic demo only if all criteria pass versus every comparator in reference and every eligible stress scenario. Missing-label and small-support must remain blocked. Insufficient scenario support is unsupported, never evidence of efficacy. No second tuning attempt.",
+      "developmentMaximumMaeWorsening": 0.05,
+      "holdoutP90MaximumWorsening": 0.05,
+      "qualifiedScenarioSeedMinimum": 20,
+      "referenceAbsoluteMaeGainDays": 2,
+      "referenceBootstrapUpperBelowZero": true,
+      "referenceComparators": [
+        "ridge",
+        "expanding",
+        "rolling"
+      ],
+      "referenceDevelopmentImprovingFoldsMinimum": 2,
+      "referenceRelativeMaeGain": 0.1,
+      "referenceScenario": "seasonal",
+      "stressMaximumMeanMaeWorsening": 0.1
+    },
+    "eligibility": "Exact native evaluator: all four folds and calendar coverage must pass; blocked histories receive no candidate score or fit",
+    "features": [
+      "opening-month-sine",
+      "opening-month-cosine"
+    ],
+    "limitations": [
+      "Synthetic independent scenario histories, not company evidence",
+      "Calendar-only conditional duration regression, not all-opening completion probability or survival model",
+      "Unresolved/cancelled/missing labels remain unscored and eligible histories require at least 90 percent observed; no censoring adjustment",
+      "No person scoring, staffing availability, deployment or production changes"
+    ],
+    "models": {
+      "gradient-boosting": {
+        "learning_rate": 0.05,
+        "loss": "squared_error",
+        "max_depth": 2,
+        "min_samples_leaf": 20,
+        "n_estimators": 100,
+        "random_state": 3187
+      },
+      "random-forest": {
+        "max_depth": 5,
+        "max_features": 1.0,
+        "min_samples_leaf": 20,
+        "n_estimators": 100,
+        "n_jobs": 1,
+        "random_state": 3187
+      },
+      "ridge": {
+        "penalties": [
+          0.1,
+          1,
+          10
+        ],
+        "selection": "native mean development MAE; ties block"
+      }
+    },
+    "openingCoverageStart": "2021-01-01",
+    "publication": "Aggregate seed/scenario/fold metrics and provenance only; no requisition rows or IDs persisted",
+    "referenceCommit": "9efd7eff9593c3c2447674b7fa098651ecee931c",
+    "scenarios": [
+      "seasonal",
+      "nonlinear-seasonal",
+      "no-signal",
+      "gradual-drift",
+      "delayed-labels",
+      "missing-labels",
+      "small-support"
+    ],
+    "seeds": {
+      "start": 28501,
+      "stopExclusive": 28521
+    },
+    "target": "opening-to-actual-start days conditional on completed external fill; log1p training",
+    "testBoundary": "Native development windows July 2025 through March 2026; train before April 2026; holdout opening cohort April-June 2026 observed through October 3 2026. Training labels must be started, closed and first-observed by origin. No holdout tuning.",
+    "version": "hiring-duration-trees-v1"
+  },
+  "runtime": {
+    "node": "v24.19.0",
+    "numpy": "2.3.5",
+    "sklearn": "1.8.0"
+  },
+  "scenarios": {
+    "delayed-labels": {
+      "blockedSeeds": 0,
+      "folds": {
+        "development-1": {
+          "expanding": {
+            "maeDays": 10.746610169491525,
+            "meanSignedErrorDays": 10.585593220338982,
+            "p90AbsoluteErrorDays": 16.21
+          },
+          "gradient-boosting": {
+            "maeDays": 3.4458190303995466,
+            "meanSignedErrorDays": -0.07485615420549921,
+            "p90AbsoluteErrorDays": 7.034762841220184
+          },
+          "random-forest": {
+            "maeDays": 3.4505951288193257,
+            "meanSignedErrorDays": -0.19669579034542756,
+            "p90AbsoluteErrorDays": 7.0435198420805945
+          },
+          "ridge": {
+            "maeDays": 3.4065855164177066,
+            "meanSignedErrorDays": -0.19003577839934566,
+            "p90AbsoluteErrorDays": 6.986731305113049
+          },
+          "rolling": {
+            "maeDays": 7.626271186440678,
+            "meanSignedErrorDays": 7.085593220338983,
+            "p90AbsoluteErrorDays": 12.75
+          }
+        },
+        "development-2": {
+          "expanding": {
+            "maeDays": 7.969491525423729,
+            "meanSignedErrorDays": 6.5016949152542365,
+            "p90AbsoluteErrorDays": 14.41
+          },
+          "gradient-boosting": {
+            "maeDays": 3.874041419372309,
+            "meanSignedErrorDays": -0.5349081744199052,
+            "p90AbsoluteErrorDays": 7.665973138107707
+          },
+          "random-forest": {
+            "maeDays": 3.87547188908826,
+            "meanSignedErrorDays": -0.6092580065192521,
+            "p90AbsoluteErrorDays": 7.68394511292945
+          },
+          "ridge": {
+            "maeDays": 3.848898243099484,
+            "meanSignedErrorDays": -0.5178350900267389,
+            "p90AbsoluteErrorDays": 7.580601793339565
+          },
+          "rolling": {
+            "maeDays": 8.272457627118644,
+            "meanSignedErrorDays": 6.926694915254236,
+            "p90AbsoluteErrorDays": 14.875
+          }
+        },
+        "development-3": {
+          "expanding": {
+            "maeDays": 12.371580946814728,
+            "meanSignedErrorDays": -12.166116306253652,
+            "p90AbsoluteErrorDays": 21.795
+          },
+          "gradient-boosting": {
+            "maeDays": 5.405067549731211,
+            "meanSignedErrorDays": -0.1533693107882432,
+            "p90AbsoluteErrorDays": 11.240899466548397
+          },
+          "random-forest": {
+            "maeDays": 5.428289321833013,
+            "meanSignedErrorDays": -0.03665467677600152,
+            "p90AbsoluteErrorDays": 11.288600605585492
+          },
+          "ridge": {
+            "maeDays": 5.387869151454314,
+            "meanSignedErrorDays": -0.052776452885160384,
+            "p90AbsoluteErrorDays": 11.167676177593457
+          },
+          "rolling": {
+            "maeDays": 11.544666861484513,
+            "meanSignedErrorDays": -11.216116306253653,
+            "p90AbsoluteErrorDays": 20.845000000000002
+          }
+        },
+        "holdout": {
+          "expanding": {
+            "maeDays": 8.747881355932204,
+            "meanSignedErrorDays": -7.3021186440677965,
+            "p90AbsoluteErrorDays": 17.815
+          },
+          "gradient-boosting": {
+            "maeDays": 4.943677862124343,
+            "meanSignedErrorDays": -0.5008940577235378,
+            "p90AbsoluteErrorDays": 9.7652240704934
+          },
+          "random-forest": {
+            "maeDays": 4.951405887573932,
+            "meanSignedErrorDays": -0.36170964792363003,
+            "p90AbsoluteErrorDays": 9.869765219100818
+          },
+          "ridge": {
+            "maeDays": 4.905901320844688,
+            "meanSignedErrorDays": -0.46596286537565385,
+            "p90AbsoluteErrorDays": 9.737743151523834
+          },
+          "rolling": {
+            "maeDays": 9.7385593220339,
+            "meanSignedErrorDays": -8.802118644067797,
+            "p90AbsoluteErrorDays": 19.315
+          }
+        }
+      },
+      "qualifiedSeeds": 20
+    },
+    "gradual-drift": {
+      "blockedSeeds": 0,
+      "folds": {
+        "development-1": {
+          "expanding": {
+            "maeDays": 7.063559322033899,
+            "meanSignedErrorDays": 6.188983050847457,
+            "p90AbsoluteErrorDays": 12.430000000000001
+          },
+          "gradient-boosting": {
+            "maeDays": 5.484414821639988,
+            "meanSignedErrorDays": -4.770876499354384,
+            "p90AbsoluteErrorDays": 11.159121153962618
+          },
+          "random-forest": {
+            "maeDays": 5.568373395388273,
+            "meanSignedErrorDays": -4.889020701061081,
+            "p90AbsoluteErrorDays": 11.283056065629893
+          },
+          "ridge": {
+            "maeDays": 5.551269679151425,
+            "meanSignedErrorDays": -4.905488989868133,
+            "p90AbsoluteErrorDays": 11.229465037026348
+          },
+          "rolling": {
+            "maeDays": 5.727966101694915,
+            "meanSignedErrorDays": 4.138983050847457,
+            "p90AbsoluteErrorDays": 10.469999999999999
+          }
+        },
+        "development-2": {
+          "expanding": {
+            "maeDays": 6.892372881355932,
+            "meanSignedErrorDays": -1.3228813559322037,
+            "p90AbsoluteErrorDays": 13.680000000000001
+          },
+          "gradient-boosting": {
+            "maeDays": 8.628835033073475,
+            "meanSignedErrorDays": -8.40423885937723,
+            "p90AbsoluteErrorDays": 16.40297061142604
+          },
+          "random-forest": {
+            "maeDays": 8.711686999526753,
+            "meanSignedErrorDays": -8.503992016238115,
+            "p90AbsoluteErrorDays": 16.496951206393184
+          },
+          "ridge": {
+            "maeDays": 8.607874692405229,
+            "meanSignedErrorDays": -8.387148621875182,
+            "p90AbsoluteErrorDays": 16.49145755326812
+          },
+          "rolling": {
+            "maeDays": 6.9050847457627125,
+            "meanSignedErrorDays": -0.37288135593220334,
+            "p90AbsoluteErrorDays": 13.390000000000004
+          }
+        },
+        "development-3": {
+          "expanding": {
+            "maeDays": 26.837448860315607,
+            "meanSignedErrorDays": -26.837448860315607,
+            "p90AbsoluteErrorDays": 39.605000000000004
+          },
+          "gradient-boosting": {
+            "maeDays": 15.320823512578439,
+            "meanSignedErrorDays": -15.124130777480667,
+            "p90AbsoluteErrorDays": 26.47153721774321
+          },
+          "random-forest": {
+            "maeDays": 15.204532147426056,
+            "meanSignedErrorDays": -14.99556108609475,
+            "p90AbsoluteErrorDays": 26.382501302484894
+          },
+          "ridge": {
+            "maeDays": 15.231227024904987,
+            "meanSignedErrorDays": -15.039089845431537,
+            "p90AbsoluteErrorDays": 26.47179121231948
+          },
+          "rolling": {
+            "maeDays": 24.46843950905903,
+            "meanSignedErrorDays": -24.462448860315607,
+            "p90AbsoluteErrorDays": 37.230000000000004
+          }
+        },
+        "holdout": {
+          "expanding": {
+            "maeDays": 23.497457627118642,
+            "meanSignedErrorDays": -23.490677966101693,
+            "p90AbsoluteErrorDays": 36.580000000000005
+          },
+          "gradient-boosting": {
+            "maeDays": 17.194050875503912,
+            "meanSignedErrorDays": -17.150553790289887,
+            "p90AbsoluteErrorDays": 27.547893464865513
+          },
+          "random-forest": {
+            "maeDays": 16.98834937098324,
+            "meanSignedErrorDays": -16.940618587634635,
+            "p90AbsoluteErrorDays": 27.299987307068704
+          },
+          "ridge": {
+            "maeDays": 17.30003260482402,
+            "meanSignedErrorDays": -17.262518634076443,
+            "p90AbsoluteErrorDays": 27.733372480232298
+          },
+          "rolling": {
+            "maeDays": 19.266949152542374,
+            "meanSignedErrorDays": -19.190677966101692,
+            "p90AbsoluteErrorDays": 32.28000000000001
+          }
+        }
+      },
+      "qualifiedSeeds": 20
+    },
+    "missing-labels": {
+      "blockedSeeds": 20,
+      "folds": {},
+      "qualifiedSeeds": 0
+    },
+    "no-signal": {
+      "blockedSeeds": 0,
+      "folds": {
+        "development-1": {
+          "expanding": {
+            "maeDays": 4.333474576271186,
+            "meanSignedErrorDays": -0.17838983050847462,
+            "p90AbsoluteErrorDays": 8.875
+          },
+          "gradient-boosting": {
+            "maeDays": 4.360055924333697,
+            "meanSignedErrorDays": -0.2893247663290323,
+            "p90AbsoluteErrorDays": 8.76408594530943
+          },
+          "random-forest": {
+            "maeDays": 4.3775162996350385,
+            "meanSignedErrorDays": -0.24704204292842755,
+            "p90AbsoluteErrorDays": 8.74557748422741
+          },
+          "ridge": {
+            "maeDays": 4.327669350227033,
+            "meanSignedErrorDays": -0.2917650159593174,
+            "p90AbsoluteErrorDays": 8.886279207248169
+          },
+          "rolling": {
+            "maeDays": 4.319491525423728,
+            "meanSignedErrorDays": -0.4533898305084746,
+            "p90AbsoluteErrorDays": 8.9
+          }
+        },
+        "development-2": {
+          "expanding": {
+            "maeDays": 4.382203389830508,
+            "meanSignedErrorDays": -0.5415254237288135,
+            "p90AbsoluteErrorDays": 8.620000000000001
+          },
+          "gradient-boosting": {
+            "maeDays": 4.4127607755208516,
+            "meanSignedErrorDays": -0.5939411042229632,
+            "p90AbsoluteErrorDays": 8.605216607601202
+          },
+          "random-forest": {
+            "maeDays": 4.427196351188838,
+            "meanSignedErrorDays": -0.5773156498489437,
+            "p90AbsoluteErrorDays": 8.642564545374402
+          },
+          "ridge": {
+            "maeDays": 4.39576130248895,
+            "meanSignedErrorDays": -0.5936766138567088,
+            "p90AbsoluteErrorDays": 8.623642201348707
+          },
+          "rolling": {
+            "maeDays": 4.410593220338982,
+            "meanSignedErrorDays": -0.8665254237288135,
+            "p90AbsoluteErrorDays": 8.695000000000002
+          }
+        },
+        "development-3": {
+          "expanding": {
+            "maeDays": 4.245762711864407,
+            "meanSignedErrorDays": -0.01864406779661018,
+            "p90AbsoluteErrorDays": 8.780000000000001
+          },
+          "gradient-boosting": {
+            "maeDays": 4.258700809879267,
+            "meanSignedErrorDays": -0.030164884032009676,
+            "p90AbsoluteErrorDays": 8.750541902061308
+          },
+          "random-forest": {
+            "maeDays": 4.262953141372681,
+            "meanSignedErrorDays": -0.011281145758662004,
+            "p90AbsoluteErrorDays": 8.776575312643514
+          },
+          "ridge": {
+            "maeDays": 4.246739900153124,
+            "meanSignedErrorDays": -0.08226578394529578,
+            "p90AbsoluteErrorDays": 8.685376844320945
+          },
+          "rolling": {
+            "maeDays": 4.232627118644068,
+            "meanSignedErrorDays": -0.4936440677966103,
+            "p90AbsoluteErrorDays": 8.835000000000003
+          }
+        },
+        "holdout": {
+          "expanding": {
+            "maeDays": 4.227966101694915,
+            "meanSignedErrorDays": -0.2245762711864407,
+            "p90AbsoluteErrorDays": 8.410000000000002
+          },
+          "gradient-boosting": {
+            "maeDays": 4.2422286728905885,
+            "meanSignedErrorDays": -0.4122321788316846,
+            "p90AbsoluteErrorDays": 8.523821859050098
+          },
+          "random-forest": {
+            "maeDays": 4.253427736169785,
+            "meanSignedErrorDays": -0.4091398870030692,
+            "p90AbsoluteErrorDays": 8.55687605645777
+          },
+          "ridge": {
+            "maeDays": 4.225071297514229,
+            "meanSignedErrorDays": -0.4075821613567541,
+            "p90AbsoluteErrorDays": 8.37843463922217
+          },
+          "rolling": {
+            "maeDays": 4.239406779661017,
+            "meanSignedErrorDays": -0.6995762711864406,
+            "p90AbsoluteErrorDays": 8.335000000000003
+          }
+        }
+      },
+      "qualifiedSeeds": 20
+    },
+    "nonlinear-seasonal": {
+      "blockedSeeds": 0,
+      "folds": {
+        "development-1": {
+          "expanding": {
+            "maeDays": 10.388983050847457,
+            "meanSignedErrorDays": -7.907627118644068,
+            "p90AbsoluteErrorDays": 19.640000000000004
+          },
+          "gradient-boosting": {
+            "maeDays": 6.926644714459327,
+            "meanSignedErrorDays": -5.2815306868018315,
+            "p90AbsoluteErrorDays": 14.457000030821092
+          },
+          "random-forest": {
+            "maeDays": 5.876657874329568,
+            "meanSignedErrorDays": -3.9146823802029913,
+            "p90AbsoluteErrorDays": 12.378789674886146
+          },
+          "ridge": {
+            "maeDays": 9.84694776444633,
+            "meanSignedErrorDays": -6.733576059087733,
+            "p90AbsoluteErrorDays": 18.43880957780223
+          },
+          "rolling": {
+            "maeDays": 10.603813559322035,
+            "meanSignedErrorDays": -8.332627118644067,
+            "p90AbsoluteErrorDays": 20.065000000000005
+          }
+        },
+        "development-2": {
+          "expanding": {
+            "maeDays": 4.420762711864406,
+            "meanSignedErrorDays": 2.6394067796610168,
+            "p90AbsoluteErrorDays": 8.405000000000001
+          },
+          "gradient-boosting": {
+            "maeDays": 5.08053274973008,
+            "meanSignedErrorDays": 3.4117541876285267,
+            "p90AbsoluteErrorDays": 9.655284763155924
+          },
+          "random-forest": {
+            "maeDays": 4.735344507091599,
+            "meanSignedErrorDays": 2.806568497643304,
+            "p90AbsoluteErrorDays": 9.163493854518242
+          },
+          "ridge": {
+            "maeDays": 5.542011103381209,
+            "meanSignedErrorDays": 4.61266012180876,
+            "p90AbsoluteErrorDays": 10.040858835425833
+          },
+          "rolling": {
+            "maeDays": 4.245762711864407,
+            "meanSignedErrorDays": 2.2644067796610168,
+            "p90AbsoluteErrorDays": 8.110000000000003
+          }
+        },
+        "development-3": {
+          "expanding": {
+            "maeDays": 10.072881355932203,
+            "meanSignedErrorDays": -7.711864406779661,
+            "p90AbsoluteErrorDays": 18.919999999999998
+          },
+          "gradient-boosting": {
+            "maeDays": 6.948238828372226,
+            "meanSignedErrorDays": -5.331649866123393,
+            "p90AbsoluteErrorDays": 14.462183239668267
+          },
+          "random-forest": {
+            "maeDays": 6.442073728022028,
+            "meanSignedErrorDays": -4.85350981444657,
+            "p90AbsoluteErrorDays": 13.448209848541683
+          },
+          "ridge": {
+            "maeDays": 9.32810550509152,
+            "meanSignedErrorDays": -5.9482929324378,
+            "p90AbsoluteErrorDays": 17.210790499292905
+          },
+          "rolling": {
+            "maeDays": 10.233898305084747,
+            "meanSignedErrorDays": -8.011864406779662,
+            "p90AbsoluteErrorDays": 19.22
+          }
+        },
+        "holdout": {
+          "expanding": {
+            "maeDays": 4.311016949152543,
+            "meanSignedErrorDays": 2.7991525423728816,
+            "p90AbsoluteErrorDays": 8.25
+          },
+          "gradient-boosting": {
+            "maeDays": 5.873909632151901,
+            "meanSignedErrorDays": 4.538734067214765,
+            "p90AbsoluteErrorDays": 11.055957926137886
+          },
+          "random-forest": {
+            "maeDays": 5.516610762401448,
+            "meanSignedErrorDays": 3.9357434763532786,
+            "p90AbsoluteErrorDays": 10.502939092129804
+          },
+          "ridge": {
+            "maeDays": 5.392004398805639,
+            "meanSignedErrorDays": 4.549575422971724,
+            "p90AbsoluteErrorDays": 9.719796375439582
+          },
+          "rolling": {
+            "maeDays": 4.236016949152542,
+            "meanSignedErrorDays": 2.5741525423728815,
+            "p90AbsoluteErrorDays": 8.084999999999999
+          }
+        }
+      },
+      "qualifiedSeeds": 20
+    },
+    "seasonal": {
+      "blockedSeeds": 0,
+      "folds": {
+        "development-1": {
+          "expanding": {
+            "maeDays": 10.886440677966101,
+            "meanSignedErrorDays": 10.735593220338982,
+            "p90AbsoluteErrorDays": 16.36
+          },
+          "gradient-boosting": {
+            "maeDays": 3.445362346302138,
+            "meanSignedErrorDays": -0.07136433346226637,
+            "p90AbsoluteErrorDays": 7.031197836411488
+          },
+          "random-forest": {
+            "maeDays": 3.4504079685235802,
+            "meanSignedErrorDays": -0.18382399938434607,
+            "p90AbsoluteErrorDays": 7.03867508965571
+          },
+          "ridge": {
+            "maeDays": 3.4071992154533746,
+            "meanSignedErrorDays": -0.2160237555828372,
+            "p90AbsoluteErrorDays": 6.994513753607467
+          },
+          "rolling": {
+            "maeDays": 9.10762711864407,
+            "meanSignedErrorDays": 8.785593220338983,
+            "p90AbsoluteErrorDays": 14.41
+          }
+        },
+        "development-2": {
+          "expanding": {
+            "maeDays": 7.811016949152543,
+            "meanSignedErrorDays": 6.2516949152542365,
+            "p90AbsoluteErrorDays": 14.2
+          },
+          "gradient-boosting": {
+            "maeDays": 3.8747222574849167,
+            "meanSignedErrorDays": -0.5400586467220642,
+            "p90AbsoluteErrorDays": 7.6720688890843665
+          },
+          "random-forest": {
+            "maeDays": 3.875170552152896,
+            "meanSignedErrorDays": -0.6077543252804348,
+            "p90AbsoluteErrorDays": 7.678281588866332
+          },
+          "ridge": {
+            "maeDays": 3.84848293834239,
+            "meanSignedErrorDays": -0.5245548385769835,
+            "p90AbsoluteErrorDays": 7.587837058312855
+          },
+          "rolling": {
+            "maeDays": 7.297033898305085,
+            "meanSignedErrorDays": 5.3766949152542365,
+            "p90AbsoluteErrorDays": 13.375
+          }
+        },
+        "development-3": {
+          "expanding": {
+            "maeDays": 12.665677966101693,
+            "meanSignedErrorDays": -12.48093220338983,
+            "p90AbsoluteErrorDays": 22.185000000000006
+          },
+          "gradient-boosting": {
+            "maeDays": 5.431458143172206,
+            "meanSignedErrorDays": -0.18844658687444732,
+            "p90AbsoluteErrorDays": 11.260801883201378
+          },
+          "random-forest": {
+            "maeDays": 5.454708826933395,
+            "meanSignedErrorDays": -0.06894833330920158,
+            "p90AbsoluteErrorDays": 11.3077833677875
+          },
+          "ridge": {
+            "maeDays": 5.414740197002753,
+            "meanSignedErrorDays": -0.08764655951920597,
+            "p90AbsoluteErrorDays": 11.195763679678741
+          },
+          "rolling": {
+            "maeDays": 12.727542372881356,
+            "meanSignedErrorDays": -12.530932203389831,
+            "p90AbsoluteErrorDays": 22.235000000000007
+          }
+        },
+        "holdout": {
+          "expanding": {
+            "maeDays": 8.694915254237289,
+            "meanSignedErrorDays": -7.227118644067796,
+            "p90AbsoluteErrorDays": 17.740000000000002
+          },
+          "gradient-boosting": {
+            "maeDays": 4.944730273971961,
+            "meanSignedErrorDays": -0.5093131483860587,
+            "p90AbsoluteErrorDays": 9.77202923116376
+          },
+          "random-forest": {
+            "maeDays": 4.954092117830172,
+            "meanSignedErrorDays": -0.2803778895106491,
+            "p90AbsoluteErrorDays": 9.941237799424998
+          },
+          "ridge": {
+            "maeDays": 4.9057872155456135,
+            "meanSignedErrorDays": -0.48455020385081093,
+            "p90AbsoluteErrorDays": 9.729542246299506
+          },
+          "rolling": {
+            "maeDays": 8.897457627118644,
+            "meanSignedErrorDays": -7.527118644067796,
+            "p90AbsoluteErrorDays": 18.04
+          }
+        }
+      },
+      "qualifiedSeeds": 20
+    },
+    "small-support": {
+      "blockedSeeds": 20,
+      "folds": {},
+      "qualifiedSeeds": 0
+    }
+  },
+  "sourceSha256": {
+    "experiments/hiring_duration_trees_v1/__init__.py": "f6f0e99e782ccc9e4a5992320e957c51775729d873b467daf09652484968340b",
+    "experiments/hiring_duration_trees_v1/protocol.json": "2dd03cba6838aac642181a60175c1e777eb00c606834409b7380304da8b8d608",
+    "experiments/hiring_duration_trees_v1/reference/hiring-acceptance.ts": "f82e4919ffc5e55df2d2e11bce925ec7618b4036f6c695f7a1859ffb453423cc",
+    "experiments/hiring_duration_trees_v1/reference/hiring-development.ts": "b5d4c4d8b8de20787a82f389b541451dd354704af0d8fb1e26023a9b299cc13c",
+    "experiments/hiring_duration_trees_v1/reference/hiring-evaluation.ts": "1afe9adc17f572f410e37bad4762386a2d0fb86d65258c7e4c84e021550a1cf4",
+    "experiments/hiring_duration_trees_v1/reference/hiring-ridge.ts": "5191b9bb78317eda44e9672a89b4172845d54edfd2b22ebce5c032ce8764a477",
+    "experiments/hiring_duration_trees_v1/reference_bridge.mjs": "1ea3bdfbf94ab06d31c8eb9c5e6f3645da97b73cfc528e9d56d6210a41e1e565",
+    "experiments/hiring_duration_trees_v1/run.py": "9201f2391186e9c5c1eecb5abceec425161d1354da7f43403ea8c120697ce7d6",
+    "experiments/hiring_duration_trees_v1/test_run.py": "b4995c1306e24e82951eadfd015daa6b7b72064fb62fc41af9b5648722ae2a89"
+  }
+}
