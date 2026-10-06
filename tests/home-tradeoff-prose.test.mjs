@@ -53,3 +53,21 @@ test('completed status does not admit over-bound or structurally truncated compo
   const result=await inspectBundleResponse(async()=>({status:'completed',output_text}),goal,pack);assert.equal(result.proposal,null);assert.equal(result.responseDiagnostic.reason,'invalid_output');
  }
 });
+
+test('reported unfinished timing limitation rejects fresh output while preserving saved text',async()=>{
+ const raw=bundleProposalFixture(goal);raw.bundles[0].limitation='Delivery timing within the 90-day goal is';
+ const result=await inspectBundleResponse(async()=>({status:'completed',output_text:JSON.stringify(raw)}),goal,pack);
+ assert.equal(result.proposal,null);assert.equal(result.responseDiagnostic.reason,'incomplete_text');assert.equal(result.responseDiagnostic.textField,'limitation');
+ assert.equal(readHomeBundleProposal(raw,goal,pack).bundles[0].limitation,raw.bundles[0].limitation);
+});
+
+test('bare predicate rejection preserves complete limitations, codes and common complete endings',async()=>{
+ for(const text of ['Delivery timing within the 90-day goal is unverified','Costs and delivery timing are unknown','Keep the current assumptions as is','Retain assumptions as they are','Review what the budget is','Clarify where the participants are','Source: IS']){
+  const raw=bundleProposalFixture(goal);raw.bundles[0].limitation=text;raw.bundles[0].components[0].limitation=text;
+  const result=await inspectBundleResponse(async()=>({status:'completed',output_text:JSON.stringify(raw)}),goal,pack);assert.ok(result.proposal,text);assert.equal(result.proposal.bundles[0].limitation,text);
+ }
+ for(const text of ['Delivery timing within the 90-day goal is','Participant availability and delivery timing are']){
+  const raw=bundleProposalFixture(goal);raw.bundles[0].components[0].limitation=text;
+  const result=await inspectBundleResponse(async()=>({status:'completed',output_text:JSON.stringify(raw)}),goal,pack);assert.equal(result.proposal,null);assert.equal(result.responseDiagnostic.textField,'component_limitation');
+ }
+});

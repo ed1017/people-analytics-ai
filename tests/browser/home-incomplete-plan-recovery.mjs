@@ -34,7 +34,7 @@ try{
       bundle.components.c1.firstStep='Run reviewed AI practice sessions for the pilot group using existing capacity.';
      }
      if(failureKind==='token'){const result=await inspectBundleResponse(async()=>({status:'incomplete',incomplete_details:{reason:'max_output_tokens'},output_text:'PRIVATE partial JSON',usage:{output_tokens:5000,output_tokens_details:{reasoning_tokens:4000}}}),body.goalContext.goal,body.overviewBriefingContext,homeBundleTask(body.goalContext));return route.fulfill({status:502,json:result});}
-     if(failureKind==='clipped')wire.bundles[0].components.c1.limitation='This pilot requires approval and';
+     if(failureKind==='clipped')wire.bundles[0].limitation='Delivery timing within the 90-day goal is';
      const result=await inspectBundleResponse(async()=>({status:'completed',output_text:JSON.stringify(wire)}),body.goalContext.goal,body.overviewBriefingContext,homeBundleTask(body.goalContext));
      return route.fulfill({status:result.proposal?200:502,json:result});
     }
@@ -95,7 +95,7 @@ try{
   const beforeRetry=(await state()).workspaces[id].fields;
   await button('Prepare Action Plans').click();await button('Retry Action Plans').waitFor();await panel.getByText('Preparation details',{exact:true}).click();
   const afterRetry=(await state()).workspaces[id].fields;
-  check(mode+' completed but clipped output is a distinct local rejection',(await panel.innerText()).includes('Reason: incomplete_text. Response status: completed.')&&(await panel.innerText()).includes('Incomplete field: component_limitation.')&&posts.length===4);
+  check(mode+' completed but clipped output is a distinct local rejection',(await panel.innerText()).includes('Reason: incomplete_text. Response status: completed.')&&(await panel.innerText()).includes('Incomplete field: limitation.')&&posts.length===4);
   check(mode+' failed re-preparation preserves prior proposal drafts calculations and immutable attachment',JSON.stringify(beforeRetry.homeBundlePreparationV1)===JSON.stringify(afterRetry.homeBundlePreparationV1)&&JSON.stringify(beforeRetry.homeSolutionBundlesV1)===JSON.stringify(afterRetry.homeSolutionBundlesV1)&&await panel.getByRole('tab').count()===3&&await button('Attach Action Plan').isDisabled());
   await page.reload();await panel.getByText(/Previous Action Plan proposal/).waitFor();check(mode+' reload does not retry the failed preparation',posts.length===4&&JSON.stringify((await state()).workspaces[id].fields.homeSolutionBundlesV1.attachments[0])===JSON.stringify(snapshot));
   failureKind=null;await button('Prepare Action Plans').click();await page.locator('[data-plan-current="true"]').waitFor();

@@ -82,7 +82,7 @@ test('actual Home POST distinguishes token-limited, incomplete and malformed out
 test('actual bundle POST distinguishes incomplete causes and preserves one bounded request',async()=>{
  const goal=aiSkillsGoalPrompt,packet=packets[1][1],wire=deliveryAcceptanceWire(goal);
  wire.bundles[0].components.c1.limitation=completeComponentLimitation;
- const clipped=structuredClone(wire);clipped.bundles[0].coordination='Coordinate the practice and';
+ const clipped=structuredClone(wire);clipped.bundles[0].limitation='Delivery timing within the 90-day goal is';
  const cases=[
   [{status:'incomplete',incomplete_details:{reason:'max_output_tokens'},output_text:'SECRET_SENTINEL'},'output_token_limit'],
   [{status:'incomplete',incomplete_details:{reason:'content_filter'},output_text:'SECRET_SENTINEL'},'content_filter'],
@@ -99,7 +99,7 @@ test('actual bundle POST distinguishes incomplete causes and preserves one bound
   assert.equal(response.status,502);assert.equal(sandbox.__requests.length,before+1);const sent=sandbox.__requests.at(-1);assert.equal(sent.max_output_tokens,homeBundleOutputTokens);assert.equal(sent.max_output_tokens,10000);assert.equal(sent.tool_choice,'none');assert.equal(sandbox.__requestOptions.at(-1).maxRetries,0);assert.ok(sandbox.__requestOptions.at(-1).signal);
   assert.deepEqual(JSON.parse(JSON.stringify(sent.text.format)),buildHomeBundleFormat(goal,normalizeHomePack(packet),'delivery'));
   const body=await response.json();assert.equal(body.responseDiagnostic.reason,reason);assert.equal(body.responseDiagnostic.outputTokenLimit,10000);assert.equal(body.responseDiagnostic.outputTokens,5000);assert.equal(body.responseDiagnostic.reasoningTokens,4000);assert.ok(!JSON.stringify(body).includes('SECRET_SENTINEL'));assert.equal(body.proposal,undefined);
-  if(reason==='incomplete_text'){assert.equal(body.responseDiagnostic.status,'completed');assert.equal(body.responseDiagnostic.textField,'coordination');}
+  if(reason==='incomplete_text'){assert.equal(body.responseDiagnostic.status,'completed');assert.equal(body.responseDiagnostic.textField,'limitation');}
  }
  sandbox.__replies.push({status:'completed',output_text:JSON.stringify(wire)});const before=sandbox.__requests.length;
  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',persona:'HR',message:HOME_BUNDLE_REQUEST,hasFocusedIssue:true,goalContext:{goal},overviewBriefingContext:packet})}));
