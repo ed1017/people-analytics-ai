@@ -25,6 +25,8 @@ try{
     await page.route('**/*',route=>{
       const url=new URL(route.request().url());requests.push(url.pathname);
       if(url.href==='http://compensation.test/')return route.fulfill({contentType:'text/html',body:'<!doctype html><html class="dark"><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><div id="root"></div></body></html>'});
+      if(url.pathname==='/api/compensation-job-release')return route.fulfill({status:503,json:{status:'release_not_enabled'}});
+      if(url.pathname==='/api/compensation-ranges')return route.fulfill({json:{jobs:[],levels:[],combinations:[]}});
       if(url.pathname==='/api/compensation')return route.fulfill({status:503,json:{error:'Synthetic source unavailable'}});
       return route.abort();
     });
@@ -55,7 +57,7 @@ try{
     check(width+' source links official and selected workbook accurate',await panel.getByRole('link',{name:'Official BLS source workbook'}).getAttribute('href')==='https://www.bls.gov/oes/special-requests/oesm25ma.zip');
     await panel.getByText('Benchmark sources and limits',{exact:true}).click();
     await page.screenshot({path:path.join(output,`benchmarks-${width}.png`),fullPage:true});
-    check(width+' selections do not fetch data or call AI',requests.filter(p=>p==='/api/compensation').length===1&&requests.every(p=>p==='/'||p==='/api/compensation'));
+    check(width+' selections do not fetch data or call AI',requests.filter(p=>p==='/api/compensation').length===1&&requests.every(p=>p==='/'||p==='/api/compensation'||p==='/api/compensation-ranges'||p==='/api/compensation-job-release'));
     check(width+' no runtime errors or implicit persistence',errors.length===0&&await page.evaluate(()=>localStorage.length===0));
     await context.close();
   }

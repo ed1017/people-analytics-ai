@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from "react";
 import type { CompensationResponse } from "@/lib/compensation";
-import {SyntheticPayDemoPanel} from "@/components/synthetic-pay-demo";
+import {CompensationJobRanges} from "@/components/compensation-job-ranges";
+import type {RangeScope} from "@/lib/compensation-ranges";
 import { CompensationBenchmarks } from "@/components/compensation-benchmarks";
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const number = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 const display = (value: number | null, currency = false) => value === null ? "Unavailable" : (currency ? money : number).format(value);
 
-export function CompensationPage() {
+export function CompensationPage({scope}: {scope?: RangeScope}) {
   const [data, setData] = useState<CompensationResponse | null>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -41,12 +42,12 @@ export function CompensationPage() {
   };
 
   return (<>
-    <div className="min-w-0 space-y-4 px-4 pt-4 sm:px-6 sm:pt-6"><SyntheticPayDemoPanel/><CompensationBenchmarks /></div>
+    <div className="min-w-0 space-y-4 px-4 pt-4 sm:px-6 sm:pt-6"><CompensationJobRanges scope={scope}/><CompensationBenchmarks /></div>
     <section className="evidence-workspace min-w-0 space-y-5 p-4 sm:p-6" aria-label="Compensation cost context" aria-busy={loading}>
       <div className="space-y-2">
-        <p className="text-xs font-medium text-primary">Synthetic aggregate evidence · USD</p>
+        <p className="text-xs font-medium text-primary">Demo data · Aggregate evidence · USD</p>
         <h2 className="text-lg font-semibold">Workforce cost context</h2>
-        <p className="max-w-3xl text-sm text-muted-foreground">Compare reported synthetic labor cost across business units. This internal source has no salary ranges or pay-equity measures.</p>
+        <p className="max-w-3xl text-sm text-muted-foreground">Compare reported demo labor cost across business units. This internal source has no salary ranges or pay-equity measures.</p>
       </div>
 
       {loading ? <p role="status" className="rounded-lg border p-6 text-sm text-muted-foreground">Loading compensation cost context…</p>
@@ -76,7 +77,7 @@ export function CompensationEvidence({ data }: { data: CompensationResponse }) {
       <p id="compensation-table-note" className="mt-1 text-xs text-muted-foreground">Highest reported cost first. Cost per FTE reflects workforce mix; it is not average salary.</p>
       <div className="mt-3 overflow-x-auto" role="region" aria-label="Business-unit cost comparison" tabIndex={0}>
         <table className="w-full min-w-[650px] text-sm" aria-describedby="compensation-table-note">
-          <caption className="sr-only">Synthetic business-unit labor costs in USD for the {snapshot} snapshot. Cost period is unknown.</caption>
+          <caption className="sr-only">Demo business-unit labor costs in USD for the {snapshot} snapshot. Cost period is unknown.</caption>
           <thead><tr className="border-b text-left text-xs text-muted-foreground"><th scope="col" className="py-3 pr-4">Business unit</th><th scope="col" className="px-2 py-3 text-right">Headcount</th><th scope="col" className="px-2 py-3 text-right">FTE</th><th scope="col" className="px-2 py-3 text-right">Labor cost · USD</th><th scope="col" className="px-2 py-3 text-right">Share</th><th scope="col" className="py-3 pl-2 text-right">Cost / FTE · USD</th></tr></thead>
           <tbody>{data.by_business_unit.map(row => <tr key={row.org_code} className="border-b last:border-0"><th scope="row" className="py-3 pr-4 text-left font-medium">{row.org_name}</th><td className="px-2 py-3 text-right tabular-nums">{display(row.headcount)}</td><td className="px-2 py-3 text-right tabular-nums">{display(row.fte)}</td><td className="px-2 py-3 text-right tabular-nums">{display(row.labor_cost_usd, true)}</td><td className="px-2 py-3 text-right tabular-nums">{row.share_of_reported_cost_pct === null ? "Unavailable" : `${number.format(row.share_of_reported_cost_pct)}%`}</td><td className="py-3 pl-2 text-right tabular-nums">{display(row.cost_per_fte_usd, true)}</td></tr>)}</tbody>
         </table>
@@ -85,7 +86,7 @@ export function CompensationEvidence({ data }: { data: CompensationResponse }) {
     <details className="rounded-lg border p-4 text-sm">
       <summary className="cursor-pointer font-medium">Source and limits</summary>
       <div className="mt-3 space-y-2 text-muted-foreground">
-        <p>Source: <code>finance_current_summary</code>, the same synthetic aggregate view used by Workforce Cost. Its snapshot predicate is fixed to September 30, 2026; the view does not report when its data was refreshed.</p>
+        <p>Source: <code>finance_current_summary</code>, the same demo aggregate view used by Workforce Cost. Its snapshot predicate is fixed to September 30, 2026; the view does not report when its data was refreshed.</p>
         <p>Cohort: snapshot rows grouped by business unit. Active-employment eligibility and employee-level known/missing cost counts are not supplied. Source sums can omit missing employee costs, so these are reported aggregates, not verified complete payroll totals.</p>
         <p>Values are already denominated in USD by the source. Original currencies, exchange-rate dates and cost-period definitions are unavailable; no conversion or annualization is performed here.</p>
         <p>Missing aggregate values remain unavailable. Cost per FTE is total reported cost divided by total reported FTE, not an average of business-unit ratios. Share uses the sum of all supplied business-unit costs and is unavailable if that total is missing or zero.</p>
