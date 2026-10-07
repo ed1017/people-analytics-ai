@@ -36,7 +36,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844],['
    await dialog.getByRole('button',{name:'Try a guided example',exact:true}).scrollIntoViewIfNeeded();check(mode+' content scrolls internally while Close remains available',await close.isVisible()&&await close.evaluate(node=>{const r=node.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight}));
    await dialog.locator('.overflow-y-auto').evaluate(node=>node.scrollTop=0);await page.screenshot({path:output+'/'+mode+'.png'});
   }
-  await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});check(mode+' '+scenario+' Escape restores trigger focus',await show.evaluate(node=>node===document.activeElement));
+  await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});await page.waitForFunction(()=>document.querySelector('[aria-controls="home-starting-instructions"]')?.getAttribute('aria-expanded')==='false');check(mode+' '+scenario+' Escape restores trigger focus',await show.evaluate(node=>node===document.activeElement));
   const after=await page.evaluate(key=>{try{return localStorage.getItem(key)}catch{return null}},DECISIONS_STORAGE_KEY);check(mode+' '+scenario+' instructions never rewrite saved work',after===before);
   if(scenario!=='blocked')check(mode+' '+scenario+' dismissal stored independently',await page.evaluate(key=>localStorage.getItem(key),HOME_INSTRUCTIONS_DISMISSED_KEY)==='1');
   await page.reload();await show.waitFor();await page.waitForFunction(()=>!document.querySelector('[aria-controls="home-starting-instructions"]')?.disabled);check(mode+' '+scenario+' reload does not reopen',!await dialog.isVisible());
