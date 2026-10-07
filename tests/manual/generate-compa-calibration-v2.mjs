@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {readFile, writeFile} from 'node:fs/promises';
+import {buildCalibrationProposal, calibrationProposalPath} from '../../lib/simulation/compa-calibration-v2.mjs';
+const mode = process.argv[2];
+assert.ok(['--write', '--check'].includes(mode));
+const proposal = await buildCalibrationProposal();
+const bytes = JSON.stringify(proposal, null, 2) + '\n';
+const path = new URL('../../' + calibrationProposalPath, import.meta.url);
+if (mode === '--write') await writeFile(path, bytes);
+else assert.equal(await readFile(path, 'utf8'), bytes, 'Calibration proposal differs from its deterministic generator');
+console.log(JSON.stringify({status: mode === '--write' ? 'written' : 'verified', contractId: proposal.contractId, activationAllowed: false, distribution: proposal.distribution}));

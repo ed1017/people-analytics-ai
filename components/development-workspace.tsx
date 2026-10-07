@@ -6,6 +6,7 @@ import { blankDevelopmentQuote, developmentCatalog, developmentCost, quoteInputs
 
 const control = "development-control mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm";
 const button = "development-button rounded border px-3 py-2 text-sm hover:bg-accent disabled:opacity-50";
+const quoteQuantity = (value: string, unit: "hour" | "session", unknown = "unknown") => `${value || unknown} ${unit}${Number(value) === 1 ? "" : "s"}`;
 function Field({ label, value, onChange, numeric = false }: { label: string; value: string; onChange: (value: string) => void; numeric?: boolean }) {
   return <label className="block min-w-0 text-sm">{label}<input className={control} value={value} maxLength={numeric ? 16 : 300} inputMode={numeric ? "decimal" : undefined} onChange={e => onChange(e.target.value)} /></label>;
 }
@@ -22,7 +23,7 @@ export function DevelopmentCatalog({ session, onChange, onOpen }: { session: Dev
     !session.goal.trim() && "Enter a development goal.",
     session.options.length >= 3 && "Three comparison options are already in Development Planning. Open Planning and remove an option to make room.",
   ].filter(Boolean);
-  const quoteFee = (q: DevelopmentQuote) => `${q.fee ? `${q.currency} ${q.fee}` : `Cost unknown (${q.currency})`} per ${q.basis === "person" ? "person" : "cohort package"} per session`;
+  const quoteFee = (q: DevelopmentQuote) => `${q.fee.trim() && Number.isFinite(Number(q.fee)) ? new Intl.NumberFormat("en-US", {style: "currency", currency: q.currency, currencyDisplay: "code"}).format(Number(q.fee)) : `Cost unknown (${q.currency})`} per ${q.basis === "person" ? "person" : "cohort package"} per session`;
   const updateDraft = (key: keyof DevelopmentQuote, value: string) => onChange({ ...session, draft: { ...session.draft, [key]: value } });
   const carry = () => {
     if (!chosen || carryReasons.length) return;
@@ -37,7 +38,7 @@ export function DevelopmentCatalog({ session, onChange, onOpen }: { session: Dev
       <span className="flex items-start gap-2"><span aria-hidden="true" className="development-quote-control">{session.selected === q.id ? "✓" : ""}</span><strong className="break-words">{q.provider}</strong></span>
       <span id={`${catalogId}-${q.id}-source`} className="mt-2 block">{q.provenance === "simulated" ? "Simulated quote · Fictional provider" : "User-provided · Unverified"}</span>
       <span id={`${catalogId}-${q.id}-focus`} className="mt-2 block">{q.kind}: {q.focus}</span><span id={`${catalogId}-${q.id}-format`} className="block">{q.format}</span>
-      <span id={`${catalogId}-${q.id}-sessions`} className="block">{q.sessions || "Unknown"} sessions × {q.hours || "unknown"} hours per participant; cohort capacity {q.capacity || "unknown"}.</span>
+      <span id={`${catalogId}-${q.id}-sessions`} className="block">{quoteQuantity(q.sessions, "session", "Unknown")} × {quoteQuantity(q.hours, "hour")} per participant; cohort capacity {q.capacity || "unknown"}.</span>
       <span id={`${catalogId}-${q.id}`} className="mt-2 block font-medium">{quoteFee(q)}<span className="mt-1 block">{session.selected === q.id ? "Selected · Select again to clear" : "Select quote"}</span></span>
     </button>)}</div>
     <div role="status" aria-atomic="true" className="mb-3 rounded border p-3 text-sm">
@@ -76,7 +77,7 @@ export function DevelopmentPlanning({ session, onChange, onCatalog }: { session:
       return <article key={index} className="development-option min-w-0 rounded-lg border p-4" aria-label={`Development option ${index+1}`}><h2 className="break-words text-lg font-semibold">{q.provider}</h2>
         <p className="text-sm">{q.provenance === "simulated" ? "Fictional provider · Simulated quote" : "User-provided quote · Unverified"} · {q.currency}</p>
         <p className="my-3 break-words text-sm"><strong>Carried goal:</strong> {option.goal}</p>
-        <p className="mb-3 text-sm">{q.focus} · {q.format}. Quoted: {q.sessions || "unknown"} sessions, {q.hours || "unknown"} hours/session, capacity {q.capacity || "unknown"}. Fee basis: per {q.basis === "person" ? "person" : "cohort package"} per session.</p>
+        <p className="mb-3 text-sm">{q.focus} · {q.format}. Quoted: {quoteQuantity(q.sessions, "session")}, {quoteQuantity(q.hours, "hour")}/session, capacity {q.capacity || "unknown"}. Fee basis: per {q.basis === "person" ? "person" : "cohort package"} per session.</p>
         <div className="grid gap-3">{([["participants","Participants"],["sessions","Sessions per participant"],["hours","Hours per participant per session"],["fee",`Quote fee (${q.currency}) per ${q.basis === "person" ? "person" : "cohort"} per session`],["additionalFees",`Additional fees total (${q.currency}; blank = unknown)`],["hourlyCost",`Loaded hourly cost (${q.currency}; optional)`]] as const).map(([key,label]) => <Field key={key} numeric label={label} value={option.inputs[key]} onChange={v => update(key,v)} />)}</div>
         {result.errors.length ? <p role="alert" className="mt-3 text-sm text-destructive">{result.errors.join(" ")}</p> : <dl className="mt-4 space-y-2 text-sm">
           {[["Cohorts",result.cohorts ?? "Unknown"],["Quote fees",money(result.quoteTotal)],["Cash cost incl. additional fees",money(result.cashCost)],["Employee hours",result.employeeHours ?? "Unknown"],["Employee time cost",money(result.timeCost)],["Total incl. employee time",money(result.total)]].map(([label,value]) => <div key={label} className="flex flex-wrap justify-between gap-2"><dt>{label}</dt><dd className="font-medium">{value}</dd></div>)}

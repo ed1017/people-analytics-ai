@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Built Home, production decoder, synthetic endpoints only. No live model or Attach actions.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -46,7 +47,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  },findings[index].text);
  const ask=async()=>{await input.fill('Identify the recorded findings');await send.click();await actions.first().waitFor();};
  const releasePending=async()=>{for(let i=0;!release&&i<100;i++)await new Promise(resolve=>setTimeout(resolve,10));assert.ok(release,'intercepted request ready');const resolve=release;release=null;delay=false;resolve();};
- await page.goto(baseUrl);await input.waitFor();await page.waitForFunction(()=>document.querySelector('[aria-label="Selected goal"]')?.value==='first'&&document.querySelector('[aria-label="Ask Workforce AI"]')?.value==='Saved unfinished draft');check(mode+' restored answers are inert and drafts survive hydration',await actions.count()===0&&await input.inputValue()==='Saved unfinished draft'&&posts.length===0);
+ await page.goto(baseUrl);await dismissHomeOnboarding(page);await input.waitFor();await page.waitForFunction(()=>document.querySelector('[aria-label="Selected goal"]')?.value==='first'&&document.querySelector('[aria-label="Ask Workforce AI"]')?.value==='Saved unfinished draft');check(mode+' restored answers are inert and drafts survive hydration',await actions.count()===0&&await input.inputValue()==='Saved unfinished draft'&&posts.length===0);
  await ask();check(mode+' one initial call produces only two explicitly designated controls',posts.length===1&&await actions.count()===2&&await conversation.getByText('Review the scope before deciding.',{exact:true}).isVisible());
  check(mode+' designated exact text, questions and existing source link stay visible',await findingLine(0).isVisible()&&await exactFinding(0)&&await exactFinding(1)&&await findingLine(0).locator('sup[data-chat-citation="W1"]').count()===1&&await findingLine(1).locator('sup[data-chat-citation="A1"]').count()===1&&await conversation.getByText('Ask: '+findings[1].prompt,{exact:true}).isVisible()&&await conversation.getByRole('button',{name:'Workforce',exact:true}).count()===1);
  check(mode+' controls have keyboard-sized targets and response body remains 14px',await actions.first().evaluate(node=>node.getBoundingClientRect().height>=44)&&await conversation.locator('.home-answer').evaluate(node=>getComputedStyle(node).fontSize==='14px'));

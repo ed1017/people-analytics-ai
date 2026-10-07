@@ -27,6 +27,8 @@ try {
   }, {key:DECISIONS_STORAGE_KEY, value:encodeDecisions(seed), palette});
   await page.route('**/*', route => {
    const request=route.request(), url=new URL(request.url());
+   // Next dev requests this analytics helper; keep local checks fully offline.
+   if (url.href==='https://va.vercel-scripts.com/v1/script.debug.js') return route.fulfill({contentType:'application/javascript',body:''});
    if (url.origin!==base) { external++; return route.abort(); }
    if (url.pathname.startsWith('/api/')) {
     if (request.method()!=='GET') { posts++; return route.abort(); }
@@ -42,7 +44,8 @@ try {
   const state = () => page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
   const saved = async () => (await state()).workspaces['quote-goal']?.fields.development;
   const nav = async key => {
-   const open=button('Open navigation'); if(await open.isVisible()) await open.click();
+   await page.getByLabel('Selected goal',{exact:true}).locator('option[value="quote-goal"]').waitFor({state:'attached'});
+   const open=button('Open navigation'); if(await open.isVisible()) {await open.click(); await page.locator('#phone-navigation').waitFor({state:'visible'});}
    const target=page.locator(`[data-nav-destination="${key}"]`);
    if(!await target.isVisible()) await target.evaluate(e=>e.closest('section').querySelector('.nav-group-label').click());
    await target.click();
@@ -59,19 +62,19 @@ try {
   await back();
   const cedar=button(developmentCatalog[0].provider), lantern=button(developmentCatalog[1].provider), harbor=button(developmentCatalog[2].provider);
   await activate(cedar.locator('strong'));
-  check(mode+' accessible quote description retains context and selection instructions',await cedar.evaluate(e=>e.getAttribute('aria-describedby').split(' ').map(id=>document.getElementById(id)?.textContent).join(' ')).then(text=>/Simulated quote/.test(text)&&/Manager feedback and delegation/.test(text)&&/Live virtual workshop/.test(text)&&/cohort capacity 12/.test(text)&&/USD 120 per person per session/.test(text)&&/again to clear/.test(text)));
-  check(mode+' card content selects once and reports unit/currency',await selected(developmentCatalog[0].provider) && (await status.innerText()).includes('USD 120 per person per session') && (await status.innerText()).includes('Enter a development goal.') && await carry.isDisabled());
+  check(mode+' accessible quote description retains context and selection instructions',await cedar.evaluate(e=>e.getAttribute('aria-describedby').split(' ').map(id=>document.getElementById(id)?.textContent).join(' ')).then(text=>/Simulated quote/.test(text)&&/Manager feedback and delegation/.test(text)&&/Live virtual workshop/.test(text)&&/cohort capacity 12/.test(text)&&/USD\s120\.00 per person per session/.test(text)&&/again to clear/.test(text)));
+  check(mode+' card content selects once and reports unit/currency',await selected(developmentCatalog[0].provider) && /USD\s120\.00 per person per session/.test(await status.innerText()) && (await status.innerText()).includes('Enter a development goal.') && await carry.isDisabled());
   await activate(cedar.locator('.development-quote-control'));
   check(mode+' visible control clears once without event double toggle',!await selected(developmentCatalog[0].provider) && (await status.innerText()).includes('No quote selected.'));
   await activate(cedar); await activate(lantern);
-  check(mode+' switching leaves exactly one selected quote',await catalog.locator('[aria-pressed="true"]').count()===1 && await selected(developmentCatalog[1].provider) && (await status.innerText()).includes('USD 1800 per cohort package per session'));
+  check(mode+' switching leaves exactly one selected quote',await catalog.locator('[aria-pressed="true"]').count()===1 && await selected(developmentCatalog[1].provider) && /USD\s1,800\.00 per cohort package per session/.test(await status.innerText()));
   await lantern.focus(); await page.keyboard.press('Space');
   check(mode+' Space deselects with focus retained',!await selected(developmentCatalog[1].provider) && await lantern.evaluate(e=>e===document.activeElement));
   await page.keyboard.press('Enter');
   await page.waitForFunction(()=>document.querySelector('.development-quote[aria-label="Fictional Lantern Academy"]')?.getAttribute('aria-pressed')==='true');
   check(mode+' Enter selects with visible keyboard focus',await selected(developmentCatalog[1].provider) && await lantern.evaluate(e=>e.matches(':focus-visible') && parseFloat(getComputedStyle(e).outlineWidth)>=3));
   await page.keyboard.press('Enter'); await activate(harbor);
-  check(mode+' all provider units remain literal', (await status.innerText()).includes('USD 200 per cohort package per session'));
+  check(mode+' all provider units remain literal', /USD\s200\.00 per cohort package per session/.test(await status.innerText()));
   await goal.fill('   ');
   check(mode+' whitespace goal is blocked and explanation is associated',await carry.isDisabled() && await carry.getAttribute('aria-describedby')===await status.locator('p').last().getAttribute('id'));
   await goal.fill('  Practice manager feedback  ');
@@ -93,7 +96,7 @@ try {
   check(mode+' editing custom draft does not change selection or options',await selected(developmentCatalog[1].provider) && (await saved()).options.length===1);
   await button('Add custom quote').click();
   const custom=(await saved()).custom[0];
-  check(mode+' adding a valid custom quote selects with truthful summary',await selected('Synthetic Custom Coach') && (await status.innerText()).includes('GBP 275.50 per cohort package per session') && (await button('Synthetic Custom Coach').innerText()).includes('User-provided · Unverified'));
+  check(mode+' adding a valid custom quote selects with truthful summary',await selected('Synthetic Custom Coach') && /GBP\s275\.50 per cohort package per session/.test(await status.innerText()) && (await button('Synthetic Custom Coach').innerText()).includes('User-provided · Unverified'));
   await activate(button('Synthetic Custom Coach')); await activate(button('Synthetic Custom Coach'));
   check(mode+' custom quote clears and reselects with the same behavior',await selected('Synthetic Custom Coach') && (await saved()).custom.length===1);
   await carry.click(); await page.locator('.development-option').nth(1).waitFor();

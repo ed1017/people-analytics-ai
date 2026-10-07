@@ -3,10 +3,10 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const productTitle =
-  "Insights to Action | People Analytics & Strategic Workforce Planning";
+  "Insight to Action | People Analytics & Strategic Workforce Planning";
 
 const productDescription =
-  "Insights to Action is a public portfolio demo for people analytics and workforce planning, connecting workforce evidence, talent responses and planning scenarios with grounded AI assistance.";
+  "Insight to Action is a public portfolio demo for people analytics and workforce planning, connecting workforce evidence, talent responses and planning scenarios with grounded AI assistance.";
 
 export const metadata: Metadata = {
   title: productTitle,

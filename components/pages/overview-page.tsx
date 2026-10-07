@@ -117,7 +117,7 @@ export function OverviewPage({
           <p className="mt-1 text-xs text-muted-foreground">
             {overviewData
               ? `${formatFte(Number(overviewData.fte))} FTE`
-              : "Loading"}
+              : dashboardLoading ? "Loading" : "Unavailable for these filters"}
           </p>
         </div>
 

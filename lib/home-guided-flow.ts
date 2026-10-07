@@ -16,15 +16,15 @@ export class HomeGuidedFlow {
  }
 }
 
-export type GuidedReceipt={type:'answered'|'pinned'|'selected'|'attached'|'edited';goalId:string;planId?:string;number?:number;sourcePlanId?:string};
+export type GuidedReceipt={type:'answered'|'pinned'|'selected'|'attached'|'edited';goalId:string;goal?:string;planId?:string;number?:number;sourcePlanId?:string};
 /** Receipts advance only the expected real control in this isolated goal. */
 export function guidedReceiptStep(step:number,event:GuidedReceipt,goalId:string,originalId:string|null,revisedId:string|null):number|null {
  if(event.goalId!==goalId)return null;
  if(step===1&&event.type==='answered')return 2;
  if(step===2&&event.type==='pinned')return 3;
- if(step===3&&event.type==='selected'&&event.number===1)return 4;
+ if(step===3&&event.type==='selected'&&event.planId&&Number.isSafeInteger(event.number)&&event.number!>0)return 4;
  if(step===4&&event.type==='attached'&&event.planId===originalId)return 5;
- if(step===5&&event.type==='edited'&&event.planId&&event.number&&event.number>1)return 6;
+ if(step===5&&event.type==='edited'&&event.planId&&event.planId!==originalId&&event.sourcePlanId===originalId&&Number.isSafeInteger(event.number)&&event.number!>0)return 6;
  if(step===6&&event.type==='selected'&&event.planId===revisedId)return 7;
  if(step===7&&event.type==='attached'&&(event.planId===revisedId||event.sourcePlanId===revisedId))return 8;
  return null;

@@ -11,12 +11,16 @@ import {DecisionBrief} from "@/components/decision-brief";
 import {decisionStore,recordDecisionEvidence} from "@/components/decision-store";
 import { intelligenceEvidence, isIntelligencePage } from "@/lib/intelligence-chat";
 import { developmentCatalog } from "@/lib/development-costs";
+import { knownDifference } from "@/lib/numeric-contract";
+import { summarizeStoredPlanning } from "@/lib/stored-planning";
 import {
   useEffect,
+  useEffectEvent,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
@@ -24,6 +28,7 @@ import {
 import {readSurveySource} from "@/lib/survey-source-client";
 import { employeeListeningEvidence, exitSurveyEvidence } from "@/lib/employee-listening";
 import { FocusedIssue } from "@/components/focused-issue";
+import {readDashboardScopeReceipt} from "@/lib/dashboard-scope";
 import { buildHomePack } from "@/lib/home-pack.mjs";
 import {MarketComparison,CarriedMarketReference,type MarketCarry} from "@/components/market-reference";
 import {defaultMarketSelection,marketCarryEvidence} from "@/lib/oews-reference.mjs";
@@ -68,6 +73,7 @@ import {
   getWorkspaceForPage,
   type AppWorkspaceKey,
 } from "@/lib/app-navigation";
+import { APP_PAGE_CHANGE_EVENT, appPageHref, currentAppPage, resolveAppPage, serverAppPage, subscribeToAppPage } from "@/lib/app-page-url";
 import {
   enterpriseTalentEvidenceScope,
   evidenceScopeForAi,
@@ -124,7 +130,7 @@ const PLANNING_VIEW_TO_PAGE: Record<
 };
 
 export default function Home() {
-  const [activePage, setActivePageState] = useState<AppPage>("home");
+  const activePage = useSyncExternalStore(subscribeToAppPage, currentAppPage, serverAppPage);
   const conversation = useProblemConversation(activePage);
   const [workspacePalette]=useWorkspacePalette();
   const [optionActions] = useState(()=>new WorkforceOptionActions());
@@ -165,7 +171,32 @@ export default function Home() {
     evaluate: "assess-evaluate",
   });
 
-  const setActivePage = (page: AppPage) => { if(page !== activePage) conversation.cancelPending(); setActivePageState(page === "overview" || page === "career-mobility" ? "workforce" : page); };
+  const setActivePage = (page: AppPage) => {
+    const destination = resolveAppPage(page);
+    if (destination !== activePage) conversation.cancelPending();
+    const href = appPageHref(window.location, destination);
+    if (href !== window.location.pathname + window.location.search + window.location.hash) {
+      // Next supports native history for local query changes without reloading the shell.
+      window.history.pushState(null, "", href);
+      window.dispatchEvent(new Event(APP_PAGE_CHANGE_EVENT));
+    }
+  };
+
+  const cancelHistoryRequest = useEffectEvent(() => conversation.cancelPending());
+  useEffect(() => {
+    // Back/Forward invalidates the leaving page's in-flight reply just like a navigation click.
+    const restore = () => cancelHistoryRequest();
+    window.addEventListener("popstate", restore);
+    return () => window.removeEventListener("popstate", restore);
+  }, []);
+
+  useEffect(() => {
+    const href = appPageHref(window.location, currentAppPage());
+    if (href !== window.location.pathname + window.location.search + window.location.hash) {
+      // Normalize invalid/legacy links in place, without adding a Back entry.
+      window.history.replaceState(null, "", href);
+    }
+  }, [activePage]);
 
   const activeWorkspace =
     getWorkspaceForPage(activePage);
@@ -411,9 +442,15 @@ export default function Home() {
 
         const data = payload as DashboardResponse;
 
-        setOverviewData(data.overview);
-        setWorkforcePerformance(data.performance_rating ?? null);
-        setHeadcountTrend(data.trend ?? []);
+        const scopeReceipt = readDashboardScopeReceipt(payload.workforce_filter_scope);
+        const filtered = selectedCountry !== 'all' || selectedOrg !== 'all' || selectedLevel !== 'all';
+        const scopeUnavailable = scopeReceipt
+          ? scopeReceipt.status !== 'verified_rpc' || scopeReceipt.effective?.country !== selectedCountry || scopeReceipt.effective?.org !== selectedOrg || scopeReceipt.effective?.level !== selectedLevel
+          : filtered || payload.workforce_filter_scope !== undefined;
+        setOverviewData(scopeUnavailable ? null : data.overview);
+        if (scopeUnavailable) setDashboardError('Workforce evidence is unavailable for these filters. ' + (scopeReceipt?.status !== 'verified_rpc' && scopeReceipt?.basis || 'The effective dashboard scope could not be verified.'));
+        setWorkforcePerformance(scopeUnavailable ? null : data.performance_rating ?? null);
+        setHeadcountTrend(scopeUnavailable ? [] : data.trend ?? []);
         setFilterOptions(
           data.filter_options ?? EMPTY_FILTER_OPTIONS
         );
@@ -426,6 +463,8 @@ export default function Home() {
         }
 
         console.error(error);
+        setOverviewData(null);
+        setHeadcountTrend([]);
         setDashboardError(
           error instanceof Error
             ? error.message
@@ -1126,33 +1165,16 @@ export default function Home() {
       baselineScenario.points.length - 1
     ] ?? null;
 
-  const planningNetChange =
-    activePlanningStart &&
-    activePlanningEnd
-      ? activePlanningEnd.planned_headcount -
-        activePlanningStart.planned_headcount
-      : null;
+  const {
+    headcount_change: planningNetChange,
+    hires: planningTotalHires,
+    exits: planningTotalExits,
+  } = summarizeStoredPlanning(activePlanningScenario?.points ?? []);
 
-  const planningHeadcountDeltaVsBaseline =
-    activePlanningEnd &&
-    baselinePlanningEnd
-      ? activePlanningEnd.planned_headcount -
-        baselinePlanningEnd.planned_headcount
-      : null;
-
-  const planningTotalHires =
-    activePlanningScenario?.points.reduce(
-      (sum, point) =>
-        sum + point.planned_hires,
-      0
-    ) ?? 0;
-
-  const planningTotalExits =
-    activePlanningScenario?.points.reduce(
-      (sum, point) =>
-        sum + point.planned_exits,
-      0
-    ) ?? 0;
+  const planningHeadcountDeltaVsBaseline = knownDifference(
+    activePlanningEnd?.planned_headcount,
+    baselinePlanningEnd?.planned_headcount,
+  );
 
   const activePositionScenario =
     positionModelingData?.scenarios.find(
@@ -2074,6 +2096,8 @@ export default function Home() {
         </div>
 
         {activePage !== "home" && activePage!=="decision-brief" && activePage!=="assess-evaluate" && <AiPanel
+          workforceIntro={getWorkspaceForPage(activePage)==='analytics'}
+          suppressIntro={demoActive}
           goalViewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,activePage,selectedPersona,selectedBusinessContext,conversation.resetEpoch])}
           hasGoal={Boolean(conversation.focusedIssue)}
           goalStatement={conversation.focusedIssue}

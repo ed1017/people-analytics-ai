@@ -1,3 +1,5 @@
+import { formatWholeCount, formatFte } from "@/lib/display-format";
+import { knownDifference } from "@/lib/numeric-contract";
 import type {
   Dispatch,
   SetStateAction,
@@ -141,7 +143,8 @@ function formatLongDate(value: string) {
   });
 }
 
-function formatCurrencyCompact(value: number) {
+function formatCurrencyCompact(value: number | null) {
+  if (value === null) return "Unavailable";
   const sign = value < 0 ? "-" : "";
   const absoluteValue = Math.abs(value);
   if (absoluteValue >= 1_000_000_000) {
@@ -222,13 +225,13 @@ export function ScenarioModelingPanel({
     {
       label: "Ending Headcount",
       baseline:
-        baselinePlanningEnd?.planned_headcount.toLocaleString() ?? "—",
+        formatWholeCount(baselinePlanningEnd?.planned_headcount),
       value: (entry) =>
         entry.scenario.summary.modeled_end_headcount.toLocaleString(),
     },
     {
       label: "HC Δ vs Baseline",
-      baseline: "0",
+      baseline: baselinePlanningEnd?.planned_headcount == null ? "Unavailable" : "0",
       value: (entry) => {
         const value = entry.scenario.summary.headcount_delta_vs_baseline;
         return `${value > 0 ? "+" : ""}${value.toLocaleString()}`;
@@ -237,7 +240,7 @@ export function ScenarioModelingPanel({
     {
       label: "Ending FTE",
       baseline:
-        baselinePlanningEnd?.planned_fte.toLocaleString() ?? "—",
+        formatFte(baselinePlanningEnd?.planned_fte),
       value: (entry) =>
         entry.scenario.summary.modeled_end_fte.toLocaleString(),
     },
@@ -255,7 +258,7 @@ export function ScenarioModelingPanel({
     },
     {
       label: "Labor Cost Δ",
-      baseline: "$0",
+      baseline: baselinePlanningEnd?.planned_labor_cost_usd == null ? "Unavailable" : "$0",
       value: (entry) =>
         formatCurrencyCompact(
           entry.scenario.summary.labor_cost_delta_vs_baseline_usd
@@ -327,8 +330,7 @@ export function ScenarioModelingPanel({
 
                 const delta =
                   end && baselineEnd !== null
-                    ? end.planned_headcount -
-                      baselineEnd
+                    ? knownDifference(end.planned_headcount, baselineEnd)
                     : null;
 
                 const selected =
@@ -358,7 +360,7 @@ export function ScenarioModelingPanel({
                     </p>
                     <p className="mt-2 text-2xl font-semibold">
                       {end
-                        ? end.planned_headcount.toLocaleString()
+                        ? formatWholeCount(end.planned_headcount)
                         : "—"}
                     </p>
                     <p className="text-xs text-muted-foreground">

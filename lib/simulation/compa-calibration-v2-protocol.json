@@ -1,0 +1,344 @@
+{
+  "version": 2,
+  "contractId": "compa-calibration-proposal-v2",
+  "status": "proposal-only",
+  "activationAllowed": false,
+  "publicationApproved": false,
+  "seed": 20261007,
+  "snapshotDate": "2026-09-30",
+  "effectiveFrom": "2026-09-30",
+  "effectiveTo": "2027-09-30",
+  "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal",
+  "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+  "rangeProvenance": "new_constructed_demo_ranges_v2",
+  "population": "New fictional salaried cohort constructed for local calibration review. Reuses only the 50 job codes; no existing people, pay, workforce totals or membership are reused.",
+  "formula": "Arithmetic mean of individual 100 * (annual contracted base pay / FTE) / matching annual full-time base-pay range midpoint; match job, level, country, currency, basis and effective date before averaging. Never sum money across currencies.",
+  "jobs": [
+    {
+      "code": "AI-ARCH",
+      "illustrativeAnchor": 150000
+    },
+    {
+      "code": "AI-ENG",
+      "illustrativeAnchor": 130000
+    },
+    {
+      "code": "BI-ANA",
+      "illustrativeAnchor": 90000
+    },
+    {
+      "code": "BI-DEV",
+      "illustrativeAnchor": 105000
+    },
+    {
+      "code": "CLOUD-ARCH",
+      "illustrativeAnchor": 145000
+    },
+    {
+      "code": "CLOUD-ENG",
+      "illustrativeAnchor": 120000
+    },
+    {
+      "code": "COMMS-GEN",
+      "illustrativeAnchor": 85000
+    },
+    {
+      "code": "CONS-MGMT",
+      "illustrativeAnchor": 125000
+    },
+    {
+      "code": "CONS-TECH",
+      "illustrativeAnchor": 120000
+    },
+    {
+      "code": "CONS-TRANS",
+      "illustrativeAnchor": 115000
+    },
+    {
+      "code": "CORPDEV-ANA",
+      "illustrativeAnchor": 105000
+    },
+    {
+      "code": "CSM-GEN",
+      "illustrativeAnchor": 95000
+    },
+    {
+      "code": "CYBER-ANA",
+      "illustrativeAnchor": 105000
+    },
+    {
+      "code": "CYBER-ENG",
+      "illustrativeAnchor": 125000
+    },
+    {
+      "code": "DE-ARCH",
+      "illustrativeAnchor": 145000
+    },
+    {
+      "code": "DE-ENG",
+      "illustrativeAnchor": 120000
+    },
+    {
+      "code": "DS-APPLIED",
+      "illustrativeAnchor": 130000
+    },
+    {
+      "code": "DS-SCI",
+      "illustrativeAnchor": 125000
+    },
+    {
+      "code": "FIN-ACC",
+      "illustrativeAnchor": 85000
+    },
+    {
+      "code": "FIN-FPNA",
+      "illustrativeAnchor": 100000
+    },
+    {
+      "code": "FIN-TREAS",
+      "illustrativeAnchor": 105000
+    },
+    {
+      "code": "HR-HRBP",
+      "illustrativeAnchor": 95000
+    },
+    {
+      "code": "HR-HRIS",
+      "illustrativeAnchor": 100000
+    },
+    {
+      "code": "HR-PA",
+      "illustrativeAnchor": 105000
+    },
+    {
+      "code": "HR-TA",
+      "illustrativeAnchor": 85000
+    },
+    {
+      "code": "HR-TM",
+      "illustrativeAnchor": 95000
+    },
+    {
+      "code": "HR-TR",
+      "illustrativeAnchor": 105000
+    },
+    {
+      "code": "INFOSEC-ANA",
+      "illustrativeAnchor": 105000
+    },
+    {
+      "code": "INFRA-ENG",
+      "illustrativeAnchor": 115000
+    },
+    {
+      "code": "IT-ENG",
+      "illustrativeAnchor": 100000
+    },
+    {
+      "code": "LEGAL-COUNSEL",
+      "illustrativeAnchor": 145000
+    },
+    {
+      "code": "LEGAL-PRIV",
+      "illustrativeAnchor": 150000
+    },
+    {
+      "code": "MKT-BRAND",
+      "illustrativeAnchor": 90000
+    },
+    {
+      "code": "MKT-GROWTH",
+      "illustrativeAnchor": 100000
+    },
+    {
+      "code": "ML-ENG",
+      "illustrativeAnchor": 140000
+    },
+    {
+      "code": "OPS-BUS",
+      "illustrativeAnchor": 85000
+    },
+    {
+      "code": "OPS-CLIENT",
+      "illustrativeAnchor": 80000
+    },
+    {
+      "code": "PMO-PGM",
+      "illustrativeAnchor": 110000
+    },
+    {
+      "code": "PMO-PM",
+      "illustrativeAnchor": 100000
+    },
+    {
+      "code": "PROC-SOURCING",
+      "illustrativeAnchor": 90000
+    },
+    {
+      "code": "PROD-PM",
+      "illustrativeAnchor": 130000
+    },
+    {
+      "code": "QA-ENG",
+      "illustrativeAnchor": 95000
+    },
+    {
+      "code": "SALES-AE",
+      "illustrativeAnchor": 105000
+    },
+    {
+      "code": "SALES-OPS",
+      "illustrativeAnchor": 95000
+    },
+    {
+      "code": "STRAT-ANA",
+      "illustrativeAnchor": 105000
+    },
+    {
+      "code": "SWE-BACK",
+      "illustrativeAnchor": 120000
+    },
+    {
+      "code": "SWE-FRONT",
+      "illustrativeAnchor": 115000
+    },
+    {
+      "code": "SWE-FULL",
+      "illustrativeAnchor": 125000
+    },
+    {
+      "code": "SWE-GEN",
+      "illustrativeAnchor": 115000
+    },
+    {
+      "code": "UX-DES",
+      "illustrativeAnchor": 110000
+    }
+  ],
+  "levels": [
+    {
+      "code": "DEMO-IC2",
+      "multiplier": 1
+    },
+    {
+      "code": "DEMO-IC4",
+      "multiplier": 1.35
+    }
+  ],
+  "countries": [
+    {
+      "code": "US",
+      "currency": "USD",
+      "localMonetaryScale": 1
+    },
+    {
+      "code": "CA",
+      "currency": "CAD",
+      "localMonetaryScale": 1.2
+    },
+    {
+      "code": "GB",
+      "currency": "GBP",
+      "localMonetaryScale": 0.78
+    }
+  ],
+  "range": {
+    "minimumRatio": 0.8,
+    "maximumRatio": 1.2,
+    "midpointRoundingUnit": 500,
+    "basis": "annual_base_1_fte"
+  },
+  "pay": {
+    "basis": "annual_contracted_base",
+    "ftePattern": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0.8,
+      0.8,
+      0.8,
+      0.8,
+      0.5,
+      0.5,
+      0.5,
+      0.5
+    ],
+    "decimalPlaces": 2
+  },
+  "distribution": {
+    "recordsPerMatchedCell": 20,
+    "interiorOffsetsPct": [
+      -14,
+      -12,
+      -10,
+      -8,
+      -6,
+      -4,
+      -2,
+      -1,
+      1,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14
+    ],
+    "jobInteriorShiftsPct": [
+      -6,
+      -3,
+      0,
+      3,
+      6
+    ],
+    "fixedTailRatiosPct": [
+      76,
+      124
+    ],
+    "fixedMidpointRatiosPct": [
+      100,
+      100
+    ],
+    "assignment": "Sorted job codes cycle through the five shifts. Stable seeded per-cell shuffle assigns the fixed ratio grid to FTE positions; neither fitted to existing salaries nor a job-quality ranking.",
+    "expectedWithinBandPct": 90,
+    "expectedBelowBandPct": 5,
+    "expectedAboveBandPct": 5,
+    "minimumAtMidpointPct": 10,
+    "expectedJobMeansPct": [
+      95.2,
+      97.6,
+      100,
+      102.4,
+      104.8
+    ]
+  },
+  "disclosure": {
+    "minimumEligiblePerJob": 5,
+    "minimumExcludedCount": 5,
+    "companionSuppression": true,
+    "scope": "Only fixed job aggregates in this proposal; no production or per-person output. Design-level synthetic distribution checks are not released workforce statistics."
+  },
+  "interpretation": "Job anchors, level multipliers and local monetary scales are authored demo assumptions, not market wages, FX rates, geographic premiums, observed employer policy or pay-equity evidence. The shape is deliberately constructed, not estimated; no normal-distribution or real-world prevalence claim. DEMO levels and country/currency cells have not been reconciled to the live catalog.",
+  "protectedV1Sha256": {
+    "lib/data/compensation-release-v1.json": "76141d78f4dff73ba833624b26fd91c495c60bc15323cbf6a064812b1d073866",
+    "lib/compensation-ranges.ts": "1b14cf513c4bc94cef5819b40476a23394e0f3d0b233bb42de0ac471c5947811",
+    "lib/compensation-convention.ts": "231dbef3f7a83ba8f22b3a272a51f49af3e6c0b487606b7213aac4323b8dd306",
+    "lib/compensation-release.ts": "0d8d8fe30a2f552fba8b8688c1ab8ceac3c562e2668b618785b2e705585f59ea",
+    "lib/data/synthetic-pay-demo-v1.json": "9f1db58075f66707eb858db0fec8a4d49738da1279c911cb77fd2c0e1594d169",
+    "lib/simulation/pay-demo-protocol.json": "ef7fc27310d4ef933d31a256d5448e3d5750b74919d05259e60acfc3b8f12d4f",
+    "lib/simulation/pay-demo.mjs": "be46b7bed0f9732e0f33eeaf7bb0e0fc3c69befeceb1e8b35e4e180ca1c74adf",
+    "lib/synthetic-pay-demo.ts": "082cdf6ba45b19eaf412b0b72512d081b2700e3e823973da016c2259cf27d4da",
+    "tests/fixtures/compensation-ranges.tsx": "8661377fc6294547100fedda16c0ff8b2ce76341858243ab2bc926f9e19b997c",
+    "tests/fixtures/compensation.tsx": "facf76fe00162c942016bd0729fcbf37afeb900181be69a2963edc1bc7ad0f93"
+  }
+}

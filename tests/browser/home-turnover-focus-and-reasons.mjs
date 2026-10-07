@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Isolated production UI with synthetic aggregate fixtures and model responses.
 import assert from 'node:assert/strict';
 import {decodeHomeModelReply} from '../../lib/home-chat-reply.ts';
@@ -13,7 +14,7 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]]){
  const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),posts=[],errors=[];let external=0;
  page.setDefaultTimeout(15000);page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/*',route=>{
-  const req=route.request(),url=new URL(req.url());if(url.origin!==base){external++;return route.abort()}
+  const req=route.request(),url=new URL(req.url());if(url.href==='https://va.vercel-scripts.com/v1/script.debug.js')return route.fulfill({contentType:'application/javascript',body:''});if(url.origin!==base){external++;return route.abort()}
   if(url.pathname==='/api/chat'){
    const body=req.postDataJSON();posts.push(body);if(body.message==='Prepare coordinated solution bundles for my exact pinned goal.')return route.fulfill({json:{proposal:bundleProposalFixture(body.goalContext.goal)}});
    const question=body.message.split('\n\n')[0],isSurvey=question.startsWith('What did exit-survey'),ordinary=question.startsWith('Why'),answer=isSurvey?surveyAnswer(body.overviewBriefingContext):ordinary?'The source does not establish why turnover changed. [A1]':'Your stated turnover goal can remain broad.\n- '+finding.text;
@@ -24,13 +25,14 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]]){
   if(url.pathname.startsWith('/api/'))return route.fulfill({json:{as_of:'2026-09-30',summary:{headcount:5000,total_exits:100,total_turnover_ytd_pct:10,voluntary_exits:60,voluntary_turnover_ytd_pct:6,regrettable_exits:20},trend:[],business_units:[],levels:[],tenure:[],reasons:[]}});
   return route.continue();
  });
- await page.goto(base);const input=page.getByLabel('Ask Workforce AI',{exact:true}),button=name=>page.getByRole('button',{name,exact:true}),card=page.getByRole('region',{name:'Pin this problem'}),chat=page.getByRole('region',{name:'Overview conversation'});
+ await page.goto(base);await dismissHomeOnboarding(page);const input=page.getByLabel('Ask Workforce AI',{exact:true}),button=name=>page.getByRole('button',{name,exact:true}),card=page.getByRole('region',{name:'Pin this problem'}),chat=page.getByRole('region',{name:'Overview conversation'});
  const send=async text=>{await input.fill(text);const done=page.waitForResponse(r=>r.url()===base+'/api/chat');await button('Send overview question').click();await done;await page.getByRole('status',{name:'AI answer status',exact:true}).waitFor({state:'hidden'})};
  const state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
  await input.waitFor();await page.waitForFunction(key=>Boolean(localStorage.getItem(key)),DECISIONS_STORAGE_KEY);const seeded=JSON.stringify((await state()).workspaces['demo-reduce-turnover']);await send('Reduce turnover');await button('Pin overall turnover goal').waitFor();
  check(mode+' broad goal and primary pin precede optional findings',await card.evaluate(node=>Boolean(document.querySelector('[data-home-response-start]').compareDocumentPosition(node)&Node.DOCUMENT_POSITION_FOLLOWING)&&Boolean(node.compareDocumentPosition(document.querySelector('[aria-label="Overview conversation"] [data-chat-role="assistant"]'))&Node.DOCUMENT_POSITION_FOLLOWING))&&await button('Pin overall turnover goal').evaluate(node=>Boolean(node.compareDocumentPosition(document.querySelector('[aria-label="Optional turnover focus"]'))&Node.DOCUMENT_POSITION_FOLLOWING)));
  check(mode+' overall context shows total rate and all exits with an honest group limitation',await card.getByText('Overall turnover · Company-wide',{exact:true}).isVisible()&&(await card.getByLabel('Turnover goal evidence').innerText()).includes('Recorded exits (all types): 100')&&(await card.getByLabel('Turnover goal evidence').innerText()).includes('10%')&&await card.getByText('Comparable group turnover rates and denominators are unavailable in Home.',{exact:true}).isVisible());
  check(mode+' voluntary choice has distinct same-period numbers and no automatic pin',await card.getByLabel('Optional turnover focus').getByText(/Voluntary turnover: 6%.*total turnover: 10%/).isVisible()&&!(await state()).goals.activeId&&await card.getByLabel('Optional finding exploration').count()===0);
+ check(mode+' optional focus explains the retention suggestion',await card.getByLabel('Optional turnover focus').getByText('Suggestion: Focus on voluntary turnover for retention planning, so you can track employees choosing to leave separately from other departures.',{exact:true}).isVisible());
  await input.fill('Keep my constraints');check(mode+' optional narrowing protects an unfinished draft',await button('Focus on voluntary turnover').isDisabled());await input.fill('');
  await card.screenshot({path:'/tmp/turnover-focus-'+mode+'.png'});
  await button('Pin overall turnover goal').click();await page.getByRole('region',{name:'Action Plans for your goal',exact:true}).waitFor();const pinned=await state();check(mode+' exact goal can coexist with seeded demo without changing its workspace',pinned.goals.activeId!=='demo-reduce-turnover'&&pinned.goals.goals.find(goal=>goal.id===pinned.goals.activeId)?.statement==='Reduce turnover'&&JSON.stringify(pinned.workspaces['demo-reduce-turnover'])===seeded&&posts.filter(post=>post.message==='Prepare coordinated solution bundles for my exact pinned goal.').length===1);

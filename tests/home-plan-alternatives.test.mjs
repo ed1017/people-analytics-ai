@@ -9,6 +9,7 @@ import {combinePlanSnapshots} from '../lib/home-plan-combination.ts';
 import {planDirections} from '../lib/plan-directions.ts';
 import {proposePlanRevision,readPlanRevisions} from '../lib/home-plan-revisions.ts';
 import {demoBundle,demoBinding,homeDemoExamples} from '../lib/home-demo-catalog.ts';
+import {planReferenceNumbers} from '../lib/home-plan-references.ts';
 
 const context={goalId:'turnover',goal:'Reduce turnover'},binding={version:1,...context,evidenceDigest:'a'.repeat(64),planningDigest:'b'.repeat(64)};
 const entered=value=>({value,kind:'user-entered',basis:'Explicit test planning assumption.'});
@@ -66,6 +67,33 @@ test('ordinary questions, invalid requests, stale sources and other goals alloca
  assert.equal(proposeEditedAlternative(value,context,{requestId:'q',text:'What is the budget?',sourceIds:[],expectedInputs:{}}).status,'not-an-edit');
  assert.equal(proposeCombinedAlternative(value,context,request(value,'combine plan #1 and #2 and remove the check-ins')).status,'needs-review');
  assert.equal(proposeCombinedAlternative(value,context,request(value,'Could you merge Action Plans 1 with 2 into a single plan?','courtesy')).status,'ready');assert.equal(JSON.stringify(value),before);assert.equal(value.nextNumber,4);
+});
+
+test('spoken and digit combination requests resolve the active saved catalog and keep immutable history',()=>{
+ let value=catalog();const first=value.plans[0];
+ value=attachPlanAlternative(value,context,first.id,{inputKey:bundleInputKey(first.draft),attachmentId:'attached-before-combination',at:'2026-10-07T00:00:00Z',acknowledgeUnknowns:true});
+ value=changeAlternativeView(value,context,{order:[...value.order].reverse()});const before=JSON.stringify(value);
+ for(const text of ['I want a combination of action plan one and two','I want a combination of action plan 1 and 2','Please combine action plan one with plan two','Could you merge Action Plans 1 and two into a single plan?']){
+  const pending=request(value,text),out=proposeCombinedAlternative(value,context,pending);
+  assert.deepEqual(pending.sourceIds,['source-A','source-B']);assert.equal(out.status,'ready');assert.equal(out.plan.number,4);
+  assert.equal(out.plan.result.cashEstimate.cash,null);assert.equal(out.plan.result.uniqueParticipants,null);assert.equal(out.plan.result.budget?.headroom??null,null);
+  assert.deepEqual(out.catalog.plans.slice(0,3),value.plans);assert.deepEqual(out.catalog.attachments,value.attachments);assert.equal(JSON.stringify(value),before);
+  assert.deepEqual(readPlanAlternatives(JSON.parse(JSON.stringify(out.catalog)),context),out.catalog);
+  assert.equal(proposeCombinedAlternative(out.catalog,context,pending).reused,true);
+  assert.throws(()=>proposeCombinedAlternative(value,{goalId:'other',goal:context.goal},pending),/active goal changed/);
+ }
+ for(const text of ['I want a combination of action plan one and nine','Combine Action Plan #1 and #99'])assert.throws(()=>request(value,text),/not available/);
+ assert.throws(()=>request(value,'Combine plan one and one'),/different/);
+ assert.equal(proposeCombinedAlternative(value,context,request(value,'I want a combination of action plan one and two and remove check-ins')).status,'needs-review');
+ for(const text of ['Explain the combination of action plan one and two','Compare action plan one and two','Why combine action plan one and two?'])assert.equal(request(value,text),null);
+});
+
+test('word references remain stable labels and never consume unrelated budget or quantity values',()=>{
+ assert.deepEqual(planReferenceNumbers('Compare action plans twenty-one and twenty two with thirty'),[21,22,30]);
+ assert.deepEqual(planReferenceNumbers('Combine Plan one and Plan two'),[1,2]);
+ assert.deepEqual(planReferenceNumbers('Plan #1: set budget to 6000 for two participants'),[1]);
+ assert.deepEqual(planReferenceNumbers('What is FTE?'),[]);
+ assert.deepEqual(planReferenceNumbers('Plan #1.5 or plan #1-2'),[]);
 });
 
 test('combination uses numbered current snapshots after reorder; unknown overlap produces a proposal without made-up affordability',()=>{

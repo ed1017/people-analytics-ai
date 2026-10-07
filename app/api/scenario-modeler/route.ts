@@ -4,6 +4,9 @@ import {
 } from "next/server";
 
 import { supabaseServer } from "../../../lib/supabase-server";
+import { nullableNumber } from "../../../lib/numeric-contract";
+import { hasCompleteReturnedMonthWindow } from "../../../lib/stored-planning";
+import { dataApiErrorResponse } from "../../../lib/data-api-error";
 import {
   buildScenarioSegmentBreakdown,
   runScenarioModel,
@@ -17,26 +20,20 @@ import type {
 
 export const dynamic = "force-dynamic";
 
-type NumericValue =
-  | number
-  | string
-  | null
-  | undefined;
+class ScenarioSourceInputError extends Error {}
 
-function toNumber(
-  value: NumericValue
-) {
-  if (
-    value === null ||
-    value === undefined
-  ) {
-    return 0;
-  }
+function requiredNumber(value: unknown, min = 0, max = Infinity) {
+  const parsed = nullableNumber(value);
+  if (parsed === null || parsed < min || parsed > max) throw new ScenarioSourceInputError();
+  return parsed;
+}
 
-  const parsed = Number(value);
-  return Number.isFinite(parsed)
-    ? parsed
-    : 0;
+function inputFailure(error: unknown) {
+  if (error instanceof ScenarioSourceInputError) return NextResponse.json({
+    error: "Scenario modeling is unavailable because required source inputs are missing, invalid, or incomplete. Refresh the source data before running a scenario.",
+    code: "scenario_inputs_unavailable",
+  }, {status: 503, headers: {"Cache-Control": "no-store"}});
+  return dataApiErrorResponse('scenario-modeler', error);
 }
 
 function clamp(
@@ -56,9 +53,9 @@ function assumptionValue(
   min: number,
   max: number
 ) {
-  const parsed = Number(value);
+  const parsed = nullableNumber(value);
 
-  if (!Number.isFinite(parsed)) {
+  if (parsed === null) {
     return fallback;
   }
 
@@ -115,62 +112,47 @@ async function loadScenarioInputs() {
   ]);
 
   if (defaultsResult.error) {
-    throw new Error(
-      "Scenario defaults: " +
-        defaultsResult.error.message
-    );
+    throw defaultsResult.error;
   }
 
   if (baselineResult.error) {
-    throw new Error(
-      "Baseline plan: " +
-        baselineResult.error.message
-    );
+    throw baselineResult.error;
   }
 
   if (overviewResult.error) {
-    throw new Error(
-      "Current workforce: " +
-        overviewResult.error.message
-    );
+    throw overviewResult.error;
   }
 
   if (businessUnitResult.error) {
-    throw new Error(
-      "Baseline business-unit plan: " +
-        businessUnitResult.error.message
-    );
+    throw businessUnitResult.error;
   }
 
   if (jobFamilyResult.error) {
-    throw new Error(
-      "Baseline job-family plan: " +
-        jobFamilyResult.error.message
-    );
+    throw jobFamilyResult.error;
   }
 
   const defaults: ScenarioModelAssumptions =
     {
-      annual_growth_pct: toNumber(
+      annual_growth_pct: requiredNumber(
         defaultsResult.data
-          ?.baseline_annual_growth_pct
+          ?.baseline_annual_growth_pct, -10, 20
       ),
-      salary_inflation_pct: toNumber(
+      salary_inflation_pct: requiredNumber(
         defaultsResult.data
-          ?.baseline_salary_inflation_pct
+          ?.baseline_salary_inflation_pct, -5, 15
       ),
-      annual_attrition_pct: toNumber(
+      annual_attrition_pct: requiredNumber(
         defaultsResult.data
-          ?.baseline_annual_attrition_pct
+          ?.baseline_annual_attrition_pct, 0, 30
       ),
-      fill_rate_pct: toNumber(
+      fill_rate_pct: requiredNumber(
         defaultsResult.data
-          ?.baseline_fill_rate_pct
+          ?.baseline_fill_rate_pct, 0, 100
       ),
       productivity_hiring_reduction_pct:
-        toNumber(
+        requiredNumber(
           defaultsResult.data
-            ?.baseline_productivity_hiring_reduction_pct
+            ?.baseline_productivity_hiring_reduction_pct, 0, 50
         ),
     };
 
@@ -179,18 +161,20 @@ async function loadScenarioInputs() {
       (row) => ({
         planning_month:
           row.planning_month,
-        planned_headcount: toNumber(
+        planned_headcount: requiredNumber(
           row.planned_headcount
         ),
-        planned_fte: toNumber(
+        planned_fte: requiredNumber(
           row.planned_fte
         ),
         planned_labor_cost_usd:
-          toNumber(
+          requiredNumber(
             row.planned_labor_cost_usd
           ),
       })
     );
+
+  if (!hasCompleteReturnedMonthWindow(baselinePoints.map(point => point.planning_month))) throw new ScenarioSourceInputError();
 
   const businessUnitBaseline:
     ScenarioEngineSegmentBaseline[] =
@@ -200,11 +184,11 @@ async function loadScenarioInputs() {
           row.planning_month,
         segment_code: row.org_code,
         segment_name: row.org_name,
-        planned_headcount: toNumber(
+        planned_headcount: requiredNumber(
           row.planned_headcount
         ),
         planned_labor_cost_usd:
-          toNumber(
+          requiredNumber(
             row.planned_labor_cost_usd
           ),
       })
@@ -218,11 +202,11 @@ async function loadScenarioInputs() {
           row.planning_month,
         segment_code: row.family_code,
         segment_name: row.family_name,
-        planned_headcount: toNumber(
+        planned_headcount: requiredNumber(
           row.planned_headcount
         ),
         planned_labor_cost_usd:
-          toNumber(
+          requiredNumber(
             row.planned_labor_cost_usd
           ),
       })
@@ -234,7 +218,7 @@ async function loadScenarioInputs() {
         ?.snapshot_date ??
       defaultsResult.data?.as_of ??
       "2026-09-30",
-    startingHeadcount: toNumber(
+    startingHeadcount: requiredNumber(
       overviewResult.data?.headcount
     ),
     defaults,
@@ -285,15 +269,7 @@ export async function GET() {
       }
     );
   } catch (error) {
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to load scenario model defaults.",
-      },
-      { status: 500 }
-    );
+    return inputFailure(error);
   }
 }
 
@@ -381,19 +357,6 @@ export async function POST(
       }
     );
   } catch (error) {
-    console.error(
-      "Scenario modeler API error:",
-      error
-    );
-
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to run scenario model.",
-      },
-      { status: 500 }
-    );
+    return inputFailure(error);
   }
 }

@@ -1,0 +1,123 @@
+{
+  "provenance": {
+    "commit": "16018a6358261699a46a8bc3918e61b25bcc9f1e",
+    "path": "lib/home-pack.mjs",
+    "method": "Original git-show module evaluated with unchanged local evidence dependencies; synthetic bounded input. Not a live model result."
+  },
+  "cases": [
+    {
+      "name": "global",
+      "filters": {
+        "country": "all",
+        "org": "all",
+        "level": "all"
+      },
+      "workforceScope": "Selected workforce snapshot: Global workforce; All business units; All levels",
+      "data": {
+        "filter_options": {
+          "countries": [
+            {
+              "value": "US",
+              "label": "United States"
+            },
+            {
+              "value": "CA",
+              "label": "Canada"
+            }
+          ],
+          "business_units": [
+            {
+              "value": "BU-DATAAI",
+              "label": "Data & AI"
+            }
+          ],
+          "levels": [
+            {
+              "value": "IC2",
+              "label": "Analyst / Specialist"
+            }
+          ]
+        },
+        "overview": {
+          "snapshot_date": "2026-09-30",
+          "headcount": 10000,
+          "fte": 9961.2,
+          "voluntary_turnover_ytd_pct": 3.2
+        },
+        "trend": [
+          {
+            "snapshot_date": "2026-09-30",
+            "headcount": 10000,
+            "fte": 9961.2
+          }
+        ]
+      },
+      "binding": {
+        "version": 1,
+        "goalId": "saved-scope",
+        "goal": "Reduce turnover",
+        "evidenceDigest": "cb4f8e40f44919ede930b11d3437850dbba37b8b550dfd4c69a0aad5a91f3f12",
+        "planningDigest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+      },
+      "serializedSha256": "5cf47a8afab17f6e66e716911189383a1b09709547eb26394df437d8ddc060fd",
+      "sourceScope": "Selected workforce snapshot: Selected workforce snapshot: Global workforce; All business units; All levels"
+    },
+    {
+      "name": "US Data and AI IC2",
+      "filters": {
+        "country": "US",
+        "org": "BU-DATAAI",
+        "level": "IC2"
+      },
+      "workforceScope": "Selected workforce snapshot: United States; Data & AI; Analyst / Specialist",
+      "data": {
+        "filter_options": {
+          "countries": [
+            {
+              "value": "US",
+              "label": "United States"
+            },
+            {
+              "value": "CA",
+              "label": "Canada"
+            }
+          ],
+          "business_units": [
+            {
+              "value": "BU-DATAAI",
+              "label": "Data & AI"
+            }
+          ],
+          "levels": [
+            {
+              "value": "IC2",
+              "label": "Analyst / Specialist"
+            }
+          ]
+        },
+        "overview": {
+          "snapshot_date": "2026-09-30",
+          "headcount": 130,
+          "fte": 129.8,
+          "voluntary_turnover_ytd_pct": 3.2
+        },
+        "trend": [
+          {
+            "snapshot_date": "2026-09-30",
+            "headcount": 130,
+            "fte": 129.8
+          }
+        ]
+      },
+      "binding": {
+        "version": 1,
+        "goalId": "saved-scope",
+        "goal": "Reduce turnover",
+        "evidenceDigest": "00f235e5c4cdd8fb5d4651229f5983c33abe48225cf78e68b698c38cc313ee5a",
+        "planningDigest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+      },
+      "serializedSha256": "373781bd892bf3b83de7eab8b707993c070d1d0083ad07a20fd00a3cbe7d6fe6",
+      "sourceScope": "Selected workforce snapshot: Selected workforce snapshot: United States; Data & AI; Analyst / Specialist"
+    }
+  ]
+}

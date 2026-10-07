@@ -1,0 +1,1849 @@
+{
+  "sourceCommit": "979570af119f74ef5b019b3a73474fcbf8cddb81",
+  "provenance": "Produced by unmodified createBundleDraft and prepareIllustrativePilot from sourceCommit. Original user request is retained in goal constraints, a supported pre-fix storage shape ignored by the old initializer.",
+  "request": "Reduce turnover by 2 percentage points over 12 months with a $100,000 illustrative budget",
+  "planningContext": {
+    "goal": "Reduce turnover by 2 percentage points",
+    "constraints": "Reduce turnover by 2 percentage points over 12 months with a $100,000 illustrative budget"
+  },
+  "drafts": [
+    {
+      "version": 1,
+      "status": "proposal",
+      "binding": {
+        "version": 1,
+        "goalId": "saved-retention",
+        "goal": "Reduce turnover by 2 percentage points",
+        "evidenceDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "planningDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "bundle": {
+        "id": "A",
+        "name": "Manager check-ins",
+        "objective": "Run regular manager check-ins and agree workload changes with the reviewed participant group.",
+        "coordination": "Deliver the proposed activity, then review participation and the same turnover measure and period. Confirm applicability against source scope.",
+        "limitation": "Proposed intervention, not a proven cause or validated retention effect. Scope, costs and employee availability require review.",
+        "components": [
+          {
+            "id": "c1",
+            "name": "Manager check-ins",
+            "domain": "manager_workload",
+            "firstStep": "Run fortnightly check-ins with the reviewed participant group and record agreed workload adjustments.",
+            "ownerRole": "People partner and line managers",
+            "dependsOn": [],
+            "evidence": [
+              "W1:summary"
+            ],
+            "limitation": "Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants."
+          },
+          {
+            "id": "c2",
+            "name": "Review delivery and turnover target",
+            "domain": "execution",
+            "firstStep": "Record participation and compare the agreed turnover measure at the end of the reviewed horizon, leaving missing baselines unknown.",
+            "ownerRole": "People analytics partner",
+            "dependsOn": [
+              "c1"
+            ],
+            "evidence": [
+              "W1:summary"
+            ],
+            "limitation": "Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants."
+          }
+        ]
+      },
+      "signature": "{\"id\":\"A\",\"name\":\"Manager check-ins\",\"objective\":\"Run regular manager check-ins and agree workload changes with the reviewed participant group.\",\"coordination\":\"Deliver the proposed activity, then review participation and the same turnover measure and period. Confirm applicability against source scope.\",\"limitation\":\"Proposed intervention, not a proven cause or validated retention effect. Scope, costs and employee availability require review.\",\"components\":[{\"id\":\"c1\",\"name\":\"Manager check-ins\",\"domain\":\"manager_workload\",\"firstStep\":\"Run fortnightly check-ins with the reviewed participant group and record agreed workload adjustments.\",\"ownerRole\":\"People partner and line managers\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants.\"},{\"id\":\"c2\",\"name\":\"Review delivery and turnover target\",\"domain\":\"execution\",\"firstStep\":\"Record participation and compare the agreed turnover measure at the end of the reviewed horizon, leaving missing baselines unknown.\",\"ownerRole\":\"People analytics partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants.\"}]}",
+      "revision": 2,
+      "inputs": {
+        "costPolicy": "cash-hours-v2",
+        "scope": {
+          "population": {
+            "value": "Hypothetical shared pilot group — not selected employees",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "businessUnit": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "jobProfile": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "startMonth": {
+            "value": "2026-11",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "months": {
+            "value": 3,
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "demand": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "capacityRequired": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "requirements": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "comparisonConfirmed": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "currency": "USD"
+        },
+        "capacity": null,
+        "timing": [
+          {
+            "componentId": "c1",
+            "start": {
+              "value": "2026-11-01",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "finish": {
+              "value": "2026-11-14",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          },
+          {
+            "componentId": "c2",
+            "start": {
+              "value": "2026-11-15",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "finish": {
+              "value": "2026-11-28",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "dependenciesConfirmed": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "groups": [
+          {
+            "id": "pilot-group",
+            "label": "Illustrative shared pilot group; not selected employees",
+            "count": {
+              "value": 10,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "memberships": [
+          {
+            "componentId": "c1",
+            "groupIds": [
+              "pilot-group"
+            ],
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          },
+          {
+            "componentId": "c2",
+            "groupIds": [
+              "pilot-group"
+            ],
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          }
+        ],
+        "groupsDisjoint": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "expenses": [
+          {
+            "id": "pilot-manager_workload",
+            "label": "DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes",
+            "kind": "cash",
+            "amount": {
+              "value": 1000,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 3,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          },
+          {
+            "id": "pilot-execution",
+            "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+            "kind": "cash",
+            "amount": {
+              "value": 500,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 1,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "expenseLinks": [
+          {
+            "expenseId": "pilot-manager_workload",
+            "componentIds": [
+              "c1"
+            ],
+            "allocations": null
+          },
+          {
+            "expenseId": "pilot-execution",
+            "componentIds": [
+              "c2"
+            ],
+            "allocations": null
+          }
+        ],
+        "costReviews": [
+          {
+            "componentId": "c1",
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          },
+          {
+            "componentId": "c2",
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          }
+        ],
+        "costsDistinct": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "whatIf": {
+          "version": 1,
+          "kind": "turnover",
+          "scopeKey": "[\"Hypothetical shared pilot group — not selected employees\",\"2026-11\",3]",
+          "baseline": {
+            "value": 15,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "target": {
+            "value": 12,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "population": {
+            "value": 100,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "unitCost": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          }
+        },
+        "deliveryEstimate": {
+          "hoursPerParticipant": {
+            "value": 2,
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          },
+          "coordinationHours": {
+            "value": 16,
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          },
+          "hourlyRate": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "acceptance": {
+            "value": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.",
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          }
+        }
+      },
+      "pilot": {
+        "version": "illustrative-pilot-v1",
+        "preparedAt": "2026-10-01T00:00:00.000Z",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "version": 1,
+      "status": "proposal",
+      "binding": {
+        "version": 1,
+        "goalId": "saved-retention",
+        "goal": "Reduce turnover by 2 percentage points",
+        "evidenceDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "planningDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "bundle": {
+        "id": "B",
+        "name": "Career development practice",
+        "objective": "Run targeted development practice and review progress against agreed role requirements.",
+        "coordination": "Deliver the proposed activity, then review participation and the same turnover measure and period. Confirm applicability against source scope.",
+        "limitation": "Proposed intervention, not a proven cause or validated retention effect. Scope, costs and employee availability require review.",
+        "components": [
+          {
+            "id": "c1",
+            "name": "Career development practice",
+            "domain": "learning",
+            "firstStep": "Run monthly development practice with the reviewed participant group and record progress against role requirements.",
+            "ownerRole": "Learning lead and team managers",
+            "dependsOn": [],
+            "evidence": [
+              "W1:summary"
+            ],
+            "limitation": "Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants."
+          },
+          {
+            "id": "c2",
+            "name": "Review delivery and turnover target",
+            "domain": "execution",
+            "firstStep": "Record participation and compare the agreed turnover measure at the end of the reviewed horizon, leaving missing baselines unknown.",
+            "ownerRole": "People analytics partner",
+            "dependsOn": [
+              "c1"
+            ],
+            "evidence": [
+              "W1:summary"
+            ],
+            "limitation": "Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants."
+          }
+        ]
+      },
+      "signature": "{\"id\":\"B\",\"name\":\"Career development practice\",\"objective\":\"Run targeted development practice and review progress against agreed role requirements.\",\"coordination\":\"Deliver the proposed activity, then review participation and the same turnover measure and period. Confirm applicability against source scope.\",\"limitation\":\"Proposed intervention, not a proven cause or validated retention effect. Scope, costs and employee availability require review.\",\"components\":[{\"id\":\"c1\",\"name\":\"Career development practice\",\"domain\":\"learning\",\"firstStep\":\"Run monthly development practice with the reviewed participant group and record progress against role requirements.\",\"ownerRole\":\"Learning lead and team managers\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants.\"},{\"id\":\"c2\",\"name\":\"Review delivery and turnover target\",\"domain\":\"execution\",\"firstStep\":\"Record participation and compare the agreed turnover measure at the end of the reviewed horizon, leaving missing baselines unknown.\",\"ownerRole\":\"People analytics partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants.\"}]}",
+      "revision": 2,
+      "inputs": {
+        "costPolicy": "cash-hours-v2",
+        "scope": {
+          "population": {
+            "value": "Hypothetical shared pilot group — not selected employees",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "businessUnit": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "jobProfile": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "startMonth": {
+            "value": "2026-11",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "months": {
+            "value": 3,
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "demand": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "capacityRequired": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "requirements": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "comparisonConfirmed": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "currency": "USD"
+        },
+        "capacity": null,
+        "timing": [
+          {
+            "componentId": "c1",
+            "start": {
+              "value": "2026-11-01",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "finish": {
+              "value": "2026-11-14",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          },
+          {
+            "componentId": "c2",
+            "start": {
+              "value": "2026-11-15",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "finish": {
+              "value": "2026-11-28",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "dependenciesConfirmed": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "groups": [
+          {
+            "id": "pilot-group",
+            "label": "Illustrative shared pilot group; not selected employees",
+            "count": {
+              "value": 10,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "memberships": [
+          {
+            "componentId": "c1",
+            "groupIds": [
+              "pilot-group"
+            ],
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          },
+          {
+            "componentId": "c2",
+            "groupIds": [
+              "pilot-group"
+            ],
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          }
+        ],
+        "groupsDisjoint": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "expenses": [
+          {
+            "id": "pilot-learning",
+            "label": "DEMO allowance: Unallocated learning pilot; excludes pay, backfill and vendor quotes",
+            "kind": "cash",
+            "amount": {
+              "value": 2000,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 1,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          },
+          {
+            "id": "pilot-execution",
+            "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+            "kind": "cash",
+            "amount": {
+              "value": 500,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 1,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "expenseLinks": [
+          {
+            "expenseId": "pilot-learning",
+            "componentIds": [
+              "c1"
+            ],
+            "allocations": null
+          },
+          {
+            "expenseId": "pilot-execution",
+            "componentIds": [
+              "c2"
+            ],
+            "allocations": null
+          }
+        ],
+        "costReviews": [
+          {
+            "componentId": "c1",
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          },
+          {
+            "componentId": "c2",
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          }
+        ],
+        "costsDistinct": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "whatIf": {
+          "version": 1,
+          "kind": "turnover",
+          "scopeKey": "[\"Hypothetical shared pilot group — not selected employees\",\"2026-11\",3]",
+          "baseline": {
+            "value": 15,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "target": {
+            "value": 12,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "population": {
+            "value": 100,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "unitCost": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          }
+        },
+        "deliveryEstimate": {
+          "hoursPerParticipant": {
+            "value": 2,
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          },
+          "coordinationHours": {
+            "value": 16,
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          },
+          "hourlyRate": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "acceptance": {
+            "value": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.",
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          }
+        }
+      },
+      "pilot": {
+        "version": "illustrative-pilot-v1",
+        "preparedAt": "2026-10-01T00:00:00.000Z",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "version": 1,
+      "status": "proposal",
+      "binding": {
+        "version": 1,
+        "goalId": "saved-retention",
+        "goal": "Reduce turnover by 2 percentage points",
+        "evidenceDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "planningDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "bundle": {
+        "id": "C",
+        "name": "Internal career pathways",
+        "objective": "Offer voluntary career conversations and reviewed internal assignment opportunities.",
+        "coordination": "Deliver the proposed activity, then review participation and the same turnover measure and period. Confirm applicability against source scope.",
+        "limitation": "Proposed intervention, not a proven cause or validated retention effect. Scope, costs and employee availability require review.",
+        "components": [
+          {
+            "id": "c1",
+            "name": "Internal career pathways",
+            "domain": "mobility",
+            "firstStep": "Run voluntary career conversations for the reviewed participant group and arrange assignments only after readiness and source-team coverage review.",
+            "ownerRole": "Mobility lead and receiving managers",
+            "dependsOn": [],
+            "evidence": [
+              "W1:summary"
+            ],
+            "limitation": "Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants."
+          },
+          {
+            "id": "c2",
+            "name": "Review delivery and turnover target",
+            "domain": "execution",
+            "firstStep": "Record participation and compare the agreed turnover measure at the end of the reviewed horizon, leaving missing baselines unknown.",
+            "ownerRole": "People analytics partner",
+            "dependsOn": [
+              "c1"
+            ],
+            "evidence": [
+              "W1:summary"
+            ],
+            "limitation": "Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants."
+          }
+        ]
+      },
+      "signature": "{\"id\":\"C\",\"name\":\"Internal career pathways\",\"objective\":\"Offer voluntary career conversations and reviewed internal assignment opportunities.\",\"coordination\":\"Deliver the proposed activity, then review participation and the same turnover measure and period. Confirm applicability against source scope.\",\"limitation\":\"Proposed intervention, not a proven cause or validated retention effect. Scope, costs and employee availability require review.\",\"components\":[{\"id\":\"c1\",\"name\":\"Internal career pathways\",\"domain\":\"mobility\",\"firstStep\":\"Run voluntary career conversations for the reviewed participant group and arrange assignments only after readiness and source-team coverage review.\",\"ownerRole\":\"Mobility lead and receiving managers\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants.\"},{\"id\":\"c2\",\"name\":\"Review delivery and turnover target\",\"domain\":\"execution\",\"firstStep\":\"Record participation and compare the agreed turnover measure at the end of the reviewed horizon, leaving missing baselines unknown.\",\"ownerRole\":\"People analytics partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants.\"}]}",
+      "revision": 2,
+      "inputs": {
+        "costPolicy": "cash-hours-v2",
+        "scope": {
+          "population": {
+            "value": "Hypothetical shared pilot group — not selected employees",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "businessUnit": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "jobProfile": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "startMonth": {
+            "value": "2026-11",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "months": {
+            "value": 3,
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "demand": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "capacityRequired": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "requirements": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "comparisonConfirmed": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "currency": "USD"
+        },
+        "capacity": null,
+        "timing": [
+          {
+            "componentId": "c1",
+            "start": {
+              "value": "2026-11-01",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "finish": {
+              "value": "2026-11-14",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          },
+          {
+            "componentId": "c2",
+            "start": {
+              "value": "2026-11-15",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "finish": {
+              "value": "2026-11-28",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "dependenciesConfirmed": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "groups": [
+          {
+            "id": "pilot-group",
+            "label": "Illustrative shared pilot group; not selected employees",
+            "count": {
+              "value": 10,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "memberships": [
+          {
+            "componentId": "c1",
+            "groupIds": [
+              "pilot-group"
+            ],
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          },
+          {
+            "componentId": "c2",
+            "groupIds": [
+              "pilot-group"
+            ],
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          }
+        ],
+        "groupsDisjoint": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "expenses": [
+          {
+            "id": "pilot-mobility",
+            "label": "DEMO allowance: Mobility review coordination; excludes pay, backfill and vendor quotes",
+            "kind": "cash",
+            "amount": {
+              "value": 1000,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 1,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          },
+          {
+            "id": "pilot-execution",
+            "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+            "kind": "cash",
+            "amount": {
+              "value": 500,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 1,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "expenseLinks": [
+          {
+            "expenseId": "pilot-mobility",
+            "componentIds": [
+              "c1"
+            ],
+            "allocations": null
+          },
+          {
+            "expenseId": "pilot-execution",
+            "componentIds": [
+              "c2"
+            ],
+            "allocations": null
+          }
+        ],
+        "costReviews": [
+          {
+            "componentId": "c1",
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          },
+          {
+            "componentId": "c2",
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          }
+        ],
+        "costsDistinct": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "whatIf": {
+          "version": 1,
+          "kind": "turnover",
+          "scopeKey": "[\"Hypothetical shared pilot group — not selected employees\",\"2026-11\",3]",
+          "baseline": {
+            "value": 15,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "target": {
+            "value": 12,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "population": {
+            "value": 100,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "unitCost": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          }
+        },
+        "deliveryEstimate": {
+          "hoursPerParticipant": {
+            "value": 2,
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          },
+          "coordinationHours": {
+            "value": 16,
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          },
+          "hourlyRate": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "acceptance": {
+            "value": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.",
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          }
+        }
+      },
+      "pilot": {
+        "version": "illustrative-pilot-v1",
+        "preparedAt": "2026-10-01T00:00:00.000Z",
+        "timezone": "UTC"
+      }
+    }
+  ],
+  "fullDrafts": [
+    {
+      "version": 1,
+      "status": "proposal",
+      "binding": {
+        "version": 1,
+        "goalId": "saved-retention",
+        "goal": "Reduce turnover by 2 percentage points over 12 months with a $100,000 illustrative budget",
+        "evidenceDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "planningDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "bundle": {
+        "id": "A",
+        "name": "Manager check-ins",
+        "objective": "Run regular manager check-ins and agree workload changes with the reviewed participant group.",
+        "coordination": "Deliver the proposed activity, then review participation and the same turnover measure and period. Confirm applicability against source scope.",
+        "limitation": "Proposed intervention, not a proven cause or validated retention effect. Scope, costs and employee availability require review.",
+        "components": [
+          {
+            "id": "c1",
+            "name": "Manager check-ins",
+            "domain": "manager_workload",
+            "firstStep": "Run fortnightly check-ins with the reviewed participant group and record agreed workload adjustments.",
+            "ownerRole": "People partner and line managers",
+            "dependsOn": [],
+            "evidence": [
+              "W1:summary"
+            ],
+            "limitation": "Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants."
+          },
+          {
+            "id": "c2",
+            "name": "Review delivery and turnover target",
+            "domain": "execution",
+            "firstStep": "Record participation and compare the agreed turnover measure at the end of the reviewed horizon, leaving missing baselines unknown.",
+            "ownerRole": "People analytics partner",
+            "dependsOn": [
+              "c1"
+            ],
+            "evidence": [
+              "W1:summary"
+            ],
+            "limitation": "Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants."
+          }
+        ]
+      },
+      "signature": "{\"id\":\"A\",\"name\":\"Manager check-ins\",\"objective\":\"Run regular manager check-ins and agree workload changes with the reviewed participant group.\",\"coordination\":\"Deliver the proposed activity, then review participation and the same turnover measure and period. Confirm applicability against source scope.\",\"limitation\":\"Proposed intervention, not a proven cause or validated retention effect. Scope, costs and employee availability require review.\",\"components\":[{\"id\":\"c1\",\"name\":\"Manager check-ins\",\"domain\":\"manager_workload\",\"firstStep\":\"Run fortnightly check-ins with the reviewed participant group and record agreed workload adjustments.\",\"ownerRole\":\"People partner and line managers\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants.\"},{\"id\":\"c2\",\"name\":\"Review delivery and turnover target\",\"domain\":\"execution\",\"firstStep\":\"Record participation and compare the agreed turnover measure at the end of the reviewed horizon, leaving missing baselines unknown.\",\"ownerRole\":\"People analytics partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants.\"}]}",
+      "revision": 2,
+      "inputs": {
+        "costPolicy": "cash-hours-v2",
+        "scope": {
+          "population": {
+            "value": "Hypothetical shared pilot group — not selected employees",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "businessUnit": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "jobProfile": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "startMonth": {
+            "value": "2026-11",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "months": {
+            "value": 12,
+            "kind": "user-entered",
+            "basis": "Explicit shared horizon retained from user conversation."
+          },
+          "demand": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "capacityRequired": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "requirements": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "comparisonConfirmed": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "currency": "USD"
+        },
+        "capacity": null,
+        "timing": [
+          {
+            "componentId": "c1",
+            "start": {
+              "value": "2026-11-01",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "finish": {
+              "value": "2026-11-14",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          },
+          {
+            "componentId": "c2",
+            "start": {
+              "value": "2026-11-15",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "finish": {
+              "value": "2026-11-28",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "dependenciesConfirmed": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "groups": [
+          {
+            "id": "pilot-group",
+            "label": "Illustrative shared pilot group; not selected employees",
+            "count": {
+              "value": 10,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "memberships": [
+          {
+            "componentId": "c1",
+            "groupIds": [
+              "pilot-group"
+            ],
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          },
+          {
+            "componentId": "c2",
+            "groupIds": [
+              "pilot-group"
+            ],
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          }
+        ],
+        "groupsDisjoint": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "expenses": [
+          {
+            "id": "pilot-manager_workload",
+            "label": "DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes",
+            "kind": "cash",
+            "amount": {
+              "value": 1000,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 3,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          },
+          {
+            "id": "pilot-execution",
+            "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+            "kind": "cash",
+            "amount": {
+              "value": 500,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 1,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "expenseLinks": [
+          {
+            "expenseId": "pilot-manager_workload",
+            "componentIds": [
+              "c1"
+            ],
+            "allocations": null
+          },
+          {
+            "expenseId": "pilot-execution",
+            "componentIds": [
+              "c2"
+            ],
+            "allocations": null
+          }
+        ],
+        "costReviews": [
+          {
+            "componentId": "c1",
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          },
+          {
+            "componentId": "c2",
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          }
+        ],
+        "costsDistinct": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "whatIf": {
+          "version": 1,
+          "kind": "turnover",
+          "scopeKey": "[\"Hypothetical shared pilot group — not selected employees\",\"2026-11\",12]",
+          "baseline": {
+            "value": 15,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "target": {
+            "value": 12,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "population": {
+            "value": 100,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "unitCost": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          }
+        },
+        "deliveryEstimate": {
+          "hoursPerParticipant": {
+            "value": 2,
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          },
+          "coordinationHours": {
+            "value": 16,
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          },
+          "hourlyRate": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "acceptance": {
+            "value": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.",
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          }
+        }
+      },
+      "pilot": {
+        "version": "illustrative-pilot-v1",
+        "preparedAt": "2026-10-01T00:00:00.000Z",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "version": 1,
+      "status": "proposal",
+      "binding": {
+        "version": 1,
+        "goalId": "saved-retention",
+        "goal": "Reduce turnover by 2 percentage points over 12 months with a $100,000 illustrative budget",
+        "evidenceDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "planningDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "bundle": {
+        "id": "B",
+        "name": "Career development practice",
+        "objective": "Run targeted development practice and review progress against agreed role requirements.",
+        "coordination": "Deliver the proposed activity, then review participation and the same turnover measure and period. Confirm applicability against source scope.",
+        "limitation": "Proposed intervention, not a proven cause or validated retention effect. Scope, costs and employee availability require review.",
+        "components": [
+          {
+            "id": "c1",
+            "name": "Career development practice",
+            "domain": "learning",
+            "firstStep": "Run monthly development practice with the reviewed participant group and record progress against role requirements.",
+            "ownerRole": "Learning lead and team managers",
+            "dependsOn": [],
+            "evidence": [
+              "W1:summary"
+            ],
+            "limitation": "Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants."
+          },
+          {
+            "id": "c2",
+            "name": "Review delivery and turnover target",
+            "domain": "execution",
+            "firstStep": "Record participation and compare the agreed turnover measure at the end of the reviewed horizon, leaving missing baselines unknown.",
+            "ownerRole": "People analytics partner",
+            "dependsOn": [
+              "c1"
+            ],
+            "evidence": [
+              "W1:summary"
+            ],
+            "limitation": "Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants."
+          }
+        ]
+      },
+      "signature": "{\"id\":\"B\",\"name\":\"Career development practice\",\"objective\":\"Run targeted development practice and review progress against agreed role requirements.\",\"coordination\":\"Deliver the proposed activity, then review participation and the same turnover measure and period. Confirm applicability against source scope.\",\"limitation\":\"Proposed intervention, not a proven cause or validated retention effect. Scope, costs and employee availability require review.\",\"components\":[{\"id\":\"c1\",\"name\":\"Career development practice\",\"domain\":\"learning\",\"firstStep\":\"Run monthly development practice with the reviewed participant group and record progress against role requirements.\",\"ownerRole\":\"Learning lead and team managers\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants.\"},{\"id\":\"c2\",\"name\":\"Review delivery and turnover target\",\"domain\":\"execution\",\"firstStep\":\"Record participation and compare the agreed turnover measure at the end of the reviewed horizon, leaving missing baselines unknown.\",\"ownerRole\":\"People analytics partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants.\"}]}",
+      "revision": 2,
+      "inputs": {
+        "costPolicy": "cash-hours-v2",
+        "scope": {
+          "population": {
+            "value": "Hypothetical shared pilot group — not selected employees",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "businessUnit": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "jobProfile": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "startMonth": {
+            "value": "2026-11",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "months": {
+            "value": 12,
+            "kind": "user-entered",
+            "basis": "Explicit shared horizon retained from user conversation."
+          },
+          "demand": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "capacityRequired": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "requirements": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "comparisonConfirmed": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "currency": "USD"
+        },
+        "capacity": null,
+        "timing": [
+          {
+            "componentId": "c1",
+            "start": {
+              "value": "2026-11-01",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "finish": {
+              "value": "2026-11-14",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          },
+          {
+            "componentId": "c2",
+            "start": {
+              "value": "2026-11-15",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "finish": {
+              "value": "2026-11-28",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "dependenciesConfirmed": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "groups": [
+          {
+            "id": "pilot-group",
+            "label": "Illustrative shared pilot group; not selected employees",
+            "count": {
+              "value": 10,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "memberships": [
+          {
+            "componentId": "c1",
+            "groupIds": [
+              "pilot-group"
+            ],
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          },
+          {
+            "componentId": "c2",
+            "groupIds": [
+              "pilot-group"
+            ],
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          }
+        ],
+        "groupsDisjoint": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "expenses": [
+          {
+            "id": "pilot-learning",
+            "label": "DEMO allowance: Unallocated learning pilot; excludes pay, backfill and vendor quotes",
+            "kind": "cash",
+            "amount": {
+              "value": 2000,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 1,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          },
+          {
+            "id": "pilot-execution",
+            "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+            "kind": "cash",
+            "amount": {
+              "value": 500,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 1,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "expenseLinks": [
+          {
+            "expenseId": "pilot-learning",
+            "componentIds": [
+              "c1"
+            ],
+            "allocations": null
+          },
+          {
+            "expenseId": "pilot-execution",
+            "componentIds": [
+              "c2"
+            ],
+            "allocations": null
+          }
+        ],
+        "costReviews": [
+          {
+            "componentId": "c1",
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          },
+          {
+            "componentId": "c2",
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          }
+        ],
+        "costsDistinct": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "whatIf": {
+          "version": 1,
+          "kind": "turnover",
+          "scopeKey": "[\"Hypothetical shared pilot group — not selected employees\",\"2026-11\",12]",
+          "baseline": {
+            "value": 15,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "target": {
+            "value": 12,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "population": {
+            "value": 100,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "unitCost": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          }
+        },
+        "deliveryEstimate": {
+          "hoursPerParticipant": {
+            "value": 2,
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          },
+          "coordinationHours": {
+            "value": 16,
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          },
+          "hourlyRate": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "acceptance": {
+            "value": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.",
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          }
+        }
+      },
+      "pilot": {
+        "version": "illustrative-pilot-v1",
+        "preparedAt": "2026-10-01T00:00:00.000Z",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "version": 1,
+      "status": "proposal",
+      "binding": {
+        "version": 1,
+        "goalId": "saved-retention",
+        "goal": "Reduce turnover by 2 percentage points over 12 months with a $100,000 illustrative budget",
+        "evidenceDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "planningDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "bundle": {
+        "id": "C",
+        "name": "Internal career pathways",
+        "objective": "Offer voluntary career conversations and reviewed internal assignment opportunities.",
+        "coordination": "Deliver the proposed activity, then review participation and the same turnover measure and period. Confirm applicability against source scope.",
+        "limitation": "Proposed intervention, not a proven cause or validated retention effect. Scope, costs and employee availability require review.",
+        "components": [
+          {
+            "id": "c1",
+            "name": "Internal career pathways",
+            "domain": "mobility",
+            "firstStep": "Run voluntary career conversations for the reviewed participant group and arrange assignments only after readiness and source-team coverage review.",
+            "ownerRole": "Mobility lead and receiving managers",
+            "dependsOn": [],
+            "evidence": [
+              "W1:summary"
+            ],
+            "limitation": "Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants."
+          },
+          {
+            "id": "c2",
+            "name": "Review delivery and turnover target",
+            "domain": "execution",
+            "firstStep": "Record participation and compare the agreed turnover measure at the end of the reviewed horizon, leaving missing baselines unknown.",
+            "ownerRole": "People analytics partner",
+            "dependsOn": [
+              "c1"
+            ],
+            "evidence": [
+              "W1:summary"
+            ],
+            "limitation": "Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants."
+          }
+        ]
+      },
+      "signature": "{\"id\":\"C\",\"name\":\"Internal career pathways\",\"objective\":\"Offer voluntary career conversations and reviewed internal assignment opportunities.\",\"coordination\":\"Deliver the proposed activity, then review participation and the same turnover measure and period. Confirm applicability against source scope.\",\"limitation\":\"Proposed intervention, not a proven cause or validated retention effect. Scope, costs and employee availability require review.\",\"components\":[{\"id\":\"c1\",\"name\":\"Internal career pathways\",\"domain\":\"mobility\",\"firstStep\":\"Run voluntary career conversations for the reviewed participant group and arrange assignments only after readiness and source-team coverage review.\",\"ownerRole\":\"Mobility lead and receiving managers\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants.\"},{\"id\":\"c2\",\"name\":\"Review delivery and turnover target\",\"domain\":\"execution\",\"firstStep\":\"Record participation and compare the agreed turnover measure at the end of the reviewed horizon, leaving missing baselines unknown.\",\"ownerRole\":\"People analytics partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Workforce snapshot provides population context only. It does not establish the intervention effect or identify eligible participants.\"}]}",
+      "revision": 2,
+      "inputs": {
+        "costPolicy": "cash-hours-v2",
+        "scope": {
+          "population": {
+            "value": "Hypothetical shared pilot group — not selected employees",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "businessUnit": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "jobProfile": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "startMonth": {
+            "value": "2026-11",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "months": {
+            "value": 12,
+            "kind": "user-entered",
+            "basis": "Explicit shared horizon retained from user conversation."
+          },
+          "demand": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "capacityRequired": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "requirements": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "comparisonConfirmed": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "currency": "USD"
+        },
+        "capacity": null,
+        "timing": [
+          {
+            "componentId": "c1",
+            "start": {
+              "value": "2026-11-01",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "finish": {
+              "value": "2026-11-14",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          },
+          {
+            "componentId": "c2",
+            "start": {
+              "value": "2026-11-15",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "finish": {
+              "value": "2026-11-28",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "dependenciesConfirmed": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "groups": [
+          {
+            "id": "pilot-group",
+            "label": "Illustrative shared pilot group; not selected employees",
+            "count": {
+              "value": 10,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "memberships": [
+          {
+            "componentId": "c1",
+            "groupIds": [
+              "pilot-group"
+            ],
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          },
+          {
+            "componentId": "c2",
+            "groupIds": [
+              "pilot-group"
+            ],
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          }
+        ],
+        "groupsDisjoint": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "expenses": [
+          {
+            "id": "pilot-mobility",
+            "label": "DEMO allowance: Mobility review coordination; excludes pay, backfill and vendor quotes",
+            "kind": "cash",
+            "amount": {
+              "value": 1000,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 1,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          },
+          {
+            "id": "pilot-execution",
+            "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+            "kind": "cash",
+            "amount": {
+              "value": 500,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 1,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-01T00:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            }
+          }
+        ],
+        "expenseLinks": [
+          {
+            "expenseId": "pilot-mobility",
+            "componentIds": [
+              "c1"
+            ],
+            "allocations": null
+          },
+          {
+            "expenseId": "pilot-execution",
+            "componentIds": [
+              "c2"
+            ],
+            "allocations": null
+          }
+        ],
+        "costReviews": [
+          {
+            "componentId": "c1",
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          },
+          {
+            "componentId": "c2",
+            "complete": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          }
+        ],
+        "costsDistinct": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "whatIf": {
+          "version": 1,
+          "kind": "turnover",
+          "scopeKey": "[\"Hypothetical shared pilot group — not selected employees\",\"2026-11\",12]",
+          "baseline": {
+            "value": 15,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "target": {
+            "value": 12,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "population": {
+            "value": 100,
+            "kind": "illustrative",
+            "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+          },
+          "unitCost": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          }
+        },
+        "deliveryEstimate": {
+          "hoursPerParticipant": {
+            "value": 2,
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          },
+          "coordinationHours": {
+            "value": 16,
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          },
+          "hourlyRate": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "acceptance": {
+            "value": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.",
+            "kind": "illustrative",
+            "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+          }
+        }
+      },
+      "pilot": {
+        "version": "illustrative-pilot-v1",
+        "preparedAt": "2026-10-01T00:00:00.000Z",
+        "timezone": "UTC"
+      }
+    }
+  ]
+}

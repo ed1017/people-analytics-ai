@@ -37,10 +37,14 @@ test('only successful receipts for the expected real control advance the guide',
  const receipt=(type,planId,number)=>({goalId:'demo',type,planId,number});
  assert.equal(guidedReceiptStep(2,receipt('pinned'),'demo',null,null),3);
  assert.equal(guidedReceiptStep(3,receipt('selected','A',1),'demo',null,null),4);
- assert.equal(guidedReceiptStep(3,receipt('selected','B',2),'demo',null,null),null);
+ assert.equal(guidedReceiptStep(3,receipt('selected','B',2),'demo',null,null),4);
+ assert.equal(guidedReceiptStep(3,receipt('selected','C',3),'demo',null,null),4);
+ for(const number of [0,-1,NaN,1.5])assert.equal(guidedReceiptStep(3,receipt('selected','B',number),'demo',null,null),null);
+ assert.equal(guidedReceiptStep(3,receipt('selected',undefined,2),'demo',null,null),null);
  assert.equal(guidedReceiptStep(4,receipt('attached','B',2),'demo','A',null),null);
  assert.equal(guidedReceiptStep(4,receipt('attached','A',1),'demo','A',null),5);
- assert.equal(guidedReceiptStep(5,receipt('edited','alternative-4',4),'demo','A',null),6);
+ assert.equal(guidedReceiptStep(5,{...receipt('edited','alternative-4',4),sourcePlanId:'B'},'demo','B',null),6);
+ for(const sourcePlanId of ['A',undefined])assert.equal(guidedReceiptStep(5,{...receipt('edited','alternative-4',4),sourcePlanId},'demo','B',null),null);
  assert.equal(guidedReceiptStep(6,receipt('selected','alternative-4',4),'demo','A','alternative-4'),7);
  assert.equal(guidedReceiptStep(7,receipt('attached','alternative-4',4),'demo','A','alternative-4'),8);
  assert.equal(guidedReceiptStep(7,{...receipt('attached','staffing-5',5),sourcePlanId:'alternative-4'},'demo','A','alternative-4'),8);

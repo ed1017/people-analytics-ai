@@ -157,6 +157,10 @@
   border-top-width: 1px;
 }
 
+/* The once-only introduction must leave the composer reachable on short screens. */
+.app-ai-panel:has([data-workforce-intro]) [data-ai-conversation-body] { overflow-y: auto; }
+.app-ai-panel:has([data-workforce-intro]) [data-ai-conversation-body] > * { flex-shrink: 0; }
+
 @media (min-width: 768px) {
   .app-shell.app-ai-left {
     grid-template-columns: var(--nav-width) var(--ai-width) var(--divider-width) minmax(0, 1fr);
@@ -453,7 +457,7 @@
 @media (max-width: 639px) {
   .goal-toolbar > [aria-label="Goal controls"] { flex-basis: 100%; }
 }
-.home-workspace [aria-label="Home chat workspace"] { max-height: max(4rem, calc(var(--home-visible-height, 100dvh) - var(--home-reading-header-height, var(--app-header-height, 120px)) - var(--home-composer-height, 180px) - 1rem)); }
+.home-workspace [aria-label="Home chat workspace"] { max-height: var(--home-reading-height, max(4rem, calc(var(--home-visible-height, 100dvh) - var(--home-reading-header-height, var(--app-header-height, 120px)) - var(--home-composer-height, 180px) - 1rem))); }
 .home-workspace :is(button, summary, [tabindex], h2, h3) { scroll-margin-top: calc(var(--app-header-height, 120px) + .75rem); }
 
 @media (max-height: 600px) {
@@ -663,4 +667,9 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
   outline: 4px solid #8c3957;
   outline-offset: 4px;
   scroll-margin-block: 110px;
+  /* Reserve the arrow's space so its label never covers the preceding content. */
+  margin-top: 104px;
+}
+:has(> [data-guided-highlight="true"]) {
+  align-items: flex-end;
 }

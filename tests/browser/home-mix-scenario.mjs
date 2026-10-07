@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Built Home and its real worker. Only evidence/model transport is stubbed.
 import assert from 'node:assert/strict';
 import {bundleProposalFixture} from '../fixtures/home-bundles.mjs';
@@ -16,7 +17,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  });
  const button=name=>page.getByRole('button',{name,exact:true}),chat=page.getByLabel('Ask Workforce AI',{exact:true}),mix=page.getByRole('region',{name:'Automatic staffing search',exact:true}),panel=page.getByRole('region',{name:'Action Plans for your goal',exact:true}),state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
  const send=async text=>{await chat.fill(text);await button('Send overview question').click()},ready=async()=>{await mix.getByLabel('Staffing search coverage').waitFor()},change=async text=>{const old=await mix.getAttribute('data-mix-fingerprint');await send(text);await page.waitForFunction(old=>{const n=document.querySelector('[aria-label="Automatic staffing search"]');return n?.dataset.mixFingerprint&&n.dataset.mixFingerprint!==old},old);await ready()};
- await page.goto(base);await button('Open goal: Add 5 roles over 12 months').click();await ready();
+ await page.goto(base);await dismissHomeOnboarding(page);await button('Open goal: Add 5 roles over 12 months').click();await ready();
  const demo=(await state()).workspaces['demo-capacity-mix'].fields.homeSolutionBundlesV1.attachments[0];
  check(mode+' first-run capacity demo automatically evaluates 12 real combinations',await mix.getByLabel('Staffing search coverage').getByText(/12 combinations evaluated.*13 calculator calls/).isVisible()&&posts.length===0);
  check(mode+' fictional basis and useful mixed result are visible',await mix.getByText(/Explicit fictional staffing scenario\./).isVisible()&&await mix.getByText(/Build → Develop internal candidates; Fictional Build group: 3/).isVisible()&&await mix.getByText(/Complete cash \$26,800 USD/).isVisible()&&!/\b(?:illustrative|synthetic)\b/i.test(await mix.textContent()));

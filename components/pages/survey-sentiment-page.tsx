@@ -1,5 +1,7 @@
 "use client";
 
+import { knownDifference } from "@/lib/numeric-contract";
+
 import {SyntheticDomainDemo} from "@/components/synthetic-domain-demo";
 
 import {
@@ -12,7 +14,7 @@ import {
   YAxis,
 } from "recharts";
 
-import { formatPercent } from "@/lib/display-format";
+import { formatPercent, formatWholeCount, formatMetric } from "@/lib/display-format";
 import type {
   SurveyListeningDimension,
   SurveySentimentResponse,
@@ -63,28 +65,28 @@ function DimensionList({
                 {row.dimension}
               </p>
               <p className="text-xs text-muted-foreground">
-                {row.avg_score.toFixed(2)} / 5 average
+                {formatMetric(row.avg_score, 2, " / 5 average")}
               </p>
             </div>
             <p className="text-sm font-semibold">
-              {row.favorable_pct.toFixed(1)}%
+              {formatMetric(row.favorable_pct, 1, "%")}
               {showExitDetails && <span className="block text-xs font-normal text-muted-foreground">favorable</span>}
             </p>
           </div>
           {showExitDetails && (
             <div className="mt-2 text-xs text-muted-foreground">
               <p>{row.question_text}</p>
-              <p className="mt-1">{row.separation_respondents.toLocaleString()} exit-survey respondents · 1–5 scale</p>
+              <p className="mt-1">{formatWholeCount(row.separation_respondents)} exit-survey respondents · 1–5 scale</p>
             </div>
           )}
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
+          {typeof row.favorable_pct === "number" && Number.isFinite(row.favorable_pct) && <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
             <div
               className="h-full rounded-full bg-foreground"
               style={{
-                width: Math.max(2, row.favorable_pct) + "%",
+                width: Math.max(0, Math.min(100, row.favorable_pct)) + "%",
               }}
             />
-          </div>
+          </div>}
         </div>
       ))}
     </div>
@@ -103,7 +105,7 @@ export function SurveySentimentPage({
       : null;
   const engagementDelta =
     summary && priorEngagement
-      ? summary.engagement_favorable_pct - priorEngagement.favorable_pct
+      ? knownDifference(summary.engagement_favorable_pct, priorEngagement.favorable_pct)
       : null;
 
   const onboarding30 =
@@ -118,7 +120,7 @@ export function SurveySentimentPage({
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">
-            Track engagement, pulse, manager feedback and onboarding experience. Exit-survey feedback is in Attrition.
+            Track engagement, pulse, manager feedback and onboarding experience. Each survey has its own respondents and period. Exit-survey feedback is in Attrition.
           </p>
         </div>
 
@@ -147,7 +149,7 @@ export function SurveySentimentPage({
                 Engagement Favorable
               </p>
               <p className="mt-2 text-3xl font-semibold">
-                {summary.engagement_favorable_pct.toFixed(1)}%
+                {formatMetric(summary.engagement_favorable_pct, 1, "%")}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 {engagementDelta === null
@@ -163,11 +165,11 @@ export function SurveySentimentPage({
                 Participation
               </p>
               <p className="mt-2 text-3xl font-semibold">
-                {summary.engagement_participation_pct.toFixed(1)}%
+                {formatMetric(summary.engagement_participation_pct, 1, "%")}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                {summary.engagement_respondents.toLocaleString()} of{" "}
-                {summary.engagement_eligible_population.toLocaleString()}
+                {formatWholeCount(summary.engagement_respondents)} of{" "}
+                {formatWholeCount(summary.engagement_eligible_population)}
               </p>
             </div>
 
@@ -176,7 +178,7 @@ export function SurveySentimentPage({
                 Manager Favorable
               </p>
               <p className="mt-2 text-3xl font-semibold">
-                {summary.manager_favorable_pct.toFixed(1)}%
+                {formatMetric(summary.manager_favorable_pct, 1, "%")}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 2026 Manager Effectiveness Survey
@@ -188,7 +190,7 @@ export function SurveySentimentPage({
                 90-Day Onboarding
               </p>
               <p className="mt-2 text-3xl font-semibold">
-                {summary.onboarding_90_favorable_pct.toFixed(1)}%
+                {formatMetric(summary.onboarding_90_favorable_pct, 1, "%")}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 Favorable across 90-day onboarding items
@@ -238,7 +240,7 @@ export function SurveySentimentPage({
                         formatYear(String(value))
                       }
                       formatter={(value) =>
-                        formatPercent(Number(value))
+                        typeof value === "number" ? formatPercent(value) : "Unavailable"
                       }
                       contentStyle={{
                         backgroundColor: "var(--background)",
@@ -318,13 +320,13 @@ export function SurveySentimentPage({
                           {row.org_name}
                         </td>
                         <td className="py-3 pr-4 text-right">
-                          {row.respondents.toLocaleString()}
+                          {formatWholeCount(row.respondents)}
                         </td>
                         <td className="py-3 pr-4 text-right">
-                          {row.avg_score.toFixed(2)}
+                          {formatMetric(row.avg_score, 2)}
                         </td>
                         <td className="py-3 text-right font-semibold">
-                          {row.favorable_pct.toFixed(1)}%
+                          {formatMetric(row.favorable_pct, 1, "%")}
                         </td>
                       </tr>
                     ))}
@@ -396,7 +398,9 @@ export function SurveySentimentPage({
           </div>
 
           <div className="mt-6 rounded-md border bg-muted/20 p-4 text-xs text-muted-foreground">
-            {summary.open_text_comments.toLocaleString()} open-text survey comments across all surveys are available in the synthetic listening dataset; this is not an exit-only count. This version does not yet run qualitative theme or sentiment analysis on those comments, so no themes are inferred here.
+            {summary.open_text_comments === null
+              ? "Open-text survey comment count is unavailable."
+              : `${formatWholeCount(summary.open_text_comments)} open-text survey comments across all surveys are available in the synthetic listening dataset; this is not an exit-only count.`} This version does not yet run qualitative theme or sentiment analysis on those comments, so no themes are inferred here.
           </div>
         </>
       ) : (

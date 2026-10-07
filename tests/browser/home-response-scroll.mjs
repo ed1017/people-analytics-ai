@@ -19,16 +19,16 @@ try{for(const [mode,width,height] of [['desktop-expanded',1366,900],['desktop-co
   return route.continue();
  });
  const button=name=>page.getByRole('button',{name,exact:true}),chat=page.getByLabel('Ask Workforce AI',{exact:true}),status=page.getByRole('status',{name:'AI answer status',exact:true});
- await page.goto(base);await button('How can we reduce turnover?').waitFor();if(mode.endsWith('expanded'))await button('Show instructions').click();await button('How can we reduce turnover?').scrollIntoViewIfNeeded();
+ await page.goto(base);await page.getByRole('dialog',{name:'Home instructions',exact:true}).waitFor();await button('Close instructions').click();await button('How can we reduce turnover?').waitFor();if(mode.endsWith('expanded')){await button('Show instructions').click();await page.keyboard.press('Escape');}await button('How can we reduce turnover?').scrollIntoViewIfNeeded();
  const before=await page.evaluate(()=>scrollY);await button('How can we reduce turnover?').click();await status.waitFor();
  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
  const pending=await page.evaluate(geometry,'[aria-label="AI answer status"]');console.log(JSON.stringify({mode,before,pending,starters:await page.getByRole('region',{name:'Starting guide'}).count()}));await page.screenshot({path:'/tmp/home-response-pending-'+mode+'.png'});
- check(mode+' starter collapse reveals pending answer in the actual reading viewport',pending.visible&&await button('Show instructions').count()===1);
+ check(mode+' starter submission after dismissed instructions reveals pending answer in the actual reading viewport',pending.visible&&await button('Show instructions').count()===1);
  release();await status.waitFor({state:'hidden'});await page.locator('[aria-label="Overview conversation"] [data-chat-role="assistant"]').last().waitFor();
  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
  const answerBox=await page.evaluate(geometry,'[aria-label="Overview conversation"] [data-chat-role="assistant"]');console.log(JSON.stringify({mode,answerBox}));if(!answerBox.topVisible)await page.screenshot({path:'/tmp/home-response-scroll-failure-'+mode+'.png'});check(mode+' long answer opens at its top above the later Pin card',answerBox.topVisible);check(mode+' original question remains at the start of the new response',(await page.evaluate(geometry,'[data-home-response-start]')).topVisible);await page.screenshot({path:'/tmp/home-response-answer-'+mode+'.png'});
  // Submit from the keyboard while keeping composer focus, then deliberately scroll away.
- await button('Show instructions').click();await chat.fill('What should I check next?');await chat.focus();
+ await button('Show instructions').click();await button('Close instructions').click();await chat.fill('What should I check next?');await chat.focus();
  await chat.evaluate(node=>node.form.requestSubmit());await status.waitFor();
  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
  check(mode+' typed submission preserves focus and reveals response once',(await page.evaluate(geometry,'[aria-label="AI answer status"]')).visible&&await chat.evaluate(node=>node===document.activeElement));

@@ -13,8 +13,8 @@ type ScenarioModelingDestinationProps =
     activePlanningEnd: PlanningPoint | null;
     planningNetChange: number | null;
     planningHeadcountDeltaVsBaseline: number | null;
-    planningTotalHires: number;
-    planningTotalExits: number;
+    planningTotalHires: number | null;
+    planningTotalExits: number | null;
   };
 
 export function ScenarioModelingDestination({

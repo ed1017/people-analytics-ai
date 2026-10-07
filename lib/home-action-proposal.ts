@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {homeAnswerScopeViolation} from './home-answer-scope.ts';
 import {normalizeHomePack} from './home-pack.mjs';
 export const homeActionFirstStepLimit=360;
 // Only bare dangling separators/ellipsis are rejected; no general grammar heuristic.
@@ -49,7 +51,9 @@ export function readHomeActionProposal(raw:unknown,goal:string,input:unknown):Ho
 export function decodeHomeActionProposal(text:string,goal:string,input:unknown){
  if(typeof text!=='string'||new TextEncoder().encode(text).length>16384)throw Error('Action preparation rejected: size.');
  let raw:unknown;try{raw=JSON.parse(text)}catch{throw Error('Action preparation rejected: format.');}
- const proposal=readHomeActionProposal(raw,goal,input);if(!proposal)throw Error('Action preparation rejected: contract.');return proposal;
+ const proposal=readHomeActionProposal(raw,goal,input);if(!proposal)throw Error('Action preparation rejected: contract.');
+ if(proposal.actions.some(action=>[action.name,action.firstStep,action.limitation].some(text=>homeAnswerScopeViolation(text,input,{references:action.evidence,scopeContext:goal}))))throw Error('Action preparation rejected: source scope mismatch.');
+ return proposal;
 }
 // Structural validity is NOT semantic validation. Free text can still contain unsupported claims.
 export function proposedActionPresentation(action:HomeAction){return {action,status:'AI-proposed pilot — not validated',semanticReviewRequired:true,cost:null,timing:null,staffing:null,effect:null} as const}

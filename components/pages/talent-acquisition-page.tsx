@@ -3,7 +3,7 @@
 import {SyntheticDomainDemo} from "@/components/synthetic-domain-demo";
 
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { formatWholeCount } from "@/lib/display-format";
+import { formatWholeCount, formatMetric } from "@/lib/display-format";
 import type { TalentAcquisitionResponse } from "@/lib/types";
 
 type TalentAcquisitionPageProps = {
@@ -43,23 +43,23 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">Open Requisitions</p>
-              <p className="mt-2 text-3xl font-semibold">{summary.open_requisitions.toLocaleString()}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{summary.open_positions.toLocaleString()} open positions</p>
+              <p className="mt-2 text-3xl font-semibold">{formatWholeCount(summary.open_requisitions)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{formatWholeCount(summary.open_positions)} open positions</p>
             </div>
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">Applications</p>
-              <p className="mt-2 text-3xl font-semibold">{summary.applications.toLocaleString()}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{summary.application_to_hire_pct.toFixed(1)}% application → hire</p>
+              <p className="mt-2 text-3xl font-semibold">{formatWholeCount(summary.applications)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{formatMetric(summary.application_to_hire_pct, 1, "%")} application → hire</p>
             </div>
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">Median Time to Fill</p>
-              <p className="mt-2 text-3xl font-semibold">{Math.round(summary.median_time_to_fill_days)} days</p>
-              <p className="mt-1 text-xs text-muted-foreground">{summary.avg_time_to_fill_days.toFixed(1)} day average</p>
+              <p className="mt-2 text-3xl font-semibold">{formatMetric(summary.median_time_to_fill_days, 0, " days")}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{formatMetric(summary.avg_time_to_fill_days, 1, " day average")}</p>
             </div>
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">Aging Open Reqs</p>
-              <p className="mt-2 text-3xl font-semibold">{summary.open_reqs_over_60_days.toLocaleString()}</p>
-              <p className="mt-1 text-xs text-muted-foreground">Older than 60 days · median age {Math.round(summary.median_open_req_age_days)} days</p>
+              <p className="mt-2 text-3xl font-semibold">{formatWholeCount(summary.open_reqs_over_60_days)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Older than 60 days · median age {formatMetric(summary.median_open_req_age_days, 0, " days")}</p>
             </div>
           </div>
 
@@ -69,16 +69,16 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
               <p className="text-sm text-muted-foreground">Candidate progression through the recruiting process</p>
             </div>
             <div className="grid gap-3 md:grid-cols-4">
-              {[
+              {([
                 ["Applications", summary.applications, null],
                 ["Interviewed", summary.interviewed_applications, summary.application_to_interview_pct],
                 ["Offers", summary.offered_applications, summary.interview_to_offer_pct],
                 ["Hires", summary.hires, summary.offer_to_hire_pct],
-              ].map(([label, value, conversion]) => (
+              ] as const).map(([label, value, conversion]) => (
                 <div key={String(label)} className="rounded-lg border bg-muted/10 p-4">
                   <p className="text-xs font-medium text-muted-foreground">{String(label)}</p>
-                  <p className="mt-2 text-2xl font-semibold">{Number(value).toLocaleString()}</p>
-                  <p className="mt-2 text-xs text-muted-foreground">{conversion === null ? "Top of funnel" : Number(conversion).toFixed(1) + "% from prior stage"}</p>
+                  <p className="mt-2 text-2xl font-semibold">{formatWholeCount(value)}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">{label === "Applications" ? "Top of funnel" : formatMetric(conversion, 1, "% from prior stage")}</p>
                 </div>
               ))}
             </div>
@@ -95,8 +95,8 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
                   <LineChart data={data.monthly} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
                     <XAxis dataKey="month" tickFormatter={formatMonth} minTickGap={28} tick={{ fontSize: 12 }} />
-                    <YAxis tickFormatter={(value) => Number(value).toLocaleString()} width={64} tick={{ fontSize: 12 }} />
-                    <Tooltip labelFormatter={(value) => formatMonth(String(value))} formatter={(value) => formatWholeCount(Number(value))} contentStyle={{ backgroundColor: "var(--background)", border: "1px solid var(--border)", borderRadius: "0.5rem" }} />
+                    <YAxis tickFormatter={(value) => formatWholeCount(value)} width={64} tick={{ fontSize: 12 }} />
+                    <Tooltip labelFormatter={(value) => formatMonth(String(value))} formatter={(value) => typeof value === "number" ? formatWholeCount(value) : "Unavailable"} contentStyle={{ backgroundColor: "var(--background)", border: "1px solid var(--border)", borderRadius: "0.5rem" }} />
                     <Line type="monotone" dataKey="applications" name="Applications" stroke="currentColor" strokeWidth={2.5} dot={false} />
                     <Line type="monotone" dataKey="hires" name="Hires" stroke="currentColor" strokeWidth={1.5} strokeDasharray="5 4" dot={false} />
                   </LineChart>
@@ -108,9 +108,9 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
               <h3 className="font-semibold">Hiring Mix</h3>
               <p className="mb-4 text-sm text-muted-foreground">Internal versus external hiring and offer acceptance</p>
               <div className="space-y-3">
-                <div className="rounded-lg border p-4"><p className="text-xs text-muted-foreground">External hires</p><p className="mt-2 text-2xl font-semibold">{summary.external_hires.toLocaleString()}</p></div>
-                <div className="rounded-lg border p-4"><p className="text-xs text-muted-foreground">Internal hires</p><p className="mt-2 text-2xl font-semibold">{summary.internal_hires.toLocaleString()}</p></div>
-                <div className="rounded-lg border p-4"><p className="text-xs text-muted-foreground">Offer acceptance</p><p className="mt-2 text-2xl font-semibold">{summary.offer_acceptance_pct.toFixed(1)}%</p></div>
+                <div className="rounded-lg border p-4"><p className="text-xs text-muted-foreground">External hires</p><p className="mt-2 text-2xl font-semibold">{formatWholeCount(summary.external_hires)}</p></div>
+                <div className="rounded-lg border p-4"><p className="text-xs text-muted-foreground">Internal hires</p><p className="mt-2 text-2xl font-semibold">{formatWholeCount(summary.internal_hires)}</p></div>
+                <div className="rounded-lg border p-4"><p className="text-xs text-muted-foreground">Offer acceptance</p><p className="mt-2 text-2xl font-semibold">{formatMetric(summary.offer_acceptance_pct, 1, "%")}</p></div>
               </div>
             </div>
           </div>
@@ -125,9 +125,9 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
                     {data.business_units.map((row) => (
                       <tr key={row.org_code} className="border-b last:border-0">
                         <td className="py-3 pr-4 font-medium">{row.org_name}</td>
-                        <td className="py-3 pr-4 text-right">{row.open_positions.toLocaleString()}</td>
-                        <td className="py-3 pr-4 text-right">{row.hires.toLocaleString()}</td>
-                        <td className="py-3 text-right">{row.avg_time_to_fill_days.toFixed(1)} days</td>
+                        <td className="py-3 pr-4 text-right">{formatWholeCount(row.open_positions)}</td>
+                        <td className="py-3 pr-4 text-right">{formatWholeCount(row.hires)}</td>
+                        <td className="py-3 text-right">{formatMetric(row.avg_time_to_fill_days, 1, " days")}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -144,9 +144,9 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
                     {data.sources.map((row) => (
                       <tr key={row.source_code} className="border-b last:border-0">
                         <td className="py-3 pr-4 font-medium">{row.source_name}</td>
-                        <td className="py-3 pr-4 text-right">{row.applications.toLocaleString()}</td>
-                        <td className="py-3 pr-4 text-right">{row.hires.toLocaleString()}</td>
-                        <td className="py-3 text-right font-semibold">{row.application_to_hire_pct.toFixed(1)}%</td>
+                        <td className="py-3 pr-4 text-right">{formatWholeCount(row.applications)}</td>
+                        <td className="py-3 pr-4 text-right">{formatWholeCount(row.hires)}</td>
+                        <td className="py-3 text-right font-semibold">{formatMetric(row.application_to_hire_pct, 1, "%")}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -169,8 +169,8 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
                       <td className="py-3 pr-4 font-medium">{row.recruiter_name}</td>
                       <td className="py-3 pr-4 text-muted-foreground">{row.region ?? "—"}</td>
                       <td className="py-3 pr-4 text-muted-foreground">{row.specialty ?? "—"}</td>
-                      <td className="py-3 pr-4 text-right">{row.open_requisitions.toLocaleString()}</td>
-                      <td className="py-3 text-right">{row.avg_time_to_fill_days.toFixed(1)} days</td>
+                      <td className="py-3 pr-4 text-right">{formatWholeCount(row.open_requisitions)}</td>
+                      <td className="py-3 text-right">{formatMetric(row.avg_time_to_fill_days, 1, " days")}</td>
                     </tr>
                   ))}
                 </tbody>

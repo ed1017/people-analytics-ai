@@ -9,6 +9,7 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import * as scope from '../lib/talent-evidence-scope.ts';
 import * as performance from '../lib/workforce-performance.ts';
 import * as format from '../lib/display-format.ts';
+import * as onboarding from '../lib/home-onboarding.ts';
 import {buildCareerGrowthMobilityAggregate} from '../lib/career-growth-mobility.ts';
 
 const require = createRequire(import.meta.url);
@@ -69,11 +70,15 @@ test('company-wide scope, source limitations and level transitions remain render
   assert.match(html, /not workforce promotion, transfer, or mobility rates/);
 });
 
-test('the independent intro and Planning guide disclosures remain collapsible', () => {
-  const {HomeGettingStarted} = loadComponent('../components/home-getting-started.tsx');
-  const intro = renderToStaticMarkup(React.createElement(HomeGettingStarted, {busy: false, onNavigate() {}, onStartDemo() {}}));
-  assert.match(intro, /aria-expanded="false" aria-controls="home-starting-instructions"/);
-  assert.match(intro, /id="home-starting-instructions" hidden=""/);
+test('Home instructions are a closed accessible dialog in server markup and the Planning guide retains disclosures', () => {
+  const {HomeGettingStarted} = loadComponent('../components/home-getting-started.tsx', {'@/lib/home-onboarding': onboarding});
+  const intro = renderToStaticMarkup(React.createElement(HomeGettingStarted, {busy: false, active: true, ready: false, autoOpen: false, dismissKey: 'initial', onNavigate() {}, onStartDemo() {}}));
+  assert.match(intro, /aria-haspopup="dialog"/);
+  assert.match(intro, />Show instructions<\/button>/);
+  assert.match(intro, /<dialog\b[^>]*aria-labelledby=/);
+  assert.doesNotMatch(intro, /<dialog\b[^>]*\sopen(?:=|[\s>])/);
+  assert.match(intro, /Close instructions/);
+  assert.match(intro, /From question to action/);
   const guide = fs.readFileSync(new URL('../components/planning-guide.tsx', import.meta.url), 'utf8');
   assert.match(guide, /<details><summary[^>]*>See the full Planning sequence<\/summary>/);
   assert.match(guide, /<details[^>]*><summary[^>]*>Limits to keep in mind<\/summary>/);

@@ -27,8 +27,8 @@ type ScenarioPlanSummaryProps = {
   activePlanningEnd: PlanningPoint | null;
   planningNetChange: number | null;
   planningHeadcountDeltaVsBaseline: number | null;
-  planningTotalHires: number;
-  planningTotalExits: number;
+  planningTotalHires: number | null;
+  planningTotalExits: number | null;
 };
 
 function formatMonth(value: string) {
@@ -153,13 +153,13 @@ export function ScenarioPlanSummary({
                         {activePlanningScenario.scenario_name} Headcount Plan
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Monthly planned headcount through December 2027
+                        Stored company-wide plan for the returned months
                       </p>
                     </div>
 
                     <div className="text-right">
                       <p className="text-xs text-muted-foreground">
-                        Planned hires / exits
+                        Stored hires / exits · returned month window
                       </p>
                       <p className="font-semibold">
                         {formatWholeCount(planningTotalHires)} /{" "}
@@ -168,6 +168,9 @@ export function ScenarioPlanSummary({
                     </div>
                   </div>
 
+                  <p className="mb-3 text-xs text-muted-foreground">
+                    Source-reported monthly flows across the returned month window. Missing, duplicate or invalid months and unknown flow values leave totals unavailable. Full horizon boundaries and source refresh date are not supplied. These flows are not observed actuals and do not fully explain the Baseline headcount curve; what-if engine flows are separate.
+                  </p>
                   <div className="h-80 w-full">
                     <ResponsiveContainer
                       width="100%"
@@ -239,9 +242,7 @@ export function ScenarioPlanSummary({
                           formatter={(
                             value
                           ) => [
-                            formatWholeCount(
-                              Number(value)
-                            ),
+                            typeof value === "number" ? formatWholeCount(value) : "Unavailable",
                             "Planned headcount",
                           ]}
                           contentStyle={{

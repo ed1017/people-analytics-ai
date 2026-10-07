@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Local production shell; aggregate/model responses intercepted. This proves
 // packet selection, refresh and presentation, not live-model wording or hosted QA.
 import assert from 'node:assert/strict';
@@ -34,7 +35,7 @@ try{for(const width of [1366,390])for(const palette of ['light','slate-blue']){
  const button=text=>page.getByRole('button',{name:text,exact:true}),input=page.getByLabel('Ask Workforce AI',{exact:true}),reply=()=>page.locator('[data-chat-role=assistant]').last();
  const send=async()=>{const done=page.waitForResponse(response=>response.url()===base+'/api/chat');await input.fill('exit survey reasons');await button('Send overview question').click();await done;await page.getByRole('status',{name:'AI answer status',exact:true}).waitFor({state:'hidden'});};
  const refresh=async mode=>{sourceMode=mode;const prior=gets;await button('Open data details').click();await button('Refresh overview evidence').click();await page.waitForFunction(()=>!document.querySelector('[aria-label="Suggested questions"] button')?.disabled);assert.ok(gets>prior,'Refresh requests current survey evidence');};
- await page.goto(base);await input.waitFor();await page.waitForFunction(()=>!document.querySelector('[aria-label="Suggested questions"] button')?.disabled);
+ await page.goto(base);await dismissHomeOnboarding(page);await input.waitFor();await page.waitForFunction(()=>!document.querySelector('[aria-label="Suggested questions"] button')?.disabled);
  await send();
  check(name+' exact phrase is sent unchanged',posts.at(-1).message.split('\n\n')[0]==='exit survey reasons');
  check(name+' missing reason rows retain favorability without inventing a reasons chart',await reply().locator('[data-exit-reason-chart]').count()===0&&(await reply().innerText()).includes('87.5%')&&posts.at(-1).overviewBriefingContext.sources.find(s=>s.id==='S2').facts.rows.every(row=>row.exits===null));

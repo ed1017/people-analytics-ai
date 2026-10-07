@@ -5,11 +5,19 @@ import {bundleInputKey,readBundleDraft,reconcileBundle} from './home-bundle-reco
 import {bundleChatEditIntent,previewBundleChatEdit,acceptBundleChatEdit} from './home-bundle-chat-edit.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {combinePlanSnapshots,type CombinationReview} from './home-plan-combination.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {savedPilotCorrection} from './home-saved-pilot-correction.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {refreshGeneratedReductionHorizon} from './home-action-plan-pilot.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {revisePlanActivities} from './home-plan-activity-edit.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {planNumberPattern,planReferenceNumbers} from './home-plan-references.ts';
 
 export const planAlternativesField='homePlanAlternativesV1';
 export type AlternativeContext={goalId:string;goal:string};
 export type AlternativeSourceRef={id:string;revision:number};
-export type AlternativeOperation={kind:'edit'|'combine'|'staffing';text:string;sourceIds:string[];review?:CombinationReview};
+export type AlternativeOperation={kind:'edit'|'combine'|'staffing'|'goal-correction';text:string;sourceIds:string[];review?:CombinationReview};
 export type PlanAlternative={id:string;number:number;draft:BundleDraft;result:BundleResult;sourceRefs:AlternativeSourceRef[];requestId:string|null;operation:AlternativeOperation|null;notes:string[];deleted:boolean;applied:boolean};
 export type AlternativeAttachment={id:string;planId:string;attachedAt:string};
 export type PlanAlternatives={version:1;goalId:string;goal:string;nextNumber:number;order:string[];plans:PlanAlternative[];attachments:AlternativeAttachment[]};
@@ -48,7 +56,7 @@ export function readPlanAlternatives(raw:unknown,context:AlternativeContext):Pla
   for(const plan of catalog.plans){
    if(!idValid(plan.id)||seen.has(plan.id)||!Number.isSafeInteger(plan.number)||plan.number<1||numbers.has(plan.number)||!readBundleDraft(plan.draft)||plan.draft.binding.goalId!==context.goalId||plan.draft.binding.goal!==context.goal||typeof plan.deleted!=='boolean'||typeof plan.applied!=='boolean'||!Array.isArray(plan.sourceRefs)||!Array.isArray(plan.notes)||!plan.notes.every(note=>typeof note==='string')||!equalResult(reconcileBundle(plan.draft),plan.result))return null;
    if(new Set(plan.sourceRefs.map(ref=>ref.id)).size!==plan.sourceRefs.length||plan.sourceRefs.some(ref=>!seen.has(ref.id)||seen.get(ref.id)!.draft.revision!==ref.revision)||plan.number!==seen.size+1)return null;
-   if(plan.requestId!==null){if(!idValid(plan.requestId)||requests.has(plan.requestId)||!plan.operation||!['edit','combine','staffing'].includes(plan.operation.kind)||typeof plan.operation.text!=='string'||!plan.operation.text.trim()||plan.operation.text.length>1200||!equal(plan.operation.sourceIds,plan.sourceRefs.map(ref=>ref.id))||plan.sourceRefs.length!==(plan.operation.kind==='combine'?2:1))return null;requests.add(plan.requestId);}
+   if(plan.requestId!==null){if(!idValid(plan.requestId)||requests.has(plan.requestId)||!plan.operation||!['edit','combine','staffing','goal-correction'].includes(plan.operation.kind)||typeof plan.operation.text!=='string'||!plan.operation.text.trim()||plan.operation.text.length>1200||!equal(plan.operation.sourceIds,plan.sourceRefs.map(ref=>ref.id))||plan.sourceRefs.length!==(plan.operation.kind==='combine'?2:1))return null;requests.add(plan.requestId);}
    else if(plan.sourceRefs.length||plan.operation!==null)return null;
    seen.set(plan.id,plan);numbers.add(plan.number);
   }
@@ -59,18 +67,18 @@ export function readPlanAlternatives(raw:unknown,context:AlternativeContext):Pla
 }
 function checked(raw:PlanAlternatives,context:AlternativeContext){assertContext(raw,context);const catalog=readPlanAlternatives(raw,context);if(!catalog)fail('Saved alternatives cannot be verified. Earlier plans are kept.');return catalog;}
 
-const combinationCourtesy=(text:string)=>text.trim().replace(/^(?:please\s+|(?:can|could|would)\s+you\s+|i(?:’|')?d like to\s+|i want to\s+)/i,'');
+const combinationCourtesy=(text:string)=>text.trim()
+ .replace(/^please\s+/i,'')
+ .replace(/^(?:(?:i\s+(?:want|need|would like)|i[’']d like|(?:can|could|would)\s+you\s+(?:please\s+)?(?:make|create|generate|give me)|(?:make|create|generate|give me))\s+)?(?:a\s+)?combination\s+of\s+/i,'combine ')
+ .replace(/^(?:(?:can|could|would)\s+you\s+(?:please\s+)?|i(?:’|')?d like to\s+|i want to\s+)/i,'');
 export function combinationIntent(text:string){return /^(?:combine|merge|join)\b/i.test(combinationCourtesy(text));}
 function combinationOnly(text:string){
- const label='(?:(?:action\\s+)?plans?\\s*)?#?\\s*\\d+';
+ const label='(?:(?:action\\s+)?plans?\\s*)?#?\\s*'+planNumberPattern;
  return new RegExp('^(?:combine|merge|join)\\s+(?:the\\s+)?'+label+'\\s*(?:and|with|\\+|&)\\s*'+label+'(?:\\s+into\\s+(?:one|a single)(?:\\s+(?:action\\s+)?plan)?)?(?:\\s+for\\s+this\\s+goal)?(?:\\s+please)?[.!?]?$','i').test(combinationCourtesy(text));
 }
 /** Resolve labels, never indexes: #1 still means #1 after display reordering or deletion. */
 export function resolveNumberedPlans(text:string,catalog:PlanAlternatives,context:AlternativeContext):PlanAlternative[]{
- const valid=checked(catalog,context),numbers=[...text.matchAll(/(?:\b(?:action\s+)?plans?\s*#?\s*|#)(\d+)\b/gi)].map(match=>Number(match[1]));
- // Also accept the unnumbered second half of “plans 1 and 2”.
- const pair=text.match(/\b(?:action\s+)?plans?\s*#?\s*(\d+)\s*(?:and|with|\+|&)\s*(?:(?:action\s+)?plan\s*)?#?\s*(\d+)\b/i);
- if(pair&&!numbers.includes(Number(pair[2])))numbers.push(Number(pair[2]));
+ const valid=checked(catalog,context),numbers=planReferenceNumbers(text);
  if(!numbers.length)fail('Name the Action Plan number shown on its tab.');
  if(new Set(numbers).size!==numbers.length)fail('Choose different Action Plan numbers.');
  return numbers.map(number=>{const plan=valid.plans.find(item=>item.number===number&&!item.deleted);if(!plan)fail(`Action Plan #${number} is not available in this goal.`);return plan;});
@@ -103,10 +111,14 @@ export function proposeEditedAlternative(raw:PlanAlternatives,context:Alternativ
  let text=request.text;
  if(/\b(?:action\s+)?plan\s*#?\s*\d+\b|#\d+/i.test(text)){
   const named=resolveNumberedPlans(text,catalog,context);if(named.length!==1||named[0].id!==sources[0].id)fail('The numbered plan does not match the selected source.');
-  text=text.replace(/\b(?:in|for|on)\s+(?:action\s+)?plan\s*#?\s*\d+\b\s*[:,]?\s*/i,' ').replace(/^(?:action\s+)?plan\s*#?\s*\d+\s*[:,]?\s*/i,'').trim();
+  text=text.replace(/^(?:please\s+)?(?:revise|update|adjust|change)\s+(?:action\s+)?plan\s*#?\s*\d+\s+by\s+/i,'').replace(/\b(?:in|for|on)\s+(?:action\s+)?plan\s*#?\s*\d+\b\s*[:,]?\s*/i,' ').replace(/^(?:action\s+)?plan\s*#?\s*\d+\s*[:,]?\s*/i,'').trim();
  }
  // Numbering is resolved above; the legacy parser need not impose its three-option UI limit.
- const source=sources[0].draft,preview=previewBundleChatEdit(source,text),draft=acceptBundleChatEdit(source,preview);
+ const source=sources[0].draft,activity=revisePlanActivities(source,text);
+ const draft=activity??acceptBundleChatEdit(source,previewBundleChatEdit(source,text));
+ // New numbered proposals can refresh generated target labels. Keep the legacy
+ // text-edit replay deterministic so earlier saved revisions still validate.
+ refreshGeneratedReductionHorizon(source,draft.inputs);
  return append(catalog,request,operation,sources,draft,reconcileBundle(draft),[]);
 }
 export function proposeCombinedAlternative(raw:PlanAlternatives,context:AlternativeContext,request:AlternativeRequest):AlternativeOutcome{
@@ -152,4 +164,15 @@ export function proposeStaffingAlternative(raw:PlanAlternatives,context:Alternat
 export function packPlanAlternatives(raw:PlanAlternatives){
  const catalog=checked(raw,raw);
  return {...catalog,encoding:'deduplicated-identities-v1' as const,plans:catalog.plans.map(plan=>{const {inputKey,signature,bindingKey,scope,...result}=plan.result;void [inputKey,signature,bindingKey,scope];return {...plan,result};})};
+}
+
+/** Explicit correction adds one immutable alternative. It never reinitializes saved inputs. */
+export function proposeCorrectedPilotAlternative(raw:PlanAlternatives,context:AlternativeContext,request:AlternativeRequest,goalContext?:unknown):AlternativeOutcome{
+ const catalog=checked(raw,context),operation:AlternativeOperation={kind:'goal-correction',text:request.text,sourceIds:request.sourceIds};
+ const sources=sourcesFor(catalog,request),existing=retry(catalog,request,operation);if(existing)return existing;
+ if(sources.length!==1)fail('Choose one saved Action Plan to correct.');
+ const correction=savedPilotCorrection(sources[0].draft,goalContext);
+ if(!correction)fail('This plan has no unchanged legacy defaults to correct. Explicit plan edits and prior attachments are kept.');
+ const prior=catalog.plans.find(plan=>!plan.deleted&&plan.operation?.kind==='goal-correction'&&plan.sourceRefs.length===1&&plan.sourceRefs[0].id===sources[0].id&&equal(plan.draft,correction.draft));if(prior)return {status:'ready',catalog,plan:structuredClone(prior),reused:true};
+ return append(catalog,request,operation,sources,correction.draft,reconcileBundle(correction.draft),[...correction.changes,'Created by explicit review of the original goal. Existing dates, activity costs and user edits are preserved; review unresolved scope and assumptions before attaching.']);
 }

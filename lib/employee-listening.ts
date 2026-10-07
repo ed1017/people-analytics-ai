@@ -15,7 +15,7 @@ export function exitSurveyEvidence(input: unknown) {
  return { source:"Existing exit-survey aggregates", as_of:text(data.as_of), scope:"Company-wide; workforce filters not applied", population:"Exit-survey respondents, not current employees or all recorded separations", period:"Exit-survey fieldwork period and monthly trend not supplied", suppression:"Source suppression metadata not supplied; preserve any unavailable or explicitly suppressed fields", respondents:number(summary.exit_respondents ?? data.respondents),
  reasons:rows(data.exit_reasons ?? data.reasons).map(r=>select(r,"exits pct_of_exit_responses","primary_reason")),
  dimensions:rows(data.exit_dimensions ?? data.dimensions).filter(r=>r.survey_code==="EXIT").map(r=>select(r,"separation_respondents avg_score favorable_pct","survey_code survey_name question_code question_text dimension")),
- limitation:"1–5 scale; favorable means 4 or 5. Reported reasons and associations are not causes. Reason shares are not employee attrition rates. Do not combine respondent and workforce denominators. No raw comments or eNPS. API numeric normalization may obscure missing source values; do not infer completeness." };
+ limitation:"1–5 scale; favorable means 4 or 5. Reported reasons and associations are not causes. Reason shares are not employee attrition rates. Do not combine respondent and workforce denominators. No raw comments or eNPS. Missing numeric source values remain unknown; do not infer completeness." };
 }
 export function employeeListeningEvidence(input: unknown) {
  const data=record(input), summary=record(data.summary), cleanSummary:Record<string,unknown>={};

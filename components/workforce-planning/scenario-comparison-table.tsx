@@ -1,3 +1,5 @@
+import { formatWholeCount, formatFte } from "@/lib/display-format";
+import { knownDifference } from "@/lib/numeric-contract";
 import type {
   PlanningPoint,
   PlanningScenario,
@@ -9,7 +11,8 @@ type ScenarioComparisonTableProps = {
   baselinePlanningEnd: PlanningPoint | null;
 };
 
-function formatCurrencyCompact(value: number) {
+function formatCurrencyCompact(value: number | null) {
+  if (value === null) return "Unavailable";
   const sign = value < 0 ? "-" : "";
   const absoluteValue = Math.abs(value);
 
@@ -95,8 +98,7 @@ export function ScenarioComparisonTable({
                 const delta =
                   end &&
                   baselineHC !== null
-                    ? end.planned_headcount -
-                      baselineHC
+                    ? knownDifference(end.planned_headcount, baselineHC)
                     : null;
 
                 return (
@@ -110,12 +112,12 @@ export function ScenarioComparisonTable({
                     </td>
                     <td className="py-3 pr-4 text-right">
                       {end
-                        ? end.planned_headcount.toLocaleString()
+                        ? formatWholeCount(end.planned_headcount)
                         : "—"}
                     </td>
                     <td className="py-3 pr-4 text-right">
                       {end
-                        ? end.planned_fte.toLocaleString()
+                        ? formatFte(end.planned_fte)
                         : "—"}
                     </td>
                     <td className="py-3 pr-4 text-right">

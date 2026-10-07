@@ -12,6 +12,7 @@ import {exitMissingFieldsBullet} from './fixtures/exit-reason-packet.mjs';
 import {homeStarterGroups,homeGoalStarters} from '../lib/contextual-prompts.ts';
 import {homeTurnPurpose} from '../lib/home-conversation.ts';
 import {homeForecastIntent} from '../lib/home-forecast-intent.ts';
+import {homeForecastAnswer} from '../lib/home-forecast.ts';
 const require=createRequire(import.meta.url);
 function component(file,name){
  const exports={},source=fs.readFileSync(new URL('../components/'+file,import.meta.url),'utf8');
@@ -87,6 +88,22 @@ test('missing requested evidence, denominator differences, demo labels and subst
   assert.deepEqual(presentation.homeAnswerPresentation(content),{answer:content,details:[]});
   assert.deepEqual(presentation.homeAnswerPresentation('One useful fact.\n'+content.replace('The available evidence','The available evidence includes 42 respondents and does not')), {answer:'One useful fact.\n'+content.replace('The available evidence','The available evidence includes 42 respondents and does not'),details:[]});
  }
+});
+
+test('forecast boilerplate collapses without hiding simulated scope, unsupported measures, numbers or source dates',()=>{
+ for(const question of ['Forecast turnover','Forecast hiring','Forecast satisfaction','Forecast turnover rate for 2027']){
+  const saved=homeForecastAnswer(question),result=presentation.homeAnswerPresentation(saved);
+  assert.match(result.answer,/SIMULATED DEMO.*fixed simulated company-wide population/);
+  assert.match(result.answer,/Goal and workforce filters do not apply/);
+  assert.match(result.answer,/planning baselines and intervention effects are unavailable/);
+  assert.ok(result.details.some(detail=>detail.includes('capacity, savings, ROI')));
+  assert.deepEqual(result.answer.split('\n').filter(line=>line.startsWith('|')),saved.split('\n').filter(line=>line.startsWith('|')));
+  if(saved.includes('| Method |')){assert.match(result.answer,/confidence intervals and operational forecasts unavailable/);assert.match(result.answer,/30 Sep 2026/);}
+  else assert.match(result.answer,/does not provide a new forecast for the requested horizon/);
+  const html=render(saved,{compact:true});assert.equal((html.match(/data-answer-evidence-details/g)??[]).length,1);assert.doesNotMatch(html,/<details[^>]* open/);
+ }
+ const authored='Forecasts are unknown because the source omits 2027 workforce counts. Costs are also unknown.';
+ assert.deepEqual(presentation.homeAnswerPresentation(authored),{answer:authored,details:[]});
 });
 
 test('bare, field-qualified, grouped and explicit citations navigate to the correct existing source',()=>{
