@@ -1,0 +1,617 @@
+{
+  "version": 2,
+  "contractId": "compa-calibration-proposal-v2",
+  "status": "proposal-only",
+  "activationAllowed": false,
+  "publicationApproved": false,
+  "dataClass": "constructed-synthetic-proposal",
+  "snapshotDate": "2026-09-30",
+  "population": "New fictional salaried cohort constructed for local calibration review. Reuses only the 50 job codes; no existing people, pay, workforce totals or membership are reused.",
+  "formula": "Arithmetic mean of individual 100 * (annual contracted base pay / FTE) / matching annual full-time base-pay range midpoint; match job, level, country, currency, basis and effective date before averaging. Never sum money across currencies.",
+  "interpretation": "Job anchors, level multipliers and local monetary scales are authored demo assumptions, not market wages, FX rates, geographic premiums, observed employer policy or pay-equity evidence. The shape is deliberately constructed, not estimated; no normal-distribution or real-world prevalence claim. DEMO levels and country/currency cells have not been reconciled to the live catalog.",
+  "distribution": {
+    "scope": "Design validation of the new constructed cohort only; not a production workforce statistic",
+    "constructedRecords": 6000,
+    "matchedBands": 300,
+    "belowBandPct": 5,
+    "withinBandPct": 90,
+    "aboveBandPct": 5,
+    "belowMidpointPct": 44,
+    "atMidpointPct": 12,
+    "aboveMidpointPct": 44,
+    "jobMeanDistribution": [
+      {
+        "meanCompaPct": 95.2,
+        "jobs": 10
+      },
+      {
+        "meanCompaPct": 97.6,
+        "jobs": 10
+      },
+      {
+        "meanCompaPct": 100,
+        "jobs": 10
+      },
+      {
+        "meanCompaPct": 102.4,
+        "jobs": 10
+      },
+      {
+        "meanCompaPct": 104.8,
+        "jobs": 10
+      }
+    ]
+  },
+  "rows": [
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "AI-ARCH",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 95.2,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "AI-ENG",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 97.6,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "BI-ANA",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 100,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "BI-DEV",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 102.4,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "CLOUD-ARCH",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 104.8,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "CLOUD-ENG",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 95.2,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "COMMS-GEN",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 97.6,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "CONS-MGMT",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 100,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "CONS-TECH",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 102.4,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "CONS-TRANS",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 104.8,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "CORPDEV-ANA",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 95.2,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "CSM-GEN",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 97.6,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "CYBER-ANA",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 100,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "CYBER-ENG",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 102.4,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "DE-ARCH",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 104.8,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "DE-ENG",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 95.2,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "DS-APPLIED",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 97.6,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "DS-SCI",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 100,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "FIN-ACC",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 102.4,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "FIN-FPNA",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 104.8,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "FIN-TREAS",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 95.2,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "HR-HRBP",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 97.6,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "HR-HRIS",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 100,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "HR-PA",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 102.4,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "HR-TA",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 104.8,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "HR-TM",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 95.2,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "HR-TR",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 97.6,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "INFOSEC-ANA",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 100,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "INFRA-ENG",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 102.4,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "IT-ENG",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 104.8,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "LEGAL-COUNSEL",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 95.2,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "LEGAL-PRIV",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 97.6,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "MKT-BRAND",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 100,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "MKT-GROWTH",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 102.4,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "ML-ENG",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 104.8,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "OPS-BUS",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 95.2,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "OPS-CLIENT",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 97.6,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "PMO-PGM",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 100,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "PMO-PM",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 102.4,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "PROC-SOURCING",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 104.8,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "PROD-PM",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 95.2,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "QA-ENG",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 97.6,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "SALES-AE",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 100,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "SALES-OPS",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 102.4,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "STRAT-ANA",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 104.8,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "SWE-BACK",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 95.2,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "SWE-FRONT",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 97.6,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "SWE-FULL",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 100,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "SWE-GEN",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 102.4,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    },
+    {
+      "contractId": "compa-calibration-proposal-v2",
+      "job": "UX-DES",
+      "snapshotDate": "2026-09-30",
+      "status": "reviewable",
+      "meanCompaPct": 104.8,
+      "coverage": "complete",
+      "basePayProvenance": "new_constructed_matched_demo_pay_v2",
+      "rangePolicyVersion": "synthetic-matched-pay-ranges-v2-proposal"
+    }
+  ],
+  "workedExamples": [
+    {
+      "label": "Independent invented arithmetic example; not extracted from a person or cohort record",
+      "job": "SWE-GEN",
+      "level": "DEMO-IC2",
+      "country": "US",
+      "currency": "USD",
+      "fte": 0.8,
+      "contractedAnnualBase": 88320,
+      "annualBaseAtOneFte": 110400,
+      "rangeMinimum": 92000,
+      "rangeMidpoint": 115000,
+      "rangeMaximum": 138000,
+      "compaPct": 96
+    },
+    {
+      "label": "Independent invented arithmetic example; not extracted from a person or cohort record",
+      "job": "HR-PA",
+      "level": "DEMO-IC4",
+      "country": "CA",
+      "currency": "CAD",
+      "fte": 0.5,
+      "contractedAnnualBase": 85000,
+      "annualBaseAtOneFte": 170000,
+      "rangeMinimum": 136000,
+      "rangeMidpoint": 170000,
+      "rangeMaximum": 204000,
+      "compaPct": 100
+    },
+    {
+      "label": "Independent invented arithmetic example; not extracted from a person or cohort record",
+      "job": "BI-ANA",
+      "level": "DEMO-IC2",
+      "country": "GB",
+      "currency": "GBP",
+      "fte": 1,
+      "contractedAnnualBase": 75600,
+      "annualBaseAtOneFte": 75600,
+      "rangeMinimum": 56000,
+      "rangeMidpoint": 70000,
+      "rangeMaximum": 84000,
+      "compaPct": 108
+    }
+  ],
+  "evidence": {
+    "generatedCohortRecordsIncluded": false,
+    "existingPeopleRead": false,
+    "existingPayRead": false,
+    "databaseChanged": false,
+    "liveCatalogMembershipVerified": false,
+    "cutoverReady": false,
+    "protectedV1Sha256": {
+      "lib/data/compensation-release-v1.json": "76141d78f4dff73ba833624b26fd91c495c60bc15323cbf6a064812b1d073866",
+      "lib/compensation-ranges.ts": "1b14cf513c4bc94cef5819b40476a23394e0f3d0b233bb42de0ac471c5947811",
+      "lib/compensation-convention.ts": "231dbef3f7a83ba8f22b3a272a51f49af3e6c0b487606b7213aac4323b8dd306",
+      "lib/compensation-release.ts": "0d8d8fe30a2f552fba8b8688c1ab8ceac3c562e2668b618785b2e705585f59ea",
+      "lib/data/synthetic-pay-demo-v1.json": "9f1db58075f66707eb858db0fec8a4d49738da1279c911cb77fd2c0e1594d169",
+      "lib/simulation/pay-demo-protocol.json": "ef7fc27310d4ef933d31a256d5448e3d5750b74919d05259e60acfc3b8f12d4f",
+      "lib/simulation/pay-demo.mjs": "be46b7bed0f9732e0f33eeaf7bb0e0fc3c69befeceb1e8b35e4e180ca1c74adf",
+      "lib/synthetic-pay-demo.ts": "082cdf6ba45b19eaf412b0b72512d081b2700e3e823973da016c2259cf27d4da",
+      "tests/fixtures/compensation-ranges.tsx": "8661377fc6294547100fedda16c0ff8b2ce76341858243ab2bc926f9e19b997c",
+      "tests/fixtures/compensation.tsx": "facf76fe00162c942016bd0729fcbf37afeb900181be69a2963edc1bc7ad0f93"
+    },
+    "sourceHashes": {
+      "lib/simulation/compa-calibration-v2-protocol.json": "44f824d81d30f26ecd3bff71f8b900ff4a03b7e3dbd8f000da003c65f4b0bd56",
+      "lib/simulation/compa-calibration-v2.mjs": "840a46b7a2738254fc2764a07ad2b03ea1afbf9cdb1734beb1bbe87e5faf6bfc",
+      "lib/compensation-ranges.ts": "1b14cf513c4bc94cef5819b40476a23394e0f3d0b233bb42de0ac471c5947811",
+      "lib/ml/synthetic-workforce/common.mjs": "60c9349a01e839e1a6fb6f6c67eb46a64f7ed6f5744e9a7757c9c4642783fc03"
+    }
+  }
+}
