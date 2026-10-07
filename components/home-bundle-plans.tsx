@@ -17,6 +17,7 @@ import {planCashEstimate} from '@/lib/home-plan-cash';
 import {calculatePlanWhatIf,whatIfOutcomeText} from '@/lib/home-plan-what-if';
 import {suggestSuccessMeasure,successMeasureText,measurementScope} from '@/lib/home-success-measures';
 import {preferredSavedBundleId,restoredBundleDraft,restoredBundleResult} from "@/lib/home-pinned-goals";
+import {SavedPilotCorrectionOffer} from '@/components/home-saved-pilot-correction';
 import {prepareIllustrativePilot,pilotAllowances} from '@/lib/home-action-plan-pilot';
 import {useId,useLayoutEffect,useRef,useState} from 'react';
 import {previewBundleChatEdit,acceptBundleChatEdit,bundleChatEditExamples,type BundleEditExample,type BundleEditPreview} from '@/lib/home-bundle-chat-edit';
@@ -33,9 +34,9 @@ export type PlanChatChange={goalId:string;planId:string;inputKey:string;ready:bo
 export type BundleSession={drafts:Record<string,BundleDraft>;results:Record<string,BundleResult>};
 export type BundleDiscussion={snapshots?:()=>{id:string;draft:BundleDraft}[];examples:BundleEditExample[];option:number;id:string;revision:number;name:string;goalId:string;goal:string;propose:(text:string)=>string;discard:()=>void;subscribe:(listener:()=>void)=>()=>void;isCurrent:()=>boolean;preview:(text:string)=>BundleEditPreview;accept:(preview:BundleEditPreview)=>void};
 const money=(value:number|null|undefined)=>value==null?'Unknown':`$${value.toLocaleString(undefined,{maximumFractionDigits:2})} USD`;
-export type HomeBundlePlansProps={contextDiagnostic?:PlanContextDiagnostic|null;chatChange?:PlanChatChange|null;planningContext?:unknown;measurePack?:unknown;projectBinding?:ProjectPlanningBinding;preparedAt:string;proposal:BundleProposal;binding:ActionBinding;contextCurrent:boolean;disabled:boolean;isCurrent:()=>boolean;cache:Map<string,BundleSession>;onDiscuss:(request:BundleDiscussion)=>void};
+export type HomeBundlePlansProps={onCorrectSavedPilot?:(id:string,expectedInput:string,sources:{id:string;draft:BundleDraft}[])=>void;contextDiagnostic?:PlanContextDiagnostic|null;chatChange?:PlanChatChange|null;planningContext?:unknown;measurePack?:unknown;projectBinding?:ProjectPlanningBinding;preparedAt:string;proposal:BundleProposal;binding:ActionBinding;contextCurrent:boolean;disabled:boolean;isCurrent:()=>boolean;cache:Map<string,BundleSession>;onDiscuss:(request:BundleDiscussion)=>void};
 export {HomeBundlePlans} from "@/components/home-plan-alternatives";
-export function LegacyHomeBundlePlans({contextDiagnostic,chatChange,planningContext,proposal,binding,preparedAt,contextCurrent,disabled,isCurrent,cache,onDiscuss,projectBinding,measurePack}:HomeBundlePlansProps){
+export function LegacyHomeBundlePlans({onCorrectSavedPilot,contextDiagnostic,chatChange,planningContext,proposal,binding,preparedAt,contextCurrent,disabled,isCurrent,cache,onDiscuss,projectBinding,measurePack}:HomeBundlePlansProps){
  const optionNumber=(id:string)=>proposal.bundles.findIndex(bundle=>bundle.id===id)+1;
  const storage=useDecisionStorage(),raw=storage.data.workspaces[binding.goalId]?.fields[bundleWorkspaceField],workspace=readBundleWorkspace(raw,binding.goalId),key=actionBindingKey(binding);
  const mixHistory=useVerifiedHomeMixHistory(storage.data.workspaces[binding.goalId]?.fields[homeMixHistoryField],binding.goalId);
@@ -149,6 +150,7 @@ export function LegacyHomeBundlePlans({contextDiagnostic,chatChange,planningCont
   </section>
   <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-medium">Selected: Action Plan #{optionNumber(selected)} · {bundleDisplayName(draft.bundle.name)}</p><button type="button" className={bundleButton} aria-expanded={!collapsed} aria-controls={panelId} onClick={()=>{setCollapsed(!collapsed);saveView({collapsed:!collapsed});if(!collapsed){setAttachFlow(null);setAttachmentOpen(null);}}}>{collapsed?'Show Action Plan':'Collapse Action Plan'}</button></div>
   <div id={panelId} hidden={collapsed}><section id="selected-home-plan" role="tabpanel" aria-labelledby={`plan-tab-${selected}`}><article aria-label={`Action Plan option ${optionNumber(selected)}`} className="space-y-3 border-t pt-3"><h3 ref={heading} tabIndex={-1} className="text-base font-semibold">{bundleDisplayName(draft.bundle.name)}</h3>
+   {onCorrectSavedPilot&&<SavedPilotCorrectionOffer draft={draft} planningContext={planningContext} disabled={disabled||!contextCurrent||attachBusy} onCreate={()=>{try{guard();if(bundleInputKey(currentDraft())!==bundleInputKey(draft))throw Error('The saved plan changed. Review its current defaults.');onCorrectSavedPilot(selected,bundleInputKey(draft),Object.entries(viewDrafts).map(([id,draft])=>({id,draft})));}catch(error){setNotice((error as Error).message);}}}/>}
    {pendingRevision&&<p className="font-medium">Proposed revision {draft.revision} · not yet applied</p>}
    {currentResult?.budget&&<p aria-label="Plan budget check" className="text-sm">{draft.inputs.budget?.basis.kind==='illustrative'&&<strong>Proposed cash-budget assumption: </strong>}{planBudgetText(currentResult)}</p>}
    <p aria-label="Plan description" className="text-sm leading-relaxed">{bundleDisplayText(draft.bundle.objective,draft.bundle,draft.inputs)}</p>

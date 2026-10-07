@@ -1,7 +1,7 @@
 // One response can contain 18 components; this cap covers visible JSON and reasoning together.
 export const homeBundleOutputTokens=10000;
 // Fixed classifications and bounded counts only. Never retain response prose, errors or identifiers.
-export const bundleResponseReasons=['output_token_limit','content_filter','incomplete_response','response_not_completed','empty_output','refusal','incomplete_text','invalid_output','api_error'] as const;
+export const bundleResponseReasons=['output_token_limit','content_filter','incomplete_response','response_not_completed','empty_output','refusal','incomplete_text','invalid_output','source_scope_mismatch','api_error'] as const;
 const statuses=['completed','incomplete','failed','cancelled','queued','in_progress','unknown'] as const;
 const incompleteReasons=['max_output_tokens','max_messages','content_filter','steered','other'] as const;
 const textFields=['objective','coordination','limitation','firstStep','component_limitation'] as const;

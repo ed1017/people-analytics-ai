@@ -24,7 +24,20 @@ export function mergeDecisionRecovery(base:DecisionData,draft:DecisionData,saved
  next.removedGoalIds=[...new Set([...(saved.removedGoalIds??[]),...(draft.removedGoalIds??[])])].filter(id=>!next.goals.goals.some(goal=>goal.id===id));
  const preferred=draft.goals.activeId;next.goals.activeId=next.goals.goals.some(goal=>goal.id===preferred)?preferred:next.goals.activeId;
  if(!next.goals.goals.some(goal=>goal.id===next.goals.activeId))next.goals.activeId='';
- // Explicit conflict resolution keeps the saved history while carrying the user's unsent request.
- if(keepSavedConflicts)for(const {goalId,field} of conflicts){if(field!=='chat')continue;const local=draft.workspaces[goalId]?.fields.chat as {input?:unknown}|undefined,remote=next.workspaces[goalId]?.fields.chat as Record<string,Json>|undefined;if(remote&&typeof local?.input==='string'&&local.input.trim())next.workspaces[goalId].fields.chat={...remote,input:local.input};}
+ // Keep a recovered request separate from saved transcript/catalog history. Its
+ // original selected plan may no longer be selected, so resubmission needs a
+ // fresh, explicit plan confirmation. This marker survives another reload.
+ for(const goal of next.goals.goals){
+  const id=goal.id,local=draft.workspaces[id]?.fields.chat as {input?:unknown}|undefined;
+  if(typeof local?.input!=='string'||!local.input.trim())continue;
+  const remote=saved.workspaces[id]?.fields.chat as {input?:unknown}|undefined;
+  const savedContextChanged=!same(base.workspaces[id]?.fields,saved.workspaces[id]?.fields)||!same(base.goals.goals.find(item=>item.id===id),goal);
+  if(local.input===remote?.input&&!savedContextChanged)continue;
+  const differentDraft=typeof remote?.input==='string'&&!!remote.input.trim()&&remote.input!==local.input;
+  if(differentDraft&&!conflicts.some(item=>item.goalId===id&&item.field==='chat'))conflicts.push({goalId:id,field:'chat'});
+  if(differentDraft&&!keepSavedConflicts)continue;
+  const chat=next.workspaces[id]?.fields.chat as Record<string,Json>|undefined;
+  if(chat)next.workspaces[id].fields.chat={...chat,input:local.input,recoveredPlanSelectionRequired:true};
+ }
  return {data:next,conflicts};
 }

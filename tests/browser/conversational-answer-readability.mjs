@@ -43,7 +43,7 @@ try{for(const [mode,width,height] of [['wide',1721,1000],['desktop',1366,900],['
  check(mode+' source markers wrap without clipping or horizontal overflow',await content.locator('[data-chat-item]').evaluateAll(nodes=>nodes.every(node=>{const r=node.getBoundingClientRect();return node.scrollWidth<=node.clientWidth&&r.right<=innerWidth+1&&[...node.querySelectorAll('sup')].every(marker=>marker.getBoundingClientRect().right<=r.right+1)}))&&await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await input.focus();await answer.screenshot({path:'/tmp/concise-answer-'+mode+'.png'});
  await input.fill('What about March?');await send.click();await page.getByText('Thinking with the available evidence…',{exact:true}).waitFor({state:'hidden'});check(mode+' follow-up keeps conversation context',posts.at(-1).history.some(turn=>turn.role==='user'&&turn.content==='why was turnover high in april'));
- await input.fill('Develop a full action plan');await send.click();await page.getByText('Thinking with the available evidence…',{exact:true}).waitFor({state:'hidden'});const planned=page.locator('[data-chat-role="assistant"]').last();
+ await input.fill('Develop a full action plan');await send.click();const planned=page.locator('[data-chat-role="assistant"]').last();await planned.locator('[data-chat-heading]').first().waitFor();
  check(mode+' Action Plan keeps five headings and numbered steps',JSON.stringify(await planned.locator('[data-chat-heading]').allTextContents())===JSON.stringify(headings)&&await planned.locator('[data-chat-item]').count()===5);
  check(mode+' no live sources, runtime errors or overflow',external===0&&errors.length===0&&await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await context.close();

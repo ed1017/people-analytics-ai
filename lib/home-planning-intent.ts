@@ -8,6 +8,15 @@ export function planningStatements(context:unknown):string[]{
  if(!context||typeof context!=='object')return [];const value=context as {goal?:unknown;notes?:unknown;constraints?:unknown;decisions?:unknown};
  return [typeof value.goal==='string'?value.goal:'',...(Array.isArray(value.notes)?value.notes.map(note=>note&&typeof note==='object'&&'text' in note&&typeof note.text==='string'?note.text:''):[]),typeof value.constraints==='string'?value.constraints:'',typeof value.decisions==='string'?value.decisions:''].filter(Boolean);
 }
+function explicitBudgetCap(statement:string):number|null{
+ // Match the amount beside its budget label, not an unrelated later vendor cost.
+ // Accept the same user-authored ceiling whether it is called demo or illustrative.
+ const afterLabel=/\b(?:maximum|cap|budget)(?:\s+(?:one-time|programme|program|cash|demo|illustrative|budget|limit|ceiling|is|of|at|to|should|must|be|not|exceed|no|more|than))*\s*[:=]?\s*(?:\$|USD\s*)(\d+(?:,\d{3})*(?:\.\d{1,2})?)/gi;
+ const beforeLabel=/(?:\$|USD\s*)(\d+(?:,\d{3})*(?:\.\d{1,2})?)\s+(?:(?:demo|illustrative|cash|programme|program|one-time)\s+)*budget\b/gi;
+ const candidates=[...statement.matchAll(afterLabel),...statement.matchAll(beforeLabel)].map(match=>({amount:Number(match[1].replaceAll(',','')),index:match.index+match[0].indexOf(match[1])}));
+ const negated=/\b(?:not|rather than|instead of|ignore|exclude|don't|don’t)\s+(?:(?:use|set|an?|the|previous|old|maximum|cap|budget|demo|illustrative|cash|programme|program|one-time|of|to|at)\s+)*(?:\$|USD\s*)$/i;
+ return candidates.filter(candidate=>candidate.amount<=1e9&&!negated.test(statement.slice(0,candidate.index))).sort((left,right)=>left.index-right.index).at(-1)?.amount??null;
+}
 export function resolveHomePlanningIntent(statements:string[]):HomePlanningIntent{
  const result:HomePlanningIntent={goal:null,months:null,relativeReduction:null,pointReduction:null,participants:null,baseline:null,target:null,rateConflict:false,baselinePeriod:null,budgetCap:null,existingCapacity:false,companyWide:false};let reductionIntent=false,voluntary=false;
  for(const raw of statements){
@@ -22,7 +31,7 @@ export function resolveHomePlanningIntent(statements:string[]):HomePlanningInten
   const relative=[...statement.matchAll(/(\d+(?:\.\d+)?)\s*%\s*relative\b/gi)].filter(match=>!/(?:not|rather than)\s*$/i.test(statement.slice(Math.max(0,match.index-20),match.index))).at(-1);if(relative&&(!points||relative.index>points.index)&&Number(relative[1])<=100){result.relativeReduction=Number(relative[1]);result.pointReduction=null;}
   const horizon=statement.match(/\b(?:within|over|for|in)\s*(\d+)\s*[- ]?months?\b/i);if(horizon&&Number(horizon[1])>=1&&Number(horizon[1])<=24)result.months=Number(horizon[1]);
   const rates=explicitTurnoverRates(statement);if(rates.conflict){result.rateConflict=true;result.baseline=null;result.target=null;}else{if(rates.baseline!==null){result.baseline=rates.baseline;result.baselinePeriod=rates.period;}if(rates.target!==null)result.target=rates.target;}
-  const cap=statement.match(/\b(?:maximum|cap|budget)[^.!?\n]{0,55}?(?:\$|USD\s*)(\d+(?:,\d{3})*(?:\.\d{1,2})?)/i);const beforeCap=statement.match(/(?:\$|USD\s*)(\d+(?:,\d{3})*(?:\.\d{1,2})?)\s+(?:(?:demo|cash|programme|program|one-time)\s+)*budget\b/i),budget=cap??beforeCap;if(budget&&Number(budget[1].replaceAll(',',''))<=1e9)result.budgetCap=Number(budget[1].replaceAll(',',''));
+  const budget=explicitBudgetCap(statement);if(budget!==null)result.budgetCap=budget;
   if(/\bexisting\s+HR\s*(?:\/|and)\s*manager\s+capacity\b/i.test(statement))result.existingCapacity=true;
   if(/\ball\s+countries\s*(?:\/|and|,)\s*(?:all\s+)?(?:BUs|business units)\b|\bcompany-wide\b/i.test(statement))result.companyWide=true;
  }

@@ -5,11 +5,13 @@ import {bundleInputKey,readBundleDraft,reconcileBundle} from './home-bundle-reco
 import {bundleChatEditIntent,previewBundleChatEdit,acceptBundleChatEdit} from './home-bundle-chat-edit.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {combinePlanSnapshots,type CombinationReview} from './home-plan-combination.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {savedPilotCorrection} from './home-saved-pilot-correction.ts';
 
 export const planAlternativesField='homePlanAlternativesV1';
 export type AlternativeContext={goalId:string;goal:string};
 export type AlternativeSourceRef={id:string;revision:number};
-export type AlternativeOperation={kind:'edit'|'combine'|'staffing';text:string;sourceIds:string[];review?:CombinationReview};
+export type AlternativeOperation={kind:'edit'|'combine'|'staffing'|'goal-correction';text:string;sourceIds:string[];review?:CombinationReview};
 export type PlanAlternative={id:string;number:number;draft:BundleDraft;result:BundleResult;sourceRefs:AlternativeSourceRef[];requestId:string|null;operation:AlternativeOperation|null;notes:string[];deleted:boolean;applied:boolean};
 export type AlternativeAttachment={id:string;planId:string;attachedAt:string};
 export type PlanAlternatives={version:1;goalId:string;goal:string;nextNumber:number;order:string[];plans:PlanAlternative[];attachments:AlternativeAttachment[]};
@@ -48,7 +50,7 @@ export function readPlanAlternatives(raw:unknown,context:AlternativeContext):Pla
   for(const plan of catalog.plans){
    if(!idValid(plan.id)||seen.has(plan.id)||!Number.isSafeInteger(plan.number)||plan.number<1||numbers.has(plan.number)||!readBundleDraft(plan.draft)||plan.draft.binding.goalId!==context.goalId||plan.draft.binding.goal!==context.goal||typeof plan.deleted!=='boolean'||typeof plan.applied!=='boolean'||!Array.isArray(plan.sourceRefs)||!Array.isArray(plan.notes)||!plan.notes.every(note=>typeof note==='string')||!equalResult(reconcileBundle(plan.draft),plan.result))return null;
    if(new Set(plan.sourceRefs.map(ref=>ref.id)).size!==plan.sourceRefs.length||plan.sourceRefs.some(ref=>!seen.has(ref.id)||seen.get(ref.id)!.draft.revision!==ref.revision)||plan.number!==seen.size+1)return null;
-   if(plan.requestId!==null){if(!idValid(plan.requestId)||requests.has(plan.requestId)||!plan.operation||!['edit','combine','staffing'].includes(plan.operation.kind)||typeof plan.operation.text!=='string'||!plan.operation.text.trim()||plan.operation.text.length>1200||!equal(plan.operation.sourceIds,plan.sourceRefs.map(ref=>ref.id))||plan.sourceRefs.length!==(plan.operation.kind==='combine'?2:1))return null;requests.add(plan.requestId);}
+   if(plan.requestId!==null){if(!idValid(plan.requestId)||requests.has(plan.requestId)||!plan.operation||!['edit','combine','staffing','goal-correction'].includes(plan.operation.kind)||typeof plan.operation.text!=='string'||!plan.operation.text.trim()||plan.operation.text.length>1200||!equal(plan.operation.sourceIds,plan.sourceRefs.map(ref=>ref.id))||plan.sourceRefs.length!==(plan.operation.kind==='combine'?2:1))return null;requests.add(plan.requestId);}
    else if(plan.sourceRefs.length||plan.operation!==null)return null;
    seen.set(plan.id,plan);numbers.add(plan.number);
   }
@@ -152,4 +154,15 @@ export function proposeStaffingAlternative(raw:PlanAlternatives,context:Alternat
 export function packPlanAlternatives(raw:PlanAlternatives){
  const catalog=checked(raw,raw);
  return {...catalog,encoding:'deduplicated-identities-v1' as const,plans:catalog.plans.map(plan=>{const {inputKey,signature,bindingKey,scope,...result}=plan.result;void [inputKey,signature,bindingKey,scope];return {...plan,result};})};
+}
+
+/** Explicit correction adds one immutable alternative. It never reinitializes saved inputs. */
+export function proposeCorrectedPilotAlternative(raw:PlanAlternatives,context:AlternativeContext,request:AlternativeRequest,goalContext?:unknown):AlternativeOutcome{
+ const catalog=checked(raw,context),operation:AlternativeOperation={kind:'goal-correction',text:request.text,sourceIds:request.sourceIds};
+ const sources=sourcesFor(catalog,request),existing=retry(catalog,request,operation);if(existing)return existing;
+ if(sources.length!==1)fail('Choose one saved Action Plan to correct.');
+ const correction=savedPilotCorrection(sources[0].draft,goalContext);
+ if(!correction)fail('This plan has no unchanged legacy defaults to correct. Explicit plan edits and prior attachments are kept.');
+ const prior=catalog.plans.find(plan=>!plan.deleted&&plan.operation?.kind==='goal-correction'&&plan.sourceRefs.length===1&&plan.sourceRefs[0].id===sources[0].id&&equal(plan.draft,correction.draft));if(prior)return {status:'ready',catalog,plan:structuredClone(prior),reused:true};
+ return append(catalog,request,operation,sources,correction.draft,reconcileBundle(correction.draft),[...correction.changes,'Created by explicit review of the original goal. Existing dates, activity costs and user edits are preserved; review unresolved scope and assumptions before attaching.']);
 }

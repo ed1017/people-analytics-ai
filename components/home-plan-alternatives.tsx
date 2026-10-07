@@ -2,6 +2,7 @@
 import {useContext,useLayoutEffect,useRef,useState} from 'react';
 import {LegacyHomeBundlePlans,type HomeBundlePlansProps,type BundleDiscussion} from '@/components/home-bundle-plans';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
+import {SavedPilotCorrectionOffer} from '@/components/home-saved-pilot-correction';
 import {PlanAlternativeCard} from '@/components/plan-alternative-card';
 import {useHomeMixSearch} from '@/components/use-home-mix-search';
 import {HomeMixHistoryView,useVerifiedHomeMixHistory} from '@/components/home-mix-history';
@@ -13,7 +14,7 @@ import {proposeStaffingAlternative} from '@/lib/home-plan-alternatives';
 import {HomeGuidedActionsContext,useHomeGuidedActions} from '@/components/home-guided-actions';
 import {alternativeDiscussion} from '@/lib/home-plan-alternative-discussion';
 import {alternativeQuestionReply,alternativeView,alternativeViewField,planAlternativeSummary} from '@/lib/home-plan-alternative-chat';
-import {createPlanAlternatives,packPlanAlternatives,readPlanAlternatives,planAlternativesField,combinationIntent,proposeCombinedAlternative,proposeEditedAlternative,applyPlanAlternative,attachPlanAlternative,changeAlternativeView,type PlanAlternatives,type AlternativeRequest,type AlternativeOutcome} from '@/lib/home-plan-alternatives';
+import {createPlanAlternatives,packPlanAlternatives,readPlanAlternatives,planAlternativesField,combinationIntent,proposeCombinedAlternative,proposeEditedAlternative,applyPlanAlternative,attachPlanAlternative,changeAlternativeView,proposeCorrectedPilotAlternative,type PlanAlternatives,type AlternativeRequest,type AlternativeOutcome} from '@/lib/home-plan-alternatives';
 import type {CombinationReview} from '@/lib/home-plan-combination';
 import {actionBindingKey} from '@/lib/home-action-drafts';
 import {bundleInputKey} from '@/lib/home-bundle-reconciliation';
@@ -44,6 +45,18 @@ export function HomeBundlePlans(props:HomeBundlePlansProps){
   guided?.emit({type:'edited',goalId:context.goalId,planId:outcome.plan.id,number:outcome.plan.number});
   setNotice(`${outcome.reused?'Existing':'New'} Action Plan #${outcome.plan.number} saved for review. Apply or Attach explicitly; earlier plans and attachments are kept.`);return reply;
  }
+ function correctSavedPilot(id:string,expectedInput:string,sources:Parameters<typeof createPlanAlternatives>[1]){
+  try{
+   const state=guard(),latestRaw=state.data.workspaces[context.goalId]?.fields[planAlternativesField],current=latestRaw===undefined?createPlanAlternatives(context,sources):readPlanAlternatives(latestRaw,context);
+   if(!current)throw Error('Saved alternatives cannot be verified. Earlier plans are kept.');
+   const source=current.plans.find(plan=>plan.id===id&&!plan.deleted);
+   if(!source||bundleInputKey(source.draft)!==expectedInput||actionBindingKey(source.draft.binding)!==actionBindingKey(props.binding))throw Error('This saved plan changed. Review its current defaults before creating a correction.');
+   const key=JSON.stringify(['goal-correction',context,id,expectedInput]);if(pending.current?.key!==key)pending.current={key,id:crypto.randomUUID()};
+   const outcome=proposeCorrectedPilotAlternative(current,context,{requestId:pending.current.id,text:'Restore unchanged starting defaults from the original goal',sourceIds:[id],expectedInputs:{[id]:expectedInput}},props.planningContext);
+   if(outcome.status==='ready'&&outcome.reused)decisionStore.commitGoalFields(context.goalId,context.goal,state.data.revision,new Date().toISOString(),()=>({[alternativeViewField]:{version:1,selectedId:outcome.plan.id,collapsed:false}}));
+   saveOutcome(outcome);
+  }catch(error){setNotice((error as Error).message);}
+ }
  function register(target:BundleDiscussion){
   props.onDiscuss({...target,discard:()=>{epoch.current++;pending.current=null;setReview(null);setNotice('Conversation reset. Saved alternatives and attachments are kept.');},propose:text=>{
    guard();if(!target.isCurrent())throw Error('The selected plan changed. Send the request again for the current plans.');
@@ -68,7 +81,7 @@ export function HomeBundlePlans(props:HomeBundlePlansProps){
   }catch(error){setNotice((error as Error).message);}
  }
  if(raw!==undefined&&!catalog)return <p role="alert">Saved Action Plan alternatives cannot be verified. Their records are kept unchanged; review browser storage before editing or attaching.</p>;
- return <>{catalog?<AlternativePlans {...props} contextCurrent={props.contextCurrent&&catalog.plans.every(plan=>actionBindingKey(plan.draft.binding)===actionBindingKey(props.binding))} catalog={catalog} onDiscuss={register}/>:<LegacyHomeBundlePlans {...props} onDiscuss={register}/>}
+ return <>{catalog?<AlternativePlans {...props} contextCurrent={props.contextCurrent&&catalog.plans.every(plan=>actionBindingKey(plan.draft.binding)===actionBindingKey(props.binding))} catalog={catalog} onDiscuss={register} onCorrectSavedPilot={correctSavedPilot}/>:<LegacyHomeBundlePlans {...props} onDiscuss={register} onCorrectSavedPilot={correctSavedPilot}/>}
   {review&&<CombinationReviewForm key={review.request.requestId} disabled={props.disabled||!props.contextCurrent} onCreate={combine} onCancel={()=>{epoch.current++;setReview(null);}}/>}
   {notice&&<p role="status" className="whitespace-pre-line text-sm">{notice}</p>}
  </>;
@@ -132,6 +145,7 @@ function AlternativePlans(props:HomeBundlePlansProps&{catalog:PlanAlternatives})
  return <div data-guide-goal={binding.goalId} className="space-y-3" data-plan-current={blocked?'false':'true'}>
  <div role="tablist" aria-label="Suggested plans" className="flex flex-wrap gap-2">{catalog.order.map((id,index)=>{const plan=catalog.plans.find(item=>item.id===id)!;return <button data-guide-plan={plan.number} key={id} id={'alternative-tab-'+id} role="tab" aria-selected={id===selected.id} aria-controls="selected-home-alternative" tabIndex={id===selected.id?0:-1} className={button+' aria-selected:bg-accent'} disabled={blocked} onClick={()=>select(id)} onKeyDown={e=>{if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;e.preventDefault();const next=e.key==='Home'?0:e.key==='End'?catalog.order.length-1:(index+(e.key==='ArrowRight'?1:-1)+catalog.order.length)%catalog.order.length;select(catalog.order[next]);(e.currentTarget.parentElement?.children[next] as HTMLElement)?.focus();}}>Action Plan #{plan.number}</button>})}</div>
  <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-medium">Selected: Action Plan #{selected.number} · {selected.draft.bundle.name}</p><button className={button} aria-expanded={!view.collapsed} onClick={()=>{try{commit(catalog,{...view,collapsed:!view.collapsed});}catch(error){setNotice((error as Error).message);}}}>{view.collapsed?'Show Action Plan':'Collapse Action Plan'}</button></div>
+ {props.onCorrectSavedPilot&&<SavedPilotCorrectionOffer draft={selected.draft} planningContext={props.planningContext} disabled={blocked} onCreate={()=>props.onCorrectSavedPilot?.(selected.id,bundleInputKey(selected.draft),catalog.order.map(id=>({id,draft:catalog.plans.find(plan=>plan.id===id)!.draft})))}/>}
  <div id="selected-home-alternative" role="tabpanel" aria-labelledby={'alternative-tab-'+selected.id} hidden={view.collapsed}><PlanAlternativeCard plan={selected} catalog={catalog} contextDiagnostic={props.contextDiagnostic} contextCurrent={props.contextCurrent} measurePack={props.measurePack}/><HomeMixResults state={mixState} candidateId={candidateId} disabled={blocked} onSelect={id=>{if(mixState.key)setMixChoice({key:mixState.key,id});}}/></div>
  {selected.result.issues.length>0&&<label className="flex min-h-11 items-start gap-2 text-sm"><input type="checkbox" checked={acknowledged===selected.id} onChange={e=>setAcknowledged(e.target.checked?selected.id:null)}/>I have reviewed the unresolved assumptions for Action Plan #{selected.number}.</label>}
  <div className="flex flex-wrap gap-2">{!view.collapsed&&<button data-guide-target="attach" className={button+' bg-primary text-primary-foreground'} disabled={blocked||pendingMix||selected.result.issues.length>0&&acknowledged!==selected.id} onClick={()=>void attach()}>Attach Action Plan</button>}<button className={button} disabled={blocked||pendingMix||selected.applied&&!candidateId} onClick={()=>void saveAction('apply')}>Apply changes</button><button className={button} disabled={catalog.order.length<2} onClick={()=>setComparing(!comparing)}>{comparing?'Hide comparison':'Compare Action Plans'}</button></div>

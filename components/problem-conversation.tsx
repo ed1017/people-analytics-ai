@@ -12,9 +12,10 @@ import { addGoalNote, emptyGoalRequirements, normalizeGoalRequirements, type Goa
 import {openGoalContextEditor,changeGoalEditorStatement,goalContextEditorCurrent,recordExplorationGoalContext,type GoalContextEditor,type GoalEditorSource} from '@/lib/goal-context-editor';
 import { MAX_GOALS, emptyLocalGoals, type LocalGoals } from "@/lib/local-goals";
 
+import {DECISIONS_STORAGE_KEY} from '@/lib/local-decisions';
 import {decisionStore,useDecisionStorage} from "@/components/decision-store";
 
-type GoalChat = { messages: ChatMessage[]; input: string; problem: HomeDecisionContext | null; questionUnanswered: boolean; resetMarks?:Record<string,number> };
+type GoalChat = { messages: ChatMessage[]; input: string; problem: HomeDecisionContext | null; questionUnanswered: boolean; resetMarks?:Record<string,number>; recoveredPlanSelectionRequired?:boolean };
 export function useProblemConversation(scope = "home") {
   const [localGoals, setLocalGoals] = useState(emptyLocalGoals);
   const goalsRef = useRef(localGoals);
@@ -46,7 +47,8 @@ export function useProblemConversation(scope = "home") {
   const messages=storedMessages.slice(boundary);
   const [input, setInputState] = useState("");
   const inputRef=useRef("");
-  const setInput:Dispatch<SetStateAction<string>>=update=>{const next=typeof update==='function'?update(inputRef.current):update;inputRef.current=next;setInputState(next)};
+  const [recoveredPlanSelectionRequired,setRecoveredPlanSelectionRequired]=useState(false);
+  const setInput:Dispatch<SetStateAction<string>>=update=>{const next=typeof update==='function'?update(inputRef.current):update;inputRef.current=next;setInputState(next);if(!next.trim())setRecoveredPlanSelectionRequired(false)};
   const canSubmitPrompt=()=>{const current=decisionStore.getSnapshot().data.goals;return storageReady&&!inputRef.current.trim()&&goalsRef.current.activeId===localGoals.activeId&&current.activeId===localGoals.activeId&&(current.goals.find(goal=>goal.id===current.activeId)?.statement??"")===focusedIssue};
   const draftExample = (prompt:string) => {
     const currentGoalMatches = () => goalsRef.current.activeId===localGoals.activeId &&
@@ -76,20 +78,27 @@ export function useProblemConversation(scope = "home") {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- One-time hydration from browser storage, with SSR-safe initial state.
     goalsRef.current=saved;setLocalGoals(saved);setFocusedIssue(saved.goals.find(g=>g.id===saved.activeId)?.statement??"");
     const chat=chats.current.get(saved.activeId)??decisionStore.getField<GoalChat|null>(saved.activeId,"chat",null);
-    if(chat){setResetMarks(chat.resetMarks??{});setStoredMessages(chat.messages);setInput(chat.input);setProblem(chat.problem);}
+    if(chat){setResetMarks(chat.resetMarks??{});setStoredMessages(chat.messages);setInput(chat.input);setRecoveredPlanSelectionRequired(chat.recoveredPlanSelectionRequired===true);setProblem(chat.problem);}
     setStorageReady(true);
+    // Keep this tab's request recoverable as soon as another tab changes saved
+    // decisions, including when no attachment dialog is open and before reload.
+    const changed=(event:StorageEvent)=>{
+      if(event.storageArea===localStorage&&(event.key===null||event.key===DECISIONS_STORAGE_KEY))decisionStore.invalidateExternalChange();
+    };
+    window.addEventListener('storage',changed);
+    return()=>window.removeEventListener('storage',changed);
   }, []);
   const setMessages: Dispatch<SetStateAction<ChatMessage[]>> = update => {const current=storedMessagesRef.current,start=conversationBoundary(resetMarksRef.current,scope,current.length);setStoredMessages([...current.slice(0,start),...(typeof update === "function" ? update(current.slice(start)) : update)]);};
   useEffect(()=>{
-    if(storageReady&&localGoals.activeId)decisionStore.setField(localGoals.activeId,"chat",{messages:storedMessages,input,problem,questionUnanswered:false,resetMarks});
-  },[storageReady,localGoals.activeId,storedMessages,input,problem,resetMarks]);
+    if(storageReady&&localGoals.activeId)decisionStore.setField(localGoals.activeId,"chat",{messages:storedMessages,input,problem,questionUnanswered:false,resetMarks,...(recoveredPlanSelectionRequired?{recoveredPlanSelectionRequired:true}:{})});
+  },[storageReady,localGoals.activeId,storedMessages,input,problem,resetMarks,recoveredPlanSelectionRequired]);
   const rememberQuestion = (key: string, question: string) => setProblem(current => rememberProblemQuestion(current, key, question));
   const cancelPending = () => { requestGate.current.invalidate(); setHomeGoalChoiceKey(null); setLoading(false); };
-  const snapshot = () => { chats.current.set(goalsRef.current.activeId, {messages:storedMessagesRef.current,input:inputRef.current,problem,questionUnanswered,resetMarks:resetMarksRef.current}); };
+  const snapshot = () => { chats.current.set(goalsRef.current.activeId, {messages:storedMessagesRef.current,input:inputRef.current,problem,questionUnanswered,resetMarks:resetMarksRef.current,recoveredPlanSelectionRequired}); };
   const activate = (next: LocalGoals, saveCurrent = true) => {
     cancelPending(); if(next.activeId!==goalsRef.current.activeId)explorationContext.current=emptyGoalRequirements(); if (saveCurrent) snapshot();
     const chat = chats.current.get(next.activeId) ?? decisionStore.getField<GoalChat|null>(next.activeId,"chat",null);
-    setStoredMessages(chat?.messages ?? []);setResetMarks(chat?.resetMarks??{}); setInput(chat?.input ?? ""); setProblem(chat?.problem ?? null); setQuestionUnanswered(false);
+    setStoredMessages(chat?.messages ?? []);setResetMarks(chat?.resetMarks??{}); setInput(chat?.input ?? ""); setRecoveredPlanSelectionRequired(chat?.recoveredPlanSelectionRequired===true); setProblem(chat?.problem ?? null); setQuestionUnanswered(false);
     history.current = {key:"", messages:[]}; setError(null); setIssueEditor(null);
     setFocusedIssue(next.goals.find(g=>g.id===next.activeId)?.statement ?? ""); persist(next);
   };
@@ -103,7 +112,7 @@ export function useProblemConversation(scope = "home") {
     cancelPending();chats.current.clear();history.current={key:'',messages:[]};
     const next=state.data.goals,chat=decisionStore.getField<GoalChat|null>(next.activeId,'chat',null);
     goalsRef.current=next;setLocalGoals(next);setFocusedIssue(next.goals.find(g=>g.id===next.activeId)?.statement??'');
-    setStoredMessages(chat?.messages??[]);setResetMarks(chat?.resetMarks??{});setInput(chat?.input??'');setProblem(chat?.problem??null);setQuestionUnanswered(false);
+    setStoredMessages(chat?.messages??[]);setResetMarks(chat?.resetMarks??{});setInput(chat?.input??'');setRecoveredPlanSelectionRequired(chat?.recoveredPlanSelectionRequired===true);setProblem(chat?.problem??null);setQuestionUnanswered(false);
     setIssueEditor(null);setError(null);setWorkspaceRevision(value=>value+1);
   };
   const beginGuidedExploration=(id:string)=>{
@@ -242,7 +251,7 @@ export function useProblemConversation(scope = "home") {
     if(current.activeId)persist({...current,activeId:""});
     setResetEpoch(value=>value+1);
   };
-  return { beginGuidedExploration,endGuidedExploration,resetConversation,resetEpoch,wasReset:Object.hasOwn(resetMarks,'*')||Object.hasOwn(resetMarks,scope),historyMessages:storedMessages, canSubmitPrompt, confirmWorkforceGoal, saved:decisionStorage.saved, retrySave:()=>recoverStorage(),recovery:decisionStorage.recovery,recoverSaved:()=>recoverStorage(true), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, closeIssueEditor, openIssueEditor, updateIssueDraft, updateIssueContext, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
+  return { recoveredPlanSelectionRequired,beginGuidedExploration,endGuidedExploration,resetConversation,resetEpoch,wasReset:Object.hasOwn(resetMarks,'*')||Object.hasOwn(resetMarks,scope),historyMessages:storedMessages, canSubmitPrompt, confirmWorkforceGoal, saved:decisionStorage.saved, retrySave:()=>recoverStorage(),recovery:decisionStorage.recovery,recoverSaved:()=>recoverStorage(true), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, closeIssueEditor, openIssueEditor, updateIssueDraft, updateIssueContext, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
 }
 export type ProblemConversation = ReturnType<typeof useProblemConversation>;
 

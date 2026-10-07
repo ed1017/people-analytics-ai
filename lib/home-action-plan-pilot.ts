@@ -42,7 +42,8 @@ export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string,con
   finishById.set(id,timing.finish.value?Date.parse(timing.finish.value+'T00:00:00Z'):earliest+13*day);
  }
  if(input.groups.length===0&&input.memberships.length===0){
-  input.groups.push({id:'pilot-group',label:'Illustrative shared pilot group; not selected employees',count:intent.participants===null?demo(10):entered(intent.participants,'Explicit participant population in the user goal and constraints.')});
+  const quantifiedRetention=intent.pointReduction!==null||intent.relativeReduction!==null;
+  input.groups.push({id:'pilot-group',label:intent.participants!==null?'User-stated participant group':quantifiedRetention?'Shared pilot group; participant population requires review':'Illustrative shared pilot group; not selected employees',count:intent.participants!==null?entered(intent.participants,'Explicit participant population in the user goal and constraints.'):quantifiedRetention?unknownAssumption<number>():demo(10)});
   input.memberships=draft.bundle.components.map(component=>({componentId:component.id,groupIds:['pilot-group'],complete:unknownAssumption()}));
  }
  for(const domain of new Set(draft.bundle.components.map(item=>item.domain))){

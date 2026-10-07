@@ -33,6 +33,7 @@ import {queueHomeResponseReveal} from '@/components/home-response-reveal';
 import {useHomeComposerDock} from '@/components/use-home-composer-dock';
 import {HomeSolutionBundles} from '@/components/home-solution-bundles';
 import type {BundleDiscussion} from '@/components/home-bundle-plans';
+import {bundleInputKey} from '@/lib/home-bundle-reconciliation';
 import {bundleChatEditIntent,type BundleEditPreview} from '@/lib/home-bundle-chat-edit';
 import {HomeBundleChatReview} from '@/components/home-bundle-chat-review';
 import {HomeActionOptions} from '@/components/home-action-options';
@@ -113,6 +114,29 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   const [evidenceRevision, setEvidenceRevision] = useState(0);
   const pack = buildHomePack(sourceResults, workforceScope, conversation.focusedIssue || conversation.problem?.latestQuestion || "", developmentSession);
   const selectedPlanForChat=useRef<BundleDiscussion|null>(null);
+  type RecoveryPlanChoice={goalId:string;id:string;option:number;revision:number;inputKey:string};
+  const [recoveryPlanChoice,setRecoveryPlanChoice]=useState<RecoveryPlanChoice|null>(null);
+  const [recoveryConfirmation,setRecoveryConfirmation]=useState<{choice:RecoveryPlanChoice;request:string;context:string}|null>(null);
+  function currentRecoveryChoice(target:BundleDiscussion|null):RecoveryPlanChoice|null{
+    const draft=target?.snapshots?.().find(item=>item.id===target.id)?.draft;
+    return target&&draft?{goalId:target.goalId,id:target.id,option:target.option,revision:target.revision,inputKey:bundleInputKey(draft)}:null;
+  }
+  function registerPlanForChat(target:BundleDiscussion){
+    selectedPlanForChat.current=target;const choice=currentRecoveryChoice(target);
+    setRecoveryPlanChoice(previous=>JSON.stringify(previous)===JSON.stringify(choice)?previous:choice);
+    setRecoveryConfirmation(previous=>previous&&JSON.stringify(previous.choice)!==JSON.stringify(choice)?null:previous);
+  }
+  function confirmRecoveredPlan(){
+    const target=selectedPlanForChat.current,choice=currentRecoveryChoice(target);
+    if(!choice||!target?.isCurrent()||!conversation.saved||choice.goalId!==conversation.activeGoalId)return;
+    setRecoveryConfirmation({choice,request:input.trim(),context:contextKey});setLocalAction(null);
+  }
+  function recoveredPlanNeedsConfirmation(message:string){
+    return conversation.recoveredPlanSelectionRequired&&bundleChatEditIntent(message).edit&&!/(?:\b(?:action\s+)?plans?\s*#?\s*|#)\d+\b/i.test(message);
+  }
+  function recoveredPlanConfirmed(message:string,target:BundleDiscussion){
+    return recoveryConfirmation?.request===message&&recoveryConfirmation.context===contextKey&&JSON.stringify(recoveryConfirmation.choice)===JSON.stringify(currentRecoveryChoice(target));
+  }
   const [planEdit,setPlanEdit]=useState<BundleDiscussion|null>(null),[editPreview,setEditPreview]=useState<BundleEditPreview|null>(null),[editNotice,setEditNotice]=useState('');
   const editReview=useRef<HTMLDivElement>(null);
   const sources = pack.sources;
@@ -152,7 +176,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   function resetHomeConversation(){
     conversation.resetConversation();requestAnimationFrame(()=>composer.current?.focus());
   }
-  function changeQuestion(value:string){setLocalAction(null);setInput(value)}
+  function changeQuestion(value:string){setRecoveryConfirmation(null);setLocalAction(null);setInput(value)}
   const loaded = useRef("");
   const loadedAt = useRef(0);
   const composer = useRef<HTMLTextAreaElement>(null);
@@ -254,6 +278,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
       if(chatLoading||!conversation.saved||!planEditReady)return;
       const target=selectedPlanForChat.current;
       if(!target||target.goalId!==conversation.activeGoalId){setLocalAction({goalId:conversation.activeGoalId,notice:'Select the intended Action Plan tab, then send this change again for review. Your request is kept; nothing has changed.'});return;}
+      if(recoveredPlanNeedsConfirmation(message)&&!recoveredPlanConfirmed(message,target)){setLocalAction({goalId:conversation.activeGoalId,notice:'Review the intended Action Plan tab and confirm it for this recovered request before sending. Nothing has changed.'});return;}
       setLocalAction(null);setPlanEdit(target);
       try{if(!target.isCurrent())throw Error('The selected plan or context changed. Select the intended Plan tab and send the change again.');const answer=target.propose(message);setMessages(current=>[...current,{role:'user',content:message},{role:'assistant',content:answer}]);setInput('');setPlanEdit(null);setEditPreview(null);setEditNotice('');setChatError(null);requestAnimationFrame(()=>{const panel=conversationViewport.current?.querySelector<HTMLElement>('[aria-label="Action Plans for your goal"]');panel?.scrollIntoView({block:'start'});});}
       catch(error){setEditPreview(null);setEditNotice((error as Error).message);setLocalAction({goalId:conversation.activeGoalId,notice:(error as Error).message});}
@@ -493,7 +518,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
         <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">Data details</h2><button type="button" popoverTarget="home-data-details" popoverTargetAction="hide" className="min-h-11 rounded border px-3 focus-visible:ring-2 focus-visible:ring-ring">Close data details</button></div>
       {evidenceError&&<p className="mb-3 text-xs">{evidenceError}</p>}
       <section aria-label="How filters affect evidence" className="mb-3 space-y-1 text-xs text-muted-foreground">
-        <p><strong>Workforce snapshot [W1]:</strong> {sourcesSettled?workforceScope.replace(/^Selected workforce snapshot:\s*/, ''):'Refreshing scope; previous figures are not current.'} Only this source follows Country, Business Unit and Level.</p>
+        <p><strong>Workforce snapshot [W1]:</strong> {sourcesSettled?pack.sources.find((source:{id:string})=>source.id==='W1')?.scope.replace(/^(?:Selected workforce snapshot:\s*)+/, ''):'Refreshing scope; previous figures are not current.'} Only this source follows Country, Business Unit and Level. If its effective scope cannot be verified, its figures stay unavailable.</p>
         <p>Other company evidence remains company-wide or survey-specific. A goal names planning intent; it does not filter sources or set a what-if population. Department scope is unknown: Home has no Department filter or department-scoped evidence.</p>
       </section>
         <section aria-label="Conversation history" className="my-4"><h3 className="font-semibold">Conversation history</h3><p className="mt-1 text-xs text-muted-foreground">Reference only. Current findings use current evidence and saved goal context.</p>{conversation.historyMessages.length?<ConversationMessages compactAssistant messages={conversation.historyMessages} onNavigate={page=>{document.getElementById("home-data-details")?.hidePopover();onNavigate(page);}}/>:<p className="mt-2 text-sm">No conversation yet.</p>}</section>
@@ -524,7 +549,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     {showFallbackPin&&!chatLoading&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
     {!activePinnedGoal&&conversationPanel}
 
-    <HomeSolutionBundles settled={sourcesSettled} chatChange={planEdit&&editPreview?{goalId:planEdit.goalId,planId:planEdit.id,inputKey:editPreview.inputKey,ready:!chatLoading&&planEditReady&&conversation.saved&&input.trim()===editPreview.request,isCurrent:planEdit.isCurrent,apply:applyPlanChanges}:null} openRequest={planOpen} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} projectEvidence={destination=>buildHomePack(sourceResults,workforceScope,conversation.focusedIssue||conversation.problem?.latestQuestion||'',destination.development??developmentSession)} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={request=>{selectedPlanForChat.current=request;}}/>
+    <HomeSolutionBundles settled={sourcesSettled} chatChange={planEdit&&editPreview?{goalId:planEdit.goalId,planId:planEdit.id,inputKey:editPreview.inputKey,ready:!chatLoading&&planEditReady&&conversation.saved&&input.trim()===editPreview.request,isCurrent:planEdit.isCurrent,apply:applyPlanChanges}:null} openRequest={planOpen} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} projectEvidence={destination=>buildHomePack(sourceResults,workforceScope,conversation.focusedIssue||conversation.problem?.latestQuestion||'',destination.development??developmentSession)} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={registerPlanForChat}/>
     {activePinnedGoal&&conversationPanel}
     {planEdit?.goalId===conversation.activeGoalId&&<div ref={editReview} tabIndex={-1}><HomeBundleChatReview target={planEdit} preview={editPreview} text={input} busy={chatLoading||!planEditReady||!conversation.saved} notice={editNotice} onClose={()=>{setPlanEdit(null);setEditPreview(null);setEditNotice('');focusQuestion();}}/></div>}
 
@@ -536,6 +561,11 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
 
     <form onSubmit={event => { event.preventDefault(); void send(); }} className="home-chat-form shrink-0">
       {visibleScopeChoice && <div aria-label="Requested country scope" className="mb-3 text-sm"><p>{visibleScopeChoice.kind==="ambiguous" ? "Which country should this workforce snapshot use?" : visibleScopeChoice.kind==="unsupported" ? "That country scope is not fully supported. Choose an available country or keep the current scope; missing evidence stays unavailable." : "Use country-specific workforce evidence for this question?"}</p><div className="mt-2 flex flex-wrap gap-2">{visibleScopeChoice.options.map(option=><button key={option.value} type="button" onClick={()=>applyCountry(option)} className="min-h-11 rounded border border-primary px-3 py-2 font-semibold text-primary">Apply {option.label} and answer</button>)}<button type="button" onClick={()=>void send(visibleScopeChoice.message,false,true)} className="min-h-11 px-2 text-primary underline">Answer with current scope</button></div><p className="mt-1 text-xs text-muted-foreground">Only the workforce snapshot changes. Other filters stay selected; company-wide sources retain their scope.</p></div>}
+      {recoveredPlanNeedsConfirmation(input)&&<section aria-label="Confirm plan for recovered request" className="mb-3 space-y-2 rounded border p-3 text-sm">
+        <p>Your recovered request does not name a plan. Another tab may have changed the selection. Select the intended Action Plan tab, then confirm it here before sending.</p>
+        {recoveryPlanChoice?.goalId===conversation.activeGoalId&&<button type="button" className="min-h-11 rounded border px-3 py-2 font-medium" disabled={!conversation.saved||chatLoading||!planEditReady} onClick={confirmRecoveredPlan}>Use Action Plan #{recoveryPlanChoice.option} for this recovered request</button>}
+        {recoveryConfirmation?.request===input.trim()&&recoveryConfirmation.context===contextKey&&JSON.stringify(recoveryConfirmation.choice)===JSON.stringify(recoveryPlanChoice)&&<p role="status">Action Plan #{recoveryPlanChoice?.option} confirmed for this request. Press Send to create a new alternative.</p>}
+      </section>}
       {pendingScope && <p role="status" className="mb-3 text-sm">Refreshing the selected workforce evidence before answering. Edit your question to cancel.</p>}
       {localAction?.goalId===conversation.activeGoalId&&<p role="status" className="mb-3 text-sm">{localAction.notice}</p>}
       <div ref={composerSlot} className="home-composer-slot"><div ref={composerDock} className="home-composer-dock rounded-t-2xl border bg-card p-2 shadow-lg">

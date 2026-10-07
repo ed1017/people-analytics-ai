@@ -3,12 +3,14 @@ import assert from "node:assert/strict";
 import {buildHomePack,normalizeHomePack,homeDefinitions,HOME_MAX_BYTES,HOME_SOURCE_BYTES,readHomeSource} from "../lib/home-pack.mjs";
 import {employeeListeningEvidence,exitSurveyEvidence} from "../lib/employee-listening.ts";
 import {overviewBriefingPrompt} from "../lib/overview-briefing.ts";
+import {scopedDashboardResponse} from '../lib/dashboard-scope.ts';
+const scoped=(overview,country,label,org='all',orgLabel='All business units')=>scopedDashboardResponse({overview,trend:[overview],filter_options:{countries:[{value:country,label}],business_units:[{value:org,label:orgLabel}],levels:[]}},{country,org,level:'all'});
 const wrap=data=>({status:"loaded",data});
 const find=(pack,id)=>pack.sources.find(s=>s.id===id);
 const survey={as_of:"2026-09-30",summary:{engagement_respondents:120,engagement_eligible_population:200,exit_respondents:15},engagement_trend:[{survey_code:"ENG-2026",respondents:120,launch_date:"2026-06-01",close_date:"2026-06-30",denominator_snapshot_date:"2026-06-30"}],exit_reasons:[{primary_reason:"Career",exits:5,pct_of_exit_responses:33.3}],exit_dimensions:[{survey_code:"EXIT",question_text:"Support?",dimension:"Support",separation_respondents:12,avg_score:3,favorable_pct:40}],exit_enps:{score:95},comments:["PRIVATE"]};
 test("Home attempts every configured category and keeps source-specific scopes and dates",()=>{
  const sources=Object.fromEntries(homeDefinitions.map(d=>[d[1],wrap({as_of:"2026-09-30",summary:{[d[7].split(" ")[0]]:1}})]));
- sources.dashboard=wrap({overview:{snapshot_date:"2026-08-31",headcount:20,fte:18,open_positions:0},trend:[]});sources["survey-sentiment"]=wrap(survey);
+ sources.dashboard=wrap(scoped({snapshot_date:"2026-08-31",headcount:20,fte:18,open_positions:0},"AU","Australia","ENG","Engineering"));sources["survey-sentiment"]=wrap(survey);
  const pack=buildHomePack(sources,"Australia; Engineering; all levels");
  assert.equal(pack.sources.length,18);assert.equal(find(pack,"W1").date,"2026-08-31");assert.equal(find(pack,"W1").facts.open_positions,0);
  for(const id of ["T1","T2","T3","T4","T5","A1","R1","S1","S2","P1","P2","F1"])assert.match(find(pack,id).scope,/Company-wide/);
@@ -58,5 +60,5 @@ test("Canada goal surfaces existing country composition without changing the fil
  const results={dashboard:wrap({overview:{snapshot_date:"2026-09-30",headcount:10000,voluntary_turnover_ytd_pct:6.2}}),workforce:wrap({summary:{headcount:10000},business_units:[{org_name:"Operations",headcount:2500}],countries:[{country_name:"Canada",headcount:850,fte:820},{country_name:"US",headcount:5000}]})};
  const global=buildHomePack(results,"All countries; all business units; all levels","I want less turnover for Canada");
  assert.equal(find(global,"W1").facts.headcount,10000);assert.match(find(global,"W1").scope,/All countries/);assert.equal(find(global,"W2").facts.rows[0].country_name,"Canada");assert.equal(find(global,"W2").facts.rows[0].voluntary_turnover_ytd_pct,undefined);
- const selected=buildHomePack({...results,dashboard:wrap({overview:{snapshot_date:"2026-09-30",headcount:850,voluntary_turnover_ytd_pct:4.1}})},"Canada; all business units; all levels","Reduce turnover");assert.equal(find(selected,"W1").facts.voluntary_turnover_ytd_pct,4.1);assert.match(find(selected,"W1").scope,/Canada/);assert.match(find(selected,"A1").scope,/Company-wide/);
+ const selected=buildHomePack({...results,dashboard:wrap(scoped({snapshot_date:"2026-09-30",headcount:850,voluntary_turnover_ytd_pct:4.1},"CA","Canada"))},"Canada; all business units; all levels","Reduce turnover");assert.equal(find(selected,"W1").facts.voluntary_turnover_ytd_pct,4.1);assert.match(find(selected,"W1").scope,/Canada/);assert.match(find(selected,"A1").scope,/Company-wide/);
 });

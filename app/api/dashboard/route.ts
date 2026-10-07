@@ -3,6 +3,8 @@ import { supabaseServer } from "../../../lib/supabase-server";
 
 import { loadPerformanceRelease, parsePerformanceFilters } from "../../../lib/workforce-performance";
 
+import {dashboardRequestedFilters,scopedDashboardResponse} from "../../../lib/dashboard-scope";
+
 export const dynamic = "force-dynamic";
 
 function normalizeFilter(value: string | null) {
@@ -40,12 +42,13 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const scoped = scopedDashboardResponse(data,dashboardRequestedFilters(request.nextUrl.searchParams));
   const filters = parsePerformanceFilters(request.nextUrl.searchParams);
-  const performance_rating = data?.overview?.snapshot_date === "2026-09-30"
+  const performance_rating = scoped.workforce_filter_scope.status === "verified_rpc" && data?.overview?.snapshot_date === "2026-09-30"
     ? await loadPerformanceRelease((name, args) => supabaseServer.rpc(name, args), filters, data?.overview?.headcount ?? null)
     : null;
 
-  return NextResponse.json({ ...data, performance_rating }, {
+  return NextResponse.json({ ...scoped, performance_rating }, {
     headers: {
       "Cache-Control": "no-store",
     },

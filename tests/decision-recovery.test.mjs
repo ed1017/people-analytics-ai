@@ -6,3 +6,44 @@ test('generated proposal survives a failed save and reload, merging only unrelat
 test('same-field conflicts never overwrite saved attachments; explicit resolution retains the unsent request',()=>{const shared=port(),tab=port(),a=new DecisionStore(),b=new DecisionStore();a.initialize(shared,seed,tab);b.initialize(shared);b.setField('a','homeSolutionBundlesV1',{attachments:['saved attachment']});b.setField('a','chat',{messages:[{role:'user',content:'Other tab question'}],input:''});a.setField('a','homeSolutionBundlesV1',{attachments:['unsaved draft']});a.setField('a','chat',{messages:[],input:'In Action Plan #1 set budget to 60000'});const saved=shared.getItem(DECISIONS_STORAGE_KEY);const reload=new DecisionStore();reload.initialize(shared,seed,tab);reload.retry();assert.equal(reload.getSnapshot().saved,false);assert.ok(reload.getSnapshot().recovery.conflicts.length);assert.equal(shared.getItem(DECISIONS_STORAGE_KEY),saved);reload.recoverDraft(true);assert.equal(reload.getSnapshot().saved,true);assert.deepEqual(reload.getField('a','homeSolutionBundlesV1',null).attachments,['saved attachment']);assert.equal(reload.getField('a','chat',null).input,'In Action Plan #1 set budget to 60000');assert.equal(reload.getField('a','chat',null).messages[0].content,'Other tab question');});
 test('a removed goal is not silently recreated by recovered local changes',()=>{const shared=port(),tab=port(),a=new DecisionStore(),b=new DecisionStore();a.initialize(shared,seed,tab);b.initialize(shared);b.saveGoals({version:1,activeId:'b',goals:[{id:'b',statement:'Develop skills'}]});a.setField('a','proposal',{keep:'recoverable'});const reload=new DecisionStore();reload.initialize(shared,seed,tab);reload.retry();assert.equal(reload.getSnapshot().saved,false);assert.ok(reload.getSnapshot().recovery.conflicts.some(item=>item.field==='goal-and-plan'));reload.recoverDraft(true);assert.equal(reload.getSnapshot().data.goals.goals.some(goal=>goal.id==='a'),false);assert.equal(reload.getSnapshot().data.workspaces.a,undefined);});
 test('single-tab quota failure recovers once without generating or duplicating a proposal',()=>{const raw=port(),tab=port();let fail=false;const shared={...raw,setItem:(key,value)=>{if(fail)throw Error('quota');raw.setItem(key,value)}};const a=new DecisionStore();a.initialize(shared,seed,tab);fail=true;a.setField('a','proposal',{id:'one'});assert.equal(a.getSnapshot().saved,false);fail=false;const reload=new DecisionStore();reload.initialize(shared,seed,tab);reload.retry();assert.equal(reload.getSnapshot().saved,true);assert.deepEqual(reload.getField('a','proposal',null),{id:'one'});reload.retry();assert.deepEqual(reload.getField('a','proposal',null),{id:'one'});});
+
+test('direct atomic Attach conflict journals the published base even with no prior unsaved typing, then Retry reads newer state',()=>{
+ const shared=port(),tab=port(),a=new DecisionStore(),b=new DecisionStore();a.initialize(shared,seed,tab);b.initialize(shared);
+ b.setField('a','attachments',{history:['other-tab-attachment']});const saved=shared.getItem(DECISIONS_STORAGE_KEY);
+ let candidateBuilt=false;assert.throws(()=>a.commitGoalFields('a','Reduce turnover',a.getSnapshot().data.revision,'2026-10-07T01:00:00Z',()=>{candidateBuilt=true;return {attachments:{history:['failed-attachment']}}}),/Another tab/);
+ assert.equal(candidateBuilt,false);assert.equal(shared.getItem(DECISIONS_STORAGE_KEY),saved);assert.ok(tab.getItem(DECISION_RECOVERY_KEY));assert.equal(a.getField('a','attachments',null),null);
+ a.retry();assert.equal(a.getSnapshot().saved,true);assert.deepEqual(a.getField('a','attachments',null),{history:['other-tab-attachment']});
+ a.commitGoalFields('a','Reduce turnover',a.getSnapshot().data.revision,'2026-10-07T02:00:00Z',fields=>({attachments:{history:[...fields.attachments.history,'explicit-retry-attachment']}}));
+ assert.deepEqual(a.getField('a','attachments',null).history,['other-tab-attachment','explicit-retry-attachment']);assert.equal(tab.getItem(DECISION_RECOVERY_KEY),null);
+});
+
+test('external invalidation without a draft offers recovery, including after a reload',()=>{
+ const shared=port(),tab=port(),a=new DecisionStore(),b=new DecisionStore();a.initialize(shared,seed,tab);b.initialize(shared);b.setField('b','sentinel','latest');a.invalidateExternalChange();assert.ok(tab.getItem(DECISION_RECOVERY_KEY));
+ const reload=new DecisionStore();reload.initialize(shared,seed,tab);reload.retry();assert.equal(reload.getSnapshot().saved,true);assert.equal(reload.getField('b','sentinel',null),'latest');assert.equal(reload.getField('a','chat',null).input,'');
+});
+
+test('recovery keeps an already saved unsent request and requires plan confirmation when the other tab changes selection',()=>{
+ const shared=port(),tab=port(),a=new DecisionStore(),b=new DecisionStore();a.initialize(shared,seed,tab);a.setField('a','chat',{messages:[],input:'Set coordination hours to 24'});a.setField('a','planView',{selectedId:'plan-1'});b.initialize(shared);
+ b.setField('a','planView',{selectedId:'plan-4'});b.setField('a','chat',{messages:[{role:'assistant',content:'New Action Plan #4'}],input:''});a.invalidateExternalChange();a.retry();
+ assert.equal(a.getSnapshot().saved,true);assert.equal(a.getField('a','planView',null).selectedId,'plan-4');assert.equal(a.getField('a','chat',null).input,'Set coordination hours to 24');assert.equal(a.getField('a','chat',null).recoveredPlanSelectionRequired,true);
+ const reload=new DecisionStore();reload.initialize(shared,seed,tab);assert.equal(reload.getField('a','chat',null).recoveredPlanSelectionRequired,true);assert.equal(reload.getField('a','chat',null).messages[0].content,'New Action Plan #4');
+});
+
+test('conflicting catalogs are never unioned by recovery and atomic failure never journals its candidate',()=>{
+ const shared=port(),tab=port(),a=new DecisionStore(),b=new DecisionStore();a.initialize(shared,seed,tab);a.setField('a','catalog',{plans:[{id:'1',number:1}],nextNumber:4,attachments:['original']});a.setField('a','chat',{messages:[],input:'Set coordination hours to 24'});b.initialize(shared);
+ const winning={plans:[{id:'1',number:1},{id:'remote-4',number:4}],nextNumber:5,attachments:['original','remote-4']};b.setField('a','catalog',winning);
+ assert.throws(()=>a.commitGoalFields('a','Reduce turnover',a.getSnapshot().data.revision,'2026-10-07T01:00:00Z',()=>({catalog:{plans:[{id:'local-4',number:4}],nextNumber:5,attachments:['local-4']}})),/Another tab/);
+ const journal=JSON.parse(tab.getItem(DECISION_RECOVERY_KEY));assert.equal(parseDecisions(journal.draft).workspaces.a.fields.catalog.plans.length,1);a.retry();assert.deepEqual(a.getField('a','catalog',null),winning);assert.equal(a.getField('a','chat',null).recoveredPlanSelectionRequired,true);
+ // An ordinary unsaved conflicting field still needs explicit review; no union is attempted.
+ const c=new DecisionStore(),d=new DecisionStore(),tabC=port();c.initialize(shared,seed,tabC);d.initialize(shared);d.setField('a','catalog',{...winning,nextNumber:6,attachments:[...winning.attachments,'remote-5']});c.setField('a','catalog',{...winning,nextNumber:6,attachments:['unsafe-local-history']});c.retry();assert.equal(c.getSnapshot().saved,false);assert.ok(c.getSnapshot().recovery.conflicts.some(item=>item.field==='catalog'));c.recoverDraft(true);assert.deepEqual(c.getField('a','catalog',null).attachments,['original','remote-4','remote-5']);
+});
+
+test('atomic conflict can recover safely in memory when no session storage port was supplied',()=>{
+ const shared=port(),a=new DecisionStore(),b=new DecisionStore();a.initialize(shared,seed);b.initialize(shared);b.setField('a','attachment','newer');
+ assert.throws(()=>a.commitGoalFields('a','Reduce turnover',a.getSnapshot().data.revision,'2026-10-07T01:00:00Z',()=>({attachment:'failed'})),/Another tab/);assert.ok(a.getSnapshot().recovery);a.retry();assert.equal(a.getSnapshot().saved,true);assert.equal(a.getField('a','attachment',null),'newer');
+});
+
+test('recovering an active guided goal leaves an unchanged inactive goal and its unsent request byte-identical',()=>{
+ const shared=port(),tab=port(),a=new DecisionStore(),b=new DecisionStore();a.initialize(shared,seed,tab);a.setField('b','chat',{messages:[{role:'user',content:'Original user question'}],input:'Original unsent draft',problem:null,questionUnanswered:false,resetMarks:{}});a.setField('b','catalog',{plans:['original'],attachments:['keep']});const original=JSON.stringify(a.getSnapshot().data.workspaces.b.fields);b.initialize(shared);b.setField('a','attachment','new saved work');a.invalidateExternalChange();a.retry();
+ assert.equal(a.getSnapshot().saved,true);assert.equal(JSON.stringify(a.getSnapshot().data.workspaces.b.fields),original);assert.equal(a.getField('b','chat',null).recoveredPlanSelectionRequired,undefined);
+});
