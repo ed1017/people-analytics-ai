@@ -1,6 +1,7 @@
 "use client";
 import {useHomeGuidedActions} from '@/components/home-guided-actions';
 import {PlanDirections} from '@/components/plan-directions';
+import {HomePlanSummary} from '@/components/home-plan-summary';
 import {useHomeMixSearch} from '@/components/use-home-mix-search';
 import {HomeMixHistoryView,useVerifiedHomeMixHistory} from '@/components/home-mix-history';
 import {HomeMixResults} from '@/components/home-mix-results';
@@ -12,17 +13,17 @@ import {attachCurrentPlan} from '@/lib/home-direct-attachment';
 import {planContextDiagnosticText,type PlanContextDiagnostic} from '@/lib/home-evidence-identity';
 import {actionEvidenceCatalog} from '@/lib/home-action-proposal';
 import {homePlanPanelField,readHomePlanPanel} from '@/lib/home-plan-panel';
-import {planDeliveryEstimate,planStaffEffortText} from "@/lib/home-plan-delivery-estimate";
+import {planStaffEffortText} from "@/lib/home-plan-delivery-estimate";
 import {planCashEstimate} from '@/lib/home-plan-cash';
 import {calculatePlanWhatIf,whatIfOutcomeText} from '@/lib/home-plan-what-if';
-import {suggestSuccessMeasure,successMeasureText,measurementScope} from '@/lib/home-success-measures';
+import {successMeasureText,measurementScope} from '@/lib/home-success-measures';
 import {preferredSavedBundleId,restoredBundleDraft,restoredBundleResult} from "@/lib/home-pinned-goals";
 import {SavedPilotCorrectionOffer} from '@/components/home-saved-pilot-correction';
 import {prepareIllustrativePilot,pilotAllowances} from '@/lib/home-action-plan-pilot';
 import {useId,useLayoutEffect,useRef,useState} from 'react';
 import {previewBundleChatEdit,acceptBundleChatEdit,bundleChatEditExamples,type BundleEditExample,type BundleEditPreview} from '@/lib/home-bundle-chat-edit';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
-import {bundleAssumptionCopy,bundleIsAnalysisOnly,bundleDisplayText,bundleComponentLabels,bundleDisplayName,bundleAssumptionText,bundleHorizonEnd} from '@/lib/home-bundle-display';
+import {bundleAssumptionCopy,bundleDisplayText,bundleComponentLabels,bundleDisplayName,bundleAssumptionText,bundleHorizonEnd} from '@/lib/home-bundle-display';
 import {HomeLinkedAttachment} from '@/components/home-linked-attachment';
 import type {ProjectPlanningBinding} from '@/lib/home-linked-attachment';
 import {actionBindingKey,type ActionBinding} from '@/lib/home-action-drafts';
@@ -132,10 +133,6 @@ export function LegacyHomeBundlePlans({onCorrectSavedPilot,contextDiagnostic,cha
  const evidenceCurrent=contextCurrent||contextDiagnostic?.evidence==='unchanged';
  const referenceCatalog=evidenceCurrent?actionEvidenceCatalog(measurePack):[];
  const referenceNotice=contextCurrent?'Observed context only; these references do not establish effectiveness.':contextDiagnostic?.evidence==='unchanged'?`Evidence is unchanged; ${contextDiagnostic.goal==='changed'?'goal': 'planning inputs'} changed. Review the plan before attaching.`:contextDiagnostic?.evidence==='changed'?'Original evidence context changed; references require review.':'Current evidence comparison is unavailable; references require review.';
- const delivery=draft?planDeliveryEstimate(draft):null;
- const whatIf=draft?calculatePlanWhatIf(draft.inputs):null;
- const cash=draft?planCashEstimate(draft,currentResult?.cashTotal??null):null;
- const suggestedMeasure=suggestSuccessMeasure(binding.goal,measurePack);
  const activeAttachments=workspace?.attachments.filter(item=>!workspace.attachments.some(next=>next.supersedes===item.id))??[],existing=activeAttachments.find(item=>item.draft.bundle.id===selected);
  function selectPlan(id:string){if(!proposal.bundles.some(bundle=>bundle.id===id))throw Error('This Action Plan is unavailable.');setSelected(id);saveView({appliedId:id as 'A'|'B'|'C'});setAttachFlow(null);setAttachmentOpen(null);setNotice('');if(decisionStore.getSnapshot().saved)guided?.emit({type:'selected',goalId:binding.goalId,planId:id,number:optionNumber(id)});}
  const guided=useHomeGuidedActions('plan',{goalId:binding.goalId,select:()=>{guard();selectPlan(proposal.bundles[0].id);setCollapsed(false);saveView({collapsed:false});},attach:attachSelected,attachReady:()=>!disabled&&contextCurrent&&!!workspace&&!pendingInput&&!attachBusy&&mixHistory.status!=='loading'&&mixHistory.status!=='invalid'&&mixState.status!=='queued'&&mixState.status!=='running',
@@ -152,23 +149,11 @@ export function LegacyHomeBundlePlans({onCorrectSavedPilot,contextDiagnostic,cha
   <div id={panelId} hidden={collapsed}><section id="selected-home-plan" role="tabpanel" aria-labelledby={`plan-tab-${selected}`}><article aria-label={`Action Plan option ${optionNumber(selected)}`} className="space-y-3 border-t pt-3"><h3 ref={heading} tabIndex={-1} className="text-base font-semibold">{bundleDisplayName(draft.bundle.name)}</h3>
    {onCorrectSavedPilot&&<SavedPilotCorrectionOffer draft={draft} planningContext={planningContext} disabled={disabled||!contextCurrent||attachBusy} onCreate={()=>{try{guard();if(bundleInputKey(currentDraft())!==bundleInputKey(draft))throw Error('The saved plan changed. Review its current defaults.');onCorrectSavedPilot(selected,bundleInputKey(draft),Object.entries(viewDrafts).map(([id,draft])=>({id,draft})));}catch(error){setNotice((error as Error).message);}}}/>}
    {pendingRevision&&<p className="font-medium">Proposed revision {draft.revision} · not yet applied</p>}
-   {currentResult?.budget&&<p aria-label="Plan budget check" className="text-sm">{draft.inputs.budget?.basis.kind==='illustrative'&&<strong>Proposed cash-budget assumption: </strong>}{planBudgetText(currentResult)}</p>}
    <p aria-label="Plan description" className="text-sm leading-relaxed">{bundleDisplayText(draft.bundle.objective,draft.bundle,draft.inputs)}</p>
    <PlanDirections draft={draft}/>
-   {bundleIsAnalysisOnly(draft.bundle)&&<p className="text-sm font-medium">The listed first steps are analytical; a delivery intervention still needs review.</p>}
-   <ul aria-label="Selected plan summary" className="list-disc space-y-1.5 pl-5 text-sm">
-    <li><strong>Approach:</strong> {bundleDisplayText(draft.bundle.coordination,draft.bundle,draft.inputs)}</li>
-    <li><strong>Stakeholders:</strong> {[...new Set(draft.bundle.components.map(item=>item.ownerRole))].slice(0,2).join('; ')} (proposed roles){new Set(draft.bundle.components.map(item=>item.ownerRole)).size>2?`; ${new Set(draft.bundle.components.map(item=>item.ownerRole)).size-2} more in details`:''}. Owners are not assigned.</li>
-    <li><strong>People needed:</strong> {draft.inputs.capacity&&<span>{planStaffEffortText(draft)} </span>} {delivery&&!draft.inputs.capacity&&<span>{delivery.participants??'Unresolved'} assumed participants; {delivery.hours??'unresolved'} total staff hours across the proposed owner roles. </span>}{!delivery&&<>{currentResult?.conditionalCoverage?`${currentResult.conditionalCoverage.at(-1)??'Not yet assessed'} conditional roles covered; ${currentResult.plannedAddedEmployees??'Not yet assessed'} planned added employees`:draft.inputs.groups.find(group=>group.id==='pilot-group')?`${bundleAssumptionText(draft.inputs.groups.find(group=>group.id==='pilot-group')!.count,value=>`${value} hypothetical pilot participants`)}; staffing not yet assessed`:'Not yet assessed'}.</>}</li>
-    <li><strong>Cost:</strong> <span>Assumed cash {money(cash?.cash)}. {!draft.inputs.capacity&&whatIf?.status==='ready'&&whatIf.kind==='capacity'&&cash?.cash!==null&&<span>Scenario cost basis: {money(whatIf.listedCash)} listed cash allowances plus {whatIf.target} roles × {money(whatIf.unitCost)} per role per month × {whatIf.months} months = {money(whatIf.roleCash)} new-hire payroll/cash. Assumes all roles are new hires paid for the full horizon; internal moves or partial schedules require staffing review. </span>}Staff effort is listed in hours above. {cash?.reason} Reviewed full budget: {money(currentResult?.cashTotal)}.</span></li>
-    <li><strong>Timeline:</strong> {delivery?.finish?`Assumed deliverables by ${delivery.finish}; planning horizon ${bundleAssumptionText(draft.inputs.scope.startMonth)} through ${bundleAssumptionText(bundleHorizonEnd(draft.inputs.scope))}`:currentResult?.planFinish?`Assumed component finish ${currentResult.planFinish}${currentResult.capacityReadyMonth?`; conditional capacity from ${currentResult.capacityReadyMonth}`:''}`:`Start ${bundleAssumptionText(draft.inputs.scope.startMonth)}; duration ${bundleAssumptionText(draft.inputs.scope.months,value=>`${value} months`)}; horizon end ${bundleAssumptionText(bundleHorizonEnd(draft.inputs.scope))}; readiness not yet assessed`}.</li>
-    <li><strong>Expected outcome:</strong> {delivery&&<span>Proposed deliverables: {delivery.deliverables.join('; ')}. These are deliverable targets, not completed work; analytical work does not imply skill growth or retention improvement. </span>}{draft.inputs.whatIf&&<span>{whatIfOutcomeText(draft.inputs)} </span>}Intended contribution to “{binding.goal}”. This is a proposed outcome, not a predicted effect. Retention effects are not established.</li>
-    <li><strong>How success is measured:</strong> {delivery?<span>{draft.inputs.successMeasure&&<>{successMeasureText(draft.inputs.successMeasure,draft.inputs.successMeasure.scopeKey===measurementScope(draft.inputs))} </>}{delivery.acceptance} Deliverable target: {delivery.deliverables.join('; ')}. {whatIf?.status==='ready'?'The what-if target is conditional, not a validated prediction.':'No intervention effect is inferred.'}</span>:<>{whatIf?.status==='ready'&&!draft.inputs.successMeasure&&<span>Proposed target: {whatIf.target}{whatIf.kind==='turnover'?'% turnover using voluntary exits / average workforce for the same period':' additional roles covered from the planning start'}, over {whatIf.months} months from {whatIf.start}. Track the same population and period; this is a target, not a prediction. </span>}{!draft.inputs.successMeasure&&!draft.inputs.whatIf&&<span>Suggested measure: {suggestedMeasure.name}. {suggestedMeasure.baseline?'A recorded contextual baseline is available for review; confirm the plan population and period before adopting it.':'No matching recorded baseline is available.'} Set a target as a planning assumption, not a prediction. </span>}{(draft.inputs.successMeasure||!draft.inputs.whatIf)&&successMeasureText(draft.inputs.successMeasure,!draft.inputs.successMeasure||draft.inputs.successMeasure.scopeKey===measurementScope(draft.inputs))}{draft.inputs.successMeasure?.baseline.value!==null&&draft.inputs.successMeasure?.baseline.basis&&<span className="block text-xs">{contextCurrent?'Saved baseline provenance:':'Historical baseline; current context needs review: '}{draft.inputs.successMeasure.baseline.basis}</span>}</>}</li>
-   </ul>
-   {draft.inputs.scope.requirements.value&&<p className="text-sm"><strong>Planning constraints:</strong> {draft.inputs.scope.requirements.value}</p>}
-   <p aria-label="Plan population and source scope" className="text-xs">Plan population: {bundleAssumptionText(draft.inputs.scope.population)}. Business unit: {bundleAssumptionText(draft.inputs.scope.businessUnit)}. These are planning inputs, separate from the workforce filters and each source’s population. Department scope is not verified by Home evidence.</p>
+   <HomePlanSummary draft={draft} result={currentResult} measurePack={measurePack}/>
    <HomeMixResults state={mixState} candidateId={mixCandidateId} disabled={disabled||!contextCurrent||attachBusy} onSelect={id=>{if(mixState.key)setMixChoice({key:mixState.key,id});setAttachmentOpen(null);setAttachFlow(null);setAttachmentMix(null);}}/>
-   <PlanAssumptions key={key+selected} draft={draft}/>
+   <PlanAssumptions key={key+selected} draft={draft} result={currentResult} contextCurrent={contextCurrent}/>
    {currentResult&&proposal.bundles.filter(bundle=>bundle.id!==selected&&session.results[bundle.id]).map(other=>{const comparison=compareCurrentBundleResults(currentResult,session.results[other.id],draft,session.drafts[other.id]);if(!comparison.comparable)return null;return <p key={other.id} className="text-xs">Compared with {bundleDisplayName(session.drafts[other.id].bundle.name)} under matching reviewed assumptions: {comparison.cashDifference===null?'cash difference unknown':`${money(Math.abs(comparison.cashDifference))} ${comparison.cashDifference<0?'lower':comparison.cashDifference>0?'higher':'difference in'} incremental cash`}; {comparison.capacityMonthsDifference===null?'capacity timing difference unknown':`${Math.abs(comparison.capacityMonthsDifference)} months ${comparison.capacityMonthsDifference<0?'earlier':comparison.capacityMonthsDifference>0?'later':'difference in capacity timing'}`}. Conditional estimates.</p>;})}
    {result&&!currentResult&&<p role="status">The previous calculation is retained as stale. Attach this revision to check and save its current totals.</p>}
    <details><summary className="min-h-11 cursor-pointer py-2 font-medium">Why these plans</summary><div className="space-y-3">{contextDiagnostic&&<p aria-label="Action Plan context check" className="text-xs">{planContextDiagnosticText(contextDiagnostic)}</p>}<p className="text-xs">{draft.bundle.origin==='local-demo-v1'?'This example was prepared locally from fictional assumptions; no model ran.':'Plans start with one preparation response and can include reviewed local edits.'} The staffing section reports only combinations actually evaluated for the current assumptions. Attach checks the selected draft and preserves any executed search with it.</p><p className="text-xs">References describe observed context; they do not establish causes, effectiveness or a ranking. Availability and combined retention impact are not established. Proposed roles are not assigned people or operational approvals.</p><ul className="list-disc space-y-2 pl-5">
@@ -196,14 +181,19 @@ export function LegacyHomeBundlePlans({onCorrectSavedPilot,contextDiagnostic,cha
  </div>;
 }
 
-export function PlanAssumptions({draft}:{draft:BundleDraft}){
+export function PlanAssumptions({draft,result,contextCurrent=true}:{draft:BundleDraft;result?:BundleResult|null;contextCurrent?:boolean}){
  const [expanded,setExpanded]=useState(false),contentId=useId();
- const input=draft.inputs,end=bundleHorizonEnd(input.scope).value,lastFinish=input.timing.map(item=>item.finish.value).filter((date):date is string=>!!date).sort().at(-1);
+ const input=draft.inputs,end=bundleHorizonEnd(input.scope).value,lastFinish=input.timing.map(item=>item.finish.value).filter((date):date is string=>!!date).sort().at(-1),whatIf=calculatePlanWhatIf(input);
  return <section aria-label={draft.pilot?'Editable starting assumptions':'Plan assumptions'} className="space-y-2 text-xs">
   <h4><button type="button" aria-expanded={expanded} aria-controls={contentId} onClick={()=>setExpanded(value=>!value)} className="min-h-11 rounded px-2 py-2 text-left font-semibold underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">{expanded?'Hide assumptions':'Show assumptions'}</button></h4>
   {draft.pilot&&<p>Starting estimates you can change.</p>}
   <div id={contentId} hidden={!expanded} className="space-y-2">
   <p><span>{draft.pilot?'Assumed values · not observed facts or market estimates.':'Editable planning assumptions; not observed outcomes.'}</span> Describe any adjustment in chat, then review and Apply Changes.</p>
+  <p>{planCashEstimate(draft,result?.cashTotal??null).reason}</p>
+  {result?.budget?.assumed&&<p>Costs and funding remain planning assumptions, not verified commitments.</p>}
+  {input.whatIf&&<p>{whatIfOutcomeText(input)}</p>}
+  {!input.capacity&&whatIf?.status==='ready'&&whatIf.kind==='capacity'&&<p>Scenario cost basis: {money(whatIf.listedCash)} listed cash allowances plus {whatIf.target} roles × {money(whatIf.unitCost)} per role per month × {whatIf.months} months = {money(whatIf.roleCash)} new-hire payroll/cash. Assumes all roles are new hires paid for the full horizon; internal moves or partial schedules require staffing review.</p>}
+  {input.successMeasure?.baseline.value!==null&&input.successMeasure?.baseline.basis&&<p>{contextCurrent?'Saved baseline provenance:':'Historical baseline; current context needs review:'} {input.successMeasure.baseline.basis}</p>}
   {draft.inputs.whatIf&&<p>Conditional scenario inputs: {Object.entries(draft.inputs.whatIf).filter(([key])=>['baseline','target','population','unitCost'].includes(key)).map(([key,value])=>{const assumption=value as {value:number|null;kind:string};return assumption.value===null?null:<span key={key}>{key}: {assumption.value} ({assumption.kind==='illustrative'?'assumed':assumption.kind}); </span>})}change these in chat, then review and Apply Changes.</p>}
   <p>Population: {bundleAssumptionText(input.scope.population)}.</p>
   {(input.capacity||input.whatIf?.kind==='capacity')&&<p>Search constraints can be changed in chat: “set maximum added employees to 5”, “set maximum staff hours to 100”, “set coverage deadline to December 2027”, or “set search objective to lowest-complete-cash”. Available objectives: lowest-complete-cash, earliest-coverage, lowest-staff-hours, fewest-added-employees. {input.mixConstraints&&Object.entries(input.mixConstraints).map(([name,value])=><span key={name}>{name}: {bundleAssumptionText<string|number>(value)}. </span>)}</p>}
