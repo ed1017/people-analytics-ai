@@ -5,6 +5,7 @@ const publicErrors={
  'survey-sentiment':'Employee Listening data is temporarily unavailable. Please try again.',
  'talent-acquisition':'Talent Acquisition data is temporarily unavailable. Please try again.',
  'workforce-planning':'Stored Planning data is temporarily unavailable. Please try again.',
+ 'scenario-modeler':'Scenario modeling source data is temporarily unavailable. Please try again.',
 } as const;
 export type DataApiSource=keyof typeof publicErrors;
 
