@@ -63,7 +63,7 @@ try {
     await market.getByRole('heading',{name:'Occupation pay, employment and outlook',exact:true}).waitFor();
     await market.getByLabel('Market occupation',{exact:true}).selectOption('29-1141');
     await market.getByLabel('Market location',{exact:true}).selectOption('35620');
-    check(device+' market content retains its own geography',await filter.inputValue()==='UK'&&await market.getByRole('region',{name:'Location comparison',exact:true}).isVisible()&&await market.getByText('United States only · BLS Employment Projections · Released August 27, 2026',{exact:true}).isVisible());
+    check(device+' market content retains its own geography',await filter.inputValue()==='UK'&&await market.getByRole('region',{name:'Location comparison',exact:true}).isVisible()&&await market.getByText('United States only · includes self-employment · location filter does not apply',{exact:true}).isVisible());
     await page.locator('summary').filter({hasText:'National labor indicators'}).click();
     await page.getByText('BLS unavailable',{exact:true}).waitFor();
     check(device+' macro failure preserves wage and outlook comparisons',await market.getByRole('region',{name:'Occupation comparison',exact:true}).isVisible()&&await market.getByRole('region',{name:'National outlook comparison',exact:true}).isVisible());

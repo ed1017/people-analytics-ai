@@ -13,6 +13,10 @@ The explorer reads internal job profiles, stored O*NET mappings and internal rol
 
 Internal tables and external-reference tables have independent availability states. A failed read never becomes a zero count, an unmapped classification or a fabricated fallback profile. Reads use explicit columns, stable pagination and a timeout. The application stores no new credentials and does not contact O*NET at runtime.
 
+Server diagnostics distinguish missing configuration, access denial, timeout, cancellation, schema mismatch and connection failure using an allowlisted source name, category, HTTP status and known provider code. Messages, row content and connection details are excluded. An access-denied response cancels pending reads without retrying or changing the access path.
+
+The default view keeps role and occupation populations, skill scales, mapping review status and source failures beside the content. Native disclosures expose mapping methods and shared-profile counts, preparation guidance, and detailed provenance. Missing stored detail sources share one status line; available public excerpts remain visible.
+
 ## Public sources
 
 Public excerpts were checked on **2026-10-06**, when the [O*NET database release](https://www.onetcenter.org/database.html) was **31.0**. The excerpts come from the official OnLine occupation profiles and are editorial summaries, not a complete database import:

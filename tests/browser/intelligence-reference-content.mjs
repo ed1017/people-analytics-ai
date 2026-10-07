@@ -91,6 +91,12 @@ try {
       await summary.focus(); await page.keyboard.press('Enter');
       check(`${device} keyboard disclosure ${name}`, await summary.evaluate(element => element.parentElement.open));
     };
+    const closeDisclosure = async name => {
+      const summary = page.locator('summary').filter({ hasText: name });
+      await summary.focus(); await page.keyboard.press('Enter');
+      check(`${device} keyboard closes ${name}`, await summary.evaluate(element => !element.parentElement.open));
+    };
+    const disclosureClosed = name => page.locator('summary').filter({ hasText: name }).evaluate(element => !element.parentElement.open);
 
     await mount();
     await page.getByRole('button', { name: /^Fixture Software Role/ }).waitFor();
@@ -111,13 +117,21 @@ try {
     await page.getByText('Synthetic reference skill', { exact: true }).waitFor();
     check(`${device} separate role requirements and occupation skills`, await page.getByRole('heading', { name: 'Internal role requirements', exact: true }).isVisible() && await page.getByText('Synthetic review skill', { exact: true }).isVisible() && await page.getByRole('heading', { name: 'Occupation skills', exact: true }).isVisible());
     check(`${device} occupation source links exact`, await page.locator('a[href="https://www.onetonline.org/link/summary/15-1252.00"]').count() > 0);
-    check(`${device} public tasks and preparation available`, await page.getByRole('heading', { name: 'Tasks and preparation', exact: true }).isVisible() && await page.getByText(/Job Zone 4/).isVisible());
-    check(`${device} reference mapping is not attainment`, await page.getByText(/does not establish employee skill attainment/i).first().isVisible());
+    check(`${device} public tasks remain inline`, await page.getByRole('heading', { name: 'Tasks and preparation', exact: true }).isVisible() && await page.getByText(/Assess user needs/).isVisible());
+    check(`${device} preparation guidance starts collapsed`, await disclosureClosed('Preparation guidance') && !await page.getByText(/Job Zone 4/).isVisible());
+    await openDisclosure('Preparation guidance');
+    check(`${device} preparation guidance remains available`, await page.getByText(/Job Zone 4/).isVisible());
+    await closeDisclosure('Preparation guidance');
+    check(`${device} reference mapping is not attainment`, await page.getByText(/Mappings do not establish employee skill attainment/i).isVisible());
+    check(`${device} internal and external rating scales remain inline`, await page.getByText('Role expectations · internal proficiency 1–5 · no employee assessment', { exact: true }).isVisible() && await page.getByText('Occupation ratings · importance 1–5 · level 0–7', { exact: true }).isVisible());
+    check(`${device} secondary source provenance starts collapsed`, await disclosureClosed('Sources and interpretation') && !await page.getByText(/Stored release label:/).isVisible());
+    check(`${device} reference view fits viewport`, await fits());
+    await page.screenshot({ path: path.join(output, `${device}-occupations.png`), fullPage: true });
     await openDisclosure('Sources and interpretation');
     check(`${device} reference version, license and population explicit`, await page.getByText(/published database release was 31.0/).isVisible() && await page.getByText(/No employee records are used/).isVisible() && await page.getByRole('link', { name: 'CC BY 4.0 license', exact: true }).getAttribute('href') === 'https://creativecommons.org/licenses/by/4.0/');
     check(`${device} source status does not imply verified live import`, await page.getByText(/import not independently verified/).isVisible() && await page.getByText(/No live O\*NET feed/).isVisible());
-    check(`${device} reference view fits viewport`, await fits());
-    await page.screenshot({ path: path.join(output, `${device}-occupations.png`), fullPage: true });
+    await page.screenshot({ path: path.join(output, `${device}-occupation-provenance.png`), fullPage: true });
+    await closeDisclosure('Sources and interpretation');
 
     await page.getByRole('button', { name: /^Fixture Other Role/ }).click();
     check(`${device} missing occupation preserves exact official link`, await page.locator('a[href="https://www.onetonline.org/link/summary/11-1011.00"]').count() > 0);
@@ -126,20 +140,25 @@ try {
     mode = 'shared-mapping'; await mount();
     await page.getByRole('button', { name: /^Fixture Software Role/ }).click();
     const review = page.getByRole('complementary', { name: 'Mapping review', exact: true });
-    check(`${device} stored mapping requires individual duties review`, await review.getByRole('heading', { name: 'Mapping review needed', exact: true }).isVisible() && await review.getByText('Stored mapping; compare the internal duties with the official occupation before using it for role decisions.', { exact: true }).isVisible());
-    check(`${device} mapping review links the exact mapped occupation`, await review.getByRole('link', { name: /^Mapped occupation: Software Developers \(15-1252\.00\)/ }).getAttribute('href') === 'https://www.onetonline.org/link/summary/15-1252.00');
+    check(`${device} stored mapping review stays visible before details opened`, await review.getByRole('heading', { name: 'Mapping review needed', exact: true }).isVisible());
+    const mappedLink = review.getByRole('link', { name: /^Mapped occupation: Software Developers \(15-1252\.00\)/ });
+    check(`${device} mapping review links the exact mapped occupation`, await mappedLink.isVisible() && await mappedLink.getAttribute('href') === 'https://www.onetonline.org/link/summary/15-1252.00');
+    check(`${device} secondary mapping detail starts collapsed`, await disclosureClosed('Mapping details') && !await review.getByText(/^2 internal job profiles mapped to this occupation\./).isVisible());
+    await openDisclosure('Mapping details');
+    check(`${device} individual duties review remains available`, await review.getByText('Stored mapping; compare the internal duties with the official occupation before using it for role decisions.', { exact: true }).isVisible());
     check(`${device} shared mapping count includes inactive catalog profiles`, await review.getByText(/^2 internal job profiles mapped to this occupation\./).isVisible() && await page.getByRole('button', { name: /^Fixture Data Role/ }).getByText(/Inactive profile/).isVisible());
     await search.fill('FIX-SW');
     check(`${device} shared occupation count survives search hiding another role`, await page.getByRole('button', { name: /^Fixture Data Role/ }).count() === 0 && await review.getByText(/^2 internal job profiles mapped to this occupation\./).isVisible());
     check(`${device} mapping review fits viewport`, await fits());
     await page.screenshot({ path: path.join(output, `${device}-shared-mapping.png`), fullPage: true });
+    await closeDisclosure('Mapping details');
     mode = 'mapping-error'; await page.getByRole('button', { name: 'Retry reference sources', exact: true }).click();
     await page.getByText('4 job profiles loaded · mapping coverage unavailable', { exact: true }).waitFor();
     check(`${device} failed mapping refresh removes previous shared count`, await page.getByText(/internal job profiles? mapped to this occupation\./).count() === 0 && await review.count() === 0 && await page.getByRole('heading', { name: 'Fixture Software Role', exact: true }).isVisible());
 
     mode = 'partial'; await mount();
     await page.getByRole('button', { name: /^Fixture Software Role/ }).click();
-    await page.getByText('Stored essential skills unavailable.', { exact: true }).waitFor();
+    await page.getByText('Stored detail unavailable: essential skills · software examples.', { exact: true }).waitFor();
     check(`${device} requirement failure remains unavailable`, await page.getByText(/requirements.*unavailable|unavailable.*requirements/i).first().isVisible());
     check(`${device} public tasks survive stored skill failure`, await page.getByRole('heading', { name: 'Tasks and preparation', exact: true }).isVisible() && await page.getByText('Synthetic reference skill', { exact: true }).count() === 0);
     check(`${device} unavailable ratings do not become zero`, await page.getByText('Critical Thinking', { exact: true }).isVisible() && await page.getByText('Importance 0 / 5', { exact: true }).count() === 0);
@@ -153,7 +172,10 @@ try {
     await page.getByText('Internal job profiles unavailable. Public references remain available below.', { exact: true }).waitFor();
     check(`${device} source error hides backend details`, await page.getByText('PRIVATE_BACKEND_DETAIL_MUST_NOT_APPEAR').count() === 0);
     await page.getByLabel('Browse public occupations', { exact: true }).selectOption('29-1141.00');
+    await page.getByText('Stored detail unavailable: essential skills · software examples.', { exact: true }).waitFor();
     check(`${device} public references survive unavailable mapping API`, await page.getByText(/Document patient information/).isVisible() && await page.locator('a[href="https://www.onetonline.org/link/summary/29-1141.00"]').count() > 0);
+    check(`${device} fallback consolidates missing stored detail into one notice`, await page.getByText('Stored detail unavailable: essential skills · software examples.', { exact: true }).count() === 1 && await page.locator('article[aria-label="Selected occupation"] p').evaluateAll(elements => elements.filter(element => /unavailable/i.test(element.textContent) && element.getClientRects().length > 0).length) === 1);
+    check(`${device} fallback retains unrated public skills with secondary prose collapsed`, await page.getByText('Active Listening', { exact: true }).isVisible() && await page.getByText('Public excerpt · names only, no ratings', { exact: true }).isVisible() && await disclosureClosed('Preparation guidance') && await disclosureClosed('Sources and interpretation'));
     check(`${device} failed reference view fits viewport`, await fits());
     await page.screenshot({ path: path.join(output, `${device}-reference-failure.png`), fullPage: true });
     mode = 'ready'; await page.getByRole('button', { name: 'Retry reference sources', exact: true }).click();
@@ -169,6 +191,10 @@ try {
     const locationTable = panel.getByRole('region', { name: 'Location comparison', exact: true });
     const outlookTable = panel.getByRole('region', { name: 'National outlook comparison', exact: true });
     await occupationTable.waitFor();
+    check(`${device} market secondary coverage and release prose starts collapsed`, await disclosureClosed('Data details') && !await panel.getByRole('heading', { name: 'Coverage and sources', exact: true }).isVisible() && !await panel.getByText(/released May 15, 2026/).isVisible());
+    check(`${device} wage period units and population remain inline`, await panel.getByText('BLS OEWS · May 2025 · Annual USD wages · Wage-and-salary jobs, all industries', { exact: true }).isVisible() && await panel.getByRole('heading', { name: 'Compare occupations in U.S.', exact: true }).isVisible());
+    check(`${device} national outlook period units and population remain inline`, await panel.getByRole('heading', { name: 'National outlook, 2025–2035', exact: true }).isVisible() && await panel.getByText('United States only · includes self-employment · location filter does not apply', { exact: true }).isVisible() && await outlookTable.locator('caption').isVisible() && await panel.getByText(/This population differs from OEWS/).isVisible());
+    check(`${device} overlapping geographies remain explicit inline`, await panel.getByText('The NY-NJ metro extends beyond NYC. Geographies overlap; employment counts are not additive.', { exact: true }).isVisible());
     for (const region of [occupationTable, locationTable, outlookTable]) {
       check(`${device} accessible table ${await region.getAttribute('aria-label')}`, await region.getByRole('table').count() === 1 && await region.locator('tbody tr').count() === 3);
       check(`${device} table caption and header scopes ${await region.getAttribute('aria-label')}`, await region.locator('caption').count() === 1 && await region.locator('thead th:not([scope="col"]), tbody th:not([scope="row"])').count() === 0);
@@ -192,6 +218,8 @@ try {
     await panel.getByRole('button', { name: 'Select Software Developers', exact: true }).click();
     check(`${device} table selection updates occupation control`, await panel.getByLabel('Market occupation', { exact: true }).inputValue() === '15-1252');
     const outlookBefore = await outlookTable.textContent();
+    for (const region of [occupationTable, locationTable, outlookTable]) await region.evaluate(element => { element.scrollLeft = 0; });
+    await page.screenshot({ path: path.join(output, `${device}-labor-compact.png`), fullPage: true });
     await openDisclosure('Data details');
     for (const area of areas) {
       await panel.getByLabel('Market location', { exact: true }).selectOption(area.code);
@@ -213,6 +241,7 @@ try {
     // Capture the first columns after keyboard scrolling and selection tests.
     for (const region of [occupationTable, locationTable, outlookTable]) await region.evaluate(element => { element.scrollLeft = 0; });
     await page.screenshot({ path: path.join(output, `${device}-labor.png`), fullPage: true });
+    await closeDisclosure('Data details');
     await page.getByRole('button', { name: 'Use unsupported market selection', exact: true }).click();
     await page.getByRole('button', { name: 'Reset market selection', exact: true }).click();
     check(`${device} unsupported selection has recovery`, await panel.getByLabel('Market occupation', { exact: true }).inputValue() === '15-1252' && await panel.getByLabel('Market location', { exact: true }).inputValue() === '99');
