@@ -28,10 +28,10 @@ export function HomeGettingStarted({ busy, onNavigate, onStartDemo, status, dism
         <li><strong>Pin a goal when ready</strong> — Optionally save your goal and request Action Plan choices.</li>
         <li><strong>Choose and attach a plan</strong> — Review a choice, then use Attach Action Plan to save it in one click.</li>
         <li><strong>Adjust it in chat</strong> — Describe a change, Send, review and Apply changes, then attach the new version.</li>
-        <li><strong>Reopen saved work</strong> — Select a Pinned Goal and expand its latest plan. Earlier attachments stay in history.</li>
+        <li><strong>Share and track your goal (TBD)</strong> — Share goals and Action Plans with owners, then track progress and outcomes.</li>
       </ol>
       <p className="text-xs text-muted-foreground">On your first visit, two goals labelled Demo example include attached plans you can explore and edit. Their scope, budget and outcomes are assumptions, not achieved results.</p>
-      <p className="text-xs text-muted-foreground">Share Action Plan (TBD) and Track results (TBD) are future features.</p>
+      <p className="text-xs text-muted-foreground">To reopen saved work, select a Pinned Goal and expand its latest plan. Earlier attachments stay in history.</p>
       <p className="text-xs text-muted-foreground">You can also use this as a traditional dashboard—explore workforce data through the left-hand menu.</p>
       <p className="text-xs text-muted-foreground">Goals and drafts are saved in this browser within the limits in Browser storage details. Explore <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => onNavigate("workforce")}>Workforce</button>, <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => onNavigate("occupational-references")}>Intelligence</button> or <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => onNavigate("planning-overview")}>Planning</button>. Opening a page does not carry evidence or run a model. Source coverage and limitations are in Data details.</p>
       <div className="flex flex-wrap gap-2">

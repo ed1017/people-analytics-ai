@@ -1,4 +1,5 @@
 "use client";
+import {LimitedPreviewBadge} from "@/components/limited-preview-badge";
 import { useEffect, useRef, type ReactNode } from "react";
 import {usePhoneLayout} from "@/components/use-phone-layout";
 import {WorkspacePaletteControl} from "@/components/workspace-palette-control";
@@ -55,10 +56,11 @@ export function AppHeader({
     <header ref={header} className="sticky top-0 z-30 border-b bg-card">
       <div className="grid min-h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-0.5 px-4 py-1.5 sm:px-5">
         <div className="col-span-2 flex min-w-0 flex-wrap items-center gap-x-5 gap-y-1 sm:col-span-1">
-          <div className="flex min-w-0 items-center gap-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
             <h1 id="app-page-title" className="min-w-0 break-words text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
               {title}
             </h1>
+            {page.status&&<LimitedPreviewBadge/>}
             <PageHelp key={activePage} page={activePage} label={page.label} />
           </div>
           {phone?<details className="header-contact"><summary className="min-h-11 cursor-pointer py-3 text-xs">About &amp; contact</summary><div className="header-contact-content">

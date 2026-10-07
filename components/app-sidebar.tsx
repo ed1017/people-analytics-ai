@@ -1,4 +1,5 @@
 "use client";
+import {LimitedPreviewBadge} from "@/components/limited-preview-badge";
 import {useRef,useState} from "react";
 import {usePhoneLayout} from "@/components/use-phone-layout";
 import type { LucideIcon } from "lucide-react";
@@ -212,11 +213,12 @@ export function AppSidebar({
                               : "relative h-auto min-h-10 w-full justify-start gap-3 px-3 py-2.5 max-md:justify-center max-md:px-0"
                           }
                           title={
-                            `${metadata.label} — ${metadata.description}`
+                            `${metadata.label}${metadata.status?" — "+metadata.status:""} — ${metadata.description}`
                           }
                           aria-label={
                             pageLabel
                           }
+                          aria-describedby={metadata.status?`nav-preview-${page}`:undefined}
                           aria-current={
                             active
                               ? "page"
@@ -232,9 +234,11 @@ export function AppSidebar({
                             <span className="absolute left-0 h-6 w-1 rounded-full bg-primary" />
                           )}
                           <Icon className="h-5 w-5 shrink-0" />
+                          {navCollapsed&&metadata.status&&<span id={`nav-preview-${page}`} className="sr-only">Limited preview</span>}
                           {!navCollapsed && (
                             <span className="min-w-0 whitespace-normal text-left text-[17px] font-medium leading-[1.15] max-md:hidden">
                               {metadata.label}
+                              {metadata.status&&<span className="mt-1 block"><LimitedPreviewBadge id={`nav-preview-${page}`}/></span>}
                             </span>
                           )}
                         </Button>
