@@ -1,4 +1,5 @@
 "use client";
+import {localPlanDiscussion} from '@/lib/home-plan-alternative-chat';
 import {GuidedDemo,GUIDED_EXAMPLE_PROMPT} from '@/components/guided-demo';
 import {HomeGuidedActionsContext,GuidedActionRegistry} from '@/components/home-guided-actions';
 import {homeExitReasonChartFromPacket,homeExitReasonChartMatches,type HomeExitReasonChart as ExitReasonChartData} from '@/lib/home-exit-reason-chart';
@@ -248,14 +249,14 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     const forecastQuestion = !actionPlan && Boolean(homeForecastIntent(message));
     if(forecastQuestion)responseIntent = 'explanation';
     if(!active||sending.current||currentEvidenceKey.current!==contextKey)return;
-    const editIntent=bundleChatEditIntent(message),localEdit=editIntent.edit;
-    if(!actionPlan&&!preserveDraft&&localEdit&&(selectedPlanForChat.current?.goalId===conversation.activeGoalId||editIntent.planReference)){
+    const editIntent=bundleChatEditIntent(message),localEdit=editIntent.edit,localDiscussion=localPlanDiscussion(message);
+    if(!actionPlan&&!preserveDraft&&(localEdit||localDiscussion)&&(selectedPlanForChat.current?.goalId===conversation.activeGoalId||editIntent.planReference||localDiscussion)){
       if(chatLoading||!conversation.saved||!planEditReady)return;
       const target=selectedPlanForChat.current;
       if(!target||target.goalId!==conversation.activeGoalId){setLocalAction({goalId:conversation.activeGoalId,notice:'Select the intended Action Plan tab, then send this change again for review. Your request is kept; nothing has changed.'});return;}
       setLocalAction(null);setPlanEdit(target);
       try{if(!target.isCurrent())throw Error('The selected plan or context changed. Select the intended Plan tab and send the change again.');const answer=target.propose(message);setMessages(current=>[...current,{role:'user',content:message},{role:'assistant',content:answer}]);setInput('');setPlanEdit(null);setEditPreview(null);setEditNotice('');setChatError(null);requestAnimationFrame(()=>{const panel=conversationViewport.current?.querySelector<HTMLElement>('[aria-label="Action Plans for your goal"]');panel?.scrollIntoView({block:'start'});});}
-      catch(error){setEditPreview(null);setEditNotice((error as Error).message);}
+      catch(error){setEditPreview(null);setEditNotice((error as Error).message);setLocalAction({goalId:conversation.activeGoalId,notice:(error as Error).message});}
       requestAnimationFrame(()=>{editReview.current?.focus({preventScroll:true});editReview.current?.scrollIntoView({block:'nearest'});});return;
     }
     if(!localEdit&&planEdit){setPlanEdit(null);setEditPreview(null);setEditNotice('');}
@@ -542,7 +543,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
         placeholder="Describe a goal, compare options, build or adjust a plan, or ask a general workforce question." className="max-h-80 min-h-28 w-full resize-y rounded-lg border bg-background/40 p-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
       <div className="home-compose-actions mt-2 flex items-end justify-between gap-3">
         <p hidden={showCandidatePin||Boolean(activePinnedGoal)} id="overview-question-context-tip" className="min-w-0 text-xs leading-4 text-muted-foreground">Ask a question or follow up on an answer. To plan an action, include your desired outcome, timeline and constraints.</p>
-        <button type="submit" aria-label="Send overview question" disabled={(!localCandidate&&!ready&&!(demoPlan&&planEditReady&&bundleChatEditIntent(input).edit)) || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
+        <button type="submit" aria-label="Send overview question" disabled={(!localCandidate&&!ready&&!(demoPlan&&planEditReady&&(bundleChatEditIntent(input).edit||localPlanDiscussion(input)))) || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
       </div></div>
     </form>
       {actionOffers.length>0&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2 text-sm">Option action suggestions</summary><section aria-label="Workforce option actions" className="mt-3 space-y-2"><p className="text-sm text-muted-foreground">{input.trim()?'Your draft is kept. Clear it to choose an option action.':'Click to open the local action. Saving, calculation and search remain explicit.'}</p><div className="flex flex-wrap gap-2">{actionOffers.map(offer=><button key={offer.id} type="button" disabled={suggestionPending||chatLoading||Boolean(input.trim())} onClick={()=>submitOption(offer.id)} className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{offer.label}</button>)}</div></section></details>}

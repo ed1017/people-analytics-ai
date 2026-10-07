@@ -9,13 +9,14 @@ import {combinePlanSnapshots,type CombinationReview} from './home-plan-combinati
 export const planAlternativesField='homePlanAlternativesV1';
 export type AlternativeContext={goalId:string;goal:string};
 export type AlternativeSourceRef={id:string;revision:number};
-export type AlternativeOperation={kind:'edit'|'combine';text:string;sourceIds:string[];review?:CombinationReview};
+export type AlternativeOperation={kind:'edit'|'combine'|'staffing';text:string;sourceIds:string[];review?:CombinationReview};
 export type PlanAlternative={id:string;number:number;draft:BundleDraft;result:BundleResult;sourceRefs:AlternativeSourceRef[];requestId:string|null;operation:AlternativeOperation|null;notes:string[];deleted:boolean;applied:boolean};
 export type AlternativeAttachment={id:string;planId:string;attachedAt:string};
 export type PlanAlternatives={version:1;goalId:string;goal:string;nextNumber:number;order:string[];plans:PlanAlternative[];attachments:AlternativeAttachment[]};
 export type AlternativeRequest={requestId:string;text:string;sourceIds:string[];expectedInputs:Record<string,string>;review?:CombinationReview};
 export type AlternativeOutcome={status:'ready';catalog:PlanAlternatives;plan:PlanAlternative;reused:boolean}|{status:'not-an-edit'}|{status:'needs-review';questions:string[]};
 const equal=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
+const equalResult=(a:BundleResult,b:BundleResult)=>!!b&&Object.keys(a).length===Object.keys(b).length&&Object.entries(a).every(([key,value])=>equal(value,b[key as keyof BundleResult]));
 const idValid=(id:string)=>typeof id==='string'&&/^[A-Za-z0-9_-]{1,80}$/.test(id);
 function fail(message:string):never{throw Error(message);}
 function assertContext(catalog:PlanAlternatives,context:AlternativeContext){if(catalog.goalId!==context.goalId||catalog.goal!==context.goal)fail('The active goal changed. Review the current goal’s plans.');}
@@ -34,13 +35,20 @@ export function createPlanAlternatives(context:AlternativeContext,sources:{id:st
 /** No migration/write: old Home history remains under its existing fields. */
 export function readPlanAlternatives(raw:unknown,context:AlternativeContext):PlanAlternatives|null{
  try{
-  const catalog=raw as PlanAlternatives;
+  let catalog=raw as PlanAlternatives;
+  if(raw&&typeof raw==='object'&&'encoding' in raw){
+   if(raw.encoding!=='deduplicated-identities-v1')return null;
+   const packed=raw as Omit<PlanAlternatives,'plans'>&{encoding:string;plans:Array<Omit<PlanAlternative,'result'>&{result:Omit<BundleResult,'inputKey'|'signature'|'bindingKey'|'scope'>}>};
+   if(!Array.isArray(packed.plans)||packed.plans.length>30||packed.plans.some(plan=>!plan.result||typeof plan.result!=='object'||['inputKey','signature','bindingKey','scope'].some(key=>key in plan.result)||!readBundleDraft(plan.draft)))return null;
+   const {encoding:_,...metadata}=packed;void _;
+   catalog={...metadata,plans:packed.plans.map(plan=>{const {inputKey,signature,bindingKey,scope}=reconcileBundle(plan.draft);return {...plan,result:{...plan.result,inputKey,signature,bindingKey,scope}};})};
+  }
   if(!catalog||catalog.version!==1||catalog.goalId!==context.goalId||catalog.goal!==context.goal||!Array.isArray(catalog.plans)||!catalog.plans.length||catalog.plans.length>30||!Array.isArray(catalog.order)||!Array.isArray(catalog.attachments)||catalog.attachments.length>30||new TextEncoder().encode(JSON.stringify(catalog)).length>450000)return null;
   const seen=new Map<string,PlanAlternative>(),numbers=new Set<number>(),requests=new Set<string>();
   for(const plan of catalog.plans){
-   if(!idValid(plan.id)||seen.has(plan.id)||!Number.isSafeInteger(plan.number)||plan.number<1||numbers.has(plan.number)||!readBundleDraft(plan.draft)||plan.draft.binding.goalId!==context.goalId||plan.draft.binding.goal!==context.goal||typeof plan.deleted!=='boolean'||typeof plan.applied!=='boolean'||!Array.isArray(plan.sourceRefs)||!Array.isArray(plan.notes)||!plan.notes.every(note=>typeof note==='string')||!equal(reconcileBundle(plan.draft),plan.result))return null;
+   if(!idValid(plan.id)||seen.has(plan.id)||!Number.isSafeInteger(plan.number)||plan.number<1||numbers.has(plan.number)||!readBundleDraft(plan.draft)||plan.draft.binding.goalId!==context.goalId||plan.draft.binding.goal!==context.goal||typeof plan.deleted!=='boolean'||typeof plan.applied!=='boolean'||!Array.isArray(plan.sourceRefs)||!Array.isArray(plan.notes)||!plan.notes.every(note=>typeof note==='string')||!equalResult(reconcileBundle(plan.draft),plan.result))return null;
    if(new Set(plan.sourceRefs.map(ref=>ref.id)).size!==plan.sourceRefs.length||plan.sourceRefs.some(ref=>!seen.has(ref.id)||seen.get(ref.id)!.draft.revision!==ref.revision)||plan.number!==seen.size+1)return null;
-   if(plan.requestId!==null){if(!idValid(plan.requestId)||requests.has(plan.requestId)||!plan.operation||!['edit','combine'].includes(plan.operation.kind)||typeof plan.operation.text!=='string'||!plan.operation.text.trim()||plan.operation.text.length>1200||!equal(plan.operation.sourceIds,plan.sourceRefs.map(ref=>ref.id))||plan.sourceRefs.length!==(plan.operation.kind==='edit'?1:2))return null;requests.add(plan.requestId);}
+   if(plan.requestId!==null){if(!idValid(plan.requestId)||requests.has(plan.requestId)||!plan.operation||!['edit','combine','staffing'].includes(plan.operation.kind)||typeof plan.operation.text!=='string'||!plan.operation.text.trim()||plan.operation.text.length>1200||!equal(plan.operation.sourceIds,plan.sourceRefs.map(ref=>ref.id))||plan.sourceRefs.length!==(plan.operation.kind==='combine'?2:1))return null;requests.add(plan.requestId);}
    else if(plan.sourceRefs.length||plan.operation!==null)return null;
    seen.set(plan.id,plan);numbers.add(plan.number);
   }
@@ -130,4 +138,18 @@ export function attachPlanAlternative(raw:PlanAlternatives,context:AlternativeCo
  if(plan.result.issues.length&&!confirmation.acknowledgeUnknowns)fail('Acknowledge unresolved assumptions before attaching this proposal.');
  catalog.attachments.push({id:confirmation.attachmentId,planId,attachedAt:confirmation.at});
  if(!readPlanAlternatives(catalog,context))fail('This attachment could not be verified. Existing snapshots are kept.');return catalog;
+}
+
+/** Save the verified staffing worker's result separately from its immutable source. */
+export function proposeStaffingAlternative(raw:PlanAlternatives,context:AlternativeContext,request:AlternativeRequest,draft:BundleDraft):AlternativeOutcome{
+ const catalog=checked(raw,context),operation:AlternativeOperation={kind:'staffing',text:request.text,sourceIds:request.sourceIds};
+ const sources=sourcesFor(catalog,request),existing=retry(catalog,request,operation);if(existing)return existing;
+ if(sources.length!==1||!readBundleDraft(draft)||draft.binding.goalId!==context.goalId||draft.binding.goal!==context.goal||draft.revision<=sources[0].draft.revision||!equal(draft.binding,sources[0].draft.binding)||draft.bundle.id!==sources[0].draft.bundle.id)fail('Review the verified staffing result for this exact source plan.');
+ return append(catalog,request,operation,sources,draft,reconcileBundle(draft),['Staffing counts come from a reviewed local search. Original plans and attachments remain unchanged.']);
+}
+
+/** Omit only duplicated identities and scope; preserve every saved numerical result and validate it on read. */
+export function packPlanAlternatives(raw:PlanAlternatives){
+ const catalog=checked(raw,raw);
+ return {...catalog,encoding:'deduplicated-identities-v1' as const,plans:catalog.plans.map(plan=>{const {inputKey,signature,bindingKey,scope,...result}=plan.result;void [inputKey,signature,bindingKey,scope];return {...plan,result};})};
 }

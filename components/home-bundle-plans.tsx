@@ -31,9 +31,11 @@ import {readBundleWorkspace,saveBundleDraftPatch,saveBundleCalculationPatch,atta
 export const bundleButton='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring';
 export type PlanChatChange={goalId:string;planId:string;inputKey:string;ready:boolean;isCurrent:()=>boolean;apply:()=>void};
 export type BundleSession={drafts:Record<string,BundleDraft>;results:Record<string,BundleResult>};
-export type BundleDiscussion={examples:BundleEditExample[];option:number;id:string;revision:number;name:string;goalId:string;goal:string;propose:(text:string)=>string;discard:()=>void;subscribe:(listener:()=>void)=>()=>void;isCurrent:()=>boolean;preview:(text:string)=>BundleEditPreview;accept:(preview:BundleEditPreview)=>void};
+export type BundleDiscussion={snapshots?:()=>{id:string;draft:BundleDraft}[];examples:BundleEditExample[];option:number;id:string;revision:number;name:string;goalId:string;goal:string;propose:(text:string)=>string;discard:()=>void;subscribe:(listener:()=>void)=>()=>void;isCurrent:()=>boolean;preview:(text:string)=>BundleEditPreview;accept:(preview:BundleEditPreview)=>void};
 const money=(value:number|null|undefined)=>value==null?'Unknown':`$${value.toLocaleString(undefined,{maximumFractionDigits:2})} USD`;
-export function HomeBundlePlans({contextDiagnostic,chatChange,planningContext,proposal,binding,preparedAt,contextCurrent,disabled,isCurrent,cache,onDiscuss,projectBinding,measurePack}:{contextDiagnostic?:PlanContextDiagnostic|null;chatChange?:PlanChatChange|null;planningContext?:unknown;measurePack?:unknown;projectBinding?:ProjectPlanningBinding;preparedAt:string;proposal:BundleProposal;binding:ActionBinding;contextCurrent:boolean;disabled:boolean;isCurrent:()=>boolean;cache:Map<string,BundleSession>;onDiscuss:(request:BundleDiscussion)=>void}){
+export type HomeBundlePlansProps={contextDiagnostic?:PlanContextDiagnostic|null;chatChange?:PlanChatChange|null;planningContext?:unknown;measurePack?:unknown;projectBinding?:ProjectPlanningBinding;preparedAt:string;proposal:BundleProposal;binding:ActionBinding;contextCurrent:boolean;disabled:boolean;isCurrent:()=>boolean;cache:Map<string,BundleSession>;onDiscuss:(request:BundleDiscussion)=>void};
+export {HomeBundlePlans} from "@/components/home-plan-alternatives";
+export function LegacyHomeBundlePlans({contextDiagnostic,chatChange,planningContext,proposal,binding,preparedAt,contextCurrent,disabled,isCurrent,cache,onDiscuss,projectBinding,measurePack}:HomeBundlePlansProps){
  const optionNumber=(id:string)=>proposal.bundles.findIndex(bundle=>bundle.id===id)+1;
  const storage=useDecisionStorage(),raw=storage.data.workspaces[binding.goalId]?.fields[bundleWorkspaceField],workspace=readBundleWorkspace(raw,binding.goalId),key=actionBindingKey(binding);
  const mixHistory=useVerifiedHomeMixHistory(storage.data.workspaces[binding.goalId]?.fields[homeMixHistoryField],binding.goalId);
@@ -117,7 +119,7 @@ export function HomeBundlePlans({contextDiagnostic,chatChange,planningContext,pr
   }catch(error){setNotice((error as Error).message);}finally{attaching.current=false;setAttachBusy(false);}
  }
  function registerChatTarget(){const proposalCount=proposal.bundles.length,inputKey=bundleInputKey(draft),epoch=selectionEpoch.current,current=()=>mounted.current&&liveAvailable.current&&!livePending.current&&selectionEpoch.current===epoch&&liveSelection.current===selected&&isCurrent()&&bundleInputKey(currentDraft())===inputKey;
-  onDiscuss({examples:bundleChatEditExamples(draft),option:optionNumber(selected),id:selected,revision:draft.revision,name:draft.bundle.name,goalId:binding.goalId,goal:binding.goal,isCurrent:current,
+  onDiscuss({snapshots:()=>Object.entries(viewDrafts).map(([id,draft])=>({id,draft})),examples:bundleChatEditExamples(draft),option:optionNumber(selected),id:selected,revision:draft.revision,name:draft.bundle.name,goalId:binding.goalId,goal:binding.goal,isCurrent:current,
    propose:text=>{guard();if(!current())throw Error('The selected plan changed. Send the adjustment again for the current plan.');const snapshot=decisionStore.getSnapshot(),fields=snapshot.data.workspaces[binding.goalId]?.fields??{},proposal=proposePlanRevision(fields[planRevisionsField],baseDraft(selected),text,{option:optionNumber(selected),count:proposalCount});decisionStore.commitGoalFields(binding.goalId,binding.goal,snapshot.data.revision,new Date().toISOString(),fields=>({[planRevisionsField]:proposal.history,[homePlanPanelField]:{...readHomePlanPanel(fields[homePlanPanelField]),collapsed:false,appliedId:selected}}));setCollapsed(false);setNotice('Recalculated proposal · revision '+proposal.record.draft.revision+'. Review before applying or attaching.');setAttachFlow(null);setAttachmentOpen(null);return planRevisionReply(proposal.record);},
    discard:()=>{try{const snapshot=decisionStore.getSnapshot();if(!snapshot.saved||snapshot.data.goals.goals.find(goal=>goal.id===binding.goalId)?.statement!==binding.goal)return;let history=readPlanRevisions(snapshot.data.workspaces[binding.goalId]?.fields[planRevisionsField],binding.goalId);for(const id of Object.keys(session.drafts))history=discardPlanRevision(history,baseDraft(id));decisionStore.setField(binding.goalId,planRevisionsField,history);setNotice('Unapplied chat revisions were closed. Applied plans and attachment history are kept.');}catch(error){setNotice((error as Error).message);}},
    subscribe:listener=>{editListeners.current.add(listener);return()=>{editListeners.current.delete(listener);};},
@@ -192,7 +194,7 @@ export function HomeBundlePlans({contextDiagnostic,chatChange,planningContext,pr
  </div>;
 }
 
-function PlanAssumptions({draft}:{draft:BundleDraft}){
+export function PlanAssumptions({draft}:{draft:BundleDraft}){
  const [expanded,setExpanded]=useState(false),contentId=useId();
  const input=draft.inputs,end=bundleHorizonEnd(input.scope).value,lastFinish=input.timing.map(item=>item.finish.value).filter((date):date is string=>!!date).sort().at(-1);
  return <section aria-label={draft.pilot?'Editable starting assumptions':'Plan assumptions'} className="space-y-2 text-xs">

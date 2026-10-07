@@ -1,4 +1,6 @@
 // @ts-expect-error Native Node tests share TypeScript source.
+import {readPlanAlternatives,planAlternativesField} from './home-plan-alternatives.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
 import {assumptionsFallbackField,readAssumptionsFallback} from './home-assumptions-fallback.ts';
 // Navigation status only. Opening a plan still uses the existing current-context guards.
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -14,6 +16,8 @@ import {homeDemoField,readHomeDemo} from './home-demo-catalog.ts';
 
 export type PinnedGoalPlanStatus = 'saved' | 'none' | 'review';
 export function pinnedGoalPlanStatus(goalId:string,fields:Record<string,unknown>|undefined,packet:unknown):PinnedGoalPlanStatus {
+  const alternatives=fields?.[planAlternativesField];
+  if(alternatives!==undefined){const goal=alternatives&&typeof alternatives==='object'&&'goal' in alternatives&&typeof alternatives.goal==='string'?alternatives.goal:'';return readPlanAlternatives(alternatives,{goalId,goal})?'saved':'review';}
   if(readHomeDemo(fields?.[homeDemoField],goalId))return readBundleWorkspace(fields?.[bundleWorkspaceField],goalId)?.attachments.length?'saved':'review';
   const raw=fields?.[bundlePreparationField];
   if(raw!==undefined){
