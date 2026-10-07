@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {homeDemoExamples} from '../../lib/home-demo-catalog.ts';
 import {DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const base=process.env.HOME_BASE_URL??'http://127.0.0.1:3181',browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
@@ -23,7 +24,7 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]]){
  hold=false;release();await status.getByText('Some data is unavailable',{exact:true}).waitFor();
  check(mode+' slow success becomes honest partial data with Refresh',!(await status.innerText()).includes('Loading data')&&/1 of \d+ source summaries available/.test(await status.innerText())&&await button('Refresh data').isVisible());
  failure=true;await button('Refresh data').focus();await page.keyboard.press('Enter');await status.getByText('Data unavailable',{exact:true}).waitFor();
- check(mode+' complete failure stops spinner and preserves draft and goals',await status.locator('svg').count()===0&&await chat.inputValue()==='Keep this draft'&&(await state()).goals.goals.length===2);
+ check(mode+' complete failure stops spinner and preserves draft and goals',await status.locator('svg').count()===0&&await chat.inputValue()==='Keep this draft'&&(await state()).goals.goals.length===homeDemoExamples.length);
  await button('Open goal: Close AI skill gaps').click();await chat.fill('set participants to 15');await button('Send overview question').click();await button('Apply changes').click();await button('Attach Action Plan').click();await button('Confirm revised attachment').click();await page.getByRole('status').filter({hasText:/Action Plan attached/}).waitFor();
  check(mode+' demo chat edits work without evidence or paid requests',posts.length===0&&(await state()).workspaces['demo-close-skill-gaps'].fields.homeSolutionBundlesV1.attachments.length===2);
  await page.getByLabel('Selected goal',{exact:true}).selectOption('');failure=false;await button('Refresh data').click();await status.getByText('Some data is unavailable',{exact:true}).waitFor();
@@ -39,7 +40,7 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]]){
  await page.getByRole('status',{name:'Data loading status',exact:true}).waitFor();
  hold=false;failure=true;release();await page.getByRole('status',{name:'Data loading status',exact:true}).waitFor({state:'hidden'});
  if(await button('Open navigation').isVisible())await button('Open navigation').click();await button('Action Planning').click();await status.getByText('Data unavailable',{exact:true}).waitFor();
- check(mode+' navigation cancellation and shared-page failure do not leave a spinner',await status.locator('svg').count()===0&&(await state()).goals.goals.length===2&&errors.length===0&&await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ check(mode+' navigation cancellation and shared-page failure do not leave a spinner',await status.locator('svg').count()===0&&(await state()).goals.goals.length===homeDemoExamples.length&&errors.length===0&&await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await context.close();
 }}finally{await browser.close();}
 console.log(JSON.stringify({checks}));

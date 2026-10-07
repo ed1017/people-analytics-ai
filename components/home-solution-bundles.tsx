@@ -1,4 +1,5 @@
 "use client";
+import {useHomeGuidedActions} from '@/components/home-guided-actions';
 import {assumptionsFallbackField,readAssumptionsFallback} from '@/lib/home-assumptions-fallback';
 import {HomeAssumptionsFallback} from '@/components/home-assumptions-fallback';
 import {HomeDemoPlans} from '@/components/home-demo-plans';
@@ -86,6 +87,11 @@ export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,
  // Only a fresh user Pin authorizes this call; reload and toggles never do.
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[pin,goalId,binding,busy,active,ready,storage.saved,identity]);
+ useHomeGuidedActions('preparation',{goalId,cancel:()=>coordinator.current.invalidate(),prepare:async()=>{
+  if(current?.proposal.bundles.length)return;
+  if(pending||!binding||busy||!storage.saved||!currentCheck(identity))throw Error('Wait for the current goal and data to finish loading, then retry.');
+  await prepare('explicit');
+ }});
  if(!goalId||!goal)return null;
  if(demo)return <HomeDemoPlans key={goalId} goalId={goalId} goal={goal} active={active} busy={busy} openRequest={openRequest} chatChange={chatChange} onDiscuss={onDiscuss}/>;
  const disabled=busy||pending||!binding||!storage.saved||!active||!ready;

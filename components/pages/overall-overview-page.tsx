@@ -1,4 +1,6 @@
 "use client";
+import {GuidedDemo,GUIDED_EXAMPLE_PROMPT} from '@/components/guided-demo';
+import {HomeGuidedActionsContext,GuidedActionRegistry} from '@/components/home-guided-actions';
 import {homeExitReasonChartFromPacket,homeExitReasonChartMatches,type HomeExitReasonChart as ExitReasonChartData} from '@/lib/home-exit-reason-chart';
 import {HomeExitReasonChart} from '@/components/home-exit-reason-chart';
 import {homeTurnoverFocus} from '@/lib/home-turnover-focus';
@@ -67,7 +69,7 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
 const noActionSubscription=()=>()=>{};
 const noActionSnapshot=()=>emptyOptionActions;
 
-export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleActive=false, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry, onEvidencePack, marketReference }: {
+export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()=>{}, guidedExampleActive=false, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry, onEvidencePack, marketReference }: {
   optionActions?:WorkforceOptionActions;
   marketReference:unknown;
   onEvidencePack:(value:string)=>void;
@@ -76,11 +78,13 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
   conversation: ProblemConversation;
   developmentSession: DevelopmentSession;
   onStartDemo: () => void;
+  onCloseDemo?: () => void;
   guidedExampleActive?: boolean;
   workforceQuery: string; workforceScope: string;
   active: boolean; persona: Persona; onNavigate: (page: AppPage) => void;
 }) {
   const storage=useDecisionStorage();
+  const [guidedActions]=useState(()=>new GuidedActionRegistry());
   const [instructionsDismissed,setInstructionsDismissed]=useState(0);
   const planner=useRef<HTMLDivElement>(null);
   const [planningReview,setPlanningReview]=useState<HomeCapacityRequest|null>(null);
@@ -227,7 +231,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
 
   function submitQuestion(prompt:string){if(ready)queueSuggestion("question:"+prompt,()=>void send(prompt))}
 
-  async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false, responseIntent:'default'|'explanation'|'alternative'='default') {
+  async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false, responseIntent:'default'|'explanation'|'alternative'='default',onAnswered?:()=>void) {
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
     if(message)setInstructionsDismissed(value=>value+1);
@@ -306,6 +310,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
       setMessages(current => [...current, assistantMessage]);
       modelHistoryRef.current = completeScopedChatTurn(key, history, message, reply.clarification?answer+'\n\n'+reply.clarification:answer);
       if (!actionPlan) { conversation.rememberQuestion(key, message); setQuestionUnanswered(false); }
+      onAnswered?.();
       return Boolean(reply.proposal&&!reply.clarification);
     } catch (error) { if (!request.current() || currentEvidenceKey.current !== key || candidateEpoch!==promptEpoch.current) return; setChatError(error instanceof Error ? error.message : "Answer unavailable. Please try again."); if (!actionPlan&&!preserveDraft) setInput(current=>current.trim()?current:message); }
     finally { if(sending.current===sendTicket)sending.current=null; if (request.current() && currentEvidenceKey.current === key) { setChatLoading(false); reveal.complete(); } else reveal.cancel(); }
@@ -420,7 +425,15 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
 
     </section>
   );
-  return <div style={{overflowAnchor:'none'}} className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-3">
+  return <HomeGuidedActionsContext.Provider value={guidedActions}><div style={{overflowAnchor:'none'}} className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]">
+    {guidedExampleActive&&<GuidedDemo active={active} registry={guidedActions} onClose={onCloseDemo} actions={{
+      ready:active&&conversation.storageReady&&conversation.saved&&!conversation.loading&&!conversation.issueEditor&&ready,
+      begin:id=>conversation.beginGuidedExploration(id),
+      send:async()=>{let answered=false;await send(GUIDED_EXAMPLE_PROMPT,false,false,false,false,'default',()=>{answered=true;});if(!answered)throw Error('The example answer did not finish. Review the answer status below, then retry.');},
+      pin:id=>{conversation.confirmWorkforceGoal(GUIDED_EXAMPLE_PROMPT,id);setCandidate(null);},
+      select:id=>{const goal=decisionStore.getSnapshot().data.goals.goals.find(item=>item.id===id);if(!goal)throw Error('The example goal was removed. It will not be recreated.');openPinnedGoal(goal);},
+      cancel:()=>{const id=decisionStore.getSnapshot().data.goals.activeId;if(!id||id===guidedActions.goalId)conversation.cancelPending();},leave:()=>conversation.endGuidedExploration(),
+    }}/>}<section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-3">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <button type="button" onClick={resetHomeConversation} className="min-h-11 rounded px-2 text-xs font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Reset conversation</button>
         <h2 id="overall-overview-heading" className="sr-only">Home overview</h2>
@@ -504,5 +517,5 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
   </section>
     <HomePinnedGoals goals={conversation.goals} activeGoalId={conversation.activeGoalId} ready={conversation.storageReady} disabled={!active||!conversation.storageReady||!conversation.saved||Boolean(conversation.issueEditor)} packet={pack} onSelect={openPinnedGoal}/>
 
-  </div>;
+  </div></HomeGuidedActionsContext.Provider>;
 }
