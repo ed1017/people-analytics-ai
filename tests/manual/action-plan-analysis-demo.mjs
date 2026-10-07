@@ -30,6 +30,8 @@ export async function actionPlanAnalysisDemo(raw){
 export async function readCachedActionPlanAnalysisDemo(cached,draft){return resolveAnalysisDemoCache(cached,await actionPlanAnalysisDemo(draft));}
 export async function analysisDemoDraft(){
  const goal='Review voluntary exits',binding=await actionBinding('scenario',goal,{sources:[]},{}),d=createBundleDraft(bundleProposalFixture(goal).bundles[0],binding);
+ // This frozen public analysis release retains its original input identity.
+ d.inputs.costPolicy='cash-hours-v1';
  const assumed=value=>({value,kind:'illustrative',basis:'Constructed offline demonstration input; not verified plan evidence.'});
  d.inputs.scope.population=assumed('all-recorded-voluntary-separations');d.inputs.scope.startMonth=assumed('2026-10');d.inputs.scope.months=assumed(3);
  d.inputs.successMeasure={goal,scopeKey:JSON.stringify(['all-recorded-voluntary-separations','2026-10',3]),name:'Voluntary exits (count)',baseline:{value:null,kind:'unknown',basis:null},target:assumed('150')};
