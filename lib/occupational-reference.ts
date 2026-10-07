@@ -23,6 +23,7 @@ export type OccupationalReferenceDetail = {
 export type OccupationalReferenceEvidence = {
   population: "occupational_reference";
   selectedProfile: { code: string; name: string } | null;
+  selectedOccupationCode: string | null;
   occupation: ReferenceOccupation | null;
   sourceMode: "stored" | "public_snapshot";
   mappingStatus: string; requiredSkills: ReferenceRequirement[];

@@ -17,10 +17,14 @@ function occupationalReferenceEvidence(value: unknown) {
   const data = record(value), occupation = record(data.occupation), sources = record(data.sourceStatus);
   if (data.population !== "occupational_reference") return null;
   const sourceStatus = Object.fromEntries(["profiles", "mappings", "occupations", "requirements", "skills", "essentialSkills", "softwareSkills"].map(key => [key, sources[key] === "ready" ? "ready" : "unavailable"]));
-  const code = typeof occupation.code === "string" && /^\d{2}-\d{4}\.\d{2}$/.test(occupation.code) ? occupation.code : null;
+  // Detail reads retain their exact scope even when the separate catalog fails.
+  // An explicit invalid or conflicting selection must not borrow another scope.
+  const candidateCode = data.selectedOccupationCode === undefined ? occupation.code : data.selectedOccupationCode;
+  const code = typeof candidateCode === "string" && /^\d{2}-\d{4}\.\d{2}$/.test(candidateCode) &&
+    (occupation.code === undefined || occupation.code === candidateCode) ? candidateCode : null;
   const publicReference = code ? publicOccupationEvidence(code) : null;
   const publicMode = data.sourceMode === "public_snapshot";
-  const storedOccupation = !publicMode && sourceStatus.occupations === "ready" && code ? {
+  const storedOccupation = !publicMode && sourceStatus.occupations === "ready" && code && occupation.code === code ? {
     code, title: text(occupation.title), description: typeof occupation.description === "string" ? occupation.description.slice(0, 2000) : null,
     release: text(occupation.release) || null, refreshedAt: text(occupation.refreshedAt) || null,
   } : null;
@@ -37,6 +41,7 @@ function occupationalReferenceEvidence(value: unknown) {
     population: "occupation descriptions and internal job-profile requirements; no employee observations",
     sourceMode: publicMode ? "public_snapshot" : "stored",
     selectedProfile: sourceStatus.profiles === "ready" && text(profile.code) && text(profile.name) ? {code:text(profile.code),name:text(profile.name)} : null,
+    selectedOccupationCode: code,
     mappingStatus: sourceStatus.mappings === "ready" ? text(data.mappingStatus) : "Stored mapping source unavailable; no mapping inferred",
     occupation: publicMode ? publicReference : storedOccupation,
     sourceUrl: code ? `https://www.onetonline.org/link/summary/${code}` : null,
@@ -54,7 +59,8 @@ export function intelligenceEvidence(page: IntelligencePage, input: unknown) {
   if (page === "occupational-references") {
     const total = data.loading || data.unavailable ? null : count(data.totalJobProfiles), mapped = data.loading || data.unavailable ? null : count(data.mappedJobProfiles);
     const selectedReference = occupationalReferenceEvidence(data.occupationalReference);
-    return { ...common, reference: "https://www.onetcenter.org/database.html", referenceContentLoaded: Boolean(selectedReference?.occupation), scope: selectedReference ? "Selected occupation reference and separate internal role requirements; no employee attainment" : "Internal stored mapping coverage only; O*NET release/import date/live connection unverified", selectedReference, totalJobProfiles: total, mappedJobProfiles: total !== null && mapped !== null && mapped <= total ? mapped : null };
+    const referenceContentLoaded = Boolean(selectedReference && (selectedReference.occupation || selectedReference.requiredSkills.length || selectedReference.essentialSkills.length || selectedReference.softwareSkills.length));
+    return { ...common, reference: "https://www.onetcenter.org/database.html", referenceContentLoaded, scope: selectedReference ? "Selected occupation reference and separate internal role requirements; no employee attainment" : "Internal stored mapping coverage only; O*NET release/import date/live connection unverified", selectedReference, totalJobProfiles: total, mappedJobProfiles: total !== null && mapped !== null && mapped <= total ? mapped : null };
   }
   if (page === "labor-market") {
     const metrics = Array.isArray(data.metrics) ? data.metrics.map(record) : [];
