@@ -13,10 +13,12 @@ import { intelligenceEvidence, isIntelligencePage } from "@/lib/intelligence-cha
 import { developmentCatalog } from "@/lib/development-costs";
 import {
   useEffect,
+  useEffectEvent,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
@@ -69,6 +71,7 @@ import {
   getWorkspaceForPage,
   type AppWorkspaceKey,
 } from "@/lib/app-navigation";
+import { APP_PAGE_CHANGE_EVENT, appPageHref, currentAppPage, resolveAppPage, serverAppPage, subscribeToAppPage } from "@/lib/app-page-url";
 import {
   enterpriseTalentEvidenceScope,
   evidenceScopeForAi,
@@ -125,7 +128,7 @@ const PLANNING_VIEW_TO_PAGE: Record<
 };
 
 export default function Home() {
-  const [activePage, setActivePageState] = useState<AppPage>("home");
+  const activePage = useSyncExternalStore(subscribeToAppPage, currentAppPage, serverAppPage);
   const conversation = useProblemConversation(activePage);
   const [workspacePalette]=useWorkspacePalette();
   const [optionActions] = useState(()=>new WorkforceOptionActions());
@@ -166,7 +169,32 @@ export default function Home() {
     evaluate: "assess-evaluate",
   });
 
-  const setActivePage = (page: AppPage) => { if(page !== activePage) conversation.cancelPending(); setActivePageState(page === "overview" || page === "career-mobility" ? "workforce" : page); };
+  const setActivePage = (page: AppPage) => {
+    const destination = resolveAppPage(page);
+    if (destination !== activePage) conversation.cancelPending();
+    const href = appPageHref(window.location, destination);
+    if (href !== window.location.pathname + window.location.search + window.location.hash) {
+      // Next supports native history for local query changes without reloading the shell.
+      window.history.pushState(null, "", href);
+      window.dispatchEvent(new Event(APP_PAGE_CHANGE_EVENT));
+    }
+  };
+
+  const cancelHistoryRequest = useEffectEvent(() => conversation.cancelPending());
+  useEffect(() => {
+    // Back/Forward invalidates the leaving page's in-flight reply just like a navigation click.
+    const restore = () => cancelHistoryRequest();
+    window.addEventListener("popstate", restore);
+    return () => window.removeEventListener("popstate", restore);
+  }, []);
+
+  useEffect(() => {
+    const href = appPageHref(window.location, currentAppPage());
+    if (href !== window.location.pathname + window.location.search + window.location.hash) {
+      // Normalize invalid/legacy links in place, without adding a Back entry.
+      window.history.replaceState(null, "", href);
+    }
+  }, [activePage]);
 
   const activeWorkspace =
     getWorkspaceForPage(activePage);
