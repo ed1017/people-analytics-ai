@@ -40,14 +40,31 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
 
  const savedOriginals=async()=>(await fields()).homePlanAlternativesV1.plans.slice(0,3);
  const catalog=async()=>(await fields()).homePlanAlternativesV1;
+ const compareAll=async stage=>{
+  const before=await catalog(),serialized=JSON.stringify(before),expected=before.order.map(id=>before.plans.find(plan=>plan.id===id));
+  await button('Compare Action Plans').click();
+  const comparison=page.getByRole('region',{name:'Action Plan comparison',exact:true});
+  check(mode+' '+stage+' comparison contains every active number in display order',JSON.stringify(await comparison.getByRole('article').evaluateAll(items=>items.map(item=>item.getAttribute('aria-label'))))===JSON.stringify(expected.map(plan=>'Comparison Action Plan '+plan.number)));
+  for(const plan of expected){
+   const card=comparison.getByRole('article',{name:'Comparison Action Plan '+plan.number,exact:true});
+   const label=plan.operation?(plan.applied?'Applied alternative':'Proposed alternative · not yet applied'):'Original plan snapshot';
+   check(mode+' '+stage+' #'+plan.number+' preserves snapshot type and revision',await card.getByText(new RegExp('^'+label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+' · revision '+plan.draft.revision)).count()===1);
+   if(plan.sourceRefs.length)check(mode+' '+stage+' #'+plan.number+' preserves source lineage',(await card.innerText()).includes('based on '+plan.sourceRefs.map(ref=>'Action Plan #'+before.plans.find(source=>source.id===ref.id).number).join(' and ')));
+  }
+  check(mode+' '+stage+' comparison is read-only for originals, alternatives and attachments',JSON.stringify(await catalog())===serialized);
+  await button('Hide comparison').click();
+ };
  await send('Can I combine action plans?');check(mode+' combination question reads actual available plans without model or mutation',posts.length===2&&!(await fields()).homePlanAlternativesV1&&await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText(/Available in this goal: Action Plan #1/).isVisible());
  await send('have a budget of 6000');await panel.getByRole('tab',{name:'Action Plan #4',exact:true}).waitFor();const originals=JSON.stringify(await savedOriginals());
  check(mode+' first edit creates selected #4 without applying or attaching',(await catalog()).plans.length===4&&!(await catalog()).plans[3].applied&&(await catalog()).attachments.length===0&&await panel.getByRole('tab',{name:'Action Plan #4',exact:true}).getAttribute('aria-selected')==='true');
+ await compareAll('after first edit');
  await send('in Action Plan #4 use 25 participants');check(mode+' second edit creates #5 with source #4 and recalculated effort',(await catalog()).plans[4].sourceRefs[0].id==='alternative-4'&&(await catalog()).plans[4].result.deliveryEstimate.hours===66&&JSON.stringify(await savedOriginals())===originals);
+ await compareAll('after editing the alternative');
  const beforeQuestion=JSON.stringify(await catalog());await send('What is the budget for Action Plan #4?');check(mode+' numbered question reads #4 rather than selected #5',posts.length===2&&JSON.stringify(await catalog())===beforeQuestion&&await page.getByText(/Action Plan #4: Manager support pilot.*Budget limit/).last().isVisible());
  await button('Apply changes').click();await panel.getByRole('checkbox').check();await button('Attach Action Plan').click();check(mode+' Apply and Attach affect only explicit #5',(await catalog()).plans[4].applied&&(await catalog()).attachments[0].planId==='alternative-5'&&JSON.stringify(await savedOriginals())===originals);
  const attachment=JSON.stringify((await catalog()).attachments),snapshot=JSON.stringify((await catalog()).plans[4].draft);
  await page.reload();await panel.getByRole('tab',{name:'Action Plan #5',exact:true}).waitFor();check(mode+' reload restores #5 selection and immutable attachment',await panel.getByRole('tab',{name:'Action Plan #5',exact:true}).getAttribute('aria-selected')==='true'&&JSON.stringify((await catalog()).attachments)===attachment&&JSON.stringify((await catalog()).plans[4].draft)===snapshot);
+ await compareAll('after reload with attached #5');
  await send('Combine Action Plan #1 and #2');const review=page.getByRole('region',{name:'Review plan combination'});await review.waitFor();check(mode+' combine waits for explicit overlap review',(await catalog()).plans.length===5);await button('Cancel combination').click();check(mode+' cancellation creates nothing',await review.count()===0&&(await catalog()).plans.length===5);
  await send('Combine Action Plan #1 and #2');await review.waitFor();await review.getByRole('button',{name:'Create combined alternative'}).click();await panel.getByRole('tab',{name:'Action Plan #6',exact:true}).waitFor();check(mode+' unknown overlap remains unknown in #6',(await catalog()).plans[5].result.cashEstimate.cash===null&&(await catalog()).plans[5].result.uniqueParticipants===null&&(await catalog()).plans[5].sourceRefs.length===2&&JSON.stringify((await catalog()).attachments)===attachment);
  await send('Combine Action Plan #1 and #2');await review.getByLabel('Combination participant overlap').selectOption('disjoint');await review.getByLabel('Combination cash overlap').selectOption('distinct');await review.getByRole('button',{name:'Create combined alternative'}).click();await panel.getByRole('tab',{name:'Action Plan #7',exact:true}).waitFor();check(mode+' reviewed disjoint overlap recalculates rather than adding targets',(await catalog()).plans[6].result.deliveryEstimate.hours===72&&(await catalog()).plans[6].result.cashEstimate.cash===7000&&(await catalog()).plans[6].result.cashTotal===null&&(await catalog()).plans[6].result.deliveryEstimate.participants===20&&(await catalog()).plans[6].result.uniqueParticipants===null&&JSON.stringify(await savedOriginals())===originals);
@@ -57,7 +74,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  await panel.getByRole('tab',{name:'Action Plan #5',exact:true}).click();await button('Remove Action Plan #5 from list').click();check(mode+' removed plan retains lineage and attachment',(await catalog()).plans[4].deleted&&JSON.stringify((await catalog()).attachments)===attachment&&JSON.stringify((await catalog()).plans[4].draft)===snapshot);
  await send('Explain Action Plan #5');check(mode+' removed reference fails without a model call or number reuse',await input.inputValue()==='Explain Action Plan #5'&&(await catalog()).nextNumber===9&&posts.length===2);await input.fill('');
  await panel.getByText('Attached Action Plans and version history (1)',{exact:true}).click();check(mode+' removed attachment remains readable',await panel.getByRole('region',{name:'Attached Action Plan 5'}).getByText(/removed from active list/).isVisible());
- await button('Compare Action Plans').click();check(mode+' comparison includes each active numbered alternative',await page.getByRole('region',{name:'Action Plan comparison'}).getByRole('article').count()===(await catalog()).order.length);await button('Hide comparison').click();
+ await compareAll('after combination, reorder and removal');
  await page.screenshot({path:'/tmp/pr175-numbered-alternatives-'+mode+'.png',fullPage:true});
  const nav=page.getByRole('navigation',{name:'Workforce navigation'});if(await button('Open navigation').isVisible())await button('Open navigation').click();await nav.getByRole('button',{name:'Planning — Plan Our Future',exact:true}).click();await page.locator('[data-nav-destination="decision-brief"]').click();const brief=page.getByRole('region',{name:'Attached Action Plans',exact:true});check(mode+' decision brief uses attached #5 snapshot after removal',await brief.getByRole('article',{name:'Action Plan option 5'}).isVisible()&&await brief.getByText(/66 total staff hours/).isVisible());
  check(mode+' responsive runtime and network boundaries hold',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&unexpected===0&&posts.length===2);
