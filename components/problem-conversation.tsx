@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
+import {guidedReturnKey,readGuidedReturn,type GuidedReturn} from '@/lib/home-guided-return';
 import {conversationBoundary,resetConversationMarks} from "@/lib/conversation-reset";
 import {createHomeDemoGoals,hasSavedUserGoal} from "@/lib/home-demo-goals";
 import { rememberProblemQuestion, ProblemRequestGate } from "@/lib/problem-session";
@@ -21,6 +22,7 @@ export function useProblemConversation(scope = "home") {
   const decisionStorage=useDecisionStorage();
   const storageNotice=decisionStorage.notice;
   const chats = useRef(new Map<string, GoalChat>());
+  const guidedIsolation=useRef<GuidedReturn|null>(null);
   const [workspaceRevision, setWorkspaceRevision] = useState(0);
   const persist = (next: LocalGoals, remove = false) => {
     goalsRef.current = next; setLocalGoals(next);
@@ -61,10 +63,19 @@ export function useProblemConversation(scope = "home") {
   const history = useRef<ScopedChatHistory>({ key: "", messages: [] });
   useEffect(() => {
     // Restore browser-owned state after hydration; never write defaults over unread storage.
-    const saved=decisionStore.initialize({getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),removeItem:key=>localStorage.removeItem(key)},createHomeDemoGoals).goals;
+    let saved=decisionStore.initialize({getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),removeItem:key=>localStorage.removeItem(key)},createHomeDemoGoals).goals;
+    let returned:GuidedReturn|null=null;
+    try{returned=readGuidedReturn(sessionStorage.getItem(guidedReturnKey));sessionStorage.removeItem(guidedReturnKey);}catch{/* Normal browser storage recovery remains available. */}
+    if(returned){
+      if(returned.general)chats.current.set('',returned.general);
+      if(saved.activeId===''||saved.activeId===returned.id){
+        const activeId=saved.goals.some(goal=>goal.id===returned.originId)?returned.originId:'';
+        saved={...saved,activeId};decisionStore.saveGoals(saved);explorationContext.current=returned.requirements;
+      }
+    }
     // eslint-disable-next-line react-hooks/set-state-in-effect -- One-time hydration from browser storage, with SSR-safe initial state.
     goalsRef.current=saved;setLocalGoals(saved);setFocusedIssue(saved.goals.find(g=>g.id===saved.activeId)?.statement??"");
-    const chat=decisionStore.getField<GoalChat|null>(saved.activeId,"chat",null);
+    const chat=chats.current.get(saved.activeId)??decisionStore.getField<GoalChat|null>(saved.activeId,"chat",null);
     if(chat){setResetMarks(chat.resetMarks??{});setStoredMessages(chat.messages);setInput(chat.input);setProblem(chat.problem);}
     setStorageReady(true);
   }, []);
@@ -81,6 +92,29 @@ export function useProblemConversation(scope = "home") {
     setStoredMessages(chat?.messages ?? []);setResetMarks(chat?.resetMarks??{}); setInput(chat?.input ?? ""); setProblem(chat?.problem ?? null); setQuestionUnanswered(false);
     history.current = {key:"", messages:[]}; setError(null); setIssueEditor(null);
     setFocusedIssue(next.goals.find(g=>g.id===next.activeId)?.statement ?? ""); persist(next);
+  };
+  const beginGuidedExploration=(id:string)=>{
+    if(guidedIsolation.current?.id===id)return;
+    if(guidedIsolation.current||!storageReady||!decisionStore.getSnapshot().saved||loading||issueEditor)throw Error("Finish the current request or edit before starting the example.");
+    snapshot();const originId=goalsRef.current.activeId,general=chats.current.get("")??null;
+    const isolated={id,originId,general,requirements:explorationContext.current};
+    try{sessionStorage.setItem(guidedReturnKey,JSON.stringify(isolated));}catch{throw Error('The original draft could not be kept for reload. Resolve browser storage before starting the example.');}
+    guidedIsolation.current=isolated;
+    activate({...goalsRef.current,activeId:""});
+    if(!decisionStore.getSnapshot().saved)throw Error('The example workspace could not be saved. Your original draft is kept; resolve browser storage before retrying.');
+    setStoredMessages([]);setResetMarks({});setInput("");setProblem(null);setQuestionUnanswered(false);explorationContext.current=emptyGoalRequirements();
+  };
+  const endGuidedExploration=()=>{
+    const isolated=guidedIsolation.current;if(!isolated)return;
+    guidedIsolation.current=null;
+    try{sessionStorage.removeItem(guidedReturnKey);}catch{/* The checked return address cannot replay actions. */}
+    if(goalsRef.current.activeId===isolated.id)snapshot();
+    if(isolated.general)chats.current.set("",isolated.general);else chats.current.delete("");
+    // Respect a user's manual selection outside the walkthrough.
+    if(goalsRef.current.activeId!==""&&goalsRef.current.activeId!==isolated.id)return;
+    const activeId=goalsRef.current.goals.some(goal=>goal.id===isolated.originId)?isolated.originId:"";
+    activate({...goalsRef.current,activeId},false);
+    if(!activeId)explorationContext.current=isolated.requirements;
   };
   const selectGoal = (id: string) => {
     const current = goalsRef.current;
@@ -126,10 +160,24 @@ export function useProblemConversation(scope = "home") {
     return null;
   };
   // Explicit local planner handoff: retain the entire transcript and unfinished draft.
-  const confirmWorkforceGoal = (statement: string): string => {
+  const confirmWorkforceGoal = (statement: string, guidedId?:string): string => {
     const clean = statement.trim(), current = goalsRef.current;
     if (!storageReady || !decisionStore.getSnapshot().saved || loading || issueEditor) throw Error("Finish the current edit or request and make sure browser storage is available.");
     if (!clean || clean.length > 240) throw Error("Review a goal between 1 and 240 characters; nothing has been shortened automatically.");
+    if(guidedId){
+      if(guidedIsolation.current?.id!==guidedId||current.activeId||!clean.includes('(demo example)'))throw Error('This example conversation changed. Exit and start the guide again.');
+      const prior=current.goals.find(goal=>goal.id===guidedId);
+      if(prior){if(prior.statement!==clean)throw Error('The example goal changed. Exit to review it.');return guidedId;}
+      if(decisionStore.getSnapshot().data.removedGoalIds?.includes(guidedId))throw Error('This example was removed. It will not be restored. Exit the guide to continue.');
+      if(current.goals.length>=MAX_GOALS)throw Error('Your saved goals are full. Free a slot before pinning the example.');
+      const chat={messages:storedMessagesRef.current,input:'',problem,questionUnanswered:false,resetMarks:resetMarksRef.current};
+      chats.current.set(guidedId,chat);
+      persist({...current,goals:[...current.goals,{id:guidedId,statement:clean}]});
+      if(!decisionStore.getSnapshot().saved)throw Error('The example goal could not be saved. Resolve browser storage before retrying.');
+      decisionStore.setField(guidedId,'chat',chat);
+      if(!decisionStore.getSnapshot().saved)throw Error('The example conversation could not be saved. Resolve browser storage before retrying.');
+      return guidedId;
+    }
     if (current.activeId) {
       if (current.goals.find(goal=>goal.id===current.activeId)?.statement !== clean) throw Error("The saved goal changed. Reopen the scope review.");
       return current.activeId;
@@ -181,7 +229,7 @@ export function useProblemConversation(scope = "home") {
     if(current.activeId)persist({...current,activeId:""});
     setResetEpoch(value=>value+1);
   };
-  return { resetConversation,resetEpoch,wasReset:Object.hasOwn(resetMarks,'*')||Object.hasOwn(resetMarks,scope),historyMessages:storedMessages, canSubmitPrompt, confirmWorkforceGoal, saved:decisionStorage.saved, retrySave:()=>decisionStore.retry(), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, closeIssueEditor, openIssueEditor, updateIssueDraft, updateIssueContext, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
+  return { beginGuidedExploration,endGuidedExploration,resetConversation,resetEpoch,wasReset:Object.hasOwn(resetMarks,'*')||Object.hasOwn(resetMarks,scope),historyMessages:storedMessages, canSubmitPrompt, confirmWorkforceGoal, saved:decisionStorage.saved, retrySave:()=>decisionStore.retry(), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, closeIssueEditor, openIssueEditor, updateIssueDraft, updateIssueContext, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
 }
 export type ProblemConversation = ReturnType<typeof useProblemConversation>;
 

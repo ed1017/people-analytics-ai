@@ -2,9 +2,11 @@
 
 Home has one **Try a guided example** entry under **Show instructions**. The expanded toggle reads **Hide instructions**. Submitting a question or selecting a starter prompt collapses the intro without clearing drafts or goals. Entering the guide also collapses the intro and hides the starter block until the guide closes. Merely having saved example goals does not hide starter prompts in General exploration.
 
-The six steps follow the current controls: ask a question, optionally **Pin as goal**, choose an Action Plan, **Attach Action Plan**, describe edits in chat and review **Apply changes**, then reopen a saved goal. Attachment uses one click unless the existing context/conflict review needs attention. Older attached versions remain in history. **Share Action Plan (TBD)** and **Track results (TBD)** remain future copy.
+The six guided steps execute real actions: **Next: send example prompt**, **Next: pin demo goal**, **Next: select demo goal**, **Next: prepare example plans**, **Next: select example plan**, and **Next: attach example plan**. Each step advances only after its handler succeeds and the resulting state is verified. The single forward button shows a loading status, disables repeated clicks, and becomes a step-specific Retry action on failure. Back cancels pending work without undoing completed saved work or repeating a successful question.
 
-**Use example prompt** requires General exploration, an empty composer, available saved storage and no pending request. It fills the composer; Send and Pin remain separate actions. Opening, stepping through or exiting the guide never sends a request or changes saved plans.
+Opening the guide sends nothing. The first Send opens an isolated temporary exploration while keeping the previous goal, transcript and draft. Pin uses the normal goal-save handler with a new guide-owned ID, explicitly labelled “demo example”; it saves only the example transcript and leaves goal selection to the following step. It does not replace or recreate first-run examples, including deliberately removed examples. Preparing plans is an explicit model request through the ordinary preparation coordinator. Selecting and attaching call the ordinary plan handlers, with their readiness, current-context, storage and conflict checks intact. No models run on guide entry, Back, goal selection, reload or first-run seeding.
+
+Cancel aborts pending work and restores the preceding conversation and draft. A user-selected different goal is respected. Successfully pinned examples and attachments remain saved. A validated tab-local return address restores the preceding conversation after reload. Reload closes the walkthrough and does not resume or replay actions. Re-entering starts a separate explicit example; existing goals and histories remain intact. The finished guide points users to ordinary chat edits and reopening saved goals. **Share Action Plan (TBD)** and **Track results (TBD)** remain future copy.
 
 ## First-run examples
 
@@ -23,7 +25,8 @@ Current or legacy state, including empty/deleted state, is never augmented. Relo
 
 - `tests/home-demo-goals.test.mjs`: first-run eligibility, immutable local templates, existing/corrupt/legacy state, deletion, quota retry, edit persistence and attachment history.
 - `tests/browser/home-demo-goals.mjs`: first-run Home, instructions, starter submission, demo edits, filters, switching, reload/reset, removal and keyboard flows at 1366px, 390px and 683px.
-- `tests/browser/home-guided-example.mjs`: explicit prompt/Send/Pin, generated plan selection, local edit review, one-click attachment, goal isolation and the sequential guide at the same sizes.
+- `tests/home-guided-flow.test.mjs`: single-flight execution, idempotent completed steps, failed receipts, explicit retry and cancelled late completion.
+- `tests/browser/home-guided-example.mjs`: real action click-through on desktop and 390px, clean/existing/deleted-example states, keyboard selection, prompt and plan failures, repeated clicks, cancellation, Back, original draft/history preservation and passive reload.
 
 Browser checks intercept source and chat requests with synthetic fixtures. They establish local application behavior, not hosted integration or real model outcomes.
 
