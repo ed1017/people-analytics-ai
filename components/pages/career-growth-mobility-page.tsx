@@ -85,8 +85,8 @@ export function CareerGrowthMobilityPage({
   return (
     <section className="min-w-0 p-6">
       <WorkforcePerformanceField value={performance} population={workforceHeadcount} filters={performanceFilters} selectedContext={selectedContext} loading={performanceLoading} />
-      <details className="mt-6">
-        <summary className="cursor-pointer text-sm font-medium">Recorded movement history · company-wide context</summary>
+      <section className="mt-6" aria-labelledby="recorded-movement-history-heading">
+        <h2 id="recorded-movement-history-heading" className="text-sm font-medium">Recorded movement history · company-wide context</h2>
       <div className="mt-4 mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">
@@ -413,7 +413,7 @@ export function CareerGrowthMobilityPage({
           </div>
         )
       )}
-      </details>
+      </section>
     </section>
   );
 }
