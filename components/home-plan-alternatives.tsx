@@ -24,6 +24,8 @@ import {planStaffEffortText} from '@/lib/home-plan-delivery-estimate';
 import {planBudgetText,planRevisionsField,readPlanRevisions} from '@/lib/home-plan-revisions';
 import {PlanDirections} from '@/components/plan-directions';
 import type {Json} from '@/lib/local-decisions';
+import {structuredPlansEnabled,createPlanConversationRequest,assertPlanConversationCurrent,readPlanConversationProposal,previewPlanConversation,savePlanConversation,type PlanConversationRequest,type PlanConversationProposal} from '@/lib/home-plan-conversation';
+import {HomePlanConversationReview} from '@/components/home-plan-conversation-review';
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring';
 const json=(value:unknown)=>value as Json;
 
@@ -32,6 +34,9 @@ type Review={request:AlternativeRequest;catalog:PlanAlternatives;current:()=>boo
 export function HomeBundlePlans(props:HomeBundlePlansProps){
  const storage=useDecisionStorage(),context={goalId:props.binding.goalId,goal:props.binding.goal},fields=storage.data.workspaces[context.goalId]?.fields??{},raw=fields[planAlternativesField],catalog=readPlanAlternatives(raw,context);
  const [review,setReview]=useState<Review|null>(null),[notice,setNotice]=useState('');
+ const [structured,setStructured]=useState<{request:PlanConversationRequest;proposal:PlanConversationProposal;current:()=>boolean;catalog:()=>PlanAlternatives}|null>(null);
+ const [comparisonIds,setComparisonIds]=useState<string[]>([]),comparisonRef=useRef<string[]>([]);
+ const lastTarget=useRef<BundleDiscussion|null>(null);
  const guided=useContext(HomeGuidedActionsContext);
  const pending=useRef<{key:string;id:string}|null>(null),epoch=useRef(0),mounted=useRef(true);
  useLayoutEffect(()=>{mounted.current=true;return()=>{mounted.current=false;};},[]);
@@ -58,7 +63,23 @@ export function HomeBundlePlans(props:HomeBundlePlansProps){
   }catch(error){setNotice((error as Error).message);}
  }
  function register(target:BundleDiscussion){
-  props.onDiscuss({...target,discard:()=>{epoch.current++;pending.current=null;setReview(null);setNotice('Conversation reset. Saved alternatives and attachments are kept.');},propose:text=>{
+  lastTarget.current=target;
+  props.onDiscuss({...target,...(structuredPlansEnabled?{structuredPropose:async(message:string,signal:AbortSignal)=>{
+   guard();if(!target.isCurrent())throw Error('Select a current saved plan before sending.');
+   const readCurrent=()=>{const state=guard(),raw=state.data.workspaces[context.goalId]?.fields[planAlternativesField],current=raw===undefined?createPlanAlternatives(context,target.snapshots?.()??[]):readPlanAlternatives(raw,context);if(!current)throw Error('Saved plans cannot be verified.');return current;};
+   const request=createPlanConversationRequest(readCurrent(),target.id,comparisonRef.current,message,crypto.randomUUID());
+   const captured=++epoch.current;setStructured(null);setReview(null);setNotice('');
+   const current=()=>{try{guard();if(signal.aborted||captured!==epoch.current||!target.isCurrent())return false;assertPlanConversationCurrent(request,readCurrent(),lastTarget.current?.id,comparisonRef.current);return true;}catch{return false;}};
+   const response=await fetch('/api/home-plan-conversation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...request,catalog:packPlanAlternatives(request.catalog)}),signal});
+   const data=await response.json();
+   if(!current())throw Error('The goal, selection or saved plans changed. Send the request again; nothing was saved.');
+   if(!response.ok)throw Error(typeof data.error==='string'?data.error:'The plan response is unavailable. Nothing was saved.');
+   if(data.requestId!==request.requestId)throw Error('The response belongs to another request. Nothing was saved.');
+   const proposal=readPlanConversationProposal(data.proposal,request),preview=previewPlanConversation(request,proposal);
+   setStructured({request,proposal,current,catalog:readCurrent});
+   return preview.kind==='clarify'?preview.question:preview.kind==='compare'?'The read-only comparison below uses your actual saved plans. Nothing was changed.':'Review the proposed changes below. Nothing is saved until you choose Save as new alternative.';
+  }}:{}),discard:()=>{epoch.current++;pending.current=null;setReview(null);setStructured(null);setNotice('Conversation reset. Saved alternatives and attachments are kept.');},propose:text=>{
+   epoch.current++;setStructured(null);
    guard();if(!target.isCurrent())throw Error('The selected plan changed. Send the request again for the current plans.');
    const state=decisionStore.getSnapshot(),latestRaw=state.data.workspaces[context.goalId]?.fields[planAlternativesField];
    const current=latestRaw===undefined?createPlanAlternatives(context,target.snapshots?.()??[]):readPlanAlternatives(latestRaw,context);
@@ -82,6 +103,8 @@ export function HomeBundlePlans(props:HomeBundlePlansProps){
  }
  if(raw!==undefined&&!catalog)return <p role="alert">Saved Action Plan alternatives cannot be verified. Their records are kept unchanged; review browser storage before editing or attaching.</p>;
  return <>{catalog?<AlternativePlans {...props} contextCurrent={props.contextCurrent&&catalog.plans.every(plan=>actionBindingKey(plan.draft.binding)===actionBindingKey(props.binding))} catalog={catalog} onDiscuss={register} onCorrectSavedPilot={correctSavedPilot}/>:<LegacyHomeBundlePlans {...props} onDiscuss={register} onCorrectSavedPilot={correctSavedPilot}/>}
+  {structuredPlansEnabled&&<details><summary className="min-h-11 cursor-pointer py-2 text-sm">Choose plans to discuss together</summary><p className="text-sm">Select two plans to refer to “these two”, or name their displayed numbers in chat.</p><button className={button} disabled={!comparisonIds.length} onClick={()=>{comparisonRef.current=[];setComparisonIds([]);epoch.current++;}}>Clear discussion selection</button>{(catalog?catalog.order.map(id=>({id,number:catalog.plans.find(plan=>plan.id===id)!.number})):props.proposal.bundles.map((bundle,index)=>({id:bundle.id,number:index+1}))).map(plan=><label key={plan.id} className="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" aria-label={'Discuss Action Plan #'+plan.number} checked={comparisonIds.includes(plan.id)} disabled={!comparisonIds.includes(plan.id)&&comparisonIds.length>=6} onChange={event=>{const next=event.target.checked?[...comparisonRef.current,plan.id]:comparisonRef.current.filter(id=>id!==plan.id);comparisonRef.current=next;setComparisonIds(next);epoch.current++;}}/>Action Plan #{plan.number}</label>)}</details>}
+  {structured&&<HomePlanConversationReview key={structured.request.requestId} request={structured.request} proposal={structured.proposal} current={structured.current()} onClose={()=>{epoch.current++;setStructured(null);}} onSave={assumptions=>{try{if(!structured.current())throw Error('The goal, selection or saved plans changed. Send the request again.');const outcome=savePlanConversation(structured.catalog(),structured.request,structured.proposal,assumptions);saveOutcome(outcome);setStructured(null);epoch.current++;}catch(error){setNotice((error as Error).message);}}}/>}
   {review&&<CombinationReviewForm key={review.request.requestId} disabled={props.disabled||!props.contextCurrent} onCreate={combine} onCancel={()=>{epoch.current++;setReview(null);}}/>}
   {notice&&<p role="status" className="whitespace-pre-line text-sm">{notice}</p>}
  </>;

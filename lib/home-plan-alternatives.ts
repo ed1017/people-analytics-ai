@@ -17,7 +17,7 @@ import {planNumberPattern,planReferenceNumbers} from './home-plan-references.ts'
 export const planAlternativesField='homePlanAlternativesV1';
 export type AlternativeContext={goalId:string;goal:string};
 export type AlternativeSourceRef={id:string;revision:number};
-export type AlternativeOperation={kind:'edit'|'combine'|'staffing'|'goal-correction';text:string;sourceIds:string[];review?:CombinationReview};
+export type AlternativeOperation={kind:'edit'|'combine'|'staffing'|'goal-correction';text:string;sourceIds:string[];review?:CombinationReview;proposalKey?:string};
 export type PlanAlternative={id:string;number:number;draft:BundleDraft;result:BundleResult;sourceRefs:AlternativeSourceRef[];requestId:string|null;operation:AlternativeOperation|null;notes:string[];deleted:boolean;applied:boolean};
 export type AlternativeAttachment={id:string;planId:string;attachedAt:string};
 export type PlanAlternatives={version:1;goalId:string;goal:string;nextNumber:number;order:string[];plans:PlanAlternative[];attachments:AlternativeAttachment[]};
@@ -58,6 +58,7 @@ export function readPlanAlternatives(raw:unknown,context:AlternativeContext):Pla
    if(new Set(plan.sourceRefs.map(ref=>ref.id)).size!==plan.sourceRefs.length||plan.sourceRefs.some(ref=>!seen.has(ref.id)||seen.get(ref.id)!.draft.revision!==ref.revision)||plan.number!==seen.size+1)return null;
    if(plan.requestId!==null){if(!idValid(plan.requestId)||requests.has(plan.requestId)||!plan.operation||!['edit','combine','staffing','goal-correction'].includes(plan.operation.kind)||typeof plan.operation.text!=='string'||!plan.operation.text.trim()||plan.operation.text.length>1200||!equal(plan.operation.sourceIds,plan.sourceRefs.map(ref=>ref.id))||plan.sourceRefs.length!==(plan.operation.kind==='combine'?2:1))return null;requests.add(plan.requestId);}
    else if(plan.sourceRefs.length||plan.operation!==null)return null;
+   if(plan.operation?.proposalKey!==undefined&&(typeof plan.operation.proposalKey!=='string'||!plan.operation.proposalKey.length||plan.operation.proposalKey.length>8000))return null;
    seen.set(plan.id,plan);numbers.add(plan.number);
   }
   if(catalog.nextNumber!==Math.max(...numbers)+1||new Set(catalog.order).size!==catalog.order.length||catalog.order.length!==catalog.plans.filter(plan=>!plan.deleted).length||catalog.order.some(id=>!seen.has(id)||seen.get(id)!.deleted))return null;
@@ -129,6 +130,14 @@ export function proposeCombinedAlternative(raw:PlanAlternatives,context:Alternat
  const named=resolveNumberedPlans(request.text,catalog,context);if(named.length!==2||!equal(named.map(plan=>plan.id),request.sourceIds))fail('Choose the two current numbered plans named in this combination.');
  const combined=combinePlanSnapshots(sources,request.review);if(combined.status!=='ready')return combined;
  return append(catalog,request,operation,sources,combined.draft,combined.result,combined.notes);
+}
+
+/** Internal structured executor boundary: only explicitly reviewed, recomputed drafts are persisted. */
+export function appendReviewedAlternative(raw:PlanAlternatives,context:AlternativeContext,request:AlternativeRequest,draft:BundleDraft,kind:'edit'|'combine',notes:string[],proposalKey:string):AlternativeOutcome{
+ const catalog=checked(raw,context),sources=sourcesFor(catalog,request),operation:AlternativeOperation={kind,text:request.text,sourceIds:request.sourceIds,proposalKey};
+ const existing=retry(catalog,request,operation);if(existing)return existing;
+ if(sources.length!==(kind==='combine'?2:1)||!readBundleDraft(draft)||!equal(draft.binding,sources[0].draft.binding)||draft.bundle.id!==sources[0].draft.bundle.id||kind==='edit'&&draft.revision!==sources[0].draft.revision+1)fail('Review a validated proposal for these exact source plans.');
+ return append(catalog,request,operation,sources,draft,reconcileBundle(draft),notes);
 }
 
 /** Metadata-only view changes: deleted plans remain as lineage/attachment tombstones. */
