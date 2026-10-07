@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
+import { nullableNumber as toNumber } from "../../../lib/numeric-contract";
+import { storedPlanningProvenance } from "../../../lib/stored-planning";
 
 export const dynamic = "force-dynamic";
 
@@ -27,15 +29,6 @@ type AssumptionRow = {
   assumption_value: number | string | null;
   assumption_text: string | null;
 };
-
-function toNumber(value: number | string | null) {
-  if (value === null || value === undefined) {
-    return 0;
-  }
-
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
 
 export async function GET() {
   try {
@@ -156,11 +149,7 @@ const summaries: SummaryRow[] =
             assumption_name:
               row.assumption_name,
             assumption_value:
-              row.assumption_value === null
-                ? null
-                : Number(
-                    row.assumption_value
-                  ),
+              toNumber(row.assumption_value),
             assumption_text:
               row.assumption_text,
           }));
@@ -195,6 +184,7 @@ const summaries: SummaryRow[] =
     return NextResponse.json(
       {
         scenarios,
+        provenance: storedPlanningProvenance,
       },
       {
         headers: {

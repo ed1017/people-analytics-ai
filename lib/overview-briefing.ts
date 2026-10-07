@@ -27,7 +27,7 @@ export function buildOverviewSources(
     { id: "P1", label: "Stored Planning baseline", page: "planning-overview", scope: "Company stored scenario; modeled, not observed",
       date: null,
       population: points.length ? `Baseline modeled workforce; horizon ${points[0].planning_month} to ${points.at(-1)!.planning_month}` : "Unavailable",
-      limitation: "Source refresh date is not supplied. Horizon dates are model periods, not source dates. Each point's planned_hires and planned_exits are flows within that single planning month, not cumulative totals through that date. Stored assumptions are not approved decisions or a model rerun; do not subtract this forecast from unrelated populations or infer response costs or timing.",
+      limitation: "Source refresh date is not supplied. Horizon dates are model periods, not source dates. Each point's planned_hires and planned_exits are source-reported flows within that single planning month, not cumulative totals through that date. Missing numeric fields are unknown. Stored flows do not fully explain the Baseline headcount curve and are distinct from engine-implied what-if flows. Stored assumptions are not approved decisions or a model rerun; do not subtract this forecast from unrelated populations or infer response costs or timing.",
       facts: baseline && points.length ? { scenario: baseline.scenario_name, type: baseline.scenario_type, start: points[0], end: points.at(-1), assumptions: baseline.assumptions } : null },
   ];
 }

@@ -1,13 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
+import { nullableNumber as toNumber } from "../../../lib/numeric-contract";
 
 export const dynamic = "force-dynamic";
-
-function toNumber(value: number | string | null | undefined) {
-  if (value === null || value === undefined) return 0;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
 
 export async function GET() {
   try {

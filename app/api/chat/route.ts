@@ -95,11 +95,11 @@ type PlanningAssumption = {
 
 type PlanningPoint = {
   planning_month: string;
-  planned_headcount: number;
-  planned_fte: number;
-  planned_hires: number;
-  planned_exits: number;
-  planned_labor_cost_usd: number;
+  planned_headcount: number | null;
+  planned_fte: number | null;
+  planned_hires: number | null;
+  planned_exits: number | null;
+  planned_labor_cost_usd: number | null;
 };
 
 type PlanningScenarioSummary = {
@@ -117,8 +117,8 @@ type PlanningContext = {
   selectedScenarioAssumptions: PlanningAssumption[];
   selectedScenarioStart: PlanningPoint | null;
   selectedScenarioEnd: PlanningPoint | null;
-  selectedScenarioTotalHires: number;
-  selectedScenarioTotalExits: number;
+  selectedScenarioTotalHires: number | null;
+  selectedScenarioTotalExits: number | null;
   scenarios: PlanningScenarioSummary[];
 };
 
@@ -428,114 +428,114 @@ type SuccessionCoverageContext = {
 
 type TalentAcquisitionContext = {
   summary: {
-    applications: number;
-    interviewed_applications: number;
-    offered_applications: number;
-    hires: number;
-    application_to_interview_pct: number;
-    interview_to_offer_pct: number;
-    offer_to_hire_pct: number;
-    application_to_hire_pct: number;
-    offer_acceptance_pct: number;
-    open_requisitions: number;
-    open_positions: number;
-    avg_time_to_fill_days: number;
-    median_time_to_fill_days: number;
-    avg_open_req_age_days: number;
-    median_open_req_age_days: number;
-    open_reqs_over_60_days: number;
-    internal_hires: number;
-    external_hires: number;
+    applications: number | null;
+    interviewed_applications: number | null;
+    offered_applications: number | null;
+    hires: number | null;
+    application_to_interview_pct: number | null;
+    interview_to_offer_pct: number | null;
+    offer_to_hire_pct: number | null;
+    application_to_hire_pct: number | null;
+    offer_acceptance_pct: number | null;
+    open_requisitions: number | null;
+    open_positions: number | null;
+    avg_time_to_fill_days: number | null;
+    median_time_to_fill_days: number | null;
+    avg_open_req_age_days: number | null;
+    median_open_req_age_days: number | null;
+    open_reqs_over_60_days: number | null;
+    internal_hires: number | null;
+    external_hires: number | null;
   };
   businessUnits: Array<{
     org_name: string;
-    open_requisitions: number;
-    open_positions: number;
-    applications: number;
-    hires: number;
-    avg_time_to_fill_days: number;
-    application_to_hire_pct: number;
+    open_requisitions: number | null;
+    open_positions: number | null;
+    applications: number | null;
+    hires: number | null;
+    avg_time_to_fill_days: number | null;
+    application_to_hire_pct: number | null;
   }>;
   sources: Array<{
     source_name: string;
     source_category: string;
-    applications: number;
-    hires: number;
-    application_to_hire_pct: number;
+    applications: number | null;
+    hires: number | null;
+    application_to_hire_pct: number | null;
   }>;
   recruiters: Array<{
     recruiter_name: string;
     region: string | null;
     specialty: string | null;
-    open_requisitions: number;
-    open_positions: number;
-    avg_time_to_fill_days: number;
+    open_requisitions: number | null;
+    open_positions: number | null;
+    avg_time_to_fill_days: number | null;
   }>;
 };
 
 type SurveySentimentContext = {
   summary: {
-    engagement_respondents: number;
-    engagement_eligible_population: number;
-    engagement_participation_pct: number;
-    engagement_avg_score: number;
-    engagement_favorable_pct: number;
-    pulse_respondents: number;
-    pulse_avg_score: number;
-    pulse_favorable_pct: number;
-    manager_respondents: number;
-    manager_avg_score: number;
-    manager_favorable_pct: number;
-    onboarding_90_respondents: number;
-    onboarding_90_avg_score: number;
-    onboarding_90_favorable_pct: number;
-    exit_respondents: number;
-    open_text_comments: number;
+    engagement_respondents: number | null;
+    engagement_eligible_population: number | null;
+    engagement_participation_pct: number | null;
+    engagement_avg_score: number | null;
+    engagement_favorable_pct: number | null;
+    pulse_respondents: number | null;
+    pulse_avg_score: number | null;
+    pulse_favorable_pct: number | null;
+    manager_respondents: number | null;
+    manager_avg_score: number | null;
+    manager_favorable_pct: number | null;
+    onboarding_90_respondents: number | null;
+    onboarding_90_avg_score: number | null;
+    onboarding_90_favorable_pct: number | null;
+    exit_respondents: number | null;
+    open_text_comments: number | null;
   };
   engagementTrend: Array<{
     survey_name: string;
     launch_date: string;
-    respondents: number;
-    participation_pct: number;
-    avg_score: number;
-    favorable_pct: number;
+    respondents: number | null;
+    participation_pct: number | null;
+    avg_score: number | null;
+    favorable_pct: number | null;
   }>;
   engagementDimensions: Array<{
     dimension: string;
-    avg_score: number;
-    favorable_pct: number;
+    avg_score: number | null;
+    favorable_pct: number | null;
   }>;
   pulseDimensions: Array<{
     dimension: string;
-    avg_score: number;
-    favorable_pct: number;
+    avg_score: number | null;
+    favorable_pct: number | null;
   }>;
   managerDimensions: Array<{
     dimension: string;
-    avg_score: number;
-    favorable_pct: number;
+    avg_score: number | null;
+    favorable_pct: number | null;
   }>;
   onboardingDimensions: Array<{
     survey_code: string;
     dimension: string;
-    avg_score: number;
-    favorable_pct: number;
+    avg_score: number | null;
+    favorable_pct: number | null;
   }>;
   exitDimensions: Array<{
     dimension: string;
-    avg_score: number;
-    favorable_pct: number;
+    avg_score: number | null;
+    favorable_pct: number | null;
   }>;
   businessUnits: Array<{
     org_name: string;
-    respondents: number;
-    avg_score: number;
-    favorable_pct: number;
+    respondents: number | null;
+    avg_score: number | null;
+    favorable_pct: number | null;
   }>;
   exitReasons: Array<{
     primary_reason: string;
-    exits: number;
-    pct_of_exit_responses: number;
+    exits: number | null;
+    pct_of_exit_responses: number | null;
   }>;
 };
 
@@ -901,9 +901,9 @@ Selected scenario start:
 ${
   planningContext.selectedScenarioStart
     ? `- Month: ${planningContext.selectedScenarioStart.planning_month}
-- Headcount: ${planningContext.selectedScenarioStart.planned_headcount}
-- FTE: ${planningContext.selectedScenarioStart.planned_fte}
-- Labor cost USD: ${planningContext.selectedScenarioStart.planned_labor_cost_usd}`
+- Headcount: ${planningContext.selectedScenarioStart.planned_headcount ?? "Unavailable"}
+- FTE: ${planningContext.selectedScenarioStart.planned_fte ?? "Unavailable"}
+- Labor cost USD: ${planningContext.selectedScenarioStart.planned_labor_cost_usd ?? "Unavailable"}`
     : "- Not available"
 }
 
@@ -911,14 +911,14 @@ Selected scenario end:
 ${
   planningContext.selectedScenarioEnd
     ? `- Month: ${planningContext.selectedScenarioEnd.planning_month}
-- Headcount: ${planningContext.selectedScenarioEnd.planned_headcount}
-- FTE: ${planningContext.selectedScenarioEnd.planned_fte}
-- Labor cost USD: ${planningContext.selectedScenarioEnd.planned_labor_cost_usd}`
+- Headcount: ${planningContext.selectedScenarioEnd.planned_headcount ?? "Unavailable"}
+- FTE: ${planningContext.selectedScenarioEnd.planned_fte ?? "Unavailable"}
+- Labor cost USD: ${planningContext.selectedScenarioEnd.planned_labor_cost_usd ?? "Unavailable"}`
     : "- Not available"
 }
 
-Total planned hires across horizon: ${planningContext.selectedScenarioTotalHires}
-Total planned exits across horizon: ${planningContext.selectedScenarioTotalExits}
+Stored monthly hires summed across horizon: ${planningContext.selectedScenarioTotalHires ?? "Unavailable"}
+Stored monthly exits summed across horizon: ${planningContext.selectedScenarioTotalExits ?? "Unavailable"}
 
 Stored assumptions:
 ${
@@ -945,7 +945,9 @@ ${planningContext.scenarios
   .join("\n")}
 
 Important modeling rule:
-- You may compare the stored scenarios and calculate simple deltas from the values above.
+- Stored company-wide plans are modeled scenarios, not observed actuals. Source refresh date is unavailable.
+- Hires and exits are source-reported monthly flows; totals sum the displayed horizon. Unknown months make a total unavailable. Stored flows do not fully explain the Baseline headcount curve and are distinct from engine-implied what-if flows. Do not invent a reconciliation.
+- You may compare stored scenarios and calculate simple deltas only when both values are available. Null or unavailable values are unknown, never zero.
 - If the user proposes a NEW assumption, call run_workforce_scenario rather than estimating the scenario yourself.
 - Only treat the returned deterministic tool result as the modeled what-if outcome.
 - Do not claim the workforce model reran unless run_workforce_scenario returned a result in this turn.
@@ -1269,29 +1271,29 @@ Interpretation rules:
         ? `
 CURRENT TALENT ACQUISITION CONTEXT
 As-of recruiting summary:
-- Open requisitions: ${talentAcquisitionContext.summary.open_requisitions}
-- Open positions: ${talentAcquisitionContext.summary.open_positions}
-- Applications: ${talentAcquisitionContext.summary.applications}
-- Interviewed applicants: ${talentAcquisitionContext.summary.interviewed_applications}
-- Offers: ${talentAcquisitionContext.summary.offered_applications}
-- Hires: ${talentAcquisitionContext.summary.hires}
-- Application to interview: ${talentAcquisitionContext.summary.application_to_interview_pct}%
-- Interview to offer: ${talentAcquisitionContext.summary.interview_to_offer_pct}%
-- Offer to hire: ${talentAcquisitionContext.summary.offer_to_hire_pct}%
-- Application to hire: ${talentAcquisitionContext.summary.application_to_hire_pct}%
-- Offer acceptance: ${talentAcquisitionContext.summary.offer_acceptance_pct}%
-- Median time to fill: ${talentAcquisitionContext.summary.median_time_to_fill_days} days
-- Average time to fill: ${talentAcquisitionContext.summary.avg_time_to_fill_days} days
-- Median open requisition age: ${talentAcquisitionContext.summary.median_open_req_age_days} days
-- Open requisitions older than 60 days: ${talentAcquisitionContext.summary.open_reqs_over_60_days}
-- Internal hires: ${talentAcquisitionContext.summary.internal_hires}
-- External hires: ${talentAcquisitionContext.summary.external_hires}
+- Open requisitions: ${talentAcquisitionContext.summary.open_requisitions ?? "Unavailable"}
+- Open positions: ${talentAcquisitionContext.summary.open_positions ?? "Unavailable"}
+- Applications: ${talentAcquisitionContext.summary.applications ?? "Unavailable"}
+- Interviewed applicants: ${talentAcquisitionContext.summary.interviewed_applications ?? "Unavailable"}
+- Offers: ${talentAcquisitionContext.summary.offered_applications ?? "Unavailable"}
+- Hires: ${talentAcquisitionContext.summary.hires ?? "Unavailable"}
+- Application to interview: ${talentAcquisitionContext.summary.application_to_interview_pct ?? "Unavailable"}%
+- Interview to offer: ${talentAcquisitionContext.summary.interview_to_offer_pct ?? "Unavailable"}%
+- Offer to hire: ${talentAcquisitionContext.summary.offer_to_hire_pct ?? "Unavailable"}%
+- Application to hire: ${talentAcquisitionContext.summary.application_to_hire_pct ?? "Unavailable"}%
+- Offer acceptance: ${talentAcquisitionContext.summary.offer_acceptance_pct ?? "Unavailable"}%
+- Median time to fill: ${talentAcquisitionContext.summary.median_time_to_fill_days ?? "Unavailable"} days
+- Average time to fill: ${talentAcquisitionContext.summary.avg_time_to_fill_days ?? "Unavailable"} days
+- Median open requisition age: ${talentAcquisitionContext.summary.median_open_req_age_days ?? "Unavailable"} days
+- Open requisitions older than 60 days: ${talentAcquisitionContext.summary.open_reqs_over_60_days ?? "Unavailable"}
+- Internal hires: ${talentAcquisitionContext.summary.internal_hires ?? "Unavailable"}
+- External hires: ${talentAcquisitionContext.summary.external_hires ?? "Unavailable"}
 
 Business unit recruiting demand:
 ${talentAcquisitionContext.businessUnits
   .map(
     (row) =>
-      `- ${row.org_name}: open positions ${row.open_positions}, hires ${row.hires}, applications ${row.applications}, avg time to fill ${row.avg_time_to_fill_days} days, application-to-hire ${row.application_to_hire_pct}%`
+      `- ${row.org_name}: open positions ${row.open_positions ?? "Unavailable"}, hires ${row.hires ?? "Unavailable"}, applications ${row.applications ?? "Unavailable"}, avg time to fill ${row.avg_time_to_fill_days ?? "Unavailable"} days, application-to-hire ${row.application_to_hire_pct ?? "Unavailable"}%`
   )
   .join("\n")}
 
@@ -1299,7 +1301,7 @@ Recruiting source performance:
 ${talentAcquisitionContext.sources
   .map(
     (row) =>
-      `- ${row.source_name} (${row.source_category}): applications ${row.applications}, hires ${row.hires}, application-to-hire ${row.application_to_hire_pct}%`
+      `- ${row.source_name} (${row.source_category}): applications ${row.applications ?? "Unavailable"}, hires ${row.hires ?? "Unavailable"}, application-to-hire ${row.application_to_hire_pct ?? "Unavailable"}%`
   )
   .join("\n")}
 
@@ -1307,11 +1309,12 @@ Top recruiter workloads:
 ${talentAcquisitionContext.recruiters
   .map(
     (row) =>
-      `- ${row.recruiter_name}: region ${row.region ?? "N/A"}, specialty ${row.specialty ?? "N/A"}, open reqs ${row.open_requisitions}, avg time to fill ${row.avg_time_to_fill_days} days`
+      `- ${row.recruiter_name}: region ${row.region ?? "N/A"}, specialty ${row.specialty ?? "N/A"}, open reqs ${row.open_requisitions ?? "Unavailable"}, avg time to fill ${row.avg_time_to_fill_days ?? "Unavailable"} days`
   )
   .join("\n")}
 
 Interpretation rules:
+- Unavailable values are unknown, never zero. Calculate differences or rates only from available values with matching populations and periods.
 - Funnel stages are governed aggregate analytics, not candidate-level assessments.
 - Interviewed applicants are deduplicated by application even when multiple interview rounds exist.
 - Internal Mobility has a structurally different funnel from external recruiting; do not compare its 100% application-to-hire conversion directly with external sources as if they were equivalent.

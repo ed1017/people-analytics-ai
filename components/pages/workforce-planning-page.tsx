@@ -56,8 +56,8 @@ type WorkforcePlanningPageProps = {
   baselinePlanningEnd: PlanningPoint | null;
   planningNetChange: number | null;
   planningHeadcountDeltaVsBaseline: number | null;
-  planningTotalHires: number;
-  planningTotalExits: number;
+  planningTotalHires: number | null;
+  planningTotalExits: number | null;
   selectedPlanningScenario: string;
   positionModelingData: PositionModelingResponse | null;
   positionModelingLoading: boolean;

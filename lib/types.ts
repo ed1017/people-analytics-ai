@@ -68,11 +68,11 @@ export type AppPage =
 
 export type PlanningPoint = {
   planning_month: string;
-  planned_headcount: number;
-  planned_fte: number;
-  planned_hires: number;
-  planned_exits: number;
-  planned_labor_cost_usd: number;
+  planned_headcount: number | null;
+  planned_fte: number | null;
+  planned_hires: number | null;
+  planned_exits: number | null;
+  planned_labor_cost_usd: number | null;
 };
 
 export type PlanningAssumption = {
@@ -91,6 +91,7 @@ export type PlanningScenario = {
 
 export type WorkforcePlanningResponse = {
   scenarios: PlanningScenario[];
+  provenance?: typeof import("./stored-planning").storedPlanningProvenance;
 };
 
 export type PositionBusinessUnit = {
@@ -973,62 +974,62 @@ export type TalentAcquisitionSource = {
   source_code: string;
   source_name: string;
   source_category: string;
-  applications: number;
-  hires: number;
-  application_to_hire_pct: number;
+  applications: number | null;
+  hires: number | null;
+  application_to_hire_pct: number | null;
 };
 
 export type TalentAcquisitionBusinessUnit = {
   org_code: string;
   org_name: string;
-  open_requisitions: number;
-  open_positions: number;
-  applications: number;
-  hires: number;
-  avg_time_to_fill_days: number;
-  application_to_hire_pct: number;
+  open_requisitions: number | null;
+  open_positions: number | null;
+  applications: number | null;
+  hires: number | null;
+  avg_time_to_fill_days: number | null;
+  application_to_hire_pct: number | null;
 };
 
 export type TalentAcquisitionRecruiter = {
   recruiter_name: string;
   region: string | null;
   specialty: string | null;
-  total_requisitions: number;
-  open_requisitions: number;
-  open_positions: number;
-  filled_requisitions: number;
-  avg_time_to_fill_days: number;
+  total_requisitions: number | null;
+  open_requisitions: number | null;
+  open_positions: number | null;
+  filled_requisitions: number | null;
+  avg_time_to_fill_days: number | null;
 };
 
 export type TalentAcquisitionMonthlyPoint = {
   month: string;
-  applications: number;
-  interviewed_applications: number;
-  offers: number;
-  hires: number;
+  applications: number | null;
+  interviewed_applications: number | null;
+  offers: number | null;
+  hires: number | null;
 };
 
 export type TalentAcquisitionResponse = {
   as_of: string;
   summary: {
-    applications: number;
-    interviewed_applications: number;
-    offered_applications: number;
-    hires: number;
-    application_to_interview_pct: number;
-    interview_to_offer_pct: number;
-    offer_to_hire_pct: number;
-    application_to_hire_pct: number;
-    offer_acceptance_pct: number;
-    open_requisitions: number;
-    open_positions: number;
-    avg_time_to_fill_days: number;
-    median_time_to_fill_days: number;
-    avg_open_req_age_days: number;
-    median_open_req_age_days: number;
-    open_reqs_over_60_days: number;
-    internal_hires: number;
-    external_hires: number;
+    applications: number | null;
+    interviewed_applications: number | null;
+    offered_applications: number | null;
+    hires: number | null;
+    application_to_interview_pct: number | null;
+    interview_to_offer_pct: number | null;
+    offer_to_hire_pct: number | null;
+    application_to_hire_pct: number | null;
+    offer_acceptance_pct: number | null;
+    open_requisitions: number | null;
+    open_positions: number | null;
+    avg_time_to_fill_days: number | null;
+    median_time_to_fill_days: number | null;
+    avg_open_req_age_days: number | null;
+    median_open_req_age_days: number | null;
+    open_reqs_over_60_days: number | null;
+    internal_hires: number | null;
+    external_hires: number | null;
   };
   sources: TalentAcquisitionSource[];
   business_units: TalentAcquisitionBusinessUnit[];
@@ -1043,11 +1044,11 @@ export type SurveyListeningDimension = {
   question_code: string;
   dimension: string;
   question_text: string;
-  employee_respondents: number;
-  candidate_respondents: number;
-  separation_respondents: number;
-  avg_score: number;
-  favorable_pct: number;
+  employee_respondents: number | null;
+  candidate_respondents: number | null;
+  separation_respondents: number | null;
+  avg_score: number | null;
+  favorable_pct: number | null;
 };
 
 export type SurveyEngagementTrendPoint = {
@@ -1055,48 +1056,48 @@ export type SurveyEngagementTrendPoint = {
   survey_name: string;
   launch_date: string;
   close_date: string;
-  respondents: number;
+  respondents: number | null;
   denominator_snapshot_date: string;
-  eligible_population: number;
-  participation_pct: number;
-  avg_score: number;
-  favorable_pct: number;
+  eligible_population: number | null;
+  participation_pct: number | null;
+  avg_score: number | null;
+  favorable_pct: number | null;
 };
 
 export type SurveyBusinessUnit = {
   org_code: string;
   org_name: string;
-  respondents: number;
-  avg_score: number;
-  favorable_pct: number;
+  respondents: number | null;
+  avg_score: number | null;
+  favorable_pct: number | null;
 };
 
 export type SurveyExitReason = {
   primary_reason: string;
-  exits: number;
-  pct_of_exit_responses: number;
+  exits: number | null;
+  pct_of_exit_responses: number | null;
 };
 
 export type SurveySentimentResponse = {
   as_of: string;
   exit_enps?: import("./exit-enps").ExitEnpsSummary | null;
   summary: {
-    engagement_respondents: number;
-    engagement_eligible_population: number;
-    engagement_participation_pct: number;
-    engagement_avg_score: number;
-    engagement_favorable_pct: number;
-    pulse_respondents: number;
-    pulse_avg_score: number;
-    pulse_favorable_pct: number;
-    manager_respondents: number;
-    manager_avg_score: number;
-    manager_favorable_pct: number;
-    onboarding_90_respondents: number;
-    onboarding_90_avg_score: number;
-    onboarding_90_favorable_pct: number;
-    exit_respondents: number;
-    open_text_comments: number;
+    engagement_respondents: number | null;
+    engagement_eligible_population: number | null;
+    engagement_participation_pct: number | null;
+    engagement_avg_score: number | null;
+    engagement_favorable_pct: number | null;
+    pulse_respondents: number | null;
+    pulse_avg_score: number | null;
+    pulse_favorable_pct: number | null;
+    manager_respondents: number | null;
+    manager_avg_score: number | null;
+    manager_favorable_pct: number | null;
+    onboarding_90_respondents: number | null;
+    onboarding_90_avg_score: number | null;
+    onboarding_90_favorable_pct: number | null;
+    exit_respondents: number | null;
+    open_text_comments: number | null;
   };
   engagement_trend: SurveyEngagementTrendPoint[];
   engagement_dimensions: SurveyListeningDimension[];
