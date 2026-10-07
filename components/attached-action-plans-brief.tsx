@@ -1,4 +1,7 @@
 "use client";
+import {readPlanAlternatives} from '@/lib/home-plan-alternatives';
+import {PlanAlternativeCard} from '@/components/plan-alternative-card';
+import {PlanDirections} from '@/components/plan-directions';
 import {readBundleWorkspace,type BundleAttachment} from '@/lib/home-bundle-records';
 import {planStaffHours} from '@/lib/home-plan-delivery-estimate';
 import {planBudgetText} from '@/lib/home-plan-revisions';
@@ -7,8 +10,8 @@ import {bundleDisplayText,bundleAssumptionText,bundleComponentLabels} from '@/li
 import {measurementScope,successMeasureText} from '@/lib/home-success-measures';
 
 const money=(value:number|null)=>value===null?'Unknown':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}).format(value);
-export function AttachedActionPlansBrief({raw,goalId,goal,onReview}:{raw:unknown;goalId:string;goal:string;onReview:()=>void}){
- const workspace=readBundleWorkspace(raw,goalId);
+export function AttachedActionPlansBrief({raw,alternatives,goalId,goal,onReview}:{alternatives?:unknown;raw:unknown;goalId:string;goal:string;onReview:()=>void}){
+ const workspace=readBundleWorkspace(raw,goalId),savedGoal=alternatives&&typeof alternatives==='object'&&'goal' in alternatives&&typeof alternatives.goal==='string'?alternatives.goal:goal,catalog=readPlanAlternatives(alternatives,{goalId,goal:savedGoal});
  const superseded=new Set(workspace?.attachments.map(item=>item.supersedes));
  function snapshot(item:BundleAttachment){
   const {draft,result}=item,measure=draft.inputs.successMeasure;
@@ -20,6 +23,7 @@ export function AttachedActionPlansBrief({raw,goalId,goal,onReview}:{raw:unknown
    {edited&&!superseded.has(item.id)&&<p>A different working draft is saved on Home. This attachment has not been replaced by that draft.</p>}
    <p className="break-words">Saved goal: {draft.binding.goal}</p>
    <p className="break-words">{bundleDisplayText(draft.bundle.objective,draft.bundle)}</p>
+   <PlanDirections draft={draft} snapshot/>
    <p>Snapshot cash: {money(result.cashTotal)}. Staff hours: {planStaffHours(draft)??'Unknown'}. Plan finish: {result.planFinish??'Unknown'}.</p>
    {result.budget&&<p>{planBudgetText(result)}</p>}
    <p className="break-words">How success is measured: {successMeasureText(measure,!measure||measure.scopeKey===measurementScope(draft.inputs))}</p>
@@ -37,7 +41,9 @@ export function AttachedActionPlansBrief({raw,goalId,goal,onReview}:{raw:unknown
  return <section aria-label="Attached Action Plans" className="min-w-0 space-y-3 rounded-lg border p-4">
   <h2 className="text-lg font-semibold">Attached Action Plans</h2>
   <p className="text-sm text-muted-foreground">Saved proposal snapshots from Home. Attachment is not approval or evidence of achieved outcomes. These historical assumptions are not revalidated against current evidence here; review the plan on Home before acting.</p>
-  {!workspace?<p role="status">Saved Action Plan records cannot be verified. They are kept unchanged; review them on Home.</p>:!workspace.attachments.length?<p className="text-sm">No Action Plan attached to this goal yet. Review and attach a calculated plan on Home to include it here.</p>:<>
+  {alternatives!==undefined&&!catalog&&<p role="status">Saved numbered alternatives cannot be verified. Their records are kept unchanged.</p>}
+  {catalog?.attachments.map(item=>{const plan=catalog.plans.find(plan=>plan.id===item.planId)!;return <div key={item.id}><p>Attached {item.attachedAt.slice(0,10)}{savedGoal!==goal?' · goal wording has changed':''}{plan.deleted?' · removed from active list':''}</p><PlanAlternativeCard plan={plan} catalog={catalog} snapshot/></div>;})}
+  {!workspace?<p role="status">Saved Action Plan records cannot be verified. They are kept unchanged; review them on Home.</p>:!workspace.attachments.length&&!catalog?.attachments.length?<p className="text-sm">No Action Plan attached to this goal yet. Review and attach a calculated plan on Home to include it here.</p>:<>
    {workspace.attachments.filter(item=>!superseded.has(item.id)).map(snapshot)}
    {workspace.attachments.some(item=>superseded.has(item.id))&&<details><summary className="min-h-11 cursor-pointer py-2 font-medium">Previous attached versions</summary><div className="space-y-3">{workspace.attachments.filter(item=>superseded.has(item.id)).map(snapshot)}</div></details>}
   </>}

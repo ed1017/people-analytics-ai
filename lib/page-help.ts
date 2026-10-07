@@ -10,7 +10,7 @@ export const pageHelp: Record<AppPage, string> = {
   "labor-market": "Compare published occupation employment and annual wages within the same May 2025 period. Read the separate U.S. 2025–2035 outlook as a national projection. Available coverage is three occupations and three geographies; neither employment nor projected openings measures available candidates.",
   "training-coaching": "Compare fictional simulated training/coaching examples or enter your own unverified quote. Select a quote and enter your goal before explicitly carrying it to Development Planning. Nothing enrolls employees or changes assumptions automatically.",
   "development-planning": "I kept this comparison separate from workforce modeling. Carry a selected development quote and your goal, then enter attendance and cost assumptions. Fictional quotes are simulated; blank costs remain unknown and nothing enrolls employees or changes staffing.",
-  home: "I built this decision-making tool to connect workforce evidence with goals, modeled costs and tradeoffs. Start with a question, explore the supporting pages, then compare possible plans without changing the real workforce.",
+  home: "A workforce decision-making tool that turns dashboard insights into practical Action Plans, helping you connect workforce decisions to business outcomes.",
   overview: workforce,
   workforce,
   attrition: "I brought the recorded separation measures together to help you explore turnover patterns. These are descriptive aggregates, so a difference between groups doesn't tell us why someone left or predict who will leave next.",

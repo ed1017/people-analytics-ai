@@ -1,11 +1,14 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {mergeDecisionRecovery,type RecoveryConflict} from './decision-recovery.ts';
 // @ts-expect-error Native Node tests use the same TypeScript source.
 import {parseLocalGoals,emptyLocalGoals,GOALS_STORAGE_KEY,type LocalGoals} from "./local-goals.ts";
+export const DECISION_RECOVERY_KEY='insights-to-action.decisions.recovery.v1';
 export const DECISIONS_STORAGE_KEY="insights-to-action.decisions.v1";
 export const MAX_DECISION_BYTES=512*1024, MAX_STORE_BYTES=3*1024*1024, MAX_DECISION_MESSAGES=200;
 export type Json = null|boolean|number|string|Json[]|{[key:string]:Json};
 export type DecisionSlot={savedAt:string;fields:Record<string,Json>};
 export type DecisionData={version:1;revision:number;removedGoalIds?:string[];goals:LocalGoals;workspaces:Record<string,DecisionSlot>};
-export type DecisionSnapshot={ready:boolean;data:DecisionData;notice:string|null;saved:boolean};
+export type DecisionSnapshot={ready:boolean;data:DecisionData;notice:string|null;saved:boolean;recovery?:{conflicts:RecoveryConflict[]}};
 type StoragePort=Pick<Storage,"getItem"|"setItem"|"removeItem">;
 const empty=():DecisionData=>({version:1,revision:0,goals:emptyLocalGoals(),workspaces:{}});
 const bytes=(s:string)=>new TextEncoder().encode(s).length;
@@ -47,30 +50,39 @@ export function parseDecisions(raw:string):DecisionData {
 }
 export class DecisionStore {
  private port:StoragePort|null=null;private expected:string|null=null;private blocked=false;
+ private recoveryPort:StoragePort|null=null;private recovery:{base:DecisionData;draft:DecisionData}|null=null;
  private listeners=new Set<()=>void>();
  private state:DecisionSnapshot={ready:false,data:empty(),notice:null,saved:false};
  getSnapshot=()=>this.state;
  subscribe=(listener:()=>void)=>{this.listeners.add(listener);return()=>{this.listeners.delete(listener)}};
  private emit(){for(const fn of this.listeners)fn()}
- private fail(error:unknown){this.state={...this.state,saved:false,notice:(error instanceof Error?error.message:"Browser storage unavailable.")+" Changes are not saved; the previous saved copy remains intact."};this.emit()}
- initialize(port:StoragePort,firstRun?:()=>Pick<DecisionData,'goals'|'workspaces'>){
+ private preserveRecovery(){
+  if(!this.recoveryPort||!this.state.ready)return;
+  try{const base=this.recovery?.base??(this.expected?parseDecisions(this.expected):empty());if(JSON.stringify(base)===JSON.stringify(this.state.data))return;this.recovery={base,draft:structuredClone(this.state.data)};this.recoveryPort.setItem(DECISION_RECOVERY_KEY,JSON.stringify({version:1,base:encodeDecisions(base),draft:encodeDecisions(this.state.data)}));this.state={...this.state,recovery:{conflicts:[]}};}
+  catch{this.state={...this.state,notice:(this.state.notice??'Saving failed.')+' A reload recovery copy could not be saved; keep this tab open.'};}
+ }
+ private clearRecovery(){const active=!!this.recovery;this.recovery=null;try{if(active)this.recoveryPort?.removeItem(DECISION_RECOVERY_KEY);}catch{/* The saved main envelope remains authoritative. */}const {recovery:_,...state}=this.state;void _;this.state=state;}
+ private fail(error:unknown){this.state={...this.state,saved:false,notice:(error instanceof Error?error.message:"Browser storage unavailable.")+" Changes are not saved; the previous saved copy remains intact."};this.preserveRecovery();this.emit()}
+ initialize(port:StoragePort,firstRun?:()=>Pick<DecisionData,'goals'|'workspaces'>,recoveryPort?:StoragePort){
   if(this.state.ready)return this.state.data;
-  this.port=port;
+  this.port=port;this.recoveryPort=recoveryPort??null;
   try{this.expected=port.getItem(DECISIONS_STORAGE_KEY);let data:DecisionData;
    if(this.expected===null){const legacy=port.getItem(GOALS_STORAGE_KEY);data={...empty(),...(legacy===null&&firstRun?firstRun():{goals:parseLocalGoals(legacy)})};}
    else data=parseDecisions(this.expected);
    this.state={ready:true,data,notice:null,saved:this.expected!==null};if(this.expected===null)this.save(data);else this.emit();try{this.cleanLegacy()}catch(error){this.fail(error)}}
   catch(error){this.blocked=true;this.state={...this.state,ready:true};this.fail(error)}
+  try{const raw=this.recoveryPort?.getItem(DECISION_RECOVERY_KEY);if(raw){const value=JSON.parse(raw);if(value.version!==1)throw Error('Unsupported recovery version.');const base=parseDecisions(value.base),draft=parseDecisions(value.draft);this.recovery={base,draft};if(JSON.stringify(draft)!==JSON.stringify(this.state.data)){this.recovery={base,draft};const review=mergeDecisionRecovery(base,draft,this.state.data);this.blocked=true;this.state={...this.state,data:draft,saved:false,recovery:{conflicts:review.conflicts},notice:'An unsaved draft was recovered in this tab. Review and recover it before applying or attaching. Saved work from other tabs is unchanged.'};this.emit();}else this.clearRecovery();}}
+  catch{this.state={...this.state,notice:'The tab recovery copy could not be verified. Saved decisions were kept; the recovery copy was not removed.'};this.emit();}
   return this.state.data;
  }
  private save(data:DecisionData){
   this.state={...this.state,data,saved:false};
   if(!this.state.ready){this.emit();return}
-  if(this.blocked){this.emit();return}
+  if(this.blocked){this.preserveRecovery();this.emit();return}
   try{
    if(!this.port)throw Error("Browser storage unavailable.");
    if(this.port.getItem(DECISIONS_STORAGE_KEY)!==this.expected){this.blocked=true;throw Error("Another tab changed saved decisions. Reload before making further saved changes.")}
-   const next={...data,revision:data.revision+1},raw=encodeDecisions(next);this.port.setItem(DECISIONS_STORAGE_KEY,raw);this.expected=raw;this.state={ready:true,data:next,notice:null,saved:true};this.emit();
+   const next={...data,revision:data.revision+1},raw=encodeDecisions(next);this.port.setItem(DECISIONS_STORAGE_KEY,raw);this.expected=raw;this.state={ready:true,data:next,notice:null,saved:true};this.clearRecovery();this.emit();
   }catch(error){this.fail(error)}
  }
  private cleanLegacy(){
@@ -111,7 +123,7 @@ export class DecisionStore {
    if(this.state.data!==original||this.expected!==expected)throw Error('Planning state changed during candidate validation; preview again.');
    if(this.port.getItem(DECISIONS_STORAGE_KEY)!==expected){this.blocked=true;throw Error('Another tab changed saved decisions. Reload before applying.');}
    this.port.setItem(DECISIONS_STORAGE_KEY,raw);
-   this.expected=raw;this.state={ready:true,data:next,notice:null,saved:true};this.emit();return next.revision;
+   this.expected=raw;this.state={ready:true,data:next,notice:null,saved:true};this.clearRecovery();this.emit();return next.revision;
   }catch(error){this.state={...this.state,saved:false,notice:(error instanceof Error?error.message:'Application failed.')+' Application inputs were not published; previous planning values are retained.'};this.emit();throw error;}
  }
  // Called by application UI storage-event listeners. Never import another tab's
@@ -121,7 +133,15 @@ export class DecisionStore {
   try{if(this.port.getItem(DECISIONS_STORAGE_KEY)===this.expected)return;this.blocked=true;this.fail(Error('Another tab changed saved decisions. Reload before applying.'));}
   catch(error){this.blocked=true;this.fail(error)}
  }
- retry(){this.save(this.state.data);if(this.state.saved)try{this.cleanLegacy()}catch(error){this.fail(error)}}
+ recoverDraft(keepSavedConflicts=false){
+  if(!this.recovery||!this.port)return;
+  try{const raw=this.port.getItem(DECISIONS_STORAGE_KEY),saved=raw?parseDecisions(raw):empty(),review=mergeDecisionRecovery(this.recovery.base,this.recovery.draft,saved,keepSavedConflicts);
+   if(review.conflicts.length&&!keepSavedConflicts){this.state={...this.state,recovery:{conflicts:review.conflicts},notice:'Both tabs changed some of the same work. Keep the saved versions and your unsent request, or keep this tab open to review the recovered draft. No saved history was overwritten.'};this.emit();return;}
+   if(review.data.goals.goals.length>20)throw Error('Recovery would exceed the 20-goal limit. Your recovered draft is kept for review.');
+   parseDecisions(encodeDecisions(review.data));this.expected=raw;this.blocked=false;this.save(review.data);
+  }catch(error){this.fail(error);}
+ }
+ retry(){if(this.recovery){this.recoverDraft();return;}this.save(this.state.data);if(this.state.saved)try{this.cleanLegacy()}catch(error){this.fail(error)}}
  clearAll(){
   // Explicit destructive UI action only; never used as automatic corruption recovery.
   try{if(!this.port)throw Error("Browser storage unavailable.");this.expected=this.port.getItem(DECISIONS_STORAGE_KEY);this.blocked=false;const removedGoalIds=[...new Set([...(this.state.data.removedGoalIds??[]),...this.state.data.goals.goals.map(g=>g.id)])];this.save({...empty(),removedGoalIds});if(this.state.saved)this.port.removeItem(GOALS_STORAGE_KEY)}catch(error){this.fail(error)}

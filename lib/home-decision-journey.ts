@@ -1,4 +1,4 @@
-export const GUIDED_EXAMPLE_PROMPT = "Add 3 additional roles for data analysts over 6 months. Compare hiring, internal moves and development Action Plans. Fictional planning assumptions: review costs, availability and missing inputs before calculating or attaching.";
+export const GUIDED_EXAMPLE_PROMPT = "Reduce company-wide turnover by 2 percentage points over 12 months with a $100,000 demo budget. Compare three manager, learning and mobility plans (demo example); baseline and average workforce are unknown.";
 export const HOME_FIND_ISSUE_PROMPT = "Find a problem worth investigating";
 export const HOME_ACTION_PLAN_LABEL = "Develop a full action plan";
 export const DEVELOPMENT_DEMO_GOAL = "I need more AI capability without increasing headcount";

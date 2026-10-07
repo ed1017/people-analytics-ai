@@ -24,8 +24,9 @@ export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string,con
  const demo=<T>(value:T):Assumption<T>=>({value,kind:'illustrative',basis});
  const input=structuredClone(draft.inputs),intent=resolveHomePlanningIntent(/\b(turnover|retention|retain)\b/i.test(draft.binding.goal)?[draft.binding.goal,...planningStatements(context?.goalContext)]:[]);
  const entered=<T>(value:T,basis:string):Assumption<T>=>({value,kind:'user-entered',basis});
+ if(!input.budget&&intent.budgetCap!==null)input.budget={amount:entered(intent.budgetCap,'Explicit cash budget ceiling from the user; not an expense or confirmed funding.'),basis:entered('cash','Incremental cash only; existing employee time stays in hours.')};
  if(input.scope.months.value===null&&intent.months!==null)input.scope.months=entered(intent.months,'Explicit shared horizon retained from user conversation.');
- if(input.scope.population.value===null&&intent.companyWide)input.scope.population=entered('Company-wide voluntary turnover; all countries and business units','User-stated population; an average-workforce denominator still requires review.');
+ if(input.scope.population.value===null&&intent.companyWide)input.scope.population=entered('Company-wide turnover; all countries and business units','User-stated population; an average-workforce denominator still requires review.');
  const requirements=planningRequirementText(intent);if(input.scope.requirements.value===null&&requirements)input.scope.requirements=entered(requirements,'Explicit user planning constraints; the cap is not an expense.');
  if(input.scope.capacityRequired.value===null&&intent.existingCapacity&&intent.goal)input.scope.capacityRequired=entered(false,'Use existing HR/manager capacity, as requested; no additional staffing is assumed.');
  if(input.scope.startMonth.value===null)input.scope.startMonth=demo(calendar.startMonth);
@@ -41,7 +42,7 @@ export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string,con
   finishById.set(id,timing.finish.value?Date.parse(timing.finish.value+'T00:00:00Z'):earliest+13*day);
  }
  if(input.groups.length===0&&input.memberships.length===0){
-  input.groups.push({id:'pilot-group',label:'Illustrative shared pilot group; not selected employees',count:demo(10)});
+  input.groups.push({id:'pilot-group',label:'Illustrative shared pilot group; not selected employees',count:intent.participants===null?demo(10):entered(intent.participants,'Explicit participant population in the user goal and constraints.')});
   input.memberships=draft.bundle.components.map(component=>({componentId:component.id,groupIds:['pilot-group'],complete:unknownAssumption()}));
  }
  for(const domain of new Set(draft.bundle.components.map(item=>item.domain))){
@@ -53,6 +54,12 @@ export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string,con
   input.expenseLinks.push({expenseId:id,componentIds:ids,allocations:null});
  }
  input.dependenciesConfirmed=unknownAssumption();input.groupsDisjoint=unknownAssumption();input.costsDistinct=unknownAssumption();input.scope.comparisonConfirmed=unknownAssumption();input.costReviews=input.costReviews.map(item=>({...item,complete:unknownAssumption()}));
+ // A desired reduction is a measurable target even when no comparable baseline exists.
+ // Do not replace a user's percentage-point/relative request with the generic demo rate pair.
+ if(!input.successMeasure&&!intent.rateConflict&&(intent.pointReduction!==null||intent.relativeReduction!==null&&intent.baseline===null)){
+  const target=intent.pointReduction!==null?`${intent.pointReduction} percentage-point reduction`:`${intent.relativeReduction}% relative reduction`;
+  input.successMeasure={goal:draft.binding.goal,scopeKey:JSON.stringify([input.scope.population.value,input.scope.startMonth.value,input.scope.months.value]),name:`Turnover rate over ${input.scope.months.value} months for the stated plan population`,baseline:intent.baseline===null?unknownAssumption():entered(`${intent.baseline}%`,'Explicit user baseline; confirm the same population, metric and period.'),target:entered(target+(intent.target===null?'':`; ending rate ${intent.target}%`),'User-requested reduction, not an estimated or validated intervention effect. A matching baseline is required before deriving an ending rate or exits.')};
+ }
  const scenario=initialWhatIf(draft.binding.goal,input);if(scenario&&!input.whatIf){
   if(intent.baseline!==null){scenario.baseline=entered(intent.baseline,'Explicit baseline accepted in the user conversation; used conditionally, not a predicted effect.');scenario.population=unknownAssumption();if(intent.baselinePeriod)scenario.ratePeriod=intent.baselinePeriod;}
   if(intent.relativeReduction!==null&&scenario.baseline.value!==null)scenario.target={value:Math.round(scenario.baseline.value*(1-intent.relativeReduction/100)*1e6)/1e6,kind:scenario.baseline.kind==='illustrative'?'illustrative':'user-entered',basis:`User-stated ${intent.relativeReduction}% relative reduction applied to the retained baseline; not a predicted effect.`};

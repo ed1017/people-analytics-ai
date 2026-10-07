@@ -5,14 +5,18 @@ import type { AppPage } from "@/lib/types";
 import { getChatNavigationAction } from "@/lib/chat-navigation";
 import {homeAnswerPresentation} from '@/lib/home-answer-presentation';
 
+// Evidence IDs identify their own pages, including S2 exit feedback in Attrition.
+const sourceTargets:Readonly<Record<string,string>>={W1:'workforce',W2:'workforce',A1:'attrition',R1:'talent-acquisition',S1:'survey-sentiment',S2:'attrition',T1:'skills',T2:'learning-development',T4:'career-growth-mobility',T5:'succession-planning',P1:'planning-overview',P2:'position-workforce-design',F1:'finance',I1:'occupational-references',I2:'labor-market',I3:'training-coaching',D1:'development-planning',M1:'labor-market'};
+const evidenceId='(?:W[12]|A1|R1|S[12]|T[1-5]|P[12]|F1|I[1-3]|D1|M1)';
+const evidenceToken=evidenceId+'(?:[.:][A-Za-z0-9_.:-]+)?';
+const citationList=new RegExp('^'+evidenceToken+'(?:\\s*[,;]\\s*'+evidenceToken+')*$','i');
+
 function renderInlineMarkdown(
   value: string,
   onNavigate?: (page: AppPage) => void,
   citationTargets: ReadonlyMap<string,string> = new Map(),
 ) {
-  const parts = value.split(
-    /(\(?\[[A-Z]+\d+\](?:[, ]+\[[A-Z]+\d+\])*\s+See\s+\[[^\]\n]+\]\(app:[a-z-]+\)\.?\)?|\[[^\]\n]+\]\(app:[a-z-]+\)|\*\*\*.*?\*\*\*|\*\*.*?\*\*|\*.*?\*|\[(?:W[12]|A1|R1|S[12]|T[1-5]|P[12]|F1|I[1-3]|D1|M1)\])/gi
-  );
+  const parts = value.split(new RegExp('(\\(?\\[[A-Z]+\\d+\\](?:[, ]+\\[[A-Z]+\\d+\\])*\\s+See\\s+\\[[^\\]\\n]+\\]\\(app:[a-z-]+\\)\\.?\\)?|\\[[^\\]\\n]+\\]\\(app:[a-z-]+\\)|\\*\\*\\*.*?\\*\\*\\*|\\*\\*.*?\\*\\*|\\*.*?\\*|\\['+evidenceToken+'(?:\\s*[,;]\\s*'+evidenceToken+')*\\])','gi'));
 
   return parts.map((part, index) => {
     // Only source-navigation references become secondary text; answer prose stays intact.
@@ -22,13 +26,14 @@ function renderInlineMarkdown(
       return <span key={index} data-chat-source-reference className="text-[11px] font-normal leading-relaxed text-muted-foreground">({renderInlineMarkdown(reference[1],onNavigate,citationTargets)}{referenceAction&&onNavigate?<button type="button" onClick={() => onNavigate(referenceAction.page)} className="inline-flex min-h-6 items-center rounded-sm text-left font-medium text-primary underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-ring">{referenceAction.label}</button>:renderInlineMarkdown(reference[2],onNavigate,citationTargets)}{reference[4]})</span>;
     }
     // Only known evidence IDs are citations. Bracketed dates, units and data stay full size.
-    const citation = part.match(/^\[(W[12]|A1|R1|S[12]|T[1-5]|P[12]|F1|I[1-3]|D1|M1)\](?:\((app:[a-z-]+)\))?$/i);
-    if (citation) {
-      const id=citation[1].toUpperCase(), target=citation[2]??citationTargets.get(id), marker=`[${citation[1]}]`;
-      const action=target?getChatNavigationAction(target):null;
-      return <sup key={index} data-chat-citation={id} className="align-super text-[11px] font-normal leading-none text-foreground">
-        {action&&onNavigate?<button type="button" aria-label={`Source ${id}: ${action.label}`} title={`Source ${id}: ${action.label}`} onClick={()=>onNavigate(action.page)} className="inline-flex min-h-6 min-w-6 items-center justify-center rounded-sm px-0.5 text-primary underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-ring">{marker}</button>:<span aria-label={`Source ${id}`} title={`Source ${id}`}>{marker}</span>}
-      </sup>;
+    const citation = part.match(/^\[([^\]]+)\](?:\((app:[a-z-]+)\))?$/i);
+    if (citation&&citationList.test(citation[1])) {
+      return <span key={index}>{citation[1].split(/\s*[,;]\s*/).map((token,n)=>{
+        const [id,field]=token.toUpperCase().split(/[.:](.*)/),target=id==='T3'?null:sourceTargets[id]?'app:'+sourceTargets[id]:citation[2]??citationTargets.get(id),action=target?getChatNavigationAction(target):null;
+        return <sup key={n} data-chat-citation={id} className="align-super text-[11px] font-normal leading-none text-foreground">
+          {action&&onNavigate?<button type="button" aria-label={`Source ${id}: ${action.label}`} title={`Source ${id}: ${action.label}${field?' · '+token.slice(id.length+1):''}`} onClick={()=>onNavigate(action.page)} className="inline-flex min-h-6 min-w-6 items-center justify-center rounded-sm px-0.5 text-primary underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-ring">[{id}]</button>:<span aria-label={`Source ${id}`} title={id==='T3'?'Career interests: see Home Data details':`Source ${id}`}>[{id}]</span>}
+        </sup>;
+      })}</span>;
     }
     const link = part.match(/^\[[^\]\n]+\]\((app:[a-z-]+)\)$/);
     const action = link ? getChatNavigationAction(link[1]) : null;

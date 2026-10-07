@@ -22,17 +22,17 @@ try{for(const [mode,width,height] of [['wide',1721,1000],['desktop',1366,900],['
  });
  await page.goto(base);const input=page.getByLabel('Ask Workforce AI',{exact:true}),send=page.getByRole('button',{name:'Send overview question',exact:true}),starters=page.getByRole('region',{name:'Suggested questions',exact:true});
  await input.waitFor();await starters.getByRole('button').first().waitFor();await page.waitForFunction(()=>!document.querySelector('[aria-label="Suggested questions"] button')?.disabled);
- check(mode+' exactly three compact groups and seven approved labels',await starters.getByRole('group').count()===3&&JSON.stringify(await starters.getByRole('button').allTextContents())===JSON.stringify(homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.label))));
- const boxes=await starters.getByRole('group').evaluateAll(nodes=>nodes.map(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width}}));
- const containerWidth=await starters.evaluate(node=>node.clientWidth);
- check(mode+' columns depend on actual container width and stack without overflow',containerWidth>=680?boxes.every(box=>Math.abs(box.y-boxes[0].y)<2):boxes.every((box,index)=>Math.abs(box.x-boxes[0].x)<2&&(index===0||box.y>boxes[index-1].y)));
+ check(mode+' Suggested prompts and category headings are larger',await starters.getByRole('heading',{name:'Suggested prompts',exact:true}).evaluate(el=>parseFloat(getComputedStyle(el).fontSize)>=20)&&await starters.locator('h4').evaluateAll(nodes=>nodes.every(el=>parseFloat(getComputedStyle(el).fontSize)>=18)));
+ check(mode+' exactly two compact groups and five approved labels',await starters.getByRole('group').count()===2&&JSON.stringify(await starters.getByRole('button').allTextContents())===JSON.stringify(homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.label))));
+ const boxes=await starters.getByRole('group').evaluateAll(nodes=>nodes.map(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,bottom:r.bottom,width:r.width,headingBottom:node.querySelector('h4').getBoundingClientRect().bottom,buttonTop:node.querySelector('button').getBoundingClientRect().top}}));
+ check(mode+' categories always stack in order with headings above buttons and clear spacing',boxes.every((box,index)=>Math.abs(box.x-boxes[0].x)<2&&box.buttonTop-box.headingBottom>=7&&(index===0||box.y-boxes[index-1].bottom>=15)));
  check(mode+' starter touch targets stay at least 44px and inside container',await starters.getByRole('button').evaluateAll(nodes=>nodes.every(node=>{const r=node.getBoundingClientRect();return r.height>=44&&r.left>=0&&r.right<=innerWidth+1&&node.scrollWidth<=node.clientWidth})));
- await input.fill('Keep this draft');check(mode+' unfinished draft blocks all seven starters',await starters.getByRole('button').evaluateAll(nodes=>nodes.length===7&&nodes.every(node=>node.disabled)));await input.fill('');
- await page.screenshot({path:'/tmp/concise-starters-'+mode+'.png',fullPage:true});
+ await input.fill('Keep this draft');check(mode+' unfinished draft blocks all five starters',await starters.getByRole('button').evaluateAll(nodes=>nodes.length===5&&nodes.every(node=>node.disabled)));await input.fill('');
+ await page.screenshot({path:'/tmp/concise-starters-'+mode+'.png',fullPage:true});await starters.screenshot({path:'/tmp/stacked-starters-'+mode+'.png'});
  const first=starters.getByRole('button',{name:'What skills are we missing?',exact:true});
  if(mode==='mobile')await first.tap();else{await first.focus();await page.keyboard.press('Enter')}
  await page.getByRole('region',{name:'Overview conversation'}).getByText(/April 2026 turnover was lower/).waitFor();
- check(mode+' starter sends grounded question and no goal is forced',posts[0].message.startsWith(homeStarterGroups[0].prompts[0].prompt)&&await page.getByRole('region',{name:'Pin this problem'}).count()===0);
+ check(mode+' starter answers before an optional goal offer',posts[0].message.startsWith(homeStarterGroups[0].prompts[0].prompt)&&await page.getByRole('region',{name:'Pin this problem'}).count()===1);
  await input.fill('why was turnover high in april');await send.click();await page.getByText('Thinking with the available evidence…',{exact:true}).waitFor({state:'hidden'});
  const answer=page.locator('[data-chat-role="assistant"]').last(),content=answer.locator('.home-answer');
  check(mode+' answer has one takeaway, two short bullets and compact caveat',await content.locator(':scope > p').count()===2&&await content.locator(':scope > ul > [data-chat-item]').count()===2&&await content.locator('[data-chat-heading]').count()===0);
@@ -47,6 +47,17 @@ try{for(const [mode,width,height] of [['wide',1721,1000],['desktop',1366,900],['
  check(mode+' Action Plan keeps five headings and numbered steps',JSON.stringify(await planned.locator('[data-chat-heading]').allTextContents())===JSON.stringify(headings)&&await planned.locator('[data-chat-item]').count()===5);
  check(mode+' no live sources, runtime errors or overflow',external===0&&errors.length===0&&await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await context.close();
+}
+// Click actual citation controls and verify the selected application destination.
+for(const width of [1366,390]){
+ const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.route('**/*',route=>{const req=route.request(),url=new URL(req.url());if(url.origin!==base)return route.abort();if(url.pathname==='/api/chat')return route.fulfill({json:{answer:'Facts [W1:summary] [a1.total_exits] [S1, S2] [T1:summary](app:skills) [R1] [T2:summary] [T4] [T3](app:skills). Dates [2026] and unknown [Q9] stay text.',nextStep:'none'}});if(url.pathname.startsWith('/api/'))return url.pathname==='/api/dashboard'?route.fulfill({json:fixture}):route.fulfill({status:503,json:{error:'Synthetic unavailable source'}});return route.continue()});
+ await page.goto(base);const input=page.getByLabel('Ask Workforce AI',{exact:true});
+ for(const [id,label,destination] of [['W1','Workforce','workforce'],['A1','Attrition','attrition'],['S1','Employee Listening','survey-sentiment'],['S2','Attrition','attrition'],['T1','Skills Intelligence','skills'],['R1','Talent Acquisition','talent-acquisition'],['T2','Learning & Development','learning-development'],['T4','Career Growth & Internal Mobility','career-growth-mobility']]){
+  await input.fill('Explain the source references');await page.getByRole('button',{name:'Send overview question',exact:true}).click();await page.locator('[data-chat-role="assistant"]').last().getByText(/Facts/).waitFor();const answer=page.locator('[data-chat-role="assistant"]').last();check(width+' '+id+' ordinary brackets stay text',await answer.getByText(/Dates \[2026\] and unknown \[Q9\]/).count()===1);await answer.getByRole('button',{name:`Source ${id}: ${label}`,exact:true}).click();await page.locator(`[data-nav-destination="${destination}"][aria-current="page"]`).waitFor({state:'attached'});check(width+' inline '+id+' opens '+destination,true);
+  const open=page.getByRole('button',{name:'Open navigation',exact:true});if(await open.isVisible())await open.click();await page.getByRole('button',{name:'Action Planning',exact:true}).click();await input.waitFor();
+ }
+ check(width+' retired T3 has readable attribution without a misleading target',await page.locator('[data-chat-role=assistant]').last().locator('sup[data-chat-citation=T3] span[title="Career interests: see Home Data details"]').count()===1&&await page.locator('button[aria-label^="Source T3"]').count()===0);check(width+' source navigation has no runtime errors',errors.length===0);await context.close();
 }
 // Every short starter label executes its unambiguous intent in the real Home UI.
 for(const item of homeStarterGroups.flatMap(group=>group.prompts)){

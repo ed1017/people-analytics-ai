@@ -1,4 +1,5 @@
 "use client";
+import {useHomeGuidedActions} from '@/components/home-guided-actions';
 import {assumptionsFallbackField,readAssumptionsFallback} from '@/lib/home-assumptions-fallback';
 import {HomeAssumptionsFallback} from '@/components/home-assumptions-fallback';
 import {HomeDemoPlans} from '@/components/home-demo-plans';
@@ -86,10 +87,15 @@ export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,
  // Only a fresh user Pin authorizes this call; reload and toggles never do.
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[pin,goalId,binding,busy,active,ready,storage.saved,identity]);
+ useHomeGuidedActions('preparation',{goalId,cancel:()=>coordinator.current.invalidate(),prepare:async()=>{
+  if(current?.proposal.bundles.length)return;
+  if(pending||!binding||busy||!storage.saved||!currentCheck(identity))throw Error('Wait for the current goal and data to finish loading, then retry.');
+  await prepare('explicit');
+ }});
  if(!goalId||!goal)return null;
  if(demo)return <HomeDemoPlans key={goalId} goalId={goalId} goal={goal} active={active} busy={busy} openRequest={openRequest} chatChange={chatChange} onDiscuss={onDiscuss}/>;
  const disabled=busy||pending||!binding||!storage.saved||!active||!ready;
- return <section aria-label="Action Plans for your goal" className="space-y-3 break-words rounded-xl border border-primary/40 p-4 text-sm leading-relaxed">
+ return <section data-guide-goal={goalId} aria-label="Action Plans for your goal" className="space-y-3 break-words rounded-xl border border-primary/40 p-4 text-sm leading-relaxed">
   <h2 ref={heading} tabIndex={-1} className="text-lg font-semibold">Action Plans for your goal</h2><p>{goal}</p>
   {pending&&<DataLoadingStatus name="Action Plan preparation status" label="Preparing Action Plans…" detail="Your goal and saved plans are kept while choices are prepared."/>}
   {!ready&&<p role="status">Checking current evidence. Saved work is kept.</p>}
@@ -103,7 +109,7 @@ export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,
    {retained.drafts.map(item=><details key={JSON.stringify([item.binding,item.bundle.id,item.signature])}><summary className="min-h-11 cursor-pointer py-2">{item.bundle.name} · saved draft revision {item.revision}</summary>{bound?.identity===identity&&bound.diagnostic&&<p aria-label="Action Plan context check" className="text-xs">{planContextDiagnosticText(bound.diagnostic)}</p>}<p>Original goal: {item.binding.goal}</p><p>{item.bundle.coordination}</p><p className="text-xs">{item.bundle.limitation}</p></details>)}
    {retained.attachments.map(item=><p key={item.id}>{item.draft.bundle.name} · attached revision {item.draft.revision} · {retained.attachments.some(next=>next.supersedes===item.id)?'Previous attached version':'Attached snapshot'}. Snapshot cash: {item.result.cashTotal===null?'Unknown':`$${item.result.cashTotal.toLocaleString()} USD`}. Not a current calculation or operational approval.</p>)}
   </section>}
-  {(!current||current.proposal.bundles.length===0)&&<button className={button} disabled={disabled} onClick={()=>void prepare('explicit')}>{failure?'Retry Action Plans':!raw||current?.proposal.bundles.length===0?'Create Action Plan':'Prepare Action Plans'}</button>}
+  {(!current||current.proposal.bundles.length===0)&&<button data-guide-target="prepare" className={button} disabled={disabled} onClick={()=>void prepare('explicit')}>{failure?'Retry Action Plans':!raw||current?.proposal.bundles.length===0?'Create Action Plan':'Prepare Action Plans'}</button>}
   {!draft?.proposal.bundles.length&&<HomeAssumptionsFallback chatChange={chatChange} goalId={goalId} goal={goal} binding={binding} pack={packet} planningContext={goalContext} disabled={busy||pending||!storage.saved||!active||!settled} isCurrent={()=>currentCheck(identity,true)} onDiscuss={onDiscuss}/>}
   {!!draft?.proposal.bundles.length&&draft&&<>
    <HomeBundlePlans contextDiagnostic={bound?.identity===identity?bound.diagnostic:null} chatChange={chatChange} planningContext={goalContext} measurePack={packet} key={JSON.stringify([actionBindingKey(draft.binding),draft.preparedAt])} proposal={draft.proposal} preparedAt={draft.preparedAt} binding={draft.binding} contextCurrent={!stale} disabled={disabled||stale} isCurrent={()=>!!current&&currentCheck(identity)} cache={bundleCache} onDiscuss={onDiscuss} projectBinding={projectEvidence?project:undefined}/>
