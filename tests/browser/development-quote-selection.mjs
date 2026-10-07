@@ -1,0 +1,135 @@
+// Real application shell with synthetic local fixtures. No live data/model/vendor calls.
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {encodeDecisions, DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
+import {developmentCatalog, quoteInputs} from '../../lib/development-costs.ts';
+import {scopeDashboard} from '../fixtures/home-scope-evidence.mjs';
+import {workforce, attrition, survey, talent, career} from '../fixtures/theme-audit-data.mjs';
+const {chromium} = await import(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
+const base = process.env.HOME_BASE_URL ?? 'http://127.0.0.1:3199';
+const browser = await chromium.launch({executablePath:'/usr/bin/chromium', args:['--no-sandbox']});
+const directory = '/tmp/development-quote-selection';
+await fs.mkdir(directory, {recursive:true});
+let checks = 0;
+const check = (label, value) => { assert.ok(value, label); checks++; console.log('PASS '+label); };
+const seed = {version:1, revision:1, goals:{version:1, activeId:'quote-goal', goals:[{id:'quote-goal', statement:'Compare development options for managers'}, {id:'other-goal', statement:'Keep unrelated work'}]}, workspaces:{'quote-goal':{savedAt:'2026-10-06T00:00:00Z',fields:{chat:{messages:[],input:'Synthetic draft pauses unrelated automatic takeaways.',problem:null,questionUnanswered:false}}},'other-goal':{savedAt:'2026-10-06T00:00:00Z', fields:{sentinel:{keep:true}}}}};
+try {
+ for (const width of [1366,390,320]) for (const palette of ['light','slate-blue']) {
+  const mode = `${width}-${palette}`;
+  const context = await browser.newContext({viewport:{width,height:900}, hasTouch:width<768});
+  const page = await context.newPage(), errors = [];
+  let posts = 0, external = 0;
+  page.setDefaultTimeout(15000);
+  page.on('pageerror', error => errors.push(error.message));
+  await page.addInitScript(({key,value,palette}) => {
+   if (!localStorage.getItem(key)) localStorage.setItem(key,value);
+   localStorage.setItem('people-analytics-workspace-palette-v1',palette);
+  }, {key:DECISIONS_STORAGE_KEY, value:encodeDecisions(seed), palette});
+  await page.route('**/*', route => {
+   const request=route.request(), url=new URL(request.url());
+   if (url.origin!==base) { external++; return route.abort(); }
+   if (url.pathname.startsWith('/api/')) {
+    if (request.method()!=='GET') { posts++; return route.abort(); }
+    return route.fulfill({json:url.pathname==='/api/dashboard' ? scopeDashboard(url.search) : ({'/api/workforce':workforce,'/api/attrition':attrition,'/api/survey-sentiment':survey,'/api/talent-acquisition':talent,'/api/career-growth-mobility':career}[url.pathname] ?? {})});
+   }
+   return route.continue();
+  });
+  const button = name => page.getByRole('button',{name,exact:true});
+  const catalog = page.getByRole('region',{name:'Development quote catalog',exact:true});
+  const status = catalog.getByRole('status');
+  const goal = page.getByLabel('Development goal',{exact:true});
+  const carry = button('Carry selected quote and goal to Development Planning');
+  const state = () => page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
+  const saved = async () => (await state()).workspaces['quote-goal']?.fields.development;
+  const nav = async key => {
+   const open=button('Open navigation'); if(await open.isVisible()) await open.click();
+   const target=page.locator(`[data-nav-destination="${key}"]`);
+   if(!await target.isVisible()) await target.evaluate(e=>e.closest('section').querySelector('.nav-group-label').click());
+   await target.click();
+  };
+  const back = async () => {await button('Choose another quote in Intelligence → Training & Coaching').click(); await catalog.waitFor();};
+  const selected = async name => await button(name).getAttribute('aria-pressed')==='true';
+  const activate = async target => width<768 ? target.tap() : target.click();
+  await page.goto(base);
+  await page.getByLabel('Selected goal',{exact:true}).locator('option[value="quote-goal"]').waitFor({state:'attached'});
+  await nav('training-coaching'); await catalog.waitFor();
+  check(mode+' initial state explains both missing prerequisites', await carry.isDisabled() && (await status.innerText()).includes('Select a quote. Enter a development goal.'));
+  await button('Open Development Planning').click();
+  check(mode+' navigation alone creates no options', await page.locator('.development-option').count()===0);
+  await back();
+  const cedar=button(developmentCatalog[0].provider), lantern=button(developmentCatalog[1].provider), harbor=button(developmentCatalog[2].provider);
+  await activate(cedar.locator('strong'));
+  check(mode+' accessible quote description retains context and selection instructions',await cedar.evaluate(e=>e.getAttribute('aria-describedby').split(' ').map(id=>document.getElementById(id)?.textContent).join(' ')).then(text=>/Simulated quote/.test(text)&&/Manager feedback and delegation/.test(text)&&/Live virtual workshop/.test(text)&&/cohort capacity 12/.test(text)&&/USD 120 per person per session/.test(text)&&/again to clear/.test(text)));
+  check(mode+' card content selects once and reports unit/currency',await selected(developmentCatalog[0].provider) && (await status.innerText()).includes('USD 120 per person per session') && (await status.innerText()).includes('Enter a development goal.') && await carry.isDisabled());
+  await activate(cedar.locator('.development-quote-control'));
+  check(mode+' visible control clears once without event double toggle',!await selected(developmentCatalog[0].provider) && (await status.innerText()).includes('No quote selected.'));
+  await activate(cedar); await activate(lantern);
+  check(mode+' switching leaves exactly one selected quote',await catalog.locator('[aria-pressed="true"]').count()===1 && await selected(developmentCatalog[1].provider) && (await status.innerText()).includes('USD 1800 per cohort package per session'));
+  await lantern.focus(); await page.keyboard.press('Space');
+  check(mode+' Space deselects with focus retained',!await selected(developmentCatalog[1].provider) && await lantern.evaluate(e=>e===document.activeElement));
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(()=>document.querySelector('.development-quote[aria-label="Fictional Lantern Academy"]')?.getAttribute('aria-pressed')==='true');
+  check(mode+' Enter selects with visible keyboard focus',await selected(developmentCatalog[1].provider) && await lantern.evaluate(e=>e.matches(':focus-visible') && parseFloat(getComputedStyle(e).outlineWidth)>=3));
+  await page.keyboard.press('Enter'); await activate(harbor);
+  check(mode+' all provider units remain literal', (await status.innerText()).includes('USD 200 per cohort package per session'));
+  await goal.fill('   ');
+  check(mode+' whitespace goal is blocked and explanation is associated',await carry.isDisabled() && await carry.getAttribute('aria-describedby')===await status.locator('p').last().getAttribute('id'));
+  await goal.fill('  Practice manager feedback  ');
+  check(mode+' valid quote and goal expose ready next action',await carry.isEnabled() && (await status.innerText()).includes('Ready to copy'));
+  await activate(cedar); await carry.click();
+  await page.locator('.development-option').waitFor();
+  const first=(await saved()).options[0];
+  check(mode+' carry copies complete quote and trimmed goal only',JSON.stringify(first)===JSON.stringify({quote:developmentCatalog[0],goal:'Practice manager feedback',inputs:quoteInputs(developmentCatalog[0])}));
+  check(mode+' planning retains units/currency and unknown attendance',await page.getByLabel('Quote fee (USD) per person per session',{exact:true}).inputValue()==='120' && await page.getByLabel('Participants',{exact:true}).inputValue()==='');
+  await back(); await activate(cedar);
+  check(mode+' deselect leaves carried snapshot intact',await catalog.locator('[aria-pressed="true"]').count()===0 && (await saved()).options.length===1);
+  await catalog.getByText('Add a custom vendor or coach',{exact:true}).click();
+  await button('Add custom quote').click();
+  check(mode+' invalid custom quote explains errors without selecting',await catalog.getByRole('alert').isVisible() && await catalog.locator('[aria-pressed="true"]').count()===0);
+  await activate(lantern);
+  for(const [label,value] of [['Provider or coach','Synthetic Custom Coach'],['Focus / skills','Feedback practice'],['Delivery format','Virtual group'],['Hours per participant per session','1.5'],['Quoted sessions','2'],['Cohort capacity','8'],['Fee per unit per session (blank = unknown)','275.50']]) await catalog.getByLabel(label,{exact:true}).fill(value);
+  await catalog.getByRole('combobox',{name:/^Currency/}).selectOption('GBP');
+  await catalog.getByRole('combobox',{name:/^Fee basis/}).selectOption('cohort');
+  check(mode+' editing custom draft does not change selection or options',await selected(developmentCatalog[1].provider) && (await saved()).options.length===1);
+  await button('Add custom quote').click();
+  const custom=(await saved()).custom[0];
+  check(mode+' adding a valid custom quote selects with truthful summary',await selected('Synthetic Custom Coach') && (await status.innerText()).includes('GBP 275.50 per cohort package per session') && (await button('Synthetic Custom Coach').innerText()).includes('User-provided · Unverified'));
+  await activate(button('Synthetic Custom Coach')); await activate(button('Synthetic Custom Coach'));
+  check(mode+' custom quote clears and reselects with the same behavior',await selected('Synthetic Custom Coach') && (await saved()).custom.length===1);
+  await carry.click(); await page.locator('.development-option').nth(1).waitFor();
+  check(mode+' custom carry retains all context and quote units',JSON.stringify((await saved()).options[1].quote)===JSON.stringify(custom) && await page.getByLabel('Quote fee (GBP) per cohort per session',{exact:true}).inputValue()==='275.50');
+  await back(); await activate(lantern); await carry.click(); await page.locator('.development-option').nth(2).waitFor(); await back();
+  check(mode+' full Planning limit is visible and carry cannot append',await carry.isDisabled() && (await status.innerText()).includes('Three comparison options are already in Development Planning.') && (await saved()).options.length===3);
+  await page.screenshot({fullPage:true,path:`${directory}/${mode}-limit.png`});
+  await goal.fill(''); await activate(lantern);
+  check(mode+' all unmet gates are explained together',/Select a quote\. Enter a development goal\. Three comparison options/.test(await status.innerText()));
+  await button('Open Development Planning').click(); await button('Remove option 3').click(); await back();
+  await goal.fill('Practice manager feedback'); await activate(lantern);
+  check(mode+' removing an option restores carry readiness',await carry.isEnabled() && (await saved()).options.length===2);
+  await nav('development-planning'); await back();
+  check(mode+' navigation preserves selection without adding options',await selected(developmentCatalog[1].provider) && (await saved()).options.length===2);
+  await page.reload(); await nav('training-coaching');
+  check(mode+' saved goal restores selected quote, goal, custom and copied options',await selected(developmentCatalog[1].provider) && await goal.inputValue()==='Practice manager feedback' && (await saved()).options.length===2 && (await saved()).custom.length===1);
+  await page.screenshot({fullPage:true,path:`${directory}/${mode}-selected.png`});
+  await activate(lantern); await page.reload(); await nav('training-coaching');
+  check(mode+' deselection persists after reload',await catalog.locator('[aria-pressed="true"]').count()===0 && (await status.innerText()).includes('No quote selected.'));
+  const preserved=JSON.stringify(await saved());
+  await page.getByLabel('Selected goal',{exact:true}).selectOption('other-goal');
+  check(mode+' unrelated goal starts with its own empty catalog',await goal.inputValue()==='' && await catalog.locator('[aria-pressed="true"]').count()===0 && await catalog.locator('.development-quote').count()===3);
+  await page.getByLabel('Selected goal',{exact:true}).selectOption('quote-goal');
+  await button('Reset conversation').click();
+  check(mode+' Reset leaves saved goal data intact and opens empty exploration',await page.getByLabel('Selected goal',{exact:true}).inputValue()==='' && await goal.inputValue()==='' && JSON.stringify(await saved())===preserved);
+  await page.getByLabel('Selected goal',{exact:true}).selectOption('quote-goal');
+  check(mode+' explicitly reopening after Reset restores saved work',await goal.inputValue()==='Practice manager feedback' && (await saved()).options.length===2);
+  await page.getByLabel('Selected goal',{exact:true}).selectOption('');
+  await activate(harbor); await goal.fill('Tab-only exploration'); await nav('development-planning'); await back();
+  check(mode+' exploration selection survives navigation within tab',await selected(developmentCatalog[2].provider) && await goal.inputValue()==='Tab-only exploration');
+  await page.reload(); await nav('training-coaching');
+  check(mode+' exploration is not persisted on reload',await goal.inputValue()==='' && await catalog.locator('[aria-pressed="true"]').count()===0 && JSON.stringify(await saved())===preserved);
+  const final=await state();
+  assert.deepEqual({unrelated:final.workspaces['other-goal'].fields.sentinel.keep,posts,external,errors,overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)},{unrelated:true,posts:0,external:0,errors:[],overflow:false},mode+' boundary diagnostics');
+  check(mode+' no unrelated changes, mutations, remote calls, errors or horizontal overflow',true);
+  await context.close();
+ }
+} finally { await browser.close(); }
+console.log(JSON.stringify({checks,screenshots:directory}));
