@@ -6,8 +6,8 @@ const base={page:'home',goal:'Improve retention',hasConversation:false,evidenceR
 test('Home starters remain simple while skills follow-ups are contextual and permit combined methods',()=>{
  assert.deepEqual(contextualPrompts({...base,goal:''}),[...homeGoalStarters]);
  assert.deepEqual(homeStarterGroups.map(group=>group.label),['Skills & growth','Workforce challenges','Forecasts']);
- assert.deepEqual(homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.label)),['What skills are we missing?','Where should we invest in training?','Reduce turnover','Improve satisfaction','Hiring','Turnover','Satisfaction']);
- assert.equal(homeGoalStarters.length,7);
+ assert.deepEqual(homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.label)),['What skills are we missing?','Where should we invest in training?','How can we reduce turnover?','How can we improve satisfaction?','Show the hiring forecast.','Show the turnover forecast.','Show the satisfaction forecast.']);
+ assert.deepEqual(homeGoalStarters,['What skills are we missing in the current workforce, and which findings apply to the selected scope?','Where should we invest in training based on recorded skill gaps and learning pathways, and which findings apply to the selected workforce scope?','Reduce turnover','Improve employee satisfaction','Forecast hiring','Forecast turnover','Forecast satisfaction']);
  assert.match(homeGoalStarters[0],/selected scope/);assert.match(homeGoalStarters[1],/selected workforce scope/);
  assert.match(contextualPrompts({...base,goal:'Build AI skills without adding headcount'})[1],/mix of training, internal moves and hiring/);
  for(const context of [base,{...base,goal:''},{...base,goal:'Build skills',sources:[source('A1')]},{...base,page:'overview',goal:'Build skills'}])assert.doesNotMatch(contextualPrompts(context).join(' '),/mix of training/);

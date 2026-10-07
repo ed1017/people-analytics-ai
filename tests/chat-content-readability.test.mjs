@@ -46,7 +46,7 @@ test('grouped starter labels submit exact grounded intents without overwriting d
  const sent=[],props={prompts:homeGoalStarters,groups:homeStarterGroups,draft:'',busy:false,onDraft:prompt=>sent.push(prompt)};
  const element=PromptExamples(props),buttons=nodes(element).filter(node=>node.type==='button'),html=renderToStaticMarkup(element);
  assert.equal(buttons.length,7);assert.equal((html.match(/role="group"/g)??[]).length,3);
- assert.deepEqual(buttons.map(button=>button.props.children),['What skills are we missing?','Where should we invest in training?','Reduce turnover','Improve satisfaction','Hiring','Turnover','Satisfaction']);
+ assert.deepEqual(buttons.map(button=>button.props.children),['What skills are we missing?','Where should we invest in training?','How can we reduce turnover?','How can we improve satisfaction?','Show the hiring forecast.','Show the turnover forecast.','Show the satisfaction forecast.']);
  buttons.forEach(button=>button.props.onClick());assert.deepEqual(sent,homeGoalStarters);
  assert.deepEqual(sent.slice(0,4).map(prompt=>homeTurnPurpose(prompt)),['answer','answer','goal','goal']);
  assert.deepEqual(sent.slice(4).map(prompt=>homeForecastIntent(prompt).domains[0]),['hiring','turnover','satisfaction']);

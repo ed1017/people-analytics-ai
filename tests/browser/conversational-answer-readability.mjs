@@ -23,12 +23,11 @@ try{for(const [mode,width,height] of [['wide',1721,1000],['desktop',1366,900],['
  await page.goto(base);const input=page.getByLabel('Ask Workforce AI',{exact:true}),send=page.getByRole('button',{name:'Send overview question',exact:true}),starters=page.getByRole('region',{name:'Suggested questions',exact:true});
  await input.waitFor();await starters.getByRole('button').first().waitFor();await page.waitForFunction(()=>!document.querySelector('[aria-label="Suggested questions"] button')?.disabled);
  check(mode+' exactly three compact groups and seven approved labels',await starters.getByRole('group').count()===3&&JSON.stringify(await starters.getByRole('button').allTextContents())===JSON.stringify(homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.label))));
- const boxes=await starters.getByRole('group').evaluateAll(nodes=>nodes.map(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width}}));
- const containerWidth=await starters.evaluate(node=>node.clientWidth);
- check(mode+' columns depend on actual container width and stack without overflow',containerWidth>=680?boxes.every(box=>Math.abs(box.y-boxes[0].y)<2):boxes.every((box,index)=>Math.abs(box.x-boxes[0].x)<2&&(index===0||box.y>boxes[index-1].y)));
+ const boxes=await starters.getByRole('group').evaluateAll(nodes=>nodes.map(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,bottom:r.bottom,width:r.width,headingBottom:node.querySelector('h4').getBoundingClientRect().bottom,buttonTop:node.querySelector('button').getBoundingClientRect().top}}));
+ check(mode+' categories always stack in order with headings above buttons and clear spacing',boxes.every((box,index)=>Math.abs(box.x-boxes[0].x)<2&&box.buttonTop-box.headingBottom>=7&&(index===0||box.y-boxes[index-1].bottom>=15)));
  check(mode+' starter touch targets stay at least 44px and inside container',await starters.getByRole('button').evaluateAll(nodes=>nodes.every(node=>{const r=node.getBoundingClientRect();return r.height>=44&&r.left>=0&&r.right<=innerWidth+1&&node.scrollWidth<=node.clientWidth})));
  await input.fill('Keep this draft');check(mode+' unfinished draft blocks all seven starters',await starters.getByRole('button').evaluateAll(nodes=>nodes.length===7&&nodes.every(node=>node.disabled)));await input.fill('');
- await page.screenshot({path:'/tmp/concise-starters-'+mode+'.png',fullPage:true});
+ await page.screenshot({path:'/tmp/concise-starters-'+mode+'.png',fullPage:true});await starters.screenshot({path:'/tmp/stacked-starters-'+mode+'.png'});
  const first=starters.getByRole('button',{name:'What skills are we missing?',exact:true});
  if(mode==='mobile')await first.tap();else{await first.focus();await page.keyboard.press('Enter')}
  await page.getByRole('region',{name:'Overview conversation'}).getByText(/April 2026 turnover was lower/).waitFor();
