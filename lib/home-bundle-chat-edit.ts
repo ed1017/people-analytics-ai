@@ -24,6 +24,16 @@ function targets(input:BundleInputs,draft:BundleDraft){
    if(input.capacity&&(key==='startMonth'||key==='months')){const field=key==='startMonth'?'planningMonth':'months';input.capacity.input[field]=value.value===null?'':String(value.value);input.capacity.origins[field]={kind:value.kind,basis:value.basis};}
   }},[...aliases]);
  }
+ if(input.capacity){const capacity=input.capacity;
+  for(const [key,label,type,aliases] of [['annualHireCost','Annual hire cost (USD)','money',['annual hire cost']],['hireFee','Recruiting fee per hire (USD)','money',['hire fee','recruiting fee per hire']],['annualBackfillCost','Annual backfill cost (USD)','money',['annual backfill cost']],['backfillFee','Recruiting fee per backfill (USD)','money',['backfill fee']],['internalAnnualCostChange','Total annual internal salary change (USD)','money',['internal salary change']],['trainingCash','Total training cash (USD)','money',['training cash']],['trainingHours','Total training hours','count',['training hours']],['arrivalDate','Hire arrival date','date',['hiring arrival date']],['buildMonth','Build effective month','month',['build month']],['moveMonth','Move effective month','month',['move month']],['backfillDate','Backfill arrival date','date',['backfill date']],['backfills','External backfill count','count',['backfills']]] as const){
+   add({key:'capacity.'+key,label,type,read:()=>({value:capacity.input[key]===''?null:type==='month'||type==='date'?capacity.input[key]:Number(capacity.input[key]),...capacity.origins[key]}),write:value=>{capacity.input[key]=value.value===null?'':String(value.value);capacity.origins[key]={kind:value.kind,basis:value.basis};}},[...aliases]);
+  }
+ }
+ if(input.whatIf?.kind==='capacity'||input.capacity){
+  for(const [key,label,type,aliases] of [['maxAddedEmployees','Maximum added employees','count',['max added employees','headcount cap']],['maxStaffHours','Maximum staff hours','count',['max staff hours','staff hours cap']],['deadlineMonth','Coverage deadline','month',['coverage deadline month']],['objective','Search objective','text',['staffing objective']]] as const){
+   add({key:'mixConstraints.'+key,label,type,read:()=>input.mixConstraints?.[key]??unknownAssumption(),write:value=>{input.mixConstraints={...input.mixConstraints,[key]:value};}},[...aliases]);
+  }
+ }
  if(input.whatIf){const scenario=input.whatIf;for(const [key,label,type,aliases] of (scenario.kind==='turnover'?[
   ['baseline','Baseline turnover','percent',['baseline turnover rate','baseline rate']],['target','Target turnover','percent',['target turnover rate','turnover target','success target']],['population','Average workforce','count',['outcome population','denominator']],
  ]:[['baseline','Baseline additional roles','count',['baseline coverage']],['target','Target additional roles','count',['additional roles','capacity target','success target']],['unitCost','Monthly cost per role','money',['monthly role cost','role monthly cost']]]) as [keyof Pick<typeof scenario,'baseline'|'target'|'population'|'unitCost'>,string,Target['type'],string[]][]){add({key:'whatIf.'+key,label,type,read:()=>scenario[key],write:value=>{scenario[key]=value as Assumption<number>;}},aliases);}}
@@ -148,7 +158,7 @@ export function previewBundleChatEdit(draft:BundleDraft,request:string,selection
   const target=matches[0];if(seen.has(target.key))fail(`Review one value for ${target.label} in each request.`);seen.add(target.key);
   const before=structuredClone(target.read()),after=parseValue(parsed.value,target);
   if(parsed.previous!==undefined&&parseValue(parsed.previous,target).value!==before.value)fail(`The current ${target.label} differs from the stated starting value. Review it before proposing a change.`);
-  if(before.value===after.value&&(before.kind===after.kind||after.value===null))continue;
+  if(before.value===after.value&&(before.kind===after.kind||after.value===null)&&!(target.key.startsWith('mixConstraints.')&&!Object.hasOwn(inputs.mixConstraints??{},target.key.split('.')[1])))continue;
   changes.push({field:target.label,before,after});target.write(after);
  }
  if(!changes.length)fail('These assumptions already have those values and provenance. No draft change is needed.');

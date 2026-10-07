@@ -1,3 +1,5 @@
+import {prepareHomeMixCommit} from "./home-mix-history";
+import {evaluateHomeMix,verifyHomeMix} from "./home-mix-runtime";
 import {previewBundleCapacityAdoption} from "./home-capacity-adoption";
 // Module worker: no fetch, SDK, database or storage access.
 import {runLocalWorkforceSearch,stageWorkforceMixSelectionLocally,previewWorkforceSearchReview,readLocalWorkforceReview,retainLocalWorkforceReview} from "./workforce-local-search";
@@ -6,6 +8,9 @@ self.onmessage=async(event: MessageEvent)=>{
  try {
   const {action,args}=event.data;let value;
   switch(action){
+   case "home-mix-commit": value=await prepareHomeMixCommit(args.draft,args.evaluation,args.candidateId,args.at,args.previous);break;
+   case "home-mix": value=await evaluateHomeMix(args.draft);break;
+   case "home-mix-read": value=await verifyHomeMix(args.raw,args.draft);break;
    case "bundle-adoption": value=await previewBundleCapacityAdoption(args.draft,args.context,args.snapshot,args.candidateId);break;
    case "search": value=await runLocalWorkforceSearch(args.context,args.spec);break;
    case "select": value=await stageWorkforceMixSelectionLocally(args.context,args.snapshot,args.ids);break;

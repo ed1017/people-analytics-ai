@@ -9,7 +9,7 @@ import {DECISIONS_STORAGE_KEY} from '@/lib/local-decisions';
 import {labelFor,display} from '@/components/home-action-plan-application';
 import type {DevelopmentSession} from '@/components/development-workspace';
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring',control='min-h-11 w-full rounded border bg-background px-2 text-sm';
-type Props={preparedAt:string;draft:BundleDraft;result:BundleResult;replaceId:string|null;reviewed:boolean;acknowledgeUnknowns:boolean;disabled:boolean;isCurrent:()=>boolean;projectBinding:ProjectPlanningBinding;onClose:()=>void;onComplete:(changes:number)=>void};
+type Props={mixCommit?:LinkedAttachmentRequest['mixCommit'];preparedAt:string;draft:BundleDraft;result:BundleResult;replaceId:string|null;reviewed:boolean;acknowledgeUnknowns:boolean;disabled:boolean;isCurrent:()=>boolean;projectBinding:ProjectPlanningBinding;onClose:()=>void;onComplete:(changes:number)=>void};
 export function HomeLinkedAttachment(props:Props){
  const storage=useDecisionStorage(),fields=storage.data.workspaces[props.draft.binding.goalId]?.fields??{},development=fields.development as DevelopmentSession|undefined,solution=readWorkforceSolution(fields.workforceSolution);
  const [stamp]=useState(()=>({attachmentId:crypto.randomUUID(),at:new Date().toISOString()}));
@@ -18,7 +18,7 @@ export function HomeLinkedAttachment(props:Props){
  const [optionIndex,setOptionIndex]=useState(()=>{const matches=development?.options?.map((item,index)=>({item,index})).filter(({item})=>item.quote.id===development.selected)??[];return matches.length===1?String(matches[0].index):'';});
  const [quoteReviewed,setQuoteReviewed]=useState(false),[hourlyReviewed,setHourlyReviewed]=useState(false),[capacityReviewed,setCapacityReviewed]=useState(true),[choices,setChoices]=useState<ApplicationChoices>({});
  const [preview,setPreview]=useState<{key:string;value:LinkedAttachmentPreview}|null>(null),[busy,setBusy]=useState(false),[committing,setCommitting]=useState(false),[notice,setNotice]=useState('');
- const request:LinkedAttachmentRequest={...stamp,preparedAt:props.preparedAt,draft:props.draft,result:props.result,replaceId:props.replaceId,reviewed:props.reviewed,acknowledgeUnknowns:props.acknowledgeUnknowns,development:componentId&&optionIndex!==''?{componentId,optionIndex:Number(optionIndex),quoteReviewed,hourlyReviewed}:null,capacityReviewed};
+ const request:LinkedAttachmentRequest={...(props.mixCommit?{mixCommit:props.mixCommit}:{}),...stamp,preparedAt:props.preparedAt,draft:props.draft,result:props.result,replaceId:props.replaceId,reviewed:props.reviewed,acknowledgeUnknowns:props.acknowledgeUnknowns,development:componentId&&optionIndex!==''?{componentId,optionIndex:Number(optionIndex),quoteReviewed,hourlyReviewed}:null,capacityReviewed};
  const key=JSON.stringify([bundleInputKey(props.draft),storage.data.revision,request.development,capacityReviewed,props.reviewed,props.acknowledgeUnknowns,choices]),live=useRef({props,key,request,choices}),mounted=useRef(true),pending=useRef(false);
  useLayoutEffect(()=>{live.current={props,key,request,choices};});
  useEffect(()=>{mounted.current=true;const changed=(event:StorageEvent)=>{if(event.key===null||event.key===DECISIONS_STORAGE_KEY)decisionStore.invalidateExternalChange();};window.addEventListener('storage',changed);return()=>{mounted.current=false;window.removeEventListener('storage',changed);};},[]);
