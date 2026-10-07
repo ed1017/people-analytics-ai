@@ -18,18 +18,18 @@ test('exact budget example inherits all context and recalculates the existing en
  const draft=base(),before=structuredClone(draft),{record}=proposePlanRevision(undefined,draft,'have a budget of 6000',selection);
  assert.equal(bundleChatEditIntent(record.request).edit,true);
  assert.deepEqual(record.draft.inputs.scope,draft.inputs.scope);assert.deepEqual(record.draft.inputs.timing,draft.inputs.timing);assert.deepEqual(record.draft.inputs.expenses,draft.inputs.expenses);assert.deepEqual(record.draft.inputs.whatIf,draft.inputs.whatIf);
- assert.equal(record.result.deliveryEstimate.participants,10);assert.equal(record.result.deliveryEstimate.hours,36);assert.equal(record.result.deliveryEstimate.employeeTime,2160);assert.equal(record.result.deliveryEstimate.finish,'2026-11-28');
- assert.deepEqual(record.result.budget,{limit:6000,basis:'cash',cash:3500,employeeTime:2160,comparedCost:3500,headroom:2500,status:'within',assumed:true});
+ assert.equal(record.result.deliveryEstimate.participants,10);assert.equal(record.result.deliveryEstimate.hours,36);assert.equal(record.result.deliveryEstimate.employeeTime,null);assert.equal(record.result.deliveryEstimate.finish,'2026-11-28');
+ assert.deepEqual(record.result.budget,{limit:6000,basis:'cash',cash:3500,employeeTime:null,comparedCost:3500,headroom:2500,status:'within',assumed:true});
  assert.deepEqual(record.result,reconcileBundle(record.draft));assert.deepEqual(draft,before);assert.equal(record.draft.inputs.budget.amount.kind,'user-entered');assert.equal(record.draft.inputs.budget.basis.kind,'illustrative');
- assert.match(planBudgetText(record.result),/cash only, with staff time separate/);
+ assert.match(planBudgetText(record.result),/cash only; staff hours are separate/);
 });
-test('sequential changes inherit the latest proposal, explicit all-in overrides cash, and staff estimates recompute',()=>{
+test('sequential changes inherit the latest proposal, all budget wording compares cash, and staff estimates recompute',()=>{
  const draft=base(),one=proposePlanRevision(undefined,draft,'I have a budget of $6,000 including staff time',selection);
- assert.equal(one.record.result.budget.headroom,340);
+ assert.equal(one.record.result.budget.headroom,2500);
  const two=proposePlanRevision(one.history,draft,'use 20 participants',selection);
- assert.equal(two.record.result.deliveryEstimate.hours,56);assert.equal(two.record.result.budget.employeeTime,3360);assert.equal(two.record.result.budget.headroom,-860);assert.equal(two.record.result.budget.status,'over');
+ assert.equal(two.record.result.deliveryEstimate.hours,56);assert.equal(two.record.result.budget.employeeTime,null);assert.equal(two.record.result.budget.headroom,2500);assert.equal(two.record.result.budget.status,'within');
  const three=proposePlanRevision(two.history,draft,'our budget is 7k',selection);
- assert.equal(three.record.result.budget.basis,'all-in');assert.equal(three.record.result.budget.headroom,140);assert.equal(three.history.revisions.length,3);assert.equal(three.history.revisions[0].result.deliveryEstimate.hours,36);
+ assert.equal(three.record.result.budget.basis,'cash');assert.equal(three.record.result.budget.headroom,3500);assert.equal(three.history.revisions.length,3);assert.equal(three.history.revisions[0].result.deliveryEstimate.hours,36);
  assert.deepEqual(currentPlanRevision(readPlanRevisions(JSON.parse(JSON.stringify(three.history)),binding.goalId),draft),three.record);
 });
 test('zero limits, incomplete estimates, unsupported currency and ambiguous changes stay honest',()=>{
@@ -67,14 +67,14 @@ test('compound participants and budget statement creates one atomic reviewed rev
   const proposed=proposePlanRevision(undefined,draft,request,selection),{record}=proposed;
   assert.equal(proposed.history.revisions.length,1);assert.equal(record.draft.revision,draft.revision+1);
   assert.equal(record.result.deliveryEstimate.participants,20);assert.equal(record.result.deliveryEstimate.hours,56);
-  assert.equal(record.result.budget.limit,8000);assert.equal(record.result.budget.cash,3500);assert.equal(record.result.budget.employeeTime,3360);assert.equal(record.result.budget.headroom,4500);
+  assert.equal(record.result.budget.limit,8000);assert.equal(record.result.budget.cash,3500);assert.equal(record.result.budget.employeeTime,null);assert.equal(record.result.budget.headroom,4500);
   assert.deepEqual(record.draft.inputs.expenses,draft.inputs.expenses);assert.deepEqual(record.draft.inputs.scope,draft.inputs.scope);assert.deepEqual(record.draft.inputs.timing,draft.inputs.timing);
   assert.equal(record.draft.inputs.groups[0].count.kind,'user-entered');assert.equal(record.draft.inputs.budget.amount.kind,'user-entered');
   assert.deepEqual(readPlanRevisions(proposed.history,draft.binding.goalId),proposed.history);
   assert.equal(JSON.stringify(draft),before);
  }
  const allIn=proposePlanRevision(undefined,draft,'i have 20 participants and a budget of $8000 including staff time',selection);
- assert.equal(allIn.record.result.budget.basis,'all-in');assert.equal(allIn.record.result.budget.headroom,1140);
+ assert.equal(allIn.record.result.budget.basis,'cash');assert.equal(allIn.record.result.budget.headroom,4500);
 });
 
 test('invalid or ambiguous compound values never partly change the plan or turn a limit into an expense',()=>{

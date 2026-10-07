@@ -4,7 +4,7 @@ import {whatIfScope} from './home-plan-what-if.ts';
 import {withDeliveryAssumptions} from "./home-plan-delivery-estimate.ts";
 // Local, bounded text edits. No model call, calculation, persistence or inferred values.
 // @ts-expect-error Native Node tests share TypeScript source.
-import {bundleInputKey,readBundleDraft,reviseBundleDraft,unknownAssumption,type Assumption,type BundleDraft,type BundleInputs} from './home-bundle-reconciliation.ts';
+import {bundleInputKey,cashHoursInputs,readBundleDraft,reviseBundleDraft,unknownAssumption,type Assumption,type BundleDraft,type BundleInputs} from './home-bundle-reconciliation.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {pilotAllowances} from './home-action-plan-pilot.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -27,9 +27,10 @@ function targets(input:BundleInputs,draft:BundleDraft){
  if(input.whatIf){const scenario=input.whatIf;for(const [key,label,type,aliases] of (scenario.kind==='turnover'?[
   ['baseline','Baseline turnover','percent',['baseline turnover rate','baseline rate']],['target','Target turnover','percent',['target turnover rate','turnover target','success target']],['population','Average workforce','count',['outcome population','denominator']],
  ]:[['baseline','Baseline additional roles','count',['baseline coverage']],['target','Target additional roles','count',['additional roles','capacity target','success target']],['unitCost','Monthly cost per role','money',['monthly role cost','role monthly cost']]]) as [keyof Pick<typeof scenario,'baseline'|'target'|'population'|'unitCost'>,string,Target['type'],string[]][]){add({key:'whatIf.'+key,label,type,read:()=>scenario[key],write:value=>{scenario[key]=value as Assumption<number>;}},aliases);}}
- if(input.deliveryEstimate){const delivery=input.deliveryEstimate;for(const [key,label,type,aliases] of [['hoursPerParticipant','Hours per participant','count',['assessment hours per participant']],['coordinationHours','Coordination hours','count',['staff coordination hours']],['hourlyRate','Staff hourly rate','money',['hourly rate','staff rate']],['acceptance','Acceptance criteria','text',['success criteria']]] as const)add({key:'deliveryEstimate.'+key,label,type,read:()=>delivery[key],write:value=>{if(key==='acceptance')delivery.acceptance=value as Assumption<string>;else delivery[key]=value as Assumption<number>;}},[...aliases]);}
+ if(input.deliveryEstimate){const delivery=input.deliveryEstimate;for(const [key,label,type,aliases] of [['hoursPerParticipant','Hours per participant','count',['assessment hours per participant']],['coordinationHours','Coordination hours','count',['staff coordination hours']],['hourlyRate','Staff hourly rate','money',['hourly rate','staff rate']],['acceptance','Acceptance criteria','text',['success criteria']]] as const){if(input.costPolicy&&key==='hourlyRate')continue;add({key:'deliveryEstimate.'+key,label,type,read:()=>delivery[key],write:value=>{if(key==='acceptance')delivery.acceptance=value as Assumption<string>;else delivery[key]=value as Assumption<number>;}},[...aliases]);}}
  for(const group of input.groups)add({key:'group.'+group.id,label:group.id==='pilot-group'&&draft.pilot&&input.groups.length===1?'Pilot participants':group.label+' participants',type:'count',read:()=>group.count,write:value=>{group.count=value as Assumption<number>;}},[group.label+' participants',group.id+' participants',...(input.groups.length===1?['participants','pilot participants']:[])]);
  for(const expense of input.expenses){
+  if(input.costPolicy&&expense.kind==='employee_time')continue;
   const pilot=pilotAllowances[expense.id.slice(6) as keyof typeof pilotAllowances],label=pilot?.label??expense.label;
   add({key:'expense.'+expense.id+'.amount',label:label+' amount (USD)',type:'money',read:()=>expense.amount,write:value=>{expense.amount=value as Assumption<number>;}},[label,label+' amount',expense.label,expense.id+' amount',...(expense.kind==='cash'?[label+' allowance',label+' cash allowance',label+' cash amount',...(expense.months.value===1?[label+' one-time allowance',label+' one-time cash allowance']:[])]:[])]);
   add({key:'expense.'+expense.id+'.months',label:label+' occurrences',type:'months',read:()=>expense.months,write:value=>{expense.months=value as Assumption<number>;}},[expense.id+' occurrences']);
@@ -109,22 +110,23 @@ function parseValue(raw:string,target:Target):Assumption<string|number>{
  return {value,kind,basis:kind==='illustrative'?'Explicit illustrative assumption accepted from a reviewed text edit; not evidence.':'Explicit user assumption accepted from a reviewed text edit; not independently verified.'};
 }
 /** Review only; all clauses must be unambiguous and valid before any proposal is returned. */
-export function previewBundleChatEdit(draft:BundleDraft,request:string,selection?:BundleEditSelection):BundleEditPreview{
+export function previewBundleChatEdit(draft:BundleDraft,request:string,selection?:BundleEditSelection,legacyReplay=false):BundleEditPreview{
  if(!readBundleDraft(draft))fail('This plan draft cannot be verified. Your work is kept.');
  if(!request.trim()||request.length>1200)fail('Describe up to six edits in 1,200 characters.');
  // Only a final complete preservation instruction is optional; never discard intervening requests.
  if(/^(?:please\s+)?(?:make|fill(?: in)?|complete|add|use)\s+(?:(?:all|the|missing|remaining|needed|necessary|starting|reasonable)\s+)*assumptions(?:\s+(?:so (?:you|we) (?:have|get|can see) an outcome|to (?:show|give|have) an outcome))?[.!]?$/i.test(selectedPlanRequest(request,selection))){
-  const completed=withDeliveryAssumptions(draft.inputs,draft.bundle.components.length);
-  if(draft.inputs.deliveryEstimate)fail('Starting assumptions are already shown. Change hours per participant, coordination hours, staff hourly rate or acceptance criteria in chat.');
-  return {inputKey:bundleInputKey(draft),request,inputs:completed,changes:[{field:'Delivery estimate assumptions',before:{value:null,kind:'unknown',basis:null},after:{value:'2 hours per participant, 8 coordination hours per component, $60 per hour and proposed acceptance criteria',kind:'illustrative',basis:'Proposed local assumptions; review before applying.'}}]};
+  const completed=withDeliveryAssumptions(legacyReplay?draft.inputs:cashHoursInputs(draft.inputs),draft.bundle.components.length);
+  if(draft.inputs.deliveryEstimate)fail('Starting assumptions are already shown. Change hours per participant, coordination hours or acceptance criteria in chat.');
+  return {inputKey:bundleInputKey(draft),request,inputs:completed,changes:[{field:'Delivery estimate assumptions',before:{value:null,kind:'unknown',basis:null},after:{value:legacyReplay?'2 hours per participant, 8 coordination hours per component, $60 per hour and proposed acceptance criteria':'2 hours per participant, 8 coordination hours per component and proposed acceptance criteria',kind:'illustrative',basis:'Proposed local assumptions; review before applying.'}}]};
  }
+ if(!legacyReplay&&/\b(?:hourly (?:rate|cost)|staff rate)\b/i.test(request))fail('Action Plans track staff effort in hours, without a monetary rate. Change hours per participant or coordination hours instead.');
  const editRequest=selectedPlanRequest(request,selection).trim().replace(/\.\s+Keep (?:all )?other assumptions unchanged\.?$/i,'');
  // Split only recognized independent edits, including a shared "I have" subject.
  // Keep amounts, expense labels and budget-basis qualifiers intact; validation
  // still rejects the entire proposal if any clause is ambiguous or invalid.
  const clauses=editRequest.split(/;|\n|\s+and\s+(?=(?:start|make|use|set|change|update|move|run)\b|(?:(?:i|we)\s+)?(?:have|only have)\b|(?:(?:a|my|our|the)\s+)?(?:(?:cash|all-in|total|overall|plan)\s+)?budget\b|(?:\d[\d,]*|twenty)\s+participants\b)/i).map(value=>value.trim()).filter(Boolean).map(value=>/^(?:\d[\d,]*|twenty)\s+participants\b/i.test(value)?'use '+value:value);
  if(!clauses.length||clauses.length>6)fail('Use up to six changes, separated by semicolons.');
- const inputs=structuredClone(draft.inputs),available=targets(inputs,draft),changes:BundleEditChange[]=[],seen=new Set<string>();
+ const inputs=legacyReplay?structuredClone(draft.inputs):cashHoursInputs(draft.inputs),available=targets(inputs,draft),changes:BundleEditChange[]=[],seen=new Set<string>();
  for(const clause of clauses){
   const budget=budgetClause(clause);
   if(budget){
@@ -132,7 +134,7 @@ export function previewBundleChatEdit(draft:BundleDraft,request:string,selection
    const target:Target={key:'budget',label:'Budget limit',type:'money',read:()=>inputs.budget?.amount??unknownAssumption(),write:()=>{}};
    const amount=parseValue(budget.amount,target) as Assumption<number>;
    const before=inputs.budget;
-   const basis=budget.basis?{value:budget.basis,kind:'user-entered' as const,basis:'Explicit user budget basis; not an expense.'}:before?.basis??{value:'cash' as const,kind:'illustrative' as const,basis:'Proposed cash ceiling, retaining this plan’s separate cash and employee-time convention for its shared planning horizon.'};
+   const basis=!legacyReplay?{value:'cash' as const,kind:budget.basis?'user-entered' as const:'illustrative' as const,basis:'Cash spending ceiling for the shared planning horizon; staff hours are tracked separately without a monetary value.'}:budget.basis?{value:budget.basis,kind:'user-entered' as const,basis:'Explicit user budget basis; not an expense.'}:before?.basis??{value:'cash' as const,kind:'illustrative' as const,basis:'Proposed cash ceiling, retaining this plan’s separate cash and employee-time convention for its shared planning horizon.'};
    if(before?.amount.value!==amount.value||JSON.stringify(before?.basis)!==JSON.stringify(basis)){
     inputs.budget={amount,basis};changes.push({field:'Budget limit (USD)',before:before?.amount??unknownAssumption(),after:amount});
     if(before?.basis.value!==basis.value)changes.push({field:'Budget basis',before:before?.basis??unknownAssumption(),after:basis});
@@ -153,15 +155,16 @@ export function previewBundleChatEdit(draft:BundleDraft,request:string,selection
  // A changed horizon must not silently move component dates, expenses or the frozen preset.
  for(const timing of inputs.timing)if(timing.start.value&&timing.finish.value&&timing.start.value>timing.finish.value)fail('A component finish cannot precede its start. Review both dates.');
  if(changes.some(change=>['Population','Shared start month','Shared horizon','Comparison requirements'].includes(change.field)))inputs.scope.comparisonConfirmed=unknownAssumption();
- reviseBundleDraft(draft,inputs); // Reuse the strict draft validator without calculating.
+ reviseBundleDraft(draft,inputs,legacyReplay); // Reuse the strict draft validator without calculating.
  return {inputKey:bundleInputKey(draft),request,changes,inputs};
 }
 /** Reconstruct the proposal from its original text; never trust a mutated preview payload. */
 export function acceptBundleChatEdit(draft:BundleDraft,preview:BundleEditPreview,selection?:BundleEditSelection):BundleDraft{
  if(bundleInputKey(draft)!==preview.inputKey)fail('The selected plan, goal or assumptions changed. Review a fresh edit proposal.');
- const checked=previewBundleChatEdit(draft,preview.request,selection);
+ const legacyReplay=!preview.inputs.costPolicy;
+ const checked=previewBundleChatEdit(draft,preview.request,selection,legacyReplay);
  if(JSON.stringify(checked)!==JSON.stringify(preview))fail('The edit proposal changed. Review it again before accepting.');
- return reviseBundleDraft(draft,checked.inputs);
+ return reviseBundleDraft(draft,checked.inputs,legacyReplay);
 }
 
 export type BundleEditExample={field:string;current:Assumption<string|number>;command:string;unit:string};

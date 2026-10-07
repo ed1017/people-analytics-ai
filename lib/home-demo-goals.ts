@@ -22,7 +22,7 @@ export function createHomeDemoGoals(now=new Date().toISOString()):Pick<DecisionD
   input.costReviews=[{componentId:'c1',complete:{value:true,kind:'illustrative',basis:'Fictional demo assumes the listed pilot allowance covers this component; real costs and funding remain unverified.'}}];
   input.expenses=[{id:'demo-budget',label:'Pilot allowance',kind:'cash',amount:assumed(example.budget),startMonth:assumed(start.slice(0,7)),months:assumed(1)}];
   input.expenseLinks=[{expenseId:'demo-budget',componentIds:['c1'],allocations:null}];
-  input.deliveryEstimate={hoursPerParticipant:assumed(4),coordinationHours:assumed(8),hourlyRate:assumed(60),acceptance:assumed(example.acceptance)};
+  input.deliveryEstimate={hoursPerParticipant:assumed(4),coordinationHours:assumed(8),hourlyRate:{value:null,kind:'unknown',basis:null},acceptance:assumed(example.acceptance)};
   const prepared=reviseBundleDraft(draft,input),workspace=attachBundlePatch(undefined,prepared,{confirmed:true,bindingKey:actionBindingKey(binding),inputKey:bundleInputKey(prepared),acknowledgeUnknowns:true},`${example.id}-attached`,now).value;
   return [example.id,{savedAt:now,fields:{[homeDemoField]:{version:1,key:example.key,preparedAt:now},[bundleWorkspaceField]:workspace} as unknown as Record<string,Json>}];
  }))};

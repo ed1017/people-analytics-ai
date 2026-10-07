@@ -115,7 +115,7 @@ function ApplicationReview(props: Props) {
       {!development?.options?.length && <p className="text-xs">No Development option exists yet. Carry a selected quote from Training &amp; Coaching to Development Planning first.</p>}
       {componentId && optionIndex !== '' && <div className="space-y-2 text-xs">
         <label className="flex gap-2"><input type="checkbox" disabled={busy || props.disabled} checked={quoteReviewed} onChange={event => setQuoteReviewed(event.target.checked)}/>I reviewed the currently selected quote for this component, population and horizon, including currency and fee basis.</label>
-        <label className="flex gap-2"><input type="checkbox" disabled={busy || props.disabled || !quoteReviewed} checked={hourlyReviewed} onChange={event => setHourlyReviewed(event.target.checked)}/>The loaded hourly rate applies to the same employee population in USD per hour.</label>
+
       </div>}
       {solution && props.draft.inputs.capacity ? <label className="flex gap-2 text-xs"><input type="checkbox" disabled={busy || props.disabled} checked={capacityReviewed} onChange={event => setCapacityReviewed(event.target.checked)}/>I reviewed these additional-capacity assumptions for workforce plan version {currentSolutionVersion(solution).version}, with the same goal and scope.</label> : <p className="text-xs">Capacity mapping needs an existing local workforce plan and explicit capacity assumptions in this Action Plan.</p>}
       <button className={button} disabled={busy || props.disabled} onClick={() => void buildPreview()}>{busy ? 'Checking…' : preview ? 'Update application preview' : 'Build application preview'}</button>

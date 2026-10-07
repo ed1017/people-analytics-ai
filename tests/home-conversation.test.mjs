@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {homeTurnPurpose,homeEvidenceSelection} from '../lib/home-conversation.ts';
+import {homeTurnPurpose,homeEvidenceSelection,homeConversationInstructions} from '../lib/home-conversation.ts';
 import {buildHomePack,normalizeHomePack,HOME_SOURCE_BYTES} from '../lib/home-pack.mjs';
 
 const prior=[{role:'user',content:'why was turnover high in April 2026'},{role:'assistant',content:'Monthly company counts do not explain why people left.'}];
@@ -63,4 +63,12 @@ test('exact April clarification carries both requested months from sources, igno
  const missing=structuredClone(sourceData);missing.attrition.data.trend=missing.attrition.data.trend.filter(r=>r.month!=='2025-04-01');
  const packet=buildHomePack(missing,'Company-wide',homeEvidenceSelection(followup,history));
  assert.ok(!packet.sources.find(s=>s.id==='A1').facts.monthly.some(r=>r.month==='2025-04-01'));
+});
+
+test('Home answers keep Action Plan budgets cash-only and never monetize staff hours',()=>{
+ for(const purpose of ['answer','goal','discovery','plan']){
+  const instructions=homeConversationInstructions(purpose);
+  assert.match(instructions,/cash expenses only and report employee effort in hours/);
+  assert.match(instructions,/Do not price staff hours/);assert.match(instructions,/keep unentered cash costs unknown/);
+ }
 });

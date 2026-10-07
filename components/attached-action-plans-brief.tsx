@@ -1,5 +1,7 @@
 "use client";
 import {readBundleWorkspace,type BundleAttachment} from '@/lib/home-bundle-records';
+import {planStaffHours} from '@/lib/home-plan-delivery-estimate';
+import {planBudgetText} from '@/lib/home-plan-revisions';
 import {bundleInputKey} from '@/lib/home-bundle-reconciliation';
 import {bundleDisplayText,bundleAssumptionText,bundleComponentLabels} from '@/lib/home-bundle-display';
 import {measurementScope,successMeasureText} from '@/lib/home-success-measures';
@@ -18,7 +20,8 @@ export function AttachedActionPlansBrief({raw,goalId,goal,onReview}:{raw:unknown
    {edited&&!superseded.has(item.id)&&<p>A different working draft is saved on Home. This attachment has not been replaced by that draft.</p>}
    <p className="break-words">Saved goal: {draft.binding.goal}</p>
    <p className="break-words">{bundleDisplayText(draft.bundle.objective,draft.bundle)}</p>
-   <p>Snapshot cash: {money(result.cashTotal)}. Employee time value: {money(result.employeeTimeTotal)} (separate from cash). Plan finish: {result.planFinish??'Unknown'}.</p>
+   <p>Snapshot cash: {money(result.cashTotal)}. Staff hours: {planStaffHours(draft)??'Unknown'}. Plan finish: {result.planFinish??'Unknown'}.</p>
+   {result.budget&&<p>{planBudgetText(result)}</p>}
    <p className="break-words">How success is measured: {successMeasureText(measure,!measure||measure.scopeKey===measurementScope(draft.inputs))}</p>
    {measure?.baseline.basis&&<p className="break-words text-xs">Saved baseline provenance: {measure.baseline.basis}</p>}
    <details><summary className="min-h-11 cursor-pointer py-2 font-medium">Saved assumptions, activities and unknowns</summary><div className="space-y-3 pt-2">

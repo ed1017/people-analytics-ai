@@ -1,0 +1,3188 @@
+{
+  "sourceCommit": "4a38fe6a319b6c8ca8f39c0f27044c904dd85f08",
+  "base": {
+    "version": 1,
+    "status": "proposal",
+    "binding": {
+      "version": 1,
+      "goalId": "legacy-cash-hours",
+      "goal": "Reduce turnover",
+      "evidenceDigest": "0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0",
+      "planningDigest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    "bundle": {
+      "id": "A",
+      "name": "Develop internally with targeted hiring",
+      "objective": "Prioritize internal capability with targeted hiring",
+      "coordination": "Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.",
+      "components": [
+        {
+          "id": "c1",
+          "name": "Manager and workload review",
+          "domain": "manager_workload",
+          "firstStep": "Review workload and manager support with the business owner before choosing the staffing response.",
+          "ownerRole": "Business owner",
+          "dependsOn": [],
+          "evidence": [
+            "W1:summary"
+          ],
+          "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+        },
+        {
+          "id": "c2",
+          "name": "Finance and execution checkpoints",
+          "domain": "execution",
+          "firstStep": "Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.",
+          "ownerRole": "Finance partner",
+          "dependsOn": [
+            "c1"
+          ],
+          "evidence": [
+            "W1:summary"
+          ],
+          "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+        }
+      ],
+      "limitation": "The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated."
+    },
+    "signature": "{\"id\":\"A\",\"name\":\"Develop internally with targeted hiring\",\"objective\":\"Prioritize internal capability with targeted hiring\",\"coordination\":\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\",\"components\":[{\"id\":\"c1\",\"name\":\"Manager and workload review\",\"domain\":\"manager_workload\",\"firstStep\":\"Review workload and manager support with the business owner before choosing the staffing response.\",\"ownerRole\":\"Business owner\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"},{\"id\":\"c2\",\"name\":\"Finance and execution checkpoints\",\"domain\":\"execution\",\"firstStep\":\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\",\"ownerRole\":\"Finance partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"}],\"limitation\":\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\"}",
+    "revision": 2,
+    "inputs": {
+      "scope": {
+        "population": {
+          "value": "Hypothetical shared pilot group — not selected employees",
+          "kind": "illustrative",
+          "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+        },
+        "businessUnit": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "jobProfile": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "startMonth": {
+          "value": "2026-11",
+          "kind": "illustrative",
+          "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+        },
+        "months": {
+          "value": 3,
+          "kind": "illustrative",
+          "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+        },
+        "demand": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "capacityRequired": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "requirements": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "comparisonConfirmed": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        },
+        "currency": "USD"
+      },
+      "capacity": null,
+      "timing": [
+        {
+          "componentId": "c1",
+          "start": {
+            "value": "2026-11-01",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "finish": {
+            "value": "2026-11-14",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          }
+        },
+        {
+          "componentId": "c2",
+          "start": {
+            "value": "2026-11-15",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "finish": {
+            "value": "2026-11-28",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          }
+        }
+      ],
+      "dependenciesConfirmed": {
+        "value": null,
+        "kind": "unknown",
+        "basis": null
+      },
+      "groups": [
+        {
+          "id": "pilot-group",
+          "label": "Illustrative shared pilot group; not selected employees",
+          "count": {
+            "value": 10,
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          }
+        }
+      ],
+      "memberships": [
+        {
+          "componentId": "c1",
+          "groupIds": [
+            "pilot-group"
+          ],
+          "complete": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          }
+        },
+        {
+          "componentId": "c2",
+          "groupIds": [
+            "pilot-group"
+          ],
+          "complete": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          }
+        }
+      ],
+      "groupsDisjoint": {
+        "value": null,
+        "kind": "unknown",
+        "basis": null
+      },
+      "expenses": [
+        {
+          "id": "pilot-manager_workload",
+          "label": "DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes",
+          "kind": "cash",
+          "amount": {
+            "value": 1000,
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "startMonth": {
+            "value": "2026-11",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "months": {
+            "value": 3,
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          }
+        },
+        {
+          "id": "pilot-execution",
+          "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+          "kind": "cash",
+          "amount": {
+            "value": 500,
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "startMonth": {
+            "value": "2026-11",
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          },
+          "months": {
+            "value": 1,
+            "kind": "illustrative",
+            "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+          }
+        }
+      ],
+      "expenseLinks": [
+        {
+          "expenseId": "pilot-manager_workload",
+          "componentIds": [
+            "c1"
+          ],
+          "allocations": null
+        },
+        {
+          "expenseId": "pilot-execution",
+          "componentIds": [
+            "c2"
+          ],
+          "allocations": null
+        }
+      ],
+      "costReviews": [
+        {
+          "componentId": "c1",
+          "complete": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          }
+        },
+        {
+          "componentId": "c2",
+          "complete": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          }
+        }
+      ],
+      "costsDistinct": {
+        "value": null,
+        "kind": "unknown",
+        "basis": null
+      },
+      "whatIf": {
+        "version": 1,
+        "kind": "turnover",
+        "scopeKey": "[\"Hypothetical shared pilot group — not selected employees\",\"2026-11\",3]",
+        "baseline": {
+          "value": 15,
+          "kind": "illustrative",
+          "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+        },
+        "target": {
+          "value": 12,
+          "kind": "illustrative",
+          "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+        },
+        "population": {
+          "value": 100,
+          "kind": "illustrative",
+          "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+        },
+        "unitCost": {
+          "value": null,
+          "kind": "unknown",
+          "basis": null
+        }
+      },
+      "deliveryEstimate": {
+        "hoursPerParticipant": {
+          "value": 2,
+          "kind": "illustrative",
+          "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+        },
+        "coordinationHours": {
+          "value": 16,
+          "kind": "illustrative",
+          "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+        },
+        "hourlyRate": {
+          "value": 60,
+          "kind": "illustrative",
+          "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+        },
+        "acceptance": {
+          "value": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.",
+          "kind": "illustrative",
+          "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+        }
+      }
+    },
+    "pilot": {
+      "version": "illustrative-pilot-v1",
+      "preparedAt": "2026-10-06T12:00:00.000Z",
+      "timezone": "UTC"
+    }
+  },
+  "history": {
+    "version": 1,
+    "goalId": "legacy-cash-hours",
+    "revisions": [
+      {
+        "request": "I have a budget of $6000 including staff time",
+        "selection": {
+          "option": 1,
+          "count": 3
+        },
+        "before": {
+          "version": 1,
+          "status": "proposal",
+          "binding": {
+            "version": 1,
+            "goalId": "legacy-cash-hours",
+            "goal": "Reduce turnover",
+            "evidenceDigest": "0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0",
+            "planningDigest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+          },
+          "bundle": {
+            "id": "A",
+            "name": "Develop internally with targeted hiring",
+            "objective": "Prioritize internal capability with targeted hiring",
+            "coordination": "Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.",
+            "components": [
+              {
+                "id": "c1",
+                "name": "Manager and workload review",
+                "domain": "manager_workload",
+                "firstStep": "Review workload and manager support with the business owner before choosing the staffing response.",
+                "ownerRole": "Business owner",
+                "dependsOn": [],
+                "evidence": [
+                  "W1:summary"
+                ],
+                "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+              },
+              {
+                "id": "c2",
+                "name": "Finance and execution checkpoints",
+                "domain": "execution",
+                "firstStep": "Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.",
+                "ownerRole": "Finance partner",
+                "dependsOn": [
+                  "c1"
+                ],
+                "evidence": [
+                  "W1:summary"
+                ],
+                "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+              }
+            ],
+            "limitation": "The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated."
+          },
+          "signature": "{\"id\":\"A\",\"name\":\"Develop internally with targeted hiring\",\"objective\":\"Prioritize internal capability with targeted hiring\",\"coordination\":\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\",\"components\":[{\"id\":\"c1\",\"name\":\"Manager and workload review\",\"domain\":\"manager_workload\",\"firstStep\":\"Review workload and manager support with the business owner before choosing the staffing response.\",\"ownerRole\":\"Business owner\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"},{\"id\":\"c2\",\"name\":\"Finance and execution checkpoints\",\"domain\":\"execution\",\"firstStep\":\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\",\"ownerRole\":\"Finance partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"}],\"limitation\":\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\"}",
+          "revision": 2,
+          "inputs": {
+            "scope": {
+              "population": {
+                "value": "Hypothetical shared pilot group — not selected employees",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "businessUnit": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "jobProfile": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "startMonth": {
+                "value": "2026-11",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "months": {
+                "value": 3,
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "demand": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "capacityRequired": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "requirements": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "comparisonConfirmed": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "currency": "USD"
+            },
+            "capacity": null,
+            "timing": [
+              {
+                "componentId": "c1",
+                "start": {
+                  "value": "2026-11-01",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "finish": {
+                  "value": "2026-11-14",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              },
+              {
+                "componentId": "c2",
+                "start": {
+                  "value": "2026-11-15",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "finish": {
+                  "value": "2026-11-28",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "dependenciesConfirmed": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "groups": [
+              {
+                "id": "pilot-group",
+                "label": "Illustrative shared pilot group; not selected employees",
+                "count": {
+                  "value": 10,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "memberships": [
+              {
+                "componentId": "c1",
+                "groupIds": [
+                  "pilot-group"
+                ],
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              },
+              {
+                "componentId": "c2",
+                "groupIds": [
+                  "pilot-group"
+                ],
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              }
+            ],
+            "groupsDisjoint": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "expenses": [
+              {
+                "id": "pilot-manager_workload",
+                "label": "DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes",
+                "kind": "cash",
+                "amount": {
+                  "value": 1000,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "startMonth": {
+                  "value": "2026-11",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "months": {
+                  "value": 3,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              },
+              {
+                "id": "pilot-execution",
+                "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+                "kind": "cash",
+                "amount": {
+                  "value": 500,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "startMonth": {
+                  "value": "2026-11",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "months": {
+                  "value": 1,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "expenseLinks": [
+              {
+                "expenseId": "pilot-manager_workload",
+                "componentIds": [
+                  "c1"
+                ],
+                "allocations": null
+              },
+              {
+                "expenseId": "pilot-execution",
+                "componentIds": [
+                  "c2"
+                ],
+                "allocations": null
+              }
+            ],
+            "costReviews": [
+              {
+                "componentId": "c1",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              },
+              {
+                "componentId": "c2",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              }
+            ],
+            "costsDistinct": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "whatIf": {
+              "version": 1,
+              "kind": "turnover",
+              "scopeKey": "[\"Hypothetical shared pilot group — not selected employees\",\"2026-11\",3]",
+              "baseline": {
+                "value": 15,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "target": {
+                "value": 12,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "population": {
+                "value": 100,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "unitCost": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              }
+            },
+            "deliveryEstimate": {
+              "hoursPerParticipant": {
+                "value": 2,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "coordinationHours": {
+                "value": 16,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "hourlyRate": {
+                "value": 60,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "acceptance": {
+                "value": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.",
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              }
+            }
+          },
+          "pilot": {
+            "version": "illustrative-pilot-v1",
+            "preparedAt": "2026-10-06T12:00:00.000Z",
+            "timezone": "UTC"
+          }
+        },
+        "draft": {
+          "version": 1,
+          "status": "proposal",
+          "binding": {
+            "version": 1,
+            "goalId": "legacy-cash-hours",
+            "goal": "Reduce turnover",
+            "evidenceDigest": "0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0",
+            "planningDigest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+          },
+          "bundle": {
+            "id": "A",
+            "name": "Develop internally with targeted hiring",
+            "objective": "Prioritize internal capability with targeted hiring",
+            "coordination": "Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.",
+            "components": [
+              {
+                "id": "c1",
+                "name": "Manager and workload review",
+                "domain": "manager_workload",
+                "firstStep": "Review workload and manager support with the business owner before choosing the staffing response.",
+                "ownerRole": "Business owner",
+                "dependsOn": [],
+                "evidence": [
+                  "W1:summary"
+                ],
+                "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+              },
+              {
+                "id": "c2",
+                "name": "Finance and execution checkpoints",
+                "domain": "execution",
+                "firstStep": "Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.",
+                "ownerRole": "Finance partner",
+                "dependsOn": [
+                  "c1"
+                ],
+                "evidence": [
+                  "W1:summary"
+                ],
+                "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+              }
+            ],
+            "limitation": "The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated."
+          },
+          "signature": "{\"id\":\"A\",\"name\":\"Develop internally with targeted hiring\",\"objective\":\"Prioritize internal capability with targeted hiring\",\"coordination\":\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\",\"components\":[{\"id\":\"c1\",\"name\":\"Manager and workload review\",\"domain\":\"manager_workload\",\"firstStep\":\"Review workload and manager support with the business owner before choosing the staffing response.\",\"ownerRole\":\"Business owner\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"},{\"id\":\"c2\",\"name\":\"Finance and execution checkpoints\",\"domain\":\"execution\",\"firstStep\":\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\",\"ownerRole\":\"Finance partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"}],\"limitation\":\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\"}",
+          "revision": 3,
+          "inputs": {
+            "scope": {
+              "population": {
+                "value": "Hypothetical shared pilot group — not selected employees",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "businessUnit": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "jobProfile": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "startMonth": {
+                "value": "2026-11",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "months": {
+                "value": 3,
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "demand": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "capacityRequired": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "requirements": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "comparisonConfirmed": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "currency": "USD"
+            },
+            "capacity": null,
+            "timing": [
+              {
+                "componentId": "c1",
+                "start": {
+                  "value": "2026-11-01",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "finish": {
+                  "value": "2026-11-14",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              },
+              {
+                "componentId": "c2",
+                "start": {
+                  "value": "2026-11-15",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "finish": {
+                  "value": "2026-11-28",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "dependenciesConfirmed": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "groups": [
+              {
+                "id": "pilot-group",
+                "label": "Illustrative shared pilot group; not selected employees",
+                "count": {
+                  "value": 10,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "memberships": [
+              {
+                "componentId": "c1",
+                "groupIds": [
+                  "pilot-group"
+                ],
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              },
+              {
+                "componentId": "c2",
+                "groupIds": [
+                  "pilot-group"
+                ],
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              }
+            ],
+            "groupsDisjoint": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "expenses": [
+              {
+                "id": "pilot-manager_workload",
+                "label": "DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes",
+                "kind": "cash",
+                "amount": {
+                  "value": 1000,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "startMonth": {
+                  "value": "2026-11",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "months": {
+                  "value": 3,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              },
+              {
+                "id": "pilot-execution",
+                "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+                "kind": "cash",
+                "amount": {
+                  "value": 500,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "startMonth": {
+                  "value": "2026-11",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "months": {
+                  "value": 1,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "expenseLinks": [
+              {
+                "expenseId": "pilot-manager_workload",
+                "componentIds": [
+                  "c1"
+                ],
+                "allocations": null
+              },
+              {
+                "expenseId": "pilot-execution",
+                "componentIds": [
+                  "c2"
+                ],
+                "allocations": null
+              }
+            ],
+            "costReviews": [
+              {
+                "componentId": "c1",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              },
+              {
+                "componentId": "c2",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              }
+            ],
+            "costsDistinct": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "whatIf": {
+              "version": 1,
+              "kind": "turnover",
+              "scopeKey": "[\"Hypothetical shared pilot group — not selected employees\",\"2026-11\",3]",
+              "baseline": {
+                "value": 15,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "target": {
+                "value": 12,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "population": {
+                "value": 100,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "unitCost": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              }
+            },
+            "deliveryEstimate": {
+              "hoursPerParticipant": {
+                "value": 2,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "coordinationHours": {
+                "value": 16,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "hourlyRate": {
+                "value": 60,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "acceptance": {
+                "value": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.",
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              }
+            },
+            "budget": {
+              "amount": {
+                "value": 6000,
+                "kind": "user-entered",
+                "basis": "Explicit user assumption accepted from a reviewed text edit; not independently verified."
+              },
+              "basis": {
+                "value": "all-in",
+                "kind": "user-entered",
+                "basis": "Explicit user budget basis; not an expense."
+              }
+            }
+          },
+          "pilot": {
+            "version": "illustrative-pilot-v1",
+            "preparedAt": "2026-10-06T12:00:00.000Z",
+            "timezone": "UTC"
+          }
+        },
+        "result": {
+          "budget": {
+            "limit": 6000,
+            "basis": "all-in",
+            "cash": 3500,
+            "employeeTime": 2160,
+            "comparedCost": 5660,
+            "headroom": 340,
+            "status": "within",
+            "assumed": true
+          },
+          "deliveryEstimate": {
+            "participants": 10,
+            "hours": 36,
+            "employeeTime": 2160,
+            "cash": 3500,
+            "finish": "2026-11-28",
+            "deliverables": [
+              "one completed work package: Manager and workload review",
+              "one completed work package: Finance and execution checkpoints"
+            ],
+            "usesEnteredTime": false,
+            "acceptance": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish."
+          },
+          "whatIf": {
+            "status": "ready",
+            "kind": "turnover",
+            "start": "2026-11",
+            "months": 3,
+            "baseline": 15,
+            "target": 12,
+            "population": 100,
+            "unitCost": null,
+            "baselineCount": 15,
+            "targetCount": 12,
+            "change": -3,
+            "listedCash": 3500,
+            "roleCash": 0,
+            "cash": 3500
+          },
+          "method": "coordinated-bundle-v1",
+          "revision": 3,
+          "signature": "{\"id\":\"A\",\"name\":\"Develop internally with targeted hiring\",\"objective\":\"Prioritize internal capability with targeted hiring\",\"coordination\":\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\",\"components\":[{\"id\":\"c1\",\"name\":\"Manager and workload review\",\"domain\":\"manager_workload\",\"firstStep\":\"Review workload and manager support with the business owner before choosing the staffing response.\",\"ownerRole\":\"Business owner\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"},{\"id\":\"c2\",\"name\":\"Finance and execution checkpoints\",\"domain\":\"execution\",\"firstStep\":\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\",\"ownerRole\":\"Finance partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"}],\"limitation\":\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\"}",
+          "bindingKey": "{\"evidenceDigest\":\"0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0\",\"goal\":\"Reduce turnover\",\"goalId\":\"legacy-cash-hours\",\"planningDigest\":\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\",\"version\":1}",
+          "scope": {
+            "population": {
+              "value": "Hypothetical shared pilot group — not selected employees",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "businessUnit": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "jobProfile": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 3,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "demand": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "capacityRequired": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "requirements": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "comparisonConfirmed": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "currency": "USD"
+          },
+          "ledger": [
+            {
+              "id": "pilot-manager_workload",
+              "label": "DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes",
+              "kind": "cash",
+              "monthly": [
+                1000,
+                1000,
+                1000
+              ],
+              "total": 3000,
+              "componentIds": [
+                "c1"
+              ],
+              "allocations": null
+            },
+            {
+              "id": "pilot-execution",
+              "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+              "kind": "cash",
+              "monthly": [
+                500,
+                0,
+                0
+              ],
+              "total": 500,
+              "componentIds": [
+                "c2"
+              ],
+              "allocations": null
+            }
+          ],
+          "knownCashSubtotal": null,
+          "cashTotal": null,
+          "knownEmployeeTimeSubtotal": null,
+          "employeeTimeTotal": null,
+          "componentCash": {
+            "c1": null,
+            "c2": null
+          },
+          "uniqueParticipants": null,
+          "componentReady": {
+            "c1": null,
+            "c2": null
+          },
+          "planFinish": null,
+          "capacityReadyMonth": null,
+          "conditionalCoverage": null,
+          "plannedAddedEmployees": null,
+          "issues": [
+            "Timing/readiness is unresolved for Manager and workload review.",
+            "Timing/readiness is unresolved for Finance and execution checkpoints.",
+            "Unique participants are unknown until population coverage, counts and overlaps are reviewed.",
+            "Confirm whether additional capacity is required and review its mix before a complete budget.",
+            "Complete budget is Unknown: review each component’s costs, shared sources and distinct additional expenses."
+          ],
+          "limitations": [
+            "All values are reviewed planning assumptions, not causal estimates or operational approvals.",
+            "No retention effects, avoided exits, savings or ROI are summed into this bundle.",
+            "Internal transitions do not add company employees; availability and source-team impact remain unverified.",
+            "Cash and employee time are separate; existing payroll and structural budgets are not added.",
+            "Unique participants covers explicitly reviewed component groups only; it is not company headcount.",
+            "Dependency-gated coverage is conditional and may be later than a paid hire arrival; unknown prerequisites keep readiness Unknown."
+          ],
+          "inputKey": "[\"{\\\"evidenceDigest\\\":\\\"0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0\\\",\\\"goal\\\":\\\"Reduce turnover\\\",\\\"goalId\\\":\\\"legacy-cash-hours\\\",\\\"planningDigest\\\":\\\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\\\",\\\"version\\\":1}\",\"{\\\"id\\\":\\\"A\\\",\\\"name\\\":\\\"Develop internally with targeted hiring\\\",\\\"objective\\\":\\\"Prioritize internal capability with targeted hiring\\\",\\\"coordination\\\":\\\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\\\",\\\"components\\\":[{\\\"id\\\":\\\"c1\\\",\\\"name\\\":\\\"Manager and workload review\\\",\\\"domain\\\":\\\"manager_workload\\\",\\\"firstStep\\\":\\\"Review workload and manager support with the business owner before choosing the staffing response.\\\",\\\"ownerRole\\\":\\\"Business owner\\\",\\\"dependsOn\\\":[],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c2\\\",\\\"name\\\":\\\"Finance and execution checkpoints\\\",\\\"domain\\\":\\\"execution\\\",\\\"firstStep\\\":\\\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\\\",\\\"ownerRole\\\":\\\"Finance partner\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"}],\\\"limitation\\\":\\\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\\\"}\",3,{\"scope\":{\"population\":{\"value\":\"Hypothetical shared pilot group — not selected employees\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"businessUnit\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"jobProfile\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"startMonth\":{\"value\":\"2026-11\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"months\":{\"value\":3,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"demand\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"capacityRequired\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"requirements\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"comparisonConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"currency\":\"USD\"},\"capacity\":null,\"timing\":[{\"componentId\":\"c1\",\"start\":{\"value\":\"2026-11-01\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"finish\":{\"value\":\"2026-11-14\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}},{\"componentId\":\"c2\",\"start\":{\"value\":\"2026-11-15\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"finish\":{\"value\":\"2026-11-28\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}}],\"dependenciesConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"groups\":[{\"id\":\"pilot-group\",\"label\":\"Illustrative shared pilot group; not selected employees\",\"count\":{\"value\":10,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}}],\"memberships\":[{\"componentId\":\"c1\",\"groupIds\":[\"pilot-group\"],\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"groupIds\":[\"pilot-group\"],\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"groupsDisjoint\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"expenses\":[{\"id\":\"pilot-manager_workload\",\"label\":\"DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes\",\"kind\":\"cash\",\"amount\":{\"value\":1000,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"startMonth\":{\"value\":\"2026-11\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"months\":{\"value\":3,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}},{\"id\":\"pilot-execution\",\"label\":\"DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes\",\"kind\":\"cash\",\"amount\":{\"value\":500,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"startMonth\":{\"value\":\"2026-11\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"months\":{\"value\":1,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}}],\"expenseLinks\":[{\"expenseId\":\"pilot-manager_workload\",\"componentIds\":[\"c1\"],\"allocations\":null},{\"expenseId\":\"pilot-execution\",\"componentIds\":[\"c2\"],\"allocations\":null}],\"costReviews\":[{\"componentId\":\"c1\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"costsDistinct\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"whatIf\":{\"version\":1,\"kind\":\"turnover\",\"scopeKey\":\"[\\\"Hypothetical shared pilot group — not selected employees\\\",\\\"2026-11\\\",3]\",\"baseline\":{\"value\":15,\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.\"},\"target\":{\"value\":12,\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.\"},\"population\":{\"value\":100,\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.\"},\"unitCost\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},\"deliveryEstimate\":{\"hoursPerParticipant\":{\"value\":2,\"kind\":\"illustrative\",\"basis\":\"Explicit starting planning assumption; editable through chat, not evidence or an assigned resource.\"},\"coordinationHours\":{\"value\":16,\"kind\":\"illustrative\",\"basis\":\"Explicit starting planning assumption; editable through chat, not evidence or an assigned resource.\"},\"hourlyRate\":{\"value\":60,\"kind\":\"illustrative\",\"basis\":\"Explicit starting planning assumption; editable through chat, not evidence or an assigned resource.\"},\"acceptance\":{\"value\":\"Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.\",\"kind\":\"illustrative\",\"basis\":\"Explicit starting planning assumption; editable through chat, not evidence or an assigned resource.\"}},\"budget\":{\"amount\":{\"value\":6000,\"kind\":\"user-entered\",\"basis\":\"Explicit user assumption accepted from a reviewed text edit; not independently verified.\"},\"basis\":{\"value\":\"all-in\",\"kind\":\"user-entered\",\"basis\":\"Explicit user budget basis; not an expense.\"}}}]"
+        },
+        "discarded": false
+      },
+      {
+        "request": "Set staff hourly rate to 75",
+        "selection": {
+          "option": 1,
+          "count": 3
+        },
+        "before": {
+          "version": 1,
+          "status": "proposal",
+          "binding": {
+            "version": 1,
+            "goalId": "legacy-cash-hours",
+            "goal": "Reduce turnover",
+            "evidenceDigest": "0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0",
+            "planningDigest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+          },
+          "bundle": {
+            "id": "A",
+            "name": "Develop internally with targeted hiring",
+            "objective": "Prioritize internal capability with targeted hiring",
+            "coordination": "Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.",
+            "components": [
+              {
+                "id": "c1",
+                "name": "Manager and workload review",
+                "domain": "manager_workload",
+                "firstStep": "Review workload and manager support with the business owner before choosing the staffing response.",
+                "ownerRole": "Business owner",
+                "dependsOn": [],
+                "evidence": [
+                  "W1:summary"
+                ],
+                "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+              },
+              {
+                "id": "c2",
+                "name": "Finance and execution checkpoints",
+                "domain": "execution",
+                "firstStep": "Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.",
+                "ownerRole": "Finance partner",
+                "dependsOn": [
+                  "c1"
+                ],
+                "evidence": [
+                  "W1:summary"
+                ],
+                "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+              }
+            ],
+            "limitation": "The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated."
+          },
+          "signature": "{\"id\":\"A\",\"name\":\"Develop internally with targeted hiring\",\"objective\":\"Prioritize internal capability with targeted hiring\",\"coordination\":\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\",\"components\":[{\"id\":\"c1\",\"name\":\"Manager and workload review\",\"domain\":\"manager_workload\",\"firstStep\":\"Review workload and manager support with the business owner before choosing the staffing response.\",\"ownerRole\":\"Business owner\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"},{\"id\":\"c2\",\"name\":\"Finance and execution checkpoints\",\"domain\":\"execution\",\"firstStep\":\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\",\"ownerRole\":\"Finance partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"}],\"limitation\":\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\"}",
+          "revision": 3,
+          "inputs": {
+            "scope": {
+              "population": {
+                "value": "Hypothetical shared pilot group — not selected employees",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "businessUnit": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "jobProfile": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "startMonth": {
+                "value": "2026-11",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "months": {
+                "value": 3,
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "demand": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "capacityRequired": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "requirements": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "comparisonConfirmed": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "currency": "USD"
+            },
+            "capacity": null,
+            "timing": [
+              {
+                "componentId": "c1",
+                "start": {
+                  "value": "2026-11-01",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "finish": {
+                  "value": "2026-11-14",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              },
+              {
+                "componentId": "c2",
+                "start": {
+                  "value": "2026-11-15",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "finish": {
+                  "value": "2026-11-28",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "dependenciesConfirmed": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "groups": [
+              {
+                "id": "pilot-group",
+                "label": "Illustrative shared pilot group; not selected employees",
+                "count": {
+                  "value": 10,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "memberships": [
+              {
+                "componentId": "c1",
+                "groupIds": [
+                  "pilot-group"
+                ],
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              },
+              {
+                "componentId": "c2",
+                "groupIds": [
+                  "pilot-group"
+                ],
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              }
+            ],
+            "groupsDisjoint": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "expenses": [
+              {
+                "id": "pilot-manager_workload",
+                "label": "DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes",
+                "kind": "cash",
+                "amount": {
+                  "value": 1000,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "startMonth": {
+                  "value": "2026-11",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "months": {
+                  "value": 3,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              },
+              {
+                "id": "pilot-execution",
+                "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+                "kind": "cash",
+                "amount": {
+                  "value": 500,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "startMonth": {
+                  "value": "2026-11",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "months": {
+                  "value": 1,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "expenseLinks": [
+              {
+                "expenseId": "pilot-manager_workload",
+                "componentIds": [
+                  "c1"
+                ],
+                "allocations": null
+              },
+              {
+                "expenseId": "pilot-execution",
+                "componentIds": [
+                  "c2"
+                ],
+                "allocations": null
+              }
+            ],
+            "costReviews": [
+              {
+                "componentId": "c1",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              },
+              {
+                "componentId": "c2",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              }
+            ],
+            "costsDistinct": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "whatIf": {
+              "version": 1,
+              "kind": "turnover",
+              "scopeKey": "[\"Hypothetical shared pilot group — not selected employees\",\"2026-11\",3]",
+              "baseline": {
+                "value": 15,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "target": {
+                "value": 12,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "population": {
+                "value": 100,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "unitCost": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              }
+            },
+            "deliveryEstimate": {
+              "hoursPerParticipant": {
+                "value": 2,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "coordinationHours": {
+                "value": 16,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "hourlyRate": {
+                "value": 60,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "acceptance": {
+                "value": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.",
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              }
+            },
+            "budget": {
+              "amount": {
+                "value": 6000,
+                "kind": "user-entered",
+                "basis": "Explicit user assumption accepted from a reviewed text edit; not independently verified."
+              },
+              "basis": {
+                "value": "all-in",
+                "kind": "user-entered",
+                "basis": "Explicit user budget basis; not an expense."
+              }
+            }
+          },
+          "pilot": {
+            "version": "illustrative-pilot-v1",
+            "preparedAt": "2026-10-06T12:00:00.000Z",
+            "timezone": "UTC"
+          }
+        },
+        "draft": {
+          "version": 1,
+          "status": "proposal",
+          "binding": {
+            "version": 1,
+            "goalId": "legacy-cash-hours",
+            "goal": "Reduce turnover",
+            "evidenceDigest": "0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0",
+            "planningDigest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+          },
+          "bundle": {
+            "id": "A",
+            "name": "Develop internally with targeted hiring",
+            "objective": "Prioritize internal capability with targeted hiring",
+            "coordination": "Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.",
+            "components": [
+              {
+                "id": "c1",
+                "name": "Manager and workload review",
+                "domain": "manager_workload",
+                "firstStep": "Review workload and manager support with the business owner before choosing the staffing response.",
+                "ownerRole": "Business owner",
+                "dependsOn": [],
+                "evidence": [
+                  "W1:summary"
+                ],
+                "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+              },
+              {
+                "id": "c2",
+                "name": "Finance and execution checkpoints",
+                "domain": "execution",
+                "firstStep": "Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.",
+                "ownerRole": "Finance partner",
+                "dependsOn": [
+                  "c1"
+                ],
+                "evidence": [
+                  "W1:summary"
+                ],
+                "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+              }
+            ],
+            "limitation": "The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated."
+          },
+          "signature": "{\"id\":\"A\",\"name\":\"Develop internally with targeted hiring\",\"objective\":\"Prioritize internal capability with targeted hiring\",\"coordination\":\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\",\"components\":[{\"id\":\"c1\",\"name\":\"Manager and workload review\",\"domain\":\"manager_workload\",\"firstStep\":\"Review workload and manager support with the business owner before choosing the staffing response.\",\"ownerRole\":\"Business owner\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"},{\"id\":\"c2\",\"name\":\"Finance and execution checkpoints\",\"domain\":\"execution\",\"firstStep\":\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\",\"ownerRole\":\"Finance partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"}],\"limitation\":\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\"}",
+          "revision": 4,
+          "inputs": {
+            "scope": {
+              "population": {
+                "value": "Hypothetical shared pilot group — not selected employees",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "businessUnit": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "jobProfile": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "startMonth": {
+                "value": "2026-11",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "months": {
+                "value": 3,
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "demand": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "capacityRequired": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "requirements": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "comparisonConfirmed": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "currency": "USD"
+            },
+            "capacity": null,
+            "timing": [
+              {
+                "componentId": "c1",
+                "start": {
+                  "value": "2026-11-01",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "finish": {
+                  "value": "2026-11-14",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              },
+              {
+                "componentId": "c2",
+                "start": {
+                  "value": "2026-11-15",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "finish": {
+                  "value": "2026-11-28",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "dependenciesConfirmed": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "groups": [
+              {
+                "id": "pilot-group",
+                "label": "Illustrative shared pilot group; not selected employees",
+                "count": {
+                  "value": 10,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "memberships": [
+              {
+                "componentId": "c1",
+                "groupIds": [
+                  "pilot-group"
+                ],
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              },
+              {
+                "componentId": "c2",
+                "groupIds": [
+                  "pilot-group"
+                ],
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              }
+            ],
+            "groupsDisjoint": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "expenses": [
+              {
+                "id": "pilot-manager_workload",
+                "label": "DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes",
+                "kind": "cash",
+                "amount": {
+                  "value": 1000,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "startMonth": {
+                  "value": "2026-11",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "months": {
+                  "value": 3,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              },
+              {
+                "id": "pilot-execution",
+                "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+                "kind": "cash",
+                "amount": {
+                  "value": 500,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "startMonth": {
+                  "value": "2026-11",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "months": {
+                  "value": 1,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "expenseLinks": [
+              {
+                "expenseId": "pilot-manager_workload",
+                "componentIds": [
+                  "c1"
+                ],
+                "allocations": null
+              },
+              {
+                "expenseId": "pilot-execution",
+                "componentIds": [
+                  "c2"
+                ],
+                "allocations": null
+              }
+            ],
+            "costReviews": [
+              {
+                "componentId": "c1",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              },
+              {
+                "componentId": "c2",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              }
+            ],
+            "costsDistinct": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "whatIf": {
+              "version": 1,
+              "kind": "turnover",
+              "scopeKey": "[\"Hypothetical shared pilot group — not selected employees\",\"2026-11\",3]",
+              "baseline": {
+                "value": 15,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "target": {
+                "value": 12,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "population": {
+                "value": 100,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "unitCost": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              }
+            },
+            "deliveryEstimate": {
+              "hoursPerParticipant": {
+                "value": 2,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "coordinationHours": {
+                "value": 16,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "hourlyRate": {
+                "value": 75,
+                "kind": "user-entered",
+                "basis": "Explicit user assumption accepted from a reviewed text edit; not independently verified."
+              },
+              "acceptance": {
+                "value": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.",
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              }
+            },
+            "budget": {
+              "amount": {
+                "value": 6000,
+                "kind": "user-entered",
+                "basis": "Explicit user assumption accepted from a reviewed text edit; not independently verified."
+              },
+              "basis": {
+                "value": "all-in",
+                "kind": "user-entered",
+                "basis": "Explicit user budget basis; not an expense."
+              }
+            }
+          },
+          "pilot": {
+            "version": "illustrative-pilot-v1",
+            "preparedAt": "2026-10-06T12:00:00.000Z",
+            "timezone": "UTC"
+          }
+        },
+        "result": {
+          "budget": {
+            "limit": 6000,
+            "basis": "all-in",
+            "cash": 3500,
+            "employeeTime": 2700,
+            "comparedCost": 6200,
+            "headroom": -200,
+            "status": "over",
+            "assumed": true
+          },
+          "deliveryEstimate": {
+            "participants": 10,
+            "hours": 36,
+            "employeeTime": 2700,
+            "cash": 3500,
+            "finish": "2026-11-28",
+            "deliverables": [
+              "one completed work package: Manager and workload review",
+              "one completed work package: Finance and execution checkpoints"
+            ],
+            "usesEnteredTime": false,
+            "acceptance": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish."
+          },
+          "whatIf": {
+            "status": "ready",
+            "kind": "turnover",
+            "start": "2026-11",
+            "months": 3,
+            "baseline": 15,
+            "target": 12,
+            "population": 100,
+            "unitCost": null,
+            "baselineCount": 15,
+            "targetCount": 12,
+            "change": -3,
+            "listedCash": 3500,
+            "roleCash": 0,
+            "cash": 3500
+          },
+          "method": "coordinated-bundle-v1",
+          "revision": 4,
+          "signature": "{\"id\":\"A\",\"name\":\"Develop internally with targeted hiring\",\"objective\":\"Prioritize internal capability with targeted hiring\",\"coordination\":\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\",\"components\":[{\"id\":\"c1\",\"name\":\"Manager and workload review\",\"domain\":\"manager_workload\",\"firstStep\":\"Review workload and manager support with the business owner before choosing the staffing response.\",\"ownerRole\":\"Business owner\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"},{\"id\":\"c2\",\"name\":\"Finance and execution checkpoints\",\"domain\":\"execution\",\"firstStep\":\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\",\"ownerRole\":\"Finance partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"}],\"limitation\":\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\"}",
+          "bindingKey": "{\"evidenceDigest\":\"0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0\",\"goal\":\"Reduce turnover\",\"goalId\":\"legacy-cash-hours\",\"planningDigest\":\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\",\"version\":1}",
+          "scope": {
+            "population": {
+              "value": "Hypothetical shared pilot group — not selected employees",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "businessUnit": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "jobProfile": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 3,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "demand": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "capacityRequired": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "requirements": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "comparisonConfirmed": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "currency": "USD"
+          },
+          "ledger": [
+            {
+              "id": "pilot-manager_workload",
+              "label": "DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes",
+              "kind": "cash",
+              "monthly": [
+                1000,
+                1000,
+                1000
+              ],
+              "total": 3000,
+              "componentIds": [
+                "c1"
+              ],
+              "allocations": null
+            },
+            {
+              "id": "pilot-execution",
+              "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+              "kind": "cash",
+              "monthly": [
+                500,
+                0,
+                0
+              ],
+              "total": 500,
+              "componentIds": [
+                "c2"
+              ],
+              "allocations": null
+            }
+          ],
+          "knownCashSubtotal": null,
+          "cashTotal": null,
+          "knownEmployeeTimeSubtotal": null,
+          "employeeTimeTotal": null,
+          "componentCash": {
+            "c1": null,
+            "c2": null
+          },
+          "uniqueParticipants": null,
+          "componentReady": {
+            "c1": null,
+            "c2": null
+          },
+          "planFinish": null,
+          "capacityReadyMonth": null,
+          "conditionalCoverage": null,
+          "plannedAddedEmployees": null,
+          "issues": [
+            "Timing/readiness is unresolved for Manager and workload review.",
+            "Timing/readiness is unresolved for Finance and execution checkpoints.",
+            "Unique participants are unknown until population coverage, counts and overlaps are reviewed.",
+            "Confirm whether additional capacity is required and review its mix before a complete budget.",
+            "Complete budget is Unknown: review each component’s costs, shared sources and distinct additional expenses."
+          ],
+          "limitations": [
+            "All values are reviewed planning assumptions, not causal estimates or operational approvals.",
+            "No retention effects, avoided exits, savings or ROI are summed into this bundle.",
+            "Internal transitions do not add company employees; availability and source-team impact remain unverified.",
+            "Cash and employee time are separate; existing payroll and structural budgets are not added.",
+            "Unique participants covers explicitly reviewed component groups only; it is not company headcount.",
+            "Dependency-gated coverage is conditional and may be later than a paid hire arrival; unknown prerequisites keep readiness Unknown."
+          ],
+          "inputKey": "[\"{\\\"evidenceDigest\\\":\\\"0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0\\\",\\\"goal\\\":\\\"Reduce turnover\\\",\\\"goalId\\\":\\\"legacy-cash-hours\\\",\\\"planningDigest\\\":\\\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\\\",\\\"version\\\":1}\",\"{\\\"id\\\":\\\"A\\\",\\\"name\\\":\\\"Develop internally with targeted hiring\\\",\\\"objective\\\":\\\"Prioritize internal capability with targeted hiring\\\",\\\"coordination\\\":\\\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\\\",\\\"components\\\":[{\\\"id\\\":\\\"c1\\\",\\\"name\\\":\\\"Manager and workload review\\\",\\\"domain\\\":\\\"manager_workload\\\",\\\"firstStep\\\":\\\"Review workload and manager support with the business owner before choosing the staffing response.\\\",\\\"ownerRole\\\":\\\"Business owner\\\",\\\"dependsOn\\\":[],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c2\\\",\\\"name\\\":\\\"Finance and execution checkpoints\\\",\\\"domain\\\":\\\"execution\\\",\\\"firstStep\\\":\\\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\\\",\\\"ownerRole\\\":\\\"Finance partner\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"}],\\\"limitation\\\":\\\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\\\"}\",4,{\"scope\":{\"population\":{\"value\":\"Hypothetical shared pilot group — not selected employees\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"businessUnit\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"jobProfile\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"startMonth\":{\"value\":\"2026-11\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"months\":{\"value\":3,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"demand\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"capacityRequired\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"requirements\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"comparisonConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"currency\":\"USD\"},\"capacity\":null,\"timing\":[{\"componentId\":\"c1\",\"start\":{\"value\":\"2026-11-01\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"finish\":{\"value\":\"2026-11-14\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}},{\"componentId\":\"c2\",\"start\":{\"value\":\"2026-11-15\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"finish\":{\"value\":\"2026-11-28\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}}],\"dependenciesConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"groups\":[{\"id\":\"pilot-group\",\"label\":\"Illustrative shared pilot group; not selected employees\",\"count\":{\"value\":10,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}}],\"memberships\":[{\"componentId\":\"c1\",\"groupIds\":[\"pilot-group\"],\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"groupIds\":[\"pilot-group\"],\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"groupsDisjoint\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"expenses\":[{\"id\":\"pilot-manager_workload\",\"label\":\"DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes\",\"kind\":\"cash\",\"amount\":{\"value\":1000,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"startMonth\":{\"value\":\"2026-11\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"months\":{\"value\":3,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}},{\"id\":\"pilot-execution\",\"label\":\"DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes\",\"kind\":\"cash\",\"amount\":{\"value\":500,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"startMonth\":{\"value\":\"2026-11\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"months\":{\"value\":1,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}}],\"expenseLinks\":[{\"expenseId\":\"pilot-manager_workload\",\"componentIds\":[\"c1\"],\"allocations\":null},{\"expenseId\":\"pilot-execution\",\"componentIds\":[\"c2\"],\"allocations\":null}],\"costReviews\":[{\"componentId\":\"c1\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"costsDistinct\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"whatIf\":{\"version\":1,\"kind\":\"turnover\",\"scopeKey\":\"[\\\"Hypothetical shared pilot group — not selected employees\\\",\\\"2026-11\\\",3]\",\"baseline\":{\"value\":15,\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.\"},\"target\":{\"value\":12,\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.\"},\"population\":{\"value\":100,\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.\"},\"unitCost\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},\"deliveryEstimate\":{\"hoursPerParticipant\":{\"value\":2,\"kind\":\"illustrative\",\"basis\":\"Explicit starting planning assumption; editable through chat, not evidence or an assigned resource.\"},\"coordinationHours\":{\"value\":16,\"kind\":\"illustrative\",\"basis\":\"Explicit starting planning assumption; editable through chat, not evidence or an assigned resource.\"},\"hourlyRate\":{\"value\":75,\"kind\":\"user-entered\",\"basis\":\"Explicit user assumption accepted from a reviewed text edit; not independently verified.\"},\"acceptance\":{\"value\":\"Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.\",\"kind\":\"illustrative\",\"basis\":\"Explicit starting planning assumption; editable through chat, not evidence or an assigned resource.\"}},\"budget\":{\"amount\":{\"value\":6000,\"kind\":\"user-entered\",\"basis\":\"Explicit user assumption accepted from a reviewed text edit; not independently verified.\"},\"basis\":{\"value\":\"all-in\",\"kind\":\"user-entered\",\"basis\":\"Explicit user budget basis; not an expense.\"}}}]"
+        },
+        "discarded": false
+      }
+    ]
+  },
+  "workspace": {
+    "version": 1,
+    "goalId": "legacy-cash-hours",
+    "drafts": [
+      {
+        "version": 1,
+        "status": "proposal",
+        "binding": {
+          "version": 1,
+          "goalId": "legacy-cash-hours",
+          "goal": "Reduce turnover",
+          "evidenceDigest": "0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0",
+          "planningDigest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        "bundle": {
+          "id": "A",
+          "name": "Develop internally with targeted hiring",
+          "objective": "Prioritize internal capability with targeted hiring",
+          "coordination": "Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.",
+          "components": [
+            {
+              "id": "c1",
+              "name": "Manager and workload review",
+              "domain": "manager_workload",
+              "firstStep": "Review workload and manager support with the business owner before choosing the staffing response.",
+              "ownerRole": "Business owner",
+              "dependsOn": [],
+              "evidence": [
+                "W1:summary"
+              ],
+              "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+            },
+            {
+              "id": "c2",
+              "name": "Finance and execution checkpoints",
+              "domain": "execution",
+              "firstStep": "Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.",
+              "ownerRole": "Finance partner",
+              "dependsOn": [
+                "c1"
+              ],
+              "evidence": [
+                "W1:summary"
+              ],
+              "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+            }
+          ],
+          "limitation": "The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated."
+        },
+        "signature": "{\"id\":\"A\",\"name\":\"Develop internally with targeted hiring\",\"objective\":\"Prioritize internal capability with targeted hiring\",\"coordination\":\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\",\"components\":[{\"id\":\"c1\",\"name\":\"Manager and workload review\",\"domain\":\"manager_workload\",\"firstStep\":\"Review workload and manager support with the business owner before choosing the staffing response.\",\"ownerRole\":\"Business owner\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"},{\"id\":\"c2\",\"name\":\"Finance and execution checkpoints\",\"domain\":\"execution\",\"firstStep\":\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\",\"ownerRole\":\"Finance partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"}],\"limitation\":\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\"}",
+        "revision": 4,
+        "inputs": {
+          "scope": {
+            "population": {
+              "value": "Hypothetical shared pilot group — not selected employees",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "businessUnit": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "jobProfile": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 3,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "demand": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "capacityRequired": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "requirements": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "comparisonConfirmed": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "currency": "USD"
+          },
+          "capacity": null,
+          "timing": [
+            {
+              "componentId": "c1",
+              "start": {
+                "value": "2026-11-01",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "finish": {
+                "value": "2026-11-14",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              }
+            },
+            {
+              "componentId": "c2",
+              "start": {
+                "value": "2026-11-15",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "finish": {
+                "value": "2026-11-28",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              }
+            }
+          ],
+          "dependenciesConfirmed": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "groups": [
+            {
+              "id": "pilot-group",
+              "label": "Illustrative shared pilot group; not selected employees",
+              "count": {
+                "value": 10,
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              }
+            }
+          ],
+          "memberships": [
+            {
+              "componentId": "c1",
+              "groupIds": [
+                "pilot-group"
+              ],
+              "complete": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              }
+            },
+            {
+              "componentId": "c2",
+              "groupIds": [
+                "pilot-group"
+              ],
+              "complete": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              }
+            }
+          ],
+          "groupsDisjoint": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "expenses": [
+            {
+              "id": "pilot-manager_workload",
+              "label": "DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes",
+              "kind": "cash",
+              "amount": {
+                "value": 1000,
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "startMonth": {
+                "value": "2026-11",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "months": {
+                "value": 3,
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              }
+            },
+            {
+              "id": "pilot-execution",
+              "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+              "kind": "cash",
+              "amount": {
+                "value": 500,
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "startMonth": {
+                "value": "2026-11",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "months": {
+                "value": 1,
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              }
+            }
+          ],
+          "expenseLinks": [
+            {
+              "expenseId": "pilot-manager_workload",
+              "componentIds": [
+                "c1"
+              ],
+              "allocations": null
+            },
+            {
+              "expenseId": "pilot-execution",
+              "componentIds": [
+                "c2"
+              ],
+              "allocations": null
+            }
+          ],
+          "costReviews": [
+            {
+              "componentId": "c1",
+              "complete": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              }
+            },
+            {
+              "componentId": "c2",
+              "complete": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              }
+            }
+          ],
+          "costsDistinct": {
+            "value": null,
+            "kind": "unknown",
+            "basis": null
+          },
+          "whatIf": {
+            "version": 1,
+            "kind": "turnover",
+            "scopeKey": "[\"Hypothetical shared pilot group — not selected employees\",\"2026-11\",3]",
+            "baseline": {
+              "value": 15,
+              "kind": "illustrative",
+              "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+            },
+            "target": {
+              "value": 12,
+              "kind": "illustrative",
+              "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+            },
+            "population": {
+              "value": 100,
+              "kind": "illustrative",
+              "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+            },
+            "unitCost": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            }
+          },
+          "deliveryEstimate": {
+            "hoursPerParticipant": {
+              "value": 2,
+              "kind": "illustrative",
+              "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+            },
+            "coordinationHours": {
+              "value": 16,
+              "kind": "illustrative",
+              "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+            },
+            "hourlyRate": {
+              "value": 75,
+              "kind": "user-entered",
+              "basis": "Explicit user assumption accepted from a reviewed text edit; not independently verified."
+            },
+            "acceptance": {
+              "value": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.",
+              "kind": "illustrative",
+              "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+            }
+          },
+          "budget": {
+            "amount": {
+              "value": 6000,
+              "kind": "user-entered",
+              "basis": "Explicit user assumption accepted from a reviewed text edit; not independently verified."
+            },
+            "basis": {
+              "value": "all-in",
+              "kind": "user-entered",
+              "basis": "Explicit user budget basis; not an expense."
+            }
+          }
+        },
+        "pilot": {
+          "version": "illustrative-pilot-v1",
+          "preparedAt": "2026-10-06T12:00:00.000Z",
+          "timezone": "UTC"
+        }
+      }
+    ],
+    "calculations": [
+      {
+        "draft": {
+          "version": 1,
+          "status": "proposal",
+          "binding": {
+            "version": 1,
+            "goalId": "legacy-cash-hours",
+            "goal": "Reduce turnover",
+            "evidenceDigest": "0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0",
+            "planningDigest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+          },
+          "bundle": {
+            "id": "A",
+            "name": "Develop internally with targeted hiring",
+            "objective": "Prioritize internal capability with targeted hiring",
+            "coordination": "Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.",
+            "components": [
+              {
+                "id": "c1",
+                "name": "Manager and workload review",
+                "domain": "manager_workload",
+                "firstStep": "Review workload and manager support with the business owner before choosing the staffing response.",
+                "ownerRole": "Business owner",
+                "dependsOn": [],
+                "evidence": [
+                  "W1:summary"
+                ],
+                "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+              },
+              {
+                "id": "c2",
+                "name": "Finance and execution checkpoints",
+                "domain": "execution",
+                "firstStep": "Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.",
+                "ownerRole": "Finance partner",
+                "dependsOn": [
+                  "c1"
+                ],
+                "evidence": [
+                  "W1:summary"
+                ],
+                "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+              }
+            ],
+            "limitation": "The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated."
+          },
+          "signature": "{\"id\":\"A\",\"name\":\"Develop internally with targeted hiring\",\"objective\":\"Prioritize internal capability with targeted hiring\",\"coordination\":\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\",\"components\":[{\"id\":\"c1\",\"name\":\"Manager and workload review\",\"domain\":\"manager_workload\",\"firstStep\":\"Review workload and manager support with the business owner before choosing the staffing response.\",\"ownerRole\":\"Business owner\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"},{\"id\":\"c2\",\"name\":\"Finance and execution checkpoints\",\"domain\":\"execution\",\"firstStep\":\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\",\"ownerRole\":\"Finance partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"}],\"limitation\":\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\"}",
+          "revision": 4,
+          "inputs": {
+            "scope": {
+              "population": {
+                "value": "Hypothetical shared pilot group — not selected employees",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "businessUnit": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "jobProfile": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "startMonth": {
+                "value": "2026-11",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "months": {
+                "value": 3,
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "demand": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "capacityRequired": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "requirements": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "comparisonConfirmed": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "currency": "USD"
+            },
+            "capacity": null,
+            "timing": [
+              {
+                "componentId": "c1",
+                "start": {
+                  "value": "2026-11-01",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "finish": {
+                  "value": "2026-11-14",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              },
+              {
+                "componentId": "c2",
+                "start": {
+                  "value": "2026-11-15",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "finish": {
+                  "value": "2026-11-28",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "dependenciesConfirmed": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "groups": [
+              {
+                "id": "pilot-group",
+                "label": "Illustrative shared pilot group; not selected employees",
+                "count": {
+                  "value": 10,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "memberships": [
+              {
+                "componentId": "c1",
+                "groupIds": [
+                  "pilot-group"
+                ],
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              },
+              {
+                "componentId": "c2",
+                "groupIds": [
+                  "pilot-group"
+                ],
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              }
+            ],
+            "groupsDisjoint": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "expenses": [
+              {
+                "id": "pilot-manager_workload",
+                "label": "DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes",
+                "kind": "cash",
+                "amount": {
+                  "value": 1000,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "startMonth": {
+                  "value": "2026-11",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "months": {
+                  "value": 3,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              },
+              {
+                "id": "pilot-execution",
+                "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+                "kind": "cash",
+                "amount": {
+                  "value": 500,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "startMonth": {
+                  "value": "2026-11",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "months": {
+                  "value": 1,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "expenseLinks": [
+              {
+                "expenseId": "pilot-manager_workload",
+                "componentIds": [
+                  "c1"
+                ],
+                "allocations": null
+              },
+              {
+                "expenseId": "pilot-execution",
+                "componentIds": [
+                  "c2"
+                ],
+                "allocations": null
+              }
+            ],
+            "costReviews": [
+              {
+                "componentId": "c1",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              },
+              {
+                "componentId": "c2",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              }
+            ],
+            "costsDistinct": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "whatIf": {
+              "version": 1,
+              "kind": "turnover",
+              "scopeKey": "[\"Hypothetical shared pilot group — not selected employees\",\"2026-11\",3]",
+              "baseline": {
+                "value": 15,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "target": {
+                "value": 12,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "population": {
+                "value": 100,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "unitCost": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              }
+            },
+            "deliveryEstimate": {
+              "hoursPerParticipant": {
+                "value": 2,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "coordinationHours": {
+                "value": 16,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "hourlyRate": {
+                "value": 75,
+                "kind": "user-entered",
+                "basis": "Explicit user assumption accepted from a reviewed text edit; not independently verified."
+              },
+              "acceptance": {
+                "value": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.",
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              }
+            },
+            "budget": {
+              "amount": {
+                "value": 6000,
+                "kind": "user-entered",
+                "basis": "Explicit user assumption accepted from a reviewed text edit; not independently verified."
+              },
+              "basis": {
+                "value": "all-in",
+                "kind": "user-entered",
+                "basis": "Explicit user budget basis; not an expense."
+              }
+            }
+          },
+          "pilot": {
+            "version": "illustrative-pilot-v1",
+            "preparedAt": "2026-10-06T12:00:00.000Z",
+            "timezone": "UTC"
+          }
+        },
+        "result": {
+          "budget": {
+            "limit": 6000,
+            "basis": "all-in",
+            "cash": 3500,
+            "employeeTime": 2700,
+            "comparedCost": 6200,
+            "headroom": -200,
+            "status": "over",
+            "assumed": true
+          },
+          "deliveryEstimate": {
+            "participants": 10,
+            "hours": 36,
+            "employeeTime": 2700,
+            "cash": 3500,
+            "finish": "2026-11-28",
+            "deliverables": [
+              "one completed work package: Manager and workload review",
+              "one completed work package: Finance and execution checkpoints"
+            ],
+            "usesEnteredTime": false,
+            "acceptance": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish."
+          },
+          "whatIf": {
+            "status": "ready",
+            "kind": "turnover",
+            "start": "2026-11",
+            "months": 3,
+            "baseline": 15,
+            "target": 12,
+            "population": 100,
+            "unitCost": null,
+            "baselineCount": 15,
+            "targetCount": 12,
+            "change": -3,
+            "listedCash": 3500,
+            "roleCash": 0,
+            "cash": 3500
+          },
+          "method": "coordinated-bundle-v1",
+          "revision": 4,
+          "signature": "{\"id\":\"A\",\"name\":\"Develop internally with targeted hiring\",\"objective\":\"Prioritize internal capability with targeted hiring\",\"coordination\":\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\",\"components\":[{\"id\":\"c1\",\"name\":\"Manager and workload review\",\"domain\":\"manager_workload\",\"firstStep\":\"Review workload and manager support with the business owner before choosing the staffing response.\",\"ownerRole\":\"Business owner\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"},{\"id\":\"c2\",\"name\":\"Finance and execution checkpoints\",\"domain\":\"execution\",\"firstStep\":\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\",\"ownerRole\":\"Finance partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"}],\"limitation\":\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\"}",
+          "bindingKey": "{\"evidenceDigest\":\"0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0\",\"goal\":\"Reduce turnover\",\"goalId\":\"legacy-cash-hours\",\"planningDigest\":\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\",\"version\":1}",
+          "scope": {
+            "population": {
+              "value": "Hypothetical shared pilot group — not selected employees",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "businessUnit": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "jobProfile": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 3,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "demand": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "capacityRequired": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "requirements": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "comparisonConfirmed": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "currency": "USD"
+          },
+          "ledger": [
+            {
+              "id": "pilot-manager_workload",
+              "label": "DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes",
+              "kind": "cash",
+              "monthly": [
+                1000,
+                1000,
+                1000
+              ],
+              "total": 3000,
+              "componentIds": [
+                "c1"
+              ],
+              "allocations": null
+            },
+            {
+              "id": "pilot-execution",
+              "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+              "kind": "cash",
+              "monthly": [
+                500,
+                0,
+                0
+              ],
+              "total": 500,
+              "componentIds": [
+                "c2"
+              ],
+              "allocations": null
+            }
+          ],
+          "knownCashSubtotal": null,
+          "cashTotal": null,
+          "knownEmployeeTimeSubtotal": null,
+          "employeeTimeTotal": null,
+          "componentCash": {
+            "c1": null,
+            "c2": null
+          },
+          "uniqueParticipants": null,
+          "componentReady": {
+            "c1": null,
+            "c2": null
+          },
+          "planFinish": null,
+          "capacityReadyMonth": null,
+          "conditionalCoverage": null,
+          "plannedAddedEmployees": null,
+          "issues": [
+            "Timing/readiness is unresolved for Manager and workload review.",
+            "Timing/readiness is unresolved for Finance and execution checkpoints.",
+            "Unique participants are unknown until population coverage, counts and overlaps are reviewed.",
+            "Confirm whether additional capacity is required and review its mix before a complete budget.",
+            "Complete budget is Unknown: review each component’s costs, shared sources and distinct additional expenses."
+          ],
+          "limitations": [
+            "All values are reviewed planning assumptions, not causal estimates or operational approvals.",
+            "No retention effects, avoided exits, savings or ROI are summed into this bundle.",
+            "Internal transitions do not add company employees; availability and source-team impact remain unverified.",
+            "Cash and employee time are separate; existing payroll and structural budgets are not added.",
+            "Unique participants covers explicitly reviewed component groups only; it is not company headcount.",
+            "Dependency-gated coverage is conditional and may be later than a paid hire arrival; unknown prerequisites keep readiness Unknown."
+          ],
+          "inputKey": "[\"{\\\"evidenceDigest\\\":\\\"0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0\\\",\\\"goal\\\":\\\"Reduce turnover\\\",\\\"goalId\\\":\\\"legacy-cash-hours\\\",\\\"planningDigest\\\":\\\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\\\",\\\"version\\\":1}\",\"{\\\"id\\\":\\\"A\\\",\\\"name\\\":\\\"Develop internally with targeted hiring\\\",\\\"objective\\\":\\\"Prioritize internal capability with targeted hiring\\\",\\\"coordination\\\":\\\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\\\",\\\"components\\\":[{\\\"id\\\":\\\"c1\\\",\\\"name\\\":\\\"Manager and workload review\\\",\\\"domain\\\":\\\"manager_workload\\\",\\\"firstStep\\\":\\\"Review workload and manager support with the business owner before choosing the staffing response.\\\",\\\"ownerRole\\\":\\\"Business owner\\\",\\\"dependsOn\\\":[],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c2\\\",\\\"name\\\":\\\"Finance and execution checkpoints\\\",\\\"domain\\\":\\\"execution\\\",\\\"firstStep\\\":\\\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\\\",\\\"ownerRole\\\":\\\"Finance partner\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"}],\\\"limitation\\\":\\\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\\\"}\",4,{\"scope\":{\"population\":{\"value\":\"Hypothetical shared pilot group — not selected employees\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"businessUnit\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"jobProfile\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"startMonth\":{\"value\":\"2026-11\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"months\":{\"value\":3,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"demand\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"capacityRequired\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"requirements\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"comparisonConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"currency\":\"USD\"},\"capacity\":null,\"timing\":[{\"componentId\":\"c1\",\"start\":{\"value\":\"2026-11-01\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"finish\":{\"value\":\"2026-11-14\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}},{\"componentId\":\"c2\",\"start\":{\"value\":\"2026-11-15\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"finish\":{\"value\":\"2026-11-28\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}}],\"dependenciesConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"groups\":[{\"id\":\"pilot-group\",\"label\":\"Illustrative shared pilot group; not selected employees\",\"count\":{\"value\":10,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}}],\"memberships\":[{\"componentId\":\"c1\",\"groupIds\":[\"pilot-group\"],\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"groupIds\":[\"pilot-group\"],\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"groupsDisjoint\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"expenses\":[{\"id\":\"pilot-manager_workload\",\"label\":\"DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes\",\"kind\":\"cash\",\"amount\":{\"value\":1000,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"startMonth\":{\"value\":\"2026-11\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"months\":{\"value\":3,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}},{\"id\":\"pilot-execution\",\"label\":\"DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes\",\"kind\":\"cash\",\"amount\":{\"value\":500,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"startMonth\":{\"value\":\"2026-11\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"months\":{\"value\":1,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}}],\"expenseLinks\":[{\"expenseId\":\"pilot-manager_workload\",\"componentIds\":[\"c1\"],\"allocations\":null},{\"expenseId\":\"pilot-execution\",\"componentIds\":[\"c2\"],\"allocations\":null}],\"costReviews\":[{\"componentId\":\"c1\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"costsDistinct\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"whatIf\":{\"version\":1,\"kind\":\"turnover\",\"scopeKey\":\"[\\\"Hypothetical shared pilot group — not selected employees\\\",\\\"2026-11\\\",3]\",\"baseline\":{\"value\":15,\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.\"},\"target\":{\"value\":12,\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.\"},\"population\":{\"value\":100,\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.\"},\"unitCost\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},\"deliveryEstimate\":{\"hoursPerParticipant\":{\"value\":2,\"kind\":\"illustrative\",\"basis\":\"Explicit starting planning assumption; editable through chat, not evidence or an assigned resource.\"},\"coordinationHours\":{\"value\":16,\"kind\":\"illustrative\",\"basis\":\"Explicit starting planning assumption; editable through chat, not evidence or an assigned resource.\"},\"hourlyRate\":{\"value\":75,\"kind\":\"user-entered\",\"basis\":\"Explicit user assumption accepted from a reviewed text edit; not independently verified.\"},\"acceptance\":{\"value\":\"Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.\",\"kind\":\"illustrative\",\"basis\":\"Explicit starting planning assumption; editable through chat, not evidence or an assigned resource.\"}},\"budget\":{\"amount\":{\"value\":6000,\"kind\":\"user-entered\",\"basis\":\"Explicit user assumption accepted from a reviewed text edit; not independently verified.\"},\"basis\":{\"value\":\"all-in\",\"kind\":\"user-entered\",\"basis\":\"Explicit user budget basis; not an expense.\"}}}]"
+        }
+      }
+    ],
+    "attachments": [
+      {
+        "id": "legacy-attachment",
+        "status": "attached_proposal",
+        "attachedAt": "2026-10-06T12:05:00Z",
+        "supersedes": null,
+        "draft": {
+          "version": 1,
+          "status": "proposal",
+          "binding": {
+            "version": 1,
+            "goalId": "legacy-cash-hours",
+            "goal": "Reduce turnover",
+            "evidenceDigest": "0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0",
+            "planningDigest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+          },
+          "bundle": {
+            "id": "A",
+            "name": "Develop internally with targeted hiring",
+            "objective": "Prioritize internal capability with targeted hiring",
+            "coordination": "Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.",
+            "components": [
+              {
+                "id": "c1",
+                "name": "Manager and workload review",
+                "domain": "manager_workload",
+                "firstStep": "Review workload and manager support with the business owner before choosing the staffing response.",
+                "ownerRole": "Business owner",
+                "dependsOn": [],
+                "evidence": [
+                  "W1:summary"
+                ],
+                "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+              },
+              {
+                "id": "c2",
+                "name": "Finance and execution checkpoints",
+                "domain": "execution",
+                "firstStep": "Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.",
+                "ownerRole": "Finance partner",
+                "dependsOn": [
+                  "c1"
+                ],
+                "evidence": [
+                  "W1:summary"
+                ],
+                "limitation": "Aggregate context does not establish availability, causes or intervention effectiveness."
+              }
+            ],
+            "limitation": "The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated."
+          },
+          "signature": "{\"id\":\"A\",\"name\":\"Develop internally with targeted hiring\",\"objective\":\"Prioritize internal capability with targeted hiring\",\"coordination\":\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\",\"components\":[{\"id\":\"c1\",\"name\":\"Manager and workload review\",\"domain\":\"manager_workload\",\"firstStep\":\"Review workload and manager support with the business owner before choosing the staffing response.\",\"ownerRole\":\"Business owner\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"},{\"id\":\"c2\",\"name\":\"Finance and execution checkpoints\",\"domain\":\"execution\",\"firstStep\":\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\",\"ownerRole\":\"Finance partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"}],\"limitation\":\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\"}",
+          "revision": 4,
+          "inputs": {
+            "scope": {
+              "population": {
+                "value": "Hypothetical shared pilot group — not selected employees",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "businessUnit": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "jobProfile": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "startMonth": {
+                "value": "2026-11",
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "months": {
+                "value": 3,
+                "kind": "illustrative",
+                "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+              },
+              "demand": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "capacityRequired": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "requirements": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "comparisonConfirmed": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "currency": "USD"
+            },
+            "capacity": null,
+            "timing": [
+              {
+                "componentId": "c1",
+                "start": {
+                  "value": "2026-11-01",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "finish": {
+                  "value": "2026-11-14",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              },
+              {
+                "componentId": "c2",
+                "start": {
+                  "value": "2026-11-15",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "finish": {
+                  "value": "2026-11-28",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "dependenciesConfirmed": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "groups": [
+              {
+                "id": "pilot-group",
+                "label": "Illustrative shared pilot group; not selected employees",
+                "count": {
+                  "value": 10,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "memberships": [
+              {
+                "componentId": "c1",
+                "groupIds": [
+                  "pilot-group"
+                ],
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              },
+              {
+                "componentId": "c2",
+                "groupIds": [
+                  "pilot-group"
+                ],
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              }
+            ],
+            "groupsDisjoint": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "expenses": [
+              {
+                "id": "pilot-manager_workload",
+                "label": "DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes",
+                "kind": "cash",
+                "amount": {
+                  "value": 1000,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "startMonth": {
+                  "value": "2026-11",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "months": {
+                  "value": 3,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              },
+              {
+                "id": "pilot-execution",
+                "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+                "kind": "cash",
+                "amount": {
+                  "value": 500,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "startMonth": {
+                  "value": "2026-11",
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                },
+                "months": {
+                  "value": 1,
+                  "kind": "illustrative",
+                  "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+                }
+              }
+            ],
+            "expenseLinks": [
+              {
+                "expenseId": "pilot-manager_workload",
+                "componentIds": [
+                  "c1"
+                ],
+                "allocations": null
+              },
+              {
+                "expenseId": "pilot-execution",
+                "componentIds": [
+                  "c2"
+                ],
+                "allocations": null
+              }
+            ],
+            "costReviews": [
+              {
+                "componentId": "c1",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              },
+              {
+                "componentId": "c2",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              }
+            ],
+            "costsDistinct": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "whatIf": {
+              "version": 1,
+              "kind": "turnover",
+              "scopeKey": "[\"Hypothetical shared pilot group — not selected employees\",\"2026-11\",3]",
+              "baseline": {
+                "value": 15,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "target": {
+                "value": 12,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "population": {
+                "value": 100,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "unitCost": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              }
+            },
+            "deliveryEstimate": {
+              "hoursPerParticipant": {
+                "value": 2,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "coordinationHours": {
+                "value": 16,
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              },
+              "hourlyRate": {
+                "value": 75,
+                "kind": "user-entered",
+                "basis": "Explicit user assumption accepted from a reviewed text edit; not independently verified."
+              },
+              "acceptance": {
+                "value": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.",
+                "kind": "illustrative",
+                "basis": "Explicit starting planning assumption; editable through chat, not evidence or an assigned resource."
+              }
+            },
+            "budget": {
+              "amount": {
+                "value": 6000,
+                "kind": "user-entered",
+                "basis": "Explicit user assumption accepted from a reviewed text edit; not independently verified."
+              },
+              "basis": {
+                "value": "all-in",
+                "kind": "user-entered",
+                "basis": "Explicit user budget basis; not an expense."
+              }
+            }
+          },
+          "pilot": {
+            "version": "illustrative-pilot-v1",
+            "preparedAt": "2026-10-06T12:00:00.000Z",
+            "timezone": "UTC"
+          }
+        },
+        "result": {
+          "budget": {
+            "limit": 6000,
+            "basis": "all-in",
+            "cash": 3500,
+            "employeeTime": 2700,
+            "comparedCost": 6200,
+            "headroom": -200,
+            "status": "over",
+            "assumed": true
+          },
+          "deliveryEstimate": {
+            "participants": 10,
+            "hours": 36,
+            "employeeTime": 2700,
+            "cash": 3500,
+            "finish": "2026-11-28",
+            "deliverables": [
+              "one completed work package: Manager and workload review",
+              "one completed work package: Finance and execution checkpoints"
+            ],
+            "usesEnteredTime": false,
+            "acceptance": "Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish."
+          },
+          "whatIf": {
+            "status": "ready",
+            "kind": "turnover",
+            "start": "2026-11",
+            "months": 3,
+            "baseline": 15,
+            "target": 12,
+            "population": 100,
+            "unitCost": null,
+            "baselineCount": 15,
+            "targetCount": 12,
+            "change": -3,
+            "listedCash": 3500,
+            "roleCash": 0,
+            "cash": 3500
+          },
+          "method": "coordinated-bundle-v1",
+          "revision": 4,
+          "signature": "{\"id\":\"A\",\"name\":\"Develop internally with targeted hiring\",\"objective\":\"Prioritize internal capability with targeted hiring\",\"coordination\":\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\",\"components\":[{\"id\":\"c1\",\"name\":\"Manager and workload review\",\"domain\":\"manager_workload\",\"firstStep\":\"Review workload and manager support with the business owner before choosing the staffing response.\",\"ownerRole\":\"Business owner\",\"dependsOn\":[],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"},{\"id\":\"c2\",\"name\":\"Finance and execution checkpoints\",\"domain\":\"execution\",\"firstStep\":\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\",\"ownerRole\":\"Finance partner\",\"dependsOn\":[\"c1\"],\"evidence\":[\"W1:summary\"],\"limitation\":\"Aggregate context does not establish availability, causes or intervention effectiveness.\"}],\"limitation\":\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\"}",
+          "bindingKey": "{\"evidenceDigest\":\"0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0\",\"goal\":\"Reduce turnover\",\"goalId\":\"legacy-cash-hours\",\"planningDigest\":\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\",\"version\":1}",
+          "scope": {
+            "population": {
+              "value": "Hypothetical shared pilot group — not selected employees",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "businessUnit": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "jobProfile": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "months": {
+              "value": 3,
+              "kind": "illustrative",
+              "basis": "illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark."
+            },
+            "demand": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "capacityRequired": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "requirements": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "comparisonConfirmed": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "currency": "USD"
+          },
+          "ledger": [
+            {
+              "id": "pilot-manager_workload",
+              "label": "DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes",
+              "kind": "cash",
+              "monthly": [
+                1000,
+                1000,
+                1000
+              ],
+              "total": 3000,
+              "componentIds": [
+                "c1"
+              ],
+              "allocations": null
+            },
+            {
+              "id": "pilot-execution",
+              "label": "DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes",
+              "kind": "cash",
+              "monthly": [
+                500,
+                0,
+                0
+              ],
+              "total": 500,
+              "componentIds": [
+                "c2"
+              ],
+              "allocations": null
+            }
+          ],
+          "knownCashSubtotal": null,
+          "cashTotal": null,
+          "knownEmployeeTimeSubtotal": null,
+          "employeeTimeTotal": null,
+          "componentCash": {
+            "c1": null,
+            "c2": null
+          },
+          "uniqueParticipants": null,
+          "componentReady": {
+            "c1": null,
+            "c2": null
+          },
+          "planFinish": null,
+          "capacityReadyMonth": null,
+          "conditionalCoverage": null,
+          "plannedAddedEmployees": null,
+          "issues": [
+            "Timing/readiness is unresolved for Manager and workload review.",
+            "Timing/readiness is unresolved for Finance and execution checkpoints.",
+            "Unique participants are unknown until population coverage, counts and overlaps are reviewed.",
+            "Confirm whether additional capacity is required and review its mix before a complete budget.",
+            "Complete budget is Unknown: review each component’s costs, shared sources and distinct additional expenses."
+          ],
+          "limitations": [
+            "All values are reviewed planning assumptions, not causal estimates or operational approvals.",
+            "No retention effects, avoided exits, savings or ROI are summed into this bundle.",
+            "Internal transitions do not add company employees; availability and source-team impact remain unverified.",
+            "Cash and employee time are separate; existing payroll and structural budgets are not added.",
+            "Unique participants covers explicitly reviewed component groups only; it is not company headcount.",
+            "Dependency-gated coverage is conditional and may be later than a paid hire arrival; unknown prerequisites keep readiness Unknown."
+          ],
+          "inputKey": "[\"{\\\"evidenceDigest\\\":\\\"0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0\\\",\\\"goal\\\":\\\"Reduce turnover\\\",\\\"goalId\\\":\\\"legacy-cash-hours\\\",\\\"planningDigest\\\":\\\"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\\\",\\\"version\\\":1}\",\"{\\\"id\\\":\\\"A\\\",\\\"name\\\":\\\"Develop internally with targeted hiring\\\",\\\"objective\\\":\\\"Prioritize internal capability with targeted hiring\\\",\\\"coordination\\\":\\\"Review workload first, coordinate learning and mobility with recruiting, and reconcile compensation and Finance checkpoints before execution.\\\",\\\"components\\\":[{\\\"id\\\":\\\"c1\\\",\\\"name\\\":\\\"Manager and workload review\\\",\\\"domain\\\":\\\"manager_workload\\\",\\\"firstStep\\\":\\\"Review workload and manager support with the business owner before choosing the staffing response.\\\",\\\"ownerRole\\\":\\\"Business owner\\\",\\\"dependsOn\\\":[],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"},{\\\"id\\\":\\\"c2\\\",\\\"name\\\":\\\"Finance and execution checkpoints\\\",\\\"domain\\\":\\\"execution\\\",\\\"firstStep\\\":\\\"Review the reconciled budget, dependencies and unresolved assumptions before any operational decision.\\\",\\\"ownerRole\\\":\\\"Finance partner\\\",\\\"dependsOn\\\":[\\\"c1\\\"],\\\"evidence\\\":[\\\"W1:summary\\\"],\\\"limitation\\\":\\\"Aggregate context does not establish availability, causes or intervention effectiveness.\\\"}],\\\"limitation\\\":\\\"The objective is unproven until scope and assumptions are reviewed; no combined retention effect is estimated.\\\"}\",4,{\"scope\":{\"population\":{\"value\":\"Hypothetical shared pilot group — not selected employees\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"businessUnit\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"jobProfile\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"startMonth\":{\"value\":\"2026-11\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"months\":{\"value\":3,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"demand\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"capacityRequired\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"requirements\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"comparisonConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"currency\":\"USD\"},\"capacity\":null,\"timing\":[{\"componentId\":\"c1\",\"start\":{\"value\":\"2026-11-01\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"finish\":{\"value\":\"2026-11-14\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}},{\"componentId\":\"c2\",\"start\":{\"value\":\"2026-11-15\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"finish\":{\"value\":\"2026-11-28\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}}],\"dependenciesConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"groups\":[{\"id\":\"pilot-group\",\"label\":\"Illustrative shared pilot group; not selected employees\",\"count\":{\"value\":10,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}}],\"memberships\":[{\"componentId\":\"c1\",\"groupIds\":[\"pilot-group\"],\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"groupIds\":[\"pilot-group\"],\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"groupsDisjoint\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"expenses\":[{\"id\":\"pilot-manager_workload\",\"label\":\"DEMO allowance: Manager facilitation and materials; excludes pay, backfill and vendor quotes\",\"kind\":\"cash\",\"amount\":{\"value\":1000,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"startMonth\":{\"value\":\"2026-11\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"months\":{\"value\":3,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}},{\"id\":\"pilot-execution\",\"label\":\"DEMO allowance: Pilot tracking administration; excludes pay, backfill and vendor quotes\",\"kind\":\"cash\",\"amount\":{\"value\":500,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"startMonth\":{\"value\":\"2026-11\",\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"},\"months\":{\"value\":1,\"kind\":\"illustrative\",\"basis\":\"illustrative-pilot-v1; prepared 2026-10-06T12:00:00.000Z; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.\"}}],\"expenseLinks\":[{\"expenseId\":\"pilot-manager_workload\",\"componentIds\":[\"c1\"],\"allocations\":null},{\"expenseId\":\"pilot-execution\",\"componentIds\":[\"c2\"],\"allocations\":null}],\"costReviews\":[{\"componentId\":\"c1\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},{\"componentId\":\"c2\",\"complete\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}}],\"costsDistinct\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"whatIf\":{\"version\":1,\"kind\":\"turnover\",\"scopeKey\":\"[\\\"Hypothetical shared pilot group — not selected employees\\\",\\\"2026-11\\\",3]\",\"baseline\":{\"value\":15,\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.\"},\"target\":{\"value\":12,\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.\"},\"population\":{\"value\":100,\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.\"},\"unitCost\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null}},\"deliveryEstimate\":{\"hoursPerParticipant\":{\"value\":2,\"kind\":\"illustrative\",\"basis\":\"Explicit starting planning assumption; editable through chat, not evidence or an assigned resource.\"},\"coordinationHours\":{\"value\":16,\"kind\":\"illustrative\",\"basis\":\"Explicit starting planning assumption; editable through chat, not evidence or an assigned resource.\"},\"hourlyRate\":{\"value\":75,\"kind\":\"user-entered\",\"basis\":\"Explicit user assumption accepted from a reviewed text edit; not independently verified.\"},\"acceptance\":{\"value\":\"Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.\",\"kind\":\"illustrative\",\"basis\":\"Explicit starting planning assumption; editable through chat, not evidence or an assigned resource.\"}},\"budget\":{\"amount\":{\"value\":6000,\"kind\":\"user-entered\",\"basis\":\"Explicit user assumption accepted from a reviewed text edit; not independently verified.\"},\"basis\":{\"value\":\"all-in\",\"kind\":\"user-entered\",\"basis\":\"Explicit user budget basis; not an expense.\"}}}]"
+        },
+        "unknownsAcknowledged": true
+      }
+    ]
+  }
+}

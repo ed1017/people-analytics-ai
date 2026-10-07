@@ -4,7 +4,7 @@ const assumed=<T>(value:T):Assumption<T>=>({value,kind:'illustrative',basis:'Exp
 /** Fill the new estimate only once; existing/user/adopted inputs are never replaced. */
 export function withDeliveryAssumptions(input:BundleInputs,components:number):BundleInputs {
  const next=structuredClone(input);if(next.deliveryEstimate)return next;
- next.deliveryEstimate={hoursPerParticipant:assumed(2),coordinationHours:assumed(components*8),hourlyRate:assumed(60),acceptance:assumed('Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.')};
+ next.deliveryEstimate={hoursPerParticipant:assumed(2),coordinationHours:assumed(components*8),hourlyRate:input.costPolicy?{value:null,kind:'unknown',basis:null}:assumed(60),acceptance:assumed('Complete the listed deliverables, document evidence gaps and assumptions, and obtain a proposed owner-role review by the planned finish.')};
  return next;
 }
 export function planDeliveryEstimate(draft:BundleDraft){
@@ -14,8 +14,8 @@ export function planDeliveryEstimate(draft:BundleDraft){
  const hours=participants!==null&&e.hoursPerParticipant.value!==null&&e.coordinationHours.value!==null?participants*e.hoursPerParticipant.value+e.coordinationHours.value:null;
  const cost=(kind:'cash'|'employee_time')=>{const rows=input.expenses.filter(row=>row.kind===kind);return rows.every(row=>row.amount.value!==null&&row.months.value!==null)?rows.reduce((n,row)=>n+row.amount.value!*row.months.value!,0):null;};
  const hasEnteredTime=input.expenses.some(row=>row.kind==='employee_time');
- const employeeTime=hasEnteredTime?(input.costsDistinct.value===false?null:cost('employee_time')):hours!==null&&e.hourlyRate.value!==null?Math.round(hours*e.hourlyRate.value*100)/100:null;
- const cash=input.costsDistinct.value===false||input.capacity?null:cost('cash'),finish=input.timing.map(row=>row.finish.value).every(Boolean)?input.timing.map(row=>row.finish.value!).sort().at(-1)??null:null;
+ const employeeTime=input.costPolicy?null:hasEnteredTime?(input.costsDistinct.value===false?null:cost('employee_time')):hours!==null&&e.hourlyRate.value!==null?Math.round(hours*e.hourlyRate.value*100)/100:null;
+ const cash=input.costsDistinct.value===false||input.capacity||(input.costPolicy&&!input.expenses.some(row=>row.kind==='cash')&&!input.costReviews.every(row=>row.complete.value===true))?null:cost('cash'),finish=input.timing.map(row=>row.finish.value).every(Boolean)?input.timing.map(row=>row.finish.value!).sort().at(-1)??null:null;
  const deliverables=draft.bundle.components.map(component=>{
   const text=component.name+' '+component.firstStep;
   if(!/^(?:propose(?: to)?\s+)?(?:review|investigate|analy[zs]e|assess|compare|examine|audit|diagnose|summari[sz]e|triangulate|identify|define)\b/i.test(component.firstStep.trim()))return `one completed work package: ${component.name}`;
@@ -24,4 +24,11 @@ export function planDeliveryEstimate(draft:BundleDraft){
   return `one completed work package: ${component.name}`;
  });
  return {participants,hours,employeeTime,cash,finish,deliverables:[...new Set(deliverables)],usesEnteredTime:hasEnteredTime,acceptance:e.acceptance.value};
+}
+
+/** Staff effort is never inferred from a stored monetary allowance. */
+export function planStaffHours(draft:BundleDraft):number|null{
+ const delivery=planDeliveryEstimate(draft);if(delivery)return delivery.hours;
+ const hours=draft.inputs.capacity?.input.trainingHours;
+ return hours?.trim()&&Number.isFinite(Number(hours))&&Number(hours)>=0?Number(hours):null;
 }

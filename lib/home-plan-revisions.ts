@@ -18,7 +18,7 @@ export function readPlanRevisions(raw:unknown,goalId:string):PlanRevisions|null{
   if(!value||value.version!==1||value.goalId!==goalId||!Array.isArray(value.revisions)||value.revisions.length>20||JSON.stringify(value).length>512000)return null;
   for(const record of value.revisions){
    if(!validSelection(record.selection)||typeof record.discarded!=='boolean'||!readBundleDraft(record.before)||record.before.binding.goalId!==goalId)return null;
-   const preview=previewBundleChatEdit(record.before,record.request,record.selection),draft=acceptBundleChatEdit(record.before,preview,record.selection);
+   const preview=previewBundleChatEdit(record.before,record.request,record.selection,!record.draft.inputs.costPolicy),draft=acceptBundleChatEdit(record.before,preview,record.selection);
    if(!same(draft,record.draft)||!same(reconcileBundle(draft),record.result))return null;
   }
   return structuredClone(value);
@@ -54,9 +54,11 @@ export function discardPlanRevision(raw:unknown,base:BundleDraft){
 const money=(value:number|null)=>value===null?'Unknown':`$${value.toLocaleString('en-US',{maximumFractionDigits:2})} USD`;
 export function planBudgetText(result:BundleResult){
  const budget=result.budget;if(!budget)return '';
- const basis=budget.basis==='all-in'?'including staff time':'cash only, with staff time separate';
- const balance=budget.headroom===null?'Budget feasibility is unresolved.':budget.headroom<0?`${money(-budget.headroom)} over the limit; the proposed scope needs adjustment.`:`${money(budget.headroom)} headroom under the listed assumptions.`;
- return `Budget limit ${money(budget.limit)} (${basis}). Cash ${money(budget.cash)}; staff time ${money(budget.employeeTime)}. ${balance} ${budget.assumed?'This retains proposed cost assumptions; actual costs and funding remain unverified.':''}`.trim();
+ // Older snapshots retain their signed totals; the current cost display always compares cash.
+ const headroom=budget.limit!==null&&budget.cash!==null?Math.round((budget.limit-budget.cash)*100)/100:null;
+ const basis='cash only; staff hours are separate';
+ const balance=headroom===null?'Budget feasibility is unresolved.':headroom<0?`${money(-headroom)} over the limit; the proposed scope needs adjustment.`:`${money(headroom)} headroom under the listed assumptions.`;
+ return `Budget limit ${money(budget.limit)} (${basis}). Cash ${money(budget.cash)}. ${balance} ${budget.assumed?'This retains proposed cost assumptions; actual costs and funding remain unverified.':''}`.trim();
 }
 export function planRevisionReply(record:PlanRevision){
  return `I recalculated Action Plan #${record.selection.option} for “${record.draft.binding.goal}” with your adjustment. ${planBudgetText(record.result)} Review the updated proposal below, then Apply changes or Attach Action Plan. Earlier versions are kept; an existing attachment has not changed.`;

@@ -18,6 +18,7 @@ import {plain,exactKeys} from './home-action-proposal.ts';
 import {validateJson} from './local-decisions.ts';
 import type {ScenarioOrigins} from './home-action-scenarios';
 
+export const planCostPolicy='cash-hours-v1' as const;
 export const bundleMethod='coordinated-bundle-v1' as const;
 export type Assumption<T>={value:T|null;kind:'unknown'|'user-entered'|'illustrative'|'adopted';basis:string|null};
 export const unknownAssumption=<T>():Assumption<T>=>({value:null,kind:'unknown',basis:null});
@@ -33,10 +34,10 @@ export type ManualExpense={id:string;label:string;kind:'cash'|'employee_time';am
 export type ComponentCostReview={componentId:string;complete:Assumption<boolean>};
 export type PlanBudget={amount:Assumption<number>;basis:Assumption<'cash'|'all-in'>};
 export type BudgetCheck={limit:number|null;basis:'cash'|'all-in'|null;cash:number|null;employeeTime:number|null;comparedCost:number|null;headroom:number|null;status:'within'|'over'|'unknown';assumed:boolean};
-export type BundleInputs={budget?:PlanBudget;deliveryEstimate?:DeliveryEstimateInputs;whatIf?:PlanWhatIf;successMeasure?:SuccessMeasure;scope:BundleScope;capacity:CapacityMix|null;timing:ComponentTiming[];dependenciesConfirmed:Assumption<boolean>;groups:PopulationGroup[];memberships:PopulationMembership[];groupsDisjoint:Assumption<boolean>;expenses:ManualExpense[];expenseLinks:ExpenseLink[];costReviews:ComponentCostReview[];costsDistinct:Assumption<boolean>};
+export type BundleInputs={costPolicy?:typeof planCostPolicy;budget?:PlanBudget;deliveryEstimate?:DeliveryEstimateInputs;whatIf?:PlanWhatIf;successMeasure?:SuccessMeasure;scope:BundleScope;capacity:CapacityMix|null;timing:ComponentTiming[];dependenciesConfirmed:Assumption<boolean>;groups:PopulationGroup[];memberships:PopulationMembership[];groupsDisjoint:Assumption<boolean>;expenses:ManualExpense[];expenseLinks:ExpenseLink[];costReviews:ComponentCostReview[];costsDistinct:Assumption<boolean>};
 export type BundleDraft={pilot?:{version:'illustrative-pilot-v1';preparedAt:string;timezone:'UTC'};version:1;status:'proposal';binding:ActionBinding;bundle:SolutionBundle;signature:string;revision:number;inputs:BundleInputs};
 export type LedgerLine={id:string;label:string;kind:'cash'|'employee_time';monthly:(number|null)[];total:number|null;componentIds:string[];allocations:ExpenseAllocation[]|null};
-export type BundleResult={budget?:BudgetCheck;deliveryEstimate?:ReturnType<typeof planDeliveryEstimate>;whatIf?:ReturnType<typeof calculatePlanWhatIf>;method:typeof bundleMethod;revision:number;signature:string;bindingKey:string;scope:BundleScope;ledger:LedgerLine[];knownCashSubtotal:number|null;cashTotal:number|null;knownEmployeeTimeSubtotal:number|null;employeeTimeTotal:number|null;componentCash:Record<string,number|null>;uniqueParticipants:number|null;componentReady:Record<string,string|null>;planFinish:string|null;capacityReadyMonth:string|null;conditionalCoverage:(number|null)[]|null;plannedAddedEmployees:number|null;issues:string[];limitations:string[];inputKey:string};
+export type BundleResult={costPolicy?:typeof planCostPolicy;budget?:BudgetCheck;deliveryEstimate?:ReturnType<typeof planDeliveryEstimate>;whatIf?:ReturnType<typeof calculatePlanWhatIf>;method:typeof bundleMethod;revision:number;signature:string;bindingKey:string;scope:BundleScope;ledger:LedgerLine[];knownCashSubtotal:number|null;cashTotal:number|null;knownEmployeeTimeSubtotal:number|null;employeeTimeTotal:number|null;componentCash:Record<string,number|null>;uniqueParticipants:number|null;componentReady:Record<string,string|null>;planFinish:string|null;capacityReadyMonth:string|null;conditionalCoverage:(number|null)[]|null;plannedAddedEmployees:number|null;issues:string[];limitations:string[];inputKey:string};
 function fail(condition:unknown,message:string):asserts condition{if(!condition)throw Error(message)}
 const bounded=(value:unknown,max=240):value is string=>typeof value==='string'&&!!value.trim()&&value.length<=max;
 const identifier=(value:unknown):value is string=>typeof value==='string'&&/^[A-Za-z][A-Za-z0-9_-]{0,79}$/.test(value);
@@ -59,7 +60,7 @@ const monthIndex=(value:string)=>{fail(/^\d{4}-(0[1-9]|1[0-2])$/.test(value)&&pl
 const monthName=(value:number)=>`${Math.floor(value/12)}-${String(value%12+1).padStart(2,'0')}`;
 export const bundleInputKey=(draft:BundleDraft)=>JSON.stringify([actionBindingKey(draft.binding),draft.signature,draft.revision,draft.inputs]);
 export function emptyBundleInputs(bundle:SolutionBundle):BundleInputs{
- return {scope:{population:unknownAssumption(),businessUnit:unknownAssumption(),jobProfile:unknownAssumption(),startMonth:unknownAssumption(),months:unknownAssumption(),demand:unknownAssumption(),capacityRequired:unknownAssumption(),requirements:unknownAssumption(),comparisonConfirmed:unknownAssumption(),currency:'USD'},capacity:null,timing:bundle.components.map(component=>({componentId:component.id,start:unknownAssumption(),finish:unknownAssumption()})),dependenciesConfirmed:unknownAssumption(),groups:[],memberships:[],groupsDisjoint:unknownAssumption(),expenses:[],expenseLinks:[],costReviews:bundle.components.map(component=>({componentId:component.id,complete:unknownAssumption()})),costsDistinct:unknownAssumption()};
+ return {costPolicy:planCostPolicy,scope:{population:unknownAssumption(),businessUnit:unknownAssumption(),jobProfile:unknownAssumption(),startMonth:unknownAssumption(),months:unknownAssumption(),demand:unknownAssumption(),capacityRequired:unknownAssumption(),requirements:unknownAssumption(),comparisonConfirmed:unknownAssumption(),currency:'USD'},capacity:null,timing:bundle.components.map(component=>({componentId:component.id,start:unknownAssumption(),finish:unknownAssumption()})),dependenciesConfirmed:unknownAssumption(),groups:[],memberships:[],groupsDisjoint:unknownAssumption(),expenses:[],expenseLinks:[],costReviews:bundle.components.map(component=>({componentId:component.id,complete:unknownAssumption()})),costsDistinct:unknownAssumption()};
 }
 export function createBundleDraft(bundle:SolutionBundle,binding:ActionBinding):BundleDraft{
  fail(validActionBinding(binding),'Invalid exact goal/evidence binding.');componentOrder(bundle.components);
@@ -74,7 +75,8 @@ function validateDraft(draft:BundleDraft){
  fail(exactKeys(bundle as unknown as Record<string,unknown>,['id','name','objective','coordination','components','limitation',...(local?['origin']:[])])&&['A','B','C'].includes(bundle.id)&&bounded(bundle.name,80)&&bounded(bundle.objective,160)&&bounded(bundle.coordination)&&bounded(bundle.limitation),'Invalid saved bundle structure.');
  for(const item of bundle.components)fail(exactKeys(item as unknown as Record<string,unknown>,['id','name','domain','firstStep','evidence','ownerRole','dependsOn','limitation'])&&/^c[1-6]$/.test(item.id)&&bounded(item.name,80)&&bundleDomains.includes(item.domain)&&bounded(item.firstStep,360)&&bounded(item.ownerRole,80)&&bounded(item.limitation,200)&&Array.isArray(item.evidence)&&(local?item.evidence.length===0:item.evidence.length>0)&&item.evidence.length<=3&&new Set(item.evidence).size===item.evidence.length&&item.evidence.every(id=>bounded(id,100)),'Invalid saved component structure.');
  const order=componentOrder(draft.bundle.components),ids=new Set(order),input=draft.inputs,scope=input.scope;
- fail(exactKeys(input as unknown as Record<string,unknown>,['scope','capacity','timing','dependenciesConfirmed','groups','memberships','groupsDisjoint','expenses','expenseLinks','costReviews','costsDistinct',...(input.budget!==undefined?['budget']:[]),...(input.deliveryEstimate!==undefined?['deliveryEstimate']:[]),...(input.successMeasure!==undefined?['successMeasure']:[]),...(input.whatIf!==undefined?['whatIf']:[])]),'Unsupported bundle inputs.');
+ fail(exactKeys(input as unknown as Record<string,unknown>,[...(input.costPolicy!==undefined?['costPolicy']:[]),'scope','capacity','timing','dependenciesConfirmed','groups','memberships','groupsDisjoint','expenses','expenseLinks','costReviews','costsDistinct',...(input.budget!==undefined?['budget']:[]),...(input.deliveryEstimate!==undefined?['deliveryEstimate']:[]),...(input.successMeasure!==undefined?['successMeasure']:[]),...(input.whatIf!==undefined?['whatIf']:[])]),'Unsupported bundle inputs.');
+ if(input.costPolicy!==undefined)fail(input.costPolicy===planCostPolicy,'Unsupported Action Plan cost policy.');
  if(input.budget!==undefined){const budget=input.budget;fail(plain(budget)&&exactKeys(budget as unknown as Record<string,unknown>,['amount','basis']),'Invalid budget constraint.');numeric(budget.amount,1000000000);assumption(budget.basis,value=>value==='cash'||value==='all-in');}
  if(input.deliveryEstimate!==undefined){const e=input.deliveryEstimate;fail(plain(e)&&exactKeys(e as unknown as Record<string,unknown>,['hoursPerParticipant','coordinationHours','hourlyRate','acceptance']),'Invalid delivery estimate.');numeric(e.hoursPerParticipant,1000);numeric(e.coordinationHours,1000000);numeric(e.hourlyRate,100000);assumption(e.acceptance,value=>bounded(value));}
  if(input.whatIf!==undefined)fail(validWhatIf(input.whatIf,draft.binding.goal),'Review a supported what-if with valid units and assumptions.');
@@ -112,9 +114,15 @@ function validateDraft(draft:BundleDraft){
 export function readBundleDraft(raw:unknown):BundleDraft|null{
  try{validateDraft(raw as BundleDraft);return structuredClone(raw) as BundleDraft}catch{return null}
 }
-export function reviseBundleDraft(draft:BundleDraft,inputs:BundleInputs):BundleDraft{
+/** A new working revision uses cash costs and staff hours. Old snapshots replay unchanged. */
+export function cashHoursInputs(inputs:BundleInputs):BundleInputs{
+ const next=structuredClone(inputs);next.costPolicy=planCostPolicy;
+ if(next.budget?.basis.value==='all-in')next.budget.basis={value:'cash',kind:'adopted',basis:'Action Plan cash budget; staff effort is tracked in hours without a monetary value.'};
+ return next;
+}
+export function reviseBundleDraft(draft:BundleDraft,inputs:BundleInputs,legacyReplay=false):BundleDraft{
  validateDraft(draft);fail(draft.revision<100000,'Bundle revision limit reached; previous work is kept.');
- const next={...structuredClone(draft),revision:draft.revision+1,inputs:structuredClone(inputs)};validateDraft(next);return next;
+ const next={...structuredClone(draft),revision:draft.revision+1,inputs:legacyReplay?structuredClone(inputs):cashHoursInputs(inputs)};validateDraft(next);return next;
 }
 /** Keep entered values when editing the plan, but require renewed cost/dependency alignment. */
 export function reviseBundleProposal(draft:BundleDraft,bundle:SolutionBundle):BundleDraft{
@@ -126,7 +134,7 @@ export function reviseBundleProposal(draft:BundleDraft,bundle:SolutionBundle):Bu
  validateDraft(next);return next;
 }
 export function reconcileBundle(draft:BundleDraft):BundleResult{
- const order=validateDraft(draft),input=draft.inputs,scope=input.scope,issues:string[]=[];
+ const order=validateDraft(draft),input=draft.inputs,scope=input.scope,cashHours=input.costPolicy===planCostPolicy,issues:string[]=[];
  if(input.whatIf&&calculatePlanWhatIf(input)?.status!=='ready')issues.push('Conditional what-if needs current scope and complete assumptions.');
  if(input.successMeasure&&input.successMeasure.scopeKey!==JSON.stringify([scope.population.value,scope.startMonth.value,scope.months.value]))issues.push('Success measure population or horizon changed; review the baseline and target again.');
  fail(scope.population.value&&scope.startMonth.value&&scope.months.value,'Confirm the aggregate population and shared planning horizon.');
@@ -162,7 +170,7 @@ export function reconcileBundle(draft:BundleDraft):BundleResult{
   if(internalOverlapUnknown)issues.push('Internal transition overlap is unresolved; combined capacity and complete budget remain Unknown.');
   for(const flow of internal){const available=groupById.get(flow.groupId!)!.count.value;if(available!==null)fail(Number(capacity.input[flow.path])<=available,'Planned internal transitions exceed their reviewed aggregate group count.');}
   const costs=[['hireStaffingCost','External hire staffing','cash'],['backfillStaffingCost','Backfill staffing','cash'],['internalSalaryUplift','Internal salary uplift','cash'],['recruitingFees','Recruiting fees','cash'],['trainingCash','Training cash','cash'],['employeeTimeValue','Employee time value','employee_time']] as const;
-  for(const [field,label,kind] of costs){const monthly=calculated.rows.map(row=>row[field]);ledger.push({id:`capacity:${field}`,label,kind,monthly,total:sum(monthly),componentIds:[],allocations:null});}
+  for(const [field,label,kind] of costs){if(cashHours&&kind==='employee_time')continue;const monthly=calculated.rows.map(row=>row[field]);ledger.push({id:`capacity:${field}`,label,kind,monthly,total:sum(monthly),componentIds:[],allocations:null});}
   const pathDate=(path:StaffingFlow['path'])=>path==='buy'?calculated.arrivalDate:path==='backfills'?calculated.backfillArrival:capacity.input[path==='build'?'buildMonth':'moveMonth']?capacity.input[path==='build'?'buildMonth':'moveMonth']+'-01':null;
   const readiness=capacity.flows.filter(flow=>flow.path!=='backfills').map(flow=>{const arrival=pathDate(flow.path),prerequisites=flow.componentIds.map(id=>componentReady[id]);return {count:Number(capacity.input[flow.path]),date:arrival&&prerequisites.every(date=>date!==null)?[arrival,...prerequisites as string[]].sort().at(-1)!:null};});
   for(let index=0;index<months;index++){const month=monthName(start+index);coverage.push(internalOverlapUnknown?null:sum(readiness.map(flow=>flow.date===null?null:flow.date.slice(0,7)<=month?flow.count:0)));}
@@ -170,18 +178,19 @@ export function reconcileBundle(draft:BundleDraft):BundleResult{
   if(internalOverlapUnknown)issues.push('budget: unresolved staffing overlap');
  }
  for(const expense of input.expenses){
+  if(cashHours&&expense.kind==='employee_time')continue;
   const first=expense.startMonth.value===null?null:monthIndex(expense.startMonth.value),duration=expense.months.value;
   if(first!==null)fail(first>=start&&first<start+months,'Expense start must be in the shared horizon.');if(first!==null&&duration!==null)fail(first+duration<=start+months,'Expense duration must fit the shared horizon.');
   const monthly=Array.from({length:months},(_,index)=>first===null||duration===null?null:index+start>=first&&index+start<first+duration?expense.amount.value:0);
   ledger.push({id:expense.id,label:expense.label,kind:expense.kind,monthly,total:sum(monthly),componentIds:[],allocations:null});
  }
- for(const link of input.expenseLinks){const line=ledger.find(item=>item.id===link.expenseId);fail(line,'Expense link refers to an unavailable cost source.');line.componentIds=[...link.componentIds];line.allocations=structuredClone(link.allocations);}
+ for(const link of input.expenseLinks){if(cashHours&&(link.expenseId==='capacity:employeeTimeValue'||input.expenses.some(expense=>expense.id===link.expenseId&&expense.kind==='employee_time')))continue;const line=ledger.find(item=>item.id===link.expenseId);fail(line,'Expense link refers to an unavailable cost source.');line.componentIds=[...link.componentIds];line.allocations=structuredClone(link.allocations);}
  const capacityUnreviewed=scope.capacityRequired.value===null||scope.capacityRequired.value===true&&!capacity;
  if(capacityUnreviewed)issues.push('Confirm whether additional capacity is required and review its mix before a complete budget.');
  const overlapUnresolved=input.costsDistinct.value!==true||issues.some(issue=>issue.startsWith('budget:'));
  const incompleteCosts=capacityUnreviewed||input.costReviews.some(item=>item.complete.value!==true)||overlapUnresolved||ledger.some(line=>line.total!==0&&line.componentIds.length===0);
  if(incompleteCosts)issues.push('Complete budget is Unknown: review each component’s costs, shared sources and distinct additional expenses.');
- const cash=ledger.filter(line=>line.kind==='cash'),time=ledger.filter(line=>line.kind==='employee_time'),cashTotal=incompleteCosts?null:sum(cash.map(line=>line.total)),employeeTimeTotal=incompleteCosts?null:sum(time.map(line=>line.total));
+ const cash=ledger.filter(line=>line.kind==='cash'),time=ledger.filter(line=>line.kind==='employee_time'),cashTotal=incompleteCosts?null:sum(cash.map(line=>line.total)),employeeTimeTotal=cashHours||incompleteCosts?null:sum(time.map(line=>line.total));
  const componentCash:Record<string,number|null>=Object.fromEntries(order.map(id=>[id,input.costReviews.find(item=>item.componentId===id)!.complete.value===true?0:null]));
  for(const line of cash){
   // Largest-remainder pennies preserve the total without negative tiny final shares.
@@ -195,11 +204,11 @@ export function reconcileBundle(draft:BundleDraft):BundleResult{
  const cashUnknown=cash.some(line=>line.total===null);if(cashUnknown)issues.push('Some cash amounts or funding dates remain Unknown.');
  const capacityReadyMonth=capacity&&scope.demand.value!==null?coverage.findIndex(value=>value!==null&&value>=scope.demand.value!):-1;
  const delivery=planDeliveryEstimate(draft),budget=input.budget;
- const budgetCash=cashTotal??delivery?.cash??null,budgetTime=time.length?employeeTimeTotal:delivery?.employeeTime??null;
- const comparedCost=budget?.basis.value==='cash'?budgetCash:budget?.basis.value==='all-in'&&budgetCash!==null&&budgetTime!==null?cents(budgetCash+budgetTime):null;
+ const budgetCash=cashTotal??delivery?.cash??null,budgetTime=cashHours?null:time.length?employeeTimeTotal:delivery?.employeeTime??null;
+ const comparedCost=cashHours&&budget?budgetCash:budget?.basis.value==='cash'?budgetCash:budget?.basis.value==='all-in'&&budgetCash!==null&&budgetTime!==null?cents(budgetCash+budgetTime):null;
  const headroom=budget?.amount.value!=null&&comparedCost!==null?cents(budget.amount.value-comparedCost):null;
- const budgetCheck:BudgetCheck|undefined=budget?{limit:budget.amount.value,basis:budget.basis.value,cash:budgetCash,employeeTime:budgetTime,comparedCost,headroom,status:headroom===null?'unknown':headroom<0?'over':'within',assumed:cashTotal===null||budget.basis.kind==='illustrative'}:undefined;
- return {...(budgetCheck?{budget:budgetCheck}:{}),...(input.deliveryEstimate?{deliveryEstimate:planDeliveryEstimate(draft)}:{}),...(input.whatIf?{whatIf:calculatePlanWhatIf(input)}:{}),method:bundleMethod,revision:draft.revision,signature:draft.signature,bindingKey:actionBindingKey(draft.binding),scope:structuredClone(scope),ledger,knownCashSubtotal:overlapUnresolved?null:cents(cash.reduce((total,line)=>total+(line.total??0),0)),cashTotal,knownEmployeeTimeSubtotal:overlapUnresolved?null:cents(time.reduce((total,line)=>total+(line.total??0),0)),employeeTimeTotal,componentCash,uniqueParticipants,componentReady,planFinish,capacityReadyMonth:capacityReadyMonth>=0?monthName(start+capacityReadyMonth):null,conditionalCoverage:capacity?coverage:null,plannedAddedEmployees,issues,limitations:['All values are reviewed planning assumptions, not causal estimates or operational approvals.','No retention effects, avoided exits, savings or ROI are summed into this bundle.','Internal transitions do not add company employees; availability and source-team impact remain unverified.','Cash and employee time are separate; existing payroll and structural budgets are not added.','Unique participants covers explicitly reviewed component groups only; it is not company headcount.','Dependency-gated coverage is conditional and may be later than a paid hire arrival; unknown prerequisites keep readiness Unknown.'],inputKey:bundleInputKey(draft)};
+ const budgetCheck:BudgetCheck|undefined=budget?{limit:budget.amount.value,basis:cashHours?'cash':budget.basis.value,cash:budgetCash,employeeTime:budgetTime,comparedCost,headroom,status:headroom===null?'unknown':headroom<0?'over':'within',assumed:cashTotal===null||budget.basis.kind==='illustrative'}:undefined;
+ return {...(cashHours?{costPolicy:planCostPolicy}:{}),...(budgetCheck?{budget:budgetCheck}:{}),...(input.deliveryEstimate?{deliveryEstimate:planDeliveryEstimate(draft)}:{}),...(input.whatIf?{whatIf:calculatePlanWhatIf(input)}:{}),method:bundleMethod,revision:draft.revision,signature:draft.signature,bindingKey:actionBindingKey(draft.binding),scope:structuredClone(scope),ledger,knownCashSubtotal:overlapUnresolved?null:cents(cash.reduce((total,line)=>total+(line.total??0),0)),cashTotal,knownEmployeeTimeSubtotal:cashHours||overlapUnresolved?null:cents(time.reduce((total,line)=>total+(line.total??0),0)),employeeTimeTotal,componentCash,uniqueParticipants,componentReady,planFinish,capacityReadyMonth:capacityReadyMonth>=0?monthName(start+capacityReadyMonth):null,conditionalCoverage:capacity?coverage:null,plannedAddedEmployees,issues,limitations:['All values are reviewed planning assumptions, not causal estimates or operational approvals.','No retention effects, avoided exits, savings or ROI are summed into this bundle.','Internal transitions do not add company employees; availability and source-team impact remain unverified.',cashHours?'Cash costs exclude employee-time valuation; staff effort is tracked in hours. Existing payroll and structural budgets are not added.':'Cash and employee time are separate; existing payroll and structural budgets are not added.','Unique participants covers explicitly reviewed component groups only; it is not company headcount.','Dependency-gated coverage is conditional and may be later than a paid hire arrival; unknown prerequisites keep readiness Unknown.'],inputKey:bundleInputKey(draft)};
 }
 export function compareBundleDrafts(leftDraft:BundleDraft,rightDraft:BundleDraft){
  const left=reconcileBundle(leftDraft),right=reconcileBundle(rightDraft);
