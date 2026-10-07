@@ -63,6 +63,12 @@ try {
    await page.keyboard.press('Escape');await tooltip.waitFor({state:'hidden'});
    await figure.locator('[data-point=forecast]').first().focus();check(prefix+' keyboard forecast tooltip',(await figure.getByRole('status').innerText()).includes(data.rows[0].month.endsWith('12')?'Dec 2026':'Oct 2026'));
    await figure.locator('[data-missing]').first().focus();check(prefix+' keyboard missing-value explanation',/unreleased|rate unavailable/.test(await figure.getByRole('status').innerText()));
+   if(domain==='hiring') {
+    await figure.locator('[data-missing="2025-11"]').focus();
+    check(prefix+' zero-opening month remains a missing rate',/Nov 2025.*zero openings; rate unavailable/s.test(await tooltip.innerText())&&!((await tooltip.innerText()).includes('90-day outcome')));
+    await figure.locator('[data-missing="2026-07"]').focus();
+    check(prefix+' July gap explains the frozen outcome reporting cutoff',/Jul 2026.*90-day outcome not fully reported at the Sep 30, 2026 cutoff; no observed value/s.test(await tooltip.innerText())&&await bounded()&&await figure.locator('[data-point="history"][data-month="2026-07"]').count()===0);
+   }
    await figure.screenshot({path:`${screenshotDirectory}/${name}-${palette}-${domain}.png`});
   }
   for(const mode of ['flat','singleton','unavailable','verified']) {

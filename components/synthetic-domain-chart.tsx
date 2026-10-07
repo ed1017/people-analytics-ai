@@ -65,11 +65,15 @@ export function SyntheticDomainChart({domain, data}: {domain: SyntheticDemoDomai
     return {tabIndex:0,'aria-label':label,'aria-describedby':tip&&feedbackText(tip.feedback)===feedbackText(feedback)?id+'-tooltip':undefined,onFocus:show,onBlur:()=>setTip(null),onPointerEnter:(event:ReactPointerEvent<Element>)=>{if(event.pointerType!=='touch')show(event);},onPointerLeave:(event:ReactPointerEvent<Element>)=>{if(event.pointerType!=='touch'&&document.activeElement!==event.currentTarget)setTip(null);},onClick:show};
   };
   const range = `${formatDemoValue(domain, scale.min)}–${formatDemoValue(domain, scale.max)}${turnover ? ' exits' : ''}`;
+  const cutoffDate = new Date(data.cutoff).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
+  const unreleasedReason = domain === 'hiring'
+    ? `90-day outcome not fully reported at the ${cutoffDate} cutoff; no observed value`
+    : 'unreleased, no observed value';
   const bridge = turnover && lastHistory && d.rows.length > 0;
   const gapNote = bridge
     ? 'September is unreleased. Faint long-dashed bridges connect August to October projections; they are not September observations.'
-    : `Unreleased gap: ${d.gaps.map(period).join(', ') || 'none'}. ${domain === 'satisfaction' ? 'December is one future quarterly wave. ' : ''}No history-to-forecast interpolation.`;
-  const missing = [...history.filter(row => !hasChartValue(row.value)).map(row => ({month: row.month, reason: domain === 'hiring' ? 'zero openings; rate unavailable' : 'observed value unavailable'})), ...d.gaps.map(month => ({month, reason: 'unreleased, no observed value'}))].filter(row => row.month >= start && row.month <= end);
+    : `Unreleased gap: ${d.gaps.map(period).join(', ') || 'none'}. ${domain === 'hiring' ? `These opening cohorts do not have fully reported 90-day outcomes at the ${cutoffDate} cutoff. ` : domain === 'satisfaction' ? 'December is one future quarterly wave. ' : ''}No history-to-forecast interpolation.`;
+  const missing = [...history.filter(row => !hasChartValue(row.value)).map(row => ({month: row.month, reason: domain === 'hiring' ? 'zero openings; rate unavailable' : 'observed value unavailable'})), ...d.gaps.map(month => ({month, reason: unreleasedReason}))].filter(row => row.month >= start && row.month <= end);
   const zeroOpenings = domain === 'hiring' ? history.filter(row => row.value === null).map(row => period(row.month)) : [];
   return <figure ref={container} aria-label={`${demoDomainCopy[domain].title}: simulated history and projections`} className="min-w-0 space-y-2">
     <figcaption className="text-xs font-medium">Simulated history → projections<span className="mt-1 block">{demoDomainCopy[domain].unit}</span></figcaption>
