@@ -33,5 +33,5 @@ export function HomeCandidateOptions({starterGoal,turnoverFocus,onFocusGoal,focu
    <details><summary className="min-h-11 cursor-pointer py-2 text-sm">Compare workforce numbers</summary><p className="mb-2 text-sm">Review supported scope and assumptions before calculating workforce options. These investigations do not predict intervention effects.</p><button className={button} disabled={busy} onClick={onQuantify}>Review numbers</button></details>
   </>}
   {notice&&<p role="status" className="text-sm">{notice}</p>}
- </section>{!pinned&&explorationChoices&&<div className="text-xs text-muted-foreground"><p>Optional exploration</p>{explorationChoices}</div>}</>;
+ </section>{!pinned&&explorationChoices}</>;
 }

@@ -1,4 +1,4 @@
-/** Reveal the pending turn without moving keyboard focus. When it completes,
+/** Reveal the start of the new turn without moving keyboard focus. When it completes,
  * keep its answer in view if a newly inserted goal panel displaced it. Any
  * intervening user navigation or composer input leaves scrolling to the user.
  */
@@ -6,7 +6,7 @@ export function queueHomeResponseReveal(viewport:()=>HTMLElement|null,isCurrent:
  let frame=0,cancelled=false,position:{outer:number;inner:number}|null=null;
  const events=['wheel','touchstart','pointerdown','keydown','input'] as const;
  const cancel=()=>{cancelled=true;cancelAnimationFrame(frame);for(const event of events)window.removeEventListener(event,cancel,true);};
- const target=()=>{const port=viewport(),answers=port?.querySelectorAll<HTMLElement>('[data-chat-role="assistant"]');return port?.querySelector<HTMLElement>('[aria-label="AI answer status"]')??answers?.[answers.length-1];};
+ const target=()=>{const port=viewport(),answers=port?.querySelectorAll<HTMLElement>('[data-chat-role="assistant"]');return port?.querySelector<HTMLElement>('[data-home-response-start]')??port?.querySelector<HTMLElement>('[aria-label="AI answer status"]')??answers?.[answers.length-1];};
  const reveal=(completion:boolean)=>{
   if(cancelled||!isCurrent()){cancel();return;}
   const port=viewport(),node=target();
