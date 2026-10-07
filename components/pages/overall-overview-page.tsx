@@ -44,8 +44,8 @@ import {readHomeClarification,inspectHomeCandidateProposal,readHomePreparationDi
 import {readWorkforceSolution,currentSolutionVersion,solutionResultIsCurrent} from '@/lib/workforce-solution';
 import {readSavedWorkforceReview} from '@/lib/workforce-solution-review';
 import { GoalConversationMessages, ConversationMessages } from "@/components/goal-conversation-messages";
-import {readSurveySource,refreshSurveySource} from '@/lib/survey-source-client';
-import { buildHomePack, homeDefinitions, readHomeSource } from "@/lib/home-pack.mjs";
+import {HomeSourceRequests,sameHomeSourceResults} from '@/lib/home-source-client';
+import { buildHomePack } from "@/lib/home-pack.mjs";
 import type { DevelopmentSession } from "@/components/development-workspace";
 import { PromptExamples } from "@/components/prompt-examples";
 import { contextualPrompts, homeStarterGroups } from "@/lib/contextual-prompts";
@@ -107,6 +107,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     setPlanningReview({context:planningContext,goalId:conversation.activeGoalId,goal:conversation.focusedIssue});
   }
   const [sourceResults, setSourceResults] = useState<Record<string, unknown>>({});
+  const sourceResultsRef=useRef<Record<string,unknown>>({});
+  const [sourceRequests]=useState(()=>new HomeSourceRequests());
   const starterForecasts=useRef(new Map<ChatMessage,{context:string;forecast:NonNullable<ReturnType<typeof homeStarterForecast>>}>());
   const exitReasonCharts=useRef(new Map<ChatMessage,{context:string;source:unknown;chart:ExitReasonChartData}>());
   const [loadedScope, setLoadedScope] = useState("");
@@ -178,7 +180,6 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   }
   function changeQuestion(value:string){setRecoveryConfirmation(null);setLocalAction(null);setInput(value)}
   const loaded = useRef("");
-  const loadedAt = useRef(0);
   const composer = useRef<HTMLTextAreaElement>(null);
   const conversationViewport = useRef<HTMLDivElement>(null);
   const responseReveal=useRef<ReturnType<typeof queueHomeResponseReveal>|null>(null);
@@ -220,24 +221,27 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   }
 
   useEffect(() => {
+    if (!active) return;
     const loadKey = JSON.stringify({workforceQuery, workforceScope, refresh, persona});
-    if (!active || (loaded.current === loadKey && Date.now() - loadedAt.current < 300000)) return;
+    const cached=sourceRequests.peek(workforceQuery);
+    if (loaded.current===loadKey&&cached&&sameHomeSourceResults(sourceResultsRef.current,cached)) return;
     // An interrupted scope load must not leave an older cache key suppressing its reload.
     loaded.current = "";
     const controller = new AbortController();
     const load = async () => {
       setLoading(true); setEvidenceError(null);
-      const keys = [...new Set(homeDefinitions.map(def => def[1]))].filter(key => !["catalogue","development"].includes(key));
-      const entries = await Promise.all(keys.map(async key => [key, await (key === "survey-sentiment" ? readSurveySource(controller.signal) : readHomeSource("/api/" + key + (key === "dashboard" ? workforceQuery : ""), controller.signal))]));
+      const next=await sourceRequests.read(workforceQuery,controller.signal);
       if (controller.signal.aborted) return;
-      const next = Object.fromEntries(entries);
-      setSourceResults(next); setLoadedScope(workforceQuery); setSettledEvidenceKey(loadKey); setEvidenceRevision(value => value + 1);
+      if(!sameHomeSourceResults(sourceResultsRef.current,next)){
+        sourceResultsRef.current=next;setSourceResults(next);setEvidenceRevision(value=>value+1);
+      }
+      setLoadedScope(workforceQuery); setSettledEvidenceKey(loadKey);
       if (Object.values(next).every(source => (source as {status:string}).status !== "loaded")) setEvidenceError("Remote evidence unavailable. Session examples remain available; coverage is partial.");
-      loaded.current = loadKey; loadedAt.current = Date.now(); setLoading(false);
+      loaded.current = loadKey; setLoading(false);
     };
     void load();
     return () => controller.abort();
-  }, [active, persona, refresh, workforceQuery, workforceScope]);
+  }, [active, persona, refresh, workforceQuery, workforceScope,sourceRequests]);
 
   const contextKey = JSON.stringify({ resetEpoch:conversation.resetEpoch, goalId:conversation.activeGoalId, persona, workforceQuery, workforceScope, evidenceRevision, refresh, developmentSession, focusedIssue:conversation.focusedIssue });
   // User intent survives evidence-only refresh; source-backed proposals still require the exact evidence context.
@@ -356,7 +360,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   }
 
   const sourcesSettled=!loading&&loadedScope===workforceQuery&&settledEvidenceKey===JSON.stringify({workforceQuery,workforceScope,refresh,persona});
-  function refreshHomeData(){liveFindingTurn.current=null;loaded.current='';refreshSurveySource();setRefresh(value=>value+1);}
+  function refreshHomeData(){liveFindingTurn.current=null;loaded.current='';sourceRequests.invalidate(workforceQuery);setRefresh(value=>value+1);}
   const ready = Boolean(sources?.some(source => source.facts)) && !loading && loadedScope === workforceQuery;
   const demoPlan=readHomeDemo(storage.data.workspaces[conversation.activeGoalId]?.fields[homeDemoField],conversation.activeGoalId);
   const planEditReady=ready||Boolean(demoPlan&&demoPlan.example.goal===conversation.focusedIssue&&conversation.storageReady);
