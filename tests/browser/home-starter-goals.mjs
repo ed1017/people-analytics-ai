@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Production UI; synthetic source and chat fixtures, no live model/data requests.
 import assert from 'node:assert/strict';
 import {homeStarterGroups} from '../../lib/contextual-prompts.ts';
@@ -17,7 +18,7 @@ async function open(width=390,missing=false){
  if(url.pathname==='/api/chat'){const body=request.postDataJSON();posts.push(body);if(body.message==='Prepare coordinated solution bundles for my exact pinned goal.')return route.fulfill({status:502,json:{error:'Synthetic preparation unavailable; pinned goal remains saved.'}});
  return route.fulfill({json:{answer:homeForecastAnswer(body.message)??'Review current recorded evidence for this question. [W1] Causes and intervention effects remain unknown.',nextStep:'none',candidateProposal:null,findingFollowups:[]}})}
  if(url.pathname.startsWith('/api/')){if(missing&&['/api/attrition','/api/survey-sentiment','/api/talent-acquisition'].includes(url.pathname))return route.fulfill({status:503,json:{error:'Synthetic unavailable'}});return route.fulfill({json:url.pathname==='/api/dashboard'?scopeDashboard(url.search):({'/api/workforce':workforce,'/api/attrition':attrition,'/api/survey-sentiment':survey,'/api/talent-acquisition':talent,'/api/career-growth-mobility':career}[url.pathname]??{})})}return route.continue()});
- await page.goto(base);const input=page.getByLabel('Ask Workforce AI',{exact:true});await input.waitFor();await page.waitForFunction(()=>!document.querySelector('[aria-label="Suggested questions"] button')?.disabled);
+ await page.goto(base);await dismissHomeOnboarding(page);const input=page.getByLabel('Ask Workforce AI',{exact:true});await input.waitFor();await page.waitForFunction(()=>!document.querySelector('[aria-label="Suggested questions"] button')?.disabled);
  return {context,page,posts,errors,input,external:()=>external,state:()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY)};
 }
 try{

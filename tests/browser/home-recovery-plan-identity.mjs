@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Production build, intercepted synthetic evidence/model transport. Two real browser
 // tabs exercise localStorage conflicts; this does not verify a hosted live model.
 import assert from 'node:assert/strict';
@@ -22,12 +23,12 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]])for(const scenar
  let id;const fields=async()=>(await state()).workspaces[id].fields,catalog=async()=>readPlanAlternatives((await fields()).homePlanAlternativesV1,{goalId:id,goal}),history=async()=>({legacy:(await fields()).homeSolutionBundlesV1?.attachments??[],numbered:(await catalog())?.attachments??[]});
  const recover=async()=>{await button(page,'Retry saving').click();if(await button(page,'Keep saved versions and my request').count())await button(page,'Keep saved versions and my request').click();await page.locator('[data-plan-current="true"]').waitFor()};
  try{
-  await page.goto(base);await chat(page).waitFor();await send(page,goal);await page.locator('[data-guide-target="pin"]').click();await ready(page);id=(await state()).goals.activeId;
+  await page.goto(base);await dismissHomeOnboarding(page);await chat(page).waitFor();await send(page,goal);await page.locator('[data-guide-target="pin"]').click();await ready(page);id=(await state()).goals.activeId;
   await attach(page);await page.getByRole('status').filter({hasText:/Action Plan attached\./}).waitFor();const originalHistory=JSON.stringify((await history()).legacy);
   if(scenario==='direct-attach')await tab(page,3).click();else await chat(page).fill('Set coordination hours to 24');
   // Wait until tab A's original selection/request is actually saved before B reads it.
   await page.waitForFunction(({key,id,text})=>JSON.parse(localStorage.getItem(key)).payload.workspaces[id].fields.chat.input===text,{key:DECISIONS_STORAGE_KEY,id,text:scenario==='direct-attach'?'':'Set coordination hours to 24'});
-  const other=await context.newPage();setup(other);await other.goto(base);await ready(other);
+  const other=await context.newPage();setup(other);await other.goto(base);await dismissHomeOnboarding(other);await ready(other);
   if(scenario==='direct-attach'){
    await tab(other,2).click();await attach(other);await other.getByRole('status').filter({hasText:/Action Plan attached\./}).waitFor();const remoteHistory=JSON.stringify(await history());
    check(label+' has no typed draft before direct Attach',await chat(page).inputValue()==='');await button(page,'Attach Action Plan').click();await button(page,'Retry saving').waitFor();

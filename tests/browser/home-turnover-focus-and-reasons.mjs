@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Isolated production UI with synthetic aggregate fixtures and model responses.
 import assert from 'node:assert/strict';
 import {decodeHomeModelReply} from '../../lib/home-chat-reply.ts';
@@ -24,7 +25,7 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]]){
   if(url.pathname.startsWith('/api/'))return route.fulfill({json:{as_of:'2026-09-30',summary:{headcount:5000,total_exits:100,total_turnover_ytd_pct:10,voluntary_exits:60,voluntary_turnover_ytd_pct:6,regrettable_exits:20},trend:[],business_units:[],levels:[],tenure:[],reasons:[]}});
   return route.continue();
  });
- await page.goto(base);const input=page.getByLabel('Ask Workforce AI',{exact:true}),button=name=>page.getByRole('button',{name,exact:true}),card=page.getByRole('region',{name:'Pin this problem'}),chat=page.getByRole('region',{name:'Overview conversation'});
+ await page.goto(base);await dismissHomeOnboarding(page);const input=page.getByLabel('Ask Workforce AI',{exact:true}),button=name=>page.getByRole('button',{name,exact:true}),card=page.getByRole('region',{name:'Pin this problem'}),chat=page.getByRole('region',{name:'Overview conversation'});
  const send=async text=>{await input.fill(text);const done=page.waitForResponse(r=>r.url()===base+'/api/chat');await button('Send overview question').click();await done;await page.getByRole('status',{name:'AI answer status',exact:true}).waitFor({state:'hidden'})};
  const state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
  await input.waitFor();await page.waitForFunction(key=>Boolean(localStorage.getItem(key)),DECISIONS_STORAGE_KEY);const seeded=JSON.stringify((await state()).workspaces['demo-reduce-turnover']);await send('Reduce turnover');await button('Pin overall turnover goal').waitFor();

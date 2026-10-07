@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Local combined build only. All source/model endpoints are intercepted.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -31,7 +32,7 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]]){
  const button=name=>page.getByRole('button',{name,exact:true}),input=page.getByLabel('Ask Workforce AI',{exact:true});
  const state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
  const send=async text=>{await input.fill(text);await button('Send overview question').click()};
- await page.goto(base);const status=page.getByRole('status',{name:'Home data status'});
+ await page.goto(base);await dismissHomeOnboarding(page);const status=page.getByRole('status',{name:'Home data status'});
  await input.waitFor();await status.waitFor({state:'hidden',timeout:18000});
  check(mode+' all current demo goals seeded',(await state()).goals.goals.length===homeDemoExamples.length);
  await send('What did exit-survey respondents report?');await page.locator('[data-chat-role=assistant]').last().getByText(/Exit-survey feedback is unavailable/).waitFor();

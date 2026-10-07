@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Real production UI with intercepted evidence/model transport and archived saved-plan fixtures.
 // This verifies recovery of pre-fix local data, not hosted/live-model behavior.
 import assert from 'node:assert/strict';
@@ -20,7 +21,7 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]])for(const layout
  await context.route('**/*',async route=>{const request=route.request(),url=new URL(request.url());if(url.origin!==base){external++;return route.abort()}if(url.pathname==='/api/chat'){const body=request.postDataJSON();posts.push(body);return route.fulfill({json:body.message==='Prepare coordinated solution bundles for my exact pinned goal.'?{proposal:retentionProposal(body.goalContext.goal)}:{answer:'Your desired reduction is 2 percentage points over 12 months. Baseline and workforce population remain unknown.',nextStep:'none'}})}if(url.pathname.startsWith('/api/'))return route.fulfill({json:{overview:{headcount:120,fte:110,open_positions:3,snapshot_date:'2026-09-30'}}});return route.continue()});
  const button=name=>page.getByRole('button',{name,exact:true}),input=page.getByLabel('Ask Workforce AI',{exact:true}),panel=page.getByRole('region',{name:'Action Plans for your goal',exact:true}),state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY),tag=mode+' '+layout;
  try{
- await page.goto(base);await input.waitFor();await input.fill(fixture.request);await button('Send overview question').click();await page.locator('[data-guide-target="pin"]').click();await page.locator('[data-plan-current="true"]').waitFor();
+ await page.goto(base);await dismissHomeOnboarding(page);await input.waitFor();await input.fill(fixture.request);await button('Send overview question').click();await page.locator('[data-guide-target="pin"]').click();await page.locator('[data-plan-current="true"]').waitFor();
  const data=await state(),id=data.goals.activeId,fields=data.workspaces[id].fields,binding=fields.homeBundlePreparationV1.binding,scope={goalId:id,goal:fixture.request};
  const oldDrafts=(process.env.RETENTION_SAVED_REQUEST?fixture.drafts:fixture.fullDrafts).map(old=>({...structuredClone(old),binding:structuredClone(binding)}));
  if(process.env.RETENTION_SAVED_REQUEST)assert.ok(oldDrafts.every(draft=>draft.inputs.scope.months.value===3&&draft.inputs.scope.months.kind==='illustrative'),'ordinary wording starts from actual archived three-month drafts');

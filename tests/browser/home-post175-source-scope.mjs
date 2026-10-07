@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Local browser fixtures exercising real Home controls and the production response inspector.
 // These are not hosted or live-model checks; actual RPC aggregate checks are recorded separately.
 import assert from 'node:assert/strict';
@@ -24,7 +25,7 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]]){
   return route.continue();
  });
  const button=name=>page.getByRole('button',{name,exact:true}),chat=page.getByLabel('Ask Workforce AI',{exact:true});
- await page.goto(base);const filters=page.locator('.workforce-filter-disclosure');if(width<768)await filters.locator('summary').click();await page.getByLabel('Country',{exact:true}).selectOption('US');
+ await page.goto(base);await dismissHomeOnboarding(page);const filters=page.locator('.workforce-filter-disclosure');if(width<768)await filters.locator('summary').click();await page.getByLabel('Country',{exact:true}).selectOption('US');
  await button('Open data details').click();const details=page.getByRole('dialog',{name:'Data details'}),scope=details.getByRole('region',{name:'How filters affect evidence'});await scope.getByText(/United States; All business units; All levels/).waitFor();
  check(mode+' effective catalogue scope appears in Data details',await scope.getByText(/effective scope cannot be verified/).isVisible());await button('Close data details').click();
  const bad=['The United States scenario has 15,000 employees. [P1, A1]','## United States\n- Recorded exits were 400. [A1]','The United States global scenario has 15,000 employees. [P1]','**United States turnover was 8%. [A1]**','Use the United States turnover rate of 8% [A1] to prioritize manager support.'];

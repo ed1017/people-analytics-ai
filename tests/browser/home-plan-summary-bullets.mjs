@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Local production app, intercepted synthetic evidence/model responses only.
 import assert from 'node:assert/strict';
 import {mkdir} from 'node:fs/promises';
@@ -22,7 +23,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
   check(mode+' '+name+' keeps detailed assumptions collapsed',await article().getByRole('button',{name:'Show assumptions',exact:true}).getAttribute('aria-expanded')==='false'&&await article().getByText(/Staffing assumptions:/).isHidden());
  };
  try{
-  await page.goto(base);await input.waitFor();await send(goal);await page.locator('[data-guide-target="pin"]').click();await panel.getByRole('tab',{name:'Action Plan #1',exact:true}).waitFor();await page.locator('[data-plan-current="true"]').waitFor();await structure('original');
+  await page.goto(base);await dismissHomeOnboarding(page);await input.waitFor();await send(goal);await page.locator('[data-guide-target="pin"]').click();await panel.getByRole('tab',{name:'Action Plan #1',exact:true}).waitFor();await page.locator('[data-plan-current="true"]').waitFor();await structure('original');
   await button('Attach Action Plan').click();await panel.getByRole('status').filter({hasText:/Action Plan attached\./}).waitFor();const id=(await state()).goals.activeId,fields=async()=>(await state()).workspaces[id].fields,original=JSON.stringify((await fields()).homeSolutionBundlesV1.attachments);
   await send('In Action Plan #1 set coordination hours to 24');await panel.getByRole('tab',{name:'Action Plan #4',exact:true}).waitFor();await structure('revision');
   check(mode+' revision keeps 10 participants and recalculates 44 hours',await summary().getByText('10 assumed participants.',{exact:true}).isVisible()&&await summary().getByText('44 total staff hours.',{exact:true}).isVisible());

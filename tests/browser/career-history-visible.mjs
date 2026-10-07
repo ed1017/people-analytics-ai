@@ -64,16 +64,19 @@ try {
       };
 
       await page.goto(base);
-      const intro = page.getByRole('button', {name: /^(Show|Hide) instructions$/});
+      const intro = page.getByRole('button', {name: 'Show instructions', exact: true});
+      const instructions = page.getByRole('dialog', {name: 'Home instructions', exact: true});
       await intro.waitFor();
+      await page.waitForFunction(() => !document.querySelector('[aria-label="Selected goal"]')?.disabled);
+      if (await instructions.isVisible()) await button('Close instructions').click();
       check(name + ' applies the requested palette', await page.locator('html').getAttribute('data-workspace-preference') === palette);
-      check(name + ' intro starts collapsed', await intro.getAttribute('aria-expanded') === 'false');
+      check(name + ' dismissed instructions leave the Home controls available', !await instructions.isVisible());
       await intro.focus(); await page.keyboard.press('Enter');
-      check(name + ' intro still expands by keyboard', await intro.getAttribute('aria-expanded') === 'true'
-        && await page.getByRole('heading', {name: 'From question to action', exact: true}).isVisible());
-      await intro.focus(); await page.keyboard.press('Space');
-      check(name + ' intro still collapses by keyboard', await intro.getAttribute('aria-expanded') === 'false'
-        && !await page.getByRole('heading', {name: 'From question to action', exact: true}).isVisible());
+      check(name + ' instructions still open by keyboard', await instructions.isVisible()
+        && await instructions.getByRole('heading', {name: 'From question to action', exact: true}).isVisible());
+      await page.keyboard.press('Escape');
+      check(name + ' Escape closes instructions and returns keyboard focus', !await instructions.isVisible()
+        && await intro.evaluate(node => node === document.activeElement));
       const country = page.getByLabel('Country', {exact: true});
       if (!await country.isVisible()) await page.locator('.workforce-filter-disclosure > summary').click();
       await country.selectOption('CA');
@@ -95,7 +98,7 @@ try {
         && await history.getByText(/These dashboard selections do not narrow these recorded movement events/).isVisible());
       await page.screenshot({path: path.join(output, device + '-' + palette + '-loaded.png'), fullPage: true});
       await navigate('home');
-      check(name + ' return to Home preserves the independent intro control', await intro.getAttribute('aria-expanded') === 'false');
+      check(name + ' return to Home preserves the independent intro control', !await instructions.isVisible() && await intro.isVisible());
       await navigate('career-growth-mobility');
       await history.getByText('Recorded Movement Events', {exact: true}).waitFor();
       check(name + ' navigation keeps recorded history visible with its company-wide scope', await history.getByText('Recorded Movement Events', {exact: true}).isVisible()

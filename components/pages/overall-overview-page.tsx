@@ -504,7 +504,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
       <header className="flex flex-wrap items-start justify-between gap-3">
         <button type="button" onClick={resetHomeConversation} className="min-h-11 rounded px-2 text-xs font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Reset conversation</button>
         <h2 id="overall-overview-heading" className="sr-only">Home overview</h2>
-        <HomeGettingStarted busy={chatLoading||guidedExampleActive} dismissKey={JSON.stringify([instructionsDismissed,conversation.workspaceKey,guidedExampleActive])} onNavigate={onNavigate} onStartDemo={onStartDemo} status={
+        <HomeGettingStarted active={active} ready={conversation.storageReady} autoOpen={conversation.firstHomeVisit&&!conversation.input.trim()&&!conversation.issueEditor} busy={chatLoading||guidedExampleActive} dismissKey={JSON.stringify([instructionsDismissed,conversation.workspaceKey,guidedExampleActive])} onNavigate={onNavigate} onStartDemo={onStartDemo} status={
         <div className="ml-auto flex items-center gap-3 text-xs">
           <span className="text-muted-foreground">In development</span>
           <button type="button" popoverTarget="home-data-details" aria-label="Open data details" title="Data, scope and conversation history" className="flex min-h-11 items-center gap-1 rounded px-2 text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"><Info size={16}/><span>Data details</span>{!sourcesSettled&&<span role="status" aria-label="Evidence refresh status">Refreshing…</span>}</button>

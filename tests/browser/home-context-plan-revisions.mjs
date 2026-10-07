@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 import {readPlanAlternatives} from '../../lib/home-plan-alternatives.ts';
 // Production app; synthetic intercepted evidence/model responses only. No operational writes.
 import assert from 'node:assert/strict';
@@ -34,7 +35,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  });
  const button=name=>page.getByRole('button',{name,exact:true}),input=page.getByLabel('Ask Workforce AI',{exact:true}),panel=page.getByRole('region',{name:'Action Plans for your goal',exact:true}),state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
  const send=async text=>{await input.fill(text);await button('Send overview question').click();};
- await page.goto(base);await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:DECISIONS_STORAGE_KEY,value:encodeDecisions({version:1,revision:1,goals:{version:1,activeId:'',goals:[{id:'other',statement:'Improve support'}]},workspaces:{}})});await page.reload();
+ await page.goto(base);await dismissHomeOnboarding(page);await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:DECISIONS_STORAGE_KEY,value:encodeDecisions({version:1,revision:1,goals:{version:1,activeId:'',goals:[{id:'other',statement:'Improve support'}]},workspaces:{}})});await page.reload();
  await send('Reduce turnover');await page.getByRole('button',{name:/^Pin (as goal|overall turnover goal)$/}).click();await page.locator('[data-plan-current="true"]').waitFor();
  const id=(await state()).goals.activeId,fields=async()=>{const data=await state(),f=data.workspaces[id].fields;return {...f,...(f.homePlanAlternativesV1?{homePlanAlternativesV1:readPlanAlternatives(f.homePlanAlternativesV1,{goalId:id,goal:data.goals.goals.find(goal=>goal.id===id).statement})}:{})}};
  check(mode+' exact starting scope and costs',await panel.getByText(/Assumed cash \$3,500 USD/).isVisible()&&await panel.getByText(/36 total staff hours/).isVisible()&&await panel.getByLabel('Selected plan summary').getByText(/2026-11-28/).isVisible());

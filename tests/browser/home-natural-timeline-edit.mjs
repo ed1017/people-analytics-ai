@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Actual UI and local calculators, with synthetic evidence/model transport only.
 import assert from 'node:assert/strict';
 import {retentionProposal} from '../fixtures/home-retention-proposal.mjs';
@@ -15,7 +16,7 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]]){
  const button=name=>page.getByRole('button',{name,exact:true}),input=page.getByLabel('Ask Workforce AI',{exact:true}),panel=page.getByRole('region',{name:'Action Plans for your goal',exact:true}),state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
  const send=async text=>{await input.fill(text);await button('Send overview question').click()};
  try{
-  await page.goto(base);await input.waitFor();await send(goal);await page.locator('[data-guide-target="pin"]').click();await panel.getByRole('tab',{name:'Action Plan #1',exact:true}).waitFor();await page.locator('[data-plan-current="true"]').waitFor();
+  await page.goto(base);await dismissHomeOnboarding(page);await input.waitFor();await send(goal);await page.locator('[data-guide-target="pin"]').click();await panel.getByRole('tab',{name:'Action Plan #1',exact:true}).waitFor();await page.locator('[data-plan-current="true"]').waitFor();
   const initial=await state(),id=initial.goals.activeId,fields=()=>state().then(data=>data.workspaces[id].fields),catalog=async()=>readPlanAlternatives((await fields()).homePlanAlternativesV1,{goalId:id,goal});
   await button('Attach Action Plan').click();await page.getByRole('status').filter({hasText:/Action Plan attached\./}).waitFor();const originalAttachment=JSON.stringify((await fields()).homeSolutionBundlesV1.attachments);
   check(mode+' first saved attachment retains the requested 12-month horizon',(await fields()).homeSolutionBundlesV1.attachments.at(-1).draft.inputs.scope.months.value===12);

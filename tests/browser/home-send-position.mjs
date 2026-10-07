@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Actual composer states in a local production build; all evidence/model transport
 // is intercepted. Observation mode records the same flow on pre-fix commits.
 import assert from 'node:assert/strict';
@@ -26,7 +27,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
   if(output&&['empty','submitted','resubmitting','recovered'].includes(name))await page.screenshot({path:output+'/'+mode+'-'+name+'.png'});
  };
  try{
-  await page.goto(base);await input.waitFor();await capture('empty');check(mode+' empty Send is disabled',await send.isDisabled());
+  await page.goto(base);await dismissHomeOnboarding(page);await input.waitFor();await capture('empty');check(mode+' empty Send is disabled',await send.isDisabled());
   await input.fill('A short draft');await capture('text');check(mode+' populated Send is enabled',await send.isEnabled());
   const long=Array.from({length:20},(_,i)=>'Line '+i+': keep the complete request.').join('\n');await input.fill(long);await capture('long-text');check(mode+' long draft is retained',await input.inputValue()===long);
   await input.fill(goal);hold=true;await send.click();await page.getByLabel('AI answer status',{exact:true}).waitFor();await capture('loading');check(mode+' loading Send is disabled',await send.isDisabled());hold=false;release();await pin.waitFor();await capture('submitted');

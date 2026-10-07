@@ -19,7 +19,7 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]]){
  });
  const button=name=>page.getByRole('button',{name,exact:true}),chat=page.getByLabel('Ask Workforce AI',{exact:true}),status=page.getByRole('status',{name:'Home data status',exact:true}),state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
  const refresh=async()=>{await button('Open data details').click();await button('Refresh overview evidence').click();};
- await page.goto(base);await status.getByText('Loading data…',{exact:true}).waitFor();await chat.fill('Keep this draft');
+ await page.goto(base);await page.getByRole('dialog',{name:'Home instructions',exact:true}).waitFor();await button('Close instructions').click();await status.getByText('Loading data…',{exact:true}).waitFor();await chat.fill('Keep this draft');
  check(mode+' slow load has a prominent indeterminate accessible status',await status.getAttribute('aria-live')==='polite'&&await status.locator('svg[aria-hidden="true"]').count()===1&&!/\d+%/.test(await status.innerText())&&await chat.inputValue()==='Keep this draft');
  await page.screenshot({path:'/tmp/home-loading-'+mode+'.png'});
  hold=false;release();await status.waitFor({state:'hidden'});await button('Open data details').click();

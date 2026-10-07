@@ -1,3 +1,4 @@
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Exact reported prompt; synthetic malformed discovery and plan fixtures, never live generation.
 import assert from 'node:assert/strict';
 import {aiSkillsGoalPrompt} from '../fixtures/home-ai-skills-goal.mjs';
@@ -51,7 +52,7 @@ try{
   const button=name=>page.getByRole('button',{name,exact:true}),chat=page.getByLabel('Ask Workforce AI',{exact:true});
   const state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
   const panel=page.getByRole('region',{name:'Action Plans for your goal',exact:true});
-  await page.goto(base);
+  await page.goto(base);await dismissHomeOnboarding(page);
   await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:DECISIONS_STORAGE_KEY,value:encodeDecisions({version:1,revision:1,goals:{version:1,activeId:'',goals:[{id:'other',statement:'Improve manager support'}]},workspaces:{other:{savedAt:'2026-10-05T00:00:00Z',fields:{sentinel:{keep:'unrelated work'}}}}})});
   await page.reload();await chat.fill(aiSkillsGoalPrompt);await button('Send overview question').click();
   const status=page.getByRole('status',{name:'Problem and options not prepared'});
