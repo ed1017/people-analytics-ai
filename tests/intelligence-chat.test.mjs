@@ -63,3 +63,27 @@ test('software examples and shared mapping counts are bounded and unavailable so
  const invalid=intelligenceEvidence('occupational-references',{occupationalReference:{...reference,coverage:{profiles:2,mappedProfiles:8,profilesSharingOccupation:8}}}).selectedReference;
  assert.deepEqual(invalid.coverage,{profiles:2,mappedProfiles:null,profilesSharingOccupation:null});
 });
+
+test('independent occupation details retain exact code when the catalog is unavailable',()=>{
+ const reference={population:'occupational_reference',sourceMode:'stored',selectedOccupationCode:'11-1011.00',occupation:null,selectedProfile:{code:'SYNTHETIC-PARTIAL',name:'Synthetic partial-source role'},mappingStatus:'Stored mapping; review needed',sourceStatus:{profiles:'ready',mappings:'ready',occupations:'unavailable',essentialSkills:'ready',softwareSkills:'ready'},essentialSkills:[{name:'Synthetic reference skill',importance:4,level:5}],softwareSkills:[{name:'Synthetic software example',category:'Synthetic category',release:'test-release'}],coverage:{profiles:2,mappedProfiles:2,profilesSharingOccupation:1}};
+ const evidence=intelligenceEvidence('occupational-references',{occupationalReference:reference});
+ const result=evidence.selectedReference;
+ assert.equal(evidence.referenceContentLoaded,true);
+ assert.equal(result.selectedOccupationCode,'11-1011.00');
+ assert.equal(result.sourceUrl,'https://www.onetonline.org/link/summary/11-1011.00');
+ assert.equal(result.occupation,null);assert.equal(result.publicExcerpt,null);
+ assert.equal(result.sourceMode,'stored');assert.equal(result.sourceStatus.occupations,'unavailable');
+ assert.equal(result.essentialSkills[0].name,'Synthetic reference skill');
+ assert.equal(result.essentialSkills[0].importance,4);assert.equal(result.essentialSkills[0].level,5);
+ assert.equal(result.softwareSkills[0].name,'Synthetic software example');
+ assert.equal(result.coverage.profilesSharingOccupation,1);
+ for(const selectedOccupationCode of ['11-1011','11-1011.00/../../other','https://example.com',null]){
+  const invalid=intelligenceEvidence('occupational-references',{occupationalReference:{...reference,selectedOccupationCode}}).selectedReference;
+  assert.equal(invalid.selectedOccupationCode,null);assert.equal(invalid.sourceUrl,null);
+  assert.deepEqual(invalid.essentialSkills,[]);assert.deepEqual(invalid.softwareSkills,[]);
+ }
+ const conflict=intelligenceEvidence('occupational-references',{occupationalReference:{...reference,occupation:{code:'15-1252.00',title:'Unrelated title'},sourceStatus:{...reference.sourceStatus,occupations:'ready'}}}).selectedReference;
+ assert.equal(conflict.selectedOccupationCode,null);assert.equal(conflict.occupation,null);
+ assert.equal(conflict.sourceUrl,null);assert.equal(conflict.publicExcerpt,null);
+ assert.deepEqual(conflict.essentialSkills,[]);assert.deepEqual(conflict.softwareSkills,[]);
+});

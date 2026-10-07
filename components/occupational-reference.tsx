@@ -71,7 +71,8 @@ export function OccupationalReference({ onEvidenceChange }: { onEvidenceChange?:
   const unavailableDetails = currentDetail ? [currentDetail.sources.essentialSkills !== "ready" ? "essential skills" : null, currentDetail.sources.softwareSkills !== "ready" ? "software examples" : null].filter(Boolean) : [];
   const evidence: OccupationalReferenceEvidence = {
     population: "occupational_reference", selectedProfile: selectedProfile ? { code: selectedProfile.code, name: selectedProfile.name } : null,
-    occupation, sourceMode: storedOccupation ? "stored" : "public_snapshot", mappingStatus,
+    selectedOccupationCode: isOccupationCode(selectedCode) ? selectedCode : null,
+    occupation, sourceMode: storedOccupation || !publicOccupation ? "stored" : "public_snapshot", mappingStatus,
     requiredSkills: selectedProfile?.requirements.slice(0, 30) ?? [], tasks: publicOccupation?.tasks ?? [],
     essentialSkills: currentDetail?.sources.essentialSkills === "ready" ? currentDetail.essentialSkills.slice(0, 20).map(({ name, importance, level }) => ({ name, importance, level })) : publicOccupation?.essentialSkills.map((name) => ({ name, importance: null, level: null })) ?? [],
     softwareSkills: currentDetail?.sources.softwareSkills === "ready" ? currentDetail.softwareSkills.slice(0, 30) : [],
