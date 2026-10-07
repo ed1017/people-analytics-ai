@@ -946,7 +946,7 @@ ${planningContext.scenarios
 
 Important modeling rule:
 - Stored company-wide plans are modeled scenarios, not observed actuals. Source refresh date is unavailable.
-- Hires and exits are source-reported monthly flows; totals sum the displayed horizon. Unknown months make a total unavailable. Stored flows do not fully explain the Baseline headcount curve and are distinct from engine-implied what-if flows. Do not invent a reconciliation.
+- Hires and exits are source-reported monthly flows; totals cover only the returned month window, whose full horizon boundaries are not supplied. Missing, duplicate or invalid months and unknown flow values make a total unavailable. Stored flows do not fully explain the Baseline headcount curve and are distinct from engine-implied what-if flows. Do not invent a reconciliation.
 - You may compare stored scenarios and calculate simple deltas only when both values are available. Null or unavailable values are unknown, never zero.
 - If the user proposes a NEW assumption, call run_workforce_scenario rather than estimating the scenario yourself.
 - Only treat the returned deterministic tool result as the modeled what-if outcome.

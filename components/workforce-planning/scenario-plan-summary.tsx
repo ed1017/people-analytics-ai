@@ -153,13 +153,13 @@ export function ScenarioPlanSummary({
                         {activePlanningScenario.scenario_name} Headcount Plan
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Stored company-wide monthly plan through December 2027
+                        Stored company-wide plan for the returned months
                       </p>
                     </div>
 
                     <div className="text-right">
                       <p className="text-xs text-muted-foreground">
-                        Stored hires / exits · full horizon
+                        Stored hires / exits · returned month window
                       </p>
                       <p className="font-semibold">
                         {formatWholeCount(planningTotalHires)} /{" "}
@@ -169,7 +169,7 @@ export function ScenarioPlanSummary({
                   </div>
 
                   <p className="mb-3 text-xs text-muted-foreground">
-                    Source-reported monthly flows, summed across the displayed horizon. Unknown months leave totals unavailable. These flows are not observed actuals and do not fully explain the Baseline headcount curve; what-if engine flows are separate. Source refresh date is not supplied.
+                    Source-reported monthly flows across the returned month window. Missing, duplicate or invalid months and unknown flow values leave totals unavailable. Full horizon boundaries and source refresh date are not supplied. These flows are not observed actuals and do not fully explain the Baseline headcount curve; what-if engine flows are separate.
                   </p>
                   <div className="h-80 w-full">
                     <ResponsiveContainer
