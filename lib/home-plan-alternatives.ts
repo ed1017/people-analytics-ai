@@ -11,6 +11,8 @@ import {savedPilotCorrection} from './home-saved-pilot-correction.ts';
 import {refreshGeneratedReductionHorizon} from './home-action-plan-pilot.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {revisePlanActivities} from './home-plan-activity-edit.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {planNumberPattern,planReferenceNumbers} from './home-plan-references.ts';
 
 export const planAlternativesField='homePlanAlternativesV1';
 export type AlternativeContext={goalId:string;goal:string};
@@ -65,18 +67,18 @@ export function readPlanAlternatives(raw:unknown,context:AlternativeContext):Pla
 }
 function checked(raw:PlanAlternatives,context:AlternativeContext){assertContext(raw,context);const catalog=readPlanAlternatives(raw,context);if(!catalog)fail('Saved alternatives cannot be verified. Earlier plans are kept.');return catalog;}
 
-const combinationCourtesy=(text:string)=>text.trim().replace(/^(?:please\s+|(?:can|could|would)\s+you\s+|i(?:’|')?d like to\s+|i want to\s+)/i,'');
+const combinationCourtesy=(text:string)=>text.trim()
+ .replace(/^please\s+/i,'')
+ .replace(/^(?:(?:i\s+(?:want|need|would like)|i[’']d like|(?:can|could|would)\s+you\s+(?:please\s+)?(?:make|create|generate|give me)|(?:make|create|generate|give me))\s+)?(?:a\s+)?combination\s+of\s+/i,'combine ')
+ .replace(/^(?:(?:can|could|would)\s+you\s+(?:please\s+)?|i(?:’|')?d like to\s+|i want to\s+)/i,'');
 export function combinationIntent(text:string){return /^(?:combine|merge|join)\b/i.test(combinationCourtesy(text));}
 function combinationOnly(text:string){
- const label='(?:(?:action\\s+)?plans?\\s*)?#?\\s*\\d+';
+ const label='(?:(?:action\\s+)?plans?\\s*)?#?\\s*'+planNumberPattern;
  return new RegExp('^(?:combine|merge|join)\\s+(?:the\\s+)?'+label+'\\s*(?:and|with|\\+|&)\\s*'+label+'(?:\\s+into\\s+(?:one|a single)(?:\\s+(?:action\\s+)?plan)?)?(?:\\s+for\\s+this\\s+goal)?(?:\\s+please)?[.!?]?$','i').test(combinationCourtesy(text));
 }
 /** Resolve labels, never indexes: #1 still means #1 after display reordering or deletion. */
 export function resolveNumberedPlans(text:string,catalog:PlanAlternatives,context:AlternativeContext):PlanAlternative[]{
- const valid=checked(catalog,context),numbers=[...text.matchAll(/(?:\b(?:action\s+)?plans?\s*#?\s*|#)(\d+)\b/gi)].map(match=>Number(match[1]));
- // Also accept the unnumbered second half of “plans 1 and 2”.
- const pair=text.match(/\b(?:action\s+)?plans?\s*#?\s*(\d+)\s*(?:and|with|\+|&)\s*(?:(?:action\s+)?plan\s*)?#?\s*(\d+)\b/i);
- if(pair&&!numbers.includes(Number(pair[2])))numbers.push(Number(pair[2]));
+ const valid=checked(catalog,context),numbers=planReferenceNumbers(text);
  if(!numbers.length)fail('Name the Action Plan number shown on its tab.');
  if(new Set(numbers).size!==numbers.length)fail('Choose different Action Plan numbers.');
  return numbers.map(number=>{const plan=valid.plans.find(item=>item.number===number&&!item.deleted);if(!plan)fail(`Action Plan #${number} is not available in this goal.`);return plan;});

@@ -6,6 +6,8 @@ import {combinationIntent,readPlanAlternatives,resolveNumberedPlans} from './hom
 import {bundleChatEditIntent} from './home-bundle-chat-edit.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {bundleInputKey} from './home-bundle-reconciliation.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {planReferenceNumbers} from './home-plan-references.ts';
 
 /** Add as an optional `alternatives` property on the UI's existing BundleDiscussion.
  * The UI owns lifecycle/Reset guards and atomic persistence. This captures exact sources,
@@ -27,7 +29,7 @@ export function alternativeDiscussion(raw:PlanAlternatives,context:AlternativeCo
   prepareRequest(text,requestId,review){
    const combination=combinationIntent(text);
    if(!combination&&!bundleChatEditIntent(text).edit)return null;
-   const named=/(?:\b(?:action\s+)?plans?\s*#?\s*|#)\d+\b/i.test(text);
+   const named=planReferenceNumbers(text).length>0;
    const sources=combination||named?resolveNumberedPlans(text,catalog,contextSnapshot):[catalog.plans.find(plan=>plan.id===selectedId)!];
    return {requestId,text,sourceIds:sources.map(plan=>plan.id),expectedInputs:Object.fromEntries(sources.map(plan=>[plan.id,bundleInputKey(plan.draft)])),...(review?{review:structuredClone(review)}:{})};
   },

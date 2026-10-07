@@ -28,6 +28,15 @@ test('routing and saved selection follow immutable identities through reorder an
  value=changeAlternativeView(value,context,{deleteId:'B'});assert.equal(alternativeView({version:1,selectedId:'B'},value).selectedId,'A');
  assert.equal(alternativeView({version:1,selectedId:'A',collapsed:'yes'},value).collapsed,false);
 });
+
+test('combination paraphrases stay local and explanation-only requests read the named saved plans',()=>{
+ const value=catalog(),before=JSON.stringify(value);
+ for(const text of ['I want a combination of action plan one and two','I want a combination of action plan 1 and 2']){assert.equal(localPlanDiscussion(text),true);assert.equal(alternativeQuestionReply(text,value,'C'),null);}
+ for(const text of ['Explain the combination of action plan one and two','Compare action plan one and two','Why combine action plan one and two?']){
+  assert.equal(localPlanDiscussion(text),true);const reply=alternativeQuestionReply(text,value,'C');assert.match(reply,/Action Plan #1/);assert.match(reply,/Action Plan #2/);assert.doesNotMatch(reply,/Action Plan #3|paste|summarize the contents/i);
+ }
+ assert.throws(()=>alternativeQuestionReply('Explain the combination of plan one and nine',value,'C'),/not available/);assert.equal(JSON.stringify(value),before);
+});
 test('reviewed staffing derivatives preserve sources and cannot cross goals or replace equal revisions',()=>{
  const value=catalog(),source=value.plans[0],input=structuredClone(source.draft.inputs);input.groups[0].count.value=14;
  const draft=reviseBundleDraft(source.draft,input),request={requestId:'staffing-1',text:'Apply reviewed staffing combination',sourceIds:[source.id],expectedInputs:{[source.id]:bundleInputKey(source.draft)}};
