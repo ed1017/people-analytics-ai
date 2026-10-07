@@ -80,9 +80,10 @@ export function JobRangeTable({catalog, scope, releaseRows}: {catalog: RangeCata
   const jobs = catalog.jobs.filter(job => ranges.some(range => range.job === job.job_profile_code));
   if (!jobs.length) return <p role="status" className="text-sm">No catalog job/level combinations match these filters. No pay coverage is implied.</p>;
   return <div className="overflow-x-auto" role="region" aria-label="Job range comparison" tabIndex={0}>
+    <p className="mb-2 text-xs text-muted-foreground">Policy ranges are shown by catalog level. The company job mean averages each matched person’s ratio to their own level midpoint; it has no single salary-range denominator.</p>
     <table className="w-full text-left text-sm">
       <caption className="pb-2 text-left text-xs text-muted-foreground">{jobs.length} catalog jobs · Ranges are assumptions · Exact pay counts are not published</caption>
-      <thead className="sr-only md:not-sr-only"><tr className="border-b text-sm text-muted-foreground"><th scope="col" className="py-2 pr-3">Job</th><th scope="col" className="py-2 pr-3">Min / midpoint / max · USD</th><th scope="col" className="py-2">Mean compa-ratio</th></tr></thead>
+      <thead className="sr-only md:not-sr-only"><tr className="border-b text-sm text-muted-foreground"><th scope="col" className="py-2 pr-3">Job</th><th scope="col" className="py-2 pr-3">Assumed ranges by level · USD</th><th scope="col" className="py-2">Company job mean compa-ratio</th></tr></thead>
       <tbody className="grid gap-4 md:table-row-group">{jobs.map(job => <tr key={job.job_profile_code} className="grid min-w-0 gap-3 rounded-lg border p-3 md:table-row md:rounded-none md:border-x-0 md:border-t-0 md:p-0">
         <th scope="row" className="min-w-0 break-words text-base font-medium md:py-4 md:pr-4">{job.job_profile_name}</th>
         <td className="min-w-0 md:py-4 md:pr-6"><RangeValues ranges={ranges.filter(range => range.job === job.job_profile_code)}/></td>
@@ -108,5 +109,5 @@ function RangeValues({ranges}: {ranges: ReturnType<typeof rangesForScope>}) {
       </div>)}
     </dl>
   </div>;
-  return <div className="min-w-0">{line(ranges[0])}{ranges.length > 1 && <details><summary className="min-h-11 cursor-pointer py-3 text-sm">{ranges.length - 1} more level ranges</summary><ul className="space-y-3">{ranges.slice(1).map(range => <li key={range.level}>{line(range)}</li>)}</ul></details>}</div>;
+  return <div className="min-w-0">{ranges.length === 1 ? line(ranges[0]) : <details><summary className="min-h-11 cursor-pointer py-3 text-sm">View all {ranges.length} catalog level ranges</summary><ul className="space-y-3">{ranges.map(range => <li key={range.level}>{line(range)}</li>)}</ul></details>}</div>;
 }
