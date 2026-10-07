@@ -39,13 +39,9 @@ export const homeStarterGroups = [
     {label:'Where should we invest in training?',prompt:'Where should we invest in training based on recorded skill gaps and learning pathways, and which findings apply to the selected workforce scope?'},
   ]},
   {label:'Workforce challenges',prompts:[
-    {label:'How can we reduce turnover?',prompt:'Reduce turnover'},
-    {label:'How can we improve satisfaction?',prompt:'Improve employee satisfaction'},
-  ]},
-  {label:'Forecasts',prompts:[
-    {label:'Show the hiring forecast.',prompt:'Forecast hiring'},
-    {label:'Show the turnover forecast.',prompt:'Forecast turnover'},
-    {label:'Show the satisfaction forecast.',prompt:'Forecast satisfaction'},
+    {label:'How can we reduce turnover?',prompt:'How can we reduce turnover based on recorded evidence, and which findings apply to the selected workforce scope?'},
+    {label:'How can we improve satisfaction?',prompt:'How can we improve employee satisfaction based on recorded feedback, and which findings apply to the selected workforce scope?'},
+    {label:'How can we improve hiring?',prompt:'How can we improve hiring based on recorded recruiting evidence, and which findings apply to the selected workforce scope?'},
   ]},
 ] as const;
 export const homeGoalStarters = homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.prompt));

@@ -45,14 +45,15 @@ test('explicit Action Plan headings and numbered steps are preserved, unrelated 
 test('grouped starter labels submit exact grounded intents without overwriting drafts or changing forecast and goal routing',()=>{
  const sent=[],props={prompts:homeGoalStarters,groups:homeStarterGroups,draft:'',busy:false,onDraft:prompt=>sent.push(prompt)};
  const element=PromptExamples(props),buttons=nodes(element).filter(node=>node.type==='button'),html=renderToStaticMarkup(element);
- assert.equal(buttons.length,7);assert.equal((html.match(/role="group"/g)??[]).length,3);
- assert.deepEqual(buttons.map(button=>button.props.children),['What skills are we missing?','Where should we invest in training?','How can we reduce turnover?','How can we improve satisfaction?','Show the hiring forecast.','Show the turnover forecast.','Show the satisfaction forecast.']);
+ assert.equal(buttons.length,5);assert.equal((html.match(/role="group"/g)??[]).length,2);
+ assert.deepEqual(buttons.map(button=>button.props.children),['What skills are we missing?','Where should we invest in training?','How can we reduce turnover?','How can we improve satisfaction?','How can we improve hiring?']);
  buttons.forEach(button=>button.props.onClick());assert.deepEqual(sent,homeGoalStarters);
- assert.deepEqual(sent.slice(0,4).map(prompt=>homeTurnPurpose(prompt)),['answer','answer','goal','goal']);
- assert.deepEqual(sent.slice(4).map(prompt=>homeForecastIntent(prompt).domains[0]),['hiring','turnover','satisfaction']);
+ assert.deepEqual(sent.slice(0,4).map(prompt=>homeTurnPurpose(prompt)),['answer','answer','answer','answer']);
+ assert.ok(sent.every(prompt=>homeForecastIntent(prompt)===null));
+ assert.equal(homeForecastIntent('Forecast turnover').domains[0],'turnover');
  assert.equal(homeTurnPurpose('Find issues worth tackling'),'discovery');
  for(const changes of [{draft:'Keep my draft'},{busy:true}]){
-  const blocked=nodes(PromptExamples({...props,...changes})).filter(node=>node.type==='button');assert.ok(blocked.every(button=>button.props.disabled));blocked.forEach(button=>button.props.onClick());assert.equal(sent.length,7);
+  const blocked=nodes(PromptExamples({...props,...changes})).filter(node=>node.type==='button');assert.ok(blocked.every(button=>button.props.disabled));blocked.forEach(button=>button.props.onClick());assert.equal(sent.length,5);
  }
  const missing=renderToStaticMarkup(PromptExamples({...props,prompts:['What evidence is unavailable?']}));assert.doesNotMatch(missing,/role="group"/);assert.match(missing,/What evidence is unavailable/);
 });
