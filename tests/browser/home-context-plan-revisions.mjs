@@ -36,7 +36,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  await page.goto(base);await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:DECISIONS_STORAGE_KEY,value:encodeDecisions({version:1,revision:1,goals:{version:1,activeId:'',goals:[{id:'other',statement:'Improve support'}]},workspaces:{}})});await page.reload();
  await send('Reduce turnover');await page.getByRole('button',{name:/^Pin (as goal|overall turnover goal)$/}).click();await page.locator('[data-plan-current="true"]').waitFor();
  const id=(await state()).goals.activeId,fields=async()=>(await state()).workspaces[id].fields;
- check(mode+' exact starting scope and costs',await panel.getByText(/Assumed cash \$3,500 USD/).isVisible()&&await panel.getByText(/36 total staff hours/).isVisible()&&await panel.getByText(/2026-11-28/).first().isVisible());
+ check(mode+' exact starting scope and costs',await panel.getByText(/Assumed cash \$3,500 USD/).isVisible()&&await panel.getByText(/36 total staff hours/).isVisible()&&await panel.getByLabel('Selected plan summary').getByText(/2026-11-28/).isVisible());
  await button('Attach Action Plan').click();await page.waitForFunction(({key,id})=>JSON.parse(localStorage.getItem(key)).payload.workspaces[id].fields.homeSolutionBundlesV1?.attachments.length===1,{key:DECISIONS_STORAGE_KEY,id});
  const attached=JSON.stringify((await fields()).homeSolutionBundlesV1.attachments);
  await send('have a budget of 6000');await panel.getByLabel('Plan budget check').waitFor();
