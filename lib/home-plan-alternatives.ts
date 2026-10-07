@@ -9,6 +9,8 @@ import {combinePlanSnapshots,type CombinationReview} from './home-plan-combinati
 import {savedPilotCorrection} from './home-saved-pilot-correction.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {refreshGeneratedReductionHorizon} from './home-action-plan-pilot.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {revisePlanActivities} from './home-plan-activity-edit.ts';
 
 export const planAlternativesField='homePlanAlternativesV1';
 export type AlternativeContext={goalId:string;goal:string};
@@ -107,10 +109,11 @@ export function proposeEditedAlternative(raw:PlanAlternatives,context:Alternativ
  let text=request.text;
  if(/\b(?:action\s+)?plan\s*#?\s*\d+\b|#\d+/i.test(text)){
   const named=resolveNumberedPlans(text,catalog,context);if(named.length!==1||named[0].id!==sources[0].id)fail('The numbered plan does not match the selected source.');
-  text=text.replace(/\b(?:in|for|on)\s+(?:action\s+)?plan\s*#?\s*\d+\b\s*[:,]?\s*/i,' ').replace(/^(?:action\s+)?plan\s*#?\s*\d+\s*[:,]?\s*/i,'').trim();
+  text=text.replace(/^(?:please\s+)?(?:revise|update|adjust|change)\s+(?:action\s+)?plan\s*#?\s*\d+\s+by\s+/i,'').replace(/\b(?:in|for|on)\s+(?:action\s+)?plan\s*#?\s*\d+\b\s*[:,]?\s*/i,' ').replace(/^(?:action\s+)?plan\s*#?\s*\d+\s*[:,]?\s*/i,'').trim();
  }
  // Numbering is resolved above; the legacy parser need not impose its three-option UI limit.
- const source=sources[0].draft,preview=previewBundleChatEdit(source,text),draft=acceptBundleChatEdit(source,preview);
+ const source=sources[0].draft,activity=revisePlanActivities(source,text);
+ const draft=activity??acceptBundleChatEdit(source,previewBundleChatEdit(source,text));
  // New numbered proposals can refresh generated target labels. Keep the legacy
  // text-edit replay deterministic so earlier saved revisions still validate.
  refreshGeneratedReductionHorizon(source,draft.inputs);

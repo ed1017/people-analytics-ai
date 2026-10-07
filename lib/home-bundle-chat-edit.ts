@@ -86,7 +86,7 @@ export function bundleChatEditIntent(request:string){
  const courtesy=(value:string)=>value.trim().replace(/^(?:please\s+|(?:can|could|would)\s+(?:you|we)\s+|i(?:’|')?d like to\s+)/i,'');
  const planReference=/\b(?:action\s+)?plan\s*#?\s*\d+\b/i.test(request);
  const body=courtesy(courtesy(request).replace(/^(?:(?:in|for|on)\s+)?(?:action\s+)?plan\s*#?\s*\d+(?:\s*(?:and|or|,)\s*(?:(?:action\s+)?plan\s*)?#?\s*\d+)*\s*[:,]?\s*/i,''));
- const edit=/^(?:(?:do not|don[’']?t|never|avoid)\s+)?(?:set|change|update|assume|lower|raise|increase|decrease|reduce|start|move|make|run|use|budget|add|remove|fill|complete|extend|shorten|adjust|correct)\b/i.test(body)||horizonEditValue(body.replace(/[.!?]$/,''))!==null;
+ const edit=/^(?:(?:do not|don[’']?t|never|avoid)\s+)?(?:set|change|update|revise|assume|lower|raise|increase|decrease|reduce|start|move|make|run|use|budget|add|remove|fill|complete|extend|shorten|adjust|correct)\b/i.test(body)||horizonEditValue(body.replace(/[.!?]$/,''))!==null;
  const statement=/^(?:(?:i|we)\s+)?(?:have|has|only have|need|want)\b.*\b(?:budget|participants?|months?|hours?)\b|^(?:(?:i|we)\s+)?(?:can spend|can afford)\s+(?:\$|USD\s*)?\d|^(?:my|our|the)\s+(?:cash\s+|total\s+|all-in\s+)?budget\b/i.test(body);
  const question=/^(?:what|why|how|when|where|which|does|is|are|will|would|could|can)\b/i.test(body)&&!edit;
  return {edit:!question&&(edit||statement),planReference};
