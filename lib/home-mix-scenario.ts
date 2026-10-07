@@ -5,7 +5,7 @@ import {readBundleDraft, unknownAssumption, type Assumption, type BundleDraft, t
 import {homeMixPlanningRequest} from './home-mix-planning.ts';
 import type {HomeMixBounds} from './home-mix-context';
 export type HomeMixScenario={version:1;basis:Assumption<'conditional-scenario'>;bounds:HomeMixBounds;flows:StaffingFlow[]};
-export const homeMixScenarioCommand='Use illustrative staffing assumptions';
+export const homeMixScenarioCommand='Use demo staffing assumptions';
 const premise='Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.';
 const assumed=<T>(value:T,basis=premise):Assumption<T>=>({value,kind:'illustrative',basis});
 const reviewed=(value:Assumption<unknown>)=>value.kind==='user-entered'||value.kind==='adopted';

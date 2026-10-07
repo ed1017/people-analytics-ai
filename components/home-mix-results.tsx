@@ -1,7 +1,10 @@
 'use client';
+import {homeMixScenarioCommand} from '@/lib/home-mix-scenario';
 import type {HomeMixState} from '@/lib/home-mix-orchestration';
 import type {HomeMixEvaluation} from '@/lib/home-mix-runtime';
 const cash=(value:number|null)=>value===null?'Unknown':`$${value.toLocaleString(undefined,{maximumFractionDigits:2})} USD`;
+// Presentation only: stored provenance and historical report identities are unchanged.
+const demoCopy=(text:string)=>text.replace(/\b(?:illustrative|synthetic)\b/gi,word=>/^[A-Z]/.test(word)?'Demo':'demo');
 export function HomeMixResults({state,candidateId,onSelect,disabled}:{state:HomeMixState<HomeMixEvaluation>;candidateId:string|null;onSelect:(id:string|null)=>void;disabled:boolean}){
  if(state.status==='idle')return null;
  if(state.status==='queued'||state.status==='running')return <section aria-label="Automatic staffing search" className="rounded border p-3"><p role="status">Checking bounded staffing combinations…</p></section>;
@@ -11,9 +14,9 @@ export function HomeMixResults({state,candidateId,onSelect,disabled}:{state:Home
  return <section aria-label="Automatic staffing search" data-mix-status={context.status} data-mix-fingerprint={report?.reportFingerprint} className="min-w-0 space-y-2 rounded border p-3 text-sm">
   <h4 className="font-semibold">Staffing combinations</h4>
   <p className="text-xs">Calculated locally from this plan’s assumptions. Existing employee effort is measured in hours. No observed availability, salary quote or intervention effect is inferred.</p>
-  {notes.map(note=><p className="text-xs" key={note}>{note}</p>)}
+  {notes.map(note=><p className="text-xs" key={note}>{demoCopy(note)}</p>)}
   {context.status==='needs-inputs'&&<><p>No combinations evaluated: the staffing inputs need review.</p><ul className="list-disc pl-5">{context.missing.map((item,index)=><li key={index}>{item.reason}</li>)}</ul></>}
-  {context.status==='ready'&&!context.source.draft.inputs.mixScenario&&report?.summary.enumerated===1&&<p className="text-xs">To explore fictional internal options, say “Use illustrative staffing assumptions” in chat. Review the proposed groups, bounds, dates, costs and release premise before applying. Skill counts alone do not establish available staff.</p>}
+  {context.status==='ready'&&!context.source.draft.inputs.mixScenario&&report?.summary.enumerated===1&&<p className="text-xs">To explore fictional internal options, say “{homeMixScenarioCommand}” in chat. Review the proposed groups, bounds, dates, costs and release premise before applying. Skill counts alone do not establish available staff.</p>}
   {report&&<>
    <p aria-label="Staffing search coverage">{report.summary.enumerated} combinations evaluated completely within bounds; {report.summary.calculatorInvocations} calculator calls including the reference. Build {report.spec.build.min}–{report.spec.build.max}, Move {report.spec.move.min}–{report.spec.move.max}, Buy {report.spec.buy.min}–{report.spec.buy.max}. {report.summary.emitted} shown; {report.summary.omittedByCap} omitted, including {report.summary.omittedNondominated} nondominated tradeoffs.</p>
    <p><strong>Objective:</strong> {report.objective.label} ({report.objective.basis}).</p>
@@ -30,7 +33,7 @@ export function HomeMixResults({state,candidateId,onSelect,disabled}:{state:Home
    </fieldset>
    {candidateId&&<p>A proposed revision only. Review the mix and assumptions, then use Apply changes or Attach Action Plan. Previous attachments remain unchanged.</p>}
    {report.missing.length>0&&<details><summary className="min-h-11 cursor-pointer py-2">Unresolved search assumptions ({report.missing.length})</summary><ul className="list-disc pl-5">{report.missing.map((item,index)=><li key={index}>{item.reason}</li>)}</ul></details>}
-   <details><summary className="min-h-11 cursor-pointer py-2">Search provenance and limits</summary><p>Best only within the stated bounds; no global optimum or operational approval.</p>{report.limitations.map(text=><p key={text} className="my-1 text-xs">{text}</p>)}<ul className="list-disc pl-5">{Object.entries(report.assumptionOrigins).map(([field,origin])=><li key={field}>{field}: {report.reference.input[field as keyof typeof report.reference.input]||'Unknown'} · {origin.kind}. {origin.basis}</li>)}</ul></details>
+   <details><summary className="min-h-11 cursor-pointer py-2">Search provenance and limits</summary><p>Best only within the stated bounds; no global optimum or operational approval.</p>{report.limitations.map(text=><p key={text} className="my-1 text-xs">{demoCopy(text)}</p>)}<ul className="list-disc pl-5">{Object.entries(report.assumptionOrigins).map(([field,origin])=><li key={field}>{field}: {report.reference.input[field as keyof typeof report.reference.input]||'Unknown'} · {demoCopy(origin.kind)}. {origin.basis&&demoCopy(origin.basis)}</li>)}</ul></details>
   </>}
  </section>;
 }

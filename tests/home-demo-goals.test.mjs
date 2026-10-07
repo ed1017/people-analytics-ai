@@ -66,3 +66,13 @@ test('storage failure keeps the prior bytes and retries the same seed without du
  const p=port(),write=p.setItem,store=new DecisionStore();p.setItem=()=>{throw Error('Quota exceeded')};store.initialize(p,seed);assert.equal(store.getSnapshot().saved,false);assert.equal(p.getItem(DECISIONS_STORAGE_KEY),null);
  p.setItem=write;store.retry();assert.equal(store.getSnapshot().saved,true);assert.equal(parseDecisions(p.getItem(DECISIONS_STORAGE_KEY)).goals.goals.length,3);
 });
+
+test('capacity example seeds once, and deleting it preserves old demo bytes without recreating it',()=>{
+ const p=port(),store=new DecisionStore();store.initialize(p,seed);
+ const initial=store.getSnapshot().data,prior=Object.fromEntries(['demo-reduce-turnover','demo-close-skill-gaps'].map(id=>[id,JSON.stringify(initial.workspaces[id])]));
+ assert.equal(initial.goals.goals.filter(goal=>goal.id==='demo-capacity-mix').length,1);
+ store.saveGoals({...initial.goals,goals:initial.goals.goals.filter(goal=>goal.id!=='demo-capacity-mix')});
+ const saved=p.getItem(DECISIONS_STORAGE_KEY),reopened=new DecisionStore();reopened.initialize(p,()=>assert.fail('Do not seed existing state'));
+ assert.equal(p.getItem(DECISIONS_STORAGE_KEY),saved);assert.equal(reopened.getSnapshot().data.goals.goals.some(goal=>goal.id==='demo-capacity-mix'),false);
+ for(const [id,bytes] of Object.entries(prior))assert.equal(JSON.stringify(reopened.getSnapshot().data.workspaces[id]),bytes);
+});

@@ -29,6 +29,13 @@ test('explicit chat opt-in evaluates 12 bounded combinations with labeled groups
  assert.match(value.notes.join(' '),/not observed eligibility/);assert.match(value.notes.join(' '),/unverified/);
  assert.equal(value.report.operationalFeasibilityVerified,false);
 });
+test('demo wording and the legacy typed alias create identical assumptions and replay both histories',async()=>{
+ const original=await fresh(),demo=edit(original,'Use demo staffing assumptions'),legacy=edit(original,'Use illustrative staffing assumptions');
+ assert.equal(homeMixScenarioCommand,'Use demo staffing assumptions');assert.deepEqual(demo.record.draft,legacy.record.draft);
+ assert.ok(readPlanRevisions(demo.history,original.binding.goalId));assert.ok(readPlanRevisions(legacy.history,original.binding.goalId));
+ assert.match(legacy.preview.changes[0].after.basis,/^Use illustrative staffing assumptions;/);
+ assert.deepEqual(await evaluateHomeMix(demo.record.draft),await evaluateHomeMix(legacy.record.draft));
+});
 test('local capacity template supports shared explicit scenario ownership without new evidence IDs',async()=>{
  const draft=await scenario({local:true}),value=await evaluateHomeMix(draft);
  assert.equal(value.context.status,'ready');assert.equal(value.report.summary.enumerated,12);assert.deepEqual(draft.bundle.components[0].evidence,[]);
