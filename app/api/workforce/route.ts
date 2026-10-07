@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
+import { dataApiErrorResponse } from "../../../lib/data-api-error";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,7 @@ export async function GET() {
         supabaseServer.from("workforce_movement_summary").select("*").order("month"),
       ]);
     for (const result of [current, trend, businessUnits, countries, levels, tenure, movements]) {
-      if (result.error) throw new Error("Workforce analytics: " + result.error.message);
+      if (result.error) throw result.error;
     }
     if (!current.data) throw new Error("Workforce current summary returned no data.");
 
@@ -48,10 +49,6 @@ export async function GET() {
       movements: movements.data ?? [],
     }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    console.error("Workforce API error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to load workforce analytics." },
-      { status: 500 }
-    );
+    return dataApiErrorResponse('workforce',error);
   }
 }
