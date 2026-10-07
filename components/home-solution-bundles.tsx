@@ -95,8 +95,8 @@ export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,
  if(!goalId||!goal)return null;
  if(demo)return <HomeDemoPlans key={goalId} goalId={goalId} goal={goal} active={active} busy={busy} openRequest={openRequest} chatChange={chatChange} onDiscuss={onDiscuss}/>;
  const disabled=busy||pending||!binding||!storage.saved||!active||!ready;
- return <section data-guide-goal={goalId} aria-label="Action Plans for your goal" className="space-y-3 break-words rounded-xl border border-primary/40 p-4 text-sm leading-relaxed">
-  <h2 ref={heading} tabIndex={-1} className="text-lg font-semibold">Action Plans for your goal</h2><p>{goal}</p>
+ return <section data-guide-goal={goalId} aria-label="Action Plans for your goal" className="space-y-2 break-words rounded-xl border border-primary/40 px-3 py-2 text-sm leading-relaxed">
+  <div data-plan-header className="flex flex-wrap items-baseline gap-x-2"><h2 ref={heading} tabIndex={-1} className="text-base font-semibold">Action plans</h2><span className="text-xs text-muted-foreground">Review and edit as needed</span></div><p>{goal}</p>
   {pending&&<DataLoadingStatus name="Action Plan preparation status" label="Preparing Action Plans…" detail="Your goal and saved plans are kept while choices are prepared."/>}
   {!ready&&<p role="status">Checking current evidence. Saved work is kept.</p>}
   {notice&&<p role="alert">{notice}</p>}
