@@ -142,7 +142,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   const [planEdit,setPlanEdit]=useState<BundleDiscussion|null>(null),[editPreview,setEditPreview]=useState<BundleEditPreview|null>(null),[editNotice,setEditNotice]=useState('');
   const editReview=useRef<HTMLDivElement>(null);
   const sources = pack.sources;
-  const [candidate,setCandidate]=useState<{proposal:HomeCandidateProposal|null;selectionGoal:string;sourceKey:string;context:string;authoredContext:string;epoch:number;originGoalId:string;rationale:ChatMessage;userGoal:string|null;planningChoice?:boolean;userStatements:string[];reviewRequired:boolean;starter?:HomeStarterGoal}|null>(null);
+  const [candidate,setCandidate]=useState<{proposal:HomeCandidateProposal|null;selectionGoal:string;sourceKey:string;context:string;authoredContext:string;epoch:number;originGoalId:string;guidedGoalId?:string|null;rationale:ChatMessage;userGoal:string|null;planningChoice?:boolean;userStatements:string[];reviewRequired:boolean;starter?:HomeStarterGoal}|null>(null);
   const [candidateNotice,setCandidateNotice]=useState('');
   const [actionPin,setActionPin]=useState<{id:string;sequence:number}|null>(null);
   const [planOpen,setPlanOpen]=useState<{goalId:string;goal:string;sequence:number}|null>(null);
@@ -342,7 +342,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
       const proposal=!prepareGoal||planningGoal||reply.clarification||reviewRequired||!conversation.focusedIssue&&intent.reason==='withdrawn'?null:reply.proposal;
       const differentIssue=responseIntent!=='alternative'||Boolean(previousCandidate?.proposal&&proposal&&isDifferentHomeIssue(previousCandidate.proposal,proposal));
       if(differentIssue&&(userGoal||(proposal||reviewRequired)&&!reply.clarification)){
-        const captured={proposal,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack),context:key,authoredContext:authoredGoalKey,epoch:candidateEpoch,originGoalId:conversation.activeGoalId,rationale:assistantMessage,userGoal,planningChoice:Boolean(planningGoal),userStatements:starter?[message]:userStatements.slice(intent.contextStart),reviewRequired,starter};
+        const captured={proposal,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack),context:key,authoredContext:authoredGoalKey,epoch:candidateEpoch,originGoalId:conversation.activeGoalId,guidedGoalId:guidedExampleActive&&message===GUIDED_EXAMPLE_PROMPT?guidedActions.goalId:null,rationale:assistantMessage,userGoal,planningChoice:Boolean(planningGoal),userStatements:starter?[message]:userStatements.slice(intent.contextStart),reviewRequired,starter};
         if(conversation.activeGoalId&&proposal)decisionStore.setField(conversation.activeGoalId,'homeCandidateOptions',{version:2,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:captured.sourceKey,proposal});
         else setCandidate(captured);
       }
@@ -432,7 +432,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   function pinProblem(problem:string){
     if(!candidate||candidate.reviewRequired||candidate.epoch!==promptEpoch.current||!reviewCandidateCurrent||currentEvidenceKey.current!==contextKey||chatLoading||!active||!ready||!conversation.saved||!conversation.storageReady||conversation.issueEditor||decisionStore.getSnapshot().data.goals.activeId!==candidate.originGoalId)return;
     try{
-      const guideId=guidedExampleActive&&problem===GUIDED_EXAMPLE_PROMPT?guidedActions.goalId:undefined;
+      const guideId=guidedExampleActive&&candidate.guidedGoalId===guidedActions.goalId?candidate.guidedGoalId:undefined;
       const id=conversation.confirmWorkforceGoal(problem,guideId??undefined);
       if(guideId)conversation.selectGoal(id);
       for(const statement of candidate.userStatements.flatMap(homePlanningNoteParts))conversation.recordGoalStatement(statement,'home',workforceScope);
@@ -440,7 +440,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
       if(candidateCurrent&&candidate.proposal&&problem===candidate.proposal.problem)decisionStore.setField(id,'homeCandidateOptions',{version:2,goalId:id,goal:problem,selectionGoal:candidate.selectionGoal,sourceKey:candidate.sourceKey,proposal:candidate.proposal});
       planRationale.current.set(candidate.rationale,id);
       setPreparationUnavailable(null);setCandidate(null);setActionPin(previous=>({id,sequence:(previous?.sequence??0)+1}));
-      guidedActions.emit({type:'pinned',goalId:id});
+      guidedActions.emit({type:'pinned',goalId:id,goal:problem});
     }catch(error){setCandidateNotice(error instanceof Error?error.message:'The goal could not be pinned. Your draft is kept.')}
   }
   const fallbackStatements=fallbackSubmission?.context===fallbackContext?fallbackSubmission.statements:[];

@@ -16,7 +16,7 @@ export class HomeGuidedFlow {
  }
 }
 
-export type GuidedReceipt={type:'answered'|'pinned'|'selected'|'attached'|'edited';goalId:string;planId?:string;number?:number;sourcePlanId?:string};
+export type GuidedReceipt={type:'answered'|'pinned'|'selected'|'attached'|'edited';goalId:string;goal?:string;planId?:string;number?:number;sourcePlanId?:string};
 /** Receipts advance only the expected real control in this isolated goal. */
 export function guidedReceiptStep(step:number,event:GuidedReceipt,goalId:string,originalId:string|null,revisedId:string|null):number|null {
  if(event.goalId!==goalId)return null;

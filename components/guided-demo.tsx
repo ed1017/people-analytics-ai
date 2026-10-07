@@ -23,15 +23,15 @@ const button='min-h-11 rounded border border-white/60 px-3 py-2 text-sm font-sem
 async function settle(signal:AbortSignal){await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));if(signal.aborted)throw Error('Example action cancelled.');}
 export function GuidedDemo({active,actions,registry,onClose}:{active:boolean;actions:GuidedDemoActions;registry:GuidedActionRegistry;onClose:()=>void}){
  const storage=useDecisionStorage();
- const [step,setStep]=useState(0),[pending,setPending]=useState(false),[error,setError]=useState(''),[revised,setRevised]=useState<{id:string;number:number}|null>(null),[completedSteps,setCompletedSteps]=useState<number[]>([]),[popupTop,setPopupTop]=useState(12);
- const [id]=useState(()=>`guided-${crypto.randomUUID()}`),flow=useRef(new HomeGuidedFlow()),abort=useRef<AbortController|null>(null),latest=useRef(actions),heading=useRef<HTMLHeadingElement>(null),panel=useRef<HTMLElement>(null),closed=useRef(false),running=useRef<AbortController|null>(null),currentStep=useRef(0),originalId=useRef<string|null>(null),originalNumber=useRef<number|null>(null),revisedId=useRef<string|null>(null),completed=useRef(new Set<number>()),editLoaded=useRef(false);
+ const [step,setStep]=useState(0),[pinnedStatement,setPinnedStatement]=useState<string>(GUIDED_EXAMPLE_PROMPT),[pending,setPending]=useState(false),[error,setError]=useState(''),[revised,setRevised]=useState<{id:string;number:number}|null>(null),[completedSteps,setCompletedSteps]=useState<number[]>([]),[popupTop,setPopupTop]=useState(12);
+ const [id]=useState(()=>`guided-${crypto.randomUUID()}`),flow=useRef(new HomeGuidedFlow()),abort=useRef<AbortController|null>(null),latest=useRef(actions),heading=useRef<HTMLHeadingElement>(null),panel=useRef<HTMLElement>(null),closed=useRef(false),running=useRef<AbortController|null>(null),currentStep=useRef(0),pinnedGoal=useRef<string>(GUIDED_EXAMPLE_PROMPT),originalId=useRef<string|null>(null),originalNumber=useRef<number|null>(null),revisedId=useRef<string|null>(null),completed=useRef(new Set<number>()),editLoaded=useRef(false);
  useLayoutEffect(()=>{latest.current=actions;currentStep.current=step;});
  function cancel(){abort.current?.abort();flow.current.cancel();registry.preparation?.cancel?.();latest.current.cancel();}
  function close(){if(closed.current)return;closed.current=true;cancel();latest.current.leave();registry.clear();onClose();}
- const owned=useCallback(()=>{const s=decisionStore.getSnapshot();if(!s.saved||s.data.goals.activeId!==id||!s.data.goals.goals.some(goal=>goal.id===id&&goal.statement===GUIDED_EXAMPLE_PROMPT))throw Error('The demo goal was removed, changed or deselected. It will not be recreated. Reopen it or exit the guide to review your work.');},[id]);
+ const owned=useCallback((statement=pinnedGoal.current)=>{const s=decisionStore.getSnapshot();if(!s.saved||s.data.goals.activeId!==id||!s.data.goals.goals.some(goal=>goal.id===id&&goal.statement===statement))throw Error('The demo goal was removed, changed or deselected. It will not be recreated. Reopen it or exit the guide to review your work.');},[id]);
  useLayoutEffect(()=>registry.subscribe((event:GuidedReceipt)=>{
   if(closed.current)return;
-  try{const current=currentStep.current;if(current===4&&guidedReceiptStep(3,event,id,originalId.current,revisedId.current)===4){owned();originalId.current=event.planId!;originalNumber.current=event.number!;return;}const next=guidedReceiptStep(current,event,id,originalId.current,revisedId.current);if(next===null)return;if(current>=2)owned();
+  try{const current=currentStep.current;if(current===4&&guidedReceiptStep(3,event,id,originalId.current,revisedId.current)===4){owned();originalId.current=event.planId!;originalNumber.current=event.number!;return;}const next=guidedReceiptStep(current,event,id,originalId.current,revisedId.current);if(next===null)return;if(current===2){const statement=event.goal??GUIDED_EXAMPLE_PROMPT;owned(statement);pinnedGoal.current=statement;setPinnedStatement(statement);}else if(current>=2)owned();
    if(current===3){originalId.current=event.planId!;originalNumber.current=event.number!;}
    if(current===5){revisedId.current=event.planId!;setRevised({id:event.planId!,number:event.number!});}
    completed.current.add(current);setCompletedSteps([...completed.current]);currentStep.current=next;setError('');setStep(next);
@@ -61,7 +61,7 @@ export function GuidedDemo({active,actions,registry,onClose}:{active:boolean;act
   finally{if(running.current===controller){running.current=null;setPending(false);}}
  }
  function back(){cancel();running.current=null;setPending(false);setError('');setStep(value=>Math.max(0,value-1));}
- const goalCurrent=step<3||storage.saved&&storage.data.goals.activeId===id&&storage.data.goals.goals.some(goal=>goal.id===id&&goal.statement===GUIDED_EXAMPLE_PROMPT);
+ const goalCurrent=step<3||storage.saved&&storage.data.goals.activeId===id&&storage.data.goals.goals.some(goal=>goal.id===id&&goal.statement===pinnedStatement);
  const complete=step===steps.length,done=completedSteps.includes(step),point=!complete&&!done&&goalCurrent;
  const scope=`[data-guide-goal="${id}"] `,selector=step===1||step===5?'[data-guide-target="submit"]':step===2?'[data-guide-target="pin"]':step===3?scope+'[data-guide-plan][aria-selected="true"], '+scope+'[data-guide-target="prepare"]':step===4||step===7?scope+'[data-guide-target="attach"]':step===6&&revised?scope+`[data-guide-plan="${revised.number}"]`:null;
  const targetLabel=step===1||step===5?'Next → Submit':step===2?'Next → Pin goal':step===3?'Review plans and choose one':step===6?`Next → Select Plan #${revised?.number}`:'Next → Attach Action Plan';
