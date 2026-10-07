@@ -1,4 +1,4 @@
-import {prepareHomeMixCommit} from "./home-mix-history";
+import {prepareHomeMixCommit,readHomeMixHistory} from "./home-mix-history";
 import {evaluateHomeMix,verifyHomeMix} from "./home-mix-runtime";
 import {previewBundleCapacityAdoption} from "./home-capacity-adoption";
 // Module worker: no fetch, SDK, database or storage access.
@@ -8,6 +8,7 @@ self.onmessage=async(event: MessageEvent)=>{
  try {
   const {action,args}=event.data;let value;
   switch(action){
+   case "home-mix-history": value=await readHomeMixHistory(args.raw,args.goalId);break;
    case "home-mix-commit": value=await prepareHomeMixCommit(args.draft,args.evaluation,args.candidateId,args.at,args.previous);break;
    case "home-mix": value=await evaluateHomeMix(args.draft);break;
    case "home-mix-read": value=await verifyHomeMix(args.raw,args.draft);break;

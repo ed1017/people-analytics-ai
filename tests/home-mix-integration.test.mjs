@@ -42,22 +42,35 @@ test('explicit mapped source evaluates all 21 combinations and selects/stages wi
  const {draft}=await homeMixFixture(),before=JSON.stringify(draft),value=await evaluateHomeMix(draft);
  assert.equal(value.report.summary.enumerated,21);assert.equal(value.report.summary.counts.met,21);
  const commit=await prepareHomeMixCommit(draft,value,value.report.preferredOptionId,at,null);
- assert.notEqual(bundleInputKey(commit.draft),bundleInputKey(draft));assert.equal(commit.draft.revision,draft.revision+1);assert.equal(commit.history.entries[0].selection.proposal.status,'proposed');assert.equal(JSON.stringify(draft),before);
- assert.deepEqual(await verifyHomeMixCommit(commit,undefined,commit.draft),commit.history);assert.ok(await readHomeMixHistory(commit.history,draft.binding.goalId));
- const changed=structuredClone(commit);changed.history.entries[0].selection.proposal.draft.inputs.capacity.input.buy='99';await assert.rejects(verifyHomeMixCommit(changed,null,commit.draft));
+ assert.notEqual(bundleInputKey(commit.draft),bundleInputKey(draft));assert.equal(commit.draft.revision,draft.revision+1);assert.equal(commit.history.entries[0].proposal.status,'proposed');assert.equal(JSON.stringify(draft),before);
+ assert.deepEqual(await verifyHomeMixCommit(commit,undefined,commit.draft),await readHomeMixHistory(commit.history,draft.binding.goalId));assert.ok(await readHomeMixHistory(commit.history,draft.binding.goalId));
+ const changed=structuredClone(commit);changed.history.entries[0].proposal.draft.inputs.capacity.input.buy='99';await assert.rejects(verifyHomeMixCommit(changed,null,commit.draft));
  await assert.rejects(verifyHomeMixCommit(commit,{version:1,goalId:draft.binding.goalId,entries:[]},commit.draft));
 });
 test('unknown results can be retained without a staffing adoption and previous searches remain byte-identical',async()=>{
  const draft=await fresh(),value=await evaluateHomeMix(draft),first=await prepareHomeMixCommit(draft,value,null,at,null),bytes=JSON.stringify(first.history.entries[0]);
- assert.equal(bundleInputKey(first.draft),bundleInputKey(draft));assert.equal(first.history.entries[0].selection,null);
+ assert.equal(bundleInputKey(first.draft),bundleInputKey(draft));assert.equal(first.history.entries[0].proposal,null);
  const next=edit(draft,'set budget to 10000').record.draft,second=await prepareHomeMixCommit(next,await evaluateHomeMix(next),null,at,first.history);
  assert.equal(second.history.entries.length,2);assert.equal(JSON.stringify(second.history.entries[0]),bytes);assert.ok(await readHomeMixHistory(second.history,draft.binding.goalId));
  const duplicate=await prepareHomeMixCommit(next,await evaluateHomeMix(next),null,at,second.history);assert.equal(duplicate.history.entries.length,2);
- const altered=structuredClone(second.history);altered.entries[0].evaluation.report.reference.cash.knownSubtotal=1;assert.equal(await readHomeMixHistory(altered,draft.binding.goalId),null);
+ const altered=structuredClone(second.history);altered.entries[0].report.data=altered.entries[0].report.data.slice(4);assert.equal(await readHomeMixHistory(altered,draft.binding.goalId),null);
 });
 test('new constraints are bounded and unknown constraints never become permissive defaults',async()=>{
  const initial=await fresh(),unknown=edit(initial,'set maximum added employees to Unknown').record.draft,value=await evaluateHomeMix(unknown);
  assert.equal(value.report.constraints.maxAddedEmployees,null);assert.equal(value.report.reference.status,'unknown');
  for(const invalid of [null,{maxAddedEmployees:null},{maxAddedEmployees:{value:-1,kind:'user-entered',basis:'test'}},{objective:{value:'global optimum',kind:'user-entered',basis:'test'}}]){const draft=structuredClone(initial);draft.inputs.mixConstraints=invalid;assert.equal(readBundleDraft(draft),null);}
  assert.throws(()=>edit(initial,'set search objective to global optimum'));
+});
+
+test('lossless local report storage preserves every source value and keeps a 21-option report compact',async()=>{
+ const {packHomeMixReport,unpackHomeMixReport}=await import('../lib/home-mix-report-codec.ts');
+ const value=await evaluateHomeMix((await homeMixFixture()).draft),packed=await packHomeMixReport(value.report);
+ assert.ok(JSON.stringify(packed).length<JSON.stringify(value.report).length/4);
+ assert.deepEqual(await unpackHomeMixReport(packed),value.report);
+ const controller=new AbortController();controller.abort();await assert.rejects(unpackHomeMixReport(packed,controller.signal));
+});
+test('corrupt or oversized compressed reports cannot bypass decoded replay limits',async()=>{
+ const {gzipSync}=await import('node:zlib'),{unpackHomeMixReport}=await import('../lib/home-mix-report-codec.ts');
+ await assert.rejects(unpackHomeMixReport({encoding:'gzip-base64',data:'%%%'}));
+ await assert.rejects(unpackHomeMixReport({encoding:'gzip-base64',data:gzipSync(Buffer.alloc(2*1024*1024+1,97)).toString('base64')}),/decoded bound/);
 });
