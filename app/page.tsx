@@ -11,6 +11,8 @@ import {DecisionBrief} from "@/components/decision-brief";
 import {decisionStore,recordDecisionEvidence} from "@/components/decision-store";
 import { intelligenceEvidence, isIntelligencePage } from "@/lib/intelligence-chat";
 import { developmentCatalog } from "@/lib/development-costs";
+import { knownDifference } from "@/lib/numeric-contract";
+import { summarizeStoredPlanning } from "@/lib/stored-planning";
 import {
   useEffect,
   useEffectEvent,
@@ -1163,33 +1165,16 @@ export default function Home() {
       baselineScenario.points.length - 1
     ] ?? null;
 
-  const planningNetChange =
-    activePlanningStart &&
-    activePlanningEnd
-      ? activePlanningEnd.planned_headcount -
-        activePlanningStart.planned_headcount
-      : null;
+  const {
+    headcount_change: planningNetChange,
+    hires: planningTotalHires,
+    exits: planningTotalExits,
+  } = summarizeStoredPlanning(activePlanningScenario?.points ?? []);
 
-  const planningHeadcountDeltaVsBaseline =
-    activePlanningEnd &&
-    baselinePlanningEnd
-      ? activePlanningEnd.planned_headcount -
-        baselinePlanningEnd.planned_headcount
-      : null;
-
-  const planningTotalHires =
-    activePlanningScenario?.points.reduce(
-      (sum, point) =>
-        sum + point.planned_hires,
-      0
-    ) ?? 0;
-
-  const planningTotalExits =
-    activePlanningScenario?.points.reduce(
-      (sum, point) =>
-        sum + point.planned_exits,
-      0
-    ) ?? 0;
+  const planningHeadcountDeltaVsBaseline = knownDifference(
+    activePlanningEnd?.planned_headcount,
+    baselinePlanningEnd?.planned_headcount,
+  );
 
   const activePositionScenario =
     positionModelingData?.scenarios.find(

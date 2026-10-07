@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { dataApiErrorResponse } from "../../../lib/data-api-error";
 import { supabaseServer } from "../../../lib/supabase-server";
 import { nullableNumber as toNumber } from "../../../lib/numeric-contract";
 
@@ -14,11 +15,11 @@ export async function GET() {
       supabaseServer.from("talent_acquisition_monthly_summary").select("*").order("month", { ascending: true }),
     ]);
 
-    if (currentResult.error) throw new Error("TA current summary: " + currentResult.error.message);
-    if (sourceResult.error) throw new Error("TA source summary: " + sourceResult.error.message);
-    if (businessUnitResult.error) throw new Error("TA business unit summary: " + businessUnitResult.error.message);
-    if (recruiterResult.error) throw new Error("TA recruiter summary: " + recruiterResult.error.message);
-    if (monthlyResult.error) throw new Error("TA monthly summary: " + monthlyResult.error.message);
+    if (currentResult.error) throw currentResult.error;
+    if (sourceResult.error) throw sourceResult.error;
+    if (businessUnitResult.error) throw businessUnitResult.error;
+    if (recruiterResult.error) throw recruiterResult.error;
+    if (monthlyResult.error) throw monthlyResult.error;
 
     const current = currentResult.data;
     if (!current) throw new Error("TA current summary returned no data.");
@@ -82,7 +83,6 @@ export async function GET() {
       })),
     }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    console.error("Talent Acquisition API error:", error);
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Failed to load Talent Acquisition data." }, { status: 500 });
+    return dataApiErrorResponse('talent-acquisition', error);
   }
 }

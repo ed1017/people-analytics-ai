@@ -7,6 +7,7 @@ import ts from 'typescript';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import * as numeric from '../lib/numeric-contract.ts';
+import {dataApiErrorResponse} from '../lib/data-api-error.ts';
 import * as format from '../lib/display-format.ts';
 import * as planning from '../lib/stored-planning.ts';
 import * as listening from '../lib/employee-listening.ts';
@@ -77,6 +78,7 @@ async function getRoute(domain, tables) {
     'next/server':{NextResponse:{json:(body,init)=>Response.json(body,init)}},
     '../../../lib/supabase-server':{supabaseServer},
     '../../../lib/numeric-contract':numeric,
+    '../../../lib/data-api-error':{dataApiErrorResponse},
     '../../../lib/stored-planning':planning,
     '../../../lib/exit-enps':{...exitEnps,localExitEnpsEnabled:()=>false},
   });

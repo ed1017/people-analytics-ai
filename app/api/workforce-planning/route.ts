@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { dataApiErrorResponse } from "../../../lib/data-api-error";
 import { supabaseServer } from "../../../lib/supabase-server";
 import { nullableNumber as toNumber } from "../../../lib/numeric-contract";
 import { storedPlanningProvenance } from "../../../lib/stored-planning";
@@ -53,15 +54,11 @@ export async function GET() {
     ]);
 
     if (summaryResult.error) {
-      throw new Error(
-        `Scenario summary: ${summaryResult.error.message}`
-      );
+      throw summaryResult.error;
     }
 
     if (scenariosResult.error) {
-      throw new Error(
-        `Scenarios: ${scenariosResult.error.message}`
-      );
+      throw scenariosResult.error;
     }
 
     const scenarioRows =
@@ -86,9 +83,7 @@ export async function GET() {
           );
 
       if (assumptionsResult.error) {
-        throw new Error(
-          `Scenario assumptions: ${assumptionsResult.error.message}`
-        );
+        throw assumptionsResult.error;
       }
 
       assumptionRows =
@@ -193,19 +188,6 @@ const summaries: SummaryRow[] =
       }
     );
   } catch (error) {
-    console.error(
-      "Workforce planning API error:",
-      error
-    );
-
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to load workforce planning data.",
-      },
-      { status: 500 }
-    );
+    return dataApiErrorResponse('workforce-planning', error);
   }
 }

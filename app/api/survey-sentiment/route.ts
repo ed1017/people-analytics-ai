@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { dataApiErrorResponse } from "../../../lib/data-api-error";
 import { supabaseServer } from "../../../lib/supabase-server";
 import { generateExitEnpsScores, localExitEnpsEnabled, summarizeExitEnps, surveyDimensionsForRetrieval } from "../../../lib/exit-enps";
 
@@ -37,19 +38,19 @@ export async function GET() {
     ]);
 
     if (currentResult.error) {
-      throw new Error("Listening current summary: " + currentResult.error.message);
+      throw currentResult.error;
     }
     if (trendResult.error) {
-      throw new Error("Engagement trend: " + trendResult.error.message);
+      throw trendResult.error;
     }
     if (dimensionsResult.error) {
-      throw new Error("Listening dimensions: " + dimensionsResult.error.message);
+      throw dimensionsResult.error;
     }
     if (businessUnitResult.error) {
-      throw new Error("Listening business units: " + businessUnitResult.error.message);
+      throw businessUnitResult.error;
     }
     if (exitReasonResult.error) {
-      throw new Error("Exit reasons: " + exitReasonResult.error.message);
+      throw exitReasonResult.error;
     }
 
     const current = currentResult.data;
@@ -131,16 +132,6 @@ export async function GET() {
       }
     );
   } catch (error) {
-    console.error("Employee Listening API error:", error);
-
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to load Employee Listening data.",
-      },
-      { status: 500 }
-    );
+    return dataApiErrorResponse('survey-sentiment', error);
   }
 }

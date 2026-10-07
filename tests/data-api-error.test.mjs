@@ -4,6 +4,9 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
 import {dataApiErrorResponse} from '../lib/data-api-error.ts';
+import * as numeric from '../lib/numeric-contract.ts';
+import * as planning from '../lib/stored-planning.ts';
+import * as exitEnps from '../lib/exit-enps.ts';
 
 async function capture(run){
  const original=console.error,logs=[];console.error=(...args)=>logs.push(args);
@@ -65,3 +68,26 @@ test('actual workforce GET redacts every upstream result failure and thrown tran
   assert.doesNotMatch(JSON.stringify({body,logs}),/JWT|PRIVATE|private.invalid/);assert.equal(body.summary,undefined);
  }
 });
+
+for(const source of ['survey-sentiment','talent-acquisition','workforce-planning']){
+ test(`actual ${source} GET redacts failed source reads and transport errors`,async()=>{
+  const code=ts.transpileModule(fs.readFileSync(new URL(`../app/api/${source}/route.ts`,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+  for(const transport of [false,true]){
+   const exports={},supabaseServer={from:()=>{
+    if(transport)throw new Error(privateMessage);
+    const query={select:()=>query,single:()=>query,order:()=>query,in:()=>query,then:resolve=>resolve({data:null,error:{code:'PGRST303',message:privateMessage}})};
+    return query;
+   }};
+   const aliases={'next/server':{NextResponse:Response},'../../../lib/supabase-server':{supabaseServer},'../../../lib/data-api-error':{dataApiErrorResponse},'../../../lib/numeric-contract':numeric,'../../../lib/stored-planning':planning,'../../../lib/exit-enps':{...exitEnps,localExitEnpsEnabled:()=>false}};
+   vm.runInNewContext(code,{exports,require:name=>{if(name in aliases)return aliases[name];throw Error('Unexpected import: '+name)}});
+   const {value:response,logs}=await capture(()=>exports.GET());
+   assert.equal(response.status,500);assert.equal(response.headers.get('cache-control'),'no-store');
+   const body=await response.json();assert.match(body.error,/temporarily unavailable/);
+   assert.equal(logs.length,1);assert.equal(logs[0][1].source,source);
+   assert.equal(logs[0][1].code,transport?null:'PGRST303');
+   assert.equal(response.headers.get('x-correlation-id'),body.correlationId);
+   assert.equal(body.correlationId,logs[0][1].correlationId);
+   assert.doesNotMatch(JSON.stringify({body,logs}),/JWT|PRIVATE|private.invalid/);
+  }
+ });
+}
