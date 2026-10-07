@@ -19,14 +19,15 @@ test('fictional titles do not block an explicit user goal, while real duplicates
  const edited=seed();edited.goals.goals[0].statement='My revised target';assert.equal(hasSavedUserGoal(edited,'My revised target'),true);
 });
 const port=(entries=[])=>{const map=new Map(entries);return {map,getItem:key=>map.get(key)??null,setItem:(key,value)=>map.set(key,value),removeItem:key=>map.delete(key)}};
-test('first run has two clearly identifiable attached examples and starts in General exploration',async()=>{
+test('first run has three clearly identifiable attached examples and starts in General exploration',async()=>{
  const p=port(),store=new DecisionStore();store.initialize(p,seed);
- const data=parseDecisions(p.getItem(DECISIONS_STORAGE_KEY));assert.equal(data.goals.activeId,'');assert.equal(data.goals.goals.length,2);
+ const data=parseDecisions(p.getItem(DECISIONS_STORAGE_KEY));assert.equal(data.goals.activeId,'');assert.equal(data.goals.goals.length,3);
  for(const example of homeDemoExamples){
   const fields=data.workspaces[example.id].fields,record=readHomeDemo(fields[homeDemoField],example.id),workspace=readBundleWorkspace(fields[bundleWorkspaceField],example.id),draft=workspace.attachments[0].draft;
   assert.equal(record.example.key,example.key);assert.equal(pinnedGoalPlanStatus(example.id,fields,{}),'saved');assert.equal(workspace.attachments.length,1);
   assert.deepEqual(demoBinding(example),await actionBinding(example.id,example.goal,{sources:[]},{origin:homeDemoOrigin,key:example.key}));
   assert.ok(draft.bundle.name.split(' ').length<=5);assert.equal(draft.bundle.origin,homeDemoOrigin);assert.deepEqual(draft.bundle.components[0].evidence,[]);
+  if(example.key==='capacity'){assert.equal(draft.inputs.mixScenario.basis.value,'conditional-scenario');assert.equal(draft.inputs.budget.amount.value,100000);assert.equal(draft.inputs.capacity.input.buy,'5');continue;}
   assert.equal(draft.inputs.expenses[0].amount.kind,'illustrative');assert.equal(draft.inputs.groups[0].count.kind,'illustrative');assert.equal(draft.inputs.scope.startMonth.value,'2026-11');assert.equal(draft.inputs.whatIf,undefined);
   assert.equal(draft.inputs.costReviews[0].complete.kind,'illustrative');
   assert.equal(workspace.attachments[0].result.cashTotal,example.budget); // Complete only within the fictional example scope.
@@ -63,5 +64,5 @@ test('supported chat edits persist as latest drafts and attachments preserve the
 });
 test('storage failure keeps the prior bytes and retries the same seed without duplicates',()=>{
  const p=port(),write=p.setItem,store=new DecisionStore();p.setItem=()=>{throw Error('Quota exceeded')};store.initialize(p,seed);assert.equal(store.getSnapshot().saved,false);assert.equal(p.getItem(DECISIONS_STORAGE_KEY),null);
- p.setItem=write;store.retry();assert.equal(store.getSnapshot().saved,true);assert.equal(parseDecisions(p.getItem(DECISIONS_STORAGE_KEY)).goals.goals.length,2);
+ p.setItem=write;store.retry();assert.equal(store.getSnapshot().saved,true);assert.equal(parseDecisions(p.getItem(DECISIONS_STORAGE_KEY)).goals.goals.length,3);
 });

@@ -1,4 +1,6 @@
 // @ts-expect-error Native Node tests share TypeScript source.
+import {withHomeMixScenario,homeMixScenarioCommand} from './home-mix-scenario.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
 import {whatIfScope} from './home-plan-what-if.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {withDeliveryAssumptions} from "./home-plan-delivery-estimate.ts";
@@ -29,6 +31,10 @@ function targets(input:BundleInputs,draft:BundleDraft){
    add({key:'capacity.'+key,label,type,read:()=>({value:capacity.input[key]===''?null:type==='month'||type==='date'?capacity.input[key]:Number(capacity.input[key]),...capacity.origins[key]}),write:value=>{capacity.input[key]=value.value===null?'':String(value.value);capacity.origins[key]={kind:value.kind,basis:value.basis};}},[...aliases]);
   }
  }
+ if(input.mixScenario){const scenario=input.mixScenario;for(const path of ['build','move','buy'] as const)for(const edge of ['min','max'] as const){
+  const label=`${path==='buy'?'Hire':path[0].toUpperCase()+path.slice(1)} search ${edge==='min'?'minimum':'maximum'}`;
+  add({key:`mixScenario.${path}.${edge}`,label,type:'count',read:()=>({value:scenario.bounds[path].value?.[edge]??null,kind:scenario.bounds[path].kind,basis:scenario.bounds[path].basis}),write:value=>{if(value.value===null)fail('Search bounds must be explicit whole counts.');const old=scenario.bounds[path].value!;scenario.bounds[path]={value:{...old,[edge]:Number(value.value)},kind:value.kind,basis:value.basis};}},[`${path} search ${edge==='min'?'minimum':'maximum'}`]);
+ }}
  if(input.whatIf?.kind==='capacity'||input.capacity){
   for(const [key,label,type,aliases] of [['maxAddedEmployees','Maximum added employees','count',['max added employees','headcount cap']],['maxStaffHours','Maximum staff hours','count',['max staff hours','staff hours cap']],['deadlineMonth','Coverage deadline','month',['coverage deadline month']],['objective','Search objective','text',['staffing objective']]] as const){
    add({key:'mixConstraints.'+key,label,type,read:()=>input.mixConstraints?.[key]??unknownAssumption(),write:value=>{input.mixConstraints={...input.mixConstraints,[key]:value};}},[...aliases]);
@@ -36,7 +42,7 @@ function targets(input:BundleInputs,draft:BundleDraft){
  }
  if(input.whatIf){const scenario=input.whatIf;for(const [key,label,type,aliases] of (scenario.kind==='turnover'?[
   ['baseline','Baseline turnover','percent',['baseline turnover rate','baseline rate']],['target','Target turnover','percent',['target turnover rate','turnover target','success target']],['population','Average workforce','count',['outcome population','denominator']],
- ]:[['baseline','Baseline additional roles','count',['baseline coverage']],['target','Target additional roles','count',['additional roles','capacity target','success target']],['unitCost','Monthly cost per role','money',['monthly role cost','role monthly cost']]]) as [keyof Pick<typeof scenario,'baseline'|'target'|'population'|'unitCost'>,string,Target['type'],string[]][]){add({key:'whatIf.'+key,label,type,read:()=>scenario[key],write:value=>{scenario[key]=value as Assumption<number>;}},aliases);}}
+ ]:[['baseline','Baseline additional roles','count',['baseline coverage']],['target','Target additional roles','count',['additional roles','capacity target','success target']],['unitCost','Monthly cost per role','money',['monthly role cost','role monthly cost']]]) as [keyof Pick<typeof scenario,'baseline'|'target'|'population'|'unitCost'>,string,Target['type'],string[]][]){add({key:'whatIf.'+key,label,type,read:()=>scenario[key],write:value=>{scenario[key]=value as Assumption<number>;if(input.mixScenario&&input.capacity&&key==='unitCost'){input.capacity.input.annualHireCost=value.value===null?'':String(Number(value.value)*12);input.capacity.origins.annualHireCost={kind:value.kind,basis:value.basis?value.basis+' Monthly USD × 12.':null};}}},aliases);}}
  if(input.deliveryEstimate){const delivery=input.deliveryEstimate;for(const [key,label,type,aliases] of [['hoursPerParticipant','Hours per participant','count',['assessment hours per participant']],['coordinationHours','Coordination hours','count',['staff coordination hours']],['hourlyRate','Staff hourly rate','money',['hourly rate','staff rate']],['acceptance','Acceptance criteria','text',['success criteria']]] as const){if(input.costPolicy&&key==='hourlyRate')continue;add({key:'deliveryEstimate.'+key,label,type,read:()=>delivery[key],write:value=>{if(key==='acceptance')delivery.acceptance=value as Assumption<string>;else delivery[key]=value as Assumption<number>;}},[...aliases]);}}
  for(const group of input.groups)add({key:'group.'+group.id,label:group.id==='pilot-group'&&draft.pilot&&input.groups.length===1?'Pilot participants':group.label+' participants',type:'count',read:()=>group.count,write:value=>{group.count=value as Assumption<number>;}},[group.label+' participants',group.id+' participants',...(input.groups.length===1?['participants','pilot participants']:[])]);
  for(const expense of input.expenses){
@@ -123,6 +129,11 @@ function parseValue(raw:string,target:Target):Assumption<string|number>{
 export function previewBundleChatEdit(draft:BundleDraft,request:string,selection?:BundleEditSelection,legacyReplay:boolean|'cash-hours-v1'=false):BundleEditPreview{
  if(!readBundleDraft(draft))fail('This plan draft cannot be verified. Your work is kept.');
  if(!request.trim()||request.length>1200)fail('Describe up to six edits in 1,200 characters.');
+ if(/^(?:please\s+)?use illustrative staffing assumptions[.!]?$/i.test(selectedPlanRequest(request,selection))){
+  const inputs=withHomeMixScenario(draft),scenario=inputs.mixScenario!,capacity=inputs.capacity!;
+  const values=[['Staffing source','Fictional, disjoint Build/Move groups; unverified release and eligibility. Existing component ownership is shown in the staffing search.'],['Search bounds',`Build 0–${scenario.bounds.build.value!.max}; Move 0–${scenario.bounds.move.value!.max}; Hire 0–${scenario.bounds.buy.value!.max}. Whole positions only; no hidden expansion.`],['Staffing costs',`Annual hire rate USD ${capacity.input.annualHireCost||'Unknown'}; hire fee USD 3000 per hire; total annual internal salary change USD 24000; total training cash USD 6000; training 80 hours.`],['Staffing dates',`Hire ${capacity.input.arrivalDate}; Build ${capacity.input.buildMonth}; Move ${capacity.input.moveMonth}. Existing component readiness still applies.`],['Release and cost coverage','Zero external backfills; fictional group separation and complete listed incremental costs. No funding or release approval; entered budget and reviewed assumptions are preserved.']];
+  return {inputKey:bundleInputKey(draft),request,inputs,changes:values.map(([field,value])=>({field,before:unknownAssumption(),after:{value,kind:'illustrative',basis:homeMixScenarioCommand+'; review these premises before applying.'}}))};
+ }
  // Only a final complete preservation instruction is optional; never discard intervening requests.
  if(/^(?:please\s+)?(?:make|fill(?: in)?|complete|add|use)\s+(?:(?:all|the|missing|remaining|needed|necessary|starting|reasonable)\s+)*assumptions(?:\s+(?:so (?:you|we) (?:have|get|can see) an outcome|to (?:show|give|have) an outcome))?[.!]?$/i.test(selectedPlanRequest(request,selection))){
   const completed=withDeliveryAssumptions(legacyReplay?draft.inputs:cashHoursInputs(draft.inputs,draft.binding.goal),draft.bundle.components.length);

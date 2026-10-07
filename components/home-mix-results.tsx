@@ -13,6 +13,7 @@ export function HomeMixResults({state,candidateId,onSelect,disabled}:{state:Home
   <p className="text-xs">Calculated locally from this plan’s assumptions. Existing employee effort is measured in hours. No observed availability, salary quote or intervention effect is inferred.</p>
   {notes.map(note=><p className="text-xs" key={note}>{note}</p>)}
   {context.status==='needs-inputs'&&<><p>No combinations evaluated: the staffing inputs need review.</p><ul className="list-disc pl-5">{context.missing.map((item,index)=><li key={index}>{item.reason}</li>)}</ul></>}
+  {context.status==='ready'&&!context.source.draft.inputs.mixScenario&&report?.summary.enumerated===1&&<p className="text-xs">To explore fictional internal options, say “Use illustrative staffing assumptions” in chat. Review the proposed groups, bounds, dates, costs and release premise before applying. Skill counts alone do not establish available staff.</p>}
   {report&&<>
    <p aria-label="Staffing search coverage">{report.summary.enumerated} combinations evaluated completely within bounds; {report.summary.calculatorInvocations} calculator calls including the reference. Build {report.spec.build.min}–{report.spec.build.max}, Move {report.spec.move.min}–{report.spec.move.max}, Buy {report.spec.buy.min}–{report.spec.buy.max}. {report.summary.emitted} shown; {report.summary.omittedByCap} omitted, including {report.summary.omittedNondominated} nondominated tradeoffs.</p>
    <p><strong>Objective:</strong> {report.objective.label} ({report.objective.basis}).</p>

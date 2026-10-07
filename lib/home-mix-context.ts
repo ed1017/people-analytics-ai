@@ -139,7 +139,7 @@ export async function resolveHomeMixContext(request: HomeMixRequest): Promise<Ho
     if (!flow) { add(`mapping.${path}`, 'Every potentially active staffing path requires a whole-flow component mapping.'); continue; }
     if (path === 'build' || path === 'move') {
       const group = draft.inputs.groups.find(item => item.id === flow.groupId);
-      if (!group || !known(group.count) || !['user-entered', 'adopted'].includes(group.count.kind)) add(`group.${path}`, 'Internal paths require a known, explicitly reviewed aggregate group count.');
+      if (!group || !known(group.count) || !(['user-entered', 'adopted'].includes(group.count.kind) || draft.inputs.mixScenario?.basis.value === 'conditional-scenario' && group.count.kind === 'illustrative')) add(`group.${path}`, 'Internal paths require a known, explicitly reviewed aggregate group count.');
       else if (Math.max(spec[path].max, Number(input[path])) > group.count.value!) add(`bounds.${path}`, 'Entered bounds exceed the mapped group count; explicit bounds are never silently narrowed.');
       if (!group || flow.componentIds.some(id => !draft.inputs.memberships.some(item => item.componentId === id && item.complete.value === true && item.groupIds.includes(group.id))))
         add(`membership.${path}`, 'Whole-flow components must include the mapped internal group in their reviewed participant coverage.');

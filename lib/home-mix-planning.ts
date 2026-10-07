@@ -17,6 +17,13 @@ export function homeMixPlanningRequest(original:BundleDraft):{request:HomeMixReq
   for(const field of ['maxAddedEmployees','deadlineMonth'] as const)if(controls?.[field]){
    const value=controls[field];draft.inputs.capacity.input[field]=value.value===null?'':String(value.value);draft.inputs.capacity.origins[field]={kind:value.kind,basis:value.basis};
   }
+  const scenario=draft.inputs.mixScenario;
+  if(scenario){
+   draft.inputs.capacity.flows=structuredClone(scenario.flows);request.bounds=structuredClone(scenario.bounds);
+   notes.push('Explicit fictional staffing scenario. Group counts and disjointness are premises, not observed eligibility or releasable capacity. Zero backfills assumes no source-team replacement need; release approval and operational feasibility remain unverified.');
+   for(const flow of scenario.flows){const group=draft.inputs.groups.find(item=>item.id===flow.groupId);notes.push(`${flow.path==='buy'?'Hire':flow.path[0].toUpperCase()+flow.path.slice(1)} → ${flow.componentIds.map(id=>draft.bundle.components.find(item=>item.id===id)!.name).join(', ')}${group?`; ${group.label}: ${group.count.value??'Unknown'} (${group.count.kind})`:''}.`);}
+   notes.push('Edit bounds in chat: “Set Build search maximum to 2”. Group size is a separate premise; changing a limit never increases it. Dates and total path costs stay fixed across combinations.');
+  }
   return {request,notes};
  }
  const scenario=draft.inputs.whatIf,scope=draft.inputs.scope;

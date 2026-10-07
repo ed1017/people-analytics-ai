@@ -1,3 +1,7 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {withHomeMixScenario} from './home-mix-scenario.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {initialWhatIf} from './home-plan-what-if.ts';
 // First-run browser examples only. No evidence fetch, model call or planning-tool write.
 // @ts-expect-error Native Node tests share TypeScript source.
 import {homeDemoExamples,homeDemoField,demoBundle,demoBinding,readHomeDemo} from './home-demo-catalog.ts';
@@ -32,6 +36,17 @@ export function createHomeDemoGoals(now=new Date().toISOString()):Pick<DecisionD
   input.expenses=[{id:'demo-budget',label:'Pilot allowance',kind:'cash',amount:assumed(example.budget),startMonth:assumed(start.slice(0,7)),months:assumed(1)}];
   input.expenseLinks=[{expenseId:'demo-budget',componentIds:['c1'],allocations:null}];
   input.deliveryEstimate={hoursPerParticipant:assumed(4),coordinationHours:assumed(8),hourlyRate:{value:null,kind:'unknown',basis:null},acceptance:assumed(example.acceptance)};
+  if(example.key==='capacity'){
+   Object.assign(input.scope,{population:assumed('Fictional capacity scenario'),businessUnit:assumed('Fictional business unit'),jobProfile:assumed('Fictional whole roles'),months:assumed(12),capacityRequired:assumed(true),demand:assumed(5)});
+   input.groups=[];input.memberships=[];input.expenses=[];input.expenseLinks=[];
+   input.timing=draft.bundle.components.map(component=>({componentId:component.id,start:assumed(start),finish:assumed(start)}));
+   input.costReviews=draft.bundle.components.map(component=>({componentId:component.id,complete:assumed(true)}));
+   input.budget={amount:assumed(example.budget),basis:assumed('cash')};
+   input.whatIf=initialWhatIf(example.goal,input)!;
+   // Keep delivery effort out of this staffing-only example; training is stated separately in hours.
+   delete input.deliveryEstimate;
+   Object.assign(input,withHomeMixScenario(draft));
+  }
   const prepared=reviseBundleDraft(draft,input),workspace=attachBundlePatch(undefined,prepared,{confirmed:true,bindingKey:actionBindingKey(binding),inputKey:bundleInputKey(prepared),acknowledgeUnknowns:true},`${example.id}-attached`,now).value;
   return [example.id,{savedAt:now,fields:{[homeDemoField]:{version:1,key:example.key,preparedAt:now},[bundleWorkspaceField]:workspace} as unknown as Record<string,Json>}];
  }))};

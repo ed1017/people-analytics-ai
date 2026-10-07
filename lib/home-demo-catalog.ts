@@ -17,10 +17,16 @@ export const homeDemoExamples=[
   component:{name:'AI practice sessions',domain:'learning' as const,firstStep:'Run guided AI practice sessions, then review a work sample against an agreed skills rubric.',ownerRole:'Learning lead and team managers'},
   budget:5000,participants:12,acceptance:'Complete a practice work sample per participant and compare baseline and final rubric scores; training completion alone does not establish skill improvement.',
   planningDigest:'e00b11e50e6847b8de27d7442e661ee802cf0d7e2d810bbdbd1ab76be2f26c02'},
+ {key:'capacity',id:'demo-capacity-mix',goal:'Add 5 roles over 12 months',name:'Compare staffing assumptions',
+  objective:'Compare a fictional mix of development, internal moves and hires for five additional whole roles.',
+  coordination:'Review distinct fictional Build and Move groups, explicit release premises and full-period hire costs before comparing bounded combinations.',
+  component:{name:'Hire additional roles',domain:'hiring' as const,firstStep:'Review fictional whole-position hiring costs and arrival assumptions.',ownerRole:'Workforce planning lead'},
+  budget:100000,participants:5,acceptance:'Five conditional roles by the stated deadline; eligibility, release, funding and delivery remain unverified.',
+  planningDigest:'0fe1a3d382f0fe8a6a20b8eb9bfc93fda852c87e68d1c51a56bdbd84c24c9ea9'},
 ] as const;
 export type HomeDemoExample=typeof homeDemoExamples[number];
 export function demoBundle(example:HomeDemoExample):SolutionBundle {
- return {origin:homeDemoOrigin,id:'A',name:example.name,objective:example.objective,coordination:example.coordination,components:[{id:'c1',...example.component,evidence:[],dependsOn:[],limitation}],limitation};
+ return {origin:homeDemoOrigin,id:'A',name:example.name,objective:example.objective,coordination:example.coordination,components:[{id:'c1',...example.component,evidence:[],dependsOn:[],limitation},...(example.key==='capacity'?[{id:'c2',name:'Develop internal candidates',domain:'learning' as const,firstStep:'Review the fictional Build group and its assumed readiness month.',ownerRole:'Learning lead',evidence:[],dependsOn:[],limitation},{id:'c3',name:'Move internal candidates',domain:'mobility' as const,firstStep:'Review the fictional Move group and release premise.',ownerRole:'People partner',evidence:[],dependsOn:[],limitation}]:[])],limitation};
 }
 // Frozen hashes of actionBinding(id, goal, {sources:[]}, {origin:homeDemoOrigin,key}).
 // Demo bindings never claim to represent current workforce evidence.
