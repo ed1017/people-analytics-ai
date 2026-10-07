@@ -4,6 +4,7 @@ import {HomeExitReasonChart} from '@/components/home-exit-reason-chart';
 import {homeTurnoverFocus} from '@/lib/home-turnover-focus';
 import {homeTurnPurpose,homeEvidenceSelection} from '@/lib/home-conversation';
 import {homeStarterGoal,homeStarterForecast,type HomeStarterGoal} from '@/lib/home-starter-goals';
+import {homeStarterExploration,buildHomeStarterExplorationPrompt,type HomeStarterExploration} from '@/lib/home-starter-exploration';
 import {HomeStarterForecastChart} from '@/components/home-forecast-chart';
 import {HomeForecastChart} from '@/components/home-forecast-chart';
 import {homeForecastIntent} from '@/lib/home-forecast-intent';
@@ -340,6 +341,14 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
     liveFindingTurn.current=null;setFindingTurn(null);
     void send(buildHomeFindingPrompt(verified),false,false,true,true,'explanation');
   }
+  function exploreStarterTopic(turn:FindingTurn,item:HomeStarterExploration){
+    if(!findingCurrent(turn)||!candidateCurrent||candidate?.rationale!==turn.message||!candidate.starter||turn.findings.length||!conversation.canSubmitPrompt()||sending.current||queuedSuggestion.current||chatLoading)return;
+    const verified=homeStarterExploration(candidate.starter,buildHomePack(sourceResults,workforceScope,turn.selectionGoal,developmentSession)).find(topic=>topic.id===item.id);
+    if(!verified||JSON.stringify(verified)!==JSON.stringify(item))return;
+    // The same response-bound guard as finding actions: one explicit explanatory request.
+    liveFindingTurn.current=null;setFindingTurn(null);
+    void send(buildHomeStarterExplorationPrompt(verified),false,false,true,true,'explanation');
+  }
   function renderStarterForecast(message:ChatMessage){
     const snapshot=starterForecasts.current.get(message);
     return ready&&active&&snapshot?.context===contextKey?<HomeStarterForecastChart domain={snapshot.forecast.domain}/>:null;
@@ -401,7 +410,10 @@ export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleA
     try{conversation.confirmWorkforceGoal(fallbackGoal);for(const statement of fallbackStatements.flatMap(homePlanningNoteParts))conversation.recordGoalStatement(statement,'home',workforceScope);if(!decisionStore.getSnapshot().saved)throw Error('The goal could not be saved. Your draft is kept.');setInput('');setCandidate(null);setActionPin(null);}catch(error){setCandidateNotice((error as Error).message);}
   }
   const candidateVerification=homeCandidateVerification(loading||settledEvidenceKey!==JSON.stringify({workforceQuery,workforceScope,refresh,persona}),storedCandidate,Boolean(savedCandidate),conversation.activeGoalId,conversation.focusedIssue,savedCandidatePack);
-  const explorationChoices=candidateCurrent&&findingTurn?.message===candidate?.rationale&&findingTurn?.context===contextKey&&findingTurn.findings.length>0?<section aria-label="Explore further" className="space-y-1"><h3 className="text-sm font-medium">Explore further</h3><div className="flex flex-wrap items-center">{findingTurn.findings.map((item,index)=>{const sourceIds=[...new Set(item.evidence.map(reference=>reference.split(':')[0]))],label=sourceIds.map(id=>pack.sources.find(source=>source.id===id)?.label??id).join(' & ');return <span key={item.id} className="inline-flex items-center">{index>0&&<span aria-hidden="true" className="mx-2 h-3 border-l"/>}<button type="button" aria-label={`Explore finding: ${item.prompt}`} title={item.prompt} disabled={chatLoading||Boolean(input.trim())} onClick={()=>exploreFinding(findingTurn,item)} className="min-h-11 rounded text-xs text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Explore {label}</button></span>})}</div></section>:undefined;
+  const explorationTurn=candidateCurrent&&findingTurn?.message===candidate?.rationale&&findingTurn?.context===contextKey&&messages.at(-1)===findingTurn.message&&active&&ready&&conversation.storageReady&&conversation.saved&&!conversation.issueEditor?findingTurn:null;
+  const starterTopics=explorationTurn&&!explorationTurn.findings.length?homeStarterExploration(candidate?.starter,buildHomePack(sourceResults,workforceScope,explorationTurn.selectionGoal,developmentSession)):[];
+  const explorationItems=explorationTurn?[...explorationTurn.findings.map(item=>({id:item.id,label:[...new Set(item.evidence.map(reference=>reference.split(':')[0]))].map(id=>pack.sources.find(source=>source.id===id)?.label??id).join(' & '),prompt:item.prompt,kind:'finding',run:()=>exploreFinding(explorationTurn,item)})),...starterTopics.map(item=>({id:item.id,label:item.label,prompt:item.prompt,kind:'topic',run:()=>exploreStarterTopic(explorationTurn,item)}))]:[];
+  const explorationChoices=explorationItems.length>0?<section aria-label="Explore further" className="space-y-1"><h3 className="text-sm font-medium">Explore further</h3><div className="flex flex-wrap items-center">{explorationItems.map((item,index)=><span key={item.id} className="inline-flex items-center">{index>0&&<span aria-hidden="true" className="mx-2 h-3 border-l"/>}<button type="button" aria-label={`Explore ${item.kind}: ${item.prompt}`} title={item.prompt} aria-describedby={input.trim()?'home-exploration-draft-note':undefined} disabled={chatLoading||suggestionPending||Boolean(input.trim())} onClick={item.run} className="min-h-11 rounded text-xs text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Explore {item.label}</button></span>)}</div>{input.trim()&&<p id="home-exploration-draft-note" role="status" className="text-xs text-muted-foreground">Your draft is kept. Send or clear it before exploring further.</p>}</section>:undefined;
   const showCandidatePin=!conversation.focusedIssue&&!hasCalculatedPlan&&reviewCandidateCurrent&&!showFallbackPin;
   const prioritizeGoal=!conversation.focusedIssue&&showCandidatePin&&userGoalCurrent;
   const responseStart=messages.findLast(message=>message.role==='user');
