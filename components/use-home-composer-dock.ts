@@ -17,6 +17,7 @@ export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement
     textarea.style.setProperty('max-height',`${Math.max(96,Math.min(240,height*.4))}px`);
     textarea.style.setProperty('min-height','96px');
     root.style.setProperty('--home-composer-height','0px');page.style.setProperty('--home-composer-height','0px');
+    root.style.removeProperty('--home-reading-height');
     return;
    }
    const keyboard=height<innerHeight*.75;
@@ -33,13 +34,20 @@ export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement
    const composerHeight=`${element.getBoundingClientRect().height}px`;
    root.style.setProperty('--home-composer-height',composerHeight);
    page.style.setProperty('--home-composer-height',composerHeight);
+   const reading=root.querySelector<HTMLElement>('[aria-label="Home chat workspace"]');
+   if(reading){
+    // The guide and outer scrolling move this pane independently of the header.
+    // Fit its actual position above the dock without scrolling the reader.
+    const top=Math.max(viewport?.offsetTop??0,reading.getBoundingClientRect().top);
+    root.style.setProperty('--home-reading-height',`${Math.max(64,element.getBoundingClientRect().top-top-12)}px`);
+   }
   };
   const keepFocusVisible=(event:FocusEvent)=>{
    if(window.matchMedia(PHONE_LAYOUT_QUERY).matches)return;
    const target=event.target;if(!(target instanceof HTMLElement)||element.contains(target))return;
    requestAnimationFrame(()=>{const box=target.getBoundingClientRect(),cover=element.getBoundingClientRect();if(box.right>cover.left&&box.left<cover.right&&box.bottom>cover.top-8&&box.top<cover.bottom)target.scrollIntoView({block:'center',behavior:'instant'});});
   };
-  measure();const observer=new ResizeObserver(measure);observer.observe(anchor);observer.observe(element);
+  measure();const observer=new ResizeObserver(measure);observer.observe(anchor);observer.observe(element);observer.observe(root);
   window.addEventListener('resize',measure);window.addEventListener('scroll',measure,{passive:true});viewport?.addEventListener('resize',measure);viewport?.addEventListener('scroll',measure);page.addEventListener('focusin',keepFocusVisible);
   return()=>{document.documentElement.classList.remove('home-keyboard-open');observer.disconnect();window.removeEventListener('resize',measure);window.removeEventListener('scroll',measure);viewport?.removeEventListener('resize',measure);viewport?.removeEventListener('scroll',measure);page.removeEventListener('focusin',keepFocusVisible);page.style.removeProperty('--home-composer-height');};
  },[active,slot,dock,input]);

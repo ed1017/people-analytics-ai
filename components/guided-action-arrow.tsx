@@ -13,8 +13,18 @@ export function GuidedActionArrow({selector,label}:{selector:string;label:string
    const next=[...document.querySelectorAll<HTMLElement>(selector)].find(node=>node.getClientRects().length&&getComputedStyle(node).visibility!=='hidden')??null;
    if(target!==next){target?.removeAttribute('data-guided-highlight');target=next;target?.setAttribute('data-guided-highlight','true');}
    if(!target){setPosition(previous=>previous===null?previous:null);return;}
-   if(!focused&&!target.matches(':disabled')){focused=true;target.scrollIntoView({block:'center',behavior:'instant'});target.focus({preventScroll:true});}
-   const rect=target.getBoundingClientRect(),nextPosition=rect.bottom<0||rect.top>innerHeight?null:{left:Math.max(96,Math.min(innerWidth-96,rect.left+rect.width/2)),top:rect.top-(overlay.current?.getBoundingClientRect().height??104)-8,label:target.dataset.guideTarget==='prepare'?target.textContent??label:label};
+   if(!focused&&!target.matches(':disabled')){
+    focused=true;
+    const dock=document.querySelector<HTMLElement>('.home-composer-dock'),reading=document.querySelector<HTMLElement>('[aria-label="Home chat workspace"]');
+    if(dock&&getComputedStyle(dock).position==='fixed'&&reading&&reading.scrollHeight>0){
+     const header=document.querySelector<HTMLElement>('main > header'),headerBottom=header&&['fixed','sticky'].includes(getComputedStyle(header).position)?header.getBoundingClientRect().bottom:0;
+     // One reveal per step: fixed Send cannot scroll the guide out of the reading area.
+     window.scrollBy({top:reading.getBoundingClientRect().top-headerBottom-12,behavior:'instant'});
+     if(!dock.contains(target))target.scrollIntoView({block:'nearest',behavior:'instant'});
+    }else target.scrollIntoView({block:'center',behavior:'instant'});
+    target.focus({preventScroll:true});
+   }
+   const rect=target.getBoundingClientRect(),nextPosition=rect.bottom<0||rect.top>innerHeight?null:{left:Math.max(112,Math.min(innerWidth-112,rect.left+rect.width/2)),top:rect.top-(overlay.current?.getBoundingClientRect().height??104)-8,label:target.dataset.guideTarget==='prepare'?target.textContent??label:label};
    setPosition(previous=>JSON.stringify(previous)===JSON.stringify(nextPosition)?previous:nextPosition);
   };
   const queue=()=>{if(!frame)frame=requestAnimationFrame(update);};

@@ -453,7 +453,7 @@
 @media (max-width: 639px) {
   .goal-toolbar > [aria-label="Goal controls"] { flex-basis: 100%; }
 }
-.home-workspace [aria-label="Home chat workspace"] { max-height: max(4rem, calc(var(--home-visible-height, 100dvh) - var(--home-reading-header-height, var(--app-header-height, 120px)) - var(--home-composer-height, 180px) - 1rem)); }
+.home-workspace [aria-label="Home chat workspace"] { max-height: var(--home-reading-height, max(4rem, calc(var(--home-visible-height, 100dvh) - var(--home-reading-header-height, var(--app-header-height, 120px)) - var(--home-composer-height, 180px) - 1rem))); }
 .home-workspace :is(button, summary, [tabindex], h2, h3) { scroll-margin-top: calc(var(--app-header-height, 120px) + .75rem); }
 
 @media (max-height: 600px) {
