@@ -26,12 +26,32 @@ export function homeExitReasonChartFromPacket(packet:unknown):HomeExitReasonChar
  const facts=record(source.facts),rows=Array.isArray(facts.rows)?facts.rows.filter(row=>record(row).kind==='Reported primary reason'):[];
  return homeExitReasonChart({status:source.status,data:{as_of:source.date,summary:{exit_respondents:facts.exit_respondents},exit_reasons:rows}});
 }
-/** Match the subject/citation only; chart values never come from assistant-authored prose or arrays. */
+const plain=(text:string)=>text.replace(/\*\*|__/g,'').replace(/[–—]/g,'-');
+function currentReasonAbsence(answer:string){
+ const subject='(?:(?:S2|exit[- ]surveys?)(?:\\s+(?:primary|reason|reasons|response|responses|data|feedback|counts))*|reason counts)';
+ const absent=new RegExp('\\b'+subject+'\\s*(?:\\[S2\\])?\\s+(?:(?:is|are|was|were|remain|remains|still|currently|now)\\s+)*(?:unavailable|absent|missing|timed out|not\\s+(?:available|loaded|supplied|provided))\\b','i');
+ const noSource=new RegExp("\\b(?:no|without|do not have|don't have|cannot access|can't access)\\s+(?:(?:current|available|supplied|loaded|the|any|usable|reliable)\\s+)*"+subject+'\\b','i');
+ return plain(answer).split(/\n+|(?<=[.!?;])\s+|\b(?:but|however)\b/i).some(clause=>{
+  // An explicitly earlier limitation can coexist with current supplied values.
+  const historical=/\b(?:earlier|previously|before (?:the )?refresh|initially|at first)\b/i.test(clause)&&!/\b(?:still|currently|now|remains?)\b/i.test(clause);
+  return !historical&&(absent.test(clause)||noSource.test(clause));
+ });
+}
+/** Prose may vary, but every plotted category must state its current count and share.
+ * Values still come exclusively from the normalized source packet. */
 export function homeExitReasonChartMatches(answer:string,chart:HomeExitReasonChart|null){
- if(!chart||!answer.match(/\[S2\]/i))return false;
- // A missing fieldwork period is a valid limitation, not a missing source.
- if(/\b(?:S2|exit[- ]survey (?:data|feedback|reasons|responses))\b[^.!?\n]{0,70}\b(?:unavailable|not available|timed out|not loaded)\b/i.test(answer))return false;
- const words=(text:string)=>text.toLowerCase().replace(/[^a-z0-9]/g,'');
- const text=words(answer);
- return chart.rows.filter(row=>text.includes(words(row.reason))).length>=2;
+ if(!chart||!answer.match(/\[S2\]/i)||currentReasonAbsence(answer))return false;
+ const lines=plain(answer).split(/\r?\n/);
+ return chart.rows.every(row=>{
+  const escaped=plain(row.reason).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const label=new RegExp('(?:^|[^\\p{L}\\p{N}])'+escaped+'(?=$|[^\\p{L}\\p{N}])','iu');
+  const claims=lines.filter(line=>label.test(line)).map(line=>({line,values:line.replace(label,' ').replace(/\[[A-Z]\d+\]/gi,'').match(/[+-]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?\s*%?/g)??[]})).filter(claim=>claim.values.length);
+  if(!claims.length)return false;
+  return claims.every(({line,values})=>{
+   if((line.match(/\[[A-Z]\d+\]/gi)??[]).some(source=>source.toUpperCase()!=='[S2]'))return false;
+   const shares=values.filter(value=>value.trim().endsWith('%')),counts=values.filter(value=>!value.trim().endsWith('%'));
+   const number=(value:string)=>Number(value.replace(/[,\s%]/g,''));
+   return shares.length===1&&counts.length===1&&number(shares[0])===row.percentage&&number(counts[0])===row.count;
+  });
+ });
 }

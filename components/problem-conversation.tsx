@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import {conversationBoundary,resetConversationMarks} from "@/lib/conversation-reset";
-import {createHomeDemoGoals} from "@/lib/home-demo-goals";
+import {createHomeDemoGoals,hasSavedUserGoal} from "@/lib/home-demo-goals";
 import { rememberProblemQuestion, ProblemRequestGate } from "@/lib/problem-session";
 import type { HomeDecisionContext } from "@/lib/home-decision-journey";
 import type { ScopedChatHistory } from "@/lib/chat-context-history";
@@ -134,7 +134,7 @@ export function useProblemConversation(scope = "home") {
       if (current.goals.find(goal=>goal.id===current.activeId)?.statement !== clean) throw Error("The saved goal changed. Reopen the scope review.");
       return current.activeId;
     }
-    if (current.goals.some(goal=>goal.statement.toLocaleLowerCase()===clean.toLocaleLowerCase())) throw Error("This goal is already saved. Select it from your goals to continue; your draft is retained.");
+    if (hasSavedUserGoal({goals:current,workspaces:decisionStore.getSnapshot().data.workspaces},clean)) throw Error("This goal is already saved. Select it from your goals to continue; your draft is retained.");
     if (current.goals.length >= MAX_GOALS) throw Error("Your saved goals are full. Select an existing goal to continue; your draft is retained.");
     const id = crypto.randomUUID();
     chats.current.set(id,{messages:storedMessages,input:inputRef.current,problem,questionUnanswered,resetMarks});

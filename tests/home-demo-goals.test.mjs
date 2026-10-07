@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createHomeDemoGoals} from '../lib/home-demo-goals.ts';
+import {createHomeDemoGoals,hasSavedUserGoal} from '../lib/home-demo-goals.ts';
 import {homeDemoExamples,homeDemoField,homeDemoOrigin,demoBinding,readHomeDemo} from '../lib/home-demo-catalog.ts';
 import {DecisionStore,DECISIONS_STORAGE_KEY,encodeDecisions,parseDecisions} from '../lib/local-decisions.ts';
 import {GOALS_STORAGE_KEY} from '../lib/local-goals.ts';
@@ -10,6 +10,14 @@ import {readBundleDraft,bundleInputKey,reconcileBundle} from '../lib/home-bundle
 import {previewBundleChatEdit,acceptBundleChatEdit} from '../lib/home-bundle-chat-edit.ts';
 import {pinnedGoalPlanStatus,restoredBundleDraft,restoredBundleResult} from '../lib/home-pinned-goals.ts';
 const now='2026-10-06T00:00:00.000Z',seed=()=>createHomeDemoGoals(now);
+test('fictional titles do not block an explicit user goal, while real duplicates and edited examples remain protected',()=>{
+ const data=seed(),before=JSON.stringify(data);
+ assert.equal(hasSavedUserGoal(data,'Reduce turnover'),false);assert.equal(JSON.stringify(data),before);
+ assert.equal(data.workspaces['demo-reduce-turnover'].fields[bundleWorkspaceField].attachments[0].draft.inputs.deliveryEstimate.hourlyRate.value,null);
+ data.goals.goals.push({id:'mine',statement:'Reduce turnover'});assert.equal(hasSavedUserGoal(data,'reduce TURNOVER'),true);
+ data.goals.goals.pop();delete data.workspaces['demo-reduce-turnover'].fields[homeDemoField];assert.equal(hasSavedUserGoal(data,'Reduce turnover'),true);
+ const edited=seed();edited.goals.goals[0].statement='My revised target';assert.equal(hasSavedUserGoal(edited,'My revised target'),true);
+});
 const port=(entries=[])=>{const map=new Map(entries);return {map,getItem:key=>map.get(key)??null,setItem:(key,value)=>map.set(key,value),removeItem:key=>map.delete(key)}};
 test('first run has two clearly identifiable attached examples and starts in General exploration',async()=>{
  const p=port(),store=new DecisionStore();store.initialize(p,seed);

@@ -6,10 +6,11 @@ import {buildHomePack,normalizeHomePack} from '../lib/home-pack.mjs';
 import {homeEvidenceSelection} from '../lib/home-conversation.ts';
 import {exitReasonSurvey} from './fixtures/exit-reason-packet.mjs';
 const fixture=()=>({status:'loaded',data:{as_of:'2026-09-30',summary:{exit_respondents:50,manager_favorable_pct:19.9},exit_reasons:[{primary_reason:'Other',exits:5,pct_of_exit_responses:10},{primary_reason:'Manager',exits:15,pct_of_exit_responses:30},{primary_reason:'Work-Life Balance',exits:20,pct_of_exit_responses:40},{primary_reason:'New Opportunity',exits:10,pct_of_exit_responses:20}],reasons:[{separation_reason:'Manager',exits:999}]}});
+const facts=chart=>chart.rows.map(row=>`  - ${row.reason}: ${row.count.toLocaleString('en-US')} (${row.percentage}%). [S2]`).join('\n');
 test('S2 chart ranks supplied primary-reason counts and preserves denominator, date and source, never A1 or S1 measures',()=>{
  const raw=fixture(),before=JSON.stringify(raw),chart=homeExitReasonChart(raw);
  assert.deepEqual(chart,{source:'S2',date:'2026-09-30',respondents:50,rows:[{reason:'Work-Life Balance',count:20,percentage:40},{reason:'Manager',count:15,percentage:30},{reason:'New Opportunity',count:10,percentage:20}]});assert.equal(JSON.stringify(raw),before);assert.doesNotMatch(JSON.stringify(chart),/999|19.9/);
- assert.ok(homeExitReasonChartMatches('Work-Life Balance and Manager were reported. [S2]',chart));assert.equal(homeExitReasonChartMatches('Work-Life Balance and Manager were administrative exits. [A1]',chart),false);assert.equal(homeExitReasonChartMatches('Manager favorable score 19.9%. [S1]',chart),false);
+ assert.ok(homeExitReasonChartMatches(facts(chart),chart));assert.equal(homeExitReasonChartMatches('Work-Life Balance and Manager were administrative exits. [A1]',chart),false);assert.equal(homeExitReasonChartMatches('Manager favorable score 19.9%. [S1]',chart),false);
 });
 
 test('exact exit survey reasons selects supplied primary reasons before experience-question keyword matches',()=>{
@@ -55,7 +56,29 @@ test('chart uses only the same normalized request snapshot as the answer across 
  assert.equal(homeExitReasonChartFromPacket(timeout),null);
  assert.equal(homeExitReasonChartFromPacket(packet).respondents,50);
  assert.equal(homeExitReasonChartMatches('Exit-survey feedback is unavailable. Work-Life Balance and Manager were earlier reasons. [S2]',chart),false);
- assert.equal(homeExitReasonChartMatches('Work-Life Balance and Manager were reported. Fieldwork dates are unavailable. [S2]',chart),true);
+ assert.equal(homeExitReasonChartMatches(facts(chart)+'\nFieldwork dates are unavailable. [S2]',chart),true);
  const sampled=structuredClone(packet);sampled.sources.find(row=>row.id==='S2').facts.rows=sampled.sources.find(row=>row.id==='S2').facts.rows.slice(0,1);
  assert.equal(homeExitReasonChartFromPacket(sampled),null);
+});
+
+test('every plotted count and share must agree while normal prose, bold labels and number formatting remain supported',()=>{
+ const chart=homeExitReasonChart(fixture()),answer=facts(chart);
+ for(const invalid of [answer.replace('20 (40%)','21 (42%)'),answer.replace('20 (40%)','20 (41%)'),answer.replace('20 (40%)','40%'),answer.replace('20 (40%). [S2]','20 (40%). [A1]'),answer+'\n- Manager: 19 (38%). [S2]','Work-Life Balance and Manager were reported. [S2]'])assert.equal(homeExitReasonChartMatches(invalid,chart),false,invalid);
+ assert.ok(homeExitReasonChartMatches(answer.replace('Work-Life Balance: 20 (40%)','**Work-Life Balance**: 20 respondents, or 40%'),chart));
+ assert.ok(homeExitReasonChartMatches(answer.replaceAll(' (',' responses ('),chart));
+ const large={...chart,respondents:5000,rows:chart.rows.map(row=>({...row,count:row.count*100}))};assert.ok(homeExitReasonChartMatches(facts(large),large));
+});
+
+test('current missing-count claims reject the chart; explicit historical absence and metadata limitations do not',()=>{
+ const chart=homeExitReasonChart(fixture()),answer=facts(chart);
+ for(const denial of ["I don't have exit-survey counts.",'S2 reason counts are still unavailable.','Exit-survey feedback is unavailable.','No current S2 data is available.','S2 timed out.','S2 data are unavailable.','S2 was unavailable earlier, but S2 is still unavailable.'])assert.equal(homeExitReasonChartMatches(denial+'\n'+answer,chart),false,denial);
+ for(const context of ['Exit-survey feedback was unavailable before refresh.','S2 was unavailable earlier; current reason counts have recovered.','Fieldwork dates and complete suppression metadata are unavailable.','No causal evidence can be established from exit-survey reasons.'])assert.ok(homeExitReasonChartMatches(context+'\n'+answer,chart),context);
+});
+
+test('root and summary suppression propagate through the S2 packet before chart or model consumption',()=>{
+ for(const scope of ['root','summary']){
+  const data=structuredClone(exitReasonSurvey);(scope==='root'?data:data.summary).suppressed=true;
+  const packet=buildHomePack({'survey-sentiment':{status:'loaded',data}},'Company','exit survey reasons'),source=packet.sources.find(source=>source.id==='S2');
+  assert.equal(source.facts.exit_respondents,null);assert.ok(source.facts.rows.every(row=>row.suppressed===true&&row.exits===null&&row.pct_of_exit_responses===null));assert.equal(homeExitReasonChartFromPacket(packet),null);
+ }
 });
