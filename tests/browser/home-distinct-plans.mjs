@@ -27,11 +27,11 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  const button=name=>page.getByRole('button',{name,exact:true}),panel=page.getByRole('region',{name:'Action Plans for your goal',exact:true});
  const state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
  await page.goto(base);await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:DECISIONS_STORAGE_KEY,value:encodeDecisions({version:1,revision:1,goals:{version:1,activeId:'g',goals:[{id:'g',statement:'Review workforce alternatives'},{id:'other',statement:'Review onboarding'}]},workspaces:{other:{savedAt:'2026-10-06T00:00:00Z',fields:{sentinel:'Keep other work'}}}})});await page.reload();
- await button('Create Action Plan').click();await button('Retry Action Plans').waitFor();
+ await button('Generate Action Plan').click();await button('Retry Action Plans').waitFor();
  check(mode+' client rejects renamed activities without partial tabs or saving',await panel.getByRole('tab').count()===0&&!(await state()).workspaces.g?.fields.homeBundlePreparationV1&&posts.length===1);
  check(mode+' existing alert explains the problem and explicit retry',await panel.getByRole('alert').innerText().then(text=>text.includes('Different titles alone are not distinct plans')&&text.includes('No retry runs automatically')));
- await page.reload();await button('Create Action Plan').waitFor();check(mode+' reload never retries rejected preparation',posts.length===1);
- kind='one';await button('Create Action Plan').focus();await page.keyboard.press('Enter');await page.locator('[data-plan-current="true"]').waitFor();
+ await page.reload();await button('Generate Action Plan').waitFor();check(mode+' reload never retries rejected preparation',posts.length===1);
+ kind='one';await button('Generate Action Plan').focus();await page.keyboard.press('Enter');await page.locator('[data-plan-current="true"]').waitFor();
  check(mode+' one supported option is accepted without invented alternatives',await panel.getByRole('tab').count()===1&&posts.length===2);
  await button('Attach Action Plan').click();await panel.getByRole('status').filter({hasText:/Action Plan attached/}).waitFor();
  const original=(await state()).workspaces.g.fields;

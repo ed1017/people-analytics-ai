@@ -36,7 +36,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  const reset=async()=>{await button('Reset conversation').click();await page.waitForTimeout(80);};
  const send=async(message,onHome=true)=>{await (onHome?home:chat).fill(message);await button(onHome?'Send overview question':'Send message').click();};
  const waitHeld=async()=>{for(let i=0;!release&&i<150;i++)await page.waitForTimeout(20);assert.ok(release,'request was held');};
- await page.goto(base);await home.waitFor();await button('Create Action Plan').click();await page.locator('[data-plan-current="true"]').waitFor();await button('Attach Action Plan').click();await page.getByText(/Action Plan attached/).first().waitFor();
+ await page.goto(base);await home.waitFor();await button('Generate Action Plan').click();await page.locator('[data-plan-current="true"]').waitFor();await button('Attach Action Plan').click();await page.getByText(/Action Plan attached/).first().waitFor();
  await home.fill('Draft to clear');
  const saved=await state(),savedFields=saved.workspaces.a.fields;
  await button('Reset conversation').focus();await page.keyboard.press('Enter');await page.waitForTimeout(80);
@@ -88,7 +88,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  await send('Fresh exploration before goal switch');await page.getByLabel('Overview conversation',{exact:true}).getByText('Synthetic reply '+posts.length,{exact:true}).waitFor();await selected.selectOption('a');await reset();
  check(mode+' reset with a pinned goal also clears any earlier general-exploration draft and messages',await home.inputValue()===''&&await activeMessages().count()===0&&await selected.inputValue()==='');
  // A new goal's separate plan-preparation controller must be invalidated by Reset too.
- await selected.selectOption('b');hold=true;release=null;await button('Create Action Plan').click();await waitHeld();await reset();hold=false;release();await page.waitForTimeout(400);
+ await selected.selectOption('b');hold=true;release=null;await button('Generate Action Plan').click();await waitHeld();await reset();hold=false;release();await page.waitForTimeout(400);
  check(mode+' late Action Plan preparation cannot commit after reset',await panel.count()===0&&await selected.inputValue()===''&&(await state()).workspaces.b.fields.homeBundlePreparationV1===undefined);
  await reset();await page.reload();await home.waitFor();
  check(mode+' final refresh retains saved goals and no active conversation',await selected.inputValue()===''&&await activeMessages().count()===0&&(await state()).goals.goals.length===2);

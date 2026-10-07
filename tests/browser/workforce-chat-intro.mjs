@@ -22,6 +22,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  try{
   await page.goto(base+(closeBy==='guide'?'':'?page=workforce'));await page.getByLabel('Selected goal',{exact:true}).waitFor();const original=(await read()).goals;
   if(closeBy==='guide'){
+   check(mode+' uses the singular Generate Action Plan accessible name',await button('Generate Action Plan').isVisible()&&await button('Create Action Plan').count()===0);
    await page.evaluate(()=>{window.introGuideOverlap=false;new MutationObserver(()=>{if(document.querySelector('[data-guided-popup]')&&document.querySelector('[aria-label="Workforce chatbot introduction"]'))window.introGuideOverlap=true;}).observe(document.body,{childList:true,subtree:true});});
    await button('Show instructions').click();await button('Try a guided example').click();await page.getByRole('dialog',{name:'Optional guided demo'}).waitFor();
    check(mode+' guide suppresses the intro without consuming its preference',await intro.count()===0&&await page.evaluate(key=>localStorage.getItem(key),preference)===null);
@@ -34,7 +35,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
   check(mode+' '+closeBy+' arrow points down to Ask AI without covering controls',await intro.evaluate(node=>{const arrow=node.querySelector('[data-workforce-intro-arrow]').getBoundingClientRect(),header=node.parentElement.nextElementSibling.getBoundingClientRect(),close=node.querySelector('button').getBoundingClientRect();return arrow.bottom<=header.top&&arrow.left>=header.left&&arrow.right<=header.right&&close.width>=44&&close.height>=44&&document.elementFromPoint(close.left+close.width/2,close.top+close.height/2)?.closest('button')===node.querySelector('button')}));
   await page.locator('[data-ai-conversation-body]').evaluate(node=>node.scrollTop=node.scrollHeight);
   await button('Send message').scrollIntoViewIfNeeded();
-  check(mode+' '+closeBy+' composer and Send remain reachable while the intro is open',await button('Send message').evaluate(node=>{const body=node.closest('[data-ai-conversation-body]'),box=node.getBoundingClientRect();return getComputedStyle(body).overflowY==='auto'&&node.contains(document.elementFromPoint(box.left+box.width/2,box.top+box.height/2))}));
+  check(mode+' '+closeBy+' composer and Send remain reachable while the intro is open',await button('Send message').evaluate(node=>{const body=node.closest('[data-ai-conversation-body]'),box=node.getBoundingClientRect();const hit=document.elementFromPoint(box.left+box.width/2,box.top+box.height/2);return getComputedStyle(body).overflowY==='auto'&&(node.contains(hit)||(node.disabled&&hit===node.parentElement))}));
   await page.locator('[data-ai-conversation-body]').evaluate(node=>node.scrollTop=0);await reveal();
   if(closeBy==='close'){await page.screenshot({path:output+'/'+mode+'.png'});await button('Close chatbot introduction').click();check(mode+' close returns focus to the chatbot',await chat.evaluate(node=>node===document.activeElement));}
   else {await chat.focus();await page.keyboard.press('Escape');check(mode+' Escape keeps existing keyboard focus',await chat.evaluate(node=>node===document.activeElement));}

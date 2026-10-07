@@ -13,7 +13,7 @@ export function WorkforceChatIntro({active,suppressed=false}:{active:boolean;sup
  useEffect(()=>{
   const node=anchor.current;
   if(!active||suppressed||!node){
-   // eslint-disable-next-line react-hooks/set-state-in-effect -- Close the introduction when its external page/guide eligibility ends.
+   // Close when the external page/guide eligibility ends.
    setOpen(false);return;
   }
   let inView=false;

@@ -20,7 +20,7 @@ try{for(const [viewport,width] of [['desktop',1366],['mobile',390]])for(const [s
  const open=async()=>{await button('Show instructions').click();await button('Try a guided example').click();await guide.getByRole('button',{name:'Next → Start example',exact:true}).click();await guide.getByRole('heading',{name:/^Step 2/}).waitFor();await button('Send overview question').click();await guide.getByRole('heading',{name:/^Step 3/}).waitFor();};
  try{
   await page.goto(base);await input.waitFor();await chooseCountry(selectedCountry);
-  if(populated){await button('Create Action Plan').click();await panel.getByRole('tab',{name:'Action Plan #1',exact:true}).waitFor();await page.locator('[data-plan-current=true]').waitFor();await button('Attach Action Plan').click();await page.getByRole('status').filter({hasText:/Action Plan attached\./}).waitFor();}
+  if(populated){await button('Generate Action Plan').click();await panel.getByRole('tab',{name:'Action Plan #1',exact:true}).waitFor();await page.locator('[data-plan-current=true]').waitFor();await button('Attach Action Plan').click();await page.getByRole('status').filter({hasText:/Action Plan attached\./}).waitFor();}
   await input.fill(priorDraft);const initial=await state(),goalsBefore=initial.goals.goals.length,originalIds=initial.goals.goals.map(goal=>goal.id);
   const originalPlans=value=>JSON.stringify(originalIds.map(id=>[id,value.workspaces[id]?.fields.homeSolutionBundlesV1??null]));
   const originalRecords=originalPlans(initial);
