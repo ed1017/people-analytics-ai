@@ -193,7 +193,9 @@ export function useProblemConversation(scope = "home") {
     if (!storageReady || !decisionStore.getSnapshot().saved || loading || issueEditor) throw Error("Finish the current edit or request and make sure browser storage is available.");
     if (!clean || clean.length > 240) throw Error("Review a goal between 1 and 240 characters; nothing has been shortened automatically.");
     if(guidedId){
-      if(guidedIsolation.current?.id!==guidedId||current.activeId||!clean.includes('(demo example)'))throw Error('This example conversation changed. Exit and start the guide again.');
+      // The active isolation and source-bound Pin receipt own this goal. Its
+      // editable label need not retain the example's literal display marker.
+      if(guidedIsolation.current?.id!==guidedId||current.activeId)throw Error('This example conversation changed. Exit and start the guide again.');
       const prior=current.goals.find(goal=>goal.id===guidedId);
       if(prior){if(prior.statement!==clean)throw Error('The example goal changed. Exit to review it.');return guidedId;}
       if(decisionStore.getSnapshot().data.removedGoalIds?.includes(guidedId))throw Error('This example was removed. It will not be restored. Exit the guide to continue.');
