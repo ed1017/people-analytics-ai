@@ -1,4 +1,5 @@
 "use client";
+import {PlanDirections} from '@/components/plan-directions';
 import {readBundleWorkspace,type BundleAttachment} from '@/lib/home-bundle-records';
 import {planStaffHours} from '@/lib/home-plan-delivery-estimate';
 import {planBudgetText} from '@/lib/home-plan-revisions';
@@ -20,6 +21,7 @@ export function AttachedActionPlansBrief({raw,goalId,goal,onReview}:{raw:unknown
    {edited&&!superseded.has(item.id)&&<p>A different working draft is saved on Home. This attachment has not been replaced by that draft.</p>}
    <p className="break-words">Saved goal: {draft.binding.goal}</p>
    <p className="break-words">{bundleDisplayText(draft.bundle.objective,draft.bundle)}</p>
+   <PlanDirections draft={draft} snapshot/>
    <p>Snapshot cash: {money(result.cashTotal)}. Staff hours: {planStaffHours(draft)??'Unknown'}. Plan finish: {result.planFinish??'Unknown'}.</p>
    {result.budget&&<p>{planBudgetText(result)}</p>}
    <p className="break-words">How success is measured: {successMeasureText(measure,!measure||measure.scopeKey===measurementScope(draft.inputs))}</p>
