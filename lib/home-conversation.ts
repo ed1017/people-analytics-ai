@@ -20,6 +20,12 @@ export function homeTurnPurpose(message:string, history:readonly Turn[]=[]):Home
   // A brief budget/scope clarification can continue an explicit user-authored goal.
   const statements=history.filter(turn=>turn.role==='user').map(turn=>homeQuestionText(turn.content));
   if (readUserGoalIntent(statements).status !== 'no_goal' && /^(?:budget|within|over|use|scope|by|with|no net|all countries|voluntary|regrettable)\b/i.test(text)) return 'goal';
+  // An explicit acceptance of the immediately preceding assumption question is
+  // still part of preparing that goal. A bare yes or an unrelated answer is not.
+  const previous=history.at(-1);
+  if (readUserGoalIntent(statements).status !== 'no_goal' && previous?.role==='assistant'
+    && /\b(?:use|keep|accept)\b[^?\n]*\b(?:baseline|budget|scope|horizon|target|rate|capacity)\b[^?\n]*\?/i.test(previous.content)
+    && /^yes[,!.]?\s+(?:please\s+)?(?:use|keep|accept)\b/i.test(text)) return 'goal';
   return 'answer';
 }
 

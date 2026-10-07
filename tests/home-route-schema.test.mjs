@@ -62,6 +62,16 @@ test('actual POST returns validated finding pairs in the existing single Home ca
   assert.match(sandbox.__requests.at(-1).instructions,/finding_followups/);
  }
 });
+test('actual Home POST keeps accepted goal assumptions in goal preparation without promoting ordinary questions',async()=>{
+ const history=[{role:'user',content:'Reduce voluntary turnover by 20% within 12 months'},{role:'assistant',content:'Use the annualized 8.2% baseline for this scenario?'}];
+ for(const [message,purpose] of [['Yes, use annualized 8.2% baseline.','goal'],['Why use this baseline?','answer']]){
+  sandbox.__replies.push({status:'completed',output:[],output_text:JSON.stringify({answer:'Synthetic response.',finding_followups:[],next_step:'none',problem:null,problem_evidence:[],options:[],question:null})});
+  const before=sandbox.__requests.length;
+  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',persona:'HR',message,history,overviewBriefingContext:packets[1][1]})}));
+  assert.equal(response.status,200);assert.equal(sandbox.__requests.length,before+1);
+  assert.match(sandbox.__requests.at(-1).instructions,new RegExp('CURRENT TURN PURPOSE: '+purpose+'\\.'));
+ }
+});
 test('actual Home POST distinguishes token-limited, incomplete and malformed output without retry or payload logging',async()=>{
  const priorConsole=sandbox.console,logs=[];sandbox.console={...console,error:(...items)=>logs.push(items)};
  try{for(const [status,reason,text,expected] of [

@@ -18,6 +18,17 @@ test('questions stay conversational, including with a prior goal and appended se
  assert.equal(homeTurnPurpose('Prepare coordinated solution bundles for my exact pinned goal.'),'plan');
 });
 const row=(month,count,rate)=>({month,total_exits:count,voluntary_exits:count-1,monthly_turnover_pct:rate,monthly_voluntary_turnover_pct:rate-0.1,employee_name:'PRIVATE_SENTINEL'});
+test('explicit assumption acceptance continues only a live goal and the immediately preceding clarification',()=>{
+ const goal={role:'user',content:'Reduce voluntary turnover by 20% within 12 months'};
+ const question={role:'assistant',content:'Review the goal.\n\nUse the annualized 8.2% baseline for this scenario?'};
+ const confirmation='Yes, use annualized 8.2% baseline.';
+ assert.equal(homeTurnPurpose(confirmation,[goal,question]),'goal');
+ for(const message of ['Yes.','Yes, why use this baseline?','Yes, explain the baseline.','Do not use that goal.'])assert.equal(homeTurnPurpose(message,[goal,question]),'answer');
+ assert.equal(homeTurnPurpose(confirmation,[question]),'answer');
+ assert.equal(homeTurnPurpose(confirmation,[goal,{role:'assistant',content:'Do you want to see a chart?'}]),'answer');
+ assert.equal(homeTurnPurpose(confirmation,[goal,question,{role:'user',content:'Cancel my goal'},{role:'assistant',content:'Use the annualized baseline?'}]),'answer');
+ assert.equal(homeTurnPurpose(confirmation,[goal,question,{role:'assistant',content:'The baseline remains unavailable.'}]),'answer');
+});
 const data={attrition:{status:'loaded',data:{as_of:'2026-09-30',summary:{voluntary_exits:88},trend:[row('2025-04-01',5,1),row('2026-02-01',6,1.2),row('2026-03-01',8,1.6),row('2026-04-01',12,2.4),row('2026-09-01',10,2)]}}};
 const source=(question)=>buildHomePack(data,'Canada; Engineering; all levels',question).sources.find(s=>s.id==='A1');
 test('April includes exact requested year, prior month and prior year without changing company scope',()=>{
