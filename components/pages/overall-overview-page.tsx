@@ -148,6 +148,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   const [planOpen,setPlanOpen]=useState<{goalId:string;goal:string;sequence:number}|null>(null);
   const [clarification,setClarification]=useState<{context:string;question:string;statements:string[]}|null>(null);
   const [preparationUnavailable,setPreparationUnavailable]=useState<{context:string;diagnostic:HomePreparationDiagnostic;stage:'server'|'client'}|null>(null);
+  const [fallbackSubmission,setFallbackSubmission]=useState<{context:string;statements:string[]}|null>(null);
   const storedCandidate=storage.data.workspaces[conversation.activeGoalId]?.fields.homeCandidateOptions;
   const selectionGoal=candidateSelectionGoal(storedCandidate)??conversation.focusedIssue;
   const savedCandidatePack=buildHomePack(sourceResults,workforceScope,selectionGoal,developmentSession);
@@ -206,7 +207,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   const clearResetState=useEffectEvent(()=>{
     if(previousPlanReset.current!==conversation.resetEpoch){selectedPlanForChat.current?.discard();previousPlanReset.current=conversation.resetEpoch;}
     promptEpoch.current++;queuedSuggestion.current=null;sending.current=null;recentSuggestions.current.clear();liveFindingTurn.current=null;pendingScopeRef.current=null;
-    setCandidate(null);setCandidateNotice('');setClarification(null);setPreparationUnavailable(null);setFindingTurn(null);setScopeChoice(null);setPendingScope(null);setSuggestionPending(false);setLocalAction(null);setPlanningReview(null);setPlanEdit(null);setEditPreview(null);setEditNotice('');setActionPin(null);setPlanOpen(null);selectedPlanForChat.current=null;
+    setCandidate(null);setCandidateNotice('');setClarification(null);setPreparationUnavailable(null);setFallbackSubmission(null);setFindingTurn(null);setScopeChoice(null);setPendingScope(null);setSuggestionPending(false);setLocalAction(null);setPlanningReview(null);setPlanEdit(null);setEditPreview(null);setEditNotice('');setActionPin(null);setPlanOpen(null);selectedPlanForChat.current=null;
   });
   // Home stays mounted during topic navigation; either Reset entry point must
   // discard its queued prompts, goal suggestions and unfinished chat edits.
@@ -246,6 +247,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   const contextKey = JSON.stringify({ resetEpoch:conversation.resetEpoch, goalId:conversation.activeGoalId, persona, workforceQuery, workforceScope, evidenceRevision, refresh, developmentSession, focusedIssue:conversation.focusedIssue });
   // User intent survives evidence-only refresh; source-backed proposals still require the exact evidence context.
   const authoredGoalKey = JSON.stringify([conversation.activeGoalId,persona,workforceQuery,workforceScope,conversation.focusedIssue,conversation.resetEpoch]);
+  const fallbackContext=JSON.stringify([conversation.workspaceKey,authoredGoalKey]);
   const currentEvidenceKey = useRef(contextKey);
   const cancelPending = useRef(conversation.cancelPending);
   useLayoutEffect(() => { cancelPending.current = conversation.cancelPending; });
@@ -310,6 +312,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     const key = contextKey;
     const history = getHomeChatHistory(modelHistoryRef.current, key);
     const purpose=homeTurnPurpose(message,history),prepareGoal=!starter&&responseIntent!=='explanation'&&(purpose==='goal'||purpose==='discovery');
+    if(!actionPlan)setFallbackSubmission(prepareGoal?{context:fallbackContext,statements:[...history.filter(item=>item.role==='user').map(item=>item.content),message].slice(-6)}:null);
     recordDecisionEvidence(conversation.activeGoalId,"home",pack);
     const goalContext=actionPlan||retainGoalContext||forecastQuestion||Boolean(selectedPlanForChat.current?.goalId===conversation.activeGoalId)?conversation.goalContext:conversation.recordGoalStatement(message,"home",workforceScope);
     setMessages(current => [...current, { role: "user", content: actionPlan ? HOME_ACTION_PLAN_LABEL : message }]);
@@ -440,12 +443,12 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
       guidedActions.emit({type:'pinned',goalId:id});
     }catch(error){setCandidateNotice(error instanceof Error?error.message:'The goal could not be pinned. Your draft is kept.')}
   }
-  const fallbackStatements=[...messages.filter(item=>item.role==='user').map(item=>item.content),...(input.trim()?[input.trim()]:[])].slice(-6);
+  const fallbackStatements=fallbackSubmission?.context===fallbackContext?fallbackSubmission.statements:[];
   const fallbackGoal=assumptionsGoalFromStatements(fallbackStatements);
   const showFallbackPin=!conversation.focusedIssue&&(!reviewCandidateCurrent||!ready)&&!clarification&&sourcesSettled&&unavailableSourceLabels(pack).length>0&&fallbackGoal&&assumptionsOnlyBundle(fallbackGoal);
   function pinAssumptionsGoal(){
     if(currentEvidenceKey.current!==contextKey||renderedPromptEpoch!==promptEpoch.current||decisionStore.getSnapshot().data.goals.activeId!==conversation.activeGoalId||!showFallbackPin||!fallbackGoal||chatLoading||!active||!conversation.saved||!conversation.storageReady||conversation.issueEditor)return;
-    try{conversation.confirmWorkforceGoal(fallbackGoal);for(const statement of fallbackStatements.flatMap(homePlanningNoteParts))conversation.recordGoalStatement(statement,'home',workforceScope);if(!decisionStore.getSnapshot().saved)throw Error('The goal could not be saved. Your draft is kept.');setInput('');setCandidate(null);setActionPin(null);}catch(error){setCandidateNotice((error as Error).message);}
+    try{conversation.confirmWorkforceGoal(fallbackGoal);for(const statement of fallbackStatements.flatMap(homePlanningNoteParts))conversation.recordGoalStatement(statement,'home',workforceScope);if(!decisionStore.getSnapshot().saved)throw Error('The goal could not be saved. Your draft is kept.');setInput(current=>current.trim()===fallbackStatements.at(-1)?'':current);setCandidate(null);setActionPin(null);}catch(error){setCandidateNotice((error as Error).message);}
   }
   const candidateVerification=homeCandidateVerification(loading||settledEvidenceKey!==JSON.stringify({workforceQuery,workforceScope,refresh,persona}),storedCandidate,Boolean(savedCandidate),conversation.activeGoalId,conversation.focusedIssue,savedCandidatePack);
   const explorationTurn=candidateCurrent&&findingTurn?.message===candidate?.rationale&&findingTurn?.context===contextKey&&messages.at(-1)===findingTurn.message&&active&&ready&&conversation.storageReady&&conversation.saved&&!conversation.issueEditor?findingTurn:null;

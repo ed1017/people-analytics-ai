@@ -5,6 +5,7 @@ import {ArrowBigDown} from 'lucide-react';
 /** Point at the existing control; this overlay cannot receive clicks or run actions. */
 export function GuidedActionArrow({selector,label}:{selector:string;label:string}){
  const overlay=useRef<HTMLDivElement>(null);
+ const measure=useRef(()=>{});
  const [position,setPosition]=useState<{left:number;top:number;label:string}|null>(null);
  useLayoutEffect(()=>{
   let frame=0,stopped=false,focused=false,target:HTMLElement|null=null;
@@ -28,10 +29,13 @@ export function GuidedActionArrow({selector,label}:{selector:string;label:string
    setPosition(previous=>JSON.stringify(previous)===JSON.stringify(nextPosition)?previous:nextPosition);
   };
   const queue=()=>{if(!frame)frame=requestAnimationFrame(update);};
+  measure.current=queue;
   const observer=new MutationObserver(queue);observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['disabled','hidden','aria-selected']});
   window.addEventListener('scroll',queue,true);window.addEventListener('resize',queue);queue();
-  return()=>{stopped=true;cancelAnimationFrame(frame);observer.disconnect();window.removeEventListener('scroll',queue,true);window.removeEventListener('resize',queue);target?.removeAttribute('data-guided-highlight');};
+  return()=>{stopped=true;measure.current=()=>{};cancelAnimationFrame(frame);observer.disconnect();window.removeEventListener('scroll',queue,true);window.removeEventListener('resize',queue);target?.removeAttribute('data-guided-highlight');};
  },[selector,label]);
+ const visible=position!==null;
+ useLayoutEffect(()=>{const node=overlay.current;if(!node)return;const observer=new ResizeObserver(()=>measure.current());observer.observe(node);return()=>observer.disconnect();},[visible]);
  return position?createPortal(<div ref={overlay} data-guided-arrow aria-hidden="true" className="pointer-events-none fixed z-50 flex w-48 -translate-x-1/2 flex-col items-center text-center" style={{left:position.left,top:position.top}}>
   <span className="rounded bg-[#6b203b] px-2 py-1 text-sm font-semibold text-white shadow">{position.label}</span><ArrowBigDown size={56} strokeWidth={2} className="fill-[#6b203b] text-white drop-shadow"/>
  </div>,document.body):null;

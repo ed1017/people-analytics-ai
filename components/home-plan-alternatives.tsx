@@ -42,7 +42,7 @@ export function HomeBundlePlans(props:HomeBundlePlansProps){
   const snapshot=guard();
   if(!outcome.reused)decisionStore.commitGoalFields(context.goalId,context.goal,snapshot.data.revision,new Date().toISOString(),()=>({[planAlternativesField]:json(packPlanAlternatives(outcome.catalog)),[alternativeViewField]:{version:1,selectedId:outcome.plan.id,collapsed:false}}));
   const reply=`${outcome.reused?'Existing':'New'} Action Plan #${outcome.plan.number} · ${outcome.plan.sourceRefs.length===2?'combined from':'based on'} ${outcome.plan.sourceRefs.map(ref=>'#'+outcome.catalog.plans.find(plan=>plan.id===ref.id)!.number).join(' and ')}. Originals and attachments are unchanged. Review this recalculated alternative, then explicitly Apply changes or Attach Action Plan.\n\n${planAlternativeSummary(outcome.plan)}`;
-  guided?.emit({type:'edited',goalId:context.goalId,planId:outcome.plan.id,number:outcome.plan.number});
+  guided?.emit({type:'edited',goalId:context.goalId,planId:outcome.plan.id,number:outcome.plan.number,sourcePlanId:outcome.plan.sourceRefs.length===1?outcome.plan.sourceRefs[0].id:undefined});
   setNotice(`${outcome.reused?'Existing':'New'} Action Plan #${outcome.plan.number} saved for review. Apply or Attach explicitly; earlier plans and attachments are kept.`);return reply;
  }
  function correctSavedPilot(id:string,expectedInput:string,sources:Parameters<typeof createPlanAlternatives>[1]){
