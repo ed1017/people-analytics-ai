@@ -1,6 +1,6 @@
 // First-run browser examples only. No evidence fetch, model call or planning-tool write.
 // @ts-expect-error Native Node tests share TypeScript source.
-import {homeDemoExamples,homeDemoField,demoBundle,demoBinding} from './home-demo-catalog.ts';
+import {homeDemoExamples,homeDemoField,demoBundle,demoBinding,readHomeDemo} from './home-demo-catalog.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {createBundleDraft,reviseBundleDraft,bundleInputKey,type Assumption} from './home-bundle-reconciliation.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -8,6 +8,15 @@ import {attachBundlePatch,bundleWorkspaceField} from './home-bundle-records.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {actionBindingKey} from './home-action-drafts.ts';
 import type {DecisionData,Json} from './local-decisions';
+
+/** Fictional first-run examples must not reserve the title of a user's own goal. */
+export function hasSavedUserGoal(data:Pick<DecisionData,'goals'|'workspaces'>,statement:string){
+ return data.goals.goals.some(goal=>{
+  if(goal.statement.toLocaleLowerCase()!==statement.trim().toLocaleLowerCase())return false;
+  const demo=readHomeDemo(data.workspaces[goal.id]?.fields[homeDemoField],goal.id);
+  return !demo||demo.example.goal!==goal.statement;
+ });
+}
 
 export function createHomeDemoGoals(now=new Date().toISOString()):Pick<DecisionData,'goals'|'workspaces'> {
  const date=new Date(now),start=new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+1,1)).toISOString().slice(0,10),finish=new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+4,0)).toISOString().slice(0,10);

@@ -32,7 +32,7 @@ try{for(const width of [1366,390])for(const palette of ['light','slate-blue']){
   return route.continue();
  });
  const button=text=>page.getByRole('button',{name:text,exact:true}),input=page.getByLabel('Ask Workforce AI',{exact:true}),reply=()=>page.locator('[data-chat-role=assistant]').last();
- const send=async()=>{const done=page.waitForResponse(response=>response.url()===base+'/api/chat');await input.fill('exit survey reasons');await button('Send overview question').click();await done;await page.getByText('Thinking with the available evidence…',{exact:true}).waitFor({state:'hidden'});};
+ const send=async()=>{const done=page.waitForResponse(response=>response.url()===base+'/api/chat');await input.fill('exit survey reasons');await button('Send overview question').click();await done;await page.getByRole('status',{name:'AI answer status',exact:true}).waitFor({state:'hidden'});};
  const refresh=async mode=>{sourceMode=mode;const prior=gets;await button('Refresh data').click();await page.waitForFunction(()=>!document.querySelector('[aria-label="Suggested questions"] button')?.disabled);assert.ok(gets>prior,'Refresh requests current survey evidence');};
  await page.goto(base);await input.waitFor();await page.waitForFunction(()=>!document.querySelector('[aria-label="Suggested questions"] button')?.disabled);
  await send();
