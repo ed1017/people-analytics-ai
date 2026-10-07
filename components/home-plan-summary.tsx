@@ -16,7 +16,7 @@ export function HomePlanSummary({draft,result,measurePack}:{draft:BundleDraft;re
   <ul aria-label="Plan population and source scope" className="list-disc space-y-1 pl-5 text-xs">
    <li>Plan population: {bundleAssumptionText(draft.inputs.scope.population)}.</li>
    <li>Business unit: {bundleAssumptionText(draft.inputs.scope.businessUnit)}.</li>
-   <li>Planning inputs are separate from workforce filters and source populations; Home evidence does not verify department scope.</li>
+   <li>Workforce evidence has not verified this plan scope.</li>
   </ul>
  </>;
 }

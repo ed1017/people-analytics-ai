@@ -157,6 +157,10 @@
   border-top-width: 1px;
 }
 
+/* The once-only introduction must leave the composer reachable on short screens. */
+.app-ai-panel:has([data-workforce-intro]) [data-ai-conversation-body] { overflow-y: auto; }
+.app-ai-panel:has([data-workforce-intro]) [data-ai-conversation-body] > * { flex-shrink: 0; }
+
 @media (min-width: 768px) {
   .app-shell.app-ai-left {
     grid-template-columns: var(--nav-width) var(--ai-width) var(--divider-width) minmax(0, 1fr);

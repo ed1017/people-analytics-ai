@@ -20,11 +20,14 @@ import {
 } from "lucide-react";
 
 import { PromptExamples } from "@/components/prompt-examples";
+import {WorkforceChatIntro} from '@/components/workforce-chat-intro';
 import { Button } from "@/components/ui/button";
 import { GoalConversationMessages, ConversationMessages } from "@/components/goal-conversation-messages";
 import type { ChatMessage } from "@/lib/types";
 
 type AiPanelProps = {
+  workforceIntro?:boolean;
+  suppressIntro?:boolean;
   goalTakeaway?:ReactNode;
   goalViewKey?:string;
   hasGoal?:boolean;
@@ -53,6 +56,7 @@ type AiPanelProps = {
 };
 
 export function AiPanel({
+  workforceIntro=false,suppressIntro=false,
   goalTakeaway,goalViewKey="",hasGoal=false,goalStatement="",
   readOnlyReason,
   aiCollapsed,
@@ -157,6 +161,7 @@ export function AiPanel({
             : "app-ai-panel sticky top-[var(--app-header-height)] flex h-[calc(100vh-var(--app-header-height))] min-w-0 flex-col overflow-hidden border-l bg-card p-4 max-md:h-[70vh] max-md:min-h-[520px]"
         }
       >
+        <WorkforceChatIntro active={workforceIntro&&!aiCollapsed&&!previewPage&&!readOnlyReason} suppressed={suppressIntro}/>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           {!aiCollapsed && (
             <div className="flex items-center gap-2">
@@ -211,7 +216,7 @@ export function AiPanel({
             <Sparkles className="h-5 w-5 text-muted-foreground" />
           </div>
         ) : (
-          <div className="flex min-h-0 flex-1 flex-col">
+          <div data-ai-conversation-body className="flex min-h-0 flex-1 flex-col">
             <div id={goalHelpId} className="mb-3 space-y-1 text-sm leading-5 text-muted-foreground">
               <p>{readOnlyReason ? "AI analysis is not available on this page." : goalStatement ? "Ask a question about this topic. Responses will use your selected goal as context." : "Select a goal to give your questions context."}</p>
               <p className="break-words text-foreground">Goal: {goalStatement || "General exploration"}</p>

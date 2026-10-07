@@ -35,12 +35,11 @@ export function homePlanSummary(draft:BundleDraft,result:BundleResult|null|undef
   const budget=result?.budget,complete=cash.coverage==='reviewed'&&result?.costPolicy!=='cash-hours-v1'&&result?.cashTotal!=null&&inputs.budget.basis.value==='cash';
   costs.push(!complete||budget?.headroom==null?'Budget feasibility is unresolved; no available headroom is established.':budget.headroom<0?`${money(-budget.headroom)} over the limit under reviewed assumptions.`:`${money(budget.headroom)} headroom under reviewed assumptions.`);
  }
- costs.push('Existing employee effort stays in hours; it is not a cash expense.');
  const timeline=[delivery?.finish?`Assumed deliverables by ${delivery.finish}.`:result?.planFinish?`Assumed component finish ${result.planFinish}.`:'Deliverable finish: Unknown.'];
  timeline.push(`Planning start: ${bundleAssumptionText(inputs.scope.startMonth)}.`,`Planning horizon: ${bundleAssumptionText(inputs.scope.months,value=>`${value} months`)}.`,`Horizon end: ${bundleAssumptionText(bundleHorizonEnd(inputs.scope))}.`);
  if(result?.capacityReadyMonth)timeline.push(`Conditional capacity from ${result.capacityReadyMonth}.`);
  const outcomes=(delivery?.deliverables??bundle.components.map(component=>component.name)).map(item=>`Deliverable target: ${item}.`);
- outcomes.push('Proposed work, not completed delivery or a predicted effect.');
+ outcomes.push('Proposed deliverables; effects unvalidated.');
  if(/\b(turnover|retention|retain|exits)\b/i.test(binding.goal))outcomes.push('Retention effects are not established.');
  const measurement=[`Goal: ${binding.goal}`];
  if(measure){

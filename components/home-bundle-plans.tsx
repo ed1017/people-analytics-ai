@@ -200,6 +200,9 @@ export function PlanAssumptions({draft,result,contextCurrent=true}:{draft:Bundle
   {input.deliveryEstimate&&<p>Staffing assumptions: {bundleAssumptionText(input.deliveryEstimate.hoursPerParticipant)} hours per participant + {bundleAssumptionText(input.deliveryEstimate.coordinationHours)} coordination hours. Acceptance criteria: {bundleAssumptionText(input.deliveryEstimate.acceptance)}. Edit these named assumptions through chat.</p>}
   {input.expenses.length>0&&<ul className="list-disc space-y-1 pl-5" aria-label="Individual cost assumptions">{input.expenses.filter(expense=>expense.kind==='cash').map(expense=><li key={expense.id}>{pilotAllowances[expense.id.slice(6) as keyof typeof pilotAllowances]?.label??expense.label}: {bundleAssumptionText(expense.amount,money)} · {bundleAssumptionText(expense.months,value=>value>1?`Monthly × ${value}`:'One-time')}. Cash allowance.</li>)}</ul>}
   <p>Individual allowances are not a complete budget. Participants are hypothetical or reviewed assumptions, not selected employees. Evidence, exclusions and provenance are in Why these plans.</p>
+  <p>Existing employee effort stays in hours; it is not a cash expense.</p>
+  <p>Proposed work, not completed delivery or a predicted effect.</p>
+  <p>Planning inputs are separate from workforce filters and source populations; Home evidence does not verify department scope.</p>
   {lastFinish&&end&&lastFinish>end&&<p role="alert">Proposed component dates extend beyond the shared horizon. Review the actual dates before calculating.</p>}
   </div>
  </section>;

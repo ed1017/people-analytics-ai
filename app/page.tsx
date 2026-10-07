@@ -2096,6 +2096,8 @@ export default function Home() {
         </div>
 
         {activePage !== "home" && activePage!=="decision-brief" && activePage!=="assess-evaluate" && <AiPanel
+          workforceIntro={getWorkspaceForPage(activePage)==='analytics'}
+          suppressIntro={demoActive}
           goalViewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,activePage,selectedPersona,selectedBusinessContext,conversation.resetEpoch])}
           hasGoal={Boolean(conversation.focusedIssue)}
           goalStatement={conversation.focusedIssue}
