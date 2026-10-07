@@ -29,6 +29,20 @@ function MethodMarker({method, x, y}: {method: number; x: number; y: number}) {
   return <circle cx={x} cy={y} r="3.5" {...props}/>;
 }
 
+/** Shared reading notes belong in the surrounding forecast's single disclosure. */
+export function SyntheticDomainChartNotes({domain, data}: {domain: SyntheticDemoDomain; data: typeof artifact}) {
+  const d = data.domains[domain], turnover = domain === 'turnover';
+  const history = turnover ? d.history.filter(row => row.month >= '2026-01' && row.month <= '2026-09') : domain === 'hiring' ? d.history.slice(-12) : d.history;
+  const bridge = turnover && history.some(row => hasChartValue(row.value)) && d.rows.length > 0;
+  const cutoffDate = new Date(data.cutoff).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
+  const zeroOpenings = domain === 'hiring' ? history.filter(row => row.value === null).map(row => period(row.month)) : [];
+  return <p>{bridge
+    ? 'September is unreleased. Faint long-dashed bridges connect August to October projections; they are not September observations.'
+    : `Unreleased gap: ${d.gaps.map(period).join(', ') || 'none'}. ${domain === 'hiring' ? `These opening cohorts do not have fully reported 90-day outcomes at the ${cutoffDate} cutoff. ` : domain === 'satisfaction' ? 'December is one future quarterly wave. ' : ''}`}
+    {' '}Missing history is not interpolated.{zeroOpenings.length > 0 ? ` ${zeroOpenings.join(', ')}: zero openings, so the rate is unavailable.` : ''}
+  </p>;
+}
+
 export function SyntheticDomainChart({domain, data}: {domain: SyntheticDemoDomain; data: typeof artifact}) {
   const d = data.domains[domain], id = useId(), [tip, setTip] = useState<PointTip | null>(null), [width, setWidth] = useState(370), container = useRef<HTMLElement>(null);
   useEffect(()=>{
@@ -70,11 +84,7 @@ export function SyntheticDomainChart({domain, data}: {domain: SyntheticDemoDomai
     ? `90-day outcome not fully reported at the ${cutoffDate} cutoff; no observed value`
     : 'unreleased, no observed value';
   const bridge = turnover && lastHistory && d.rows.length > 0;
-  const gapNote = bridge
-    ? 'September is unreleased. Faint long-dashed bridges connect August to October projections; they are not September observations.'
-    : `Unreleased gap: ${d.gaps.map(period).join(', ') || 'none'}. ${domain === 'hiring' ? `These opening cohorts do not have fully reported 90-day outcomes at the ${cutoffDate} cutoff. ` : domain === 'satisfaction' ? 'December is one future quarterly wave. ' : ''}No history-to-forecast interpolation.`;
   const missing = [...history.filter(row => !hasChartValue(row.value)).map(row => ({month: row.month, reason: domain === 'hiring' ? 'zero openings; rate unavailable' : 'observed value unavailable'})), ...d.gaps.map(month => ({month, reason: unreleasedReason}))].filter(row => row.month >= start && row.month <= end);
-  const zeroOpenings = domain === 'hiring' ? history.filter(row => row.value === null).map(row => period(row.month)) : [];
   return <figure ref={container} aria-label={`${demoDomainCopy[domain].title}: simulated history and projections`} className="min-w-0 space-y-2">
     <figcaption className="text-xs font-medium">Simulated history → projections<span className="mt-1 block">{demoDomainCopy[domain].unit}</span></figcaption>
     <p data-axis-note className="text-xs">Y axis: {range}{scale.min > 0 ? ' · does not start at zero' : ''}. {cadence === 3 ? 'Quarterly waves' : turnover ? 'Monthly counts' : 'Monthly opening cohorts'}.</p>
@@ -91,7 +101,7 @@ export function SyntheticDomainChart({domain, data}: {domain: SyntheticDemoDomai
       {history.filter(row => hasChartValue(row.value)).map(row => <circle key={row.month} data-point="history" data-month={row.month} data-value={row.value} cx={x(row.month)} cy={y(row.value!)} r="3" fill="currentColor" stroke="transparent" strokeWidth="14" {...interaction(forecastPointFeedback(domain,row.month,row.value))}/>)}
       {d.rows.flatMap(row => d.methods.map((method, i) => hasChartValue(row.values[i]) && <g key={row.month + method} data-point="forecast" data-method={method} data-month={row.month} data-value={row.values[i]} {...interaction(forecastPointFeedback(domain,row.month,row.values[i],demoMethodLabels[method]))}><MethodMarker method={i} x={x(row.month)} y={y(row.values[i])}/><circle cx={x(row.month)} cy={y(row.values[i])} r="8" fill="transparent"/></g>))}
     </svg>
-    <p className="text-xs">{gapNote}{missing.length > 0 ? ' × on the date axis means no value, not zero.' : ''}{zeroOpenings.length > 0 ? ` ${zeroOpenings.join(', ')}: zero openings, so the rate is unavailable.` : ''}</p>
+    {missing.length > 0 && <p className="text-xs">× means no value, not zero.</p>}
     <p className="text-xs">Hover, focus or tap a point for its date, value and series.</p>
     <p role="status" className="sr-only">{tip?feedbackText(tip.feedback):''}</p>
     {tip&&<PointTooltip tip={tip} id={id+'-tooltip'}/>}
