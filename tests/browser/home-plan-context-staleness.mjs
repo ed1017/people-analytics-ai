@@ -68,32 +68,32 @@ try{
   await chat.fill('use twelve participants');await button('Send overview question').click();
   const review=page.getByRole('region',{name:'Overview conversation'});
   await button('Apply changes').waitFor();
-  check(mode+' chat edit needs Apply and no further model request',await button('Apply changes').isEnabled()&&await review.getByText(/I recalculated Action Plan/).count()===1&&posts.length===2&&!(await state()).workspaces[id].fields.homeSolutionBundlesV1);
-  await button('Apply changes').click();await button('Attach Action Plan').click();
-  await page.getByRole('status').filter({hasText:/Action Plan attached\./}).waitFor();
+  check(mode+' chat edit needs Apply and no further model request',await button('Apply changes').isEnabled()&&await review.getByText(/New Action Plan #4/).count()===1&&posts.length===2&&!(await state()).workspaces[id].fields.homeSolutionBundlesV1);
+  await button('Apply changes').click();if(await panel.getByRole('checkbox').count())await panel.getByRole('checkbox').check();await button('Attach Action Plan').click();
+  await page.getByRole('status').filter({hasText:/Action Plan #4 attached\./}).waitFor();
   check(mode+' one-click attachment has no routine confirmation or manual editor',await button('Continue to attachment').count()===0&&await button('Review calculation').count()===0&&await page.getByRole('region',{name:'Action Plan editor'}).count()===0);
-  const snapshot=(await state()).workspaces[id].fields.homeSolutionBundlesV1.attachments[0];
-  check(mode+' reviewed attachment retains exact goal and explicitly applied edit',snapshot.draft.binding.goal===aiSkillsGoalPrompt&&snapshot.draft.inputs.groups[0].count.value===12&&snapshot.draft.inputs.groups[0].count.kind==='user-entered'&&posts.length===2);
+  const attachmentState=async()=>{const catalog=(await state()).workspaces[id].fields.homePlanAlternativesV1;return {attachment:catalog.attachments[0],plan:catalog.plans.find(plan=>plan.id===catalog.attachments[0].planId)};};const snapshot=await attachmentState();
+  check(mode+' reviewed attachment retains exact goal and explicitly applied edit',snapshot.plan.draft.binding.goal===aiSkillsGoalPrompt&&snapshot.plan.draft.inputs.groups[0].count.value===12&&snapshot.plan.draft.inputs.groups[0].count.kind==='user-entered'&&posts.length===2);
   await page.reload();await page.locator('[data-plan-current="true"]').waitFor();
-  check(mode+' reload restores immutable attachment without generation',JSON.stringify((await state()).workspaces[id].fields.homeSolutionBundlesV1.attachments[0])===JSON.stringify(snapshot)&&posts.length===2);
+  check(mode+' reload restores immutable attachment without generation',JSON.stringify(await attachmentState())===JSON.stringify(snapshot)&&posts.length===2);
   await page.getByLabel('Selected goal',{exact:true}).selectOption('other');
   check(mode+' another goal keeps separate work',!await panel.getByRole('tab').count()&&(await state()).workspaces.other.fields.sentinel.keep==='unrelated work');
   await page.getByLabel('Selected goal',{exact:true}).selectOption(id);await page.locator('[data-plan-current="true"]').waitFor();
-  check(mode+' goal return restores exact saved plan and no calls',JSON.stringify((await state()).workspaces[id].fields.homeSolutionBundlesV1.attachments[0])===JSON.stringify(snapshot)&&posts.length===2);
+  check(mode+' goal return restores exact saved plan and no calls',JSON.stringify(await attachmentState())===JSON.stringify(snapshot)&&posts.length===2);
   const baseline=await page.evaluate(key=>localStorage.getItem(key),DECISIONS_STORAGE_KEY);
-  const reload=async()=>{await page.reload();await page.getByRole('status',{name:'Home data status',includeHidden:true}).waitFor({state:'attached'});await panel.getByText('Why these plans',{exact:true}).click();await panel.getByLabel('Action Plan context check',{exact:true}).waitFor()};
-  dataMode='order';await reload();await page.locator('[data-plan-current="true"]').waitFor();
-  check(mode+' categorical row order alone survives attachment reload as current',await button('Attach Action Plan').isEnabled()&&(await panel.getByLabel('Action Plan context check').innerText()).includes('Evidence: unchanged. Planning: unchanged. Only unordered detail-row order changed.')&&posts.length===2&&JSON.stringify((await state()).workspaces[id].fields.homeSolutionBundlesV1.attachments[0])===JSON.stringify(snapshot));
+  const reload=async()=>{await page.reload();await page.getByLabel('Ask Workforce AI',{exact:true}).waitFor();await panel.getByText('Why these plans',{exact:true}).first().click();await panel.getByLabel('Action Plan context check',{exact:true}).waitFor()};
+  dataMode='order';await reload();await page.locator('[data-plan-current="true"]').waitFor();if(await panel.getByRole('checkbox').count())await panel.getByRole('checkbox').check();
+  check(mode+' categorical row order alone survives attachment reload as current',await button('Attach Action Plan').isEnabled()&&(await panel.getByLabel('Action Plan context check').innerText()).includes('Evidence: unchanged. Planning: unchanged. Only unordered detail-row order changed.')&&posts.length===2&&JSON.stringify(await attachmentState())===JSON.stringify(snapshot));
   for(const [change,copy] of [['content','Source content, scope, dates, selection or meaningful order changed.'],['availability','Source availability changed.']]){
     dataMode=change;await reload();await panel.getByText(/Previous Action Plan proposal/).waitFor();
     const diagnostic=await panel.getByLabel('Action Plan context check').innerText();
-    check(mode+' '+change+' retains real staleness without regeneration',diagnostic.includes('Evidence: changed. Planning: unchanged.')&&diagnostic.includes(copy)&&await button('Attach Action Plan').isDisabled()&&posts.length===2&&JSON.stringify((await state()).workspaces[id].fields.homeSolutionBundlesV1.attachments[0])===JSON.stringify(snapshot));
+    check(mode+' '+change+' retains real staleness without regeneration',diagnostic.includes('Evidence: changed. Planning: unchanged.')&&diagnostic.includes(copy)&&await button('Attach Action Plan').isDisabled()&&posts.length===2&&JSON.stringify(await attachmentState())===JSON.stringify(snapshot));
   }
   dataMode='base';const changed=JSON.parse(baseline).payload;changed.goals.goals.find(goal=>goal.id===id).context.constraints='Explicitly changed planning constraint';
   await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:DECISIONS_STORAGE_KEY,value:encodeDecisions(changed)});await reload();await panel.getByText(/Previous Action Plan proposal/).waitFor();
   check(mode+' planning-only change is identified without dumping context', (await panel.getByLabel('Action Plan context check').innerText()).includes('Evidence: unchanged. Planning: changed. Source comparison unchanged.')&&await button('Attach Action Plan').isDisabled()&&posts.length===2);
-  await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:DECISIONS_STORAGE_KEY,value:baseline});await reload();await page.locator('[data-plan-current="true"]').waitFor();
-  check(mode+' exact context restoration restores current attachment without mutation',await button('Attach Action Plan').isEnabled()&&posts.length===2&&JSON.stringify((await state()).workspaces[id].fields.homeSolutionBundlesV1.attachments[0])===JSON.stringify(snapshot));
+  await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:DECISIONS_STORAGE_KEY,value:baseline});await reload();await page.locator('[data-plan-current="true"]').waitFor();if(await panel.getByRole('checkbox').count())await panel.getByRole('checkbox').check();
+  check(mode+' exact context restoration restores current attachment without mutation',await button('Attach Action Plan').isEnabled()&&posts.length===2&&JSON.stringify(await attachmentState())===JSON.stringify(snapshot));
   check(mode+' responsive runtime and network boundaries',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&unexpected===0);
   await context.close();
  }

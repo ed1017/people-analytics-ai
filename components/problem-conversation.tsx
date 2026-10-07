@@ -63,7 +63,7 @@ export function useProblemConversation(scope = "home") {
   const history = useRef<ScopedChatHistory>({ key: "", messages: [] });
   useEffect(() => {
     // Restore browser-owned state after hydration; never write defaults over unread storage.
-    let saved=decisionStore.initialize({getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),removeItem:key=>localStorage.removeItem(key)},createHomeDemoGoals).goals;
+    let saved=decisionStore.initialize({getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),removeItem:key=>localStorage.removeItem(key)},createHomeDemoGoals,{getItem:key=>sessionStorage.getItem(key),setItem:(key,value)=>sessionStorage.setItem(key,value),removeItem:key=>sessionStorage.removeItem(key)}).goals;
     let returned:GuidedReturn|null=null;
     try{returned=readGuidedReturn(sessionStorage.getItem(guidedReturnKey));sessionStorage.removeItem(guidedReturnKey);}catch{/* Normal browser storage recovery remains available. */}
     if(returned){
@@ -92,6 +92,19 @@ export function useProblemConversation(scope = "home") {
     setStoredMessages(chat?.messages ?? []);setResetMarks(chat?.resetMarks??{}); setInput(chat?.input ?? ""); setProblem(chat?.problem ?? null); setQuestionUnanswered(false);
     history.current = {key:"", messages:[]}; setError(null); setIssueEditor(null);
     setFocusedIssue(next.goals.find(g=>g.id===next.activeId)?.statement ?? ""); persist(next);
+  };
+  const recoverStorage=(keepSaved=false)=>{
+    const wasRecovery=!!decisionStore.getSnapshot().recovery;
+    if(keepSaved)decisionStore.recoverDraft(true);else decisionStore.retry();
+    const state=decisionStore.getSnapshot();
+    if(!wasRecovery||!state.saved)return;
+    // Replace React's cached transcript and goal selection with the reviewed merge.
+    // Reusing a stale chat cache here would write this tab's old history over the merge.
+    cancelPending();chats.current.clear();history.current={key:'',messages:[]};
+    const next=state.data.goals,chat=decisionStore.getField<GoalChat|null>(next.activeId,'chat',null);
+    goalsRef.current=next;setLocalGoals(next);setFocusedIssue(next.goals.find(g=>g.id===next.activeId)?.statement??'');
+    setStoredMessages(chat?.messages??[]);setResetMarks(chat?.resetMarks??{});setInput(chat?.input??'');setProblem(chat?.problem??null);setQuestionUnanswered(false);
+    setIssueEditor(null);setError(null);setWorkspaceRevision(value=>value+1);
   };
   const beginGuidedExploration=(id:string)=>{
     if(guidedIsolation.current?.id===id)return;
@@ -229,7 +242,7 @@ export function useProblemConversation(scope = "home") {
     if(current.activeId)persist({...current,activeId:""});
     setResetEpoch(value=>value+1);
   };
-  return { beginGuidedExploration,endGuidedExploration,resetConversation,resetEpoch,wasReset:Object.hasOwn(resetMarks,'*')||Object.hasOwn(resetMarks,scope),historyMessages:storedMessages, canSubmitPrompt, confirmWorkforceGoal, saved:decisionStorage.saved, retrySave:()=>decisionStore.retry(), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, closeIssueEditor, openIssueEditor, updateIssueDraft, updateIssueContext, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
+  return { beginGuidedExploration,endGuidedExploration,resetConversation,resetEpoch,wasReset:Object.hasOwn(resetMarks,'*')||Object.hasOwn(resetMarks,scope),historyMessages:storedMessages, canSubmitPrompt, confirmWorkforceGoal, saved:decisionStorage.saved, retrySave:()=>recoverStorage(),recovery:decisionStorage.recovery,recoverSaved:()=>recoverStorage(true), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, closeIssueEditor, openIssueEditor, updateIssueDraft, updateIssueContext, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
 }
 export type ProblemConversation = ReturnType<typeof useProblemConversation>;
 

@@ -11,7 +11,7 @@ export function whatIfKind(goal:string):PlanWhatIf['kind']|null{
 export function normalizeWhatIfQuantities(text:string){const words=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];return text.replace(/\b(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\b/gi,word=>String(words.indexOf(word.toLowerCase())));}
 export function initialWhatIf(goal:string,input:BundleInputs):PlanWhatIf|undefined{
  goal=normalizeWhatIfQuantities(goal);
- const kind=whatIfKind(goal);if(!kind||input.capacity||input.successMeasure)return undefined;
+ const kind=whatIfKind(goal);if(!kind||input.capacity||input.successMeasure||kind==='turnover'&&/\d+(?:\.\d+)?\s*[- ]?percentage[- ]points?\b/i.test(goal))return undefined;
  const demo=(value:number):Assumption<number>=>({value,kind:'illustrative',basis:'Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.'});
  const unknown:Assumption<number>={value:null,kind:'unknown',basis:null};
  let baseline=demo(kind==='turnover'?15:0);const baselineRate=goal.match(/\bbaseline(?: turnover(?: rate)?)?\s*(?:is|of|:)\s*(\d+(?:\.\d+)?)\s*%/i);if(kind==='turnover'&&baselineRate&&Number(baselineRate[1])<=100)baseline={value:Number(baselineRate[1]),kind:'user-entered',basis:'Explicit baseline assumption in the pinned goal; not independently verified.'};let target=demo(kind==='turnover'?12:3);

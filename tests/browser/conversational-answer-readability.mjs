@@ -22,6 +22,7 @@ try{for(const [mode,width,height] of [['wide',1721,1000],['desktop',1366,900],['
  });
  await page.goto(base);const input=page.getByLabel('Ask Workforce AI',{exact:true}),send=page.getByRole('button',{name:'Send overview question',exact:true}),starters=page.getByRole('region',{name:'Suggested questions',exact:true});
  await input.waitFor();await starters.getByRole('button').first().waitFor();await page.waitForFunction(()=>!document.querySelector('[aria-label="Suggested questions"] button')?.disabled);
+ check(mode+' Suggested prompts and category headings are larger',await starters.getByRole('heading',{name:'Suggested prompts',exact:true}).evaluate(el=>parseFloat(getComputedStyle(el).fontSize)>=20)&&await starters.locator('h4').evaluateAll(nodes=>nodes.every(el=>parseFloat(getComputedStyle(el).fontSize)>=18)));
  check(mode+' exactly two compact groups and five approved labels',await starters.getByRole('group').count()===2&&JSON.stringify(await starters.getByRole('button').allTextContents())===JSON.stringify(homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.label))));
  const boxes=await starters.getByRole('group').evaluateAll(nodes=>nodes.map(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,bottom:r.bottom,width:r.width,headingBottom:node.querySelector('h4').getBoundingClientRect().bottom,buttonTop:node.querySelector('button').getBoundingClientRect().top}}));
  check(mode+' categories always stack in order with headings above buttons and clear spacing',boxes.every((box,index)=>Math.abs(box.x-boxes[0].x)<2&&box.buttonTop-box.headingBottom>=7&&(index===0||box.y-boxes[index-1].bottom>=15)));
@@ -46,6 +47,17 @@ try{for(const [mode,width,height] of [['wide',1721,1000],['desktop',1366,900],['
  check(mode+' Action Plan keeps five headings and numbered steps',JSON.stringify(await planned.locator('[data-chat-heading]').allTextContents())===JSON.stringify(headings)&&await planned.locator('[data-chat-item]').count()===5);
  check(mode+' no live sources, runtime errors or overflow',external===0&&errors.length===0&&await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await context.close();
+}
+// Click actual citation controls and verify the selected application destination.
+for(const width of [1366,390]){
+ const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.route('**/*',route=>{const req=route.request(),url=new URL(req.url());if(url.origin!==base)return route.abort();if(url.pathname==='/api/chat')return route.fulfill({json:{answer:'Facts [W1:summary] [a1.total_exits] [S1, S2] [T1:summary](app:skills) [R1] [T2:summary] [T4] [T3](app:skills). Dates [2026] and unknown [Q9] stay text.',nextStep:'none'}});if(url.pathname.startsWith('/api/'))return url.pathname==='/api/dashboard'?route.fulfill({json:fixture}):route.fulfill({status:503,json:{error:'Synthetic unavailable source'}});return route.continue()});
+ await page.goto(base);const input=page.getByLabel('Ask Workforce AI',{exact:true});
+ for(const [id,label,destination] of [['W1','Workforce','workforce'],['A1','Attrition','attrition'],['S1','Employee Listening','survey-sentiment'],['S2','Attrition','attrition'],['T1','Skills Intelligence','skills'],['R1','Talent Acquisition','talent-acquisition'],['T2','Learning & Development','learning-development'],['T4','Career Growth & Internal Mobility','career-growth-mobility']]){
+  await input.fill('Explain the source references');await page.getByRole('button',{name:'Send overview question',exact:true}).click();await page.locator('[data-chat-role="assistant"]').last().getByText(/Facts/).waitFor();const answer=page.locator('[data-chat-role="assistant"]').last();check(width+' '+id+' ordinary brackets stay text',await answer.getByText(/Dates \[2026\] and unknown \[Q9\]/).count()===1);await answer.getByRole('button',{name:`Source ${id}: ${label}`,exact:true}).click();await page.locator(`[data-nav-destination="${destination}"][aria-current="page"]`).waitFor({state:'attached'});check(width+' inline '+id+' opens '+destination,true);
+  const open=page.getByRole('button',{name:'Open navigation',exact:true});if(await open.isVisible())await open.click();await page.getByRole('button',{name:'Action Planning',exact:true}).click();await input.waitFor();
+ }
+ check(width+' retired T3 has readable attribution without a misleading target',await page.locator('[data-chat-role=assistant]').last().locator('sup[data-chat-citation=T3] span[title="Career interests: see Home Data details"]').count()===1&&await page.locator('button[aria-label^="Source T3"]').count()===0);check(width+' source navigation has no runtime errors',errors.length===0);await context.close();
 }
 // Every short starter label executes its unambiguous intent in the real Home UI.
 for(const item of homeStarterGroups.flatMap(group=>group.prompts)){

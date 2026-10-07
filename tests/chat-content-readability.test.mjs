@@ -40,7 +40,7 @@ test('explicit Action Plan headings and numbered steps are preserved, unrelated 
  const content=headings.map((heading,index)=>'### '+heading+'\n'+(index+1)+'. Review the supplied evidence. [A1]').join('\n');
  const html=render(content,{compact:true});assert.equal((html.match(/data-chat-heading="true"/g)??[]).length,5);assert.equal((html.match(/data-chat-item="true"/g)??[]).length,5);for(const heading of headings)assert.ok(html.includes(heading));
  const prose='This one ordinary paragraph has [Q4] data and no list.';assert.match(render(prose),new RegExp(prose.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));assert.doesNotMatch(render(prose),/<sup|data-chat-item/);
- assert.doesNotMatch(render('[A1] See [Unknown](app:unknown).',{onNavigate:()=>{}}),/<button/);
+ assert.match(render('[A1] See [Unknown](app:unknown).',{onNavigate:()=>{}}),/Source A1: Attrition/);assert.doesNotMatch(render('[Q9](app:unknown)',{onNavigate:()=>{}}),/<button/);
 });
 test('grouped starter labels submit exact grounded intents without overwriting drafts or changing forecast and goal routing',()=>{
  const sent=[],props={prompts:homeGoalStarters,groups:homeStarterGroups,draft:'',busy:false,onDraft:prompt=>sent.push(prompt)};
@@ -87,4 +87,11 @@ test('missing requested evidence, denominator differences, demo labels and subst
   assert.deepEqual(presentation.homeAnswerPresentation(content),{answer:content,details:[]});
   assert.deepEqual(presentation.homeAnswerPresentation('One useful fact.\n'+content.replace('The available evidence','The available evidence includes 42 respondents and does not')), {answer:'One useful fact.\n'+content.replace('The available evidence','The available evidence includes 42 respondents and does not'),details:[]});
  }
+});
+
+test('bare, field-qualified, grouped and explicit citations navigate to the correct existing source',()=>{
+ const visited=[],content='Facts [W1:summary] [a1.total_exits] [S1, S2] [T1:summary](app:skills) [S2](app:survey-sentiment). Dates [2026] and unknown [Q9] stay text.';
+ const html=render(content,{onNavigate:page=>visited.push(page)});assert.equal((html.match(/data-chat-citation=/g)??[]).length,6);assert.doesNotMatch(html,/\[W1:summary\]|\[a1.total_exits\]|\[S1, S2\]/);assert.match(html,/Dates \[2026\] and unknown \[Q9\]/);
+ nodes(ChatContent({content,onNavigate:page=>visited.push(page)})).filter(node=>node.type==='button').forEach(button=>button.props.onClick());assert.deepEqual(visited,['workforce','attrition','survey-sentiment','attrition','skills','attrition']);
+ assert.doesNotMatch(render('[T3](app:workforce)',{onNavigate:()=>{}}),/<button/);
 });

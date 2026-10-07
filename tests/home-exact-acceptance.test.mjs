@@ -18,7 +18,7 @@ test('verbatim 941-character prompt survives pin notes and normalization with it
  assert.equal(prompt.length,941);assert.equal(homeGoalForPin([prompt]),goal);assert.equal(context.notes.map(n=>n.text).join(' '),prompt);assert.ok(context.notes.every(n=>n.text.length<=800&&!n.truncated));
  assert.equal(task,'delivery');assert.equal(homeBundleTask({...context,goal:'Investigate voluntary turnover signals'}),'delivery');assert.equal(homeBundleTask({goal:'Investigate turnover',notes:[{text:'Propose three Action Plan alternatives.'}]}),'delivery');
  assert.match(homeBundleTaskInstructions(context),/Classify each component activity/);
- assert.deepEqual(resolveHomePlanningIntent(planningStatements(context)),{goal,months:12,relativeReduction:20,baseline:8.2,target:6.56,rateConflict:false,baselinePeriod:'annualized',budgetCap:500000,existingCapacity:true,companyWide:true});
+ assert.deepEqual(resolveHomePlanningIntent(planningStatements(context)),{goal,months:12,relativeReduction:20,pointReduction:null,participants:null,baseline:8.2,target:6.56,rateConflict:false,baselinePeriod:'annualized',budgetCap:500000,existingCapacity:true,companyWide:true});
 });
 test('suffix target is retained independently of relative arithmetic and conflicts stay unknown',async()=>{
  assert.equal(resolveHomePlanningIntent([prompt.replace('6.56% target','6.5% target')]).target,6.5);

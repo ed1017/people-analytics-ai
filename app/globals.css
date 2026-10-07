@@ -658,3 +658,9 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
   .development-option dl > div:last-child dd { color: #075A49; }
   .evidence-workspace nav[aria-label="Planning destination cards"] button[aria-current="page"] { background: var(--secondary); color: #075A49; border-color: #08765C; box-shadow: inset 0 2px 0 #08765C; }
 }
+
+[data-guided-highlight="true"] {
+  outline: 4px solid #8c3957;
+  outline-offset: 4px;
+  scroll-margin-block: 110px;
+}

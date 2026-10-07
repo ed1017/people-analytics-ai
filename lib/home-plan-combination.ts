@@ -96,7 +96,9 @@ export function combinePlanSnapshots(sources:CombinationSource[],review:Combinat
  }
  const budgets=sources.map(source=>source.draft.inputs.budget).filter((budget):budget is NonNullable<BundleInputs['budget']>=>!!budget);
  if(budgets.length){const amount=budgets.length===sources.length&&budgets.every(budget=>budget.amount.value===budgets[0].amount.value)?structuredClone(budgets[0].amount):unknownAssumption<number>();input.budget={amount,basis:proposed('cash','One shared cash ceiling is proposed for the combined horizon; source ceilings are never summed.')};if(amount.value===null)notes.push('Review one budget ceiling for the combined plan; source ceilings differ or are unknown.');}
- if(sources.some(source=>source.draft.inputs.whatIf||source.draft.inputs.successMeasure))notes.push('Source outcome targets remain in their original plans; they are not summed or treated as promised improvement.');
+ if(left.inputs.successMeasure&&same(left.inputs.successMeasure,right.inputs.successMeasure))input.successMeasure=structuredClone(left.inputs.successMeasure);
+ if(left.inputs.whatIf&&left.inputs.whatIf.baseline.kind!=='illustrative'&&same(left.inputs.whatIf,right.inputs.whatIf))input.whatIf=structuredClone(left.inputs.whatIf);
+ if(sources.some(source=>source.draft.inputs.whatIf||source.draft.inputs.successMeasure))notes.push('Matching outcome targets are retained once; differing source targets stay in their original plans and require review. Targets are never summed or treated as promised improvement.');
  try{const draft=reviseBundleDraft(empty,input);return {status:'ready',draft,result:reconcileBundle(draft),notes};}
  catch(error){return {status:'needs-review',questions:[(error as Error).message]};}
 }

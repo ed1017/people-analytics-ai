@@ -1,8 +1,10 @@
 // Home-only response inspection. Fixed diagnostics and numeric counts; never raw failure text.
 // @ts-expect-error Native Node tests share TypeScript source.
 import {decodeHomeModelReply,HomeReplyError} from './home-chat-reply.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {homeAnswerScopeViolation} from './home-answer-scope.ts';
 import type {CandidatePack} from './home-candidate-options.ts';
-type HomeReplyReason='ready'|'token_limit'|'incomplete_output'|'response_not_completed'|'refusal'|'empty_output'|'output_too_large'|'invalid_json'|'invalid_reply';
+type HomeReplyReason='ready'|'token_limit'|'incomplete_output'|'response_not_completed'|'refusal'|'empty_output'|'output_too_large'|'invalid_json'|'invalid_reply'|'source_scope_mismatch';
 const record=(raw:unknown):Record<string,unknown>=>raw!==null&&typeof raw==='object'&&!Array.isArray(raw)?raw as Record<string,unknown>:{};
 const count=(raw:unknown):number|null=>Number.isSafeInteger(raw)&&Number(raw)>=0?Number(raw):null;
 const statuses=['completed','incomplete','failed','cancelled','queued','in_progress'] as const;
@@ -19,6 +21,6 @@ export function inspectHomeChatResponse(raw:unknown,hasFocusedIssue:boolean,pack
  if(refusal)return rejected('refusal');
  if(!text.trim())return rejected('empty_output');
  if(outputBytes>48000)return rejected('output_too_large');
- try{return {ok:true as const,body:{...decodeHomeModelReply(text,hasFocusedIssue,pack,prepareGoal),homeReplyDiagnostic:diagnostic('ready')}}}
+ try{const reply=decodeHomeModelReply(text,hasFocusedIssue,pack,prepareGoal);if(homeAnswerScopeViolation(reply.answer,pack))return {ok:false as const,body:{error:'The answer mixed selected filters with company-wide evidence. Your question is kept. Only the workforce snapshot follows these filters; the requested scoped result is unavailable from the other sources.',homeReplyDiagnostic:diagnostic('source_scope_mismatch')}};return {ok:true as const,body:{...reply,homeReplyDiagnostic:diagnostic('ready')}}}
  catch(error){return rejected(error instanceof HomeReplyError?error.reason:'invalid_reply')}
 }
