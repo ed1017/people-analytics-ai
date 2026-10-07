@@ -26,8 +26,8 @@ const pageExamples:Record<string,string> = {
   'talent-acquisition':topics[2].question,
   'survey-sentiment':topics[4].question,
   finance:topics[3].question,
-  'occupational-references':'What do the stored occupation mappings cover, and what should I verify?',
-  'labor-market':'What are the dates and scope of these labor-market observations?',
+  'occupational-references':'What tasks and skills describe the selected occupation, and how do its internal role requirements differ?',
+  'labor-market':'How do pay and employment compare for this occupation, and what does the national outlook show?',
   'training-coaching':'How do the simulated training quotes compare, and which costs remain unknown?',
   'development-planning':'Which costs come from selected quotes and which are my assumptions?',
 };
