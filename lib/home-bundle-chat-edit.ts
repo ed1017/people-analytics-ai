@@ -21,7 +21,7 @@ function fail(message:string):never{throw Error(message)}
 function targets(input:BundleInputs,draft:BundleDraft){
  const names=new Map<string,Target[]>();
  function add(target:Target,aliases:string[]){for(const alias of new Set([target.label,...aliases].map(normalize)))names.set(alias,[...names.get(alias)??[],target]);}
- for(const [key,label,type,aliases] of [['population','Population','text',['aggregate population']],['startMonth','Shared start month','month',['start month']],['months','Shared horizon','months',['horizon','planning horizon']],['requirements','Comparison requirements','text',['requirements']]] as const){
+ for(const [key,label,type,aliases] of [['population','Population','text',['aggregate population']],['startMonth','Shared start month','month',['start month']],['months','Shared horizon','months',['horizon','planning horizon','timeline','plan timeline','planning timeline','duration','plan duration']],['requirements','Comparison requirements','text',['requirements']]] as const){
   add({key:'scope.'+key,label,type,read:()=>input.scope[key],write:value=>{if(key==='months')input.scope.months=value as Assumption<number>;else input.scope[key]=value as Assumption<string>;
    if(input.capacity&&(key==='startMonth'||key==='months')){const field=key==='startMonth'?'planningMonth':'months';input.capacity.input[field]=value.value===null?'':String(value.value);input.capacity.origins[field]={kind:value.kind,basis:value.basis};}
   }},[...aliases]);
@@ -69,12 +69,24 @@ function budgetClause(raw:string):{amount:string;basis:'cash'|'all-in'|null}|nul
  const short=amount.match(/^(\$|USD\s*)?(\d+(?:\.\d{1,2})?)k(?:\s+USD)?$/i);if(short)amount=String(Number(short[2])*1000);
  return {amount,basis};
 }
+/** Whole-clause duration requests; never discard an extra instruction or infer a missing value. */
+function horizonEditValue(clause:string):string|null{
+ const subject='(?:it|(?:the |this |my |our )?(?:plan|timeline|duration|(?:shared |planning |plan )?horizon|plan timeline|plan duration))';
+ for(const pattern of [
+  `^correct\\s+${subject}\\s+to\\s+match\\s+(?:(?:my|our|the)\\s+)?(.+?)\\s+goal$`,
+  `^(?:make|run)\\s+${subject}\\s+(?:(?:last|run)\\s+)?(?:for\\s+)?(.+?\\s*[- ]?\\s*(?:months?|years?))$`,
+  `^(?:extend|shorten|adjust|correct)\\s+${subject}\\s+(?:to|for)\\s+(.+)$`,
+  `^(?:the|this|my|our)\\s+(?:plan|timeline|duration|planning horizon)\\s+(?:should|must|needs to)\\s+(?:run|last|be)\\s+(?:for\\s+)?(.+)$`,
+  '^use\\s+(?:an?\\s+)?(.+?)\\s+(?:(?:shared|planning|plan)\\s+)?(?:timeline|duration|horizon)$',
+ ]){const match=clause.match(new RegExp(pattern,'i'));if(match)return match[1];}
+ return null;
+}
 /** Routing only: recognize a local edit before general chat can append it to goal context. */
 export function bundleChatEditIntent(request:string){
  const courtesy=(value:string)=>value.trim().replace(/^(?:please\s+|(?:can|could|would)\s+(?:you|we)\s+|i(?:’|')?d like to\s+)/i,'');
  const planReference=/\b(?:action\s+)?plan\s*#?\s*\d+\b/i.test(request);
  const body=courtesy(courtesy(request).replace(/^(?:(?:in|for|on)\s+)?(?:action\s+)?plan\s*#?\s*\d+(?:\s*(?:and|or|,)\s*(?:(?:action\s+)?plan\s*)?#?\s*\d+)*\s*[:,]?\s*/i,''));
- const edit=/^(?:(?:do not|don[’']?t|never|avoid)\s+)?(?:set|change|update|assume|lower|raise|increase|decrease|reduce|start|move|make|run|use|budget|add|remove|fill|complete)\b/i.test(body);
+ const edit=/^(?:(?:do not|don[’']?t|never|avoid)\s+)?(?:set|change|update|assume|lower|raise|increase|decrease|reduce|start|move|make|run|use|budget|add|remove|fill|complete|extend|shorten|adjust|correct)\b/i.test(body)||horizonEditValue(body.replace(/[.!?]$/,''))!==null;
  const statement=/^(?:(?:i|we)\s+)?(?:have|has|only have|need|want)\b.*\b(?:budget|participants?|months?|hours?)\b|^(?:(?:i|we)\s+)?(?:can spend|can afford)\s+(?:\$|USD\s*)?\d|^(?:my|our|the)\s+(?:cash\s+|total\s+|all-in\s+)?budget\b/i.test(body);
  const question=/^(?:what|why|how|when|where|which|does|is|are|will|would|could|can)\b/i.test(body)&&!edit;
  return {edit:!question&&(edit||statement),planReference};
@@ -92,9 +104,10 @@ function selectedPlanRequest(request:string,selection?:BundleEditSelection):stri
  return stripped;
 }
 function everydayClause(raw:string,available:Map<string,Target[]>,draft:BundleDraft):{name:string;value:string;previous?:string}{
- const clause=raw.trim().replace(/[.?]$/,'').replace(/^(?:please\s+|(?:can|could|would)\s+(?:you|we)\s+|i(?:’|')?d like to\s+)/i,'');
+ const clause=raw.trim().replace(/[.!?]$/,'').replace(/^(?:please\s+|(?:can|could|would)\s+(?:you|we)\s+|i(?:’|')?d like to\s+)/i,'');
  if(/\b(?:not|never|don[’']?t|do not|avoid|except|unless|instead|rather than)\b/i.test(clause))fail('Which change should I make? Restate the desired value without a negation or exception; no changes have been proposed.');
  if(/\b(?:plan\s*#?\s*\d+|(?:both|all|other|another|each)\s+plans?)\b/i.test(clause))fail('Which plan should I edit? Select that Plan tab, then describe its changes without referring to other plans.');
+ const horizon=horizonEditValue(clause);if(horizon!==null)return {name:'Shared horizon',value:horizon};
  const transition=clause.match(/^(?:set|change|update|lower|raise|increase|decrease|reduce)\s+(?:the\s+)?(.+?)\s+from\s+(.+?)\s+to\s+(.+)$/i);
  if(transition&&!/\bbudget\b/i.test(transition[1]))return {name:transition[1],previous:transition[2],value:transition[3]};
  let match=clause.match(/^(?:set|change|update|lower|raise|increase|decrease|reduce)\s+(?:the\s+)?(.+?)\s+to\s+(.+)$/i);
@@ -118,10 +131,12 @@ function parseValue(raw:string,target:Target):Assumption<string|number>{
  let value:string|number=raw,kind:'user-entered'|'illustrative'='user-entered';
  if(/^illustrative\s+/i.test(raw)){kind='illustrative';raw=raw.replace(/^illustrative\s+/i,'');value=raw;}
  if(target.type==='count'||target.type==='months'||target.type==='money'||target.type==='percent'){
-  let cleaned=(target.type==='percent'?raw.replace(/\s*(?:%|percent)$/i,''):raw).replace(target.type==='money'?/^(?:\$|USD\s+)/i:/^$/,'').replace(target.type==='months'?/\s+months?$/i:target.type==='count'?/\s+(?:people|participants)$/i:/\s+USD$/i,'');
+  const year=target.type==='months'&&/\s*[- ]?\s*years?$/i.test(raw);
+  let cleaned=(target.type==='percent'?raw.replace(/\s*(?:%|percent)$/i,''):raw).replace(target.type==='money'?/^(?:\$|USD\s+)/i:/^$/,'').replace(target.type==='months'?/\s*[- ]?\s*(?:months?|years?)$/i:target.type==='count'?/\s+(?:people|participants)$/i:/\s+USD$/i,'');
+  if(year&&/^an?$/i.test(cleaned))cleaned='1';
   const word=numberWords.indexOf(cleaned.toLowerCase());if(word>=0)cleaned=String(word);
   if(!/^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d{1,2})?$/.test(cleaned))fail(`Use an explicit ${target.type==='money'?'USD amount':'whole count'} for ${target.label}, or Unknown.`);
-  value=Number(cleaned.replaceAll(',',''));if(target.type!=='money'&&target.type!=='percent'&&!Number.isInteger(value))fail(`${target.label} needs a whole count.`);
+  value=Number(cleaned.replaceAll(',',''))*(year?12:1);if(target.type!=='money'&&target.type!=='percent'&&!Number.isInteger(value))fail(`${target.label} needs a whole count.`);
  }else if(target.type==='month'){const named=raw.match(/^([A-Za-z]+)\s+(\d{4})$/),month=named?monthNames.findIndex(name=>name===named[1].toLowerCase()||name.slice(0,3)===named[1].toLowerCase()):-1;if(named&&month>=0){raw=`${named[2]}-${String(month+1).padStart(2,'0')}`;value=raw;}if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(raw)||!planDate(raw+'-01'))fail(`Which month and year should ${target.label} use? Say December 2026 or 2026-12, or Unknown.`);}
  else if(target.type==='date'){if(!planDate(raw))fail(`Use YYYY-MM-DD for ${target.label}, or Unknown.`);}
  return {value,kind,basis:kind==='illustrative'?'Explicit illustrative assumption accepted from a reviewed text edit; not evidence.':'Explicit user assumption accepted from a reviewed text edit; not independently verified.'};
@@ -146,7 +161,7 @@ export function previewBundleChatEdit(draft:BundleDraft,request:string,selection
  // Split only recognized independent edits, including a shared "I have" subject.
  // Keep amounts, expense labels and budget-basis qualifiers intact; validation
  // still rejects the entire proposal if any clause is ambiguous or invalid.
- const clauses=editRequest.split(/;|\n|\s+and\s+(?=(?:start|make|use|set|change|update|move|run)\b|(?:(?:i|we)\s+)?(?:have|only have)\b|(?:(?:a|my|our|the)\s+)?(?:(?:cash|all-in|total|overall|plan)\s+)?budget\b|(?:\d[\d,]*|twenty)\s+participants\b)/i).map(value=>value.trim()).filter(Boolean).map(value=>/^(?:\d[\d,]*|twenty)\s+participants\b/i.test(value)?'use '+value:value);
+ const clauses=editRequest.split(/;|\n|\s+and\s+(?=(?:start|make|use|set|change|update|move|run|extend|shorten|adjust|correct)\b|(?:(?:i|we)\s+)?(?:have|only have)\b|(?:(?:a|my|our|the)\s+)?(?:(?:cash|all-in|total|overall|plan)\s+)?budget\b|(?:\d[\d,]*|twenty)\s+participants\b)/i).map(value=>value.trim()).filter(Boolean).map(value=>/^(?:\d[\d,]*|twenty)\s+participants\b/i.test(value)?'use '+value:value);
  if(!clauses.length||clauses.length>6)fail('Use up to six changes, separated by semicolons.');
  const inputs=legacyReplay?structuredClone(draft.inputs):cashHoursInputs(draft.inputs,draft.binding.goal),available=targets(inputs,draft),changes:BundleEditChange[]=[],seen=new Set<string>();
  for(const clause of clauses){

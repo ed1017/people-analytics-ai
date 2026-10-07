@@ -1,12 +1,12 @@
 // @ts-expect-error Native Node tests share TypeScript source.
-import {planningStatements,resolveHomePlanningIntent,planningRequirementText} from './home-planning-intent.ts';
+import {planningStatements,resolveHomePlanningIntent,resolvePlanningHorizon,planningRequirementText} from './home-planning-intent.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
-import {initialWhatIf,normalizeWhatIfQuantities} from './home-plan-what-if.ts';
+import {initialWhatIf} from './home-plan-what-if.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {withDeliveryAssumptions} from "./home-plan-delivery-estimate.ts";
 // Deterministic local DEMO assumptions. Never a quote, staffing forecast or model input.
 // @ts-expect-error Native Node tests share TypeScript source.
-import {readBundleDraft,reviseBundleDraft,unknownAssumption,type Assumption,type BundleDraft} from './home-bundle-reconciliation.ts';
+import {readBundleDraft,reviseBundleDraft,unknownAssumption,type Assumption,type BundleDraft,type BundleInputs} from './home-bundle-reconciliation.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {componentOrder} from './home-solution-bundles.ts';
 export const pilotVersion='illustrative-pilot-v1' as const;
@@ -22,7 +22,8 @@ export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string,con
  if(draft.pilot)return structuredClone(draft); // Never refresh frozen dates or overwrite edits.
  const calendar=pilotCalendar(preparedAt),basis=`${pilotVersion}; prepared ${calendar.preparedAt}; UTC calendar. DEMO placeholder, not evidence, quote or market benchmark.`;
  const demo=<T>(value:T):Assumption<T>=>({value,kind:'illustrative',basis});
- const input=structuredClone(draft.inputs),intent=resolveHomePlanningIntent(/\b(turnover|retention|retain)\b/i.test(draft.binding.goal)?[draft.binding.goal,...planningStatements(context?.goalContext)]:[]);
+ const statements=[draft.binding.goal,...planningStatements(context?.goalContext)],horizon=resolvePlanningHorizon(statements);
+ const input=structuredClone(draft.inputs),intent=resolveHomePlanningIntent(/\b(turnover|retention|retain)\b/i.test(draft.binding.goal)?statements:[]);
  const entered=<T>(value:T,basis:string):Assumption<T>=>({value,kind:'user-entered',basis});
  if(!input.budget&&intent.budgetCap!==null)input.budget={amount:entered(intent.budgetCap,'Explicit cash budget ceiling from the user; not an expense or confirmed funding.'),basis:entered('cash','Incremental cash only; existing employee time stays in hours.')};
  if(input.scope.months.value===null&&intent.months!==null)input.scope.months=entered(intent.months,'Explicit shared horizon retained from user conversation.');
@@ -30,7 +31,7 @@ export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string,con
  const requirements=planningRequirementText(intent);if(input.scope.requirements.value===null&&requirements)input.scope.requirements=entered(requirements,'Explicit user planning constraints; the cap is not an expense.');
  if(input.scope.capacityRequired.value===null&&intent.existingCapacity&&intent.goal)input.scope.capacityRequired=entered(false,'Use existing HR/manager capacity, as requested; no additional staffing is assumed.');
  if(input.scope.startMonth.value===null)input.scope.startMonth=demo(calendar.startMonth);
- if(input.scope.months.value===null){const stated=normalizeWhatIfQuantities(draft.binding.goal).match(/\b(?:over|within|for|in)\s+(\d+)\s*[- ]?months?\b/i),months=stated?Number(stated[1]):null;input.scope.months=months&&months<=24?{value:months,kind:'user-entered',basis:'Explicit planning horizon in the pinned goal; not an observed result.'}:demo(3);}
+ if(input.scope.months.value===null)input.scope.months=horizon.months!==null?entered(horizon.months,resolvePlanningHorizon([draft.binding.goal]).months===horizon.months?'Explicit planning horizon in the pinned goal; not an observed result.':'Explicit planning horizon in the user goal and constraints; not an observed result.'):horizon.needsReview?unknownAssumption():demo(3);
  if(input.scope.population.value===null)input.scope.population=demo('Hypothetical shared pilot group — not selected employees');
  // Existing exact-draft assumptions always win. No adoption from a different option/goal.
  const start=Date.parse(input.scope.startMonth.value+'-01T00:00:00Z'),finishById=new Map<string,number>();
@@ -51,7 +52,7 @@ export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string,con
   // Any existing expense/coverage association may overlap: never add a second allowance.
   if(input.expenses.some(item=>item.id===`pilot-${domain}`)||input.expenseLinks.some(link=>link.componentIds.some(id=>ids.includes(id)))||input.capacity||input.expenses.some(expense=>!input.expenseLinks.some(link=>link.expenseId===expense.id)))continue;
   const allowance=pilotAllowances[domain],id=`pilot-${domain}`;
-  input.expenses.push({id,label:`DEMO allowance: ${allowance.label}; excludes pay, backfill and vendor quotes`,kind:'cash',amount:demo(allowance.amount),startMonth:demo(input.scope.startMonth.value!),months:demo(Math.min(allowance.months,input.scope.months.value!))});
+  input.expenses.push({id,label:`DEMO allowance: ${allowance.label}; excludes pay, backfill and vendor quotes`,kind:'cash',amount:demo(allowance.amount),startMonth:demo(input.scope.startMonth.value!),months:input.scope.months.value===null?unknownAssumption():demo(Math.min(allowance.months,input.scope.months.value))});
   input.expenseLinks.push({expenseId:id,componentIds:ids,allocations:null});
  }
  input.dependenciesConfirmed=unknownAssumption();input.groupsDisjoint=unknownAssumption();input.costsDistinct=unknownAssumption();input.scope.comparisonConfirmed=unknownAssumption();input.costReviews=input.costReviews.map(item=>({...item,complete:unknownAssumption()}));
@@ -59,7 +60,7 @@ export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string,con
  // Do not replace a user's percentage-point/relative request with the generic demo rate pair.
  if(!input.successMeasure&&!intent.rateConflict&&(intent.pointReduction!==null||intent.relativeReduction!==null&&intent.baseline===null)){
   const target=intent.pointReduction!==null?`${intent.pointReduction} percentage-point reduction`:`${intent.relativeReduction}% relative reduction`;
-  input.successMeasure={goal:draft.binding.goal,scopeKey:JSON.stringify([input.scope.population.value,input.scope.startMonth.value,input.scope.months.value]),name:`Turnover rate over ${input.scope.months.value} months for the stated plan population`,baseline:intent.baseline===null?unknownAssumption():entered(`${intent.baseline}%`,'Explicit user baseline; confirm the same population, metric and period.'),target:entered(target+(intent.target===null?'':`; ending rate ${intent.target}%`),'User-requested reduction, not an estimated or validated intervention effect. A matching baseline is required before deriving an ending rate or exits.')};
+  input.successMeasure={goal:draft.binding.goal,scopeKey:JSON.stringify([input.scope.population.value,input.scope.startMonth.value,input.scope.months.value]),name:`Turnover rate over ${input.scope.months.value===null?'the requested period':input.scope.months.value+' months'} for the stated plan population`,baseline:intent.baseline===null?unknownAssumption():entered(`${intent.baseline}%`,'Explicit user baseline; confirm the same population, metric and period.'),target:entered(target+(intent.target===null?'':`; ending rate ${intent.target}%`),'User-requested reduction, not an estimated or validated intervention effect. A matching baseline is required before deriving an ending rate or exits.')};
  }
  const scenario=initialWhatIf(draft.binding.goal,input);if(scenario&&!input.whatIf){
   if(intent.baseline!==null){scenario.baseline=entered(intent.baseline,'Explicit baseline accepted in the user conversation; used conditionally, not a predicted effect.');scenario.population=unknownAssumption();if(intent.baselinePeriod)scenario.ratePeriod=intent.baselinePeriod;}
@@ -70,4 +71,18 @@ export function prepareIllustrativePilot(draft:BundleDraft,preparedAt:string,con
  }
  const next=reviseBundleDraft(draft,context?.includeDeliveryEstimate?withDeliveryAssumptions(input,draft.bundle.components.length):input);next.pilot={version:pilotVersion,preparedAt:calendar.preparedAt,timezone:'UTC'};
  if(!readBundleDraft(next))throw Error('Illustrative pilot could not be validated.');return next;
+}
+
+/** Refresh a generated reduction label after an explicit horizon-only edit. No rate is
+ * converted: known/custom baselines, edited measures and changed populations still need review.
+ */
+export function refreshGeneratedReductionHorizon(source:BundleDraft,input:BundleInputs):void{
+ const prior=source.inputs,measure=prior.successMeasure,next=input.successMeasure;
+ if(!source.pilot||prior.whatIf||input.whatIf||!measure||!next||measure.baseline.value!==null||measure.baseline.kind!=='unknown'||measure.baseline.basis!==null||input.scope.months.value===null||input.scope.months.value===prior.scope.months.value)return;
+ const expectedNames=[`Turnover rate over ${prior.scope.months.value===null?'the requested period':prior.scope.months.value+' months'} for the stated plan population`,`Turnover reduction target over ${prior.scope.months.value??'the requested'} months for the stated plan population`];
+ const generatedBasis=['User-requested reduction, not an estimated or validated intervention effect. A matching baseline is required before deriving an ending rate or exits.','Original user-requested reduction, not an estimated or validated intervention effect. No missing rate or workforce denominator is inferred.'];
+ if(!expectedNames.includes(measure.name)||measure.target.kind!=='user-entered'||!generatedBasis.includes(measure.target.basis??'')||!/^\d+(?:\.\d+)?(?: percentage-point|% relative) reduction$/.test(measure.target.value??'')||JSON.stringify(measure)!==JSON.stringify(next))return;
+ if(prior.scope.population.value!==input.scope.population.value||prior.scope.startMonth.value!==input.scope.startMonth.value||measure.scopeKey!==JSON.stringify([prior.scope.population.value,prior.scope.startMonth.value,prior.scope.months.value]))return;
+ next.name=`Turnover rate over ${input.scope.months.value} months for the stated plan population`;
+ next.scopeKey=JSON.stringify([input.scope.population.value,input.scope.startMonth.value,input.scope.months.value]);
 }

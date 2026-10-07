@@ -2,6 +2,8 @@
 import {readBundleDraft,reviseBundleDraft,unknownAssumption,type Assumption,type BundleDraft} from './home-bundle-reconciliation.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {planningStatements,resolveHomePlanningIntent,planningRequirementText} from './home-planning-intent.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {refreshGeneratedReductionHorizon} from './home-action-plan-pilot.ts';
 
 const entered=<T>(value:T,basis:string):Assumption<T>=>({value,kind:'user-entered',basis});
 const pilotDefault=(value:Assumption<unknown>)=>value.kind==='illustrative'&&value.basis?.startsWith('illustrative-pilot-v1; prepared ');
@@ -57,6 +59,7 @@ export function savedPilotCorrection(source:BundleDraft,goalContext?:unknown):Sa
   }
  }
  const requirements=planningRequirementText(intent);if(input.scope.requirements.value===null&&requirements)input.scope.requirements=entered(requirements,'Explicit original goal constraints; this ceiling is not an expense.');
+ refreshGeneratedReductionHorizon(source,input);
  return {draft:reviseBundleDraft(source,input),changes};
 }
 

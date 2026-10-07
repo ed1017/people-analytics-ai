@@ -10,6 +10,7 @@ import {saveBundleCalculationPatch,attachBundlePatch} from '../../lib/home-bundl
 import {reconcileBundle} from '../../lib/home-bundle-reconciliation.ts';
 import {createPlanAlternatives,attachPlanAlternative,packPlanAlternatives,readPlanAlternatives} from '../../lib/home-plan-alternatives.ts';
 const fixture=JSON.parse(readFileSync(new URL('../fixtures/home-saved-pilot-before-pr175.json',import.meta.url),'utf8'));
+if(process.env.RETENTION_SAVED_REQUEST)fixture.request=process.env.RETENTION_SAVED_REQUEST;
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright'),base=process.env.HOME_BASE_URL??'http://127.0.0.1:3385';
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
 let checks=0;const check=(name,value)=>{assert.ok(value,name);checks++;console.log('PASS '+name)};
@@ -21,7 +22,8 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]])for(const layout
  try{
  await page.goto(base);await input.waitFor();await input.fill(fixture.request);await button('Send overview question').click();await page.locator('[data-guide-target="pin"]').click();await page.locator('[data-plan-current="true"]').waitFor();
  const data=await state(),id=data.goals.activeId,fields=data.workspaces[id].fields,binding=fields.homeBundlePreparationV1.binding,scope={goalId:id,goal:fixture.request};
- const oldDrafts=fixture.fullDrafts.map(old=>({...structuredClone(old),binding:structuredClone(binding)}));
+ const oldDrafts=(process.env.RETENTION_SAVED_REQUEST?fixture.drafts:fixture.fullDrafts).map(old=>({...structuredClone(old),binding:structuredClone(binding)}));
+ if(process.env.RETENTION_SAVED_REQUEST)assert.ok(oldDrafts.every(draft=>draft.inputs.scope.months.value===3&&draft.inputs.scope.months.kind==='illustrative'),'ordinary wording starts from actual archived three-month drafts');
  let legacy;for(const draft of oldDrafts)legacy=saveBundleCalculationPatch(legacy,draft,reconcileBundle(draft)).value;
  if(layout==='legacy')legacy=attachBundlePatch(legacy,oldDrafts[0],{confirmed:true,bindingKey:actionBindingKey(binding),inputKey:bundleInputKey(oldDrafts[0]),acknowledgeUnknowns:true},'old-attachment','2026-10-01T12:00:00Z').value;
  fields.homeSolutionBundlesV1=legacy;

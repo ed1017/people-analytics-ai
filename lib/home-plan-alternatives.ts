@@ -7,6 +7,8 @@ import {bundleChatEditIntent,previewBundleChatEdit,acceptBundleChatEdit} from '.
 import {combinePlanSnapshots,type CombinationReview} from './home-plan-combination.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {savedPilotCorrection} from './home-saved-pilot-correction.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {refreshGeneratedReductionHorizon} from './home-action-plan-pilot.ts';
 
 export const planAlternativesField='homePlanAlternativesV1';
 export type AlternativeContext={goalId:string;goal:string};
@@ -109,6 +111,9 @@ export function proposeEditedAlternative(raw:PlanAlternatives,context:Alternativ
  }
  // Numbering is resolved above; the legacy parser need not impose its three-option UI limit.
  const source=sources[0].draft,preview=previewBundleChatEdit(source,text),draft=acceptBundleChatEdit(source,preview);
+ // New numbered proposals can refresh generated target labels. Keep the legacy
+ // text-edit replay deterministic so earlier saved revisions still validate.
+ refreshGeneratedReductionHorizon(source,draft.inputs);
  return append(catalog,request,operation,sources,draft,reconcileBundle(draft),[]);
 }
 export function proposeCombinedAlternative(raw:PlanAlternatives,context:AlternativeContext,request:AlternativeRequest):AlternativeOutcome{
