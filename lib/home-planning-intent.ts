@@ -11,10 +11,15 @@ export function planningStatements(context:unknown):string[]{
 function explicitBudgetCap(statement:string):number|null{
  // Match the amount beside its budget label, not an unrelated later vendor cost.
  // Accept the same user-authored ceiling whether it is called demo or illustrative.
- const afterLabel=/\b(?:maximum|cap|budget)(?:\s+(?:one-time|programme|program|cash|demo|illustrative|budget|limit|ceiling|is|of|at|to|should|must|be|not|exceed|no|more|than))*\s*[:=]?\s*(?:\$|USD\s*)(\d+(?:,\d{3})*(?:\.\d{1,2})?)/gi;
- const beforeLabel=/(?:\$|USD\s*)(\d+(?:,\d{3})*(?:\.\d{1,2})?)\s+(?:(?:demo|illustrative|cash|programme|program|one-time)\s+)*budget\b/gi;
- const candidates=[...statement.matchAll(afterLabel),...statement.matchAll(beforeLabel)].map(match=>({amount:Number(match[1].replaceAll(',','')),index:match.index+match[0].indexOf(match[1])}));
- const negated=/\b(?:not|rather than|instead of|ignore|exclude|don't|don’t)\s+(?:(?:use|set|an?|the|previous|old|maximum|cap|budget|demo|illustrative|cash|programme|program|one-time|of|to|at)\s+)*(?:\$|USD\s*)$/i;
+ // Consume the complete money token. An unknown suffix or malformed decimal
+ // must not backtrack into a smaller numeric prefix (for example $100bn → $100).
+ // Capture the greedy token in a lookahead, then consume that exact capture.
+ // Validation cannot discard a spaced multiplier and reinterpret $100 kk as $100.
+ const money=String.raw`(?:\$|USD\s*)(?=((\d+(?:,\d{3})*(?:\.\d{1,2})?)(?:\s*([km]))?))\1(?![\p{L}\p{N}_]|\.\d|,\d)(?!\s*(?:b|bn|mm|mn|thousand|million|billion|trillion|grand|lakh|crore)\b)`;
+ const afterLabel=new RegExp(String.raw`\b(?:maximum|cap|budget)(?:\s+(?:one-time|programme|program|cash|demo|illustrative|budget|limit|ceiling|is|of|at|to|should|must|be|not|exceed|no|more|than))*\s*[:=]?\s*`+money,'giu');
+ const beforeLabel=new RegExp(money+String.raw`\s+(?:(?:demo|illustrative|cash|programme|program|one-time)\s+)*budget\b`,'giu');
+ const candidates=[...statement.matchAll(afterLabel),...statement.matchAll(beforeLabel)].map(match=>({amount:Number(match[2].replaceAll(',',''))*(match[3]?.toLowerCase()==='k'?1000:match[3]?.toLowerCase()==='m'?1000000:1),index:match.index+match[0].indexOf(match[2])}));
+ const negated=/\b(?:not|rather than|instead of|ignore|exclude|don't|don’t)\s+(?:(?:use|set|be|an?|the|previous|old|maximum|cap|budget|demo|illustrative|cash|programme|program|one-time|of|to|at)\s+)*(?:\$|USD\s*)$/i;
  return candidates.filter(candidate=>candidate.amount<=1e9&&!negated.test(statement.slice(0,candidate.index))).sort((left,right)=>left.index-right.index).at(-1)?.amount??null;
 }
 export function resolveHomePlanningIntent(statements:string[]):HomePlanningIntent{

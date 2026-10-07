@@ -663,4 +663,9 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
   outline: 4px solid #8c3957;
   outline-offset: 4px;
   scroll-margin-block: 110px;
+  /* Reserve the arrow's space so its label never covers the preceding content. */
+  margin-top: 104px;
+}
+:has(> [data-guided-highlight="true"]) {
+  align-items: flex-end;
 }

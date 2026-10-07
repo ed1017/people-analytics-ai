@@ -17,3 +17,5 @@ Active pre-fix illustrative pilot drafts with known generated defaults offer **C
 The exact request “reduce turnover by 2 percentage points over 12 months with a $100,000 illustrative budget” carries the cash ceiling into calculation, regeneration, comparison, attachment and reopening. “Demo budget” remains supported. Employee time stays in hours; unknown costs do not create budget headroom. Quantified retention goals with no participant count leave it unknown.
 
 The browser regressions use the production build and real controls with intercepted evidence/model transport. They cover desktop and 390px mobile, two-tab recovery and resubmission, direct Attach without prior typing, competing Plan #4 creation, and legacy/catalog draft correction. These checks do not establish hosted live-model behavior.
+
+The storage guards are optimistic checks. They detect a saved envelope that has already changed, but localStorage provides no atomic compare-and-swap across tabs. The tests do not prove protection from truly simultaneous final-read/final-write interleaving; the implementation is not a serializable multi-tab database.

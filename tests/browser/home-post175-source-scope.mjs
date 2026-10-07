@@ -27,7 +27,7 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]]){
  await page.goto(base);const filters=page.locator('.workforce-filter-disclosure');if(width<768)await filters.locator('summary').click();await page.getByLabel('Country',{exact:true}).selectOption('US');
  await button('Open data details').click();const details=page.getByRole('dialog',{name:'Data details'}),scope=details.getByRole('region',{name:'How filters affect evidence'});await scope.getByText(/United States; All business units; All levels/).waitFor();
  check(mode+' effective catalogue scope appears in Data details',await scope.getByText(/effective scope cannot be verified/).isVisible());await button('Close data details').click();
- const bad=['The United States scenario has 15,000 employees. [P1, A1]','## United States\n- Recorded exits were 400. [A1]','The United States global scenario has 15,000 employees. [P1]'];
+ const bad=['The United States scenario has 15,000 employees. [P1, A1]','## United States\n- Recorded exits were 400. [A1]','The United States global scenario has 15,000 employees. [P1]','**United States turnover was 8%. [A1]**','Use the United States turnover rate of 8% [A1] to prioritize manager support.'];
  for(let i=0;i<bad.length;i++){
   answer=bad[i];const question='Explain the current workforce evidence '+i+'.';await chat.fill(question);await button('Send overview question').click();await page.getByRole('alert').filter({hasText:'The answer mixed selected filters with company-wide evidence.'}).waitFor();
   check(mode+' contradiction '+i+' stays out of the visible answer and keeps request',await chat.inputValue()===question&&await page.getByText(answer,{exact:true}).count()===0);

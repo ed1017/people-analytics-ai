@@ -43,10 +43,32 @@ test('budget wording does not adopt a negated amount, unrelated cost, or superse
  assert.equal(resolveHomePlanningIntent([request,'Use a $75,000 illustrative budget instead.']).budgetCap,75000);
 });
 
-async function alternatives(at){
- const binding=await actionBinding(context.goalId,request,{sources:[]},{goal:request});
- return retentionProposal(request).bundles.map(bundle=>({id:bundle.id,draft:prepareIllustrativePilot(createBundleDraft(bundle,binding),at,{goalContext:{goal:request},includeDeliveryEstimate:true})}));
+async function alternatives(at,statement=request){
+ const binding=await actionBinding(context.goalId,statement,{sources:[]},{goal:statement});
+ return retentionProposal(statement).bundles.map(bundle=>({id:bundle.id,draft:prepareIllustrativePilot(createBundleDraft(bundle,binding),at,{goalContext:{goal:statement},includeDeliveryEstimate:true})}));
 }
+test('k and m budgets are complete numeric amounts through calculation, comparison and saved-plan replay',async()=>{
+ for(const [amount,expected] of [['$100k',100000],['$1.5m',1500000],['USD 100K',100000],['$1.5 M',1500000],['$100 k',100000]]){
+  const statement='Reduce turnover by 2 percentage points over 12 months with a budget of '+amount;
+  const intent=resolveHomePlanningIntent([statement]);assert.equal(intent.budgetCap,expected,statement);assert.equal(typeof intent.budgetCap,'number');assert.deepEqual(intent,resolveHomePlanningIntent([statement.replace(amount,'$'+expected)]));
+  const drafts=await alternatives('2026-10-07T00:00:00Z',statement),local={goalId:context.goalId,goal:statement};
+  for(const item of drafts){const result=reconcileBundle(item.draft);assert.equal(result.budget.limit,expected);assert.equal(result.budget.headroom,null);assert.equal(item.draft.inputs.successMeasure.target.value,'2 percentage-point reduction');assert.equal(item.draft.inputs.successMeasure.baseline.value,null);assert.equal(item.draft.inputs.scope.months.value,12);}
+  const reviewed=drafts.map(({draft})=>{const inputs=structuredClone(draft.inputs);inputs.scope.comparisonConfirmed=entered(true);return reviseBundleDraft(draft,inputs);});assert.equal(compareBundleDrafts(reviewed[0],reviewed[1]).comparable,true);
+  const loaded=readPlanAlternatives(JSON.parse(JSON.stringify(packPlanAlternatives(createPlanAlternatives(local,drafts)))),local);assert.ok(loaded);for(const plan of loaded.plans)assert.equal(plan.result.budget.limit,expected);
+ }
+ for(const [statement,expected] of [['Use a $100k illustrative budget.',100000],['Use a $100 k illustrative budget.',100000],['Use a $100 illustrative budget.',100],['Use a $1.5m demo budget.',1500000],['Use a $100k budget, not a $1.5m budget.',100000]])assert.equal(resolveHomePlanningIntent([statement]).budgetCap,expected,statement);
+ assert.equal(resolveHomePlanningIntent(['The budget should not be $100k.']).budgetCap,null);
+ assert.equal(resolveHomePlanningIntent(['Use a $50k illustrative budget. The budget should not be $100k.']).budgetCap,50000);
+ assert.equal(resolveHomePlanningIntent(['Use a $50k illustrative budget.','The budget should not be $100k.']).budgetCap,50000);
+ assert.equal(resolveHomePlanningIntent(['The budget must not exceed $100k.']).budgetCap,100000);
+});
+test('unsupported monetary suffixes and malformed amounts are rejected without accepting a numeric prefix',async()=>{
+ for(const amount of ['$100bn','$1.5mm','$100kk','$100xyz','$100million','$100 bn','$1.5 million','$100,00','$1.555m','$100kextra','$1.5mfoo','$100 kk','$100 kextra','$100 k2','$1.5 mfoo','$100 k million']){
+  const statement='Reduce turnover by 2 percentage points over 12 months with a budget of '+amount;
+  assert.equal(resolveHomePlanningIntent([statement]).budgetCap,null,statement);assert.equal(resolveHomePlanningIntent(['Use a '+amount+' illustrative budget.']).budgetCap,null,amount);
+  const [{draft}]=await alternatives('2026-10-07T00:00:00Z',statement);assert.equal(draft.inputs.budget?.amount.value??null,null,amount);assert.equal(reconcileBundle(draft).budget?.limit??null,null,amount);
+ }
+});
 function assertExact(draft){
  assert.equal(draft.binding.goal,request);
  assert.equal(draft.inputs.scope.months.value,12);
