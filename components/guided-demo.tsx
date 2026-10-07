@@ -38,7 +38,7 @@ export function GuidedDemo({active,actions,registry,onClose}:{active:boolean;act
    if(current===4&&!editLoaded.current&&originalNumber.current){editLoaded.current=true;try{latest.current.fillDraft(guidedEditPrompt(originalNumber.current));}catch(reason){setError((reason as Error).message);}}
   }catch(reason){setError((reason as Error).message);}
  }),[registry,id,owned]);
- useLayoutEffect(()=>{heading.current?.focus({preventScroll:true});},[step]);
+ useLayoutEffect(()=>{const node=heading.current;node?.focus({preventScroll:true});if(node?.parentElement)node.parentElement.scrollTop=node.offsetTop-node.parentElement.offsetTop;},[step]);
  useLayoutEffect(()=>{
   let frame=0;
   const position=()=>{frame=0;const popup=panel.current;if(!popup)return;const viewport=window.visualViewport,top=(viewport?.offsetTop??0)+12,height=viewport?.height??innerHeight,box=popup.getBoundingClientRect(),target=document.querySelector<HTMLElement>('[data-guided-highlight="true"]')?.getBoundingClientRect();
@@ -65,9 +65,9 @@ export function GuidedDemo({active,actions,registry,onClose}:{active:boolean;act
  const complete=step===steps.length,done=completedSteps.includes(step),point=!complete&&!done&&goalCurrent;
  const scope=`[data-guide-goal="${id}"] `,selector=step===1||step===5?'[data-guide-target="submit"]':step===2?'[data-guide-target="pin"]':step===3?scope+'[data-guide-plan][aria-selected="true"], '+scope+'[data-guide-target="prepare"]':step===4||step===7?scope+'[data-guide-target="attach"]':step===6&&revised?scope+`[data-guide-plan="${revised.number}"]`:null;
  const targetLabel=step===1||step===5?'Next → Submit':step===2?'Next → Pin goal':step===3?'Review plans and choose one':step===6?`Next → Select Plan #${revised?.number}`:'Next → Attach Action Plan';
- return typeof document==='undefined'?null:createPortal(<section ref={panel} role="dialog" aria-modal="false" data-guided-popup style={{top:popupTop,right:12,width:'min(360px, calc(100vw - 24px))',maxHeight:'min(400px, max(148px, 33dvh))'}} aria-label="Optional guided demo" className="fixed z-40 flex min-w-0 flex-col rounded-lg border border-[#8c3957] border-b-4 bg-[#6b203b] p-3 text-white shadow-xl">
+ return typeof document==='undefined'?null:createPortal(<section ref={panel} role="dialog" aria-modal="false" data-guided-popup style={{top:popupTop,right:12,width:'min(360px, calc(100vw - 24px))',maxHeight:'min(calc(100dvh - 24px), 400px, max(228px, 33dvh))'}} aria-label="Optional guided demo" className="fixed z-40 flex min-w-0 flex-col rounded-lg border border-[#8c3957] border-b-4 bg-[#6b203b] p-3 text-white shadow-xl">
   <div className="flex shrink-0 items-center justify-between gap-2"><h2 className="text-lg font-semibold">Guided instructions</h2><button className={button} onClick={close}>{complete?'Finish example':'Exit guide'}</button></div>
-  <div className="min-h-0 overflow-y-auto overscroll-contain">
+  <div data-guided-content className="min-h-0 overflow-y-auto overscroll-contain">
   <p className="mt-2 text-xs text-white/85">Demo example · fictional planning assumptions, not predicted or achieved outcomes.</p><hr className="my-3 border-white/40"/>
   <h3 ref={heading} tabIndex={-1} className="text-lg font-semibold">{complete?'Original and revised plans attached':`Step ${step+1} of ${steps.length}: ${steps[step][0]}`}</h3>
   <p className="my-2 text-sm">{complete?'Your demo goal keeps both attached versions. Reopen it from Pinned Goals to compare plans and continue editing.':steps[step][1]}</p>

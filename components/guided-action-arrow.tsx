@@ -22,7 +22,15 @@ export function GuidedActionArrow({selector,label}:{selector:string;label:string
      // One reveal per step: fixed Send cannot scroll the guide out of the reading area.
      window.scrollBy({top:reading.getBoundingClientRect().top-headerBottom-12,behavior:'instant'});
      if(!dock.contains(target))target.scrollIntoView({block:'nearest',behavior:'instant'});
-    }else target.scrollIntoView({block:'center',behavior:'instant'});
+    }else {
+     target.scrollIntoView({block:'center',behavior:'instant'});
+     const popup=document.querySelector<HTMLElement>('[data-guided-popup]');
+     if(popup&&innerWidth<768&&innerHeight<600){
+      const box=target.getBoundingClientRect(),space=popup.getBoundingClientRect().height+24+Math.max(104,overlay.current?.getBoundingClientRect().height??0)+8;
+      // A short phone viewport needs readable instructions and a separate action area.
+      if(space+box.height<=innerHeight-12&&box.top<space)window.scrollBy({top:box.top-space,behavior:'instant'});
+     }
+    }
     target.focus({preventScroll:true});
    }
    const rect=target.getBoundingClientRect(),nextPosition=rect.bottom<0||rect.top>innerHeight?null:{left:Math.max(112,Math.min(innerWidth-112,rect.left+rect.width/2)),top:rect.top-(overlay.current?.getBoundingClientRect().height??104)-8,label:target.dataset.guideTarget==='prepare'?target.textContent??label:label};

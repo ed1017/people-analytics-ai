@@ -8,7 +8,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),posts=[],errors=[];let external=0;
  page.setDefaultTimeout(15000);page.on('pageerror',error=>errors.push(error.message));
  await page.route('**/*',async route=>{
-  const request=route.request(),url=new URL(request.url());if(url.origin!==base){external++;return route.abort();}
+  const request=route.request(),url=new URL(request.url());if(url.href==='https://va.vercel-scripts.com/v1/script.debug.js')return route.fulfill({contentType:'application/javascript',body:''});if(url.origin!==base){external++;return route.abort();}
   if(url.pathname==='/api/chat'){posts.push(request.postDataJSON());return route.fulfill({json:{answer:'FTE means full-time equivalent.',nextStep:'none'}});}
   if(url.pathname==='/api/dashboard')return route.fulfill({json:{overview:{headcount:123,fte:120,open_positions:3,snapshot_date:'2026-09-30'},trend:[],filter_options:{countries:[{value:'CA',label:'Canada'}],business_units:[],levels:[]}}});
   if(url.pathname.startsWith('/api/'))return route.fulfill({json:{overview:{headcount:123,fte:120,open_positions:3,snapshot_date:'2026-09-30'}}});
@@ -40,7 +40,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  check(mode+' starter submission keeps dismissed instructions closed without deleting goals',await button('Show instructions').isVisible()&&!await page.getByText('From question to action',{exact:true}).isVisible()&&(await state()).goals.goals.length===3);
  await button('Show instructions').click();await page.keyboard.press('Escape');await chat.fill('What does FTE mean?');await button('Send overview question').click();await button('Show instructions').waitFor();check(mode+' typed submission keeps instructions closed after Escape',!await page.getByText('From question to action',{exact:true}).isVisible());
  await button('Reset conversation').click();await button('Show instructions').click();await button('Try a guided example').focus();await page.keyboard.press('Enter');
- check(mode+' guided entry hides starter and competing intro',await page.getByRole('region',{name:'Optional guided demo'}).isVisible()&&await page.getByRole('region',{name:'Starting guide'}).count()===0&&!await page.getByText('From question to action',{exact:true}).isVisible());
+ check(mode+' guided entry hides starter and competing intro',await page.getByRole('dialog',{name:'Optional guided demo'}).isVisible()&&await page.getByRole('region',{name:'Starting guide'}).count()===0&&!await page.getByText('From question to action',{exact:true}).isVisible());
  await button('Exit guide').click();await select('Close AI skill gaps');await button('Read or edit Focused issue: Close AI skill gaps').click();page.once('dialog',dialog=>dialog.accept());await button('Remove goal').click();await page.reload();await rail.waitFor();
  check(mode+' deliberate removal survives reload',await rail.getByRole('button',{name:'Open goal: Close AI skill gaps'}).count()===0&&(await state()).goals.goals.length===2);
  await select('Reduce turnover');await panel.getByRole('heading',{name:'Manager check-ins',exact:true}).waitFor();await page.screenshot({path:'/tmp/home-demo-goals-'+mode+'.png',fullPage:true});
