@@ -107,8 +107,8 @@ function dominates(a: WorkforceMixCandidate, b: WorkforceMixCandidate): boolean 
     (left.incrementalCash! < right.incrementalCash! || left.employeeTimeValue! < right.employeeTimeValue! || left.addedEmployees < right.addedEmployees || left.fullCoverageMonth! < right.fullCoverageMonth!);
 }
 
-/** Exhaustive only within explicit bounds and budget. Never returns a partial search as complete. */
-export function evaluateWorkforceMixes(source: PreparedMixSource, binding: MixBinding, rawSpec: unknown, searchFingerprint: string) {
+/** Pure input kernel. No saved evidence identity is required or manufactured by other facades. */
+export function evaluateBoundedWorkforceInputs(source: Pick<PreparedMixSource, "input" | "timing">, rawSpec: unknown) {
   const roles = Number(source.input.roles), {spec, enumerated, withinBudget} = preflightWorkforceMixes(roles, rawSpec);
   const moveRange = (build: number) => ({min: Math.max(spec.move.min, roles - build - spec.buy.max), max: Math.min(spec.move.max, roles - build - spec.buy.min)});
   assert(withinBudget, "The complete bounded search plus its reference calculation exceeds the evaluation budget; narrow the explicit bounds. No partial search was evaluated.");
@@ -131,6 +131,12 @@ export function evaluateWorkforceMixes(source: PreparedMixSource, binding: MixBi
       candidates.push(candidate);
     }
   }
+  return {spec, enumerated, referencePlan, candidates};
+}
+
+/** Saved-source facade: its version, projection, ordering and replay bytes stay unchanged. */
+export function evaluateWorkforceMixes(source: PreparedMixSource, binding: MixBinding, rawSpec: unknown, searchFingerprint: string) {
+  const {spec, enumerated, referencePlan, candidates} = evaluateBoundedWorkforceInputs(source, rawSpec);
   // Pareto comparison uses all enumerated matches, before any output truncation.
   // It expresses only cash/time/headcount/readiness trade-offs, never a weighted best.
   for (const candidate of candidates) {
