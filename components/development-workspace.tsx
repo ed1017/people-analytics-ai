@@ -1,7 +1,7 @@
 "use client";
 import { PlanningGuide } from "@/components/planning-guide";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { blankDevelopmentQuote, developmentCatalog, developmentCost, quoteInputs, validateQuote, type DevelopmentQuote, type DevelopmentOption, type DevelopmentInputs } from "@/lib/development-costs";
 
 const control = "development-control mt-1 w-full min-w-0 rounded border bg-background p-2 text-sm";
@@ -14,27 +14,39 @@ export const emptyDevelopmentSession = (): DevelopmentSession => ({ custom: [], 
 
 export function DevelopmentCatalog({ session, onChange, onOpen }: { session: DevelopmentSession; onChange: (session: DevelopmentSession) => void; onOpen: () => void }) {
   const [errors, setErrors] = useState<string[]>([]);
+  const catalogId = useId();
   const quotes = [...developmentCatalog, ...session.custom];
   const chosen = quotes.find(q => q.id === session.selected);
+  const carryReasons = [
+    !chosen && "Select a quote.",
+    !session.goal.trim() && "Enter a development goal.",
+    session.options.length >= 3 && "Three comparison options are already in Development Planning. Open Planning and remove an option to make room.",
+  ].filter(Boolean);
+  const quoteFee = (q: DevelopmentQuote) => `${q.fee ? `${q.currency} ${q.fee}` : `Cost unknown (${q.currency})`} per ${q.basis === "person" ? "person" : "cohort package"} per session`;
   const updateDraft = (key: keyof DevelopmentQuote, value: string) => onChange({ ...session, draft: { ...session.draft, [key]: value } });
   const carry = () => {
-    if (!chosen || !session.goal.trim() || session.options.length >= 3) return;
+    if (!chosen || carryReasons.length) return;
     onChange({ ...session, options: [...session.options, { quote: { ...chosen }, goal: session.goal.trim(), inputs: quoteInputs(chosen) }] });
     onOpen();
   };
   return <section aria-label="Development quote catalog" className="development-catalog mb-6 min-w-0 rounded-lg border p-4">
     <h2 className="text-xl font-semibold">Explore training and coaching</h2>
     <p className="mt-2 text-sm text-muted-foreground">All named providers below are fictional; their quotes are simulated examples, not vendor offers or evidence of results. Custom quotes are unverified user input. With a selected goal, quotes and inputs are saved in this browser; without a goal they last only in this tab. Workforce filters do not select participants.</p>
-    <div className="development-quotes my-4 grid min-w-0 gap-3 xl:grid-cols-3">{quotes.map(q => <label key={q.id} className="development-quote min-w-0 rounded border p-3 text-sm">
-      <span className="flex items-start gap-2"><input type="radio" name="development-quote" checked={session.selected === q.id} onChange={() => onChange({ ...session, selected: q.id })} /><strong className="break-words">{q.provider}</strong></span>
-      <span className="mt-2 block">{q.provenance === "simulated" ? "Simulated quote · Fictional provider" : "User-provided · Unverified"}</span>
-      <span className="mt-2 block">{q.kind}: {q.focus}</span><span className="block">{q.format}</span>
-      <span className="block">{q.sessions || "Unknown"} sessions × {q.hours || "unknown"} hours per participant; cohort capacity {q.capacity || "unknown"}.</span>
-      <span className="mt-2 block font-medium">{q.fee ? `${q.currency} ${q.fee}` : "Cost unknown"} per {q.basis === "person" ? "person" : "cohort package"} per session</span>
-    </label>)}</div>
+    <p id={`${catalogId}-help`} className="mt-3 text-sm">Select one quote to compare in Planning. Select the same card again to clear it.</p>
+    <div className="development-quotes my-4 grid min-w-0 gap-3 xl:grid-cols-3">{quotes.map(q => <button type="button" key={q.id} aria-label={q.provider} aria-pressed={session.selected === q.id} aria-describedby={`${catalogId}-${q.id}-source ${catalogId}-${q.id}-focus ${catalogId}-${q.id}-format ${catalogId}-${q.id}-sessions ${catalogId}-${q.id} ${catalogId}-help`} onClick={() => onChange({ ...session, selected: session.selected === q.id ? "" : q.id })} className="development-quote min-w-0 rounded border p-3 text-left text-sm">
+      <span className="flex items-start gap-2"><span aria-hidden="true" className="development-quote-control">{session.selected === q.id ? "✓" : ""}</span><strong className="break-words">{q.provider}</strong></span>
+      <span id={`${catalogId}-${q.id}-source`} className="mt-2 block">{q.provenance === "simulated" ? "Simulated quote · Fictional provider" : "User-provided · Unverified"}</span>
+      <span id={`${catalogId}-${q.id}-focus`} className="mt-2 block">{q.kind}: {q.focus}</span><span id={`${catalogId}-${q.id}-format`} className="block">{q.format}</span>
+      <span id={`${catalogId}-${q.id}-sessions`} className="block">{q.sessions || "Unknown"} sessions × {q.hours || "unknown"} hours per participant; cohort capacity {q.capacity || "unknown"}.</span>
+      <span id={`${catalogId}-${q.id}`} className="mt-2 block font-medium">{quoteFee(q)}<span className="mt-1 block">{session.selected === q.id ? "Selected · Select again to clear" : "Select quote"}</span></span>
+    </button>)}</div>
+    <div role="status" aria-atomic="true" className="mb-3 rounded border p-3 text-sm">
+      <p>{chosen ? <><strong>Selected quote: {chosen.provider}.</strong> {quoteFee(chosen)}.</> : "No quote selected."}</p>
+      <p id={`${catalogId}-carry-status`} className="mt-1">{carryReasons.length ? `To carry: ${carryReasons.join(" ")}` : `Ready to copy this quote and your goal to Development Planning (${session.options.length} of 3 options used).`}</p>
+    </div>
     <Field label="Development goal" value={session.goal} onChange={goal => onChange({ ...session, goal })} />
-    <div className="mt-3 flex flex-wrap gap-2"><button className={`${button} development-primary`} disabled={!chosen || !session.goal.trim() || session.options.length >= 3} onClick={carry}>Carry selected quote and goal to Development Planning</button><button className={button} onClick={onOpen}>Open Development Planning</button></div>
-    <p className="mt-2 text-xs text-muted-foreground">Up to three comparison options. Carry copies only your selected quote and goal; it does not enroll or allocate anyone. Remove a comparison option to make room.</p>
+    <div className="mt-3 flex flex-wrap gap-2"><button className={`${button} development-primary`} aria-describedby={`${catalogId}-carry-status`} disabled={carryReasons.length > 0} onClick={carry}>Carry selected quote and goal to Development Planning</button><button className={button} onClick={onOpen}>Open Development Planning</button></div>
+    <p className="mt-2 text-xs text-muted-foreground">Up to three comparison options. Carry copies only your selected quote and goal; it does not enroll or allocate anyone, make a purchase, or contact a provider.</p>
     <details className="mt-5"><summary className="cursor-pointer font-medium">Add a custom vendor or coach</summary>
       <div className="mt-3 grid min-w-0 gap-3 sm:grid-cols-2">
         <Field label="Provider or coach" value={session.draft.provider} onChange={v => updateDraft("provider",v)} />
