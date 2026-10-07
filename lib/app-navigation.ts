@@ -37,8 +37,8 @@ export const appPageMetadata: Record<
 > = {
   "decision-brief":{label:"Decision brief",section:"Planning",description:"Your browser-local evidence, assumptions, proposals and explicit approval notes."},
   "assess-evaluate":{label:"Coming soon",section:"Assess & Evaluate",description:"Placeholder only; no outcomes, scorecard or ROI calculation."},
-  "occupational-references": {label:"Occupational References",section:"Intelligence",description:"O*NET reference and stored mapping provenance, not a live occupational feed."},
-  "labor-market": {label:"Labor Market",section:"Intelligence",description:"Available US national BLS observations with dates and limitations."},
+  "occupational-references": {label:"Occupational References",section:"Intelligence",description:"Search job-profile mappings, role requirements and O*NET occupation references."},
+  "labor-market": {label:"Labor Market",section:"Intelligence",description:"Compare published occupation wages, employment and separate U.S. projections."},
   "training-coaching": {label:"Training & Coaching",section:"Intelligence",description:"Fictional simulated provider examples and unverified user-provided quotes."},
   "development-planning": { label: "Development Planning", section: "Planning", description: "Compare explicitly selected development quotes and user-entered cost assumptions." },
   home: { label: "Home", section: "Insights to Action", description: "Explore key findings and ask questions across governed workforce evidence." },
