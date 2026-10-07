@@ -29,7 +29,7 @@ export function HomeCapacityAdoption({draft,offer,currentContext,isCurrent,onAcc
   <p className="text-xs">Review the full bundle with its existing dates, participant groups and shared costs. Unsupported mappings block adoption. Current saved attachments stay in history until explicit replacement.</p>
   {preview&&<><ul className="list-disc pl-5">{preview.changes.map(change=><li key={change.field}>{change.field}: {change.before} → {change.after}</li>)}</ul>
    <p>Participants under current assumptions: {shown(preview.before.uniqueParticipants)} → {shown(preview.after.uniqueParticipants)}. Added company employees: {shown(preview.before.plannedAddedEmployees)} → {shown(preview.after.plannedAddedEmployees)}. These are different measures.</p>
-   <p>Complete bundle cash (USD): {shown(preview.before.cashTotal)} → {shown(preview.after.cashTotal)}. Employee-time value stays separate: {shown(preview.after.employeeTimeTotal)}.</p>
+   <p>Complete bundle cash (USD): {shown(preview.before.cashTotal)} → {shown(preview.after.cashTotal)}. Staff effort remains in hours, separate from cash.</p>
    <p>Dependency-gated capacity month: {shown(preview.before.capacityReadyMonth)} → {shown(preview.after.capacityReadyMonth)}. Component finish: {shown(preview.after.planFinish)}. Existing dates are preserved.</p>
    <p>Cost coverage needs renewed review for: {preview.costReviewComponents.map(id=>draft.bundle.components.find(item=>item.id===id)?.name).join('; ')||'No changed shared-cost allocations'}.</p>
    <p>Inactive flow mappings removed: {preview.removedFlows.join(', ')||'None'}. Component activities, group counts and non-staffing expenses are preserved.</p>

@@ -1,0 +1,54 @@
+// Isolated production UI with synthetic aggregate fixtures and model responses.
+import assert from 'node:assert/strict';
+import {decodeHomeModelReply} from '../../lib/home-chat-reply.ts';
+import {bundleProposalFixture} from '../fixtures/home-bundles.mjs';
+import {DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
+import {scopeDashboard} from '../fixtures/home-scope-evidence.mjs';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright'),base=process.env.HOME_BASE_URL??'http://127.0.0.1:3249';
+const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});let checks=0;
+const check=(label,value)=>{assert.ok(value,label);checks++;console.log('PASS '+label)};
+const finding={id:'f1',text:'The company recorded 100 exits across all turnover types. [A1]',evidence:['A1:summary'],prompt:'What does the total exit count establish, and what remains unknown?'};
+const surveyAnswer=packet=>'Reported exit-survey reasons are associations, not established causes.\n- Supplied reasons among 50 exit-survey respondents, company-wide as of 30 Sep 2026: [S2]\n'+packet.sources.find(source=>source.id==='S2').facts.rows.map(row=>'  - '+row.primary_reason+': '+row.exits+' ('+row.pct_of_exit_responses+'%). [S2]').join('\n')+'\n- Fieldwork dates and complete suppression metadata are unavailable. [S2]';
+try{for(const [mode,width] of [['desktop',1366],['mobile',390]]){
+ const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),posts=[],errors=[];let external=0;
+ page.setDefaultTimeout(15000);page.on('pageerror',e=>errors.push(e.message));
+ await page.route('**/*',route=>{
+  const req=route.request(),url=new URL(req.url());if(url.origin!==base){external++;return route.abort()}
+  if(url.pathname==='/api/chat'){
+   const body=req.postDataJSON();posts.push(body);if(body.message==='Prepare coordinated solution bundles for my exact pinned goal.')return route.fulfill({json:{proposal:bundleProposalFixture(body.goalContext.goal)}});
+   const question=body.message.split('\n\n')[0],isSurvey=question.startsWith('What did exit-survey'),ordinary=question.startsWith('Why'),answer=isSurvey?surveyAnswer(body.overviewBriefingContext):ordinary?'The source does not establish why turnover changed. [A1]':'Your stated turnover goal can remain broad.\n- '+finding.text;
+   return route.fulfill({json:decodeHomeModelReply(JSON.stringify({answer,next_step:'none',problem:null,problem_evidence:[],options:[],question:null,finding_followups:isSurvey||ordinary?[]:[finding]}),Boolean(body.hasFocusedIssue),body.overviewBriefingContext)});
+  }
+  if(url.pathname==='/api/dashboard')return route.fulfill({json:scopeDashboard(url.search)});
+  if(url.pathname==='/api/survey-sentiment')return route.fulfill({json:{as_of:'2026-09-30',summary:{exit_respondents:50,manager_favorable_pct:19.9},exit_reasons:[{primary_reason:'Other',exits:5,pct_of_exit_responses:10},{primary_reason:'Manager',exits:15,pct_of_exit_responses:30},{primary_reason:'Work-Life Balance',exits:20,pct_of_exit_responses:40},{primary_reason:'New Opportunity',exits:10,pct_of_exit_responses:20}]}});
+  if(url.pathname.startsWith('/api/'))return route.fulfill({json:{as_of:'2026-09-30',summary:{headcount:5000,total_exits:100,total_turnover_ytd_pct:10,voluntary_exits:60,voluntary_turnover_ytd_pct:6,regrettable_exits:20},trend:[],business_units:[],levels:[],tenure:[],reasons:[]}});
+  return route.continue();
+ });
+ await page.goto(base);const input=page.getByLabel('Ask Workforce AI',{exact:true}),button=name=>page.getByRole('button',{name,exact:true}),card=page.getByRole('region',{name:'Pin this problem'}),chat=page.getByRole('region',{name:'Overview conversation'});
+ const send=async text=>{await input.fill(text);const done=page.waitForResponse(r=>r.url()===base+'/api/chat');await button('Send overview question').click();await done;await page.getByRole('status',{name:'AI answer status',exact:true}).waitFor({state:'hidden'})};
+ const state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
+ await input.waitFor();await page.waitForFunction(key=>Boolean(localStorage.getItem(key)),DECISIONS_STORAGE_KEY);const seeded=JSON.stringify((await state()).workspaces['demo-reduce-turnover']);await send('Reduce turnover');await button('Pin overall turnover goal').waitFor();
+ check(mode+' broad goal and primary pin precede optional findings',await card.evaluate(node=>Boolean(node.compareDocumentPosition(document.querySelector('[aria-label="Overview conversation"]'))&Node.DOCUMENT_POSITION_FOLLOWING))&&await button('Pin overall turnover goal').evaluate(node=>Boolean(node.compareDocumentPosition(document.querySelector('[aria-label="Optional turnover focus"]'))&Node.DOCUMENT_POSITION_FOLLOWING)));
+ check(mode+' overall context shows total rate and all exits with an honest group limitation',await card.getByText('Overall turnover · Company-wide',{exact:true}).isVisible()&&(await card.getByLabel('Turnover goal evidence').innerText()).includes('Recorded exits (all types): 100')&&(await card.getByLabel('Turnover goal evidence').innerText()).includes('10%')&&await card.getByText('Comparable group turnover rates and denominators are unavailable in Home.',{exact:true}).isVisible());
+ check(mode+' voluntary choice has distinct same-period numbers and no automatic pin',await card.getByLabel('Optional turnover focus').getByText(/Voluntary turnover: 6%.*total turnover: 10%/).isVisible()&&!(await state()).goals.activeId&&await card.getByLabel('Optional finding exploration').count()===0);
+ await input.fill('Keep my constraints');check(mode+' optional narrowing protects an unfinished draft',await button('Focus on voluntary turnover').isDisabled());await input.fill('');
+ await card.screenshot({path:'/tmp/turnover-focus-'+mode+'.png'});
+ await button('Pin overall turnover goal').click();await page.getByRole('region',{name:'Action Plans for your goal',exact:true}).waitFor();const pinned=await state();check(mode+' exact goal can coexist with seeded demo without changing its workspace',pinned.goals.activeId!=='demo-reduce-turnover'&&pinned.goals.goals.find(goal=>goal.id===pinned.goals.activeId)?.statement==='Reduce turnover'&&JSON.stringify(pinned.workspaces['demo-reduce-turnover'])===seeded&&posts.filter(post=>post.message==='Prepare coordinated solution bundles for my exact pinned goal.').length===1);
+ await button('Reset conversation').click();await send('Reduce turnover');await button('Pin overall turnover goal').click();await page.getByText('This goal is already saved. Select it from your goals to continue; your draft is retained.',{exact:true}).waitFor();check(mode+' duplicate user goal remains blocked without another plan request',!(await state()).goals.activeId&&(await state()).goals.goals.length===pinned.goals.goals.length&&posts.filter(post=>post.message==='Prepare coordinated solution bundles for my exact pinned goal.').length===1);await button('Focus on voluntary turnover').click();await button('Pin voluntary turnover goal').waitFor();check(mode+' narrowing is explicit and remains unpinned for review',posts.at(-1).message.startsWith('Reduce voluntary turnover')&&await card.getByRole('heading',{name:'Reduce voluntary turnover',exact:true}).isVisible()&&!(await state()).goals.activeId);
+ await send('Why was turnover high in April?');await chat.getByText(/does not establish why turnover changed/).waitFor();check(mode+' ordinary factual question stays conversational without goal-first UI',await card.count()===0&&await button('Pin overall turnover goal').count()===0);
+ await send('What did exit-survey respondents report?');const answer=page.locator('[data-chat-role="assistant"]').last(),chart=answer.locator('[data-exit-reason-chart]');await chart.waitFor();
+ check(mode+' response preserves semantic nested bullets',await answer.locator('.home-answer > ul > li > ul > li').count()===3&&await answer.locator('.home-answer sup[data-chat-citation="S2"]').count()===5);
+ check(mode+' chart uses only packet counts and percentages with zero-based axis',await chart.getByRole('img').getAttribute('aria-label')==='Reported responses, count axis from 0 to 20. Work-Life Balance: 20 (40%); Manager: 15 (30%); Other: 5 (10%).'&&JSON.stringify(await chart.locator('[data-reason-bar]').evaluateAll(nodes=>nodes.map(node=>Number(node.dataset.count))))==='[20,15,5]');
+ check(mode+' chart keeps respondent denominator, date, scope and causal caveat separate from A1/S1',/50 exit-survey respondents.*Company-wide.*2026/.test(await chart.innerText())&&(await chart.innerText()).includes('Reported reasons, not proven causes.')&&!/19.9|100 exits/.test(await chart.innerText()));
+ await chart.screenshot({path:'/tmp/exit-reasons-'+mode+'.png'});
+ await send('Why did administrative exits rise?');check(mode+' administrative answer gets no S2 chart and prior chart remains bound to its original reply',await page.locator('[data-chat-role="assistant"]').last().locator('[data-exit-reason-chart]').count()===0&&await page.locator('[data-exit-reason-chart]').count()===1);
+ check(mode+' reset, runtime and mobile wrapping preserve boundaries',errors.length===0&&external===0&&await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await button('Reset conversation').click();check(mode+' reset removes chart and optional focus without deleting saved broad goal',await page.locator('[data-exit-reason-chart]').count()===0&&await button('Focus on voluntary turnover').count()===0&&(await state()).goals.goals.some(goal=>goal.id===pinned.goals.activeId&&goal.statement==='Reduce turnover'));
+ const country=page.getByLabel('Country',{exact:true});await country.evaluate(node=>node.closest('details')?.setAttribute('open',''));await country.selectOption('US');
+ await send('Reduce turnover in the United States');await button('Pin scoped turnover goal').waitFor();
+ check(mode+' scoped turnover retains selected filters and uses matching W1 voluntary evidence',await country.inputValue()==='US'&&(await card.getByLabel('Optional turnover focus').innerText()).includes('4.1%')&&(await card.getByLabel('Optional turnover focus').innerText()).includes('[W1]')&&!(await card.getByLabel('Optional turnover focus').innerText()).includes('6%')&&await card.getByText(/Overall turnover · United States/).isVisible());
+ await button('Pin scoped turnover goal').click();await page.getByRole('region',{name:'Action Plans for your goal',exact:true}).waitFor();
+ check(mode+' scoped primary pin keeps all turnover types without clearing country',await country.inputValue()==='US'&&(await state()).goals.goals.some(goal=>goal.statement==='Reduce turnover in the United States'));
+ await context.close();
+}}finally{await browser.close()}
+console.log(JSON.stringify({checks}));

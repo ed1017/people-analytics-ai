@@ -224,7 +224,7 @@ export async function previewActionPlanApplication(context: ApplicationContext, 
       ...(membership ? origin(`draft.inputs.memberships[${membership.componentId}].complete`, membership.complete) : [])], countIssue, countIssue ? 'blocked' : null);
   const capacity = draft.inputs.capacity, hourly = capacity?.input.loadedHourlyCost;
   const hourlyOrigin = capacity?.origins.loadedHourlyCost;
-  const hourlyIssue = quoteIssue ?? (!review?.loadedHourlyCostCompatible ? 'Review the same population and loaded USD/hour basis before copying the rate.' :
+  const hourlyIssue = draft.inputs.costPolicy ? 'Action Plans track staff effort in hours without a monetary rate.' : quoteIssue ?? (!review?.loadedHourlyCostCompatible ? 'Review the same population and loaded USD/hour basis before copying the rate.' :
     !capacity || !capacity.flows.some(flow => flow.path === 'build' && flow.componentIds.includes(component!.id) && membership?.groupIds.includes(flow.groupId ?? '')) ? 'No compatible Build component and population carry this loaded hourly rate.' :
     !hourly ? 'No explicit loaded hourly rate; totals and annual wages cannot supply it.' :
     !/^\d+(\.\d{1,2})?$/.test(hourly) || Number(hourly) > 1000000 ? 'Loaded hourly rate exceeds Development units or bounds.' : null);

@@ -1,12 +1,22 @@
 /** Reader-facing copy only; stored provenance identifiers and kinds stay unchanged. */
 export function bundleAssumptionCopy(text:string){return text.replaceAll('illustrative-pilot-v1','Starting estimate preset').replace(/\billustrative\b/gi,word=>word[0]==='I'?'Assumed':'assumed');}
 import type {SolutionBundle} from './home-solution-bundles';
+import type {BundleInputs} from './home-bundle-reconciliation';
 /** Presentation-only resolution of this contract's exact internal reference tokens.
  * No semantic classification or editing of the stored model text. Unknown tokens stay literal.
  */
-export function bundleDisplayText(text:string,bundle:SolutionBundle):string{
+export function bundleDisplayText(text:string,bundle:SolutionBundle,inputs?:Pick<BundleInputs,'groups'>):string{
  const titles=new Map(bundle.components.map(component=>[component.id,component.name]));
- return text.replace(/\bc[1-6]\b/g,id=>titles.get(id)??id);
+ let result=text.replace(/\bc[1-6]\b/g,id=>titles.get(id)??id);
+ // Resolve explicit shared-participant references from the current draft only.
+ // Stored proposal text, unrelated quantities and attachment history stay intact.
+ if(inputs?.groups.length===1&&inputs.groups[0].count.value!==null){
+  const count=String(inputs.groups[0].count.value),quantity='(?:\\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)';
+  result=result.replace(new RegExp('\\b'+quantity+'(\\s+(?:pilot\\s+)?participants)\\b','gi'),(_,noun)=>count+noun)
+   .replace(new RegExp('\\b'+quantity+'[- ](person|participant)(?=\\s+(?:pilot|group|cohort)\\b)','gi'),(_,noun)=>count+'-'+noun)
+   .replace(new RegExp('(\\b(?:pilot|pilot group|participant group|participant cohort)\\s+of\\s+)'+quantity+'\\b','gi'),(_,prefix)=>prefix+count);
+ }
+ return result;
 }
 export function bundleComponentLabels(ids:string[],bundle:SolutionBundle):string{
  return ids.map(id=>bundle.components.find(component=>component.id===id)?.name??'Unavailable component').join(', ');

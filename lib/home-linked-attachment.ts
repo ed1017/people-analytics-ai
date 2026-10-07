@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {verifyHomeMixCommit,homeMixHistoryField,type HomeMixCommit} from './home-mix-history.ts';
 // Reviewed local transaction: attachment, compatible inputs, receipt and context transition.
 // @ts-expect-error Native Node tests share TypeScript source.
 import {DecisionStore,encodeDecisions,validateJson,type Json} from './local-decisions.ts';
@@ -21,7 +23,7 @@ export type ProjectPlanningBinding=(destination:PlanningDestination)=>Promise<Ac
 type FieldLink={destination:string;written:string;sourcePaths:string[];receiptId:string;ownerBindingKey:string;ownerPreparedAt:string;ownerSignature:string;bundleId:string};
 export type AttachmentTransition={id:string;preparedAt:string;sourceBinding:ActionBinding;fromBinding:ActionBinding;toBinding:ActionBinding;attachmentId:string;inputKey:string;destinationBefore:PlanningDestination;destinationAfter:PlanningDestination;links:FieldLink[];receiptId:string|null};
 export type AttachmentLinks={version:1;entries:AttachmentTransition[]};
-export type LinkedAttachmentRequest={preparedAt:string;draft:BundleDraft;result:BundleResult;attachmentId:string;at:string;replaceId:string|null;reviewed:boolean;acknowledgeUnknowns:boolean;development:null|{componentId:string;optionIndex:number;quoteReviewed:boolean;hourlyReviewed:boolean};capacityReviewed:boolean};
+export type LinkedAttachmentRequest={mixCommit?:HomeMixCommit;preparedAt:string;draft:BundleDraft;result:BundleResult;attachmentId:string;at:string;replaceId:string|null;reviewed:boolean;acknowledgeUnknowns:boolean;development:null|{componentId:string;optionIndex:number;quoteReviewed:boolean;hourlyReviewed:boolean};capacityReviewed:boolean};
 export type LinkedAttachmentPreview={request:LinkedAttachmentRequest;revision:number;physicalBinding:ActionBinding;application:ApplicationPreview;choices:ApplicationChoices;manualConflicts:string[]};
 const canonical=(value:unknown):string=>JSON.stringify(value,(_,item)=>plain(item)?Object.fromEntries(Object.entries(item).sort(([a],[b])=>a.localeCompare(b))):item);
 const same=(a:unknown,b:unknown)=>canonical(a)===canonical(b);
@@ -100,6 +102,7 @@ function applicationContext(store:DecisionStore,request:LinkedAttachmentRequest)
   capacityReview:request.capacityReviewed&&solution?{source,solutionId:solution.id,version:currentSolutionVersion(solution).version,confirmedAdditionalCapacity:true}:null};
 }
 export async function previewLinkedAttachment(store:DecisionStore,request:LinkedAttachmentRequest,overrides:ApplicationChoices,project:ProjectPlanningBinding):Promise<LinkedAttachmentPreview>{
+ if(request.mixCommit)await verifyHomeMixCommit(request.mixCommit,store.getSnapshot().data.workspaces[request.draft.binding.goalId]?.fields[homeMixHistoryField],request.draft);
  const context=applicationContext(store,request),fields=store.getSnapshot().data.workspaces[request.draft.binding.goalId].fields,history=readAttachmentLinks(fields[linkedAttachmentField],fields);check(history,'Link history cannot be verified.');
  const physicalBinding=await project(planningDestination(fields));check(await resolveAttachedSourceBinding(request.draft.binding,physicalBinding,fields,project,request.preparedAt),'Evidence, unlinked planning inputs or prior history changed. Review the current plan context.');
  const unselected=await previewActionPlanApplication(context),choices:ApplicationChoices={},manualConflicts:string[]=[],links=history.entries.at(-1)?.links??[];
@@ -131,7 +134,7 @@ export async function commitLinkedAttachment(store:DecisionStore,preview:LinkedA
    const link:FieldLink={destination:row.destination,written:String(row.after),sourcePaths:sourcePaths(row),receiptId,ownerBindingKey:actionBindingKey(preview.request.draft.binding),ownerPreparedAt:preview.request.preparedAt,ownerSignature:preview.request.draft.signature,bundleId:preview.request.draft.bundle.id};const index=links.findIndex(item=>item.destination===row.destination);if(index<0)links.push(link);else links[index]=link;
   }
   history.entries.push({id:preview.request.attachmentId,preparedAt:preview.request.preparedAt,sourceBinding:preview.request.draft.binding,fromBinding:preview.physicalBinding,toBinding,attachmentId:preview.request.attachmentId,inputKey:bundleInputKey(preview.request.draft),destinationBefore:planningDestination(fields),destinationAfter:after,links,receiptId:preview.application.selectedChanges.length?receiptId:null});
-  const patch:Record<string,Json>={homeSolutionBundlesV1:next.homeSolutionBundlesV1,[linkedAttachmentField]:history as unknown as Json};
+  const patch:Record<string,Json>={homeSolutionBundlesV1:next.homeSolutionBundlesV1,[linkedAttachmentField]:history as unknown as Json,...(preview.request.mixCommit?{[homeMixHistoryField]:preview.request.mixCommit.history as unknown as Json}:{})};
   for(const field of ['development','workforceSolution',applicationHistoryField])if(!same(fields[field]??null,next[field]??null))patch[field]=next[field];
   check(readAttachmentLinks(patch[linkedAttachmentField],{...fields,...patch}),'The complete attachment transition cannot be verified.');
   check(isCurrent()&&same(store.getSnapshot().data,before)&&same(await project(planningDestination(fields)),preview.physicalBinding),'Context changed during attachment validation.');

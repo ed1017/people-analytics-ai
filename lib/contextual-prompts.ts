@@ -26,21 +26,29 @@ const pageExamples:Record<string,string> = {
   'talent-acquisition':topics[2].question,
   'survey-sentiment':topics[4].question,
   finance:topics[3].question,
-  'occupational-references':'What do the stored occupation mappings cover, and what should I verify?',
-  'labor-market':'What are the dates and scope of these labor-market observations?',
+  'occupational-references':'What tasks and skills describe the selected occupation, and how do its internal role requirements differ?',
+  'labor-market':'How do pay and employment compare for this occupation, and what does the national outlook show?',
   'training-coaching':'How do the simulated training quotes compare, and which costs remain unknown?',
   'development-planning':'Which costs come from selected quotes and which are my assumptions?',
 };
 const planningPages = new Set(['planning-overview','scenario-modeling','position-workforce-design','workforce-response','execution-feasibility','workforce-planning']);
 const readOnlyPages = new Set(['compensation','decision-brief','assess-evaluate']);
-export const homeGoalStarters = [
-  'Find issues worth tackling',
-  'Reduce turnover',
-  'What skills do we need?',
-  'Should we hire, train, or both?',
-  'Forecast turnover',
-  'Compare prediction methods',
+export const homeStarterGroups = [
+  {label:'Skills & growth',prompts:[
+    {label:'What skills are we missing?',prompt:'What skills are we missing in the current workforce, and which findings apply to the selected scope?'},
+    {label:'Where should we invest in training?',prompt:'Where should we invest in training based on recorded skill gaps and learning pathways, and which findings apply to the selected workforce scope?'},
+  ]},
+  {label:'Workforce challenges',prompts:[
+    {label:'Reduce turnover',prompt:'Reduce turnover'},
+    {label:'Improve satisfaction',prompt:'Improve employee satisfaction'},
+  ]},
+  {label:'Forecasts',prompts:[
+    {label:'Hiring',prompt:'Forecast hiring'},
+    {label:'Turnover',prompt:'Forecast turnover'},
+    {label:'Satisfaction',prompt:'Forecast satisfaction'},
+  ]},
 ] as const;
+export const homeGoalStarters = homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.prompt));
 export function hasKnownNumericEvidence(value:unknown):boolean {
   if(typeof value==='number')return Number.isFinite(value);
   if(!value||typeof value!=='object')return false;

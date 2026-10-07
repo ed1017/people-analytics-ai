@@ -1,12 +1,18 @@
 "use client";
+import {homeExitReasonChartFromPacket,homeExitReasonChartMatches,type HomeExitReasonChart as ExitReasonChartData} from '@/lib/home-exit-reason-chart';
+import {HomeExitReasonChart} from '@/components/home-exit-reason-chart';
+import {homeTurnoverFocus} from '@/lib/home-turnover-focus';
 import {homeTurnPurpose,homeEvidenceSelection} from '@/lib/home-conversation';
 import {HomeForecastChart} from '@/components/home-forecast-chart';
 import {homeForecastIntent} from '@/lib/home-forecast-intent';
 import {assumptionsGoalFromStatements,assumptionsOnlyBundle,unavailableSourceLabels} from '@/lib/home-assumptions-fallback';
 import {homePlanningNoteParts,resolveHomeUserGoal,workforceChoiceDiscoveryGoal} from '@/lib/home-planning-intent';
 import {HomePinnedGoals} from "@/components/home-pinned-goals";
+import {homeDemoField,readHomeDemo} from '@/lib/home-demo-catalog';
 import type {LocalGoal} from "@/lib/local-goals";
 import {HomeGettingStarted} from "@/components/home-getting-started";
+import {HomeDataStatus} from '@/components/home-data-status';
+import {DataLoadingStatus} from '@/components/data-loading-status';
 import {readHomeFindingFollowups,buildHomeFindingPrompt,type HomeFindingFollowup} from "@/lib/home-finding-followups";
 import {emptyOptionActions,isOptionActionLabel,type WorkforceOptionActions,type OptionAction} from "@/lib/workforce-option-actions";
 
@@ -17,7 +23,7 @@ import {revealJourneyTarget} from "@/components/workforce-journey-continue";
 import {decisionStore,recordDecisionEvidence,useDecisionStorage} from "@/components/decision-store";
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUp, RefreshCw, Info } from "lucide-react";
-import {PHONE_LAYOUT_QUERY} from "@/components/use-phone-layout";
+import {queueHomeResponseReveal} from '@/components/home-response-reveal';
 import {useHomeComposerDock} from '@/components/use-home-composer-dock';
 import {HomeSolutionBundles} from '@/components/home-solution-bundles';
 import type {BundleDiscussion} from '@/components/home-bundle-plans';
@@ -35,11 +41,11 @@ import {readSurveySource,refreshSurveySource} from '@/lib/survey-source-client';
 import { buildHomePack, homeDefinitions, readHomeSource } from "@/lib/home-pack.mjs";
 import type { DevelopmentSession } from "@/components/development-workspace";
 import { PromptExamples } from "@/components/prompt-examples";
-import { contextualPrompts } from "@/lib/contextual-prompts";
+import { contextualPrompts, homeStarterGroups } from "@/lib/contextual-prompts";
 import { HOME_ACTION_PLAN_LABEL, buildHomeActionPlanRequest } from "@/lib/home-decision-journey";
 import { completeScopedChatTurn } from "@/lib/chat-context-history";
 import { requestedHomeCountries, type CountryOption } from "@/lib/home-country-scope";
-import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
+import { getHomeChatHistory, withProblemContext } from "@/lib/problem-session";
 import type { ProblemConversation } from "@/components/problem-conversation";
 import type { AppPage, ChatMessage, Persona } from "@/lib/types";
 
@@ -61,7 +67,7 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
 const noActionSubscription=()=>()=>{};
 const noActionSnapshot=()=>emptyOptionActions;
 
-export function OverallOverviewPage({ optionActions, onStartDemo, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry, onEvidencePack, marketReference }: {
+export function OverallOverviewPage({ optionActions, onStartDemo, guidedExampleActive=false, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry, onEvidencePack, marketReference }: {
   optionActions?:WorkforceOptionActions;
   marketReference:unknown;
   onEvidencePack:(value:string)=>void;
@@ -70,10 +76,12 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   conversation: ProblemConversation;
   developmentSession: DevelopmentSession;
   onStartDemo: () => void;
+  guidedExampleActive?: boolean;
   workforceQuery: string; workforceScope: string;
   active: boolean; persona: Persona; onNavigate: (page: AppPage) => void;
 }) {
   const storage=useDecisionStorage();
+  const [instructionsDismissed,setInstructionsDismissed]=useState(0);
   const planner=useRef<HTMLDivElement>(null);
   const [planningReview,setPlanningReview]=useState<HomeCapacityRequest|null>(null);
   const [retentionEntry,setRetentionEntry]=useState<{id:string;sequence:number}|null>(null);
@@ -90,6 +98,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     setPlanningReview({context:planningContext,goalId:conversation.activeGoalId,goal:conversation.focusedIssue});
   }
   const [sourceResults, setSourceResults] = useState<Record<string, unknown>>({});
+  const exitReasonCharts=useRef(new Map<ChatMessage,{context:string;source:unknown;chart:ExitReasonChartData}>());
   const [loadedScope, setLoadedScope] = useState("");
   const [settledEvidenceKey,setSettledEvidenceKey]=useState("");
   const [evidenceRevision, setEvidenceRevision] = useState(0);
@@ -118,7 +127,6 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const [evidenceError, setEvidenceError] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(0);
   const { messages, setMessages, input, setInput, loading: chatLoading, setLoading: setChatLoading, error: chatError, setError: setChatError, problem: journey, questionUnanswered, setQuestionUnanswered, history: modelHistoryRef } = conversation;
-  const hasAnswer=messages.some(message=>message.role==="assistant");
   const optionSnapshot=useSyncExternalStore(optionActions?.subscribe??noActionSubscription,optionActions?.getSnapshot??noActionSnapshot,noActionSnapshot);
   const [suggestionPending,setSuggestionPending]=useState(false);
   const [localAction,setLocalAction]=useState<{goalId:string;notice:string}|null>(null);
@@ -140,6 +148,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const loadedAt = useRef(0);
   const composer = useRef<HTMLTextAreaElement>(null);
   const conversationViewport = useRef<HTMLDivElement>(null);
+  const responseReveal=useRef<ReturnType<typeof queueHomeResponseReveal>|null>(null);
+  useLayoutEffect(()=>()=>responseReveal.current?.cancel(),[]);
   const composerSlot=useRef<HTMLDivElement>(null),composerDock=useRef<HTMLDivElement>(null);
   useHomeComposerDock(active,composerSlot,composerDock,composer);
   useLayoutEffect(()=>{
@@ -158,7 +168,9 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const [pendingScope,setPendingScope] = useState<PendingScope|null>(null);
   const pendingScopeRef = useRef<PendingScope|null>(null);
   const visibleScopeChoice = scopeChoice?.identity===scopeIdentity && scopeChoice.query===workforceQuery && scopeChoice.message===input.trim() ? scopeChoice : null;
+  const previousPlanReset=useRef(conversation.resetEpoch);
   const clearResetState=useEffectEvent(()=>{
+    if(previousPlanReset.current!==conversation.resetEpoch){selectedPlanForChat.current?.discard();previousPlanReset.current=conversation.resetEpoch;}
     promptEpoch.current++;queuedSuggestion.current=null;sending.current=null;recentSuggestions.current.clear();liveFindingTurn.current=null;pendingScopeRef.current=null;
     setCandidate(null);setCandidateNotice('');setClarification(null);setPreparationUnavailable(null);setFindingTurn(null);setScopeChoice(null);setPendingScope(null);setSuggestionPending(false);setLocalAction(null);setPlanningReview(null);setPlanEdit(null);setEditPreview(null);setEditNotice('');setActionPin(null);setPlanOpen(null);selectedPlanForChat.current=null;
   });
@@ -208,7 +220,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   useEffect(()=>{const identity=()=>{const goals=decisionStore.getSnapshot().data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement])};let prior=identity();return decisionStore.subscribe(()=>{const next=identity();if(next!==prior){prior=next;promptEpoch.current++;liveFindingTurn.current=null;setCandidate(null);setClarification(null);setPreparationUnavailable(null);queuedSuggestion.current=null;setSuggestionPending(false);}})},[]);
   const planRequest = questionUnanswered ? null : buildHomeActionPlanRequest(conversation.focusedIssue ? {key:contextKey,firstQuestion:conversation.focusedIssue,latestQuestion:journey?.latestQuestion ?? conversation.focusedIssue} : journey, contextKey);
 
-  function applyPlanChanges(){try{if(!active||chatLoading||!ready||!conversation.saved||!planEdit||!editPreview||input.trim()!==editPreview.request||!planEdit.isCurrent())throw Error('The request or current context changed. Review it again.');planEdit.accept(editPreview);setInput('');setPlanEdit(null);setEditPreview(null);setEditNotice('');}catch(error){setEditNotice((error as Error).message);}}
+  function applyPlanChanges(){try{if(!active||chatLoading||!planEditReady||!conversation.saved||!planEdit||!editPreview||input.trim()!==editPreview.request||!planEdit.isCurrent())throw Error('The request or current context changed. Review it again.');planEdit.accept(editPreview);setInput('');setPlanEdit(null);setEditPreview(null);setEditNotice('');}catch(error){setEditNotice((error as Error).message);}}
   function focusQuestion() {
     window.requestAnimationFrame(() => { composer.current?.focus(); composer.current?.scrollIntoView({ block: "nearest" }); });
   }
@@ -218,16 +230,17 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false, responseIntent:'default'|'explanation'|'alternative'='default') {
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
+    if(message)setInstructionsDismissed(value=>value+1);
     const forecastQuestion = !actionPlan && Boolean(homeForecastIntent(message));
     if(forecastQuestion)responseIntent = 'explanation';
     if(!active||sending.current||currentEvidenceKey.current!==contextKey)return;
     const editIntent=bundleChatEditIntent(message),localEdit=editIntent.edit;
     if(!actionPlan&&!preserveDraft&&localEdit&&(selectedPlanForChat.current?.goalId===conversation.activeGoalId||editIntent.planReference)){
-      if(chatLoading||!conversation.saved||!ready)return;
+      if(chatLoading||!conversation.saved||!planEditReady)return;
       const target=selectedPlanForChat.current;
       if(!target||target.goalId!==conversation.activeGoalId){setLocalAction({goalId:conversation.activeGoalId,notice:'Select the intended Action Plan tab, then send this change again for review. Your request is kept; nothing has changed.'});return;}
       setLocalAction(null);setPlanEdit(target);
-      try{if(!target.isCurrent())throw Error('The selected plan or context changed. Select the intended Plan tab and send the change again.');setEditPreview(target.preview(message));setEditNotice('Review these changes before accepting. Nothing is saved or calculated.');}
+      try{if(!target.isCurrent())throw Error('The selected plan or context changed. Select the intended Plan tab and send the change again.');const answer=target.propose(message);setMessages(current=>[...current,{role:'user',content:message},{role:'assistant',content:answer}]);setInput('');setPlanEdit(null);setEditPreview(null);setEditNotice('');setChatError(null);requestAnimationFrame(()=>{const panel=conversationViewport.current?.querySelector<HTMLElement>('[aria-label="Action Plans for your goal"]');panel?.scrollIntoView({block:'start'});});}
       catch(error){setEditPreview(null);setEditNotice((error as Error).message);}
       requestAnimationFrame(()=>{editReview.current?.focus({preventScroll:true});editReview.current?.scrollIntoView({block:'nearest'});});return;
     }
@@ -251,12 +264,15 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     const sendTicket=Symbol();sending.current=sendTicket;const candidateEpoch=promptEpoch.current;if(!previousCandidate)setCandidate(null);setCandidateNotice('');setPreparationUnavailable(null);
     const request = conversation.beginRequest();
     const key = contextKey;
-    const history = getProblemChatHistory(modelHistoryRef.current, key);
+    const history = getHomeChatHistory(modelHistoryRef.current, key);
     const purpose=homeTurnPurpose(message,history),prepareGoal=responseIntent!=='explanation'&&(purpose==='goal'||purpose==='discovery');
     recordDecisionEvidence(conversation.activeGoalId,"home",pack);
-    const goalContext=actionPlan||retainGoalContext||forecastQuestion?conversation.goalContext:conversation.recordGoalStatement(message,"home",workforceScope);
+    const goalContext=actionPlan||retainGoalContext||forecastQuestion||Boolean(selectedPlanForChat.current?.goalId===conversation.activeGoalId)?conversation.goalContext:conversation.recordGoalStatement(message,"home",workforceScope);
     setMessages(current => [...current, { role: "user", content: actionPlan ? HOME_ACTION_PLAN_LABEL : message }]);
     if(!preserveDraft)setInput(""); setChatLoading(true); setChatError(null);
+    responseReveal.current?.cancel();
+    const reveal=queueHomeResponseReveal(()=>conversationViewport.current,()=>liveActive.current&&request.current()&&currentEvidenceKey.current===key&&candidateEpoch===promptEpoch.current);
+    responseReveal.current=reveal;
     if (!actionPlan) setQuestionUnanswered(true);
     try {
       const requestSelection=homeEvidenceSelection(message,history,conversation.focusedIssue),requestPack=buildHomePack(sourceResults,workforceScope,requestSelection,developmentSession);
@@ -264,6 +280,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       if (!request.current() || currentEvidenceKey.current !== key || candidateEpoch!==promptEpoch.current) return;
       const answer = reply.answer;
       const assistantMessage:ChatMessage={role:"assistant",content:answer};
+      const chart=homeExitReasonChartFromPacket(requestPack);
+      if(chart&&homeExitReasonChartMatches(answer,chart))exitReasonCharts.current.set(assistantMessage,{context:key,source:sourceResults['survey-sentiment'],chart});
       if(actionPlan)planRationale.current.set(assistantMessage,conversation.activeGoalId);
       const priorStatements=history.filter(item=>item.role==='user').map(item=>item.content);
       // Preserve chronological repetitions (including a restated goal after withdrawal).
@@ -288,14 +306,17 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       setMessages(current => [...current, assistantMessage]);
       modelHistoryRef.current = completeScopedChatTurn(key, history, message, reply.clarification?answer+'\n\n'+reply.clarification:answer);
       if (!actionPlan) { conversation.rememberQuestion(key, message); setQuestionUnanswered(false); }
-      window.requestAnimationFrame(() => { if(reply.proposal&&conversation.focusedIssue){const heading=conversationViewport.current?.querySelector<HTMLElement>('[aria-label="Investigation options for your goal"] h2');heading?.focus({preventScroll:true});heading?.scrollIntoView({block:'start'});return;} const viewport=conversationViewport.current,answers=viewport?.querySelectorAll<HTMLElement>('[data-chat-role="assistant"]'),answer=answers?.[answers.length-1]; if(viewport&&answer){if(window.matchMedia(PHONE_LAYOUT_QUERY).matches)requestAnimationFrame(()=>requestAnimationFrame(()=>answer.scrollIntoView({block:'start'})));else viewport.scrollTop+=answer.getBoundingClientRect().top-viewport.getBoundingClientRect().top;} });
       return Boolean(reply.proposal&&!reply.clarification);
     } catch (error) { if (!request.current() || currentEvidenceKey.current !== key || candidateEpoch!==promptEpoch.current) return; setChatError(error instanceof Error ? error.message : "Answer unavailable. Please try again."); if (!actionPlan&&!preserveDraft) setInput(current=>current.trim()?current:message); }
-    finally { if(sending.current===sendTicket)sending.current=null; if (request.current() && currentEvidenceKey.current === key) setChatLoading(false); }
+    finally { if(sending.current===sendTicket)sending.current=null; if (request.current() && currentEvidenceKey.current === key) { setChatLoading(false); reveal.complete(); } else reveal.cancel(); }
   }
 
   const sourcesSettled=!loading&&loadedScope===workforceQuery&&settledEvidenceKey===JSON.stringify({workforceQuery,workforceScope,refresh,persona});
+  const remoteSources=sources.filter(source=>source.id!=='I3'&&source.id!=='D1');
+  function refreshHomeData(){liveFindingTurn.current=null;loaded.current='';refreshSurveySource();setRefresh(value=>value+1);}
   const ready = Boolean(sources?.some(source => source.facts)) && !loading && loadedScope === workforceQuery;
+  const demoPlan=readHomeDemo(storage.data.workspaces[conversation.activeGoalId]?.fields[homeDemoField],conversation.activeGoalId);
+  const planEditReady=ready||Boolean(demoPlan&&demoPlan.example.goal===conversation.focusedIssue&&conversation.storageReady);
   function findingCurrent(turn:FindingTurn){
     const goals=decisionStore.getSnapshot().data.goals;
     return liveFindingTurn.current===turn&&active&&liveActive.current&&ready&&conversation.storageReady&&conversation.saved&&!conversation.issueEditor&&turn.context===contextKey&&currentEvidenceKey.current===turn.context&&turn.epoch===promptEpoch.current&&goals.activeId===turn.goalId&&(goals.goals.find(goal=>goal.id===goals.activeId)?.statement??'')===turn.goal&&messages.at(-1)===turn.message&&turn.sourceKey===candidateSourceKey(buildHomePack(sourceResults,workforceScope,turn.selectionGoal,developmentSession));
@@ -307,6 +328,10 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
     // Consume this exact response synchronously. Double clicks and stale closures cannot send twice.
     liveFindingTurn.current=null;setFindingTurn(null);
     void send(buildHomeFindingPrompt(verified),false,false,true,true,'explanation');
+  }
+  function renderExitReasonChart(message:ChatMessage){
+    const snapshot=exitReasonCharts.current.get(message);
+    return ready&&active&&snapshot&&snapshot.context===contextKey&&snapshot.source===sourceResults['survey-sentiment']?<HomeExitReasonChart chart={snapshot.chart}/>:null;
   }
   function renderFindingAction(message:ChatMessage,text:string){
     if(!findingTurn||findingTurn.message!==message||!findingCurrent(findingTurn))return null;
@@ -362,7 +387,9 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
   const candidateVerification=homeCandidateVerification(loading||settledEvidenceKey!==JSON.stringify({workforceQuery,workforceScope,refresh,persona}),storedCandidate,Boolean(savedCandidate),conversation.activeGoalId,conversation.focusedIssue,savedCandidatePack);
   const explorationChoices=candidateCurrent&&findingTurn?.message===candidate?.rationale&&findingTurn?.context===contextKey&&findingTurn.findings.length>0?<div className="flex flex-wrap items-center" aria-label="Optional finding exploration">{findingTurn.findings.map((item,index)=>{const sourceIds=[...new Set(item.evidence.map(reference=>reference.split(':')[0]))],label=sourceIds.map(id=>pack.sources.find(source=>source.id===id)?.label??id).join(' & ');return <span key={item.id} className="inline-flex items-center">{index>0&&<span aria-hidden="true" className="mx-2 h-3 border-l"/>}<button type="button" aria-label={`Explore finding: ${item.prompt}`} title={item.prompt} disabled={chatLoading||Boolean(input.trim())} onClick={()=>exploreFinding(findingTurn,item)} className="min-h-11 rounded text-xs text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Explore {label}</button></span>})}</div>:undefined;
   const showCandidatePin=!conversation.focusedIssue&&!hasCalculatedPlan&&reviewCandidateCurrent&&!showFallbackPin;
-  const candidatePanel=showCandidatePin&&candidate?.reviewRequired?<button type="button" className="min-h-11 rounded border px-3 py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring" disabled={chatLoading||!ready||!conversation.saved} onClick={reviewUserGoal}>Review goal</button>:!hasCalculatedPlan&&(conversation.focusedIssue||showCandidatePin)?<HomeCandidateOptions onFindAnother={!conversation.focusedIssue&&candidateCurrent&&candidate?.proposal&&!candidate.userGoal?findAnotherIssue:undefined} anotherBlocked={Boolean(input.trim())} explorationChoices={!conversation.focusedIssue?explorationChoices:undefined} planningChoice={candidate?.planningChoice} proposedGoal={!conversation.focusedIssue&&reviewCandidateCurrent?candidate!.userGoal:undefined} goal={conversation.focusedIssue} proposal={conversation.focusedIssue?savedCandidate?.proposal??null:candidateCurrent?candidate!.proposal:null} pack={conversation.focusedIssue?savedCandidatePack:buildHomePack(sourceResults,workforceScope,candidate?.selectionGoal??'',developmentSession)} busy={chatLoading||suggestionPending||!conversation.saved} ready={ready&&active} verification={candidateVerification==='checking'||candidateVerification==='unavailable'?candidateVerification:null} stale={candidateVerification==='stale'} onPin={pinProblem} onGenerate={()=>void send('Generate qualitative candidate options for my pinned goal using the current supplied evidence. Keep unsupported costs, timing and staffing unknown.',false,false,true)} onRefine={answer=>send(`Refine investigation options: ${answer}`,false,false,true)} onQuantify={compareWorkforceOptions} onNavigate={onNavigate}/>:null;
+  const prioritizeGoal=!conversation.focusedIssue&&showCandidatePin&&userGoalCurrent;
+  const turnoverFocus=prioritizeGoal&&candidate?.userGoal?homeTurnoverFocus(candidate.userGoal,buildHomePack(sourceResults,workforceScope,candidate.selectionGoal,developmentSession),workforceQuery):null;
+  const candidatePanel=showCandidatePin&&candidate?.reviewRequired?<button type="button" className="min-h-11 rounded border px-3 py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring" disabled={chatLoading||!ready||!conversation.saved} onClick={reviewUserGoal}>Review goal</button>:!hasCalculatedPlan&&(conversation.focusedIssue||showCandidatePin)?<HomeCandidateOptions turnoverFocus={turnoverFocus} focusBlocked={Boolean(input.trim())} onFocusGoal={submitQuestion} onFindAnother={!conversation.focusedIssue&&candidateCurrent&&candidate?.proposal&&!candidate.userGoal?findAnotherIssue:undefined} anotherBlocked={Boolean(input.trim())} explorationChoices={!conversation.focusedIssue&&!prioritizeGoal?explorationChoices:undefined} planningChoice={candidate?.planningChoice} proposedGoal={!conversation.focusedIssue&&reviewCandidateCurrent?candidate!.userGoal:undefined} goal={conversation.focusedIssue} proposal={conversation.focusedIssue?savedCandidate?.proposal??null:candidateCurrent?candidate!.proposal:null} pack={conversation.focusedIssue?savedCandidatePack:buildHomePack(sourceResults,workforceScope,candidate?.selectionGoal??'',developmentSession)} busy={chatLoading||suggestionPending||!conversation.saved} ready={ready&&active} verification={candidateVerification==='checking'||candidateVerification==='unavailable'?candidateVerification:null} stale={candidateVerification==='stale'} onPin={pinProblem} onGenerate={()=>void send('Generate qualitative candidate options for my pinned goal using the current supplied evidence. Keep unsupported costs, timing and staffing unknown.',false,false,true)} onRefine={answer=>send(`Refine investigation options: ${answer}`,false,false,true)} onQuantify={compareWorkforceOptions} onNavigate={onNavigate}/>:null;
   const finishScopeRequest = useEffectEvent((pending:PendingScope, cancel:boolean) => {
     if (pendingScopeRef.current!==pending) return;
     pendingScopeRef.current=null;setPendingScope(null);
@@ -389,15 +416,15 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
         <p className="text-sm text-muted-foreground">Describe a goal, compare options, build or adjust a plan, or ask a general workforce question.</p>
       </div>
 
-      <div className="mt-3"><PromptExamples prompts={contextualPrompts({page:"home",goal:conversation.focusedIssue,hasConversation:messages.some(message=>message.role==="user"),evidenceReady:ready,sources})} draft={input} busy={suggestionPending||chatLoading||!ready||!active} onDraft={submitQuestion}/></div>
+      <div className="mt-3"><PromptExamples groups={conversation.focusedIssue?undefined:homeStarterGroups} prompts={contextualPrompts({page:"home",goal:conversation.focusedIssue,hasConversation:messages.some(message=>message.role==="user"),evidenceReady:ready,sources})} draft={input} busy={suggestionPending||chatLoading||!ready||!active} onDraft={submitQuestion}/></div>
 
     </section>
   );
-  return <div className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-3">
+  return <div style={{overflowAnchor:'none'}} className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]"><section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-3">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <button type="button" onClick={resetHomeConversation} className="min-h-11 rounded px-2 text-xs font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Reset conversation</button>
         <h2 id="overall-overview-heading" className="sr-only">Home overview</h2>
-        <HomeGettingStarted busy={chatLoading} onNavigate={onNavigate} onStartDemo={onStartDemo} status={
+        <HomeGettingStarted busy={chatLoading||guidedExampleActive} dismissKey={JSON.stringify([instructionsDismissed,conversation.workspaceKey,guidedExampleActive])} onNavigate={onNavigate} onStartDemo={onStartDemo} status={
         <div className="ml-auto flex items-center gap-3 text-xs">
           <span className="text-muted-foreground">In development</span>
           <button type="button" popoverTarget="home-data-details" aria-label="Open data details" title="Data, scope and conversation history" className="flex min-h-11 items-center gap-1 rounded px-2 text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"><Info size={16}/><span>Data details</span>{!sourcesSettled&&<span role="status" aria-label="Evidence refresh status">Refreshing…</span>}</button>
@@ -405,8 +432,9 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
         </div>
         }/>
       </header>
+      <HomeDataStatus loading={!sourcesSettled} available={remoteSources.filter(source=>source.facts).length} total={remoteSources.length} error={evidenceError} onRefresh={refreshHomeData}/>
       <div id="home-data-details" popover="auto" role="dialog" aria-label="Data details" className="fixed inset-0 m-auto max-h-[80dvh] w-[min(60rem,92vw)] overflow-y-auto rounded-xl border bg-background p-5 text-sm text-foreground shadow-xl">
-        <button type="button" aria-label="Refresh overview evidence" disabled={loading||chatLoading} onClick={event=>{event.currentTarget.closest<HTMLElement>('[popover]')?.hidePopover();liveFindingTurn.current=null;loaded.current='';refreshSurveySource();setRefresh(value=>value+1);}} className="mb-3 flex min-h-11 items-center gap-2 rounded border px-3 py-2 focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18}/>Refresh evidence</button>
+        <button type="button" aria-label="Refresh overview evidence" disabled={loading||chatLoading} onClick={event=>{event.currentTarget.closest<HTMLElement>('[popover]')?.hidePopover();refreshHomeData();}} className="mb-3 flex min-h-11 items-center gap-2 rounded border px-3 py-2 focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18}/>Refresh evidence</button>
         <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">Data details</h2><button type="button" popoverTarget="home-data-details" popoverTargetAction="hide" className="min-h-11 rounded border px-3 focus-visible:ring-2 focus-visible:ring-ring">Close data details</button></div>
       <section aria-label="How filters affect evidence" className="mb-3 space-y-1 text-xs text-muted-foreground">
         <p><strong>Workforce snapshot [W1]:</strong> {sourcesSettled?workforceScope.replace(/^Selected workforce snapshot:\s*/, ''):'Refreshing scope; previous figures are not current.'} Only this source follows Country, Business Unit and Level.</p>
@@ -435,26 +463,24 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
       {active&&<WorkforceSolutionPanel hideEntry optionActions={optionActions} page="home" onNavigate={onNavigate}/>}
     </div>
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
-    <HomeSolutionBundles settled={sourcesSettled} chatChange={planEdit&&editPreview?{goalId:planEdit.goalId,planId:planEdit.id,inputKey:editPreview.inputKey,ready:!chatLoading&&ready&&conversation.saved&&input.trim()===editPreview.request,isCurrent:planEdit.isCurrent,apply:applyPlanChanges}:null} openRequest={planOpen} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} projectEvidence={destination=>buildHomePack(sourceResults,workforceScope,conversation.focusedIssue||conversation.problem?.latestQuestion||'',destination.development??developmentSession)} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={request=>{selectedPlanForChat.current=request;}}/>
-    {planEdit?.goalId===conversation.activeGoalId&&<div ref={editReview} tabIndex={-1}><HomeBundleChatReview target={planEdit} preview={editPreview} text={input} busy={chatLoading||!ready||!conversation.saved} notice={editNotice} onClose={()=>{setPlanEdit(null);setEditPreview(null);setEditNotice('');focusQuestion();}}/></div>}
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
-    {!hasAnswer&&!conversation.focusedIssue&&startingGuide}
-    {loading && <p role="status" className="text-sm text-muted-foreground">Loading available evidence for your questions.</p>}
-
-      {evidenceError && <p role="alert" className="mt-3 text-base text-destructive">{evidenceError}</p>}
-
-    {showFallbackPin&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
-    {messages.length > 0 && <section aria-label="Overview conversation" className="space-y-3">
-      <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona,conversation.resetEpoch])} onNavigate={onNavigate} home hideHistory collapsedRationale={message=>activePinnedGoal&&(planRationale.current.get(message)===conversation.activeGoalId||messages[messages.indexOf(message)-1]?.content===HOME_ACTION_PLAN_LABEL)} renderBulletAction={renderFindingAction} renderMessageSupplement={message=><HomeForecastChart question={messages[messages.indexOf(message)-1]?.role==='user'?messages[messages.indexOf(message)-1].content:''} answer={message.content}/>}/>
+    {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&startingGuide}
+    {showFallbackPin&&!chatLoading&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
+    {prioritizeGoal&&candidatePanel}
+    <section hidden={messages.length === 0} aria-label="Overview conversation" className="space-y-3">
+      <GoalConversationMessages messages={messages} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,active,workforceQuery,persona,conversation.resetEpoch,conversation.storageReady])} onNavigate={onNavigate} home hideHistory collapsedRationale={message=>activePinnedGoal&&(planRationale.current.get(message)===conversation.activeGoalId||messages[messages.indexOf(message)-1]?.content===HOME_ACTION_PLAN_LABEL)} renderBulletAction={renderFindingAction} renderMessageSupplement={message=><><HomeForecastChart question={messages[messages.indexOf(message)-1]?.role==='user'?messages[messages.indexOf(message)-1].content:''} answer={message.content}/>{renderExitReasonChart(message)}</>}/>
       {conversation.homeGoalChoiceKey === contextKey && !conversation.focusedIssue && <div role="group" aria-label="Choose a goal" className="flex flex-wrap gap-2">
         <p className="w-full text-sm text-muted-foreground">State your goal in your own words.</p>
         <button type="button" disabled={chatLoading} onClick={() => { conversation.setHomeGoalChoiceKey(null); focusQuestion(); }} className="min-h-11 rounded-lg border px-4 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">State my goal</button>
       </div>}
-      {chatLoading && <p role="status" className="text-base text-muted-foreground">Thinking with the available evidence…</p>}
+      {chatLoading && <DataLoadingStatus name="AI answer status" label="Preparing your answer…" detail="Using the available evidence and your question."/>}
       {chatError && <p role="alert" className="text-destructive">{chatError}</p>}
-    </section>}
+    </section>
 
-    {!conversation.focusedIssue&&candidatePanel}
+    <HomeSolutionBundles settled={sourcesSettled} chatChange={planEdit&&editPreview?{goalId:planEdit.goalId,planId:planEdit.id,inputKey:editPreview.inputKey,ready:!chatLoading&&planEditReady&&conversation.saved&&input.trim()===editPreview.request,isCurrent:planEdit.isCurrent,apply:applyPlanChanges}:null} openRequest={planOpen} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} projectEvidence={destination=>buildHomePack(sourceResults,workforceScope,conversation.focusedIssue||conversation.problem?.latestQuestion||'',destination.development??developmentSession)} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={request=>{selectedPlanForChat.current=request;}}/>
+    {planEdit?.goalId===conversation.activeGoalId&&<div ref={editReview} tabIndex={-1}><HomeBundleChatReview target={planEdit} preview={editPreview} text={input} busy={chatLoading||!planEditReady||!conversation.saved} notice={editNotice} onClose={()=>{setPlanEdit(null);setEditPreview(null);setEditNotice('');focusQuestion();}}/></div>}
+
+    {!conversation.focusedIssue&&!prioritizeGoal&&candidatePanel}
     {clarification?.context===contextKey&&<section aria-label="Clarify your goal" className="space-y-2 rounded border border-primary/40 p-3 text-sm"><p className="font-semibold">{clarification.question}</p><p>{userGoalCurrent?'You can pin your stated goal above. This question can refine the plan; unresolved details still need review.':'Reply in the chat below. Your original goal and constraints are kept; nothing is pinned or calculated.'}</p><button type="button" className="min-h-11 rounded border px-3 py-2 focus-visible:ring-2 focus-visible:ring-ring" onClick={focusQuestion}>Answer in chat</button></section>}
     {preparationUnavailable?.context===contextKey&&<section role="status" aria-label="Problem and options not prepared" className="space-y-1 rounded border p-3 text-sm"><p className="font-semibold">Problem and options not prepared</p><p>{showCandidatePin&&candidate?.userGoal&&!candidate.proposal?'No validated investigation options were prepared. You can still pin your own stated goal above to request Action Plan drafts.':'This answer has no validated problem and options to pin.'} Your work and drafts are kept; nothing was pinned or calculated. No retry runs automatically.</p><details><summary className="cursor-pointer py-1">Preparation details</summary><p>Stage: {preparationUnavailable.stage}. Reason: {preparationUnavailable.diagnostic.reason}. Field: {preparationUnavailable.diagnostic.field}. Candidate count (4 means 4 or more): {preparationUnavailable.diagnostic.optionCount}. Missing fields: {preparationUnavailable.diagnostic.missingFieldCount}.</p></details></section>}
     {candidateNotice&&<p role="status">{candidateNotice}</p>}
@@ -471,7 +497,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, active, person
         placeholder="Describe a goal, compare options, build or adjust a plan, or ask a general workforce question." className="max-h-80 min-h-28 w-full resize-y rounded-lg border bg-background/40 p-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
       <div className="home-compose-actions mt-2 flex items-end justify-between gap-3">
         <p hidden={showCandidatePin||Boolean(activePinnedGoal)} id="overview-question-context-tip" className="min-w-0 text-xs leading-4 text-muted-foreground">Ask a question or follow up on an answer. To plan an action, include your desired outcome, timeline and constraints.</p>
-        <button type="submit" aria-label="Send overview question" disabled={(!localCandidate&&!ready) || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
+        <button type="submit" aria-label="Send overview question" disabled={(!localCandidate&&!ready&&!(demoPlan&&planEditReady&&bundleChatEditIntent(input).edit)) || chatLoading || !input.trim()} className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Send <ArrowUp size={17} /></button></div>
       </div></div>
     </form>
       {actionOffers.length>0&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2 text-sm">Option action suggestions</summary><section aria-label="Workforce option actions" className="mt-3 space-y-2"><p className="text-sm text-muted-foreground">{input.trim()?'Your draft is kept. Clear it to choose an option action.':'Click to open the local action. Saving, calculation and search remain explicit.'}</p><div className="flex flex-wrap gap-2">{actionOffers.map(offer=><button key={offer.id} type="button" disabled={suggestionPending||chatLoading||Boolean(input.trim())} onClick={()=>submitOption(offer.id)} className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{offer.label}</button>)}</div></section></details>}

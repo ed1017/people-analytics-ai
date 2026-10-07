@@ -1,5 +1,5 @@
 /** One bounded local operation per worker. Abort/unmount terminates work and ignores late replies. */
-export function localWorkforceTask<T>(action: "bundle-adoption"|"search"|"select"|"preview"|"read"|"retain"|"cards"|"what-if"|"save-what-if"|"pin"|"resolve-pin",args: unknown,signal: AbortSignal): Promise<T> {
+export function localWorkforceTask<T>(action: "home-mix-history"|"home-mix-commit"|"home-mix"|"home-mix-read"|"bundle-adoption"|"search"|"select"|"preview"|"read"|"retain"|"cards"|"what-if"|"save-what-if"|"pin"|"resolve-pin",args: unknown,signal: AbortSignal): Promise<T> {
  return new Promise((resolve,reject)=>{
   if(signal.aborted){reject(Error("Local operation cancelled."));return}
   let worker: Worker;

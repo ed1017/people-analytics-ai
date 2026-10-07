@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getProblemChatHistory, rememberProblemQuestion, withProblemContext, boundSessionTranscript, ProblemRequestGate, validateFocusedIssue } from '../lib/problem-session.ts';
+import { getProblemChatHistory, getHomeChatHistory, rememberProblemQuestion, withProblemContext, boundSessionTranscript, ProblemRequestGate, validateFocusedIssue } from '../lib/problem-session.ts';
 import { getPlanningGuide, planningGuideSteps } from '../lib/planning-guide.ts';
 test('page change preserves bounded conversation but labels earlier answers as historical', () => {
   const prior={key:'Home evidence',messages:[{role:'user',content:'Improve feedback by Q3'},{role:'assistant',content:'Old scoped evidence'}]};
@@ -22,6 +22,13 @@ test('session memory is bounded without mutating prior transcript',()=>{
   const all=Array.from({length:60},(_,i)=>({role:'user',content:'q'+i}));
   assert.equal(boundSessionTranscript(all).length,40);assert.equal(all.length,60);
   assert.equal(getProblemChatHistory({key:'old',messages:all},'new').length,8);
+});
+test('Home evidence refresh retains user context and transcript without stale assistant claims',()=>{
+  const previous={key:'S2 timed out',messages:[{role:'user',content:'Budget 6000; use 20 participants'},{role:'assistant',content:'Exit-survey feedback is unavailable.'},{role:'user',content:'Use the current company-wide snapshot'}]},before=structuredClone(previous);
+  assert.deepEqual(getHomeChatHistory(previous,'S2 loaded'),[previous.messages[0],previous.messages[2]]);
+  assert.deepEqual(getHomeChatHistory(previous,previous.key),previous.messages);
+  assert.deepEqual(previous,before);
+  assert.equal(getHomeChatHistory({key:'old',messages:Array.from({length:20},(_,i)=>({role:'user',content:String(i)}))},'new').length,8);
 });
 test('Planning help preserves five core destinations and supports only relevant additions',()=>{
   assert.deepEqual(planningGuideSteps.map(s=>s.page),['planning-overview','scenario-modeling','position-workforce-design','workforce-response','execution-feasibility']);

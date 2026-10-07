@@ -293,6 +293,7 @@
 /* Shared visual rhythm for the manual Home and session-only development flow. */
 .home-workspace,
 .learning-development-page,
+.development-catalog,
 .development-planning {
   --development-surface: #15263e;
   --development-line: #3c5572;
@@ -340,8 +341,9 @@
 .development-quote strong { font-size: 1rem; line-height: 1.4; }
 .development-quote > span:nth-child(2) { color: #b6c5d8; font-size: 0.75rem; }
 .development-quote > span:last-child { color: var(--development-teal); border-top: 1px solid var(--development-line); padding-top: 0.75rem; margin-top: 1rem; }
-.development-quote:has(input:checked) { border-color: var(--development-teal); background: #153333; box-shadow: inset 0 3px 0 var(--development-teal); }
-.development-quote input[type="radio"] { accent-color: var(--development-teal); margin-top: 0.2rem; flex-shrink: 0; }
+.development-quote[aria-pressed="true"] { border-color: var(--development-teal); background: #153333; box-shadow: inset 0 3px 0 var(--development-teal); }
+.development-quote-control { display: inline-flex; align-items: center; justify-content: center; width: 1.25rem; height: 1.25rem; border: 2px solid currentColor; border-radius: 50%; margin-top: 0.1rem; flex-shrink: 0; line-height: 1; }
+.development-quote[aria-pressed="true"] .development-quote-control { color: var(--development-teal); }
 .development-control { min-height: 44px; border-radius: 0.6rem; border-color: #6f8aa8; padding: 0.65rem 0.75rem; font-size: 1rem; background: #0b1426; }
 .development-button { min-height: 44px; border-radius: 0.6rem; padding: 0.65rem 1rem; font-weight: 600; line-height: 1.4; border-color: #6f8aa8; }
 .development-primary { background: var(--development-teal); color: #0b1426; border-color: var(--development-teal); }
@@ -637,16 +639,17 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 
 /* Legacy custom surfaces use the same Light tokens as utility-based cards. */
 html[data-workspace-preference="light"] [data-workspace-palette]:not([data-workspace-palette="original-navy-teal"]) {
-  :is(.home-workspace, .learning-development-page, .development-planning) {
+  :is(.home-workspace, .learning-development-page, .development-catalog, .development-planning) {
     --development-surface: var(--card);
     --development-line: var(--border);
     --development-teal: #08765C;
   }
+  .development-catalog { --development-teal: #075A49; }
   .evidence-workspace { --evidence-line: var(--border); }
   :is(.home-workspace aside, .development-quote) { background: var(--card); }
   :is(.development-control, .evidence-workspace input:not([type="checkbox"]):not([type="radio"]), .evidence-workspace select, .evidence-workspace textarea) { background: #F3F7FC; color: var(--foreground); border-color: var(--border); }
   :is(.development-quote > span:nth-child(2), .development-option > p, .development-remove) { color: var(--muted-foreground); }
-  :is(.development-quote:has(input:checked), .development-option > p:has(strong), .development-option dl > div:last-child, .evidence-workspace .evidence-scope-notice) { background: var(--secondary); color: var(--foreground); }
+  :is(.development-quote[aria-pressed="true"], .development-option > p:has(strong), .development-option dl > div:last-child, .evidence-workspace .evidence-scope-notice) { background: var(--secondary); color: var(--foreground); }
   .development-primary { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
   .development-primary:hover:not(:disabled) { background: #174D90; }
   .evidence-workspace th { background: var(--muted); color: var(--foreground); }

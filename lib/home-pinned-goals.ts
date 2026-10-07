@@ -9,9 +9,12 @@ import {readBundleWorkspace,bundleWorkspaceField,type BundleWorkspace} from './h
 import {actionBindingKey,validActionBinding,type ActionBinding} from './home-action-drafts.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {bundleInputKey,type BundleDraft,type BundleResult} from './home-bundle-reconciliation.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {homeDemoField,readHomeDemo} from './home-demo-catalog.ts';
 
 export type PinnedGoalPlanStatus = 'saved' | 'none' | 'review';
 export function pinnedGoalPlanStatus(goalId:string,fields:Record<string,unknown>|undefined,packet:unknown):PinnedGoalPlanStatus {
+  if(readHomeDemo(fields?.[homeDemoField],goalId))return readBundleWorkspace(fields?.[bundleWorkspaceField],goalId)?.attachments.length?'saved':'review';
   const raw=fields?.[bundlePreparationField];
   if(raw!==undefined){
     const binding=raw&&typeof raw==='object'&&'binding' in raw?raw.binding:null;

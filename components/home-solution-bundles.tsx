@@ -1,6 +1,9 @@
 "use client";
 import {assumptionsFallbackField,readAssumptionsFallback} from '@/lib/home-assumptions-fallback';
 import {HomeAssumptionsFallback} from '@/components/home-assumptions-fallback';
+import {HomeDemoPlans} from '@/components/home-demo-plans';
+import {DataLoadingStatus} from '@/components/data-loading-status';
+import {homeDemoField,readHomeDemo} from '@/lib/home-demo-catalog';
 import {readBundleWorkspace,bundleWorkspaceField} from "@/lib/home-bundle-records";
 import {revealJourneyTarget} from "@/components/workforce-journey-continue";
 import {useEffect,useLayoutEffect,useRef,useState} from 'react';
@@ -26,6 +29,7 @@ export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,
  },[openRequest,active,goalId,goal]);
  const [bundleCache]=useState(()=>new Map<string,BundleSession>());
  const fields=storage.data.workspaces[goalId]?.fields??{},raw=fields[bundlePreparationField];
+ const demo=readHomeDemo(fields[homeDemoField],goalId);
  const plans=localInputs(goalId),planningKey=JSON.stringify(plans);
  const linkState=()=>{const current=decisionStore.getSnapshot().data.workspaces[goalId]?.fields;return JSON.stringify([current?.development??null,current?.[linkedAttachmentField]??null]);},linkKey=linkState();
  const evidenceMode=preparationEvidenceMode(raw),fingerprintPacket=(value:unknown)=>evidenceMode==='canonical'?canonicalHomeEvidence(value):value;
@@ -74,7 +78,7 @@ export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,
   else {if(outcome.status==='failed')setFailure({stage:outcome.diagnostic??'client_response',details:readBundleResponseDiagnostic(outcome.responseDiagnostic)});setNotice(outcome.status==='failed'?`Action Plan preparation failed. ${outcome.diagnostic==='delivery_required'?'A proposed plan contained only diagnostic activities; this goal requires a concrete proposed intervention. ':outcome.diagnostic==='duplicate_plans'?'The proposed alternatives repeated the same activities, responsible roles and sequence. Different titles alone are not distinct plans. ':''}Stage: ${outcome.diagnostic??'client_response'}. Your goal, previous draft and results are kept. No retry runs automatically.`:'The context changed. Your saved work is kept; prepare again explicitly.');}
  }
  useEffect(()=>{
-  if(pin?.id!==goalId||pin.sequence===consumed.current)return;
+  if(demo||pin?.id!==goalId||pin.sequence===consumed.current)return;
   if(pinContext.current?.sequence!==pin.sequence)pinContext.current={sequence:pin.sequence,identity};
   if(pinContext.current.identity!==identity||!active||!ready){consumed.current=pin.sequence;return;}
   // eslint-disable-next-line react-hooks/set-state-in-effect -- A newly received explicit Pin event starts its one coordinated external request.
@@ -83,10 +87,11 @@ export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[pin,goalId,binding,busy,active,ready,storage.saved,identity]);
  if(!goalId||!goal)return null;
+ if(demo)return <HomeDemoPlans key={goalId} goalId={goalId} goal={goal} active={active} busy={busy} openRequest={openRequest} chatChange={chatChange} onDiscuss={onDiscuss}/>;
  const disabled=busy||pending||!binding||!storage.saved||!active||!ready;
  return <section aria-label="Action Plans for your goal" className="space-y-3 break-words rounded-xl border border-primary/40 p-4 text-sm leading-relaxed">
   <h2 ref={heading} tabIndex={-1} className="text-lg font-semibold">Action Plans for your goal</h2><p>{goal}</p>
-  {pending&&<p role="status">Preparing coordinated Action Plans in one response…</p>}
+  {pending&&<DataLoadingStatus name="Action Plan preparation status" label="Preparing Action Plans…" detail="Your goal and saved plans are kept while choices are prepared."/>}
   {!ready&&<p role="status">Checking current evidence. Saved work is kept.</p>}
   {notice&&<p role="alert">{notice}</p>}
   {failure&&<details><summary className="min-h-11 cursor-pointer py-2">Preparation details</summary><p className="text-xs">Stage: {failure.stage}. {failure.details?bundleResponseDiagnosticText(failure.details):'Detailed response information is unavailable.'}</p></details>}

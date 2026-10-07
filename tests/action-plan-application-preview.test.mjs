@@ -88,7 +88,8 @@ test('unknown additional fees stay unknown, and numeric zero remains an occupied
   context.destination.development.options[0].inputs.hourlyCost = '0';
   const preview = await previewActionPlanApplication(context, {[path('hourlyCost')]: 'fill-empty', [path('additionalFees')]: 'replace'});
   assert.equal(row(preview, path('hourlyCost')).after, '0');
-  assert.equal(row(preview, path('hourlyCost')).conflict, true);
+  assert.equal(row(preview, path('hourlyCost')).conflict, false);
+  assert.equal(row(preview, path('hourlyCost')).status, 'blocked');
   assert.equal(row(preview, path('additionalFees')).proposed, null);
   assert.equal(row(preview, path('additionalFees')).after, '');
   assert.equal(row(preview, path('additionalFees')).status, 'missing');
@@ -163,8 +164,8 @@ test('unresolved overlap, partial membership, illustrative counts and out-of-ran
   }
 });
 
-test('only exact reviewed loaded USD/hour is offered, with original illustrative provenance', async () => {
-  const context = fixture(draft => {draft.inputs.capacity.origins.loadedHourlyCost = {kind: 'illustrative', basis: 'DEMO loaded hourly assumption.'};});
+test('legacy application snapshots retain their exact reviewed loaded USD/hour provenance', async () => {
+  const context = fixture(draft => {delete draft.inputs.costPolicy;draft.inputs.capacity.origins.loadedHourlyCost = {kind: 'illustrative', basis: 'DEMO loaded hourly assumption.'};});
   const preview = await previewActionPlanApplication(context, {[path('hourlyCost')]: 'fill-empty'});
   assert.equal(row(preview, path('hourlyCost')).after, '50');
   assert.equal(row(preview, path('hourlyCost')).provenance[0].kind, 'illustrative');
@@ -349,4 +350,10 @@ test('working edits during asynchronous fingerprinting cannot change the returne
   assert.equal(row(preview, 'development.options[0].quote').current.provider, original.destination.development.options[0].quote.provider);
   assert.equal(await actionPlanApplicationPreviewIsCurrent(preview, original), true);
   assert.equal(await actionPlanApplicationPreviewIsCurrent(preview, context), false);
+});
+
+test('new Action Plans cannot copy a staff hourly rate even when marked compatible',async()=>{
+ const context=fixture(),preview=await previewActionPlanApplication(context,{[path('hourlyCost')]:'replace'});
+ assert.equal(row(preview,path('hourlyCost')).proposed,null);assert.equal(row(preview,path('hourlyCost')).after,'');
+ assert.equal(row(preview,path('hourlyCost')).status,'blocked');
 });

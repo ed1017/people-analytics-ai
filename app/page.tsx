@@ -2,6 +2,7 @@
 
 import { contextualPrompts, hasKnownNumericEvidence } from "@/lib/contextual-prompts";
 import {usePlanningEvidenceValidation} from "@/components/use-planning-evidence-validation";
+import {DataLoadingStatus} from '@/components/data-loading-status';
 
 import {WorkforceOptionActions} from "@/lib/workforce-option-actions";
 import {WorkforceSolutionPanel} from "@/components/workforce-solution-panel";
@@ -43,6 +44,7 @@ import { AttritionPage } from "@/components/pages/attrition-page";
 import { CompensationPage } from "@/components/pages/compensation-page";
 import { FinancePage } from "@/components/pages/finance-page";
 import { IntelligencePage } from "@/components/pages/intelligence-page";
+import { OccupationalReference } from "@/components/occupational-reference";
 import { SkillsPage } from "@/components/pages/skills-page";
 import { GuidedDemo, GUIDED_EXAMPLE_PROMPT } from "@/components/guided-demo";
 import { DevelopmentCatalog, DevelopmentPlanning, emptyDevelopmentSession } from "@/components/development-workspace";
@@ -131,6 +133,7 @@ export default function Home() {
   const goalWorkspaceKeys = ["", ...conversation.goals.map(g=>g.id)].map(id=>conversation.workspaceKey.split(":")[0]+":"+id);
   const [demoActive, setDemoActive] = useState(false);
   const [developmentSession, setDevelopmentSession] = useGoalWorkspace(conversation.workspaceKey, goalWorkspaceKeys, emptyDevelopmentSession,"development");
+  const [occupationalEvidence, setOccupationalEvidence] = useState<unknown>(null);
   const [marketSelection,setMarketSelection]=useGoalWorkspace(conversation.workspaceKey,goalWorkspaceKeys,defaultMarketSelection,"marketSelection");
   const [marketCarry,setMarketCarry]=useGoalWorkspace<MarketCarry|null>(conversation.workspaceKey,goalWorkspaceKeys,emptyMarketCarry,"marketCarry");
   const [talentResponseEvidenceContext, setTalentResponseEvidenceContext] = useGoalWorkspace<string | null>(conversation.workspaceKey, goalWorkspaceKeys, emptyTalentContext,"talentContext");
@@ -701,7 +704,7 @@ export default function Home() {
 
   useEffect(() => {
     if (
-      (activePage !== "skills" && activePage !== "occupational-references") ||
+      activePage !== "skills" ||
       skillsData
     ) {
       return;
@@ -1215,7 +1218,7 @@ export default function Home() {
     setSelectedLevel("all");
   };
 
-  const catalogueContext = activePage === "occupational-references" ? { loading: skillsLoading, unavailable: Boolean(skillsError) || !skillsData, mappedJobProfiles: skillsData?.summary.onet_mapped_job_profiles, totalJobProfiles: skillsData?.summary.total_job_profiles } : activePage === "labor-market" ? { loading: blsLoading, unavailable: Boolean(blsError) || !blsData, metrics: blsData?.metrics,marketSelection } : activePage === "training-coaching" ? { quotes: [...developmentCatalog, ...developmentSession.custom], selected: developmentSession.selected, goal: developmentSession.goal } : null;
+  const catalogueContext = activePage === "occupational-references" ? { occupationalReference: occupationalEvidence } : activePage === "labor-market" ? { loading: blsLoading, unavailable: Boolean(blsError) || !blsData, metrics: blsData?.metrics,marketSelection } : activePage === "training-coaching" ? { quotes: [...developmentCatalog, ...developmentSession.custom], selected: developmentSession.selected, goal: developmentSession.goal } : null;
   const chatEvidence = intelligencePage ? { page: activePage, persona: selectedPersona, intelligenceContext: catalogueContext } : overviewData ? {
             persona: selectedPersona,
             page: planningWorkspaceActive
@@ -1569,7 +1572,8 @@ export default function Home() {
           } : null;
   const sourceState = activePage === "workforce" ? [workforceData, workforceLoading, workforceError] : activePage === "attrition" ? [attritionData, attritionLoading, attritionError] : activePage === "skills" ? [skillsData, skillsLoading, skillsError] : activePage === "learning-development" ? [learningDevelopmentData, learningDevelopmentLoading, learningDevelopmentError] : activePage === "career-mobility" ? [careerMobilityData, careerMobilityLoading, careerMobilityError] : activePage === "career-growth-mobility" ? [careerGrowthMobilityData, careerGrowthMobilityLoading, careerGrowthMobilityError] : activePage === "succession-planning" ? [successionCoverageData, successionCoverageLoading, successionCoverageError] : activePage === "talent-acquisition" ? [talentAcquisitionData, talentAcquisitionLoading, talentAcquisitionError] : activePage === "survey-sentiment" ? [surveySentimentData, surveySentimentLoading, surveySentimentError] : activePage === "finance" ? [financeData, financeLoading, financeError] : [planningData, planningLoading || positionModelingLoading, planningError || positionModelingError];
   const chatEvidenceReady = activePage === "development-planning" ? true : intelligencePage ? true : !readOnlyChatPage && Boolean(overviewData) && !dashboardLoading && !dashboardError && !sourceState[1] && Boolean(sourceState[0]) && !sourceState[2];
-  const suggestedPrompts = contextualPrompts({page:activePage,goal:conversation.focusedIssue,hasConversation:chatMessages.some(message=>message.role==="user"),evidenceReady:intelligencePage ? activePage==="occupational-references" ? !skillsLoading&&!skillsError&&Boolean(skillsData) : activePage==="labor-market" ? !blsLoading&&!blsError&&Boolean(blsData) : developmentSession.selected.length>0 : activePage==="development-planning" ? developmentSession.options.length>0 : chatEvidenceReady&&hasKnownNumericEvidence(sourceState[0])});
+  const pageDataLoading = activePage==='overview'?dashboardLoading:activePage==='occupational-references'?!occupationalEvidence:activePage==='labor-market'?blsLoading:['workforce','attrition','skills','learning-development','career-mobility','career-growth-mobility','succession-planning','talent-acquisition','survey-sentiment','finance','planning-overview','scenario-modeling','position-workforce-design','workforce-response','execution-feasibility','workforce-planning'].includes(activePage)&&Boolean(sourceState[1]);
+  const suggestedPrompts = contextualPrompts({page:activePage,goal:conversation.focusedIssue,hasConversation:chatMessages.some(message=>message.role==="user"),evidenceReady:intelligencePage ? activePage==="occupational-references" ? Boolean(occupationalEvidence) : activePage==="labor-market" ? true : developmentSession.selected.length>0 : activePage==="development-planning" ? developmentSession.options.length>0 : chatEvidenceReady&&hasKnownNumericEvidence(sourceState[0])});
   const currentSource = sourceState[0];
   const sourceRecord = currentSource && typeof currentSource === "object" ? currentSource as Record<string, unknown> : null;
   const movementSource = sourceRecord?.source;
@@ -1585,7 +1589,7 @@ export default function Home() {
     const priority=/turnover|retention|attrition/i.test(conversation.focusedIssue)?["A1","S1","T1","T2"]:["T1","T2","A1","S1"];
     return priority.map(id=>packet.pack.sources.find((source:{id:string})=>source.id===id)).filter((source:{page:string;facts:unknown}|undefined)=>source&&source.page!==activePage&&source.facts).slice(0,3);
   },[homeEvidencePacket,conversation.workspaceKey,conversation.focusedIssue,activePage]);
-  const summaryEvidenceReady = intelligencePage ? activePage!=="occupational-references"||(!skillsLoading&&Boolean(skillsData)) : chatEvidenceReady;
+  const summaryEvidenceReady = intelligencePage ? activePage!=="occupational-references"||Boolean(occupationalEvidence) : chatEvidenceReady;
   const goalSummaryPayload = {...JSON.parse(chatEvidenceKey),goalEvidenceContext:relatedGoalEvidence,marketReference:marketCarry};
   // This client-only key tracks request validity; it adds nothing to model inputs.
   const sectionRequestContextKey = JSON.stringify([chatEvidenceKey, relatedGoalEvidence, marketCarry, conversation.focusedIssue, chatEvidenceReady, conversation.resetEpoch]);
@@ -1888,12 +1892,13 @@ export default function Home() {
 
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
+        {pageDataLoading&&<div className="m-4"><DataLoadingStatus/></div>}
         {activePage!=="home"&&<WorkforceSolutionPanel optionActions={optionActions} page={activePage} onNavigate={setActivePage}/>}
         {!["home","decision-brief","assess-evaluate","compensation"].includes(activePage)&&<p className="px-6 pt-3 text-xs text-muted-foreground" aria-label="Evidence type">{evidenceTrustLabel(activePage)}</p>}
         {demoActive && <GuidedDemo page={activePage} onNavigate={setActivePage} onClose={() => {setDemoActive(false);requestAnimationFrame(()=>document.getElementById("overview-question")?.focus());}} canUsePrompt={conversation.storageReady&&conversation.saved&&!conversation.loading&&!conversation.focusedIssue&&!conversation.input.trim()} onUsePrompt={() => {if(activePage!=="home"||!conversation.storageReady||!conversation.saved||conversation.loading||conversation.focusedIssue||conversation.input.trim())return;conversation.startNewProblem(GUIDED_EXAMPLE_PROMPT);requestAnimationFrame(()=>document.getElementById("overview-question")?.focus());}} />}
-        <div hidden={activePage !== "home"}><OverallOverviewPage optionActions={optionActions} marketReference={marketCarry} onEvidencePack={setHomeEvidencePacket} countryOptions={filterOptions.countries} onCountry={setSelectedCountry} developmentSession={developmentSession} conversation={conversation} onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></div>
+        <div hidden={activePage !== "home"}><OverallOverviewPage guidedExampleActive={demoActive} optionActions={optionActions} marketReference={marketCarry} onEvidencePack={setHomeEvidencePacket} countryOptions={filterOptions.countries} onCountry={setSelectedCountry} developmentSession={developmentSession} conversation={conversation} onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></div>
         {planningWorkspaceActive && marketCarry && <CarriedMarketReference carry={marketCarry} onClear={()=>setMarketCarry(null)}/>}
-        {activePage === "decision-brief" ? <DecisionBrief key={conversation.workspaceKey} conversation={conversation} onNavigate={setActivePage}/> : activePage === "assess-evaluate" ? <section className="p-6"><h2 className="text-lg font-semibold">Coming soon</h2><p className="mt-3 text-muted-foreground">A future space to compare agreed targets with observed outcomes. No scorecard, predicted impact or ROI is calculated here.</p></section> : activePage === "home" ? null : intelligencePage ? <IntelligencePage page={activePage as "occupational-references" | "labor-market" | "training-coaching"} skills={skillsData} skillsLoading={skillsLoading} bls={blsData} blsLoading={blsLoading} blsError={blsError} market={<MarketComparison selection={marketSelection} onChange={setMarketSelection} goal={conversation.focusedIssue} onCarry={carry=>{recordDecisionEvidence(conversation.activeGoalId,"labor-market",marketCarryEvidence(carry));setMarketCarry(carry);setActivePage("planning-overview");}} />} catalog={<DevelopmentCatalog session={developmentSession} onChange={setDevelopmentSession} onOpen={() => setActivePage("development-planning")} />} /> : activePage === "compensation" ? (
+        {activePage === "decision-brief" ? <DecisionBrief key={conversation.workspaceKey} conversation={conversation} onNavigate={setActivePage}/> : activePage === "assess-evaluate" ? <section className="p-6"><h2 className="text-lg font-semibold">Coming soon</h2><p className="mt-3 text-muted-foreground">A future space to compare agreed targets with observed outcomes. No scorecard, predicted impact or ROI is calculated here.</p></section> : activePage === "home" ? null : intelligencePage ? <IntelligencePage page={activePage as "occupational-references" | "labor-market" | "training-coaching"} occupational={<OccupationalReference onEvidenceChange={setOccupationalEvidence} />} bls={blsData} blsLoading={blsLoading} blsError={blsError} market={<MarketComparison selection={marketSelection} onChange={setMarketSelection} goal={conversation.focusedIssue} onCarry={carry=>{recordDecisionEvidence(conversation.activeGoalId,"labor-market",marketCarryEvidence(carry));setMarketCarry(carry);setActivePage("planning-overview");}} />} catalog={<DevelopmentCatalog session={developmentSession} onChange={setDevelopmentSession} onOpen={() => setActivePage("development-planning")} />} /> : activePage === "compensation" ? (
           <CompensationPage scope={{country: selectedCountry, org: selectedOrg, level: selectedLevel}} />
         ) : activePage === "development-planning" ? (
           <DevelopmentPlanning session={developmentSession} onChange={setDevelopmentSession} onCatalog={() => setActivePage("training-coaching")} />

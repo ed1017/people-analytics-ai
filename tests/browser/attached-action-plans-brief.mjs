@@ -1,5 +1,6 @@
 // Built Decision Brief with validated synthetic attachment history; no live services.
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {bundleProposalFixture} from '../fixtures/home-bundles.mjs';
 import {createBundleDraft,reviseBundleDraft,bundleInputKey} from '../../lib/home-bundle-reconciliation.ts';
 import {attachBundlePatch,saveBundleDraftPatch} from '../../lib/home-bundle-records.ts';
@@ -28,13 +29,18 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  const load=async value=>{await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:DECISIONS_STORAGE_KEY,value:encodeDecisions(value)});await page.reload();await open()};
  await page.goto(base);await load(seed);
  check(mode+' latest snapshot is visible and prior version collapsed',await panel().getByRole('article').filter({visible:true}).count()===1&&await panel().getByText('Attached 2026-10-05 · Latest attached version',{exact:true}).isVisible());
- check(mode+' changed goal is historical and missing totals remain unknown',await panel().getByText('Goal wording has changed since this attachment.',{exact:true}).first().isVisible()&&await panel().getByText(/Snapshot cash: Unknown. Employee time value: Unknown/).first().isVisible());
+ check(mode+' changed goal is historical and missing totals remain unknown',await panel().getByText('Goal wording has changed since this attachment.',{exact:true}).first().isVisible()&&await panel().getByText(/Snapshot cash: Unknown. Staff hours: Unknown/).first().isVisible());
  await panel().getByText('Previous attached versions',{exact:true}).click();check(mode+' prior immutable version can be inspected',await panel().getByRole('article').filter({visible:true}).count()===2&&await panel().getByText('Attached 2026-10-05 · Previous attached version',{exact:true}).isVisible());
  check(mode+' decision owner and explicit notes preserved',await page.getByLabel(/^Decision owner \(optional\)/).inputValue()==='Keep owner'&&await page.getByRole('region',{name:'Explicit approvals'}).getByText(/A separate review note/).isVisible());
  check(mode+' responsive snapshot and history fit page',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  const bad=structuredClone(seed);bad.workspaces.a.fields.homeSolutionBundlesV1.attachments[1].result.cashTotal=123;
  await load(bad);check(mode+' corrupt result withheld and saved bytes retained',await panel().getByRole('status').getByText(/cannot be verified/).isVisible()&&await panel().getByRole('article').count()===0&&await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload.workspaces.a.fields.homeSolutionBundlesV1.attachments[1].result.cashTotal,DECISIONS_STORAGE_KEY)===123);
  const wrong=structuredClone(seed);wrong.workspaces.a.fields.homeSolutionBundlesV1.goalId='b';await load(wrong);check(mode+' cross-goal records are withheld',await panel().getByRole('status').isVisible()&&await panel().getByRole('article').count()===0);
+ const legacy=JSON.parse(readFileSync(new URL('../fixtures/home-plan-legacy-costs.json',import.meta.url))),legacyId=legacy.base.binding.goalId;
+ const legacySeed={version:1,revision:1,goals:{version:1,activeId:legacyId,goals:[{id:legacyId,statement:legacy.base.binding.goal}]},workspaces:{[legacyId]:{savedAt:'2026-10-06T12:05:00Z',fields:{homeSolutionBundlesV1:legacy.workspace,homePlanRevisionsV1:legacy.history}}}};
+ await load(legacySeed);
+ check(mode+' saved all-in snapshot displays cash headroom and hours without time pricing',await panel().getByText(/Staff hours: 36/).isVisible()&&await panel().getByText(/\$2,500 USD headroom/).isVisible()&&!/Employee time value|\$2,700|\$6,200/.test(await panel().innerText()));
+ check(mode+' legacy stored snapshot remains byte-for-byte unchanged',await page.evaluate(({key,id,expected})=>JSON.stringify(JSON.parse(localStorage.getItem(key)).payload.workspaces[id].fields.homeSolutionBundlesV1)===expected,{key:DECISIONS_STORAGE_KEY,id:legacyId,expected:JSON.stringify(legacy.workspace)}));
  check(mode+' no model calls or runtime errors',posts===0&&errors.length===0);await context.close();
 }}finally{await browser.close()}
 console.log(JSON.stringify({checks}));
