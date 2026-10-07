@@ -1,0 +1,6 @@
+// Representative aggregate contract: reason categories and experience scores are
+// separate measures. The similar work-life percentage must never connect them.
+export const exitReasonSurvey={as_of:'2026-09-30',summary:{exit_respondents:1957},
+ exit_reasons:[{primary_reason:'Work-Life Balance',exits:244,pct_of_exit_responses:12.5},{primary_reason:'Manager',exits:243,pct_of_exit_responses:12.4},{primary_reason:'New Opportunity',exits:242,pct_of_exit_responses:12.4},{primary_reason:'Compensation',exits:236,pct_of_exit_responses:12.1}],
+ exit_dimensions:[{survey_code:'EXIT',question_code:'WORK_LIFE',question_text:'My workload supported reasonable work-life balance.',separation_respondents:1957,favorable_pct:87.5},{survey_code:'EXIT',question_code:'RECOMMEND',question_text:'I would recommend the organization as a place to work.',separation_respondents:1957,favorable_pct:68.5},{survey_code:'EXIT',question_code:'MANAGER',question_text:'I had a positive relationship with my manager.',separation_respondents:1957,favorable_pct:58.9}]};
+export const exitMissingFieldsBullet='- The available evidence does not provide respondent-level detail, subgroup breakdowns, a fieldwork period, or a comparison with non-exiting employees, so stronger retention conclusions are unavailable. [S2]';

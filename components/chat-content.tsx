@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import type { AppPage } from "@/lib/types";
 import { getChatNavigationAction } from "@/lib/chat-navigation";
+import {homeAnswerPresentation} from '@/lib/home-answer-presentation';
 
 function renderInlineMarkdown(
   value: string,
@@ -117,7 +118,8 @@ export function ChatContent({
 }) {
   const references: string[] = [];
   const citationTargets = new Map<string,string>();
-  const answer = content.replace(/\(?\[[A-Z]+\d+\](?:[, ]+\[[A-Z]+\d+\])*\s+See\s+\[[^\]\n]+\]\(app:[a-z-]+\)\.?\)?/gi, reference => {
+  const presentation=compact?homeAnswerPresentation(content):{answer:content,details:[]};
+  const answer = presentation.answer.replace(/\(?\[[A-Z]+\d+\](?:[, ]+\[[A-Z]+\d+\])*\s+See\s+\[[^\]\n]+\]\(app:[a-z-]+\)\.?\)?/gi, reference => {
     const href = reference.match(/\]\((app:[a-z-]+)\)/)?.[1];
     if (!onNavigate || !href || !getChatNavigationAction(href)) return reference;
     references.push(reference);
@@ -296,6 +298,7 @@ export function ChatContent({
   return (
     <div className={compact ? "home-answer text-sm leading-[1.5]" : "space-y-2 leading-relaxed"}>
       {rendered}
+      {presentation.details.length>0&&<details data-answer-evidence-details className="mt-2 text-xs text-muted-foreground"><summary className="min-h-6 cursor-pointer rounded focus-visible:ring-2 focus-visible:ring-ring">Evidence details</summary>{presentation.details.map((detail,index)=><p key={index} className="mt-1">{renderInlineMarkdown(detail,onNavigate,citationTargets)}</p>)}</details>}
       {references.length > 0 && <aside aria-label="Answer sources" className="mt-2 space-y-0.5 border-t border-border/40 pt-1">
         {references.map((reference, referenceIndex) => <div key={referenceIndex} className="text-[11px] leading-relaxed">{renderInlineMarkdown(reference, onNavigate, citationTargets)}</div>)}
       </aside>}

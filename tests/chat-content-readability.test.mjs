@@ -7,6 +7,8 @@ import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {createRequire} from 'node:module';
 import * as navigation from '../lib/chat-navigation.ts';
+import * as presentation from '../lib/home-answer-presentation.ts';
+import {exitMissingFieldsBullet} from './fixtures/exit-reason-packet.mjs';
 import {homeStarterGroups,homeGoalStarters} from '../lib/contextual-prompts.ts';
 import {homeTurnPurpose} from '../lib/home-conversation.ts';
 import {homeForecastIntent} from '../lib/home-forecast-intent.ts';
@@ -14,7 +16,7 @@ const require=createRequire(import.meta.url);
 function component(file,name){
  const exports={},source=fs.readFileSync(new URL('../components/'+file,import.meta.url),'utf8');
  const js=ts.transpileModule(source,{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
- vm.runInNewContext(js,{exports,require:name=>name==='@/lib/chat-navigation'?navigation:require(name)});return exports[name];
+ vm.runInNewContext(js,{exports,require:name=>name==='@/lib/chat-navigation'?navigation:name==='@/lib/home-answer-presentation'?presentation:require(name)});return exports[name];
 }
 const ChatContent=component('chat-content.tsx','ChatContent'),PromptExamples=component('prompt-examples.tsx','PromptExamples');
 const render=(content,options={})=>renderToStaticMarkup(React.createElement(ChatContent,{content,...options}));
@@ -67,4 +69,21 @@ test('categorical comparisons render semantic nested bullets with inline source 
 test('exit reason chart renders a zero-based count axis with explicit S2 denominator, date and limits',()=>{
  const Chart=component('home-exit-reason-chart.tsx','HomeExitReasonChart'),chart={source:'S2',date:'2026-09-30',respondents:50,rows:[{reason:'Work-Life Balance',count:20,percentage:40},{reason:'Manager',count:15,percentage:30},{reason:'New Opportunity',count:10,percentage:20}]};
  const html=renderToStaticMarkup(React.createElement(Chart,{chart}));assert.match(html,/count axis from 0 to 20/);assert.match(html,/50.*exit-survey respondents/);assert.match(html,/Company-wide.*As of.*2026/);assert.match(html,/Source S2/);assert.equal((html.match(/data-reason-bar=/g)??[]).length,3);assert.match(html,/20.*40.*%/);assert.match(html,/fieldwork period.*unavailable/);assert.match(html,/do not establish causes or workforce turnover rates/);
+});
+
+test('known standalone missing-fields inventory moves into collapsed detail while factual answer and qualifiers stay visible',()=>{
+ const main='These are reported primary reasons, not proven causes.\n- Work-Life Balance: 244 respondents (12.5%). [S2]\n- No month-specific reason breakdown is supplied. [S2]';
+ const content=main+'\n'+exitMissingFieldsBullet+'\n'+exitMissingFieldsBullet;
+ const result=presentation.homeAnswerPresentation(content);assert.equal(result.answer.trim(),main);assert.equal(result.details.length,1);
+ const html=render(content,{compact:true});assert.equal((html.match(/data-chat-item="true"/g)??[]).length,2);assert.match(html,/<details data-answer-evidence-details=/);assert.doesNotMatch(html,/<details[^>]* open/);
+ assert.ok(html.indexOf('244')<html.indexOf('<details'));assert.ok(html.indexOf('No month-specific')<html.indexOf('<details'));assert.ok(html.indexOf('stronger retention')>html.indexOf('<details'));
+ assert.match(html,/<summary[^>]*>Evidence details<\/summary>/);assert.equal((html.match(/stronger retention/g)??[]).length,1);
+ assert.doesNotMatch(render(content),/data-answer-evidence-details/);
+});
+
+test('missing requested evidence, denominator differences, demo labels and substantive limitations never disappear',()=>{
+ for(const content of [exitMissingFieldsBullet,'- Respondent-level exit reasons are unavailable. [S2]','- These are simulated figures, not observed outcomes. [S2]','- The available evidence does not provide monthly exit counts, subgroup breakdowns, a fieldwork period, or a comparison with non-exiting employees, so stronger retention conclusions are unavailable. [S2]','- Exit-survey respondents and all separations have different denominators. [S2] [A1]']){
+  assert.deepEqual(presentation.homeAnswerPresentation(content),{answer:content,details:[]});
+  assert.deepEqual(presentation.homeAnswerPresentation('One useful fact.\n'+content.replace('The available evidence','The available evidence includes 42 respondents and does not')), {answer:'One useful fact.\n'+content.replace('The available evidence','The available evidence includes 42 respondents and does not'),details:[]});
+ }
 });

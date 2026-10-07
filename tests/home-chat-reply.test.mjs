@@ -36,3 +36,10 @@ test('a valid clarification survives invalid quantified problem without validati
  assert.equal(reply.candidateProposal,null);assert.equal(reply.candidateDiagnostic.reason,'invalid_problem');assert.equal(reply.clarification,question);assert.equal(reply.nextStep,'none');
  for(const question of ['','x'.repeat(201),'Which? What?',42])assert.equal(decodeHomeModelReply(JSON.stringify({answer:'Answer',next_step:'none',question}),false,pack).clarification,null);
 });
+
+test('answer style omits generic absent-field lists and groups values without hiding material qualifications',()=>{
+ for(const prompt of ['exit survey reasons','Explain exit survey results in detail']){
+  const style=homeResponseStyle(prompt).instructions;
+  for(const term of ['Lead with the answer','Do not add a standalone limitations-only bullet','Missing requested evidence must still be stated plainly','Retain demo/simulated provenance','Never infer stated exit reasons from unfavorable','one indented sub-bullet per value','When the user explicitly asks about limitations'])assert.ok(style.includes(term),term);
+ }
+});

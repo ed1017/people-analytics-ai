@@ -10,6 +10,7 @@ export function HomeExitReasonChart({chart}:{chart:ChartData}){
    {chart.rows.map(row=><div key={row.reason}><div className="mb-0.5 flex flex-wrap justify-between gap-x-2"><span>{row.reason}</span><span className="tabular-nums">{fmt(row.count)} ({row.percentage}%)</span></div><div className="h-3 border-l border-foreground/60 bg-muted/40"><div data-reason-bar data-count={row.count} className="h-full bg-primary" style={{width:`${row.count/axisMax*100}%`}}/></div></div>)}
    <div className="flex justify-between border-t border-foreground/60 pt-1 tabular-nums"><span>0</span><span>{fmt(axisMax/2)}</span><span>{fmt(axisMax)}</span></div><p className="text-center">Reported responses (count)</p>
   </div>
-  <p className="text-muted-foreground">Leading supplied reasons; fieldwork period and suppression metadata are unavailable. Reported associations do not establish causes or workforce turnover rates.</p>
+  <p className="text-muted-foreground">Reported reasons, not proven causes.</p>
+  <details className="text-muted-foreground"><summary className="min-h-6 cursor-pointer rounded focus-visible:ring-2 focus-visible:ring-ring">Evidence details</summary><p className="mt-1">Leading supplied reasons; fieldwork period and suppression metadata are unavailable. Reported associations do not establish causes or workforce turnover rates.</p></details>
  </figure>;
 }

@@ -42,7 +42,7 @@ const numberWords=['zero','one','two','three','four','five','six','seven','eight
 const monthNames=['january','february','march','april','may','june','july','august','september','october','november','december'];
 function budgetClause(raw:string):{amount:string;basis:'cash'|'all-in'|null}|null{
  const clause=raw.trim().replace(/[.!?]$/,'').replace(/^(?:please\s+|(?:can|could|would)\s+(?:you|we)\s+)/i,'');
- const match=clause.match(/^(?:(?:(?:i|we)\s+)?(?:have|only have)\s+(?:a\s+)?|(?:(?:my|our|the)\s+)?|(?:set|change|update|lower|raise|increase|decrease|reduce)\s+(?:the\s+)?)(?:(cash|all-in|total|overall|plan)\s+)?budget(?:\s+(?:ceiling|limit))?\s*(?:of|is|to|=|:)\s*(.+)$/i)
+ const match=clause.match(/^(?:(?:(?:i|we)\s+)?(?:have|only have)\s+(?:a\s+)?|(?:(?:my|our|the|a)\s+)?|(?:set|change|update|lower|raise|increase|decrease|reduce)\s+(?:the\s+)?)(?:(cash|all-in|total|overall|plan)\s+)?budget(?:\s+(?:ceiling|limit))?\s*(?:of|is|to|=|:)\s*(.+)$/i)
   ??clause.match(/^(?:(?:i|we)\s+)?(?:can spend|can afford)\s+()(.+)$/i);
  if(!match)return null;
  let amount=match[2],basis:'cash'|'all-in'|null=match[1]?.toLowerCase()==='cash'?'cash':match[1]?.toLowerCase()==='all-in'?'all-in':null;
@@ -119,7 +119,10 @@ export function previewBundleChatEdit(draft:BundleDraft,request:string,selection
   return {inputKey:bundleInputKey(draft),request,inputs:completed,changes:[{field:'Delivery estimate assumptions',before:{value:null,kind:'unknown',basis:null},after:{value:'2 hours per participant, 8 coordination hours per component, $60 per hour and proposed acceptance criteria',kind:'illustrative',basis:'Proposed local assumptions; review before applying.'}}]};
  }
  const editRequest=selectedPlanRequest(request,selection).trim().replace(/\.\s+Keep (?:all )?other assumptions unchanged\.?$/i,'');
- const clauses=editRequest.split(/;|\n|\s+and\s+(?=(?:start|make|use|set|change|update|move|run)\b)/i).map(value=>value.trim()).filter(Boolean);
+ // Split only recognized independent edits, including a shared "I have" subject.
+ // Keep amounts, expense labels and budget-basis qualifiers intact; validation
+ // still rejects the entire proposal if any clause is ambiguous or invalid.
+ const clauses=editRequest.split(/;|\n|\s+and\s+(?=(?:start|make|use|set|change|update|move|run)\b|(?:(?:i|we)\s+)?(?:have|only have)\b|(?:(?:a|my|our|the)\s+)?(?:(?:cash|all-in|total|overall|plan)\s+)?budget\b|(?:\d[\d,]*|twenty)\s+participants\b)/i).map(value=>value.trim()).filter(Boolean).map(value=>/^(?:\d[\d,]*|twenty)\s+participants\b/i.test(value)?'use '+value:value);
  if(!clauses.length||clauses.length>6)fail('Use up to six changes, separated by semicolons.');
  const inputs=structuredClone(draft.inputs),available=targets(inputs,draft),changes:BundleEditChange[]=[],seen=new Set<string>();
  for(const clause of clauses){

@@ -64,7 +64,7 @@ try {
       };
 
       await page.goto(base);
-      const intro = page.getByRole('button', {name: /Intro & instructions/});
+      const intro = page.getByRole('button', {name: /^(Show|Hide) instructions$/});
       await intro.waitFor();
       check(name + ' applies the requested palette', await page.locator('html').getAttribute('data-workspace-preference') === palette);
       check(name + ' intro starts collapsed', await intro.getAttribute('aria-expanded') === 'false');

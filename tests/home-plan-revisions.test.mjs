@@ -59,3 +59,29 @@ test('Reset closes pending proposals without deleting versions; other goals and 
  const tampered=structuredClone(one.history);tampered.revisions[0].result.budget.headroom=999;assert.equal(readPlanRevisions(tampered,binding.goalId),null);
  assert.equal(proposePlanRevision(discarded,draft,'use 12 participants',selection).record.draft.inputs.budget,undefined);
 });
+
+test('compound participants and budget statement creates one atomic reviewed revision without spending the cap',()=>{
+ const draft=base(),before=JSON.stringify(draft);
+ for(const request of ['i have 20 participants and a budget of $8000','I have a budget of $8,000 and 20 participants','use 20 participants and our budget is 8k','I have twenty participants and a cash budget of USD 8000']){
+  assert.equal(bundleChatEditIntent(request).edit,true);
+  const proposed=proposePlanRevision(undefined,draft,request,selection),{record}=proposed;
+  assert.equal(proposed.history.revisions.length,1);assert.equal(record.draft.revision,draft.revision+1);
+  assert.equal(record.result.deliveryEstimate.participants,20);assert.equal(record.result.deliveryEstimate.hours,56);
+  assert.equal(record.result.budget.limit,8000);assert.equal(record.result.budget.cash,3500);assert.equal(record.result.budget.employeeTime,3360);assert.equal(record.result.budget.headroom,4500);
+  assert.deepEqual(record.draft.inputs.expenses,draft.inputs.expenses);assert.deepEqual(record.draft.inputs.scope,draft.inputs.scope);assert.deepEqual(record.draft.inputs.timing,draft.inputs.timing);
+  assert.equal(record.draft.inputs.groups[0].count.kind,'user-entered');assert.equal(record.draft.inputs.budget.amount.kind,'user-entered');
+  assert.deepEqual(readPlanRevisions(proposed.history,draft.binding.goalId),proposed.history);
+  assert.equal(JSON.stringify(draft),before);
+ }
+ const allIn=proposePlanRevision(undefined,draft,'i have 20 participants and a budget of $8000 including staff time',selection);
+ assert.equal(allIn.record.result.budget.basis,'all-in');assert.equal(allIn.record.result.budget.headroom,1140);
+});
+
+test('invalid or ambiguous compound values never partly change the plan or turn a limit into an expense',()=>{
+ const draft=base(),before=JSON.stringify(draft);
+ for(const request of ['i have 20 participants and a budget of EUR 8000','i have 20 participants and a budget of $8000 or $9000','i have 20 participants and a budget of $8000 per month','i have about 20 participants and a budget of $8000','i have 20 participants and a budget of $8000 and use 30 participants'])assert.throws(()=>proposePlanRevision(undefined,draft,request,selection));
+ assert.equal(JSON.stringify(draft),before);
+ const inputs=structuredClone(draft.inputs);inputs.groups.push({...inputs.groups[0],id:'another',label:'Another group'});
+ const multi=reviseBundleDraft(draft,inputs);
+ assert.throws(()=>proposePlanRevision(undefined,multi,'i have 20 participants and a budget of $8000',selection),/Which participant group/);
+});
