@@ -1,0 +1,18 @@
+{
+  "scope": "Only clock-deadline, three turns, against reviewed metric-reference fix aff336860b239416fee604168ab4acbe87cfb365",
+  "supersedesForThisRunOnly": "docs/preview-conversation-acceptance.md",
+  "batchName": "clock-followup",
+  "maximumCountRequests": 12,
+  "maximumGenerationRequests": 12,
+  "sdkRetries": 0,
+  "maximumInputTokensPerGeneration": 100000,
+  "maximumOutputTokensPerGeneration": 5000,
+  "priorRetainedMicrousd": 4143960,
+  "newTrancheReservedMicrousd": 972000,
+  "cumulativeReservedMicrousd": 5115960,
+  "authorization": "Parent-approved separate follow-up tranche within the existing $50 total authorization; not reopening the initial tranche or any closed run.",
+  "diagnostics": "Bounded sanitized fictional request, each provider output, intermediate tool arguments/results, service error message and Home source frames are emitted to protected build logs. No keys, headers or raw provider exception bodies.",
+  "stopPolicy": "Existing validation/provider/budget/timeout/cancellation/persistence errors stop the entire run. No retries or redeployment on ambiguity.",
+  "output": "Blank static HTML only on successful service completion; no runtime endpoint or public receipts.",
+  "limits": "Historical failure guard remains unproven. This follow-up tests the general reference contract, not later progress-entry integration or browser UI. Semantic review remains separate. Any diagnostic truncation/redaction limits exact replay."
+}

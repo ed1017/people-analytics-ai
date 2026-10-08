@@ -12,12 +12,11 @@ import {reviewBundleProposal} from '../../lib/home-bundle-reconciliation.ts';
 import {DecisionStore} from '../../lib/local-decisions.ts';
 import {fictionalProvenance, fictionalScenarios, fictionalRequest, fictionalProjection, fictionalEvidence} from '../fixtures/fictional-solution-evaluation.mjs';
 
-export const checkpoint = Object.freeze({head: '256a4a9569c0a8ae52c2331ba5a71b4ccfb0225e', tree: 'bf40c71febd5624d0633a131a9c40f45e93746b2'});
+export const checkpoint = Object.freeze({head: 'aff336860b239416fee604168ab4acbe87cfb365', tree: '1fa469dac3ca9bece5cc98264882b0d231e73802'});
 export const batchDefinitions = Object.freeze({
-  'core-four': Object.freeze(['clock-deadline', 'goal-select-refine', 'blend-replace', 'headcount-followup']),
-  'corrections-two': Object.freeze(['same-people-correction', 'constraint-recovery']),
+  'clock-followup': Object.freeze(['clock-deadline']),
 });
-export const limits = Object.freeze({roundsPerTurn: 4, toolsPerTurn: 6, inputTokens: 100000, outputTokens: 5000, payloadBytes: 160000, countAllowanceMicrousd: 50000, generationMicrousd: 31000, pairMicrousd: 81000, requestsPerMinute: 6, callTimeoutMs: 30000, turnTimeoutMs: 360000, batchTimeoutMs: 1800000, initialCapMicrousd: 4500000, totalCapMicrousd: 50000000});
+export const limits = Object.freeze({roundsPerTurn: 4, toolsPerTurn: 6, inputTokens: 100000, outputTokens: 5000, payloadBytes: 160000, countAllowanceMicrousd: 50000, generationMicrousd: 31000, pairMicrousd: 81000, requestsPerMinute: 6, callTimeoutMs: 30000, turnTimeoutMs: 360000, batchTimeoutMs: 1800000, trancheCapMicrousd: 972000, totalCapMicrousd: 50000000});
 export const apiBase = 'https://api.openai.com/v1';
 export const sha256 = value => createHash('sha256').update(typeof value === 'string' || Buffer.isBuffer(value) ? value : JSON.stringify(value)).digest('hex');
 function stop(code) { const error = new Error('Acceptance batch stopped.'); error.code = code; throw error; }
@@ -43,14 +42,14 @@ export function sourceManifest(root) {
   function visit(dir) { for (const entry of readdirSync(join(root, dir), {withFileTypes: true})) { const path = dir + '/' + entry.name; if (entry.isDirectory()) visit(path); else if (/\.(?:ts|mjs)$/.test(path)) files.push(path); } }
   visit('lib'); return Object.fromEntries(files.sort().map(path => [path, sha256(readFileSync(join(root, path)))]));
 }
-export function unarmedManifest(root, batch = 'core-four') {
-  return {version: 1, checkpoint, runId: null, reservationId: null, parentReserved: false, plan: batchPlan(batch), priorInitialMicrousd: 255960, priorTotalMicrousd: 255960, pricingBasis: 'approved-envelope-input-0.25-output-1.20-per-million', projectId: null, createdAt: null, expiresAt: null, files: sourceManifest(root)};
+export function unarmedManifest(root, batch = 'clock-followup') {
+  return {version: 1, checkpoint, runId: null, reservationId: null, parentReserved: false, plan: batchPlan(batch), trancheAuthorization: 'parent-approved-clock-followup-2026-10-08', priorTrancheMicrousd: 0, priorTotalMicrousd: 4143960, pricingBasis: 'approved-envelope-input-0.25-output-1.20-per-million', projectId: null, createdAt: null, expiresAt: null, files: sourceManifest(root)};
 }
 export function validateManifest(manifest, env, now = Date.now()) {
   const plan = batchPlan(manifest?.plan?.name);
   if (manifest.version !== 1 || sha256(manifest.plan) !== sha256(plan) || manifest.parentReserved !== true || !uuid(manifest.runId) || !uuid(manifest.reservationId) || sha256(manifest.checkpoint) !== sha256(checkpoint)) stop('invalid_reservation');
-  const a = manifest.priorInitialMicrousd, b = manifest.priorTotalMicrousd;
-  if (![a, b].every(n => Number.isSafeInteger(n) && n >= 255960) || a > b || a + plan.reservedMicrousd > 4500000 || b + plan.reservedMicrousd > 50000000) stop('budget_exhausted');
+  const a = manifest.priorTrancheMicrousd, b = manifest.priorTotalMicrousd;
+  if (manifest.trancheAuthorization !== 'parent-approved-clock-followup-2026-10-08' || a !== 0 || !Number.isSafeInteger(b) || b !== 4143960 || a + plan.reservedMicrousd > 972000 || b + plan.reservedMicrousd > 50000000) stop('budget_exhausted');
   if (manifest.pricingBasis !== 'approved-envelope-input-0.25-output-1.20-per-million') stop('pricing_basis_changed');
   const start = Date.parse(manifest.createdAt), expiry = Date.parse(manifest.expiresAt);
   if (!Number.isFinite(start) || !Number.isFinite(expiry) || start > now || expiry <= now || expiry - start > 3600000) stop('reservation_expired');
@@ -108,7 +107,8 @@ export async function runAcceptance({manifest, env, client, claim, record, now =
   const pending = plan.sequenceIds.flatMap(id => [1, 2, 3].map(n => id + '-' + n));
   const report = {kind: 'fictional-preview-acceptance-v1', runId: manifest.runId, reservationId: manifest.reservationId, deploymentId: env.VERCEL_DEPLOYMENT_ID, checkpoint, plan, sourceManifestSha256: sha256(manifest.files), fixtureSha256: sha256({fictionalProvenance, fictionalScenarios, projection: fictionalProjection()}), fixtureOnly: true, model: CHAT_MODEL, limits, reservedMicrousd: plan.reservedMicrousd, cumulativeReservedMicrousd: manifest.priorTotalMicrousd + plan.reservedMicrousd, attemptedCountStages: 0, attemptedGenerationStages: 0, countedInputTokens: 0, generatedInputTokens: 0, generatedOutputTokens: 0, projectionReads: 0, completedTurns: [], pendingTurns: pending, turns: [], semanticReview: 'pending', browserPersistenceVerified: false, fullAcceptance: false};
   const emit = (stage, value) => record(stage, structuredClone(value));
-  let currentTurn = null, stage = 'local', lastProviderOutput = null;
+  let currentTurn = null, stage = 'local', lastProviderOutput = null, toolRecordCount = 0;
+  const serviceDiagnostic = error => ['service', 'service_checks'].includes(stage) ? {message: safeText(error?.message ?? '', 2000), frames: String(error?.stack ?? '').split('\n').slice(1).filter(line => /[\\/]lib[\\/]home-/.test(line)).slice(0, 8).map(line => safeText(line, 800))} : null;
   try {
     emit('start', report);
     for (const id of plan.sequenceIds) {
@@ -118,6 +118,7 @@ export async function runAcceptance({manifest, env, client, claim, record, now =
         signal.throwIfAborted(); currentTurn = id + '-' + (index + 1); stage = 'input'; lastProviderOutput = null;
         const request = await fictionalRequest(scenario, index, state, goal, catalog), before = sha256(request), savedBefore = sha256(request.catalog);
         if (/https?:\/\/|@[A-Za-z0-9.-]+\.|(?:ghp_|github_pat_|sk-proj-)/.test(JSON.stringify(request))) stop('unexpected_fixture_reference');
+        emit('input-' + currentTurn, {currentTurn, fixtureOnly: true, request: safeText(request, 120000)});
         const turnSignal = AbortSignal.any([signal, AbortSignal.timeout(limits.turnTimeoutMs)]);
         let rounds = 0; const toolReceipts = new Map();
         const reply = await converseSolutions(request, {
@@ -129,6 +130,7 @@ export async function runAcceptance({manifest, env, client, claim, record, now =
             for (const item of input) if (item.type === 'function_call_output' && !toolReceipts.has(item.call_id)) {
               const output = JSON.parse(item.output), call = input.find(row => row.type === 'function_call' && row.call_id === item.call_id);
               toolReceipts.set(item.call_id, {name: safeWord(call?.name), outputSha256: sha256(output), ok: output.ok !== false, boundary: output.ok === false ? safeText(output.error, 2000) : null});
+              emit('tool-result-' + (++toolRecordCount), {currentTurn, fixtureOnly: true, callId: safeText(item.call_id, 200), name: safeWord(call?.name), arguments: safeText(call?.arguments ?? '', 32000), result: safeText(item.output, 65000)});
             }
             const pair = report.attemptedCountStages + 1;
             const payload = {model: CHAT_MODEL, instructions: solutionConversationInstructions, input, tools: solutionTools, text: {format: solutionResponseFormat}, tool_choice: finalOnly ? 'none' : 'auto', parallel_tool_calls: false};
@@ -154,6 +156,8 @@ export async function runAcceptance({manifest, env, client, claim, record, now =
             emit('generation-' + pair, {currentTurn, pair, status: generated.response.status, requestId: safeId(generated.request_id), inputTokens: usage.input_tokens, outputTokens: usage.output_tokens});
             if (response.service_tier !== 'default' || response.status !== 'completed' || !Array.isArray(response.output)) stop('incomplete_or_tier');
             lastProviderOutput = {sha256: sha256(response.output), text: safeText(response.output_text, 6000), calls: response.output.filter(item => item.type === 'function_call').slice(0, 6).map(item => ({name: safeWord(item.name), arguments: safeText(item.arguments, 2000)}))};
+            emit('provider-output-' + pair, {currentTurn, pair, fixtureOnly: true, output: safeText(response.output, 70000), text: safeText(response.output_text, 20000)});
+            activeSignal.throwIfAborted();
             stage = 'service';
             return {completed: true, items: response.output, calls: response.output.filter(item => item.type === 'function_call').map(item => ({id: item.call_id, name: item.name, arguments: item.arguments})), text: response.output_text};
           },
@@ -173,7 +177,7 @@ export async function runAcceptance({manifest, env, client, claim, record, now =
         report.completedTurns.push(currentTurn); report.pendingTurns = report.pendingTurns.filter(turn => turn !== currentTurn);
       }
     }
-  } catch (error) { report.failure = {currentTurn, stage, ...safeFailure(error), lastProviderOutput}; }
+  } catch (error) { report.failure = {currentTurn, stage, ...safeFailure(error), serviceDiagnostic: serviceDiagnostic(error), lastProviderOutput}; }
   report.executionComplete = report.pendingTurns.length === 0 && !report.failure;
   emit('result', {...report, turns: report.turns.map(turn => ({requestId: turn.requestId, outputSha256: turn.outputSha256, checks: turn.checks}))});
   return report;
