@@ -47,7 +47,7 @@ try{for(const width of [1366,390]){
  await page.screenshot({path:path.join(output,`home-copy-${width}.png`),fullPage:true});
  const baseline=posts;const first=suggestions().getByRole('button').first();await first.focus();await page.keyboard.press('Enter');
  await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('Synthetic response',{exact:true}).waitFor();check(width+' keyboard example sends exactly once',await home.inputValue()===''&&posts===baseline+1);
- await home.fill('Keep my unfinished question');check(width+' draft prevents replacement',await suggestions().getByRole('button').first().isDisabled());
+ await home.fill('Keep my unfinished question');check(width+' draft stays editable while suggestions remain available',await suggestions().getByRole('button').first().isEnabled());
  await page.getByRole('button',{name:'Previous discussion',exact:true}).click();check(width+' stage changes examples while retaining draft',await home.inputValue()==='Keep my unfinished question'&&await suggestions().getByRole('button',{name:/revise/}).count()===1);
  await page.getByRole('button',{name:'skills goal',exact:true}).click();await page.getByText('More questions',{exact:true}).click();await suggestions().getByRole('button',{name:/skill requirements/}).waitFor();
  check(width+' goal changes evidence topic',await home.inputValue()==='');await home.fill('Keep skills draft');
@@ -60,12 +60,12 @@ try{for(const width of [1366,390]){
  await home.fill('');missing=true;await page.getByRole('button',{name:'Refresh overview evidence',exact:true}).click();await suggestions().getByRole('button',{name:/missing for my goal/}).waitFor();
  check(width+' unknown evidence removes confident topic',await suggestions().getByRole('button').count()===1);
  await page.getByRole('button',{name:'Toggle panel',exact:true}).click();const panel=page.getByLabel('Ask People Analytics AI',{exact:true});const panelBaseline=posts;
- await suggestions().getByRole('button').first().click();check(width+' panel example drafts without sending',Boolean(await panel.inputValue())&&posts===panelBaseline&&await panel.evaluate(el=>el===document.activeElement));
+ await suggestions().getByRole('button').first().click();await page.waitForTimeout(100);check(width+' panel example sends directly without replacing draft',await panel.inputValue()===''&&posts===panelBaseline+1);
  await panel.fill('');await page.getByRole('button',{name:'Switch goal with queued example',exact:true}).click();
  check(width+' panel queued example cannot overwrite another goal draft',await panel.inputValue()==='Keep skills draft');
  await page.getByRole('button',{name:'retention goal',exact:true}).click();
  await panel.fill('Keep panel draft');await page.getByRole('button',{name:'Toggle panel evidence',exact:true}).click();check(width+' missing page evidence preserves draft',await panel.inputValue()==='Keep panel draft'&&await suggestions().getByRole('button').first().isDisabled());
- await panel.fill('');await suggestions().getByRole('button').first().click();check(width+' missing evidence example remains editable but send unavailable',Boolean(await panel.inputValue())&&await page.getByRole('button',{name:'Send message',exact:true}).isDisabled()&&posts===panelBaseline);
+ await panel.fill('');check(width+' missing evidence disables suggested and manual sends',await suggestions().getByRole('button').first().isDisabled()&&await page.getByRole('button',{name:'Send message',exact:true}).isDisabled()&&posts===panelBaseline+1);
  const data=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
  check(width+' no solution, approval or pins created',data.workspaces.retention.fields.owner==='Keep owner'&&data.workspaces.retention.fields.workforceSolutionPins.length===0&&!data.workspaces.retention.fields.workforceSolution);
  check(width+' no horizontal overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));

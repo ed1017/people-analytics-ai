@@ -52,7 +52,7 @@ export function useProblemConversation(scope = "home") {
   const inputRef=useRef("");
   const [recoveredPlanSelectionRequired,setRecoveredPlanSelectionRequired]=useState(false);
   const setInput:Dispatch<SetStateAction<string>>=update=>{const next=typeof update==='function'?update(inputRef.current):update;inputRef.current=next;setInputState(next);if(!next.trim())setRecoveredPlanSelectionRequired(false)};
-  const canSubmitPrompt=()=>{const current=decisionStore.getSnapshot().data.goals;return storageReady&&!inputRef.current.trim()&&goalsRef.current.activeId===localGoals.activeId&&current.activeId===localGoals.activeId&&(current.goals.find(goal=>goal.id===current.activeId)?.statement??"")===focusedIssue};
+  const canSubmitPrompt=(allowDraft=false)=>{const current=decisionStore.getSnapshot().data.goals;return storageReady&&(allowDraft||!inputRef.current.trim())&&goalsRef.current.activeId===localGoals.activeId&&current.activeId===localGoals.activeId&&(current.goals.find(goal=>goal.id===current.activeId)?.statement??"")===focusedIssue};
   const draftExample = (prompt:string) => {
     const currentGoalMatches = () => goalsRef.current.activeId===localGoals.activeId &&
       (goalsRef.current.goals.find(goal=>goal.id===goalsRef.current.activeId)?.statement??"")===focusedIssue;
