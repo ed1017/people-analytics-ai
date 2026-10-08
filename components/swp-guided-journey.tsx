@@ -10,7 +10,8 @@ import {SwpDemandJourney,type DemandIntakeControl,type ReviewedDemand} from './s
 import {serviceStaffingBundle} from '@/lib/home-demo-catalog';
 import type {DemandReview} from '@/lib/swp-demand';
 import {SwpOutcomeChart} from './swp-outcome-chart';
-import {buildGoalProgressContext,goalProgressField} from '@/lib/goal-progress';
+import {goalProgressField} from '@/lib/goal-progress';
+import {readProgressSnapshot,readProgressLinkedPlan} from '@/lib/goal-progress-summary';
 import {GoalProgressSummary} from './goal-progress-summary';
 import {planAlternativesField,readPlanAlternatives} from '@/lib/home-plan-alternatives';
 import type {AppPage} from '@/lib/types';
@@ -91,8 +92,8 @@ export function SwpGuidedJourney({conversation,active,busy,commandRef,modelConte
  }
  const selected=currentComparison?.options.find(o=>o.id===selection),fields=storage.data.workspaces[conversation.activeGoalId]?.fields;
  const catalog=fields&&readPlanAlternatives(fields[planAlternativesField],{goalId:conversation.activeGoalId,goal:conversation.focusedIssue});
- let progress:ReturnType<typeof buildGoalProgressContext>|null=null;
- try{if(fields?.[goalProgressField]&&saved)progress=buildGoalProgressContext(fields[goalProgressField],{goalId:conversation.activeGoalId,asOf:new Date().toISOString().slice(0,10)});}catch{/* Retain malformed saved bytes without displaying invented progress. */}
+ let progress:ReturnType<typeof readProgressSnapshot>|null=null;
+ try{if(fields?.[goalProgressField]&&saved)progress=readProgressSnapshot(fields[goalProgressField],conversation.activeGoalId,new Date().toISOString().slice(0,10));}catch{/* Retain malformed saved bytes without displaying invented progress. */}
  return <section aria-label="Strategic workforce planning journey" className="min-w-0 space-y-3 rounded-xl border border-primary/30 p-4">
   <div><h2 className="text-lg font-semibold">Plan the workforce for your business goal</h2><p className="text-sm">Define the outcome and horizon, compare options, then review a plan. People Analytics supplies supporting evidence.</p></div>
   {(!draft||demandBridge)&&<SwpDemandJourney conversation={conversation} active={active} busy={busy||pending} beginRef={demandControlRef} reviewRef={demandReviewRef} contextRef={demandContextRef} onReview={invalidateDemand} onStaffing={useDemand} seed={demandBridge??undefined} staffingInputs={demandBridge?draft?.inputs.capacity:undefined} staffingSummary={demandBridge&&currentComparison?currentComparison.options.map(o=>({mix:o.candidate.mix,cash:o.candidate.cash.complete,endDateLimits:o.candidate.status,effort:serviceOptionEffort(o,demandBridge)})):null}/>}
@@ -116,7 +117,7 @@ export function SwpGuidedJourney({conversation,active,busy,commandRef,modelConte
    </>}
    {review&&selected&&<section aria-label="Review and save workforce plan" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Review before saving</h3>{demandBridge&&<><p>{effortText(selected,demandBridge)}</p><p>Accepted for scenario use only: demand inputs retain their original proposed/reported provenance. Internal pools, distinct membership, release, zero backfills and hire delivery are separate unverified staffing premises. This saves an incomplete conditional staffing proposal when effort remains uncovered.</p><details><summary>Accepted operational assumptions and history</summary><pre className="overflow-auto whitespace-pre-wrap text-xs">{JSON.stringify({spec:demandBridge.review.spec,reviewedAt:demandBridge.reviewedAt,priorAccepted:demandBridge.priorAccepted},null,2)}</pre></details></>}<p>{draft.binding.goal} · {draft.inputs.scope.population.value} · target {draft.inputs.scope.demand.value} roles by {swpEnd(draft)}.</p><p>Proposed owners are roles, not assigned people. Selecting this proposal acknowledges unknowns; funding, availability and capability are unverified. Changed staffing costs still require component cost review in the saved plan.</p><ul className="list-disc pl-5">{selected.draft.bundle.components.map(c=><li key={c.id}>{c.name} — proposed owner: {c.ownerRole}; checkpoint: {selected.draft.inputs.timing.find(t=>t.componentId===c.id)?.finish.value??'Unknown'}.</li>)}</ul><p><strong>Success measure:</strong> {swpMetric} in this unit and role. Assess readiness before deployment; training completion alone does not meet the target.</p><div className="flex flex-wrap gap-2"><button className={button} disabled={busy||pending||review.alreadySaved} onClick={save}>Save reviewed plan and goal</button><button className={button} onClick={()=>setReview(null)}>Cancel review</button></div></section>}
    {catalog&&saved&&<details><summary className="min-h-11 cursor-pointer py-2 text-sm">Saved plan versions and proposed owners ({catalog.attachments.length})</summary>{catalog.attachments.map(a=>{const p=catalog.plans.find(p=>p.id===a.planId)!;return <div key={a.id} className="my-2 text-xs"><strong>Action Plan #{p.number} · revision {p.draft.revision} · attached proposal</strong><p>{a.attachedAt}. {p.draft.bundle.components.map(c=>`${c.name}: ${c.ownerRole} (proposed)`).join('; ')}.</p><p>Saved cash estimate: {money(p.result.cashEstimate?.cash)}. Prior source inputs and search results are retained.</p></div>;})}</details>}
-   {progress&&<details><summary className="min-h-11 cursor-pointer py-2 text-sm">Saved progress target and plan link · no observed results</summary><GoalProgressSummary context={progress}/></details>}
+   {progress&&fields&&<details><summary className="min-h-11 cursor-pointer py-2 text-sm">Saved goal progress and plan link</summary><GoalProgressSummary context={progress.context} snapshot={progress} plan={readProgressLinkedPlan(fields[goalProgressField],fields,progress.context,conversation.focusedIssue,token)} goal={conversation.focusedIssue}/></details>}
   </>}
   {draft&&<button className={button} onClick={exit}>Exit workforce example</button>}
   {notice&&<p role="status" className="text-sm">{notice}</p>}
