@@ -1,6 +1,7 @@
-import {SyntheticDomainChart,SyntheticDomainChartNotes} from '@/components/synthetic-domain-chart';
+import {SyntheticDomainPrediction} from '@/components/synthetic-domain-prediction';
+import {SyntheticDomainChartNotes} from '@/components/synthetic-domain-chart';
 import artifact from '@/lib/data/synthetic-domain-demo-v1.json';
-import {resolveSyntheticDomainDemo,formatDemoValue,demoDomainCopy,demoMethodLabels,type SyntheticDemoDomain} from '@/lib/synthetic-domain-demo';
+import {resolveSyntheticDomainDemo,formatDemoValue,demoDomainCopy,type SyntheticDemoDomain} from '@/lib/synthetic-domain-demo';
 const month=(value:string)=>new Date(value+'-01T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'});
 export function SyntheticDomainDemo({domain,evidence=artifact}:{domain:SyntheticDemoDomain;evidence?:unknown}){
  const view=resolveSyntheticDomainDemo(evidence),copy=demoDomainCopy[domain];
@@ -12,7 +13,7 @@ export function SyntheticDomainDemo({domain,evidence=artifact}:{domain:Synthetic
 function DemoResults({domain,data}:{domain:SyntheticDemoDomain;data:typeof artifact}){
  const d=data.domains[domain],copy=demoDomainCopy[domain],test=d.assessment.filter(s=>s.stage==='test'),training=d.assessment.filter(s=>s.stage==='training');
  return <>
-  {d.status!=='predicted'?<p role="status">No simulated projection: {d.reasonCodes.join(', ')||'insufficient support'}.</p>:<div className="grid min-w-0 items-start gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"><div className="max-w-full overflow-x-auto"><table className="w-full text-xs"><caption className="py-2 text-left font-medium">{copy.unit}</caption><thead><tr className="border-b text-left"><th scope="col" className="py-2 pr-2">Method</th>{d.rows.map(row=><th key={row.month} scope="col" className="px-1 py-2 text-right">{month(row.month)}</th>)}</tr></thead><tbody>{d.methods.map((method,index)=><tr key={method} className="border-b"><th scope="row" className="max-w-40 py-2 pr-2 text-left font-normal">{demoMethodLabels[method]}</th>{d.rows.map(row=><td key={row.month} className="px-1 py-2 text-right tabular-nums">{formatDemoValue(domain,row.values[index])}</td>)}</tr>)}</tbody></table></div><SyntheticDomainChart domain={domain} data={data}/></div>}
+  {d.status!=='predicted'?<p role="status">No simulated projection: {d.reasonCodes.join(', ')||'insufficient support'}.</p>:<SyntheticDomainPrediction domain={domain} data={data}/>}
   <details><summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Details</summary><div className="space-y-2 break-words text-xs">
   <p className="text-xs">Cutoff 30 Sep 2026 · History through {month(d.support.lastPeriod)} · Intervals unavailable.</p>
    <p>Fixed simulated company-wide population. Dashboard filters do not apply; these are not predictions for the recorded-data cohort. Operational forecasts are unavailable. All three methods are shown; none is designated as preferred.</p>
