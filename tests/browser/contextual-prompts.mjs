@@ -30,18 +30,18 @@ try{for(const width of [1366,390]){
  const suggestions=()=>page.getByRole('region',{name:'Suggested questions',exact:true});
  const home=page.getByLabel('Ask Workforce AI',{exact:true});await home.waitFor();
  check(width+' no automatic takeaway request',posts===0);
- const placeholder='Describe a business issue, and I’ll help you explore the evidence, compare options, and build or adjust a plan.';
+ const placeholder='Describe a goal, compare options, build or adjust a plan, or ask a general workforce question.';
  check(width+' Home guidance is an empty accessible placeholder',await home.getAttribute('placeholder')===placeholder&&await home.inputValue()===''&&await page.getByRole('textbox',{name:'Ask Workforce AI',exact:true}).count()===1);
  check(width+' placeholder fits the composer',await home.evaluate(el=>el.scrollHeight<=el.clientHeight));
  const sizing=await home.evaluate(el=>{const height=el.getBoundingClientRect().height,minHeight=getComputedStyle(el).minHeight;el.style.minHeight='80px';const baselineHeight=el.getBoundingClientRect().height;el.style.removeProperty('min-height');return {viewport:innerWidth,rows:el.rows,height,baselineHeight,change:height-baselineHeight,lineHeight:getComputedStyle(el).lineHeight,minHeight}});
- check(width+' composer grows to fit its placeholder with a two-row floor',sizing.rows===2&&sizing.height>=80&&sizing.height<=320&&await home.evaluate(el=>el.scrollHeight<=el.clientHeight));
+ check(width+' composer grows to fit its placeholder with a three-row floor',sizing.rows===3&&sizing.height>=80&&sizing.height<=320&&await home.evaluate(el=>el.scrollHeight<=el.clientHeight));
  console.log('COMPOSER '+JSON.stringify(sizing));
  check(width+' redundant helper copy removed',await page.getByText('Keep this focus across pages.',{exact:true}).count()===0&&await page.getByText('Choose an example to edit, then send when ready.',{exact:true}).count()===0);
  const development=page.getByText('In development',{exact:true}),details=page.getByRole('button',{name:'Open data details',exact:true});
  const developmentBox=await development.boundingBox(),detailsBox=await details.boundingBox();
  check(width+' development label shares Data details row',developmentBox&&detailsBox&&Math.abs(developmentBox.y+developmentBox.height/2-detailsBox.y-detailsBox.height/2)<2);
  check(width+' Home has no horizontal overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
- await details.click();check(width+' source disclosure remains accessible',await page.getByText('Synthetic workforce evidence.',{exact:false}).isVisible());await page.getByRole('button',{name:'Close data details',exact:true}).click();
+ await details.click();check(width+' source disclosure remains accessible',await page.getByText('Demo only: company records are synthetic, not real employee data.',{exact:false}).isVisible());await page.getByRole('button',{name:'Close data details',exact:true}).click();
  await page.screenshot({path:path.join(output,`home-copy-${width}.png`),fullPage:true});
  // Pinned Home no longer shows starter suggestions; their submission lifecycle is covered by home-prompt-auto-send.
  await page.getByRole('button',{name:'Toggle panel',exact:true}).click();
