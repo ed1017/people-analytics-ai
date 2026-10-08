@@ -143,7 +143,8 @@ export async function prepareSwpSelection(store:DecisionStore,draft:BundleDraft,
  const evaluation=await verifyHomeMix(raw,draft,signal);guard();
  const option=evaluation&&swpOptions(evaluation).find(o=>o.id===candidateId);
  if(!option||option.candidate.status!=='met'||option.candidate.cash.complete===null)throw Error('Choose an available option that meets the entered scenario limits.');
- const mix=await prepareHomeMixCommit(draft,evaluation,candidateId,at,fields[homeMixHistoryField],signal);guard();if(demandBridge)validateDemandBridge(mix.draft,demandBridge,token);
+ // The verified reference retains the source draft; only emitted alternatives need a proposal.
+ const mix=await prepareHomeMixCommit(draft,evaluation,option.candidate.isReferenceMix?null:candidateId,at,fields[homeMixHistoryField],signal);guard();if(demandBridge)validateDemandBridge(mix.draft,demandBridge,token);
  // Preserve the original input as lineage, even when the reviewed choice is another mix.
  if(!catalog)catalog=createPlanAlternatives({goalId:goal.id,goal:goal.statement},[{id:'swp-original',draft}]);
  let source=catalog.plans.find(p=>bundleInputKey(p.draft)===bundleInputKey(draft));
@@ -154,7 +155,7 @@ export async function prepareSwpSelection(store:DecisionStore,draft:BundleDraft,
   if(sourceOutcome.status!=='ready')throw Error('The revised source cannot be preserved.');catalog=sourceOutcome.catalog;source=sourceOutcome.plan;
  }
  const request={requestId:'swp-choice-'+revision,text:'Reviewed fictional staffing choice; not operational authorization.',sourceIds:[source.id],expectedInputs:{[source.id]:bundleInputKey(source.draft)}};
- const outcome=proposeStaffingAlternative(catalog,catalog,request,mix.draft);if(outcome.status!=='ready')throw Error('The selected plan could not be prepared.');
+ const outcome=option.candidate.isReferenceMix?{status:'ready' as const,catalog,plan:source}:proposeStaffingAlternative(catalog,catalog,request,mix.draft);if(outcome.status!=='ready')throw Error('The selected plan could not be prepared.');
  catalog=associatePlanProposal(outcome.catalog,outcome.catalog,outcome.plan.id,{inputKey:outcome.plan.result.inputKey,attachmentId:request.requestId,at,acknowledgeUnknowns:true});
  const plan=outcome.plan,existing=fields[goalProgressField];let ledger=existing===undefined?emptyGoalProgress(goal.id,'demo'):readGoalProgressLedger(existing,goal.id);
  const prior=ledger.events.filter(e=>e.kind==='measurement').at(-1),measurementId='swp-measure-'+revision;

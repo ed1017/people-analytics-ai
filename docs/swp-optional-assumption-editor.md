@@ -5,9 +5,11 @@ Isolated successor to public diagnostic checkpoint
 `7f741597d4f3cd208637445348b5f819de61465a`. The frozen application
 `cf9dbd1195ac11ceda5645ace392034e9bb03f7e` and its diagnostic branch remain
 unchanged. Integration/release ownership remains with
-`01a1139b-d5e4-704a-902c-610e54b1e023`; this successor is not merged or published.
+`01a1139b-d5e4-704a-902c-610e54b1e023`; this successor is not merged or released.
+A separate source-only browser acceptance handoff is documented below.
 
-Only `components/swp-demand-journey.tsx` changes existing product code. New
+The original editor increment changed only `components/swp-demand-journey.tsx`
+among existing product files. New
 `components/swp-demand-editor.tsx` and `lib/swp-demand-editor.ts` own the editor
 and its typed patch adapter. Detection uses the existing
 `DemandIntakeControl.command` hook. Conversation services, schemas, runtime
@@ -60,22 +62,58 @@ renewed acceptance, explicit save/cancel, busy/reset/navigation/dataset changes
 and blocked network attempts. Fixture-only feature constants permit rendering
 the UI; they do not change application runtime configuration.
 
-The standalone build passed. **Browser behavior is not yet verified:** the
-cloud sandbox first blocked Chromium's local socket operation; an approved
-headless execution then launched Chromium but browser administration policy
-rejected the local fixture URL with `ERR_BLOCKED_BY_ADMINISTRATOR`. Testing
-stopped at that boundary, without policy changes or an alternate navigation
-route. No desktop/mobile pass, screenshot review or full-app acceptance is
-claimed. The browser assertions need execution in an approved environment
-before integration.
+The browser acceptance successor uses the supported managed-Linux workflow in
+`docs/workforce-device-acceptance.md`: Playwright fulfills only GET document
+navigation to `http://127.0.0.1:3100/` from generated synthetic fixture bytes.
+Every other request is aborted. CSP and fixture network guards remain enabled;
+no HTTP listener, file navigation, browser policy change or additional security
+flag is used.
+
+**68 browser assertions passed**, 34 each at 1280×900 desktop and 390×844 mobile
+with touch enabled. Coverage includes explicit-request boundaries, natural-chat
+routing (a synthetic no-model reply), initial focus and keyboard traversal,
+accessible labels, 44px controls/actions, no horizontal overflow, repeated opens,
+button/chat/Escape cancellation, invalid numbers, exact preservation of untouched
+values/periods/scopes/provenance, changed-month user provenance, renewed/repeated
+assumption acceptance, pending plan-review invalidation, separate plan cancel/save,
+busy/reset/navigation interruptions and stale dataset rejection before host redraw.
+There were zero runtime errors, blocked non-fixture requests or guarded network
+attempts. Component screenshots and an assertion receipt are written to the printed
+OS temporary output directory; the receipt records HEAD/tree, working-tree status,
+artifact SHA-256, exact assertions and never-run coverage. Run on a clean committed
+tree to bind evidence to the exact final source.
+
+The first browser execution exposed a scoped save defect: the feasible displayed
+“Current mix” (`reference`) was passed to an adapter accepting only emitted
+alternative IDs. `lib/swp-demo.ts` now uses the existing no-alternative receipt
+path and associates the immutable source plan for that verified reference. It
+still verifies the exact report, feasibility, context and storage guards. Emitted
+alternatives retain their existing proposal path. Two synthetic regression tests
+cover preparation without writes, unchanged demand provenance, invalid IDs/altered
+reports, infeasible-reference rejection and emitted-alternative preparation. The
+positive reference test failed on the original code before this fix.
+
+The harness also fixes two synthetic-host expectations: reset starts a fresh
+discussion, and changing fixture input supplies the host redraw after its store
+instance is replaced. Before that redraw, the real editor must reject the stale
+dataset draft. Editor screenshots are scoped to the editor and the review button
+is explicitly scrolled into view before clicking; this avoids the intermittent
+full-page screenshot/scroll interaction observed during harness development.
+
+Ten focused unit/regression tests, eight related Home mix integration tests,
+TypeScript, focused lint and isolated component compilation pass. No full-app,
+physical-device, screen-reader or real-AI natural-language correction acceptance
+is claimed. The diagnostic API harness, provider/model/token-count calls, database,
+credential/billing actions, production startup/deployment and user desktop were
+never run or accessed. Frozen predecessor and diagnostic files remain unchanged.
 
 ```sh
-node --experimental-strip-types --test --test-isolation=none tests/swp-demand-editor.test.mjs
+node --experimental-strip-types --test --test-isolation=none tests/swp-demand-editor.test.mjs tests/swp-reference-save.test.mjs tests/home-mix-integration.test.mjs
 node node_modules/typescript/bin/tsc --noEmit --pretty false --incremental false
-node node_modules/eslint/bin/eslint.js components/swp-demand-journey.tsx components/swp-demand-editor.tsx lib/swp-demand-editor.ts tests/swp-demand-editor.test.mjs tests/fixtures/swp-demand-editor.tsx tests/browser/swp-demand-editor.mjs
+node node_modules/eslint/bin/eslint.js components/swp-demand-journey.tsx components/swp-demand-editor.tsx lib/swp-demand-editor.ts lib/swp-demo.ts tests/swp-demand-editor.test.mjs tests/swp-reference-save.test.mjs tests/fixtures/swp-demand-editor.tsx tests/browser/swp-demand-editor.mjs
 # Build only: no browser launch or model call.
 node --experimental-strip-types tests/browser/swp-demand-editor.mjs --build-only
-# Only in an environment authorized to open the isolated fixture:
+# Isolated intercepted HTTP fixture; no server or diagnostic:
 node --experimental-strip-types tests/browser/swp-demand-editor.mjs
 ```
 
