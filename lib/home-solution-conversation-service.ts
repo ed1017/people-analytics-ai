@@ -1,3 +1,5 @@
+// @ts-expect-error Native tests share TypeScript source.
+import {workloadPlanIndex} from './workload-plan-records.ts';
 // @ts-expect-error Native Node fixtures share TypeScript source.
 import {goalProgressProposalTool,createProgressEntryProposal,readProgressEntryState,type ProgressEntryProposal,type ProgressEntryContext} from './goal-progress-entry.ts';
 import type {SolutionRequest,SolutionState,SolutionEvaluation} from './home-solution-conversation';
@@ -15,7 +17,7 @@ import {calculateHeadcountProjection} from './home-solution-projection.ts';
 import {goalProgressReadTool,readGoalProgressConversation,runGoalProgressRead,type GoalProgressConversation} from './goal-progress-conversation.ts';
 
 // @ts-expect-error Native fixture tests share TypeScript source.
-import {solutionPlanView,solutionEvaluationView,solutionResultView} from './home-solution-model-view.ts';
+import {solutionPlanView,solutionEvaluationView,solutionResultView,projectWorkloadContext} from './home-solution-model-view.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {actionEvidenceCatalog} from './home-action-proposal.ts';
 
@@ -36,12 +38,12 @@ function checkedMetricReferences(state:SolutionState,kind:SolutionMetricRef['kin
 }
 export function solutionModelContext(request:SolutionRequest,progress?:GoalProgressConversation){
  const saved=request.catalog?.plans.filter(plan=>!plan.deleted)??[];
- return {goal:request.goal,scope:request.scope,filters:request.filters,timeZone:request.timeZone,goalContext:request.goalContext,...(progress?{savedGoalProgress:progress}:{}),currentEvidence:request.evidence,citationCatalog:actionEvidenceCatalog(request.evidence),currentConstraints:request.state.constraints,
-  savedPlans:saved.map(plan=>({id:plan.id,number:plan.number,revision:plan.draft.revision,name:plan.draft.bundle.name,objective:plan.draft.bundle.objective,activities:plan.draft.bundle.components})),selectedPlan:saved.some(plan=>plan.id===request.selectedId)?solutionPlanView(saved.find(plan=>plan.id===request.selectedId)!):null,
+ return projectWorkloadContext({goal:request.goal,scope:request.scope,filters:request.filters,timeZone:request.timeZone,goalContext:request.goalContext,...(progress?{savedGoalProgress:progress}:{}),currentEvidence:request.evidence,citationCatalog:actionEvidenceCatalog(request.evidence),currentConstraints:request.state.constraints,
+  savedPlans:saved.map(plan=>({id:plan.id,number:plan.number,revision:plan.draft.revision,name:plan.draft.bundle.name,objective:plan.draft.bundle.objective,activities:plan.draft.bundle.components,...(plan.workload?{workloadIndex:workloadPlanIndex(plan)}:{})})),selectedPlan:saved.some(plan=>plan.id===request.selectedId)?solutionPlanView(saved.find(plan=>plan.id===request.selectedId)!):null,
   recentTurns:request.state.turns,modelView:{version:1,omittedInternalEqualityKeys:['draft.signature','result.signature','result.bindingKey','result.inputKey','evaluation.sourceKeys'],authoritativeState:'Retained on the server; projected views cannot be saved or used as authoritative input.',history:'All retained turns; no history truncation during projection.'},currentWorkingRevisions:latest(request.state.working).map(({id,revision})=>({id,revision})),workingProposals:request.state.working.map(item=>{const view=solutionEvaluationView(request,item);return {...view,inputs:item.draft?.inputs??null,draft:undefined,result:item.result?solutionResultView(item.result):null};}),
   analyses:request.state.analyses.map(item=>({id:item.id,revision:item.revision,method:item.spec.method,months:item.spec.months,assumptions:item.assumptions,opening:item.inputs.opening,asOf:item.inputs.asOf,scope:item.inputs.scope,interpretations:item.interpretations,finalHeadcount:item.points.at(-1)?.headcount})),
   rejectedIdeas:request.state.rejected,unresolvedQuestions:request.state.questions,focusCandidateId:request.state.focusCandidateId,currentMessage:request.message,
- };
+ },request.catalog);
 }
 /** Bounded model-directed read/calculation loop. No write, model switch or automatic retry. */
 export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,signal:AbortSignal):Promise<SolutionReply>{

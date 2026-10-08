@@ -91,6 +91,7 @@ function source(request:SolutionRequest,ref:SolutionSource,checkedWorking=new Se
  if(ref.kind==='saved'){
   const item=request.catalog?.plans.find(plan=>plan.id===ref.id&&!plan.deleted&&plan.draft.revision===ref.revision);
   if(!item)fail('A referenced saved plan or revision is no longer current.');
+  if(item.workload)fail('Workload changes require the full workload calculator; generic conversation cannot derive a staffing-only replacement.');
   assertSavedProvenance(request.catalog!,item.id);
   return {draft:item.draft,sourceRefs:[{id:item.id,revision:item.draft.revision}],sourceKeys:{[item.id]:bundleInputKey(item.draft)}};
  }

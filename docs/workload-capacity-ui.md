@@ -45,15 +45,13 @@ owners, scope and readiness. The app's existing `SelectedGoalProgress` continues
 to display independently verified saved records. Neither receives a fabricated
 workload save or link.
 
-Current SWP save/goal-link contracts do not retain this new report's ticket,
-source-team and manager constraints. The plan review therefore explicitly says
-not accepted/saved and disables saving. Assumption acceptance stays local to the
-view. No persistence schema is widened, no accepted-plan marker is written and
-no workload observation is invented. The integration owner must authorize a
-contract preserving the report and its exact current binding before saving or
-linking can be enabled. This is the remaining functional boundary, not a claimed
-complete plan-save journey. Changing staffing/timing/cohort configuration via
-natural language is also unsupported in this first slice.
+The persistence successor now preserves the full workload input and comparison
+report in an optional versioned catalog snapshot, with explicit proposal save,
+goal association and a separate met-only local Apply. See
+[workload-capacity-save.md](workload-capacity-save.md) for the contract, guards,
+compact model projections and focused verification. This original UI fixture
+has no initialized goal store, so its Save remains disabled. Changing
+staffing/timing/cohort configuration through chat remains unsupported.
 
 ## Offline verification
 
@@ -81,5 +79,5 @@ node --experimental-strip-types --test --test-isolation=none tests/workload-capa
 
 Never run: provider/model/token-count diagnostics, the inherited diagnostic API
 harness, database/auth/permission changes, user desktop actions, production
-startup/deployment, merge or release. Full production navigation/runtime and a
-workload plan save/link remain untested; the latter is deliberately unavailable.
+startup/deployment, merge or release. Full production navigation/runtime remains untested. The separate synthetic
+persistence fixture covers workload save/link and local Apply.

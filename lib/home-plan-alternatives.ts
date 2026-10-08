@@ -1,3 +1,8 @@
+// @ts-expect-error Native tests share TypeScript source.
+import {actionBindingKey} from './home-action-drafts.ts';
+import type {WorkloadPlanSnapshotV1} from './workload-plan-records';
+// @ts-expect-error Native tests share TypeScript source.
+import {readWorkloadPlanSnapshot,workloadEqual,workloadSnapshotKey} from './workload-plan-records.ts';
 import type {BundleDraft,BundleResult} from './home-bundle-reconciliation';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {bundleInputKey,readBundleDraft,reviewBundleProposal as reconcileBundle} from './home-bundle-reconciliation.ts';
@@ -15,10 +20,11 @@ import {revisePlanActivities} from './home-plan-activity-edit.ts';
 import {planNumberPattern,planReferenceNumbers} from './home-plan-references.ts';
 
 export const planAlternativesField='homePlanAlternativesV1';
+export type WorkloadCurrentProof={datasetToken:string;sourceKey:string;bindingKey:string;revision:number;selectedOptionId:string};
 export type AlternativeContext={goalId:string;goal:string};
 export type AlternativeSourceRef={id:string;revision:number};
-export type AlternativeOperation={provenanceVersion?:1;kind:'edit'|'combine'|'staffing'|'goal-correction'|'conversation';text:string;sourceIds:string[];review?:CombinationReview;proposalKey?:string};
-export type PlanAlternative={id:string;number:number;draft:BundleDraft;result:BundleResult;sourceRefs:AlternativeSourceRef[];requestId:string|null;operation:AlternativeOperation|null;notes:string[];deleted:boolean;applied:boolean};
+export type AlternativeOperation={provenanceVersion?:1;kind:'edit'|'combine'|'staffing'|'goal-correction'|'conversation'|'workload';text:string;sourceIds:string[];review?:CombinationReview;proposalKey?:string};
+export type PlanAlternative={id:string;number:number;draft:BundleDraft;result:BundleResult;sourceRefs:AlternativeSourceRef[];requestId:string|null;operation:AlternativeOperation|null;notes:string[];deleted:boolean;applied:boolean;workload?:WorkloadPlanSnapshotV1};
 export type AlternativeAttachment={id:string;planId:string;attachedAt:string;purpose?:'proposal-selection'};
 export type PlanAlternatives={version:1;goalId:string;goal:string;nextNumber:number;order:string[];plans:PlanAlternative[];attachments:AlternativeAttachment[]};
 export type AlternativeRequest={requestId:string;text:string;sourceIds:string[];expectedInputs:Record<string,string>;review?:CombinationReview};
@@ -55,10 +61,14 @@ export function readPlanAlternatives(raw:unknown,context:AlternativeContext):Pla
   const seen=new Map<string,PlanAlternative>(),numbers=new Set<number>(),requests=new Set<string>();
   for(const plan of catalog.plans){
    if(!idValid(plan.id)||seen.has(plan.id)||!Number.isSafeInteger(plan.number)||plan.number<1||numbers.has(plan.number)||!readBundleDraft(plan.draft)||plan.draft.binding.goalId!==context.goalId||plan.draft.binding.goal!==context.goal||typeof plan.deleted!=='boolean'||typeof plan.applied!=='boolean'||!Array.isArray(plan.sourceRefs)||!Array.isArray(plan.notes)||!plan.notes.every(note=>typeof note==='string')||!equalResult(reconcileBundle(plan.draft),plan.result))return null;
+   if(Object.hasOwn(plan,'workload')&&!plan.workload)return null;
+   if(plan.operation?.kind==='workload'&&!plan.workload||plan.workload&&(plan.operation?.kind!=='workload'||!readWorkloadPlanSnapshot(plan.workload,plan.draft,plan.result)||plan.operation?.proposalKey!==workloadSnapshotKey(plan.workload)||plan.applied&&plan.workload.report.options.find(o=>o.id===plan.workload!.selectedOptionId)?.status!=='met'))return null;
    if(new Set(plan.sourceRefs.map(ref=>ref.id)).size!==plan.sourceRefs.length||plan.sourceRefs.some(ref=>!seen.has(ref.id)||seen.get(ref.id)!.draft.revision!==ref.revision)||plan.number!==seen.size+1)return null;
+   if(plan.sourceRefs.some(ref=>seen.get(ref.id)?.workload)&&plan.operation?.kind!=='workload')return null;
+   if(plan.workload&&plan.sourceRefs.some(ref=>{const source=seen.get(ref.id)!;return !source.workload||source.draft.revision>=plan.draft.revision||!workloadEqual(source.workload.input.currentBinding,plan.workload!.input.currentBinding);}))return null;
    if(plan.result.calculationStatus==='awaiting-scope'&&(plan.applied||catalog.attachments.some(item=>item.planId===plan.id&&item.purpose!=='proposal-selection')))return null;
    if(plan.operation?.provenanceVersion!==undefined&&plan.operation.provenanceVersion!==1)return null;
-   if(plan.requestId!==null){if(!idValid(plan.requestId)||requests.has(plan.requestId)||!plan.operation||!['edit','combine','staffing','goal-correction','conversation'].includes(plan.operation.kind)||typeof plan.operation.text!=='string'||!plan.operation.text.trim()||plan.operation.text.length>1200||!equal(plan.operation.sourceIds,plan.sourceRefs.map(ref=>ref.id))||(plan.operation.kind==='conversation'?plan.sourceRefs.length>30||plan.draft.bundle.origin!=='conversation-v1':plan.sourceRefs.length!==(plan.operation.kind==='combine'?2:1)))return null;requests.add(plan.requestId);}
+   if(plan.requestId!==null){if(!idValid(plan.requestId)||requests.has(plan.requestId)||!plan.operation||!['edit','combine','staffing','goal-correction','conversation','workload'].includes(plan.operation.kind)||typeof plan.operation.text!=='string'||!plan.operation.text.trim()||plan.operation.text.length>1200||!equal(plan.operation.sourceIds,plan.sourceRefs.map(ref=>ref.id))||(plan.operation.kind==='workload'?plan.sourceRefs.length>1:plan.operation.kind==='conversation'?plan.sourceRefs.length>30||plan.draft.bundle.origin!=='conversation-v1':plan.sourceRefs.length!==(plan.operation.kind==='combine'?2:1)))return null;requests.add(plan.requestId);}
    else if(plan.sourceRefs.length||plan.operation!==null)return null;
    if(plan.operation?.proposalKey!==undefined&&(typeof plan.operation.proposalKey!=='string'||!plan.operation.proposalKey.length||plan.operation.proposalKey.length>(plan.operation.kind==='conversation'?32000:8000)))return null;
    seen.set(plan.id,plan);numbers.add(plan.number);
@@ -97,9 +107,9 @@ function retry(catalog:PlanAlternatives,request:AlternativeRequest,operation:Alt
  if(prior.deleted)fail('This request’s alternative was removed. Use a new request to create another alternative.');
  return {status:'ready',catalog,plan:structuredClone(prior),reused:true};
 }
-function append(catalog:PlanAlternatives,request:AlternativeRequest,operation:AlternativeOperation,sources:PlanAlternative[],draft:BundleDraft,result:BundleResult,notes:string[]):AlternativeOutcome{
+function append(catalog:PlanAlternatives,request:AlternativeRequest,operation:AlternativeOperation,sources:PlanAlternative[],draft:BundleDraft,result:BundleResult,notes:string[],workload?:WorkloadPlanSnapshotV1):AlternativeOutcome{
  const number=catalog.nextNumber;let id=`alternative-${number}`;while(catalog.plans.some(plan=>plan.id===id))id+='x';
- const plan:PlanAlternative={id,number,draft:structuredClone(draft),result:structuredClone(result),sourceRefs:sources.map(source=>({id:source.id,revision:source.draft.revision})),requestId:request.requestId,operation:structuredClone(operation),notes:[...notes],deleted:false,applied:false};
+ const plan:PlanAlternative={id,number,draft:structuredClone(draft),result:structuredClone(result),sourceRefs:sources.map(source=>({id:source.id,revision:source.draft.revision})),requestId:request.requestId,operation:structuredClone(operation),notes:[...notes],deleted:false,applied:false,...(workload?{workload:structuredClone(workload)}:{})};
  catalog.plans.push(plan);catalog.order.push(id);catalog.nextNumber++;
  if(!readPlanAlternatives(catalog,catalog))fail('The alternative history is full or cannot be verified. Earlier plans are kept.');
  return {status:'ready',catalog,plan:structuredClone(plan),reused:false};
@@ -117,6 +127,7 @@ export function proposeEditedAlternative(raw:PlanAlternatives,context:Alternativ
   text=text.replace(/^(?:please\s+)?(?:revise|update|adjust|change)\s+(?:action\s+)?plan\s*#?\s*\d+\s+by\s+/i,'').replace(/\b(?:in|for|on)\s+(?:action\s+)?plan\s*#?\s*\d+\b\s*[:,]?\s*/i,' ').replace(/^(?:action\s+)?plan\s*#?\s*\d+\s*[:,]?\s*/i,'').trim();
  }
  // Numbering is resolved above; the legacy parser need not impose its three-option UI limit.
+ if(sources.some(s=>s.workload))fail('Workload edits require a complete recalculated workload snapshot; use Workload & Capacity Planning.');
  const source=sources[0].draft,activity=revisePlanActivities(source,text);
  const draft=activity??acceptBundleChatEdit(source,previewBundleChatEdit(source,text));
  // New numbered proposals can refresh generated target labels. Keep the legacy
@@ -130,6 +141,7 @@ export function proposeCombinedAlternative(raw:PlanAlternatives,context:Alternat
  const operation:AlternativeOperation={kind:'combine',text:request.text,sourceIds:request.sourceIds,...(request.review?{review:request.review}:{})};
  const sources=sourcesFor(catalog,request),existing=retry(catalog,request,operation);if(existing)return existing;
  const named=resolveNumberedPlans(request.text,catalog,context);if(named.length!==2||!equal(named.map(plan=>plan.id),request.sourceIds))fail('Choose the two current numbered plans named in this combination.');
+ if(sources.some(s=>s.workload))fail('Combining workload snapshots needs a separately reviewed pool contract.');
  const combined=combinePlanSnapshots(sources,request.review);if(combined.status!=='ready')return combined;
  return append(catalog,request,operation,sources,combined.draft,combined.result,combined.notes);
 }
@@ -138,6 +150,7 @@ export function proposeCombinedAlternative(raw:PlanAlternatives,context:Alternat
 export function appendReviewedAlternative(raw:PlanAlternatives,context:AlternativeContext,request:AlternativeRequest,draft:BundleDraft,kind:'edit'|'combine',notes:string[],proposalKey:string):AlternativeOutcome{
  const catalog=checked(raw,context),sources=sourcesFor(catalog,request),operation:AlternativeOperation={kind,text:request.text,sourceIds:request.sourceIds,proposalKey};
  const existing=retry(catalog,request,operation);if(existing)return existing;
+ if(sources.some(s=>s.workload))fail('Workload edits need a retained complete snapshot.');
  if(sources.length!==(kind==='combine'?2:1)||!readBundleDraft(draft)||!equal(draft.binding,sources[0].draft.binding)||draft.bundle.id!==sources[0].draft.bundle.id||kind==='edit'&&draft.revision!==sources[0].draft.revision+1)fail('Review a validated proposal for these exact source plans.');
  return append(catalog,request,operation,sources,draft,reconcileBundle(draft),notes);
 }
@@ -148,6 +161,7 @@ export function appendConversationAlternative(raw:PlanAlternatives|null,context:
  if(!idValid(request.requestId)||!request.text.trim()||request.text.length>1200||request.sourceIds.length>30||new Set(request.sourceIds).size!==request.sourceIds.length||!readBundleDraft(draft)||draft.bundle.origin!=='conversation-v1'||draft.binding.goalId!==context.goalId||draft.binding.goal!==context.goal)fail('Review a validated conversational proposal for this goal.');
  const operation:AlternativeOperation={kind:'conversation',text:request.text,sourceIds:[...request.sourceIds],proposalKey,...(provenanceVersion===1?{provenanceVersion}: {})},existing=retry(catalog,request,operation);if(existing)return existing;
  const sources=request.sourceIds.length?sourcesFor(catalog,request):[];
+ if(sources.some(s=>s.workload))fail('Workload redesign must recalculate and retain its full snapshot in Workload & Capacity Planning.');
  return append(catalog,request,operation,sources,draft,reconcileBundle(draft),notes);
 }
 
@@ -158,16 +172,19 @@ export function changeAlternativeView(raw:PlanAlternatives,context:AlternativeCo
  if(change.order)catalog.order=[...change.order];
  if(!readPlanAlternatives(catalog,context))fail('Keep each available alternative once in the display order.');return catalog;
 }
-export function applyPlanAlternative(raw:PlanAlternatives,context:AlternativeContext,planId:string,expectedInput:string):PlanAlternatives{
+export function applyPlanAlternative(raw:PlanAlternatives,context:AlternativeContext,planId:string,expectedInput:string,workloadProof?:WorkloadCurrentProof):PlanAlternatives{
  const catalog=checked(raw,context),plan=catalog.plans.find(item=>item.id===planId&&!item.deleted);
  if(plan?.result.calculationStatus==='awaiting-scope')fail('This is a qualitative proposal. Confirm population and horizon, then calculate it before applying.');
- if(!plan||bundleInputKey(plan.draft)!==expectedInput)fail('The alternative changed. Review it before applying.');plan.applied=true;return catalog;
+ if(!plan||bundleInputKey(plan.draft)!==expectedInput)fail('The alternative changed. Review it before applying.');
+ if(plan.workload)assertWorkloadPlanProof(plan,workloadProof,true);
+ plan.applied=true;return catalog;
 }
 /** An explicit new attachment references the immutable alternative. Existing attachments remain intact. */
-export function attachPlanAlternative(raw:PlanAlternatives,context:AlternativeContext,planId:string,confirmation:{inputKey:string;attachmentId:string;at:string;acknowledgeUnknowns:boolean}):PlanAlternatives{
+export function attachPlanAlternative(raw:PlanAlternatives,context:AlternativeContext,planId:string,confirmation:{inputKey:string;attachmentId:string;at:string;acknowledgeUnknowns:boolean;workloadProof?:WorkloadCurrentProof}):PlanAlternatives{
  const catalog=checked(raw,context),plan=catalog.plans.find(item=>item.id===planId&&!item.deleted);
  if(plan?.result.calculationStatus==='awaiting-scope')fail('This is a qualitative proposal. Confirm population and horizon, then calculate it before attaching.');
  if(!plan||bundleInputKey(plan.draft)!==confirmation.inputKey)fail('Review this exact alternative before attaching.');
+ if(plan.workload)assertWorkloadPlanProof(plan,confirmation.workloadProof);
  const existing=catalog.attachments.find(item=>item.id===confirmation.attachmentId);if(existing){if(existing.planId!==planId)fail('That attachment ID belongs to another alternative.');return catalog;}
  if(plan.result.issues.length&&!confirmation.acknowledgeUnknowns)fail('Acknowledge unresolved assumptions before attaching this proposal.');
  catalog.attachments.push({id:confirmation.attachmentId,planId,attachedAt:confirmation.at});
@@ -178,6 +195,7 @@ export function attachPlanAlternative(raw:PlanAlternatives,context:AlternativeCo
 export function proposeStaffingAlternative(raw:PlanAlternatives,context:AlternativeContext,request:AlternativeRequest,draft:BundleDraft):AlternativeOutcome{
  const catalog=checked(raw,context),operation:AlternativeOperation={kind:'staffing',text:request.text,sourceIds:request.sourceIds};
  const sources=sourcesFor(catalog,request),existing=retry(catalog,request,operation);if(existing)return existing;
+ if(sources.some(s=>s.workload))fail('Generic staffing search cannot substitute for a workload plan.');
  if(sources.length!==1||!readBundleDraft(draft)||draft.binding.goalId!==context.goalId||draft.binding.goal!==context.goal||draft.revision<=sources[0].draft.revision||!equal(draft.binding,sources[0].draft.binding)||draft.bundle.id!==sources[0].draft.bundle.id)fail('Review the verified staffing result for this exact source plan.');
  return append(catalog,request,operation,sources,draft,reconcileBundle(draft),['Staffing counts come from a reviewed local search. Original plans and attachments remain unchanged.']);
 }
@@ -193,6 +211,7 @@ export function proposeCorrectedPilotAlternative(raw:PlanAlternatives,context:Al
  const catalog=checked(raw,context),operation:AlternativeOperation={kind:'goal-correction',text:request.text,sourceIds:request.sourceIds};
  const sources=sourcesFor(catalog,request),existing=retry(catalog,request,operation);if(existing)return existing;
  if(sources.length!==1)fail('Choose one saved Action Plan to correct.');
+ if(sources.some(s=>s.workload))fail('Workload corrections need the complete workload calculator.');
  const correction=savedPilotCorrection(sources[0].draft,goalContext);
  if(!correction)fail('This plan has no unchanged legacy defaults to correct. Explicit plan edits and prior attachments are kept.');
  const prior=catalog.plans.find(plan=>!plan.deleted&&plan.operation?.kind==='goal-correction'&&plan.sourceRefs.length===1&&plan.sourceRefs[0].id===sources[0].id&&equal(plan.draft,correction.draft));if(prior)return {status:'ready',catalog,plan:structuredClone(prior),reused:true};
@@ -200,13 +219,30 @@ export function proposeCorrectedPilotAlternative(raw:PlanAlternatives,context:Al
 }
 
 /** Explicit goal association of an immutable proposal; never operational Apply. */
-export function associatePlanProposal(raw:PlanAlternatives,context:AlternativeContext,planId:string,confirmation:{inputKey:string;attachmentId:string;at:string;acknowledgeUnknowns:boolean}):PlanAlternatives{
+export function associatePlanProposal(raw:PlanAlternatives,context:AlternativeContext,planId:string,confirmation:{inputKey:string;attachmentId:string;at:string;acknowledgeUnknowns:boolean;workloadProof?:WorkloadCurrentProof}):PlanAlternatives{
  const catalog=checked(raw,context),plan=catalog.plans.find(item=>item.id===planId&&!item.deleted);
  if(!plan||plan.result.inputKey!==confirmation.inputKey)fail('This proposal changed. Review it before choosing.');
+ if(plan.workload)assertWorkloadPlanProof(plan,confirmation.workloadProof);
  const existing=catalog.attachments.find(item=>item.id===confirmation.attachmentId);
  if(existing){if(existing.planId!==planId||existing.purpose!=='proposal-selection')fail('That selection belongs to another proposal.');return catalog;}
  if(plan.result.issues.length&&!confirmation.acknowledgeUnknowns)fail('Review the unknowns before choosing this proposal.');
  catalog.attachments.push({id:confirmation.attachmentId,planId,attachedAt:confirmation.at,purpose:'proposal-selection'});
  if(!readPlanAlternatives(catalog,context))fail('The selected proposal could not be verified. Existing work is kept.');
  return catalog;
+}
+
+/** Workload proposals retain the full replay artifact and immutable source lineage. */
+export function appendWorkloadAlternative(raw:PlanAlternatives|null,context:AlternativeContext,request:AlternativeRequest,snapshot:WorkloadPlanSnapshotV1,proposalKey:string):AlternativeOutcome{
+ const catalog=raw?checked(raw,context):{version:1 as const,...context,nextNumber:1,order:[],plans:[],attachments:[]};
+ const option=snapshot.report.options.find(o=>o.id===snapshot.selectedOptionId);if(!option||!idValid(request.requestId)||request.sourceIds.length>1||!request.text.trim()||request.text.length>1200||!readWorkloadPlanSnapshot(snapshot,option.normalizedDraft,reconcileBundle(option.normalizedDraft))||snapshot.input.identity.goalId!==context.goalId||snapshot.input.identity.goal!==context.goal)fail('Review the complete workload proposal for this exact goal.');
+ const operation:AlternativeOperation={kind:'workload',text:request.text,sourceIds:[...request.sourceIds],proposalKey};
+ const prior=retry(catalog,request,operation);if(prior&&prior.status==='ready'){if(!workloadEqual(prior.plan.workload,snapshot))fail('This retry belongs to a different workload snapshot.');return prior;}
+ const sources=request.sourceIds.length?sourcesFor(catalog,request):[];
+ if(sources.some(s=>!s.workload||s.draft.revision>=snapshot.input.identity.revision||!workloadEqual(s.workload.input.currentBinding,snapshot.input.currentBinding)))fail('A workload edit must retain its older workload source and advance revision.');
+ return append(catalog,request,operation,sources,option.normalizedDraft,reconcileBundle(option.normalizedDraft),['Saved workload proposal; assumptions and constraints are retained. Not operational hiring.'],snapshot);
+}
+
+/** Pure guard shared by Apply and both attachment paths; summaries never qualify. */
+export function assertWorkloadPlanProof(plan:PlanAlternative,proof:WorkloadCurrentProof|undefined,requireMet=false){
+ const s=plan.workload,o=s?.report.options.find(o=>o.id===s.selectedOptionId);if(!s||!readWorkloadPlanSnapshot(s,plan.draft,plan.result)||!proof||proof.datasetToken!==s.input.identity.datasetToken||proof.sourceKey!==s.report.sourceKey||proof.revision!==s.input.identity.revision||proof.selectedOptionId!==s.selectedOptionId||proof.bindingKey!==actionBindingKey(s.input.currentBinding.binding)||requireMet&&o?.status!=='met')fail(requireMet?'Local workload Apply needs a current met option and complete workload proof; it is app planning state only.':'Workload linking needs current full artifact proof. Reopen Workload & Capacity Planning.');
 }
