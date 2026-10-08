@@ -5,7 +5,7 @@ import {SyntheticDomainChart,SyntheticDomainChartNotes} from '@/components/synth
 function HomeForecastDetails({domain,data}:{domain:SyntheticDemoDomain;data:typeof artifact}){
  return <details><summary className="min-h-11 cursor-pointer py-2 text-xs font-medium focus-visible:ring-2 focus-visible:ring-ring">Details</summary><div className="space-y-2 break-words text-xs">
   <p>Fixed simulated company-wide population, separate from recorded workforce evidence. Your goal and workforce filters do not change these values. Operational forecasts are unavailable.</p>
-  <p>Cutoff 30 Sep 2026 · History through {data.domains[domain].support.lastPeriod} · Intervals unavailable.</p>
+  <p>Cutoff 30 Sep 2026 · History through {new Date(data.domains[domain].support.lastPeriod+'-01T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'})} · Intervals unavailable.</p>
   <p>Constructed synthetic demonstration: {data.historyCases} histories, {data.monthsPerHistory} months each. Fixed stable-mechanism case, seed {data.seed}; methods use only releases available at the cutoff.</p>
   <p>{demoDomainCopy[domain].assumption}</p>
   <SyntheticDomainChartNotes domain={domain} data={data}/>
