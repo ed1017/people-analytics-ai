@@ -2,6 +2,7 @@ import {taExtensionPrompt} from "@/lib/synthetic-ta/extension";
 import {conversationalAnswerStyle} from '@/lib/chat-answer-style';
 import {homeForecastAnswer} from '@/lib/home-forecast';
 import {homeTurnPurpose,homeConversationInstructions} from '@/lib/home-conversation';
+import {strategicPlanningInstructions} from '@/lib/home-strategic-planning';
 import {decodeHomeModelReply} from '@/lib/home-chat-reply';
 import {syntheticDomainDemoPrompt} from '@/lib/synthetic-domain-demo';
 import {homeBundleTask,homeBundleTaskInstructions} from '@/lib/home-bundle-task';
@@ -1521,7 +1522,7 @@ ${message}
     const homePurpose=homeTurnPurpose(message,history);
     const prepareHomeGoal=!summaryOnly&&(homePurpose==='goal'||homePurpose==='discovery');
     const homeReplyFormat=page==="home"?buildHomeReplyFormat(body.overviewBriefingContext,prepareHomeGoal):null;
-    const homeInstructions=homeConversationInstructions(homePurpose);
+    const homeInstructions=[homeConversationInstructions(homePurpose),strategicPlanningInstructions(message,history)].filter(Boolean).join('\n');
     const homeAnswerStyle=homePurpose==='answer'?conversationalAnswerStyle:homeStyle.instructions;
     const homeInput=[
       {role:'user' as const,content:workforceContext+'\nACTIVE GOAL CONTEXT (user intent, not evidence): '+JSON.stringify(goalContext)+'\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: '+JSON.stringify(marketReference)},

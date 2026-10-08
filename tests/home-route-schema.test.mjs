@@ -234,3 +234,30 @@ test('tool-continuation answer retains concise formatting instructions',async()=
  for(const sent of sandbox.__requests.slice(start))assert.match(sent.instructions,/CONVERSATIONAL ANSWER FORMAT/);
  assert.match(sandbox.__requests.at(-1).input[0].output,/error/);
 });
+
+// The actual route stays on the existing single Home call; no live provider.
+const {planningPrompts,challengePrompts}=await import('./fixtures/home-starter-prompts.mjs');
+for(const [index,prompt] of planningPrompts.entries())test('actual Home POST adds bounded planning clarification for approved opener '+(index+1),async()=>{
+ const reply={answer:'What operating baseline should we use?',finding_followups:[],next_step:'choose_goal',problem:'Unrequested goal',problem_evidence:[],options:[],question:'Pin this?'};
+ sandbox.__replies.push({status:'completed',output:[],output_text:JSON.stringify(reply)});
+ const before=sandbox.__requests.length;
+ const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',persona:'HR',message:prompt,history:[],overviewBriefingContext:packets[1][1]})}));
+ assert.equal(response.status,200);assert.equal(sandbox.__requests.length,before+1);
+ const request=JSON.parse(JSON.stringify(sandbox.__requests.at(-1)));
+ assert.equal(request.model,'gpt-5.6-luna');assert.equal(request.tool_choice,'none');
+ assert.deepEqual(request.text.format,buildHomeReplyFormat(normalizeHomePack(packets[1][1]),false));
+ assert.match(request.instructions,/CURRENT TURN PURPOSE: answer/);assert.match(request.instructions,/STRATEGIC WORKFORCE PLANNING CLARIFICATION/);assert.match(request.instructions,/keep unsupported measured\/source values unknown/);
+ assert.ok(JSON.stringify(request.input).includes(prompt));
+ const decoded=await response.json();assert.equal(decoded.nextStep,'none');assert.equal(decoded.candidateProposal,null);assert.equal(decoded.clarification,null);
+});
+test('actual route keeps related planning follow-up guidance but drops it on a new challenge',async()=>{
+ const history=[{role:'user',content:planningPrompts[1]},{role:'assistant',content:'What scope and delivery effort should we assume for the product?'}];
+ for(const [message,planning] of [['We need designers and engineers for the product project.',true],[challengePrompts[0],false],[challengePrompts[2],false]]){
+  sandbox.__replies.push({status:'completed',output:[],output_text:JSON.stringify({answer:'Synthetic clarification.',finding_followups:[],next_step:'none',problem:null,problem_evidence:[],options:[],question:null})});
+  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',persona:'HR',message,history,overviewBriefingContext:packets[1][1]})}));
+  assert.equal(response.status,200);const request=sandbox.__requests.at(-1);
+  assert.equal(request.instructions.includes('STRATEGIC WORKFORCE PLANNING CLARIFICATION'),planning);
+  assert.ok(JSON.stringify(request.input).includes(planningPrompts[1]));assert.ok(JSON.stringify(request.input).includes(message));
+  assert.equal(request.tool_choice,'none');
+ }
+});
