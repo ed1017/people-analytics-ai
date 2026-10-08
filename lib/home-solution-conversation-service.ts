@@ -1,5 +1,5 @@
 import type {SolutionRequest,SolutionState,SolutionEvaluation} from './home-solution-conversation';
-import type {SolutionCandidate,SolutionConstraint,SolutionFinal,ProjectionSpec} from './home-solution-conversation-schema';
+import type {SolutionCandidate,SolutionConstraint,SolutionFinal,ProjectionSpec,SolutionMetricRef} from './home-solution-conversation-schema';
 import type {ProjectionInputs,HeadcountProjection} from './home-solution-projection';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {readSolutionRequest,readSolutionState,evaluateSolutionCandidate,mergeSolutionConstraints,solutionUserTurns,resolveSolutionMetric} from './home-solution-conversation.ts';
@@ -14,6 +14,15 @@ export type SolutionRuntime={complete:(input:unknown[],finalOnly:boolean,signal:
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 const abort=(signal:AbortSignal)=>{if(signal.aborted)throw Error('Conversation request cancelled.');};
 const latest=<T extends {id:string}>(items:T[])=>[...new Map(items.map(item=>[item.id,item])).values()];
+/** References for known results use evaluation identity, never nested draft lineage. */
+function checkedMetricReferences(state:SolutionState,kind:SolutionMetricRef['kind'],id:string,revision:number):SolutionMetricRef[]{
+ const metrics:SolutionMetricRef['metric'][]=kind==='candidate'?['cash_usd','staff_hours','participants']:['opening_headcount','closing_headcount'];
+ return metrics.flatMap(metric=>{
+  const ref:SolutionMetricRef={kind,id,revision,metric};
+  try{const value=resolveSolutionMetric(state,ref).value;return typeof value==='number'&&Number.isFinite(value)?[ref]:[];}
+  catch{return [];}
+ });
+}
 export function solutionModelContext(request:SolutionRequest){
  const saved=request.catalog?.plans.filter(plan=>!plan.deleted)??[];
  return {goal:request.goal,scope:request.scope,filters:request.filters,timeZone:request.timeZone,goalContext:request.goalContext,currentEvidence:request.evidence,currentConstraints:request.state.constraints,
@@ -51,11 +60,11 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
     }else if(call.name==='evaluate_candidate'){
      const constraints=mergeSolutionConstraints(request,state.constraints,args.constraintUpdates as SolutionConstraint[]);
      const item=await evaluateSolutionCandidate(request,args.candidate as SolutionCandidate,constraints);abort(signal);
-     state.constraints=constraints;state.working=[...state.working,item].slice(-12);evaluated.set(item.id,item);result=item;
+     state.constraints=constraints;state.working=[...state.working,item].slice(-12);evaluated.set(item.id,item);result={...item,verifiedMetricReferences:checkedMetricReferences(state,'candidate',item.id,item.revision)};
     }else{
      projectionInput??=runtime.loadProjection(request.filters,signal);
      const item=await calculateHeadcountProjection(args.spec as ProjectionSpec,await projectionInput,state.analyses,solutionUserTurns(request).map(turn=>turn.id));abort(signal);
-     state.analyses=[...state.analyses,item].slice(-6);analyses.set(item.id,item);result=item;
+     state.analyses=[...state.analyses,item].slice(-6);analyses.set(item.id,item);result={...item,verifiedMetricReferences:checkedMetricReferences(state,'projection',item.id,item.revision)};
     }
     if(JSON.stringify(result).length>65000)result={ok:false,error:'The read result exceeds the tool budget. Request fewer source IDs.'};
    }catch(error){abort(signal);result={ok:false,error:error instanceof Error?error.message:'The read or calculation was unavailable.',instruction:'Explain the boundary, ask a focused question, or revise typed inputs. Do not claim this calculation succeeded.'};}
