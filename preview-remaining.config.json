@@ -1,0 +1,1 @@
+{"framework":null,"buildCommand":"node --experimental-strip-types tests/manual/solution-preview-acceptance.mjs --execute-reserved-batch .preview-remaining/reservation.json","outputDirectory":".preview-acceptance-empty"}
