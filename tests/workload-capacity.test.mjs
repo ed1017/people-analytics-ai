@@ -76,3 +76,59 @@ test('the existing staffing deadline uses prerequisite-gated additional roles',a
  const i=await workloadFixture();i.workload.ticketsByMonth=i.workload.ticketsByMonth.map(()=>known(0));i.options[0].draft.inputs.capacity.input.deadlineMonth='2027-02';let r=calculateWorkloadCapacity(i);assert.equal(r.options[0].checks.deadline,'not-met');
  i.options[0].draft.inputs.capacity.input.deadlineMonth='';i.options[0].draft.inputs.capacity.origins.deadlineMonth={kind:'unknown',basis:null};r=calculateWorkloadCapacity(i);assert.equal(r.options[0].checks.deadline,'unknown');assert.notEqual(r.options[0].status,'met');
 });
+
+// Review regressions: these six cases fail on d937b5f before adapter changes.
+test('review 1: a cleared reviewed budget cannot resurrect the older staffing budget',async()=>{
+ const i=await workloadFixture();i.options=i.options.slice(0,1);i.workload.ticketsByMonth=[known(3840),known(3840),known(5760)];i.options[0].draft.inputs.budget.amount=unknown();
+ const before=structuredClone(i),r=calculateWorkloadCapacity(i);assert.equal(r.options[0].checks.cash,'unknown');assert.equal(r.options[0].status,'unknown');assert.deepEqual(r.options[0].normalizedDraft.inputs.budget.amount,unknown());assert.deepEqual(i,before);
+ delete i.options[0].draft.inputs.budget;assert.equal(calculateWorkloadCapacity(i).options[0].checks.cash,'met');
+});
+test('review 2: comparison rejects different evidence/planning bindings and aggregate scopes',async()=>{
+ for(const mutate of [d=>d.binding.evidenceDigest='a'.repeat(64),d=>d.binding.planningDigest='b'.repeat(64),d=>{d.inputs.scope.businessUnit=known('BU-OTHER');d.inputs.capacity.input.businessUnit='BU-OTHER';},d=>d.inputs.scope.population=known('Another source population'),d=>d.inputs.scope.requirements=known('Different service level')]){
+  const i=await workloadFixture();mutate(i.options[1].draft);assert.throws(()=>calculateWorkloadCapacity(i),/comparison|binding|scope/i);
+ }
+});
+test('review 3: cohort training cannot precede its learning-component start',async()=>{
+ const i=await workloadFixture();i.options[0].draft.inputs.timing.find(t=>t.componentId==='c1').start=known('2027-02-01');assert.throws(()=>calculateWorkloadCapacity(i),/Training.*start/i);
+});
+test('review 4: decimal per-person cash normalizes in cents without relaxing input precision',async()=>{
+ const i=await workloadFixture(),first=i.options[0];Object.assign(first.draft.inputs.capacity.input,{build:'3',buy:'9',backfills:'3'});first.draft.inputs.groups[0].count=known(3);first.cohorts[0].trainingHoursByMonth=[known(60),known(60),known(0)];for(const o of i.options){o.training.cash=known(0.1);o.draft.inputs.capacity.input.trainingCash=Number(o.draft.inputs.capacity.input.build)===3?'0.30':'0.80';o.draft.inputs.capacity.origins.trainingCash={kind:'user-entered',basis:'Reviewed synthetic whole-program cash.'};}
+ const before=structuredClone(i),r=calculateWorkloadCapacity(i);assert.deepEqual(r.options.map(o=>o.training.wholeProgramCash),[0.3,0.8]);assert.equal(r.options[0].cash,244500.3);assert.equal(r.options[1].cash,152000.8);assert.deepEqual(i,before);
+ i.options[0].training.cash=known(0.001);assert.throws(()=>calculateWorkloadCapacity(i),/decimal|precision/i);
+});
+test('review 5: manager pool cannot alias the source or target pool',async()=>{
+ for(const pool of ['source','target']){const i=await workloadFixture();i.managers[0].poolId=pool;assert.throws(()=>calculateWorkloadCapacity(i),/Manager.*distinct/i);}
+});
+test('review 6: monthly cash follows reconciled ledger timing, unknown amounts and ownership',async()=>{
+ const i=await workloadFixture();let o=calculateWorkloadCapacity(i).options[0];assert.deepEqual(o.rows.map(r=>r.cashTotal),[74400,64000,90000]);assert.equal(o.rows.reduce((n,r)=>n+r.cashTotal,0),o.cash);
+ const r=reviewBundleProposal(o.normalizedDraft);assert.deepEqual(o.cashLedger,r.ledger.filter(l=>l.kind==='cash'));assert.deepEqual(o.rows[0].cashLines.map(l=>[l.id,l.amount]),o.cashLedger.map(l=>[l.id,l.monthly[0]]));
+ i.options[0].training.cash=unknown();o=calculateWorkloadCapacity(i).options[0];assert.deepEqual(o.rows.map(r=>r.cashTotal),[null,64000,90000]);assert.equal(o.cash,null);
+ const j=await workloadFixture();j.options[0].draft.inputs.capacity.input.arrivalDate='';j.options[0].draft.inputs.capacity.origins.arrivalDate={kind:'unknown',basis:null};o=calculateWorkloadCapacity(j).options[0];assert.deepEqual(o.rows.map(r=>r.cashTotal),[null,null,null]);assert.ok(o.cashLedger.find(l=>l.id==='capacity:hireStaffingCost').monthly.every(v=>v===null));
+ const k=await workloadFixture();k.options[0].draft.inputs.costsDistinct=unknown();o=calculateWorkloadCapacity(k).options[0];assert.deepEqual(o.rows.map(r=>r.cashTotal),[null,null,null]);
+});
+
+async function feasibleReview(){const i=await workloadFixture();i.options=i.options.slice(0,1);i.workload.ticketsByMonth=[known(3840),known(3840),known(5760)];assert.equal(calculateWorkloadCapacity(i).options[0].status,'met');return i;}
+test('review 1 exact: reviewed unknown, zero, sufficient and absent budgets retain authority',async()=>{
+ const i=await feasibleReview(),d=i.options[0].draft;d.inputs.budget.amount=unknown();let o=calculateWorkloadCapacity(i).options[0];assert.equal(o.checks.cash,'unknown');assert.equal(o.status,'unknown');assert.equal(d.inputs.capacity.input.budget,'1000000');
+ d.inputs.budget.amount=known(0);o=calculateWorkloadCapacity(i).options[0];assert.equal(o.checks.cash,'not-met');d.inputs.budget.amount=known(1000000);assert.equal(calculateWorkloadCapacity(i).options[0].status,'met');delete d.inputs.budget;assert.equal(calculateWorkloadCapacity(i).options[0].status,'met');
+});
+test('review 2 exact: current dataset and expected binding cannot silently rebind old drafts',async()=>{
+ for(const mutate of [i=>i.identity.datasetToken='other:1',i=>i.options[0].draft.binding.evidenceDigest='a'.repeat(64),i=>i.options[0].draft.binding.planningDigest='b'.repeat(64)]){const i=await feasibleReview();mutate(i);assert.throws(()=>calculateWorkloadCapacity(i),/current|binding|dataset/i);}
+ for(const mutate of [d=>d.binding.evidenceDigest='a'.repeat(64),d=>d.binding.planningDigest='b'.repeat(64),d=>{d.inputs.capacity.input.businessUnit='BU-OTHER';d.inputs.scope.businessUnit=known('BU-OTHER');}]){const i=await feasibleReview(),second=structuredClone(i.options[0]);second.id='other';mutate(second.draft);i.options.push(second);assert.throws(()=>calculateWorkloadCapacity(i),/comparison|binding|scope/i);}
+});
+test('review 3 exact: learning finish bounds training even when target transfer is later',async()=>{
+ const i=await feasibleReview(),timing=i.options[0].draft.inputs.timing.find(t=>t.componentId==='c1');timing.finish=known('2027-02-01');assert.throws(()=>calculateWorkloadCapacity(i),/Training.*window|Training.*finish/i);
+ timing.finish=unknown();assert.notEqual(calculateWorkloadCapacity(i).options[0].status,'met');timing.finish=known('2027-03-01');timing.start=unknown();assert.notEqual(calculateWorkloadCapacity(i).options[0].status,'met');timing.start=known('2027-01-01');assert.equal(calculateWorkloadCapacity(i).options[0].status,'met');
+});
+test('review 4 exact: decimal per-person cash and hours equal explicit whole-program totals',async()=>{
+ const i=await feasibleReview(),o=i.options[0],d=o.draft;Object.assign(d.inputs.capacity.input,{build:'3',buy:'9',backfills:'3'});d.inputs.groups[0].count=known(3);o.training.cash=known(600.1);o.cohorts[0].trainingHoursByMonth=[known(60),known(60),known(0)];
+ let r=calculateWorkloadCapacity(i).options[0];assert.equal(r.training.wholeProgramCash,1800.3);assert.equal(r.training.wholeProgramHours,120);o.training={basis:'whole-program',cash:known(1800.3),hours:known(120)};assert.equal(calculateWorkloadCapacity(i).options[0].cash,r.cash);
+ o.training={basis:'per-person',cash:known(600.1),hours:known(0.1)};o.cohorts[0].trainingHoursByMonth=[known(0.15),known(0.15),known(0)];r=calculateWorkloadCapacity(i).options[0];assert.equal(r.training.wholeProgramHours,0.3);assert.equal(r.normalizedDraft.inputs.capacity.input.trainingHours,'0.3');
+ o.training={basis:'whole-program',cash:known(1800.3),hours:known(0.3)};assert.equal(calculateWorkloadCapacity(i).options[0].training.wholeProgramHours,r.training.wholeProgramHours);
+ o.training.hours=known(0.001);assert.throws(()=>calculateWorkloadCapacity(i),/decimal|precision/i);
+});
+test('review 6 exact: additional expense preserves first-month training and unknown complete cash',async()=>{
+ const i=await feasibleReview(),d=i.options[0].draft;d.inputs.expenses.push({id:'manual-support',label:'Synthetic additional cost',kind:'cash',amount:known(500),startMonth:known('2027-02'),months:known(1)});d.inputs.expenseLinks.push({expenseId:'manual-support',componentIds:['c1'],allocations:null});
+ let o=calculateWorkloadCapacity(i).options[0];assert.deepEqual(o.rows.map(r=>r.cashTotal),[74400,64500,90000]);assert.equal(o.cash,228900);assert.equal(o.status,'met');assert.deepEqual(o.cashLedger.find(l=>l.id==='capacity:trainingCash').monthly,[2400,0,0]);
+ d.inputs.costReviews[0].complete=unknown();o=calculateWorkloadCapacity(i).options[0];assert.equal(o.cash,null);assert.equal(o.checks.cash,'unknown');assert.equal(o.status,'unknown');assert.deepEqual(o.rows.map(r=>r.cashTotal),[null,null,null]);
+});
