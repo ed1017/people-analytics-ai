@@ -4,7 +4,7 @@ import {actionEvidenceCatalog,plain,exactKeys} from './home-action-proposal.ts';
 
 export const bundleDomains=['manager_workload','learning','mobility','compensation','hiring','execution'] as const;
 export type BundleComponent={id:string;name:string;domain:typeof bundleDomains[number];firstStep:string;evidence:string[];ownerRole:string;dependsOn:string[];limitation:string};
-export type SolutionBundle={origin?:'local-assumptions-v1'|'local-demo-v1';id:'A'|'B'|'C';name:string;objective:string;coordination:string;components:BundleComponent[];limitation:string};
+export type SolutionBundle={origin?:'local-assumptions-v1'|'local-demo-v1'|'conversation-v1';id:'A'|'B'|'C';name:string;objective:string;coordination:string;components:BundleComponent[];limitation:string};
 export type BundleProposal={version:1;goal:string;bundles:SolutionBundle[];question:string|null;unavailableReason:string|null};
 const text=(value:unknown,max:number):value is string=>typeof value==='string'&&!!value.trim()&&value.length<=max;
 const ids=['c1','c2','c3','c4','c5','c6'];

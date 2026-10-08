@@ -1,7 +1,29 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {HomeGuidedFlow,guidedReceiptStep} from '../lib/home-guided-flow.ts';
+import {HomeGuidedFlow,guidedReceiptStep,conversationalReceiptStep} from '../lib/home-guided-flow.ts';
 const deferred=()=>{let resolve;const promise=new Promise(done=>{resolve=done});return {promise,resolve};};
+test('choosing a reviewed proposal early or after Back advances to saved-plan refinement',()=>{
+ const chosen={type:'proposal-chosen',goalId:'guided-test',goal:'Reduce turnover',planId:'chosen-proposal',number:2};
+ for(const step of [0,1,2,3])assert.equal(conversationalReceiptStep(step,chosen,'guided-test',null),4);
+ // Back cannot turn a failed save, another goal's receipt or an invalid selection
+ // into successful guide progress; completed guides do not restart.
+ for(const event of [{...chosen,type:'proposal-reviewed'},{...chosen,goalId:'other'},{...chosen,planId:undefined},{...chosen,number:0}])assert.notEqual(conversationalReceiptStep(2,event,'guided-test',null),4);
+ for(const step of [-1,6,7])assert.equal(conversationalReceiptStep(step,chosen,'guided-test',null),null);
+});
+test('conversational guide follows replies and atomic selection, never a separate pin or fixed plan',()=>{
+ const ref={id:'voluntary-trial',revision:2,requestId:'refinement-reply'},reviewed={type:'proposal-reviewed',goalId:'guided-test',planId:'voluntary-trial',candidates:[ref]},chosen={type:'proposal-chosen',goalId:'guided-test',planId:'any-proposal',number:7,candidate:ref};
+ for(const step of [1,2,4])assert.equal(conversationalReceiptStep(step,reviewed,'guided-test','original'),step+1);
+ for(const step of [3,5])assert.equal(conversationalReceiptStep(step,chosen,'guided-test','original',[ref]),step+1);
+ for(const event of [{...reviewed,type:'answered'},{...reviewed,planId:undefined},{...reviewed,goalId:'other'}])assert.equal(conversationalReceiptStep(1,event,'guided-test',null),null);
+ for(const event of [{...chosen,type:'pinned'},{...chosen,number:0},{...chosen,planId:'original'},{...chosen,goalId:'other'}])assert.equal(conversationalReceiptStep(5,event,'guided-test','original'),null);
+});
+test('final guide selection requires the exact candidate revision from a refinement reply',()=>{
+ const eligible=[{id:'mentoring',revision:2,requestId:'refinement'},{id:'peer-support',revision:1,requestId:'refinement'}],chosen={type:'proposal-chosen',goalId:'guided-test',planId:'new-plan',number:9};
+ for(const candidate of eligible)assert.equal(conversationalReceiptStep(5,{...chosen,candidate},'guided-test','original',eligible),6);
+ for(const candidate of [undefined,{...eligible[0],revision:1},{...eligible[0],requestId:'earlier'},{...eligible[0],id:'earlier-alternative'}])assert.equal(conversationalReceiptStep(5,{...chosen,candidate},'guided-test','original',eligible),null);
+ for(const candidates of [undefined,[],[{...eligible[0],revision:0}]])assert.equal(conversationalReceiptStep(4,{type:'proposal-reviewed',goalId:'guided-test',planId:'mentoring',candidates},'guided-test','original'),null);
+ assert.equal(conversationalReceiptStep(5,{type:'proposal-reviewed',goalId:'guided-test',planId:'mentoring',candidates:eligible},'guided-test','original'),5);
+});
 
 test('a pending or completed Next cannot send twice',async()=>{
  const flow=new HomeGuidedFlow(),wait=deferred();let calls=0;

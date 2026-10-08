@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import {HOME_INSTRUCTIONS_DISMISSED_KEY} from '@/lib/home-onboarding';
 import type { AppPage } from "@/lib/types";
 
-export function HomeGettingStarted({ busy, active, ready, autoOpen, onNavigate, onStartDemo, status, dismissKey }: {
+export function HomeGettingStarted({ busy, active, ready, autoOpen, onNavigate, onStartDemo, status, dismissKey, conversational=false }: {
+  conversational?:boolean;
   busy: boolean;
   active: boolean;
   ready: boolean;
@@ -57,9 +58,7 @@ export function HomeGettingStarted({ busy, active, ready, autoOpen, onNavigate, 
       <h4 className="font-semibold">From question to action</h4>
       <ol className="list-decimal space-y-2 pl-5">
         <li><strong>Ask a question</strong> — Start a conversation or <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => navigate("workforce")}>explore your data</button>.</li>
-        <li><strong>Pin a goal when ready</strong> — Optionally save your goal and request Action Plan choices.</li>
-        <li><strong>Choose and attach a plan</strong> — Review a choice, then use Attach Action Plan to save it in one click.</li>
-        <li><strong>Adjust it in chat</strong> — Describe a change and Send. Review and select the new numbered alternative, then attach it to your goal.</li>
+        {conversational?<><li><strong>Explore and refine in chat</strong> — Describe the goal and discuss possible approaches. Reuse what is known; missing dates, budgets and assumptions can stay unknown.</li><li><strong>Choose a plan when ready</strong> — Review a proposal and its unknowns, then choose it. The goal is saved and the proposal attached automatically.</li><li><strong>Adjust it in chat</strong> — Describe a change and Send. Choose the revised proposal to keep both versions. Optional forms are available when you ask for them.</li></>:<><li><strong>Pin a goal when ready</strong> — Optionally save your goal and request Action Plan choices.</li><li><strong>Choose and attach a plan</strong> — Review a choice, then use Attach Action Plan to save it in one click.</li><li><strong>Adjust it in chat</strong> — Describe a change and Send. Review and select the new numbered alternative, then attach it to your goal.</li></>}
         <li><strong>Share and track your goal (TBD)</strong> — Share goals and Action Plans with owners, then track progress and outcomes.</li>
       </ol>
       <p className="text-xs text-muted-foreground">On your first visit, goals labelled Demo example include attached plans you can explore and edit. Their scope, budget and outcomes are assumptions, not achieved results.</p>
