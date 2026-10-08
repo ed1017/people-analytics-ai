@@ -1,3 +1,4 @@
+import {calibratedExtensionForSource} from "../../../lib/synthetic-ta/extension";
 import { NextResponse } from "next/server";
 import { dataApiErrorResponse } from "../../../lib/data-api-error";
 import { supabaseServer } from "../../../lib/supabase-server";
@@ -26,6 +27,7 @@ export async function GET() {
 
     return NextResponse.json({
       as_of: current.as_of,
+      modeled_extension: calibratedExtensionForSource(current.as_of, current, monthlyResult.data ?? []),
       summary: {
         applications: toNumber(current.applications),
         interviewed_applications: toNumber(current.interviewed_applications),

@@ -1532,6 +1532,7 @@ export default function Home() {
                 "talent-acquisition" &&
               talentAcquisitionData
                 ? {
+                    modeledExtension: talentAcquisitionData.modeled_extension,
                     summary:
                       talentAcquisitionData.summary,
                     businessUnits:

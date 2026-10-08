@@ -1,6 +1,7 @@
 "use client";
 
-import {SyntheticDomainDemo} from "@/components/synthetic-domain-demo";
+import {CalibratedTaPanels} from "@/components/calibrated-ta-panels";
+import {resolveTaExtension} from "@/lib/synthetic-ta/extension";
 
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatWholeCount, formatMetric } from "@/lib/display-format";
@@ -22,6 +23,7 @@ function formatLongDate(value: string) {
 
 export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitionPageProps) {
   const summary = data?.summary;
+  const extension = resolveTaExtension(data?.modeled_extension);
 
   return (
     <section className="evidence-workspace min-w-0 p-6">
@@ -36,13 +38,13 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
 
       {error && <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">{error}</div>}
 
-      <SyntheticDomainDemo domain="hiring" />
+      <div className="mb-4">{extension ? <CalibratedTaPanels data={extension} /> : <p className="rounded-lg border p-3 text-sm">Calibrated projections and expanded funnel unavailable: source data is loading or differs from the calibration snapshot.</p>}</div>
 
       {summary ? (
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-lg border p-4">
-              <p className="text-sm text-muted-foreground">Open Requisitions</p>
+              <p className="text-sm text-muted-foreground">Current-status Open Requisitions</p>
               <p className="mt-2 text-3xl font-semibold">{formatWholeCount(summary.open_requisitions)}</p>
               <p className="mt-1 text-xs text-muted-foreground">{formatWholeCount(summary.open_positions)} open positions</p>
             </div>
@@ -60,27 +62,6 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
               <p className="text-sm text-muted-foreground">Aging Open Reqs</p>
               <p className="mt-2 text-3xl font-semibold">{formatWholeCount(summary.open_reqs_over_60_days)}</p>
               <p className="mt-1 text-xs text-muted-foreground">Older than 60 days · median age {formatMetric(summary.median_open_req_age_days, 0, " days")}</p>
-            </div>
-          </div>
-
-          <div className="mt-6 rounded-lg border p-4">
-            <div className="mb-4">
-              <h3 className="font-semibold">Recruiting Funnel</h3>
-              <p className="text-sm text-muted-foreground">Candidate progression through the recruiting process</p>
-            </div>
-            <div className="grid gap-3 md:grid-cols-4">
-              {([
-                ["Applications", summary.applications, null],
-                ["Interviewed", summary.interviewed_applications, summary.application_to_interview_pct],
-                ["Offers", summary.offered_applications, summary.interview_to_offer_pct],
-                ["Hires", summary.hires, summary.offer_to_hire_pct],
-              ] as const).map(([label, value, conversion]) => (
-                <div key={String(label)} className="rounded-lg border bg-muted/10 p-4">
-                  <p className="text-xs font-medium text-muted-foreground">{String(label)}</p>
-                  <p className="mt-2 text-2xl font-semibold">{formatWholeCount(value)}</p>
-                  <p className="mt-2 text-xs text-muted-foreground">{label === "Applications" ? "Top of funnel" : formatMetric(conversion, 1, "% from prior stage")}</p>
-                </div>
-              ))}
             </div>
           </div>
 
@@ -116,7 +97,7 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
           </div>
 
           <div className="mt-6 grid gap-6">
-            <div className="rounded-lg border p-4">
+            <div className="min-w-0 rounded-lg border p-4">
               <div className="mb-4"><h3 className="font-semibold">Hiring Demand by Business Unit</h3><p className="text-sm text-muted-foreground">Current open positions and historical hiring velocity</p></div>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[620px] text-sm">
@@ -135,7 +116,7 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
               </div>
             </div>
 
-            <div className="rounded-lg border p-4">
+            <div className="min-w-0 rounded-lg border p-4">
               <div className="mb-4"><h3 className="font-semibold">Source Effectiveness</h3><p className="text-sm text-muted-foreground">Applications, hires, and application-to-hire conversion</p></div>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[560px] text-sm">

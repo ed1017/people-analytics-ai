@@ -90,7 +90,7 @@ test('missing requested evidence, denominator differences, demo labels and subst
 });
 
 test('forecast boilerplate collapses without hiding simulated scope, unsupported measures, numbers or source dates',()=>{
- for(const question of ['Forecast turnover','Forecast hiring','Forecast satisfaction','Forecast turnover rate for 2027']){
+ for(const question of ['Forecast turnover','Forecast satisfaction','Forecast turnover rate for 2027']){
   const saved=homeForecastAnswer(question),result=presentation.homeAnswerPresentation(saved);
   assert.match(result.answer,/SIMULATED DEMO.*fixed simulated company-wide population/);
   assert.match(result.answer,/Goal and workforce filters do not apply/);
@@ -111,3 +111,5 @@ test('bare, field-qualified, grouped and explicit citations navigate to the corr
  nodes(ChatContent({content,onNavigate:page=>visited.push(page)})).filter(node=>node.type==='button').forEach(button=>button.props.onClick());assert.deepEqual(visited,['workforce','attrition','survey-sentiment','attrition','skills','attrition']);
  assert.doesNotMatch(render('[T3](app:workforce)',{onNavigate:()=>{}}),/<button/);
 });
+
+test('calibrated hiring answer retains generated scope, count units and source distinction',()=>{const saved=homeForecastAnswer('Forecast hiring'),result=presentation.homeAnswerPresentation(saved);assert.match(result.answer,/Generated synthetic history/);assert.match(result.answer,/474/);assert.match(result.answer,/475/);assert.match(result.answer,/synthetic-ta-calibrated-v2/);assert.deepEqual(result.answer.split('\n').filter(l=>l.startsWith('|')),saved.split('\n').filter(l=>l.startsWith('|')));});

@@ -1010,6 +1010,7 @@ export type TalentAcquisitionMonthlyPoint = {
 };
 
 export type TalentAcquisitionResponse = {
+  modeled_extension?: import("./synthetic-ta/extension").TaExtension | null;
   as_of: string;
   summary: {
     applications: number | null;

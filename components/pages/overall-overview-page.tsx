@@ -1,4 +1,5 @@
 "use client";
+import {resolveTaExtension} from "@/lib/synthetic-ta/extension";
 import {localPlanDiscussion} from '@/lib/home-plan-alternative-chat';
 import {GuidedDemo,GUIDED_EXAMPLE_PROMPT} from '@/components/guided-demo';
 import {HomeGuidedActionsContext,GuidedActionRegistry} from '@/components/home-guided-actions';
@@ -389,7 +390,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   }
   function renderStarterForecast(message:ChatMessage){
     const snapshot=starterForecasts.current.get(message);
-    return ready&&active&&snapshot?.context===contextKey?<HomeStarterForecastChart domain={snapshot.forecast.domain}/>:null;
+    return ready&&active&&snapshot?.context===contextKey?<HomeStarterForecastChart domain={snapshot.forecast.domain} taReady={ready && Boolean(resolveTaExtension((sourceResults["talent-acquisition"] as {data?:{modeled_extension?:unknown}}|undefined)?.data?.modeled_extension))}/>:null;
   }
   function renderExitReasonChart(message:ChatMessage){
     const snapshot=exitReasonCharts.current.get(message);
@@ -482,7 +483,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   const conversationPanel=(
     <section hidden={messages.length === 0} aria-label="Overview conversation" className="space-y-3">
       {/* Leaving Home does not start a new conversation or archive the visible reply. */}
-      <GoalConversationMessages messages={messages} responseStart={responseStart} renderBeforeMessage={message=>prioritizeGoal&&candidate?.rationale===message?candidatePanel:null} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,workforceQuery,persona,conversation.resetEpoch,conversation.storageReady])} onNavigate={onNavigate} home hideHistory collapsedRationale={message=>activePinnedGoal&&(planRationale.current.get(message)===conversation.activeGoalId||messages[messages.indexOf(message)-1]?.content===HOME_ACTION_PLAN_LABEL)} renderBulletAction={renderFindingAction} renderMessageSupplement={message=><><HomeForecastChart question={messages[messages.indexOf(message)-1]?.role==='user'?messages[messages.indexOf(message)-1].content:''} answer={message.content}/>{renderStarterForecast(message)}{renderExitReasonChart(message)}</>}/>
+      <GoalConversationMessages messages={messages} responseStart={responseStart} renderBeforeMessage={message=>prioritizeGoal&&candidate?.rationale===message?candidatePanel:null} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,workforceQuery,persona,conversation.resetEpoch,conversation.storageReady])} onNavigate={onNavigate} home hideHistory collapsedRationale={message=>activePinnedGoal&&(planRationale.current.get(message)===conversation.activeGoalId||messages[messages.indexOf(message)-1]?.content===HOME_ACTION_PLAN_LABEL)} renderBulletAction={renderFindingAction} renderMessageSupplement={message=><><HomeForecastChart taReady={ready && Boolean(resolveTaExtension((sourceResults["talent-acquisition"] as {data?:{modeled_extension?:unknown}}|undefined)?.data?.modeled_extension))} question={messages[messages.indexOf(message)-1]?.role==='user'?messages[messages.indexOf(message)-1].content:''} answer={message.content}/>{renderStarterForecast(message)}{renderExitReasonChart(message)}</>}/>
       {conversation.homeGoalChoiceKey === contextKey && !conversation.focusedIssue && <div role="group" aria-label="Choose a goal" className="flex flex-wrap gap-2">
         <p className="w-full text-sm text-muted-foreground">State your goal in your own words.</p>
         <button type="button" disabled={chatLoading} onClick={() => { conversation.setHomeGoalChoiceKey(null); focusQuestion(); }} className="min-h-11 rounded-lg border px-4 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">State my goal</button>

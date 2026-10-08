@@ -1,3 +1,4 @@
+import {taExtensionPrompt} from "@/lib/synthetic-ta/extension";
 import {conversationalAnswerStyle} from '@/lib/chat-answer-style';
 import {homeForecastAnswer} from '@/lib/home-forecast';
 import {homeTurnPurpose,homeConversationInstructions} from '@/lib/home-conversation';
@@ -427,6 +428,7 @@ type SuccessionCoverageContext = {
 };
 
 type TalentAcquisitionContext = {
+  modeledExtension?: unknown;
   summary: {
     applications: number | null;
     interviewed_applications: number | null;
@@ -585,7 +587,9 @@ export async function POST(
         : "";
 
     if (body?.page === "home" && !summaryOnly) {
-      const answer = homeForecastAnswer(message);
+      const recruiting = body.overviewBriefingContext?.sources?.find((source: {id:string}) => source.id === "R1");
+      const taReady = recruiting?.status === "loaded" && recruiting?.facts?.modeled_ta_version === "synthetic-ta-calibrated-v2" && recruiting?.facts?.modeled_ta_status === "ready";
+      const answer = homeForecastAnswer(message, undefined, taReady);
       if (answer) return NextResponse.json(decodeHomeModelReply(JSON.stringify({answer,next_step:"none",problem:null,problem_evidence:[],options:[],question:null,finding_followups:[]}),body.hasFocusedIssue,body.overviewBriefingContext));
     }
 
@@ -1271,7 +1275,7 @@ Interpretation rules:
         ? `
 CURRENT TALENT ACQUISITION CONTEXT
 As-of recruiting summary:
-- Open requisitions: ${talentAcquisitionContext.summary.open_requisitions ?? "Unavailable"}
+- Current-status open requisitions (not the month-end historical stock): ${talentAcquisitionContext.summary.open_requisitions ?? "Unavailable"}
 - Open positions: ${talentAcquisitionContext.summary.open_positions ?? "Unavailable"}
 - Applications: ${talentAcquisitionContext.summary.applications ?? "Unavailable"}
 - Interviewed applicants: ${talentAcquisitionContext.summary.interviewed_applications ?? "Unavailable"}
@@ -1480,7 +1484,7 @@ ${workforceDetailPrompt}
 
 ${attritionPrompt}
 
-${summaryOnly ? "" : syntheticDomainDemoPrompt(page,message)}
+${page === "talent-acquisition" ? taExtensionPrompt(talentAcquisitionContext?.modeledExtension) : summaryOnly ? "" : syntheticDomainDemoPrompt(page,message)}
 
 ${planningEvidenceHandoffPrompt}
 ${talentResponseChatPrompt(page, body?.talentResponseEvidenceContext)}

@@ -119,7 +119,7 @@ test('actual bundle POST distinguishes incomplete causes and preserves one bound
 
 test('domain demo reaches the actual route only after an explicit matching-page request',async()=>{
  const context={snapshotDate:'2026-09-30',country:'France',businessUnit:'Technology',level:'L2',headcount:12,fte:11,voluntaryTurnoverYtdPct:3,laborCostUsd:500000,openPositions:2,headcountGrowthPct:null,trendStart:null,trendEnd:null};
- for(const [page,message,include,summaryOnly=false] of [['attrition','Explain the synthetic projections',true],['talent-acquisition','Explain the simulated demo',true],['survey-sentiment','Explain the simulated models',true],['attrition','Predict exits for the selected cohort',false],['workforce','Explain the simulated demo',false],['attrition','Explain the simulated demo',false,true]]){
+ for(const [page,message,include,summaryOnly=false] of [['attrition','Explain the synthetic projections',true],['talent-acquisition','Explain the simulated demo',false],['survey-sentiment','Explain the simulated models',true],['attrition','Predict exits for the selected cohort',false],['workforce','Explain the simulated demo',false],['attrition','Explain the simulated demo',false,true]]){
   sandbox.__replies.push({status:'completed',output:[],output_text:'Synthetic harness response.'});
   const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page,context,message,summaryOnly,goalContext:{goal:'Review the synthetic demonstration'},history:[],syntheticDemo:{values:[999999999]}})}));assert.equal(response.status,200);const input=sandbox.__requests.at(-1).input;assert.equal(input.includes('SEPARATE CONSTRUCTED SYNTHETIC DEMONSTRATION'),include);assert.ok(!input.includes('999999999'));if(include){assert.match(input,/independent of the selected country/);assert.match(input,/No real-world accuracy/);assert.match(input,/Country: France/);}
  }
@@ -140,7 +140,7 @@ test('Home explicit forecasts use only server-owned verified evidence without a 
  for(const message of ['Forecast turnover','Predict talent acquisition','Forecast employee listening','Compare prediction methods','Compare forecasts across all three domains','Forecast turnover rate in Canada']){
   const before=sandbox.__requests.length;
   const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',message,overviewBriefingContext:packets[1][1],projection:{value:999999},hasFocusedIssue:true})}));
-  assert.equal(response.status,200);assert.equal(sandbox.__requests.length,before);const decoded=await response.json();assert.equal(decoded.candidateProposal,null);assert.equal(decoded.clarification,null);assert.equal(decoded.nextStep,'none');assert.ok(!decoded.answer.includes('999999'));assert.match(decoded.answer,/simulated/i);
+  assert.equal(response.status,200);assert.equal(sandbox.__requests.length,before);const decoded=await response.json();assert.equal(decoded.candidateProposal,null);assert.equal(decoded.clarification,null);assert.equal(decoded.nextStep,'none');assert.ok(!decoded.answer.includes('999999'));assert.match(decoded.answer,/simulated|calibrat.*unavailable/i);
  }
 });
 
