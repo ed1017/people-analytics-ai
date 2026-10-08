@@ -1,13 +1,15 @@
 // @ts-expect-error Native Node tests share TypeScript source.
 import {mergeDecisionRecovery,type RecoveryConflict} from './decision-recovery.ts';
 // @ts-expect-error Native Node tests use the same TypeScript source.
+import {homeDemoField,readHomeDemo} from './home-demo-catalog.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
 import {parseLocalGoals,emptyLocalGoals,GOALS_STORAGE_KEY,type LocalGoals} from "./local-goals.ts";
 export const DECISION_RECOVERY_KEY='insights-to-action.decisions.recovery.v1';
 export const DECISIONS_STORAGE_KEY="insights-to-action.decisions.v1";
 export const MAX_DECISION_BYTES=512*1024, MAX_STORE_BYTES=3*1024*1024, MAX_DECISION_MESSAGES=200;
 export type Json = null|boolean|number|string|Json[]|{[key:string]:Json};
 export type DecisionSlot={savedAt:string;fields:Record<string,Json>};
-export type DecisionData={version:1;revision:number;removedGoalIds?:string[];goals:LocalGoals;workspaces:Record<string,DecisionSlot>};
+export type DecisionData={version:1;revision:number;removedGoalIds?:string[];exploration?:DecisionSlot;goals:LocalGoals;workspaces:Record<string,DecisionSlot>};
 export type DecisionSnapshot={ready:boolean;data:DecisionData;notice:string|null;saved:boolean;recovery?:{conflicts:RecoveryConflict[]}};
 type StoragePort=Pick<Storage,"getItem"|"setItem"|"removeItem">;
 const empty=():DecisionData=>({version:1,revision:0,goals:emptyLocalGoals(),workspaces:{}});
@@ -23,7 +25,7 @@ export function validateJson(value:unknown,depth=0):boolean {
 }
 function checksum(text:string){let hash=2166136261;for(let i=0;i<text.length;i++){hash^=text.charCodeAt(i);hash=Math.imul(hash,16777619)}return (hash>>>0).toString(16)}
 export function encodeDecisions(data:DecisionData){
- for(const slot of Object.values(data.workspaces)){
+ for(const slot of [...Object.values(data.workspaces),...(data.exploration?[data.exploration]:[])]){
   if(bytes(JSON.stringify(slot))>MAX_DECISION_BYTES)throw Error("This decision exceeds its 512 KiB save limit. The working copy remains in this tab.");
   const chat=slot.fields.chat as {messages?:Json[]}|undefined;
   if(Array.isArray(chat?.messages)&&chat.messages.length>MAX_DECISION_MESSAGES)throw Error("This decision exceeds its 200-message save limit. The working copy remains in this tab.");
@@ -40,9 +42,10 @@ export function parseDecisions(raw:string):DecisionData {
  if(data.removedGoalIds!==undefined&&(!Array.isArray(data.removedGoalIds)||data.removedGoalIds.some((id:unknown)=>typeof id!=="string"||!/^[a-zA-Z0-9-]{1,80}$/.test(id))))throw Error("Saved deletion metadata is invalid.");
  if(!data.workspaces||Array.isArray(data.workspaces)||typeof data.workspaces!=="object")throw Error("Saved decision workspaces are invalid.");
  const ids=new Set(goals.goals.map(g=>g.id));
- for(const [id,rawSlot] of Object.entries(data.workspaces)){
+ if(Object.hasOwn(data.workspaces,''))throw Error('Exploration cannot masquerade as a saved goal.');
+ for(const [id,rawSlot] of [...Object.entries(data.workspaces),...(data.exploration?[['',data.exploration] as const]:[])]){
   const slot=rawSlot as DecisionSlot;
-  if(!ids.has(id)||!slot||typeof slot.savedAt!=="string"||!slot.fields||Array.isArray(slot.fields)||typeof slot.fields!=="object")throw Error("A saved decision has no valid goal.");
+  if(id!==''&&!ids.has(id)||!slot||typeof slot.savedAt!=="string"||!slot.fields||Array.isArray(slot.fields)||typeof slot.fields!=="object")throw Error("A saved decision has no valid goal.");
   const chat=slot.fields.chat as {messages?:Json[];input?:Json}|undefined;
   if(chat&&(!Array.isArray(chat.messages)||chat.messages.some(m=>!m||Array.isArray(m)||typeof m!=="object"||!['user','assistant'].includes(String(m.role))||typeof m.content!=="string")||typeof chat.input!=="string"))throw Error("A saved conversation is invalid.");
  }
@@ -99,25 +102,44 @@ export class DecisionStore {
   this.save({...this.state.data,goals,removedGoalIds,workspaces:Object.fromEntries(Object.entries(this.state.data.workspaces).filter(([id])=>ids.has(id)))});
   if(this.state.saved)try{this.cleanLegacy()}catch(error){this.fail(Error("Legacy goal cleanup is pending: "+(error instanceof Error?error.message:"storage unavailable")))}
  }
- getField<T>(id:string,field:string,fallback:T):T{return (this.state.data.workspaces[id]?.fields[field] as T|undefined)??fallback}
+ getField<T>(id:string,field:string,fallback:T):T{return ((id?this.state.data.workspaces[id]:this.state.data.exploration)?.fields[field] as T|undefined)??fallback}
  setField(id:string,field:string,value:unknown){
-  if(!this.state.ready||!id||!this.state.data.goals.goals.some(g=>g.id===id))return;
+  if(!this.state.ready||id&&!this.state.data.goals.goals.some(g=>g.id===id))return;
   if(forbidden.has(field)||!validateJson(value)){this.fail(Error("This decision contains unsupported data and was not saved."));return}
-  const before=this.state.data.workspaces[id];
+  const before=id?this.state.data.workspaces[id]:this.state.data.exploration;
   if(JSON.stringify(before?.fields[field])===JSON.stringify(value))return;
-  this.save({...this.state.data,workspaces:{...this.state.data.workspaces,[id]:{savedAt:new Date().toISOString(),fields:{...before?.fields,[field]:value as Json}}}});
+  const slot={savedAt:new Date().toISOString(),fields:{...before?.fields,[field]:value as Json}};
+  this.save({...this.state.data,...(id?{workspaces:{...this.state.data.workspaces,[id]:slot}}:{exploration:slot})});
  }
  // One-envelope optimistic transaction. Unlike ordinary field editing, a failed
  // transaction never publishes its candidate as an unsaved working copy.
  commitGoalFields(id:string,goal:string,revision:number,at:string,build:(fields:Record<string,Json>)=>Record<string,Json>):number{
+  if(!id)throw Error('A saved goal is required for this transaction.');
+  return this.commitWorkspace(id,goal,revision,at,build,false);
+ }
+ commitExplorationFields(revision:number,at:string,build:(fields:Record<string,Json>)=>Record<string,Json>):number{
+  return this.commitWorkspace('','',revision,at,build,false);
+ }
+ commitGoalSelection(id:string,goal:string,revision:number,at:string,build:(fields:Record<string,Json>)=>Record<string,Json>):number{
+  return this.commitWorkspace(id,goal,revision,at,build,true);
+ }
+ private commitWorkspace(id:string,goal:string,revision:number,at:string,build:(fields:Record<string,Json>)=>Record<string,Json>,selection:boolean):number{
   try{
    if(!this.state.ready||!this.state.saved||this.blocked||!this.port)throw Error('Saved planning state is unavailable; reload or resolve storage before applying.');
-   if(this.state.data.revision!==revision||this.state.data.goals.activeId!==id||this.state.data.goals.goals.find(item=>item.id===id)?.statement!==goal)throw Error('The goal or destination revision changed; preview again.');
+   const creating=selection&&!this.state.data.goals.activeId;
+   if(this.state.data.revision!==revision||!creating&&(this.state.data.goals.activeId!==id||(this.state.data.goals.goals.find(item=>item.id===id)?.statement??'')!==goal))throw Error('The goal or destination revision changed; preview again.');
+   if(creating){
+    if(!/^[a-zA-Z0-9-]{1,80}$/.test(id)||!goal.trim()||goal.length>240||goal!==goal.trim())throw Error('Review the goal before selecting this proposal.');
+    if(this.state.data.removedGoalIds?.includes(id)||this.state.data.goals.goals.some(item=>item.id===id||item.statement.toLocaleLowerCase()===goal.toLocaleLowerCase()&&readHomeDemo(this.state.data.workspaces[item.id]?.fields[homeDemoField],item.id)?.example.goal!==item.statement))throw Error('This goal already exists or was removed. Select the existing goal to continue; your exploration is kept.');
+    if(this.state.data.goals.goals.length>=20)throw Error('Your saved goals are full. Your exploration is kept.');
+   }
    if(!/^\d{4}-\d\d-\d\dT/.test(at)||!Number.isFinite(Date.parse(at)))throw Error('Invalid application timestamp.');
    if(this.port.getItem(DECISIONS_STORAGE_KEY)!==this.expected){this.blocked=true;throw Error('Another tab changed saved decisions. Reload before applying.');}
-   const original=this.state.data,expected=this.expected,before=original.workspaces[id],patch=build(structuredClone(before?.fields??{}));
+   const original=this.state.data,expected=this.expected,before=id?original.workspaces[id]:original.exploration,patch=build(structuredClone(before?.fields??{}));
    if(!validateJson(patch)||!patch||Array.isArray(patch)||typeof patch!=='object'||!Object.keys(patch).length)throw Error('Invalid or empty application transaction.');
-   const next={...original,revision:revision+1,workspaces:{...original.workspaces,[id]:{savedAt:at,fields:{...before?.fields,...structuredClone(patch)}}}};
+   const slot={savedAt:at,fields:{...before?.fields,...structuredClone(patch)}};
+   const next:DecisionData={...original,revision:revision+1,...(id?{workspaces:{...original.workspaces,[id]:slot}}:{exploration:slot})};
+   if(creating){next.goals={...original.goals,activeId:id,goals:[...original.goals.goals,{id,statement:goal}]};delete next.exploration;}
    const raw=encodeDecisions(next);parseDecisions(raw);
    // Recheck after candidate validation. localStorage has no native cross-tab CAS.
    if(this.state.data!==original||this.expected!==expected)throw Error('Planning state changed during candidate validation; preview again.');

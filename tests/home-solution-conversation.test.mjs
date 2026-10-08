@@ -41,3 +41,42 @@ test('ordinary time answer is clock-grounded, then a deadline request reviews th
  const request=solutionRequest('Change the deadline of the selected plan to November 20, 2026.',true,first.state,2),c=based();c.quantities=[{...quantity('activity_finish',null,'YYYY-MM-DD','c1','user-2'),text:'2026-11-20'}];
  const reply=await run(request,[evaluate(c),final('The discussed plan now has a proposed November 20 deadline for your review.',['mentoring'])]);assert.equal(reply.state.turns[1].text,'It is 11:24 AM in New York.');assert.deepEqual(reply.state.working.at(-1).blocking,[]);assert.equal(reply.state.working.at(-1).draft.inputs.timing[0].finish.value,'2026-11-20');assert.equal(request.catalog.plans[0].draft.inputs.timing[0].finish.value,'2026-11-14');
 });
+
+test('quantity-only saved and working sources enter lineage and reject mutation before selection',async()=>{
+ const request=solutionRequest('Use half the budget from saved plan one for a fresh mentoring trial.',true),c=candidate();
+ c.quantities=[{...quantity('budget_usd',null,'USD'),kind:'scale',source:{kind:'saved',id:'B',revision:request.catalog.plans[1].draft.revision,field:'budget_usd',target:null},factor:.5}];
+ const item=await evaluateSolutionCandidate(request,c,[]);assert.deepEqual(item.blocking,[]);assert.deepEqual(item.sourceRefs.map(ref=>ref.id),['B']);assert.ok(item.sourceKeys.B);assert.equal(item.draft.inputs.budget.amount.value,5000);
+ request.state.working=[item];const saved=await saveSolutionCandidate(request,request.catalog,item,request.goal,request.evidence,true);assert.deepEqual(saved.plan.sourceRefs,item.sourceRefs);
+ const changed=structuredClone(request.catalog);changed.plans[1].draft.inputs.budget.amount.value=8000;
+ await assert.rejects(()=>saveSolutionCandidate(request,changed,item,request.goal,request.evidence,true),/source plan changed/);
+ const next=solutionRequest('Use that same proposed budget.',true,request.state,2),derived=candidate('derived');derived.quantities=[{...quantity('budget_usd',null,'USD',null,'user-2'),kind:'reference',source:{kind:'working',id:item.id,revision:item.revision,field:'budget_usd',target:null}}];
+ const evaluated=await evaluateSolutionCandidate(next,derived,[]);assert.deepEqual(evaluated.sourceRefs,item.sourceRefs);assert.deepEqual(evaluated.sourceKeys,item.sourceKeys);
+ next.state.working.push(evaluated);await assert.rejects(()=>saveSolutionCandidate(next,changed,evaluated,next.goal,next.evidence,true),/source plan changed/);
+});
+test('changing one formerly shared membership clears disjoint certainty',async()=>{
+ const request=solutionRequest('Add office hours with the same ten people.',true),c=based();c.activities.push({...activity('c2','Office hours'),audienceOf:'c1'});
+ const first=await evaluateSolutionCandidate(request,c,[]);assert.deepEqual(first.blocking,[]);assert.equal(first.result.uniqueParticipants,10);assert.equal(first.draft.inputs.groupsDisjoint.value,true);
+ request.state.working=[first];const next=solutionRequest('Change only mentoring to twenty participants.',true,request.state,2),change=candidate();change.base={kind:'working',id:first.id,revision:first.revision};change.activities=['c1','c2'].map(id=>({...activity(id),mode:'retain',source:{...change.base,activityId:id}}));change.quantities=[quantity('participants',20,'people','c1','user-2')];
+ const second=await evaluateSolutionCandidate(next,change,[]);assert.deepEqual(second.blocking,[]);assert.equal(second.draft.inputs.groupsDisjoint.value,null);assert.equal(second.result.uniqueParticipants,null);assert.equal(second.draft.inputs.groups.length,2);
+});
+test('typed constraint removal clears inherited cap, keeps provenance and blocks older resurrection',async()=>{
+ const request=solutionRequest('Set a budget cap.',true);request.state.constraints=[constraint(4000)];request.state.turns=[{id:'user-1',role:'user',text:'Cap it at four thousand.'}];request.message={id:'user-2',text:'Drop the budget cap.'};
+ const removed={...constraint(null,'user-2'),action:'remove'},constraints=mergeSolutionConstraints(request,request.state.constraints,[removed]);assert.deepEqual(constraints,[removed]);
+ const item=await evaluateSolutionCandidate(request,based(),constraints);assert.deepEqual(item.blocking,[]);assert.equal(item.draft.inputs.budget.amount.value,null);assert.match(item.interpretations.join(' '),/Removed budget_usd/);
+ assert.throws(()=>mergeSolutionConstraints(request,constraints,[constraint(4000,'user-1')]),/older statement/);
+ request.state.turns.push({id:'user-2',role:'user',text:'Drop the cap.'});request.message={id:'user-3',text:'Use a six thousand cap instead.'};assert.equal(mergeSolutionConstraints(request,constraints,[constraint(6000,'user-3')])[0].number,6000);
+});
+test('intentional qualitative association is idempotent, survives reload and never enables Apply',async()=>{
+ const {associatePlanProposal}=await import('../lib/home-plan-alternatives.ts');
+ const request=solutionRequest('I want to reduce turnover.'),reply=await run(request,[evaluate(candidate()),final('Consider a mentoring trial.',['mentoring'])]),item=reply.state.working[0];assert.equal(item.binding.goal,'Reduce turnover');assert.notEqual(item.binding.goal,item.candidate.objective);
+ const outcome=await saveSolutionCandidate(currentForSave(request,reply),null,item,{id:'turnover',statement:item.candidate.goal.statement},request.evidence,true),confirmation={inputKey:outcome.plan.result.inputKey,attachmentId:outcome.plan.requestId,at:'2026-10-08T12:00:00Z',acknowledgeUnknowns:true};
+ const selected=associatePlanProposal(outcome.catalog,outcome.catalog,outcome.plan.id,confirmation),again=associatePlanProposal(selected,selected,outcome.plan.id,confirmation);assert.deepEqual(again,selected);assert.equal(selected.attachments[0].purpose,'proposal-selection');assert.ok(readPlanAlternatives(JSON.parse(JSON.stringify(selected)),selected));assert.equal(selected.plans[0].applied,false);
+ assert.throws(()=>applyPlanAlternative(selected,selected,outcome.plan.id,confirmation.inputKey),/qualitative/);
+});
+test('computed claims accept only exact checked metric references; invented savings cannot be verified',async()=>{
+ const {resolveSolutionMetric}=await import('../lib/home-solution-conversation.ts');
+ const request=solutionRequest('Review plan one.',true),answer=final('A mentoring approach may help.',['mentoring']);answer.verifiedMetrics=[{kind:'candidate',id:'mentoring',revision:1,metric:'cash_usd'}];const reply=await run(request,[evaluate(based()),answer]);assert.equal(resolveSolutionMetric(reply.state,reply.state.verifiedMetrics[0]).value,3000);
+ const invented={...answer,answer:'Verified savings are $500,000.',verifiedMetrics:[{kind:'candidate',id:'mentoring',revision:1,metric:'savings_usd'}]};await assert.rejects(()=>run(request,[evaluate(based()),invented]),/Unsupported answer.verifiedMetrics/);
+ const unchecked={...answer,verifiedMetrics:[{kind:'candidate',id:'invented',revision:1,metric:'cash_usd'}]};await assert.rejects(()=>run(request,[evaluate(based()),unchecked]),/not checked/);
+ const prose=await run(solutionRequest(),[final('The untrusted model asserts $500,000 savings.')]);assert.deepEqual(prose.state.verifiedMetrics,[]);const view=readFileSync(new URL('../components/pages/overall-overview-page.tsx',import.meta.url),'utf8');assert.match(view,/Discussion · interpretations and hypotheses. Checked quantities appear in the result cards./);
+});

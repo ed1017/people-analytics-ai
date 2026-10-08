@@ -2,7 +2,7 @@ import type {SolutionRequest,SolutionState,SolutionEvaluation} from './home-solu
 import type {SolutionCandidate,SolutionConstraint,SolutionFinal,ProjectionSpec} from './home-solution-conversation-schema';
 import type {ProjectionInputs,HeadcountProjection} from './home-solution-projection';
 // @ts-expect-error Native fixture tests share TypeScript source.
-import {readSolutionRequest,readSolutionState,evaluateSolutionCandidate,mergeSolutionConstraints,solutionUserTurns} from './home-solution-conversation.ts';
+import {readSolutionRequest,readSolutionState,evaluateSolutionCandidate,mergeSolutionConstraints,solutionUserTurns,resolveSolutionMetric} from './home-solution-conversation.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {assertSolutionShape,solutionTools,solutionFinalSchema} from './home-solution-conversation-schema.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
@@ -67,6 +67,12 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  if(new Set(final.candidateIds).size!==final.candidateIds.length||final.candidateIds.some(id=>!evaluated.has(id))||new Set(final.analysisIds).size!==final.analysisIds.length||final.analysisIds.some(id=>!analyses.has(id)))throw Error('The answer references a proposal or analysis that was not checked in this turn.');
  for(const id of final.candidateIds){const item=evaluated.get(id)!;if(!same(item.constraints,state.constraints)){item.blocking.push('Constraints changed after this calculation. Refine the proposal against the current constraints before saving.');}}
  for(const rejected of final.rejected){const item=latest(state.working).find(item=>item.id===rejected.candidateId);if(!item||!solutionUserTurns(request).some(turn=>turn.id===rejected.turnId))throw Error('The rejected idea has no current candidate or user-turn reference.');state.rejected.push({...rejected,revision:item.revision});}
+ for(const ref of final.verifiedMetrics){
+  const checked=ref.kind==='candidate'?evaluated.get(ref.id):analyses.get(ref.id);
+  if(!checked||checked.revision!==ref.revision)throw Error('A claimed quantitative result was not checked in this turn.');
+  resolveSolutionMetric(state,ref);
+ }
+ state.verifiedMetrics=final.verifiedMetrics;
  state.rejected=state.rejected.slice(-24);state.questions=final.questions;state.focusCandidateId=final.focusCandidateId;
  if(state.focusCandidateId&&!state.working.some(item=>item.id===state.focusCandidateId))throw Error('The conversational focus is unavailable.');
  state.turns=[...state.turns,{id:request.message.id,role:'user' as const,text:request.message.text},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:final.answer}].slice(-32);

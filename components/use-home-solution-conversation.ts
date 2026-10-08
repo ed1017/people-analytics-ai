@@ -4,7 +4,7 @@ import {decisionStore,useDecisionStorage} from './decision-store';
 import type {ProblemConversation} from './problem-conversation';
 import type {BundleDiscussion} from './home-bundle-plans';
 import {emptySolutionState,readSolutionState,readSolutionRequest,saveSolutionCandidate,solutionConversationField,type SolutionEvaluation,type SolutionRequest,type SolutionState} from '@/lib/home-solution-conversation';
-import {createPlanAlternatives,packPlanAlternatives,planAlternativesField,readPlanAlternatives,type PlanAlternatives} from '@/lib/home-plan-alternatives';
+import {createPlanAlternatives,packPlanAlternatives,planAlternativesField,readPlanAlternatives,associatePlanProposal,type PlanAlternatives} from '@/lib/home-plan-alternatives';
 import type {SolutionReply} from '@/lib/home-solution-conversation-service';
 import {alternativeViewField} from '@/lib/home-plan-alternative-chat';
 import {reviewBundleProposal as reconcileBundle} from '@/lib/home-bundle-reconciliation';
@@ -18,11 +18,11 @@ export function useHomeSolutionConversation(props:Props){
  useLayoutEffect(()=>{currentProps.current=props;});
  useLayoutEffect(()=>{mounted.current=true;return()=>{mounted.current=false;controller.current?.abort();};},[]);
  const goal={id:props.conversation.activeGoalId,statement:props.conversation.focusedIssue};
- const identity=JSON.stringify([goal,props.conversation.resetEpoch]);
+ const identity=JSON.stringify([goal,props.conversation.resetEpoch,props.conversation.storageReady]);
  const loaded=useRef(''),reset=useRef(props.conversation.resetEpoch);
  const synchronize=useEffectEvent(()=>{
   if(loaded.current===identity)return;loaded.current=identity;epoch.current++;controller.current?.abort();setPending(false);setNotice('');
-  try{const state=reset.current!==props.conversation.resetEpoch?emptySolutionState():readSolutionState(storage.data.workspaces[goal.id]?.fields[solutionConversationField]);reset.current=props.conversation.resetEpoch;memoryRef.current=state;setMemory(state);}catch(error){memoryRef.current=emptySolutionState();setMemory(emptySolutionState());setNotice((error as Error).message);}
+  try{const wasReset=reset.current!==props.conversation.resetEpoch;const state=wasReset?emptySolutionState():readSolutionState((goal.id?storage.data.workspaces[goal.id]:storage.data.exploration)?.fields[solutionConversationField]);reset.current=props.conversation.resetEpoch;if(wasReset&&props.conversation.storageReady)persist(state);memoryRef.current=state;setMemory(state);}catch(error){memoryRef.current=emptySolutionState();setMemory(emptySolutionState());setNotice((error as Error).message);}
  });
  // eslint-disable-next-line react-hooks/set-state-in-effect -- Goal/reset events select an isolated local conversation.
  useLayoutEffect(()=>{synchronize();},[identity]);
@@ -36,7 +36,7 @@ export function useHomeSolutionConversation(props:Props){
   return sources?.length?createPlanAlternatives(g,sources):null;
  }
  function requireCurrent(){const p=currentProps.current,snapshot=decisionStore.getSnapshot();if(!mounted.current||!p.enabled||!p.active||!p.settled||!snapshot.saved||!p.conversation.storageReady||p.conversation.issueEditor||snapshot.data.goals.activeId!==p.conversation.activeGoalId||(snapshot.data.goals.goals.find(g=>g.id===snapshot.data.goals.activeId)?.statement??'')!==p.conversation.focusedIssue)throw Error('The goal, sources or browser storage changed. Your earlier work is kept.');return snapshot;}
- function persist(state:SolutionState){const p=currentProps.current;memoryRef.current=state;setMemory(state);if(p.conversation.activeGoalId){const snapshot=requireCurrent();decisionStore.commitGoalFields(p.conversation.activeGoalId,p.conversation.focusedIssue,snapshot.data.revision,new Date().toISOString(),()=>({[solutionConversationField]:state as unknown as Json}));}}
+ function persist(state:SolutionState){const p=currentProps.current,snapshot=requireCurrent(),build=()=>({[solutionConversationField]:state as unknown as Json});if(p.conversation.activeGoalId)decisionStore.commitGoalFields(p.conversation.activeGoalId,p.conversation.focusedIssue,snapshot.data.revision,new Date().toISOString(),build);else decisionStore.commitExplorationFields(snapshot.data.revision,new Date().toISOString(),build);memoryRef.current=state;setMemory(state);}
  function makeRequest(text:string):SolutionRequest{
   const p=currentProps.current,current=catalog(),params=new URLSearchParams(p.query),selected=p.target()?.id;
   return readSolutionRequest({version:1,requestId:crypto.randomUUID(),goal:{id:p.conversation.activeGoalId,statement:p.conversation.focusedIssue},scope:p.scope,filters:{country:params.get('country')||'all',org:params.get('org')||'all',level:params.get('level')||'all'},timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,evidence:p.evidence,goalContext:p.conversation.goalContext,selectedId:current?.order.includes(selected??'')?selected:null,catalog:current,state:memoryRef.current,message:{id:crypto.randomUUID(),text}});
@@ -57,19 +57,20 @@ export function useHomeSolutionConversation(props:Props){
   if(saving||pending)return;setSaving(true);setNotice('');
   try{
    requireCurrent();const request=makeRequest(item.message.text);request.requestId=item.requestId;request.message=item.message;
-   const p=currentProps.current,key=liveKey.current,initialEpoch=epoch.current,desired={id:p.conversation.activeGoalId||'reviewed-goal',statement:p.conversation.focusedIssue||goalStatement.trim()};
-   // Reconcile and validate everything before the explicit Pin action can write a new goal.
+   const p=currentProps.current,key=liveKey.current,initialEpoch=epoch.current,desired={id:p.conversation.activeGoalId||crypto.randomUUID(),statement:p.conversation.focusedIssue||goalStatement.trim()};
    const outcome=await saveSolutionCandidate(request,request.catalog,item,desired,p.evidence,acknowledge);
-   requireCurrent();if(key!==liveKey.current||initialEpoch!==epoch.current||!equal(request.catalog,catalog()))throw Error('The conversation changed while reviewing Save. Try again against the current context.');
+   const snapshot=requireCurrent();if(key!==liveKey.current||initialEpoch!==epoch.current||!equal(request.catalog,catalog()))throw Error('The conversation changed while reviewing selection. Try again against the current context.');
    if(outcome.status!=='ready')throw Error('The proposal needs further review.');
-   let result=outcome;
-   if(!p.conversation.activeGoalId){const newId=p.conversation.confirmWorkforceGoal(desired.statement);const updated=structuredClone(outcome.catalog);updated.goalId=newId;updated.plans.forEach(plan=>{plan.draft.binding.goalId=newId;});
-    // Binding-derived totals are rebuilt for the final immutable identity.
-    updated.plans.forEach(plan=>{plan.result=reconcileBundle(plan.draft);});result={...outcome,catalog:updated,plan:updated.plans.at(-1)!};
+   const selected=associatePlanProposal(outcome.catalog,outcome.catalog,outcome.plan.id,{inputKey:outcome.plan.result.inputKey,attachmentId:outcome.plan.requestId!,at:new Date().toISOString(),acknowledgeUnknowns:acknowledge});
+   const state=structuredClone(memoryRef.current);
+   if(!p.conversation.activeGoalId)for(const candidate of state.working){
+    if(candidate.binding.goal!==item.binding.goal)continue;
+    candidate.binding={...candidate.binding,goalId:desired.id,goal:desired.statement};
+    if(candidate.draft){candidate.draft.binding=structuredClone(candidate.binding);if(candidate.draft.inputs.successMeasure)candidate.draft.inputs.successMeasure.goal=desired.statement;candidate.result=reconcileBundle(candidate.draft);}
    }
-   const snapshot=decisionStore.getSnapshot(),id=result.catalog.goalId;
-   decisionStore.commitGoalFields(id,result.catalog.goal,snapshot.data.revision,new Date().toISOString(),()=>({[planAlternativesField]:packPlanAlternatives(result.catalog) as unknown as Json,[solutionConversationField]:memoryRef.current as unknown as Json,[alternativeViewField]:{version:1,selectedId:result.plan.id,collapsed:false}}));
-   setNotice(`${result.reused?'Already saved':'Saved'} as Action Plan #${result.plan.number}.`);
+   p.conversation.selectProposalGoal(desired,snapshot.data.revision,{[planAlternativesField]:packPlanAlternatives(selected) as unknown as Json,[solutionConversationField]:state as unknown as Json,[alternativeViewField]:{version:1,selectedId:outcome.plan.id,collapsed:false}});
+   memoryRef.current=state;setMemory(state);
+   setNotice(`Action Plan #${outcome.plan.number} attached as a proposal to “${desired.statement}”.`);
   }catch(error){setNotice(error instanceof Error?error.message:'The proposal could not be saved.');}finally{setSaving(false);}
  }
  function reject(item:SolutionEvaluation){try{requireCurrent();const state=structuredClone(memoryRef.current),turnId=crypto.randomUUID();state.turns=[...state.turns,{id:turnId,role:'user' as const,text:`Discard proposal ${item.candidate.name}, revision ${item.revision}.`}].slice(-32);state.rejected=[...state.rejected,{candidateId:item.id,revision:item.revision,reason:'Discarded using the proposal review control.',turnId}].slice(-24);if(state.focusCandidateId===item.id)state.focusCandidateId=null;persist(state);}catch(error){setNotice((error as Error).message);}}

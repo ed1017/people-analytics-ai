@@ -1,7 +1,7 @@
 'use client';
 import {useState} from 'react';
 import type {useHomeSolutionConversation} from './use-home-solution-conversation';
-import type {SolutionEvaluation} from '@/lib/home-solution-conversation';
+import {resolveSolutionMetric,type SolutionEvaluation} from '@/lib/home-solution-conversation';
 import type {HeadcountProjection} from '@/lib/home-solution-projection';
 import {PlanAlternativeCard} from './plan-alternative-card';
 
@@ -9,10 +9,10 @@ type Controller=ReturnType<typeof useHomeSolutionConversation>;
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring';
 const number=(value:number|null|undefined)=>value==null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:1});
 function Proposal({item,controller,goal}:{item:SolutionEvaluation;controller:Controller;goal:string}){
- const [ack,setAck]=useState(false),[statement,setStatement]=useState(goal||item.candidate.objective);
+ const [ack,setAck]=useState(false),[statement,setStatement]=useState(goal||item.candidate.goal.statement);
  const stale=JSON.stringify(item.constraints)!==JSON.stringify(controller.state.constraints),saved=controller.saved?.plans.find(plan=>plan.operation?.proposalKey===JSON.stringify(item.candidate));
  return <article aria-label={`Working proposal: ${item.candidate.name}`} className="space-y-3 rounded border p-3 text-sm">
-  <h3 className="font-semibold">{item.candidate.name} · revision {item.revision}</h3><p>{item.candidate.objective}</p><p>{item.candidate.rationale}</p><p>{item.candidate.approach}</p>
+  <p className="text-xs font-medium">Proposed approach · effectiveness is unproven</p><h3 className="font-semibold">{item.candidate.name} · revision {item.revision}</h3><p>{item.candidate.objective}</p><p>{item.candidate.rationale}</p><p>{item.candidate.approach}</p>
   <ol className="list-decimal space-y-2 pl-5">{item.candidate.activities.map(activity=><li key={activity.id}><strong>{activity.mode==='retain'?item.draft?.bundle.components.find(part=>part.id===activity.id)?.name??activity.name:activity.name}</strong> · {activity.mode}{activity.source?` from ${activity.source.kind} ${activity.source.id}, revision ${activity.source.revision}`:''}<p>{item.draft?.bundle.components.find(part=>part.id===activity.id)?.firstStep??activity.step}</p><p className="text-xs">{activity.limitation}</p></li>)}</ol>
   <p><strong>Tradeoffs:</strong> {item.candidate.tradeoffs.join(' ')||'Not yet evaluated.'}</p><p><strong>Next step:</strong> {item.candidate.nextStep}</p><p><strong>Learn whether it helps:</strong> {item.candidate.successMeasure}</p>
   {item.result?.calculationStatus==='awaiting-scope'?<p>Qualitative proposal · population or horizon still needs review. Resource totals have not been calculated.</p>:<p>Calculated cash: {item.result?.cashEstimate?.cash==null?'Unknown':`$${number(item.result.cashEstimate.cash)} USD`} · staff effort: {number(item.result?.deliveryEstimate?.hours)} hours · distinct participants: {number(item.result?.uniqueParticipants)}.</p>}
@@ -21,7 +21,8 @@ function Proposal({item,controller,goal}:{item:SolutionEvaluation;controller:Con
   {!!item.issues.length&&<details><summary className="cursor-pointer py-2">Unknowns and calculation limits ({item.issues.length})</summary><ul className="list-disc space-y-1 pl-5">{item.issues.map((line,index)=><li key={index}>{line}</li>)}</ul></details>}
   {!!item.issues.length&&<label className="flex min-h-11 items-center gap-2"><input type="checkbox" checked={ack} onChange={event=>setAck(event.target.checked)}/>I reviewed these unknowns and want to keep this as a proposal.</label>}
   {!goal&&<label className="block">Goal to pin with this proposal<input className="mt-1 w-full rounded border p-2" value={statement} maxLength={240} onChange={event=>setStatement(event.target.value)}/></label>}
-  <div className="flex flex-wrap gap-2"><button className={button} disabled={!controller.canSend||controller.pending||controller.saving||stale||!!item.blocking.length||!item.draft||!!item.issues.length&&!ack||!statement.trim()||!!saved} onClick={()=>void controller.save(item,ack,statement)}>{saved?`Saved as Action Plan #${saved.number}`:goal?'Save as new Action Plan':'Pin goal and save proposal'}</button><button className={button} disabled={controller.pending||controller.saving||!controller.canSend} onClick={()=>controller.reject(item)}>Discard proposal</button></div>
+  <p className="text-xs">Choosing attaches this proposal to the goal above. It does not apply operational changes; unknown inputs can be refined in chat.</p>
+  <div className="flex flex-wrap gap-2"><button className={button} disabled={!controller.canSend||controller.pending||controller.saving||stale||!!item.blocking.length||!item.draft||!!item.issues.length&&!ack||!statement.trim()||!!saved} onClick={()=>void controller.save(item,ack,statement)}>{saved?`Selected as Action Plan #${saved.number}`:goal?'Choose plan and attach proposal':'Choose plan, pin goal and attach proposal'}</button><button className={button} disabled={controller.pending||controller.saving||!controller.canSend} onClick={()=>controller.reject(item)}>Discard proposal</button></div>
  </article>;
 }
 export function SolutionProjectionChart({analysis}:{analysis:HeadcountProjection}){
@@ -41,7 +42,8 @@ export function HomeSolutionConversationReview({controller,goal,pack,showSaved}:
  return <section aria-label="Solution conversation review" className="space-y-3">
   {controller.pending&&<div role="status" className="flex items-center gap-3"><p>Thinking through the question and checking useful calculations…</p><button className={button} onClick={controller.cancel}>Cancel request</button></div>}
   {controller.notice&&<p role="status">{controller.notice}</p>}
-  {!!controller.state.constraints.length&&<details><summary className="cursor-pointer py-2 text-sm">Current interpreted constraints</summary>{controller.state.constraints.map(item=><p key={item.field} className="text-sm">{item.field.replaceAll('_',' ')}: {item.number??item.text} {item.unit}. Correct this in chat if needed.</p>)}</details>}
+  {!!controller.state.constraints.length&&<details><summary className="cursor-pointer py-2 text-sm">Current interpreted constraints</summary>{controller.state.constraints.map(item=><p key={item.field} className="text-sm">{item.field.replaceAll('_',' ')}: {item.action==='remove'?'Removed':item.number??item.text} {item.unit}. Correct this in chat if needed.</p>)}</details>}
+  {!!controller.state.verifiedMetrics.length&&<section aria-label="Checked quantitative results" className="rounded border p-3 text-sm"><h3 className="font-semibold">Checked quantitative results</h3>{controller.state.verifiedMetrics.map((ref,index)=>{const metric=resolveSolutionMetric(controller.state,ref);return <p key={index}>{metric.label}: {number(metric.value)} {metric.unit}. {metric.basis} · {metric.source}.</p>;})}<p>Effectiveness and savings are not established by these calculations.</p></section>}
   {analyses.map(item=><SolutionProjectionChart key={item.id+item.revision} analysis={item}/>)}
   {latest.map(item=><Proposal key={item.id+item.revision} item={item} controller={controller} goal={goal}/>)}
   {showSaved&&controller.saved&&<details open><summary className="cursor-pointer py-2 font-semibold">Saved Action Plans</summary>{controller.saved.order.map(id=><PlanAlternativeCard key={id} plan={controller.saved!.plans.find(item=>item.id===id)!} catalog={controller.saved!} measurePack={pack} contextCurrent={false}/>)}</details>}
