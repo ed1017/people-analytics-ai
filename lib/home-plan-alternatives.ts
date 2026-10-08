@@ -1,6 +1,6 @@
 import type {BundleDraft,BundleResult} from './home-bundle-reconciliation';
 // @ts-expect-error Native Node tests share TypeScript source.
-import {bundleInputKey,readBundleDraft,reconcileBundle} from './home-bundle-reconciliation.ts';
+import {bundleInputKey,readBundleDraft,reviewBundleProposal as reconcileBundle} from './home-bundle-reconciliation.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {bundleChatEditIntent,previewBundleChatEdit,acceptBundleChatEdit} from './home-bundle-chat-edit.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -17,7 +17,7 @@ import {planNumberPattern,planReferenceNumbers} from './home-plan-references.ts'
 export const planAlternativesField='homePlanAlternativesV1';
 export type AlternativeContext={goalId:string;goal:string};
 export type AlternativeSourceRef={id:string;revision:number};
-export type AlternativeOperation={kind:'edit'|'combine'|'staffing'|'goal-correction';text:string;sourceIds:string[];review?:CombinationReview;proposalKey?:string};
+export type AlternativeOperation={kind:'edit'|'combine'|'staffing'|'goal-correction'|'conversation';text:string;sourceIds:string[];review?:CombinationReview;proposalKey?:string};
 export type PlanAlternative={id:string;number:number;draft:BundleDraft;result:BundleResult;sourceRefs:AlternativeSourceRef[];requestId:string|null;operation:AlternativeOperation|null;notes:string[];deleted:boolean;applied:boolean};
 export type AlternativeAttachment={id:string;planId:string;attachedAt:string};
 export type PlanAlternatives={version:1;goalId:string;goal:string;nextNumber:number;order:string[];plans:PlanAlternative[];attachments:AlternativeAttachment[]};
@@ -56,9 +56,10 @@ export function readPlanAlternatives(raw:unknown,context:AlternativeContext):Pla
   for(const plan of catalog.plans){
    if(!idValid(plan.id)||seen.has(plan.id)||!Number.isSafeInteger(plan.number)||plan.number<1||numbers.has(plan.number)||!readBundleDraft(plan.draft)||plan.draft.binding.goalId!==context.goalId||plan.draft.binding.goal!==context.goal||typeof plan.deleted!=='boolean'||typeof plan.applied!=='boolean'||!Array.isArray(plan.sourceRefs)||!Array.isArray(plan.notes)||!plan.notes.every(note=>typeof note==='string')||!equalResult(reconcileBundle(plan.draft),plan.result))return null;
    if(new Set(plan.sourceRefs.map(ref=>ref.id)).size!==plan.sourceRefs.length||plan.sourceRefs.some(ref=>!seen.has(ref.id)||seen.get(ref.id)!.draft.revision!==ref.revision)||plan.number!==seen.size+1)return null;
-   if(plan.requestId!==null){if(!idValid(plan.requestId)||requests.has(plan.requestId)||!plan.operation||!['edit','combine','staffing','goal-correction'].includes(plan.operation.kind)||typeof plan.operation.text!=='string'||!plan.operation.text.trim()||plan.operation.text.length>1200||!equal(plan.operation.sourceIds,plan.sourceRefs.map(ref=>ref.id))||plan.sourceRefs.length!==(plan.operation.kind==='combine'?2:1))return null;requests.add(plan.requestId);}
+   if(plan.result.calculationStatus==='awaiting-scope'&&(plan.applied||catalog.attachments.some(item=>item.planId===plan.id)))return null;
+   if(plan.requestId!==null){if(!idValid(plan.requestId)||requests.has(plan.requestId)||!plan.operation||!['edit','combine','staffing','goal-correction','conversation'].includes(plan.operation.kind)||typeof plan.operation.text!=='string'||!plan.operation.text.trim()||plan.operation.text.length>1200||!equal(plan.operation.sourceIds,plan.sourceRefs.map(ref=>ref.id))||(plan.operation.kind==='conversation'?plan.sourceRefs.length>6||plan.draft.bundle.origin!=='conversation-v1':plan.sourceRefs.length!==(plan.operation.kind==='combine'?2:1)))return null;requests.add(plan.requestId);}
    else if(plan.sourceRefs.length||plan.operation!==null)return null;
-   if(plan.operation?.proposalKey!==undefined&&(typeof plan.operation.proposalKey!=='string'||!plan.operation.proposalKey.length||plan.operation.proposalKey.length>8000))return null;
+   if(plan.operation?.proposalKey!==undefined&&(typeof plan.operation.proposalKey!=='string'||!plan.operation.proposalKey.length||plan.operation.proposalKey.length>(plan.operation.kind==='conversation'?32000:8000)))return null;
    seen.set(plan.id,plan);numbers.add(plan.number);
   }
   if(catalog.nextNumber!==Math.max(...numbers)+1||new Set(catalog.order).size!==catalog.order.length||catalog.order.length!==catalog.plans.filter(plan=>!plan.deleted).length||catalog.order.some(id=>!seen.has(id)||seen.get(id)!.deleted))return null;
@@ -140,6 +141,15 @@ export function appendReviewedAlternative(raw:PlanAlternatives,context:Alternati
  return append(catalog,request,operation,sources,draft,reconcileBundle(draft),notes);
 }
 
+/** New conversational proposals may originate independently or from several immutable sources. */
+export function appendConversationAlternative(raw:PlanAlternatives|null,context:AlternativeContext,request:AlternativeRequest,draft:BundleDraft,notes:string[],proposalKey:string):AlternativeOutcome{
+ const catalog=raw?checked(raw,context):{version:1 as const,...context,nextNumber:1,order:[],plans:[],attachments:[]};
+ if(!idValid(request.requestId)||!request.text.trim()||request.text.length>1200||request.sourceIds.length>6||new Set(request.sourceIds).size!==request.sourceIds.length||!readBundleDraft(draft)||draft.bundle.origin!=='conversation-v1'||draft.binding.goalId!==context.goalId||draft.binding.goal!==context.goal)fail('Review a validated conversational proposal for this goal.');
+ const operation:AlternativeOperation={kind:'conversation',text:request.text,sourceIds:[...request.sourceIds],proposalKey},existing=retry(catalog,request,operation);if(existing)return existing;
+ const sources=request.sourceIds.length?sourcesFor(catalog,request):[];
+ return append(catalog,request,operation,sources,draft,reconcileBundle(draft),notes);
+}
+
 /** Metadata-only view changes: deleted plans remain as lineage/attachment tombstones. */
 export function changeAlternativeView(raw:PlanAlternatives,context:AlternativeContext,change:{order?:string[];deleteId?:string}):PlanAlternatives{
  const catalog=checked(raw,context);
@@ -149,11 +159,13 @@ export function changeAlternativeView(raw:PlanAlternatives,context:AlternativeCo
 }
 export function applyPlanAlternative(raw:PlanAlternatives,context:AlternativeContext,planId:string,expectedInput:string):PlanAlternatives{
  const catalog=checked(raw,context),plan=catalog.plans.find(item=>item.id===planId&&!item.deleted);
+ if(plan?.result.calculationStatus==='awaiting-scope')fail('This is a qualitative proposal. Confirm population and horizon, then calculate it before applying.');
  if(!plan||bundleInputKey(plan.draft)!==expectedInput)fail('The alternative changed. Review it before applying.');plan.applied=true;return catalog;
 }
 /** An explicit new attachment references the immutable alternative. Existing attachments remain intact. */
 export function attachPlanAlternative(raw:PlanAlternatives,context:AlternativeContext,planId:string,confirmation:{inputKey:string;attachmentId:string;at:string;acknowledgeUnknowns:boolean}):PlanAlternatives{
  const catalog=checked(raw,context),plan=catalog.plans.find(item=>item.id===planId&&!item.deleted);
+ if(plan?.result.calculationStatus==='awaiting-scope')fail('This is a qualitative proposal. Confirm population and horizon, then calculate it before attaching.');
  if(!plan||bundleInputKey(plan.draft)!==confirmation.inputKey)fail('Review this exact alternative before attaching.');
  const existing=catalog.attachments.find(item=>item.id===confirmation.attachmentId);if(existing){if(existing.planId!==planId)fail('That attachment ID belongs to another alternative.');return catalog;}
  if(plan.result.issues.length&&!confirmation.acknowledgeUnknowns)fail('Acknowledge unresolved assumptions before attaching this proposal.');
