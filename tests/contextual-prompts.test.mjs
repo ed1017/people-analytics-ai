@@ -1,14 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {contextualPrompts,hasKnownNumericEvidence,homeGoalStarters,homeStarterGroups,workforceStageExample} from '../lib/contextual-prompts.ts';
+import {planningPrompts,challengePrompts} from './fixtures/home-starter-prompts.mjs';
 const source=(id,facts={count:0},status='loaded')=>({id,facts,status});
 const base={page:'home',goal:'Improve retention',hasConversation:false,evidenceReady:true,sources:[source('A1'),source('T1')]};
 test('Home starters remain simple while skills follow-ups are contextual and permit combined methods',()=>{
  assert.deepEqual(contextualPrompts({...base,goal:''}),[...homeGoalStarters]);
- assert.deepEqual(homeStarterGroups.map(group=>group.label),['Skills & growth','Workforce challenges']);
- assert.deepEqual(homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.label)),['What skills are we missing?','Where should we invest in training?','How can we reduce turnover?','How can we improve satisfaction?','How can we improve hiring?']);
- assert.deepEqual(homeGoalStarters,['What skills are we missing in the current workforce, and which findings apply to the selected scope?','Where should we invest in training based on recorded skill gaps and learning pathways, and which findings apply to the selected workforce scope?','How can we reduce turnover based on recorded evidence, and which findings apply to the selected workforce scope?','How can we improve employee satisfaction based on recorded feedback, and which findings apply to the selected workforce scope?','How can we improve hiring based on recorded recruiting evidence, and which findings apply to the selected workforce scope?']);
- assert.match(homeGoalStarters[0],/selected scope/);assert.match(homeGoalStarters[1],/selected workforce scope/);
+ assert.deepEqual(homeStarterGroups.map(group=>group.label),['Strategic Workforce Planning','Workforce challenges']);
+ assert.deepEqual(homeStarterGroups[0].prompts.map(item=>item.label),planningPrompts);
+ assert.ok(homeStarterGroups[0].prompts.every(item=>item.label===item.prompt));
+ assert.deepEqual(homeGoalStarters,[...planningPrompts,...challengePrompts]);
  assert.match(contextualPrompts({...base,goal:'Build AI skills without adding headcount'})[1],/mix of training, internal moves and hiring/);
  for(const context of [base,{...base,goal:''},{...base,goal:'Build skills',sources:[source('A1')]},{...base,page:'overview',goal:'Build skills'}])assert.doesNotMatch(contextualPrompts(context).join(' '),/mix of training/);
  assert.equal(contextualPrompts({...base,goal:'',sources:[]}).length,1);

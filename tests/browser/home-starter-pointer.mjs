@@ -14,7 +14,7 @@ await mkdir(output,{recursive:true});
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
 let checks=0,totalPosts=0;const evidence=[];
 const check=(name,ok)=>{assert.ok(ok,name);checks++;console.log('PASS '+name)};
-const items=homeStarterGroups.flatMap(group=>group.prompts);
+const items=homeStarterGroups.flatMap(group=>group.prompts),satisfaction=items.find(item=>item.label==='How can we improve satisfaction?');
 try{for(const [mode,width,height] of [['wide',1844,1100],['desktop',1366,900],['mobile',390,844],['small-mobile',320,740]]){
  const touch=width<640,context=await browser.newContext({viewport:{width,height},hasTouch:touch,isMobile:touch,ignoreHTTPSErrors:process.env.HOME_IGNORE_HTTPS_ERRORS==='1'}),page=await context.newPage(),posts=[],errors=[];
  page.setDefaultTimeout(12000);page.on('pageerror',error=>errors.push(error.message));
@@ -41,13 +41,14 @@ try{for(const [mode,width,height] of [['wide',1844,1100],['desktop',1366,900],['
   if(keyboard){await target.focus();await page.keyboard.press('Enter');}else await activate(target,label);
   await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText(`Synthetic pointer response ${before+1}.`,{exact:true}).waitFor();
   check(mode+' '+label+' submits exactly once',posts.length===before+1&&posts.at(-1).message===item.prompt);
+  if(homeStarterGroups[0].prompts.some(entry=>entry.prompt===item.prompt))check(mode+' '+label+' stays conversational without goal or forecast shortcut',await page.getByRole('button',{name:/^Pin /}).count()===0&&await page.getByRole('region',{name:/projection for this starter$/}).count()===0&&await page.getByText('Active requisitions at month-end',{exact:true}).count()===0&&posts.at(-1).page==='home'&&posts.at(-1).hasFocusedIssue===false);
  };
  await page.goto(base+'/?page=home');await dialog.waitFor();
  await page.waitForFunction(()=>!document.querySelector('[aria-controls="home-starting-instructions"]')?.disabled);
- const initial=await geometry(button(items[3].label));evidence.push({mode,label:'first-visit-modal',...initial});
+ const initial=await geometry(button(satisfaction.label));evidence.push({mode,label:'first-visit-modal',...initial});
  check(mode+' fresh instructions are a native modal',await dialog.evaluate(node=>node.open&&node.matches(':modal')));
  if(initial.rect.top>=0&&initial.rect.bottom<=height)check(mode+' modal owns background starter hit point',initial.hitDialog==='home-starting-instructions'&&!initial.receivesPointer);
- await button(items[3].label).focus();
+ await button(satisfaction.label).focus();
  check(mode+' background focus cannot bypass native modal',await dialog.evaluate(node=>node.contains(document.activeElement)));
  await page.keyboard.press('Enter');
  check(mode+' background keyboard attempt cannot send',posts.length===0&&await dialog.isVisible());
@@ -55,6 +56,8 @@ try{for(const [mode,width,height] of [['wide',1844,1100],['desktop',1366,900],['
  const close=button('Close instructions');await close[touch?'tap':'click']({trial:true});
  check(mode+' Close is a real hit-tested target',(await geometry(close)).receivesPointer);
  await close[touch?'tap':'click']();await dialog.waitFor({state:'hidden'});
+ check(mode+' five exact planning openers and three unchanged challenges',await page.getByRole('group',{name:'Strategic Workforce Planning',exact:true}).getByRole('button').count()===5&&await page.getByRole('group',{name:'Workforce challenges',exact:true}).getByRole('button').count()===3&&await page.getByText('Skills & growth',{exact:true}).count()===0);
+ await page.screenshot({path:`${output}/${mode}-starters.png`,fullPage:true});
  await page.waitForFunction(key=>localStorage.getItem(key)==='1',HOME_INSTRUCTIONS_DISMISSED_KEY);
  check(mode+' semantic dismissal persisted without a chat call',posts.length===0&&await page.evaluate(key=>localStorage.getItem(key),HOME_INSTRUCTIONS_DISMISSED_KEY)==='1');
  for(const [index,item] of items.entries()){
@@ -62,7 +65,7 @@ try{for(const [mode,width,height] of [['wide',1844,1100],['desktop',1366,900],['
   await sendStarter(item,'fresh '+item.label);
  }
  await reset();
- await sendStarter(items[3],'keyboard after dismissal',true);
+ await sendStarter(items[0],'planning keyboard after dismissal',true);
  await reset();
  // Use real navigation controls, including the phone drawer, then return Home.
  if(touch)await activate(button('Open navigation'),'open navigation');
@@ -83,14 +86,14 @@ try{for(const [mode,width,height] of [['wide',1844,1100],['desktop',1366,900],['
  evidence.push({mode,label:'ordinary scroll',gesturePoint,beforeScroll,afterDown,afterUp});
  console.log('SCROLL '+JSON.stringify({mode,beforeScroll,afterDown,afterUp}));
  check(mode+' ordinary gesture scrolls available content',beforeScroll.range===0||[afterDown,afterUp].some(state=>state.page!==beforeScroll.page||state.pane!==beforeScroll.pane));
- await sendStarter(items[3],'after ordinary navigation and '+(touch?'touch scroll':'wheel scroll'));
+ await sendStarter(satisfaction,'after ordinary navigation and '+(touch?'touch scroll':'wheel scroll'));
  await reset();
  await page.mouse.wheel(0,220);await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));const beforeReload=await scrollState();await page.reload();
- await button(items[3].label).waitFor();
+ await button(satisfaction.label).waitFor();
  await page.waitForFunction(()=>!document.querySelector('[aria-controls="home-starting-instructions"]')?.disabled);
  evidence.push({mode,label:'reload positions',beforeReload,afterReload:await scrollState()});
  check(mode+' reload retains dismissed instructions',!await dialog.isVisible());
- await sendStarter(items[3],'reload with retained dismissal');
+ await sendStarter(satisfaction,'reload with retained dismissal');
  await page.screenshot({path:`${output}/${mode}-answered.png`});
  check(mode+' no runtime errors or horizontal overflow',errors.length===0&&await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await context.close();

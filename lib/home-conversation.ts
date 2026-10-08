@@ -2,6 +2,8 @@
 import {readUserGoalIntent} from './home-user-goal-intent.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {workforceChoiceDiscoveryGoal} from './home-planning-intent.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {strategicPlanningStarter,strategicPlanningAssumptionReply} from './home-strategic-planning.ts';
 
 export type HomeTurnPurpose = 'answer' | 'goal' | 'discovery' | 'plan';
 type Turn = {role:string;content:string};
@@ -10,15 +12,17 @@ export const homeQuestionText = (message:string) => message.split(/\n\n(?:Focuse
 /** Preparation is opt-in. An old goal or an interrogative alone never requests a new card. */
 export function homeTurnPurpose(message:string, history:readonly Turn[]=[]):HomeTurnPurpose {
   const text=homeQuestionText(message);
+  if(strategicPlanningStarter(text))return 'answer';
   if (/^(?:please\s+)?(?:do not|don't|don’t)\b/i.test(text)) return 'answer';
   if (/^(?:(?:please|can you|could you)\s+)*(?:develop|create|draft|write|make|build|prepare|show|give me)\b[^?\n]*\b(?:action plan|full plan|plan drafts|solution bundles|plan)\b/i.test(text)) return 'plan';
   if (/^(?:(?:please|can you|could you)\s+)*(?:help (?:me|us) )?(?:find|identify|suggest|propose|generate|refine|update)\b[^?\n]*\b(?:issue|problem|investigation|candidate|goal|priorit)/i.test(text) || /^where should (?:i|we) focus\b/i.test(text)) return 'discovery';
+  if(strategicPlanningAssumptionReply(message,history))return 'answer';
   if (workforceChoiceDiscoveryGoal(text)) return 'goal';
   // Questions and analytical imperatives stay conversational, even with an earlier goal.
   if (/\?|^(?:why|what|how|when|where|who|which|is|are|was|were|does|do|did|can|could|would|should|explain|compare|summarize|describe|tell me|review|explore)\b/i.test(text)) return 'answer';
   if (readUserGoalIntent([text]).status !== 'no_goal') return 'goal';
   // A brief budget/scope clarification can continue an explicit user-authored goal.
-  const statements=history.filter(turn=>turn.role==='user').map(turn=>homeQuestionText(turn.content));
+  const statements=history.filter(turn=>turn.role==='user').map(turn=>homeQuestionText(turn.content)).filter(text=>!strategicPlanningStarter(text));
   if (readUserGoalIntent(statements).status !== 'no_goal' && /^(?:budget|within|over|use|scope|by|with|no net|all countries|voluntary|regrettable)\b/i.test(text)) return 'goal';
   // An explicit acceptance of the immediately preceding assumption question is
   // still part of preparing that goal. A bare yes or an unrelated answer is not.
