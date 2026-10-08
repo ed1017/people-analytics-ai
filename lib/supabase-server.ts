@@ -1,3 +1,4 @@
+import { datasetRouter, registerLegacyDatasetClient } from "./dataset-runtime";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -11,7 +12,7 @@ if (!supabaseSecretKey) {
   throw new Error("Missing SUPABASE_SECRET_KEY");
 }
 
-export const supabaseServer = createClient(
+const legacyClient = createClient(
   supabaseUrl,
   supabaseSecretKey,
   {
@@ -21,3 +22,12 @@ export const supabaseServer = createClient(
     },
   }
 );
+registerLegacyDatasetClient(legacyClient);
+// Every existing consumer resolves through the same request-pinned provider.
+export const supabaseServer: typeof legacyClient = new Proxy(legacyClient, {
+  get(_target, key) {
+    const client = datasetRouter.client() as typeof legacyClient;
+    const value = Reflect.get(client, key, client);
+    return typeof value === "function" ? value.bind(client) : value;
+  },
+});

@@ -1,9 +1,10 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import { supabaseServer } from "../../../lib/supabase-server";
 import { buildCompensationResponse, COMPENSATION_COLUMNS } from "../../../lib/compensation";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+async function handleGET() {
   const headers = { "Cache-Control": "no-store" };
   try {
     const { data, error, count } = await supabaseServer
@@ -20,4 +21,8 @@ export async function GET() {
       { status: 503, headers },
     );
   }
+}
+
+export async function GET(request?: Request) {
+  return withDatasetRequest(request, () => handleGET());
 }

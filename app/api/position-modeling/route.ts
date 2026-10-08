@@ -1,3 +1,4 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
 
@@ -60,7 +61,7 @@ function round2(value: number) {
   return Math.round(value * 100) / 100;
 }
 
-export async function GET() {
+async function handleGET() {
   try {
     const [currentResult, scenarioResult] =
       await Promise.all([
@@ -543,4 +544,8 @@ export async function GET() {
       { status: 500 }
     );
   }
+}
+
+export async function GET(request?: Request) {
+  return withDatasetRequest(request, () => handleGET());
 }

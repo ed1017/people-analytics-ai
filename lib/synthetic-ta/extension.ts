@@ -7,6 +7,20 @@ export const taExtension = release;
 export function resolveTaExtension(candidate: unknown): TaExtension | null {
   try {return JSON.stringify(candidate) === JSON.stringify(release) ? release : null;} catch {return null;}
 }
+/** This release is calibrated only to legacy recruiting. A dataset-tagged
+ * response needs its own release; equal totals or copied bytes are insufficient. */
+export function isSeparateTaDataset(response: unknown): boolean {
+  if(!response||typeof response!=='object')return false;
+  const meta=(response as {data_meta?:unknown}).data_meta;
+  if(meta===undefined)return false;
+  if(!meta||typeof meta!=='object')return true;
+  const value=meta as {datasetId?:unknown;datasetToken?:unknown;dataClass?:unknown};
+  return value.datasetId!=='legacy-v1'||typeof value.datasetToken!=='string'||!/^legacy-v1:\d+$/.test(value.datasetToken)||value.dataClass==='constructed-synthetic';
+}
+export function resolveTaResponseExtension(response: unknown): TaExtension | null {
+  if(!response||typeof response!=='object'||isSeparateTaDataset(response))return null;
+  return resolveTaExtension((response as {modeled_extension?:unknown}).modeled_extension);
+}
 export function calibratedExtensionForSource(cutoff: unknown, summary: Record<string,unknown>, monthly: Record<string,unknown>[]) {
   const keys=['applications','interviewed_applications','offered_applications','hires','open_requisitions','open_positions','internal_hires','external_hires'] as const;
   const matches=cutoff===release.cutoff && keys.every(k=>summary[k]!==null&&summary[k]!==undefined&&Number(summary[k])===targets.summary[k]) && monthly.length===targets.monthly.length && targets.monthly.every(t=>{

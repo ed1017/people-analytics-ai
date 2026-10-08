@@ -1,3 +1,4 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
 
@@ -15,7 +16,7 @@ function normalizeFilter(value: string | null) {
   return value;
 }
 
-export async function GET(request: NextRequest) {
+async function handleGET(request: NextRequest) {
   const country = normalizeFilter(
     request.nextUrl.searchParams.get("country")
   );
@@ -53,4 +54,8 @@ export async function GET(request: NextRequest) {
       "Cache-Control": "no-store",
     },
   });
+}
+
+export async function GET(request: NextRequest) {
+  return withDatasetRequest(request, () => handleGET(request));
 }

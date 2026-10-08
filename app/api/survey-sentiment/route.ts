@@ -1,3 +1,4 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import { NextResponse } from "next/server";
 import { dataApiErrorResponse } from "../../../lib/data-api-error";
 import { supabaseServer } from "../../../lib/supabase-server";
@@ -7,7 +8,7 @@ import { nullableNumber as toNumber } from "../../../lib/numeric-contract";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+async function handleGET() {
   try {
     const [
       currentResult,
@@ -134,4 +135,8 @@ export async function GET() {
   } catch (error) {
     return dataApiErrorResponse('survey-sentiment', error);
   }
+}
+
+export async function GET(request?: Request) {
+  return withDatasetRequest(request, () => handleGET());
 }

@@ -65,12 +65,16 @@ export function PlanningOverview({
       ? "Response portfolio modeled; BU allocation still pending"
       : "No approved Build / Move / Buy response yet";
   const feasibility = responseConstraintResult
-    ? responseConstraintResult.overall_feasible
+    ? responseConstraintResult.capacity_feasibility
+      ? responseConstraintResult.user_constraints_satisfied ? "Assumptions meet limits; staffing not assessed" : "Assumption limits breached; staffing not assessed"
+      : responseConstraintResult.overall_feasible
       ? "Feasible under current hard constraints"
       : "Not feasible under current hard constraints"
     : "Not tested yet";
   const executionRisk = failedConstraint
     ? failedConstraint.detail
+    : responseConstraintResult?.capacity_feasibility
+      ? "Staffing readiness, availability and execution costs remain unknown"
     : responseExecutionResult &&
         responseExecutionResult.final_remaining_net_gap > 0
       ? `${formatCapacity(responseExecutionResult.final_remaining_net_gap)} roles remain uncovered in the current schedule`

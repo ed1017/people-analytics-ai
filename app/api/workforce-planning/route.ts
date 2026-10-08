@@ -1,3 +1,4 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import { NextResponse } from "next/server";
 import { dataApiErrorResponse } from "../../../lib/data-api-error";
 import { supabaseServer } from "../../../lib/supabase-server";
@@ -31,7 +32,7 @@ type AssumptionRow = {
   assumption_text: string | null;
 };
 
-export async function GET() {
+async function handleGET() {
   try {
     const [
       summaryResult,
@@ -190,4 +191,8 @@ const summaries: SummaryRow[] =
   } catch (error) {
     return dataApiErrorResponse('workforce-planning', error);
   }
+}
+
+export async function GET(request?: Request) {
+  return withDatasetRequest(request, () => handleGET());
 }

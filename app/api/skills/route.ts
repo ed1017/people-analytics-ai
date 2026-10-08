@@ -1,3 +1,4 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
 
@@ -35,7 +36,7 @@ function round1(value: number) {
   return Math.round(value * 10) / 10;
 }
 
-export async function GET() {
+async function handleGET() {
   try {
     const [
       gapsResult,
@@ -314,4 +315,8 @@ export async function GET() {
       { status: 500 }
     );
   }
+}
+
+export async function GET(request?: Request) {
+  return withDatasetRequest(request, () => handleGET());
 }

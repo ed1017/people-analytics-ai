@@ -5,7 +5,7 @@ import {bundleInputKey,type BundleDraft,type BundleResult} from '@/lib/home-bund
 import {previewLinkedAttachment,commitLinkedAttachment,type ProjectPlanningBinding,type LinkedAttachmentPreview,type LinkedAttachmentRequest} from '@/lib/home-linked-attachment';
 import type {ApplicationChoices} from '@/lib/action-plan-application-preview';
 import {readWorkforceSolution} from '@/lib/workforce-solution';
-import {DECISIONS_STORAGE_KEY} from '@/lib/local-decisions';
+import {datasetDecisionKey} from '@/lib/local-decisions';
 import {labelFor,display} from '@/components/home-action-plan-application';
 import type {DevelopmentSession} from '@/components/development-workspace';
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring',control='min-h-11 w-full rounded border bg-background px-2 text-sm';
@@ -21,7 +21,7 @@ export function HomeLinkedAttachment(props:Props){
  const request:LinkedAttachmentRequest={...(props.mixCommit?{mixCommit:props.mixCommit}:{}),...stamp,preparedAt:props.preparedAt,draft:props.draft,result:props.result,replaceId:props.replaceId,reviewed:props.reviewed,acknowledgeUnknowns:props.acknowledgeUnknowns,development:componentId&&optionIndex!==''?{componentId,optionIndex:Number(optionIndex),quoteReviewed,hourlyReviewed}:null,capacityReviewed};
  const key=JSON.stringify([bundleInputKey(props.draft),storage.data.revision,request.development,capacityReviewed,props.reviewed,props.acknowledgeUnknowns,choices]),live=useRef({props,key,request,choices}),mounted=useRef(true),pending=useRef(false);
  useLayoutEffect(()=>{live.current={props,key,request,choices};});
- useEffect(()=>{mounted.current=true;const changed=(event:StorageEvent)=>{if(event.key===null||event.key===DECISIONS_STORAGE_KEY)decisionStore.invalidateExternalChange();};window.addEventListener('storage',changed);return()=>{mounted.current=false;window.removeEventListener('storage',changed);};},[]);
+ useEffect(()=>{mounted.current=true;const changed=(event:StorageEvent)=>{if(event.key===null||event.key===datasetDecisionKey(decisionStore.getDatasetToken()))decisionStore.invalidateExternalChange();};window.addEventListener('storage',changed);return()=>{mounted.current=false;window.removeEventListener('storage',changed);};},[]);
  useEffect(()=>{
   let cancelled=false;const current=live.current;
   // eslint-disable-next-line react-hooks/set-state-in-effect -- A user-opened attachment review recomputes local fields after explicit review/choice changes.

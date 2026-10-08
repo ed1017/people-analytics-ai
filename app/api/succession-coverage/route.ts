@@ -1,3 +1,4 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import {
   NextRequest,
   NextResponse,
@@ -33,7 +34,7 @@ function unavailable() {
   );
 }
 
-export async function GET(
+async function handleGET(
   request: NextRequest
 ) {
   const contentLength = Number(
@@ -109,7 +110,7 @@ export async function GET(
   }
 }
 
-export async function POST() {
+async function handlePOST() {
   return NextResponse.json(
     { error: "Method not allowed." },
     {
@@ -120,4 +121,12 @@ export async function POST() {
       },
     }
   );
+}
+
+export async function GET(request: NextRequest) {
+  return withDatasetRequest(request, () => handleGET(request));
+}
+
+export async function POST(request?: Request) {
+  return withDatasetRequest(request, () => handlePOST());
 }

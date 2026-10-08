@@ -1,7 +1,7 @@
 "use client";
 
 import {CalibratedTaPanels} from "@/components/calibrated-ta-panels";
-import {resolveTaExtension} from "@/lib/synthetic-ta/extension";
+import {isSeparateTaDataset,resolveTaResponseExtension} from "@/lib/synthetic-ta/extension";
 
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatWholeCount, formatMetric } from "@/lib/display-format";
@@ -23,7 +23,8 @@ function formatLongDate(value: string) {
 
 export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitionPageProps) {
   const summary = data?.summary;
-  const extension = resolveTaExtension(data?.modeled_extension);
+  const separateDataset = isSeparateTaDataset(data);
+  const extension = !loading&&!error ? resolveTaResponseExtension(data) : null;
 
   return (
     <section className="evidence-workspace min-w-0 p-6">
@@ -38,7 +39,7 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
 
       {error && <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">{error}</div>}
 
-      <div className="mb-4">{extension ? <CalibratedTaPanels data={extension} /> : <p className="rounded-lg border p-3 text-sm">Calibrated projections and expanded funnel unavailable: source data is loading or differs from the calibration snapshot.</p>}</div>
+      <div className="mb-4">{extension ? <CalibratedTaPanels data={extension} /> : <p className="rounded-lg border p-3 text-sm">{separateDataset?'Active-requisition history, projections and a screening stage are not released for this dataset. The recruiting summary and funnel use its own events.':'Calibrated projections and expanded funnel unavailable: source data is loading or differs from the calibration snapshot.'}</p>}</div>
 
       {summary ? (
         <>
@@ -64,6 +65,15 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
               <p className="mt-1 text-xs text-muted-foreground">Older than 60 days · median age {formatMetric(summary.median_open_req_age_days, 0, " days")}</p>
             </div>
           </div>
+
+          {!extension&&<section aria-label="Source recruiting funnel" className="mt-6 rounded-lg border p-4">
+            <h3 className="font-semibold">Recruiting funnel</h3>
+            <p className="mb-4 text-sm text-muted-foreground">{separateDataset?'Constructed source events. Hires count accepted offers; employment starts drive headcount. Internal fills are movements. Screening and a separate acceptance stage are unavailable.':'Stages available in the current source summary; no screening or acceptance stage is inferred.'}</p>
+            <div className="grid gap-3 md:grid-cols-4">{([
+              ['Applications',summary.applications,null],['Interviewed',summary.interviewed_applications,summary.application_to_interview_pct],
+              ['Offers',summary.offered_applications,summary.interview_to_offer_pct],['Hires',summary.hires,summary.offer_to_hire_pct],
+            ] as const).map(([label,value,conversion])=><div key={label} className="rounded-lg border bg-muted/10 p-4"><p className="text-xs font-medium">{label}</p><p className="mt-2 text-2xl font-semibold">{formatWholeCount(value)}</p><p className="mt-2 text-xs text-muted-foreground">{label==='Applications'?'Top of funnel':formatMetric(conversion,1,'% from prior stage')}</p></div>)}</div>
+          </section>}
 
           <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)]">
             <div className="rounded-lg border p-4">

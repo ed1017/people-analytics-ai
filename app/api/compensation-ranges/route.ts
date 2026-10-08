@@ -1,10 +1,11 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import {supabaseServer} from '../../../lib/supabase-server';
 import type {RangeCatalog} from '../../../lib/compensation-ranges';
 
 export const dynamic = 'force-dynamic';
 
 /** Catalog metadata only: no employee rows, cost values or new database objects. */
-export async function GET() {
+async function handleGET() {
   try {
     const [jobs, inventory] = await Promise.all([
       supabaseServer.from('job_profiles').select('job_profile_code, job_profile_name', {count: 'exact'}),
@@ -29,4 +30,8 @@ export async function GET() {
   } catch {
     return Response.json({error: 'Job range catalog unavailable.'}, {status: 503, headers: {'Cache-Control': 'no-store'}});
   }
+}
+
+export async function GET(request?: Request) {
+  return withDatasetRequest(request, () => handleGET());
 }

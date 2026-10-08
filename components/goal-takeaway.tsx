@@ -1,4 +1,6 @@
 "use client";
+import { datasetFetch } from "@/lib/dataset-client.mjs";
+
 import {recordDecisionEvidence} from "@/components/decision-store";
 import {useEffect,useState} from "react";
 import {ChatContent} from "@/components/chat-content";
@@ -24,7 +26,7 @@ export function GoalTakeaway({goalId,goalContext,displayedGoal='',payload,active
    timeout=setTimeout(()=>controller.abort(),30000);
    try{
     const evidence=JSON.parse(request);for(const name of ["goalContext","summaryGoal","history","message","goalEvidenceContext"])delete evidence[name];recordDecisionEvidence(goalId,String(evidence.page??"unknown"),evidence);
-    const response=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:request,signal:controller.signal});
+    const response=await datasetFetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:request,signal:controller.signal});
     const data=await response.json();if(!response.ok||typeof data.answer!=="string"||!data.answer.trim())throw new Error("unavailable");
     if(live){const result={key,goalId,text:data.answer,failed:false};sessionCache.set(key,result);while(sessionCache.size>32)sessionCache.delete(sessionCache.keys().next().value!);setEntries(current=>[...current.filter(e=>e.key!==key),result].slice(-32));}
    }catch{if(live)setEntries(current=>[...current.filter(e=>e.key!==key),{key,goalId,text:"The goal takeaway is unavailable. Ask a question below to continue with this page's evidence.",failed:true}].slice(-32));}

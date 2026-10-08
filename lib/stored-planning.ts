@@ -2,6 +2,14 @@ import type { PlanningPoint } from "./types";
 // @ts-expect-error Native Node tests share the TypeScript source.
 import { knownDifference, knownSum } from "./numeric-contract.ts";
 
+export type PlanningProvenance = {
+  source:string;status:'stored_modeled_plan'|'constructed_draft_assumption';
+  population:string;grain:string;source_refreshed_at:string|null;
+  flow_definition:string;reconciliation:string;
+  history_cutoff?:string;opening_headcount?:number;planning_start?:string;planning_end?:string;
+  unmodeled_gap?:string[];independent_forecast_validation?:false;
+};
+
 export const storedPlanningProvenance = {
   source: "workforce_scenario_summary",
   status: "stored_modeled_plan",

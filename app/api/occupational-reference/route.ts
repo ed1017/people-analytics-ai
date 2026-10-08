@@ -3,7 +3,7 @@ import { referenceReadDiagnostic } from "../../../lib/reference-source-diagnosti
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
+async function handleGET(request: Request) {
   const code = new URL(request.url).searchParams.get("occupation");
   const headers = { "Cache-Control": "no-store" };
   if (code !== null && !isOccupationCode(code)) return Response.json({ error: "Use an O*NET-SOC code such as 15-1252.00." }, { status: 400, headers });
@@ -41,3 +41,8 @@ export async function GET(request: Request) {
     return Response.json(unavailable(), { headers });
   }
 }
+
+export async function GET(request: Request) {
+  return withDatasetRequest(request, () => handleGET(request));
+}
+import { withDatasetRequest } from "@/lib/dataset-runtime";

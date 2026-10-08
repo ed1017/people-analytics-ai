@@ -1,6 +1,6 @@
 // @ts-expect-error Native Node tests share TypeScript source.
 import {plain,exactKeys,readHomeActionProposal,type HomeAction,type HomeActionProposal} from './home-action-proposal.ts';
-import {normalizeHomePack} from './home-pack.mjs';
+import {homeEvidenceBindingValue} from './home-pack.mjs';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {validateJson} from './local-decisions.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -13,7 +13,7 @@ const canonical=(value:unknown):string=>JSON.stringify(value,(_,item)=>plain(ite
 const digest=async(value:unknown)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(canonical(value))))).map(byte=>byte.toString(16).padStart(2,'0')).join('');
 export async function actionBinding(goalId:string,goal:string,packet:unknown,localPlanningInputs:unknown):Promise<ActionBinding>{
  if(!goalId||goalId.length>120||!goal.trim()||goal.length>240||!validateJson(localPlanningInputs)||new TextEncoder().encode(canonical(localPlanningInputs)).length>128*1024)throw Error('Action preparation context is invalid.');
- return {version:1,goalId,goal,evidenceDigest:await digest(normalizeHomePack(packet)),planningDigest:await digest(localPlanningInputs)};
+ return {version:1,goalId,goal,evidenceDigest:await digest(homeEvidenceBindingValue(packet)),planningDigest:await digest(localPlanningInputs)};
 }
 export function validActionBinding(raw:unknown):raw is ActionBinding{const value=plain(raw);return !!value&&exactKeys(value,['version','goalId','goal','evidenceDigest','planningDigest'])&&value.version===1&&typeof value.goalId==='string'&&!!value.goalId&&value.goalId.length<=120&&typeof value.goal==='string'&&!!value.goal.trim()&&value.goal.length<=240&&typeof value.evidenceDigest==='string'&&/^[a-f0-9]{64}$/.test(value.evidenceDigest)&&typeof value.planningDigest==='string'&&/^[a-f0-9]{64}$/.test(value.planningDigest)}
 export const actionBindingKey=(binding:ActionBinding)=>canonical(binding);

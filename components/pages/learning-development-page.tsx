@@ -64,6 +64,11 @@ export function LearningDevelopmentPage({
         </span>
       </div>
 
+      {data?.data_meta?.dataClass === "constructed-synthetic" && (
+        <p className="mb-4 rounded-md border bg-muted/20 p-3 text-sm text-muted-foreground">
+          {data.data_meta.sourceLabel}. Employee preferences remain separate from assessed readiness. No measured learning gains are supplied.
+        </p>
+      )}
 
       {error && (
         <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">

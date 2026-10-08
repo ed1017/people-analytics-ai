@@ -1,4 +1,6 @@
 "use client";
+import { datasetFetch } from "@/lib/dataset-client.mjs";
+
 import {ModelCapabilityPlanner} from "@/components/model-capability-planner";
 import {useEffect,useRef,useState} from "react";
 import {decisionStore,useDecisionStorage} from "@/components/decision-store";
@@ -28,12 +30,12 @@ export function CapabilityJourney({goalId,goal,onNavigate}:{goalId:string;goal:s
   const timer=setTimeout(()=>c.abort(new Error("Calculation timed out after 45 seconds; prior results retained.")),45000);
   try{
    if(kind==="prepare"){
-    const r=await fetch("/api/scenario-modeler",{signal:c.signal,cache:"no-store"});if(!r.ok)throw Error("Existing scenario source unavailable. Prior results retained; try again later.");
+    const r=await datasetFetch("/api/scenario-modeler",{signal:c.signal,cache:"no-store"});if(!r.ok)throw Error("Existing scenario source unavailable. Prior results retained; try again later.");
     const source=validateJourneySource(await r.json()),proposal=prepareJourney(goal,options,saved.limits,source);
     if(stillHere(c)){persist({proposal});setTrace(["Existing scenario defaults read. Proposals prepared; no scenario calculation or allocation has run."])}
    }else{
     if(!proposalCurrent||!saved.proposal)throw Error("Inputs changed. Prepare and review proposals again.");
-    const run=await runCapabilityJourney(saved.proposal,async(assumptions,signal)=>{const r=await fetch("/api/scenario-modeler",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({assumptions}),signal});if(!r.ok)throw Error("Existing scenario calculation failed. No replacement result saved.");return await r.json() as ScenarioModelResponse},c.signal,t=>{if(stillHere(c))setTrace(t)});
+    const run=await runCapabilityJourney(saved.proposal,async(assumptions,signal)=>{const r=await datasetFetch("/api/scenario-modeler",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({assumptions}),signal});if(!r.ok)throw Error("Existing scenario calculation failed. No replacement result saved.");return await r.json() as ScenarioModelResponse},c.signal,t=>{if(stillHere(c))setTrace(t)});
     if(stillHere(c))persist({run});
    }
   }catch(e){if(controller.current===c)setError(c.signal.aborted?(c.signal.reason instanceof Error?c.signal.reason.message:"Cancelled; prior saved results retained."):(e instanceof Error?e.message:"Calculation unavailable."))}

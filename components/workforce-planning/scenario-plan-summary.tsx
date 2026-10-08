@@ -64,6 +64,7 @@ export function ScenarioPlanSummary({
   planningTotalHires,
   planningTotalExits,
 }: ScenarioPlanSummaryProps) {
+  const draftProvenance=activePlanningScenario?.provenance?.status==='constructed_draft_assumption'?activePlanningScenario.provenance:null;
   return (
     <>
           {planningLoading &&
@@ -169,7 +170,7 @@ export function ScenarioPlanSummary({
                   </div>
 
                   <p className="mb-3 text-xs text-muted-foreground">
-                    Source-reported monthly flows across the returned month window. Missing, duplicate or invalid months and unknown flow values leave totals unavailable. Full horizon boundaries and source refresh date are not supplied. These flows are not observed actuals and do not fully explain the Baseline headcount curve; what-if engine flows are separate.
+                    {draftProvenance ? <>{draftProvenance.reconciliation} History ends {draftProvenance.history_cutoff}. October–December 2026 are unmodeled; carrying September headcount into January 2027 is an explicit draft assumption. Source refresh time is unavailable.</> : <>Source-reported monthly flows across the returned month window. Missing, duplicate or invalid months and unknown flow values leave totals unavailable. Full horizon boundaries and source refresh date are not supplied. These flows are not observed actuals and do not fully explain the Baseline headcount curve; what-if engine flows are separate.</>}
                   </p>
                   <div className="h-80 w-full">
                     <ResponsiveContainer
