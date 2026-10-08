@@ -22,11 +22,12 @@ let checks=0;
 const check=(name,yes)=>{assert(yes,name);checks++;console.log('PASS '+name)};
 const screenshotDirectory='/tmp/forecast-chart-readability';await fs.mkdir(screenshotDirectory,{recursive:true});
 try {
- for(const [name,width,height] of [['desktop',1366,900],['mobile',390,844],['small-mobile',320,740],['zoom',683,450]]) for(const palette of ['light','slate-blue']) {
+ for(const [name,width,height] of [['wide',1844,1100],['desktop',1366,900],['mobile',390,844],['small-mobile',320,740],['zoom',683,450]]) for(const palette of ['light','slate-blue']) {
   const context=await browser.newContext({viewport:{width,height},hasTouch:true}),page=await context.newPage(),errors=[];let requests=0;
   page.on('pageerror',error=>errors.push(error.message));
   await page.route('**/*',route=>{if(route.request().url()==='http://fixture.local/')return route.fulfill({contentType:'text/html',body:html});requests++;return route.abort()});
   await page.goto('http://fixture.local/');
+  if(name==='wide')await page.locator('main').evaluate(n=>n.style.maxWidth='none');
   await page.evaluate(palette=>{document.documentElement.dataset.workspacePreference=palette;document.documentElement.classList.add('dark')},palette);
   for(const [domain,title,expectedPoints,expectedSegments] of [['turnover','Turnover projections',8,1],['hiring','Hiring projections',11,2],['satisfaction','Satisfaction projection',8,1]]) {
    const figure=page.getByRole('figure',{name:title+': simulated history and projections'});await figure.waitFor();
@@ -36,14 +37,24 @@ try {
     return {min:Number(svg.dataset.yMin),max:Number(svg.dataset.yMax),width:svg.viewBox.baseVal.width,ticks:[...node.querySelectorAll('[data-axis=x]')].map(t=>({month:t.dataset.month,text:t.textContent,rect:t.getBoundingClientRect().toJSON()})),history:[...node.querySelectorAll('[data-series=history]')].map(p=>p.getAttribute('d')),points:[...node.querySelectorAll('[data-point=history]')].map(p=>({month:p.dataset.month,x:Number(p.getAttribute('cx')),y:Number(p.getAttribute('cy'))})),forecast:[...node.querySelectorAll('[data-point=forecast]')].map(p=>{const shape=p.children[0],box=shape.getBBox();return {value:Number(p.dataset.value),month:p.dataset.month,method:p.dataset.method,label:p.getAttribute('aria-label'),shape:shape.tagName,x:box.x+box.width/2,y:box.y+box.height/2}}),missing:[...node.querySelectorAll('[data-missing]')].map(p=>p.dataset.missing),textSize:parseFloat(getComputedStyle(node.querySelector('[data-axis=y]')).fontSize)*svg.getBoundingClientRect().width/svg.viewBox.baseVal.width};
    });
    const prefix=`${name} ${palette} ${domain}`;
+   const panel=figure.locator('xpath=ancestor::section[1]'),details=panel.locator('details'),summary=details.locator('summary');
+   check(prefix+' compact disclosure defaults closed',await details.count()===1&&!await details.evaluate(n=>n.open)&&await summary.innerText()==='Details'&&await summary.evaluate(n=>n.getBoundingClientRect().height>=44));
+   check(prefix+' no repeated caveats outside Details',!(await panel.innerText()).match(/DEMO|Methods unselected|Filters excluded|Intervals unavailable|× means|Hover, focus/)&&await figure.getByText(/Simulated projections/).isVisible());
+   check(prefix+' shorter chart keeps unscaled text',await figure.locator('svg[role=img]').evaluate(n=>n.getBoundingClientRect().height<=261));
+   for(let repeat=0;repeat<3;repeat++){
+    await summary.focus();await page.keyboard.press(repeat%2?'Space':'Enter');
+    check(prefix+' keyboard Details opens '+repeat,await details.evaluate(n=>n.open)&&await details.getByText(/× means no value, not zero/).isVisible()&&await details.getByText(/none is designated as preferred/).isVisible()&&await details.getByRole('link',{name:'Source methods and complete comparisons'}).isVisible());
+    await page.keyboard.press(repeat%2?'Space':'Enter');check(prefix+' keyboard Details closes '+repeat,!await details.evaluate(n=>n.open));
+   }
+   console.log('LAYOUT '+JSON.stringify({name,palette,domain,...await panel.evaluate(n=>({panelHeight:n.getBoundingClientRect().height,chartHeight:n.querySelector('svg[role=img]').getBoundingClientRect().height}))}));
    check(prefix+' denser ticks with endpoint and boundary years',geometry.ticks.length>=6&&geometry.ticks[0].text.includes(geometry.ticks[0].month.slice(0,4))&&geometry.ticks.at(-1).text.includes('2026')&&(domain!=='satisfaction'||geometry.ticks.some(t=>t.text.includes('2025'))));
    check(prefix+' non-overlapping readable dates',geometry.textSize>=11.9&&geometry.ticks.every((t,i)=>!i||t.rect.left>=geometry.ticks[i-1].rect.right+2));
    check(prefix+' cropped scale explicitly disclosed',(await figure.locator('[data-axis-note]').innerText()).includes('does not start at zero')&&geometry.min>0&&(domain==='turnover'||geometry.max<=(domain==='hiring'?1:100)));
    const data=artifact.domains[domain],history=domain==='turnover'?data.history.filter(r=>r.month>='2026-01'):domain==='hiring'?data.history.slice(-12):data.history;
    const start=domain==='turnover'?'2026-01':history[0].month,index=month=>Number(month.slice(0,4))*12+Number(month.slice(5,7)),span=index(data.rows.at(-1).month)-index(start);
-   check(prefix+' original historical values and dates preserved',geometry.points.length===expectedPoints&&geometry.points.every(p=>{const row=history.find(r=>r.month===p.month);return row&&Math.abs(p.x-(58+(index(p.month)-index(start))/span*(geometry.width-78)))<1e-8&&Math.abs(p.y-(186-(row.value-geometry.min)/(geometry.max-geometry.min)*156))<1e-8}));
+   check(prefix+' original historical values and dates preserved',geometry.points.length===expectedPoints&&geometry.points.every(p=>{const row=history.find(r=>r.month===p.month);return row&&Math.abs(p.x-(58+(index(p.month)-index(start))/span*(geometry.width-78)))<1e-8&&Math.abs(p.y-(166-(row.value-geometry.min)/(geometry.max-geometry.min)*136))<1e-8}));
    check(prefix+' only consecutive native cadence joined',geometry.history.length===expectedSegments&&geometry.history.reduce((n,d)=>n+(d.match(/L/g)||[]).length,0)===expectedPoints-expectedSegments);
-   check(prefix+' all methods and values keep their dates',geometry.forecast.length===data.rows.length*data.methods.length&&geometry.forecast.every(p=>{const row=data.rows.find(r=>r.month===p.month),method=data.methods.indexOf(p.method),value=row?.values[method];return value!==undefined&&Math.abs(p.x-(58+(index(p.month)-index(start))/span*(geometry.width-78)))<.001&&Math.abs(p.y-(186-(value-geometry.min)/(geometry.max-geometry.min)*156))<.001&&p.value===value&&p.label.includes('Projection')})&&new Set(geometry.forecast.map(p=>p.shape)).size===3);
+   check(prefix+' all methods and values keep their dates',geometry.forecast.length===data.rows.length*data.methods.length&&geometry.forecast.every(p=>{const row=data.rows.find(r=>r.month===p.month),method=data.methods.indexOf(p.method),value=row?.values[method];return value!==undefined&&Math.abs(p.x-(58+(index(p.month)-index(start))/span*(geometry.width-78)))<.001&&Math.abs(p.y-(166-(value-geometry.min)/(geometry.max-geometry.min)*136))<.001&&p.value===value&&p.label.includes('Projection')})&&new Set(geometry.forecast.map(p=>p.shape)).size===3);
    check(prefix+' projection boundary in all charts',await figure.locator('[data-region=projection]').count()===1&&await figure.getByLabel('Chart legend').count()===1);
    check(prefix+' missing periods remain missing',data.gaps.every(month=>geometry.missing.includes(month)&&!geometry.points.some(p=>p.month===month))&&(domain!=='hiring'||geometry.missing.includes('2025-11'))&&await figure.locator('[data-series=forecast-bridge]').count()===(domain==='turnover'?3:0));
    const historyPoint=figure.locator(domain==='turnover'?'[data-point=history][data-month="2026-02"]':'[data-point=history]').first();
@@ -71,6 +82,16 @@ try {
    }
    await figure.screenshot({path:`${screenshotDirectory}/${name}-${palette}-${domain}.png`});
   }
+  await page.getByLabel('Chart fixture').selectOption('home');
+  const homePanels=page.locator('section');
+  check(name+palette+' all Home projection surfaces',await homePanels.count()===4);
+  for(const panel of await homePanels.all()){
+   const summary=panel.locator('summary');
+   check(name+palette+' Home closed details and simulation label',!await panel.locator('details').evaluate(n=>n.open)&&await panel.getByText(/Simulated projections/).isVisible()&&!/Intervals unavailable|Methods unselected|Goal and filters excluded/.test(await panel.innerText()));
+   for(let repeat=0;repeat<3;repeat++){await summary.focus();await page.keyboard.press('Enter');check(name+palette+' Home disclosure evidence',await panel.getByText(/Cutoff 30 Sep 2026/).isVisible()&&await panel.getByText(/Constructed synthetic demonstration/).isVisible()&&await panel.getByText(/none is designated as preferred/).isVisible());await page.keyboard.press('Space');}
+  }
+  await page.getByRole('button',{name:'Toggle projection page'}).click();check(name+palette+' navigation unmounts charts',await page.locator('figure').count()===0);
+  await page.getByRole('button',{name:'Toggle projection page'}).click();check(name+palette+' navigation restores closed disclosures',await page.locator('details').count()===4&&await page.locator('details[open]').count()===0);
   for(const mode of ['flat','singleton','unavailable','verified']) {
    await page.getByLabel('Chart fixture').selectOption(mode);
    if(mode==='unavailable')check(name+palette+' null series unavailable',await page.getByText('Simulated history chart unavailable.',{exact:true}).count()===3);
