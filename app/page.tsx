@@ -1616,10 +1616,14 @@ export default function Home() {
   const sectionRequestContextKey = JSON.stringify([chatEvidenceKey, relatedGoalEvidence, marketCarry, conversation.focusedIssue, chatEvidenceReady, conversation.resetEpoch]);
   const currentChatEvidenceKey = useRef(sectionRequestContextKey);
   const sectionSending = useRef<symbol | null>(null);
+  const queuedSectionPrompt = useRef<symbol | null>(null);
+  const recentSectionPrompts = useRef(new Set<string>());
   useLayoutEffect(() => {
     if (currentChatEvidenceKey.current !== sectionRequestContextKey) {
       currentChatEvidenceKey.current = sectionRequestContextKey;
       sectionSending.current = null;
+      queuedSectionPrompt.current = null;
+      recentSectionPrompts.current.clear();
       if (activePage !== "home") conversation.cancelPending();
     }
   }, [sectionRequestContextKey, activePage, conversation]);
@@ -1644,7 +1648,7 @@ export default function Home() {
       const csv = !roster && chatEvidenceReady ? buildAggregateExport({page:activePage,filters:JSON.stringify(selectedBusinessContext),snapshot:overviewData,trend:headcountTrend,workforce:workforceData,skills:skillsData}) : null;
       if (csv) downloadAggregateCsv(csv, activePage);
       setChatMessages(current => [...current, {role:"user",content:message},{role:"assistant",content:roster ? "Employee-name and roster exports are not available from the current public aggregate views. I have not downloaded a roster. This needs a separate source and access review." : csv ? "Downloaded the available Workforce or Skills aggregate tables as CSV, with source, scope, filters, dates and units. This contains aggregate metrics, not employee names or raw records." : "A CSV export is currently available on Workforce and Skills Intelligence after their data has loaded. This page’s data is not yet supported for export; no file was downloaded."}]);
-      setChatInput("");
+      if(suggestedMessage===undefined)setChatInput("");
       return;
     }
 
@@ -1667,7 +1671,7 @@ export default function Home() {
     ];
 
     setChatMessages(nextMessages);
-    setChatInput("");
+    if(suggestedMessage===undefined)setChatInput("");
     setChatLoading(true);
     setChatError(null);
     conversation.setQuestionUnanswered(true);
@@ -1721,6 +1725,21 @@ export default function Home() {
       if (sectionSending.current === sending) sectionSending.current = null;
       if (request.current()) setChatLoading(false);
     }
+  };
+
+  const sendSuggestedPrompt = (prompt:string) => {
+    if(queuedSectionPrompt.current||sectionSending.current||chatLoading||!chatEvidenceReady||
+      readOnlyChatPage||!conversation.storageReady||conversation.issueEditor||!conversation.canSubmitPrompt(true)||
+      currentChatEvidenceKey.current!==sectionRequestContextKey||recentSectionPrompts.current.has(prompt))return;
+    const ticket=Symbol();queuedSectionPrompt.current=ticket;
+    recentSectionPrompts.current.add(prompt);
+    setTimeout(()=>recentSectionPrompts.current.delete(prompt),1000);
+    requestAnimationFrame(()=>{
+      if(queuedSectionPrompt.current!==ticket)return;
+      queuedSectionPrompt.current=null;
+      if(currentChatEvidenceKey.current!==sectionRequestContextKey||!conversation.canSubmitPrompt(true))return;
+      void sendChatMessage(prompt);
+    });
   };
 
   const explainCustomScenario = async (
@@ -2121,7 +2140,7 @@ export default function Home() {
             setAiCollapsed(!aiCollapsed)
           }
           onChatInputChange={setChatInput}
-          onDraftExample={conversation.draftExample}
+          onSendSuggested={sendSuggestedPrompt}
           onResetConversation={()=>{sectionSending.current=null;conversation.resetConversation();}}
           conversationHistory={conversation.historyMessages}
           onSend={() => sendChatMessage()}

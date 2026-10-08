@@ -267,12 +267,12 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   function submitQuestion(prompt:string){if(ready)queueSuggestion("question:"+prompt,()=>void send(prompt))}
 
   function submitStarterQuestion(prompt:string){
+    if(conversation.issueEditor)return;
     const starter=!conversation.focusedIssue?homeStarterGoal(prompt):null;
-    if(!starter){submitQuestion(prompt);return;}
-    if(ready)queueSuggestion('starter:'+prompt,()=>void send(prompt,false,false,false,false,'default',starter));
+    if(ready)queueSuggestion('starter:'+prompt,()=>void send(prompt,false,false,false,false,'default',starter??undefined,undefined,true),true);
   }
 
-  async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false, responseIntent:'default'|'explanation'|'alternative'='default',starter?:HomeStarterGoal,onAnswered?:()=>void) {
+  async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false, responseIntent:'default'|'explanation'|'alternative'='default',starter?:HomeStarterGoal,onAnswered?:()=>void, keepComposer=false) {
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
     if(message)setInstructionsDismissed(value=>value+1);
@@ -286,7 +286,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
       if(!target||target.goalId!==conversation.activeGoalId){setLocalAction({goalId:conversation.activeGoalId,notice:'Select the intended Action Plan tab, then send this change again for review. Your request is kept; nothing has changed.'});return;}
       if(recoveredPlanNeedsConfirmation(message)&&!recoveredPlanConfirmed(message,target)){setLocalAction({goalId:conversation.activeGoalId,notice:'Review the intended Action Plan tab and confirm it for this recovered request before sending. Nothing has changed.'});return;}
       setLocalAction(null);setPlanEdit(target);
-      try{if(!target.isCurrent())throw Error('The selected plan or context changed. Select the intended Plan tab and send the change again.');const answer=target.propose(message);setMessages(current=>[...current,{role:'user',content:message},{role:'assistant',content:answer}]);setInput('');setPlanEdit(null);setEditPreview(null);setEditNotice('');setChatError(null);requestAnimationFrame(()=>{const panel=conversationViewport.current?.querySelector<HTMLElement>('[aria-label="Action Plans for your goal"]');panel?.scrollIntoView({block:'start'});});}
+      try{if(!target.isCurrent())throw Error('The selected plan or context changed. Select the intended Plan tab and send the change again.');const answer=target.propose(message);setMessages(current=>[...current,{role:'user',content:message},{role:'assistant',content:answer}]);if(!keepComposer)setInput('');setPlanEdit(null);setEditPreview(null);setEditNotice('');setChatError(null);requestAnimationFrame(()=>{const panel=conversationViewport.current?.querySelector<HTMLElement>('[aria-label="Action Plans for your goal"]');panel?.scrollIntoView({block:'start'});});}
       catch(error){setEditPreview(null);setEditNotice((error as Error).message);setLocalAction({goalId:conversation.activeGoalId,notice:(error as Error).message});}
       requestAnimationFrame(()=>{editReview.current?.focus({preventScroll:true});editReview.current?.scrollIntoView({block:'nearest'});});return;
     }
@@ -297,11 +297,11 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     }
     if (!message || !sources || loadedScope !== workforceQuery || chatLoading || loading || sources.every(source => !source.facts)) return;
     if (/^(?:please\s+|can you\s+)?(?:export|download)\b/i.test(message)) {
-      setMessages(current=>[...current,{role:"user",content:message},{role:"assistant",content:"CSV downloads are currently available on Workforce and Skills Intelligence. Open one of those pages and choose Export current data (CSV), then Send. Home exports, other modules and employee-name rosters are not available yet; no file was downloaded."}]);if(!preserveDraft)setInput("");return;
+      setMessages(current=>[...current,{role:"user",content:message},{role:"assistant",content:"CSV downloads are currently available on Workforce and Skills Intelligence. Open one of those pages and choose Export current data (CSV), then Send. Home exports, other modules and employee-name rosters are not available yet; no file was downloaded."}]);if(!preserveDraft&&!keepComposer)setInput("");return;
     }
     if (!actionPlan && !scopeConfirmed && !forecastQuestion) {
       const requested=requestedHomeCountries(message,countryOptions,selectedCountry);
-      if(requested.kind!=="none") { if(preserveDraft){setCandidateNotice("This clarification requests different country evidence. Your drafts are kept. Change the workforce country filter before updating options.");return false;} setInput(message);setScopeChoice({message,query:workforceQuery,identity:scopeIdentity,...requested});return; }
+      if(requested.kind!=="none") { if(preserveDraft||keepComposer){setCandidateNotice("This clarification requests different country evidence. Your drafts are kept. Change the workforce country filter before updating options.");return false;} setInput(message);setScopeChoice({message,query:workforceQuery,identity:scopeIdentity,...requested});return; }
     }
     setScopeChoice(null);setLocalAction(null);
     liveFindingTurn.current=null;setFindingTurn(null);
@@ -316,7 +316,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     recordDecisionEvidence(conversation.activeGoalId,"home",pack);
     const goalContext=actionPlan||retainGoalContext||forecastQuestion||Boolean(selectedPlanForChat.current?.goalId===conversation.activeGoalId)?conversation.goalContext:conversation.recordGoalStatement(message,"home",workforceScope);
     setMessages(current => [...current, { role: "user", content: actionPlan ? HOME_ACTION_PLAN_LABEL : message }]);
-    if(!preserveDraft)setInput(""); setChatLoading(true); setChatError(null);
+    if(!preserveDraft&&!keepComposer)setInput(""); setChatLoading(true); setChatError(null);
     responseReveal.current?.cancel();
     const reveal=queueHomeResponseReveal(()=>conversationViewport.current,()=>liveActive.current&&request.current()&&currentEvidenceKey.current===key&&candidateEpoch===promptEpoch.current);
     responseReveal.current=reveal;
@@ -401,15 +401,15 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     const item=findingTurn.findings.find(finding=>finding.text===text);if(!item)return null;
     return <span className="mt-1 flex flex-wrap items-center gap-x-2"><button type="button" disabled={chatLoading||suggestionPending||Boolean(input.trim())} aria-describedby={input.trim()?'home-finding-draft-note':undefined} onClick={()=>exploreFinding(findingTurn,item)} aria-label={`Explore this finding: ${item.text}`} className="min-h-11 rounded border px-2 text-xs font-medium focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Explore this finding</button><span className="text-xs text-muted-foreground">Ask: {item.prompt}</span>{input.trim()&&item.id===findingTurn.findings[0].id&&<span id="home-finding-draft-note" role="status" className="basis-full text-xs text-muted-foreground">Your draft is kept. Send or clear it before exploring a finding.</span>}</span>;
   }
-  function allowSuggestion(key:string){
-    if(!active||!liveActive.current||renderedPromptEpoch!==promptEpoch.current||queuedSuggestion.current||chatLoading||sending.current||!conversation.canSubmitPrompt()||currentEvidenceKey.current!==contextKey)return false;
+  function allowSuggestion(key:string,allowDraft=false){
+    if(!active||!liveActive.current||renderedPromptEpoch!==promptEpoch.current||queuedSuggestion.current||chatLoading||sending.current||!conversation.canSubmitPrompt(allowDraft)||currentEvidenceKey.current!==contextKey)return false;
     if(recentSuggestions.current.has(key))return false;
     recentSuggestions.current.add(key);setTimeout(()=>recentSuggestions.current.delete(key),1000);return true;
   }
-  function queueSuggestion(key:string,run:()=>void){
-    if(!allowSuggestion(key))return;
+  function queueSuggestion(key:string,run:()=>void,allowDraft=false){
+    if(!allowSuggestion(key,allowDraft))return;
     const ticket=Symbol();queuedSuggestion.current=ticket;setSuggestionPending(true);
-    requestAnimationFrame(()=>{if(queuedSuggestion.current!==ticket)return;queuedSuggestion.current=null;setSuggestionPending(false);if(!liveActive.current||renderedPromptEpoch!==promptEpoch.current||!conversation.canSubmitPrompt()||currentEvidenceKey.current!==contextKey||sending.current)return;run()});
+    requestAnimationFrame(()=>{if(queuedSuggestion.current!==ticket)return;queuedSuggestion.current=null;setSuggestionPending(false);if(!liveActive.current||renderedPromptEpoch!==promptEpoch.current||!conversation.canSubmitPrompt(allowDraft)||currentEvidenceKey.current!==contextKey||sending.current)return;run()});
   }
   function submitOption(id:OptionAction){
     const command=optionActions?.stage(id);
@@ -498,7 +498,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
         <p className="text-sm text-muted-foreground">Describe a goal, compare options, build or adjust a plan, or ask a general workforce question.</p>
       </div>
 
-      <div className="mt-3"><PromptExamples groups={conversation.focusedIssue?undefined:homeStarterGroups} prompts={contextualPrompts({page:"home",goal:conversation.focusedIssue,hasConversation:messages.some(message=>message.role==="user"),evidenceReady:ready,sources})} draft={input} busy={suggestionPending||chatLoading||!ready||!active} onDraft={submitStarterQuestion}/></div>
+      <div className="mt-3"><PromptExamples groups={conversation.focusedIssue?undefined:homeStarterGroups} prompts={contextualPrompts({page:"home",goal:conversation.focusedIssue,hasConversation:messages.some(message=>message.role==="user"),evidenceReady:ready,sources})} draft={input} busy={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)} onSend={submitStarterQuestion}/></div>
 
     </section>
   );
