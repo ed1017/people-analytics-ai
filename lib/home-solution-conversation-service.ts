@@ -2,7 +2,7 @@
 import {goalProgressProposalTool,createProgressEntryProposal,readProgressEntryState,type ProgressEntryProposal,type ProgressEntryContext} from './goal-progress-entry.ts';
 import type {SolutionRequest,SolutionState,SolutionEvaluation} from './home-solution-conversation';
 // @ts-expect-error Native Node fixtures share TypeScript source.
-import {requestDemandContext,createDemandReview,reviseDemandReview,serviceDemandTool,demandPatchTool,type DemandReview} from './swp-demand.ts';
+import {requestDemandContext,createDemandReview,reviseDemandReview,serviceDemandTool,demandPatchTool,demandPeriodFeedback,type DemandReview} from './swp-demand.ts';
 import type {SolutionParameterEdit,SolutionCandidate,SolutionConstraint,SolutionFinal,ProjectionSpec,SolutionMetricRef} from './home-solution-conversation-schema';
 import type {ProjectionInputs,HeadcountProjection} from './home-solution-projection';
 // @ts-expect-error Native fixture tests share TypeScript source.
@@ -64,7 +64,10 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   for(const call of output.calls){
    abort(signal);toolCalls++;let result:unknown;
    try{
-    const tool=demand?[serviceDemandTool,demandPatchTool,...solutionTools.filter(t=>['read_clock','read_evidence'].includes(t.name))].find(t=>t.name===call.name):call.name==='propose_goal_progress'&&entryContext?goalProgressProposalTool:call.name==='read_goal_progress'&&progress?goalProgressReadTool:solutionTools.find(tool=>tool.name===call.name);if(!tool||call.arguments.length>32000)throw Error('Unsupported or oversized tool request.');const args=JSON.parse(call.arguments);assertSolutionShape(args,tool.parameters,'tool arguments');
+    const tool=demand?[serviceDemandTool,demandPatchTool,...solutionTools.filter(t=>['read_clock','read_evidence'].includes(t.name))].find(t=>t.name===call.name):call.name==='propose_goal_progress'&&entryContext?goalProgressProposalTool:call.name==='read_goal_progress'&&progress?goalProgressReadTool:solutionTools.find(tool=>tool.name===call.name);if(!tool||call.arguments.length>32000)throw Error('Unsupported or oversized tool request.');const args=JSON.parse(call.arguments);
+    const periodFeedback=demand?demandPeriodFeedback(call.name,args):null;
+    if(periodFeedback){input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(periodFeedback)});continue;}
+    assertSolutionShape(args,tool.parameters,'tool arguments');
     if((call.name==='review_service_demand'||call.name==='revise_service_demand')&&demand){
      const prior=demandReview??demand.demandProposal,turns=solutionUserTurns(request).map(({id,text})=>({id,text}));
      if(call.name==='review_service_demand'){if(prior)throw Error('Use an exact-key parameter edit to preserve existing assumptions.');demandReview=createDemandReview(args.spec,demand,request.requestId,turns);}
