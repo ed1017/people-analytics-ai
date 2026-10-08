@@ -1,4 +1,6 @@
 // @ts-expect-error Native Node tests share TypeScript source.
+import {resolveProjectionBacktest,projectionBacktestSummary} from './projection-backtest.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
 import {taForecastAnswer} from './synthetic-ta/extension.ts';
 import artifact from './data/synthetic-domain-demo-v1.json' with {type:'json'};
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -37,8 +39,10 @@ export function homeForecastAnswer(message:string,candidate:unknown=artifact,taR
  const intro=domain==='turnover'?'The available turnover projection is **monthly voluntary-exit counts**, not a turnover rate or a cumulative year-end total. A forecast for your recorded workforce remains unavailable.':'The available satisfaction projection is **one December quarterly mean respondent favorable-answer share**, not the percentage of satisfied employees.';
  const header='| Method | '+d.rows.map(row=>month(row.month)).join(' | ')+' |';
  const separator='| --- | '+d.rows.map(()=>'---:').join(' | ')+' |';
- const rows=d.methods.map((method,index)=>'| '+demoMethodLabels[method]+' | '+d.rows.map(row=>formatDemoValue(domain,row.values[index])).join(' | ')+' |');
- return [intro,scope,'Cutoff: **30 Sep 2026**. Latest released support: **'+month(d.support.lastPeriod)+'**. Units: '+copy.unit+'.',[header,separator,...rows].join('\n'),'Released simulated history: '+d.history.map(row=>month(row.month)+': '+(row.value===null?'unavailable (zero openings)':formatDemoValue(domain,row.value))).slice(-3).join('; ')+'. Unreleased gap: '+d.gaps.map(month).join(', ')+'. No interpolation.',copy.assumption,'All three methods are shown; none is selected as best. Results are scenario-dependent and miss unannounced reversals. Confidence intervals and operational forecasts are unavailable; method differences are not uncertainty bands.',navigate].join('\n\n');
+ const ranking=resolveProjectionBacktest(domain,data);
+ const methodOrder=ranking?.ranked.map(row=>row.method)??d.methods;
+ const rows=methodOrder.map(method=>{const index=d.methods.indexOf(method);return '| '+demoMethodLabels[method]+' | '+d.rows.map(row=>formatDemoValue(domain,row.values[index])).join(' | ')+' |'});
+ return [intro,scope,'Cutoff: **30 Sep 2026**. Latest released support: **'+month(d.support.lastPeriod)+'**. Units: '+copy.unit+'.',[header,separator,...rows].join('\n'),'Released simulated history: '+d.history.map(row=>month(row.month)+': '+(row.value===null?'unavailable (zero openings)':formatDemoValue(domain,row.value))).slice(-3).join('; ')+'. Unreleased gap: '+d.gaps.map(month).join(', ')+'. No interpolation.',copy.assumption,projectionBacktestSummary(domain,data),(ranking?'All three existing methods are shown in past synthetic MAE order, without a future-accuracy guarantee.':'All three existing methods are shown as an unranked comparison.')+' Results are scenario-dependent and miss unannounced reversals. Confidence intervals and operational forecasts are unavailable; method differences are not uncertainty bands.',navigate].join('\n\n');
 }
 
 const meanings:Record<string,string>={
@@ -56,10 +60,12 @@ function homeMethodComparison(candidate:unknown,domains:HomeForecastDomain[],taR
  const lines=['**Implemented prediction methods** · cutoff 30 Sep 2026. These domains use different outcomes and periods; their values cannot be ranked or combined.'];
  for(const domain of domains){if(domain==='hiring'){lines.push(taReady?'**Hiring projections** — active requisitions at month-end. '+taForecastAnswer('Forecast hiring'):'**Hiring projections** — unavailable: missing or stale recruiting calibration.');continue;}const d=view.data.domains[domain],last=d.rows.at(-1),test=d.assessment.filter(item=>item.stage==='test');
   lines.push('**'+demoDomainCopy[domain].title+'** — '+(domain==='turnover'?'monthly voluntary-exit counts':'quarterly mean respondent favorable-answer share (%)')+'.');
-  lines.push(d.methods.map((method,i)=>'- **'+demoMethodLabels[method]+'**: '+(method==='recent-mean-3'&&domain==='satisfaction'?'Mean of the three most recent released quarterly waves':meanings[method])+(last?'; '+month(last.month)+' projection **'+formatDemoValue(domain,last.values[i])+'**.':'.')).join('\n'));
-  lines.push('Evaluation: '+test.reduce((n,row)=>n+row.scored,0)+' of '+test.reduce((n,row)=>n+row.cases,0)+' held-out synthetic cases scored across '+test.length+' scenario families. '+(domain==='satisfaction'?'Instrument-break cases are withheld from scoring. ':'' ));
+  const ordered=resolveProjectionBacktest(domain,view.data)?.ranked.map(row=>row.method)??d.methods;
+  lines.push(ordered.map(method=>{const i=d.methods.indexOf(method);return '- **'+demoMethodLabels[method]+'**: '+(method==='recent-mean-3'&&domain==='satisfaction'?'Mean of the three most recent released quarterly waves':meanings[method])+(last?'; '+month(last.month)+' projection **'+formatDemoValue(domain,last.values[i])+'**.':'.')}).join('\n'));
+  lines.push(projectionBacktestSummary(domain,view.data));
+  lines.push('Separate original frozen multi-case assessment (not the samples or scores used for this ranking): '+test.reduce((n,row)=>n+row.scored,0)+' of '+test.reduce((n,row)=>n+row.cases,0)+' held-out synthetic cases scored across '+test.length+' scenario families. '+(domain==='satisfaction'?'Instrument-break cases are withheld from scoring. ':'' ));
  }
- lines.push('Fixed simulated company-wide demonstration, separate from your goal and filters. Method-specific error metrics are not included in this verified display artifact; no proven winner, causal effect, operational qualification or confidence intervals.');
+ lines.push('Fixed simulated company-wide demonstration, separate from your goal and filters. Historical MAE ordering is limited to the three fixed methods in each versioned synthetic population; no universal winner, real-workforce validation, causal effect, operational qualification or confidence intervals.');
  lines.push('For detail, open '+domains.map(domain=>destinations[domain]).join(', ')+'.');return lines.join('\n\n');
 }
 /** Reproduce only an exact verified supported answer; arbitrary/model-authored prose cannot create a chart. */

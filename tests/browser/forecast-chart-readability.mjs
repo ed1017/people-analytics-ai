@@ -42,21 +42,28 @@ try {
    check(prefix+' no repeated caveats outside Details',!(await panel.innerText()).match(/DEMO|Methods unselected|Filters excluded|Intervals unavailable|× means|Hover, focus/)&&await figure.getByText(/Simulated projections/).isVisible());
    check(prefix+' shorter chart keeps unscaled text',await figure.locator('svg[role=img]').evaluate(n=>n.getBoundingClientRect().height<=261));
    const summaryTable=panel.locator('table').first();
-   check(prefix+' honest method count',await panel.getByText('3 prediction methods',{exact:true}).isVisible()&&!/Top 3 prediction methods/.test(await panel.innerText()));
+   check(prefix+' honest method count',await panel.getByText(domain==='hiring'?'3 prediction methods':'3 methods ranked by backtest',{exact:true}).isVisible()&&!/Top 3 prediction methods/.test(await panel.innerText()));
+   const displayedRows=await summaryTable.locator('tbody tr').evaluateAll(rows=>rows.map(row=>({method:row.querySelector('th').textContent,values:[...row.querySelectorAll('td')].map(td=>td.textContent)})));
+   const expectedOrder=domain==='turnover'?['Same month last year','Recent mean (3)','Linear Regression']:domain==='satisfaction'?['Last quarterly wave','Linear Regression','Recent mean (3)']:['Pooled opening cohorts','Recent 3 opening cohorts','Logistic trend'];
+   check(prefix+' exact historical rank order',JSON.stringify(displayedRows.map(row=>row.method))===JSON.stringify(expectedOrder));
+   const methodIds=domain==='turnover'?['seasonal-naive-12','recent-mean-3','linear-trend-12']:domain==='satisfaction'?['last-wave','linear-trend-8','recent-mean-3']:artifact.domains.hiring.methods;
+   check(prefix+' ranked table values keep original method identity',displayedRows.every((row,i)=>JSON.stringify(row.values)===JSON.stringify(artifact.domains[domain].rows.map(point=>(domain==='hiring'?100:1)*point.values[artifact.domains[domain].methods.indexOf(methodIds[i])]).map(value=>value.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1})+(domain==='turnover'?'':'%')))));
+
    check(prefix+' every projection month retained',await summaryTable.locator('thead th').count()===artifact.domains[domain].rows.length+1&&await summaryTable.locator('tbody tr').count()===3);
+   check(prefix+' requested axis-note placement',await figure.locator('[data-axis-note]').count()===(domain==='satisfaction'?0:1)&&await details.locator('[data-axis-note]').count()===(domain==='satisfaction'?1:0));
    const split=await summaryTable.evaluate(n=>{const table=n.parentElement.getBoundingClientRect(),chart=n.closest('section').querySelector('figure').getBoundingClientRect();return {table:table.toJSON(),chart:chart.toJSON()}});
    if(split.chart.top<split.table.bottom)check(prefix+' compact summary leaves most width to chart',split.table.width<=(domain==='satisfaction'?257:385)&&split.chart.width>split.table.width);
    else check(prefix+' narrow layout stacks without clipping',split.chart.top>=split.table.bottom&&await summaryTable.evaluate(n=>n.parentElement.clientWidth<=innerWidth));
    if(palette==='light'&&['wide','desktop','mobile'].includes(name)&&domain!=='hiring')await panel.screenshot({path:`${screenshotDirectory}/${name}-${domain}-panel.png`});
    for(let repeat=0;repeat<3;repeat++){
     await summary.focus();await page.keyboard.press(repeat%2?'Space':'Enter');
-    check(prefix+' keyboard Details opens '+repeat,await details.evaluate(n=>n.open)&&await details.getByText(/× means no value, not zero/).isVisible()&&await details.getByText(/none is designated as preferred/).isVisible()&&await details.getByRole('link',{name:'Source methods and complete comparisons'}).isVisible());
+    check(prefix+' keyboard Details opens '+repeat,await details.evaluate(n=>n.open)&&await details.getByText(/× means no value, not zero/).isVisible()&&await details.getByText(/Historical score order is not an operational recommendation/).isVisible()&&await details.getByRole('link',{name:'Source methods and complete comparisons'}).isVisible());
     await page.keyboard.press(repeat%2?'Space':'Enter');check(prefix+' keyboard Details closes '+repeat,!await details.evaluate(n=>n.open));
    }
    console.log('LAYOUT '+JSON.stringify({name,palette,domain,...await panel.evaluate(n=>({panelHeight:n.getBoundingClientRect().height,chartHeight:n.querySelector('svg[role=img]').getBoundingClientRect().height}))}));
    check(prefix+' denser ticks with endpoint and boundary years',geometry.ticks.length>=6&&geometry.ticks[0].text.includes(geometry.ticks[0].month.slice(0,4))&&geometry.ticks.at(-1).text.includes('2026')&&(domain!=='satisfaction'||geometry.ticks.some(t=>t.text.includes('2025'))));
    check(prefix+' non-overlapping readable dates',geometry.textSize>=11.9&&geometry.ticks.every((t,i)=>!i||t.rect.left>=geometry.ticks[i-1].rect.right+2));
-   check(prefix+' cropped scale explicitly disclosed',(await figure.locator('[data-axis-note]').innerText()).includes('does not start at zero')&&geometry.min>0&&(domain==='turnover'||geometry.max<=(domain==='hiring'?1:100)));
+   check(prefix+' cropped scale explicitly disclosed',(await panel.locator('[data-axis-note]').textContent()).includes('does not start at zero')&&geometry.min>0&&(domain==='turnover'||geometry.max<=(domain==='hiring'?1:100)));
    const data=artifact.domains[domain],history=domain==='turnover'?data.history.filter(r=>r.month>='2026-01'):domain==='hiring'?data.history.slice(-12):data.history;
    const start=domain==='turnover'?'2026-01':history[0].month,index=month=>Number(month.slice(0,4))*12+Number(month.slice(5,7)),span=index(data.rows.at(-1).month)-index(start);
    check(prefix+' original historical values and dates preserved',geometry.points.length===expectedPoints&&geometry.points.every(p=>{const row=history.find(r=>r.month===p.month);return row&&Math.abs(p.x-(58+(index(p.month)-index(start))/span*(geometry.width-78)))<1e-8&&Math.abs(p.y-(166-(row.value-geometry.min)/(geometry.max-geometry.min)*136))<1e-8}));
@@ -94,9 +101,9 @@ try {
   check(name+palette+' all Home projection surfaces',await homePanels.count()===3 && await page.locator('[data-source-version="synthetic-ta-calibrated-v2"]').count()===1);
   for(const panel of await homePanels.all()){
    const summary=panel.locator('summary');
-   check(name+palette+' Home has same three-method summary',await panel.getByText('3 prediction methods',{exact:true}).isVisible()&&await panel.locator('table tbody tr').count()===3);
+   check(name+palette+' Home has same three-method summary',await panel.getByText('3 methods ranked by backtest',{exact:true}).isVisible()&&await panel.locator('table').first().locator('tbody tr').count()===3);
    check(name+palette+' Home closed details and simulation label',!await panel.locator('details').evaluate(n=>n.open)&&await panel.getByText(/Simulated projections/).isVisible()&&!/Intervals unavailable|Methods unselected|Goal and filters excluded/.test(await panel.innerText()));
-   for(let repeat=0;repeat<3;repeat++){await summary.focus();await page.keyboard.press('Enter');check(name+palette+' Home disclosure evidence',await panel.getByText(/Cutoff 30 Sep 2026/).isVisible()&&await panel.getByText(/Constructed synthetic demonstration/).isVisible()&&await panel.getByText(/none is designated as preferred/).isVisible());await page.keyboard.press('Space');}
+   for(let repeat=0;repeat<3;repeat++){await summary.focus();await page.keyboard.press('Enter');check(name+palette+' Home disclosure evidence',await panel.getByText(/Cutoff 30 Sep 2026/).isVisible()&&await panel.getByText(/Constructed synthetic demonstration/).isVisible()&&await panel.getByText(/Historical score order is not an operational recommendation/).isVisible());await page.keyboard.press('Space');}
   }
   await page.getByRole('button',{name:'Toggle projection page'}).click();check(name+palette+' navigation unmounts charts',await page.locator('figure').count()===0);
   await page.getByRole('button',{name:'Toggle projection page'}).click();check(name+palette+' navigation restores closed disclosures',await page.locator('details').count()===4&&await page.locator('details[open]').count()===0);

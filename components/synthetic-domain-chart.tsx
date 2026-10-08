@@ -1,4 +1,5 @@
 'use client';
+import {resolveProjectionBacktest} from '@/lib/projection-backtest';
 import {useEffect, useId, useLayoutEffect, useRef, useState, type SyntheticEvent, type PointerEvent as ReactPointerEvent} from 'react';
 import {createPortal} from 'react-dom';
 import artifact from '@/lib/data/synthetic-domain-demo-v1.json';
@@ -36,14 +37,16 @@ export function SyntheticDomainChartNotes({domain, data}: {domain: SyntheticDemo
   const bridge = turnover && history.some(row => hasChartValue(row.value)) && d.rows.length > 0;
   const cutoffDate = new Date(data.cutoff).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
   const zeroOpenings = domain === 'hiring' ? history.filter(row => row.value === null).map(row => period(row.month)) : [];
-  return <><p>× means no value, not zero. Hover, focus or tap a point for its date, value and series.</p><p>{bridge
+  const scale=forecastScale(domain,[...history.map(row=>row.value),...d.rows.flatMap(row=>row.values)]);
+  const range=scale?`${formatDemoValue(domain,scale.min)}–${formatDemoValue(domain,scale.max)}${turnover?' exits':''}`:null;
+  return <>{domain==='satisfaction'&&scale&&<p data-axis-note>Y axis: {range}{scale.min>0?' · does not start at zero':''}. Quarterly waves.</p>}<p>× means no value, not zero. Hover, focus or tap a point for its date, value and series.</p><p>{bridge
     ? 'September is unreleased. Faint long-dashed bridges connect August to October projections; they are not September observations.'
     : `Unreleased gap: ${d.gaps.map(period).join(', ') || 'none'}. ${domain === 'hiring' ? `These opening cohorts do not have fully reported 90-day outcomes at the ${cutoffDate} cutoff. ` : domain === 'satisfaction' ? 'December is one future quarterly wave. ' : ''}`}
     {' '}Missing history is not interpolated.{zeroOpenings.length > 0 ? ` ${zeroOpenings.join(', ')}: zero openings, so the rate is unavailable.` : ''}
   </p></>;
 }
 
-export function SyntheticDomainChart({domain, data}: {domain: SyntheticDemoDomain; data: typeof artifact}) {
+export function SyntheticDomainChart({domain, data, metricInSummary=false}: {domain: SyntheticDemoDomain; data: typeof artifact; metricInSummary?:boolean}) {
   const d = data.domains[domain], id = useId(), [tip, setTip] = useState<PointTip | null>(null), [width, setWidth] = useState(370), container = useRef<HTMLElement>(null);
   useEffect(()=>{
     if(!tip)return;
@@ -62,6 +65,8 @@ export function SyntheticDomainChart({domain, data}: {domain: SyntheticDemoDomai
     observer.observe(node);
     return () => observer.disconnect();
   }, [domain, data]);
+  const ranking=domain==='hiring'?null:resolveProjectionBacktest(domain,data);
+  const methodEntries=ranking?ranking.ranked.map(row=>({method:row.method,i:d.methods.indexOf(row.method)})):d.methods.map((method,i)=>({method,i}));
   const turnover = domain === 'turnover', cadence = domain === 'satisfaction' ? 3 : 1;
   const history = turnover ? d.history.filter(row => row.month >= '2026-01' && row.month <= '2026-09') : domain === 'satisfaction' ? d.history : d.history.slice(-12);
   const scale = forecastScale(domain, [...history.map(row => row.value), ...d.rows.flatMap(row => row.values)]);
@@ -86,22 +91,22 @@ export function SyntheticDomainChart({domain, data}: {domain: SyntheticDemoDomai
   const bridge = turnover && lastHistory && d.rows.length > 0;
   const missing = [...history.filter(row => !hasChartValue(row.value)).map(row => ({month: row.month, reason: domain === 'hiring' ? 'zero openings; rate unavailable' : 'observed value unavailable'})), ...d.gaps.map(month => ({month, reason: unreleasedReason}))].filter(row => row.month >= start && row.month <= end);
   return <figure ref={container} aria-label={`${demoDomainCopy[domain].title}: simulated history and projections`} className="min-w-0 space-y-1">
-    <figcaption className="text-xs font-medium">Simulated projections · {demoDomainCopy[domain].unit}</figcaption>
-    <p data-axis-note className="text-xs">Y axis: {range}{scale.min > 0 ? ' · does not start at zero' : ''}. {cadence === 3 ? 'Quarterly waves' : turnover ? 'Monthly counts' : 'Monthly opening cohorts'}.</p>
+    <figcaption className="text-xs font-medium">Simulated projections{!metricInSummary&&<> · {demoDomainCopy[domain].unit}</>}</figcaption>
+    {domain!=='satisfaction'&&<p data-axis-note className="text-xs text-muted-foreground">Y axis: {range}{scale.min>0?' · does not start at zero':''}. {turnover?'Monthly counts':'Monthly opening cohorts'}.</p>}
     <svg viewBox={`0 0 ${width} ${rotated ? 260 : 220}`} role="img" aria-label={demoDomainCopy[domain].unit} aria-describedby={id} className="w-full overflow-visible" data-y-min={scale.min} data-y-max={scale.max}>
       <desc id={id}>Y axis {range}. Solid demo history; dashed projections from three comparison methods. Unreleased periods remain gaps. {bridge ? 'Faint long-dashed forecast bridges cross September without a September observation.' : ''} Values are available in the tables.</desc>
       {scale.ticks.map(value => <g key={value}><line x1="58" x2={width - 20} y1={y(value)} y2={y(value)} stroke="currentColor" opacity=".16"/><text data-axis="y" x="52" y={y(value) + 4} textAnchor="end" fill="currentColor" fontSize="12">{formatDemoValue(domain, value)}</text></g>)}
       {boundary !== null && <g data-region="projection"><rect x={boundary} y="24" width={width - 20 - boundary} height="146" fill="currentColor" opacity=".05"/><line x1={boundary} x2={boundary} y1="24" y2="170" stroke="currentColor" strokeDasharray="3 3" opacity=".4"/><text x={width - 20} y="16" textAnchor="end" fill="currentColor" fontSize="12">Projection</text></g>}
-      {bridge && d.methods.map((method, i) => hasChartValue(d.rows[0].values[i]) && <path key={method} data-series="forecast-bridge" aria-label={`${demoMethodLabels[method]}: forecast bridge from ${period(lastHistory.month)} to ${period(d.rows[0].month)}; September unavailable`} d={`M${x(lastHistory.month)},${y(lastHistory.value!)} L${x(d.rows[0].month)},${y(d.rows[0].values[i])}`} fill="none" stroke={colors[i]} strokeWidth="1.5" strokeDasharray="7 6" opacity=".5"/>)}
+      {bridge && methodEntries.map(({method,i}) => hasChartValue(d.rows[0].values[i]) && <path key={method} data-series="forecast-bridge" aria-label={`${demoMethodLabels[method]}: forecast bridge from ${period(lastHistory.month)} to ${period(d.rows[0].month)}; September unavailable`} d={`M${x(lastHistory.month)},${y(lastHistory.value!)} L${x(d.rows[0].month)},${y(d.rows[0].values[i])}`} fill="none" stroke={colors[i]} strokeWidth="1.5" strokeDasharray="7 6" opacity=".5"/>)}
       {segments.map((rows, i) => <path key={i} d={rows.map((row, n) => `${n ? ' L' : 'M'}${x(row.month)},${y(row.value!)}`).join('')} fill="none" stroke="currentColor" strokeWidth="2" data-series="history"/>)}
-      {d.methods.flatMap((method, i) => historySegments(d.rows.map(row => ({month: row.month, value: row.values[i] ?? null})), cadence).map((rows, n) => <path key={method + n} data-series={method} d={rows.length === 1 ? `M${x(rows[0].month) - 8},${y(rows[0].value!)}h16` : rows.map((row, j) => `${j ? 'L' : 'M'}${x(row.month)},${y(row.value!)}`).join(' ')} fill="none" stroke={colors[i]} strokeWidth="2" strokeDasharray={dashes[i]}/>))}
+      {methodEntries.flatMap(({method,i}) => historySegments(d.rows.map(row => ({month: row.month, value: row.values[i] ?? null})), cadence).map((rows, n) => <path key={method + n} data-series={method} d={rows.length === 1 ? `M${x(rows[0].month) - 8},${y(rows[0].value!)}h16` : rows.map((row, j) => `${j ? 'L' : 'M'}${x(row.month)},${y(row.value!)}`).join(' ')} fill="none" stroke={colors[i]} strokeWidth="2" strokeDasharray={dashes[i]}/>))}
       {ticks.map(row => <text data-axis="x" data-month={row.month} key={row.month} x={x(row.month)} y="184" transform={rotated ? `rotate(-90 ${x(row.month)} 184)` : undefined} textAnchor={rotated ? 'end' : 'middle'} fill="currentColor" fontSize="12">{row.label}{row.year && (rotated ? ` ${row.year}` : <tspan x={x(row.month)} dy="16">{row.year}</tspan>)}</text>)}
       {missing.map(row => <g key={row.month} data-missing={row.month} {...interaction({date:period(row.month),value:row.reason,series:'No value'},`${period(row.month)}: ${row.reason}`)}><path d={`M${x(row.month) - 3},163l6,6m-6,0l6,-6`} stroke="currentColor" strokeWidth="1.5"/><circle cx={x(row.month)} cy="166" r="10" fill="transparent"/></g>)}
       {history.filter(row => hasChartValue(row.value)).map(row => <circle key={row.month} data-point="history" data-month={row.month} data-value={row.value} cx={x(row.month)} cy={y(row.value!)} r="3" fill="currentColor" stroke="transparent" strokeWidth="14" {...interaction(forecastPointFeedback(domain,row.month,row.value))}/>)}
-      {d.rows.flatMap(row => d.methods.map((method, i) => hasChartValue(row.values[i]) && <g key={row.month + method} data-point="forecast" data-method={method} data-month={row.month} data-value={row.values[i]} {...interaction(forecastPointFeedback(domain,row.month,row.values[i],demoMethodLabels[method]))}><MethodMarker method={i} x={x(row.month)} y={y(row.values[i])}/><circle cx={x(row.month)} cy={y(row.values[i])} r="8" fill="transparent"/></g>))}
+      {d.rows.flatMap(row => methodEntries.map(({method,i}) => hasChartValue(row.values[i]) && <g key={row.month + method} data-point="forecast" data-method={method} data-month={row.month} data-value={row.values[i]} {...interaction(forecastPointFeedback(domain,row.month,row.values[i],demoMethodLabels[method]))}><MethodMarker method={i} x={x(row.month)} y={y(row.values[i])}/><circle cx={x(row.month)} cy={y(row.values[i])} r="8" fill="transparent"/></g>))}
     </svg>
     <p role="status" className="sr-only">{tip?feedbackText(tip.feedback):''}</p>
     {tip&&<PointTooltip tip={tip} id={id+'-tooltip'}/>}
-    <ul aria-label="Chart legend" className="flex flex-wrap gap-x-3 gap-y-1 text-xs"><li>— Released history</li>{bridge && <li className="flex items-center gap-1"><svg width="22" height="12" aria-hidden="true"><line x1="0" x2="22" y1="6" y2="6" stroke="currentColor" strokeWidth="1.5" strokeDasharray="7 6" opacity=".5"/></svg>Forecast bridge (no observation)</li>}{d.methods.map((method, i) => <li key={method} className="flex items-center gap-1"><svg width="28" height="12" aria-hidden="true"><line x1="0" x2="28" y1="6" y2="6" stroke={colors[i]} strokeWidth="2" strokeDasharray={dashes[i]}/><MethodMarker method={i} x={14} y={6}/></svg>{demoMethodLabels[method]}</li>)}</ul>
+    <ul aria-label="Chart legend" className="flex flex-wrap gap-x-3 gap-y-1 text-xs"><li>— Released history</li>{bridge && <li className="flex items-center gap-1"><svg width="22" height="12" aria-hidden="true"><line x1="0" x2="22" y1="6" y2="6" stroke="currentColor" strokeWidth="1.5" strokeDasharray="7 6" opacity=".5"/></svg>Forecast bridge (no observation)</li>}{methodEntries.map(({method,i}) => <li key={method} className="flex items-center gap-1"><svg width="28" height="12" aria-hidden="true"><line x1="0" x2="28" y1="6" y2="6" stroke={colors[i]} strokeWidth="2" strokeDasharray={dashes[i]}/><MethodMarker method={i} x={14} y={6}/></svg>{demoMethodLabels[method]}</li>)}</ul>
   </figure>;
 }
