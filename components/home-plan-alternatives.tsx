@@ -26,6 +26,7 @@ import {PlanDirections} from '@/components/plan-directions';
 import type {Json} from '@/lib/local-decisions';
 import {structuredPlansEnabled,createPlanConversationRequest,assertPlanConversationCurrent,readPlanConversationProposal,previewPlanConversation,savePlanConversation,type PlanConversationRequest,type PlanConversationProposal} from '@/lib/home-plan-conversation';
 import {HomePlanConversationReview} from '@/components/home-plan-conversation-review';
+import {OptionalConversationForm} from '@/components/optional-conversation-form';
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring';
 const json=(value:unknown)=>value as Json;
 
@@ -90,7 +91,7 @@ export function HomeBundlePlans(props:HomeBundlePlansProps){
    if(pending.current?.key!==key)pending.current={key,id:crypto.randomUUID()};
    const request=alternativeDiscussion(current,context,selectedId).prepareRequest(text,pending.current.id);
    if(!request)return 'No plan changes were requested.';
-   if(combinationIntent(text)){setReview({request,catalog:current,current:target.isCurrent,epoch:epoch.current});setNotice('');return `Review the combination of ${request.sourceIds.map(id=>'Action Plan #'+current.plans.find(plan=>plan.id===id)!.number).join(' and ')} below. Choose only overlap assumptions you can support, then create the combined alternative. Nothing is applied or attached.`;}
+   if(combinationIntent(text)){setReview({request,catalog:current,current:target.isCurrent,epoch:epoch.current});setNotice('');return `Review the combination of ${request.sourceIds.map(id=>'Action Plan #'+current.plans.find(plan=>plan.id===id)!.number).join(' and ')} below. Participant and cash overlap remain unknown. You can keep those unknowns in the combined proposal. Nothing is applied or attached.`;}
    setReview(null);return saveOutcome(proposeEditedAlternative(current,context,request));
   }});
  }
@@ -113,9 +114,10 @@ export function HomeBundlePlans(props:HomeBundlePlansProps){
 function CombinationReviewForm({disabled,onCreate,onCancel}:{disabled:boolean;onCreate:(review:CombinationReview)=>void;onCancel:()=>void}){
  const [participants,setParticipants]=useState(''),[fees,setFees]=useState(''),[count,setCount]=useState('');
  return <section aria-label="Review plan combination" className="space-y-3 rounded border p-3 text-sm"><h3 className="font-semibold">Review plan combination</h3><p>Keep overlap unknown unless you have reviewed it. Matching activity wording alone does not establish shared participants or fees.</p>
- <label className="block">Participant overlap<select aria-label="Combination participant overlap" className="ml-2 max-w-full rounded border bg-background p-2" value={participants} onChange={e=>setParticipants(e.target.value)}><option value="">Unknown</option><option value="same">Same participants</option><option value="disjoint">Separate participant groups</option></select></label>
+ <p>Participant overlap: {participants==='same'?'shared participants':participants==='disjoint'?'separate groups':'Unknown'}. Cash allowance overlap: {fees==='distinct'?'separate allowances':fees==='shared-matches'?'matching allowances shared':'Unknown'}.</p>
+ <OptionalConversationForm label="overlap form"><label className="block">Participant overlap<select aria-label="Combination participant overlap" className="ml-2 max-w-full rounded border bg-background p-2" value={participants} onChange={e=>setParticipants(e.target.value)}><option value="">Unknown</option><option value="same">Same participants</option><option value="disjoint">Separate participant groups</option></select></label>
  {participants==='same'&&<label className="block">Shared participant count (optional)<input aria-label="Shared participant count" className="ml-2 w-28 rounded border bg-background p-2" type="number" min="0" max="1000000" value={count} onChange={e=>setCount(e.target.value)}/></label>}
- <label className="block">Cash allowance overlap<select aria-label="Combination cash overlap" className="ml-2 max-w-full rounded border bg-background p-2" value={fees} onChange={e=>setFees(e.target.value)}><option value="">Unknown</option><option value="distinct">Separate allowances</option><option value="shared-matches">Share exactly matching allowances</option></select></label>
+ <label className="block">Cash allowance overlap<select aria-label="Combination cash overlap" className="ml-2 max-w-full rounded border bg-background p-2" value={fees} onChange={e=>setFees(e.target.value)}><option value="">Unknown</option><option value="distinct">Separate allowances</option><option value="shared-matches">Share exactly matching allowances</option></select></label></OptionalConversationForm>
  <p>Source budget ceilings and outcome targets are never added. Staff effort remains in hours.</p><div className="flex flex-wrap gap-2"><button className={button} disabled={disabled} onClick={()=>onCreate({...(participants?{participants:participants as CombinationReview['participants']} :{}),...(participants==='same'&&count!==''?{participantCount:Number(count)}:{}),...(fees?{fees:fees as CombinationReview['fees']}:{})})}>Create combined alternative</button><button className={button} onClick={onCancel}>Cancel combination</button></div></section>;
 }
 

@@ -8,13 +8,16 @@ export function GuidedActionArrow({selector,label}:{selector:string;label:string
  const measure=useRef(()=>{});
  const [position,setPosition]=useState<{left:number;top:number;label:string}|null>(null);
  useLayoutEffect(()=>{
-  let frame=0,stopped=false,focused=false,target:HTMLElement|null=null;
+  let frame=0,focusFrame=0,stopped=false,focused=false,focusReady=false,focusQueued=false,target:HTMLElement|null=null;
   const update=()=>{
    frame=0;if(stopped)return;
    const next=[...document.querySelectorAll<HTMLElement>(selector)].find(node=>node.getClientRects().length&&getComputedStyle(node).visibility!=='hidden')??null;
-   if(target!==next){target?.removeAttribute('data-guided-highlight');target=next;target?.setAttribute('data-guided-highlight','true');}
+   if(target!==next){target?.removeAttribute('data-guided-highlight');target=next;target?.setAttribute('data-guided-highlight','true');focused=false;focusReady=false;focusQueued=false;cancelAnimationFrame(focusFrame);}
    if(!target){setPosition(previous=>previous===null?previous:null);return;}
-   if(!focused&&!target.matches(':disabled')){
+   // A verified reply can commit its card and transcript in adjacent renders.
+   // Reveal once after both have laid out, without fighting subsequent user scroll.
+   if(!focused&&!focusQueued){focusQueued=true;focusFrame=requestAnimationFrame(()=>{focusFrame=requestAnimationFrame(()=>{if(!stopped){focusReady=true;queue();}});});}
+   if(!focused&&focusReady&&!target.matches(':disabled')){
     focused=true;
     const dock=document.querySelector<HTMLElement>('.home-composer-dock'),reading=document.querySelector<HTMLElement>('[aria-label="Home chat workspace"]');
     if(dock&&getComputedStyle(dock).position==='fixed'&&reading&&reading.scrollHeight>0){
@@ -40,7 +43,7 @@ export function GuidedActionArrow({selector,label}:{selector:string;label:string
   measure.current=queue;
   const observer=new MutationObserver(queue);observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['disabled','hidden','aria-selected']});
   window.addEventListener('scroll',queue,true);window.addEventListener('resize',queue);queue();
-  return()=>{stopped=true;measure.current=()=>{};cancelAnimationFrame(frame);observer.disconnect();window.removeEventListener('scroll',queue,true);window.removeEventListener('resize',queue);target?.removeAttribute('data-guided-highlight');};
+  return()=>{stopped=true;measure.current=()=>{};cancelAnimationFrame(frame);cancelAnimationFrame(focusFrame);observer.disconnect();window.removeEventListener('scroll',queue,true);window.removeEventListener('resize',queue);target?.removeAttribute('data-guided-highlight');};
  },[selector,label]);
  const visible=position!==null;
  useLayoutEffect(()=>{const node=overlay.current;if(!node)return;const observer=new ResizeObserver(()=>measure.current());observer.observe(node);return()=>observer.disconnect();},[visible]);

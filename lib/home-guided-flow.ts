@@ -16,7 +16,14 @@ export class HomeGuidedFlow {
  }
 }
 
-export type GuidedReceipt={type:'answered'|'pinned'|'selected'|'attached'|'edited';goalId:string;goal?:string;planId?:string;number?:number;sourcePlanId?:string};
+export type GuidedReceipt={type:'answered'|'pinned'|'selected'|'attached'|'edited'|'proposal-reviewed'|'proposal-chosen';goalId:string;goal?:string;planId?:string;number?:number;sourcePlanId?:string};
+/** Conversational progress follows completed replies and atomic selections. */
+export function conversationalReceiptStep(step:number,event:GuidedReceipt,goalId:string,originalId:string|null):number|null {
+ if(event.goalId!==goalId)return null;
+ if((step===1||step===2||step===4)&&event.type==='proposal-reviewed'&&event.planId)return step+1;
+ if((step===3||step===5)&&event.type==='proposal-chosen'&&event.planId&&Number.isSafeInteger(event.number)&&event.number!>0&&(step===3||event.planId!==originalId))return step+1;
+ return null;
+}
 /** Receipts advance only the expected real control in this isolated goal. */
 export function guidedReceiptStep(step:number,event:GuidedReceipt,goalId:string,originalId:string|null,revisedId:string|null):number|null {
  if(event.goalId!==goalId)return null;

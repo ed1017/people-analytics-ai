@@ -97,7 +97,7 @@ export function useProblemConversation(scope = "home") {
   }, []);
   const setMessages: Dispatch<SetStateAction<ChatMessage[]>> = update => {const current=storedMessagesRef.current,start=conversationBoundary(resetMarksRef.current,scope,current.length);setStoredMessages([...current.slice(0,start),...(typeof update === "function" ? update(current.slice(start)) : update)]);};
   useEffect(()=>{
-    if(storageReady&&(localGoals.activeId||solutionConversationEnabled))decisionStore.setField(localGoals.activeId,"chat",{messages:storedMessages,input,problem,questionUnanswered:false,resetMarks,...(recoveredPlanSelectionRequired?{recoveredPlanSelectionRequired:true}:{})});
+    if(storageReady&&(localGoals.activeId||solutionConversationEnabled&&!guidedIsolation.current))decisionStore.setField(localGoals.activeId,"chat",{messages:storedMessages,input,problem,questionUnanswered:false,resetMarks,...(recoveredPlanSelectionRequired?{recoveredPlanSelectionRequired:true}:{})});
   },[storageReady,localGoals.activeId,storedMessages,input,problem,resetMarks,recoveredPlanSelectionRequired]);
   const rememberQuestion = (key: string, question: string) => setProblem(current => rememberProblemQuestion(current, key, question));
   const cancelPending = () => { requestGate.current.invalidate(); setHomeGoalChoiceKey(null); setLoading(false); };
@@ -224,9 +224,9 @@ export function useProblemConversation(scope = "home") {
   // Adopt the checked receipt without a second goal write or cached-chat overwrite.
   const selectProposalGoal=(goal:{id:string;statement:string},revision:number,fields:Record<string,Json>)=>{
     if(!storageReady||loading||issueEditorRef.current)throw Error('Finish the current edit or request before choosing a proposal.');
-    if(!goalsRef.current.activeId&&hasSavedUserGoal(decisionStore.getSnapshot().data,goal.statement))throw Error('This goal is already saved. Select it to continue; your exploration is kept.');
+    if(!goalsRef.current.activeId&&guidedIsolation.current?.id!==goal.id&&hasSavedUserGoal(decisionStore.getSnapshot().data,goal.statement))throw Error('This goal is already saved. Select it to continue; your exploration is kept.');
     const chat={messages:storedMessagesRef.current,input:inputRef.current,problem,questionUnanswered:false,resetMarks:resetMarksRef.current};
-    decisionStore.commitGoalSelection(goal.id,goal.statement,revision,new Date().toISOString(),()=>({...fields,chat:chat as unknown as Json}));
+    decisionStore.commitGoalSelection(goal.id,goal.statement,revision,new Date().toISOString(),()=>({...fields,chat:chat as unknown as Json}),guidedIsolation.current?.id===goal.id);
     const next=decisionStore.getSnapshot().data.goals;
     cancelPending();chats.current.delete('');chats.current.set(goal.id,chat);
     goalsRef.current=next;setLocalGoals(next);setFocusedIssue(goal.statement);

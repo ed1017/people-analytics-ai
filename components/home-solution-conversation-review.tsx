@@ -4,12 +4,13 @@ import type {useHomeSolutionConversation} from './use-home-solution-conversation
 import {resolveSolutionMetric,type SolutionEvaluation} from '@/lib/home-solution-conversation';
 import type {HeadcountProjection} from '@/lib/home-solution-projection';
 import {PlanAlternativeCard} from './plan-alternative-card';
+import {OptionalConversationForm} from './optional-conversation-form';
 
 type Controller=ReturnType<typeof useHomeSolutionConversation>;
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring';
 const number=(value:number|null|undefined)=>value==null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:1});
 function Proposal({item,controller,goal}:{item:SolutionEvaluation;controller:Controller;goal:string}){
- const [ack,setAck]=useState(false),[statement,setStatement]=useState(goal||item.candidate.goal.statement);
+ const [statement,setStatement]=useState(goal||item.candidate.goal.statement);
  const stale=JSON.stringify(item.constraints)!==JSON.stringify(controller.state.constraints),saved=controller.saved?.plans.find(plan=>plan.operation?.proposalKey===JSON.stringify(item.candidate));
  return <article aria-label={`Working proposal: ${item.candidate.name}`} className="space-y-3 rounded border p-3 text-sm">
   <p className="text-xs font-medium">Proposed approach · effectiveness is unproven</p><h3 className="font-semibold">{item.candidate.name} · revision {item.revision}</h3><p>{item.candidate.objective}</p><p>{item.candidate.rationale}</p><p>{item.candidate.approach}</p>
@@ -19,10 +20,11 @@ function Proposal({item,controller,goal}:{item:SolutionEvaluation;controller:Con
   <details open><summary className="cursor-pointer py-2 font-medium">Review interpreted inputs and changes</summary><ul className="list-disc space-y-1 pl-5">{[...item.interpretations,...item.changes].map((line,index)=><li key={index}>{line}</li>)}</ul>{!item.interpretations.length&&<p>No new quantities were supplied. Missing assumptions remain unknown.</p>}</details>
   {[...item.blocking,...(stale?['Current constraints changed. Refine this proposal in chat before saving.']:[])].map((line,index)=><p key={index} role="status">{line}</p>)}
   {!!item.issues.length&&<details><summary className="cursor-pointer py-2">Unknowns and calculation limits ({item.issues.length})</summary><ul className="list-disc space-y-1 pl-5">{item.issues.map((line,index)=><li key={index}>{line}</li>)}</ul></details>}
-  {!!item.issues.length&&<label className="flex min-h-11 items-center gap-2"><input type="checkbox" checked={ack} onChange={event=>setAck(event.target.checked)}/>I reviewed these unknowns and want to keep this as a proposal.</label>}
-  {!goal&&<label className="block">Goal to pin with this proposal<input className="mt-1 w-full rounded border p-2" value={statement} maxLength={240} onChange={event=>setStatement(event.target.value)}/></label>}
-  <p className="text-xs">Choosing attaches this proposal to the goal above. It does not apply operational changes; unknown inputs can be refined in chat.</p>
-  <div className="flex flex-wrap gap-2"><button className={button} disabled={!controller.canSend||controller.pending||controller.saving||stale||!!item.blocking.length||!item.draft||!!item.issues.length&&!ack||!statement.trim()||!!saved} onClick={()=>void controller.save(item,ack,statement)}>{saved?`Selected as Action Plan #${saved.number}`:goal?'Choose plan and attach proposal':'Choose plan, pin goal and attach proposal'}</button><button className={button} disabled={controller.pending||controller.saving||!controller.canSend} onClick={()=>controller.reject(item)}>Discard proposal</button></div>
+  <p><strong>Goal:</strong> {statement}. Refine the goal, dates, budget or assumptions in chat.</p>
+  {!goal&&<OptionalConversationForm label="goal form"><label className="block">Goal for this proposal<input className="mt-1 w-full rounded border p-2" value={statement} maxLength={240} onChange={event=>setStatement(event.target.value)}/></label></OptionalConversationForm>}
+  {!!item.issues.length&&<p>This proposal has unresolved assumptions. Choosing it acknowledges the unknowns listed above and keeps them for later review.</p>}
+  <p className="text-xs">Choosing saves the goal and attaches this proposal automatically. It does not apply operational changes.</p>
+  <div className="flex flex-wrap gap-2"><button data-guide-target="choose-proposal" className={button} disabled={!controller.canSend||controller.pending||controller.saving||stale||!!item.blocking.length||!item.draft||!statement.trim()||!!saved} onClick={()=>void controller.save(item,true,statement)}>{saved?`Selected as Action Plan #${saved.number}`:item.issues.length?'Choose this plan with unknowns':'Choose this plan'}</button><button className={button} disabled={controller.pending||controller.saving||!controller.canSend} onClick={()=>controller.reject(item)}>Discard proposal</button></div>
  </article>;
 }
 export function SolutionProjectionChart({analysis}:{analysis:HeadcountProjection}){

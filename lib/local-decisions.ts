@@ -120,17 +120,18 @@ export class DecisionStore {
  commitExplorationFields(revision:number,at:string,build:(fields:Record<string,Json>)=>Record<string,Json>):number{
   return this.commitWorkspace('','',revision,at,build,false);
  }
- commitGoalSelection(id:string,goal:string,revision:number,at:string,build:(fields:Record<string,Json>)=>Record<string,Json>):number{
-  return this.commitWorkspace(id,goal,revision,at,build,true);
+ commitGoalSelection(id:string,goal:string,revision:number,at:string,build:(fields:Record<string,Json>)=>Record<string,Json>,isolatedExample=false):number{
+  if(isolatedExample&&!/^guided-[a-zA-Z0-9-]+$/.test(id))throw Error('Invalid isolated example identity.');
+  return this.commitWorkspace(id,goal,revision,at,build,true,isolatedExample);
  }
- private commitWorkspace(id:string,goal:string,revision:number,at:string,build:(fields:Record<string,Json>)=>Record<string,Json>,selection:boolean):number{
+ private commitWorkspace(id:string,goal:string,revision:number,at:string,build:(fields:Record<string,Json>)=>Record<string,Json>,selection:boolean,isolatedExample=false):number{
   try{
    if(!this.state.ready||!this.state.saved||this.blocked||!this.port)throw Error('Saved planning state is unavailable; reload or resolve storage before applying.');
    const creating=selection&&!this.state.data.goals.activeId;
    if(this.state.data.revision!==revision||!creating&&(this.state.data.goals.activeId!==id||(this.state.data.goals.goals.find(item=>item.id===id)?.statement??'')!==goal))throw Error('The goal or destination revision changed; preview again.');
    if(creating){
     if(!/^[a-zA-Z0-9-]{1,80}$/.test(id)||!goal.trim()||goal.length>240||goal!==goal.trim())throw Error('Review the goal before selecting this proposal.');
-    if(this.state.data.removedGoalIds?.includes(id)||this.state.data.goals.goals.some(item=>item.id===id||item.statement.toLocaleLowerCase()===goal.toLocaleLowerCase()&&readHomeDemo(this.state.data.workspaces[item.id]?.fields[homeDemoField],item.id)?.example.goal!==item.statement))throw Error('This goal already exists or was removed. Select the existing goal to continue; your exploration is kept.');
+    if(this.state.data.removedGoalIds?.includes(id)||this.state.data.goals.goals.some(item=>item.id===id||!isolatedExample&&item.statement.toLocaleLowerCase()===goal.toLocaleLowerCase()&&readHomeDemo(this.state.data.workspaces[item.id]?.fields[homeDemoField],item.id)?.example.goal!==item.statement))throw Error('This goal already exists or was removed. Select the existing goal to continue; your exploration is kept.');
     if(this.state.data.goals.goals.length>=20)throw Error('Your saved goals are full. Your exploration is kept.');
    }
    if(!/^\d{4}-\d\d-\d\dT/.test(at)||!Number.isFinite(Date.parse(at)))throw Error('Invalid application timestamp.');
@@ -139,7 +140,7 @@ export class DecisionStore {
    if(!validateJson(patch)||!patch||Array.isArray(patch)||typeof patch!=='object'||!Object.keys(patch).length)throw Error('Invalid or empty application transaction.');
    const slot={savedAt:at,fields:{...before?.fields,...structuredClone(patch)}};
    const next:DecisionData={...original,revision:revision+1,...(id?{workspaces:{...original.workspaces,[id]:slot}}:{exploration:slot})};
-   if(creating){next.goals={...original.goals,activeId:id,goals:[...original.goals.goals,{id,statement:goal}]};delete next.exploration;}
+   if(creating){next.goals={...original.goals,activeId:id,goals:[...original.goals.goals,{id,statement:goal}]};if(!isolatedExample)delete next.exploration;}
    const raw=encodeDecisions(next);parseDecisions(raw);
    // Recheck after candidate validation. localStorage has no native cross-tab CAS.
    if(this.state.data!==original||this.expected!==expected)throw Error('Planning state changed during candidate validation; preview again.');

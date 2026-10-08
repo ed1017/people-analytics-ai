@@ -1,11 +1,12 @@
 /** Offline reservation guard. It neither authorizes nor sends provider requests.
- * A future runner must supply a verified local full-request token upper bound,
+ * A caller must supply a verified full-request token upper bound,
  * durable journal callback and independently checked endpoint/pricing receipt.
- * Missing token/rate provenance is a stop, never a paid token-count fallback.
+ * Missing token/rate provenance is a stop. Exact provider counts are accepted
+ * only by a separately authorized live runner; this helper performs no calls.
  */
 export const evaluationLimits=Object.freeze({turns:18,requests:72,roundsPerTurn:4,inputTokensPerRequest:200000,outputTokensPerRequest:5000,inputTokensTotal:14400000,outputTokensTotal:360000,inputUsdPerMillion:.25,outputUsdPerMillion:1.2,requestReservationMicrousd:56000,totalReservationMicrousd:4032000,ceilingMicrousd:4500000,requestsPerMinute:6,concurrentRequests:1,hostedAcceptanceCalls:0});
 export function createEvaluationReservation({receipt,persist,now=()=>Date.now()}){
- if(receipt?.model!=='gpt-5.6-luna'||receipt?.standardTier!==true||receipt?.endpointRatesVerified!==true||receipt?.localTokenUpperBoundVerified!==true||receipt?.inputUsdPerMillion!==.25||receipt?.outputUsdPerMillion!==1.2||typeof persist!=='function')throw Error('Verified endpoint, pricing, local token bounds and durable reservations are required before evaluation.');
+ if(receipt?.model!=='gpt-5.6-luna'||receipt?.standardTier!==true||receipt?.endpointRatesVerified!==true||(receipt?.localTokenUpperBoundVerified!==true&&receipt?.exactProviderTokenCountVerified!==true)||receipt?.inputUsdPerMillion!==.25||receipt?.outputUsdPerMillion!==1.2||typeof persist!=='function')throw Error('Verified endpoint, pricing, token bounds and durable reservations are required before evaluation.');
  let entries=[],inFlight=null,closed=false;
  return {
   get entries(){return structuredClone(entries);},

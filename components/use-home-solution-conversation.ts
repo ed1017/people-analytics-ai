@@ -9,8 +9,9 @@ import type {SolutionReply} from '@/lib/home-solution-conversation-service';
 import {alternativeViewField} from '@/lib/home-plan-alternative-chat';
 import {reviewBundleProposal as reconcileBundle} from '@/lib/home-bundle-reconciliation';
 import type {Json} from '@/lib/local-decisions';
+import type {GuidedActionRegistry} from './home-guided-actions';
 
-type Props={enabled:boolean;conversation:ProblemConversation;active:boolean;settled:boolean;evidence:unknown;scope:string;query:string;target:()=>BundleDiscussion|null};
+type Props={enabled:boolean;conversation:ProblemConversation;active:boolean;settled:boolean;evidence:unknown;scope:string;query:string;target:()=>BundleDiscussion|null;guided?:GuidedActionRegistry|null};
 const equal=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 export function useHomeSolutionConversation(props:Props){
  const storage=useDecisionStorage(),[memory,setMemory]=useState<SolutionState>(emptySolutionState),[pending,setPending]=useState(false),[saving,setSaving]=useState(false),[notice,setNotice]=useState('');
@@ -18,15 +19,16 @@ export function useHomeSolutionConversation(props:Props){
  useLayoutEffect(()=>{currentProps.current=props;});
  useLayoutEffect(()=>{mounted.current=true;return()=>{mounted.current=false;controller.current?.abort();};},[]);
  const goal={id:props.conversation.activeGoalId,statement:props.conversation.focusedIssue};
- const identity=JSON.stringify([goal,props.conversation.resetEpoch,props.conversation.storageReady]);
+ const guideId=props.guided?.goalId??null;
+ const identity=JSON.stringify([goal,guideId,props.conversation.resetEpoch,props.conversation.storageReady]);
  const loaded=useRef(''),reset=useRef(props.conversation.resetEpoch);
  const synchronize=useEffectEvent(()=>{
   if(loaded.current===identity)return;loaded.current=identity;epoch.current++;controller.current?.abort();setPending(false);setNotice('');
-  try{const wasReset=reset.current!==props.conversation.resetEpoch;const state=wasReset?emptySolutionState():readSolutionState((goal.id?storage.data.workspaces[goal.id]:storage.data.exploration)?.fields[solutionConversationField]);reset.current=props.conversation.resetEpoch;if(wasReset&&props.conversation.storageReady)persist(state);memoryRef.current=state;setMemory(state);}catch(error){memoryRef.current=emptySolutionState();setMemory(emptySolutionState());setNotice((error as Error).message);}
+  try{const wasReset=reset.current!==props.conversation.resetEpoch;const state=wasReset||guideId&&!goal.id?emptySolutionState():readSolutionState((goal.id?storage.data.workspaces[goal.id]:storage.data.exploration)?.fields[solutionConversationField]);reset.current=props.conversation.resetEpoch;if(wasReset&&props.conversation.storageReady)persist(state);memoryRef.current=state;setMemory(state);}catch(error){memoryRef.current=emptySolutionState();setMemory(emptySolutionState());setNotice((error as Error).message);}
  });
  // eslint-disable-next-line react-hooks/set-state-in-effect -- Goal/reset events select an isolated local conversation.
  useLayoutEffect(()=>{synchronize();},[identity]);
- const contextKey=JSON.stringify([goal,props.active,props.settled,props.scope,props.query,props.evidence,props.conversation.resetEpoch,props.conversation.issueEditor?.id]);
+ const contextKey=JSON.stringify([goal,guideId,props.active,props.settled,props.scope,props.query,props.evidence,props.conversation.resetEpoch,props.conversation.issueEditor?.id]);
  const liveKey=useRef(contextKey);
  useLayoutEffect(()=>{if(liveKey.current!==contextKey){liveKey.current=contextKey;epoch.current++;controller.current?.abort();setPending(false);}},[contextKey]);
  function catalog():PlanAlternatives|null{
@@ -36,20 +38,21 @@ export function useHomeSolutionConversation(props:Props){
   return sources?.length?createPlanAlternatives(g,sources):null;
  }
  function requireCurrent(){const p=currentProps.current,snapshot=decisionStore.getSnapshot();if(!mounted.current||!p.enabled||!p.active||!p.settled||!snapshot.saved||!p.conversation.storageReady||p.conversation.issueEditor||snapshot.data.goals.activeId!==p.conversation.activeGoalId||(snapshot.data.goals.goals.find(g=>g.id===snapshot.data.goals.activeId)?.statement??'')!==p.conversation.focusedIssue)throw Error('The goal, sources or browser storage changed. Your earlier work is kept.');return snapshot;}
- function persist(state:SolutionState){const p=currentProps.current,snapshot=requireCurrent(),build=()=>({[solutionConversationField]:state as unknown as Json});if(p.conversation.activeGoalId)decisionStore.commitGoalFields(p.conversation.activeGoalId,p.conversation.focusedIssue,snapshot.data.revision,new Date().toISOString(),build);else decisionStore.commitExplorationFields(snapshot.data.revision,new Date().toISOString(),build);memoryRef.current=state;setMemory(state);}
+ function persist(state:SolutionState){const p=currentProps.current,snapshot=requireCurrent(),build=()=>({[solutionConversationField]:state as unknown as Json});if(p.conversation.activeGoalId)decisionStore.commitGoalFields(p.conversation.activeGoalId,p.conversation.focusedIssue,snapshot.data.revision,new Date().toISOString(),build);else if(!p.guided?.goalId)decisionStore.commitExplorationFields(snapshot.data.revision,new Date().toISOString(),build);memoryRef.current=state;setMemory(state);}
+ function selectedPlanId(value:PlanAlternatives|null){const p=currentProps.current,target=p.target();return target?.goalId===p.conversation.activeGoalId&&value?.order.includes(target.id)?target.id:null;}
  function makeRequest(text:string):SolutionRequest{
-  const p=currentProps.current,current=catalog(),params=new URLSearchParams(p.query),selected=p.target()?.id;
-  return readSolutionRequest({version:1,requestId:crypto.randomUUID(),goal:{id:p.conversation.activeGoalId,statement:p.conversation.focusedIssue},scope:p.scope,filters:{country:params.get('country')||'all',org:params.get('org')||'all',level:params.get('level')||'all'},timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,evidence:p.evidence,goalContext:p.conversation.goalContext,selectedId:current?.order.includes(selected??'')?selected:null,catalog:current,state:memoryRef.current,message:{id:crypto.randomUUID(),text}});
+  const p=currentProps.current,current=catalog(),params=new URLSearchParams(p.query);
+  return readSolutionRequest({version:1,requestId:crypto.randomUUID(),goal:{id:p.conversation.activeGoalId,statement:p.conversation.focusedIssue},scope:p.scope,filters:{country:params.get('country')||'all',org:params.get('org')||'all',level:params.get('level')||'all'},timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,evidence:p.evidence,goalContext:p.conversation.goalContext,selectedId:selectedPlanId(current),catalog:current,state:memoryRef.current,message:{id:crypto.randomUUID(),text}});
  }
  async function send(text:string){
   if(controller.current||saving)return;requireCurrent();const request=makeRequest(text),captured=++epoch.current,key=liveKey.current,abort=new AbortController();controller.current=abort;setPending(true);setNotice('');
-  const current=()=>!abort.signal.aborted&&mounted.current&&captured===epoch.current&&key===liveKey.current&&equal(request.catalog,catalog())&&(currentProps.current.target()?.id??null)===(request.selectedId??null);
+  const current=()=>!abort.signal.aborted&&mounted.current&&captured===epoch.current&&key===liveKey.current&&equal(request.catalog,catalog())&&selectedPlanId(catalog())===(request.selectedId??null);
   try{
    const response=await fetch('/api/home-solution-conversation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(request),signal:abort.signal});const data=await response.json();
    if(!current())return null;if(!response.ok)throw Error(typeof data.error==='string'?data.error:'The conversation response is unavailable.');
    const reply=data as SolutionReply;if(reply.requestId!==request.requestId||typeof reply.answer!=='string'||!reply.answer.trim()||reply.answer.length>10000||!Array.isArray(reply.candidateIds)||!Array.isArray(reply.analysisIds))throw Error('The conversation response does not match this request.');
    const state=readSolutionState(reply.state);if(state.turns.at(-2)?.id!==request.message.id||state.turns.at(-1)?.text!==reply.answer||reply.candidateIds.some(id=>!state.working.some(item=>item.id===id&&item.requestId===request.requestId))||reply.analysisIds.some(id=>!state.analyses.some(item=>item.id===id)))throw Error('The returned conversation could not be verified.');
-   requireCurrent();persist(state);return reply.answer;
+   requireCurrent();persist(state);const p=currentProps.current,guided=p.guided;if(guided?.goalId&&(!p.conversation.activeGoalId||p.conversation.activeGoalId===guided.goalId)&&reply.candidateIds.length)guided.emit({type:'proposal-reviewed',goalId:guided.goalId,planId:reply.candidateIds[0]});return reply.answer;
   }catch(error){if(current())throw error;return null;}finally{if(controller.current===abort){controller.current=null;setPending(false);}}
  }
  function cancel(){epoch.current++;controller.current?.abort();controller.current=null;setPending(false);setNotice('Request cancelled. Your draft and saved work are kept.');}
@@ -57,7 +60,7 @@ export function useHomeSolutionConversation(props:Props){
   if(saving||pending)return;setSaving(true);setNotice('');
   try{
    requireCurrent();const request=makeRequest(item.message.text);request.requestId=item.requestId;request.message=item.message;
-   const p=currentProps.current,key=liveKey.current,initialEpoch=epoch.current,desired={id:p.conversation.activeGoalId||crypto.randomUUID(),statement:p.conversation.focusedIssue||goalStatement.trim()};
+   const p=currentProps.current,key=liveKey.current,initialEpoch=epoch.current,desired={id:p.conversation.activeGoalId||p.guided?.goalId||crypto.randomUUID(),statement:p.conversation.focusedIssue||goalStatement.trim()};
    const outcome=await saveSolutionCandidate(request,request.catalog,item,desired,p.evidence,acknowledge);
    const snapshot=requireCurrent();if(key!==liveKey.current||initialEpoch!==epoch.current||!equal(request.catalog,catalog()))throw Error('The conversation changed while reviewing selection. Try again against the current context.');
    if(outcome.status!=='ready')throw Error('The proposal needs further review.');
@@ -70,6 +73,7 @@ export function useHomeSolutionConversation(props:Props){
    }
    p.conversation.selectProposalGoal(desired,snapshot.data.revision,{[planAlternativesField]:packPlanAlternatives(selected) as unknown as Json,[solutionConversationField]:state as unknown as Json,[alternativeViewField]:{version:1,selectedId:outcome.plan.id,collapsed:false}});
    memoryRef.current=state;setMemory(state);
+   p.guided?.emit({type:'proposal-chosen',goalId:desired.id,goal:desired.statement,planId:outcome.plan.id,number:outcome.plan.number});
    setNotice(`Action Plan #${outcome.plan.number} attached as a proposal to “${desired.statement}”.`);
   }catch(error){setNotice(error instanceof Error?error.message:'The proposal could not be saved.');}finally{setSaving(false);}
  }

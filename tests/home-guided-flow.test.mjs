@@ -1,7 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {HomeGuidedFlow,guidedReceiptStep} from '../lib/home-guided-flow.ts';
+import {HomeGuidedFlow,guidedReceiptStep,conversationalReceiptStep} from '../lib/home-guided-flow.ts';
 const deferred=()=>{let resolve;const promise=new Promise(done=>{resolve=done});return {promise,resolve};};
+test('conversational guide follows replies and atomic selection, never a separate pin or fixed plan',()=>{
+ const reviewed={type:'proposal-reviewed',goalId:'guided-test',planId:'voluntary-trial'},chosen={type:'proposal-chosen',goalId:'guided-test',planId:'any-proposal',number:7};
+ for(const step of [1,2,4])assert.equal(conversationalReceiptStep(step,reviewed,'guided-test','original'),step+1);
+ for(const step of [3,5])assert.equal(conversationalReceiptStep(step,chosen,'guided-test','original'),step+1);
+ for(const event of [{...reviewed,type:'answered'},{...reviewed,planId:undefined},{...reviewed,goalId:'other'}])assert.equal(conversationalReceiptStep(1,event,'guided-test',null),null);
+ for(const event of [{...chosen,type:'pinned'},{...chosen,number:0},{...chosen,planId:'original'},{...chosen,goalId:'other'}])assert.equal(conversationalReceiptStep(5,event,'guided-test','original'),null);
+});
 
 test('a pending or completed Next cannot send twice',async()=>{
  const flow=new HomeGuidedFlow(),wait=deferred();let calls=0;

@@ -4,6 +4,12 @@ import {DecisionStore,DECISIONS_STORAGE_KEY,parseDecisions} from '../lib/local-d
 import {mergeDecisionRecovery} from '../lib/decision-recovery.ts';
 const at='2026-10-08T12:00:00Z';
 function setup(){const values=new Map();let fail=false,writes=0;const port={getItem:key=>values.get(key)??null,setItem:(key,value)=>{if(fail)throw Error('Disk full');values.set(key,value);writes++;},removeItem:key=>values.delete(key)},store=new DecisionStore();store.initialize(port);return {store,port,values,get writes(){return writes;},fail:()=>{fail=true;}};}
+test('isolated guide selection retains real exploration and an existing same-title goal',()=>{
+ const x=setup();x.store.saveGoals({version:1,activeId:'',goals:[{id:'real',statement:'Reduce turnover'}]});x.store.setField('real','proposal',{keep:true});x.store.setField('','working',{proposal:'real unpinned exploration'});const before=structuredClone(x.store.getSnapshot().data),writes=x.writes;
+ x.store.commitGoalSelection('guided-example','Reduce turnover',before.revision,at,()=>({attachment:{fictional:true}}),true);
+ const after=parseDecisions(x.values.get(DECISIONS_STORAGE_KEY));assert.equal(x.writes,writes+1);assert.equal(after.goals.activeId,'guided-example');assert.deepEqual(after.exploration,before.exploration);assert.deepEqual(after.workspaces.real,before.workspaces.real);
+ assert.throws(()=>x.store.commitGoalSelection('real','Reduce turnover',after.revision,at,()=>({}),true),/Invalid isolated/);
+});
 test('exploration reload and atomic selection preserve transcript, association and unrelated goals',()=>{
  const x=setup();x.store.saveGoals({version:1,activeId:'',goals:[{id:'other',statement:'Protect existing work'}]});x.store.setField('other','plan',{untouched:true});
  x.store.commitExplorationFields(x.store.getSnapshot().data.revision,at,()=>({chat:{messages:[{role:'user',content:'I want to reduce turnover'}],input:''},working:{proposal:'mentoring'}}));

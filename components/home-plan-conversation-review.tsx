@@ -6,6 +6,7 @@ import {PlanAlternativeCard} from '@/components/plan-alternative-card';
 import {PlanDirections} from '@/components/plan-directions';
 import {planBudgetText} from '@/lib/home-plan-revisions';
 import {planStaffEffortText} from '@/lib/home-plan-delivery-estimate';
+import {OptionalConversationForm} from '@/components/optional-conversation-form';
 const button='min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring';
 
 export function HomePlanConversationReview({request,proposal,current,onSave,onClose}:{request:PlanConversationRequest;proposal:PlanConversationProposal;current:boolean;onSave:(review:CombinationReview)=>void;onClose:()=>void}) {
@@ -17,8 +18,9 @@ export function HomePlanConversationReview({request,proposal,current,onSave,onCl
   <p>Goal: {request.context.goal}</p><p>Your request: {request.text}</p>
   {!current&&<p role="status">The goal, selection or saved plans changed. Send the request again before saving.</p>}
   {proposal.intent==='combine'&&<><p>Overlap stays unknown unless you confirm it. Matching descriptions do not prove shared participants or costs.</p>
-   <label className="block">Participant overlap<select className="ml-2 rounded border bg-background p-2" aria-label="Structured participant overlap" value={participants} onChange={event=>setParticipants(event.target.value)}><option value="">Unknown</option><option value="same">Same participants</option><option value="disjoint">Separate groups</option></select></label>
-   <label className="block">Cash allowance overlap<select className="ml-2 rounded border bg-background p-2" aria-label="Structured cash overlap" value={fees} onChange={event=>setFees(event.target.value)}><option value="">Unknown</option><option value="distinct">Separate allowances</option><option value="shared-matches">Share exact matches</option></select></label></>}
+   <p>Participant overlap: {participants||'Unknown'}. Cash allowance overlap: {fees||'Unknown'}.</p>
+   <OptionalConversationForm label="overlap form"><label className="block">Participant overlap<select className="ml-2 rounded border bg-background p-2" aria-label="Structured participant overlap" value={participants} onChange={event=>setParticipants(event.target.value)}><option value="">Unknown</option><option value="same">Same participants</option><option value="disjoint">Separate groups</option></select></label>
+   <label className="block">Cash allowance overlap<select className="ml-2 rounded border bg-background p-2" aria-label="Structured cash overlap" value={fees} onChange={event=>setFees(event.target.value)}><option value="">Unknown</option><option value="distinct">Separate allowances</option><option value="shared-matches">Share exact matches</option></select></label></OptionalConversationForm></>}
   {preview.kind==='clarify'&&<p role="status">{preview.question}</p>}
   {preview.kind==='compare'&&<><p>Read-only comparison of saved assumptions. No recommendation ranking or predicted effect.</p><div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))] gap-3">{preview.plans.map(plan=><PlanAlternativeCard key={plan.id} plan={plan} catalog={request.catalog} compact snapshot/>)}</div></>}
   {preview.kind==='proposal'&&<><p>Based on {preview.sources.map(plan=>'Action Plan #'+plan.number+' (revision '+plan.draft.revision+')').join(' and ')}. Originals and attached history remain saved.</p>
