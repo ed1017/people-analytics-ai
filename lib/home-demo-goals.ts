@@ -6,6 +6,8 @@ import {initialWhatIf} from './home-plan-what-if.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {homeDemoExamples,homeDemoField,demoBundle,demoBinding,readHomeDemo} from './home-demo-catalog.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
+import {homeGuideOriginField,readHomeGuideOrigin} from './home-guide-origin.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
 import {createBundleDraft,reviseBundleDraft,bundleInputKey,type Assumption} from './home-bundle-reconciliation.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {attachBundlePatch,bundleWorkspaceField} from './home-bundle-records.ts';
@@ -17,6 +19,7 @@ import type {DecisionData,Json} from './local-decisions';
 export function hasSavedUserGoal(data:Pick<DecisionData,'goals'|'workspaces'>,statement:string){
  return data.goals.goals.some(goal=>{
   if(goal.statement.toLocaleLowerCase()!==statement.trim().toLocaleLowerCase())return false;
+  if(readHomeGuideOrigin(data.workspaces[goal.id]?.fields[homeGuideOriginField],goal.id))return false;
   const demo=readHomeDemo(data.workspaces[goal.id]?.fields[homeDemoField],goal.id);
   return !demo||demo.example.goal!==goal.statement;
  });

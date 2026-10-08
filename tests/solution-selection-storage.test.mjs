@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DecisionStore,DECISIONS_STORAGE_KEY,parseDecisions} from '../lib/local-decisions.ts';
 import {mergeDecisionRecovery} from '../lib/decision-recovery.ts';
+import {hasSavedUserGoal} from '../lib/home-demo-goals.ts';
+import {homeGuideOriginField,readHomeGuideOrigin} from '../lib/home-guide-origin.ts';
 const at='2026-10-08T12:00:00Z';
 function setup(){const values=new Map();let fail=false,writes=0;const port={getItem:key=>values.get(key)??null,setItem:(key,value)=>{if(fail)throw Error('Disk full');values.set(key,value);writes++;},removeItem:key=>values.delete(key)},store=new DecisionStore();store.initialize(port);return {store,port,values,get writes(){return writes;},fail:()=>{fail=true;}};}
 test('isolated guide selection retains real exploration and an existing same-title goal',()=>{
@@ -9,6 +11,23 @@ test('isolated guide selection retains real exploration and an existing same-tit
  x.store.commitGoalSelection('guided-example','Reduce turnover',before.revision,at,()=>({attachment:{fictional:true}}),true);
  const after=parseDecisions(x.values.get(DECISIONS_STORAGE_KEY));assert.equal(x.writes,writes+1);assert.equal(after.goals.activeId,'guided-example');assert.deepEqual(after.exploration,before.exploration);assert.deepEqual(after.workspaces.real,before.workspaces.real);
  assert.throws(()=>x.store.commitGoalSelection('real','Reduce turnover',after.revision,at,()=>({}),true),/Invalid isolated/);
+});
+test('guide-first selection persists fictional origin across reload and allows a later real goal with the same wording',()=>{
+ const x=setup();x.store.saveGoals({version:1,activeId:'',goals:[{id:'other',statement:'Protect existing work'}]});x.store.setField('other','plan',{keep:true});const other=structuredClone(x.store.getSnapshot().data.workspaces.other);
+ x.store.commitGoalSelection('guided-example','Reduce turnover',x.store.getSnapshot().data.revision,at,()=>({attachment:{fictional:true}}),true);
+ const first=structuredClone(x.store.getSnapshot().data.workspaces['guided-example']);assert.equal(readHomeGuideOrigin(first.fields[homeGuideOriginField],'guided-example').origin,'conversation-guide-v1');assert.equal(hasSavedUserGoal(x.store.getSnapshot().data,'Reduce turnover'),false);
+ const reloaded=new DecisionStore();reloaded.initialize(x.port);reloaded.commitGoalFields('guided-example','Reduce turnover',reloaded.getSnapshot().data.revision,'2026-10-09T12:00:00Z',()=>({[homeGuideOriginField]:null,anotherAttachment:true}));
+ assert.deepEqual(reloaded.getField('guided-example',homeGuideOriginField,null),first.fields[homeGuideOriginField]);
+ reloaded.saveGoals({...reloaded.getSnapshot().data.goals,activeId:''});const example=structuredClone(reloaded.getSnapshot().data.workspaces['guided-example']);
+ reloaded.commitGoalSelection('real-turnover','Reduce turnover',reloaded.getSnapshot().data.revision,at,()=>({attachment:{real:true}}));
+ const after=parseDecisions(x.values.get(DECISIONS_STORAGE_KEY));assert.equal(hasSavedUserGoal(after,'Reduce turnover'),true);assert.deepEqual(after.workspaces['guided-example'],example);assert.deepEqual(after.workspaces.other,other);assert.equal(after.workspaces['real-turnover'].fields[homeGuideOriginField],undefined);
+ const renamed=structuredClone(after);renamed.goals.goals.find(g=>g.id==='guided-example').statement='Fictional retention trial';assert.equal(hasSavedUserGoal(renamed,'Fictional retention trial'),false);
+});
+test('an unmarked guided ID or invalid example marker never exempts a real duplicate',()=>{
+ for(const marker of [undefined,{version:1,origin:'conversation-guide-v1',goalId:'guided-other',createdAt:at},{version:1,origin:'conversation-guide-v1',goalId:'guided-real',createdAt:'invalid'}]){
+  const x=setup();x.store.saveGoals({version:1,activeId:'',goals:[{id:'guided-real',statement:'Reduce turnover'}]});if(marker)x.store.setField('guided-real',homeGuideOriginField,marker);
+  assert.equal(hasSavedUserGoal(x.store.getSnapshot().data,'Reduce turnover'),true);assert.throws(()=>x.store.commitGoalSelection('real-turnover','Reduce turnover',x.store.getSnapshot().data.revision,at,()=>({attachment:true})),/already exists/);
+ }
 });
 test('exploration reload and atomic selection preserve transcript, association and unrelated goals',()=>{
  const x=setup();x.store.saveGoals({version:1,activeId:'',goals:[{id:'other',statement:'Protect existing work'}]});x.store.setField('other','plan',{untouched:true});

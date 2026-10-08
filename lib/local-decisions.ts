@@ -3,6 +3,8 @@ import {mergeDecisionRecovery,type RecoveryConflict} from './decision-recovery.t
 // @ts-expect-error Native Node tests use the same TypeScript source.
 import {homeDemoField,readHomeDemo} from './home-demo-catalog.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
+import {homeGuideOriginField,readHomeGuideOrigin} from './home-guide-origin.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
 import {parseLocalGoals,emptyLocalGoals,GOALS_STORAGE_KEY,type LocalGoals} from "./local-goals.ts";
 export const DECISION_RECOVERY_KEY='insights-to-action.decisions.recovery.v1';
 export const DECISIONS_STORAGE_KEY="insights-to-action.decisions.v1";
@@ -131,7 +133,7 @@ export class DecisionStore {
    if(this.state.data.revision!==revision||!creating&&(this.state.data.goals.activeId!==id||(this.state.data.goals.goals.find(item=>item.id===id)?.statement??'')!==goal))throw Error('The goal or destination revision changed; preview again.');
    if(creating){
     if(!/^[a-zA-Z0-9-]{1,80}$/.test(id)||!goal.trim()||goal.length>240||goal!==goal.trim())throw Error('Review the goal before selecting this proposal.');
-    if(this.state.data.removedGoalIds?.includes(id)||this.state.data.goals.goals.some(item=>item.id===id||!isolatedExample&&item.statement.toLocaleLowerCase()===goal.toLocaleLowerCase()&&readHomeDemo(this.state.data.workspaces[item.id]?.fields[homeDemoField],item.id)?.example.goal!==item.statement))throw Error('This goal already exists or was removed. Select the existing goal to continue; your exploration is kept.');
+    if(this.state.data.removedGoalIds?.includes(id)||this.state.data.goals.goals.some(item=>item.id===id||!isolatedExample&&item.statement.toLocaleLowerCase()===goal.toLocaleLowerCase()&&!readHomeGuideOrigin(this.state.data.workspaces[item.id]?.fields[homeGuideOriginField],item.id)&&readHomeDemo(this.state.data.workspaces[item.id]?.fields[homeDemoField],item.id)?.example.goal!==item.statement))throw Error('This goal already exists or was removed. Select the existing goal to continue; your exploration is kept.');
     if(this.state.data.goals.goals.length>=20)throw Error('Your saved goals are full. Your exploration is kept.');
    }
    if(!/^\d{4}-\d\d-\d\dT/.test(at)||!Number.isFinite(Date.parse(at)))throw Error('Invalid application timestamp.');
@@ -139,6 +141,8 @@ export class DecisionStore {
    const original=this.state.data,expected=this.expected,before=id?original.workspaces[id]:original.exploration,patch=build(structuredClone(before?.fields??{}));
    if(!validateJson(patch)||!patch||Array.isArray(patch)||typeof patch!=='object'||!Object.keys(patch).length)throw Error('Invalid or empty application transaction.');
    const slot={savedAt:at,fields:{...before?.fields,...structuredClone(patch)}};
+   const guideOrigin=readHomeGuideOrigin(before?.fields[homeGuideOriginField],id);
+   if(guideOrigin||isolatedExample)slot.fields[homeGuideOriginField]=guideOrigin??{version:1,origin:'conversation-guide-v1',goalId:id,createdAt:at};
    const next:DecisionData={...original,revision:revision+1,...(id?{workspaces:{...original.workspaces,[id]:slot}}:{exploration:slot})};
    if(creating){next.goals={...original.goals,activeId:id,goals:[...original.goals.goals,{id,statement:goal}]};if(!isolatedExample)delete next.exploration;}
    const raw=encodeDecisions(next);parseDecisions(raw);

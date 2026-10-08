@@ -16,12 +16,17 @@ export class HomeGuidedFlow {
  }
 }
 
-export type GuidedReceipt={type:'answered'|'pinned'|'selected'|'attached'|'edited'|'proposal-reviewed'|'proposal-chosen';goalId:string;goal?:string;planId?:string;number?:number;sourcePlanId?:string};
+export type GuidedCandidate={id:string;revision:number;requestId:string};
+export type GuidedReceipt={type:'answered'|'pinned'|'selected'|'attached'|'edited'|'proposal-reviewed'|'proposal-chosen';goalId:string;goal?:string;planId?:string;number?:number;sourcePlanId?:string;candidate?:GuidedCandidate;candidates?:GuidedCandidate[]};
+const validCandidate=(candidate:GuidedCandidate)=>Boolean(candidate.id&&candidate.requestId&&Number.isSafeInteger(candidate.revision)&&candidate.revision>0);
 /** Conversational progress follows completed replies and atomic selections. */
-export function conversationalReceiptStep(step:number,event:GuidedReceipt,goalId:string,originalId:string|null):number|null {
+export function conversationalReceiptStep(step:number,event:GuidedReceipt,goalId:string,originalId:string|null,eligible:GuidedCandidate[]=[]):number|null {
  if(event.goalId!==goalId)return null;
- if((step===1||step===2||step===4)&&event.type==='proposal-reviewed'&&event.planId)return step+1;
- if((step===3||step===5)&&event.type==='proposal-chosen'&&event.planId&&Number.isSafeInteger(event.number)&&event.number!>0&&(step===3||event.planId!==originalId))return step+1;
+ if((step===1||step===2||step===4||step===5)&&event.type==='proposal-reviewed'&&event.planId&&(step<4||event.candidates?.length&&event.candidates.every(validCandidate)))return Math.min(step+1,5);
+ if(event.type==='proposal-chosen'&&event.planId&&Number.isSafeInteger(event.number)&&event.number!>0){
+  if(step>=0&&step<=3)return 4;
+  if(step===5&&originalId&&event.planId!==originalId&&event.candidate&&validCandidate(event.candidate)&&eligible.some(item=>item.id===event.candidate!.id&&item.revision===event.candidate!.revision&&item.requestId===event.candidate!.requestId))return 6;
+ }
  return null;
 }
 /** Receipts advance only the expected real control in this isolated goal. */

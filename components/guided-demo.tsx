@@ -1,7 +1,7 @@
 "use client";
 import {useCallback,useLayoutEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
-import {HomeGuidedFlow,guidedReceiptStep,conversationalReceiptStep,type GuidedReceipt} from '@/lib/home-guided-flow';
+import {HomeGuidedFlow,guidedReceiptStep,conversationalReceiptStep,type GuidedReceipt,type GuidedCandidate} from '@/lib/home-guided-flow';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
 import {GuidedActionArrow} from '@/components/guided-action-arrow';
 import type {GuidedActionRegistry} from '@/components/home-guided-actions';
@@ -34,6 +34,7 @@ export function GuidedDemo({active,actions,registry,onClose,conversational=false
  const steps=conversational?conversationSteps:legacySteps;
  const storage=useDecisionStorage();
  const [step,setStep]=useState(0),[pinnedStatement,setPinnedStatement]=useState<string>(GUIDED_EXAMPLE_PROMPT),[pending,setPending]=useState(false),[error,setError]=useState(''),[revised,setRevised]=useState<{id:string;number:number}|null>(null),[completedSteps,setCompletedSteps]=useState<number[]>([]),[popupTop,setPopupTop]=useState(12);
+ const [eligible,setEligible]=useState<GuidedCandidate[]>([]),eligibleRef=useRef<GuidedCandidate[]>([]),[selectionNotice,setSelectionNotice]=useState('');
  const [id]=useState(()=>`guided-${crypto.randomUUID()}`),flow=useRef(new HomeGuidedFlow()),abort=useRef<AbortController|null>(null),latest=useRef(actions),heading=useRef<HTMLHeadingElement>(null),panel=useRef<HTMLElement>(null),closed=useRef(false),running=useRef<AbortController|null>(null),currentStep=useRef(0),pinnedGoal=useRef<string>(GUIDED_EXAMPLE_PROMPT),originalId=useRef<string|null>(null),originalNumber=useRef<number|null>(null),revisedId=useRef<string|null>(null),completed=useRef(new Set<number>()),editLoaded=useRef(false);
  useLayoutEffect(()=>{latest.current=actions;currentStep.current=step;});
  function cancel(){abort.current?.abort();flow.current.cancel();registry.preparation?.cancel?.();latest.current.cancel();}
@@ -43,10 +44,13 @@ export function GuidedDemo({active,actions,registry,onClose,conversational=false
   if(closed.current)return;
   try{const current=currentStep.current;
    if(conversational){
-    const next=conversationalReceiptStep(current,event,id,originalId.current);if(next===null)return;
-    if(current===3){const statement=event.goal!;owned(statement);pinnedGoal.current=statement;setPinnedStatement(statement);originalId.current=event.planId!;originalNumber.current=event.number!;}else if(current>3)owned();
-    completed.current.add(current);setCompletedSteps([...completed.current]);currentStep.current=next;setError('');setStep(next);
-    if(current===3)latest.current.fillDraft('Keep the main approach, and add a peer check-in using the same participants. Leave the count unknown unless we already agreed it.');
+    const next=conversationalReceiptStep(current,event,id,originalId.current,eligibleRef.current);
+    if(next===null){if(current===5&&event.goalId===id&&event.type==='proposal-chosen'){owned();setSelectionNotice('That alternative is saved. To finish the guide, choose a proposal from the refinement reply.');}return;}
+    const firstChoice=current<=3&&event.type==='proposal-chosen';
+    if(firstChoice){const statement=event.goal!;owned(statement);pinnedGoal.current=statement;setPinnedStatement(statement);originalId.current=event.planId!;originalNumber.current=event.number!;completed.current=new Set([0,1,2,3]);eligibleRef.current=[];setEligible([]);}else if(current>3)owned();
+    if(current>=4&&event.type==='proposal-reviewed'){eligibleRef.current=event.candidates!;setEligible(event.candidates!);completed.current.delete(5);completed.current.add(4);}else completed.current.add(current);
+    setCompletedSteps([...completed.current]);currentStep.current=next;setError('');setSelectionNotice('');setStep(next);
+    if(firstChoice&&!latest.current.draft.trim())latest.current.fillDraft('Keep the main approach, and add a peer check-in using the same participants. Leave the count unknown unless we already agreed it.');
     return;
    }
    if(current===4&&guidedReceiptStep(3,event,id,originalId.current,revisedId.current)===4){owned();originalId.current=event.planId!;originalNumber.current=event.number!;return;}const next=guidedReceiptStep(current,event,id,originalId.current,revisedId.current);if(next===null)return;if(current===2){const statement=event.goal??GUIDED_EXAMPLE_PROMPT;owned(statement);pinnedGoal.current=statement;setPinnedStatement(statement);}else if(current>=2)owned();
@@ -78,11 +82,12 @@ export function GuidedDemo({active,actions,registry,onClose,conversational=false
   catch(reason){if(!controller.signal.aborted)setError(reason instanceof Error?reason.message:'The example could not start. Please retry.');}
   finally{if(running.current===controller){running.current=null;setPending(false);}}
  }
- function back(){cancel();running.current=null;setPending(false);setError('');setStep(value=>Math.max(0,value-1));}
+ function back(){cancel();running.current=null;setPending(false);setError('');setSelectionNotice('');setStep(value=>Math.max(0,value-1));}
  const savedGuide=storage.saved&&storage.data.goals.activeId===id&&storage.data.goals.goals.some(goal=>goal.id===id&&goal.statement===pinnedStatement);
  const goalCurrent=conversational?(step===0||savedGuide||step<4&&!completedSteps.includes(3)&&storage.saved&&!storage.data.goals.activeId):step<3||savedGuide;
  const complete=step===steps.length,done=completedSteps.includes(step),point=!complete&&!done&&goalCurrent;
- const scope=`[data-guide-goal="${id}"] `,selector=conversational?([1,2,4].includes(step)?'[data-guide-target="submit"]':[3,5].includes(step)?'[data-guide-target="choose-proposal"]:not(:disabled)':null):step===1||step===5?'[data-guide-target="submit"]':step===2?'[data-guide-target="pin"]':step===3?scope+'[data-guide-plan][aria-selected="true"], '+scope+'[data-guide-target="prepare"]':step===4||step===7?scope+'[data-guide-target="attach"]':step===6&&revised?scope+`[data-guide-plan="${revised.number}"]`:null;
+ const revisedSelector=eligible.map(item=>`[data-guide-target="choose-proposal"][data-guide-candidate=${JSON.stringify(item.id)}][data-guide-revision="${item.revision}"][data-guide-request=${JSON.stringify(item.requestId)}]:not(:disabled)`).join(', ');
+ const scope=`[data-guide-goal="${id}"] `,selector=conversational?([1,2,4].includes(step)?'[data-guide-target="submit"]':step===3?'[data-guide-target="choose-proposal"]:not(:disabled)':step===5?revisedSelector:null):step===1||step===5?'[data-guide-target="submit"]':step===2?'[data-guide-target="pin"]':step===3?scope+'[data-guide-plan][aria-selected="true"], '+scope+'[data-guide-target="prepare"]':step===4||step===7?scope+'[data-guide-target="attach"]':step===6&&revised?scope+`[data-guide-plan="${revised.number}"]`:null;
  const targetLabel=conversational?([1,2,4].includes(step)?'Next → Submit':'Review and choose a plan'):step===1||step===5?'Next → Submit':step===2?'Next → Pin goal':step===3?'Review plans and choose one':step===6?`Next → Select Plan #${revised?.number}`:'Next → Attach Action Plan';
  return typeof document==='undefined'?null:createPortal(<section ref={panel} role="dialog" aria-modal="false" data-guided-popup style={{top:popupTop,right:12,width:'min(360px, calc(100vw - 24px))',maxHeight:'min(calc(100dvh - 24px), 400px, max(228px, 33dvh))'}} aria-label="Optional guided demo" className="fixed z-40 flex min-w-0 flex-col rounded-lg border border-[#8c3957] border-b-4 bg-[#6b203b] p-3 text-white shadow-xl">
   <div className="flex shrink-0 items-center justify-between gap-2"><h2 className="text-lg font-semibold">Guided instructions</h2><button className={button} onClick={close}>{complete?'Finish example':'Exit guide'}</button></div>
@@ -95,7 +100,8 @@ export function GuidedDemo({active,actions,registry,onClose,conversational=false
   {(pending||actions.loading)&&<p role="status" aria-live="polite" className="my-2 text-sm">{pending?'Opening the example conversation…':'Waiting for your submitted question…'}</p>}
   {!goalCurrent&&<p role="alert" className="my-2 text-sm">The demo goal is not current or saved. Reopen it or resolve browser storage before continuing. A removed goal will not be recreated.</p>}
   {error&&<p role="alert" className="my-2 text-sm">{error}</p>}
-  {done&&!complete&&<p className="my-2 text-sm">This step is complete. Continuing keeps the saved result.</p>}
+  {selectionNotice&&<p role="status" className="my-2 text-sm">{selectionNotice}</p>}
+  {done&&!complete&&<p className="my-2 text-sm">{conversational&&step<4&&completedSteps.includes(3)?'Your plan is already selected. Continuing keeps the saved result.':'This step is complete. Continuing keeps the saved result.'}</p>}
   {complete&&<p className="text-xs text-white/85">Share Action Plan (TBD) and Track results (TBD) are future features.</p>}
   </div>
   <div className="mt-3 flex shrink-0 flex-wrap gap-2"><button className={button} disabled={step===0} onClick={back}>Back</button>{done&&!complete?<button className={button} onClick={()=>setStep(value=>value+1)}>Continue walkthrough</button>:step===0&&<button className={button} disabled={pending||!actions.ready} onClick={()=>void start()}>Next → Start example</button>}</div>
