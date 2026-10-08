@@ -13,9 +13,9 @@ import {reviewBundleProposal} from '../../lib/home-bundle-reconciliation.ts';
 import {DecisionStore} from '../../lib/local-decisions.ts';
 import {fictionalProvenance, fictionalScenarios, fictionalRequest, fictionalProjection, fictionalEvidence} from '../fixtures/fictional-solution-evaluation.mjs';
 
-export const checkpoint = Object.freeze({head: 'aff336860b239416fee604168ab4acbe87cfb365', tree: '1fa469dac3ca9bece5cc98264882b0d231e73802'});
+export const checkpoint = Object.freeze({head: '50e196836042120a4c223a7884ebf3f5fe380e1a', tree: '6719f793e0f0112c67be3e0d1ddc50371c35d175'});
 export const batchDefinitions = Object.freeze({
-  'clock-followup': Object.freeze(['clock-deadline']),
+  'parameter-verification': Object.freeze(['clock-deadline']),
 });
 export const limits = Object.freeze({roundsPerTurn: 4, toolsPerTurn: 6, inputTokens: 100000, outputTokens: 5000, payloadBytes: 160000, countAllowanceMicrousd: 50000, generationMicrousd: 31000, pairMicrousd: 81000, requestsPerMinute: 6, callTimeoutMs: 30000, turnTimeoutMs: 360000, batchTimeoutMs: 1800000, trancheCapMicrousd: 972000, totalCapMicrousd: 50000000});
 export const apiBase = 'https://api.openai.com/v1';
@@ -43,14 +43,14 @@ export function sourceManifest(root) {
   function visit(dir) { for (const entry of readdirSync(join(root, dir), {withFileTypes: true})) { const path = dir + '/' + entry.name; if (entry.isDirectory()) visit(path); else if (/\.(?:ts|mjs)$/.test(path)) files.push(path); } }
   visit('lib'); return Object.fromEntries(files.sort().map(path => [path, sha256(readFileSync(join(root, path)))]));
 }
-export function unarmedManifest(root, batch = 'clock-followup') {
-  return {version: 1, checkpoint, runId: null, reservationId: null, parentReserved: false, plan: batchPlan(batch), trancheAuthorization: 'parent-approved-clock-followup-2026-10-08', priorTrancheMicrousd: 0, priorTotalMicrousd: 4143960, pricingBasis: 'approved-envelope-input-0.25-output-1.20-per-million', projectId: null, createdAt: null, expiresAt: null, files: sourceManifest(root)};
+export function unarmedManifest(root, batch = 'parameter-verification') {
+  return {version: 1, checkpoint, runId: null, reservationId: null, parentReserved: false, plan: batchPlan(batch), trancheAuthorization: 'parent-approved-parameter-verification-2026-10-08', priorTrancheMicrousd: 0, priorTotalMicrousd: 5115960, pricingBasis: 'approved-envelope-input-0.25-output-1.20-per-million', projectId: null, createdAt: null, expiresAt: null, files: sourceManifest(root)};
 }
 export function validateManifest(manifest, env, now = Date.now()) {
   const plan = batchPlan(manifest?.plan?.name);
   if (manifest.version !== 1 || sha256(manifest.plan) !== sha256(plan) || manifest.parentReserved !== true || !uuid(manifest.runId) || !uuid(manifest.reservationId) || sha256(manifest.checkpoint) !== sha256(checkpoint)) stop('invalid_reservation');
   const a = manifest.priorTrancheMicrousd, b = manifest.priorTotalMicrousd;
-  if (manifest.trancheAuthorization !== 'parent-approved-clock-followup-2026-10-08' || a !== 0 || !Number.isSafeInteger(b) || b !== 4143960 || a + plan.reservedMicrousd > 972000 || b + plan.reservedMicrousd > 50000000) stop('budget_exhausted');
+  if (manifest.trancheAuthorization !== 'parent-approved-parameter-verification-2026-10-08' || a !== 0 || !Number.isSafeInteger(b) || b !== 5115960 || a + plan.reservedMicrousd > 972000 || b + plan.reservedMicrousd > 50000000) stop('budget_exhausted');
   if (manifest.pricingBasis !== 'approved-envelope-input-0.25-output-1.20-per-million') stop('pricing_basis_changed');
   const start = Date.parse(manifest.createdAt), expiry = Date.parse(manifest.expiresAt);
   if (!Number.isFinite(start) || !Number.isFinite(expiry) || start > now || expiry <= now || expiry - start > 3600000) stop('reservation_expired');
@@ -98,6 +98,23 @@ function turnSummary(request, reply, checks, selection, toolReceipts) {
   return {requestId: request.requestId, inputSha256: sha256(request), outputSha256: sha256(reply), question: safeText(request.message.text), answer: safeText(reply.answer, 6000), modelRounds: reply.usage.modelRounds, toolCalls: reply.usage.toolCalls, checks, selection, toolReceipts, constraints: safeText(reply.state.constraints, 3000), questions: safeText(reply.state.questions, 3000), verifiedMetrics: safeText(reply.state.verifiedMetrics, 3000),
     candidates: candidates.map(row => ({id: safeText(row.id, 100), revision: row.revision, name: safeText(row.candidate.name), goal: safeText(row.candidate.goal), objective: safeText(row.candidate.objective), nextStep: safeText(row.candidate.nextStep), successMeasure: safeText(row.candidate.successMeasure), effectiveTiming: safeText(row.draft?.inputs.timing, 4000), effectiveScope: safeText(row.draft?.inputs.scope, 4000), approach: safeText(row.candidate.approach), rationale: safeText(row.candidate.rationale), tradeoffs: safeText(row.candidate.tradeoffs), activities: safeText(row.candidate.activities, 6000), interpretedQuantities: safeText(row.candidate.quantities, 4000), verifiedCalculation: safeText({uniqueParticipants: row.result.uniqueParticipants, cashEstimate: row.result.cashEstimate, status: row.result.calculationStatus, blocking: row.blocking}, 3000)})),
     analyses: analyses.map(row => ({id: safeText(row.id, 100), revision: row.revision, method: row.spec.method, assumptions: safeText(row.assumptions, 3000), interpretations: safeText(row.interpretations, 3000), limitations: safeText(row.limitations, 3000), scope: safeText(row.inputs.scope), opening: row.inputs.opening, points: row.points, displayedFlowTolerance: row.spec.method === 'configured_scenario' ? 0.2 : 1e-8})), semanticReview: 'pending', browserPersistenceVerified: false};
+}
+
+export function deadlineChecks(request, reply, toolReceipts) {
+ const original=request.catalog.plans.find(p=>p.id==='A').draft;
+ const items=reply.state.working.filter(row=>reply.candidateIds.includes(row.id)&&row.requestId===request.requestId);
+ const item=items.length===1?items[0]:null;
+ const expected=structuredClone(original.inputs);
+ if(item?.draft) expected.timing.find(row=>row.componentId==='c1').finish=structuredClone(item.draft.inputs.timing.find(row=>row.componentId==='c1')?.finish);
+ const q=item?.candidate.quantities;
+ return {
+  parameterOperation:toolReceipts.some(row=>row.name==='revise_parameters')&&!toolReceipts.some(row=>row.name==='evaluate_candidate'),
+  exactSource:item?.candidate.base?.kind==='saved'&&item.candidate.base.id==='A'&&item.candidate.base.revision===original.revision,
+  deadlineOnly:q?.length===1&&q[0].field==='activity_finish'&&q[0].target==='c1'&&q[0].turnId===request.message.id&&item?.draft?.inputs.timing.find(row=>row.componentId==='c1')?.finish.value==='2026-11-20',
+  strategyPreserved:!!item?.draft&&sha256(item.draft.bundle)===sha256(original.bundle),
+  unrelatedInputsPreserved:!!item?.draft&&sha256(item.draft.inputs)===sha256(expected),
+  calculationValid:!!item?.result&&item.blocking.length===0&&item.result.deliveryEstimate?.hours===28&&item.result.cashEstimate?.cash===3000&&item.result.uniqueParticipants===10,
+ };
 }
 
 export async function runAcceptance({manifest, env, client, claim, record, now = Date.now, sleep, signal: outerSignal = new AbortController().signal}) {
@@ -169,6 +186,7 @@ export async function runAcceptance({manifest, env, client, claim, record, now =
         let selection = null;
         if (scenario.selectAfterTurn === index + 1) { const selected = await selectFictionalCandidate(request, reply); ({state, goal, catalog} = selected); selection = selected.receipt; checks.intentionalSelection = true; }
         const newest = state.working.findLast(row => reply.candidateIds.includes(row.id) && row.requestId === request.requestId);
+        if(id==='clock-deadline'&&index===2)Object.assign(checks,deadlineChecks(request,reply,[...toolReceipts.values()]));
         if (id === 'same-people-correction') checks.sharedPeople = newest?.result.uniqueParticipants === [10, 5, 8][index];
         if (id === 'constraint-recovery' && index === 1) checks.capRemovedFeePreserved = newest?.draft?.inputs.budget.amount.value === null && newest?.result.cashEstimate.cash === 2000;
         if (id === 'headcount-followup' && index < 2) checks.roundedProjectionReconciles = reply.analysisIds.length > 0 && state.analyses.at(-1).points.every(p => Math.abs(p.headcount - (p.opening + p.hires - p.exits + p.transfersIn - p.transfersOut)) <= (state.analyses.at(-1).spec.method === 'configured_scenario' ? 0.2 + 1e-8 : 1e-8));

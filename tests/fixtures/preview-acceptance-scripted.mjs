@@ -7,7 +7,7 @@ export function scriptedStepsFor(id,index,state){
  if(id==='clock-deadline'){
   if(index===0)return [{name:'read_clock',args:{}},final('It is 3:24 PM UTC, using the supplied clock.')];
   if(index===1)return [final('Manager support could surface workload obstacles earlier. That mechanism is a hypothesis; ask volunteers whether concerns lead to practical follow-up, while watching manager time.')];
-  const c=based();c.quantities=[{...quantity('activity_finish',null,'YYYY-MM-DD','c1','user-3'),text:'2026-11-20'}];return [evaluate(c),final('Here is a deadline revision for review; the saved plan is unchanged.',['mentoring'])];
+  const c=based();c.quantities=[{...quantity('activity_finish',null,'YYYY-MM-DD','c1','user-3'),text:'2026-11-20'}];return [{name:'revise_parameters',args:{edit:{id:c.id,source:c.base,quantities:c.quantities},constraintUpdates:[]}},final('Here is a deadline revision for review; the saved plan is unchanged.',['mentoring'])];
  }
  if(id==='goal-select-refine'){
   const c=index?retainWorking(state):candidate();

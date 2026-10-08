@@ -9,7 +9,7 @@ const start = Date.parse('2026-10-08T12:00:00Z');
 function setup(options = {}) {
   let time = start, current = '', steps = [], claimed = false;
   const calls = [], records = [], controller = new AbortController();
-  const manifest = {version: 1, checkpoint, runId: '10000000-0000-4000-8000-000000000001', reservationId: '20000000-0000-4000-8000-000000000001', parentReserved: true, plan: batchPlan(options.batch ?? 'clock-followup'), trancheAuthorization: 'parent-approved-clock-followup-2026-10-08', priorTrancheMicrousd: 0, priorTotalMicrousd: 4143960, pricingBasis: 'approved-envelope-input-0.25-output-1.20-per-million', projectId: 'prj_fictional', createdAt: new Date(start).toISOString(), expiresAt: new Date(start + 3600000).toISOString(), files: {fixture: 'offline-only'}};
+  const manifest = {version: 1, checkpoint, runId: '10000000-0000-4000-8000-000000000001', reservationId: '20000000-0000-4000-8000-000000000001', parentReserved: true, plan: batchPlan(options.batch ?? 'parameter-verification'), trancheAuthorization: 'parent-approved-parameter-verification-2026-10-08', priorTrancheMicrousd: 0, priorTotalMicrousd: 5115960, pricingBasis: 'approved-envelope-input-0.25-output-1.20-per-million', projectId: 'prj_fictional', createdAt: new Date(start).toISOString(), expiresAt: new Date(start + 3600000).toISOString(), files: {fixture: 'offline-only'}};
   const env = {VERCEL: '1', VERCEL_ENV: 'preview', VERCEL_PROJECT_ID: manifest.projectId, VERCEL_DEPLOYMENT_ID: 'dpl_fictional', SOLUTION_ACCEPTANCE_RUN_ID: manifest.runId};
   const scripted = payload => {
     const context = JSON.parse(payload.input[0].content.split('\n').slice(1).join('\n'));
@@ -54,7 +54,7 @@ test('three scripted clock/deadline turns exercise actual service, schema, tools
   globalThis.fetch = () => { attempts++; throw Error('Network forbidden in offline checks'); };
   try {
     let turns = 0;
-    for (const batch of ['clock-followup']) {
+    for (const batch of ['parameter-verification']) {
       const x = setup({batch}), result = await x.run();
       assert.equal(result.failure, undefined, JSON.stringify(result.failure));
       assert.equal(result.executionComplete, true); assert.equal(result.fullAcceptance, false);
@@ -87,10 +87,10 @@ test('three scripted clock/deadline turns exercise actual service, schema, tools
 });
 
 test('only clock follow-up fits the explicit new tranche with original allocation retained', () => {
-  const plan = batchPlan('clock-followup');
+  const plan = batchPlan('parameter-verification');
   assert.deepEqual(plan.sequenceIds, ['clock-deadline']); assert.equal(plan.turns, 3);
   assert.equal(plan.countCalls, 12); assert.equal(plan.generationCalls, 12); assert.equal(plan.maxProviderCalls, 24);
-  assert.equal(plan.reservedMicrousd, 972000); assert.equal(4143960 + plan.reservedMicrousd, 5115960);
+  assert.equal(plan.reservedMicrousd, 972000); assert.equal(5115960 + plan.reservedMicrousd, 6087960);
   assert.equal(plan.reservedMicrousd, 12 * (limits.countAllowanceMicrousd + limits.generationMicrousd));
   assert.equal(limits.generationMicrousd, limits.inputTokens * .25 + limits.outputTokens * 1.2);
   for (const name of ['core-four', 'corrections-two']) assert.throws(() => batchPlan(name), {code: 'unknown_batch'});
@@ -186,7 +186,7 @@ test('service rejection preserves exact guard and fictional intermediate payload
   assert.equal(result.failure.serviceDiagnostic.message.text, 'A claimed quantitative result was not checked in this turn.');
   assert.ok(result.failure.serviceDiagnostic.frames.some(frame => frame.text.includes('home-solution-conversation-service.ts')));
   const tools = x.records.filter(r => r.stage.startsWith('tool-result-'));
-  const evaluated = tools.find(r => r.receipt.name === 'evaluate_candidate').receipt;
+  const evaluated = tools.find(r => r.receipt.name === 'revise_parameters').receipt;
   const tool = JSON.parse(evaluated.result.text);
   assert.equal(tool.revision, 1); assert.equal(tool.draft.revision, 3);
   assert.equal(evaluated.result.truncated, false); assert.equal(evaluated.arguments.truncated, false);
@@ -202,4 +202,16 @@ test('diagnostic persistence failures stop before further provider calls', async
     const x = setup({recordError: stage}), result = await x.run();
     assert.ok(result.failure); assert.equal(x.calls.length, expected);
   }
+});
+test('deadline semantic guard rejects wrong operation and unrelated input changes', async()=>{
+ const {deadlineChecks}=await import('./helpers/solution-preview-acceptance.mjs');
+ const {fictionalRequest}=await import('./fixtures/fictional-solution-evaluation.mjs');
+ const {evaluateSolutionParameterEdit}=await import('../lib/home-solution-conversation.ts');
+ const r=await fictionalRequest(fictionalScenarios[0],2);
+ const item=await evaluateSolutionParameterEdit(r,{id:'deadline',source:{kind:'saved',id:'A',revision:r.catalog.plans[0].draft.revision},quantities:[{field:'activity_finish',target:'c1',unit:'YYYY-MM-DD',kind:'literal',number:null,text:'2026-11-20',source:null,factor:null,turnId:'user-3',interpretation:'Requested finish date.'}]},[]);
+ const reply={candidateIds:[item.id],state:{working:[item]}},tools=[{name:'revise_parameters'}];
+ assert.ok(Object.values(deadlineChecks(r,reply,tools)).every(Boolean));
+ assert.equal(deadlineChecks(r,reply,[{name:'evaluate_candidate'}]).parameterOperation,false);
+ item.draft.inputs.deliveryEstimate.coordinationHours.value=null;
+ assert.equal(deadlineChecks(r,reply,tools).unrelatedInputsPreserved,false);
 });
