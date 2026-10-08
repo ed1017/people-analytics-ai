@@ -1,3 +1,4 @@
+import {ProjectionBacktestDetails} from '@/components/projection-backtest-details';
 import {SyntheticDomainPrediction} from '@/components/synthetic-domain-prediction';
 import {CalibratedTaPanels} from "@/components/calibrated-ta-panels";
 import artifact from '@/lib/data/synthetic-domain-demo-v1.json';
@@ -8,10 +9,10 @@ function HomeForecastDetails({domain,data}:{domain:SyntheticDemoDomain;data:type
  return <details><summary className="min-h-11 cursor-pointer py-2 text-xs font-medium focus-visible:ring-2 focus-visible:ring-ring">Details</summary><div className="space-y-2 break-words text-xs">
   <p>Fixed simulated company-wide population, separate from recorded workforce evidence. Your goal and workforce filters do not change these values. Operational forecasts are unavailable.</p>
   <p>Cutoff 30 Sep 2026 · History through {new Date(data.domains[domain].support.lastPeriod+'-01T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'})} · Intervals unavailable.</p>
-  <p>Constructed synthetic demonstration: {data.historyCases} histories, {data.monthsPerHistory} months each. Fixed stable-mechanism case, seed {data.seed}; methods use only releases available at the cutoff.</p>
+  <p>Constructed synthetic demonstration: the separate original frozen assessment contains {data.historyCases} histories, {data.monthsPerHistory} months each. Those counts are not the samples for this historical ranking. The displayed stable-mechanism case uses seed {data.seed}; methods use only releases available at the cutoff.</p>
   <p>{demoDomainCopy[domain].assumption}</p>
-  <SyntheticDomainChartNotes domain={domain} data={data}/>
-  <p>All three methods are shown; none is designated as preferred. Their spread is not an uncertainty interval; confidence intervals and intervention effects are unavailable. No real-world accuracy is established.</p>
+  <SyntheticDomainChartNotes domain={domain} data={data}/>{domain!=='hiring'&&<ProjectionBacktestDetails domain={domain} data={data}/>}
+  <p>All three existing methods are shown. Historical score order is not an operational recommendation. Their spread is not an uncertainty interval; confidence intervals and intervention effects are unavailable. No real-world accuracy is established.</p>
   <a className="inline-block min-h-11 py-2 text-primary underline" target="_blank" rel="noreferrer" href={'https://github.com/ed1017/people-analytics-ai/blob/'+data.evidence.commit+'/docs/synthetic-domain-predictions-v1.md'}>Source methods and complete comparisons</a>
   <p>Report SHA-256: {data.evidence.reportSha256}</p>
  </div></details>;

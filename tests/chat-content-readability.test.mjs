@@ -97,7 +97,7 @@ test('forecast boilerplate collapses without hiding simulated scope, unsupported
   assert.match(result.answer,/planning baselines and intervention effects are unavailable/);
   assert.ok(result.details.some(detail=>detail.includes('capacity, savings, ROI')));
   assert.deepEqual(result.answer.split('\n').filter(line=>line.startsWith('|')),saved.split('\n').filter(line=>line.startsWith('|')));
-  if(saved.includes('| Method |')){assert.match(result.answer,/confidence intervals and operational forecasts unavailable/);assert.match(result.answer,/30 Sep 2026/);}
+  if(saved.includes('| Method |')){assert.match(result.answer,/confidence intervals and operational forecasts (?:are )?unavailable/i);assert.match(result.answer,/30 Sep 2026/);}
   else assert.match(result.answer,/does not provide a new forecast for the requested horizon/);
   const html=render(saved,{compact:true});assert.equal((html.match(/data-answer-evidence-details/g)??[]).length,1);assert.doesNotMatch(html,/<details[^>]* open/);
  }

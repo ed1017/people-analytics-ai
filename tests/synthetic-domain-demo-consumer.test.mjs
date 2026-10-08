@@ -23,7 +23,7 @@ test('altered or missing projection withholds UI and AI values even with copied 
 test('AI demo is explicit, matching-page only and never a cohort baseline or intervention estimate',()=>{
  for(const page of ['home','workforce','workforce-planning','__proto__'])assert.equal(syntheticDomainDemoPrompt(page,'Explain the simulated demo'),'');
  for(const request of ['Forecast turnover for France','Use current hiring as a planning baseline','Summarize my goal'])assert.equal(syntheticDomainDemoPrompt('attrition',request),'');
- for(const [page,domain] of [['attrition','turnover'],['talent-acquisition','hiring'],['survey-sentiment','satisfaction']]){const p=syntheticDomainDemoPrompt(page,'Explain the simulated demo projections');assert.match(p,new RegExp('"domain":"'+domain+'"'));assert.match(p,/independent of the selected country/);assert.match(p,/Never use these outputs as a filtered plan baseline/);assert.match(p,/avoided exits, added capacity, savings, ROI or an intervention effect/);assert.match(p,/interval.*null/);assert.match(p,/do not infer a winner/);}
+ for(const [page,domain] of [['attrition','turnover'],['talent-acquisition','hiring'],['survey-sentiment','satisfaction']]){const p=syntheticDomainDemoPrompt(page,'Explain the simulated demo projections');assert.match(p,new RegExp('"domain":"'+domain+'"'));assert.match(p,/independent of the selected country/);assert.match(p,/Never use these outputs as a filtered plan baseline/);assert.match(p,/avoided exits, added capacity, savings, ROI or an intervention effect/);assert.match(p,/interval.*null/);assert.match(p,/do not infer future superiority/);}
 });
 
 test('verified history preserves original population, release cutoff, gaps and native units',async()=>{
