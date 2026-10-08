@@ -31,11 +31,22 @@ Future acceptance must distinguish three separate conditions:
   1,080 capacity hours, a 360-hour gap, one-third additional FTE and one whole role.
 
 The existing clarified continuation fixture and its pinned historical manifest
-remain unchanged. Its original fully specified synthetic test remains valid for
-that lane; it is not a rule that every intermediate review must be calculated.
-The new incomplete-lane test explicitly leaves `acceptedForScenario` false.
-Any later private executor must incorporate these stage expectations and bind a
-new source/fixture identity rather than reuse a closed run or its manifest.
+remain unchanged. The executable successor is
+`tests/fixtures/swp-period-contract-continuation.mjs`, with its mandatory checks
+and portable driver in `tests/helpers/swp-period-contract-continuation.mjs`.
+`runPeriodContractContinuation` runs the actual service against a caller-supplied
+completion transport, validates each reply before advancing, retains unknowns and
+stops on failed checks or receipt writes. It neither creates a provider client nor
+supplies execution authorization. All requests leave `acceptedForScenario` false
+and staffing comparison null. Final review arithmetic is recomputed from its own
+specification; tests include different assumptions and a zero gap.
+
+The old `tests/helpers/swp-preview-acceptance.mjs` belongs to its historical
+diagnostic. Do not use its overstrict per-turn calculated check for this successor.
+Any later private executor must use the successor driver, bind the exact source,
+fixture and supplied preserved first reply, and obtain a new reservation. It must
+not reuse a closed run or manifest. Unknown budget and unreviewed staffing costs
+remain unknown; this driver does not substitute illustrative staffing costs.
 
 `tests/fixtures/swp-demand-period-failures.mjs` reproduces observed numeric values,
 periods and provenance kinds using synthetic explanations. Exact original
@@ -44,8 +55,23 @@ Tests use mocked model calls and explicit counterfactual corrected proposals;
 they establish no new real-model acceptance result.
 
 ```sh
-node --experimental-strip-types --test --test-isolation=none tests/swp-demand-period-contract.test.mjs tests/swp-demand-editor.test.mjs tests/swp-clarification-continuation.test.mjs
+node --experimental-strip-types --test --test-isolation=none tests/swp-demand-period-contract.test.mjs tests/swp-period-contract-continuation.test.mjs tests/swp-demand-editor.test.mjs tests/swp-clarification-continuation.test.mjs
 ```
+
+The clean executor should first verify the externally pinned source manifest:
+
+```sh
+node --experimental-strip-types tests/manual/verify-swp-period-contract-source.mjs MANIFEST_FILE_SHA256
+```
+
+Then import `runPeriodContractContinuation` and supply the separately verified
+private anchor, an authorized completion callback, an abort signal and a durable
+recorder. The callback receives `{index, request, input, finalOnly, signal}` and
+returns the existing `SolutionModelOutput` shape. Counting, exact model/profile,
+deadlines, allowed endpoints, source/run binding, no-retry policy and conservative
+budget accounting remain the executor's independently enforced responsibilities.
+The fixture grants none of that authority. Record source and anchor digests along
+with every turn; structural completion leaves semantic review pending.
 
 No provider call, deployment, data change, staffing execution or paid-run authority
 is part of this change.
