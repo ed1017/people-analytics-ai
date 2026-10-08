@@ -88,59 +88,69 @@ export function readPlanConversationProposal(raw:unknown,request:PlanConversatio
 }
 
 const words=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+const tens=['twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
 function literalNumber(raw:string):number {
  const value=raw.trim().toLowerCase();
  if(/^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d{1,2})?$/.test(value))return Number(value.replaceAll(',',''));
  if(words.includes(value))return words.indexOf(value);
- const parts=value.split(/[- ]/),tens=['twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+ const parts=value.split(/[- ]/);
  if(tens.includes(parts[0])&&parts.length<=2&&(parts.length===1||words.indexOf(parts[1])>0&&words.indexOf(parts[1])<10))return (tens.indexOf(parts[0])+2)*10+(parts.length===2?words.indexOf(parts[1]):0);
  return fail('Use an explicit number or number word for the proposed assumption. Nothing was saved.');
 }
 const numberContinuation=/^(?:(?:and|to|or|through)\s+)?(?:(?:a|an)\s+)?(?:\d|zero\b|one\b|two\b|three\b|four\b|five\b|six\b|seven\b|eight\b|nine\b|ten\b|eleven\b|twelve\b|thirteen\b|fourteen\b|fifteen\b|sixteen\b|seventeen\b|eighteen\b|nineteen\b|twenty\b|thirty\b|forty\b|fifty\b|sixty\b|seventy\b|eighty\b|ninety\b|hundred\b|thousand\b|million\b|billion\b|trillion\b|dozen\b|half\b|quarter\b|point\b)/i;
 const quantityUnits=/^(months?|years?|hours?|people|participants?|employees?|usd|dollars?)\b/i;
-const quantityContinuation=/^(on|for|with|and|but|while|to|in|over|as|instead|please|only|total|overall|altogether)\b/i;
 function quantityLocation(op:PlanConversationOperation,message:string) {
  const quoteAt=message.indexOf(op.quote);
  if(quoteAt!==message.lastIndexOf(op.quote))fail('Quote a unique complete quantity and its units before saving.');
  const offset=quoteAt+op.quote.indexOf(op.value!),before=message.slice(0,offset),tail=message.slice(offset+op.value!.length);
  if(/[\p{L}\p{N}\p{M}_+\-−–—/.,]$/u.test(before)||/^[\p{L}\p{N}\p{M}_+\-−–—/]|^[.,]\s*\d/u.test(tail))fail('Quote the complete literal quantity, not part of another number or word.');
- return {before,tail};
+ return {before,tail,offset,end:offset+op.value!.length};
+}
+/** A clause ends only at a separator introducing another quoted operation, never at a unit prefix. */
+function quantityTail(op:PlanConversationOperation,message:string,operations:PlanConversationOperation[]) {
+ const location=quantityLocation(op,message);
+ const next=operations.filter(item=>item!==op).map(item=>item.value===null?message.indexOf(item.quote):quantityLocation(item,message).offset).filter(offset=>offset>location.offset).sort((a,b)=>a-b)[0];
+ if(next===undefined)return location.tail.trim();
+ const between=message.slice(location.end,next),separators=[...between.matchAll(/[,;]\s*(?:(?:and|with)\b\s*)?|[.!?]\s+|\b(?:and|with)\b/gi)],separator=separators.at(-1);
+ if(!separator)fail('Separate each complete assumption into a clear clause before saving.');
+ return between.slice(0,separator.index).trim();
+}
+function completeQuantityTail(tail:string) {
+ // These phrases do not change a quantity's currency, duration or dimensional basis.
+ if(!/^(?:(?:on|for) this(?: plan)?|for coordination|in total|total|overall|altogether|please|only|instead)?\s*[.!?]*$/i.test(tail.trim()))fail('The quoted units or trailing quantity modifiers are unsupported. Review the complete quantity before saving.');
 }
 /** Consume complete literals and only supported units. Unknown unit words never mean unitless. */
-function quantityUnit(op:PlanConversationOperation,message:string):string {
- const {before,tail}=quantityLocation(op,message);
- const after=tail.trim();
+function quantityUnit(op:PlanConversationOperation,message:string,operations:PlanConversationOperation[]):string {
+ const {before}=quantityLocation(op,message),after=quantityTail(op,message,operations);
  if(numberContinuation.test(after)||/^[+\-−–—/×*±]/.test(after))fail('The quantity has an unsupported continuation or range. Review the complete quantity before saving.');
  const match=after.match(quantityUnits),unit=match?.[0].toLowerCase()??'';
- // Clause punctuation or a short grammatical continuation may follow a complete bare value.
- // Every other word (e.g. quarters, AUD, thousand) requires clarification, not guessed units.
- if(after&&!unit&&!/^[.,;!?)\]]/.test(after)&&!quantityContinuation.test(after))fail('The quoted units are unsupported. Review the units before saving.');
- const rest=match?after.slice(match[0].length).trim():'';
+ let rest=match?after.slice(match[0].length).trim():after;
  if(numberContinuation.test(rest)||/^[+\-−–—/×*±]/.test(rest))fail('The quantity has an unsupported continuation or range. Review the complete quantity before saving.');
- if(/^(per|each|every)\b/i.test(rest)&&!(op.field==='hours_per_participant'&&/^per (person|participant)\b/i.test(rest)))fail('Review the quantity basis before saving; no per-period or per-group conversion is inferred.');
+ if(op.field==='hours_per_participant')rest=rest.replace(/^per (?:person|participant)\b\s*/i,'');
  const allowed=op.field==='horizon_months'?/^(months?|years?)$/:op.field==='participants'?/^(people|participants?|employees?)$/:op.field.includes('usd')?/^(usd|dollars?)$/:/^hours?$/;
  if(unit&&!allowed.test(unit))fail('The quoted units do not match the supported assumption. Review the units before saving.');
  if(op.field.includes('usd')){
   const prefix=before.match(/\b([A-Za-z]{3})\s*(?:\$\s*)?$/)?.[1].toLowerCase(),dollarPrefix=before.match(/\b([A-Za-z]{1,3})\s*\$\s*$/)?.[1].toLowerCase();
-  const suffix=after.match(/^[([]\s*([A-Za-z]{3})\b/)?.[1].toLowerCase();
   const grammar=['fee','cap','max','min','the','our','for','set','use','add','pay','has','was','now','its','new','old','all','say','not'];
   const dollarQualifiers=[...message.matchAll(/\b([A-Za-z]+)\s+dollars?\b/gi)].map(item=>item[1].toLowerCase());
-  if(prefix&&prefix!=='usd'&&!grammar.includes(prefix)||dollarPrefix&&!['us','usd'].includes(dollarPrefix)||suffix&&suffix!=='usd'||dollarQualifiers.some(word=>!['us','usd'].includes(word))||[...message.matchAll(/\p{Sc}/gu)].some(item=>item[0]!=='$'))fail('The quoted currency is unsupported. Only the saved plan’s USD basis is supported.');
+  if(prefix&&prefix!=='usd'&&!grammar.includes(prefix)||dollarPrefix&&!['us','usd'].includes(dollarPrefix)||dollarQualifiers.some(word=>!['us','usd',...words,...tens].includes(word))||[...message.matchAll(/\p{Sc}/gu)].some(item=>item[0]!=='$'))fail('The quoted currency is unsupported. Only the saved plan’s USD basis is supported.');
+  rest=rest.replace(/^(?:\(\s*USD\s*\)|in\s+USD\b|USD\b)\s*/i,'');
  }
+ completeQuantityTail(rest);
  return unit;
 }
-function inputValue(op:PlanConversationOperation,message=op.quote):Assumption<number|string> {
+function inputValue(op:PlanConversationOperation,message=op.quote,operations:PlanConversationOperation[]=[op]):Assumption<number|string> {
  if(op.value===null){if(!/\b(unknown|unconfirmed|not known)\b/i.test(op.quote))fail('Unknown must be explicitly requested. Nothing was saved.');return unknownAssumption();}
  let value:number|string;
  if(op.field==='start_month'){
-  quantityLocation(op,message);
+  completeQuantityTail(quantityTail(op,message,operations));
   const named=op.value.match(/^([A-Za-z]+) (\d{4})$/),months=['january','february','march','april','may','june','july','august','september','october','november','december'];
   const index=named?months.findIndex(month=>month===named[1].toLowerCase()||month.slice(0,3)===named[1].toLowerCase()):-1;
   value=named&&index>=0?`${named[2]}-${String(index+1).padStart(2,'0')}`:op.value;
   if(!/^20\d\d-(0[1-9]|1[0-2])$/.test(value))fail('Review an explicit month and year. Nothing was saved.');
  }else{
   value=literalNumber(op.value);
-  const unit=quantityUnit(op,message);
+  const unit=quantityUnit(op,message,operations);
   if(op.field==='horizon_months'&&/^years?$/.test(unit))value*=12;
   const max=op.field==='horizon_months'?120:op.field.includes('usd')?1e9:1e6;
   if(value<0||value>max||['horizon_months','participants'].includes(op.field)&&!Number.isInteger(value)||op.field==='horizon_months'&&value<1)fail('The proposed assumption is outside the supported range. Nothing was saved.');
@@ -153,7 +163,7 @@ function revisedDraft(source:BundleDraft,operations:PlanConversationOperation[],
  // The existing staffing model has coupled inputs. Do not partially edit those via this slice.
  if(input.capacity||input.whatIf?.kind==='capacity')fail('Use the existing staffing controls to revise this coupled staffing plan. Nothing was saved.');
  for(const op of operations){
-  const value=inputValue(op,message),numeric=value as Assumption<number>;
+  const value=inputValue(op,message,operations),numeric=value as Assumption<number>;
   if(!['participants','cash_allowance_usd'].includes(op.field)&&op.targetId!==null)fail('This assumption does not accept a target ID.');
   switch(op.field){
    case 'budget_usd': input.budget={amount:numeric,basis:{value:'cash',kind:'user-entered',basis:'Reviewed cash ceiling; not an expense or approved funding.'}};break;
@@ -173,10 +183,10 @@ function revisedDraft(source:BundleDraft,operations:PlanConversationOperation[],
  return draft;
 }
 
-function changeDescription(source:BundleDraft,op:PlanConversationOperation,message:string) {
+function changeDescription(source:BundleDraft,op:PlanConversationOperation,message:string,operations:PlanConversationOperation[]) {
  const input=source.inputs,group=input.groups.find(item=>item.id===op.targetId),expense=input.expenses.find(item=>item.id===op.targetId);
  const fields={budget_usd:['Cash ceiling (USD)',input.budget?.amount.value],horizon_months:['Shared horizon (months)',input.scope.months.value],start_month:['Shared start month',input.scope.startMonth.value],participants:[(group?.label??'Participant group')+' count',group?.count.value],hours_per_participant:['Hours per participant',input.deliveryEstimate?.hoursPerParticipant.value],coordination_hours:['Coordination hours',input.deliveryEstimate?.coordinationHours.value],cash_allowance_usd:[(expense?.label??'Cash allowance')+' (USD)',expense?.amount.value]};
- const [label,before]=fields[op.field];return `${label}: ${before??'Unknown'} → ${inputValue(op,message).value??'Unknown'}. Your request: “${op.quote}”.`;
+ const [label,before]=fields[op.field];return `${label}: ${before??'Unknown'} → ${inputValue(op,message,operations).value??'Unknown'}. Your request: “${op.quote}”.`;
 }
 
 export function previewPlanConversation(request:PlanConversationRequest,raw:unknown,review:CombinationReview={}):PlanConversationPreview {
@@ -193,7 +203,7 @@ export function previewPlanConversation(request:PlanConversationRequest,raw:unkn
   if(combined.status!=='ready')return {kind:'clarify',question:combined.questions.join(' ')};
   if(!equal(combined.draft.inputs.whatIf??null,left.whatIf??null)||!equal(combined.draft.inputs.successMeasure??null,left.successMeasure??null))return {kind:'clarify',question:'The current combination cannot preserve the saved outcome scenario and its provenance. Keep the source plans separate and review that scenario before combining.'};
   draft=combined.draft;notes=combined.notes;
- }else{draft=revisedDraft(sources[0].draft,proposal.operations,request.text);notes=proposal.operations.map(op=>changeDescription(sources[0].draft,op,request.text));}
+ }else{draft=revisedDraft(sources[0].draft,proposal.operations,request.text);notes=proposal.operations.map(op=>changeDescription(sources[0].draft,op,request.text,proposal.operations));}
  const months=draft.inputs.scope.months.value,start=draft.inputs.scope.startMonth.value;
  if(start&&months){const [year,month]=start.split('-').map(Number),end=new Date(Date.UTC(year,month-1+months,0)).toISOString().slice(0,10);if(draft.inputs.timing.some(item=>item.finish.value&&item.finish.value>end||item.start.value&&item.start.value<start+'-01'))return {kind:'clarify',question:'The saved activity dates fall outside the proposed horizon. Review their timing in the existing controls before saving.'};}
  const result=reconcileBundle(draft);

@@ -35,6 +35,21 @@ const cases=[
  ['AUD prefix','Budget AUD 9000.','budget_usd','9000','AUD 9000',null],
  ['lowercase aud','Budget aud 9000.','budget_usd','9000','aud 9000',null],
  ['parenthetical AUD','Budget 9000 (AUD).','budget_usd','9000','9000 (AUD)',null],
+ ['AUD after dollars','Budget 9000 dollars (AUD).','budget_usd','9000','9000 dollars (AUD)',null],
+ ['AUD after dollars in','Budget 9000 dollars in AUD.','budget_usd','9000','9000 dollars in AUD',null],
+ ['short quote cannot hide trailing currency','Budget 9000 dollars (AUD).','budget_usd','9000','9000 dollars',null],
+ ['USD with trailing foreign currency','Budget 9000 USD (AUD).','budget_usd','9000','9000 USD',null],
+ ['foreign currency after comma','Budget 9000 dollars, in AUD.','budget_usd','9000','9000 dollars',null],
+ ['foreign currency after semicolon','Budget 9000 dollars; in AUD.','budget_usd','9000','9000 dollars',null],
+ ['unknown trailing currency modifier','Budget 9000 dollars denominated in AUD.','budget_usd','9000','9000 dollars',null],
+ ['weekly participant hours','Allow 4 hours per person per week.','hours_per_participant','4','4 hours per person per week',null],
+ ['monthly participant hours','Allow 4 hours per participant each month.','hours_per_participant','4','4 hours per participant',null],
+ ['parenthetical weekly basis','Allow 4 hours per person (weekly).','hours_per_participant','4','4 hours',null],
+ ['weekly basis after comma','Allow 4 hours per person, per week.','hours_per_participant','4','4 hours per person',null],
+ ['weekly basis after purpose','Allow 4 hours for coordination per week.','coordination_hours','4','4 hours for coordination',null],
+ ['weekly basis after slash','Allow 4 hours per person/week.','hours_per_participant','4','4 hours per person',null],
+ ['headcount basis after punctuation','Use 20 participants, per team.','participants','20','20 participants','people'],
+ ['ambiguous alternative amount','Budget 9000, perhaps 8000.','budget_usd','9000','Budget 9000',null],
  ['JPY suffix','Budget 9000 JPY.','budget_usd','9000','9000 JPY',null],
  ['JPY prefix','Budget JPY 9000.','budget_usd','9000','JPY 9000',null],
  ['rupee symbol','Budget ₹9000.','budget_usd','9000','₹9000',null],
@@ -55,6 +70,39 @@ for(const literal of ['twenty-one','twenty one'])test('review: complete '+litera
 test('review: two years still converts to 24 months',()=>{const req=request('Run this for two years.'),p=previewPlanConversation(req,proposal('revise',['A'],[operation('horizon_months','two','two years')]));assert.equal(p.draft.inputs.scope.months.value,24);});
 test('review: supported bare, USD and dollar inputs retain their basis',()=>{
  for(const [message,quote] of [['Budget 9000.','9000'],['Budget 9000 USD.','9000 USD'],['Budget USD 9000.','USD 9000'],['Budget $9000.','$9000'],['Budget 9000 dollars.','9000 dollars']]){const req=request(message),p=previewPlanConversation(req,proposal('revise',['A'],[operation('budget_usd','9000',quote)]));assert.equal(p.draft.inputs.budget.amount.value,9000);assert.equal(p.draft.inputs.scope.currency,'USD');}
+});
+for(const [literal,amount] of [['fifty',50],['twenty-one',21],['twenty one',21],['ninety',90]])test('review: complete '+literal+' dollars is a supported cash allowance',()=>{
+ const req=request(`Cash allowance should be ${literal} dollars.`),before=JSON.stringify(req.catalog),p=proposal('revise',['A'],[operation('cash_allowance_usd',literal,`${literal} dollars`,'fee')]);
+ const preview=previewPlanConversation(req,p),out=savePlanConversation(req.catalog,req,p);assert.equal(preview.kind,'proposal');assert.equal(out.plan.result.cashEstimate.cash,amount);assert.equal(out.plan.draft.inputs.budget.amount.value,10000);assert.equal(JSON.stringify(req.catalog),before);
+});
+for(const suffix of ['dollars (USD)','dollars in USD','(USD)'])test('review: explicit '+suffix+' is supported',()=>{
+ const req=request(`Budget 9000 ${suffix}.`),p=previewPlanConversation(req,proposal('revise',['A'],[operation('budget_usd','9000',`9000 ${suffix}`)]));assert.equal(p.kind,'proposal');assert.equal(p.draft.inputs.budget.amount.value,9000);
+});
+for(const [message,first,second] of [
+ ['Budget 8000 USD and 25 participants.','8000 USD','25 participants'],
+ ['Budget 8000 USD, with 25 participants.','8000 USD','25 participants'],
+ ['Budget 8000 dollars; use twenty-five participants.','8000 dollars','twenty-five participants'],
+ ['Use 25 participants and budget 8000 USD.','8000 USD','25 participants'],
+])test('review: independently quoted compound assumptions save atomically: '+message,()=>{
+ const req=request(message),before=JSON.stringify(req.catalog),count=second.startsWith('twenty')?'twenty-five':'25',p=proposal('revise',['A'],[operation('budget_usd','8000',first),operation('participants',count,second,'people')]);
+ const out=savePlanConversation(req.catalog,req,p);assert.equal(out.plan.draft.inputs.budget.amount.value,8000);assert.equal(out.plan.draft.inputs.groups[0].count.value,25);assert.equal(out.plan.result.deliveryEstimate.hours,58);assert.equal(out.catalog.plans.length,4);assert.equal(out.plan.applied,false);assert.equal(out.catalog.attachments.length,0);assert.equal(JSON.stringify(req.catalog),before);
+});
+test('review: adjacent word-dollar amounts remain independent supported cash fields',()=>{
+ const req=request('Cash allowance should be fifty dollars, and budget 8000 dollars.'),p=proposal('revise',['A'],[operation('cash_allowance_usd','fifty','fifty dollars','fee'),operation('budget_usd','8000','8000 dollars')]);const out=savePlanConversation(req.catalog,req,p);assert.equal(out.plan.result.cashEstimate.cash,50);assert.equal(out.plan.draft.inputs.budget.amount.value,8000);
+});
+test('review: compound dimensions accept each complete basis and compute hours',()=>{
+ const req=request('Allow four hours per person and six hours for coordination.'),p=proposal('revise',['A'],[operation('hours_per_participant','four','four hours per person'),operation('coordination_hours','six','six hours for coordination')]);const out=savePlanConversation(req.catalog,req,p);assert.equal(out.plan.result.deliveryEstimate.hours,46);
+});
+test('review: every supported acceptance-plan clause survives complete-tail validation',()=>{
+ const req=request('Start this plan in October 2026, run it for two years, allow four hours per person, and set the Test delivery fee to 2400 USD.'),p=proposal('revise',['A'],[operation('start_month','October 2026','October 2026'),operation('horizon_months','two','two years'),operation('hours_per_participant','four','four hours per person'),operation('cash_allowance_usd','2400','2400 USD','fee')]);const out=savePlanConversation(req.catalog,req,p);assert.equal(out.plan.draft.inputs.scope.months.value,24);assert.equal(out.plan.result.deliveryEstimate.hours,48);assert.equal(out.plan.result.cashEstimate.cash,2400);
+});
+for(const [message,field,value,quote,targetId] of [
+ ['Budget 9000 dollars (AUD) and 25 participants.','budget_usd','9000','9000 dollars',null],
+ ['Budget 9000 dollars in AUD, with 25 participants.','budget_usd','9000','9000 dollars',null],
+ ['Allow 4 hours per person per week and 25 participants.','hours_per_participant','4','4 hours per person',null],
+ ['Allow 4 hours per person, per week, and 25 participants.','hours_per_participant','4','4 hours per person',null],
+])test('review: another valid operation cannot hide an unsupported modifier: '+message,()=>{
+ const req=request(message),before=JSON.stringify(req.catalog),p=proposal('revise',['A'],[operation(field,value,quote,targetId),operation('participants','25','25 participants','people')]);assert.throws(()=>previewPlanConversation(req,p));assert.throws(()=>savePlanConversation(req.catalog,req,p));assert.equal(JSON.stringify(req.catalog),before);
 });
 test('review: matching illustrative baseline and entered target cannot silently disappear',()=>{
  const c=conversationCatalog();for(const source of c.plans.slice(0,2)){const scenario=initialWhatIf(c.goal,source.draft.inputs);scenario.target=entered(9);source.draft.inputs.whatIf=scenario;source.result=reconcileBundle(source.draft);assert.ok(readBundleDraft(source.draft));}

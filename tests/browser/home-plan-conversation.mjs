@@ -75,11 +75,18 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  for(const [message,field,value,quote,error] of [
   ['Use twenty-one participants.','participants','twenty','twenty-one participants',/Quote the complete literal quantity/],
   ['Use ten thousand participants.','participants','ten','ten thousand participants',/quantity has an unsupported continuation/],
-  ['Run this for 2 quarters.','horizon_months','2','2 quarters',/quoted units are unsupported/],
-  ['Budget 9000 AUD.','budget_usd','9000','9000 AUD',/quoted units are unsupported/],
+  ['Run this for 2 quarters.','horizon_months','2','2 quarters',/quoted units.*unsupported/],
+  ['Budget 9000 AUD.','budget_usd','9000','9000 AUD',/quoted units.*unsupported/],
+  ['Budget 9000 dollars (AUD).','budget_usd','9000','9000 dollars',/quoted units.*unsupported/],
+  ['Budget 9000 dollars in AUD.','budget_usd','9000','9000 dollars',/quoted units.*unsupported/],
+  ['Allow 4 hours per person per week.','hours_per_participant','4','4 hours per person',/quoted units.*unsupported/],
  ]){
   injectedResponse=(_body,selected)=>proposal('revise',[selected.id],[operation(field,value,quote,field==='participants'?selected.draft.inputs.groups[0].id:null)]);
   await send(message);await page.getByText(error).last().waitFor();check(mode+' rejects incomplete or unsupported model quantity: '+message,await input.inputValue()===message&&await review.count()===0&&JSON.stringify(await catalog())===retained);
+ }
+ for(const message of ['Cash allowance should be fifty dollars.','Budget 8000 USD and 25 participants.']){
+  injectedResponse=(_body,selected)=>proposal('revise',[selected.id],message.startsWith('Cash')?[operation('cash_allowance_usd','fifty','fifty dollars',selected.draft.inputs.expenses.find(item=>item.kind==='cash').id)]:[operation('budget_usd','8000','8000 USD'),operation('participants','25','25 participants',selected.draft.inputs.groups[0].id)]);
+  await send(message);await review.waitFor();check(mode+' complete supported quantity reaches explicit review: '+message,await button('Save as new alternative').isEnabled()&&JSON.stringify(await catalog())===retained);await button('Cancel proposal').click();
  }
  for(const [message,ids] of [['What are the assumptions in this plan?',['B']],['Compare Action Plan #1 and #2.',['A','B','C']]]){
   injectedResponse=()=>proposal('compare',ids);await send(message);await page.getByText(/response does not match the requested current plan references/).last().waitFor();check(mode+' rejects wrong comparison identity: '+message,await input.inputValue()===message&&await review.count()===0&&JSON.stringify(await catalog())===retained);
