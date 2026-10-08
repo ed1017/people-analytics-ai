@@ -13,13 +13,20 @@ const js=await fs.readFile(path.join(output,'fixture.js'),'utf8');assert(!js.inc
 const html=`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style></head><body><div id="root"></div><script>${js.replaceAll('</script','<\\/script')}</script></body></html>`;
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
 let checks=0;const check=(name,v)=>{assert(v,name);checks++};await fs.mkdir('/tmp/calibrated-ta',{recursive:true});
-try{for(const [name,width,height] of [['desktop',1366,900],['mobile',390,844],['small-mobile',320,740],['zoom',683,450]]){
+try{for(const [name,width,height] of [['wide',1844,1100],['desktop',1366,900],['mobile',390,844],['small-mobile',320,740],['zoom',683,450]]){
  const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),errors=[];let calls=0;
  page.on('pageerror',e=>errors.push(e.message));await page.route('**/*',route=>{if(route.request().url()==='http://fixture.local/')return route.fulfill({contentType:'text/html',body:html});calls++;return route.abort()});await page.goto('http://fixture.local/');
  const figure=page.getByRole('figure',{name:'Active requisitions: synthetic history and forecasts'});
  await figure.waitFor();check(name+' source version',await page.locator('[data-source-version="synthetic-ta-calibrated-v2"]').count()===1);
  check(name+' modeled assumption visible',await page.getByText(/Modeled stage attainment · Screening assumed/).isVisible());
  check(name+' compact chart',await figure.locator('svg[role=group]').evaluate(n=>n.getBoundingClientRect().height===214));
+ await page.waitForFunction(()=>{const svg=document.querySelector('svg[aria-label="Requisition counts by month"]');return Math.abs(svg.width.baseVal.value-Math.max(760,svg.parentElement.clientWidth))<=1});
+ check(name+' plot fills allocated width',await figure.locator('svg[role=group]').evaluate(n=>Math.abs(n.getBoundingClientRect().width-Math.max(760,n.parentElement.clientWidth))<=1));
+ const activePanel=figure.locator('xpath=ancestor::section[1]'),comparison=activePanel.getByRole('table',{name:'Projected active requisitions at month-end',exact:true});
+ check(name+' honest methods and December summary',await activePanel.getByText('3 prediction methods',{exact:true}).isVisible()&&await comparison.getByRole('columnheader',{name:'Dec 2026',exact:true}).isVisible());
+ for(const [label,key] of [['Last count','carryForward'],['Recent mean (3)','recentMean'],['Damped change','dampedChange']]){const value=await comparison.getByRole('row').filter({has:page.getByRole('rowheader',{name:label,exact:true})}).getByRole('cell').innerText();check(name+' summary matches plotted '+key,(await figure.locator(`[data-forecast-method="${key}"]`).last().getAttribute('aria-label')).includes(value+' active requisitions'));}
+ const split=await comparison.evaluate(n=>{const table=n.parentElement.getBoundingClientRect(),chart=n.closest('section').querySelector('figure').getBoundingClientRect();return {table:table.toJSON(),chart:chart.toJSON()}});
+ check(name+' compact responsive split',split.chart.top>=split.table.bottom||(split.table.width<=340&&split.chart.width>split.table.width));
  check(name+' preserved headlines',await page.getByText('62,104',{exact:true}).count()>0&&await page.getByText('Current-status Open Requisitions',{exact:true}).isVisible()&&await page.getByText('475',{exact:true}).isVisible());
  check(name+' six actual shapes',await page.locator('polygon').count()===6);
  check(name+' no viewport overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));

@@ -1,8 +1,9 @@
+import {SyntheticDomainPrediction} from '@/components/synthetic-domain-prediction';
 import {CalibratedTaPanels} from "@/components/calibrated-ta-panels";
 import artifact from '@/lib/data/synthetic-domain-demo-v1.json';
 import {homeForecastChartDomain} from '@/lib/home-forecast';
 import {resolveSyntheticDomainDemo,demoDomainCopy,type SyntheticDemoDomain} from '@/lib/synthetic-domain-demo';
-import {SyntheticDomainChart,SyntheticDomainChartNotes} from '@/components/synthetic-domain-chart';
+import {SyntheticDomainChartNotes} from '@/components/synthetic-domain-chart';
 function HomeForecastDetails({domain,data}:{domain:SyntheticDemoDomain;data:typeof artifact}){
  return <details><summary className="min-h-11 cursor-pointer py-2 text-xs font-medium focus-visible:ring-2 focus-visible:ring-ring">Details</summary><div className="space-y-2 break-words text-xs">
   <p>Fixed simulated company-wide population, separate from recorded workforce evidence. Your goal and workforce filters do not change these values. Operational forecasts are unavailable.</p>
@@ -19,7 +20,7 @@ export function HomeForecastChart({question,answer,taReady=false}:{question:stri
  const domain=homeForecastChartDomain(question,answer);if(!domain)return null;
  if(domain==="hiring")return !taReady?null:<div className="my-3"><CalibratedTaPanels chartOnly /></div>;
  return <section aria-label="Turnover projection for this answer" className="my-3 min-w-0 rounded-lg border p-3">
-  <SyntheticDomainChart domain={domain} data={artifact}/>
+  <SyntheticDomainPrediction domain={domain} data={artifact}/>
   <HomeForecastDetails domain={domain} data={artifact}/>
  </section>;
 }
@@ -29,7 +30,7 @@ export function HomeStarterForecastChart({domain,taReady=false}:{domain:Syntheti
  if(domain==="hiring")return !taReady?null:<div className="my-3"><CalibratedTaPanels chartOnly /></div>;
  const view=resolveSyntheticDomainDemo(artifact);if(view.status!=='ready'||view.data.domains[domain].status!=='predicted')return null;
  return <section aria-label={`${domain[0].toUpperCase()+domain.slice(1)} projection for this starter`} className="my-3 min-w-0 rounded-lg border p-3">
-  <SyntheticDomainChart domain={domain} data={view.data}/>
+  <SyntheticDomainPrediction domain={domain} data={view.data}/>
   <HomeForecastDetails domain={domain} data={view.data}/>
  </section>;
 }

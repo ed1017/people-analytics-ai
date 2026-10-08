@@ -41,6 +41,13 @@ try {
    check(prefix+' compact disclosure defaults closed',await details.count()===1&&!await details.evaluate(n=>n.open)&&await summary.innerText()==='Details'&&await summary.evaluate(n=>n.getBoundingClientRect().height>=44));
    check(prefix+' no repeated caveats outside Details',!(await panel.innerText()).match(/DEMO|Methods unselected|Filters excluded|Intervals unavailable|× means|Hover, focus/)&&await figure.getByText(/Simulated projections/).isVisible());
    check(prefix+' shorter chart keeps unscaled text',await figure.locator('svg[role=img]').evaluate(n=>n.getBoundingClientRect().height<=261));
+   const summaryTable=panel.locator('table').first();
+   check(prefix+' honest method count',await panel.getByText('3 prediction methods',{exact:true}).isVisible()&&!/Top 3 prediction methods/.test(await panel.innerText()));
+   check(prefix+' every projection month retained',await summaryTable.locator('thead th').count()===artifact.domains[domain].rows.length+1&&await summaryTable.locator('tbody tr').count()===3);
+   const split=await summaryTable.evaluate(n=>{const table=n.parentElement.getBoundingClientRect(),chart=n.closest('section').querySelector('figure').getBoundingClientRect();return {table:table.toJSON(),chart:chart.toJSON()}});
+   if(split.chart.top<split.table.bottom)check(prefix+' compact summary leaves most width to chart',split.table.width<=(domain==='satisfaction'?257:385)&&split.chart.width>split.table.width);
+   else check(prefix+' narrow layout stacks without clipping',split.chart.top>=split.table.bottom&&await summaryTable.evaluate(n=>n.parentElement.clientWidth<=innerWidth));
+   if(palette==='light'&&['wide','desktop','mobile'].includes(name)&&domain!=='hiring')await panel.screenshot({path:`${screenshotDirectory}/${name}-${domain}-panel.png`});
    for(let repeat=0;repeat<3;repeat++){
     await summary.focus();await page.keyboard.press(repeat%2?'Space':'Enter');
     check(prefix+' keyboard Details opens '+repeat,await details.evaluate(n=>n.open)&&await details.getByText(/× means no value, not zero/).isVisible()&&await details.getByText(/none is designated as preferred/).isVisible()&&await details.getByRole('link',{name:'Source methods and complete comparisons'}).isVisible());
@@ -87,6 +94,7 @@ try {
   check(name+palette+' all Home projection surfaces',await homePanels.count()===3 && await page.locator('[data-source-version="synthetic-ta-calibrated-v2"]').count()===1);
   for(const panel of await homePanels.all()){
    const summary=panel.locator('summary');
+   check(name+palette+' Home has same three-method summary',await panel.getByText('3 prediction methods',{exact:true}).isVisible()&&await panel.locator('table tbody tr').count()===3);
    check(name+palette+' Home closed details and simulation label',!await panel.locator('details').evaluate(n=>n.open)&&await panel.getByText(/Simulated projections/).isVisible()&&!/Intervals unavailable|Methods unselected|Goal and filters excluded/.test(await panel.innerText()));
    for(let repeat=0;repeat<3;repeat++){await summary.focus();await page.keyboard.press('Enter');check(name+palette+' Home disclosure evidence',await panel.getByText(/Cutoff 30 Sep 2026/).isVisible()&&await panel.getByText(/Constructed synthetic demonstration/).isVisible()&&await panel.getByText(/none is designated as preferred/).isVisible());await page.keyboard.press('Space');}
   }

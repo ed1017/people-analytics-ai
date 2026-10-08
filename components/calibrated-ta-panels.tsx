@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import {taExtension, type TaExtension} from '@/lib/synthetic-ta/extension';
 
 const count = (value: number | null) => value === null ? 'Unavailable' : value.toLocaleString('en-US');
@@ -13,19 +13,42 @@ const methods = [
 
 export function CalibratedTaPanels({ data = taExtension, chartOnly = false }: { data?: TaExtension; chartOnly?: boolean }) {
   const panelId = useId();
+  const chartContainer = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(760);
+  useEffect(() => {
+    const node = chartContainer.current;
+    if (!node) return;
+    const observer = new ResizeObserver(entries => {
+      const next = Math.round(entries[0].contentRect.width);
+      if (next > 0) setContainerWidth(next);
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
   const [hover, setHover] = useState('Focus or hover a point for its month, method and count.');
   const history = data.history.slice(-12), forecasts = data.forecasts;
   const allMonths = [...history.map(r => r.month), ...forecasts.map(r => r.month)];
   const maximum = Math.ceil(Math.max(1, ...history.map(r => r.active ?? 0), ...forecasts.flatMap(r => methods.map(m => r[m.key]))) / 20) * 20;
-  const width = Math.max(760, allMonths.length * 38), x = (i: number) => 40 + i * (width - 60) / Math.max(1, allMonths.length - 1), y = (v: number) => 156 - v / maximum * 128;
+  const width = Math.max(760, containerWidth, allMonths.length * 38), x = (i: number) => 40 + i * (width - 60) / Math.max(1, allMonths.length - 1), y = (v: number) => 156 - v / maximum * 128;
   const stageTotal = data.stages[0].count;
+  const finalForecast = forecasts.at(-1);
   return <div className="min-w-0 space-y-3" data-source-version={data.version}>
     <section aria-labelledby={panelId+"-active"} className="rounded-lg border p-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2"><h2 id={panelId+"-active"} className="font-semibold">Active requisitions at month-end</h2><p className="text-sm"><strong>{count(data.active)}</strong> at cutoff · {count(data.onHold)} on hold</p></div>
-      <figure aria-label="Active requisitions: synthetic history and forecasts">
+      <div className="@container min-w-0">
+       <div className="grid min-w-0 items-start gap-3 @min-[58rem]:grid-cols-[18rem_minmax(0,1fr)]">
+        <div className="min-w-0 max-w-full overflow-x-auto">
+         <p className="text-xs font-semibold">3 prediction methods</p>
+         {finalForecast ? <table className="w-full text-xs">
+          <caption className="py-2 text-left font-medium">Projected active requisitions at month-end</caption>
+          <thead><tr className="border-b text-left"><th scope="col" className="py-2 pr-3">Method</th><th scope="col" className="whitespace-nowrap py-2 text-right">{new Date(finalForecast.month+'-01T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'})}</th></tr></thead>
+          <tbody>{methods.map(m=><tr key={m.key} className="border-b"><th scope="row" className="py-2 pr-3 text-left font-normal">{m.label}</th><td className="py-2 text-right tabular-nums">{count(finalForecast[m.key])}</td></tr>)}</tbody>
+         </table> : <p className="py-2 text-xs">Projected active requisitions unavailable.</p>}
+        </div>
+      <figure className="min-w-0" aria-label="Active requisitions: synthetic history and forecasts">
         <div className="flex flex-wrap gap-x-4 gap-y-1 py-2 text-xs" aria-label="Chart legend"><span>● Synthetic history</span>{methods.map(m => <span key={m.key} className="inline-flex items-center gap-1"><svg width="28" height="12" aria-hidden="true"><line x1="0" x2="28" y1="6" y2="6" stroke={m.color} strokeWidth="2" strokeDasharray={m.dash} /></svg>{m.label} forecast</span>)}</div>
         <p className="mb-1 text-xs text-muted-foreground sm:hidden">Scroll the chart to see all months.</p>
-        <div className="overflow-x-auto rounded focus-visible:outline-2" tabIndex={0} role="region" aria-label="Scrollable requisition chart; use arrow keys to scroll">
+        <div ref={chartContainer} className="overflow-x-auto rounded focus-visible:outline-2" tabIndex={0} role="region" aria-label="Scrollable requisition chart; use arrow keys to scroll">
           <svg width={width} height="214" viewBox={`0 0 ${width} 214`} className="block" role="group" aria-label="Requisition counts by month">
             {[0, maximum / 2, maximum].map(t => <g key={t}><line x1="36" x2={width - 12} y1={y(t)} y2={y(t)} stroke="currentColor" opacity=".12" /><text x="31" y={y(t) + 4} textAnchor="end" fill="currentColor" fontSize="12">{t}</text></g>)}
             {forecasts.length > 0 && <><line x1={x(history.length - .5)} x2={x(history.length - .5)} y1="14" y2="161" stroke="currentColor" strokeDasharray="3 3" /><text x={x(history.length - .5) + 4} y="14" fill="currentColor" fontSize="12">Forecast</text></>}
@@ -51,6 +74,8 @@ export function CalibratedTaPanels({ data = taExtension, chartOnly = false }: { 
         </div>
         <figcaption className="min-h-10 py-1 text-xs" aria-live="polite">{hover}</figcaption>
       </figure>
+       </div>
+      </div>
     </section>
 
     {!chartOnly && <section className="rounded-lg border p-3" aria-labelledby={panelId+"-funnel"}>
