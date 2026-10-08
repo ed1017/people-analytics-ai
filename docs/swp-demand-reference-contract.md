@@ -25,4 +25,50 @@ node tests/manual/replay-swp-recorded-reference-edit.mjs PRIVATE_REVIEW_PATH REV
 
 The last two scripts require private files supplied separately; none are embedded in this repository. Hashes verify exact bytes, not origin. The preserved anchor's model clarification was recorded; its conversation state was reconstructed offline and does not prove saved/reloaded UI state. The new reference arguments are derived from the recorded rejected edit, and all new follow-up tool calls/replies in offline fixtures are synthetic. The earlier paid failure remains failed/consumed. No independent forecast or real-world validation is claimed.
 
-Whole-app build limitation at preparation: Webpack compilation succeeds, but generated Next route types reject optional `Request` parameters in 21 inherited API routes. Those route files are byte-identical to the frozen predecessor. This source/fixture handoff does not suppress type checking or certify a production deployment; resolve that separate build boundary before deploying the whole application.
+## Narrow route-type build repair
+
+The reference-contract source at `b9dfcb6c4664ffbe636145f12a04bfb0b51923dc`
+compiled with Webpack but failed generated Next route type checking in 21 inherited
+API routes. Each declared `request?: Request`, producing `Request | undefined`,
+which does not satisfy Next's `ParamCheck<Request | NextRequest>` for the first
+argument. The repair declares `request: Request` in those 21 exports. Their
+transpiled JavaScript is byte-identical to the predecessor: handlers, authentication,
+validation, and dataset-wrapper behavior are preserved. The shared dataset router
+still supports an omitted request for existing direct JavaScript fixtures.
+
+The one internal TypeScript caller in the capability-agent route now forwards its
+original request to the scenario-modeler route. The existing request-scoped dataset
+binding is retained through the nested call. No synthetic request, header override,
+authentication change, type assertion, `any`, or type-check suppression was added.
+
+`npm run build -- --webpack` passes compilation, generated TypeScript checking,
+page generation and build traces. Webpack is the supported production compiler
+used for the predecessor's build check. The default Turbopack invocation could not
+resolve this isolated worktree's externally symlinked installed dependencies; no
+configuration was changed to work around it. No server was started.
+
+Twenty-nine synthetic offline route regressions pass: all 21 exported wrappers
+preserve dataset response headers and request-local context, reject stale headers
+before handlers, and retain legacy direct-call behavior; the capability source
+handoff forwards the exact original request and preserves validation without a
+provider invocation. Existing data-API mocks now use the real inherited dataset
+wrapper, retaining zero values and error-redaction checks. The 64 SWP tests,
+including synthetic reference continuation, pass unchanged. Focused lint and the
+current reference source-manifest verification pass separately.
+
+The current `swp-reference-source-manifest.json` is refreshed for this successor's
+route bytes and support files. Its model/fixture contract hashes and unarmed
+execution fields remain unchanged; older source manifests remain historical.
+PR185, the frozen predecessor, and the independent workload persistence commit
+`53aebee33960977455be9b3bc60a4918cd9d09d7` remain untouched. This is source-only
+publishing, without merge or deployment. Provider calls, credentials/access changes,
+database writes, and foreground desktop actions were never performed. Private
+anchor/recorded-edit replays were not rerun; synthetic continuation tests and the
+offline source verifier supply this repair's evidence.
+
+```sh
+npm run build -- --webpack
+node --experimental-strip-types --test --test-isolation=none tests/dataset-route-request.test.mjs tests/data-api-error.test.mjs
+node --test tests/swp-*.test.mjs
+node tests/manual/verify-swp-reference-source.mjs EXPECTED_MANIFEST_SHA256
+```

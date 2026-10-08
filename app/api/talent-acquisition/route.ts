@@ -89,6 +89,6 @@ async function handleGET() {
     return dataApiErrorResponse('talent-acquisition', error);
   }
 }
-export async function GET(request?: Request) {
+export async function GET(request: Request) {
   return withDatasetRequest(request, () => handleGET());
 }

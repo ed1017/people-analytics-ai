@@ -284,6 +284,6 @@ async function handleGET() {
   }
 }
 
-export async function GET(request?: Request) {
+export async function GET(request: Request) {
   return withDatasetRequest(request, () => handleGET());
 }

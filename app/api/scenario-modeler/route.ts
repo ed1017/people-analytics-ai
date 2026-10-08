@@ -362,7 +362,7 @@ async function handlePOST(
   }
 }
 
-export async function GET(request?: Request) {
+export async function GET(request: Request) {
   return withDatasetRequest(request, () => handleGET());
 }
 

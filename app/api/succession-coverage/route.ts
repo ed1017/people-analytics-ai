@@ -127,6 +127,6 @@ export async function GET(request: NextRequest) {
   return withDatasetRequest(request, () => handleGET(request));
 }
 
-export async function POST(request?: Request) {
+export async function POST(request: Request) {
   return withDatasetRequest(request, () => handlePOST());
 }

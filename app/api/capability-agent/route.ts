@@ -26,7 +26,7 @@ async function handlePOST(request:NextRequest){
  if(!client)return NextResponse.json({error:"The existing model connection is unavailable. Saved results remain intact."},{status:503});
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(new Error("Planner timed out.")),90000),signal=AbortSignal.any([request.signal,controller.signal]);
  try{
-  signal.throwIfAborted();const sourceResponse=await abortable(existingScenarioSource(),signal);if(!sourceResponse.ok)throw Error("Source unavailable");const source=await sourceResponse.json();
+  signal.throwIfAborted();const sourceResponse=await abortable(existingScenarioSource(request),signal);if(!sourceResponse.ok)throw Error("Source unavailable");const source=await sourceResponse.json();
   const result=await runCapabilityAgent(input,source,async(spec,s)=>{
    const response=await datasetAI(() => client.responses.create({model:CHAT_MODEL,...spec,include:["reasoning.encrypted_content"],input:spec.input as ResponseInput},{signal:s}));
    return {status:response.status,output:response.output,usage:response.usage??undefined} as AgentModelResponse;

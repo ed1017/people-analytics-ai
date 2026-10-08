@@ -17,6 +17,6 @@ async function handleGET() {
 
   return NextResponse.json(data);
 }
-export async function GET(request?: Request) {
+export async function GET(request: Request) {
   return withDatasetRequest(request, () => handleGET());
 }
