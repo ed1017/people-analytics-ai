@@ -1,0 +1,17 @@
+# Partial-change contract and offline verification
+
+A parameter-only edit identifies one exact saved or working revision and supplies only explicit typed quantity changes, each tied to the current user turn. `revise_parameters` accepts no strategy or activity fields. It copies the source bundle and inputs, applies the listed quantities plus current reviewed constraints, and uses the same strict calculator, shape, lineage, budget, hours, horizon and metric-reference checks as other evaluations. Omitted inputs retain their values, provenance and uncertainty. Participant changes preserve an existing shared cohort identity when all its members are targeted; membership changes otherwise recalculate only affected overlap assumptions. Working proposals with usable drafts can recover from calculation blocks through narrow corrections.
+
+New or substantive changes, including mixed strategy and timing changes, use `evaluate_candidate`. Its existing adaptation invalidation remains. Unresolved intent asks for clarification. Cancellation leaves caller state unchanged. No phrase matching was added. Model tool choice and interpretation remain semantic judgments requiring live verification; offline fixture tests do not prove those choices.
+
+Review, explicit selection/save, stale-source rejection, unknown acknowledgement, metric validation and operational Apply boundaries remain in place. No endpoint or normal build hook was added.
+
+Receipt transport serializes sanitized JSON into ASCII chunks capped at 3000 bytes, below the observed 4096-byte log-event truncation boundary. Every chunk includes a run/stage record ID, index, total count, byte length and whole-record SHA-256. `decodeReceipt` rejects missing, duplicate, mixed, malformed or corrupted chunks and verifies the entire record before parsing JSON. The private fsynced receipt remains the source artifact; the transport digest covers its compact JSON without the file's trailing newline. Provider receipts allowlist application-visible text and tool calls, omit reasoning/encrypted content and SDK envelopes, and keep existing text redaction/explicit truncation flags. They are not byte-for-byte SDK-response archives.
+
+## Proposed verification only — not armed
+
+The previous clock follow-up run is closed; its reservation must not be reused. No new run, reservation, provider request or deployment was made for this change.
+
+After explicit authorization and a newly source-bound reservation, use one isolated protected Preview build against this reviewed commit. First repeat only the three-turn fictional clock/deadline sequence, at most 12 count plus 12 generation calls under the existing per-pair ceilings. Require all receipt chunks to reassemble and verify before reviewing the answer. Compare the final plan against the exact fictional source: only the requested finish date may change; start date, activity, fee, coverage, participants, effort, original unknowns and lineage must remain. Confirm the model chose `revise_parameters`, current metric references resolve, and nothing was saved/applied. Stop on failure or ambiguous receipt recovery; never automatically redeploy or retry.
+
+Only after this narrow run passes, propose a separately bounded semantic suite covering quantity-only, mixed strategy+date, ambiguous reference and cancellation. The existing budget/authorization manifest in this historical harness is not approval for a new run and must be replaced by the next explicitly authorized contract before execution.

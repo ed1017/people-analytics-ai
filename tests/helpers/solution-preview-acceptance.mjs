@@ -1,3 +1,4 @@
+import {providerReceiptOutput} from './preview-receipt-log.mjs';
 /** Finite manually supervised Preview batch. Importing this module makes no calls. */
 import {createHash} from 'node:crypto';
 import {readFileSync, readdirSync} from 'node:fs';
@@ -38,7 +39,7 @@ export function batchPlan(name) {
   return {name, sequenceIds: [...ids], turns, countCalls: rounds, generationCalls: rounds, maxProviderCalls: rounds * 2, maxGenerationInputTokens: rounds * 100000, maxOutputTokens: rounds * 5000, reservedMicrousd: rounds * 81000};
 }
 export function sourceManifest(root) {
-  const files = ['package.json', 'package-lock.json', 'tests/helpers/solution-preview-acceptance.mjs', 'tests/manual/solution-preview-acceptance.mjs', 'tests/fixtures/fictional-solution-evaluation.mjs'];
+  const files = ['package.json', 'package-lock.json', 'tests/helpers/solution-preview-acceptance.mjs', 'tests/helpers/preview-receipt-log.mjs', 'tests/manual/solution-preview-acceptance.mjs', 'tests/fixtures/fictional-solution-evaluation.mjs'];
   function visit(dir) { for (const entry of readdirSync(join(root, dir), {withFileTypes: true})) { const path = dir + '/' + entry.name; if (entry.isDirectory()) visit(path); else if (/\.(?:ts|mjs)$/.test(path)) files.push(path); } }
   visit('lib'); return Object.fromEntries(files.sort().map(path => [path, sha256(readFileSync(join(root, path)))]));
 }
@@ -156,7 +157,7 @@ export async function runAcceptance({manifest, env, client, claim, record, now =
             emit('generation-' + pair, {currentTurn, pair, status: generated.response.status, requestId: safeId(generated.request_id), inputTokens: usage.input_tokens, outputTokens: usage.output_tokens});
             if (response.service_tier !== 'default' || response.status !== 'completed' || !Array.isArray(response.output)) stop('incomplete_or_tier');
             lastProviderOutput = {sha256: sha256(response.output), text: safeText(response.output_text, 6000), calls: response.output.filter(item => item.type === 'function_call').slice(0, 6).map(item => ({name: safeWord(item.name), arguments: safeText(item.arguments, 2000)}))};
-            emit('provider-output-' + pair, {currentTurn, pair, fixtureOnly: true, output: safeText(response.output, 70000), text: safeText(response.output_text, 20000)});
+            emit('provider-output-' + pair, {currentTurn, pair, fixtureOnly: true, output: safeText(providerReceiptOutput(response.output), 70000), omittedProviderInternals: true, text: safeText(response.output_text, 20000)});
             activeSignal.throwIfAborted();
             stage = 'service';
             return {completed: true, items: response.output, calls: response.output.filter(item => item.type === 'function_call').map(item => ({id: item.call_id, name: item.name, arguments: item.arguments})), text: response.output_text};

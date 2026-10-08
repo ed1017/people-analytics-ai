@@ -1,8 +1,8 @@
 import type {SolutionRequest,SolutionState,SolutionEvaluation} from './home-solution-conversation';
-import type {SolutionCandidate,SolutionConstraint,SolutionFinal,ProjectionSpec,SolutionMetricRef} from './home-solution-conversation-schema';
+import type {SolutionParameterEdit,SolutionCandidate,SolutionConstraint,SolutionFinal,ProjectionSpec,SolutionMetricRef} from './home-solution-conversation-schema';
 import type {ProjectionInputs,HeadcountProjection} from './home-solution-projection';
 // @ts-expect-error Native fixture tests share TypeScript source.
-import {readSolutionRequest,readSolutionState,evaluateSolutionCandidate,mergeSolutionConstraints,solutionUserTurns,resolveSolutionMetric} from './home-solution-conversation.ts';
+import {readSolutionRequest,readSolutionState,evaluateSolutionParameterEdit,evaluateSolutionCandidate,mergeSolutionConstraints,solutionUserTurns,resolveSolutionMetric} from './home-solution-conversation.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {assertSolutionShape,solutionTools,solutionFinalSchema} from './home-solution-conversation-schema.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
@@ -57,9 +57,9 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
      result=ids.length?sources.filter(source=>ids.includes(source.id as string)):sources.map(({id,label,scope,date,status,limitation})=>({id,label,scope,date,status,limitation}));
     }else if(call.name==='read_plans'){
      const ids=args.planIds as string[];result=ids.map(id=>{const plan=request.catalog?.plans.find(plan=>plan.id===id&&!plan.deleted);if(!plan)throw Error('A requested saved plan is unavailable.');return plan;});
-    }else if(call.name==='evaluate_candidate'){
+    }else if(call.name==='evaluate_candidate'||call.name==='revise_parameters'){
      const constraints=mergeSolutionConstraints(request,state.constraints,args.constraintUpdates as SolutionConstraint[]);
-     const item=await evaluateSolutionCandidate(request,args.candidate as SolutionCandidate,constraints);abort(signal);
+     const item=call.name==='revise_parameters'?await evaluateSolutionParameterEdit(request,args.edit as SolutionParameterEdit,constraints):await evaluateSolutionCandidate(request,args.candidate as SolutionCandidate,constraints);abort(signal);
      state.constraints=constraints;state.working=[...state.working,item].slice(-12);evaluated.set(item.id,item);result={...item,verifiedMetricReferences:checkedMetricReferences(state,'candidate',item.id,item.revision)};
     }else{
      projectionInput??=runtime.loadProjection(request.filters,signal);

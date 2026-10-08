@@ -4,6 +4,7 @@ import {resolve, join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {sourceManifest, unarmedManifest, sha256, validateManifest, runAcceptance, safeFailure} from '../helpers/solution-preview-acceptance.mjs';
+import {encodeReceipt} from '../helpers/preview-receipt-log.mjs';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const [mode, argument] = process.argv.slice(2);
 if (mode === '--prepare' && process.argv.length <= 4) {
@@ -22,7 +23,7 @@ if (mode === '--prepare' && process.argv.length <= 4) {
       const text = JSON.stringify({stage, ...receipt}) + '\n';
       const fd = openSync(join(output, stage + '.json'), 'wx', 0o600);
       try { writeFileSync(fd, text); fsyncSync(fd); } finally { closeSync(fd); }
-      console.log('SOLUTION_ACCEPTANCE_RECEIPT ' + text.trim());
+      for (const line of encodeReceipt(manifest.runId + '_' + stage, JSON.parse(text))) console.log(line);
     };
     const {default: OpenAI} = await import('openai');
     const {openAIProxyTransport} = await import('../../lib/openai-proxy-transport.ts');
