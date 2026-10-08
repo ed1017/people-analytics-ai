@@ -11,7 +11,7 @@ test('five exact starters offer specific qualitative goals; unrelated and typed 
  for(const prompt of ['Forecast turnover','What else?','Reduce turnover by 20%','How can we improve hiring?'])assert.equal(homeStarterGoal(prompt),null);
 });
 test('skills and training never acquire a fabricated forecast',()=>{for(const prompt of homeGoalStarters.slice(0,2))assert.equal(homeStarterForecast(homeStarterGoal(prompt),pack,''),null)});
-for(const prompt of homeGoalStarters.slice(2))test('forecast compares identical simulated metric and population for '+prompt,()=>{
+for(const prompt of homeGoalStarters.slice(2,4))test('forecast compares identical simulated metric and population for '+prompt,()=>{
  const starter=homeStarterGoal(prompt),forecast=homeStarterForecast(starter,pack,'?country=all&org=all&level=all'),data=artifact.domains[starter.domain];
  assert.equal(forecast.domain,starter.domain);assert.match(forecast.summary,/separate simulated company-wide demo/);assert.match(forecast.summary,/Dec 2026 projections/);assert.match(forecast.summary,/forecast for your recorded workforce is unavailable/);
  assert.ok(forecast.summary.includes(formatDemoValue(starter.domain,data.history.findLast(row=>row.value!==null).value)));

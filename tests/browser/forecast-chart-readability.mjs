@@ -83,8 +83,8 @@ try {
    await figure.screenshot({path:`${screenshotDirectory}/${name}-${palette}-${domain}.png`});
   }
   await page.getByLabel('Chart fixture').selectOption('home');
-  const homePanels=page.locator('section');
-  check(name+palette+' all Home projection surfaces',await homePanels.count()===4);
+  const homePanels=page.locator('section').filter({has:page.getByText(/Simulated projections/)});
+  check(name+palette+' all Home projection surfaces',await homePanels.count()===3 && await page.locator('[data-source-version="synthetic-ta-calibrated-v2"]').count()===1);
   for(const panel of await homePanels.all()){
    const summary=panel.locator('summary');
    check(name+palette+' Home closed details and simulation label',!await panel.locator('details').evaluate(n=>n.open)&&await panel.getByText(/Simulated projections/).isVisible()&&!/Intervals unavailable|Methods unselected|Goal and filters excluded/.test(await panel.innerText()));

@@ -1,3 +1,4 @@
+import * as taExtensionModule from '../lib/synthetic-ta/extension.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -53,6 +54,8 @@ function load(file, aliases = {}) {
   const exports = {};
   vm.runInNewContext(code,{exports,Response,console,require:name=>{
     if (name in aliases) return aliases[name];
+    if(name==='@/lib/synthetic-ta/extension')return taExtensionModule;
+    if(name==='@/components/calibrated-ta-panels')return {CalibratedTaPanels:()=>null};
     if (name.startsWith('.') || name.startsWith('@/')) throw Error('Unexpected module: '+name);
     return require(name);
   }});
@@ -78,6 +81,7 @@ async function getRoute(domain, tables) {
     'next/server':{NextResponse:{json:(body,init)=>Response.json(body,init)}},
     '../../../lib/supabase-server':{supabaseServer},
     '../../../lib/numeric-contract':numeric,
+    '../../../lib/synthetic-ta/extension':taExtensionModule,
     '../../../lib/data-api-error':{dataApiErrorResponse},
     '../../../lib/stored-planning':planning,
     '../../../lib/exit-enps':{...exitEnps,localExitEnpsEnabled:()=>false},
@@ -162,9 +166,8 @@ test('TA cards and funnel never coerce unknown cells to zero or call a missing c
   const html = render('components/pages/talent-acquisition-page.tsx','TalentAcquisitionPage',{data,loading:false,error:null});
   assert.match(html,/Open Requisitions<\/p><p[^>]*>Unavailable/);
   assert.match(html,/Median Time to Fill<\/p><p[^>]*>Unavailable/);
-  assert.match(html,/Interviewed<\/p><p[^>]*>Unavailable/);
-  assert.match(html,/Hires<\/p><p[^>]*>0<\/p>/);
-  assert.equal((html.match(/Top of funnel/g)||[]).length,1);
+  assert.match(html,/Calibrated projections and expanded funnel unavailable/);
+  assert.doesNotMatch(html,/Top of funnel|Modeled stage attainment/);
   assert.doesNotMatch(html,/NaN|Unavailable%|Unavailable days/);
 });
 

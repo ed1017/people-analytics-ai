@@ -1,3 +1,4 @@
+import * as taExtensionModule from '../lib/synthetic-ta/extension.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -78,7 +79,7 @@ for(const source of ['survey-sentiment','talent-acquisition','workforce-planning
     const query={select:()=>query,single:()=>query,order:()=>query,in:()=>query,then:resolve=>resolve({data:null,error:{code:'PGRST303',message:privateMessage}})};
     return query;
    }};
-   const aliases={'next/server':{NextResponse:Response},'../../../lib/supabase-server':{supabaseServer},'../../../lib/data-api-error':{dataApiErrorResponse},'../../../lib/numeric-contract':numeric,'../../../lib/stored-planning':planning,'../../../lib/exit-enps':{...exitEnps,localExitEnpsEnabled:()=>false}};
+   const aliases={'../../../lib/synthetic-ta/extension':taExtensionModule,'next/server':{NextResponse:Response},'../../../lib/supabase-server':{supabaseServer},'../../../lib/data-api-error':{dataApiErrorResponse},'../../../lib/numeric-contract':numeric,'../../../lib/stored-planning':planning,'../../../lib/exit-enps':{...exitEnps,localExitEnpsEnabled:()=>false}};
    vm.runInNewContext(code,{exports,require:name=>{if(name in aliases)return aliases[name];throw Error('Unexpected import: '+name)}});
    const {value:response,logs}=await capture(()=>exports.GET());
    assert.equal(response.status,500);assert.equal(response.headers.get('cache-control'),'no-store');
