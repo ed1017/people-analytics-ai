@@ -8,7 +8,7 @@ import {encodeReceipt} from '../helpers/preview-receipt-log.mjs';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const [mode, argument] = process.argv.slice(2);
 if (mode === '--prepare' && process.argv.length <= 4) {
-  console.log(JSON.stringify(unarmedManifest(root, argument ?? 'clock-followup'), null, 2));
+  console.log(JSON.stringify(unarmedManifest(root, argument ?? 'identifier-first'), null, 2));
 } else if (mode === '--execute-reserved-batch' && argument && process.argv.length === 4) {
   try {
     const bytes = readFileSync(resolve(argument));
@@ -35,4 +35,4 @@ if (mode === '--prepare' && process.argv.length <= 4) {
     }
     process.exitCode = report.executionComplete ? 0 : 1;
   } catch (error) { console.log('SOLUTION_ACCEPTANCE_STOP ' + JSON.stringify(safeFailure(error))); process.exitCode = 1; }
-} else { console.error('Use --prepare [clock-followup], or --execute-reserved-batch MANIFEST.'); process.exitCode = 1; }
+} else { console.error('Use --prepare [identifier-first], or --execute-reserved-batch MANIFEST.'); process.exitCode = 1; }

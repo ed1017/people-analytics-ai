@@ -9,7 +9,7 @@ const start = Date.parse('2026-10-08T12:00:00Z');
 function setup(options = {}) {
   let time = start, current = '', steps = [], claimed = false;
   const calls = [], records = [], controller = new AbortController();
-  const manifest = {version: 1, checkpoint, runId: '10000000-0000-4000-8000-000000000001', reservationId: '20000000-0000-4000-8000-000000000001', parentReserved: true, plan: batchPlan(options.batch ?? 'clock-followup'), trancheAuthorization: 'parent-approved-clock-followup-2026-10-08', priorTrancheMicrousd: 0, priorTotalMicrousd: 4143960, pricingBasis: 'approved-envelope-input-0.25-output-1.20-per-million', projectId: 'prj_fictional', createdAt: new Date(start).toISOString(), expiresAt: new Date(start + 3600000).toISOString(), files: {fixture: 'offline-only'}};
+  const manifest = {version: 1, checkpoint, runId: '10000000-0000-4000-8000-000000000001', reservationId: '20000000-0000-4000-8000-000000000001', parentReserved: true, plan: batchPlan(options.batch ?? 'identifier-first'), trancheAuthorization: 'parent-approved-identifier-first-2026-10-08', priorTrancheMicrousd: 0, priorTotalMicrousd: 2118960, pricingBasis: 'approved-envelope-input-0.25-output-1.20-per-million', projectId: 'prj_fictional', createdAt: new Date(start).toISOString(), expiresAt: new Date(start + 3600000).toISOString(), files: {fixture: 'offline-only'}};
   const env = {VERCEL: '1', VERCEL_ENV: 'preview', VERCEL_PROJECT_ID: manifest.projectId, VERCEL_DEPLOYMENT_ID: 'dpl_fictional', SOLUTION_ACCEPTANCE_RUN_ID: manifest.runId};
   const scripted = payload => {
     const context = JSON.parse(payload.input[0].content.split('\n').slice(1).join('\n'));
@@ -17,12 +17,16 @@ function setup(options = {}) {
     const index = scenario.turns.indexOf(context.currentMessage.text), key = scenario.id + '-' + index;
     if (key !== current) {
       current = key; steps = scriptedStepsFor(scenario.id, index, {working: context.workingProposals});
+      if(options.discussionOnly&&scenario.id==='blend-replace'&&index===2)steps=[steps.at(-1)];
+      if(options.discussionOnly&&scenario.id==='blend-replace'&&index===2){steps[0].candidateIds=[];steps[0].focusCandidateId=null;}
+      if(options.literalHiring&&scenario.id==='headcount-followup'&&index===1)steps[0].args.spec.changes[0]={...steps[0].args.spec.changes[0],kind:'literal',value:50};
+      if(options.semanticFailure&&scenario.id==='goal-select-refine'&&index===0)steps=steps.map(step=>step.name==='evaluate_candidate'?{...step,args:{...step.args,candidate:{...step.args.candidate,quantities:[{field:'cash',target:'c1',unit:'USD',kind:'literal',number:100,text:null,source:null,factor:null,turnId:'user-1',interpretation:'Invented unsupported fixture allowance.'}]}}}:step);
       if (options.maximumRounds) while (steps.length < 4) steps.unshift({name: 'read_clock', args: {}});
     }
     const step = steps.shift(); assert.ok(step, 'No unscripted provider rounds');
-    if (!step.name && scenario.id === 'clock-deadline' && index === 2) {
+    if (!step.name && scenario.id === 'goal-select-refine' && index === 0) {
       const result = JSON.parse(payload.input.findLast(item => item.type === 'function_call_output').output);
-      step.verifiedMetrics = result.verifiedMetricReferences.map(ref => ({...ref, revision: options.wrongRevision ? result.draft.revision : ref.revision}));
+      step.verifiedMetrics = options.wrongRevision ? [{kind:'candidate',id:result.id,revision:result.revision+1,metric:'cash_usd'}] : result.verifiedMetricReferences;
     }
     const output = step.name ? [{type: 'function_call', call_id: 'call-' + calls.length, name: step.name, arguments: JSON.stringify(step.args)}] : [];
     return {status: 'completed', service_tier: 'default', usage: {input_tokens: 9000, output_tokens: 100}, output, output_text: step.name ? '' : JSON.stringify(step), ...options.response};
@@ -49,12 +53,12 @@ function setup(options = {}) {
   return {manifest, env, client, records, calls, controller, run};
 }
 
-test('three scripted clock/deadline turns exercise actual service, schema, tools, state and selection without network', async () => {
+test('only three original goal-select-refine scripted turns exercise actual service, schema, tools, state and selection without network', async () => {
   const originalFetch = globalThis.fetch; let attempts = 0;
   globalThis.fetch = () => { attempts++; throw Error('Network forbidden in offline checks'); };
   try {
     let turns = 0;
-    for (const batch of ['clock-followup']) {
+    for (const batch of ['identifier-first']) {
       const x = setup({batch}), result = await x.run();
       assert.equal(result.failure, undefined, JSON.stringify(result.failure));
       assert.equal(result.executionComplete, true); assert.equal(result.fullAcceptance, false);
@@ -86,11 +90,11 @@ test('three scripted clock/deadline turns exercise actual service, schema, tools
   } finally { globalThis.fetch = originalFetch; }
 });
 
-test('only clock follow-up fits the explicit new tranche with original allocation retained', () => {
-  const plan = batchPlan('clock-followup');
-  assert.deepEqual(plan.sequenceIds, ['clock-deadline']); assert.equal(plan.turns, 3);
+test('only the first sequence fits the explicit new tranche with original allocation retained', () => {
+  const plan = batchPlan('identifier-first');
+  assert.deepEqual(plan.sequenceIds, ['goal-select-refine']); assert.equal(plan.turns, 3);
   assert.equal(plan.countCalls, 12); assert.equal(plan.generationCalls, 12); assert.equal(plan.maxProviderCalls, 24);
-  assert.equal(plan.reservedMicrousd, 972000); assert.equal(4143960 + plan.reservedMicrousd, 5115960);
+  assert.equal(plan.reservedMicrousd, 972000); assert.equal(2118960 + plan.reservedMicrousd, 3090960);
   assert.equal(plan.reservedMicrousd, 12 * (limits.countAllowanceMicrousd + limits.generationMicrousd));
   assert.equal(limits.generationMicrousd, limits.inputTokens * .25 + limits.outputTokens * 1.2);
   for (const name of ['core-four', 'corrections-two']) assert.throws(() => batchPlan(name), {code: 'unknown_batch'});
@@ -145,7 +149,7 @@ test('persistence failures or cancellation stop before the next SDK call, includ
   }
   const x = setup({abortDuringPacing: true}), result = await x.run();
   assert.equal(x.calls.length, 6); assert.ok(result.failure);
-  const y = setup({recordError: 'turn-clock-deadline-1'}), stopped = await y.run();
+  const y = setup({recordError: 'turn-goal-select-refine-1'}), stopped = await y.run();
   assert.equal(y.calls.length, 4); assert.deepEqual(stopped.completedTurns, []); assert.equal(stopped.pendingTurns.length, 3);
 });
 
@@ -181,25 +185,45 @@ test('prepare is unarmed and source-bound; normal builds have no paid hook', () 
 
 test('service rejection preserves exact guard and fictional intermediate payloads', async () => {
   const x = setup({wrongRevision: true}), result = await x.run();
-  assert.equal(result.executionComplete, false); assert.equal(result.completedTurns.length, 2);
-  assert.equal(result.failure.currentTurn, 'clock-deadline-3');
+  assert.equal(result.executionComplete, false); assert.equal(result.completedTurns.length, 0);
+  assert.equal(result.failure.currentTurn, 'goal-select-refine-1');
   assert.equal(result.failure.serviceDiagnostic.message.text, 'A claimed quantitative result was not checked in this turn.');
   assert.ok(result.failure.serviceDiagnostic.frames.some(frame => frame.text.includes('home-solution-conversation-service.ts')));
   const tools = x.records.filter(r => r.stage.startsWith('tool-result-'));
   const evaluated = tools.find(r => r.receipt.name === 'evaluate_candidate').receipt;
   const tool = JSON.parse(evaluated.result.text);
-  assert.equal(tool.revision, 1); assert.equal(tool.draft.revision, 3);
+  assert.equal(tool.revision, 1); assert.equal(tool.draft.revision, 1);
   assert.equal(evaluated.result.truncated, false); assert.equal(evaluated.arguments.truncated, false);
   assert.equal(sha256(evaluated.result.text), evaluated.result.sha256);
   const provider = x.records.filter(r => r.stage.startsWith('provider-output-')).at(-1).receipt;
-  assert.equal(JSON.parse(provider.text.text).verifiedMetrics[0].revision, 3);
+  assert.equal(JSON.parse(provider.text.text).verifiedMetrics[0].revision, 2);
   assert.equal(sha256(provider.text.text), provider.text.sha256);
-  assert.equal(x.records.filter(r => r.stage.startsWith('input-')).length, 3);
+  assert.equal(x.records.filter(r => r.stage.startsWith('input-')).length, 1);
 });
 
 test('diagnostic persistence failures stop before further provider calls', async () => {
-  for (const [stage, expected] of [['input-clock-deadline-1', 0], ['provider-output-1', 2], ['tool-result-1', 2]]) {
+  for (const [stage, expected] of [['input-goal-select-refine-1', 0], ['provider-output-1', 2], ['tool-result-1', 2]]) {
     const x = setup({recordError: stage}), result = await x.run();
     assert.ok(result.failure); assert.equal(x.calls.length, expected);
   }
 });
+test('deadline semantic guard rejects wrong operation and unrelated input changes', async()=>{
+ const {deadlineChecks}=await import('./helpers/solution-preview-acceptance.mjs');
+ const {fictionalRequest}=await import('./fixtures/fictional-solution-evaluation.mjs');
+ const {evaluateSolutionParameterEdit}=await import('../lib/home-solution-conversation.ts');
+ const r=await fictionalRequest(fictionalScenarios[0],2);
+ const item=await evaluateSolutionParameterEdit(r,{id:'deadline',source:{kind:'saved',id:'A',revision:r.catalog.plans[0].draft.revision},quantities:[{field:'activity_finish',target:'c1',unit:'YYYY-MM-DD',kind:'literal',number:null,text:'2026-11-20',source:null,factor:null,turnId:'user-3',interpretation:'Requested finish date.'}]},[]);
+ const reply={candidateIds:[item.id],state:{working:[item]}},tools=[{name:'revise_parameters'}];
+ assert.ok(Object.values(deadlineChecks(r,reply,tools)).every(Boolean));
+ assert.equal(deadlineChecks(r,reply,[{name:'evaluate_candidate'}]).parameterOperation,false);
+ item.draft.inputs.deliveryEstimate.coordinationHours.value=null;
+ assert.equal(deadlineChecks(r,reply,tools).unrelatedInputsPreserved,false);
+});
+
+test('first semantic contract failure records the failing turn and prevents all later sequences',async()=>{
+ const x=setup({semanticFailure:true}),result=await x.run();
+ assert.equal(result.failure.code,'mechanical_check_failed');assert.equal(result.failure.currentTurn,'goal-select-refine-1');
+ assert.equal(result.turns[0].checks.unprovidedResourcesUnknown,false);assert.equal(result.completedTurns.length,0);assert.equal(result.pendingTurns.length,3);assert.equal(x.calls.length,4);
+ assert.equal(result.reservedMicrousd,972000);assert.equal(result.cumulativeReservedMicrousd,3090960);
+});
+
