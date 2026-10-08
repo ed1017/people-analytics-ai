@@ -91,7 +91,8 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  state.constraints=mergeSolutionConstraints(request,state.constraints,final.constraintUpdates);
  if(new Set(final.candidateIds).size!==final.candidateIds.length||final.candidateIds.some(id=>!evaluated.has(id))||new Set(final.analysisIds).size!==final.analysisIds.length||final.analysisIds.some(id=>!analyses.has(id)))throw Error('The answer references a proposal or analysis that was not checked in this turn.');
  for(const id of final.candidateIds){const item=evaluated.get(id)!;if(!same(item.constraints,state.constraints)){item.blocking.push('Constraints changed after this calculation. Refine the proposal against the current constraints before saving.');}}
- for(const rejected of final.rejected){const item=latest(state.working).find(item=>item.id===rejected.candidateId);if(!item||!solutionUserTurns(request).some(turn=>turn.id===rejected.turnId))throw Error('The rejected idea has no current candidate or user-turn reference.');state.rejected.push({...rejected,revision:item.revision});}
+ for(const rejected of final.rejected){const item=latest(state.working).find(item=>item.id===rejected.candidateId);if(!item||!solutionUserTurns(request).some(turn=>turn.id===rejected.turnId))throw Error('The rejected idea has no current candidate or user-turn reference.');// Model rejection is interpretation only; the existing explicit review control owns rejection state.
+  item.interpretations.push(`Proposed rejection (unconfirmed), turn ${rejected.turnId}: ${rejected.reason}`);}
  for(const ref of final.verifiedMetrics){
   const checked=ref.kind==='candidate'?evaluated.get(ref.id):analyses.get(ref.id);
   if(!checked||checked.revision!==ref.revision)throw Error('A claimed quantitative result was not checked in this turn.');

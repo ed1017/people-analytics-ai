@@ -32,9 +32,9 @@ export async function calculateHeadcountProjection(spec:ProjectionSpec,inputs:Pr
   const before=assumptions[change.field],value=change.kind==='scale'?before===undefined?NaN:before*change.value:change.value,[min,max]=bounds[change.field];
   if(!Number.isFinite(value)||value<min||value>max)throw Error(`The ${change.field} assumption is missing or outside ${min}–${max}.`);
   assumptions[change.field]=value;
-  interpretations.push(`${change.field}: ${value}${change.field.endsWith('_pct')?'%':' people/month'}. ${change.interpretation} (${change.basis==='illustrative'?'Illustrative assumption; not supplied by the user':`Interpreted from user turn ${change.turnId}`}${change.kind==='scale'?`; previous ${before} × ${change.value}`:''}).`);
+  interpretations.push(`${change.field}: ${value}${change.field.endsWith('_pct')?'%':' people/month'}. ${change.interpretation} (${change.basis==='illustrative'?'Illustrative assumption; not supplied by the user':`Unconfirmed model interpretation of turn ${change.turnId}; not user confirmation`}${change.kind==='scale'?`; previous ${before} × ${change.value}`:''}).`);
  }
- const limitations=['Assumption-based scenario, not a trained forecast or a promised outcome.','Active configured data is synthetic. Source version/import identity is not exposed; the content digest identifies only the inputs used in this calculation.','No intervention effectiveness, savings, staffing availability or funding is inferred.'];
+ const limitations=['Assumption-based scenario, not a trained forecast or a promised outcome.','Active configured data is synthetic. Source version/import identity is not exposed; the content digest identifies only the inputs used in this calculation.','No intervention effectiveness, savings, staffing availability or funding is inferred.','Model-selected basis and turn references describe proposed interpretation, not independently confirmed user assumptions.'];
  const inputDigest=await projectionDigest(inputs);if(base&&base.inputDigest!==inputDigest)limitations.push('The active source inputs changed since the prior projection; this revision uses the new opening snapshot.');
  const points:HeadcountProjection['points']=[];
  if(spec.method==='configured_scenario'){

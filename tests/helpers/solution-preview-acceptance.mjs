@@ -7,7 +7,7 @@ import {setTimeout as pause} from 'node:timers/promises';
 import {CHAT_MODEL} from '../../lib/chat-model.ts';
 import {converseSolutions} from '../../lib/home-solution-conversation-service.ts';
 import {solutionConversationInstructions, solutionTools, solutionResponseFormat} from '../../lib/home-solution-conversation-schema.ts';
-import {emptySolutionState, readSolutionState, saveSolutionCandidate} from '../../lib/home-solution-conversation.ts';
+import {emptySolutionState, readSolutionState, saveSolutionCandidate, assertSolutionParticipationProvenance} from '../../lib/home-solution-conversation.ts';
 import {associatePlanProposal, packPlanAlternatives} from '../../lib/home-plan-alternatives.ts';
 import {reviewBundleProposal} from '../../lib/home-bundle-reconciliation.ts';
 import {DecisionStore} from '../../lib/local-decisions.ts';
@@ -164,6 +164,7 @@ export async function runAcceptance({manifest, env, client, claim, record, now =
           },
         }, turnSignal);
         stage = 'service_checks';
+        for (const item of reply.state.working.filter(row => row.requestId === request.requestId && row.draft)) assertSolutionParticipationProvenance(request, item.candidate, item.draft);
         const checks = {inputPreserved: sha256(request) === before, savedPlansPreserved: sha256(request.catalog) === savedBefore, historyCarried: reply.state.turns.length === (index + 1) * 2};
         state = reply.state; goal = request.goal; catalog = request.catalog;
         let selection = null;

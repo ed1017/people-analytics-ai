@@ -8,7 +8,7 @@ import {solutionRequest,based,final,fixtureRuntime,constraint} from './fixtures/
 const size=x=>Buffer.byteLength(JSON.stringify(x));
 const resultView=result=>result&&Object.fromEntries(Object.entries(result).filter(([key])=>!['inputKey','bindingKey','signature'].includes(key)));
 const draftView=draft=>draft&&Object.fromEntries(Object.entries(draft).filter(([key])=>key!=='signature'));
-test('complete preserved three-turn application sequence keeps exact calculations and reaches bounded continuation',async()=>{const report=await replayPreserved();assert.ok(report.turns[2].continuationReached);});
+test('preserved provider arguments replay with newly checked provenance and reach bounded continuation',async()=>{const report=await replayPreserved();assert.ok(report.turns[2].continuationReached);});
 test('all retained user history, constraints, evidence and candidate revisions survive projection',async()=>{
  const r=solutionRequest('Compare the alternatives while retaining my original constraint.',true);
  r.state.turns=Array.from({length:30},(_,i)=>({id:'history-'+i,role:i%2?'assistant':'user',text:(i===0?'Original intent: protect voluntary participation. ':'Retained context. ')+('detail '.repeat(90))}));

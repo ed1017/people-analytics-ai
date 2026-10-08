@@ -88,7 +88,7 @@ test('participant source targets distinguish actual cohorts/activities from fabr
  for(const target of [null,cohort,'c1','fabricated-cohort','deleted-activity']){
   const c=based();c.quantities=[{...quantity('participants',null,'people','c1'),kind:'reference',source:{...source,target}}];
   const item=await evaluateSolutionCandidate(r,c,[]);
-  if([null,cohort,'c1'].includes(target)){assert.deepEqual(item.blocking,[]);assert.equal(item.result.uniqueParticipants,10);}
+  if([null,cohort,'c1'].includes(target)){assert.deepEqual(item.blocking,[]);assert.equal(item.result.uniqueParticipants,null);assert.ok(item.draft.inputs.groups.some(g=>g.count.value===10&&g.count.kind==='illustrative'));}
   else{assert.match(item.blocking.join(' '),/actual participant group or activity/);assert.equal(item.draft,null);}
  }
  r.catalog.plans[0].draft.inputs.groups.push({...structuredClone(r.catalog.plans[0].draft.inputs.groups[0]),id:'second-cohort'});

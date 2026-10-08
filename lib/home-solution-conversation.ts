@@ -25,7 +25,8 @@ import {readHeadcountProjections} from './home-solution-projection.ts';
 export const solutionConversationEnabled=process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION==='true';
 export const solutionConversationField='homeSolutionConversationV1';
 export type SolutionTurn={id:string;role:'user'|'assistant';text:string};
-export type SolutionEvaluation={id:string;revision:number;requestId:string;message:{id:string;text:string};candidate:SolutionCandidate;binding:ActionBinding;draft:BundleDraft|null;result:BundleResult|null;sourceRefs:AlternativeSourceRef[];sourceKeys:Record<string,string>;constraints:SolutionConstraint[];interpretations:string[];changes:string[];issues:string[];blocking:string[]};
+export const solutionProvenanceVersion=1 as const;
+export type SolutionEvaluation={provenanceVersion?:1;id:string;revision:number;requestId:string;message:{id:string;text:string};candidate:SolutionCandidate;binding:ActionBinding;draft:BundleDraft|null;result:BundleResult|null;sourceRefs:AlternativeSourceRef[];sourceKeys:Record<string,string>;constraints:SolutionConstraint[];interpretations:string[];changes:string[];issues:string[];blocking:string[]};
 export type SolutionState={version:1;verifiedMetrics:SolutionMetricRef[];turns:SolutionTurn[];constraints:SolutionConstraint[];working:SolutionEvaluation[];analyses:HeadcountProjection[];rejected:{candidateId:string;revision:number;reason:string;turnId:string}[];questions:string[];focusCandidateId:string|null};
 export type SolutionRequest={version:1;requestId:string;goal:{id:string;statement:string};scope:string;filters:DashboardFilters;timeZone:string;evidence:unknown;goalContext:unknown;selectedId:string|null;catalog:PlanAlternatives|null;state:SolutionState;message:{id:string;text:string}};
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
@@ -52,6 +53,7 @@ export function readSolutionState(raw:unknown):SolutionState {
   seen.add(key);
   if(item.draft&&actionBindingKey(item.binding)!==actionBindingKey(item.draft.binding))fail('The working calculation belongs to another evidence context.');
   for(const constraint of item.constraints){constraint.action??='set';}for(const constraint of item.constraints)assertSolutionShape(constraint,solutionConstraintSchema,'working constraint');
+  if(item.provenanceVersion!==undefined&&item.provenanceVersion!==1)fail('Unsupported conversation provenance version.');
   if(item.draft===null&&item.result!==null||item.constraints.length>5||item.sourceRefs.length>30||!Object.values(item.sourceKeys).every(key=>typeof key==='string'&&key.length<50000)||![item.issues,item.blocking,item.changes,item.interpretations].every(list=>list.length<=80&&list.every(value=>text(value,2000))))fail('A working proposal contains unsupported metadata.');
  }
  if(state.rejected.some(item=>!id(item.candidateId)||!Number.isInteger(item.revision)||!text(item.reason,240)||!id(item.turnId)))fail('The rejected approach history could not be verified.');
@@ -87,12 +89,69 @@ function source(request:SolutionRequest,ref:SolutionSource){
  if(ref.kind==='saved'){
   const item=request.catalog?.plans.find(plan=>plan.id===ref.id&&!plan.deleted&&plan.draft.revision===ref.revision);
   if(!item)fail('A referenced saved plan or revision is no longer current.');
+  assertSavedProvenance(request.catalog!,item.id);
   return {draft:item.draft,sourceRefs:[{id:item.id,revision:item.draft.revision}],sourceKeys:{[item.id]:bundleInputKey(item.draft)}};
  }
  const item=request.state.working.find(candidate=>candidate.id===ref.id&&candidate.revision===ref.revision);
  if(!item?.draft)fail('The referenced working proposal cannot supply calculated assumptions.');
+ if(request.state.working.filter(row=>row.id===ref.id).at(-1)!==item||request.state.rejected.some(row=>row.candidateId===ref.id&&row.revision===ref.revision))fail('The working source is stale or rejected. Review a current proposal.');
+ if(item.provenanceVersion!==solutionProvenanceVersion)fail('Legacy conversation provenance requires reevaluation before reuse.');
  assertSourcesCurrent(request.catalog,item.sourceKeys);
+ for(const ref of item.sourceRefs)assertSavedProvenance(request.catalog!,ref.id);
  return {draft:item.draft,sourceRefs:item.sourceRefs,sourceKeys:item.sourceKeys};
+}
+/** A version is a code contract, not user confirmation. Never bless legacy ancestry. */
+function assertSavedProvenance(catalog:PlanAlternatives,id:string,visiting=new Set<string>()){
+ if(visiting.has(id))fail('The source provenance contains a cycle.');
+ const plan=catalog?.plans.find(row=>row.id===id);if(!plan)fail('The source provenance is unavailable.');
+ if(plan.operation?.kind==='conversation'&&plan.operation.provenanceVersion!==solutionProvenanceVersion)fail('Legacy conversation provenance requires reevaluation before reuse.');
+ visiting.add(id);for(const ref of plan.sourceRefs)assertSavedProvenance(catalog,ref.id,visiting);visiting.delete(id);
+}
+/** Independent of counts: only an exact retained source can establish membership or overlap. */
+export function assertSolutionParticipationProvenance(request:SolutionRequest,candidate:SolutionCandidate,draft:BundleDraft){
+ const groupProof=new Map<string,{sourceKey:string;groupId:string;draft:BundleDraft}>();
+ const reverse=new Map<string,string>();
+ for(const membership of draft.inputs.memberships){
+  if(membership.complete.value===null)continue;
+  const activity=candidate.activities.find(row=>row.id===membership.componentId);
+  if(activity?.mode!=='retain'||!activity.source)fail('Participation confirmation needs an exact retained checked source.');
+  const checked=source(request,activity.source).draft,original=checked.inputs.memberships.find(row=>row.componentId===activity.source!.activityId);
+  if(!original||!same(original.complete,membership.complete)||original.groupIds.length!==membership.groupIds.length)fail('Participation completeness cannot be supplied by a model interpretation.');
+  const sourceKey=JSON.stringify([activity.source.kind,activity.source.id,activity.source.revision]);
+  for(let index=0;index<membership.groupIds.length;index++){
+   const groupId=membership.groupIds[index],originalId=original.groupIds[index],proof=groupProof.get(groupId),identity=JSON.stringify([sourceKey,originalId]);
+   if(proof&&(proof.sourceKey!==sourceKey||proof.groupId!==originalId)||reverse.has(identity)&&reverse.get(identity)!==groupId)fail('A model cannot merge or split confirmed source cohorts.');
+   groupProof.set(groupId,{sourceKey,groupId:originalId,draft:checked});reverse.set(identity,groupId);
+  }
+ }
+ const used=[...new Set(draft.inputs.memberships.flatMap(row=>row.groupIds))];
+ if(draft.inputs.groupsDisjoint.value===true){
+  if(draft.inputs.memberships.some(row=>row.complete.value!==true)||used.some(id=>!groupProof.has(id)))fail('Unknown membership cannot establish disjoint participation.');
+  if(used.length>1){const proofs=used.map(id=>groupProof.get(id)!);if(new Set(proofs.map(p=>p.sourceKey)).size!==1||proofs.some(p=>p.draft.inputs.groupsDisjoint.value!==true))fail('Mixed sources do not establish disjoint participation.');}
+ }
+ const assumptions=(value:unknown,path=''):Array<{path:string;atom:unknown}>=>{if(!obj(value)&&!Array.isArray(value))return [];if(obj(value)&&value.kind==='user-entered')return [{path,atom:value}];return Object.entries(value).flatMap(([key,item])=>assumptions(item,path+'/'+key));};
+ const allowed:Array<{path:string;atom:unknown}>=[],perActivity=new Set(['memberships','groups','timing','costReviews','expenses']);
+ if(candidate.base){const base=source(request,candidate.base).draft.inputs;for(const [key,value] of Object.entries(base))if(!perActivity.has(key))allowed.push(...assumptions(value,'/'+key));}
+ for(const activity of candidate.activities){
+  if(activity.mode!=='retain'||!activity.source)continue;
+  const checked=source(request,activity.source).draft.inputs;
+  for(const key of ['memberships','timing','costReviews'] as const){const index=draft.inputs[key].findIndex(row=>row.componentId===activity.id),prior=checked[key].find(row=>row.componentId===activity.source!.activityId);if(index>=0&&prior)allowed.push(...assumptions(prior,`/${key}/${index}`));}
+  const prior=checked.memberships.find(row=>row.componentId===activity.source!.activityId),current=draft.inputs.memberships.find(row=>row.componentId===activity.id);
+  if(prior&&current&&prior.groupIds.length===current.groupIds.length)for(let i=0;i<prior.groupIds.length;i++){const index=draft.inputs.groups.findIndex(row=>row.id===current.groupIds[i]),group=checked.groups.find(row=>row.id===prior.groupIds[i]);if(index>=0&&group)allowed.push(...assumptions(group,`/groups/${index}`));}
+ }
+ const refs:SolutionSource[]=[];for(const ref of [candidate.base,...candidate.quantities.map(q=>q.source),...candidate.activities.map(a=>a.source)])if(ref&&!refs.some(old=>old.kind===ref.kind&&old.id===ref.id&&old.revision===ref.revision))refs.push(ref);
+ const base=candidate.base?source(request,candidate.base).draft:null;
+ const parameterLayout=base&&same(draft.bundle,base.bundle)&&same(draft.inputs.expenses.map(row=>row.id),base.inputs.expenses.map(row=>row.id));
+ for(let index=0;index<draft.inputs.expenses.length;index++){
+  const expense=draft.inputs.expenses[index];
+  if(parameterLayout){const original=base.inputs.expenses.find(row=>row.id===expense.id);if(original)allowed.push(...assumptions(original,`/expenses/${index}`));continue;}
+  for(let origin=0;origin<refs.length;origin++){
+   const checked=source(request,refs[origin]).draft.inputs,original=checked.expenses.find(row=>`s${origin}-${row.id}`===expense.id);
+   if(original)allowed.push(...assumptions(original,`/expenses/${index}`));
+  }
+ }
+
+ if(assumptions(draft.inputs).some(atom=>!allowed.some(prior=>prior.path===atom.path&&same(atom.atom,prior.atom))))fail('User-confirmed values must retain their checked source field and target, never a model interpretation.');
 }
 export function assertSourcesCurrent(catalog:PlanAlternatives|null,keys:Record<string,string>){
  for(const [id,key] of Object.entries(keys)){const plan=catalog?.plans.find(item=>item.id===id&&!item.deleted);if(!plan||bundleInputKey(plan.draft)!==key)fail('A source plan changed or was removed. Review the proposal again; earlier work is kept.');}
@@ -124,7 +183,7 @@ function quantityValue(request:SolutionRequest,q:SolutionQuantity):Assumption<nu
  if(q.kind==='reference'||q.kind==='scale'){
   if(!q.source||unitFor(q.source.field)!==q.unit)fail('A relative/reference quantity must use an actual value with the same units.');
   const prior=readQuantity(source(request,q.source).draft,q.source.field,q.source.target);
-  if(q.kind==='reference')return structuredClone(prior);
+  if(q.kind==='reference')return prior.value===null?unknownAssumption():{value:prior.value,kind:'illustrative',basis:'Unconfirmed application of a checked source value to the proposed target.'};
   if(q.factor===null||prior.value!==null&&typeof prior.value!=='number')fail('A relative numeric change needs a numeric reference and explicit factor.');
   value=prior.value===null?null:(prior.value as number)*q.factor;
  }else value=q.unit==='boolean'?q.text==='true'?true:q.text==='false'?false:fail('Review an explicit true/false interpretation.'):['text','YYYY-MM','YYYY-MM-DD'].includes(q.unit)?q.text:q.number;
@@ -132,19 +191,23 @@ function quantityValue(request:SolutionRequest,q:SolutionQuantity):Assumption<nu
  if(typeof value==='number'&&(!Number.isFinite(value)||value<0||value>(q.field==='horizon_months'?24:q.field==='hours_per_participant'?1000:q.field==='participants'?1000000:1e9)||['participants','horizon_months'].includes(q.field)&&!Number.isInteger(value)||q.field==='horizon_months'&&value<1))fail(`The normalized ${q.field} is outside its supported range.`);
  if(q.unit==='YYYY-MM'&&(typeof value!=='string'||!/^20\d\d-(0[1-9]|1[0-2])$/.test(value)))fail('Review a normalized YYYY-MM start month.');
  if(q.unit==='YYYY-MM-DD'&&(typeof value!=='string'||!/^20\d\d-(0[1-9]|1[0-2])-\d\d$/.test(value)||!Number.isFinite(Date.parse(value))||new Date(value).toISOString().slice(0,10)!==value))fail('Review a real normalized calendar date.');
- return {value,kind:'user-entered',basis:`Interpreted from user turn ${q.turnId}: ${q.interpretation}`.slice(0,240)};
+ return {value,kind:'illustrative',basis:`Unconfirmed model interpretation of turn ${q.turnId}: ${q.interpretation}`.slice(0,240)};
 }
-function applyQuantity(input:BundleInputs,q:SolutionQuantity,value:Assumption<number|string|boolean>,activities:string[],freshParticipantGroup=false){
+function applyQuantity(input:BundleInputs,q:SolutionQuantity,value:Assumption<number|string|boolean>,activities:string[]){
  const number=value as Assumption<number>,string=value as Assumption<string>;
  switch(q.field){
   case 'budget_usd':input.budget={amount:number,basis:{value:'cash',kind:'adopted',basis:'Cash ceiling; not an expense, funding or approval.'}};break;
   case 'participants':{
    const ids=q.target==='all'?activities:activities.includes(q.target??'')?[q.target!]:[];if(!ids.length)fail('Participant inputs need an actual candidate activity or all.');
    input.groupsDisjoint=unknownAssumption();
-   const groupBase=q.target==='all'?'people':`people-${q.target}`;let groupId=groupBase;
-   if(freshParticipantGroup){let suffix=1;while(input.groups.some(group=>group.id===groupId))groupId=groupBase+'-edit-'+suffix++;}
-   input.groups=input.groups.filter(group=>group.id!==groupId);input.groups.push({id:groupId,label:q.target==='all'?'Reviewed shared participants':`Participants for ${q.target}`,count:number});
-   for(const componentId of ids){input.memberships=input.memberships.filter(item=>item.componentId!==componentId);input.memberships.push({componentId,groupIds:[groupId],complete:{value:true,kind:'user-entered',basis:value.basis??'Explicit participant interpretation.'}});}break;
+   // Counts and overlap are independent: a model target of all does not confirm sharing.
+   for(const componentId of ids){
+    const groupBase=`proposed-${componentId}`;let groupId=groupBase,suffix=1;
+    while(input.groups.some(group=>group.id===groupId))groupId=groupBase+'-'+suffix++;
+    input.groups.push({id:groupId,label:`Proposed participants for ${componentId}`,count:number});
+    input.memberships=input.memberships.filter(item=>item.componentId!==componentId);
+    input.memberships.push({componentId,groupIds:[groupId],complete:unknownAssumption()});
+   }break;
   }
   case 'hours_per_participant':case 'coordination_hours':if(!input.deliveryEstimate)input.deliveryEstimate={hoursPerParticipant:unknownAssumption(),coordinationHours:unknownAssumption(),hourlyRate:unknownAssumption(),acceptance:unknownAssumption()};input.deliveryEstimate[q.field==='hours_per_participant'?'hoursPerParticipant':'coordinationHours']=number;break;
   case 'cash':{
@@ -173,10 +236,10 @@ function applyParameterQuantity(input:BundleInputs,q:SolutionQuantity,value:Assu
    input.groups.find(row=>row.id===groupId)!.count=value as Assumption<number>;return;
   }
  }
- applyQuantity(input,q,value,activities,true);
+ applyQuantity(input,q,value,activities);
  if(q.field==='participants'){
   const used=new Set(input.memberships.flatMap(row=>row.groupIds));input.groups=input.groups.filter(row=>used.has(row.id));
-  if(input.groups.length===1)input.groupsDisjoint={value:true,kind:'adopted',basis:'One shared group identity after the explicit participant edit.'};
+  if(input.groups.length!==1||input.memberships.some(row=>row.complete.value!==true))input.groupsDisjoint=unknownAssumption();
  }
 }
 function applyReviewedInputs(request:SolutionRequest,evaluation:SolutionEvaluation,input:BundleInputs,quantitiesToApply:SolutionQuantity[],constraints:SolutionConstraint[],activities:string[],parameterOnly=false){
@@ -190,14 +253,15 @@ function applyReviewedInputs(request:SolutionRequest,evaluation:SolutionEvaluati
    }
    evaluation.interpretations.push(`Current ${constraint.field}: ${constraint.number??constraint.text} ${constraint.unit}, from user turn ${constraint.turnId}; takes precedence over earlier assumptions.`);
    if(constraint.field==='max_hours')continue;
-   const value={value:constraint.number??constraint.text,kind:'user-entered' as const,basis:`Current interpreted constraint from user turn ${constraint.turnId}.`};
+   const value={value:constraint.number??constraint.text,kind:'illustrative' as const,basis:`Unconfirmed model interpretation of constraint from turn ${constraint.turnId}.`};
    applyQuantity(input,{field:constraint.field,target:null} as SolutionQuantity,value as Assumption<number|string>,activities);
   }
 }
-function finishEvaluation(evaluation:SolutionEvaluation,draft:BundleDraft,constraints:SolutionConstraint[]){
+function finishEvaluation(request:SolutionRequest,evaluation:SolutionEvaluation,draft:BundleDraft,constraints:SolutionConstraint[]){
  const input=draft.inputs;
   draft.signature=bundleSignature(draft.bundle);
   if(!readBundleDraft(draft))fail('This normalized candidate does not satisfy the existing plan data contract. Unsupported scope or accounting stays conversational.');
+  assertSolutionParticipationProvenance(request,evaluation.candidate,draft);evaluation.provenanceVersion=solutionProvenanceVersion;
   const result=reconcileBundle(draft);evaluation.draft=draft;evaluation.result=result;evaluation.issues=[...result.issues];
   if(evaluation.result.budget?.status==='over')evaluation.blocking.push('Known cash exceeds the current cash ceiling. Refine the proposal or correct the constraint before saving.');
   const hours=evaluation.result.deliveryEstimate?.hours??null,maxHours=constraints.find(item=>item.field==='max_hours'&&item.action==='set')?.number;
@@ -225,7 +289,7 @@ export async function evaluateSolutionParameterEdit(request:SolutionRequest,edit
   for(const q of edit.quantities)if(q.source){const dependency=source(request,q.source);Object.assign(evaluation.sourceKeys,dependency.sourceKeys);for(const ref of dependency.sourceRefs)if(!evaluation.sourceRefs.some(old=>old.id===ref.id))evaluation.sourceRefs.push(ref);}
   applyReviewedInputs(request,evaluation,draft.inputs,edit.quantities,constraints,draft.bundle.components.map(c=>c.id),true);
   evaluation.changes.push('Only the listed parameters and current constraints were changed. Source activities and unrelated assumptions, including unknowns, are retained.');
-  finishEvaluation(evaluation,draft,constraints);
+  finishEvaluation(request,evaluation,draft,constraints);
  }catch(error){evaluation.blocking.push(error instanceof Error?error.message:'The parameter edit could not be calculated.');}
  return evaluation;
 }
@@ -297,15 +361,16 @@ export async function evaluateSolutionCandidate(request:SolutionRequest,candidat
   if(!input.successMeasure)input.successMeasure={goal,scopeKey:JSON.stringify([goal,request.scope]),name:candidate.successMeasure,baseline:unknownAssumption(),target:unknownAssumption()};
   if(input.successMeasure.goal!==goal)fail('A saved outcome measure belongs to another goal; review it explicitly.');
   applyReviewedInputs(request,evaluation,input,candidate.quantities,constraints,components.map(item=>item.id));
-  // Explicit same-people links share a single group identity, with cycle checks.
+  // Model same-people links are proposals, never user confirmation. Preserve only existing source identity.
   const audienceDone=new Set<string>(),audienceVisiting=new Set<string>();
-  const audience=(activityId:string)=>{if(audienceDone.has(activityId))return;const activity=candidate.activities.find(item=>item.id===activityId);if(!activity||audienceVisiting.has(activityId))fail('The same-people reference is missing or circular.');audienceVisiting.add(activityId);if(activity.audienceOf){audience(activity.audienceOf);const shared=input.memberships.find(row=>row.componentId===activity.audienceOf)!;input.groupsDisjoint=unknownAssumption();input.memberships=input.memberships.filter(row=>row.componentId!==activityId);input.memberships.push({...structuredClone(shared),componentId:activityId});evaluation.interpretations.push(`${activity.name}: the same participant group as ${candidate.activities.find(row=>row.id===activity.audienceOf)!.name}; counted once.`);}audienceVisiting.delete(activityId);audienceDone.add(activityId);};
+  const audience=(activityId:string)=>{if(audienceDone.has(activityId))return;const activity=candidate.activities.find(item=>item.id===activityId);if(!activity||audienceVisiting.has(activityId))fail('The same-people reference is missing or circular.');audienceVisiting.add(activityId);if(activity.audienceOf){audience(activity.audienceOf);const shared=input.memberships.find(row=>row.componentId===activity.audienceOf)!,own=input.memberships.find(row=>row.componentId===activityId)!;const inherited=own.complete.value===true&&shared.complete.value===true&&same(own.groupIds,shared.groupIds)&&own.groupIds.length>0;if(!inherited){own.complete=unknownAssumption();input.groupsDisjoint=unknownAssumption();}evaluation.interpretations.push(`${activity.name}: ${inherited?'retains checked source participation':'proposes shared participation, still unconfirmed'} with ${candidate.activities.find(row=>row.id===activity.audienceOf)!.name}. A model reference or conversation turn does not confirm cohort identity.`);}audienceVisiting.delete(activityId);audienceDone.add(activityId);};
   candidate.activities.forEach(activity=>audience(activity.id));
   const usedGroups=new Set(input.memberships.flatMap(row=>row.groupIds));input.groups=input.groups.filter(group=>usedGroups.has(group.id));
-  if(input.groups.length===1)input.groupsDisjoint={value:true,kind:'adopted',basis:'One shared group identity; no cross-group overlap is assumed.'};
+  if(input.memberships.some(row=>row.complete.value!==true))input.groupsDisjoint=unknownAssumption();
+  if(input.groups.length===1&&input.memberships.every(row=>row.complete.value===true))input.groupsDisjoint={value:true,kind:'adopted',basis:'Retained checked source cohort identity; no new sharing inferred.'};
   if(input.expenses.length===1)input.costsDistinct={value:true,kind:'adopted',basis:'One cash item; no cross-item sum.'};
   for(const item of resolved.values()){Object.assign(evaluation.sourceKeys,item.sourceKeys);for(const ref of item.sourceRefs)if(!evaluation.sourceRefs.some(old=>old.id===ref.id))evaluation.sourceRefs.push(ref);}
-  finishEvaluation(evaluation,draft,constraints);
+  finishEvaluation(request,evaluation,draft,constraints);
  }catch(error){evaluation.blocking.push(error instanceof Error?error.message:'The candidate could not be calculated.');}
  return evaluation;
 }
@@ -313,6 +378,7 @@ export async function evaluateSolutionCandidate(request:SolutionRequest,candidat
 export async function saveSolutionCandidate(request:SolutionRequest,current:PlanAlternatives|null,evaluation:SolutionEvaluation,goal:{id:string;statement:string},currentEvidence:unknown,acknowledgeUnknowns:boolean){
  if(!id(goal.id)||!text(goal.statement,240))fail('Pin the reviewed goal before saving this proposal.');
  if(evaluation.blocking.length||!evaluation.draft||!evaluation.result)fail('Resolve the candidate’s blocking calculation feedback before saving.');
+ if(evaluation.provenanceVersion!==solutionProvenanceVersion)fail('Legacy conversation provenance requires reevaluation before saving.');
  if(!acknowledgeUnknowns&&evaluation.issues.length)fail('Acknowledge the listed unknowns before saving this proposal.');
  const latest=request.state.working.filter(item=>item.id===evaluation.id).at(-1);
  if(!latest||!same(latest,evaluation)||!same(request.state.constraints,evaluation.constraints)||request.state.rejected.some(item=>item.candidateId===evaluation.id&&item.revision===evaluation.revision))fail('This proposal is no longer the current reviewed revision. Refine it using the current constraints before saving.');
@@ -320,13 +386,16 @@ export async function saveSolutionCandidate(request:SolutionRequest,current:Plan
  if(actionBindingKey(binding)!==actionBindingKey(evaluation.binding))fail('The evidence, goal or constraints changed. Review the current proposal before saving.');
  if(request.goal.id&&(!same(request.goal,goal)))fail('The active goal changed. Earlier saved work is preserved.');
  assertSourcesCurrent(current,evaluation.sourceKeys);
+ assertSolutionParticipationProvenance({...request,state:{...request.state,working:request.state.working.filter(row=>row.id!==evaluation.id||row.revision<evaluation.revision)}},evaluation.candidate,evaluation.draft);
+ if(!same(reconcileBundle(evaluation.draft),evaluation.result))fail('The current calculation no longer matches its reviewed inputs.');
+
  const saveId=await solutionSaveId(request.requestId,evaluation.id,evaluation.revision);
  const prior=current?.plans.find(item=>item.requestId===saveId);
  if(!prior&&!same(current,request.catalog))fail('The saved catalog changed. Review the proposal again before saving.');
  const draft=structuredClone(evaluation.draft);draft.binding={...draft.binding,goalId:goal.id,goal:goal.statement};if(draft.inputs.successMeasure)draft.inputs.successMeasure.goal=goal.statement;
  if(draft.inputs.whatIf&&goal.statement!==request.goal.statement)fail('Review the saved outcome scenario for the pinned goal before saving.');
  if(!readBundleDraft(draft))fail('The proposal could not be rebound to the reviewed goal.');
- return appendConversationAlternative(current,{goalId:goal.id,goal:goal.statement},{requestId:saveId,text:request.message.text.slice(0,1200),sourceIds:evaluation.sourceRefs.map(ref=>ref.id),expectedInputs:evaluation.sourceKeys},draft,[evaluation.candidate.rationale,...evaluation.candidate.tradeoffs,evaluation.candidate.nextStep,...evaluation.changes],JSON.stringify(evaluation.candidate));
+ return appendConversationAlternative(current,{goalId:goal.id,goal:goal.statement},{requestId:saveId,text:request.message.text.slice(0,1200),sourceIds:evaluation.sourceRefs.map(ref=>ref.id),expectedInputs:evaluation.sourceKeys},draft,[evaluation.candidate.rationale,...evaluation.candidate.tradeoffs,evaluation.candidate.nextStep,...evaluation.changes],JSON.stringify(evaluation.candidate),solutionProvenanceVersion);
 }
 export async function solutionSaveId(requestId:string,candidateId:string,revision:number){return 'conversation-'+[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([requestId,candidateId,revision]))))].map(value=>value.toString(16).padStart(2,'0')).join('');}
 
@@ -336,7 +405,7 @@ export function resolveSolutionMetric(state:Pick<SolutionState,'working'|'analys
   const item=state.working.find(item=>item.id===ref.id&&item.revision===ref.revision);
   if(!item?.result||item.blocking.length||!['cash_usd','staff_hours','participants'].includes(ref.metric))fail('The claimed result has no checked candidate metric.');
   const metrics={cash_usd:{label:'Cash total',value:item.result.cashEstimate?.cash??null,unit:'USD'},staff_hours:{label:'Staff effort',value:item.result.deliveryEstimate?.hours??null,unit:'hours'},participants:{label:'Distinct participants',value:item.result.uniqueParticipants,unit:'people'}};
-  return {...metrics[ref.metric as keyof typeof metrics],basis:'Calculated from reviewed assumptions',source:`${item.candidate.name}, revision ${item.revision}`};
+  return {...metrics[ref.metric as keyof typeof metrics],basis:'Calculated from stated assumptions; model interpretations remain unconfirmed',source:`${item.candidate.name}, revision ${item.revision}`};
  }
  const item=state.analyses.find(item=>item.id===ref.id&&item.revision===ref.revision);
  if(!item||!['opening_headcount','closing_headcount'].includes(ref.metric))fail('The claimed result has no checked projection metric.');
