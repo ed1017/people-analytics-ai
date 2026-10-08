@@ -1,3 +1,5 @@
+// @ts-expect-error Native fixtures share TypeScript source.
+import {reviewReferencedDemandTool,reviseReferencedDemandTool,createReferencedDemandReview,reviseReferencedDemandReview,referencedDemandView,demandReferenceId} from './swp-demand-reference.ts';
 // @ts-expect-error Native Node fixtures share TypeScript source.
 import {goalProgressProposalTool,createProgressEntryProposal,readProgressEntryState,type ProgressEntryProposal,type ProgressEntryContext} from './goal-progress-entry.ts';
 import type {SolutionRequest,SolutionState,SolutionEvaluation} from './home-solution-conversation';
@@ -21,7 +23,7 @@ import {actionEvidenceCatalog} from './home-action-proposal.ts';
 
 export type SolutionModelOutput={items:unknown[];calls:{id:string;name:string;arguments:string}[];text:string;completed:boolean};
 export type SolutionReply={requestId:string;answer:string;candidateIds:string[];analysisIds:string[];state:SolutionState;usage:{modelRounds:number;toolCalls:number};progressProposal?:ProgressEntryProposal;demandReview?:DemandReview};
-export type SolutionRuntime={complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal)=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date;progress?:{enabled:boolean;datasetToken:string};demand?:{datasetToken:string}};
+export type SolutionRuntime={complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal)=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date;progress?:{enabled:boolean;datasetToken:string};demand?:{datasetToken:string;referenceContract?:boolean}};
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 const abort=(signal:AbortSignal)=>{if(signal.aborted)throw Error('Conversation request cancelled.');};
 const latest=<T extends {id:string}>(items:T[])=>[...new Map(items.map(item=>[item.id,item])).values()];
@@ -51,7 +53,11 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  const entryContext:ProgressEntryContext|undefined=progress?.context&&request.goal.id?{input:request.goalProgress as ProgressEntryContext['input'],goal:request.goal.statement,requestId:request.requestId,turns:solutionUserTurns(request).map(({id,text})=>({id,text})),previous:readProgressEntryState(request.progressEntry),now:(runtime.now?.()??new Date()).toISOString()}:undefined;
  let progressProposal:ProgressEntryProposal|undefined;
  let demandReview:DemandReview|undefined;
- const input:unknown[]=[{role:'user',content:'CURRENT AUTHORITATIVE CONTEXT AND CONVERSATION DATA\n'+JSON.stringify({...solutionModelContext(request,progress),...(entryContext?{progressEntryDraft:entryContext.previous}:{} )})}];
+ const referenced=!!demand&&runtime.demand?.referenceContract===true;let referenceStep=0;
+ let currentDemandReference=referenced?demandReferenceId(request.requestId,referenceStep):'';
+ const modelContext=solutionModelContext(request,progress);
+ if(referenced&&demand){const goalContext=structuredClone(request.goalContext) as {scenarioReview:Record<string,unknown>};goalContext.scenarioReview.demandProposal=demand.demandProposal?referencedDemandView(demand.demandProposal,demand,currentDemandReference):null;modelContext.goalContext=goalContext;}
+ const input:unknown[]=[{role:'user',content:'CURRENT AUTHORITATIVE CONTEXT AND CONVERSATION DATA\n'+JSON.stringify({...modelContext,...(entryContext?{progressEntryDraft:entryContext.previous}:{} )})}];
  const evaluated=new Map<string,SolutionEvaluation>(),analyses=new Map<string,HeadcountProjection>();
  let toolCalls=0,projectionInput:Promise<ProjectionInputs>|undefined,final:SolutionFinal|undefined,rounds=0;
  for(let round=0;round<4;round++){
@@ -64,14 +70,14 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   for(const call of output.calls){
    abort(signal);toolCalls++;let result:unknown;
    try{
-    const tool=demand?[serviceDemandTool,demandPatchTool,...solutionTools.filter(t=>['read_clock','read_evidence'].includes(t.name))].find(t=>t.name===call.name):call.name==='propose_goal_progress'&&entryContext?goalProgressProposalTool:call.name==='read_goal_progress'&&progress?goalProgressReadTool:solutionTools.find(tool=>tool.name===call.name);if(!tool||call.arguments.length>32000)throw Error('Unsupported or oversized tool request.');const args=JSON.parse(call.arguments);
+    const tool=demand?[...(referenced?[reviewReferencedDemandTool,reviseReferencedDemandTool]:[serviceDemandTool,demandPatchTool]),...solutionTools.filter(t=>['read_clock','read_evidence'].includes(t.name))].find(t=>t.name===call.name):call.name==='propose_goal_progress'&&entryContext?goalProgressProposalTool:call.name==='read_goal_progress'&&progress?goalProgressReadTool:solutionTools.find(tool=>tool.name===call.name);if(!tool||call.arguments.length>32000)throw Error('Unsupported or oversized tool request.');const args=JSON.parse(call.arguments);
     const periodFeedback=demand?demandPeriodFeedback(call.name,args):null;
     if(periodFeedback){input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(periodFeedback)});continue;}
     assertSolutionShape(args,tool.parameters,'tool arguments');
-    if((call.name==='review_service_demand'||call.name==='revise_service_demand')&&demand){
+    if(['review_service_demand','revise_service_demand','review_scoped_service_demand','revise_scoped_service_demand'].includes(call.name)&&demand){
      const prior=demandReview??demand.demandProposal,turns=solutionUserTurns(request).map(({id,text})=>({id,text}));
-     if(call.name==='review_service_demand'){if(prior)throw Error('Use an exact-key parameter edit to preserve existing assumptions.');demandReview=createDemandReview(args.spec,demand,request.requestId,turns);}
-     else {if(!prior)throw Error('No current demand review exists.');demandReview=reviseDemandReview(prior,args.edit,demand,request.requestId,turns,request.message.id);}result=demandReview;
+     if(call.name==='review_service_demand'||call.name==='review_scoped_service_demand'){if(prior)throw Error('Use a source-bound parameter edit to preserve existing assumptions.');demandReview=referenced?createReferencedDemandReview(args.spec,demand,request.requestId,turns):createDemandReview(args.spec,demand,request.requestId,turns);}
+     else {if(!prior)throw Error('No current demand review exists.');demandReview=referenced?reviseReferencedDemandReview(prior,args.edit,demand,request.requestId,turns,request.message.id,currentDemandReference):reviseDemandReview(prior,args.edit,demand,request.requestId,turns,request.message.id);}if(referenced){currentDemandReference=demandReferenceId(request.requestId,++referenceStep);result=referencedDemandView(demandReview,demand,currentDemandReference);}else result=demandReview;
     }else if(call.name==='propose_goal_progress'&&entryContext){
      progressProposal=await createProgressEntryProposal(args.spec,entryContext);result=progressProposal;
     }else if(call.name==='read_goal_progress'){

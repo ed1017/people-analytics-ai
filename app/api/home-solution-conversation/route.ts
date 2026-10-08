@@ -1,3 +1,4 @@
+import {demandReferenceModelContract} from '@/lib/swp-demand-reference';
 import {progressModelContract} from '@/lib/goal-progress-entry-service';
 import { withDatasetRequest, datasetAI, datasetRouter } from '@/lib/dataset-runtime';
 import OpenAI from 'openai';
@@ -6,7 +7,7 @@ import {CHAT_MODEL} from '@/lib/chat-model';
 import {openAIProxyTransport} from '@/lib/openai-proxy-transport';
 import {readSolutionRequest,solutionConversationEnabled} from '@/lib/home-solution-conversation';
 import {SWP_CONVERSATION_HEADER,swpConversationModel} from '@/lib/swp-conversation-model';
-import {SWP_DEMAND_MODE,requestDemandContext,demandInstructions,serviceDemandTool,demandPatchTool} from '@/lib/swp-demand';
+import {SWP_DEMAND_MODE,requestDemandContext} from '@/lib/swp-demand';
 import {solutionConversationInstructions,solutionResponseFormat,solutionTools} from '@/lib/home-solution-conversation-schema';
 import {converseSolutions} from '@/lib/home-solution-conversation-service';
 import {goalProgressConversationEnabled} from '@/lib/goal-progress-conversation';
@@ -23,12 +24,12 @@ async function handlePOST(request:Request){
   const client=new OpenAI({...openAIProxyTransport(),apiKey:process.env.OPENAI_API_KEY,maxRetries:0});
   const signal=AbortSignal.any([request.signal,AbortSignal.timeout(90000)]);
   const progressContract=progressModelContract(goalProgressConversationEnabled);
-  const conversationTools=demand?[...solutionTools.filter(t=>['read_clock','read_evidence'].includes(t.name)),serviceDemandTool,demandPatchTool]:[...solutionTools,...progressContract.tools];
+  const conversationTools=demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools];
   const reply=await converseSolutions(parsed,{
-   ...(demand?{demand:{datasetToken:datasetRouter.current().token}}:{}),
+   ...(demand?{demand:{datasetToken:datasetRouter.current().token,referenceContract:true}}:{}),
    progress:{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token},
    complete:async(input,finalOnly,signal)=>{
-    const response=await datasetAI(() => client.responses.create({model:CHAT_MODEL,...swpModel,instructions:solutionConversationInstructions+(demand?'\n'+demandInstructions:progressContract.instructions),input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:30000,signal}));
+    const response=await datasetAI(() => client.responses.create({model:CHAT_MODEL,...swpModel,instructions:demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:30000,signal}));
     return {completed:response.status==='completed',items:response.output,calls:response.output.filter(item=>item.type==='function_call').map(item=>({id:item.call_id,name:item.name,arguments:item.arguments})),text:response.output_text};
    },
    loadProjection:async(filters,signal)=>(await import('@/lib/home-solution-projection-source')).loadSolutionProjectionInputs(filters,signal),
