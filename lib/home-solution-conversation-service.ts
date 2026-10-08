@@ -8,6 +8,9 @@ import {assertSolutionShape,solutionTools,solutionFinalSchema} from './home-solu
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {calculateHeadcountProjection} from './home-solution-projection.ts';
 
+// @ts-expect-error Native fixture tests share TypeScript source.
+import {solutionPlanView,solutionEvaluationView,solutionResultView} from './home-solution-model-view.ts';
+
 export type SolutionModelOutput={items:unknown[];calls:{id:string;name:string;arguments:string}[];text:string;completed:boolean};
 export type SolutionReply={requestId:string;answer:string;candidateIds:string[];analysisIds:string[];state:SolutionState;usage:{modelRounds:number;toolCalls:number}};
 export type SolutionRuntime={complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal)=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date};
@@ -26,9 +29,9 @@ function checkedMetricReferences(state:SolutionState,kind:SolutionMetricRef['kin
 export function solutionModelContext(request:SolutionRequest){
  const saved=request.catalog?.plans.filter(plan=>!plan.deleted)??[];
  return {goal:request.goal,scope:request.scope,filters:request.filters,timeZone:request.timeZone,goalContext:request.goalContext,currentEvidence:request.evidence,currentConstraints:request.state.constraints,
-  savedPlans:saved.map(plan=>({id:plan.id,number:plan.number,revision:plan.draft.revision,name:plan.draft.bundle.name,objective:plan.draft.bundle.objective,activities:plan.draft.bundle.components})),selectedPlan:saved.find(plan=>plan.id===request.selectedId)??null,
-  recentTurns:request.state.turns.slice(-16),workingProposals:latest(request.state.working).slice(-6).map(item=>({id:item.id,revision:item.revision,candidate:item.candidate,inputs:item.draft?.inputs??null,result:item.result,changes:item.changes,blocking:item.blocking})),
-  analyses:latest(request.state.analyses).map(item=>({id:item.id,revision:item.revision,method:item.spec.method,months:item.spec.months,assumptions:item.assumptions,opening:item.inputs.opening,asOf:item.inputs.asOf,scope:item.inputs.scope,interpretations:item.interpretations,finalHeadcount:item.points.at(-1)?.headcount})),
+  savedPlans:saved.map(plan=>({id:plan.id,number:plan.number,revision:plan.draft.revision,name:plan.draft.bundle.name,objective:plan.draft.bundle.objective,activities:plan.draft.bundle.components})),selectedPlan:saved.some(plan=>plan.id===request.selectedId)?solutionPlanView(saved.find(plan=>plan.id===request.selectedId)!):null,
+  recentTurns:request.state.turns,modelView:{version:1,omittedInternalEqualityKeys:['draft.signature','result.signature','result.bindingKey','result.inputKey','evaluation.sourceKeys'],authoritativeState:'Retained on the server; projected views cannot be saved or used as authoritative input.',history:'All retained turns; no history truncation during projection.'},currentWorkingRevisions:latest(request.state.working).map(({id,revision})=>({id,revision})),workingProposals:request.state.working.map(item=>{const view=solutionEvaluationView(request,item);return {...view,inputs:item.draft?.inputs??null,draft:undefined,result:item.result?solutionResultView(item.result):null};}),
+  analyses:request.state.analyses.map(item=>({id:item.id,revision:item.revision,method:item.spec.method,months:item.spec.months,assumptions:item.assumptions,opening:item.inputs.opening,asOf:item.inputs.asOf,scope:item.inputs.scope,interpretations:item.interpretations,finalHeadcount:item.points.at(-1)?.headcount})),
   rejectedIdeas:request.state.rejected,unresolvedQuestions:request.state.questions,focusCandidateId:request.state.focusCandidateId,currentMessage:request.message,
  };
 }
@@ -56,11 +59,11 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
      const ids=args.sourceIds as string[];if(ids.some(id=>!sources.some(source=>source.id===id)))throw Error('A requested current evidence source is unavailable.');
      result=ids.length?sources.filter(source=>ids.includes(source.id as string)):sources.map(({id,label,scope,date,status,limitation})=>({id,label,scope,date,status,limitation}));
     }else if(call.name==='read_plans'){
-     const ids=args.planIds as string[];result=ids.map(id=>{const plan=request.catalog?.plans.find(plan=>plan.id===id&&!plan.deleted);if(!plan)throw Error('A requested saved plan is unavailable.');return plan;});
+     const ids=args.planIds as string[];result=ids.map(id=>{const plan=request.catalog?.plans.find(plan=>plan.id===id&&!plan.deleted);if(!plan)throw Error('A requested saved plan is unavailable.');return solutionPlanView(plan);});
     }else if(call.name==='evaluate_candidate'||call.name==='revise_parameters'){
      const constraints=mergeSolutionConstraints(request,state.constraints,args.constraintUpdates as SolutionConstraint[]);
      const item=call.name==='revise_parameters'?await evaluateSolutionParameterEdit(request,args.edit as SolutionParameterEdit,constraints):await evaluateSolutionCandidate(request,args.candidate as SolutionCandidate,constraints);abort(signal);
-     state.constraints=constraints;state.working=[...state.working,item].slice(-12);evaluated.set(item.id,item);result={...item,verifiedMetricReferences:checkedMetricReferences(state,'candidate',item.id,item.revision)};
+     state.constraints=constraints;state.working=[...state.working,item].slice(-12);evaluated.set(item.id,item);result={...solutionEvaluationView(request,item),verifiedMetricReferences:checkedMetricReferences(state,'candidate',item.id,item.revision)};
     }else{
      projectionInput??=runtime.loadProjection(request.filters,signal);
      const item=await calculateHeadcountProjection(args.spec as ProjectionSpec,await projectionInput,state.analyses,solutionUserTurns(request).map(turn=>turn.id));abort(signal);
