@@ -102,7 +102,7 @@ function readQuantity(draft:BundleDraft,field:SolutionField,target:string|null):
  const input=draft.inputs;
  switch(field){
   case 'budget_usd':return input.budget?.amount??unknownAssumption();
-  case 'participants':{const group=input.groups.find(item=>item.id===target);if(group)return group.count;const membership=input.memberships.find(item=>item.componentId===target);if(membership?.groupIds.length===1)return input.groups.find(item=>item.id===membership.groupIds[0])!.count;return input.groups.length===1?input.groups[0].count:fail('Choose one actual participant group for this reference.');}
+  case 'participants':{const group=input.groups.find(item=>item.id===target);if(group)return group.count;const membership=input.memberships.find(item=>item.componentId===target);if(membership?.groupIds.length===1)return input.groups.find(item=>item.id===membership.groupIds[0])!.count;return target===null&&input.groups.length===1?input.groups[0].count:fail('Choose one actual participant group or activity for this reference.');}
   case 'hours_per_participant':return input.deliveryEstimate?.hoursPerParticipant??unknownAssumption();
   case 'coordination_hours':return input.deliveryEstimate?.coordinationHours??unknownAssumption();
   case 'cash':{const explicit=input.expenses.find(item=>item.id===target&&item.kind==='cash');if(explicit)return explicit.amount;const links=input.expenseLinks.filter(item=>item.componentIds.length===1&&item.componentIds[0]===target),rows=input.expenses.filter(item=>item.kind==='cash'&&links.some(link=>link.expenseId===item.id));if(rows.length!==1)fail('Choose the exact cash item; this activity has multiple or unknown allowances.');return rows[0].amount;}

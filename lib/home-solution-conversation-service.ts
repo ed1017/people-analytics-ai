@@ -10,6 +10,8 @@ import {calculateHeadcountProjection} from './home-solution-projection.ts';
 
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {solutionPlanView,solutionEvaluationView,solutionResultView} from './home-solution-model-view.ts';
+// @ts-expect-error Native fixture tests share TypeScript source.
+import {actionEvidenceCatalog} from './home-action-proposal.ts';
 
 export type SolutionModelOutput={items:unknown[];calls:{id:string;name:string;arguments:string}[];text:string;completed:boolean};
 export type SolutionReply={requestId:string;answer:string;candidateIds:string[];analysisIds:string[];state:SolutionState;usage:{modelRounds:number;toolCalls:number}};
@@ -28,7 +30,7 @@ function checkedMetricReferences(state:SolutionState,kind:SolutionMetricRef['kin
 }
 export function solutionModelContext(request:SolutionRequest){
  const saved=request.catalog?.plans.filter(plan=>!plan.deleted)??[];
- return {goal:request.goal,scope:request.scope,filters:request.filters,timeZone:request.timeZone,goalContext:request.goalContext,currentEvidence:request.evidence,currentConstraints:request.state.constraints,
+ return {goal:request.goal,scope:request.scope,filters:request.filters,timeZone:request.timeZone,goalContext:request.goalContext,currentEvidence:request.evidence,citationCatalog:actionEvidenceCatalog(request.evidence),currentConstraints:request.state.constraints,
   savedPlans:saved.map(plan=>({id:plan.id,number:plan.number,revision:plan.draft.revision,name:plan.draft.bundle.name,objective:plan.draft.bundle.objective,activities:plan.draft.bundle.components})),selectedPlan:saved.some(plan=>plan.id===request.selectedId)?solutionPlanView(saved.find(plan=>plan.id===request.selectedId)!):null,
   recentTurns:request.state.turns,modelView:{version:1,omittedInternalEqualityKeys:['draft.signature','result.signature','result.bindingKey','result.inputKey','evaluation.sourceKeys'],authoritativeState:'Retained on the server; projected views cannot be saved or used as authoritative input.',history:'All retained turns; no history truncation during projection.'},currentWorkingRevisions:latest(request.state.working).map(({id,revision})=>({id,revision})),workingProposals:request.state.working.map(item=>{const view=solutionEvaluationView(request,item);return {...view,inputs:item.draft?.inputs??null,draft:undefined,result:item.result?solutionResultView(item.result):null};}),
   analyses:request.state.analyses.map(item=>({id:item.id,revision:item.revision,method:item.spec.method,months:item.spec.months,assumptions:item.assumptions,opening:item.inputs.opening,asOf:item.inputs.asOf,scope:item.inputs.scope,interpretations:item.interpretations,finalHeadcount:item.points.at(-1)?.headcount})),
@@ -57,10 +59,21 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
     }else if(call.name==='read_evidence'){
      const sources=(request.evidence as {sources:Record<string,unknown>[]}).sources;
      const ids=args.sourceIds as string[];if(ids.some(id=>!sources.some(source=>source.id===id)))throw Error('A requested current evidence source is unavailable.');
-     result=ids.length?sources.filter(source=>ids.includes(source.id as string)):sources.map(({id,label,scope,date,status,limitation})=>({id,label,scope,date,status,limitation}));
+     const catalog=actionEvidenceCatalog(request.evidence);
+     result=(ids.length?sources.filter(source=>ids.includes(source.id as string)):sources.map(({id,label,scope,date,status,limitation})=>({id,label,scope,date,status,limitation}))).map(source=>({...source,citationCatalog:catalog.filter(item=>item.sourceId===source.id)}));
     }else if(call.name==='read_plans'){
      const ids=args.planIds as string[];result=ids.map(id=>{const plan=request.catalog?.plans.find(plan=>plan.id===id&&!plan.deleted);if(!plan)throw Error('A requested saved plan is unavailable.');return solutionPlanView(plan);});
     }else if(call.name==='evaluate_candidate'||call.name==='revise_parameters'){
+     // Validate citation identifiers before merging constraints or recording an evaluation.
+     // Feedback is data for the existing bounded model loop, never a repair or retry.
+     if(call.name==='evaluate_candidate'){
+      const candidate=args.candidate as SolutionCandidate,allowedEvidenceIds=actionEvidenceCatalog(request.evidence).map(item=>item.id);
+      const invalidReferences=candidate.activities.filter(activity=>activity.mode!=='retain').flatMap(activity=>activity.evidenceIds.filter(id=>!allowedEvidenceIds.includes(id)).map(id=>({activityId:activity.id,id})));
+      if(invalidReferences.length){
+       result={ok:false,code:'invalid_evidence_identifiers',error:'Activity citations must use exact current citationCatalog item IDs, not packet source IDs.',invalidReferences,allowedEvidenceIds,instruction:'Choose justified current citationCatalog entries or leave unsupported citations empty. Do not infer aliases, claim success or change the proposal silently. A corrected tool call uses the remaining existing round/tool budget.'};
+       input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(result)});continue;
+      }
+     }
      const constraints=mergeSolutionConstraints(request,state.constraints,args.constraintUpdates as SolutionConstraint[]);
      const item=call.name==='revise_parameters'?await evaluateSolutionParameterEdit(request,args.edit as SolutionParameterEdit,constraints):await evaluateSolutionCandidate(request,args.candidate as SolutionCandidate,constraints);abort(signal);
      state.constraints=constraints;state.working=[...state.working,item].slice(-12);evaluated.set(item.id,item);result={...solutionEvaluationView(request,item),verifiedMetricReferences:checkedMetricReferences(state,'candidate',item.id,item.revision)};
