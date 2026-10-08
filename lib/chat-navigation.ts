@@ -14,6 +14,7 @@ export const chatNavigationTargets = {
   "career-growth-mobility": "Career Growth & Internal Mobility",
   "succession-planning": "Succession Planning",
   "talent-acquisition": "Talent Acquisition",
+  "workload-capacity": "Workload & Capacity Planning",
   "planning-overview": "Planning Overview",
   "scenario-modeling": "Scenario Modeling",
   "position-workforce-design": "Position & Workforce Design",

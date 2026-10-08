@@ -59,6 +59,7 @@ export type AppPage =
   | "career-mobility"
   | "career-growth-mobility"
   | "succession-planning"
+  | "workload-capacity"
   | "planning-overview"
   | "scenario-modeling"
   | "position-workforce-design"

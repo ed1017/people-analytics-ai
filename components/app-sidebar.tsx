@@ -54,6 +54,7 @@ const pageIcons: Record<
   AppPage,
   LucideIcon
 > = {
+  "workload-capacity": CalendarDays,
   "decision-brief": MessageSquareText,
   "assess-evaluate": ShieldCheck,
   "occupational-references": Compass,

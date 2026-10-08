@@ -28,7 +28,7 @@ export const appWorkspaceJourneys: Array<{key: AppWorkspaceKey; journeyLabel: st
 export const appNavigationSections: AppNavigationSection[] = [
   {key:"analytics", title:"Workforce", pages:["workforce","attrition","talent-acquisition","compensation","survey-sentiment","skills","learning-development","career-growth-mobility","succession-planning"]},
   {key:"talent", title:"Intelligence", pages:["occupational-references","labor-market","training-coaching"]},
-  {key:"strategy", title:"Planning", pages:["planning-overview","scenario-modeling","position-workforce-design","workforce-response","execution-feasibility","finance","development-planning","decision-brief"]},
+  {key:"strategy", title:"Planning", pages:["planning-overview","workload-capacity","scenario-modeling","position-workforce-design","workforce-response","execution-feasibility","finance","development-planning","decision-brief"]},
   {key:"evaluate",title:"Assess & Evaluate",pages:["assess-evaluate"]},
 ];
 
@@ -36,6 +36,7 @@ export const appPageMetadata: Record<
   AppPage,
   AppPageMetadata
 > = {
+  "workload-capacity":{status:"Limited preview",label:"Workload & Capacity Planning",section:"Planning",description:"Compare illustrative ticket demand, source capacity and management constraints under reviewed assumptions."},
   "decision-brief":{label:"Decision brief",section:"Planning",description:"Your browser-local evidence, assumptions, proposals and explicit approval notes."},
   "assess-evaluate":{label:"Coming soon",section:"Assess & Evaluate",description:"Placeholder only; no outcomes, scorecard or ROI calculation."},
   "occupational-references": {label:"Occupational References",section:"Intelligence",description:"Search job-profile mappings, role requirements and O*NET occupation references."},

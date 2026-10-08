@@ -4,6 +4,7 @@ const workforce = "I brought the workforce snapshot and company trends together 
 const planning = "I built this as a starting point for turning a question into a modeled plan. Follow the five Planning steps to compare demand, positions, responses and feasibility; you choose when to run each model.";
 
 export const pageHelp: Record<AppPage, string> = {
+  "workload-capacity": "Explore the illustrative ticket scenario. Describe assumption changes in chat, review them, then accept for scenario use. Saving this report is unavailable until its source and management constraints have a reviewed integration contract.",
   "decision-brief":"Keep observed evidence, calculations, assumptions, unknowns, proposals and explicitly recorded approvals separate. This brief is saved only in this browser and is not sent to AI automatically.",
   "assess-evaluate":"Coming soon. This placeholder does not track outcomes, estimate ROI or run a scorecard.",
   "occupational-references": "Search internal job profiles and inspect their stored occupation mappings and role requirements. O*NET tasks, skills and preparation describe occupations; they do not measure employee attainment. Public starter references remain available when a stored source cannot load.",
