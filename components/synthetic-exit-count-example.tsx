@@ -12,9 +12,9 @@ const month=(value:string)=>new Date(value+'-01T00:00:00Z').toLocaleDateString('
 
 export function SyntheticExitCountExample({consumer = consumerArtifact, analysis, groupEvidence}: {consumer?: unknown; analysis?: unknown; groupEvidence?:unknown} = {}){
  const readiness = resolveForecastConsumerView(consumer, consumerArtifact, report);
- return <details className="mt-6 min-w-0 rounded-lg border bg-muted/10 p-3 text-sm" aria-label="Synthetic count example">
-  <summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Synthetic count example <span className="ml-2 text-xs font-normal text-muted-foreground">Conditional retrospective demo · 2026</span><span className="mt-1 block text-xs font-normal">Operational forecast unavailable{readiness.status === 'ready' ? ' · conditional synthetic example only' : ' · example evidence unavailable'}</span></summary>
-  <section aria-label="Conditional synthetic exit counts" className="min-w-0 space-y-4 pt-3">
+ return <details className="mt-3 min-w-0 rounded-lg border bg-muted/10 p-3 text-sm" aria-label="Synthetic count example">
+  <summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Synthetic count example <span className="ml-2 text-xs font-normal text-muted-foreground">Conditional retrospective estimates · 2026</span><span className="mt-1 block text-xs font-normal">Operational forecast unavailable{readiness.status === 'ready' ? ' · conditional synthetic example only' : ' · example evidence unavailable'}</span></summary>
+  <section aria-label="Conditional synthetic exit counts" className="min-w-0 space-y-2 pt-2">
    {readiness.status !== 'ready' ? <p role="status">{readiness.message}</p> : <>
    <div className="space-y-2">
     <h2 className="text-lg font-semibold">Recorded counts and conditional estimates</h2>

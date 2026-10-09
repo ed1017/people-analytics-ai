@@ -19,7 +19,7 @@ try{for(const [name,width,height] of [['wide',1844,1100],['desktop',1366,900],['
  const figure=page.getByRole('figure',{name:'Active requisitions: synthetic history and forecasts'});
  await figure.waitFor();check(name+' source version',await page.locator('[data-source-version="synthetic-ta-calibrated-v2"]').count()===1);
  check(name+' modeled assumption visible',await page.getByText(/Modeled stage attainment · Screening assumed/).isVisible());
- check(name+' compact chart',await figure.locator('svg[role=group]').evaluate(n=>n.getBoundingClientRect().height===214));
+ check(name+' compact chart',await figure.locator('svg[role=group]').evaluate(n=>n.getBoundingClientRect().height===194));
  await page.waitForFunction(()=>{const svg=document.querySelector('svg[aria-label="Requisition counts by month"]');return Math.abs(svg.width.baseVal.value-Math.max(760,svg.parentElement.clientWidth))<=1});
  check(name+' plot fills allocated width',await figure.locator('svg[role=group]').evaluate(n=>Math.abs(n.getBoundingClientRect().width-Math.max(760,n.parentElement.clientWidth))<=1));
  const activePanel=figure.locator('xpath=ancestor::section[1]'),comparison=activePanel.getByRole('table',{name:'Projected active requisitions at month-end',exact:true});

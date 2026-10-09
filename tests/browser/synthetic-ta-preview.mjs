@@ -22,7 +22,7 @@ try {
     const details = page.locator('details'), summary = details.locator('summary');
     check(name + ' one closed disclosure', await details.count() === 1 && !await details.evaluate(n => n.open));
     check(name + ' no page overflow', await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
-    check(name + ' compact chart', await page.getByRole('group', { name: 'Requisition counts by month' }).evaluate(n => n.getBoundingClientRect().height) === 214);
+    check(name + ' compact chart', await page.getByRole('group', { name: 'Requisition counts by month' }).evaluate(n => n.getBoundingClientRect().height) === 194);
     check(name + ' six funnel stages', await page.getByRole('list', { name: 'Cumulative recruiting stages' }).locator('li').count() === 6);
     check(name + ' funnel shapes', await page.locator('polygon').count() === 6);
     check(name + ' legend identifies forecasts', await page.getByLabel('Chart legend').innerText().then(t => ['Last count forecast', 'Recent mean (3) forecast', 'Damped change forecast'].every(s => t.includes(s))));

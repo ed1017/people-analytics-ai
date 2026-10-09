@@ -19,8 +19,8 @@ function HomeForecastDetails({domain,data}:{domain:SyntheticDemoDomain;data:type
 }
 export function HomeForecastChart({question,answer,taReady=false}:{question:string;answer:string;taReady?:boolean}) {
  const domain=homeForecastChartDomain(question,answer);if(!domain)return null;
- if(domain==="hiring")return !taReady?null:<div className="my-3"><CalibratedTaPanels chartOnly /></div>;
- return <section aria-label="Turnover projection for this answer" className="my-3 min-w-0 rounded-lg border p-3">
+ if(domain==="hiring")return !taReady?null:<div className="my-2"><CalibratedTaPanels chartOnly /></div>;
+ return <section aria-label="Turnover projection for this answer" className="my-2 min-w-0 rounded-lg border p-3">
   <SyntheticDomainPrediction domain={domain} data={artifact}/>
   <HomeForecastDetails domain={domain} data={artifact}/>
  </section>;
@@ -28,9 +28,9 @@ export function HomeForecastChart({question,answer,taReady=false}:{question:stri
 
 /** Starter charts use the same verified artifact and chart as the domain pages. */
 export function HomeStarterForecastChart({domain,taReady=false}:{domain:SyntheticDemoDomain;taReady?:boolean}){
- if(domain==="hiring")return !taReady?null:<div className="my-3"><CalibratedTaPanels chartOnly /></div>;
+ if(domain==="hiring")return !taReady?null:<div className="my-2"><CalibratedTaPanels chartOnly /></div>;
  const view=resolveSyntheticDomainDemo(artifact);if(view.status!=='ready'||view.data.domains[domain].status!=='predicted')return null;
- return <section aria-label={`${domain[0].toUpperCase()+domain.slice(1)} projection for this starter`} className="my-3 min-w-0 rounded-lg border p-3">
+ return <section aria-label={`${domain[0].toUpperCase()+domain.slice(1)} projection for this starter`} className="my-2 min-w-0 rounded-lg border p-3">
   <SyntheticDomainPrediction domain={domain} data={view.data}/>
   <HomeForecastDetails domain={domain} data={view.data}/>
  </section>;
