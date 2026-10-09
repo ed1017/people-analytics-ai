@@ -18,6 +18,8 @@ import {converseSolutions} from '@/lib/home-solution-conversation-service';
 import {goalProgressConversationEnabled} from '@/lib/goal-progress-conversation';
 
 export const dynamic='force-dynamic';
+// Leave response/cleanup headroom beyond the shared 90-second operation deadline.
+export const maxDuration=120;
 // This route owns the stronger Home conversation policy; other routes keep theirs.
 const homeSolutionModel={model:'gpt-6.1-sol',reasoning:{effort:'medium' as const},service_tier:'default' as const};
 async function handlePOST(request:Request){
@@ -49,7 +51,7 @@ async function handlePOST(request:Request){
    complete:async(input,finalOnly,signal)=>{
     const response=await datasetAI(() => {
      diagnostics.modelAttempt();
-     return client.responses.create({...homeSolutionModel,instructions:(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:30000,signal});
+     return client.responses.create({...homeSolutionModel,instructions:(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:60000,signal});
     });
     diagnostics.stage('response_validation');
     return {completed:response.status==='completed',items:toResponseInputItems(response.output),calls:response.output.filter(item=>item.type==='function_call').map(item=>({id:item.call_id,name:item.name,arguments:item.arguments})),text:response.output_text};

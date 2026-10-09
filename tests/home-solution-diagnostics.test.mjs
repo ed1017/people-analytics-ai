@@ -90,7 +90,7 @@ test('actual POST separates pre-provider, provider and output failures without l
  await check(body,'response_validation_failed','response_validation',1);
  let turn=0;isolated.sandbox.__replies.shift=()=>{if(turn++===0)return responseForStep({name:'read_evidence',args:{sourceIds:['A1']}});throw Error(secret);};
  await check(body,'provider_failed','provider',2);
- assert.ok(isolated.sandbox.__requestOptions.every(options=>options.maxRetries===0&&options.timeout===30000));
+ assert.ok(isolated.sandbox.__requestOptions.every(options=>options.maxRetries===0&&options.timeout===60000));
  isolated.sandbox.__replies.shift=originalShift;logs.length=0;isolated.sandbox.__requests.length=0;
  assert.equal((await post(body,'legacy-v1:1')).status,409);assert.equal(isolated.sandbox.__requests.length,0);assert.equal(logs.length,0);
  isolated.sandbox.__replies.push(responseForStep(final('Review the company-wide evidence before proposing changes.')));

@@ -15,6 +15,55 @@ const firstOutput=[
  {id:'fc_offline',type:'function_call',status:'completed',call_id:'call_offline',name:'read_evidence',arguments:'{"sourceIds":["A1"]}'},
 ];
 const response=output=>new Response(JSON.stringify({id:'resp_offline',object:'response',status:'completed',model:'gpt-6.1-sol',service_tier:'default',output}),{status:200,headers});
+const drain=()=>new Promise(resolve=>setImmediate(resolve));
+
+test('actual POST keeps one overall deadline across longer provider calls without retries',async t=>{
+ const isolated=await offlineBusinessRoute();
+ assert.equal(isolated.sandbox.module.exports.maxDuration,120);
+ for(const scenario of ['slow_success','provider_timeout','shared_deadline'])await t.test(scenario,async t=>{
+  t.mock.timers.enable({apis:['setTimeout','Date'],now:Date.UTC(2026,9,9,21,30)});
+  t.mock.method(globalThis,'fetch',network);
+  const logs=[],deadlines=[],dispatches=[];let shared,settled=false;
+  isolated.sandbox.Date=Date;isolated.sandbox.console={error:(...args)=>logs.push(args)};
+  isolated.sandbox.AbortSignal={any:signals=>AbortSignal.any(signals),timeout:ms=>{
+   deadlines.push(ms);shared=new AbortController();setTimeout(()=>shared.abort(new DOMException('Synthetic shared deadline','TimeoutError')),ms);return shared.signal;
+  }};
+  isolated.sandbox.__requests.length=0;isolated.sandbox.__requestOptions.length=0;
+  const body=solutionRequest(secret),sources={attrition:{status:'loaded',data:{as_of:'2026-09-30',summary:{total_exits:4,voluntary_exits:3}}}};
+  body.evidence=buildHomePack(sources,body.scope);isolated.sandbox.__aggregateSources=sources;
+  const client=new OpenAI({apiKey:'synthetic-sdk-only',maxRetries:0,logLevel:'off',fetch:async(_url,init)=>{
+   dispatches.push({at:Date.now(),signal:init.signal});
+   assert.equal(new Headers(init.headers).get('x-stainless-retry-count'),'0');
+   const index=dispatches.length,delay=scenario==='slow_success'?(index===1?45000:5000):scenario==='shared_deadline'&&index===1?50000:null;
+   return new Promise((resolve,reject)=>{
+    const abort=()=>reject(Object.assign(Error('Synthetic aborted transport'),{name:'AbortError'}));
+    if(init.signal.aborted)return abort();
+    init.signal.addEventListener('abort',abort,{once:true});
+    if(delay!==null)setTimeout(()=>{init.signal.removeEventListener('abort',abort);resolve(response(index===1?firstOutput:[{type:'message',id:'msg_offline',role:'assistant',status:'completed',content:[{type:'output_text',annotations:[],text:JSON.stringify(final('Review the proposal before choosing.'))}]}]));},delay);
+   });
+  }});
+  isolated.sandbox.__replies.shift=()=>client.responses.create(isolated.sandbox.__requests.at(-1),isolated.sandbox.__requestOptions.at(-1));
+  const task=isolated.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',headers:{'x-workforce-dataset':'legacy-v1:0'},body:JSON.stringify(body)})).then(value=>{settled=true;return value;});
+  const flush=async()=>{await drain();await drain();};await flush();assert.equal(dispatches.length,1,JSON.stringify({logs,requests:isolated.sandbox.__requests.length,settled,deadlines}));
+  const advance=async ms=>{t.mock.timers.tick(ms);await flush();};
+  await advance(30000);assert.equal(settled,false,'The former 30-second cutoff does not end this request');
+  if(scenario==='slow_success'){
+   await advance(15000);assert.equal(dispatches.length,2);await advance(5000);
+   const result=await task;assert.equal(result.status,200);assert.equal((await result.json()).usage.modelRounds,2);assert.equal(logs.length,0);
+  }else if(scenario==='provider_timeout'){
+   await advance(29999);assert.equal(settled,false);await advance(1);
+   const result=await task;assert.equal(result.status,422);assert.equal((await result.json()).code,'provider_timeout');
+   assert.equal(dispatches.length,1);assert.equal(shared.signal.aborted,false);assert.equal(logs[0][1].providerElapsedMs,60000);
+  }else{
+   await advance(20000);assert.equal(dispatches.length,2);await advance(39999);assert.equal(settled,false);await advance(1);
+   const result=await task;assert.equal(result.status,422);assert.equal((await result.json()).code,'conversation_deadline');
+   assert.equal(shared.signal.aborted,true);assert.equal(dispatches.length,2);assert.equal(logs[0][1].elapsedMs,90000);assert.equal(logs[0][1].providerElapsedMs,40000);
+  }
+  assert.deepEqual(deadlines,[90000],'The shared deadline is created once, not renewed for later calls');
+  const options=isolated.sandbox.__requestOptions;assert.ok(options.every(option=>option.timeout===60000&&option.maxRetries===0&&option.signal===options[0].signal));
+  const count=dispatches.length;await advance(120000);assert.equal(dispatches.length,count,'No retry or new invocation after expiry');
+ });
+});
 
 test('native SDK error identity fixes inherited Error.name; logs remain bounded',t=>{
  t.mock.timers.enable({apis:['Date'],now:100000});
@@ -90,7 +139,7 @@ test('second SDK invocation preserves tool exchange and separates timeout, conne
   assert.equal(JSON.parse(toolOutput.output)[0].id,'A1');assert.equal(JSON.parse(toolOutput.output)[0].facts.total_exits,4);
   assert.ok(new TextEncoder().encode(JSON.stringify(payloads[1].input)).length<=120000);
   for(const payload of payloads){assert.equal(payload.model,'gpt-6.1-sol');assert.equal(payload.reasoning.effort,'medium');assert.equal(payload.service_tier,'default');assert.equal(payload.max_output_tokens,5000);assert.equal(payload.parallel_tool_calls,false);}
-  assert.ok(isolated.sandbox.__requestOptions.every(value=>value.maxRetries===0&&value.timeout===30000));
+  assert.ok(isolated.sandbox.__requestOptions.every(value=>value.maxRetries===0&&value.timeout===60000));
   if(expectedCode){
    assert.equal(result.status,422);assert.equal(reply.code,expectedCode,JSON.stringify({logs,sdkError}));assert.equal(logs.length,1);
    const event=logs[0][1];assert.equal(event.stage,'provider');assert.equal(event.modelAttempts,2);assert.equal(event.providerErrorClass,expectedClass);assert.equal(event.providerHttpStatus,expectedStatus);
