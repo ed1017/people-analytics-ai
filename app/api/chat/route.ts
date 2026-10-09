@@ -571,7 +571,7 @@ export async function POST(
     let body = await request.json();
     if (body?.page === "home") {
       if (new TextEncoder().encode(JSON.stringify(body.overviewBriefingContext ?? {})).length > HOME_MAX_BYTES || (typeof body.message === "string" && body.message.length > 6000)) return NextResponse.json({error:"Home evidence or question exceeds the supported limit. Refresh evidence or shorten the question."},{status:413});
-      body = {page:"home",persona:body.persona,message:body.message,history:body.history,hasFocusedIssue:body.hasFocusedIssue === true,summaryOnly:body.summaryOnly===true,summaryGoal:body.summaryGoal,goalContext:body.goalContext,marketReference:body.marketReference,overviewBriefingContext:normalizeHomePack(body.overviewBriefingContext)};
+      body = {page:"home",persona:body.persona,message:body.message,history:body.history,hasFocusedIssue:body.hasFocusedIssue === true,planningCalculatorAvailable:body.planningCalculatorAvailable===true,summaryOnly:body.summaryOnly===true,summaryGoal:body.summaryGoal,goalContext:body.goalContext,marketReference:body.marketReference,overviewBriefingContext:normalizeHomePack(body.overviewBriefingContext)};
       if (Array.isArray(body.history)) body.history = body.history.slice(-8).map((item: ChatMessage) => ({role:item?.role,content:typeof item?.content === "string" ? item.content.slice(0,6000) : ""}));
     }
     const summaryOnly = body?.summaryOnly === true;
@@ -1522,7 +1522,7 @@ ${message}
     const homePurpose=homeTurnPurpose(message,history);
     const prepareHomeGoal=!summaryOnly&&(homePurpose==='goal'||homePurpose==='discovery');
     const homeReplyFormat=page==="home"?buildHomeReplyFormat(body.overviewBriefingContext,prepareHomeGoal):null;
-    const homeInstructions=[homeConversationInstructions(homePurpose),strategicPlanningInstructions(message,history)].filter(Boolean).join('\n');
+    const homeInstructions=[homeConversationInstructions(homePurpose),strategicPlanningInstructions(message,history,body.planningCalculatorAvailable===true)].filter(Boolean).join('\n');
     const homeAnswerStyle=homePurpose==='answer'?conversationalAnswerStyle:homeStyle.instructions;
     const homeInput=[
       {role:'user' as const,content:workforceContext+'\nACTIVE GOAL CONTEXT (user intent, not evidence): '+JSON.stringify(goalContext)+'\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: '+JSON.stringify(marketReference)},
