@@ -1,0 +1,1079 @@
+{
+  "version": 1,
+  "goalId": "demo-capacity-mix",
+  "entries": [
+    {
+      "before": {
+        "version": 1,
+        "status": "proposal",
+        "binding": {
+          "version": 1,
+          "goalId": "demo-capacity-mix",
+          "goal": "Add 5 roles over 12 months",
+          "evidenceDigest": "0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0",
+          "planningDigest": "0fe1a3d382f0fe8a6a20b8eb9bfc93fda852c87e68d1c51a56bdbd84c24c9ea9"
+        },
+        "bundle": {
+          "origin": "local-demo-v1",
+          "id": "A",
+          "name": "Compare staffing assumptions",
+          "objective": "Compare a fictional mix of development, internal moves and hires for five additional whole roles.",
+          "coordination": "Review distinct fictional Build and Move groups, explicit release premises and full-period hire costs before comparing bounded combinations.",
+          "components": [
+            {
+              "id": "c1",
+              "name": "Hire additional roles",
+              "domain": "hiring",
+              "firstStep": "Review fictional whole-position hiring costs and arrival assumptions.",
+              "ownerRole": "Workforce planning lead",
+              "evidence": [],
+              "dependsOn": [],
+              "limitation": "Fictional example; costs, availability and effectiveness are unverified."
+            },
+            {
+              "id": "c2",
+              "name": "Develop internal candidates",
+              "domain": "learning",
+              "firstStep": "Review the fictional Build group and its assumed readiness month.",
+              "ownerRole": "Learning lead",
+              "evidence": [],
+              "dependsOn": [],
+              "limitation": "Fictional example; costs, availability and effectiveness are unverified."
+            },
+            {
+              "id": "c3",
+              "name": "Move internal candidates",
+              "domain": "mobility",
+              "firstStep": "Review the fictional Move group and release premise.",
+              "ownerRole": "People partner",
+              "evidence": [],
+              "dependsOn": [],
+              "limitation": "Fictional example; costs, availability and effectiveness are unverified."
+            }
+          ],
+          "limitation": "Fictional example; costs, availability and effectiveness are unverified."
+        },
+        "signature": "{\"origin\":\"local-demo-v1\",\"id\":\"A\",\"name\":\"Compare staffing assumptions\",\"objective\":\"Compare a fictional mix of development, internal moves and hires for five additional whole roles.\",\"coordination\":\"Review distinct fictional Build and Move groups, explicit release premises and full-period hire costs before comparing bounded combinations.\",\"components\":[{\"id\":\"c1\",\"name\":\"Hire additional roles\",\"domain\":\"hiring\",\"firstStep\":\"Review fictional whole-position hiring costs and arrival assumptions.\",\"ownerRole\":\"Workforce planning lead\",\"evidence\":[],\"dependsOn\":[],\"limitation\":\"Fictional example; costs, availability and effectiveness are unverified.\"},{\"id\":\"c2\",\"name\":\"Develop internal candidates\",\"domain\":\"learning\",\"firstStep\":\"Review the fictional Build group and its assumed readiness month.\",\"ownerRole\":\"Learning lead\",\"evidence\":[],\"dependsOn\":[],\"limitation\":\"Fictional example; costs, availability and effectiveness are unverified.\"},{\"id\":\"c3\",\"name\":\"Move internal candidates\",\"domain\":\"mobility\",\"firstStep\":\"Review the fictional Move group and release premise.\",\"ownerRole\":\"People partner\",\"evidence\":[],\"dependsOn\":[],\"limitation\":\"Fictional example; costs, availability and effectiveness are unverified.\"}],\"limitation\":\"Fictional example; costs, availability and effectiveness are unverified.\"}",
+        "revision": 2,
+        "inputs": {
+          "costPolicy": "cash-hours-v2",
+          "scope": {
+            "population": {
+              "value": "Fictional capacity scenario",
+              "kind": "illustrative",
+              "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+            },
+            "businessUnit": {
+              "value": "Fictional business unit",
+              "kind": "illustrative",
+              "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+            },
+            "jobProfile": {
+              "value": "Fictional whole roles",
+              "kind": "illustrative",
+              "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+            },
+            "startMonth": {
+              "value": "2026-11",
+              "kind": "illustrative",
+              "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+            },
+            "months": {
+              "value": 12,
+              "kind": "illustrative",
+              "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+            },
+            "demand": {
+              "value": 5,
+              "kind": "illustrative",
+              "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+            },
+            "capacityRequired": {
+              "value": true,
+              "kind": "illustrative",
+              "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+            },
+            "requirements": {
+              "value": "Example plan only; review scope, owners, funding and measures before acting.",
+              "kind": "illustrative",
+              "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+            },
+            "comparisonConfirmed": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "currency": "USD"
+          },
+          "capacity": {
+            "input": {
+              "businessUnit": "Fictional business unit",
+              "jobProfile": "Fictional whole roles",
+              "intent": "additional",
+              "roles": "5",
+              "build": "0",
+              "move": "0",
+              "buy": "5",
+              "backfills": "0",
+              "planningMonth": "2026-11",
+              "months": "12",
+              "recruitingStart": "",
+              "arrivalMode": "explicit",
+              "arrivalDate": "2026-11-01",
+              "buildMonth": "2027-01",
+              "moveMonth": "2026-12",
+              "backfillDate": "",
+              "annualHireCost": "96000",
+              "hireFee": "3000",
+              "annualBackfillCost": "",
+              "backfillFee": "",
+              "internalAnnualCostChange": "24000",
+              "trainingCash": "6000",
+              "trainingHours": "80",
+              "loadedHourlyCost": "",
+              "budget": "100000",
+              "maxAddedEmployees": "5",
+              "deadlineMonth": "2027-10"
+            },
+            "origins": {
+              "businessUnit": {
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "jobProfile": {
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "intent": {
+                "kind": "illustrative",
+                "basis": "Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment."
+              },
+              "roles": {
+                "kind": "user-entered",
+                "basis": "Explicit additional-role target in the pinned goal; availability is not established."
+              },
+              "build": {
+                "kind": "illustrative",
+                "basis": "Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment."
+              },
+              "move": {
+                "kind": "illustrative",
+                "basis": "Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment."
+              },
+              "buy": {
+                "kind": "illustrative",
+                "basis": "Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment."
+              },
+              "backfills": {
+                "kind": "illustrative",
+                "basis": "Fictional zero-backfill and release premise only. Source-team capacity and permission to release people remain unverified."
+              },
+              "planningMonth": {
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "months": {
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "recruitingStart": {
+                "kind": "unknown",
+                "basis": null
+              },
+              "arrivalMode": {
+                "kind": "illustrative",
+                "basis": "Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment."
+              },
+              "arrivalDate": {
+                "kind": "illustrative",
+                "basis": "Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment."
+              },
+              "buildMonth": {
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              },
+              "moveMonth": {
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              },
+              "backfillDate": {
+                "kind": "unknown",
+                "basis": null
+              },
+              "annualHireCost": {
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect. Monthly USD assumption × 12; no FX."
+              },
+              "hireFee": {
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              },
+              "annualBackfillCost": {
+                "kind": "unknown",
+                "basis": null
+              },
+              "backfillFee": {
+                "kind": "unknown",
+                "basis": null
+              },
+              "internalAnnualCostChange": {
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              },
+              "trainingCash": {
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              },
+              "trainingHours": {
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              },
+              "loadedHourlyCost": {
+                "kind": "unknown",
+                "basis": null
+              },
+              "budget": {
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "maxAddedEmployees": {
+                "kind": "illustrative",
+                "basis": "Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment."
+              },
+              "deadlineMonth": {
+                "kind": "illustrative",
+                "basis": "Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment."
+              }
+            },
+            "flows": [
+              {
+                "id": "scenario-buy",
+                "path": "buy",
+                "componentIds": [
+                  "c1"
+                ],
+                "groupId": null
+              }
+            ]
+          },
+          "timing": [
+            {
+              "componentId": "c1",
+              "start": {
+                "value": "2026-11-01",
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "finish": {
+                "value": "2026-11-01",
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              }
+            },
+            {
+              "componentId": "c2",
+              "start": {
+                "value": "2026-11-01",
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "finish": {
+                "value": "2026-11-01",
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              }
+            },
+            {
+              "componentId": "c3",
+              "start": {
+                "value": "2026-11-01",
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "finish": {
+                "value": "2026-11-01",
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              }
+            }
+          ],
+          "dependenciesConfirmed": {
+            "value": true,
+            "kind": "illustrative",
+            "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+          },
+          "groups": [
+            {
+              "id": "scenario-build",
+              "label": "Fictional Build group",
+              "count": {
+                "value": 3,
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              }
+            },
+            {
+              "id": "scenario-move",
+              "label": "Fictional Move group",
+              "count": {
+                "value": 2,
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              }
+            }
+          ],
+          "memberships": [
+            {
+              "componentId": "c1",
+              "groupIds": [],
+              "complete": {
+                "value": true,
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              }
+            },
+            {
+              "componentId": "c2",
+              "groupIds": [
+                "scenario-build"
+              ],
+              "complete": {
+                "value": true,
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              }
+            },
+            {
+              "componentId": "c3",
+              "groupIds": [
+                "scenario-move"
+              ],
+              "complete": {
+                "value": true,
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              }
+            }
+          ],
+          "groupsDisjoint": {
+            "value": true,
+            "kind": "illustrative",
+            "basis": "Fictional groups are assumed distinct, including any pilot group. No employee membership or release availability has been verified."
+          },
+          "expenses": [],
+          "expenseLinks": [
+            {
+              "expenseId": "capacity:hireStaffingCost",
+              "componentIds": [
+                "c1"
+              ],
+              "allocations": null
+            },
+            {
+              "expenseId": "capacity:recruitingFees",
+              "componentIds": [
+                "c1"
+              ],
+              "allocations": null
+            },
+            {
+              "expenseId": "capacity:internalSalaryUplift",
+              "componentIds": [
+                "c2",
+                "c3"
+              ],
+              "allocations": null
+            },
+            {
+              "expenseId": "capacity:trainingCash",
+              "componentIds": [
+                "c2"
+              ],
+              "allocations": null
+            }
+          ],
+          "costReviews": [
+            {
+              "componentId": "c1",
+              "complete": {
+                "value": true,
+                "kind": "illustrative",
+                "basis": "Fictional completeness premise for the listed costs only; no quote, funding approval or operational verification."
+              }
+            },
+            {
+              "componentId": "c2",
+              "complete": {
+                "value": true,
+                "kind": "illustrative",
+                "basis": "Fictional completeness premise for the listed costs only; no quote, funding approval or operational verification."
+              }
+            },
+            {
+              "componentId": "c3",
+              "complete": {
+                "value": true,
+                "kind": "illustrative",
+                "basis": "Fictional completeness premise for the listed costs only; no quote, funding approval or operational verification."
+              }
+            }
+          ],
+          "costsDistinct": {
+            "value": true,
+            "kind": "illustrative",
+            "basis": "This fictional scenario assumes the listed incremental costs are distinct and exhaustive; review omitted obligations before any decision."
+          },
+          "budget": {
+            "amount": {
+              "value": 100000,
+              "kind": "illustrative",
+              "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+            },
+            "basis": {
+              "value": "cash",
+              "kind": "illustrative",
+              "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+            }
+          },
+          "whatIf": {
+            "capacityBasis": "full-period-hire",
+            "version": 1,
+            "kind": "capacity",
+            "scopeKey": "[\"Fictional capacity scenario\",\"2026-11\",12]",
+            "baseline": {
+              "value": 0,
+              "kind": "illustrative",
+              "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+            },
+            "target": {
+              "value": 5,
+              "kind": "user-entered",
+              "basis": "Explicit additional-role target in the pinned goal; availability is not established."
+            },
+            "population": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "unitCost": {
+              "value": 8000,
+              "kind": "illustrative",
+              "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+            }
+          },
+          "mixScenario": {
+            "version": 1,
+            "basis": {
+              "value": "conditional-scenario",
+              "kind": "illustrative",
+              "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+            },
+            "flows": [
+              {
+                "id": "scenario-build",
+                "path": "build",
+                "componentIds": [
+                  "c2"
+                ],
+                "groupId": "scenario-build"
+              },
+              {
+                "id": "scenario-move",
+                "path": "move",
+                "componentIds": [
+                  "c3"
+                ],
+                "groupId": "scenario-move"
+              },
+              {
+                "id": "scenario-buy",
+                "path": "buy",
+                "componentIds": [
+                  "c1"
+                ],
+                "groupId": null
+              }
+            ],
+            "bounds": {
+              "build": {
+                "value": {
+                  "min": 0,
+                  "max": 3
+                },
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              },
+              "move": {
+                "value": {
+                  "min": 0,
+                  "max": 2
+                },
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              },
+              "buy": {
+                "value": {
+                  "min": 0,
+                  "max": 5
+                },
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              }
+            }
+          }
+        }
+      },
+      "report": {
+        "encoding": "gzip-base64",
+        "data": "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"
+      },
+      "proposal": {
+        "kind": "home-assumption-mix-proposal",
+        "schemaVersion": 1,
+        "status": "proposed",
+        "sourceFingerprint": "7fd013be044d7e6d76619b762369954e1335333474459ce9f361ebb81996987a",
+        "reportFingerprint": "4c94bd1c1f00c9ee6f99b76deea748676dca3d15f5c30a5d327f0d6978101d0c",
+        "candidateId": "build-3-move-2-buy-0",
+        "baseInputKey": "[\"{\\\"evidenceDigest\\\":\\\"0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0\\\",\\\"goal\\\":\\\"Add 5 roles over 12 months\\\",\\\"goalId\\\":\\\"demo-capacity-mix\\\",\\\"planningDigest\\\":\\\"0fe1a3d382f0fe8a6a20b8eb9bfc93fda852c87e68d1c51a56bdbd84c24c9ea9\\\",\\\"version\\\":1}\",\"{\\\"origin\\\":\\\"local-demo-v1\\\",\\\"id\\\":\\\"A\\\",\\\"name\\\":\\\"Compare staffing assumptions\\\",\\\"objective\\\":\\\"Compare a fictional mix of development, internal moves and hires for five additional whole roles.\\\",\\\"coordination\\\":\\\"Review distinct fictional Build and Move groups, explicit release premises and full-period hire costs before comparing bounded combinations.\\\",\\\"components\\\":[{\\\"id\\\":\\\"c1\\\",\\\"name\\\":\\\"Hire additional roles\\\",\\\"domain\\\":\\\"hiring\\\",\\\"firstStep\\\":\\\"Review fictional whole-position hiring costs and arrival assumptions.\\\",\\\"ownerRole\\\":\\\"Workforce planning lead\\\",\\\"evidence\\\":[],\\\"dependsOn\\\":[],\\\"limitation\\\":\\\"Fictional example; costs, availability and effectiveness are unverified.\\\"},{\\\"id\\\":\\\"c2\\\",\\\"name\\\":\\\"Develop internal candidates\\\",\\\"domain\\\":\\\"learning\\\",\\\"firstStep\\\":\\\"Review the fictional Build group and its assumed readiness month.\\\",\\\"ownerRole\\\":\\\"Learning lead\\\",\\\"evidence\\\":[],\\\"dependsOn\\\":[],\\\"limitation\\\":\\\"Fictional example; costs, availability and effectiveness are unverified.\\\"},{\\\"id\\\":\\\"c3\\\",\\\"name\\\":\\\"Move internal candidates\\\",\\\"domain\\\":\\\"mobility\\\",\\\"firstStep\\\":\\\"Review the fictional Move group and release premise.\\\",\\\"ownerRole\\\":\\\"People partner\\\",\\\"evidence\\\":[],\\\"dependsOn\\\":[],\\\"limitation\\\":\\\"Fictional example; costs, availability and effectiveness are unverified.\\\"}],\\\"limitation\\\":\\\"Fictional example; costs, availability and effectiveness are unverified.\\\"}\",2,{\"costPolicy\":\"cash-hours-v2\",\"scope\":{\"population\":{\"value\":\"Fictional capacity scenario\",\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"businessUnit\":{\"value\":\"Fictional business unit\",\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"jobProfile\":{\"value\":\"Fictional whole roles\",\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"startMonth\":{\"value\":\"2026-11\",\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"months\":{\"value\":12,\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"demand\":{\"value\":5,\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"capacityRequired\":{\"value\":true,\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"requirements\":{\"value\":\"Example plan only; review scope, owners, funding and measures before acting.\",\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"comparisonConfirmed\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"currency\":\"USD\"},\"capacity\":{\"input\":{\"businessUnit\":\"Fictional business unit\",\"jobProfile\":\"Fictional whole roles\",\"intent\":\"additional\",\"roles\":\"5\",\"build\":\"0\",\"move\":\"0\",\"buy\":\"5\",\"backfills\":\"0\",\"planningMonth\":\"2026-11\",\"months\":\"12\",\"recruitingStart\":\"\",\"arrivalMode\":\"explicit\",\"arrivalDate\":\"2026-11-01\",\"buildMonth\":\"2027-01\",\"moveMonth\":\"2026-12\",\"backfillDate\":\"\",\"annualHireCost\":\"96000\",\"hireFee\":\"3000\",\"annualBackfillCost\":\"\",\"backfillFee\":\"\",\"internalAnnualCostChange\":\"24000\",\"trainingCash\":\"6000\",\"trainingHours\":\"80\",\"loadedHourlyCost\":\"\",\"budget\":\"100000\",\"maxAddedEmployees\":\"5\",\"deadlineMonth\":\"2027-10\"},\"origins\":{\"businessUnit\":{\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"jobProfile\":{\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"intent\":{\"kind\":\"illustrative\",\"basis\":\"Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment.\"},\"roles\":{\"kind\":\"user-entered\",\"basis\":\"Explicit additional-role target in the pinned goal; availability is not established.\"},\"build\":{\"kind\":\"illustrative\",\"basis\":\"Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment.\"},\"move\":{\"kind\":\"illustrative\",\"basis\":\"Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment.\"},\"buy\":{\"kind\":\"illustrative\",\"basis\":\"Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment.\"},\"backfills\":{\"kind\":\"illustrative\",\"basis\":\"Fictional zero-backfill and release premise only. Source-team capacity and permission to release people remain unverified.\"},\"planningMonth\":{\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"months\":{\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"recruitingStart\":{\"kind\":\"unknown\",\"basis\":null},\"arrivalMode\":{\"kind\":\"illustrative\",\"basis\":\"Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment.\"},\"arrivalDate\":{\"kind\":\"illustrative\",\"basis\":\"Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment.\"},\"buildMonth\":{\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"},\"moveMonth\":{\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"},\"backfillDate\":{\"kind\":\"unknown\",\"basis\":null},\"annualHireCost\":{\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect. Monthly USD assumption × 12; no FX.\"},\"hireFee\":{\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"},\"annualBackfillCost\":{\"kind\":\"unknown\",\"basis\":null},\"backfillFee\":{\"kind\":\"unknown\",\"basis\":null},\"internalAnnualCostChange\":{\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"},\"trainingCash\":{\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"},\"trainingHours\":{\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"},\"loadedHourlyCost\":{\"kind\":\"unknown\",\"basis\":null},\"budget\":{\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"maxAddedEmployees\":{\"kind\":\"illustrative\",\"basis\":\"Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment.\"},\"deadlineMonth\":{\"kind\":\"illustrative\",\"basis\":\"Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment.\"}},\"flows\":[{\"id\":\"scenario-build\",\"path\":\"build\",\"componentIds\":[\"c2\"],\"groupId\":\"scenario-build\"},{\"id\":\"scenario-move\",\"path\":\"move\",\"componentIds\":[\"c3\"],\"groupId\":\"scenario-move\"},{\"id\":\"scenario-buy\",\"path\":\"buy\",\"componentIds\":[\"c1\"],\"groupId\":null}]},\"timing\":[{\"componentId\":\"c1\",\"start\":{\"value\":\"2026-11-01\",\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"finish\":{\"value\":\"2026-11-01\",\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"}},{\"componentId\":\"c2\",\"start\":{\"value\":\"2026-11-01\",\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"finish\":{\"value\":\"2026-11-01\",\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"}},{\"componentId\":\"c3\",\"start\":{\"value\":\"2026-11-01\",\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"finish\":{\"value\":\"2026-11-01\",\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"}}],\"dependenciesConfirmed\":{\"value\":true,\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"},\"groups\":[{\"id\":\"scenario-build\",\"label\":\"Fictional Build group\",\"count\":{\"value\":3,\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"}},{\"id\":\"scenario-move\",\"label\":\"Fictional Move group\",\"count\":{\"value\":2,\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"}}],\"memberships\":[{\"componentId\":\"c1\",\"groupIds\":[],\"complete\":{\"value\":true,\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"}},{\"componentId\":\"c2\",\"groupIds\":[\"scenario-build\"],\"complete\":{\"value\":true,\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"}},{\"componentId\":\"c3\",\"groupIds\":[\"scenario-move\"],\"complete\":{\"value\":true,\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"}}],\"groupsDisjoint\":{\"value\":true,\"kind\":\"illustrative\",\"basis\":\"Fictional groups are assumed distinct, including any pilot group. No employee membership or release availability has been verified.\"},\"expenses\":[],\"expenseLinks\":[{\"expenseId\":\"capacity:hireStaffingCost\",\"componentIds\":[\"c1\"],\"allocations\":null},{\"expenseId\":\"capacity:recruitingFees\",\"componentIds\":[\"c1\"],\"allocations\":null},{\"expenseId\":\"capacity:internalSalaryUplift\",\"componentIds\":[\"c2\",\"c3\"],\"allocations\":null},{\"expenseId\":\"capacity:trainingCash\",\"componentIds\":[\"c2\"],\"allocations\":null}],\"costReviews\":[{\"componentId\":\"c1\",\"complete\":{\"value\":true,\"kind\":\"illustrative\",\"basis\":\"Fictional completeness premise for the listed costs only; no quote, funding approval or operational verification.\"}},{\"componentId\":\"c2\",\"complete\":{\"value\":true,\"kind\":\"illustrative\",\"basis\":\"Fictional completeness premise for the listed costs only; no quote, funding approval or operational verification.\"}},{\"componentId\":\"c3\",\"complete\":{\"value\":true,\"kind\":\"illustrative\",\"basis\":\"Fictional completeness premise for the listed costs only; no quote, funding approval or operational verification.\"}}],\"costsDistinct\":{\"value\":true,\"kind\":\"illustrative\",\"basis\":\"This fictional scenario assumes the listed incremental costs are distinct and exhaustive; review omitted obligations before any decision.\"},\"budget\":{\"amount\":{\"value\":100000,\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"},\"basis\":{\"value\":\"cash\",\"kind\":\"illustrative\",\"basis\":\"Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment.\"}},\"whatIf\":{\"capacityBasis\":\"full-period-hire\",\"version\":1,\"kind\":\"capacity\",\"scopeKey\":\"[\\\"Fictional capacity scenario\\\",\\\"2026-11\\\",12]\",\"baseline\":{\"value\":0,\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.\"},\"target\":{\"value\":5,\"kind\":\"user-entered\",\"basis\":\"Explicit additional-role target in the pinned goal; availability is not established.\"},\"population\":{\"value\":null,\"kind\":\"unknown\",\"basis\":null},\"unitCost\":{\"value\":8000,\"kind\":\"illustrative\",\"basis\":\"Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect.\"}},\"mixScenario\":{\"version\":1,\"basis\":{\"value\":\"conditional-scenario\",\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"},\"flows\":[{\"id\":\"scenario-build\",\"path\":\"build\",\"componentIds\":[\"c2\"],\"groupId\":\"scenario-build\"},{\"id\":\"scenario-move\",\"path\":\"move\",\"componentIds\":[\"c3\"],\"groupId\":\"scenario-move\"},{\"id\":\"scenario-buy\",\"path\":\"buy\",\"componentIds\":[\"c1\"],\"groupId\":null}],\"bounds\":{\"build\":{\"value\":{\"min\":0,\"max\":3},\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"},\"move\":{\"value\":{\"min\":0,\"max\":2},\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"},\"buy\":{\"value\":{\"min\":0,\"max\":5},\"kind\":\"illustrative\",\"basis\":\"Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote.\"}}}}]",
+        "baseRevision": 2,
+        "draft": {
+          "version": 1,
+          "status": "proposal",
+          "binding": {
+            "version": 1,
+            "goalId": "demo-capacity-mix",
+            "goal": "Add 5 roles over 12 months",
+            "evidenceDigest": "0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0",
+            "planningDigest": "0fe1a3d382f0fe8a6a20b8eb9bfc93fda852c87e68d1c51a56bdbd84c24c9ea9"
+          },
+          "bundle": {
+            "origin": "local-demo-v1",
+            "id": "A",
+            "name": "Compare staffing assumptions",
+            "objective": "Compare a fictional mix of development, internal moves and hires for five additional whole roles.",
+            "coordination": "Review distinct fictional Build and Move groups, explicit release premises and full-period hire costs before comparing bounded combinations.",
+            "components": [
+              {
+                "id": "c1",
+                "name": "Hire additional roles",
+                "domain": "hiring",
+                "firstStep": "Review fictional whole-position hiring costs and arrival assumptions.",
+                "ownerRole": "Workforce planning lead",
+                "evidence": [],
+                "dependsOn": [],
+                "limitation": "Fictional example; costs, availability and effectiveness are unverified."
+              },
+              {
+                "id": "c2",
+                "name": "Develop internal candidates",
+                "domain": "learning",
+                "firstStep": "Review the fictional Build group and its assumed readiness month.",
+                "ownerRole": "Learning lead",
+                "evidence": [],
+                "dependsOn": [],
+                "limitation": "Fictional example; costs, availability and effectiveness are unverified."
+              },
+              {
+                "id": "c3",
+                "name": "Move internal candidates",
+                "domain": "mobility",
+                "firstStep": "Review the fictional Move group and release premise.",
+                "ownerRole": "People partner",
+                "evidence": [],
+                "dependsOn": [],
+                "limitation": "Fictional example; costs, availability and effectiveness are unverified."
+              }
+            ],
+            "limitation": "Fictional example; costs, availability and effectiveness are unverified."
+          },
+          "signature": "{\"origin\":\"local-demo-v1\",\"id\":\"A\",\"name\":\"Compare staffing assumptions\",\"objective\":\"Compare a fictional mix of development, internal moves and hires for five additional whole roles.\",\"coordination\":\"Review distinct fictional Build and Move groups, explicit release premises and full-period hire costs before comparing bounded combinations.\",\"components\":[{\"id\":\"c1\",\"name\":\"Hire additional roles\",\"domain\":\"hiring\",\"firstStep\":\"Review fictional whole-position hiring costs and arrival assumptions.\",\"ownerRole\":\"Workforce planning lead\",\"evidence\":[],\"dependsOn\":[],\"limitation\":\"Fictional example; costs, availability and effectiveness are unverified.\"},{\"id\":\"c2\",\"name\":\"Develop internal candidates\",\"domain\":\"learning\",\"firstStep\":\"Review the fictional Build group and its assumed readiness month.\",\"ownerRole\":\"Learning lead\",\"evidence\":[],\"dependsOn\":[],\"limitation\":\"Fictional example; costs, availability and effectiveness are unverified.\"},{\"id\":\"c3\",\"name\":\"Move internal candidates\",\"domain\":\"mobility\",\"firstStep\":\"Review the fictional Move group and release premise.\",\"ownerRole\":\"People partner\",\"evidence\":[],\"dependsOn\":[],\"limitation\":\"Fictional example; costs, availability and effectiveness are unverified.\"}],\"limitation\":\"Fictional example; costs, availability and effectiveness are unverified.\"}",
+          "revision": 3,
+          "inputs": {
+            "costPolicy": "cash-hours-v2",
+            "scope": {
+              "population": {
+                "value": "Fictional capacity scenario",
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "businessUnit": {
+                "value": "Fictional business unit",
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "jobProfile": {
+                "value": "Fictional whole roles",
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "startMonth": {
+                "value": "2026-11",
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "months": {
+                "value": 12,
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "demand": {
+                "value": 5,
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "capacityRequired": {
+                "value": true,
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "requirements": {
+                "value": "Example plan only; review scope, owners, funding and measures before acting.",
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "comparisonConfirmed": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "currency": "USD"
+            },
+            "capacity": {
+              "input": {
+                "businessUnit": "Fictional business unit",
+                "jobProfile": "Fictional whole roles",
+                "intent": "additional",
+                "roles": "5",
+                "build": "3",
+                "move": "2",
+                "buy": "0",
+                "backfills": "0",
+                "planningMonth": "2026-11",
+                "months": "12",
+                "recruitingStart": "",
+                "arrivalMode": "explicit",
+                "arrivalDate": "2026-11-01",
+                "buildMonth": "2027-01",
+                "moveMonth": "2026-12",
+                "backfillDate": "",
+                "annualHireCost": "96000",
+                "hireFee": "3000",
+                "annualBackfillCost": "",
+                "backfillFee": "",
+                "internalAnnualCostChange": "24000",
+                "trainingCash": "6000",
+                "trainingHours": "80",
+                "loadedHourlyCost": "",
+                "budget": "100000",
+                "maxAddedEmployees": "5",
+                "deadlineMonth": "2027-10"
+              },
+              "origins": {
+                "businessUnit": {
+                  "kind": "illustrative",
+                  "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+                },
+                "jobProfile": {
+                  "kind": "illustrative",
+                  "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+                },
+                "intent": {
+                  "kind": "illustrative",
+                  "basis": "Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment."
+                },
+                "roles": {
+                  "kind": "user-entered",
+                  "basis": "Explicit additional-role target in the pinned goal; availability is not established."
+                },
+                "build": {
+                  "kind": "illustrative",
+                  "basis": "Home assumption build-3-move-2-buy-0; source 7fd013be044d7e6d76619b762369954e1335333474459ce9f361ebb81996987a; bounded home-assumption-mix-v1."
+                },
+                "move": {
+                  "kind": "illustrative",
+                  "basis": "Home assumption build-3-move-2-buy-0; source 7fd013be044d7e6d76619b762369954e1335333474459ce9f361ebb81996987a; bounded home-assumption-mix-v1."
+                },
+                "buy": {
+                  "kind": "illustrative",
+                  "basis": "Home assumption build-3-move-2-buy-0; source 7fd013be044d7e6d76619b762369954e1335333474459ce9f361ebb81996987a; bounded home-assumption-mix-v1."
+                },
+                "backfills": {
+                  "kind": "illustrative",
+                  "basis": "Fictional zero-backfill and release premise only. Source-team capacity and permission to release people remain unverified."
+                },
+                "planningMonth": {
+                  "kind": "illustrative",
+                  "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+                },
+                "months": {
+                  "kind": "illustrative",
+                  "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+                },
+                "recruitingStart": {
+                  "kind": "unknown",
+                  "basis": null
+                },
+                "arrivalMode": {
+                  "kind": "illustrative",
+                  "basis": "Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment."
+                },
+                "arrivalDate": {
+                  "kind": "illustrative",
+                  "basis": "Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment."
+                },
+                "buildMonth": {
+                  "kind": "illustrative",
+                  "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+                },
+                "moveMonth": {
+                  "kind": "illustrative",
+                  "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+                },
+                "backfillDate": {
+                  "kind": "unknown",
+                  "basis": null
+                },
+                "annualHireCost": {
+                  "kind": "illustrative",
+                  "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect. Monthly USD assumption × 12; no FX."
+                },
+                "hireFee": {
+                  "kind": "illustrative",
+                  "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+                },
+                "annualBackfillCost": {
+                  "kind": "unknown",
+                  "basis": null
+                },
+                "backfillFee": {
+                  "kind": "unknown",
+                  "basis": null
+                },
+                "internalAnnualCostChange": {
+                  "kind": "illustrative",
+                  "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+                },
+                "trainingCash": {
+                  "kind": "illustrative",
+                  "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+                },
+                "trainingHours": {
+                  "kind": "illustrative",
+                  "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+                },
+                "loadedHourlyCost": {
+                  "kind": "unknown",
+                  "basis": null
+                },
+                "budget": {
+                  "kind": "illustrative",
+                  "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+                },
+                "maxAddedEmployees": {
+                  "kind": "illustrative",
+                  "basis": "Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment."
+                },
+                "deadlineMonth": {
+                  "kind": "illustrative",
+                  "basis": "Conditional full-period hiring scenario; planning assumption only, not verified workforce scope or a hiring commitment."
+                }
+              },
+              "flows": [
+                {
+                  "id": "scenario-build",
+                  "path": "build",
+                  "componentIds": [
+                    "c2"
+                  ],
+                  "groupId": "scenario-build"
+                },
+                {
+                  "id": "scenario-move",
+                  "path": "move",
+                  "componentIds": [
+                    "c3"
+                  ],
+                  "groupId": "scenario-move"
+                }
+              ]
+            },
+            "timing": [
+              {
+                "componentId": "c1",
+                "start": {
+                  "value": "2026-11-01",
+                  "kind": "illustrative",
+                  "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+                },
+                "finish": {
+                  "value": "2026-11-01",
+                  "kind": "illustrative",
+                  "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+                }
+              },
+              {
+                "componentId": "c2",
+                "start": {
+                  "value": "2026-11-01",
+                  "kind": "illustrative",
+                  "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+                },
+                "finish": {
+                  "value": "2026-11-01",
+                  "kind": "illustrative",
+                  "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+                }
+              },
+              {
+                "componentId": "c3",
+                "start": {
+                  "value": "2026-11-01",
+                  "kind": "illustrative",
+                  "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+                },
+                "finish": {
+                  "value": "2026-11-01",
+                  "kind": "illustrative",
+                  "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+                }
+              }
+            ],
+            "dependenciesConfirmed": {
+              "value": true,
+              "kind": "illustrative",
+              "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+            },
+            "groups": [
+              {
+                "id": "scenario-build",
+                "label": "Fictional Build group",
+                "count": {
+                  "value": 3,
+                  "kind": "illustrative",
+                  "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+                }
+              },
+              {
+                "id": "scenario-move",
+                "label": "Fictional Move group",
+                "count": {
+                  "value": 2,
+                  "kind": "illustrative",
+                  "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+                }
+              }
+            ],
+            "memberships": [
+              {
+                "componentId": "c1",
+                "groupIds": [],
+                "complete": {
+                  "value": true,
+                  "kind": "illustrative",
+                  "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+                }
+              },
+              {
+                "componentId": "c2",
+                "groupIds": [
+                  "scenario-build"
+                ],
+                "complete": {
+                  "value": true,
+                  "kind": "illustrative",
+                  "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+                }
+              },
+              {
+                "componentId": "c3",
+                "groupIds": [
+                  "scenario-move"
+                ],
+                "complete": {
+                  "value": true,
+                  "kind": "illustrative",
+                  "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+                }
+              }
+            ],
+            "groupsDisjoint": {
+              "value": true,
+              "kind": "illustrative",
+              "basis": "Fictional groups are assumed distinct, including any pilot group. No employee membership or release availability has been verified."
+            },
+            "expenses": [],
+            "expenseLinks": [
+              {
+                "expenseId": "capacity:hireStaffingCost",
+                "componentIds": [
+                  "c1"
+                ],
+                "allocations": null
+              },
+              {
+                "expenseId": "capacity:recruitingFees",
+                "componentIds": [
+                  "c1"
+                ],
+                "allocations": null
+              },
+              {
+                "expenseId": "capacity:internalSalaryUplift",
+                "componentIds": [
+                  "c2",
+                  "c3"
+                ],
+                "allocations": null
+              },
+              {
+                "expenseId": "capacity:trainingCash",
+                "componentIds": [
+                  "c2"
+                ],
+                "allocations": null
+              }
+            ],
+            "costReviews": [
+              {
+                "componentId": "c1",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              },
+              {
+                "componentId": "c2",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              },
+              {
+                "componentId": "c3",
+                "complete": {
+                  "value": null,
+                  "kind": "unknown",
+                  "basis": null
+                }
+              }
+            ],
+            "costsDistinct": {
+              "value": null,
+              "kind": "unknown",
+              "basis": null
+            },
+            "budget": {
+              "amount": {
+                "value": 100000,
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              },
+              "basis": {
+                "value": "cash",
+                "kind": "illustrative",
+                "basis": "Fictional demo assumption; editable in chat. Not workforce evidence or an approved commitment."
+              }
+            },
+            "whatIf": {
+              "capacityBasis": "full-period-hire",
+              "version": 1,
+              "kind": "capacity",
+              "scopeKey": "[\"Fictional capacity scenario\",\"2026-11\",12]",
+              "baseline": {
+                "value": 0,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              },
+              "target": {
+                "value": 5,
+                "kind": "user-entered",
+                "basis": "Explicit additional-role target in the pinned goal; availability is not established."
+              },
+              "population": {
+                "value": null,
+                "kind": "unknown",
+                "basis": null
+              },
+              "unitCost": {
+                "value": 8000,
+                "kind": "illustrative",
+                "basis": "Visible illustrative what-if starting assumption, not an observed baseline, forecast, quote or validated effect."
+              }
+            },
+            "mixScenario": {
+              "version": 1,
+              "basis": {
+                "value": "conditional-scenario",
+                "kind": "illustrative",
+                "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+              },
+              "flows": [
+                {
+                  "id": "scenario-build",
+                  "path": "build",
+                  "componentIds": [
+                    "c2"
+                  ],
+                  "groupId": "scenario-build"
+                },
+                {
+                  "id": "scenario-move",
+                  "path": "move",
+                  "componentIds": [
+                    "c3"
+                  ],
+                  "groupId": "scenario-move"
+                },
+                {
+                  "id": "scenario-buy",
+                  "path": "buy",
+                  "componentIds": [
+                    "c1"
+                  ],
+                  "groupId": null
+                }
+              ],
+              "bounds": {
+                "build": {
+                  "value": {
+                    "min": 0,
+                    "max": 3
+                  },
+                  "kind": "illustrative",
+                  "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+                },
+                "move": {
+                  "value": {
+                    "min": 0,
+                    "max": 2
+                  },
+                  "kind": "illustrative",
+                  "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+                },
+                "buy": {
+                  "value": {
+                    "min": 0,
+                    "max": 5
+                  },
+                  "kind": "illustrative",
+                  "basis": "Explicit fictional staffing scenario; not observed eligibility, available employees, approved release or a cost quote."
+                }
+              }
+            }
+          }
+        },
+        "costReviewComponents": [
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "removedFlows": [
+          "buy"
+        ]
+      },
+      "createdAt": "2026-10-09T00:00:00Z"
+    }
+  ]
+}
