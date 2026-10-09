@@ -2,16 +2,17 @@
   "kind": "swp-fluid-source-v1",
   "paidExecutionAuthorized": false,
   "providerExecutionEntryPoint": null,
-  "runtimeCommit": "f137730669c6466076438894964ab55f4b965303",
+  "runtimeCommit": "fbe9695cff4344cf80f27f9d481095caab139d9a",
   "inputs": {
+    "predecessorIntegration": "02ddda844bcd4470a9dac9c015ed56b519ae6d68",
     "referenceBuild": "6adf0a9d2f84edb9c27357b5e25fcd3529f16df0",
     "calculatorPR188": "8a81f8c810750a9394f69c6126117f457432d34c",
     "continuityPR187": "1441dcaea8f1e33c08334a3e0168d2bde232f296"
   },
   "runtimeFileCount": 524,
-  "runtimeSha256": "9afb384afb65f6bbdce4e36af3648842d33335bd4a5caeef13c7533c8aa737b3",
+  "runtimeSha256": "bb1bb4680412a26f14b69d5b9ce00dcae54997ccc322a8157ed398437fc736c6",
   "supportFileCount": 478,
-  "supportSha256": "9fb64ee43905a3add4c4ffbdf3e9c0459a16622128aa9923ed2af652aea752b4",
+  "supportSha256": "764e969de939e7d579bb538be8a596cff7a82e371475551bd2498af8caa0769d",
   "preservedReference": {
     "fixture": {
       "id": "swp-managed-services-reference-continuation-v5",
@@ -43,7 +44,7 @@
     }
   },
   "publication": {
-    "branch": "codex/swp-fluid-package-integration-20261009",
+    "branch": "codex/swp-grounded-comparisons-20261009",
     "automaticVercelDeployment": false,
     "config": "vercel.json",
     "productionMergeApproved": false
@@ -442,7 +443,7 @@
     "lib/home-source-client.ts": "44918cd5d97fe383f8e07826d055a79a9d7cc18aaabbf69769d72d71ca0fa205",
     "lib/home-starter-exploration.ts": "7b5ae3746eeefabd42af206e78ae70dd9b671ddef32c8c43f789c081cf793497",
     "lib/home-starter-goals.ts": "b048ae2d88bf3e432d5bcbd8eaa98471e65aa0a31acd9fd64457e91105d83adb",
-    "lib/home-strategic-planning.ts": "1fd68e9300c87770adb850a8ace1c7c28b9e7e6dc9d469ca66d6aa80cc34905a",
+    "lib/home-strategic-planning.ts": "c2daa680e130d039373844b6052f955ee20676c1891b360e2a74be7cac753edc",
     "lib/home-success-measures.ts": "14cdbe92185f191b4fd393123b9b24860a6c5086df4d2e8900ad11d566e93f42",
     "lib/home-turnover-focus.ts": "a7e825f39c9b4519cb918f2239c3646f495c9a83c831609335299992d666bc61",
     "lib/home-turnover-rates.ts": "92e6780098fa6c0f34df78923d6d40b8905715fcf245a0f7447f738484b1ded1",
@@ -587,7 +588,7 @@
     "public/vercel.svg": "f081337b2fee635b455b63275406a3e7f39d6a014e25ad90dab5a67e62a12ac4",
     "public/window.svg": "644768c4aaeb4767bce293344eeb0c125fb804a94d801440424072202d85e3a1",
     "tsconfig.json": "be18523b23b78b6e1a876ddd107d330f0168bddf09d751b57e0b5edce69c66f3",
-    "vercel.json": "0c41fd0d46db817e8d8885e26e98f44947f24b99b282f91ef1f383716dd9f4a9"
+    "vercel.json": "9b203bc91c25dbdf64fb596ae2bc90881025dbacfde614dc2c44a107eae01efd"
   },
   "supportFiles": {
     "docs/standalone-assumption-editor.md": "09f492095fec3484f2296f3f8b3517ce178f4916a00ae571b590b42cb124f401",
@@ -595,7 +596,7 @@
     "docs/swp-demand-period-contract.md": "2e71ff8095b8e0d7b0d4f498f5f2cef2bbe6de2e5bddd67fd0d7e46bc15c0745",
     "docs/swp-demand-provenance-contract.md": "7c4f98f49894d1c33a9890ed7ce3bce1596d41847c88437a088abbbb65704045",
     "docs/swp-demand-reference-contract.md": "69dc380e55d1ace92c6a01f6bb8ad15c43dce9f4e6d84e08f44c3f462eaed7d3",
-    "docs/swp-fluid-integration-checkpoint.md": "68f87456007fdb46aaa121a865edd9e0a068d4a94db1849afe0d0e5755775112",
+    "docs/swp-fluid-integration-checkpoint.md": "eb1e96ea9d4ff23b2a1a1c50f4ec12f37ec3d5975eda20bda615bb0cdce36d54",
     "tests/action-plan-analysis-demo.test.mjs": "0c56bfff0ace386748b038631c13a84b4bcdf17370371d09656625da1b15d8f2",
     "tests/action-plan-application-preview.test.mjs": "93a5abc740b3c6cbe1758677b0982e3ece930c881af46c56f9db9df717496298",
     "tests/action-plan-application.test.mjs": "943f6b0b53ac9a2d49a32f83b940af58fbb49c9dbae0510de7b2e08d9d5baa9f",
@@ -937,7 +938,7 @@
     "tests/home-post175-scope-guard.test.mjs": "e338c6dc4efe9d4037ed63afcec10b0ff8d86a4151b27b3b16a91f941bd07087",
     "tests/home-preparation-diagnostic.test.mjs": "980c3dd9c3832d7efbcbcd76cade685ba7cedd241c449a1a75436aaf7f9f23fc",
     "tests/home-retention-target-context.test.mjs": "92def4f5682204b5d409ed292f4e85b238d70cfacdb39d3261eca3b17049d796",
-    "tests/home-route-schema.test.mjs": "2c4896c52b387e4d141b3ef8204f321621235888559e618d6fa3788538c7e30b",
+    "tests/home-route-schema.test.mjs": "8b35a5b61c18d48d78175bb69d87cd706c725ae64dfda877a15ec83a9312ecf0",
     "tests/home-saved-pilot-correction.test.mjs": "7e3324851d4655c968c0caa7f0bf9d260cbdb26fc2e90351cc3d52848558847a",
     "tests/home-source-client.test.mjs": "1246126afca06bd33365d12f9a21a80a22d107c83103d45ca0c562b67b9db561",
     "tests/home-starter-exploration.test.mjs": "673b301a51e30089851cd511d34bc5ab544619d30655522b12b7d1ab5322cead",
@@ -959,7 +960,7 @@
     "tests/manual/benchmark-hiring-cohorts.mjs": "91e6a664a22d4b3e60d731a9859273f47587987bb9c262d223bcd6e827722de4",
     "tests/manual/benchmark-hiring-selection.mjs": "e4c42ffeb6148a8422cc0127696ea094563358a227738d020fc0496782c4549d",
     "tests/manual/build-workforce-device-fixture.mjs": "ee0ebfc28060eebab0cf0b44884e1b272c2bf7e7dc53433eafb346e7708375cb",
-    "tests/manual/create-swp-fluid-source.mjs": "4356e8933beafabe4d1cc8d063c389534fee777e8b1719c4eb2d2a7142fbf88c",
+    "tests/manual/create-swp-fluid-source.mjs": "72e628acbf3555c58787e97647ba83de15315e75bacbd847ceca599274327dc8",
     "tests/manual/forecast-consumer.mjs": "f4d15a0a73fa627908af06c9f8e637cf761a78a32884f76e9f037a8bc098c4c5",
     "tests/manual/generate-calibrated-ta.mjs": "594f8121d71043cf850663cbff0f8718c49ffe8f14223fb766c6913a6253f1b7",
     "tests/manual/generate-compa-calibration-v2.mjs": "97c575be6cddd6eb825ca95da86b198ec07f2061f548a528b4831e6cfdd0f767",
@@ -1016,7 +1017,7 @@
     "tests/swp-demand-period-contract.test.mjs": "8b2a007aaf98ea08256e2a4b3a41a870631a200f2830ec5242b661c2c1424bd5",
     "tests/swp-demand-provenance-contract.test.mjs": "b3ad807ca94bd35bead2c4d8f7136ff7130c8d0100954f71936a17fca757a17c",
     "tests/swp-demand-reference.test.mjs": "64cea64121da27cfedaa4c6979b10ab592561c7096bcd8db0f71755968ac5ded",
-    "tests/swp-fluid-request.test.mjs": "e3d2a27dd41b92417f1c7edc487501455cba6e1ee640e4d3536b6139c53e2945",
+    "tests/swp-fluid-request.test.mjs": "7987c051f9a5f2b27ffcc5ed7a72f56ec4d1de6ab56f45afce5b9edb4e0ad400",
     "tests/swp-period-contract-continuation.test.mjs": "f192daf5792038880841341c36d72138e1256efcd81690987fcaf0d5b7cdf4f3",
     "tests/swp-preview-acceptance.test.mjs": "ec863cadd04d164404c2b6c4aaff16506995ded772f97a81aa1971d967dc390b",
     "tests/swp-provenance-contract-continuation.test.mjs": "cde598f26c576d474f793692cb8da695beead6bbd5222b692447055a7d6469c5",
