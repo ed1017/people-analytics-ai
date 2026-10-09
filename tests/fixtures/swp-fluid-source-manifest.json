@@ -2,17 +2,18 @@
   "kind": "swp-fluid-source-v1",
   "paidExecutionAuthorized": false,
   "providerExecutionEntryPoint": null,
-  "runtimeCommit": "fbe9695cff4344cf80f27f9d481095caab139d9a",
+  "runtimeCommit": "b7658aabba3348868025588585a6c2f897096205",
   "inputs": {
-    "predecessorIntegration": "02ddda844bcd4470a9dac9c015ed56b519ae6d68",
+    "predecessorIntegration": "f76ed89ba388ae088bb9f9e2f096a9db10dc96e6",
+    "successfulFixtureSource": "02ddda844bcd4470a9dac9c015ed56b519ae6d68",
     "referenceBuild": "6adf0a9d2f84edb9c27357b5e25fcd3529f16df0",
     "calculatorPR188": "8a81f8c810750a9394f69c6126117f457432d34c",
     "continuityPR187": "1441dcaea8f1e33c08334a3e0168d2bde232f296"
   },
   "runtimeFileCount": 524,
-  "runtimeSha256": "bb1bb4680412a26f14b69d5b9ce00dcae54997ccc322a8157ed398437fc736c6",
-  "supportFileCount": 478,
-  "supportSha256": "764e969de939e7d579bb538be8a596cff7a82e371475551bd2498af8caa0769d",
+  "runtimeSha256": "969dfe73c25e3ad9a706df3294146d6e16815b662e839d885b1784024faa18cd",
+  "supportFileCount": 480,
+  "supportSha256": "459b830140216f73f623c48cf7d87fef748b6c9473d002832e18e9105c0b448a",
   "preservedReference": {
     "fixture": {
       "id": "swp-managed-services-reference-continuation-v5",
@@ -44,7 +45,7 @@
     }
   },
   "publication": {
-    "branch": "codex/swp-grounded-comparisons-20261009",
+    "branch": "codex/swp-fluid-apply-cost-review-20261009",
     "automaticVercelDeployment": false,
     "config": "vercel.json",
     "productionMergeApproved": false
@@ -402,10 +403,10 @@
     "lib/home-linked-attachment.ts": "44858cf6cf43255b1c9a0c27c4bafb8aeae9517e4b26afa2e69d714b519812f2",
     "lib/home-mix-client.ts": "80cfa8c329ea3d75eda8626b70d75657fedaaab0e0538cdd48512f9c3d965772",
     "lib/home-mix-context.ts": "90116e75713d8a5147be5e636db16f1e09dacc6353fce013287296dbc3286555",
-    "lib/home-mix-history.ts": "bf689d70ff8936bb6b6b2118cf7bd0886b4154db504e8c9993331446262de89f",
+    "lib/home-mix-history.ts": "d8741fdd266e235a3e3f3384b033c5408a5f816446b06d4ff2588aae8bd9399b",
     "lib/home-mix-orchestration.ts": "eaaf684901a52a06c97dcda466ac153e431ec34a8b70d0c023b57f937a48ddae",
     "lib/home-mix-planning.ts": "da364a78c79d7d346a5c88cc4692c00e2ce0b510b28ff38c904e6c726a50c7f8",
-    "lib/home-mix-records.ts": "1ba87434812ac812b9c1c0b5a9012177ec8bf1d06948a1d3656330299efc4b63",
+    "lib/home-mix-records.ts": "6fadeca47d207f75a69ca41aeaf15a1efe9e9289155af241f4001b21ec6e142a",
     "lib/home-mix-report-codec.ts": "846bda7419b3b4cea131c29ba2e6834f1a695f383f49f8eb382a37552514c97d",
     "lib/home-mix-runtime.ts": "ac984a15a49d4b57ad24e5183d0380b21f020790c66478a5460c5d71f7e18932",
     "lib/home-mix-scenario.ts": "efb3cbd2b23aa12fb9727ca678153e84419a89a360ff60eec134de83669bd41f",
@@ -588,7 +589,7 @@
     "public/vercel.svg": "f081337b2fee635b455b63275406a3e7f39d6a014e25ad90dab5a67e62a12ac4",
     "public/window.svg": "644768c4aaeb4767bce293344eeb0c125fb804a94d801440424072202d85e3a1",
     "tsconfig.json": "be18523b23b78b6e1a876ddd107d330f0168bddf09d751b57e0b5edce69c66f3",
-    "vercel.json": "9b203bc91c25dbdf64fb596ae2bc90881025dbacfde614dc2c44a107eae01efd"
+    "vercel.json": "4bd841d73555dc7ceec15982fe17a6f3b1ad2e1921f2855437b01d2bf0d9cb55"
   },
   "supportFiles": {
     "docs/standalone-assumption-editor.md": "09f492095fec3484f2296f3f8b3517ce178f4916a00ae571b590b42cb124f401",
@@ -596,7 +597,7 @@
     "docs/swp-demand-period-contract.md": "2e71ff8095b8e0d7b0d4f498f5f2cef2bbe6de2e5bddd67fd0d7e46bc15c0745",
     "docs/swp-demand-provenance-contract.md": "7c4f98f49894d1c33a9890ed7ce3bce1596d41847c88437a088abbbb65704045",
     "docs/swp-demand-reference-contract.md": "69dc380e55d1ace92c6a01f6bb8ad15c43dce9f4e6d84e08f44c3f462eaed7d3",
-    "docs/swp-fluid-integration-checkpoint.md": "eb1e96ea9d4ff23b2a1a1c50f4ec12f37ec3d5975eda20bda615bb0cdce36d54",
+    "docs/swp-fluid-integration-checkpoint.md": "44a84d6829aadd5fa44df051c5abf5d46f99d48c198e2301315afd362d485142",
     "tests/action-plan-analysis-demo.test.mjs": "0c56bfff0ace386748b038631c13a84b4bcdf17370371d09656625da1b15d8f2",
     "tests/action-plan-application-preview.test.mjs": "93a5abc740b3c6cbe1758677b0982e3ece930c881af46c56f9db9df717496298",
     "tests/action-plan-application.test.mjs": "943f6b0b53ac9a2d49a32f83b940af58fbb49c9dbae0510de7b2e08d9d5baa9f",
@@ -803,6 +804,7 @@
     "tests/fixtures/home-capacity-flow.tsx": "e16c9d45c560da7a09e5d0f21378cc4d967cfef7886bd2fd378149987e47f931",
     "tests/fixtures/home-complete-limitation.mjs": "ae831e0ead87c4b8088bc33a5d3f03a0fd43e7f3f53ae32b7833c66d7fda2486",
     "tests/fixtures/home-exact-acceptance.mjs": "d6b9f37c8d8c934b2a529ced319976d7f777ea1e7d9e1b4221b837d81d763413",
+    "tests/fixtures/home-mix-cost-review-v1.json": "b7fa8c8a255717919b36211134f1ff99b1bbdcbd18f56b9021a5f8cdd5aac5f5",
     "tests/fixtures/home-mix-orchestration.tsx": "9cb8ea1bd29032b3b3cd0ad68287389314a2189f81c1d000c3c6e03e4d238b6e",
     "tests/fixtures/home-mix.mjs": "8659984d3a3dde987e318098c5d56981247b776651fd5fa8381d59ead405a276",
     "tests/fixtures/home-plan-conversation.mjs": "f11a7c809e81064ca23cebe29a82a23f491f6c4f621d958c6c42e4cd6d2b7580",
@@ -912,9 +914,10 @@
     "tests/home-illustrative-budget-context.test.mjs": "db3cfc071285135875481b9076ce775f9df57a4df7b08647f6948ae9356b8f58",
     "tests/home-investigation-contract.test.mjs": "7277ae0c3570c7e35a8032ec0e9ffa25b4f757b5fbb5c7708cd74dfee9b8faa1",
     "tests/home-linked-attachment.test.mjs": "c3c215515ebc9b3f0a690d33f1176c28bb6c809b45c9adcff798ad16dee4cc52",
+    "tests/home-mix-apply-reload.test.mjs": "d83df7777d1a1cd34579234a176d20cca0715b8096f16a3f0bbc461237bf83fc",
     "tests/home-mix-integration.test.mjs": "801e85ef969549cf08efdd21a74cc46bfd16110f49d4b88741ebaf042789ab80",
     "tests/home-mix-orchestration.test.mjs": "8c7b1f044a68526b5a1238cdccd31412c38193011d92753710eb1181fc4473c5",
-    "tests/home-mix-scenario.test.mjs": "b5b30488b0df741b2a14d5723e9df73a2678c31e971b299a5da467fa7962a8d7",
+    "tests/home-mix-scenario.test.mjs": "910b574718c3b8e2c71aadebcfd0ea39fcea1b7eef91fa1fc84a6e3bd03eb269",
     "tests/home-mix.test.mjs": "84e4d65de0789687b3548f0d2697bdd9d780c30207aa4849d258ce91a4c8f2e1",
     "tests/home-monthly-comparisons.test.mjs": "fbc5e027e6fbca5a8bab4ef82f09c5eeffecc3fe4c99913cd23616f579f8e47b",
     "tests/home-onboarding.test.mjs": "4f1acb2920b9c5c2fff04c562d394eb3913b6e53804788cf9c528f1d82d4967a",
@@ -960,7 +963,7 @@
     "tests/manual/benchmark-hiring-cohorts.mjs": "91e6a664a22d4b3e60d731a9859273f47587987bb9c262d223bcd6e827722de4",
     "tests/manual/benchmark-hiring-selection.mjs": "e4c42ffeb6148a8422cc0127696ea094563358a227738d020fc0496782c4549d",
     "tests/manual/build-workforce-device-fixture.mjs": "ee0ebfc28060eebab0cf0b44884e1b272c2bf7e7dc53433eafb346e7708375cb",
-    "tests/manual/create-swp-fluid-source.mjs": "72e628acbf3555c58787e97647ba83de15315e75bacbd847ceca599274327dc8",
+    "tests/manual/create-swp-fluid-source.mjs": "e94d73e1add3dcdcda5f31dbe8c2fe43b107b659521df88bdfbe955a0b4b0804",
     "tests/manual/forecast-consumer.mjs": "f4d15a0a73fa627908af06c9f8e637cf761a78a32884f76e9f037a8bc098c4c5",
     "tests/manual/generate-calibrated-ta.mjs": "594f8121d71043cf850663cbff0f8718c49ffe8f14223fb766c6913a6253f1b7",
     "tests/manual/generate-compa-calibration-v2.mjs": "97c575be6cddd6eb825ca95da86b198ec07f2061f548a528b4831e6cfdd0f767",
