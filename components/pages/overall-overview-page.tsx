@@ -66,10 +66,10 @@ import { getHomeChatHistory, withProblemContext } from "@/lib/problem-session";
 import type { ProblemConversation } from "@/components/problem-conversation";
 import type { AppPage, ChatMessage, Persona } from "@/lib/types";
 
-async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, message: string, history: ChatMessage[], signal?: AbortSignal, hasFocusedIssue = false, goalContext:unknown = null, marketReference:unknown = null) {
+async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, message: string, history: ChatMessage[], signal?: AbortSignal, hasFocusedIssue = false, goalContext:unknown = null, marketReference:unknown = null, planningCalculatorAvailable=false) {
   const response = await datasetFetch("/api/chat", {
     method: "POST", headers: { "Content-Type": "application/json" }, signal,
-    body: JSON.stringify({ page: "home", persona, message, history, goalContext, marketReference, hasFocusedIssue, overviewBriefingContext: sources }),
+    body: JSON.stringify({ page: "home", persona, message, history, goalContext, marketReference, hasFocusedIssue, overviewBriefingContext: sources, planningCalculatorAvailable }),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "The answer is unavailable. Please try again.");
@@ -367,7 +367,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     if (!actionPlan) setQuestionUnanswered(true);
     try {
       const requestSelection=homeEvidenceSelection(message,history,conversation.focusedIssue),requestPack=buildHomePack(sourceResults,workforceScope,requestSelection,developmentSession);
-      const reply = await ask(requestPack, persona, withProblemContext(message, journey, conversation.focusedIssue), history, request.signal, Boolean(conversation.focusedIssue),goalContext,marketReference);
+      const reply = await ask(requestPack, persona, withProblemContext(message, journey, conversation.focusedIssue), history, request.signal, Boolean(conversation.focusedIssue),goalContext,marketReference,demandControl.current?.calculatorAvailable()===true);
       if (!request.current() || currentEvidenceKey.current !== key || candidateEpoch!==promptEpoch.current) return;
       const starterForecast=starter?homeStarterForecast(starter,requestPack,workforceQuery,undefined,decisionStore.getDatasetToken()):null;
       const answer = starterForecast?starterForecast.summary+'\n\n'+reply.answer:reply.answer;
@@ -410,7 +410,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   function refreshHomeData(){liveFindingTurn.current=null;loaded.current='';sourceRequests.invalidate(workforceQuery);setRefresh(value=>value+1);}
   const ready = Boolean(sources?.some(source => source.facts)) && !loading && loadedScope === workforceQuery;
   const demoPlan=readHomeDemo(storage.data.workspaces[conversation.activeGoalId]?.fields[homeDemoField],conversation.activeGoalId);
-  const solutions=useHomeSolutionConversation({enabled:solutionConversationEnabled,conversation,active,settled:sourcesSettled,evidence:pack,scope:workforceScope,query:workforceQuery,planningContext:()=>demandContext.current??swpModelContext.current,demandReviewRef:demandReview,target:()=>selectedPlanForChat.current,guided:guidedExampleActive?guidedActions:null});
+  const solutions=useHomeSolutionConversation({enabled:solutionConversationEnabled,conversation,active,settled:sourcesSettled,evidence:pack,scope:workforceScope,query:workforceQuery,planningContext:()=>demandContext.current??swpModelContext.current,demandReviewRef:demandReview,planningCalculatorAvailable:()=>demandControl.current?.calculatorAvailable()===true,target:()=>selectedPlanForChat.current,guided:guidedExampleActive?guidedActions:null});
   const planEditReady=ready||Boolean(demoPlan&&demoPlan.example.goal===conversation.focusedIssue&&conversation.storageReady);
   function findingCurrent(turn:FindingTurn){
     const goals=decisionStore.getSnapshot().data.goals;
@@ -598,7 +598,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     </div>
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
-    {!guidedExampleActive&&<SwpGuidedJourney conversation={conversation} active={active} busy={chatLoading||solutions.pending||solutions.saving} commandRef={swpCommand} modelContextRef={swpModelContext} demandControlRef={demandControl} demandReviewRef={demandReview} demandContextRef={demandContext} sources={sources??[]} onNavigate={onNavigate}/>}
+    {!guidedExampleActive&&<SwpGuidedJourney discussionKey={JSON.stringify([workforceScope,workforceQuery,persona])} conversation={conversation} active={active} busy={chatLoading||solutions.pending||solutions.saving} commandRef={swpCommand} modelContextRef={swpModelContext} demandControlRef={demandControl} demandReviewRef={demandReview} demandContextRef={demandContext} sources={sources??[]} onNavigate={onNavigate}/>}
     {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&startingGuide}
     {showFallbackPin&&!chatLoading&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
     {!activePinnedGoal&&conversationPanel}

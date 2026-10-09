@@ -1,3 +1,4 @@
+import {solutionPlanningInstructions} from '@/lib/home-solution-planning';
 import {demandReferenceModelContract} from '@/lib/swp-demand-reference';
 import {progressModelContract} from '@/lib/goal-progress-entry-service';
 import { withDatasetRequest, datasetAI, datasetRouter } from '@/lib/dataset-runtime';
@@ -24,12 +25,13 @@ async function handlePOST(request:Request){
   const client=new OpenAI({...openAIProxyTransport(),apiKey:process.env.OPENAI_API_KEY,maxRetries:0});
   const signal=AbortSignal.any([request.signal,AbortSignal.timeout(90000)]);
   const progressContract=progressModelContract(goalProgressConversationEnabled);
+  const planningInstructions=solutionPlanningInstructions(parsed,demand);
   const conversationTools=demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools];
   const reply=await converseSolutions(parsed,{
    ...(demand?{demand:{datasetToken:datasetRouter.current().token,referenceContract:true}}:{}),
    progress:{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token},
    complete:async(input,finalOnly,signal)=>{
-    const response=await datasetAI(() => client.responses.create({model:CHAT_MODEL,...swpModel,instructions:demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:30000,signal}));
+    const response=await datasetAI(() => client.responses.create({model:CHAT_MODEL,...swpModel,instructions:(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:30000,signal}));
     return {completed:response.status==='completed',items:response.output,calls:response.output.filter(item=>item.type==='function_call').map(item=>({id:item.call_id,name:item.name,arguments:item.arguments})),text:response.output_text};
    },
    loadProjection:async(filters,signal)=>(await import('@/lib/home-solution-projection-source')).loadSolutionProjectionInputs(filters,signal),

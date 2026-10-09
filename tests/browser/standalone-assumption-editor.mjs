@@ -112,7 +112,7 @@ try{
   await page.evaluate(()=>window.staleCalculator());await page.getByRole('button',{name:'Review planning inputs',exact:true}).click();
   check(await page.getByRole('alert').innerText().then(text=>text.includes('changed')),label+' stale current review rejected');
   check((await state()).reviewed===1,label+' stale review invokes no accepted update');
-  await page.evaluate(()=>window.interruptCalculator());
+  await page.evaluate(()=>window.interruptCalculator());await page.getByRole('dialog').waitFor({state:'hidden'});
   check(await page.getByRole('dialog').count()===0,label+' owner interruption closes popup');
   check(await page.evaluate(()=>localStorage.getItem('insights-to-action.decisions.v1'))==='PRESERVED_BROWSER_HISTORY_SENTINEL',label+' all modal flows preserve stored history');
   check(errors.length===0&&api.length===0&&await page.evaluate(()=>window.networkAttempts)===0,label+' all modal flows have zero errors or network');

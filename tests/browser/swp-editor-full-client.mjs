@@ -12,6 +12,8 @@ import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 import {DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
 import {SWP_DEMAND_MODE,illustrativeServiceReview} from '../../lib/swp-demand.ts';
 import {swpDemandBridgeField} from '../../lib/swp-demo.ts';
+import {demandReferenceId} from '../../lib/swp-demand-reference.ts';
+import {solutionPlanningInstructions} from '../../lib/home-solution-planning.ts';
 import {converseSolutions} from '../../lib/home-solution-conversation-service.ts';
 import {fixtureRuntime,final} from '../fixtures/home-solution-conversation.mjs';
 
@@ -46,23 +48,28 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
   if(url.origin!==base||!url.pathname.startsWith('/api/')){blocked.push(req.url());return route.abort();}
   api.push(url.pathname);
   if(url.pathname==='/api/home-solution-conversation'){
-   const body=req.postDataJSON(),c=body.goalContext?.scenarioReview;requests.push(body);let steps;
+   const body=req.postDataJSON(),c=body.goalContext?.scenarioReview;requests.push(body);let steps;const guidance=solutionPlanningInstructions(body,c?.conversationMode===SWP_DEMAND_MODE?c:null);if(c?.conversationMode===SWP_DEMAND_MODE)assert.match(guidance,/Lead with a useful grounded or clearly conditional recommendation/);
    if(c?.conversationMode===SWP_DEMAND_MODE&&!c.demandProposal){
     assert.equal(req.headers()['x-workforce-conversation'],SWP_DEMAND_MODE);
     const spec=illustrativeServiceReview(c,'2026-10-08T12:00:00Z').spec;
     spec.objective=body.message.text;spec.objectiveTurnId=body.message.id;
     for(const value of Object.values(spec)){if(value?.kind==='illustrative')value.kind='model-proposed';if(value?.basis?.kind==='illustrative')value.basis.kind='model-proposed';}
-    steps=[{name:'review_service_demand',args:{spec}},final('Proposed assumptions for a client-operations slice. Edit or correct these unverified inputs.')];
+    steps=[{name:'review_scoped_service_demand',args:{spec}},final('Proposed assumptions for a client-operations slice. Edit or correct these unverified inputs.')];
+   }else if(c?.conversationMode===SWP_DEMAND_MODE){
+    assert.equal(body.planningCalculatorAvailable,true);assert.match(guidance,/UI supplies the optional popup control/);
+    assert.equal(body.message.text,'Make that ten months');
+    const basis={kind:'user-supplied',turnId:body.message.id,quote:body.message.text,explanation:'Synthetic current-turn correction, not observed model behavior.'};
+    steps=[{name:'revise_scoped_service_demand',args:{edit:{reviewRef:demandReferenceId(body.requestId,0),changes:[{field:'months',quantity:null,number:10,text:null,basis}]}}},final('Revised to ten months; other inputs retain their exact provenance.')];
    }else{
     assert(c?.acceptedOperationalReview);
     steps=[final('The saved operating inputs are scenario assumptions, not verified availability.')];
    }
-   const runtime=fixtureRuntime(steps);if(c.conversationMode===SWP_DEMAND_MODE)runtime.demand={datasetToken:'legacy-v1:0'};
+   const runtime=fixtureRuntime(steps);if(c.conversationMode===SWP_DEMAND_MODE)runtime.demand={datasetToken:'legacy-v1:0',referenceContract:true};
    return route.fulfill({json:await converseSolutions(body,runtime,new AbortController().signal)});
   }
   return route.fulfill({json:{overview:{headcount:100,fte:100,open_positions:3,snapshot_date:'2026-09-30'},trend:[{snapshot_date:'2026-09-30',headcount:100,fte:100}]}});
  });
- const button=n=>page.getByRole('button',{name:n,exact:true}),journey=page.getByRole('region',{name:'Strategic workforce planning journey'}),editor=()=>page.getByRole('region',{name:'Edit business demand assumptions'});
+ const button=n=>page.getByRole('button',{name:n,exact:true}),journey=page.getByRole('region',{name:'Strategic workforce planning journey'}),editor=()=>page.getByRole('region',{name:'Planning Calculator inputs'});
  const state=()=>page.evaluate(k=>JSON.parse(localStorage.getItem(k)).payload,DECISIONS_STORAGE_KEY);
  const send=async text=>{await page.getByLabel('Ask Workforce AI',{exact:true}).fill(text);await button('Send overview question').click();};
  await page.goto(base+'/');await dismissHomeOnboarding(page);
@@ -70,12 +77,24 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  await send('Could our teams cover two new managed-services contracts?');
  await journey.getByRole('heading',{name:'Using proposed assumptions'}).waitFor();
  check(mode+' natural proposal has no automatic editor or saved goal',await editor().count()===0&&!(await state()).goals.activeId);
+ check(mode+' initial review request cannot advertise a calculator before an owner review exists',requests.at(-1).planningCalculatorAvailable!==true);
+ const currentReviewText=await journey.getByRole('region',{name:'Review business demand assumptions'}).innerText();
+ await button('Open Planning Calculator').click();await editor().getByLabel('Planning months',{exact:true}).fill('7');
+ await button('Open Planning Calculator').evaluate(el=>el.click());
+ check(mode+' repeated popup click preserves one draft',await page.locator('dialog[open]').count()===1&&await editor().getByLabel('Planning months',{exact:true}).inputValue()==='7');
+ await button('Cancel input edits').click();
+ check(mode+' cancel returns focus to its caller',await button('Open Planning Calculator').evaluate(el=>el===document.activeElement));
+ check(mode+' popup cancel returns to unchanged current review',await journey.getByRole('region',{name:'Review business demand assumptions'}).innerText()===currentReviewText);
+ await send('Make that ten months');await page.getByText('Revised to ten months; other inputs retain their exact provenance.',{exact:true}).filter({visible:true}).first().waitFor();
+ await button('Open Planning Calculator').click();
+ check(mode+' chat edit feeds the same popup review owner',await editor().getByLabel('Planning months',{exact:true}).inputValue()==='10');
+ await page.keyboard.press('Escape');
  const calls=requests.length;
  await send('Open the assumption editor');await editor().waitFor();
  await editor().getByLabel('Planning months',{exact:true}).fill('9');
  await editor().getByLabel('Existing roles',{exact:true}).fill('4');
  await editor().getByLabel('Uncommitted availability (%)',{exact:true}).fill('25');
- await button('Review edited assumptions').click();await editor().waitFor({state:'detached'});
+ await button('Review planning inputs').click();await editor().waitFor({state:'detached'});
  check(mode+' editing uses local calculator and requires acceptance',requests.length===calls&&await button('Use your assumptions for now').isEnabled()&&await journey.getByText(/Gap: 4,800 hours/).count()===1);
  await button('Use your assumptions for now').click();await journey.getByRole('figure').waitFor();
  check(mode+' reviewed reference is the one feasible choice',await journey.getByRole('radio').count()===1&&await journey.getByRole('radio').first().isEnabled());
@@ -102,10 +121,10 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  check(mode+' continued discussion preserves saved plan and measured-progress records',savedArtifacts((await state()).workspaces[id].fields)===savedArtifacts(saved.workspaces[id].fields));
  await button('Continue reviewed business assumptions').click();await send('Open the editor');await editor().waitFor();
  check(mode+' reopened editor uses saved edited values',await editor().getByLabel('Planning months',{exact:true}).inputValue()==='9'&&await editor().getByLabel('Existing roles',{exact:true}).inputValue()==='4');
- await editor().getByLabel('Planning months',{exact:true}).fill('8');await button('Cancel assumption edits').click();
+ await editor().getByLabel('Planning months',{exact:true}).fill('8');await button('Cancel input edits').click();
  check(mode+' cancelling a reopened draft preserves saved plan and review',savedArtifacts((await state()).workspaces[id].fields)===savedArtifacts(saved.workspaces[id].fields));
  await send('Open the editor');await editor().getByLabel('Planning months',{exact:true}).fill('8');
- await button('Reset conversation').click();await editor().waitFor({state:'detached'});
+ await button('Reset conversation').evaluate(el=>el.click());await editor().waitFor({state:'detached'});
  check(mode+' actual Home reset invalidates editor and preserves saved plan',savedArtifacts((await state()).workspaces[id].fields)===savedArtifacts(saved.workspaces[id].fields));
  await page.screenshot({path:path.join(output,mode+'-after-reset.png'),fullPage:true});
  check(mode+' full client layout stays within viewport',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));

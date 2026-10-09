@@ -31,10 +31,15 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  page.on('request',request=>requests.push(request.url()));
  await context.route('**/*',route=>route.request().url()===mockURL&&route.request().isNavigationRequest()&&route.request().frame()===page.mainFrame()&&route.request().resourceType()==='document'&&route.request().method()==='GET'?route.fulfill({contentType:'text/html',body:artifact}):(blocked.push(route.request().url()),route.abort()));
  await page.goto(mockURL);
- const button=name=>page.getByRole('button',{name,exact:true}),editor=()=>page.getByRole('region',{name:'Edit business demand assumptions'}),saved=async()=>JSON.parse(await page.getByTestId('saved').textContent()),send=async text=>{await page.getByLabel('Fixture chat',{exact:true}).fill(text);if(mode==='mobile')await button('Send fixture request').tap();else await button('Send fixture request').click();};
+ const button=name=>page.getByRole('button',{name,exact:true}),editor=()=>page.getByRole('region',{name:'Planning Calculator inputs'}),saved=async()=>JSON.parse(await page.getByTestId('saved').textContent()),send=async text=>{const field=page.getByLabel('Fixture chat',{exact:true});if(await page.locator('dialog[open]').count()){
+  // Simulate a queued chat/control event while the real modal makes background UI inert.
+  await field.evaluate((el,value)=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,value);el.dispatchEvent(new Event('input',{bubbles:true}));},text);
+  await button('Send fixture request').evaluate(el=>el.click());
+ }else{await field.fill(text);if(mode==='mobile')await button('Send fixture request').tap();else await button('Send fixture request').click();}};
+ const interrupt=name=>button(name).evaluate(el=>el.click());
  await button('Start with my business objective').click();
  await send('Open the assumption editor');check(mode+' no form before reviewed inputs',await editor().count()===0);
- await button('Review an illustrative managed-services example').click();const original=await saved();
+ await interrupt('Review an illustrative managed-services example');const original=await saved();
  check(mode+' natural default has no editor or manual pin prerequisite',await editor().count()===0&&!original.goals.activeId);
  await send('Make that nine months');check(mode+' ordinary correction remains natural language',await page.getByTestId('reply').textContent().then(s=>s.includes('normal path'))&&await editor().count()===0);
  for(const text of ['Do not open the editor','\"open the editor\"','Open the editor and set availability to 50%']){await send(text);check(mode+' stays on natural path: '+text,await editor().count()===0&&await page.getByTestId('reply').textContent().then(s=>s.includes('normal path')));}
@@ -46,20 +51,20 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  await page.keyboard.press('Tab');check(mode+' keyboard traverses labelled fields',await editor().getByLabel('Planning start',{exact:true}).evaluate(el=>el===document.activeElement));
  await editor().getByLabel('Planning months',{exact:true}).fill('9');
  await send('Open the editor');check(mode+' repeated request preserves unsaved edits',await editor().getByLabel('Planning months',{exact:true}).inputValue()==='9');
- await send('Use these assumptions');check(mode+' pending editor explains blocked acceptance',await page.getByTestId('reply').textContent().then(s=>s.includes('Review edited assumptions or cancel'))&&await editor().getByLabel('Planning months',{exact:true}).inputValue()==='9');
- await button('Cancel assumption edits').click();check(mode+' cancel leaves review and storage unchanged',await editor().count()===0&&JSON.stringify(await saved())===JSON.stringify(original));
+ await send('Use these assumptions');check(mode+' pending editor explains blocked acceptance',await page.getByTestId('reply').textContent().then(s=>s.includes('Review planning inputs or cancel'))&&await editor().getByLabel('Planning months',{exact:true}).inputValue()==='9');
+ await button('Cancel input edits').click();check(mode+' cancel leaves review and storage unchanged',await editor().count()===0&&JSON.stringify(await saved())===JSON.stringify(original));
  await send('Open the editor');await editor().getByLabel('Planning months',{exact:true}).fill('7');await send('Cancel the assumption editor');check(mode+' chat cancellation discards edits',await editor().count()===0&&JSON.stringify(await saved())===JSON.stringify(original));
- await send('Open the editor');await editor().getByLabel('Planning months',{exact:true}).fill('7');await button('Review an illustrative managed-services example').click();await editor().waitFor({state:'detached'});
+ await send('Open the editor');await editor().getByLabel('Planning months',{exact:true}).fill('7');await interrupt('Review an illustrative managed-services example');await editor().waitFor({state:'detached'});
  check(mode+' replacement review invalidates stale draft',JSON.stringify(await saved())===JSON.stringify(original));
  await send('Open the editor');check(mode+' reopening restores original values',await editor().getByLabel('Planning months',{exact:true}).inputValue()==='12');
- await editor().getByLabel('Uncommitted availability (%)',{exact:true}).fill('101');await button('Review edited assumptions').click();check(mode+' invalid value leaves editor open',await editor().getByRole('alert').isVisible()&&JSON.stringify(await saved())===JSON.stringify(original));
+ await editor().getByLabel('Uncommitted availability (%)',{exact:true}).fill('101');await button('Review planning inputs').click();check(mode+' invalid value leaves editor open',await editor().getByRole('alert').isVisible()&&JSON.stringify(await saved())===JSON.stringify(original));
  await editor().getByLabel('Uncommitted availability (%)',{exact:true}).fill('0');await editor().getByLabel('Planning months',{exact:true}).fill('9');
  check(mode+' editor reflows without viewport overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  check(mode+' inputs and editor actions retain touch size',await editor().locator('input,select,button').evaluateAll(nodes=>nodes.every(el=>el.getBoundingClientRect().height>=44)));
  check(mode+' all editable controls have accessible labels',await editor().getByRole('spinbutton').count()===10&&await editor().getByRole('combobox').count()===2&&await editor().getByLabel('Planning start',{exact:true}).count()===1);
  await editor().screenshot({path:path.join(output,mode+'-editor.png')});
- await button('Review edited assumptions').scrollIntoViewIfNeeded();
- await button('Review edited assumptions').click();try{await editor().waitFor({state:'detached',timeout:5000});}catch(error){console.error(JSON.stringify({editor:await editor().innerText(),inputs:await editor().locator('input').evaluateAll(nodes=>nodes.map(el=>[el.parentElement.textContent,el.value])),errors,disabled:await button('Review edited assumptions').isDisabled()}));throw error;}
+ await button('Review planning inputs').scrollIntoViewIfNeeded();
+ await button('Review planning inputs').click();try{await editor().waitFor({state:'detached',timeout:5000});}catch(error){console.error(JSON.stringify({editor:await editor().innerText(),inputs:await editor().locator('input').evaluateAll(nodes=>nodes.map(el=>[el.parentElement.textContent,el.value])),errors,disabled:await button('Review planning inputs').isDisabled()}));throw error;}
  check(mode+' months-only edit preserves untouched values, periods, scopes and provenance',JSON.stringify(await provenance().locator('tbody tr').allTextContents())===JSON.stringify(originalRows)&&(await provenance().locator(':scope > p').allTextContents()).slice(0,4).every((value,index)=>value===originalBasis[index]));
  check(mode+' changed months alone have explicit unverified user basis',(await provenance().locator(':scope > p').allTextContents())[4].includes('months: user-supplied')&&(await provenance().locator(':scope > p').allTextContents())[4].includes('Planning months: 9.'));
  const editedProvenance=await provenance().textContent();
@@ -70,23 +75,23 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  await send('Open the editor');await editor().getByLabel('Existing roles',{exact:true}).fill('4');await page.keyboard.press('Escape');
  check(mode+' Escape preserves accepted scenario',await editor().count()===0&&await button('Assumptions accepted for scenario use').isDisabled());
  await send('Open the editor');await editor().getByLabel('Existing roles',{exact:true}).fill('4');await editor().getByLabel('Uncommitted availability (%)',{exact:true}).fill('25');
- await button('Review edited assumptions').click();await button('Use your assumptions for now').click();await button('Assumptions accepted for scenario use').waitFor();
+ await button('Review planning inputs').click();await button('Use your assumptions for now').click();await button('Assumptions accepted for scenario use').waitFor();
  check(mode+' revised positive capacity retains nine months and excludes internal pools',await page.getByLabel('Calculated managed-services workload bridge').innerText().then(s=>s.includes('4 existing roles')&&s.includes('25%')&&s.includes('4 whole roles')));
  const options=page.getByRole('radio');await options.first().waitFor();await options.first().check();await button('Review selected Action Plan').click();try{await button('Cancel review').waitFor({timeout:5000});}catch(error){await fs.writeFile(path.join(output,mode+'-failure.txt'),await page.locator('main').innerText());console.error('Synthetic failure evidence: '+path.join(output,mode+'-failure.txt'));throw error;}await button('Cancel review').click();
  check(mode+' cancelling explicit save review writes nothing',JSON.stringify(await saved())===JSON.stringify(original));
- await button('Review selected Action Plan').click();await send('Open the editor');await editor().getByLabel('Existing roles',{exact:true}).fill('5');await button('Review edited assumptions').click();
+ await button('Review selected Action Plan').click();await send('Open the editor');await editor().getByLabel('Existing roles',{exact:true}).fill('5');await button('Review planning inputs').click();
  check(mode+' new assumption review invalidates pending plan review and comparison',await button('Save reviewed plan and goal').count()===0&&await page.getByRole('radio').count()===0&&JSON.stringify(await saved())===JSON.stringify(original));
  await button('Use your assumptions for now').click();await button('Assumptions accepted for scenario use').waitFor();await page.getByRole('radio').first().check();
  await button('Review selected Action Plan').click();await button('Save reviewed plan and goal').click();await button('Continue reviewed business assumptions').waitFor();
  const committed=await saved();check(mode+' explicit save persists reviewed plan and goal',!!committed.goals.activeId&&Object.keys(committed.workspaces).length>0);
- await button('Continue reviewed business assumptions').click();await send('Open the editor');await editor().getByLabel('Planning months',{exact:true}).fill('8');await button('Toggle busy').click();
- check(mode+' busy work blocks edited review',await button('Review edited assumptions').isDisabled());await button('Toggle busy').click();
- await button('Reset fixture conversation').click();await editor().waitFor({state:'detached'});check(mode+' reset discards stale edits and preserves saved work',JSON.stringify(await saved())===JSON.stringify(committed));
- await button('Start with my business objective').click();await button('Review an illustrative managed-services example').click();await send('Open the editor');await button('Toggle navigation').click();await editor().waitFor({state:'detached'});check(mode+' navigation invalidates editor without changing saved plan',JSON.stringify(await saved())===JSON.stringify(committed));
- await button('Toggle navigation').click();await button('Start with my business objective').click();await button('Review an illustrative managed-services example').click();await send('Open the editor');await editor().getByLabel('Planning months',{exact:true}).fill('8');await button('Switch fixture dataset').click();await button('Review edited assumptions').click();
+ await button('Continue reviewed business assumptions').click();await send('Open the editor');await editor().getByLabel('Planning months',{exact:true}).fill('8');await interrupt('Toggle busy');
+ check(mode+' busy work blocks edited review',await button('Review planning inputs').isDisabled());await interrupt('Toggle busy');
+ await interrupt('Reset fixture conversation');await editor().waitFor({state:'detached'});check(mode+' reset discards stale edits and preserves saved work',JSON.stringify(await saved())===JSON.stringify(committed));
+ await button('Start with my business objective').click();await interrupt('Review an illustrative managed-services example');await send('Open the editor');await interrupt('Toggle navigation');await editor().waitFor({state:'detached'});check(mode+' navigation invalidates editor without changing saved plan',JSON.stringify(await saved())===JSON.stringify(committed));
+ await interrupt('Toggle navigation');await button('Start with my business objective').click();await interrupt('Review an illustrative managed-services example');await send('Open the editor');await editor().getByLabel('Planning months',{exact:true}).fill('8');await interrupt('Switch fixture dataset');await button('Review planning inputs').click();
  check(mode+' stale dataset edit is rejected before host redraw',await editor().getByRole('alert').innerText().then(s=>s.includes('decision changed'))&&JSON.stringify(await saved())===JSON.stringify(committed));
  // This minimal host replaces its store without a dataset-root subscription; changing its input supplies that root redraw.
- await page.getByLabel('Fixture chat',{exact:true}).fill('Dataset context changed');await editor().waitFor({state:'detached'});
+ await send('Dataset context changed');await editor().waitFor({state:'detached'});
  check(mode+' dataset switch closes old editor',await editor().count()===0);
  check(mode+' no runtime error or network attempt',errors.length===0&&blocked.length===0&&requests.length===1&&requests[0]===mockURL&&await page.evaluate(()=>window.networkAttempts)===0);
  await context.close();
