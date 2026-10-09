@@ -1,0 +1,34 @@
+{
+  "checkedOn": "2026-10-09",
+  "sources": [
+    "https://developers.openai.com/api/docs/pricing",
+    "https://developers.openai.com/api/docs/models/gpt-6.1-sol"
+  ],
+  "model": "gpt-6.1-sol",
+  "tier": "default",
+  "contextWindow": 1050000,
+  "longContextUsdPerMillion": {
+    "input": 4,
+    "cachedInput": 0.2,
+    "cacheWrite": 5,
+    "output": 15
+  },
+  "planningInputUsdPerMillion": 5,
+  "planningOutputUsdPerMillion": 15,
+  "regionalContingencyMultiplier": 1.1,
+  "maximumGenerationAttempts": 3,
+  "maximumOutputTokensEach": 5000,
+  "formula": "3 * ((1050000 * 5 + 5000 * 15) / 1000000) * 1.10",
+  "proposedMaximumUsd": 17.5725,
+  "remainingBeforeAnyReservationUsd": 20.051104,
+  "reserved": false,
+  "requiresRecheckBeforeArming": true,
+  "hypotheticalExposureUsd": 47.521396,
+  "hypotheticalRemainingUsd": 2.479604,
+  "maximumQuestions": 1,
+  "retainedKnownUsd": 24.091396,
+  "retainedUnresolvedLiabilityUsd": 5.8575,
+  "priorConservativeExposureUsd": 29.948896,
+  "accountingSource": "Coordinator partial closure after one ambiguous dispatch; not measured provider charges.",
+  "pricingBasis": "Inherited reviewed rates; no new pricing verification in this local-only successor. Recheck before any arming."
+}
