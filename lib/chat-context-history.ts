@@ -1,6 +1,6 @@
 import type { ChatMessage } from "./types";
 
-export type ScopedChatHistory = { key: string; messages: ChatMessage[] };
+export type ScopedChatHistory = { key: string; messages: ChatMessage[]; planningObjective?:string|null };
 
 // The visible transcript is separate. Only turns from the current evidence state
 // may become model history; an old answer must not compete with new evidence.
