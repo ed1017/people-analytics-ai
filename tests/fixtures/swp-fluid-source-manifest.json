@@ -2,16 +2,16 @@
   "kind": "swp-fluid-source-v1",
   "paidExecutionAuthorized": false,
   "providerExecutionEntryPoint": null,
-  "runtimeCommit": "6a0232ca4c0604fdcd0f3e909478bac0d8b373f8",
+  "runtimeCommit": "f137730669c6466076438894964ab55f4b965303",
   "inputs": {
     "referenceBuild": "6adf0a9d2f84edb9c27357b5e25fcd3529f16df0",
     "calculatorPR188": "8a81f8c810750a9394f69c6126117f457432d34c",
     "continuityPR187": "1441dcaea8f1e33c08334a3e0168d2bde232f296"
   },
-  "runtimeFileCount": 523,
-  "runtimeSha256": "b94a821b7c4d10c9bef60ff0d5a8cf46ba2957c9f130218713d271af8cdc5bf0",
+  "runtimeFileCount": 524,
+  "runtimeSha256": "9afb384afb65f6bbdce4e36af3648842d33335bd4a5caeef13c7533c8aa737b3",
   "supportFileCount": 478,
-  "supportSha256": "e88e7fcdc057d40deb0987a5ead1243d8e79d9b5d200d2604d5658f8dab8e686",
+  "supportSha256": "9fb64ee43905a3add4c4ffbdf3e9c0459a16622128aa9923ed2af652aea752b4",
   "preservedReference": {
     "fixture": {
       "id": "swp-managed-services-reference-continuation-v5",
@@ -41,6 +41,12 @@
       "scopedObjectiveField": false,
       "note": "Existing checked solution state; the ordinary Home eight-turn objective contract does not apply to this route."
     }
+  },
+  "publication": {
+    "branch": "codex/swp-fluid-package-integration-20261009",
+    "automaticVercelDeployment": false,
+    "config": "vercel.json",
+    "productionMergeApproved": false
   },
   "acceptance": {
     "localSyntheticOnly": true,
@@ -580,7 +586,8 @@
     "public/next.svg": "55995dfad6ecb4945a1e856ddca03c5e16aa5bf13fd21b4df6a74ae79357bcfc",
     "public/vercel.svg": "f081337b2fee635b455b63275406a3e7f39d6a014e25ad90dab5a67e62a12ac4",
     "public/window.svg": "644768c4aaeb4767bce293344eeb0c125fb804a94d801440424072202d85e3a1",
-    "tsconfig.json": "be18523b23b78b6e1a876ddd107d330f0168bddf09d751b57e0b5edce69c66f3"
+    "tsconfig.json": "be18523b23b78b6e1a876ddd107d330f0168bddf09d751b57e0b5edce69c66f3",
+    "vercel.json": "0c41fd0d46db817e8d8885e26e98f44947f24b99b282f91ef1f383716dd9f4a9"
   },
   "supportFiles": {
     "docs/standalone-assumption-editor.md": "09f492095fec3484f2296f3f8b3517ce178f4916a00ae571b590b42cb124f401",
@@ -588,7 +595,7 @@
     "docs/swp-demand-period-contract.md": "2e71ff8095b8e0d7b0d4f498f5f2cef2bbe6de2e5bddd67fd0d7e46bc15c0745",
     "docs/swp-demand-provenance-contract.md": "7c4f98f49894d1c33a9890ed7ce3bce1596d41847c88437a088abbbb65704045",
     "docs/swp-demand-reference-contract.md": "69dc380e55d1ace92c6a01f6bb8ad15c43dce9f4e6d84e08f44c3f462eaed7d3",
-    "docs/swp-fluid-integration-checkpoint.md": "74c39330f06c17df7c9839ab6d8c1927c245d6213db8effa35538f91df6cbea6",
+    "docs/swp-fluid-integration-checkpoint.md": "68f87456007fdb46aaa121a865edd9e0a068d4a94db1849afe0d0e5755775112",
     "tests/action-plan-analysis-demo.test.mjs": "0c56bfff0ace386748b038631c13a84b4bcdf17370371d09656625da1b15d8f2",
     "tests/action-plan-application-preview.test.mjs": "93a5abc740b3c6cbe1758677b0982e3ece930c881af46c56f9db9df717496298",
     "tests/action-plan-application.test.mjs": "943f6b0b53ac9a2d49a32f83b940af58fbb49c9dbae0510de7b2e08d9d5baa9f",
@@ -952,7 +959,7 @@
     "tests/manual/benchmark-hiring-cohorts.mjs": "91e6a664a22d4b3e60d731a9859273f47587987bb9c262d223bcd6e827722de4",
     "tests/manual/benchmark-hiring-selection.mjs": "e4c42ffeb6148a8422cc0127696ea094563358a227738d020fc0496782c4549d",
     "tests/manual/build-workforce-device-fixture.mjs": "ee0ebfc28060eebab0cf0b44884e1b272c2bf7e7dc53433eafb346e7708375cb",
-    "tests/manual/create-swp-fluid-source.mjs": "349282f7c0c3c51d1f969eef6221e109d3218f8d5db0ee338bd47dbdc09ed50c",
+    "tests/manual/create-swp-fluid-source.mjs": "4356e8933beafabe4d1cc8d063c389534fee777e8b1719c4eb2d2a7142fbf88c",
     "tests/manual/forecast-consumer.mjs": "f4d15a0a73fa627908af06c9f8e637cf761a78a32884f76e9f037a8bc098c4c5",
     "tests/manual/generate-calibrated-ta.mjs": "594f8121d71043cf850663cbff0f8718c49ffe8f14223fb766c6913a6253f1b7",
     "tests/manual/generate-compa-calibration-v2.mjs": "97c575be6cddd6eb825ca95da86b198ec07f2061f548a528b4831e6cfdd0f767",
@@ -975,7 +982,7 @@
     "tests/manual/report-satisfaction-wave-change.mjs": "8389c984b1c43362c8f08e2b236f4193e7b500fc93c82b9e31739199d33b68a5",
     "tests/manual/swp-preview-acceptance.mjs": "6f5c833e70cd0f72825db762732460b81969406a89412a7ef3699f5cebe5e761",
     "tests/manual/verify-compensation-oews.py": "61d64e6befb79a126334578e795085452b56061b66572bbf9e01e611478a0c17",
-    "tests/manual/verify-swp-fluid-source.mjs": "625ede23a301bd855777f370c5f607be53a4aec5563a51183b5b8d8f5b63087b",
+    "tests/manual/verify-swp-fluid-source.mjs": "c34d416e95c8980c68e38aa27ed8758cd0d6a61e43e775e0c41b8502c03028f7",
     "tests/manual/verify-swp-period-contract-source.mjs": "e5775dbcae45d1cf3587037a978f830879f55c4228c3b6410e5c1081db2618f7",
     "tests/manual/verify-swp-reference-source.mjs": "9449dd9b2ad44779915b962501492a82d0a7fb2f828ce24d6faa49408c585b49",
     "tests/manual/workforce-agent-openai.mjs": "15a78a19ce32363df4f244673ff66e942f2331837e1bb2c5c2a737893d05876e",

@@ -15,6 +15,8 @@ const bytes=readFileSync(join(root,manifestPath));
 if(hash(bytes)!==expected)throw Error('Source manifest identity changed.');
 const m=JSON.parse(bytes);
 if(m.kind!=='swp-fluid-source-v1'||m.paidExecutionAuthorized!==false||m.providerExecutionEntryPoint!==null||m.acceptance.fullAcceptance!==false)throw Error('Expected the unarmed fluid integration source manifest.');
+const deployment=JSON.parse(readFileSync(join(root,'vercel.json'))).git?.deploymentEnabled;
+if(m.publication.automaticVercelDeployment!==false||deployment?.[m.publication.branch]!==false||Object.keys(deployment).length!==1)throw Error('Source publication deployment guard changed.');
 for(const [path,digest] of Object.entries({...m.runtimeFiles,...m.supportFiles})){
  if(path.startsWith('/')||path.split('/').some(part=>!part||part==='.'||part==='..')||!/^[a-f0-9]{64}$/.test(digest))throw Error('Invalid source entry.');
  if(!lstatSync(join(root,path)).isFile()||hash(readFileSync(join(root,path)))!==digest)throw Error('Source changed: '+path);
