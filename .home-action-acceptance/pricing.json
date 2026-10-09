@@ -1,0 +1,28 @@
+{
+  "checkedOn": "2026-10-09",
+  "sources": [
+    "https://developers.openai.com/api/docs/pricing",
+    "https://developers.openai.com/api/docs/models/gpt-6.1-sol"
+  ],
+  "model": "gpt-6.1-sol",
+  "tier": "default",
+  "contextWindow": 1050000,
+  "longContextUsdPerMillion": {
+    "input": 4,
+    "cachedInput": 0.2,
+    "cacheWrite": 5,
+    "output": 15
+  },
+  "planningInputUsdPerMillion": 5,
+  "planningOutputUsdPerMillion": 15,
+  "regionalContingencyMultiplier": 1.1,
+  "maximumGenerationAttempts": 2,
+  "maximumOutputTokensEach": 5000,
+  "formula": "2 * ((1050000 * 5 + 5000 * 15) / 1000000) * 1.10",
+  "proposedMaximumUsd": 11.715,
+  "reserved": false,
+  "requiresRecheckBeforeArming": true,
+  "maximumQuestions": 1,
+  "accountingSource": "No current available-budget assertion. Model authorization requires a coordinator ledger checked within 15 minutes; total ceiling unchanged.",
+  "pricingBasis": "Inherited reviewed rates; no new pricing verification in this local-only successor. Recheck before any arming."
+}
