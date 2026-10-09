@@ -7,6 +7,7 @@ import {demandReferenceModelContract} from '@/lib/swp-demand-reference';
 import {progressModelContract} from '@/lib/goal-progress-entry-service';
 import { withDatasetRequest, datasetAI, datasetRouter } from '@/lib/dataset-runtime';
 import OpenAI from 'openai';
+import {toResponseInputItems} from 'openai/lib/responses/ResponseInputItems';
 import type {ResponseInput} from 'openai/resources/responses/responses';
 import {openAIProxyTransport} from '@/lib/openai-proxy-transport';
 import {readSolutionRequest,solutionConversationEnabled} from '@/lib/home-solution-conversation';
@@ -51,7 +52,7 @@ async function handlePOST(request:Request){
      return client.responses.create({...homeSolutionModel,instructions:(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:30000,signal});
     });
     diagnostics.stage('response_validation');
-    return {completed:response.status==='completed',items:response.output,calls:response.output.filter(item=>item.type==='function_call').map(item=>({id:item.call_id,name:item.name,arguments:item.arguments})),text:response.output_text};
+    return {completed:response.status==='completed',items:toResponseInputItems(response.output),calls:response.output.filter(item=>item.type==='function_call').map(item=>({id:item.call_id,name:item.name,arguments:item.arguments})),text:response.output_text};
    },
    loadProjection:async(filters,signal)=>(await import('@/lib/home-solution-projection-source')).loadSolutionProjectionInputs(filters,signal),
   },signal);
