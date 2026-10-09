@@ -64,7 +64,7 @@ test('framework sources cannot enter company citation or checked quantitative na
  const runtime=fixtureRuntime([{name:'read_workforce_planning_playbook',args:{sections:['supply']}},evaluate(c),final('The framework suggests reviewing readiness; availability remains unknown.')]);runtime.grounding=grounding;
  const reply=await converseSolutions(body,runtime,signal());assert.deepEqual(reply.state.working,[]);assert.deepEqual(reply.state.verifiedMetrics,[]);
  const outputs=runtime.contexts.at(-1).filter(i=>i.type==='function_call_output').map(i=>JSON.parse(i.output));
- assert.equal(outputs[0].observedWorkforceEvidence,false);assert.equal(outputs[1].code,'invalid_evidence_identifiers');
+ assert.equal(outputs[0].ok,false);assert.equal(outputs[0].error,'Unsupported or oversized tool request.');assert.equal(outputs[1].code,'invalid_evidence_identifiers');
  const invented={...final('A framework cannot verify participant counts.'),verifiedMetrics:[{kind:'candidate',id:'cipd',revision:1,metric:'participants'}]};
  await assert.rejects(converseSolutions(body,fixtureRuntime([invented]),signal()),/not checked in this turn/);
 });
@@ -78,7 +78,8 @@ test('actual POST verifies aggregates before model use and rejects stale dataset
  const response=await isolated.post(request(body));assert.equal(response.status,200,JSON.stringify(await response.json()));assert.equal(isolated.sandbox.__requests.length,1);
  const model=isolated.sandbox.__requests[0],context=JSON.parse(model.input[0].content.split('\n').slice(1).join('\n'));
  assert.equal(context.evidenceGrounding.datasetToken,token);assert.equal(context.currentEvidence.sources.find(s=>s.id==='W1').facts.headcount,17);
- assert.match(model.instructions,/Do not manufacture existing roles, skills, availability, costs, baselines, turnover causes or projected effects/);
+ assert.match(model.instructions,/invent no effect sizes, savings, available resources or approvals/);
+ assert.ok(!model.tools.some(tool=>['read_workforce_planning_playbook','evaluate_action_plans'].includes(tool.name)));
 });
 test('source projection keeps suppression and company-only scopes; invented supplied fields do not become model evidence',()=>{
  const pack=normalizeHomePack({workforceScope:'United States',sources:[{id:'S2',status:'loaded',facts:{exit_respondents:7,rows:[{primary_reason:'Suppressed',exits:2,suppressed:true}]}},{id:'T1',status:'loaded',facts:{current_workforce:17,ready_engineers:17,employees:[{name:'MUST_NOT_APPEAR'}]}}]});
