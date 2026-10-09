@@ -17,7 +17,7 @@ const same = (a,b) => hash(a)===hash(b);
 const integer = v => Number.isSafeInteger(v)&&v>=0;
 const safeId = value => typeof value==='string'&&/^(?:req_|resp_|dpl_|prj_)[A-Za-z0-9_-]{1,160}$/.test(value)?value:null;
 function safeFailure(error) { return {code:/^[a-z_]{1,70}$/.test(error?.message??'')?error.message:'provider_or_runtime_failure',
-  httpStatus:Number.isInteger(error?.status)?error.status:null,requestId:safeId(error?.request_id)}; }
+  httpStatus:Number.isInteger(error?.status)?error.status:null,requestId:safeId(error?.requestID??error?.request_id)}; }
 function safeUsage(usage) {
   if (!usage || typeof usage!=='object') return null;
   return {input_tokens:integer(usage.input_tokens)?usage.input_tokens:null,
