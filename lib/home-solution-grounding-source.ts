@@ -1,6 +1,6 @@
 import {NextRequest} from 'next/server';
 import {datasetRouter} from './dataset-runtime';
-import {verifySolutionEvidence} from './home-solution-grounding.mjs';
+import {verifySolutionEvidence,AggregateEvidenceReadError} from './home-solution-grounding.mjs';
 import type {SolutionRequest} from './home-solution-conversation';
 import type {DashboardFilters} from './dashboard-scope';
 
@@ -24,7 +24,9 @@ export async function groundSolutionRequest(request:SolutionRequest,signal:Abort
   const handler=(await readers[key as keyof typeof readers]()).GET;
   readSignal.throwIfAborted();
   const response=await handler(local);
-  if(!response.ok||(key!=='bls'&&response.headers.get('x-workforce-dataset')!==datasetToken))throw Error('Aggregate source unavailable or mixed');
-  readSignal.throwIfAborted();return {status:'loaded',data:await response.json()};
+  if(!response.ok)throw new AggregateEvidenceReadError('http_error',response.status);
+  if(key!=='bls'&&response.headers.get('x-workforce-dataset')!==datasetToken)throw new AggregateEvidenceReadError('mixed_dataset');
+  readSignal.throwIfAborted();
+  try{return {status:'loaded',data:await response.json()};}catch{throw new AggregateEvidenceReadError('invalid_json');}
  }},signal);
 }
