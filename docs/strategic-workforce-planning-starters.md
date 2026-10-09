@@ -1,12 +1,12 @@
 # Strategic Workforce Planning starters
 
-Home’s former “Skills & growth” suggested-prompt category is now “Strategic Workforce Planning”. Its five openers are the exact approved business-change examples below; the existing three Workforce challenges questions are unchanged.
+Home’s former “Skills & growth” suggested-prompt category is now “Strategic Workforce Planning”. Its five openers use concrete staffing decisions for the fictional technology/services company; the existing three Workforce challenges questions are unchanged.
 
-1. We’re bidding on three new AI implementation projects next year. Can we staff them internally, or will we need to hire?
-2. A client wants us to build a new digital product in six months. How should we staff the project?
-3. We’re taking on two new managed-services contracts. Can our current teams cover them?
-4. We want to expand our cloud modernization business. Should we develop existing employees or hire specialists?
-5. Several client projects will finish next quarter. How can we redeploy those teams to upcoming work?
+1. If we win three AI projects next year, should we hire engineers or move people from other projects?
+2. A client wants a new digital product in six months. Should we recruit more engineers if our managers are already stretched?
+3. If two new managed-services contracts bring more support tickets, should we hire specialists or train people from another team?
+4. We want more cloud modernization work. Should we train our engineers or hire specialists?
+5. If some client projects finish next quarter, which upcoming work could those teams move to?
 
 These are illustrative leader objectives, not claims that the application contains project scope, workloads, employee allocations or available delivery capacity. The targeted Home guidance supports useful provisional planning: missing effort, timing, skills, costs or availability may be proposed as clearly labelled assumptions for review and correction, separately from measured/source values that remain unknown. Only essential business ambiguity requires a question. Role headcounts are not available delivery capacity. No new assumptions form, calculator, source, model or persistence format is introduced.
 
@@ -16,7 +16,19 @@ These are illustrative leader objectives, not claims that the application contai
 
 Starter goal lookup now uses exact prompt keys instead of matching array indices. The three challenge starters still map to turnover, satisfaction and hiring, with unchanged forecast values/source gates. The two former skills prompts retain recognition for legacy use without appearing in the new category. Existing Skills navigation, stored goals, drafts and conversations are unchanged.
 
+The preceding five SWP questions remain recognized in older conversation history. Stable IDs, topic matching and hidden planning assumptions remain unchanged. The support-ticket increase and project releases are conditional premises, not observed app evidence; manager capacity is also a condition. The current Home opener path is conversational with `tool_choice: none`: it does not promise a recruiting/onboarding or ticket-throughput calculator.
+
 ## Verification
+
+Current copy revision from main `48d1b006afd24e0ccf93386c2507ed103b2f392d`: 46 focused starter/context/conversation/actual-route tests and 34 existing plan integration/revision/what-if/forecast tests passed (80 total). ESLint on the changed TypeScript source, `git diff --check` and `npm run build -- --webpack` passed, including the configured generated-data prebuild checks.
+
+The built app passed 206 browser assertions at 1844px, 1366px, 390px and 320px widths: all eight starters send the exact displayed prompt once; planning starters remain conversational without goal/forecast shortcuts; pointer/touch, keyboard, onboarding dismissal, drafts, reset, navigation, reload and overflow/error guards passed. All 44 chat requests were mocked, with zero provider calls. Desktop and 320px screenshots were inspected at `/tmp/swp-copy-pointer/desktop-starters.png` and `/tmp/swp-copy-pointer/small-mobile-starters.png`.
+
+The response-behavior diagnosis and proposed semantic acceptance examples are in `docs/swp-recommendation-acceptance-proposal.md`. They are a proposal, not a change to the runtime model guidance or a real-model acceptance result. This copy revision is intended for a draft PR review before merge or deployment.
+
+### Historical verification of the original PR184 questions
+
+The following evidence applies to the previous wording, not the current copy revision.
 
 Bounded unit/actual-route/planning/forecast regression: 116 tests passed. The actual route is bundled into a network-forbidden harness with a fake provider, checking all five exact openers, unchanged model and `tool_choice: none`, normal history/envelope, relevant follow-ups, topic switches and forced suppression of unsolicited goal fields. Explicit later goal, plan, review, save and calculation classifications remain covered. The existing saved-plan/revision/calculation and all three forecast mappings also passed.
 

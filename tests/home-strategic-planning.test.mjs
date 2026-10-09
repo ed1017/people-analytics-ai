@@ -1,11 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {strategicPlanningStarters,strategicPlanningContext,strategicPlanningInstructions} from '../lib/home-strategic-planning.ts';
+import {strategicPlanningStarters,strategicPlanningStarter,strategicPlanningContext,strategicPlanningInstructions} from '../lib/home-strategic-planning.ts';
 import {homeTurnPurpose} from '../lib/home-conversation.ts';
 import {homeStarterGoal} from '../lib/home-starter-goals.ts';
 import {homeForecastIntent} from '../lib/home-forecast-intent.ts';
 import {planningPrompts,challengePrompts} from './fixtures/home-starter-prompts.mjs';
 const user=content=>({role:'user',content}),assistant=content=>({role:'assistant',content});
+test('previous SWP questions retain conversational recognition and bounded follow-up context',()=>{
+ for(const starter of strategicPlanningStarters){
+  assert.equal(strategicPlanningStarter(starter.legacyPrompt)?.id,starter.id);
+  assert.equal(homeTurnPurpose(starter.legacyPrompt),'answer');
+  assert.equal(homeStarterGoal(starter.legacyPrompt),null);
+  assert.equal(strategicPlanningContext('Why?',[user(starter.legacyPrompt)])?.id,starter.id);
+  assert.equal(strategicPlanningInstructions(starter.legacyPrompt),strategicPlanningInstructions(starter.prompt));
+ }
+});
 test('all five approved business-change openers clarify without goal, forecast or pin shortcuts',()=>{
  assert.deepEqual(strategicPlanningStarters.map(item=>item.prompt),planningPrompts);
  for(const prompt of planningPrompts){

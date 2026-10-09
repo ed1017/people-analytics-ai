@@ -2,19 +2,19 @@
 // @ts-expect-error Native Node tests share TypeScript source.
 import {readUserGoalIntent} from './home-user-goal-intent.ts';
 export const strategicPlanningStarters = [
-  {id:'ai-projects',prompt:'We’re bidding on three new AI implementation projects next year. Can we staff them internally, or will we need to hire?',
+  {id:'ai-projects',prompt:'If we win three AI projects next year, should we hire engineers or move people from other projects?',legacyPrompt:'We’re bidding on three new AI implementation projects next year. Can we staff them internally, or will we need to hire?',
     topic:/\b(AI|implementation|projects?|bids?|bidding|deliver(?:y|ing)?|staff(?:ing)?|allocations?|availability)\b/i,
     assumptions:'Clarify each bid’s scope, likelihood and timing, estimated effort and skill levels, delivery milestones, and actual employee allocations and availability. Three bids are not three confirmed projects. Compare internal staffing and hiring using supplied requirements and clearly identified assumptions for capacity, costs and lead times.'},
-  {id:'digital-product',prompt:'A client wants us to build a new digital product in six months. How should we staff the project?',
+  {id:'digital-product',prompt:'A client wants a new digital product in six months. Should we recruit more engineers if our managers are already stretched?',legacyPrompt:'A client wants us to build a new digital product in six months. How should we staff the project?',
     topic:/\b(digital|product|client|projects?|scope|milestones?|design|engineering|staff(?:ing)?|allocations?|availability)\b/i,
     assumptions:'Clarify the product scope and delivery milestones, estimated design, engineering and other effort, required skills and proficiency, budget, and actual allocations and availability over the six-month period. Six months is the user’s requested delivery horizon, not proof that delivery or recruiting is feasible.'},
-  {id:'managed-services',prompt:'We’re taking on two new managed-services contracts. Can our current teams cover them?',
+  {id:'managed-services',prompt:'If two new managed-services contracts bring more support tickets, should we hire specialists or train people from another team?',legacyPrompt:'We’re taking on two new managed-services contracts. Can our current teams cover them?',
     topic:/\b(managed[ -]services|contracts?|service|coverage|shifts?|on-call|workload|capacity|teams?|allocations?|availability)\b/i,
     assumptions:'Clarify the services in each contract, start dates, workload and effort, service levels and coverage hours, required skills, and actual current-team allocations and availability. Two contracts alone do not establish workload or required headcount; account for existing commitments, on-call coverage and service constraints.'},
-  {id:'cloud-modernization',prompt:'We want to expand our cloud modernization business. Should we develop existing employees or hire specialists?',
+  {id:'cloud-modernization',prompt:'We want more cloud modernization work. Should we train our engineers or hire specialists?',legacyPrompt:'We want to expand our cloud modernization business. Should we develop existing employees or hire specialists?',
     topic:/\b(cloud|modernization|specialists?|skills?|training|develop(?:ment)?|business|pipeline|allocations?|availability)\b/i,
     assumptions:'Clarify the expected cloud-modernization pipeline and timing, required skills and proficiency, current evidenced skills, actual allocations and availability, and training, hiring and delivery costs and lead times. Compare development and hiring against the leader’s objective and constraints; a recorded skill or a training pathway does not prove deployment readiness or guarantee training effects.'},
-  {id:'project-redeployment',prompt:'Several client projects will finish next quarter. How can we redeploy those teams to upcoming work?',
+  {id:'project-redeployment',prompt:'If some client projects finish next quarter, which upcoming work could those teams move to?',legacyPrompt:'Several client projects will finish next quarter. How can we redeploy those teams to upcoming work?',
     topic:/\b(projects?|clients?|redeploy(?:ment)?|teams?|upcoming|releases?|finish|quarter|skills?|allocations?|availability)\b/i,
     assumptions:'Clarify which projects and people are expected to finish, release dates and remaining commitments, upcoming work’s scope, likelihood, skills and effort, and actual allocations and availability. An expected project finish is not confirmed employee availability; check handovers, overlapping assignments and skill fit before proposing redeployment.'},
 ] as const;
@@ -22,7 +22,7 @@ export const strategicPlanningStarters = [
 type Turn={role:string;content:string};
 type Starter=typeof strategicPlanningStarters[number];
 const question=(message:string)=>message.split(/\n\n(?:Focused issue|Session problem context)/)[0].trim();
-export const strategicPlanningStarter=(message:string)=>strategicPlanningStarters.find(item=>item.prompt===question(message))??null;
+export const strategicPlanningStarter=(message:string)=>strategicPlanningStarters.find(item=>item.prompt===question(message)||item.legacyPrompt===question(message))??null;
 const explicitSwitch=(text:string)=>/^(?:(?:no|please)[, ]+)*(?:forget\b|cancel\b|reset\b|new topic\b|change (?:the )?topic\b|stop\b)/i.test(text)
   ||/^How can we (?:reduce turnover|improve employee satisfaction|improve hiring) based on recorded\b/i.test(text);
 const explicitWorkflow=(text:string)=>/\b(?:pin|save|calculate|review|set (?:a |the |this )?goal|confirm (?:a |the |this )?goal)\b/i.test(text)
