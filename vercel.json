@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "codex/home-action-acceptance-20261009": false
+    }
+  },
+  "framework": null,
+  "installCommand": "npm ci --ignore-scripts --no-audit --no-fund",
+  "buildCommand": "node .home-action-acceptance/build.mjs",
+  "outputDirectory": ".home-action-acceptance-output"
+}
