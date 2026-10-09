@@ -23,8 +23,8 @@ export function homeStarterGoal(prompt:string):HomeStarterGoal|null{
 const month=(value:string)=>new Date(value+'-01T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'});
 const metrics:Record<SyntheticDemoDomain,string>={turnover:'monthly voluntary exits',hiring:'active requisitions at month-end',satisfaction:'quarterly mean respondent favorable-answer share'};
 /** Same verified simulated population and metric on both sides; never combines recorded rates with demo counts. */
-export function homeStarterForecast(starter:HomeStarterGoal,pack:CandidatePack,query:string,candidate:unknown=artifact){
- if(!starter.domain||!starter.sourceId)return null;
+export function homeStarterForecast(starter:HomeStarterGoal,pack:CandidatePack,query:string,candidate:unknown=artifact,datasetToken?:string){
+ if(datasetToken!==undefined&&datasetToken!=='legacy-v1:0'||!starter.domain||!starter.sourceId||'datasetContext' in pack&&pack.datasetContext)return null;
  const filters=new URLSearchParams(query);
  if([...filters.entries()].some(([key,value])=>['country','org','level'].includes(key)&&value&&value!=='all'))return null;
  const source=pack.sources.find(item=>item.id===starter.sourceId);

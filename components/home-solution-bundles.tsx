@@ -1,4 +1,6 @@
 "use client";
+import { datasetFetch } from "@/lib/dataset-client.mjs";
+
 import {useHomeGuidedActions} from '@/components/home-guided-actions';
 import {assumptionsFallbackField,readAssumptionsFallback} from '@/lib/home-assumptions-fallback';
 import {HomeAssumptionsFallback} from '@/components/home-assumptions-fallback';
@@ -19,7 +21,7 @@ import {readBundleResponseDiagnostic,bundleResponseDiagnosticText,type BundleRes
 import type {Persona} from '@/lib/types';
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring';
 const localInputs=(id:string)=>{const fields=decisionStore.getSnapshot().data.workspaces[id]?.fields;return {capacity:fields?.workforceSolution??null,retention:fields?.retentionWhatIfV1??null}};
-export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,pack,projectEvidence,active,ready,busy,pin,persona,goalContext,marketReference,hasPlanningWork,onResume,onDiscuss}:{chatChange?:PlanChatChange|null;settled:boolean;projectEvidence?:(destination:PlanningDestination)=>unknown;openRequest?:{goalId:string;goal:string;sequence:number}|null;goalId:string;goal:string;pack:unknown;active:boolean;ready:boolean;busy:boolean;pin:{id:string;sequence:number}|null;persona:Persona;goalContext:unknown;marketReference:unknown;hasPlanningWork:boolean;onResume:()=>void;onDiscuss:(request:BundleDiscussion)=>void}){
+export function HomeSolutionBundles({existingOnly=false,chatChange,settled,openRequest,goalId,goal,pack,projectEvidence,active,ready,busy,pin,persona,goalContext,marketReference,hasPlanningWork,onResume,onDiscuss}:{existingOnly?:boolean;chatChange?:PlanChatChange|null;settled:boolean;projectEvidence?:(destination:PlanningDestination)=>unknown;openRequest?:{goalId:string;goal:string;sequence:number}|null;goalId:string;goal:string;pack:unknown;active:boolean;ready:boolean;busy:boolean;pin:{id:string;sequence:number}|null;persona:Persona;goalContext:unknown;marketReference:unknown;hasPlanningWork:boolean;onResume:()=>void;onDiscuss:(request:BundleDiscussion)=>void}){
  const storage=useDecisionStorage(),coordinator=useRef(createHomeBundlePreparation()),consumed=useRef(0),pinContext=useRef<{sequence:number;identity:string}|null>(null),heading=useRef<HTMLHeadingElement>(null);
  const openedRequest=useRef(0);
  useLayoutEffect(()=>{
@@ -69,7 +71,7 @@ export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,
   let nextBinding:ActionBinding;
   try{nextBinding=await actionBinding(goalId,goal,canonicalHomeEvidence(packet),{plans,request:{persona,goalContext,marketReference}});}catch{if(live.current===identity){setPending(false);setNotice('The current context is unavailable. Your saved work is kept.');}return;}
   const outcome=await coordinator.current.run({mode,binding:nextBinding,packet,stored:mode==='explicit'&&(current?.proposal.bundles.length===0||bound?.sourceRejected)?undefined:raw,isCurrent:()=>currentCheck(identity),prepare:async signal=>{
-   const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},signal,body:JSON.stringify({page:'home',persona,message:HOME_BUNDLE_REQUEST,history:[],goalContext,marketReference,hasFocusedIssue:true,overviewBriefingContext:packet})});
+   const response=await datasetFetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},signal,body:JSON.stringify({page:'home',persona,message:HOME_BUNDLE_REQUEST,history:[],goalContext,marketReference,hasFocusedIssue:true,overviewBriefingContext:packet})});
    let reply;try{reply=await response.json()}catch{return {proposal:null,diagnostic:'client_response'}}
    if(!response.ok)return {proposal:null,diagnostic:reply?.diagnostic??'client_response',responseDiagnostic:reply?.responseDiagnostic};return reply;
   },commit:patch=>{decisionStore.setField(goalId,patch.field,patch.value);if(!decisionStore.getSnapshot().saved)throw Error('Draft could not be saved.');}});
@@ -92,7 +94,7 @@ export function HomeSolutionBundles({chatChange,settled,openRequest,goalId,goal,
   if(pending||!binding||busy||!storage.saved||!currentCheck(identity))throw Error('Wait for the current goal and data to finish loading, then retry.');
   await prepare('explicit');
  }});
- if(!goalId||!goal)return null;
+ if(!goalId||!goal||existingOnly&&!raw&&!demo&&!fields[bundleWorkspaceField])return null;
  if(demo)return <HomeDemoPlans key={goalId} goalId={goalId} goal={goal} active={active} busy={busy} openRequest={openRequest} chatChange={chatChange} onDiscuss={onDiscuss}/>;
  const disabled=busy||pending||!binding||!storage.saved||!active||!ready;
  return <section data-guide-goal={goalId} aria-label="Action Plans for your goal" className="space-y-2 break-words rounded-xl border border-primary/40 px-3 py-2 text-sm leading-relaxed">

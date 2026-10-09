@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import {HOME_INSTRUCTIONS_DISMISSED_KEY} from '@/lib/home-onboarding';
 import type { AppPage } from "@/lib/types";
 
-export function HomeGettingStarted({ busy, active, ready, autoOpen, onNavigate, onStartDemo, status, dismissKey }: {
+export function HomeGettingStarted({ busy, active, ready, autoOpen, onNavigate, onStartDemo, status, dismissKey, conversational=false }: {
+  conversational?:boolean;
   busy: boolean;
   active: boolean;
   ready: boolean;
@@ -51,20 +52,18 @@ export function HomeGettingStarted({ busy, active, ready, autoOpen, onNavigate, 
       <div className="flex max-h-[calc(100dvh-2rem)] flex-col">
       <div className="flex shrink-0 items-start justify-between gap-3 border-b p-4 sm:px-6"><h2 ref={title} id="home-instructions-title" tabIndex={-1} className="pt-2 text-xl font-semibold focus:outline-none">Home instructions</h2><button type="button" aria-label="Close instructions" onClick={close} className="min-h-11 shrink-0 rounded border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Close</button></div>
       <div className="min-h-0 space-y-3 overflow-y-auto overscroll-contain p-4 text-sm leading-relaxed sm:p-6">
-      <p>The purpose of this product is to showcase the evolution of dashboards and strategic workforce planning from insight → action → outcomes.</p>
-      <p>By incorporating AI into People Analytics and strategic workforce planning, it aims to help organizations turn workforce challenges into practical Action Plans, with clear ownership and accountability for results.</p>
-      <p className="text-xs text-muted-foreground">Demo only. Review plans with your team before acting.</p>
-      <h4 className="font-semibold">From question to action</h4>
+      <p>An AI-enabled Strategic Workforce Planning prototype: connect a business objective to workforce choices, a reviewed Action Plan and progress tracking — insight → action → outcomes.</p>
+      <p className="text-xs text-muted-foreground">Synthetic data and fictional scenarios. Benefits are conditional estimates; review capability, availability and funding before acting.</p>
+      <h4 className="font-semibold">Try the five-role workforce decision</h4>
       <ol className="list-decimal space-y-2 pl-5">
-        <li><strong>Ask a question</strong> — Start a conversation or <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => navigate("workforce")}>explore your data</button>.</li>
-        <li><strong>Pin a goal when ready</strong> — Optionally save your goal and request Action Plan choices.</li>
-        <li><strong>Choose and attach a plan</strong> — Review a choice, then use Attach Action Plan to save it in one click.</li>
-        <li><strong>Adjust it in chat</strong> — Describe a change and Send. Review and select the new numbered alternative, then attach it to your goal.</li>
-        <li><strong>Share and track your goal (TBD)</strong> — Share goals and Action Plans with owners, then track progress and outcomes.</li>
+        <li><strong>Frame the goal</strong> — Close these instructions and choose Explore the five-role example. Review the business objective, horizon and demand assumption in chat, then Send.</li>
+        <li><strong>Review the evidence</strong> — People Analytics supports the decision. <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => navigate("workforce")}>Explore your data</button>; company skill coverage does not establish staff availability in the fictional unit.</li>
+        <li><strong>Compare choices</strong> — Compare developing, moving and hiring people, with calculated cash, effort and dated role coverage. {conversational?'Discuss the trade-offs in chat.':'The local comparison is available in this mode.'} Say “Set budget to $100,000” to review a tighter constraint and recalculate.</li>
+        <li><strong>Review and save</strong> — Select an option, review proposed owners and checkpoints, then save. The goal and Action Plan are linked together automatically. Earlier versions stay in history.</li>
+        <li><strong>Track honestly</strong> — The existing progress ledger retains the target and plan link. This role-coverage example has no observed progress or supported outcome assessment yet; saving a proposal does not authorize implementation.</li>
       </ol>
       <p className="text-xs text-muted-foreground">On your first visit, goals labelled Demo example include attached plans you can explore and edit. Their scope, budget and outcomes are assumptions, not achieved results.</p>
       <p className="text-xs text-muted-foreground">To reopen saved work, select a Pinned Goal and expand its latest plan. Earlier attachments stay in history.</p>
-      <p className="text-xs text-muted-foreground">You can also use this as a traditional dashboard—explore workforce data through the left-hand menu.</p>
       <p className="text-xs text-muted-foreground">Goals and drafts are saved in this browser within the limits in Browser storage details. Explore <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => navigate("workforce")}>Workforce</button>, <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => navigate("occupational-references")}>Intelligence</button> or <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => navigate("planning-overview")}>Planning</button>. Opening a page does not carry evidence or run a model. Source coverage and limitations are in Data details.</p>
       <div className="flex flex-wrap gap-2">
         <button type="button" disabled={busy} onClick={() => {restoreFocus.current=false;close();onStartDemo();}} className="min-h-11 rounded border px-3 py-2 font-semibold text-primary focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Try a guided example</button>

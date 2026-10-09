@@ -1,3 +1,4 @@
+import { ConstructedResponseFeasibilitySummary } from "./constructed-response-feasibility";
 import type { Dispatch, SetStateAction } from "react";
 
 import type {
@@ -217,6 +218,7 @@ export function SkillWorkforceResponsePlan({
 
                                 {responsePlanResult && (
                                   <>
+                                    <ConstructedResponseFeasibilitySummary data={responsePlanResult.capacity_feasibility} />
                                     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                                       <div className="rounded-md border p-3">
                                         <p className="text-xs text-muted-foreground">
@@ -289,7 +291,7 @@ export function SkillWorkforceResponsePlan({
                                         </p>
                                         <p className="mt-1 text-xs text-muted-foreground">
                                           {responsePlanResult.evidence.move.mobility_candidates.toLocaleString()}{" "}
-                                          mobility candidates; not confirmed availability
+                                          {responsePlanResult.capacity_feasibility ? "recorded preference matches; assessed readiness and available movers are unknown" : "mobility candidates; not confirmed availability"}
                                         </p>
                                       </div>
                                       <div className="rounded-md border p-3 text-sm">

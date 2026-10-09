@@ -1,0 +1,104 @@
+/** Offline component bundle + headless desktop/mobile. No Next build/start. */
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
+import postcss from 'postcss';
+import tailwind from '@tailwindcss/postcss';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
+const output=await fs.mkdtemp(path.join(os.tmpdir(),'swp-demand-editor-'));
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,plugins:[new webpackPackage.webpack.DefinePlugin({'process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION':JSON.stringify('true'),'process.env.NEXT_PUBLIC_GOAL_PROGRESS':JSON.stringify('true')})],entry:path.resolve('tests/fixtures/swp-demand-editor.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
+const css=(await postcss([tailwind({base:process.cwd()})]).process(await fs.readFile('app/globals.css','utf8'),{from:path.resolve('app/globals.css')})).css;
+const bootstrap="window.networkAttempts=0;window.fetch=()=>{window.networkAttempts++;throw Error('Network forbidden')};window.XMLHttpRequest=window.WebSocket=window.EventSource=class{constructor(){window.networkAttempts++;throw Error('Network forbidden')}};";
+const js=await fs.readFile(path.join(output,'fixture.js'),'utf8');
+const file=path.join(output,'fixture.html');
+await fs.writeFile(file,`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; worker-src blob:; connect-src 'none'; img-src data:; font-src data:"><style>${css.replaceAll('</style','<\\/style')}</style></head><body><div id="root"></div><script>${bootstrap.replaceAll('</script','<\\/script')}</script><script>${js.replaceAll('</script','<\\/script')}</script></body></html>`);
+if(process.argv.includes('--build-only')){console.log(JSON.stringify({output,file,browserRun:false}));process.exit(0);}
+const artifact=await fs.readFile(file,'utf8'),mockURL='http://127.0.0.1:3100/';
+const sourceSha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+const sourceTree=execFileSync('git',['rev-parse','HEAD^{tree}'],{encoding:'utf8'}).trim();
+const assertions=[];
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH??'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+const browserVersion=browser.version();
+let checks=0;const check=(name,pass)=>{assert.ok(pass,name);checks++;assertions.push(name);console.log('PASS '+name);};
+try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
+ const context=await browser.newContext({viewport:{width,height},isMobile:mode==='mobile',hasTouch:mode==='mobile'}),page=await context.newPage(),errors=[],requests=[],blocked=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ page.on('request',request=>requests.push(request.url()));
+ await context.route('**/*',route=>route.request().url()===mockURL&&route.request().isNavigationRequest()&&route.request().frame()===page.mainFrame()&&route.request().resourceType()==='document'&&route.request().method()==='GET'?route.fulfill({contentType:'text/html',body:artifact}):(blocked.push(route.request().url()),route.abort()));
+ await page.goto(mockURL);
+ const button=name=>page.getByRole('button',{name,exact:true}),editor=()=>page.getByRole('region',{name:'Planning Calculator inputs'}),saved=async()=>JSON.parse(await page.getByTestId('saved').textContent()),send=async text=>{const field=page.getByLabel('Fixture chat',{exact:true});if(await page.locator('dialog[open]').count()){
+  // Simulate a queued chat/control event while the real modal makes background UI inert.
+  await field.evaluate((el,value)=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,value);el.dispatchEvent(new Event('input',{bubbles:true}));},text);
+  await button('Send fixture request').evaluate(el=>el.click());
+ }else{await field.fill(text);if(mode==='mobile')await button('Send fixture request').tap();else await button('Send fixture request').click();}};
+ const interrupt=name=>button(name).evaluate(el=>el.click());
+ await button('Start with my business objective').click();
+ await send('Open the assumption editor');check(mode+' no form before reviewed inputs',await editor().count()===0);
+ await interrupt('Review an illustrative managed-services example');const original=await saved();
+ check(mode+' natural default has no editor or manual pin prerequisite',await editor().count()===0&&!original.goals.activeId);
+ await send('Make that nine months');check(mode+' ordinary correction remains natural language',await page.getByTestId('reply').textContent().then(s=>s.includes('normal path'))&&await editor().count()===0);
+ for(const text of ['Do not open the editor','\"open the editor\"','Open the editor and set availability to 50%']){await send(text);check(mode+' stays on natural path: '+text,await editor().count()===0&&await page.getByTestId('reply').textContent().then(s=>s.includes('normal path')));}
+ const provenance=()=>page.getByRole('region',{name:'Review business demand assumptions'}).locator('details').first();
+ const originalRows=await provenance().locator('tbody tr').allTextContents();
+ const originalBasis=await provenance().locator(':scope > p').allTextContents();
+ await send('Show me an assumption editor');await editor().waitFor();
+ check(mode+' explicit request focuses first field',await editor().getByLabel('Planning months',{exact:true}).evaluate(el=>el===document.activeElement));
+ await page.keyboard.press('Tab');check(mode+' keyboard traverses labelled fields',await editor().getByLabel('Planning start',{exact:true}).evaluate(el=>el===document.activeElement));
+ await editor().getByLabel('Planning months',{exact:true}).fill('9');
+ check(mode+' popup opens directly into editable boxes without an Edit gate',await editor().getByLabel('Planning months',{exact:true}).inputValue()==='9'&&await editor().getByRole('button',{name:/^Edit\b/i}).count()===0);
+ check(mode+' advanced inputs and source explanations start collapsed',await editor().locator('details').evaluateAll(nodes=>nodes.every(node=>!node.open)));
+ await send('Open the editor');check(mode+' repeated request preserves unsaved edits',await editor().getByLabel('Planning months',{exact:true}).inputValue()==='9');
+ await send('Use these assumptions');check(mode+' pending editor explains blocked acceptance',await page.getByTestId('reply').textContent().then(s=>s.includes('Review planning inputs or cancel'))&&await editor().getByLabel('Planning months',{exact:true}).inputValue()==='9');
+ await button('Cancel input edits').click();check(mode+' cancel leaves review and storage unchanged',await editor().count()===0&&JSON.stringify(await saved())===JSON.stringify(original));
+ await send('Open the editor');await editor().getByLabel('Planning months',{exact:true}).fill('7');await send('Cancel the assumption editor');check(mode+' chat cancellation discards edits',await editor().count()===0&&JSON.stringify(await saved())===JSON.stringify(original));
+ await send('Open the editor');await editor().getByLabel('Planning months',{exact:true}).fill('7');await interrupt('Review an illustrative managed-services example');await editor().waitFor({state:'detached'});
+ check(mode+' replacement review invalidates stale draft',JSON.stringify(await saved())===JSON.stringify(original));
+ await send('Open the editor');check(mode+' reopening restores original values',await editor().getByLabel('Planning months',{exact:true}).inputValue()==='12');
+ await editor().getByLabel('Available team time (%)',{exact:true}).fill('101');await button('Review planning inputs').click();check(mode+' invalid value leaves editor open',await editor().getByRole('alert').isVisible()&&JSON.stringify(await saved())===JSON.stringify(original));
+ await editor().getByLabel('Available team time (%)',{exact:true}).fill('0');await editor().getByLabel('Planning months',{exact:true}).fill('9');
+ check(mode+' editor reflows without viewport overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ check(mode+' visible inputs and editor actions retain touch size',await editor().locator('input,select,button,summary').evaluateAll(nodes=>nodes.filter(el=>el.checkVisibility()).every(el=>el.getBoundingClientRect().height>=44)));
+ await editor().getByText('Advanced role assumptions',{exact:true}).click();
+ check(mode+' all editable controls have accessible labels',await editor().getByRole('spinbutton').count()===10&&await editor().getByRole('combobox').count()===2&&await editor().getByLabel('Planning start',{exact:true}).count()===1);
+ await editor().getByText('Advanced role assumptions',{exact:true}).click();
+ await editor().screenshot({path:path.join(output,mode+'-editor.png')});
+ await button('Review planning inputs').scrollIntoViewIfNeeded();
+ await button('Review planning inputs').click();try{await editor().waitFor({state:'detached',timeout:5000});}catch(error){console.error(JSON.stringify({editor:await editor().innerText(),inputs:await editor().locator('input').evaluateAll(nodes=>nodes.map(el=>[el.parentElement.textContent,el.value])),errors,disabled:await button('Review planning inputs').isDisabled()}));throw error;}
+ check(mode+' months-only edit preserves untouched values, periods, scopes and provenance',JSON.stringify(await provenance().locator('tbody tr').allTextContents())===JSON.stringify(originalRows)&&(await provenance().locator(':scope > p').allTextContents()).slice(0,4).every((value,index)=>value===originalBasis[index]));
+ check(mode+' changed months alone have explicit unverified user basis',(await provenance().locator(':scope > p').allTextContents())[4].includes('months: user-supplied')&&(await provenance().locator(':scope > p').allTextContents())[4].includes('Planning months: 9.'));
+ const editedProvenance=await provenance().textContent();
+ check(mode+' review requires fresh acceptance and does not save',!await button('Use your assumptions for now').isDisabled()&&JSON.stringify(await saved())===JSON.stringify(original));
+ await button('Use your assumptions for now').click();await button('Assumptions accepted for scenario use').waitFor();
+ check(mode+' assumption acceptance preserves provenance and writes no plan',await provenance().textContent()===editedProvenance&&JSON.stringify(await saved())===JSON.stringify(original));
+ await send('Use these assumptions');check(mode+' repeated acceptance preserves review',await page.getByTestId('reply').textContent().then(s=>s.includes('already accepted'))&&await provenance().textContent()===editedProvenance&&JSON.stringify(await saved())===JSON.stringify(original));
+ await send('Open the editor');await editor().getByLabel('Existing roles',{exact:true}).fill('4');await page.keyboard.press('Escape');
+ check(mode+' Escape preserves accepted scenario',await editor().count()===0&&await button('Assumptions accepted for scenario use').isDisabled());
+ await send('Open the editor');await editor().getByLabel('Existing roles',{exact:true}).fill('4');await editor().getByLabel('Available team time (%)',{exact:true}).fill('25');
+ await button('Review planning inputs').click();await button('Use your assumptions for now').click();await button('Assumptions accepted for scenario use').waitFor();
+ check(mode+' revised positive capacity retains nine months and excludes internal pools',await page.getByLabel('Calculated managed-services workload bridge').innerText().then(s=>s.includes('4 existing roles')&&s.includes('25%')&&s.includes('4 whole roles')));
+ const options=page.getByRole('radio');await options.first().waitFor();await options.first().check();await button('Review selected Action Plan').click();try{await button('Cancel review').waitFor({timeout:5000});}catch(error){await fs.writeFile(path.join(output,mode+'-failure.txt'),await page.locator('main').innerText());console.error('Synthetic failure evidence: '+path.join(output,mode+'-failure.txt'));throw error;}await button('Cancel review').click();
+ check(mode+' cancelling explicit save review writes nothing',JSON.stringify(await saved())===JSON.stringify(original));
+ await button('Review selected Action Plan').click();await send('Open the editor');await editor().getByLabel('Existing roles',{exact:true}).fill('5');await button('Review planning inputs').click();
+ check(mode+' new assumption review invalidates pending plan review and comparison',await button('Save reviewed plan and goal').count()===0&&await page.getByRole('radio').count()===0&&JSON.stringify(await saved())===JSON.stringify(original));
+ await button('Use your assumptions for now').click();await button('Assumptions accepted for scenario use').waitFor();await page.getByRole('radio').first().check();
+ await button('Review selected Action Plan').click();await button('Save reviewed plan and goal').click();await button('Continue reviewed business assumptions').waitFor();
+ const committed=await saved();check(mode+' explicit save persists reviewed plan and goal',!!committed.goals.activeId&&Object.keys(committed.workspaces).length>0);
+ await button('Continue reviewed business assumptions').click();await send('Open the editor');await editor().getByLabel('Planning months',{exact:true}).fill('8');await interrupt('Toggle busy');
+ check(mode+' busy work blocks edited review',await button('Review planning inputs').isDisabled());await interrupt('Toggle busy');
+ await interrupt('Reset fixture conversation');await editor().waitFor({state:'detached'});check(mode+' reset discards stale edits and preserves saved work',JSON.stringify(await saved())===JSON.stringify(committed));
+ await button('Start with my business objective').click();await interrupt('Review an illustrative managed-services example');await send('Open the editor');await interrupt('Toggle navigation');await editor().waitFor({state:'detached'});check(mode+' navigation invalidates editor without changing saved plan',JSON.stringify(await saved())===JSON.stringify(committed));
+ await interrupt('Toggle navigation');await button('Start with my business objective').click();await interrupt('Review an illustrative managed-services example');await send('Open the editor');await editor().getByLabel('Planning months',{exact:true}).fill('8');await interrupt('Switch fixture dataset');await button('Review planning inputs').click();
+ check(mode+' stale dataset edit is rejected before host redraw',await editor().getByRole('alert').innerText().then(s=>s.includes('decision changed'))&&JSON.stringify(await saved())===JSON.stringify(committed));
+ // This minimal host replaces its store without a dataset-root subscription; changing its input supplies that root redraw.
+ await send('Dataset context changed');await editor().waitFor({state:'detached'});
+ check(mode+' dataset switch closes old editor',await editor().count()===0);
+ check(mode+' no runtime error or network attempt',errors.length===0&&blocked.length===0&&requests.length===1&&requests[0]===mockURL&&await page.evaluate(()=>window.networkAttempts)===0);
+ await context.close();
+}}finally{await browser.close();}
+await fs.writeFile(path.join(output,'receipt.json'),JSON.stringify({sourceSha,sourceTree,browserVersion,nodeVersion:process.version,mobileTouch:true,workingTree:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim(),artifactSha256:createHash('sha256').update(artifact).digest('hex'),checks,assertions,mode:'isolated-real-components-intercepted-http',fixtureURL:mockURL,httpServerStarted:false,modelCalls:0,databaseCalls:0,viewports:[1280,390],fullApplicationTest:false,neverRun:['diagnostic API harness','provider/model/token-count calls','database access','Next production startup or deployment','physical-device or user desktop interactions']},null,2));
+console.log(JSON.stringify({checks,output}));

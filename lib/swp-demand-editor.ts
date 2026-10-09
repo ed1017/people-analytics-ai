@@ -1,4 +1,4 @@
-import type {DemandContext,DemandPatch,DemandReview,DemandQuantityField} from './swp-demand';
+import type {DemandContext,DemandPatch,DemandReview,DemandQuantityField,DemandBasis} from './swp-demand';
 // @ts-expect-error Native Node fixtures share TypeScript source.
 import {demandQuantityFields,readDemandReview,reviseDemandReview} from './swp-demand.ts';
 
@@ -8,9 +8,9 @@ export type DemandEditorDraft={baseKey:string;months:string;startMonth:string;va
 /** Consume only an explicit editor request. Ordinary corrections stay in chat. */
 export function demandEditorIntent(text:string):'open'|'close'|null {
  const value=text.trim().toLowerCase().replaceAll('’',"'").replace(/[.!?]+$/,'').replace(/^please\s+|,?\s+please$/g,'');
- const target='(?:(?:an?|the) )?(?:(?:assumption|assumptions) editor|editor|edit box)(?: for (?:my|these|the) assumptions)?';
+ const target='(?:(?:an?|the) )?(?:(?:assumption|assumptions) editor|planning calculator|editor|edit box)(?: for (?:my|these|the) assumptions)?';
  if(new RegExp('^(?:(?:can|could|would) you |can i )?(?:open|show(?: me)?|give me) '+target+'$').test(value)||new RegExp("^(?:i want|i need|i'd like|i would like) "+target+'$').test(value))return 'open';
- if(/^(?:close|cancel|dismiss) (?:the )?(?:assumption editor|assumptions editor|editor|edit box)$/.test(value))return 'close';
+ if(/^(?:close|cancel|dismiss) (?:the )?(?:assumption editor|assumptions editor|planning calculator|editor|edit box)$/.test(value))return 'close';
  return null;
 }
 export function createDemandEditorDraft(review:DemandReview):DemandEditorDraft {
@@ -19,10 +19,10 @@ export function createDemandEditorDraft(review:DemandReview):DemandEditorDraft {
 /** Only changed fields acquire the explicit editor action's user provenance. */
 export function reviewDemandEditor(current:DemandReview,draft:DemandEditorDraft,context:DemandContext,turnId:string):DemandReview {
  const source=readDemandReview(current,context),initial=createDemandEditorDraft(source);
- if(draft.baseKey!==source.key)throw Error('These assumptions changed. Reopen the editor on the current review.');
+ if(draft.baseKey!==source.key)throw Error('These planning inputs changed. Reopen Planning Calculator on the current review.');
  const edits:DemandPatch['changes']=[],lines:string[]=[];
- const number=(value:string,label:string)=>{if(!value.trim()||!Number.isFinite(Number(value)))throw Error(`Enter a number for ${label}, or cancel to keep the current assumption.`);return Number(value);};
- const basis=(line:string)=>{lines.push(line);return {kind:'user-supplied' as const,turnId,quote:line,explanation:'Explicit entry in the optional assumption editor; an unverified planning input.'};};
+ const number=(value:string,label:string)=>{if(!value.trim()||!Number.isFinite(Number(value)))throw Error(`Enter a number for ${label}, or cancel to keep the current input.`);return Number(value);};
+ const basis=(line:string)=>{lines.push(line);return {kind:'user-supplied' as const,turnId,quote:line,explanation:'Explicit entry in Planning Calculator; an unverified manually entered planning input.'};};
  if(draft.months!==initial.months){const n=number(draft.months,'Planning months');if(!Number.isInteger(n)||n<1||n>24)throw Error('Planning months must be a whole number from 1 to 24.');if(n!==source.spec.months)edits.push({field:'months',quantity:null,number:n,text:null,basis:basis(`Planning months: ${n}.`)});}
  if(draft.startMonth!==initial.startMonth)edits.push({field:'startMonth',quantity:null,number:null,text:draft.startMonth,basis:basis(`Planning start: ${draft.startMonth}.`)});
  for(const field of demandQuantityFields){
@@ -33,6 +33,9 @@ export function reviewDemandEditor(current:DemandReview,draft:DemandEditorDraft,
   const provenance=basis(`${demandEditorLabels[field]}: ${value}${period?` per ${period}`:''}.`);
   edits.push({field,quantity:{...source.spec[field],value,period:period as typeof source.spec[typeof field]['period'],basis:provenance},number:null,text:null,basis:provenance});
  }
- if(!edits.length)throw Error('No assumption values changed. Cancel to keep the current review.');
+ if(!edits.length)throw Error('No planning input values changed. Cancel to keep the current review.');
  return reviseDemandReview(source,{baseKey:source.key,changes:edits},context,turnId,[{id:turnId,text:lines.join('\n')}],turnId);
 }
+
+/** Display provenance without promoting user entries or fictional defaults to actuals. */
+export function demandInputSourceLabel(kind:DemandBasis['kind']){return {illustrative:'Fictional example assumption','model-proposed':'Model-proposed planning assumption · not verified actual','user-supplied':'User-supplied input · not verified actual',unknown:'Unknown'}[kind];}

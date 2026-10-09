@@ -1,4 +1,6 @@
 "use client";
+import { datasetFetch, datasetSession } from "@/lib/dataset-client.mjs";
+
 import {usePlanningDecisionState} from "@/components/workforce-planning/use-planning-decision-state";
 import { PlanningGuide } from "@/components/planning-guide";
 
@@ -40,6 +42,7 @@ import type {
   StructuralPositionScenarioResponse,
   TimePhasedWorkforceExecutionResponse,
   ConstraintAwareWorkforceScheduleResponse,
+  CandidateSchedulingAssumptions,
   WorkforceResponseConstraintResponse,
   WorkforceResponsePlanAllocation,
   WorkforceResponsePlanResponse,
@@ -492,7 +495,7 @@ export function WorkforcePlanningPage({
     if(goalKey.slice(goalKey.indexOf(":")+1))return; // Legacy global scenarios stay unassigned.
     try {
       const stored = window.localStorage.getItem(
-        SAVED_SCENARIOS_STORAGE_KEY
+        datasetSession.current()==="legacy-v1:0"?SAVED_SCENARIOS_STORAGE_KEY:`${SAVED_SCENARIOS_STORAGE_KEY}.dataset.${datasetSession.current()}`
       );
 
       if (!stored) return;
@@ -527,7 +530,7 @@ export function WorkforcePlanningPage({
 
     async function loadStructuralPositionCatalog() {
       try {
-        const response = await fetch(
+        const response = await datasetFetch(
           "/api/position-structure",
           { cache: "no-store" }
         );
@@ -569,7 +572,7 @@ export function WorkforcePlanningPage({
 
     async function loadPositionActionDefaults() {
       try {
-        const response = await fetch(
+        const response = await datasetFetch(
           "/api/position-actions",
           { cache: "no-store", signal: controller.signal }
         );
@@ -614,7 +617,7 @@ export function WorkforcePlanningPage({
 
     async function loadBusinessUnitScenarioCatalog() {
       try {
-        const response = await fetch(
+        const response = await datasetFetch(
           "/api/business-unit-scenario",
           { cache: "no-store", signal: controller.signal }
         );
@@ -660,7 +663,7 @@ export function WorkforcePlanningPage({
 
     async function loadScenarioDefaults() {
       try {
-        const response = await fetch("/api/scenario-modeler", {
+        const response = await datasetFetch("/api/scenario-modeler", {
           cache: "no-store",
           signal: controller.signal,
         });
@@ -703,7 +706,7 @@ export function WorkforcePlanningPage({
       setCustomScenarioLoading(true);
       setCustomScenarioError(null);
 
-      const response = await fetch("/api/scenario-modeler", {
+      const response = await datasetFetch("/api/scenario-modeler", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -752,7 +755,7 @@ export function WorkforcePlanningPage({
       setBuScenarioLoading(true);
       setBuScenarioError(null);
 
-      const response = await fetch(
+      const response = await datasetFetch(
         "/api/business-unit-scenario",
         {
           method: "POST",
@@ -808,7 +811,7 @@ export function WorkforcePlanningPage({
       setPositionActionLoading(true);
       setPositionActionError(null);
 
-      const response = await fetch(
+      const response = await datasetFetch(
         "/api/position-actions",
         {
           method: "POST",
@@ -924,7 +927,7 @@ export function WorkforcePlanningPage({
       setStructuralPositionLoading(true);
       setStructuralPositionError(null);
 
-      const response = await fetch(
+      const response = await datasetFetch(
         "/api/position-structure",
         {
           method: "POST",
@@ -1032,7 +1035,7 @@ export function WorkforcePlanningPage({
       setResponsePlanLoading(true);
       setResponsePlanError(null);
 
-      const response = await fetch(
+      const response = await datasetFetch(
         "/api/workforce-response-plan",
         {
           method: "POST",
@@ -1093,7 +1096,7 @@ export function WorkforcePlanningPage({
       setRoleResponsePlanLoading(true);
       setRoleResponsePlanError(null);
 
-      const response = await fetch(
+      const response = await datasetFetch(
         "/api/role-workforce-response-plan",
         {
           method: "POST",
@@ -1204,7 +1207,7 @@ export function WorkforcePlanningPage({
       setResponsePortfolioLoading(true);
       setResponsePortfolioError(null);
 
-      const response = await fetch(
+      const response = await datasetFetch(
         "/api/workforce-response-portfolio",
         {
           method: "POST",
@@ -1355,7 +1358,7 @@ export function WorkforcePlanningPage({
       setBusinessUnitResponseLoading(true);
       setBusinessUnitResponseError(null);
 
-      const response = await fetch(
+      const response = await datasetFetch(
         "/api/business-unit-response-allocation",
         {
           method: "POST",
@@ -1543,7 +1546,7 @@ export function WorkforcePlanningPage({
             row.effective_month,
         }));
 
-    if (schedule.length === 0) {
+    if (schedule.length === 0 && !businessUnitResponseResult.capacity_feasibility) {
       setResponseExecutionError(
         "Enter an effective month for at least one positive Build, Move, or Buy phase."
       );
@@ -1554,7 +1557,7 @@ export function WorkforcePlanningPage({
       setResponseExecutionLoading(true);
       setResponseExecutionError(null);
 
-      const response = await fetch(
+      const response = await datasetFetch(
         "/api/time-phased-workforce-execution",
         {
           method: "POST",
@@ -1630,7 +1633,7 @@ export function WorkforcePlanningPage({
     setConstraintAwareScheduleError(null);
   }
 
-  async function runConstraintAwareScheduler() {
+  async function runConstraintAwareScheduler(schedulingAssumptions?: CandidateSchedulingAssumptions) {
     if (
       !businessUnitResponseResult ||
       !responsePortfolioResult
@@ -1642,7 +1645,7 @@ export function WorkforcePlanningPage({
       setConstraintAwareScheduleLoading(true);
       setConstraintAwareScheduleError(null);
 
-      const response = await fetch(
+      const response = await datasetFetch(
         "/api/constraint-aware-workforce-scheduler",
         {
           method: "POST",
@@ -1651,6 +1654,7 @@ export function WorkforcePlanningPage({
               "application/json",
           },
           body: JSON.stringify({
+            ...(businessUnitResponseResult.capacity_feasibility && schedulingAssumptions ? {scheduling_assumptions: schedulingAssumptions} : {}),
             actions:
               structuralPositionActions,
             allocations:
@@ -1697,6 +1701,7 @@ export function WorkforcePlanningPage({
       setConstraintAwareScheduleResult(
         result
       );
+      if (result.status === "needs_assumptions") return;
       setResponseExecutionDrafts(
         result.generated_schedule.map(
           (row, index) => ({
@@ -1774,7 +1779,7 @@ export function WorkforcePlanningPage({
         })
       );
 
-    if (schedule.length === 0) {
+    if (schedule.length === 0 && !businessUnitResponseResult.capacity_feasibility) {
       setResponseConstraintError(
         "Run at least one scheduled execution phase before checking constraints."
       );
@@ -1810,7 +1815,7 @@ export function WorkforcePlanningPage({
       setResponseConstraintLoading(true);
       setResponseConstraintError(null);
 
-      const response = await fetch(
+      const response = await datasetFetch(
         "/api/workforce-response-constraints",
         {
           method: "POST",
@@ -1908,7 +1913,7 @@ export function WorkforcePlanningPage({
 
     try {
       window.localStorage.setItem(
-        SAVED_SCENARIOS_STORAGE_KEY,
+        datasetSession.current()==="legacy-v1:0"?SAVED_SCENARIOS_STORAGE_KEY:`${SAVED_SCENARIOS_STORAGE_KEY}.dataset.${datasetSession.current()}`,
         JSON.stringify(next)
       );
     } catch {
@@ -1978,6 +1983,13 @@ export function WorkforcePlanningPage({
 
   return (
 <section className="evidence-workspace min-w-0 p-6">
+          {activePlanningScenario?.provenance?.status === 'constructed_draft_assumption' && (
+            <div className="mb-4 rounded-md border bg-muted/20 p-3 text-sm text-muted-foreground">
+              <p>Constructed demo what-if calculations. Zero growth and inflation come from the stored flat draft; the attrition default annualizes company January–September exits and is a shared assumption for business-unit scenarios. Fill rate is an assumption, not proven hiring capacity.</p>
+              <p className="mt-1">September stock carries to January 2027. October–December 2026 is unmodeled. Calculated hires and exits are separate from the draft’s zero flows; no independent forecast validation is supplied.</p>
+              <p className="mt-1">Fourteen vacancy-only structural combinations have no draft cost basis. Affected costs display as unavailable. Scenario scope comes from its business-unit selector or structural actions; dashboard filters do not narrow these calculations. Inventory partitions retain calculation precision; displayed labels round independently. Skill profiles and career preferences do not establish assessed readiness or available movers; Borrow and Automate evidence remain unavailable.</p>
+            </div>
+          )}
           <p className="mb-3 text-xs text-muted-foreground">{goalKey.slice(goalKey.indexOf(":")+1)?"Saved with this goal. Completed results retain their recorded inputs; changes require an explicit model run.":"General exploration: select a goal to save this decision workspace."} Model allocations are assumptions, not organizational approvals.</p>
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>

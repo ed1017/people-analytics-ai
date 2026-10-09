@@ -1,3 +1,4 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import {
   NextRequest,
   NextResponse,
@@ -10,7 +11,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export async function POST(
+async function handlePOST(
   request: NextRequest
 ) {
   try {
@@ -119,4 +120,8 @@ export async function POST(
       }
     );
   }
+}
+
+export async function POST(request: NextRequest) {
+  return withDatasetRequest(request, () => handlePOST(request));
 }

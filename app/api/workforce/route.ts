@@ -1,3 +1,4 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
 import { dataApiErrorResponse } from "../../../lib/data-api-error";
@@ -10,7 +11,7 @@ function toNumber(value: number | string | null | undefined) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-export async function GET() {
+async function handleGET() {
   try {
     const [current, trend, businessUnits, countries, levels, tenure, movements] =
       await Promise.all([
@@ -51,4 +52,8 @@ export async function GET() {
   } catch (error) {
     return dataApiErrorResponse('workforce',error);
   }
+}
+
+export async function GET(request: Request) {
+  return withDatasetRequest(request, () => handleGET());
 }

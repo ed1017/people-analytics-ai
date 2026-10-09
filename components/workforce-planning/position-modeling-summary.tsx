@@ -29,6 +29,13 @@ export function PositionModelingSummary({
 }: PositionModelingSummaryProps) {
   return (
     <>
+      {positionModelingData?.data_meta?.dataClass === "constructed-synthetic" && (
+        <div className="mb-4 rounded-md border bg-muted/20 p-3 text-sm text-muted-foreground">
+          <p>{positionModelingData.data_meta.sourceLabel}.</p>
+          <p className="mt-1">{positionModelingData.data_meta.planningCaveat}</p>
+          <p className="mt-1">{positionModelingData.data_meta.planningAvailabilityLabel ?? 'Planning operation availability must be reviewed for this dataset.'}</p>
+        </div>
+      )}
       {positionModelingError && (
         <div className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
           {positionModelingError}

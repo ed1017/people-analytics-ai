@@ -1,3 +1,4 @@
+import { ConstructedResponseFeasibilitySummary } from "./constructed-response-feasibility";
 import type {
   ReactNode,
 } from "react";
@@ -210,6 +211,7 @@ export function BusinessUnitResponseAllocationPanel({
 
         {result && (
           <>
+            <ConstructedResponseFeasibilitySummary data={result.capacity_feasibility} />
             <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-md border p-3">
                 <p className="text-[11px] text-muted-foreground">

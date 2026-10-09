@@ -1,3 +1,4 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import {
   NextRequest,
   NextResponse,
@@ -13,7 +14,7 @@ import type {
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+async function handleGET() {
   try {
     const result =
       await getStructuralPositionCatalog();
@@ -39,7 +40,7 @@ export async function GET() {
   }
 }
 
-export async function POST(
+async function handlePOST(
   request: NextRequest
 ) {
   try {
@@ -90,4 +91,12 @@ export async function POST(
       { status: 500 }
     );
   }
+}
+
+export async function GET(request: Request) {
+  return withDatasetRequest(request, () => handleGET());
+}
+
+export async function POST(request: NextRequest) {
+  return withDatasetRequest(request, () => handlePOST(request));
 }

@@ -11,7 +11,8 @@ const structuralActionLabels = {
   fill_vacancies: "Fill vacancies",
 } as const;
 
-function formatCurrencyCompact(value: number) {
+function formatCurrencyCompact(value: number | null) {
+  if(value===null)return "Unavailable";
   const sign = value < 0 ? "-" : "";
   const absoluteValue = Math.abs(value);
 

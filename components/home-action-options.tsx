@@ -1,4 +1,6 @@
 "use client";
+import { datasetFetch } from "@/lib/dataset-client.mjs";
+
 import {useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
 import {HomeActionAssumptions} from '@/components/home-action-assumptions';
@@ -37,7 +39,7 @@ export function HomeActionOptions({goalId,goal,pack,active,ready,busy,pin,person
   if(!binding||busy||!storage.saved||!currentCheck(identity))return;
   setPending(true);setNotice('');
   const outcome=await coordinator.current.run({mode,binding,packet,stored:raw,isCurrent:()=>currentCheck(identity),prepare:async signal=>{
-   const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},signal,body:JSON.stringify({page:'home',persona,message:HOME_ACTION_REQUEST,history:[],goalContext,marketReference,hasFocusedIssue:true,overviewBriefingContext:packet})});
+   const response=await datasetFetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},signal,body:JSON.stringify({page:'home',persona,message:HOME_ACTION_REQUEST,history:[],goalContext,marketReference,hasFocusedIssue:true,overviewBriefingContext:packet})});
    if(!response.ok)throw Error('Action preparation unavailable.');return await response.json();
   },commit:patch=>{decisionStore.setField(goalId,patch.field,patch.value);if(!decisionStore.getSnapshot().saved)throw Error('Draft could not be saved.');}});
   if(live.current!==identity)return;

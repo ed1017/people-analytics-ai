@@ -1,6 +1,7 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import {companyReleaseQuery, compensationRelease, RELEASE_COLUMNS, validateRelease} from '../../../lib/compensation-release';
 export const dynamic = 'force-dynamic';
-export async function GET(request: Request) {
+async function handleGET(request: Request) {
   const headers = {'Cache-Control':'no-store'};
   if (!companyReleaseQuery(new URL(request.url).searchParams)) return Response.json({status:'scope_not_released'}, {status:422,headers});
   // Convention approval is NOT aggregate publication approval. No client or DB
@@ -12,4 +13,8 @@ export async function GET(request: Request) {
     if (error || !data || count !== compensationRelease.jobCodes.length || count !== data.length) throw Error('Incomplete release');
     return Response.json({release_id:compensationRelease.releaseId,snapshot_date:compensationRelease.snapshotDate,scope:{country:null,org:null,level:null},convention:'Demo data: existing base salary is treated as annual contracted pay at recorded FTE; not verified payroll semantics.',rows:validateRelease(data)}, {headers});
   } catch {return Response.json({status:'release_unavailable'}, {status:503,headers});}
+}
+
+export async function GET(request: Request) {
+  return withDatasetRequest(request, () => handleGET(request));
 }

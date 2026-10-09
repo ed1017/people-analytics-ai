@@ -1,6 +1,7 @@
 import type {
   ReactNode,
 } from "react";
+import { ConstructedResponseFeasibilitySummary } from "./constructed-response-feasibility";
 
 import {
   formatCapacity,
@@ -189,7 +190,7 @@ export function ResponsePortfolioControls({
       </div>
 
       <p className="mt-3 text-[11px] text-muted-foreground">
-        The governed career-preference model allows one target profile per employee, so interested internal Build/Move pools do not overlap across portfolio roles. Each role is still capped at its own modeled demand.
+        {scenario.response_strategy.provenance ? "Recorded preferences target one profile per employee. They do not establish Build/Move availability or readiness. Conditional coverage is capped at each role's demand." : "The governed career-preference model allows one target profile per employee, so interested internal Build/Move pools do not overlap across portfolio roles. Each role is still capped at its own modeled demand."}
       </p>
 
       {error && (
@@ -200,6 +201,7 @@ export function ResponsePortfolioControls({
 
       {result && (
         <>
+          <ConstructedResponseFeasibilitySummary data={result.capacity_feasibility} />
           <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-md border p-3">
               <p className="text-xs text-muted-foreground">
@@ -240,14 +242,13 @@ export function ResponsePortfolioControls({
             </div>
             <div className="rounded-md border p-3">
               <p className="text-xs text-muted-foreground">
-                Internal Supply
+                {result.capacity_feasibility ? "Assessed Internal Supply" : "Internal Supply"}
               </p>
               <p className="mt-1 text-2xl font-semibold">
-                {formatWholeCount(result.internal_supply.role_ready)}
+                {result.capacity_feasibility ? "Unknown" : formatWholeCount(result.internal_supply.role_ready)}
               </p>
               <p className="text-xs text-muted-foreground">
-                role-ready ·{" "}
-                {formatWholeCount(result.internal_supply.fully_pathway_covered_near_ready)} path-covered near-ready
+                {result.capacity_feasibility ? "Readiness and available movers are not assessed" : <>role-ready ·{" "}{formatWholeCount(result.internal_supply.fully_pathway_covered_near_ready)} path-covered near-ready</>}
               </p>
             </div>
           </div>

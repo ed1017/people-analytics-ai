@@ -1,8 +1,11 @@
+import {prepareProgressConversation,missingProgressPageInstructions} from '@/lib/goal-progress-entry-service';
+import {goalProgressConversationEnabled,goalProgressReadTool,runGoalProgressRead} from '@/lib/goal-progress-conversation';
+import { withDatasetRequest, datasetAI, datasetRouter } from "@/lib/dataset-runtime";
 import {taExtensionPrompt} from "@/lib/synthetic-ta/extension";
 import {conversationalAnswerStyle} from '@/lib/chat-answer-style';
 import {homeForecastAnswer} from '@/lib/home-forecast';
 import {homeTurnPurpose,homeConversationInstructions} from '@/lib/home-conversation';
-import {strategicPlanningInstructions} from '@/lib/home-strategic-planning';
+import {strategicPlanningInstructions,strategicPlanningObjective,normalizePlanningObjective,planningConversationHistory} from '@/lib/home-strategic-planning';
 import {decodeHomeModelReply} from '@/lib/home-chat-reply';
 import {syntheticDomainDemoPrompt} from '@/lib/synthetic-domain-demo';
 import {homeBundleTask,homeBundleTaskInstructions} from '@/lib/home-bundle-task';
@@ -21,7 +24,7 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import {openAIProxyTransport} from "@/lib/openai-proxy-transport";
 import {marketCarryEvidence} from "../../../lib/oews-reference.mjs";
-import {normalizeGoalContext,goalContextInstructions,goalSummaryInstructions} from "../../../lib/goal-context";
+import {goalSummaryInstructions} from "../../../lib/goal-context";
 import { normalizeHomePack, HOME_MAX_BYTES } from "../../../lib/home-pack.mjs";
 import { overviewBriefingPrompt } from "../../../lib/overview-briefing";
 import { talentResponseChatPrompt } from "../../../lib/talent-response-evidence";
@@ -564,18 +567,19 @@ Scope rule:
 `.trim();
 }
 
-export async function POST(
+async function handlePOST(
   request: NextRequest
 ) {
   try {
     let body = await request.json();
     if (body?.page === "home") {
       if (new TextEncoder().encode(JSON.stringify(body.overviewBriefingContext ?? {})).length > HOME_MAX_BYTES || (typeof body.message === "string" && body.message.length > 6000)) return NextResponse.json({error:"Home evidence or question exceeds the supported limit. Refresh evidence or shorten the question."},{status:413});
-      body = {page:"home",persona:body.persona,message:body.message,history:body.history,hasFocusedIssue:body.hasFocusedIssue === true,summaryOnly:body.summaryOnly===true,summaryGoal:body.summaryGoal,goalContext:body.goalContext,marketReference:body.marketReference,overviewBriefingContext:normalizeHomePack(body.overviewBriefingContext)};
+      body = {page:"home",persona:body.persona,message:body.message,history:body.history,...(Object.hasOwn(body,"planningObjective")?{planningObjective:normalizePlanningObjective(body.planningObjective)}:{}),hasFocusedIssue:body.hasFocusedIssue === true,planningCalculatorAvailable:body.planningCalculatorAvailable===true,summaryOnly:body.summaryOnly===true,summaryGoal:body.summaryGoal,goalContext:body.goalContext,marketReference:body.marketReference,overviewBriefingContext:normalizeHomePack(body.overviewBriefingContext)};
       if (Array.isArray(body.history)) body.history = body.history.slice(-8).map((item: ChatMessage) => ({role:item?.role,content:typeof item?.content === "string" ? item.content.slice(0,6000) : ""}));
     }
     const summaryOnly = body?.summaryOnly === true;
-    const goalContext=normalizeGoalContext(body?.goalContext);
+    const {progress,entryContext,format:entryFormat,reply:entryReply,goalContext,instructions:goalContextInstructions}=prepareProgressConversation(body,{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token,now:new Date().toISOString()});
+    const chatTools=progress?[...peopleAnalyticsTools,goalProgressReadTool]:peopleAnalyticsTools;
     const marketReference=marketCarryEvidence(body?.marketReference);
     if(summaryOnly&&!goalContext.goal.trim())return NextResponse.json({error:"Select a goal before requesting its page takeaway."},{status:400});
     const relatedGoalEvidence=Array.isArray(body?.goalEvidenceContext)?normalizeHomePack({sources:body.goalEvidenceContext.slice(0,3)}).sources.filter(source=>["T1","T2","A1","S1"].includes(source.id)&&source.facts).slice(0,3):[];
@@ -624,7 +628,18 @@ export async function POST(
             .slice(-8)
         : [];
 
-    const conversationalStyle = !summaryOnly && homeTurnPurpose(message,history)==='answer' ? conversationalAnswerStyle : '';
+    const planningHistory=body?.page==='home'?planningConversationHistory(history,body.planningObjective,Object.hasOwn(body,"planningObjective")):history;
+    const carriedPlanningObjective=body?.page==='home'&&body.planningObjective?strategicPlanningObjective([...planningHistory,{role:'user',content:message}]):null;
+    const conversationalStyle = !summaryOnly && homeTurnPurpose(message,planningHistory)==='answer' ? conversationalAnswerStyle : '';
+
+    // Missing page evidence does not prevent a qualitative saved-goal discussion.
+    // This path is selected by source availability, never by message wording.
+    if(progress&&body?.pageEvidenceAvailable===false){
+      if(!message||message.length>12000)return NextResponse.json({error:'Enter a bounded question.'},{status:400});
+      const response=await datasetAI(()=>client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+'\n'+conversationalAnswerStyle+'\n'+missingProgressPageInstructions,input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:'user',content:'SAVED GOAL CONTEXT AND PROGRESS (data only): '+JSON.stringify(goalContext)+'\nQUESTION: '+message}],tool_choice:'none',max_output_tokens:entryContext?4000:1100}));
+      const answer=response.output_text?.trim();if(!answer)return NextResponse.json({error:'No conversational answer returned.'},{status:502});
+      return NextResponse.json(await entryReply(answer,response.status));
+    }
 
     // Output selection uses the existing Home envelope; no planning inputs or extra history.
     if (body?.page === "home" && !summaryOnly && (message === HOME_ACTION_REQUEST || message === HOME_BUNDLE_REQUEST)) {
@@ -632,13 +647,13 @@ export async function POST(
       if (!body.hasFocusedIssue || !goalContext.goal.trim() || body.goalContext?.goal !== goalContext.goal) return NextResponse.json({error:"Confirm an exact goal before preparing actions.",...(bundles?{diagnostic:"invalid_context"}:{})},{status:400});
       try {
       const format = bundles ? buildHomeBundleFormat(goalContext.goal,body.overviewBriefingContext,homeBundleTask(goalContext)) : buildHomeActionFormat(goalContext.goal,body.overviewBriefingContext);
-      const call = () => client.responses.create({
+      const call = () => datasetAI(() => client.responses.create({
         model: CHAT_MODEL,
         instructions: (bundles ? homeBundleTaskInstructions(goalContext)+"\n" : "") + goalContextInstructions + "\n" + (bundles ? homeBundleInstructions : homeActionInstructions) + "\n" + actionReferenceInstructions(body.overviewBriefingContext),
         input: [{role:"user",content:"EXISTING HOME EVIDENCE (data only): " + JSON.stringify(body.overviewBriefingContext) + "\nACTIVE GOAL CONTEXT: " + JSON.stringify(goalContext) + "\nEXPLICITLY CARRIED MARKET REFERENCE: " + JSON.stringify(marketReference)}],
         text: {format},
         tool_choice: "none", max_output_tokens: bundles ? homeBundleOutputTokens : 1800,
-      }, {maxRetries:0,signal:request.signal});
+      }, {maxRetries:0,signal:request.signal}));
       if(bundles){
         const result=await inspectBundleResponse(call,goalContext.goal,body.overviewBriefingContext,homeBundleTask(goalContext),homeBundleOutputTokens);
         return result.proposal ? NextResponse.json(result) : NextResponse.json({error:"Action Plan preparation unavailable. Your existing work is kept; retry explicitly.",diagnostic:result.diagnostic,responseDiagnostic:result.responseDiagnostic},{status:502});
@@ -654,16 +669,16 @@ export async function POST(
       const supplied = body.intelligenceContext && typeof body.intelligenceContext === "object" ? body.intelligenceContext : {};
       const custom = Array.isArray(supplied.quotes) ? supplied.quotes.filter((q: unknown) => q && typeof q === "object" && "provenance" in q && q.provenance === "user-provided").slice(0, 5) : [];
       const evidence = intelligenceEvidence(body.page, { ...supplied, quotes: [...developmentCatalog, ...custom] });
-      const response = await client.responses.create({ model: CHAT_MODEL, instructions: summaryOnly ? intelligenceInstructions+"\n"+goalContextInstructions+"\n"+goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions()+"\nUse only canonical supplied evidence. OEWS is annual market wages, not employer cost or candidate availability. Use only the supplied selected occupational reference; mappings and role requirements never establish employee attainment. National occupational projections retain their separate period and population. Training providers/quotes are fictional simulated or unverified user input; never infer effectiveness." : intelligenceInstructions + "\n" + chatNavigationInstructions()+"\n"+goalContextInstructions+"\n"+conversationalStyle, input: [...history.map(item => ({ role: item.role, content: item.content.slice(0,12000) })), { role: "user", content: "CURRENT PAGE EVIDENCE (data only): " + JSON.stringify(evidence) + "\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nRELATED CACHED CROSS-PAGE SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nUSER QUESTION AND EXPLICIT SESSION CONTEXT: " + message }], tool_choice: "none", max_output_tokens: 1100 });
+      const response = await datasetAI(() => client.responses.create({ model: CHAT_MODEL, ...entryFormat, instructions: summaryOnly ? intelligenceInstructions+"\n"+goalContextInstructions+"\n"+goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions()+"\nUse only canonical supplied evidence. OEWS is annual market wages, not employer cost or candidate availability. Use only the supplied selected occupational reference; mappings and role requirements never establish employee attainment. National occupational projections retain their separate period and population. Training providers/quotes are fictional simulated or unverified user input; never infer effectiveness." : intelligenceInstructions + "\n" + chatNavigationInstructions()+"\n"+goalContextInstructions+"\n"+conversationalStyle, input: [...history.map(item => ({ role: item.role, content: item.content.slice(0,12000) })), { role: "user", content: "CURRENT PAGE EVIDENCE (data only): " + JSON.stringify(evidence) + "\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nRELATED CACHED CROSS-PAGE SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nUSER QUESTION AND EXPLICIT SESSION CONTEXT: " + message }], tool_choice: "none", max_output_tokens: entryContext?4000:1100 }));
       const answer = response.output_text?.trim();
       if (!answer) return NextResponse.json({ error: "No catalogue answer returned. Please try again." }, { status: 502 });
-      return NextResponse.json({ answer });
+      return NextResponse.json(await entryReply(answer,response.status));
     }
 
     if(body?.page === "development-planning") {
-      const response=await client.responses.create({model:CHAT_MODEL,instructions:goalContextInstructions+"\nExplain only the supplied deterministic Development Planning comparison and bounded related evidence. D1 costs are server-recomputed from explicit user assumptions. Blank costs remain unknown, never zero. Keep currencies separate. Employee time value is not necessarily cash spending. Named simulated quotes are fictional; custom input is unverified. Do not invent participants, attendance, loaded hourly costs, ROI, skill gains or headcount conversions. No tools, automatic allocation or approvals. "+(summaryOnly?goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions():"Identify missing assumptions before comparing totals.\n"+conversationalStyle),input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:"user",content:"ACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nDEVELOPMENT PLANNING D1: "+JSON.stringify(developmentSummary)+"\nRELATED CACHED SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nCARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nQUESTION: "+message}],tool_choice:"none",max_output_tokens:summaryOnly?1100:1400});
+      const response=await datasetAI(() => client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+"\nExplain only the supplied deterministic Development Planning comparison and bounded related evidence. D1 costs are server-recomputed from explicit user assumptions. Blank costs remain unknown, never zero. Keep currencies separate. Employee time value is not necessarily cash spending. Named simulated quotes are fictional; custom input is unverified. Do not invent participants, attendance, loaded hourly costs, ROI, skill gains or headcount conversions. No tools, automatic allocation or approvals. "+(summaryOnly?goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions():"Identify missing assumptions before comparing totals.\n"+conversationalStyle),input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:"user",content:"ACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nDEVELOPMENT PLANNING D1: "+JSON.stringify(developmentSummary)+"\nRELATED CACHED SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nCARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nQUESTION: "+message}],tool_choice:"none",max_output_tokens:entryContext?4000:summaryOnly?1100:1400}));
       const answer=response.output_text?.trim();
-      return answer?NextResponse.json({answer}):NextResponse.json({error:"No Development Planning answer returned. Please try again."},{status:502});
+      return answer?NextResponse.json(await entryReply(answer,response.status)):NextResponse.json({error:"No Development Planning answer returned. Please try again."},{status:502});
     }
 
     const context =
@@ -1519,17 +1534,17 @@ ${message}
 `.trim();
 
     const homeStyle=homeResponseStyle(message);
-    const homePurpose=homeTurnPurpose(message,history);
+    const homePurpose=homeTurnPurpose(message,planningHistory);
     const prepareHomeGoal=!summaryOnly&&(homePurpose==='goal'||homePurpose==='discovery');
     const homeReplyFormat=page==="home"?buildHomeReplyFormat(body.overviewBriefingContext,prepareHomeGoal):null;
-    const homeInstructions=[homeConversationInstructions(homePurpose),strategicPlanningInstructions(message,history)].filter(Boolean).join('\n');
+    const homeInstructions=[homeConversationInstructions(homePurpose),strategicPlanningInstructions(message,planningHistory,body.planningCalculatorAvailable===true)].filter(Boolean).join('\n');
     const homeAnswerStyle=homePurpose==='answer'?conversationalAnswerStyle:homeStyle.instructions;
     const homeInput=[
-      {role:'user' as const,content:workforceContext+'\nACTIVE GOAL CONTEXT (user intent, not evidence): '+JSON.stringify(goalContext)+'\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: '+JSON.stringify(marketReference)},
+      {role:'user' as const,content:workforceContext+'\nACTIVE GOAL CONTEXT (user intent, not evidence): '+JSON.stringify(goalContext)+'\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: '+JSON.stringify(marketReference)+(carriedPlanningObjective?'\nCARRIED USER PLANNING OBJECTIVE (conversation only; not source evidence, verified inputs or an accepted plan): '+JSON.stringify(carriedPlanningObjective):'')},
       ...history.map(item=>({role:item.role,content:item.content})),
       {role:'user' as const,content:message},
     ];
-    const maxOutputTokens = summaryOnly ? 1100 : page === "home" ? homeStyle.maxOutputTokens :
+    const maxOutputTokens = entryContext ? 4000 : summaryOnly ? 1100 : page === "home" ? homeStyle.maxOutputTokens :
       page === "workforce-planning" || page === "home" || page === "attrition" || page === "survey-sentiment"
         ? 1400
         : 700;
@@ -1540,16 +1555,16 @@ ${message}
         : ("auto" as const);
 
     let response =
-      await client.responses.create({
+      await datasetAI(() => client.responses.create({
         model: CHAT_MODEL,
         instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? (prepareHomeGoal ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions : "") + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeAnswerStyle+"\n"+homeInstructions : "\n"+conversationalStyle),
-        ...(page === "home" ? { text: { format: homeReplyFormat! } } : {}),
+        ...(page === "home" ? { text: { format: homeReplyFormat! } } : entryFormat),
         input: page==='home'&&!summaryOnly?homeInput:aiInput,
-        tools: peopleAnalyticsTools,
+        tools: chatTools,
         tool_choice: toolChoice,
         max_output_tokens:
           maxOutputTokens,
-      });
+      }));
 
     for (
       let toolRound = 0;
@@ -1581,7 +1596,7 @@ ${message}
                       )
                     : {};
 
-                const result =
+                const result = call.name==='read_goal_progress' ? runGoalProgressRead(toolArgs,progress) :
                   await runPeopleAnalyticsTool(
                     call.name,
                     toolArgs
@@ -1610,18 +1625,18 @@ ${message}
         );
 
       response =
-        await client.responses.create({
+        await datasetAI(() => client.responses.create({
           model: CHAT_MODEL,
           instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? (prepareHomeGoal ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions : "") + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeAnswerStyle+"\n"+homeInstructions : "\n"+conversationalStyle),
-          ...(page === "home" ? { text: { format: homeReplyFormat! } } : {}),
+          ...(page === "home" ? { text: { format: homeReplyFormat! } } : entryFormat),
           previous_response_id:
             response.id,
           input: toolOutputs,
-          tools: peopleAnalyticsTools,
+          tools: chatTools,
           tool_choice: toolChoice,
           max_output_tokens:
           maxOutputTokens,
-        });
+        }));
     }
 
     if (page === "home") {
@@ -1629,11 +1644,7 @@ ${message}
       return NextResponse.json(inspected.body,{status:inspected.ok?200:502});
     }
 
-    return NextResponse.json({
-      answer:
-        response.output_text ||
-        "No answer was returned.",
-    });
+    return NextResponse.json(await entryReply(response.output_text || "No answer was returned.",response.status));
   } catch (error) {
     console.error("Chat API error:", error);
 
@@ -1647,4 +1658,8 @@ ${message}
       { status: 500 }
     );
   }
+}
+
+export async function POST(request: NextRequest) {
+  return withDatasetRequest(request, () => handlePOST(request));
 }

@@ -33,7 +33,7 @@ export async function readHomeMixHistory(raw:unknown,goalId:string,signal?:Abort
    const context=await resolveHomeMixContext(homeMixPlanningRequest(entry.before).request);
    const report=await unpackHomeMixReport(entry.report,signal);
    if(context.status!=='ready'||!await readHomeMixReport(report,context,signal))return null;
-   if(entry.proposal){const selected=await createHomeMixRecord(context,report as HomeMixReport,entry.proposal.candidateId,entry.createdAt,signal);if(!same(selected.proposal,entry.proposal))return null;}
+   if(entry.proposal){const selected=await createHomeMixRecord(context,report as HomeMixReport,entry.proposal.candidateId,entry.createdAt,signal,entry.proposal.schemaVersion);if(!same(selected.proposal,entry.proposal))return null;}
    decoded.entries.push({...entry,report:report as HomeMixReport});
   }
   return decoded;
@@ -47,7 +47,7 @@ export async function prepareHomeMixCommit(before:BundleDraft,raw:unknown,candid
  const selection=candidateId?await createHomeMixRecord(evaluation.context,evaluation.report,candidateId,createdAt,signal):null;
  const draft=selection?.proposal.draft??before;
  if(!/^\d{4}-\d\d-\d\dT/.test(createdAt)||!Number.isFinite(Date.parse(createdAt)))throw Error('Supply a valid search receipt timestamp.');
- const duplicate=decoded.entries.some(entry=>bundleInputKey(entry.before)===bundleInputKey(before)&&entry.report.reportFingerprint===evaluation.report!.reportFingerprint&&(entry.proposal?.candidateId??null)===candidateId);
+ const duplicate=decoded.entries.some(entry=>bundleInputKey(entry.before)===bundleInputKey(before)&&entry.report.reportFingerprint===evaluation.report!.reportFingerprint&&(entry.proposal?.candidateId??null)===candidateId&&entry.proposal?.schemaVersion===selection?.proposal.schemaVersion);
  if(!duplicate){if(history.entries.length>=12)throw Error('Staffing search history is full. Existing reports are kept.');history.entries.push({before:structuredClone(before),report:await packHomeMixReport(evaluation.report),proposal:selection?.proposal??null,createdAt});}
  if(JSON.stringify(history).length>512*1024)throw Error('Staffing search history is full. Existing reports are kept.');
  return {previous:previous??null,history,draft:structuredClone(draft)};

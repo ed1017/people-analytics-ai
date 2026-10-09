@@ -1,4 +1,6 @@
 "use client";
+import { datasetFetch } from "@/lib/dataset-client.mjs";
+
 import {useEffect,useRef,useState} from 'react';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
 import {actionBindingKey,actionCalculatorRoute,actionSignature,type ActionBinding} from '@/lib/home-action-drafts';
@@ -22,7 +24,7 @@ export function HomeActionAssumptions({action,binding,disabled,contextCurrent,is
  useEffect(()=>{
   if(!open||action.route!=='capacity')return;
   const controller=new AbortController();
-  void fetch('/api/position-structure',{signal:controller.signal}).then(async response=>{if(!response.ok)throw Error();const data=await response.json();if(!Array.isArray(data.business_units)||!Array.isArray(data.job_profiles))throw Error();if(!controller.signal.aborted)setCatalog({business_units:data.business_units,job_profiles:data.job_profiles});}).catch(()=>{if(!controller.signal.aborted)setCatalogError(true)});
+  void datasetFetch('/api/position-structure',{signal:controller.signal}).then(async response=>{if(!response.ok)throw Error();const data=await response.json();if(!Array.isArray(data.business_units)||!Array.isArray(data.job_profiles))throw Error();if(!controller.signal.aborted)setCatalog({business_units:data.business_units,job_profiles:data.job_profiles});}).catch(()=>{if(!controller.signal.aborted)setCatalogError(true)});
   return()=>controller.abort();
  },[open,action.route]);
  function current(){if(disabled||invalid.current||!isCurrent()||!storage.saved)throw Error('The goal or evidence changed, or browser storage is unavailable. Your proposal draft is kept.');}

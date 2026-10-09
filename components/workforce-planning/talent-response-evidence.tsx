@@ -1,4 +1,6 @@
 "use client";
+import { datasetFetch } from "@/lib/dataset-client.mjs";
+
 
 import { useEffect, useRef, useState } from "react";
 import type { CareerGrowthMobilityResponse } from "@/lib/career-growth-mobility";
@@ -15,7 +17,7 @@ type Props = {
 
 async function readEvidence<T>(url: string): Promise<T | null> {
   try {
-    const response = await fetch(url, { cache: "no-store" });
+    const response = await datasetFetch(url, { cache: "no-store" });
     return response.ok ? await response.json() as T : null;
   } catch {
     return null;
@@ -102,7 +104,10 @@ function GoalTalentResponseEvidence({ roleCode, roleName, initialGoal = "", role
           </article>
           <article className="min-w-0 rounded-md border p-3">
             <h6 className="font-semibold">Move · Existing readiness evidence</h6>
-            {readiness ? <>
+            {readiness?.assessment_status === "not_assessed" ? <>
+              <p className="mt-2 text-sm">Assessed readiness: Not assessed. Available movers: Unknown.</p>
+              <p className="mt-2 text-xs text-muted-foreground">{readiness.profile_fit.all_required_thresholds_met} constructed profiles meet all authored thresholds; {readiness.profile_fit.within_two_skill_two_point_gap_rule} fall within the demo gap rule. These profile comparisons do not establish assessed capability or availability.</p>
+            </> : readiness ? <>
               <p className="mt-2 text-sm">{readiness.candidate_pool.role_ready} meet all required-skill thresholds; {readiness.candidate_pool.near_ready} meet the existing near-ready rule.</p>
               <p className="mt-1 text-xs text-muted-foreground">Source: Internal Talent Readiness from the current role-plan result. Denominator: {readiness.candidate_pool.eligible_internal_candidates} active employees who prefer this role, excluding current incumbents. Source as-of date: unavailable in this response.</p>
               <p className="mt-2 text-xs text-muted-foreground">Near-ready rule: at most {readiness.readiness_rules.near_ready_max_missing_required_skills} required-skill gaps and {readiness.readiness_rules.near_ready_max_total_proficiency_shortfall} total proficiency points of shortfall. Preferred skills do not gate readiness.</p>

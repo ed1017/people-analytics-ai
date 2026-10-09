@@ -1,8 +1,12 @@
 import { ConstraintAwareScheduleSummary } from "@/components/workforce-planning/constraint-aware-schedule-summary";
 import { ExecutionResultSummary } from "@/components/workforce-planning/execution-result-summary";
+import { useState } from "react";
+import { ConstructedResponseFeasibilitySummary } from "./constructed-response-feasibility";
+import { CandidateSchedulingInputs, emptyCandidateSchedulingAssumptions } from "./candidate-scheduling-assumptions";
 
 import type {
   BusinessUnitResponseAllocationResponse,
+  CandidateSchedulingAssumptions,
   ConstraintAwareWorkforceScheduleResponse,
   TimePhasedWorkforceExecutionResponse,
   WorkforceResponseConstraintResponse,
@@ -46,7 +50,7 @@ type WorkforceExecutionPanelProps = {
   responseConstraintError: string | null;
   responseConstraintResult: WorkforceResponseConstraintResponse | null;
   resetResponseExecution: () => void;
-  runConstraintAwareScheduler: () => void;
+  runConstraintAwareScheduler: (assumptions?: CandidateSchedulingAssumptions) => void;
   runResponseExecution: () => void;
   updateResponseExecutionDraft: (
     id: string,
@@ -118,6 +122,8 @@ export function WorkforceExecutionPanel({
   resetResponseConstraints,
   runResponseConstraints,
 }: WorkforceExecutionPanelProps) {
+  const [schedulingAssumptions, setSchedulingAssumptions] = useState(emptyCandidateSchedulingAssumptions);
+  const constructed = Boolean(businessUnitResponseResult.capacity_feasibility);
   return (
 <details
                                         className="mt-4 rounded-md border"
@@ -148,7 +154,7 @@ export function WorkforceExecutionPanel({
                                               </button>
                                               <button
                                                 type="button"
-                                                onClick={runConstraintAwareScheduler}
+                                                onClick={() => runConstraintAwareScheduler(constructed ? schedulingAssumptions : undefined)}
                                                 disabled={constraintAwareScheduleLoading}
                                                 className="rounded-md border px-3 py-2 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
                                               >
@@ -169,12 +175,13 @@ export function WorkforceExecutionPanel({
                                             </div>
                                           </div>
 
+                                          {constructed && <CandidateSchedulingInputs value={schedulingAssumptions} allocation={businessUnitResponseResult.allocation} onChange={setSchedulingAssumptions} />}
                                           <div className="mb-3 rounded-md border bg-muted/20 p-3">
                                             <p className="text-[11px] font-medium">
                                               Auto-scheduler limits
                                             </p>
                                             <p className="mt-1 text-[10px] text-muted-foreground">
-                                              Optional. Blank monthly caps are unconstrained. These values are shared with the detailed Constraint Feasibility panel below.
+                                              {constructed ? "Optional limits on the assumed schedule. Blank removes a limit; it does not establish any available capacity. These values are shared with the checks below." : "Optional. Blank monthly caps are unconstrained. These values are shared with the detailed Constraint Feasibility panel below."}
                                             </p>
                                             <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
                                               {(
@@ -441,7 +448,7 @@ export function WorkforceExecutionPanel({
                                                 <div className="border-t p-4">
                                                   <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                                                     <p className="max-w-3xl text-xs text-muted-foreground">
-                                                      Blank caps are unconstrained. Hard feasibility uses only the limits you enter plus schedule-integrity checks. Readiness and recruiting history remain separate evidence signals.
+                                                      {constructed ? "Blank removes a limit. These checks assess your assumptions and schedule integrity; they do not establish actual staffing feasibility. Readiness, mover availability and execution costs remain unknown." : "Blank caps are unconstrained. Hard feasibility uses only the limits you enter plus schedule-integrity checks. Readiness and recruiting history remain separate evidence signals."}
                                                     </p>
                                                     <div className="flex gap-2">
                                                       <button
@@ -590,13 +597,14 @@ export function WorkforceExecutionPanel({
 
                                                   {responseConstraintResult && (
                                                     <>
+                                                      <ConstructedResponseFeasibilitySummary data={responseConstraintResult.capacity_feasibility} />
                                                       <div className="mt-4 grid gap-3 sm:grid-cols-3">
                                                         <div className="rounded-md border p-3">
                                                           <p className="text-[11px] text-muted-foreground">
                                                             Hard-Constraint Result
                                                           </p>
                                                           <p className="mt-1 text-xl font-semibold">
-                                                            {responseConstraintResult.overall_feasible
+                                                            {responseConstraintResult.capacity_feasibility ? responseConstraintResult.user_constraints_satisfied ? "Assumptions meet limits" : "Assumption breach" : responseConstraintResult.overall_feasible
                                                               ? "Feasible"
                                                               : "Breach"}
                                                           </p>
@@ -699,7 +707,7 @@ export function WorkforceExecutionPanel({
                                                                       )}
                                                                     </td>
                                                                     <td className="p-3 text-right tabular-nums">
-                                                                      {row.fully_pathway_covered_near_ready.toLocaleString()}
+                                                                      {row.fully_pathway_covered_near_ready === null ? "Not assessed" : row.fully_pathway_covered_near_ready.toLocaleString()}
                                                                       {row.build_exceeds_current_path_covered
                                                                         ? " *"
                                                                         : ""}
@@ -710,7 +718,7 @@ export function WorkforceExecutionPanel({
                                                                       )}
                                                                     </td>
                                                                     <td className="p-3 text-right tabular-nums">
-                                                                      {row.role_ready_internal_candidates.toLocaleString()}
+                                                                      {row.role_ready_internal_candidates === null ? "Not assessed" : row.role_ready_internal_candidates.toLocaleString()}
                                                                       {row.move_exceeds_role_ready
                                                                         ? " *"
                                                                         : ""}

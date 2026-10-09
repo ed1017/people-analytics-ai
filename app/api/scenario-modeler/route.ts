@@ -1,3 +1,4 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import {
   NextRequest,
   NextResponse,
@@ -228,7 +229,7 @@ async function loadScenarioInputs() {
   };
 }
 
-export async function GET() {
+async function handleGET() {
   try {
     const inputs =
       await loadScenarioInputs();
@@ -273,7 +274,7 @@ export async function GET() {
   }
 }
 
-export async function POST(
+async function handlePOST(
   request: NextRequest
 ) {
   try {
@@ -359,4 +360,12 @@ export async function POST(
   } catch (error) {
     return inputFailure(error);
   }
+}
+
+export async function GET(request: Request) {
+  return withDatasetRequest(request, () => handleGET());
+}
+
+export async function POST(request: NextRequest) {
+  return withDatasetRequest(request, () => handlePOST(request));
 }

@@ -87,11 +87,12 @@ export type PlanningScenario = {
   description: string | null;
   assumptions: PlanningAssumption[];
   points: PlanningPoint[];
+  provenance?: import("./stored-planning").PlanningProvenance;
 };
 
 export type WorkforcePlanningResponse = {
   scenarios: PlanningScenario[];
-  provenance?: typeof import("./stored-planning").storedPlanningProvenance;
+  provenance?: import("./stored-planning").PlanningProvenance;
 };
 
 export type PositionBusinessUnit = {
@@ -138,6 +139,7 @@ export type PositionScenario = {
 };
 
 export type PositionModelingResponse = {
+  data_meta?: {sourceLabel?:string;planningCaveat?:string;planningAvailabilityLabel?:string;dataClass?:string};
   as_of: string;
   planning_month: string;
   current: {
@@ -219,8 +221,8 @@ export type StructuralPositionScenarioResponse = {
     net_authorized_position_change: number;
     net_filled_position_change: number;
     vacancy_rate_pct: number;
-    authorized_budget_delta_usd: number;
-    annualized_staffed_labor_cost_delta_usd: number;
+    authorized_budget_delta_usd: number | null;
+    annualized_staffed_labor_cost_delta_usd: number | null;
   };
   job_profile_impact: Array<{
     job_profile_code: string;
@@ -297,6 +299,7 @@ export type StructuralPositionScenarioResponse = {
     }>;
   };
   response_strategy: {
+    provenance?: string;
     scope: "scenario_widened_skill_gaps";
     skills_evaluated: number;
     borrow_data_available: boolean;
@@ -365,9 +368,9 @@ export type StructuralPositionScenarioResponse = {
     requested_value: number;
     applied_value: number;
     affected_vacancies_before: number;
-    annual_cost_basis_per_position_usd: number;
-    authorized_budget_delta_usd: number;
-    staffed_labor_cost_delta_usd: number;
+    annual_cost_basis_per_position_usd: number | null;
+    authorized_budget_delta_usd: number | null;
+    staffed_labor_cost_delta_usd: number | null;
     requisitions_to_hold: number;
     requisitions_to_cancel: number;
     requisitions_to_create_for_fill: number;
@@ -385,7 +388,22 @@ export type WorkforceResponsePlanAllocation = {
   automate: number;
 };
 
+export type ConstructedResponseFeasibility = {
+  status: "not_assessed";
+  overall_feasible: null;
+  assessed_ready_people: null;
+  available_movers: null;
+  release_capacity: null;
+  build_capacity: null;
+  buy_capacity: null;
+  confirmed_coverage: null;
+  time_to_readiness: null;
+  scheduled_coverage: null;
+  deadline_feasible: null;
+};
+
 export type WorkforceResponsePlanResponse = {
+  capacity_feasibility?: ConstructedResponseFeasibility;
   skill_code: string;
   skill_name: string;
   skill_category: string;
@@ -425,7 +443,8 @@ export type WorkforceResponsePlanResponse = {
   methodology: string[];
 };
 
-export type InternalTalentReadinessResponse = {
+export type LegacyInternalTalentReadinessResponse = {
+  assessment_status?: "legacy_threshold_rules";
   job_profile_code: string;
   job_profile_name: string;
   required_skill_count: number;
@@ -464,7 +483,28 @@ export type InternalTalentReadinessResponse = {
   methodology: string[];
 };
 
+export type ConstructedTalentProfileFitResponse = Omit<LegacyInternalTalentReadinessResponse, "assessment_status" | "candidate_pool" | "development_pathway_coverage"> & {
+  assessment_status: "not_assessed";
+  as_of: string;
+  candidate_pool: Pick<LegacyInternalTalentReadinessResponse["candidate_pool"], "active_with_profile_preference" | "already_in_target_role" | "eligible_internal_candidates"> & {
+    role_ready: null; near_ready: null; longer_term: null; role_ready_pct: null; ready_or_near_ready_pct: null;
+  };
+  development_pathway_coverage: {[K in keyof LegacyInternalTalentReadinessResponse["development_pathway_coverage"]]: null};
+  profile_fit: {
+    status: "constructed_threshold_comparison";
+    eligible_profiles: number; unknown_profiles: number; all_required_thresholds_met: number;
+    within_two_skill_two_point_gap_rule: number; beyond_gap_rule: number; all_thresholds_met_pct: number | null;
+    course_coverage: {within_gap_rule_profiles:number;fully_covered:number;partly_covered:number;uncovered:number};
+    gaps: Array<{skill_code:string;skill_name:string;required_proficiency:number;active_course_count:number;shortest_active_course_hours:number|null;profiles_below_requirement:number;avg_profile_shortfall:number}>;
+  };
+  availability: {assessed_ready_people:null;available_movers:null;release_capacity:null;time_to_readiness:null};
+  data_meta: {sourceLabel:string;readinessSemantics:"not-assessed-with-separate-profile-fit"};
+};
+export type InternalTalentReadinessResponse = LegacyInternalTalentReadinessResponse | ConstructedTalentProfileFitResponse;
+
 export type RoleBuyFeasibilityResponse = {
+  data_meta?: {sourceLabel:string};
+  future_capacity?: {available_hires:null;simultaneous_hiring_capacity:null;forecast_arrival_date:null};
   timing_evidence?: import("./recruiting-timing").RecruitingTimingEvidence;
   as_of: string;
   job_profile_code: string;
@@ -497,6 +537,7 @@ export type RoleBuyFeasibilityResponse = {
 };
 
 export type RoleWorkforceResponsePlanResponse = {
+  capacity_feasibility?: ConstructedResponseFeasibility;
   job_profile_code: string;
   job_profile_name: string;
   scenario_created_role_demand: number;
@@ -531,6 +572,7 @@ export type RoleWorkforceResponsePlanResponse = {
 };
 
 export type BusinessUnitResponseAllocationResponse = {
+  capacity_feasibility?: ConstructedResponseFeasibility;
   as_of: string;
   scenario_net_role_demand: number;
   gross_destination_demand: number;
@@ -585,9 +627,12 @@ export type BusinessUnitResponseAllocationResponse = {
 };
 
 export type TimePhasedWorkforceExecutionResponse = {
+  capacity_feasibility?: ConstructedResponseFeasibility;
+  confirmed_completion_month?: null;
+  execution_cost?: null;
   as_of: string;
   planning_start_month: string;
-  planning_end_month: string;
+  planning_end_month: string | null;
   target_allocation: WorkforceResponsePlanAllocation;
   scheduled_allocation: WorkforceResponsePlanAllocation;
   unscheduled_allocation: WorkforceResponsePlanAllocation;
@@ -634,8 +679,10 @@ export type TimePhasedWorkforceExecutionResponse = {
 };
 
 export type WorkforceResponseConstraintResponse = {
+  capacity_feasibility?: ConstructedResponseFeasibility;
+  user_constraints_satisfied?: boolean;
   as_of: string;
-  overall_feasible: boolean;
+  overall_feasible: boolean | null;
   hard_constraint_count: number;
   hard_constraint_breaches: number;
   hard_constraints: Array<{
@@ -656,11 +703,11 @@ export type WorkforceResponseConstraintResponse = {
     job_profile_code: string;
     job_profile_name: string;
     build_target: number;
-    fully_pathway_covered_near_ready: number;
-    build_exceeds_current_path_covered: boolean;
+    fully_pathway_covered_near_ready: number | null;
+    build_exceeds_current_path_covered: boolean | null;
     move_target: number;
-    role_ready_internal_candidates: number;
-    move_exceeds_role_ready: boolean;
+    role_ready_internal_candidates: number | null;
+    move_exceeds_role_ready: boolean | null;
     buy_target: number;
     recent_12m_external_fills: number;
     buy_pct_of_recent_12m_external_fills: number | null;
@@ -670,10 +717,21 @@ export type WorkforceResponseConstraintResponse = {
   methodology: string[];
 };
 
+export type CandidateSchedulingAssumptions = {
+  start_month: string | null;
+  earliest_effective_months: Record<"build" | "move" | "buy", string | null>;
+  monthly_capacity: Record<"build" | "move" | "buy", number | null>;
+};
+
 export type ConstraintAwareWorkforceScheduleResponse = {
+  capacity_feasibility?: ConstructedResponseFeasibility;
+  user_constraints_satisfied?: boolean | null;
+  status?: "needs_assumptions" | "conditional_schedule" | "no_allocation";
+  scheduling_assumptions?: CandidateSchedulingAssumptions | null;
+  missing_assumptions?: string[];
   as_of: string;
-  scheduling_start_month: string;
-  scheduling_end_month: string;
+  scheduling_start_month: string | null;
+  scheduling_end_month: string | null;
   target_allocation: WorkforceResponsePlanAllocation;
   generated_schedule: Array<{
     org_code: string;
@@ -694,6 +752,7 @@ export type ConstraintAwareWorkforceScheduleResponse = {
 };
 
 export type WorkforceResponsePortfolioResponse = {
+  capacity_feasibility?: ConstructedResponseFeasibility;
   as_of: string;
   scenario_positive_role_demand: number;
   planned_role_demand: number;
@@ -705,9 +764,9 @@ export type WorkforceResponsePortfolioResponse = {
   coverage_pct_of_planned_roles: number;
   coverage_pct_of_all_positive_role_demand: number;
   internal_supply: {
-    role_ready: number;
-    near_ready: number;
-    fully_pathway_covered_near_ready: number;
+    role_ready: number | null;
+    near_ready: number | null;
+    fully_pathway_covered_near_ready: number | null;
   };
   recruiting_evidence: {
     current_open_requisitions: number;
@@ -756,7 +815,7 @@ export type StructuralPositionCatalogResponse = {
     job_profile_code: string;
     current_positions: number;
     vacant_positions: number;
-    annual_cost_per_position_usd: number;
+    annual_cost_per_position_usd: number | null;
   }>;
 };
 
@@ -859,6 +918,7 @@ export type LearningDevelopmentJobProfilePathway = {
 };
 
 export type LearningDevelopmentResponse = {
+  data_meta?: {sourceLabel?:string;dataClass?:string};
   as_of: string;
   summary: {
     current_workforce: number;
@@ -935,6 +995,7 @@ export type CareerMobilityResponse = {
 };
 
 export type SuccessionCoverageResponse = {
+  data_meta?: {sourceLabel:string;successionSemantics:'illustrative-plan-flags'};
   as_of_date: string | null;
   small_cell_threshold: number;
   critical_job_profiles: number;
@@ -1011,6 +1072,7 @@ export type TalentAcquisitionMonthlyPoint = {
 
 export type TalentAcquisitionResponse = {
   modeled_extension?: import("./synthetic-ta/extension").TaExtension | null;
+  data_meta?: {datasetId?:string;datasetToken?:string;dataClass?:string;hireDateConvention?:string};
   as_of: string;
   summary: {
     applications: number | null;
@@ -1081,6 +1143,7 @@ export type SurveyExitReason = {
 
 export type SurveySentimentResponse = {
   as_of: string;
+  data_meta?: {listeningWave?:string;listeningPeriod?:string;sourceLabel?:string};
   exit_enps?: import("./exit-enps").ExitEnpsSummary | null;
   summary: {
     engagement_respondents: number | null;

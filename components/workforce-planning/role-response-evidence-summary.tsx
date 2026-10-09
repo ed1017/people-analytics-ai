@@ -1,3 +1,5 @@
+import { ConstructedTalentProfileFit } from "./constructed-talent-profile-fit";
+import { ConstructedResponseFeasibilitySummary } from "./constructed-response-feasibility";
 import type {
   RoleWorkforceResponsePlanResponse,
 } from "@/lib/types";
@@ -15,8 +17,10 @@ function formatCount(value: number) {
 export function RoleResponseEvidenceSummary({
   result,
 }: RoleResponseEvidenceSummaryProps) {
+  const readiness = result.internal_talent_readiness;
   return (
     <>
+      <ConstructedResponseFeasibilitySummary data={result.capacity_feasibility} />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-md border p-3">
           <p className="text-xs text-muted-foreground">
@@ -67,6 +71,7 @@ export function RoleResponseEvidenceSummary({
           </p>
         </div>
       </div>
+      {readiness.assessment_status === "not_assessed" ? <ConstructedTalentProfileFit data={readiness} /> : (
       <div className="mt-4 rounded-md border p-4">
         <div className="mb-3">
           <p className="font-medium">
@@ -86,7 +91,7 @@ export function RoleResponseEvidenceSummary({
               Eligible Internal Pool
             </p>
             <p className="mt-1 text-xl font-semibold">
-              {result.internal_talent_readiness.candidate_pool.eligible_internal_candidates.toLocaleString()}
+              {readiness.candidate_pool.eligible_internal_candidates.toLocaleString()}
             </p>
           </div>
           <div className="rounded-md border p-3">
@@ -97,10 +102,10 @@ export function RoleResponseEvidenceSummary({
               Role-ready
             </p>
             <p className="mt-1 text-xl font-semibold">
-              {result.internal_talent_readiness.candidate_pool.role_ready.toLocaleString()}
+              {readiness.candidate_pool.role_ready.toLocaleString()}
             </p>
             <p className="text-xs text-muted-foreground">
-              {result.internal_talent_readiness.candidate_pool.role_ready_pct.toFixed(
+              {readiness.candidate_pool.role_ready_pct.toFixed(
                 1
               )}% of eligible pool
             </p>
@@ -114,7 +119,7 @@ export function RoleResponseEvidenceSummary({
               Near-ready
             </p>
             <p className="mt-1 text-xl font-semibold">
-              {result.internal_talent_readiness.candidate_pool.near_ready.toLocaleString()}
+              {readiness.candidate_pool.near_ready.toLocaleString()}
             </p>
             <p className="text-xs text-muted-foreground">
               Build-development pool
@@ -128,7 +133,7 @@ export function RoleResponseEvidenceSummary({
               Longer-term
             </p>
             <p className="mt-1 text-xl font-semibold">
-              {result.internal_talent_readiness.candidate_pool.longer_term.toLocaleString()}
+              {readiness.candidate_pool.longer_term.toLocaleString()}
             </p>
             <p className="text-xs text-muted-foreground">
               Development beyond near-ready
@@ -151,7 +156,7 @@ export function RoleResponseEvidenceSummary({
                 Fully path-covered
               </p>
               <p className="mt-1 font-semibold tabular-nums">
-                {result.internal_talent_readiness.development_pathway_coverage.fully_pathway_covered_candidates.toLocaleString()}
+                {readiness.development_pathway_coverage.fully_pathway_covered_candidates.toLocaleString()}
               </p>
             </div>
             <div className="rounded-md border bg-background p-2">
@@ -159,7 +164,7 @@ export function RoleResponseEvidenceSummary({
                 Partial pathway
               </p>
               <p className="mt-1 font-semibold tabular-nums">
-                {result.internal_talent_readiness.development_pathway_coverage.partially_pathway_covered_candidates.toLocaleString()}
+                {readiness.development_pathway_coverage.partially_pathway_covered_candidates.toLocaleString()}
               </p>
             </div>
             <div className="rounded-md border bg-background p-2">
@@ -167,19 +172,19 @@ export function RoleResponseEvidenceSummary({
                 No active pathway
               </p>
               <p className="mt-1 font-semibold tabular-nums">
-                {result.internal_talent_readiness.development_pathway_coverage.no_active_pathway_candidates.toLocaleString()}
+                {readiness.development_pathway_coverage.no_active_pathway_candidates.toLocaleString()}
               </p>
             </div>
           </div>
         </div>
-        {result.internal_talent_readiness.top_near_ready_skill_gaps.length >
+        {readiness.top_near_ready_skill_gaps.length >
           0 && (
           <div className="mt-4 border-t pt-4">
             <p className="text-xs font-medium">
               Most common near-ready gaps
             </p>
             <div className="mt-2 grid gap-2 md:grid-cols-2">
-              {result.internal_talent_readiness.top_near_ready_skill_gaps.map(
+              {readiness.top_near_ready_skill_gaps.map(
                 (gap) => (
                   <div
                     key={gap.skill_code}
@@ -218,6 +223,7 @@ export function RoleResponseEvidenceSummary({
           Aggregate planning signal only. Missing skill records mean no demonstrated proficiency in the loaded data; they do not prove an employee lacks the skill. No individual employees are exposed or ranked.
         </p>
       </div>
+      )}
       <div className="mt-4 rounded-md border p-4">
         <div className="mb-3">
           <p className="font-medium">
@@ -228,6 +234,7 @@ export function RoleResponseEvidenceSummary({
           </p>
         </div>
 
+        {result.external_recruiting_feasibility.data_meta && <p className="mb-3 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">{result.external_recruiting_feasibility.data_meta.sourceLabel}. Future hiring capacity and arrival dates are unknown.</p>}
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-md border p-3">
             <p className="text-xs text-muted-foreground">
@@ -328,9 +335,9 @@ export function RoleResponseEvidenceSummary({
               </th>
               <th
                 className="pb-3 px-3 text-right"
-                title="Skill-level mobility signal. Use the Internal Talent Readiness section above for whole-role Move capacity."
+                title={result.capacity_feasibility ? "Company-wide recorded preferences for roles requiring this skill. Assessed readiness and mover availability are unknown." : "Skill-level mobility signal. Use the Internal Talent Readiness section above for whole-role Move capacity."}
               >
-                Skill Move Signal
+                {result.capacity_feasibility ? "Recorded Preference Signal" : "Skill Move Signal"}
               </th>
               <th className="pb-3 pl-3 text-right">
                 Buy History

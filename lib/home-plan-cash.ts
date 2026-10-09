@@ -6,6 +6,7 @@ const month=(value:string)=>Number(value.slice(0,4))*12+Number(value.slice(5,7))
 /** A scheduled allowance subtotal is not evidence that all costs were entered. */
 export function listedPlanCash(draft:BundleDraft):number|null{
  const input=draft.inputs,start=input.scope.startMonth.value,months=input.scope.months.value,rows=input.expenses.filter(row=>row.kind==='cash');
+ if(draft.bundle.origin==='conversation-v1'&&input.costsDistinct.value!==true)return null;
  if(input.costsDistinct.value===false||!start||!months||!rows.length&&!input.costReviews.every(row=>row.complete.value===true))return null;
  if(rows.some(row=>row.amount.value===null||row.months.value===null||row.startMonth.value===null||month(row.startMonth.value)<month(start)||month(row.startMonth.value)+row.months.value>month(start)+months))return null;
  return Math.round(rows.reduce((total,row)=>total+row.amount.value!*row.months.value!,0)*100)/100;

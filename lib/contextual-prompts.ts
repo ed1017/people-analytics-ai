@@ -36,7 +36,7 @@ const pageExamples:Record<string,string> = {
 const planningPages = new Set(['planning-overview','scenario-modeling','position-workforce-design','workforce-response','execution-feasibility','workforce-planning']);
 const readOnlyPages = new Set(['compensation','decision-brief','assess-evaluate']);
 export const homeStarterGroups = [
-  {label:'Strategic Workforce Planning',prompts:strategicPlanningStarters.map(({prompt})=>({label:prompt,prompt}))},
+  {label:'Strategic Workforce Planning',purpose:'swp-business',prompts:strategicPlanningStarters.map(({prompt})=>({label:prompt,prompt}))},
   {label:'Workforce challenges',prompts:[
     {label:'How can we reduce turnover?',prompt:'How can we reduce turnover based on recorded evidence, and which findings apply to the selected workforce scope?'},
     {label:'How can we improve satisfaction?',prompt:'How can we improve employee satisfaction based on recorded feedback, and which findings apply to the selected workforce scope?'},

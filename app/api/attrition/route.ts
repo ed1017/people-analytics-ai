@@ -1,3 +1,4 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
 
@@ -16,7 +17,7 @@ function numericRows(rows: Record<string, unknown>[]) {
   );
 }
 
-export async function GET() {
+async function handleGET() {
   try {
     const [current, trend, businessUnits, levels, tenure, reasons] =
       await Promise.all([
@@ -48,4 +49,8 @@ export async function GET() {
       { status: 500 }
     );
   }
+}
+
+export async function GET(request: Request) {
+  return withDatasetRequest(request, () => handleGET());
 }

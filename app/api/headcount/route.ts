@@ -1,7 +1,8 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase-server";
 
-export async function GET() {
+async function handleGET() {
   const { count, error } = await supabaseServer
     .from("employees")
     .select("*", {
@@ -20,4 +21,7 @@ export async function GET() {
   return NextResponse.json({
     headcount: count,
   });
+}
+export async function GET(request: Request) {
+  return withDatasetRequest(request, () => handleGET());
 }

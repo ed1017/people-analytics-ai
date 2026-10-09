@@ -33,7 +33,14 @@ export function demoBundle(example:HomeDemoExample):SolutionBundle {
 export function demoBinding(example:HomeDemoExample):ActionBinding {
  return {version:1,goalId:example.id,goal:example.goal,evidenceDigest:'0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0',planningDigest:example.planningDigest};
 }
+export const swpDemoGoal='Support service growth within budget';
+/** Separate exact local template; original first-run examples and pinned bindings are unchanged. */
+export function swpDemoBundle():SolutionBundle{return {...demoBundle(homeDemoExamples.find(e=>e.key==='capacity')!),name:'Service growth capacity plan'};}
+/** Separate deterministic illustration linked to a reviewed managed-services workload gap. */
+export function serviceStaffingBundle():SolutionBundle{return {...swpDemoBundle(),name:'Managed-services workload staffing illustration',objective:'Compare separately reviewed illustrative staffing routes for a managed-services role-slice gap.'};}
 export function validDemoBundle(bundle:SolutionBundle,goal:string):boolean {
+ if(JSON.stringify(bundle)===JSON.stringify(serviceStaffingBundle()))return !!goal.trim();
+ if(goal===swpDemoGoal)return JSON.stringify(bundle)===JSON.stringify(swpDemoBundle());
  const example=homeDemoExamples.find(item=>item.goal===goal);
  return !!example&&JSON.stringify(bundle)===JSON.stringify(demoBundle(example));
 }

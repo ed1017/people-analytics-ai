@@ -27,6 +27,8 @@ type ScenarioEngineInput = {
   baselinePoints: ScenarioEngineBaselinePoint[];
   defaults: ScenarioModelAssumptions;
   assumptions: ScenarioModelAssumptions;
+  // Optional local audit port; no change to the legacy result or arithmetic.
+  onPoint?: (point: {planning_month:string;opening_headcount:number;hires:number;exits:number;closing_headcount:number}) => void;
 };
 
 function round1(value: number) {
@@ -347,6 +349,8 @@ export function runScenarioModel(
               modeledHires -
               modeledExits
           );
+
+        input.onPoint?.({planning_month:baselinePoint.planning_month,opening_headcount:modeledPreviousHeadcount,hires:modeledHires,exits:modeledExits,closing_headcount:modeledHeadcount});
 
         const baselineFteRatio =
           safeRatio(

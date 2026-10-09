@@ -66,6 +66,25 @@ try{for(const [mode,width,height] of [['wide',1844,1100],['desktop',1366,900],['
  }
  await reset();
  await sendStarter(items[0],'planning keyboard after dismissal',true);
+ // One scoped objective owns continuity; visible transcript is not replayed.
+ const sendTurn=async text=>{
+  const before=posts.length;await page.getByLabel('Ask Workforce AI',{exact:true}).fill(text);
+  await button('Send overview question').click();
+  await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText(`Synthetic pointer response ${before+1}.`,{exact:true}).waitFor();
+  check(mode+' typed turn sends once with bounded history',posts.length===before+1&&posts.at(-1).message.startsWith(text)&&posts.at(-1).history.length<=8);
+ };
+ for(let index=0;index<12;index++){
+  await sendTurn(['Or how about both?','Budget is $20000.','We need it sooner.'][index%3]);
+  check(mode+' long turn '+index+' carries recognized objective and independent unavailable calculator hint',posts.at(-1).planningObjective===items[0].prompt&&posts.at(-1).planningCalculatorAvailable===false&&Object.keys(posts.at(-1)).filter(key=>key.startsWith('planning')).sort().join(',')==='planningCalculatorAvailable,planningObjective');
+ }
+ check(mode+' opener falls outside model window but remains in visible transcript',!posts.at(-1).history.some(turn=>turn.content===items[0].prompt)&&await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText(items[0].prompt,{exact:true}).count()===1);
+ await sendTurn('New topic: movies.');
+ for(let index=0;index<5;index++)await sendTurn('What movies should I watch?');
+ await sendTurn('Or how about both?');
+ check(mode+' cleared objective stays absent after topic change leaves model window',posts.at(-1).planningObjective===null&&!posts.at(-1).history.some(turn=>turn.content==='New topic: movies.'));
+ await reset();
+ await sendTurn('Or how about both?');
+ check(mode+' reset visible boundary cannot carry archived objective',posts.at(-1).planningObjective===null&&posts.at(-1).history.length===0);
  await reset();
  // Use real navigation controls, including the phone drawer, then return Home.
  if(touch)await activate(button('Open navigation'),'open navigation');

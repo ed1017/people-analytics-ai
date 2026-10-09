@@ -1,7 +1,8 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
 
-export async function GET() {
+async function handleGET() {
   const { data, error } = await supabaseServer
     .from("dashboard_overview_current")
     .select("*")
@@ -15,4 +16,7 @@ export async function GET() {
   }
 
   return NextResponse.json(data);
+}
+export async function GET(request: Request) {
+  return withDatasetRequest(request, () => handleGET());
 }
