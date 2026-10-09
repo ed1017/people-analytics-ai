@@ -1,5 +1,6 @@
 'use client';
 import {prepareBusinessPlanningSelection,businessPlanningSelectionFields,businessPlanningReceiptField,type BusinessPlanningSelection} from '@/lib/home-business-planning-save';
+import {currentBusinessPlanning} from '@/lib/home-business-planning';
 import {datasetFetch} from '@/lib/dataset-client.mjs';
 import {swpConversationHeaders} from '@/lib/swp-conversation-model';
 import {useEffectEvent,useLayoutEffect,useRef,useState,type RefObject} from 'react';
@@ -81,6 +82,12 @@ export function useHomeSolutionConversation(props:Props){
     candidate.binding={...candidate.binding,goalId:desired.id,goal:desired.statement};
     if(candidate.draft){candidate.draft.binding=structuredClone(candidate.binding);if(candidate.draft.inputs.successMeasure)candidate.draft.inputs.successMeasure.goal=desired.statement;candidate.result=reconcileBundle(candidate.draft);}
    }
+   if(!p.conversation.activeGoalId&&state.businessPlanning){
+    // Only the same checked objective follows an intentional exploration-to-goal save.
+    // A different objective or stale source context must not inherit its premises.
+    try{const business=currentBusinessState();state.businessPlanning=business&&business.review.spec.objective===desired.statement&&item.binding.goal===desired.statement?{...business,context:{...business.context,boundGoal:structuredClone(desired)}}:null;}
+    catch{state.businessPlanning=null;}
+   }
    p.conversation.selectProposalGoal(desired,snapshot.data.revision,{[planAlternativesField]:packPlanAlternatives(selected) as unknown as Json,[solutionConversationField]:state as unknown as Json,[alternativeViewField]:{version:1,selectedId:outcome.plan.id,collapsed:false}});
    memoryRef.current=state;setMemory(state);
    p.guided?.emit({type:'proposal-chosen',goalId:desired.id,goal:desired.statement,planId:outcome.plan.id,number:outcome.plan.number,candidate:{id:item.id,revision:item.revision,requestId:item.requestId}});
@@ -89,10 +96,17 @@ export function useHomeSolutionConversation(props:Props){
  }
  function reject(item:SolutionEvaluation){try{requireCurrent();const state=structuredClone(memoryRef.current),turnId=crypto.randomUUID();state.turns=[...state.turns,{id:turnId,role:'user' as const,text:`Discard proposal ${item.candidate.name}, revision ${item.revision}.`}].slice(-32);state.rejected=[...state.rejected,{candidateId:item.id,revision:item.revision,reason:'Discarded using the proposal review control.',turnId}].slice(-24);if(state.focusCandidateId===item.id)state.focusCandidateId=null;persist(state);}catch(error){setNotice((error as Error).message);}}
  function clearBusinessPlanning(){try{requireCurrent();persist({...memoryRef.current,businessPlanning:null});}catch(error){setNotice((error as Error).message);}}
- async function reviewBusinessOption(id:string){requireCurrent();const state=memoryRef.current.businessPlanning;if(!state)throw Error('The business discussion changed.');const key=JSON.stringify(state),revision=decisionStore.getSnapshot().data.revision;const selection=await prepareBusinessPlanningSelection(state,id);requireCurrent();if(JSON.stringify(memoryRef.current.businessPlanning)!==key||decisionStore.getSnapshot().data.revision!==revision)throw Error('The discussion changed. Review the current option.');return {selection,key,revision};}
- async function saveBusinessOption(review:{selection:BusinessPlanningSelection;key:string;revision:number}){
+ function currentBusinessState(){return currentBusinessPlanning(makeRequest('Review the current provisional staffing option.'),decisionStore.getDatasetToken());}
+ async function reviewBusinessOption(id:string){
+  const snapshot=requireCurrent(),state=currentBusinessState();if(!state)throw Error('The business discussion changed.');
+  const key=JSON.stringify(state),revision=snapshot.data.revision,context=liveKey.current,initialEpoch=epoch.current;
+  const selection=await prepareBusinessPlanningSelection(state,id);requireCurrent();
+  if(context!==liveKey.current||initialEpoch!==epoch.current||JSON.stringify(currentBusinessState())!==key||decisionStore.getSnapshot().data.revision!==revision)throw Error('The discussion changed. Review the current option.');
+  return {selection,key,revision,context,epoch:initialEpoch};
+ }
+ async function saveBusinessOption(review:{selection:BusinessPlanningSelection;key:string;revision:number;context:string;epoch:number}){
   if(saving||pending)return;setSaving(true);setNotice('');
-  try{const snapshot=requireCurrent(),p=currentProps.current;if(JSON.stringify(memoryRef.current.businessPlanning)!==review.key||snapshot.data.revision!==review.revision)throw Error('The reviewed comparison changed. Review the current option.');
+  try{const snapshot=requireCurrent(),p=currentProps.current;if(review.context!==liveKey.current||review.epoch!==epoch.current||JSON.stringify(currentBusinessState())!==review.key||snapshot.data.revision!==review.revision)throw Error('The reviewed comparison changed. Review the current option.');
    const requestId='business-choice-'+crypto.randomUUID(),at=new Date().toISOString(),fields=businessPlanningSelectionFields(review.selection,catalog(),requestId,at,snapshot.data.workspaces[review.selection.goal.id]?.fields[businessPlanningReceiptField]);
    const state=structuredClone(memoryRef.current);if(state.businessPlanning)state.businessPlanning.context.boundGoal=structuredClone(review.selection.goal);
    p.conversation.selectProposalGoal(review.selection.goal,snapshot.data.revision,{...fields,[solutionConversationField]:state} as unknown as Record<string,Json>);memoryRef.current=state;setMemory(state);setNotice('Reviewed provisional staffing plan saved. Assumptions remain unverified; no operational change was applied.');

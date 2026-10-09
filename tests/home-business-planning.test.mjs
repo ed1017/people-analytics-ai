@@ -58,4 +58,13 @@ test('a current-user withdrawal restores an unknown without filling it from a pr
  const s=(await journey()).state.businessPlanning,body=solutionRequest('The hire cost is unknown now; withdraw the earlier rate.',false,undefined,9);
  const inputs=editStaffingInputs(s.review,s.staffing.inputs,[{field:'annualHireCost',value:null,basis:supplied(body)}],body.message,[body.message]);
  const result=calculateServiceStaffing(s.review,inputs);assert.equal(result.options[0].cash,null);assert.equal(inputs.values.annualHireCost.value,null);assert.equal(inputs.values.annualHireCost.basis.turnId,body.message.id);assert.deepEqual(inputs.values.hireFee,s.staffing.inputs.values.hireFee);
+ const later=solutionRequest('Show the comparison again.',false,undefined,10),proposed={field:'annualHireCost',value:90000,basis:{kind:'model-proposed',turnId:null,quote:null,explanation:'Illustrative replacement rate.'}},before=structuredClone(inputs);
+ assert.throws(()=>editStaffingInputs(s.review,inputs,[proposed],later.message,[later.message]),/current-user correction/);
+ assert.deepEqual(inputs,before);
+ const replacement=solutionRequest('Use 90000 USD per year as the hire cost.',false,undefined,11);
+ const replaced=editStaffingInputs(s.review,inputs,[{...proposed,basis:supplied(replacement)}],replacement.message,[replacement.message]);
+ assert.equal(replaced.values.annualHireCost.value,90000);assert.deepEqual(replaced.values.annualHireCost.basis,supplied(replacement));
+ assert.deepEqual(replaced.values.hireFee,inputs.values.hireFee);
+ const first=editStaffingInputs(s.review,null,[proposed],later.message,[later.message]);
+ assert.equal(first.values.annualHireCost.value,90000);assert.equal(first.values.annualHireCost.basis.kind,'model-proposed');
 });

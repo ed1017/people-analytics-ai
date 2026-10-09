@@ -53,7 +53,7 @@ export function editStaffingInputs(review:DemandReview,previous:StaffingInputs|n
   if(!staffingFields.includes(c.field))throw Error('Unsupported staffing assumption.');
   const atom={value:c.value,basis:c.basis};checkAtom(c.field,atom,s.basisTurns);
   if(c.basis.kind==='user-supplied'&&c.basis.turnId!==current.id)throw Error('Corrections require the current user turn.');
-  if(s.values[c.field].value!==null&&!equal(s.values[c.field],atom)&&c.basis.kind!=='user-supplied')throw Error('An existing staffing premise can change only through a current-user correction.');
+  if((s.values[c.field].value!==null||s.values[c.field].basis.kind==='user-supplied')&&!equal(s.values[c.field],atom)&&c.basis.kind!=='user-supplied')throw Error('An existing staffing premise can change only through a current-user correction.');
   s.values[c.field]=structuredClone(atom);
  }
  return readStaffingInputs(s);
