@@ -2,7 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "git": {
     "deploymentEnabled": {
-      "codex/swp-fluid-package-integration-20261009": false
+      "codex/swp-fluid-package-integration-20261009": false,
+      "codex/swp-plan-b-two-turn-20261009": false
     }
-  }
+  },
+  "framework": null,
+  "installCommand": "npm ci --ignore-scripts --no-audit --no-fund",
+  "buildCommand": "node .plan-b-two-turn/build.mjs",
+  "outputDirectory": ".plan-b-two-turn-output"
 }
