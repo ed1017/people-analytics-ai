@@ -1,0 +1,449 @@
+{
+  "scope": "Selected workforce snapshot: Global workforce; All business units; All levels",
+  "query": "",
+  "evidence": {
+    "version": 1,
+    "workforceScope": "Selected workforce snapshot: Global workforce; All business units; All levels",
+    "sources": [
+      {
+        "id": "W1",
+        "label": "Workforce snapshot",
+        "page": "workforce",
+        "scope": "Selected workforce snapshot: Selected workforce snapshot: Global workforce; All business units; All levels",
+        "date": "2026-09-30",
+        "population": "Snapshot employees; FTE capacity; open positions",
+        "limitation": "Observed synthetic aggregate. People, FTE and positions differ.",
+        "status": "loaded",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 1,
+          "rowsIncluded": 1,
+          "selection": "Last 3 returned chronological observations",
+          "detailTruncated": false
+        },
+        "facts": {
+          "headcount": 100,
+          "fte": 100,
+          "voluntary_turnover_ytd_pct": null,
+          "labor_cost_usd": null,
+          "open_positions": 3,
+          "rows": [
+            {
+              "headcount": 100,
+              "fte": 100,
+              "snapshot_date": "2026-09-30"
+            }
+          ]
+        }
+      },
+      {
+        "id": "W2",
+        "label": "Workforce composition",
+        "page": "workforce",
+        "scope": "Company-wide; unfiltered",
+        "date": null,
+        "population": "Company employees",
+        "limitation": "Company composition does not follow dashboard filters.",
+        "status": "unavailable",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": null
+      },
+      {
+        "id": "A1",
+        "label": "Attrition",
+        "page": "attrition",
+        "scope": "Company-wide; unfiltered",
+        "date": null,
+        "population": "Recorded exits; source-specific turnover denominator",
+        "limitation": "Historical exits are not causes or a forecast.",
+        "status": "unavailable",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": null
+      },
+      {
+        "id": "R1",
+        "label": "Recruiting",
+        "page": "talent-acquisition",
+        "scope": "Company-wide; unfiltered",
+        "date": null,
+        "population": "Applications, hires and requisitions are separate populations",
+        "limitation": "Historical hiring speed is not guaranteed future capacity. No recruiter names.",
+        "status": "loaded",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Last 3 returned chronological observations",
+          "detailTruncated": false
+        },
+        "facts": {
+          "applications": null,
+          "interviewed_applications": null,
+          "offered_applications": null,
+          "hires": null,
+          "application_to_interview_pct": null,
+          "interview_to_offer_pct": null,
+          "offer_to_hire_pct": null,
+          "application_to_hire_pct": null,
+          "offer_acceptance_pct": null,
+          "open_requisitions": null,
+          "open_positions": null,
+          "median_time_to_fill_days": null,
+          "median_open_req_age_days": null,
+          "open_reqs_over_60_days": null,
+          "internal_hires": null,
+          "external_hires": null,
+          "modeled_ta_version": null,
+          "modeled_ta_status": "unavailable",
+          "modeled_ta_metric": "Calibrated TA extension unavailable or stale; no modeled counts or forecasts available. Planning source separate.",
+          "rows": []
+        }
+      },
+      {
+        "id": "S1",
+        "label": "Employee Listening",
+        "page": "survey-sentiment",
+        "scope": "Company-wide; survey-specific respondents",
+        "date": null,
+        "population": "Each survey has its own respondent and eligible population",
+        "limitation": "Do not combine survey denominators. No raw comments or eNPS.",
+        "status": "unavailable",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Last 3 returned chronological observations",
+          "detailTruncated": false
+        },
+        "facts": null
+      },
+      {
+        "id": "S2",
+        "label": "Exit survey feedback",
+        "page": "attrition",
+        "scope": "Company-wide; exit respondents",
+        "date": null,
+        "population": "Exit-survey respondents, not workforce headcount",
+        "limitation": "Fieldwork period/monthly trend and suppression metadata unavailable. Reasons/associations are not causes or employee attrition rates. No eNPS.",
+        "status": "unavailable",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": null
+      },
+      {
+        "id": "T1",
+        "label": "Skills Intelligence",
+        "page": "skills",
+        "scope": "Company-wide; unfiltered",
+        "date": null,
+        "population": "Current workforce; skill-specific role demand",
+        "limitation": "Threshold counts are skills, not employees. Missing proficiency is not inability or headcount demand.",
+        "status": "unavailable",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": null
+      },
+      {
+        "id": "T2",
+        "label": "Learning pathways",
+        "page": "learning-development",
+        "scope": "Company-wide; unfiltered",
+        "date": null,
+        "population": "Gap skills and active job profiles",
+        "limitation": "Catalogue coverage and duration do not prove readiness or improvement.",
+        "status": "unavailable",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": null
+      },
+      {
+        "id": "T3",
+        "label": "Career interests",
+        "page": "home",
+        "scope": "Company-wide; unfiltered",
+        "date": null,
+        "population": "Active employees with recorded preferences",
+        "limitation": "Preferences and relocation willingness are not available or ready movers.",
+        "status": "unavailable",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": null
+      },
+      {
+        "id": "T4",
+        "label": "Recorded mobility",
+        "page": "career-growth-mobility",
+        "scope": "Company-wide; recorded history",
+        "date": null,
+        "population": "Recorded movement events, not unique employees",
+        "limitation": "Partial months and incomplete history are not comparable full periods or population rates.",
+        "status": "unavailable",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": null
+      },
+      {
+        "id": "T5",
+        "label": "Succession coverage",
+        "page": "succession-planning",
+        "scope": "Company-wide; suppression preserved",
+        "date": null,
+        "population": "Filled critical positions",
+        "limitation": "Recorded plans/readiness assessments do not prove capability. Never derive suppressed complements.",
+        "status": "invalid",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": null
+      },
+      {
+        "id": "P1",
+        "label": "Stored Planning scenarios",
+        "page": "planning-overview",
+        "scope": "Company-wide; modeled, not observed",
+        "date": null,
+        "population": "Modeled workforce by scenario and month",
+        "limitation": "Refresh date unavailable. Month hires/exits are flows, not cumulative; scenarios are not approved decisions.",
+        "status": "unavailable",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": null
+      },
+      {
+        "id": "P2",
+        "label": "Position inventory",
+        "page": "position-workforce-design",
+        "scope": "Company-wide; current inventory",
+        "date": null,
+        "population": "Authorized positions, not employees",
+        "limitation": "Current position inventory only; scenario outcomes require explicit Planning selection.",
+        "status": "unavailable",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": null
+      },
+      {
+        "id": "F1",
+        "label": "Labor cost planning",
+        "page": "finance",
+        "scope": "Company-wide; current aggregate",
+        "date": null,
+        "population": "Employees/FTE and vacancies; USD labor costs",
+        "limitation": "Not base salary or market benchmarks. Source normalizes missing numeric values; cost period/refresh provenance not established.",
+        "status": "unavailable",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": null
+      },
+      {
+        "id": "I1",
+        "label": "Occupational mapping",
+        "page": "occupational-references",
+        "scope": "Internal stored mapping; unfiltered",
+        "date": null,
+        "population": "Stored job profiles",
+        "limitation": "O*NET reference content not loaded; release/import date unverified. No external occupation facts.",
+        "status": "unavailable",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": null
+      },
+      {
+        "id": "I2",
+        "label": "US labor market",
+        "page": "labor-market",
+        "scope": "US national; no workforce filters",
+        "date": null,
+        "population": "US national series populations",
+        "limitation": "Each observation has its own date/unit. Not local hiring, salary, company turnover or a forecast.",
+        "status": "loaded",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 3,
+          "rowsIncluded": 3,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": {
+          "rows": [
+            {
+              "value": null,
+              "series_id": "LNS14000000",
+              "name": "US unemployment rate",
+              "unit": "percent",
+              "observationDate": null
+            },
+            {
+              "value": null,
+              "series_id": "LNS11300000",
+              "name": "US labor force participation",
+              "unit": "percent",
+              "observationDate": null
+            },
+            {
+              "value": null,
+              "series_id": "CES0000000001",
+              "name": "US nonfarm employment",
+              "unit": "thousands",
+              "observationDate": null
+            }
+          ]
+        }
+      },
+      {
+        "id": "I3",
+        "label": "Training and coaching quotes",
+        "page": "training-coaching",
+        "scope": "Fictional examples and unverified session input",
+        "date": null,
+        "population": "Quotes, not employees or measured outcomes",
+        "limitation": "Named examples FICTIONAL; quotes SIMULATED. Custom inputs UNVERIFIED. No ROI, quality or skill-improvement claims.",
+        "status": "loaded",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 3,
+          "rowsIncluded": 3,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": {
+          "rows": [
+            {
+              "provider": "Fictional Cedar Learning",
+              "provenance": "FICTIONAL provider; SIMULATED quote",
+              "kind": "Training",
+              "focus": "Manager feedback and delegation",
+              "format": "Live virtual workshop",
+              "hoursPerSession": "2",
+              "sessions": "3",
+              "capacity": "12",
+              "feePerUnitPerSession": "120",
+              "currency": "USD",
+              "basis": "per person per session"
+            },
+            {
+              "provider": "Fictional Lantern Academy",
+              "provenance": "FICTIONAL provider; SIMULATED quote",
+              "kind": "Training",
+              "focus": "Data literacy and business communication",
+              "format": "In-person cohort",
+              "hoursPerSession": "3",
+              "sessions": "2",
+              "capacity": "10",
+              "feePerUnitPerSession": "1800",
+              "currency": "USD",
+              "basis": "per cohort package per session"
+            },
+            {
+              "provider": "Fictional Harbor Coach",
+              "provenance": "FICTIONAL provider; SIMULATED quote",
+              "kind": "Leadership coaching",
+              "focus": "Leadership reflection and difficult conversations",
+              "format": "Individual virtual coaching",
+              "hoursPerSession": "1",
+              "sessions": "4",
+              "capacity": "1",
+              "feePerUnitPerSession": "200",
+              "currency": "USD",
+              "basis": "per cohort package per session"
+            }
+          ]
+        }
+      },
+      {
+        "id": "D1",
+        "label": "Development comparison",
+        "page": "development-planning",
+        "scope": "User-selected session assumptions; modeled costs",
+        "date": null,
+        "population": "Explicit participants and attendance assumptions",
+        "limitation": "Not approved budgets or measured results. Blank costs unknown; currencies never combined. Time value is not necessarily cash spending.",
+        "status": "unavailable",
+        "coverage": {
+          "summary": "Allowlisted summary only; not all source rows",
+          "rowsAvailable": 0,
+          "rowsIncluded": 0,
+          "selection": "Explicit goal-word matches first, then source order; no priority ranking",
+          "detailTruncated": false
+        },
+        "facts": null
+      }
+    ],
+    "coverage": {
+      "available": 4,
+      "total": 18,
+      "limits": "48000 UTF-8 bytes total; 1900 bytes facts/source; at most 3 detail rows/source; text 160 characters.",
+      "selection": "Every configured source summary is attempted. Detail rows match explicit goal words first, then source order; chronological series use recent rows. This is a compact sample, not full app coverage.",
+      "unavailable": [
+        "Internal Compensation and eNPS unavailable; market pay requires an explicitly supplied reference",
+        "Interactive Planning model outputs, role readiness/recruiting comparisons and carried Skills handoffs are not supplied; open Planning for explicit current comparisons"
+      ]
+    }
+  },
+  "conversation": {
+    "activeGoalId": "",
+    "focusedIssue": "",
+    "goalContext": null
+  }
+}

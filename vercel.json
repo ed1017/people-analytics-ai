@@ -2,7 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "git": {
     "deploymentEnabled": {
-      "codex/home-natural-swp-entry-20261009": false
+      "codex/home-natural-swp-entry-20261009": false,
+      "codex/home-natural-acceptance-20261009": false
     }
-  }
+  },
+  "framework": null,
+  "installCommand": "npm ci --ignore-scripts --no-audit --no-fund",
+  "buildCommand": "node .home-natural-acceptance/build.mjs",
+  "outputDirectory": ".home-natural-acceptance-output"
 }
