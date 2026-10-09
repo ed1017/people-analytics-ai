@@ -9,7 +9,7 @@ for(const [kind,text] of [['product',productQuestion],['turnover',turnoverQuesti
  const body=solutionRequest(text),before=JSON.stringify(body),runtime=fixtureRuntime(recommendationSteps(kind,body));
  const reply=await converseSolutions(body,runtime,signal());
  assert.equal(reply.candidateIds.length,3);assert.equal(reply.state.working.length,3);assert.equal(JSON.stringify(body),before);assert.equal(body.catalog,null);assert.equal(body.goal.id,'');assert.equal(reply.state.businessPlanning,undefined);
- assert.ok(reply.answer.startsWith('I recommend '));assert.ok(reply.answer.indexOf('Proposed Action Plan 3')<reply.answer.indexOf('optionally focus'));
+ assert.ok(reply.answer.startsWith('Summary: I recommend '));assert.ok(reply.answer.indexOf('Proposed Action Plan 3')<reply.answer.indexOf('Further reading and investigations:'));assert.ok(reply.answer.indexOf('Further reading and investigations:')<reply.answer.indexOf('optionally focus'));
  assert.deepEqual(reply.state.verifiedMetrics,[]);assert.equal(reply.usage.modelRounds,2);
  for(const item of reply.state.working){assert.deepEqual(item.blocking,[]);assert.ok(item.draft);assert.equal(item.result.calculationStatus,'awaiting-scope');assert.equal(item.result.cashEstimate.cash,null);assert.equal(item.result.uniqueParticipants,null);assert.ok(item.candidate.successMeasure);assert.ok(item.candidate.nextStep);assert.equal(item.candidate.activities.length,2);assert.ok(item.candidate.activities.every(a=>a.ownerRole&&a.step));}
  const context=solutionModelContext(solutionRequest('Let us discuss the second plan.',false,reply.state,2));
