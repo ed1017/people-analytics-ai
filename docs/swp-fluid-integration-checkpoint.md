@@ -2,7 +2,15 @@
 
 This separate source combines full-app reference/build `6adf0a9d2f84edb9c27357b5e25fcd3529f16df0`, calculator PR188 `8a81f8c810750a9394f69c6126117f457432d34c`, and final PR187 continuity successor `1441dcaea8f1e33c08334a3e0168d2bde232f296`. It also simplifies the optional calculator popup. PR186 and PR189 are excluded. Runtime feature flags, model selection, frozen reference contents, and saved data remain unchanged. Publication of this source is separate from permission to merge, deploy or make provider calls.
 
-`vercel.json` disables automatic Git deployment for the exact source branch `codex/swp-fluid-package-integration-20261009` only. It does not change any existing production branch setting. This follows [Vercel's branch-specific deployment control](https://vercel.com/docs/project-configuration/git-configuration#git.deploymentenabled) so publishing the source does not request a preview rollout. Any later branch rename or deployment requires a fresh review of that setting.
+`vercel.json` disables automatic Git deployment for the exact source branch `codex/swp-grounded-comparisons-20261009` only. It does not change any existing production branch setting. This follows [Vercel's branch-specific deployment control](https://vercel.com/docs/project-configuration/git-configuration#git.deploymentenabled) so publishing the source does not request a preview rollout. Any later branch rename or deployment requires a fresh review of that setting.
+
+## Grounded comparative recommendations successor
+
+This narrow successor starts from `02ddda844bcd4470a9dac9c015ed56b519ae6d68`. A coordinator-reported ordinary Home Preview response recommended a staged combination while timing and capacity were unknown, yet called cross-training “the fastest reversible way.” The report motivates this change; no full response or invented measurements are included here.
+
+Shared scoped guidance now requires comparative claims such as fastest, cheapest or best to follow available evidence about alternatives or name the decisive condition briefly alongside the recommendation. It still leads with useful advice, without a caveat list or a predetermined hiring/training answer. Only this shared guidance changes application behavior; ordinary chat scope, model/provider settings, calculator and explicit review/save ownership remain unchanged.
+
+Successor validation passed 124 focused tests, affected-source lint and a production Webpack build including TypeScript and all six prebuild artifact checks. The final 31 request tests also passed after adding the initial-opener assertion. The build used local dummy Supabase values, no model key, and a network-blocking preload. Existing network-isolated actual-POST regressions check that both Home paths receive the rule, including sparse/unavailable sources and comparative follow-ups. They validate request construction, not generated recommendation quality. The earlier Preview observation and canary commit `679ba42dacfd2056ba4c0fddfd897abe49d66a5e` remain separate snapshots; neither certifies this successor. Refreshing this branch's fluid manifest creates a new review target and does not rewrite frozen reference manifests.
 
 ## Calculator ownership and direct editing
 

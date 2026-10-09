@@ -46,6 +46,9 @@ test('actual full-app POST adds scoped recommendation guidance and preserves che
   assert.equal(result.status,200);assert.equal(sandbox.__requests.length,n+1);
   const sent=JSON.parse(JSON.stringify(sandbox.__requests.at(-1)));
   assert.match(sent.instructions,/Lead with a useful grounded or clearly conditional recommendation/);
+  assert.match(sent.instructions,/Ground comparative claims such as faster, fastest, cheaper, cheapest or best in available evidence about the alternatives/);
+  assert.match(sent.instructions,/otherwise make the claim explicitly conditional on the missing timing, cost, skill or availability evidence/);
+  assert.match(sent.instructions,/State the decisive condition briefly alongside the recommendation, without a caveat list/);
   assert.match(sent.instructions,available===true&&c.demandProposal?/UI supplies the optional popup control/:/No Planning Calculator popup control/);
   assert.deepEqual(sent.tools,demandReferenceModelContract.tools);assert.deepEqual(sent.text.format,demandReferenceModelContract.responseFormat);
   assert.equal(sent.model,'gpt-5.6-luna');assert.equal(sent.parallel_tool_calls,false);assert.equal(sent.max_output_tokens,5000);

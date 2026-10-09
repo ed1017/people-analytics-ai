@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "git": {
     "deploymentEnabled": {
-      "codex/swp-fluid-package-integration-20261009": false
+      "codex/swp-grounded-comparisons-20261009": false
     }
   }
 }

@@ -248,6 +248,7 @@ for(const [index,prompt] of planningPrompts.entries())test('actual Home POST add
  assert.equal(request.model,'gpt-5.6-luna');assert.equal(request.tool_choice,'none');
  assert.deepEqual(request.text.format,buildHomeReplyFormat(normalizeHomePack(packets[1][1]),false));
  assert.match(request.instructions,/CURRENT TURN PURPOSE: answer/);assert.match(request.instructions,/STRATEGIC WORKFORCE PLANNING CLARIFICATION/);assert.match(request.instructions,/keep unsupported measured\/source values unknown/);
+ assert.match(request.instructions,/Ground comparative claims such as faster, fastest, cheaper, cheapest or best in available evidence about the alternatives; otherwise make the claim explicitly conditional/);
  assert.ok(JSON.stringify(request.input).includes(prompt));
  const decoded=await response.json();assert.equal(decoded.nextStep,'none');assert.equal(decoded.candidateProposal,null);assert.equal(decoded.clarification,null);
 });
@@ -277,6 +278,9 @@ test('actual planning follow-up POSTs keep recommendation-first guidance with sp
    assert.equal(request.model,'gpt-5.6-luna');assert.equal(request.tool_choice,'none');
    assert.match(request.instructions,/CURRENT TURN PURPOSE: answer/);
    assert.match(request.instructions,/Lead with a useful grounded or clearly conditional recommendation/);
+   assert.match(request.instructions,/Ground comparative claims such as faster, fastest, cheaper, cheapest or best in available evidence about the alternatives/);
+   assert.match(request.instructions,/otherwise make the claim explicitly conditional on the missing timing, cost, skill or availability evidence/);
+   assert.match(request.instructions,/State the decisive condition briefly alongside the recommendation, without a caveat list/);
    assert.match(request.instructions,/Offer optional deeper exploration afterward/);
    assert.match(request.instructions,/hybrid when complementary work, timing and constraints justify it/);
    assert.match(request.instructions,/Missing or unavailable sources remain unknown/);
