@@ -36,7 +36,7 @@ export function PlanningAssumptionIllustration({launcherOnly=false}:{launcherOnl
  const cancel=()=>{setEditing(false);setNotice('Edits cancelled. The last reviewed inputs are unchanged.');};
  return <div className="min-w-0 space-y-5">
   {!launcherOnly&&content}
-  <div className="flex flex-wrap gap-2"><button type="button" aria-haspopup="dialog" aria-expanded={editing} className={button} onClick={()=>{setNotice('');setEditing(true);}}>{launcherOnly?'Open Planning Calculator':'Edit planning inputs'}</button>{!launcherOnly&&<button className={button} onClick={()=>{setReview(initial());setNotice('The original fictional example is restored.');}}>Reset illustration</button>}</div>
+  <div className="flex flex-wrap gap-2"><button type="button" aria-haspopup="dialog" aria-expanded={editing} className={button} onClick={()=>{setNotice('');setEditing(true);}}>Open Planning Calculator</button>{!launcherOnly&&<button className={button} onClick={()=>{setReview(initial());setNotice('The original fictional example is restored.');}}>Reset illustration</button>}</div>
   <PlanningCalculatorDialog open={editing} review={review} disabled={false} onReview={update} onCancel={cancel}>{launcherOnly&&<>{content}<button className={button} onClick={()=>{setEditing(false);setReview(initial());setNotice('The original fictional example is restored.');}}>Reset illustration</button></>}</PlanningCalculatorDialog>
   {notice&&<p role="status" className="text-sm">{notice}</p>}
  </div>;

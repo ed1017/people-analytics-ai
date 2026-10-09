@@ -80,11 +80,19 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  check(mode+' initial review request cannot advertise a calculator before an owner review exists',requests.at(-1).planningCalculatorAvailable!==true);
  const currentReviewText=await journey.getByRole('region',{name:'Review business demand assumptions'}).innerText();
  await button('Open Planning Calculator').click();await editor().getByLabel('Planning months',{exact:true}).fill('7');
+ check(mode+' popup permits direct typing with no Edit button',await editor().getByLabel('Planning months',{exact:true}).inputValue()==='7'&&await editor().getByRole('button',{name:/^Edit\b/i}).count()===0);
+ check(mode+' advanced details start closed and basics have readable units',await editor().locator('details').evaluateAll(nodes=>nodes.every(node=>!node.open))&&await editor().getByLabel('Available team time (%)',{exact:true}).isVisible()&&await editor().getByLabel('Budget limit (USD)',{exact:true}).isVisible());
  await button('Open Planning Calculator').evaluate(el=>el.click());
  check(mode+' repeated popup click preserves one draft',await page.locator('dialog[open]').count()===1&&await editor().getByLabel('Planning months',{exact:true}).inputValue()==='7');
  await button('Cancel input edits').click();
  check(mode+' cancel returns focus to its caller',await button('Open Planning Calculator').evaluate(el=>el===document.activeElement));
  check(mode+' popup cancel returns to unchanged current review',await journey.getByRole('region',{name:'Review business demand assumptions'}).innerText()===currentReviewText);
+ await button('Open Planning Calculator').click();
+ check(mode+' cancel and reopen discard the typed draft',await editor().getByLabel('Planning months',{exact:true}).inputValue()==='12');
+ await editor().getByLabel('Planning months',{exact:true}).fill('6');await page.keyboard.press('Escape');await button('Open Planning Calculator').click();
+ check(mode+' Escape and reopen discard the typed draft',await editor().getByLabel('Planning months',{exact:true}).inputValue()==='12');
+ check(mode+' popup fits mobile viewport and keeps touch controls usable',await page.getByRole('dialog',{name:'Planning Calculator',exact:true}).evaluate(node=>{const r=node.getBoundingClientRect();return r.width<=innerWidth&&r.height<=innerHeight;})&&await editor().locator('input,button,summary').evaluateAll(nodes=>nodes.filter(node=>node.checkVisibility()).every(node=>node.getBoundingClientRect().height>=44)));
+ await page.keyboard.press('Escape');
  await send('Make that ten months');await page.getByText('Revised to ten months; other inputs retain their exact provenance.',{exact:true}).filter({visible:true}).first().waitFor();
  await button('Open Planning Calculator').click();
  check(mode+' chat edit feeds the same popup review owner',await editor().getByLabel('Planning months',{exact:true}).inputValue()==='10');
@@ -93,7 +101,7 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  await send('Open the assumption editor');await editor().waitFor();
  await editor().getByLabel('Planning months',{exact:true}).fill('9');
  await editor().getByLabel('Existing roles',{exact:true}).fill('4');
- await editor().getByLabel('Uncommitted availability (%)',{exact:true}).fill('25');
+ await editor().getByLabel('Available team time (%)',{exact:true}).fill('25');
  await button('Review planning inputs').click();await editor().waitFor({state:'detached'});
  check(mode+' editing uses local calculator and requires acceptance',requests.length===calls&&await button('Use your assumptions for now').isEnabled()&&await journey.getByText(/Gap: 4,800 hours/).count()===1);
  await button('Use your assumptions for now').click();await journey.getByRole('figure').waitFor();

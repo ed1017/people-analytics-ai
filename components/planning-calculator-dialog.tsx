@@ -20,6 +20,6 @@ export function PlanningCalculatorDialog({open,review,disabled,onReview,onCancel
   if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
   else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
  }} className="m-auto max-h-[85dvh] w-[calc(100vw-2rem)] max-w-3xl overflow-y-auto rounded-xl border bg-card p-4 text-foreground shadow-xl backdrop:bg-black/60">
-  {open&&<>{children}<SwpDemandEditor review={review} disabled={disabled} onReview={onReview} onCancel={onCancel}/></>}
+  {open&&<><SwpDemandEditor review={review} disabled={disabled} onReview={onReview} onCancel={onCancel}/>{children&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2">Reviewed results and input types</summary>{children}</details>}</>}
  </dialog>;
 }

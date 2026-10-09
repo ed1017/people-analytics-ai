@@ -50,6 +50,8 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  check(mode+' explicit request focuses first field',await editor().getByLabel('Planning months',{exact:true}).evaluate(el=>el===document.activeElement));
  await page.keyboard.press('Tab');check(mode+' keyboard traverses labelled fields',await editor().getByLabel('Planning start',{exact:true}).evaluate(el=>el===document.activeElement));
  await editor().getByLabel('Planning months',{exact:true}).fill('9');
+ check(mode+' popup opens directly into editable boxes without an Edit gate',await editor().getByLabel('Planning months',{exact:true}).inputValue()==='9'&&await editor().getByRole('button',{name:/^Edit\b/i}).count()===0);
+ check(mode+' advanced inputs and source explanations start collapsed',await editor().locator('details').evaluateAll(nodes=>nodes.every(node=>!node.open)));
  await send('Open the editor');check(mode+' repeated request preserves unsaved edits',await editor().getByLabel('Planning months',{exact:true}).inputValue()==='9');
  await send('Use these assumptions');check(mode+' pending editor explains blocked acceptance',await page.getByTestId('reply').textContent().then(s=>s.includes('Review planning inputs or cancel'))&&await editor().getByLabel('Planning months',{exact:true}).inputValue()==='9');
  await button('Cancel input edits').click();check(mode+' cancel leaves review and storage unchanged',await editor().count()===0&&JSON.stringify(await saved())===JSON.stringify(original));
@@ -57,11 +59,13 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  await send('Open the editor');await editor().getByLabel('Planning months',{exact:true}).fill('7');await interrupt('Review an illustrative managed-services example');await editor().waitFor({state:'detached'});
  check(mode+' replacement review invalidates stale draft',JSON.stringify(await saved())===JSON.stringify(original));
  await send('Open the editor');check(mode+' reopening restores original values',await editor().getByLabel('Planning months',{exact:true}).inputValue()==='12');
- await editor().getByLabel('Uncommitted availability (%)',{exact:true}).fill('101');await button('Review planning inputs').click();check(mode+' invalid value leaves editor open',await editor().getByRole('alert').isVisible()&&JSON.stringify(await saved())===JSON.stringify(original));
- await editor().getByLabel('Uncommitted availability (%)',{exact:true}).fill('0');await editor().getByLabel('Planning months',{exact:true}).fill('9');
+ await editor().getByLabel('Available team time (%)',{exact:true}).fill('101');await button('Review planning inputs').click();check(mode+' invalid value leaves editor open',await editor().getByRole('alert').isVisible()&&JSON.stringify(await saved())===JSON.stringify(original));
+ await editor().getByLabel('Available team time (%)',{exact:true}).fill('0');await editor().getByLabel('Planning months',{exact:true}).fill('9');
  check(mode+' editor reflows without viewport overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
- check(mode+' inputs and editor actions retain touch size',await editor().locator('input,select,button').evaluateAll(nodes=>nodes.every(el=>el.getBoundingClientRect().height>=44)));
+ check(mode+' visible inputs and editor actions retain touch size',await editor().locator('input,select,button,summary').evaluateAll(nodes=>nodes.filter(el=>el.checkVisibility()).every(el=>el.getBoundingClientRect().height>=44)));
+ await editor().getByText('Advanced role assumptions',{exact:true}).click();
  check(mode+' all editable controls have accessible labels',await editor().getByRole('spinbutton').count()===10&&await editor().getByRole('combobox').count()===2&&await editor().getByLabel('Planning start',{exact:true}).count()===1);
+ await editor().getByText('Advanced role assumptions',{exact:true}).click();
  await editor().screenshot({path:path.join(output,mode+'-editor.png')});
  await button('Review planning inputs').scrollIntoViewIfNeeded();
  await button('Review planning inputs').click();try{await editor().waitFor({state:'detached',timeout:5000});}catch(error){console.error(JSON.stringify({editor:await editor().innerText(),inputs:await editor().locator('input').evaluateAll(nodes=>nodes.map(el=>[el.parentElement.textContent,el.value])),errors,disabled:await button('Review planning inputs').isDisabled()}));throw error;}
@@ -74,7 +78,7 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  await send('Use these assumptions');check(mode+' repeated acceptance preserves review',await page.getByTestId('reply').textContent().then(s=>s.includes('already accepted'))&&await provenance().textContent()===editedProvenance&&JSON.stringify(await saved())===JSON.stringify(original));
  await send('Open the editor');await editor().getByLabel('Existing roles',{exact:true}).fill('4');await page.keyboard.press('Escape');
  check(mode+' Escape preserves accepted scenario',await editor().count()===0&&await button('Assumptions accepted for scenario use').isDisabled());
- await send('Open the editor');await editor().getByLabel('Existing roles',{exact:true}).fill('4');await editor().getByLabel('Uncommitted availability (%)',{exact:true}).fill('25');
+ await send('Open the editor');await editor().getByLabel('Existing roles',{exact:true}).fill('4');await editor().getByLabel('Available team time (%)',{exact:true}).fill('25');
  await button('Review planning inputs').click();await button('Use your assumptions for now').click();await button('Assumptions accepted for scenario use').waitFor();
  check(mode+' revised positive capacity retains nine months and excludes internal pools',await page.getByLabel('Calculated managed-services workload bridge').innerText().then(s=>s.includes('4 existing roles')&&s.includes('25%')&&s.includes('4 whole roles')));
  const options=page.getByRole('radio');await options.first().waitFor();await options.first().check();await button('Review selected Action Plan').click();try{await button('Cancel review').waitFor({timeout:5000});}catch(error){await fs.writeFile(path.join(output,mode+'-failure.txt'),await page.locator('main').innerText());console.error('Synthetic failure evidence: '+path.join(output,mode+'-failure.txt'));throw error;}await button('Cancel review').click();
