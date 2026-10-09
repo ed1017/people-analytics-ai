@@ -261,3 +261,56 @@ test('actual route keeps related planning follow-up guidance but drops it on a n
   assert.equal(request.tool_choice,'none');
  }
 });
+
+test('actual planning follow-up POSTs keep recommendation-first guidance with sparse or unavailable sources and no automatic preparation',async()=>{
+ const proposal='Conditionally compare hiring and training. Costs, timing and availability remain proposed assumptions or unknown.';
+ for(const packet of [{sources:[]},{sources:[{id:'W1',status:'unavailable',facts:{headcount:999999}}]},{sources:[{id:'W1',status:'loaded',facts:{headcount:12}}]}]){
+  for(const message of ['Or how about both?','Can we do it cheaper?','Could we do that sooner?','What about a different team?','Yes to training, but not hiring.','Actually, 25% not 50%.',"We don't have those numbers."]){
+   const history=[{role:'user',content:planningPrompts[1]},{role:'assistant',content:proposal},{role:'user',content:'Or how about both?'},{role:'assistant',content:proposal}];
+   const reply={answer:'Synthetic response; not a semantic evaluation.',finding_followups:[],next_step:'choose_goal',problem:'Unrequested preparation',problem_evidence:[],options:[],question:'Open a form?'};
+   sandbox.__replies.push({status:'completed',output:[],output_text:JSON.stringify(reply)});
+   const before=sandbox.__requests.length;
+   const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',message,history,overviewBriefingContext:packet})}));
+   assert.equal(response.status,200);assert.equal(sandbox.__requests.length,before+1);
+   const request=sandbox.__requests.at(-1);
+   assert.equal(request.model,'gpt-5.6-luna');assert.equal(request.tool_choice,'none');
+   assert.match(request.instructions,/CURRENT TURN PURPOSE: answer/);
+   assert.match(request.instructions,/Lead with a useful grounded or clearly conditional recommendation/);
+   assert.match(request.instructions,/Offer optional deeper exploration afterward/);
+   assert.match(request.instructions,/hybrid when complementary work, timing and constraints justify it/);
+   assert.match(request.instructions,/Missing or unavailable sources remain unknown/);
+   assert.match(request.instructions,/do not open or require an assumption editor or form unless the user explicitly requests it/);
+   assert.match(request.instructions,/keep unsupported measured\/source values unknown/);
+   assert.ok(JSON.stringify(request.input).includes(message));
+   assert.ok(JSON.stringify(request.input).includes('proposed assumptions or unknown'));
+   if(packet.sources[0]?.status==='unavailable')assert.ok(!JSON.stringify(request.input).includes('999999'),'unavailable source values cannot enter the model evidence');
+   const decoded=await response.json();assert.equal(decoded.answer,reply.answer);assert.equal(decoded.nextStep,'none');assert.equal(decoded.candidateProposal,null);assert.equal(decoded.clarification,null);
+  }
+ }
+});
+
+test('actual nonplanning or switched-topic POSTs receive no planning recommendation override',async()=>{
+ const proposal='Conditionally compare hiring and training.';
+ const cases=[
+  ['Or how about both?',[],{sources:[]}],
+  ['Can we do it cheaper?',[{role:'user',content:'Compare these recipes.'},{role:'assistant',content:proposal}],{sources:[]}],
+  ['What movies should I watch?',[{role:'user',content:planningPrompts[1]},{role:'assistant',content:proposal}],{sources:[]}],
+  ['Or how about both?',[{role:'user',content:planningPrompts[1]},{role:'assistant',content:proposal},{role:'user',content:'New topic: movies.'},{role:'assistant',content:proposal}],{sources:[]}],
+ ];
+ for(const [message,history,packet] of cases){
+  sandbox.__replies.push({status:'completed',output:[],output_text:JSON.stringify({answer:'Synthetic ordinary answer.',finding_followups:[],next_step:'none',problem:null,problem_evidence:[],options:[],question:null})});
+  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',message,history,overviewBriefingContext:packet})}));
+  assert.equal(response.status,200);assert.doesNotMatch(sandbox.__requests.at(-1).instructions,/STRATEGIC WORKFORCE PLANNING CLARIFICATION/);
+ }
+});
+
+test('actual Home POST offers the popup invitation only for explicit UI availability and active planning',async()=>{
+ for(const [message,available,expected] of [[planningPrompts[1],false,false],[planningPrompts[1],'true',false],[planningPrompts[1],true,true],['What movies should I watch?',true,false]]){
+  sandbox.__replies.push({status:'completed',output:[],output_text:JSON.stringify({answer:'Synthetic response.',finding_followups:[],next_step:'none',problem:null,problem_evidence:[],options:[],question:null})});
+  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',message,history:[],overviewBriefingContext:{sources:[]},planningCalculatorAvailable:available})}));
+  assert.equal(response.status,200);
+  const request=sandbox.__requests.at(-1);assert.equal(request.tool_choice,'none');assert.equal(request.model,'gpt-5.6-luna');
+  assert.equal(request.instructions.includes('Tell me in chat, or open the Planning Calculator.'),expected);
+  if(expected)assert.match(request.instructions,/never invent a navigation link, new tab, form opening, supported field or calculated update/);
+ }
+});
