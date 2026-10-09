@@ -51,7 +51,45 @@ test('actual full-app POST adds scoped recommendation guidance and preserves che
   assert.match(sent.instructions,/State the decisive condition briefly alongside the recommendation, without a caveat list/);
   assert.match(sent.instructions,available===true&&c.demandProposal?/UI supplies the optional popup control/:/No Planning Calculator popup control/);
   assert.deepEqual(sent.tools,demandReferenceModelContract.tools);assert.deepEqual(sent.text.format,demandReferenceModelContract.responseFormat);
-  assert.equal(sent.model,'gpt-5.6-luna');assert.equal(sent.parallel_tool_calls,false);assert.equal(sent.max_output_tokens,5000);
+  assert.equal(sent.model,'gpt-6.1-sol');assert.deepEqual(sent.reasoning,{effort:'medium'});assert.equal(sent.service_tier,'default');assert.equal(sent.parallel_tool_calls,false);assert.equal(sent.max_output_tokens,5000);
   const reply=await result.json();assert.equal(reply.demandReview,undefined);assert.deepEqual(reply.candidateIds,[]);assert.equal(JSON.stringify(body),before);
  }
+});
+
+test('general Home and validated SWP use the route policy without client model or tier overrides',async()=>{
+ const fictional={conversationMode:'fictional-swp-demo-v1',classification:'fictional-scenario',goalId:'guided-swp-policy-test',goal:'Review fictional capacity',datasetToken:'legacy-v1:0',revision:1};
+ for(const [mode,body,profile] of [
+  [null,solutionRequest('Would a mix of training and hiring help?'),false],
+  [SWP_DEMAND_MODE,make(true),false],
+  [SWP_DEMAND_MODE,make(true),true],
+  ['fictional-swp-demo-v1',readSolutionRequest({...solutionRequest('Compare the fictional options'),goalContext:{scenarioReview:fictional}}),true],
+ ]){
+  sandbox.process.env.SWP_DEMO_MODEL_PROFILE=profile?'medium-acceptance-v1':'';
+  sandbox.process.env.SWP_DEMO_MODEL_ID=profile?'gpt-6.1-sol':'';
+  const n=sandbox.__requests.length;
+  sandbox.__replies.push({status:'completed',output:[],output_text:JSON.stringify(final('Synthetic conditional recommendation.'))});
+  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/home-solution-conversation',{method:'POST',headers:{'content-type':'application/json',...(mode?{'x-workforce-conversation':mode}:{})},body:JSON.stringify({...body,model:'client-model',reasoning:{effort:'low'},service_tier:'priority'})}));
+  assert.equal(response.status,200);assert.equal(sandbox.__requests.length,n+1);
+  const sent=JSON.parse(JSON.stringify(sandbox.__requests.at(-1))),options=sandbox.__requestOptions.at(-1);
+  assert.equal(sent.model,'gpt-6.1-sol');assert.deepEqual(sent.reasoning,{effort:'medium'});assert.equal(sent.service_tier,'default');
+  assert.equal(sent.max_output_tokens,5000);assert.equal(sent.parallel_tool_calls,false);assert.equal(options.maxRetries,0);assert.equal(options.timeout,30000);
+ }
+ delete sandbox.process.env.SWP_DEMO_MODEL_PROFILE;delete sandbox.process.env.SWP_DEMO_MODEL_ID;
+});
+
+test('invalid SWP bindings and conflicting server configuration stop before a provider request',async()=>{
+ for(const [mode,body,profile,model] of [
+  ['unsupported',make(true),'',''],
+  [SWP_DEMAND_MODE,solutionRequest('No bound scenario'),'',''],
+  [SWP_DEMAND_MODE,{...make(true),goalContext:{scenarioReview:{...reviewed,datasetToken:'other-v1:1'}}},'',''],
+  [SWP_DEMAND_MODE,make(true),'medium-acceptance-v1','gpt-5.6-luna'],
+  [SWP_DEMAND_MODE,make(true),'unsupported-profile','gpt-6.1-sol'],
+  [SWP_DEMAND_MODE,make(true),'medium-acceptance-v1',''],
+ ]){
+  sandbox.process.env.SWP_DEMO_MODEL_PROFILE=profile;sandbox.process.env.SWP_DEMO_MODEL_ID=model;
+  const n=sandbox.__requests.length;
+  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/home-solution-conversation',{method:'POST',headers:{'content-type':'application/json','x-workforce-conversation':mode},body:JSON.stringify(body)}));
+  assert.equal(response.status,422);assert.equal(sandbox.__requests.length,n);
+ }
+ delete sandbox.process.env.SWP_DEMO_MODEL_PROFILE;delete sandbox.process.env.SWP_DEMO_MODEL_ID;
 });

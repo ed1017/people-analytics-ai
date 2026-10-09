@@ -1,8 +1,8 @@
 # Fluid planning integration source
 
-This separate source combines full-app reference/build `6adf0a9d2f84edb9c27357b5e25fcd3529f16df0`, calculator PR188 `8a81f8c810750a9394f69c6126117f457432d34c`, and final PR187 continuity successor `1441dcaea8f1e33c08334a3e0168d2bde232f296`. It also simplifies the optional calculator popup. PR186 and PR189 are excluded. Runtime feature flags, model selection, frozen reference contents, and saved data remain unchanged. Publication of this source is separate from permission to merge, deploy or make provider calls.
+This separate source combines full-app reference/build `6adf0a9d2f84edb9c27357b5e25fcd3529f16df0`, calculator PR188 `8a81f8c810750a9394f69c6126117f457432d34c`, and final PR187 continuity successor `1441dcaea8f1e33c08334a3e0168d2bde232f296`. It also simplifies the optional calculator popup. PR186 and PR189 are excluded. Runtime feature flags, frozen reference contents, and saved data remain unchanged. The route-scoped model policy successor is described below. Publication of this source is separate from permission to merge, deploy or make provider calls.
 
-`vercel.json` disables automatic Git deployment for the exact source branch `codex/swp-fluid-apply-cost-review-20261009` only. It does not change any existing production branch setting. This follows [Vercel's branch-specific deployment control](https://vercel.com/docs/project-configuration/git-configuration#git.deploymentenabled) so publishing the source does not request a preview rollout. Any later branch rename or deployment requires a fresh review of that setting.
+`vercel.json` disables automatic Git deployment for the exact source branch `codex/home-solution-sol-policy-20261009` only. It does not change any existing production branch setting. This follows [Vercel's branch-specific deployment control](https://vercel.com/docs/project-configuration/git-configuration#git.deploymentenabled) so publishing the source does not request a preview rollout. Any later branch rename or deployment requires a fresh review of that setting.
 
 ## Grounded comparative recommendations successor
 
@@ -21,6 +21,14 @@ The reset occurs before storage in `proposalFromReport`: every changed cash line
 Version 1 proposal/history replay retains the original reset rule and exact contents. A new version 2 selection appends independently instead of replacing a matching older entry. No migration or automatic repair of already-saved Unknown values occurs. The new fixture records the original failure from the predecessor; it is fictional local test data, not exported operational records.
 
 Validation: 52 focused tests, TypeScript, scoped lint and diff checks pass with network blocked and no provider key. The regression crosses actual mix preparation, reconciliation, browser DecisionStore persistence, reload, explicit attachment confirmation and attachment history. It preserves $26,800 conditional cash, 80 staff hours, zero added employees and one feasible candidate within the stated fictional assumptions; negative tests retain genuine unknowns and legacy history. The full hosted browser check remains separate. Existing guidance-only production-build evidence is reused; it is not represented as a production build of this successor.
+
+## Home solution route model policy successor
+
+This separate successor starts from preserved Apply/reload repair `b550102e08456aa13584c24667ffe8c94037ef2d`. The actual `/api/home-solution-conversation` route now sends `gpt-6.1-sol`, medium reasoning and explicit `service_tier: default` for both general Home and valid SWP requests. The model/tier policy is a server-owned constant in that route, not a client field or hidden test override. SWP mode and dataset binding validation still run; a configured SWP model that conflicts with Sol is rejected before transport. An absent SWP profile no longer makes this route fall back to Luna. The shared `CHAT_MODEL` and every unrelated route remain unchanged.
+
+No credentials or environment settings are modified. Enable the existing full-conversation feature at build time to route general Home through this endpoint; when disabled, ordinary `/api/chat` retains its existing Luna policy. Goal-progress behavior continues to follow its separate existing flag. Current valid Sol SWP profile settings may remain in place. SDK retries, call/turn deadlines, output limit, tools, instructions, dataset guards and deliberate review/save controls remain unchanged.
+
+Validation passed 87 targeted route-policy, legacy-Home, save/reload, cost-unknown and historical-replay tests, scoped lint, and a production Webpack build including TypeScript and all six prebuild artifact checks. Build-time flags enabled full Home conversation and goal progress; dummy Supabase values and a network-blocking preload prevented remote calls. No model key, provider call, deployment or hosted acceptance occurred. The separate acceptance harness must verify the actual route's Standard tier without inserting one.
 
 ## Calculator ownership and direct editing
 
