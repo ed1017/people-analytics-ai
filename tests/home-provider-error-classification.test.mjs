@@ -44,7 +44,11 @@ test('actual POST keeps one overall deadline across longer provider calls withou
   }});
   isolated.sandbox.__replies.shift=()=>client.responses.create(isolated.sandbox.__requests.at(-1),isolated.sandbox.__requestOptions.at(-1));
   const task=isolated.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',headers:{'x-workforce-dataset':'legacy-v1:0'},body:JSON.stringify(body)})).then(value=>{settled=true;return value;});
-  const flush=async()=>{await drain();await drain();};await flush();assert.equal(dispatches.length,1,JSON.stringify({logs,requests:isolated.sandbox.__requests.length,settled,deadlines}));
+  const flush=async()=>{await drain();await drain();};
+  // Wait for the synthetic transport before advancing its clock. Concurrent bundling can
+  // take more than two event-loop turns; elapsed wall time is not provider latency.
+  for(let turn=0;dispatches.length===0&&!settled&&turn<100;turn++)await drain();
+  assert.equal(dispatches.length,1,JSON.stringify({logs,requests:isolated.sandbox.__requests.length,settled,deadlines}));
   const advance=async ms=>{t.mock.timers.tick(ms);await flush();};
   await advance(30000);assert.equal(settled,false,'The former 30-second cutoff does not end this request');
   if(scenario==='slow_success'){

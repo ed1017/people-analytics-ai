@@ -8,7 +8,7 @@ import type {GuidedActionRegistry} from '@/components/home-guided-actions';
 import {GUIDED_EXAMPLE_PROMPT} from '@/lib/home-decision-journey';
 export {GUIDED_EXAMPLE_PROMPT} from '@/lib/home-decision-journey';
 export const guidedEditPrompt=(number:number)=>`In Action Plan #${number} set coordination hours to 24`;
-const conversationalPrompt='I want to reduce turnover. Suggest three proposed Action Plans we can refine together. This is a fictional example; leave missing scope, costs, dates and targets unknown.';
+const conversationalPrompt='I want to reduce turnover. Suggest an actionable proposed plan we can refine together. This is a fictional example; leave missing scope, costs, dates and targets unknown.';
 const legacySteps=[
  ['Review the retention example','Start a separate example conversation. Your current conversation and draft are kept. No question is sent until you use the real Send button.'],
  ['Submit the example question','Review the prefilled question, then follow Next → Submit to the actual Send button. Wait for the answer before pinning.'],
@@ -22,7 +22,7 @@ const legacySteps=[
 const conversationSteps=[
  ['Review the retention example','Start a separate example conversation. Your current conversation and draft are kept. Send only when you are ready.'],
  ['Describe the goal in chat','Review the example question, then use the actual Send button. A useful reply can propose approaches without saving a goal yet.'],
- ['Explore and refine the approach','Compare the three proposed Action Plans and the conditional recommendation, then say what to keep, replace or combine. Team focus is optional after the plans. Review suggested owners, steps, measures and unknowns.'],
+ ['Explore and refine the approach','Review the proposed Action Plan and its conditional recommendation, then say what to keep or change. You can ask for another approach or optionally focus on a team. Review suggested owners, steps, measures and unknowns.'],
  ['Choose a plan','Review any proposed plan and choose it using its own button. Selection saves the goal and attaches the proposal automatically. There is no separate pin step or form to complete.'],
  ['Refine your selected plan in chat','Describe another adjustment and Send. Reuse the known context; mention only what should change. The original proposal stays attached.'],
  ['Choose the revised plan','Review the new proposal and its unknowns, then choose it. Both versions remain in the goal history.'],

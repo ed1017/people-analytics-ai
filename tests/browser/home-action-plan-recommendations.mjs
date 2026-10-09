@@ -14,7 +14,7 @@ import {solutionConversationField} from '../../lib/home-solution-conversation.ts
 import {planAlternativesField} from '../../lib/home-plan-alternatives.ts';
 import {offlineBusinessRoute} from '../helpers/offline-business-route.mjs';
 import {responseForStep} from '../fixtures/natural-business-planning.mjs';
-import {productQuestion,turnoverQuestion,recommendationSteps,actionPlans,batch,combinedPlan,fourPlanSteps,answeredOwnerPlan,refinementQuestions} from '../fixtures/action-plan-recommendations.mjs';
+import {productQuestion,turnoverQuestion,recommendationSteps,actionPlans,combinedPlan,fourthPlan,answeredOwnerPlan,refinementQuestions} from '../fixtures/action-plan-recommendations.mjs';
 import {final,evaluate} from '../fixtures/home-solution-conversation.mjs';
 import {homeStarterGroups} from '../../lib/contextual-prompts.ts';
 import {homeDefinitions} from '../../lib/home-pack.mjs';
@@ -58,13 +58,14 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
   if(url.pathname==='/api/home-solution-conversation'){
    const body=req.postDataJSON();requests.push(body);let steps;
    assert.equal(req.headers()['x-workforce-conversation'],undefined);
-   if(body.message.text===productQuestion)steps=fourPlanSteps('product',body);
+   if(body.message.text===productQuestion)steps=recommendationSteps('product',body);
    else if(body.message.text===turnoverQuestion)steps=recommendationSteps('turnover',body);
+   else if(body.message.text==='Combine the pilot activities as a fourth proposal.'){const hybrid=fourthPlan('product',body);steps=[evaluate(hybrid),final('The additional pilot combination is ready for review.',[hybrid.id])];}
    else if(body.message.text==='The product owner can own the pilot review for the first plan. Keep its other activities.'){
     const edited=answeredOwnerPlan(body);steps=[evaluate(edited),{...final('The first plan now has a product owner for pilot review; scope is still unknown.',[edited.id]),questions:refinementQuestions('product').slice(0,1)}];
    }else if(body.message.text==='Develop an action plan'){
     const original=body.state.turns.find(turn=>turn.role==='user'&&turn.text===productQuestion),plans=actionPlans('product',{message:original});
-    steps=[batch(plans),final('The detailed product plans are ready to review.',plans.map(plan=>plan.id))];
+    steps=[...plans.map(plan=>evaluate(plan)),final('The detailed product plans are ready to review.',plans.map(plan=>plan.id))];
    }else if(body.message.text==='Let us discuss the second proposed plan.')steps=[{...final('The second proposal is our discussion focus; nothing has been saved.'),focusCandidateId:body.state.working[1].id}];
    else if(body.message.text==='Combine the delivery activities from the first two proposed plans.'){
     const combined=combinedPlan(body);steps=[evaluate(combined),final('The combined delivery proposal is ready to review; overlap and costs remain unknown.',[combined.id])];
@@ -76,7 +77,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
    isolated.sandbox.__replies.push(...steps.map(responseForStep));
    const response=await isolated.post(new Request(req.url(),{method:req.method(),headers:req.headers(),body:req.postData()})),bytes=await response.text();
    assert.equal(response.status,200,bytes);assert.equal(isolated.sandbox.__replies.length,0);
-   for(const sent of isolated.sandbox.__requests){assert.equal(JSON.parse(sent.input[0].content.split('\n').slice(1).join('\n')).evidenceGrounding.databaseIntegrityCertified,false);assert.equal(sent.model,'gpt-6.1-sol');assert.equal(sent.max_output_tokens,5000);assert.ok(sent.tools.some(tool=>tool.name==='evaluate_action_plans'));assert.match(sent.instructions,/RECOMMENDATIONS ARE ACTION PLANS/);assert.match(sent.instructions,/focus.*optional afterward/);assert.match(sent.instructions,/start with a short summary/);assert.match(sent.instructions,/After the plans, add a concise optional further reading and investigations section/);assert.match(sent.instructions,/never fabricate a source, title, URL/);}
+   for(const sent of isolated.sandbox.__requests){assert.equal(JSON.parse(sent.input[0].content.split('\n').slice(1).join('\n')).evidenceGrounding.databaseIntegrityCertified,false);assert.equal(sent.model,'gpt-6.1-sol');assert.equal(sent.max_output_tokens,5000);assert.ok(sent.tools.some(tool=>tool.name==='evaluate_candidate'));assert.ok(!sent.tools.some(tool=>['evaluate_action_plans','read_workforce_planning_playbook'].includes(tool.name)));assert.match(sent.instructions,/lead with an actionable proposed Action Plan/);assert.match(sent.instructions,/Focus is optional/);assert.match(sent.instructions,/Missing population, dates, costs or capacity must remain unknown/);assert.match(sent.instructions,/Empty evidenceIds is correct when no supplied item supports an activity/);assert.match(sent.instructions,/invent no effect sizes, savings, available resources or approvals/);}
    return route.fulfill({status:200,contentType:'application/json',body:bytes});
   }
   assert.equal(req.method(),'GET');
@@ -88,7 +89,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
  // Existing guide remains the entry, preserves the draft and does not auto-send.
  await chat.fill('Keep my unfinished question');await button('Show instructions')[click]();await button('Try a guided example')[click]();
  const guide=page.getByRole('dialog',{name:'Optional guided demo'});await guide.waitFor();await guide.getByRole('button',{name:'Next → Start example',exact:true})[click]();
- await page.waitForFunction(()=>document.querySelector('[aria-label="Ask Workforce AI"]')?.value.includes('three proposed Action Plans'));
+ await page.waitForFunction(()=>document.querySelector('[aria-label="Ask Workforce AI"]')?.value.includes('an actionable proposed plan'));
  check(mode+' existing guide starts with real chat and no request',requests.length===0&&await guide.count()===1);
  await guide.getByRole('button',{name:'Exit guide',exact:true})[click]();await guide.waitFor({state:'detached'});
  check(mode+' exiting guide restores the draft and original saved demo goals',await chat.inputValue()==='Keep my unfinished question'&&JSON.stringify((await state()).goals)===demoGoals);
@@ -103,7 +104,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
  for(const [kind,question] of [['turnover',turnoverQuestion],['product',productQuestion]]){
   if(kind==='product')await button('Reset conversation')[click]();
   await chat.fill(question);await button('Send overview question')[click]();await page.getByRole('article',{name:'Working proposal: '+(kind==='product'?'Hire after capacity review':'Improve manager check-ins'),exact:true}).waitFor();
-  const expectedCount=kind==='product'?4:3;
+  const expectedCount=3; // Scripted storage/interaction coverage, not a live-model guarantee.
   const s=await state(),plans=working(s).working,articles=page.getByRole('article',{name:/^Working proposal:/});
   check(mode+' '+kind+' renders summary and information then several plans, optional questions and investigations with no goal save',await articles.count()===expectedCount&&plans.length===expectedCount&&JSON.stringify(s.goals)===demoGoals&&!s.exploration.fields[planAlternativesField]&&working(s).turns.at(-1).text.startsWith('Summary: I recommend ')&&working(s).turns.at(-1).text.indexOf('Proposed Action Plan 3')<working(s).turns.at(-1).text.indexOf('Further reading and investigations:')&&working(s).turns.at(-1).text.indexOf('Further reading and investigations:')<working(s).turns.at(-1).text.indexOf('optionally focus'));
   check(mode+' '+kind+' cards retain steps owners timing intended outcomes and success measures',await articles.first().getByText('Suggested owner:',{exact:true}).count()===2&&await articles.first().getByText('Timing:',{exact:true}).count()===2&&await articles.first().getByText('Success measure:',{exact:true}).count()===1&&await articles.first().getByText('Intended outcome:',{exact:true}).count()===1);
@@ -116,6 +117,8 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
   check(mode+' '+kind+' questions impose no form or selection lock',await questions.getByRole('textbox').count()===0&&await articles.first().getByRole('button',{name:'Choose this plan with unknowns',exact:true}).isEnabled());
   await page.screenshot({path:path.join(output,mode+'-'+kind+'-plans.png'),fullPage:true});
  }
+ await send('Combine the pilot activities as a fourth proposal.','The additional pilot combination is ready for review.');
+ check(mode+' a later individually checked hybrid preserves four current proposals',await page.getByRole('article',{name:/^Working proposal:/}).count()===4);
  const beforeAnswer=working(await state());
  await send('The product owner can own the pilot review for the first plan. Keep its other activities.','The first plan now has a product owner for pilot review; scope is still unknown.');
  const afterAnswer=working(await state()),revised=afterAnswer.working.at(-1);
@@ -142,7 +145,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
  check(mode+' existing demo plan data remains byte-identical',oldExamples.every(([id,fields])=>JSON.stringify(current.workspaces[id].fields)===JSON.stringify(fields)));
  const capacityGoal=original.goals.goals.find(goal=>goal.statement==='Add 5 roles over 12 months');
  await button('Open goal: '+capacityGoal.statement)[click]();await page.getByRole('region',{name:'Action Plans for your goal',exact:true}).waitFor();
- check(mode+' existing five-role demo still opens through Pinned Goals without a model request',(await state()).goals.activeId===capacityGoal.id&&requests.length===9&&await page.getByRole('region',{name:'Action Plans for your goal',exact:true}).getByText('Demo example',{exact:true}).isVisible());
+ check(mode+' existing five-role demo still opens through Pinned Goals without a model request',(await state()).goals.activeId===capacityGoal.id&&requests.length===10&&await page.getByRole('region',{name:'Action Plans for your goal',exact:true}).getByText('Demo example',{exact:true}).isVisible());
  check(mode+' no overflow or browser errors',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&blocked.length===0);
  transport.push({mode,requests:requests.length,errors,blocked});await context.close();
 }}catch(error){for(const context of browser.contexts())for(const page of context.pages()){await fs.writeFile(path.join(output,'failure.txt'),await page.locator('body').innerText()).catch(()=>{});await page.screenshot({path:path.join(output,'failure.png'),fullPage:true}).catch(()=>{});}console.error(JSON.stringify({output,transport}));throw error;}finally{await browser.close();}
