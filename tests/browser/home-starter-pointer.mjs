@@ -75,7 +75,7 @@ try{for(const [mode,width,height] of [['wide',1844,1100],['desktop',1366,900],['
  };
  for(let index=0;index<12;index++){
   await sendTurn(['Or how about both?','Budget is $20000.','We need it sooner.'][index%3]);
-  check(mode+' long turn '+index+' carries only recognized user objective',posts.at(-1).planningObjective===items[0].prompt&&Object.keys(posts.at(-1)).filter(key=>key.startsWith('planning')).join(',')==='planningObjective');
+  check(mode+' long turn '+index+' carries recognized objective and independent unavailable calculator hint',posts.at(-1).planningObjective===items[0].prompt&&posts.at(-1).planningCalculatorAvailable===false&&Object.keys(posts.at(-1)).filter(key=>key.startsWith('planning')).sort().join(',')==='planningCalculatorAvailable,planningObjective');
  }
  check(mode+' opener falls outside model window but remains in visible transcript',!posts.at(-1).history.some(turn=>turn.content===items[0].prompt)&&await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText(items[0].prompt,{exact:true}).count()===1);
  await sendTurn('New topic: movies.');

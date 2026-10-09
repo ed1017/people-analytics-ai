@@ -3,6 +3,7 @@ import {useState} from 'react';
 import {OverallOverviewPage} from '@/components/pages/overall-overview-page';
 import {useProblemConversation} from '@/components/problem-conversation';
 import {emptyDevelopmentSession} from '@/components/development-workspace';
+import {DatasetBoundary} from '@/components/dataset-boundary';
 const noop=()=>{},development=emptyDevelopmentSession();
 function Fixture(){
  const conversation=useProblemConversation(),[active,setActive]=useState(true);
@@ -10,4 +11,4 @@ function Fixture(){
  return <main><button onClick={()=>setActive(value=>!value)}>Back or return</button><button onClick={()=>conversation.selectGoal('a')}>Goal A</button><button onClick={()=>conversation.selectGoal('b')}>Goal B</button><button onClick={()=>{prior()?.click();setActive(false)}}>Click then navigate</button><button onClick={()=>{prior()?.click();conversation.selectGoal('b')}}>Click then goal switch</button><button onClick={()=>{conversation.setInput('Keep queued draft');prior()?.click()}}>Queue draft then click</button>
  <button onClick={()=>{conversation.setInput("Keep queued pin draft");[...document.querySelectorAll<HTMLButtonElement>("button")].find(node=>node.textContent==="Pin as goal")?.click()}}>Queue draft then pin</button><div hidden={!active}><OverallOverviewPage active={active} onNavigate={()=>setActive(false)} onStartDemo={noop} persona="HR" workforceQuery="?country=all" workforceScope="Synthetic all countries" conversation={conversation} developmentSession={development} countryOptions={[]} onCountry={noop} onEvidencePack={noop} marketReference={null}/></div></main>;
 }
-createRoot(document.getElementById('root')!).render(<Fixture/>);
+createRoot(document.getElementById('root')!).render(<DatasetBoundary initialToken="legacy-v1:0"><Fixture/></DatasetBoundary>);
