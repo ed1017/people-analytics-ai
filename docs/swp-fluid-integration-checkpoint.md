@@ -2,6 +2,8 @@
 
 This separate source combines full-app reference/build `6adf0a9d2f84edb9c27357b5e25fcd3529f16df0`, calculator PR188 `8a81f8c810750a9394f69c6126117f457432d34c`, and final PR187 continuity successor `1441dcaea8f1e33c08334a3e0168d2bde232f296`. It also simplifies the optional calculator popup. PR186 and PR189 are excluded. Runtime feature flags, model selection, frozen reference contents, and saved data remain unchanged. Publication of this source is separate from permission to merge, deploy or make provider calls.
 
+`vercel.json` disables automatic Git deployment for the exact source branch `codex/swp-fluid-package-integration-20261009` only. It does not change any existing production branch setting. This follows [Vercel's branch-specific deployment control](https://vercel.com/docs/project-configuration/git-configuration#git.deploymentenabled) so publishing the source does not request a preview rollout. Any later branch rename or deployment requires a fresh review of that setting.
+
 ## Calculator ownership and direct editing
 
 `SwpDemandJourney` remains the sole owner of the current `DemandReview`, acceptance key and provenance history. `PlanningCalculatorDialog` receives that review and owns only unsaved input text. An explicit request or the **Open Planning Calculator** button opens one modal directly into editable boxes, with no additional Edit step. Short labels and unit help accompany the fields; advanced role assumptions, source explanations and optional reviewed-results details start collapsed. Source labels remain visible beside inputs. Results remain conditional estimates, never verified actuals.
