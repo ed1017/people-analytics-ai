@@ -10,6 +10,33 @@ import {offlineBusinessRoute} from './helpers/offline-business-route.mjs';
 
 const secret='PRIVATE_PROMPT_ANSWER_NAME_PAY_KEY_HEADER_SENTINEL',token='legacy-v1:0';
 const source=data=>({status:'loaded',data}),signal=()=>new AbortController().signal,drain=()=>new Promise(resolve=>setImmediate(resolve));
+test('successful requests record bounded stage and per-round usage counters without content or inferred usage',t=>{
+ t.mock.timers.enable({apis:['Date'],now:1000});const logs=[];t.mock.method(console,'info',(...args)=>logs.push(args));t.mock.method(console,'error',(...args)=>logs.push(args));
+ const diagnostic=createSolutionDiagnostics(),tick=ms=>t.mock.timers.tick(ms);
+ tick(2);diagnostic.stage('configuration');tick(3);diagnostic.stage('grounding');tick(11);diagnostic.stage('conversation_preparation');tick(5);
+ diagnostic.modelAttempt({inputBytes:123,instructionsBytes:456,toolSchemaBytes:789,body:secret});tick(20);
+ const response={model:'gpt-6.1-sol',service_tier:'default',output:[{reasoning:secret,text:secret}],headers:{authorization:secret},usage:{input_tokens:100,cached:secret,input_tokens_details:{cached_tokens:40},output_tokens:20,output_tokens_details:{reasoning_tokens:5},total_tokens:120}};
+ diagnostic.providerResult(response);diagnostic.providerResult(response);diagnostic.stage('response_validation');tick(7);
+ diagnostic.modelAttempt({inputBytes:1e20,instructionsBytes:-1,toolSchemaBytes:secret});tick(30);
+ diagnostic.providerResult({model:secret,service_tier:secret,usage:new Proxy({},{get(){throw Error(secret);}})});diagnostic.stage('response_validation');tick(2);
+ diagnostic.success({modelRounds:2,toolCalls:1,answer:secret});diagnostic.success({modelRounds:999,toolCalls:999});diagnostic.failure(Error(secret),null,false,false);
+ assert.equal(logs.length,1);assert.equal(logs[0][0],'Home solution conversation completed');const event=logs[0][1];
+ assert.equal(event.elapsedMs,80);assert.deepEqual(event.stageElapsedMs,{request_validation:2,configuration:3,grounding:11,model_setup:0,conversation_preparation:5,provider:50,response_validation:9});
+ assert.equal(event.modelAttempts,2);assert.equal(event.modelRounds,2);assert.equal(event.toolCalls,1);assert.equal(event.providerRounds.length,2);
+ assert.deepEqual(event.providerRounds[0],{attempt:1,elapsedMs:20,inputBytes:123,instructionsBytes:456,toolSchemaBytes:789,model:'gpt-6.1-sol',serviceTier:'default',inputTokens:100,cachedInputTokens:40,outputTokens:20,reasoningTokens:5,totalTokens:120});
+ const absent=event.providerRounds[1];assert.equal(absent.elapsedMs,30);assert.equal(absent.inputBytes,null);assert.equal(absent.instructionsBytes,null);assert.equal(absent.model,null);assert.equal(absent.serviceTier,null);
+ for(const key of ['inputTokens','cachedInputTokens','outputTokens','reasoningTokens','totalTokens'])assert.equal(absent[key],null,'Missing usage is not free usage');
+ assert.doesNotMatch(JSON.stringify(logs),new RegExp(secret));
+ const frozen=JSON.stringify(event);diagnostic.providerResult(response);assert.equal(JSON.stringify(event),frozen);
+});
+
+test('successful logging failure and hostile optional usage cannot change a completed operation',t=>{
+ t.mock.method(console,'info',()=>{throw Error(secret);});const diagnostic=createSolutionDiagnostics();
+ diagnostic.modelAttempt(new Proxy({},{get(){throw Error(secret);}}));
+ assert.doesNotThrow(()=>diagnostic.providerResult(new Proxy({},{get(){throw Error(secret);}})));
+ assert.doesNotThrow(()=>diagnostic.success({modelRounds:1,toolCalls:0}));
+});
+
 function fixture(){
  const results={attrition:source({as_of:'2026-09-30',summary:{total_exits:4,voluntary_exits:3}}),bls:source({latest_date:'2026-09-01',metrics:[{series_id:'LNS14000000',raw_value:4,observation_date:'2026-09-01'}]})};
  const body=solutionRequest(secret);body.evidence=buildHomePack(results,body.scope);return {body,results};
