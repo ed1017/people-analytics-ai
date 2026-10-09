@@ -16,6 +16,7 @@ const firstOutput=[
 ];
 const response=output=>new Response(JSON.stringify({id:'resp_offline',object:'response',status:'completed',model:'gpt-6.1-sol',service_tier:'default',output}),{status:200,headers});
 const drain=()=>new Promise(resolve=>setImmediate(resolve));
+const realSetTimeout=setTimeout,realClearTimeout=clearTimeout;
 
 test('actual POST keeps one overall deadline across longer provider calls without retries',async t=>{
  const isolated=await offlineBusinessRoute();
@@ -23,7 +24,8 @@ test('actual POST keeps one overall deadline across longer provider calls withou
  for(const scenario of ['slow_success','provider_timeout','shared_deadline'])await t.test(scenario,async t=>{
   t.mock.timers.enable({apis:['setTimeout','Date'],now:Date.UTC(2026,9,9,21,30)});
   t.mock.method(globalThis,'fetch',network);
-  const logs=[],deadlines=[],dispatches=[];let shared,settled=false;
+  const logs=[],deadlines=[],dispatches=[],firstDispatch=Promise.withResolvers();let shared,settled=false;
+  t.after(()=>shared?.abort());
   isolated.sandbox.Date=Date;isolated.sandbox.console={error:(...args)=>logs.push(args)};
   isolated.sandbox.AbortSignal={any:signals=>AbortSignal.any(signals),timeout:ms=>{
    deadlines.push(ms);shared=new AbortController();setTimeout(()=>shared.abort(new DOMException('Synthetic shared deadline','TimeoutError')),ms);return shared.signal;
@@ -33,6 +35,7 @@ test('actual POST keeps one overall deadline across longer provider calls withou
   body.evidence=buildHomePack(sources,body.scope);isolated.sandbox.__aggregateSources=sources;
   const client=new OpenAI({apiKey:'synthetic-sdk-only',maxRetries:0,logLevel:'off',fetch:async(_url,init)=>{
    dispatches.push({at:Date.now(),signal:init.signal});
+   firstDispatch.resolve();
    assert.equal(new Headers(init.headers).get('x-stainless-retry-count'),'0');
    const index=dispatches.length,delay=scenario==='slow_success'?(index===1?45000:5000):scenario==='shared_deadline'&&index===1?50000:null;
    return new Promise((resolve,reject)=>{
@@ -45,9 +48,11 @@ test('actual POST keeps one overall deadline across longer provider calls withou
   isolated.sandbox.__replies.shift=()=>client.responses.create(isolated.sandbox.__requests.at(-1),isolated.sandbox.__requestOptions.at(-1));
   const task=isolated.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',headers:{'x-workforce-dataset':'legacy-v1:0'},body:JSON.stringify(body)})).then(value=>{settled=true;return value;});
   const flush=async()=>{await drain();await drain();};
-  // Wait for the synthetic transport before advancing its clock. Concurrent bundling can
-  // take more than two event-loop turns; elapsed wall time is not provider latency.
-  for(let turn=0;dispatches.length===0&&!settled&&turn<100;turn++)await drain();
+  // WebCrypto grounding can outlast an arbitrary number of event-loop turns.
+  // Synchronize on dispatch before advancing the fake provider clock.
+  let dispatchTimer;
+  try{await Promise.race([firstDispatch.promise,new Promise((_,reject)=>{dispatchTimer=realSetTimeout(()=>reject(Error('Synthetic transport did not start')),2000);})]);}
+  finally{realClearTimeout(dispatchTimer);}
   assert.equal(dispatches.length,1,JSON.stringify({logs,requests:isolated.sandbox.__requests.length,settled,deadlines}));
   const advance=async ms=>{t.mock.timers.tick(ms);await flush();};
   await advance(30000);assert.equal(settled,false,'The former 30-second cutoff does not end this request');

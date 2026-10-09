@@ -8,7 +8,10 @@ import {readGoalProgressConversation,goalProgressConversationInstructions,goalPr
 import {normalizeGoalContext,goalContextInstructions as baseGoalContextInstructions} from './goal-context.ts';
 
 /** Shared model additions; activation and dataset binding belong to the caller. */
-export function progressModelContract(enabled:boolean){return {instructions:enabled?'\n'+goalProgressConversationInstructions+'\n'+progressEntryInstructions:'',tools:enabled?[goalProgressReadTool,goalProgressProposalTool]:[]};}
+export function progressModelContract(enabled:boolean,entryEnabled=enabled){return {
+ instructions:enabled?'\n'+goalProgressConversationInstructions+'\n'+(entryEnabled?progressEntryInstructions:'Progress entry is unavailable for this request; discussion does not record progress.'):'',
+ tools:enabled?[goalProgressReadTool,...(entryEnabled?[goalProgressProposalTool]:[])]:[],
+};}
 /** Both section adapters use the same checked context, exclusions and decoder. */
 export function prepareProgressConversation(body:Record<string,unknown>|null|undefined,{enabled,datasetToken,now}:{enabled:boolean;datasetToken:string;now:string}){
  const progress=enabled&&body?.summaryOnly!==true&&body?.page!=='home'?readGoalProgressConversation(body?.goalProgress,{goalId:typeof body?.goalId==='string'?body.goalId:'',datasetToken,asOf:now.slice(0,10)}):undefined;

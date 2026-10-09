@@ -1,7 +1,8 @@
 import {groundSolutionRequest} from '@/lib/home-solution-grounding-source';
 import {SolutionEvidenceError} from '@/lib/home-solution-grounding.mjs';
 import {createSolutionDiagnostics} from '@/lib/home-solution-diagnostics';
-import {businessPlanningTools,businessPlanningInstructions} from '@/lib/home-business-planning';
+import {businessPlanningInstructions} from '@/lib/home-business-planning';
+import {businessPlanningModelTools} from '@/lib/home-model-tool-schemas';
 import {solutionPlanningInstructions} from '@/lib/home-solution-planning';
 import {demandReferenceModelContract} from '@/lib/swp-demand-reference';
 import {progressModelContract} from '@/lib/goal-progress-entry-service';
@@ -38,26 +39,29 @@ async function handlePOST(request:Request){
   const grounding=await groundSolutionRequest(parsed,signal);
   diagnostics.stage('model_setup');
   const client=new OpenAI({...openAIProxyTransport(),apiKey:process.env.OPENAI_API_KEY,maxRetries:0});
-  const progressContract=progressModelContract(goalProgressConversationEnabled);
   const natural=request.headers.get(SWP_CONVERSATION_HEADER)===null;
   const planningInstructions=solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions:'');
-  const conversationTools=demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools,...(natural?businessPlanningTools:[])];
   diagnostics.stage('conversation_preparation');
   const reply=await converseSolutions(parsed,{
    grounding,
    ...(demand?{demand:{datasetToken:datasetRouter.current().token,referenceContract:true}}:{}),
    ...(natural?{natural:{datasetToken:datasetRouter.current().token}}:{}),
    progress:{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token},
-   complete:async(input,finalOnly,signal)=>{
+   complete:async(input,finalOnly,signal,capabilities)=>{
+    const progressContract=progressModelContract(goalProgressConversationEnabled,capabilities.progressEntryEnabled);
+    const conversationTools=demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools,...(natural?businessPlanningModelTools:[])];
+    const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions;
     const response=await datasetAI(() => {
-     diagnostics.modelAttempt();
-     return client.responses.create({...homeSolutionModel,instructions:(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:60000,signal});
+     diagnostics.modelAttempt({inputBytes:new TextEncoder().encode(JSON.stringify(input)).length,instructionsBytes:new TextEncoder().encode(instructions).length,toolSchemaBytes:new TextEncoder().encode(JSON.stringify(conversationTools)).length});
+     return client.responses.create({...homeSolutionModel,instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:60000,signal});
     });
+    diagnostics.providerResult(response);
     diagnostics.stage('response_validation');
     return {completed:response.status==='completed',items:toResponseInputItems(response.output),calls:response.output.filter(item=>item.type==='function_call').map(item=>({id:item.call_id,name:item.name,arguments:item.arguments})),text:response.output_text};
    },
    loadProjection:async(filters,signal)=>(await import('@/lib/home-solution-projection-source')).loadSolutionProjectionInputs(filters,signal),
   },signal);
+  diagnostics.success(reply.usage);
   return Response.json(reply,{headers:{'Cache-Control':'no-store'}});
  }catch(error){
   const evidence=error instanceof SolutionEvidenceError,diagnostic=diagnostics.failure(error,evidence?error.diagnostic:null,request.signal.aborted,signal?.aborted===true);
