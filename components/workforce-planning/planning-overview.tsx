@@ -1,4 +1,4 @@
-import Link from "next/link";
+import {PlanningAssumptionIllustration} from "../planning-assumption-illustration";
 import {
   formatCapacity,
   formatPercent,
@@ -134,9 +134,9 @@ export function PlanningOverview({
   return (
     <div className="space-y-6">
       <div className="rounded-lg border p-4">
-        <p className="font-semibold">Try the planning assumption editor</p>
-        <p className="mt-1 text-sm text-muted-foreground">Explore a fictional managed-services workload and review how changed assumptions affect its capacity gap.</p>
-        <Link href="/planning/assumptions" target="_blank" rel="noopener noreferrer" prefetch={false} className="mt-2 inline-flex min-h-11 items-center text-sm font-medium underline">Open assumption illustration (new tab)</Link>
+        <p className="font-semibold">Try Planning Calculator</p>
+        <p className="mt-1 text-sm text-muted-foreground">Explore a fictional managed-services workload and review how planning inputs affect its estimated capacity gap. Fictional defaults and unverified entries remain labeled.</p>
+        <PlanningAssumptionIllustration launcherOnly/>
       </div>
       <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
         {cards.map((card) => (
