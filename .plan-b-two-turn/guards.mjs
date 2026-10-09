@@ -47,7 +47,9 @@ export function authorizationTemplate(source) {
 }
 export function validateAuthorization(auth,env,source,now=Date.now()) {
   const uuid=v=>typeof v==='string'&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(v);
-  if(auth?.kind!=='swp-plan-b-two-turn-reservation-v1'||auth.executionAuthorized!==true||auth.budgetReviewApproved!==true||auth.singleDeploymentOnly!==true||
+  if(auth?.kind!=='swp-plan-b-two-turn-reservation-v1'||
+     Object.keys(auth).sort().join(',')!=='apiBase,approvalReference,budgetReviewApproved,createdAt,executionAuthorized,expiresAt,harnessSha256,kind,limits,model,reservationId,runId,singleDeploymentOnly,sourceCommit'||
+     auth.executionAuthorized!==true||auth.budgetReviewApproved!==true||auth.singleDeploymentOnly!==true||
      !uuid(auth.runId)||!uuid(auth.reservationId)||!/^parent-[A-Za-z0-9_-]{1,100}$/.test(auth.approvalReference??'')||
      !/^[a-f0-9]{40}$/.test(auth.sourceCommit??'')||auth.sourceCommit===baseSource||auth.harnessSha256!==source.harnessSha256||
      canonical(auth.model)!==canonical(model)||auth.apiBase!==apiBase||canonical(auth.limits)!==canonical(limits))fail('unarmed_or_unbound_authorization');

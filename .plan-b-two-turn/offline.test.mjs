@@ -50,8 +50,8 @@ function setup(steps,{wire=false}={}) {
         request_id:next.testMissingRequestId?null:'req_synthetic_'+calls.length,response:{status:200}};
     }};
   },inputTokens:{count(){throw Error('token_count_forbidden');}}}};
-  return {events,calls,client,run:()=>runTwoTurns({code,client,runId,requireWireProof:wire,
-    bindBoundary:value=>{boundary=value;},record:(stage,value)=>events.push({stage,...structuredClone(value)})})};
+  return {events,calls,client,run:(recordHook=()=>{})=>runTwoTurns({code,client,runId,requireWireProof:wire,
+    bindBoundary:value=>{boundary=value;},record:(stage,value)=>{recordHook(stage,value);events.push({stage,...structuredClone(value)});}})};
 }
 test('actual integrated POST keeps real first state, reference tools, Sol medium and explicit test Standard override',async()=>{
   const firstText='Synthetic opener reply unique to this run: clarify the service work.';
@@ -117,6 +117,12 @@ test('provider error consumes the attempt, stops both turns and leaves budget un
   assert.deepEqual(report.completedTurns,[]);assert(!JSON.stringify(s.events).includes('sk-do-not-print-this'));
   assert.equal(s.events.find(e=>e.stage==='attempt-stop-1').requestId,'req_timeout');
 });
+test('a before-attempt receipt failure stops before the SDK and conservatively consumes the slot',async()=>{
+  const s=setup([answer('Must not be dispatched.')]);
+  const report=await s.run(stage=>{if(stage==='before-generation-1')throw Error('receipt_write_failed');});
+  assert.equal(s.calls.length,0);assert.equal(report.generationAttempts,1);assert.equal(report.attemptAmbiguous,true);
+  assert.equal(report.executionComplete,false);assert.equal(report.reservationRetainedMicrousd,23430000);
+});
 test('schema and checked-tool failures stop without a corrective model attempt',async()=>{
   for(const bad of [{output:[],output_text:'{"invalid":true}'},{output:[tool('review_scoped_service_demand',{spec:{}})],output_text:''}]){
     const s=setup([bad]);assert.equal((await s.run()).executionComplete,false);assert.equal(s.calls.length,1);
@@ -159,7 +165,7 @@ test('authorization remains unarmed by default, pins Preview/source/budget, and 
     VERCEL_GIT_REPO_OWNER:'ed1017',VERCEL_GIT_REPO_SLUG:'people-analytics-ai',VERCEL_GIT_COMMIT_REF:branch,VERCEL_GIT_COMMIT_SHA:auth.sourceCommit};
   assert.equal(validateAuthorization(auth,env,source,now),true);
   for(const changed of [{...env,VERCEL_ENV:'production'},{...env,VERCEL_GIT_COMMIT_SHA:'b'.repeat(40)},{...env,OPENAI_BASE_URL:'https://example.invalid'},{...env,VERCEL_PROJECT_ID:'prj_wrong'}])assert.throws(()=>validateAuthorization(auth,changed,source,now));
-  for(const changed of [{...auth,budgetReviewApproved:false},{...auth,harnessSha256:'0'.repeat(64)},{...auth,expiresAt:new Date(now-1).toISOString()},{...auth,limits:{...limits,generationAttempts:5}}])assert.throws(()=>validateAuthorization(changed,env,source,now));
+  for(const changed of [{...auth,budgetReviewApproved:false},{...auth,harnessSha256:'0'.repeat(64)},{...auth,expiresAt:new Date(now-1).toISOString()},{...auth,limits:{...limits,generationAttempts:5}},{...auth,unexpectedField:'refuse-unreviewed-input'}])assert.throws(()=>validateAuthorization(changed,env,source,now));
   assert.equal(limits.priorRetainedMicrousd+limits.reservationMicrousd,46799877);
 });
 test('receipts round trip in full, redact secrets and never overwrite a prior record',()=>{
