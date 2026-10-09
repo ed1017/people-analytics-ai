@@ -1,3 +1,4 @@
+import {APIError,APIConnectionError,APIConnectionTimeoutError,APIUserAbortError} from 'openai/core/error';
 /** Server diagnostics are projections of fixed codes and bounded counters, never error text. */
 const readers = ['dashboard','workforce','attrition','talent-acquisition','survey-sentiment','skills','learning-development','career-mobility','career-growth-mobility','succession-coverage','workforce-planning','position-modeling','finance','bls'] as const;
 const triggers = ['deadline','cancelled','reader_failed','dataset_mismatch','scope_mismatch','facts_changed','verification_failed'] as const;
@@ -8,6 +9,23 @@ const record = (value:unknown):Record<string,unknown> => value && typeof value==
 const member = <T extends string>(value:unknown,choices:readonly T[]):T|null => typeof value==='string' ? choices.find(item=>item===value)??null : null;
 const bounded = (value:unknown,max:number) => typeof value==='number'&&Number.isFinite(value) ? Math.min(max,Math.max(0,Math.floor(value))) : 0;
 const httpStatus = (value:unknown) => typeof value==='number'&&Number.isInteger(value)&&value>=400&&value<=599 ? value : null;
+const read = (value:unknown,key:string):unknown => {try{return value!==null&&(typeof value==='object'||typeof value==='function')?(value as Record<string,unknown>)[key]:undefined;}catch{return undefined;}};
+const providerClasses=['APIConnectionTimeoutError','APIConnectionError','APIUserAbortError','APIError','BadRequestError','AuthenticationError','PermissionDeniedError','NotFoundError','ConflictError','UnprocessableEntityError','RateLimitError','InternalServerError','SyntaxError','TypeError','RangeError','AbortError','TimeoutError','Error'] as const;
+const connectionCodes=['ECONNRESET','ECONNREFUSED','ENOTFOUND','EAI_AGAIN','ETIMEDOUT','EPIPE','UND_ERR_CONNECT_TIMEOUT','UND_ERR_HEADERS_TIMEOUT','UND_ERR_BODY_TIMEOUT','UND_ERR_SOCKET','UND_ERR_ABORTED','ABORT_ERR'] as const;
+function providerFailureDetails(error:unknown){
+ // SDK 7.23.0 subclasses inherit name="Error". Identity survives minification;
+ // bounded constructor/name fallbacks also cover a second SDK copy or realm.
+ let errorClass:typeof providerClasses[number]|null=null;
+ try{
+  errorClass=error instanceof APIConnectionTimeoutError?'APIConnectionTimeoutError':error instanceof APIConnectionError?'APIConnectionError':error instanceof APIUserAbortError?'APIUserAbortError':error instanceof APIError?'APIError':null;
+ }catch{/* A hostile prototype/getter must not replace the original failure. */}
+ errorClass??=member(read(read(error,'constructor'),'name'),providerClasses);
+ if(errorClass===null||errorClass==='Error')errorClass=member(read(error,'name'),providerClasses)??errorClass;
+ const status=httpStatus(read(error,'status')),cause=read(error,'cause');
+ const causeCode=[read(error,'code'),read(cause,'code'),read(read(cause,'cause'),'code')].map(value=>member(value,connectionCodes)).find(value=>value!==null)??null;
+ const kind=errorClass==='APIConnectionTimeoutError'||errorClass==='TimeoutError'?'timeout':errorClass==='APIConnectionError'?'connection':errorClass==='APIUserAbortError'||errorClass==='AbortError'?'aborted':status!==null?'http':'other';
+ return {kind,errorClass,causeCode,status};
+}
 
 /** Also applied at the log boundary; adding properties to an error never expands logging. */
 export function groundingFailureDetails(value:unknown){
@@ -22,21 +40,21 @@ export function groundingFailureDetails(value:unknown){
 }
 
 export function createSolutionDiagnostics(){
- const correlationId=crypto.randomUUID(),startedAt=Date.now();let stage:Stage='request_validation',modelAttempts=0,reported=false;
+ const correlationId=crypto.randomUUID(),startedAt=Date.now();let stage:Stage='request_validation',modelAttempts=0,attemptStartedAt:number|null=null,reported=false;
  return {
   stage(value:Stage){stage=member(value,stages)??'request_validation';},
-  modelAttempt(){stage='provider';modelAttempts=Math.min(4,modelAttempts+1);},
+  modelAttempt(){stage='provider';modelAttempts=Math.min(4,modelAttempts+1);attemptStartedAt=Date.now();},
   failure(error:unknown,grounding:unknown,callerAborted:boolean,deadlineAborted:boolean){
-   const evidence=grounding==null?null:groundingFailureDetails(grounding),raw=record(error);
-   // Names/status are only inspected in the provider stage. No messages, stacks, bodies or headers.
-   const status=stage==='provider'?httpStatus(raw.status):null;
-   const providerKind=stage!=='provider'?null:raw.name==='APIConnectionTimeoutError'?'timeout':raw.name==='APIConnectionError'?'connection':status!==null?'http':'other';
+   const evidence=grounding==null?null:groundingFailureDetails(grounding);
+   // Classification only; no messages, stacks, request/response bodies or headers.
+   const provider=stage==='provider'?providerFailureDetails(error):null,providerKind=provider?.kind??null;
    const code=evidence?'evidence_'+evidence.trigger:callerAborted?'conversation_cancelled':deadlineAborted?'conversation_deadline':
     stage==='provider'?'provider_'+(providerKind==='http'?'http_error':providerKind==='other'?'failed':providerKind):
     ({request_validation:'invalid_request',configuration:'configuration_unavailable',grounding:'evidence_verification_failed',model_setup:'model_setup_failed',conversation_preparation:'conversation_preparation_failed',response_validation:'response_validation_failed'} as const)[stage];
-   const diagnostic={version:1,correlationId,code,stage,elapsedMs:bounded(Date.now()-startedAt,600000),modelAttempts,
+   const diagnostic={version:2,correlationId,code,stage,elapsedMs:bounded(Date.now()-startedAt,600000),modelAttempts,
     // An SDK attempt is not proof of a wire dispatch, provider receipt, usage or spend.
-    providerKind,providerHttpStatus:status,grounding:evidence};
+    providerKind,providerHttpStatus:provider?.status??null,providerErrorClass:provider?.errorClass??null,providerCauseCode:provider?.causeCode??null,
+    providerElapsedMs:provider&&attemptStartedAt!==null?bounded(Date.now()-attemptStartedAt,600000):null,grounding:evidence};
    if(!reported){reported=true;try{console.error('Home solution conversation failed',diagnostic);}catch{/* Logging cannot change the failure response. */}}
    return {code,correlationId};
   },
