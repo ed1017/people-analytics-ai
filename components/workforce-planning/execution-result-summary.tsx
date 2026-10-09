@@ -2,6 +2,7 @@ import {
   formatCapacity,
   formatPercent,
 } from "@/lib/display-format";
+import { ConstructedResponseFeasibilitySummary } from "./constructed-response-feasibility";
 import type {
   TimePhasedWorkforceExecutionResponse,
 } from "@/lib/types";
@@ -10,7 +11,8 @@ type ExecutionResultSummaryProps = {
   result: TimePhasedWorkforceExecutionResponse;
 };
 
-function formatMonth(value: string) {
+function formatMonth(value: string | null) {
+  if (value === null) return "Unknown";
   return new Date(
     value + "-01T00:00:00"
   ).toLocaleDateString("en-US", {
@@ -24,6 +26,8 @@ export function ExecutionResultSummary({
 }: ExecutionResultSummaryProps) {
   return (
     <>
+      <ConstructedResponseFeasibilitySummary data={result.capacity_feasibility} />
+      {result.capacity_feasibility && <p className="text-xs text-muted-foreground">Timeline values are conditional on the entered effective dates. Confirmed completion and execution cost remain unknown.</p>}
       <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-md border p-3">
           <p className="text-[11px] text-muted-foreground">

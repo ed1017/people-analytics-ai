@@ -1,4 +1,6 @@
 "use client";
+import { datasetFetch } from "@/lib/dataset-client.mjs";
+
 
 import { useEffect, useState } from "react";
 import type { CompensationResponse } from "@/lib/compensation";
@@ -20,7 +22,7 @@ export function CompensationPage({scope}: {scope?: RangeScope}) {
     const controller = new AbortController();
     async function load() {
       try {
-        const response = await fetch("/api/compensation", { signal: controller.signal, cache: "no-store" });
+        const response = await datasetFetch("/api/compensation", { signal: controller.signal, cache: "no-store" });
         if (!response.ok) throw new Error("Unavailable");
         const result: CompensationResponse = await response.json();
         if (!controller.signal.aborted) setData(result);

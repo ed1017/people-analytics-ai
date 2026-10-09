@@ -1,4 +1,5 @@
 'use client';
+import {datasetFetch} from '@/lib/dataset-client.mjs';
 import {useContext,useLayoutEffect,useRef,useState} from 'react';
 import {LegacyHomeBundlePlans,type HomeBundlePlansProps,type BundleDiscussion} from '@/components/home-bundle-plans';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
@@ -24,6 +25,9 @@ import {planStaffEffortText} from '@/lib/home-plan-delivery-estimate';
 import {planBudgetText,planRevisionsField,readPlanRevisions} from '@/lib/home-plan-revisions';
 import {PlanDirections} from '@/components/plan-directions';
 import type {Json} from '@/lib/local-decisions';
+import {structuredPlansEnabled,createPlanConversationRequest,assertPlanConversationCurrent,readPlanConversationProposal,previewPlanConversation,savePlanConversation,type PlanConversationRequest,type PlanConversationProposal} from '@/lib/home-plan-conversation';
+import {HomePlanConversationReview} from '@/components/home-plan-conversation-review';
+import {OptionalConversationForm} from '@/components/optional-conversation-form';
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring';
 const json=(value:unknown)=>value as Json;
 
@@ -32,6 +36,9 @@ type Review={request:AlternativeRequest;catalog:PlanAlternatives;current:()=>boo
 export function HomeBundlePlans(props:HomeBundlePlansProps){
  const storage=useDecisionStorage(),context={goalId:props.binding.goalId,goal:props.binding.goal},fields=storage.data.workspaces[context.goalId]?.fields??{},raw=fields[planAlternativesField],catalog=readPlanAlternatives(raw,context);
  const [review,setReview]=useState<Review|null>(null),[notice,setNotice]=useState('');
+ const [structured,setStructured]=useState<{request:PlanConversationRequest;proposal:PlanConversationProposal;current:()=>boolean;catalog:()=>PlanAlternatives}|null>(null);
+ const [comparisonIds,setComparisonIds]=useState<string[]>([]),comparisonRef=useRef<string[]>([]);
+ const lastTarget=useRef<BundleDiscussion|null>(null);
  const guided=useContext(HomeGuidedActionsContext);
  const pending=useRef<{key:string;id:string}|null>(null),epoch=useRef(0),mounted=useRef(true);
  useLayoutEffect(()=>{mounted.current=true;return()=>{mounted.current=false;};},[]);
@@ -58,7 +65,23 @@ export function HomeBundlePlans(props:HomeBundlePlansProps){
   }catch(error){setNotice((error as Error).message);}
  }
  function register(target:BundleDiscussion){
-  props.onDiscuss({...target,discard:()=>{epoch.current++;pending.current=null;setReview(null);setNotice('Conversation reset. Saved alternatives and attachments are kept.');},propose:text=>{
+  lastTarget.current=target;
+  props.onDiscuss({...target,...(structuredPlansEnabled?{structuredPropose:async(message:string,signal:AbortSignal)=>{
+   guard();if(!target.isCurrent())throw Error('Select a current saved plan before sending.');
+   const readCurrent=()=>{const state=guard(),raw=state.data.workspaces[context.goalId]?.fields[planAlternativesField],current=raw===undefined?createPlanAlternatives(context,target.snapshots?.()??[]):readPlanAlternatives(raw,context);if(!current)throw Error('Saved plans cannot be verified.');return current;};
+   const request=createPlanConversationRequest(readCurrent(),target.id,comparisonRef.current,message,crypto.randomUUID());
+   const captured=++epoch.current;setStructured(null);setReview(null);setNotice('');
+   const current=()=>{try{guard();if(signal.aborted||captured!==epoch.current||!target.isCurrent())return false;assertPlanConversationCurrent(request,readCurrent(),lastTarget.current?.id,comparisonRef.current);return true;}catch{return false;}};
+   const response=await datasetFetch('/api/home-plan-conversation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...request,catalog:packPlanAlternatives(request.catalog),...(props.measurePack&&typeof props.measurePack==='object'&&'datasetContext' in props.measurePack?{evidence:props.measurePack,datasetEvidenceContexts:fields.homeSolutionConversationV1&&typeof fields.homeSolutionConversationV1==='object'&&!Array.isArray(fields.homeSolutionConversationV1)?fields.homeSolutionConversationV1.datasetEvidenceContexts:undefined}:{})}),signal});
+   const data=await response.json();
+   if(!current())throw Error('The goal, selection or saved plans changed. Send the request again; nothing was saved.');
+   if(!response.ok)throw Error(typeof data.error==='string'?data.error:'The plan response is unavailable. Nothing was saved.');
+   if(data.requestId!==request.requestId)throw Error('The response belongs to another request. Nothing was saved.');
+   const proposal=readPlanConversationProposal(data.proposal,request),preview=previewPlanConversation(request,proposal);
+   setStructured({request,proposal,current,catalog:readCurrent});
+   return preview.kind==='clarify'?preview.question:preview.kind==='compare'?'The read-only comparison below uses your actual saved plans. Nothing was changed.':'Review the proposed changes below. Nothing is saved until you choose Save as new alternative.';
+  }}:{}),discard:()=>{epoch.current++;pending.current=null;setReview(null);setStructured(null);setNotice('Conversation reset. Saved alternatives and attachments are kept.');},propose:text=>{
+   epoch.current++;setStructured(null);
    guard();if(!target.isCurrent())throw Error('The selected plan changed. Send the request again for the current plans.');
    const state=decisionStore.getSnapshot(),latestRaw=state.data.workspaces[context.goalId]?.fields[planAlternativesField];
    const current=latestRaw===undefined?createPlanAlternatives(context,target.snapshots?.()??[]):readPlanAlternatives(latestRaw,context);
@@ -69,7 +92,7 @@ export function HomeBundlePlans(props:HomeBundlePlansProps){
    if(pending.current?.key!==key)pending.current={key,id:crypto.randomUUID()};
    const request=alternativeDiscussion(current,context,selectedId).prepareRequest(text,pending.current.id);
    if(!request)return 'No plan changes were requested.';
-   if(combinationIntent(text)){setReview({request,catalog:current,current:target.isCurrent,epoch:epoch.current});setNotice('');return `Review the combination of ${request.sourceIds.map(id=>'Action Plan #'+current.plans.find(plan=>plan.id===id)!.number).join(' and ')} below. Choose only overlap assumptions you can support, then create the combined alternative. Nothing is applied or attached.`;}
+   if(combinationIntent(text)){setReview({request,catalog:current,current:target.isCurrent,epoch:epoch.current});setNotice('');return `Review the combination of ${request.sourceIds.map(id=>'Action Plan #'+current.plans.find(plan=>plan.id===id)!.number).join(' and ')} below. Participant and cash overlap remain unknown. You can keep those unknowns in the combined proposal. Nothing is applied or attached.`;}
    setReview(null);return saveOutcome(proposeEditedAlternative(current,context,request));
   }});
  }
@@ -82,6 +105,8 @@ export function HomeBundlePlans(props:HomeBundlePlansProps){
  }
  if(raw!==undefined&&!catalog)return <p role="alert">Saved Action Plan alternatives cannot be verified. Their records are kept unchanged; review browser storage before editing or attaching.</p>;
  return <>{catalog?<AlternativePlans {...props} contextCurrent={props.contextCurrent&&catalog.plans.every(plan=>actionBindingKey(plan.draft.binding)===actionBindingKey(props.binding))} catalog={catalog} onDiscuss={register} onCorrectSavedPilot={correctSavedPilot}/>:<LegacyHomeBundlePlans {...props} onDiscuss={register} onCorrectSavedPilot={correctSavedPilot}/>}
+  {structuredPlansEnabled&&<details><summary className="min-h-11 cursor-pointer py-2 text-sm">Choose plans to discuss together</summary><p className="text-sm">Select two plans to refer to “these two”, or name their displayed numbers in chat.</p><button className={button} disabled={!comparisonIds.length} onClick={()=>{comparisonRef.current=[];setComparisonIds([]);epoch.current++;}}>Clear discussion selection</button>{(catalog?catalog.order.map(id=>({id,number:catalog.plans.find(plan=>plan.id===id)!.number})):props.proposal.bundles.map((bundle,index)=>({id:bundle.id,number:index+1}))).map(plan=><label key={plan.id} className="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" aria-label={'Discuss Action Plan #'+plan.number} checked={comparisonIds.includes(plan.id)} disabled={!comparisonIds.includes(plan.id)&&comparisonIds.length>=6} onChange={event=>{const next=event.target.checked?[...comparisonRef.current,plan.id]:comparisonRef.current.filter(id=>id!==plan.id);comparisonRef.current=next;setComparisonIds(next);epoch.current++;}}/>Action Plan #{plan.number}</label>)}</details>}
+  {structured&&<HomePlanConversationReview key={structured.request.requestId} request={structured.request} proposal={structured.proposal} current={structured.current()} onClose={()=>{epoch.current++;setStructured(null);}} onSave={assumptions=>{try{if(!structured.current())throw Error('The goal, selection or saved plans changed. Send the request again.');const outcome=savePlanConversation(structured.catalog(),structured.request,structured.proposal,assumptions);saveOutcome(outcome);setStructured(null);epoch.current++;}catch(error){setNotice((error as Error).message);}}}/>}
   {review&&<CombinationReviewForm key={review.request.requestId} disabled={props.disabled||!props.contextCurrent} onCreate={combine} onCancel={()=>{epoch.current++;setReview(null);}}/>}
   {notice&&<p role="status" className="whitespace-pre-line text-sm">{notice}</p>}
  </>;
@@ -90,9 +115,10 @@ export function HomeBundlePlans(props:HomeBundlePlansProps){
 function CombinationReviewForm({disabled,onCreate,onCancel}:{disabled:boolean;onCreate:(review:CombinationReview)=>void;onCancel:()=>void}){
  const [participants,setParticipants]=useState(''),[fees,setFees]=useState(''),[count,setCount]=useState('');
  return <section aria-label="Review plan combination" className="space-y-3 rounded border p-3 text-sm"><h3 className="font-semibold">Review plan combination</h3><p>Keep overlap unknown unless you have reviewed it. Matching activity wording alone does not establish shared participants or fees.</p>
- <label className="block">Participant overlap<select aria-label="Combination participant overlap" className="ml-2 max-w-full rounded border bg-background p-2" value={participants} onChange={e=>setParticipants(e.target.value)}><option value="">Unknown</option><option value="same">Same participants</option><option value="disjoint">Separate participant groups</option></select></label>
+ <p>Participant overlap: {participants==='same'?'shared participants':participants==='disjoint'?'separate groups':'Unknown'}. Cash allowance overlap: {fees==='distinct'?'separate allowances':fees==='shared-matches'?'matching allowances shared':'Unknown'}.</p>
+ <OptionalConversationForm label="overlap form"><label className="block">Participant overlap<select aria-label="Combination participant overlap" className="ml-2 max-w-full rounded border bg-background p-2" value={participants} onChange={e=>setParticipants(e.target.value)}><option value="">Unknown</option><option value="same">Same participants</option><option value="disjoint">Separate participant groups</option></select></label>
  {participants==='same'&&<label className="block">Shared participant count (optional)<input aria-label="Shared participant count" className="ml-2 w-28 rounded border bg-background p-2" type="number" min="0" max="1000000" value={count} onChange={e=>setCount(e.target.value)}/></label>}
- <label className="block">Cash allowance overlap<select aria-label="Combination cash overlap" className="ml-2 max-w-full rounded border bg-background p-2" value={fees} onChange={e=>setFees(e.target.value)}><option value="">Unknown</option><option value="distinct">Separate allowances</option><option value="shared-matches">Share exactly matching allowances</option></select></label>
+ <label className="block">Cash allowance overlap<select aria-label="Combination cash overlap" className="ml-2 max-w-full rounded border bg-background p-2" value={fees} onChange={e=>setFees(e.target.value)}><option value="">Unknown</option><option value="distinct">Separate allowances</option><option value="shared-matches">Share exactly matching allowances</option></select></label></OptionalConversationForm>
  <p>Source budget ceilings and outcome targets are never added. Staff effort remains in hours.</p><div className="flex flex-wrap gap-2"><button className={button} disabled={disabled} onClick={()=>onCreate({...(participants?{participants:participants as CombinationReview['participants']} :{}),...(participants==='same'&&count!==''?{participantCount:Number(count)}:{}),...(fees?{fees:fees as CombinationReview['fees']}:{})})}>Create combined alternative</button><button className={button} onClick={onCancel}>Cancel combination</button></div></section>;
 }
 

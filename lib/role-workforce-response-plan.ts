@@ -10,6 +10,7 @@ import {
 } from "./structural-position-scenario";
 import type {
   RoleWorkforceResponsePlanResponse,
+  LegacyInternalTalentReadinessResponse,
   StructuralPositionAction,
   StructuralPositionScenarioResponse,
   WorkforceResponsePlanAllocation,
@@ -58,7 +59,7 @@ function cleanAllocation(
 export async function runRoleWorkforceResponsePlan(
   request: RoleWorkforceResponsePlanRequest,
   scenarioOverride?: StructuralPositionScenarioResponse
-): Promise<RoleWorkforceResponsePlanResponse> {
+): Promise<RoleWorkforceResponsePlanResponse & {internal_talent_readiness: LegacyInternalTalentReadinessResponse}> {
   const scenario =
     scenarioOverride ??
     (await runStructuralPositionScenario(

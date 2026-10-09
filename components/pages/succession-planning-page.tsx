@@ -56,6 +56,7 @@ export function SuccessionPlanningPage({
   error,
   selectedContext,
 }: SuccessionPlanningPageProps) {
+  const illustrative = data?.data_meta?.successionSemantics === 'illustrative-plan-flags';
   const validZeroState =
     data?.filled_critical_positions === 0;
 
@@ -64,7 +65,7 @@ export function SuccessionPlanningPage({
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="max-w-3xl text-muted-foreground">
-            Company-wide recorded succession-plan coverage and source-assessment readiness signals. No individual candidate records are shown.
+            {illustrative ? 'Illustrative demo succession-plan coverage and authored plan flags. No assessed or predicted individual readiness is supplied.' : 'Company-wide recorded succession-plan coverage and source-assessment readiness signals. No individual candidate records are shown.'}
           </p>
         </div>
 
@@ -72,7 +73,7 @@ export function SuccessionPlanningPage({
           {loading
             ? "Loading summary…"
             : data
-              ? "Assessment " +
+              ? (illustrative ? "Demo as of " : "Assessment ") +
                 formatDate(data.as_of_date)
               : "Company summary"}
         </span>
@@ -92,7 +93,7 @@ export function SuccessionPlanningPage({
       {data && (
         <EvidenceScopeNotice
           scope={enterpriseTalentEvidenceScope({
-            label: "Company succession population",
+            label: illustrative ? "Constructed succession population" : "Company succession population",
             asOf: data.as_of_date,
             populationLabel:
               "filled critical positions",
@@ -109,14 +110,14 @@ export function SuccessionPlanningPage({
         <>
           {validZeroState && (
             <div className="mb-6 rounded-lg border border-dashed p-5 text-sm text-muted-foreground">
-              No filled critical-position population is recorded for this assessment. This is a valid zero state, not an unavailable-data fallback.
+              {illustrative ? 'No filled critical-position population is recorded for this demo. This is a valid zero state, not an unavailable-data fallback.' : 'No filled critical-position population is recorded for this assessment. This is a valid zero state, not an unavailable-data fallback.'}
             </div>
           )}
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">
-                Recorded Plan Coverage
+                {illustrative ? 'Illustrative Plan Coverage' : 'Recorded Plan Coverage'}
               </p>
               <p className="mt-2 text-3xl font-semibold">
                 {displayPercent(
@@ -124,7 +125,7 @@ export function SuccessionPlanningPage({
                 )}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Filled critical positions with a recorded succession plan
+                {illustrative ? 'Constructed filled critical positions with an illustrative plan' : 'Filled critical positions with a recorded succession plan'}
               </p>
             </div>
 
@@ -147,7 +148,7 @@ export function SuccessionPlanningPage({
 
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">
-                Positions with Recorded Plan
+                {illustrative ? 'Positions with Demo Plan' : 'Positions with Recorded Plan'}
               </p>
               <p className="mt-2 text-3xl font-semibold">
                 {displayCount(
@@ -164,7 +165,7 @@ export function SuccessionPlanningPage({
 
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">
-                Recorded Ready-Now Coverage
+                {illustrative ? 'Illustrative Flag Coverage' : 'Recorded Ready-Now Coverage'}
               </p>
               <p className="mt-2 text-3xl font-semibold">
                 {displayPercent(
@@ -172,7 +173,7 @@ export function SuccessionPlanningPage({
                 )}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Planned positions with at least one candidate recorded as ready now
+                {illustrative ? 'Demo plans with an authored illustrative flag; not assessed readiness' : 'Planned positions with at least one candidate recorded as ready now'}
               </p>
             </div>
           </div>
@@ -216,12 +217,12 @@ export function SuccessionPlanningPage({
 
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">
-                Recorded Readiness Signal
+                {illustrative ? 'Illustrative Plan Flags' : 'Recorded Readiness Signal'}
               </h3>
               <div className="mt-4 space-y-3 text-sm">
                 <div className="flex items-center justify-between gap-4 border-b pb-3">
                   <span className="text-muted-foreground">
-                    Planned positions with ready-now record
+                    {illustrative ? 'Demo plans with illustrative flag' : 'Planned positions with ready-now record'}
                   </span>
                   <span className="font-medium tabular-nums">
                     {displayCount(
@@ -231,7 +232,7 @@ export function SuccessionPlanningPage({
                 </div>
                 <div className="flex items-center justify-between gap-4 border-b pb-3">
                   <span className="text-muted-foreground">
-                    Planned positions without ready-now record
+                    {illustrative ? 'Demo plans without illustrative flag' : 'Planned positions without ready-now record'}
                   </span>
                   <span className="font-medium tabular-nums">
                     {displayCount(
@@ -241,7 +242,7 @@ export function SuccessionPlanningPage({
                 </div>
                 <div className="flex items-center justify-between gap-4">
                   <span className="text-muted-foreground">
-                    Ready-now share of recorded plans
+                    {illustrative ? 'Illustrative share of demo plans' : 'Ready-now share of recorded plans'}
                   </span>
                   <span className="font-medium tabular-nums">
                     {displayPercent(
@@ -260,7 +261,7 @@ export function SuccessionPlanningPage({
                 Small-cell protection applied
               </p>
               <p className="mt-1">
-                Counts are suppressed in paired partitions when either side would expose a cell from 1–9. Downstream readiness detail is also suppressed whenever its upstream plan partition is suppressed. Suppressed values are intentionally not estimated.
+                Counts are suppressed in paired partitions when either side would expose a cell from 1–9. Downstream {illustrative ? 'illustrative flag' : 'readiness'} detail is also suppressed whenever its upstream plan partition is suppressed. Suppressed values are intentionally not estimated.
               </p>
             </div>
           )}
@@ -270,7 +271,7 @@ export function SuccessionPlanningPage({
               How to read this summary
             </p>
             <p className="mt-1">
-              Recorded plan coverage means a filled position in an active critical job profile has a source succession-plan record. Ready-now coverage means that source plan records at least one candidate in the ready-now category. These are recorded source assessments, not model predictions, promotion recommendations, transfer recommendations, or individual employment decisions.
+              {illustrative ? 'Constructed demo plan flags are authored examples, not source assessments or model predictions. The flags establish no individual readiness, capability, promotion or transfer recommendation. Career preferences are employee-expressed interests and remain separate from assessed readiness.' : 'Recorded plan coverage means a filled position in an active critical job profile has a source succession-plan record. Ready-now coverage means that source plan records at least one candidate in the ready-now category. These are recorded source assessments, not model predictions, promotion recommendations, transfer recommendations, or individual employment decisions.'}
             </p>
           </div>
         </>

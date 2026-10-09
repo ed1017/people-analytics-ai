@@ -69,7 +69,7 @@ export function StructuralPositionScenarioSummary({
           <p className="text-xs text-muted-foreground">
             Authorized Budget Δ
           </p>
-          <p className="mt-1 text-2xl font-semibold">
+          <p className={"mt-1 font-semibold " + (structuralPositionResult.modeled.authorized_budget_delta_usd === null ? "text-sm break-words" : "text-2xl")}>
             {formatCurrencyCompact(
               structuralPositionResult.modeled
                 .authorized_budget_delta_usd
@@ -84,7 +84,7 @@ export function StructuralPositionScenarioSummary({
           <p className="text-xs text-muted-foreground">
             Staffed Labor Cost Δ
           </p>
-          <p className="mt-1 text-2xl font-semibold">
+          <p className={"mt-1 font-semibold " + (structuralPositionResult.modeled.annualized_staffed_labor_cost_delta_usd === null ? "text-sm break-words" : "text-2xl")}>
             {formatCurrencyCompact(
               structuralPositionResult.modeled
                 .annualized_staffed_labor_cost_delta_usd

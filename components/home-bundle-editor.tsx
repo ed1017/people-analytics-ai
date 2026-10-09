@@ -1,4 +1,6 @@
 "use client";
+import { datasetFetch } from "@/lib/dataset-client.mjs";
+
 import {bundleAssumptionCopy} from '@/lib/home-bundle-display';
 import {HomeSuccessMeasureReview} from '@/components/home-success-measure-review';
 import {useEffect,useState} from 'react';
@@ -20,7 +22,7 @@ function MonthAssumptionInput({value,label,onChange,onPending}:{value:string;lab
 }
 export function HomeBundleEditor({draft,optionNumber,disabled,onChange,onProposalChange,onPendingInput,measurePack}:{measurePack?:unknown;onPendingInput:(pending:boolean)=>void;optionNumber:number;draft:BundleDraft;disabled:boolean;onChange:(inputs:BundleInputs)=>void;onProposalChange:(bundle:SolutionBundle)=>void}){
  const input=draft.inputs,[tab,setTab]=useState('Scope'),[basis,setBasis]=useState<'user-entered'|'illustrative'>('user-entered'),[catalog,setCatalog]=useState<Catalog|null>(null);
- useEffect(()=>{const controller=new AbortController();void fetch('/api/position-structure',{signal:controller.signal}).then(response=>response.ok?response.json():null).then(data=>{if(data&&Array.isArray(data.business_units)&&Array.isArray(data.job_profiles)&&!controller.signal.aborted)setCatalog(data)}).catch(()=>{});return()=>controller.abort();},[]);
+ useEffect(()=>{const controller=new AbortController();void datasetFetch('/api/position-structure',{signal:controller.signal}).then(response=>response.ok?response.json():null).then(data=>{if(data&&Array.isArray(data.business_units)&&Array.isArray(data.job_profiles)&&!controller.signal.aborted)setCatalog(data)}).catch(()=>{});return()=>controller.abort();},[]);
  const assumption=<T,>(value:T|null):Assumption<T>=>value===null?unknownAssumption<T>():{value,kind:basis,basis:basis==='illustrative'?'Editable illustrative scenario assumption; not evidence.':'Explicitly entered or confirmed for this bundle; not independently verified.'};
  function update(run:(next:BundleInputs)=>void){const next=cashHoursInputs(input);run(next);onChange(next);}
  function scope(field:keyof BundleInputs['scope'],value:string){update(next=>{

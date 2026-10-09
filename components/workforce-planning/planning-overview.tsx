@@ -1,4 +1,4 @@
-import Link from "next/link";
+import {PlanningAssumptionIllustration} from "../planning-assumption-illustration";
 import {
   formatCapacity,
   formatPercent,
@@ -66,12 +66,16 @@ export function PlanningOverview({
       ? "Response portfolio modeled; BU allocation still pending"
       : "No approved Build / Move / Buy response yet";
   const feasibility = responseConstraintResult
-    ? responseConstraintResult.overall_feasible
+    ? responseConstraintResult.capacity_feasibility
+      ? responseConstraintResult.user_constraints_satisfied ? "Assumptions meet limits; staffing not assessed" : "Assumption limits breached; staffing not assessed"
+      : responseConstraintResult.overall_feasible
       ? "Feasible under current hard constraints"
       : "Not feasible under current hard constraints"
     : "Not tested yet";
   const executionRisk = failedConstraint
     ? failedConstraint.detail
+    : responseConstraintResult?.capacity_feasibility
+      ? "Staffing readiness, availability and execution costs remain unknown"
     : responseExecutionResult &&
         responseExecutionResult.final_remaining_net_gap > 0
       ? `${formatCapacity(responseExecutionResult.final_remaining_net_gap)} roles remain uncovered in the current schedule`
@@ -134,9 +138,9 @@ export function PlanningOverview({
   return (
     <div className="space-y-6">
       <div className="rounded-lg border p-4">
-        <p className="font-semibold">Try the planning assumption editor</p>
-        <p className="mt-1 text-sm text-muted-foreground">Explore a fictional managed-services workload and review how changed assumptions affect its capacity gap.</p>
-        <Link href="/planning/assumptions" target="_blank" rel="noopener noreferrer" prefetch={false} className="mt-2 inline-flex min-h-11 items-center text-sm font-medium underline">Open assumption illustration (new tab)</Link>
+        <p className="font-semibold">Try Planning Calculator</p>
+        <p className="mt-1 text-sm text-muted-foreground">Explore a fictional managed-services workload and review how planning inputs affect its estimated capacity gap. Fictional defaults and unverified entries remain labeled.</p>
+        <PlanningAssumptionIllustration launcherOnly/>
       </div>
       <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
         {cards.map((card) => (

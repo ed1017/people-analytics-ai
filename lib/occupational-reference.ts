@@ -9,6 +9,7 @@ export type ReferenceProfile = {
   requirements: ReferenceRequirement[];
 };
 export type OccupationalReferenceIndex = {
+  data_meta?: {sourceLabel:string;externalReferenceStatus:"not-bound";publicExcerptBoundary:string};
   kind: "index"; profiles: ReferenceProfile[]; occupations: ReferenceOccupation[];
   sources: ReferenceSources; mappedProfileCount: number | null;
 };

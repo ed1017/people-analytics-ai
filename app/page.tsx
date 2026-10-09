@@ -1,4 +1,11 @@
 "use client";
+import {SelectedProgressEntry} from '@/components/goal-progress-entry-review';
+import {progressEntryContext,retainProgressEntryProposal} from '@/lib/goal-progress-entry-store';
+import {progressEntryPacket} from '@/lib/goal-progress-entry-service';
+import {captureGoalProgressInput} from '@/lib/goal-progress-conversation';
+import {validateSuccessionContext} from "@/lib/succession-release-context";
+import { datasetFetch, datasetSession } from "@/lib/dataset-client.mjs";
+
 
 import { contextualPrompts, hasKnownNumericEvidence } from "@/lib/contextual-prompts";
 import {usePlanningEvidenceValidation} from "@/components/use-planning-evidence-validation";
@@ -32,6 +39,7 @@ import {readDashboardScopeReceipt} from "@/lib/dashboard-scope";
 import { buildHomePack } from "@/lib/home-pack.mjs";
 import {MarketComparison,CarriedMarketReference,type MarketCarry} from "@/components/market-reference";
 import {defaultMarketSelection,marketCarryEvidence} from "@/lib/oews-reference.mjs";
+import {SelectedGoalProgress} from "@/components/goal-progress-summary";
 import { GoalTakeaway } from "@/components/goal-takeaway";
 import { useGoalWorkspace } from "@/components/use-goal-workspace";
 import { useProblemConversation } from "@/components/problem-conversation";
@@ -423,7 +431,7 @@ export default function Home() {
           ? `/api/dashboard?${queryString}`
           : "/api/dashboard";
 
-        const response = await fetch(url, {
+        const response = await datasetFetch(url, {
           cache: "no-store",
           signal: controller.signal,
         });
@@ -494,7 +502,7 @@ export default function Home() {
       try {
         setWorkforceLoading(true);
         setWorkforceError(null);
-        const response = await fetch("/api/workforce", { cache: "no-store" });
+        const response = await datasetFetch("/api/workforce", { cache: "no-store" });
         const payload = await response.json();
         if (!response.ok) {
           throw new Error(payload?.error ?? "Failed to load workforce analytics.");
@@ -520,7 +528,7 @@ export default function Home() {
       try {
         setAttritionLoading(true);
         setAttritionError(null);
-        const response = await fetch("/api/attrition", { cache: "no-store" });
+        const response = await datasetFetch("/api/attrition", { cache: "no-store" });
         const payload = await response.json();
         if (!response.ok) {
           throw new Error(payload?.error ?? "Failed to load attrition analytics.");
@@ -552,7 +560,7 @@ export default function Home() {
         setPlanningLoading(true);
         setPlanningError(null);
 
-        const response = await fetch(
+        const response = await datasetFetch(
           "/api/workforce-planning",
           {
             cache: "no-store",
@@ -603,7 +611,7 @@ export default function Home() {
         setPositionModelingLoading(true);
         setPositionModelingError(null);
 
-        const response = await fetch(
+        const response = await datasetFetch(
           "/api/position-modeling",
           {
             cache: "no-store",
@@ -654,7 +662,7 @@ export default function Home() {
         setFinanceLoading(true);
         setFinanceError(null);
 
-        const response = await fetch(
+        const response = await datasetFetch(
           "/api/finance",
           {
             cache: "no-store",
@@ -698,7 +706,7 @@ export default function Home() {
       try {
         setTalentAcquisitionLoading(true);
         setTalentAcquisitionError(null);
-        const response = await fetch("/api/talent-acquisition", { cache: "no-store" });
+        const response = await datasetFetch("/api/talent-acquisition", { cache: "no-store" });
         const payload = await response.json();
         if (!response.ok) {
           throw new Error(payload?.error ?? "Failed to load Talent Acquisition data.");
@@ -753,7 +761,7 @@ export default function Home() {
         setSkillsLoading(true);
         setSkillsError(null);
 
-        const response = await fetch(
+        const response = await datasetFetch(
           "/api/skills",
           {
             cache: "no-store",
@@ -802,7 +810,7 @@ export default function Home() {
         setLearningDevelopmentLoading(true);
         setLearningDevelopmentError(null);
 
-        const response = await fetch(
+        const response = await datasetFetch(
           "/api/learning-development",
           {
             cache: "no-store",
@@ -854,7 +862,7 @@ export default function Home() {
         setCareerMobilityLoading(true);
         setCareerMobilityError(null);
 
-        const response = await fetch(
+        const response = await datasetFetch(
           "/api/career-mobility",
           {
             cache: "no-store",
@@ -905,7 +913,7 @@ export default function Home() {
       try {
         setCareerGrowthMobilityLoading(true);
         setCareerGrowthMobilityError(null);
-        const response = await fetch(
+        const response = await datasetFetch(
           "/api/career-growth-mobility",
           { cache: "no-store" }
         );
@@ -950,7 +958,7 @@ export default function Home() {
         setSuccessionCoverageLoading(true);
         setSuccessionCoverageError(null);
 
-        const response = await fetch(
+        const response = await datasetFetch(
           "/api/succession-coverage",
           {
             cache: "no-store",
@@ -968,7 +976,7 @@ export default function Home() {
         }
 
         setSuccessionCoverageData(
-          payload as SuccessionCoverageResponse
+          validateSuccessionContext(payload, datasetSession.current())
         );
       } catch (error) {
         console.error(error);
@@ -1001,7 +1009,7 @@ export default function Home() {
         setBlsLoading(true);
         setBlsError(null);
 
-        const response = await fetch(
+        const response = await datasetFetch(
           "/api/bls",
           {
             cache: "no-store",
@@ -1614,7 +1622,9 @@ export default function Home() {
   const summaryEvidenceReady = intelligencePage ? activePage!=="occupational-references"||Boolean(occupationalEvidence) : chatEvidenceReady;
   const goalSummaryPayload = {...JSON.parse(chatEvidenceKey),goalEvidenceContext:relatedGoalEvidence,marketReference:marketCarry};
   // This client-only key tracks request validity; it adds nothing to model inputs.
-  const sectionRequestContextKey = JSON.stringify([chatEvidenceKey, relatedGoalEvidence, marketCarry, conversation.focusedIssue, chatEvidenceReady, conversation.resetEpoch]);
+  const progressInput=captureGoalProgressInput(decisionStore,conversation.activeGoalId);
+  const sectionChatReady=chatEvidenceReady||Boolean(progressInput)&&!readOnlyChatPage;
+  const sectionRequestContextKey = JSON.stringify([chatEvidenceKey, relatedGoalEvidence, marketCarry, conversation.focusedIssue, chatEvidenceReady, conversation.resetEpoch,progressInput]);
   const currentChatEvidenceKey = useRef(sectionRequestContextKey);
   const sectionSending = useRef<symbol | null>(null);
   const queuedSectionPrompt = useRef<symbol | null>(null);
@@ -1637,11 +1647,11 @@ export default function Home() {
     ).trim();
     const currentContext = () => {
       const goals = decisionStore.getSnapshot().data.goals;
-      return currentChatEvidenceKey.current === sectionRequestContextKey &&
+      return currentChatEvidenceKey.current === sectionRequestContextKey && JSON.stringify(captureGoalProgressInput(decisionStore,conversation.activeGoalId))===JSON.stringify(progressInput) &&
         goals.activeId === conversation.activeGoalId &&
         (goals.goals.find(goal => goal.id === goals.activeId)?.statement ?? "") === conversation.focusedIssue;
     };
-    if (!message || !chatEvidenceReady || chatLoading || sectionSending.current ||
+    if (!message || !sectionChatReady || chatLoading || sectionSending.current ||
       readOnlyChatPage || !conversation.storageReady || conversation.issueEditor || !currentContext()) return;
 
     if (/^(?:please\s+|can you\s+)?(?:export|download)\b/i.test(message)) {
@@ -1653,6 +1663,8 @@ export default function Home() {
       return;
     }
 
+    let entryContext;
+    try{entryContext=progressEntryContext(decisionStore,crypto.randomUUID(),[{id:crypto.randomUUID(),text:message}]);}catch(error){setChatError((error as Error).message);return;}
     const userMessage: ChatMessage = {
       role: "user",
       content: message,
@@ -1678,7 +1690,7 @@ export default function Home() {
     conversation.setQuestionUnanswered(true);
 
     try {
-      const response = await fetch(
+      const response = await datasetFetch(
         "/api/chat",
         {
           method: "POST",
@@ -1687,7 +1699,7 @@ export default function Home() {
               "application/json",
           },
           signal: request.signal,
-          body: JSON.stringify({ ...JSON.parse(chatEvidenceKey), goalContext:conversation.recordGoalStatement(message,activePage,JSON.stringify(selectedBusinessContext)),goalEvidenceContext:relatedGoalEvidence,marketReference:marketCarry, message: withProblemContext(message, conversation.problem, conversation.focusedIssue), history: modelHistory }),
+          body: JSON.stringify({ ...(chatEvidenceReady?JSON.parse(chatEvidenceKey):{goalId:conversation.activeGoalId,page:activePage,persona:selectedPersona,pageEvidenceAvailable:false}), ...(progressInput?{goalProgress:progressInput}:{}), ...(entryContext?{progressEntry:progressEntryPacket(entryContext)}:{}), goalContext:conversation.recordGoalStatement(message,activePage,JSON.stringify(selectedBusinessContext)),goalEvidenceContext:chatEvidenceReady?relatedGoalEvidence:[],marketReference:chatEvidenceReady?marketCarry:null, message: withProblemContext(message, conversation.problem, conversation.focusedIssue), history: modelHistory }),
         }
       );
 
@@ -1702,6 +1714,7 @@ export default function Home() {
       }
 
       if (!request.current() || !currentContext()) return;
+      if(payload.progressProposal){if(!entryContext)throw Error('Progress entry is not enabled.');await retainProgressEntryProposal(decisionStore,payload.progressProposal,entryContext,{current:()=>request.current()&&currentContext()});if(!request.current()||!currentContext())return;}
       setChatMessages((current) => [
         ...current,
         {
@@ -1933,6 +1946,8 @@ export default function Home() {
 
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
+        <SelectedGoalProgress/>
+        <SelectedProgressEntry/>
         {pageDataLoading&&<div className="m-4"><DataLoadingStatus/></div>}
         {activePage!=="home"&&<WorkforceSolutionPanel optionActions={optionActions} page={activePage} onNavigate={setActivePage}/>}
         {!["home","decision-brief","assess-evaluate","compensation"].includes(activePage)&&<p className="px-6 pt-3 text-xs text-muted-foreground" aria-label="Evidence type">{evidenceTrustLabel(activePage)}</p>}
@@ -2133,7 +2148,7 @@ export default function Home() {
           chatInput={chatInput}
           chatLoading={chatLoading}
           chatError={chatError}
-          dashboardReady={chatEvidenceReady}
+          dashboardReady={sectionChatReady}
           onResizeStart={startAiResize}
           onResizeKeyDown={resizeAiWithKeyboard}
           onToggleExpanded={toggleAiExpanded}

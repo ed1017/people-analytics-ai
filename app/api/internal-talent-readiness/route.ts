@@ -1,3 +1,4 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import {
   NextRequest,
   NextResponse,
@@ -9,7 +10,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export async function GET(
+async function handleGET(
   request: NextRequest
 ) {
   try {
@@ -67,4 +68,8 @@ export async function GET(
       }
     );
   }
+}
+
+export async function GET(request: NextRequest) {
+  return withDatasetRequest(request, () => handleGET(request));
 }

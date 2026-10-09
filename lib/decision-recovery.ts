@@ -21,6 +21,8 @@ export function mergeDecisionRecovery(base:DecisionData,draft:DecisionData,saved
   for(const field of new Set([...Object.keys(oldFields),...Object.keys(localFields),...Object.keys(remoteFields)])){const value=crossedGoalChange?remoteFields[field]:choose(oldFields[field],localFields[field],remoteFields[field],id,field);if(value!==undefined)fields[field]=structuredClone(value);}
   if(Object.keys(fields).length)next.workspaces[id]={savedAt:new Date().toISOString(),fields};
  }
+ const exploration=choose(base.exploration,draft.exploration,saved.exploration,'','exploration');
+ if(exploration)next.exploration=structuredClone(exploration);else delete next.exploration;
  next.removedGoalIds=[...new Set([...(saved.removedGoalIds??[]),...(draft.removedGoalIds??[])])].filter(id=>!next.goals.goals.some(goal=>goal.id===id));
  const preferred=draft.goals.activeId;next.goals.activeId=next.goals.goals.some(goal=>goal.id===preferred)?preferred:next.goals.activeId;
  if(!next.goals.goals.some(goal=>goal.id===next.goals.activeId))next.goals.activeId='';

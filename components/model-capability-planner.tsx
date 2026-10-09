@@ -1,4 +1,6 @@
 "use client";
+import { datasetFetch } from "@/lib/dataset-client.mjs";
+
 import {useEffect,useRef,useState} from "react";
 import {decisionStore,useDecisionStorage} from "@/components/decision-store";
 import {agentFingerprint,appendAgentToBrief,emptyAgentSettings,type AgentInput,type AgentRun,type AgentSettings,type AgentEvaluation} from "@/lib/capability-agent";
@@ -21,7 +23,7 @@ export function ModelCapabilityPlanner({goalId,goal,options,limits}:{goalId:stri
  const persist=(patch:Partial<Saved>)=>decisionStore.setField(goalId,"capabilityAgent",{...decisionStore.getField<Saved>(goalId,"capabilityAgent",empty()),...patch});
  const valid=(c:AbortController)=>!c.signal.aborted&&controller.current===c&&decisionStore.getSnapshot().data.goals.activeId===goalId&&decisionStore.getSnapshot().data.goals.goals.some(g=>g.id===goalId&&g.statement===goal);
  async function run(){if(controller.current)return;const c=new AbortController();controller.current=c;setBusy(true);setNotice("");const timer=setTimeout(()=>c.abort(),95000);
-  try{const response=await fetch("/api/capability-agent",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(input),signal:c.signal});const body=await response.json();if(!valid(c))return;
+  try{const response=await datasetFetch("/api/capability-agent",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(input),signal:c.signal});const body=await response.json();if(!valid(c))return;
    if(!response.ok){persist({lastAttempt:{error:typeof body.error==="string"?body.error:"Planner failed; retry explicitly.",trace:Array.isArray(body.trace)?body.trace:[],partialResults:Array.isArray(body.partialResults)?body.partialResults:[]}});return}
    const result=body as AgentRun;if(result.version!==1||!Array.isArray(result.evaluations)||agentFingerprint(result.input)!==fingerprint)throw Error("Planner response did not match this goal and inputs; no result replaced.");
    persist({run:result,lastAttempt:null});setNotice("AI review completed and calculations validated. No actions were executed.");

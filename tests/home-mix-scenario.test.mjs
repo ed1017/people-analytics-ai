@@ -70,7 +70,7 @@ test('candidate Apply keeps future mappings and immutable source history; subseq
  const draft=edit(await scenario(),'set budget to 100000').record.draft,value=await evaluateHomeMix(draft),commit=await prepareHomeMixCommit(draft,value,value.report.preferredOptionId,at,null);
  assert.equal(commit.draft.inputs.capacity.flows.some(f=>f.path==='buy'),false);assert.equal(commit.draft.inputs.mixScenario.flows.some(f=>f.path==='buy'),true);
  assert.ok(await readHomeMixHistory(commit.history,draft.binding.goalId));const after=await evaluateHomeMix(commit.draft);assert.equal(after.report.summary.enumerated,12);assert.equal(after.report.spec.buy.max,5);
- assert.equal(commit.draft.inputs.costsDistinct.value,null);assert.equal(after.report.preferredOptionId,null); // Changed costs require review, not auto-reapproval.
+ assert.deepEqual(commit.draft.inputs.costsDistinct,draft.inputs.costsDistinct);assert.equal(after.report.preferredOptionId,'build-3-move-2-buy-0'); // Same bounded fictional premises, not operational cost approval.
  assert.doesNotThrow(()=>reconcileBundle(commit.draft));
 });
 test('new capacity demo gives a genuine bounded multi-path result while original demo bytes and published source replay stay unchanged',async()=>{

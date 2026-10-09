@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { DatasetBoundary } from "@/components/dataset-boundary";
+import { connection } from "next/server";
+import { datasetRouter } from "@/lib/dataset-runtime";
 import "./globals.css";
 
 const productTitle =
@@ -23,16 +26,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Selection must be read at request time, never embedded by a static build.
+  await connection();
+  const initialDatasetToken = await datasetRouter.bootstrapToken();
   return (
     <html lang="en" className="dark" data-workspace-preference="light" suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{__html: `(function(){var p='light';try{var s=localStorage.getItem('people-analytics-workspace-palette-v1');if(s==='slate-blue'||s==='original-navy-teal')p='slate-blue'}catch(e){}document.documentElement.dataset.workspacePreference=p})()`}} /></head>
       <body>
-        {children}
+        <DatasetBoundary initialToken={initialDatasetToken}>{children}</DatasetBoundary>
         <Analytics />
       </body>
     </html>

@@ -30,7 +30,7 @@ export function WorkforceSolutionEvidence({review, page, editsBlocked, onReview}
       <summary className="cursor-pointer font-medium">L&amp;D · pathways and training assumptions</summary>
       <div className="mt-3 space-y-3 text-sm">
         <p>Near-ready candidates with pathways for all recorded gaps: {shown(evidence.fullyCovered)}; some gaps: {shown(evidence.partiallyCovered)}; no active pathway: {shown(evidence.noPathway)}.</p>
-        <p>Saved Build assumption: {review.input.build} employees, ready in {review.input.buildMonth || "an unknown month"}. Training cash: USD {review.input.trainingCash || "Unknown"}; total employee hours: {review.input.trainingHours || "Unknown"}.</p>
+        <p>Saved Build assumption: {review.input.build} employees, {review.response.capacity_feasibility ? "assumed effective in" : "ready in"} {review.input.buildMonth || "an unknown month"}. Training cash: USD {review.input.trainingCash || "Unknown"}; total employee hours: {review.input.trainingHours || "Unknown"}.</p>
         {evidence.gaps.length ? <ul className="list-disc space-y-1 pl-5">{evidence.gaps.map((gap, i) => <li key={i}>{gap.name}: {shown(gap.candidates)} near-ready candidates below requirement, {shown(gap.courses)} active courses, shortest course {shown(gap.shortestHours)} hours.</li>)}</ul> : <p>No near-ready gap detail is retained in this result.</p>}
         <p className="text-xs">Course presence and duration do not establish suitability, enrollment, completion, readiness dates or productivity gains. Training cash and hours remain user assumptions; catalog hours do not populate them.</p>
         <button className={button} disabled={editsBlocked} onClick={() => onReview("training")}>Review training assumptions</button>

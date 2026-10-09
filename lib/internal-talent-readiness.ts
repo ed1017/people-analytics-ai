@@ -1,6 +1,6 @@
 import { supabaseServer } from "./supabase-server";
 import type {
-  InternalTalentReadinessResponse,
+  LegacyInternalTalentReadinessResponse,
 } from "./types";
 
 const NEAR_READY_MAX_MISSING = 2;
@@ -56,7 +56,7 @@ function emptyCandidatePool(
 
 export async function getInternalTalentReadiness(
   jobProfile: string
-): Promise<InternalTalentReadinessResponse> {
+): Promise<LegacyInternalTalentReadinessResponse> {
   const profileResult =
     await supabaseServer
       .from("job_profiles")

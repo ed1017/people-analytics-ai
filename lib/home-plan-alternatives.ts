@@ -1,6 +1,6 @@
 import type {BundleDraft,BundleResult} from './home-bundle-reconciliation';
 // @ts-expect-error Native Node tests share TypeScript source.
-import {bundleInputKey,readBundleDraft,reconcileBundle} from './home-bundle-reconciliation.ts';
+import {bundleInputKey,readBundleDraft,reviewBundleProposal as reconcileBundle} from './home-bundle-reconciliation.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {bundleChatEditIntent,previewBundleChatEdit,acceptBundleChatEdit} from './home-bundle-chat-edit.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -17,9 +17,9 @@ import {planNumberPattern,planReferenceNumbers} from './home-plan-references.ts'
 export const planAlternativesField='homePlanAlternativesV1';
 export type AlternativeContext={goalId:string;goal:string};
 export type AlternativeSourceRef={id:string;revision:number};
-export type AlternativeOperation={kind:'edit'|'combine'|'staffing'|'goal-correction';text:string;sourceIds:string[];review?:CombinationReview};
+export type AlternativeOperation={provenanceVersion?:1;kind:'edit'|'combine'|'staffing'|'goal-correction'|'conversation';text:string;sourceIds:string[];review?:CombinationReview;proposalKey?:string};
 export type PlanAlternative={id:string;number:number;draft:BundleDraft;result:BundleResult;sourceRefs:AlternativeSourceRef[];requestId:string|null;operation:AlternativeOperation|null;notes:string[];deleted:boolean;applied:boolean};
-export type AlternativeAttachment={id:string;planId:string;attachedAt:string};
+export type AlternativeAttachment={id:string;planId:string;attachedAt:string;purpose?:'proposal-selection'};
 export type PlanAlternatives={version:1;goalId:string;goal:string;nextNumber:number;order:string[];plans:PlanAlternative[];attachments:AlternativeAttachment[]};
 export type AlternativeRequest={requestId:string;text:string;sourceIds:string[];expectedInputs:Record<string,string>;review?:CombinationReview};
 export type AlternativeOutcome={status:'ready';catalog:PlanAlternatives;plan:PlanAlternative;reused:boolean}|{status:'not-an-edit'}|{status:'needs-review';questions:string[]};
@@ -56,12 +56,15 @@ export function readPlanAlternatives(raw:unknown,context:AlternativeContext):Pla
   for(const plan of catalog.plans){
    if(!idValid(plan.id)||seen.has(plan.id)||!Number.isSafeInteger(plan.number)||plan.number<1||numbers.has(plan.number)||!readBundleDraft(plan.draft)||plan.draft.binding.goalId!==context.goalId||plan.draft.binding.goal!==context.goal||typeof plan.deleted!=='boolean'||typeof plan.applied!=='boolean'||!Array.isArray(plan.sourceRefs)||!Array.isArray(plan.notes)||!plan.notes.every(note=>typeof note==='string')||!equalResult(reconcileBundle(plan.draft),plan.result))return null;
    if(new Set(plan.sourceRefs.map(ref=>ref.id)).size!==plan.sourceRefs.length||plan.sourceRefs.some(ref=>!seen.has(ref.id)||seen.get(ref.id)!.draft.revision!==ref.revision)||plan.number!==seen.size+1)return null;
-   if(plan.requestId!==null){if(!idValid(plan.requestId)||requests.has(plan.requestId)||!plan.operation||!['edit','combine','staffing','goal-correction'].includes(plan.operation.kind)||typeof plan.operation.text!=='string'||!plan.operation.text.trim()||plan.operation.text.length>1200||!equal(plan.operation.sourceIds,plan.sourceRefs.map(ref=>ref.id))||plan.sourceRefs.length!==(plan.operation.kind==='combine'?2:1))return null;requests.add(plan.requestId);}
+   if(plan.result.calculationStatus==='awaiting-scope'&&(plan.applied||catalog.attachments.some(item=>item.planId===plan.id&&item.purpose!=='proposal-selection')))return null;
+   if(plan.operation?.provenanceVersion!==undefined&&plan.operation.provenanceVersion!==1)return null;
+   if(plan.requestId!==null){if(!idValid(plan.requestId)||requests.has(plan.requestId)||!plan.operation||!['edit','combine','staffing','goal-correction','conversation'].includes(plan.operation.kind)||typeof plan.operation.text!=='string'||!plan.operation.text.trim()||plan.operation.text.length>1200||!equal(plan.operation.sourceIds,plan.sourceRefs.map(ref=>ref.id))||(plan.operation.kind==='conversation'?plan.sourceRefs.length>30||plan.draft.bundle.origin!=='conversation-v1':plan.sourceRefs.length!==(plan.operation.kind==='combine'?2:1)))return null;requests.add(plan.requestId);}
    else if(plan.sourceRefs.length||plan.operation!==null)return null;
+   if(plan.operation?.proposalKey!==undefined&&(typeof plan.operation.proposalKey!=='string'||!plan.operation.proposalKey.length||plan.operation.proposalKey.length>(plan.operation.kind==='conversation'?32000:8000)))return null;
    seen.set(plan.id,plan);numbers.add(plan.number);
   }
   if(catalog.nextNumber!==Math.max(...numbers)+1||new Set(catalog.order).size!==catalog.order.length||catalog.order.length!==catalog.plans.filter(plan=>!plan.deleted).length||catalog.order.some(id=>!seen.has(id)||seen.get(id)!.deleted))return null;
-  if(new Set(catalog.attachments.map(item=>item.id)).size!==catalog.attachments.length||catalog.attachments.some(item=>!idValid(item.id)||!seen.has(item.planId)||!/^\d{4}-\d\d-\d\dT/.test(item.attachedAt)||!Number.isFinite(Date.parse(item.attachedAt))))return null;
+  if(new Set(catalog.attachments.map(item=>item.id)).size!==catalog.attachments.length||catalog.attachments.some(item=>!idValid(item.id)||!seen.has(item.planId)||item.purpose!==undefined&&item.purpose!=='proposal-selection'||!/^\d{4}-\d\d-\d\dT/.test(item.attachedAt)||!Number.isFinite(Date.parse(item.attachedAt))))return null;
   return structuredClone(catalog);
  }catch{return null;}
 }
@@ -131,6 +134,23 @@ export function proposeCombinedAlternative(raw:PlanAlternatives,context:Alternat
  return append(catalog,request,operation,sources,combined.draft,combined.result,combined.notes);
 }
 
+/** Internal structured executor boundary: only explicitly reviewed, recomputed drafts are persisted. */
+export function appendReviewedAlternative(raw:PlanAlternatives,context:AlternativeContext,request:AlternativeRequest,draft:BundleDraft,kind:'edit'|'combine',notes:string[],proposalKey:string):AlternativeOutcome{
+ const catalog=checked(raw,context),sources=sourcesFor(catalog,request),operation:AlternativeOperation={kind,text:request.text,sourceIds:request.sourceIds,proposalKey};
+ const existing=retry(catalog,request,operation);if(existing)return existing;
+ if(sources.length!==(kind==='combine'?2:1)||!readBundleDraft(draft)||!equal(draft.binding,sources[0].draft.binding)||draft.bundle.id!==sources[0].draft.bundle.id||kind==='edit'&&draft.revision!==sources[0].draft.revision+1)fail('Review a validated proposal for these exact source plans.');
+ return append(catalog,request,operation,sources,draft,reconcileBundle(draft),notes);
+}
+
+/** New conversational proposals may originate independently or from several immutable sources. */
+export function appendConversationAlternative(raw:PlanAlternatives|null,context:AlternativeContext,request:AlternativeRequest,draft:BundleDraft,notes:string[],proposalKey:string,provenanceVersion?:1):AlternativeOutcome{
+ const catalog=raw?checked(raw,context):{version:1 as const,...context,nextNumber:1,order:[],plans:[],attachments:[]};
+ if(!idValid(request.requestId)||!request.text.trim()||request.text.length>1200||request.sourceIds.length>30||new Set(request.sourceIds).size!==request.sourceIds.length||!readBundleDraft(draft)||draft.bundle.origin!=='conversation-v1'||draft.binding.goalId!==context.goalId||draft.binding.goal!==context.goal)fail('Review a validated conversational proposal for this goal.');
+ const operation:AlternativeOperation={kind:'conversation',text:request.text,sourceIds:[...request.sourceIds],proposalKey,...(provenanceVersion===1?{provenanceVersion}: {})},existing=retry(catalog,request,operation);if(existing)return existing;
+ const sources=request.sourceIds.length?sourcesFor(catalog,request):[];
+ return append(catalog,request,operation,sources,draft,reconcileBundle(draft),notes);
+}
+
 /** Metadata-only view changes: deleted plans remain as lineage/attachment tombstones. */
 export function changeAlternativeView(raw:PlanAlternatives,context:AlternativeContext,change:{order?:string[];deleteId?:string}):PlanAlternatives{
  const catalog=checked(raw,context);
@@ -140,11 +160,13 @@ export function changeAlternativeView(raw:PlanAlternatives,context:AlternativeCo
 }
 export function applyPlanAlternative(raw:PlanAlternatives,context:AlternativeContext,planId:string,expectedInput:string):PlanAlternatives{
  const catalog=checked(raw,context),plan=catalog.plans.find(item=>item.id===planId&&!item.deleted);
+ if(plan?.result.calculationStatus==='awaiting-scope')fail('This is a qualitative proposal. Confirm population and horizon, then calculate it before applying.');
  if(!plan||bundleInputKey(plan.draft)!==expectedInput)fail('The alternative changed. Review it before applying.');plan.applied=true;return catalog;
 }
 /** An explicit new attachment references the immutable alternative. Existing attachments remain intact. */
 export function attachPlanAlternative(raw:PlanAlternatives,context:AlternativeContext,planId:string,confirmation:{inputKey:string;attachmentId:string;at:string;acknowledgeUnknowns:boolean}):PlanAlternatives{
  const catalog=checked(raw,context),plan=catalog.plans.find(item=>item.id===planId&&!item.deleted);
+ if(plan?.result.calculationStatus==='awaiting-scope')fail('This is a qualitative proposal. Confirm population and horizon, then calculate it before attaching.');
  if(!plan||bundleInputKey(plan.draft)!==confirmation.inputKey)fail('Review this exact alternative before attaching.');
  const existing=catalog.attachments.find(item=>item.id===confirmation.attachmentId);if(existing){if(existing.planId!==planId)fail('That attachment ID belongs to another alternative.');return catalog;}
  if(plan.result.issues.length&&!confirmation.acknowledgeUnknowns)fail('Acknowledge unresolved assumptions before attaching this proposal.');
@@ -175,4 +197,16 @@ export function proposeCorrectedPilotAlternative(raw:PlanAlternatives,context:Al
  if(!correction)fail('This plan has no unchanged legacy defaults to correct. Explicit plan edits and prior attachments are kept.');
  const prior=catalog.plans.find(plan=>!plan.deleted&&plan.operation?.kind==='goal-correction'&&plan.sourceRefs.length===1&&plan.sourceRefs[0].id===sources[0].id&&equal(plan.draft,correction.draft));if(prior)return {status:'ready',catalog,plan:structuredClone(prior),reused:true};
  return append(catalog,request,operation,sources,correction.draft,reconcileBundle(correction.draft),[...correction.changes,'Created by explicit review of the original goal. Existing dates, activity costs and user edits are preserved; review unresolved scope and assumptions before attaching.']);
+}
+
+/** Explicit goal association of an immutable proposal; never operational Apply. */
+export function associatePlanProposal(raw:PlanAlternatives,context:AlternativeContext,planId:string,confirmation:{inputKey:string;attachmentId:string;at:string;acknowledgeUnknowns:boolean}):PlanAlternatives{
+ const catalog=checked(raw,context),plan=catalog.plans.find(item=>item.id===planId&&!item.deleted);
+ if(!plan||plan.result.inputKey!==confirmation.inputKey)fail('This proposal changed. Review it before choosing.');
+ const existing=catalog.attachments.find(item=>item.id===confirmation.attachmentId);
+ if(existing){if(existing.planId!==planId||existing.purpose!=='proposal-selection')fail('That selection belongs to another proposal.');return catalog;}
+ if(plan.result.issues.length&&!confirmation.acknowledgeUnknowns)fail('Review the unknowns before choosing this proposal.');
+ catalog.attachments.push({id:confirmation.attachmentId,planId,attachedAt:confirmation.at,purpose:'proposal-selection'});
+ if(!readPlanAlternatives(catalog,context))fail('The selected proposal could not be verified. Existing work is kept.');
+ return catalog;
 }

@@ -1,4 +1,5 @@
 "use client";
+import {datasetFetch} from "@/lib/dataset-client.mjs";
 
 import { useEffect, useMemo, useState } from "react";
 import { filterReferenceProfiles, isOccupationCode, occupationSourceUrl, unavailableReferenceDetail, unavailableReferenceIndex, type OccupationalReferenceDetail, type OccupationalReferenceEvidence, type OccupationalReferenceIndex, type ReferenceOccupation } from "../lib/occupational-reference";
@@ -25,7 +26,7 @@ export function OccupationalReference({ onEvidenceChange }: { onEvidenceChange?:
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch("/api/occupational-reference", { cache: "no-store", signal: controller.signal })
+    datasetFetch("/api/occupational-reference", { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error("Reference source unavailable");
         const result = await response.json();
@@ -48,7 +49,7 @@ export function OccupationalReference({ onEvidenceChange }: { onEvidenceChange?:
   useEffect(() => {
     if (!isOccupationCode(selectedCode)) return;
     const controller = new AbortController();
-    fetch(`/api/occupational-reference?occupation=${encodeURIComponent(selectedCode)}`, { cache: "no-store", signal: controller.signal })
+    datasetFetch(`/api/occupational-reference?occupation=${encodeURIComponent(selectedCode)}`, { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error("Occupation skills unavailable");
         const result = await response.json();
@@ -87,6 +88,7 @@ export function OccupationalReference({ onEvidenceChange }: { onEvidenceChange?:
     <div className={cardClass}>
       <h2 className="text-xl font-semibold">Explore roles and occupations</h2>
       <p className="mt-2 text-sm text-muted-foreground">Explore job profiles and occupational guidance. Mappings do not establish employee skill attainment.</p>
+      {index?.data_meta && <p className="mt-3 rounded-md border bg-muted/20 p-3 text-sm">{index.data_meta.sourceLabel}. {index.data_meta.publicExcerptBoundary}</p>}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
         <p role="status">{!index ? "Loading job-profile sources…" : index.sources.profiles !== "ready" ? "Internal job profiles unavailable. Public references remain available below." : index.mappedProfileCount === null ? `${index.profiles.length} job profiles loaded · mapping coverage unavailable` : `${index.mappedProfileCount} of ${index.profiles.length} job profiles have a stored mapping`}</p>
         <button type="button" className="min-h-11 rounded border px-3 py-2" onClick={() => { setIndex(null); setDetail(null); setRevision((value) => value + 1); }}>Retry reference sources</button>
@@ -161,7 +163,7 @@ export function OccupationalReference({ onEvidenceChange }: { onEvidenceChange?:
       </section>}
     </article>}
     <details className="rounded-lg border p-4 text-xs text-muted-foreground"><summary className="min-h-11 cursor-pointer py-2 font-medium">Sources and interpretation</summary><div className="mt-3 space-y-3">
-      <p>Internal role expectations use a 1–5 proficiency scale. O*NET occupation ratings use importance 1–5 and level 0–7; the scales are not interchangeable. No employee records are used in this explorer.</p>
+      <p>Internal role expectations use a 1–5 proficiency scale. O*NET occupation ratings use importance 1–5 and level 0–7; the scales are not interchangeable. {index?.data_meta ? "No individual employee records are shown in this explorer." : "No employee records are used in this explorer."}</p>
       {storedOccupation && <p>Stored release label: {storedOccupation.release ?? "unknown"} · stored refresh: {shortDate(storedOccupation.refreshedAt)} · import not independently verified. Stored timestamps do not verify publication or import dates.</p>}
       <p>{occupationalPublicSource.attribution} Public excerpts were checked against O*NET OnLine on {occupationalPublicSource.checkedAt}; the published database release was 31.0. No live O*NET feed. {occupationalPublicSource.modifications}</p>
       {currentDetail?.sources.essentialSkills === "ready" && currentDetail.essentialSkills.length > 0 && <div><p className="font-medium">Stored essential-skill provenance</p><ul className="mt-2 space-y-1">{currentDetail.essentialSkills.map((skill, position) => <li key={`${skill.name}-${position}`}>{skill.name}: release {skill.release ?? "unknown"} · updated {shortDate(skill.updatedAt)}</li>)}</ul></div>}

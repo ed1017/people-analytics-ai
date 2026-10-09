@@ -31,6 +31,7 @@ export function ResponseStrategyEvidence({
           {responseStrategy.skills_evaluated} skills evaluated
         </span>
       </div>
+      {responseStrategy.provenance && <p className="mb-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">{responseStrategy.provenance} Skill presence and career preferences do not establish assessed readiness or available movers.</p>}
       {responseStrategy.skills.length > 0 ? (
         <>
           <div className="mb-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
@@ -124,7 +125,7 @@ export function ResponseStrategyEvidence({
                         {row.move.evidence_available ? (
                           <>
                             <p className="font-medium">
-                              {row.move.mobility_candidates.toLocaleString()} candidates
+                              {row.move.mobility_candidates.toLocaleString()} {responseStrategy.provenance ? "preference matches" : "candidates"}
                             </p>
                             <p className="text-[11px] text-muted-foreground">
                               Hold skill + preference toward another profile requiring it

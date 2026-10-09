@@ -153,10 +153,10 @@ export function SurveySentimentPage({
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 {engagementDelta === null
-                  ? "2026 Global Engagement"
+                  ? data?.data_meta?.listeningWave ?? "2026 Global Engagement"
                   : (engagementDelta >= 0 ? "+" : "") +
                     engagementDelta.toFixed(1) +
-                    " pts vs prior annual survey"}
+                    (data?.data_meta?.listeningPeriod === "quarterly" ? " pts vs prior quarterly wave" : " pts vs prior annual survey")}
               </p>
             </div>
 
@@ -205,7 +205,7 @@ export function SurveySentimentPage({
                   Engagement Trend
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Annual favorable sentiment and survey participation
+                  {data.data_meta?.listeningPeriod === "quarterly" ? "Quarterly valid-respondent favorability and participation" : "Annual favorable sentiment and survey participation"}
                 </p>
               </div>
 

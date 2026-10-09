@@ -148,7 +148,7 @@ export function PositionActionSimulator({
         </div>
       ) : (
         <p className="text-sm text-muted-foreground">
-          Loading position action model…
+          {loading ? "Loading position action model…" : "Position action model unavailable."}
         </p>
       )}
 

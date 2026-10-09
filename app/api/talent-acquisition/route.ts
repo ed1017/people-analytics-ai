@@ -1,3 +1,4 @@
+import { withDatasetRequest } from "@/lib/dataset-runtime";
 import {calibratedExtensionForSource} from "../../../lib/synthetic-ta/extension";
 import { NextResponse } from "next/server";
 import { dataApiErrorResponse } from "../../../lib/data-api-error";
@@ -6,7 +7,7 @@ import { nullableNumber as toNumber } from "../../../lib/numeric-contract";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+async function handleGET() {
   try {
     const [currentResult, sourceResult, businessUnitResult, recruiterResult, monthlyResult] = await Promise.all([
       supabaseServer.from("talent_acquisition_current_summary").select("*").single(),
@@ -87,4 +88,7 @@ export async function GET() {
   } catch (error) {
     return dataApiErrorResponse('talent-acquisition', error);
   }
+}
+export async function GET(request: Request) {
+  return withDatasetRequest(request, () => handleGET());
 }

@@ -8,6 +8,7 @@ import {dataApiErrorResponse} from '../lib/data-api-error.ts';
 import * as numeric from '../lib/numeric-contract.ts';
 import * as planning from '../lib/stored-planning.ts';
 import * as exitEnps from '../lib/exit-enps.ts';
+import {withDatasetRequest} from '../lib/dataset-runtime.ts';
 
 async function capture(run){
  const original=console.error,logs=[];console.error=(...args)=>logs.push(args);
@@ -41,6 +42,7 @@ async function routeWith(results){
  const supabaseServer={from:table=>{calls.push(table);return {select:()=>({single:async()=>results(table),order:async()=>results(table)})}}};
  vm.runInNewContext(code,{exports,require:name=>{
   if(name==='next/server')return {NextResponse:Response};
+  if(name==='@/lib/dataset-runtime')return {withDatasetRequest};
   if(name==='../../../lib/supabase-server')return {supabaseServer};
   if(name==='../../../lib/data-api-error')return {dataApiErrorResponse};
   throw Error('Unexpected import: '+name);
@@ -79,7 +81,7 @@ for(const source of ['survey-sentiment','talent-acquisition','workforce-planning
     const query={select:()=>query,single:()=>query,order:()=>query,in:()=>query,then:resolve=>resolve({data:null,error:{code:'PGRST303',message:privateMessage}})};
     return query;
    }};
-   const aliases={'../../../lib/synthetic-ta/extension':taExtensionModule,'next/server':{NextResponse:Response},'../../../lib/supabase-server':{supabaseServer},'../../../lib/data-api-error':{dataApiErrorResponse},'../../../lib/numeric-contract':numeric,'../../../lib/stored-planning':planning,'../../../lib/exit-enps':{...exitEnps,localExitEnpsEnabled:()=>false}};
+   const aliases={'@/lib/dataset-runtime':{withDatasetRequest},'../../../lib/synthetic-ta/extension':taExtensionModule,'next/server':{NextResponse:Response},'../../../lib/supabase-server':{supabaseServer},'../../../lib/data-api-error':{dataApiErrorResponse},'../../../lib/numeric-contract':numeric,'../../../lib/stored-planning':planning,'../../../lib/exit-enps':{...exitEnps,localExitEnpsEnabled:()=>false}};
    vm.runInNewContext(code,{exports,require:name=>{if(name in aliases)return aliases[name];throw Error('Unexpected import: '+name)}});
    const {value:response,logs}=await capture(()=>exports.GET());
    assert.equal(response.status,500);assert.equal(response.headers.get('cache-control'),'no-store');

@@ -1,7 +1,7 @@
 "use client";
 import {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {decisionStore, useDecisionStorage} from '@/components/decision-store';
-import {DECISIONS_STORAGE_KEY} from '@/lib/local-decisions';
+import {datasetDecisionKey} from '@/lib/local-decisions';
 import {actionPlanApplicationSource, actionPlanDevelopmentScopeKey, actionPlanQuoteKey, previewActionPlanApplication,
   type ApplicationContext, type ApplicationChoices, type ApplicationPreview} from '@/lib/action-plan-application-preview';
 import {applyActionPlanPreview, currentApplicationContext, readApplicationHistory, applicationHistoryField} from '@/lib/action-plan-application';
@@ -31,7 +31,7 @@ export function HomeActionPlanApplication(props: Props) {
   // confirmation can never be silently rebound to newly rendered destinations.
   const key = JSON.stringify([props.attachmentId, bundleInputKey(props.draft), props.binding, storage.data.revision]);
   useEffect(() => {
-    const changed = (event: StorageEvent) => {if (event.key === null || event.key === DECISIONS_STORAGE_KEY) decisionStore.invalidateExternalChange();};
+    const changed = (event: StorageEvent) => {if (event.key === null || event.key === datasetDecisionKey(decisionStore.getDatasetToken())) decisionStore.invalidateExternalChange();};
     window.addEventListener('storage', changed); return () => window.removeEventListener('storage', changed);
   }, []);
   return <section aria-label="Apply Action Plan locally" className="space-y-3 rounded border p-3">
