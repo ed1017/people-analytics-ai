@@ -17,7 +17,12 @@ import {responseForStep} from '../fixtures/natural-business-planning.mjs';
 import {productQuestion,turnoverQuestion,recommendationSteps,actionPlans,batch,combinedPlan,fourPlanSteps,answeredOwnerPlan,refinementQuestions} from '../fixtures/action-plan-recommendations.mjs';
 import {final,evaluate} from '../fixtures/home-solution-conversation.mjs';
 import {homeStarterGroups} from '../../lib/contextual-prompts.ts';
+import {homeDefinitions} from '../../lib/home-pack.mjs';
+import {scopedDashboardResponse} from '../../lib/dashboard-scope.ts';
 const isolated=await offlineBusinessRoute();
+const aggregateFixture=scopedDashboardResponse({overview:{headcount:100,fte:100,open_positions:3,snapshot_date:'2026-09-30'},trend:[{snapshot_date:'2026-09-30',headcount:100,fte:100}]},{country:'all',org:'all',level:'all'});
+isolated.sandbox.__aggregateSources=Object.fromEntries(homeDefinitions.map(def=>[def[1],{status:'loaded',data:aggregateFixture}]));
+isolated.sandbox.__aggregateReads=[];
 
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const output=await fs.mkdtemp(path.join(os.tmpdir(),'home-action-plans-browser-'));
@@ -71,11 +76,11 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
    isolated.sandbox.__replies.push(...steps.map(responseForStep));
    const response=await isolated.post(new Request(req.url(),{method:req.method(),headers:req.headers(),body:req.postData()})),bytes=await response.text();
    assert.equal(response.status,200,bytes);assert.equal(isolated.sandbox.__replies.length,0);
-   for(const sent of isolated.sandbox.__requests){assert.equal(sent.model,'gpt-6.1-sol');assert.equal(sent.max_output_tokens,5000);assert.ok(sent.tools.some(tool=>tool.name==='evaluate_action_plans'));assert.match(sent.instructions,/RECOMMENDATIONS ARE ACTION PLANS/);assert.match(sent.instructions,/focus.*optional afterward/);assert.match(sent.instructions,/start with a short summary/);assert.match(sent.instructions,/After the plans, add a concise optional further reading and investigations section/);assert.match(sent.instructions,/never fabricate a source, title, URL/);}
+   for(const sent of isolated.sandbox.__requests){assert.equal(JSON.parse(sent.input[0].content.split('\n').slice(1).join('\n')).evidenceGrounding.databaseIntegrityCertified,false);assert.equal(sent.model,'gpt-6.1-sol');assert.equal(sent.max_output_tokens,5000);assert.ok(sent.tools.some(tool=>tool.name==='evaluate_action_plans'));assert.match(sent.instructions,/RECOMMENDATIONS ARE ACTION PLANS/);assert.match(sent.instructions,/focus.*optional afterward/);assert.match(sent.instructions,/start with a short summary/);assert.match(sent.instructions,/After the plans, add a concise optional further reading and investigations section/);assert.match(sent.instructions,/never fabricate a source, title, URL/);}
    return route.fulfill({status:200,contentType:'application/json',body:bytes});
   }
   assert.equal(req.method(),'GET');
-  return route.fulfill({json:{overview:{headcount:100,fte:100,open_positions:3,snapshot_date:'2026-09-30'},trend:[{snapshot_date:'2026-09-30',headcount:100,fte:100}]}});
+  return route.fulfill({json:aggregateFixture});
  });
  const send=async(text,answer)=>{await chat.fill(text);await button('Send overview question')[click]();await page.getByText(answer,{exact:true}).filter({visible:true}).first().waitFor();};
  await page.goto(base+'/');await dismissHomeOnboarding(page);const original=await state(),demoGoals=JSON.stringify(original.goals);
@@ -141,5 +146,5 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
  check(mode+' no overflow or browser errors',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&blocked.length===0);
  transport.push({mode,requests:requests.length,errors,blocked});await context.close();
 }}catch(error){for(const context of browser.contexts())for(const page of context.pages()){await fs.writeFile(path.join(output,'failure.txt'),await page.locator('body').innerText()).catch(()=>{});await page.screenshot({path:path.join(output,'failure.png'),fullPage:true}).catch(()=>{});}console.error(JSON.stringify({output,transport}));throw error;}finally{await browser.close();}
-await fs.writeFile(path.join(output,'receipt.json'),JSON.stringify({sourceSha:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),workingTree:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim(),artifactSha256:createHash('sha256').update(artifact).digest('hex'),checks:assertions.length,assertions,transport,actualRootPage:true,actualPOST:true,clientRequestsUnmodified:true,modelResponses:'synthetic fixtures; not independent semantic acceptance',providerCalls:0,databaseCalls:0},null,2));
+await fs.writeFile(path.join(output,'receipt.json'),JSON.stringify({sourceSha:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),workingTree:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim(),artifactSha256:createHash('sha256').update(artifact).digest('hex'),checks:assertions.length,assertions,transport,actualRootPage:true,actualPOST:true,clientRequestsUnmodified:true,modelResponses:'synthetic fixtures; not independent semantic acceptance',providerCalls:0,databaseCalls:0,realAggregateVerifier:true,aggregateFixtureReads:isolated.sandbox.__aggregateReads.length},null,2));
 console.log(JSON.stringify({checks:assertions.length,output}));

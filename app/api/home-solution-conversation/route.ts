@@ -1,3 +1,5 @@
+import {groundSolutionRequest} from '@/lib/home-solution-grounding-source';
+import {SolutionEvidenceError} from '@/lib/home-solution-grounding.mjs';
 import {businessPlanningTools,businessPlanningInstructions} from '@/lib/home-business-planning';
 import {solutionPlanningInstructions} from '@/lib/home-solution-planning';
 import {demandReferenceModelContract} from '@/lib/swp-demand-reference';
@@ -25,13 +27,15 @@ async function handlePOST(request:Request){
   if(swpModel.model&&swpModel.model!==homeSolutionModel.model)throw Error('Configured SWP model conflicts with the Home conversation policy.');
   const demand=request.headers.get(SWP_CONVERSATION_HEADER)===SWP_DEMAND_MODE?requestDemandContext(parsed,datasetRouter.current().token):null;
   if(!process.env.OPENAI_API_KEY)throw Error('Model unavailable');
-  const client=new OpenAI({...openAIProxyTransport(),apiKey:process.env.OPENAI_API_KEY,maxRetries:0});
   const signal=AbortSignal.any([request.signal,AbortSignal.timeout(90000)]);
+  const grounding=await groundSolutionRequest(parsed,signal);
+  const client=new OpenAI({...openAIProxyTransport(),apiKey:process.env.OPENAI_API_KEY,maxRetries:0});
   const progressContract=progressModelContract(goalProgressConversationEnabled);
   const natural=request.headers.get(SWP_CONVERSATION_HEADER)===null;
   const planningInstructions=solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions:'');
   const conversationTools=demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools,...(natural?businessPlanningTools:[])];
   const reply=await converseSolutions(parsed,{
+   grounding,
    ...(demand?{demand:{datasetToken:datasetRouter.current().token,referenceContract:true}}:{}),
    ...(natural?{natural:{datasetToken:datasetRouter.current().token}}:{}),
    progress:{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token},
@@ -42,7 +46,7 @@ async function handlePOST(request:Request){
    loadProjection:async(filters,signal)=>(await import('@/lib/home-solution-projection-source')).loadSolutionProjectionInputs(filters,signal),
   },signal);
   return Response.json(reply,{headers:{'Cache-Control':'no-store'}});
- }catch{return Response.json({error:'The conversation could not be completed or verified. Your request and earlier work are kept. Try a narrower question or retry explicitly.'},{status:422});}
+ }catch(error){if(error instanceof SolutionEvidenceError)return Response.json({error:error.message},{status:503,headers:{'Cache-Control':'no-store'}});return Response.json({error:'The conversation could not be completed or verified. Your request and earlier work are kept. Try a narrower question or retry explicitly.'},{status:422});}
 }
 
 export async function POST(request:Request) {

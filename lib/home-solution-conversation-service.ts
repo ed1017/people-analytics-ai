@@ -1,3 +1,6 @@
+import type {verifySolutionEvidence} from './home-solution-grounding.mjs';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {homeAnswerScopeViolation} from './home-answer-scope.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {businessPlanningTools,currentBusinessPlanning,businessPlanningView,runBusinessPlanningTool} from './home-business-planning.ts';
 // @ts-expect-error Native fixtures share TypeScript source.
@@ -29,7 +32,7 @@ import {readSwpPlaybook} from './swp-reasoning-playbook.ts';
 
 export type SolutionModelOutput={items:unknown[];calls:{id:string;name:string;arguments:string}[];text:string;completed:boolean};
 export type SolutionReply={requestId:string;answer:string;candidateIds:string[];analysisIds:string[];state:SolutionState;usage:{modelRounds:number;toolCalls:number};progressProposal?:ProgressEntryProposal;demandReview?:DemandReview};
-export type SolutionRuntime={complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal)=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date;natural?:{datasetToken:string};progress?:{enabled:boolean;datasetToken:string};demand?:{datasetToken:string;referenceContract?:boolean}};
+export type SolutionRuntime={grounding?:Awaited<ReturnType<typeof verifySolutionEvidence>>;complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal)=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date;natural?:{datasetToken:string};progress?:{enabled:boolean;datasetToken:string};demand?:{datasetToken:string;referenceContract?:boolean}};
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 const abort=(signal:AbortSignal)=>{if(signal.aborted)throw Error('Conversation request cancelled.');};
 const latest=<T extends {id:string}>(items:T[])=>[...new Map(items.map(item=>[item.id,item])).values()];
@@ -82,7 +85,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  const referenced=!!demand&&runtime.demand?.referenceContract===true;let referenceStep=0;
  let currentDemandReference=referenced?demandReferenceId(request.requestId,referenceStep):'';
  let natural=runtime.natural?currentBusinessPlanning(request,runtime.natural.datasetToken):null,naturalStep=0;
- const modelContext={...solutionModelContext(request,progress),...(runtime.natural?{businessPlanning:businessPlanningView(natural,request.requestId,naturalStep)}:{})};
+ const modelContext={...solutionModelContext(request,progress),...(runtime.grounding?{evidenceGrounding:runtime.grounding}:{}),...(runtime.natural?{businessPlanning:businessPlanningView(natural,request.requestId,naturalStep)}:{})};
  if(referenced&&demand){const goalContext=structuredClone(request.goalContext) as {scenarioReview:Record<string,unknown>};goalContext.scenarioReview.demandProposal=demand.demandProposal?referencedDemandView(demand.demandProposal,demand,currentDemandReference):null;modelContext.goalContext=goalContext;}
  const input:unknown[]=[{role:'user',content:'CURRENT AUTHORITATIVE CONTEXT AND CONVERSATION DATA\n'+JSON.stringify({...modelContext,...(entryContext?{progressEntryDraft:entryContext.previous}:{} )})}];
  const evaluated=new Map<string,SolutionEvaluation>(),analyses=new Map<string,HeadcountProjection>();
@@ -123,7 +126,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
      const sources=(request.evidence as {sources:Record<string,unknown>[]}).sources;
      const ids=args.sourceIds as string[];if(ids.some(id=>!sources.some(source=>source.id===id)))throw Error('A requested current evidence source is unavailable.');
      const catalog=actionEvidenceCatalog(request.evidence);
-     result=(ids.length?sources.filter(source=>ids.includes(source.id as string)):sources.map(({id,label,scope,date,status,limitation})=>({id,label,scope,date,status,limitation}))).map(source=>({...source,citationCatalog:catalog.filter(item=>item.sourceId===source.id)}));
+     result=(ids.length?sources.filter(source=>ids.includes(source.id as string)):sources.map(({id,label,scope,date,status,limitation})=>({id,label,scope,date,status,limitation}))).map(source=>({...source,...(runtime.grounding?{grounding:runtime.grounding.sources.find(item=>item.id===source.id),datasetToken:runtime.grounding.datasetToken,retrievedAt:runtime.grounding.retrievedAt}:{}),citationCatalog:catalog.filter(item=>item.sourceId===source.id)}));
     }else if(call.name==='read_plans'){
      const ids=args.planIds as string[];result=ids.map(id=>{const plan=request.catalog?.plans.find(plan=>plan.id===id&&!plan.deleted);if(!plan)throw Error('A requested saved plan is unavailable.');return solutionPlanView(plan);});
     }else if(call.name==='evaluate_candidate'||call.name==='evaluate_action_plans'||call.name==='revise_parameters'){
@@ -166,6 +169,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   }
  }
  if(!final)throw Error('No complete conversational answer was returned.');
+ if(homeAnswerScopeViolation(final.answer,request.evidence))throw Error('The answer attributes source evidence to an unsupported population.');
  state.constraints=mergeSolutionConstraints(request,state.constraints,final.constraintUpdates);
  if(new Set(final.candidateIds).size!==final.candidateIds.length||final.candidateIds.some(id=>!evaluated.has(id))||new Set(final.analysisIds).size!==final.analysisIds.length||final.analysisIds.some(id=>!analyses.has(id)))throw Error('The answer references a proposal or analysis that was not checked in this turn.');
  for(const id of final.candidateIds){const item=evaluated.get(id)!;if(!same(item.constraints,state.constraints)){item.blocking.push('Constraints changed after this calculation. Refine the proposal against the current constraints before saving.');}}
