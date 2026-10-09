@@ -9,7 +9,7 @@ import {useHomeSolutionConversation} from '@/components/use-home-solution-conver
 import type {DemandIntakeControl} from '@/components/swp-demand-journey';
 import type {DemandReview} from '@/lib/swp-demand';
 import {SwpGuidedJourney} from '@/components/swp-guided-journey';
-import {HomeSolutionConversationReview} from '@/components/home-solution-conversation-review';
+import {HomeSolutionConversationReview,HomeSolutionProposalLinks} from '@/components/home-solution-conversation-review';
 import {GuidedDemo,GUIDED_EXAMPLE_PROMPT} from '@/components/guided-demo';
 import {HomeGuidedActionsContext,GuidedActionRegistry} from '@/components/home-guided-actions';
 import {homeExitReasonChartFromPacket,homeExitReasonChartMatches,type HomeExitReasonChart as ExitReasonChartData} from '@/lib/home-exit-reason-chart';
@@ -542,7 +542,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     <section aria-label="Starting guide" data-testid="overview-starting-guide" className="space-y-3 pt-0 pb-1">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <h3 className="text-2xl font-semibold">What workforce decision will support your goal?</h3>
-        <p className="text-sm text-muted-foreground">Describe the business outcome and horizon. We can review evidence, assumptions and choices together.</p>
+        <p className="text-sm text-muted-foreground">Ask your question or use a prompt. Compare proposed Action Plans, then refine your choice in chat.</p>
       </div>
 
       <div className="mt-3"><PromptExamples groups={conversation.focusedIssue?undefined:homeStarterGroups} prompts={[...contextualPrompts({page:"home",goal:conversation.focusedIssue,hasConversation:messages.some(message=>message.role==="user"),evidenceReady:ready,sources})]} draft={input} busy={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)} onSend={submitStarterQuestion}/></div>
@@ -598,6 +598,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
       {active&&hasRetention&&<RetentionWhatIfPanel key={conversation.activeGoalId} openSequence={retentionEntry?.sequence??0} initiallyOpen={retentionEntry?.id===conversation.activeGoalId}/>}
       {active&&<WorkforceSolutionPanel hideEntry optionActions={optionActions} page="home" onNavigate={onNavigate}/>}
     </div>
+    {solutionConversationEnabled&&<HomeSolutionProposalLinks controller={solutions}/>}
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!guidedExampleActive&&<SwpGuidedJourney discussionKey={JSON.stringify([workforceScope,workforceQuery,persona])} conversation={conversation} active={active} busy={chatLoading||solutions.pending||solutions.saving} commandRef={swpCommand} modelContextRef={swpModelContext} demandControlRef={demandControl} demandReviewRef={demandReview} demandContextRef={demandContext} sources={sources??[]} onNavigate={onNavigate}/>}
@@ -629,7 +630,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
       {planEdit?.goalId===conversation.activeGoalId&&<p className="mb-1 text-xs font-medium">Editing Action Plan #{planEdit.option}. Send previews changes for your review.</p>}
       <label htmlFor="overview-question" className="sr-only">Ask Workforce AI</label>
       <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" aria-describedby="overview-question-context-tip" value={input} onChange={event => changeQuestion(event.target.value)} rows={3}
-        placeholder="Describe the business outcome and horizon. We can review evidence, assumptions and choices together." className="max-h-80 min-h-28 w-full resize-y rounded-lg border bg-background/40 p-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+        placeholder="Ask your question or use a prompt. Compare proposed Action Plans, then refine your choice in chat." className="max-h-80 min-h-28 w-full resize-y rounded-lg border bg-background/40 p-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
       <div className="home-compose-actions mt-2 flex items-end justify-between gap-3">
         <p hidden={showCandidatePin||Boolean(activePinnedGoal)} id="overview-question-context-tip" className="min-w-0 text-xs leading-4 text-muted-foreground">Ask a question or follow up on an answer. To plan an action, include your desired outcome, timeline and constraints.</p>
         <button data-guide-target="submit" type="submit" aria-label="Send overview question" disabled={(solutionConversationEnabled?!solutions.canSend:(!localCandidate&&!ready&&!(demoPlan&&planEditReady&&(structuredPlansEnabled&&structuredMode||bundleChatEditIntent(input).edit||localPlanDiscussion(input))))) || chatLoading || structuredPending || solutions.pending || !input.trim()} className="ms-auto flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{structuredPending?'Reviewing…':'Send'} <ArrowUp size={17} /></button></div>

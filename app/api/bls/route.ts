@@ -63,11 +63,12 @@ function observationDate(
   ).padStart(2, "0")}-01`;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const response = await fetch(
       "https://api.bls.gov/publicAPI/v1/timeseries/data/",
       {
+        signal: request.signal,
         method: "POST",
         headers: {
           "Content-Type":

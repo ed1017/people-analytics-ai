@@ -21,7 +21,7 @@ test('all five approved business-change openers clarify without goal, forecast o
   assert.equal(homeTurnPurpose(prompt),'answer');assert.equal(homeTurnPurpose(prompt+'\n\nFocused issue: Previous goal',[user('Reduce turnover')]),'answer');
   assert.equal(homeStarterGoal(prompt),null);assert.equal(homeForecastIntent(prompt),null);
   const instructions=strategicPlanningInstructions(prompt);
-  for(const pattern of [/keep unsupported measured\/source values unknown/,/Role headcounts do not establish available delivery capacity/,/employee snapshots/,/Do not force three plans/,/Never claim that a plan was calculated, saved or executed/])assert.match(instructions,pattern);
+  for(const pattern of [/keep unsupported measured\/source values unknown/,/Role headcounts do not establish available delivery capacity/,/employee snapshots/,/Do not force three plans/,/rather than fabricate numeric results/,/Never claim that a plan was calculated, saved or executed/])assert.match(instructions,pattern);
  }
 });
 test('each opener supports provisional planning with reviewable assumptions, not invented project evidence or a full questionnaire',()=>{

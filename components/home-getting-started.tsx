@@ -54,13 +54,13 @@ export function HomeGettingStarted({ busy, active, ready, autoOpen, onNavigate, 
       <div className="min-h-0 space-y-3 overflow-y-auto overscroll-contain p-4 text-sm leading-relaxed sm:p-6">
       <p>An AI-enabled Strategic Workforce Planning prototype: connect a business objective to workforce choices, a reviewed Action Plan and progress tracking — insight → action → outcomes.</p>
       <p className="text-xs text-muted-foreground">Synthetic data and fictional scenarios. Benefits are conditional estimates; review capability, availability and funding before acting.</p>
-      <h4 className="font-semibold">Try the five-role workforce decision</h4>
+      <h4 className="font-semibold">Start with your question</h4>
       <ol className="list-decimal space-y-2 pl-5">
-        <li><strong>Frame the goal</strong> — Close these instructions and choose Explore the five-role example. Review the business objective, horizon and demand assumption in chat, then Send.</li>
-        <li><strong>Review the evidence</strong> — People Analytics supports the decision. <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => navigate("workforce")}>Explore your data</button>; company skill coverage does not establish staff availability in the fictional unit.</li>
-        <li><strong>Compare choices</strong> — Compare developing, moving and hiring people, with calculated cash, effort and dated role coverage. {conversational?'Discuss the trade-offs in chat.':'The local comparison is available in this mode.'} Say “Set budget to $100,000” to review a tighter constraint and recalculate.</li>
-        <li><strong>Review and save</strong> — Select an option, review proposed owners and checkpoints, then save. The goal and Action Plan are linked together automatically. Earlier versions stay in history.</li>
-        <li><strong>Track honestly</strong> — The existing progress ledger retains the target and plan link. This role-coverage example has no observed progress or supported outcome assessment yet; saving a proposal does not authorize implementation.</li>
+        <li><strong>Describe the outcome</strong> — Type in chat or click a practical starter prompt to send it. You do not need to select a mode or pin a goal first.</li>
+        <li><strong>Review proposed Action Plans</strong> — {conversational?'Review the proposed plan, its conditional recommendation, concrete steps, suggested owners and success measures. Missing costs, capacity and dates stay unknown.':'Ask for plans and review their assumptions before choosing.'} <button className="rounded-sm text-primary underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => navigate("workforce")}>Explore your data</button> when supporting evidence would help.</li>
+        <li><strong>Refine in chat</strong> — Choose an approach to discuss, combine ideas, or optionally focus on a team. Discussing a plan does not save it.</li>
+        <li><strong>Review and save</strong> — Use the plan’s explicit selection control when ready. The goal and proposal are linked together; earlier versions remain in history. Saving does not authorize implementation.</li>
+        <li><strong>Check outcomes</strong> — Agree what to observe and compare it with a baseline and target. Proposed benefits are not achieved results.</li>
       </ol>
       <p className="text-xs text-muted-foreground">On your first visit, goals labelled Demo example include attached plans you can explore and edit. Their scope, budget and outcomes are assumptions, not achieved results.</p>
       <p className="text-xs text-muted-foreground">To reopen saved work, select a Pinned Goal and expand its latest plan. Earlier attachments stay in history.</p>
