@@ -35,7 +35,10 @@ test('plan linkage checks exact goal, revision, inputs, dataset and saved eviden
  for(const mutate of [link=>link.revision++,link=>link.inputKey+='stale',link=>link.evidenceDigest='b'.repeat(64)]){const changed=structuredClone(ledger);mutate(changed.events.at(-1).data);assert.equal(readProgressLinkedPlan(changed,fields,readProgressSnapshot(changed,'linked',day).context,goal,'legacy-v1:0').status,'unavailable');}
  assert.equal(readProgressLinkedPlan(ledger,{},context,goal,'legacy-v1:0').status,'unavailable');
 });
-test('existing quoted-chat proposal path requires confirmation and preserves repeated updates and goal binding',async()=>{
+test('existing quoted-chat proposal path requires confirmation and preserves repeated updates and goal binding',async t=>{
+ // Confirmations must be captured on the fixture's as-of day. Later wall-clock
+ // captures are correctly excluded by the production historical-date guards.
+ t.mock.timers.enable({apis:['Date'],now:new Date(day+'T12:00:00.000Z')});
  const values=new Map(),store=new DecisionStore();store.initialize({getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,value),removeItem:key=>values.delete(key)});
  store.saveGoals({version:1,activeId:'growth',goals:[{id:'growth',statement:'Grow the synthetic workforce'},{id:'other',statement:'Other goal'}]});store.setField('growth',goalProgressField,progressFixture('growth'));
  const text='Our complete saved population has 114 people on 2026-10-01.',turns=[{id:'report',text}],c=progressEntryContext(store,'update',turns,true),spec={metric:'headcount',definition:HEADCOUNT_DEFINITION,unit:'people',scope,measurement:null,observation:{value:114,date:'2026-10-01',complete:true,supersedes:null,useAsBaseline:false},basis:[{turnId:'report',quote:text}]};
