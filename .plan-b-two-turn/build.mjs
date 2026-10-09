@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {compileRoute} from './route.mjs';
 import {runTwoTurns,apiBase} from './run.mjs';
-import {verifySource,validateAuthorization,validateNodeRuntime} from './guards.mjs';
+import {verifySource,readAuthorization,validateAuthorization,validateNodeRuntime} from './guards.mjs';
 import {encodeReceipt} from '../tests/helpers/swp-preview-receipt-log.mjs';
 export function sanitize(value,knownSecret='') {
   let redacted=false;
@@ -43,10 +43,9 @@ export function createBuildClient({OpenAI,apiKey,transport={},dispatch=transport
 async function build() {
   if(process.argv.length!==2)throw Error('no_run_overrides');
   const root=fileURLToPath(new URL('../',import.meta.url)),source=verifySource(root);
-  // The checked-in build is inert without a separately approved, bound reservation.
-  const raw=process.env.SWP_PLAN_B_AUTHORIZATION;
-  if(!raw||Buffer.byteLength(raw)>20000)throw Error('unarmed');
-  const authorization=JSON.parse(raw);validateAuthorization(authorization,process.env,source);
+  // Absent file means unarmed. The file configures a run; permission lives in the coordinator ledger.
+  const {authorization,authorizationSha256}=readAuthorization(root,process.env);
+  validateAuthorization(authorization,process.env,source);
   validateNodeRuntime(process.versions.node);
   for(const [name,version] of [['openai','7.23.0'],['undici','7.30.0'],['next','16.3.6']])
     if(JSON.parse(readFileSync(join(root,'node_modules',name,'package.json'))).version!==version)throw Error('dependencies_changed');
@@ -57,13 +56,15 @@ async function build() {
   validateAuthorization(authorization,process.env,source);
   if(!process.env.OPENAI_API_KEY)throw Error('preview_key_unavailable');
   const record=durableRecorder(directory,authorization.runId,process.env.OPENAI_API_KEY);
-  record('claimed',{authorization,source,projectId:process.env.VERCEL_PROJECT_ID,
-    deploymentId:process.env.VERCEL_DEPLOYMENT_ID,environment:'preview',oneDeploymentOnly:true});
+  record('claimed',{authorization,authorizationSha256,source,projectId:process.env.VERCEL_PROJECT_ID,
+    sourceCommit:process.env.VERCEL_GIT_COMMIT_SHA,deploymentId:process.env.VERCEL_DEPLOYMENT_ID,
+    environment:'preview',coordinatorDispatchPolicy:'one-pinned-create-no-ambiguous-retry',crossBuildExactlyOnce:false});
   const {default:OpenAI}=await import('openai');
   const {openAIProxyTransport}=await import('../lib/openai-proxy-transport.ts');
   const transport=openAIProxyTransport();let boundary;
   const client=createBuildClient({OpenAI,apiKey:process.env.OPENAI_API_KEY,transport,getBoundary:()=>boundary});
   const report=await runTwoTurns({code,client,record,runId:authorization.runId,requireWireProof:true,bindBoundary:value=>{boundary=value;},
+    expiresAt:Date.parse(authorization.expiresAt),
     signal:AbortSignal.timeout(Math.max(0,Date.parse(authorization.expiresAt)-Date.now()))});
   if(!report.executionComplete){process.exitCode=1;return;}
   const output=join(root,'.plan-b-two-turn-output');mkdirSync(output,{mode:0o700});

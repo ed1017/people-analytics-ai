@@ -45,7 +45,9 @@ fallback, model selection or routing change is introduced.
 - Exact `gpt-6.1-sol`, medium reasoning, 5,000 output tokens, function tools only,
   sequential calls, direct `https://api.openai.com/v1/responses`, SDK retries zero.
   Existing four-round/six-tool/90-second-turn guards remain unchanged. Overall
-  batch deadline is 180 seconds and cannot outlive the reservation.
+  batch deadline is 180 seconds and cannot outlive the reservation. Wall-clock
+  expiry is checked on every generation, after before-attempt receipt IO, and
+  immediately before each outgoing wire dispatch.
 - The sole outbound payload adaptation is explicit `service_tier: 'default'`.
   This forces the requested Standard billing tier **for this test**. Every call
   receipt records requested and actual model/tier. There is no production-tier
@@ -104,34 +106,52 @@ serialization, header identity, custom-header rejection and zero retries on 503.
 Synthetic test answers are
 labelled fixture inputs and are never model acceptance evidence.
 
-## Missing preflight before any external action
+## Source-bound run configuration and coordinator checks
 
 1. Independent source review of the exact final commit, diff and harness digest.
    Confirm no concurrent run/reservation has changed the retained budget.
-2. Explicit approval to publish only the guarded branch
-   `codex/swp-plan-b-two-turn-20261009`, preserving the pinned base and other drafts.
-   Review any deployment side effect before publication; its exact branch is
-   disabled in `git.deploymentEnabled`. No production merge is proposed.
+2. Publication authority for the guarded branch
+   `codex/swp-plan-b-two-turn-20261009` is already granted by the parent; ordinary
+   publication approval must not be requested again. This preparation stays local.
+   Preserve disabled automatic Git deployment and the separate unpublished CI draft.
 3. A real parent-owned $23.43 reservation and one-use execution approval for exactly
    one manual Preview deployment in project `prj_qXEE4BF4KrbTbzFvDg8dc3MJQjDF`,
    repository `ed1017/people-analytics-ai`, the reviewed commit and branch. The
    local directory lock is only a same-build guard, not distributed idempotency.
    Never redeploy/retry after an uncertain create/deploy/build attempt; retain the
    reservation and inspect existing evidence first.
-4. Verify Standard availability/budget/rate allowance, exact Node 24.19.0 (local
-   offline validation) or 24.21.0 (observed successful Vercel canary), and the existing
-   locked OpenAI 7.23.0 / Undici 7.30.0 / Next 16.3.6 packages, Preview protection,
-   build identity variables, and availability of the existing Preview key without
-   reading/exporting it. Dependency install is lockfile-only with lifecycle scripts
-   disabled; no storage/billing/permissions expansion is included.
-5. Determine the supported one-deployment mechanism to supply non-secret
-   `SWP_PLAN_B_AUTHORIZATION` JSON without changing persistent project settings.
-   `authorizationTemplate(verifySource(root))` produces an **unarmed** template.
-   Only the coordinator can fill the approved run/reservation/approval IDs, exact
-   source commit/harness hash, true authorization flags and an expiry within one
-   hour. Model/endpoint/limits must remain exact. No key is in that object.
-   Missing injection capability is a blocker, not permission to add a public route
-   or persistent arming flag. Never share an armed object in public source.
+4. Verify Standard availability/budget/rate allowance, exact Node 24.21.0 (observed
+   successful Vercel canary), and locked OpenAI 7.23.0 / Undici 7.30.0 / Next 16.3.6,
+   Preview protection, build identity variables, and the existing Preview key without
+   reading/exporting it. Local offline validation used Node 24.19.0. The run manifest
+   requires 24.21.0 even though the reusable runtime gate admits both reviewed patches.
+   Dependency installation remains lockfile-only with lifecycle scripts disabled.
+5. Review and freeze unarmed code commit U. `source-inventory.json` is a sorted,
+   checked-in path list covering all repository sources, configuration and lockfile,
+   including itself. It contains no content hashes. Runtime code dynamically hashes
+   each listed input, then hashes canonical JSON `{version:1,files:pathToHash}`.
+   The inventory's bytes therefore participate without self-hash recursion. Only
+   `.plan-b-two-turn/run-authorization.json` is excluded from source inputs. Git/host
+   metadata and installed dependencies are not repository sources. Unexpected source
+   entries and symlinks are rejected. `vercel.json` is semantically bound because the
+   platform normalizes its serialization; its raw hash is recorded separately.
+
+   After independent review and a real coordinator reservation, create A as the
+   direct child of U changing only that fixed run-authorization file. The file is
+   canonical JSON plus a newline, contains no secrets or self-declared approval flag,
+   and binds U, source/inventory digests, project, repository, branch, exact deployment
+   runtime, distinct unique run/reservation UUIDs, model/endpoint/limits and strict UTC
+   creation/expiry within one hour. Prefer a short window. Missing file means unarmed;
+   the old SWP_PLAN_B_AUTHORIZATION environment variable is rejected even when empty.
+   The template is incomplete configuration, never permission evidence.
+
+   The coordinator verifies A's parent and single-file diff, externally pins A's full
+   SHA/tree and authorization-file hash with its actual permission/reservation record,
+   and makes exactly one deployment-create request pinned to A. No final Git SHA is
+   embedded in its own file. The build checks content and platform identity and records
+   the observed SHA and file hash; it cannot prove the external approval or Git ancestry.
+   Never retry an ambiguous create/build result. No new credentials, persistent arming
+   environment, security/grant expansion or lock service is introduced.
 6. Bind the one observed deployment ID, fetch all protected receipt chunks, verify
    completeness/hashes and actual usage/tier/IDs, then perform semantic and budget
    closure. No further provider call is authorized by a partial or failed result.
@@ -143,5 +163,13 @@ failure or establish full model, browser, billing-tier or production acceptance.
 The Node gate is tested against both accepted version strings and neighboring
 rejected patches. The offline suite ran on 24.19.0; admitting the observed 24.21.0
 does not claim that the full application test suite has executed on that patch.
-This local runtime correction leaves environment-based arming unchanged. A proposed
-source-bound authorization file has not been implemented or created.
+The source-manifest mechanism is implemented locally and tested offline. The actual
+run-authorization file remains absent, and no budget is reserved by this checkout.
+
+Normal execution is bounded to one coordinator dispatch and four attempts per run.
+Automatic Git deployment is disabled; SDK retries remain zero. An exclusive local
+run directory does not establish distributed exactly-once behavior. A platform
+re-execution in a fresh container before expiry could repeat paid work. No such
+re-execution was observed, and the absence of an absolute infrastructure guarantee
+is not evidence that Vercel will repeat the build. This is a residual limitation,
+not a reason to invent a distributed lock service or claim cross-build enforcement.

@@ -1,16 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtempSync,readFileSync,statSync} from 'node:fs';
+import {mkdtempSync,readFileSync,statSync,writeFileSync,cpSync,unlinkSync,symlinkSync,existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
-import {join} from 'node:path';
+import {join,relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {compileRoute,loadRoute} from './route.mjs';
 import {runTwoTurns,createBoundary,hash,model,limits} from './run.mjs';
-import {verifySource,validateAuthorization,authorizationTemplate,validateNodeRuntime,supportedNodeVersions,branch,projectId} from './guards.mjs';
+import {verifySource,readAuthorization,validateAuthorization,authorizationTemplate,validateNodeRuntime,supportedNodeVersions,branch,projectId,authorizationPath,inventoryPath,canonical} from './guards.mjs';
 import {firstRequest,fixture} from './fixture.mjs';
 import {durableRecorder} from './build.mjs';
-import {decodeReceipt} from '../tests/helpers/swp-preview-receipt-log.mjs';
+import {encodeReceipt,decodeReceipt,receiptPrefix} from '../tests/helpers/swp-preview-receipt-log.mjs';
 import {illustrativeServiceReview,requestDemandContext,demandQuantityFields} from '../lib/swp-demand.ts';
 import {demandReferenceModelContract} from '../lib/swp-demand-reference.ts';
 import {final} from '../tests/fixtures/home-solution-conversation.mjs';
@@ -35,12 +35,13 @@ function scopedTool(payload) {
   spec.existingRoles.value=4;spec.existingRoles.basis=basis;spec.availabilityPct.value=25;spec.availabilityPct.basis=basis;
   return {output:[tool('review_scoped_service_demand',{spec})],output_text:''};
 }
-function setup(steps,{wire=false}={}) {
+function setup(steps,{wire=false,expiresAt=Date.now()+60000,now=Date.now,beforeWire=()=>{}}={}) {
   const events=[],calls=[];let boundary;
   const client={responses:{create(payload,options){
     calls.push({payload:structuredClone(payload),options,consumedBeforeDispatch:boundary.report.generationAttempts});
     return {withResponse:async()=>{
       const wireRequest={method:'POST',body:JSON.stringify(payload),headers:{'x-client-request-id':options.headers['X-Client-Request-Id'],'x-stainless-retry-count':'0'}};
+      beforeWire();
       if(wire)boundary.verifyTransport('https://api.openai.com/v1/responses',wireRequest);
       if(wire===2)boundary.verifyTransport('https://api.openai.com/v1/responses',wireRequest);
       const step=steps[calls.length-1];if(step instanceof Error)throw step;
@@ -51,7 +52,7 @@ function setup(steps,{wire=false}={}) {
         request_id:next.testMissingRequestId?null:'req_synthetic_'+calls.length,response:{status:200}};
     }};
   },inputTokens:{count(){throw Error('token_count_forbidden');}}}};
-  return {events,calls,client,run:(recordHook=()=>{})=>runTwoTurns({code,client,runId,requireWireProof:wire,
+  return {events,calls,client,run:(recordHook=()=>{})=>runTwoTurns({code,client,runId,expiresAt,now,requireWireProof:wire,
     bindBoundary:value=>{boundary=value;},record:(stage,value)=>{recordHook(stage,value);events.push({stage,...structuredClone(value)});}})};
 }
 test('actual integrated POST keeps real first state, reference tools, Sol medium and explicit test Standard override',async()=>{
@@ -136,7 +137,7 @@ test('unexpected tier/model, incomplete response and missing usage/request ident
   }
 });
 test('transport blocks token counting, alternate endpoints and repeated dispatch before any extra wire call',()=>{
-  const b=createBoundary({client:{},record(){},runId,signal:new AbortController().signal});
+  const b=createBoundary({client:{},record(){},runId,expiresAt:Date.now()+60000,signal:new AbortController().signal});
   for(const url of ['https://api.openai.com/v1/responses/input_tokens','https://example.invalid/v1/responses'])
     assert.throws(()=>b.verifyTransport(url,{method:'POST',body:'{}'}));
   assert.equal(b.report.wireAttempts,0);
@@ -157,17 +158,98 @@ test('actual dataset wrapper rejects stale dataset before model execution',async
     method:'POST',headers:{'x-workforce-dataset':'stale-v2:2'},body:JSON.stringify(firstRequest())}));
   assert.equal(response.status,409);assert.equal(calls,0);
 });
-test('authorization remains unarmed by default, pins Preview/source/budget, and rejects stale or modified authorization',()=>{
-  const source=verifySource(root),template=authorizationTemplate(source),now=Date.now();
-  assert.equal(template.executionAuthorized,false);assert.throws(()=>validateAuthorization(template,{},source,now));
-  const auth={...template,executionAuthorized:true,budgetReviewApproved:true,runId,reservationId:runId,
-    approvalReference:'parent-offline-test-only',sourceCommit:'a'.repeat(40),createdAt:new Date(now-1000).toISOString(),expiresAt:new Date(now+60000).toISOString()};
+function configuredRun(source,now) {
+  const auth={...authorizationTemplate(source),runId,reservationId:'01234567-89ab-cdef-0123-456789abcdef',
+    reviewedCodeCommit:'a'.repeat(40),createdAt:new Date(now-1000).toISOString(),expiresAt:new Date(now+60000).toISOString()};
   const env={VERCEL:'1',VERCEL_ENV:'preview',VERCEL_PROJECT_ID:projectId,VERCEL_DEPLOYMENT_ID:'dpl_offline',
-    VERCEL_GIT_REPO_OWNER:'ed1017',VERCEL_GIT_REPO_SLUG:'people-analytics-ai',VERCEL_GIT_COMMIT_REF:branch,VERCEL_GIT_COMMIT_SHA:auth.sourceCommit};
-  assert.equal(validateAuthorization(auth,env,source,now),true);
-  for(const changed of [{...env,VERCEL_ENV:'production'},{...env,VERCEL_GIT_COMMIT_SHA:'b'.repeat(40)},{...env,OPENAI_BASE_URL:'https://example.invalid'},{...env,VERCEL_PROJECT_ID:'prj_wrong'},{...env,OPENAI_CUSTOM_HEADERS:'Authorization: synthetic-override'},{...env,OPENAI_ADMIN_KEY:'synthetic-admin'}])assert.throws(()=>validateAuthorization(auth,changed,source,now));
-  for(const changed of [{...auth,budgetReviewApproved:false},{...auth,harnessSha256:'0'.repeat(64)},{...auth,expiresAt:new Date(now-1).toISOString()},{...auth,limits:{...limits,generationAttempts:5}},{...auth,unexpectedField:'refuse-unreviewed-input'}])assert.throws(()=>validateAuthorization(changed,env,source,now));
+    VERCEL_GIT_REPO_OWNER:'ed1017',VERCEL_GIT_REPO_SLUG:'people-analytics-ai',VERCEL_GIT_COMMIT_REF:branch,VERCEL_GIT_COMMIT_SHA:'b'.repeat(40)};
+  return {auth,env};
+}
+test('run configuration is unarmed by default and pins source, exact runtime, Preview identity and limits without approval flags',()=>{
+  const source=verifySource(root),template=authorizationTemplate(source),now=Date.now();
+  assert.equal(template.runId,null);assert.equal(Object.hasOwn(template,'executionAuthorized'),false);
+  assert.throws(()=>validateAuthorization(template,{},source,now,'24.21.0'));
+  const {auth,env}=configuredRun(source,now),check=(a=auth,e=env,n=now,v='24.21.0')=>validateAuthorization(a,e,source,n,v);
+  assert.equal(check(),true);
+  for(const changed of [{VERCEL_ENV:'production'},{VERCEL_TARGET_ENV:'production'},{VERCEL_GIT_COMMIT_SHA:auth.reviewedCodeCommit},
+    {VERCEL_GIT_COMMIT_SHA:'invalid'},{VERCEL_GIT_COMMIT_REF:'wrong'},{VERCEL_GIT_REPO_OWNER:'wrong'},
+    {OPENAI_BASE_URL:'https://example.invalid'},{VERCEL_PROJECT_ID:'prj_wrong'},{OPENAI_CUSTOM_HEADERS:'Authorization: synthetic-override'},
+    {OPENAI_ADMIN_KEY:'synthetic-admin'},{SWP_PLAN_B_AUTHORIZATION:''}])assert.throws(()=>check(auth,{...env,...changed}));
+  for(const changed of [{approved:true},{sourceRootSha256:'0'.repeat(64)},{inventorySha256:'0'.repeat(64)},
+    {projectId:'prj_wrong'},{repository:'wrong/repo'},{branch:'wrong'},{runtime:{name:'node',version:'24.19.0'}},
+    {reservationId:runId},{runId:null},{reviewedCodeCommit:'invalid'},{sourceCommit:'c'.repeat(40)},
+    {expiresAt:new Date(now).toISOString()},{createdAt:new Date(now+1).toISOString()},
+    {expiresAt:new Date(now+3600001).toISOString()},{createdAt:'2026-10-09T00:00:00+00:00'},
+    {createdAt:'2026-02-30T00:00:00.000Z'},{limits:{...limits,generationAttempts:5}},{model:{...model,id:'other'}}])
+    assert.throws(()=>check({...auth,...changed}));
+  assert.throws(()=>check(auth,env,now,'24.19.0'));assert.throws(()=>check(auth,env,NaN));
   assert.equal(limits.priorRetainedMicrousd+limits.reservationMicrousd,46799877);
+});
+test('path-only inventory binds its own bytes and all source inputs, with only run configuration excluded',()=>{
+  const source=verifySource(root),paths=JSON.parse(readFileSync(join(root,inventoryPath)));
+  assert.equal(paths.includes(inventoryPath),true);assert.equal(paths.includes(authorizationPath),false);
+  assert.equal(source.sourceFileCount,paths.length);assert.equal(source.frozenReferencePreserved,true);
+  const expected=Object.fromEntries(paths.map(path=>[path,hash(path==='vercel.json'?canonical(JSON.parse(readFileSync(join(root,path)))):readFileSync(join(root,path)))]));
+  assert.equal(source.sourceRootSha256,hash(canonical({version:1,files:expected})));
+  assert.equal(source.inventorySha256,expected[inventoryPath]);
+  const clone=join(mkdtempSync(join(tmpdir(),'plan-b-source-')),'checkout');
+  cpSync(root,clone,{recursive:true,filter:path=>!['node_modules','.git','.vercel'].includes(relative(root,path).split('/')[0])});
+  assert.equal(verifySource(clone).sourceRootSha256,source.sourceRootSha256);
+  writeFileSync(join(clone,authorizationPath),'{}\n');
+  assert.equal(verifySource(clone).sourceRootSha256,source.sourceRootSha256);
+  unlinkSync(join(clone,authorizationPath));
+  writeFileSync(join(clone,'.npmrc'),'ignore-scripts=false\n');
+  assert.throws(()=>verifySource(clone),/source_inventory_changed/);unlinkSync(join(clone,'.npmrc'));
+  const readme=join(clone,'.plan-b-two-turn/README.md'),before=readFileSync(readme);
+  writeFileSync(readme,Buffer.concat([before,Buffer.from('\nChanged source input.\n')]));
+  const changed=verifySource(clone);assert.notEqual(changed.sourceRootSha256,source.sourceRootSha256);
+  const now=Date.now(),{auth,env}=configuredRun(source,now);
+  assert.throws(()=>validateAuthorization(auth,env,changed,now,'24.21.0'),/unarmed_or_unbound/);
+  writeFileSync(readme,before);
+  for(const list of [[...paths,paths[0]],[...paths,authorizationPath],paths.filter(path=>path!==inventoryPath),[...paths].reverse()]){
+    writeFileSync(join(clone,inventoryPath),JSON.stringify(list,null,2)+'\n');
+    assert.throws(()=>verifySource(clone),/source_inventory_changed/);
+  }
+  writeFileSync(join(clone,inventoryPath),readFileSync(join(root,inventoryPath)));
+  unlinkSync(readme);symlinkSync(join(clone,'README.md'),readme);
+  assert.throws(()=>verifySource(clone),/source_entry_changed/);
+});
+test('authorization reader requires the fixed canonical file and refuses legacy environment arming or symlinks',()=>{
+  assert.equal(existsSync(join(root,authorizationPath)),false);
+  assert.throws(()=>readAuthorization(root,{}),/unarmed/);
+  assert.throws(()=>readAuthorization(root,{SWP_PLAN_B_AUTHORIZATION:''}),/legacy_arming_forbidden/);
+  const dir=mkdtempSync(join(tmpdir(),'plan-b-auth-reader-'));
+  cpSync(join(root,'.plan-b-two-turn'),join(dir,'.plan-b-two-turn'),{recursive:true});
+  const {auth}=configuredRun(verifySource(root),Date.now()),path=join(dir,authorizationPath),raw=canonical(auth)+'\n';
+  writeFileSync(path,raw);const read=readAuthorization(dir,{});
+  assert.deepEqual(read.authorization,auth);assert.equal(read.authorizationSha256,hash(raw));
+  for(const invalid of [JSON.stringify(auth,null,2)+'\n',' '.repeat(20001),raw.replace('{','{"kind":"duplicate",')]){
+    writeFileSync(path,invalid);assert.throws(()=>readAuthorization(dir,{}));
+  }
+  unlinkSync(path);symlinkSync(join(dir,inventoryPath),path);
+  assert.throws(()=>readAuthorization(dir,{}),/authorization_file_invalid/);
+});
+test('expiry is checked before every generation, after receipt IO and immediately before outgoing dispatch',async()=>{
+  let time=1000;const now=()=>time,expiresAt=2000;
+  time=2000;const expired=setup([answer('Never dispatched.')],{now,expiresAt,wire:true});
+  const first=await expired.run();assert.equal(first.generationAttempts,0);assert.equal(expired.calls.length,0);
+  assert.equal(first.stopReason,'reservation_expired');
+  time=1000;const afterReceipt=setup([answer('Never dispatched.')],{now,expiresAt,wire:true});
+  const second=await afterReceipt.run(stage=>{if(stage==='before-generation-1')time=2000;});
+  assert.equal(second.generationAttempts,1);assert.equal(afterReceipt.calls.length,0);assert.equal(second.attemptAmbiguous,true);
+  time=1000;const atWire=setup([answer('Never dispatched.')],{now,expiresAt,wire:true,beforeWire:()=>{time=2000;}});
+  const third=await atWire.run();assert.equal(atWire.calls.length,1);assert.equal(third.wireAttempts,0);
+  assert.equal(third.stopReason,'reservation_expired');
+  time=1000;const nextTurn=setup([answer('Synthetic completed turn one.'),answer('Never dispatched.')],{now,expiresAt,wire:true});
+  const fourth=await nextTurn.run(stage=>{if(stage==='checked-turn-1')time=2000;});
+  assert.deepEqual(fourth.completedTurns,[1]);assert.equal(nextTurn.calls.length,1);assert.equal(fourth.wireAttempts,1);
+  assert.equal(fourth.stopReason,'reservation_expired');assert.equal(fourth.reservationRetainedMicrousd,23430000);
+  assert.throws(()=>createBoundary({client:{},record(){},runId,signal:new AbortController().signal}),/reservation_expired/);
+});
+test('database refusal is latched before any database operation',()=>{
+  const b=createBoundary({client:{},record(){},runId,expiresAt:Date.now()+60000,signal:new AbortController().signal});
+  assert.throws(()=>b.forbiddenDatabase(),/database_forbidden/);assert.equal(b.report.databaseAttempts,1);
+  assert.throws(()=>b.beginTurn(firstRequest(),0),/database_forbidden/);
 });
 test('runtime gate explicitly accepts the observed Vercel patch and rejects unreviewed patches or coercion',()=>{
   assert.deepEqual(supportedNodeVersions,['24.19.0','24.21.0']);
@@ -185,6 +267,16 @@ test('receipts round trip in full, redact secrets and never overwrite a prior re
   assert(!JSON.stringify(recovered).includes('private-known-secret'));assert(!JSON.stringify(recovered).includes('sk-protectedcredential'));
   assert.deepEqual(JSON.parse(readFileSync(join(dir,'test.json'))),recovered);assert.equal(statSync(join(dir,'test.json')).mode&0o777,0o600);
   assert.throws(()=>record('test',{}));
+});
+test('receipt decoder rejects incomplete, duplicate, mixed, corrupted and malformed chunks',()=>{
+  const receipt={text:'Synthetic receipt '.repeat(300)},lines=encodeReceipt('offline_integrity',receipt);
+  assert(lines.length>1);assert.deepEqual(decodeReceipt([...lines].reverse()).receipt,receipt);
+  const changed=patch=>lines.map((line,index)=>index===0?receiptPrefix+JSON.stringify({...JSON.parse(line.slice(receiptPrefix.length)),...patch}):line);
+  for(const broken of [lines.slice(1),[lines[0],...lines.slice(0,-1)],changed({recordId:'different'}),
+    changed({sha256:'0'.repeat(64)}),changed({bytes:1}),changed({data:'!bad'}),changed({extra:'refuse'}),
+    changed({index:lines.length}),changed({data:'AAAA'})])assert.throws(()=>decodeReceipt(broken));
+  assert.throws(()=>encodeReceipt('invalid id',receipt));
+  assert.throws(()=>decodeReceipt([receiptPrefix+'x'.repeat(3000)]));
 });
 test('unarmed build exits before provider access and does not print even a supplied sentinel key',()=>{
   const result=spawnSync(process.execPath,['.plan-b-two-turn/build.mjs'],{cwd:root,encoding:'utf8',env:{PATH:process.env.PATH,OPENAI_API_KEY:'SENTINEL_DO_NOT_EXPORT'}});
@@ -218,7 +310,7 @@ test('locked real SDK serializes exact payload/headers and never retries, using 
           usage:{input_tokens:100,output_tokens:20,total_tokens:120,input_tokens_details:{cached_tokens:0},output_tokens_details:{reasoning_tokens:0}}}),
           {status:200,headers:{'content-type':'application/json','x-request-id':'req_sdk_'+wire}});
       }});
-      const result=await runTwoTurns({code,client,runId,requireWireProof:true,bindBoundary:v=>boundary=v,record:(stage,value)=>records.push({stage,...value})});
+      const result=await runTwoTurns({code,client,runId,expiresAt:Date.now()+60000,requireWireProof:true,bindBoundary:v=>boundary=v,record:(stage,value)=>records.push({stage,...value})});
       assert.equal(result.executionComplete,mode==='success',JSON.stringify({mode,result,wire,stages:records.map(r=>({stage:r.stage,code:r.code,requestId:r.requestId}))}));assert.equal(wire,mode==='success'?2:mode==='server-error'?1:0);
       assert.equal(result.generationAttempts,mode==='success'?2:1);assert.equal(result.countAttempts,0);
       if(mode==='success')assert.equal(records.find(r=>r.stage==='generation-1').requestId,'req_sdk_1');

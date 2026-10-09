@@ -30,7 +30,8 @@ function visibleOutput(output) {
   return providerReceiptOutput((Array.isArray(output)?output:[]).filter(item=>item&&typeof item==='object').map(item=>
     item.type==='message'?{...item,content:Array.isArray(item.content)?item.content.filter(part=>part&&typeof part==='object'):[]}:item));
 }
-export function createBoundary({client,record,runId,signal,requireWireProof=false}) {
+export function createBoundary({client,record,runId,signal,expiresAt,now=Date.now,requireWireProof=false}) {
+  if(!Number.isSafeInteger(expiresAt))throw Error('reservation_expired');
   const report = {fixtureId:fixture.id,model,limits,generationAttempts:0,wireAttempts:0,countAttempts:0,
     sdkRetries:0,databaseAttempts:0,completedTurns:[],partial:true,executionComplete:false,
     inputTokens:0,outputTokens:0,knownUsageUpperEstimateMicrousd:0,budgetClosure:'pending-external-review',
@@ -39,6 +40,10 @@ export function createBoundary({client,record,runId,signal,requireWireProof=fals
     acceptedForScenario:false,goalSaved:false};
   let current=null,turn=0,failed=null,busy=false,wireExpected=null,wireCount=0;
   const stop = code => { report.stopReason??=code;failed ??= Error(code); throw failed; };
+  const checkExpiry = () => {
+    const time=now();
+    if(!Number.isFinite(time)||time>=expiresAt)stop('reservation_expired');
+  };
   const emit = (stage,value) => record(stage,structuredClone(value));
   const boundary = {
     report,
@@ -46,6 +51,7 @@ export function createBoundary({client,record,runId,signal,requireWireProof=fals
     checkClient(options) { if(options.maxRetries!==0||options.apiKey!=='build-owned-transport'||Object.keys(options).sort().join(',')!=='apiKey,maxRetries')stop('route_client_options_changed'); },
     forbiddenDatabase() { report.databaseAttempts++;stop('database_forbidden'); },
     verifyTransport(input,init) {
+      checkExpiry();signal.throwIfAborted(); // Immediately before the actual outgoing request.
       const url = new URL(typeof input==='string'||input instanceof URL?input:input.url);
       if(!busy||!wireExpected||wireCount!==0||url.origin!=='https://api.openai.com'||url.pathname!=='/v1/responses'||url.search||
          init?.method!=='POST'||typeof init.body!=='string'||!same(JSON.parse(init.body),wireExpected))stop('transport_scope_or_attempt_ambiguity');
@@ -59,6 +65,7 @@ export function createBoundary({client,record,runId,signal,requireWireProof=fals
       if(failed)throw failed;
       if(busy)stop('overlapping_generation');
       signal.throwIfAborted();options.signal.throwIfAborted();
+      checkExpiry(); // Every generation attempt, including later turns/tool rounds.
       if(!current||report.generationAttempts>=limits.generationAttempts)stop('global_attempt_limit');
       const context=requestDemandContext(current,fixture.datasetToken);
       if(Object.keys(payload).sort().join(',')!=='input,instructions,max_output_tokens,model,parallel_tool_calls,reasoning,text,tool_choice,tools'||
@@ -81,6 +88,7 @@ export function createBoundary({client,record,runId,signal,requireWireProof=fals
         emit('before-generation-'+attempt,{turn,attempt,clientRequestId,model,testOnlyBillingOverride:true,
           payload:outbound,payloadSha256:hash(outbound),reservationMicrousd:limits.reservationMicrousd});
         signal.throwIfAborted();options.signal.throwIfAborted();
+        checkExpiry(); // Receipt IO cannot extend the authorization window.
         const generated=await client.responses.create(outbound,{...options,
           signal:AbortSignal.any([signal,options.signal]),headers:{'X-Client-Request-Id':clientRequestId}}).withResponse();
         const response=generated.data,usage=safeUsage(response?.usage),requestId=safeId(generated.request_id);
@@ -114,9 +122,9 @@ export function createBoundary({client,record,runId,signal,requireWireProof=fals
   };
   return boundary;
 }
-export async function runTwoTurns({code,client,record,runId,requireWireProof=false,bindBoundary=()=>{},signal:outer=new AbortController().signal}) {
+export async function runTwoTurns({code,client,record,runId,expiresAt,now=Date.now,requireWireProof=false,bindBoundary=()=>{},signal:outer=new AbortController().signal}) {
   const signal=AbortSignal.any([outer,AbortSignal.timeout(limits.batchTimeoutMs)]);
-  const boundary=createBoundary({client,record,runId,signal,requireWireProof});bindBoundary(boundary);
+  const boundary=createBoundary({client,record,runId,signal,expiresAt,now,requireWireProof});bindBoundary(boundary);
   const report=boundary.report,POST=loadRoute(code,boundary);let first=null;
   try {
     for(let index=0;index<2;index++) {
