@@ -34,7 +34,7 @@ async function handleGET(request: NextRequest) {
       p_org_code: org,
       p_level_code: level,
     }
-  );
+  ).abortSignal(request.signal);
 
   if (error) {
     return NextResponse.json(
@@ -46,7 +46,7 @@ async function handleGET(request: NextRequest) {
   const scoped = scopedDashboardResponse(data,dashboardRequestedFilters(request.nextUrl.searchParams));
   const filters = parsePerformanceFilters(request.nextUrl.searchParams);
   const performance_rating = scoped.workforce_filter_scope.status === "verified_rpc" && data?.overview?.snapshot_date === "2026-09-30"
-    ? await loadPerformanceRelease((name, args) => supabaseServer.rpc(name, args), filters, data?.overview?.headcount ?? null)
+    ? await loadPerformanceRelease((name, args) => supabaseServer.rpc(name, args).abortSignal(request.signal), filters, data?.overview?.headcount ?? null)
     : null;
 
   return NextResponse.json({ ...scoped, performance_rating }, {

@@ -17,16 +17,18 @@ function numericRows(rows: Record<string, unknown>[]) {
   );
 }
 
-async function handleGET() {
+async function handleGET(request?: Request) {
   try {
+    request?.signal.throwIfAborted();
+    const abort=<T extends {abortSignal:(signal:AbortSignal)=>T}>(query:T)=>request?query.abortSignal(request.signal):query;
     const [current, trend, businessUnits, levels, tenure, reasons] =
       await Promise.all([
-        supabaseServer.from("attrition_current_summary").select("*").single(),
-        supabaseServer.from("attrition_monthly_trend").select("*").order("month"),
-        supabaseServer.from("attrition_business_unit_summary").select("*").order("voluntary_turnover_ytd_pct", { ascending: false }),
-        supabaseServer.from("attrition_level_summary").select("*").order("level_rank"),
-        supabaseServer.from("attrition_tenure_summary").select("*").order("tenure_sort"),
-        supabaseServer.from("attrition_reason_summary").select("*").order("exits", { ascending: false }),
+        abort(supabaseServer.from("attrition_current_summary").select("*")).single(),
+        abort(supabaseServer.from("attrition_monthly_trend").select("*").order("month")),
+        abort(supabaseServer.from("attrition_business_unit_summary").select("*").order("voluntary_turnover_ytd_pct", { ascending: false })),
+        abort(supabaseServer.from("attrition_level_summary").select("*").order("level_rank")),
+        abort(supabaseServer.from("attrition_tenure_summary").select("*").order("tenure_sort")),
+        abort(supabaseServer.from("attrition_reason_summary").select("*").order("exits", { ascending: false })),
       ]);
     for (const result of [current, trend, businessUnits, levels, tenure, reasons]) {
       if (result.error) throw new Error("Attrition analytics: " + result.error.message);
@@ -52,5 +54,5 @@ async function handleGET() {
 }
 
 export async function GET(request: Request) {
-  return withDatasetRequest(request, () => handleGET());
+  return withDatasetRequest(request, () => handleGET(request));
 }

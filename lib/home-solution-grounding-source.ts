@@ -17,10 +17,12 @@ const readers={
 export async function groundSolutionRequest(request:SolutionRequest,signal:AbortSignal){
  const datasetToken=datasetRouter.current().token;
  return verifySolutionEvidence(request,{datasetToken,read:async(key:string,filters:DashboardFilters,readSignal:AbortSignal)=>{
+  readSignal.throwIfAborted();
   if(!Object.hasOwn(readers,key))throw Error('Unsupported aggregate source');
   const query=key==='dashboard'?'?'+new URLSearchParams(filters).toString():'';
   const local=new NextRequest('http://local.invalid/api/'+key+query,{headers:{'x-workforce-dataset':datasetToken},signal:readSignal});
   const handler=(await readers[key as keyof typeof readers]()).GET;
+  readSignal.throwIfAborted();
   const response=await handler(local);
   if(!response.ok||(key!=='bls'&&response.headers.get('x-workforce-dataset')!==datasetToken))throw Error('Aggregate source unavailable or mixed');
   readSignal.throwIfAborted();return {status:'loaded',data:await response.json()};
