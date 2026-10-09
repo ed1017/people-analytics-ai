@@ -2,7 +2,7 @@ import {taExtensionPrompt} from "@/lib/synthetic-ta/extension";
 import {conversationalAnswerStyle} from '@/lib/chat-answer-style';
 import {homeForecastAnswer} from '@/lib/home-forecast';
 import {homeTurnPurpose,homeConversationInstructions} from '@/lib/home-conversation';
-import {strategicPlanningInstructions} from '@/lib/home-strategic-planning';
+import {strategicPlanningInstructions,strategicPlanningObjective,normalizePlanningObjective,planningConversationHistory} from '@/lib/home-strategic-planning';
 import {decodeHomeModelReply} from '@/lib/home-chat-reply';
 import {syntheticDomainDemoPrompt} from '@/lib/synthetic-domain-demo';
 import {homeBundleTask,homeBundleTaskInstructions} from '@/lib/home-bundle-task';
@@ -571,7 +571,7 @@ export async function POST(
     let body = await request.json();
     if (body?.page === "home") {
       if (new TextEncoder().encode(JSON.stringify(body.overviewBriefingContext ?? {})).length > HOME_MAX_BYTES || (typeof body.message === "string" && body.message.length > 6000)) return NextResponse.json({error:"Home evidence or question exceeds the supported limit. Refresh evidence or shorten the question."},{status:413});
-      body = {page:"home",persona:body.persona,message:body.message,history:body.history,hasFocusedIssue:body.hasFocusedIssue === true,planningCalculatorAvailable:body.planningCalculatorAvailable===true,summaryOnly:body.summaryOnly===true,summaryGoal:body.summaryGoal,goalContext:body.goalContext,marketReference:body.marketReference,overviewBriefingContext:normalizeHomePack(body.overviewBriefingContext)};
+      body = {page:"home",persona:body.persona,message:body.message,history:body.history,...(Object.hasOwn(body,"planningObjective")?{planningObjective:normalizePlanningObjective(body.planningObjective)}:{}),hasFocusedIssue:body.hasFocusedIssue === true,planningCalculatorAvailable:body.planningCalculatorAvailable===true,summaryOnly:body.summaryOnly===true,summaryGoal:body.summaryGoal,goalContext:body.goalContext,marketReference:body.marketReference,overviewBriefingContext:normalizeHomePack(body.overviewBriefingContext)};
       if (Array.isArray(body.history)) body.history = body.history.slice(-8).map((item: ChatMessage) => ({role:item?.role,content:typeof item?.content === "string" ? item.content.slice(0,6000) : ""}));
     }
     const summaryOnly = body?.summaryOnly === true;
@@ -624,7 +624,9 @@ export async function POST(
             .slice(-8)
         : [];
 
-    const conversationalStyle = !summaryOnly && homeTurnPurpose(message,history)==='answer' ? conversationalAnswerStyle : '';
+    const planningHistory=body?.page==='home'?planningConversationHistory(history,body.planningObjective,Object.hasOwn(body,"planningObjective")):history;
+    const carriedPlanningObjective=body?.page==='home'&&body.planningObjective?strategicPlanningObjective([...planningHistory,{role:'user',content:message}]):null;
+    const conversationalStyle = !summaryOnly && homeTurnPurpose(message,planningHistory)==='answer' ? conversationalAnswerStyle : '';
 
     // Output selection uses the existing Home envelope; no planning inputs or extra history.
     if (body?.page === "home" && !summaryOnly && (message === HOME_ACTION_REQUEST || message === HOME_BUNDLE_REQUEST)) {
@@ -1519,13 +1521,13 @@ ${message}
 `.trim();
 
     const homeStyle=homeResponseStyle(message);
-    const homePurpose=homeTurnPurpose(message,history);
+    const homePurpose=homeTurnPurpose(message,planningHistory);
     const prepareHomeGoal=!summaryOnly&&(homePurpose==='goal'||homePurpose==='discovery');
     const homeReplyFormat=page==="home"?buildHomeReplyFormat(body.overviewBriefingContext,prepareHomeGoal):null;
-    const homeInstructions=[homeConversationInstructions(homePurpose),strategicPlanningInstructions(message,history,body.planningCalculatorAvailable===true)].filter(Boolean).join('\n');
+    const homeInstructions=[homeConversationInstructions(homePurpose),strategicPlanningInstructions(message,planningHistory,body.planningCalculatorAvailable===true)].filter(Boolean).join('\n');
     const homeAnswerStyle=homePurpose==='answer'?conversationalAnswerStyle:homeStyle.instructions;
     const homeInput=[
-      {role:'user' as const,content:workforceContext+'\nACTIVE GOAL CONTEXT (user intent, not evidence): '+JSON.stringify(goalContext)+'\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: '+JSON.stringify(marketReference)},
+      {role:'user' as const,content:workforceContext+'\nACTIVE GOAL CONTEXT (user intent, not evidence): '+JSON.stringify(goalContext)+'\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: '+JSON.stringify(marketReference)+(carriedPlanningObjective?'\nCARRIED USER PLANNING OBJECTIVE (conversation only; not source evidence, verified inputs or an accepted plan): '+JSON.stringify(carriedPlanningObjective):'')},
       ...history.map(item=>({role:item.role,content:item.content})),
       {role:'user' as const,content:message},
     ];

@@ -237,6 +237,7 @@ test('tool-continuation answer retains concise formatting instructions',async()=
 
 // The actual route stays on the existing single Home call; no live provider.
 const {planningPrompts,challengePrompts}=await import('./fixtures/home-starter-prompts.mjs');
+const {scopedPlanningObjective,completeHomePlanningTurn}=await import('../lib/home-strategic-planning.ts');
 for(const [index,prompt] of planningPrompts.entries())test('actual Home POST adds bounded planning clarification for approved opener '+(index+1),async()=>{
  const reply={answer:'What operating baseline should we use?',finding_followups:[],next_step:'choose_goal',problem:'Unrequested goal',problem_evidence:[],options:[],question:'Pin this?'};
  sandbox.__replies.push({status:'completed',output:[],output_text:JSON.stringify(reply)});
@@ -313,4 +314,34 @@ test('actual Home POST offers the popup invitation only for explicit UI availabi
   assert.equal(request.instructions.includes('Tell me in chat, or open the Planning Calculator.'),expected);
   if(expected)assert.match(request.instructions,/never invent a navigation link, new tab, form opening, supported field or calculated update/);
  }
+});
+
+test('actual POST retains only a bounded active objective across long chat, then honors an old clear and stale saved goal',async()=>{
+ const root=planningPrompts[1],proposal='Conditional comparison; costs and timing remain proposed assumptions or unknown.';
+ let state=completeHomePlanningTurn({key:'',messages:[]},'home',root,proposal);
+ async function send(message,expected,override){
+  const planningObjective=override===undefined?scopedPlanningObjective(state,'home'):override;
+  const history=state.messages,before=sandbox.__requests.length;
+  sandbox.__replies.push({status:'completed',output:[],output_text:JSON.stringify({answer:'Synthetic transport check.',finding_followups:[],next_step:'none',problem:null,problem_evidence:[],options:[],question:null})});
+  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'home',message,history,planningObjective,goalContext:{goal:root},overviewBriefingContext:{sources:[]}})}));
+  assert.equal(response.status,200);assert.equal(sandbox.__requests.length,before+1);
+  const request=sandbox.__requests.at(-1);
+  assert.equal(request.instructions.includes('STRATEGIC WORKFORCE PLANNING CLARIFICATION'),expected,message);
+  assert.equal(request.input.length,history.length+2,'model gets eight actual turns plus packet and current question');
+  assert.ok(request.input.every(turn=>turn.role!=='planning-objective'),'internal marker never becomes a model turn');
+  const carried=request.input[0].content.includes('CARRIED USER PLANNING OBJECTIVE');
+  assert.equal(carried,expected,message);
+  if(carried)assert.match(request.input[0].content,/conversation only; not source evidence, verified inputs or an accepted plan/);
+  assert.equal(request.tool_choice,'none');assert.equal(request.model,'gpt-5.6-luna');
+  state=completeHomePlanningTurn(state,'home',message,proposal);
+ }
+ for(let i=0;i<12;i++)await send(['Or how about both?','Budget is $20000.','We need it sooner.'][i%3],true);
+ assert.ok(!state.messages.some(turn=>turn.content===root));
+ await send('New topic: movies.',false);
+ for(let i=0;i<5;i++)await send('What movies should I watch?',false);
+ await send('Or how about both?',false);
+ assert.ok(!state.messages.some(turn=>turn.content==='New topic: movies.'));
+ // Invalid/cleared carry is authoritative despite a lagging older model window.
+ state=completeHomePlanningTurn({key:'',messages:[]},'home',root,proposal);
+ for(const invalid of [null,'Arbitrary saved objective',{},'x'.repeat(241)])await send('Or how about both?',false,invalid);
 });
