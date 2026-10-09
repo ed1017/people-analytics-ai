@@ -24,7 +24,7 @@ test('deadline records active readers and bounded timing; cancellation is distin
  }},signal()),checked=failure(task);
  await drain();t.mock.timers.tick(solutionGroundingLimits.timeoutMs);
  const diagnostic=await checked;
- assert.deepEqual(diagnostic,{trigger:'deadline',reader:null,elapsedMs:8000,readerElapsedMs:null,readersStarted:2,readersCompleted:1,readFailure:null,httpStatus:null,activeReaders:[{reader:'bls',elapsedMs:8000}]});
+ assert.deepEqual(diagnostic,{trigger:'deadline',reader:null,elapsedMs:solutionGroundingLimits.timeoutMs,readerElapsedMs:null,readersStarted:2,readersCompleted:1,readFailure:null,httpStatus:null,activeReaders:[{reader:'bls',elapsedMs:solutionGroundingLimits.timeoutMs}]});
  assert.equal(blsSignal.aborted,true);pending.reject(Error(secret));await drain();assert.equal(diagnostic.trigger,'deadline');
  const controller=new AbortController(),cancelled=verifySolutionEvidence(body,{datasetToken:token,read:async()=>new Promise(()=>{})},controller.signal),cancelledCheck=failure(cancelled);
  t.mock.timers.tick(123);controller.abort(secret);const cancellation=await cancelledCheck;
