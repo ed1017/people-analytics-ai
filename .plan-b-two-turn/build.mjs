@@ -28,6 +28,18 @@ export function durableRecorder(directory,runId,knownSecret='',emit=console.log)
     for(const line of encodeReceipt(runId+'_'+stage,receipt))emit(line);
   };
 }
+export function createBuildClient({OpenAI,apiKey,transport={},dispatch=transport.fetch??globalThis.fetch,getBoundary}) {
+  return new OpenAI({...transport,apiKey,adminAPIKey:null,organization:null,project:null,webhookSecret:null,
+    baseURL:apiBase,maxRetries:0,logLevel:'off',
+    fetch:async(input,init)=>{
+      const boundary=getBoundary();if(!boundary)throw Error('transport_not_bound');
+      const headers=new Headers(init?.headers);
+      // Never record these headers or include mismatched values in an error.
+      if(headers.get('authorization')!=='Bearer '+apiKey||headers.has('openai-organization')||headers.has('openai-project')||headers.has('api-key'))
+        throw Error('wire_authentication_changed');
+      boundary.verifyTransport(input,init);return dispatch(input,{...init,redirect:'error'});
+    }});
+}
 async function build() {
   if(process.argv.length!==2)throw Error('no_run_overrides');
   const root=fileURLToPath(new URL('../',import.meta.url)),source=verifySource(root);
@@ -49,9 +61,8 @@ async function build() {
     deploymentId:process.env.VERCEL_DEPLOYMENT_ID,environment:'preview',oneDeploymentOnly:true});
   const {default:OpenAI}=await import('openai');
   const {openAIProxyTransport}=await import('../lib/openai-proxy-transport.ts');
-  const transport=openAIProxyTransport(),baseFetch=transport.fetch??globalThis.fetch;let boundary;
-  const client=new OpenAI({...transport,apiKey:process.env.OPENAI_API_KEY,baseURL:apiBase,maxRetries:0,logLevel:'off',
-    fetch:async(input,init)=>{if(!boundary)throw Error('transport_not_bound');boundary.verifyTransport(input,init);return baseFetch(input,{...init,redirect:'error'});}});
+  const transport=openAIProxyTransport();let boundary;
+  const client=createBuildClient({OpenAI,apiKey:process.env.OPENAI_API_KEY,transport,getBoundary:()=>boundary});
   const report=await runTwoTurns({code,client,record,runId:authorization.runId,requireWireProof:true,bindBoundary:value=>{boundary=value;},
     signal:AbortSignal.timeout(Math.max(0,Date.parse(authorization.expiresAt)-Date.now()))});
   if(!report.executionComplete){process.exitCode=1;return;}

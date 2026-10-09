@@ -49,6 +49,10 @@ export function createBoundary({client,record,runId,signal,requireWireProof=fals
       const url = new URL(typeof input==='string'||input instanceof URL?input:input.url);
       if(!busy||!wireExpected||wireCount!==0||url.origin!=='https://api.openai.com'||url.pathname!=='/v1/responses'||url.search||
          init?.method!=='POST'||typeof init.body!=='string'||!same(JSON.parse(init.body),wireExpected))stop('transport_scope_or_attempt_ambiguity');
+      if(requireWireProof) {
+        const headers=new Headers(init.headers);
+        if(headers.get('x-client-request-id')!==runId+'-generation-'+report.generationAttempts||headers.get('x-stainless-retry-count')!=='0')stop('wire_request_identity_or_retry_changed');
+      }
       wireCount++;report.wireAttempts++;
     },
     async create(payload,options) {

@@ -59,7 +59,7 @@ export function validateAuthorization(auth,env,source,now=Date.now()) {
      env.VERCEL_PROJECT_ID!==projectId||!/^dpl_[A-Za-z0-9_-]{1,100}$/.test(env.VERCEL_DEPLOYMENT_ID??'')||
      env.VERCEL_GIT_REPO_OWNER!=='ed1017'||env.VERCEL_GIT_REPO_SLUG!=='people-analytics-ai'||
      env.VERCEL_GIT_COMMIT_REF!==branch||env.VERCEL_GIT_COMMIT_SHA!==auth.sourceCommit)fail('preview_identity_mismatch');
-  if(['OPENAI_BASE_URL','OPENAI_ORG_ID','OPENAI_PROJECT_ID','OPENAI_LOG'].some(key=>env[key]))fail('provider_override');
+  if(['OPENAI_BASE_URL','OPENAI_ORG_ID','OPENAI_PROJECT_ID','OPENAI_LOG','OPENAI_CUSTOM_HEADERS','OPENAI_ADMIN_KEY'].some(key=>env[key]))fail('provider_override');
   if(limits.reservationMicrousd>limits.remainingMicrousd||limits.priorRetainedMicrousd+limits.reservationMicrousd>limits.totalCapMicrousd||
      Math.ceil(4*(1050000*5+5000*15)*11/10)!==limits.reservationMicrousd)fail('reservation_formula_changed');
   return true;

@@ -54,6 +54,9 @@ fallback, model selection or routing change is introduced.
   save actions, runtime endpoints, application deployment or credential exports.
   The network guard allows one wire dispatch per counted SDK attempt, with exact
   payload equality; other endpoints, redirects and duplicate dispatch are refused.
+  Ambient custom headers/admin keys are rejected; unused SDK account/admin/webhook
+  fields are explicitly null. Wire authentication, absent account overrides,
+  client request ID and zero SDK retry count are checked without logging headers.
 - Any invalid final schema, checked-tool error, route/runtime failure, missing
   usage/request identity or attempt ambiguity stops the batch. A partial result
   retains its receipts and budget; it cannot expand to finish the conversation.
@@ -95,7 +98,10 @@ node node_modules/eslint/bin/eslint.js .plan-b-two-turn/*.mjs .plan-b-two-turn/*
 The tests stub the SDK and exercise the real route bundle. They cover exact
 payload/schema/model, count ordering, both first-state carryover paths, checked
 tool arithmetic, turn and global bounds, failure/ambiguity stops, dataset binding,
-private receipt round trips, and the unarmed build. Synthetic test answers are
+private receipt round trips, and the unarmed build. A separate clean-environment
+child uses the locked real SDK with a wholly offline fetch stub to prove actual
+serialization, header identity, custom-header rejection and zero retries on 503.
+Synthetic test answers are
 labelled fixture inputs and are never model acceptance evidence.
 
 ## Missing preflight before any external action

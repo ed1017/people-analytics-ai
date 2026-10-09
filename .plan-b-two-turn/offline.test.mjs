@@ -40,8 +40,9 @@ function setup(steps,{wire=false}={}) {
   const client={responses:{create(payload,options){
     calls.push({payload:structuredClone(payload),options,consumedBeforeDispatch:boundary.report.generationAttempts});
     return {withResponse:async()=>{
-      if(wire)boundary.verifyTransport('https://api.openai.com/v1/responses',{method:'POST',body:JSON.stringify(payload)});
-      if(wire===2)boundary.verifyTransport('https://api.openai.com/v1/responses',{method:'POST',body:JSON.stringify(payload)});
+      const wireRequest={method:'POST',body:JSON.stringify(payload),headers:{'x-client-request-id':options.headers['X-Client-Request-Id'],'x-stainless-retry-count':'0'}};
+      if(wire)boundary.verifyTransport('https://api.openai.com/v1/responses',wireRequest);
+      if(wire===2)boundary.verifyTransport('https://api.openai.com/v1/responses',wireRequest);
       const step=steps[calls.length-1];if(step instanceof Error)throw step;
       const next=typeof step==='function'?step(payload):step;
       if(!next)throw Error('unexpected_stub_call');
@@ -164,7 +165,7 @@ test('authorization remains unarmed by default, pins Preview/source/budget, and 
   const env={VERCEL:'1',VERCEL_ENV:'preview',VERCEL_PROJECT_ID:projectId,VERCEL_DEPLOYMENT_ID:'dpl_offline',
     VERCEL_GIT_REPO_OWNER:'ed1017',VERCEL_GIT_REPO_SLUG:'people-analytics-ai',VERCEL_GIT_COMMIT_REF:branch,VERCEL_GIT_COMMIT_SHA:auth.sourceCommit};
   assert.equal(validateAuthorization(auth,env,source,now),true);
-  for(const changed of [{...env,VERCEL_ENV:'production'},{...env,VERCEL_GIT_COMMIT_SHA:'b'.repeat(40)},{...env,OPENAI_BASE_URL:'https://example.invalid'},{...env,VERCEL_PROJECT_ID:'prj_wrong'}])assert.throws(()=>validateAuthorization(auth,changed,source,now));
+  for(const changed of [{...env,VERCEL_ENV:'production'},{...env,VERCEL_GIT_COMMIT_SHA:'b'.repeat(40)},{...env,OPENAI_BASE_URL:'https://example.invalid'},{...env,VERCEL_PROJECT_ID:'prj_wrong'},{...env,OPENAI_CUSTOM_HEADERS:'Authorization: synthetic-override'},{...env,OPENAI_ADMIN_KEY:'synthetic-admin'}])assert.throws(()=>validateAuthorization(auth,changed,source,now));
   for(const changed of [{...auth,budgetReviewApproved:false},{...auth,harnessSha256:'0'.repeat(64)},{...auth,expiresAt:new Date(now-1).toISOString()},{...auth,limits:{...limits,generationAttempts:5}},{...auth,unexpectedField:'refuse-unreviewed-input'}])assert.throws(()=>validateAuthorization(changed,env,source,now));
   assert.equal(limits.priorRetainedMicrousd+limits.reservationMicrousd,46799877);
 });
@@ -185,3 +186,42 @@ test('unarmed build exits before provider access and does not print even a suppl
   assert(!result.stdout.includes('SENTINEL'));assert(!result.stderr.includes('SENTINEL'));
 });
 test('all checks were offline',()=>{assert.equal(networkAttempts,0);assert.equal(hash(firstRequest()),hash(firstRequest()));});
+test('locked real SDK serializes exact payload/headers and never retries, using only an isolated fetch stub',()=>{
+  const program=`
+    import assert from 'node:assert/strict';
+    import OpenAI from 'openai';
+    import {readFileSync} from 'node:fs';
+    import {createBuildClient} from './.plan-b-two-turn/build.mjs';
+    import {runTwoTurns} from './.plan-b-two-turn/run.mjs';
+    const code=readFileSync(process.argv[1],'utf8');
+    const runId='5f318def-88b2-4fe7-85c5-c89ca8b3467f';
+    for(const mode of ['success','server-error','hostile-headers']){
+      if(mode==='hostile-headers')process.env.OPENAI_CUSTOM_HEADERS='Authorization: synthetic-override\\nOpenAI-Project: synthetic-wrong-project';
+      else delete process.env.OPENAI_CUSTOM_HEADERS;
+      let boundary,wire=0;const records=[];
+      const client=createBuildClient({OpenAI,apiKey:'synthetic-sdk-key',getBoundary:()=>boundary,dispatch:async(url,init)=>{
+        wire++;assert.equal(new URL(url).href,'https://api.openai.com/v1/responses');
+        const p=JSON.parse(init.body),headers=new Headers(init.headers);
+        assert.equal(p.model,'gpt-6.1-sol');assert.equal(p.reasoning.effort,'medium');assert.equal(p.service_tier,'default');assert.equal(p.max_output_tokens,5000);
+        assert.equal(headers.get('authorization'),'Bearer synthetic-sdk-key');assert.equal(headers.get('x-stainless-retry-count'),'0');
+        assert.equal(headers.has('openai-project'),false);assert.equal(headers.has('openai-organization'),false);assert.equal(init.redirect,'error');
+        if(mode==='server-error')return new Response(JSON.stringify({error:{message:'synthetic unavailable',type:'server_error'}}),{status:503,headers:{'content-type':'application/json','x-request-id':'req_sdk_error'}});
+        const text=JSON.stringify({answer:'Synthetic SDK reply '+wire,candidateIds:[],analysisIds:[],questions:[],constraintUpdates:[],rejected:[],focusCandidateId:null,verifiedMetrics:[]});
+        return new Response(JSON.stringify({id:'resp_sdk_'+wire,object:'response',status:'completed',model:'gpt-6.1-sol',service_tier:'default',
+          output:[{type:'message',id:'msg_synthetic',role:'assistant',content:[{type:'output_text',text,annotations:[]}]}],
+          usage:{input_tokens:100,output_tokens:20,total_tokens:120,input_tokens_details:{cached_tokens:0},output_tokens_details:{reasoning_tokens:0}}}),
+          {status:200,headers:{'content-type':'application/json','x-request-id':'req_sdk_'+wire}});
+      }});
+      const result=await runTwoTurns({code,client,runId,requireWireProof:true,bindBoundary:v=>boundary=v,record:(stage,value)=>records.push({stage,...value})});
+      assert.equal(result.executionComplete,mode==='success',JSON.stringify({mode,result,wire,stages:records.map(r=>({stage:r.stage,code:r.code,requestId:r.requestId}))}));assert.equal(wire,mode==='success'?2:mode==='server-error'?1:0);
+      assert.equal(result.generationAttempts,mode==='success'?2:1);assert.equal(result.countAttempts,0);
+      if(mode==='success')assert.equal(records.find(r=>r.stage==='generation-1').requestId,'req_sdk_1');
+      if(mode==='server-error')assert.equal(records.find(r=>r.stage==='attempt-stop-1').requestId,'req_sdk_error');
+      if(mode==='hostile-headers')assert.equal(result.attemptAmbiguous,true);
+    }
+    console.log('PASS isolated installed-SDK wire identity, Standard payload, header rejection and zero retries');
+  `;
+  const result=spawnSync(process.execPath,['--input-type=module','-e',program,join(compiled,'route.cjs')],
+    {cwd:root,encoding:'utf8',env:{PATH:process.env.PATH},timeout:15000});
+  assert.equal(result.status,0,result.stderr);assert.match(result.stdout,/PASS isolated installed-SDK/);
+});
