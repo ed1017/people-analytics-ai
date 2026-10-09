@@ -80,7 +80,7 @@ try {
    await page.keyboard.press('Escape');await tooltip.waitFor({state:'hidden'});await historyPoint.tap();await tooltip.waitFor();
    check(prefix+' tap opens the same bounded history feedback',(await tooltip.innerText()).includes('Demo history')&&await bounded());
    const methodPoint=figure.locator(domain==='hiring'?'[data-point=forecast][data-method=logistic-trend]':'[data-point=forecast][data-method^=linear-trend]').last();
-   await methodPoint.focus();await tooltip.waitFor();
+   await page.keyboard.press('Escape');await page.getByRole('button',{name:'Toggle projection page'}).focus();await page.mouse.move(0,0);await tooltip.waitFor({state:'hidden'});await methodPoint.focus();await tooltip.waitFor();
    const method=domain==='hiring'?'Logistic trend':'Linear Regression';
    check(prefix+' keyboard projection has date value unit and exact method',(await tooltip.innerText()).includes('Dec 2026')&&(await tooltip.innerText()).includes('Projection · '+method)&&await methodPoint.getAttribute('aria-describedby')===await tooltip.getAttribute('id')&&await bounded());
    check(prefix+' method names agree across table and legend',await figure.getByLabel('Chart legend').getByText(method,{exact:true}).count()===1&&await figure.locator('..').getByRole('rowheader',{name:method,exact:true}).count()===1&&!(await figure.innerText()).includes('Linear trend'));
