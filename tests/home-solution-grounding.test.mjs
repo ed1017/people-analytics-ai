@@ -6,7 +6,7 @@ import {verifySolutionEvidence,SolutionEvidenceError,solutionGroundingLimits} fr
 import {scopedDashboardResponse} from '../lib/dashboard-scope.ts';
 import {converseSolutions} from '../lib/home-solution-conversation-service.ts';
 import {actionEvidenceCatalog} from '../lib/home-action-proposal.ts';
-import {solutionRequest,fixtureRuntime,final,evaluate,candidate} from './fixtures/home-solution-conversation.mjs';
+import {solutionRequest,fixtureRuntime,final,evaluate,candidate,quantity} from './fixtures/home-solution-conversation.mjs';
 import {responseForStep} from './fixtures/natural-business-planning.mjs';
 import {offlineBusinessRoute} from './helpers/offline-business-route.mjs';
 const signal=()=>new AbortController().signal,token='legacy-v1:0';
@@ -85,6 +85,33 @@ test('source projection keeps suppression and company-only scopes; invented supp
  const pack=normalizeHomePack({workforceScope:'United States',sources:[{id:'S2',status:'loaded',facts:{exit_respondents:7,rows:[{primary_reason:'Suppressed',exits:2,suppressed:true}]}},{id:'T1',status:'loaded',facts:{current_workforce:17,ready_engineers:17,employees:[{name:'MUST_NOT_APPEAR'}]}}]});
  assert.equal(pack.sources.find(s=>s.id==='S2').facts.rows[0].exits,null);assert.match(pack.sources.find(s=>s.id==='S2').scope,/Company-wide/);
  assert.doesNotMatch(JSON.stringify(pack),/ready_engineers|MUST_NOT_APPEAR/);
+});
+
+test('actual POST supports a visible qualitative turnover proposal without inventing scope or verified numbers',async()=>{
+ const isolated=await offlineBusinessRoute(),body=solutionRequest('How can we reduce turnover?'),c=candidate('turnover-pilot');
+ isolated.sandbox.__replies.push(...[evaluate(c),final('Review this proposed mentoring trial. Population and resources are unknown; it has not been calculated.',[c.id])].map(responseForStep));
+ const response=await isolated.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',headers:{'x-workforce-dataset':token},body:JSON.stringify(body)}));
+ assert.equal(response.status,200);const reply=await response.json(),item=reply.state.working[0];
+ assert.deepEqual(reply.candidateIds,[c.id]);assert.deepEqual(item.blocking,[]);
+ assert.equal(item.result.calculationStatus,'awaiting-scope');assert.equal(item.draft.inputs.scope.population.value,null);
+ assert.equal(item.result.cashEstimate.cash,null);assert.equal(item.result.uniqueParticipants,null);assert.deepEqual(reply.state.verifiedMetrics,[]);
+ assert.equal(item.candidate.activities[0].ownerRole,'Learning lead');assert.equal(item.candidate.activities[0].step,c.activities[0].step);
+ assert.equal(body.catalog,null);assert.equal(body.goal.id,'');assert.equal(isolated.sandbox.__requests.length,2);
+ const instructions=isolated.sandbox.__requests[0].instructions;
+ assert.match(instructions,/prose advice alone does not satisfy a planning request/);assert.match(instructions,/Focus is optional/);
+ assert.ok(!isolated.sandbox.__requests[0].tools.some(t=>['evaluate_action_plans','read_workforce_planning_playbook'].includes(t.name)));
+});
+
+test('explicit fictional population and horizon unlock checked effort without turning unknown costs into a complete total',async()=>{
+ const body=solutionRequest('Reduce turnover with a fictional mentoring pilot for the fictional client-operations cohort: 12 participants, 2 total hours each, 3 coordination hours and 240 USD total cash. Start October 2026 for three months. These are proposed test inputs, not workforce facts.'),c=candidate('scoped-pilot');
+ const text=(field,value,unit)=>({...quantity(field,null,unit),text:value});
+ c.quantities=[text('population','Fictional client-operations cohort','text'),text('start_month','2026-10','YYYY-MM'),quantity('horizon_months',3,'months'),quantity('participants',12,'people','c1'),quantity('hours_per_participant',2,'hours/person/total','c1'),quantity('coordination_hours',3,'hours/total'),quantity('cash',240,'USD','c1')];
+ const runtime=fixtureRuntime([evaluate(c),(input)=>{const result=JSON.parse(input.at(-1).output);return {...final('Review the fictional pilot and its remaining unknowns.',[c.id]),verifiedMetrics:result.verifiedMetricReferences};}]);
+ const reply=await converseSolutions(body,runtime,signal()),item=reply.state.working[0];
+ assert.deepEqual(item.blocking,[]);assert.notEqual(item.result.calculationStatus,'awaiting-scope');
+ assert.equal(item.draft.inputs.scope.population.value,'Fictional client-operations cohort');
+ assert.equal(item.result.deliveryEstimate.hours,27);assert.ok(reply.state.verifiedMetrics.some(ref=>ref.metric==='staff_hours'));
+ assert.equal(item.result.cashTotal,null);assert.equal(body.catalog,null);assert.equal(runtime.rounds,2);
 });
 
 const deferred=()=>Promise.withResolvers();

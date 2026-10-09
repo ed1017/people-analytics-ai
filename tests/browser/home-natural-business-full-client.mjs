@@ -90,6 +90,8 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  s=await state();const goalId=s.goals.activeId,fields=s.workspaces[goalId].fields;
  check(mode+' deliberate selection saves the calculated plan with a preserved assumption receipt',!!goalId&&fields[businessPlanningReceiptField].length===1&&fields[businessPlanningReceiptField][0].state.review.result.additionalRoles===1&&!!fields[planAlternativesField]);
  const savedArtifacts=JSON.stringify([s.goals,fields[planAlternativesField],fields[businessPlanningReceiptField]]);
+ await page.reload();await dismissHomeOnboarding(page);await card.getByRole('button',{name:'Selected as Action Plan #1',exact:true}).waitFor();s=await state();
+ check(mode+' reload restores the exact saved goal, Action Plan and assumption receipt',JSON.stringify([s.goals,s.workspaces[goalId].fields[planAlternativesField],s.workspaces[goalId].fields[businessPlanningReceiptField]])===savedArtifacts);
  await send('topic');await card.waitFor({state:'detached'});s=await state();
  check(mode+' typed topic change clears provisional context but preserves saved goal and proposal',conversation(s).businessPlanning===null&&JSON.stringify([s.goals,s.workspaces[goalId].fields[planAlternativesField],s.workspaces[goalId].fields[businessPlanningReceiptField]])===savedArtifacts);
  await send('opener');await card.waitFor();const count=requests.length;await button('Clear provisional business discussion').click();await card.waitFor({state:'detached'});
