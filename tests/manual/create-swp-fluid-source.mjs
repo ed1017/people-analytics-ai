@@ -23,14 +23,14 @@ const digests=paths=>Object.fromEntries(paths.map(path=>[path,hash(readFileSync(
 const runtimeFiles=digests(runtimePaths),supportFiles=digests(supportPaths);
 const manifest={
  kind:'swp-fluid-source-v1',paidExecutionAuthorized:false,providerExecutionEntryPoint:null,
- runtimeCommit:'b7658aabba3348868025588585a6c2f897096205',
- inputs:{predecessorIntegration:'f76ed89ba388ae088bb9f9e2f096a9db10dc96e6',successfulFixtureSource:'02ddda844bcd4470a9dac9c015ed56b519ae6d68',referenceBuild:'6adf0a9d2f84edb9c27357b5e25fcd3529f16df0',calculatorPR188:'8a81f8c810750a9394f69c6126117f457432d34c',continuityPR187:'1441dcaea8f1e33c08334a3e0168d2bde232f296'},
+ runtimeCommit:'0b828bb367471743ec18d5b0baeefc95657bffb2',
+ inputs:{predecessorIntegration:'b550102e08456aa13584c24667ffe8c94037ef2d',groundedComparisonSource:'f76ed89ba388ae088bb9f9e2f096a9db10dc96e6',successfulFixtureSource:'02ddda844bcd4470a9dac9c015ed56b519ae6d68',referenceBuild:'6adf0a9d2f84edb9c27357b5e25fcd3529f16df0',calculatorPR188:'8a81f8c810750a9394f69c6126117f457432d34c',continuityPR187:'1441dcaea8f1e33c08334a3e0168d2bde232f296'},
  runtimeFileCount:runtimePaths.length,runtimeSha256:hash(JSON.stringify(runtimeFiles)),
  supportFileCount:supportPaths.length,supportSha256:hash(JSON.stringify(supportFiles)),
  preservedReference:{fixture:{id:fixture.id,objectSha256:hash(JSON.stringify(fixture)),fileSha256:hash(readFileSync(join(root,'tests/fixtures/swp-reference-continuation.mjs')))},baseModelContractSha256:hash(JSON.stringify(demandReferenceModelContract)),frozenManifestFileSha256:hash(readFileSync(join(root,'tests/fixtures/swp-reference-source-manifest.json')))},
  instructionComposition:{route:'app/api/home-solution-conversation/route.ts',demandMode:'demandReferenceModelContract.instructions + solutionPlanningInstructions(parsed, demand)',otherMode:'Existing solution/progress instructions + solutionPlanningInstructions(parsed, null)',helper:'lib/home-solution-planning.ts',requestDependent:true,frozenReferenceAcceptanceCoversThisEnvelope:false},
  historyContracts:{ordinaryHome:{route:'/api/chat',recentTurns:8,scopedObjective:'One recognized user opener, at most 240 characters; in-memory interpretation only, never an extra model history turn.'},fullSolution:{route:'/api/home-solution-conversation',retainedTurns:32,scopedObjectiveField:false,note:'Existing checked solution state; the ordinary Home eight-turn objective contract does not apply to this route.'}},
- publication:{branch:'codex/swp-fluid-apply-cost-review-20261009',automaticVercelDeployment:false,config:'vercel.json',productionMergeApproved:false},
+ publication:{branch:'codex/home-solution-sol-policy-20261009',automaticVercelDeployment:false,config:'vercel.json',productionMergeApproved:false},
  acceptance:{localSyntheticOnly:true,fullAcceptance:false,semanticReview:'required on this exact composed runtime',independentConflictReview:'pending coordinator review',realProviderCalls:0,paidBudgetApproved:false,deploymentApproved:false,featureFlagsChanged:false,excludedPRs:[186,189],note:'This source pin authorizes no execution. Separately approve exact route, feature flags, transport, complete context budget, turn/tool limits and semantic criteria before any paid acceptance run.'},
  runtimeFiles,supportFiles,
 };
