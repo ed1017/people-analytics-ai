@@ -56,8 +56,13 @@ export function HomeSolutionConversationReview({controller,goal,pack,showSaved}:
   {!!controller.state.verifiedMetrics.length&&<section aria-label="Checked quantitative results" className="rounded border p-3 text-sm"><h3 className="font-semibold">Checked quantitative results</h3>{controller.state.verifiedMetrics.map((ref,index)=>{const metric=resolveSolutionMetric(controller.state,ref);return <p key={index}>{metric.label}: {number(metric.value)} {metric.unit}. {metric.basis} · {metric.source}.</p>;})}<p>Effectiveness and savings are not established by these calculations.</p></section>}
   <HomeBusinessPlanningReview controller={controller}/>
   {analyses.map(item=><SolutionProjectionChart key={item.id+item.revision} analysis={item}/>)}
+  {!!latest.length&&!!controller.state.questions.length&&<section aria-label="Optional questions before choosing a plan" className="space-y-2 rounded border p-3 text-sm">
+   <h3 className="font-semibold">Before you choose — optional questions</h3>
+   <ol className="list-decimal space-y-1 pl-5">{controller.state.questions.map((question,index)=><li key={index}>{question}</li>)}</ol>
+   <p>Answer in chat for new or revised plans, or skip these questions and review any plan below. Your answers do not save a plan.</p>
+  </section>}
   {latest.map((item,index)=><Proposal key={item.id+item.revision} item={item} controller={controller} goal={goal} number={index+1}/>)}
-  {!!latest.length&&<p className="text-sm">Refine a plan by name or combine ideas in chat. You can optionally focus on a team after reviewing the proposals. New proposals stay unsaved until you choose a plan.</p>}
+  {!!latest.length&&<p className="text-sm">Ask for more alternatives, refine a plan by name, or combine ideas in chat. You can optionally focus on a team. New and revised proposals stay unsaved until you review and choose a plan.</p>}
   {showSaved&&controller.saved&&<details open><summary className="cursor-pointer py-2 font-semibold">Saved Action Plans</summary>{controller.saved.order.map(id=><PlanAlternativeCard key={id} plan={controller.saved!.plans.find(item=>item.id===id)!} catalog={controller.saved!} measurePack={pack} contextCurrent={false}/>)}</details>}
  </section>;
 }

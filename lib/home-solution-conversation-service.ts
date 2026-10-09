@@ -24,6 +24,8 @@ import {solutionPlanView,solutionEvaluationView,solutionResultView} from './home
 import {actionEvidenceCatalog} from './home-action-proposal.ts';
 // @ts-expect-error Native fixtures share TypeScript source.
 import {haveDuplicateBundleActivities} from './home-bundle-distinctness.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {readSwpPlaybook} from './swp-reasoning-playbook.ts';
 
 export type SolutionModelOutput={items:unknown[];calls:{id:string;name:string;arguments:string}[];text:string;completed:boolean};
 export type SolutionReply={requestId:string;answer:string;candidateIds:string[];analysisIds:string[];state:SolutionState;usage:{modelRounds:number;toolCalls:number};progressProposal?:ProgressEntryProposal;demandReview?:DemandReview};
@@ -113,6 +115,8 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
      progressProposal=await createProgressEntryProposal(args.spec,entryContext);result=progressProposal;
     }else if(call.name==='read_goal_progress'){
      result=runGoalProgressRead(args,progress);
+    }else if(call.name==='read_workforce_planning_playbook'){
+     result=readSwpPlaybook(args.sections);
     }else if(call.name==='read_clock'){
      const now=runtime.now?.()??new Date();result={utc:now.toISOString(),timeZone:request.timeZone,local:new Intl.DateTimeFormat('en-US',{timeZone:request.timeZone,dateStyle:'full',timeStyle:'long'}).format(now),basis:'Server clock at tool execution, rendered in the supplied browser time zone.'};
     }else if(call.name==='read_evidence'){
