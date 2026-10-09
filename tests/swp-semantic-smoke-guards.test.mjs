@@ -14,7 +14,7 @@ function envelope(id,extra={}){
 }
 const completed=(answer='Actual preceding reply bytes — fictional test completion',toolCalls=[])=>({status:'completed',usage:{inputTokens:100,outputTokens:50},answer,toolCalls,items:[]});
 test('published original closure stays pinned and smoke budgets do not import v5 allowances',()=>{
- assert.equal(verifyPinnedSource(process.cwd()).executionAuthorized,false);
+ const source=verifyPinnedSource(process.cwd());assert.equal(source.executionAuthorized,false);assert.equal(source.deploymentOverlay,true);assert.equal(source.supportBranch,'codex/swp-semantic-smoke-offline-guards-20261009');
  assert.equal(limits.generations,9);assert.equal(limits.tools,3);assert.equal(limits.countCalls,0);assert.equal(limits.reservedMicrousd,0);assert.ok(limits.payloadBytes>143568);
 });
 test('missing tokenizer, complete serializer, source, model and transport remain blockers; never arms',()=>{

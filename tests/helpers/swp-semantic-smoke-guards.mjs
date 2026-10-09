@@ -6,6 +6,7 @@ import {join} from 'node:path';
 import {encodeReceipt,decodeReceipt} from './swp-preview-receipt-log.mjs';
 
 export const pin=Object.freeze({source:'02ddda844bcd4470a9dac9c015ed56b519ae6d68',manifest:'c4b66bf45f682c6e5fdddc621950d79b88f4756dbd5fc028e1fb49cc77c0e45f',runtime:'9afb384afb65f6bbdce4e36af3648842d33335bd4a5caeef13c7533c8aa737b3'});
+export const supportBranch='codex/swp-semantic-smoke-offline-guards-20261009';
 export const limits=Object.freeze({requests:6,generations:9,tools:3,countCalls:0,retries:0,payloadBytes:192000,inputBytes:120000,callMs:30000,requestMs:90000,batchMs:300000,priorMicrousd:18669877,totalMicrousd:50000000,reservedMicrousd:0});
 export const cases=Object.freeze([
  {id:'home-opener',route:'/api/chat',mode:'ordinary-home',model:'gpt-5.6-luna',reasoning:null,maxGenerations:1,maxTools:0,maxOutput:4000},
@@ -27,11 +28,19 @@ export function verifyPinnedSource(root){
  const bytes=readFileSync(join(root,'tests/fixtures/swp-fluid-source-manifest.json'));
  if(digest(bytes)!==pin.manifest)fail('manifest_pin');const m=JSON.parse(bytes);
  if(m.runtimeSha256!==pin.runtime||m.paidExecutionAuthorized!==false)fail('runtime_pin');
- for(const [path,sha] of Object.entries({...m.runtimeFiles,...m.supportFiles}))if(!lstatSync(join(root,path)).isFile()||digest(readFileSync(join(root,path)))!==sha)fail('source_changed:'+path);
+ let deploymentOverlay=false;
+ for(const [path,sha] of Object.entries({...m.runtimeFiles,...m.supportFiles})){
+  if(!lstatSync(join(root,path)).isFile())fail('source_changed:'+path);
+  const bytes=readFileSync(join(root,path));if(digest(bytes)===sha)continue;
+  if(path!=='vercel.json')fail('source_changed:'+path);
+  const config=JSON.parse(bytes),enabled=config.git?.deploymentEnabled;
+  if(Object.keys(config).sort().join(',')!=='$schema,git'||config.$schema!=='https://openapi.vercel.sh/vercel.json'||Object.keys(config.git).join(',')!=='deploymentEnabled'||Object.keys(enabled??{}).sort().join(',')!==[m.publication.branch,supportBranch].sort().join(',')||enabled[m.publication.branch]!==false||enabled[supportBranch]!==false)fail('deployment_overlay_changed');
+  deploymentOverlay=true;
+ }
  const visit=dir=>readdirSync(join(root,dir),{withFileTypes:true}).flatMap(entry=>{const path=dir+'/'+entry.name;if(entry.isDirectory())return visit(path);if(!entry.isFile())fail('unexpected_runtime_entry');return [path];});
  const found=[...Object.keys(m.runtimeFiles).filter(path=>!path.includes('/')),...['app','components','lib','public'].flatMap(visit)].sort();
  if(JSON.stringify(found)!==JSON.stringify(Object.keys(m.runtimeFiles).sort()))fail('runtime_membership_changed');
- return {source:pin.source,manifest:pin.manifest,runtime:pin.runtime,executionAuthorized:false};
+ return {baseSource:pin.source,manifest:pin.manifest,baseRuntime:pin.runtime,deploymentOverlay,supportBranch,executionAuthorized:false};
 }
 
 /** Rates are consumer-supplied reviewed USD/million, never guessed prices.
