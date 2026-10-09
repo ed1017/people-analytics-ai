@@ -23,7 +23,7 @@ const digests=paths=>Object.fromEntries(paths.map(path=>[path,hash(readFileSync(
 const runtimeFiles=digests(runtimePaths),supportFiles=digests(supportPaths);
 const manifest={
  kind:'swp-fluid-source-v1',paidExecutionAuthorized:false,providerExecutionEntryPoint:null,
- runtimeCommit:'9da5219693e867cc6495613137b0345c00df6906',
+ runtimeCommit:'02b894f1d21ae63db07d0e7bcf0616a18f8ec93b',
  inputs:{predecessorIntegration:'b7d0e4cf625b292604cfb803e15d81d1f14b17a6',preservedApplyRepair:'b550102e08456aa13584c24667ffe8c94037ef2d',groundedComparisonSource:'f76ed89ba388ae088bb9f9e2f096a9db10dc96e6',successfulFixtureSource:'02ddda844bcd4470a9dac9c015ed56b519ae6d68',referenceBuild:'6adf0a9d2f84edb9c27357b5e25fcd3529f16df0',calculatorPR188:'8a81f8c810750a9394f69c6126117f457432d34c',continuityPR187:'1441dcaea8f1e33c08334a3e0168d2bde232f296'},
  runtimeFileCount:runtimePaths.length,runtimeSha256:hash(JSON.stringify(runtimeFiles)),
  supportFileCount:supportPaths.length,supportSha256:hash(JSON.stringify(supportFiles)),
