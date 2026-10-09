@@ -9,7 +9,7 @@ import {normalizeGoalContext,goalContextInstructions as baseGoalContextInstructi
 
 /** Shared model additions; activation and dataset binding belong to the caller. */
 export function progressModelContract(enabled:boolean,entryEnabled=enabled){return {
- instructions:enabled?'\n'+goalProgressConversationInstructions+'\n'+(entryEnabled?progressEntryInstructions:'Progress entry is unavailable for this request. Explain the saved-goal clarification; discussion does not record progress.'):'',
+ instructions:enabled?'\n'+goalProgressConversationInstructions+'\n'+(entryEnabled?progressEntryInstructions:'Progress entry is unavailable for this request; discussion does not record progress.'):'',
  tools:enabled?[goalProgressReadTool,...(entryEnabled?[goalProgressProposalTool]:[])]:[],
 };}
 /** Both section adapters use the same checked context, exclusions and decoder. */
