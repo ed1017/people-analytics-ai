@@ -1,6 +1,8 @@
 // Illustrative leader-authored objectives, never claims about available project data.
 // @ts-expect-error Native Node tests share TypeScript source.
 import {readUserGoalIntent} from './home-user-goal-intent.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {getScopedChatHistory,completeScopedChatTurn,type ScopedChatHistory} from './chat-context-history.ts';
 export const strategicPlanningStarters = [
   {id:'ai-projects',prompt:'We’re bidding on three new AI implementation projects next year. Can we staff them internally, or will we need to hire?',
     topic:/\b(AI|implementation|projects?|bids?|bidding|deliver(?:y|ing)?|staff(?:ing)?|allocations?|availability)\b/i,
@@ -45,8 +47,8 @@ function assumptionReply(text:string,previousAssistant:string,context:Starter){
  * These forms refer back to that discussion; isolated words never start planning.
  * Assistant language supplies an antecedent only, never evidence or acceptance.
  */
-function conversationalContinuation(text:string,previousAssistant:string){
-  if(!previousAssistant.trim()||text.length>400||explicitSwitch(text))return false;
+function conversationalContinuation(text:string,previousAssistant:string,carriedAntecedent=false){
+  if((!previousAssistant.trim()&&!carriedAntecedent)||text.length>400||explicitSwitch(text))return false;
   if(/\b(?:pin|save|calculate|review|goal|full plan|action plan)\b/i.test(text)
     ||/^(?:I|we) (?:want|need|would like) to\b/i.test(text))return false;
   const reply=text.replace(/^(?:or|and|actually|no|yes)[, ]+/i,'').trim().replace(/[?!.]+$/,'');
@@ -60,34 +62,64 @@ function conversationalContinuation(text:string,previousAssistant:string){
     &&! /\b(?:for|at|in|about|because|when|where|which|who|that)\b/i.test(reply.replace(/^(?:how|what) about /i,''));
   const number='[$£€]?\\d+(?:\\.\\d+)?%?(?: (?:hours?|days?|weeks?|months?|years?|FTE))?';
   const correction=new RegExp(`^(?:actually|correction|no)[, :]+(?:(?:the |our )?(?:budget|hours|effort|availability|deadline|duration)(?: is|:)? )?${number}(?: (?:not|instead of) ${number})?[.!]?$`,'i').test(text);
-  const options=['hiring','training','redeployment','recruiting','onboarding','costs','timing'].filter(option=>new RegExp(`\\b${option}\\b`,'i').test(previousAssistant)).join('|');
+  const options=['hiring','training','redeployment','recruiting','onboarding','costs','timing'].filter(option=>carriedAntecedent||new RegExp(`\\b${option}\\b`,'i').test(previousAssistant)).join('|');
   const selection=!!options&&new RegExp(`^(?:(?:yes|no) to |I (?:like|prefer|agree with) |(?:use|keep|drop) )(?:the )?(${options})(?: option| part)?(?:,? (?:but |and )?(?:not|no|yes|without)(?: to)? (?:the )?(${options}))?$`,'i').test(text.replace(/[.!?]+$/,''));
   const unavailable=/^(?:(?:we|I) (?:do not|don['’]t) have (?:those|these) (?:numbers|figures|inputs)|(?:those|these) (?:numbers|figures|inputs|sources) are (?:unknown|unavailable))$/i.test(reply);
   return comparison||elliptical||alternative||correction||selection||unavailable;
 }
 
 /** No new persisted state; the normal recent conversation supplies bounded context. */
-function planningState(message:string,history:readonly Turn[]=[]){
-  let active:Starter|null=null,previousAssistant='',isAssumption=false,goalRequested=false;
-  for(const turn of [...history,{role:'user',content:message}]){
-    if(turn.role==='assistant'){previousAssistant=turn.content;continue;}
+function planningState(message:string|null,history:readonly Turn[]=[]){
+  let active:Starter|null=null,objective='',previousAssistant='',isAssumption=false,goalRequested=false,carriedAntecedent=false,answered=false;
+  for(const turn of message===null?history:[...history,{role:'user',content:message}]){
+    // Internal interpretation marker only: never sent as a model/history turn.
+    // It supplies the antecedent omitted immediately before a truncated window,
+    // not an assistant statement, source value or accepted option.
+    if(turn.role==='planning-objective'){
+      const starter=strategicPlanningStarter(turn.content);
+      if(starter){active=starter;objective=turn.content;goalRequested=false;carriedAntecedent=true;answered=true;}
+      continue;
+    }
+    if(turn.role==='assistant'){previousAssistant=turn.content;if(active)answered=true;carriedAntecedent=false;continue;}
     if(turn.role!=='user')continue;
     const text=question(turn.content),starter=strategicPlanningStarter(text);isAssumption=false;
-    if(starter){active=starter;previousAssistant='';goalRequested=false;continue;}
+    if(starter){active=starter;objective=text;previousAssistant='';goalRequested=false;carriedAntecedent=false;answered=false;continue;}
     if(!active){previousAssistant='';continue;}
     const topicMatches=active.topic.test(text);
     const unrelated=/\b(turnover|attrition|satisfaction|engagement|employee benefits|workplace safety|weather|question about|talk about|discuss)\b/i.test(text)&&!topicMatches;
-    const continuation=conversationalContinuation(text,previousAssistant);
+    const continuation=conversationalContinuation(text,previousAssistant,carriedAntecedent);
     isAssumption=assumptionReply(text,previousAssistant,active)||continuation;
     if(!isAssumption&&!text.includes('?')&&readUserGoalIntent([text]).status!=='no_goal')goalRequested=true;
     const shortFollowup=/^(?:why|how|what next|what do you need|what else do you need|which assumptions are missing)[?!.]*$/i.test(text);
     if(explicitSwitch(text)||unrelated||(!topicMatches&&!isAssumption&&!shortFollowup)){active=null;isAssumption=false;}
-    previousAssistant='';
+    previousAssistant='';carriedAntecedent=false;
   }
-  return {context:active,isAssumption:isAssumption&&!goalRequested};
+  return {context:active,isAssumption:isAssumption&&!goalRequested,objective:active&&!goalRequested&&answered?objective:null};
 }
 export const strategicPlanningContext=(message:string,history:readonly Turn[]=[])=>planningState(message,history).context;
 export const strategicPlanningAssumptionReply=(message:string,history:readonly Turn[]=[])=>planningState(message,history).isAssumption;
+
+/** Project the still-active answered user objective from bounded interpreted turns.
+ * No archive scan, source value, plan input or implicit goal is carried.
+ */
+export const strategicPlanningObjective=(transcript:readonly Turn[])=>planningState(null,transcript).objective;
+export const normalizePlanningObjective=(value:unknown)=>typeof value==='string'&&value.length<=240&&value===question(value)&&strategicPlanningStarter(value)?value:null;
+export function planningConversationHistory(history:readonly Turn[],objective:unknown,authoritative=false):readonly Turn[]{
+  const known=normalizePlanningObjective(objective);
+  if(known)return [{role:authoritative?'planning-objective':'user',content:known},...history];
+  // An explicitly cleared scoped objective outranks a stale model window
+  // (which can lag local-only turns). Keep other goal intent/history intact.
+  return authoritative?history.filter(turn=>turn.role!=='user'||!strategicPlanningStarter(turn.content)):history;
+}
+/** One optional scalar on the existing in-memory history follows its key/clear
+ * boundaries. It is never restored from visible or saved/archive messages.
+ */
+export const scopedPlanningObjective=(previous:ScopedChatHistory,key:string)=>previous.key===key?normalizePlanningObjective(previous.planningObjective):null;
+export function completeHomePlanningTurn(previous:ScopedChatHistory,key:string,message:string,answer:string):ScopedChatHistory{
+  const history=getScopedChatHistory(previous,key);
+  const planningObjective=strategicPlanningObjective([...planningConversationHistory(history,scopedPlanningObjective(previous,key),true),{role:'user',content:message},{role:'assistant',content:answer}]);
+  return {...completeScopedChatTurn(key,history,message,answer),planningObjective};
+}
 
 /** The UI owns popup availability and all input/review state; chat grants no action. */
 export const planningCalculatorInvitation='Have a rough idea of your available people, budget or timeline? Tell me in chat, or open the Planning Calculator.';

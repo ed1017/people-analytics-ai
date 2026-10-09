@@ -16,6 +16,7 @@ import {homeExitReasonChartFromPacket,homeExitReasonChartMatches,type HomeExitRe
 import {HomeExitReasonChart} from '@/components/home-exit-reason-chart';
 import {homeTurnoverFocus} from '@/lib/home-turnover-focus';
 import {homeTurnPurpose,homeEvidenceSelection} from '@/lib/home-conversation';
+import {scopedPlanningObjective,completeHomePlanningTurn,planningConversationHistory} from '@/lib/home-strategic-planning';
 import {homeStarterGoal,homeStarterForecast,type HomeStarterGoal} from '@/lib/home-starter-goals';
 import {homeStarterExploration,buildHomeStarterExplorationPrompt,type HomeStarterExploration} from '@/lib/home-starter-exploration';
 import {HomeStarterForecastChart} from '@/components/home-forecast-chart';
@@ -60,16 +61,15 @@ import type { DevelopmentSession } from "@/components/development-workspace";
 import { PromptExamples } from "@/components/prompt-examples";
 import { contextualPrompts, homeStarterGroups } from "@/lib/contextual-prompts";
 import { HOME_ACTION_PLAN_LABEL, buildHomeActionPlanRequest } from "@/lib/home-decision-journey";
-import { completeScopedChatTurn } from "@/lib/chat-context-history";
 import { requestedHomeCountries, type CountryOption } from "@/lib/home-country-scope";
 import { getHomeChatHistory, withProblemContext } from "@/lib/problem-session";
 import type { ProblemConversation } from "@/components/problem-conversation";
 import type { AppPage, ChatMessage, Persona } from "@/lib/types";
 
-async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, message: string, history: ChatMessage[], signal?: AbortSignal, hasFocusedIssue = false, goalContext:unknown = null, marketReference:unknown = null, planningCalculatorAvailable=false) {
+async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, message: string, history: ChatMessage[], signal?: AbortSignal, hasFocusedIssue = false, goalContext:unknown = null, marketReference:unknown = null, planningCalculatorAvailable=false, planningObjective:string|null = null) {
   const response = await datasetFetch("/api/chat", {
     method: "POST", headers: { "Content-Type": "application/json" }, signal,
-    body: JSON.stringify({ page: "home", persona, message, history, goalContext, marketReference, hasFocusedIssue, overviewBriefingContext: sources, planningCalculatorAvailable }),
+    body: JSON.stringify({ page: "home", persona, message, history, planningObjective, goalContext, marketReference, hasFocusedIssue, overviewBriefingContext: sources, planningCalculatorAvailable }),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "The answer is unavailable. Please try again.");
@@ -330,7 +330,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
       if(!target||target.goalId!==conversation.activeGoalId){setLocalAction({goalId:conversation.activeGoalId,notice:'Select the intended Action Plan tab, then send this change again for review. Your request is kept; nothing has changed.'});return;}
       if(recoveredPlanNeedsConfirmation(message)&&!recoveredPlanConfirmed(message,target)){setLocalAction({goalId:conversation.activeGoalId,notice:'Review the intended Action Plan tab and confirm it for this recovered request before sending. Nothing has changed.'});return;}
       setLocalAction(null);setPlanEdit(target);
-      try{if(!target.isCurrent())throw Error('The selected plan or context changed. Select the intended Plan tab and send the change again.');const answer=target.propose(message);setMessages(current=>[...current,{role:'user',content:message},{role:'assistant',content:answer}]);if(!keepComposer)setInput('');setPlanEdit(null);setEditPreview(null);setEditNotice('');setChatError(null);requestAnimationFrame(()=>{const panel=conversationViewport.current?.querySelector<HTMLElement>('[aria-label="Action Plans for your goal"]');panel?.scrollIntoView({block:'start'});});}
+      try{if(!target.isCurrent())throw Error('The selected plan or context changed. Select the intended Plan tab and send the change again.');const answer=target.propose(message);modelHistoryRef.current={...modelHistoryRef.current,planningObjective:null};setMessages(current=>[...current,{role:'user',content:message},{role:'assistant',content:answer}]);if(!keepComposer)setInput('');setPlanEdit(null);setEditPreview(null);setEditNotice('');setChatError(null);requestAnimationFrame(()=>{const panel=conversationViewport.current?.querySelector<HTMLElement>('[aria-label="Action Plans for your goal"]');panel?.scrollIntoView({block:'start'});});}
       catch(error){setEditPreview(null);setEditNotice((error as Error).message);setLocalAction({goalId:conversation.activeGoalId,notice:(error as Error).message});}
       requestAnimationFrame(()=>{editReview.current?.focus({preventScroll:true});editReview.current?.scrollIntoView({block:'nearest'});});return;
     }
@@ -341,6 +341,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     }
     if (!message || !sources || loadedScope !== workforceQuery || chatLoading || loading || sources.every(source => !source.facts)) return;
     if (/^(?:please\s+|can you\s+)?(?:export|download)\b/i.test(message)) {
+      modelHistoryRef.current={...modelHistoryRef.current,planningObjective:null};
       setMessages(current=>[...current,{role:"user",content:message},{role:"assistant",content:"CSV downloads are currently available on Workforce and Skills Intelligence. Open one of those pages and choose Export current data (CSV), then Send. Home exports, other modules and employee-name rosters are not available yet; no file was downloaded."}]);if(!preserveDraft&&!keepComposer)setInput("");return;
     }
     if (!actionPlan && !scopeConfirmed && !forecastQuestion) {
@@ -355,7 +356,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     const request = conversation.beginRequest();
     const key = contextKey;
     const history = getHomeChatHistory(modelHistoryRef.current, key);
-    const purpose=homeTurnPurpose(message,history),prepareGoal=!starter&&responseIntent!=='explanation'&&(purpose==='goal'||purpose==='discovery');
+    const planningObjective=scopedPlanningObjective(modelHistoryRef.current,key);
+    const purpose=homeTurnPurpose(message,planningConversationHistory(history,planningObjective,true)),prepareGoal=!starter&&responseIntent!=='explanation'&&(purpose==='goal'||purpose==='discovery');
     if(!actionPlan)setFallbackSubmission(prepareGoal?{context:fallbackContext,statements:[...history.filter(item=>item.role==='user').map(item=>item.content),message].slice(-6)}:null);
     recordDecisionEvidence(conversation.activeGoalId,"home",pack);
     const goalContext=actionPlan||retainGoalContext||forecastQuestion||Boolean(selectedPlanForChat.current?.goalId===conversation.activeGoalId)?conversation.goalContext:conversation.recordGoalStatement(message,"home",workforceScope);
@@ -367,7 +369,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     if (!actionPlan) setQuestionUnanswered(true);
     try {
       const requestSelection=homeEvidenceSelection(message,history,conversation.focusedIssue),requestPack=buildHomePack(sourceResults,workforceScope,requestSelection,developmentSession);
-      const reply = await ask(requestPack, persona, withProblemContext(message, journey, conversation.focusedIssue), history, request.signal, Boolean(conversation.focusedIssue),goalContext,marketReference,demandControl.current?.calculatorAvailable()===true);
+      const reply = await ask(requestPack, persona, withProblemContext(message, journey, conversation.focusedIssue), history, request.signal, Boolean(conversation.focusedIssue),goalContext,marketReference,demandControl.current?.calculatorAvailable()===true,planningObjective);
       if (!request.current() || currentEvidenceKey.current !== key || candidateEpoch!==promptEpoch.current) return;
       const starterForecast=starter?homeStarterForecast(starter,requestPack,workforceQuery,undefined,decisionStore.getDatasetToken()):null;
       const answer = starterForecast?starterForecast.summary+'\n\n'+reply.answer:reply.answer;
@@ -397,7 +399,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
       const capturedFinding:FindingTurn={message:assistantMessage,findings:reply.findingFollowups,context:key,epoch:candidateEpoch,goalId:conversation.activeGoalId,goal:conversation.focusedIssue,selectionGoal:requestSelection,sourceKey:candidateSourceKey(requestPack)};
       liveFindingTurn.current=capturedFinding;setFindingTurn(capturedFinding);
       setMessages(current => [...current, assistantMessage]);
-      modelHistoryRef.current = completeScopedChatTurn(key, history, message, reply.clarification?answer+'\n\n'+reply.clarification:answer);
+      modelHistoryRef.current = completeHomePlanningTurn({key,messages:history,planningObjective},key,message,reply.clarification?answer+'\n\n'+reply.clarification:answer);
       if (!actionPlan) { conversation.rememberQuestion(key, message); setQuestionUnanswered(false); }
       onAnswered?.();
       if(guidedExampleActive&&message===GUIDED_EXAMPLE_PROMPT&&guidedActions.goalId)guidedActions.emit({type:'answered',goalId:guidedActions.goalId});

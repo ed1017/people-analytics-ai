@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {strategicPlanningStarters,strategicPlanningContext,strategicPlanningInstructions,planningCalculatorInvitation} from '../lib/home-strategic-planning.ts';
+import {strategicPlanningStarters,strategicPlanningContext,strategicPlanningInstructions,planningCalculatorInvitation,strategicPlanningObjective,planningConversationHistory,normalizePlanningObjective,scopedPlanningObjective,completeHomePlanningTurn} from '../lib/home-strategic-planning.ts';
 import {homeTurnPurpose} from '../lib/home-conversation.ts';
 const user=content=>({role:'user',content}),assistant=content=>({role:'assistant',content});
 const proposal='Conditionally compare hiring for urgent specialist coverage and training for repeatable work. Costs, timing and team availability are unknown. These are proposed assumptions, not measurements.';
@@ -46,4 +46,51 @@ test('new topics terminate planning; later comparisons cannot revive the old obj
   assert.equal(strategicPlanningInstructions(text,initial),'',text);
   assert.equal(strategicPlanningInstructions('Or how about both?',[...initial,user(text),assistant(proposal)]),'',text);
  }
+});
+
+test('scoped memory carries only the active user objective beyond the eight-turn window',()=>{
+ for(const starter of strategicPlanningStarters){
+  let state=completeHomePlanningTurn({key:'',messages:[]},'home',starter.prompt,proposal);
+  for(let i=0;i<16;i++){
+   const text=['Or how about both?','Budget is $20000.','We need it sooner.','Actually, 25% not 50%.'][i%4];
+   const objective=scopedPlanningObjective(state,'home');
+   assert.equal(objective,starter.prompt);assert.ok(objective.length<=240);
+   const context=planningConversationHistory(state.messages,objective,true);
+   assert.equal(strategicPlanningContext(text,context)?.id,starter.id,text);
+   assert.equal(homeTurnPurpose(text,context),'answer',text);
+   state=completeHomePlanningTurn(state,'home',text,proposal);
+   assert.ok(state.messages.length<=8);
+  }
+  assert.ok(!state.messages.some(turn=>turn.content===starter.prompt));
+  state=completeHomePlanningTurn(state,'home','New topic: movies.','We can discuss movies.');
+  for(let i=0;i<8;i++)state=completeHomePlanningTurn(state,'home','What movies should I watch?','Consider your preferred genres.');
+  assert.equal(scopedPlanningObjective(state,'home'),null);
+  assert.equal(strategicPlanningInstructions('Or how about both?',planningConversationHistory(state.messages,null,true)),'');
+ }
+});
+test('existing key/reset/recovery boundaries and local clears cannot rebuild from archive or saved goals',()=>{
+ const root=strategicPlanningStarters[1].prompt;
+ const active=completeHomePlanningTurn({key:'',messages:[]},'home',root,proposal);
+ for(const key of ['new-problem','edited-goal','other-role','other-evidence','selected-goal']){
+  assert.equal(scopedPlanningObjective(active,key),null,key);
+  assert.equal(completeHomePlanningTurn(active,key,'Or how about both?',proposal).planningObjective,null,key);
+ }
+ // Existing controllers replace the scoped ref on reset, new problem, edit,
+ // activation, recovery and reload. An unchanged visible archive is irrelevant.
+ const cleared={key:'',messages:[]};
+ assert.equal(scopedPlanningObjective(cleared,'home'),null);
+ assert.equal(completeHomePlanningTurn(cleared,'home','Or how about both?',proposal).planningObjective,null);
+ const localClear={...active,planningObjective:null};
+ assert.equal(completeHomePlanningTurn(localClear,'home','Or how about both?',proposal).planningObjective,null);
+ for(const text of ['I want to build AI implementation capacity.','We need to build capacity in both teams.'])assert.equal(completeHomePlanningTurn(active,'home',text,proposal).planningObjective,null,text);
+ assert.equal(scopedPlanningObjective({...active,planningObjective:'arbitrary saved goal'},'home'),null);
+ assert.equal(completeHomePlanningTurn(cleared,'home',root,proposal).planningObjective,root,'an explicit fresh starter can reestablish context');
+});
+test('clear is authoritative even if model history lags local turns, and saved-goal intent is not inferred',()=>{
+ const stale=[user(strategicPlanningStarters[1].prompt),assistant(proposal)];
+ assert.equal(strategicPlanningInstructions('Or how about both?',planningConversationHistory(stale,null,true)),'');
+ assert.equal(strategicPlanningObjective([...stale,user('I want to build AI implementation capacity.')]),null);
+ for(const invalid of ['An arbitrary old goal',strategicPlanningStarters[0].prompt+'\n\nFocused issue: unrelated',{},'x'.repeat(241)])assert.equal(normalizePlanningObjective(invalid),null);
+ const explicit=[user('I want to build AI implementation capacity.'),assistant('What budget should we use?')];
+ assert.equal(homeTurnPurpose('Budget is $20000.',planningConversationHistory(explicit,null,true)),'goal');
 });
