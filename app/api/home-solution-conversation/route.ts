@@ -1,3 +1,4 @@
+import {businessPlanningTools,businessPlanningInstructions} from '@/lib/home-business-planning';
 import {solutionPlanningInstructions} from '@/lib/home-solution-planning';
 import {demandReferenceModelContract} from '@/lib/swp-demand-reference';
 import {progressModelContract} from '@/lib/goal-progress-entry-service';
@@ -27,10 +28,12 @@ async function handlePOST(request:Request){
   const client=new OpenAI({...openAIProxyTransport(),apiKey:process.env.OPENAI_API_KEY,maxRetries:0});
   const signal=AbortSignal.any([request.signal,AbortSignal.timeout(90000)]);
   const progressContract=progressModelContract(goalProgressConversationEnabled);
-  const planningInstructions=solutionPlanningInstructions(parsed,demand);
-  const conversationTools=demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools];
+  const natural=request.headers.get(SWP_CONVERSATION_HEADER)===null;
+  const planningInstructions=solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions:'');
+  const conversationTools=demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools,...(natural?businessPlanningTools:[])];
   const reply=await converseSolutions(parsed,{
    ...(demand?{demand:{datasetToken:datasetRouter.current().token,referenceContract:true}}:{}),
+   ...(natural?{natural:{datasetToken:datasetRouter.current().token}}:{}),
    progress:{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token},
    complete:async(input,finalOnly,signal)=>{
     const response=await datasetAI(() => client.responses.create({...homeSolutionModel,instructions:(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:30000,signal}));

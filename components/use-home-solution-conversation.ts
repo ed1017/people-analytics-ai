@@ -1,4 +1,5 @@
 'use client';
+import {prepareBusinessPlanningSelection,businessPlanningSelectionFields,businessPlanningReceiptField,type BusinessPlanningSelection} from '@/lib/home-business-planning-save';
 import {datasetFetch} from '@/lib/dataset-client.mjs';
 import {swpConversationHeaders} from '@/lib/swp-conversation-model';
 import {useEffectEvent,useLayoutEffect,useRef,useState,type RefObject} from 'react';
@@ -87,6 +88,16 @@ export function useHomeSolutionConversation(props:Props){
   }catch(error){setNotice(error instanceof Error?error.message:'The proposal could not be saved.');}finally{setSaving(false);}
  }
  function reject(item:SolutionEvaluation){try{requireCurrent();const state=structuredClone(memoryRef.current),turnId=crypto.randomUUID();state.turns=[...state.turns,{id:turnId,role:'user' as const,text:`Discard proposal ${item.candidate.name}, revision ${item.revision}.`}].slice(-32);state.rejected=[...state.rejected,{candidateId:item.id,revision:item.revision,reason:'Discarded using the proposal review control.',turnId}].slice(-24);if(state.focusCandidateId===item.id)state.focusCandidateId=null;persist(state);}catch(error){setNotice((error as Error).message);}}
+ function clearBusinessPlanning(){try{requireCurrent();persist({...memoryRef.current,businessPlanning:null});}catch(error){setNotice((error as Error).message);}}
+ async function reviewBusinessOption(id:string){requireCurrent();const state=memoryRef.current.businessPlanning;if(!state)throw Error('The business discussion changed.');const key=JSON.stringify(state),revision=decisionStore.getSnapshot().data.revision;const selection=await prepareBusinessPlanningSelection(state,id);requireCurrent();if(JSON.stringify(memoryRef.current.businessPlanning)!==key||decisionStore.getSnapshot().data.revision!==revision)throw Error('The discussion changed. Review the current option.');return {selection,key,revision};}
+ async function saveBusinessOption(review:{selection:BusinessPlanningSelection;key:string;revision:number}){
+  if(saving||pending)return;setSaving(true);setNotice('');
+  try{const snapshot=requireCurrent(),p=currentProps.current;if(JSON.stringify(memoryRef.current.businessPlanning)!==review.key||snapshot.data.revision!==review.revision)throw Error('The reviewed comparison changed. Review the current option.');
+   const requestId='business-choice-'+crypto.randomUUID(),at=new Date().toISOString(),fields=businessPlanningSelectionFields(review.selection,catalog(),requestId,at,snapshot.data.workspaces[review.selection.goal.id]?.fields[businessPlanningReceiptField]);
+   const state=structuredClone(memoryRef.current);if(state.businessPlanning)state.businessPlanning.context.boundGoal=structuredClone(review.selection.goal);
+   p.conversation.selectProposalGoal(review.selection.goal,snapshot.data.revision,{...fields,[solutionConversationField]:state} as unknown as Record<string,Json>);memoryRef.current=state;setMemory(state);setNotice('Reviewed provisional staffing plan saved. Assumptions remain unverified; no operational change was applied.');
+  }catch(error){setNotice((error as Error).message);}finally{setSaving(false);}
+ }
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
- return {state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }

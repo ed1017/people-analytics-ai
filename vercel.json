@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "git": {
     "deploymentEnabled": {
-      "codex/home-solution-sol-policy-20261009": false
+      "codex/home-natural-swp-entry-20261009": false
     }
   }
 }
