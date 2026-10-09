@@ -1,14 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {SWP_DEMAND_MODE,illustrativeServiceReview,readDemandReview} from '../lib/swp-demand.ts';
-import {demandEditorIntent,createDemandEditorDraft,reviewDemandEditor} from '../lib/swp-demand-editor.ts';
+import {demandInputSourceLabel,demandEditorIntent,createDemandEditorDraft,reviewDemandEditor} from '../lib/swp-demand-editor.ts';
 const context={conversationMode:SWP_DEMAND_MODE,classification:'unverified-business-inputs',intakeId:'swp-demand-editor-fixture',datasetToken:'legacy-v1:0',boundGoal:{id:'',statement:''},revision:1};
 const review=()=>illustrativeServiceReview(context,'2026-10-08T12:00:00Z');
 
 test('only explicit editor requests are intercepted; normal corrections, quotes and negations stay in chat',()=>{
- for(const text of ['Open the assumption editor','Show me an edit box','Can you show me an editor for these assumptions?','Please open the editor.','I’d like an assumption editor','Could you give me an edit box, please?'])assert.equal(demandEditorIntent(text),'open',text);
+ for(const text of ['Open Planning Calculator','Show me the Planning Calculator','Open the assumption editor','Show me an edit box','Can you show me an editor for these assumptions?','Please open the editor.','I’d like an assumption editor','Could you give me an edit box, please?'])assert.equal(demandEditorIntent(text),'open',text);
  for(const text of ['Make that nine months','Assume 25% available','Can I edit assumptions?','Explain the editor','Do not open the editor','I do not want an editor','"open the editor"','Someone said open the editor','Open the editor and set availability to 50%','Review these assumptions'])assert.equal(demandEditorIntent(text),null,text);
- assert.equal(demandEditorIntent('Cancel the assumption editor'),'close');
+ assert.equal(demandEditorIntent('Cancel the assumption editor'),'close');assert.equal(demandEditorIntent('Cancel Planning Calculator'),'close');for(const text of ['Do not open Planning Calculator','Open Planning Calculator and set availability to 50%'])assert.equal(demandEditorIntent(text),null);
 });
 test('months-only review preserves all untouched values and provenance, without mutating accepted input',()=>{
  const base=review(),before=structuredClone(base),draft=createDemandEditorDraft(base);draft.months='9';
@@ -44,7 +44,7 @@ test('stale key, stale dataset/context and forged calculations cannot be applied
 });
 test('no-op formatting keeps original provenance; cancelling draft edits requires no mutation',()=>{
  const base=review(),before=structuredClone(base),draft=createDemandEditorDraft(base);
- draft.values.contracts='2.0';assert.throws(()=>reviewDemandEditor(base,draft,context,'noop'),/No assumption values changed/);
+ draft.values.contracts='2.0';assert.throws(()=>reviewDemandEditor(base,draft,context,'noop'),/No planning input values changed/);
  draft.values.contracts='4';draft.months='9';assert.deepEqual(base,before);
  assert.deepEqual(createDemandEditorDraft(base).values.contracts,'2');
 });
@@ -59,4 +59,11 @@ test('unknown optional inputs remain unknown unless explicitly supplied; missing
  const next=reviewDemandEditor(base,draft,context,'zero');assert.equal(next.spec.budgetUsd.value,0);assert.equal(next.spec.budgetUsd.basis.kind,'user-supplied');assert.deepEqual(next.spec.explicitAdditionalRoles,base.spec.explicitAdditionalRoles);
  const incomplete=createDemandEditorDraft(base);incomplete.periods.hoursPerContract='';
  const blocked=reviewDemandEditor(base,incomplete,context,'unknown-period');assert.equal(blocked.result.status,'needs-inputs');assert.equal(blocked.result.additionalRoles,null);
+});
+
+test('source labels distinguish fictional and proposed assumptions from unverified manual inputs',()=>{
+ assert.equal(demandInputSourceLabel('illustrative'),'Fictional example assumption');
+ assert.equal(demandInputSourceLabel('model-proposed'),'Model-proposed planning assumption · not verified actual');
+ assert.equal(demandInputSourceLabel('user-supplied'),'User-supplied input · not verified actual');
+ assert.equal(demandInputSourceLabel('unknown'),'Unknown');
 });
