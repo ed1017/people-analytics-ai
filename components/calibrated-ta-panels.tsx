@@ -31,7 +31,7 @@ export function CalibratedTaPanels({ data = taExtension, chartOnly = false }: { 
   const history = data.history.slice(-12), forecasts = data.forecasts;
   const allMonths = [...history.map(r => r.month), ...forecasts.map(r => r.month)];
   const maximum = Math.ceil(Math.max(1, ...history.map(r => r.active ?? 0), ...forecasts.flatMap(r => methods.map(m => r[m.key]))) / 20) * 20;
-  const width = Math.max(760, containerWidth, allMonths.length * 38), x = (i: number) => 40 + i * (width - 60) / Math.max(1, allMonths.length - 1), y = (v: number) => 156 - v / maximum * 128;
+  const width = Math.max(760, containerWidth, allMonths.length * 38), x = (i: number) => 40 + i * (width - 60) / Math.max(1, allMonths.length - 1), y = (v: number) => 136 - v / maximum * 108;
   const stageTotal = data.stages[0].count;
   const finalForecast = forecasts.at(-1);
   const ranking=resolveProjectionBacktest('hiring',data);
@@ -40,29 +40,29 @@ export function CalibratedTaPanels({ data = taExtension, chartOnly = false }: { 
     <section aria-labelledby={panelId+"-active"} className="rounded-lg border p-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2"><h2 id={panelId+"-active"} className="font-semibold">Active requisitions at month-end</h2><p className="text-sm"><strong>{count(data.active)}</strong> at cutoff · {count(data.onHold)} on hold</p></div>
       <div className="@container min-w-0">
-       <div className="grid min-w-0 items-start gap-3 @min-[58rem]:grid-cols-[18rem_minmax(0,1fr)]">
+       <div className="grid min-w-0 items-start gap-2 @min-[58rem]:grid-cols-[18rem_minmax(0,1fr)]">
         <div className="min-w-0 max-w-full overflow-x-auto">
          <p className="text-xs font-semibold">{ranking?'3 methods ranked by backtest':'3 prediction methods'}</p>
          {finalForecast ? <table className="w-full text-xs">
-          <caption className="py-2 text-left font-medium">Projected active requisitions at month-end</caption>
-          <thead><tr className="border-b text-left"><th scope="col" className="py-2 pr-3">Method</th><th scope="col" className="whitespace-nowrap py-2 text-right">{new Date(finalForecast.month+'-01T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'})}</th></tr></thead>
-          <tbody>{orderedMethods.map(m=><tr key={m.key} className="border-b"><th scope="row" className="py-2 pr-3 text-left font-normal">{m.label}</th><td className="py-2 text-right tabular-nums">{count(finalForecast[m.key])}</td></tr>)}</tbody>
+          <caption className="py-1 text-left font-medium">Projected active requisitions at month-end</caption>
+          <thead><tr className="border-b text-left"><th scope="col" className="py-1 pr-3">Method</th><th scope="col" className="whitespace-nowrap py-1 text-right">{new Date(finalForecast.month+'-01T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'})}</th></tr></thead>
+          <tbody>{orderedMethods.map(m=><tr key={m.key} className="border-b"><th scope="row" className="py-1 pr-3 text-left font-normal">{m.label}</th><td className="py-1 text-right tabular-nums">{count(finalForecast[m.key])}</td></tr>)}</tbody>
          </table> : <p className="py-2 text-xs">Projected active requisitions unavailable.</p>}
         </div>
       <figure className="min-w-0" aria-label="Active requisitions: synthetic history and forecasts">
         <div className="flex flex-wrap gap-x-4 gap-y-1 py-2 text-xs" aria-label="Chart legend"><span>● Synthetic history</span>{orderedMethods.map(m => <span key={m.key} className="inline-flex items-center gap-1"><svg width="28" height="12" aria-hidden="true"><line x1="0" x2="28" y1="6" y2="6" stroke={m.color} strokeWidth="2" strokeDasharray={m.dash} /></svg>{m.label} forecast</span>)}</div>
         <p className="mb-1 text-xs text-muted-foreground sm:hidden">Scroll the chart to see all months.</p>
         <div ref={chartContainer} className="overflow-x-auto rounded focus-visible:outline-2" tabIndex={0} role="region" aria-label="Scrollable requisition chart; use arrow keys to scroll">
-          <svg width={width} height="214" viewBox={`0 0 ${width} 214`} className="block" role="group" aria-label="Requisition counts by month">
+          <svg width={width} height="194" viewBox={`0 0 ${width} 194`} className="block" role="group" aria-label="Requisition counts by month">
             {[0, maximum / 2, maximum].map(t => <g key={t}><line x1="36" x2={width - 12} y1={y(t)} y2={y(t)} stroke="currentColor" opacity=".12" /><text x="31" y={y(t) + 4} textAnchor="end" fill="currentColor" fontSize="12">{t}</text></g>)}
-            {forecasts.length > 0 && <><line x1={x(history.length - .5)} x2={x(history.length - .5)} y1="14" y2="161" stroke="currentColor" strokeDasharray="3 3" /><text x={x(history.length - .5) + 4} y="14" fill="currentColor" fontSize="12">Forecast</text></>}
+            {forecasts.length > 0 && <><line x1={x(history.length - .5)} x2={x(history.length - .5)} y1="14" y2="141" stroke="currentColor" strokeDasharray="3 3" /><text x={x(history.length - .5) + 4} y="14" fill="currentColor" fontSize="12">Forecast</text></>}
             {history.map((r, i) => {
               const previous = history[i - 1], label = `${month(r.month)} · Synthetic history · ${count(r.active)}${r.active === null ? ': snapshot coverage missing' : ' active requisitions'}`;
               return <g key={r.month}>
                 {i > 0 && previous.active !== null && r.active !== null && <line x1={x(i - 1)} x2={x(i)} y1={y(previous.active)} y2={y(r.active)} stroke="currentColor" strokeWidth="2" />}
                 <g tabIndex={0} role="img" aria-label={label} onFocus={() => setHover(label)} onMouseEnter={() => setHover(label)} onClick={() => setHover(label)} className="cursor-pointer focus-visible:outline-2" data-history-month={r.month}>
-                  <rect x={x(i) - 10} y={(r.active === null ? 148 : y(r.active)) - 12} width="20" height="24" fill="transparent" />
-                  {r.active === null ? <text x={x(i)} y="152" textAnchor="middle" fill="currentColor" fontSize="16">×</text> : <circle cx={x(i)} cy={y(r.active)} r="4" fill="currentColor" />}
+                  <rect x={x(i) - 10} y={(r.active === null ? 128 : y(r.active)) - 12} width="20" height="24" fill="transparent" />
+                  {r.active === null ? <text x={x(i)} y="132" textAnchor="middle" fill="currentColor" fontSize="16">×</text> : <circle cx={x(i)} cy={y(r.active)} r="4" fill="currentColor" />}
                 </g>
               </g>;
             })}
@@ -73,10 +73,10 @@ export function CalibratedTaPanels({ data = taExtension, chartOnly = false }: { 
                 <g tabIndex={0} role="img" aria-label={label} onFocus={() => setHover(label)} onMouseEnter={() => setHover(label)} onClick={() => setHover(label)} className="cursor-pointer focus-visible:outline-2" data-forecast-method={m.key}><rect x={x(i) + offset - 5} y={y(r[m.key]) - 5} width="10" height="10" fill={m.color} stroke="var(--background)" /><title>{label}</title></g>
               </g>;
             })}</g>)}
-            {allMonths.map((m, i) => <text key={m} transform={`translate(${x(i)},178) rotate(-40)`} textAnchor="end" fill="currentColor" fontSize="12">{month(m)}</text>)}
+            {allMonths.map((m, i) => <text key={m} transform={`translate(${x(i)},158) rotate(-40)`} textAnchor="end" fill="currentColor" fontSize="12">{month(m)}</text>)}
           </svg>
         </div>
-        <figcaption className="min-h-10 py-1 text-xs" aria-live="polite">{hover}</figcaption>
+        <figcaption className="min-h-8 py-1 text-xs" aria-live="polite">{hover}</figcaption>
       </figure>
        </div>
       </div>
@@ -106,8 +106,8 @@ export function CalibratedTaPanels({ data = taExtension, chartOnly = false }: { 
         <p><strong>Methods:</strong> last count, rounded mean of the last three consecutive complete months, and mean recent monthly change damped by 0.5 per horizon, rounded and floored at zero. All require complete consecutive snapshots ending at cutoff. Symbols are slightly offset within each month to keep overlapping methods selectable. {data.methodLimits}</p>
         <p><strong>Separate evidence:</strong> existing timing, aging, recruiter, source, role and BU breakdowns and planning remain on their original source. Generated open ages and fill timing are not calibrated to those records; do not infer role capacity, arrival dates, headcount or ROI. The residual open pool is a construction, not reconstructed aging history.</p>
         <p><strong>Reconciliation:</strong> {data.opened} opened = {data.active} active + {data.filled} filled + {data.cancelled} cancelled. Hired = filled = 5,080. Application outcomes total 62,104, including 600 internal and 4,480 external hires.</p>
-        <div className="overflow-x-auto"><table className="w-full text-left text-xs"><caption className="py-2 text-left font-medium">Month-end history and application events · {data.version}</caption><thead><tr><th className="p-2">Month</th><th>Active</th><th>Coverage</th><th>Applied</th><th>Hired</th></tr></thead><tbody>{data.history.map((r, i) => <tr key={r.month} className="border-t"><th className="p-2 text-left font-normal">{month(r.month)}</th><td>{count(r.active)}</td><td>{r.complete ? 'Complete' : 'Missing'}</td><td>{count(data.monthly[i].applications)}</td><td>{count(data.monthly[i].hires)}</td></tr>)}</tbody></table></div>
-        <div className="overflow-x-auto"><table className="w-full text-left text-xs"><caption className="py-2 text-left font-medium">Projected active requisitions</caption><thead><tr><th className="p-2">Month</th>{orderedMethods.map(m => <th key={m.key}>{m.label}</th>)}</tr></thead><tbody>{forecasts.map(r => <tr key={r.month} className="border-t"><th className="p-2 text-left font-normal">{month(r.month)}</th>{orderedMethods.map(m => <td key={m.key}>{count(r[m.key])}</td>)}</tr>)}</tbody></table></div>
+        <div className="overflow-x-auto"><table className="w-full text-left text-xs"><caption className="py-1 text-left font-medium">Month-end history and application events · {data.version}</caption><thead><tr><th className="p-2">Month</th><th>Active</th><th>Coverage</th><th>Applied</th><th>Hired</th></tr></thead><tbody>{data.history.map((r, i) => <tr key={r.month} className="border-t"><th className="p-2 text-left font-normal">{month(r.month)}</th><td>{count(r.active)}</td><td>{r.complete ? 'Complete' : 'Missing'}</td><td>{count(data.monthly[i].applications)}</td><td>{count(data.monthly[i].hires)}</td></tr>)}</tbody></table></div>
+        <div className="overflow-x-auto"><table className="w-full text-left text-xs"><caption className="py-1 text-left font-medium">Projected active requisitions</caption><thead><tr><th className="p-2">Month</th>{orderedMethods.map(m => <th key={m.key}>{m.label}</th>)}</tr></thead><tbody>{forecasts.map(r => <tr key={r.month} className="border-t"><th className="p-2 text-left font-normal">{month(r.month)}</th>{orderedMethods.map(m => <td key={m.key}>{count(r[m.key])}</td>)}</tr>)}</tbody></table></div>
       </div>
     </details>
   </div>;

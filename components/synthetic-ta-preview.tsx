@@ -16,7 +16,7 @@ export function SyntheticTaPreview({ data }: { data: Preview }) {
   const history = data.history, forecasts = data.forecasts;
   const allMonths = [...history.map(r => r.month), ...forecasts.map(r => r.month)];
   const maximum = Math.ceil(Math.max(1, ...history.map(r => r.active ?? 0), ...forecasts.flatMap(r => methods.map(m => r[m.key]))) / 20) * 20;
-  const width = Math.max(760, allMonths.length * 38), x = (i: number) => 40 + i * (width - 60) / Math.max(1, allMonths.length - 1), y = (v: number) => 156 - v / maximum * 128;
+  const width = Math.max(760, allMonths.length * 38), x = (i: number) => 40 + i * (width - 60) / Math.max(1, allMonths.length - 1), y = (v: number) => 136 - v / maximum * 108;
   const stageTotal = data.stages[0].count;
   return <main className="mx-auto max-w-6xl space-y-3 p-3 sm:p-5" data-source-version={data.version}>
     <header><h1 className="text-xl font-semibold">Talent Acquisition</h1><p className="text-sm text-muted-foreground">Synthetic company-wide history · {data.cutoff}</p></header>
@@ -26,16 +26,16 @@ export function SyntheticTaPreview({ data }: { data: Preview }) {
         <div className="flex flex-wrap gap-x-4 gap-y-1 py-2 text-xs" aria-label="Chart legend"><span>● Synthetic history</span>{methods.map(m => <span key={m.key} className="inline-flex items-center gap-1"><svg width="28" height="12" aria-hidden="true"><line x1="0" x2="28" y1="6" y2="6" stroke={m.color} strokeWidth="2" strokeDasharray={m.dash} /></svg>{m.label} forecast</span>)}</div>
         <p className="mb-1 text-xs text-muted-foreground sm:hidden">Scroll the chart to see all months.</p>
         <div className="overflow-x-auto rounded focus-visible:outline-2" tabIndex={0} role="region" aria-label="Scrollable requisition chart; use arrow keys to scroll">
-          <svg width={width} height="214" viewBox={`0 0 ${width} 214`} className="block" role="group" aria-label="Requisition counts by month">
+          <svg width={width} height="194" viewBox={`0 0 ${width} 194`} className="block" role="group" aria-label="Requisition counts by month">
             {[0, maximum / 2, maximum].map(t => <g key={t}><line x1="36" x2={width - 12} y1={y(t)} y2={y(t)} stroke="currentColor" opacity=".12" /><text x="31" y={y(t) + 4} textAnchor="end" fill="currentColor" fontSize="12">{t}</text></g>)}
-            {forecasts.length > 0 && <><line x1={x(history.length - .5)} x2={x(history.length - .5)} y1="14" y2="161" stroke="currentColor" strokeDasharray="3 3" /><text x={x(history.length - .5) + 4} y="14" fill="currentColor" fontSize="12">Forecast</text></>}
+            {forecasts.length > 0 && <><line x1={x(history.length - .5)} x2={x(history.length - .5)} y1="14" y2="141" stroke="currentColor" strokeDasharray="3 3" /><text x={x(history.length - .5) + 4} y="14" fill="currentColor" fontSize="12">Forecast</text></>}
             {history.map((r, i) => {
               const previous = history[i - 1], label = `${month(r.month)} · Synthetic history · ${count(r.active)}${r.active === null ? ': snapshot coverage missing' : ' active requisitions'}`;
               return <g key={r.month}>
                 {i > 0 && previous.active !== null && r.active !== null && <line x1={x(i - 1)} x2={x(i)} y1={y(previous.active)} y2={y(r.active)} stroke="currentColor" strokeWidth="2" />}
                 <g tabIndex={0} role="img" aria-label={label} onFocus={() => setHover(label)} onMouseEnter={() => setHover(label)} onClick={() => setHover(label)} className="cursor-pointer focus-visible:outline-2" data-history-month={r.month}>
-                  <rect x={x(i) - 10} y={(r.active === null ? 148 : y(r.active)) - 12} width="20" height="24" fill="transparent" />
-                  {r.active === null ? <text x={x(i)} y="152" textAnchor="middle" fill="currentColor" fontSize="16">×</text> : <circle cx={x(i)} cy={y(r.active)} r="4" fill="currentColor" />}
+                  <rect x={x(i) - 10} y={(r.active === null ? 128 : y(r.active)) - 12} width="20" height="24" fill="transparent" />
+                  {r.active === null ? <text x={x(i)} y="132" textAnchor="middle" fill="currentColor" fontSize="16">×</text> : <circle cx={x(i)} cy={y(r.active)} r="4" fill="currentColor" />}
                 </g>
               </g>;
             })}
@@ -46,10 +46,10 @@ export function SyntheticTaPreview({ data }: { data: Preview }) {
                 <g tabIndex={0} role="img" aria-label={label} onFocus={() => setHover(label)} onMouseEnter={() => setHover(label)} onClick={() => setHover(label)} className="cursor-pointer focus-visible:outline-2" data-forecast-method={m.key}><rect x={x(i) + offset - 5} y={y(r[m.key]) - 5} width="10" height="10" fill={m.color} stroke="var(--background)" /><title>{label}</title></g>
               </g>;
             })}</g>)}
-            {allMonths.map((m, i) => <text key={m} transform={`translate(${x(i)},178) rotate(-40)`} textAnchor="end" fill="currentColor" fontSize="12">{month(m)}</text>)}
+            {allMonths.map((m, i) => <text key={m} transform={`translate(${x(i)},158) rotate(-40)`} textAnchor="end" fill="currentColor" fontSize="12">{month(m)}</text>)}
           </svg>
         </div>
-        <figcaption className="min-h-10 py-1 text-xs" aria-live="polite">{hover}</figcaption>
+        <figcaption className="min-h-8 py-1 text-xs" aria-live="polite">{hover}</figcaption>
       </figure>
     </section>
 

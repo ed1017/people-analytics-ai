@@ -6,7 +6,7 @@ import {resolveSyntheticDomainDemo,formatDemoValue,demoDomainCopy,type Synthetic
 const month=(value:string)=>new Date(value+'-01T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'});
 export function SyntheticDomainDemo({domain,evidence=artifact}:{domain:SyntheticDemoDomain;evidence?:unknown}){
  const view=resolveSyntheticDomainDemo(evidence),copy=demoDomainCopy[domain];
- return <section aria-label={'Simulated '+copy.title.toLowerCase()} className="my-3 min-w-0 space-y-1 rounded-lg border bg-muted/10 p-3 text-sm">
+ return <section aria-label={'Simulated '+copy.title.toLowerCase()} className="my-2 min-w-0 space-y-1 rounded-lg border bg-muted/10 p-3 text-sm">
   <h3 className="font-semibold">{copy.title}</h3>
   {view.status!=='ready'?<p role="status">{view.message}</p>:<DemoResults domain={domain} data={view.data}/>}
  </section>;
