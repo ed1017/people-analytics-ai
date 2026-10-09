@@ -39,6 +39,10 @@ const id=(value:unknown):value is string=>typeof value==='string'&&/^[A-Za-z0-9_
 const text=(value:unknown,max:number):value is string=>typeof value==='string'&&!!value.trim()&&value.length<=max;
 const obj=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
 export const emptySolutionState=():SolutionState=>({version:1,verifiedMetrics:[],turns:[],constraints:[],working:[],analyses:[],rejected:[],questions:[],focusCandidateId:null});
+/** The model and review cards use the same current, unsaved-proposal labels. */
+export function currentSolutionProposals(state:SolutionState){
+ return [...new Map(state.working.map(item=>[item.id,item])).values()].filter(item=>!state.rejected.some(rejected=>rejected.candidateId===item.id&&rejected.revision===item.revision));
+}
 export function readSolutionState(raw:unknown):SolutionState {
  if(raw===undefined||raw===null)return emptySolutionState();
  if(!validateJson(raw)||!obj(raw)||raw.version!==1||!Array.isArray(raw.turns)||raw.turns.length>32||!Array.isArray(raw.constraints)||raw.constraints.length>5||!Array.isArray(raw.working)||raw.working.length>12||!Array.isArray(raw.rejected)||raw.rejected.length>24||!Array.isArray(raw.questions)||raw.questions.length>2||!raw.questions.every(q=>text(q,300))||!(raw.focusCandidateId===null||id(raw.focusCandidateId)))fail('The working conversation could not be read. Saved plans are preserved.');

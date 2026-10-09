@@ -2,7 +2,7 @@
 import {useState} from 'react';
 import {HomeBusinessPlanningReview} from './home-business-planning-review';
 import type {useHomeSolutionConversation} from './use-home-solution-conversation';
-import {resolveSolutionMetric,type SolutionEvaluation} from '@/lib/home-solution-conversation';
+import {resolveSolutionMetric,currentSolutionProposals,type SolutionEvaluation} from '@/lib/home-solution-conversation';
 import type {HeadcountProjection} from '@/lib/home-solution-projection';
 import {PlanAlternativeCard} from './plan-alternative-card';
 import {OptionalConversationForm} from './optional-conversation-form';
@@ -10,13 +10,20 @@ import {OptionalConversationForm} from './optional-conversation-form';
 type Controller=ReturnType<typeof useHomeSolutionConversation>;
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring';
 const number=(value:number|null|undefined)=>value==null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:1});
-function Proposal({item,controller,goal}:{item:SolutionEvaluation;controller:Controller;goal:string}){
+const proposalAnchor=(id:string)=>'proposed-action-plan-'+id;
+/** Direct access to the actual review cards, without changing selection or saving. */
+export function HomeSolutionProposalLinks({controller}:{controller:Controller}){
+ const proposals=currentSolutionProposals(controller.state);
+ if(!proposals.length)return null;
+ return <nav aria-label="Review proposed Action Plans" className="space-y-2 text-sm"><p className="font-semibold">Proposed Action Plans <span className="font-normal text-muted-foreground">· review before saving</span></p><div className="flex flex-wrap gap-2">{proposals.map((item,index)=><button key={item.id} type="button" className={button+' min-w-0 max-w-full break-words text-left'} onClick={()=>{const card=document.getElementById(proposalAnchor(item.id));card?.scrollIntoView({block:'start'});card?.focus({preventScroll:true});}}>Review {index+1}: {item.candidate.name}</button>)}</div></nav>;
+}
+function Proposal({item,controller,goal,number:proposalNumber}:{item:SolutionEvaluation;controller:Controller;goal:string;number:number}){
  const [statement,setStatement]=useState(goal||item.candidate.goal.statement);
  const stale=JSON.stringify(item.constraints)!==JSON.stringify(controller.state.constraints),saved=controller.saved?.plans.find(plan=>plan.operation?.proposalKey===JSON.stringify(item.candidate));
- return <article aria-label={`Working proposal: ${item.candidate.name}`} className="space-y-3 rounded border p-3 text-sm">
-  <p className="text-xs font-medium">Proposed approach · effectiveness is unproven</p><h3 className="font-semibold">{item.candidate.name} · revision {item.revision}</h3><p>{item.candidate.objective}</p><p>{item.candidate.rationale}</p><p>{item.candidate.approach}</p>
-  <ol className="list-decimal space-y-2 pl-5">{item.candidate.activities.map(activity=><li key={activity.id}><strong>{activity.mode==='retain'?item.draft?.bundle.components.find(part=>part.id===activity.id)?.name??activity.name:activity.name}</strong> · {activity.mode}{activity.source?` from ${activity.source.kind} ${activity.source.id}, revision ${activity.source.revision}`:''}<p>{item.draft?.bundle.components.find(part=>part.id===activity.id)?.firstStep??activity.step}</p><p className="text-xs">{activity.limitation}</p></li>)}</ol>
-  <p><strong>Tradeoffs:</strong> {item.candidate.tradeoffs.join(' ')||'Not yet evaluated.'}</p><p><strong>Next step:</strong> {item.candidate.nextStep}</p><p><strong>Learn whether it helps:</strong> {item.candidate.successMeasure}</p>
+ return <article id={proposalAnchor(item.id)} tabIndex={-1} aria-label={`Working proposal: ${item.candidate.name}`} className="space-y-3 rounded border p-3 text-sm focus-visible:ring-2 focus-visible:ring-ring">
+  <p className="text-xs font-medium">Proposed Action Plan {proposalNumber} · {saved?'saved proposal':'not saved'} · effectiveness is unproven</p><h3 className="font-semibold">{item.candidate.name} · revision {item.revision}</h3><p><strong>Intended outcome:</strong> {item.candidate.objective}</p><p>{item.candidate.rationale}</p><p>{item.candidate.approach}</p>
+  <ol className="list-decimal space-y-2 pl-5">{item.candidate.activities.map(activity=>{const component=item.draft?.bundle.components.find(part=>part.id===activity.id),timing=item.draft?.inputs.timing.find(row=>row.componentId===activity.id);return <li key={activity.id}><strong>{component?.name??activity.name}</strong><p>{component?.firstStep??activity.step}</p><p><strong>Suggested owner:</strong> {component?.ownerRole??activity.ownerRole}</p><p className="text-xs"><strong>Timing:</strong> {timing?.start.value??'Start not confirmed'} → {timing?.finish.value??'Finish not confirmed'}. Follow the proposed step sequence; dates and availability need review.</p><p className="text-xs">{component?.limitation??activity.limitation}</p></li>;})}</ol>
+  <p><strong>Tradeoffs:</strong> {item.candidate.tradeoffs.join(' ')||'Not yet evaluated.'}</p><p><strong>Next step:</strong> {item.candidate.nextStep}</p><p><strong>Success measure:</strong> {item.candidate.successMeasure}</p>
   {item.result?.calculationStatus==='awaiting-scope'?<p>Qualitative proposal · population or horizon still needs review. Resource totals have not been calculated.</p>:<p>Calculated cash: {item.result?.cashEstimate?.cash==null?'Unknown':`$${number(item.result.cashEstimate.cash)} USD`} · staff effort: {number(item.result?.deliveryEstimate?.hours)} hours · distinct participants: {number(item.result?.uniqueParticipants)}.</p>}
   <details open><summary className="cursor-pointer py-2 font-medium">Review interpreted inputs and changes</summary><ul className="list-disc space-y-1 pl-5">{[...item.interpretations,...item.changes].map((line,index)=><li key={index}>{line}</li>)}</ul>{!item.interpretations.length&&<p>No new quantities were supplied. Missing assumptions remain unknown.</p>}</details>
   {[...item.blocking,...(stale?['Current constraints changed. Refine this proposal in chat before saving.']:[])].map((line,index)=><p key={index} role="status">{line}</p>)}
@@ -40,7 +47,7 @@ export function SolutionProjectionChart({analysis}:{analysis:HeadcountProjection
  </section>;
 }
 export function HomeSolutionConversationReview({controller,goal,pack,showSaved}:{controller:Controller;goal:string;pack:unknown;showSaved:boolean}){
- const latest=[...new Map(controller.state.working.map(item=>[item.id,item])).values()].filter(item=>!controller.state.rejected.some(rejected=>rejected.candidateId===item.id&&rejected.revision===item.revision));
+ const latest=currentSolutionProposals(controller.state);
  const analyses=[...new Map(controller.state.analyses.map(item=>[item.id,item])).values()];
  return <section aria-label="Solution conversation review" className="space-y-3">
   {controller.pending&&<div role="status" className="flex items-center gap-3"><p>Thinking through the question and checking useful calculations…</p><button className={button} onClick={controller.cancel}>Cancel request</button></div>}
@@ -49,7 +56,8 @@ export function HomeSolutionConversationReview({controller,goal,pack,showSaved}:
   {!!controller.state.verifiedMetrics.length&&<section aria-label="Checked quantitative results" className="rounded border p-3 text-sm"><h3 className="font-semibold">Checked quantitative results</h3>{controller.state.verifiedMetrics.map((ref,index)=>{const metric=resolveSolutionMetric(controller.state,ref);return <p key={index}>{metric.label}: {number(metric.value)} {metric.unit}. {metric.basis} · {metric.source}.</p>;})}<p>Effectiveness and savings are not established by these calculations.</p></section>}
   <HomeBusinessPlanningReview controller={controller}/>
   {analyses.map(item=><SolutionProjectionChart key={item.id+item.revision} analysis={item}/>)}
-  {latest.map(item=><Proposal key={item.id+item.revision} item={item} controller={controller} goal={goal}/>)}
+  {latest.map((item,index)=><Proposal key={item.id+item.revision} item={item} controller={controller} goal={goal} number={index+1}/>)}
+  {!!latest.length&&<p className="text-sm">Refine a plan by name or combine ideas in chat. You can optionally focus on a team after reviewing the proposals. New proposals stay unsaved until you choose a plan.</p>}
   {showSaved&&controller.saved&&<details open><summary className="cursor-pointer py-2 font-semibold">Saved Action Plans</summary>{controller.saved.order.map(id=><PlanAlternativeCard key={id} plan={controller.saved!.plans.find(item=>item.id===id)!} catalog={controller.saved!} measurePack={pack} contextCurrent={false}/>)}</details>}
  </section>;
 }

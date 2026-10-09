@@ -10,7 +10,7 @@ import {requestDemandContext,createDemandReview,reviseDemandReview,serviceDemand
 import type {SolutionParameterEdit,SolutionCandidate,SolutionConstraint,SolutionFinal,ProjectionSpec,SolutionMetricRef} from './home-solution-conversation-schema';
 import type {ProjectionInputs,HeadcountProjection} from './home-solution-projection';
 // @ts-expect-error Native fixture tests share TypeScript source.
-import {readSolutionRequest,readSolutionState,evaluateSolutionParameterEdit,evaluateSolutionCandidate,mergeSolutionConstraints,solutionUserTurns,resolveSolutionMetric} from './home-solution-conversation.ts';
+import {readSolutionRequest,readSolutionState,evaluateSolutionParameterEdit,evaluateSolutionCandidate,mergeSolutionConstraints,solutionUserTurns,resolveSolutionMetric,currentSolutionProposals} from './home-solution-conversation.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {assertSolutionShape,solutionTools,solutionFinalSchema} from './home-solution-conversation-schema.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
@@ -22,6 +22,8 @@ import {goalProgressReadTool,readGoalProgressConversation,runGoalProgressRead,ty
 import {solutionPlanView,solutionEvaluationView,solutionResultView} from './home-solution-model-view.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {actionEvidenceCatalog} from './home-action-proposal.ts';
+// @ts-expect-error Native fixtures share TypeScript source.
+import {haveDuplicateBundleActivities} from './home-bundle-distinctness.ts';
 
 export type SolutionModelOutput={items:unknown[];calls:{id:string;name:string;arguments:string}[];text:string;completed:boolean};
 export type SolutionReply={requestId:string;answer:string;candidateIds:string[];analysisIds:string[];state:SolutionState;usage:{modelRounds:number;toolCalls:number};progressProposal?:ProgressEntryProposal;demandReview?:DemandReview};
@@ -42,11 +44,31 @@ export function solutionModelContext(request:SolutionRequest,progress?:GoalProgr
  const saved=request.catalog?.plans.filter(plan=>!plan.deleted)??[];
  return {goal:request.goal,scope:request.scope,filters:request.filters,timeZone:request.timeZone,goalContext:request.goalContext,...(progress?{savedGoalProgress:progress}:{}),currentEvidence:request.evidence,citationCatalog:actionEvidenceCatalog(request.evidence),currentConstraints:request.state.constraints,
   savedPlans:saved.map(plan=>({id:plan.id,number:plan.number,revision:plan.draft.revision,name:plan.draft.bundle.name,objective:plan.draft.bundle.objective,activities:plan.draft.bundle.components})),selectedPlan:saved.some(plan=>plan.id===request.selectedId)?solutionPlanView(saved.find(plan=>plan.id===request.selectedId)!):null,
-  recentTurns:request.state.turns,modelView:{version:1,omittedInternalEqualityKeys:['draft.signature','result.signature','result.bindingKey','result.inputKey','evaluation.sourceKeys'],authoritativeState:'Retained on the server; projected views cannot be saved or used as authoritative input.',history:'All retained turns; no history truncation during projection.'},currentWorkingRevisions:latest(request.state.working).map(({id,revision})=>({id,revision})),workingProposals:request.state.working.map(item=>{const view=solutionEvaluationView(request,item);return {...view,inputs:item.draft?.inputs??null,draft:undefined,result:item.result?solutionResultView(item.result):null};}),
+  recentTurns:request.state.turns,modelView:{version:1,omittedInternalEqualityKeys:['draft.signature','result.signature','result.bindingKey','result.inputKey','evaluation.sourceKeys'],authoritativeState:'Retained on the server; projected views cannot be saved or used as authoritative input.',history:'All retained turns; no history truncation during projection.'},currentWorkingRevisions:currentSolutionProposals(request.state).map(({id,revision,candidate},index)=>({id,revision,name:candidate.name,label:`Proposed Action Plan ${index+1}`})),workingProposals:request.state.working.map(item=>{const view=solutionEvaluationView(request,item);return {...view,inputs:item.draft?.inputs??null,draft:undefined,result:item.result?solutionResultView(item.result):null};}),
   analyses:request.state.analyses.map(item=>({id:item.id,revision:item.revision,method:item.spec.method,months:item.spec.months,assumptions:item.assumptions,opening:item.inputs.opening,asOf:item.inputs.asOf,scope:item.inputs.scope,interpretations:item.interpretations,finalHeadcount:item.points.at(-1)?.headcount})),
   rejectedIdeas:request.state.rejected,unresolvedQuestions:request.state.questions,focusCandidateId:request.state.focusCandidateId,currentMessage:request.message,
  };
 }
+
+/** Keep the exact provenance of every retained proposal, including a batched set. */
+function retainEvaluations(state:SolutionState,items:SolutionEvaluation[]){
+ const proposed=[...state.working,...items],retained=proposed.slice(-12);
+ // Keep every proof needed by a current proposal. Refuse this edit before
+ // trimming, so the existing checked revision remains reviewable and savable.
+ const key=(row:{id:string;revision:number})=>JSON.stringify([row.id,row.revision]);
+ const removed=new Set(proposed.slice(0,-12).map(key)),byKey=new Map(retained.map(row=>[key(row),row])),visited=new Set<string>();
+ const checkAncestry=(row:SolutionEvaluation)=>{
+  if(visited.has(key(row)))return;visited.add(key(row));
+  for(const ref of [row.candidate.base,...row.candidate.activities.map(a=>a.source),...row.candidate.quantities.map(q=>q.source)])if(ref?.kind==='working'){
+   if(removed.has(key(ref)))throw Error('The working history limit would remove source provenance. Choose the current proposal to save it, then continue from that saved plan; this edit and its constraints were not recorded.');
+   const prior=byKey.get(key(ref));if(prior)checkAncestry(prior);
+  }
+ };
+ if(removed.size)latest(retained).forEach(checkAncestry);
+
+ return retained;
+}
+
 /** Bounded model-directed read/calculation loop. No write, model switch or automatic retry. */
 export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,signal:AbortSignal):Promise<SolutionReply>{
  const original=readSolutionRequest(raw),request=structuredClone(original),state=request.state;
@@ -62,16 +84,17 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  if(referenced&&demand){const goalContext=structuredClone(request.goalContext) as {scenarioReview:Record<string,unknown>};goalContext.scenarioReview.demandProposal=demand.demandProposal?referencedDemandView(demand.demandProposal,demand,currentDemandReference):null;modelContext.goalContext=goalContext;}
  const input:unknown[]=[{role:'user',content:'CURRENT AUTHORITATIVE CONTEXT AND CONVERSATION DATA\n'+JSON.stringify({...modelContext,...(entryContext?{progressEntryDraft:entryContext.previous}:{} )})}];
  const evaluated=new Map<string,SolutionEvaluation>(),analyses=new Map<string,HeadcountProjection>();
- let toolCalls=0,projectionInput:Promise<ProjectionInputs>|undefined,final:SolutionFinal|undefined,rounds=0;
+ let toolCalls=0,operations=0,projectionInput:Promise<ProjectionInputs>|undefined,final:SolutionFinal|undefined,rounds=0;
  for(let round=0;round<4;round++){
   abort(signal);if(new TextEncoder().encode(JSON.stringify(input)).length>120000)throw Error('This conversation needs a narrower set of sources before another model round. Earlier work is kept.');
-  const output=await runtime.complete(input,round===3||toolCalls>=6,signal);rounds++;abort(signal);
+  const output=await runtime.complete(input,round===3||operations>=6,signal);rounds++;abort(signal);
   if(!output.completed||output.calls.length>6||JSON.stringify(output.items).length>70000)throw Error('The conversation response was incomplete or exceeded its bounds.');
   if(!output.calls.length){if(!output.text||output.text.length>20000)throw Error('The conversational answer is unavailable.');const value=JSON.parse(output.text);assertSolutionShape(value,solutionFinalSchema,'answer');final=value;break;}
-  if(round===3||toolCalls+output.calls.length>6)throw Error('The bounded calculation limit was reached. No proposal was saved.');
+  const callCost=(call:SolutionModelOutput['calls'][number])=>{if(call.name!=='evaluate_action_plans')return 1;try{const count=JSON.parse(call.arguments)?.candidates?.length;return Number.isInteger(count)&&count>=1&&count<=3?count:3;}catch{return 3;}};
+  if(round===3||operations+output.calls.reduce((total,call)=>total+callCost(call),0)>6)throw Error('The bounded calculation limit was reached. No proposal was saved.');
   input.push(...output.items);
   for(const call of output.calls){
-   abort(signal);toolCalls++;let result:unknown;
+   abort(signal);toolCalls++;operations+=callCost(call);let result:unknown;
    try{
     const tool=runtime.natural&&businessPlanningTools.some(t=>t.name===call.name)?businessPlanningTools.find(t=>t.name===call.name):demand?[...(referenced?[reviewReferencedDemandTool,reviseReferencedDemandTool]:[serviceDemandTool,demandPatchTool]),...solutionTools.filter(t=>['read_clock','read_evidence'].includes(t.name))].find(t=>t.name===call.name):call.name==='propose_goal_progress'&&entryContext?goalProgressProposalTool:call.name==='read_goal_progress'&&progress?goalProgressReadTool:solutionTools.find(tool=>tool.name===call.name);if(!tool||call.arguments.length>32000)throw Error('Unsupported or oversized tool request.');const args=JSON.parse(call.arguments);
     const periodFeedback=demand?demandPeriodFeedback(call.name,args):null;
@@ -99,33 +122,35 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
      result=(ids.length?sources.filter(source=>ids.includes(source.id as string)):sources.map(({id,label,scope,date,status,limitation})=>({id,label,scope,date,status,limitation}))).map(source=>({...source,citationCatalog:catalog.filter(item=>item.sourceId===source.id)}));
     }else if(call.name==='read_plans'){
      const ids=args.planIds as string[];result=ids.map(id=>{const plan=request.catalog?.plans.find(plan=>plan.id===id&&!plan.deleted);if(!plan)throw Error('A requested saved plan is unavailable.');return solutionPlanView(plan);});
-    }else if(call.name==='evaluate_candidate'||call.name==='revise_parameters'){
+    }else if(call.name==='evaluate_candidate'||call.name==='evaluate_action_plans'||call.name==='revise_parameters'){
      // Validate citation identifiers before merging constraints or recording an evaluation.
      // Feedback is data for the existing bounded model loop, never a repair or retry.
-     if(call.name==='evaluate_candidate'){
-      const candidate=args.candidate as SolutionCandidate,allowedEvidenceIds=actionEvidenceCatalog(request.evidence).map(item=>item.id);
-      const invalidReferences=candidate.activities.filter(activity=>activity.mode!=='retain').flatMap(activity=>activity.evidenceIds.filter(id=>!allowedEvidenceIds.includes(id)).map(id=>({activityId:activity.id,id})));
+     const candidates=call.name==='evaluate_action_plans'?args.candidates as SolutionCandidate[]:call.name==='evaluate_candidate'?[args.candidate as SolutionCandidate]:[];
+     if(candidates.length){
+      if(new Set(candidates.map(candidate=>candidate.id)).size!==candidates.length)throw Error('Each proposed Action Plan needs a distinct candidate ID.');
+      if(candidates.some(candidate=>!same(candidate.goal,candidates[0].goal)))throw Error('Compare Action Plans for the same user objective.');
+      const allowedEvidenceIds=actionEvidenceCatalog(request.evidence).map(item=>item.id);
+      const invalidReferences=candidates.flatMap(candidate=>candidate.activities.filter(activity=>activity.mode!=='retain').flatMap(activity=>activity.evidenceIds.filter(id=>!allowedEvidenceIds.includes(id)).map(id=>({activityId:activity.id,id}))));
       if(invalidReferences.length){
        result={ok:false,code:'invalid_evidence_identifiers',error:'Activity citations must use exact current citationCatalog item IDs, not packet source IDs.',invalidReferences,allowedEvidenceIds,instruction:'Choose justified current citationCatalog entries or leave unsupported citations empty. Do not infer aliases, claim success or change the proposal silently. A corrected tool call uses the remaining existing round/tool budget.'};
        input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(result)});continue;
       }
      }
      const constraints=mergeSolutionConstraints(request,state.constraints,args.constraintUpdates as SolutionConstraint[]);
-     const item=call.name==='revise_parameters'?await evaluateSolutionParameterEdit(request,args.edit as SolutionParameterEdit,constraints):await evaluateSolutionCandidate(request,args.candidate as SolutionCandidate,constraints);abort(signal);
-     const proposed=[...state.working,item],retained=proposed.slice(-12);
-     // Keep every proof needed by a current proposal. Refuse this edit before
-     // trimming, so the existing checked revision remains reviewable and savable.
-     const key=(row:{id:string;revision:number})=>JSON.stringify([row.id,row.revision]);
-     const removed=new Set(proposed.slice(0,-12).map(key)),byKey=new Map(retained.map(row=>[key(row),row])),visited=new Set<string>();
-     const checkAncestry=(row:SolutionEvaluation)=>{
-      if(visited.has(key(row)))return;visited.add(key(row));
-      for(const ref of [row.candidate.base,...row.candidate.activities.map(a=>a.source),...row.candidate.quantities.map(q=>q.source)])if(ref?.kind==='working'){
-       if(removed.has(key(ref)))throw Error('The working history limit would remove source provenance. Choose the current proposal to save it, then continue from that saved plan; this edit and its constraints were not recorded.');
-       const prior=byKey.get(key(ref));if(prior)checkAncestry(prior);
-      }
-     };
-     if(removed.size)latest(retained).forEach(checkAncestry);
-     state.constraints=constraints;state.working=retained;evaluated.set(item.id,item);result={...solutionEvaluationView(request,item),verifiedMetricReferences:checkedMetricReferences(state,'candidate',item.id,item.revision)};
+     const staged=structuredClone(request),items:SolutionEvaluation[]=[];
+     for(const candidate of candidates.length?candidates:[null]){
+      const item=candidate?await evaluateSolutionCandidate(staged,candidate,constraints):await evaluateSolutionParameterEdit(staged,args.edit as SolutionParameterEdit,constraints);abort(signal);
+      items.push(item);
+      staged.state.working=retainEvaluations(staged.state,[item]);
+     }
+     if(candidates.length>1&&haveDuplicateBundleActivities(items.flatMap(item=>item.draft?[item.draft.bundle]:[])))throw Error('These plans repeat the same activities. Propose distinct actions, owners or dependency sequences; changed titles alone are not alternatives.');
+     // Commit the set together only after citations, identities and retained history validate.
+     const nextState={...state,constraints,working:retainEvaluations(state,items)};
+     const views=items.map(item=>({...solutionEvaluationView({...request,state:nextState},item),verifiedMetricReferences:checkedMetricReferences(nextState,'candidate',item.id,item.revision)}));
+     result=call.name==='evaluate_action_plans'?{proposals:views,accepted:false,saved:false}:views[0];
+     if(JSON.stringify(result).length>65000)throw Error('The proposed set exceeds the result budget. Use fewer, more concise activities; no proposals or constraints were recorded.');
+     state.constraints=constraints;state.working=nextState.working;
+     for(const item of items)evaluated.set(item.id,item);
     }else{
      projectionInput??=runtime.loadProjection(request.filters,signal);
      const item=await calculateHeadcountProjection(args.spec as ProjectionSpec,await projectionInput,state.analyses,solutionUserTurns(request).map(turn=>turn.id));abort(signal);

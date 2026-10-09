@@ -15,8 +15,12 @@ function activitySignature(bundle: SolutionBundle) {
 
 /** Use only at fresh-response boundaries; saved proposals must remain readable unchanged. */
 export function hasDuplicatePlanActivities(proposal: BundleProposal) {
+ return haveDuplicateBundleActivities(proposal.bundles);
+}
+
+export function haveDuplicateBundleActivities(bundles: readonly SolutionBundle[]) {
  const seen = new Set<string>();
- for (const bundle of proposal.bundles) {
+ for (const bundle of bundles) {
   const signature = activitySignature(bundle);
   if (seen.has(signature)) return true;
   seen.add(signature);
