@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {compileRoute} from './route.mjs';
 import {runTwoTurns,apiBase} from './run.mjs';
-import {verifySource,validateAuthorization} from './guards.mjs';
+import {verifySource,validateAuthorization,validateNodeRuntime} from './guards.mjs';
 import {encodeReceipt} from '../tests/helpers/swp-preview-receipt-log.mjs';
 export function sanitize(value,knownSecret='') {
   let redacted=false;
@@ -47,7 +47,7 @@ async function build() {
   const raw=process.env.SWP_PLAN_B_AUTHORIZATION;
   if(!raw||Buffer.byteLength(raw)>20000)throw Error('unarmed');
   const authorization=JSON.parse(raw);validateAuthorization(authorization,process.env,source);
-  if(process.versions.node!=='24.19.0')throw Error('runtime_changed');
+  validateNodeRuntime(process.versions.node);
   for(const [name,version] of [['openai','7.23.0'],['undici','7.30.0'],['next','16.3.6']])
     if(JSON.parse(readFileSync(join(root,'node_modules',name,'package.json'))).version!==version)throw Error('dependencies_changed');
   const directory=join(tmpdir(),'swp-plan-b-two-turn-'+authorization.runId);

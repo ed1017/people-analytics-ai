@@ -7,7 +7,7 @@ import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {compileRoute,loadRoute} from './route.mjs';
 import {runTwoTurns,createBoundary,hash,model,limits} from './run.mjs';
-import {verifySource,validateAuthorization,authorizationTemplate,branch,projectId} from './guards.mjs';
+import {verifySource,validateAuthorization,authorizationTemplate,validateNodeRuntime,supportedNodeVersions,branch,projectId} from './guards.mjs';
 import {firstRequest,fixture} from './fixture.mjs';
 import {durableRecorder} from './build.mjs';
 import {decodeReceipt} from '../tests/helpers/swp-preview-receipt-log.mjs';
@@ -168,6 +168,12 @@ test('authorization remains unarmed by default, pins Preview/source/budget, and 
   for(const changed of [{...env,VERCEL_ENV:'production'},{...env,VERCEL_GIT_COMMIT_SHA:'b'.repeat(40)},{...env,OPENAI_BASE_URL:'https://example.invalid'},{...env,VERCEL_PROJECT_ID:'prj_wrong'},{...env,OPENAI_CUSTOM_HEADERS:'Authorization: synthetic-override'},{...env,OPENAI_ADMIN_KEY:'synthetic-admin'}])assert.throws(()=>validateAuthorization(auth,changed,source,now));
   for(const changed of [{...auth,budgetReviewApproved:false},{...auth,harnessSha256:'0'.repeat(64)},{...auth,expiresAt:new Date(now-1).toISOString()},{...auth,limits:{...limits,generationAttempts:5}},{...auth,unexpectedField:'refuse-unreviewed-input'}])assert.throws(()=>validateAuthorization(changed,env,source,now));
   assert.equal(limits.priorRetainedMicrousd+limits.reservationMicrousd,46799877);
+});
+test('runtime gate explicitly accepts the observed Vercel patch and rejects unreviewed patches or coercion',()=>{
+  assert.deepEqual(supportedNodeVersions,['24.19.0','24.21.0']);
+  for(const version of supportedNodeVersions)assert.doesNotThrow(()=>validateNodeRuntime(version));
+  for(const version of ['24.18.0','24.20.0','24.21.1','24.22.0','25.0.0','24.x','v24.21.0','24.21.0 ',null,undefined,24,{toString:()=> '24.21.0'}])
+    assert.throws(()=>validateNodeRuntime(version),/runtime_changed/);
 });
 test('receipts round trip in full, redact secrets and never overwrite a prior record',()=>{
   const dir=mkdtempSync(join(tmpdir(),'plan-b-receipts-')),lines=[];

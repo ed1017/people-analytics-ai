@@ -4,6 +4,11 @@ import {hash,limits,model,apiBase} from './run.mjs';
 export const baseSource='02ddda844bcd4470a9dac9c015ed56b519ae6d68';
 export const branch='codex/swp-plan-b-two-turn-20261009';
 export const projectId='prj_qXEE4BF4KrbTbzFvDg8dc3MJQjDF';
+// Exact local validation runtime and exact observed Vercel canary runtime.
+export const supportedNodeVersions=Object.freeze(['24.19.0','24.21.0']);
+export function validateNodeRuntime(version) {
+  if(!supportedNodeVersions.includes(version))throw Error('runtime_changed');
+}
 export const expectedConfig={
   $schema:'https://openapi.vercel.sh/vercel.json',
   git:{deploymentEnabled:{'codex/swp-fluid-package-integration-20261009':false,[branch]:false}},

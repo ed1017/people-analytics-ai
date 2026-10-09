@@ -118,7 +118,8 @@ labelled fixture inputs and are never model acceptance evidence.
    local directory lock is only a same-build guard, not distributed idempotency.
    Never redeploy/retry after an uncertain create/deploy/build attempt; retain the
    reservation and inspect existing evidence first.
-4. Verify Standard availability/budget/rate allowance, Node 24.19.0 and the existing
+4. Verify Standard availability/budget/rate allowance, exact Node 24.19.0 (local
+   offline validation) or 24.21.0 (observed successful Vercel canary), and the existing
    locked OpenAI 7.23.0 / Undici 7.30.0 / Next 16.3.6 packages, Preview protection,
    build identity variables, and availability of the existing Preview key without
    reading/exporting it. Dependency install is lockfile-only with lifecycle scripts
@@ -138,3 +139,9 @@ labelled fixture inputs and are never model acceptance evidence.
 The canary's READY result proves the deployment connector/build path only. This
 draft has not been run against a provider and does not change the frozen historical
 failure or establish full model, browser, billing-tier or production acceptance.
+
+The Node gate is tested against both accepted version strings and neighboring
+rejected patches. The offline suite ran on 24.19.0; admitting the observed 24.21.0
+does not claim that the full application test suite has executed on that patch.
+This local runtime correction leaves environment-based arming unchanged. A proposed
+source-bound authorization file has not been implemented or created.
