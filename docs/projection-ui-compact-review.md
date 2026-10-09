@@ -24,6 +24,7 @@ Relevant source: `lib/ml/synthetic-domain-demo.mjs`, the synthetic hiring genera
 - Shared chart browser suite: 1,160 assertions across 1844/1366/390/320/683px, light/slate-blue palettes. Exact source values/dates, null/zero, all methods and forecast legends, tooltip hover/tap/keyboard access, date-label readability, three repeated keyboard Details cycles, navigation reset, flat/singleton/unavailable observations and no overflow/network calls.
 - Calibrated TA browser suite: 218 assertions across the same five widths, including Home chart-only, null/zero observations, method focus/hover and Details/navigation cycles.
 - Development-only TA preview: 127 assertions across desktop/mobile/zoom. Production route intentionally remains unavailable.
+- Production Home forecast integration: 33 assertions across desktop, mobile and zoom; recruiting mock has no calibrated extension, so the reply correctly withholds Hiring projections.
 - Retrospective forecast readiness display: 33 assertions, including unavailable evidence and no invented totals.
 - Changed-component ESLint, production build with all six reproducible prebuild artifacts and TypeScript, and diff whitespace check passed.
 - Independent review approved the bounded source diff and inspected current desktop/mobile render pixels; 53 independent focused tests passed.
