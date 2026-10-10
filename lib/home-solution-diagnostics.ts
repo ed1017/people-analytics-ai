@@ -1,8 +1,10 @@
 import {APIError,APIConnectionError,APIConnectionTimeoutError,APIUserAbortError} from 'openai/core/error';
+import {sourceAuthenticationCode,correlationReceipt} from './data-source-failure.mjs';
+import {solutionEvidenceCode} from './home-evidence-recovery.mjs';
 /** Server diagnostics are projections of fixed codes and bounded counters, never error text. */
 const readers = ['dashboard','workforce','attrition','talent-acquisition','survey-sentiment','skills','learning-development','career-mobility','career-growth-mobility','succession-coverage','workforce-planning','position-modeling','finance','bls'] as const;
 const triggers = ['deadline','cancelled','reader_failed','dataset_mismatch','scope_mismatch','facts_changed','verification_failed'] as const;
-const readFailures = ['http_error','mixed_dataset','invalid_json','unavailable_result','exception'] as const;
+const readFailures = ['http_error','source_authentication','mixed_dataset','invalid_json','unavailable_result','exception'] as const;
 type Stage = 'request_validation'|'configuration'|'grounding'|'model_setup'|'conversation_preparation'|'provider'|'response_validation';
 const stages:Stage[] = ['request_validation','configuration','grounding','model_setup','conversation_preparation','provider','response_validation'];
 const record = (value:unknown):Record<string,unknown> => value && typeof value==='object' ? value as Record<string,unknown> : {};
@@ -38,6 +40,7 @@ export function groundingFailureDetails(value:unknown){
   elapsedMs:bounded(raw.elapsedMs,600000),readerElapsedMs:raw.readerElapsedMs==null?null:bounded(raw.readerElapsedMs,600000),
   readersStarted:bounded(raw.readersStarted,readers.length),readersCompleted:bounded(raw.readersCompleted,readers.length),
   readFailure:member(raw.readFailure,readFailures),httpStatus:httpStatus(raw.httpStatus),
+  upstreamCode:sourceAuthenticationCode(raw.upstreamCode),sourceCorrelationId:correlationReceipt(raw.sourceCorrelationId),
   activeReaders:(Array.isArray(raw.activeReaders)?raw.activeReaders:[]).slice(0,2).flatMap(item=>{
    const entry=record(item),reader=member(entry.reader,readers);return reader?[{reader,elapsedMs:bounded(entry.elapsedMs,600000)}]:[];
   })});
@@ -75,7 +78,7 @@ export function createSolutionDiagnostics(){
    const evidence=grounding==null?null:groundingFailureDetails(grounding);
    // Classification only; no messages, stacks, request/response bodies or headers.
    const provider=stage==='provider'?providerFailureDetails(error):null,providerKind=provider?.kind??null;
-   const code=evidence?'evidence_'+evidence.trigger:callerAborted?'conversation_cancelled':deadlineAborted?'conversation_deadline':
+   const code=evidence?solutionEvidenceCode(evidence):callerAborted?'conversation_cancelled':deadlineAborted?'conversation_deadline':
     stage==='provider'?'provider_'+(providerKind==='http'?'http_error':providerKind==='other'?'failed':providerKind):
     ({request_validation:'invalid_request',configuration:'configuration_unavailable',grounding:'evidence_verification_failed',model_setup:'model_setup_failed',conversation_preparation:'conversation_preparation_failed',response_validation:'response_validation_failed'} as const)[stage];
    const diagnostic={version:2,correlationId,code,stage,elapsedMs:bounded(Date.now()-startedAt,600000),modelAttempts,

@@ -18,8 +18,9 @@ const privateMessage='JWT issued at future: PRIVATE_JWT PRIVATE_CREDENTIAL https
 
 test('API failure keeps details private and returns a server-generated correlation receipt',async()=>{
  const {value:response,logs}=await capture(()=>dataApiErrorResponse('workforce',{code:'PGRST303',message:privateMessage,details:privateMessage,hint:privateMessage}));
- assert.equal(response.status,500);assert.equal(response.headers.get('cache-control'),'no-store');
+ assert.equal(response.status,503);assert.equal(response.headers.get('cache-control'),'no-store');
  const body=await response.json();assert.equal(body.error,'Workforce analytics are temporarily unavailable. Please try again.');
+ assert.equal(body.code,'source_auth_unavailable');assert.equal(response.headers.get('x-data-upstream-code'),'PGRST303');assert.equal(response.headers.get('www-authenticate'),null);
  assert.match(body.correlationId,/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
  assert.equal(response.headers.get('x-correlation-id'),body.correlationId);
  assert.equal(logs.length,1);assert.deepEqual(logs[0],['Data API unavailable',{source:'workforce',correlationId:body.correlationId,code:'PGRST303',errorType:'upstream_error'}]);
@@ -65,7 +66,7 @@ test('actual workforce GET redacts every upstream result failure and thrown tran
    if(table===failed)return {error:{code:'PGRST303',message:privateMessage},data:null};
    return {error:null,data:table==='workforce_current_summary'?(failed==='missing-summary'?null:{headcount:1}):[]};
   }));
-  assert.equal(response.status,500);assert.equal(response.headers.get('cache-control'),'no-store');
+  assert.equal(response.status,tables.includes(failed)?503:500);assert.equal(response.headers.get('cache-control'),'no-store');
   const body=await response.json();assert.equal(body.error,'Workforce analytics are temporarily unavailable. Please try again.');
   assert.equal(logs.length,1);assert.equal(body.correlationId,logs[0][1].correlationId);
   assert.doesNotMatch(JSON.stringify({body,logs}),/JWT|PRIVATE|private.invalid/);assert.equal(body.summary,undefined);
@@ -84,7 +85,7 @@ for(const source of ['survey-sentiment','talent-acquisition','workforce-planning
    const aliases={'@/lib/dataset-runtime':{withDatasetRequest},'../../../lib/synthetic-ta/extension':taExtensionModule,'next/server':{NextResponse:Response},'../../../lib/supabase-server':{supabaseServer},'../../../lib/data-api-error':{dataApiErrorResponse},'../../../lib/numeric-contract':numeric,'../../../lib/stored-planning':planning,'../../../lib/exit-enps':{...exitEnps,localExitEnpsEnabled:()=>false}};
    vm.runInNewContext(code,{exports,require:name=>{if(name in aliases)return aliases[name];throw Error('Unexpected import: '+name)}});
    const {value:response,logs}=await capture(()=>exports.GET());
-   assert.equal(response.status,500);assert.equal(response.headers.get('cache-control'),'no-store');
+   assert.equal(response.status,transport?500:503);assert.equal(response.headers.get('cache-control'),'no-store');
    const body=await response.json();assert.match(body.error,/temporarily unavailable/);
    assert.equal(logs.length,1);assert.equal(logs[0][1].source,source);
    assert.equal(logs[0][1].code,transport?null:'PGRST303');
