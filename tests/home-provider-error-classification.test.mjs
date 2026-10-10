@@ -62,11 +62,11 @@ test('actual POST keeps one overall deadline across longer provider calls withou
   }else if(scenario==='provider_timeout'){
    await advance(29999);assert.equal(settled,false);await advance(1);
    const result=await task;assert.equal(result.status,422);assert.equal((await result.json()).code,'provider_timeout');
-   assert.equal(dispatches.length,1);assert.equal(shared.signal.aborted,false);assert.equal(logs[0][1].providerElapsedMs,60000);
+   assert.equal(dispatches.length,1);assert.equal(shared.signal.aborted,false);assert.equal(JSON.parse(logs[0][1]).providerElapsedMs,60000);
   }else{
    await advance(20000);assert.equal(dispatches.length,2);await advance(39999);assert.equal(settled,false);await advance(1);
    const result=await task;assert.equal(result.status,422);assert.equal((await result.json()).code,'conversation_deadline');
-   assert.equal(shared.signal.aborted,true);assert.equal(dispatches.length,2);assert.equal(logs[0][1].elapsedMs,90000);assert.equal(logs[0][1].providerElapsedMs,40000);
+   assert.equal(shared.signal.aborted,true);assert.equal(dispatches.length,2);assert.equal(JSON.parse(logs[0][1]).elapsedMs,90000);assert.equal(JSON.parse(logs[0][1]).providerElapsedMs,40000);
   }
   assert.deepEqual(deadlines,[90000],'The shared deadline is created once, not renewed for later calls');
   const options=isolated.sandbox.__requestOptions;assert.ok(options.every(option=>option.timeout===60000&&option.maxRetries===0&&option.signal===options[0].signal));
@@ -86,14 +86,14 @@ test('native SDK error identity fixes inherited Error.name; logs remain bounded'
   const diagnostic=createSolutionDiagnostics();diagnostic.modelAttempt();
   t.mock.timers.tick(11984);diagnostic.stage('response_validation');diagnostic.modelAttempt();t.mock.timers.tick(30000);
   assert.equal(diagnostic.failure(error,null,false,false).code,code);
-  const event=logs.at(-1)[1];assert.equal(event.version,2);assert.equal(event.elapsedMs,41984);assert.equal(event.providerElapsedMs,30000);
+  const event=JSON.parse(logs.at(-1)[1]);assert.equal(event.version,2);assert.equal(event.elapsedMs,41984);assert.equal(event.providerElapsedMs,30000);
   assert.equal(event.modelAttempts,2);assert.equal(event.providerKind,kind);assert.equal(event.providerErrorClass,error.constructor.name);assert.equal(event.providerCauseCode,causeCode);
  }
  const renamed=new OpenAI.APIConnectionTimeoutError({message:secret});
  Object.defineProperty(renamed,'constructor',{value:{name:'a'}});
  const renamedDiagnostic=createSolutionDiagnostics();renamedDiagnostic.modelAttempt();
  assert.equal(renamedDiagnostic.failure(renamed,null,false,false).code,'provider_timeout');
- assert.equal(logs.at(-1)[1].providerErrorClass,'APIConnectionTimeoutError','SDK identity takes precedence over a minified constructor name');
+ assert.equal(JSON.parse(logs.at(-1)[1]).providerErrorClass,'APIConnectionTimeoutError','SDK identity takes precedence over a minified constructor name');
  assert.doesNotMatch(JSON.stringify(logs),new RegExp(secret));
 });
 
@@ -103,7 +103,7 @@ test('unknown properties/getters and caller cancellation cannot expand or replac
   {constructor:{name:secret},name:secret,message:secret,code:secret,status:secret,cause:{code:secret}},null]){
   const diagnostic=createSolutionDiagnostics();diagnostic.modelAttempt();
   assert.equal(diagnostic.failure(error,null,false,false).code,'provider_failed');
-  assert.equal(logs.at(-1)[1].providerErrorClass,null);assert.equal(logs.at(-1)[1].providerCauseCode,null);
+  assert.equal(JSON.parse(logs.at(-1)[1]).providerErrorClass,null);assert.equal(JSON.parse(logs.at(-1)[1]).providerCauseCode,null);
  }
  const diagnostic=createSolutionDiagnostics();diagnostic.modelAttempt();
  assert.equal(diagnostic.failure(new OpenAI.APIUserAbortError({message:secret}),null,true,true).code,'conversation_cancelled');
@@ -151,7 +151,7 @@ test('second SDK invocation preserves tool exchange and separates timeout, conne
   assert.ok(isolated.sandbox.__requestOptions.every(value=>value.maxRetries===0&&value.timeout===60000));
   if(expectedCode){
    assert.equal(result.status,422);assert.equal(reply.code,expectedCode,JSON.stringify({logs,sdkError}));assert.equal(logs.length,1);
-   const event=logs[0][1];assert.equal(event.stage,'provider');assert.equal(event.modelAttempts,2);assert.equal(event.providerErrorClass,expectedClass);assert.equal(event.providerHttpStatus,expectedStatus);
+   const event=JSON.parse(logs[0][1]);assert.equal(event.stage,'provider');assert.equal(event.modelAttempts,2);assert.equal(event.providerErrorClass,expectedClass);assert.equal(event.providerHttpStatus,expectedStatus);
    assert.equal(event.grounding,null);assert.ok(event.providerElapsedMs>=0);assert.doesNotMatch(JSON.stringify([logs,reply]),new RegExp(secret));
    summary.push({scenario,stage:event.stage,modelAttempts:event.modelAttempts,providerKind:event.providerKind,errorClass:event.providerErrorClass,status:event.providerHttpStatus,syntheticDispatches:dispatches});
   }else{
