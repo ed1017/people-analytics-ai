@@ -34,17 +34,23 @@ const pageExamples:Record<string,string> = {
 const planningPages = new Set(['planning-overview','scenario-modeling','position-workforce-design','workforce-response','execution-feasibility','workforce-planning']);
 const readOnlyPages = new Set(['compensation','decision-brief','assess-evaluate']);
 export const homeStarterGroups = [
-  {label:'Strategic Workforce Planning',purpose:'swp-business',prompts:[
-    'More support tickets, same payroll?',
-    'Train, redeploy or hire for new client work?',
-    'How many active requisitions can recruiters cover?',
-    'Can managers support more delivery work?',
-    'Can our hiring target fit Finance’s budget?',
+  {label:'Discovery',collapsed:true,prompts:[
+    'What workforce issues should we tackle first?',
+    'Which teams need attention first based on the available workforce data?',
   ].map(label=>({label,prompt:label}))},
-  {label:'Workforce challenges',prompts:[
-    'How can we reduce turnover?',
-    'How can we improve satisfaction?',
-    'How can we improve hiring?',
+  {label:'Strategic Workforce Planning',purpose:'swp-business',prompts:[
+    'If support tickets rise 20% and payroll stays flat, how can we cover the work?',
+    'For a client project starting in three months, should we train, redeploy or hire engineers?',
+    'Can five recruiters handle 40 active requisitions without delaying priority hires?',
+    'If client work grows 20% without more managers, how should we adjust workload?',
+    'We need 10 engineers, but Finance capped the budget at $1 million. What are our options?',
+    'If two projects end next quarter, where can we redeploy their people before hiring?',
+  ].map(label=>({label,prompt:label}))},
+  {label:'Workforce questions',collapsed:true,prompts:[
+    'How can we reduce turnover in the team with the highest recorded voluntary turnover?',
+    'Which teams have the weakest satisfaction scores, and what should we change first?',
+    'Where are candidates dropping out of our hiring process, and what should we fix first?',
+    'Based on our current hiring and exits, what could headcount look like in six months?',
   ].map(label=>({label,prompt:label}))},
 ] as const;
 export const homeGoalStarters = homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.prompt));

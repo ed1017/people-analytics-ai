@@ -1,5 +1,5 @@
 "use client";
-type PromptGroup = {label:string;purpose?:'swp-business';prompts:readonly {label:string;prompt:string}[]};
+type PromptGroup = {label:string;collapsed?:boolean;purpose?:'swp-business';prompts:readonly {label:string;prompt:string}[]};
 export function PromptExamples({prompts,groups,draft,busy,onSend}:{prompts:readonly string[];groups?:readonly PromptGroup[];draft:string;busy:boolean;onSend:(prompt:string,purpose?:'swp-business')=>void}) {
  if(!prompts.length)return null;
  const occupied=Boolean(draft.trim());
@@ -8,9 +8,9 @@ export function PromptExamples({prompts,groups,draft,busy,onSend}:{prompts:reado
  return <section aria-label="Suggested questions" className="@container space-y-2">
   <h3 className="text-xl font-semibold">Suggested prompts</h3>
   {occupied&&<p className="text-sm text-muted-foreground">Suggested prompts send immediately. Your draft stays in the text box.</p>}
-  {grouped?.length ? <div className="space-y-4">{grouped.map(group=><div key={group.label} role="group" aria-label={group.label} className="min-w-0 space-y-2">
-   <h4 className="text-lg font-semibold">{group.label}</h4>
+  {grouped?.length ? <div className="space-y-4">{grouped.map(group=><details key={group.label} open={!group.collapsed} role="group" aria-label={group.label} className="min-w-0 space-y-2">
+   <summary className="min-h-11 cursor-pointer py-2 text-lg font-semibold">{group.label}</summary>
    <div className="flex flex-wrap gap-2">{group.prompts.map(item=>button(item.prompt,item.label,group.purpose))}</div>
-  </div>)}</div> : <div className="flex flex-wrap gap-2">{prompts.map(prompt=>button(prompt))}</div>}
+  </details>)}</div> : <div className="flex flex-wrap gap-2">{prompts.map(prompt=>button(prompt))}</div>}
  </section>;
 }

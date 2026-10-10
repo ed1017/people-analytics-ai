@@ -6,8 +6,8 @@ import artifact from '../lib/data/synthetic-domain-demo-v1.json' with {type:'jso
 import {formatDemoValue} from '../lib/synthetic-domain-demo.ts';
 import {planningPrompts,legacySkillsPrompts,challengePrompts} from './fixtures/home-starter-prompts.mjs';
 const pack={sources:['A1','R1','S1'].map(id=>({id,status:'loaded',facts:{count:1}}))};
-test('legacy mappings stay separate from eight exact-text starters',()=>{
- assert.equal(homeGoalStarters.length,8);
+test('legacy mappings stay separate from twelve exact-text starters',()=>{
+ assert.equal(homeGoalStarters.length,12);
  for(const prompt of [...planningPrompts,...homeGoalStarters])assert.equal(homeStarterGoal(prompt),null);
  assert.deepEqual(challengePrompts.map(prompt=>homeStarterGoal(prompt).domain),['turnover','satisfaction','hiring']);
  for(const prompt of [...legacySkillsPrompts,...challengePrompts].reverse()){const starter=homeStarterGoal(prompt);assert.ok(starter.goal&&starter.reason&&starter.pinLabel.startsWith('Pin '));assert.doesNotMatch(starter.goal,/\d|%/);}

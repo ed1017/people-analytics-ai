@@ -46,15 +46,15 @@ test('explicit Action Plan headings and numbered steps are preserved, unrelated 
 test('grouped starter labels submit exactly their visible text without overwriting drafts or changing forecast and goal routing',()=>{
  const sent=[],props={prompts:homeGoalStarters,groups:homeStarterGroups,draft:'',busy:false,onSend:prompt=>sent.push(prompt)};
  const element=PromptExamples(props),buttons=nodes(element).filter(node=>node.type==='button'),html=renderToStaticMarkup(element);
- assert.equal(buttons.length,8);assert.equal((html.match(/role="group"/g)??[]).length,2);
+ assert.equal(buttons.length,12);assert.equal((html.match(/role="group"/g)??[]).length,3);
  assert.deepEqual(buttons.map(button=>button.props.children),homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.label)));
  buttons.forEach(button=>button.props.onClick());assert.deepEqual(sent,buttons.map(button=>button.props.children));assert.deepEqual(sent,homeGoalStarters);
- assert.deepEqual(sent.map(prompt=>homeTurnPurpose(prompt)),Array(8).fill('answer'));
- assert.ok(sent.every(prompt=>homeForecastIntent(prompt)===null));
+ assert.ok(sent.every(prompt=>['answer','discovery'].includes(homeTurnPurpose(prompt))));
+ assert.ok(sent.slice(0,-1).every(prompt=>homeForecastIntent(prompt)===null));
  assert.equal(homeForecastIntent('Forecast turnover').domains[0],'turnover');
  assert.equal(homeTurnPurpose('Find issues worth tackling'),'discovery');
  const occupied=nodes(PromptExamples({...props,draft:'Keep my draft'})).filter(node=>node.type==='button');assert.ok(occupied.every(button=>!button.props.disabled));occupied[0].props.onClick();assert.equal(sent.at(-1),homeGoalStarters[0]);
- const blocked=nodes(PromptExamples({...props,busy:true})).filter(node=>node.type==='button');assert.ok(blocked.every(button=>button.props.disabled));blocked.forEach(button=>button.props.onClick());assert.equal(sent.length,9);
+ const blocked=nodes(PromptExamples({...props,busy:true})).filter(node=>node.type==='button');assert.ok(blocked.every(button=>button.props.disabled));blocked.forEach(button=>button.props.onClick());assert.equal(sent.length,13);
  const missing=renderToStaticMarkup(PromptExamples({...props,prompts:['What evidence is unavailable?']}));assert.doesNotMatch(missing,/role="group"/);assert.match(missing,/What evidence is unavailable/);
 });
 test('linked markers retain their explicit targets and references still use superscripts without a navigation handler',()=>{
