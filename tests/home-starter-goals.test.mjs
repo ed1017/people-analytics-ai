@@ -6,9 +6,9 @@ import artifact from '../lib/data/synthetic-domain-demo-v1.json' with {type:'jso
 import {formatDemoValue} from '../lib/synthetic-domain-demo.ts';
 import {planningPrompts,legacySkillsPrompts,challengePrompts} from './fixtures/home-starter-prompts.mjs';
 const pack={sources:['A1','R1','S1'].map(id=>({id,status:'loaded',facts:{count:1}}))};
-test('stable challenge and legacy mappings survive five new planning openers',()=>{
- assert.equal(homeGoalStarters.length,8);
- for(const prompt of planningPrompts)assert.equal(homeStarterGoal(prompt),null);
+test('stable challenge and legacy mappings survive five hypothetical decision starters',()=>{
+ assert.equal(homeGoalStarters.length,5);
+ for(const prompt of [...planningPrompts,...homeGoalStarters])assert.equal(homeStarterGoal(prompt),null);
  assert.deepEqual(challengePrompts.map(prompt=>homeStarterGoal(prompt).domain),['turnover','satisfaction','hiring']);
  for(const prompt of [...legacySkillsPrompts,...challengePrompts].reverse()){const starter=homeStarterGoal(prompt);assert.ok(starter.goal&&starter.reason&&starter.pinLabel.startsWith('Pin '));assert.doesNotMatch(starter.goal,/\d|%/);}
  for(const prompt of ['Forecast turnover','What else?','Reduce turnover by 20%','How can we improve hiring?'])assert.equal(homeStarterGoal(prompt),null);

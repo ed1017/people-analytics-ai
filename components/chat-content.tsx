@@ -176,14 +176,14 @@ export function ChatContent({
           key={`table-${index}`}
           className="my-3 overflow-x-auto rounded-lg border"
         >
-          <table className={compact ? "w-full min-w-[560px] text-sm" : "w-full min-w-[560px] text-[15px]"}>
+          <table className="w-full min-w-[560px] text-base leading-relaxed">
             <thead className="bg-muted/40">
               <tr>
                 {headers.map(
                   (header, headerIndex) => (
                     <th
                       key={headerIndex}
-                      className="border-b px-3 py-2 text-left font-semibold"
+                      className="border-b px-4 py-3 text-left font-semibold"
                     >
                       {renderInlineMarkdown(
                         header, onNavigate, citationTargets
@@ -208,7 +208,7 @@ export function ChatContent({
                       ) => (
                         <td
                           key={cellIndex}
-                          className="px-3 py-2 align-top"
+                          className="px-4 py-3 align-top"
                         >
                           {renderInlineMarkdown(
                             row[
@@ -301,9 +301,9 @@ export function ChatContent({
   }
 
   return (
-    <div className={compact ? "home-answer text-sm leading-[1.5]" : "space-y-2 leading-relaxed"}>
+    <div className={compact ? "home-answer text-base leading-relaxed" : "space-y-3 text-base leading-relaxed"}>
       {rendered}
-      {presentation.details.length>0&&<details data-answer-evidence-details className="mt-2 text-xs text-muted-foreground"><summary className="min-h-6 cursor-pointer rounded focus-visible:ring-2 focus-visible:ring-ring">Evidence details</summary>{presentation.details.map((detail,index)=><p key={index} className="mt-1">{renderInlineMarkdown(detail,onNavigate,citationTargets)}</p>)}</details>}
+      {presentation.details.length>0&&<details data-answer-evidence-details className="mt-3 text-base text-muted-foreground"><summary className="min-h-11 cursor-pointer rounded py-2 focus-visible:ring-2 focus-visible:ring-ring">Evidence details</summary>{presentation.details.map((detail,index)=><p key={index} className="mt-1">{renderInlineMarkdown(detail,onNavigate,citationTargets)}</p>)}</details>}
       {references.length > 0 && <aside aria-label="Answer sources" className="mt-2 space-y-0.5 border-t border-border/40 pt-1">
         {references.map((reference, referenceIndex) => <div key={referenceIndex} className="text-[11px] leading-relaxed">{renderInlineMarkdown(reference, onNavigate, citationTargets)}</div>)}
       </aside>}

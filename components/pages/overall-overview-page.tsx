@@ -557,8 +557,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
       cancel:()=>{const id=decisionStore.getSnapshot().data.goals.activeId;if(!id||id===guidedActions.goalId){solutions.cancel();conversation.cancelPending();}},leave:()=>conversation.endGuidedExploration(),
     }}/>}<section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-3">
       <header className="flex flex-wrap items-start justify-between gap-3">
+        <h2 id="overall-overview-heading" className="text-2xl font-semibold leading-tight tracking-tight">Workforce AI</h2>
         <button type="button" onClick={resetHomeConversation} className="min-h-11 rounded px-2 text-xs font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Reset conversation</button>
-        <h2 id="overall-overview-heading" className="sr-only">Home overview</h2>
         <HomeGettingStarted conversational={solutionConversationEnabled} active={active} ready={conversation.storageReady} autoOpen={conversation.firstHomeVisit&&!conversation.input.trim()&&!conversation.issueEditor} busy={chatLoading||guidedExampleActive} dismissKey={JSON.stringify([instructionsDismissed,conversation.workspaceKey,guidedExampleActive])} onNavigate={onNavigate} onStartDemo={onStartDemo} status={
         <div className="ml-auto flex items-center gap-3 text-xs">
           <span className="text-muted-foreground">In development</span>
@@ -626,13 +626,13 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
       </section>}
       {pendingScope && <p role="status" className="mb-3 text-sm">Refreshing the selected workforce evidence before answering. Edit your question to cancel.</p>}
       {localAction?.goalId===conversation.activeGoalId&&<p role="status" className="mb-3 text-sm">{localAction.notice}</p>}
-      <div ref={composerSlot} className="home-composer-slot"><div ref={composerDock} className="home-composer-dock rounded-t-2xl border bg-card p-2 shadow-lg">
+      <div ref={composerSlot} className="home-composer-slot"><div ref={composerDock} className="home-composer-dock rounded-t-2xl border bg-card p-3 shadow-lg">
       {planEdit?.goalId===conversation.activeGoalId&&<p className="mb-1 text-xs font-medium">Editing Action Plan #{planEdit.option}. Send previews changes for your review.</p>}
       <label htmlFor="overview-question" className="sr-only">Ask Workforce AI</label>
       <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" aria-describedby="overview-question-context-tip" value={input} onChange={event => changeQuestion(event.target.value)} rows={3}
-        placeholder="Ask your question or use a prompt. Compare proposed Action Plans, then refine your choice in chat." className="max-h-80 min-h-28 w-full resize-y rounded-lg border bg-background/40 p-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+        placeholder="Ask your question or use a prompt. Compare proposed Action Plans, then refine your choice in chat." className="max-h-80 min-h-28 w-full resize-y rounded-lg border bg-background/40 p-3 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
       <div className="home-compose-actions mt-2 flex items-end justify-between gap-3">
-        <p hidden={showCandidatePin||Boolean(activePinnedGoal)} id="overview-question-context-tip" className="min-w-0 text-xs leading-4 text-muted-foreground">Ask a question or follow up on an answer. To plan an action, include your desired outcome, timeline and constraints.</p>
+        <p hidden={showCandidatePin||Boolean(activePinnedGoal)} id="overview-question-context-tip" className="min-w-0 text-sm leading-relaxed text-muted-foreground">Ask a question or follow up on an answer. To plan an action, include your desired outcome, timeline and constraints.</p>
         <button data-guide-target="submit" type="submit" aria-label="Send overview question" disabled={(solutionConversationEnabled?!solutions.canSend:(!localCandidate&&!ready&&!(demoPlan&&planEditReady&&(structuredPlansEnabled&&structuredMode||bundleChatEditIntent(input).edit||localPlanDiscussion(input))))) || chatLoading || structuredPending || solutions.pending || !input.trim()} className="ms-auto flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{structuredPending?'Reviewing…':'Send'} <ArrowUp size={17} /></button></div>
       </div></div>
     </form>

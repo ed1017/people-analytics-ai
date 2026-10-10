@@ -5,7 +5,7 @@ import {bundleAssumptionText} from '@/lib/home-bundle-display';
 export function HomePlanSummary({draft,result,measurePack}:{draft:BundleDraft;result?:BundleResult|null;measurePack?:unknown}){
  return <>
   <ul aria-label="Selected plan summary" className="space-y-3 text-sm">
-   {homePlanSummary(draft,result,measurePack).map(section=><li key={section.heading} className="min-w-0 break-words">
+   {homePlanSummary(draft,result,measurePack).map(section=><li key={section.heading} className="min-w-0 break-words rounded-xl border bg-muted/40 p-4">
     <strong>{section.heading}:</strong>
     <ul aria-label={section.label??section.heading} className="mt-1 list-disc space-y-1 pl-5">
      {section.items.map((item,index)=><li key={index}>{item}</li>)}
