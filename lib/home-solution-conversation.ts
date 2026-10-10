@@ -17,6 +17,8 @@ import {actionBinding,actionBindingKey,validActionBinding} from './home-action-d
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {createBundleDraft,readBundleDraft,reviewBundleProposal as reconcileBundle,unknownAssumption,bundleInputKey} from './home-bundle-reconciliation.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
+import {measurementScope} from './home-success-measures.ts';
+// @ts-expect-error Native fixture tests share TypeScript source.
 import {bundleSignature,componentOrder} from './home-solution-bundles.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {readPlanAlternatives,appendConversationAlternative} from './home-plan-alternatives.ts';
@@ -382,9 +384,12 @@ export async function evaluateSolutionCandidate(request:SolutionRequest,candidat
   input.costsDistinct=resolved.size<=1&&base?structuredClone(base.draft.inputs.costsDistinct):unknownAssumption();
   input.dependenciesConfirmed=changed?unknownAssumption():input.dependenciesConfirmed;
   if(base?.draft.inputs.capacity&&!changed)Object.assign(input,structuredClone(base.draft.inputs));
-  if(!input.successMeasure)input.successMeasure={goal,scopeKey:JSON.stringify([goal,request.scope]),name:candidate.successMeasure,baseline:unknownAssumption(),target:unknownAssumption()};
+  const newMeasure=!input.successMeasure;
+  if(!input.successMeasure)input.successMeasure={goal,scopeKey:measurementScope(input),name:candidate.successMeasure,baseline:unknownAssumption(),target:unknownAssumption()};
   if(input.successMeasure.goal!==goal)fail('A saved outcome measure belongs to another goal; review it explicitly.');
   applyReviewedInputs(request,evaluation,input,candidate.quantities,constraints,components.map(item=>item.id));
+  // Bind new measures after this turn's scope inputs; retained measures must stay stale after a scope change.
+  if(newMeasure)input.successMeasure.scopeKey=measurementScope(input);
   // Model same-people links are proposals, never user confirmation. Preserve only existing source identity.
   const audienceDone=new Set<string>(),audienceVisiting=new Set<string>();
   const audience=(activityId:string)=>{if(audienceDone.has(activityId))return;const activity=candidate.activities.find(item=>item.id===activityId);if(!activity||audienceVisiting.has(activityId))fail('The same-people reference is missing or circular.');audienceVisiting.add(activityId);if(activity.audienceOf){audience(activity.audienceOf);const shared=input.memberships.find(row=>row.componentId===activity.audienceOf)!,own=input.memberships.find(row=>row.componentId===activityId)!;const inherited=own.complete.value===true&&shared.complete.value===true&&same(own.groupIds,shared.groupIds)&&own.groupIds.length>0;if(!inherited){own.complete=unknownAssumption();input.groupsDisjoint=unknownAssumption();}evaluation.interpretations.push(`${activity.name}: ${inherited?'retains checked source participation':'proposes shared participation, still unconfirmed'} with ${candidate.activities.find(row=>row.id===activity.audienceOf)!.name}. A model reference or conversation turn does not confirm cohort identity.`);}audienceVisiting.delete(activityId);audienceDone.add(activityId);};
