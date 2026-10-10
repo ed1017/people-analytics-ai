@@ -35,7 +35,7 @@ const planningPages = new Set(['planning-overview','scenario-modeling','position
 const readOnlyPages = new Set(['compensation','decision-brief','assess-evaluate']);
 const recommendedPlanRequest = 'Recommend an Action Plan using known inputs. Separate missing inputs from editable assumptions; do not invent numbers, available capacity or automation benefits.';
 export const homeStarterGroups = [
-  {label:'Service delivery',purpose:'swp-business',prompts:[
+  {label:'Strategic Workforce Planning',purpose:'swp-business',prompts:[
     {label:'More support tickets, same payroll?',prompt:`Hypothetical scenario: if support-ticket demand rose while payroll stayed flat, how could we cover the work without overloading another team? ${recommendedPlanRequest}`},
     {label:'Train, redeploy or hire for new client work?',prompt:`Hypothetical scenario: if new client work required skills we might not have available, should we train, redeploy or hire? Compare skill readiness, release dates, cost and delivery tradeoffs. ${recommendedPlanRequest}`},
   ]},
