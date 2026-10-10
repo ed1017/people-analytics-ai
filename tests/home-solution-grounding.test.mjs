@@ -116,25 +116,25 @@ test('explicit fictional population and horizon unlock checked effort without tu
 
 const deferred=()=>Promise.withResolvers();
 const drain=()=>new Promise(resolve=>setImmediate(resolve));
-test('grounding queue runs at most two readers and verifies every loaded source before returning',async()=>{
+test('grounding queue runs within four slots with three loaded readers and verifies every loaded source before returning',async()=>{
  const {body,results}=inputs(),pending=[],started=[];let active=0,maximum=0;
  const task=verifySolutionEvidence(body,{datasetToken:token,read:async(key,_filters,readSignal)=>{
   started.push(key);active++;maximum=Math.max(maximum,active);const wait=deferred();pending.push({key,readSignal,...wait});
   try{return await wait.promise;}finally{active--;}
  }},signal());
- assert.equal(started.length,2);assert.equal(maximum,2);
+ assert.equal(started.length,3);assert.equal(maximum,3);
  pending[0].resolve(results[pending[0].key]);await drain();assert.equal(started.length,3);assert.equal(active,2);
  pending[1].resolve(results[pending[1].key]);pending[2].resolve(results[pending[2].key]);
- const grounding=await task;assert.deepEqual([...started].sort(),Object.keys(results).sort());assert.equal(maximum,2);assert.equal(active,0);
+ const grounding=await task;assert.deepEqual([...started].sort(),Object.keys(results).sort());assert.equal(maximum,3);assert.equal(active,0);
  assert.equal(grounding.sources.find(s=>s.id==='T1').status,'loaded');
 });
 test('total grounding deadline wins against hung readers and late results cannot schedule more work',async t=>{
  t.mock.timers.enable({apis:['setTimeout']});const {body,results}=inputs(),pending=[],before=JSON.stringify(body);
  const task=verifySolutionEvidence(body,{datasetToken:token,read:async(key,_filters,readSignal)=>{const wait=deferred();pending.push({key,readSignal,...wait});return wait.promise;}},signal());
  let stopped=false;const rejected=assert.rejects(task,SolutionEvidenceError).then(()=>{stopped=true;});
- assert.equal(pending.length,2);t.mock.timers.tick(solutionGroundingLimits.timeoutMs-1);await Promise.resolve();assert.equal(stopped,false);
+ assert.equal(pending.length,3);t.mock.timers.tick(solutionGroundingLimits.timeoutMs-1);await Promise.resolve();assert.equal(stopped,false);
  t.mock.timers.tick(1);await rejected;assert.ok(pending.every(item=>item.readSignal.aborted));
- pending.forEach(item=>item.resolve(results[item.key]));await drain();assert.equal(pending.length,2);assert.equal(JSON.stringify(body),before);
+ pending.forEach(item=>item.resolve(results[item.key]));await drain();assert.equal(pending.length,3);assert.equal(JSON.stringify(body),before);
 });
 test('first read failure or unavailable result stops the queue without waiting for another hung reader',async()=>{
  for(const unavailable of [false,true]){
@@ -142,17 +142,17 @@ test('first read failure or unavailable result stops the queue without waiting f
   const task=verifySolutionEvidence(body,{datasetToken:token,read:async(key,_filters,readSignal)=>{const wait=deferred();pending.push({key,readSignal,...wait});return wait.promise;}},signal());
   const rejected=assert.rejects(task,SolutionEvidenceError);
   if(unavailable)pending[0].resolve({status:'unavailable',data:null});else pending[0].reject(Error('Synthetic read failure'));
-  await rejected;assert.equal(pending.length,2);assert.ok(pending.every(item=>item.readSignal.aborted));
-  pending[1].resolve(results[pending[1].key]);await drain();assert.equal(pending.length,2);
+  await rejected;assert.equal(pending.length,3);assert.ok(pending.every(item=>item.readSignal.aborted));
+  pending[1].resolve(results[pending[1].key]);await drain();assert.equal(pending.length,3);
  }
 });
 test('caller cancellation stops queued reads immediately, including an already aborted request',async()=>{
  const {body,results}=inputs(),controller=new AbortController(),pending=[];
  const read=async(key,_filters,readSignal)=>{const wait=deferred();pending.push({key,readSignal,...wait});return wait.promise;};
  const task=verifySolutionEvidence(body,{datasetToken:token,read},controller.signal),rejected=assert.rejects(task,SolutionEvidenceError);
- controller.abort();await rejected;assert.equal(pending.length,2);assert.ok(pending.every(item=>item.readSignal.aborted));
- pending.forEach(item=>item.resolve(results[item.key]));await drain();assert.equal(pending.length,2);
- await assert.rejects(verifySolutionEvidence(body,{datasetToken:token,read},controller.signal),SolutionEvidenceError);assert.equal(pending.length,2);
+ controller.abort();await rejected;assert.equal(pending.length,3);assert.ok(pending.every(item=>item.readSignal.aborted));
+ pending.forEach(item=>item.resolve(results[item.key]));await drain();assert.equal(pending.length,3);
+ await assert.rejects(verifySolutionEvidence(body,{datasetToken:token,read},controller.signal),SolutionEvidenceError);assert.equal(pending.length,3);
 });
 test('actual POST returns unavailable with zero model calls on timeout, reader failure and cancellation',async t=>{
  t.mock.timers.enable({apis:['setTimeout']});const isolated=await offlineBusinessRoute(),{body}=inputs();
@@ -161,12 +161,12 @@ test('actual POST returns unavailable with zero model calls on timeout, reader f
   const controller=new AbortController(),pending=[];isolated.sandbox.__aggregateReads=[];
   isolated.sandbox.__aggregateRead=(key,readSignal)=>{const wait=deferred();pending.push({key,readSignal,...wait});return wait.promise;};
   const task=isolated.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',headers:{'x-workforce-dataset':token},body:JSON.stringify(body),signal:controller.signal}));
-  await drain();assert.equal(pending.length,2);
+  await drain();assert.equal(pending.length,3);
   if(kind==='timeout')t.mock.timers.tick(solutionGroundingLimits.timeoutMs);
   else if(kind==='failure')pending[0].reject(Error('Synthetic source failure'));
   else controller.abort();
   const response=await task;assert.equal(response.status,503,kind);assert.match((await response.json()).error,kind==='timeout'?/evidence took too long/:kind==='failure'?/evidence could not be read/:/evidence check was cancelled/);
-  assert.equal(isolated.sandbox.__requests.length,0);assert.equal(isolated.sandbox.__aggregateReads.length,2);assert.ok(pending.every(item=>item.readSignal.aborted));
-  pending.forEach(item=>item.resolve({status:'unavailable',data:null}));await drain();assert.equal(isolated.sandbox.__aggregateReads.length,2);
+  assert.equal(isolated.sandbox.__requests.length,0);assert.equal(isolated.sandbox.__aggregateReads.length,3);assert.ok(pending.every(item=>item.readSignal.aborted));
+  pending.forEach(item=>item.resolve({status:'unavailable',data:null}));await drain();assert.equal(isolated.sandbox.__aggregateReads.length,3);
  }
 });

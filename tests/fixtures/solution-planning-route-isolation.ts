@@ -7,9 +7,9 @@ export const withDatasetRequest=async(_request:Request,run:()=>unknown)=>run();
 export const datasetAI=async(run:()=>unknown)=>run();
 
 // Ordinary UI fixtures isolate database I/O; source tests inject aggregate results into the real verifier.
-export const groundSolutionRequest=async(request:unknown,signal:AbortSignal)=>{
+export const groundSolutionRequest=async(request:unknown,signal:AbortSignal,onDiagnostic?:(value:unknown)=>void)=>{
  const fixture=globalThis as unknown as {__aggregateSources?:Record<string,unknown>;__grounding?:unknown;__aggregateReads?:string[];__aggregateFailure?:{reader:string;status:number;code?:string};__aggregateResponse?:(key:string,signal:AbortSignal)=>Promise<Response>;__aggregateRead?:(key:string,signal:AbortSignal)=>Promise<unknown>};
- if(fixture.__aggregateSources)return verifySolutionEvidence(request,{datasetToken:'legacy-v1:0',read:async(key:string,_filters:unknown,readSignal:AbortSignal)=>{
+ if(fixture.__aggregateSources)return verifySolutionEvidence(request,{datasetToken:'legacy-v1:0',onDiagnostic,read:async(key:string,_filters:unknown,readSignal:AbortSignal)=>{
   fixture.__aggregateReads?.push(key);
   if(fixture.__aggregateResponse){const response=await fixture.__aggregateResponse(key,readSignal);if(!response.ok)throw AggregateEvidenceReadError.fromResponse(response);return {status:'loaded',data:await response.json()};}
   if(fixture.__aggregateFailure?.reader===key){
