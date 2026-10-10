@@ -8,7 +8,8 @@ import postcss from 'postcss';
 import tailwind from '@tailwindcss/postcss';
 import {converseSolutions} from '../../lib/home-solution-conversation-service.ts';
 import {fixtureRuntime} from '../fixtures/home-solution-conversation.mjs';
-import {fixedMessages,fixedSteps} from '../fixtures/required-staffing.mjs';
+import {fixedMessages,fixedSteps,fixedChanges,liveStaffingMessage} from '../fixtures/required-staffing.mjs';
+import {readStaffingScenario,staffingScenarioLabel} from '../../lib/home-staffing-scenario.ts';
 import {DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
 import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 import {offlineBusinessRoute} from '../helpers/offline-business-route.mjs';
@@ -31,13 +32,17 @@ try{for(const [mode,width,height] of [['desktop',1440,1100],['phone',390,844]]){
   if(url.pathname==='/api/home-solution-conversation'){
    const body=req.postDataJSON();requests.push(body);
    if(isolated){
-    const steps=fixedSteps(body),start=isolated.sandbox.__requests.length;
+    const scenario=body.message.text===liveStaffingMessage;
+    if(scenario)assert.ok(readStaffingScenario(body,{natural:true,datasetToken:'legacy-v1:0'}),'actual fresh UI request must be eligible: '+JSON.stringify({scope:body.scope,filters:body.filters,goal:body.goal,goalContext:body.goalContext,selectedId:body.selectedId,catalog:body.catalog,goalProgress:body.goalProgress,progressEntry:body.progressEntry,message:body.message,planningCalculatorAvailable:body.planningCalculatorAvailable,state:body.state,evidenceDatasetContext:body.evidence.datasetContext}));
+    const steps=scenario?[{name:'compare_required_staffing',args:{changes:fixedChanges(body)}}]:fixedSteps(body),start=isolated.sandbox.__requests.length;
+    const reads=isolated.sandbox.__aggregateReads?.length??0;
     const provider=(step,index)=>({...responseForStep(step,index),model:'gpt-6.1-sol',service_tier:'default',usage:{input_tokens:100,output_tokens:20,total_tokens:120,input_tokens_details:{cached_tokens:0},output_tokens_details:{reasoning_tokens:5}}});
     isolated.sandbox.__replies.push({...provider(steps[0],0),...(failNext?{status:'incomplete'}:{})});
     const response=await isolated.post(new Request(req.url(),{method:req.method(),headers:req.headers(),body:req.postData()})),reply=await response.json();
     assert.equal(response.status,failNext?422:200,JSON.stringify(reply));assert.equal(isolated.sandbox.__requests.length-start,1);
     assert.deepEqual(JSON.parse(JSON.stringify(isolated.sandbox.__requests[start].tool_choice)),{type:'function',name:'compare_required_staffing'});
     assert.deepEqual(JSON.parse(JSON.stringify(isolated.sandbox.__requests[start].tools.map(t=>t.name))),['compare_required_staffing']);
+    if(scenario){assert.equal(isolated.sandbox.__aggregateReads?.length??0,reads);assert.deepEqual(Object.keys(JSON.parse(isolated.sandbox.__requests[start].input[0].content)).sort(),['contract','currentMessage']);assert.ok(reply.answer.startsWith(staffingScenarioLabel));assert.deepEqual(reply.charts,[]);}else assert.match(JSON.stringify(isolated.sandbox.__requests[start].input),/evidenceGrounding/);
     assert.equal(reply.providerReceipt.modelAttempts,1);
     for(const sent of isolated.sandbox.__requests.slice(start))assert.equal(sent.truncation,'disabled');
     routeReceipts.push({mode,path:url.pathname,status:response.status,synthetic:true,modelAttempts:reply.providerReceipt.modelAttempts,firstToolChoice:isolated.sandbox.__requests[start].tool_choice,model:isolated.sandbox.__requests[start].model,reasoning:isolated.sandbox.__requests[start].reasoning,service_tier:isolated.sandbox.__requests[start].service_tier,truncation:isolated.sandbox.__requests[start].truncation});
@@ -52,10 +57,11 @@ try{for(const [mode,width,height] of [['desktop',1440,1100],['phone',390,844]]){
  await page.goto(base);if(fullUI)await dismissHomeOnboarding(page);const input=page.getByLabel('Ask Workforce AI',{exact:true});
  const send=async text=>{await input.fill(text);await page.getByRole('button',{name:'Send overview question',exact:true}).click();await page.getByRole('status').filter({hasText:'Thinking through the question'}).waitFor({state:'hidden'});};
  const card=page.getByRole('region',{name:'Fixed-role staffing comparison',exact:true}),state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
- await send(fixedMessages.start);await card.waitFor();
+ await send(fullUI?liveStaffingMessage:fixedMessages.start);await card.waitFor();
  const receipt=page.getByRole('region',{name:'Preview test receipt',exact:true});
  if(fullUI){const visible=JSON.parse(await receipt.locator('pre').innerText());check('visible receipt exposes exact path, complete per-round usage and validated calculator state',visible.endpoint==='/api/home-solution-conversation'&&visible.httpStatus===200&&visible.applicationOutcome==='validated'&&visible.providerUsageComplete&&visible.rounds.length===1&&visible.rounds.every(r=>r.inputTokens===100&&r.cachedInputTokens===0&&r.outputTokens===20&&r.reasoningTokens===5&&r.totalTokens===120)&&visible.calculator.inputs.hireTrainingHoursPerPerson===null&&visible.calculator.options[2].listedCash===495000);check('receipt is absent from persisted conversation storage',!JSON.stringify(await state()).includes('providerUsageComplete'));await receipt.screenshot({path:path.join(output,mode+'-receipt.png')});}
  if(fullUI)check('actual Home UI selects the solution endpoint and renders checked cards',requests.length===1&&isolated.sandbox.__requests.at(-1).service_tier==='default'&&isolated.sandbox.__requests.at(-1).reasoning.effort==='medium');
+ if(fullUI)check('illustrative calculation visibly states company data was not consulted',await page.getByRole('region',{name:'Overview conversation',exact:true}).innerText().then(text=>text.includes(staffingScenarioLabel))&&await page.getByRole('figure').count()===0);
  check('three numeric options without a workload form',await card.getByRole('article').count()===3&&(await card.innerText()).includes('1,600,000 USD')&&(await card.innerText()).includes('30,000 USD')&&(await card.innerText()).includes('495,000 USD')&&await page.getByRole('region',{name:'Business planning assumptions',exact:true}).count()===0);
  check('training requirements and operational timing stay unknown',await card.getByRole('article',{name:'Train 0, redeploy 0, hire 10',exact:true}).innerText().then(t=>t.includes('Training: Not specified')&&t.includes('Readiness: Unknown'))&&(await card.innerText()).includes('480 hours')&&(await card.innerText()).includes('240 hours'));
  check('one recommendation and optional details, no new input form',(await card.innerText()).split('Recommendation:').length===2&&await card.locator('form,input,select').count()===0&&await card.locator('details[open]').count()===0);
