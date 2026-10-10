@@ -39,6 +39,22 @@ test('forged source rates, stale scopes, unsupported inputs and silent premise c
  assert.throws(()=>editRequiredStaffing(next,token,fixedChanges(next,{currency:'EUR'})),/restating or clearing/);assert.throws(()=>editRequiredStaffing(next,token,fixedChanges(next,{months:6})),/restating or clearing/);assert.throws(()=>editRequiredStaffing(next,token,fixedChanges(next,{role:'Another role'})),/restating or clearing/);
  const withdrawn=editRequiredStaffing(next,token,fixedChanges(next,{hireCostPerPerson:null}));assert.equal(requiredStaffingView(withdrawn).options[0].listedCash,null);
 });
+test('a horizon correction must restate or clear the period redeployment quote even when other period costs are restated',()=>{
+ const initial=solutionRequest(fixedMessages.start.replace('Redeployment adds zero cash per person.','Redeployment adds USD 1200 cash per person for the 12-month period.'));
+ const prior=editRequiredStaffing(initial,token,fixedChanges(initial,{...fixedValues,redeploymentCostPerPerson:1200}));
+ const text='Use 6 months, USD 80000 per hire for that period and a USD 500000 budget. Backfill remains unknown.';
+ const next=solutionRequest(text,false,{...initial.state,requiredStaffing:prior},2);
+ const periodChanges={months:6,hireCostPerPerson:80000,backfillCostPerInternalPerson:null,budget:500000};
+ assert.throws(()=>editRequiredStaffing(next,token,fixedChanges(next,periodChanges)),/restating or clearing/);
+ assert.equal(prior.inputs.months,12);assert.equal(prior.inputs.redeploymentCostPerPerson,1200);
+ const clear=solutionRequest(text+' Clear the redeployment quote; its cost for 6 months is unknown.',false,next.state,2);
+ const cleared=editRequiredStaffing(clear,token,fixedChanges(clear,{...periodChanges,redeploymentCostPerPerson:null}));
+ assert.equal(cleared.inputs.months,6);assert.equal(cleared.inputs.redeploymentCostPerPerson,null);
+ const restate=solutionRequest(text+' Redeployment costs USD 600 per person for the 6-month period.',false,next.state,2);
+ const restated=editRequiredStaffing(restate,token,fixedChanges(restate,{...periodChanges,redeploymentCostPerPerson:600}));
+ assert.equal(restated.inputs.redeploymentCostPerPerson,600);assert.equal(restated.origins.redeploymentCostPerPerson.turnId,'user-2');
+ assert.equal(requiredStaffingView(restated).options.find(o=>o.train===6&&o.redeploy===4).listedCash,32400);
+});
 test('actual POST offers the direct tool and preserves numerical initial/follow-up/correction replies through offline transport',async()=>{
  const route=await offlineBusinessRoute();route.sandbox.console={info(){},error(){}};let state;
  for(const [i,message] of Object.values(fixedMessages).entries()){
