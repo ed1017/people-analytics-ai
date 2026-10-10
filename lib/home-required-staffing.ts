@@ -36,6 +36,34 @@ export function requiresRequiredStaffing(request:SolutionRequest){
  if(strategies>=2&&requirement.test(text))return true;
  return !!request.state.requiredStaffing&&(/\b(?:numerical|numbers|totals?|recalculate|recompute|compare|comparison|options?|mixes)\b/i.test(text)||/\b(?:change|make|set|use|clear|remove|update|keep)\b/i.test(text)&&/\b(?:training|trainee|hire|hiring|redeploy\w*|backfill|budget|month\w*|horizon|currency|role\w*|pool\w*|hours?|cost\w*|USD|EUR|GBP)\b/i.test(text));
 }
+// Performance gate, not a general intent classifier. Every clause must fit a
+// bounded staffing request/premise grammar; unfamiliar wording keeps the full loop.
+const staffingNumber='(?:\\d+(?:[.,]\\d+)*|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)';
+const staffingMoney='(?:USD|EUR|GBP)\\s+'+staffingNumber;
+const staffingStrategies='(?:hir(?:e|ing)|train(?:ing)|redeploy(?:ment|ing)?)';
+const staffingStrategyList=staffingStrategies+'(?:(?:\\s*[/,]\\s*(?:and\\s+)?|\\s+(?:and|or)\\s+)'+staffingStrategies+'){1,2}';
+const staffingRequestPatterns=[
+ `(?:illustrative scenario:\\s*)?(?:please\\s+)?(?:compare ways to\\s+)?(?:fill|staff|cover|need|require)\\s+${staffingNumber}\\s+(?:[a-z-]+\\s+){0,3}(?:roles?|positions?|people|employees?|engineers?|developers?|analysts?)(?:\\s+over\\s+${staffingNumber}\\s+months?)?(?:,?\\s+with a budget of\\s+${staffingMoney})?(?:\\s+by\\s+${staffingStrategyList})?`,
+ '(?:give me|show me|recalculate|recompute|compare) (?:the )?(?:numerical totals|numbers|totals|options|comparison)(?: for the (?:three )?options)?(?: again)?',
+ `(?:make|set|change) training (?:to )?${staffingMoney} per trainee`,
+].map(pattern=>new RegExp('^(?:'+pattern+')$','i'));
+const staffingPremisePatterns=[
+ `each hire costs ${staffingMoney} for the (?:whole )?${staffingNumber}-month period`,
+ `each trainee costs ${staffingMoney}(?: and needs ${staffingNumber} planned training hours)?`,
+ `redeployment adds ${staffingNumber} cash per person`,
+ `we have a pool of ${staffingNumber} redeployable people and a separate pool of ${staffingNumber} trainable people`,
+ '(?:release|readiness|backfill costs|other cost coverage)(?:(?:, | and )(?:release|readiness|backfill costs|other cost coverage))* (?:is|are|remain) unknown',
+ 'new-hire training requirements are not specified',
+ 'keep the (?:required headcount, horizon and all other premises|other premises|same assumptions) unchanged',
+].map(pattern=>new RegExp('^(?:'+pattern+')$','i'));
+export function canCompleteRequiredStaffingAlone(request:SolutionRequest){
+ if(!requiresRequiredStaffing(request))return false;
+ const clauses=request.message.text.trim().split(/[.!?;\n]+(?!\d)/).map(clause=>clause.trim()).filter(Boolean);
+ const requests=clauses.filter(clause=>staffingRequestPatterns.some(pattern=>pattern.test(clause)));
+ // A generic continuation is ambiguous when another planning review is retained.
+ if((request.state.hiringBudget||request.state.businessPlanning)&&!requests.some(clause=>staffingRequestPatterns[0].test(clause)))return false;
+ return requests.length===1&&clauses.every(clause=>[...staffingRequestPatterns,...staffingPremisePatterns].some(pattern=>pattern.test(clause)));
+}
 /** Numerical prose shares the cards' calculator, so unknown requirements cannot become zero. */
 export function requiredStaffingAnswer(review:RequiredStaffingReview){
  const r=requiredStaffingView(review)!;
