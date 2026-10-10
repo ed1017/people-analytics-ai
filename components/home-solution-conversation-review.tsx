@@ -1,4 +1,5 @@
 'use client';
+import {PlanReviewNextStep} from './plan-review-next-step';
 import {ActionPlanQuickSummary} from './action-plan-quick-summary';
 import {ChatContent} from './chat-content';
 import {useState} from 'react';
@@ -30,6 +31,7 @@ function Proposal({item,controller,goal,number:proposalNumber,recommended=false,
   <ol className="list-decimal space-y-2 pl-5">{item.candidate.activities.map(activity=>{const component=item.draft?.bundle.components.find(part=>part.id===activity.id),timing=item.draft?.inputs.timing.find(row=>row.componentId===activity.id);return <li key={activity.id}><strong>{component?.name??activity.name}</strong><p>{component?.firstStep??activity.step}</p><p><strong>Suggested owner:</strong> {component?.ownerRole??activity.ownerRole}</p><p className="text-xs"><strong>Timing:</strong> {timing?.start.value??'Start not confirmed'} → {timing?.finish.value??'Finish not confirmed'}. Follow the proposed step sequence; dates and availability need review.</p><p className="text-xs">{component?.limitation??activity.limitation}</p></li>;})}</ol>
   <p><strong>Tradeoffs:</strong> {item.candidate.tradeoffs.join(' ')||'Not yet evaluated.'}</p><p><strong>Next step:</strong> {item.candidate.nextStep}</p><p><strong>Success measure:</strong> {item.candidate.successMeasure}</p>
 
+  <PlanReviewNextStep goal={statement}/>
   <details><summary className="cursor-pointer py-2 font-medium">Inputs and changes</summary><ul className="list-disc space-y-1 pl-5">{[...item.interpretations,...item.changes].map((line,index)=><li key={index}>{line}</li>)}</ul>{!item.interpretations.length&&<p>No new quantities were supplied. Missing assumptions remain unknown.</p>}</details>
   {[...item.blocking,...(stale?['Current constraints changed. Refine this proposal in chat before saving.']:[])].map((line,index)=><p key={index} role="status">{line}</p>)}
   {!!item.issues.length&&<details open><summary className="cursor-pointer py-2">Unknowns ({item.issues.length})</summary><ul className="list-disc space-y-1 pl-5">{item.issues.map((line,index)=><li key={index}>{line}</li>)}</ul></details>}
