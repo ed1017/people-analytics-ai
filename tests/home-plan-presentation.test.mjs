@@ -72,3 +72,14 @@ test('reported assumptions paragraphs remain available with the plan without dup
  const value='Use a small trial.\n\nMissing factual inputs: scope; available hours.\n\nEditable scenario assumptions—not established facts: timing.\n\nRisk: available capacity has not been verified.';
  const split=splitPlanFollowUp(value);assert.match(split.planningNotes,/scope; available hours/);assert.match(split.planningNotes,/timing/);assert.doesNotMatch(split.discussion,/Missing factual inputs|Editable scenario/);assert.match(split.discussion,/Risk: available capacity/);
 });
+
+ test('reported capacity explanation and exact standalone question move below the plan without losing evidence',()=>{
+ const explanation='The decisive condition is whether qualified management hours cover demand when needed. Existing commitments, coaching and onboarding need review.';
+ const question='Which client-delivery team or manager group should we assess first?';
+ const answer='Test manager capacity before expanding delivery.\n\n'+explanation+'\n\n'+question+'\n\nRisk: capacity has not been verified.';
+ const split=splitPlanFollowUp(answer,[question]);
+ assert.equal(split.explanation,explanation);assert.equal(split.furtherReading,question);
+ assert.equal(split.capacityRisk,'Confirm that qualified management hours cover demand when needed.');
+ assert.doesNotMatch(split.discussion,/decisive condition|Which client-delivery/);assert.match(split.discussion,/Risk: capacity has not been verified/);
+ assert.equal(splitPlanFollowUp('Could capacity be a risk?').discussion,'Could capacity be a risk?');
+ });
