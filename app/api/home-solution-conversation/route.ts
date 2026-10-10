@@ -40,7 +40,7 @@ async function handlePOST(request:Request){
   if(!process.env.OPENAI_API_KEY)throw Error('Model unavailable');
   signal=AbortSignal.any([request.signal,AbortSignal.timeout(90000)]);
   diagnostics.stage('grounding');
-  const grounding=await groundSolutionRequest(parsed,signal);
+  const grounding=await groundSolutionRequest(parsed,signal,diagnostics.groundingResult);
   diagnostics.stage('model_setup');
   const client=new OpenAI({...openAIProxyTransport(),apiKey:process.env.OPENAI_API_KEY,maxRetries:0});
   const natural=request.headers.get(SWP_CONVERSATION_HEADER)===null;

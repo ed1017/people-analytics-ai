@@ -41,20 +41,32 @@ export function groundingFailureDetails(value:unknown){
   readersStarted:bounded(raw.readersStarted,readers.length),readersCompleted:bounded(raw.readersCompleted,readers.length),
   readFailure:member(raw.readFailure,readFailures),httpStatus:httpStatus(raw.httpStatus),
   upstreamCode:sourceAuthenticationCode(raw.upstreamCode),sourceCorrelationId:correlationReceipt(raw.sourceCorrelationId),
-  activeReaders:(Array.isArray(raw.activeReaders)?raw.activeReaders:[]).slice(0,2).flatMap(item=>{
+  activeReaders:(Array.isArray(raw.activeReaders)?raw.activeReaders:[]).slice(0,4).flatMap(item=>{
    const entry=record(item),reader=member(entry.reader,readers);return reader?[{reader,elapsedMs:bounded(entry.elapsedMs,600000)}]:[];
   })});
+}
+
+/** Fixed reader names and bounded timings only; never source facts, URLs, headers or errors. */
+export function groundingReadDetails(value:unknown){
+ const raw=record(value),items=read(raw,'readers');
+ return {elapsedMs:bounded(read(raw,'elapsedMs'),600000),readersStarted:bounded(read(raw,'readersStarted'),readers.length),
+  readersCompleted:bounded(read(raw,'readersCompleted'),readers.length),maxConcurrentReaders:bounded(read(raw,'maxConcurrentReaders'),4),
+  readers:(Array.isArray(items)?items:[]).slice(0,readers.length).flatMap(item=>{
+   const reader=member(read(item,'reader'),readers);return reader?[{reader,startedAfterMs:bounded(read(item,'startedAfterMs'),600000),elapsedMs:bounded(read(item,'elapsedMs'),600000),completed:read(item,'completed')===true}]:[];
+  })};
 }
 
 export function createSolutionDiagnostics(){
  const correlationId=crypto.randomUUID(),startedAt=Date.now();let stage:Stage='request_validation',modelAttempts=0,attemptStartedAt:number|null=null,reported=false;
  let stageStartedAt=startedAt,requestSizes={inputBytes:null,instructionsBytes:null,toolSchemaBytes:null} as Pick<ProviderRound,'inputBytes'|'instructionsBytes'|'toolSchemaBytes'>;
  const stageElapsedMs=Object.fromEntries(stages.map(key=>[key,0])) as Record<Stage,number>,providerRounds:ProviderRound[]=[];
+ let groundingReads:ReturnType<typeof groundingReadDetails>|null=null;
  const closeStage=()=>{const at=Date.now();stageElapsedMs[stage]=bounded(stageElapsedMs[stage]+Math.max(0,at-stageStartedAt),600000);stageStartedAt=at;};
  const setStage=(value:Stage)=>{closeStage();stage=member(value,stages)??'request_validation';};
  return {
   receipt(){return {version:1,correlationId,modelAttempts,providerRounds:providerRounds.map(round=>({...round}))};},
   stage:setStage,
+  groundingResult(value:unknown){if(!reported)groundingReads=groundingReadDetails(value);},
   modelAttempt(sizes?:unknown){
    setStage('provider');modelAttempts=Math.min(4,modelAttempts+1);attemptStartedAt=Date.now();
    requestSizes={inputBytes:count(read(sizes,'inputBytes'),900000),instructionsBytes:count(read(sizes,'instructionsBytes'),900000),toolSchemaBytes:count(read(sizes,'toolSchemaBytes'),900000)};
@@ -71,7 +83,7 @@ export function createSolutionDiagnostics(){
    if(reported)return;reported=true;closeStage();
    // Numeric counters and allowlisted identifiers only; absent usage stays null.
    // response_validation includes local tool execution and continuation assembly.
-   const diagnostic={version:1,correlationId,elapsedMs:bounded(Date.now()-startedAt,600000),stageElapsedMs:{...stageElapsedMs},modelAttempts,
+   const diagnostic={version:1,correlationId,elapsedMs:bounded(Date.now()-startedAt,600000),stageElapsedMs:{...stageElapsedMs},modelAttempts,...(groundingReads?{groundingReads}:{}),
     modelRounds:bounded(read(usage,'modelRounds'),4),toolCalls:bounded(read(usage,'toolCalls'),6),providerRounds:providerRounds.map(round=>({...round}))};
    try{console.info('Home solution conversation completed',diagnostic);}catch{/* Logging cannot change a successful response. */}
   },
@@ -82,7 +94,7 @@ export function createSolutionDiagnostics(){
    const code=evidence?solutionEvidenceCode(evidence):callerAborted?'conversation_cancelled':deadlineAborted?'conversation_deadline':
     stage==='provider'?'provider_'+(providerKind==='http'?'http_error':providerKind==='other'?'failed':providerKind):
     ({request_validation:'invalid_request',configuration:'configuration_unavailable',grounding:'evidence_verification_failed',model_setup:'model_setup_failed',conversation_preparation:'conversation_preparation_failed',response_validation:'response_validation_failed'} as const)[stage];
-   const diagnostic={version:2,correlationId,code,stage,elapsedMs:bounded(Date.now()-startedAt,600000),modelAttempts,
+   const diagnostic={version:2,correlationId,code,stage,elapsedMs:bounded(Date.now()-startedAt,600000),modelAttempts,...(groundingReads?{groundingReads}:{}),
     // An SDK attempt is not proof of a wire dispatch, provider receipt, usage or spend.
     providerKind,providerHttpStatus:provider?.status??null,providerErrorClass:provider?.errorClass??null,providerCauseCode:provider?.causeCode??null,
     providerElapsedMs:provider&&attemptStartedAt!==null?bounded(Date.now()-attemptStartedAt,600000):null,grounding:evidence};
