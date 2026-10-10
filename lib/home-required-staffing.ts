@@ -83,7 +83,15 @@ export function editRequiredStaffing(request:SolutionRequest,datasetToken:string
  const before=structuredClone(s.inputs),turns=new Map(s.basisTurns.map(t=>[t.id,t]));
  for(const t of [...request.state.turns.filter(t=>t.role==='user'),request.message]){if(turns.has(t.id)&&turns.get(t.id)!.text!==t.text)throw Error('A staffing source turn changed.');turns.set(t.id,{id:t.id,text:t.text});}s.basisTurns=[...turns.values()];
  for(const c of list){checkBasis(c.basis,s.basisTurns);if(c.basis.kind==='user-supplied'&&c.basis.turnId!==request.message.id)throw Error('Staffing corrections require the current user turn.');if(s.origins[c.field]&&!same(s.inputs[c.field],c.value)&&c.basis.kind!=='user-supplied')throw Error('Existing staffing premises require an explicit user correction.');if(same(s.inputs[c.field],c.value)&&s.origins[c.field])continue;s.inputs={...s.inputs,[c.field]:c.value};s.origins={...s.origins,[c.field]:structuredClone(c.basis)};}
- const requireRestated=(fields:readonly StaffingInputField[])=>{for(const field of fields)if(before[field]!==null&&s.inputs[field]!==null&&!list.some(c=>c.field===field&&c.basis.kind==='user-supplied'))throw Error('Changing the role, currency or cost horizon requires explicitly restating or clearing its affected rates and pools.');};
+ const requireRestated=(fields:readonly StaffingInputField[])=>{
+  for(const field of fields)if(before[field]!==null&&s.inputs[field]!==null){
+   const restatement=list.find(c=>c.field===field&&c.basis.kind==='user-supplied');
+   if(!restatement)throw Error('Changing the role, currency or cost horizon requires explicitly restating or clearing its affected rates and pools.');
+   // An unchanged amount can describe a different currency, period or role.
+   // Keep the required current-user quote without confirming other premises.
+   s.origins[field]=structuredClone(restatement.basis);
+  }
+ };
  if(before.currency!==null&&before.currency!==s.inputs.currency)requireRestated(staffingCashFields);
  if(before.months!==null&&before.months!==s.inputs.months)requireRestated(['hireCostPerPerson','redeploymentCostPerPerson','backfillCostPerInternalPerson','budget']);
  if(before.role!==null&&before.role!==s.inputs.role)requireRestated(requiredStaffingFields.filter(f=>!['role','requiredRoles','months','currency','budget'].includes(f)));
