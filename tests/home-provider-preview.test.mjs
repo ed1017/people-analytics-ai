@@ -96,11 +96,14 @@ test('actual POST returns explicit incomplete and receipts before a second call;
   else {assert.equal(response.status,422);assert.equal(reply.code,'preview_single_attempt_incomplete');assert.match(reply.error,/incomplete/);assert.equal(reply.answer,undefined);assert.equal(reply.state,undefined);assert.equal(r.sandbox.__requests.length,1);assert.equal(reply.providerReceipt.providerRounds.length,1);assert.equal(reply.providerReceipt.modelAttempts,1);}
  }
 });
-test('Preview still verifies fresh aggregate grounding and fails before a model call when facts change',async()=>{
- const r=await route(),data={as_of:'2026-09-30',summary:{headcount:100,fte:100}},body=solutionRequest(fixedMessages.start);
+test('Preview actual-company and mixed requests still verify fresh grounding before a model call',async()=>{
+ const r=await route(),data={as_of:'2026-09-30',summary:{headcount:100,fte:100}};
+ for(const text of [fixedMessages.start.replace('Illustrative scenario: ','Actual company requirement: '),fixedMessages.start+' Check our actual workforce availability.']){
+ const body=solutionRequest(text);
  body.evidence=buildHomePack({workforce:{status:'loaded',data}},body.scope);
  r.sandbox.__aggregateSources={workforce:{status:'loaded',data:{...data,summary:{headcount:101,fte:101}}}};
  const response=await r.submit(body),reply=await response.json();assert.equal(response.status,503);assert.equal(reply.code,'evidence_facts_changed');assert.equal(r.sandbox.__requests.length,0);assert.equal(reply.providerReceipt.modelAttempts,0);assert.equal(reply.answer,undefined);
+ }
 });
 
 test('allowance is per request, not a shared duplicate-submission limit',()=>{
