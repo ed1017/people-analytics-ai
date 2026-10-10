@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share application source.
+import {hiringBudgetTool} from './home-hiring-budget.ts';
 // @ts-expect-error Native Node checks share the application schemas.
 import {businessPlanningTools} from './home-business-planning.ts';
 
@@ -8,7 +10,7 @@ function sharedParameters(name:string,parameters:Record<string,unknown>){
   ?{basis:at(['properties','spec','properties','scopeBasis'])}
   :name==='revise_scoped_service_demand'
    ?{basis:at(['properties','edit','properties','changes','items','anyOf','0','properties','basis']),scope:at(['properties','edit','properties','changes','items','anyOf','0','properties','quantity','properties','scope'])}
-   :name==='compare_service_staffing'
+   :['compare_service_staffing','review_hiring_budget'].includes(name)
     ?{basis:at(['properties','changes','items','anyOf','0','properties','basis'])}:{};
  if(!Object.keys(definitions).length)return parameters;
  if(parameters.$defs||Object.values(definitions).some(value=>!value))throw Error('Shared model schema definitions are unavailable.');
@@ -22,4 +24,4 @@ function sharedParameters(name:string,parameters:Record<string,unknown>){
 }
 
 // Build once, keeping tool names, descriptions, strictness and argument contracts.
-export const businessPlanningModelTools=businessPlanningTools.map(tool=>({...tool,parameters:sharedParameters(tool.name,tool.parameters)}));
+export const businessPlanningModelTools=[...businessPlanningTools,hiringBudgetTool].map(tool=>({...tool,parameters:sharedParameters(tool.name,tool.parameters)}));
