@@ -17,6 +17,7 @@ import type {Json} from '@/lib/local-decisions';
 import type {GuidedActionRegistry} from './home-guided-actions';
 import {progressEntryContext,retainProgressEntryProposal} from '@/lib/goal-progress-entry-store';
 import {captureGoalProgressInput} from '@/lib/goal-progress-conversation';
+import {homeConversationErrorMessage} from '@/lib/home-evidence-recovery.mjs';
 
 type Props={enabled:boolean;conversation:ProblemConversation;active:boolean;settled:boolean;evidence:unknown;planningContext?:()=>unknown;planningCalculatorAvailable?:()=>boolean;demandReviewRef?:RefObject<((review:DemandReview)=>void)|null>;scope:string;query:string;target:()=>BundleDiscussion|null;guided?:GuidedActionRegistry|null};
 const equal=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
@@ -57,7 +58,7 @@ export function useHomeSolutionConversation(props:Props){
   const current=()=>!abort.signal.aborted&&mounted.current&&captured===epoch.current&&key===liveKey.current&&scenario===JSON.stringify(currentProps.current.planningContext?.()??null)&&equal(request.goalProgress,captureGoalProgressInput(decisionStore,currentProps.current.conversation.activeGoalId))&&equal(request.catalog,catalog())&&selectedPlanId(catalog())===(request.selectedId??null);
   try{
    const response=await datasetFetch('/api/home-solution-conversation',{method:'POST',headers:{'Content-Type':'application/json',...swpConversationHeaders(request.goalContext)},body:JSON.stringify(request),signal:abort.signal});const data=await response.json();
-   if(!current())return null;if(!response.ok)throw Error(typeof data.error==='string'?data.error:'The conversation response is unavailable.');
+   if(!current())return null;if(!response.ok)throw Error(homeConversationErrorMessage(data));
    const reply=data as SolutionReply;if(reply.requestId!==request.requestId||typeof reply.answer!=='string'||!reply.answer.trim()||reply.answer.length>10000||!Array.isArray(reply.candidateIds)||!Array.isArray(reply.analysisIds))throw Error('The conversation response does not match this request.');
    const state=readSolutionState(reply.state);if(state.turns.at(-2)?.id!==request.message.id||state.turns.at(-1)?.text!==reply.answer||reply.candidateIds.some(id=>!state.working.some(item=>item.id===id&&item.requestId===request.requestId))||reply.analysisIds.some(id=>!state.analyses.some(item=>item.id===id)))throw Error('The returned conversation could not be verified.');
    const demandContext=reply.demandReview?requestDemandContext(request,decisionStore.getDatasetToken()):null;
