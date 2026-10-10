@@ -53,6 +53,7 @@ export function createSolutionDiagnostics(){
  const closeStage=()=>{const at=Date.now();stageElapsedMs[stage]=bounded(stageElapsedMs[stage]+Math.max(0,at-stageStartedAt),600000);stageStartedAt=at;};
  const setStage=(value:Stage)=>{closeStage();stage=member(value,stages)??'request_validation';};
  return {
+  receipt(){return {version:1,correlationId,modelAttempts,providerRounds:providerRounds.map(round=>({...round}))};},
   stage:setStage,
   modelAttempt(sizes?:unknown){
    setStage('provider');modelAttempts=Math.min(4,modelAttempts+1);attemptStartedAt=Date.now();
