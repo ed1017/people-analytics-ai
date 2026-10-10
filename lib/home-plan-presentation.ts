@@ -54,7 +54,33 @@ export function splitPlanDiscussion(answer:string){
  return {discussion:visible.join('\n').trim(),reference:reference.join('\n\n').trim()};
 }
 
-export type PlanDiscussion={discussion:string;reference:string;proposals:SolutionEvaluation[]};
+/** Move only explicitly labelled follow-up reading and assumptions. Unlabelled
+ * risks, caveats and ordinary explanation are never shortened or reclassified. */
+export function splitPlanFollowUp(answer:string){
+ const lines=answer.split('\n'),discussion:string[]=[],reading:string[]=[],notes:string[]=[];
+ const readingTitle=(line:string)=>/^(?:#{1,6}\s+)?(?:\*\*)?Further (?:reading(?:\s*(?:and|\/|&)\s*investigations?)?|investigations?)(?:\*\*)?\s*:?$/i.test(line.trim());
+ for(let index=0;index<lines.length;){
+  const inlineReading=lines[index].trim().match(/^(?:\*\*)?Further (?:reading(?:\s*(?:and|\/|&)\s*investigations?)?|investigations?)(?:\*\*)?:\s+(.+)$/i);
+  if(inlineReading){
+   let end=index+1;while(end<lines.length&&lines[end].trim()&&!heading(lines[end]))end++;
+   reading.push([inlineReading[1],...lines.slice(index+1,end)].join('\n'));index=end;continue;
+  }
+  if(readingTitle(lines[index])){
+   const level=lines[index].trim().match(/^(#{1,6})\s/)?.[1].length??6;
+   let end=index+1;while(end<lines.length){const next=heading(lines[end]);if(next&&next.level<=level)break;end++;}
+   reading.push(lines.slice(index+1,end).join('\n').trim());index=end;continue;
+  }
+  // These are the exact verbose paragraph labels used in the reported UI.
+  if(/^(?:\*\*)?(?:Missing factual inputs|Editable scenario assumptions)(?:\*\*)?\s*[:—–-]/i.test(lines[index].trim())){
+   let end=index+1;while(end<lines.length&&lines[end].trim()&&!heading(lines[end]))end++;
+   notes.push(lines.slice(index,end).join('\n'));index=end;continue;
+  }
+  discussion.push(lines[index++]);
+ }
+ return {discussion:discussion.join('\n').trim(),furtherReading:reading.filter(Boolean).join('\n\n'),planningNotes:notes.join('\n\n')};
+}
+
+export type PlanDiscussion={discussion:string;reference:string;furtherReading:string;planningNotes:string;proposals:SolutionEvaluation[]};
 /** Pair by both user and assistant turn, backwards and once only. Identical
  * replies, discard events and revised candidates cannot borrow another turn's card. */
 export function solutionDiscussionPresentations(messages:ChatMessage[],state:SolutionState):Map<ChatMessage,PlanDiscussion>{
@@ -69,7 +95,8 @@ export function solutionDiscussionPresentations(messages:ChatMessage[],state:Sol
   const proposals=[...new Map(state.working.filter(item=>item.message.id===turn.id).map(item=>[item.id,item])).values()];
   if(!proposals.length)continue;
   const split=splitPlanDiscussion(message.content);
-  if(split.reference)result.set(message,{...split,proposals});
+  const followUp=splitPlanFollowUp(split.discussion);
+  if(split.reference||followUp.furtherReading||followUp.planningNotes)result.set(message,{...split,...followUp,proposals});
  }
  return result;
 }

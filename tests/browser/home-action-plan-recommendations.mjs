@@ -98,7 +98,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
  if(mode==='mobile')await button('Open navigation')[click]();
  await button('Action Planning')[click]();await chat.waitFor();
  check(mode+' existing instructions data link and Home return preserve saved goals',JSON.stringify((await state()).goals)===demoGoals&&requests.length===0);
- const starter=homeStarterGroups.flatMap(group=>group.prompts)[0];await button(starter.label)[click]();await page.getByText('This ordinary question is answered directly without new proposals.',{exact:true}).filter({visible:true}).first().waitFor();
+ const starter=homeStarterGroups.flatMap(group=>group.prompts)[0];await page.getByRole('group',{name:homeStarterGroups[0].label,exact:true}).locator('summary')[click]();await button(starter.label)[click]();await page.getByText('This ordinary question is answered directly without new proposals.',{exact:true}).filter({visible:true}).first().waitFor();
  check(mode+' prompt click sends once without mode or pin',requests.length===1&&requests[0].message.text===starter.prompt&&!requests[0].goal.id);
  await button('Reset conversation')[click]();
  for(const [kind,question] of [['turnover',turnoverQuestion],['product',productQuestion]]){
@@ -112,8 +112,8 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
   const navigation=page.getByRole('navigation',{name:'Review proposed Action Plans'});const beforeReview=JSON.stringify(await state());
   await navigation.getByRole('button',{name:'Review 1: '+plans[0].candidate.name,exact:true})[click]();
   check(mode+' '+kind+' direct review links focus the actual card without saving',await navigation.getByRole('button').count()===expectedCount&&await articles.first().evaluate(node=>document.activeElement===node)&&JSON.stringify(await state())===beforeReview);
-  const questions=page.getByRole('region',{name:'Optional questions before choosing a plan'});
-  check(mode+' '+kind+' optional questions follow the proposals in the answer and precede review controls',working(s).turns.at(-1).text.indexOf('Proposed Action Plan '+expectedCount)<working(s).turns.at(-1).text.indexOf('Optional questions before choosing:')&&await questions.getByRole('listitem').count()===2&&await questions.evaluate(node=>Boolean(node.compareDocumentPosition(document.querySelector('[aria-label^="Working proposal:"]'))&Node.DOCUMENT_POSITION_FOLLOWING)));
+  const questions=page.getByRole('region',{name:'Further reading and investigation'});
+  check(mode+' '+kind+' follow-up reading follows review cards without a duplicate optional-question box',working(s).turns.at(-1).text.indexOf('Proposed Action Plan '+expectedCount)<working(s).turns.at(-1).text.indexOf('Optional questions before choosing:')&&await page.getByRole('region',{name:'Optional questions before choosing a plan'}).count()===0&&await questions.evaluate(node=>Boolean(document.querySelector('[aria-label^="Working proposal:"]').compareDocumentPosition(node)&Node.DOCUMENT_POSITION_FOLLOWING)));
   check(mode+' '+kind+' questions impose no form or selection lock',await questions.getByRole('textbox').count()===0&&await articles.first().getByRole('button',{name:'Pin Action Plan with unknowns',exact:true}).isEnabled());
   await page.screenshot({path:path.join(output,mode+'-'+kind+'-plans.png'),fullPage:true});
  }
@@ -133,7 +133,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
  check(mode+' more than four current plans remain reviewable',await page.locator('article[aria-label^="Working proposal:"]').count()===5);
  check(mode+' combination and refinement preserve provenance and unknown overlap',combined.revision===2&&combined.draft.bundle.components[0].ownerRole==='Product owner'&&combined.draft.inputs.groupsDisjoint.value===null&&combined.result.cashEstimate.cash===null);
  const card=page.getByRole('article',{name:'Working proposal: Combined delivery pilot',exact:true});
- check(mode+' unanswered question still allows explicit choice',await page.getByRole('region',{name:'Optional questions before choosing a plan'}).isVisible()&&working(current).questions.length===1);
+ check(mode+' unanswered question still allows explicit choice',await card.getByRole('button',{name:'Pin Action Plan with unknowns',exact:true}).isEnabled()&&working(current).questions.length===1);
  await card.getByRole('button',{name:'Pin Action Plan with unknowns',exact:true})[click]();await card.getByRole('button',{name:'Pinned Action Plan #1',exact:true}).waitFor();
  current=await state();const fields=current.workspaces[current.goals.activeId].fields,catalog=fields[planAlternativesField];
  check(mode+' explicit reviewed choice links goal and proposal without applying operations',!!current.goals.activeId&&catalog.plans.length===1&&catalog.attachments.length===1&&!catalog.plans[0].applied&&catalog.plans[0].draft.binding.goal===current.goals.goals.find(goal=>goal.id===current.goals.activeId).statement);

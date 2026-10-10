@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {splitPlanDiscussion,solutionReviewPresentation,solutionDiscussionPresentations} from '../lib/home-plan-presentation.ts';
+import {splitPlanDiscussion,splitPlanFollowUp,solutionReviewPresentation,solutionDiscussionPresentations} from '../lib/home-plan-presentation.ts';
 import {converseSolutions} from '../lib/home-solution-conversation-service.ts';
 import {candidate,evaluate,final,fixtureRuntime,solutionRequest} from './fixtures/home-solution-conversation.mjs';
 const prose='Workload may contribute; the evidence does not establish a cause.\n\n### Proposed Action Plan\n\n1. Launch listening circles. Owner: HR director.\n2. Commission a workload survey. Owner: Operations.\n\nCosts and population are unknown; do not assume availability.\n\n### Why this approach\nSmall trials help test a hypothesis before expansion.';
@@ -59,4 +59,16 @@ test('unheaded bullet and numbered caveats stay visible under an explicit plan h
  }
  const mixed='### Proposed Action Plan\n\n1. Launch mentoring. Owner: Learning lead.\n2. Costs are unknown.';
  assert.equal(splitPlanDiscussion(mixed).discussion,mixed);assert.equal(splitPlanDiscussion(mixed).reference,'');
+});
+
+test('only labelled reading moves after the plan; risks and short tables stay in the takeaway',()=>{
+ const answer='Start a small trial.\n\n| Choice | Constraint |\n| --- | --- |\n| Mentoring | Capacity unknown |\n\n### Further reading / investigation\nReview [T1] and ask managers about availability.\n\n### Risk\nDo not add workload without confirming capacity.';
+ const split=splitPlanFollowUp(answer);assert.match(split.furtherReading,/Review \[T1\]/);assert.doesNotMatch(split.discussion,/Review \[T1\]/);assert.match(split.discussion,/Do not add workload/);assert.match(split.discussion,/Capacity unknown/);
+ assert.equal(splitPlanFollowUp('Read more about capacity risks before acting.').furtherReading,'');
+ const inline=splitPlanFollowUp('Takeaway.\n\nFurther reading and investigations: Review the workload baseline.\n\nRisk: capacity remains unknown.');
+ assert.equal(inline.furtherReading,'Review the workload baseline.');assert.match(inline.discussion,/Risk: capacity remains unknown/);
+});
+test('reported assumptions paragraphs remain available with the plan without duplicating the introduction',()=>{
+ const value='Use a small trial.\n\nMissing factual inputs: scope; available hours.\n\nEditable scenario assumptions—not established facts: timing.\n\nRisk: available capacity has not been verified.';
+ const split=splitPlanFollowUp(value);assert.match(split.planningNotes,/scope; available hours/);assert.match(split.planningNotes,/timing/);assert.doesNotMatch(split.discussion,/Missing factual inputs|Editable scenario/);assert.match(split.discussion,/Risk: available capacity/);
 });
