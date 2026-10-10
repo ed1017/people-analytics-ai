@@ -1,5 +1,6 @@
 'use client';
 import {useState} from 'react';
+import {solutionReviewPresentation} from '@/lib/home-plan-presentation';
 import {HomeBusinessPlanningReview} from './home-business-planning-review';
 import type {useHomeSolutionConversation} from './use-home-solution-conversation';
 import {resolveSolutionMetric,currentSolutionProposals,type SolutionEvaluation} from '@/lib/home-solution-conversation';
@@ -13,15 +14,16 @@ const number=(value:number|null|undefined)=>value==null?'Unknown':value.toLocale
 const proposalAnchor=(id:string)=>'proposed-action-plan-'+id;
 /** Direct access to the actual review cards, without changing selection or saving. */
 export function HomeSolutionProposalLinks({controller}:{controller:Controller}){
- const proposals=currentSolutionProposals(controller.state);
+ const view=solutionReviewPresentation(controller.state);
+ const proposals=[...(view.recommended?[view.recommended]:[]),...view.alternatives];
  if(!proposals.length)return null;
- return <nav aria-label="Review proposed Action Plans" className="space-y-2 text-sm"><p className="font-semibold">Proposed Action Plans <span className="font-normal text-muted-foreground">· review before saving</span></p><div className="flex flex-wrap gap-2">{proposals.map((item,index)=><button key={item.id} type="button" className={button+' min-w-0 max-w-full break-words text-left'} onClick={()=>{const card=document.getElementById(proposalAnchor(item.id));card?.scrollIntoView({block:'start'});card?.focus({preventScroll:true});}}>Review {index+1}: {item.candidate.name}</button>)}</div></nav>;
+ return <nav aria-label="Review proposed Action Plans" className="space-y-2 text-sm"><p className="font-semibold">Jump to plan review <span className="font-normal text-muted-foreground">· review before saving</span></p><div className="flex flex-wrap gap-2">{proposals.map(item=><button key={item.id} type="button" className={button+' min-w-0 max-w-full break-words text-left'} onClick={()=>{const card=document.getElementById(proposalAnchor(item.id));card?.scrollIntoView({block:'start'});card?.focus({preventScroll:true});}}>Review {currentSolutionProposals(controller.state).findIndex(proposal=>proposal.id===item.id)+1}: {item.candidate.name}</button>)}</div></nav>;
 }
-function Proposal({item,controller,goal,number:proposalNumber}:{item:SolutionEvaluation;controller:Controller;goal:string;number:number}){
+function Proposal({item,controller,goal,number:proposalNumber,recommended=false}:{item:SolutionEvaluation;controller:Controller;goal:string;number:number;recommended?:boolean}){
  const [statement,setStatement]=useState(goal||item.candidate.goal.statement);
  const stale=JSON.stringify(item.constraints)!==JSON.stringify(controller.state.constraints),saved=controller.saved?.plans.find(plan=>plan.operation?.proposalKey===JSON.stringify(item.candidate));
  return <article id={proposalAnchor(item.id)} tabIndex={-1} aria-label={`Working proposal: ${item.candidate.name}`} className="space-y-3 rounded border p-3 text-sm focus-visible:ring-2 focus-visible:ring-ring">
-  <p className="text-xs font-medium">Proposed Action Plan {proposalNumber} · {saved?'saved proposal':'not saved'} · effectiveness is unproven</p><h3 className="font-semibold">{item.candidate.name} · revision {item.revision}</h3><p><strong>Intended outcome:</strong> {item.candidate.objective}</p><p>{item.candidate.rationale}</p><p>{item.candidate.approach}</p>
+  <p className="text-xs font-medium">{recommended?'Recommended Action Plan':`Alternative Action Plan ${proposalNumber}`} · {saved?'saved proposal':'not saved'} · effectiveness is unproven</p><h3 className="font-semibold">{item.candidate.name} · revision {item.revision}</h3><p><strong>Intended outcome:</strong> {item.candidate.objective}</p><p>{item.candidate.rationale}</p><p>{item.candidate.approach}</p>
   <ol className="list-decimal space-y-2 pl-5">{item.candidate.activities.map(activity=>{const component=item.draft?.bundle.components.find(part=>part.id===activity.id),timing=item.draft?.inputs.timing.find(row=>row.componentId===activity.id);return <li key={activity.id}><strong>{component?.name??activity.name}</strong><p>{component?.firstStep??activity.step}</p><p><strong>Suggested owner:</strong> {component?.ownerRole??activity.ownerRole}</p><p className="text-xs"><strong>Timing:</strong> {timing?.start.value??'Start not confirmed'} → {timing?.finish.value??'Finish not confirmed'}. Follow the proposed step sequence; dates and availability need review.</p><p className="text-xs">{component?.limitation??activity.limitation}</p></li>;})}</ol>
   <p><strong>Tradeoffs:</strong> {item.candidate.tradeoffs.join(' ')||'Not yet evaluated.'}</p><p><strong>Next step:</strong> {item.candidate.nextStep}</p><p><strong>Success measure:</strong> {item.candidate.successMeasure}</p>
   {item.result?.calculationStatus==='awaiting-scope'?<p>Qualitative proposal · population or horizon still needs review. Resource totals have not been calculated.</p>:<p>Calculated cash: {item.result?.cashEstimate?.cash==null?'Unknown':`$${number(item.result.cashEstimate.cash)} USD`} · staff effort: {number(item.result?.deliveryEstimate?.hours)} hours · distinct participants: {number(item.result?.uniqueParticipants)}.</p>}
@@ -47,7 +49,9 @@ export function SolutionProjectionChart({analysis}:{analysis:HeadcountProjection
  </section>;
 }
 export function HomeSolutionConversationReview({controller,goal,pack,showSaved}:{controller:Controller;goal:string;pack:unknown;showSaved:boolean}){
- const latest=currentSolutionProposals(controller.state);
+ const proposalNumber=(item:SolutionEvaluation)=>currentSolutionProposals(controller.state).findIndex(proposal=>proposal.id===item.id)+1;
+ const presentation=solutionReviewPresentation(controller.state);
+ const latest=[...(presentation.recommended?[presentation.recommended]:[]),...presentation.alternatives];
  const analyses=[...new Map(controller.state.analyses.map(item=>[item.id,item])).values()];
  return <section aria-label="Solution conversation review" className="space-y-3">
   {controller.pending&&<div role="status" className="flex items-center gap-3"><p>Thinking through the question and checking useful calculations…</p><button className={button} onClick={controller.cancel}>Cancel request</button></div>}
@@ -61,7 +65,9 @@ export function HomeSolutionConversationReview({controller,goal,pack,showSaved}:
    <ol className="list-decimal space-y-1 pl-5">{controller.state.questions.map((question,index)=><li key={index}>{question}</li>)}</ol>
    <p>Answer in chat for new or revised plans, or skip these questions and review any plan below. Your answers do not save a plan.</p>
   </section>}
-  {latest.map((item,index)=><Proposal key={item.id+item.revision} item={item} controller={controller} goal={goal} number={index+1}/>)}
+  {presentation.recommended&&<p aria-label="Recommendation summary" className="text-base leading-relaxed">Recommended: <strong>{presentation.recommended.candidate.name}</strong>. {presentation.recommended.candidate.objective}{/[.!?]$/.test(presentation.recommended.candidate.objective.trim())?' ':'. '}Review the steps and unknowns below before choosing; effectiveness is unproven.</p>}
+  {latest.map(item=><Proposal key={item.id+item.revision} item={item} controller={controller} goal={goal} number={proposalNumber(item)} recommended={item===presentation.recommended}/>)}
+  {!!presentation.earlier.length&&<details><summary className="min-h-11 cursor-pointer py-2">Earlier proposals ({presentation.earlier.length})</summary><p>Reference proposals from earlier turns. Review their context and unknowns before choosing.</p>{presentation.earlier.map(item=><Proposal key={item.id+item.revision} item={item} controller={controller} goal={goal} number={proposalNumber(item)}/>)}</details>}
   {!!latest.length&&<p className="text-sm">Ask for more alternatives, refine a plan by name, or combine ideas in chat. You can optionally focus on a team. New and revised proposals stay unsaved until you review and choose a plan.</p>}
   {showSaved&&controller.saved&&<details open><summary className="cursor-pointer py-2 font-semibold">Saved Action Plans</summary>{controller.saved.order.map(id=><PlanAlternativeCard key={id} plan={controller.saved!.plans.find(item=>item.id===id)!} catalog={controller.saved!} measurePack={pack} contextCurrent={false}/>)}</details>}
  </section>;
