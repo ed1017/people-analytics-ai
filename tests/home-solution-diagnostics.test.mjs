@@ -10,6 +10,29 @@ import {offlineBusinessRoute} from './helpers/offline-business-route.mjs';
 
 const secret='PRIVATE_PROMPT_ANSWER_NAME_PAY_KEY_HEADER_SENTINEL',token='legacy-v1:0';
 const source=data=>({status:'loaded',data}),signal=()=>new AbortController().signal,drain=()=>new Promise(resolve=>setImmediate(resolve));
+test('success reader timings project bounded allowlisted fields only and are detached from their input',t=>{
+ t.mock.method(console,'info',()=>{});const diagnostic=createSolutionDiagnostics();diagnostic.stage('grounding');
+ const values=[{reader:'skills',startedAfterMs:12.9,elapsedMs:1e20,data:secret},{reader:'skills',startedAfterMs:100,elapsedMs:20},{reader:secret,startedAfterMs:0,elapsedMs:0},{reader:'learning-development',startedAfterMs:-3,elapsedMs:NaN},new Proxy({},{get(){throw Error(secret);}})];
+ diagnostic.groundingComplete(values);values[0].reader=secret;
+ const result=diagnostic.success({modelRounds:0,toolCalls:0});
+ assert.deepEqual(result.groundingReaders,[{reader:'skills',startedAfterMs:12,elapsedMs:600000},{reader:'learning-development',startedAfterMs:0,elapsedMs:0}]);
+ assert.doesNotMatch(JSON.stringify(result),new RegExp(secret));
+ diagnostic.groundingComplete([{reader:'bls',startedAfterMs:0,elapsedMs:1}]);assert.equal(result.groundingReaders.length,2);
+ const bounded=createSolutionDiagnostics();bounded.stage('grounding');bounded.groundingComplete([...Array.from({length:14},()=>({reader:'skills',startedAfterMs:0,elapsedMs:1})),{reader:'bls',startedAfterMs:0,elapsedMs:1}]);assert.equal(bounded.success({}).groundingReaders.length,1);
+});
+
+test('verified success emits exact reader start offsets/durations without changing evidence or failing on diagnostics',async t=>{
+ t.mock.timers.enable({apis:['Date'],now:1000});const {body,results}=fixture(),pending=new Map(),timings=[];
+ const task=verifySolutionEvidence(body,{datasetToken:token,onReadersComplete:value=>timings.push(value),read:async key=>{
+  const wait=Promise.withResolvers();pending.set(key,wait);await wait.promise;return results[key];
+ }},signal());
+ await drain();t.mock.timers.tick(7);pending.get('attrition').resolve();await drain();t.mock.timers.tick(5);pending.get('bls').resolve();const result=await task;
+ assert.deepEqual(timings,[[{reader:'attrition',startedAfterMs:0,elapsedMs:7},{reader:'bls',startedAfterMs:0,elapsedMs:12}]]);
+ assert.equal(result.groundingReaders,undefined);
+ const again=await verifySolutionEvidence(body,{datasetToken:token,read:async key=>results[key],onReadersComplete:()=>{throw Error(secret);}},signal());
+ assert.equal(again.packetSha256,result.packetSha256);
+});
+
 test('successful requests record bounded stage and per-round usage counters without content or inferred usage',t=>{
  t.mock.timers.enable({apis:['Date'],now:1000});const logs=[];t.mock.method(console,'info',(...args)=>logs.push(args));t.mock.method(console,'error',(...args)=>logs.push(args));
  const diagnostic=createSolutionDiagnostics(),tick=ms=>t.mock.timers.tick(ms);

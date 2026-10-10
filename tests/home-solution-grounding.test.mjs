@@ -75,9 +75,12 @@ test('actual POST verifies aggregates before model use and rejects stale dataset
  const forged=structuredClone(body);forged.evidence.sources.find(s=>s.id==='W1').facts.headcount=999;
  assert.equal((await isolated.post(request(forged))).status,503);assert.equal(isolated.sandbox.__requests.length,0);
  isolated.sandbox.__replies.push(responseForStep(final('The supplied company-wide August exit observation does not establish causes or current availability.')));
- const response=await isolated.post(request(body));assert.equal(response.status,200,JSON.stringify(await response.json()));assert.equal(isolated.sandbox.__requests.length,1);
+ const response=await isolated.post(request(body)),payload=await response.json();assert.equal(response.status,200,JSON.stringify(payload));assert.equal(isolated.sandbox.__requests.length,1);
+ assert.deepEqual(payload.diagnostics.groundingReaders.map(item=>item.reader).sort(),['attrition','dashboard','skills']);
+ assert.ok(payload.diagnostics.groundingReaders.every(item=>Number.isInteger(item.startedAfterMs)&&Number.isInteger(item.elapsedMs)));
  const model=isolated.sandbox.__requests[0],context=JSON.parse(model.input[0].content.split('\n').slice(1).join('\n'));
  assert.equal(context.evidenceGrounding.datasetToken,token);assert.equal(context.currentEvidence.sources.find(s=>s.id==='W1').facts.headcount,17);
+ assert.equal(context.evidenceGrounding.groundingReaders,undefined);
  assert.match(model.instructions,/invent no effect sizes, savings, available resources or approvals/);
  assert.ok(!model.tools.some(tool=>['read_workforce_planning_playbook','evaluate_action_plans'].includes(tool.name)));
 });

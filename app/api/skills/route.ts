@@ -1,4 +1,5 @@
-import { withDatasetRequest } from "@/lib/dataset-runtime";
+import { withDatasetRequest, datasetRouter } from "@/lib/dataset-runtime";
+import {readFreshSkillGaps,readFreshSkillHeadcount} from '@/lib/home-fresh-skill-reads';
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
 
@@ -38,6 +39,7 @@ function round1(value: number) {
 
 async function handleGET() {
   try {
+    const client=datasetRouter.client() as typeof supabaseServer,token=datasetRouter.current().token;
     const [
       gapsResult,
       skillCountResult,
@@ -45,11 +47,7 @@ async function handleGET() {
       onetMappingResult,
       jobProfilesResult,
     ] = await Promise.all([
-      supabaseServer
-        .from("skills_proficiency_gap_summary")
-        .select(
-          "skill_id, skill_code, skill_name, skill_category, employees_in_roles_requiring_skill, employees_with_observed_proficiency, employees_meeting_requirement, employees_below_or_missing_requirement, avg_required_proficiency, avg_observed_proficiency, avg_proficiency_gap, profile_coverage_pct, requirement_met_pct, avg_requirement_weight"
-        ),
+      readFreshSkillGaps(client,token,'skills'),
 
       supabaseServer
         .from("skills")
@@ -59,10 +57,7 @@ async function handleGET() {
         })
         .eq("active", true),
 
-      supabaseServer
-        .from("dashboard_overview_current")
-        .select("headcount")
-        .single(),
+      readFreshSkillHeadcount(client,token),
 
       supabaseServer
         .from("job_onet_mapping")

@@ -14,6 +14,7 @@ const count=(value:unknown,max:number):number|null=>typeof value==='number'&&Num
 const providerModels=['gpt-6.1-sol'] as const;
 const providerTiers=['default','standard','auto','flex','scale','priority','fast','ultrafast'] as const;
 type ProviderRound={attempt:number;elapsedMs:number;inputBytes:number|null;instructionsBytes:number|null;toolSchemaBytes:number|null;model:string|null;serviceTier:string|null;inputTokens:number|null;cachedInputTokens:number|null;outputTokens:number|null;reasoningTokens:number|null;totalTokens:number|null};
+type GroundingReader={reader:typeof readers[number];startedAfterMs:number;elapsedMs:number};
 const providerClasses=['APIConnectionTimeoutError','APIConnectionError','APIUserAbortError','APIError','BadRequestError','AuthenticationError','PermissionDeniedError','NotFoundError','ConflictError','UnprocessableEntityError','RateLimitError','InternalServerError','SyntaxError','TypeError','RangeError','AbortError','TimeoutError','Error'] as const;
 const connectionCodes=['ECONNRESET','ECONNREFUSED','ENOTFOUND','EAI_AGAIN','ETIMEDOUT','EPIPE','UND_ERR_CONNECT_TIMEOUT','UND_ERR_HEADERS_TIMEOUT','UND_ERR_BODY_TIMEOUT','UND_ERR_SOCKET','UND_ERR_ABORTED','ABORT_ERR'] as const;
 function providerFailureDetails(error:unknown){
@@ -47,10 +48,20 @@ export function createSolutionDiagnostics(){
  const correlationId=crypto.randomUUID(),startedAt=Date.now();let stage:Stage='request_validation',modelAttempts=0,attemptStartedAt:number|null=null,reported=false;
  let stageStartedAt=startedAt,requestSizes={inputBytes:null,instructionsBytes:null,toolSchemaBytes:null} as Pick<ProviderRound,'inputBytes'|'instructionsBytes'|'toolSchemaBytes'>;
  const stageElapsedMs=Object.fromEntries(stages.map(key=>[key,0])) as Record<Stage,number>,providerRounds:ProviderRound[]=[];
+ let groundingReaders:GroundingReader[]=[];
  const closeStage=()=>{const at=Date.now();stageElapsedMs[stage]=bounded(stageElapsedMs[stage]+Math.max(0,at-stageStartedAt),600000);stageStartedAt=at;};
  const setStage=(value:Stage)=>{closeStage();stage=member(value,stages)??'request_validation';};
  return {
   stage:setStage,
+  groundingComplete(value:unknown){
+   if(reported||stage!=='grounding')return;
+   const safe:GroundingReader[]=[];
+   if(Array.isArray(value))for(let i=0;i<Math.min(value.length,readers.length);i++){
+    const entry=read(value,String(i)),reader=member(read(entry,'reader'),readers);
+    if(reader&&!safe.some(item=>item.reader===reader))safe.push({reader,startedAfterMs:bounded(read(entry,'startedAfterMs'),600000),elapsedMs:bounded(read(entry,'elapsedMs'),600000)});
+   }
+   groundingReaders=safe;
+  },
   modelAttempt(sizes?:unknown){
    setStage('provider');modelAttempts=Math.min(4,modelAttempts+1);attemptStartedAt=Date.now();
    requestSizes={inputBytes:count(read(sizes,'inputBytes'),900000),instructionsBytes:count(read(sizes,'instructionsBytes'),900000),toolSchemaBytes:count(read(sizes,'toolSchemaBytes'),900000)};
@@ -68,7 +79,7 @@ export function createSolutionDiagnostics(){
    // Numeric counters and allowlisted identifiers only; absent usage stays null.
    // response_validation includes local tool execution and continuation assembly.
    const diagnostic={version:1,correlationId,elapsedMs:bounded(Date.now()-startedAt,600000),stageElapsedMs:{...stageElapsedMs},modelAttempts,
-    modelRounds:bounded(read(usage,'modelRounds'),4),toolCalls:bounded(read(usage,'toolCalls'),6),providerRounds:providerRounds.map(round=>({...round}))};
+    modelRounds:bounded(read(usage,'modelRounds'),4),toolCalls:bounded(read(usage,'toolCalls'),6),providerRounds:providerRounds.map(round=>({...round})),groundingReaders:groundingReaders.map(reader=>({...reader}))};
    try{console.info('Home solution conversation completed',diagnostic);}catch{/* Logging cannot change a successful response. */}
    return diagnostic;
   },
