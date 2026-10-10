@@ -6,7 +6,7 @@ const source=(id,facts={count:0},status='loaded')=>({id,facts,status});
 const base={page:'home',goal:'Improve retention',hasConversation:false,evidenceReady:true,sources:[source('A1'),source('T1')]};
 test('Home starters remain simple while skills follow-ups are contextual and permit combined methods',()=>{
  assert.deepEqual(contextualPrompts({...base,goal:''}),[...homeGoalStarters]);
- assert.deepEqual(homeStarterGroups.map(group=>group.label),['Service delivery','People and capacity']);
+ assert.deepEqual(homeStarterGroups.map(group=>group.label),['Strategic Workforce Planning','People and capacity']);
  assert.deepEqual(homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.label)),decisionStarterLabels);
  assert.ok(homeStarterGroups.every(group=>group.purpose==='swp-business'));
  assert.ok(homeGoalStarters.every(prompt=>prompt.startsWith('Hypothetical scenario:')));
