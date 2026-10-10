@@ -51,6 +51,16 @@ export function resolveSalaryReference(input:HiringBudgetInput,datasetToken:stri
  return {status:'available',cohort,annualBasePerHire:c.meanAnnualBase*(c.payBasis==='annual_base_per_fte'?input.ftePerHire:1)};
 }
 const round=(n:number)=>Math.round((n+Number.EPSILON)*100)/100;
+function affordableHires(budget:number,perHire:number){
+ // Compare rounded group costs, as the budget check does; do not round the per-hire rate first.
+ let low=0,high=Math.floor((budget+.01)/perHire)+1;
+ if(!Number.isSafeInteger(high))return null;
+ while(low+1<high){
+  const middle=low+Math.floor((high-low)/2);
+  if(round(middle*perHire)<=budget)low=middle;else high=middle;
+ }
+ return low;
+}
 export function calculateHiringBudget(raw:HiringBudgetInput,datasetToken='unconnected',cohort?:unknown){
  const input=readHiringBudgetInput(raw),salary=resolveSalaryReference(input,datasetToken,cohort),missing:string[]=[];
  const annualBasePerHire=input.annualBasePay!==null?(input.payBasis==='per_hire'?input.annualBasePay:input.payBasis==='per_fte'&&input.ftePerHire!==null?input.annualBasePay*input.ftePerHire:null):salary.status==='available'?salary.annualBasePerHire:null;
@@ -85,13 +95,18 @@ export function calculateHiringBudget(raw:HiringBudgetInput,datasetToken='unconn
  }
  const complete=listedCost!==null&&input.otherCostsComplete===true&&input.ftePerHire!==null;
  const periodCost=complete?listedCost:null;
- const knownSubtotal=listedCost??baseCost;
+ const knownParts=activeYearFraction===null?[]:[
+  annualBasePerHire===null?null:annualBasePerHire*activeYearFraction,
+  input.annualAdditionalCostPerHire===null?null:input.annualAdditionalCostPerHire*activeYearFraction,
+  input.recruitingFeePerHire===null?null:activeYearFraction>0?input.recruitingFeePerHire:0,
+ ].filter((cost):cost is number=>cost!==null);
+ const knownSubtotal=listedCost??(positiveCount&&knownParts.length?round(input.hires!*knownParts.reduce((sum,cost)=>sum+cost,0)):null);
  const budgetStatus=input.currency&&input.budget!==null&&knownSubtotal!==null&&knownSubtotal>input.budget?'over':periodCost!==null&&input.budget!==null?'within':'unknown';
- const maxAffordableHires=complete&&perHire!==null&&perHire>0&&input.budget!==null?Math.floor(input.budget/perHire):null;
- return {input,salary,rateSource,annualBasePerHire,budgetPerHire,baseCost,listedCost,periodCost,budgetStatus,maxAffordableHires,activeYearFraction,annualRunRate:positiveCount&&annualBasePerHire!==null&&input.annualAdditionalCostPerHire!==null?round(input.hires!*(annualBasePerHire+input.annualAdditionalCostPerHire)):null,hiresInHorizon:activeYearFraction===null||!positiveCount?null:activeYearFraction>0?input.hires:0,rows,missing,limitations:[
+ const maxAffordableHires=complete&&perHire!==null&&perHire>0&&input.budget!==null?affordableHires(input.budget,perHire):null;
+ return {input,salary,rateSource,annualBasePerHire,budgetPerHire,baseCost,knownSubtotal,listedCost,periodCost,budgetStatus,maxAffordableHires,activeYearFraction,annualRunRate:positiveCount&&annualBasePerHire!==null&&input.annualAdditionalCostPerHire!==null?round(input.hires!*(annualBasePerHire+input.annualAdditionalCostPerHire)):null,hiresInHorizon:activeYearFraction===null||!positiveCount?null:activeYearFraction>0?input.hires:0,rows,missing,limitations:[
   'Budget per hire is an allowance for the specified budget period, not an annual salary or a market/company pay fact.',
   'Annual costs are divided by 12 and prorated by calendar days in each active month; recruiting cost is charged on arrival. All hires share the entered arrival date. The final month carries any cent-rounding residual.',
   'Later starts can reduce period cash but postpone staffing; they do not reduce the annual recurring rate. No ramp, attrition, salary growth or productivity effect is estimated.',
-  'Known base cost is a subtotal. Unknown non-base costs and fees are not zero; affordability requires explicit cost coverage. Internal moves and development need separate availability and cost evidence.',
+  'Known costs form a lower-bound subtotal including supplied base pay, non-base costs and recruiting fees. Missing components remain unknown; affordability requires explicit cost coverage. Internal moves and development need separate availability and cost evidence.',
  ],saved:false as const,operationalFeasibilityVerified:false as const};
 }
