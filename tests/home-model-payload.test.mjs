@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import OpenAI from 'openai';
+import {requiredStaffingTool} from '../lib/home-required-staffing.ts';
 import {hiringBudgetTool} from '../lib/home-hiring-budget.ts';
 import {businessPlanningTools} from '../lib/home-business-planning.ts';
 import {businessPlanningModelTools} from '../lib/home-model-tool-schemas.ts';
@@ -30,7 +31,7 @@ function expandSchema(root){
 }
 
 test('outbound shared definitions expand to every original field, constraint and tool attribute',()=>{
- const originals=[...businessPlanningTools,hiringBudgetTool];
+ const originals=[...businessPlanningTools,hiringBudgetTool,requiredStaffingTool];
  assert.equal(businessPlanningModelTools.length,originals.length);
  for(const [index,tool] of businessPlanningModelTools.entries()){
   const original=originals[index];
@@ -97,7 +98,7 @@ test('actual POST serializes shared strict schemas through the pinned SDK withou
  assert.equal(response.status,200);assert.equal(wire.length,1);assert.equal((await response.json()).answer,'FTE means full-time equivalent.');
  const request=wire[0];assert.equal(request.model,'gpt-6.1-sol');assert.deepEqual(request.reasoning,{effort:'medium'});assert.equal(request.service_tier,'default');assert.equal(Object.hasOwn(request,'temperature'),false);
  assert.equal(request.parallel_tool_calls,false);assert.equal(request.max_output_tokens,5000);assert.deepEqual(request.text,{format:solutionResponseFormat});
- for(const original of [...businessPlanningTools,hiringBudgetTool]){const sent=request.tools.find(tool=>tool.name===original.name);assert.deepEqual({...sent,parameters:expandSchema(sent.parameters)},original);}
+ for(const original of [...businessPlanningTools,hiringBudgetTool,requiredStaffingTool]){const sent=request.tools.find(tool=>tool.name===original.name);assert.deepEqual({...sent,parameters:expandSchema(sent.parameters)},original);}
  const options=isolated.sandbox.__requestOptions[0];assert.equal(options.timeout,60000);assert.equal(options.maxRetries,0);assert.equal(isolated.sandbox.module.exports.maxDuration,120);
  assert.equal(logs.length,1);assert.equal(logs[0][0],'Home solution conversation completed');
  const round=logs[0][1].providerRounds[0];assert.equal(round.inputTokens,100);assert.equal(round.cachedInputTokens,40);assert.equal(round.outputTokens,20);assert.equal(round.reasoningTokens,5);

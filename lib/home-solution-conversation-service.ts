@@ -2,6 +2,8 @@
 import {hiringBudgetTool,currentHiringBudget,hiringBudgetView,editHiringBudget} from './home-hiring-budget.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {answerEvidenceSeries,type ChatEvidenceSeries} from './chat-evidence-series.ts';
+// @ts-expect-error Native Node tests share application source.
+import {requiredStaffingTool,currentRequiredStaffing,requiredStaffingView,editRequiredStaffing} from './home-required-staffing.ts';
 import type {verifySolutionEvidence} from './home-solution-grounding.mjs';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {homeAnswerScopeViolation} from './home-answer-scope.ts';
@@ -89,7 +91,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  const referenced=!!demand&&runtime.demand?.referenceContract===true;let referenceStep=0;
  let currentDemandReference=referenced?demandReferenceId(request.requestId,referenceStep):'';
  let natural=runtime.natural?currentBusinessPlanning(request,runtime.natural.datasetToken):null,naturalStep=0;
- const modelContext={...solutionModelContext(request,progress),...(runtime.grounding?{evidenceGrounding:runtime.grounding}:{}),...(runtime.natural?{businessPlanning:businessPlanningView(natural,request.requestId,naturalStep),hiringBudget:hiringBudgetView(currentHiringBudget(request,runtime.natural.datasetToken))}:{})};
+ const modelContext={...solutionModelContext(request,progress),...(runtime.grounding?{evidenceGrounding:runtime.grounding}:{}),...(runtime.natural?{requiredStaffing:requiredStaffingView(currentRequiredStaffing(request,runtime.natural.datasetToken)),businessPlanning:businessPlanningView(natural,request.requestId,naturalStep),hiringBudget:hiringBudgetView(currentHiringBudget(request,runtime.natural.datasetToken))}:{})};
  if(referenced&&demand){const goalContext=structuredClone(request.goalContext) as {scenarioReview:Record<string,unknown>};goalContext.scenarioReview.demandProposal=demand.demandProposal?referencedDemandView(demand.demandProposal,demand,currentDemandReference):null;modelContext.goalContext=goalContext;}
  const input:unknown[]=[{role:'user',content:'CURRENT AUTHORITATIVE CONTEXT AND CONVERSATION DATA\n'+JSON.stringify({...modelContext,...(entryContext?{progressEntryDraft:entryContext.previous}:{} )})}];
  const evaluated=new Map<string,SolutionEvaluation>(),analyses=new Map<string,HeadcountProjection>();
@@ -105,11 +107,13 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   for(const call of output.calls){
    abort(signal);toolCalls++;operations+=callCost(call);let result:unknown;
    try{
-    const tool=runtime.natural&&call.name===hiringBudgetTool.name?hiringBudgetTool:runtime.natural&&businessPlanningTools.some(t=>t.name===call.name)?businessPlanningTools.find(t=>t.name===call.name):demand?[...(referenced?[reviewReferencedDemandTool,reviseReferencedDemandTool]:[serviceDemandTool,demandPatchTool]),...solutionTools.filter(t=>['read_clock','read_evidence'].includes(t.name))].find(t=>t.name===call.name):call.name==='propose_goal_progress'&&entryContext?goalProgressProposalTool:call.name==='read_goal_progress'&&progress?goalProgressReadTool:solutionTools.find(tool=>tool.name===call.name);if(!tool||call.arguments.length>32000)throw Error('Unsupported or oversized tool request.');const args=JSON.parse(call.arguments);
+    const tool=runtime.natural&&call.name===requiredStaffingTool.name?requiredStaffingTool:runtime.natural&&call.name===hiringBudgetTool.name?hiringBudgetTool:runtime.natural&&businessPlanningTools.some(t=>t.name===call.name)?businessPlanningTools.find(t=>t.name===call.name):demand?[...(referenced?[reviewReferencedDemandTool,reviseReferencedDemandTool]:[serviceDemandTool,demandPatchTool]),...solutionTools.filter(t=>['read_clock','read_evidence'].includes(t.name))].find(t=>t.name===call.name):call.name==='propose_goal_progress'&&entryContext?goalProgressProposalTool:call.name==='read_goal_progress'&&progress?goalProgressReadTool:solutionTools.find(tool=>tool.name===call.name);if(!tool||call.arguments.length>32000)throw Error('Unsupported or oversized tool request.');const args=JSON.parse(call.arguments);
     const periodFeedback=demand?demandPeriodFeedback(call.name,args):null;
     if(periodFeedback){input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(periodFeedback)});continue;}
     assertSolutionShape(args,tool.parameters,'tool arguments');
-    if(runtime.natural&&call.name===hiringBudgetTool.name){
+    if(runtime.natural&&call.name===requiredStaffingTool.name){
+     const next=editRequiredStaffing(request,runtime.natural.datasetToken,args.changes);state.requiredStaffing=next;result={requiredStaffing:requiredStaffingView(next),accepted:false,saved:false};
+    }else if(runtime.natural&&call.name===hiringBudgetTool.name){
      const next=editHiringBudget(request,runtime.natural.datasetToken,args.changes);
      state.hiringBudget=next;result={hiringBudget:hiringBudgetView(next),accepted:false,saved:false};
     }else if(runtime.natural&&businessPlanningTools.some(t=>t.name===call.name)){
