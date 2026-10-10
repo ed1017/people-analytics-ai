@@ -54,7 +54,42 @@ export function splitPlanDiscussion(answer:string){
  return {discussion:visible.join('\n').trim(),reference:reference.join('\n\n').trim()};
 }
 
-export type PlanDiscussion={discussion:string;reference:string;proposals:SolutionEvaluation[]};
+/** Move only explicitly labelled follow-up reading and assumptions. Unlabelled
+ * risks and caveats remain visible; the reported capacity explanation is retained below the plan. */
+export function splitPlanFollowUp(answer:string,questions:readonly string[]=[]){
+ const lines=answer.split('\n'),discussion:string[]=[],reading:string[]=[],notes:string[]=[],explanation:string[]=[];
+ let capacityRisk='';
+ const normalize=(value:string)=>value.replace(/\s+/g,' ').trim();
+ const readingTitle=(line:string)=>/^(?:#{1,6}\s+)?(?:\*\*)?Further (?:reading(?:\s*(?:and|\/|&)\s*investigations?)?|investigations?)(?:\*\*)?\s*:?$/i.test(line.trim());
+ for(let index=0;index<lines.length;){
+  if(!lines[index].trim()){discussion.push(lines[index++]);continue;}
+  let paragraphEnd=index+1;while(paragraphEnd<lines.length&&lines[paragraphEnd].trim()&&!heading(lines[paragraphEnd]))paragraphEnd++;
+  const paragraph=lines.slice(index,paragraphEnd).join('\n');
+  if(/^The decisive condition is whether qualified management hours cover demand when needed\b/.test(paragraph.replace(/(\*{1,2}|_{1,2})(?=\S)(.+?)\1/g,'$2').trim())){
+   explanation.push(paragraph);capacityRisk='Confirm that qualified management hours cover demand when needed.';index=paragraphEnd;continue;
+  }
+  if(questions.some(question=>normalize(question)===normalize(paragraph))){reading.push(paragraph);index=paragraphEnd;continue;}
+  const inlineReading=lines[index].trim().match(/^(?:\*\*)?Further (?:reading(?:\s*(?:and|\/|&)\s*investigations?)?|investigations?)(?:\*\*)?:\s+(.+)$/i);
+  if(inlineReading){
+   let end=index+1;while(end<lines.length&&lines[end].trim()&&!heading(lines[end]))end++;
+   reading.push([inlineReading[1],...lines.slice(index+1,end)].join('\n'));index=end;continue;
+  }
+  if(readingTitle(lines[index])){
+   const level=lines[index].trim().match(/^(#{1,6})\s/)?.[1].length??6;
+   let end=index+1;while(end<lines.length){const next=heading(lines[end]);if(next&&next.level<=level)break;end++;}
+   reading.push(lines.slice(index+1,end).join('\n').trim());index=end;continue;
+  }
+  // These are the exact verbose paragraph labels used in the reported UI.
+  if(/^(?:\*\*)?(?:Missing factual inputs|Editable scenario assumptions)(?:\*\*)?\s*[:—–-]/i.test(lines[index].trim())){
+   let end=index+1;while(end<lines.length&&lines[end].trim()&&!heading(lines[end]))end++;
+   notes.push(lines.slice(index,end).join('\n'));index=end;continue;
+  }
+  discussion.push(lines[index++]);
+ }
+ return {discussion:discussion.join('\n').trim(),furtherReading:reading.filter(Boolean).join('\n\n'),planningNotes:notes.join('\n\n'),explanation:explanation.join('\n\n'),capacityRisk};
+}
+
+export type PlanDiscussion={discussion:string;reference:string;furtherReading:string;planningNotes:string;explanation:string;capacityRisk:string;proposals:SolutionEvaluation[]};
 /** Pair by both user and assistant turn, backwards and once only. Identical
  * replies, discard events and revised candidates cannot borrow another turn's card. */
 export function solutionDiscussionPresentations(messages:ChatMessage[],state:SolutionState):Map<ChatMessage,PlanDiscussion>{
@@ -69,7 +104,8 @@ export function solutionDiscussionPresentations(messages:ChatMessage[],state:Sol
   const proposals=[...new Map(state.working.filter(item=>item.message.id===turn.id).map(item=>[item.id,item])).values()];
   if(!proposals.length)continue;
   const split=splitPlanDiscussion(message.content);
-  if(split.reference)result.set(message,{...split,proposals});
+  const followUp=splitPlanFollowUp(split.discussion,state.questions);
+  if(split.reference||followUp.furtherReading||followUp.planningNotes||followUp.explanation)result.set(message,{...split,...followUp,proposals});
  }
  return result;
 }
