@@ -1,4 +1,5 @@
 'use client';
+import {readChatEvidenceSeries,type ChatEvidenceSeries} from '@/lib/chat-evidence-series';
 import {prepareBusinessPlanningSelection,businessPlanningSelectionFields,businessPlanningReceiptField,type BusinessPlanningSelection} from '@/lib/home-business-planning-save';
 import {currentBusinessPlanning} from '@/lib/home-business-planning';
 import {datasetFetch} from '@/lib/dataset-client.mjs';
@@ -22,6 +23,7 @@ import {homeConversationErrorMessage} from '@/lib/home-evidence-recovery.mjs';
 type Props={enabled:boolean;conversation:ProblemConversation;active:boolean;settled:boolean;evidence:unknown;planningContext?:()=>unknown;planningCalculatorAvailable?:()=>boolean;demandReviewRef?:RefObject<((review:DemandReview)=>void)|null>;scope:string;query:string;target:()=>BundleDiscussion|null;guided?:GuidedActionRegistry|null};
 const equal=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 export function useHomeSolutionConversation(props:Props){
+ const answerSeries=useRef<ChatEvidenceSeries[]>([]);
  const storage=useDecisionStorage(),[memory,setMemory]=useState<SolutionState>(emptySolutionState),[pending,setPending]=useState(false),[saving,setSaving]=useState(false),[notice,setNotice]=useState('');
  const controller=useRef<AbortController|null>(null),epoch=useRef(0),mounted=useRef(false),memoryRef=useRef(memory),currentProps=useRef(props);
  useLayoutEffect(()=>{currentProps.current=props;});
@@ -54,7 +56,7 @@ export function useHomeSolutionConversation(props:Props){
   return readSolutionRequest({version:1,planningCalculatorAvailable:p.planningCalculatorAvailable?.()===true,requestId:crypto.randomUUID(),goal:{id:p.conversation.activeGoalId,statement:p.conversation.focusedIssue},scope:p.scope,filters:{country:params.get('country')||'all',org:params.get('org')||'all',level:params.get('level')||'all'},timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,evidence:p.evidence,goalContext:p.planningContext?.()?{goalContext:p.conversation.goalContext,scenarioReview:p.planningContext()}:p.conversation.goalContext,...(progress?{progressEntry:progressEntryContext(decisionStore,'context',[{id:'context',text}])?.previous??null}:{}),...(progress?{goalProgress:progress}:{}),selectedId:selectedPlanId(current),catalog:current,state:memoryRef.current,message:{id:crypto.randomUUID(),text}});
  }
  async function send(text:string){
-  if(controller.current||saving)return;requireCurrent();const request=makeRequest(text),entryContext=progressEntryContext(decisionStore,request.requestId,[...request.state.turns.filter(t=>t.role==='user').map(({id,text})=>({id,text})),request.message]),captured=++epoch.current,key=liveKey.current,scenario=JSON.stringify(currentProps.current.planningContext?.()??null),abort=new AbortController();controller.current=abort;setPending(true);setNotice('');
+  if(controller.current||saving)return;requireCurrent();const request=makeRequest(text),entryContext=progressEntryContext(decisionStore,request.requestId,[...request.state.turns.filter(t=>t.role==='user').map(({id,text})=>({id,text})),request.message]),captured=++epoch.current,key=liveKey.current,scenario=JSON.stringify(currentProps.current.planningContext?.()??null),abort=new AbortController();controller.current=abort;answerSeries.current=[];setPending(true);setNotice('');
   const current=()=>!abort.signal.aborted&&mounted.current&&captured===epoch.current&&key===liveKey.current&&scenario===JSON.stringify(currentProps.current.planningContext?.()??null)&&equal(request.goalProgress,captureGoalProgressInput(decisionStore,currentProps.current.conversation.activeGoalId))&&equal(request.catalog,catalog())&&selectedPlanId(catalog())===(request.selectedId??null);
   try{
    const response=await datasetFetch('/api/home-solution-conversation',{method:'POST',headers:{'Content-Type':'application/json',...swpConversationHeaders(request.goalContext)},body:JSON.stringify(request),signal:abort.signal});const data=await response.json();
@@ -64,7 +66,7 @@ export function useHomeSolutionConversation(props:Props){
    const demandContext=reply.demandReview?requestDemandContext(request,decisionStore.getDatasetToken()):null;
    const demandReview=reply.demandReview&&demandContext?readDemandReview(reply.demandReview,demandContext):null;
    if(reply.demandReview&&(!demandReview||!currentProps.current.demandReviewRef?.current||reply.demandReview.requestId!==request.requestId))throw Error('The business demand review does not match this request.');
-   requireCurrent();persist(state);if(reply.progressProposal){if(!entryContext)throw Error('Progress entry is not enabled.');await retainProgressEntryProposal(decisionStore,reply.progressProposal,entryContext,{current});if(!current())return null;}const p=currentProps.current,guided=p.guided;if(guided?.goalId&&(!p.conversation.activeGoalId||p.conversation.activeGoalId===guided.goalId)&&reply.candidateIds.length)guided.emit({type:'proposal-reviewed',goalId:guided.goalId,planId:reply.candidateIds[0],candidates:state.working.filter(item=>reply.candidateIds.includes(item.id)&&item.requestId===request.requestId).map(({id,revision,requestId})=>({id,revision,requestId}))});if(demandReview)p.demandReviewRef?.current?.(demandReview);return reply.answer;
+   requireCurrent();persist(state);if(reply.progressProposal){if(!entryContext)throw Error('Progress entry is not enabled.');await retainProgressEntryProposal(decisionStore,reply.progressProposal,entryContext,{current});if(!current())return null;}const p=currentProps.current,guided=p.guided;if(guided?.goalId&&(!p.conversation.activeGoalId||p.conversation.activeGoalId===guided.goalId)&&reply.candidateIds.length)guided.emit({type:'proposal-reviewed',goalId:guided.goalId,planId:reply.candidateIds[0],candidates:state.working.filter(item=>reply.candidateIds.includes(item.id)&&item.requestId===request.requestId).map(({id,revision,requestId})=>({id,revision,requestId}))});if(demandReview)p.demandReviewRef?.current?.(demandReview);answerSeries.current=readChatEvidenceSeries(reply.charts,request.requestId,decisionStore.getDatasetToken());return reply.answer;
   }catch(error){if(current())throw error;return null;}finally{if(controller.current===abort){controller.current=null;setPending(false);}}
  }
  function cancel(){epoch.current++;controller.current?.abort();controller.current=null;setPending(false);setNotice('Request cancelled. Your draft and saved work are kept.');}
@@ -114,5 +116,5 @@ export function useHomeSolutionConversation(props:Props){
   }catch(error){setNotice((error as Error).message);}finally{setSaving(false);}
  }
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
- return {clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {answerSeries,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }

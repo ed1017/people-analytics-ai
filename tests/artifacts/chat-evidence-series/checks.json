@@ -1,0 +1,24 @@
+{
+  "checks": [
+    "desktop Headcount snapshots uses returned values and explicitly labels recorded data",
+    "desktop Headcount snapshots shows a compact discrete chart, without a forecast line",
+    "desktop Monthly hires uses returned values and explicitly labels recorded data",
+    "desktop Monthly hires shows a compact discrete chart, without a forecast line",
+    "desktop Monthly voluntary turnover uses returned values and explicitly labels recorded data",
+    "desktop Monthly voluntary turnover shows a compact discrete chart, without a forecast line",
+    "desktop 6.2% YTD alone adds no trend or projection",
+    "desktop uncited answer cannot borrow another answer chart",
+    "desktop no overflow, runtime errors or external calls",
+    "desktop reset removes old charts with their messages",
+    "phone Headcount snapshots uses returned values and explicitly labels recorded data",
+    "phone Headcount snapshots shows a compact discrete chart, without a forecast line",
+    "phone Monthly hires uses returned values and explicitly labels recorded data",
+    "phone Monthly hires shows a compact discrete chart, without a forecast line",
+    "phone Monthly voluntary turnover uses returned values and explicitly labels recorded data",
+    "phone Monthly voluntary turnover shows a compact discrete chart, without a forecast line",
+    "phone 6.2% YTD alone adds no trend or projection",
+    "phone uncited answer cannot borrow another answer chart",
+    "phone no overflow, runtime errors or external calls",
+    "phone reset removes old charts with their messages"
+  ]
+}
