@@ -92,6 +92,8 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  let currentDemandReference=referenced?demandReferenceId(request.requestId,referenceStep):'';
  let natural=runtime.natural?currentBusinessPlanning(request,runtime.natural.datasetToken):null,naturalStep=0;
  let staffingRequired=!!runtime.natural&&requiresRequiredStaffing(request),staffingCalculated=false;
+ // Only the already selected, standalone comparison can finish from its first tool result.
+ const standaloneStaffing=staffingRequired&&!demand&&!entryContext&&!request.goal.id&&!request.goal.statement&&!request.goalContext&&!request.selectedId&&!request.catalog&&!state.working.length&&!state.analyses.length&&!state.constraints.length&&!state.verifiedMetrics.length&&!state.focusCandidateId;
  const modelContext={...solutionModelContext(request,progress),...(runtime.grounding?{evidenceGrounding:runtime.grounding}:{}),...(runtime.natural?{requiredStaffing:requiredStaffingView(currentRequiredStaffing(request,runtime.natural.datasetToken)),businessPlanning:businessPlanningView(natural,request.requestId,naturalStep),hiringBudget:hiringBudgetView(currentHiringBudget(request,runtime.natural.datasetToken))}:{})};
  if(referenced&&demand){const goalContext=structuredClone(request.goalContext) as {scenarioReview:Record<string,unknown>};goalContext.scenarioReview.demandProposal=demand.demandProposal?referencedDemandView(demand.demandProposal,demand,currentDemandReference):null;modelContext.goalContext=goalContext;}
  const input:unknown[]=[{role:'user',content:'CURRENT AUTHORITATIVE CONTEXT AND CONVERSATION DATA\n'+JSON.stringify({...modelContext,...(entryContext?{progressEntryDraft:entryContext.previous}:{} )})}];
@@ -180,6 +182,11 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
     if(JSON.stringify(result).length>65000){if(call.name===requiredStaffingTool.name)staffingCalculated=false;result={ok:false,error:'The read result exceeds the tool budget. Request fewer source IDs.'};}
    }catch(error){abort(signal);result={ok:false,error:error instanceof Error?error.message:'The read or calculation was unavailable.',instruction:'Explain the boundary, ask a focused question, or revise typed inputs. Do not claim this calculation succeeded.'};}
    input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(result)});
+  }
+  if(standaloneStaffing&&round===0&&output.calls.length===1&&output.calls[0].name===requiredStaffingTool.name&&staffingCalculated&&state.requiredStaffing){
+   final={answer:requiredStaffingAnswer(state.requiredStaffing),candidateIds:[],analysisIds:[],verifiedMetrics:[],constraintUpdates:[],rejected:[],questions:[],focusCandidateId:null};
+   assertSolutionShape(final,solutionFinalSchema,'answer');
+   break;
   }
  }
  if(!final)throw Error('No complete conversational answer was returned.');

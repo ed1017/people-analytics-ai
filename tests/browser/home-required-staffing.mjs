@@ -32,12 +32,12 @@ try{for(const [mode,width,height] of [['desktop',1440,1100],['phone',390,844]]){
    const body=req.postDataJSON();requests.push(body);
    if(isolated){
     const steps=fixedSteps(body),start=isolated.sandbox.__requests.length;
-    isolated.sandbox.__replies.push(responseForStep(steps[0],0),null);const shift=isolated.sandbox.__replies.shift.bind(isolated.sandbox.__replies);
-    isolated.sandbox.__replies.shift=()=>shift()??responseForStep(steps[1](isolated.sandbox.__requests.at(-1).input),1);
-    const response=await isolated.post(new Request(req.url(),{method:req.method(),headers:req.headers(),body:req.postData()})),reply=await response.json();isolated.sandbox.__replies.shift=shift;
-    assert.equal(response.status,200,JSON.stringify(reply));assert.equal(isolated.sandbox.__requests.length-start,2);
+    isolated.sandbox.__replies.push(responseForStep(steps[0],0));
+    const response=await isolated.post(new Request(req.url(),{method:req.method(),headers:req.headers(),body:req.postData()})),reply=await response.json();
+    assert.equal(response.status,200,JSON.stringify(reply));assert.equal(isolated.sandbox.__requests.length-start,1);
     assert.deepEqual(JSON.parse(JSON.stringify(isolated.sandbox.__requests[start].tool_choice)),{type:'function',name:'compare_required_staffing'});
-    if(reply.providerReceipt)assert.equal(reply.providerReceipt.modelAttempts,2);
+    assert.deepEqual(JSON.parse(JSON.stringify(isolated.sandbox.__requests[start].tools.map(t=>t.name))),['compare_required_staffing']);
+    if(reply.providerReceipt)assert.equal(reply.providerReceipt.modelAttempts,1);
     return route.fulfill({json:reply});
    }
    const runtime=fixtureRuntime(fixedSteps(body));runtime.natural={datasetToken:'legacy-v1:0'};
