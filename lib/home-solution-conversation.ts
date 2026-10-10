@@ -1,5 +1,7 @@
 // @ts-expect-error Native Node tests share application source.
 import {readHiringBudgetReview,type HiringBudgetReview} from './home-hiring-budget.ts';
+// @ts-expect-error Native Node tests share application source.
+import {readRequiredStaffingReview,type RequiredStaffingReview} from './home-required-staffing.ts';
 import type {BusinessPlanning} from './home-business-planning';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {readBusinessPlanning} from './home-business-planning.ts';
@@ -14,6 +16,8 @@ import {assertSolutionShape,solutionParameterEditSchema,solutionCandidateSchema,
 import {actionBinding,actionBindingKey,validActionBinding} from './home-action-drafts.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {createBundleDraft,readBundleDraft,reviewBundleProposal as reconcileBundle,unknownAssumption,bundleInputKey} from './home-bundle-reconciliation.ts';
+// @ts-expect-error Native fixture tests share TypeScript source.
+import {measurementScope} from './home-success-measures.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {bundleSignature,componentOrder} from './home-solution-bundles.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
@@ -33,7 +37,7 @@ export const solutionConversationField='homeSolutionConversationV1';
 export type SolutionTurn={id:string;role:'user'|'assistant';text:string};
 export const solutionProvenanceVersion=1 as const;
 export type SolutionEvaluation={provenanceVersion?:1;id:string;revision:number;requestId:string;message:{id:string;text:string};candidate:SolutionCandidate;binding:ActionBinding;draft:BundleDraft|null;result:BundleResult|null;sourceRefs:AlternativeSourceRef[];sourceKeys:Record<string,string>;constraints:SolutionConstraint[];interpretations:string[];changes:string[];issues:string[];blocking:string[]};
-export type SolutionState={hiringBudget?:HiringBudgetReview|null;businessPlanning?:BusinessPlanning|null;datasetEvidenceContexts?:ReturnType<typeof readCandidateHomeContext>[];version:1;verifiedMetrics:SolutionMetricRef[];turns:SolutionTurn[];constraints:SolutionConstraint[];working:SolutionEvaluation[];analyses:HeadcountProjection[];rejected:{candidateId:string;revision:number;reason:string;turnId:string}[];questions:string[];focusCandidateId:string|null};
+export type SolutionState={requiredStaffing?:RequiredStaffingReview|null;hiringBudget?:HiringBudgetReview|null;businessPlanning?:BusinessPlanning|null;datasetEvidenceContexts?:ReturnType<typeof readCandidateHomeContext>[];version:1;verifiedMetrics:SolutionMetricRef[];turns:SolutionTurn[];constraints:SolutionConstraint[];working:SolutionEvaluation[];analyses:HeadcountProjection[];rejected:{candidateId:string;revision:number;reason:string;turnId:string}[];questions:string[];focusCandidateId:string|null};
 export type SolutionRequest={version:1;planningCalculatorAvailable?:boolean;requestId:string;goal:{id:string;statement:string};scope:string;filters:DashboardFilters;timeZone:string;evidence:unknown;goalContext:unknown;goalProgress?:unknown;progressEntry?:unknown;selectedId:string|null;catalog:PlanAlternatives|null;state:SolutionState;message:{id:string;text:string}};
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 function fail(message:string):never {throw Error(message);}
@@ -50,6 +54,7 @@ export function readSolutionState(raw:unknown):SolutionState {
  if(!validateJson(raw)||!obj(raw)||raw.version!==1||!Array.isArray(raw.turns)||raw.turns.length>32||!Array.isArray(raw.constraints)||raw.constraints.length>5||!Array.isArray(raw.working)||raw.working.length>12||!Array.isArray(raw.rejected)||raw.rejected.length>24||!Array.isArray(raw.questions)||raw.questions.length>2||!raw.questions.every(q=>text(q,300))||!(raw.focusCandidateId===null||id(raw.focusCandidateId)))fail('The working conversation could not be read. Saved plans are preserved.');
  if(raw.datasetEvidenceContexts!==undefined){if(!Array.isArray(raw.datasetEvidenceContexts)||raw.datasetEvidenceContexts.length>16)fail('Evidence recipes exceed the supported limit.');raw.datasetEvidenceContexts.forEach(readCandidateHomeContext);}
  const state=raw as unknown as SolutionState;
+ if(state.requiredStaffing!==undefined)state.requiredStaffing=readRequiredStaffingReview(state.requiredStaffing);
  if(state.hiringBudget!==undefined)state.hiringBudget=readHiringBudgetReview(state.hiringBudget);
  if(state.businessPlanning!==undefined)state.businessPlanning=readBusinessPlanning(state.businessPlanning);
  state.analyses=readHeadcountProjections(state.analyses);
@@ -379,9 +384,12 @@ export async function evaluateSolutionCandidate(request:SolutionRequest,candidat
   input.costsDistinct=resolved.size<=1&&base?structuredClone(base.draft.inputs.costsDistinct):unknownAssumption();
   input.dependenciesConfirmed=changed?unknownAssumption():input.dependenciesConfirmed;
   if(base?.draft.inputs.capacity&&!changed)Object.assign(input,structuredClone(base.draft.inputs));
-  if(!input.successMeasure)input.successMeasure={goal,scopeKey:JSON.stringify([goal,request.scope]),name:candidate.successMeasure,baseline:unknownAssumption(),target:unknownAssumption()};
+  const newMeasure=!input.successMeasure;
+  if(!input.successMeasure)input.successMeasure={goal,scopeKey:measurementScope(input),name:candidate.successMeasure,baseline:unknownAssumption(),target:unknownAssumption()};
   if(input.successMeasure.goal!==goal)fail('A saved outcome measure belongs to another goal; review it explicitly.');
   applyReviewedInputs(request,evaluation,input,candidate.quantities,constraints,components.map(item=>item.id));
+  // Bind new measures after this turn's scope inputs; retained measures must stay stale after a scope change.
+  if(newMeasure)input.successMeasure.scopeKey=measurementScope(input);
   // Model same-people links are proposals, never user confirmation. Preserve only existing source identity.
   const audienceDone=new Set<string>(),audienceVisiting=new Set<string>();
   const audience=(activityId:string)=>{if(audienceDone.has(activityId))return;const activity=candidate.activities.find(item=>item.id===activityId);if(!activity||audienceVisiting.has(activityId))fail('The same-people reference is missing or circular.');audienceVisiting.add(activityId);if(activity.audienceOf){audience(activity.audienceOf);const shared=input.memberships.find(row=>row.componentId===activity.audienceOf)!,own=input.memberships.find(row=>row.componentId===activityId)!;const inherited=own.complete.value===true&&shared.complete.value===true&&same(own.groupIds,shared.groupIds)&&own.groupIds.length>0;if(!inherited){own.complete=unknownAssumption();input.groupsDisjoint=unknownAssumption();}evaluation.interpretations.push(`${activity.name}: ${inherited?'retains checked source participation':'proposes shared participation, still unconfirmed'} with ${candidate.activities.find(row=>row.id===activity.audienceOf)!.name}. A model reference or conversation turn does not confirm cohort identity.`);}audienceVisiting.delete(activityId);audienceDone.add(activityId);};

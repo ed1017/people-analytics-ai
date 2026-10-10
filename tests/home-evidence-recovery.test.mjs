@@ -45,7 +45,7 @@ test('actual POST distinguishes auth/read/facts failures, preserves evidence and
   logs.length=0;
   isolated.sandbox.__aggregateFailure=kind==='auth'?{reader:'workforce',status:503,code:'PGRST303'}:kind==='http'?{reader:'workforce',status:500}:undefined;
   isolated.sandbox.__aggregateSources=kind==='facts'?{workforce:{status:'loaded',data:{...data,summary:{headcount:101,fte:101}}}}:results;
-  const response=await post(),payload=await response.json(),event=logs.at(-1)[1],message=homeConversationErrorMessage(payload);
+  const response=await post(),payload=await response.json(),event=JSON.parse(logs.at(-1)[1]),message=homeConversationErrorMessage(payload);
   assert.equal(response.status,503);assert.equal(payload.code,kind==='auth'?'evidence_source_auth_unavailable':kind==='http'?'evidence_reader_failed':'evidence_facts_changed');
   assert.equal(event.stage,'grounding');assert.equal(event.modelAttempts,0);assert.equal(isolated.sandbox.__requests.length,0);
   assert.equal(JSON.stringify(body),before);assert.equal(payload.state,undefined);assert.equal(payload.answer,undefined);

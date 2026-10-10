@@ -5,6 +5,7 @@ import {ActionPlanQuickSummary} from './action-plan-quick-summary';
 import {ChatContent} from './chat-content';
 import {useState} from 'react';
 import {solutionReviewPresentation} from '@/lib/home-plan-presentation';
+import {HomeRequiredStaffingReview} from './home-required-staffing-review';
 import {HomeBusinessPlanningReview} from './home-business-planning-review';
 import type {useHomeSolutionConversation} from './use-home-solution-conversation';
 import {resolveSolutionMetric,currentSolutionProposals,type SolutionEvaluation} from '@/lib/home-solution-conversation';
@@ -64,7 +65,8 @@ export function HomeSolutionConversationReview({controller,goal,pack,showSaved,p
   {!!controller.state.constraints.length&&<details><summary className="cursor-pointer py-2 text-sm">Current interpreted constraints</summary>{controller.state.constraints.map(item=><p key={item.field} className="text-sm">{item.field.replaceAll('_',' ')}: {item.action==='remove'?'Removed':item.number??item.text} {item.unit}. Correct this in chat if needed.</p>)}</details>}
   {!!controller.state.verifiedMetrics.length&&<section aria-label="Checked quantitative results" className="rounded border p-3 text-sm"><h3 className="font-semibold">Checked quantitative results</h3>{controller.state.verifiedMetrics.map((ref,index)=>{const metric=resolveSolutionMetric(controller.state,ref);return <p key={index}>{metric.label}: {number(metric.value)} {metric.unit}. {metric.basis} · {metric.source}.</p>;})}<p>Effectiveness and savings are not established by these calculations.</p></section>}
   {controller.state.hiringBudget&&<HomeHiringBudgetReview key={controller.state.hiringBudget.revision} review={controller.state.hiringBudget} onUpdate={controller.updateHiringBudget} disabled={controller.pending||controller.saving||!controller.canSend}/>}
-  <HomeBusinessPlanningReview controller={controller}/>
+  {controller.state.requiredStaffing&&<HomeRequiredStaffingReview review={controller.state.requiredStaffing} onClear={controller.clearRequiredStaffing} disabled={controller.pending||controller.saving||!controller.canSend}/>}
+  {controller.state.requiredStaffing&&controller.state.businessPlanning?<details><summary className="min-h-11 cursor-pointer py-2">Separate workload assumptions</summary><HomeBusinessPlanningReview controller={controller}/></details>:<HomeBusinessPlanningReview controller={controller}/>}
   {analyses.map(item=><SolutionProjectionChart key={item.id+item.revision} analysis={item}/>)}
   {latest.map(item=><Proposal key={item.id+item.revision} item={item} controller={controller} goal={goal} number={proposalNumber(item)} recommended={item===presentation.recommended} notes={item===presentation.recommended?planningNotes:undefined} capacityRisk={item===presentation.recommended?capacityRisk:undefined}/>)}
   {!!presentation.earlier.length&&<details><summary className="min-h-11 cursor-pointer py-2">Earlier proposals ({presentation.earlier.length})</summary><p>Reference proposals from earlier turns. Review their context and unknowns before choosing.</p>{presentation.earlier.map(item=><Proposal key={item.id+item.revision} item={item} controller={controller} goal={goal} number={proposalNumber(item)}/>)}</details>}

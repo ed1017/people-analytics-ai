@@ -14,9 +14,9 @@ const readers={
  'workforce-planning':()=>import('../app/api/workforce-planning/route'),'position-modeling':()=>import('../app/api/position-modeling/route'),
  finance:()=>import('../app/api/finance/route'),bls:()=>import('../app/api/bls/route'),
 };
-export async function groundSolutionRequest(request:SolutionRequest,signal:AbortSignal){
+export async function groundSolutionRequest(request:SolutionRequest,signal:AbortSignal,onDiagnostic?:(value:unknown)=>void){
  const datasetToken=datasetRouter.current().token;
- return verifySolutionEvidence(request,{datasetToken,read:async(key:string,filters:DashboardFilters,readSignal:AbortSignal)=>{
+ return verifySolutionEvidence(request,{datasetToken,onDiagnostic,read:async(key:string,filters:DashboardFilters,readSignal:AbortSignal)=>{
   readSignal.throwIfAborted();
   if(!Object.hasOwn(readers,key))throw Error('Unsupported aggregate source');
   const query=key==='dashboard'?'?'+new URLSearchParams(filters).toString():'';
