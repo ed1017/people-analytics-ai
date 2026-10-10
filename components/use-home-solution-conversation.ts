@@ -92,7 +92,7 @@ export function useHomeSolutionConversation(props:Props){
    p.conversation.selectProposalGoal(desired,snapshot.data.revision,{[planAlternativesField]:packPlanAlternatives(selected) as unknown as Json,[solutionConversationField]:state as unknown as Json,[alternativeViewField]:{version:1,selectedId:outcome.plan.id,collapsed:false}});
    memoryRef.current=state;setMemory(state);
    p.guided?.emit({type:'proposal-chosen',goalId:desired.id,goal:desired.statement,planId:outcome.plan.id,number:outcome.plan.number,candidate:{id:item.id,revision:item.revision,requestId:item.requestId}});
-   setNotice(`Action Plan #${outcome.plan.number} attached as a proposal to “${desired.statement}”.`);
+   setNotice(`Action Plan #${outcome.plan.number} pinned with the goal “${desired.statement}”.`);
   }catch(error){setNotice(error instanceof Error?error.message:'The proposal could not be saved.');}finally{setSaving(false);}
  }
  function reject(item:SolutionEvaluation){try{requireCurrent();const state=structuredClone(memoryRef.current),turnId=crypto.randomUUID();state.turns=[...state.turns,{id:turnId,role:'user' as const,text:`Discard proposal ${item.candidate.name}, revision ${item.revision}.`}].slice(-32);state.rejected=[...state.rejected,{candidateId:item.id,revision:item.revision,reason:'Discarded using the proposal review control.',turnId}].slice(-24);if(state.focusCandidateId===item.id)state.focusCandidateId=null;persist(state);}catch(error){setNotice((error as Error).message);}}

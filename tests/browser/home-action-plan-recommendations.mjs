@@ -114,11 +114,11 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
   check(mode+' '+kind+' direct review links focus the actual card without saving',await navigation.getByRole('button').count()===expectedCount&&await articles.first().evaluate(node=>document.activeElement===node)&&JSON.stringify(await state())===beforeReview);
   const questions=page.getByRole('region',{name:'Optional questions before choosing a plan'});
   check(mode+' '+kind+' optional questions follow the proposals in the answer and precede review controls',working(s).turns.at(-1).text.indexOf('Proposed Action Plan '+expectedCount)<working(s).turns.at(-1).text.indexOf('Optional questions before choosing:')&&await questions.getByRole('listitem').count()===2&&await questions.evaluate(node=>Boolean(node.compareDocumentPosition(document.querySelector('[aria-label^="Working proposal:"]'))&Node.DOCUMENT_POSITION_FOLLOWING)));
-  check(mode+' '+kind+' questions impose no form or selection lock',await questions.getByRole('textbox').count()===0&&await articles.first().getByRole('button',{name:'Choose this plan with unknowns',exact:true}).isEnabled());
+  check(mode+' '+kind+' questions impose no form or selection lock',await questions.getByRole('textbox').count()===0&&await articles.first().getByRole('button',{name:'Pin Action Plan with unknowns',exact:true}).isEnabled());
   await page.screenshot({path:path.join(output,mode+'-'+kind+'-plans.png'),fullPage:true});
  }
  await send('Combine the pilot activities as a fourth proposal.','The additional pilot combination is ready for review.');
- check(mode+' a later individually checked hybrid preserves four current proposals',await page.getByRole('article',{name:/^Working proposal:/}).count()===4);
+ check(mode+' a later individually checked hybrid preserves four current proposals',await page.locator('article[aria-label^="Working proposal:"]').count()===4);
  const beforeAnswer=working(await state());
  await send('The product owner can own the pilot review for the first plan. Keep its other activities.','The first plan now has a product owner for pilot review; scope is still unknown.');
  const afterAnswer=working(await state()),revised=afterAnswer.working.at(-1);
@@ -130,11 +130,11 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
  await send('Combine the delivery activities from the first two proposed plans.','The combined delivery proposal is ready to review; overlap and costs remain unknown.');
  await send('Keep the combined approach but use a product owner for the first activity.','The revised combined proposal is ready to review.');
  let current=await state(),combined=working(current).working.at(-1);
- check(mode+' more than four current plans remain reviewable',await page.getByRole('article',{name:/^Working proposal:/}).count()===5);
+ check(mode+' more than four current plans remain reviewable',await page.locator('article[aria-label^="Working proposal:"]').count()===5);
  check(mode+' combination and refinement preserve provenance and unknown overlap',combined.revision===2&&combined.draft.bundle.components[0].ownerRole==='Product owner'&&combined.draft.inputs.groupsDisjoint.value===null&&combined.result.cashEstimate.cash===null);
  const card=page.getByRole('article',{name:'Working proposal: Combined delivery pilot',exact:true});
  check(mode+' unanswered question still allows explicit choice',await page.getByRole('region',{name:'Optional questions before choosing a plan'}).isVisible()&&working(current).questions.length===1);
- await card.getByRole('button',{name:'Choose this plan with unknowns',exact:true})[click]();await card.getByRole('button',{name:'Selected as Action Plan #1',exact:true}).waitFor();
+ await card.getByRole('button',{name:'Pin Action Plan with unknowns',exact:true})[click]();await card.getByRole('button',{name:'Pinned Action Plan #1',exact:true}).waitFor();
  current=await state();const fields=current.workspaces[current.goals.activeId].fields,catalog=fields[planAlternativesField];
  check(mode+' explicit reviewed choice links goal and proposal without applying operations',!!current.goals.activeId&&catalog.plans.length===1&&catalog.attachments.length===1&&!catalog.plans[0].applied&&catalog.plans[0].draft.binding.goal===current.goals.goals.find(goal=>goal.id===current.goals.activeId).statement);
  const savedBytes=JSON.stringify(catalog);await page.reload();await dismissHomeOnboarding(page);
@@ -144,8 +144,8 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
  const oldExamples=original.goals.goals.map(goal=>[goal.id,original.workspaces[goal.id].fields]);
  check(mode+' existing demo plan data remains byte-identical',oldExamples.every(([id,fields])=>JSON.stringify(current.workspaces[id].fields)===JSON.stringify(fields)));
  const capacityGoal=original.goals.goals.find(goal=>goal.statement==='Add 5 roles over 12 months');
- await button('Open goal: '+capacityGoal.statement)[click]();await page.getByRole('region',{name:'Action Plans for your goal',exact:true}).waitFor();
- check(mode+' existing five-role demo still opens through Pinned Goals without a model request',(await state()).goals.activeId===capacityGoal.id&&requests.length===10&&await page.getByRole('region',{name:'Action Plans for your goal',exact:true}).getByText('Demo example',{exact:true}).isVisible());
+ await page.getByRole('complementary',{name:'Pinned Action Plans'}).getByRole('button').filter({hasText:'Goal: '+capacityGoal.statement})[click]();await page.getByRole('region',{name:'Action Plans for your goal',exact:true}).waitFor();
+ check(mode+' existing five-role demo still opens through Pinned Action Plans without a model request',(await state()).goals.activeId===capacityGoal.id&&requests.length===10&&await page.getByRole('region',{name:'Action Plans for your goal',exact:true}).getByText('Demo example',{exact:true}).isVisible());
  check(mode+' no overflow or browser errors',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&blocked.length===0);
  transport.push({mode,requests:requests.length,errors,blocked});await context.close();
 }}catch(error){for(const context of browser.contexts())for(const page of context.pages()){await fs.writeFile(path.join(output,'failure.txt'),await page.locator('body').innerText()).catch(()=>{});await page.screenshot({path:path.join(output,'failure.png'),fullPage:true}).catch(()=>{});}console.error(JSON.stringify({output,transport}));throw error;}finally{await browser.close();}

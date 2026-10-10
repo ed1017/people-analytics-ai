@@ -1,4 +1,5 @@
 "use client";
+import {alternativeViewField} from '@/lib/home-plan-alternative-chat';
 import {solutionDiscussionPresentations} from '@/lib/home-plan-presentation';
 import {ChatContent} from '@/components/chat-content';
 import { datasetFetch } from "@/lib/dataset-client.mjs";
@@ -519,13 +520,14 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     if(!active || pendingScope.identity!==scopeIdentity || pendingScope.query!==workforceQuery || input.trim()!==pendingScope.message) finishScopeRequest(pendingScope,true);
     else if(ready) finishScopeRequest(pendingScope,false);
   },[pendingScope,active,scopeIdentity,workforceQuery,input,ready]);
-  function openPinnedGoal(goal:LocalGoal){
+  function openPinnedGoal(goal:LocalGoal,planId?:string){
     const current=decisionStore.getSnapshot();
     if(!active||!conversation.storageReady||!current.saved||conversation.issueEditor||current.data.goals.goals.find(item=>item.id===goal.id)?.statement!==goal.statement)return;
     // Selecting a saved goal is not a new Pin event and never prepares another response.
     setActionPin(previous=>previous?{...previous,id:""}:null);
     conversation.selectGoal(goal.id);
     if(decisionStore.getSnapshot().data.goals.activeId!==goal.id)return;
+    if(planId)decisionStore.setField(goal.id,alternativeViewField,{version:1,selectedId:planId,collapsed:false});
     setPlanOpen(previous=>({goalId:goal.id,goal:goal.statement,sequence:(previous?.sequence??0)+1}));
   }
   const planDiscussions=solutionDiscussionPresentations(messages,solutions.state);
@@ -606,7 +608,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!guidedExampleActive&&<SwpGuidedJourney discussionKey={JSON.stringify([workforceScope,workforceQuery,persona])} conversation={conversation} active={active} busy={chatLoading||solutions.pending||solutions.saving} commandRef={swpCommand} modelContextRef={swpModelContext} demandControlRef={demandControl} demandReviewRef={demandReview} demandContextRef={demandContext} sources={sources??[]} onNavigate={onNavigate}/>}
     {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&startingGuide}
-    {showFallbackPin&&!chatLoading&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
+    {!solutionConversationEnabled&&showFallbackPin&&!chatLoading&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
     {!activePinnedGoal&&conversationPanel}
 
     <HomeSolutionBundles existingOnly={solutionConversationEnabled} settled={sourcesSettled} chatChange={planEdit&&editPreview?{goalId:planEdit.goalId,planId:planEdit.id,inputKey:editPreview.inputKey,ready:!chatLoading&&planEditReady&&conversation.saved&&input.trim()===editPreview.request,isCurrent:planEdit.isCurrent,apply:applyPlanChanges}:null} openRequest={planOpen} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} projectEvidence={destination=>buildHomePack(sourceResults,workforceScope,conversation.focusedIssue||conversation.problem?.latestQuestion||'',destination.development??developmentSession)} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={registerPlanForChat}/>
@@ -614,7 +616,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     {solutionConversationEnabled&&<HomeSolutionConversationReview controller={solutions} goal={conversation.focusedIssue} pack={pack} showSaved={recoveryPlanChoice?.goalId!==conversation.activeGoalId}/>}
     {planEdit?.goalId===conversation.activeGoalId&&<div ref={editReview} tabIndex={-1}><HomeBundleChatReview target={planEdit} preview={editPreview} text={input} busy={chatLoading||!planEditReady||!conversation.saved} notice={editNotice} onClose={()=>{setPlanEdit(null);setEditPreview(null);setEditNotice('');focusQuestion();}}/></div>}
 
-    {!conversation.focusedIssue&&!prioritizeGoal&&candidatePanel}
+    {!solutionConversationEnabled&&!conversation.focusedIssue&&!prioritizeGoal&&candidatePanel}
     {clarification?.context===contextKey&&<section aria-label="Clarify your goal" className="space-y-2 rounded border border-primary/40 p-3 text-sm"><p className="font-semibold">{clarification.question}</p><p>{userGoalCurrent?'You can pin your stated goal above. This question can refine the plan; unresolved details still need review.':'Reply in the chat below. Your original goal and constraints are kept; nothing is pinned or calculated.'}</p><button type="button" className="min-h-11 rounded border px-3 py-2 focus-visible:ring-2 focus-visible:ring-ring" onClick={focusQuestion}>Answer in chat</button></section>}
     {preparationUnavailable?.context===contextKey&&<section role="status" aria-label="Problem and options not prepared" className="space-y-1 rounded border p-3 text-sm"><p className="font-semibold">Problem and options not prepared</p><p>{showCandidatePin&&candidate?.userGoal&&!candidate.proposal?'No validated investigation options were prepared. You can still pin your own stated goal above to request Action Plan drafts.':'This answer has no validated problem and options to pin.'} Your work and drafts are kept; nothing was pinned or calculated. No retry runs automatically.</p><details><summary className="cursor-pointer py-1">Preparation details</summary><p>Stage: {preparationUnavailable.stage}. Reason: {preparationUnavailable.diagnostic.reason}. Field: {preparationUnavailable.diagnostic.field}. Candidate count (4 means 4 or more): {preparationUnavailable.diagnostic.optionCount}. Missing fields: {preparationUnavailable.diagnostic.missingFieldCount}.</p></details></section>}
     {candidateNotice&&<p role="status">{candidateNotice}</p>}
