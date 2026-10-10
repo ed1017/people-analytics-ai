@@ -70,6 +70,7 @@ export function createSolutionDiagnostics(){
    const diagnostic={version:1,correlationId,elapsedMs:bounded(Date.now()-startedAt,600000),stageElapsedMs:{...stageElapsedMs},modelAttempts,
     modelRounds:bounded(read(usage,'modelRounds'),4),toolCalls:bounded(read(usage,'toolCalls'),6),providerRounds:providerRounds.map(round=>({...round}))};
    try{console.info('Home solution conversation completed',diagnostic);}catch{/* Logging cannot change a successful response. */}
+   return diagnostic;
   },
   failure(error:unknown,grounding:unknown,callerAborted:boolean,deadlineAborted:boolean){
    const evidence=grounding==null?null:groundingFailureDetails(grounding);

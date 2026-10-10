@@ -17,6 +17,7 @@ import {SWP_DEMAND_MODE,requestDemandContext} from '@/lib/swp-demand';
 import {solutionConversationInstructions,solutionResponseFormat,solutionTools} from '@/lib/home-solution-conversation-schema';
 import {converseSolutions} from '@/lib/home-solution-conversation-service';
 import {goalProgressConversationEnabled} from '@/lib/goal-progress-conversation';
+import {reviewReadyInstructions,reviewReadySolutionTools} from '@/lib/home-solution-review-completion';
 
 export const dynamic='force-dynamic';
 // Leave response/cleanup headroom beyond the shared 90-second operation deadline.
@@ -40,16 +41,21 @@ async function handlePOST(request:Request){
   diagnostics.stage('model_setup');
   const client=new OpenAI({...openAIProxyTransport(),apiKey:process.env.OPENAI_API_KEY,maxRetries:0});
   const natural=request.headers.get(SWP_CONVERSATION_HEADER)===null;
-  const planningInstructions=solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions:'');
+  const planningInstructions=solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions+reviewReadyInstructions:'');
   diagnostics.stage('conversation_preparation');
   const reply=await converseSolutions(parsed,{
+   reviewReady:natural,
    grounding,
    ...(demand?{demand:{datasetToken:datasetRouter.current().token,referenceContract:true}}:{}),
    ...(natural?{natural:{datasetToken:datasetRouter.current().token}}:{}),
    progress:{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token},
    complete:async(input,finalOnly,signal,capabilities)=>{
     const progressContract=progressModelContract(goalProgressConversationEnabled,capabilities.progressEntryEnabled);
-    const conversationTools=demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools,...(natural?businessPlanningModelTools:[])];
+    // Offer source-bound operations after their checked source exists, including later rounds.
+    // This is contract eligibility, not a keyword/intent filter; all valid workflows remain available.
+    const planTools=natural?reviewReadySolutionTools.filter(tool=>tool.name==='read_plans'?capabilities.savedPlansAvailable:tool.name==='revise_parameters'?capabilities.planSourcesAvailable:true):solutionTools;
+    const businessTools=businessPlanningModelTools.filter(tool=>capabilities.businessPlanningReady||!['revise_scoped_service_demand','compare_service_staffing'].includes(tool.name));
+    const conversationTools=demand?demandReferenceModelContract.tools:[...planTools,...progressContract.tools,...(natural?businessTools:[])];
     const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions;
     const response=await datasetAI(() => {
      diagnostics.modelAttempt({inputBytes:new TextEncoder().encode(JSON.stringify(input)).length,instructionsBytes:new TextEncoder().encode(instructions).length,toolSchemaBytes:new TextEncoder().encode(JSON.stringify(conversationTools)).length});
@@ -61,8 +67,8 @@ async function handlePOST(request:Request){
    },
    loadProjection:async(filters,signal)=>(await import('@/lib/home-solution-projection-source')).loadSolutionProjectionInputs(filters,signal),
   },signal);
-  diagnostics.success(reply.usage);
-  return Response.json(reply,{headers:{'Cache-Control':'no-store'}});
+  const receipt=diagnostics.success(reply.usage);
+  return Response.json({...reply,...(receipt?{diagnostics:receipt}:{})},{headers:{'Cache-Control':'no-store',...(receipt?{'X-Correlation-ID':receipt.correlationId,'Server-Timing':Object.entries(receipt.stageElapsedMs).map(([name,ms])=>`${name};dur=${ms}`).concat(`total;dur=${receipt.elapsedMs}`).join(', ')}:{})}});
  }catch(error){
   const evidence=error instanceof SolutionEvidenceError,diagnostic=diagnostics.failure(error,evidence?error.diagnostic:null,request.signal.aborted,signal?.aborted===true);
   return Response.json({error:evidence?error.message:'The conversation could not be completed or verified. Your request and earlier work are kept. Try a narrower question or retry explicitly.',...diagnostic},

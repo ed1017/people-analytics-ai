@@ -29,10 +29,12 @@ import {actionEvidenceCatalog} from './home-action-proposal.ts';
 import {haveDuplicateBundleActivities} from './home-bundle-distinctness.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {readSwpPlaybook} from './swp-reasoning-playbook.ts';
+// @ts-expect-error Native fixtures share the application contract.
+import {readReviewReadyArguments} from './home-solution-review-completion.ts';
 
 export type SolutionModelOutput={items:unknown[];calls:{id:string;name:string;arguments:string}[];text:string;completed:boolean};
 export type SolutionReply={requestId:string;answer:string;candidateIds:string[];analysisIds:string[];state:SolutionState;usage:{modelRounds:number;toolCalls:number};progressProposal?:ProgressEntryProposal;demandReview?:DemandReview};
-export type SolutionRuntime={grounding?:Awaited<ReturnType<typeof verifySolutionEvidence>>;complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal,capabilities:{progressEntryEnabled:boolean})=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date;natural?:{datasetToken:string};progress?:{enabled:boolean;datasetToken:string};demand?:{datasetToken:string;referenceContract?:boolean}};
+export type SolutionRuntime={reviewReady?:boolean;grounding?:Awaited<ReturnType<typeof verifySolutionEvidence>>;complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal,capabilities:{progressEntryEnabled:boolean;savedPlansAvailable:boolean;planSourcesAvailable:boolean;businessPlanningReady:boolean})=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date;natural?:{datasetToken:string};progress?:{enabled:boolean;datasetToken:string};demand?:{datasetToken:string;referenceContract?:boolean}};
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 const abort=(signal:AbortSignal)=>{if(signal.aborted)throw Error('Conversation request cancelled.');};
 const latest=<T extends {id:string}>(items:T[])=>[...new Map(items.map(item=>[item.id,item])).values()];
@@ -92,7 +94,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  let toolCalls=0,operations=0,projectionInput:Promise<ProjectionInputs>|undefined,final:SolutionFinal|undefined,rounds=0;
  for(let round=0;round<4;round++){
   abort(signal);if(new TextEncoder().encode(JSON.stringify(input)).length>120000)throw Error('This conversation needs a narrower set of sources before another model round. Earlier work is kept.');
-  const output=await runtime.complete(input,round===3||operations>=6,signal,{progressEntryEnabled:!!entryContext});rounds++;abort(signal);
+  const output=await runtime.complete(input,round===3||operations>=6,signal,{progressEntryEnabled:!!entryContext,savedPlansAvailable:!!request.catalog?.plans.some(plan=>!plan.deleted),planSourcesAvailable:!!request.catalog?.plans.some(plan=>!plan.deleted)||state.working.some(item=>!!item.draft),businessPlanningReady:!!natural});rounds++;abort(signal);
   if(!output.completed||output.calls.length>6||JSON.stringify(output.items).length>70000)throw Error('The conversation response was incomplete or exceeded its bounds.');
   if(!output.calls.length){if(!output.text||output.text.length>20000)throw Error('The conversational answer is unavailable.');const value=JSON.parse(output.text);assertSolutionShape(value,solutionFinalSchema,'answer');final=value;break;}
   const callCost=(call:SolutionModelOutput['calls'][number])=>{if(call.name!=='evaluate_action_plans')return 1;try{const count=JSON.parse(call.arguments)?.candidates?.length;return Number.isInteger(count)&&count>=1&&count<=3?count:3;}catch{return 3;}};
@@ -101,7 +103,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   for(const call of output.calls){
    abort(signal);toolCalls++;operations+=callCost(call);let result:unknown;
    try{
-    const tool=runtime.natural&&businessPlanningTools.some(t=>t.name===call.name)?businessPlanningTools.find(t=>t.name===call.name):demand?[...(referenced?[reviewReferencedDemandTool,reviseReferencedDemandTool]:[serviceDemandTool,demandPatchTool]),...solutionTools.filter(t=>['read_clock','read_evidence'].includes(t.name))].find(t=>t.name===call.name):call.name==='propose_goal_progress'&&entryContext?goalProgressProposalTool:call.name==='read_goal_progress'&&progress?goalProgressReadTool:solutionTools.find(tool=>tool.name===call.name);if(!tool||call.arguments.length>32000)throw Error('Unsupported or oversized tool request.');const args=JSON.parse(call.arguments);
+    const tool=runtime.natural&&businessPlanningTools.some(t=>t.name===call.name)?businessPlanningTools.find(t=>t.name===call.name):demand?[...(referenced?[reviewReferencedDemandTool,reviseReferencedDemandTool]:[serviceDemandTool,demandPatchTool]),...solutionTools.filter(t=>['read_clock','read_evidence'].includes(t.name))].find(t=>t.name===call.name):call.name==='propose_goal_progress'&&entryContext?goalProgressProposalTool:call.name==='read_goal_progress'&&progress?goalProgressReadTool:solutionTools.find(tool=>tool.name===call.name);if(!tool||call.arguments.length>32000)throw Error('Unsupported or oversized tool request.');const review=readReviewReadyArguments(call.name,JSON.parse(call.arguments),runtime.reviewReady===true),args=review.args;
     const periodFeedback=demand?demandPeriodFeedback(call.name,args):null;
     if(periodFeedback){input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(periodFeedback)});continue;}
     assertSolutionShape(args,tool.parameters,'tool arguments');
@@ -158,6 +160,13 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
      if(JSON.stringify(result).length>65000)throw Error('The proposed set exceeds the result budget. Use fewer, more concise activities; no proposals or constraints were recorded.');
      state.constraints=constraints;state.working=nextState.working;
      for(const item of items)evaluated.set(item.id,item);
+     // Only an explicitly terminal, independently checked calculation skips prose generation.
+     // Mixed operations, blocked/qualitative plans and oversized metric sets retain the loop.
+     const metrics=items.flatMap(item=>checkedMetricReferences(nextState,'candidate',item.id,item.revision));
+     if(review.ready&&output.calls.length===1&&!progressProposal&&!demandReview&&naturalStep===0&&analyses.size===0&&metrics.length>0&&metrics.length<=8&&items.every(item=>item.draft&&item.result&&item.result.calculationStatus!=='awaiting-scope'&&!item.blocking.length)){
+      const reviewedFinal:SolutionFinal={answer:items.length===1?'Review the calculated Action Plan and its assumptions below. Unknowns remain listed; the proposal has not been saved or applied.':'Review the calculated Action Plans and their assumptions below. Unknowns remain listed; the proposals have not been saved or applied.',candidateIds:items.map(item=>item.id),analysisIds:[],verifiedMetrics:metrics,questions:[],constraintUpdates:[],rejected:[],focusCandidateId:items[0].id};
+      assertSolutionShape(reviewedFinal,solutionFinalSchema,'calculated review');final=reviewedFinal;
+     }
     }else{
      projectionInput??=runtime.loadProjection(request.filters,signal);
      const item=await calculateHeadcountProjection(args.spec as ProjectionSpec,await projectionInput,state.analyses,solutionUserTurns(request).map(turn=>turn.id));abort(signal);
@@ -167,6 +176,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
    }catch(error){abort(signal);result={ok:false,error:error instanceof Error?error.message:'The read or calculation was unavailable.',instruction:'Explain the boundary, ask a focused question, or revise typed inputs. Do not claim this calculation succeeded.'};}
    input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(result)});
   }
+  if(final)break;
  }
  if(!final)throw Error('No complete conversational answer was returned.');
  if(homeAnswerScopeViolation(final.answer,request.evidence))throw Error('The answer attributes source evidence to an unsupported population.');
