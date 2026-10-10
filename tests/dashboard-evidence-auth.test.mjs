@@ -88,7 +88,7 @@ for(const pair of [['dashboard','workforce'],['dashboard','attrition'],['workfor
  for(const key of pair)assert.equal(body.evidence.sources.find(s=>s.id===({dashboard:'W1',workforce:'W2',attrition:'A1'})[key]).status,'loaded');
  const before=JSON.stringify(body),pending=isolated.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',headers:{'x-workforce-dataset':token},body:before}));
  await drain();assert.deepEqual([...seen.keys()],pair);gates[first].resolve(upstream());
- const response=await pending,payload=await response.json(),event=logs.find(entry=>entry[0]==='Home solution conversation failed')[1];
+ const response=await pending,payload=await response.json(),event=JSON.parse(logs.find(entry=>entry[0]==='Home solution conversation failed')[1]);
  assert.equal(response.status,503);assert.equal(payload.code,'evidence_source_auth_unavailable');assert.match(payload.error,/server could not authenticate/);
  assert.equal(event.grounding.reader,first);assert.equal(event.grounding.readFailure,'source_authentication');assert.equal(event.grounding.upstreamCode,'PGRST303');
  assert.equal(event.grounding.readersStarted,2);assert.equal(event.grounding.readersCompleted,0);assert.equal(event.modelAttempts,0);assert.equal(isolated.sandbox.__requests.length,0);
