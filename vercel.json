@@ -1,7 +1,8 @@
 {
   "git": {
     "deploymentEnabled": {
-      "codex/home-interactive-recovery-20261009": false
+      "codex/home-interactive-recovery-20261009": false,
+      "codex/home-auth-recovery-review-20261010": false
     }
   }
 }
