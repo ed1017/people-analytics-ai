@@ -59,6 +59,8 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  await card.getByRole('button',{name:'Clear hiring estimate',exact:true}).click();check('clear removes only the estimate without a model call',await card.count()===0&&requests.length===2&&(await readState()).exploration.fields.homeSolutionConversationV1.turns.length===4);
  await send('Recommend a plan');const review=page.getByRole('region',{name:'Solution conversation review',exact:true});await review.getByRole('article').filter({hasText:'Recommended Action Plan'}).waitFor();
  check('existing checked-plan review remains available after clearing the estimate',await review.getByLabel('Recommendation summary',{exact:true}).count()===1);
+ const quick=review.getByRole('region',{name:'Action Plan quick summary',exact:true});
+ check('PR201 cost timeline and resource summary remains present',await quick.count()===1&&await quick.getByRole('region',{name:'Total cost',exact:true}).isVisible()&&await quick.getByRole('region',{name:'Timeline',exact:true}).isVisible()&&await quick.getByRole('region',{name:'Resources',exact:true}).isVisible());
  await context.close();
 }}finally{await browser.close()}
 await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({checks},null,2));console.log(JSON.stringify({checks:checks.length,output}));
