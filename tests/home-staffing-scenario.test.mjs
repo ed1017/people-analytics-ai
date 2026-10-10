@@ -1,16 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readStaffingScenario,staffingScenarioLabel} from '../lib/home-staffing-scenario.ts';
+import {readStaffingScenario,staffingScenarioLabel,converseStaffingScenario} from '../lib/home-staffing-scenario.ts';
 import {converseSolutions} from '../lib/home-solution-conversation-service.ts';
 import {solutionRequest,fixtureRuntime} from './fixtures/home-solution-conversation.mjs';
-import {fixedMessages,liveStaffingMessage,fixedChanges,fixedValues} from './fixtures/required-staffing.mjs';
+import {fixedMessages,liveStaffingMessage,fixedValues} from './fixtures/required-staffing.mjs';
 import {offlineBusinessRoute} from './helpers/offline-business-route.mjs';
-import {responseForStep} from './fixtures/natural-business-planning.mjs';
 import {buildHomePack} from '../lib/home-pack.mjs';
 const fresh=(...args)=>structuredClone(solutionRequest(...args));
 const token='legacy-v1:0',context={natural:true,datasetToken:token},secret='PRIVATE_COMPANY_EVIDENCE_SENTINEL';
 const submit=(route,body,extra={})=>route.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',headers:{'x-workforce-dataset':token,...extra.headers},body:JSON.stringify(body),...(extra.signal?{signal:extra.signal}:{})}));
-const response=body=>responseForStep({name:'compare_required_staffing',args:{changes:fixedChanges(body)}},0);
 const sources={attrition:{status:'loaded',data:{as_of:'2026-09-30',summary:{total_exits:4,voluntary_exits:3},reasons:[{separation_reason:secret,exits:1}]}}};
 function poisonedBody(text=liveStaffingMessage){const body=fresh(text);body.evidence=buildHomePack(sources,body.scope);return body;}
 
@@ -53,49 +51,35 @@ test('only complete explicit illustrative premises in fresh default exploration 
  assert.equal(readStaffingScenario(fresh(liveStaffingMessage,true),context),null);
 });
 
-test('actual POST projects poisoned browser evidence out and calculates the exact fixture with no aggregate reads',async()=>{
+test('actual POST calculates captured inputs without constructing a provider or reading poisoned company evidence',async()=>{
  const route=await offlineBusinessRoute(),logs=[];route.sandbox.console={info:(...args)=>logs.push(args),error:(...args)=>logs.push(args)};
  route.sandbox.__aggregateSources=sources;route.sandbox.__aggregateReads=[];route.sandbox.__aggregateRead=()=>{throw Error('Any aggregate read is forbidden for this scenario');};
  const body=poisonedBody(),before=JSON.stringify(body);assert.ok(before.includes(secret),'the browser packet must actually contain the poisoned company evidence');
- const extraction=response(body),args=JSON.parse(extraction.output[0].arguments);args.changes.forEach(change=>{change.basis.explanation=secret;});extraction.output[0].arguments=JSON.stringify(args);route.sandbox.__replies.push(extraction);
+ route.sandbox.__forbidProvider=true;route.sandbox.__replies.push({output_text:secret});
  const result=await submit(route,body),reply=await result.json();assert.equal(result.status,200,JSON.stringify(reply));assert.equal(JSON.stringify(body),before);
- assert.equal(route.sandbox.__aggregateReads.length,0);assert.equal(route.sandbox.__requests.length,1);
- const sent=JSON.parse(JSON.stringify(route.sandbox.__requests[0])),payload=JSON.parse(sent.input[0].content);
- assert.deepEqual(Object.keys(payload).sort(),['contract','currentMessage']);assert.deepEqual(payload.currentMessage,body.message);
- assert.deepEqual(sent.tools.map(t=>t.name),['compare_required_staffing']);assert.deepEqual(sent.tool_choice,{type:'function',name:'compare_required_staffing'});
- assert.equal(sent.model,'gpt-6.1-sol');assert.deepEqual(sent.reasoning,{effort:'medium'});assert.equal(sent.service_tier,'default');assert.equal(sent.parallel_tool_calls,false);assert.equal(sent.max_output_tokens,5000);assert.equal(route.sandbox.__requestOptions[0].maxRetries,0);
+ assert.equal(route.sandbox.__aggregateReads.length,0);assert.equal(route.sandbox.__requests.length,0);assert.equal(route.sandbox.__providerConstructions??0,0);assert.equal(route.sandbox.__transportSetups??0,0);assert.equal(route.sandbox.__replies.length,1);
  assert.ok(reply.answer.startsWith(staffingScenarioLabel));for(const value of ['1600000 USD','30000 USD','495000 USD','480 planned training hours','240 planned training hours','Recommendation:','Next step:','Nothing was saved or applied.'])assert.ok(reply.answer.includes(value),value);
- assert.deepEqual(reply.usage,{modelRounds:1,toolCalls:1});assert.deepEqual(reply.charts,[]);assert.deepEqual(reply.candidateIds,[]);assert.deepEqual(reply.analysisIds,[]);assert.deepEqual(reply.state.verifiedMetrics,[]);assert.deepEqual(reply.state.working,[]);
+ assert.deepEqual(reply.usage,{modelRounds:0,toolCalls:0});assert.deepEqual(reply.charts,[]);assert.deepEqual(reply.candidateIds,[]);assert.deepEqual(reply.analysisIds,[]);assert.deepEqual(reply.state.verifiedMetrics,[]);assert.deepEqual(reply.state.working,[]);
  for(const field of ['internalRelease','costsComplete','hireTrainingHoursPerPerson','backfillCostPerInternalPerson','hireReadyAfterMonths','trainingReadyAfterMonths','redeployReadyAfterMonths'])assert.equal(reply.state.requiredStaffing.inputs[field],null);
- assert.doesNotMatch(JSON.stringify([sent,reply,logs]),new RegExp(secret));assert.equal(JSON.parse(logs[0][1]).groundingReads,undefined);
- assert.equal(payload.evidenceGrounding,undefined);assert.equal(payload.currentEvidence,undefined);assert.equal(payload.citationCatalog,undefined);
+ const scenario=readStaffingScenario(body,context);
+ for(const [field,origin] of Object.entries(reply.state.requiredStaffing.origins)){assert.equal(origin.kind,'user-supplied');assert.equal(origin.turnId,body.message.id);assert.equal(origin.quote,scenario.quotes[field]);assert.ok(body.message.text.includes(origin.quote));}
+ assert.doesNotMatch(JSON.stringify([reply,logs]),new RegExp(secret));const diagnostic=JSON.parse(logs[0][1]);assert.equal(diagnostic.groundingReads,undefined);assert.equal(diagnostic.modelAttempts,0);assert.equal(diagnostic.modelRounds,0);assert.equal(diagnostic.toolCalls,0);assert.deepEqual(diagnostic.providerRounds,[]);
+ if(reply.providerReceipt){assert.equal(reply.providerReceipt.modelAttempts,0);assert.deepEqual(reply.providerReceipt.providerRounds,[]);}
  // A normal numeric follow-up leaves the scenario-only contract and revalidates live evidence.
  const follow=fresh(fixedMessages.followup,false,reply.state,2);follow.evidence=body.evidence;
- const failed=await submit(route,follow);assert.equal(failed.status,503);assert.equal(route.sandbox.__aggregateReads.length,1);assert.equal(route.sandbox.__requests.length,1);
+ const failed=await submit(route,follow);assert.equal(failed.status,503);assert.equal(route.sandbox.__aggregateReads.length,1);assert.equal(route.sandbox.__requests.length,0);
 });
 
-test('scenario-only extraction rejects unsupported tools, invented quantities and model prose without fallback',async()=>{
- const route=await offlineBusinessRoute();route.sandbox.console={info(){},error(){}};route.sandbox.__aggregateSources=sources;route.sandbox.__aggregateReads=[];
- const cases=[
-  r=>{r.output[0].name='read_evidence';r.output[0].arguments='{"sourceIds":[]}';},
-  r=>{r.output[0].name='project_headcount';},r=>{r.output.push({...r.output[0],call_id:'extra'});},
-  r=>{r.status='incomplete';},r=>{r.output=[];},r=>{r.output_text='Company staffing is verified.';},
-  r=>{r.output.push({type:'message',role:'assistant',content:[{type:'output_text',text:secret,annotations:[]}]});},
-  r=>{r.output[0].arguments='invalid';},
-  ...['invent','missing','proposed','wrong-quote','wrong-turn','unknown-zero','duplicate','extra-field'].map(kind=>r=>{
-   const args=JSON.parse(r.output[0].arguments);
-   if(kind==='invent')args.changes.find(e=>e.field==='trainingCostPerPerson').value=1;
-   if(kind==='missing')args.changes.pop();
-   if(kind==='proposed')args.changes[0].basis={kind:'model-proposed',turnId:null,quote:null,explanation:'Proposed'};
-   if(kind==='wrong-quote')args.changes[0].basis.quote='Do not save anything.';
-   if(kind==='wrong-turn')args.changes[0].basis.turnId='prior';
-   if(kind==='unknown-zero')args.changes.push({...args.changes[0],field:'hireTrainingHoursPerPerson',value:0});
-   if(kind==='duplicate')args.changes.push(args.changes[0]);
-   if(kind==='extra-field')args.private=secret;
-   r.output[0].arguments=JSON.stringify(args);
-  }),
- ];
- for(const mutate of cases){const body=poisonedBody(),r=response(body),before=JSON.stringify(body),start=route.sandbox.__requests.length;mutate(r);route.sandbox.__replies.push(r);const result=await submit(route,body),reply=await result.json();assert.equal(result.status,422);assert.equal(route.sandbox.__requests.length,start+1);assert.equal(route.sandbox.__aggregateReads.length,0);assert.equal(reply.state,undefined);assert.equal(reply.answer,undefined);assert.equal(JSON.stringify(body),before);assert.doesNotMatch(JSON.stringify(reply),new RegExp(secret));}
+test('deterministic validation failures preserve input and never fall back to a provider',async()=>{
+ const body=poisonedBody(),before=JSON.stringify(body),runtime=fixtureRuntime([]);runtime.natural={datasetToken:token};runtime.staffingScenarioOnly=true;
+ let dispatches=0,reads=0;runtime.complete=async()=>{dispatches++;throw Error('Provider dispatch forbidden');};runtime.loadProjection=async()=>{reads++;throw Error('Source reads forbidden');};
+ const reply=await converseSolutions(body,runtime,new AbortController().signal);assert.deepEqual(reply.usage,{modelRounds:0,toolCalls:0});assert.equal(JSON.stringify(body),before);
+ for(const mutate of [s=>{s.inputs.requiredRoles=21;},s=>{s.quotes.requiredRoles='fabricated';},s=>{s.inputs.months=25;}]){
+  const captured=readStaffingScenario(body,context);mutate(captured);
+  await assert.rejects(converseStaffingScenario(body,captured,runtime,new AbortController().signal));assert.equal(JSON.stringify(body),before);
+ }
+ const invalidState=structuredClone(body);invalidState.requestId='@';await assert.rejects(converseStaffingScenario(invalidState,readStaffingScenario(body,context),runtime,new AbortController().signal));
+ assert.equal(JSON.stringify(body),before);assert.equal(runtime.rounds,0);assert.equal(dispatches,0);assert.equal(reads,0);
 });
 
 test('ineligible actual, mixed, scoped or retained requests keep fresh grounding and fail before dispatch if evidence cannot verify',async()=>{
@@ -116,7 +100,7 @@ test('request, dataset, mode and cancellation gates still precede scenario provi
  const aborted=new AbortController();aborted.abort();assert.equal((await submit(route,body,{signal:aborted.signal})).status,422);
  delete route.sandbox.process.env.OPENAI_API_KEY;assert.equal((await submit(route,body)).status,422);
  assert.equal(route.sandbox.__requests.length,0);
- const controller=new AbortController(),runtime=fixtureRuntime([{name:'compare_required_staffing',args:{changes:fixedChanges(body)}}]);runtime.staffingScenarioOnly=true;runtime.natural={datasetToken:token};const complete=runtime.complete;runtime.complete=async(...args)=>{const result=await complete(...args);controller.abort();return result;};
- await assert.rejects(converseSolutions(body,runtime,controller.signal));assert.equal(body.state.requiredStaffing,undefined);
- const ineligible=fresh(liveStaffingMessage+' Check company availability.');await assert.rejects(converseSolutions(ineligible,runtime,new AbortController().signal),/not eligible/);assert.equal(runtime.rounds,1);
+ const controller=new AbortController(),runtime=fixtureRuntime([]);runtime.staffingScenarioOnly=true;runtime.natural={datasetToken:token};controller.abort();
+ await assert.rejects(converseSolutions(body,runtime,controller.signal));assert.equal(body.state.requiredStaffing,undefined);assert.equal(runtime.rounds,0);
+ const ineligible=fresh(liveStaffingMessage+' Check company availability.');await assert.rejects(converseSolutions(ineligible,runtime,new AbortController().signal),/not eligible/);assert.equal(runtime.rounds,0);
 });
