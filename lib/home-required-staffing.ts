@@ -27,6 +27,27 @@ export function currentRequiredStaffing(request:SolutionRequest,datasetToken:str
  return s;
 }
 export const requiredStaffingView=(s:RequiredStaffingReview|null)=>s?{revision:s.revision,origins:s.origins,...calculateRequiredStaffing(s.inputs)}:null;
+/** Routing only: the model still supplies typed, provenance-checked inputs. */
+export function requiresRequiredStaffing(request:SolutionRequest){
+ const text=request.message.text;
+ const strategies=[/\bhir(?:e|es|ing)\b/i,/\btrain(?:ing|ee|ees|able)?\b/i,/\bredeploy(?:ment|able|ing)?\b/i].filter(pattern=>pattern.test(text)).length;
+ const count='(?:\\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)';
+ const requirement=new RegExp('\\b(?:fill|staff|cover|need|require|required)\\s+(?:exactly\\s+)?'+count+'(?:\\s+[\\w-]+){0,3}\\s+(?:roles?|positions?|people|employees?|engineers?|developers?|analysts?)\\b','i');
+ if(strategies>=2&&requirement.test(text))return true;
+ return !!request.state.requiredStaffing&&(/\b(?:numerical|numbers|totals?|recalculate|recompute|compare|comparison|options?|mixes)\b/i.test(text)||/\b(?:change|make|set|use|clear|remove|update|keep)\b/i.test(text)&&/\b(?:training|trainee|hire|hiring|redeploy\w*|backfill|budget|month\w*|horizon|currency|role\w*|pool\w*|hours?|cost\w*|USD|EUR|GBP)\b/i.test(text));
+}
+/** Numerical prose shares the cards' calculator, so unknown requirements cannot become zero. */
+export function requiredStaffingAnswer(review:RequiredStaffingReview){
+ const r=requiredStaffingView(review)!;
+ if(!r.options.length)return 'The staffing comparison needs more inputs: '+r.missing.join(' ')+' Nothing was saved.';
+ const show=(n:number|null)=>n===null?'Unknown':String(n),unit=r.input.currency??'(currency unknown)';
+ const lines=r.options.map(o=>{
+  const training=[o.train?`${show(o.plannedTrainingHours)} planned training hours`:null,o.newHireTrainingUnspecified?'new-hire training not specified':o.hire?`${show(o.totalTrainingHours)} total training hours in this scenario`:null].filter(Boolean).join('; ')||'No trainee or new-hire training is modeled.';
+  return `Train ${o.train}, redeploy ${o.redeploy}, hire ${o.hire}: ${show(o.listedCash)} ${unit} known incremental cash${o.completeCash===null?' (subtotal)':''}${o.budgetStatus==='over'?' — over budget':''}; ${training}. Readiness: ${o.readyAfterMonths===null?'Unknown':o.readyAfterMonths+' months'}. Coverage: ${o.coverage}.`;
+ });
+ const unknowns=[...new Set(r.options.flatMap(o=>o.unknowns))];
+ return ['Calculated from the stated scenario; actual people and skills are unverified.',...lines,r.recommendation?`Recommendation: ${r.recommendation.text} Next step: ${r.recommendation.nextStep}`:'Next step: confirm the missing inputs before choosing an option.',...r.missing,...unknowns,'Nothing was saved or applied.'].join('\n');
+}
 export function editRequiredStaffing(request:SolutionRequest,datasetToken:string,raw:unknown):RequiredStaffingReview{
  const s=currentRequiredStaffing(request,datasetToken)??{version:1 as const,revision:0,datasetToken,scopeKey:key(request),inputs:emptyRequiredStaffing(),origins:{},basisTurns:[]};
  const list=raw as {field:StaffingInputField;value:RequiredStaffingInput[StaffingInputField];basis:HiringInputBasis}[];

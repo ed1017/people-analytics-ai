@@ -10,9 +10,14 @@ import {converseSolutions} from '../../lib/home-solution-conversation-service.ts
 import {fixtureRuntime} from '../fixtures/home-solution-conversation.mjs';
 import {fixedMessages,fixedSteps} from '../fixtures/required-staffing.mjs';
 import {DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
+import {offlineBusinessRoute} from '../helpers/offline-business-route.mjs';
+import {responseForStep} from '../fixtures/natural-business-planning.mjs';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
+const fullUI=process.env.REQUIRED_STAFFING_FULL_UI==='true',isolated=fullUI?await offlineBusinessRoute():null;
+if(isolated){isolated.sandbox.console={info(){},error(){}};Object.assign(isolated.sandbox.process.env,{VERCEL_ENV:'preview',VERCEL_GIT_COMMIT_REF:'codex/pr204-bounded-preview-20261010'});}
 const output=process.env.REQUIRED_STAFFING_QA_OUTPUT??await fs.mkdtemp(path.join(os.tmpdir(),'required-staffing-'));await fs.mkdir(output,{recursive:true});
-const compiler=webpackPackage.webpack({mode:'development',devtool:false,plugins:[new webpackPackage.webpack.DefinePlugin({'process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION':JSON.stringify('true'),'process.env.NEXT_PUBLIC_GOAL_PROGRESS':JSON.stringify('true'),'process.env.NEXT_PUBLIC_HOME_STRUCTURED_PLANS':JSON.stringify('false')})],entry:path.resolve('tests/fixtures/home-hiring-budget-client.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,plugins:[new webpackPackage.webpack.DefinePlugin({'process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION':JSON.stringify('true'),'process.env.NEXT_PUBLIC_GOAL_PROGRESS':JSON.stringify('true'),'process.env.NEXT_PUBLIC_HOME_STRUCTURED_PLANS':JSON.stringify('false')})],entry:path.resolve(fullUI?'tests/fixtures/swp-editor-full-client.tsx':'tests/fixtures/home-hiring-budget-client.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
 const css=(await postcss([tailwind({base:process.cwd()})]).process(await fs.readFile('app/globals.css','utf8'),{from:path.resolve('app/globals.css')})).css;
 const js=await fs.readFile(path.join(output,'fixture.js'),'utf8');
@@ -24,25 +29,38 @@ try{for(const [mode,width,height] of [['desktop',1440,1100],['phone',390,844]]){
  const check=(name,ok)=>{assert.ok(ok,mode+' '+name);checks.push(mode+' '+name);console.log('PASS '+mode+' '+name);};
  await context.route('**/*',async route=>{const req=route.request(),url=new URL(req.url());if(req.isNavigationRequest()&&url.href===base+'/')return route.fulfill({contentType:'text/html',body:html});if(url.origin!==base){external++;return route.abort();}
   if(url.pathname==='/api/home-solution-conversation'){
-   const body=req.postDataJSON();requests.push(body);const runtime=fixtureRuntime(fixedSteps(body));runtime.natural={datasetToken:'legacy-v1:0'};
+   const body=req.postDataJSON();requests.push(body);
+   if(isolated){
+    const steps=fixedSteps(body),start=isolated.sandbox.__requests.length;
+    isolated.sandbox.__replies.push(responseForStep(steps[0],0),null);const shift=isolated.sandbox.__replies.shift.bind(isolated.sandbox.__replies);
+    isolated.sandbox.__replies.shift=()=>shift()??responseForStep(steps[1](isolated.sandbox.__requests.at(-1).input),1);
+    const response=await isolated.post(new Request(req.url(),{method:req.method(),headers:req.headers(),body:req.postData()})),reply=await response.json();isolated.sandbox.__replies.shift=shift;
+    assert.equal(response.status,200,JSON.stringify(reply));assert.equal(isolated.sandbox.__requests.length-start,2);
+    assert.deepEqual(JSON.parse(JSON.stringify(isolated.sandbox.__requests[start].tool_choice)),{type:'function',name:'compare_required_staffing'});
+    if(reply.providerReceipt)assert.equal(reply.providerReceipt.modelAttempts,2);
+    return route.fulfill({json:reply});
+   }
+   const runtime=fixtureRuntime(fixedSteps(body));runtime.natural={datasetToken:'legacy-v1:0'};
    return route.fulfill({json:await converseSolutions(body,runtime,new AbortController().signal)});
   }
+  if(req.method()==='POST'){external++;return route.abort();}
   if(url.pathname.startsWith('/api/'))return route.fulfill({json:{overview:{headcount:100,fte:100,open_positions:3,snapshot_date:'2026-09-30'},trend:[]}});external++;return route.abort();
  });
- await page.goto(base);const input=page.getByLabel('Ask Workforce AI',{exact:true});
+ await page.goto(base);if(fullUI)await dismissHomeOnboarding(page);const input=page.getByLabel('Ask Workforce AI',{exact:true});
  const send=async text=>{await input.fill(text);await page.getByRole('button',{name:'Send overview question',exact:true}).click();await page.getByRole('status').filter({hasText:'Thinking through the question'}).waitFor({state:'hidden'});};
  const card=page.getByRole('region',{name:'Fixed-role staffing comparison',exact:true}),state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
  await send(fixedMessages.start);await card.waitFor();
+ if(fullUI)check('actual Home UI selects the solution endpoint and renders checked cards',requests.length===1&&isolated.sandbox.__requests.at(-1).service_tier==='default'&&isolated.sandbox.__requests.at(-1).reasoning.effort==='medium');
  check('three numeric options without a workload form',await card.getByRole('article').count()===3&&(await card.innerText()).includes('1,600,000 USD')&&(await card.innerText()).includes('30,000 USD')&&(await card.innerText()).includes('495,000 USD')&&await page.getByRole('region',{name:'Business planning assumptions',exact:true}).count()===0);
  check('training requirements and operational timing stay unknown',await card.getByRole('article',{name:'Train 0, redeploy 0, hire 10',exact:true}).innerText().then(t=>t.includes('Training: Not specified')&&t.includes('Readiness: Unknown'))&&(await card.innerText()).includes('480 hours')&&(await card.innerText()).includes('240 hours'));
  check('one recommendation and optional details, no new input form',(await card.innerText()).split('Recommendation:').length===2&&await card.locator('form,input,select').count()===0&&await card.locator('details[open]').count()===0);
  await send(fixedMessages.followup);check('numeric follow-up retains the exact ten-role comparison',(await card.innerText()).includes('495,000 USD')&&requests.at(-1).state.requiredStaffing.inputs.requiredRoles===10);
  await send(fixedMessages.correction);check('per-trainee correction recalculates two internal options',(await card.innerText()).includes('42,000 USD')&&(await card.innerText()).includes('501,000 USD')&&(await card.innerText()).includes('240 hours'));
- await page.reload();await card.waitFor();check('reload retains corrected values and unknown new-hire training',(await card.innerText()).includes('501,000 USD')&&(await card.innerText()).includes('Training: Not specified'));
+ await page.reload();if(fullUI)await dismissHomeOnboarding(page);await card.waitFor();check('reload retains corrected values and unknown new-hire training',(await card.innerText()).includes('501,000 USD')&&(await card.innerText()).includes('Training: Not specified'));
  const stored=await state();check('comparison does not pin a goal or create a saved plan',!stored.goals.activeId&&stored.exploration.fields.homeSolutionConversationV1.working.length===0);
  await card.screenshot({path:path.join(output,mode+'.png')});
  check('responsive comparison has no overflow, runtime errors or external traffic',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&external===0);
- await page.getByRole('button',{name:'Change workforce scope',exact:true}).click();await card.getByRole('button',{name:'Clear staffing comparison',exact:true}).click();
+ if(!fullUI)await page.getByRole('button',{name:'Change workforce scope',exact:true}).click();await card.getByRole('button',{name:'Clear staffing comparison',exact:true}).click();
  check('clear removes only this comparison without a model request',await card.count()===0&&requests.length===3&&(await state()).exploration.fields.homeSolutionConversationV1.turns.length===6);
  await context.close();
 }}finally{await browser.close()}
