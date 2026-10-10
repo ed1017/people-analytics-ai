@@ -1,4 +1,5 @@
 "use client";
+import {ActionPlanQuickSummary} from './action-plan-quick-summary';
 import {planContextDiagnosticText,type PlanContextDiagnostic} from '@/lib/home-evidence-identity';
 import {PlanDirections} from '@/components/plan-directions';
 import {HomePlanSummary} from '@/components/home-plan-summary';
@@ -13,6 +14,7 @@ export function PlanAlternativeCard({plan,catalog,compact=false,snapshot=false,c
  const referenceNotice='Saved reference only; review its population and period against current evidence. It does not establish effectiveness.';
  return <article aria-label={compact?`Comparison Action Plan ${plan.number}`:`Action Plan option ${plan.number}`} className="min-w-0 space-y-3 break-words rounded border p-3 text-sm">
  <h3 className="font-semibold">{compact?`Action Plan #${plan.number}: `:""}{bundleDisplayName(draft.bundle.name)}</h3>
+ <ActionPlanQuickSummary draft={draft} result={currentResult}/>
  {result.calculationStatus==='awaiting-scope'&&<p>Qualitative proposal · population or horizon unknown. No resource totals have been calculated; refine in chat before operational Apply. It may already be attached to its goal as a proposal.</p>}
  <p>{snapshot?'Attached snapshot':catalog.attachments.some(item=>item.planId===plan.id&&item.purpose==='proposal-selection')&&!plan.applied?'Selected proposal attached to goal · not operationally applied':!plan.operation?'Original plan snapshot':plan.applied?'Applied alternative':'Proposed alternative · not yet applied'} · revision {draft.revision}{plan.sourceRefs.length?` · based on ${plan.sourceRefs.map(ref=>'Action Plan #'+catalog.plans.find(item=>item.id===ref.id)!.number).join(' and ')}`:''}.</p>
  {(!contextCurrent||snapshot)&&<p>Historical assumptions; review current evidence before acting.</p>}

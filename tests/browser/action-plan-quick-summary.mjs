@@ -1,0 +1,43 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
+import postcss from 'postcss';
+import tailwind from '@tailwindcss/postcss';
+import {summaryFixture} from '../fixtures/plan-quick-summary.mjs';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
+const output=await fs.mkdtemp(path.join(os.tmpdir(),'plan-quick-summary-'));
+const cases=['known','partial','unknown'].map(summaryFixture);const scenario=summaryFixture();scenario.name='scenario';scenario.result.conditionalCoverage=[0,1,2,3,4,5];cases.push(scenario);const empty=summaryFixture();empty.name='all-unknown';empty.result=null;cases.push(empty);
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,plugins:[new webpackPackage.webpack.DefinePlugin({'process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION':JSON.stringify('true'),'process.env.NEXT_PUBLIC_GOAL_PROGRESS':JSON.stringify('true'),'process.env.NEXT_PUBLIC_HOME_STRUCTURED_PLANS':JSON.stringify('false')})],entry:path.resolve('tests/fixtures/plan-quick-summary-client.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
+const css=(await postcss([tailwind({base:process.cwd()})]).process(await fs.readFile('app/globals.css','utf8'),{from:path.resolve('app/globals.css')})).css;
+const js=await fs.readFile(path.join(output,'fixture.js'),'utf8');
+const html=`<!doctype html><html data-workspace-preference="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style></head><body><div id="root"></div><script>window.summaryCases=${JSON.stringify(cases)};</script><script>${js.replaceAll('</script','<\\/script')}</script></body></html>`;
+const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']}),checks=[];
+try{for(const [mode,width,height] of [['desktop',1200,1000],['phone',390,844]]){
+ const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),errors=[];let external=0;
+ page.on('pageerror',error=>errors.push(error.message));
+ await context.route('**/*',route=>{if(route.request().url()==='http://localhost:3123/')return route.fulfill({contentType:'text/html',body:html});external++;return route.abort();});
+ await page.goto('http://localhost:3123/');await page.getByRole('article',{name:'known',exact:true}).waitFor();
+ const check=(name,ok)=>{assert.ok(ok,mode+' '+name);checks.push(mode+' '+name);};
+ const known=page.getByRole('article',{name:'known',exact:true}),partial=page.getByRole('article',{name:'partial',exact:true}),unknown=page.getByRole('article',{name:'unknown',exact:true});
+ const sections=known.getByRole('region',{name:'Action Plan quick summary'}).locator(':scope > div > section');
+ const boxes=await sections.evaluateAll(nodes=>nodes.map(node=>({x:node.getBoundingClientRect().x,y:node.getBoundingClientRect().y,width:node.getBoundingClientRect().width})));
+ check('three readable columns on desktop; stacked on phone',mode==='desktop'?boxes.every(box=>box.y===boxes[0].y)&&boxes[1].x>boxes[0].x:boxes.every(box=>box.x===boxes[0].x)&&boxes[1].y>boxes[0].y);
+ check('known cash and its actual training/hiring breakdown show checked amounts',await known.getByText('$3,000',{exact:true}).count()===1&&await known.getByText('Training',{exact:true}).isVisible()&&await known.getByText('Hiring fees',{exact:true}).isVisible());
+ check('only complete reconciled costs have breakdown bars',await known.locator('[aria-hidden=true]').count()===2&&await partial.locator('[aria-hidden=true]').count()===0&&await unknown.locator('[aria-hidden=true]').count()===0);
+ check('partial subtotal is explicit and total remains unknown',await partial.getByText('Listed: $3,000 · partial',{exact:true}).isVisible()&&await partial.getByRole('region',{name:'Total cost',exact:true}).getByText('Unknown',{exact:true}).count()===1);
+ check('unknown component is not shown as zero',await unknown.getByText('$2,000',{exact:true}).count()===1&&await unknown.getByText('$0',{exact:true}).count()===0);
+ const emptySummary=page.getByRole('article',{name:'all-unknown',exact:true}).getByRole('region',{name:'Action Plan quick summary'});
+ check('all-unknown summary stays compact with every unknown explicit',await emptySummary.evaluate(node=>node.getBoundingClientRect().height<260)&&await emptySummary.innerText().then(text=>text.includes('Breakdown: Unknown')&&text.includes('Duration / start / finish: Unknown')&&text.includes('People / FTE / staff hours: Unknown')));
+ await page.getByRole('article',{name:'all-unknown',exact:true}).screenshot({path:path.join(output,mode+'-all-unknown.png')});
+ check('scenario chart uses supplied points and explicitly distinguishes them from actuals',await page.getByRole('figure',{name:'Conditional capacity scenario'}).count()===1&&await page.getByText('Conditional on readiness · not an observed trend',{exact:true}).isVisible());
+ await page.getByRole('article',{name:'scenario',exact:true}).screenshot({path:path.join(output,mode+'-scenario.png')});
+ check('FTE remains unknown and no inferred forecast appears',await known.getByRole('region',{name:'Resources'}).innerText().then(text=>text.includes('FTE: Unknown'))&&await page.getByText(/forecast/i).count()===0);
+ check('summary precedes goal and controls',await known.getByRole('region',{name:'Action Plan quick summary'}).evaluate(node=>Boolean(node.compareDocumentPosition(node.parentElement.querySelector('button'))&Node.DOCUMENT_POSITION_FOLLOWING)));
+ await known.screenshot({path:path.join(output,mode+'-known.png')});await partial.screenshot({path:path.join(output,mode+'-partial.png')});await unknown.screenshot({path:path.join(output,mode+'-unknown.png')});
+ if(mode==='desktop'){await known.evaluate(node=>node.style.width='350px');const positions=await sections.evaluateAll(nodes=>nodes.map(node=>node.getBoundingClientRect().y));check('resized narrow panel stacks even on desktop',positions[1]>positions[0]);await known.screenshot({path:path.join(output,'desktop-narrow-panel.png')});}
+ check('no overflow, runtime errors or network calls',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&external===0);await context.close();
+}}finally{await browser.close()}
+await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({checks},null,2));console.log(JSON.stringify({checks:checks.length,output}));

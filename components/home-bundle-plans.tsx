@@ -1,4 +1,5 @@
 "use client";
+import {ActionPlanQuickSummary} from './action-plan-quick-summary';
 import {useHomeGuidedActions} from '@/components/home-guided-actions';
 import {PlanDirections} from '@/components/plan-directions';
 import {HomePlanSummary} from '@/components/home-plan-summary';
@@ -147,6 +148,7 @@ export function LegacyHomeBundlePlans({onCorrectSavedPilot,contextDiagnostic,cha
   </section>
   <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-medium">Selected: Action Plan #{optionNumber(selected)} · {bundleDisplayName(draft.bundle.name)}</p><button type="button" className={bundleButton} aria-expanded={!collapsed} aria-controls={panelId} onClick={()=>{setCollapsed(!collapsed);saveView({collapsed:!collapsed});if(!collapsed){setAttachFlow(null);setAttachmentOpen(null);}}}>{collapsed?'Show Action Plan':'Collapse Action Plan'}</button></div>
   <div id={panelId} hidden={collapsed}><section id="selected-home-plan" role="tabpanel" aria-labelledby={`plan-tab-${selected}`}><article aria-label={`Action Plan option ${optionNumber(selected)}`} className="space-y-3 border-t pt-3"><h3 ref={heading} tabIndex={-1} className="text-base font-semibold">{bundleDisplayName(draft.bundle.name)}</h3>
+   <ActionPlanQuickSummary draft={draft} result={currentResult}/>
    {onCorrectSavedPilot&&<SavedPilotCorrectionOffer draft={draft} planningContext={planningContext} disabled={disabled||!contextCurrent||attachBusy} onCreate={()=>{try{guard();if(bundleInputKey(currentDraft())!==bundleInputKey(draft))throw Error('The saved plan changed. Review its current defaults.');onCorrectSavedPilot(selected,bundleInputKey(draft),Object.entries(viewDrafts).map(([id,draft])=>({id,draft})));}catch(error){setNotice((error as Error).message);}}}/>}
    {pendingRevision&&<p className="font-medium">Proposed revision {draft.revision} · not yet applied</p>}
    <p aria-label="Plan description" className="text-sm leading-relaxed">{bundleDisplayText(draft.bundle.objective,draft.bundle,draft.inputs)}</p>
