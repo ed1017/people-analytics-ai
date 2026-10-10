@@ -1,0 +1,23 @@
+{
+  "checks": [
+    "desktop three readable columns on desktop; stacked on phone",
+    "desktop known cash and its actual training/hiring breakdown show checked amounts",
+    "desktop only complete reconciled costs have breakdown bars",
+    "desktop partial subtotal is explicit and total remains unknown",
+    "desktop unknown component is not shown as zero",
+    "desktop scenario chart uses supplied points and explicitly distinguishes them from actuals",
+    "desktop FTE remains unknown and no inferred forecast appears",
+    "desktop summary precedes goal and controls",
+    "desktop resized narrow panel stacks even on desktop",
+    "desktop no overflow, runtime errors or network calls",
+    "phone three readable columns on desktop; stacked on phone",
+    "phone known cash and its actual training/hiring breakdown show checked amounts",
+    "phone only complete reconciled costs have breakdown bars",
+    "phone partial subtotal is explicit and total remains unknown",
+    "phone unknown component is not shown as zero",
+    "phone scenario chart uses supplied points and explicitly distinguishes them from actuals",
+    "phone FTE remains unknown and no inferred forecast appears",
+    "phone summary precedes goal and controls",
+    "phone no overflow, runtime errors or network calls"
+  ]
+}
