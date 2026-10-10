@@ -3,7 +3,7 @@ import {hiringBudgetTool,currentHiringBudget,hiringBudgetView,editHiringBudget} 
 // @ts-expect-error Native Node tests share TypeScript source.
 import {answerEvidenceSeries,type ChatEvidenceSeries} from './chat-evidence-series.ts';
 // @ts-expect-error Native Node tests share application source.
-import {requiredStaffingTool,currentRequiredStaffing,requiredStaffingView,editRequiredStaffing,requiresRequiredStaffing,requiredStaffingAnswer} from './home-required-staffing.ts';
+import {requiredStaffingTool,currentRequiredStaffing,requiredStaffingView,editRequiredStaffing,requiresRequiredStaffing,canCompleteRequiredStaffingAlone,requiredStaffingAnswer} from './home-required-staffing.ts';
 import type {verifySolutionEvidence} from './home-solution-grounding.mjs';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {homeAnswerScopeViolation} from './home-answer-scope.ts';
@@ -93,7 +93,8 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  let natural=runtime.natural?currentBusinessPlanning(request,runtime.natural.datasetToken):null,naturalStep=0;
  let staffingRequired=!!runtime.natural&&requiresRequiredStaffing(request),staffingCalculated=false;
  // Only the already selected, standalone comparison can finish from its first tool result.
- const standaloneStaffing=staffingRequired&&!demand&&!entryContext&&!request.goal.id&&!request.goal.statement&&!request.goalContext&&!request.selectedId&&!request.catalog&&!state.working.length&&!state.analyses.length&&!state.constraints.length&&!state.verifiedMetrics.length&&!state.focusCandidateId;
+ const staffingOnly=staffingRequired&&canCompleteRequiredStaffingAlone(request);
+ const standaloneStaffing=staffingOnly&&!demand&&!entryContext&&!request.goal.id&&!request.goal.statement&&!request.goalContext&&!request.selectedId&&!request.catalog&&!state.working.length&&!state.analyses.length&&!state.constraints.length&&!state.verifiedMetrics.length&&!state.focusCandidateId;
  const modelContext={...solutionModelContext(request,progress),...(runtime.grounding?{evidenceGrounding:runtime.grounding}:{}),...(runtime.natural?{requiredStaffing:requiredStaffingView(currentRequiredStaffing(request,runtime.natural.datasetToken)),businessPlanning:businessPlanningView(natural,request.requestId,naturalStep),hiringBudget:hiringBudgetView(currentHiringBudget(request,runtime.natural.datasetToken))}:{})};
  if(referenced&&demand){const goalContext=structuredClone(request.goalContext) as {scenarioReview:Record<string,unknown>};goalContext.scenarioReview.demandProposal=demand.demandProposal?referencedDemandView(demand.demandProposal,demand,currentDemandReference):null;modelContext.goalContext=goalContext;}
  const input:unknown[]=[{role:'user',content:'CURRENT AUTHORITATIVE CONTEXT AND CONVERSATION DATA\n'+JSON.stringify({...modelContext,...(entryContext?{progressEntryDraft:entryContext.previous}:{} )})}];
@@ -102,7 +103,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  for(let round=0;round<4;round++){
   abort(signal);if(new TextEncoder().encode(JSON.stringify(input)).length>120000)throw Error('This conversation needs a narrower set of sources before another model round. Earlier work is kept.');
   if(staffingRequired&&!staffingCalculated&&(round===3||operations>=6))throw Error('The staffing comparison was not calculated within this turn\'s limits. Earlier work is kept.');
-  const output=await runtime.complete(input,round===3||operations>=6,signal,{progressEntryEnabled:!!entryContext,requiredStaffingCalculation:staffingRequired&&!staffingCalculated});rounds++;abort(signal);
+  const output=await runtime.complete(input,round===3||operations>=6,signal,{progressEntryEnabled:!!entryContext,requiredStaffingCalculation:standaloneStaffing&&!staffingCalculated});rounds++;abort(signal);
   if(!output.completed||output.calls.length>6||JSON.stringify(output.items).length>70000)throw Error('The conversation response was incomplete or exceeded its bounds.');
   if(!output.calls.length){if(staffingRequired&&!staffingCalculated)throw Error('The staffing comparison was not calculated in this turn. Earlier work is kept.');if(!output.text||output.text.length>20000)throw Error('The conversational answer is unavailable.');const value=JSON.parse(output.text);assertSolutionShape(value,solutionFinalSchema,'answer');final=value;break;}
   const callCost=(call:SolutionModelOutput['calls'][number])=>{if(call.name!=='evaluate_action_plans')return 1;try{const count=JSON.parse(call.arguments)?.candidates?.length;return Number.isInteger(count)&&count>=1&&count<=3?count:3;}catch{return 3;}};
@@ -191,8 +192,11 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  }
  if(!final)throw Error('No complete conversational answer was returned.');
  if(staffingCalculated&&state.requiredStaffing){
-  if(final.candidateIds.length||final.analysisIds.length||final.verifiedMetrics.length||final.constraintUpdates.length||final.rejected.length||final.focusCandidateId!==null)throw Error('Keep the fixed-role comparison separate from Action Plan and projection changes.');
-  final.answer=requiredStaffingAnswer(state.requiredStaffing);final.questions=[];
+  if(staffingOnly){
+   if(final.candidateIds.length||final.analysisIds.length||final.verifiedMetrics.length||final.constraintUpdates.length||final.rejected.length||final.focusCandidateId!==null)throw Error('Keep the fixed-role comparison separate from Action Plan and projection changes.');
+   final.answer=requiredStaffingAnswer(state.requiredStaffing);final.questions=[];
+  }else final.answer+='\n\nChecked fixed-role comparison:\n'+requiredStaffingAnswer(state.requiredStaffing);
+  assertSolutionShape(final,solutionFinalSchema,'answer');
  }
  if(homeAnswerScopeViolation(final.answer,request.evidence))throw Error('The answer attributes source evidence to an unsupported population.');
  state.constraints=mergeSolutionConstraints(request,state.constraints,final.constraintUpdates);

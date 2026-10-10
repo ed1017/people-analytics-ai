@@ -4,7 +4,7 @@ import OpenAI from 'openai';
 import {createProviderPreviewGuard,providerPreviewEnabled,providerPreviewLimits,providerPreviewBranch,ProviderPreviewIncompleteError} from '../lib/home-provider-preview.ts';
 import {offlineBusinessRoute} from './helpers/offline-business-route.mjs';
 import {solutionRequest,final} from './fixtures/home-solution-conversation.mjs';
-import {fixedMessages,fixedSteps} from './fixtures/required-staffing.mjs';
+import {fixedMessages,fixedSteps,fixedChanges} from './fixtures/required-staffing.mjs';
 import {responseForStep} from './fixtures/natural-business-planning.mjs';
 import {buildHomePack} from '../lib/home-pack.mjs';
 const env={VERCEL_ENV:'preview',VERCEL_GIT_COMMIT_REF:providerPreviewBranch,VERCEL_GIT_COMMIT_SHA:'synthetic-reviewed-head'};
@@ -55,6 +55,17 @@ test('read-only preflight rejects a Preview built without the Home UI flag befor
  const r=await route({NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION:'false'}),response=r.sandbox.module.exports.GET(),probe=await response.json();
  assert.equal(response.status,503);assert.equal(probe.ready,false);assert.equal(probe.solutionConversationEnabled,false);assert.equal(r.sandbox.__requests.length,0);
  assert.equal((await r.submit(solutionRequest(fixedMessages.start))).status,404);assert.equal(r.sandbox.__requests.length,0);
+});
+test('compound staffing retains both tools but cannot bypass the Preview two-call cap',async()=>{
+ const r=await route(),body=solutionRequest('Fill 10 engineering roles by hiring/training/redeploying. Also review an annual hiring budget for five designers.'),before=JSON.stringify(body);
+ const steps=[{name:'compare_required_staffing',args:{changes:fixedChanges(body,{role:'Engineering roles',requiredRoles:10})}},{name:'review_hiring_budget',args:{changes:fixedChanges(body,{role:'Designers',hires:5,months:12})}}];let step=0;
+ r.sandbox.__replies.shift=()=>{
+  const sent=r.sandbox.__requests.at(-1),next=steps[step++];assert.ok(next,'No third provider request');assert.equal(sent.tool_choice,'auto');assert.equal(sent.parallel_tool_calls,false);
+  for(const name of ['compare_required_staffing','review_hiring_budget'])assert.ok(sent.tools.some(tool=>tool.name===name));assert.ok(sent.tools.some(tool=>tool.name===next.name));
+  return provider(next);
+ };
+ const response=await r.submit(body),reply=await response.json();assert.equal(response.status,422);assert.equal(reply.code,'preview_two_call_incomplete');assert.equal(step,2);assert.equal(r.sandbox.__requests.length,2);
+ assert.equal(reply.providerReceipt.modelAttempts,2);assert.equal(reply.providerReceipt.providerRounds.length,2);assert.equal(reply.answer,undefined);assert.equal(reply.state,undefined);assert.equal(JSON.stringify(body),before);
 });
 test('actual POST returns explicit incomplete and receipts before a third call; production preserves ordinary continuation',async()=>{
  for(const production of [false,true]){
