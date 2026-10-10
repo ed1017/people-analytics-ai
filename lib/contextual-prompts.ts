@@ -1,6 +1,4 @@
 // Local example selection only. No model calls, data loading or persisted state.
-// @ts-expect-error Native Node tests share TypeScript source.
-import {strategicPlanningStarters} from './home-strategic-planning.ts';
 export type PromptContext = {
   page: string;
   goal: string;
@@ -35,12 +33,16 @@ const pageExamples:Record<string,string> = {
 };
 const planningPages = new Set(['planning-overview','scenario-modeling','position-workforce-design','workforce-response','execution-feasibility','workforce-planning']);
 const readOnlyPages = new Set(['compensation','decision-brief','assess-evaluate']);
+const recommendedPlanRequest = 'Recommend an Action Plan using known inputs. Separate missing inputs from editable assumptions; do not invent numbers, available capacity or automation benefits.';
 export const homeStarterGroups = [
-  {label:'Strategic Workforce Planning',purpose:'swp-business',prompts:strategicPlanningStarters.map(({prompt})=>({label:prompt,prompt}))},
-  {label:'Workforce challenges',prompts:[
-    {label:'How can we reduce turnover?',prompt:'How can we reduce turnover based on recorded evidence, and which findings apply to the selected workforce scope?'},
-    {label:'How can we improve satisfaction?',prompt:'How can we improve employee satisfaction based on recorded feedback, and which findings apply to the selected workforce scope?'},
-    {label:'How can we improve hiring?',prompt:'How can we improve hiring based on recorded recruiting evidence, and which findings apply to the selected workforce scope?'},
+  {label:'Service delivery',purpose:'swp-business',prompts:[
+    {label:'More support tickets, same payroll?',prompt:`Hypothetical scenario: if support-ticket demand rose while payroll stayed flat, how could we cover the work without overloading another team? ${recommendedPlanRequest}`},
+    {label:'Train, redeploy or hire for new client work?',prompt:`Hypothetical scenario: if new client work required skills we might not have available, should we train, redeploy or hire? Compare skill readiness, release dates, cost and delivery tradeoffs. ${recommendedPlanRequest}`},
+  ]},
+  {label:'People and capacity',purpose:'swp-business',prompts:[
+    {label:'How many active requisitions can recruiters cover?',prompt:`Hypothetical scenario: if active requisitions increased, how should we balance recruiter workload, hiring priorities and additional recruiting capacity? Check requisition complexity and current commitments. ${recommendedPlanRequest}`},
+    {label:'Can managers support more delivery work?',prompt:`Hypothetical scenario: before taking on more client delivery work, how could we check manager capacity for supervision, coaching and onboarding? Compare workload changes and additional management capacity. ${recommendedPlanRequest}`},
+    {label:'Can our hiring target fit Finance’s budget?',prompt:'Hypothetical scenario: could we add 3 support specialists over 6 months within a $120,000 Finance budget cap? Treat these as editable example inputs; confirm the role and salary from recorded role data or Finance input. Recommend an Action Plan using known inputs, checking feasibility where supported and comparing phased hiring, internal moves or a mix. Keep missing employer and recruiting costs explicit editable assumptions; do not claim unrun calculations or automation savings.'},
   ]},
 ] as const;
 export const homeGoalStarters = homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.prompt));

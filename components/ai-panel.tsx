@@ -166,8 +166,8 @@ export function AiPanel({
           {!aiCollapsed && (
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
-              <div><h2 className="text-xl font-semibold">
-                Ask AI
+              <div><h2 className="text-2xl font-semibold tracking-tight">
+                Workforce AI
               </h2></div>
             </div>
           )}
@@ -217,7 +217,7 @@ export function AiPanel({
           </div>
         ) : (
           <div data-ai-conversation-body className="flex min-h-0 flex-1 flex-col">
-            <div id={goalHelpId} className="mb-3 space-y-1 text-sm leading-5 text-muted-foreground">
+            <div id={goalHelpId} className="mb-3 space-y-1 text-base leading-relaxed text-muted-foreground">
               <p>{readOnlyReason ? "AI analysis is not available on this page." : goalStatement ? "Ask a question about this topic. Responses will use your selected goal as context." : "Select a goal to give your questions context."}</p>
               <p className="break-words text-foreground">Goal: {goalStatement || "General exploration"}</p>
             </div>
@@ -234,7 +234,7 @@ export function AiPanel({
               {!chatMessages.length&&!hasGoal&&!readOnlyReason&&!dashboardReady&&<p className="text-base text-muted-foreground">You can keep drafting while page evidence loads.</p>}
 
               {chatLoading && (
-                <div className="flex items-center gap-2 py-2 text-[17px] text-muted-foreground">
+                <div className="flex items-center gap-2 py-2 text-base text-muted-foreground">
                   <LoaderCircle className="h-4 w-4 animate-spin" />
                   Analyzing current workforce context…
                 </div>
@@ -276,7 +276,7 @@ export function AiPanel({
                 rows={5}
                 aria-label="Ask People Analytics AI"
                 aria-describedby={goalHelpId}
-                className="h-36 min-h-32 max-h-64 min-w-0 flex-1 resize-y rounded-lg border bg-background p-3.5 text-[17px] leading-relaxed outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-36 min-h-32 max-h-64 min-w-0 flex-1 resize-y rounded-lg border bg-background p-3.5 text-base leading-relaxed outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
               />
 
               <Button

@@ -37,7 +37,7 @@ export function HomeGettingStarted({ busy, active, ready, autoOpen, onNavigate, 
     if(restoreFocus.current&&activeHome.current)trigger.current?.focus({preventScroll:true});
   };
   const navigate=(page:AppPage)=>{restoreFocus.current=false;close();onNavigate(page);};
-  return <section aria-label="Home instructions" className="min-w-0 flex-1 text-sm">
+  return <section aria-label="Home instructions" className="min-w-0 basis-full flex-1 text-sm sm:basis-80">
     <div className="flex flex-wrap items-start justify-between gap-x-3">
       <button ref={trigger} type="button" disabled={busy||!ready} aria-haspopup="dialog" aria-expanded={open} aria-controls="home-starting-instructions" onClick={() => {restoreFocus.current=true;dialog.current?.showModal();title.current?.focus();setOpen(true);}} className="min-h-11 rounded px-1 text-xs font-medium text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Show instructions</button>
       {status}

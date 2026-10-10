@@ -157,8 +157,8 @@
   border-top-width: 1px;
 }
 
-/* The once-only introduction must leave the composer reachable on short screens. */
-.app-ai-panel:has([data-workforce-intro]) [data-ai-conversation-body] { overflow-y: auto; }
+/* Readable controls and the composer remain reachable in short/narrow panels. */
+.app-ai-panel [data-ai-conversation-body] { overflow-y: auto; }
 .app-ai-panel:has([data-workforce-intro]) [data-ai-conversation-body] > * { flex-shrink: 0; }
 
 @media (min-width: 768px) {
@@ -438,10 +438,31 @@
   }
 }
 
+/* Planning and chat share a readable type scale. Source references retain their
+   explicit footnote size; existing layout/resize measurements remain in control. */
+:is(.home-workspace, .app-ai-panel, .goal-toolbar, .global-workforce-filters) {
+  --text-xs: 1rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 1rem;
+  --text-sm--line-height: 1.5;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+:is(.home-workspace, .app-ai-panel, .goal-toolbar, .global-workforce-filters) :is(input, select, textarea) {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.chat-message { overflow-wrap: anywhere; }
+.chat-message[data-chat-role="user"] {
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--muted);
+  padding: 1rem;
+}
 /* Home prose stays complete; spacing does not alter other page responses. */
-.home-answer > * + * { margin-block-start: 6px; }
-.home-answer > [data-chat-item] + [data-chat-item] { margin-block-start: 2px; }
-.home-answer > [data-chat-heading] { margin-block-start: 8px; margin-block-end: 4px; }
+.home-answer > * + * { margin-block-start: 12px; }
+.home-answer li + li { margin-block-start: 8px; }
+.home-answer > [data-chat-heading] { margin-block-start: 20px; margin-block-end: 8px; font-size: 1.125rem; }
 .home-answer > [data-chat-heading] + * { margin-block-start: 0; }
 .home-answer > :first-child { margin-block-start: 0; }
 

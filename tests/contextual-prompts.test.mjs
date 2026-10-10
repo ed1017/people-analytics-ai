@@ -1,15 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {contextualPrompts,hasKnownNumericEvidence,homeGoalStarters,homeStarterGroups,workforceStageExample} from '../lib/contextual-prompts.ts';
-import {planningPrompts,challengePrompts} from './fixtures/home-starter-prompts.mjs';
+import {decisionStarterLabels,decisionStarterPrompts} from './fixtures/home-starter-prompts.mjs';
 const source=(id,facts={count:0},status='loaded')=>({id,facts,status});
 const base={page:'home',goal:'Improve retention',hasConversation:false,evidenceReady:true,sources:[source('A1'),source('T1')]};
 test('Home starters remain simple while skills follow-ups are contextual and permit combined methods',()=>{
  assert.deepEqual(contextualPrompts({...base,goal:''}),[...homeGoalStarters]);
- assert.deepEqual(homeStarterGroups.map(group=>group.label),['Strategic Workforce Planning','Workforce challenges']);
- assert.deepEqual(homeStarterGroups[0].prompts.map(item=>item.label),planningPrompts);
- assert.ok(homeStarterGroups[0].prompts.every(item=>item.label===item.prompt));
- assert.deepEqual(homeGoalStarters,[...planningPrompts,...challengePrompts]);
+ assert.deepEqual(homeStarterGroups.map(group=>group.label),['Service delivery','People and capacity']);
+ assert.deepEqual(homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.label)),decisionStarterLabels);
+ assert.ok(homeStarterGroups.every(group=>group.purpose==='swp-business'));
+ assert.ok(homeGoalStarters.every(prompt=>prompt.startsWith('Hypothetical scenario:')));
+ assert.deepEqual(homeGoalStarters,decisionStarterPrompts);
  assert.match(contextualPrompts({...base,goal:'Build AI skills without adding headcount'})[1],/mix of training, internal moves and hiring/);
  for(const context of [base,{...base,goal:''},{...base,goal:'Build skills',sources:[source('A1')]},{...base,page:'overview',goal:'Build skills'}])assert.doesNotMatch(contextualPrompts(context).join(' '),/mix of training/);
  assert.equal(contextualPrompts({...base,goal:'',sources:[]}).length,1);
@@ -48,3 +49,5 @@ test('page examples use only the active capability and remain small',()=>{
  for(const page of ['compensation','decision-brief','assess-evaluate'])assert.deepEqual(contextualPrompts({...base,page}),[]);
  assert.match(contextualPrompts({...base,page:'unsupported'})[0],/missing/);
 });
+
+test('Finance target is explicitly hypothetical and editable without inventing a salary or a calculation',()=>{const prompt=homeGoalStarters.at(-1);for(const pattern of [/3 support specialists/,/6 months/,/\$120,000 Finance budget cap/,/editable example inputs/,/confirm the role and salary/,/where supported/,/phased hiring, internal moves or a mix/,/missing employer and recruiting costs/,/do not claim unrun calculations/])assert.match(prompt,pattern);});
