@@ -1,6 +1,7 @@
 import { withDatasetRequest } from "@/lib/dataset-runtime";
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
+import { dataApiErrorResponse } from "../../../lib/data-api-error";
 
 import { loadPerformanceRelease, parsePerformanceFilters } from "../../../lib/workforce-performance";
 
@@ -37,10 +38,7 @@ async function handleGET(request: NextRequest) {
   ).abortSignal(request.signal);
 
   if (error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    );
+    throw error;
   }
 
   const scoped = scopedDashboardResponse(data,dashboardRequestedFilters(request.nextUrl.searchParams));
@@ -57,5 +55,8 @@ async function handleGET(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  return withDatasetRequest(request, () => handleGET(request));
+  return withDatasetRequest(request, async () => {
+    try { return await handleGET(request); }
+    catch (error) { return dataApiErrorResponse('dashboard',error); }
+  });
 }

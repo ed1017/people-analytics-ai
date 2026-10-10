@@ -165,7 +165,7 @@ test('actual POST returns unavailable with zero model calls on timeout, reader f
   if(kind==='timeout')t.mock.timers.tick(solutionGroundingLimits.timeoutMs);
   else if(kind==='failure')pending[0].reject(Error('Synthetic source failure'));
   else controller.abort();
-  const response=await task;assert.equal(response.status,503,kind);assert.match((await response.json()).error,/evidence is unavailable or changed/);
+  const response=await task;assert.equal(response.status,503,kind);assert.match((await response.json()).error,kind==='timeout'?/evidence took too long/:kind==='failure'?/evidence could not be read/:/evidence check was cancelled/);
   assert.equal(isolated.sandbox.__requests.length,0);assert.equal(isolated.sandbox.__aggregateReads.length,2);assert.ok(pending.every(item=>item.readSignal.aborted));
   pending.forEach(item=>item.resolve({status:'unavailable',data:null}));await drain();assert.equal(isolated.sandbox.__aggregateReads.length,2);
  }
