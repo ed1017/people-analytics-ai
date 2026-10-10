@@ -24,7 +24,7 @@ export async function groundSolutionRequest(request:SolutionRequest,signal:Abort
   const handler=(await readers[key as keyof typeof readers]()).GET;
   readSignal.throwIfAborted();
   const response=await handler(local);
-  if(!response.ok)throw new AggregateEvidenceReadError('http_error',response.status);
+  if(!response.ok)throw AggregateEvidenceReadError.fromResponse(response);
   if(key!=='bls'&&response.headers.get('x-workforce-dataset')!==datasetToken)throw new AggregateEvidenceReadError('mixed_dataset');
   readSignal.throwIfAborted();
   try{return {status:'loaded',data:await response.json()};}catch{throw new AggregateEvidenceReadError('invalid_json');}

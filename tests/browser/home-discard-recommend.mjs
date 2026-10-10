@@ -64,20 +64,23 @@ try{
   assert.equal(body.evidence.sources.find(source=>source.id==='W2').status,'loaded','The workforce reader must be exercised');
   assert.equal(body.catalog,null);assert.equal(body.goal.id,'');assert.equal(body.state.rejected.length,Math.min(n-1,2));
   if(n>1){assert.deepEqual(body.state.working[0].candidate.goal,originalGoal);assert.ok(body.state.turns.some(turn=>turn.id===originalGoal.turnId));}
-  if(fault)isolated.sandbox.__aggregateFailure={reader:'workforce',status:500};
+  if(fault)isolated.sandbox.__aggregateFailure={reader:'workforce',status:fault==='auth'?503:500,...(fault==='auth'?{code:'PGRST303'}:{})};
   else{
    delete isolated.sandbox.__aggregateFailure;
    if(body.state.rejected.length){
     const old=body.state.rejected[0],invalid=candidate('invalid-old-source');invalid.goal=originalGoal;invalid.base={kind:'working',id:old.candidateId,revision:old.revision};
     const rejected=await evaluateSolutionCandidate(read,invalid,read.state.constraints);assert.ok(rejected.blocking.some(line=>/stale or rejected/.test(line)),'Explicit reuse of a discarded revision must stay blocked');
    }
-   const c=candidate('pilot-'+n);c.name='Fictional plan '+n;c.goal=originalGoal;
-   isolated.sandbox.__replies.push(...[evaluate(c),final('Fictional recommendation '+n+' is ready for review; not saved.',[c.id])].map(responseForStep));
+   if(n>3)isolated.sandbox.__replies.push(responseForStep(final('The explicit retry succeeded. Your prior proposal remains available for review.')));
+   else{
+    const c=candidate('pilot-'+n);c.name='Fictional plan '+n;c.goal=originalGoal;
+    isolated.sandbox.__replies.push(...[evaluate(c),final('Fictional recommendation '+n+' is ready for review; not saved.',[c.id])].map(responseForStep));
+   }
   }
   const response=await isolated.post(new Request(base+url.pathname,{method:'POST',headers:req.headers(),body:JSON.stringify(body)})),reply=await response.json();
   outcomes.push({status:response.status,code:reply.code??null,attempts:isolated.sandbox.__requests.length,diagnostic:logs.at(-1)?.[1]});
-  if(fault){assert.equal(response.status,503);assert.equal(reply.code,'evidence_reader_failed');assert.equal(isolated.sandbox.__requests.length,0);assert.equal(logs.at(-1)[1].grounding.httpStatus,500);}
-  else{assert.equal(response.status,200);const current=currentSolutionProposals(reply.state);assert.equal(current.length,1);assert.equal(current[0].id,'pilot-'+n);assert.deepEqual(current[0].sourceRefs,[]);assert.deepEqual(current[0].blocking,[]);}
+  if(fault){assert.equal(response.status,503);assert.equal(reply.code,fault==='auth'?'evidence_source_auth_unavailable':'evidence_reader_failed');assert.equal(isolated.sandbox.__requests.length,0);assert.equal(logs.at(-1)[1].grounding.httpStatus,fault==='auth'?503:500);}
+  else{assert.equal(response.status,200);const current=currentSolutionProposals(reply.state);assert.equal(current.length,1);assert.equal(current[0].id,'pilot-'+Math.min(n,3));assert.deepEqual(current[0].sourceRefs,[]);assert.deepEqual(current[0].blocking,[]);}
   return route.fulfill({status:response.status,json:reply});
  });
  await page.goto(base+'/');await dismissHomeOnboarding(page);const goalsBefore=JSON.stringify((await state()).goals);
@@ -93,15 +96,30 @@ try{
   check('cycle '+cycle+' fresh proposal remains reviewable without stale source references',current.length===1&&current[0].id==='pilot-'+(cycle+1)&&current[0].revision===1&&current[0].sourceRefs.length===0&&current[0].blocking.length===0&&renewed.rejected.length===cycle);
   check('cycle '+cycle+' retains goal context and avoids automatic save',JSON.stringify(current[0].candidate.goal)===JSON.stringify(originalGoal)&&JSON.stringify((await state()).goals)===goalsBefore&&!(await state()).exploration.fields[planAlternativesField]);
  }
- const beforeFailure=JSON.stringify(working(await state()));fault=true;
+ const beforeFailure=JSON.stringify(working(await state()));fault='http';
  await chat.fill('recommend me a plan');await button('Send overview question').click();
- await page.getByText('Current database evidence is unavailable or changed. Refresh Home before continuing.',{exact:true}).filter({visible:true}).first().waitFor();
- check('reader HTTP 500 reproduces the exact screenshot error before any model attempt',outcomes.at(-1).status===503&&outcomes.at(-1).code==='evidence_reader_failed'&&outcomes.at(-1).attempts===0);
+ await page.getByRole('alert').filter({hasText:'Current database evidence could not be read.'}).waitFor();
+ check('reader HTTP 500 identifies an unanswered request without claiming changed evidence',outcomes.at(-1).status===503&&outcomes.at(-1).code==='evidence_reader_failed'&&outcomes.at(-1).attempts===0&&!/has changed|Refresh Home/.test(await page.getByRole('alert').innerText()));
  check('failed request preserves conversation, rejected revisions and the last valid card',JSON.stringify(working(await state()))===beforeFailure&&await page.getByRole('article',{name:'Working proposal: Fictional plan 3',exact:true}).isVisible());
  check('prior completed answer remains visible below which the new error is shown',await page.getByText('Fictional recommendation 3 is ready for review; not saved.',{exact:true}).filter({visible:true}).first().isVisible());
  check('failed question stays in the composer without an automatic retry',await chat.inputValue()==='recommend me a plan'&&requests.length===4);
+ fault='auth';await button('Send overview question').click();
+ const alert=page.getByRole('alert').filter({hasText:'The server could not authenticate to its data source.'});await alert.waitFor();
+ check('server auth failure is distinct, traceable, and does not suggest browser login or refresh',outcomes.at(-1).code==='evidence_source_auth_unavailable'&&outcomes.at(-1).attempts===0&&outcomes.at(-1).diagnostic.grounding.upstreamCode==='PGRST303'&&/Reference: [0-9a-f-]{36}/.test(await alert.innerText())&&!/Refresh Home|login|expired|JWT|PRIVATE/.test(await alert.innerText()));
+ check('auth failure preserves draft and all previous working state',JSON.stringify(working(await state()))===beforeFailure&&await chat.inputValue()==='recommend me a plan'&&requests.length===5);
+ await page.screenshot({path:path.join(output,'server-auth-failure-desktop.png'),fullPage:true});
+ await page.setViewportSize({width:390,height:844});
+ check('mobile recovery message remains readable without horizontal overflow',await alert.isVisible()&&await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await page.screenshot({path:path.join(output,'server-auth-failure-mobile.png'),fullPage:true});
+ fault=false;
+ check('source recovery does not automatically resend or call the provider',requests.length===5);
+ await button('Send overview question').click();await page.getByText('The explicit retry succeeded. Your prior proposal remains available for review.',{exact:true}).filter({visible:true}).first().waitFor();
+ const recovered=working(await state()),prior=JSON.parse(beforeFailure);
+ check('explicit retry revalidates and completes while retaining discards, goal and proposal',requests.length===6&&outcomes.at(-1).status===200&&JSON.stringify(recovered.working)===JSON.stringify(prior.working)&&JSON.stringify(recovered.rejected)===JSON.stringify(prior.rejected)&&recovered.turns.length===prior.turns.length+2&&JSON.stringify((await state()).goals)===goalsBefore);
+ check('successful retry clears the error and composer without saving a plan',await page.getByRole('alert').count()===0&&await chat.inputValue()===''&&!(await state()).exploration.fields[planAlternativesField]);
+ const beforeReload=JSON.stringify(recovered);
  await page.reload();await dismissHomeOnboarding(page);
- check('reload preserves the original goal and rejected/current revision history',JSON.stringify(working(await state()))===beforeFailure&&JSON.stringify((await state()).goals)===goalsBefore);
+ check('reload preserves the original goal and rejected/current revision history',JSON.stringify(working(await state()))===beforeReload&&JSON.stringify((await state()).goals)===goalsBefore);
  check('no unexpected network or browser errors',blocked.length===0&&errors.length===0);
  await page.screenshot({path:path.join(output,'discard-recommend-reloaded.png'),fullPage:true});
  await fs.writeFile(path.join(output,'discard-recommend-receipt.json'),JSON.stringify({sourceSha:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),checks:assertions.length,assertions,outcomes,providerCalls:0,databaseCalls:0,syntheticApplicationPosts:requests.length,artifactSha256:createHash('sha256').update(artifact).digest('hex'),scope:'Real browser client and POST; synthetic reader/provider seams. Not live model or authentication validation.'},null,2));
