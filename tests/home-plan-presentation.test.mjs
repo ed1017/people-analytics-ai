@@ -74,7 +74,7 @@ test('reported assumptions paragraphs remain available with the plan without dup
 });
 
  test('reported capacity explanation and exact standalone question move below the plan without losing evidence',()=>{
- const explanation='The decisive condition is whether qualified management hours cover demand when needed. Existing commitments, coaching and onboarding need review.';
+ const explanation='The decisive condition is whether qualified management hours cover demand **when needed**, without displacing essential obligations or weakening delivery quality. The proposal includes a baseline and pilot review to test that condition; it does not establish affordability, additional capacity or improved outcomes.';
  const question='Which client-delivery team or manager group should we assess first?';
  const answer='Test manager capacity before expanding delivery.\n\n'+explanation+'\n\n'+question+'\n\nRisk: capacity has not been verified.';
  const split=splitPlanFollowUp(answer,[question]);

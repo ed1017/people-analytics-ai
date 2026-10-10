@@ -65,7 +65,7 @@ export function splitPlanFollowUp(answer:string,questions:readonly string[]=[]){
   if(!lines[index].trim()){discussion.push(lines[index++]);continue;}
   let paragraphEnd=index+1;while(paragraphEnd<lines.length&&lines[paragraphEnd].trim()&&!heading(lines[paragraphEnd]))paragraphEnd++;
   const paragraph=lines.slice(index,paragraphEnd).join('\n');
-  if(/^The decisive condition is whether qualified management hours cover demand when needed\b/.test(paragraph.trim())){
+  if(/^The decisive condition is whether qualified management hours cover demand when needed\b/.test(paragraph.replace(/(\*{1,2}|_{1,2})(?=\S)(.+?)\1/g,'$2').trim())){
    explanation.push(paragraph);capacityRisk='Confirm that qualified management hours cover demand when needed.';index=paragraphEnd;continue;
   }
   if(questions.some(question=>normalize(question)===normalize(paragraph))){reading.push(paragraph);index=paragraphEnd;continue;}
