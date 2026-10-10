@@ -28,6 +28,7 @@ test('only complete explicit illustrative premises in fresh default exploration 
   liveStaffingMessage.replace('USD 5,000 and 80 planned training hours per trainee','USD 5,000 and 80 total training hours'),
   liveStaffingMessage.replace('USD 5,000','EUR 5,000'),liveStaffingMessage.replace('USD 5,000','USD 5,00'),
   liveStaffingMessage.replace('10 engineering roles','21 engineering roles'),liveStaffingMessage.replace('12 months','25 months'),
+  liveStaffingMessage.replace('10 engineering roles','0 engineering roles'),
   liveStaffingMessage.replace('USD 160,000 cash per hire for the entire period; ',''),
   liveStaffingMessage.replace('zero incremental redeployment cash per person','unknown redeployment cash per person'),
   liveStaffingMessage.replace('in separate pools','in overlapping pools'),
@@ -103,6 +104,7 @@ test('ineligible actual, mixed, scoped or retained requests keep fresh grounding
  const history=poisonedBody();history.state.turns=[{id:'prior',role:'assistant',text:secret}];requests.push(history);
  const goal=poisonedBody();goal.goalContext={source:secret};requests.push(goal);
  const saved=fresh(liveStaffingMessage,true);saved.evidence=poisonedBody().evidence;requests.push(saved);
+ requests.push(poisonedBody(liveStaffingMessage.replace('10 engineering roles','0 engineering roles')));
  for(const body of requests){const start=route.sandbox.__aggregateReads.length;body.staffingScenarioOnly=true;const result=await submit(route,body);assert.equal(result.status,503);assert.equal(route.sandbox.__aggregateReads.length,start+1);assert.equal(route.sandbox.__requests.length,0);}
 });
 

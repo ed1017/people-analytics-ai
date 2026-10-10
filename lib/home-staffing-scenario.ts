@@ -73,7 +73,7 @@ export function readStaffingScenario(request:SolutionRequest,context:{natural:bo
    else return null;
   }
   const required=['role','currency','requiredRoles','months','budget','hireCostPerPerson','trainingCostPerPerson','trainingHoursPerPerson','redeploymentCostPerPerson','redeployablePeople','trainablePeople','poolsDistinct'] as const;
-  if(!illustrative||!requirement||!seen.has('operational-unknowns')||!seen.has('new-hire-unknown')||required.some(field=>inputs[field]===null))return null;
+  if(!illustrative||!requirement||!seen.has('operational-unknowns')||!seen.has('new-hire-unknown')||required.some(field=>inputs[field]===null)||!(inputs.requiredRoles!>0))return null;
   return {inputs:readRequiredStaffingInput(inputs),quotes};
  }catch{return null;}
 }
