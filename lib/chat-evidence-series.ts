@@ -7,6 +7,7 @@ const validValue=(value:unknown,rate:boolean):value is number=>typeof value==='n
 /** Only already-grounded, cited packet rows. No new reads, model points, forecasts or YTD conversion. */
 export function answerEvidenceSeries(evidence:unknown,grounding:Grounding|undefined,requestId:string,question:string,answer:string):ChatEvidenceSeries[]{
  if(!grounding||!/^[a-f0-9]{64}$/.test(grounding.packetSha256))return [];
+ if(/\b(?:turnover|attrition|exits?)\b/i.test(question)&&/\b(?:involuntary|regrettable|non[\s\-‐‑–—]*voluntary)\b/i.test(question))return [];
  const metric=/\b(?:turnover|attrition|exits?)\b/i.test(question)?/\bvoluntary\b/i.test(question)?'monthly_voluntary_turnover_pct':'monthly_turnover_pct':/\b(?:hiring|hires|recruiting)\b/i.test(question)?'hires':/\b(?:headcount|workforce size|how many employees)\b/i.test(question)?'headcount':null;
  if(!metric)return [];
  const definition=metrics[metric];
@@ -18,13 +19,15 @@ export function answerEvidenceSeries(evidence:unknown,grounding:Grounding|undefi
  const selected=rows.filter(row=>row.suppressed!==true&&date(row[definition.date])&&String(row[definition.date])<=asOf&&validValue(row[metric],definition.unit==='%'));
  const points=selected.map(row=>({date:String(row[definition.date]),value:Number(row[metric])})).sort((a,b)=>a.date.localeCompare(b.date));
  if(points.length<2||points.length>3||new Set(points.map(point=>point.date)).size!==points.length)return [];
- return [{version:1,requestId,datasetToken:grounding.datasetToken,packetSha256:grounding.packetSha256,kind:'recorded',synthetic:!!source.sourceContext||/synthetic|fictional|simulated|constructed/i.test(source.limitation),metric,title:definition.title,unit:definition.unit,sourceId:definition.source,scope:source.scope,asOf:source.date,limitation:source.limitation,sampled:true,omitted:rows.length-points.length,points}];
+ const denominator=(source.coverage as {monthly?:{denominator?:unknown}}).monthly?.denominator;
+ const limitation=[source.limitation,metric.startsWith('monthly_')&&typeof denominator==='string'?`Monthly-rate denominator: ${denominator}`:''].filter(Boolean).join(' ');
+ return [{version:1,requestId,datasetToken:grounding.datasetToken,packetSha256:grounding.packetSha256,kind:'recorded',synthetic:!!source.sourceContext||/synthetic|fictional|simulated|constructed/i.test(source.limitation),metric,title:definition.title,unit:definition.unit,sourceId:definition.source,scope:source.scope,asOf:source.date,limitation,sampled:true,omitted:rows.length-points.length,points}];
 }
 /** Reject malformed or stale supplemental data without losing a valid text answer. */
 export function readChatEvidenceSeries(raw:unknown,requestId:string,datasetToken:string):ChatEvidenceSeries[]{
  if(!Array.isArray(raw)||raw.length!==1)return [];
  const item=raw[0] as ChatEvidenceSeries,definition=metrics[item?.metric];
  if(!definition||item.version!==1||item.kind!=='recorded'||typeof item.synthetic!=='boolean'||item.sampled!==true||item.requestId!==requestId||item.datasetToken!==datasetToken||!/^[a-f0-9]{64}$/.test(item.packetSha256)||item.sourceId!==definition.source||item.unit!==definition.unit||item.title!==definition.title||!date(item.asOf)||typeof item.scope!=='string'||item.scope.length>300||typeof item.limitation!=='string'||item.limitation.length>2000||!Number.isInteger(item.omitted)||item.omitted<0||!Array.isArray(item.points)||item.points.length<2||item.points.length>3)return [];
- if(item.points.some((point,index)=>!date(point.date)||point.date>item.asOf||!validValue(point.value,item.unit==='%')||index>0&&point.date<=item.points[index-1].date))return [];
+ if(item.points.some((point,index)=>!point||typeof point!=='object'||Array.isArray(point)||!date(point.date)||point.date>item.asOf||!validValue(point.value,item.unit==='%')||index>0&&point.date<=item.points[index-1].date))return [];
  return structuredClone(raw);
 }

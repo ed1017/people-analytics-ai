@@ -5,6 +5,7 @@ import os from 'node:os';
 import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
 import postcss from 'postcss';
 import tailwind from '@tailwindcss/postcss';
+import {DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
 import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 import {converseSolutions} from '../../lib/home-solution-conversation-service.ts';
 import {fixtureRuntime,final} from '../fixtures/home-solution-conversation.mjs';
@@ -25,9 +26,9 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  await context.route('**/*',async route=>{const req=route.request(),url=new URL(req.url());if(req.isNavigationRequest()&&url.href===base+'/')return route.fulfill({contentType:'text/html',body:html});if(url.origin!==base){external++;return route.abort();}
  if(url.pathname==='/api/home-solution-conversation'){
   posts++;const body=req.postDataJSON(),question=body.message.text;
-  const answer=question==='Headcount trend'?'The recorded snapshots show 100, 103 and 105 people [W1].':question==='Hiring trend'?'The selected months record 2, 3 and 4 hires [R1].':question==='Voluntary turnover trend'?'The monthly voluntary rates were 0.8%, 1.4% and 1% [A1].':question==='Single YTD turnover'?'The snapshot reports 6.2% YTD voluntary turnover [W1].':'There is not enough cited evidence to attach a chart.';
+  const answer=question.startsWith('Headcount')?'The recorded snapshots show 100, 103 and 105 people [W1].':question==='Hiring trend'?'The selected months record 2, 3 and 4 hires [R1].':question==='Voluntary turnover trend'?'The monthly voluntary rates were 0.8%, 1.4% and 1% [A1].':question==='Single YTD turnover'?'The snapshot reports 6.2% YTD voluntary turnover [W1].':'There is not enough cited evidence to attach a chart.';
   const runtime=fixtureRuntime([final(answer)]);runtime.grounding=chartGrounding(body.evidence);
-  const reply=await converseSolutions(body,runtime,new AbortController().signal);return route.fulfill({json:reply});
+  const reply=await converseSolutions(body,runtime,new AbortController().signal);if(question==='Headcount malformed supplement')reply.charts[0].points[0]=null;return route.fulfill({json:reply});
  }
  if(url.pathname.startsWith('/api/'))return route.fulfill({json:fixtures[url.pathname.slice(5)]?.data??{}});external++;return route.abort();});
  await page.goto(base);await dismissHomeOnboarding(page);
@@ -36,11 +37,13 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
   await send(question);const chart=page.getByRole('figure',{name:title+' for this answer',exact:true});await chart.waitFor();
   check(title+' uses returned values and explicitly labels recorded data',await chart.innerText().then(text=>values.every(value=>text.includes(value))&&/recorded (?:synthetic )?aggregate, not a forecast/.test(text)&&text.includes('Selected periods only')));
   check(title+' shows a compact discrete chart, without a forecast line',await chart.locator('[aria-hidden=true]').count()===3&&await chart.locator('svg').count()===0);
+  if(title==='Monthly voluntary turnover'){await chart.getByText('Source and limits',{exact:true}).click();check('monthly rate keeps the source denominator-unavailable caveat',await chart.getByText(/Monthly-rate denominator: Unavailable; snapshot headcount is not a monthly rate denominator/).isVisible());await chart.getByText('Source and limits',{exact:true}).click();}
   await chart.screenshot({path:path.join(output,mode+'-'+title.toLowerCase().replaceAll(' ','-')+'.png')});
  }
  await send('Single YTD turnover');check('6.2% YTD alone adds no trend or projection',await page.getByRole('figure').count()===3);
  await send('Explain without a cited source');check('uncited answer cannot borrow another answer chart',await page.getByRole('figure').count()===3);
- check('no overflow, runtime errors or external calls',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&external===0&&posts===5);
+ await send('Headcount malformed supplement');check('malformed chart is omitted while the valid answer and saved conversation survive',await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload.exploration.fields.homeSolutionConversationV1.turns.at(-1).text==='The recorded snapshots show 100, 103 and 105 people [W1].',DECISIONS_STORAGE_KEY)&&await page.getByRole('figure').count()===3&&await page.getByRole('region',{name:'Overview conversation',exact:true}).innerText().then(text=>text.includes('Headcount malformed supplement')&&text.split('The recorded snapshots show 100, 103 and 105 people').length===3));
+ check('no overflow, runtime errors or external calls',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&external===0&&posts===6);
  await page.getByRole('button',{name:'Reset conversation',exact:true}).click();check('reset removes old charts with their messages',await page.getByRole('figure').count()===0);
  await context.close();
 }}finally{await browser.close()}
