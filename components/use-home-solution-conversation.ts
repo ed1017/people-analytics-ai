@@ -21,11 +21,13 @@ import type {GuidedActionRegistry} from './home-guided-actions';
 import {progressEntryContext,retainProgressEntryProposal} from '@/lib/goal-progress-entry-store';
 import {captureGoalProgressInput} from '@/lib/goal-progress-conversation';
 import {homeConversationErrorMessage} from '@/lib/home-evidence-recovery.mjs';
+import {visibleProviderPreviewReceipt,type VisibleProviderPreviewReceipt} from '@/lib/home-provider-preview-receipt';
 
 type Props={enabled:boolean;conversation:ProblemConversation;active:boolean;settled:boolean;evidence:unknown;planningContext?:()=>unknown;planningCalculatorAvailable?:()=>boolean;demandReviewRef?:RefObject<((review:DemandReview)=>void)|null>;scope:string;query:string;target:()=>BundleDiscussion|null;guided?:GuidedActionRegistry|null};
 const equal=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 export function useHomeSolutionConversation(props:Props){
  const answerSeries=useRef<ChatEvidenceSeries[]>([]);
+ const [previewReceipt,setPreviewReceipt]=useState<VisibleProviderPreviewReceipt|null>(null);
  const storage=useDecisionStorage(),[memory,setMemory]=useState<SolutionState>(emptySolutionState),[pending,setPending]=useState(false),[saving,setSaving]=useState(false),[notice,setNotice]=useState('');
  const controller=useRef<AbortController|null>(null),epoch=useRef(0),mounted=useRef(false),memoryRef=useRef(memory),currentProps=useRef(props);
  useLayoutEffect(()=>{currentProps.current=props;});
@@ -35,7 +37,7 @@ export function useHomeSolutionConversation(props:Props){
  const identity=JSON.stringify([goal,guideId,props.conversation.resetEpoch,props.conversation.storageReady]);
  const loaded=useRef(''),reset=useRef(props.conversation.resetEpoch);
  const synchronize=useEffectEvent(()=>{
-  if(loaded.current===identity)return;loaded.current=identity;epoch.current++;controller.current?.abort();setPending(false);setNotice('');
+  if(loaded.current===identity)return;loaded.current=identity;epoch.current++;controller.current?.abort();setPending(false);setNotice('');setPreviewReceipt(null);
   try{const wasReset=reset.current!==props.conversation.resetEpoch;const state=wasReset||guideId&&!goal.id?emptySolutionState():readSolutionState((goal.id?storage.data.workspaces[goal.id]:storage.data.exploration)?.fields[solutionConversationField]);reset.current=props.conversation.resetEpoch;if(wasReset&&props.conversation.storageReady)persist(state);memoryRef.current=state;setMemory(state);}catch(error){memoryRef.current=emptySolutionState();setMemory(emptySolutionState());setNotice((error as Error).message);}
  });
  // eslint-disable-next-line react-hooks/set-state-in-effect -- Goal/reset events select an isolated local conversation.
@@ -43,7 +45,7 @@ export function useHomeSolutionConversation(props:Props){
  const progressInput=captureGoalProgressInput(decisionStore,goal.id);
  const contextKey=JSON.stringify([goal,guideId,props.active,props.settled,props.scope,props.query,props.evidence,props.conversation.resetEpoch,props.conversation.issueEditor?.id,progressInput]);
  const liveKey=useRef(contextKey);
- useLayoutEffect(()=>{if(liveKey.current!==contextKey){liveKey.current=contextKey;epoch.current++;controller.current?.abort();setPending(false);}},[contextKey]);
+ useLayoutEffect(()=>{if(liveKey.current!==contextKey){liveKey.current=contextKey;epoch.current++;controller.current?.abort();setPending(false);setPreviewReceipt(null);}},[contextKey]);
  function catalog():PlanAlternatives|null{
   const p=currentProps.current,g={goalId:p.conversation.activeGoalId,goal:p.conversation.focusedIssue},snapshot=decisionStore.getSnapshot(),raw=snapshot.data.workspaces[g.goalId]?.fields[planAlternativesField];
   if(raw!==undefined){const value=readPlanAlternatives(raw,g);if(!value)throw Error('Saved plans could not be verified. They have been preserved.');return value;}
@@ -60,15 +62,18 @@ export function useHomeSolutionConversation(props:Props){
  async function send(text:string){
   if(controller.current||saving)return;requireCurrent();const request=makeRequest(text),entryContext=progressEntryContext(decisionStore,request.requestId,[...request.state.turns.filter(t=>t.role==='user').map(({id,text})=>({id,text})),request.message]),captured=++epoch.current,key=liveKey.current,scenario=JSON.stringify(currentProps.current.planningContext?.()??null),abort=new AbortController();controller.current=abort;answerSeries.current=[];setPending(true);setNotice('');
   const current=()=>!abort.signal.aborted&&mounted.current&&captured===epoch.current&&key===liveKey.current&&scenario===JSON.stringify(currentProps.current.planningContext?.()??null)&&equal(request.goalProgress,captureGoalProgressInput(decisionStore,currentProps.current.conversation.activeGoalId))&&equal(request.catalog,catalog())&&selectedPlanId(catalog())===(request.selectedId??null);
+  setPreviewReceipt(null);const endpoint='/api/home-solution-conversation',startedAt=new Date().toISOString(),started=performance.now();
   try{
-   const response=await datasetFetch('/api/home-solution-conversation',{method:'POST',headers:{'Content-Type':'application/json',...swpConversationHeaders(request.goalContext)},body:JSON.stringify(request),signal:abort.signal});const data=await response.json();
-   if(!current())return null;if(!response.ok)throw Error(homeConversationErrorMessage(data));
+   const response=await datasetFetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json',...swpConversationHeaders(request.goalContext)},body:JSON.stringify(request),signal:abort.signal});const data=await response.json();
+   if(!current())return null;
+   const receiptContext={requestId:request.requestId,endpoint,status:response.status,startedAt,receivedAt:new Date().toISOString(),elapsedMs:Math.round(performance.now()-started)};
+   setPreviewReceipt(visibleProviderPreviewReceipt(data,receiptContext));if(!response.ok)throw Error(homeConversationErrorMessage(data));
    const reply=data as SolutionReply;if(reply.requestId!==request.requestId||typeof reply.answer!=='string'||!reply.answer.trim()||reply.answer.length>10000||!Array.isArray(reply.candidateIds)||!Array.isArray(reply.analysisIds))throw Error('The conversation response does not match this request.');
    const state=readSolutionState(reply.state);if(state.turns.at(-2)?.id!==request.message.id||state.turns.at(-1)?.text!==reply.answer||reply.candidateIds.some(id=>!state.working.some(item=>item.id===id&&item.requestId===request.requestId))||reply.analysisIds.some(id=>!state.analyses.some(item=>item.id===id)))throw Error('The returned conversation could not be verified.');
    const demandContext=reply.demandReview?requestDemandContext(request,decisionStore.getDatasetToken()):null;
    const demandReview=reply.demandReview&&demandContext?readDemandReview(reply.demandReview,demandContext):null;
    if(reply.demandReview&&(!demandReview||!currentProps.current.demandReviewRef?.current||reply.demandReview.requestId!==request.requestId))throw Error('The business demand review does not match this request.');
-   requireCurrent();persist(state);if(reply.progressProposal){if(!entryContext)throw Error('Progress entry is not enabled.');await retainProgressEntryProposal(decisionStore,reply.progressProposal,entryContext,{current});if(!current())return null;}const p=currentProps.current,guided=p.guided;if(guided?.goalId&&(!p.conversation.activeGoalId||p.conversation.activeGoalId===guided.goalId)&&reply.candidateIds.length)guided.emit({type:'proposal-reviewed',goalId:guided.goalId,planId:reply.candidateIds[0],candidates:state.working.filter(item=>reply.candidateIds.includes(item.id)&&item.requestId===request.requestId).map(({id,revision,requestId})=>({id,revision,requestId}))});if(demandReview)p.demandReviewRef?.current?.(demandReview);answerSeries.current=readChatEvidenceSeries(reply.charts,request.requestId,decisionStore.getDatasetToken());return reply.answer;
+   requireCurrent();persist(state);if(reply.progressProposal){if(!entryContext)throw Error('Progress entry is not enabled.');await retainProgressEntryProposal(decisionStore,reply.progressProposal,entryContext,{current});if(!current())return null;}const p=currentProps.current,guided=p.guided;if(guided?.goalId&&(!p.conversation.activeGoalId||p.conversation.activeGoalId===guided.goalId)&&reply.candidateIds.length)guided.emit({type:'proposal-reviewed',goalId:guided.goalId,planId:reply.candidateIds[0],candidates:state.working.filter(item=>reply.candidateIds.includes(item.id)&&item.requestId===request.requestId).map(({id,revision,requestId})=>({id,revision,requestId}))});if(demandReview)p.demandReviewRef?.current?.(demandReview);answerSeries.current=readChatEvidenceSeries(reply.charts,request.requestId,decisionStore.getDatasetToken());setPreviewReceipt(visibleProviderPreviewReceipt(data,receiptContext,state));return reply.answer;
   }catch(error){if(current())throw error;return null;}finally{if(controller.current===abort){controller.current=null;setPending(false);}}
  }
  function cancel(){epoch.current++;controller.current?.abort();controller.current=null;setPending(false);setNotice('Request cancelled. Your draft and saved work are kept.');}
@@ -129,5 +134,5 @@ export function useHomeSolutionConversation(props:Props){
   }catch(error){setNotice((error as Error).message);}finally{setSaving(false);}
  }
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
- return {answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {previewReceipt,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }
