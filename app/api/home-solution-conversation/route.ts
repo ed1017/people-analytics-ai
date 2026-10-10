@@ -1,3 +1,4 @@
+import {hiringBudgetInstructions} from '@/lib/home-hiring-budget';
 import {groundSolutionRequest} from '@/lib/home-solution-grounding-source';
 import {SolutionEvidenceError} from '@/lib/home-solution-grounding.mjs';
 import {createSolutionDiagnostics} from '@/lib/home-solution-diagnostics';
@@ -40,7 +41,7 @@ async function handlePOST(request:Request){
   diagnostics.stage('model_setup');
   const client=new OpenAI({...openAIProxyTransport(),apiKey:process.env.OPENAI_API_KEY,maxRetries:0});
   const natural=request.headers.get(SWP_CONVERSATION_HEADER)===null;
-  const planningInstructions=solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions:'');
+  const planningInstructions=solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions+'\n'+hiringBudgetInstructions:'');
   diagnostics.stage('conversation_preparation');
   const reply=await converseSolutions(parsed,{
    grounding,

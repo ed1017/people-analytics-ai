@@ -1,4 +1,6 @@
 'use client';
+import {currentHiringBudget,editHiringBudgetLocally} from '@/lib/home-hiring-budget';
+import type {HiringBudgetInput} from '@/lib/hiring-budget';
 import {prepareBusinessPlanningSelection,businessPlanningSelectionFields,businessPlanningReceiptField,type BusinessPlanningSelection} from '@/lib/home-business-planning-save';
 import {currentBusinessPlanning} from '@/lib/home-business-planning';
 import {datasetFetch} from '@/lib/dataset-client.mjs';
@@ -96,6 +98,13 @@ export function useHomeSolutionConversation(props:Props){
   }catch(error){setNotice(error instanceof Error?error.message:'The proposal could not be saved.');}finally{setSaving(false);}
  }
  function reject(item:SolutionEvaluation){try{requireCurrent();const state=structuredClone(memoryRef.current),turnId=crypto.randomUUID();state.turns=[...state.turns,{id:turnId,role:'user' as const,text:`Discard proposal ${item.candidate.name}, revision ${item.revision}.`}].slice(-32);state.rejected=[...state.rejected,{candidateId:item.id,revision:item.revision,reason:'Discarded using the proposal review control.',turnId}].slice(-24);if(state.focusCandidateId===item.id)state.focusCandidateId=null;persist(state);}catch(error){setNotice((error as Error).message);}}
+ function updateHiringBudget(inputs:HiringBudgetInput|null){
+  if(controller.current||pending||saving)throw Error('Wait for the current request before editing this estimate.');
+  requireCurrent();
+  const previous=inputs===null?null:currentHiringBudget(makeRequest('Edit the hiring estimate.'),decisionStore.getDatasetToken());
+  if(inputs!==null&&!previous)throw Error('The hiring estimate changed.');
+  persist({...memoryRef.current,hiringBudget:inputs===null?null:editHiringBudgetLocally(previous!,inputs)});
+ }
  function clearBusinessPlanning(){try{requireCurrent();persist({...memoryRef.current,businessPlanning:null});}catch(error){setNotice((error as Error).message);}}
  function currentBusinessState(){return currentBusinessPlanning(makeRequest('Review the current provisional staffing option.'),decisionStore.getDatasetToken());}
  async function reviewBusinessOption(id:string){
@@ -114,5 +123,5 @@ export function useHomeSolutionConversation(props:Props){
   }catch(error){setNotice((error as Error).message);}finally{setSaving(false);}
  }
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
- return {clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }
