@@ -1,0 +1,85 @@
+{
+  "checks": [
+    {
+      "mode": "desktop",
+      "prompt": "More support tickets, same payroll?",
+      "submitted": "More support tickets, same payroll?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "Train, redeploy or hire for new client work?",
+      "submitted": "Train, redeploy or hire for new client work?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "How many active requisitions can recruiters cover?",
+      "submitted": "How many active requisitions can recruiters cover?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "Can managers support more delivery work?",
+      "submitted": "Can managers support more delivery work?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "Can our hiring target fit Finance’s budget?",
+      "submitted": "Can our hiring target fit Finance’s budget?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "How can we reduce turnover?",
+      "submitted": "How can we reduce turnover?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "How can we improve satisfaction?",
+      "submitted": "How can we improve satisfaction?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "How can we improve hiring?",
+      "submitted": "How can we improve hiring?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "More support tickets, same payroll?",
+      "submitted": "More support tickets, same payroll?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "Train, redeploy or hire for new client work?",
+      "submitted": "Train, redeploy or hire for new client work?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "How many active requisitions can recruiters cover?",
+      "submitted": "How many active requisitions can recruiters cover?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "Can managers support more delivery work?",
+      "submitted": "Can managers support more delivery work?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "Can our hiring target fit Finance’s budget?",
+      "submitted": "Can our hiring target fit Finance’s budget?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "How can we reduce turnover?",
+      "submitted": "How can we reduce turnover?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "How can we improve satisfaction?",
+      "submitted": "How can we improve satisfaction?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "How can we improve hiring?",
+      "submitted": "How can we improve hiring?"
+    }
+  ],
+  "providerCalls": 0
+}

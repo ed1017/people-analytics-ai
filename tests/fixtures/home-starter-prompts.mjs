@@ -22,12 +22,8 @@ export const decisionStarterLabels=[
  'How many active requisitions can recruiters cover?',
  'Can managers support more delivery work?',
  'Can our hiring target fit Finance’s budget?',
+ 'How can we reduce turnover?',
+ 'How can we improve satisfaction?',
+ 'How can we improve hiring?',
 ];
-export const decisionStarterPrompts=[
- 'Hypothetical scenario: if support-ticket demand rose while payroll stayed flat, how could we cover the work without overloading another team?',
- 'Hypothetical scenario: if new client work required skills we might not have available, should we train, redeploy or hire? Compare skill readiness, release dates, cost and delivery tradeoffs.',
- 'Hypothetical scenario: if active requisitions increased, how should we balance recruiter workload, hiring priorities and additional recruiting capacity? Check requisition complexity and current commitments.',
- 'Hypothetical scenario: before taking on more client delivery work, how could we check manager capacity for supervision, coaching and onboarding? Compare workload changes and additional management capacity.',
-].map(prompt=>prompt+' Recommend an Action Plan using known inputs. Separate missing inputs from editable assumptions; do not invent numbers, available capacity or automation benefits.');
-
-decisionStarterPrompts.push('Hypothetical scenario: could we add 3 support specialists over 6 months within a $120,000 Finance budget cap? Treat these as editable example inputs; confirm the role and salary from recorded role data or Finance input. Recommend an Action Plan using known inputs, checking feasibility where supported and comparing phased hiring, internal moves or a mix. Keep missing employer and recruiting costs explicit editable assumptions; do not claim unrun calculations or automation savings.');
+export const decisionStarterPrompts=[...decisionStarterLabels];

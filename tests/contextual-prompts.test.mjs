@@ -6,10 +6,10 @@ const source=(id,facts={count:0},status='loaded')=>({id,facts,status});
 const base={page:'home',goal:'Improve retention',hasConversation:false,evidenceReady:true,sources:[source('A1'),source('T1')]};
 test('Home starters remain simple while skills follow-ups are contextual and permit combined methods',()=>{
  assert.deepEqual(contextualPrompts({...base,goal:''}),[...homeGoalStarters]);
- assert.deepEqual(homeStarterGroups.map(group=>group.label),['Strategic Workforce Planning','People and capacity']);
+ assert.deepEqual(homeStarterGroups.map(group=>group.label),['Strategic Workforce Planning','Workforce challenges']);
  assert.deepEqual(homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.label)),decisionStarterLabels);
- assert.ok(homeStarterGroups.every(group=>group.purpose==='swp-business'));
- assert.ok(homeGoalStarters.every(prompt=>prompt.startsWith('Hypothetical scenario:')));
+ assert.equal(homeStarterGroups[0].purpose,'swp-business');assert.equal(homeStarterGroups[1].purpose,undefined);
+ assert.deepEqual(homeGoalStarters,decisionStarterLabels,"Starter messages are exactly the visible words; no hidden instructions or assumptions");
  assert.deepEqual(homeGoalStarters,decisionStarterPrompts);
  assert.match(contextualPrompts({...base,goal:'Build AI skills without adding headcount'})[1],/mix of training, internal moves and hiring/);
  for(const context of [base,{...base,goal:''},{...base,goal:'Build skills',sources:[source('A1')]},{...base,page:'overview',goal:'Build skills'}])assert.doesNotMatch(contextualPrompts(context).join(' '),/mix of training/);
@@ -50,4 +50,4 @@ test('page examples use only the active capability and remain small',()=>{
  assert.match(contextualPrompts({...base,page:'unsupported'})[0],/missing/);
 });
 
-test('Finance target is explicitly hypothetical and editable without inventing a salary or a calculation',()=>{const prompt=homeGoalStarters.at(-1);for(const pattern of [/3 support specialists/,/6 months/,/\$120,000 Finance budget cap/,/editable example inputs/,/confirm the role and salary/,/where supported/,/phased hiring, internal moves or a mix/,/missing employer and recruiting costs/,/do not claim unrun calculations/])assert.match(prompt,pattern);});
+test('Finance starter sends only the visible question without invented role, cohort or budget inputs',()=>{const prompt=homeGoalStarters.find(text=>text.includes('Finance'));assert.equal(prompt,'Can our hiring target fit Finance’s budget?');assert.doesNotMatch(prompt,/120,000|3 support|6 months|Hypothetical|Recommend an Action Plan/);});
