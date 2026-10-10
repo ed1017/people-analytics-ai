@@ -101,6 +101,6 @@ test('actual POST serializes shared strict schemas through the pinned SDK withou
  for(const original of [...businessPlanningTools,hiringBudgetTool,requiredStaffingTool]){const sent=request.tools.find(tool=>tool.name===original.name);assert.deepEqual({...sent,parameters:expandSchema(sent.parameters)},original);}
  const options=isolated.sandbox.__requestOptions[0];assert.equal(options.timeout,60000);assert.equal(options.maxRetries,0);assert.equal(isolated.sandbox.module.exports.maxDuration,120);
  assert.equal(logs.length,1);assert.equal(logs[0][0],'Home solution conversation completed');
- const round=logs[0][1].providerRounds[0];assert.equal(round.inputTokens,100);assert.equal(round.cachedInputTokens,40);assert.equal(round.outputTokens,20);assert.equal(round.reasoningTokens,5);
+ const round=JSON.parse(logs[0][1]).providerRounds[0];assert.equal(round.inputTokens,100);assert.equal(round.cachedInputTokens,40);assert.equal(round.outputTokens,20);assert.equal(round.reasoningTokens,5);
  assert.equal(round.inputBytes,bytes(request.input));assert.equal(round.toolSchemaBytes,bytes(request.tools));
 });
