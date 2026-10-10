@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {converseSolutions} from '../lib/home-solution-conversation-service.ts';
 import {currentRequiredStaffing,editRequiredStaffing,readRequiredStaffingReview,requiredStaffingView,requiresRequiredStaffing,canCompleteRequiredStaffingAlone} from '../lib/home-required-staffing.ts';
 import {solutionRequest,fixtureRuntime,final,constraint} from './fixtures/home-solution-conversation.mjs';
-import {fixedMessages,fixedValues,fixedChanges,fixedBasis,fixedSteps} from './fixtures/required-staffing.mjs';
+import {fixedMessages,fixedValues,fixedChanges,fixedBasis,fixedSteps,liveStaffingMessage} from './fixtures/required-staffing.mjs';
 import {offlineBusinessRoute} from './helpers/offline-business-route.mjs';
 import {responseForStep} from './fixtures/natural-business-planning.mjs';
 import {initialSpec} from './fixtures/natural-business-planning.mjs';
@@ -205,4 +205,22 @@ test('actual POST offers the direct tool and preserves numerical initial/follow-
 test('actual POST refuses an otherwise valid prose-only reply for a fixed-role request',async()=>{
  const route=await offlineBusinessRoute();route.sandbox.console={info(){},error(){}};route.sandbox.__replies.push(responseForStep(final('Hire ten for 1600000 USD with 0 training hours.')));
  const response=await route.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',body:JSON.stringify(solutionRequest(fixedMessages.start))})),reply=await response.json();assert.equal(response.status,422);assert.equal(reply.code,'response_validation_failed');assert.equal(reply.state,undefined);assert.equal(reply.answer,undefined);assert.equal(route.sandbox.__requests.length,1);
+});
+
+test('exact live Home fixture selects one staffing tool and completes from its checked calculation',async()=>{
+ // Fresh General exploration: empty goal/state, all workforce filters, no saved plan or scenario.
+ const body=solutionRequest(liveStaffingMessage),before=JSON.stringify(body),route=await offlineBusinessRoute();
+ route.sandbox.console={info(){},error(){}};
+ assert.equal(requiresRequiredStaffing(body),true);assert.equal(canCompleteRequiredStaffingAlone(body),true);
+ route.sandbox.__replies.push(responseForStep({name:'compare_required_staffing',args:{changes:fixedChanges(body)}},0));
+ const response=await route.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',body:JSON.stringify(body)})),reply=await response.json(),sent=route.sandbox.__requests[0];
+ assert.equal(response.status,200,JSON.stringify({status:response.status,toolCount:sent.tools.length,toolChoice:sent.tool_choice}));
+ assert.equal(route.sandbox.__requests.length,1);
+ assert.deepEqual(JSON.parse(JSON.stringify(sent.tools.map(t=>t.name))),['compare_required_staffing']);
+ assert.deepEqual(JSON.parse(JSON.stringify(sent.tool_choice)),{type:'function',name:'compare_required_staffing'});
+ assert.deepEqual(JSON.parse(JSON.stringify(reply.usage)),{modelRounds:1,toolCalls:1});
+ assert.match(reply.answer,/495000 USD/);assert.match(reply.answer,/480 planned training hours/);
+ assert.match(reply.answer,/Recommendation:.*conditional/);assert.match(reply.answer,/Next step:/);assert.match(reply.answer,/Nothing was saved or applied/);
+ assert.equal(reply.state.requiredStaffing.inputs.hireTrainingHoursPerPerson,null);assert.equal(reply.state.working.length,0);assert.equal(JSON.stringify(body),before);
+ for(const suffix of [' Also explain FTE.',' Also review an annual hiring budget for five designers.',' Something else may matter.',' And save the plan.',' Fill 5 designer roles by hiring/training/redeploying.'])assert.equal(canCompleteRequiredStaffingAlone(solutionRequest(liveStaffingMessage+suffix)),false,suffix);
 });
