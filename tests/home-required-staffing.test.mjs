@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {converseSolutions} from '../lib/home-solution-conversation-service.ts';
 import {currentRequiredStaffing,editRequiredStaffing,readRequiredStaffingReview,requiredStaffingView,requiresRequiredStaffing} from '../lib/home-required-staffing.ts';
-import {solutionRequest,fixtureRuntime,final} from './fixtures/home-solution-conversation.mjs';
+import {solutionRequest,fixtureRuntime,final,constraint} from './fixtures/home-solution-conversation.mjs';
 import {fixedMessages,fixedValues,fixedChanges,fixedBasis,fixedSteps} from './fixtures/required-staffing.mjs';
 import {offlineBusinessRoute} from './helpers/offline-business-route.mjs';
 import {responseForStep} from './fixtures/natural-business-planning.mjs';
@@ -21,8 +21,31 @@ test('fixed-role calculations fail closed when the provider skips the tool or it
  await assert.rejects(converseSolutions(implicit,failed,new AbortController().signal),/not calculated/,'A model-selected staffing operation must also complete successfully');
 });
 test('checked calculator output owns final prose and preserves unspecified new-hire training',async()=>{
- const body=solutionRequest(fixedMessages.start),runtime=fixtureRuntime([{name:'compare_required_staffing',args:{changes:fixedChanges(body)}},final('Hire ten for 1 USD with zero training hours; everyone is available immediately.')]);runtime.natural={datasetToken:token};
+ const body=solutionRequest(fixedMessages.start),runtime=fixtureRuntime([{name:'compare_required_staffing',args:{changes:fixedChanges(body)}}]);runtime.natural={datasetToken:token};
  const reply=await converseSolutions(body,runtime,new AbortController().signal);assert.match(reply.answer,/1600000 USD/);assert.match(reply.answer,/30000 USD/);assert.match(reply.answer,/495000 USD/);assert.match(reply.answer,/480 planned training hours/);assert.match(reply.answer,/new-hire training not specified/);assert.match(reply.answer,/Readiness: Unknown/);assert.doesNotMatch(reply.answer,/zero training|0 training hours|1 USD|available immediately/);assert.equal(reply.state.turns.at(-1).text,reply.answer);assert.equal(reply.state.requiredStaffing.inputs.hireTrainingHoursPerPerson,null);
+ assert.deepEqual(reply.usage,{modelRounds:1,toolCalls:1});assert.equal(runtime.rounds,1);assert.match(reply.answer,/Recommendation:.*conditional/);assert.match(reply.answer,/Nothing was saved or applied/);
+});
+test('missing inputs remain unknown and failed or oversized calculations cannot use deterministic completion',async()=>{
+ const request=solutionRequest(fixedMessages.start),runtime=fixtureRuntime([{name:'compare_required_staffing',args:{changes:fixedChanges(request,{role:'Engineering roles',requiredRoles:10,months:12,currency:'USD'})}}]);runtime.natural={datasetToken:token};
+ const reply=await converseSolutions(request,runtime,new AbortController().signal);assert.equal(runtime.rounds,1);assert.equal(reply.state.requiredStaffing.inputs.hireCostPerPerson,null);assert.equal(reply.state.requiredStaffing.inputs.hireTrainingHoursPerPerson,null);assert.equal(requiredStaffingView(reply.state.requiredStaffing).options[0].listedCash,null);assert.match(reply.answer,/unknown|missing|Unknown/);assert.doesNotMatch(reply.answer,/1600000|30000|495000/);
+ const long=solutionRequest(fixedMessages.start+' '+ 'x'.repeat(3300));
+ const prior=editRequiredStaffing(long,token,fixedChanges(long,{...fixedValues,hireTrainingHoursPerPerson:0,backfillCostPerInternalPerson:0,internalRelease:false,costsComplete:false,hireReadyAfterMonths:0,trainingReadyAfterMonths:0,redeployReadyAfterMonths:0}));
+ assert.ok(JSON.stringify(requiredStaffingView(prior)).length>65000);
+ const next=solutionRequest(fixedMessages.followup,false,{...request.state,requiredStaffing:prior},2),before=JSON.stringify(next),failed=fixtureRuntime([{name:'compare_required_staffing',args:{changes:[]}},final('A calculation succeeded.')]);failed.natural={datasetToken:token};
+ await assert.rejects(converseSolutions(next,failed,new AbortController().signal),/not calculated/);assert.equal(JSON.stringify(next),before);
+ const incomplete=fixtureRuntime([fixedSteps(request)[0]]);incomplete.natural={datasetToken:token};const complete=incomplete.complete;incomplete.complete=async(...args)=>({...await complete(...args),completed:false});
+ await assert.rejects(converseSolutions(request,incomplete,new AbortController().signal),/incomplete/);assert.equal(request.state.requiredStaffing,undefined);
+});
+test('saved plans, existing constraints, opportunistic staffing and mixed tools retain normal continuation',async()=>{
+ const constrained=solutionRequest(fixedMessages.start);constrained.state.turns=[{id:'earlier',role:'user',text:'Use a USD 1000000 budget.'}];constrained.state.constraints=[constraint(1000000,'earlier')];
+ const opportunistic=solutionRequest(fixedMessages.start.replace('fill 10','consider 10'));assert.equal(requiresRequiredStaffing(opportunistic),false);
+ for(const body of [solutionRequest(fixedMessages.start,true),constrained,opportunistic]){
+  const before=JSON.stringify(body),runtime=fixtureRuntime([{name:'compare_required_staffing',args:{changes:fixedChanges(body)}},final('Untrusted intermediate prose.')]);runtime.natural={datasetToken:token};
+  const reply=await converseSolutions(body,runtime,new AbortController().signal);assert.equal(runtime.rounds,2);assert.equal(reply.usage.toolCalls,1);assert.match(reply.answer,/495000 USD/);assert.equal(JSON.stringify(body),before);assert.deepEqual(reply.state.constraints,body.state.constraints);
+ }
+ const body=solutionRequest(fixedMessages.start),mixed=fixtureRuntime([{name:'compare_required_staffing',args:{changes:fixedChanges(body)}},final('Both tools completed.')]);mixed.natural={datasetToken:token};const complete=mixed.complete;
+ mixed.complete=async(...args)=>{const output=await complete(...args);if(mixed.rounds===1)output.calls.push({id:'clock',name:'read_clock',arguments:'{}'});return output;};
+ const reply=await converseSolutions(body,mixed,new AbortController().signal);assert.deepEqual(reply.usage,{modelRounds:2,toolCalls:2});
 });
 test('calculation routing covers count comparisons and numeric continuations, keeping unrelated discussion free',()=>{
  for(const text of [fixedMessages.start,'Compare ways to fill ten engineering roles by hiring, training and redeploying.'])assert.equal(requiresRequiredStaffing(solutionRequest(text)),true);
@@ -31,7 +54,7 @@ test('calculation routing covers count comparisons and numeric continuations, ke
  for(const text of [fixedMessages.followup,fixedMessages.correction])assert.equal(requiresRequiredStaffing(solutionRequest(text,false,{...body.state,requiredStaffing:review},2)),true);
  assert.equal(requiresRequiredStaffing(solutionRequest('What does FTE mean?',false,{...body.state,requiredStaffing:review},2)),false);
 });
-async function ask(text,state,sequence=1){const request=solutionRequest(text,false,state,sequence),runtime=fixtureRuntime(fixedSteps(request));runtime.natural={datasetToken:token};return {reply:await converseSolutions(request,runtime,new AbortController().signal),runtime};}
+async function ask(text,state,sequence=1){const request=solutionRequest(text,false,state,sequence),runtime=fixtureRuntime([fixedSteps(request)[0]]);runtime.natural={datasetToken:token};const reply=await converseSolutions(request,runtime,new AbortController().signal);assert.equal(runtime.rounds,1);return {reply,runtime};}
 test('actual conversation calculates the fixed requirement and returns numbers on follow-up without population or workload lookup',async()=>{
  const {reply,runtime}=await ask(fixedMessages.start);assert.equal(runtime.reads,0);assert.equal(reply.state.businessPlanning,undefined);assert.equal(reply.state.hiringBudget,undefined);assert.equal(requiredStaffingView(reply.state.requiredStaffing).enumerated,35);assert.match(reply.answer,/1600000 USD/);assert.match(reply.answer,/30000 USD/);assert.match(reply.answer,/495000 USD/);assert.match(reply.answer,/new-hire training not specified/);
  assert.deepEqual(reply.candidateIds,[]);assert.deepEqual(reply.analysisIds,[]);assert.deepEqual(reply.state.verifiedMetrics,[]);assert.equal(reply.state.working.length,0);
@@ -82,17 +105,17 @@ test('actual POST offers the direct tool and preserves numerical initial/follow-
  for(const [i,message] of Object.values(fixedMessages).entries()){
   const body=solutionRequest(message,false,state,i+1),steps=fixedSteps(body);
   route.sandbox.__replies.push(responseForStep(steps[0],0));
-  route.sandbox.__replies.push(null);
-  const originalShift=route.sandbox.__replies.shift.bind(route.sandbox.__replies);
-  route.sandbox.__replies.shift=()=>{const r=originalShift();return r??responseForStep(steps[1](route.sandbox.__requests.at(-1).input),1);};
   const response=await route.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',body:JSON.stringify(body)}));
   assert.equal(response.status,200);const reply=await response.json();state=reply.state;
   assert.match(reply.answer,i===2?/501000 USD/:/495000 USD/);assert.equal(state.requiredStaffing.inputs.requiredRoles,10);assert.equal(state.businessPlanning,undefined);
-  route.sandbox.__replies.shift=originalShift;
+  assert.deepEqual(reply.usage,{modelRounds:1,toolCalls:1});
  }
- assert.equal(route.sandbox.__requests.length,6);assert.ok(route.sandbox.__requests[0].tools.some(t=>t.name==='compare_required_staffing'));assert.match(route.sandbox.__requests[0].instructions,/does not require ticket volume/);assert.equal(route.sandbox.__requests[0].parallel_tool_calls,false);
- for(const i of [0,2,4])assert.deepEqual(JSON.parse(JSON.stringify(route.sandbox.__requests[i].tool_choice)),{type:'function',name:'compare_required_staffing'});
- for(const i of [1,3,5])assert.equal(route.sandbox.__requests[i].tool_choice,'auto');
+ assert.equal(route.sandbox.__requests.length,3);assert.match(route.sandbox.__requests[0].instructions,/does not require ticket volume/);
+ for(const sent of route.sandbox.__requests){assert.deepEqual(JSON.parse(JSON.stringify(sent.tools.map(t=>t.name))),['compare_required_staffing']);assert.deepEqual(JSON.parse(JSON.stringify(sent.tool_choice)),{type:'function',name:'compare_required_staffing'});assert.equal(sent.parallel_tool_calls,false);assert.equal(sent.model,'gpt-6.1-sol');assert.equal(sent.reasoning.effort,'medium');assert.equal(sent.service_tier,'default');assert.equal(sent.max_output_tokens,5000);assert.match(JSON.stringify(sent.input),/evidenceGrounding/);}
+ assert.ok(route.sandbox.__requestOptions.every(o=>o.maxRetries===0&&o.timeout===60000));
+ route.sandbox.__replies.push(responseForStep(final('FTE describes equivalent full-time capacity.')));
+ const ordinary=await route.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',body:JSON.stringify(solutionRequest('What does FTE mean?'))}));assert.equal(ordinary.status,200);
+ const sent=route.sandbox.__requests.at(-1);assert.equal(sent.tool_choice,'auto');assert.ok(sent.tools.length>1);assert.ok(sent.tools.some(t=>t.name==='read_clock'));assert.ok(sent.tools.some(t=>t.name==='review_hiring_budget'));
 });
 test('actual POST refuses an otherwise valid prose-only reply for a fixed-role request',async()=>{
  const route=await offlineBusinessRoute();route.sandbox.console={info(){},error(){}};route.sandbox.__replies.push(responseForStep(final('Hire ten for 1600000 USD with 0 training hours.')));

@@ -53,7 +53,7 @@ async function handlePOST(request:Request){
    progress:{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token},
    complete:async(input,finalOnly,signal,capabilities)=>{
     const progressContract=progressModelContract(goalProgressConversationEnabled,capabilities.progressEntryEnabled);
-    const conversationTools=demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools,...(natural?businessPlanningModelTools:[])];
+    const conversationTools=capabilities.requiredStaffingCalculation?[requiredStaffingTool]:demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools,...(natural?businessPlanningModelTools:[])];
     const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions;
     let providerRequest:ResponseCreateParamsNonStreaming={...homeSolutionModel,instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000};
     if(previewGuard)providerRequest=previewGuard(providerRequest,signal);

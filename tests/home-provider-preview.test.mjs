@@ -40,16 +40,16 @@ test('HTTP and timeout failures do not retry or fall back',async()=>{
   await assert.rejects(client.responses.create(createProviderPreviewGuard()(request(),signal()),{maxRetries:0,timeout:60000}));assert.equal(calls,1);
  }
 });
-test('actual POST retains the checked fixed-role calculation and complete payload in two calls',async()=>{
+test('actual POST completes checked standalone staffing in one call within the two-call limit',async()=>{
  const r=await route(),body=solutionRequest(fixedMessages.start),steps=fixedSteps(body),before=JSON.stringify(body);
- r.sandbox.__replies.push(provider(steps[0]),null);const shift=r.sandbox.__replies.shift.bind(r.sandbox.__replies);
- r.sandbox.__replies.shift=()=>shift()??provider(steps[1](r.sandbox.__requests.at(-1).input));
+ r.sandbox.__replies.push(provider(steps[0]));
  const response=await r.submit(body),reply=await response.json();assert.equal(response.status,200);assert.match(reply.answer,/495000 USD/);assert.equal(reply.state.requiredStaffing.inputs.requiredRoles,10);assert.equal(reply.state.working.length,0);assert.equal(JSON.stringify(body),before);
- assert.equal(r.sandbox.__requests.length,2);assert.equal(reply.providerReceipt.modelAttempts,2);assert.equal(reply.providerReceipt.providerRounds.length,2);
+ assert.equal(r.sandbox.__requests.length,1);assert.equal(reply.providerReceipt.modelAttempts,1);assert.equal(reply.providerReceipt.providerRounds.length,1);
  for(const sent of r.sandbox.__requests){assert.equal(sent.truncation,'disabled');assert.equal(sent.reasoning.effort,'medium');assert.equal(sent.service_tier,'default');assert.ok(sent.tools.some(t=>t.name==='compare_required_staffing'));assert.equal(sent.max_output_tokens,5000);}
  for(const options of r.sandbox.__requestOptions){assert.equal(options.maxRetries,0);assert.equal(options.timeout,60000);}
  assert.deepEqual(JSON.parse(JSON.stringify(r.sandbox.__requests[0].tool_choice)),{type:'function',name:'compare_required_staffing'});
- const probe=await r.sandbox.module.exports.GET().json();assert.equal(probe.limits.rounds,2);assert.equal(probe.commit,'synthetic-reviewed-head');assert.equal(probe.ready,true);assert.equal(probe.solutionConversationEnabled,true);assert.equal(probe.endpoint,'/api/home-solution-conversation');assert.equal(probe.legacyChatBlocked,true);assert.equal(r.sandbox.__requests.length,2);
+ assert.deepEqual(JSON.parse(JSON.stringify(r.sandbox.__requests[0].tools.map(t=>t.name))),['compare_required_staffing']);
+ const probe=await r.sandbox.module.exports.GET().json();assert.equal(probe.limits.rounds,2);assert.equal(probe.commit,'synthetic-reviewed-head');assert.equal(probe.ready,true);assert.equal(probe.solutionConversationEnabled,true);assert.equal(probe.endpoint,'/api/home-solution-conversation');assert.equal(probe.legacyChatBlocked,true);assert.equal(r.sandbox.__requests.length,1);
 });
 test('read-only preflight rejects a Preview built without the Home UI flag before any model request',async()=>{
  const r=await route({NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION:'false'}),response=r.sandbox.module.exports.GET(),probe=await response.json();

@@ -28,6 +28,12 @@ test('failed second attempt preserves earlier reported usage without inventing m
  const missing=response();delete missing.providerReceipt.providerRounds[1].inputTokens;
  const projected=visibleProviderPreviewReceipt(missing,context);assert.equal(projected.applicationOutcome,'unverified');assert.equal(projected.providerUsageComplete,false);assert.equal(projected.rounds[1].inputTokens,null);assert.equal(projected.rounds[1].cachedInputTokens,0);
 });
+test('one completed staffing round is a complete receipt without an invented second round',()=>{
+ const reply=response();reply.providerReceipt.modelAttempts=1;reply.providerReceipt.providerRounds=[round(1)];reply.usage.modelRounds=1;
+ const receipt=visibleProviderPreviewReceipt(reply,context,state());
+ assert.equal(receipt.applicationOutcome,'validated');assert.equal(receipt.providerUsageComplete,true);assert.equal(receipt.modelAttempts,1);assert.equal(receipt.modelRounds,1);assert.equal(receipt.rounds.length,1);assert.equal(receipt.toolCalls,1);
+ assert.deepEqual(receipt.calculator.options.map(o=>o.listedCash),[1600000,30000,495000]);
+});
 test('malformed, inconsistent, unexpected or oversized receipts cannot appear complete',()=>{
  for(const mutate of [r=>r.providerReceipt.version=2,r=>r.providerReceipt.modelAttempts=3,r=>r.providerReceipt.providerRounds.push(round(3)),r=>r.providerReceipt.providerRounds[1].model=secret,r=>r.providerReceipt.providerRounds[1].serviceTier='priority',r=>r.providerReceipt.providerRounds[1].totalTokens=119,r=>r.providerReceipt.providerRounds[1].cachedInputTokens=101,r=>r.providerReceipt.providerRounds[1].outputTokens=-1]){
   const reply=response();mutate(reply);const receipt=visibleProviderPreviewReceipt(reply,context);assert.equal(receipt.providerUsageComplete,false);assert.ok(receipt.rounds.length<=2);assert.doesNotMatch(JSON.stringify(receipt),new RegExp(secret));
