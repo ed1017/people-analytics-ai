@@ -11,17 +11,25 @@ type Controller=ReturnType<typeof useHomeSolutionConversation>;
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring';
 const number=(value:number|null|undefined)=>value==null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:1});
 const proposalAnchor=(id:string)=>'proposed-action-plan-'+id;
+/** Only the freshly reviewed conversational lead gets a recommendation label.
+ * Saved catalogue order and discussion-only focus never establish a recommendation. */
+function recommendedProposal(controller:Controller){
+ const item=currentSolutionProposals(controller.state).find(item=>item.id===controller.state.focusCandidateId),turn=controller.state.turns.at(-1),user=controller.state.turns.at(-2);
+ if(controller.pending||!item||turn?.role!=='assistant'||turn.id!=='reply-'+item.requestId.slice(0,70)||user?.id!==item.message.id||item.blocking.length||JSON.stringify(item.constraints)!==JSON.stringify(controller.state.constraints)||controller.saved?.plans.some(plan=>plan.operation?.proposalKey===JSON.stringify(item.candidate)))return null;
+ return item.id;
+}
 /** Direct access to the actual review cards, without changing selection or saving. */
 export function HomeSolutionProposalLinks({controller}:{controller:Controller}){
- const proposals=currentSolutionProposals(controller.state);
+ const proposals=currentSolutionProposals(controller.state),recommendedId=recommendedProposal(controller);
  if(!proposals.length)return null;
- return <nav aria-label="Review proposed Action Plans" className="space-y-2 text-sm"><p className="font-semibold">Proposed Action Plans <span className="font-normal text-muted-foreground">· review before saving</span></p><div className="flex flex-wrap gap-2">{proposals.map((item,index)=><button key={item.id} type="button" className={button+' min-w-0 max-w-full break-words text-left'} onClick={()=>{const card=document.getElementById(proposalAnchor(item.id));card?.scrollIntoView({block:'start'});card?.focus({preventScroll:true});}}>Review {index+1}: {item.candidate.name}</button>)}</div></nav>;
+ const links=(items:SolutionEvaluation[])=>items.map(item=><button key={item.id} type="button" className={button+' min-w-0 max-w-full break-words text-left'} onClick={()=>{const card=document.getElementById(proposalAnchor(item.id));card?.scrollIntoView({block:'start'});card?.focus({preventScroll:true});}}>Review {proposals.indexOf(item)+1}: {item.candidate.name}</button>);
+ return <nav aria-label="Review proposed Action Plans" className="space-y-2 text-sm"><p className="font-semibold">{recommendedId?'Recommended Action Plan':'Proposed Action Plans'} <span className="font-normal text-muted-foreground">· review before saving</span></p><div className="flex flex-wrap gap-2">{links(recommendedId?proposals.filter(item=>item.id===recommendedId):proposals)}</div>{recommendedId&&proposals.length>1&&<><p className="font-semibold">Alternative Action Plans</p><div className="flex flex-wrap gap-2">{links(proposals.filter(item=>item.id!==recommendedId))}</div></>}</nav>;
 }
-function Proposal({item,controller,goal,number:proposalNumber}:{item:SolutionEvaluation;controller:Controller;goal:string;number:number}){
+function Proposal({item,controller,goal,number:proposalNumber,label}:{item:SolutionEvaluation;controller:Controller;goal:string;number:number;label:string}){
  const [statement,setStatement]=useState(goal||item.candidate.goal.statement);
  const stale=JSON.stringify(item.constraints)!==JSON.stringify(controller.state.constraints),saved=controller.saved?.plans.find(plan=>plan.operation?.proposalKey===JSON.stringify(item.candidate));
  return <article id={proposalAnchor(item.id)} tabIndex={-1} aria-label={`Working proposal: ${item.candidate.name}`} className="space-y-3 rounded border p-3 text-sm focus-visible:ring-2 focus-visible:ring-ring">
-  <p className="text-xs font-medium">Proposed Action Plan {proposalNumber} · {saved?'saved proposal':'not saved'} · effectiveness is unproven</p><h3 className="font-semibold">{item.candidate.name} · revision {item.revision}</h3><p><strong>Intended outcome:</strong> {item.candidate.objective}</p>
+  <p className="text-xs font-medium">{label} · proposal {proposalNumber} · {saved?'saved proposal':'Not saved'} · effectiveness is unproven</p><h3 className="font-semibold">{item.candidate.name} · revision {item.revision}</h3><p><strong>Intended outcome:</strong> {item.candidate.objective}</p>
   <ol className="list-decimal space-y-2 pl-5">{item.candidate.activities.map(activity=>{const component=item.draft?.bundle.components.find(part=>part.id===activity.id),timing=item.draft?.inputs.timing.find(row=>row.componentId===activity.id);return <li key={activity.id}><strong>{component?.name??activity.name}</strong><p>{component?.firstStep??activity.step}</p><p><strong>Suggested owner:</strong> {component?.ownerRole??activity.ownerRole}</p><p className="text-xs"><strong>Timing:</strong> {timing?.start.value??'Start not confirmed'} → {timing?.finish.value??'Finish not confirmed'}. Follow the proposed step sequence; dates and availability need review.</p><p className="text-xs">{component?.limitation??activity.limitation}</p></li>;})}</ol>
   <p><strong>Next step:</strong> {item.candidate.nextStep}</p><p><strong>Success measure:</strong> {item.candidate.successMeasure}</p>
   {item.result?.calculationStatus==='awaiting-scope'?<p>Qualitative proposal · population or horizon still needs review. Resource totals have not been calculated.</p>:<p>Calculated cash: {item.result?.cashEstimate?.cash==null?'Unknown':`$${number(item.result.cashEstimate.cash)} USD`} · staff effort: {number(item.result?.deliveryEstimate?.hours)} hours · distinct participants: {number(item.result?.uniqueParticipants)}.</p>}
@@ -48,7 +56,8 @@ export function SolutionProjectionChart({analysis}:{analysis:HeadcountProjection
  </section>;
 }
 export function HomeSolutionConversationReview({controller,goal,pack,showSaved}:{controller:Controller;goal:string;pack:unknown;showSaved:boolean}){
- const latest=currentSolutionProposals(controller.state);
+ const latest=currentSolutionProposals(controller.state),recommendedId=recommendedProposal(controller);
+ const displayed=recommendedId?[...latest.filter(item=>item.id===recommendedId),...latest.filter(item=>item.id!==recommendedId)]:latest;
  const analyses=[...new Map(controller.state.analyses.map(item=>[item.id,item])).values()];
  return <section aria-label="Solution conversation review" className="space-y-3">
   {controller.pending&&<div role="status" className="flex items-center gap-3"><p>Thinking through the question and checking useful calculations…</p><button className={button} onClick={controller.cancel}>Cancel request</button></div>}
@@ -62,7 +71,7 @@ export function HomeSolutionConversationReview({controller,goal,pack,showSaved}:
    <ol className="list-decimal space-y-1 pl-5">{controller.state.questions.map((question,index)=><li key={index}>{question}</li>)}</ol>
    <p>Answer in chat for new or revised plans, or skip these questions and review any plan below. Your answers do not save a plan.</p>
   </section>}
-  {latest.map((item,index)=><Proposal key={item.id+item.revision} item={item} controller={controller} goal={goal} number={index+1}/>)}
+  {displayed.map(item=><Proposal key={item.id+item.revision} item={item} controller={controller} goal={goal} number={latest.indexOf(item)+1} label={recommendedId===item.id?'Recommended Action Plan':recommendedId?'Alternative Action Plan':'Proposed Action Plan'}/>)}
   {!!latest.length&&<p className="text-sm">Refine a plan, combine ideas or ask for alternatives in chat.</p>}
   {showSaved&&controller.saved&&<details open><summary className="cursor-pointer py-2 font-semibold">Saved Action Plans</summary>{controller.saved.order.map(id=><PlanAlternativeCard key={id} plan={controller.saved!.plans.find(item=>item.id===id)!} catalog={controller.saved!} measurePack={pack} contextCurrent={false}/>)}</details>}
  </section>;
