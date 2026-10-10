@@ -1,4 +1,4 @@
-import {requiredStaffingInstructions} from '@/lib/home-required-staffing';
+import {requiredStaffingInstructions,requiredStaffingTool} from '@/lib/home-required-staffing';
 import {createProviderPreviewGuard,providerPreviewEnabled,providerPreviewLimits,ProviderPreviewIncompleteError} from '@/lib/home-provider-preview';
 import {hiringBudgetInstructions} from '@/lib/home-hiring-budget';
 import {groundSolutionRequest} from '@/lib/home-solution-grounding-source';
@@ -55,7 +55,7 @@ async function handlePOST(request:Request){
     const progressContract=progressModelContract(goalProgressConversationEnabled,capabilities.progressEntryEnabled);
     const conversationTools=demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools,...(natural?businessPlanningModelTools:[])];
     const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions;
-    let providerRequest:ResponseCreateParamsNonStreaming={...homeSolutionModel,instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000};
+    let providerRequest:ResponseCreateParamsNonStreaming={...homeSolutionModel,instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000};
     if(previewGuard)providerRequest=previewGuard(providerRequest,signal);
     const response=await datasetAI(() => {
      diagnostics.modelAttempt({inputBytes:new TextEncoder().encode(JSON.stringify(input)).length,instructionsBytes:new TextEncoder().encode(instructions).length,toolSchemaBytes:new TextEncoder().encode(JSON.stringify(conversationTools)).length});
@@ -83,5 +83,5 @@ export async function POST(request:Request) {
 /** Read-only policy probe for this isolated Preview; never invokes grounding or a model. */
 export function GET(){
  if(!providerPreviewEnabled(process.env))return new Response(null,{status:405});
- return Response.json({verification:'pr204-initial-two-calls-v1',...homeSolutionModel,limits:providerPreviewLimits,commit:process.env.VERCEL_GIT_COMMIT_SHA??null},{headers:{'Cache-Control':'no-store'}});
+ return Response.json({verification:'pr204-initial-two-calls-v2',ready:solutionConversationEnabled,solutionConversationEnabled,endpoint:'/api/home-solution-conversation',legacyChatBlocked:true,...homeSolutionModel,limits:providerPreviewLimits,commit:process.env.VERCEL_GIT_COMMIT_SHA??null},{status:solutionConversationEnabled?200:503,headers:{'Cache-Control':'no-store'}});
 }

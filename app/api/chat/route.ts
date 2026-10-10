@@ -1,4 +1,5 @@
 import {prepareProgressConversation,missingProgressPageInstructions} from '@/lib/goal-progress-entry-service';
+import {providerPreviewEnabled} from '@/lib/home-provider-preview';
 import {goalProgressConversationEnabled,goalProgressReadTool,runGoalProgressRead} from '@/lib/goal-progress-conversation';
 import { withDatasetRequest, datasetAI, datasetRouter } from "@/lib/dataset-runtime";
 import {taExtensionPrompt} from "@/lib/synthetic-ta/extension";
@@ -1661,5 +1662,6 @@ ${message}
 }
 
 export async function POST(request: NextRequest) {
+  if(providerPreviewEnabled(process.env))return NextResponse.json({error:'This bounded Preview requires the guarded Home conversation endpoint.',code:'preview_guarded_endpoint_required'},{status:503,headers:{'Cache-Control':'no-store'}});
   return withDatasetRequest(request, () => handlePOST(request));
 }

@@ -13,7 +13,9 @@ export function createProviderPreviewGuard(){
  return (request:ResponseCreateParamsNonStreaming,signal:AbortSignal)=>{
   signal.throwIfAborted();
   if(used>=providerPreviewLimits.rounds)throw new ProviderPreviewIncompleteError();
-  if(Object.keys(request).some(key=>!allowedKeys.has(key))||request.model!=='gpt-6.1-sol'||request.reasoning?.effort!=='medium'||request.service_tier!=='default'||request.max_output_tokens!==5000||request.parallel_tool_calls!==false||!['auto','none'].includes(String(request.tool_choice))||!Array.isArray(request.tools)||request.tools.some(tool=>tool.type!=='function')||(request.truncation!==undefined&&request.truncation!=='disabled'))throw Error('Unsupported bounded Preview request');
+  const choice=request.tool_choice;
+  const staffingChoice=typeof choice==='object'&&choice!==null&&Object.keys(choice).length===2&&choice.type==='function'&&'name' in choice&&choice.name==='compare_required_staffing'&&request.tools?.some(tool=>tool.type==='function'&&tool.name===choice.name);
+  if(Object.keys(request).some(key=>!allowedKeys.has(key))||request.model!=='gpt-6.1-sol'||request.reasoning?.effort!=='medium'||request.service_tier!=='default'||request.max_output_tokens!==5000||request.parallel_tool_calls!==false||!(choice==='auto'||choice==='none'||staffingChoice)||!Array.isArray(request.tools)||request.tools.some(tool=>tool.type!=='function')||(request.truncation!==undefined&&request.truncation!=='disabled'))throw Error('Unsupported bounded Preview request');
   used++;return {...request,truncation:'disabled' as const};
  };
 }

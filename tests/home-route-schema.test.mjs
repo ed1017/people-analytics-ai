@@ -15,6 +15,7 @@ import {aiSkillsGoalPrompt} from './fixtures/home-ai-skills-goal.mjs';
 import {HOME_BUNDLE_REQUEST,homeBundleOutputTokens} from '../lib/home-bundle-preparation.ts';
 import {buildHomeBundleFormat} from '../lib/home-solution-bundles.ts';
 import {investigationMetrics} from '../lib/home-investigation-contract.ts';
+import {providerPreviewBranch} from '../lib/home-provider-preview.ts';
 const require=createRequire(import.meta.url),Ajv=require('ajv'),ajv=new Ajv();
 // Features checked against https://developers.openai.com/api/docs/guides/structured-outputs
 // This checks the documented subset, not remote provider acceptance.
@@ -36,6 +37,14 @@ await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close((
 const sandbox={exports:{},require,Response,Request,URL,URLSearchParams,TextEncoder,TextDecoder,AbortController,console,process:{env:{OPENAI_API_KEY:'synthetic-harness-only'}},__requests:[],__replies:[],__requestOptions:[],fetch:()=>{throw Error('Network is forbidden in the route harness')}};
 sandbox.module={exports:sandbox.exports};// Bundle fixtures are JSON-only; clone within the VM realm for strict plain-object checks.
 vm.runInNewContext('globalThis.structuredClone=value=>JSON.parse(JSON.stringify(value));\n'+await fs.readFile(path.join(out,'route.cjs'),'utf8'),sandbox);
+test('bounded Preview refuses the legacy route before parsing the body or calling a model',async()=>{
+ const before=sandbox.__requests.length;
+ Object.assign(sandbox.process.env,{VERCEL_ENV:'preview',VERCEL_GIT_COMMIT_REF:providerPreviewBranch});
+ try{
+  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',body:'not JSON'}));
+  assert.equal(response.status,503);assert.equal((await response.json()).code,'preview_guarded_endpoint_required');assert.equal(sandbox.__requests.length,before);
+ }finally{delete sandbox.process.env.VERCEL_ENV;delete sandbox.process.env.VERCEL_GIT_COMMIT_REF;}
+});
 const all={};for(const metric of Object.values(investigationMetrics)){all[metric.source]??={id:metric.source,status:'loaded',facts:{}};all[metric.source].facts[metric.field]=24;}
 const packets=[['empty',{sources:[]}],['sparse',{sources:[{id:'W1',status:'loaded',facts:{headcount:12}}]}],['full',{sources:Object.values(all)}]];
 for(const [name,packet] of packets)test('actual POST constructs strict Responses format for '+name,async()=>{
