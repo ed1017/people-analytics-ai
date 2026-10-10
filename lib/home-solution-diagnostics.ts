@@ -1,4 +1,6 @@
 import {APIError,APIConnectionError,APIConnectionTimeoutError,APIUserAbortError} from 'openai/core/error';
+// @ts-expect-error Native Node checks share the Preview error identity.
+import {UltrafastPreviewIncompleteError} from './home-ultrafast-preview.ts';
 /** Server diagnostics are projections of fixed codes and bounded counters, never error text. */
 const readers = ['dashboard','workforce','attrition','talent-acquisition','survey-sentiment','skills','learning-development','career-mobility','career-growth-mobility','succession-coverage','workforce-planning','position-modeling','finance','bls'] as const;
 const triggers = ['deadline','cancelled','reader_failed','dataset_mismatch','scope_mismatch','facts_changed','verification_failed'] as const;
@@ -88,12 +90,15 @@ export function createSolutionDiagnostics(){
    // Classification only; no messages, stacks, request/response bodies or headers.
    const provider=stage==='provider'?providerFailureDetails(error):null,providerKind=provider?.kind??null;
    const code=evidence?'evidence_'+evidence.trigger:callerAborted?'conversation_cancelled':deadlineAborted?'conversation_deadline':
+    error instanceof UltrafastPreviewIncompleteError?'preview_single_call_incomplete':
     stage==='provider'?'provider_'+(providerKind==='http'?'http_error':providerKind==='other'?'failed':providerKind):
     ({request_validation:'invalid_request',configuration:'configuration_unavailable',grounding:'evidence_verification_failed',model_setup:'model_setup_failed',conversation_preparation:'conversation_preparation_failed',response_validation:'response_validation_failed'} as const)[stage];
    const diagnostic={version:2,correlationId,code,stage,elapsedMs:bounded(Date.now()-startedAt,600000),modelAttempts,
     // An SDK attempt is not proof of a wire dispatch, provider receipt, usage or spend.
     providerKind,providerHttpStatus:provider?.status??null,providerErrorClass:provider?.errorClass??null,providerCauseCode:provider?.causeCode??null,
-    providerElapsedMs:provider&&attemptStartedAt!==null?bounded(Date.now()-attemptStartedAt,600000):null,grounding:evidence};
+    providerElapsedMs:provider&&attemptStartedAt!==null?bounded(Date.now()-attemptStartedAt,600000):null,grounding:evidence,
+    // Retain bounded usage from a completed paid attempt even if a later continuation is blocked.
+    providerRounds:providerRounds.map(round=>({...round}))};
    if(!reported){reported=true;try{console.error('Home solution conversation failed',diagnostic);}catch{/* Logging cannot change the failure response. */}}
    return {code,correlationId};
   },

@@ -9,7 +9,8 @@ import {progressModelContract} from '@/lib/goal-progress-entry-service';
 import { withDatasetRequest, datasetAI, datasetRouter } from '@/lib/dataset-runtime';
 import OpenAI from 'openai';
 import {toResponseInputItems} from 'openai/lib/responses/ResponseInputItems';
-import type {ResponseInput} from 'openai/resources/responses/responses';
+import type {ResponseInput,ResponseCreateParamsNonStreaming} from 'openai/resources/responses/responses';
+import {createUltrafastPreviewGuard,ultrafastPreviewEnabled,UltrafastPreviewIncompleteError} from '@/lib/home-ultrafast-preview';
 import {openAIProxyTransport} from '@/lib/openai-proxy-transport';
 import {readSolutionRequest,solutionConversationEnabled} from '@/lib/home-solution-conversation';
 import {SWP_CONVERSATION_HEADER,swpConversationModel} from '@/lib/swp-conversation-model';
@@ -35,6 +36,7 @@ async function handlePOST(request:Request){
   if(swpModel.model&&swpModel.model!==homeSolutionModel.model)throw Error('Configured SWP model conflicts with the Home conversation policy.');
   const demand=request.headers.get(SWP_CONVERSATION_HEADER)===SWP_DEMAND_MODE?requestDemandContext(parsed,datasetRouter.current().token):null;
   if(!process.env.OPENAI_API_KEY)throw Error('Model unavailable');
+  const ultrafast=ultrafastPreviewEnabled(process.env),guardUltrafast=createUltrafastPreviewGuard();
   signal=AbortSignal.any([request.signal,AbortSignal.timeout(90000)]);
   diagnostics.stage('grounding');
   const grounding=await groundSolutionRequest(parsed,signal,diagnostics.groundingComplete);
@@ -57,9 +59,11 @@ async function handlePOST(request:Request){
     const businessTools=businessPlanningModelTools.filter(tool=>capabilities.businessPlanningReady||!['revise_scoped_service_demand','compare_service_staffing'].includes(tool.name));
     const conversationTools=demand?demandReferenceModelContract.tools:[...planTools,...progressContract.tools,...(natural?businessTools:[])];
     const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions;
+    let providerRequest:ResponseCreateParamsNonStreaming={...homeSolutionModel,instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000};
+    if(ultrafast)providerRequest=guardUltrafast({...providerRequest,service_tier:'ultrafast'},signal);
     const response=await datasetAI(() => {
      diagnostics.modelAttempt({inputBytes:new TextEncoder().encode(JSON.stringify(input)).length,instructionsBytes:new TextEncoder().encode(instructions).length,toolSchemaBytes:new TextEncoder().encode(JSON.stringify(conversationTools)).length});
-     return client.responses.create({...homeSolutionModel,instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:60000,signal});
+     return client.responses.create(providerRequest,{maxRetries:0,timeout:60000,signal});
     });
     diagnostics.providerResult(response);
     diagnostics.stage('response_validation');
@@ -70,8 +74,8 @@ async function handlePOST(request:Request){
   const receipt=diagnostics.success(reply.usage);
   return Response.json({...reply,...(receipt?{diagnostics:receipt}:{})},{headers:{'Cache-Control':'no-store',...(receipt?{'X-Correlation-ID':receipt.correlationId,'Server-Timing':Object.entries(receipt.stageElapsedMs).map(([name,ms])=>`${name};dur=${ms}`).concat(`total;dur=${receipt.elapsedMs}`).join(', ')}:{})}});
  }catch(error){
-  const evidence=error instanceof SolutionEvidenceError,diagnostic=diagnostics.failure(error,evidence?error.diagnostic:null,request.signal.aborted,signal?.aborted===true);
-  return Response.json({error:evidence?error.message:'The conversation could not be completed or verified. Your request and earlier work are kept. Try a narrower question or retry explicitly.',...diagnostic},
+  const evidence=error instanceof SolutionEvidenceError,incomplete=error instanceof UltrafastPreviewIncompleteError,diagnostic=diagnostics.failure(error,evidence?error.diagnostic:null,request.signal.aborted,signal?.aborted===true);
+  return Response.json({error:evidence||incomplete?error.message:'The conversation could not be completed or verified. Your request and earlier work are kept. Try a narrower question or retry explicitly.',...diagnostic},
    {status:evidence?503:422,headers:{'Cache-Control':'no-store','X-Correlation-ID':diagnostic.correlationId}});
  }
 }
