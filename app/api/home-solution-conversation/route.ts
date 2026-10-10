@@ -22,7 +22,7 @@ export const dynamic='force-dynamic';
 // Leave response/cleanup headroom beyond the shared 90-second operation deadline.
 export const maxDuration=120;
 // This route owns the stronger Home conversation policy; other routes keep theirs.
-const homeSolutionModel={model:'gpt-6.1-sol',reasoning:{effort:'medium' as const},service_tier:'default' as const};
+const homeSolutionModel={model:'gpt-6.1-sol',reasoning:{effort:'low' as const},service_tier:'default' as const};
 async function handlePOST(request:Request){
  if(!solutionConversationEnabled)return Response.json({error:'Solution conversation is not enabled.'},{status:404});
  const body=await request.text();if(new TextEncoder().encode(body).length>900000)return Response.json({error:'The conversation request is too large.'},{status:413});
