@@ -70,6 +70,34 @@ test('multiple calls in one response and a preceding projection retain the full 
  const projected=await converseSolutions(solutionRequest(A),runtime([project(projectionSpec()),ready(c),final('Review the proposal and scenario.',['mentoring'],['headcount'])]),signal());assert.equal(projected.usage.modelRounds,3);assert.equal(projected.analysisIds.length,1);
 });
 
+function checkedAlternatives(){
+ return [['mentoring','Mentoring trial','Learning lead','Pair volunteers with mentors.',5,12],['peer-practice','Peer feedback practice','Team facilitator','Practice feedback in peer pairs.',4,9],['manager-check-in','Manager check-in','People partner','Review workload with managers.',3,6]].map(([id,name,ownerRole,step,hours,coordination])=>{
+  const c=scoped();c.id=id;c.name=name;Object.assign(c.activities[0],{name,ownerRole,step});c.quantities.find(q=>q.field==='hours_per_participant').number=hours;c.quantities.find(q=>q.field==='coordination_hours').number=coordination;return c;
+ });
+}
+const finalWithAllMetrics=(candidates,answer)=>input=>({...final(answer,candidates.map(c=>c.id)),verifiedMetrics:input.filter(row=>row.type==='function_call_output').flatMap(row=>JSON.parse(row.output).verifiedMetricReferences??[])});
+const assertAllAlternatives=(reply,candidates)=>{
+ assert.deepEqual(reply.candidateIds,candidates.map(c=>c.id));
+ assert.deepEqual([...new Set(reply.state.verifiedMetrics.map(ref=>ref.id))],reply.candidateIds);
+ for(const [i,c] of candidates.entries()){
+  const item=reply.state.working.find(row=>row.id===c.id);assert.deepEqual(item.blocking,[]);assert.equal(item.result.cashEstimate.cash,null);
+  assert.equal(resolveSolutionMetric(reply.state,reply.state.verifiedMetrics.find(ref=>ref.id===c.id&&ref.metric==='staff_hours')).value,[27,21,15][i]);
+ }
+};
+
+test('an earlier checked A prevents terminal B from bypassing the final review of both options',async()=>{
+ const candidates=checkedAlternatives().slice(0,2),first=ready(candidates[0]);first.args.readyForReview=false;
+ const answer='Review both alternatives and their tradeoffs.',reply=await converseSolutions(solutionRequest('Compare two fictional alternatives with the supplied dates and hours; keep both for review.'),runtime([first,ready(candidates[1]),finalWithAllMetrics(candidates,answer)]),signal());
+ assert.equal(reply.usage.modelRounds,3);assert.equal(reply.answer,answer);assertAllAlternatives(reply,candidates);
+});
+
+test('a multi-plan request retains earlier parallel options and terminal C through the normal final turn',async()=>{
+ const candidates=checkedAlternatives(),answer='Review all three alternatives.',rt=runtime([ready(candidates[0]),ready(candidates[2]),finalWithAllMetrics(candidates,answer)]),complete=rt.complete;let first=true;
+ rt.complete=async(...args)=>{const output=await complete(...args);if(first){first=false;const step=ready(candidates[1]),call={id:'parallel-option',name:step.name,arguments:JSON.stringify(step.args)};output.calls.push(call);output.items.push({type:'function_call',call_id:call.id,name:call.name,arguments:call.arguments});}return output;};
+ const reply=await converseSolutions(solutionRequest('Compare three fictional plans, preserving all options and checked effort for review.'),rt,signal());
+ assert.equal(reply.usage.modelRounds,3);assert.equal(reply.usage.toolCalls,3);assert.equal(reply.answer,answer);assertAllAlternatives(reply,candidates);
+});
+
 test('cancellation still rejects before any model round',async()=>{
  const control=new AbortController();control.abort();const rt=runtime([ready(scoped())]);await assert.rejects(converseSolutions(solutionRequest(A),rt,control.signal),/cancelled/);
 });

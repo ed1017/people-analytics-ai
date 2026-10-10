@@ -159,11 +159,13 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
      result=call.name==='evaluate_action_plans'?{proposals:views,accepted:false,saved:false}:views[0];
      if(JSON.stringify(result).length>65000)throw Error('The proposed set exceeds the result budget. Use fewer, more concise activities; no proposals or constraints were recorded.');
      state.constraints=constraints;state.working=nextState.working;
+     const firstEvaluation=evaluated.size===0;
      for(const item of items)evaluated.set(item.id,item);
      // Only an explicitly terminal, independently checked calculation skips prose generation.
+     // Earlier evaluations need the normal final turn to preserve all requested options/metrics.
      // Mixed operations, blocked/qualitative plans and oversized metric sets retain the loop.
      const metrics=items.flatMap(item=>checkedMetricReferences(nextState,'candidate',item.id,item.revision));
-     if(review.ready&&output.calls.length===1&&!progressProposal&&!demandReview&&naturalStep===0&&analyses.size===0&&metrics.length>0&&metrics.length<=8&&items.every(item=>item.draft&&item.result&&item.result.calculationStatus!=='awaiting-scope'&&!item.blocking.length)){
+     if(firstEvaluation&&review.ready&&output.calls.length===1&&!progressProposal&&!demandReview&&naturalStep===0&&analyses.size===0&&metrics.length>0&&metrics.length<=8&&items.every(item=>item.draft&&item.result&&item.result.calculationStatus!=='awaiting-scope'&&!item.blocking.length)){
       const reviewedFinal:SolutionFinal={answer:items.length===1?'Action Plan ready for review; not saved or applied.':'Action Plans ready for review; not saved or applied.',candidateIds:items.map(item=>item.id),analysisIds:[],verifiedMetrics:metrics,questions:[],constraintUpdates:[],rejected:[],focusCandidateId:items[0].id};
       assertSolutionShape(reviewedFinal,solutionFinalSchema,'calculated review');final=reviewedFinal;
      }
