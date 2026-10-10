@@ -8,7 +8,7 @@ import tailwind from '@tailwindcss/postcss';
 import {summaryFixture} from '../fixtures/plan-quick-summary.mjs';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const output=await fs.mkdtemp(path.join(os.tmpdir(),'plan-quick-summary-'));
-const cases=['known','partial','unknown'].map(summaryFixture);const scenario=summaryFixture();scenario.name='scenario';scenario.result.conditionalCoverage=[0,1,2,3,4,5];cases.push(scenario);
+const cases=['known','partial','unknown'].map(summaryFixture);const scenario=summaryFixture();scenario.name='scenario';scenario.result.conditionalCoverage=[0,1,2,3,4,5];cases.push(scenario);const empty=summaryFixture();empty.name='all-unknown';empty.result=null;cases.push(empty);
 const compiler=webpackPackage.webpack({mode:'development',devtool:false,plugins:[new webpackPackage.webpack.DefinePlugin({'process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION':JSON.stringify('true'),'process.env.NEXT_PUBLIC_GOAL_PROGRESS':JSON.stringify('true'),'process.env.NEXT_PUBLIC_HOME_STRUCTURED_PLANS':JSON.stringify('false')})],entry:path.resolve('tests/fixtures/plan-quick-summary-client.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
 const css=(await postcss([tailwind({base:process.cwd()})]).process(await fs.readFile('app/globals.css','utf8'),{from:path.resolve('app/globals.css')})).css;
@@ -29,6 +29,9 @@ try{for(const [mode,width,height] of [['desktop',1200,1000],['phone',390,844]]){
  check('only complete reconciled costs have breakdown bars',await known.locator('[aria-hidden=true]').count()===2&&await partial.locator('[aria-hidden=true]').count()===0&&await unknown.locator('[aria-hidden=true]').count()===0);
  check('partial subtotal is explicit and total remains unknown',await partial.getByText('Listed: $3,000 · partial',{exact:true}).isVisible()&&await partial.getByRole('region',{name:'Total cost',exact:true}).getByText('Unknown',{exact:true}).count()===1);
  check('unknown component is not shown as zero',await unknown.getByText('$2,000',{exact:true}).count()===1&&await unknown.getByText('$0',{exact:true}).count()===0);
+ const emptySummary=page.getByRole('article',{name:'all-unknown',exact:true}).getByRole('region',{name:'Action Plan quick summary'});
+ check('all-unknown summary stays compact with every unknown explicit',await emptySummary.evaluate(node=>node.getBoundingClientRect().height<260)&&await emptySummary.innerText().then(text=>text.includes('Breakdown: Unknown')&&text.includes('Duration / start / finish: Unknown')&&text.includes('People / FTE / staff hours: Unknown')));
+ await page.getByRole('article',{name:'all-unknown',exact:true}).screenshot({path:path.join(output,mode+'-all-unknown.png')});
  check('scenario chart uses supplied points and explicitly distinguishes them from actuals',await page.getByRole('figure',{name:'Conditional capacity scenario'}).count()===1&&await page.getByText('Conditional on readiness · not an observed trend',{exact:true}).isVisible());
  await page.getByRole('article',{name:'scenario',exact:true}).screenshot({path:path.join(output,mode+'-scenario.png')});
  check('FTE remains unknown and no inferred forecast appears',await known.getByRole('region',{name:'Resources'}).innerText().then(text=>text.includes('FTE: Unknown'))&&await page.getByText(/forecast/i).count()===0);

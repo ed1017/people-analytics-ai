@@ -4,6 +4,12 @@ const number=(value:number|null)=>value===null?'Unknown':value.toLocaleString('e
 const money=(value:number|null)=>value===null?'Unknown':`$${value.toLocaleString('en-US',{maximumFractionDigits:2})}`;
 export function ActionPlanQuickSummary({draft,result}:{draft:BundleDraft|null;result?:BundleResult|null}){
  const value=actionPlanQuickSummary(draft,result);
+ const allUnknown=value.cash===null&&value.subtotal===null&&!value.costs.length&&value.start===null&&value.finish===null&&value.months===null&&value.people===null&&value.deliveryHours===null&&!value.capacitySeries.length;
+ if(allUnknown)return <section aria-label="Action Plan quick summary" className="@container text-base leading-normal"><div className="grid grid-cols-1 gap-2 @min-[36rem]:grid-cols-3">
+  <section aria-label="Total cost" className="min-w-0 rounded-lg border bg-muted/30 px-3 py-2"><div className="flex flex-wrap justify-between gap-x-2"><h4 className="font-semibold">Total cost</h4><p>Unknown</p></div><p>Breakdown: Unknown</p></section>
+  <section aria-label="Timeline" className="min-w-0 rounded-lg border bg-muted/30 px-3 py-2"><h4 className="font-semibold">Timeline</h4><p>Duration / start / finish: Unknown</p></section>
+  <section aria-label="Resources" className="min-w-0 rounded-lg border bg-muted/30 px-3 py-2"><h4 className="font-semibold">Resources</h4><p>People / FTE / staff hours: Unknown</p>{value.staffingHoursSeparate&&<p>Training effort: Unknown</p>}</section>
+ </div></section>;
  const costRows=value.costs.map(row=><li key={row.id} className="min-w-0"><div className="flex flex-wrap justify-between gap-x-2"><span>{row.label}</span><span className="font-medium">{money(row.value)}</span></div>{value.chart&&<div aria-hidden="true" className="mt-1 h-1.5 rounded bg-muted"><div className="h-full rounded bg-primary" style={{width:`${row.value!/value.cash!*100}%`}}/></div>}</li>);
  const series=value.capacitySeries,max=Math.max(1,...series.map(point=>point.people),value.demand??0);
  const x=(index:number)=>30+index/Math.max(1,series.length-1)*600,y=(people:number)=>90-people/max*70;
