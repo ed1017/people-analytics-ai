@@ -1,0 +1,32 @@
+{
+  "checks": [
+    "desktop question produces period allowance and unavailable salary without a workload fiction",
+    "desktop currency, horizon, costs and FTE start blank",
+    "desktop editor calculates period cash and annual run rate without a model request",
+    "desktop edit retains scenario provenance without pinning a goal or plan",
+    "desktop blank fee restores unknown complete cost instead of zero",
+    "desktop reload preserves edited inputs and unknowns",
+    "desktop next conversation receives local edits",
+    "desktop changing currency clears previous amounts before recalculation",
+    "desktop new currency cannot silently reuse a USD rate",
+    "desktop phone and desktop fit without runtime errors or external traffic",
+    "desktop scope change blocks stale estimate edits",
+    "desktop clear removes only the estimate without a model call",
+    "desktop existing checked-plan review remains available after clearing the estimate",
+    "desktop PR201 cost timeline and resource summary remains present",
+    "phone question produces period allowance and unavailable salary without a workload fiction",
+    "phone currency, horizon, costs and FTE start blank",
+    "phone editor calculates period cash and annual run rate without a model request",
+    "phone edit retains scenario provenance without pinning a goal or plan",
+    "phone blank fee restores unknown complete cost instead of zero",
+    "phone reload preserves edited inputs and unknowns",
+    "phone next conversation receives local edits",
+    "phone changing currency clears previous amounts before recalculation",
+    "phone new currency cannot silently reuse a USD rate",
+    "phone phone and desktop fit without runtime errors or external traffic",
+    "phone scope change blocks stale estimate edits",
+    "phone clear removes only the estimate without a model call",
+    "phone existing checked-plan review remains available after clearing the estimate",
+    "phone PR201 cost timeline and resource summary remains present"
+  ]
+}

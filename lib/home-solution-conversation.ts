@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share application source.
+import {readHiringBudgetReview,type HiringBudgetReview} from './home-hiring-budget.ts';
 import type {BusinessPlanning} from './home-business-planning';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {readBusinessPlanning} from './home-business-planning.ts';
@@ -31,7 +33,7 @@ export const solutionConversationField='homeSolutionConversationV1';
 export type SolutionTurn={id:string;role:'user'|'assistant';text:string};
 export const solutionProvenanceVersion=1 as const;
 export type SolutionEvaluation={provenanceVersion?:1;id:string;revision:number;requestId:string;message:{id:string;text:string};candidate:SolutionCandidate;binding:ActionBinding;draft:BundleDraft|null;result:BundleResult|null;sourceRefs:AlternativeSourceRef[];sourceKeys:Record<string,string>;constraints:SolutionConstraint[];interpretations:string[];changes:string[];issues:string[];blocking:string[]};
-export type SolutionState={businessPlanning?:BusinessPlanning|null;datasetEvidenceContexts?:ReturnType<typeof readCandidateHomeContext>[];version:1;verifiedMetrics:SolutionMetricRef[];turns:SolutionTurn[];constraints:SolutionConstraint[];working:SolutionEvaluation[];analyses:HeadcountProjection[];rejected:{candidateId:string;revision:number;reason:string;turnId:string}[];questions:string[];focusCandidateId:string|null};
+export type SolutionState={hiringBudget?:HiringBudgetReview|null;businessPlanning?:BusinessPlanning|null;datasetEvidenceContexts?:ReturnType<typeof readCandidateHomeContext>[];version:1;verifiedMetrics:SolutionMetricRef[];turns:SolutionTurn[];constraints:SolutionConstraint[];working:SolutionEvaluation[];analyses:HeadcountProjection[];rejected:{candidateId:string;revision:number;reason:string;turnId:string}[];questions:string[];focusCandidateId:string|null};
 export type SolutionRequest={version:1;planningCalculatorAvailable?:boolean;requestId:string;goal:{id:string;statement:string};scope:string;filters:DashboardFilters;timeZone:string;evidence:unknown;goalContext:unknown;goalProgress?:unknown;progressEntry?:unknown;selectedId:string|null;catalog:PlanAlternatives|null;state:SolutionState;message:{id:string;text:string}};
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 function fail(message:string):never {throw Error(message);}
@@ -48,6 +50,7 @@ export function readSolutionState(raw:unknown):SolutionState {
  if(!validateJson(raw)||!obj(raw)||raw.version!==1||!Array.isArray(raw.turns)||raw.turns.length>32||!Array.isArray(raw.constraints)||raw.constraints.length>5||!Array.isArray(raw.working)||raw.working.length>12||!Array.isArray(raw.rejected)||raw.rejected.length>24||!Array.isArray(raw.questions)||raw.questions.length>2||!raw.questions.every(q=>text(q,300))||!(raw.focusCandidateId===null||id(raw.focusCandidateId)))fail('The working conversation could not be read. Saved plans are preserved.');
  if(raw.datasetEvidenceContexts!==undefined){if(!Array.isArray(raw.datasetEvidenceContexts)||raw.datasetEvidenceContexts.length>16)fail('Evidence recipes exceed the supported limit.');raw.datasetEvidenceContexts.forEach(readCandidateHomeContext);}
  const state=raw as unknown as SolutionState;
+ if(state.hiringBudget!==undefined)state.hiringBudget=readHiringBudgetReview(state.hiringBudget);
  if(state.businessPlanning!==undefined)state.businessPlanning=readBusinessPlanning(state.businessPlanning);
  state.analyses=readHeadcountProjections(state.analyses);
  state.verifiedMetrics??=[];if(!Array.isArray(state.verifiedMetrics)||state.verifiedMetrics.length>8)fail('Checked result references are unavailable.');

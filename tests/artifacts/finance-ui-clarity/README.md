@@ -11,3 +11,5 @@ Validation: 4 offline reconciliation tests; 20 desktop/phone component-browser a
 Scope labels distinguish selected Workforce snapshot data from unfiltered Finance and company composition. No source/provider/calculator/auth/database files changed. Existing Finance numeric normalization and source refresh metadata are unchanged; this presentation does not independently certify the underlying view estimates.
 
 Plans gain one short request to confirm owner, baseline, target and review date, plus optional retention-pilot participation/workload check-in guidance. No owner, target or date is assigned or saved automatically.
+
+Integration with main `a3dbbb1` (PR200): the sole conflict was adjacent imports in `home-solution-conversation-review.tsx`; both the hiring-budget review and plan check-in imports are retained. Calculator, chart, route and conversation hook files match main. Post-integration checks passed: 41 calculator/chart/Finance contract tests, 28 offline desktop/mobile hiring-budget and checked-plan assertions, TypeScript and scoped lint. `main-integration-checks.json` records the browser assertions. No live provider calls or deployment.
