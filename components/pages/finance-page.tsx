@@ -1,4 +1,5 @@
 "use client";
+import {financeVacancyBasis} from '@/lib/finance-vacancy-basis';
 import { PlanningGuide } from "@/components/planning-guide";
 
 import type {
@@ -36,9 +37,11 @@ export function FinancePage({
   financeScenarios,
   maxFinanceLaborCost,
 }: FinancePageProps) {
+  const exposure=financeData?financeVacancyBasis(financeData.current.estimated_vacancy_cost_exposure_usd,financeBusinessUnits):null;
+  const precise=(value:number)=>Number.isFinite(value)?'$'+value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' USD':'Unavailable';
   return (
-<section className="evidence-workspace min-w-0 p-6">
-            <div className="mb-6 flex items-end justify-between gap-4">
+<section className="evidence-workspace @container min-w-0 p-4 sm:p-6">
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
               <div>
                 <div className="flex flex-wrap items-center gap-3"><PlanningGuide page="finance" /></div>
                 <p className="text-muted-foreground">
@@ -61,12 +64,13 @@ export function FinancePage({
 
             {financeData ? (
               <>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                  <div className="rounded-lg border p-4">
+                <p aria-label="Finance metric scope" className="mb-3 rounded-lg border bg-muted/30 px-3 py-2 text-base font-semibold">Company-wide · workforce filters not applied</p>
+                <div aria-label="Finance headline metrics" className="grid grid-cols-1 gap-4 @min-[26rem]:grid-cols-2 @min-[56rem]:grid-cols-4">
+                  <div className="min-w-0 break-words rounded-lg border p-4">
                     <p className="text-sm text-muted-foreground">
                       Total Labor Cost
                     </p>
-                    <p className="mt-2 text-3xl font-semibold">
+                    <p className="mt-2 break-words text-[clamp(1.25rem,3cqw,1.875rem)] font-semibold">
                       {formatCurrencyCompact(
                         financeData.current.labor_cost_usd
                       )}
@@ -76,11 +80,11 @@ export function FinancePage({
                     </p>
                   </div>
 
-                  <div className="rounded-lg border p-4">
+                  <div className="min-w-0 break-words rounded-lg border p-4">
                     <p className="text-sm text-muted-foreground">
                       Cost per FTE
                     </p>
-                    <p className="mt-2 text-3xl font-semibold">
+                    <p className="mt-2 break-words text-[clamp(1.25rem,3cqw,1.875rem)] font-semibold">
                       $
                       {Math.round(
                         financeData.current.cost_per_fte_usd
@@ -91,11 +95,11 @@ export function FinancePage({
                     </p>
                   </div>
 
-                  <div className="rounded-lg border p-4">
+                  <div className="min-w-0 break-words rounded-lg border p-4">
                     <p className="text-sm text-muted-foreground">
                       Vacancy Cost Exposure
                     </p>
-                    <p className="mt-2 text-3xl font-semibold">
+                    <p className="mt-2 break-words text-[clamp(1.25rem,3cqw,1.875rem)] font-semibold">
                       {formatCurrencyCompact(
                         financeData.current
                           .estimated_vacancy_cost_exposure_usd
@@ -106,11 +110,11 @@ export function FinancePage({
                     </p>
                   </div>
 
-                  <div className="rounded-lg border p-4">
+                  <div className="min-w-0 break-words rounded-lg border p-4">
                     <p className="text-sm text-muted-foreground">
                       Vacant Positions
                     </p>
-                    <p className="mt-2 text-3xl font-semibold">
+                    <p className="mt-2 break-words text-[clamp(1.25rem,3cqw,1.875rem)] font-semibold">
                       {financeData.current.vacant_positions.toLocaleString()}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -120,11 +124,12 @@ export function FinancePage({
                 </div>
 
                 <div className="mt-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
-                  Vacancy cost exposure is an estimate based on current average labor cost per FTE multiplied by vacant positions. It is not booked expense.
+                  <p>Vacancy exposure = sum of business-unit exposure estimates; not booked expense.</p>
+                  <details><summary className="min-h-11 cursor-pointer py-2 text-base">Exposure calculation</summary><ul className="space-y-1 text-base">{financeBusinessUnits.map(row=><li key={row.org_code}>{row.org_name}: {precise(row.estimated_vacancy_cost_exposure_usd)}</li>)}</ul><p className="mt-2 text-base">Sum: {exposure?.subtotal==null?'Unavailable':precise(exposure.subtotal)} · Reported headline: {precise(financeData.current.estimated_vacancy_cost_exposure_usd)}</p>{exposure?.difference!==null&&!exposure?.reconciles&&<p className="text-base">Difference: {precise(exposure!.difference!)}. Source totals need reconciliation.</p>}</details>
                 </div>
 
-                <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(340px,1fr)]">
-                  <div className="rounded-lg border p-4">
+                <div className="mt-6 grid gap-6 @min-[52rem]:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+                  <div className="min-w-0 break-words rounded-lg border p-4">
                     <div className="mb-4">
                       <h3 className="font-semibold">
                         Labor Cost by Business Unit
@@ -141,7 +146,7 @@ export function FinancePage({
                             key={row.org_code}
                             className="space-y-2"
                           >
-                            <div className="flex items-end justify-between gap-4">
+                            <div className="flex flex-wrap items-end justify-between gap-4">
                               <div>
                                 <p className="text-sm font-medium">
                                   {row.org_name}
@@ -193,7 +198,7 @@ export function FinancePage({
                     </div>
                   </div>
 
-                  <div className="rounded-lg border p-4">
+                  <div className="min-w-0 break-words rounded-lg border p-4">
                     <div className="mb-4">
                       <h3 className="font-semibold">
                         Vacancy Exposure by Business Unit
@@ -264,12 +269,12 @@ export function FinancePage({
                     </p>
                   </div>
 
-                  <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                  <div className="grid gap-3 @min-[26rem]:grid-cols-2 @min-[56rem]:grid-cols-4">
                     {financeScenarios.map(
                       (scenario) => (
                         <div
                           key={scenario.scenario_name}
-                          className="rounded-lg border p-4"
+                          className="min-w-0 break-words rounded-lg border p-4"
                         >
                           <p className="text-sm font-semibold">
                             {scenario.scenario_name}

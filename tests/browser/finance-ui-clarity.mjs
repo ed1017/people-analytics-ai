@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
+import postcss from 'postcss';
+import tailwind from '@tailwindcss/postcss';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
+const output=await fs.mkdtemp(path.join(os.tmpdir(),'finance-ui-clarity-'));
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,plugins:[new webpackPackage.webpack.DefinePlugin({'process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION':JSON.stringify('true'),'process.env.NEXT_PUBLIC_GOAL_PROGRESS':JSON.stringify('true'),'process.env.NEXT_PUBLIC_HOME_STRUCTURED_PLANS':JSON.stringify('false')})],entry:path.resolve('tests/fixtures/finance-ui-clarity-client.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
+const css=(await postcss([tailwind({base:process.cwd()})]).process(await fs.readFile('app/globals.css','utf8'),{from:path.resolve('app/globals.css')})).css;
+const js=await fs.readFile(path.join(output,'fixture.js'),'utf8');
+const html=`<!doctype html><html data-workspace-preference="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style></head><body><div id="root"></div><script>${js.replaceAll('</script','<\\/script')}</script></body></html>`;
+const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']}),checks=[];
+try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
+ const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),errors=[];let external=0;
+ page.on('pageerror',error=>errors.push(error.message));await context.route('**/*',route=>{if(route.request().url()==='http://localhost:3144/')return route.fulfill({contentType:'text/html',body:html});external++;return route.abort();});
+ const check=(name,ok)=>{assert.ok(ok,mode+' '+name);checks.push(mode+' '+name);console.log('PASS '+mode+' '+name);};
+ await page.goto('http://localhost:3144/');await page.getByLabel('Finance metric scope').waitFor();
+ await page.getByRole('button',{name:'Workforce',exact:true}).click();check('selected US snapshot labels its scope immediately above its metrics',await page.getByLabel('Country').inputValue()==='US'&&await page.getByLabel('Workforce snapshot scope').innerText().then(text=>text.includes('Filters applied: United States'))&&await page.getByText('5,000',{exact:true}).isVisible());
+ await page.getByRole('button',{name:'Finance',exact:true}).click();check('Finance keeps the selected filter but explicitly reports company-wide metrics',await page.getByLabel('Country').inputValue()==='US'&&await page.getByLabel('Finance metric scope').innerText().then(text=>text.includes('Company-wide')&&text.includes('not applied'))&&await page.getByText('475',{exact:true}).isVisible());
+ await page.getByText('Exposure calculation',{exact:true}).click();check('exposure sum reproduces headline while removing the misleading enterprise-average formula',await page.getByText('Sum: $96,300,000.00 USD · Reported headline: $96,300,000.00 USD',{exact:true}).isVisible()&&await page.getByText(/average labor cost per FTE multiplied/).count()===0);await page.getByText('Exposure calculation',{exact:true}).click();
+ if(mode==='desktop')await page.getByRole('button',{name:'Widen AI',exact:true}).click();
+ const metrics=page.getByLabel('Finance headline metrics');check('Finance headline cards fit the available pane beside AI',await metrics.evaluate(node=>[...node.children].every(card=>card.scrollWidth<=card.clientWidth&&card.getBoundingClientRect().right<=node.getBoundingClientRect().right+1)));
+ await metrics.screenshot({path:path.join(output,mode+'-finance-metrics.png')});
+ const ai=page.locator('.app-ai-panel'),composer=ai.getByRole('textbox');await composer.fill('Explain the scope');await composer.press('Enter');const status=page.getByRole('status',{name:'AI generation status'});await status.waitFor();
+ check('starters collapse after submit while generation status stays outside the scrollback',await ai.getByText('Suggested prompts',{exact:true}).evaluate(node=>!node.parentElement.open)&&await status.evaluate(node=>!node.closest('[aria-label="AI conversation"]')));
+ check('generation status fits inside the visible AI panel',await status.evaluate(node=>{const a=node.getBoundingClientRect(),b=node.closest('.app-ai-panel').getBoundingClientRect();return a.top>=b.top&&a.bottom<=b.bottom;}));
+ await ai.screenshot({path:path.join(output,mode+'-generating.png')});await status.waitFor({state:'hidden'});
+ await ai.getByText('Suggested prompts',{exact:true}).click();await composer.fill('Compare scope again');await composer.press('Enter');await status.waitFor();check('a later submit also closes manually reopened starters',await ai.getByText('Suggested prompts',{exact:true}).evaluate(node=>!node.parentElement.open));await status.waitFor({state:'hidden'});
+ const next=page.getByRole('region',{name:'Plan next step fixture'});check('next step requests confirmation rather than inventing owners dates or targets',await next.innerText().then(text=>text.includes('Confirm owner, baseline, target and review date.')));await next.getByText('Pilot check-in',{exact:true}).click();check('pilot check-in includes participation and workload alongside turnover',await next.getByText(/Review pilot participation and workload alongside turnover/).isVisible());
+ check('no horizontal overflow runtime errors or external traffic',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&external===0);await context.close();
+}}finally{await browser.close()}
+await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({checks},null,2));console.log(JSON.stringify({checks:checks.length,output}));
