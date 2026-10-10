@@ -23,9 +23,9 @@ const conversationSteps=[
  ['Review the retention example','Start a separate example conversation. Your current conversation and draft are kept. Send only when you are ready.'],
  ['Describe the goal in chat','Review the example question, then use the actual Send button. A useful reply can propose approaches without saving a goal yet.'],
  ['Explore and refine the approach','Review the proposed Action Plan and its conditional recommendation, then say what to keep or change. You can ask for another approach or optionally focus on a team. Review suggested owners, steps, measures and unknowns.'],
- ['Choose a plan','Review any proposed plan and choose it using its own button. Selection saves the goal and attaches the proposal automatically. There is no separate pin step or form to complete.'],
+ ['Pin an Action Plan','Review the plan’s goal, actions, success measure and unknowns, then choose Pin Action Plan. The plan and goal are saved together; pinning does not apply the plan.'],
  ['Refine your selected plan in chat','Describe another adjustment and Send. Reuse the known context; mention only what should change. The original proposal stays attached.'],
- ['Choose the revised plan','Review the new proposal and its unknowns, then choose it. Both versions remain in the goal history.'],
+ ['Pin the revised Action Plan','Review the new proposal and its unknowns, then pin it. Both versions remain with their goal and progress history.'],
 ] as const;
 export type GuidedDemoActions={ready:boolean;loading:boolean;draft:string;begin:(id:string)=>void;fillDraft:(text:string)=>void;cancel:()=>void;leave:()=>void};
 const button='min-h-11 rounded border border-white/60 px-3 py-2 text-sm font-semibold text-white hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-50';
@@ -94,7 +94,7 @@ export function GuidedDemo({active,actions,registry,onClose,conversational=false
   <div data-guided-content className="min-h-0 overflow-y-auto overscroll-contain">
   <p className="mt-2 text-xs text-white/85">Demo example · fictional planning assumptions, not predicted or achieved outcomes.</p><hr className="my-3 border-white/40"/>
   <h3 ref={heading} tabIndex={-1} className="text-lg font-semibold">{complete?'Original and revised plans attached':`Step ${step+1} of ${steps.length}: ${steps[step][0]}`}</h3>
-  <p className="my-2 text-sm">{complete?'Your demo goal keeps both attached versions. Reopen it from Pinned Goals to compare plans and continue editing.':steps[step][1]}</p>
+  <p className="my-2 text-sm">{complete?'Your demo goal keeps both attached versions. Reopen it from Pinned Action Plans to compare plans and continue editing.':steps[step][1]}</p>
   {step===0&&<blockquote className="my-3 break-words border-l-2 border-white/60 pl-3 text-sm">{conversational?conversationalPrompt:GUIDED_EXAMPLE_PROMPT}</blockquote>}
   {(conversational?[1,2,4]:[1,5]).includes(step)&&!done&&<p className="my-3 break-words text-sm"><strong>Chat draft:</strong> {actions.draft||'Enter the question or adjustment you want to submit.'}</p>}
   {(pending||actions.loading)&&<p role="status" aria-live="polite" className="my-2 text-sm">{pending?'Opening the example conversation…':'Waiting for your submitted question…'}</p>}
