@@ -1,3 +1,4 @@
+import {readStaffingScenario,staffingScenarioInstructions} from '@/lib/home-staffing-scenario';
 import {requiredStaffingInstructions,requiredStaffingTool} from '@/lib/home-required-staffing';
 import {hiringBudgetInstructions} from '@/lib/home-hiring-budget';
 import {groundSolutionRequest} from '@/lib/home-solution-grounding-source';
@@ -37,22 +38,25 @@ async function handlePOST(request:Request){
   const demand=request.headers.get(SWP_CONVERSATION_HEADER)===SWP_DEMAND_MODE?requestDemandContext(parsed,datasetRouter.current().token):null;
   if(!process.env.OPENAI_API_KEY)throw Error('Model unavailable');
   signal=AbortSignal.any([request.signal,AbortSignal.timeout(90000)]);
+  signal.throwIfAborted();
+  const natural=request.headers.get(SWP_CONVERSATION_HEADER)===null;
+  const staffingScenarioOnly=readStaffingScenario(parsed,{natural,datasetToken:datasetRouter.current().token})!==null;
   diagnostics.stage('grounding');
-  const grounding=await groundSolutionRequest(parsed,signal,diagnostics.groundingResult);
+  const grounding=staffingScenarioOnly?undefined:await groundSolutionRequest(parsed,signal,diagnostics.groundingResult);
   diagnostics.stage('model_setup');
   const client=new OpenAI({...openAIProxyTransport(),apiKey:process.env.OPENAI_API_KEY,maxRetries:0});
-  const natural=request.headers.get(SWP_CONVERSATION_HEADER)===null;
-  const planningInstructions=solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions+'\n'+hiringBudgetInstructions+'\n'+requiredStaffingInstructions:'');
+  const planningInstructions=staffingScenarioOnly?'':solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions+'\n'+hiringBudgetInstructions+'\n'+requiredStaffingInstructions:'');
   diagnostics.stage('conversation_preparation');
   const reply=await converseSolutions(parsed,{
-   grounding,
+   grounding,staffingScenarioOnly,
    ...(demand?{demand:{datasetToken:datasetRouter.current().token,referenceContract:true}}:{}),
    ...(natural?{natural:{datasetToken:datasetRouter.current().token}}:{}),
    progress:{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token},
    complete:async(input,finalOnly,signal,capabilities)=>{
+    if(!!capabilities.staffingScenarioOnly!==staffingScenarioOnly)throw Error('The staffing evidence contract changed.');
     const progressContract=progressModelContract(goalProgressConversationEnabled,capabilities.progressEntryEnabled);
     const conversationTools=capabilities.requiredStaffingCalculation?[requiredStaffingTool]:demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools,...(natural?businessPlanningModelTools:[])];
-    const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions;
+    const instructions=staffingScenarioOnly?staffingScenarioInstructions:(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions;
     const response=await datasetAI(() => {
      diagnostics.modelAttempt({inputBytes:new TextEncoder().encode(JSON.stringify(input)).length,instructionsBytes:new TextEncoder().encode(instructions).length,toolSchemaBytes:new TextEncoder().encode(JSON.stringify(conversationTools)).length});
      return client.responses.create({...homeSolutionModel,instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:60000,signal});
