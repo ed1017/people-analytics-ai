@@ -40,3 +40,10 @@ test('malformed, inconsistent, unexpected or oversized receipts cannot appear co
  }
  const receipt=visibleProviderPreviewReceipt({providerReceipt:null},{...context,requestId:secret,endpoint:secret,startedAt:secret});assert.equal(receipt.providerUsageComplete,false);assert.equal(receipt.requestId,null);assert.equal(receipt.endpoint,null);assert.equal(receipt.startedAt,null);
 });
+
+test('direct calculation has a complete zero-attempt receipt without invented provider usage',()=>{
+ const reply=response();reply.providerReceipt.modelAttempts=0;reply.providerReceipt.providerRounds=[];reply.usage={modelRounds:0,toolCalls:0};
+ const receipt=visibleProviderPreviewReceipt(reply,context,state());
+ assert.equal(receipt.applicationOutcome,'validated');assert.equal(receipt.providerUsageComplete,true);assert.equal(receipt.modelAttempts,0);assert.equal(receipt.modelRounds,0);assert.equal(receipt.toolCalls,0);assert.deepEqual(receipt.rounds,[]);
+ assert.deepEqual(receipt.calculator.options.map(o=>o.listedCash),[1600000,30000,495000]);assert.doesNotMatch(JSON.stringify(receipt),new RegExp(secret));
+});

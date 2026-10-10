@@ -1,17 +1,14 @@
 import type {SolutionRequest} from './home-solution-conversation';
 import type {SolutionRuntime,SolutionReply} from './home-solution-conversation-service';
 // @ts-expect-error Native Node tests share application source.
-import {requiredStaffingTool,editRequiredStaffing,requiredStaffingAnswer} from './home-required-staffing.ts';
+import {editRequiredStaffing,requiredStaffingAnswer} from './home-required-staffing.ts';
 // @ts-expect-error Native Node tests share application source.
 import {emptyRequiredStaffing,readRequiredStaffingInput,requiredStaffingFields,type RequiredStaffingInput,type StaffingInputField} from './required-staffing.ts';
-// @ts-expect-error Native Node tests share application source.
-import {assertSolutionShape} from './home-solution-conversation-schema.ts';
 // @ts-expect-error Native Node tests share application source.
 import {readSolutionState} from './home-solution-conversation.ts';
 import {LEGACY_DATASET_TOKEN} from './dataset-identity.mjs';
 
 export const staffingScenarioLabel='Calculated from user-provided illustrative assumptions; company data was not consulted; actual availability remains unverified.';
-export const staffingScenarioInstructions='USER-SCENARIO-ONLY STAFFING. The current message is an explicitly illustrative scenario, not company evidence. Extract only its stated quantities and units using compare_required_staffing once. Cite the current user turn and exact source quotes with kind user-supplied. Whole-period hire cash and per-trainee cash/hours must retain their units. Unspecified release, readiness, backfill, complete costs and new-hire training remain null. Do not propose values, read sources, produce prose, save, apply or call another tool. The server validates extraction and owns all calculation and final prose.';
 type Scenario={inputs:RequiredStaffingInput;quotes:Partial<Record<StaffingInputField,string>>};
 const number='(?:zero|(?:0|[1-9]\\d*|[1-9]\\d{0,2}(?:,\\d{3})+)(?:\\.\\d{1,2})?)';
 const money='(USD|EUR|GBP)\\s+('+number+')';
@@ -78,32 +75,14 @@ export function readStaffingScenario(request:SolutionRequest,context:{natural:bo
  }catch{return null;}
 }
 
-/** Separate execution boundary: no generic tool dispatcher, company context, evidence charts or continuation. */
+/** Pure calculation from admitted current-user captures; no model or tool dispatcher. */
 export async function converseStaffingScenario(request:SolutionRequest,scenario:Scenario,runtime:SolutionRuntime,signal:AbortSignal):Promise<SolutionReply>{
  signal.throwIfAborted();
- const input=[{role:'user',content:JSON.stringify({contract:'user-scenario-only-staffing-v1',currentMessage:{id:request.message.id,text:request.message.text}})}];
- const output=await runtime.complete(input,false,signal,{progressEntryEnabled:false,requiredStaffingCalculation:true,staffingScenarioOnly:true});
- signal.throwIfAborted();
- if(!output.completed||output.calls.length!==1||output.calls[0].name!==requiredStaffingTool.name||output.text.trim()||JSON.stringify(output.items).length>70000||output.items.some(item=>!item||typeof item!=='object'||!['function_call','reasoning'].includes((item as {type:string}).type)))throw Error('The illustrative staffing extraction was not completed safely.');
- const call=output.calls[0];
- const items=output.items.filter(item=>(item as {type:string}).type==='function_call') as {call_id:string;name:string;arguments:string}[];
- if(items.length!==1||items[0].call_id!==call.id||items[0].name!==call.name||items[0].arguments!==call.arguments)throw Error('The illustrative staffing call does not match its output.');
- if(call.arguments.length>32000)throw Error('The illustrative staffing extraction exceeds its bounds.');
- const args=JSON.parse(call.arguments);assertSolutionShape(args,requiredStaffingTool.parameters,'tool arguments');
- const edits=args.changes as {field:StaffingInputField;value:RequiredStaffingInput[StaffingInputField];basis:{kind:string;turnId:string|null;quote:string|null;explanation:string}}[];
- const fields=new Set<StaffingInputField>();
- for(const edit of edits){
-  const expected=scenario.inputs[edit.field],value=edit.value;
-  const matches=edit.field==='role'&&typeof value==='string'&&typeof expected==='string'?value.toLowerCase()===expected.toLowerCase():value===expected;
-  if(fields.has(edit.field)||!matches||edit.basis.kind!=='user-supplied'||edit.basis.turnId!==request.message.id||typeof edit.basis.quote!=='string'||!edit.basis.quote.trim()||!request.message.text.includes(edit.basis.quote)||scenario.quotes[edit.field]&&!edit.basis.quote.includes(scenario.quotes[edit.field]!))throw Error('The illustrative staffing extraction does not match the stated premises.');
-  fields.add(edit.field);
- }
- if(requiredStaffingFields.some(field=>scenario.inputs[field]!==null&&!fields.has(field)))throw Error('The illustrative staffing extraction omitted a required premise.');
  // Rebuild provenance from captured user clauses; never retain model prose or proposed values.
  const changes=requiredStaffingFields.filter(field=>scenario.inputs[field]!==null).map(field=>({field,value:scenario.inputs[field],basis:{kind:'user-supplied',turnId:request.message.id,quote:scenario.quotes[field]!,explanation:'User-provided illustrative assumption; not company evidence.'}}));
  const review=editRequiredStaffing(request,runtime.natural!.datasetToken,changes);
  const answer=staffingScenarioLabel+'\n'+requiredStaffingAnswer(review).split('\n').slice(1).join('\n');
  const state=readSolutionState({...request.state,requiredStaffing:review,turns:[{id:request.message.id,role:'user',text:request.message.text},{id:'reply-'+request.requestId.slice(0,70),role:'assistant',text:answer}]});
  signal.throwIfAborted();
- return {requestId:request.requestId,answer,charts:[],candidateIds:[],analysisIds:[],state,usage:{modelRounds:1,toolCalls:1}};
+ return {requestId:request.requestId,answer,charts:[],candidateIds:[],analysisIds:[],state,usage:{modelRounds:0,toolCalls:0}};
 }
