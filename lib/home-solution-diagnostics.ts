@@ -41,7 +41,7 @@ export function groundingFailureDetails(value:unknown){
   readersStarted:bounded(raw.readersStarted,readers.length),readersCompleted:bounded(raw.readersCompleted,readers.length),
   readFailure:member(raw.readFailure,readFailures),httpStatus:httpStatus(raw.httpStatus),
   upstreamCode:sourceAuthenticationCode(raw.upstreamCode),sourceCorrelationId:correlationReceipt(raw.sourceCorrelationId),
-  activeReaders:(Array.isArray(raw.activeReaders)?raw.activeReaders:[]).slice(0,4).flatMap(item=>{
+  activeReaders:(Array.isArray(raw.activeReaders)?raw.activeReaders:[]).slice(0,2).flatMap(item=>{
    const entry=record(item),reader=member(entry.reader,readers);return reader?[{reader,elapsedMs:bounded(entry.elapsedMs,600000)}]:[];
   })});
 }
@@ -50,7 +50,7 @@ export function groundingFailureDetails(value:unknown){
 export function groundingReadDetails(value:unknown){
  const raw=record(value),items=read(raw,'readers');
  return {elapsedMs:bounded(read(raw,'elapsedMs'),600000),readersStarted:bounded(read(raw,'readersStarted'),readers.length),
-  readersCompleted:bounded(read(raw,'readersCompleted'),readers.length),maxConcurrentReaders:bounded(read(raw,'maxConcurrentReaders'),4),
+  readersCompleted:bounded(read(raw,'readersCompleted'),readers.length),maxConcurrentReaders:bounded(read(raw,'maxConcurrentReaders'),2),
   readers:(Array.isArray(items)?items:[]).slice(0,readers.length).flatMap(item=>{
    const reader=member(read(item,'reader'),readers);return reader?[{reader,startedAfterMs:bounded(read(item,'startedAfterMs'),600000),elapsedMs:bounded(read(item,'elapsedMs'),600000),completed:read(item,'completed')===true}]:[];
   })};
@@ -85,7 +85,7 @@ export function createSolutionDiagnostics(){
    // response_validation includes local tool execution and continuation assembly.
    const diagnostic={version:1,correlationId,elapsedMs:bounded(Date.now()-startedAt,600000),stageElapsedMs:{...stageElapsedMs},modelAttempts,...(groundingReads?{groundingReads}:{}),
     modelRounds:bounded(read(usage,'modelRounds'),4),toolCalls:bounded(read(usage,'toolCalls'),6),providerRounds:providerRounds.map(round=>({...round}))};
-   try{console.info('Home solution conversation completed',diagnostic);}catch{/* Logging cannot change a successful response. */}
+   try{console.info('Home solution conversation completed',JSON.stringify(diagnostic));}catch{/* Logging cannot change a successful response. */}
   },
   failure(error:unknown,grounding:unknown,callerAborted:boolean,deadlineAborted:boolean){
    const evidence=grounding==null?null:groundingFailureDetails(grounding);
@@ -98,7 +98,7 @@ export function createSolutionDiagnostics(){
     // An SDK attempt is not proof of a wire dispatch, provider receipt, usage or spend.
     providerKind,providerHttpStatus:provider?.status??null,providerErrorClass:provider?.errorClass??null,providerCauseCode:provider?.causeCode??null,
     providerElapsedMs:provider&&attemptStartedAt!==null?bounded(Date.now()-attemptStartedAt,600000):null,grounding:evidence};
-   if(!reported){reported=true;try{console.error('Home solution conversation failed',diagnostic);}catch{/* Logging cannot change the failure response. */}}
+   if(!reported){reported=true;try{console.error('Home solution conversation failed',JSON.stringify(diagnostic));}catch{/* Logging cannot change the failure response. */}}
    return {code,correlationId};
   },
  };

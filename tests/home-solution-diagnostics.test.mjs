@@ -1,5 +1,7 @@
 /** Synthetic data and provider seams only. No live database, BLS or model requests. */
 import test from 'node:test';
+import {Console} from 'node:console';
+import {Writable} from 'node:stream';
 import assert from 'node:assert/strict';
 import {buildHomePack} from '../lib/home-pack.mjs';
 import {verifySolutionEvidence,SolutionEvidenceError,AggregateEvidenceReadError,solutionGroundingLimits} from '../lib/home-solution-grounding.mjs';
@@ -20,7 +22,7 @@ test('successful requests record bounded stage and per-round usage counters with
  diagnostic.modelAttempt({inputBytes:1e20,instructionsBytes:-1,toolSchemaBytes:secret});tick(30);
  diagnostic.providerResult({model:secret,service_tier:secret,usage:new Proxy({},{get(){throw Error(secret);}})});diagnostic.stage('response_validation');tick(2);
  diagnostic.success({modelRounds:2,toolCalls:1,answer:secret});diagnostic.success({modelRounds:999,toolCalls:999});diagnostic.failure(Error(secret),null,false,false);
- assert.equal(logs.length,1);assert.equal(logs[0][0],'Home solution conversation completed');const event=logs[0][1];
+ assert.equal(logs.length,1);assert.equal(logs[0][0],'Home solution conversation completed');const event=JSON.parse(logs[0][1]);
  assert.equal(event.elapsedMs,80);assert.deepEqual(event.stageElapsedMs,{request_validation:2,configuration:3,grounding:11,model_setup:0,conversation_preparation:5,provider:50,response_validation:9});
  assert.equal(event.modelAttempts,2);assert.equal(event.modelRounds,2);assert.equal(event.toolCalls,1);assert.equal(event.providerRounds.length,2);
  assert.deepEqual(event.providerRounds[0],{attempt:1,elapsedMs:20,inputBytes:123,instructionsBytes:456,toolSchemaBytes:789,model:'gpt-6.1-sol',serviceTier:'default',inputTokens:100,cachedInputTokens:40,outputTokens:20,reasoningTokens:5,totalTokens:120});
@@ -81,9 +83,9 @@ test('diagnostic projection ignores raw fields and bounds all dimensions; failed
  const error=Object.assign(Error(secret),{name:'RateLimitError',status:429,headers:{authorization:secret},body:secret,code:secret});
  const result=diagnostic.failure(error,null,false,false);diagnostic.failure(error,null,false,false);
  assert.equal(logs.length,1);assert.equal(result.code,'provider_http_error');assert.match(result.correlationId,/^[0-9a-f-]{36}$/);
- assert.equal(logs[0][1].modelAttempts,1);assert.equal(logs[0][1].providerHttpStatus,429);assert.doesNotMatch(JSON.stringify(logs),new RegExp(secret));
+ assert.equal(JSON.parse(logs[0][1]).modelAttempts,1);assert.equal(JSON.parse(logs[0][1]).providerHttpStatus,429);assert.doesNotMatch(JSON.stringify(logs),new RegExp(secret));
  const projected=groundingFailureDetails({trigger:secret,reader:secret,elapsedMs:1e20,readerElapsedMs:-50,readersStarted:999,readersCompleted:999,readFailure:secret,httpStatus:999,activeReaders:Array(30).fill({reader:'bls',elapsedMs:1e20,body:secret}),raw:secret});
- assert.equal(projected.trigger,'verification_failed');assert.equal(projected.reader,null);assert.equal(projected.elapsedMs,600000);assert.equal(projected.readerElapsedMs,0);assert.equal(projected.readersStarted,14);assert.equal(projected.activeReaders.length,4);assert.equal(projected.httpStatus,null);assert.doesNotMatch(JSON.stringify(projected),new RegExp(secret));
+ assert.equal(projected.trigger,'verification_failed');assert.equal(projected.reader,null);assert.equal(projected.elapsedMs,600000);assert.equal(projected.readerElapsedMs,0);assert.equal(projected.readersStarted,14);assert.equal(projected.activeReaders.length,2);assert.equal(projected.httpStatus,null);assert.doesNotMatch(JSON.stringify(projected),new RegExp(secret));
  t.mock.method(console,'error',()=>{throw Error(secret);});assert.equal(createSolutionDiagnostics().failure(error,null,false,false).code,'invalid_request');
 });
 
@@ -96,7 +98,7 @@ test('actual POST separates pre-provider, provider and output failures without l
   logs.length=0;isolated.sandbox.__requests.length=0;
   const response=await post(value),payload=await response.json();assert.equal(response.status,status);assert.equal(payload.code,code);
   assert.equal(response.headers.get('x-correlation-id'),payload.correlationId);assert.notEqual(payload.correlationId,secret);
-  assert.equal(logs.length,1);const event=logs[0][1];assert.equal(event.correlationId,payload.correlationId);assert.equal(event.stage,stage);assert.equal(event.modelAttempts,attempts);assert.equal(isolated.sandbox.__requests.length,attempts);
+  assert.equal(logs.length,1);const event=JSON.parse(logs[0][1]);assert.equal(event.correlationId,payload.correlationId);assert.equal(event.stage,stage);assert.equal(event.modelAttempts,attempts);assert.equal(isolated.sandbox.__requests.length,attempts);
   assert.doesNotMatch(JSON.stringify([logs,payload]),new RegExp(secret));return event;
  };
  await check({message:secret},'invalid_request','request_validation',0);
@@ -132,7 +134,7 @@ test('grounding observations snapshot reader counts, queue offsets and durations
  assert.equal(observations.length,1);assert.deepEqual(observations[0],{elapsedMs:100,readersStarted:2,readersCompleted:2,maxConcurrentReaders:2,readers:[{reader:pending[0].key,startedAfterMs:0,elapsedMs:40,completed:true},{reader:pending[1].key,startedAfterMs:0,elapsedMs:100,completed:true}]});
  assert.equal(evidence.groundingReads,undefined);assert.doesNotMatch(JSON.stringify(observations),new RegExp(secret));
  const logs=[];t.mock.method(console,'info',(...args)=>logs.push(args));const diagnostic=createSolutionDiagnostics();diagnostic.groundingResult({...observations[0],payload:secret});diagnostic.success({modelRounds:1,toolCalls:1});
- assert.deepEqual(logs[0][1].groundingReads,observations[0]);assert.doesNotMatch(JSON.stringify(logs),new RegExp(secret));
+ assert.deepEqual(JSON.parse(logs[0][1]).groundingReads,observations[0]);assert.doesNotMatch(JSON.stringify(logs),new RegExp(secret));
  await assert.doesNotReject(verifySolutionEvidence(body,{datasetToken:token,read:async key=>results[key],onDiagnostic:()=>{throw Error(secret);}},signal()));
 });
 test('failed grounding observations are frozen before late readers settle and sanitize every field',async t=>{
@@ -142,6 +144,27 @@ test('failed grounding observations are frozen before late readers settle and sa
  const frozen=JSON.stringify(observations);assert.equal(observations.length,1);assert.equal(observations[0].readersCompleted,0);assert.ok(observations[0].readers.every(r=>r.elapsedMs===50&&!r.completed));
  pending.forEach(p=>p.resolve(results[p.key]));await drain();assert.equal(JSON.stringify(observations),frozen);
  const projected=groundingReadDetails({elapsedMs:1e20,readersStarted:1000,readersCompleted:-1,maxConcurrentReaders:1000,readers:[{reader:secret,elapsedMs:100},{reader:'dashboard',elapsedMs:-5,startedAfterMs:1e20,completed:secret,payload:secret}],body:secret});
- assert.deepEqual(projected,{elapsedMs:600000,readersStarted:14,readersCompleted:0,maxConcurrentReaders:4,readers:[{reader:'dashboard',startedAfterMs:600000,elapsedMs:0,completed:false}]});assert.doesNotMatch(JSON.stringify(projected),new RegExp(secret));
- const logs=[];t.mock.method(console,'error',(...args)=>logs.push(args));const diagnostic=createSolutionDiagnostics();diagnostic.groundingResult(observations[0]);diagnostic.failure(Error(secret),null,false,false);assert.deepEqual(logs[0][1].groundingReads,observations[0]);
+ assert.deepEqual(projected,{elapsedMs:600000,readersStarted:14,readersCompleted:0,maxConcurrentReaders:2,readers:[{reader:'dashboard',startedAfterMs:600000,elapsedMs:0,completed:false}]});assert.doesNotMatch(JSON.stringify(projected),new RegExp(secret));
+ const logs=[];t.mock.method(console,'error',(...args)=>logs.push(args));const diagnostic=createSolutionDiagnostics();diagnostic.groundingResult(observations[0]);diagnostic.failure(Error(secret),null,false,false);assert.deepEqual(JSON.parse(logs[0][1]).groundingReads,observations[0]);
+});
+
+test('actual console output preserves nested reader timings as JSON at both sanitized boundaries',t=>{
+ const output={info:'',error:''},sink=kind=>new Writable({write(chunk,_encoding,done){output[kind]+=chunk.toString();done();}});
+ const emitted=new Console({stdout:sink('info'),stderr:sink('error')});
+ t.mock.method(console,'info',emitted.info.bind(emitted));t.mock.method(console,'error',emitted.error.bind(emitted));
+ for(const kind of ['info','error']){
+  const diagnostic=createSolutionDiagnostics();
+  diagnostic.groundingResult({elapsedMs:125,readersStarted:2,readersCompleted:kind==='info'?2:1,maxConcurrentReaders:2,
+   readers:[{reader:'dashboard',startedAfterMs:0,elapsedMs:80,completed:true,headers:{authorization:secret}},{reader:'bls',startedAfterMs:0,elapsedMs:125,completed:kind==='info',body:secret},{reader:secret,elapsedMs:1}],request:secret,url:secret});
+  if(kind==='info')diagnostic.success({modelRounds:1,toolCalls:1,answer:secret});
+  else diagnostic.failure(Object.assign(Error(secret),{headers:{authorization:secret},body:secret}),null,false,false);
+  const prefix=kind==='info'?'Home solution conversation completed ':'Home solution conversation failed ';
+  assert.ok(output[kind].startsWith(prefix));assert.equal(output[kind].trim().split('\n').length,1);
+  assert.doesNotMatch(output[kind],/\[Object\]/);assert.doesNotMatch(output[kind],new RegExp(secret));
+  const event=JSON.parse(output[kind].slice(prefix.length));
+  assert.deepEqual(event.groundingReads,{elapsedMs:125,readersStarted:2,readersCompleted:kind==='info'?2:1,maxConcurrentReaders:2,
+   readers:[{reader:'dashboard',startedAfterMs:0,elapsedMs:80,completed:true},{reader:'bls',startedAfterMs:0,elapsedMs:125,completed:kind==='info'}]});
+  for(const reader of event.groundingReads.readers)assert.deepEqual(Object.keys(reader).sort(),['completed','elapsedMs','reader','startedAfterMs']);
+  for(const field of ['request','url','headers','body','answer'])assert.equal(Object.hasOwn(event.groundingReads,field),false);
+ }
 });

@@ -29,9 +29,9 @@ function fullEvidence(){
  return {body,results};
 }
 
-test('actual POST keeps all evidence checks within the four-reader queue budget',async t=>{
+test('actual POST keeps all evidence checks within the two-reader queue budget',async t=>{
  const isolated=await offlineBusinessRoute(),logs=[];isolated.sandbox.console={error:(...args)=>logs.push(args),info:(...args)=>logs.push(args)};
- assert.deepEqual(solutionGroundingLimits,{readers:4,timeoutMs:30000});
+ assert.deepEqual(solutionGroundingLimits,{readers:2,timeoutMs:30000});
  for(const kind of ['slow_success','hung_bls','changed_facts','caller_cancellation','reader_failure'])await t.test(kind,async sub=>{
   sub.mock.timers.enable({apis:['setTimeout','Date'],now:1791663395550});isolated.sandbox.Date=Date;logs.length=0;
   const {body,results}=fullEvidence(),controller=new AbortController(),starts=[],signals=[],late=Promise.withResolvers();
@@ -39,7 +39,7 @@ test('actual POST keeps all evidence checks within the four-reader queue budget'
   isolated.sandbox.__aggregateSources=results;isolated.sandbox.__requests.length=0;isolated.sandbox.__replies.length=0;
   isolated.sandbox.__aggregateRead=async(key,signal)=>{
    starts.push(key);signals.push(signal);active++;maximum=Math.max(maximum,active);
-   try{if((kind==='hung_bls'&&key==='bls')||(kind==='reader_failure'&&starts.length===9))return await late.promise;
+   try{if((kind==='hung_bls'&&key==='bls')||(kind==='reader_failure'&&starts.length===5))return await late.promise;
     await new Promise(resolve=>setTimeout(resolve,4000));completed++;return results[key];
    }finally{active--;}
   };
@@ -47,26 +47,26 @@ test('actual POST keeps all evidence checks within the four-reader queue budget'
   isolated.sandbox.__replies.push(responseForStep(final('Review the company-wide evidence before proposing changes.')));
   const request=new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',headers:{'x-workforce-dataset':token},body:JSON.stringify(body),signal:controller.signal});
   const task=isolated.post(request).then(response=>{settled=true;return response;});await drain();
-  assert.equal(starts.length,4);assert.equal(isolated.sandbox.__requests.length,0);
+  assert.equal(starts.length,2);assert.equal(isolated.sandbox.__requests.length,0);
   // The old 8s deadline would fail here despite continued successful reads.
   for(let wave=0;wave<2;wave++){sub.mock.timers.tick(4000);await drain();}
-  assert.equal(settled,false);assert.equal(completed,8);assert.equal(starts.length,12);assert.equal(maximum,4);assert.equal(isolated.sandbox.__requests.length,0);
+  assert.equal(settled,false);assert.equal(completed,4);assert.equal(starts.length,6);assert.equal(maximum,2);assert.equal(isolated.sandbox.__requests.length,0);
   if(kind==='caller_cancellation'||kind==='reader_failure'){
    if(kind==='caller_cancellation')controller.abort();else late.reject(Error('Synthetic reader failure'));const response=await task;assert.equal(response.status,503);assert.equal((await response.json()).code,kind==='caller_cancellation'?'evidence_cancelled':'evidence_reader_failed');
-   sub.mock.timers.tick(4000);await drain();assert.equal(starts.length,12);assert.equal(isolated.sandbox.__requests.length,0);assert.ok(signals.every(s=>s.aborted));return;
+   sub.mock.timers.tick(4000);await drain();assert.equal(starts.length,6);assert.equal(isolated.sandbox.__requests.length,0);assert.ok(signals.every(s=>s.aborted));return;
   }
-  for(let wave=2;wave<4;wave++){assert.equal(isolated.sandbox.__requests.length,0);sub.mock.timers.tick(4000);await drain();}
-  assert.equal(starts.length,14);assert.equal(new Set(starts).size,14);assert.equal(maximum,4);
+  for(let wave=2;wave<7;wave++){assert.equal(isolated.sandbox.__requests.length,0);sub.mock.timers.tick(4000);await drain();}
+  assert.equal(starts.length,14);assert.equal(new Set(starts).size,14);assert.equal(maximum,2);
   if(kind==='hung_bls'){
-   assert.equal(completed,13);sub.mock.timers.tick(13999);await drain();assert.equal(settled,false);assert.equal(isolated.sandbox.__requests.length,0);
+   assert.equal(completed,13);sub.mock.timers.tick(1999);await drain();assert.equal(settled,false);assert.equal(isolated.sandbox.__requests.length,0);
    sub.mock.timers.tick(1);const response=await task;assert.equal(response.status,503);assert.equal((await response.json()).code,'evidence_deadline');assert.ok(signals.every(s=>s.aborted));
    late.resolve(results.bls);await drain();assert.equal(isolated.sandbox.__requests.length,0);assert.equal(starts.length,14);
   }else{
    const response=await task;assert.equal(completed,14);assert.equal(active,0);
    if(kind==='changed_facts'){assert.equal(response.status,503);assert.equal((await response.json()).code,'evidence_facts_changed');assert.equal(isolated.sandbox.__requests.length,0);}
    else{assert.equal(response.status,200,JSON.stringify(logs));assert.equal(isolated.sandbox.__requests.length,1);assert.ok(signals.every(s=>!s.aborted));
-    const timing=logs[0][1].groundingReads;assert.equal(timing.elapsedMs,16000);assert.equal(timing.readersStarted,14);assert.equal(timing.readersCompleted,14);assert.equal(timing.maxConcurrentReaders,4);
-    assert.deepEqual(JSON.parse(JSON.stringify(timing.readers.map(r=>r.startedAfterMs))),[0,0,0,0,4000,4000,4000,4000,8000,8000,8000,8000,12000,12000]);assert.ok(timing.readers.every(r=>r.elapsedMs===4000&&r.completed));
+    const timing=JSON.parse(logs[0][1]).groundingReads;assert.equal(timing.elapsedMs,28000);assert.equal(timing.readersStarted,14);assert.equal(timing.readersCompleted,14);assert.equal(timing.maxConcurrentReaders,2);
+    assert.deepEqual(JSON.parse(JSON.stringify(timing.readers.map(r=>r.startedAfterMs))),[0,0,4000,4000,8000,8000,12000,12000,16000,16000,20000,20000,24000,24000]);assert.ok(timing.readers.every(r=>r.elapsedMs===4000&&r.completed));
     assert.ok(!JSON.stringify(isolated.sandbox.__requests).includes('maxConcurrentReaders'),'Diagnostics must not enter provider input');}
   }
  });
