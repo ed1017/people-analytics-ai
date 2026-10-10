@@ -69,15 +69,12 @@ export function OverviewPage({
   headcountGrowthPct,
 }: OverviewPageProps) {
   return (
-    <section className="evidence-workspace min-w-0 p-6">
+    <section className="evidence-workspace @container min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold">
             Selected workforce snapshot
           </h2>
-          <p className="text-muted-foreground">
-            Filters apply to this snapshot and its trend only. Company composition below remains unfiltered.
-          </p>
         </div>
 
         {overviewData && (
@@ -90,7 +87,6 @@ export function OverviewPage({
         )}
       </div>
 
-      <p className="mb-6 text-sm text-muted-foreground">{selectedCountryLabel} · {selectedOrgLabel} · {selectedLevelLabel}</p>
 
       {dashboardError && (
         <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
@@ -98,8 +94,9 @@ export function OverviewPage({
         </div>
       )}
 
+      <p aria-label="Workforce snapshot scope" className="mb-3 rounded-lg border bg-muted/30 px-3 py-2 text-base font-semibold">{dashboardLoading?'Updating requested scope:':overviewData?'Filters applied:':'Requested scope:'} {selectedCountryLabel} · {selectedOrgLabel} · {selectedLevelLabel}</p>
       <div
-        className={`grid grid-cols-1 gap-4 transition-opacity sm:grid-cols-2 xl:grid-cols-4 ${
+        className={`grid grid-cols-1 gap-4 transition-opacity @min-[26rem]:grid-cols-2 @min-[56rem]:grid-cols-4 ${
           dashboardLoading
             ? "opacity-60"
             : "opacity-100"

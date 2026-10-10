@@ -1,0 +1,24 @@
+{
+  "checks": [
+    "desktop selected US snapshot labels its scope immediately above its metrics",
+    "desktop Finance keeps the selected filter but explicitly reports company-wide metrics",
+    "desktop exposure sum reproduces headline while removing the misleading enterprise-average formula",
+    "desktop Finance headline cards fit the available pane beside AI",
+    "desktop starters collapse after submit while generation status stays outside the scrollback",
+    "desktop generation status fits inside the visible AI panel",
+    "desktop a later submit also closes manually reopened starters",
+    "desktop next step requests confirmation rather than inventing owners dates or targets",
+    "desktop pilot check-in includes participation and workload alongside turnover",
+    "desktop no horizontal overflow runtime errors or external traffic",
+    "phone selected US snapshot labels its scope immediately above its metrics",
+    "phone Finance keeps the selected filter but explicitly reports company-wide metrics",
+    "phone exposure sum reproduces headline while removing the misleading enterprise-average formula",
+    "phone Finance headline cards fit the available pane beside AI",
+    "phone starters collapse after submit while generation status stays outside the scrollback",
+    "phone generation status fits inside the visible AI panel",
+    "phone a later submit also closes manually reopened starters",
+    "phone next step requests confirmation rather than inventing owners dates or targets",
+    "phone pilot check-in includes participation and workload alongside turnover",
+    "phone no horizontal overflow runtime errors or external traffic"
+  ]
+}

@@ -41,13 +41,11 @@ export function WorkforcePage({ data, loading, error }: Props) {
     : "unavailable";
 
   return (
-    <section className="evidence-workspace min-w-0 p-6">
+    <section className="evidence-workspace @container min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold">Company composition</h2>
-          <p className="text-muted-foreground">
-            All countries, business units and levels. Snapshot filters above do not narrow these breakdowns.
-          </p>
+
         </div>
         <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
           {loading ? "Loading workforce…" : data ? "As of " + data.as_of : "Workforce"}
@@ -61,7 +59,8 @@ export function WorkforcePage({ data, loading, error }: Props) {
 
       {summary ? (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <p aria-label="Company composition scope" className="mb-3 rounded-lg border bg-muted/30 px-3 py-2 text-base font-semibold">Company-wide · workforce filters not applied</p>
+          <div className="grid grid-cols-1 gap-4 @min-[26rem]:grid-cols-2 @min-[56rem]:grid-cols-4">
             {[
               ["Headcount", summary.headcount.toLocaleString(), summary.fte.toLocaleString() + " FTE", "Number of active employees in the current workforce snapshot. Headcount counts people; FTE reflects capacity."],
               ["People Managers", summary.people_managers.toLocaleString(), summary.avg_span_of_control.toFixed(1) + " avg span", "Employees with at least one direct report in the current snapshot. Average span is direct reports per people manager."],

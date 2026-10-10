@@ -232,16 +232,10 @@ export function AiPanel({
             <div key={goalViewKey} aria-label="AI conversation" className="mb-3 min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain pr-2">
               <GoalConversationMessages messages={chatMessages} viewKey={goalViewKey} hasGoal={hasGoal} hideHistory/>
               {!chatMessages.length&&!hasGoal&&!readOnlyReason&&!dashboardReady&&<p className="text-base text-muted-foreground">You can keep drafting while page evidence loads.</p>}
-
-              {chatLoading && (
-                <div className="flex items-center gap-2 py-2 text-base text-muted-foreground">
-                  <LoaderCircle className="h-4 w-4 animate-spin" />
-                  Analyzing current workforce context…
-                </div>
-              )}
             </div>
 
-            <div className="mb-3"><PromptExamples prompts={suggestedPrompts} draft={chatInput} busy={chatLoading||!dashboardReady||previewPage||Boolean(readOnlyReason)} onSend={onSendSuggested}/></div>
+            {suggestedPrompts.length>0&&<details key={`${goalViewKey}:${chatMessages.length}:${chatLoading}`} open={!chatMessages.length&&!chatLoading} className="mb-2 shrink-0"><summary className="min-h-11 cursor-pointer py-2 font-semibold">Suggested prompts</summary><PromptExamples hideHeading prompts={suggestedPrompts} draft={chatInput} busy={chatLoading||!dashboardReady||previewPage||Boolean(readOnlyReason)} onSend={onSendSuggested}/></details>}
+            {chatLoading&&<div role="status" aria-label="AI generation status" className="mb-2 flex shrink-0 items-center gap-2 text-base"><LoaderCircle aria-hidden="true" className="h-4 w-4 animate-spin"/>Analyzing current workforce context…</div>}
 
             {chatError && (
               <div className="mb-3 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
