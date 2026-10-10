@@ -153,6 +153,38 @@ test('a horizon correction must restate or clear the period redeployment quote e
  assert.equal(restated.inputs.redeploymentCostPerPerson,600);assert.equal(restated.origins.redeploymentCostPerPerson.turnId,'user-2');
  assert.equal(requiredStaffingView(restated).options.find(o=>o.train===6&&o.redeploy===4).listedCash,32400);
 });
+test('same numeric cash restatements use the current EUR quote after a currency correction',()=>{
+ const initial=solutionRequest(fixedMessages.start),prior=editRequiredStaffing(initial,token,fixedChanges(initial)),before=JSON.stringify(prior);
+ const text='Change currency to EUR. Restated EUR amounts: budget 1000000; whole-period hire cost 160000 per person; training 5000 per trainee; redeployment 0 per person. Backfill is unknown.';
+ const next=solutionRequest(text,false,{...initial.state,requiredStaffing:prior},2);
+ const values={currency:'EUR',budget:1000000,hireCostPerPerson:160000,trainingCostPerPerson:5000,redeploymentCostPerPerson:0,backfillCostPerInternalPerson:null};
+ const corrected=editRequiredStaffing(next,token,fixedChanges(next,values));
+ assert.deepEqual(corrected.inputs,{...prior.inputs,currency:'EUR'});
+ for(const field of ['budget','hireCostPerPerson','trainingCostPerPerson','redeploymentCostPerPerson'])assert.deepEqual(corrected.origins[field],fixedBasis(next));
+ for(const field of ['role','requiredRoles','months','trainingHoursPerPerson','trainablePeople','redeployablePeople','poolsDistinct'])assert.deepEqual(corrected.origins[field],prior.origins[field]);
+ const result=requiredStaffingView(corrected);assert.deepEqual(result.options.map(o=>o.listedCash),[1600000,30000,495000]);assert.ok(result.options.every(o=>o.completeCash===null));
+ assert.equal(corrected.inputs.internalRelease,null);assert.equal(corrected.inputs.costsComplete,null);assert.equal(JSON.stringify(prior),before);
+ const proposed=fixedChanges(next,values);proposed.find(c=>c.field==='hireCostPerPerson').basis={kind:'model-proposed',turnId:null,quote:null,explanation:'Repeat the old amount without a current user restatement.'};
+ assert.throws(()=>editRequiredStaffing(next,token,proposed),/restating or clearing/);assert.equal(JSON.stringify(prior),before);
+});
+test('same numeric period rates use the current six-month quote after a horizon correction',()=>{
+ const initial=solutionRequest(fixedMessages.start),prior=editRequiredStaffing(initial,token,fixedChanges(initial)),before=JSON.stringify(prior);
+ const text='Use a 6-month horizon. For those six months, restate USD 160000 per hire, USD 0 redeployment cash per person and a USD 1000000 budget. Backfill remains unknown; training is still a one-time USD 5000 per trainee.';
+ const next=solutionRequest(text,false,{...initial.state,requiredStaffing:prior},2);
+ const corrected=editRequiredStaffing(next,token,fixedChanges(next,{months:6,hireCostPerPerson:160000,redeploymentCostPerPerson:0,backfillCostPerInternalPerson:null,budget:1000000}));
+ assert.deepEqual(corrected.inputs,{...prior.inputs,months:6});
+ for(const field of ['budget','hireCostPerPerson','redeploymentCostPerPerson'])assert.deepEqual(corrected.origins[field],fixedBasis(next));
+ for(const field of ['currency','trainingCostPerPerson','trainingHoursPerPerson','trainablePeople','redeployablePeople','poolsDistinct'])assert.deepEqual(corrected.origins[field],prior.origins[field]);
+ const result=requiredStaffingView(corrected);assert.deepEqual(result.options.map(o=>o.listedCash),[1600000,30000,495000]);assert.ok(result.options.every(o=>o.completeCash===null));assert.equal(corrected.inputs.backfillCostPerInternalPerson,null);assert.equal(JSON.stringify(prior),before);
+});
+test('ordinary unchanged inputs and recalculation without new evidence retain their original provenance',()=>{
+ const initial=solutionRequest(fixedMessages.start),prior=editRequiredStaffing(initial,token,fixedChanges(initial));
+ const next=solutionRequest(fixedMessages.followup,false,{...initial.state,requiredStaffing:prior},2);
+ const proposed=fixedChanges(next,{hireCostPerPerson:160000}).map(c=>({...c,basis:{kind:'model-proposed',turnId:null,quote:null,explanation:'Repeat the existing rate; no new evidence.'}}));
+ for(const changes of [[],proposed,fixedChanges(next,{hireCostPerPerson:160000})]){
+  const unchanged=editRequiredStaffing(next,token,changes);assert.deepEqual(unchanged.inputs,prior.inputs);assert.deepEqual(unchanged.origins,prior.origins);assert.equal(unchanged.revision,prior.revision+1);
+ }
+});
 test('actual POST offers the direct tool and preserves numerical initial/follow-up/correction replies through offline transport',async()=>{
  const route=await offlineBusinessRoute();route.sandbox.console={info(){},error(){}};let state;
  for(const [i,message] of Object.values(fixedMessages).entries()){
