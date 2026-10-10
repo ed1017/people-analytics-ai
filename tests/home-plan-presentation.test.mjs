@@ -48,6 +48,15 @@ test('new proposals retain earlier candidates for review without presenting both
 });
 
 test('nested unknowns and explanation lists stay visible',()=>{
- const value='### Proposed Action Plan\n\n1. Mentor volunteers.\n\n#### Unknowns\n\n- Costs are unknown.\n- Availability needs review.';
+ const value='### Proposed Action Plan\n\n1. Mentor volunteers. Owner: Learning lead.\n\n#### Unknowns\n\n- Costs are unknown.\n- Availability needs review.';
  const result=splitPlanDiscussion(value);assert.match(result.reference,/Mentor volunteers/);assert.doesNotMatch(result.reference,/Costs|Availability/);assert.match(result.discussion,/Costs are unknown/);
+});
+
+test('unheaded bullet and numbered caveats stay visible under an explicit plan heading',()=>{
+ for(const caveats of ['- Costs are unknown.\n- Availability needs review.','1. Costs are unknown.\n2. Availability needs review.']){
+  const answer='### Proposed Action Plan\n\n1. Launch mentoring. Owner: Learning lead.\n\n'+caveats;
+  const result=splitPlanDiscussion(answer);assert.match(result.reference,/Launch mentoring/);assert.ok(result.discussion.includes(caveats));assert.doesNotMatch(result.reference,/Costs|Availability/);
+ }
+ const mixed='### Proposed Action Plan\n\n1. Launch mentoring. Owner: Learning lead.\n2. Costs are unknown.';
+ assert.equal(splitPlanDiscussion(mixed).discussion,mixed);assert.equal(splitPlanDiscussion(mixed).reference,'');
 });
