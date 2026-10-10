@@ -2,7 +2,9 @@ import {randomUUID} from 'node:crypto';
 import {sourceAuthenticationCode} from './data-source-failure.mjs';
 
 const publicErrors={
+ dashboard:'Dashboard analytics are temporarily unavailable. Please try again.',
  workforce:'Workforce analytics are temporarily unavailable. Please try again.',
+ attrition:'Attrition analytics are temporarily unavailable. Please try again.',
  'survey-sentiment':'Employee Listening data is temporarily unavailable. Please try again.',
  'talent-acquisition':'Talent Acquisition data is temporarily unavailable. Please try again.',
  'workforce-planning':'Stored Planning data is temporarily unavailable. Please try again.',

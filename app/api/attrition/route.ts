@@ -1,6 +1,7 @@
 import { withDatasetRequest } from "@/lib/dataset-runtime";
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
+import { dataApiErrorResponse } from "../../../lib/data-api-error";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,7 @@ async function handleGET(request?: Request) {
         abort(supabaseServer.from("attrition_reason_summary").select("*").order("exits", { ascending: false })),
       ]);
     for (const result of [current, trend, businessUnits, levels, tenure, reasons]) {
-      if (result.error) throw new Error("Attrition analytics: " + result.error.message);
+      if (result.error) throw result.error;
     }
     if (!current.data) throw new Error("Attrition current summary returned no data.");
 
@@ -45,11 +46,7 @@ async function handleGET(request?: Request) {
       reasons: numericRows((reasons.data ?? []) as Record<string, unknown>[]),
     }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    console.error("Attrition API error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to load attrition analytics." },
-      { status: 500 }
-    );
+    return dataApiErrorResponse('attrition',error);
   }
 }
 
