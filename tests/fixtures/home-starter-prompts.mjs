@@ -17,17 +17,17 @@ export const challengePrompts=[
 ];
 
 export const decisionStarterLabels=[
- 'More support tickets, same payroll?',
- 'Train, redeploy or hire for new client work?',
- 'How many active requisitions can recruiters cover?',
- 'Can managers support more delivery work?',
- 'Can our hiring target fit Finance’s budget?',
+ 'What workforce issues should we tackle first?',
+ 'Which teams need attention first based on the available workforce data?',
+ 'If support tickets rise 20% and payroll stays flat, how can we cover the work?',
+ 'For a client project starting in three months, should we train, redeploy or hire engineers?',
+ 'Can five recruiters handle 40 active requisitions without delaying priority hires?',
+ 'If client work grows 20% without more managers, how should we adjust workload?',
+ 'We need 10 engineers, but Finance capped the budget at $1 million. What are our options?',
+ 'If two projects end next quarter, where can we redeploy their people before hiring?',
+ 'How can we reduce turnover in the team with the highest recorded voluntary turnover?',
+ 'Which teams have the weakest satisfaction scores, and what should we change first?',
+ 'Where are candidates dropping out of our hiring process, and what should we fix first?',
+ 'Based on our current hiring and exits, what could headcount look like in six months?',
 ];
-export const decisionStarterPrompts=[
- 'Hypothetical scenario: if support-ticket demand rose while payroll stayed flat, how could we cover the work without overloading another team?',
- 'Hypothetical scenario: if new client work required skills we might not have available, should we train, redeploy or hire? Compare skill readiness, release dates, cost and delivery tradeoffs.',
- 'Hypothetical scenario: if active requisitions increased, how should we balance recruiter workload, hiring priorities and additional recruiting capacity? Check requisition complexity and current commitments.',
- 'Hypothetical scenario: before taking on more client delivery work, how could we check manager capacity for supervision, coaching and onboarding? Compare workload changes and additional management capacity.',
-].map(prompt=>prompt+' Recommend an Action Plan using known inputs. Separate missing inputs from editable assumptions; do not invent numbers, available capacity or automation benefits.');
-
-decisionStarterPrompts.push('Hypothetical scenario: could we add 3 support specialists over 6 months within a $120,000 Finance budget cap? Treat these as editable example inputs; confirm the role and salary from recorded role data or Finance input. Recommend an Action Plan using known inputs, checking feasibility where supported and comparing phased hiring, internal moves or a mix. Keep missing employer and recruiting costs explicit editable assumptions; do not claim unrun calculations or automation savings.');
+export const decisionStarterPrompts=[...decisionStarterLabels];

@@ -1,0 +1,125 @@
+{
+  "checks": [
+    {
+      "mode": "desktop",
+      "prompt": "What workforce issues should we tackle first?",
+      "submitted": "What workforce issues should we tackle first?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "Which teams need attention first based on the available workforce data?",
+      "submitted": "Which teams need attention first based on the available workforce data?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "If support tickets rise 20% and payroll stays flat, how can we cover the work?",
+      "submitted": "If support tickets rise 20% and payroll stays flat, how can we cover the work?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "For a client project starting in three months, should we train, redeploy or hire engineers?",
+      "submitted": "For a client project starting in three months, should we train, redeploy or hire engineers?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "Can five recruiters handle 40 active requisitions without delaying priority hires?",
+      "submitted": "Can five recruiters handle 40 active requisitions without delaying priority hires?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "If client work grows 20% without more managers, how should we adjust workload?",
+      "submitted": "If client work grows 20% without more managers, how should we adjust workload?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "We need 10 engineers, but Finance capped the budget at $1 million. What are our options?",
+      "submitted": "We need 10 engineers, but Finance capped the budget at $1 million. What are our options?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "If two projects end next quarter, where can we redeploy their people before hiring?",
+      "submitted": "If two projects end next quarter, where can we redeploy their people before hiring?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "How can we reduce turnover in the team with the highest recorded voluntary turnover?",
+      "submitted": "How can we reduce turnover in the team with the highest recorded voluntary turnover?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "Which teams have the weakest satisfaction scores, and what should we change first?",
+      "submitted": "Which teams have the weakest satisfaction scores, and what should we change first?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "Where are candidates dropping out of our hiring process, and what should we fix first?",
+      "submitted": "Where are candidates dropping out of our hiring process, and what should we fix first?"
+    },
+    {
+      "mode": "desktop",
+      "prompt": "Based on our current hiring and exits, what could headcount look like in six months?",
+      "submitted": "Based on our current hiring and exits, what could headcount look like in six months?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "What workforce issues should we tackle first?",
+      "submitted": "What workforce issues should we tackle first?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "Which teams need attention first based on the available workforce data?",
+      "submitted": "Which teams need attention first based on the available workforce data?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "If support tickets rise 20% and payroll stays flat, how can we cover the work?",
+      "submitted": "If support tickets rise 20% and payroll stays flat, how can we cover the work?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "For a client project starting in three months, should we train, redeploy or hire engineers?",
+      "submitted": "For a client project starting in three months, should we train, redeploy or hire engineers?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "Can five recruiters handle 40 active requisitions without delaying priority hires?",
+      "submitted": "Can five recruiters handle 40 active requisitions without delaying priority hires?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "If client work grows 20% without more managers, how should we adjust workload?",
+      "submitted": "If client work grows 20% without more managers, how should we adjust workload?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "We need 10 engineers, but Finance capped the budget at $1 million. What are our options?",
+      "submitted": "We need 10 engineers, but Finance capped the budget at $1 million. What are our options?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "If two projects end next quarter, where can we redeploy their people before hiring?",
+      "submitted": "If two projects end next quarter, where can we redeploy their people before hiring?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "How can we reduce turnover in the team with the highest recorded voluntary turnover?",
+      "submitted": "How can we reduce turnover in the team with the highest recorded voluntary turnover?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "Which teams have the weakest satisfaction scores, and what should we change first?",
+      "submitted": "Which teams have the weakest satisfaction scores, and what should we change first?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "Where are candidates dropping out of our hiring process, and what should we fix first?",
+      "submitted": "Where are candidates dropping out of our hiring process, and what should we fix first?"
+    },
+    {
+      "mode": "phone",
+      "prompt": "Based on our current hiring and exits, what could headcount look like in six months?",
+      "submitted": "Based on our current hiring and exits, what could headcount look like in six months?"
+    }
+  ],
+  "providerCalls": 0
+}
