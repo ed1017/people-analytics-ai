@@ -164,7 +164,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
      // Mixed operations, blocked/qualitative plans and oversized metric sets retain the loop.
      const metrics=items.flatMap(item=>checkedMetricReferences(nextState,'candidate',item.id,item.revision));
      if(review.ready&&output.calls.length===1&&!progressProposal&&!demandReview&&naturalStep===0&&analyses.size===0&&metrics.length>0&&metrics.length<=8&&items.every(item=>item.draft&&item.result&&item.result.calculationStatus!=='awaiting-scope'&&!item.blocking.length)){
-      const reviewedFinal:SolutionFinal={answer:items.length===1?'Review the calculated Action Plan and its assumptions below. Unknowns remain listed; the proposal has not been saved or applied.':'Review the calculated Action Plans and their assumptions below. Unknowns remain listed; the proposals have not been saved or applied.',candidateIds:items.map(item=>item.id),analysisIds:[],verifiedMetrics:metrics,questions:[],constraintUpdates:[],rejected:[],focusCandidateId:items[0].id};
+      const reviewedFinal:SolutionFinal={answer:items.length===1?'Action Plan ready for review; not saved or applied.':'Action Plans ready for review; not saved or applied.',candidateIds:items.map(item=>item.id),analysisIds:[],verifiedMetrics:metrics,questions:[],constraintUpdates:[],rejected:[],focusCandidateId:items[0].id};
       assertSolutionShape(reviewedFinal,solutionFinalSchema,'calculated review');final=reviewedFinal;
      }
     }else{

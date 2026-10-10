@@ -34,7 +34,7 @@ test('presentation metadata preserves every original tool and calculator argumen
 
 test('one-round checked A and B preserve unknowns, original, dates, lineage and explicit save/reload',async()=>{
  const body=solutionRequest(A),before=JSON.stringify(body),reply=await converseSolutions(body,runtime([ready(scoped())]),signal()),item=check(reply,27);
- assert.equal(JSON.stringify(body),before);assert.equal(body.catalog,null);assert.match(reply.answer,/not been saved or applied/);
+ assert.equal(JSON.stringify(body),before);assert.equal(body.catalog,null);assert.equal(reply.answer,'Action Plan ready for review; not saved or applied.');
  const goal={id:'review-test',statement:item.candidate.goal.statement};
  await assert.rejects(saveSolutionCandidate({...body,state:reply.state},null,item,goal,body.evidence,false),/Acknowledge/);
  const saved=await saveSolutionCandidate({...body,state:reply.state},null,item,goal,body.evidence,true);assert.equal(saved.status,'ready');
