@@ -21,7 +21,20 @@ function heading(line:string){
  return null;
 }
 const planTitle=(value:string)=>/^(?:(?:proposed|recommended)\s+)?action plan(?:\s+\d+)?(?:\s*[:—–-].*)?\s*:?$/i.test(value);
-const steps=(block:string)=>/^\s*(?:#{1,6}\s+)?(?:\*\*)?(?:\d+[.)]\s|[-*]\s|\|[^\n]*\b(?:step|action|activity|owner)\b)/i.test(block);
+function steps(block:string){
+ const text=block.trim();
+ // Labels alone do not establish that a list contains actions. Fold only an
+ // explicit step/owner table or list items that each carry an owner field.
+ // Ambiguous lists (including numbered caveats) remain visible verbatim.
+ if(/^\|[^\n]*\b(?:step|action|activity)\b[^\n]*\|/i.test(text))return /^\|[^\n]*\bowner\b[^\n]*\|/i.test(text);
+ const marker=/^\s*(?:#{1,6}\s+)?(?:\*\*)?(?:\d+[.)]|[-*])\s+/gm;
+ const matches=[...text.matchAll(marker)];
+ if(!matches.length||matches[0].index!==0)return false;
+ return matches.every((match,index)=>{
+  const item=text.slice(match.index!+match[0].length,matches[index+1]?.index??text.length);
+  return !/^(?:\*\*)?(?:suggested\s+)?owner\s*:/i.test(item)&&/\b(?:suggested\s+)?owner\s*:/i.test(item);
+ });
+}
 
 /** Only explicit plan step blocks are folded. Unlabelled prose, explanations,
  * caveats and alternative sections stay verbatim. No semantic/fuzzy matching. */
