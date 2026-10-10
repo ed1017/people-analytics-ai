@@ -71,7 +71,7 @@ async function handlePOST(request:Request){
   return Response.json({...reply,...(preview?{providerReceipt:diagnostics.receipt()}: {})},{headers:{'Cache-Control':'no-store'}});
  }catch(error){
   const evidence=error instanceof SolutionEvidenceError,incomplete=error instanceof ProviderPreviewIncompleteError,diagnostic=diagnostics.failure(error,evidence?error.diagnostic:null,request.signal.aborted,signal?.aborted===true);
-  return Response.json({error:evidence||incomplete?error.message:'The conversation could not be completed or verified. Your request and earlier work are kept. Try a narrower question or retry explicitly.',...diagnostic,...(incomplete?{code:'preview_two_call_incomplete'}:{}),...(preview?{providerReceipt:diagnostics.receipt()}:{})},
+  return Response.json({error:evidence||incomplete?error.message:'The conversation could not be completed or verified. Your request and earlier work are kept. Try a narrower question or retry explicitly.',...diagnostic,...(incomplete?{code:'preview_single_attempt_incomplete'}:{}),...(preview?{providerReceipt:diagnostics.receipt()}:{})},
    {status:evidence?503:422,headers:{'Cache-Control':'no-store','X-Correlation-ID':diagnostic.correlationId}});
  }
 }
@@ -83,5 +83,5 @@ export async function POST(request:Request) {
 /** Read-only policy probe for this isolated Preview; never invokes grounding or a model. */
 export function GET(){
  if(!providerPreviewEnabled(process.env))return new Response(null,{status:405});
- return Response.json({verification:'pr204-initial-two-calls-v2',ready:solutionConversationEnabled,solutionConversationEnabled,endpoint:'/api/home-solution-conversation',legacyChatBlocked:true,...homeSolutionModel,limits:providerPreviewLimits,commit:process.env.VERCEL_GIT_COMMIT_SHA??null},{status:solutionConversationEnabled?200:503,headers:{'Cache-Control':'no-store'}});
+ return Response.json({verification:'pr204-standalone-single-attempt-v1',ready:solutionConversationEnabled,solutionConversationEnabled,endpoint:'/api/home-solution-conversation',legacyChatBlocked:true,...homeSolutionModel,limits:providerPreviewLimits,commit:process.env.VERCEL_GIT_COMMIT_SHA??null},{status:solutionConversationEnabled?200:503,headers:{'Cache-Control':'no-store'}});
 }

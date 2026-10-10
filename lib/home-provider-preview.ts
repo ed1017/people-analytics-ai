@@ -1,13 +1,13 @@
 import type {ResponseCreateParamsNonStreaming} from 'openai/resources/responses/responses';
 /** Adapted from the earlier single-call Preview guard; no counting or context trimming. */
 export const providerPreviewBranch='codex/pr204-bounded-preview-20261010';
-export const providerPreviewLimits=Object.freeze({contextTokens:1050000,outputTokens:5000,rounds:2});
+export const providerPreviewLimits=Object.freeze({contextTokens:1050000,outputTokens:5000,rounds:1});
 export const providerPreviewEnabled=(env:Readonly<Record<string,string|undefined>>)=>env.VERCEL_ENV==='preview'&&env.VERCEL_GIT_COMMIT_REF===providerPreviewBranch;
 export class ProviderPreviewIncompleteError extends Error {
- constructor(){super('This bounded Preview test needs more than two model calls and is incomplete. Earlier work is kept; nothing was saved or applied. No automatic retry.');}
+ constructor(){super('This bounded Preview test needs more than one model call and is incomplete. Earlier work is kept; nothing was saved or applied. No automatic retry.');}
 }
 const allowedKeys=new Set(['model','reasoning','service_tier','instructions','input','tools','text','tool_choice','parallel_tool_calls','max_output_tokens','truncation']);
-/** One instance per authorized application request. Consume an attempt before dispatch. */
+/** Per-request limit only; duplicate submissions have separate allowances. Consume before dispatch. */
 export function createProviderPreviewGuard(){
  let used=0;
  return (request:ResponseCreateParamsNonStreaming,signal:AbortSignal)=>{
