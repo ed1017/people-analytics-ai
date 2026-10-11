@@ -1,0 +1,17 @@
+import {candidate,quantity,based,solutionRequest} from './home-solution-conversation.mjs';
+export function proposedPilot(id='manager-pilot',turnId='user-1'){
+ const c=candidate(id);c.goal.turnId=turnId;c.goal.statement='Improve employee experience';c.name='Targeted manager/workload pilot';c.objective='Test a manageable manager check-in and workload review';c.approach='Run a small voluntary pilot before considering expansion.';c.rationale='Regular check-ins may reveal workload friction; this is an untested mechanism.';c.nextStep='Confirm volunteer participation and owner availability.';c.successMeasure='Compare feedback before and after the pilot; effects are not established.';
+ c.activities=[{...c.activities[0],name:'Manager check-ins and workload review',domain:'manager_workload',ownerRole:'Pilot coordinator',step:'Invite volunteers for manager check-ins, review workload friction and document follow-up actions.',limitation:'No weakest team has been identified; availability and effects remain unknown.'}];
+ const propose=(field,value,unit,target,reason)=>({...quantity(field,value,unit,target,null),kind:'model-proposed',interpretation:reason});
+ c.quantities=[propose('horizon_months',2,'months',null,'Two months provides an initial cycle and a follow-up.'),propose('participants',10,'people','c1','A small voluntary group keeps the first review manageable.'),propose('hours_per_participant',2,'hours/person/total',null,'Allow two short check-ins plus preparation over the pilot.'),propose('coordination_hours',8,'hours/total',null,'Allow coordinator preparation, synthesis and follow-up.'),propose('cash',500,'USD','c1','One-time materials/facilitation allowance, excluding pay and backfill; not a quote.')];return c;
+}
+
+// Retained recurring cash and a legacy hourly rate alongside newly proposed effort.
+export async function mixedPlanningFixture(sourceItem){
+ const {createPlanAlternatives}=await import('../../lib/home-plan-alternatives.ts');
+ const {conversationContext,entered}=await import('./home-plan-conversation.mjs');
+ const request=solutionRequest('Propose coordination time.',true,sourceItem?{...solutionRequest().state,working:[sourceItem]}:undefined,2);
+ const draft=request.catalog.plans[0].draft;draft.inputs.expenses[0].months=entered(3);draft.inputs.deliveryEstimate.coordinationHours={value:null,kind:'unknown',basis:null};draft.inputs.deliveryEstimate.hourlyRate=entered(75);
+ request.catalog=createPlanAlternatives(conversationContext,request.catalog.plans.map(p=>({id:p.id,draft:p.draft})));
+ const c=based('A');c.quantities=[proposedPilot().quantities.find(q=>q.field==='coordination_hours')];return {request,c};
+}

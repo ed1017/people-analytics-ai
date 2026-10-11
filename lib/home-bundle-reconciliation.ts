@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {proposedPlanningEstimate} from './home-proposed-planning.ts';
 import type {HomeMixScenario} from './home-mix-scenario';
 import type {HomeMixConstraints} from './home-mix-planning';
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -25,7 +27,7 @@ import type {ScenarioOrigins} from './home-action-scenarios';
 export const planCostPolicy='cash-hours-v2' as const;
 export type PlanCostPolicy=typeof planCostPolicy|'cash-hours-v1';
 export const bundleMethod='coordinated-bundle-v1' as const;
-export type Assumption<T>={value:T|null;kind:'unknown'|'user-entered'|'illustrative'|'adopted';basis:string|null};
+export type Assumption<T>={value:T|null;kind:'unknown'|'user-entered'|'illustrative'|'adopted'|'model-proposed';basis:string|null};
 export const unknownAssumption=<T>():Assumption<T>=>({value:null,kind:'unknown',basis:null});
 export type BundleScope={population:Assumption<string>;businessUnit:Assumption<string>;jobProfile:Assumption<string>;startMonth:Assumption<string>;months:Assumption<number>;demand:Assumption<number>;capacityRequired:Assumption<boolean>;requirements:Assumption<string>;comparisonConfirmed:Assumption<boolean>;currency:'USD'};
 export type ComponentTiming={componentId:string;start:Assumption<string>;finish:Assumption<string>};
@@ -56,7 +58,7 @@ function allocatedCents(total:number,ids:string[],allocations:ExpenseAllocation[
 }
 function assumption<T>(raw:Assumption<T>,valid:(value:unknown)=>boolean):void{
  const value=plain(raw);fail(value&&exactKeys(value,['value','kind','basis']),'Unsupported assumption record.');
- fail(['unknown','user-entered','illustrative','adopted'].includes(String(value.kind)),'Unknown assumption provenance.');
+ fail(['unknown','user-entered','illustrative','adopted','model-proposed'].includes(String(value.kind)),'Unknown assumption provenance.');
  fail(value.value===null?value.kind==='unknown'&&value.basis===null:value.kind!=='unknown'&&bounded(value.basis)&&valid(value.value),'Supply a reviewed value and its basis, or leave it Unknown.');
 }
 const numeric=(raw:Assumption<number>,max:number,whole=false,min=0)=>assumption(raw,value=>typeof value==='number'&&Number.isFinite(value)&&value>=min&&value<=max&&(!whole||Number.isInteger(value)));
@@ -165,7 +167,7 @@ export function reviewBundleProposal(draft:BundleDraft):BundleResult{
  fail(!draft.inputs.capacity&&!draft.inputs.whatIf,'Scope is required before reviewing a staffing or outcome calculation.');
  for(const row of draft.inputs.timing)if(row.start.value&&row.finish.value)fail(row.start.value<=row.finish.value,'Component finish cannot precede its start.');
  const missing=[!scope.population.value?'population':null,!scope.startMonth.value?'start month':null,!scope.months.value?'horizon':null].filter(Boolean);
- const issues=[`Qualitative proposal: ${missing.join(', ')} unknown. Supply these before calculating or applying this plan.`, 'Cash, staff effort, timing and participant totals have not been calculated. Review all resource assumptions before use.'];
+ const issues=proposedPlanningEstimate(draft)?[`Plan scope: ${missing.join(', ')} unconfirmed. Review before operational application.`, 'Conditional planning estimates do not confirm actual staffing, funding, dates or effectiveness.']:[`Qualitative proposal: ${missing.join(', ')} unknown. Supply these before calculating or applying this plan.`, 'Cash, staff effort, timing and participant totals have not been calculated. Review all resource assumptions before use.'];
  return {calculationStatus:'awaiting-scope',method:bundleMethod,revision:draft.revision,signature:draft.signature,bindingKey:actionBindingKey(draft.binding),scope:structuredClone(scope),ledger:[],knownCashSubtotal:null,cashTotal:null,knownEmployeeTimeSubtotal:null,employeeTimeTotal:null,componentCash:Object.fromEntries(draft.bundle.components.map(item=>[item.id,null])),uniqueParticipants:null,componentReady:Object.fromEntries(draft.bundle.components.map(item=>[item.id,null])),planFinish:null,capacityReadyMonth:null,conditionalCoverage:null,plannedAddedEmployees:null,issues,limitations:['Qualitative saved proposal only. No definitive calculation, executable plan, funding or operational approval.'],inputKey:bundleInputKey(draft),cashEstimate:{cash:null,coverage:'unknown',reason:issues[0]}};
 }
 export function reconcileBundle(draft:BundleDraft):BundleResult{

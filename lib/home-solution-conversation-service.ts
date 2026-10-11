@@ -21,7 +21,7 @@ import {requestDemandContext,createDemandReview,reviseDemandReview,serviceDemand
 import type {SolutionParameterEdit,SolutionCandidate,SolutionConstraint,SolutionFinal,ProjectionSpec,SolutionMetricRef} from './home-solution-conversation-schema';
 import type {ProjectionInputs,HeadcountProjection} from './home-solution-projection';
 // @ts-expect-error Native fixture tests share TypeScript source.
-import {readSolutionRequest,readSolutionState,evaluateSolutionParameterEdit,evaluateSolutionCandidate,mergeSolutionConstraints,solutionUserTurns,resolveSolutionMetric,currentSolutionProposals} from './home-solution-conversation.ts';
+import {retainEvaluations,readSolutionRequest,readSolutionState,evaluateSolutionParameterEdit,evaluateSolutionCandidate,mergeSolutionConstraints,solutionUserTurns,resolveSolutionMetric,currentSolutionProposals} from './home-solution-conversation.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {assertSolutionShape,solutionTools,solutionFinalSchema} from './home-solution-conversation-schema.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
@@ -61,25 +61,6 @@ export function solutionModelContext(request:SolutionRequest,progress?:GoalProgr
   analyses:request.state.analyses.map(item=>({id:item.id,revision:item.revision,method:item.spec.method,months:item.spec.months,assumptions:item.assumptions,opening:item.inputs.opening,asOf:item.inputs.asOf,scope:item.inputs.scope,interpretations:item.interpretations,finalHeadcount:item.points.at(-1)?.headcount})),
   rejectedIdeas:request.state.rejected,unresolvedQuestions:request.state.questions,focusCandidateId:request.state.focusCandidateId,currentMessage:request.message,
  };
-}
-
-/** Keep the exact provenance of every retained proposal, including a batched set. */
-function retainEvaluations(state:SolutionState,items:SolutionEvaluation[]){
- const proposed=[...state.working,...items],retained=proposed.slice(-12);
- // Keep every proof needed by a current proposal. Refuse this edit before
- // trimming, so the existing checked revision remains reviewable and savable.
- const key=(row:{id:string;revision:number})=>JSON.stringify([row.id,row.revision]);
- const removed=new Set(proposed.slice(0,-12).map(key)),byKey=new Map(retained.map(row=>[key(row),row])),visited=new Set<string>();
- const checkAncestry=(row:SolutionEvaluation)=>{
-  if(visited.has(key(row)))return;visited.add(key(row));
-  for(const ref of [row.candidate.base,...row.candidate.activities.map(a=>a.source),...row.candidate.quantities.map(q=>q.source)])if(ref?.kind==='working'){
-   if(removed.has(key(ref)))throw Error('The working history limit would remove source provenance. Choose the current proposal to save it, then continue from that saved plan; this edit and its constraints were not recorded.');
-   const prior=byKey.get(key(ref));if(prior)checkAncestry(prior);
-  }
- };
- if(removed.size)latest(retained).forEach(checkAncestry);
-
- return retained;
 }
 
 /** Bounded model-directed read/calculation loop. No write, model switch or automatic retry. */

@@ -11,7 +11,7 @@ import {requestDemandContext,readDemandReview,type DemandReview} from '@/lib/swp
 import {decisionStore,useDecisionStorage} from './decision-store';
 import type {ProblemConversation} from './problem-conversation';
 import type {BundleDiscussion} from './home-bundle-plans';
-import {emptySolutionState,readSolutionState,readSolutionRequest,saveSolutionCandidate,solutionConversationField,type SolutionEvaluation,type SolutionRequest,type SolutionState} from '@/lib/home-solution-conversation';
+import {retainEvaluations,editSolutionPlanningInputs,type PlanningInputChange,emptySolutionState,readSolutionState,readSolutionRequest,saveSolutionCandidate,solutionConversationField,type SolutionEvaluation,type SolutionRequest,type SolutionState} from '@/lib/home-solution-conversation';
 import {createPlanAlternatives,packPlanAlternatives,planAlternativesField,readPlanAlternatives,associatePlanProposal,type PlanAlternatives} from '@/lib/home-plan-alternatives';
 import type {SolutionReply} from '@/lib/home-solution-conversation-service';
 import {alternativeViewField} from '@/lib/home-plan-alternative-chat';
@@ -99,6 +99,19 @@ export function useHomeSolutionConversation(props:Props){
    setNotice(`Action Plan #${outcome.plan.number} pinned with the goal “${desired.statement}”.`);
   }catch(error){setNotice(error instanceof Error?error.message:'The proposal could not be saved.');}finally{setSaving(false);}
  }
+ async function editPlanningInputs(item:SolutionEvaluation,changes:PlanningInputChange[]){
+  if(controller.current||pending||saving)return;
+  const snapshot=requireCurrent(),request=makeRequest(`Edit planning assumptions for ${item.candidate.name}: ${changes.map(change=>`${change.field}${change.target?' ('+change.target+')':''} = ${change.value??'Unknown'}`).join('; ')}.`),key=liveKey.current,captured=epoch.current;
+  setSaving(true);setNotice('');
+  try{
+   const revised=await editSolutionPlanningInputs(request,item,changes);requireCurrent();
+   if(key!==liveKey.current||captured!==epoch.current||snapshot.data.revision!==decisionStore.getSnapshot().data.revision||!equal(request.catalog,catalog()))throw Error('The conversation changed. Review the current proposal before editing.');
+   if(revised.blocking.length)throw Error(revised.blocking.join(' '));
+   const state=structuredClone(memoryRef.current);state.working=retainEvaluations(state,[revised]);state.verifiedMetrics=[];state.focusCandidateId=revised.id;state.constraints=revised.constraints;
+   state.turns=[...state.turns,{id:request.message.id,role:'user' as const,text:request.message.text}].slice(-32);
+   persist(readSolutionState(state));setNotice('Planning assumptions recalculated. Review before pinning; inputs remain unverified.');
+  }catch(error){setNotice((error as Error).message);}finally{setSaving(false);}
+ }
  function reject(item:SolutionEvaluation){try{requireCurrent();const state=structuredClone(memoryRef.current),turnId=crypto.randomUUID();state.turns=[...state.turns,{id:turnId,role:'user' as const,text:`Discard proposal ${item.candidate.name}, revision ${item.revision}.`}].slice(-32);state.rejected=[...state.rejected,{candidateId:item.id,revision:item.revision,reason:'Discarded using the proposal review control.',turnId}].slice(-24);if(state.focusCandidateId===item.id)state.focusCandidateId=null;persist(state);}catch(error){setNotice((error as Error).message);}}
  function clearRequiredStaffing(){
   if(controller.current||pending||saving)throw Error('Wait for the current request before clearing this comparison.');
@@ -129,5 +142,5 @@ export function useHomeSolutionConversation(props:Props){
   }catch(error){setNotice((error as Error).message);}finally{setSaving(false);}
  }
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
- return {answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }

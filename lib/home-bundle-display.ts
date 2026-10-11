@@ -30,11 +30,11 @@ export function bundleDisplayName(name:string):string{
  } as Record<string,string>)[name]??name;
 }
 
-type DisplayAssumption<T>={value:T|null;kind:'unknown'|'user-entered'|'illustrative'|'adopted'};
+type DisplayAssumption<T>={value:T|null;kind:'unknown'|'user-entered'|'illustrative'|'adopted'|'model-proposed'};
 /** Label every hypothetical value; never render missing inputs as zero or verified facts. */
 export function bundleAssumptionText<T>(assumption:DisplayAssumption<T>,format:(value:T)=>string=value=>String(value)):string{
  if(assumption.value===null)return 'Not yet assessed';
- const label=assumption.kind==='illustrative'?'Assumed':assumption.kind==='adopted'?'Adopted assumption':'User assumption';
+ const label=assumption.kind==='model-proposed'?'Model-proposed · unconfirmed':assumption.kind==='illustrative'?'Assumed':assumption.kind==='adopted'?'Adopted assumption':'User assumption';
  return `${label}: ${bundleAssumptionCopy(format(assumption.value))}`;
 }
 /** Shared horizon end, not a forecast or a component readiness date. */
@@ -42,7 +42,7 @@ export function bundleHorizonEnd(scope:{startMonth:DisplayAssumption<string>;mon
  if(scope.startMonth.value===null||scope.months.value===null)return {value:null,kind:'unknown'};
  const [year,month]=scope.startMonth.value.split('-').map(Number);
  const value=new Date(Date.UTC(year,month-1+scope.months.value,0)).toISOString().slice(0,10);
- return {value,kind:scope.startMonth.kind==='illustrative'||scope.months.kind==='illustrative'?'illustrative':scope.startMonth.kind==='adopted'&&scope.months.kind==='adopted'?'adopted':'user-entered'};
+ return {value,kind:scope.startMonth.kind==='model-proposed'||scope.months.kind==='model-proposed'?'model-proposed':scope.startMonth.kind==='illustrative'||scope.months.kind==='illustrative'?'illustrative':scope.startMonth.kind==='adopted'&&scope.months.kind==='adopted'?'adopted':'user-entered'};
 }
 
 /** Conservative label: recognized analysis verbs only; other drafts are not certified interventions. */
