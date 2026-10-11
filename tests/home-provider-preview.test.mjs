@@ -1,6 +1,9 @@
 /** Isolated Preview policy and actual route, exclusively synthetic transports. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+import ts from 'typescript';
 import {createProviderPreviewGuard,providerPreviewEnabled,providerPreviewBranch,ProviderPreviewIncompleteError} from '../lib/home-provider-preview.ts';
 import {offlineBusinessRoute} from './helpers/offline-business-route.mjs';
 import {solutionRequest,final} from './fixtures/home-solution-conversation.mjs';
@@ -9,6 +12,35 @@ const signal=()=>new AbortController().signal;
 const enabled={VERCEL_ENV:'preview',VERCEL_GIT_COMMIT_REF:providerPreviewBranch,VERCEL_GIT_COMMIT_SHA:'fixture-exact-commit'};
 const request=()=>new Request('https://offline.invalid/api/home-solution-conversation',{method:'POST',headers:{'content-type':'application/json','x-workforce-dataset':'legacy-v1:0'},body:JSON.stringify(solutionRequest('Summarize Employee Listening evidence.'))});
 const reply=()=>({status:'completed',output:[],output_text:JSON.stringify(final('Employee Listening coverage is unavailable in this synthetic fixture.'))});
+function buildConfig(env){
+ const sandbox={exports:{},process:{env}};
+ vm.runInNewContext(ts.transpileModule(readFileSync('next.config.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,sandbox);
+ return JSON.parse(JSON.stringify(sandbox.exports.default));
+}
+test('build flag override is confined to the guarded Preview branch',()=>{
+ for(const flag of [undefined,'false','true']){
+  assert.deepEqual(buildConfig({...enabled,NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION:flag}),{env:{NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION:'true'}});
+  for(const env of [{},{...enabled,VERCEL_ENV:'production'},{...enabled,VERCEL_ENV:'development'},{...enabled,VERCEL_GIT_COMMIT_REF:'main'},{VERCEL_ENV:'preview'}]){
+   assert.deepEqual(buildConfig({...env,NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION:flag}),{});
+  }
+ }
+});
+test('build flag fixes actual route readiness while retaining one provider attempt',async()=>{
+ const env={...enabled,NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION:'false'};
+ const before=await offlineBusinessRoute({env});
+ assert.equal(before.get().status,503);assert.equal((await before.get().json()).ready,false);
+ assert.equal((await before.post(request())).status,404);assert.equal(before.sandbox.__requests.length,0);
+ const h=await offlineBusinessRoute({env,buildEnv:buildConfig(env).env});
+ h.sandbox.__forbidProvider=true;h.sandbox.__aggregateRead=()=>{throw Error('Forbidden aggregate read');};
+ const response=h.get(),body=await response.json();
+ assert.equal(response.status,200);assert.equal(body.ready,true);assert.equal(body.legacyChatBlocked,true);
+ assert.equal(h.sandbox.__providerConstructions,undefined);assert.equal(h.sandbox.__requests.length,0);
+ h.sandbox.__forbidProvider=false;
+ h.sandbox.__replies.push({status:'completed',output:[{type:'function_call',call_id:'fixture-call',name:'project_headcount',arguments:'{}'}],output_text:''},reply());
+ const post=await h.post(request());assert.equal(post.status,422);assert.equal((await post.json()).code,'preview_single_attempt_incomplete');
+ assert.equal(h.sandbox.__requests.length,1);assert.equal(h.sandbox.__replies.length,1);
+ assert.equal(h.sandbox.__requests[0].truncation,'disabled');assert.equal(h.sandbox.__requests[0].max_output_tokens,5000);assert.equal(h.sandbox.__requestOptions[0].maxRetries,0);
+});
 test('guard is isolated to exact Preview branch and consumes before dispatch',()=>{
  assert.equal(providerPreviewEnabled(enabled),true);
  for(const env of [{},{...enabled,VERCEL_ENV:'production'},{...enabled,VERCEL_GIT_COMMIT_REF:'main'}])assert.equal(providerPreviewEnabled(env),false);
