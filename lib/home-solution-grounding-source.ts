@@ -4,9 +4,9 @@ import {verifySolutionEvidence,AggregateEvidenceReadError} from './home-solution
 import type {SolutionRequest} from './home-solution-conversation';
 import type {DashboardFilters} from './dashboard-scope';
 
-/** Existing GET readers only. No arbitrary URL, new relation, grant, write or credential. */
+/** Existing aggregate readers only. No arbitrary URL, new relation, grant, write or credential. */
 const readers={
- dashboard:()=>import('../app/api/dashboard/route'),workforce:()=>import('../app/api/workforce/route'),
+ dashboard:async()=>({GET:(await import('./dashboard-overview-reader')).readDashboardOverview}),workforce:()=>import('../app/api/workforce/route'),
  attrition:()=>import('../app/api/attrition/route'),'talent-acquisition':()=>import('../app/api/talent-acquisition/route'),
  'survey-sentiment':()=>import('../app/api/survey-sentiment/route'),skills:()=>import('../app/api/skills/route'),
  'learning-development':()=>import('../app/api/learning-development/route'),'career-mobility':()=>import('../app/api/career-mobility/route'),

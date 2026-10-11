@@ -23,7 +23,15 @@ function queryResult(result){const query={select:()=>query,order:()=>query,abort
 function reader(name,client){
  const code=ts.transpileModule(fs.readFileSync(new URL(`../app/api/${name}/route.ts`,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
  const exports={},aliases={'@/lib/dataset-runtime':{withDatasetRequest},'next/server':{NextResponse:Response},'../../../lib/supabase-server':{supabaseServer:client},'../../../lib/data-api-error':{dataApiErrorResponse},'../../../lib/dashboard-scope':dashboardScope,'../../../lib/workforce-performance':performance};
- vm.runInNewContext(code,{exports,require:key=>{assert.ok(key in aliases,'Unexpected import: '+key);return aliases[key];}});
+ const load=key=>{
+  if(key==='../../../lib/dashboard-overview-reader'){
+   const shared={};const code=ts.transpileModule(fs.readFileSync(new URL('../lib/dashboard-overview-reader.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+   vm.runInNewContext(code,{exports:shared,require:load});return shared;
+  }
+  const resolved=key==='./dataset-runtime'?'@/lib/dataset-runtime':key.startsWith('./')?'../../../lib/'+key.slice(2):key;
+  assert.ok(resolved in aliases,'Unexpected import: '+key);return aliases[resolved];
+ };
+ vm.runInNewContext(code,{exports,require:load});
  return (signal=new AbortController().signal,query='')=>exports.GET(Object.assign(new Request('http://offline.invalid/api/'+name+query,{headers:{'x-workforce-dataset':token},signal}),{nextUrl:new URL('http://offline.invalid/api/'+name+query)}));
 }
 
