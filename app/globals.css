@@ -700,3 +700,8 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .compact-data-table :is(th, td) { padding: .375rem .75rem; }
 .assumptions-disclosure { color: var(--foreground); }
 .assumptions-disclosure :is(.text-xs, .text-sm, table) { font-size: .875rem; line-height: 1.5; }
+
+.assumptions-disclosure .home-answer { font-size: .875rem; line-height: 1.5; }
+.assumptions-disclosure .home-answer > [data-chat-heading] { font-size: 1rem; margin-block-start: .5rem; }
+
+.home-answer > [data-chat-caveat-qualifier], [data-chat-caveat-qualifier] { font-size: .875rem; line-height: 1.5; }

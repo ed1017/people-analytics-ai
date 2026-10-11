@@ -8,6 +8,7 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import {createRequire} from 'node:module';
 import * as navigation from '../lib/chat-navigation.ts';
 import * as presentation from '../lib/home-answer-presentation.ts';
+import * as caveats from '../lib/chat-caveat-blocks.ts';
 import {exitMissingFieldsBullet} from './fixtures/exit-reason-packet.mjs';
 import {homeStarterGroups,homeGoalStarters} from '../lib/contextual-prompts.ts';
 import {homeTurnPurpose} from '../lib/home-conversation.ts';
@@ -17,7 +18,7 @@ const require=createRequire(import.meta.url);
 function component(file,name){
  const exports={},source=fs.readFileSync(new URL('../components/'+file,import.meta.url),'utf8');
  const js=ts.transpileModule(source,{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
- vm.runInNewContext(js,{exports,require:name=>name.endsWith('/assumptions-disclosure')?{AssumptionsDisclosure:component('assumptions-disclosure.tsx','AssumptionsDisclosure')}:name==='@/lib/chat-navigation'?navigation:name==='@/lib/home-answer-presentation'?presentation:require(name)});return exports[name];
+ vm.runInNewContext(js,{exports,require:name=>name==='@/lib/chat-caveat-blocks'?caveats:name.endsWith('/assumptions-disclosure')?{AssumptionsDisclosure:component('assumptions-disclosure.tsx','AssumptionsDisclosure')}:name==='@/lib/chat-navigation'?navigation:name==='@/lib/home-answer-presentation'?presentation:require(name)});return exports[name];
 }
 const ChatContent=component('chat-content.tsx','ChatContent'),PromptExamples=component('prompt-examples.tsx','PromptExamples');
 const render=(content,options={})=>renderToStaticMarkup(React.createElement(ChatContent,{content,...options}));
@@ -113,3 +114,17 @@ test('bare, field-qualified, grouped and explicit citations navigate to the corr
 });
 
 test('calibrated hiring answer retains generated scope, count units and source distinction',()=>{const saved=homeForecastAnswer('Forecast hiring'),result=presentation.homeAnswerPresentation(saved);assert.match(result.answer,/Generated synthetic history/);assert.match(result.answer,/474/);assert.match(result.answer,/475/);assert.match(result.answer,/synthetic-ta-calibrated-v2/);assert.deepEqual(result.answer.split('\n').filter(l=>l.startsWith('|')),saved.split('\n').filter(l=>l.startsWith('|')));});
+
+test('explicit caveat disclosure preserves Markdown structure without reclassifying its contents',()=>{
+ const html=render('Answer remains visible.\n\n### Assumptions\n- The inputs are held steady.\n- Variability can alter the outcome.\n\n### Next steps\nReview before saving.',{compact:true});
+ assert.equal((html.match(/data-assumptions-disclosure=/g)??[]).length,1);
+ assert.match(html,/<details[^>]*>[\s\S]*<ul[^>]*>[\s\S]*The inputs are held steady/);
+ assert.ok(html.indexOf('Review before saving')<html.indexOf('<details'));
+ assert.doesNotMatch(html,/<details[^>]* open/);
+});
+test('labelled numeric qualifiers remain inline while only explanatory text collapses',()=>{
+ const html=render('Figure: 9,910.\n\n**Important caveat:** This simulated scenario assumes 100 hires and 115 exits each month. The inputs are held steady for illustration.',{compact:true});
+ const [inline,expanded]=html.split('<details');
+ assert.match(inline,/data-chat-caveat-qualifier="true"/);assert.match(inline,/100 hires and 115 exits each month/);assert.doesNotMatch(inline,/held steady for illustration/);
+ assert.match(expanded,/100 hires and 115 exits each month/);assert.match(expanded,/held steady for illustration/);
+});

@@ -4,6 +4,7 @@ import {AssumptionsDisclosure} from "./assumptions-disclosure";
 import type { ReactNode } from "react";
 import type { AppPage } from "@/lib/types";
 import { getChatNavigationAction } from "@/lib/chat-navigation";
+import {chatCaveatBlocks} from '@/lib/chat-caveat-blocks';
 import {homeAnswerPresentation} from '@/lib/home-answer-presentation';
 
 // Evidence IDs identify their own pages, including S2 exit feedback in Attrition.
@@ -115,16 +116,21 @@ export function ChatContent({
   content,
   onNavigate,
   compact = false,
+  collapseCaveats = true,
   bulletAction,
 }: {
   content: string;
   bulletAction?: (text:string)=>ReactNode;
   compact?: boolean;
+  collapseCaveats?: boolean;
   onNavigate?: (page: AppPage) => void;
 }) {
   const references: string[] = [];
   const citationTargets = new Map<string,string>();
-  const presentation=homeAnswerPresentation(content);
+  const labelled=collapseCaveats?chatCaveatBlocks(content):{answer:content,details:[],qualifiers:[]};
+  const known=collapseCaveats?homeAnswerPresentation(labelled.answer):{answer:labelled.answer,details:[]};
+  const presentation={answer:known.answer,details:[...known.details,...labelled.details]};
+  const qualifierLines=new Set(presentation.answer.trim().split('\n').flatMap((line,index)=>labelled.qualifiers.some(qualifier=>qualifier.trim()===line.trim())?[index]:[]));
   const answer = presentation.answer.replace(/\(?\[[A-Z]+\d+\](?:[, ]+\[[A-Z]+\d+\])*\s+See\s+\[[^\]\n]+\]\(app:[a-z-]+\)\.?\)?/gi, reference => {
     const href = reference.match(/\]\((app:[a-z-]+)\)/)?.[1];
     if (!onNavigate || !href || !getChatNavigationAction(href)) return reference;
@@ -256,9 +262,10 @@ export function ChatContent({
         <p
           key={`heading-${index}`}
           data-chat-heading={compact || undefined}
+          data-chat-caveat-qualifier={qualifierLines.has(index)||undefined}
           role={compact ? "heading" : undefined}
           aria-level={compact ? 3 : undefined}
-          className="font-semibold"
+          className={qualifierLines.has(index)?"text-sm font-semibold":"font-semibold"}
         >
           {renderInlineMarkdown(
             headingMatch[2], onNavigate, citationTargets
@@ -283,7 +290,7 @@ export function ChatContent({
             if(!nested||nested[1].length<=indent)break;
             children.push(renderList(nested[1].length,/\d/.test(nested[2])));
           }
-          items.push(<li key={key} value={ordered?Number(item[2].replace('.','')):undefined} data-chat-item={compact||undefined}>
+          items.push(<li key={key} value={ordered?Number(item[2].replace('.','')):undefined} data-chat-item={compact||undefined} data-chat-caveat-qualifier={qualifierLines.has(key)||undefined} className={qualifierLines.has(key)?"text-sm leading-relaxed":undefined}>
             <span>{renderInlineMarkdown(text,onNavigate,citationTargets)}{!ordered&&bulletAction?.(text)}</span>{children}
           </li>);
         }
@@ -295,7 +302,7 @@ export function ChatContent({
     }
 
     rendered.push(
-      <p key={`text-${index}`}>
+      <p key={`text-${index}`} data-chat-caveat-qualifier={qualifierLines.has(index)||undefined} className={qualifierLines.has(index)?"text-sm leading-relaxed":undefined}>
         {renderInlineMarkdown(
           trimmed, onNavigate, citationTargets
         )}
@@ -308,7 +315,7 @@ export function ChatContent({
   return (
     <div className={compact ? "home-answer text-base leading-relaxed" : "space-y-3 text-base leading-relaxed"}>
       {rendered}
-      {presentation.details.length>0&&<AssumptionsDisclosure evidenceDetails className="mt-2">{presentation.details.map((detail,index)=><p key={index} className="mt-1">{renderInlineMarkdown(detail,onNavigate,citationTargets)}</p>)}</AssumptionsDisclosure>}
+      {presentation.details.length>0&&<AssumptionsDisclosure evidenceDetails className="mt-2">{presentation.details.map((detail,index)=><ChatContent key={index} content={detail} onNavigate={onNavigate} compact collapseCaveats={false}/>)}</AssumptionsDisclosure>}
       {references.length > 0 && <aside aria-label="Answer sources" className="mt-2 space-y-0.5 border-t border-border/40 pt-1">
         {references.map((reference, referenceIndex) => <div key={referenceIndex} className="text-[11px] leading-relaxed">{renderInlineMarkdown(reference, onNavigate, citationTargets)}</div>)}
       </aside>}
