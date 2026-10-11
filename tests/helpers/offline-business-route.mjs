@@ -12,5 +12,5 @@ export async function offlineBusinessRoute(){
  const sandbox={exports:{},require:createRequire(import.meta.url),Response,Request,URL,URLSearchParams,TextEncoder,TextDecoder,AbortController,AbortSignal,setTimeout:(...args)=>setTimeout(...args),clearTimeout:(id)=>clearTimeout(id),console,Intl,crypto:globalThis.crypto,process:{env:{OPENAI_API_KEY:'synthetic-harness-only',NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION:'true',NEXT_PUBLIC_GOAL_PROGRESS:'true'}},__requests:[],__replies:[],__requestOptions:[],fetch:()=>{throw Error('Network forbidden')}};
  sandbox.module={exports:sandbox.exports};
  vm.runInNewContext('globalThis.structuredClone=value=>JSON.parse(JSON.stringify(value));\n'+await fs.readFile(path.join(out,'route.cjs'),'utf8'),sandbox);
- return {sandbox,post:sandbox.module.exports.POST};
+ return {sandbox,post:sandbox.module.exports.POST,get:sandbox.module.exports.GET};
 }

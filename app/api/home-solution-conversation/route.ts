@@ -1,3 +1,4 @@
+import {createProviderPreviewGuard,providerPreviewEnabled,providerPreviewLimits,ProviderPreviewIncompleteError} from '@/lib/home-provider-preview';
 import {readStaffingScenario} from '@/lib/home-staffing-scenario';
 import {requiredStaffingInstructions,requiredStaffingTool} from '@/lib/home-required-staffing';
 import {hiringBudgetInstructions} from '@/lib/home-hiring-budget';
@@ -12,7 +13,7 @@ import {progressModelContract} from '@/lib/goal-progress-entry-service';
 import { withDatasetRequest, datasetAI, datasetRouter } from '@/lib/dataset-runtime';
 import OpenAI from 'openai';
 import {toResponseInputItems} from 'openai/lib/responses/ResponseInputItems';
-import type {ResponseInput} from 'openai/resources/responses/responses';
+import type {ResponseInput,ResponseCreateParamsNonStreaming} from 'openai/resources/responses/responses';
 import {openAIProxyTransport} from '@/lib/openai-proxy-transport';
 import {readSolutionRequest,solutionConversationEnabled} from '@/lib/home-solution-conversation';
 import {SWP_CONVERSATION_HEADER,swpConversationModel} from '@/lib/swp-conversation-model';
@@ -30,6 +31,7 @@ async function handlePOST(request:Request){
  if(!solutionConversationEnabled)return Response.json({error:'Solution conversation is not enabled.'},{status:404});
  const body=await request.text();if(new TextEncoder().encode(body).length>900000)return Response.json({error:'The conversation request is too large.'},{status:413});
  const diagnostics=createSolutionDiagnostics();let signal:AbortSignal|undefined;
+ const previewGuard=providerPreviewEnabled(process.env)?createProviderPreviewGuard():null;
  try{
   const parsed=readSolutionRequest(JSON.parse(body));
   diagnostics.stage('configuration');
@@ -57,12 +59,15 @@ async function handlePOST(request:Request){
     const progressContract=progressModelContract(goalProgressConversationEnabled,capabilities.progressEntryEnabled);
     const conversationTools=capabilities.requiredStaffingCalculation?[requiredStaffingTool]:demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools,...(natural?businessPlanningModelTools:[])];
     const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions;
+    let providerRequest:ResponseCreateParamsNonStreaming={...homeSolutionModel,instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000};
+    if(previewGuard)providerRequest=previewGuard(providerRequest,signal);
     const response=await datasetAI(() => {
      diagnostics.modelAttempt({inputBytes:new TextEncoder().encode(JSON.stringify(input)).length,instructionsBytes:new TextEncoder().encode(instructions).length,toolSchemaBytes:new TextEncoder().encode(JSON.stringify(conversationTools)).length});
-     return client.responses.create({...homeSolutionModel,instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:60000,signal});
+     return client.responses.create(providerRequest,{maxRetries:0,timeout:60000,signal});
     });
     diagnostics.providerResult(response);
     diagnostics.stage('response_validation');
+    if(previewGuard&&response.output.some(item=>item.type==='function_call'))throw new ProviderPreviewIncompleteError();
     return {completed:response.status==='completed',items:toResponseInputItems(response.output),calls:response.output.filter(item=>item.type==='function_call').map(item=>({id:item.call_id,name:item.name,arguments:item.arguments})),text:response.output_text};
    },
    loadProjection:async(filters,signal)=>(await import('@/lib/home-solution-projection-source')).loadSolutionProjectionInputs(filters,signal),
@@ -70,12 +75,18 @@ async function handlePOST(request:Request){
   diagnostics.success(reply.usage);
   return Response.json(reply,{headers:{'Cache-Control':'no-store'}});
  }catch(error){
-  const evidence=error instanceof SolutionEvidenceError,diagnostic=diagnostics.failure(error,evidence?error.diagnostic:null,request.signal.aborted,signal?.aborted===true);
-  return Response.json({error:evidence?error.message:'The conversation could not be completed or verified. Your request and earlier work are kept. Try a narrower question or retry explicitly.',...diagnostic},
+  const evidence=error instanceof SolutionEvidenceError,incomplete=error instanceof ProviderPreviewIncompleteError,diagnostic=diagnostics.failure(error,evidence?error.diagnostic:null,request.signal.aborted,signal?.aborted===true);
+  return Response.json({error:evidence||incomplete?error.message:'The conversation could not be completed or verified. Your request and earlier work are kept. Try a narrower question or retry explicitly.',...diagnostic,...(incomplete?{code:'preview_single_attempt_incomplete'}:{})},
    {status:evidence?503:422,headers:{'Cache-Control':'no-store','X-Correlation-ID':diagnostic.correlationId}});
  }
 }
 
 export async function POST(request:Request) {
  return withDatasetRequest(request, () => handlePOST(request));
+}
+
+/** Read-only isolated Preview policy probe: no dataset, grounding or provider work. */
+export function GET(){
+ if(!providerPreviewEnabled(process.env))return new Response(null,{status:405});
+ return Response.json({verification:'pr208-single-attempt-v1',baseCommit:'2e6e160d85dfbacefbfd9d543c6356fb5b86f609',ready:solutionConversationEnabled,endpoint:'/api/home-solution-conversation',legacyChatBlocked:true,...homeSolutionModel,limits:{...providerPreviewLimits,sdkRetries:0,continuations:0},commit:process.env.VERCEL_GIT_COMMIT_SHA??null},{status:solutionConversationEnabled?200:503,headers:{'Cache-Control':'no-store'}});
 }
