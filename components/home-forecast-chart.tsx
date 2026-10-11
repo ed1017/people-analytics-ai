@@ -22,7 +22,7 @@ export function HomeForecastChart({question,answer,taReady=false,datasetContext,
  if(datasetContext||datasetToken!==undefined&&datasetToken!=='legacy-v1:0')return null;
  const domain=homeForecastChartDomain(question,answer);if(!domain)return null;
  if(domain==="hiring")return !taReady?null:<div className="my-3"><CalibratedTaPanels chartOnly /></div>;
- return <section aria-label="Turnover projection for this answer" className="my-3 min-w-0 rounded-lg border p-3">
+ return <section aria-label={`${domain === 'satisfaction' ? 'Satisfaction' : 'Turnover'} projection for this answer`} className="my-3 min-w-0 rounded-lg border p-3">
   <SyntheticDomainPrediction domain={domain} data={artifact}/>
   <HomeForecastDetails domain={domain} data={artifact}/>
  </section>;
