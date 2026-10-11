@@ -54,7 +54,12 @@ export function homeAnswerScopeViolation(answer:string,raw:unknown,options:Scope
   if(!target||match[3]&&(typeof target[match[3]]!=='number'||!Number.isFinite(target[match[3]])))return true;
  }
  const sources=new Map<string,{id:string;scope:string}>(pack.sources.map((source:{id:string;scope:string})=>[source.id,source]));
- const scopeLabels=(text:string)=>labels.filter(label=>contains(text,label));
+ const scopeLabels=(text:string)=>{
+  const matches=labels.flatMap(label=>[...text.matchAll(new RegExp('(?<![A-Za-z])'+escape(label)+'(?![A-Za-z])',label==='US'?'g':'gi'))].map(match=>({label,start:match.index,end:match.index+match[0].length})));
+  // An exact longer entity mention owns its span. A separate mention of the
+  // shorter entity still needs its own matching row reference.
+  return [...new Set(matches.filter(match=>!matches.some(other=>other.start<=match.start&&other.end>=match.end&&other.end-other.start>match.end-match.start)).map(match=>match.label))];
+ };
  const sourceAllows=(id:string,label:string,claim:string)=>{
   const source=sources.get(id);if(!source)return false;
   if(id==='F1'){

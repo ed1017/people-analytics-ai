@@ -85,3 +85,12 @@ test('actual Finance route uses existing aggregate queries and preserves null so
  assert.equal(value.current.labor_cost_usd,null);assert.equal(value.by_business_unit[0].org_code,'BU-1');assert.equal(value.currency,'USD');assert.equal(value.cost_period,null);
  assert.deepEqual(calls.map(c=>c.name),['finance_current_summary','workforce_scenario_summary']);assert.doesNotMatch(calls[0].columns,/employee|salary/);
 });
+
+test('overlapping BU names resolve the longest actual mention and retain wrong-BU rejection',()=>{
+ const p=packet('Engineering Services and Engineering');
+ const f=finance(p),services=f.facts.rows.findIndex(r=>r.org_name==='Engineering Services'),engineering=f.facts.rows.findIndex(r=>r.org_name==='Engineering');
+ assert.equal(homeAnswerScopeViolation(`Engineering Services labor cost is 800000 USD [F1:row:${services}:labor_cost_usd].`,p),false);
+ assert.equal(homeAnswerScopeViolation(`Engineering Services labor cost is 800000 USD [F1:row:${engineering}:labor_cost_usd].`,p),true);
+ assert.equal(homeAnswerScopeViolation(`Engineering labor cost is 800000 USD [F1:row:${services}:labor_cost_usd].`,p),true);
+ assert.equal(homeAnswerScopeViolation(`Engineering Services and Engineering labor costs are 800000 USD each [F1:row:${services}:labor_cost_usd].`,p),true);
+});
