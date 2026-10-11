@@ -170,7 +170,14 @@ test('TA cards and funnel never coerce unknown cells to zero or call a missing c
   assert.match(html,/Open Requisitions<\/p><p[^>]*>Unavailable/);
   assert.match(html,/Median Time to Fill<\/p><p[^>]*>Unavailable/);
   assert.match(html,/Calibrated projections and expanded funnel unavailable/);
-  assert.doesNotMatch(html,/Top of funnel|Modeled stage attainment/);
+  const funnel=html.match(/<section aria-label="Source recruiting funnel"[\s\S]*?<\/section>/)?.[0];
+  assert.ok(funnel,'source funnel remains available without calibrated projections');
+  assert.match(funnel,/Applications<\/p><p[^>]*>0<\/p><p[^>]*>Top of funnel<\/p>/);
+  for(const [label,count] of [['Interviewed','Unavailable'],['Offers','Unavailable'],['Hires','0']]){
+    assert.match(funnel,new RegExp(label+'<\\/p><p[^>]*>'+count+'<\\/p><p[^>]*>Unavailable<\\/p>'));
+  }
+  assert.equal((funnel.match(/Top of funnel/g)||[]).length,1);
+  assert.doesNotMatch(html,/Modeled stage attainment/);
   assert.doesNotMatch(html,/NaN|Unavailable%|Unavailable days/);
 });
 
