@@ -8,7 +8,7 @@ import type {DashboardFilters} from './dashboard-scope';
 const readers={
  dashboard:async()=>({GET:(await import('./dashboard-overview-reader')).readDashboardOverview}),workforce:()=>import('../app/api/workforce/route'),
  attrition:()=>import('../app/api/attrition/route'),'talent-acquisition':()=>import('../app/api/talent-acquisition/route'),
- 'survey-sentiment':()=>import('../app/api/survey-sentiment/route'),skills:()=>import('../app/api/skills/route'),
+ 'survey-sentiment':async()=>({GET:(await import('./survey-sentiment-reader')).readHomeSurveyEvidence}),skills:()=>import('../app/api/skills/route'),
  'learning-development':()=>import('../app/api/learning-development/route'),'career-mobility':()=>import('../app/api/career-mobility/route'),
  'career-growth-mobility':()=>import('../app/api/career-growth-mobility/route'),'succession-coverage':()=>import('../app/api/succession-coverage/route'),
  'workforce-planning':()=>import('../app/api/workforce-planning/route'),'position-modeling':()=>import('../app/api/position-modeling/route'),
