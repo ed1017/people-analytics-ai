@@ -1,0 +1,40 @@
+/** Replay a captured completed diagnostic receipt. Every provider/API POST is denied. */
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
+import postcss from 'postcss';
+import tailwind from '@tailwindcss/postcss';
+import {application,hash,sourceManifest} from './guard.mjs';
+import {fixture} from './fixture.mjs';
+import {readSolutionState,solutionConversationField} from '../../../lib/home-solution-conversation.ts';
+import {encodeDecisions,DECISIONS_STORAGE_KEY} from '../../../lib/local-decisions.ts';
+const [file,mode]=process.argv.slice(2);assert.ok(file,'Supply the verified completed receipt JSON.');
+sourceManifest(process.cwd());const receipt=JSON.parse(await fs.readFile(file,'utf8'));
+assert.equal(receipt.stage,'completed');assert.equal(receipt.application,application);assert.equal(receipt.attempts,2);assert.equal(receipt.synthetic===true,mode==='--allow-synthetic','Synthetic receipts require explicit offline-test mode; live evidence must not be relabelled.');
+const decode=value=>{assert.equal(value.truncated,false);assert.equal(value.redacted,false);assert.equal(hash(value.text),value.sha256);return JSON.parse(value.text);};
+const reply=decode(receipt.reply),request=decode(receipt.request),state=readSolutionState(reply.state);assert.equal(reply.requestId,request.requestId);assert.equal(state.turns.at(-2).id,request.message.id);assert.equal(state.turns.at(-1).text,reply.answer);assert.equal(state.hiringBudget.inputs.hires,10);
+const output=await fs.mkdtemp(path.join(os.tmpdir(),'pr212-hiring-replay-'));
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,plugins:[new webpackPackage.webpack.DefinePlugin({'process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION':'"true"','process.env.NEXT_PUBLIC_GOAL_PROGRESS':'"true"','process.env.NEXT_PUBLIC_HOME_STRUCTURED_PLANS':'"false"'})],entry:path.resolve('tests/fixtures/home-hiring-budget-client.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
+const css=(await postcss([tailwind({base:process.cwd()})]).process(await fs.readFile('app/globals.css','utf8'),{from:path.resolve('app/globals.css')})).css,js=await fs.readFile(path.join(output,'fixture.js'),'utf8');
+const html=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style></head><body><div id="root"></div><script>${js.replaceAll('</script','<\\/script')}</script></body></html>`;
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright'),browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']}),base='http://127.0.0.1:3119',checks=[];
+try{for(const [mode,width,height] of [['desktop',1440,1000],['mobile',390,844]]){
+ const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),errors=[];let forbidden=0;page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);
+ const check=(name,condition)=>{assert.ok(condition,mode+' '+name);checks.push(mode+' '+name);};
+ await context.route('**/*',route=>{const req=route.request(),url=new URL(req.url());if(req.isNavigationRequest()&&url.href===base+'/')return route.fulfill({contentType:'text/html',body:html});if(url.origin===base&&url.pathname.startsWith('/api/')&&req.method()==='GET')return route.fulfill({json:{overview:{headcount:null,fte:null,open_positions:null,snapshot_date:null},trend:[]}});forbidden++;return route.abort();});
+ const seed={version:1,revision:1,goals:{version:1,activeId:'',goals:[]},workspaces:{},exploration:{savedAt:fixture.clock,fields:{[solutionConversationField]:state}}};
+ await page.goto(base);await page.evaluate(({key,value,scope})=>{localStorage.setItem(key,value);sessionStorage.setItem('fixture-scope',scope);},{key:DECISIONS_STORAGE_KEY,value:encodeDecisions(seed),scope:request.scope});await page.reload();
+ const card=page.getByRole('region',{name:'Hiring budget estimate',exact:true});await card.waitFor();check('actual captured estimate retains original ten-hire subtotal',(await card.innerText()).includes('1,540,000 USD'));
+ await page.getByText('Review hiring route as an Action Plan',{exact:true}).click();await page.getByLabel('External hires in the reviewed route',{exact:true}).fill('6');await page.getByRole('button',{name:'Review hiring plan',exact:true}).click();
+ const reviewed=page.getByRole('region',{name:'Reviewed hiring plan',exact:true});await reviewed.waitFor();const text=await reviewed.innerText();check('local route review preserves cash required roles FTE and uncertainty',text.includes('$924,000')&&text.includes('$76,000')&&text.includes('Required: 10 roles')&&text.includes('6 FTE')&&text.includes('affordability: Unknown'));
+ await page.screenshot({path:path.join(output,mode+'-review.png'),fullPage:true});await reviewed.getByRole('button',{name:'Pin hiring plan with unknowns',exact:true}).click();await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key)).payload.goals.activeId,DECISIONS_STORAGE_KEY);
+ const saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY),id=saved.goals.activeId,catalog=saved.workspaces[id].fields.homePlanAlternativesV1;
+ check('saved receipt preserves actual model-derived native input provenance',JSON.stringify(catalog.plans[0].draft.inputs.hiringPlan.review)===JSON.stringify(state.hiringBudget));
+ await page.reload();await page.getByText('Saved Action Plans',{exact:true}).click();const reopened=page.getByRole('article',{name:'Action Plan option 1',exact:true});await reopened.waitFor();check('reload retains reviewed subtotal',(await reopened.innerText()).includes('$924,000'));
+ const after=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);check('reload preserves saved bytes',JSON.stringify(after.workspaces[id].fields.homePlanAlternativesV1)===JSON.stringify(catalog));check('no provider requests external traffic errors or overflow',forbidden===0&&errors.length===0&&await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await fs.writeFile(path.join(output,mode+'-saved.json'),JSON.stringify({receiptSha256:hash(receipt),synthetic:receipt.synthetic===true,workspace:after.workspaces[id]},null,2));await page.screenshot({path:path.join(output,mode+'-reopened.png'),fullPage:true});await context.close();
+}}finally{await browser.close();}
+await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({application,receiptSha256:hash(receipt),synthetic:receipt.synthetic===true,checks,providerCalls:0},null,2));console.log(JSON.stringify({checks:checks.length,output,synthetic:receipt.synthetic===true,providerCalls:0}));

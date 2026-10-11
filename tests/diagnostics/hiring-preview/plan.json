@@ -1,0 +1,48 @@
+{
+  "purpose": "One manual protected Preview build for the exact PR212 hiring fixture; never merge this diagnostic overlay.",
+  "application": "c682a5b2a57b44c681c29d4d8f3d3e7dac4fe99f",
+  "productionLastVerified": "9d21ee85af364e3048182d4b9dae127aa3bad7fc",
+  "state": "UNARMED: authoritative reservation and independent overlay review required; no paid calls or deployment authorized by this preparation.",
+  "reservationMicrousd": 11715000,
+  "userCapMicrousd": 11720000,
+  "pricingBasis": "Preserve the established parent-reviewed USD5.8575 reservation per maximum provider call. No smaller bound, caching discount or refund assumed.",
+  "bounds": {
+    "generationCalls": 2,
+    "countCalls": 0,
+    "rounds": 2,
+    "nativeToolCalls": 1,
+    "sdkRetries": 0,
+    "outputsPerCall": 5000,
+    "contextPerCall": 1050000
+  },
+  "inputCaveat": "The existing guard context ceiling is not an exact pre-call token measurement. Disabled truncation and model context limits remain; no paid count endpoint or lower token-based reservation is introduced. Returned usage exceeding the envelope stops acceptance.",
+  "manualDeploymentOverridesAfterApprovalOnly": {
+    "framework": null,
+    "buildCommand": "node tests/diagnostics/hiring-preview/run.mjs --execute-reserved .hiring-preview-private/reservation.json",
+    "outputDirectory": ".hiring-preview-empty"
+  },
+  "steps": [
+    "Review the exact overlay commit/diff and offline tests. Confirm application files match application-files.json and c682a5b. Do not merge overlay or modify production settings.",
+    "Parent records the full USD11.715 reservation in the authoritative ledger. Supply its receipt SHA, run/reservation UUIDs, tested model receipt SHA, project ID, exact overlay SHA, and a launch window no longer than one hour. Set parentReserved and overlayReviewed only after both approvals.",
+    "Generate --prepare offline, arm its exact manifest bytes after review, and bind their SHA through HIRING_PREVIEW_MANIFEST_SHA256. Bind HIRING_PREVIEW_RUN_ID and Vercel Preview/project/branch/commit/deployment identities. Keep credentials in the existing protected Preview environment; never print/export them.",
+    "Use one explicitly supervised manual Preview deployment/build with Node24 and locked dependencies. The standard package build is unchanged and Git deployment is disabled for this diagnostic branch. Supply the armed manifest outside the repository; the deployment-local build command must point to its actual approved path.",
+    "Run once. The blank static output has no application route, DB access or model endpoint. Stop on ambiguous build completion, guard failure, provider failure or missing receipts. Do not redeploy/retry/reclaim unused calls; inspect the same deployment and retain the whole reservation.",
+    "Reassemble and verify private chunked receipts. Independently assess the actual recommendation, amounts, units, provenance and uncertainty; technical completion is not semantic acceptance.",
+    "Replay only the captured validated actual reply into the c682a5b offline browser fixture. Block all further provider/external traffic; select six external hires, Review/Pin/reload, verify USD924000 partial cash, USD76000 remaining before unknown costs, ten required roles, six external FTE and unresolved four roles; compare saved receipt bytes and desktop/mobile screenshots. No additional model call."
+  ],
+  "limitsOfEvidence": [
+    "Prompt explicitly selects the six-external scenario; this tests extraction, native calculation, referenced synthesis and handoff, not spontaneous route selection or optimization.",
+    "Additional clarification/read/repair requests fail this strict fixture; ordinary four-round recovery is not tested.",
+    "Synthetic evidence has no company facts. No live DB, auth/RLS or grounding-source validation is performed.",
+    "Browser replay validates the actual model result handoff and persistence, not deployed authenticated browser transport.",
+    "Local exclusive claim and two-attempt counters do not enforce a global budget across separate builds/submissions. Parent ledger and one-shot operator control are mandatory.",
+    "No model outcome is guaranteed; invalid tools, incomplete output, wrong references or unsupported claims fail acceptance.",
+    "Goal-progress model instructions/tools use the existing enabled Home profile with no active goal or entry; instruction/tool/schema parity is tested offline against the actual route."
+  ],
+  "manifestDelivery": "After review and ledger recording, place the exact armed manifest at .hiring-preview-private/reservation.json in the one approved deployment upload only; do not commit, push or publish it. Verify its uploaded bytes/hash and Preview identity before launch. The existing executor must confirm protected upload/build support and existing project credentials. No manifest or deployment was prepared as armed here.",
+  "offlineVerificationCommands": [
+    "node --test tests/diagnostics/hiring-preview/guard.test.mjs",
+    "node tests/diagnostics/hiring-preview/run.mjs --prepare",
+    "PLAYWRIGHT_MODULE=<installed-playwright-module> node tests/diagnostics/hiring-preview/replay-browser.mjs <verified-completed-receipt.json>"
+  ]
+}
