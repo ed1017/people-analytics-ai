@@ -1,4 +1,5 @@
 'use client';
+import {AssumptionsDisclosure} from '@/components/assumptions-disclosure';
 import {useState} from 'react';
 import {calculateHiringBudget,hiringBudgetFields,type HiringBudgetInput,type HiringBudgetField} from '@/lib/hiring-budget';
 import type {HiringBudgetReview} from '@/lib/home-hiring-budget';
@@ -45,7 +46,7 @@ export function HomeHiringBudgetReview({review,onUpdate,disabled}:{review:Hiring
     <button className={button} disabled={disabled}>Update estimate</button>
    </form>
   </details>
-  <details><summary className="min-h-11 cursor-pointer py-2">Input provenance and calculation limits</summary><ul className="list-disc pl-5">{Object.entries(review.origins).map(([field,basis])=><li key={field}>{labels[field as HiringBudgetField]}: {basis.kind.replaceAll('-',' ')} — {basis.explanation}{basis.quote?` “${basis.quote}”`:''}</li>)}</ul>{result.limitations.map(line=><p key={line}>{line}</p>)}</details>
+  <AssumptionsDisclosure><ul className="list-disc pl-5">{Object.entries(review.origins).map(([field,basis])=><li key={field}>{labels[field as HiringBudgetField]}: {basis.kind.replaceAll('-',' ')} — {basis.explanation}{basis.quote?` “${basis.quote}”`:''}</li>)}</ul>{result.limitations.map(line=><p key={line}>{line}</p>)}</AssumptionsDisclosure>
   {error&&<p role="alert">{error}</p>}
   <button type="button" className={button} disabled={disabled} onClick={()=>apply(null)}>Clear hiring estimate</button>
  </section>;

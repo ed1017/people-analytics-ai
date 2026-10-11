@@ -1,3 +1,4 @@
+import {AssumptionsDisclosure} from './fixtures/assumptions-disclosure.mjs';
 /** Real React server render of the card; browser interaction is a separate check. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -10,10 +11,10 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import * as calculator from '../lib/hiring-budget.ts';
 import {editHiringBudget,editHiringBudgetLocally} from '../lib/home-hiring-budget.ts';
 import {solutionRequest} from './fixtures/home-solution-conversation.mjs';
-const require=createRequire(import.meta.url),module={exports:{}};
+const require=createRequire(import.meta.url),cardModule={exports:{}};
 const code=ts.transpileModule(readFileSync(new URL('../components/home-hiring-budget-review.tsx',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022}}).outputText;
-vm.runInNewContext(code,{module,exports:module.exports,require:name=>name==='@/lib/hiring-budget'?calculator:require(name)});
-const Card=module.exports.HomeHiringBudgetReview;
+vm.runInNewContext(code,{module:cardModule,exports:cardModule.exports,require:name=>name==='@/components/assumptions-disclosure'?{AssumptionsDisclosure}:name==='@/lib/hiring-budget'?calculator:require(name)});
+const Card=cardModule.exports.HomeHiringBudgetReview;
 const request=solutionRequest('Ten engineers within a budget of one million.'),basis={kind:'user-supplied',turnId:request.message.id,quote:request.message.text,explanation:'Fictional test interpretation.'};
 const review=editHiringBudget(request,'fixture:0',[{field:'hires',value:10,basis},{field:'budget',value:1000000,basis}]);
 const render=(value,disabled=false)=>renderToStaticMarkup(React.createElement(Card,{review:value,onUpdate(){},disabled}));

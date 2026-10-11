@@ -1,3 +1,4 @@
+import {AssumptionsDisclosure} from '@/components/assumptions-disclosure';
 import {ProjectionBacktestDetails} from '@/components/projection-backtest-details';
 import {SyntheticDomainPrediction} from '@/components/synthetic-domain-prediction';
 import {SyntheticDomainChartNotes} from '@/components/synthetic-domain-chart';
@@ -15,7 +16,7 @@ function DemoResults({domain,data}:{domain:SyntheticDemoDomain;data:typeof artif
  const d=data.domains[domain],copy=demoDomainCopy[domain],test=d.assessment.filter(s=>s.stage==='test'),training=d.assessment.filter(s=>s.stage==='training');
  return <>
   {d.status!=='predicted'?<p role="status">No simulated projection: {d.reasonCodes.join(', ')||'insufficient support'}.</p>:<SyntheticDomainPrediction domain={domain} data={data}/>}
-  <details><summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Details</summary><div className="space-y-2 break-words text-xs">
+  <AssumptionsDisclosure><div className="space-y-2 break-words text-xs">
   <p className="text-xs">Cutoff 30 Sep 2026 · History through {month(d.support.lastPeriod)} · Intervals unavailable.</p>
    <p>Fixed simulated company-wide population. Dashboard filters do not apply; these are not predictions for the recorded-data cohort. Operational forecasts are unavailable. All three existing methods are shown. Historical score order is not an operational recommendation.</p>
    {domain==='hiring'&&<p>Opening months, not hire months; 90-day follow-up for Nov–Dec extends into 2027.</p>}
@@ -30,6 +31,6 @@ function DemoResults({domain,data}:{domain:SyntheticDemoDomain;data:typeof artif
    <p>No person-level score, causal intervention effect, avoided-exit estimate, capacity gain, savings or ROI is supplied.</p>
    <a className="inline-block min-h-11 py-2 text-primary underline" target="_blank" rel="noreferrer" href={'https://github.com/ed1017/people-analytics-ai/blob/'+data.evidence.commit+'/docs/synthetic-domain-predictions-v1.md'}>Source methods and complete comparisons</a>
    <p>Report SHA-256: {data.evidence.reportSha256}</p>
-  </div></details>
+  </div></AssumptionsDisclosure>
  </>;
 }

@@ -8,6 +8,7 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import {createRequire} from 'node:module';
 import * as navigation from '../lib/chat-navigation.ts';
 import * as presentation from '../lib/home-answer-presentation.ts';
+import * as caveats from '../lib/chat-caveat-blocks.ts';
 import {exitMissingFieldsBullet} from './fixtures/exit-reason-packet.mjs';
 import {homeStarterGroups,homeGoalStarters} from '../lib/contextual-prompts.ts';
 import {homeTurnPurpose} from '../lib/home-conversation.ts';
@@ -17,7 +18,7 @@ const require=createRequire(import.meta.url);
 function component(file,name){
  const exports={},source=fs.readFileSync(new URL('../components/'+file,import.meta.url),'utf8');
  const js=ts.transpileModule(source,{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
- vm.runInNewContext(js,{exports,require:name=>name==='@/lib/chat-navigation'?navigation:name==='@/lib/home-answer-presentation'?presentation:require(name)});return exports[name];
+ vm.runInNewContext(js,{exports,require:name=>name==='@/lib/chat-caveat-blocks'?caveats:name.endsWith('/assumptions-disclosure')?{AssumptionsDisclosure:component('assumptions-disclosure.tsx','AssumptionsDisclosure')}:name==='@/lib/chat-navigation'?navigation:name==='@/lib/home-answer-presentation'?presentation:require(name)});return exports[name];
 }
 const ChatContent=component('chat-content.tsx','ChatContent'),PromptExamples=component('prompt-examples.tsx','PromptExamples');
 const render=(content,options={})=>renderToStaticMarkup(React.createElement(ChatContent,{content,...options}));
@@ -76,10 +77,10 @@ test('known standalone missing-fields inventory moves into collapsed detail whil
  const main='These are reported primary reasons, not proven causes.\n- Work-Life Balance: 244 respondents (12.5%). [S2]\n- No month-specific reason breakdown is supplied. [S2]';
  const content=main+'\n'+exitMissingFieldsBullet+'\n'+exitMissingFieldsBullet;
  const result=presentation.homeAnswerPresentation(content);assert.equal(result.answer.trim(),main);assert.equal(result.details.length,1);
- const html=render(content,{compact:true});assert.equal((html.match(/data-chat-item="true"/g)??[]).length,2);assert.match(html,/<details data-answer-evidence-details=/);assert.doesNotMatch(html,/<details[^>]* open/);
+ const html=render(content,{compact:true});assert.equal((html.match(/data-chat-item="true"/g)??[]).length,2);assert.match(html,/<details[^>]*data-answer-evidence-details=/);assert.doesNotMatch(html,/<details[^>]* open/);
  assert.ok(html.indexOf('244')<html.indexOf('<details'));assert.ok(html.indexOf('No month-specific')<html.indexOf('<details'));assert.ok(html.indexOf('stronger retention')>html.indexOf('<details'));
- assert.match(html,/<summary[^>]*>Evidence details<\/summary>/);assert.equal((html.match(/stronger retention/g)??[]).length,1);
- assert.doesNotMatch(render(content),/data-answer-evidence-details/);
+ assert.match(html,/<summary[^>]*>Assumptions &amp; limits<\/summary>/);assert.equal((html.match(/stronger retention/g)??[]).length,1);
+ assert.match(render(content),/data-answer-evidence-details/);
 });
 
 test('missing requested evidence, denominator differences, demo labels and substantive limitations never disappear',()=>{
@@ -113,3 +114,23 @@ test('bare, field-qualified, grouped and explicit citations navigate to the corr
 });
 
 test('calibrated hiring answer retains generated scope, count units and source distinction',()=>{const saved=homeForecastAnswer('Forecast hiring'),result=presentation.homeAnswerPresentation(saved);assert.match(result.answer,/Generated synthetic history/);assert.match(result.answer,/474/);assert.match(result.answer,/475/);assert.match(result.answer,/synthetic-ta-calibrated-v2/);assert.deepEqual(result.answer.split('\n').filter(l=>l.startsWith('|')),saved.split('\n').filter(l=>l.startsWith('|')));});
+
+test('explicit assumption headings preserve full Markdown and instructions without a model-prose disclosure',()=>{
+ const html=render('Answer remains visible.\n\n### Assumptions\n- The analysis covers permanent staff.\n- The dataset omits contractors.\nProceed with the plan.\nExport the result.\n\n### Next steps\nReview before saving.',{compact:true});
+ assert.doesNotMatch(html,/data-assumptions-disclosure/);
+ assert.match(html,/<ul[^>]*>[\s\S]*The analysis covers permanent staff/);
+ for(const text of ['The dataset omits contractors.','Proceed with the plan.','Export the result.','Review before saving.'])assert.ok(html.includes(text));
+});
+test('all labelled caveat content remains visible, including scope, coverage, exclusions and unknown wording',()=>{
+ for(const text of ['The analysis covers permanent staff.','The dataset omits contractors.','The population excludes agency staff and interns.','An unfamiliar qualifier has no recognised keywords.','This simulated scenario assumes 100 hires and 115 exits each month. The inputs are held steady for illustration.']){
+  const html=render('Figure: 9,910.\n\n**Important caveat:** '+text,{compact:true});
+  assert.match(html,/data-chat-caveat-qualifier="true"/);assert.ok(html.includes(text));assert.doesNotMatch(html,/<details/);
+ }
+});
+test('mixed critical qualifiers and incomplete streaming Markdown stay visible in full',()=>{
+ for(const text of ['Important caveat: 9,910 assumes 100 hires and 115 exits per month. Company-wide as of September 2026. Simulated scenario, not a trained forecast. Denominator: opening workforce. Partial costs; benefits excluded. Source unavailable. Review and confirm before saving.','**Important caveat: The analysis covers','**Important caveat:** The analysis *covers','Important caveat: The dataset omits','### Assumptions\nThe inputs are held [steady.']){
+  const html=render(text,{compact:true});assert.doesNotMatch(html,/<details/);
+  const visible=html.replace(/<[^>]*>/g,'').replaceAll('**','');
+  for(const phrase of text.replaceAll('**','').replace('### ','').split('\n'))assert.ok(visible.includes(phrase),phrase);
+ }
+});

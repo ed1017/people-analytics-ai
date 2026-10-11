@@ -81,5 +81,5 @@ test('Home instructions are a closed accessible dialog in server markup and the 
   assert.match(intro, /From question to action/);
   const guide = fs.readFileSync(new URL('../components/planning-guide.tsx', import.meta.url), 'utf8');
   assert.match(guide, /<details><summary[^>]*>See the full Planning sequence<\/summary>/);
-  assert.match(guide, /<details[^>]*><summary[^>]*>Limits to keep in mind<\/summary>/);
+  assert.match(guide, /<AssumptionsDisclosure>/);
 });

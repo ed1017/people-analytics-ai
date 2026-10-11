@@ -1,4 +1,5 @@
 "use client";
+import {AssumptionsDisclosure} from '@/components/assumptions-disclosure';
 import { datasetFetch } from "@/lib/dataset-client.mjs";
 
 
@@ -85,8 +86,7 @@ export function CompensationEvidence({ data }: { data: CompensationResponse }) {
         </table>
       </div>
     </div>
-    <details className="rounded-lg border p-4 text-sm">
-      <summary className="cursor-pointer font-medium">Source and limits</summary>
+    <AssumptionsDisclosure>
       <div className="mt-3 space-y-2 text-muted-foreground">
         <p>Source: <code>finance_current_summary</code>, the same demo aggregate view used by Workforce Cost. Its snapshot predicate is fixed to September 30, 2026; the view does not report when its data was refreshed.</p>
         <p>Cohort: snapshot rows grouped by business unit. Active-employment eligibility and employee-level known/missing cost counts are not supplied. Source sums can omit missing employee costs, so these are reported aggregates, not verified complete payroll totals.</p>
@@ -94,6 +94,6 @@ export function CompensationEvidence({ data }: { data: CompensationResponse }) {
         <p>Missing aggregate values remain unavailable. Cost per FTE is total reported cost divided by total reported FTE, not an average of business-unit ratios. Share uses the sum of all supplied business-unit costs and is unavailable if that total is missing or zero.</p>
         <p>Base pay, bonus, equity, salary bands, pay percentiles and market-pay evidence are not in this source. These aggregates do not support individual pay decisions or forecasts.</p>
       </div>
-    </details>
+    </AssumptionsDisclosure>
   </>;
 }

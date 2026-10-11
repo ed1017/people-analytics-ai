@@ -38,7 +38,7 @@ try {
    });
    const prefix=`${name} ${palette} ${domain}`;
    const panel=figure.locator('xpath=ancestor::section[1]'),details=panel.locator('details'),summary=details.locator('summary');
-   check(prefix+' compact disclosure defaults closed',await details.count()===1&&!await details.evaluate(n=>n.open)&&await summary.innerText()==='Details'&&await summary.evaluate(n=>n.getBoundingClientRect().height>=44));
+   check(prefix+' compact disclosure defaults closed',await details.count()===1&&!await details.evaluate(n=>n.open)&&await summary.innerText()==='Assumptions & limits'&&await summary.evaluate(n=>n.getBoundingClientRect().height>=44));
    check(prefix+' no repeated caveats outside Details',!(await panel.innerText()).match(/DEMO|Methods unselected|Filters excluded|Intervals unavailable|× means|Hover, focus/)&&await figure.getByText(/Simulated projections/).isVisible());
    check(prefix+' shorter chart keeps unscaled text',await figure.locator('svg[role=img]').evaluate(n=>n.getBoundingClientRect().height<=261));
    const summaryTable=panel.locator('table').first();
