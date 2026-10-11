@@ -705,3 +705,5 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .assumptions-disclosure .home-answer > [data-chat-heading] { font-size: 1rem; margin-block-start: .5rem; }
 
 .home-answer > [data-chat-caveat-qualifier], [data-chat-caveat-qualifier] { font-size: .875rem; line-height: 1.5; }
+.home-answer > [data-chat-caveat-qualifier], .home-answer li[data-chat-caveat-qualifier] { margin-block-start: .375rem; }
+.home-answer > [data-chat-caveat-qualifier]:first-child { margin-block-start: 0; }

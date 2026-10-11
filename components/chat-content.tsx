@@ -4,7 +4,7 @@ import {AssumptionsDisclosure} from "./assumptions-disclosure";
 import type { ReactNode } from "react";
 import type { AppPage } from "@/lib/types";
 import { getChatNavigationAction } from "@/lib/chat-navigation";
-import {chatCaveatBlocks} from '@/lib/chat-caveat-blocks';
+import {chatCaveatLineNumbers} from '@/lib/chat-caveat-blocks';
 import {homeAnswerPresentation} from '@/lib/home-answer-presentation';
 
 // Evidence IDs identify their own pages, including S2 exit feedback in Attrition.
@@ -127,10 +127,10 @@ export function ChatContent({
 }) {
   const references: string[] = [];
   const citationTargets = new Map<string,string>();
-  const labelled=collapseCaveats?chatCaveatBlocks(content):{answer:content,details:[],qualifiers:[]};
-  const known=collapseCaveats?homeAnswerPresentation(labelled.answer):{answer:labelled.answer,details:[]};
-  const presentation={answer:known.answer,details:[...known.details,...labelled.details]};
-  const qualifierLines=new Set(presentation.answer.trim().split('\n').flatMap((line,index)=>labelled.qualifiers.some(qualifier=>qualifier.trim()===line.trim())?[index]:[]));
+  // Only exact app-authored boilerplate enters a disclosure. Model prose is
+  // kept intact; explicit labels select typography, never semantic omissions.
+  const presentation=collapseCaveats?homeAnswerPresentation(content):{answer:content,details:[]};
+  const qualifierLines=new Set(chatCaveatLineNumbers(presentation.answer.trim()));
   const answer = presentation.answer.replace(/\(?\[[A-Z]+\d+\](?:[, ]+\[[A-Z]+\d+\])*\s+See\s+\[[^\]\n]+\]\(app:[a-z-]+\)\.?\)?/gi, reference => {
     const href = reference.match(/\]\((app:[a-z-]+)\)/)?.[1];
     if (!onNavigate || !href || !getChatNavigationAction(href)) return reference;

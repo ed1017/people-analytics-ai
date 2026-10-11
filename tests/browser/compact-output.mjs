@@ -29,10 +29,10 @@ try{for(const [mode,width] of [['wide',1920],['desktop',1366],['mobile',390],['n
  check(mode+' six month values unchanged',/9,985/.test(original)&&/9,910/.test(original)&&await table.locator('tbody tr').count()===6);
  const disclosures=page.locator('[data-assumptions-disclosure]');check(mode+' details initially collapsed',await disclosures.count()===5&&await disclosures.evaluateAll(nodes=>nodes.every(n=>!n.open)));
  const narrative=page.locator('.home-answer').first();
- check(mode+' labelled caveat keeps its numeric qualifier visible at 14px',await narrative.getByText(/This simulated scenario assumes 100 hires/).first().isVisible()&&await narrative.locator('[data-chat-caveat-qualifier]').evaluate(n=>getComputedStyle(n).fontSize==='14px'));
- check(mode+' labelled explanation is collapsed but ordinary prose remains',await narrative.getByText(/The inputs are held steady for illustration/).isHidden()&&await narrative.getByText('This unlabelled caveat sentence stays visible.',{exact:true}).isVisible());
- const narrativeSummary=narrative.locator('details > summary');await narrativeSummary.focus();await page.keyboard.press('Enter');
- check(mode+' keyboard reveals the full model-authored caveat',await narrative.getByText(/Individual departures can vary/).isVisible());await page.keyboard.press('Space');
+ check(mode+' labelled caveat keeps its numeric qualifier visible at 14px',await narrative.getByText(/This simulated scenario assumes 100 hires/).first().isVisible()&&await narrative.locator('[data-chat-caveat-qualifier]').evaluateAll(nodes=>nodes.every(n=>getComputedStyle(n).fontSize==='14px')));
+ check(mode+' full labelled explanation and ordinary prose remain visible',await narrative.getByText(/The inputs are held steady for illustration/).isVisible()&&await narrative.getByText('This unlabelled caveat sentence stays visible.',{exact:true}).isVisible());
+ for(const text of ['Important caveat: The analysis covers permanent staff.','Important caveat: The dataset omits contractors.','Important caveat: The population excludes agency staff and interns.'])check(mode+' scope and exclusions remain visible: '+text,await narrative.getByText(text,{exact:true}).isVisible());
+ check(mode+' labelled caveats use tighter 6px spacing',await narrative.locator('[data-chat-caveat-qualifier]').evaluateAll(nodes=>nodes.every(n=>getComputedStyle(n).marginTop==='6px')));
  const detail=chart.locator('details'),summary=detail.locator('summary'),full=await detail.textContent();
  check(mode+' accessible target and visible qualifiers',await summary.evaluate(n=>n.getBoundingClientRect().height>=44)&&await chart.getByText('Assumption-based scenario, not a trained forecast.',{exact:true}).isVisible());
  await summary.focus();await page.keyboard.press('Enter');check(mode+' Enter expands with focus retained',await detail.evaluate(n=>n.open)&&await summary.evaluate(n=>n===document.activeElement));

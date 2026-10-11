@@ -115,16 +115,22 @@ test('bare, field-qualified, grouped and explicit citations navigate to the corr
 
 test('calibrated hiring answer retains generated scope, count units and source distinction',()=>{const saved=homeForecastAnswer('Forecast hiring'),result=presentation.homeAnswerPresentation(saved);assert.match(result.answer,/Generated synthetic history/);assert.match(result.answer,/474/);assert.match(result.answer,/475/);assert.match(result.answer,/synthetic-ta-calibrated-v2/);assert.deepEqual(result.answer.split('\n').filter(l=>l.startsWith('|')),saved.split('\n').filter(l=>l.startsWith('|')));});
 
-test('explicit caveat disclosure preserves Markdown structure without reclassifying its contents',()=>{
- const html=render('Answer remains visible.\n\n### Assumptions\n- The inputs are held steady.\n- Variability can alter the outcome.\n\n### Next steps\nReview before saving.',{compact:true});
- assert.equal((html.match(/data-assumptions-disclosure=/g)??[]).length,1);
- assert.match(html,/<details[^>]*>[\s\S]*<ul[^>]*>[\s\S]*The inputs are held steady/);
- assert.ok(html.indexOf('Review before saving')<html.indexOf('<details'));
- assert.doesNotMatch(html,/<details[^>]* open/);
+test('explicit assumption headings preserve full Markdown and instructions without a model-prose disclosure',()=>{
+ const html=render('Answer remains visible.\n\n### Assumptions\n- The analysis covers permanent staff.\n- The dataset omits contractors.\nProceed with the plan.\nExport the result.\n\n### Next steps\nReview before saving.',{compact:true});
+ assert.doesNotMatch(html,/data-assumptions-disclosure/);
+ assert.match(html,/<ul[^>]*>[\s\S]*The analysis covers permanent staff/);
+ for(const text of ['The dataset omits contractors.','Proceed with the plan.','Export the result.','Review before saving.'])assert.ok(html.includes(text));
 });
-test('labelled numeric qualifiers remain inline while only explanatory text collapses',()=>{
- const html=render('Figure: 9,910.\n\n**Important caveat:** This simulated scenario assumes 100 hires and 115 exits each month. The inputs are held steady for illustration.',{compact:true});
- const [inline,expanded]=html.split('<details');
- assert.match(inline,/data-chat-caveat-qualifier="true"/);assert.match(inline,/100 hires and 115 exits each month/);assert.doesNotMatch(inline,/held steady for illustration/);
- assert.match(expanded,/100 hires and 115 exits each month/);assert.match(expanded,/held steady for illustration/);
+test('all labelled caveat content remains visible, including scope, coverage, exclusions and unknown wording',()=>{
+ for(const text of ['The analysis covers permanent staff.','The dataset omits contractors.','The population excludes agency staff and interns.','An unfamiliar qualifier has no recognised keywords.','This simulated scenario assumes 100 hires and 115 exits each month. The inputs are held steady for illustration.']){
+  const html=render('Figure: 9,910.\n\n**Important caveat:** '+text,{compact:true});
+  assert.match(html,/data-chat-caveat-qualifier="true"/);assert.ok(html.includes(text));assert.doesNotMatch(html,/<details/);
+ }
+});
+test('mixed critical qualifiers and incomplete streaming Markdown stay visible in full',()=>{
+ for(const text of ['Important caveat: 9,910 assumes 100 hires and 115 exits per month. Company-wide as of September 2026. Simulated scenario, not a trained forecast. Denominator: opening workforce. Partial costs; benefits excluded. Source unavailable. Review and confirm before saving.','**Important caveat: The analysis covers','**Important caveat:** The analysis *covers','Important caveat: The dataset omits','### Assumptions\nThe inputs are held [steady.']){
+  const html=render(text,{compact:true});assert.doesNotMatch(html,/<details/);
+  const visible=html.replace(/<[^>]*>/g,'').replaceAll('**','');
+  for(const phrase of text.replaceAll('**','').replace('### ','').split('\n'))assert.ok(visible.includes(phrase),phrase);
+ }
 });
