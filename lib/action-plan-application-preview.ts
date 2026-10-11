@@ -75,7 +75,7 @@ function bounded(value: unknown, limit: number) {
 }
 const reviewed = (assumption: Assumption<unknown>) => assumption.value !== null && ['user-entered', 'adopted'].includes(assumption.kind);
 const origin = (sourcePath: string, assumption: Assumption<unknown>): ApplicationProvenance[] =>
-  assumption.kind === 'unknown' ? [] : [{sourcePath, kind: assumption.kind, basis: assumption.basis}];
+  assumption.kind === 'unknown' ? [] : [{sourcePath, kind: assumption.kind === 'model-proposed' ? 'illustrative' : assumption.kind, basis: assumption.basis}];
 export const actionPlanQuoteKey = (quote: DevelopmentQuote) => canonical(quote);
 export const actionPlanDevelopmentScopeKey = (draft: BundleDraft) => canonical([draft.inputs.scope.population.value, draft.inputs.scope.businessUnit.value,
   draft.inputs.scope.jobProfile.value, draft.inputs.scope.startMonth.value, draft.inputs.scope.months.value, draft.inputs.scope.currency]);

@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {proposedPlanningEstimate} from './home-proposed-planning.ts';
 import type {BundleDraft,BundleResult} from './home-bundle-reconciliation';
 import type {PlanAlternative} from './home-plan-alternatives';
 import type {SolutionEvaluation,SolutionRequest} from './home-solution-conversation';
@@ -13,5 +15,5 @@ export function solutionPlanView(plan:PlanAlternative){return {...plan,draft:sol
 /** Source IDs/revisions and bindings remain visible; exact equality keys remain server-owned. */
 export function solutionEvaluationView(request:SolutionRequest,item:SolutionEvaluation){
  let sourcesCurrent=true;try{assertSourcesCurrent(request.catalog,item.sourceKeys);}catch{sourcesCurrent=false;}
- return {...omit(item,['sourceKeys','draft','result']),sourcesCurrent,draft:item.draft?solutionDraftView(item.draft):null,result:item.result?solutionResultView(item.result):null};
+ return {...omit(item,['sourceKeys','draft','result']),sourcesCurrent,planningEstimate:item.draft?proposedPlanningEstimate(item.draft):null,draft:item.draft?solutionDraftView(item.draft):null,result:item.result?solutionResultView(item.result):null};
 }

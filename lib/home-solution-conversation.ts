@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {proposedPlanningEstimate,proposedPlanningInputs,type PlanningInput} from './home-proposed-planning.ts';
 // @ts-expect-error Native Node tests share application source.
 import {readHiringBudgetReview,type HiringBudgetReview} from './home-hiring-budget.ts';
 // @ts-expect-error Native Node tests share application source.
@@ -204,12 +206,20 @@ function readQuantity(draft:BundleDraft,field:SolutionField,target:string|null):
 function quantityValue(request:SolutionRequest,q:SolutionQuantity):Assumption<number|string|boolean>{
  if(q.unit!==unitFor(q.field))fail(`${q.field} uses ${unitFor(q.field)}; ${q.unit} needs a separate dimensional interpretation.`);
  if(q.kind==='unknown')return unknownAssumption();
+ if(q.kind==='model-proposed'){
+  const limits:Partial<Record<SolutionField,[number,number]>>={horizon_months:[1,3],participants:[1,20],hours_per_participant:[.5,8],coordination_hours:[1,24],cash:[0,2000]};
+  const range=limits[q.field];
+  if(!range||q.turnId!==null||q.source!==null||q.factor!==null||q.text!==null||q.number===null||q.number<range[0]||q.number>range[1]||['participants','horizon_months'].includes(q.field)&&!Number.isInteger(q.number))fail('Use a bounded model-proposed pilot assumption without user or source provenance.');
+  if(!['participants','cash'].includes(q.field)&&q.target!==null)fail('This proposed assumption has no activity target.');
+  return {value:q.number,kind:'model-proposed',basis:`Model-proposed planning choice · unconfirmed: ${q.interpretation}`.slice(0,240)};
+ }
  if((q.kind==='literal'||q.kind==='scale')&&!solutionUserTurns(request).some(turn=>turn.id===q.turnId))fail('A new value or relative change must reference the user turn that requested it.');
  let value:number|string|boolean|null;
  if(q.kind==='reference'||q.kind==='scale'){
   if(!q.source||unitFor(q.source.field)!==q.unit)fail('A relative/reference quantity must use an actual value with the same units.');
   const prior=readQuantity(source(request,q.source).draft,q.source.field,q.source.target);
-  if(q.kind==='reference')return prior.value===null?unknownAssumption():{value:prior.value,kind:'illustrative',basis:'Unconfirmed application of a checked source value to the proposed target.'};
+  if(prior.kind==='model-proposed'&&q.field!==q.source.field)fail('A model-proposed assumption cannot supply a different planning field.');
+  if(q.kind==='reference')return prior.value===null?unknownAssumption():{value:prior.value,kind:prior.kind==='model-proposed'?'model-proposed':'illustrative',basis:`Unconfirmed application of a checked ${prior.kind} source value; not an observed fact.`};
   if(q.factor===null||prior.value!==null&&typeof prior.value!=='number')fail('A relative numeric change needs a numeric reference and explicit factor.');
   value=prior.value===null?null:(prior.value as number)*q.factor;
  }else value=q.unit==='boolean'?q.text==='true'?true:q.text==='false'?false:fail('Review an explicit true/false interpretation.'):['text','YYYY-MM','YYYY-MM-DD'].includes(q.unit)?q.text:q.number;
@@ -239,7 +249,12 @@ function applyQuantity(input:BundleInputs,q:SolutionQuantity,value:Assumption<nu
   case 'cash':{
    let row=input.expenses.find(item=>item.id===q.target&&item.kind==='cash');
    if(!row){const links=input.expenseLinks.filter(item=>item.componentIds.length===1&&item.componentIds[0]===q.target);const rows=input.expenses.filter(item=>item.kind==='cash'&&links.some(link=>link.expenseId===item.id));if(rows.length!==1)fail('Name the exact cash item or an activity with one allowance.');row=rows[0];}
-   row.amount=number;break;
+   row.amount=number;
+   if(q.kind==='model-proposed'){
+    if(row.months.value!==null&&row.months.value!==1)fail('A proposed one-time allowance cannot replace an existing recurring cost basis.');
+    if(row.months.value===null)row.months={value:1,kind:'model-proposed',basis:'One-time allowance for the entire proposed pilot; funding date and availability remain unknown.'};
+   }
+   break;
   }
   case 'start_month':input.scope.startMonth=string;break;
   case 'horizon_months':input.scope.months=number;break;
@@ -268,9 +283,24 @@ function applyParameterQuantity(input:BundleInputs,q:SolutionQuantity,value:Assu
   if(input.groups.length!==1||input.memberships.some(row=>row.complete.value!==true))input.groupsDisjoint=unknownAssumption();
  }
 }
+function readQuantityForProposal(input:BundleInputs,field:SolutionField,target:string|null):unknown{
+ switch(field){
+  case 'horizon_months':return input.scope.months.value;
+  case 'hours_per_participant':return input.deliveryEstimate?.hoursPerParticipant.value??null;
+  case 'coordination_hours':return input.deliveryEstimate?.coordinationHours.value??null;
+  case 'participants':return input.memberships.filter(row=>row.componentId===target).flatMap(row=>row.groupIds).map(id=>input.groups.find(group=>group.id===id)?.count.value).find(value=>value!=null)??null;
+  case 'cash':return input.expenses.filter(row=>row.id===target||input.expenseLinks.some(link=>link.expenseId===row.id&&link.componentIds.includes(target??''))).find(row=>row.amount.value!==null)?.amount.value??null;
+  default:return null;
+ }
+}
 function applyReviewedInputs(request:SolutionRequest,evaluation:SolutionEvaluation,input:BundleInputs,quantitiesToApply:SolutionQuantity[],constraints:SolutionConstraint[],activities:string[],parameterOnly=false){
   const quantities=new Set<string>();
-  for(const q of quantitiesToApply){const key=JSON.stringify([q.field,q.target]);if(quantities.has(key))fail('Review one normalized value for each assumption.');quantities.add(key);const value=quantityValue(request,q);(parameterOnly?applyParameterQuantity:applyQuantity)(input,q,value,activities);evaluation.interpretations.push(`${q.field}${q.target?` (${q.target})`:''}: ${value.value??'Unknown'} ${q.unit}. ${q.interpretation}${q.source?` Source: ${q.source.kind} ${q.source.id} revision ${q.source.revision}; factor ${q.factor??1}.`:''}`);}
+  for(const q of quantitiesToApply){
+   if(q.kind==='model-proposed'){
+    const existing=q.field==='participants'&&q.target==='all'?activities.map(target=>readQuantityForProposal(input,q.field,target)): [readQuantityForProposal(input,q.field,q.target)];
+    if(existing.some(value=>value!==null))fail('A model-proposed assumption cannot replace an existing input. Use an explicit reviewed edit.');
+   }
+   const key=JSON.stringify([q.field,q.target]);if(quantities.has(key))fail('Review one normalized value for each assumption.');quantities.add(key);const value=quantityValue(request,q);(parameterOnly?applyParameterQuantity:applyQuantity)(input,q,value,activities);evaluation.interpretations.push(`${q.field}${q.target?` (${q.target})`:''}: ${value.value??'Unknown'} ${q.unit}. ${q.interpretation}${q.source?` Source: ${q.source.kind} ${q.source.id} revision ${q.source.revision}; factor ${q.factor??1}.`:''}`);}
   for(const constraint of constraints){
    if(constraint.action==='remove'){
     evaluation.interpretations.push(`Removed ${constraint.field} constraint, from user turn ${constraint.turnId}.`);
@@ -290,7 +320,9 @@ function finishEvaluation(request:SolutionRequest,evaluation:SolutionEvaluation,
   assertSolutionParticipationProvenance(request,evaluation.candidate,draft);evaluation.provenanceVersion=solutionProvenanceVersion;
   const result=reconcileBundle(draft);evaluation.draft=draft;evaluation.result=result;evaluation.issues=[...result.issues];
   if(evaluation.result.budget?.status==='over')evaluation.blocking.push('Known cash exceeds the current cash ceiling. Refine the proposal or correct the constraint before saving.');
-  const hours=evaluation.result.deliveryEstimate?.hours??null,maxHours=constraints.find(item=>item.field==='max_hours'&&item.action==='set')?.number;
+  const planning=proposedPlanningEstimate(draft);
+  if(planning&&input.budget?.amount.value!=null&&(planning.cash??Math.max(0,...planning.cashItems.map(row=>row.amount??0)))>input.budget.amount.value)evaluation.blocking.push('Listed pilot allowances exceed the current cash ceiling.');
+  const hours=planning?.hours?.max??evaluation.result.deliveryEstimate?.hours??null,maxHours=constraints.find(item=>item.field==='max_hours'&&item.action==='set')?.number;
   if(maxHours!==undefined&&maxHours!==null&&hours!==null&&hours>maxHours)evaluation.blocking.push(`Calculated ${hours} staff hours exceeds the current ${maxHours}-hour limit.`);
   const start=input.scope.startMonth.value,months=input.scope.months.value;
   if(start&&months){const [year,month]=start.split('-').map(Number),end=new Date(Date.UTC(year,month-1+months,0)).toISOString().slice(0,10);if(input.timing.some(row=>row.start.value&&row.start.value<start+'-01'||row.finish.value&&row.finish.value>end))evaluation.blocking.push('Activity dates fall outside the current planning horizon.');}
@@ -318,6 +350,22 @@ export async function evaluateSolutionParameterEdit(request:SolutionRequest,edit
   finishEvaluation(request,evaluation,draft,constraints);
  }catch(error){evaluation.blocking.push(error instanceof Error?error.message:'The parameter edit could not be calculated.');}
  return evaluation;
+}
+
+export type PlanningInputChange={field:PlanningInput['field'];target:string|null;value:number|null};
+/** Explicit local review edit; no model or source fact is fabricated by this control. */
+export async function editSolutionPlanningInputs(request:SolutionRequest,item:SolutionEvaluation,changes:PlanningInputChange[]){
+ if(!item.draft||!same(request.state.working.filter(row=>row.id===item.id).at(-1),item)||!same(item.constraints,request.state.constraints))fail('The proposal changed. Review the current revision before editing.');
+ const allowed=proposedPlanningInputs(item.draft);
+ const quantities=changes.map(change=>{
+  const row=allowed.find(row=>row.field===change.field&&row.target===change.target);
+  if(!row||change.value!==null&&(!Number.isFinite(change.value)||change.value<0))fail('Review a valid planning input.');
+  return {field:change.field,target:change.target,unit:row.unit,kind:change.value===null?'unknown' as const:'literal' as const,number:change.value,text:null,source:null,factor:null,turnId:request.message.id,interpretation:'Value entered in the planning assumptions editor; an unverified user planning input.'};
+ });
+ if(!quantities.length)fail('Change an assumption before recalculating.');
+ const horizon=changes.find(change=>change.field==='horizon_months');
+ const constraints=horizon&&request.state.constraints.some(row=>row.field==='horizon_months')?mergeSolutionConstraints(request,request.state.constraints,[{action:horizon.value===null?'remove':'set',field:'horizon_months',number:horizon.value,text:null,unit:'months',turnId:request.message.id}]):request.state.constraints;
+ return evaluateSolutionParameterEdit(request,{id:item.id,source:{kind:'working',id:item.id,revision:item.revision},quantities},constraints);
 }
 
 export async function evaluateSolutionCandidate(request:SolutionRequest,candidate:SolutionCandidate,constraints:SolutionConstraint[]):Promise<SolutionEvaluation>{
