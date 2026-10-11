@@ -27,7 +27,8 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
   const body=req.postDataJSON();requests.push(body);if(body.message.text.startsWith('Offline failure:'))return route.fulfill({status:body.message.text.includes('deadline')?503:422,json:{error:'Synthetic request failure; previous work is retained.',diagnostic:body.message.text.includes('deadline')?'conversation_deadline':'response_validation'}});const c=proposedPilot(body.message.text==='Recommend again'?'renewed-pilot':'manager-pilot',body.message.id);
   const changed=final('Use the updated cash ceiling.',[]);changed.constraintUpdates=[{action:'set',field:'budget_usd',number:1000,text:null,unit:'USD',turnId:body.message.id}];
   const response=final('The evidence cannot identify the weakest teams.',[c.id]);response.answer={findings:'The evidence cannot identify the weakest teams.',decisionRationale:'A limited trial tests the workload hypothesis before expansion.',caveats:['Availability remains unverified; no improvement is guaranteed.']};
-  const runtime=fixtureRuntime(body.message.text==='Change constraint'?[changed]:body.message.text==='Explain evidence only'?[final('No team ranking can be established from this evidence. No new plan is proposed.')]:[evaluate(c),response]);
+  const alternative=proposedPilot('alternative',body.message.id);alternative.name='Alternative pilot';
+  const runtime=fixtureRuntime(body.message.text==='Compare alternatives'?[evaluate(c),evaluate(alternative),final('Compare the two unconfirmed pilots.',[c.id,alternative.id])]:body.message.text==='Change constraint'?[changed]:body.message.text==='Explain evidence only'?[final('No team ranking can be established from this evidence. No new plan is proposed.')]:[evaluate(c),response]);
   const reply=await converseSolutions(body,runtime,new AbortController().signal);assert.equal(runtime.reads,0);return route.fulfill({json:reply});
  }if(url.pathname.startsWith('/api/'))return route.fulfill({json:{overview:{headcount:100,fte:100,open_positions:3,snapshot_date:'2026-09-30'},trend:[]}});external++;return route.abort();});
  await page.goto(base);await dismissHomeOnboarding(page);
@@ -39,6 +40,9 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  check('one authoritative plan and visible unconfirmed label',await card().count()===1&&await card().getByText('Model-proposed planning assumptions · unconfirmed',{exact:true}).isVisible());
  const summary=()=>card().getByRole('region',{name:'Action Plan quick summary',exact:true});
  check('conditional cash, duration, people and labor time are readable',await summary().getByText('$500',{exact:true}).isVisible()&&await summary().getByText('2 months',{exact:true}).isVisible()&&await summary().getByText('10 people',{exact:true}).isVisible()&&await summary().getByText('Labor time: 28 hours',{exact:true}).isVisible());
+ check('goal precedes metrics and optional plan details start collapsed',await summary().evaluate(node=>Boolean(node.compareDocumentPosition([...node.parentElement.children].find(child=>child.textContent.startsWith('Goal:')))&Node.DOCUMENT_POSITION_PRECEDING))&&await card().getByText('Plan details',{exact:true}).evaluate(node=>!node.parentElement.open));
+ check('accountability remains visible without invented values',await card().getByText(/Suggested owners · unconfirmed:/).isVisible()&&await card().getByText(/Baseline: Unknown; Target: Unknown/).isVisible()&&await card().getByText(/Confirm owner, baseline, target and review date/).isVisible());
+ await card().getByText('Plan details',{exact:true}).click();check('optional steps can be reviewed',await card().getByText('Invite volunteers for manager check-ins, review workload friction and document follow-up actions.',{exact:true}).isVisible());await card().getByText('Plan details',{exact:true}).click();
  check('labor price and actual availability remain unknown',await summary().getByText('Labor cost: Not calculated',{exact:true}).isVisible()&&await summary().getByText('Availability and membership unconfirmed.',{exact:true}).isVisible());
  await summary().scrollIntoViewIfNeeded();await page.screenshot({path:path.join(output,mode+'-proposal.png')});
  await card().getByText('Edit planning assumptions',{exact:true}).click();const calls=requests.length;
@@ -83,6 +87,12 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  await card().getByRole('button',{name:'Discard input changes',exact:true}).click();await pin().click();await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key)).payload.goals.activeId,DECISIONS_STORAGE_KEY);
  const bounded=await readState(),boundedPlan=bounded.workspaces[bounded.goals.activeId].fields.homePlanAlternativesV1.plans[0];check('history-limit rejection leaves prior proposal savable',boundedPlan.draft.inputs.groups[0].count.value===21);
  await page.reload();await card().waitFor();check('history-limited saved proposal reloads',await card().getByRole('button',{name:/Pinned Action Plan/}).isDisabled()&&await summary().getByText('21 people',{exact:true}).isVisible());
+ await page.evaluate(()=>localStorage.clear());await page.reload();await dismissHomeOnboarding(page);await send('Compare alternatives');await card().waitFor();
+ const alternatives=review.getByText('Alternative Action Plans (1)',{exact:true});
+ check('one recommendation is expanded while alternatives remain optional',await card().count()===1&&await alternatives.evaluate(node=>!node.parentElement.open));
+ await page.getByRole('button',{name:'Review 2: Alternative pilot',exact:true}).click();
+ check('jump link opens the alternative and focuses its actual review card',await alternatives.evaluate(node=>node.parentElement.open)&&await page.getByRole('article',{name:'Working proposal: Alternative pilot',exact:true}).evaluate(node=>document.activeElement===node));
+ await card().scrollIntoViewIfNeeded();await page.screenshot({path:path.join(output,mode+'-compact-review.png')});
  check('no overflow, runtime errors or external traffic',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&external===0);await context.close();
 }}finally{await browser.close()}
 await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({checks},null,2));console.log(JSON.stringify({checks:checks.length,output}));
