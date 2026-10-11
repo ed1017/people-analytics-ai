@@ -17,7 +17,7 @@ const require=createRequire(import.meta.url);
 function component(file,name){
  const exports={},source=fs.readFileSync(new URL('../components/'+file,import.meta.url),'utf8');
  const js=ts.transpileModule(source,{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
- vm.runInNewContext(js,{exports,require:name=>name==='@/lib/chat-navigation'?navigation:name==='@/lib/home-answer-presentation'?presentation:require(name)});return exports[name];
+ vm.runInNewContext(js,{exports,require:name=>name.endsWith('/assumptions-disclosure')?{AssumptionsDisclosure:component('assumptions-disclosure.tsx','AssumptionsDisclosure')}:name==='@/lib/chat-navigation'?navigation:name==='@/lib/home-answer-presentation'?presentation:require(name)});return exports[name];
 }
 const ChatContent=component('chat-content.tsx','ChatContent'),PromptExamples=component('prompt-examples.tsx','PromptExamples');
 const render=(content,options={})=>renderToStaticMarkup(React.createElement(ChatContent,{content,...options}));
@@ -76,10 +76,10 @@ test('known standalone missing-fields inventory moves into collapsed detail whil
  const main='These are reported primary reasons, not proven causes.\n- Work-Life Balance: 244 respondents (12.5%). [S2]\n- No month-specific reason breakdown is supplied. [S2]';
  const content=main+'\n'+exitMissingFieldsBullet+'\n'+exitMissingFieldsBullet;
  const result=presentation.homeAnswerPresentation(content);assert.equal(result.answer.trim(),main);assert.equal(result.details.length,1);
- const html=render(content,{compact:true});assert.equal((html.match(/data-chat-item="true"/g)??[]).length,2);assert.match(html,/<details data-answer-evidence-details=/);assert.doesNotMatch(html,/<details[^>]* open/);
+ const html=render(content,{compact:true});assert.equal((html.match(/data-chat-item="true"/g)??[]).length,2);assert.match(html,/<details[^>]*data-answer-evidence-details=/);assert.doesNotMatch(html,/<details[^>]* open/);
  assert.ok(html.indexOf('244')<html.indexOf('<details'));assert.ok(html.indexOf('No month-specific')<html.indexOf('<details'));assert.ok(html.indexOf('stronger retention')>html.indexOf('<details'));
- assert.match(html,/<summary[^>]*>Evidence details<\/summary>/);assert.equal((html.match(/stronger retention/g)??[]).length,1);
- assert.doesNotMatch(render(content),/data-answer-evidence-details/);
+ assert.match(html,/<summary[^>]*>Assumptions &amp; limits<\/summary>/);assert.equal((html.match(/stronger retention/g)??[]).length,1);
+ assert.match(render(content),/data-answer-evidence-details/);
 });
 
 test('missing requested evidence, denominator differences, demo labels and substantive limitations never disappear',()=>{

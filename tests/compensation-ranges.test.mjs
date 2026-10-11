@@ -1,3 +1,4 @@
+import {AssumptionsDisclosure} from './fixtures/assumptions-disclosure.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -71,7 +72,7 @@ test('compact graph marks actual means, keeps a 100% reference, and hides suppre
   const file=new URL('../components/compensation-job-ranges.tsx',import.meta.url);
   const js=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
   const exports={}, require=createRequire(import.meta.url);
-  vm.runInNewContext(js,{exports,require:name=>name==='@/lib/compensation-ranges'?rangeModule:name==='@/lib/compensation-release'?releaseModule:require(name)});
+  vm.runInNewContext(js,{exports,require:name=>name==='@/components/assumptions-disclosure'?{AssumptionsDisclosure}:name==='@/lib/compensation-ranges'?rangeModule:name==='@/lib/compensation-release'?releaseModule:require(name)});
   const render=result=>renderToStaticMarkup(React.createElement(exports.JobCompaGraph,{result}));
   assert.match(render({status:'published',meanPct:105}),/105.0%/);
   assert.match(render({status:'published',meanPct:105}),/<circle/);

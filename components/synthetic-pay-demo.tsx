@@ -1,4 +1,5 @@
 'use client';
+import {AssumptionsDisclosure} from '@/components/assumptions-disclosure';
 import {useId,useState} from 'react';
 import artifact from '@/lib/data/synthetic-pay-demo-v1.json';
 import {resolveSyntheticPayDemo,selectSyntheticPayCohort,type SyntheticPayDemo} from '@/lib/synthetic-pay-demo';
@@ -34,7 +35,7 @@ function PayResults({data}:{data:SyntheticPayDemo}){
    <PayQuartiles q1={metrics.q1} median={metrics.median} q3={metrics.q3} mean={metrics.mean}/>
    <p className="text-xs">Invented range midpoint: {usd(metrics.rangeMidpoint)}. These figures are not a pay-equity finding or a pay recommendation.</p>
   </div>}
-  <details className="border-t pt-2 text-sm"><summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Details: definitions, coverage and limits</summary><div className="space-y-2 text-xs leading-relaxed text-muted-foreground">
+  <AssumptionsDisclosure><div className="space-y-2 text-xs leading-relaxed text-muted-foreground">
    <p>{data.definitions.population} The dataset is independent of the workforce-cost source, dashboard filters, selected goal and BLS occupation references. No internal role is matched to a BLS occupation.</p>
    <p>Eligibility requires a unique active salaried synthetic record, positive finite annual contracted base pay, FTE greater than zero and no more than one, and a matching job, level, location, USD currency, base-pay basis and 30 September 2026 range date. Missing or incompatible inputs are excluded, never treated as zero pay. No FX conversion or salary annualization is performed.</p>
    <p>Compa-ratio = 100 × sum(annual contracted base pay ÷ FTE) ÷ sum(matching annual full-time base-pay range midpoint). All records in this fixed cohort share the same qualified band. Each eligible person contributes one full-time-normalized pay and midpoint; this is not FTE-weighted payroll cost or an undefined average of percentages. A ratio of 100% means pay equals the matching midpoint. The midpoint is invented company-demo policy, never a BLS median.</p>
@@ -43,7 +44,7 @@ function PayResults({data}:{data:SyntheticPayDemo}){
    <p>{data.definitions.interpretation}</p>
    <p>Reproducible offline dataset {data.dataset} · seed {data.seed}. Only aggregate JSON is shipped; no synthetic record rows, real salaries, personal attributes or individual rankings are supplied.</p>
    <a className="inline-block min-h-11 py-2 text-primary underline" href="https://github.com/ed1017/people-analytics-ai/blob/101bfb37c4757400db221bf89b9df3ae290e2194/docs/synthetic-pay-demo-v1.md" target="_blank" rel="noreferrer">Synthetic pay methods and contract</a>
-  </div></details>
+  </div></AssumptionsDisclosure>
  </>;
 }
 function Metric({label,value,note}:{label:string;value:string;note:string}){return <div className="min-w-0 rounded border p-3"><dt className="text-xs">{label}</dt><dd className="mt-1 break-words text-xl font-semibold tabular-nums">{value}</dd><dd className="mt-1 text-xs text-muted-foreground">{note}</dd></div>}

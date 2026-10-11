@@ -1,4 +1,5 @@
 'use client';
+import {AssumptionsDisclosure} from '@/components/assumptions-disclosure';
 import { datasetFetch, datasetSession } from "@/lib/dataset-client.mjs";
 
 import {useEffect, useState} from 'react';
@@ -64,7 +65,7 @@ export function CompensationJobRanges({scope = defaultRangeScope}: {scope?: Rang
     <p className="text-xs text-muted-foreground">Top filters: {scope.org === 'all' ? 'All business units' : scope.org} · {scope.level === 'all' ? 'All levels' : scope.level} · {scope.country === 'all' ? 'Global range assumption' : `${scope.country} range assumption`}. Country selects a policy assumption; filtered pay analysis is not released.</p>
     <p role="status" className="text-xs text-muted-foreground">{!company ? 'Compa-ratios are not released for these filters. No company results are substituted.' : release ? constructed ? 'Constructed demo pay and matching policy v2 · Withheld jobs remain protected · Exact counts are not published.' : 'USD-pay subset only · Partial job coverage · Exact counts are not published.' : 'Compa-ratio release unavailable. The demo pay convention is approved; aggregate publication is separately gated.'}</p>
     {failed ? <div role="alert" className="text-sm">Job range catalog unavailable. <button className="min-h-11 px-2 underline" onClick={() => {setFailed(false); setCatalog(null); setAttempt(value => value + 1);}}>Try again</button></div> : !catalog ? <p role="status" className="text-sm">Loading existing jobs…</p> : <JobRangeTable catalog={catalog} scope={scope} releaseRows={company && Boolean(catalog.constructedPolicy) === constructed ? release : null} />}
-    <details className="text-xs text-muted-foreground"><summary className="min-h-11 cursor-pointer py-3 font-medium">Range assumptions and calculation</summary>
+    <AssumptionsDisclosure>
       <div className="space-y-2">
         <p>All jobs come from the existing job catalog. At company scope, each job receives an assumed range at every level found in the existing position inventory; these are policy proposals, not observed employee combinations. Business-unit and level filters narrow catalog combinations, not employee pay records.</p>
         {catalog?.constructedPolicy ? <p>Displayed bands come from the sealed constructed range policy v2 used by these compa-ratios. Country assumptions are identical. They are invented policy values, not observed salaries or market benchmarks.</p> : <p>Midpoint = $50,000 + an arbitrary stable job-code seed (0–10 × $2,500) + catalog level rank × $10,000. Minimum and maximum are 80% and 120% of midpoint. The same USD assumptions apply in every location; there is no FX conversion or market calibration. No BLS wage is used.</p>}
@@ -73,7 +74,7 @@ export function CompensationJobRanges({scope = defaultRangeScope}: {scope?: Rang
         <p>The first-release proposal contains only company-wide job means. Fewer than five matches or 1–4 exclusions withhold the job; one additional job is withheld when needed for companion protection. Exact counts, salary sums, numerical coverage percentages, filter variants and time comparisons are not published. A withheld graph has no pay point.</p>
         <p>Range policy version: {catalog?.constructedPolicy ? 'constructed demo v2' : '1'}. Assumed demo ranges are not market benchmarks or pay recommendations. BLS references and company labor costs retain their separate scopes below.</p>
       </div>
-    </details>
+    </AssumptionsDisclosure>
   </section>;
 }
 

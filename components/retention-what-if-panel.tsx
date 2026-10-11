@@ -1,4 +1,5 @@
 "use client";
+import {AssumptionsDisclosure} from '@/components/assumptions-disclosure';
 import {useEffect,useRef,useState} from 'react';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
 import {calculateRetentionWhatIf,emptyRetentionInput,type RetentionField,type RetentionInput,type RetentionResult} from '@/lib/retention-what-if';
@@ -73,5 +74,5 @@ function RetentionSummary({result:r}:{result:RetentionResult}){return <div class
  <ul className="list-disc space-y-1 pl-5"><li>No intervention: {shown(r.noIntervention.expectedExits)} expected exits; $0 incremental program cost.</li><li>Program with no effect: {shown(r.programNoEffect.expectedExits)} expected exits; {money(r.programNoEffect.programCost)}.</li><li>Assumed effect range: {r.assumedRange.lowReduction.expectedExits===null?'Unknown':`${shown(r.assumedRange.highReduction.expectedExits)}–${shown(r.assumedRange.lowReduction.expectedExits)}`} expected exits; {money(r.programNoEffect.programCost)}.</li></ul>
  <p>These are baseline comparisons for one program, not three strategies. The no-effect case is not a worst-case guarantee; worsening effects, savings and ROI are not modeled.</p>
  {r.issues.length>0&&<div role="status"><p>Missing assumptions — outcomes may remain unknown:</p><ul className="list-disc pl-5">{r.issues.map(issue=><li key={issue.field}>{issue.message}</li>)}</ul></div>}
- <details><summary className="min-h-11 cursor-pointer py-2">Details: arithmetic and limitations</summary><p>Effect-active baseline: {shown(r.baselineActive)} expected exits. Fewer exits = effect-active expected exits × assumed relative reduction / 100. Program cost = setup + participants × one-time cost + monthly cost × funded months.</p><ul className="list-disc space-y-1 pl-5">{r.limitations.map(text=><li key={text}>{text}</li>)}</ul></details>
+ <AssumptionsDisclosure><p>Effect-active baseline: {shown(r.baselineActive)} expected exits. Fewer exits = effect-active expected exits × assumed relative reduction / 100. Program cost = setup + participants × one-time cost + monthly cost × funded months.</p><ul className="list-disc space-y-1 pl-5">{r.limitations.map(text=><li key={text}>{text}</li>)}</ul></AssumptionsDisclosure>
  </div>}

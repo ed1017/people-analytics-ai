@@ -694,3 +694,9 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 :has(> [data-guided-highlight="true"]) {
   align-items: flex-end;
 }
+
+/* Compact shared read-only output; controls and review confirmations keep their spacing. */
+.compact-data-table { width: auto; min-width: min(100%, 20rem); max-width: 100%; font-size: .875rem; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.compact-data-table :is(th, td) { padding: .375rem .75rem; }
+.assumptions-disclosure { color: var(--foreground); }
+.assumptions-disclosure :is(.text-xs, .text-sm, table) { font-size: .875rem; line-height: 1.5; }

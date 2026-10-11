@@ -1,4 +1,5 @@
 "use client";
+import {AssumptionsDisclosure} from '@/components/assumptions-disclosure';
 import {resolveProjectionBacktest} from '@/lib/projection-backtest';
 import {ProjectionBacktestDetails} from '@/components/projection-backtest-details';
 
@@ -95,8 +96,7 @@ export function CalibratedTaPanels({ data = taExtension, chartOnly = false }: { 
       <div className="mt-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4" aria-label="Mutually exclusive application outcomes">{Object.entries(data.outcomes).map(([label, n]) => <p key={label} className="rounded border px-2 py-1"><span className="block text-xs text-muted-foreground">{label.replaceAll('_', ' ')}</span><strong>{count(n)}</strong></p>)}</div>
     </section>}
 
-    <details className="rounded-lg border px-3 text-sm">
-      <summary className="flex min-h-11 cursor-pointer items-center font-medium focus-visible:outline-2">Details</summary>
+    <AssumptionsDisclosure>
       <div className="space-y-3 pb-3">
         <ProjectionBacktestDetails domain="hiring" data={data}/>
         <p><strong>Source:</strong> {data.version}. Generated synthetic aggregate chronology calibrated to the frozen company-wide snapshot audited {data.auditDate}; not repaired observed records. {data.scope}. Cutoff {data.cutoff}. Filters do not change this population. All generated events are assumed available on their event date.</p>
@@ -109,6 +109,6 @@ export function CalibratedTaPanels({ data = taExtension, chartOnly = false }: { 
         <div className="overflow-x-auto"><table className="w-full text-left text-xs"><caption className="py-2 text-left font-medium">Month-end history and application events · {data.version}</caption><thead><tr><th className="p-2">Month</th><th>Active</th><th>Coverage</th><th>Applied</th><th>Hired</th></tr></thead><tbody>{data.history.map((r, i) => <tr key={r.month} className="border-t"><th className="p-2 text-left font-normal">{month(r.month)}</th><td>{count(r.active)}</td><td>{r.complete ? 'Complete' : 'Missing'}</td><td>{count(data.monthly[i].applications)}</td><td>{count(data.monthly[i].hires)}</td></tr>)}</tbody></table></div>
         <div className="overflow-x-auto"><table className="w-full text-left text-xs"><caption className="py-2 text-left font-medium">Projected active requisitions</caption><thead><tr><th className="p-2">Month</th>{orderedMethods.map(m => <th key={m.key}>{m.label}</th>)}</tr></thead><tbody>{forecasts.map(r => <tr key={r.month} className="border-t"><th className="p-2 text-left font-normal">{month(r.month)}</th>{orderedMethods.map(m => <td key={m.key}>{count(r[m.key])}</td>)}</tr>)}</tbody></table></div>
       </div>
-    </details>
+    </AssumptionsDisclosure>
   </div>;
 }

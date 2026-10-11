@@ -1,5 +1,6 @@
 "use client";
 
+import {AssumptionsDisclosure} from "./assumptions-disclosure";
 import type { ReactNode } from "react";
 import type { AppPage } from "@/lib/types";
 import { getChatNavigationAction } from "@/lib/chat-navigation";
@@ -123,7 +124,7 @@ export function ChatContent({
 }) {
   const references: string[] = [];
   const citationTargets = new Map<string,string>();
-  const presentation=compact?homeAnswerPresentation(content):{answer:content,details:[]};
+  const presentation=homeAnswerPresentation(content);
   const answer = presentation.answer.replace(/\(?\[[A-Z]+\d+\](?:[, ]+\[[A-Z]+\d+\])*\s+See\s+\[[^\]\n]+\]\(app:[a-z-]+\)\.?\)?/gi, reference => {
     const href = reference.match(/\]\((app:[a-z-]+)\)/)?.[1];
     if (!onNavigate || !href || !getChatNavigationAction(href)) return reference;
@@ -174,16 +175,20 @@ export function ChatContent({
       rendered.push(
         <div
           key={`table-${index}`}
-          className="my-3 overflow-x-auto rounded-lg border"
+          role="region"
+          aria-label="Response table"
+          tabIndex={0}
+          className="my-2 w-fit max-w-full overflow-x-auto rounded-lg border focus-visible:outline-2 focus-visible:outline-ring"
         >
-          <table className="w-full min-w-[560px] text-base leading-relaxed">
+          <table className="compact-data-table text-sm leading-normal">
             <thead className="bg-muted/40">
               <tr>
                 {headers.map(
                   (header, headerIndex) => (
                     <th
                       key={headerIndex}
-                      className="border-b px-4 py-3 text-left font-semibold"
+                      scope="col"
+                      className="border-b text-left font-semibold"
                     >
                       {renderInlineMarkdown(
                         header, onNavigate, citationTargets
@@ -208,7 +213,7 @@ export function ChatContent({
                       ) => (
                         <td
                           key={cellIndex}
-                          className="px-4 py-3 align-top"
+                          className="align-top"
                         >
                           {renderInlineMarkdown(
                             row[
@@ -303,7 +308,7 @@ export function ChatContent({
   return (
     <div className={compact ? "home-answer text-base leading-relaxed" : "space-y-3 text-base leading-relaxed"}>
       {rendered}
-      {presentation.details.length>0&&<details data-answer-evidence-details className="mt-3 text-base text-muted-foreground"><summary className="min-h-11 cursor-pointer rounded py-2 focus-visible:ring-2 focus-visible:ring-ring">Evidence details</summary>{presentation.details.map((detail,index)=><p key={index} className="mt-1">{renderInlineMarkdown(detail,onNavigate,citationTargets)}</p>)}</details>}
+      {presentation.details.length>0&&<AssumptionsDisclosure evidenceDetails className="mt-2">{presentation.details.map((detail,index)=><p key={index} className="mt-1">{renderInlineMarkdown(detail,onNavigate,citationTargets)}</p>)}</AssumptionsDisclosure>}
       {references.length > 0 && <aside aria-label="Answer sources" className="mt-2 space-y-0.5 border-t border-border/40 pt-1">
         {references.map((reference, referenceIndex) => <div key={referenceIndex} className="text-[11px] leading-relaxed">{renderInlineMarkdown(reference, onNavigate, citationTargets)}</div>)}
       </aside>}

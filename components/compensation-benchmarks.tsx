@@ -1,5 +1,6 @@
 "use client";
 
+import {AssumptionsDisclosure} from '@/components/assumptions-disclosure';
 import { useState } from "react";
 import { benchmarkAreas, benchmarkOccupations, benchmarkProvenance, compensationBenchmark, formatOewsEstimate, wagePercentiles } from "@/lib/compensation-benchmarks";
 
@@ -50,8 +51,7 @@ export function CompensationBenchmarks() {
       <p className="text-xs text-muted-foreground">Estimated employment: {formatOewsEstimate(selected.employment)}. Employment PRSE: {formatOewsEstimate(selected.employmentPrse)}{selected.employmentPrse.status === "published" ? "%" : ""}. Employment is not vacancies or available candidates; this PRSE is not uncertainty for the wage percentiles.</p>
       <a href={selected.source.url} target="_blank" rel="noreferrer" className="inline-block text-sm text-primary underline">Official BLS source workbook</a>
     </div>}
-    <details className="border-t pt-3 text-sm">
-      <summary className="cursor-pointer font-medium">Benchmark sources and limits</summary>
+    <AssumptionsDisclosure>
       <div className="mt-3 space-y-2 text-xs leading-relaxed text-muted-foreground">
         <p>Occupation percentiles are not seniority levels, salary bands or total compensation. A job title alone does not verify an internal role match. Workforce filters do not change this public reference. A market median is not an internal salary-range midpoint and cannot supply a compa-ratio.</p>
         <p>BLS OEWS May 2025, released May 15, 2026. Versioned subset checked October 5, 2026; no automatic refresh or inflation adjustment. US nonfarm wage and salary employment, including full- and part-time workers; self-employed workers are excluded.</p>
@@ -62,6 +62,6 @@ export function CompensationBenchmarks() {
         <p><a href="https://www.onetcenter.org/database.html" target="_blank" rel="noreferrer" className="text-primary underline">{onet.attribution}</a> Release: {onet.release_month}. Used under <a href={onet.license} target="_blank" rel="noreferrer" className="text-primary underline">CC BY 4.0</a>. {onet.modifications}</p>
         <p><a href={onet.crosswalk_source} target="_blank" rel="noreferrer" className="text-primary underline">O*NET-SOC 2019 → 2018 SOC crosswalk</a>. Source verification checks taxonomy pairs only. Duties, specialty, seniority and location still require review before using a reference for an internal role.</p>
       </div>
-    </details>
+    </AssumptionsDisclosure>
   </section>;
 }

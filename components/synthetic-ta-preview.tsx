@@ -1,5 +1,6 @@
 "use client";
 
+import {AssumptionsDisclosure} from '@/components/assumptions-disclosure';
 import { useState } from 'react';
 import type { Preview } from '@/lib/synthetic-ta/v1';
 
@@ -66,8 +67,7 @@ export function SyntheticTaPreview({ data }: { data: Preview }) {
       <div className="mt-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4" aria-label="Mutually exclusive application outcomes">{Object.entries(data.outcomes).map(([label, n]) => <p key={label} className="rounded border px-2 py-1"><span className="block text-xs text-muted-foreground">{label}</span><strong>{count(n)}</strong></p>)}</div>
     </section>
 
-    <details className="rounded-lg border px-3 text-sm">
-      <summary className="flex min-h-11 cursor-pointer items-center font-medium focus-visible:outline-2">Details</summary>
+    <AssumptionsDisclosure>
       <div className="space-y-3 pb-3">
         <p><strong>Source:</strong> {data.version}. Wholly synthetic records with no real identities, independently constructed rather than inferred from loaded records. {data.scope}. Cutoff {data.cutoff}; all generated events are assumed available on their event date. No selected filters apply.</p>
         <p><strong>Active:</strong> distinct requisitions opened or reopened by month-end and not filled or cancelled by that date. On-hold requisitions remain active, with their count shown separately; resuming does not add another requisition. Each requisition represents one modeled vacancy. Counts are stock, not monthly openings or a count of positions. Events on month-end apply that day. There is no 90-day maturity rule.</p>
@@ -79,6 +79,6 @@ export function SyntheticTaPreview({ data }: { data: Preview }) {
         <div className="overflow-x-auto"><table className="w-full text-left text-xs"><caption className="py-2 text-left font-medium">Projected active requisitions</caption><thead><tr><th className="p-2">Month</th>{methods.map(m => <th key={m.key}>{m.label}</th>)}</tr></thead><tbody>{forecasts.map(r => <tr key={r.month} className="border-t"><th className="p-2 text-left font-normal">{month(r.month)}</th>{methods.map(m => <td key={m.key}>{count(r[m.key])}</td>)}</tr>)}</tbody></table></div>
         <p className="text-xs">Local preview only. The published TA summaries, Home hiring projection, AI requests and planning timing evidence still use their existing sources. This population must not be combined with those counts.</p>
       </div>
-    </details>
+    </AssumptionsDisclosure>
   </main>;
 }
