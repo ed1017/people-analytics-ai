@@ -9,9 +9,9 @@ const response=ids=>({...final('unused',ids),answer:structuredClone(discussion)}
 const run=(request,steps)=>converseSolutions(request,fixtureRuntime(steps),new AbortController().signal);
 test('new plan-bearing replies cannot include a second unrestricted prose plan',async()=>{
  const request=solutionRequest(),c=candidate(),before=JSON.stringify(request),bad={...final('unused',[c.id]),answer:'Recommended route: start listening circles, assign HR and budget a quarter.'};
- // The wire supports ordinary prose, but the service enforces its channel against checked IDs.
- assertSolutionShape(bad,solutionFinalSchema);
- await assert.rejects(run(request,[evaluate(c),bad]),/separate findings/);assert.equal(JSON.stringify(request),before);
+ // New finals require a typed outcome even before candidate linkage is checked.
+ assert.throws(()=>assertSolutionShape(bad,solutionFinalSchema));
+ await assert.rejects(run(request,[evaluate(c),bad]),/specific unsupported planning outcome/);assert.equal(JSON.stringify(request),before);
  const extra=response([c.id]);extra.answer.actionPlan='A different plan';assert.throws(()=>assertSolutionShape(extra,solutionFinalSchema));
  assert.match(solutionConversationInstructions,/single source of general Action Plan details/);
 });
@@ -39,4 +39,12 @@ test('old prose history survives a new reply, revision, discard and renewed reco
  second.state.rejected.push({candidateId:'a',revision:2,reason:'Discarded using review.',turnId:'user-2'});second.state.focusCandidateId=null;assert.equal(solutionReviewPresentation(second.state).recommended,null);
  const b=candidate('b');b.goal.turnId='user-3';const third=await run(solutionRequest('Recommend again.',false,second.state,3),[evaluate(b),response(['b'])]);
  assert.equal(solutionReviewPresentation(third.state).recommended.id,'b');assert.equal(solutionReviewPresentation(third.state).earlier.length,0);assert.ok(third.state.turns.some(x=>x.text===old));
+});
+
+test('new Home finals cannot bypass typed outcomes without a successful specialist tool',async()=>{
+ const request=solutionRequest('Help plan the next move.'),before=JSON.stringify(request);
+ await assert.rejects(run(request,[{...final(),answer:'Which budget do you have?'}]),/specific unsupported planning outcome/);assert.equal(JSON.stringify(request),before);
+ const unsupported={...final(),answer:{...discussion,unsupportedPlan:{decision:'Define the scope and currency.',nextStep:'Confirm the scope with the owner, then compare supplied costs.',calculationRefs:[]}}};
+ const reply=await run(request,[unsupported]);assert.match(reply.answer,/Decision needed: Define the scope/);assert.equal(reply.usage.modelRounds,1);
+ const factual=await run(solutionRequest('Explain only; make no assumptions.'),[final('No new assumptions or plan were created.')]);assert.equal(factual.answer,'No new assumptions or plan were created.');assert.equal(factual.state.working.length,0);
 });

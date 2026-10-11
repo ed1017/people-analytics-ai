@@ -7,20 +7,18 @@ const labels:Record<HiringBudgetField,string>={role:'Comparable role',level:'Lev
 const number=(value:number|null)=>value===null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:2});
 const control='mt-1 block min-h-11 w-full rounded border bg-background p-2';
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50';
-export function HomeHiringBudgetReview({review,onUpdate,disabled}:{review:HiringBudgetReview;onUpdate:(inputs:HiringBudgetInput|null)=>void;disabled:boolean}){
+export function HomeHiringBudgetReview({review,onUpdate,onDirtyChange,disabled}:{onDirtyChange?:(dirty:boolean)=>void;review:HiringBudgetReview;onUpdate:(inputs:HiringBudgetInput|null)=>void;disabled:boolean}){
  const [draft,setDraft]=useState<HiringBudgetInput>(review.inputs),[error,setError]=useState('');
  const result=calculateHiringBudget(review.inputs,review.datasetToken),unit=review.inputs.currency??'currency unspecified';
  const money=(v:number|null)=>v===null?'Unknown':`${number(v)} ${unit}`;
  function set(field:HiringBudgetField,text:string){
   const numeric=['hires','budget','months','ftePerHire','annualBasePay','annualAdditionalCostPerHire','recruitingFeePerHire'].includes(field);
-  setDraft(old=>{
-   const next={...old,[field]:text===''?null:field==='otherCostsComplete'?text==='true':numeric?Number(text):text};
-   if(field==='currency'&&old.currency!==null&&old.currency!==text){next.budget=null;next.annualBasePay=null;next.annualAdditionalCostPerHire=null;next.recruitingFeePerHire=null;}
-   return next;
-  });
+  const next={...draft,[field]:text===''?null:field==='otherCostsComplete'?text==='true':numeric?Number(text):text};
+  if(field==='currency'&&draft.currency!==null&&draft.currency!==text){next.budget=null;next.annualBasePay=null;next.annualAdditionalCostPerHire=null;next.recruitingFeePerHire=null;}
+  setDraft(next);onDirtyChange?.(JSON.stringify(next)!==JSON.stringify(review.inputs));
  }
- function apply(inputs:HiringBudgetInput|null){try{onUpdate(inputs);setError('');}catch(e){setError(e instanceof Error?e.message:'Review the entered inputs.');}}
- const salary=result.salary;
+ function apply(inputs:HiringBudgetInput|null){try{onUpdate(inputs);onDirtyChange?.(false);setError('');}catch(e){setError(e instanceof Error?e.message:'Review the entered inputs.');}}
+ const dirty=JSON.stringify(draft)!==JSON.stringify(review.inputs),salary=result.salary;
  return <section aria-label="Hiring budget estimate" className="space-y-3 rounded border p-3 text-sm">
   <h3 className="font-semibold">Hiring budget estimate</h3>
   <p>{number(review.inputs.hires)} hires · {review.inputs.role??'Role unknown'} · {review.inputs.months===null?'Period unknown':`${review.inputs.months} months`} from {review.inputs.startMonth??'start unknown'}</p>
@@ -46,6 +44,8 @@ export function HomeHiringBudgetReview({review,onUpdate,disabled}:{review:Hiring
      })}
     </fieldset>
     <button className={button} disabled={disabled}>Update estimate</button>
+    <button type="button" className={button} disabled={disabled||!dirty} onClick={()=>{setDraft(review.inputs);onDirtyChange?.(false);setError('');}}>Discard estimate edits</button>
+    {dirty&&<p>Update the estimate or explicitly discard its edits before reviewing or pinning a hiring plan.</p>}
    </form>
   </details>
   <AssumptionsDisclosure><ul className="list-disc pl-5">{Object.entries(review.origins).map(([field,basis])=><li key={field}>{labels[field as HiringBudgetField]}: {basis.kind.replaceAll('-',' ')} — {basis.explanation}{basis.quote?` “${basis.quote}”`:''}</li>)}</ul>{result.limitations.map(line=><p key={line}>{line}</p>)}</AssumptionsDisclosure>

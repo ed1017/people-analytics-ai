@@ -22,6 +22,7 @@ export function guidedChatContract<T>(original:Format,reply:(text:string,status?
  const schema=original.text?.format.schema;
  const format={text:{format:{type:'json_schema' as const,name:'guided_chat_reply',strict:true,schema:schema?{...schema,properties:{...(schema.properties as Record<string,unknown>),answer:guidedChatAnswerSchema}}:object({answer:guidedChatAnswerSchema})}}};
  return {format,instructions:guidedChatAnswerInstructions,reply:(raw:string,status?:string)=>{
+  if(status!=='completed')throw Error('The guided response is incomplete; no answer was saved.');
   const body=JSON.parse(raw);assertSolutionShape(body,format.text.format.schema as Schema,'guided reply');
   const answer=renderGuidedChatAnswer(body.answer);return reply(schema?JSON.stringify({...body,answer}):answer,status);
  }};

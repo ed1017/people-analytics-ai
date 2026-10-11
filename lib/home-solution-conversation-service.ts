@@ -96,7 +96,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   if(staffingRequired&&!staffingCalculated&&(round===3||operations>=6))throw Error('The staffing comparison was not calculated within this turn\'s limits. Earlier work is kept.');
   const output=await runtime.complete(input,round===3||operations>=6,signal,{progressEntryEnabled:!!entryContext,requiredStaffingCalculation:standaloneStaffing&&!staffingCalculated});rounds++;abort(signal);
   if(!output.completed||output.calls.length>6||JSON.stringify(output.items).length>70000)throw Error('The conversation response was incomplete or exceeded its bounds.');
-  if(!output.calls.length){if(staffingRequired&&!staffingCalculated)throw Error('The staffing comparison was not calculated in this turn. Earlier work is kept.');if(!output.text||output.text.length>20000)throw Error('The conversational answer is unavailable.');const value=JSON.parse(output.text);assertSolutionShape(value,solutionFinalSchema,'answer');final=value;break;}
+  if(!output.calls.length){if(staffingRequired&&!staffingCalculated)throw Error('The staffing comparison was not calculated in this turn. Earlier work is kept.');if(!output.text||output.text.length>20000)throw Error('The conversational answer is unavailable.');const value=JSON.parse(output.text);if(typeof value?.answer==='string')throw Error('Use a checked recommendation, a specific unsupported planning outcome, or explicit discussion-only response.');assertSolutionShape(value,solutionFinalSchema,'answer');final=value;break;}
   const callCost=(call:SolutionModelOutput['calls'][number])=>{if(call.name!=='evaluate_action_plans')return 1;try{const count=JSON.parse(call.arguments)?.candidates?.length;return Number.isInteger(count)&&count>=1&&count<=3?count:3;}catch{return 3;}};
   if(round===3||operations+output.calls.reduce((total,call)=>total+callCost(call),0)>6)throw Error('The bounded calculation limit was reached. No proposal was saved.');
   input.push(...output.items);
@@ -180,13 +180,12 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
    input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(result)});
   }
   if(standaloneStaffing&&round===0&&output.calls.length===1&&output.calls[0].name===requiredStaffingTool.name&&staffingCalculated&&state.requiredStaffing){
-   final={answer:requiredStaffingAnswer(state.requiredStaffing),candidateIds:[],analysisIds:[],verifiedMetrics:[],constraintUpdates:[],rejected:[],questions:[],focusCandidateId:null};
+   final={answer:{discussionOnly:requiredStaffingAnswer(state.requiredStaffing)},candidateIds:[],analysisIds:[],verifiedMetrics:[],constraintUpdates:[],rejected:[],questions:[],focusCandidateId:null};
    assertSolutionShape(final,solutionFinalSchema,'answer');
    break;
   }
  }
  if(!final)throw Error('No complete conversational answer was returned.');
- if(planningRefs.size&&!staffingCalculated&&typeof final.answer==='string')throw Error('A planning calculation needs a checked recommendation, a specific unsupported planning outcome, or explicit discussion-only response.');
  let answer=solutionAnswerText(final,staffingCalculated);
  if(staffingCalculated&&state.requiredStaffing){
   if(staffingOnly){
@@ -200,6 +199,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  state.constraints=mergeSolutionConstraints(request,state.constraints,final.constraintUpdates);
  if(typeof final.answer!=='string'&&('recommendedPlan' in final.answer||'unsupportedPlan' in final.answer)){
   const refs=('recommendedPlan' in final.answer?final.answer.recommendedPlan:final.answer.unsupportedPlan).calculationRefs;
+  if(planningRefs.size&&!refs.length)throw Error('Use the current checked planning references for this outcome.');
   if(new Set(refs).size!==refs.length)throw Error('Use distinct checked planning references.');
   for(const ref of refs){
    const known=planningRefs.get(ref),current=known?await planningCalculationRef(known.kind,request,state,demandReview,known.analysisId):null;

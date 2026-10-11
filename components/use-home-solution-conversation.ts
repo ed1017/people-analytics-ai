@@ -25,8 +25,13 @@ import {homeConversationErrorMessage} from '@/lib/home-evidence-recovery.mjs';
 
 type Props={enabled:boolean;conversation:ProblemConversation;active:boolean;settled:boolean;evidence:unknown;planningContext?:()=>unknown;planningCalculatorAvailable?:()=>boolean;demandReviewRef?:RefObject<((review:DemandReview)=>void)|null>;scope:string;query:string;target:()=>BundleDiscussion|null;guided?:GuidedActionRegistry|null};
 const equal=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
+const hiringEditsMessage='Update the hiring estimate or explicitly discard its edits before reviewing or pinning.';
 export function useHomeSolutionConversation(props:Props){
  const answerSeries=useRef<ChatEvidenceSeries[]>([]);
+ const [hiringEdit,setHiringEdit]=useState<{key:string;dirty:boolean}|null>(null),hiringEditRef=useRef(hiringEdit);
+ function hiringInputsDirty(){return hiringEditRef.current?.dirty===true&&hiringEditRef.current.key===JSON.stringify(memoryRef.current.hiringBudget);}
+ function setHiringEditorDirty(key:string,dirty:boolean){if(!dirty)setNotice(current=>current===hiringEditsMessage?'':current);if(key!==JSON.stringify(memoryRef.current.hiringBudget))return;hiringEditRef.current={key,dirty};setHiringEdit({key,dirty});}
+ function requireReviewedHiringInputs(){if(hiringInputsDirty())throw Error(hiringEditsMessage);}
  const storage=useDecisionStorage(),[memory,setMemory]=useState<SolutionState>(emptySolutionState),[pending,setPending]=useState(false),[saving,setSaving]=useState(false),[notice,setNotice]=useState('');
  const controller=useRef<AbortController|null>(null),epoch=useRef(0),mounted=useRef(false),memoryRef=useRef(memory),currentProps=useRef(props);
  useLayoutEffect(()=>{currentProps.current=props;});
@@ -126,16 +131,17 @@ export function useHomeSolutionConversation(props:Props){
   persist({...memoryRef.current,hiringBudget:inputs===null?null:editHiringBudgetLocally(previous!,inputs)});
  }
  async function reviewHiringPlan(externalHires:number){
+  requireReviewedHiringInputs();
   const snapshot=requireCurrent(),request=makeRequest('Review the hiring route.'),review=currentHiringBudget(request,decisionStore.getDatasetToken());if(!review)throw Error('The hiring estimate changed.');
   const key=JSON.stringify(review),revision=snapshot.data.revision,context=liveKey.current,initialEpoch=epoch.current;
   const goal={id:request.goal.id||crypto.randomUUID(),statement:request.goal.statement||`Cover ${review.inputs.hires} ${review.inputs.role??'workforce'} roles within the reviewed budget period.`};
-  const selection=await prepareHiringPlan(review,externalHires,goal);requireCurrent();
+  const selection=await prepareHiringPlan(review,externalHires,goal);requireCurrent();requireReviewedHiringInputs();
   if(context!==liveKey.current||initialEpoch!==epoch.current||JSON.stringify(currentHiringBudget(makeRequest('Review the hiring route.'),decisionStore.getDatasetToken()))!==key||decisionStore.getSnapshot().data.revision!==revision)throw Error('The estimate changed. Review the current hiring route.');
   return {selection,key,revision,context,epoch:initialEpoch};
  }
  async function saveHiringPlan(review:{selection:HiringPlanSelection;key:string;revision:number;context:string;epoch:number}){
   if(saving||pending)return;setSaving(true);setNotice('');
-  try{const snapshot=requireCurrent();if(review.context!==liveKey.current||review.epoch!==epoch.current||snapshot.data.revision!==review.revision||JSON.stringify(currentHiringBudget(makeRequest('Review the hiring route.'),decisionStore.getDatasetToken()))!==review.key)throw Error('The hiring inputs changed. Review the current route.');
+  try{requireReviewedHiringInputs();const snapshot=requireCurrent();if(review.context!==liveKey.current||review.epoch!==epoch.current||snapshot.data.revision!==review.revision||JSON.stringify(currentHiringBudget(makeRequest('Review the hiring route.'),decisionStore.getDatasetToken()))!==review.key)throw Error('The hiring inputs changed. Review the current route.');
    const fields=hiringPlanFields(review.selection,catalog(),'hiring-choice-'+crypto.randomUUID(),new Date().toISOString()),state=structuredClone(memoryRef.current);
    currentProps.current.conversation.selectProposalGoal(review.selection.goal,snapshot.data.revision,{...fields,[solutionConversationField]:state} as unknown as Record<string,Json>);memoryRef.current=state;setMemory(state);setNotice('Reviewed hiring plan saved with its exact cost receipt. Internal availability and full mixed-route costs remain unknown.');
   }catch(error){setNotice(error instanceof Error?error.message:'The reviewed hiring plan could not be saved.');}finally{setSaving(false);}
@@ -158,5 +164,5 @@ export function useHomeSolutionConversation(props:Props){
   }catch(error){setNotice((error as Error).message);}finally{setSaving(false);}
  }
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
- return {reviewHiringPlan,saveHiringPlan,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }

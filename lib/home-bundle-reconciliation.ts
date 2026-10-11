@@ -1,5 +1,5 @@
 // @ts-expect-error Native fixtures share source.
-import {hiringPlanFacts,type HiringPlanReceipt} from './home-hiring-plan.ts';
+import {hiringPlanInputs,type HiringPlanReceipt} from './home-hiring-plan.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {proposedPlanningEstimate} from './home-proposed-planning.ts';
 import type {HomeMixScenario} from './home-mix-scenario';
@@ -85,7 +85,7 @@ function validateDraft(draft:BundleDraft){
  for(const item of bundle.components)fail(exactKeys(item as unknown as Record<string,unknown>,['id','name','domain','firstStep','evidence','ownerRole','dependsOn','limitation'])&&/^c[1-6]$/.test(item.id)&&bounded(item.name,80)&&bundleDomains.includes(item.domain)&&bounded(item.firstStep,360)&&bounded(item.ownerRole,80)&&bounded(item.limitation,200)&&Array.isArray(item.evidence)&&(local?item.evidence.length===0:conversation||item.evidence.length>0)&&item.evidence.length<=3&&new Set(item.evidence).size===item.evidence.length&&item.evidence.every(id=>bounded(id,100)),'Invalid saved component structure.');
  const order=componentOrder(draft.bundle.components),ids=new Set(order),input=draft.inputs,scope=input.scope;
  fail(exactKeys(input as unknown as Record<string,unknown>,[...(input.hiringPlan!==undefined?['hiringPlan']:[]),...(input.costPolicy!==undefined?['costPolicy']:[]),'scope','capacity','timing','dependenciesConfirmed','groups','memberships','groupsDisjoint','expenses','expenseLinks','costReviews','costsDistinct',...(input.budget!==undefined?['budget']:[]),...(input.deliveryEstimate!==undefined?['deliveryEstimate']:[]),...(input.successMeasure!==undefined?['successMeasure']:[]),...(input.whatIf!==undefined?['whatIf']:[]),...(input.mixConstraints!==undefined?['mixConstraints']:[]),...(input.mixScenario!==undefined?['mixScenario']:[])]),'Unsupported bundle inputs.');
- if(input.hiringPlan!==undefined){const f=hiringPlanFacts(input.hiringPlan);fail(input.expenses.length===f.monthlyCosts.length&&f.monthlyCosts.every(month=>{const row=input.expenses.find(e=>e.id==='hiring-external-'+month.month);return row?.amount.value===month.cash&&row.months.value===1&&row.startMonth.value===month.month;})&&scope.startMonth.value===f.start&&scope.months.value===f.months&&scope.demand.value===f.requiredRoles,'Hiring plan inputs changed without a new checked receipt.');}
+ if(input.hiringPlan!==undefined){const expected=hiringPlanInputs(input.hiringPlan);fail(Object.entries(expected).every(([key,value])=>JSON.stringify(input[key as keyof BundleInputs])===JSON.stringify(value))&&['deliveryEstimate','whatIf','mixConstraints','mixScenario'].every(key=>!Object.hasOwn(input,key)),'Hiring plan inputs are tied to the checked receipt. Update the hiring estimate and review the route again.');}
  if(input.mixConstraints!==undefined){const c=input.mixConstraints;fail(plain(c)&&Object.keys(c).length>0&&Object.keys(c).every(key=>['maxAddedEmployees','maxStaffHours','deadlineMonth','objective'].includes(key)),'Invalid Home search constraints.');if(Object.hasOwn(c,'maxAddedEmployees'))numeric(c.maxAddedEmployees!,2000,true);if(Object.hasOwn(c,'maxStaffHours'))numeric(c.maxStaffHours!,100000000);if(Object.hasOwn(c,'deadlineMonth'))assumption(c.deadlineMonth!,value=>typeof value==='string'&&Number.isFinite(monthIndex(value)));if(Object.hasOwn(c,'objective'))assumption(c.objective!,value=>['lowest-complete-cash','earliest-coverage','lowest-staff-hours','fewest-added-employees'].includes(String(value)));}
  if(input.costPolicy!==undefined)fail((input.costPolicy===planCostPolicy||input.costPolicy==='cash-hours-v1'),'Unsupported Action Plan cost policy.');
  if(input.budget!==undefined){const budget=input.budget;fail(plain(budget)&&exactKeys(budget as unknown as Record<string,unknown>,['amount','basis']),'Invalid budget constraint.');numeric(budget.amount,1000000000);assumption(budget.basis,value=>value==='cash'||value==='all-in');}
@@ -149,6 +149,7 @@ export function cashHoursInputs(inputs:BundleInputs,goal?:string):BundleInputs{
 }
 export function reviseBundleDraft(draft:BundleDraft,inputs:BundleInputs,legacyReplay:boolean|'cash-hours-v1'=false):BundleDraft{
  validateDraft(draft);fail(draft.revision<100000,'Bundle revision limit reached; previous work is kept.');
+ if(draft.inputs.hiringPlan)fail(JSON.stringify(inputs.hiringPlan)===JSON.stringify(draft.inputs.hiringPlan),'Hiring plan receipt changes require a new checked hiring review.');
  const next={...structuredClone(draft),revision:draft.revision+1,inputs:legacyReplay?structuredClone(inputs):cashHoursInputs(inputs,draft.binding.goal)};validateDraft(next);return next;
 }
 /** Keep entered values when editing the plan, but require renewed cost/dependency alignment. */

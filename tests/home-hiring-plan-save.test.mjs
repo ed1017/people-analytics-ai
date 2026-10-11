@@ -17,3 +17,21 @@ test('checked hiring subtotal, required roles, period, FTE and unknowns survive 
  assert.throws(()=>hiringPlanFields({...selected,goal:{id:'another',statement:'Another goal'}},saved,'wrong-goal','2026-10-11T00:02:00Z'),/another goal/);
  const forged=structuredClone(saved);forged.plans[0].draft.inputs.hiringPlan.externalHires=7;assert.equal(readPlanAlternatives(forged,{goalId:'goal-1',goal:selected.goal.statement}),null);
 });
+test('receipt-bound economic, resource and timing edits require a new checked hiring review',async()=>{
+ const {reviseBundleDraft}=await import('../lib/home-bundle-reconciliation.ts');
+ const selected=await prepareHiringPlan(fullHiringReview(),6,{id:'goal-1',statement:'Cover 10 engineering roles.'});
+ const edits=[['budget',i=>i.budget.amount.value=2000000],['budget basis',i=>i.budget.basis.value='all-in'],['budget currency',i=>i.scope.currency='EUR'],['start',i=>i.scope.startMonth.value='2027-02'],['horizon',i=>i.scope.months.value=6],['required roles',i=>i.scope.demand.value=8],['population',i=>i.scope.population.value='A different role'],['cash',i=>i.expenses[0].amount.value=1],['cash period',i=>i.expenses[0].months.value=2],['cash classification',i=>i.expenses[0].kind='employee_time'],['cash links',i=>i.expenseLinks=[]],['timing',i=>i.timing[0].finish={value:'2027-01-01',kind:'illustrative',basis:'Unconfirmed readiness.'}],['cost coverage',i=>i.costReviews[0].complete={value:true,kind:'illustrative',basis:'Unverified complete costs.'}],['cost distinctness',i=>i.costsDistinct.value=false],['participants',i=>i.groups=[{id:'external',label:'External',count:{value:8,kind:'illustrative',basis:'Unconfirmed count.'}}]]];
+ for(const [label,edit] of edits){const input=structuredClone(selected.draft.inputs);edit(input);assert.throws(()=>reviseBundleDraft(selected.draft,input),/hiring receipt|Hiring plan/i,label);}
+ const removed=structuredClone(selected.draft.inputs);delete removed.hiringPlan;assert.throws(()=>reviseBundleDraft(selected.draft,removed),/Hiring plan receipt/);
+ const replaced=structuredClone(selected.draft.inputs);replaced.hiringPlan.review.inputs.budget=2000000;assert.throws(()=>reviseBundleDraft(selected.draft,replaced),/Hiring plan receipt/);
+ const revisedReview=structuredClone(selected.receipt.review);revisedReview.inputs.budget=2000000;revisedReview.revision++;
+ const updated=await prepareHiringPlan(revisedReview,6,selected.goal);assert.equal(updated.facts.remainingBeforeUnknownCosts,1076000);assert.equal(updated.result.budget.limit,2000000);
+});
+test('known over-budget hiring routes cannot be prepared or pinned through the handoff',async()=>{
+ const review=fullHiringReview(),goal={id:'goal-1',statement:'Cover 10 engineering roles.'};
+ await assert.rejects(prepareHiringPlan(review,10,goal),/exceed.*budget|over.*budget/i);
+ const selected=await prepareHiringPlan(review,6,goal),smaller=structuredClone(selected);smaller.receipt.review.inputs.budget=500000;
+ const {hiringPlanInputs}=await import('../lib/home-hiring-plan.ts');
+ smaller.draft.inputs=hiringPlanInputs(smaller.receipt);
+ assert.throws(()=>hiringPlanFields(smaller,null,'known-over','2026-10-11T00:00:00Z'),/exceed.*budget|over.*budget/i);
+});

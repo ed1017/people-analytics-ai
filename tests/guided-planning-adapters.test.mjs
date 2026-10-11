@@ -113,3 +113,17 @@ test('hiring to train/redeploy/hire followup reuses exact original count and rol
  assert.throws(()=>editRequiredStaffing(follow,'fixture:0',[{...changes[0],value:11},changes[1]]),/current user turn/);
  assert.throws(()=>editRequiredStaffing({...follow,state:{...follow.state,requiredStaffing:state}},'fixture:0',[{...changes[0],value:9}]),/current user turn/);
 });
+test('retained analyst role cannot inherit an earlier engineer demand count',async()=>{
+ const {editRequiredStaffing}=await import('../lib/home-required-staffing.ts');
+ const first=solutionRequest('We need 10 engineers with a million dollar cap.'),review=editHiringBudget(first,'fixture:0',initial(first));
+ const analyst=solutionRequest('Now compare options for analysts; their required count is unknown.',false,{...first.state,hiringBudget:review},2);
+ const staffing=editRequiredStaffing(analyst,'fixture:0',[{field:'role',value:'analysts',basis:supplied(analyst)}]);
+ const follow=solutionRequest('For analysts, use 10 required roles.',false,{...analyst.state,requiredStaffing:staffing},3),before=JSON.stringify(follow);
+ assert.throws(()=>editRequiredStaffing(follow,'fixture:0',[{field:'requiredRoles',value:10,basis:review.origins.hires}]),/current user turn/);
+ assert.equal(JSON.stringify(follow),before);
+ const engineer=solutionRequest('Compare engineers; their required count is unknown.',false,{...first.state,hiringBudget:review},2);
+ const engineerState=editRequiredStaffing(engineer,'fixture:0',[{field:'role',value:'engineers',basis:supplied(engineer)}]);
+ const sameRole=solutionRequest('Compare the options.',false,{...engineer.state,requiredStaffing:engineerState},3);
+ const matching=editRequiredStaffing(sameRole,'fixture:0',[{field:'requiredRoles',value:10,basis:review.origins.hires}]);assert.equal(matching.inputs.requiredRoles,10);assert.equal(matching.inputs.role,'engineers');
+ const corrected=editRequiredStaffing(follow,'fixture:0',[{field:'requiredRoles',value:10,basis:supplied(follow)}]);assert.equal(corrected.inputs.role,'analysts');assert.equal(corrected.origins.requiredRoles.turnId,follow.message.id);
+});

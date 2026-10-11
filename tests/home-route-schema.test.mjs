@@ -361,3 +361,10 @@ test('non-Home actual POST enforces typed planning outcomes with truthful tool c
   const invalid=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}));assert.notEqual(invalid.status,200);
  }
 });
+test('ordinary Finance POST rejects valid discussion JSON from incomplete output without retry',async()=>{
+ const before=sandbox.__requests.length;
+ sandbox.__replies.push({status:'incomplete',incomplete_details:{reason:'max_output_tokens'},output:[],output_text:JSON.stringify({answer:{discussion:'Partial Finance explanation must not be persisted.'}})});
+ const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'finance',message:'Explain the budget variance.',context:{headcountGrowthPct:null}})}));
+ assert.notEqual(response.status,200);assert.equal(sandbox.__requests.length,before+1);
+ const body=await response.json();assert.equal(body.answer,undefined);assert.doesNotMatch(JSON.stringify(body),/Partial Finance explanation/);
+});
