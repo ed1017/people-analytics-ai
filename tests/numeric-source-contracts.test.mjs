@@ -77,7 +77,8 @@ async function getRoute(domain, tables) {
     const query = {select:()=>query,order:()=>query,single:()=>query,in:()=>query,then:resolve=>resolve({data:tables[name] ?? [],error:null})};
     return query;
   }};
-  const route = load(`app/api/${domain}/route.ts`, {
+  const aliases = {
+    '@/lib/dataset-runtime':{withDatasetRequest:(_request,run)=>run()},
     'next/server':{NextResponse:{json:(body,init)=>Response.json(body,init)}},
     '../../../lib/supabase-server':{supabaseServer},
     '../../../lib/numeric-contract':numeric,
@@ -85,7 +86,9 @@ async function getRoute(domain, tables) {
     '../../../lib/data-api-error':{dataApiErrorResponse},
     '../../../lib/stored-planning':planning,
     '../../../lib/exit-enps':{...exitEnps,localExitEnpsEnabled:()=>false},
-  });
+  };
+  if(domain==='survey-sentiment')aliases['@/lib/survey-sentiment-reader']=load('lib/survey-sentiment-reader.ts',Object.fromEntries(Object.entries(aliases).map(([key,value])=>[key.replace('../../../lib/','./').replace('@/lib/','./'),value])));
+  const route = load(`app/api/${domain}/route.ts`, aliases);
   const response = await route.GET();
   assert.equal(response.status,200);
   assert.equal(response.headers.get('cache-control'),'no-store');
