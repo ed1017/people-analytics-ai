@@ -1,0 +1,130 @@
+{
+  "baseline": {
+    "definition_sha256": "e572aa161aab4246ecd1e3a26b6754ac383b23c909aed7c2dcb0e2e1ff4da954",
+    "owner": "postgres",
+    "acl": "{postgres=arwdDxtm/postgres,anon=Dxtm/postgres,authenticated=Dxtm/postgres,service_role=rDxtm/postgres}",
+    "reloptions": [
+      "security_invoker=true"
+    ],
+    "columns": [
+      {
+        "name": "survey_code",
+        "type": "text",
+        "collation": "\"default\""
+      },
+      {
+        "name": "survey_name",
+        "type": "text",
+        "collation": "\"default\""
+      },
+      {
+        "name": "survey_type",
+        "type": "text",
+        "collation": "\"default\""
+      },
+      {
+        "name": "question_code",
+        "type": "text",
+        "collation": "\"default\""
+      },
+      {
+        "name": "dimension",
+        "type": "text",
+        "collation": "\"default\""
+      },
+      {
+        "name": "question_text",
+        "type": "text",
+        "collation": "\"default\""
+      },
+      {
+        "name": "employee_respondents",
+        "type": "integer",
+        "collation": "-"
+      },
+      {
+        "name": "candidate_respondents",
+        "type": "integer",
+        "collation": "-"
+      },
+      {
+        "name": "separation_respondents",
+        "type": "integer",
+        "collation": "-"
+      },
+      {
+        "name": "avg_score",
+        "type": "numeric",
+        "collation": "-"
+      },
+      {
+        "name": "favorable_pct",
+        "type": "numeric",
+        "collation": "-"
+      }
+    ]
+  },
+  "lastObservedOid": "19812",
+  "requiredTableMetadata": [
+    {
+      "table": "surveys",
+      "owner": "postgres",
+      "rls": true,
+      "force_rls": false,
+      "constraints": [
+        "PRIMARY KEY (survey_id)",
+        "UNIQUE (survey_code)"
+      ]
+    },
+    {
+      "table": "survey_questions",
+      "owner": "postgres",
+      "rls": true,
+      "force_rls": false,
+      "constraints": [
+        "PRIMARY KEY (survey_question_id)",
+        "UNIQUE (survey_id, question_code)"
+      ]
+    },
+    {
+      "table": "survey_responses",
+      "owner": "postgres",
+      "rls": true,
+      "force_rls": false,
+      "constraints": [
+        "PRIMARY KEY (survey_response_id)"
+      ]
+    }
+  ],
+  "requiredPolicies": [],
+  "roles": [
+    {
+      "name": "postgres",
+      "bypassrls": true,
+      "superuser": false
+    },
+    {
+      "name": "authenticated",
+      "bypassrls": false,
+      "superuser": false
+    },
+    {
+      "name": "anon",
+      "bypassrls": false,
+      "superuser": false
+    },
+    {
+      "name": "service_role",
+      "bypassrls": true,
+      "superuser": false
+    }
+  ],
+  "syntheticValidation": {
+    "postgresVersion": "17.6",
+    "fixtureAttempts": 4,
+    "originalFixtureChecksPassed": 48,
+    "adaptationChecksPassed": 40,
+    "cleanupVerified": true,
+    "scope": "Isolated synthetic fixture; modeled executor-owned transaction and history. Does not certify hosted service internals. Raw fixture logs excluded."
+  }
+}
