@@ -172,7 +172,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
      state.analyses=[...state.analyses,item].slice(-6);analyses.set(item.id,item);result={...item,verifiedMetricReferences:checkedMetricReferences(state,'projection',item.id,item.revision)};
     }
     const planningKind:PlanningCalculationKind|null=call.name==='review_hiring_budget'?'hiring':call.name==='compare_required_staffing'?'fixed-staffing':call.name==='project_headcount'?'projection':['review_service_demand','revise_service_demand','review_scoped_service_demand','revise_scoped_service_demand','compare_service_staffing'].includes(call.name)?'workload':null;
-    const planningBinding=planningKind?await planningCalculationRef(planningKind,request,state,demandReview):null;
+    const planningBinding=planningKind?await planningCalculationRef(planningKind,request,state,demandReview,planningKind==='projection'?(args.spec as ProjectionSpec).id:undefined):null;
     if(planningBinding&&result&&typeof result==='object')result={...result,planningGuidance:planningCalculationFeedback(planningBinding)};
 
     if(JSON.stringify(result).length>65000){if(call.name===requiredStaffingTool.name)staffingCalculated=false;result={ok:false,error:'The read result exceeds the tool budget. Request fewer source IDs.'};}else if(planningBinding)planningRefs.set(planningBinding.reference,planningBinding);
@@ -186,6 +186,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   }
  }
  if(!final)throw Error('No complete conversational answer was returned.');
+ if(planningRefs.size&&!staffingCalculated&&typeof final.answer==='string')throw Error('A planning calculation needs a checked recommendation, a specific unsupported planning outcome, or explicit discussion-only response.');
  let answer=solutionAnswerText(final,staffingCalculated);
  if(staffingCalculated&&state.requiredStaffing){
   if(staffingOnly){
@@ -197,11 +198,11 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  if(answer.length>10000)throw Error('The combined answer exceeds the response budget. Narrow the request; earlier state is retained.');
  if(homeAnswerScopeViolation(answer,request.evidence))throw Error('The answer attributes source evidence to an unsupported population.');
  state.constraints=mergeSolutionConstraints(request,state.constraints,final.constraintUpdates);
- if(typeof final.answer!=='string'&&'recommendedPlan' in final.answer){
-  const refs=final.answer.recommendedPlan.calculationRefs;
+ if(typeof final.answer!=='string'&&('recommendedPlan' in final.answer||'unsupportedPlan' in final.answer)){
+  const refs=('recommendedPlan' in final.answer?final.answer.recommendedPlan:final.answer.unsupportedPlan).calculationRefs;
   if(new Set(refs).size!==refs.length)throw Error('Use distinct checked planning references.');
   for(const ref of refs){
-   const known=planningRefs.get(ref),current=known?await planningCalculationRef(known.kind,request,state,demandReview):null;
+   const known=planningRefs.get(ref),current=known?await planningCalculationRef(known.kind,request,state,demandReview,known.analysisId):null;
    if(!known||!current||current.reference!==ref)throw Error('The recommended plan must reference the current checked inputs and results from this turn.');
   }
  }
@@ -216,7 +217,10 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   resolveSolutionMetric(state,ref);
  }
  state.verifiedMetrics=final.verifiedMetrics;
- state.rejected=state.rejected.slice(-24);state.questions=final.questions;state.focusCandidateId=final.focusCandidateId;
+ state.rejected=state.rejected.slice(-24);state.questions=final.questions;
+ if(final.candidateIds.length){state.recommendationRequestId=request.requestId;state.focusCandidateId=final.focusCandidateId;}
+ else if(staffingCalculated||typeof final.answer!=='string'&&('recommendedPlan' in final.answer||'unsupportedPlan' in final.answer)){state.recommendationRequestId=null;state.focusCandidateId=null;}
+ else if(final.focusCandidateId!==null){state.focusCandidateId=final.focusCandidateId;state.recommendationRequestId=state.working.findLast(item=>item.id===final.focusCandidateId)?.requestId??state.recommendationRequestId;}
  if(state.focusCandidateId&&!state.working.some(item=>item.id===state.focusCandidateId))throw Error('The conversational focus is unavailable.');
  state.turns=[...state.turns,{id:request.message.id,role:'user' as const,text:request.message.text},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:answer}].slice(-32);
  abort(signal);

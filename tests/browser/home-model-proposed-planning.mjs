@@ -24,7 +24,7 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  page.setDefaultTimeout(20000);page.on('pageerror',error=>errors.push(error.message));
  const check=(name,ok)=>{assert.ok(ok,mode+' '+name);checks.push(mode+' '+name);console.log('PASS '+mode+' '+name);};
  await context.route('**/*',async route=>{const req=route.request(),url=new URL(req.url());if(req.isNavigationRequest()&&url.href===base+'/')return route.fulfill({contentType:'text/html',body:html});if(url.origin!==base){external++;return route.abort();}if(url.pathname==='/api/home-solution-conversation'){
-  const body=req.postDataJSON();requests.push(body);const c=proposedPilot(body.message.text==='Recommend again'?'renewed-pilot':'manager-pilot',body.message.id);
+  const body=req.postDataJSON();requests.push(body);if(body.message.text.startsWith('Offline failure:'))return route.fulfill({status:body.message.text.includes('deadline')?503:422,json:{error:'Synthetic request failure; previous work is retained.',diagnostic:body.message.text.includes('deadline')?'conversation_deadline':'response_validation'}});const c=proposedPilot(body.message.text==='Recommend again'?'renewed-pilot':'manager-pilot',body.message.id);
   const changed=final('Use the updated cash ceiling.',[]);changed.constraintUpdates=[{action:'set',field:'budget_usd',number:1000,text:null,unit:'USD',turnId:body.message.id}];
   const response=final('The evidence cannot identify the weakest teams.',[c.id]);response.answer={findings:'The evidence cannot identify the weakest teams.',decisionRationale:'A limited trial tests the workload hypothesis before expansion.',caveats:['Availability remains unverified; no improvement is guaranteed.']};
   const runtime=fixtureRuntime(body.message.text==='Change constraint'?[changed]:body.message.text==='Explain evidence only'?[final('No team ranking can be established from this evidence. No new plan is proposed.')]:[evaluate(c),response]);
@@ -66,6 +66,12 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  check('save links exact proposal to goal and keeps provenance',plans.length===1&&plans[0].draft.binding.goal==='Improve employee experience'&&plans[0].draft.inputs.scope.months.kind==='model-proposed'&&plans[0].draft.inputs.scope.population.value===null&&plans[0].draft.inputs.groups[0].count.value===12);
  await page.reload();await card().waitFor();check('reload preserves one saved card and unconfirmed assumptions',await card().count()===1&&await card().getByRole('button',{name:/Pinned Action Plan/}).isDisabled()&&await summary().getByText('Model-proposed planning assumptions · unconfirmed',{exact:true}).isVisible());
  await summary().scrollIntoViewIfNeeded();await page.screenshot({path:path.join(output,mode+'-saved.png')});
+ for(const kind of ['validation','deadline']){
+  const before=await readState(),beforeFields=JSON.stringify([before.workspaces[before.goals.activeId].fields.homeSolutionConversationV1,before.workspaces[before.goals.activeId].fields.homePlanAlternativesV1]),question='Offline failure: '+kind+' — show turnover and engagement by business unit.';
+  await send(question);const after=await readState();
+  check(kind+' failure retains the complete question in the composer',await input.inputValue()===question);
+  check(kind+' failure preserves saved plan and conversation fields',JSON.stringify([after.workspaces[after.goals.activeId].fields.homeSolutionConversationV1,after.workspaces[after.goals.activeId].fields.homePlanAlternativesV1])===beforeFields);
+ }
  await page.evaluate(()=>localStorage.clear());await page.reload();await dismissHomeOnboarding(page);await send('Recommend a fresh pilot.');await card().waitFor();
  for(let i=1;i<=14;i++){
   if(i<=12)await card().getByText('Edit planning assumptions',{exact:true}).click();

@@ -93,7 +93,7 @@ export function calculateHiringBudget(raw:HiringBudgetInput,datasetToken='unconn
   for(const row of rows)row.listedCost=round(input.hires!*((annualBasePerHire+input.annualAdditionalCostPerHire)*row.activeYearFraction+(row.month===input.arrivalDate!.slice(0,7)?input.recruitingFeePerHire:0)));
   if(rows.length)rows[rows.length-1].listedCost=round(rows[rows.length-1].listedCost!+listedCost-rows.reduce((sum,row)=>sum+row.listedCost!,0));
  }
- const annualBasePayCeiling=positiveCount&&input.currency&&input.budget!==null&&activeYearFraction!==null&&activeYearFraction>0&&input.annualAdditionalCostPerHire!==null&&input.recruitingFeePerHire!==null?round((input.budget/input.hires!-input.recruitingFeePerHire)/activeYearFraction-input.annualAdditionalCostPerHire):null;
+ const annualBasePayCeiling=positiveCount&&input.currency&&input.budget!==null&&activeYearFraction!==null&&activeYearFraction>0&&input.annualAdditionalCostPerHire!==null&&input.recruitingFeePerHire!==null?Math.floor(((input.budget/input.hires!-input.recruitingFeePerHire)/activeYearFraction-input.annualAdditionalCostPerHire)*100)/100:null;
  const complete=listedCost!==null&&input.otherCostsComplete===true&&input.ftePerHire!==null;
  const periodCost=complete?listedCost:null;
  const knownParts=activeYearFraction===null?[]:[

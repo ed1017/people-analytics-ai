@@ -44,7 +44,7 @@ export function editHiringBudget(request:SolutionRequest,datasetToken:string,raw
   checkBasis(c.basis,s.basisTurns);
   if(c.basis.kind==='user-supplied'&&c.basis.turnId!==request.message.id)throw Error('Hiring corrections require the current user turn.');
   if(s.origins[c.field]&&(s.inputs[c.field]!==null||s.origins[c.field]?.kind!=='model-proposed')&&!same(s.inputs[c.field],c.value)&&c.basis.kind!=='user-supplied')throw Error('An existing hiring input changes only through an explicit user correction.');
-  if(same(s.inputs[c.field],c.value)&&s.origins[c.field])continue;
+  if(same(s.inputs[c.field],c.value)&&s.origins[c.field]&&c.basis.kind!=='user-supplied')continue;
   s.inputs={...s.inputs,[c.field]:c.value};s.origins={...s.origins,[c.field]:structuredClone(c.basis)};
  }
  validateCurrencyEdit(before,s.inputs,list.filter(c=>c.basis.kind==='user-supplied').map(c=>c.field));

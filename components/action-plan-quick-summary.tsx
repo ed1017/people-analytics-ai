@@ -5,6 +5,12 @@ const money=(value:number|null)=>value===null?'Unknown':`$${value.toLocaleString
 export function ActionPlanQuickSummary({draft,result}:{draft:BundleDraft|null;result?:BundleResult|null}){
  const value=actionPlanQuickSummary(draft,result);
  const planning=value.planning;
+ if(value.hiring){const h=value.hiring;return <section aria-label="Action Plan quick summary" className="grid gap-3 sm:grid-cols-3 text-sm">
+ <section aria-label="Total cost"><h4 className="font-semibold">External cash subtotal</h4><p>{money(h.externalSubtotal)} USD · partial</p><p>Before unknown costs: {money(h.remainingBeforeUnknownCosts)} USD remaining</p><p>Full mixed-route cost and affordability: Unknown</p></section>
+ <section aria-label="Timeline"><h4 className="font-semibold">Budget period</h4><p>{h.start} through {h.end} · {h.months} months</p><p>Hire arrival: {h.arrival}</p><p>Internal readiness: Unknown</p></section>
+ <section aria-label="Resources"><h4 className="font-semibold">Required: {h.requiredRoles} roles</h4><p>{h.externalHires} external hires · {h.externalFte} FTE</p><p>{h.ftePerHire} FTE per hire · {h.remainingRoles} roles unresolved</p><p>Internal availability, release, backfill and payroll: Unknown</p></section>
+ </section>;}
+
  const range=(v:{min:number;max:number}|null)=>v===null?'Unknown':v.min===v.max?number(v.min):`${number(v.min)}–${number(v.max)}`;
  if(planning)return <section aria-label="Action Plan quick summary" className="@container space-y-2 text-base leading-normal">
   <p className="text-sm font-medium">{planning.modelProposed?'Model-proposed planning assumptions · unconfirmed':'Planning assumptions · unconfirmed'}</p>

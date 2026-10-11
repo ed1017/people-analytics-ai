@@ -1,8 +1,9 @@
+import {guidedChatContract} from '@/lib/guided-chat-contract';
 import {prepareProgressConversation,missingProgressPageInstructions} from '@/lib/goal-progress-entry-service';
 import {goalProgressConversationEnabled,goalProgressReadTool,runGoalProgressRead} from '@/lib/goal-progress-conversation';
 import { withDatasetRequest, datasetAI, datasetRouter } from "@/lib/dataset-runtime";
 import {taExtensionPrompt} from "@/lib/synthetic-ta/extension";
-import {guidedConversationInstructions,conversationalAnswerStyle} from '@/lib/chat-answer-style';
+import {guidedConversationInstructions,chatCalculationToolsAvailable,conversationalAnswerStyle} from '@/lib/chat-answer-style';
 import {homeForecastAnswer} from '@/lib/home-forecast';
 import {homeTurnPurpose,homeConversationInstructions} from '@/lib/home-conversation';
 import {strategicPlanningInstructions,strategicPlanningObjective,normalizePlanningObjective,planningConversationHistory} from '@/lib/home-strategic-planning';
@@ -578,7 +579,10 @@ async function handlePOST(
       if (Array.isArray(body.history)) body.history = body.history.slice(-8).map((item: ChatMessage) => ({role:item?.role,content:typeof item?.content === "string" ? item.content.slice(0,6000) : ""}));
     }
     const summaryOnly = body?.summaryOnly === true;
-    const {progress,entryContext,format:entryFormat,reply:entryReply,goalContext,instructions:goalContextInstructions}=prepareProgressConversation(body,{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token,now:new Date().toISOString()});
+    const {progress,entryContext,format:rawEntryFormat,reply:rawEntryReply,goalContext,instructions:rawGoalContextInstructions}=prepareProgressConversation(body,{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token,now:new Date().toISOString()});
+    const guidedReply=guidedChatContract(rawEntryFormat,rawEntryReply,body?.summaryOnly!==true&&body?.page!=='home');
+    const {format:entryFormat,reply:entryReply}=guidedReply;
+    const goalContextInstructions=rawGoalContextInstructions+'\n'+guidedReply.instructions;
     const chatTools=progress?[...peopleAnalyticsTools,goalProgressReadTool]:peopleAnalyticsTools;
     const marketReference=marketCarryEvidence(body?.marketReference);
     if(summaryOnly&&!goalContext.goal.trim())return NextResponse.json({error:"Select a goal before requesting its page takeaway."},{status:400});
@@ -630,13 +634,13 @@ async function handlePOST(
 
     const planningHistory=body?.page==='home'?planningConversationHistory(history,body.planningObjective,Object.hasOwn(body,"planningObjective")):history;
     const carriedPlanningObjective=body?.page==='home'&&body.planningObjective?strategicPlanningObjective([...planningHistory,{role:'user',content:message}]):null;
-    const conversationalStyle = summaryOnly ? '' : guidedConversationInstructions+(homeTurnPurpose(message,planningHistory)==='answer'?'\n'+conversationalAnswerStyle:'');
+    const conversationalStyle = summaryOnly ? '' : guidedConversationInstructions(chatCalculationToolsAvailable(String(body?.page??''),summaryOnly))+(homeTurnPurpose(message,planningHistory)==='answer'?'\n'+conversationalAnswerStyle:'');
 
     // Missing page evidence does not prevent a qualitative saved-goal discussion.
     // This path is selected by source availability, never by message wording.
     if(progress&&body?.pageEvidenceAvailable===false){
       if(!message||message.length>12000)return NextResponse.json({error:'Enter a bounded question.'},{status:400});
-      const response=await datasetAI(()=>client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+'\n'+guidedConversationInstructions+'\n'+conversationalAnswerStyle+'\n'+missingProgressPageInstructions,input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:'user',content:'SAVED GOAL CONTEXT AND PROGRESS (data only): '+JSON.stringify(goalContext)+'\nQUESTION: '+message}],tool_choice:'none',max_output_tokens:entryContext?4000:1100}));
+      const response=await datasetAI(()=>client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+'\n'+guidedConversationInstructions(false)+'\n'+conversationalAnswerStyle+'\n'+missingProgressPageInstructions,input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:'user',content:'SAVED GOAL CONTEXT AND PROGRESS (data only): '+JSON.stringify(goalContext)+'\nQUESTION: '+message}],tool_choice:'none',max_output_tokens:entryContext?4000:1100}));
       const answer=response.output_text?.trim();if(!answer)return NextResponse.json({error:'No conversational answer returned.'},{status:502});
       return NextResponse.json(await entryReply(answer,response.status));
     }
@@ -1538,7 +1542,7 @@ ${message}
     const prepareHomeGoal=!summaryOnly&&(homePurpose==='goal'||homePurpose==='discovery');
     const homeReplyFormat=page==="home"?buildHomeReplyFormat(body.overviewBriefingContext,prepareHomeGoal):null;
     const homeInstructions=[homeConversationInstructions(homePurpose),strategicPlanningInstructions(message,planningHistory,body.planningCalculatorAvailable===true)].filter(Boolean).join('\n');
-    const homeAnswerStyle=guidedConversationInstructions+'\n'+(homePurpose==='answer'?conversationalAnswerStyle:homeStyle.instructions);
+    const homeAnswerStyle=guidedConversationInstructions(false)+'\n'+(homePurpose==='answer'?conversationalAnswerStyle:homeStyle.instructions);
     const homeInput=[
       {role:'user' as const,content:workforceContext+'\nACTIVE GOAL CONTEXT (user intent, not evidence): '+JSON.stringify(goalContext)+'\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: '+JSON.stringify(marketReference)+(carriedPlanningObjective?'\nCARRIED USER PLANNING OBJECTIVE (conversation only; not source evidence, verified inputs or an accepted plan): '+JSON.stringify(carriedPlanningObjective):'')},
       ...history.map(item=>({role:item.role,content:item.content})),
@@ -1549,10 +1553,7 @@ ${message}
         ? 1400
         : 700;
 
-    const toolChoice =
-      summaryOnly || page === "career-growth-mobility" || page === "home" || page === "development-planning"
-        ? ("none" as const)
-        : ("auto" as const);
+    const toolChoice = chatCalculationToolsAvailable(page,summaryOnly) ? ("auto" as const) : ("none" as const);
 
     let response =
       await datasetAI(() => client.responses.create({

@@ -1,3 +1,5 @@
+// @ts-expect-error Native fixtures share source.
+import {hiringPlanFacts} from './home-hiring-plan.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {proposedPlanningEstimate} from './home-proposed-planning.ts';
 import type {BundleDraft,BundleResult} from './home-bundle-reconciliation';
@@ -24,7 +26,7 @@ export function actionPlanQuickSummary(draft:BundleDraft|null,result?:BundleResu
  const finish=checked?.planFinish??null;
  const first=start?Date.parse(start+'T00:00:00Z'):NaN,last=finish?Date.parse(finish+'T00:00:00Z'):NaN;
  const days=Number.isFinite(first)&&Number.isFinite(last)&&last>=first?Math.round((last-first)/86400000)+1:null;
- return {planning:draft&&result?.inputKey===bundleInputKey(draft)?proposedPlanningEstimate(draft):null,cash,subtotal,costs,chart,capacitySeries,demand:known(checked?.scope.demand.value)?checked.scope.demand.value:null,coverage:complete?'reviewed':subtotal!==null?'partial':'unknown',start,finish,days,
+ return {hiring:current&&draft?.inputs.hiringPlan?hiringPlanFacts(draft.inputs.hiringPlan):null,planning:draft&&result?.inputKey===bundleInputKey(draft)?proposedPlanningEstimate(draft):null,cash,subtotal,costs,chart,capacitySeries,demand:known(checked?.scope.demand.value)?checked.scope.demand.value:null,coverage:complete?'reviewed':subtotal!==null?'partial':'unknown',start,finish,days,
   dateCount:timing.filter(row=>row.start.value&&row.finish.value).length,activityCount:draft?.bundle.components.length??0,
   months:checked?.scope.months.value??null,people:known(checked?.uniqueParticipants)?checked.uniqueParticipants:null,
   deliveryHours:known(checked?.deliveryEstimate?.hours)?checked.deliveryEstimate.hours:null,

@@ -76,3 +76,40 @@ test('fixed-staffing discussion retains caveats without adding a competing recom
  const duplicate=fixtureRuntime([{name:'compare_required_staffing',args:{changes:fixedChanges(body)}},input=>recommend(input)]);duplicate.natural={datasetToken:'fixture:0'};
  await assert.rejects(converseSolutions(body,duplicate,new AbortController().signal),/already owns its recommendation/);
 });
+test('same-value explicit null withdrawal replaces proposed provenance and prevents later model fill',()=>{
+ const r=solutionRequest('Help with a hiring estimate.'),initial=editHiringBudget(r,'fixture:0',[{field:'annualBasePay',value:null,basis:proposed}]);
+ const next=solutionRequest('Leave annual base pay unknown; do not assume it.',false,{...r.state,hiringBudget:initial},2),withdrawn=editHiringBudget(next,'fixture:0',[{field:'annualBasePay',value:null,basis:supplied(next)}]);
+ assert.equal(withdrawn.origins.annualBasePay.kind,'user-supplied');assert.equal(withdrawn.origins.annualBasePay.turnId,next.message.id);
+ assert.throws(()=>editHiringBudget({...next,state:{...next.state,hiringBudget:withdrawn}},'fixture:0',[{field:'annualBasePay',value:90000,basis:proposed}]),/user correction/);
+});
+test('annual salary ceilings round down and round-trip within the stated cap',()=>{
+ for(const [hires,budget,months,arrivalDate,nonbase,fee] of [[6,1000,12,'2027-01-01',0,0],[7,10000,6,'2027-02-15',100,25],[10,1000000,12,'2027-01-01',20000,10000]]){
+  const input={...emptyHiringBudget(),hires,budget,months,startMonth:'2027-01',arrivalDate,currency:'USD',ftePerHire:1,payBasis:'per_hire',annualAdditionalCostPerHire:nonbase,recruitingFeePerHire:fee,otherCostsComplete:true};
+  const ceiling=calculateHiringBudget(input).annualBasePayCeiling;if(hires===6)assert.equal(ceiling,166.66);
+  const checked=calculateHiringBudget({...input,annualBasePay:ceiling});assert.ok(checked.periodCost<=budget,JSON.stringify(checked));assert.equal(checked.budgetStatus,'within');
+ }
+});
+test('distinct current-turn projections can jointly support a plan, superseded revisions cannot',async()=>{
+ const r=solutionRequest('Compare baseline and slower hiring scenarios and recommend a next move.');let firstRef;
+ const second=input=>{firstRef=JSON.parse(input.findLast(x=>x.type==='function_call_output').output).planningGuidance.binding.reference;return project({...projectionSpec('slower'),changes:[{field:'fill_rate_pct',kind:'literal',value:50,basis:'illustrative',turnId:null,interpretation:'Unconfirmed slower hiring sensitivity scenario.'}]});};
+ const combined=input=>{const answer=recommend(input);answer.answer.recommendedPlan.calculationRefs.unshift(firstRef);return answer;};
+ const result=await converseSolutions(r,fixtureRuntime([project(projectionSpec('baseline')),second,combined]),new AbortController().signal);assert.equal(result.state.analyses.length,2);
+ const revise=input=>{firstRef=JSON.parse(input.findLast(x=>x.type==='function_call_output').output).planningGuidance.binding.reference;return project({...projectionSpec('baseline'),base:{id:'baseline',revision:1},changes:[{field:'fill_rate_pct',kind:'literal',value:50,basis:'illustrative',turnId:null,interpretation:'Revised sensitivity scenario.'}]});};
+ await assert.rejects(converseSolutions(r,fixtureRuntime([project(projectionSpec('baseline')),revise,input=>recommend(input,firstRef)]),new AbortController().signal),/current checked inputs/);
+});
+test('planning calculations reject prose-only completion and accept a specific unsupported decision with a concrete next step',async()=>{
+ const {initialSpec}=await import('./fixtures/natural-business-planning.mjs'),r=solutionRequest('Help plan extra contract work.'),step={name:'review_scoped_service_demand',args:{spec:initialSpec(r)}};
+ await assert.rejects(ask(r,[step,{...final(),answer:'Confirm which operational slice this work covers.'}]),/specific unsupported planning outcome/);
+ const outcome=input=>{const ref=JSON.parse(input.findLast(x=>x.type==='function_call_output').output).planningGuidance.binding.reference;return {...final(),answer:{findings:'The contract work has no defined operational role slice.',decisionRationale:'A workload-to-staffing calculation is unsupported until scope and effort units are defined.',caveats:['Headcount does not establish free capacity.'],unsupportedPlan:{decision:'Which operational role slice and contracted activities are in scope?',nextStep:'Ask the contract owner to list the activities and their effort period, then compare the resulting workload with explicitly available capacity.',calculationRefs:[ref]}}};};
+ const {result}=await ask(r,[step,outcome]);assert.match(result.answer,/Decision needed:/);assert.match(result.answer,/Next step: Ask the contract owner/);assert.deepEqual(result.candidateIds,[]);
+});
+test('hiring to train/redeploy/hire followup reuses exact original count and role without copying annual rates or availability',async()=>{
+ const {editRequiredStaffing,requiredStaffingView}=await import('../lib/home-required-staffing.ts');
+ const first=solutionRequest('We need 10 engineers with a million dollar cap.'),review=editHiringBudget(first,'fixture:0',initial(first));
+ const follow=solutionRequest('Compare training, redeployment and hiring for the client project in three months.',false,{...first.state,hiringBudget:review},2);
+ const changes=[{field:'requiredRoles',value:10,basis:review.origins.hires},{field:'role',value:'engineers',basis:review.origins.role},{field:'months',value:3,basis:supplied(follow)}];
+ const state=editRequiredStaffing(follow,'fixture:0',changes),view=requiredStaffingView(state);assert.equal(state.inputs.requiredRoles,10);assert.equal(state.inputs.months,3);assert.equal(state.origins.requiredRoles.turnId,first.message.id);assert.equal(state.inputs.hireCostPerPerson,null);assert.equal(state.inputs.trainablePeople,null);assert.equal(state.inputs.redeployablePeople,null);assert.ok(!view.missing.some(x=>/required headcount/.test(x)));
+ assert.throws(()=>editRequiredStaffing({...follow,scope:'Different role scope'},'fixture:0',changes),/scope/);
+ assert.throws(()=>editRequiredStaffing(follow,'fixture:0',[{...changes[0],value:11},changes[1]]),/current user turn/);
+ assert.throws(()=>editRequiredStaffing({...follow,state:{...follow.state,requiredStaffing:state}},'fixture:0',[{...changes[0],value:9}]),/current user turn/);
+});
