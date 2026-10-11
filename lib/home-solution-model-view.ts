@@ -15,5 +15,5 @@ export function solutionPlanView(plan:PlanAlternative){return {...plan,draft:sol
 /** Source IDs/revisions and bindings remain visible; exact equality keys remain server-owned. */
 export function solutionEvaluationView(request:SolutionRequest,item:SolutionEvaluation){
  let sourcesCurrent=true;try{assertSourcesCurrent(request.catalog,item.sourceKeys);}catch{sourcesCurrent=false;}
- return {...omit(item,['sourceKeys','draft','result']),sourcesCurrent,planningEstimate:item.draft?proposedPlanningEstimate(item.draft):null,draft:item.draft?solutionDraftView(item.draft):null,result:item.result?solutionResultView(item.result):null};
+ return {...omit(item,['sourceKeys','draft','result']),sourcesCurrent,planningEstimate:item.draft?proposedPlanningEstimate(item.draft):null,planningGuidance:{status:item.blocking.length?'needs-correction':item.issues.length?'conditional':'checked',next:'For planning, recommend concrete actions using supported proposed inputs and current constraints. If a useful estimate is incomplete, propose defensible missing assumptions or explain the specific unsupported decision; factual/discussion-only and no-assumptions requests do not require new inputs. Unknown scope is not a reason to invent staffing, funding or effects.'},draft:item.draft?solutionDraftView(item.draft):null,result:item.result?solutionResultView(item.result):null};
 }

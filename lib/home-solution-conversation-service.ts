@@ -1,3 +1,5 @@
+// @ts-expect-error Native fixture tests share TypeScript source.
+import {planningCalculationRef,planningCalculationFeedback,type PlanningCalculationRef,type PlanningCalculationKind} from './guided-planning-adapters.ts';
 // @ts-expect-error Native Node tests share application source.
 import {readStaffingScenario,converseStaffingScenario} from './home-staffing-scenario.ts';
 // @ts-expect-error Native Node tests share application source.
@@ -23,7 +25,7 @@ import type {ProjectionInputs,HeadcountProjection} from './home-solution-project
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {retainEvaluations,readSolutionRequest,readSolutionState,evaluateSolutionParameterEdit,evaluateSolutionCandidate,mergeSolutionConstraints,solutionUserTurns,resolveSolutionMetric,currentSolutionProposals} from './home-solution-conversation.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
-import {assertSolutionShape,solutionTools,solutionFinalSchema} from './home-solution-conversation-schema.ts';
+import {solutionAnswerText,assertSolutionShape,solutionTools,solutionFinalSchema} from './home-solution-conversation-schema.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {calculateHeadcountProjection} from './home-solution-projection.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
@@ -86,6 +88,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  const modelContext={...solutionModelContext(request,progress),...(runtime.grounding?{evidenceGrounding:runtime.grounding}:{}),...(runtime.natural?{requiredStaffing:requiredStaffingView(currentRequiredStaffing(request,runtime.natural.datasetToken)),businessPlanning:businessPlanningView(natural,request.requestId,naturalStep),hiringBudget:hiringBudgetView(currentHiringBudget(request,runtime.natural.datasetToken))}:{})};
  if(referenced&&demand){const goalContext=structuredClone(request.goalContext) as {scenarioReview:Record<string,unknown>};goalContext.scenarioReview.demandProposal=demand.demandProposal?referencedDemandView(demand.demandProposal,demand,currentDemandReference):null;modelContext.goalContext=goalContext;}
  const input:unknown[]=[{role:'user',content:'CURRENT AUTHORITATIVE CONTEXT AND CONVERSATION DATA\n'+JSON.stringify({...modelContext,...(entryContext?{progressEntryDraft:entryContext.previous}:{} )})}];
+ const planningRefs=new Map<string,PlanningCalculationRef>();
  const evaluated=new Map<string,SolutionEvaluation>(),analyses=new Map<string,HeadcountProjection>();
  let toolCalls=0,operations=0,projectionInput:Promise<ProjectionInputs>|undefined,final:SolutionFinal|undefined,rounds=0;
  for(let round=0;round<4;round++){
@@ -168,7 +171,11 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
      const item=await calculateHeadcountProjection(args.spec as ProjectionSpec,await projectionInput,state.analyses,solutionUserTurns(request).map(turn=>turn.id));abort(signal);
      state.analyses=[...state.analyses,item].slice(-6);analyses.set(item.id,item);result={...item,verifiedMetricReferences:checkedMetricReferences(state,'projection',item.id,item.revision)};
     }
-    if(JSON.stringify(result).length>65000){if(call.name===requiredStaffingTool.name)staffingCalculated=false;result={ok:false,error:'The read result exceeds the tool budget. Request fewer source IDs.'};}
+    const planningKind:PlanningCalculationKind|null=call.name==='review_hiring_budget'?'hiring':call.name==='compare_required_staffing'?'fixed-staffing':call.name==='project_headcount'?'projection':['review_service_demand','revise_service_demand','review_scoped_service_demand','revise_scoped_service_demand','compare_service_staffing'].includes(call.name)?'workload':null;
+    const planningBinding=planningKind?await planningCalculationRef(planningKind,request,state,demandReview):null;
+    if(planningBinding&&result&&typeof result==='object')result={...result,planningGuidance:planningCalculationFeedback(planningBinding)};
+
+    if(JSON.stringify(result).length>65000){if(call.name===requiredStaffingTool.name)staffingCalculated=false;result={ok:false,error:'The read result exceeds the tool budget. Request fewer source IDs.'};}else if(planningBinding)planningRefs.set(planningBinding.reference,planningBinding);
    }catch(error){abort(signal);result={ok:false,error:error instanceof Error?error.message:'The read or calculation was unavailable.',instruction:'Explain the boundary, ask a focused question, or revise typed inputs. Do not claim this calculation succeeded.'};}
    input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(result)});
   }
@@ -179,15 +186,26 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   }
  }
  if(!final)throw Error('No complete conversational answer was returned.');
+ let answer=solutionAnswerText(final,staffingCalculated);
  if(staffingCalculated&&state.requiredStaffing){
   if(staffingOnly){
    if(final.candidateIds.length||final.analysisIds.length||final.verifiedMetrics.length||final.constraintUpdates.length||final.rejected.length||final.focusCandidateId!==null)throw Error('Keep the fixed-role comparison separate from Action Plan and projection changes.');
-   final.answer=requiredStaffingAnswer(state.requiredStaffing);final.questions=[];
-  }else final.answer+='\n\nChecked fixed-role comparison:\n'+requiredStaffingAnswer(state.requiredStaffing);
+   answer=requiredStaffingAnswer(state.requiredStaffing);final.questions=[];
+  }else answer+='\n\nChecked fixed-role comparison:\n'+requiredStaffingAnswer(state.requiredStaffing);
   assertSolutionShape(final,solutionFinalSchema,'answer');
  }
- if(homeAnswerScopeViolation(final.answer,request.evidence))throw Error('The answer attributes source evidence to an unsupported population.');
+ if(answer.length>10000)throw Error('The combined answer exceeds the response budget. Narrow the request; earlier state is retained.');
+ if(homeAnswerScopeViolation(answer,request.evidence))throw Error('The answer attributes source evidence to an unsupported population.');
  state.constraints=mergeSolutionConstraints(request,state.constraints,final.constraintUpdates);
+ if(typeof final.answer!=='string'&&'recommendedPlan' in final.answer){
+  const refs=final.answer.recommendedPlan.calculationRefs;
+  if(new Set(refs).size!==refs.length)throw Error('Use distinct checked planning references.');
+  for(const ref of refs){
+   const known=planningRefs.get(ref),current=known?await planningCalculationRef(known.kind,request,state,demandReview):null;
+   if(!known||!current||current.reference!==ref)throw Error('The recommended plan must reference the current checked inputs and results from this turn.');
+  }
+ }
+
  if(new Set(final.candidateIds).size!==final.candidateIds.length||final.candidateIds.some(id=>!evaluated.has(id))||new Set(final.analysisIds).size!==final.analysisIds.length||final.analysisIds.some(id=>!analyses.has(id)))throw Error('The answer references a proposal or analysis that was not checked in this turn.');
  for(const id of final.candidateIds){const item=evaluated.get(id)!;if(!same(item.constraints,state.constraints)){item.blocking.push('Constraints changed after this calculation. Refine the proposal against the current constraints before saving.');}}
  for(const rejected of final.rejected){const item=latest(state.working).find(item=>item.id===rejected.candidateId);if(!item||!solutionUserTurns(request).some(turn=>turn.id===rejected.turnId))throw Error('The rejected idea has no current candidate or user-turn reference.');// Model rejection is interpretation only; the existing explicit review control owns rejection state.
@@ -200,7 +218,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  state.verifiedMetrics=final.verifiedMetrics;
  state.rejected=state.rejected.slice(-24);state.questions=final.questions;state.focusCandidateId=final.focusCandidateId;
  if(state.focusCandidateId&&!state.working.some(item=>item.id===state.focusCandidateId))throw Error('The conversational focus is unavailable.');
- state.turns=[...state.turns,{id:request.message.id,role:'user' as const,text:request.message.text},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:final.answer}].slice(-32);
+ state.turns=[...state.turns,{id:request.message.id,role:'user' as const,text:request.message.text},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:answer}].slice(-32);
  abort(signal);
- return {...(progressProposal?{progressProposal}:{}),...(demandReview?{demandReview}:{}),charts:final.candidateIds.length||final.analysisIds.length?[]:answerEvidenceSeries(request.evidence,runtime.grounding,request.requestId,request.message.text,final.answer),requestId:request.requestId,answer:final.answer,candidateIds:final.candidateIds,analysisIds:final.analysisIds,state:readSolutionState(state),usage:{modelRounds:rounds,toolCalls}};
+ return {...(progressProposal?{progressProposal}:{}),...(demandReview?{demandReview}:{}),charts:final.candidateIds.length||final.analysisIds.length?[]:answerEvidenceSeries(request.evidence,runtime.grounding,request.requestId,request.message.text,answer),requestId:request.requestId,answer,candidateIds:final.candidateIds,analysisIds:final.analysisIds,state:readSolutionState(state),usage:{modelRounds:rounds,toolCalls}};
 }

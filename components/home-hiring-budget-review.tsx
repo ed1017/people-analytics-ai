@@ -24,6 +24,8 @@ export function HomeHiringBudgetReview({review,onUpdate,disabled}:{review:Hiring
  return <section aria-label="Hiring budget estimate" className="space-y-3 rounded border p-3 text-sm">
   <h3 className="font-semibold">Hiring budget estimate</h3>
   <p>{number(review.inputs.hires)} hires · {review.inputs.role??'Role unknown'} · {review.inputs.months===null?'Period unknown':`${review.inputs.months} months`} from {review.inputs.startMonth??'start unknown'}</p>
+  {Object.values(review.origins).some(b=>b.kind==='model-proposed')&&<p className="font-medium">Model-proposed scenario assumptions · unconfirmed</p>}
+  {result.annualBasePayCeiling!==null&&<p><strong>Annual base-pay ceiling per hire:</strong> {money(result.annualBasePayCeiling)} before any unlisted costs. This is a spending limit under the entered timing and cost assumptions, not a salary estimate or proof that hiring is feasible.</p>}
   <p><strong>Budget allowance per hire:</strong> {money(result.budgetPerHire)} for the budget period. This is not an annual salary.</p>
   <dl className="grid grid-cols-1 gap-2 sm:grid-cols-2">
    {([['Base-pay subtotal',result.baseCost],['Listed period costs',result.listedCost],['Complete period cost',result.periodCost],['Recurring annual cost',result.annualRunRate]] as const).map(([label,value])=><div key={label}><dt>{label}</dt><dd className="font-medium">{money(value)}</dd></div>)}

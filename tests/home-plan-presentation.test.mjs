@@ -8,6 +8,8 @@ const messages=state=>state.turns.map(t=>({role:t.role,content:t.text}));
 const run=(body,steps)=>converseSolutions(body,fixtureRuntime(steps),new AbortController().signal);
 test('differently worded prose steps are reference-only; explanations, unknowns and the original answer survive',async()=>{
  const c=candidate(),reply=await run(solutionRequest(),[evaluate(c),final(prose,[c.id])]);
+ // Historical messages keep their original free-text response; no migration or rewrite.
+ reply.answer=prose;reply.state.turns.at(-1).text=prose;
  const before=JSON.stringify(reply.state),visible=messages(reply.state),p=solutionDiscussionPresentations(visible,reply.state).get(visible.at(-1));
  assert.match(p.reference,/Launch listening circles/);assert.doesNotMatch(p.discussion,/Launch listening|Commission a workload/);
  for(const text of ['does not establish a cause','Costs and population are unknown','Small trials'])assert.ok(p.discussion.includes(text));

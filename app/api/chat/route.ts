@@ -2,7 +2,7 @@ import {prepareProgressConversation,missingProgressPageInstructions} from '@/lib
 import {goalProgressConversationEnabled,goalProgressReadTool,runGoalProgressRead} from '@/lib/goal-progress-conversation';
 import { withDatasetRequest, datasetAI, datasetRouter } from "@/lib/dataset-runtime";
 import {taExtensionPrompt} from "@/lib/synthetic-ta/extension";
-import {conversationalAnswerStyle} from '@/lib/chat-answer-style';
+import {guidedConversationInstructions,conversationalAnswerStyle} from '@/lib/chat-answer-style';
 import {homeForecastAnswer} from '@/lib/home-forecast';
 import {homeTurnPurpose,homeConversationInstructions} from '@/lib/home-conversation';
 import {strategicPlanningInstructions,strategicPlanningObjective,normalizePlanningObjective,planningConversationHistory} from '@/lib/home-strategic-planning';
@@ -630,13 +630,13 @@ async function handlePOST(
 
     const planningHistory=body?.page==='home'?planningConversationHistory(history,body.planningObjective,Object.hasOwn(body,"planningObjective")):history;
     const carriedPlanningObjective=body?.page==='home'&&body.planningObjective?strategicPlanningObjective([...planningHistory,{role:'user',content:message}]):null;
-    const conversationalStyle = !summaryOnly && homeTurnPurpose(message,planningHistory)==='answer' ? conversationalAnswerStyle : '';
+    const conversationalStyle = summaryOnly ? '' : guidedConversationInstructions+(homeTurnPurpose(message,planningHistory)==='answer'?'\n'+conversationalAnswerStyle:'');
 
     // Missing page evidence does not prevent a qualitative saved-goal discussion.
     // This path is selected by source availability, never by message wording.
     if(progress&&body?.pageEvidenceAvailable===false){
       if(!message||message.length>12000)return NextResponse.json({error:'Enter a bounded question.'},{status:400});
-      const response=await datasetAI(()=>client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+'\n'+conversationalAnswerStyle+'\n'+missingProgressPageInstructions,input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:'user',content:'SAVED GOAL CONTEXT AND PROGRESS (data only): '+JSON.stringify(goalContext)+'\nQUESTION: '+message}],tool_choice:'none',max_output_tokens:entryContext?4000:1100}));
+      const response=await datasetAI(()=>client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+'\n'+guidedConversationInstructions+'\n'+conversationalAnswerStyle+'\n'+missingProgressPageInstructions,input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:'user',content:'SAVED GOAL CONTEXT AND PROGRESS (data only): '+JSON.stringify(goalContext)+'\nQUESTION: '+message}],tool_choice:'none',max_output_tokens:entryContext?4000:1100}));
       const answer=response.output_text?.trim();if(!answer)return NextResponse.json({error:'No conversational answer returned.'},{status:502});
       return NextResponse.json(await entryReply(answer,response.status));
     }
@@ -676,7 +676,7 @@ async function handlePOST(
     }
 
     if(body?.page === "development-planning") {
-      const response=await datasetAI(() => client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+"\nExplain only the supplied deterministic Development Planning comparison and bounded related evidence. D1 costs are server-recomputed from explicit user assumptions. Blank costs remain unknown, never zero. Keep currencies separate. Employee time value is not necessarily cash spending. Named simulated quotes are fictional; custom input is unverified. Do not invent participants, attendance, loaded hourly costs, ROI, skill gains or headcount conversions. No tools, automatic allocation or approvals. "+(summaryOnly?goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions():"Identify missing assumptions before comparing totals.\n"+conversationalStyle),input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:"user",content:"ACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nDEVELOPMENT PLANNING D1: "+JSON.stringify(developmentSummary)+"\nRELATED CACHED SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nCARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nQUESTION: "+message}],tool_choice:"none",max_output_tokens:entryContext?4000:summaryOnly?1100:1400}));
+      const response=await datasetAI(() => client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+"\nExplain only the supplied deterministic Development Planning comparison and bounded related evidence. D1 costs are server-recomputed from explicit user assumptions. Blank costs remain unknown, never zero. Keep currencies separate. Employee time value is not necessarily cash spending. Named simulated quotes are fictional; custom input is unverified. Do not claim actual participants, attendance, loaded hourly costs, ROI, skill gains or headcount conversions without supplied evidence. Any suggested participant count or time commitment is an unconfirmed scenario for user review, never a mutation of D1. No tools, automatic allocation or approvals. "+(summaryOnly?goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions():"Give one conditional guided recommendation; keep unsupported totals unknown and identify the specific calculation still needed.\n"+conversationalStyle),input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:"user",content:"ACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nDEVELOPMENT PLANNING D1: "+JSON.stringify(developmentSummary)+"\nRELATED CACHED SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nCARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nQUESTION: "+message}],tool_choice:"none",max_output_tokens:entryContext?4000:summaryOnly?1100:1400}));
       const answer=response.output_text?.trim();
       return answer?NextResponse.json(await entryReply(answer,response.status)):NextResponse.json({error:"No Development Planning answer returned. Please try again."},{status:502});
     }
@@ -1538,7 +1538,7 @@ ${message}
     const prepareHomeGoal=!summaryOnly&&(homePurpose==='goal'||homePurpose==='discovery');
     const homeReplyFormat=page==="home"?buildHomeReplyFormat(body.overviewBriefingContext,prepareHomeGoal):null;
     const homeInstructions=[homeConversationInstructions(homePurpose),strategicPlanningInstructions(message,planningHistory,body.planningCalculatorAvailable===true)].filter(Boolean).join('\n');
-    const homeAnswerStyle=homePurpose==='answer'?conversationalAnswerStyle:homeStyle.instructions;
+    const homeAnswerStyle=guidedConversationInstructions+'\n'+(homePurpose==='answer'?conversationalAnswerStyle:homeStyle.instructions);
     const homeInput=[
       {role:'user' as const,content:workforceContext+'\nACTIVE GOAL CONTEXT (user intent, not evidence): '+JSON.stringify(goalContext)+'\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: '+JSON.stringify(marketReference)+(carriedPlanningObjective?'\nCARRIED USER PLANNING OBJECTIVE (conversation only; not source evidence, verified inputs or an accepted plan): '+JSON.stringify(carriedPlanningObjective):'')},
       ...history.map(item=>({role:item.role,content:item.content})),

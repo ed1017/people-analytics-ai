@@ -26,6 +26,14 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
   if(url.pathname==='/api/home-solution-conversation'){
    const body=req.postDataJSON();requests.push(body);const basis={kind:'user-supplied',turnId:body.message.id,quote:body.message.text,explanation:'Offline fixture interpretation of the user request.'};
    let steps=body.state.hiringBudget?[{name:'review_hiring_budget',args:{changes:[]}},final('The entered scenario is conditional; confirm the salary and hiring schedule.')]:[{name:'review_hiring_budget',args:{changes:[{field:'hires',value:10,basis},{field:'budget',value:1000000,basis},{field:'role',value:'Engineers',basis}]}},final('Confirm the cost basis and timing before committing. The estimate shows the allowance per hire.')];
+   if(body.message.text==='Propose a hiring scenario for 10 engineers with a $1 million cap'){
+    const proposed={kind:'model-proposed',turnId:null,quote:null,explanation:'Illustrative budget sensitivity input for review, not a company cost or salary.'};
+    const values={currency:'USD',months:12,startMonth:'2027-01',arrivalDate:'2027-01-01',ftePerHire:1,payBasis:'per_hire',annualAdditionalCostPerHire:20000,recruitingFeePerHire:10000};
+    steps=[{name:'review_hiring_budget',args:{changes:[{field:'hires',value:10,basis},{field:'budget',value:1000000,basis},...Object.entries(values).map(([field,value])=>({field,value,basis:proposed}))]}},input=>{
+     const ref=JSON.parse(input.findLast(x=>x.type==='function_call_output').output).planningGuidance.binding.reference;
+     return {...final(),answer:{findings:'Actual salaries and availability remain unknown.',decisionRationale:'Screen comparable quotes against the conditional ceiling before committing.',caveats:['Currency, timing and non-base costs are unconfirmed scenario assumptions.'],recommendedPlan:{name:'Validate the hiring route',steps:['Confirm the proposed budget period with Finance.','Request comparable quotes and review full costs.'],calculationRefs:[ref]}}};
+    }];
+   }
    if(body.message.text==='Recommend a plan'){const c=candidate();c.goal.turnId=body.message.id;steps=[evaluate(c),final('Begin with a bounded trial.\n\n### Further reading / investigation\nReview the actual cost inputs before approval.',[c.id])];}
    const runtime=fixtureRuntime(steps);runtime.natural={datasetToken:'legacy-v1:0'};return route.fulfill({json:await converseSolutions(body,runtime,new AbortController().signal)});
   }
@@ -61,6 +69,10 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  check('existing checked-plan review remains available after clearing the estimate',await review.getByLabel('Recommendation summary',{exact:true}).count()===1);
  const quick=review.getByRole('region',{name:'Action Plan quick summary',exact:true});
  check('PR201 cost timeline and resource summary remains present',await quick.count()===1&&await quick.getByRole('region',{name:'Total cost',exact:true}).isVisible()&&await quick.getByRole('region',{name:'Timeline',exact:true}).isVisible()&&await quick.getByRole('region',{name:'Resources',exact:true}).isVisible());
+ await send('Propose a hiring scenario for 10 engineers with a $1 million cap');await card.waitFor();
+ check('unconfirmed scenario shows a checked ceiling without inventing salary',(await card.innerText()).includes('Model-proposed scenario assumptions')&&(await card.innerText()).includes('70,000 USD')&&(await card.innerText()).includes('Budget check: Unknown'));
+ await card.getByText('Edit inputs and salary override',{exact:true}).click();
+ check('proposed inputs remain editable and salary stays blank',await card.getByRole('combobox',{name:'Currency',exact:true}).inputValue()==='USD'&&await card.getByLabel('Annual base pay override',{exact:true}).inputValue()==='');
  await context.close();
 }}finally{await browser.close()}
 await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({checks},null,2));console.log(JSON.stringify({checks:checks.length,output}));

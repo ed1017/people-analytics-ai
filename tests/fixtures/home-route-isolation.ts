@@ -8,7 +8,7 @@ export default class OpenAI {
  responses={create:async(request:unknown,options?:unknown)=>{
   const harness=globalThis as unknown as {__requests:unknown[];__replies:unknown[];__requestOptions?:unknown[]};
   harness.__requests.push(request);harness.__requestOptions?.push(options);
-  const reply=harness.__replies.shift();if(!reply)throw Error('Unexpected synthetic Responses call');return reply;
+  const reply=harness.__replies.shift();if(!reply)throw Error('Unexpected synthetic Responses call');return typeof reply==='function'?reply(request):reply;
  }};
 }
 export const openAIProxyTransport=()=>{
