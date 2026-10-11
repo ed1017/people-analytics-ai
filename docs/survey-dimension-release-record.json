@@ -1,0 +1,44 @@
+{
+  "recordType": "sanitized release audit",
+  "repositoryBase": "85b5678d8eccb2d8ba526ece81cdc57aad7793aa",
+  "migration": {
+    "name": "optimize_survey_listening_dimension_summary",
+    "version": "20261011012717",
+    "projectId": "noykvmztefmmhyuwuppv",
+    "applyCalls": 1,
+    "applyArtifactSha256": "ee0ffa73efb8a98a446d94dc7f302b7b4ee8e08546e80beb6886e9b6c37af17a",
+    "metadataVerified": true,
+    "metadataInvariantsMatch": true,
+    "candidateCatalogSha256": "e3c68cdd720994413bc3d8fe4afa21be11c15e573b8cbed333e50e88db34d7db"
+  },
+  "acceptance": {
+    "startedAt": "2026-10-11T01:34:13.168277+00:00",
+    "completedAt": "2026-10-11T01:34:27.171Z",
+    "querySha256": "8fdb8ce68179aefa78a39e87adca6736b7240ad5ca4feffe56171601c2985469",
+    "dispatches": 1,
+    "unorderedDifferenceCount": 0,
+    "columns": 11,
+    "aggregateEvaluations": 2,
+    "snapshot": "single SELECT snapshot",
+    "readOnly": true,
+    "role": "service_role",
+    "statementTimeoutMs": 10000,
+    "transactionTimeoutMs": 15000,
+    "lockTimeoutMs": 2000,
+    "serverBatchElapsedMs": 2320.687,
+    "toolElapsedMs": 5805,
+    "priorAttemptStatus": "unverified; this new attempt was separately authorized"
+  },
+  "limits": [
+    "Equivalence is established only for the tested snapshot and role.",
+    "Server batch timing includes setup and metadata guards, not separate baseline/candidate timings.",
+    "No proven end-to-end speed improvement.",
+    "No response rows, identities, credentials or raw runtime logs included."
+  ],
+  "archiveActions": {
+    "sqlReapplied": false,
+    "additionalAggregatesRun": false,
+    "paidAiCalls": 0,
+    "manualDeployment": false
+  }
+}
