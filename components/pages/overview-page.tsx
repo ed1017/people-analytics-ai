@@ -144,7 +144,7 @@ export function OverviewPage({
               : "—"}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Annualized total labor cost
+            Reported labor cost · period unknown
           </p>
         </div>
 
