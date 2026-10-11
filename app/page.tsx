@@ -1221,7 +1221,7 @@ export default function Home() {
     financeBusinessUnits.length > 0
       ? Math.max(
           ...financeBusinessUnits.map(
-            (row) => row.labor_cost_usd
+            (row) => row.labor_cost_usd ?? 0
           )
         )
       : 0;

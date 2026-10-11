@@ -807,7 +807,7 @@ Current metrics:
 - Headcount: ${context.headcount}
 - FTE: ${context.fte}
 - Voluntary turnover YTD: ${context.voluntaryTurnoverYtdPct}%
-- Annualized labor cost USD: ${context.laborCostUsd}
+- Reported labor cost USD (period unknown): ${context.laborCostUsd}
 - Open positions: ${context.openPositions}
 - Headcount growth over displayed history: ${
       context.headcountGrowthPct === null
@@ -1024,7 +1024,7 @@ CURRENT WORKFORCE FINANCE CONTEXT
 Company current:
 - Headcount: ${financeContext.current.headcount}
 - FTE: ${financeContext.current.fte}
-- Annualized labor cost USD: ${financeContext.current.labor_cost_usd}
+- Reported labor cost USD (period unknown; not salary): ${financeContext.current.labor_cost_usd}
 - Cost per FTE USD: ${financeContext.current.cost_per_fte_usd}
 - Vacant positions: ${financeContext.current.vacant_positions}
 - Estimated vacancy cost exposure USD: ${financeContext.current.estimated_vacancy_cost_exposure_usd}
@@ -1046,7 +1046,7 @@ ${financeContext.scenarios
   .join("\n")}
 
 Interpretation rule:
-- Vacancy cost exposure is an estimate based on current average cost per FTE times vacancies. It is not booked expense or guaranteed savings.
+- Vacancy cost exposure sums the source-reported business-unit estimates; it is not enterprise average cost per FTE times all vacancies. Cost period is unknown. It is not booked expense or guaranteed savings.
 `.trim()
         : "";
 
