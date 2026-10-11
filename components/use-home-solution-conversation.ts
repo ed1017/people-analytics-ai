@@ -11,7 +11,7 @@ import {requestDemandContext,readDemandReview,type DemandReview} from '@/lib/swp
 import {decisionStore,useDecisionStorage} from './decision-store';
 import type {ProblemConversation} from './problem-conversation';
 import type {BundleDiscussion} from './home-bundle-plans';
-import {editSolutionPlanningInputs,type PlanningInputChange,emptySolutionState,readSolutionState,readSolutionRequest,saveSolutionCandidate,solutionConversationField,type SolutionEvaluation,type SolutionRequest,type SolutionState} from '@/lib/home-solution-conversation';
+import {retainEvaluations,editSolutionPlanningInputs,type PlanningInputChange,emptySolutionState,readSolutionState,readSolutionRequest,saveSolutionCandidate,solutionConversationField,type SolutionEvaluation,type SolutionRequest,type SolutionState} from '@/lib/home-solution-conversation';
 import {createPlanAlternatives,packPlanAlternatives,planAlternativesField,readPlanAlternatives,associatePlanProposal,type PlanAlternatives} from '@/lib/home-plan-alternatives';
 import type {SolutionReply} from '@/lib/home-solution-conversation-service';
 import {alternativeViewField} from '@/lib/home-plan-alternative-chat';
@@ -107,7 +107,7 @@ export function useHomeSolutionConversation(props:Props){
    const revised=await editSolutionPlanningInputs(request,item,changes);requireCurrent();
    if(key!==liveKey.current||captured!==epoch.current||snapshot.data.revision!==decisionStore.getSnapshot().data.revision||!equal(request.catalog,catalog()))throw Error('The conversation changed. Review the current proposal before editing.');
    if(revised.blocking.length)throw Error(revised.blocking.join(' '));
-   const state=structuredClone(memoryRef.current);state.working=[...state.working,revised].slice(-12);state.verifiedMetrics=[];state.focusCandidateId=revised.id;state.constraints=revised.constraints;
+   const state=structuredClone(memoryRef.current);state.working=retainEvaluations(state,[revised]);state.verifiedMetrics=[];state.focusCandidateId=revised.id;state.constraints=revised.constraints;
    state.turns=[...state.turns,{id:request.message.id,role:'user' as const,text:request.message.text}].slice(-32);
    persist(readSolutionState(state));setNotice('Planning assumptions recalculated. Review before pinning; inputs remain unverified.');
   }catch(error){setNotice((error as Error).message);}finally{setSaving(false);}

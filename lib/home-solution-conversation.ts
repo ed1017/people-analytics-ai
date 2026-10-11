@@ -51,6 +51,25 @@ export const emptySolutionState=():SolutionState=>({version:1,verifiedMetrics:[]
 export function currentSolutionProposals(state:SolutionState){
  return [...new Map(state.working.map(item=>[item.id,item])).values()].filter(item=>!state.rejected.some(rejected=>rejected.candidateId===item.id&&rejected.revision===item.revision));
 }
+/** Keep the exact provenance of every retained proposal, including a batched set. */
+export function retainEvaluations(state:SolutionState,items:SolutionEvaluation[]){
+ const proposed=[...state.working,...items],retained=proposed.slice(-12);
+ // Keep every proof needed by a current proposal. Refuse this edit before
+ // trimming, so the existing checked revision remains reviewable and savable.
+ const key=(row:{id:string;revision:number})=>JSON.stringify([row.id,row.revision]);
+ const removed=new Set(proposed.slice(0,-12).map(key)),byKey=new Map(retained.map(row=>[key(row),row])),visited=new Set<string>();
+ const checkAncestry=(row:SolutionEvaluation)=>{
+  if(visited.has(key(row)))return;visited.add(key(row));
+  for(const ref of [row.candidate.base,...row.candidate.activities.map(a=>a.source),...row.candidate.quantities.map(q=>q.source)])if(ref?.kind==='working'){
+   if(removed.has(key(ref)))throw Error('The working history limit would remove source provenance. Choose the current proposal to save it, then continue from that saved plan; this edit and its constraints were not recorded.');
+   const prior=byKey.get(key(ref));if(prior)checkAncestry(prior);
+  }
+ };
+ if(removed.size)[...new Map(retained.map(item=>[item.id,item])).values()].forEach(checkAncestry);
+
+ return retained;
+}
+
 export function readSolutionState(raw:unknown):SolutionState {
  if(raw===undefined||raw===null)return emptySolutionState();
  if(!validateJson(raw)||!obj(raw)||raw.version!==1||!Array.isArray(raw.turns)||raw.turns.length>32||!Array.isArray(raw.constraints)||raw.constraints.length>5||!Array.isArray(raw.working)||raw.working.length>12||!Array.isArray(raw.rejected)||raw.rejected.length>24||!Array.isArray(raw.questions)||raw.questions.length>2||!raw.questions.every(q=>text(q,300))||!(raw.focusCandidateId===null||id(raw.focusCandidateId)))fail('The working conversation could not be read. Saved plans are preserved.');
@@ -214,20 +233,20 @@ function quantityValue(request:SolutionRequest,q:SolutionQuantity):Assumption<nu
   return {value:q.number,kind:'model-proposed',basis:`Model-proposed planning choice · unconfirmed: ${q.interpretation}`.slice(0,240)};
  }
  if((q.kind==='literal'||q.kind==='scale')&&!solutionUserTurns(request).some(turn=>turn.id===q.turnId))fail('A new value or relative change must reference the user turn that requested it.');
- let value:number|string|boolean|null;
+ let value:number|string|boolean|null,derivedFromModel=false;
  if(q.kind==='reference'||q.kind==='scale'){
   if(!q.source||unitFor(q.source.field)!==q.unit)fail('A relative/reference quantity must use an actual value with the same units.');
   const prior=readQuantity(source(request,q.source).draft,q.source.field,q.source.target);
   if(prior.kind==='model-proposed'&&q.field!==q.source.field)fail('A model-proposed assumption cannot supply a different planning field.');
   if(q.kind==='reference')return prior.value===null?unknownAssumption():{value:prior.value,kind:prior.kind==='model-proposed'?'model-proposed':'illustrative',basis:`Unconfirmed application of a checked ${prior.kind} source value; not an observed fact.`};
   if(q.factor===null||prior.value!==null&&typeof prior.value!=='number')fail('A relative numeric change needs a numeric reference and explicit factor.');
-  value=prior.value===null?null:(prior.value as number)*q.factor;
+  value=prior.value===null?null:(prior.value as number)*q.factor;derivedFromModel=prior.kind==='model-proposed';
  }else value=q.unit==='boolean'?q.text==='true'?true:q.text==='false'?false:fail('Review an explicit true/false interpretation.'):['text','YYYY-MM','YYYY-MM-DD'].includes(q.unit)?q.text:q.number;
  if(value===null)return unknownAssumption();
  if(typeof value==='number'&&(!Number.isFinite(value)||value<0||value>(q.field==='horizon_months'?24:q.field==='hours_per_participant'?1000:q.field==='participants'?1000000:1e9)||['participants','horizon_months'].includes(q.field)&&!Number.isInteger(value)||q.field==='horizon_months'&&value<1))fail(`The normalized ${q.field} is outside its supported range.`);
  if(q.unit==='YYYY-MM'&&(typeof value!=='string'||!/^20\d\d-(0[1-9]|1[0-2])$/.test(value)))fail('Review a normalized YYYY-MM start month.');
  if(q.unit==='YYYY-MM-DD'&&(typeof value!=='string'||!/^20\d\d-(0[1-9]|1[0-2])-\d\d$/.test(value)||!Number.isFinite(Date.parse(value))||new Date(value).toISOString().slice(0,10)!==value))fail('Review a real normalized calendar date.');
- return {value,kind:'illustrative',basis:`Unconfirmed model interpretation of turn ${q.turnId}: ${q.interpretation}`.slice(0,240)};
+ return {value,kind:derivedFromModel?'model-proposed':'illustrative',basis:`${derivedFromModel?'Scaled model-proposed input; unconfirmed':'Unconfirmed model interpretation'} of turn ${q.turnId}: ${q.interpretation}`.slice(0,240)};
 }
 function applyQuantity(input:BundleInputs,q:SolutionQuantity,value:Assumption<number|string|boolean>,activities:string[]){
  const number=value as Assumption<number>,string=value as Assumption<string>;
@@ -250,7 +269,7 @@ function applyQuantity(input:BundleInputs,q:SolutionQuantity,value:Assumption<nu
    let row=input.expenses.find(item=>item.id===q.target&&item.kind==='cash');
    if(!row){const links=input.expenseLinks.filter(item=>item.componentIds.length===1&&item.componentIds[0]===q.target);const rows=input.expenses.filter(item=>item.kind==='cash'&&links.some(link=>link.expenseId===item.id));if(rows.length!==1)fail('Name the exact cash item or an activity with one allowance.');row=rows[0];}
    row.amount=number;
-   if(q.kind==='model-proposed'){
+   if(value.kind==='model-proposed'){
     if(row.months.value!==null&&row.months.value!==1)fail('A proposed one-time allowance cannot replace an existing recurring cost basis.');
     if(row.months.value===null)row.months={value:1,kind:'model-proposed',basis:'One-time allowance for the entire proposed pilot; funding date and availability remain unknown.'};
    }
@@ -283,24 +302,28 @@ function applyParameterQuantity(input:BundleInputs,q:SolutionQuantity,value:Assu
   if(input.groups.length!==1||input.memberships.some(row=>row.complete.value!==true))input.groupsDisjoint=unknownAssumption();
  }
 }
-function readQuantityForProposal(input:BundleInputs,field:SolutionField,target:string|null):unknown{
+function readQuantityForProposal(input:BundleInputs,field:SolutionField,target:string|null):Assumption<unknown>[] {
  switch(field){
-  case 'horizon_months':return input.scope.months.value;
-  case 'hours_per_participant':return input.deliveryEstimate?.hoursPerParticipant.value??null;
-  case 'coordination_hours':return input.deliveryEstimate?.coordinationHours.value??null;
-  case 'participants':return input.memberships.filter(row=>row.componentId===target).flatMap(row=>row.groupIds).map(id=>input.groups.find(group=>group.id===id)?.count.value).find(value=>value!=null)??null;
-  case 'cash':return input.expenses.filter(row=>row.id===target||input.expenseLinks.some(link=>link.expenseId===row.id&&link.componentIds.includes(target??''))).find(row=>row.amount.value!==null)?.amount.value??null;
-  default:return null;
+  case 'horizon_months':return [input.scope.months];
+  case 'hours_per_participant':return input.deliveryEstimate?[input.deliveryEstimate.hoursPerParticipant]:[];
+  case 'coordination_hours':return input.deliveryEstimate?[input.deliveryEstimate.coordinationHours]:[];
+  case 'participants':return input.memberships.filter(row=>row.componentId===target).flatMap(row=>row.groupIds).flatMap(id=>{const group=input.groups.find(group=>group.id===id);return group?[group.count]:[];});
+  case 'cash':return input.expenses.filter(row=>row.id===target||input.expenseLinks.some(link=>link.expenseId===row.id&&link.componentIds.includes(target??''))).map(row=>row.amount);
+  default:return [];
  }
 }
-function applyReviewedInputs(request:SolutionRequest,evaluation:SolutionEvaluation,input:BundleInputs,quantitiesToApply:SolutionQuantity[],constraints:SolutionConstraint[],activities:string[],parameterOnly=false){
+function applyReviewedInputs(request:SolutionRequest,evaluation:SolutionEvaluation,input:BundleInputs,quantitiesToApply:SolutionQuantity[],constraints:SolutionConstraint[],activities:string[],parameterOnly=false,parameterSource?:SolutionSource){
   const quantities=new Set<string>();
   for(const q of quantitiesToApply){
-   if(q.kind==='model-proposed'){
-    const existing=q.field==='participants'&&q.target==='all'?activities.map(target=>readQuantityForProposal(input,q.field,target)): [readQuantityForProposal(input,q.field,q.target)];
-    if(existing.some(value=>value!==null))fail('A model-proposed assumption cannot replace an existing input. Use an explicit reviewed edit.');
+   const key=JSON.stringify([q.field,q.target]);if(quantities.has(key))fail('Review one normalized value for each assumption.');quantities.add(key);
+   const value=quantityValue(request,q);
+   if(value.kind==='model-proposed'){
+    const existing=q.field==='participants'&&q.target==='all'?activities.flatMap(target=>readQuantityForProposal(input,q.field,target)):readQuantityForProposal(input,q.field,q.target);
+    // A current explicit relative edit may scale its own proposed value, but never a retained user input.
+    const ownScale=parameterOnly&&q.kind==='scale'&&q.turnId===request.message.id&&q.source&&parameterSource&&q.source.kind===parameterSource.kind&&q.source.id===parameterSource.id&&q.source.revision===parameterSource.revision&&q.source.field===q.field&&q.source.target===q.target;
+    if(existing.some(prior=>prior.value!==null&&(!ownScale||prior.kind!=='model-proposed')))fail('A model-proposed assumption cannot replace an existing input. Use an explicit reviewed edit.');
    }
-   const key=JSON.stringify([q.field,q.target]);if(quantities.has(key))fail('Review one normalized value for each assumption.');quantities.add(key);const value=quantityValue(request,q);(parameterOnly?applyParameterQuantity:applyQuantity)(input,q,value,activities);evaluation.interpretations.push(`${q.field}${q.target?` (${q.target})`:''}: ${value.value??'Unknown'} ${q.unit}. ${q.interpretation}${q.source?` Source: ${q.source.kind} ${q.source.id} revision ${q.source.revision}; factor ${q.factor??1}.`:''}`);}
+   (parameterOnly?applyParameterQuantity:applyQuantity)(input,q,value,activities);evaluation.interpretations.push(`${q.field}${q.target?` (${q.target})`:''}: ${value.value??'Unknown'} ${q.unit}. ${q.interpretation}${q.source?` Source: ${q.source.kind} ${q.source.id} revision ${q.source.revision}; factor ${q.factor??1}.`:''}`);}
   for(const constraint of constraints){
    if(constraint.action==='remove'){
     evaluation.interpretations.push(`Removed ${constraint.field} constraint, from user turn ${constraint.turnId}.`);
@@ -345,7 +368,7 @@ export async function evaluateSolutionParameterEdit(request:SolutionRequest,edit
   const draft=structuredClone(original);draft.binding=binding;draft.revision++;
   if(draft.inputs.successMeasure&&draft.inputs.successMeasure.goal!==goal)fail('A saved outcome measure belongs to another goal; review it explicitly.');
   for(const q of edit.quantities)if(q.source){const dependency=source(request,q.source);Object.assign(evaluation.sourceKeys,dependency.sourceKeys);for(const ref of dependency.sourceRefs)if(!evaluation.sourceRefs.some(old=>old.id===ref.id))evaluation.sourceRefs.push(ref);}
-  applyReviewedInputs(request,evaluation,draft.inputs,edit.quantities,constraints,draft.bundle.components.map(c=>c.id),true);
+  applyReviewedInputs(request,evaluation,draft.inputs,edit.quantities,constraints,draft.bundle.components.map(c=>c.id),true,edit.source);
   evaluation.changes.push('Only the listed parameters and current constraints were changed. Source activities and unrelated assumptions, including unknowns, are retained.');
   finishEvaluation(request,evaluation,draft,constraints);
  }catch(error){evaluation.blocking.push(error instanceof Error?error.message:'The parameter edit could not be calculated.');}

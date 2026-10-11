@@ -25,7 +25,8 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  const check=(name,ok)=>{assert.ok(ok,mode+' '+name);checks.push(mode+' '+name);console.log('PASS '+mode+' '+name);};
  await context.route('**/*',async route=>{const req=route.request(),url=new URL(req.url());if(req.isNavigationRequest()&&url.href===base+'/')return route.fulfill({contentType:'text/html',body:html});if(url.origin!==base){external++;return route.abort();}if(url.pathname==='/api/home-solution-conversation'){
   const body=req.postDataJSON();requests.push(body);const c=proposedPilot(body.message.text==='Recommend again'?'renewed-pilot':'manager-pilot',body.message.id);
-  const runtime=fixtureRuntime([evaluate(c),final('Try a small manager/workload pilot. The available evidence cannot identify the weakest teams.',[c.id])]);
+  const changed=final('Use the updated cash ceiling.',[]);changed.constraintUpdates=[{action:'set',field:'budget_usd',number:1000,text:null,unit:'USD',turnId:body.message.id}];
+  const runtime=fixtureRuntime(body.message.text==='Change constraint'?[changed]:[evaluate(c),final('Try a small manager/workload pilot. The available evidence cannot identify the weakest teams.',[c.id])]);
   const reply=await converseSolutions(body,runtime,new AbortController().signal);assert.equal(runtime.reads,0);return route.fulfill({json:reply});
  }if(url.pathname.startsWith('/api/'))return route.fulfill({json:{overview:{headcount:100,fte:100,open_positions:3,snapshot_date:'2026-09-30'},trend:[]}});external++;return route.abort();});
  await page.goto(base);await dismissHomeOnboarding(page);
@@ -35,21 +36,44 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  check('one authoritative plan and visible unconfirmed label',await card().count()===1&&await card().getByText('Model-proposed planning assumptions · unconfirmed',{exact:true}).isVisible());
  const summary=()=>card().getByRole('region',{name:'Action Plan quick summary',exact:true});
  check('conditional cash, duration, people and labor time are readable',await summary().getByText('$500',{exact:true}).isVisible()&&await summary().getByText('2 months',{exact:true}).isVisible()&&await summary().getByText('10 people',{exact:true}).isVisible()&&await summary().getByText('Labor time: 28 hours',{exact:true}).isVisible());
- check('labor price and actual availability remain unknown',await summary().getByText('Labor cost: Unknown · no pay rate assumed',{exact:true}).isVisible()&&await summary().getByText('Availability and membership unconfirmed.',{exact:true}).isVisible());
+ check('labor price and actual availability remain unknown',await summary().getByText('Labor cost: Not calculated',{exact:true}).isVisible()&&await summary().getByText('Availability and membership unconfirmed.',{exact:true}).isVisible());
  await summary().scrollIntoViewIfNeeded();await page.screenshot({path:path.join(output,mode+'-proposal.png')});
  await card().getByText('Edit planning assumptions',{exact:true}).click();const calls=requests.length;
+ await card().getByLabel('Participants · Manager check-ins and workload review (people)',{exact:true}).fill('12');
+ const pin=()=>card().getByRole('button',{name:'Pin Action Plan with unknowns',exact:true});
+ const beforeDirty=JSON.stringify(await readState());await pin().evaluate(button=>button.click());
+ check('dirty inputs block pinning without changing storage',await pin().isDisabled()&&JSON.stringify(await readState())===beforeDirty&&await card().getByText('Recalculate or discard input changes before pinning.',{exact:true}).isVisible());
+ await card().getByRole('button',{name:'Discard input changes',exact:true}).click();
+ check('discard input changes restores the reviewed value and enables pin',await card().getByLabel('Participants · Manager check-ins and workload review (people)',{exact:true}).inputValue()==='10'&&await pin().isEnabled());
  await card().getByLabel('Participants · Manager check-ins and workload review (people)',{exact:true}).fill('12');
  await card().getByRole('button',{name:'Recalculate proposal',exact:true}).click();await card().getByText(/revision 2/).waitFor();
  check('local edit updates one card without a model request',requests.length===calls&&await card().count()===1&&await summary().getByText('12 people',{exact:true}).isVisible()&&await summary().getByText('Labor time: 32 hours',{exact:true}).isVisible());
  check('duration and cash preserved after edit',await summary().getByText('2 months',{exact:true}).isVisible()&&await summary().getByText('$500',{exact:true}).isVisible());
  await card().getByText('Edit planning assumptions',{exact:true}).click();await card().getByLabel('Hours per participant (hours/person/total)',{exact:true}).fill('');await card().getByRole('button',{name:'Recalculate proposal',exact:true}).click();await card().getByText(/revision 3/).waitFor();
  check('blank edit stays unknown without zero or rate fallback',await summary().getByText('Labor time: Unknown hours',{exact:true}).isVisible());
+ await card().getByText('Edit planning assumptions',{exact:true}).click();await card().getByLabel('Participants · Manager check-ins and workload review (people)',{exact:true}).fill('14');
+ await send('Change constraint');
+ check('changed constraints disable recalculation and pinning of dirty stale proposal',await pin().isDisabled()&&await card().getByRole('button',{name:'Recalculate proposal',exact:true}).isDisabled());
+ await card().getByRole('button',{name:'Discard input changes',exact:true}).click();
+ check('discarding dirty inputs cannot make a stale proposal savable',await pin().isDisabled()&&await card().getByLabel('Participants · Manager check-ins and workload review (people)',{exact:true}).inputValue()==='12');
  await card().getByRole('button',{name:'Discard proposal',exact:true}).click();check('discard removes the current card',await card().count()===0);
  await send('Recommend again');await card().waitFor();check('recommend again retains rejection and has one fresh plan',await card().count()===1&&requests.at(-1).state.rejected.some(row=>row.candidateId==='manager-pilot'&&row.revision===3));
+ await card().getByText('Edit planning assumptions',{exact:true}).click();await card().getByLabel('Participants · Manager check-ins and workload review (people)',{exact:true}).fill('12');await card().getByRole('button',{name:'Recalculate proposal',exact:true}).click();await card().getByText(/revision 2/).waitFor();
  await card().getByRole('button',{name:'Pin Action Plan with unknowns',exact:true}).click();await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key)).payload.goals.activeId,DECISIONS_STORAGE_KEY);const saved=await readState(),id=saved.goals.activeId,plans=saved.workspaces[id].fields.homePlanAlternativesV1.plans;
- check('save links exact proposal to goal and keeps provenance',plans.length===1&&plans[0].draft.binding.goal==='Improve employee experience'&&plans[0].draft.inputs.scope.months.kind==='model-proposed'&&plans[0].draft.inputs.scope.population.value===null);
+ check('save links exact proposal to goal and keeps provenance',plans.length===1&&plans[0].draft.binding.goal==='Improve employee experience'&&plans[0].draft.inputs.scope.months.kind==='model-proposed'&&plans[0].draft.inputs.scope.population.value===null&&plans[0].draft.inputs.groups[0].count.value===12);
  await page.reload();await card().waitFor();check('reload preserves one saved card and unconfirmed assumptions',await card().count()===1&&await card().getByRole('button',{name:/Pinned Action Plan/}).isDisabled()&&await summary().getByText('Model-proposed planning assumptions · unconfirmed',{exact:true}).isVisible());
  await summary().scrollIntoViewIfNeeded();await page.screenshot({path:path.join(output,mode+'-saved.png')});
+ await page.evaluate(()=>localStorage.clear());await page.reload();await dismissHomeOnboarding(page);await send('Recommend a fresh pilot.');await card().waitFor();
+ for(let i=1;i<=14;i++){
+  if(i<=12)await card().getByText('Edit planning assumptions',{exact:true}).click();
+  await card().getByLabel('Participants · Manager check-ins and workload review (people)',{exact:true}).fill(String(10+i));await card().getByRole('button',{name:'Recalculate proposal',exact:true}).click();
+  if(i<=11)await card().getByText(new RegExp('revision '+(i+1)+'$')).waitFor();
+  else await page.getByText(/The working history limit would remove source provenance/).waitFor();
+ }
+ check('history limit preserves latest reviewed revision and blocks dirty pin',await summary().getByText('21 people',{exact:true}).isVisible()&&await pin().isDisabled());
+ await card().getByRole('button',{name:'Discard input changes',exact:true}).click();await pin().click();await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key)).payload.goals.activeId,DECISIONS_STORAGE_KEY);
+ const bounded=await readState(),boundedPlan=bounded.workspaces[bounded.goals.activeId].fields.homePlanAlternativesV1.plans[0];check('history-limit rejection leaves prior proposal savable',boundedPlan.draft.inputs.groups[0].count.value===21);
+ await page.reload();await card().waitFor();check('history-limited saved proposal reloads',await card().getByRole('button',{name:/Pinned Action Plan/}).isDisabled()&&await summary().getByText('21 people',{exact:true}).isVisible());
  check('no overflow, runtime errors or external traffic',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&external===0);await context.close();
 }}finally{await browser.close()}
 await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({checks},null,2));console.log(JSON.stringify({checks:checks.length,output}));

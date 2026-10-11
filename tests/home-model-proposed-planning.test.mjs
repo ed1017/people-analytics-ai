@@ -1,8 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {solutionRequest,activity,evaluate,final,fixtureRuntime} from './fixtures/home-solution-conversation.mjs';
-import {proposedPilot} from './fixtures/model-proposed-pilot.mjs';
-import {evaluateSolutionCandidate,editSolutionPlanningInputs,readSolutionState,saveSolutionCandidate} from '../lib/home-solution-conversation.ts';
+import {solutionRequest,based,candidate,activity,evaluate,final,fixtureRuntime} from './fixtures/home-solution-conversation.mjs';
+import {proposedPilot,mixedPlanningFixture} from './fixtures/model-proposed-pilot.mjs';
+import {createPlanAlternatives} from '../lib/home-plan-alternatives.ts';
+import {conversationContext} from './fixtures/home-plan-conversation.mjs';
+import {evaluateSolutionCandidate,evaluateSolutionParameterEdit,retainEvaluations,editSolutionPlanningInputs,readSolutionState,saveSolutionCandidate} from '../lib/home-solution-conversation.ts';
 import {converseSolutions} from '../lib/home-solution-conversation-service.ts';
 import {solutionCandidateSchema,assertSolutionShape} from '../lib/home-solution-conversation-schema.ts';
 import {proposedPlanningEstimate} from '../lib/home-proposed-planning.ts';
@@ -71,4 +73,49 @@ test('editing a constrained horizon explicitly replaces or withdraws that constr
 test('referencing a proposed allowance cannot turn it into a user budget ceiling',async()=>{
  const item=await run(),request=requestWith(item),c=proposedPilot('different','user-2');c.quantities=[{field:'budget_usd',target:null,unit:'USD',kind:'reference',number:null,text:null,source:{kind:'working',id:item.id,revision:item.revision,field:'cash',target:'new-c1'},factor:null,turnId:null,interpretation:'Reuse the allowance as a budget.'}];
  assert.ok((await evaluateSolutionCandidate(request,c,[])).blocking.some(line=>/different planning field/.test(line)));
+});
+
+const sourced=(item,field,kind='reference',target=null)=>({...proposedPilot().quantities.find(q=>q.field===field),target,kind,number:null,source:{kind:'working',id:item.id,revision:item.revision,field,target:field==='participants'?'c1':field==='cash'?'new-c1':null},factor:kind==='scale'?0.5:null,turnId:kind==='scale'?'user-2':null});
+test('resolved proposed provenance cannot overwrite retained user inputs via direct, reference or scale paths',async()=>{
+ const item=await run();
+ for(const field of ['horizon_months','participants','cash'])for(const kind of ['model-proposed','reference','scale']){
+  const request=solutionRequest('Review this proposal.',true,{...solutionRequest().state,working:[item]},2),before=JSON.stringify(request),c=based('A');
+  c.quantities=[kind==='model-proposed'?proposedPilot().quantities.find(q=>q.field===field):sourced(item,field,kind,field==='horizon_months'?null:'c1')];
+  const result=await evaluateSolutionCandidate(request,c,[]);assert.ok(result.blocking.some(line=>/cannot replace an existing input/.test(line)),field+' '+kind+': '+result.blocking);assert.equal(JSON.stringify(request),before);
+ }
+});
+test('reference and scale chains retain model provenance; explicit own-source scaling remains editable',async()=>{
+ const item=await run();
+ for(const field of ['horizon_months','participants','cash'])for(const kind of ['reference','scale']){
+  const c=candidate('intermediary');c.goal.turnId='user-2';c.quantities=[sourced(item,field,kind,field==='horizon_months'?null:'c1')];
+  const middle=await evaluateSolutionCandidate(requestWith(item),c,[]);assert.deepEqual(middle.blocking,[]);assert.equal((field==='horizon_months'?middle.draft.inputs.scope.months:field==='participants'?middle.draft.inputs.groups[0].count:middle.draft.inputs.expenses[0].amount).kind,'model-proposed');
+  const target=based('A');target.quantities=[sourced(middle,field,'reference',field==='horizon_months'?null:'c1')];const request=solutionRequest('Reuse the proposal.',true,{...solutionRequest().state,working:[item,middle]},3);
+  assert.ok((await evaluateSolutionCandidate(request,target,[])).blocking.some(line=>/cannot replace/.test(line)));
+ }
+ const scaled=await evaluateSolutionParameterEdit(requestWith(item),{id:item.id,source:{kind:'working',id:item.id,revision:item.revision},quantities:[sourced(item,'horizon_months','scale')]},[]);
+ assert.deepEqual(scaled.blocking,[]);assert.equal(scaled.draft.inputs.scope.months.value,1);assert.equal(scaled.draft.inputs.scope.months.kind,'model-proposed');
+});
+test('referenced or scaled proposed cash cannot acquire a recurring basis',async()=>{
+ const item=await run();
+ for(const kind of ['reference','scale']){
+  const {request,c}=await mixedPlanningFixture(item);request.catalog.plans[0].draft.inputs.expenses[0].amount={value:null,kind:'unknown',basis:null};
+  request.catalog=createPlanAlternatives(conversationContext,request.catalog.plans.map(p=>({id:p.id,draft:p.draft})));
+  c.base.revision=request.catalog.plans[0].draft.revision;c.activities[0].source.revision=c.base.revision;c.quantities=[sourced(item,'cash',kind,'c1')];
+  assert.ok((await evaluateSolutionCandidate(request,c,[])).blocking.some(line=>/recurring cost basis/.test(line)));
+ }
+});
+test('mixed retained recurring cash and proposed effort keep their actual calculation basis and legacy rate',async()=>{
+ const {request,c}=await mixedPlanningFixture(),item=await evaluateSolutionCandidate(request,c,[]);assert.deepEqual(item.blocking,[]);const p=proposedPlanningEstimate(item.draft);
+ assert.equal(p.cash,9000);assert.equal(item.draft.inputs.expenses[0].months.value,3);assert.equal(item.draft.inputs.expenses[0].amount.kind,'user-entered');assert.equal(item.draft.inputs.deliveryEstimate.hourlyRate.value,75);assert.equal(p.laborCost,null);
+});
+test('history limit rejects further edits without losing ancestry, then saves and reloads the current revision',async()=>{
+ let item=await run(),state={...requestWith(item).state,working:[item]};
+ for(let i=1;i<=14;i++){
+  const request=solutionRequest('Change participant count.',false,state,i+1),revised=await editSolutionPlanningInputs(request,item,[{field:'participants',target:'c1',value:10+i}]);assert.deepEqual(revised.blocking,[]);
+  if(i<=11){state={...state,working:retainEvaluations(state,[revised]),turns:[...state.turns,{...request.message,role:'user'}]};item=revised;}
+  else{const before=JSON.stringify(state);assert.throws(()=>retainEvaluations(state,[revised]),/history limit.*source provenance/);assert.equal(JSON.stringify(state),before);}
+ }
+ assert.equal(state.working.length,12);assert.equal(item.revision,12);state=readSolutionState(JSON.parse(JSON.stringify(state)));
+ const request=solutionRequest('Save current proposal.',false,state,16),saved=await saveSolutionCandidate(request,null,item,{id:'experience',statement:item.candidate.goal.statement},request.evidence,true);
+ assert.equal(saved.status,'ready');assert.equal(saved.plan.draft.inputs.groups[0].count.value,21);
 });
