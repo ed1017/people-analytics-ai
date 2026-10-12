@@ -26,7 +26,7 @@ const specifications={
 const day=(start:string,offset:number)=>new Date(Date.parse(start)+offset*86400000).toISOString().slice(0,10);
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 /** Same record shape for applicable domains; all figures here are invented teaching values. */
-export function fictionalPilotLifecycle(attachment:BundleAttachment,domain:'workload'|'skills'='workload'):PilotLifecycleExample{
+export function fictionalPilotLifecycle(attachment:Pick<BundleAttachment,'id'|'draft'>,domain:'workload'|'skills'='workload'):PilotLifecycleExample{
  const draft=attachment.draft,start=draft.inputs.timing[0]?.start.value;
  if(!start)throw Error('A dated saved example is required.');
  const populationSize=draft.inputs.groups[0]?.count.value;
@@ -66,4 +66,10 @@ export function readPilotLifecycleExample(raw:unknown,goalId:string,datasetToken
  const original=workspace.attachments.find(a=>a.id===example.id+'-attached'&&a.supersedes===null);
  if(!original||!same(original.draft,createHomeDemoDraft(example,original.attachedAt)))return null;
  return {record:fictionalPilotLifecycle(original),historical:workspace.attachments.some(a=>a.supersedes===original.id)||workspace.drafts.some(d=>d.bundle.id===original.draft.bundle.id&&bundleInputKey(d)!==bundleInputKey(original.draft))};
+}
+
+/** Fixed in-memory illustration, independent of browser goals, dataset selection and saved receipts. */
+export function standalonePilotLifecycle(){
+ const example=homeDemoExamples.find(e=>e.key==='retention')!;
+ return fictionalPilotLifecycle({id:'fictional-pilot-read-only',draft:createHomeDemoDraft(example,'2026-10-12T12:00:00Z')});
 }
