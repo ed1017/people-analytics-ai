@@ -1,3 +1,4 @@
+import { attritionDefaultLabel, type ScenarioDefaultSource } from "@/lib/legacy-source-contracts";
 import { formatWholeCount, formatFte } from "@/lib/display-format";
 import { knownDifference } from "@/lib/numeric-contract";
 import type {
@@ -38,6 +39,8 @@ type ScenarioModelingPanelProps = {
   activePlanningScenario: PlanningScenario | undefined;
   onScenarioChange: (scenario: string) => void;
   scenarioDefaults: ScenarioModelAssumptions | null;
+  scenarioDefaultsError?: string | null;
+  scenarioDefaultSource?: ScenarioDefaultSource | null;
   customAssumptions: ScenarioModelAssumptions | null;
   setCustomAssumptions: Dispatch<
     SetStateAction<ScenarioModelAssumptions | null>
@@ -163,6 +166,8 @@ export function ScenarioModelingPanel({
   activePlanningScenario,
   onScenarioChange,
   scenarioDefaults,
+  scenarioDefaultsError,
+  scenarioDefaultSource,
   customAssumptions,
   setCustomAssumptions,
   customScenario,
@@ -478,15 +483,21 @@ export function ScenarioModelingPanel({
                           </>
                         )}
                       </p>
-                      {field.key === "annual_attrition_pct" && <span className="mt-1 block text-[11px] text-muted-foreground">Default provenance unavailable · Not observed voluntary turnover YTD</span>}
+                      {field.key === "annual_attrition_pct" && <span className="mt-1 block text-[11px] text-muted-foreground">{attritionDefaultLabel(scenarioDefaultSource)}</span>}
                     </label>
                   );
                 })}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                Loading Baseline assumptions…
+                {scenarioDefaultsError ? "Baseline assumptions unavailable." : "Loading Baseline assumptions…"}
               </p>
+            )}
+
+            {scenarioDefaultsError && (
+              <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                Defaults unavailable: {scenarioDefaultsError}
+              </div>
             )}
 
             {customScenarioError && (

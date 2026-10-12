@@ -1,3 +1,4 @@
+import * as sourceContracts from '../lib/legacy-source-contracts.ts';
 import * as taExtensionModule from '../lib/synthetic-ta/extension.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -42,6 +43,7 @@ async function routeWith(results){
  const calls=[],exports={};
  const supabaseServer={from:table=>{calls.push(table);return {select:()=>({single:async()=>results(table),order:async()=>results(table)})}}};
  vm.runInNewContext(code,{exports,require:name=>{
+  if(name==='../../../lib/legacy-source-contracts')return sourceContracts;
   if(name==='next/server')return {NextResponse:Response};
   if(name==='@/lib/dataset-runtime')return {withDatasetRequest};
   if(name==='../../../lib/supabase-server')return {supabaseServer};
@@ -54,7 +56,7 @@ async function routeWith(results){
 test('actual workforce GET preserves its aggregate read contract and legitimate zero',async()=>{
  const {value:{response,calls},logs}=await capture(()=>routeWith(table=>({error:null,data:table==='workforce_current_summary'?{as_of:'2026-09-30',headcount:'0'}:table==='dashboard_headcount_trend'?[{snapshot_date:'2026-09-30',headcount:'0',fte:'0'}]:[]})));
  assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'no-store');
- const body=await response.json();assert.equal(body.summary.headcount,0);assert.equal(body.trend[0].fte,0);assert.equal(logs.length,0);
+ const body=await response.json();assert.deepEqual(body.movement_window,sourceContracts.legacyMovementWindow);assert.equal(body.summary.headcount,0);assert.equal(body.trend[0].fte,0);assert.equal(logs.length,0);
  assert.deepEqual(calls,['workforce_current_summary','dashboard_headcount_trend','workforce_business_unit_summary','workforce_country_summary','workforce_level_summary','workforce_tenure_summary','workforce_movement_summary']);
 });
 
@@ -83,6 +85,12 @@ for(const source of ['survey-sentiment','talent-acquisition','workforce-planning
     return query;
    }};
    const aliases={'@/lib/dataset-runtime':{withDatasetRequest},'../../../lib/synthetic-ta/extension':taExtensionModule,'next/server':{NextResponse:Response},'../../../lib/supabase-server':{supabaseServer},'../../../lib/data-api-error':{dataApiErrorResponse},'../../../lib/numeric-contract':numeric,'../../../lib/stored-planning':planning,'../../../lib/exit-enps':{...exitEnps,localExitEnpsEnabled:()=>false}};
+   if(source==='survey-sentiment'){
+    const readerCode=ts.transpileModule(fs.readFileSync(new URL('../lib/survey-sentiment-reader.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+    const reader={};const readerAliases={'./dataset-runtime':{withDatasetRequest},'next/server':{NextResponse:Response},'./supabase-server':{supabaseServer},'./data-api-error':{dataApiErrorResponse},'./numeric-contract':numeric,'./exit-enps':{...exitEnps,localExitEnpsEnabled:()=>false}};
+    vm.runInNewContext(readerCode,{exports:reader,require:name=>{assert.ok(name in readerAliases,name);return readerAliases[name]}});
+    aliases['@/lib/survey-sentiment-reader']=reader;
+   }
    vm.runInNewContext(code,{exports,require:name=>{if(name in aliases)return aliases[name];throw Error('Unexpected import: '+name)}});
    const {value:response,logs}=await capture(()=>exports.GET());
    assert.equal(response.status,transport?500:503);assert.equal(response.headers.get('cache-control'),'no-store');

@@ -970,7 +970,7 @@ ${planningContext.scenarios
 
 Important modeling rule:
 - Stored company-wide plans are modeled scenarios, not observed actuals. Source refresh date is unavailable.
-- Hires and exits are source-reported monthly flows; totals cover only the returned month window, whose full horizon boundaries are not supplied. Missing, duplicate or invalid months and unknown flow values make a total unavailable. Stored flows do not fully explain the Baseline headcount curve and are distinct from engine-implied what-if flows. Do not invent a reconciliation.
+- Hires and exits are source-reported monthly flows; totals cover only the returned month window, whose full horizon boundaries are not supplied. Missing, duplicate or invalid months and unknown flow values make a total unavailable. Completeness as hiring/exit flows and a stock-flow reconciliation are unverified; different opening boundaries cannot establish one. Keep stored plan fields separate from engine-implied what-if flows. Do not invent a reconciliation.
 - You may compare stored scenarios and calculate simple deltas only when both values are available. Null or unavailable values are unknown, never zero.
 - If the user proposes a NEW assumption, call run_workforce_scenario rather than estimating the scenario yourself.
 - Only treat the returned deterministic tool result as the modeled what-if outcome.
@@ -984,35 +984,34 @@ Important modeling rule:
       positionContext
         ? `
 CURRENT POSITION MODELING CONTEXT
-Current authorized positions: ${positionContext.current.current_positions}
+Current position records (filled + vacant): ${positionContext.current.current_positions}
 Current filled positions: ${positionContext.current.filled_positions}
 Current vacant positions: ${positionContext.current.vacant_positions}
 Current vacancy rate: ${positionContext.current.vacancy_rate_pct}%
 
 Selected position scenario: ${positionContext.selectedScenario}
-Planned positions at end of horizon: ${positionContext.totals.planned_positions}
-Net position change vs current authorized positions: ${positionContext.totals.net_position_change}
+Planned headcount at end of horizon: ${positionContext.totals.planned_positions}
 Planned FTE at end of horizon: ${positionContext.totals.planned_fte}
 Planned labor cost USD: ${positionContext.totals.planned_labor_cost_usd}
 
-Position change by business unit:
+Position records and planned headcount by business unit:
 ${positionContext.byBusinessUnit
   .map(
     (row) =>
-      `- ${row.org_name}: current ${row.current_positions}, planned ${row.planned_positions}, change ${row.net_position_change >= 0 ? "+" : ""}${row.net_position_change}`
+      `- ${row.org_name}: position records ${row.current_positions}, planned headcount ${row.planned_positions}`
   )
   .join("\n")}
 
-Position change by level:
+Position records and planned headcount by level:
 ${positionContext.byLevel
   .map(
     (row) =>
-      `- ${row.level_name}: current ${row.current_positions}, planned ${row.planned_positions}, change ${row.net_position_change >= 0 ? "+" : ""}${row.net_position_change}`
+      `- ${row.level_name}: position records ${row.current_positions}, planned headcount ${row.planned_positions}`
   )
   .join("\n")}
 
 Interpretation rule:
-- Positions are authorized roles; headcount is people. Do not treat them as interchangeable.
+- Current filled + vacant position records and future planned headcount are different measures. Their difference does not establish hiring need or an approved change. The inventory effective date is not supplied here; do not infer it from the workforce snapshot.
 `.trim()
         : "";
 

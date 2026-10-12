@@ -1,5 +1,6 @@
 "use client";
 
+import { movementWindowLabel } from "@/lib/legacy-source-contracts";
 import {
   Bar,
   BarChart,
@@ -153,7 +154,7 @@ export function WorkforcePage({ data, loading, error }: Props) {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <p className="mt-4 text-xs text-muted-foreground">Recorded movement events · Returned months: {movementPeriod}. Counts are events, not distinct people; the workforce snapshot date does not define this period.</p>
+              <p className="mt-4 text-xs text-muted-foreground">Recorded movement events · {movementWindowLabel(data?.movement_window)}Returned months: {movementPeriod}. Counts are events, not distinct people; the workforce snapshot date does not define this period.</p>
               <div className="mt-2 grid grid-cols-3 gap-3 text-center text-sm">
                 <div className="rounded-md border p-3"><p className="text-muted-foreground">Promotion events</p><p className="text-xl font-semibold">{movementTotals.promotion ?? 0}</p></div>
                 <div className="rounded-md border p-3"><p className="text-muted-foreground">Transfer events</p><p className="text-xl font-semibold">{movementTotals.transfer ?? 0}</p></div>

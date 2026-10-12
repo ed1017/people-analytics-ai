@@ -1,4 +1,5 @@
 "use client";
+import type { ScenarioDefaultSource } from "@/lib/legacy-source-contracts";
 import { datasetFetch, datasetSession } from "@/lib/dataset-client.mjs";
 
 import {usePlanningDecisionState} from "@/components/workforce-planning/use-planning-decision-state";
@@ -252,6 +253,8 @@ export function WorkforcePlanningPage({
     onPlanningDestinationChange(view);
   };
 
+  const [scenarioDefaultsError, setScenarioDefaultsError] = useState<string | null>(null);
+  const [scenarioDefaultSource, setScenarioDefaultSource] = useState<ScenarioDefaultSource | null>(null);
   const [scenarioDefaults, setScenarioDefaults] =
     useState<ScenarioModelAssumptions | null>(null);
   const [customAssumptions, setCustomAssumptions] =
@@ -662,6 +665,9 @@ export function WorkforcePlanningPage({
     const controller = new AbortController();
 
     async function loadScenarioDefaults() {
+      setScenarioDefaultsError(null);
+      setScenarioDefaults(null);
+      setScenarioDefaultSource(null);
       try {
         const response = await datasetFetch("/api/scenario-modeler", {
           cache: "no-store",
@@ -677,12 +683,19 @@ export function WorkforcePlanningPage({
         }
 
         if (!cancelled) {
+          setScenarioDefaultsError(null);
           setScenarioDefaults(payload.defaults);
+          setScenarioDefaultSource({
+            provenance: payload.default_provenance,
+            dataClass: typeof payload.data_meta?.dataClass === "string" ? payload.data_meta.dataClass : undefined,
+          });
           setCustomAssumptions(current=>current??payload.defaults);
         }
       } catch (error) {
         if (!cancelled) {
-          setCustomScenarioError(
+          setScenarioDefaults(null);
+          setScenarioDefaultSource(null);
+          setScenarioDefaultsError(
             error instanceof Error
               ? error.message
               : "Failed to load scenario defaults."
@@ -2095,6 +2108,8 @@ export function WorkforcePlanningPage({
             activePlanningScenario={activePlanningScenario}
             onScenarioChange={onScenarioChange}
             scenarioDefaults={scenarioDefaults}
+            scenarioDefaultsError={scenarioDefaultsError}
+            scenarioDefaultSource={scenarioDefaultSource}
             customAssumptions={customAssumptions}
             setCustomAssumptions={setCustomAssumptions}
             customScenario={customScenario}
