@@ -1,3 +1,5 @@
+// @ts-expect-error Native fixtures share source.
+import {companyTurnoverContext,isTurnoverGoal} from './home-turnover-context.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {proposedPlanningEstimate,proposedPlanningInputs,type PlanningInput} from './home-proposed-planning.ts';
 // @ts-expect-error Native Node tests share application source.
@@ -467,7 +469,7 @@ export async function evaluateSolutionCandidate(request:SolutionRequest,candidat
   if(input.successMeasure.goal!==goal)fail('A saved outcome measure belongs to another goal; review it explicitly.');
   applyReviewedInputs(request,evaluation,input,candidate.quantities,constraints,components.map(item=>item.id));
   // Bind new measures after this turn's scope inputs; retained measures must stay stale after a scope change.
-  if(newMeasure)input.successMeasure.scopeKey=measurementScope(input);
+  if(newMeasure){input.successMeasure.scopeKey=measurementScope(input);const context=isTurnoverGoal(goal)?companyTurnoverContext(request.evidence):undefined;if(context)input.successMeasure.companyTurnover=context;}
   // Model same-people links are proposals, never user confirmation. Preserve only existing source identity.
   const audienceDone=new Set<string>(),audienceVisiting=new Set<string>();
   const audience=(activityId:string)=>{if(audienceDone.has(activityId))return;const activity=candidate.activities.find(item=>item.id===activityId);if(!activity||audienceVisiting.has(activityId))fail('The same-people reference is missing or circular.');audienceVisiting.add(activityId);if(activity.audienceOf){audience(activity.audienceOf);const shared=input.memberships.find(row=>row.componentId===activity.audienceOf)!,own=input.memberships.find(row=>row.componentId===activityId)!;const inherited=own.complete.value===true&&shared.complete.value===true&&same(own.groupIds,shared.groupIds)&&own.groupIds.length>0;if(!inherited){own.complete=unknownAssumption();input.groupsDisjoint=unknownAssumption();}evaluation.interpretations.push(`${activity.name}: ${inherited?'retains checked source participation':'proposes shared participation, still unconfirmed'} with ${candidate.activities.find(row=>row.id===activity.audienceOf)!.name}. A model reference or conversation turn does not confirm cohort identity.`);}audienceVisiting.delete(activityId);audienceDone.add(activityId);};

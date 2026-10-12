@@ -1,4 +1,5 @@
 "use client";
+import {TurnoverContext} from './turnover-context';
 import {useState} from 'react';
 import {suggestSuccessMeasure,reviewSuccessMeasure,successMeasureText} from '@/lib/home-success-measures';
 import {bundleInputKey,type BundleDraft,type BundleInputs} from '@/lib/home-bundle-reconciliation';
@@ -12,6 +13,7 @@ export function HomeSuccessMeasureReview({draft,pack,basis,disabled,onAccept}:{d
  const proposed=()=>reviewSuccessMeasure(draft,name,baseline,target,basis,suggestion,observed);
  return <details className="space-y-2 rounded border p-3 text-sm"><summary className="min-h-11 cursor-pointer py-2 font-medium">Review success measure and baseline</summary>
   <p>For “{draft.binding.goal}”. {suggestion.status}</p><p className="text-xs">Use the same population, metric definition and observation period when reviewing progress. No change is a predicted or causal effect.</p>
+  <TurnoverContext goal={draft.binding.goal} context={suggestion.companyTurnover}/>
   <label className="block">Success measure<input className={control} aria-label="Success measure" maxLength={240} value={name} onChange={event=>{setName(event.target.value);setObserved(false);setBaseline('');change();}}/></label>
   <label className="block">Baseline (value, unit and period; blank means Unknown)<input className={control} aria-label="Measure baseline" maxLength={240} value={observed?suggestion.baseline?.value??'':baseline} readOnly={observed} onChange={event=>{setBaseline(event.target.value);change();}}/></label>
   {suggestion.baseline&&name===suggestion.name&&<label className="flex gap-2"><input type="checkbox" checked={observed} onChange={event=>{setObserved(event.target.checked);change();}}/>Use recorded baseline: {suggestion.baseline.value}. {suggestion.baseline.basis}</label>}
