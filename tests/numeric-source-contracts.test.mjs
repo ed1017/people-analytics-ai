@@ -129,7 +129,7 @@ test('stored planning API keeps raw monthly flows distinct from the headcount cu
   assert.equal(body.provenance.status,'stored_modeled_plan');
   assert.match(body.provenance.grain,/scenario and planning month/);
   assert.equal(body.provenance.source_refreshed_at,null);
-  assert.match(body.provenance.reconciliation,/no reconciliation is asserted/);
+  assert.match(body.provenance.reconciliation,/complete stock-flow reconciliation has not been verified/);
   const scenario = body.scenarios[0];
   assert.equal(scenario.points[0].planned_hires,0);
   assert.equal(scenario.points[0].planned_exits,0);

@@ -1,0 +1,70 @@
+// Actual conversation hooks, DecisionStore and review card; deterministic offline model transport.
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
+import postcss from 'postcss';
+import tailwind from '@tailwindcss/postcss';
+import {converseSolutions} from '../../lib/home-solution-conversation-service.ts';
+import {candidate,evaluate,final,fixtureRuntime} from '../fixtures/home-solution-conversation.mjs';
+import {conditionalHiringAnswer} from '../fixtures/underspecified-planning.mjs';
+import {DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
+const output=process.env.CONDITIONAL_HIRING_QA_OUTPUT??await fs.mkdtemp(path.join(os.tmpdir(),'conditional-hiring-'));
+await fs.mkdir(output,{recursive:true});
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,plugins:[new webpackPackage.webpack.DefinePlugin({'process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION':JSON.stringify('true'),'process.env.NEXT_PUBLIC_GOAL_PROGRESS':JSON.stringify('true'),'process.env.NEXT_PUBLIC_HOME_STRUCTURED_PLANS':JSON.stringify('false')})],entry:path.resolve('tests/fixtures/home-hiring-budget-client.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
+const css=(await postcss([tailwind({base:process.cwd()})]).process(await fs.readFile('app/globals.css','utf8'),{from:path.resolve('app/globals.css')})).css;
+const js=await fs.readFile(path.join(output,'fixture.js'),'utf8');
+const html=`<!doctype html><html data-workspace-preference="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style></head><body><div id="root"></div><script>${js.replaceAll('</script','<\\/script')}</script></body></html>`;
+const base='http://127.0.0.1:3117',browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox',...(process.env.HIRING_BROWSER_SINGLE_PROCESS==='1'?['--single-process','--no-zygote','--disable-gpu']:[])]}),checks=[];
+try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
+ const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),errors=[],requests=[];let external=0;
+ page.setDefaultTimeout(15000);page.on('pageerror',error=>errors.push(error.message));
+ const check=(name,ok)=>{assert.ok(ok,mode+' '+name);checks.push(mode+' '+name);console.log('PASS '+mode+' '+name);};
+ await context.route('**/*',async route=>{const req=route.request(),url=new URL(req.url());if(req.isNavigationRequest()&&url.href===base+'/')return route.fulfill({contentType:'text/html',body:html});if(url.origin!==base){external++;return route.abort();}
+  if(url.pathname==='/api/home-solution-conversation'){
+   const body=req.postDataJSON();requests.push(body);const basis={kind:'user-supplied',turnId:body.message.id,quote:body.message.text,explanation:'Fictional explicit count, role and cap.'};
+   const changes=body.state.hiringBudget?[]:Object.entries({hires:10,role:'engineers',budget:1000000}).map(([field,value])=>({field,value,basis}));
+   const runtime=fixtureRuntime(body.message.text==='Explain only'?[final('The budget allowance is not salary.')]:[{name:'review_hiring_budget',args:{changes}},conditionalHiringAnswer]);runtime.natural={datasetToken:'legacy-v1:0'};
+   return route.fulfill({json:await converseSolutions(body,runtime,new AbortController().signal)});
+  }
+  if(url.pathname.startsWith('/api/'))return route.fulfill({json:{overview:{headcount:100,fte:100,open_positions:3,snapshot_date:'2026-09-30'},trend:[]}});external++;return route.abort();
+ });
+ await page.goto(base);const input=page.getByLabel('Ask Workforce AI',{exact:true}),card=page.getByRole('region',{name:'Hiring budget estimate',exact:true}),reviewButton=()=>card.getByRole('button',{name:'Review conditional hiring plan',exact:true}),pin=()=>card.getByRole('button',{name:'Pin conditional hiring plan',exact:true});
+ const send=async text=>{await input.fill(text);await page.getByRole('button',{name:'Send overview question',exact:true}).click();await page.getByRole('status').filter({hasText:'Thinking through the question'}).waitFor({state:'hidden'});};
+ const state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY),plans=async()=>{const s=await state();return s.workspaces[s.goals.activeId]?.fields.homePlanAlternativesV1;};
+ await send('We need ten engineers with a $1m budget. Recommend a plan.');await card.waitFor();
+ check('one compact native recommendation has count, allowance and honest unknown time',await page.getByRole('heading',{name:'Recommended Action Plan · conditional hiring',exact:true}).count()===1&&await card.getByText('100,000 currency unspecified',{exact:true}).isVisible()&&await card.getByText('Budget period unconfirmed',{exact:true}).isVisible());
+ check('concrete next action is visible while detail and editing start collapsed',await card.getByText(/Confirm the budget currency, period and role scope/).isVisible()&&await card.getByText('Plan details',{exact:true}).evaluate(n=>!n.parentElement.open)&&await card.getByText('Edit inputs and salary override',{exact:true}).evaluate(n=>!n.parentElement.open));
+ await card.getByRole('button',{name:'Clear hiring estimate',exact:true}).click();check('clear removes the conditional plan',await card.count()===0);await send('Recommend again: ten engineers with a $1m budget.');await card.waitFor();check('recommend again creates one current conditional plan',await page.getByRole('heading',{name:'Recommended Action Plan · conditional hiring',exact:true}).count()===1);
+ await reviewButton().click();await pin().waitFor();await page.screenshot({path:path.join(output,mode+'-conditional-review.png')});
+ const beforeReview=await page.evaluate(()=>window.__hiringFixture.reviewHiringPlan(null).then(r=>{window.__lastHiringReview=r;return r.selection.receipt.version;}));check('native conditional review uses version two receipt',beforeReview===2);
+ await card.getByText('Edit inputs and salary override',{exact:true}).click();await card.getByLabel('Total budget for the period',{exact:true}).fill('2000000');check('dirty inputs block pinning',await pin().isDisabled());await card.getByRole('button',{name:'Discard estimate edits',exact:true}).click();await pin().click();await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key)).payload.goals.activeId,DECISIONS_STORAGE_KEY);
+ const first=await plans(),goalId=(await state()).goals.activeId,original=JSON.stringify(first.plans[0]);
+ check('pin preserves unknown currency period salary and native provenance',first.plans.length===1&&first.plans[0].draft.inputs.hiringPlan.version===2&&first.plans[0].draft.inputs.scope.currency===null&&first.plans[0].draft.inputs.scope.months.value===null&&first.plans[0].draft.inputs.hiringPlan.review.inputs.annualBasePay===null&&first.plans[0].draft.inputs.hiringPlan.review.origins.hires.kind==='user-supplied');
+ await page.reload();await page.getByText('Saved Action Plans',{exact:true}).click();const reopened=page.getByRole('article',{name:'Action Plan option 1',exact:true});await reopened.waitFor();
+ check('reload and reopen preserve exact snapshot and unknown cash',JSON.stringify((await plans()).plans[0])===original&&await reopened.getByText('100,000 currency unspecified',{exact:true}).isVisible()&&(await reopened.innerText()).includes('Budget allowance is not reviewed complete cash'));
+ await send('Repeat the recommendation');await reviewButton().click();await card.getByRole('button',{name:'Pinned Action Plan #1',exact:true}).waitFor();check('repeat request reuses the pinned receipt',await card.getByRole('button',{name:'Pinned Action Plan #1',exact:true}).isDisabled()&&(await plans()).plans.length===1);
+ await page.evaluate(()=>window.__hiringFixture.reviewHiringPlan(null).then(r=>{window.__lastHiringReview=r;}));await page.evaluate(id=>{window.__hiringGoalSwitch('');window.__hiringGoalSwitch(id);},goalId);await card.waitFor();await page.evaluate(()=>window.__hiringFixture.saveHiringPlan(window.__lastHiringReview));
+ check('goal bounce rejects stale review without altering saved plan',(await page.getByRole('status').allTextContents()).some(t=>t.includes('inputs changed'))&&(await plans()).plans.length===1);
+ await send('Explain only');check('factual follow-up collapses the old calculator',!await card.isVisible()&&await page.getByText('Earlier hiring calculation',{exact:true}).isVisible());await page.getByText('Earlier hiring calculation',{exact:true}).click();
+ await card.getByText('Edit inputs and salary override',{exact:true}).click();
+ for(const [label,value] of [['Budget start month','2027-01'],['Budget horizon (months)','6'],['Hire arrival date','2027-01-01'],['One-time recruiting cost per hire','0']])await card.getByLabel(label,{exact:true}).fill(value);
+ await card.getByRole('combobox',{name:'Currency',exact:true}).selectOption('EUR');await card.getByRole('button',{name:'Update estimate',exact:true}).click();
+ check('zero incomplete subtotal keeps per-hire allowance visible',await card.getByText('0 EUR',{exact:true}).isVisible()&&await card.getByText(/Budget allowance per hire: 100,000 EUR/).isVisible());
+ await reviewButton().click();await pin().click();await page.waitForFunction(key=>{const s=JSON.parse(localStorage.getItem(key)).payload;return s.workspaces[s.goals.activeId].fields.homePlanAlternativesV1.plans.length===2;},DECISIONS_STORAGE_KEY);
+ const second=await plans();check('local edits pin a linked revision and preserve original receipt',second.plans[1].draft.revision===2&&second.plans[1].sourceRefs[0].id===first.plans[0].id&&JSON.stringify(second.plans[0])===original&&second.plans[1].draft.inputs.hiringPlan.review.inputs.currency==='EUR');
+ await card.getByText('Edit inputs and salary override',{exact:true}).click();await card.getByRole('combobox',{name:'Currency',exact:true}).selectOption('USD');
+ for(const [label,value] of [['Total budget for the period','2000000'],['Budget horizon (months)','12'],['FTE per hire','1'],['Annual base pay override','120000'],['Annual non-base cost per hire','24000'],['One-time recruiting cost per hire','10000']])await card.getByLabel(label,{exact:true}).fill(value);
+ await card.getByRole('combobox',{name:'Base pay basis',exact:true}).selectOption('per_hire');await card.getByRole('button',{name:'Update estimate',exact:true}).click();await card.getByText('Review hiring route as an Action Plan',{exact:true}).click();await card.getByRole('button',{name:'Review hiring plan',exact:true}).click();
+ const costed=card.getByRole('region',{name:'Reviewed hiring plan',exact:true});await costed.waitFor();check('promotion uses the existing costed receipt and keeps incomplete full costs unknown',(await costed.innerText()).includes('$1,540,000')&&(await costed.innerText()).includes('affordability: Unknown'));
+ await costed.getByRole('button',{name:'Pin hiring plan with unknowns',exact:true}).click();await page.waitForFunction(key=>{const s=JSON.parse(localStorage.getItem(key)).payload;return s.workspaces[s.goals.activeId].fields.homePlanAlternativesV1.plans.length===3;},DECISIONS_STORAGE_KEY);
+ const promoted=await plans();check('promotion records lineage and retains both conditional snapshots',promoted.plans[2].draft.inputs.hiringPlan.version===1&&promoted.plans[2].sourceRefs[0].id===second.plans[1].id&&promoted.plans[2].draft.revision===3&&JSON.stringify(promoted.plans[0])===original);
+ await page.evaluate(()=>window.__hiringFixture.reviewHiringPlan(10).then(r=>{window.__lastHiringReview=r;}));const beforeDataset=JSON.stringify(await plans());await page.evaluate(()=>window.__hiringDatasetSwitch());await card.waitFor({state:'hidden'});await page.evaluate(()=>window.__hiringFixture.saveHiringPlan(window.__lastHiringReview));
+ check('dataset switch isolates planning drafts and rejects the old receipt',await page.evaluate(()=>!window.__hiringFixture.state.hiringBudget&&!window.__hiringFixture.saved)&&JSON.stringify(await plans())===beforeDataset);
+ check('all edits and review controls remain offline and fit the viewport',requests.length===4&&external===0&&errors.length===0&&await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await context.close();
+}}finally{await browser.close()}
+await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({checks},null,2));console.log(JSON.stringify({checks:checks.length,output}));

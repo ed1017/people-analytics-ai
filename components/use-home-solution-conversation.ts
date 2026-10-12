@@ -1,5 +1,5 @@
 'use client';
-import {prepareHiringPlan,hiringPlanFields,type HiringPlanSelection} from '@/lib/home-hiring-plan-save';
+import {prepareHiringPlan,prepareConditionalHiringPlan,hiringPlanFields,type HiringPlanSelection} from '@/lib/home-hiring-plan-save';
 import {currentHiringBudget,editHiringBudgetLocally} from '@/lib/home-hiring-budget';
 import type {HiringBudgetInput} from '@/lib/hiring-budget';
 import {readChatEvidenceSeries,type ChatEvidenceSeries} from '@/lib/chat-evidence-series';
@@ -133,14 +133,14 @@ export function useHomeSolutionConversation(props:Props){
   requireCurrent();
   const previous=inputs===null?null:currentHiringBudget(makeRequest('Edit the hiring estimate.'),decisionStore.getDatasetToken());
   if(inputs!==null&&!previous)throw Error('The hiring estimate changed.');
-  persist({...memoryRef.current,hiringBudget:inputs===null?null:editHiringBudgetLocally(previous!,inputs),currentCalculationKinds:inputs===null?memoryRef.current.currentCalculationKinds?.filter(kind=>kind!=='hiring'):memoryRef.current.currentCalculationKinds});
+  persist({...memoryRef.current,conditionalHiringPlan:inputs===null?false:memoryRef.current.conditionalHiringPlan,hiringBudget:inputs===null?null:editHiringBudgetLocally(previous!,inputs),currentCalculationKinds:inputs===null?memoryRef.current.currentCalculationKinds?.filter(kind=>kind!=='hiring'):memoryRef.current.currentCalculationKinds});
  }
- async function reviewHiringPlan(externalHires:number){
+ async function reviewHiringPlan(externalHires:number|null){
   requireReviewedHiringInputs();
   const snapshot=requireCurrent(),request=makeRequest('Review the hiring route.'),review=currentHiringBudget(request,decisionStore.getDatasetToken());if(!review)throw Error('The hiring estimate changed.');
   const key=JSON.stringify(review),revision=snapshot.data.revision,context=liveKey.current,initialEpoch=epoch.current;
-  const goal={id:request.goal.id||crypto.randomUUID(),statement:request.goal.statement||`Cover ${review.inputs.hires} ${review.inputs.role??'workforce'} roles within the reviewed budget period.`};
-  const selection=await prepareHiringPlan(review,externalHires,goal);requireCurrent();requireReviewedHiringInputs();
+  const goal={id:request.goal.id||crypto.randomUUID(),statement:request.goal.statement||`Cover ${review.inputs.hires} ${review.inputs.role??'workforce'} roles within the proposed budget.`};
+  const selection=externalHires===null?await prepareConditionalHiringPlan(review,goal):await prepareHiringPlan(review,externalHires,goal);requireCurrent();requireReviewedHiringInputs();
   if(context!==liveKey.current||initialEpoch!==epoch.current||JSON.stringify(currentHiringBudget(makeRequest('Review the hiring route.'),decisionStore.getDatasetToken()))!==key||decisionStore.getSnapshot().data.revision!==revision)throw Error('The estimate changed. Review the current hiring route.');
   return {selection,key,revision,context,epoch:initialEpoch};
  }
@@ -148,7 +148,7 @@ export function useHomeSolutionConversation(props:Props){
   if(saving||pending)return;setSaving(true);setNotice('');
   try{requireReviewedHiringInputs();const snapshot=requireCurrent();if(review.context!==liveKey.current||review.epoch!==epoch.current||snapshot.data.revision!==review.revision||JSON.stringify(currentHiringBudget(makeRequest('Review the hiring route.'),decisionStore.getDatasetToken()))!==review.key)throw Error('The hiring inputs changed. Review the current route.');
    const fields=hiringPlanFields(review.selection,catalog(),'hiring-choice-'+crypto.randomUUID(),new Date().toISOString()),state=structuredClone(memoryRef.current);
-   currentProps.current.conversation.selectProposalGoal(review.selection.goal,snapshot.data.revision,{...fields,[solutionConversationField]:state} as unknown as Record<string,Json>);memoryRef.current=state;setMemory(state);setNotice('Reviewed hiring plan saved with its exact cost receipt. Internal availability and full mixed-route costs remain unknown.');
+   currentProps.current.conversation.selectProposalGoal(review.selection.goal,snapshot.data.revision,{...fields,[solutionConversationField]:state} as unknown as Record<string,Json>);memoryRef.current=state;setMemory(state);setNotice(review.selection.receipt.version===2?'Conditional hiring plan pinned with its native assumptions. Costs, affordability and staffing remain unverified.':'Reviewed hiring plan saved with its exact cost receipt. Internal availability and full mixed-route costs remain unknown.');
   }catch(error){setNotice(error instanceof Error?error.message:'The reviewed hiring plan could not be saved.');}finally{setSaving(false);}
  }
  function clearBusinessPlanning(){try{requireCurrent();persist({...memoryRef.current,businessPlanning:null});}catch(error){setNotice((error as Error).message);}}

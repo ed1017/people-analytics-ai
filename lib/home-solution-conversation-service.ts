@@ -1,3 +1,5 @@
+// @ts-expect-error Native fixture tests share source.
+import {canReviewConditionalHiringPlan,canReviewCostedHiringPlan} from './home-hiring-plan.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {SolutionResponseError} from './home-solution-response-failure.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
@@ -208,8 +210,9 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  if(answer.length>10000)throw new SolutionResponseError('output_bounds','The combined answer exceeds the response budget. Narrow the request; earlier state is retained.');
  if(homeAnswerScopeViolation(answer,request.evidence))throw new SolutionResponseError('scope_rejected','The answer attributes source evidence to an unsupported population.');
  state.constraints=mergeSolutionConstraints(request,state.constraints,final.constraintUpdates);
- if(typeof final.answer!=='string'&&('recommendedPlan' in final.answer||'unsupportedPlan' in final.answer)){
-  const refs=('recommendedPlan' in final.answer?final.answer.recommendedPlan:final.answer.unsupportedPlan).calculationRefs;
+ if(typeof final.answer!=='string'&&('recommendedPlan' in final.answer||'unsupportedPlan' in final.answer||'conditionalHiringPlan' in final.answer)){
+  const refs=('recommendedPlan' in final.answer?final.answer.recommendedPlan:'conditionalHiringPlan' in final.answer?final.answer.conditionalHiringPlan:final.answer.unsupportedPlan).calculationRefs;
+  if('conditionalHiringPlan' in final.answer&&(!state.hiringBudget||!canReviewConditionalHiringPlan(state.hiringBudget)||canReviewCostedHiringPlan(state.hiringBudget)||refs.length!==1||planningRefs.get(refs[0])?.kind!=='hiring'))throw new SolutionResponseError('calculation_reference','A conditional hiring plan needs the current count-and-budget calculation.');
   if(planningRefs.size&&!refs.length)throw new SolutionResponseError('calculation_reference','Use the current checked planning references for this outcome.');
   if(new Set(refs).size!==refs.length)throw new SolutionResponseError('calculation_reference','Use distinct checked planning references.');
   for(const ref of refs){
@@ -227,11 +230,12 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   if(!checked||checked.revision!==ref.revision)throw new SolutionResponseError('calculation_reference','A claimed quantitative result was not checked in this turn.');
   try{resolveSolutionMetric(state,ref);}catch{throw new SolutionResponseError('calculation_reference','A claimed quantitative result has an invalid metric reference.');}
  }
+ if([...planningRefs.values()].some(ref=>ref.kind==='hiring'))state.conditionalHiringPlan=typeof final.answer!=='string'&&'conditionalHiringPlan' in final.answer;
  state.currentCalculationKinds=[...([...planningRefs.values()].some(ref=>ref.kind==='hiring')?['hiring' as const]:[]),...(staffingCalculated?['required-staffing' as const]:[])];
  state.verifiedMetrics=final.verifiedMetrics;
  state.rejected=state.rejected.slice(-24);state.questions=final.questions;
  if(final.candidateIds.length){state.recommendationRequestId=request.requestId;state.focusCandidateId=final.focusCandidateId;}
- else if(staffingCalculated||typeof final.answer!=='string'&&('recommendedPlan' in final.answer||'unsupportedPlan' in final.answer)){state.recommendationRequestId=null;state.focusCandidateId=null;}
+ else if(staffingCalculated||typeof final.answer!=='string'&&('recommendedPlan' in final.answer||'unsupportedPlan' in final.answer||'conditionalHiringPlan' in final.answer)){state.recommendationRequestId=null;state.focusCandidateId=null;}
  else if(final.focusCandidateId!==null){state.focusCandidateId=final.focusCandidateId;state.recommendationRequestId=state.working.findLast(item=>item.id===final.focusCandidateId)?.requestId??state.recommendationRequestId;}
  if(state.focusCandidateId&&!state.working.some(item=>item.id===state.focusCandidateId))throw Error('The conversational focus is unavailable.');
  state.turns=[...state.turns,{id:request.message.id,role:'user' as const,text:request.message.text},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:answer}].slice(-32);

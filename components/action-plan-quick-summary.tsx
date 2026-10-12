@@ -1,3 +1,4 @@
+import {HiringPlanningSummary} from './hiring-planning-summary';
 import type {BundleDraft,BundleResult} from '@/lib/home-bundle-reconciliation';
 import {actionPlanQuickSummary} from '@/lib/action-plan-quick-summary';
 const number=(value:number|null)=>value===null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:1});
@@ -5,6 +6,7 @@ const money=(value:number|null)=>value===null?'Unknown':`$${value.toLocaleString
 export function ActionPlanQuickSummary({draft,result}:{draft:BundleDraft|null;result?:BundleResult|null}){
  const value=actionPlanQuickSummary(draft,result);
  const planning=value.planning;
+ if(value.conditionalHiring)return <section aria-label="Action Plan quick summary" className="space-y-2"><p className="font-medium">Conditional hiring proposal · assumptions unconfirmed</p><HiringPlanningSummary result={value.conditionalHiring.result}/><p>Full hiring cost, affordability and staffing availability: Unknown. Budget allowance is not reviewed complete cash.</p></section>;
  if(value.hiring){const h=value.hiring;return <section aria-label="Action Plan quick summary" className="@container text-base leading-normal"><div className="grid grid-cols-1 gap-2 @min-[36rem]:grid-cols-3">
  <section aria-label="Total cost" className="min-w-0 break-words rounded-lg border bg-muted/30 p-3"><h4 className="font-semibold">External cash subtotal</h4><p>{money(h.externalSubtotal)} USD · partial</p><p>Before unknown costs: {money(h.remainingBeforeUnknownCosts)} USD remaining</p><p>Full mixed-route cost and affordability: Unknown</p></section>
  <section aria-label="Timeline" className="min-w-0 break-words rounded-lg border bg-muted/30 p-3"><h4 className="font-semibold">Budget period</h4><p>{h.start} through {h.end} · {h.months} months</p><p>Hire arrival: {h.arrival}</p><p>Internal readiness: Unknown</p></section>
