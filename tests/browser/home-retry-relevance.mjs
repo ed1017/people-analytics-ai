@@ -26,14 +26,14 @@ const finance={as_of:'2026-09-30',...buildFinanceCurrent(['Accounting','Consulti
 
 
 const base='http://127.0.0.1:3100',browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']}),checks=[],failures=[];
-try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]])for(const scenario of ['starter','starter-new-draft','starter-cancel','calculators','goal-switch']){
- const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),requests=[],errors=[];let fail=scenario!=='calculators',hold=false,release,heldStarted,blocked=0;
+try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]])for(const scenario of ['starter','starter-new-draft','starter-cancel','calculators','goal-switch','bounce-success','bounce-failure']){
+ const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),requests=[],errors=[];let fail=scenario!=='calculators',hold=false,release,heldStarted,heldCompleted,completeHeld,blocked=0;
  const check=(name,value)=>{assert.ok(value,mode+' '+name);checks.push(mode+' '+name);console.log('PASS',mode,name);};page.setDefaultTimeout(15000);page.on('pageerror',e=>errors.push(e.message));
- const chat=input=>({messages:[],input,problem:null,questionUnanswered:false,resetMarks:{}}),seed={version:1,revision:1,goals:{version:1,activeId:scenario==='goal-switch'?'goal-a':'',goals:[{id:'goal-a',statement:'Goal A hiring'},{id:'goal-b',statement:'Goal B finance'}]},workspaces:{'goal-a':{savedAt:'2026-10-12',fields:{chat:chat('')}},'goal-b':{savedAt:'2026-10-12',fields:{chat:chat('Goal B draft')}}}};
+ const chat=input=>({messages:[],input,problem:null,questionUnanswered:false,resetMarks:{}}),seed={version:1,revision:1,goals:{version:1,activeId:(scenario==='goal-switch'||scenario.startsWith('bounce-'))?'goal-a':'',goals:[{id:'goal-a',statement:'Goal A hiring'},{id:'goal-b',statement:'Goal B finance'}]},workspaces:{'goal-a':{savedAt:'2026-10-12',fields:{chat:chat('')}},'goal-b':{savedAt:'2026-10-12',fields:{chat:chat('Goal B draft')}}}};
  await context.addInitScript(({key,value})=>{if(!localStorage.getItem(key))localStorage.setItem(key,value);},{key:DECISIONS_STORAGE_KEY,value:encodeDecisions(seed)});
  await context.route('**/*',async route=>{const req=route.request(),url=new URL(req.url());if(url.origin!==base){blocked++;return route.abort();}if(url.pathname==='/')return route.fulfill({contentType:'text/html',body:html});
  if(url.pathname==='/api/home-solution-conversation'){
- const body=req.postDataJSON();requests.push(body);if(hold){hold=false;await new Promise(resolve=>{release=resolve;heldStarted();});}
+ const body=req.postDataJSON();requests.push(body);const finish=hold?completeHeld:null;try{if(hold){hold=false;await new Promise(resolve=>{release=resolve;heldStarted();});}
  if(fail){try{return await route.fulfill({status:422,json:{error:'The conversation could not be verified.',code:'response_validation_failed'}});}catch{return;}}
  let steps=[final('Finance response: cost period remains unknown.')];
  if(body.message.text==='Review ten engineers with explicit fictional costs.'){
@@ -41,11 +41,12 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]])f
  steps=[{name:'review_hiring_budget',args:{changes:Object.entries({role:'engineers',hires:10,budget:1000000,currency:'USD',startMonth:'2027-01',months:12,arrivalDate:'2027-01-01',ftePerHire:1,annualBasePay:120000,payBasis:'per_hire',annualAdditionalCostPerHire:24000,recruitingFeePerHire:10000}).map(([field,value])=>({field,value,basis}))}},input=>({...final(),answer:{findings:'Ten external hires exceed the cap.',decisionRationale:'Review the inputs before commitment.',caveats:['Full costs remain unknown.'],recommendedPlan:{name:'Review hiring',steps:['Review costs with Finance.'],calculationRefs:[JSON.parse(input.findLast(x=>x.type==='function_call_output').output).planningGuidance.binding.reference]}}})];}
  if(body.message.text==='Compare staffing routes for the ten required engineering roles.')steps=[{name:'compare_required_staffing',args:{changes:fixedChanges(body)}},final('Review the staffing comparison.')];
  const runtime=fixtureRuntime(steps);runtime.natural={datasetToken:'legacy-v1:0'};try{return await route.fulfill({json:await converseSolutions(body,runtime,new AbortController().signal)});}catch(error){if(!req.failure())throw error;return;}
+ }finally{finish?.();}
  }if(url.pathname.startsWith('/api/'))return route.fulfill({json:url.pathname==='/api/finance'?finance:common});blocked++;return route.abort();});
  try{await page.goto(base);await dismissHomeOnboarding(page);const input=page.getByLabel('Ask Workforce AI',{exact:true}),send=page.getByRole('button',{name:'Send overview question',exact:true}),cancel=page.getByRole('button',{name:'Cancel request',exact:true});
  const state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY),slot=data=>data.goals.activeId?data.workspaces[data.goals.activeId]:data.exploration;
  const submit=async text=>{await input.fill(text);const response=page.waitForResponse(r=>r.url().endsWith('/api/home-solution-conversation'),{timeout:15000});await send.click();await response;await cancel.waitFor({state:'hidden'});};
- const beginHeld=async action=>{hold=true;const held=new Promise(resolve=>{heldStarted=resolve;});await action();await Promise.race([held,new Promise((_,reject)=>setTimeout(()=>reject(Error('Held request did not start')),15000))]);await cancel.waitFor();};
+ const beginHeld=async action=>{hold=true;heldCompleted=new Promise(resolve=>{completeHeld=resolve;});const held=new Promise(resolve=>{heldStarted=resolve;});await action();await Promise.race([held,new Promise((_,reject)=>setTimeout(()=>reject(Error('Held request did not start')),15000))]);await cancel.waitFor();};
  if(scenario==='starter'){
  const prompt='What workforce issues should we tackle first?';await page.getByText('Discovery',{exact:true}).click();const starter=page.getByRole('button',{name:prompt,exact:true});const response=page.waitForResponse(r=>r.url().endsWith('/api/home-solution-conversation'),{timeout:15000});await starter.click();await response;await cancel.waitFor({state:'hidden'});
  check('failed clicked starter restores exact editable question',await input.inputValue()===prompt);
@@ -59,6 +60,17 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]])f
  await beginHeld(()=>page.getByRole('button',{name:prompt,exact:true}).click());check('pending starter is already visible',await page.getByRole('region',{name:'Overview conversation',exact:true}).locator('[data-chat-role="user"]').filter({hasText:prompt}).isVisible());
  if(scenario==='starter-new-draft'){await input.fill('Newer user draft');release();await cancel.waitFor({state:'hidden'});check('failed starter never overwrites newer typing',await input.inputValue()==='Newer user draft');}
  else{await cancel.click();release();check('cancelled starter retains exact retry text',await input.inputValue()===prompt);check('cancellation does not mutate accepted state',(slot(await state()).fields.homeSolutionConversationV1?.turns??[]).length===0);fail=false;await submit(prompt);check('cancelled starter retries once without duplicate turns',requests.length===2&&slot(await state()).fields.chat.messages.filter(m=>m.role==='user'&&m.content===prompt).length===1&&slot(await state()).fields.homeSolutionConversationV1.turns.filter(t=>t.role==='user').length===1);}
+ }else if(scenario.startsWith('bounce-')){
+ fail=scenario==='bounce-failure';await input.fill('Delayed goal A question.');await beginHeld(()=>send.click());
+ await page.getByText('Earlier saved goals and drafts',{exact:true}).click();
+ await page.evaluate(()=>{const buttons=[...document.querySelectorAll('button')],a=buttons.find(b=>b.textContent==='Goal A hiring'),b=buttons.find(b=>b.textContent==='Goal B finance');if(!a||!b)throw Error('Goal controls missing');b.click();a.click();});
+ check(scenario+' returns to the original goal', (await state()).goals.activeId==='goal-a');
+ await input.fill('New goal A draft after bounce');release();await heldCompleted;await cancel.waitFor({state:'hidden'});
+ check(scenario+' discards the delayed accepted model state',(slot(await state()).fields.homeSolutionConversationV1?.turns??[]).length===0);
+ check(scenario+' discards the delayed UI reply',!slot(await state()).fields.chat.messages.some(m=>m.role==='assistant'));
+ check(scenario+' suppresses the cancelled request error',await page.getByText('The conversation could not be verified.',{exact:true}).count()===0);
+ check(scenario+' preserves the newer draft',await input.inputValue()==='New goal A draft after bounce');
+ fail=false;await submit('Delayed goal A question.');check(scenario+' explicit retry is accepted once',requests.length===2&&slot(await state()).fields.homeSolutionConversationV1.turns.filter(t=>t.role==='user').length===1);
  }else if(scenario==='goal-switch'){
  await input.fill('Pending question in goal A.');await beginHeld(()=>send.click());await page.getByText('Earlier saved goals and drafts',{exact:true}).click();await page.getByRole('button',{name:'Goal B finance',exact:true}).click();await input.fill('New typing in goal B');release();await cancel.waitFor({state:'hidden'});
  check('late failed goal A request cannot overwrite goal B draft',await input.inputValue()==='New typing in goal B');let data=await state();check('goal switch retains failed question only in originating UI history',data.goals.activeId==='goal-b'&&data.workspaces['goal-a'].fields.chat.messages.some(m=>m.content==='Pending question in goal A.')&&!data.workspaces['goal-b'].fields.chat.messages.some(m=>m.content==='Pending question in goal A.'));

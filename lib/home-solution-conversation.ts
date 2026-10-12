@@ -76,7 +76,7 @@ export function readSolutionState(raw:unknown):SolutionState {
  // Absent keeps legacy presentation; null explicitly demotes generic proposals after a specialist recommendation.
  if(raw.recommendationRequestId!==undefined&&raw.recommendationRequestId!==null&&!id(raw.recommendationRequestId))fail('The current recommendation could not be read.');
  if(raw.datasetEvidenceContexts!==undefined){if(!Array.isArray(raw.datasetEvidenceContexts)||raw.datasetEvidenceContexts.length>16)fail('Evidence recipes exceed the supported limit.');raw.datasetEvidenceContexts.forEach(readCandidateHomeContext);}
- if(raw.currentCalculationKinds!==undefined&&(!Array.isArray(raw.currentCalculationKinds)||raw.currentCalculationKinds.length>2||new Set(raw.currentCalculationKinds).size!==raw.currentCalculationKinds.length||raw.currentCalculationKinds.some(kind=>!['hiring','required-staffing'].includes(String(kind)))))fail('The current calculations could not be read.');
+ if(raw.currentCalculationKinds!==undefined&&(!Array.isArray(raw.currentCalculationKinds)||raw.currentCalculationKinds.length>2||new Set(raw.currentCalculationKinds).size!==raw.currentCalculationKinds.length||raw.currentCalculationKinds.some(kind=>typeof kind!=='string'||!['hiring','required-staffing'].includes(kind))))fail('The current calculations could not be read.');
  const state=raw as unknown as SolutionState;
  state.currentCalculationKinds??=[];
  if(state.currentCalculationKinds.some(kind=>kind==='hiring'?!state.hiringBudget:!state.requiredStaffing))fail('A current calculation is unavailable.');

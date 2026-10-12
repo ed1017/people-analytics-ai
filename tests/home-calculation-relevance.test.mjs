@@ -20,6 +20,7 @@ test('staffing calculations are current only for their accepted turn, including 
  const request=solutionRequest('Compare staffing routes.');
  const reply=await run(request,[{name:'compare_required_staffing',args:{changes:fixedChanges(request)}},final('Review the staffing comparison.')]);
  assert.deepEqual(reply.state.currentCalculationKinds,['required-staffing']);
+ for(const currentCalculationKinds of [[['hiring']],[{kind:'hiring'}],[null],[42]])assert.throws(()=>readSolutionState({...structuredClone(reply.state),currentCalculationKinds}),/calculation/i);
  const next=await run(solutionRequest('What is the Finance cost period?',false,reply.state,2),[final('The period is unknown.')]);
  assert.deepEqual(next.state.currentCalculationKinds,[]);assert.deepEqual(next.state.requiredStaffing,reply.state.requiredStaffing);
  const runtime=fixtureRuntime([]);runtime.natural={datasetToken:'legacy-v1:0'};runtime.staffingScenarioOnly=true;

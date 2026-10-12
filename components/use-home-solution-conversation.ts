@@ -36,6 +36,11 @@ export function useHomeSolutionConversation(props:Props){
  const controller=useRef<AbortController|null>(null),epoch=useRef(0),mounted=useRef(false),memoryRef=useRef(memory),currentProps=useRef(props);
  useLayoutEffect(()=>{currentProps.current=props;});
  useLayoutEffect(()=>{mounted.current=true;return()=>{mounted.current=false;controller.current?.abort();};},[]);
+ // Observe every store transition, including A→B→A batched into one React render.
+ useLayoutEffect(()=>{
+  const identity=()=>{const goals=decisionStore.getSnapshot().data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement]);};
+  let previous=identity();return decisionStore.subscribe(()=>{const next=identity();if(next===previous)return;previous=next;epoch.current++;controller.current?.abort();controller.current=null;setPending(false);});
+ },[]);
  const goal={id:props.conversation.activeGoalId,statement:props.conversation.focusedIssue};
  const guideId=props.guided?.goalId??null;
  const identity=JSON.stringify([goal,guideId,props.conversation.resetEpoch,props.conversation.storageReady]);
