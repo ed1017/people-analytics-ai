@@ -6,7 +6,7 @@ import {application,applicationTree,branch,question,binding,limits,model} from '
 export const hash=value=>createHash('sha256').update(typeof value==='string'||Buffer.isBuffer(value)?value:JSON.stringify(value)).digest('hex');
 export const fail=code=>{throw Object.assign(Error('Bounded conversation Preview stopped: '+code),{code});};
 const same=(a,b)=>hash(a)===hash(b),hex=v=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v);
-export const controlFiles=['config.mjs','guard.mjs','sdk.mjs','entry.ts','bundle.mjs','run.mjs','guard.test.mjs','route.test.mjs','README.md','application-files.json'].map(p=>'tests/diagnostics/conversation-preview/'+p).concat('vercel.json');
+export const controlFiles=['config.mjs','guard.mjs','sdk.mjs','entry.ts','bundle.mjs','run.mjs','claim.mjs','claim.test.mjs','claim-postgres.test.mjs','verify-claim.mjs','database/create-claims.sql','database/inspect-claims.sql','guard.test.mjs','route.test.mjs','README.md','application-files.json'].map(p=>'tests/diagnostics/conversation-preview/'+p).concat('vercel.json');
 export function sourceManifest(root){
  const base=JSON.parse(readFileSync(join(root,'tests/diagnostics/conversation-preview/application-files.json'),'utf8'));
  if(base.commit!==application||base.tree!==applicationTree)fail('application_identity');

@@ -17,15 +17,18 @@ try{
   if(hash(sourceManifest(root))!==hash(manifest.files))throw Error('Source changed');
   if(process.versions.node.split('.')[0]!=='24'||!process.env.OPENAI_API_KEY)throw Error('Runtime unavailable');
   for(const [name,version] of [['openai','7.23.0'],['undici','7.30.0'],['next','16.3.6']])if(JSON.parse(readFileSync(join(root,'node_modules',name,'package.json'))).version!==version)throw Error('Dependency changed');
-  // Atomic mkdir refuses duplicates/restarts within this build filesystem.
-  // Across fresh builds the mandatory parent/operator one-build limit owns admission.
+  // Local receipts are exclusive; only the database claim admits a paid run globally.
   const output=join(tmpdir(),'conversation-preview-'+binding.runId);mkdirSync(output,{mode:0o700});
   const record=(stage,data)=>{const value={stage,...data},serialized=clean(value);if(Buffer.byteLength(serialized)>900000)throw Error('Receipt bounds');const fd=openSync(join(output,stage+'.json'),'wx',0o600);try{writeFileSync(fd,serialized+'\n');fsyncSync(fd);}finally{closeSync(fd);}for(const line of encodeReceipt(binding.runId+'_'+stage,JSON.parse(serialized)))console.log(line);};
-  record('claimed',{application,overlayCommit:manifest.overlayCommit,...binding,deploymentId:process.env.VERCEL_DEPLOYMENT_ID,manifestSha256:hash(bytes),reservedMicrousd:limits.reservedMicrousd});
-  const control=createControl(record,()=>{if(hash(bytes)!==process.env.CONVERSATION_PREVIEW_MANIFEST_SHA256)throw Error('Manifest changed');validateManifest(manifest,process.env);});globalThis.__conversationPreviewControl=control;
+  let admission,assertPaidClaim;
+  const control=createControl(record,()=>{if(typeof assertPaidClaim!=='function')throw Error('Durable claim missing');assertPaidClaim(admission);if(hash(bytes)!==process.env.CONVERSATION_PREVIEW_MANIFEST_SHA256)throw Error('Manifest changed');validateManifest(manifest,process.env);});
   try{
    const {compileRoute}=await import('./bundle.mjs');
-   const modulePath=await compileRoute(root,join(output,'compiled')),{prepareRequest,POST}=createRequire(import.meta.url)(modulePath);
+   const modulePath=await compileRoute(root,join(output,'compiled')),entry=createRequire(import.meta.url)(modulePath),{prepareRequest,POST}=entry;
+   assertPaidClaim=entry.assertPaidClaim;
+   admission=await entry.claimPaidPreview(manifest,process.env);assertPaidClaim(admission);
+   record('claimed',{application,overlayCommit:manifest.overlayCommit,...binding,deploymentId:process.env.VERCEL_DEPLOYMENT_ID,manifestSha256:hash(bytes),reservedMicrousd:limits.reservedMicrousd});
+   globalThis.__conversationPreviewControl=control;
    const body=await prepareRequest();if(body.message?.text!==question||body.requestId!==binding.runId)throw Error('Request identity');
    record('prepared',{requestSha256:hash(body),evidenceSha256:hash(body.evidence),scope:body.scope,timeZone:body.timeZone,sourceCount:body.evidence.sources.length});
    const response=await POST(new Request('http://local.invalid/api/home-solution-conversation',{method:'POST',headers:{'content-type':'application/json','x-workforce-dataset':'legacy-v1:0'},body:JSON.stringify(body)}));
