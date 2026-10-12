@@ -253,6 +253,7 @@ export function WorkforcePlanningPage({
     onPlanningDestinationChange(view);
   };
 
+  const [scenarioDefaultsError, setScenarioDefaultsError] = useState<string | null>(null);
   const [scenarioDefaultSource, setScenarioDefaultSource] = useState<ScenarioDefaultSource | null>(null);
   const [scenarioDefaults, setScenarioDefaults] =
     useState<ScenarioModelAssumptions | null>(null);
@@ -664,6 +665,7 @@ export function WorkforcePlanningPage({
     const controller = new AbortController();
 
     async function loadScenarioDefaults() {
+      setScenarioDefaultsError(null);
       setScenarioDefaults(null);
       setScenarioDefaultSource(null);
       try {
@@ -681,7 +683,7 @@ export function WorkforcePlanningPage({
         }
 
         if (!cancelled) {
-          setCustomScenarioError(null);
+          setScenarioDefaultsError(null);
           setScenarioDefaults(payload.defaults);
           setScenarioDefaultSource({
             provenance: payload.default_provenance,
@@ -693,7 +695,7 @@ export function WorkforcePlanningPage({
         if (!cancelled) {
           setScenarioDefaults(null);
           setScenarioDefaultSource(null);
-          setCustomScenarioError(
+          setScenarioDefaultsError(
             error instanceof Error
               ? error.message
               : "Failed to load scenario defaults."
@@ -2106,6 +2108,7 @@ export function WorkforcePlanningPage({
             activePlanningScenario={activePlanningScenario}
             onScenarioChange={onScenarioChange}
             scenarioDefaults={scenarioDefaults}
+            scenarioDefaultsError={scenarioDefaultsError}
             scenarioDefaultSource={scenarioDefaultSource}
             customAssumptions={customAssumptions}
             setCustomAssumptions={setCustomAssumptions}

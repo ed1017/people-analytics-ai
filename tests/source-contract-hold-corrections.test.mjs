@@ -14,21 +14,22 @@ const page=fs.readFileSync('components/pages/workforce-planning-page.tsx','utf8'
 // Execute the actual page effect and reset closure, including its dependency array.
 const end=page.indexOf('  async function runCustomScenario()');
 const effect=page.slice(page.lastIndexOf('  useEffect(() => {',end),end);
+const run=ts.transpileModule(page.slice(end,page.indexOf('  function resetCustomScenario()')),{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
 const reset=page.slice(page.indexOf('  function resetCustomScenario()'),page.indexOf('  async function runBuScenario()'));
 const aliases={'@/lib/legacy-source-contracts':contracts,'@/lib/display-format':format,'@/lib/numeric-contract':numeric};
 const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('components/workforce-planning/scenario-modeling-panel.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText,{exports,require:name=>aliases[name]??require(name)});
 const defaults={annual_growth_pct:2,salary_inflation_pct:3,annual_attrition_pct:11.3,fill_rate_pct:90,productivity_hiring_reduction_pct:5};
 function harness(){
  const pending=[];let cleanup,dependencies;
- const state={scenarioDefaults:null,scenarioDefaultSource:null,customAssumptions:{...defaults,annual_attrition_pct:4},customScenario:{retained:true},customScenarioError:null};
+ const state={scenarioDefaults:null,scenarioDefaultSource:null,customAssumptions:{...defaults,annual_attrition_pct:4},customScenario:{retained:true},customScenarioError:null,scenarioDefaultsError:null,customScenarioLoading:false};
  const context={...state,AbortController,Error,
-  datasetFetch:(_url,options)=>new Promise((resolve,reject)=>pending.push({resolve,reject,signal:options.signal})),
+  datasetFetch:(_url,options)=>new Promise((resolve,reject)=>pending.push({resolve,reject,signal:options.signal,method:options.method??'GET'})),
   useEffect:(run,next)=>{if(!dependencies||next.some((item,i)=>item!==dependencies[i])){cleanup?.();dependencies=next;cleanup=run();}},
  };
  for(const name of Object.keys(state))context['set'+name[0].toUpperCase()+name.slice(1)]=value=>context[name]=typeof value==='function'?value(context[name]):value;
  vm.createContext(context);
- const render=()=>vm.runInContext(effect+reset,context);
- const html=()=>renderToStaticMarkup(React.createElement(exports.ScenarioModelingPanel,{visible:true,planningScenarios:[],scenarioDefaults:context.scenarioDefaults,scenarioDefaultSource:context.scenarioDefaultSource,customAssumptions:context.customAssumptions,customScenarioError:context.customScenarioError,buScenarioOptions:[],savedScenarios:[],comparisonScenarioIds:[]}));
+ const render=()=>vm.runInContext(effect+run+reset,context);
+ const html=()=>renderToStaticMarkup(React.createElement(exports.ScenarioModelingPanel,{visible:true,planningScenarios:[],scenarioDefaults:context.scenarioDefaults,scenarioDefaultSource:context.scenarioDefaultSource,customAssumptions:context.customAssumptions,customScenarioError:context.customScenarioError,scenarioDefaultsError:context.scenarioDefaultsError,buScenarioOptions:[],savedScenarios:[],comparisonScenarioIds:[]}));
  return {context,pending,render,html,dispose:()=>cleanup?.(),reload:()=>{const previous=context.setCustomAssumptions;context.setCustomAssumptions=value=>previous(value);render();}};
 }
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
@@ -47,10 +48,10 @@ test('same-mount dependency reload invalidates paired defaults; failure cannot r
  h.context.resetCustomScenario();assert.equal(h.context.customAssumptions.annual_attrition_pct,4);assert.deepEqual(h.context.customScenario,{retained:true});
  h.pending[1].reject(new Error('Defaults reload failed'));await flush();
  assert.equal(h.context.scenarioDefaults,null);assert.equal(h.context.scenarioDefaultSource,null);assert.equal(resetDisabled(h.html()),true);
- h.context.resetCustomScenario();assert.equal(h.context.customScenarioError,'Defaults reload failed');assert.equal(h.context.customAssumptions.annual_attrition_pct,4);
+ h.context.resetCustomScenario();assert.equal(h.context.scenarioDefaultsError,'Defaults reload failed');assert.equal(h.context.customScenarioError,null);assert.match(h.html(),/Defaults reload failed/);assert.equal(h.context.customAssumptions.annual_attrition_pct,4);
  for(const [extra,label] of [[{},/Default provenance unavailable/],[{data_meta:{dataClass:'constructed-synthetic'},default_provenance:contracts.legacyAttritionDefaultSource},/Constructed dataset planning default/]]){
   h.reload();assert.equal(resetDisabled(h.html()),true);await succeed(h.pending.at(-1),extra);
-  assert.equal(h.context.customScenarioError,null);assert.match(h.html(),label);assert.equal(resetDisabled(h.html()),false);
+  assert.equal(h.context.scenarioDefaultsError,null);assert.equal(h.context.customScenarioError,null);assert.match(h.html(),label);assert.equal(resetDisabled(h.html()),false);
   assert.equal(h.context.customAssumptions.annual_attrition_pct,4);
  }
  h.context.resetCustomScenario();assert.equal(h.context.customAssumptions.annual_attrition_pct,11.3);assert.equal(h.context.customScenario,null);h.dispose();
@@ -75,4 +76,27 @@ test('complete chat evidence uses inventory and name order, while visible rows a
  assert.deepEqual(Array.from(context.full,row=>row.org_name),['A','B','C','D','E','F','G','H','I','J']);
  assert.equal(context.full.length,10);assert.equal(context.top.length,8);assert.deepEqual(rows,original);
  assert.deepEqual(Array.from(context.full,row=>row.net_position_change),[91,92,93,94,95,96,97,98,99,100]);
+});
+
+
+test('delayed defaults GET success cannot erase a failed scenario POST error or change the retained result',async()=>{
+ const h=harness();h.render();const retained=h.context.customScenario;
+ const running=h.context.runCustomScenario();
+ const post=h.pending.find(request=>request.method==='POST');assert.ok(post);
+ post.resolve({ok:false,json:async()=>({error:'Scenario POST failed'})});await running;
+ assert.equal(h.context.customScenarioError,'Scenario POST failed');assert.match(h.html(),/Scenario POST failed/);
+ await succeed(h.pending[0],{default_provenance:contracts.legacyAttritionDefaultSource});
+ assert.equal(h.context.scenarioDefaultsError,null);assert.equal(h.context.customScenarioError,'Scenario POST failed');
+ assert.match(h.html(),/Scenario POST failed/);assert.match(h.html(),/Default: all separations/);
+ assert.equal(h.context.customScenario,retained);assert.equal(h.context.customAssumptions.annual_attrition_pct,4);h.dispose();
+});
+
+test('defaults failure and scenario-run failure stay independent across retries and Reset',async()=>{
+ const h=harness();h.render();h.pending[0].reject(new Error('Defaults unavailable'));await flush();
+ const failed=h.context.runCustomScenario();h.pending.at(-1).reject(new Error('Scenario transport failed'));await failed;
+ assert.match(h.html(),/Defaults unavailable/);assert.match(h.html(),/Scenario transport failed/);
+ h.context.resetCustomScenario();assert.equal(h.context.scenarioDefaultsError,'Defaults unavailable');assert.equal(h.context.customScenarioError,'Scenario transport failed');
+ const retry=h.context.runCustomScenario();const result={replacement:true};h.pending.at(-1).resolve({ok:true,json:async()=>result});await retry;
+ assert.equal(h.context.customScenarioError,null);assert.equal(h.context.customScenario,result);assert.equal(h.context.scenarioDefaultsError,'Defaults unavailable');assert.match(h.html(),/Defaults unavailable/);
+ h.reload();assert.equal(h.context.scenarioDefaultsError,null);assert.equal(h.context.customAssumptions.annual_attrition_pct,4);h.dispose();
 });

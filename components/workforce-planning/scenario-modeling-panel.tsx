@@ -39,6 +39,7 @@ type ScenarioModelingPanelProps = {
   activePlanningScenario: PlanningScenario | undefined;
   onScenarioChange: (scenario: string) => void;
   scenarioDefaults: ScenarioModelAssumptions | null;
+  scenarioDefaultsError?: string | null;
   scenarioDefaultSource?: ScenarioDefaultSource | null;
   customAssumptions: ScenarioModelAssumptions | null;
   setCustomAssumptions: Dispatch<
@@ -165,6 +166,7 @@ export function ScenarioModelingPanel({
   activePlanningScenario,
   onScenarioChange,
   scenarioDefaults,
+  scenarioDefaultsError,
   scenarioDefaultSource,
   customAssumptions,
   setCustomAssumptions,
@@ -488,8 +490,14 @@ export function ScenarioModelingPanel({
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                Loading Baseline assumptions…
+                {scenarioDefaultsError ? "Baseline assumptions unavailable." : "Loading Baseline assumptions…"}
               </p>
+            )}
+
+            {scenarioDefaultsError && (
+              <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                Defaults unavailable: {scenarioDefaultsError}
+              </div>
             )}
 
             {customScenarioError && (
