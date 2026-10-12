@@ -10,6 +10,7 @@ import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 import {converseSolutions} from '../../lib/home-solution-conversation-service.ts';
 import {evaluate,final,fixtureRuntime} from '../fixtures/home-solution-conversation.mjs';
 import {proposedPilot} from '../fixtures/model-proposed-pilot.mjs';
+import {planningPrompts} from '../fixtures/underspecified-planning.mjs';
 import {DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const output=await fs.mkdtemp(path.join(os.tmpdir(),'model-proposed-pilot-'));
@@ -25,6 +26,7 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  const check=(name,ok)=>{assert.ok(ok,mode+' '+name);checks.push(mode+' '+name);console.log('PASS '+mode+' '+name);};
  await context.route('**/*',async route=>{const req=route.request(),url=new URL(req.url());if(req.isNavigationRequest()&&url.href===base+'/')return route.fulfill({contentType:'text/html',body:html});if(url.origin!==base){external++;return route.abort();}if(url.pathname==='/api/home-solution-conversation'){
   const body=req.postDataJSON();requests.push(body);if(body.message.text.startsWith('Offline failure:'))return route.fulfill({status:body.message.text.includes('deadline')?503:422,json:{error:'Synthetic request failure; previous work is retained.',diagnostic:body.message.text.includes('deadline')?'conversation_deadline':'response_validation'}});const c=proposedPilot(body.message.text==='Recommend again'?'renewed-pilot':'manager-pilot',body.message.id);
+  if(body.message.text===planningPrompts.turnover){c.id='turnover-pilot';c.goal.statement='Reduce turnover';c.successMeasure='Review participation and feedback, then agree a turnover baseline and target before judging impact.';}
   const changed=final('Use the updated cash ceiling.',[]);changed.constraintUpdates=[{action:'set',field:'budget_usd',number:1000,text:null,unit:'USD',turnId:body.message.id}];
   const response=final('The evidence cannot identify the weakest teams.',[c.id]);response.answer={findings:'The evidence cannot identify the weakest teams.',decisionRationale:'A limited trial tests the workload hypothesis before expansion.',caveats:['Availability remains unverified; no improvement is guaranteed.']};
   const alternative=proposedPilot('alternative',body.message.id);alternative.name='Alternative pilot';
@@ -35,6 +37,10 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  const input=page.getByLabel('Ask Workforce AI',{exact:true}),send=async text=>{await input.fill(text);await page.getByRole('button',{name:'Send overview question',exact:true}).click();await page.getByRole('status').filter({hasText:'Thinking through the question'}).waitFor({state:'hidden'});};
  const review=page.getByRole('region',{name:'Solution conversation review',exact:true}),card=()=>review.getByRole('article').filter({hasText:'Recommended Action Plan'}),readState=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
  await send('Explain evidence only');check('ordinary no-plan reply stays visible without creating a card',await card().count()===0&&await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('No team ranking can be established from this evidence. No new plan is proposed.',{exact:true}).isVisible());
+ await send(planningPrompts.turnover);await card().waitFor();
+ check('ordinary turnover prompt keeps the broad goal with editable proposed duration and no invented target',await card().getByText('Goal: Reduce turnover.',{exact:true}).isVisible()&&await card().getByText('2 months',{exact:true}).isVisible()&&await card().getByText(/Baseline: Unknown; Target: Unknown/).isVisible()&&await card().getByText('Edit planning assumptions',{exact:true}).isVisible());
+ await card().getByRole('button',{name:'Discard proposal',exact:true}).click();
+ await page.evaluate(()=>localStorage.clear());await page.reload();await dismissHomeOnboarding(page);
  await send('Recommend a manager/workload pilot. I have no time or budget assumptions.');await card().waitFor();
  check('new answer contains findings and caveats with one full set of actions',await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('The evidence cannot identify the weakest teams.',{exact:true}).isVisible()&&await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('Availability remains unverified; no improvement is guaranteed.',{exact:true}).isVisible()&&await page.getByText('Invite volunteers for manager check-ins, review workload friction and document follow-up actions.',{exact:true}).count()===1);
  check('one authoritative plan and visible unconfirmed label',await card().count()===1&&await card().getByText('Model-proposed planning assumptions · unconfirmed',{exact:true}).isVisible());

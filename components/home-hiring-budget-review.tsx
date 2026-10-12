@@ -2,7 +2,7 @@
 import {AssumptionsDisclosure} from '@/components/assumptions-disclosure';
 import {useState} from 'react';
 import {calculateHiringBudget,hiringBudgetFields,type HiringBudgetInput,type HiringBudgetField} from '@/lib/hiring-budget';
-import type {HiringBudgetReview} from '@/lib/home-hiring-budget';
+import {hiringPlanningSummary,type HiringBudgetReview} from '@/lib/home-hiring-budget';
 const labels:Record<HiringBudgetField,string>={role:'Comparable role',level:'Level',location:'Location',snapshotDate:'Salary snapshot date',hires:'Number of hires',budget:'Total budget for the period',currency:'Currency',startMonth:'Budget start month',months:'Budget horizon (months)',arrivalDate:'Hire arrival date',ftePerHire:'FTE per hire',annualBasePay:'Annual base pay override',payBasis:'Base pay basis',annualAdditionalCostPerHire:'Annual non-base cost per hire',recruitingFeePerHire:'One-time recruiting cost per hire',otherCostsComplete:'All other costs included'};
 const number=(value:number|null)=>value===null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:2});
 const control='mt-1 block min-h-11 w-full rounded border bg-background p-2';
@@ -18,20 +18,30 @@ export function HomeHiringBudgetReview({review,onUpdate,onDirtyChange,disabled}:
   setDraft(next);onDirtyChange?.(JSON.stringify(next)!==JSON.stringify(review.inputs));
  }
  function apply(inputs:HiringBudgetInput|null){try{onUpdate(inputs);onDirtyChange?.(false);setError('');}catch(e){setError(e instanceof Error?e.message:'Review the entered inputs.');}}
- const dirty=JSON.stringify(draft)!==JSON.stringify(review.inputs),salary=result.salary;
+ const dirty=JSON.stringify(draft)!==JSON.stringify(review.inputs),salary=result.salary,summary=hiringPlanningSummary(result);
+ const costLabel={complete:'Complete period cost',listed:'Listed period costs',subtotal:'Known cost subtotal',allowance:'Budget allowance per hire',unknown:'Cost estimate'}[summary.cost.kind];
  return <section aria-label="Hiring budget estimate" className="space-y-3 rounded border p-3 text-sm">
   <h3 className="font-semibold">Hiring budget estimate</h3>
-  <p>{number(review.inputs.hires)} hires · {review.inputs.role??'Role unknown'} · {review.inputs.months===null?'Period unknown':`${review.inputs.months} months`} from {review.inputs.startMonth??'start unknown'}</p>
+  <section aria-label="Hiring planning summary">
+   <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+    <div><dt>{costLabel}</dt><dd className="font-medium">{money(summary.cost.amount)}</dd><dd className="text-xs">{summary.cost.kind==='allowance'?'For the budget period; not an annual salary.':summary.cost.kind==='unknown'?'Enter cost assumptions to calculate.':'Under the entered cost and timing assumptions.'}</dd></div>
+    <div><dt>Time</dt><dd className="font-medium">{summary.months===null?'Budget period unconfirmed':`${summary.months} months`}</dd><dd className="text-xs">Start: {summary.startMonth??'unconfirmed'} · Arrival: {summary.arrivalDate??'unconfirmed'}</dd></div>
+    <div><dt>Resources</dt><dd className="font-medium">{number(summary.hires)} proposed hires · {review.inputs.role??'role unconfirmed'}</dd><dd className="text-xs">{summary.ftePerHire===null?'FTE per hire unconfirmed':`${number(summary.ftePerHire)} FTE per hire`}. Availability and recruiting effort unverified.</dd></div>
+   </dl>
+  </section>
   {Object.values(review.origins).some(b=>b.kind==='model-proposed')&&<p className="font-medium">Model-proposed scenario assumptions · unconfirmed</p>}
   {result.annualBasePayCeiling!==null&&<p><strong>Annual base-pay ceiling per hire:</strong> {money(result.annualBasePayCeiling)} before any unlisted costs. This is a spending limit under the entered timing and cost assumptions, not a salary estimate or proof that hiring is feasible.</p>}
-  <p><strong>Budget allowance per hire:</strong> {money(result.budgetPerHire)} for the budget period. This is not an annual salary.</p>
+  <p><strong>Budget check:</strong> {result.budgetStatus==='within'?'Within the entered period budget, subject to the stated cost coverage':result.budgetStatus==='over'?'Known costs exceed the budget':'Unknown until costs, currency and coverage are supplied'}. Hiring feasibility remains unverified.</p>
+  <details><summary className="min-h-11 cursor-pointer py-2">Calculation details and unknowns</summary><div className="space-y-3">
+  {summary.cost.kind!=='allowance'&&<p><strong>Budget allowance per hire:</strong> {money(result.budgetPerHire)} for the budget period. This is not an annual salary.</p>}
   <dl className="grid grid-cols-1 gap-2 sm:grid-cols-2">
    {([['Base-pay subtotal',result.baseCost],['Listed period costs',result.listedCost],['Complete period cost',result.periodCost],['Recurring annual cost',result.annualRunRate]] as const).map(([label,value])=><div key={label}><dt>{label}</dt><dd className="font-medium">{money(value)}</dd></div>)}
   </dl>
-  <p><strong>Budget check:</strong> {result.budgetStatus==='within'?'Within the entered period budget, subject to the stated cost coverage':result.budgetStatus==='over'?'Known costs exceed the budget':'Unknown until costs, currency and coverage are supplied'}. Hires arriving within the period: {number(result.hiresInHorizon)}. Affordable hires under these inputs: {number(result.maxAffordableHires)}.</p>
+  <p>Hires arriving within the period: {number(result.hiresInHorizon)}. Affordable hires under these inputs: {number(result.maxAffordableHires)}.</p>
   <p><strong>Comparable company salary:</strong> {salary.status==='unavailable'?salary.reason:`${money(salary.annualBasePerHire)} annual base per proposed hire; ${salary.cohort.coveredCount} of ${salary.cohort.eligibleCount} employees, ${salary.cohort.coverage} coverage, ${salary.cohort.coveredFte} FTE, ${salary.cohort.snapshotDate}, ${salary.cohort.payBasis.replaceAll('_',' ')} (${salary.cohort.aggregation.replaceAll('_',' ')}). Source: ${salary.cohort.releaseId} (${salary.cohort.provenance}).`}</p>
   {result.rateSource==='scenario-override'&&<p>The base-pay override is an unverified scenario input. Benefits, employer costs and recruiting fees are separate.</p>}
-  {!!result.missing.length&&<details open><summary className="min-h-11 cursor-pointer py-2">Unknowns ({result.missing.length})</summary><ul className="list-disc pl-5">{result.missing.map(line=><li key={line}>{line}</li>)}</ul></details>}
+  {!!result.missing.length&&<div><p>Unknowns ({result.missing.length})</p><ul className="list-disc pl-5">{result.missing.map(line=><li key={line}>{line}</li>)}</ul></div>}
+  </div></details>
   <details><summary className="min-h-11 cursor-pointer py-2">Edit inputs and salary override</summary>
    <p>Blank means unknown. Enter zero only when the cost is explicitly zero. Changing currency clears prior money amounts. Changes recalculate this estimate; they do not approve a hiring plan.</p>
    <form className="space-y-3" onSubmit={event=>{event.preventDefault();apply(draft);}}>
