@@ -21,7 +21,7 @@ const realSetTimeout=setTimeout,realClearTimeout=clearTimeout;
 test('actual POST keeps one overall deadline across longer provider calls without retries',async t=>{
  const isolated=await offlineBusinessRoute();
  assert.equal(isolated.sandbox.module.exports.maxDuration,120);
- for(const scenario of ['slow_success','provider_timeout','shared_deadline'])await t.test(scenario,async t=>{
+ for(const scenario of ['slow_success','provider_timeout','shared_deadline','slow_grounding_shared_deadline'])await t.test(scenario,async t=>{
   t.mock.timers.enable({apis:['setTimeout','Date'],now:Date.UTC(2026,9,9,21,30)});
   t.mock.method(globalThis,'fetch',network);
   const logs=[],deadlines=[],dispatches=[],firstDispatch=Promise.withResolvers();let shared,settled=false;
@@ -31,13 +31,15 @@ test('actual POST keeps one overall deadline across longer provider calls withou
    deadlines.push(ms);shared=new AbortController();setTimeout(()=>shared.abort(new DOMException('Synthetic shared deadline','TimeoutError')),ms);return shared.signal;
   }};
   isolated.sandbox.__requests.length=0;isolated.sandbox.__requestOptions.length=0;
-  const body=solutionRequest(secret),sources={attrition:{status:'loaded',data:{as_of:'2026-09-30',summary:{total_exits:4,voluntary_exits:3}}}};
+  const body=solutionRequest(scenario==='slow_grounding_shared_deadline'?'What workforce issues should we tackle first?':secret),sources={attrition:{status:'loaded',data:{as_of:'2026-09-30',summary:{total_exits:4,voluntary_exits:3}}}};
   body.evidence=buildHomePack(sources,body.scope);isolated.sandbox.__aggregateSources=sources;
+  const groundingStarted=Promise.withResolvers();
+  isolated.sandbox.__aggregateRead=async key=>{groundingStarted.resolve();if(scenario==='slow_grounding_shared_deadline')await new Promise(resolve=>setTimeout(resolve,28000));return sources[key];};
   const client=new OpenAI({apiKey:'synthetic-sdk-only',maxRetries:0,logLevel:'off',fetch:async(_url,init)=>{
    dispatches.push({at:Date.now(),signal:init.signal});
    firstDispatch.resolve();
    assert.equal(new Headers(init.headers).get('x-stainless-retry-count'),'0');
-   const index=dispatches.length,delay=scenario==='slow_success'?(index===1?45000:5000):scenario==='shared_deadline'&&index===1?50000:null;
+   const index=dispatches.length,delay=scenario==='slow_success'?(index===1?45000:5000):['shared_deadline','slow_grounding_shared_deadline'].includes(scenario)&&index===1?50000:null;
    return new Promise((resolve,reject)=>{
     const abort=()=>reject(Object.assign(Error('Synthetic aborted transport'),{name:'AbortError'}));
     if(init.signal.aborted)return abort();
@@ -50,6 +52,7 @@ test('actual POST keeps one overall deadline across longer provider calls withou
   const flush=async()=>{await drain();await drain();};
   // WebCrypto grounding can outlast an arbitrary number of event-loop turns.
   // Synchronize on dispatch before advancing the fake provider clock.
+  if(scenario==='slow_grounding_shared_deadline'){await groundingStarted.promise;assert.equal(dispatches.length,0);t.mock.timers.tick(28000);}
   let dispatchTimer;
   try{await Promise.race([firstDispatch.promise,new Promise((_,reject)=>{dispatchTimer=realSetTimeout(()=>reject(Error('Synthetic transport did not start')),2000);})]);}
   finally{realClearTimeout(dispatchTimer);}
@@ -64,9 +67,10 @@ test('actual POST keeps one overall deadline across longer provider calls withou
    const result=await task;assert.equal(result.status,422);assert.equal((await result.json()).code,'provider_timeout');
    assert.equal(dispatches.length,1);assert.equal(shared.signal.aborted,false);assert.equal(JSON.parse(logs[0][1]).providerElapsedMs,60000);
   }else{
-   await advance(20000);assert.equal(dispatches.length,2);await advance(39999);assert.equal(settled,false);await advance(1);
+   await advance(20000);assert.equal(dispatches.length,2);await advance(scenario==='slow_grounding_shared_deadline'?11999:39999);assert.equal(settled,false);await advance(1);
    const result=await task;assert.equal(result.status,422);assert.equal((await result.json()).code,'conversation_deadline');
-   assert.equal(shared.signal.aborted,true);assert.equal(dispatches.length,2);assert.equal(JSON.parse(logs[0][1]).elapsedMs,90000);assert.equal(JSON.parse(logs[0][1]).providerElapsedMs,40000);
+   assert.equal(shared.signal.aborted,true);assert.equal(dispatches.length,2);assert.equal(JSON.parse(logs[0][1]).elapsedMs,90000);assert.equal(JSON.parse(logs[0][1]).providerElapsedMs,scenario==='slow_grounding_shared_deadline'?12000:40000);
+   if(scenario==='slow_grounding_shared_deadline'){const event=JSON.parse(logs[0][1]);assert.equal(event.stageElapsedMs.grounding,28000);assert.equal(event.stageElapsedMs.provider,62000);assert.equal(event.groundingReads.readersCompleted,1);assert.equal(event.providerRounds.length,1);assert.equal(event.providerRounds[0].elapsedMs,50000);assert.equal(event.providerRounds[0].completionStatus,'completed');}
   }
   assert.deepEqual(deadlines,[90000],'The shared deadline is created once, not renewed for later calls');
   const options=isolated.sandbox.__requestOptions;assert.ok(options.every(option=>option.timeout===60000&&option.maxRetries===0&&option.signal===options[0].signal));

@@ -30,7 +30,7 @@ export function readStaffingScenario(request:SolutionRequest,context:{natural:bo
  const defaultScopes=['All countries; All business units; All levels','Selected workforce snapshot: Global workforce; All business units; All levels'];
  if(!defaultScopes.includes(request.scope)||Object.values(request.filters).some(value=>value!=='all'))return null;
  if((request.evidence as {datasetContext?:unknown}).datasetContext!=null)return null;
- const arrays=['turns','constraints','working','analyses','verifiedMetrics','rejected','questions','datasetEvidenceContexts'] as const;
+ const arrays=['turns','constraints','working','analyses','verifiedMetrics','rejected','questions','datasetEvidenceContexts','currentCalculationKinds'] as const;
  const nullable=['requiredStaffing','hiringBudget','businessPlanning','focusCandidateId'] as const;
  const allowed=new Set<string>(['version',...arrays,...nullable]);
  if(Object.keys(state).some(key=>!allowed.has(key))||arrays.some(key=>state[key]?.length)||nullable.some(key=>state[key]!=null))return null;
@@ -82,7 +82,7 @@ export async function converseStaffingScenario(request:SolutionRequest,scenario:
  const changes=requiredStaffingFields.filter(field=>scenario.inputs[field]!==null).map(field=>({field,value:scenario.inputs[field],basis:{kind:'user-supplied',turnId:request.message.id,quote:scenario.quotes[field]!,explanation:'User-provided illustrative assumption; not company evidence.'}}));
  const review=editRequiredStaffing(request,runtime.natural!.datasetToken,changes);
  const answer=staffingScenarioLabel+'\n'+requiredStaffingAnswer(review).split('\n').slice(1).join('\n');
- const state=readSolutionState({...request.state,requiredStaffing:review,turns:[{id:request.message.id,role:'user',text:request.message.text},{id:'reply-'+request.requestId.slice(0,70),role:'assistant',text:answer}]});
+ const state=readSolutionState({...request.state,requiredStaffing:review,currentCalculationKinds:['required-staffing'],turns:[{id:request.message.id,role:'user',text:request.message.text},{id:'reply-'+request.requestId.slice(0,70),role:'assistant',text:answer}]});
  signal.throwIfAborted();
  return {requestId:request.requestId,answer,charts:[],candidateIds:[],analysisIds:[],state,usage:{modelRounds:0,toolCalls:0}};
 }

@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useLayoutEffect,useRef,useState} from 'react';
 import {PlanningCalculatorDialog} from './planning-calculator-dialog';
 import {SWP_DEMAND_MODE,illustrativeServiceReview,demandQuantityFields,type DemandContext} from '@/lib/swp-demand';
 import {reviewDemandEditor,demandEditorLabels,demandInputSourceLabel,type DemandEditorDraft} from '@/lib/swp-demand-editor';
@@ -11,10 +11,14 @@ const button='min-h-11 rounded border px-3 py-2 text-sm font-medium focus-visibl
 
 /** An isolated deterministic illustration: no chat, API, storage or plan mutation. */
 export function PlanningAssumptionIllustration({launcherOnly=false}:{launcherOnly?:boolean}){
- const [review,setReview]=useState(initial),[editing,setEditing]=useState(false),[notice,setNotice]=useState('');
+ const [review,setReview]=useState(initial),[editing,setEditing]=useState(false),[notice,setNotice]=useState(''),[hasReviewed,setHasReviewed]=useState(false);
+ const resultSummary=useRef<HTMLElement>(null);
+ useLayoutEffect(()=>{
+  if(launcherOnly&&hasReviewed)resultSummary.current?.scrollIntoView({block:'nearest'});
+ },[review,launcherOnly,hasReviewed]);
  function update(draft:DemandEditorDraft){
   const next=reviewDemandEditor(review,draft,context,'assumption-editor-'+crypto.randomUUID());
-  setReview(next);setEditing(false);setNotice('Planning inputs reviewed and illustration recalculated. Your entries remain unverified user-supplied inputs.');
+  setReview(next);setHasReviewed(true);setEditing(false);setNotice('Planning inputs reviewed and illustration recalculated. Your entries remain unverified user-supplied inputs.');
  }
  const result=review.result;
  const content=<div className="min-w-0 space-y-5">
@@ -37,7 +41,17 @@ export function PlanningAssumptionIllustration({launcherOnly=false}:{launcherOnl
  return <div className="min-w-0 space-y-5">
   {!launcherOnly&&content}
   <div className="flex flex-wrap gap-2"><button type="button" aria-haspopup="dialog" aria-expanded={editing} className={button} onClick={()=>{setNotice('');setEditing(true);}}>Open Planning Calculator</button>{!launcherOnly&&<button className={button} onClick={()=>{setReview(initial());setNotice('The original fictional example is restored.');}}>Reset illustration</button>}</div>
-  <PlanningCalculatorDialog open={editing} review={review} disabled={false} onReview={update} onCancel={cancel}>{launcherOnly&&<>{content}<button className={button} onClick={()=>{setEditing(false);setReview(initial());setNotice('The original fictional example is restored.');}}>Reset illustration</button></>}</PlanningCalculatorDialog>
+  {launcherOnly&&hasReviewed&&<section ref={resultSummary} aria-live="polite" aria-atomic="true" aria-label="Latest reviewed calculator result" className="space-y-2 rounded border p-3 text-sm">
+   <h2 className="font-semibold">Reviewed workload · {review.spec.months} months</h2>
+   {result.status==='calculated'?<dl className="grid grid-cols-2 gap-2">
+    <div><dt>Required workload</dt><dd className="font-semibold">{number(result.workloadHours)} hours</dd></div>
+    <div><dt>Available capacity</dt><dd className="font-semibold">{number(result.capacityHours)} hours</dd></div>
+    <div><dt>Capacity gap</dt><dd className="font-semibold">{number(result.gapHours)} hours</dd></div>
+    <div><dt>Additional whole roles</dt><dd className="font-semibold">{number(result.additionalRoles)}</dd></div>
+   </dl>:<p>Calculation needs clarification: {result.missing.join('; ')}.</p>}
+   <p>Conditional estimate from unverified inputs. Reviewing does not accept assumptions, save a plan or recommend hiring.</p>
+  </section>}
+  <PlanningCalculatorDialog open={editing} review={review} disabled={false} onReview={update} onCancel={cancel}>{launcherOnly&&<>{content}<button className={button} onClick={()=>{setEditing(false);setHasReviewed(false);setReview(initial());setNotice('The original fictional example is restored.');}}>Reset illustration</button></>}</PlanningCalculatorDialog>
   {notice&&<p role="status" className="text-sm">{notice}</p>}
  </div>;
 }

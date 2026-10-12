@@ -25,7 +25,7 @@ test('successful requests record bounded stage and per-round usage counters with
  assert.equal(logs.length,1);assert.equal(logs[0][0],'Home solution conversation completed');const event=JSON.parse(logs[0][1]);
  assert.equal(event.elapsedMs,80);assert.deepEqual(event.stageElapsedMs,{request_validation:2,configuration:3,grounding:11,model_setup:0,conversation_preparation:5,provider:50,response_validation:9});
  assert.equal(event.modelAttempts,2);assert.equal(event.modelRounds,2);assert.equal(event.toolCalls,1);assert.equal(event.providerRounds.length,2);
- assert.deepEqual(event.providerRounds[0],{attempt:1,elapsedMs:20,inputBytes:123,instructionsBytes:456,toolSchemaBytes:789,model:'gpt-6.1-sol',serviceTier:'default',inputTokens:100,cachedInputTokens:40,outputTokens:20,reasoningTokens:5,totalTokens:120});
+ assert.deepEqual(event.providerRounds[0],{completionStatus:null,incompleteReason:null,attempt:1,elapsedMs:20,inputBytes:123,instructionsBytes:456,toolSchemaBytes:789,model:'gpt-6.1-sol',serviceTier:'default',inputTokens:100,cachedInputTokens:40,outputTokens:20,reasoningTokens:5,totalTokens:120});
  const absent=event.providerRounds[1];assert.equal(absent.elapsedMs,30);assert.equal(absent.inputBytes,null);assert.equal(absent.instructionsBytes,null);assert.equal(absent.model,null);assert.equal(absent.serviceTier,null);
  for(const key of ['inputTokens','cachedInputTokens','outputTokens','reasoningTokens','totalTokens'])assert.equal(absent[key],null,'Missing usage is not free usage');
  assert.doesNotMatch(JSON.stringify(logs),new RegExp(secret));
@@ -167,4 +167,55 @@ test('actual console output preserves nested reader timings as JSON at both sani
   for(const reader of event.groundingReads.readers)assert.deepEqual(Object.keys(reader).sort(),['completed','elapsedMs','reader','startedAfterMs']);
   for(const field of ['request','url','headers','body','answer'])assert.equal(Object.hasOwn(event.groundingReads,field),false);
  }
+});
+
+
+test('actual POST distinguishes bounded validation reasons and never exposes provider details',async t=>{
+ t.mock.method(globalThis,'fetch',()=>{throw Error('Live network forbidden');});
+ const isolated=await offlineBusinessRoute(),logs=[];isolated.sandbox.console={error:(...args)=>logs.push(args)};
+ const {body,results}=fixture();isolated.sandbox.__aggregateSources=results;
+ const scope=final('Canada has 4 exits [A1].'),reference=final('Review checked results.');reference.analysisIds=['unchecked'];
+ for(const [output,reason] of [
+  [{status:'incomplete',output:[],output_text:secret,incomplete_details:{reason:'max_output_tokens',message:secret}},'incomplete_output'],
+  [{status:'incomplete',output:[],output_text:secret,incomplete_details:{reason:'content_filter'}},'incomplete_output'],
+  [{status:'incomplete',output:[],output_text:secret,incomplete_details:{reason:secret}},'incomplete_output'],
+  [{status:'completed',output:[],output_text:secret},'invalid_json'],
+  [{status:'completed',output:[],output_text:''},'answer_unavailable'],
+  [{status:'completed',output:[],output_text:secret.repeat(1000)},'answer_unavailable'],
+  [{status:'completed',output:[{type:'reasoning',id:'large',summary:[],opaque:secret.repeat(2000)}],output_text:''},'output_bounds'],
+  [responseForStep({unexpected:secret}),'invalid_schema'],
+  [responseForStep(scope),'scope_rejected'],
+  [responseForStep(reference),'calculation_reference'],
+ ]){
+  logs.length=0;isolated.sandbox.__requests.length=0;isolated.sandbox.__replies.push(output);
+  const response=await isolated.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',headers:{'x-workforce-dataset':token},body:JSON.stringify(body)})),payload=await response.json();
+  assert.equal(response.status,422);assert.equal(payload.code,'response_validation_failed');assert.equal(payload.reason,undefined);
+  const event=JSON.parse(logs[0][1]);assert.equal(event.reason,reason);assert.equal(event.providerRounds.length,1);assert.equal(isolated.sandbox.__requests.length,1);
+  assert.equal(event.providerRounds[0].completionStatus,output.status);assert.equal(event.providerRounds[0].incompleteReason,['max_output_tokens','content_filter'].includes(output.incomplete_details?.reason)?output.incomplete_details.reason:null);
+  assert.doesNotMatch(JSON.stringify([logs,payload]),new RegExp(secret));
+ }
+});
+
+test('exact business-unit question accepts a factual limitation with freshly verified company context',async t=>{
+ t.mock.method(globalThis,'fetch',()=>{throw Error('Live network forbidden');});
+ const isolated=await offlineBusinessRoute(),logs=[];isolated.sandbox.console={error:(...args)=>logs.push(args)};
+ const body=solutionRequest('Which business unit has the highest voluntary turnover, and how does its engagement compare?');
+ const results={attrition:source({as_of:'2026-09-30',summary:{total_exits:4,voluntary_exits:3}}),'survey-sentiment':source({as_of:'2026-09-30',summary:{engagement_respondents:20,engagement_favorable_pct:70}})};
+ body.evidence=buildHomePack(results,body.scope);const before=JSON.stringify(body);
+ isolated.sandbox.__aggregateSources=results;isolated.sandbox.__aggregateReads=[];
+ for(const id of ['A1','S1']){const facts=body.evidence.sources.find(item=>item.id===id).facts;assert.deepEqual(facts.rows??[],[]);assert.equal(facts.business_units,undefined);}
+ const answer='I cannot determine which business unit has the highest voluntary turnover or compare its engagement: the supplied sources have no business-unit breakdown. Company-wide, there were 4 exits, including 3 voluntary exits [A1]. Engagement was 70% favorable among 20 respondents [S1]. These company totals do not establish a business-unit ranking. Comparable business-unit turnover denominators and survey results are needed.';
+ isolated.sandbox.__replies.push(responseForStep(final(answer)));
+ const response=await isolated.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',headers:{'x-workforce-dataset':token},body:JSON.stringify(body)})),reply=await response.json();
+ assert.equal(response.status,200,JSON.stringify(logs));assert.equal(reply.answer,answer);assert.deepEqual(reply.candidateIds,[]);assert.deepEqual(reply.analysisIds,[]);assert.deepEqual(reply.state.verifiedMetrics,[]);assert.deepEqual(reply.usage,{modelRounds:1,toolCalls:0});
+ assert.deepEqual([...isolated.sandbox.__aggregateReads].sort(),['attrition','survey-sentiment']);assert.equal(JSON.stringify(body),before);assert.equal(isolated.sandbox.__requests.length,1);assert.equal(logs.length,0);
+});
+
+
+test('unknown validation reasons and hostile provider completion metadata remain null',t=>{
+ const logs=[];t.mock.method(console,'error',(...args)=>logs.push(args));
+ const diagnostic=createSolutionDiagnostics();diagnostic.modelAttempt();
+ diagnostic.providerResult({status:secret,incomplete_details:new Proxy({},{get(){throw Error(secret);}})});
+ diagnostic.stage('response_validation');diagnostic.failure({reason:secret,message:secret},null,false,false);
+ const event=JSON.parse(logs[0][1]);assert.equal(event.reason,null);assert.equal(event.providerRounds[0].completionStatus,null);assert.equal(event.providerRounds[0].incompleteReason,null);assert.doesNotMatch(JSON.stringify(logs),new RegExp(secret));
 });

@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {solutionResponseReasons} from './home-solution-response-failure.ts';
 import {APIError,APIConnectionError,APIConnectionTimeoutError,APIUserAbortError} from 'openai/core/error';
 import {sourceAuthenticationCode,correlationReceipt} from './data-source-failure.mjs';
 import {solutionEvidenceCode} from './home-evidence-recovery.mjs';
@@ -15,7 +17,9 @@ const read = (value:unknown,key:string):unknown => {try{return value!==null&&(ty
 const count=(value:unknown,max:number):number|null=>typeof value==='number'&&Number.isSafeInteger(value)&&value>=0?Math.min(value,max):null;
 const providerModels=['gpt-6.1-sol'] as const;
 const providerTiers=['default','standard','auto','flex','scale','priority','fast','ultrafast'] as const;
-type ProviderRound={attempt:number;elapsedMs:number;inputBytes:number|null;instructionsBytes:number|null;toolSchemaBytes:number|null;model:string|null;serviceTier:string|null;inputTokens:number|null;cachedInputTokens:number|null;outputTokens:number|null;reasoningTokens:number|null;totalTokens:number|null};
+const completionStatuses=['completed','incomplete','failed','cancelled','queued','in_progress'] as const;
+const incompleteReasons=['max_output_tokens','content_filter'] as const;
+type ProviderRound={completionStatus:typeof completionStatuses[number]|null;incompleteReason:typeof incompleteReasons[number]|null;attempt:number;elapsedMs:number;inputBytes:number|null;instructionsBytes:number|null;toolSchemaBytes:number|null;model:string|null;serviceTier:string|null;inputTokens:number|null;cachedInputTokens:number|null;outputTokens:number|null;reasoningTokens:number|null;totalTokens:number|null};
 const providerClasses=['APIConnectionTimeoutError','APIConnectionError','APIUserAbortError','APIError','BadRequestError','AuthenticationError','PermissionDeniedError','NotFoundError','ConflictError','UnprocessableEntityError','RateLimitError','InternalServerError','SyntaxError','TypeError','RangeError','AbortError','TimeoutError','Error'] as const;
 const connectionCodes=['ECONNRESET','ECONNREFUSED','ENOTFOUND','EAI_AGAIN','ETIMEDOUT','EPIPE','UND_ERR_CONNECT_TIMEOUT','UND_ERR_HEADERS_TIMEOUT','UND_ERR_BODY_TIMEOUT','UND_ERR_SOCKET','UND_ERR_ABORTED','ABORT_ERR'] as const;
 function providerFailureDetails(error:unknown){
@@ -74,6 +78,7 @@ export function createSolutionDiagnostics(){
    if(reported||attemptStartedAt===null||providerRounds.at(-1)?.attempt===modelAttempts||providerRounds.length===4)return;
    const usage=read(response,'usage');
    providerRounds.push({attempt:modelAttempts,elapsedMs:bounded(Date.now()-attemptStartedAt,600000),...requestSizes,
+    completionStatus:member(read(response,'status'),completionStatuses),incompleteReason:member(read(read(response,'incomplete_details'),'reason'),incompleteReasons),
     model:member(read(response,'model'),providerModels),serviceTier:member(read(response,'service_tier'),providerTiers),
     inputTokens:count(read(usage,'input_tokens'),2000000),cachedInputTokens:count(read(read(usage,'input_tokens_details'),'cached_tokens'),2000000),
     outputTokens:count(read(usage,'output_tokens'),2000000),reasoningTokens:count(read(read(usage,'output_tokens_details'),'reasoning_tokens'),2000000),totalTokens:count(read(usage,'total_tokens'),4000000)});
@@ -93,7 +98,8 @@ export function createSolutionDiagnostics(){
    const code=evidence?solutionEvidenceCode(evidence):callerAborted?'conversation_cancelled':deadlineAborted?'conversation_deadline':
     stage==='provider'?'provider_'+(providerKind==='http'?'http_error':providerKind==='other'?'failed':providerKind):
     ({request_validation:'invalid_request',configuration:'configuration_unavailable',grounding:'evidence_verification_failed',model_setup:'model_setup_failed',conversation_preparation:'conversation_preparation_failed',response_validation:'response_validation_failed'} as const)[stage];
-   const diagnostic={version:2,correlationId,code,stage,elapsedMs:bounded(Date.now()-startedAt,600000),modelAttempts,...(groundingReads?{groundingReads}:{}),
+   if(!reported)closeStage();
+   const diagnostic={version:2,correlationId,code,stage,reason:stage==='response_validation'?member(read(error,'reason'),solutionResponseReasons):null,stageElapsedMs:{...stageElapsedMs},providerRounds:providerRounds.map(round=>({...round})),elapsedMs:bounded(Date.now()-startedAt,600000),modelAttempts,...(groundingReads?{groundingReads}:{}),
     // An SDK attempt is not proof of a wire dispatch, provider receipt, usage or spend.
     providerKind,providerHttpStatus:provider?.status??null,providerErrorClass:provider?.errorClass??null,providerCauseCode:provider?.causeCode??null,
     providerElapsedMs:provider&&attemptStartedAt!==null?bounded(Date.now()-attemptStartedAt,600000):null,grounding:evidence};

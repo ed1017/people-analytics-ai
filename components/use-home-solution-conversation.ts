@@ -36,6 +36,11 @@ export function useHomeSolutionConversation(props:Props){
  const controller=useRef<AbortController|null>(null),epoch=useRef(0),mounted=useRef(false),memoryRef=useRef(memory),currentProps=useRef(props);
  useLayoutEffect(()=>{currentProps.current=props;});
  useLayoutEffect(()=>{mounted.current=true;return()=>{mounted.current=false;controller.current?.abort();};},[]);
+ // Observe every store transition, including A→B→A batched into one React render.
+ useLayoutEffect(()=>{
+  const identity=()=>{const goals=decisionStore.getSnapshot().data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement]);};
+  let previous=identity();return decisionStore.subscribe(()=>{const next=identity();if(next===previous)return;previous=next;epoch.current++;controller.current?.abort();controller.current=null;setPending(false);});
+ },[]);
  const goal={id:props.conversation.activeGoalId,statement:props.conversation.focusedIssue};
  const guideId=props.guided?.goalId??null;
  const identity=JSON.stringify([goal,guideId,props.conversation.resetEpoch,props.conversation.storageReady]);
@@ -121,14 +126,14 @@ export function useHomeSolutionConversation(props:Props){
  function reject(item:SolutionEvaluation){try{requireCurrent();const state=structuredClone(memoryRef.current),turnId=crypto.randomUUID();state.turns=[...state.turns,{id:turnId,role:'user' as const,text:`Discard proposal ${item.candidate.name}, revision ${item.revision}.`}].slice(-32);state.rejected=[...state.rejected,{candidateId:item.id,revision:item.revision,reason:'Discarded using the proposal review control.',turnId}].slice(-24);if(state.focusCandidateId===item.id)state.focusCandidateId=null;persist(state);}catch(error){setNotice((error as Error).message);}}
  function clearRequiredStaffing(){
   if(controller.current||pending||saving)throw Error('Wait for the current request before clearing this comparison.');
-  requireCurrent();persist({...memoryRef.current,requiredStaffing:null});
+  requireCurrent();persist({...memoryRef.current,requiredStaffing:null,currentCalculationKinds:memoryRef.current.currentCalculationKinds?.filter(kind=>kind!=='required-staffing')});
  }
  function updateHiringBudget(inputs:HiringBudgetInput|null){
   if(controller.current||pending||saving)throw Error('Wait for the current request before editing this estimate.');
   requireCurrent();
   const previous=inputs===null?null:currentHiringBudget(makeRequest('Edit the hiring estimate.'),decisionStore.getDatasetToken());
   if(inputs!==null&&!previous)throw Error('The hiring estimate changed.');
-  persist({...memoryRef.current,hiringBudget:inputs===null?null:editHiringBudgetLocally(previous!,inputs)});
+  persist({...memoryRef.current,hiringBudget:inputs===null?null:editHiringBudgetLocally(previous!,inputs),currentCalculationKinds:inputs===null?memoryRef.current.currentCalculationKinds?.filter(kind=>kind!=='hiring'):memoryRef.current.currentCalculationKinds});
  }
  async function reviewHiringPlan(externalHires:number){
   requireReviewedHiringInputs();
