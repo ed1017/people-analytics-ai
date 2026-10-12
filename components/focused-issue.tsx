@@ -7,9 +7,11 @@ import { useEffect, useRef, useState } from "react";
 import type { ProblemConversation } from "@/components/problem-conversation";
 import { MAX_GOALS } from "@/lib/local-goals";
 import { validateFocusedIssue } from "@/lib/problem-session";
+import {readRecoveredRequests,recoveredRequestsField} from '@/lib/decision-recovery';
 
 export function FocusedIssue({ conversation, page="", scope="" }: { conversation: ProblemConversation;page?:string;scope?:string }) {
   const storage=useDecisionStorage(),planMode=solutionConversationEnabled;
+  const recoveredRequests=readRecoveredRequests(storage.data.workspaces[conversation.activeGoalId]?.fields[recoveredRequestsField]);
   const plans=planMode?pinnedActionPlans(conversation.goals,storage.data.workspaces):[];
   const selectedView=storage.data.workspaces[conversation.activeGoalId]?.fields[alternativeViewField] as {selectedId?:string}|undefined;
   const selectedPlan=plans.find(item=>item.goal.id===conversation.activeGoalId&&item.planId===selectedView?.selectedId)??plans.find(item=>item.goal.id===conversation.activeGoalId);
@@ -27,7 +29,9 @@ export function FocusedIssue({ conversation, page="", scope="" }: { conversation
     </button>}</div></div>
     {(!conversation.storageReady||!conversation.saved)&&<p role="status" className="text-xs">{!conversation.storageReady?"Loading saved decisions…":"Unsaved changes — keep this tab open"}</p>}
     {conversation.storageNotice&&<button type="button" onClick={conversation.retrySave} className="min-h-9 rounded border px-2 text-xs">Retry saving</button>}
-    {!!conversation.recovery?.conflicts.length&&<div role="region" aria-label="Review recovered draft" className="w-full rounded border p-3 text-sm"><p>Another tab changed {new Set(conversation.recovery.conflicts.map(item=>item.goalId)).size} of the same goals. Your recovered draft remains visible for review. Continuing keeps saved plan versions and attachment history, carries your unsent request into chat, and discards conflicting unsaved changes.</p><button type="button" className="mt-2 min-h-11 rounded border px-3" onClick={conversation.recoverSaved}>Keep saved versions and my request</button></div>}
+    {!!conversation.recovery?.conflicts.length&&<div role="region" aria-label="Review recovered draft" className="w-full rounded border p-3 text-sm"><p>Another tab changed {new Set(conversation.recovery.conflicts.map(item=>item.goalId)).size} of the same goals. Your recovered draft remains visible for review. Continuing keeps saved plan versions and attachment history, carries your unsent request into chat, and discards conflicting unsaved plan changes. A different saved request is kept below as a read-only recovery copy.</p><button type="button" className="mt-2 min-h-11 rounded border px-3" onClick={conversation.recoverSaved}>Keep saved versions and my request</button></div>}
+    {!!recoveredRequests?.length&&<details key={conversation.activeGoalId} className="w-full min-w-0 rounded border p-2 text-sm"><summary className="min-h-11 cursor-pointer py-2 font-medium">Recovered request copies ({recoveredRequests.length})</summary><p>Unsent requests retained during conflict resolution. These copies are not submitted or applied. Review the original goal before reusing the text.</p><ul className="space-y-3 pt-2">{recoveredRequests.map((request,index)=><li key={index}><p className="text-xs">Goal at recovery: {request.goal} · {request.recoveredAt}</p><p className="whitespace-pre-wrap break-words">{request.input}</p></li>)}</ul></details>}
+    {recoveredRequests===null&&<p role="status">Saved request recovery copies could not be verified. Their stored contents are unchanged.</p>}
     {conversation.storageNotice && <p role="alert" className="text-xs text-destructive">{conversation.storageNotice}</p>}
     <dialog ref={dialog} aria-labelledby="focused-issue-title" onCancel={close} onClose={close} className="m-auto max-h-[80dvh] w-[calc(100vw-2rem)] max-w-xl overflow-y-auto rounded-xl border bg-card p-5 text-foreground shadow-xl backdrop:bg-black/60">
       <form onSubmit={e=>{e.preventDefault();const validation=validateFocusedIssue(editor?.draft ?? "");setError(validation);if(!validation)setError(conversation.updateFocusedIssue(editor!.draft,editor!.id));}}>

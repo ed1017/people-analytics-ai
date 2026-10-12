@@ -47,3 +47,28 @@ test('recovering an active guided goal leaves an unchanged inactive goal and its
  const shared=port(),tab=port(),a=new DecisionStore(),b=new DecisionStore();a.initialize(shared,seed,tab);a.setField('b','chat',{messages:[{role:'user',content:'Original user question'}],input:'Original unsent draft',problem:null,questionUnanswered:false,resetMarks:{}});a.setField('b','catalog',{plans:['original'],attachments:['keep']});const original=JSON.stringify(a.getSnapshot().data.workspaces.b.fields);b.initialize(shared);b.setField('a','attachment','new saved work');a.invalidateExternalChange();a.retry();
  assert.equal(a.getSnapshot().saved,true);assert.equal(JSON.stringify(a.getSnapshot().data.workspaces.b.fields),original);assert.equal(a.getField('b','chat',null).recoveredPlanSelectionRequired,undefined);
 });
+
+test('explicit same-request-field resolution preserves both requests outside transcript and plan history',()=>{
+ const shared=port(),tab=port(),a=new DecisionStore(),b=new DecisionStore();a.initialize(shared,seed,tab);b.initialize(shared);
+ b.setField('a','chat',{messages:[{role:'user',content:'Saved transcript'}],input:'Saved unsent request from B'});a.setField('a','chat',{messages:[],input:'Unsent request from A'});
+ const before=shared.getItem(DECISIONS_STORAGE_KEY);a.retry();assert.equal(a.getSnapshot().saved,false);assert.equal(shared.getItem(DECISIONS_STORAGE_KEY),before);
+ a.recoverDraft(true);assert.equal(a.getSnapshot().saved,true);assert.equal(a.getField('a','chat',null).input,'Unsent request from A');assert.deepEqual(a.getField('a','chat',null).messages,[{role:'user',content:'Saved transcript'}]);
+ const copies=a.getField('a','recoveredRequestsV1',[]);assert.equal(copies.length,1);assert.equal(copies[0].input,'Saved unsent request from B');assert.equal(copies[0].goal,'Reduce turnover');assert.ok(Number.isFinite(Date.parse(copies[0].recoveredAt)));
+ const reload=new DecisionStore();reload.initialize(shared,seed,tab);assert.deepEqual(reload.getField('a','recoveredRequestsV1',[]),copies);assert.equal(reload.getField('a','chat',null).input,'Unsent request from A');assert.equal(reload.getField('b','recoveredRequestsV1',null),null);
+});
+test('quota during explicit resolution retains the saved request until retry commits both copies once',()=>{
+ const base=port(),tab=port();let full=false;const shared={...base,setItem:(key,value)=>{if(full)throw Error('quota');base.setItem(key,value)}};
+ const a=new DecisionStore(),b=new DecisionStore();a.initialize(shared,seed,tab);b.initialize(shared);b.setField('a','chat',{messages:[],input:'B saved request'});a.setField('a','chat',{messages:[],input:'A local request'});const saved=shared.getItem(DECISIONS_STORAGE_KEY);
+ full=true;a.recoverDraft(true);assert.equal(a.getSnapshot().saved,false);assert.equal(shared.getItem(DECISIONS_STORAGE_KEY),saved);
+ full=false;const reload=new DecisionStore();reload.initialize(shared,seed,tab);reload.recoverDraft(true);assert.equal(reload.getSnapshot().saved,true);const copies=reload.getField('a','recoveredRequestsV1',[]);assert.equal(copies.filter(c=>c.input==='B saved request').length,1);reload.retry();assert.deepEqual(reload.getField('a','recoveredRequestsV1',[]),copies);
+});
+test('invalid or full request-copy history fails closed without replacing either request',()=>{
+ for(const history of [{bad:true},Array.from({length:50},(_,i)=>({goal:'Reduce turnover',input:'Old request '+i,recoveredAt:'2026-10-01T00:00:00Z'}))]){
+  const shared=port(),tab=port(),a=new DecisionStore(),b=new DecisionStore();a.initialize(shared,seed,tab);a.setField('a','recoveredRequestsV1',history);b.initialize(shared);b.setField('a','chat',{messages:[],input:'B saved request'});a.setField('a','chat',{messages:[],input:'A local request'});const before=shared.getItem(DECISIONS_STORAGE_KEY);a.recoverDraft(true);assert.equal(a.getSnapshot().saved,false);assert.equal(shared.getItem(DECISIONS_STORAGE_KEY),before);assert.equal(a.getField('a','chat',null).input,'A local request');
+ }
+});
+test('editing a nonempty request after quota failure is not a competing edit when saved text equals the base',()=>{
+ const raw=port(),tab=port();let full=false;const shared={...raw,setItem:(key,value)=>{if(full)throw Error('quota');raw.setItem(key,value)}};
+ const a=new DecisionStore();a.initialize(shared,seed,tab);a.setField('a','chat',{messages:[],input:'Original nonempty request'});full=true;a.setField('a','chat',{messages:[],input:'Revised request from the same tab'});full=false;
+ const reload=new DecisionStore();reload.initialize(shared,seed,tab);reload.retry();assert.equal(reload.getSnapshot().saved,true);assert.equal(reload.getSnapshot().notice,null);assert.equal(reload.getField('a','chat',null).input,'Revised request from the same tab');assert.equal(reload.getField('a','recoveredRequestsV1',null),null);
+});
