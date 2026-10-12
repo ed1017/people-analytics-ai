@@ -28,3 +28,14 @@ test('shared route separates unsupported scope, checked proposals and deadline f
   assert.ok(isolated.sandbox.__requestOptions.every(options=>options.maxRetries===0));
  });
 });
+
+test('actual route accepts optional co-produced typed final only after tool checks, with fixed diagnostics and unchanged transport gates',async()=>{
+ const isolated=await offlineBusinessRoute(),logs=[];isolated.sandbox.console={info:(...args)=>logs.push(args),error:(...args)=>logs.push(args)};
+ const c=candidate('checked-pilot'),answer=final('Review the unconfirmed pilot after confirming the population.',[c.id]),combined={...responseForStep(evaluate(c),1),output_text:JSON.stringify(answer)};
+ isolated.sandbox.__replies.push(combined);
+ const body=solutionRequest(question),response=await isolated.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',body:JSON.stringify(body)})),reply=await response.json();
+ assert.equal(response.status,200);assert.deepEqual(reply.usage,{modelRounds:1,toolCalls:1});assert.deepEqual(reply.candidateIds,[c.id]);
+ const event=JSON.parse(logs.at(-1)[1]);assert.equal(event.toolSequence.length,1);assert.equal(event.toolSequence[0].name,'evaluate_candidate');assert.equal(event.toolSequence[0].status,'ok');
+ const sent=isolated.sandbox.__requests[0],options=isolated.sandbox.__requestOptions[0];assert.equal(options.maxRetries,0);assert.equal(options.timeout,60000);assert.equal(sent.max_output_tokens,5000);assert.equal(sent.parallel_tool_calls,false);assert.equal(sent.model,'gpt-6.1-sol');
+ const context=JSON.parse(sent.input[0].content.split('\n').slice(1).join('\n'));assert.match(context.preparation.clock.basis,/request-start/);assert.match(sent.instructions,/same response as those tool calls/);
+});

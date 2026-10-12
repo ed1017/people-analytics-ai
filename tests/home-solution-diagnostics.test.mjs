@@ -219,3 +219,21 @@ test('unknown validation reasons and hostile provider completion metadata remain
  diagnostic.stage('response_validation');diagnostic.failure({reason:secret,message:secret},null,false,false);
  const event=JSON.parse(logs[0][1]);assert.equal(event.reason,null);assert.equal(event.providerRounds[0].completionStatus,null);assert.equal(event.providerRounds[0].incompleteReason,null);assert.doesNotMatch(JSON.stringify(logs),new RegExp(secret));
 });
+
+test('tool sequence diagnostics allow only fixed names/status and bounded counters, including unknown and failed calls',t=>{
+ const logs=[];t.mock.method(console,'info',(...args)=>logs.push(args));t.mock.method(console,'error',(...args)=>logs.push(args));
+ for(const outcome of ['success','failure']){
+  const d=createSolutionDiagnostics();
+  d.toolResult({round:1,name:'evaluate_candidate',status:'ok',elapsedMs:12,args:secret,result:secret});
+  d.toolResult({round:999,name:secret,status:secret,elapsedMs:1e9});
+  d.toolResult({round:2,name:'read_evidence',status:'feedback',elapsedMs:-1,error:secret});
+  d.toolResult({round:2,name:'project_headcount',status:'aborted',elapsedMs:3});
+  d.toolResult(new Proxy({},{get(){throw Error(secret);}}));
+  for(let i=0;i<10;i++)d.toolResult({round:1,name:'read_clock',status:'ok',elapsedMs:1});
+  if(outcome==='success')d.success({modelRounds:2,toolCalls:6});else d.failure(Error(secret),null,false,false);
+  const event=JSON.parse(logs.at(-1)[1]);assert.equal(event.toolSequence.length,6);
+  assert.deepEqual(event.toolSequence.slice(0,4),[{round:1,name:'evaluate_candidate',status:'ok',elapsedMs:12},{round:4,name:'unknown',status:'feedback',elapsedMs:600000},{round:2,name:'read_evidence',status:'feedback',elapsedMs:0},{round:2,name:'project_headcount',status:'aborted',elapsedMs:3}]);
+  assert.doesNotMatch(JSON.stringify(event),new RegExp(secret));
+  d.toolResult({name:secret});assert.equal(logs.length,outcome==='success'?1:2);
+ }
+});
