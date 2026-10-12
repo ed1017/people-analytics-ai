@@ -11,9 +11,41 @@ import {homePlanSummary} from '../lib/home-plan-summary.ts';
 import {evaluateSolutionCandidate,evaluateSolutionParameterEdit,saveSolutionCandidate} from '../lib/home-solution-conversation.ts';
 import {solutionRequest} from './fixtures/home-solution-conversation.mjs';
 import {accountabilityCandidate,accountabilityQuantity} from './fixtures/plan-accountability.mjs';
+import {turnoverMetric,companyTurnoverText} from '../lib/home-turnover-context.ts';
 const legacy=JSON.parse(fs.readFileSync(new URL('./fixtures/pre-shared-metric-context.json',import.meta.url)));
 const packFor=c=>({sources:[{id:c.id,status:'loaded',date:'2026-09-30',scope:'Spoofed pilot subset',facts:{[c.field]:c.value}}]});
 const approve=draft=>({confirmed:true,bindingKey:actionBindingKey(draft.binding),inputKey:bundleInputKey(draft),acknowledgeUnknowns:true});
+test('every registry label selects its exact metric; broad goals remain suggestions',()=>{
+ for(const [metric,{name}] of Object.entries(historicalMetrics))for(const goal of [name,'Reduce '+name,'  Review '+name.toUpperCase()+'!  '])assert.deepEqual(resolveHistoricalMetric(goal),{kind:'supported',metric},goal);
+ for(const goal of ['Reduce turnover','Reduce voluntary turnover','Improve retention','Improve hiring','Improve employee engagement','Build skills'])assert.equal(resolveHistoricalMetric(goal).kind,'suggested',goal);
+});
+test('explicit cadences and rolling windows never borrow a different historical period',()=>{
+ const periods=['daily','weekly','monthly','quarterly','annual','yearly','30-day','30 day','30–day','four-week','rolling 90 days','trailing twelve months','last month','this quarter','Q3 2026','2025','since January'];
+ for(const metric of ['turnover','voluntary turnover','median time to fill','engagement favorable percentage','weighted skill requirement coverage'])for(const period of periods)for(const goal of [`Reduce ${period} ${metric}`,`Reduce ${metric} for ${period}`]){
+  assert.equal(resolveHistoricalMetric(goal).kind,'unsupported',goal);
+  assert.equal(captureMetricHistory(goal,{sources:legacy.cases.map(c=>packFor(c).sources[0])},'a'.repeat(64)),undefined,goal);
+  if(metric.includes('turnover')){assert.equal(turnoverMetric(goal),null,goal);assert.match(companyTurnoverText(goal,undefined),/metric unavailable/);}
+ }
+});
+test('mixed statistics, units, plurals and negations fail closed even with a saved snapshot',()=>{
+ const variants=[
+  ['Overall turnover YTD',['voluntary turnover','turnover count','turnover counts','attrition risk score','attrition risk scores']],
+  ['Median time to fill',['hiring cost','hiring costs','hiring quality','acceptance rate','acceptance rates']],
+  ['Engagement favorable percentage',['survey response','survey responses','participation rate','participation rates','engagement score','engagement scores']],
+  ['Weighted skills requirement coverage',['skill profile coverage','skills profile coverage','proficiency score','proficiency scores','training completion','training completions']],
+ ];
+ const unsupported=['Reduce review turnover','Unweighted skills requirement coverage','Unweighted skill requirement coverage','Attrition risk score','Attrition risk scores','Turnover count','Turnover counts','Median time to fill in hours','Engagement favorable count','Weighted skill requirement coverage count','Overall turnover YTD per week','Annualized voluntary turnover YTD'];
+ for(const [metric,others] of variants){
+  for(const other of others)for(const join of [' and ',' & ',' + ',', ',' / ',' or '])unsupported.push('Reduce '+metric+join+other,'Reduce '+other+join+metric);
+  for(const prefix of ['Not ','Non-','Non–','Exclude '])unsupported.push(prefix+metric);
+ }
+ for(const goal of unsupported){
+  assert.equal(resolveHistoricalMetric(goal).kind,'unsupported',goal);
+  const history=captureMetricHistory('Improve hiring',packFor(legacy.cases[1]),'a'.repeat(64)),before=JSON.stringify(history);
+  assert.equal(captureMetricHistory(goal,packFor(legacy.cases[1]),'a'.repeat(64)),undefined,goal);
+  const text=historicalContextText(goal,{history});assert.match(text,/unavailable or ambiguous/,goal);assert.doesNotMatch(text,/49 days|Suggested historical metric/,goal);assert.equal(JSON.stringify(history),before);
+ }
+});
 for(const c of legacy.cases){
  test(c.id+' frozen baseline-production records remain byte-identical and legacy aggregate is never labelled verified',()=>{
   const before=JSON.stringify(c.raw),goalId=c.raw.attachments[0].draft.binding.goalId,read=readBundleWorkspace(c.raw,goalId);assert.ok(read);assert.equal(JSON.stringify(read),before);

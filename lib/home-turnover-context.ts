@@ -3,10 +3,15 @@ import {normalizeHomePack} from './home-pack.mjs';
 export type CompanyTurnoverContext={source:'A1';asOf:string|null;total_turnover_ytd_pct:number|null;voluntary_turnover_ytd_pct:number|null;annualized_voluntary_turnover_pct:number|null};
 export const turnoverMetrics={total_turnover_ytd_pct:'Overall turnover (YTD %)',voluntary_turnover_ytd_pct:'Voluntary turnover (YTD %)',annualized_voluntary_turnover_pct:'Annualized voluntary turnover (%)'};
 export const isTurnoverGoal=(goal:string)=>/\b(turnover|retention|retain|exits|attrition)\b/i.test(goal);
+// Only normalize presentation and a single action verb, never metric qualifiers.
+export const metricRequest=(goal:string)=>goal.toLowerCase().replace(/[\u2010-\u2015]/g,'-').trim().replace(/[.!?]+$/,'').replace(/^(?:reduce|improve|review|increase|decrease|lower|support|strengthen|develop|build|measure|track)\s+/,'').replace(/\s+/g,' ');
 export function turnoverMetric(goal:string):keyof typeof turnoverMetrics|null{
- if(/\b(?:non[-\s]|nonvoluntary|not\b|no\b|without\b|exclud\w*|except\w*|other than|rather than)/i.test(goal.replace(/[\u2010-\u2015]/g,'-'))||!isTurnoverGoal(goal)||/\b(involuntary|regrettable|monthly|quarterly|annual)\b/i.test(goal)||/\bannualized\b/i.test(goal)&&!/\bvoluntary\b/i.test(goal)||/\b(overall|total|not)\b/i.test(goal)&&/\bvoluntary\b/i.test(goal))return null;
- if(/\bvoluntary\b/i.test(goal)&&!/\binvoluntary\b/i.test(goal))return /\bannualized\b/i.test(goal)?'annualized_voluntary_turnover_pct':'voluntary_turnover_ytd_pct';
- return 'total_turnover_ytd_pct';
+ const request=metricRequest(goal);
+ for(const metric of Object.keys(turnoverMetrics) as (keyof typeof turnoverMetrics)[])if(request===metricRequest(turnoverMetrics[metric]))return metric;
+ if(/^annualized voluntary turnover(?: rate)?$/.test(request))return 'annualized_voluntary_turnover_pct';
+ if(/^voluntary turnover(?: rate)?(?: (?:ytd|year[- ]to[- ]date))?$/.test(request))return 'voluntary_turnover_ytd_pct';
+ if(/^(?:(?:overall|total) )?turnover(?: rate)?(?: (?:ytd|year[- ]to[- ]date))?$/.test(request)||/^(?:retention|attrition)$/.test(request))return 'total_turnover_ytd_pct';
+ return null;
 }
 export function companyTurnoverContext(pack:unknown):CompanyTurnoverContext|undefined{
  const source=normalizeHomePack(pack).sources.find((s:{id:string})=>s.id==='A1');

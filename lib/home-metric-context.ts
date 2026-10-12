@@ -1,6 +1,6 @@
 import {normalizeHomePack} from './home-pack.mjs';
 // @ts-expect-error Native fixtures share source.
-import {turnoverMetric,isTurnoverGoal,type CompanyTurnoverContext} from './home-turnover-context.ts';
+import {turnoverMetric,isTurnoverGoal,metricRequest,type CompanyTurnoverContext} from './home-turnover-context.ts';
 
 // Version 1 definitions are immutable: saved values are interpreted using these exact metrics.
 const attrition={source:'A1',unit:'%',population:'Company-wide; unfiltered',denominator:'Exact rate denominator unavailable',period:'Exact YTD dates unavailable'};
@@ -16,27 +16,28 @@ export type HistoricalMetric=keyof typeof historicalMetrics;
 export type MetricObservation={metric:HistoricalMetric;value:number|null;asOf:string|null};
 export type MetricHistory={version:1;originEvidenceDigest:string;observations:MetricObservation[]};
 export type HistoricalMeasure={history?:MetricHistory;companyTurnover?:CompanyTurnoverContext};
-const excluded=(goal:string)=>/\b(?:non[-\s]|nonvoluntary|not\b|no\b|without\b|exclud\w*|except\w*|other than|rather than)/i.test(goal.replace(/[\u2010-\u2015]/g,'-'));
 export function resolveHistoricalMetric(goal:string):{kind:'supported'|'suggested';metric:HistoricalMetric}|{kind:'unsupported'|'none'}{
- const domains=[isTurnoverGoal(goal),/\b(hiring|hire|recruiting|recruitment)\b|time[- ]to[- ]fill/i.test(goal),/\bengagement\b/i.test(goal),/\b(skills|learning|training|capability)\b/i.test(goal),/\b(finance|salary|cost|headcount|fte|satisfaction)\b/i.test(goal)];
+ const request=metricRequest(goal);
+ // Display labels are exact metric selections, including their statistic and period.
+ for(const metric of Object.keys(historicalMetrics) as HistoricalMetric[])if(request===metricRequest(historicalMetrics[metric].name))return {kind:'supported',metric};
+ const domains=[isTurnoverGoal(request),/\b(hiring|hire|recruiting|recruitment)\b|time[- ]to[- ]fill/i.test(request),/\b(engagement|survey)\b/i.test(request),/\b(skills?|learning|training|capabilit(?:y|ies))\b/i.test(request),/\b(finance|salar(?:y|ies)|costs?|headcount|fte|satisfaction)\b/i.test(request)];
  const count=domains.filter(Boolean).length;
  if(!count)return {kind:'none'};
- if(count!==1||excluded(goal)||!domains[0]&&/\b(monthly|quarterly|annual|weekly|daily)\b/i.test(goal))return {kind:'unsupported'};
- if(domains[0]){const metric=turnoverMetric(goal);return metric?{kind:/\bytd\b|year[- ]to[- ]date|annualized voluntary/i.test(goal)?'supported':'suggested',metric}:{kind:'unsupported'};}
+ if(count!==1)return {kind:'unsupported'};
+ // Anchored positive phrases reject extra metrics, units and observation periods.
+ // Unknown windows cannot be equated with a requested cadence or rolling window.
+ if(domains[0]){const metric=turnoverMetric(goal);return metric?{kind:/\bytd\b|year[- ]to[- ]date|annualized voluntary/.test(request)?'supported':'suggested',metric}:{kind:'unsupported'};}
  if(domains[1]){
-  if(/\b(mean|average|readiness|cost|budget|salary|participation|acceptance|conversion|applications|requisitions|vacancies|count|rate)\b|time[- ]to[- ](hire|start)/i.test(goal))return {kind:'unsupported'};
-  if(/median.*time[- ]to[- ]fill/i.test(goal))return {kind:'supported',metric:'median_time_to_fill_days'};
-  return /^(?:improve|review|support|strengthen) (?:our )?(?:hiring|recruiting|recruitment)[.!?]?$/i.test(goal.trim())?{kind:'suggested',metric:'median_time_to_fill_days'}:{kind:'unsupported'};
+  if(/^median time[- ]to[- ]fill(?: in days)?$/.test(request))return {kind:'supported',metric:'median_time_to_fill_days'};
+  return /^(?:our )?(?:hiring|recruiting|recruitment)$/.test(request)?{kind:'suggested',metric:'median_time_to_fill_days'}:{kind:'unsupported'};
  }
  if(domains[2]){
-  if(/\b(mean|average|enps|score|participation|response|respondents|count)\b/i.test(goal))return {kind:'unsupported'};
-  if(/\bfavorab(?:le|ility)\b/i.test(goal))return {kind:'supported',metric:'engagement_favorable_pct'};
-  return /^(?:improve|review|increase|support) (?:employee )?engagement[.!?]?$/i.test(goal.trim())?{kind:'suggested',metric:'engagement_favorable_pct'}:{kind:'unsupported'};
+  if(/^(?:employee )?engagement (?:favorable(?: percentage| percent)?|favorability)$/.test(request))return {kind:'supported',metric:'engagement_favorable_pct'};
+  return /^(?:employee )?engagement$/.test(request)?{kind:'suggested',metric:'engagement_favorable_pct'}:{kind:'unsupported'};
  }
  if(domains[3]){
-  if(/\b(proficiency|availability|effectiveness|profile|profiles|courses|hours|completion|count)\b/i.test(goal))return {kind:'unsupported'};
-  if(/weighted.*requirement.*coverage/i.test(goal))return {kind:'supported',metric:'weighted_requirement_met_pct'};
-  return /^(?:improve|review|develop|build|support) (?:skills|learning|training|capability)[.!?]?$/i.test(goal.trim())?{kind:'suggested',metric:'weighted_requirement_met_pct'}:{kind:'unsupported'};
+  if(/^weighted skills? requirement coverage(?: percentage| percent)?$/.test(request))return {kind:'supported',metric:'weighted_requirement_met_pct'};
+  return /^(?:skills|learning|training|capability)$/.test(request)?{kind:'suggested',metric:'weighted_requirement_met_pct'}:{kind:'unsupported'};
  }
  return {kind:'none'};
 }

@@ -34,6 +34,13 @@ try{for(const [mode,width,height] of [['desktop',1350,1000],['phone',390,844]]){
   await page.getByLabel('Snapshot format',{exact:true}).selectOption('legacy');check(id+' pre-change adopted value is visibly unverified without data migration',await attached.innerText().then(t=>t.includes('Legacy source value: '+value)&&t.includes('plan baseline: Unverified')&&!t.includes('Recorded baseline:')));
   const editor=page.getByText('Review success measure and baseline',{exact:true});await editor.click();check(id+' has no aggregate adoption control',await page.getByLabel(/Use recorded baseline/).count()===0);
   await page.getByLabel('Success measure',{exact:true}).fill('Different user metric');check(id+' renaming does not relabel the source value',await page.getByRole('region',{name:'Historical metric context',exact:true}).first().innerText().then(t=>t.includes(value)&&!t.includes('Different user metric')));await editor.click();
+  await page.getByLabel('Snapshot format',{exact:true}).selectOption('comparison');await page.getByRole('button',{name:'Compare Action Plans',exact:true}).click();
+  const comparison=page.getByRole('region',{name:'Action Plan comparison',exact:true});
+  check(id+' legacy comparison renders frozen context in each card',await comparison.getByRole('region',{name:'Historical metric context',exact:true}).count()===2&&await comparison.innerText().then(t=>t.includes(value)&&t.includes(population)&&t.includes('Baseline: Unknown')));
+  await page.getByRole('button',{name:'Change current evidence',exact:true}).click();
+  check(id+' legacy comparison does not refresh its source snapshot',await comparison.innerText().then(t=>t.includes(value)&&!t.includes('99%')&&!t.includes('99 days')));
+  const limits=comparison.getByText('Metric definitions and limits',{exact:true}).first();await limits.click();
+  check(id+' legacy comparison exposes source and period limits',await comparison.innerText().then(t=>t.includes(id+'.')&&t.includes('2026-09-30')&&t.includes('denominator')));await limits.click();
   check(id+' no horizontal overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  }
  check('saved source fixtures unchanged and no external traffic/errors',original===await page.evaluate(()=>JSON.stringify(window.__surfaceFixtures))&&external===0&&errors.length===0);await page.screenshot({path:path.join(output,mode+'-legacy-skills.png')});await context.close();
