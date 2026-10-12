@@ -1,4 +1,5 @@
 "use client";
+import {HistoricalMetricContext} from './historical-metric-context';
 import {readPlanAlternatives} from '@/lib/home-plan-alternatives';
 import {PlanAlternativeCard} from '@/components/plan-alternative-card';
 import {PlanDirections} from '@/components/plan-directions';
@@ -27,6 +28,7 @@ export function AttachedActionPlansBrief({raw,alternatives,goalId,goal,onReview}
    <p>Snapshot cash: {money(result.cashTotal)}. Staff hours: {planStaffHours(draft)??'Unknown'}. Plan finish: {result.planFinish??'Unknown'}.</p>
    {result.budget&&<p>{planBudgetText(result)}</p>}
    <p className="break-words">How success is measured: {successMeasureText(measure,!measure||measure.scopeKey===measurementScope(draft.inputs))}</p>
+   <HistoricalMetricContext goal={draft.binding.goal} measure={measure}/>
    {measure?.baseline.basis&&<p className="break-words text-xs">Saved baseline provenance: {measure.baseline.basis}</p>}
    <details><summary className="min-h-11 cursor-pointer py-2 font-medium">Saved assumptions, activities and unknowns</summary><div className="space-y-3 pt-2">
     <p>Population — {bundleAssumptionText(draft.inputs.scope.population)}. Start — {bundleAssumptionText(draft.inputs.scope.startMonth)}. Duration — {bundleAssumptionText(draft.inputs.scope.months)} months.</p>

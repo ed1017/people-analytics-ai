@@ -1,5 +1,5 @@
 "use client";
-import {TurnoverContext} from './turnover-context';
+import {HistoricalMetricContext} from './historical-metric-context';
 import {ActionPlanQuickSummary} from './action-plan-quick-summary';
 import {planContextDiagnosticText,type PlanContextDiagnostic} from '@/lib/home-evidence-identity';
 import {PlanDirections} from '@/components/plan-directions';
@@ -27,7 +27,7 @@ export function PlanAlternativeCard({plan,catalog,compact=false,snapshot=false,c
     <p><strong>Goal:</strong> {draft.binding.goal}</p>
     <p><strong>Success measure:</strong> {successMeasureText(draft.inputs.successMeasure,draft.inputs.successMeasure?.scopeKey===measurementScope(draft.inputs))}{!draft.inputs.successMeasure&&' Baseline: Unknown; Target: Unknown.'}</p>
    </section>}
-   {result.calculationStatus==='awaiting-scope'&&<TurnoverContext goal={draft.binding.goal} context={draft.inputs.successMeasure?.companyTurnover}/>}
+   {result.calculationStatus==='awaiting-scope'&&<HistoricalMetricContext goal={draft.binding.goal} measure={draft.inputs.successMeasure}/>}
    {result.calculationStatus==='awaiting-scope'?<ul className="list-disc space-y-2 pl-5">{draft.bundle.components.map(activity=><li key={activity.id}><strong>{activity.name}:</strong> {activity.firstStep}</li>)}</ul>:<PlanDirections draft={draft} snapshot={snapshot}/>}
    {result.calculationStatus!=='awaiting-scope'&&<><HomePlanSummary draft={draft} result={currentResult} measurePack={measurePack}/><PlanAssumptions key={key+selected} draft={draft} result={currentResult} contextCurrent={contextCurrent}/></>}
    <details><summary className="min-h-11 cursor-pointer py-2 font-medium">Why these plans</summary><div className="space-y-3"><p className="text-xs">Review population, period and unresolved assumptions before comparing. These proposals are not ranked by effectiveness. Edits create separate numbered alternatives. Apply and Attach are explicit; earlier plans and attachments stay unchanged.</p>{contextDiagnostic&&<p aria-label="Action Plan context check" className="text-xs">{planContextDiagnosticText(contextDiagnostic)}</p>}<p className="text-xs">{draft.bundle.origin==='local-demo-v1'?'This example was prepared locally from fictional assumptions; no model ran.':draft.bundle.origin==='conversation-v1'?'This proposal was developed in conversation; its mechanism and effectiveness are unproven.':'Plans start with one preparation response and can include reviewed local edits.'} The staffing section reports only combinations actually evaluated for the current assumptions. Attach checks the selected draft and preserves any executed search with it.</p><p className="text-xs">References describe observed context; they do not establish causes, effectiveness or a ranking. Availability and combined retention impact are not established. Proposed roles are not assigned people or operational approvals.</p><ul className="list-disc space-y-2 pl-5">

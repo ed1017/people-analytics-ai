@@ -4,7 +4,7 @@ export type CompanyTurnoverContext={source:'A1';asOf:string|null;total_turnover_
 export const turnoverMetrics={total_turnover_ytd_pct:'Overall turnover (YTD %)',voluntary_turnover_ytd_pct:'Voluntary turnover (YTD %)',annualized_voluntary_turnover_pct:'Annualized voluntary turnover (%)'};
 export const isTurnoverGoal=(goal:string)=>/\b(turnover|retention|retain|exits|attrition)\b/i.test(goal);
 export function turnoverMetric(goal:string):keyof typeof turnoverMetrics|null{
- if(!isTurnoverGoal(goal)||/\b(involuntary|regrettable|monthly|quarterly|annual)\b/i.test(goal)||/\bannualized\b/i.test(goal)&&!/\bvoluntary\b/i.test(goal)||/\b(overall|total|not)\b/i.test(goal)&&/\bvoluntary\b/i.test(goal))return null;
+ if(/\b(?:non[-\s]|nonvoluntary|not\b|no\b|without\b|exclud\w*|except\w*|other than|rather than)/i.test(goal.replace(/[\u2010-\u2015]/g,'-'))||!isTurnoverGoal(goal)||/\b(involuntary|regrettable|monthly|quarterly|annual)\b/i.test(goal)||/\bannualized\b/i.test(goal)&&!/\bvoluntary\b/i.test(goal)||/\b(overall|total|not)\b/i.test(goal)&&/\bvoluntary\b/i.test(goal))return null;
  if(/\bvoluntary\b/i.test(goal)&&!/\binvoluntary\b/i.test(goal))return /\bannualized\b/i.test(goal)?'annualized_voluntary_turnover_pct':'voluntary_turnover_ytd_pct';
  return 'total_turnover_ytd_pct';
 }

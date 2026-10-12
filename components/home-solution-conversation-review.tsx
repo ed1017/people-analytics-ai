@@ -1,5 +1,5 @@
 'use client';
-import {TurnoverContext} from './turnover-context';
+import {HistoricalMetricContext} from './historical-metric-context';
 import {canReviewCostedHiringPlan} from '@/lib/home-hiring-plan';
 import {HomeHiringPlanReview} from './home-hiring-plan-review';
 import {ProposedPlanningEditor} from './proposed-planning-editor';
@@ -44,7 +44,7 @@ function Proposal({item,controller,goal,number:proposalNumber,recommended=false,
   <ol className="list-decimal space-y-2 pl-5">{item.candidate.activities.map((activity,index)=>{const component=item.draft?.bundle.components.find(part=>part.id===activity.id),timing=item.draft?.inputs.timing.find(row=>row.componentId===activity.id);return <li key={activity.id}><strong>{component?.name??activity.name}</strong>{index>0&&<p>{component?.firstStep??activity.step}</p>}<p><strong>Suggested owner:</strong> {component?.ownerRole??activity.ownerRole}</p><p className="text-xs"><strong>Timing:</strong> {timing?.start.value??'Start not confirmed'} → {timing?.finish.value??'Finish not confirmed'}. Follow the proposed step sequence; dates and availability need review.</p><p className="text-xs">{component?.limitation??activity.limitation}</p></li>;})}</ol>
   <p><strong>Tradeoffs:</strong> {item.candidate.tradeoffs.join(' ')||'Not yet evaluated.'}</p></div></details><p><strong>Next step:</strong> {item.candidate.nextStep}</p><p><strong>Success measure:</strong> {item.draft?.inputs.successMeasure?successMeasureText(item.draft.inputs.successMeasure,item.draft.inputs.successMeasure.scopeKey===measurementScope(item.draft.inputs)):`${item.candidate.successMeasure} · Baseline: Unknown; Target: Unknown.`}</p>
 
-  <TurnoverContext goal={item.draft?.binding.goal??goal} context={item.draft?.inputs.successMeasure?.companyTurnover}/>
+  <HistoricalMetricContext goal={item.draft?.binding.goal??goal} measure={item.draft?.inputs.successMeasure}/>
   {item.draft&&proposedPlanningEstimate(item.draft)&&<ProposedPlanningEditor draft={item.draft} onDirtyChange={setPlanningDirty} disabled={controller.pending||controller.saving||!controller.canSend||stale||!!saved} onReview={changes=>controller.editPlanningInputs(item,changes)}/>}
   <PlanReviewNextStep goal={statement}/>
   <details><summary className="cursor-pointer py-2 font-medium">Inputs and changes</summary><ul className="list-disc space-y-1 pl-5">{[...item.interpretations,...item.changes].map((line,index)=><li key={index}>{line}</li>)}</ul>{!item.interpretations.length&&<p>No new quantities were supplied. Missing assumptions remain unknown.</p>}</details>

@@ -58,9 +58,9 @@ try{
   assert.ok(await card().getByText(/Baseline: Unknown; Target: Unknown/).isVisible());
   assert.ok(await card().getByText(accountabilityNextStep,{exact:false}).isVisible());
   assert.ok(await card().getByText(/Suggested owners · unconfirmed: Learning lead/).isVisible());
-  assert.ok(await card().getByText(/Company history.*Overall turnover.*9.1%/).isVisible());assert.ok(await card().getByText('Company metric definitions and limits',{exact:true}).evaluate(n=>!n.parentElement.open));await card().getByRole('button',{name:/^Pin Action Plan/}).click();await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key)).payload.goals.activeId,DECISIONS_STORAGE_KEY);
+  assert.ok(await card().getByText(/Suggested historical metric.*Overall turnover.*9.1%/).isVisible());assert.ok(await card().getByText('Metric definitions and limits',{exact:true}).evaluate(n=>!n.parentElement.open));await card().getByRole('button',{name:/^Pin Action Plan/}).click();await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key)).payload.goals.activeId,DECISIONS_STORAGE_KEY);
   const pinned=await state(),id=pinned.goals.activeId,original=pinned.workspaces[id].fields.homePlanAlternativesV1,measure=original.plans[0].draft.inputs.successMeasure;
-  assert.equal(measure.scopeKey,measurementScope(original.plans[0].draft.inputs));assert.equal(measure.baseline.kind,'unknown');assert.equal(measure.target.kind,'unknown');assert.equal(measure.companyTurnover.total_turnover_ytd_pct,9.1);assert.equal(measure.companyTurnover.voluntary_turnover_ytd_pct,6.2);
+  assert.equal(measure.scopeKey,measurementScope(original.plans[0].draft.inputs));assert.equal(measure.baseline.kind,'unknown');assert.equal(measure.target.kind,'unknown');assert.equal(measure.history.observations.find(o=>o.metric==='total_turnover_ytd_pct').value,9.1);assert.equal(measure.history.observations.find(o=>o.metric==='voluntary_turnover_ytd_pct').value,6.2);
   assert.equal(pinned.goals.goals.find(goal=>goal.id===id).statement,'Reduce turnover');assert.equal(original.attachments[0].purpose,'proposal-selection');assert.ok(!original.plans[0].applied);
   async function inspect(stage){
    await card().waitFor();assert.ok(await card().getByRole('button',{name:/^Pinned Action Plan/}).isDisabled());

@@ -1,5 +1,5 @@
 import {PlanReviewNextStep} from './plan-review-next-step';
-import {TurnoverContext} from './turnover-context';
+import {HistoricalMetricContext} from './historical-metric-context';
 import type {BundleDraft,BundleResult} from '@/lib/home-bundle-reconciliation';
 import {homePlanSummary,planSummarySentences} from '@/lib/home-plan-summary';
 import {bundleAssumptionText} from '@/lib/home-bundle-display';
@@ -14,7 +14,7 @@ export function HomePlanSummary({draft,result,measurePack}:{draft:BundleDraft;re
     </ul>
    </li>)}
   </ul>
-  <TurnoverContext goal={draft.binding.goal} context={draft.inputs.successMeasure?.companyTurnover} detailsOnly/>
+  <HistoricalMetricContext goal={draft.binding.goal} measure={draft.inputs.successMeasure} detailsOnly/>
   <PlanReviewNextStep goal={draft.binding.goal}/>
   {draft.inputs.scope.requirements.value&&<section aria-label="Planning constraints" className="text-sm"><strong>Planning constraints:</strong><ul className="mt-1 list-disc space-y-1 pl-5">{planSummarySentences(draft.inputs.scope.requirements.value).map((item,index)=><li key={index}>{item}</li>)}</ul></section>}
   <ul aria-label="Plan population and source scope" className="list-disc space-y-1 pl-5 text-xs">

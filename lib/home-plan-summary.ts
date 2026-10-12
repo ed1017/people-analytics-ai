@@ -1,6 +1,6 @@
 import type {Assumption,BundleDraft,BundleResult} from './home-bundle-reconciliation';
 // @ts-expect-error Native fixtures share source.
-import {companyTurnoverText} from './home-turnover-context.ts';
+import {historicalContextText,historicalContextLimit} from './home-metric-context.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {bundleAssumptionText,bundleDisplayText,bundleHorizonEnd,bundleIsAnalysisOnly} from './home-bundle-display.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -46,7 +46,7 @@ export function homePlanSummary(draft:BundleDraft,result:BundleResult|null|undef
  const measurement=[`Goal: ${binding.goal}`];
  if(measure){
   if(measure.scopeKey!==measurementScope(inputs))measurement.push('Saved measure needs renewed review: the plan population or horizon changed.');
-  else measurement.push(`Metric: ${measure.name}.`,legacyCompanyBaseline(measure)?`Legacy company value: ${measure.baseline.value}; plan baseline: Unverified.`:measureValue(measure.baseline),measureValue(measure.target,true));
+  else measurement.push(`Metric: ${measure.name}.`,legacyCompanyBaseline(measure)?`Legacy source value: ${measure.baseline.value}; plan baseline: Unverified.`:measureValue(measure.baseline),measureValue(measure.target,true));
  }else if(inputs.whatIf&&inputs.whatIf.scopeKey===measurementScope(inputs)){
   const kind=inputs.whatIf.kind;
   measurement.push(`Metric: ${kind==='turnover'?'Turnover rate (%)':'Additional roles covered'}.`,measureValue(inputs.whatIf.baseline,false,kind==='turnover'?'%':' roles'),measureValue(inputs.whatIf.target,true,kind==='turnover'?'%':' roles'));
@@ -55,7 +55,7 @@ export function homePlanSummary(draft:BundleDraft,result:BundleResult|null|undef
   measurement.push(`Suggested metric: ${suggestSuccessMeasure(binding.goal,measurePack).name}.`,'Baseline: Unknown.','Target: Unknown.');
   if(whatIf&&whatIf.status!=='ready')measurement.push(whatIf.reason);
  }
- const companyHistory=companyTurnoverText(binding.goal,measure?.companyTurnover);if(companyHistory)measurement.push(companyHistory,'Company context is not a pilot baseline; matching observation periods and denominators are unverified. Targets are not recorded outcomes.');
+ const companyHistory=historicalContextText(binding.goal,measure);if(companyHistory)measurement.push(companyHistory,historicalContextLimit);
  const approach=planSummarySentences(bundleDisplayText(bundle.coordination,bundle,inputs));
  if(bundleIsAnalysisOnly(bundle))approach.push('Analytical first steps; a delivery intervention still needs review.');
  return [
