@@ -53,3 +53,18 @@ test('release expiry between SDK admission and wire send refuses network; receip
  await assert.rejects(c.dispatch(p,o,async()=>{allowed=false;await fetch('https://api.openai.com/v1/responses',{method:'POST',body:JSON.stringify(p),signal:o.signal});return response();}));assert.equal(writes,0);assert.equal(c.wires,0);
  const broken=createControl(()=>{throw Error('Receipt unavailable');});await assert.rejects(dispatch(broken));assert.equal(broken.calls,1);assert.equal(broken.wires,0);
 });
+
+
+test('provider receipts omit raw IDs/text and reject unbounded metadata before serialization',async()=>{
+ const secret='untrusted-provider-value-'.repeat(1000);
+ for(const patch of [{status:secret},{model:secret},{service_tier:{value:secret}},{usage:{input_tokens:secret,output_tokens:20}},{usage:{input_tokens:100,output_tokens:20,total_tokens:Infinity}},{usage:{input_tokens:100,output_tokens:20,input_tokens_details:{cached_tokens:101}}},{usage:{input_tokens:100,output_tokens:20,output_tokens_details:{reasoning_tokens:{value:secret}}}}]){
+  const events=[],c=createControl((stage,data)=>events.push({stage,...data}));
+  await assert.rejects(dispatch(c,payload(),{...response(),_request_id:secret,id:secret,...patch}));
+  assert.deepEqual(events.find(e=>e.stage==='provider-1'),{stage:'provider-1',attempt:1,code:'provider_result_or_usage'});
+  assert.ok(!JSON.stringify(events).includes('untrusted-provider-value'));assert.equal(c.wires,1);await assert.rejects(dispatch(c));
+ }
+ const events=[],c=createControl((stage,data)=>events.push({stage,...data}));
+ await dispatch(c,payload(),{...response(),_request_id:secret,id:secret,output_text:secret,output:[null,{type:'function_call',arguments:secret}]});
+ const receipt=events.find(e=>e.stage==='provider-1');assert.equal(receipt.hasOutputText,true);assert.equal(receipt.functionCalls,1);assert.ok(!JSON.stringify(events).includes('untrusted-provider-value'));
+ assert.deepEqual(Object.keys(receipt).sort(),['stage','attempt','status','model','serviceTier','usage','functionCalls','hasOutputText'].sort());
+});

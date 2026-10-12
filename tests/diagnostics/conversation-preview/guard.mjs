@@ -47,8 +47,14 @@ export function createControl(record=()=>{},admit=()=>{}){
     const response=await send();options.signal.throwIfAborted();
     if(phase!=='sent')stop('missing_or_extra_wire');
     const u=response?.usage;
-    record('provider-'+calls,{attempt:calls,requestId:response?._request_id??null,responseId:response?.id??null,status:response?.status??null,model:response?.model??null,serviceTier:response?.service_tier??null,usage:u?{input_tokens:u.input_tokens??null,output_tokens:u.output_tokens??null,total_tokens:u.total_tokens??null,cached_input_tokens:u.input_tokens_details?.cached_tokens??null,reasoning_tokens:u.output_tokens_details?.reasoning_tokens??null}:null,functionCalls:Array.isArray(response?.output)?Math.min(7,response.output.filter(item=>item.type==='function_call').length):null,hasOutputText:typeof response?.output_text==='string'&&response.output_text.trim().length>0});
-    if(response?.status!=='completed'||response?.model!==model.id||response?.service_tier!==model.serviceTier||!u||!Number.isSafeInteger(u.input_tokens)||u.input_tokens<0||u.input_tokens>limits.inputTokensPerCall||!Number.isSafeInteger(u.output_tokens)||u.output_tokens<0||u.output_tokens>limits.outputTokensPerCall)stop('provider_result_or_usage');
+    const integer=(v,max)=>Number.isSafeInteger(v)&&v>=0&&v<=max;
+    const optional=(v,max)=>v===undefined||integer(v,max);
+    if(response?.status!=='completed'||response?.model!==model.id||response?.service_tier!==model.serviceTier||!u||!integer(u.input_tokens,limits.inputTokensPerCall)||!integer(u.output_tokens,limits.outputTokensPerCall)||!optional(u.total_tokens,limits.inputTokensPerCall+limits.outputTokensPerCall)||!optional(u.input_tokens_details?.cached_tokens,u.input_tokens)||!optional(u.output_tokens_details?.reasoning_tokens,u.output_tokens)){
+     // Never serialize rejected provider values, including IDs, strings or objects.
+     record('provider-'+calls,{attempt:calls,code:'provider_result_or_usage'});
+     stop('provider_result_or_usage');
+    }
+    record('provider-'+calls,{attempt:calls,status:'completed',model:model.id,serviceTier:model.serviceTier,usage:{input_tokens:u.input_tokens,output_tokens:u.output_tokens,total_tokens:u.total_tokens??null,cached_input_tokens:u.input_tokens_details?.cached_tokens??null,reasoning_tokens:u.output_tokens_details?.reasoning_tokens??null},functionCalls:Array.isArray(response.output)?Math.min(7,response.output.filter(item=>item?.type==='function_call').length):null,hasOutputText:typeof response.output_text==='string'&&response.output_text.trim().length>0});
     phase='ready';expected=null;return response;
    }catch(error){phase='stopped';throw error;}
   },
