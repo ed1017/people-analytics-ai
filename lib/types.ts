@@ -139,8 +139,9 @@ export type PositionScenario = {
 };
 
 export type PositionModelingResponse = {
+  source_contract?: typeof import("./legacy-source-contracts").legacyPositionSource;
   data_meta?: {sourceLabel?:string;planningCaveat?:string;planningAvailabilityLabel?:string;dataClass?:string};
-  as_of: string;
+  as_of: string | null;
   planning_month: string;
   current: {
     current_positions: number;
@@ -1273,6 +1274,7 @@ export type BusinessUnitScenarioResponse =
   };
 
 export type WorkforceResponse = {
+  movement_window?: typeof import("./legacy-source-contracts").legacyMovementWindow;
   as_of: string;
   summary: {
     headcount: number;

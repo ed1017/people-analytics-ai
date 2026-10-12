@@ -1,3 +1,4 @@
+import { legacyMovementWindow } from "../../../lib/legacy-source-contracts";
 import { withDatasetRequest } from "@/lib/dataset-runtime";
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
@@ -48,6 +49,7 @@ async function handleGET() {
       levels: levels.data ?? [],
       tenure: tenure.data ?? [],
       movements: movements.data ?? [],
+      movement_window: legacyMovementWindow,
     }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     return dataApiErrorResponse('workforce',error);

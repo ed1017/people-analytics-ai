@@ -1,3 +1,4 @@
+import * as sourceContracts from '../lib/legacy-source-contracts.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -24,6 +25,8 @@ async function request(tables,{method='POST',assumptions,errorTable}={}){
     const query={select:()=>query,single:()=>query,eq:()=>query,order:()=>query,then:resolve=>resolve({data:tables[table],error:table===errorTable?{code:'PGRST303',message:'PRIVATE_JWT https://private.invalid/sql'}:null})};return query;
   }};
   const aliases={
+    '@/lib/dataset-runtime':{withDatasetRequest:(_request,run)=>run()},
+    '../../../lib/legacy-source-contracts':sourceContracts,
     'next/server':{NextResponse:Response},'../../../lib/supabase-server':{supabaseServer},
     '../../../lib/numeric-contract':numeric,'../../../lib/stored-planning':planning,
     '../../../lib/data-api-error':{dataApiErrorResponse},
@@ -84,7 +87,14 @@ test('empty optional segment datasets are allowed but provided unknown numeric c
 test('upstream errors use safe responses and never run or expose raw JWT details',async()=>{
   for(const method of ['GET','POST']){
     const {response,body,runs,logs}=await request(fixture(),{method,errorTable:'scenario_modeler_defaults'});
-    assert.equal(response.status,500);assert.equal(runs,0);assert.match(body.error,/Scenario modeling source data is temporarily unavailable/);
+    assert.equal(response.status,503);assert.equal(runs,0);assert.match(body.error,/Scenario modeling source data is temporarily unavailable/);
     assert.doesNotMatch(JSON.stringify({body,logs}),/PRIVATE_JWT|private.invalid/);
   }
+});
+
+test('legacy GET attaches verified default basis without changing its numeric defaults',async()=>{
+ const {response,body,runs}=await request(fixture(),{method:'GET'});
+ assert.equal(response.status,200);assert.equal(runs,0);
+ assert.deepEqual(body.default_provenance,sourceContracts.legacyAttritionDefaultSource);
+ assert.deepEqual(body.defaults,{annual_growth_pct:5,salary_inflation_pct:3,annual_attrition_pct:10,fill_rate_pct:80,productivity_hiring_reduction_pct:0});
 });

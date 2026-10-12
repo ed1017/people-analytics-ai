@@ -546,7 +546,7 @@ async function getWorkforcePlanning() {
       >[]
     ),
     interpretation_note:
-      "Positions are authorized roles; headcount is people. Do not treat them as interchangeable.",
+      "Current position totals count filled + vacant records; scenario values are planned headcount. Their difference does not establish hiring need or an approved change. Inventory effective date is unavailable.",
   };
 }
 

@@ -1,6 +1,6 @@
+import { hasLegacyPositionSource } from "@/lib/legacy-source-contracts";
 import {
   formatPercent,
-  formatSignedWholeDelta,
   formatWholeCount,
 } from "@/lib/display-format";
 import type {
@@ -45,10 +45,10 @@ export function PositionModelingSummary({
       {positionModelingData &&
       activePositionScenario ? (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-lg border p-4">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="min-w-0 rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">
-                Current Positions
+                Position records
               </p>
               <p className="mt-2 text-3xl font-semibold">
                 {formatWholeCount(positionModelingData.current.current_positions)}
@@ -59,7 +59,7 @@ export function PositionModelingSummary({
               </p>
             </div>
 
-            <div className="rounded-lg border p-4">
+            <div className="min-w-0 rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">
                 Vacancy Rate
               </p>
@@ -69,13 +69,13 @@ export function PositionModelingSummary({
                 )}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Current authorized positions
+                Vacant / (filled + vacant) records
               </p>
             </div>
 
-            <div className="rounded-lg border p-4">
+            <div className="min-w-0 rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">
-                Dec 2027 Planned Positions
+                Planned headcount · Dec 2027
               </p>
               <p className="mt-2 text-3xl font-semibold">
                 {formatWholeCount(activePositionScenario.totals.planned_positions)}
@@ -84,35 +84,24 @@ export function PositionModelingSummary({
                 {activePositionScenario.scenario_name} scenario
               </p>
             </div>
-
-            <div className="rounded-lg border p-4">
-              <p className="text-sm text-muted-foreground">
-                Net Position Change
-              </p>
-              <p className="mt-2 text-3xl font-semibold">
-                {formatSignedWholeDelta(
-                  activePositionScenario.totals.net_position_change
-                )}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Planned positions vs current
-              </p>
-            </div>
           </div>
 
           <div className="mt-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
-            Positions represent authorized roles, while headcount represents people.
-            Planned position totals can therefore differ slightly from planned headcount.
+            <p>{positionModelingData.as_of ? `Inventory effective date: ${positionModelingData.as_of}` : "Inventory effective date unavailable"}.</p>
+            <p>Filled + vacant position records and future planned headcount are different measures; their difference does not establish hiring need or an approved change.</p>
+            {positionModelingData.data_meta?.dataClass !== "constructed-synthetic" && hasLegacyPositionSource(positionModelingData.source_contract) && (
+              <p className="mt-1">Planned headcount sums rounded organization/level groups across all plans in this scenario. Grouped rounding and plan scope can differ from the workforce planning total.</p>
+            )}
           </div>
 
-          <div className="mt-6 grid gap-6 xl:grid-cols-2">
-            <div className="rounded-lg border p-4">
+          <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <div className="min-w-0 rounded-lg border p-4">
               <div className="mb-4">
                 <h4 className="font-semibold">
-                  Position Change by Business Unit
+                  Inventory and Plan by Business Unit
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  Largest absolute changes under{" "}
+                  Largest current inventories ·{" "}
                   {activePositionScenario.scenario_name}
                 </p>
               </div>
@@ -125,13 +114,10 @@ export function PositionModelingSummary({
                         Business Unit
                       </th>
                       <th className="pb-3 pr-4 text-right">
-                        Current
+                        Position records
                       </th>
                       <th className="pb-3 pr-4 text-right">
-                        Planned
-                      </th>
-                      <th className="pb-3 text-right">
-                        Change
+                        Planned headcount
                       </th>
                     </tr>
                   </thead>
@@ -151,11 +137,6 @@ export function PositionModelingSummary({
                           <td className="py-3 pr-4 text-right">
                             {formatWholeCount(row.planned_positions)}
                           </td>
-                          <td className="py-3 text-right font-semibold">
-                            {formatSignedWholeDelta(
-                              row.net_position_change
-                            )}
-                          </td>
                         </tr>
                       )
                     )}
@@ -164,23 +145,22 @@ export function PositionModelingSummary({
               </div>
             </div>
 
-            <div className="rounded-lg border p-4">
+            <div className="min-w-0 rounded-lg border p-4">
               <div className="mb-4">
                 <h4 className="font-semibold">
-                  Position Change by Level
+                  Inventory and Plan by Level
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  Current versus Dec 2027 planned structure
+                  Position records and Dec 2027 planned headcount
                 </p>
               </div>
 
-              <div className="max-h-[360px] overflow-y-auto overflow-x-hidden pr-1">
+              <div className="max-h-[360px] overflow-y-auto overflow-x-auto pr-1">
                 <table className="w-full table-fixed text-sm">
                   <colgroup>
-                    <col className="w-[42%]" />
-                    <col className="w-[18%]" />
-                    <col className="w-[18%]" />
-                    <col className="w-[22%]" />
+                    <col className="w-[40%]" />
+                    <col className="w-[30%]" />
+                    <col className="w-[30%]" />
                   </colgroup>
 
                   <thead className="sticky top-0 z-10 bg-background">
@@ -189,13 +169,10 @@ export function PositionModelingSummary({
                         Level
                       </th>
                       <th className="pb-3 px-1 text-right">
-                        Current
+                        Position records
                       </th>
                       <th className="pb-3 px-1 text-right">
-                        Planned
-                      </th>
-                      <th className="pb-3 pl-1 text-right">
-                        Change
+                        Planned headcount
                       </th>
                     </tr>
                   </thead>
@@ -215,11 +192,6 @@ export function PositionModelingSummary({
                           </td>
                           <td className="px-1 py-3 text-right tabular-nums whitespace-nowrap">
                             {formatWholeCount(row.planned_positions)}
-                          </td>
-                          <td className="py-3 pl-1 text-right font-semibold tabular-nums whitespace-nowrap">
-                            {formatSignedWholeDelta(
-                              row.net_position_change
-                            )}
                           </td>
                         </tr>
                       )

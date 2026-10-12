@@ -16,8 +16,8 @@ export const storedPlanningProvenance = {
   population: "Company-wide scenario workforce",
   grain: "One scenario and planning month per point",
   source_refreshed_at: null,
-  flow_definition: "planned_hires and planned_exits are source-reported monthly flows, not cumulative counts or observed actuals.",
-  reconciliation: "Stored flows do not fully explain the Baseline headcount curve. They are separate from engine-implied what-if hires and exits; no reconciliation is asserted.",
+  flow_definition: "planned_hires and planned_exits are source-reported monthly plan fields, not cumulative counts or observed actuals. Their completeness as hiring and exit flows is unverified.",
+  reconciliation: "A complete stock-flow reconciliation has not been verified; comparisons with different opening boundaries cannot establish one. Stored plan fields are separate from engine-implied what-if hires and exits.",
 } as const;
 
 /** The source declares no horizon bounds; validate every month between its returned endpoints. */

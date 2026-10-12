@@ -28,3 +28,20 @@ test('known returned endpoints do not assert a wider horizon, and unknown flows 
   assert.equal(hasCompleteReturnedMonthWindow(['2026-11-01']),true);
   assert.deepEqual(summarizeStoredPlanning([point('2026-11-01',null,0)]),{headcount_change:0,hires:null,exits:0,months:1});
 });
+
+test('stored plan provenance does not claim complete flows or stock-flow reconciliation',async()=>{
+ const {storedPlanningProvenance}=await import('../lib/stored-planning.ts');
+ assert.match(storedPlanningProvenance.flow_definition,/source-reported monthly plan fields/);
+ assert.match(storedPlanningProvenance.flow_definition,/completeness.*unverified/);
+ assert.match(storedPlanningProvenance.reconciliation,/different opening boundaries/);
+ assert.doesNotMatch(storedPlanningProvenance.reconciliation,/Stored flows do not fully explain|adjustment|reconciled/);
+});
+
+test('Home briefing retains unknown completeness and reconciliation, including legacy overview sources',async()=>{
+ const {buildOverviewSources,overviewBriefingPrompt}=await import('../lib/overview-briefing.ts');
+ const sources=buildOverviewSources(null,null,{scenarios:[{scenario_name:'Baseline',points:[point('2026-10-01')],assumptions:[]}]});
+ const prompt=overviewBriefingPrompt(sources);
+ assert.match(prompt,/completeness as hiring\/exit flows and stock-flow reconciliation are unverified/);
+ assert.doesNotMatch(prompt,/do not fully explain the Baseline headcount curve/);
+ assert.match(sources.find(s=>s.id==='P1').limitation,/different opening boundaries/);
+});

@@ -1,3 +1,4 @@
+import { legacyPositionSource } from "../../../lib/legacy-source-contracts";
 import { withDatasetRequest } from "@/lib/dataset-runtime";
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
@@ -498,7 +499,8 @@ async function handleGET() {
 
     return NextResponse.json(
       {
-        as_of: "2026-09-30",
+        as_of: null,
+        source_contract: legacyPositionSource,
         planning_month: "2027-12-01",
         current: {
           ...currentTotals,

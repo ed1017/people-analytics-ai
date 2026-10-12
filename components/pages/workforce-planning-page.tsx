@@ -1,4 +1,5 @@
 "use client";
+import type { ScenarioDefaultSource } from "@/lib/legacy-source-contracts";
 import { datasetFetch, datasetSession } from "@/lib/dataset-client.mjs";
 
 import {usePlanningDecisionState} from "@/components/workforce-planning/use-planning-decision-state";
@@ -252,6 +253,7 @@ export function WorkforcePlanningPage({
     onPlanningDestinationChange(view);
   };
 
+  const [scenarioDefaultSource, setScenarioDefaultSource] = useState<ScenarioDefaultSource | null>(null);
   const [scenarioDefaults, setScenarioDefaults] =
     useState<ScenarioModelAssumptions | null>(null);
   const [customAssumptions, setCustomAssumptions] =
@@ -678,6 +680,10 @@ export function WorkforcePlanningPage({
 
         if (!cancelled) {
           setScenarioDefaults(payload.defaults);
+          setScenarioDefaultSource({
+            provenance: payload.default_provenance,
+            dataClass: typeof payload.data_meta?.dataClass === "string" ? payload.data_meta.dataClass : undefined,
+          });
           setCustomAssumptions(current=>current??payload.defaults);
         }
       } catch (error) {
@@ -2095,6 +2101,7 @@ export function WorkforcePlanningPage({
             activePlanningScenario={activePlanningScenario}
             onScenarioChange={onScenarioChange}
             scenarioDefaults={scenarioDefaults}
+            scenarioDefaultSource={scenarioDefaultSource}
             customAssumptions={customAssumptions}
             setCustomAssumptions={setCustomAssumptions}
             customScenario={customScenario}

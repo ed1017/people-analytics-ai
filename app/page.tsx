@@ -1198,12 +1198,8 @@ export default function Home() {
       ? [...activePositionScenario.by_business_unit]
           .sort(
             (a, b) =>
-              Math.abs(
-                b.net_position_change
-              ) -
-              Math.abs(
-                a.net_position_change
-              )
+              b.current_positions - a.current_positions ||
+              a.org_name.localeCompare(b.org_name)
           )
           .slice(0, 8)
       : [];

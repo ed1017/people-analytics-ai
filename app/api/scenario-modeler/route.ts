@@ -1,3 +1,4 @@
+import { legacyAttritionDefaultSource } from "../../../lib/legacy-source-contracts";
 import { withDatasetRequest } from "@/lib/dataset-runtime";
 import {
   NextRequest,
@@ -238,6 +239,7 @@ async function handleGET() {
       {
         as_of: inputs.asOf,
         defaults: inputs.defaults,
+        default_provenance: legacyAttritionDefaultSource,
         bounds: {
           annual_growth_pct: {
             min: -10,

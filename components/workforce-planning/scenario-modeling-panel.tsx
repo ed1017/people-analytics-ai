@@ -1,3 +1,4 @@
+import { attritionDefaultLabel, type ScenarioDefaultSource } from "@/lib/legacy-source-contracts";
 import { formatWholeCount, formatFte } from "@/lib/display-format";
 import { knownDifference } from "@/lib/numeric-contract";
 import type {
@@ -38,6 +39,7 @@ type ScenarioModelingPanelProps = {
   activePlanningScenario: PlanningScenario | undefined;
   onScenarioChange: (scenario: string) => void;
   scenarioDefaults: ScenarioModelAssumptions | null;
+  scenarioDefaultSource?: ScenarioDefaultSource | null;
   customAssumptions: ScenarioModelAssumptions | null;
   setCustomAssumptions: Dispatch<
     SetStateAction<ScenarioModelAssumptions | null>
@@ -163,6 +165,7 @@ export function ScenarioModelingPanel({
   activePlanningScenario,
   onScenarioChange,
   scenarioDefaults,
+  scenarioDefaultSource,
   customAssumptions,
   setCustomAssumptions,
   customScenario,
@@ -478,7 +481,7 @@ export function ScenarioModelingPanel({
                           </>
                         )}
                       </p>
-                      {field.key === "annual_attrition_pct" && <span className="mt-1 block text-[11px] text-muted-foreground">Default provenance unavailable · Not observed voluntary turnover YTD</span>}
+                      {field.key === "annual_attrition_pct" && <span className="mt-1 block text-[11px] text-muted-foreground">{attritionDefaultLabel(scenarioDefaultSource)}</span>}
                     </label>
                   );
                 })}
