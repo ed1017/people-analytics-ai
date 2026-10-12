@@ -67,6 +67,22 @@ try{
  }
 
  for(const destination of ['home','planning-overview','decision-brief']){
+  const {context,a,b}=await tabs();const copy=input=>({goal:'Original archived goal',input,recoveredAt:'2026-10-01T00:00:00Z'}),local=copy('Local archived request'),remote=copy('Saved archived request');
+  await b.evaluate(({id,remote})=>window.multitab.field(id,'recoveredRequestsV1',[remote]),{id,remote});
+  await a.waitForFunction(()=>!!window.multitab.snapshot().recovery);
+  await a.evaluate(({id,local})=>window.multitab.field(id,'recoveredRequestsV1',[local]),{id,local});
+  await a.getByRole('textbox',{name:'Ask Workforce AI',exact:true}).fill('New local composer while saved composer equals base');
+  await navigate(a,destination);const before=await raw(a);
+  await a.getByRole('button',{name:'Retry saving',exact:true}).click();await a.getByRole('region',{name:'Review recovered draft',exact:true}).waitFor();
+  check(destination+' divergent archives require explicit recovery',await raw(a)===before&&!(await snapshot(a)).saved);
+  await a.getByRole('button',{name:'Keep saved versions and my request',exact:true}).click();await settled(a);
+  check(destination+' base-equal composer retains both original archive entries',JSON.stringify((await snapshot(a)).data.workspaces[id].fields.recoveredRequestsV1)===JSON.stringify([remote,local]));
+  await a.getByText('Recovered request copies (2)',{exact:true}).click();check(destination+' both archive entries readable',await a.getByText('Local archived request',{exact:true}).isVisible()&&await a.getByText('Saved archived request',{exact:true}).isVisible());
+  const after=await raw(a);await a.reload();await dismissHomeOnboarding(a);await settled(a);check(destination+' archive union survives reload byte-identically',await raw(a)===after);
+  await context.close();
+ }
+
+ for(const destination of ['home','planning-overview','decision-brief']){
   const {context,a,b}=await tabs();await navigate(a,destination);
   const initial=(await snapshot(a)).data.workspaces[id].fields.homeSolutionBundlesV1.attachments;
   const winner=await b.evaluate(id=>window.multitab.attach(id),id);check(destination+' competing attachment saved',winner.built&&!winner.error);

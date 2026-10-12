@@ -72,3 +72,28 @@ test('editing a nonempty request after quota failure is not a competing edit whe
  const a=new DecisionStore();a.initialize(shared,seed,tab);a.setField('a','chat',{messages:[],input:'Original nonempty request'});full=true;a.setField('a','chat',{messages:[],input:'Revised request from the same tab'});full=false;
  const reload=new DecisionStore();reload.initialize(shared,seed,tab);reload.retry();assert.equal(reload.getSnapshot().saved,true);assert.equal(reload.getSnapshot().notice,null);assert.equal(reload.getField('a','chat',null).input,'Revised request from the same tab');assert.equal(reload.getField('a','recoveredRequestsV1',null),null);
 });
+
+test('explicit recovery unions archived requests even when saved composer returns to base or neither composer has text',()=>{
+ for(const [baseInput,localInput,remoteInput] of [['base','local','base'],['','',''],['same','same','same']]){
+  const shared=port(),tab=port(),a=new DecisionStore(),b=new DecisionStore();a.initialize(shared,seed,tab);
+  a.setField('a','chat',{messages:[],input:baseInput});b.initialize(shared);
+  const copy=input=>({goal:'Original goal text',input,recoveredAt:'2026-10-01T00:00:00Z'}),local=copy('Local archived request'),remote=copy('Remote archived request');
+  b.setField('a','recoveredRequestsV1',[remote]);b.setField('a','chat',{messages:[],input:remoteInput});
+  a.setField('a','recoveredRequestsV1',[local]);a.setField('a','chat',{messages:[],input:localInput});
+  const before=shared.getItem(DECISIONS_STORAGE_KEY);a.retry();assert.equal(a.getSnapshot().saved,false);assert.equal(shared.getItem(DECISIONS_STORAGE_KEY),before);
+  a.recoverDraft(true);assert.equal(a.getSnapshot().saved,true);assert.deepEqual(a.getField('a','recoveredRequestsV1',[]),[remote,local]);
+  const reload=new DecisionStore();reload.initialize(shared,seed,tab);assert.deepEqual(reload.getField('a','recoveredRequestsV1',[]),[remote,local]);assert.equal(reload.getField('b','recoveredRequestsV1',null),null);
+  reload.retry();assert.deepEqual(reload.getField('a','recoveredRequestsV1',[]),[remote,local]);
+ }
+});
+
+test('archive-only explicit recovery deduplicates exact entries and fails closed on invalid or overflowing unions',()=>{
+ const copy=i=>({goal:'Original goal',input:'Archived '+i,recoveredAt:'2026-10-01T00:00:00Z'});
+ for(const [local,remote,valid] of [[[copy(1)],[copy(1),copy(2)],true],[[copy(1)],{bad:true},false],[Array.from({length:26},(_,i)=>copy(i)),Array.from({length:25},(_,i)=>copy(i+26)),false]]){
+  const shared=port(),tab=port(),a=new DecisionStore(),b=new DecisionStore();a.initialize(shared,seed,tab);b.initialize(shared);
+  b.setField('a','recoveredRequestsV1',remote);a.setField('a','recoveredRequestsV1',local);const before=shared.getItem(DECISIONS_STORAGE_KEY);
+  a.recoverDraft(true);assert.equal(a.getSnapshot().saved,valid);
+  if(valid)assert.deepEqual(a.getField('a','recoveredRequestsV1',[]),[copy(1),copy(2)]);
+  else{assert.equal(shared.getItem(DECISIONS_STORAGE_KEY),before);assert.deepEqual(a.getField('a','recoveredRequestsV1',[]),local);assert.ok(tab.getItem(DECISION_RECOVERY_KEY));}
+ }
+});
