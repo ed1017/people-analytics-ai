@@ -1,12 +1,9 @@
 {
   "git": {
-    "deploymentEnabled": {
-      "codex/home-interactive-recovery-20261009": false,
-      "codex/home-auth-recovery-review-20261010": false,
-      "codex/grounded-hiring-budget-20261010": false,
-      "codex/fixed-role-staffing-20261010": false,
-      "codex/action-plan-answer-separation-20261011": false,
-      "codex/finance-evidence-scope-20261011": false
-    }
-  }
+    "deploymentEnabled": false
+  },
+  "framework": null,
+  "buildCommand": "node tests/diagnostics/conversation-preview/run.mjs --execute-reserved .conversation-preview-private/reservation.json",
+  "outputDirectory": ".conversation-preview-empty",
+  "installCommand": "npm ci --ignore-scripts"
 }
