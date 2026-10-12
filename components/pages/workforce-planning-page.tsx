@@ -664,6 +664,8 @@ export function WorkforcePlanningPage({
     const controller = new AbortController();
 
     async function loadScenarioDefaults() {
+      setScenarioDefaults(null);
+      setScenarioDefaultSource(null);
       try {
         const response = await datasetFetch("/api/scenario-modeler", {
           cache: "no-store",
@@ -679,6 +681,7 @@ export function WorkforcePlanningPage({
         }
 
         if (!cancelled) {
+          setCustomScenarioError(null);
           setScenarioDefaults(payload.defaults);
           setScenarioDefaultSource({
             provenance: payload.default_provenance,
@@ -688,6 +691,8 @@ export function WorkforcePlanningPage({
         }
       } catch (error) {
         if (!cancelled) {
+          setScenarioDefaults(null);
+          setScenarioDefaultSource(null);
           setCustomScenarioError(
             error instanceof Error
               ? error.message
