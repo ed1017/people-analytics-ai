@@ -8,12 +8,12 @@ import type {GuidedActionRegistry} from '@/components/home-guided-actions';
 import {GUIDED_EXAMPLE_PROMPT} from '@/lib/home-decision-journey';
 export {GUIDED_EXAMPLE_PROMPT} from '@/lib/home-decision-journey';
 export const guidedEditPrompt=(number:number)=>`In Action Plan #${number} set coordination hours to 24`;
-const conversationalPrompt='I want to reduce turnover. Suggest an actionable proposed plan we can refine together. This is a fictional example; leave missing scope, costs, dates and targets unknown.';
+const conversationalPrompt='I want to reduce turnover. Suggest an actionable proposed plan we can refine together. This is a fictional example. Include a proposed owner, baseline, target and review date; leave missing scope, costs, dates, baselines and targets unknown.';
 const legacySteps=[
  ['Review the retention example','Start a separate example conversation. Your current conversation and draft are kept. No question is sent until you use the real Send button.'],
  ['Submit the example question','Review the prefilled question, then follow Next → Submit to the actual Send button. Wait for the answer before pinning.'],
  ['Pin the demo goal','Follow Next → Pin goal to the real button. After the goal is saved, its Action Plans will be prepared using the normal Pin flow.'],
- ['Review the plans and choose one','Compare the approaches, proposed owners, cash costs, employee hours, periods and targets, then select any available Action Plan. If preparation failed, use Retry Action Plans.'],
+ ['Review the plans and choose one','Compare the plans, proposed owners, cash costs and employee hours. Check the baseline, target and review date; ask in chat about missing values. Activities completed are not measured outcomes. Select any available Action Plan; if preparation failed, use Retry Action Plans.'],
  ['Attach your chosen plan','Follow Next → Attach Action Plan to the real button. Review any displayed conflict or assumptions. This step advances only after the attachment is saved.'],
  ['Edit your Action Plan','A suggested coordination-hours adjustment is filled into chat. Review or change it, then follow Next → Submit to the real Send button. The goal, budget and original attachment are kept.'],
  ['Select the revised plan','Follow the arrow to the new numbered plan. Review the recalculated assumptions and compare it with the original before attaching.'],
@@ -22,7 +22,7 @@ const legacySteps=[
 const conversationSteps=[
  ['Review the retention example','Start a separate example conversation. Your current conversation and draft are kept. Send only when you are ready.'],
  ['Describe the goal in chat','Review the example question, then use the actual Send button. A useful reply can propose approaches without saving a goal yet.'],
- ['Explore and refine the approach','Review the proposed Action Plan and its conditional recommendation, then say what to keep or change. You can ask for another approach or optionally focus on a team. Review suggested owners, steps, measures and unknowns.'],
+ ['Explore and refine the approach','In the proposed plan, review the owner, baseline, target and review date. Keep unverified values unknown and ask in chat about gaps. Activities completed are not measured outcomes. Say what to keep or change, or ask for another approach.'],
  ['Pin an Action Plan','Review the plan’s goal, actions, success measure and unknowns, then choose Pin Action Plan. The plan and goal are saved together; pinning does not apply the plan.'],
  ['Refine your selected plan in chat','Describe another adjustment and Send. Reuse the known context; mention only what should change. The original proposal stays attached.'],
  ['Pin the revised Action Plan','Review the new proposal and its unknowns, then pin it. Both versions remain with their goal and progress history.'],
@@ -94,7 +94,7 @@ export function GuidedDemo({active,actions,registry,onClose,conversational=false
   <div data-guided-content className="min-h-0 overflow-y-auto overscroll-contain">
   <p className="mt-2 text-xs text-white/85">Demo example · fictional planning assumptions, not predicted or achieved outcomes.</p><hr className="my-3 border-white/40"/>
   <h3 ref={heading} tabIndex={-1} className="text-lg font-semibold">{complete?'Original and revised plans attached':`Step ${step+1} of ${steps.length}: ${steps[step][0]}`}</h3>
-  <p className="my-2 text-sm">{complete?'Your demo goal keeps both attached versions. Reopen it from Pinned Action Plans to compare plans and continue editing.':steps[step][1]}</p>
+  <p className="my-2 text-sm">{complete?'Your goal keeps both attached versions. Reopen it from Pinned Action Plans to compare and refine them. At the agreed review date, compare dated evidence with the baseline and target; saving a plan does not record execution or achieved results.':steps[step][1]}</p>
   {step===0&&<blockquote className="my-3 break-words border-l-2 border-white/60 pl-3 text-sm">{conversational?conversationalPrompt:GUIDED_EXAMPLE_PROMPT}</blockquote>}
   {(conversational?[1,2,4]:[1,5]).includes(step)&&!done&&<p className="my-3 break-words text-sm"><strong>Chat draft:</strong> {actions.draft||'Enter the question or adjustment you want to submit.'}</p>}
   {(pending||actions.loading)&&<p role="status" aria-live="polite" className="my-2 text-sm">{pending?'Opening the example conversation…':'Waiting for your submitted question…'}</p>}

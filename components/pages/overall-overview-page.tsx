@@ -1,5 +1,4 @@
 "use client";
-import {PilotExampleDisclosure} from '@/components/pilot-example-disclosure';
 import {SelectedGoalProgress} from '@/components/goal-progress-summary';
 import {ChatEvidenceChart} from '@/components/chat-evidence-chart';
 import type {ChatEvidenceSeries} from '@/lib/chat-evidence-series';
@@ -587,7 +586,6 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
         }/>
       </header>
       <HomeDataStatus loading={!sourcesSettled}/>
-      <PilotExampleDisclosure/>
       <div id="home-data-details" popover="auto" role="dialog" aria-label="Data details" className="fixed inset-0 m-auto max-h-[80dvh] w-[min(60rem,92vw)] overflow-y-auto rounded-xl border bg-background p-5 text-sm text-foreground shadow-xl">
         <button type="button" aria-label="Refresh overview evidence" disabled={loading||chatLoading} onClick={event=>{event.currentTarget.closest<HTMLElement>('[popover]')?.hidePopover();refreshHomeData();}} className="mb-3 flex min-h-11 items-center gap-2 rounded border px-3 py-2 focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><RefreshCw size={18}/>Refresh evidence</button>
         <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">Data details</h2><button type="button" popoverTarget="home-data-details" popoverTargetAction="hide" className="min-h-11 rounded border px-3 focus-visible:ring-2 focus-visible:ring-ring">Close data details</button></div>

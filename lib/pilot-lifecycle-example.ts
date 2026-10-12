@@ -67,9 +67,3 @@ export function readPilotLifecycleExample(raw:unknown,goalId:string,datasetToken
  if(!original||!same(original.draft,createHomeDemoDraft(example,original.attachedAt)))return null;
  return {record:fictionalPilotLifecycle(original),historical:workspace.attachments.some(a=>a.supersedes===original.id)||workspace.drafts.some(d=>d.bundle.id===original.draft.bundle.id&&bundleInputKey(d)!==bundleInputKey(original.draft))};
 }
-
-/** Fixed in-memory illustration, independent of browser goals, dataset selection and saved receipts. */
-export function standalonePilotLifecycle(){
- const example=homeDemoExamples.find(e=>e.key==='retention')!;
- return fictionalPilotLifecycle({id:'fictional-pilot-read-only',draft:createHomeDemoDraft(example,'2026-10-12T12:00:00Z')});
-}
