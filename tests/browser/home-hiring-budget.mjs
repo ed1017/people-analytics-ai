@@ -94,6 +94,9 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  await send('Explain the recommendation.');
  check('generic factual followup preserves the current recommended candidate',await review.getByRole('article').filter({hasText:'Recommended Action Plan'}).count()===1&&(await readState()).exploration.fields.homeSolutionConversationV1.focusCandidateId===focus);
  await send('Compare two pilot alternatives');
+ const alternativeSummary=review.getByText(/^Alternative Action Plan \d+: Workload review alternative$/);
+ check('requested alternative starts collapsed and remains discoverable',await alternativeSummary.isVisible()&&await alternativeSummary.evaluate(node=>!node.parentElement.open));
+ await alternativeSummary.click();
  check('explicit alternatives remain separate beside one recommendation',await review.getByRole('article').filter({hasText:'Recommended Action Plan'}).count()===1&&await review.getByRole('article').filter({hasText:'Workload review alternative'}).count()===1);
  await send('Explain the recommendation.');
  check('factual followup preserves requested alternatives',await review.getByRole('article').filter({hasText:'Workload review alternative'}).count()===1);
