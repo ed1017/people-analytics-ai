@@ -1,5 +1,6 @@
 "use client";
 
+import {EvidenceTableRegion} from '@/components/evidence-table-region';
 import {
   formatPercent,
   formatWholeCount,
@@ -39,7 +40,7 @@ export function SkillsPage({
   onOpenPlanning,
 }: SkillsPageProps) {
   return (
-<section className="evidence-workspace min-w-0 p-6">
+<section className="evidence-workspace evidence-pane min-w-0 p-6">
             <div className="mb-6 flex items-end justify-between gap-4">
               <div>
                 <p className="text-muted-foreground">
@@ -76,27 +77,12 @@ export function SkillsPage({
                   selectedContext={selectedContext}
                   note="Skill-level denominators remain the employees in current roles requiring each skill."
                 />
-
-                <SkillsEvidenceHandoffPanel
-                  skillsData={skillsData}
-                  selectedContext={selectedContext}
-                  activeHandoff={activeHandoff}
-                  onCarryToPlanning={
-                    onCarryToPlanning
-                  }
-                  onClearHandoff={
-                    onClearHandoff
-                  }
-                  onOpenPlanning={
-                    onOpenPlanning
-                  }
-                />
               </>
             )}
 
             {skillsData ? (
               <>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="evidence-metric-grid grid gap-4">
                   <div className="rounded-lg border p-4">
                     <p className="text-sm text-muted-foreground">
                       Active Skills
@@ -154,7 +140,7 @@ export function SkillsPage({
                   Apparent proficiency gaps compare observed employee proficiency with the proficiency required by the employee&apos;s current job profile. Missing or stale skill records should not be interpreted as proof that an employee lacks a capability.
                 </div>
 
-                <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,1fr)]">
+                <div className="mt-6 evidence-panel-grid grid gap-6">
                   <div className="rounded-lg border p-4">
                     <div className="mb-4 flex items-start justify-between gap-4">
                       <div>
@@ -173,7 +159,7 @@ export function SkillsPage({
                       </span>
                     </div>
 
-                    <div className="overflow-x-auto">
+                    <EvidenceTableRegion label="Largest apparent proficiency gaps">
                       <table className="w-full min-w-[760px] text-sm">
                         <thead>
                           <tr className="border-b text-left text-xs text-muted-foreground">
@@ -237,7 +223,7 @@ export function SkillsPage({
                           )}
                         </tbody>
                       </table>
-                    </div>
+                    </EvidenceTableRegion>
                   </div>
 
                   <div className="rounded-lg border p-4">
@@ -359,6 +345,20 @@ export function SkillsPage({
                   </div>
 
                 </div>
+                <SkillsEvidenceHandoffPanel
+                  skillsData={skillsData}
+                  selectedContext={selectedContext}
+                  activeHandoff={activeHandoff}
+                  onCarryToPlanning={
+                    onCarryToPlanning
+                  }
+                  onClearHandoff={
+                    onClearHandoff
+                  }
+                  onOpenPlanning={
+                    onOpenPlanning
+                  }
+                />
               </>
             ) : (
               <div className="rounded-lg border p-8 text-center text-sm text-muted-foreground">

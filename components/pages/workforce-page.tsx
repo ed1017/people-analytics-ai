@@ -1,5 +1,6 @@
 "use client";
 
+import {EvidenceTableRegion} from '@/components/evidence-table-region';
 import { movementWindowLabel } from "@/lib/legacy-source-contracts";
 import {
   Bar,
@@ -42,7 +43,7 @@ export function WorkforcePage({ data, loading, error }: Props) {
     : "unavailable";
 
   return (
-    <section className="evidence-workspace @container min-w-0 p-6">
+    <section className="evidence-workspace evidence-pane @container min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold">Company composition</h2>
@@ -61,7 +62,7 @@ export function WorkforcePage({ data, loading, error }: Props) {
       {summary ? (
         <>
           <p aria-label="Company composition scope" className="mb-3 rounded-lg border bg-muted/30 px-3 py-2 text-base font-semibold">Company-wide · workforce filters not applied</p>
-          <div className="grid grid-cols-1 gap-4 @min-[26rem]:grid-cols-2 @min-[56rem]:grid-cols-4">
+          <div className="evidence-metric-grid grid gap-4">
             {[
               ["Headcount", summary.headcount.toLocaleString(), summary.fte.toLocaleString() + " FTE", "Number of active employees in the current workforce snapshot. Headcount counts people; FTE reflects capacity."],
               ["People Managers", summary.people_managers.toLocaleString(), summary.avg_span_of_control.toFixed(1) + " avg span", "Employees with at least one direct report in the current snapshot. Average span is direct reports per people manager."],
@@ -81,11 +82,11 @@ export function WorkforcePage({ data, loading, error }: Props) {
               </div>
             ))}
           </div>
-          <div className="mt-6 grid gap-6 xl:grid-cols-2">
+          <div className="mt-6 evidence-panel-grid grid gap-6">
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">Headcount Trend</h3>
               <p className="mb-4 text-sm text-muted-foreground">Monthly workforce size since 2024</p>
-              <div className="h-72">
+              <div className="evidence-chart">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={data.trend}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
@@ -104,7 +105,7 @@ export function WorkforcePage({ data, loading, error }: Props) {
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">Workforce by Business Unit</h3>
               <p className="mb-4 text-sm text-muted-foreground">Current headcount distribution</p>
-              <div className="h-72">
+              <div className="evidence-chart">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={data.business_units} layout="vertical" margin={{ left: 90 }}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
@@ -122,7 +123,7 @@ export function WorkforcePage({ data, loading, error }: Props) {
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">Career Level Mix</h3>
               <p className="mb-4 text-sm text-muted-foreground">Headcount and manager concentration by level</p>
-              <div className="overflow-x-auto">
+              <EvidenceTableRegion label="Workforce career level mix">
                 <table className="w-full min-w-[560px] text-sm">
                   <thead><tr className="border-b text-left text-xs text-muted-foreground">
                     <th className="pb-3">Level</th><th className="pb-3 text-right">HC</th>
@@ -137,13 +138,13 @@ export function WorkforcePage({ data, loading, error }: Props) {
                     </tr>
                   ))}</tbody>
                 </table>
-              </div>
+              </EvidenceTableRegion>
             </div>
 
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">Tenure Distribution</h3>
               <p className="mb-4 text-sm text-muted-foreground">Current workforce by employee tenure</p>
-              <div className="h-72">
+              <div className="evidence-chart">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={data.tenure}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
@@ -155,7 +156,7 @@ export function WorkforcePage({ data, loading, error }: Props) {
                 </ResponsiveContainer>
               </div>
               <p className="mt-4 text-xs text-muted-foreground">Recorded movement events · {movementWindowLabel(data?.movement_window)}Returned months: {movementPeriod}. Counts are events, not distinct people; the workforce snapshot date does not define this period.</p>
-              <div className="mt-2 grid grid-cols-3 gap-3 text-center text-sm">
+              <div className="mt-2 evidence-metric-grid grid gap-3 text-center text-sm">
                 <div className="rounded-md border p-3"><p className="text-muted-foreground">Promotion events</p><p className="text-xl font-semibold">{movementTotals.promotion ?? 0}</p></div>
                 <div className="rounded-md border p-3"><p className="text-muted-foreground">Transfer events</p><p className="text-xl font-semibold">{movementTotals.transfer ?? 0}</p></div>
                 <div className="rounded-md border p-3"><p className="text-muted-foreground">Lateral move events</p><p className="text-xl font-semibold">{movementTotals.lateral_move ?? 0}</p></div>
@@ -165,7 +166,7 @@ export function WorkforcePage({ data, loading, error }: Props) {
           <div className="mt-6 rounded-lg border p-4">
             <h3 className="font-semibold">Geographic Footprint</h3>
             <p className="mb-4 text-sm text-muted-foreground">Current workforce by country</p>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            <div className="evidence-metric-grid grid gap-3">
               {data.countries.map((row) => (
                 <div key={row.country_code} className="rounded-md border p-3">
                   <p className="text-sm font-medium">{row.country_name}</p>

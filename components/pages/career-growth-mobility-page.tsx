@@ -1,5 +1,6 @@
 "use client";
 
+import {EvidenceTableRegion} from '@/components/evidence-table-region';
 import {
   Bar,
   BarChart,
@@ -83,7 +84,7 @@ export function CareerGrowthMobilityPage({
     ) ?? [];
 
   return (
-    <section className="min-w-0 p-6">
+    <section className="evidence-pane min-w-0 p-6">
       <WorkforcePerformanceField value={performance} population={workforceHeadcount} filters={performanceFilters} selectedContext={selectedContext} loading={performanceLoading} />
       <section className="mt-6" aria-labelledby="recorded-movement-history-heading">
         <h2 id="recorded-movement-history-heading" className="text-sm font-medium">Recorded movement history · company-wide context</h2>
@@ -147,7 +148,7 @@ export function CareerGrowthMobilityPage({
       data.source
         .total_recorded_events > 0 ? (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="evidence-metric-grid grid gap-4">
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">
                 Recorded Movement Events
@@ -272,7 +273,7 @@ export function CareerGrowthMobilityPage({
               </p>
             </div>
 
-            <div className="h-80 min-w-0">
+            <div className="evidence-chart min-w-0">
               <ResponsiveContainer
                 width="100%"
                 height="100%"
@@ -331,7 +332,7 @@ export function CareerGrowthMobilityPage({
             </div>
           </div>
 
-          <div className="mt-6 grid gap-6 xl:grid-cols-3">
+          <div className="mt-6 evidence-panel-grid grid gap-6">
             {(
               [
                 "promotion",
@@ -354,7 +355,7 @@ export function CareerGrowthMobilityPage({
                   source classifications.
                 </p>
 
-                <div className="overflow-x-auto">
+                <EvidenceTableRegion label={`${typeLabels[type]} by recorded level transition`}>
                   <table className="w-full min-w-[260px] text-sm">
                     <thead>
                       <tr className="border-b text-left text-xs text-muted-foreground">
@@ -385,7 +386,7 @@ export function CareerGrowthMobilityPage({
                       ))}
                     </tbody>
                   </table>
-                </div>
+                </EvidenceTableRegion>
               </div>
             ))}
           </div>

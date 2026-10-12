@@ -1,5 +1,6 @@
 "use client";
 
+import {EvidenceTableRegion} from '@/components/evidence-table-region';
 import { knownDifference } from "@/lib/numeric-contract";
 
 import {SyntheticDomainDemo} from "@/components/synthetic-domain-demo";
@@ -116,7 +117,7 @@ export function SurveySentimentPage({
     data?.onboarding_dimensions.filter((row) => row.survey_code === "ONB-90") ?? [];
 
   return (
-    <section className="evidence-workspace min-w-0 p-6">
+    <section className="evidence-workspace evidence-pane min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">
@@ -139,11 +140,10 @@ export function SurveySentimentPage({
         </div>
       )}
 
-      <SyntheticDomainDemo domain="satisfaction" />
 
       {summary ? (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="evidence-metric-grid grid gap-4">
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">
                 Engagement Favorable
@@ -198,7 +198,7 @@ export function SurveySentimentPage({
             </div>
           </div>
 
-          <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(340px,1fr)]">
+          <div className="mt-6 evidence-panel-grid grid gap-6">
             <div className="rounded-lg border p-4">
               <div className="mb-4">
                 <h3 className="font-semibold">
@@ -209,7 +209,7 @@ export function SurveySentimentPage({
                 </p>
               </div>
 
-              <div className="h-80 w-full">
+              <div className="evidence-chart">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={data.engagement_trend}
@@ -300,7 +300,7 @@ export function SurveySentimentPage({
                 </p>
               </div>
 
-              <div className="overflow-x-auto">
+              <EvidenceTableRegion label="Engagement by business unit">
                 <table className="w-full min-w-[620px] text-sm">
                   <thead>
                     <tr className="border-b text-left text-xs text-muted-foreground">
@@ -332,7 +332,7 @@ export function SurveySentimentPage({
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </EvidenceTableRegion>
             </div>
 
             <div className="rounded-lg border p-4">
@@ -345,7 +345,7 @@ export function SurveySentimentPage({
                 </p>
               </div>
 
-              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+              <div className="evidence-panel-grid grid gap-5">
                 <div>
                   <p className="mb-3 text-sm font-semibold">
                     Q2 Pulse
@@ -376,7 +376,7 @@ export function SurveySentimentPage({
               </p>
             </div>
 
-            <div className="grid gap-6 xl:grid-cols-3">
+            <div className="evidence-panel-grid grid gap-6">
               {[
                 ["ONB-30", onboarding30],
                 ["ONB-60", onboarding60],
@@ -410,6 +410,7 @@ export function SurveySentimentPage({
             : "No Employee Listening data returned."}
         </div>
       )}
+      <SyntheticDomainDemo domain="satisfaction" />
     </section>
   );
 }

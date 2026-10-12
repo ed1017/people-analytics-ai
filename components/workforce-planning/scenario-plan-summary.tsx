@@ -78,7 +78,7 @@ export function ScenarioPlanSummary({
               <div
                 className={
                   visible
-                    ? "grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+                    ? "evidence-metric-grid grid gap-4"
                     : "hidden"
                 }
               >
@@ -143,7 +143,7 @@ export function ScenarioPlanSummary({
               <div
                 className={
                   visible
-                    ? "mt-6 grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]"
+                    ? "mt-6 evidence-panel-grid grid gap-6"
                     : "hidden"
                 }
               >
@@ -172,7 +172,7 @@ export function ScenarioPlanSummary({
                   <p className="mb-3 text-xs text-muted-foreground">
                     {draftProvenance ? <>{draftProvenance.reconciliation} History ends {draftProvenance.history_cutoff}. October–December 2026 are unmodeled; carrying September headcount into January 2027 is an explicit draft assumption. Source refresh time is unavailable.</> : <>Source-reported monthly flows across the returned month window. Missing, duplicate or invalid months and unknown flow values leave totals unavailable. Full horizon boundaries and source refresh date are not supplied. These flows are not observed actuals. Their completeness and reconciliation with the aligned Baseline headcount curve remain unverified; what-if engine flows are separate.</>}
                   </p>
-                  <div className="h-80 w-full">
+                  <div className="evidence-chart">
                     <ResponsiveContainer
                       width="100%"
                       height="100%"

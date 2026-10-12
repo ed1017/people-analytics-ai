@@ -1,3 +1,4 @@
+import {EvidenceTableRegion} from '@/components/evidence-table-region';
 import {resolveProjectionBacktest} from '@/lib/projection-backtest';
 import {SyntheticDomainChart} from '@/components/synthetic-domain-chart';
 import artifact from '@/lib/data/synthetic-domain-demo-v1.json';
@@ -15,13 +16,15 @@ export function SyntheticDomainPrediction({domain,data}:{domain:SyntheticDemoDom
  return <div className="@container min-w-0">
   {domain === 'satisfaction' && <p className="mb-2 text-xs font-medium">Independent simulated population · Not a projection of recorded engagement</p>}
   <div className={`grid min-w-0 items-start gap-3 ${columns}`}>
-   <div className="min-w-0 max-w-full overflow-x-auto">
+   <div className="min-w-0 max-w-full">
     <p className="text-xs font-semibold">{ranking?'3 methods ranked by backtest':'3 prediction methods'}</p>
+    <EvidenceTableRegion label={`${demoDomainCopy[domain].title} simulated method comparison`}>
     <table className="w-full text-xs">
      <caption className="py-2 text-left font-medium">{demoDomainCopy[domain].unit}</caption>
      <thead><tr className="border-b text-left"><th scope="col" className="min-w-32 py-2 pr-3">Method</th>{d.rows.map(row=><th key={row.month} scope="col" className="whitespace-nowrap px-2 py-2 text-right">{month(row.month)}</th>)}</tr></thead>
      <tbody>{methodEntries.map(({method,index})=><tr key={method} className="border-b"><th scope="row" className="py-2 pr-3 text-left font-normal">{demoMethodLabels[method]}</th>{d.rows.map(row=><td key={row.month} className="whitespace-nowrap px-2 py-2 text-right tabular-nums">{formatDemoValue(domain,row.values[index])}</td>)}</tr>)}</tbody>
     </table>
+    </EvidenceTableRegion>
    </div>
    <SyntheticDomainChart domain={domain} data={data} metricInSummary/>
   </div>

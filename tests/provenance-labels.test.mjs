@@ -68,14 +68,14 @@ test('shell disclosure states the gate rather than denying an enabled release',(
  const shell=fs.readFileSync('app/page.tsx','utf8');assert.match(shell,/Compa-ratios require an enabled company-wide release/);assert.doesNotMatch(shell,/Pay coverage and compa-ratios remain unavailable/);
 });
 test('rendered attrition default is an annual planning assumption, distinct from observed YTD',()=>{
- const {ScenarioModelingPanel}=load('components/workforce-planning/scenario-modeling-panel.tsx',{'@/lib/display-format':format,'@/lib/legacy-source-contracts':sourceContracts,'@/lib/numeric-contract':numeric});
+ const {ScenarioModelingPanel}=load('components/workforce-planning/scenario-modeling-panel.tsx',{'@/components/evidence-table-region':load('components/evidence-table-region.tsx'),'@/lib/display-format':format,'@/lib/legacy-source-contracts':sourceContracts,'@/lib/numeric-contract':numeric});
  const assumptions={annual_growth_pct:0,salary_inflation_pct:0,annual_attrition_pct:11.3,fill_rate_pct:100,productivity_hiring_reduction_pct:0};
  const html=render(ScenarioModelingPanel,{visible:true,planningScenarios:[],scenarioDefaults:assumptions,customAssumptions:assumptions,buScenarioOptions:[],savedScenarios:[],comparisonScenarioIds:[]});
  assert.match(html,/Annual Attrition Assumption/);assert.match(html,/Planning default 11.3%/);assert.match(html,/Default provenance unavailable · Not observed voluntary turnover YTD/);
  assert.match(html,/value="11.3"/);
 });
 test('shared satisfaction projection keeps independent simulation label outside collapsed details and retains values',()=>{
- const {SyntheticDomainPrediction}=load('components/synthetic-domain-prediction.tsx',{'@/lib/projection-backtest':ranking,'@/components/synthetic-domain-chart':{SyntheticDomainChart:()=>null},'@/lib/synthetic-domain-demo':demo});
+ const {SyntheticDomainPrediction}=load('components/synthetic-domain-prediction.tsx',{'@/components/evidence-table-region':load('components/evidence-table-region.tsx'),'@/lib/projection-backtest':ranking,'@/components/synthetic-domain-chart':{SyntheticDomainChart:()=>null},'@/lib/synthetic-domain-demo':demo});
  const html=render(SyntheticDomainPrediction,{domain:'satisfaction',data:artifact});
  assert.match(html,/Independent simulated population · Not a projection of recorded engagement/);assert.match(html,/64.5%/);
  assert(html.indexOf('Independent simulated')<html.indexOf('<table'));assert.doesNotMatch(html,/<details/);
@@ -83,7 +83,7 @@ test('shared satisfaction projection keeps independent simulation label outside 
 });
 
 test('attrition default provenance belongs to the default, with constructed and unknown fallbacks',()=>{
- const {ScenarioModelingPanel}=load('components/workforce-planning/scenario-modeling-panel.tsx',{'@/lib/display-format':format,'@/lib/numeric-contract':numeric,'@/lib/legacy-source-contracts':sourceContracts});
+ const {ScenarioModelingPanel}=load('components/workforce-planning/scenario-modeling-panel.tsx',{'@/components/evidence-table-region':load('components/evidence-table-region.tsx'),'@/lib/display-format':format,'@/lib/numeric-contract':numeric,'@/lib/legacy-source-contracts':sourceContracts});
  const assumptions={annual_growth_pct:0,salary_inflation_pct:0,annual_attrition_pct:11.3,fill_rate_pct:100,productivity_hiring_reduction_pct:0};
  const markup=source=>render(ScenarioModelingPanel,{visible:true,planningScenarios:[],scenarioDefaults:assumptions,scenarioDefaultSource:source,customAssumptions:{...assumptions,annual_attrition_pct:4},buScenarioOptions:[],savedScenarios:[],comparisonScenarioIds:[]});
  const legacy=markup({provenance:sourceContracts.legacyAttritionDefaultSource});
@@ -98,7 +98,7 @@ test('attrition default provenance belongs to the default, with constructed and 
 
 test('movement label distinguishes the verified source window from returned months and event counts',()=>{
  const chartNames=['Bar','BarChart','CartesianGrid','Line','LineChart','ResponsiveContainer','Tooltip','XAxis','YAxis'];
- const {WorkforcePage}=load('components/pages/workforce-page.tsx',{'@/lib/legacy-source-contracts':sourceContracts,'@/lib/display-format':format,recharts:Object.fromEntries(chartNames.map(name=>[name,()=>null]))});
+ const {WorkforcePage}=load('components/pages/workforce-page.tsx',{'@/components/evidence-table-region':load('components/evidence-table-region.tsx'),'@/lib/legacy-source-contracts':sourceContracts,'@/lib/display-format':format,recharts:Object.fromEntries(chartNames.map(name=>[name,()=>null]))});
  const data={as_of:'2030-01-01',summary:{headcount:100,fte:90,people_managers:10,avg_span_of_control:9,avg_tenure_years:5,full_time_headcount:80,hybrid_headcount:10,remote_headcount:5},trend:[],business_units:[],countries:[],levels:[],tenure:[],movements:[{month:'2026-03-01',movement_type:'promotion',movements:72}]};
  const html=render(WorkforcePage,{data:{...data,movement_window:sourceContracts.legacyMovementWindow}});
  assert.match(html,/Source window: Jan–Sep 2026/);assert.match(html,/Returned months: Mar 26 – Mar 26/);assert.match(html,/Counts are events, not distinct people/);assert.match(html,/72/);
