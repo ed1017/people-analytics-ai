@@ -1,0 +1,11 @@
+import {createRoot} from 'react-dom/client';
+import {decisionStore} from '../../components/decision-store';
+import {LegacyHomeBundlePlans,type HomeBundlePlansProps} from '../../components/home-bundle-plans';
+import {HomeBundlePlans} from '../../components/home-plan-alternatives';
+import {AttachedActionPlansBrief} from '../../components/attached-action-plans-brief';
+import type {BundleWorkspace} from '../../lib/home-bundle-records';
+const data=(window as unknown as {historyFixture:{workspace:BundleWorkspace;props:Pick<HomeBundlePlansProps,'binding'|'proposal'>}}).historyFixture;
+decisionStore.initialize(localStorage);
+const props:HomeBundlePlansProps={...data.props,preparedAt:'2026-10-06T12:00:00Z',contextCurrent:true,disabled:false,isCurrent:()=>true,cache:new Map(),onDiscuss:()=>{}};
+const surface=new URL(location.href).searchParams.get('surface');
+createRoot(document.getElementById('root')!).render(<main className="mx-auto max-w-5xl p-3">{surface==='brief'?<AttachedActionPlansBrief raw={data.workspace} goalId={props.binding.goalId} goal={props.binding.goal} onReview={()=>{}}/>:surface==='legacy-home'?<LegacyHomeBundlePlans {...props}/>:<HomeBundlePlans {...props}/>}</main>);
