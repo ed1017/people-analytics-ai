@@ -5,7 +5,7 @@ import {buildHomePack} from '../../../lib/home-pack.mjs';
 import {readSolutionRequest,emptySolutionState} from '../../../lib/home-solution-conversation';
 import {withDatasetRequest,datasetRouter} from '../../../lib/dataset-runtime';
 import {question,binding,limits} from './config.mjs';
-import {claimPaidRun,claimVerificationRun} from './claim.mjs';
+import {claimPaidRun} from './claim.mjs';
 export {POST};
 export {assertPaidClaim} from './claim.mjs';
 async function withClaimClient<T>(claim:(client:typeof import('../../../lib/supabase-server').supabaseServer)=>Promise<T>):Promise<T>{
@@ -17,7 +17,6 @@ async function withClaimClient<T>(claim:(client:typeof import('../../../lib/supa
  if(!response.ok||value===undefined)throw Error('Claim context unavailable');return value;
 }
 export const claimPaidPreview=(manifest:unknown,env:NodeJS.ProcessEnv)=>withClaimClient(client=>claimPaidRun(client,manifest,env));
-export const claimProviderFreePreview=(env:NodeJS.ProcessEnv)=>withClaimClient(client=>claimVerificationRun(client,env));
 // Same read-only source routes as groundSolutionRequest; never the public survey BU reader.
 const readers={
  dashboard:async()=>({GET:(await import('../../../lib/dashboard-overview-reader')).readDashboardOverview}),workforce:()=>import('../../../app/api/workforce/route'),

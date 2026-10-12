@@ -20,20 +20,20 @@ BEGIN
     reservation_id uuid UNIQUE,
     manifest_sha256 text,
     overlay_commit text,
-    deployment_id text NOT NULL CHECK (deployment_id ~ '^dpl_[A-Za-z0-9]{1,100}$'),
+    deployment_id text CHECK (deployment_id ~ '^dpl_[A-Za-z0-9]{1,100}$'),
     project_id text NOT NULL CHECK (project_id='prj_qXEE4BF4KrbTbzFvDg8dc3MJQjDF'),
     ledger_receipt_sha256 text,
     reserved_microusd bigint NOT NULL,
     claimed_at timestamptz NOT NULL DEFAULT clock_timestamp(),
     CONSTRAINT exact_claim_allocation CHECK (
-      (claim_kind='paid' AND run_id='45dc0c92-13b7-41c8-985e-9da7acb628f0'::uuid
+      (claim_kind='paid' AND run_id='45dc0c92-13b7-41c8-985e-9da7acb628f0'::uuid AND deployment_id IS NOT NULL
         AND reservation_id IS NOT NULL AND reservation_id='d9f663b2-0556-4d76-9e20-aaa550041cec'::uuid
         AND manifest_sha256 IS NOT NULL AND manifest_sha256 ~ '^[a-f0-9]{64}$'
         AND overlay_commit IS NOT NULL AND overlay_commit ~ '^[a-f0-9]{40}$'
         AND ledger_receipt_sha256 IS NOT NULL AND ledger_receipt_sha256='6a6500e5633fea6f1e55f5b462841b57ca7e984183c167cdfd32494862311d31'
         AND reserved_microusd=23430000)
       OR
-      (claim_kind='provider_free' AND run_id='6f98085e-f9be-40bf-a8a7-d46a2e538120'::uuid
+      (claim_kind='provider_free' AND run_id='6f98085e-f9be-40bf-a8a7-d46a2e538120'::uuid AND deployment_id IS NULL
         AND reservation_id IS NULL AND manifest_sha256 IS NULL AND overlay_commit IS NULL
         AND ledger_receipt_sha256 IS NULL AND reserved_microusd=0)
     )

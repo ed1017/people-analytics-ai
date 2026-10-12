@@ -8,7 +8,7 @@ import {createRequire} from 'node:module';
 import {compileRoute} from './bundle.mjs';
 import {createControl,hash} from './guard.mjs';
 import {question,binding,application,applicationTree,branch,limits,model} from './config.mjs';
-import {claimStore} from './claim.mjs';
+import {claimStore} from './claim-store.mjs';
 import {solutionRequest,candidate,evaluate,final} from '../../fixtures/home-solution-conversation.mjs';
 const provider=(step,n)=>({id:'resp-offline-'+n,object:'response',status:'completed',model:'gpt-6.1-sol',service_tier:'default',usage:{input_tokens:2000,output_tokens:100,total_tokens:2100,input_tokens_details:{cached_tokens:0},output_tokens_details:{reasoning_tokens:0}},output:step.name?[{type:'function_call',call_id:'call-'+n,name:step.name,arguments:JSON.stringify(step.args),id:'fc-'+n,status:'completed'}]:[{id:'msg-'+n,type:'message',role:'assistant',status:'completed',content:[{type:'output_text',text:JSON.stringify(step),annotations:[]}]}]});
 test('reviewed actual POST and real SDK use the bounded transport for one/two/four rounds and reject incomplete usage',async t=>{
@@ -34,9 +34,9 @@ test('reviewed actual POST and real SDK use the bounded transport for one/two/fo
     const request=()=>new Request('http://local.invalid/api/home-solution-conversation',{method:'POST',body:JSON.stringify(solutionRequest(question))});
     const guarded=()=>{const c=createControl(()=>{},()=>entry.assertPaidClaim(admission));globalThis.__conversationPreviewControl=c;return c;};
     guarded();assert.equal((await POST(request())).status,422);assert.equal(providerCalls,0);
-    admission=await entry.claimProviderFreePreview(process.env);guarded();assert.equal((await POST(request())).status,422);assert.equal(providerCalls,0);assert.equal(rows.has(binding.runId),false);
+    admission=Object.freeze({kind:'provider_free',paidAdmission:false});guarded();assert.equal((await POST(request())).status,422);assert.equal(providerCalls,0);assert.equal(rows.has(binding.runId),false);
     admission=await entry.claimPaidPreview(manifest,process.env);const control=guarded();assert.equal((await POST(request())).status,200);assert.equal(providerCalls,1);assert.equal(control.wires,1);control.stop();
-    await assert.rejects(entry.claimPaidPreview(manifest,process.env));assert.deepEqual(events,['provider_free','paid','provider','paid']);assert.equal(providerCalls,1);
+    await assert.rejects(entry.claimPaidPreview(manifest,process.env));assert.deepEqual(events,['paid','provider','paid']);assert.equal(providerCalls,1);
    }finally{delete globalThis.__conversationPreviewControl;for(const [k,v] of Object.entries(previous))if(v===undefined)delete process.env[k];else process.env[k]=v;}
   });
   for(const count of [1,2,4])await t.test(count+' round route preserves question, instructions, tools and calculation',async()=>{

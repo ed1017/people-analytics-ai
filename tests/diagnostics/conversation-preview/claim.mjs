@@ -1,12 +1,11 @@
 /** Durable admission only. Importing this module never reads credentials or dispatches. */
 import {binding,limits} from './config.mjs';
 import {validateManifest,fail} from './guard.mjs';
-export const claimStore=Object.freeze({project:'noykvmztefmmhyuwuppv',table:'conversation_preview_claims',verificationRun:'6f98085e-f9be-40bf-a8a7-d46a2e538120',timeoutMs:10000});
+import {claimStore,verifyStoreTarget} from './claim-store.mjs';
 const admissions=new WeakSet();
 export function assertPaidClaim(admission){if(!admissions.has(admission))fail('durable_paid_claim_required');}
 function verifyStore(env){
- let url;try{url=new URL(env.SUPABASE_URL);}catch{fail('claim_store');}
- if(url.protocol!=='https:'||url.hostname!==claimStore.project+'.supabase.co'||url.port||url.username||url.password||url.pathname!=='/'||url.search||url.hash||!env.SUPABASE_SECRET_KEY)fail('claim_store');
+ verifyStoreTarget(env);
  if(env.VERCEL!=='1'||env.VERCEL_ENV!=='preview'||env.VERCEL_PROJECT_ID!==binding.projectId||!/^dpl_[A-Za-z0-9]{1,100}$/.test(env.VERCEL_DEPLOYMENT_ID??''))fail('claim_preview');
 }
 async function insertClaim(client,row){
@@ -26,10 +25,4 @@ export async function claimPaidRun(client,manifest,env){
  validateManifest(manifest,env);
  const admission=Object.freeze({kind:'paid',runId:binding.runId,reservationId:binding.reservationId});
  admissions.add(admission);return admission;
-}
-export async function claimVerificationRun(client,env){
- verifyStore(env);
- await insertClaim(client,{run_id:claimStore.verificationRun,claim_kind:'provider_free',reservation_id:null,manifest_sha256:null,overlay_commit:null,deployment_id:env.VERCEL_DEPLOYMENT_ID,project_id:binding.projectId,ledger_receipt_sha256:null,reserved_microusd:0});
- // Deliberately not entered in admissions. This receipt can never authorize model use.
- return Object.freeze({kind:'provider_free',runId:claimStore.verificationRun});
 }
