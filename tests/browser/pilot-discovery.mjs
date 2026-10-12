@@ -39,8 +39,9 @@ try{for(const width of [1366,390])for(const scenario of ['fresh','existing-empty
   return route.fulfill({status:503,headers,json:{error:'Offline fixture source unavailable'}});
  });
  page.on('pageerror',e=>report.errors.push(e.message));await page.goto(base);await dismissHomeOnboarding(page);await settle(page);
- const summary=page.locator('summary').filter({hasText:/^View fictional pilot example$/});await summary.waitFor();
+ const summary=page.locator('summary').filter({hasText:/^View sample plan and results$/});await summary.waitFor();
  check(label+' always available without saved demo attachment',await summary.count()===1);
+ check(label+' static sample explanation visible while collapsed',await page.getByText('Fictional, read-only example. Viewing it does not run AI or save a plan.',{exact:true}).isVisible());
  if(scenario==='existing-empty')check(label+' dropdown only General exploration',await page.getByLabel('Selected Action Plan',{exact:true}).locator('option').count()===1);
  const input=page.locator('#overview-question');await input.fill('Preserve this unsent question');await settle(page);await page.waitForTimeout(150);
  const state=()=>page.evaluate(()=>({local:Object.fromEntries(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)])),session:Object.fromEntries(Object.keys(sessionStorage).sort().map(k=>[k,sessionStorage.getItem(k)])),memory:window.pilotDiscovery.snapshot().data,input:document.querySelector('#overview-question').value}));
