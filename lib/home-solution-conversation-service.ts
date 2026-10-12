@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {SolutionResponseError} from './home-solution-response-failure.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {planningCalculationRef,planningCalculationFeedback,type PlanningCalculationRef,type PlanningCalculationKind} from './guided-planning-adapters.ts';
 // @ts-expect-error Native Node tests share application source.
@@ -95,8 +97,17 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   abort(signal);if(new TextEncoder().encode(JSON.stringify(input)).length>120000)throw Error('This conversation needs a narrower set of sources before another model round. Earlier work is kept.');
   if(staffingRequired&&!staffingCalculated&&(round===3||operations>=6))throw Error('The staffing comparison was not calculated within this turn\'s limits. Earlier work is kept.');
   const output=await runtime.complete(input,round===3||operations>=6,signal,{progressEntryEnabled:!!entryContext,requiredStaffingCalculation:standaloneStaffing&&!staffingCalculated});rounds++;abort(signal);
-  if(!output.completed||output.calls.length>6||JSON.stringify(output.items).length>70000)throw Error('The conversation response was incomplete or exceeded its bounds.');
-  if(!output.calls.length){if(staffingRequired&&!staffingCalculated)throw Error('The staffing comparison was not calculated in this turn. Earlier work is kept.');if(!output.text||output.text.length>20000)throw Error('The conversational answer is unavailable.');const value=JSON.parse(output.text);if(typeof value?.answer==='string')throw Error('Use a checked recommendation, a specific unsupported planning outcome, or explicit discussion-only response.');assertSolutionShape(value,solutionFinalSchema,'answer');final=value;break;}
+  if(!output.completed)throw new SolutionResponseError('incomplete_output','The conversation response was incomplete or exceeded its bounds.');
+  if(output.calls.length>6||JSON.stringify(output.items).length>70000)throw new SolutionResponseError('output_bounds','The conversation response was incomplete or exceeded its bounds.');
+  if(!output.calls.length){
+   if(staffingRequired&&!staffingCalculated)throw Error('The staffing comparison was not calculated in this turn. Earlier work is kept.');
+   if(!output.text||output.text.length>20000)throw new SolutionResponseError('answer_unavailable','The conversational answer is unavailable.');
+   let value;
+   try{value=JSON.parse(output.text);}catch{throw new SolutionResponseError('invalid_json','The conversational answer is not valid JSON.');}
+   if(typeof value?.answer==='string')throw new SolutionResponseError('invalid_schema','Use a checked recommendation, a specific unsupported planning outcome, or explicit discussion-only response.');
+   try{assertSolutionShape(value,solutionFinalSchema,'answer');}catch{throw new SolutionResponseError('invalid_schema','The conversational answer does not match the required schema.');}
+   final=value;break;
+  }
   const callCost=(call:SolutionModelOutput['calls'][number])=>{if(call.name!=='evaluate_action_plans')return 1;try{const count=JSON.parse(call.arguments)?.candidates?.length;return Number.isInteger(count)&&count>=1&&count<=3?count:3;}catch{return 3;}};
   if(round===3||operations+output.calls.reduce((total,call)=>total+callCost(call),0)>6)throw Error('The bounded calculation limit was reached. No proposal was saved.');
   input.push(...output.items);
@@ -185,7 +196,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
    break;
   }
  }
- if(!final)throw Error('No complete conversational answer was returned.');
+ if(!final)throw new SolutionResponseError('incomplete_output','No complete conversational answer was returned.');
  let answer=solutionAnswerText(final,staffingCalculated);
  if(staffingCalculated&&state.requiredStaffing){
   if(staffingOnly){
@@ -194,27 +205,27 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   }else answer+='\n\nChecked fixed-role comparison:\n'+requiredStaffingAnswer(state.requiredStaffing);
   assertSolutionShape(final,solutionFinalSchema,'answer');
  }
- if(answer.length>10000)throw Error('The combined answer exceeds the response budget. Narrow the request; earlier state is retained.');
- if(homeAnswerScopeViolation(answer,request.evidence))throw Error('The answer attributes source evidence to an unsupported population.');
+ if(answer.length>10000)throw new SolutionResponseError('output_bounds','The combined answer exceeds the response budget. Narrow the request; earlier state is retained.');
+ if(homeAnswerScopeViolation(answer,request.evidence))throw new SolutionResponseError('scope_rejected','The answer attributes source evidence to an unsupported population.');
  state.constraints=mergeSolutionConstraints(request,state.constraints,final.constraintUpdates);
  if(typeof final.answer!=='string'&&('recommendedPlan' in final.answer||'unsupportedPlan' in final.answer)){
   const refs=('recommendedPlan' in final.answer?final.answer.recommendedPlan:final.answer.unsupportedPlan).calculationRefs;
-  if(planningRefs.size&&!refs.length)throw Error('Use the current checked planning references for this outcome.');
-  if(new Set(refs).size!==refs.length)throw Error('Use distinct checked planning references.');
+  if(planningRefs.size&&!refs.length)throw new SolutionResponseError('calculation_reference','Use the current checked planning references for this outcome.');
+  if(new Set(refs).size!==refs.length)throw new SolutionResponseError('calculation_reference','Use distinct checked planning references.');
   for(const ref of refs){
    const known=planningRefs.get(ref),current=known?await planningCalculationRef(known.kind,request,state,demandReview,known.analysisId):null;
-   if(!known||!current||current.reference!==ref)throw Error('The recommended plan must reference the current checked inputs and results from this turn.');
+   if(!known||!current||current.reference!==ref)throw new SolutionResponseError('calculation_reference','The recommended plan must reference the current checked inputs and results from this turn.');
   }
  }
 
- if(new Set(final.candidateIds).size!==final.candidateIds.length||final.candidateIds.some(id=>!evaluated.has(id))||new Set(final.analysisIds).size!==final.analysisIds.length||final.analysisIds.some(id=>!analyses.has(id)))throw Error('The answer references a proposal or analysis that was not checked in this turn.');
+ if(new Set(final.candidateIds).size!==final.candidateIds.length||final.candidateIds.some(id=>!evaluated.has(id))||new Set(final.analysisIds).size!==final.analysisIds.length||final.analysisIds.some(id=>!analyses.has(id)))throw new SolutionResponseError('calculation_reference','The answer references a proposal or analysis that was not checked in this turn.');
  for(const id of final.candidateIds){const item=evaluated.get(id)!;if(!same(item.constraints,state.constraints)){item.blocking.push('Constraints changed after this calculation. Refine the proposal against the current constraints before saving.');}}
  for(const rejected of final.rejected){const item=latest(state.working).find(item=>item.id===rejected.candidateId);if(!item||!solutionUserTurns(request).some(turn=>turn.id===rejected.turnId))throw Error('The rejected idea has no current candidate or user-turn reference.');// Model rejection is interpretation only; the existing explicit review control owns rejection state.
   item.interpretations.push(`Proposed rejection (unconfirmed), turn ${rejected.turnId}: ${rejected.reason}`);}
  for(const ref of final.verifiedMetrics){
   const checked=ref.kind==='candidate'?evaluated.get(ref.id):analyses.get(ref.id);
-  if(!checked||checked.revision!==ref.revision)throw Error('A claimed quantitative result was not checked in this turn.');
-  resolveSolutionMetric(state,ref);
+  if(!checked||checked.revision!==ref.revision)throw new SolutionResponseError('calculation_reference','A claimed quantitative result was not checked in this turn.');
+  try{resolveSolutionMetric(state,ref);}catch{throw new SolutionResponseError('calculation_reference','A claimed quantitative result has an invalid metric reference.');}
  }
  state.currentCalculationKinds=[...([...planningRefs.values()].some(ref=>ref.kind==='hiring')?['hiring' as const]:[]),...(staffingCalculated?['required-staffing' as const]:[])];
  state.verifiedMetrics=final.verifiedMetrics;
