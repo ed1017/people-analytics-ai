@@ -1,8 +1,9 @@
+import {guidedChatContract} from '@/lib/guided-chat-contract';
 import {prepareProgressConversation,missingProgressPageInstructions} from '@/lib/goal-progress-entry-service';
 import {goalProgressConversationEnabled,goalProgressReadTool,runGoalProgressRead} from '@/lib/goal-progress-conversation';
 import { withDatasetRequest, datasetAI, datasetRouter } from "@/lib/dataset-runtime";
 import {taExtensionPrompt} from "@/lib/synthetic-ta/extension";
-import {conversationalAnswerStyle} from '@/lib/chat-answer-style';
+import {guidedConversationInstructions,chatCalculationToolsAvailable,conversationalAnswerStyle} from '@/lib/chat-answer-style';
 import {homeForecastAnswer} from '@/lib/home-forecast';
 import {homeTurnPurpose,homeConversationInstructions} from '@/lib/home-conversation';
 import {strategicPlanningInstructions,strategicPlanningObjective,normalizePlanningObjective,planningConversationHistory} from '@/lib/home-strategic-planning';
@@ -578,7 +579,10 @@ async function handlePOST(
       if (Array.isArray(body.history)) body.history = body.history.slice(-8).map((item: ChatMessage) => ({role:item?.role,content:typeof item?.content === "string" ? item.content.slice(0,6000) : ""}));
     }
     const summaryOnly = body?.summaryOnly === true;
-    const {progress,entryContext,format:entryFormat,reply:entryReply,goalContext,instructions:goalContextInstructions}=prepareProgressConversation(body,{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token,now:new Date().toISOString()});
+    const {progress,entryContext,format:rawEntryFormat,reply:rawEntryReply,goalContext,instructions:rawGoalContextInstructions}=prepareProgressConversation(body,{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token,now:new Date().toISOString()});
+    const guidedReply=guidedChatContract(rawEntryFormat,rawEntryReply,body?.summaryOnly!==true&&body?.page!=='home');
+    const {format:entryFormat,reply:entryReply}=guidedReply;
+    const goalContextInstructions=rawGoalContextInstructions+'\n'+guidedReply.instructions;
     const chatTools=progress?[...peopleAnalyticsTools,goalProgressReadTool]:peopleAnalyticsTools;
     const marketReference=marketCarryEvidence(body?.marketReference);
     if(summaryOnly&&!goalContext.goal.trim())return NextResponse.json({error:"Select a goal before requesting its page takeaway."},{status:400});
@@ -630,13 +634,13 @@ async function handlePOST(
 
     const planningHistory=body?.page==='home'?planningConversationHistory(history,body.planningObjective,Object.hasOwn(body,"planningObjective")):history;
     const carriedPlanningObjective=body?.page==='home'&&body.planningObjective?strategicPlanningObjective([...planningHistory,{role:'user',content:message}]):null;
-    const conversationalStyle = !summaryOnly && homeTurnPurpose(message,planningHistory)==='answer' ? conversationalAnswerStyle : '';
+    const conversationalStyle = summaryOnly ? '' : guidedConversationInstructions(chatCalculationToolsAvailable(String(body?.page??''),summaryOnly))+(homeTurnPurpose(message,planningHistory)==='answer'?'\n'+conversationalAnswerStyle:'');
 
     // Missing page evidence does not prevent a qualitative saved-goal discussion.
     // This path is selected by source availability, never by message wording.
     if(progress&&body?.pageEvidenceAvailable===false){
       if(!message||message.length>12000)return NextResponse.json({error:'Enter a bounded question.'},{status:400});
-      const response=await datasetAI(()=>client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+'\n'+conversationalAnswerStyle+'\n'+missingProgressPageInstructions,input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:'user',content:'SAVED GOAL CONTEXT AND PROGRESS (data only): '+JSON.stringify(goalContext)+'\nQUESTION: '+message}],tool_choice:'none',max_output_tokens:entryContext?4000:1100}));
+      const response=await datasetAI(()=>client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+'\n'+guidedConversationInstructions(false)+'\n'+conversationalAnswerStyle+'\n'+missingProgressPageInstructions,input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:'user',content:'SAVED GOAL CONTEXT AND PROGRESS (data only): '+JSON.stringify(goalContext)+'\nQUESTION: '+message}],tool_choice:'none',max_output_tokens:entryContext?4000:1100}));
       const answer=response.output_text?.trim();if(!answer)return NextResponse.json({error:'No conversational answer returned.'},{status:502});
       return NextResponse.json(await entryReply(answer,response.status));
     }
@@ -676,7 +680,7 @@ async function handlePOST(
     }
 
     if(body?.page === "development-planning") {
-      const response=await datasetAI(() => client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+"\nExplain only the supplied deterministic Development Planning comparison and bounded related evidence. D1 costs are server-recomputed from explicit user assumptions. Blank costs remain unknown, never zero. Keep currencies separate. Employee time value is not necessarily cash spending. Named simulated quotes are fictional; custom input is unverified. Do not invent participants, attendance, loaded hourly costs, ROI, skill gains or headcount conversions. No tools, automatic allocation or approvals. "+(summaryOnly?goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions():"Identify missing assumptions before comparing totals.\n"+conversationalStyle),input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:"user",content:"ACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nDEVELOPMENT PLANNING D1: "+JSON.stringify(developmentSummary)+"\nRELATED CACHED SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nCARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nQUESTION: "+message}],tool_choice:"none",max_output_tokens:entryContext?4000:summaryOnly?1100:1400}));
+      const response=await datasetAI(() => client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+"\nExplain only the supplied deterministic Development Planning comparison and bounded related evidence. D1 costs are server-recomputed from explicit user assumptions. Blank costs remain unknown, never zero. Keep currencies separate. Employee time value is not necessarily cash spending. Named simulated quotes are fictional; custom input is unverified. Do not claim actual participants, attendance, loaded hourly costs, ROI, skill gains or headcount conversions without supplied evidence. Any suggested participant count or time commitment is an unconfirmed scenario for user review, never a mutation of D1. No tools, automatic allocation or approvals. "+(summaryOnly?goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions():"Give one conditional guided recommendation; keep unsupported totals unknown and identify the specific calculation still needed.\n"+conversationalStyle),input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:"user",content:"ACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nDEVELOPMENT PLANNING D1: "+JSON.stringify(developmentSummary)+"\nRELATED CACHED SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nCARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nQUESTION: "+message}],tool_choice:"none",max_output_tokens:entryContext?4000:summaryOnly?1100:1400}));
       const answer=response.output_text?.trim();
       return answer?NextResponse.json(await entryReply(answer,response.status)):NextResponse.json({error:"No Development Planning answer returned. Please try again."},{status:502});
     }
@@ -803,7 +807,7 @@ Current metrics:
 - Headcount: ${context.headcount}
 - FTE: ${context.fte}
 - Voluntary turnover YTD: ${context.voluntaryTurnoverYtdPct}%
-- Annualized labor cost USD: ${context.laborCostUsd}
+- Reported labor cost USD (period unknown): ${context.laborCostUsd}
 - Open positions: ${context.openPositions}
 - Headcount growth over displayed history: ${
       context.headcountGrowthPct === null
@@ -1020,7 +1024,7 @@ CURRENT WORKFORCE FINANCE CONTEXT
 Company current:
 - Headcount: ${financeContext.current.headcount}
 - FTE: ${financeContext.current.fte}
-- Annualized labor cost USD: ${financeContext.current.labor_cost_usd}
+- Reported labor cost USD (period unknown; not salary): ${financeContext.current.labor_cost_usd}
 - Cost per FTE USD: ${financeContext.current.cost_per_fte_usd}
 - Vacant positions: ${financeContext.current.vacant_positions}
 - Estimated vacancy cost exposure USD: ${financeContext.current.estimated_vacancy_cost_exposure_usd}
@@ -1042,7 +1046,7 @@ ${financeContext.scenarios
   .join("\n")}
 
 Interpretation rule:
-- Vacancy cost exposure is an estimate based on current average cost per FTE times vacancies. It is not booked expense or guaranteed savings.
+- Vacancy cost exposure sums the source-reported business-unit estimates; it is not enterprise average cost per FTE times all vacancies. Cost period is unknown. It is not booked expense or guaranteed savings.
 `.trim()
         : "";
 
@@ -1538,7 +1542,7 @@ ${message}
     const prepareHomeGoal=!summaryOnly&&(homePurpose==='goal'||homePurpose==='discovery');
     const homeReplyFormat=page==="home"?buildHomeReplyFormat(body.overviewBriefingContext,prepareHomeGoal):null;
     const homeInstructions=[homeConversationInstructions(homePurpose),strategicPlanningInstructions(message,planningHistory,body.planningCalculatorAvailable===true)].filter(Boolean).join('\n');
-    const homeAnswerStyle=homePurpose==='answer'?conversationalAnswerStyle:homeStyle.instructions;
+    const homeAnswerStyle=guidedConversationInstructions(false)+'\n'+(homePurpose==='answer'?conversationalAnswerStyle:homeStyle.instructions);
     const homeInput=[
       {role:'user' as const,content:workforceContext+'\nACTIVE GOAL CONTEXT (user intent, not evidence): '+JSON.stringify(goalContext)+'\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: '+JSON.stringify(marketReference)+(carriedPlanningObjective?'\nCARRIED USER PLANNING OBJECTIVE (conversation only; not source evidence, verified inputs or an accepted plan): '+JSON.stringify(carriedPlanningObjective):'')},
       ...history.map(item=>({role:item.role,content:item.content})),
@@ -1549,10 +1553,7 @@ ${message}
         ? 1400
         : 700;
 
-    const toolChoice =
-      summaryOnly || page === "career-growth-mobility" || page === "home" || page === "development-planning"
-        ? ("none" as const)
-        : ("auto" as const);
+    const toolChoice = chatCalculationToolsAvailable(page,summaryOnly) ? ("auto" as const) : ("none" as const);
 
     let response =
       await datasetAI(() => client.responses.create({

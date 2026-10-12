@@ -107,10 +107,10 @@ const scenarioFields: Array<{
   },
   {
     key: "annual_attrition_pct",
-    label: "Annual Attrition",
+    label: "Annual Attrition Assumption",
     suffix: "%",
     step: 0.5,
-    help: "Annualized attrition assumption used for modeled exits.",
+    help: "Annual planning assumption for modeled exits; not observed voluntary turnover YTD.",
   },
   {
     key: "fill_rate_pct",
@@ -281,7 +281,7 @@ export function ScenarioModelingPanel({
         `${entry.scenario.assumptions.salary_inflation_pct.toFixed(1)}%`,
     },
     {
-      label: "Annual Attrition",
+      label: "Annual Attrition Assumption",
       baseline: scenarioDefaults
         ? `${scenarioDefaults.annual_attrition_pct.toFixed(1)}%`
         : "—",
@@ -463,7 +463,7 @@ export function ScenarioModelingPanel({
                         </span>
                       </div>
                       <p className="mt-2 text-[11px] text-muted-foreground">
-                        Baseline{" "}
+                        {field.key === "annual_attrition_pct" ? "Planning default" : "Baseline"}{" "}
                         {baseline === null
                           ? "—"
                           : baseline.toFixed(1) + field.suffix}
@@ -478,6 +478,7 @@ export function ScenarioModelingPanel({
                           </>
                         )}
                       </p>
+                      {field.key === "annual_attrition_pct" && <span className="mt-1 block text-[11px] text-muted-foreground">Default provenance unavailable · Not observed voluntary turnover YTD</span>}
                     </label>
                   );
                 })}

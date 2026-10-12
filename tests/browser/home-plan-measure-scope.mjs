@@ -55,6 +55,9 @@ try{
   const state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
   async function send(text){await page.getByLabel('Ask Workforce AI',{exact:true}).fill(text);await page.getByRole('button',{name:'Send overview question',exact:true}).click();}
   await send(accountabilityMessage);await card().waitFor();
+  assert.ok(await card().getByText(/Assumed baseline: 8\.2%; Assumed target: 6\.56%/).isVisible());
+  assert.ok(await card().getByText(accountabilityNextStep,{exact:false}).isVisible());
+  assert.ok(await card().getByText(/Suggested owners · unconfirmed: Learning lead/).isVisible());
   await card().getByRole('button',{name:/^Pin Action Plan/}).click();await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key)).payload.goals.activeId,DECISIONS_STORAGE_KEY);
   const pinned=await state(),id=pinned.goals.activeId,original=pinned.workspaces[id].fields.homePlanAlternativesV1,measure=original.plans[0].draft.inputs.successMeasure;
   assert.equal(measure.scopeKey,measurementScope(original.plans[0].draft.inputs));assert.equal(measure.baseline.kind,'illustrative');assert.equal(measure.target.kind,'illustrative');
@@ -75,6 +78,8 @@ try{
   await rail.getByRole('button',{name:/Open Action Plan: Accountability review/}).click();await inspect('reopened');
   await page.reload();await dismissHomeOnboarding(page);await inspect('refreshed');assert.equal(item.syntheticSolutionRequests,1);
   await send(accountabilityScopeChange);await card().getByText(/revision 2/).waitFor();
+  assert.ok(await card().getByText(/Saved measure needs renewed review/).isVisible());
+  assert.equal(await card().getByText(/Assumed baseline: 8\.2%/).count(),0);
   const changed=(await state()).workspaces[id].fields.homeSolutionConversationV1.working.filter(value=>value.id==='accountability').at(-1);
   assert.deepEqual(changed.draft.inputs.successMeasure,measure);assert.notEqual(measure.scopeKey,measurementScope(changed.draft.inputs));assert.ok(changed.result.issues.some(issue=>issue.startsWith('Success measure')));
   // Pinning the revision preserves both numbered plans; it must not revalidate the stale measure.

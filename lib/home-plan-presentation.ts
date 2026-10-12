@@ -4,8 +4,9 @@ import type {SolutionState,SolutionEvaluation} from './home-solution-conversatio
 /** Presentation only: never changes checked candidates, revisions or saved state. */
 export function solutionReviewPresentation(state:SolutionState){
  const current=[...new Map(state.working.map(item=>[item.id,item])).values()].filter(item=>!state.rejected.some(rejected=>rejected.candidateId===item.id&&rejected.revision===item.revision));
- const focused=current.find(item=>item.id===state.focusCandidateId);
- const requestId=focused?.requestId??state.working.at(-1)?.requestId;
+ const priorFocus=current.find(item=>item.id===state.focusCandidateId);
+ const requestId=state.recommendationRequestId!==undefined?state.recommendationRequestId:priorFocus?.requestId??state.working.at(-1)?.requestId;
+ const focused=priorFocus?.requestId===requestId?priorFocus:undefined;
  const active=current.filter(item=>item.requestId===requestId);
  const evaluatedIds=new Set(state.working.filter(item=>item.requestId===requestId).map(item=>item.id));
  const recommended=focused??(active.length===1&&evaluatedIds.size===1?active[0]:null);

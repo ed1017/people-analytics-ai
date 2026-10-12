@@ -24,18 +24,26 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  page.setDefaultTimeout(20000);page.on('pageerror',error=>errors.push(error.message));
  const check=(name,ok)=>{assert.ok(ok,mode+' '+name);checks.push(mode+' '+name);console.log('PASS '+mode+' '+name);};
  await context.route('**/*',async route=>{const req=route.request(),url=new URL(req.url());if(req.isNavigationRequest()&&url.href===base+'/')return route.fulfill({contentType:'text/html',body:html});if(url.origin!==base){external++;return route.abort();}if(url.pathname==='/api/home-solution-conversation'){
-  const body=req.postDataJSON();requests.push(body);const c=proposedPilot(body.message.text==='Recommend again'?'renewed-pilot':'manager-pilot',body.message.id);
+  const body=req.postDataJSON();requests.push(body);if(body.message.text.startsWith('Offline failure:'))return route.fulfill({status:body.message.text.includes('deadline')?503:422,json:{error:'Synthetic request failure; previous work is retained.',diagnostic:body.message.text.includes('deadline')?'conversation_deadline':'response_validation'}});const c=proposedPilot(body.message.text==='Recommend again'?'renewed-pilot':'manager-pilot',body.message.id);
   const changed=final('Use the updated cash ceiling.',[]);changed.constraintUpdates=[{action:'set',field:'budget_usd',number:1000,text:null,unit:'USD',turnId:body.message.id}];
-  const runtime=fixtureRuntime(body.message.text==='Change constraint'?[changed]:[evaluate(c),final('Try a small manager/workload pilot. The available evidence cannot identify the weakest teams.',[c.id])]);
+  const response=final('The evidence cannot identify the weakest teams.',[c.id]);response.answer={findings:'The evidence cannot identify the weakest teams.',decisionRationale:'A limited trial tests the workload hypothesis before expansion.',caveats:['Availability remains unverified; no improvement is guaranteed.']};
+  const alternative=proposedPilot('alternative',body.message.id);alternative.name='Alternative pilot';
+  const runtime=fixtureRuntime(body.message.text==='Compare alternatives'?[evaluate(c),evaluate(alternative),final('Compare the two unconfirmed pilots.',[c.id,alternative.id])]:body.message.text==='Change constraint'?[changed]:body.message.text==='Explain evidence only'?[final('No team ranking can be established from this evidence. No new plan is proposed.')]:[evaluate(c),response]);
   const reply=await converseSolutions(body,runtime,new AbortController().signal);assert.equal(runtime.reads,0);return route.fulfill({json:reply});
  }if(url.pathname.startsWith('/api/'))return route.fulfill({json:{overview:{headcount:100,fte:100,open_positions:3,snapshot_date:'2026-09-30'},trend:[]}});external++;return route.abort();});
  await page.goto(base);await dismissHomeOnboarding(page);
  const input=page.getByLabel('Ask Workforce AI',{exact:true}),send=async text=>{await input.fill(text);await page.getByRole('button',{name:'Send overview question',exact:true}).click();await page.getByRole('status').filter({hasText:'Thinking through the question'}).waitFor({state:'hidden'});};
  const review=page.getByRole('region',{name:'Solution conversation review',exact:true}),card=()=>review.getByRole('article').filter({hasText:'Recommended Action Plan'}),readState=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
+ await send('Explain evidence only');check('ordinary no-plan reply stays visible without creating a card',await card().count()===0&&await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('No team ranking can be established from this evidence. No new plan is proposed.',{exact:true}).isVisible());
  await send('Recommend a manager/workload pilot. I have no time or budget assumptions.');await card().waitFor();
+ check('new answer contains findings and caveats with one full set of actions',await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('The evidence cannot identify the weakest teams.',{exact:true}).isVisible()&&await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('Availability remains unverified; no improvement is guaranteed.',{exact:true}).isVisible()&&await page.getByText('Invite volunteers for manager check-ins, review workload friction and document follow-up actions.',{exact:true}).count()===1);
  check('one authoritative plan and visible unconfirmed label',await card().count()===1&&await card().getByText('Model-proposed planning assumptions · unconfirmed',{exact:true}).isVisible());
  const summary=()=>card().getByRole('region',{name:'Action Plan quick summary',exact:true});
  check('conditional cash, duration, people and labor time are readable',await summary().getByText('$500',{exact:true}).isVisible()&&await summary().getByText('2 months',{exact:true}).isVisible()&&await summary().getByText('10 people',{exact:true}).isVisible()&&await summary().getByText('Labor time: 28 hours',{exact:true}).isVisible());
+ check('goal precedes metrics and optional plan details start collapsed',await summary().evaluate(node=>Boolean(node.compareDocumentPosition([...node.parentElement.children].find(child=>child.textContent.startsWith('Goal:')))&Node.DOCUMENT_POSITION_PRECEDING))&&await card().getByText('Plan details',{exact:true}).evaluate(node=>!node.parentElement.open));
+ check('accountability remains visible without invented values',await card().getByText(/Suggested owners · unconfirmed:/).isVisible()&&await card().getByText(/Baseline: Unknown; Target: Unknown/).isVisible()&&await card().getByText(/Confirm owner, baseline, target and review date/).isVisible());
+ check('first concrete action remains visible with details collapsed',await card().getByText('Invite volunteers for manager check-ins, review workload friction and document follow-up actions.',{exact:true}).isVisible());
+ await card().getByText('Plan details',{exact:true}).click();check('optional steps can be reviewed',await card().getByText('Invite volunteers for manager check-ins, review workload friction and document follow-up actions.',{exact:true}).isVisible());await card().getByText('Plan details',{exact:true}).click();
  check('labor price and actual availability remain unknown',await summary().getByText('Labor cost: Not calculated',{exact:true}).isVisible()&&await summary().getByText('Availability and membership unconfirmed.',{exact:true}).isVisible());
  await summary().scrollIntoViewIfNeeded();await page.screenshot({path:path.join(output,mode+'-proposal.png')});
  await card().getByText('Edit planning assumptions',{exact:true}).click();const calls=requests.length;
@@ -63,6 +71,12 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  check('save links exact proposal to goal and keeps provenance',plans.length===1&&plans[0].draft.binding.goal==='Improve employee experience'&&plans[0].draft.inputs.scope.months.kind==='model-proposed'&&plans[0].draft.inputs.scope.population.value===null&&plans[0].draft.inputs.groups[0].count.value===12);
  await page.reload();await card().waitFor();check('reload preserves one saved card and unconfirmed assumptions',await card().count()===1&&await card().getByRole('button',{name:/Pinned Action Plan/}).isDisabled()&&await summary().getByText('Model-proposed planning assumptions · unconfirmed',{exact:true}).isVisible());
  await summary().scrollIntoViewIfNeeded();await page.screenshot({path:path.join(output,mode+'-saved.png')});
+ for(const kind of ['validation','deadline']){
+  const before=await readState(),beforeFields=JSON.stringify([before.workspaces[before.goals.activeId].fields.homeSolutionConversationV1,before.workspaces[before.goals.activeId].fields.homePlanAlternativesV1]),question='Offline failure: '+kind+' — show turnover and engagement by business unit.';
+  await send(question);const after=await readState();
+  check(kind+' failure retains the complete question in the composer',await input.inputValue()===question);
+  check(kind+' failure preserves saved plan and conversation fields',JSON.stringify([after.workspaces[after.goals.activeId].fields.homeSolutionConversationV1,after.workspaces[after.goals.activeId].fields.homePlanAlternativesV1])===beforeFields);
+ }
  await page.evaluate(()=>localStorage.clear());await page.reload();await dismissHomeOnboarding(page);await send('Recommend a fresh pilot.');await card().waitFor();
  for(let i=1;i<=14;i++){
   if(i<=12)await card().getByText('Edit planning assumptions',{exact:true}).click();
@@ -74,6 +88,12 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  await card().getByRole('button',{name:'Discard input changes',exact:true}).click();await pin().click();await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key)).payload.goals.activeId,DECISIONS_STORAGE_KEY);
  const bounded=await readState(),boundedPlan=bounded.workspaces[bounded.goals.activeId].fields.homePlanAlternativesV1.plans[0];check('history-limit rejection leaves prior proposal savable',boundedPlan.draft.inputs.groups[0].count.value===21);
  await page.reload();await card().waitFor();check('history-limited saved proposal reloads',await card().getByRole('button',{name:/Pinned Action Plan/}).isDisabled()&&await summary().getByText('21 people',{exact:true}).isVisible());
+ await page.evaluate(()=>localStorage.clear());await page.reload();await dismissHomeOnboarding(page);await send('Compare alternatives');await card().waitFor();
+ const alternatives=review.getByText('Alternative Action Plan 2: Alternative pilot',{exact:true});
+ check('one recommendation is expanded while alternatives remain optional',await card().count()===1&&await alternatives.evaluate(node=>!node.parentElement.open));
+ await page.getByRole('button',{name:'Review 2: Alternative pilot',exact:true}).click();
+ check('jump link opens the alternative and focuses its actual review card',await alternatives.evaluate(node=>node.parentElement.open)&&await page.getByRole('article',{name:'Working proposal: Alternative pilot',exact:true}).evaluate(node=>document.activeElement===node));
+ await card().scrollIntoViewIfNeeded();await page.screenshot({path:path.join(output,mode+'-compact-review.png')});
  check('no overflow, runtime errors or external traffic',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&external===0);await context.close();
 }}finally{await browser.close()}
 await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({checks},null,2));console.log(JSON.stringify({checks:checks.length,output}));

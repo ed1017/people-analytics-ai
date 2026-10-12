@@ -4,7 +4,7 @@ import {emptyWorkforcePlanInput} from '../lib/workforce-increment.ts';
 import {validateClarificationInput,clarificationRequest,validateClarificationResult} from '../lib/workforce-clarification.ts';
 const catalog={business_units:[{org_code:'TECH',org_name:'Technology',employee_id:'excluded'}],job_profiles:[{job_profile_code:'ENG',job_profile_name:'Engineer',owner_notes:'excluded'}],combinations:[{org_code:'TECH',job_profile_code:'ENG',salary:90000}]};
 const request={goal:'Plan additional positions',statement:'Add 3 Engineer roles in Technology. Build 1, move 1 and buy 1. Backfills 0. Annual loaded hire cost USD 120,000.',inputs:emptyWorkforcePlanInput()};
-const response=changes=>({summary:'Review the proposed assumptions.',questions:['What is the planning month?'],changes});
+const response=changes=>({summary:{unsupportedPlan:{reason:'Review the proposed assumptions.',decision:'The planning month is unspecified.',nextStep:'Confirm the planning month before running the comparison.'}},questions:['What is the planning month?'],changes});
 test('model envelope contains only supported planning data and projected synthetic catalog',()=>{
  const spec=clarificationRequest(request,catalog),payload=JSON.parse(spec.input[0].content);
  assert.deepEqual(Object.keys(payload),['goal','statement','inputs','catalog']);
@@ -105,7 +105,7 @@ test('generic January planning start cannot ground a recruiting date; omission w
  const input={...request,statement},before=structuredClone(input);
  // These are deliberately fabricated test proposals, not the deployed model output.
  for(const value of ['2027-01-01','2027-01-15',''])assert.throws(()=>validateClarificationResult(response([{field:'recruitingStart',value,evidence:'starting January 2027'}]),input,catalog),error=>error.message==='Proposed input is not grounded in the supplied planning statement.'&&error.cause?.field==='recruitingStart'&&error.cause?.reason==='value-not-supported');
- const proposed={summary:'Review the known planning horizon; recruitment timing is unspecified.',questions:['When should recruitment launch (YYYY-MM-DD), or should it remain unknown?'],changes:[{field:'planningMonth',value:'2027-01',evidence:'January 2027'},{field:'months',value:'12',evidence:'12 months'},{field:'deadlineMonth',value:'2027-12',evidence:'December 2027'}]};
+ const proposed={summary:{unsupportedPlan:{reason:'Review the known planning horizon; recruitment timing is unspecified.',decision:'Recruitment launch date is unknown.',nextStep:'Confirm the recruitment launch date or retain it as unknown.'}},questions:['When should recruitment launch (YYYY-MM-DD), or should it remain unknown?'],changes:[{field:'planningMonth',value:'2027-01',evidence:'January 2027'},{field:'months',value:'12',evidence:'12 months'},{field:'deadlineMonth',value:'2027-12',evidence:'December 2027'}]};
  const result=validateClarificationResult(proposed,input,catalog);assert.equal(result.draft.planningMonth,'2027-01');assert.equal(result.draft.months,'12');assert.equal(result.draft.recruitingStart,'');assert.equal(result.draft.arrivalDate,'');assert.equal(result.draft.arrivalMode,'');assert.match(result.questions[0],/recruitment launch/);assert.deepEqual(input,before);
 });
 test('explicit ISO recruiting launch is accepted without inventing arrival; omitted saved timing remains intact',()=>{

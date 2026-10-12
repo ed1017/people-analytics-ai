@@ -39,7 +39,7 @@ export const solutionConversationField='homeSolutionConversationV1';
 export type SolutionTurn={id:string;role:'user'|'assistant';text:string};
 export const solutionProvenanceVersion=1 as const;
 export type SolutionEvaluation={provenanceVersion?:1;id:string;revision:number;requestId:string;message:{id:string;text:string};candidate:SolutionCandidate;binding:ActionBinding;draft:BundleDraft|null;result:BundleResult|null;sourceRefs:AlternativeSourceRef[];sourceKeys:Record<string,string>;constraints:SolutionConstraint[];interpretations:string[];changes:string[];issues:string[];blocking:string[]};
-export type SolutionState={requiredStaffing?:RequiredStaffingReview|null;hiringBudget?:HiringBudgetReview|null;businessPlanning?:BusinessPlanning|null;datasetEvidenceContexts?:ReturnType<typeof readCandidateHomeContext>[];version:1;verifiedMetrics:SolutionMetricRef[];turns:SolutionTurn[];constraints:SolutionConstraint[];working:SolutionEvaluation[];analyses:HeadcountProjection[];rejected:{candidateId:string;revision:number;reason:string;turnId:string}[];questions:string[];focusCandidateId:string|null};
+export type SolutionState={recommendationRequestId?:string|null;requiredStaffing?:RequiredStaffingReview|null;hiringBudget?:HiringBudgetReview|null;businessPlanning?:BusinessPlanning|null;datasetEvidenceContexts?:ReturnType<typeof readCandidateHomeContext>[];version:1;verifiedMetrics:SolutionMetricRef[];turns:SolutionTurn[];constraints:SolutionConstraint[];working:SolutionEvaluation[];analyses:HeadcountProjection[];rejected:{candidateId:string;revision:number;reason:string;turnId:string}[];questions:string[];focusCandidateId:string|null};
 export type SolutionRequest={version:1;planningCalculatorAvailable?:boolean;requestId:string;goal:{id:string;statement:string};scope:string;filters:DashboardFilters;timeZone:string;evidence:unknown;goalContext:unknown;goalProgress?:unknown;progressEntry?:unknown;selectedId:string|null;catalog:PlanAlternatives|null;state:SolutionState;message:{id:string;text:string}};
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 function fail(message:string):never {throw Error(message);}
@@ -73,6 +73,8 @@ export function retainEvaluations(state:SolutionState,items:SolutionEvaluation[]
 export function readSolutionState(raw:unknown):SolutionState {
  if(raw===undefined||raw===null)return emptySolutionState();
  if(!validateJson(raw)||!obj(raw)||raw.version!==1||!Array.isArray(raw.turns)||raw.turns.length>32||!Array.isArray(raw.constraints)||raw.constraints.length>5||!Array.isArray(raw.working)||raw.working.length>12||!Array.isArray(raw.rejected)||raw.rejected.length>24||!Array.isArray(raw.questions)||raw.questions.length>2||!raw.questions.every(q=>text(q,300))||!(raw.focusCandidateId===null||id(raw.focusCandidateId)))fail('The working conversation could not be read. Saved plans are preserved.');
+ // Absent keeps legacy presentation; null explicitly demotes generic proposals after a specialist recommendation.
+ if(raw.recommendationRequestId!==undefined&&raw.recommendationRequestId!==null&&!id(raw.recommendationRequestId))fail('The current recommendation could not be read.');
  if(raw.datasetEvidenceContexts!==undefined){if(!Array.isArray(raw.datasetEvidenceContexts)||raw.datasetEvidenceContexts.length>16)fail('Evidence recipes exceed the supported limit.');raw.datasetEvidenceContexts.forEach(readCandidateHomeContext);}
  const state=raw as unknown as SolutionState;
  if(state.requiredStaffing!==undefined)state.requiredStaffing=readRequiredStaffingReview(state.requiredStaffing);

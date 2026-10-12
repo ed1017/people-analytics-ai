@@ -319,7 +319,7 @@ test("Career Growth AI is page-grounded and cannot fall back to generic tools", 
   );
   assert.match(
     source,
-    /page === "career-growth-mobility"[\s\S]*?\? \("none" as const\)/
+    /chatCalculationToolsAvailable\(page,summaryOnly\)/
   );
   assert.match(
     source,

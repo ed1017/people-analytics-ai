@@ -822,13 +822,13 @@ export type StructuralPositionCatalogResponse = {
 export type FinanceBusinessUnit = {
   org_code: string;
   org_name: string;
-  headcount: number;
-  fte: number;
-  labor_cost_usd: number;
-  cost_per_fte_usd: number;
-  vacant_positions: number;
-  estimated_vacancy_cost_exposure_usd: number;
-  share_of_enterprise_labor_cost_pct: number;
+  headcount: number | null;
+  fte: number | null;
+  labor_cost_usd: number | null;
+  cost_per_fte_usd: number | null;
+  vacant_positions: number | null;
+  estimated_vacancy_cost_exposure_usd: number | null;
+  share_of_enterprise_labor_cost_pct: number | null;
 };
 
 export type FinanceScenario = {
@@ -847,12 +847,12 @@ export type FinanceScenario = {
 export type FinanceResponse = {
   as_of: string;
   current: {
-    headcount: number;
-    fte: number;
-    labor_cost_usd: number;
-    cost_per_fte_usd: number;
-    vacant_positions: number;
-    estimated_vacancy_cost_exposure_usd: number;
+    headcount: number | null;
+    fte: number | null;
+    labor_cost_usd: number | null;
+    cost_per_fte_usd: number | null;
+    vacant_positions: number | null;
+    estimated_vacancy_cost_exposure_usd: number | null;
   };
   by_business_unit: FinanceBusinessUnit[];
   scenarios: FinanceScenario[];

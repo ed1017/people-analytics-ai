@@ -8,6 +8,8 @@ const messages=state=>state.turns.map(t=>({role:t.role,content:t.text}));
 const run=(body,steps)=>converseSolutions(body,fixtureRuntime(steps),new AbortController().signal);
 test('differently worded prose steps are reference-only; explanations, unknowns and the original answer survive',async()=>{
  const c=candidate(),reply=await run(solutionRequest(),[evaluate(c),final(prose,[c.id])]);
+ // Historical messages keep their original free-text response; no migration or rewrite.
+ reply.answer=prose;reply.state.turns.at(-1).text=prose;
  const before=JSON.stringify(reply.state),visible=messages(reply.state),p=solutionDiscussionPresentations(visible,reply.state).get(visible.at(-1));
  assert.match(p.reference,/Launch listening circles/);assert.doesNotMatch(p.discussion,/Launch listening|Commission a workload/);
  for(const text of ['does not establish a cause','Costs and population are unknown','Small trials'])assert.ok(p.discussion.includes(text));
@@ -83,3 +85,24 @@ test('reported assumptions paragraphs remain available with the plan without dup
  assert.doesNotMatch(split.discussion,/decisive condition|Which client-delivery/);assert.match(split.discussion,/Risk: capacity has not been verified/);
  assert.equal(splitPlanFollowUp('Could capacity be a risk?').discussion,'Could capacity be a risk?');
  });
+
+test('cross-domain recommendations demote prior cards, retain history and preserve factual focus and alternatives',async()=>{
+ const a=candidate('a'),b=candidate('b');b.name='Alternative workload review';
+ const first=await run(solutionRequest('Compare two approaches'),[evaluate(a),evaluate(b),final('Two requested alternatives.',['a','b'])]);
+ const follow=await run(solutionRequest('Explain the evidence only',false,first.state,2),[final('The evidence is not causal.')]);
+ assert.equal(solutionReviewPresentation(follow.state).recommended.id,'a');assert.deepEqual(solutionReviewPresentation(follow.state).alternatives.map(x=>x.id),['b']);
+ const request=solutionRequest('Propose a hiring approach',false,follow.state,3),runtime=fixtureRuntime([{name:'review_hiring_budget',args:{changes:[]}},input=>{
+  const reference=JSON.parse(input.findLast(x=>x.type==='function_call_output').output).planningGuidance.binding.reference;
+  return {...final(),answer:{findings:'Actual rates are unavailable.',decisionRationale:'Confirm a hiring cost basis.',caveats:['Availability remains unverified.'],recommendedPlan:{name:'Validate hiring costs',steps:['Request comparable quotes.'],calculationRefs:[reference]}}};
+ }]);runtime.natural={datasetToken:'fixture:0'};
+ const specialist=await converseSolutions(request,runtime,new AbortController().signal),view=solutionReviewPresentation(specialist.state);
+ assert.equal(view.recommended,null);assert.deepEqual(view.alternatives,[]);assert.deepEqual(view.earlier.map(x=>x.id),['a','b']);assert.equal(specialist.state.focusCandidateId,null);
+ const factual=await run(solutionRequest('Explain the cost uncertainty',false,specialist.state,4),[final('Comparable cost inputs remain unknown.')]);
+ assert.equal(solutionReviewPresentation(factual.state).recommended,null);assert.deepEqual(solutionReviewPresentation(factual.state).earlier.map(x=>x.id),['a','b']);
+ const c=candidate('c');c.goal.turnId='user-5';const again=await run(solutionRequest('Recommend a mentoring pilot instead',false,factual.state,5),[evaluate(c),final('Try the mentoring pilot.',['c'])]);
+ const current=solutionReviewPresentation(again.state);assert.equal(current.recommended.id,'c');assert.deepEqual(current.earlier.map(x=>x.id),['a','b']);assert.ok(again.state.hiringBudget,'specialist inputs are retained');
+ const recall=await run(solutionRequest('Return to the earlier mentoring alternative.',false,factual.state,6),[{...final('Review the earlier proposal in its original context.'),focusCandidateId:'a'}]);assert.equal(solutionReviewPresentation(recall.state).recommended.id,'a');
+ const {readSolutionState}=await import('../lib/home-solution-conversation.ts');assert.equal(solutionReviewPresentation(readSolutionState(JSON.parse(JSON.stringify(factual.state)))).recommended,null);
+ const legacy=structuredClone(first.state);delete legacy.recommendationRequestId;assert.equal(solutionReviewPresentation(legacy).recommended.id,'a');
+ assert.throws(()=>readSolutionState({...first.state,recommendationRequestId:12}),/current recommendation/);
+});

@@ -93,6 +93,7 @@ export function calculateHiringBudget(raw:HiringBudgetInput,datasetToken='unconn
   for(const row of rows)row.listedCost=round(input.hires!*((annualBasePerHire+input.annualAdditionalCostPerHire)*row.activeYearFraction+(row.month===input.arrivalDate!.slice(0,7)?input.recruitingFeePerHire:0)));
   if(rows.length)rows[rows.length-1].listedCost=round(rows[rows.length-1].listedCost!+listedCost-rows.reduce((sum,row)=>sum+row.listedCost!,0));
  }
+ const annualBasePayCeiling=positiveCount&&input.currency&&input.budget!==null&&activeYearFraction!==null&&activeYearFraction>0&&input.annualAdditionalCostPerHire!==null&&input.recruitingFeePerHire!==null?Math.floor(((input.budget/input.hires!-input.recruitingFeePerHire)/activeYearFraction-input.annualAdditionalCostPerHire)*100)/100:null;
  const complete=listedCost!==null&&input.otherCostsComplete===true&&input.ftePerHire!==null;
  const periodCost=complete?listedCost:null;
  const knownParts=activeYearFraction===null?[]:[
@@ -103,7 +104,7 @@ export function calculateHiringBudget(raw:HiringBudgetInput,datasetToken='unconn
  const knownSubtotal=listedCost??(positiveCount&&knownParts.length?round(input.hires!*knownParts.reduce((sum,cost)=>sum+cost,0)):null);
  const budgetStatus=input.currency&&input.budget!==null&&knownSubtotal!==null&&knownSubtotal>input.budget?'over':periodCost!==null&&input.budget!==null?'within':'unknown';
  const maxAffordableHires=complete&&perHire!==null&&perHire>0&&input.budget!==null?affordableHires(input.budget,perHire):null;
- return {input,salary,rateSource,annualBasePerHire,budgetPerHire,baseCost,knownSubtotal,listedCost,periodCost,budgetStatus,maxAffordableHires,activeYearFraction,annualRunRate:positiveCount&&annualBasePerHire!==null&&input.annualAdditionalCostPerHire!==null?round(input.hires!*(annualBasePerHire+input.annualAdditionalCostPerHire)):null,hiresInHorizon:activeYearFraction===null||!positiveCount?null:activeYearFraction>0?input.hires:0,rows,missing,limitations:[
+ return {input,salary,rateSource,annualBasePayCeiling,annualBasePerHire,budgetPerHire,baseCost,knownSubtotal,listedCost,periodCost,budgetStatus,maxAffordableHires,activeYearFraction,annualRunRate:positiveCount&&annualBasePerHire!==null&&input.annualAdditionalCostPerHire!==null?round(input.hires!*(annualBasePerHire+input.annualAdditionalCostPerHire)):null,hiresInHorizon:activeYearFraction===null||!positiveCount?null:activeYearFraction>0?input.hires:0,rows,missing,limitations:[
   'Budget per hire is an allowance for the specified budget period, not an annual salary or a market/company pay fact.',
   'Annual costs are divided by 12 and prorated by calendar days in each active month; recruiting cost is charged on arrival. All hires share the entered arrival date. The final month carries any cent-rounding residual.',
   'Later starts can reduce period cash but postpone staffing; they do not reduce the annual recurring rate. No ramp, attrition, salary growth or productivity effect is estimated.',

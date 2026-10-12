@@ -120,7 +120,7 @@ test('actual bundle POST distinguishes incomplete causes and preserves one bound
 test('domain demo reaches the actual route only after an explicit matching-page request',async()=>{
  const context={snapshotDate:'2026-09-30',country:'France',businessUnit:'Technology',level:'L2',headcount:12,fte:11,voluntaryTurnoverYtdPct:3,laborCostUsd:500000,openPositions:2,headcountGrowthPct:null,trendStart:null,trendEnd:null};
  for(const [page,message,include,summaryOnly=false] of [['attrition','Explain the synthetic projections',true],['talent-acquisition','Explain the simulated demo',false],['survey-sentiment','Explain the simulated models',true],['attrition','Predict exits for the selected cohort',false],['workforce','Explain the simulated demo',false],['attrition','Explain the simulated demo',false,true]]){
-  sandbox.__replies.push({status:'completed',output:[],output_text:'Synthetic harness response.'});
+  sandbox.__replies.push({status:'completed',output:[],output_text:summaryOnly?'Synthetic harness response.':JSON.stringify({answer:{discussion:'Synthetic harness response.'}})});
   const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page,context,message,summaryOnly,goalContext:{goal:'Review the synthetic demonstration'},history:[],syntheticDemo:{values:[999999999]}})}));assert.equal(response.status,200);const input=sandbox.__requests.at(-1).input;assert.equal(input.includes('SEPARATE CONSTRUCTED SYNTHETIC DEMONSTRATION'),include);assert.ok(!input.includes('999999999'));if(include){assert.match(input,/independent of the selected country/);assert.match(input,/No real-world accuracy/);assert.match(input,/Country: France/);}
  }
 });
@@ -214,7 +214,7 @@ test('actual Home POST supplies computed April directions after normalization an
 });
 test('ordinary answers share concise list guidance across analytical routes without changing explicit plans or goals',async()=>{
  for(const page of ['home','workforce','attrition','labor-market','development-planning']){
-  const answer='One finding.\n- A bounded fact. [W1]';sandbox.__replies.push({status:'completed',output:[],output_text:page==='home'?JSON.stringify({answer,next_step:'none',problem:null,problem_evidence:[],options:[],question:null,finding_followups:[]}):answer});
+  const answer='One finding.\n- A bounded fact. [W1]';sandbox.__replies.push({status:'completed',output:[],output_text:page==='home'?JSON.stringify({answer,next_step:'none',problem:null,problem_evidence:[],options:[],question:null,finding_followups:[]}):JSON.stringify({answer:{discussion:answer}})});
   const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page,message:'What does the available workforce evidence show?',context:{headcountGrowthPct:null},overviewBriefingContext:packets[1][1]})}));
   assert.equal(response.status,200,page);assert.match(sandbox.__requests.at(-1).instructions,/CONVERSATIONAL ANSWER FORMAT/);
  }
@@ -227,7 +227,7 @@ test('ordinary answers share concise list guidance across analytical routes with
  }
 });
 test('tool-continuation answer retains concise formatting instructions',async()=>{
- sandbox.__replies.push({id:'synthetic-tools',status:'completed',output:[{type:'function_call',name:'get_workforce',arguments:'{}',call_id:'synthetic-call'}],output_text:''},{status:'completed',output:[],output_text:'The requested tool evidence is unavailable.'});
+ sandbox.__replies.push({id:'synthetic-tools',status:'completed',output:[{type:'function_call',name:'get_workforce',arguments:'{}',call_id:'synthetic-call'}],output_text:''},{status:'completed',output:[],output_text:JSON.stringify({answer:{discussion:'The requested tool evidence is unavailable.'}})});
  const start=sandbox.__requests.length;
  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'workforce',message:'How many people are there?',context:{headcountGrowthPct:null}})}));
  assert.equal(response.status,200);assert.equal(sandbox.__requests.length,start+2);
@@ -348,4 +348,23 @@ test('actual POST retains only a bounded active objective across long chat, then
  // Invalid/cleared carry is authoritative despite a lagging older model window.
  state=completeHomePlanningTurn({key:'',messages:[]},'home',root,proposal);
  for(const invalid of [null,'Arbitrary saved objective',{},'x'.repeat(241)])await send('Or how about both?',false,invalid);
+});
+test('non-Home actual POST enforces typed planning outcomes with truthful tool capabilities',async()=>{
+ for(const page of ['finance','development-planning','labor-market','training-coaching','occupational-references']){
+  const body={page,message:'Recommend a practical plan with explicit assumptions.',context:{headcountGrowthPct:null}};
+  const outcome={unsupportedPlan:{reason:'Comparable costs and scope are unavailable.',decision:'Which currency and budget period govern this decision?',nextStep:'Confirm those two units with Finance, then compare the entered costs.'}};
+  sandbox.__replies.push({status:'completed',output:[],output_text:JSON.stringify({answer:outcome})});
+  const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}));
+  assert.equal(response.status,200);assert.match((await response.json()).answer,/Next step: Confirm/);
+  const sent=sandbox.__requests.at(-1);assert.equal(sent.text.format.name,'guided_chat_reply');assert.equal(sent.tool_choice,page==='finance'?'auto':'none');assert.equal(sent.instructions.includes('This response has no calculation tool'),page!=='finance');
+  sandbox.__replies.push({status:'completed',output:[],output_text:JSON.stringify({answer:'What is your budget?'})});
+  const invalid=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}));assert.notEqual(invalid.status,200);
+ }
+});
+test('ordinary Finance POST rejects valid discussion JSON from incomplete output without retry',async()=>{
+ const before=sandbox.__requests.length;
+ sandbox.__replies.push({status:'incomplete',incomplete_details:{reason:'max_output_tokens'},output:[],output_text:JSON.stringify({answer:{discussion:'Partial Finance explanation must not be persisted.'}})});
+ const response=await sandbox.module.exports.POST(new Request('http://synthetic.invalid/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({page:'finance',message:'Explain the budget variance.',context:{headcountGrowthPct:null}})}));
+ assert.notEqual(response.status,200);assert.equal(sandbox.__requests.length,before+1);
+ const body=await response.json();assert.equal(body.answer,undefined);assert.doesNotMatch(JSON.stringify(body),/Partial Finance explanation/);
 });

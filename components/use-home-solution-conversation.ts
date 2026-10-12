@@ -1,4 +1,5 @@
 'use client';
+import {prepareHiringPlan,hiringPlanFields,type HiringPlanSelection} from '@/lib/home-hiring-plan-save';
 import {currentHiringBudget,editHiringBudgetLocally} from '@/lib/home-hiring-budget';
 import type {HiringBudgetInput} from '@/lib/hiring-budget';
 import {readChatEvidenceSeries,type ChatEvidenceSeries} from '@/lib/chat-evidence-series';
@@ -22,10 +23,15 @@ import {progressEntryContext,retainProgressEntryProposal} from '@/lib/goal-progr
 import {captureGoalProgressInput} from '@/lib/goal-progress-conversation';
 import {homeConversationErrorMessage} from '@/lib/home-evidence-recovery.mjs';
 
-type Props={enabled:boolean;conversation:ProblemConversation;active:boolean;settled:boolean;evidence:unknown;planningContext?:()=>unknown;planningCalculatorAvailable?:()=>boolean;demandReviewRef?:RefObject<((review:DemandReview)=>void)|null>;scope:string;query:string;target:()=>BundleDiscussion|null;guided?:GuidedActionRegistry|null};
+type Props={enabled:boolean;conversation:ProblemConversation;active:boolean;settled:boolean;evidence:unknown;evidenceContext?:unknown;evidenceForMessage?:(text:string)=>unknown;planningContext?:()=>unknown;planningCalculatorAvailable?:()=>boolean;demandReviewRef?:RefObject<((review:DemandReview)=>void)|null>;scope:string;query:string;target:()=>BundleDiscussion|null;guided?:GuidedActionRegistry|null};
 const equal=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
+const hiringEditsMessage='Update the hiring estimate or explicitly discard its edits before reviewing or pinning.';
 export function useHomeSolutionConversation(props:Props){
  const answerSeries=useRef<ChatEvidenceSeries[]>([]);
+ const [hiringEdit,setHiringEdit]=useState<{key:string;dirty:boolean}|null>(null),hiringEditRef=useRef(hiringEdit);
+ function hiringInputsDirty(){return hiringEditRef.current?.dirty===true&&hiringEditRef.current.key===JSON.stringify(memoryRef.current.hiringBudget);}
+ function setHiringEditorDirty(key:string,dirty:boolean){if(!dirty)setNotice(current=>current===hiringEditsMessage?'':current);if(key!==JSON.stringify(memoryRef.current.hiringBudget))return;hiringEditRef.current={key,dirty};setHiringEdit({key,dirty});}
+ function requireReviewedHiringInputs(){if(hiringInputsDirty())throw Error(hiringEditsMessage);}
  const storage=useDecisionStorage(),[memory,setMemory]=useState<SolutionState>(emptySolutionState),[pending,setPending]=useState(false),[saving,setSaving]=useState(false),[notice,setNotice]=useState('');
  const controller=useRef<AbortController|null>(null),epoch=useRef(0),mounted=useRef(false),memoryRef=useRef(memory),currentProps=useRef(props);
  useLayoutEffect(()=>{currentProps.current=props;});
@@ -41,7 +47,7 @@ export function useHomeSolutionConversation(props:Props){
  // eslint-disable-next-line react-hooks/set-state-in-effect -- Goal/reset events select an isolated local conversation.
  useLayoutEffect(()=>{synchronize();},[identity]);
  const progressInput=captureGoalProgressInput(decisionStore,goal.id);
- const contextKey=JSON.stringify([goal,guideId,props.active,props.settled,props.scope,props.query,props.evidence,props.conversation.resetEpoch,props.conversation.issueEditor?.id,progressInput]);
+ const contextKey=JSON.stringify([goal,guideId,props.active,props.settled,props.scope,props.query,props.evidence,props.evidenceContext,props.conversation.resetEpoch,props.conversation.issueEditor?.id,progressInput]);
  const liveKey=useRef(contextKey);
  useLayoutEffect(()=>{if(liveKey.current!==contextKey){liveKey.current=contextKey;epoch.current++;controller.current?.abort();setPending(false);}},[contextKey]);
  function catalog():PlanAlternatives|null{
@@ -55,7 +61,7 @@ export function useHomeSolutionConversation(props:Props){
  function selectedPlanId(value:PlanAlternatives|null){const p=currentProps.current,target=p.target();return target?.goalId===p.conversation.activeGoalId&&value?.order.includes(target.id)?target.id:null;}
  function makeRequest(text:string):SolutionRequest{
   const p=currentProps.current,current=catalog(),params=new URLSearchParams(p.query),progress=captureGoalProgressInput(decisionStore,p.conversation.activeGoalId);
-  return readSolutionRequest({version:1,planningCalculatorAvailable:p.planningCalculatorAvailable?.()===true,requestId:crypto.randomUUID(),goal:{id:p.conversation.activeGoalId,statement:p.conversation.focusedIssue},scope:p.scope,filters:{country:params.get('country')||'all',org:params.get('org')||'all',level:params.get('level')||'all'},timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,evidence:p.evidence,goalContext:p.planningContext?.()?{goalContext:p.conversation.goalContext,scenarioReview:p.planningContext()}:p.conversation.goalContext,...(progress?{progressEntry:progressEntryContext(decisionStore,'context',[{id:'context',text}])?.previous??null}:{}),...(progress?{goalProgress:progress}:{}),selectedId:selectedPlanId(current),catalog:current,state:memoryRef.current,message:{id:crypto.randomUUID(),text}});
+  return readSolutionRequest({version:1,planningCalculatorAvailable:p.planningCalculatorAvailable?.()===true,requestId:crypto.randomUUID(),goal:{id:p.conversation.activeGoalId,statement:p.conversation.focusedIssue},scope:p.scope,filters:{country:params.get('country')||'all',org:params.get('org')||'all',level:params.get('level')||'all'},timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,evidence:p.evidenceForMessage?.(text)??p.evidence,goalContext:p.planningContext?.()?{goalContext:p.conversation.goalContext,scenarioReview:p.planningContext()}:p.conversation.goalContext,...(progress?{progressEntry:progressEntryContext(decisionStore,'context',[{id:'context',text}])?.previous??null}:{}),...(progress?{goalProgress:progress}:{}),selectedId:selectedPlanId(current),catalog:current,state:memoryRef.current,message:{id:crypto.randomUUID(),text}});
  }
  async function send(text:string){
   if(controller.current||saving)return;requireCurrent();const request=makeRequest(text),entryContext=progressEntryContext(decisionStore,request.requestId,[...request.state.turns.filter(t=>t.role==='user').map(({id,text})=>({id,text})),request.message]),captured=++epoch.current,key=liveKey.current,scenario=JSON.stringify(currentProps.current.planningContext?.()??null),abort=new AbortController();controller.current=abort;answerSeries.current=[];setPending(true);setNotice('');
@@ -77,7 +83,7 @@ export function useHomeSolutionConversation(props:Props){
   try{
    requireCurrent();const request=makeRequest(item.message.text);request.requestId=item.requestId;request.message=item.message;
    const p=currentProps.current,key=liveKey.current,initialEpoch=epoch.current,scenario=JSON.stringify(p.planningContext?.()??null),desired={id:p.conversation.activeGoalId||p.guided?.goalId||crypto.randomUUID(),statement:p.conversation.focusedIssue||goalStatement.trim()};
-   const outcome=await saveSolutionCandidate(request,request.catalog,item,desired,p.evidence,acknowledge);
+   const outcome=await saveSolutionCandidate(request,request.catalog,item,desired,request.evidence,acknowledge);
    const snapshot=requireCurrent();if(key!==liveKey.current||initialEpoch!==epoch.current||scenario!==JSON.stringify(currentProps.current.planningContext?.()??null)||!equal(request.catalog,catalog()))throw Error('The conversation changed while reviewing selection. Try again against the current context.');
    if(outcome.status!=='ready')throw Error('The proposal needs further review.');
    const selected=associatePlanProposal(outcome.catalog,outcome.catalog,outcome.plan.id,{inputKey:outcome.plan.result.inputKey,attachmentId:outcome.plan.requestId!,at:new Date().toISOString(),acknowledgeUnknowns:acknowledge});
@@ -107,7 +113,7 @@ export function useHomeSolutionConversation(props:Props){
    const revised=await editSolutionPlanningInputs(request,item,changes);requireCurrent();
    if(key!==liveKey.current||captured!==epoch.current||snapshot.data.revision!==decisionStore.getSnapshot().data.revision||!equal(request.catalog,catalog()))throw Error('The conversation changed. Review the current proposal before editing.');
    if(revised.blocking.length)throw Error(revised.blocking.join(' '));
-   const state=structuredClone(memoryRef.current);state.working=retainEvaluations(state,[revised]);state.verifiedMetrics=[];state.focusCandidateId=revised.id;state.constraints=revised.constraints;
+   const state=structuredClone(memoryRef.current);state.working=retainEvaluations(state,[revised]);state.verifiedMetrics=[];state.focusCandidateId=revised.id;state.recommendationRequestId=revised.requestId;state.constraints=revised.constraints;
    state.turns=[...state.turns,{id:request.message.id,role:'user' as const,text:request.message.text}].slice(-32);
    persist(readSolutionState(state));setNotice('Planning assumptions recalculated. Review before pinning; inputs remain unverified.');
   }catch(error){setNotice((error as Error).message);}finally{setSaving(false);}
@@ -123,6 +129,22 @@ export function useHomeSolutionConversation(props:Props){
   const previous=inputs===null?null:currentHiringBudget(makeRequest('Edit the hiring estimate.'),decisionStore.getDatasetToken());
   if(inputs!==null&&!previous)throw Error('The hiring estimate changed.');
   persist({...memoryRef.current,hiringBudget:inputs===null?null:editHiringBudgetLocally(previous!,inputs)});
+ }
+ async function reviewHiringPlan(externalHires:number){
+  requireReviewedHiringInputs();
+  const snapshot=requireCurrent(),request=makeRequest('Review the hiring route.'),review=currentHiringBudget(request,decisionStore.getDatasetToken());if(!review)throw Error('The hiring estimate changed.');
+  const key=JSON.stringify(review),revision=snapshot.data.revision,context=liveKey.current,initialEpoch=epoch.current;
+  const goal={id:request.goal.id||crypto.randomUUID(),statement:request.goal.statement||`Cover ${review.inputs.hires} ${review.inputs.role??'workforce'} roles within the reviewed budget period.`};
+  const selection=await prepareHiringPlan(review,externalHires,goal);requireCurrent();requireReviewedHiringInputs();
+  if(context!==liveKey.current||initialEpoch!==epoch.current||JSON.stringify(currentHiringBudget(makeRequest('Review the hiring route.'),decisionStore.getDatasetToken()))!==key||decisionStore.getSnapshot().data.revision!==revision)throw Error('The estimate changed. Review the current hiring route.');
+  return {selection,key,revision,context,epoch:initialEpoch};
+ }
+ async function saveHiringPlan(review:{selection:HiringPlanSelection;key:string;revision:number;context:string;epoch:number}){
+  if(saving||pending)return;setSaving(true);setNotice('');
+  try{requireReviewedHiringInputs();const snapshot=requireCurrent();if(review.context!==liveKey.current||review.epoch!==epoch.current||snapshot.data.revision!==review.revision||JSON.stringify(currentHiringBudget(makeRequest('Review the hiring route.'),decisionStore.getDatasetToken()))!==review.key)throw Error('The hiring inputs changed. Review the current route.');
+   const fields=hiringPlanFields(review.selection,catalog(),'hiring-choice-'+crypto.randomUUID(),new Date().toISOString()),state=structuredClone(memoryRef.current);
+   currentProps.current.conversation.selectProposalGoal(review.selection.goal,snapshot.data.revision,{...fields,[solutionConversationField]:state} as unknown as Record<string,Json>);memoryRef.current=state;setMemory(state);setNotice('Reviewed hiring plan saved with its exact cost receipt. Internal availability and full mixed-route costs remain unknown.');
+  }catch(error){setNotice(error instanceof Error?error.message:'The reviewed hiring plan could not be saved.');}finally{setSaving(false);}
  }
  function clearBusinessPlanning(){try{requireCurrent();persist({...memoryRef.current,businessPlanning:null});}catch(error){setNotice((error as Error).message);}}
  function currentBusinessState(){return currentBusinessPlanning(makeRequest('Review the current provisional staffing option.'),decisionStore.getDatasetToken());}
@@ -142,5 +164,5 @@ export function useHomeSolutionConversation(props:Props){
   }catch(error){setNotice((error as Error).message);}finally{setSaving(false);}
  }
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
- return {editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }

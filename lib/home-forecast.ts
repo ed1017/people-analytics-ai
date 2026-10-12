@@ -8,7 +8,7 @@ import {homeForecastIntent,type HomeForecastDomain} from './home-forecast-intent
 // @ts-expect-error Native Node tests share TypeScript source.
 import {resolveSyntheticDomainDemo,formatDemoValue,demoDomainCopy,demoMethodLabels} from './synthetic-domain-demo.ts';
 
-const destinations:Record<HomeForecastDomain,string>={turnover:'[Attrition](app:attrition)',hiring:'[Talent Acquisition](app:talent-acquisition)',satisfaction:'[Survey Sentiment](app:survey-sentiment)'};
+const destinations:Record<HomeForecastDomain,string>={turnover:'[Attrition](app:attrition)',hiring:'[Talent Acquisition](app:talent-acquisition)',satisfaction:'[Employee Listening](app:survey-sentiment)'};
 const month=(value:string)=>new Date(value+'-01T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'});
 const scope='**SIMULATED DEMO — fixed simulated company-wide population.** These precomputed results are separate from recorded workforce data, dashboard filters and your goal. They cannot supply a filtered planning baseline, avoided exits, capacity, savings, ROI or an intervention effect.';
 /** Read-only projection of server-owned verified evidence. Never calculates, calls a model or takes request-supplied evidence. */

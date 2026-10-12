@@ -12,6 +12,12 @@ const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const output=await fs.mkdtemp(path.join(os.tmpdir(),'plan-quick-summary-'));
 const cases=['known','partial','unknown'].map(summaryFixture);const scenario=summaryFixture();scenario.name='scenario';scenario.result.conditionalCoverage=[0,1,2,3,4,5];cases.push(scenario);const empty=summaryFixture();empty.name='all-unknown';empty.result=null;cases.push(empty);
 const mixedInput=await mixedPlanningFixture(),mixedResult=await evaluateSolutionCandidate(mixedInput.request,mixedInput.c,[]);assert.deepEqual(mixedResult.blocking,[]);cases.push({name:'mixed-recurring',draft:mixedResult.draft,result:mixedResult.result});
+const {prepareHiringPlan}=await import('../../lib/home-hiring-plan-save.ts');
+const {editHiringBudget}=await import('../../lib/home-hiring-budget.ts');
+const {solutionRequest}=await import('../fixtures/home-solution-conversation.mjs');
+const hiringRequest=solutionRequest('Explicit fictional hiring assumptions.'),basis={kind:'user-supplied',turnId:hiringRequest.message.id,quote:hiringRequest.message.text,explanation:'Offline fixture.'};
+const hiringReview=editHiringBudget(hiringRequest,'fixture:0',Object.entries({role:'engineer',hires:10,budget:1000000,currency:'USD',startMonth:'2027-01',months:12,arrivalDate:'2027-01-01',ftePerHire:1,annualBasePay:120000,payBasis:'per_hire',annualAdditionalCostPerHire:24000,recruitingFeePerHire:10000}).map(([field,value])=>({field,value,basis})));
+const hiring=await prepareHiringPlan(hiringReview,6,{id:'goal-1',statement:'Cover 10 engineering roles within the reviewed budget.'});cases.push({name:'hiring',draft:hiring.draft,result:hiring.result});
 const compiler=webpackPackage.webpack({mode:'development',devtool:false,plugins:[new webpackPackage.webpack.DefinePlugin({'process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION':JSON.stringify('true'),'process.env.NEXT_PUBLIC_GOAL_PROGRESS':JSON.stringify('true'),'process.env.NEXT_PUBLIC_HOME_STRUCTURED_PLANS':JSON.stringify('false')})],entry:path.resolve('tests/fixtures/plan-quick-summary-client.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
 const css=(await postcss([tailwind({base:process.cwd()})]).process(await fs.readFile('app/globals.css','utf8'),{from:path.resolve('app/globals.css')})).css;
@@ -42,6 +48,13 @@ try{for(const [mode,width,height] of [['desktop',1200,1000],['phone',390,844]]){
  check('summary precedes goal and controls',await known.getByRole('region',{name:'Action Plan quick summary'}).evaluate(node=>Boolean(node.compareDocumentPosition(node.parentElement.querySelector('button'))&Node.DOCUMENT_POSITION_FOLLOWING)));
  await known.screenshot({path:path.join(output,mode+'-known.png')});await partial.screenshot({path:path.join(output,mode+'-partial.png')});await unknown.screenshot({path:path.join(output,mode+'-unknown.png')});
  if(mode==='desktop'){await known.evaluate(node=>node.style.width='350px');const positions=await sections.evaluateAll(nodes=>nodes.map(node=>node.getBoundingClientRect().y));check('resized narrow panel stacks even on desktop',positions[1]>positions[0]);await known.screenshot({path:path.join(output,'desktop-narrow-panel.png')});}
+ const hiringCard=page.getByRole('article',{name:'hiring',exact:true}),hiringSummary=hiringCard.getByRole('region',{name:'Action Plan quick summary'});
+ const hiringSections=hiringSummary.locator(':scope > div > section');
+ const hiringTops=await hiringSections.evaluateAll(nodes=>nodes.map(node=>node.getBoundingClientRect().y));
+ check('hiring uses readable cost time resource columns when space permits',mode==='desktop'?hiringTops.every(y=>y===hiringTops[0]):hiringTops[1]>hiringTops[0]);
+ check('hiring preserves checked subtotal and unresolved roles',await hiringSummary.innerText().then(text=>text.includes('$924,000 USD · partial')&&text.includes('4 roles unresolved')&&text.includes('affordability: Unknown'))&&await hiringSummary.evaluate(node=>parseFloat(getComputedStyle(node).fontSize)>=16));
+ if(mode==='desktop'){await hiringCard.evaluate(node=>node.style.width='350px');const tops=await hiringSections.evaluateAll(nodes=>nodes.map(node=>node.getBoundingClientRect().y));check('hiring stacks in a narrow desktop pane without clipping',tops[1]>tops[0]&&await hiringCard.evaluate(node=>node.scrollWidth<=node.clientWidth));}
+ await hiringCard.screenshot({path:path.join(output,mode+'-hiring.png')});
  check('no overflow, runtime errors or network calls',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&external===0);await context.close();
 }}finally{await browser.close()}
 await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({checks},null,2));console.log(JSON.stringify({checks:checks.length,output}));

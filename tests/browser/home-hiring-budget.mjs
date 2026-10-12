@@ -26,7 +26,21 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
   if(url.pathname==='/api/home-solution-conversation'){
    const body=req.postDataJSON();requests.push(body);const basis={kind:'user-supplied',turnId:body.message.id,quote:body.message.text,explanation:'Offline fixture interpretation of the user request.'};
    let steps=body.state.hiringBudget?[{name:'review_hiring_budget',args:{changes:[]}},final('The entered scenario is conditional; confirm the salary and hiring schedule.')]:[{name:'review_hiring_budget',args:{changes:[{field:'hires',value:10,basis},{field:'budget',value:1000000,basis},{field:'role',value:'Engineers',basis}]}},final('Confirm the cost basis and timing before committing. The estimate shows the allowance per hire.')];
-   if(body.message.text==='Recommend a plan'){const c=candidate();c.goal.turnId=body.message.id;steps=[evaluate(c),final('Begin with a bounded trial.\n\n### Further reading / investigation\nReview the actual cost inputs before approval.',[c.id])];}
+   if(body.message.text==='Propose a hiring scenario for 10 engineers with a $1 million cap'){
+    const proposed={kind:'model-proposed',turnId:null,quote:null,explanation:'Illustrative budget sensitivity input for review, not a company cost or salary.'};
+    const values={currency:'USD',months:12,startMonth:'2027-01',arrivalDate:'2027-01-01',ftePerHire:1,payBasis:'per_hire',annualAdditionalCostPerHire:20000,recruitingFeePerHire:10000};
+    steps=[{name:'review_hiring_budget',args:{changes:[{field:'hires',value:10,basis},{field:'budget',value:1000000,basis},...Object.entries(values).map(([field,value])=>({field,value,basis:proposed}))]}},input=>{
+     const ref=JSON.parse(input.findLast(x=>x.type==='function_call_output').output).planningGuidance.binding.reference;
+     return {...final(),answer:{findings:'Actual salaries and availability remain unknown.',decisionRationale:'Screen comparable quotes against the conditional ceiling before committing.',caveats:['Currency, timing and non-base costs are unconfirmed scenario assumptions.'],recommendedPlan:{name:'Validate the hiring route',steps:['Confirm the proposed budget period with Finance.','Request comparable quotes and review full costs.'],calculationRefs:[ref]}}};
+    }];
+   }
+   if(body.message.text==='Recommend a plan'){const c=candidate('mentoring-'+requests.length);c.goal.turnId=body.message.id;steps=[evaluate(c),final('Begin with a bounded trial.\n\n### Further reading / investigation\nReview the actual cost inputs before approval.',[c.id])];}
+   if(body.message.text==='Compare two pilot alternatives'){const a=candidate('pilot-a-'+requests.length),b=candidate('pilot-b-'+requests.length);a.goal.turnId=b.goal.turnId=body.message.id;b.name='Workload review alternative';steps=[evaluate(a),evaluate(b),final('The alternatives test different mechanisms.',[a.id,b.id])];}
+   if(['Explain the recommendation.','Explain the hiring assumptions.'].includes(body.message.text))steps=[final('These remain unconfirmed assumptions; the evidence does not establish effectiveness.')];
+   if(body.message.text==='Review the fully specified hiring case: 10 engineers, USD1000000, Jan-Dec2027, Jan1 arrival, 1FTE, annual salary120000, extras24000 and recruiting10000 each.'){
+    const values={role:'engineer',hires:10,budget:1000000,currency:'USD',startMonth:'2027-01',months:12,arrivalDate:'2027-01-01',ftePerHire:1,annualBasePay:120000,payBasis:'per_hire',annualAdditionalCostPerHire:24000,recruitingFeePerHire:10000};
+    steps=[{name:'review_hiring_budget',args:{changes:Object.entries(values).map(([field,value])=>({field,value,basis}))}},input=>{const ref=JSON.parse(input.findLast(x=>x.type==='function_call_output').output).planningGuidance.binding.reference;return {...final(),answer:{findings:'Ten external hires exceed the cap; internal costs and availability remain unknown.',decisionRationale:'Review a smaller external route before committing to unresolved internal coverage.',caveats:['No internal release or full mixed-route affordability is established.'],recommendedPlan:{name:'Review the conditional hiring route',steps:['Review the external count and exact costs.','Confirm remaining-role coverage and internal costs before commitment.'],calculationRefs:[ref]}}};}];
+   }
    const runtime=fixtureRuntime(steps);runtime.natural={datasetToken:'legacy-v1:0'};return route.fulfill({json:await converseSolutions(body,runtime,new AbortController().signal)});
   }
   if(url.pathname.startsWith('/api/'))return route.fulfill({json:{overview:{headcount:100,fte:100,open_positions:3,snapshot_date:'2026-09-30'},trend:[]}});external++;return route.abort();
@@ -61,6 +75,76 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  check('existing checked-plan review remains available after clearing the estimate',await review.getByLabel('Recommendation summary',{exact:true}).count()===1);
  const quick=review.getByRole('region',{name:'Action Plan quick summary',exact:true});
  check('PR201 cost timeline and resource summary remains present',await quick.count()===1&&await quick.getByRole('region',{name:'Total cost',exact:true}).isVisible()&&await quick.getByRole('region',{name:'Timeline',exact:true}).isVisible()&&await quick.getByRole('region',{name:'Resources',exact:true}).isVisible());
+ await send('Propose a hiring scenario for 10 engineers with a $1 million cap');await card.waitFor();
+ check('specialist recommendation demotes the prior generic card',await review.getByRole('article').filter({hasText:'Recommended Action Plan'}).count()===0);
+ check('unconfirmed scenario shows a checked ceiling without inventing salary',(await card.innerText()).includes('Model-proposed scenario assumptions')&&(await card.innerText()).includes('70,000 USD')&&(await card.innerText()).includes('Budget check: Unknown'));
+ await card.getByText('Edit inputs and salary override',{exact:true}).click();
+ check('proposed inputs remain editable and salary stays blank',await card.getByRole('combobox',{name:'Currency',exact:true}).inputValue()==='USD'&&await card.getByLabel('Annual base pay override',{exact:true}).inputValue()==='');
+ const history=review.locator('details').filter({has:page.locator('summary').filter({hasText:/^Earlier proposals/})}).first();
+ await history.locator('summary').first().click();
+ check('earlier generic proposal remains accessible without recommendation styling',await history.getByRole('article').count()===1&&!((await history.innerText()).includes('Recommended Action Plan')));
+ await history.locator('summary').first().click();
+ await send('Explain the hiring assumptions.');
+ check('specialist factual followup does not revive the generic recommendation',await review.getByRole('article').filter({hasText:'Recommended Action Plan'}).count()===0&&(await readState()).exploration.fields.homeSolutionConversationV1.recommendationRequestId===null);
+ await page.reload();await card.waitFor();
+ check('reload retains specialist focus and accessible generic history',await review.getByRole('article').filter({hasText:'Recommended Action Plan'}).count()===0&&await review.getByText('Earlier proposals (1)',{exact:true}).count()===1);
+ await send('Recommend a plan');
+ check('specialist to generic transition has one current recommendation and retains the estimate',await review.getByRole('article').filter({hasText:'Recommended Action Plan'}).count()===1&&await card.count()===1);
+ const focus=(await readState()).exploration.fields.homeSolutionConversationV1.focusCandidateId;
+ await send('Explain the recommendation.');
+ check('generic factual followup preserves the current recommended candidate',await review.getByRole('article').filter({hasText:'Recommended Action Plan'}).count()===1&&(await readState()).exploration.fields.homeSolutionConversationV1.focusCandidateId===focus);
+ await send('Compare two pilot alternatives');
+ const alternativeSummary=review.getByText(/^Alternative Action Plan \d+: Workload review alternative$/);
+ check('requested alternative starts collapsed and remains discoverable',await alternativeSummary.isVisible()&&await alternativeSummary.evaluate(node=>!node.parentElement.open));
+ await alternativeSummary.click();
+ check('explicit alternatives remain separate beside one recommendation',await review.getByRole('article').filter({hasText:'Recommended Action Plan'}).count()===1&&await review.getByRole('article').filter({hasText:'Workload review alternative'}).count()===1);
+ await send('Explain the recommendation.');
+ check('factual followup preserves requested alternatives',await review.getByRole('article').filter({hasText:'Workload review alternative'}).count()===1);
+ await send('Propose a hiring scenario for 10 engineers with a $1 million cap');
+ check('switching from alternatives to a specialist demotes all generic cards',await review.getByRole('article').filter({hasText:'Recommended Action Plan'}).count()===0&&await review.getByText('Earlier proposals (4)',{exact:true}).count()===1);
+ check('cross-domain transitions retain mobile layout and browser safety',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&external===0);
+ await send('Review the fully specified hiring case: 10 engineers, USD1000000, Jan-Dec2027, Jan1 arrival, 1FTE, annual salary120000, extras24000 and recruiting10000 each.');
+ check('fully specified case retains checked ten-hire external subtotal',(await card.innerText()).includes('1,540,000 USD'));
+ await page.getByText('Review hiring route as an Action Plan',{exact:true}).click();
+ await page.getByLabel('External hires in the reviewed route',{exact:true}).fill('6');await page.getByRole('button',{name:'Review hiring plan',exact:true}).click();
+ const hiringPlan=page.getByRole('region',{name:'Reviewed hiring plan',exact:true});await hiringPlan.waitFor();
+ check('route review carries known subtotal period and resources without full affordability',(await hiringPlan.innerText()).includes('$924,000')&&(await hiringPlan.innerText()).includes('$76,000')&&(await hiringPlan.innerText()).includes('Required: 10 roles')&&(await hiringPlan.innerText()).includes('6 FTE')&&(await hiringPlan.innerText()).includes('2027-12-31')&&(await hiringPlan.innerText()).includes('affordability: Unknown'));
+ const prePin=await readState();check('review alone does not pin a goal',!prePin.goals.activeId);
+ const routeCount=page.getByLabel('External hires in the reviewed route',{exact:true}),reviewButton=page.getByRole('button',{name:'Review hiring plan',exact:true});
+ await page.evaluate(()=>{window.__holdHiringReview=true;});await reviewButton.click();await page.waitForFunction(()=>typeof window.__releaseHiringReview==='function');
+ check('route count is locked during an asynchronous review',await routeCount.isDisabled());
+ await assert.rejects(routeCount.fill('8',{timeout:300}),/not enabled|Timeout/);
+ await page.evaluate(()=>{window.__holdHiringReview=false;window.__releaseHiringReview();delete window.__releaseHiringReview;});await page.waitForFunction(()=>!document.querySelector('input[max="10"]').disabled);
+ check('delayed completion retains the displayed six-hire receipt',await routeCount.inputValue()==='6'&&(await hiringPlan.innerText()).includes('$924,000'));
+ await routeCount.fill('8');check('changing the reviewed count removes the old receipt and pin action',await hiringPlan.count()===0&&await page.getByRole('button',{name:'Pin hiring plan with unknowns',exact:true}).count()===0);
+ await routeCount.fill('10');await reviewButton.click();await page.getByRole('alert').filter({hasText:'Known hiring costs exceed the budget.'}).waitFor();
+ check('known over-budget route cannot reach the pin action',await hiringPlan.count()===0&&!(await readState()).goals.activeId);
+ await routeCount.fill('6');await reviewButton.click();await hiringPlan.waitFor();
+ await card.getByText('Edit inputs and salary override',{exact:true}).click();await card.getByLabel('Annual base pay override',{exact:true}).fill('130000');
+ const pinButton=hiringPlan.getByRole('button',{name:'Pin hiring plan with unknowns',exact:true});
+ check('unsaved salary edits block sibling review and pin',await reviewButton.isDisabled()&&await pinButton.isDisabled());
+ await page.evaluate(()=>window.__hiringFixture.saveHiringPlan(window.__lastHiringReview));
+ const dirtyReviewError=await page.evaluate(async()=>{try{await window.__hiringFixture.reviewHiringPlan(6);return '';}catch(e){return e.message;}});
+ check('controller also refuses stale review and pin while the editor is dirty',dirtyReviewError.includes('explicitly discard')&&!(await readState()).goals.activeId);
+ await card.getByRole('button',{name:'Discard estimate edits',exact:true}).click();
+ check('explicit discard restores the receipt and original salary',!await pinButton.isDisabled()&&await card.getByLabel('Annual base pay override',{exact:true}).inputValue()==='120000');
+ await card.getByLabel('Hire arrival date',{exact:true}).fill('2027-02-01');
+ check('unsaved timing edits also block review and pin',await reviewButton.isDisabled()&&await pinButton.isDisabled());
+ await card.getByRole('button',{name:'Discard estimate edits',exact:true}).click();
+ await card.getByLabel('Annual base pay override',{exact:true}).fill('125000');await card.getByRole('button',{name:'Update estimate',exact:true}).click();
+ check('updating the estimate invalidates the old reviewed receipt',await hiringPlan.count()===0);
+ await reviewButton.click();await hiringPlan.waitFor();check('updated salary is used in the new review',(await hiringPlan.innerText()).includes('$954,000'));
+ await card.getByText('Edit inputs and salary override',{exact:true}).click();await card.getByLabel('Annual base pay override',{exact:true}).fill('120000');await card.getByRole('button',{name:'Update estimate',exact:true}).click();await reviewButton.click();await hiringPlan.waitFor();
+ check('review controls remain within the viewport without browser errors',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&external===0);
+ await page.screenshot({path:path.join(output,mode+'-review.png'),fullPage:true});
+
+ await hiringPlan.getByRole('button',{name:'Pin hiring plan with unknowns',exact:true}).click();await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key)).payload.goals.activeId,DECISIONS_STORAGE_KEY).catch(async error=>{console.log('PIN DIAGNOSTIC',await page.getByRole('status').allTextContents());throw error;});
+ const pinned=await readState(),pinnedId=pinned.goals.activeId,snapshot=pinned.workspaces[pinnedId].fields.homePlanAlternativesV1;
+ check('pin retains the exact native receipt and partial-cost plan',!!pinnedId&&JSON.stringify(snapshot).includes('924000')&&JSON.stringify(snapshot).includes('annualBasePay'));
+ await page.reload();await page.getByText('Saved Action Plans',{exact:true}).click();
+ const reopened=page.getByRole('article',{name:'Action Plan option 1',exact:true});await reopened.waitFor();
+ check('saved plan reopen retains known costs and resource basis',(await reopened.innerText()).includes('$924,000')&&(await reopened.innerText()).includes('Required: 10 roles')&&(await reopened.innerText()).includes('6 FTE'));
+ check('reopen preserves complete saved bytes',JSON.stringify((await readState()).workspaces[pinnedId].fields.homePlanAlternativesV1)===JSON.stringify(snapshot));
  await context.close();
 }}finally{await browser.close()}
 await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({checks},null,2));console.log(JSON.stringify({checks:checks.length,output}));
