@@ -9,6 +9,11 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import {createRequire} from 'node:module';
 import * as releaseModule from '../lib/compensation-release.ts';
 import * as rangeModule from '../lib/compensation-ranges.ts';
+import * as rangeContext from '../lib/compensation-range-context.ts';
+import * as releaseContext from '../lib/compensation-release-context.ts';
+import * as datasetClient from '../lib/dataset-client.mjs';
+import {withDatasetRequest} from '../lib/dataset-runtime.ts';
+import {DATASET_HEADER,LEGACY_DATASET_TOKEN} from '../lib/dataset-identity.mjs';
 const {makeDemoRange, rangesForScope, aggregateJobCompa, defaultRangeScope} = rangeModule;
 
 const catalog = {jobs: [{job_profile_code:'existing-a',job_profile_name:'Existing A'},{job_profile_code:'existing-b',job_profile_name:'Existing B'}], levels:[{level_code:'L1',level_rank:1},{level_code:'L2',level_rank:2}],combinations:[{org_code:'BU1',job_profile_code:'existing-a',level_code:'L1'}]};
@@ -52,16 +57,21 @@ test('small eligible and missing cells withhold counts and metrics; larger missi
 
 const source=fs.readFileSync(new URL('../app/api/compensation-ranges/route.ts',import.meta.url),'utf8');
 const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-async function route(resultOverrides={}) {
+async function route(resultOverrides={},token=LEGACY_DATASET_TOKEN) {
   const calls=[], exports={};
   const results={job_profiles:{data:catalog.jobs,count:2,error:null},position_action_structural_inventory:{data:[{...catalog.combinations[0],level_rank:1}],count:1,error:null},...resultOverrides};
-  vm.runInNewContext(code,{exports,Response,require:()=>({supabaseServer:{from:name=>({select:async columns=>{calls.push([name,columns]);return results[name];}})}})});
-  return {response:await exports.GET(),calls};
+  vm.runInNewContext(code,{exports,Response,require:name=>{
+    if(name==='@/lib/dataset-runtime')return {withDatasetRequest};
+    if(name==='../../../lib/supabase-server')return {supabaseServer:{from:name=>({select:async columns=>{calls.push([name,columns]);return results[name];}})}};
+    throw Error('Unexpected module '+name);
+  }});
+  return {response:await exports.GET(new Request('http://local/api/compensation-ranges',{headers:{[DATASET_HEADER]:token}})),calls};
 }
 test('catalog route allowlists metadata, rejects truncated responses, sanitizes failures',async()=>{
   const {response,calls}=await route();
-  assert.equal(response.status,200); assert.equal(response.headers.get('cache-control'),'no-store');
+  assert.equal(response.status,200); assert.equal(response.headers.get('cache-control'),'no-store');assert.equal(response.headers.get(DATASET_HEADER),LEGACY_DATASET_TOKEN);
   assert.equal((await response.json()).jobs.length,2);
+  const stale=await route({},'legacy-v1:1');assert.equal(stale.response.status,409);assert.equal(stale.calls.length,0);
   assert.deepEqual(calls,[['job_profiles','job_profile_code, job_profile_name'],['position_action_structural_inventory','org_code, job_profile_code, level_code, level_rank']]);
   for(const result of [{data:catalog.jobs,count:3,error:null},{data:catalog.jobs,count:null,error:null},{data:null,error:{message:'PRIVATE'}}]) {
     const {response}=await route({job_profiles:result}); assert.equal(response.status,503); assert.doesNotMatch(await response.text(),/PRIVATE/);
@@ -72,7 +82,7 @@ test('compact graph marks actual means, keeps a 100% reference, and hides suppre
   const file=new URL('../components/compensation-job-ranges.tsx',import.meta.url);
   const js=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
   const exports={}, require=createRequire(import.meta.url);
-  vm.runInNewContext(js,{exports,require:name=>name==='@/components/assumptions-disclosure'?{AssumptionsDisclosure}:name==='@/lib/compensation-ranges'?rangeModule:name==='@/lib/compensation-release'?releaseModule:require(name)});
+  vm.runInNewContext(js,{exports,require:name=>name==='@/components/assumptions-disclosure'?{AssumptionsDisclosure}:name==='@/lib/dataset-client.mjs'?datasetClient:name==='@/lib/compensation-range-context'?rangeContext:name==='@/lib/compensation-release-context'?releaseContext:name==='@/lib/compensation-ranges'?rangeModule:name==='@/lib/compensation-release'?releaseModule:require(name)});
   const render=result=>renderToStaticMarkup(React.createElement(exports.JobCompaGraph,{result}));
   assert.match(render({status:'published',meanPct:105}),/105.0%/);
   assert.match(render({status:'published',meanPct:105}),/<circle/);
