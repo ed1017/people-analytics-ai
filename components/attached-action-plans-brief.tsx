@@ -1,5 +1,6 @@
 "use client";
 import {HomePlanSummary} from './home-plan-summary';
+import {planBudgetText} from '@/lib/home-plan-revisions';
 import {readPlanAlternatives} from '@/lib/home-plan-alternatives';
 import {PlanAlternativeCard} from '@/components/plan-alternative-card';
 import {PlanDirections} from '@/components/plan-directions';
@@ -18,7 +19,7 @@ export function AttachedActionPlansBrief({raw,alternatives,goalId,goal,onReview}
    <p>Attached {item.attachedAt.slice(0,10)} · {superseded.has(item.id)?'Previous attached version':'Latest attached version'}</p>
    {draft.binding.goal!==goal&&<p className="font-medium">Goal wording has changed since this attachment.</p>}
    {edited&&!superseded.has(item.id)&&<p>A different working draft is saved on Home. This attachment has not been replaced by that draft.</p>}
-   <HomePlanSummary draft={draft} result={result}/>
+   <HomePlanSummary draft={draft} result={result} savedBudgetText={result.budget?planBudgetText(result):undefined}/>
    <PlanDirections draft={draft} snapshot/>
    {measure?.baseline.basis&&<p className="break-words text-xs">Saved baseline provenance: {measure.baseline.basis}</p>}
    <details><summary className="min-h-11 cursor-pointer py-2 font-medium">Saved assumptions, activities and unknowns</summary><div className="space-y-3 pt-2">

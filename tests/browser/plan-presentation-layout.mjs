@@ -13,7 +13,6 @@ import {evaluate,final,fixtureRuntime} from '../fixtures/home-solution-conversat
 import {accountabilityMessage,accountabilityCandidate} from '../fixtures/plan-accountability.mjs';
 import {DECISIONS_STORAGE_KEY,encodeDecisions} from '../../lib/local-decisions.ts';
 import {DATASET_HEADER} from '../../lib/dataset-identity.mjs';
-import {summaryFixture} from '../fixtures/plan-quick-summary.mjs';
 import {readBundleWorkspace} from '../../lib/home-bundle-records.ts';
 import {scopeDashboard} from '../fixtures/home-scope-evidence.mjs';
 import {workforce,attrition,survey,talent,career} from '../fixtures/theme-audit-data.mjs';
@@ -30,8 +29,9 @@ const js=await fs.readFile(path.join(build,'fixture.js'),'utf8');
 const html=`<!doctype html><html data-workspace-preference="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style></head><body><div id="root"></div><script>${js.replaceAll('</script','<\\/script')}</script></body></html>`;
 const base='http://127.0.0.1:3188';
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-background-networking','--disable-component-update','--disable-domain-reliability','--disable-sync','--metrics-recording-only','--host-resolver-rules=MAP * ~NOTFOUND']});
-const knownReceipt=summaryFixture(),knownId=knownReceipt.draft.binding.goalId;
-const knownRaw={version:1,goalId:knownId,drafts:[],calculations:[],attachments:[{id:'known-legacy-attachment',status:'attached_proposal',attachedAt:'2026-10-07T12:00:00Z',supersedes:null,draft:knownReceipt.draft,result:knownReceipt.result,unknownsAcknowledged:true}]};
+const knownRaw=JSON.parse(await fs.readFile('tests/fixtures/pre-layout-known-receipt.json','utf8')).raw;
+const knownReceipt=knownRaw.attachments[0],knownId=knownRaw.goalId;
+const oldBudget=JSON.parse(await fs.readFile('tests/fixtures/home-plan-legacy-costs.json','utf8')).workspace;
 assert.ok(readBundleWorkspace(knownRaw,knownId));
 const report={scope:'Actual Page and read-only numbered/legacy plan presentation; offline fixtures only.',cases:[],checks:[]};
 const check=(label,pass)=>{report.checks.push({label,pass:!!pass});if(!baseline)assert.ok(pass,label);};
@@ -73,13 +73,14 @@ function measure(){
 }
 try{for(const [size,width,height] of [['laptop',1366,768],['phone',390,844],['small-phone',320,740]]){
  const context=await browser.newContext({viewport:{width,height},offline:true,serviceWorkers:'block'}),page=await context.newPage();page.setDefaultTimeout(15000);
- const errors=[],blocked=[];page.on('pageerror',error=>errors.push(error.message));
+ let serviceCalls=0;const errors=[],blocked=[];page.on('pageerror',error=>errors.push(error.message));
  await context.route('**/*',async route=>{
   const request=route.request(),url=new URL(request.url());
   if(request.isNavigationRequest()&&url.origin===base)return route.fulfill({contentType:'text/html',body:html});
   if(url.origin!==base){blocked.push(url.href);return route.abort();}
   const token=request.headers()[DATASET_HEADER]??'legacy-v1:0',headers={[DATASET_HEADER]:token};
   if(url.pathname==='/api/home-solution-conversation'){
+   serviceCalls++;
    const body=request.postDataJSON(),candidate=accountabilityCandidate(body);candidate.quantities=candidate.quantities.filter(q=>!['success_baseline','success_target'].includes(q.field));
    return route.fulfill({headers,json:await converseSolutions(body,fixtureRuntime([evaluate(candidate),final('Review this fictional plan.',[candidate.id])]),new AbortController().signal)});
   }
@@ -112,7 +113,10 @@ try{for(const [size,width,height] of [['laptop',1366,768],['phone',390,844],['sm
  await capture('home-initial');
  await page.getByLabel('Ask Workforce AI',{exact:true}).fill(accountabilityMessage);await page.getByRole('button',{name:'Send overview question',exact:true}).click();
  const card=page.getByRole('article',{name:'Working proposal: Accountability review',exact:true});await card.waitFor();await capture('home-working');
- await card.screenshot({path:path.join(output,'working-card-'+size+'.png')});await inspect('working',card);
+ await card.screenshot({path:path.join(output,'working-card-'+size+'.png')});
+ const composer=page.getByLabel('Ask Workforce AI',{exact:true}),unsent='Unsent revision: keep my proposed coordination hours at 24.';
+ await composer.fill(unsent);const beforeDisclosureCalls=serviceCalls;await inspect('working',card);
+ check(size+' disclosure preserves unsent revision without requests',await composer.inputValue()===unsent&&serviceCalls===beforeDisclosureCalls);await composer.fill('');
  await card.getByRole('button',{name:/^Pin Action Plan/}).click();await card.getByRole('button',{name:/^Pinned Action Plan/}).waitFor();await capture('home-pinned');
  const saved=page.locator('summary').filter({hasText:/^Saved Action Plans$/});if(await saved.count()){await saved.click();await capture('home-saved-expanded');await inspect('saved',page.getByRole('article',{name:'Action Plan option 1',exact:true}).first());await saved.click();}
  await navigate('decision-brief');await capture('decision-brief');
@@ -139,6 +143,17 @@ try{for(const [size,width,height] of [['laptop',1366,768],['phone',390,844],['sm
  await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:DECISIONS_STORAGE_KEY,value:encodeDecisions(knownSeed)});await page.reload();await dismissHomeOnboarding(page);await navigate('decision-brief');await capture('legacy-known-receipt');
  const knownCard=page.getByRole('region',{name:'Attached Action Plans',exact:true}).getByRole('article').first();await inspect('legacy-known',knownCard);
  check(size+' legacy known receipt retains exact cash and finish',await knownCard.innerText().then(text=>text.includes('$3,000')&&(!knownReceipt.result.planFinish||text.includes(knownReceipt.result.planFinish)))&&await page.evaluate(({key,id,expected})=>JSON.stringify(JSON.parse(localStorage.getItem(key)).payload.workspaces[id].fields.homeSolutionBundlesV1)===expected,{key:DECISIONS_STORAGE_KEY,id:knownId,expected:JSON.stringify(knownRaw)}));
+ check(size+' accepted historical cash, hours, people and finish are visible with details closed',await knownCard.getByRole('region',{name:'Total cost',exact:true}).getByText('$3,000',{exact:true}).isVisible()&&await knownCard.getByRole('region',{name:'Resources',exact:true}).innerText().then(t=>t.includes('Delivery hours: 36')&&/People\s+10/.test(t))&&await knownCard.getByRole('region',{name:'Timeline',exact:true}).innerText().then(t=>t.includes('2026-11-28'))&&await knownCard.getByText('Plan details and assumptions',{exact:true}).evaluate(n=>!n.parentElement.open));
+ check(size+' historical proposal status remains visible',await knownCard.getByText('Attached 2026-10-07 · Latest attached version',{exact:true}).isVisible()&&await knownCard.getByText('Proposal · effects, owners and funding unconfirmed.',{exact:true}).isVisible());
+ await page.getByRole('button',{name:'Review Action Plans on Home',exact:true}).click();
+ check(size+' review button returns to Home without changing snapshot',await page.getByLabel('Ask Workforce AI',{exact:true}).isVisible()&&await page.evaluate(({key,id,expected})=>JSON.stringify(JSON.parse(localStorage.getItem(key)).payload.workspaces[id].fields.homeSolutionBundlesV1)===expected,{key:DECISIONS_STORAGE_KEY,id:knownId,expected:JSON.stringify(knownRaw)}));
+ const budgetId=oldBudget.goalId,budgetSeed={version:1,revision:1,goals:{version:1,activeId:budgetId,goals:[{id:budgetId,statement:oldBudget.attachments[0].draft.binding.goal}]},workspaces:{[budgetId]:{savedAt:'2026-10-06T12:05:00Z',fields:{homeSolutionBundlesV1:oldBudget}}}};
+ await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:DECISIONS_STORAGE_KEY,value:encodeDecisions(budgetSeed)});await page.reload();await dismissHomeOnboarding(page);await navigate('decision-brief');await capture('legacy-budget-receipt');
+ const budgetCard=page.getByRole('region',{name:'Attached Action Plans',exact:true}).getByRole('article').first();
+ check(size+' original legacy budget cash headroom and uncertainty remain visible',await budgetCard.getByText(/\$2,500 USD headroom under the listed assumptions/).filter({visible:true}).isVisible()&&await budgetCard.getByRole('region',{name:'Resources',exact:true}).innerText().then(t=>t.includes('Delivery hours: 36'))&&await budgetCard.innerText().then(t=>t.includes('actual costs and funding remain unverified')&&!t.includes('$2,700')&&!t.includes('$6,200')));
+ await budgetCard.getByText('Plan details and assumptions',{exact:true}).click();
+ check(size+' expanded detail preserves the same historical budget wording',await budgetCard.getByLabel('Selected plan summary').getByText(/\$2,500 USD headroom under the listed assumptions/).isVisible()&&await budgetCard.getByLabel('Selected plan summary').getByText(/no available headroom is established/).count()===0);
+ check(size+' legacy budget receipt is not rewritten',await page.evaluate(({key,id,expected})=>JSON.stringify(JSON.parse(localStorage.getItem(key)).payload.workspaces[id].fields.homeSolutionBundlesV1)===expected,{key:DECISIONS_STORAGE_KEY,id:budgetId,expected:JSON.stringify(oldBudget)}));
  check(size+' no document overflow, runtime errors or network escapes',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&blocked.length===0);
  await context.close();
 }}finally{await browser.close();await fs.writeFile(path.join(output,'geometry.json'),JSON.stringify(report,null,2));console.log(JSON.stringify({checks:report.checks.length,failures:report.checks.filter(x=>!x.pass),states:report.cases.length,output}));}

@@ -7,11 +7,12 @@ import {homePlanSummary,planSummarySentences} from '@/lib/home-plan-summary';
 import {bundleAssumptionText,bundleDisplayText,bundleHorizonEnd} from '@/lib/home-bundle-display';
 
 /** Read-only presentation of the supplied revision; never adopts or rewrites a snapshot. */
-export function HomePlanSummary({draft,result,measurePack,children}:{draft:BundleDraft;result?:BundleResult|null;measurePack?:unknown;children?:ReactNode}){
+export function HomePlanSummary({draft,result,measurePack,children,savedBudgetText}:{draft:BundleDraft;result?:BundleResult|null;measurePack?:unknown;children?:ReactNode;savedBudgetText?:string}){
  const end=bundleHorizonEnd(draft.inputs.scope).value,lastFinish=draft.inputs.timing.map(item=>item.finish.value).filter((date):date is string=>!!date).sort().at(-1);
- const sections=homePlanSummary(draft,result,measurePack);
+ const isBudgetText=(item:string)=>/Budget limit|Budget feasibility|over the limit|headroom under/.test(item);
+ const sections=homePlanSummary(draft,result,measurePack).map(section=>savedBudgetText&&section.heading==='Cost'?{...section,items:[...section.items.filter(item=>!isBudgetText(item)),savedBudgetText]}:section);
  const measurement=sections.find(section=>section.heading==='How success is measured')!;
- const budget=sections.find(section=>section.heading==='Cost')!.items.filter(item=>/Budget limit|Budget feasibility|over the limit|headroom under/.test(item));
+ const budget=sections.find(section=>section.heading==='Cost')!.items.filter(item=>item===savedBudgetText||isBudgetText(item));
  return <section aria-label="Plan overview" className="min-w-0 space-y-1 text-sm">
   <ActionPlanQuickSummary draft={draft} result={result}/>
   <p aria-label="Plan description"><strong>Proposed approach:</strong> {bundleDisplayText(draft.bundle.objective,draft.bundle,draft.inputs)}</p>
