@@ -1,5 +1,6 @@
 "use client";
 import {HomePlanSummary} from './home-plan-summary';
+import {PilotLifecycleExample} from './pilot-lifecycle-example';
 import {planBudgetText} from '@/lib/home-plan-revisions';
 import {readPlanAlternatives} from '@/lib/home-plan-alternatives';
 import {PlanAlternativeCard} from '@/components/plan-alternative-card';
@@ -41,6 +42,7 @@ export function AttachedActionPlansBrief({raw,alternatives,goalId,goal,onReview}
    {workspace.attachments.filter(item=>!superseded.has(item.id)).map(snapshot)}
    {workspace.attachments.some(item=>superseded.has(item.id))&&<details><summary className="min-h-11 cursor-pointer py-2 font-medium">Previous attached versions</summary><div className="space-y-3">{workspace.attachments.filter(item=>superseded.has(item.id)).map(snapshot)}</div></details>}
   </>}
+  <PilotLifecycleExample raw={raw} goalId={goalId} goal={goal}/>
   <button className="min-h-11 rounded border px-3 py-2 text-sm font-medium" onClick={onReview}>Review Action Plans on Home</button>
  </section>;
 }

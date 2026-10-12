@@ -38,12 +38,14 @@ export function useHomeSolutionConversation(props:Props){
  useLayoutEffect(()=>{mounted.current=true;return()=>{mounted.current=false;controller.current?.abort();};},[]);
  // Observe every store transition, including A→B→A batched into one React render.
  useLayoutEffect(()=>{
-  const identity=()=>{const goals=decisionStore.getSnapshot().data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement]);};
+  const identity=()=>{const snapshot=decisionStore.getSnapshot(),goals=snapshot.data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement,snapshot.saved]);};
   let previous=identity();return decisionStore.subscribe(()=>{const next=identity();if(next===previous)return;previous=next;epoch.current++;controller.current?.abort();controller.current=null;setPending(false);});
  },[]);
  const goal={id:props.conversation.activeGoalId,statement:props.conversation.focusedIssue};
  const guideId=props.guided?.goalId??null;
- const identity=JSON.stringify([goal,guideId,props.conversation.resetEpoch,props.conversation.storageReady]);
+ // Recovery advances workspaceKey even when the goal itself is unchanged. Reload
+ // reviewed solution state and invalidate pending completions for that workspace.
+ const identity=JSON.stringify([goal,guideId,props.conversation.workspaceKey,props.conversation.resetEpoch,props.conversation.storageReady]);
  const loaded=useRef(''),reset=useRef(props.conversation.resetEpoch);
  const synchronize=useEffectEvent(()=>{
   if(loaded.current===identity)return;loaded.current=identity;epoch.current++;controller.current?.abort();setPending(false);setNotice('');
