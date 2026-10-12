@@ -20,6 +20,7 @@ export function GoalProgressSummary({context,snapshot,plan,goal,pinnedPlanName}:
   <p><strong>Measured progress:</strong> {latest?`${number(latest.value)} ${m?.unit} · ${latest.period.end} · ${classification(latest.source.classification)}${snapshot?.stale?' · Stale under saved freshness policy':''}${baseline&&latest.period.end===baseline.period.end?' · Baseline only; no later measurement':''}`:missing}. Execution not recorded. Plan assumptions are not measured results.</p>
   {m&&<p className="text-xs">Saved scope: {m.metric} · {m.scope.country} / {m.scope.org} / {m.scope.level}. Page filters do not change this scope.</p>}
   {context.origin==='demo'&&<p className="text-xs">Fictional demo goal.</p>}
+  {m&&a.assessedOn>m.target.date&&<p className="text-sm" aria-label="Goal deadline status">Deadline passed ({m.target.date}); review dated evidence.</p>}
   <p><strong>Next action:</strong> {next}</p>
   <details>
    <summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Measurement details and plan link</summary>
@@ -29,7 +30,7 @@ export function GoalProgressSummary({context,snapshot,plan,goal,pinnedPlanName}:
    <div><dt className="text-xs text-muted-foreground">Baseline</dt><dd>{baseline?`${number(baseline.value)} ${m?.unit}`:missing}</dd>{baseline&&<dd className="text-xs">{baseline.period.end} · {classification(baseline.source.classification)}</dd>}</div>
    <div><dt className="text-xs text-muted-foreground">Latest dated measurement</dt><dd>{latest?`${number(latest.value)} ${m?.unit}`:missing}</dd>{latest&&<dd className="text-xs">{latest.period.end} · {classification(latest.source.classification)}{snapshot?.stale?' · Stale under saved freshness policy':''}{baseline&&latest.period.end===baseline.period.end?' · Baseline only; no later measurement':''}</dd>}</div>
    <div><dt className="text-xs text-muted-foreground">Target</dt><dd>{m?`${number(m.target.value)} ${m.unit}`:'Not defined'}</dd>{m&&<dd className="text-xs">{m.direction==='increase'?'Higher is better':m.direction==='decrease'?'Lower is better':'At or below the limit'}</dd>}</div>
-   <div><dt className="text-xs text-muted-foreground">Deadline</dt><dd>{m?.target.date??'Not defined'}</dd>{m&&a.assessedOn>m.target.date&&<dd className="text-xs">Deadline passed; review dated evidence</dd>}</div>
+   <div><dt className="text-xs text-muted-foreground">Deadline</dt><dd>{m?.target.date??'Not defined'}</dd></div>
    <div><dt className="text-xs text-muted-foreground">Remaining gap</dt><dd>{a.gap!==null?`${number(a.gap)} ${m?.unit}`:'Unavailable'}</dd>{a.gap!==null&&<dd className="text-xs">At {a.latestComparable?.observation.period.end}; dated arithmetic{snapshot?.stale?', stale':''}</dd>}</div>
    <div><dt className="text-xs text-muted-foreground">Execution status</dt><dd>Not recorded</dd><dd className="text-xs">Plan selection does not record implementation</dd></div>
   </dl>

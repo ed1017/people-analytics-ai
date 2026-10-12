@@ -71,6 +71,14 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  const committed=(await saved()).workspaces.growth.fields.goalProgressV1;await report(text2);check(mode+' repeated same-date report needs an explicit correction',await button('Confirm progress entry').isDisabled());await choose('Cancel progress draft');
  check(mode+' repeated identical report does not invent another observation',JSON.stringify((await saved()).workspaces.growth.fields.goalProgressV1)===JSON.stringify(committed));
  check(mode+' no runtime error or nonfixture network request',errors.length===0&&blocked.length===0&&requests.length===1&&requests[0]===mockURL&&await page.evaluate(()=>window.networkAttempts)===0);
+ for(const [date,overdue] of [['2026-08-01',false],['2026-12-30',false],['2026-12-31',false],['2027-01-01',true]]){
+  await page.clock.setFixedTime(new Date(date+'T13:00:00Z'));await page.reload();await summary().waitFor();
+  const beforeDeadlineRead=JSON.stringify(await saved()),deadline=summary().getByLabel('Goal deadline status',{exact:true});
+  check(mode+' '+date+' deadline boundary is honest with details closed',await details.evaluate(n=>!n.parentElement.open)&&await deadline.count()===(overdue?1:0)&&(!overdue||await deadline.isVisible()&&await deadline.innerText().then(t=>t.includes('2026-12-31')&&t.includes('review dated evidence'))));
+  check(mode+' '+date+' reading deadline does not write saved plans or progress',JSON.stringify(await saved())===beforeDeadlineRead);
+  if(overdue){await choose('Unmeasured synthetic goal');check(mode+' overdue warning remains visible without observations',await deadline.isVisible()&&(await summary().innerText()).includes('Not yet measured'));}
+ }
+ check(mode+' deadline cases have no errors or external requests',errors.length===0&&blocked.length===0&&await page.evaluate(()=>window.networkAttempts)===0);
  await context.close();
 }}finally{await browser.close()}
 await fs.writeFile(path.join(output,'receipt.json'),JSON.stringify({sourceSha,sourceTree,browserVersion,syntheticClock:'2026-10-08T13:00:00Z',nodeVersion:process.version,workingTree:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim(),artifactSha256:createHash('sha256').update(artifact).digest('hex'),checks,assertions,fixtureURL:mockURL,httpServerStarted:false,modelCalls:0,databaseCalls:0,fullApplicationTest:false,neverRun:['diagnostic API harness','provider/model/token-count calls','database','production startup/deployment','physical-device or user desktop interactions']},null,2));
