@@ -42,7 +42,12 @@ export function CapabilityJourney({goalId,goal,onNavigate}:{goalId:string;goal:s
   finally{clearTimeout(timer);if(controller.current===c){controller.current=null;setBusy(false)}}
  }
  function append(){if(!saved.run||!runCurrent)return;try{const b=decisionStore.getField<DecisionBrief>(goalId,"brief",emptyDecisionBrief());const next=appendJourneyToBrief(b,saved.run);decisionStore.setField(goalId,"brief",next);persist({imported:[...saved.imported,saved.run.id].slice(-20)});setError("")}catch(e){setError((e as Error).message)}}
- return <details className="rounded-lg border border-primary/50 p-4" open><summary className="cursor-pointer text-lg font-semibold">Build AI capability without net headcount</summary>
+ // Keep disclosure preference per goal, separate from saved comparison inputs and results.
+ return <details className="rounded-lg border p-4" open={fields['capabilityJourney.open']===true} onToggle={event=>{
+  const open=event.currentTarget.open;
+  if(open!==(fields['capabilityJourney.open']===true))decisionStore.setField(goalId,'capabilityJourney.open',open);
+ }}><summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold">Optional tools: AI capability comparison</summary>
+ <h2 className="mt-3 text-lg font-semibold">Build AI capability without net headcount</h2>
  <p className="mt-3 text-sm">Choose the fixed-rule comparison or expand Model-directed planning below. The fixed-rule workflow prepares fixed proposals, calculates, compares and optionally revises once. AI does not choose tools or revisions. It cannot establish AI proficiency or recommend people. Existing tools run only when you press Run bounded comparison.</p>
  <ol className="my-4 space-y-3 text-sm"><li><strong>1. Review evidence.</strong> Check recorded skills and the goal. An AI skill gap is not assumed. <button className={button} onClick={()=>onNavigate("skills")}>Review Skills evidence</button></li><li><strong>2. Select relevant options.</strong> Carry one or two quotes and enter participants, sessions, hours and known costs. Fictional quotes are examples, not validated AI programs. <button className={button} onClick={()=>onNavigate("training-coaching")}>Choose development quotes</button> <button className={button} onClick={()=>onNavigate("development-planning")}>Edit development inputs</button></li></ol>
  <p className="text-sm font-medium">3. Set comparison limits in {options[0]?.quote.currency??"the quote currency"}.</p><p className="mt-1 text-xs text-muted-foreground">Company scenario uses the synthetic enterprise Baseline; country, business-unit and level filters do not apply. Program totals include employee time value, which is not necessarily added cash spending. No exchange conversion or automatic cost ranking.</p>
