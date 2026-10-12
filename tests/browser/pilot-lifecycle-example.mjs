@@ -1,0 +1,53 @@
+/** Offline component bundle + headless desktop/mobile. No Next build/start. */
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
+import postcss from 'postcss';
+import tailwind from '@tailwindcss/postcss';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
+const output=await fs.mkdtemp(path.join(os.tmpdir(),'pilot-lifecycle-example-'));
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,plugins:[new webpackPackage.webpack.DefinePlugin({'process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION':JSON.stringify('true'),'process.env.NEXT_PUBLIC_GOAL_PROGRESS':JSON.stringify('true'),'process.env.NEXT_PUBLIC_HOME_STRUCTURED_PLANS':JSON.stringify('false')})],entry:path.resolve('tests/fixtures/pilot-lifecycle-example.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
+const css=(await postcss([tailwind({base:process.cwd()})]).process(await fs.readFile('app/globals.css','utf8'),{from:path.resolve('app/globals.css')})).css;
+const bootstrap="window.networkAttempts=0;window.fetch=()=>{window.networkAttempts++;throw Error('Network forbidden')};window.XMLHttpRequest=window.WebSocket=window.EventSource=class{constructor(){window.networkAttempts++;throw Error('Network forbidden')}};";
+const js=await fs.readFile(path.join(output,'fixture.js'),'utf8');
+const file=path.join(output,'fixture.html');
+await fs.writeFile(file,`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; worker-src blob:; connect-src 'none'; img-src data:; font-src data:"><style>${css.replaceAll('</style','<\\/style')}</style></head><body><div id="root"></div><script>${bootstrap.replaceAll('</script','<\\/script')}</script><script>${js.replaceAll('</script','<\\/script')}</script></body></html>`);
+if(process.argv.includes('--build-only')){console.log(JSON.stringify({output,file,browserRun:false}));process.exit(0);}
+const artifact=await fs.readFile(file,'utf8'),mockURL='http://127.0.0.1:3100/';
+const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH??'/usr/bin/chromium',args:['--no-sandbox']}),checks=[];
+try{for(const width of [1366,390]){
+ const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[],blocked=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.route('**/*',r=>r.request().url()===mockURL?r.fulfill({status:200,contentType:'text/html',body:artifact}):(blocked.push(r.request().url()),r.abort()));
+ const check=(label,value)=>{assert.ok(value,label);checks.push(`${width}: ${label}`);};
+ await page.goto(mockURL);
+ const card=()=>page.getByRole('region',{name:'Fictional pilot lifecycle',exact:true}),saved=()=>page.getByTestId('saved').textContent();
+ await card().waitFor().catch(async e=>{console.error(JSON.stringify({errors,text:await page.locator('body').innerText()}));throw e;});const original=await saved();
+ check('single authoritative walkthrough',await card().count()===1);
+ check('concise fictional result distinct from activities',await card().innerText().then(t=>t.includes('not company history or real outcomes')&&t.includes('7 → 6.5')&&t.includes('38 total labor hours')&&t.includes('Activities do not establish an outcome or its cause')));
+ check('details initially closed',await card().locator('details').getAttribute('open')===null);
+ await card().locator('summary').focus();await page.keyboard.press('Enter');
+ check('keyboard opens dated details',await card().innerText().then(t=>t.includes('2026-11-15: in-progress')&&t.includes('2026-12-12: completed')&&t.includes('2026-10-25 through 2026-10-31')&&t.includes('Labor cost is unknown')&&t.includes('demo-reduce-turnover-attached')));
+ check('touch target',await card().locator('summary').evaluate(n=>n.getBoundingClientRect().height>=44));
+ check('no horizontal overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ check('viewing does not mutate saved bytes',await saved()===original);
+ await card().screenshot({path:path.join(output,`${width}-home.png`)});
+ await page.getByRole('button',{name:'Toggle Brief',exact:true}).click();await card().waitFor();
+ check('Brief shares one walkthrough',await card().count()===1&&await card().innerText().then(t=>t.includes('7 → 6.5')));
+ check('Brief read preserves saved bytes',await saved()===original);
+ await page.getByRole('button',{name:'Replace plan',exact:true}).click();
+ check('replacement retains historical example',await card().innerText().then(t=>t.includes('Historical example')&&t.includes('7 → 6.5')));
+ const replaced=await saved();check('original attachment byte-for-byte retained',JSON.stringify(JSON.parse(replaced).workspaces['demo-reduce-turnover'].fields.homeSolutionBundlesV1.attachments[0])===JSON.stringify(JSON.parse(original).workspaces['demo-reduce-turnover'].fields.homeSolutionBundlesV1.attachments[0]));
+ await page.getByRole('button',{name:'Change goal',exact:true}).click();check('goal edit does not move original scope',await card().innerText().then(t=>t.includes('Historical example for “Reduce turnover”')));
+ const changed=await saved();await page.reload();await card().waitFor();check('reload preserves exact history',await saved()===changed&&await card().innerText().then(t=>t.includes('Historical example')));
+ await page.getByRole('button',{name:'Switch goal',exact:true}).click();check('other goal cannot inherit outcome',await card().count()===0);
+ await page.getByRole('button',{name:'Switch goal',exact:true}).click();await card().waitFor();
+ const beforeDataset=await saved();await page.getByRole('button',{name:'Switch dataset',exact:true}).click();check('other dataset cannot inherit outcome',await card().count()===0);
+ await page.getByRole('button',{name:'Switch dataset',exact:true}).click();await card().waitFor();check('return restores original history',await saved()===beforeDataset);
+ check('no runtime errors',errors.length===0);check('no external calls',blocked.length===0&&await page.evaluate(()=>window.networkAttempts===0));
+ await context.close();
+}}finally{await browser.close();}
+await fs.writeFile(path.join(output,'report.json'),JSON.stringify({checks,count:checks.length,offline:true},null,2));console.log(JSON.stringify({output,checks:checks.length}));

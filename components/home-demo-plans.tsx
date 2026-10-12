@@ -5,6 +5,7 @@ import {HomeBundlePlans,type BundleSession,type BundleDiscussion,type PlanChatCh
 import {demoBinding,demoBundle,homeDemoField,readHomeDemo} from '@/lib/home-demo-catalog';
 import {bundleWorkspaceField,readBundleWorkspace} from '@/lib/home-bundle-records';
 import {revealJourneyTarget} from '@/components/workforce-journey-continue';
+import {PilotLifecycleExample} from './pilot-lifecycle-example';
 
 export function HomeDemoPlans({goalId,goal,active,busy,openRequest,chatChange,onDiscuss}:{goalId:string;goal:string;active:boolean;busy:boolean;openRequest?:{goalId:string;goal:string;sequence:number}|null;chatChange?:PlanChatChange|null;onDiscuss:(request:BundleDiscussion)=>void}) {
  const storage=useDecisionStorage(),saved=readHomeDemo(storage.data.workspaces[goalId]?.fields[homeDemoField],goalId),[cache]=useState(()=>new Map<string,BundleSession>()),heading=useRef<HTMLHeadingElement>(null);
@@ -18,5 +19,6 @@ export function HomeDemoPlans({goalId,goal,active,busy,openRequest,chatChange,on
   <p className="text-xs text-muted-foreground">An attached example to explore and edit. Scope, owners, budget and dates are fictional assumptions; no work or outcomes have been achieved.</p>
   {!current&&<p role="status">The goal changed. The original example is kept for reference; its assumptions still describe “{example.goal}”.</p>}
   {!workspace||!workspace.attachments.length?<p role="status">The saved example plan is unavailable. Its records are kept; it will not be recreated automatically.</p>:<HomeBundlePlans key={goalId} chatChange={chatChange} binding={demoBinding(example)} proposal={{version:1,goal:example.goal,bundles:[demoBundle(example)],question:null,unavailableReason:null}} preparedAt={preparedAt} contextCurrent={current} disabled={!active||busy||!storage.saved||!current} isCurrent={isCurrent} cache={cache} onDiscuss={onDiscuss} measurePack={{sources:[]}}/>}
+  <PilotLifecycleExample raw={storage.data.workspaces[goalId]?.fields[bundleWorkspaceField]} goalId={goalId} goal={goal}/>
  </section>;
 }
