@@ -17,7 +17,8 @@ type FinancePageProps = {
   maxFinanceLaborCost: number;
 };
 
-function formatCurrencyCompact(value: number) {
+function formatCurrencyCompact(value: number | null) {
+  if(value===null||!Number.isFinite(value))return "Unavailable";
   if (Math.abs(value) >= 1_000_000_000) {
     return "$" + (value / 1_000_000_000).toFixed(2) + "B";
   }
@@ -38,7 +39,8 @@ export function FinancePage({
   maxFinanceLaborCost,
 }: FinancePageProps) {
   const exposure=financeData?financeVacancyBasis(financeData.current.estimated_vacancy_cost_exposure_usd,financeBusinessUnits):null;
-  const precise=(value:number)=>Number.isFinite(value)?'$'+value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' USD':'Unavailable';
+  const count=(value:number|null)=>value===null?"Unavailable":value.toLocaleString();
+  const precise=(value:number|null)=>value!==null&&Number.isFinite(value)?'$'+value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' USD':'Unavailable';
   return (
 <section className="evidence-workspace @container min-w-0 p-4 sm:p-6">
             <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
@@ -76,7 +78,7 @@ export function FinancePage({
                       )}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Annualized company labor cost
+                      Reported USD cost · period unknown
                     </p>
                   </div>
 
@@ -85,13 +87,10 @@ export function FinancePage({
                       Cost per FTE
                     </p>
                     <p className="mt-2 break-words text-[clamp(1.25rem,3cqw,1.875rem)] font-semibold">
-                      $
-                      {Math.round(
-                        financeData.current.cost_per_fte_usd
-                      ).toLocaleString()}
+                      {formatCurrencyCompact(financeData.current.cost_per_fte_usd)}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {financeData.current.fte.toLocaleString()} FTE
+                      {count(financeData.current.fte)} FTE
                     </p>
                   </div>
 
@@ -106,7 +105,7 @@ export function FinancePage({
                       )}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Estimated annualized exposure
+                      Estimated USD exposure · period unknown
                     </p>
                   </div>
 
@@ -115,7 +114,7 @@ export function FinancePage({
                       Vacant Positions
                     </p>
                     <p className="mt-2 break-words text-[clamp(1.25rem,3cqw,1.875rem)] font-semibold">
-                      {financeData.current.vacant_positions.toLocaleString()}
+                      {count(financeData.current.vacant_positions)}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Current authorized vacancies
@@ -124,7 +123,7 @@ export function FinancePage({
                 </div>
 
                 <div className="mt-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
-                  <p>Vacancy exposure = sum of business-unit exposure estimates; not booked expense.</p>
+                  <p>Vacancy exposure = sum of business-unit exposure estimates; not company cost/FTE × vacancies, booked expense or guaranteed savings. Cost/FTE reflects workforce mix, not salary. Missing values stay unavailable.</p>
                   <details><summary className="min-h-11 cursor-pointer py-2 text-base">Exposure calculation</summary><ul className="space-y-1 text-base">{financeBusinessUnits.map(row=><li key={row.org_code}>{row.org_name}: {precise(row.estimated_vacancy_cost_exposure_usd)}</li>)}</ul><p className="mt-2 text-base">Sum: {exposure?.subtotal==null?'Unavailable':precise(exposure.subtotal)} · Reported headline: {precise(financeData.current.estimated_vacancy_cost_exposure_usd)}</p>{exposure?.difference!==null&&!exposure?.reconciles&&<p className="text-base">Difference: {precise(exposure!.difference!)}. Source totals need reconciliation.</p>}</details>
                 </div>
 
@@ -135,7 +134,7 @@ export function FinancePage({
                         Labor Cost by Business Unit
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Current annualized workforce cost and cost mix
+                        Reported workforce cost and cost mix · period unknown
                       </p>
                     </div>
 
@@ -152,10 +151,7 @@ export function FinancePage({
                                   {row.org_name}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  {row.headcount.toLocaleString()} HC · $
-                                  {Math.round(
-                                    row.cost_per_fte_usd
-                                  ).toLocaleString()}
+                                  {count(row.headcount)} HC · {formatCurrencyCompact(row.cost_per_fte_usd)}
                                   /FTE
                                 </p>
                               </div>
@@ -167,10 +163,7 @@ export function FinancePage({
                                   )}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  {row.share_of_enterprise_labor_cost_pct.toFixed(
-                                    1
-                                  )}
-                                  % of total
+                                  {row.share_of_enterprise_labor_cost_pct===null?"Share unavailable":row.share_of_enterprise_labor_cost_pct.toFixed(1)+"% of total"}
                                 </p>
                               </div>
                             </div>
@@ -180,7 +173,7 @@ export function FinancePage({
                                 className="h-full rounded-full bg-foreground"
                                 style={{
                                   width: `${
-                                    maxFinanceLaborCost > 0
+                                    row.labor_cost_usd !== null && maxFinanceLaborCost > 0
                                       ? Math.max(
                                           3,
                                           (row.labor_cost_usd /
@@ -204,7 +197,7 @@ export function FinancePage({
                         Vacancy Exposure by Business Unit
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Estimated annualized cost capacity associated with open positions
+                        Source-reported estimates for open positions · period unknown
                       </p>
                     </div>
 
@@ -232,8 +225,8 @@ export function FinancePage({
                           {[...financeBusinessUnits]
                             .sort(
                               (a, b) =>
-                                b.estimated_vacancy_cost_exposure_usd -
-                                a.estimated_vacancy_cost_exposure_usd
+                                (b.estimated_vacancy_cost_exposure_usd ?? -1) -
+                                (a.estimated_vacancy_cost_exposure_usd ?? -1)
                             )
                             .map((row) => (
                               <tr
@@ -244,7 +237,7 @@ export function FinancePage({
                                   {row.org_name}
                                 </td>
                                 <td className="px-1 py-3 text-right tabular-nums">
-                                  {row.vacant_positions.toLocaleString()}
+                                  {count(row.vacant_positions)}
                                 </td>
                                 <td className="py-3 pl-1 text-right font-semibold tabular-nums">
                                   {formatCurrencyCompact(
@@ -265,7 +258,7 @@ export function FinancePage({
                       2027 Workforce Cost Scenarios
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      December 2027 annualized labor cost and headcount relative to Baseline
+                      December 2027 modeled labor cost and headcount relative to Baseline
                     </p>
                   </div>
 

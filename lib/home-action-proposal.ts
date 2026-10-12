@@ -8,7 +8,7 @@ export const homeActionRoutes=['capacity','retention_what_if','unmodeled'] as co
 export type HomeAction={name:string;firstStep:string;evidence:string[];limitation:string;route:typeof homeActionRoutes[number]};
 export type HomeActionProposal={version:1;goal:string;actions:HomeAction[];question:string|null;unavailableReason:string|null};
 export type ActionEvidence={id:string;sourceId:string;location:string;scope:string;date:string|null;limitation:string};
-const sources=new Set(['W1','W2','A1','R1','S1','S2','T1','T2','T3','T4','T5','P2']);
+const sources=new Set(['W1','W2','A1','R1','S1','S2','T1','T2','T3','T4','T5','P2','F1']);
 export const plain=(raw:unknown):Record<string,unknown>|null=>raw!==null&&typeof raw==='object'&&Object.getPrototypeOf(raw)===Object.prototype?raw as Record<string,unknown>:null;
 export const exactKeys=(raw:Record<string,unknown>,keys:string[])=>Object.keys(raw).length===keys.length&&keys.every(key=>Object.hasOwn(raw,key));
 const bounded=(value:unknown,max:number):value is string=>typeof value==='string'&&!!value.trim()&&value.length<=max;
@@ -20,7 +20,8 @@ export function actionEvidenceCatalog(input:unknown):ActionEvidence[]{
   const facts=plain(source.facts);if(!facts)continue;
   const add=(suffix:string,location:string)=>items.push({id:`${source.id}:${suffix}`,sourceId:source.id,location,scope:source.scope,date:source.date,limitation:source.limitation});
   if(Object.entries(facts).some(([key,value])=>key!=='rows'&&knownNumber(value)))add('summary','facts (summary fields)');
-  if(Array.isArray(facts.rows))facts.rows.forEach((raw,index)=>{const row=plain(raw);if(row&&row.suppressed!==true&&Object.values(row).some(knownNumber))add(`row:${index}`,`facts.rows[${index}]`)});
+  if(source.id==='F1')for(const [field,value] of Object.entries(facts))if(knownNumber(value))add(`summary:${field}`,`facts.${field}`);
+  if(Array.isArray(facts.rows))facts.rows.forEach((raw,index)=>{const row=plain(raw);if(row&&row.suppressed!==true&&Object.values(row).some(knownNumber)){add(`row:${index}`,`facts.rows[${index}]`);if(source.id==='F1')for(const [field,value] of Object.entries(row))if(knownNumber(value))add(`row:${index}:${field}`,`facts.rows[${index}].${field}`);}});
  }
  return items;
 }

@@ -1,4 +1,5 @@
 import { withDatasetRequest } from "@/lib/dataset-runtime";
+import {buildFinanceCurrent} from "../../../lib/finance-current";
 import { NextResponse } from "next/server";
 import { supabaseServer } from "../../../lib/supabase-server";
 
@@ -92,92 +93,7 @@ async function handleGET() {
     const scenarioRows: ScenarioRow[] =
       scenarioResult.data ?? [];
 
-    const current = financeRows.reduce(
-      (acc, row) => {
-        acc.headcount += toNumber(
-          row.headcount
-        );
-        acc.fte += toNumber(row.fte);
-        acc.labor_cost_usd += toNumber(
-          row.labor_cost_usd
-        );
-        acc.vacant_positions += toNumber(
-          row.vacant_positions
-        );
-        acc.estimated_vacancy_cost_exposure_usd +=
-          toNumber(
-            row.estimated_vacancy_cost_exposure_usd
-          );
-        return acc;
-      },
-      {
-        headcount: 0,
-        fte: 0,
-        labor_cost_usd: 0,
-        vacant_positions: 0,
-        estimated_vacancy_cost_exposure_usd:
-          0,
-      }
-    );
-
-    const currentSummary = {
-      headcount: current.headcount,
-      fte: round1(current.fte),
-      labor_cost_usd: round2(
-        current.labor_cost_usd
-      ),
-      cost_per_fte_usd:
-        current.fte > 0
-          ? round2(
-              current.labor_cost_usd /
-                current.fte
-            )
-          : 0,
-      vacant_positions:
-        current.vacant_positions,
-      estimated_vacancy_cost_exposure_usd:
-        round2(
-          current.estimated_vacancy_cost_exposure_usd
-        ),
-    };
-
-    const byBusinessUnit = financeRows
-      .map((row) => ({
-        org_code: row.org_code,
-        org_name: row.org_name,
-        headcount: toNumber(row.headcount),
-        fte: round1(toNumber(row.fte)),
-        labor_cost_usd: round2(
-          toNumber(row.labor_cost_usd)
-        ),
-        cost_per_fte_usd: round2(
-          toNumber(row.cost_per_fte_usd)
-        ),
-        vacant_positions: toNumber(
-          row.vacant_positions
-        ),
-        estimated_vacancy_cost_exposure_usd:
-          round2(
-            toNumber(
-              row.estimated_vacancy_cost_exposure_usd
-            )
-          ),
-        share_of_enterprise_labor_cost_pct:
-          current.labor_cost_usd > 0
-            ? round1(
-                (toNumber(
-                  row.labor_cost_usd
-                ) /
-                  current.labor_cost_usd) *
-                  100
-              )
-            : 0,
-      }))
-      .sort(
-        (a, b) =>
-          b.labor_cost_usd -
-          a.labor_cost_usd
-      );
+    const finance = buildFinanceCurrent(financeRows);
 
     const scenarioOrder = [
       "Baseline",
@@ -255,9 +171,7 @@ async function handleGET() {
     return NextResponse.json(
       {
         as_of: "2026-09-30",
-        current: currentSummary,
-        by_business_unit:
-          byBusinessUnit,
+        ...finance,
         scenarios: scenarioComparison,
       },
       {

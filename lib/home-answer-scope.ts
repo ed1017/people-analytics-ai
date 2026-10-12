@@ -4,7 +4,7 @@ const countryAliases=[['United States','USA','U.S.','US','U.S.-scoped','US-scope
 const escape=(value:string)=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 const contains=(text:string,label:string)=>new RegExp('(?<![A-Za-z])'+escape(label)+'(?![A-Za-z])',label==='US'?'':'i').test(text);
 const broad=/\b(?:company[ -]wide|global|enterprise[ -]wide|all countries)\b/i;
-const metric=/\b(?:headcount|workforce|employees|people|turnover|exits|scenario|forecast|hires|hiring|skills?|respondents|favo(?:u)?rable|satisfaction|baseline|rate|population|coverage|participation)\b/i;
+const metric=/\b(?:cost|costs|salary|pay|FTE|vacancies|exposure|headcount|workforce|employees|people|turnover|exits|scenario|forecast|hires|hiring|skills?|respondents|favo(?:u)?rable|satisfaction|baseline|rate|population|coverage|participation)\b/i;
 const assertion=/\b(?:is|are|was|were|has|have|had|recorded|reported|shows?|indicates?|totals?|includes?|represents?|covers?|projects?|forecasts?|accounts? for|based on)\b/i;
 const unavailable=/\b(?:unavailable|unsupported|unknown|not supplied|not available|cannot (?:establish|determine|infer|provide)|does not (?:establish|represent|provide)|not (?:a |an )?(?:country|US|U\.S\.|United States|Canada|scoped)[ -]?(?:specific|only|forecast|estimate|rate|breakdown)?|no (?:scoped|country[ -]specific) (?:data|evidence|breakdown))\b/i;
 const proposal=/^(?:target|aim|reduce|increase|improve|lower|retain|propose|proposed|introduce|run|pilot|review|compare|assess|evaluate|consider|offer|schedule|ask|define|measure|track|confirm|identify|validate|establish|test|coordinate|launch|use|provide|create|support)\b/i;
@@ -39,12 +39,36 @@ type ScopeOptions={references?:string[];scopeContext?:string};
 export function homeAnswerScopeViolation(answer:string,raw:unknown,options:ScopeOptions={}):boolean {
  const pack=normalizeHomePack(raw);
  const selected=(pack.workforceScope??'').replace(/Selected workforce snapshot:\s*/gi,'').split(/;/).map((part:string)=>part.trim().replace(/^(?:country|business unit|level):\s*/i,'' )).filter((part:string)=>part&&!/^(?:all\b|global workforce|company|synthetic|scope unavailable)/i.test(part));
- const labels=[...new Set([...selected,...countryAliases.flat()])];
+ const finance=pack.sources.find((source:{id:string})=>source.id==='F1');
+ const financeFacts=finance?.facts as Record<string,unknown>|null;
+ const financeRows=(financeFacts?.rows??[]) as Record<string,unknown>[];
+ const financeLabels=financeRows.flatMap(row=>[row.org_name,...(typeof row.org_code==='string'&&row.org_code.length>=3?[row.org_code]:[])]).filter((value):value is string=>typeof value==='string');
+ const labels=[...new Set([...selected,...countryAliases.flat(),...financeLabels])];
+ // Field citations bind to the supplied packet, whose row identities/values are
+ // checked against freshly loaded allowlisted aggregates before the model runs.
+ const financeReferences=[...answer.matchAll(/\[([^\]\n]+)\]/g)].flatMap(match=>match[1].split(/[,;\s]+/)).concat(options.references??[]).filter(ref=>ref.startsWith('F1:'));
+ for(const ref of financeReferences){
+  const match=/^F1:(summary|row:(\d+))(?::([a-z_]+))?$/.exec(ref);
+  if(!match||finance?.status!=='loaded')return true;
+  const target=match[1]==='summary'?financeFacts:financeRows[Number(match[2])];
+  if(!target||match[3]&&(typeof target[match[3]]!=='number'||!Number.isFinite(target[match[3]])))return true;
+ }
  const sources=new Map<string,{id:string;scope:string}>(pack.sources.map((source:{id:string;scope:string})=>[source.id,source]));
- const scopeLabels=(text:string)=>labels.filter(label=>contains(text,label));
+ const scopeLabels=(text:string)=>{
+  const matches=labels.flatMap(label=>[...text.matchAll(new RegExp('(?<![A-Za-z])'+escape(label)+'(?![A-Za-z])',label==='US'?'g':'gi'))].map(match=>({label,start:match.index,end:match.index+match[0].length})));
+  // An exact longer entity mention owns its span. A separate mention of the
+  // shorter entity still needs its own matching row reference.
+  return [...new Set(matches.filter(match=>!matches.some(other=>other.start<=match.start&&other.end>=match.end&&other.end-other.start>match.end-match.start)).map(match=>match.label))];
+ };
  const sourceAllows=(id:string,label:string,claim:string)=>{
   const source=sources.get(id);if(!source)return false;
-  if(id==='W2'&&/\b(?:headcount|FTE|employees)\b/i.test(claim)&&!/\b(?:turnover|exits|hires|rate|forecast|scenario)\b/i.test(claim)){
+  if(id==='F1'){
+   if(countryAliases.flat().includes(label))return false;
+   const refs=[...claim.matchAll(/F1:row:(\d+)(?::([a-z_]+))?/g)].map(match=>Number(match[1]));
+   for(const ref of options.references??[]){const match=/^F1:row:(\d+)(?::[a-z_]+)?$/.exec(ref);if(match)refs.push(Number(match[1]));}
+   return refs.some(index=>{const row=financeRows[index];return row&&(row.org_name===label||row.org_code===label);});
+  }
+  if(id==='W2' &&/\b(?:headcount|FTE|employees)\b/i.test(claim)&&!/\b(?:turnover|exits|hires|rate|forecast|scenario)\b/i.test(claim)){
    const facts=pack.sources.find((item:{id:string})=>item.id==='W2')?.facts as {rows?:{country_name?:string;headcount?:number;fte?:number}[]}|null;
    const rows=facts?.rows??[];
    if(rows.some((row:{country_name?:string;headcount?:number;fte?:number})=>typeof row.country_name==='string'&&(contains(row.country_name,label)||countryAliases.some(aliases=>aliases.some(a=>contains(row.country_name!,a))&&aliases.includes(label)))&&(typeof row.headcount==='number'||typeof row.fte==='number')))return true;
