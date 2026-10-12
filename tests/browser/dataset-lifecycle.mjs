@@ -6,6 +6,7 @@ import os from 'node:os';
 import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
 import postcss from 'postcss';
 import tailwind from '@tailwindcss/postcss';
+import {createDomainRace,hasDomainRace} from './dataset-domain-race.mjs';
 import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 import {runScenarioModel} from '../../lib/scenario-engine.ts';
 import {converseSolutions} from '../../lib/home-solution-conversation-service.ts';
@@ -50,10 +51,13 @@ function payload(path,query,next){
  return null;
 }
 try{
- for(const [domain,destination,endpoint] of domains)for(const [size,width,height] of [['desktop',1350,1000],['phone',390,844]]){
+ for(const [domain,destination,endpoint] of domains)for(const [size,width,height] of [['desktop',1350,1000],['phone',390,844]])for(const phase of process.env.LIFECYCLE_DOMAIN_RACES?['headers','body']:[null]){
+  if(phase&&!hasDomainRace(destination))continue;
   if(process.env.LIFECYCLE_CASE&&!`${destination}-${size}`.includes(process.env.LIFECYCLE_CASE))continue;
-  const item={domain,size,checks:[],errors:[],requests:[],blocked:[],solutionCalls:0};report.cases.push(item);
+  const item={domain,destination,size,phase,checks:[],errors:[],requests:[],blocked:[],solutionCalls:0};report.cases.push(item);
   const context=await browser.newContext({viewport:{width,height},offline:true,serviceWorkers:'block'}),page=await context.newPage();page.setDefaultTimeout(15000);
+  const race=phase?createDomainRace(destination,phase,payload):null;
+  if(race)await race.install(context);
   page.on('pageerror',e=>item.errors.push(e.message));let holdDashboard=false,held,release;
   const check=(name,ok)=>{assert.ok(ok,domain+' '+size+' '+name);item.checks.push(name);console.log('PASS '+domain+' '+size+' '+name);};
   await context.route('**/*',async route=>{
@@ -69,6 +73,7 @@ try{
     else{assert.equal(body.message.text,accountabilityMessage);const c=accountabilityCandidate(body);c.quantities=c.quantities.filter(q=>!['success_baseline','success_target'].includes(q.field));steps=[evaluate(c),final('Review this fictional plan.',[c.id])];}
     return route.fulfill({headers,json:await converseSolutions(body,fixtureRuntime(steps),new AbortController().signal)});
    }
+   if(race&&await race.respond(route))return;
    if(url.pathname==='/api/compensation'||url.pathname==='/api/compensation-job-release')return route.fulfill({status:503,headers,json:{error:'Synthetic release unavailable'}});
    if(url.pathname.startsWith('/api/')){
     const data=payload(url.pathname,url.search,next);
@@ -94,6 +99,13 @@ try{
   const pinned=await state(DECISIONS_STORAGE_KEY),id=pinned.goals.activeId,attached=pinned.workspaces[id].fields.homePlanAlternativesV1;
   await send(accountabilityScopeChange);await card.getByText(/revision 2/).waitFor();
   check('working revision differs from immutable pinned and attached revision',JSON.stringify((await state(DECISIONS_STORAGE_KEY)).workspaces[id].fields.homePlanAlternativesV1)===JSON.stringify(attached));
+  if(race){
+   await race.exercise({page,navigate,check,state,key:DECISIONS_STORAGE_KEY,nextKey:datasetDecisionKey('fixture-next:1'),id,oldId,attached,legacy,card,item});
+   check('no browser exceptions or network escapes',item.errors.length===0&&item.blocked.length===0);
+   await page.screenshot({path:path.join(output,destination+'-'+size+'-'+phase+'.png')});
+   await context.close();await fs.writeFile(path.join(output,'checks.json'),JSON.stringify(report,null,2)+'\n');
+   continue;
+  }
   if(destination!=='home')await navigate(destination);
   await page.waitForFunction(()=>!document.querySelector('[aria-label="AI generation status"]'));
   check('actual domain requested version-bound evidence',item.requests.some(r=>r.path===endpoint&&r.token==='legacy-v1:0'));
