@@ -1,7 +1,7 @@
 'use client';
 import {compareFictionalPilot,type PilotLifecycleExample as PilotRecord} from '@/lib/pilot-lifecycle-example';
-/** Shared presentation for saved examples and the independent in-memory illustration. */
-export function PilotLifecycleView({record:r,historical=false,goal,standalone=false}:{record:PilotRecord;historical?:boolean;goal:string;standalone?:boolean}){
+/** Shared read-only presentation for saved examples. */
+export function PilotLifecycleView({record:r,historical=false,goal}:{record:PilotRecord;historical?:boolean;goal:string}){
  const result=compareFictionalPilot(r),last=r.observations.at(-1)!,delivery=r.delivery.at(-1)!,participation=r.participation.at(-1)!;
  return <section aria-label="Fictional pilot lifecycle" className="min-w-0 space-y-2 break-words rounded border p-3 text-sm">
   <h3 className="font-semibold">Fictional pilot walkthrough</h3>
@@ -20,11 +20,9 @@ export function PilotLifecycleView({record:r,historical=false,goal,standalone=fa
     <ul className="space-y-1">{r.participation.map(e=><li key={e.date}>{e.date}: cumulative participation {e.participants}/{e.invited}; {e.participantHours} participant hours + {e.coordinationHours} coordination hours (fictional). These snapshots are not additive.</li>)}</ul>
     <ul className="space-y-1">{r.observations.map((o,i)=><li key={o.period.end}>Fictional {i?'follow-up':'baseline'}: {o.value} {o.unit}, {o.period.start} through {o.period.end}; {o.quality.denominator} fictional respondents. Captured {o.capturedAt.slice(0,10)}. Source: scenario · {o.source.releaseId}.</li>)}</ul>
     <p>Descriptive fictional change: {result.change===null?'Unavailable':`${result.change} points`}. No causal effect, turnover benefit or real completion is inferred. Next review: inspect response completeness and discuss workload adjustments; do not declare the goal achieved.</p>
-    <p>Labor is time, not cash. Labor cost is unknown: no pay rate is supplied. {standalone?'The illustrated':'The saved'} pilot cash allowance remains a proposal, not recorded expenditure.</p>
-    {standalone?<p>Read-only fictional example. It is not attached to your selected goal and does not record progress or change your plans.</p>:<>
+    <p>Labor is time, not cash. Labor cost is unknown: no pay rate is supplied. The saved pilot cash allowance remains a proposal, not recorded expenditure.</p>
     <p className="break-all">Exact original attachment: {r.plan.planId} · revision {r.plan.revision}. Exact original inputs and evidence binding verified within this browser dataset. This link is not an evidence release certificate.</p>
     <p>Read-only walkthrough reconstructed from the original saved example. It does not add measurements to Goal progress. Prior attached plans remain unchanged; real observations require their own explicit review.</p>
-    </>}
    </div>
   </details>
  </section>;
