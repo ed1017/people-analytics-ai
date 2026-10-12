@@ -22,7 +22,7 @@ import {progressEntryContext,retainProgressEntryProposal} from '@/lib/goal-progr
 import {captureGoalProgressInput} from '@/lib/goal-progress-conversation';
 import {homeConversationErrorMessage} from '@/lib/home-evidence-recovery.mjs';
 
-type Props={enabled:boolean;conversation:ProblemConversation;active:boolean;settled:boolean;evidence:unknown;planningContext?:()=>unknown;planningCalculatorAvailable?:()=>boolean;demandReviewRef?:RefObject<((review:DemandReview)=>void)|null>;scope:string;query:string;target:()=>BundleDiscussion|null;guided?:GuidedActionRegistry|null};
+type Props={enabled:boolean;conversation:ProblemConversation;active:boolean;settled:boolean;evidence:unknown;evidenceContext?:unknown;evidenceForMessage?:(text:string)=>unknown;planningContext?:()=>unknown;planningCalculatorAvailable?:()=>boolean;demandReviewRef?:RefObject<((review:DemandReview)=>void)|null>;scope:string;query:string;target:()=>BundleDiscussion|null;guided?:GuidedActionRegistry|null};
 const equal=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 export function useHomeSolutionConversation(props:Props){
  const answerSeries=useRef<ChatEvidenceSeries[]>([]);
@@ -41,7 +41,7 @@ export function useHomeSolutionConversation(props:Props){
  // eslint-disable-next-line react-hooks/set-state-in-effect -- Goal/reset events select an isolated local conversation.
  useLayoutEffect(()=>{synchronize();},[identity]);
  const progressInput=captureGoalProgressInput(decisionStore,goal.id);
- const contextKey=JSON.stringify([goal,guideId,props.active,props.settled,props.scope,props.query,props.evidence,props.conversation.resetEpoch,props.conversation.issueEditor?.id,progressInput]);
+ const contextKey=JSON.stringify([goal,guideId,props.active,props.settled,props.scope,props.query,props.evidence,props.evidenceContext,props.conversation.resetEpoch,props.conversation.issueEditor?.id,progressInput]);
  const liveKey=useRef(contextKey);
  useLayoutEffect(()=>{if(liveKey.current!==contextKey){liveKey.current=contextKey;epoch.current++;controller.current?.abort();setPending(false);}},[contextKey]);
  function catalog():PlanAlternatives|null{
@@ -55,7 +55,7 @@ export function useHomeSolutionConversation(props:Props){
  function selectedPlanId(value:PlanAlternatives|null){const p=currentProps.current,target=p.target();return target?.goalId===p.conversation.activeGoalId&&value?.order.includes(target.id)?target.id:null;}
  function makeRequest(text:string):SolutionRequest{
   const p=currentProps.current,current=catalog(),params=new URLSearchParams(p.query),progress=captureGoalProgressInput(decisionStore,p.conversation.activeGoalId);
-  return readSolutionRequest({version:1,planningCalculatorAvailable:p.planningCalculatorAvailable?.()===true,requestId:crypto.randomUUID(),goal:{id:p.conversation.activeGoalId,statement:p.conversation.focusedIssue},scope:p.scope,filters:{country:params.get('country')||'all',org:params.get('org')||'all',level:params.get('level')||'all'},timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,evidence:p.evidence,goalContext:p.planningContext?.()?{goalContext:p.conversation.goalContext,scenarioReview:p.planningContext()}:p.conversation.goalContext,...(progress?{progressEntry:progressEntryContext(decisionStore,'context',[{id:'context',text}])?.previous??null}:{}),...(progress?{goalProgress:progress}:{}),selectedId:selectedPlanId(current),catalog:current,state:memoryRef.current,message:{id:crypto.randomUUID(),text}});
+  return readSolutionRequest({version:1,planningCalculatorAvailable:p.planningCalculatorAvailable?.()===true,requestId:crypto.randomUUID(),goal:{id:p.conversation.activeGoalId,statement:p.conversation.focusedIssue},scope:p.scope,filters:{country:params.get('country')||'all',org:params.get('org')||'all',level:params.get('level')||'all'},timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,evidence:p.evidenceForMessage?.(text)??p.evidence,goalContext:p.planningContext?.()?{goalContext:p.conversation.goalContext,scenarioReview:p.planningContext()}:p.conversation.goalContext,...(progress?{progressEntry:progressEntryContext(decisionStore,'context',[{id:'context',text}])?.previous??null}:{}),...(progress?{goalProgress:progress}:{}),selectedId:selectedPlanId(current),catalog:current,state:memoryRef.current,message:{id:crypto.randomUUID(),text}});
  }
  async function send(text:string){
   if(controller.current||saving)return;requireCurrent();const request=makeRequest(text),entryContext=progressEntryContext(decisionStore,request.requestId,[...request.state.turns.filter(t=>t.role==='user').map(({id,text})=>({id,text})),request.message]),captured=++epoch.current,key=liveKey.current,scenario=JSON.stringify(currentProps.current.planningContext?.()??null),abort=new AbortController();controller.current=abort;answerSeries.current=[];setPending(true);setNotice('');
@@ -77,7 +77,7 @@ export function useHomeSolutionConversation(props:Props){
   try{
    requireCurrent();const request=makeRequest(item.message.text);request.requestId=item.requestId;request.message=item.message;
    const p=currentProps.current,key=liveKey.current,initialEpoch=epoch.current,scenario=JSON.stringify(p.planningContext?.()??null),desired={id:p.conversation.activeGoalId||p.guided?.goalId||crypto.randomUUID(),statement:p.conversation.focusedIssue||goalStatement.trim()};
-   const outcome=await saveSolutionCandidate(request,request.catalog,item,desired,p.evidence,acknowledge);
+   const outcome=await saveSolutionCandidate(request,request.catalog,item,desired,request.evidence,acknowledge);
    const snapshot=requireCurrent();if(key!==liveKey.current||initialEpoch!==epoch.current||scenario!==JSON.stringify(currentProps.current.planningContext?.()??null)||!equal(request.catalog,catalog()))throw Error('The conversation changed while reviewing selection. Try again against the current context.');
    if(outcome.status!=='ready')throw Error('The proposal needs further review.');
    const selected=associatePlanProposal(outcome.catalog,outcome.catalog,outcome.plan.id,{inputKey:outcome.plan.result.inputKey,attachmentId:outcome.plan.requestId!,at:new Date().toISOString(),acknowledgeUnknowns:acknowledge});
