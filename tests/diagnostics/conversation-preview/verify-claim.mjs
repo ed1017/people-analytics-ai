@@ -6,11 +6,26 @@ import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
 import {compileVerification} from './verification-bundle.mjs';
 import {verifyLocalTarget} from './verification-claim.mjs';
+import {stage} from './verification-diagnostics.mjs';
+const stages=[];
+const report=code=>stages.push(code);
 const root=fileURLToPath(new URL('../../../',import.meta.url));
 try{
- if(process.argv.length!==3||process.argv[2]!=='--verify-local-provider-free')throw Error('Explicit local mode required');
+ stage(report,'CONFIG');
+ const preflight=process.argv[2]==='--preflight-local-no-inserts';
+ if(process.argv.length!==3||(!preflight&&process.argv[2]!=='--verify-local-provider-free'))throw Error('Explicit local mode required');
  verifyLocalTarget(process.env);
+ const fetch=globalThis.fetch;
+ globalThis.fetch=async(...args)=>{
+  stage(report,'DISPATCH');
+  if(preflight)throw Error('Network disabled for preflight');
+  return fetch(...args);
+ };
+ stage(report,'COMPILE');
  const output=mkdtempSync(join(tmpdir(),'conversation-claim-verification-'));
- const entry=createRequire(import.meta.url)(await compileVerification(root,output));
- console.log(JSON.stringify(await entry.verifyLocalClaim(process.env)));
-}catch{console.error('CLAIM_VERIFICATION_STOP: no paid dispatch; retain all records and investigate without reset.');process.exitCode=1;}
+ const file=await compileVerification(root,output);
+ stage(report,'IMPORT');
+ const entry=createRequire(import.meta.url)(file);
+ const receipt=await (preflight?entry.preflightLocalClaim:entry.verifyLocalClaim)(process.env,report);
+ console.log(JSON.stringify({receipt,stages}));
+}catch{console.error(JSON.stringify({code:'CLAIM_VERIFICATION_STOP',stages}));process.exitCode=1;}

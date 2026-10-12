@@ -7,6 +7,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createRequire} from 'node:module';
 import {execFileSync} from 'node:child_process';
+import {stage} from './verification-diagnostics.mjs';
 import {verifyLocalClaims} from './verification-claim.mjs';
 import {claimStore} from './claim-store.mjs';
 import {assertPaidClaim} from './claim.mjs';
@@ -32,11 +33,30 @@ test('wrong target and any Vercel execution identity refuse before database I/O'
 test('separate compiled entry uses existing server client locally, exports no paid entry and contains no paid/OpenAI dependencies',async()=>{
  const output=mkdtempSync(join(tmpdir(),'offline-local-claim-')),file=await compileVerification(process.cwd(),output),source=readFileSync(file,'utf8');
  assert.doesNotMatch(source,/45dc0c92-13b7-41c8-985e-9da7acb628f0|d9f663b2-0556-4d76-9e20-aaa550041cec|__conversationPreviewControl|api\.openai\.com|home-solution-conversation\/route/);
- const entry=createRequire(import.meta.url)(file);assert.deepEqual(Object.keys(entry),['verifyLocalClaim']);
+ const entry=createRequire(import.meta.url)(file);assert.deepEqual(Object.keys(entry).sort(),['preflightLocalClaim','verifyLocalClaim']);
  const keys=['SUPABASE_URL','SUPABASE_SECRET_KEY','VERCEL','VERCEL_ENV','VERCEL_DEPLOYMENT_ID'],saved=Object.fromEntries(keys.map(k=>[k,process.env[k]])),fetch=globalThis.fetch;
  try{
   for(const k of keys)delete process.env[k];Object.assign(process.env,env);let writes=0;
   globalThis.fetch=async(url,init)=>{assert.equal(String(url),env.SUPABASE_URL+'/rest/v1/'+claimStore.table);assert.equal(init.method,'POST');writes++;return writes===1?new Response(null,{status:201}):duplicate();};
+  const stages=[];const preflight=await entry.preflightLocalClaim(process.env,code=>stages.push(code));assert.equal(preflight.claims,0);assert.equal(writes,0);assert.deepEqual(stages,['CONTEXT','CLIENT','READY','PRECHECK_OK']);
   const receipt=await entry.verifyLocalClaim(process.env);assert.equal(writes,2);assert.equal(receipt.paidAdmission,false);assert.equal(receipt.execution,'local');assert.throws(()=>assertPaidClaim(receipt));
  }finally{globalThis.fetch=fetch;for(const [k,v] of Object.entries(saved))if(v===undefined)delete process.env[k];else process.env[k]=v;}
+});
+
+test('diagnostic allowlist and response classes never include raw payloads',async()=>{
+ const seen=[];stage(code=>seen.push(code),'UNTRUSTED_ERROR_CONTENT');assert.deepEqual(seen,[]);
+ for(const [status,code,expected] of [[401,'28000','ACCESS'],[403,'42501','ACCESS'],[400,'23514','CONSTRAINT'],[503,'XX000','RESPONSE']]){
+  const stages=[];await assert.rejects(verifyLocalClaims(client(async()=>duplicate(status,code)),env,c=>stages.push(c)));
+  assert.ok(stages.includes(expected));assert.equal(JSON.stringify(stages).includes('UNTRUSTED'),false);
+ }
+ const stages=[];await assert.rejects(verifyLocalClaims(client(async()=>{throw Error('UNTRUSTED_ERROR_CONTENT');}),env,c=>stages.push(c)));assert.ok(stages.includes('TRANSPORT'));
+});
+test('CLI dry preflight initializes configured client without dispatch or insert stages; configuration failures stay fixed',()=>{
+ const local={...process.env,...env};for(const key of ['VERCEL','VERCEL_ENV','VERCEL_DEPLOYMENT_ID'])delete local[key];
+ const command=['tests/diagnostics/conversation-preview/verify-claim.mjs','--preflight-local-no-inserts'];
+ const result=JSON.parse(execFileSync(process.execPath,command,{env:local,encoding:'utf8'}));
+ assert.deepEqual(result.stages,['CONFIG','COMPILE','IMPORT','CONTEXT','CLIENT','READY','PRECHECK_OK']);assert.equal(result.receipt.claims,0);
+ assert.throws(()=>execFileSync(process.execPath,command,{env:{...local,SUPABASE_SECRET_KEY:''},stdio:'pipe'}),error=>{
+  assert.deepEqual(JSON.parse(error.stderr.toString()),{code:'CLAIM_VERIFICATION_STOP',stages:['CONFIG']});return true;
+ });
 });

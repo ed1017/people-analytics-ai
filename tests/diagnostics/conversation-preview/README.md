@@ -39,3 +39,20 @@ Only after control GO + parent release: place exact armed manifest at .conversat
 Provider-free verification command (only after reviewed apply and explicit local verification release): `node tests/diagnostics/conversation-preview/verify-claim.mjs --verify-local-provider-free`. Run locally from this reviewed checkout with existing SUPABASE_URL/SUPABASE_SECRET_KEY targeting noykvmztefmmhyuwuppv; VERCEL, VERCEL_ENV and VERCEL_DEPLOYMENT_ID must be absent. The CLI rejects Vercel execution rather than requiring or fabricating its identity. The old --verify-provider-free mode is rejected. No paid manifest, OPENAI_API_KEY, remote build or build-command override is needed. Never invoke the unchanged paid vercel.json build command merely to verify admission.
 
 References checked: https://supabase.com/docs/reference/javascript/insert ; https://supabase.com/docs/reference/javascript/retry ; https://supabase.com/docs/guides/api/securing-your-api ; https://www.postgresql.org/docs/17/ddl-rowsecurity.html ; https://www.postgresql.org/docs/17/sql-grant.html .
+
+### Local stage diagnostics and no-insert preflight
+
+`node tests/diagnostics/conversation-preview/verify-claim.mjs --preflight-local-no-inserts`
+compiles the separate verification bundle, checks the local target, imports and
+initializes the existing server client in dataset context, and stops before any
+insert builder. Its fetch transport is disabled. Run in a network-disabled
+container for OS-level isolation; a successful preflight is not database admission
+verification and does not validate credentials against the server.
+
+The verifier emits only allowlisted stage names and the fixed
+`CLAIM_VERIFICATION_STOP` code. `DISPATCH` means fetch was invoked, not that the
+server received a request. `ACCESS` classifies HTTP 401/403; `CONSTRAINT` classifies
+allowlisted SQLSTATEs; neither emits raw response details. `CLIENT` without `READY`
+locates an initialization failure; `COMPILE`/`IMPORT` locate bundle failures.
+No diagnostic changes the same verification UUID, no-retry rule, retained records,
+or paid admission. Live verification still requires a separate explicit release.
