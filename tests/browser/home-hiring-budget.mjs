@@ -86,7 +86,7 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  await history.locator('summary').first().click();
  await send('Explain the hiring assumptions.');
  check('specialist factual followup does not revive the generic recommendation',await review.getByRole('article').filter({hasText:'Recommended Action Plan'}).count()===0&&(await readState()).exploration.fields.homeSolutionConversationV1.recommendationRequestId===null);
- await page.reload();await card.waitFor();
+ await page.reload();await review.getByText('Earlier hiring calculation',{exact:true}).click();await card.waitFor();
  check('reload retains specialist focus and accessible generic history',await review.getByRole('article').filter({hasText:'Recommended Action Plan'}).count()===0&&await review.getByText('Earlier proposals (1)',{exact:true}).count()===1);
  await send('Recommend a plan');
  check('specialist to generic transition has one current recommendation and retains the estimate',await review.getByRole('article').filter({hasText:'Recommended Action Plan'}).count()===1&&await card.count()===1);

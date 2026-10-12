@@ -306,10 +306,14 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     }
     if(solutionConversationEnabled&&message){
       if(!solutions.canSend||solutions.pending||chatLoading||sending.current)return;
-      const ticket=Symbol(),key=contextKey;sending.current=ticket;setChatError(null);
+      const ticket=Symbol(),key=contextKey,emptyComposer=!input.trim();sending.current=ticket;setChatError(null);
+      // Failed/cancelled submissions belong to UI history, never accepted model state.
+      // Retrying the last unanswered question reuses its visible turn.
+      setMessages(current=>current.at(-1)?.role==='user'&&current.at(-1)?.content===message?current:[...current,{role:'user',content:message}]);
+      setInput(current=>current.trim()?current:message);
       responseReveal.current?.cancel();const reveal=guidedExampleActive?null:queueHomeResponseReveal(()=>conversationViewport.current,()=>liveActive.current&&currentEvidenceKey.current===key);responseReveal.current=reveal;
-      try{const answer=await solutions.send(message);if(answer){const assistantMessage:ChatMessage={role:'assistant',content:answer};if(solutions.answerSeries.current.length){answerCharts.current.set(assistantMessage,{context:key,series:solutions.answerSeries.current});while(answerCharts.current.size>16)answerCharts.current.delete(answerCharts.current.keys().next().value!);}setMessages(current=>[...current,{role:'user',content:message},assistantMessage]);if(!keepComposer)setInput(current=>current.trim()===message?'':current);setQuestionUnanswered(false);}}
-      catch(error){setChatError(error instanceof Error?error.message:'The conversation is unavailable. Your draft is kept.');}
+      try{const answer=await solutions.send(message);if(answer&&sending.current===ticket&&liveActive.current&&currentEvidenceKey.current===key){const assistantMessage:ChatMessage={role:'assistant',content:answer};if(solutions.answerSeries.current.length){answerCharts.current.set(assistantMessage,{context:key,series:solutions.answerSeries.current});while(answerCharts.current.size>16)answerCharts.current.delete(answerCharts.current.keys().next().value!);}setMessages(current=>[...current,assistantMessage]);if(!keepComposer||emptyComposer)setInput(current=>current.trim()===message?'':current);setQuestionUnanswered(false);}}
+      catch(error){if(sending.current===ticket&&liveActive.current&&currentEvidenceKey.current===key)setChatError(error instanceof Error?error.message:'The conversation is unavailable. Your draft is kept.');}
       finally{if(sending.current===ticket)sending.current=null;if(liveActive.current&&currentEvidenceKey.current===key)reveal?.complete();else reveal?.cancel();}return;
     }
     const forecastQuestion = !actionPlan && Boolean(homeForecastIntent(message));

@@ -216,6 +216,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   if(!checked||checked.revision!==ref.revision)throw Error('A claimed quantitative result was not checked in this turn.');
   resolveSolutionMetric(state,ref);
  }
+ state.currentCalculationKinds=[...([...planningRefs.values()].some(ref=>ref.kind==='hiring')?['hiring' as const]:[]),...(staffingCalculated?['required-staffing' as const]:[])];
  state.verifiedMetrics=final.verifiedMetrics;
  state.rejected=state.rejected.slice(-24);state.questions=final.questions;
  if(final.candidateIds.length){state.recommendationRequestId=request.requestId;state.focusCandidateId=final.focusCandidateId;}
