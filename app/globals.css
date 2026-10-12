@@ -707,3 +707,16 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .home-answer > [data-chat-caveat-qualifier], [data-chat-caveat-qualifier] { font-size: .875rem; line-height: 1.5; }
 .home-answer > [data-chat-caveat-qualifier], .home-answer li[data-chat-caveat-qualifier] { margin-block-start: .375rem; }
 .home-answer > [data-chat-caveat-qualifier]:first-child { margin-block-start: 0; }
+
+/* Evidence columns follow their available pane, including AI-panel resizing. */
+.evidence-pane { container-type: inline-size; overflow-wrap: anywhere; }
+.evidence-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+}
+.evidence-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+:is(.evidence-panel-grid, .evidence-metric-grid) > *, .evidence-pane .grid > * { min-width: 0; }
+.evidence-chart { width: 100%; height: clamp(16rem, 65cqi, 20rem); }

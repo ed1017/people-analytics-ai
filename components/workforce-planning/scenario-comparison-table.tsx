@@ -1,3 +1,4 @@
+import {EvidenceTableRegion} from '@/components/evidence-table-region';
 import { formatWholeCount, formatFte } from "@/lib/display-format";
 import { knownDifference } from "@/lib/numeric-contract";
 import type {
@@ -64,7 +65,7 @@ export function ScenarioComparisonTable({
         </p>
       </div>
 
-      <div className="overflow-x-auto">
+      <EvidenceTableRegion label="Company scenario comparison">
         <table className="w-full min-w-[720px] text-sm">
           <thead>
             <tr className="border-b text-left text-xs text-muted-foreground">
@@ -142,7 +143,7 @@ export function ScenarioComparisonTable({
             )}
           </tbody>
         </table>
-      </div>
+      </EvidenceTableRegion>
     </>
   );
 }

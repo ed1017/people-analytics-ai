@@ -16,7 +16,13 @@ for(const route of routes)test(`${route}: exported request wrapper retains datas
  const declaration=source.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text===method);
  assert.ok(declaration);const exports={},seen=[];
  const handler=async()=>{const before=datasetRouter.current();await Promise.resolve();assert.equal(datasetRouter.current(),before);seen.push(before.token);return Response.json({synthetic:true});};
- const code=ts.transpileModule(declaration.getText(source),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+ let reader='';
+ if(route==='survey-sentiment'){
+  const shared=ts.createSourceFile('reader.ts',readFileSync(new URL('../lib/survey-sentiment-reader.ts',import.meta.url),'utf8'),ts.ScriptTarget.Latest,true);
+  const wrapper=shared.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='readSurveySentiment');
+  assert.ok(wrapper);reader=wrapper.getText(shared)+'\n';
+ }
+ const code=ts.transpileModule(reader+declaration.getText(source),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
  vm.runInNewContext(code,{exports,withDatasetRequest,handleGET:handler,handlePOST:handler});
  for(const header of [LEGACY_DATASET_TOKEN,null]){
   const request=new Request('http://synthetic.invalid/api/'+route,{method,headers:header?{[DATASET_HEADER]:header}:{}}),response=await exports[method](request);

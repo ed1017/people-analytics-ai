@@ -6,6 +6,8 @@ import ts from 'typescript';
 import {makeDemoRange} from '../lib/compensation-ranges.ts';
 import {buildDemoConventionRelease} from '../lib/compensation-convention.ts';
 import * as contract from '../lib/compensation-release.ts';
+import {withDatasetRequest} from '../lib/dataset-runtime.ts';
+import {DATASET_HEADER,LEGACY_DATASET_TOKEN} from '../lib/dataset-identity.mjs';
 const {compensationRelease:m, companyReleaseQuery, validateRelease}=contract;
 const names=Object.fromEntries(m.jobCodes.map(job=>[job,job]));
 const bands=m.jobCodes.flatMap(job=>[makeDemoRange(job,'L1',1,'US'),makeDemoRange(job,'L2',8,'US')]);
@@ -65,14 +67,15 @@ test('wire validator binds snapshot/policy/job set, preserves withholding and st
 
 const source=fs.readFileSync(new URL('../app/api/compensation-job-release/route.ts',import.meta.url),'utf8');
 const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-async function route(query='',enabled=false,result={data:calculate(),count:50,error:null}) {
+async function route(query='',enabled=false,result={data:calculate(),count:50,error:null},token=LEGACY_DATASET_TOKEN) {
   const calls=[],exports={};
   vm.runInNewContext(code,{exports,Response,URL,process:{env:{COMPENSATION_JOB_RELEASE_ENABLED:enabled?'true':'false'}},require:name=>{
+    if(name==='@/lib/dataset-runtime')return {withDatasetRequest};
     if(name.endsWith('compensation-release'))return contract;
     if(name.endsWith('supabase-server')){calls.push('loaded server');return {supabaseServer:{from:table=>{calls.push(table);return {select:columns=>{calls.push(columns);return {eq:async(...args)=>{calls.push(args);return result;}}}}}}};}
     throw Error('Unexpected module '+name);
   }});
-  return {response:await exports.GET(new Request('http://local/api/compensation-job-release?'+query)),calls};
+  return {response:await exports.GET(new Request('http://local/api/compensation-job-release?'+query,{headers:{[DATASET_HEADER]:token}})),calls};
 }
 test('disabled or filtered route never loads a database module; convention approval cannot enable publication',async()=>{
   for(const [query,enabled,status] of [['',false,503],['country=US',true,422],['date=2026-09-30',true,422]]) {
@@ -80,7 +83,8 @@ test('disabled or filtered route never loads a database module; convention appro
   }
 });
 test('enabled route reads only the frozen aggregate and rejects incomplete/stale releases without source details',async()=>{
-  const {response,calls}=await route('',true);assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'no-store');
+  const {response,calls}=await route('',true);assert.equal(response.status,200);assert.equal(response.headers.get(DATASET_HEADER),LEGACY_DATASET_TOKEN);
+  const stale=await route('',true,undefined,'legacy-v1:1');assert.equal(stale.response.status,409);assert.equal(stale.calls.length,0);assert.equal(response.headers.get('cache-control'),'no-store');
   assert.equal((await response.json()).rows.length,50);assert.deepEqual(calls,['loaded server','compensation_job_release_v1',contract.RELEASE_COLUMNS,['release_id',m.releaseId]]);
   for(const result of [{data:calculate(),count:49,error:null},{data:null,count:null,error:{message:'PRIVATE'}},{data:calculate().map(r=>({...r,snapshot_date:'2025-01-01'})),count:50,error:null}]) {
     const {response}=await route('',true,result);assert.equal(response.status,503);assert.doesNotMatch(await response.text(),/PRIVATE/);

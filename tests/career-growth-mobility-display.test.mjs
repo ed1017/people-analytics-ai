@@ -23,6 +23,7 @@ function loadComponent(path, aliases = {}) {
   return exports;
 }
 const {CareerGrowthMobilityPage} = loadComponent('../components/pages/career-growth-mobility-page.tsx', {
+  '@/components/evidence-table-region': loadComponent('../components/evidence-table-region.tsx'),
   '@/components/evidence-scope-notice': loadComponent('../components/evidence-scope-notice.tsx', {'@/lib/talent-evidence-scope': scope}),
   '@/components/workforce-performance': loadComponent('../components/workforce-performance.tsx', {'@/lib/workforce-performance': performance}),
   '@/lib/talent-evidence-scope': scope,

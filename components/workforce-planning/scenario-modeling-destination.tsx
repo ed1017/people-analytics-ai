@@ -37,15 +37,8 @@ export function ScenarioModelingDestination({
   return (
     <div
       data-planning-destination="scenario-modeling"
-      className={visible ? "space-y-6" : "hidden"}
+      className={visible ? "evidence-pane space-y-6" : "hidden"}
     >
-      <ScenarioModelingPanel
-        {...panelProps}
-        visible
-      />
-
-      <TrainingTimingPanel suggestedMonth={activePlanningStart?.planning_month.slice(0,7)??""} />
-
       <ScenarioPlanSummary
         visible
         planningLoading={planningLoading}
@@ -70,6 +63,13 @@ export function ScenarioModelingDestination({
             />
           </div>
         )}
+      <ScenarioModelingPanel
+        {...panelProps}
+        visible
+      />
+
+      <TrainingTimingPanel suggestedMonth={activePlanningStart?.planning_month.slice(0,7)??""} />
+
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import {EvidenceTableRegion} from '@/components/evidence-table-region';
 import { attritionDefaultLabel, type ScenarioDefaultSource } from "@/lib/legacy-source-contracts";
 import { formatWholeCount, formatFte } from "@/lib/display-format";
 import { knownDifference } from "@/lib/numeric-contract";
@@ -319,7 +320,7 @@ export function ScenarioModelingPanel({
                 : "hidden"
             }
           >
-          <div className="mb-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mb-6 evidence-metric-grid grid gap-3">
             {planningScenarios.map(
               (scenario) => {
                 const end =
@@ -422,7 +423,7 @@ export function ScenarioModelingPanel({
             </div>
 
             {customAssumptions ? (
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+              <div className="evidence-metric-grid grid gap-3">
                 {scenarioFields.map((field) => {
                   const baseline =
                     scenarioDefaults?.[field.key] ?? null;
@@ -582,7 +583,7 @@ export function ScenarioModelingPanel({
                   </span>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="evidence-metric-grid grid gap-3">
                   <div className="rounded-md border p-3">
                     <p className="text-xs text-muted-foreground">
                       Ending Headcount
@@ -667,7 +668,7 @@ export function ScenarioModelingPanel({
                     </div>
                   </div>
 
-                  <div className="h-72 w-full">
+                  <div className="evidence-chart">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart
                         data={customScenario.points}
@@ -801,7 +802,7 @@ export function ScenarioModelingPanel({
                       }
                     </div>
 
-                    <div className="overflow-x-auto">
+                    <EvidenceTableRegion label="Scenario impact by segment">
                       <table className="w-full min-w-[720px] text-sm">
                         <thead>
                           <tr className="border-b text-left text-xs text-muted-foreground">
@@ -866,7 +867,7 @@ export function ScenarioModelingPanel({
                           )}
                         </tbody>
                       </table>
-                    </div>
+                    </EvidenceTableRegion>
 
                     <p className="mt-3 text-[11px] text-muted-foreground">
                       Showing{" "}
@@ -927,7 +928,7 @@ export function ScenarioModelingPanel({
               </div>
             </div>
 
-            <div className="mb-4 grid gap-3 lg:grid-cols-[minmax(240px,1fr)_2fr]">
+            <div className="mb-4 evidence-panel-grid grid gap-3">
               <label className="rounded-md border p-3">
                 <span className="text-xs font-medium text-muted-foreground">
                   Business Unit
@@ -965,7 +966,7 @@ export function ScenarioModelingPanel({
               </label>
 
               {buScenarioAssumptions ? (
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                <div className="evidence-metric-grid grid gap-3">
                   {scenarioFields.map(
                     (field) => (
                       <label
@@ -1031,7 +1032,7 @@ export function ScenarioModelingPanel({
             )}
 
             {buScenarioResult && (
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="evidence-metric-grid grid gap-3">
                 <div className="rounded-md border p-3">
                   <p className="text-xs text-muted-foreground">
                     BU Ending Headcount
@@ -1120,7 +1121,7 @@ export function ScenarioModelingPanel({
                 </span>
               </div>
 
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <div className="evidence-metric-grid grid gap-3">
                 {savedScenarios.map((entry) => {
                   const selected =
                     comparisonScenarioIds.includes(
@@ -1209,7 +1210,7 @@ export function ScenarioModelingPanel({
               </div>
 
               {comparedSavedScenarios.length > 0 && (
-                <div className="mt-5 overflow-x-auto">
+                <EvidenceTableRegion label="Saved scenario comparison" className="mt-5">
                   <table className="w-full min-w-[760px] text-sm">
                     <thead>
                       <tr className="border-b text-left text-xs text-muted-foreground">
@@ -1257,7 +1258,7 @@ export function ScenarioModelingPanel({
                       ))}
                     </tbody>
                   </table>
-                </div>
+                </EvidenceTableRegion>
               )}
             </div>
           )}

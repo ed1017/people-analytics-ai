@@ -34,6 +34,11 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  const summary=()=>page.getByRole('region',{name:'Goal progress',exact:true}),button=name=>page.getByRole('button',{name,exact:true}),value=label=>summary().locator('dl > div').filter({has:page.locator('dt').filter({hasText:label})}),saved=async()=>JSON.parse(await page.getByTestId('saved').textContent());
  const choose=async name=>{if(mode==='mobile')await button(name).tap();else await button(name).click();};
  await summary().waitFor();const original=await saved();
+ const details=summary().getByText('Measurement details and plan link',{exact:true});
+ check(mode+' compact summary keeps dated source, scope and execution caveat visible',await summary().innerText().then(t=>t.includes('110 people')&&t.includes('2026-09-20')&&t.includes('User-reported')&&t.includes('Saved scope:')&&t.includes('Execution not recorded')));
+ check(mode+' measurement grid starts disclosed',!await value('Baseline').isVisible());
+ await details.focus();await page.keyboard.press('Enter');
+ check(mode+' keyboard expands without moving focus',await value('Baseline').isVisible()&&await details.evaluate(n=>n===document.activeElement));
  check(mode+' saved baseline and dated actual appear',await value('Baseline').innerText().then(t=>t.includes('100 people')&&t.includes('2026-08-01'))&&await value('Latest dated measurement').innerText().then(t=>t.includes('110 people')&&t.includes('2026-09-20')&&t.includes('User-reported')));
  check(mode+' higher target, deadline and dated remaining gap',await value('Target').innerText().then(t=>t.includes('120 people')&&t.includes('Higher is better'))&&await value('Deadline').innerText().then(t=>t.includes('2026-12-31'))&&await value('Remaining gap').innerText().then(t=>t.includes('10 people')&&t.includes('2026-09-20')));
  check(mode+' no default measurement form or chart trajectory',await summary().locator('input,select,textarea,svg').count()===0&&!(await summary().innerText()).includes('Behind the arithmetic reference'));
@@ -66,6 +71,14 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  const committed=(await saved()).workspaces.growth.fields.goalProgressV1;await report(text2);check(mode+' repeated same-date report needs an explicit correction',await button('Confirm progress entry').isDisabled());await choose('Cancel progress draft');
  check(mode+' repeated identical report does not invent another observation',JSON.stringify((await saved()).workspaces.growth.fields.goalProgressV1)===JSON.stringify(committed));
  check(mode+' no runtime error or nonfixture network request',errors.length===0&&blocked.length===0&&requests.length===1&&requests[0]===mockURL&&await page.evaluate(()=>window.networkAttempts)===0);
+ for(const [date,overdue] of [['2026-08-01',false],['2026-12-30',false],['2026-12-31',false],['2027-01-01',true]]){
+  await page.clock.setFixedTime(new Date(date+'T13:00:00Z'));await page.reload();await summary().waitFor();
+  const beforeDeadlineRead=JSON.stringify(await saved()),deadline=summary().getByLabel('Goal deadline status',{exact:true});
+  check(mode+' '+date+' deadline boundary is honest with details closed',await details.evaluate(n=>!n.parentElement.open)&&await deadline.count()===(overdue?1:0)&&(!overdue||await deadline.isVisible()&&await deadline.innerText().then(t=>t.includes('2026-12-31')&&t.includes('review dated evidence'))));
+  check(mode+' '+date+' reading deadline does not write saved plans or progress',JSON.stringify(await saved())===beforeDeadlineRead);
+  if(overdue){await choose('Unmeasured synthetic goal');check(mode+' overdue warning remains visible without observations',await deadline.isVisible()&&(await summary().innerText()).includes('Not yet measured'));}
+ }
+ check(mode+' deadline cases have no errors or external requests',errors.length===0&&blocked.length===0&&await page.evaluate(()=>window.networkAttempts)===0);
  await context.close();
 }}finally{await browser.close()}
 await fs.writeFile(path.join(output,'receipt.json'),JSON.stringify({sourceSha,sourceTree,browserVersion,syntheticClock:'2026-10-08T13:00:00Z',nodeVersion:process.version,workingTree:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim(),artifactSha256:createHash('sha256').update(artifact).digest('hex'),checks,assertions,fixtureURL:mockURL,httpServerStarted:false,modelCalls:0,databaseCalls:0,fullApplicationTest:false,neverRun:['diagnostic API harness','provider/model/token-count calls','database','production startup/deployment','physical-device or user desktop interactions']},null,2));

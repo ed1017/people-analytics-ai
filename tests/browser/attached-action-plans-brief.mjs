@@ -1,5 +1,6 @@
 // Built Decision Brief with validated synthetic attachment history; no live services.
 import assert from 'node:assert/strict';
+import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 import {readFileSync} from 'node:fs';
 import {bundleProposalFixture} from '../fixtures/home-bundles.mjs';
 import {createBundleDraft,reviseBundleDraft,bundleInputKey} from '../../lib/home-bundle-reconciliation.ts';
@@ -26,10 +27,10 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  const seed={version:1,revision:1,goals:{version:1,activeId:'a',goals:[{id:'a',statement:'Reduce turnover with a revised scope'},{id:'b',statement:'Other goal'}]},workspaces:{a:{savedAt:'2026-10-05T00:00:00Z',fields:{homeSolutionBundlesV1:workspace,brief:{...emptyDecisionBrief(),owner:'Keep owner',approvals:[{text:'A separate review note',recordedAt:'2026-10-05T00:00:00Z'}]}}}}};
  const open=async()=>{const trigger=page.getByRole('button',{name:'Open navigation',exact:true});if(await trigger.isVisible())await trigger.click();const group=page.getByRole('button',{name:'Planning — Plan Our Future',exact:true});if(await group.getAttribute('aria-expanded')!=='true')await group.click();await page.locator('[data-nav-destination="decision-brief"]').click();await page.getByRole('region',{name:'Attached Action Plans',exact:true}).waitFor()};
  const panel=()=>page.getByRole('region',{name:'Attached Action Plans',exact:true});
- const load=async value=>{await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:DECISIONS_STORAGE_KEY,value:encodeDecisions(value)});await page.reload();await open()};
+ const load=async value=>{await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:DECISIONS_STORAGE_KEY,value:encodeDecisions(value)});await page.reload();await dismissHomeOnboarding(page);await open()};
  await page.goto(base);await load(seed);
  check(mode+' latest snapshot is visible and prior version collapsed',await panel().getByRole('article').filter({visible:true}).count()===1&&await panel().getByText('Attached 2026-10-05 · Latest attached version',{exact:true}).isVisible());
- check(mode+' changed goal is historical and missing totals remain unknown',await panel().getByText('Goal wording has changed since this attachment.',{exact:true}).first().isVisible()&&await panel().getByText(/Snapshot cash: Unknown. Staff hours: Unknown/).first().isVisible());
+ check(mode+' changed goal is historical and missing totals remain unknown',await panel().getByText('Goal wording has changed since this attachment.',{exact:true}).first().isVisible()&&await panel().getByRole('region',{name:'Total cost',exact:true}).first().getByText('Unknown',{exact:true}).isVisible()&&await panel().getByRole('region',{name:'Resources',exact:true}).first().getByText(/Delivery hours: Unknown/).isVisible());
  await panel().getByText('Previous attached versions',{exact:true}).click();check(mode+' prior immutable version can be inspected',await panel().getByRole('article').filter({visible:true}).count()===2&&await panel().getByText('Attached 2026-10-05 · Previous attached version',{exact:true}).isVisible());
  check(mode+' decision owner and explicit notes preserved',await page.getByLabel(/^Decision owner \(optional\)/).inputValue()==='Keep owner'&&await page.getByRole('region',{name:'Explicit approvals'}).getByText(/A separate review note/).isVisible());
  check(mode+' responsive snapshot and history fit page',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
@@ -39,7 +40,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  const legacy=JSON.parse(readFileSync(new URL('../fixtures/home-plan-legacy-costs.json',import.meta.url))),legacyId=legacy.base.binding.goalId;
  const legacySeed={version:1,revision:1,goals:{version:1,activeId:legacyId,goals:[{id:legacyId,statement:legacy.base.binding.goal}]},workspaces:{[legacyId]:{savedAt:'2026-10-06T12:05:00Z',fields:{homeSolutionBundlesV1:legacy.workspace,homePlanRevisionsV1:legacy.history}}}};
  await load(legacySeed);
- check(mode+' saved all-in snapshot displays cash headroom and hours without time pricing',await panel().getByText(/Staff hours: 36/).isVisible()&&await panel().getByText(/\$2,500 USD headroom/).isVisible()&&!/Employee time value|\$2,700|\$6,200/.test(await panel().innerText()));
+ check(mode+' saved all-in snapshot displays cash headroom and hours without time pricing',await panel().getByRole('region',{name:'Resources',exact:true}).getByText(/Delivery hours: 36/).isVisible()&&await panel().getByText(/\$2,500 USD headroom/).filter({visible:true}).isVisible()&&!/Employee time value|\$2,700|\$6,200/.test(await panel().innerText()));
  check(mode+' legacy stored snapshot remains byte-for-byte unchanged',await page.evaluate(({key,id,expected})=>JSON.stringify(JSON.parse(localStorage.getItem(key)).payload.workspaces[id].fields.homeSolutionBundlesV1)===expected,{key:DECISIONS_STORAGE_KEY,id:legacyId,expected:JSON.stringify(legacy.workspace)}));
  check(mode+' no model calls or runtime errors',posts===0&&errors.length===0);await context.close();
 }}finally{await browser.close()}

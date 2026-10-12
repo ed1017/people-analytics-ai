@@ -1,5 +1,6 @@
 "use client";
 
+import {EvidenceTableRegion} from '@/components/evidence-table-region';
 import {CalibratedTaPanels} from "@/components/calibrated-ta-panels";
 import {isSeparateTaDataset,resolveTaResponseExtension} from "@/lib/synthetic-ta/extension";
 
@@ -27,7 +28,7 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
   const extension = !loading&&!error ? resolveTaResponseExtension(data) : null;
 
   return (
-    <section className="evidence-workspace min-w-0 p-6">
+    <section className="evidence-workspace evidence-pane min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">Monitor recruiting demand, funnel conversion, hiring velocity, and source effectiveness.</p>
@@ -39,11 +40,11 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
 
       {error && <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">{error}</div>}
 
-      <div className="mb-4">{extension ? <CalibratedTaPanels data={extension} /> : <p className="rounded-lg border p-3 text-sm">{separateDataset?'Active-requisition history, projections and a screening stage are not released for this dataset. The recruiting summary and funnel use its own events.':'Calibrated projections and expanded funnel unavailable: source data is loading or differs from the calibration snapshot.'}</p>}</div>
+
 
       {summary ? (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="evidence-metric-grid grid gap-4">
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">Current-status Open Requisitions</p>
               <p className="mt-2 text-3xl font-semibold">{formatWholeCount(summary.open_requisitions)}</p>
@@ -69,19 +70,19 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
           {!extension&&<section aria-label="Source recruiting funnel" className="mt-6 rounded-lg border p-4">
             <h3 className="font-semibold">Recruiting funnel</h3>
             <p className="mb-4 text-sm text-muted-foreground">{separateDataset?'Constructed source events. Hires count accepted offers; employment starts drive headcount. Internal fills are movements. Screening and a separate acceptance stage are unavailable.':'Stages available in the current source summary; no screening or acceptance stage is inferred.'}</p>
-            <div className="grid gap-3 md:grid-cols-4">{([
+            <div className="evidence-metric-grid grid gap-3">{([
               ['Applications',summary.applications,null],['Interviewed',summary.interviewed_applications,summary.application_to_interview_pct],
               ['Offers',summary.offered_applications,summary.interview_to_offer_pct],['Hires',summary.hires,summary.offer_to_hire_pct],
             ] as const).map(([label,value,conversion])=><div key={label} className="rounded-lg border bg-muted/10 p-4"><p className="text-xs font-medium">{label}</p><p className="mt-2 text-2xl font-semibold">{formatWholeCount(value)}</p><p className="mt-2 text-xs text-muted-foreground">{label==='Applications'?'Top of funnel':formatMetric(conversion,1,'% from prior stage')}</p></div>)}</div>
           </section>}
 
-          <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)]">
+          <div className="mt-6 evidence-panel-grid grid gap-6">
             <div className="rounded-lg border p-4">
               <div className="mb-4">
                 <h3 className="font-semibold">Monthly Recruiting Activity</h3>
                 <p className="text-sm text-muted-foreground">Applications and hires from January 2024 through September 2026</p>
               </div>
-              <div className="h-80 w-full">
+              <div className="evidence-chart">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={data.monthly} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
@@ -109,7 +110,7 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
           <div className="mt-6 grid gap-6">
             <div className="min-w-0 rounded-lg border p-4">
               <div className="mb-4"><h3 className="font-semibold">Hiring Demand by Business Unit</h3><p className="text-sm text-muted-foreground">Current open positions and historical hiring velocity</p></div>
-              <div className="overflow-x-auto">
+              <EvidenceTableRegion label="Hiring demand by business unit">
                 <table className="w-full min-w-[620px] text-sm">
                   <thead><tr className="border-b text-left text-xs text-muted-foreground"><th className="pb-3 pr-4">Business Unit</th><th className="pb-3 pr-4 text-right">Open</th><th className="pb-3 pr-4 text-right">Hires</th><th className="pb-3 text-right">Avg TTF</th></tr></thead>
                   <tbody>
@@ -123,12 +124,12 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </EvidenceTableRegion>
             </div>
 
             <div className="min-w-0 rounded-lg border p-4">
               <div className="mb-4"><h3 className="font-semibold">Source Effectiveness</h3><p className="text-sm text-muted-foreground">Applications, hires, and application-to-hire conversion</p></div>
-              <div className="overflow-x-auto">
+              <EvidenceTableRegion label="Recruiting source effectiveness">
                 <table className="w-full min-w-[560px] text-sm">
                   <thead><tr className="border-b text-left text-xs text-muted-foreground"><th className="pb-3 pr-4">Source</th><th className="pb-3 pr-4 text-right">Apps</th><th className="pb-3 pr-4 text-right">Hires</th><th className="pb-3 text-right">Conv.</th></tr></thead>
                   <tbody>
@@ -142,7 +143,7 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </EvidenceTableRegion>
             </div>
           </div>
 
@@ -151,7 +152,7 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
               <div><h3 className="font-semibold">Recruiter Workload</h3><p className="text-sm text-muted-foreground">Recruiters with the largest active requisition loads</p></div>
               <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">Top 10 by open reqs</span>
             </div>
-            <div className="overflow-x-auto">
+            <EvidenceTableRegion label="Recruiter workload">
               <table className="w-full min-w-[760px] text-sm">
                 <thead><tr className="border-b text-left text-xs text-muted-foreground"><th className="pb-3 pr-4">Recruiter</th><th className="pb-3 pr-4">Region</th><th className="pb-3 pr-4">Specialty</th><th className="pb-3 pr-4 text-right">Open Reqs</th><th className="pb-3 text-right">Avg TTF</th></tr></thead>
                 <tbody>
@@ -166,12 +167,13 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
                   ))}
                 </tbody>
               </table>
-            </div>
+            </EvidenceTableRegion>
           </div>
         </>
       ) : (
         <div className="rounded-lg border p-8 text-center text-sm text-muted-foreground">{loading ? "Loading Talent Acquisition analytics…" : "No Talent Acquisition data returned."}</div>
       )}
+      <div className="mb-4">{extension ? <CalibratedTaPanels data={extension} /> : <p className="rounded-lg border p-3 text-sm">{separateDataset?'Active-requisition history, projections and a screening stage are not released for this dataset. The recruiting summary and funnel use its own events.':'Calibrated projections and expanded funnel unavailable: source data is loading or differs from the calibration snapshot.'}</p>}</div>
     </section>
   );
 }

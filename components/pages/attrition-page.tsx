@@ -1,5 +1,6 @@
 "use client";
 
+import {EvidenceTableRegion} from '@/components/evidence-table-region';
 import {memo, useMemo} from "react";
 import {SyntheticDomainDemo} from "@/components/synthetic-domain-demo";
 
@@ -38,7 +39,7 @@ export const AttritionPage = memo(function AttritionPage({ data, loading, error,
   const trend2026 = useMemo(() => (data?.trend ?? []).filter((row) => row.month >= "2026-01-01"), [data?.trend]);
 
   return (
-    <section className="evidence-workspace min-w-0 p-6">
+    <section className="evidence-workspace evidence-pane min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">
@@ -55,11 +56,10 @@ export const AttritionPage = memo(function AttritionPage({ data, loading, error,
           {error}
         </div>
       )}
-      <SyntheticDomainDemo domain="turnover" />
 
       {summary ? (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="evidence-metric-grid grid gap-4">
             {[
               ["Voluntary Turnover YTD", summary.voluntary_turnover_ytd_pct.toFixed(1) + "%", summary.voluntary_exits.toLocaleString() + " voluntary exits", "Voluntary exits year to date divided by average monthly headcount over the same period."],
               ["Annualized Voluntary", summary.annualized_voluntary_turnover_pct.toFixed(1) + "%", "Run-rate based on Jan-Sep", "Current year-to-date voluntary turnover converted to a 12-month run rate. It is a pace indicator, not a forecast."],
@@ -80,11 +80,11 @@ export const AttritionPage = memo(function AttritionPage({ data, loading, error,
             ))}
           </div>
 
-          <div className="mt-6 grid gap-6 xl:grid-cols-2">
+          <div className="mt-6 evidence-panel-grid grid gap-6">
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">Monthly Voluntary Turnover</h3>
               <p className="mb-4 text-sm text-muted-foreground">2026 monthly voluntary turnover rate</p>
-              <div className="h-72">
+              <div className="evidence-chart">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={trend2026}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
@@ -100,7 +100,7 @@ export const AttritionPage = memo(function AttritionPage({ data, loading, error,
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">Voluntary Turnover by Business Unit</h3>
               <p className="mb-4 text-sm text-muted-foreground">YTD rate using average monthly headcount</p>
-              <div className="h-72">
+              <div className="evidence-chart">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={data.business_units} layout="vertical" margin={{ left: 90 }}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
@@ -118,7 +118,7 @@ export const AttritionPage = memo(function AttritionPage({ data, loading, error,
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">Reported Separation Reasons</h3>
               <p className="mb-4 text-sm text-muted-foreground">All 2026 YTD separation records</p>
-              <div className="overflow-x-auto">
+              <EvidenceTableRegion label="Reported separation reasons">
                 <table className="w-full min-w-[540px] text-sm">
                   <thead><tr className="border-b text-left text-xs text-muted-foreground">
                     <th className="pb-3">Reason</th><th className="pb-3">Type</th>
@@ -133,13 +133,13 @@ export const AttritionPage = memo(function AttritionPage({ data, loading, error,
                     </tr>
                   ))}</tbody>
                 </table>
-              </div>
+              </EvidenceTableRegion>
             </div>
 
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">Attrition by Tenure</h3>
               <p className="mb-4 text-sm text-muted-foreground">Exit volume by tenure at separation</p>
-              <div className="h-72">
+              <div className="evidence-chart">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={data.tenure}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
@@ -159,7 +159,7 @@ export const AttritionPage = memo(function AttritionPage({ data, loading, error,
           <div className="mt-6 rounded-lg border p-4">
             <h3 className="font-semibold">Career Level Exit Profile</h3>
             <p className="mb-4 text-sm text-muted-foreground">YTD exits by career level</p>
-            <div className="overflow-x-auto">
+            <EvidenceTableRegion label="Turnover by job level">
               <table className="w-full min-w-[680px] text-sm">
                 <thead><tr className="border-b text-left text-xs text-muted-foreground">
                   <th className="pb-3">Level</th><th className="pb-3 text-right">Total Exits</th>
@@ -174,7 +174,7 @@ export const AttritionPage = memo(function AttritionPage({ data, loading, error,
                   </tr>
                 ))}</tbody>
               </table>
-            </div>
+            </EvidenceTableRegion>
           </div>
 
           <div className="mt-6 rounded-md border bg-muted/20 p-4 text-xs text-muted-foreground">
@@ -188,6 +188,7 @@ export const AttritionPage = memo(function AttritionPage({ data, loading, error,
       )}
       <ExitSurveyFeedback data={exitData} loading={exitLoading} error={exitError} />
       <SyntheticExitCountExample />
+      <SyntheticDomainDemo domain="turnover" />
     </section>
   );
 });

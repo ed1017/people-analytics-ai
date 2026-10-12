@@ -11,6 +11,7 @@ import {summaryFixture} from '../fixtures/plan-quick-summary.mjs';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const output=await fs.mkdtemp(path.join(os.tmpdir(),'plan-quick-summary-'));
 const cases=['known','partial','unknown'].map(summaryFixture);const scenario=summaryFixture();scenario.name='scenario';scenario.result.conditionalCoverage=[0,1,2,3,4,5];cases.push(scenario);const empty=summaryFixture();empty.name='all-unknown';empty.result=null;cases.push(empty);
+const horizon=summaryFixture();horizon.name='out-of-horizon';horizon.draft.inputs.timing[0].finish={value:'2028-01-01',kind:'user-entered',basis:'Explicit fixture date after the shared horizon.'};horizon.result=null;cases.push(horizon);
 const mixedInput=await mixedPlanningFixture(),mixedResult=await evaluateSolutionCandidate(mixedInput.request,mixedInput.c,[]);assert.deepEqual(mixedResult.blocking,[]);cases.push({name:'mixed-recurring',draft:mixedResult.draft,result:mixedResult.result});
 const {prepareHiringPlan}=await import('../../lib/home-hiring-plan-save.ts');
 const {editHiringBudget}=await import('../../lib/home-hiring-budget.ts');
@@ -31,6 +32,12 @@ try{for(const [mode,width,height] of [['desktop',1200,1000],['phone',390,844]]){
  await page.goto('http://localhost:3123/');await page.getByRole('article',{name:'known',exact:true}).waitFor();
  const check=(name,ok)=>{assert.ok(ok,mode+' '+name);checks.push(mode+' '+name);};
  const known=page.getByRole('article',{name:'known',exact:true}),partial=page.getByRole('article',{name:'partial',exact:true}),unknown=page.getByRole('article',{name:'unknown',exact:true});
+ for(const card of [known,partial,unknown]){
+  const disclosure=card.locator('details').filter({has:page.locator('summary').filter({hasText:/^Cash breakdown/})}).first();
+  check('cash detail starts closed without hiding total/coverage',!await disclosure.evaluate(n=>n.open)&&await card.getByRole('region',{name:'Total cost',exact:true}).isVisible());
+  await disclosure.locator(':scope > summary').focus();await page.keyboard.press('Enter');
+  check('cash detail opens with keyboard and visible focus',await disclosure.evaluate(n=>n.open)&&await disclosure.locator(':scope > summary').evaluate(n=>n===document.activeElement&&parseFloat(getComputedStyle(n).outlineWidth)>0));
+ }
  const sections=known.getByRole('region',{name:'Action Plan quick summary'}).locator(':scope > div > section');
  const boxes=await sections.evaluateAll(nodes=>nodes.map(node=>({x:node.getBoundingClientRect().x,y:node.getBoundingClientRect().y,width:node.getBoundingClientRect().width})));
  check('three readable columns on desktop; stacked on phone',mode==='desktop'?boxes.every(box=>box.y===boxes[0].y)&&boxes[1].x>boxes[0].x:boxes.every(box=>box.x===boxes[0].x)&&boxes[1].y>boxes[0].y);
@@ -42,6 +49,9 @@ try{for(const [mode,width,height] of [['desktop',1200,1000],['phone',390,844]]){
  const emptySummary=page.getByRole('article',{name:'all-unknown',exact:true}).getByRole('region',{name:'Action Plan quick summary'});
  check('all-unknown summary stays compact with every unknown explicit',await emptySummary.evaluate(node=>node.getBoundingClientRect().height<260)&&await emptySummary.innerText().then(text=>text.includes('Breakdown: Unknown')&&text.includes('Duration / start / finish: Unknown')&&text.includes('People / FTE / staff hours: Unknown')));
  await page.getByRole('article',{name:'all-unknown',exact:true}).screenshot({path:path.join(output,mode+'-all-unknown.png')});
+ const capacity=page.getByRole('article',{name:'scenario',exact:true}).getByText('Conditional capacity scenario · not an observed trend',{exact:true});
+ check('capacity chart defaults to optional details',await page.getByRole('figure',{name:'Conditional capacity scenario'}).count()===0);
+ await capacity.focus();await page.keyboard.press('Enter');
  check('scenario chart uses supplied points and explicitly distinguishes them from actuals',await page.getByRole('figure',{name:'Conditional capacity scenario'}).count()===1&&await page.getByText('Conditional on readiness · not an observed trend',{exact:true}).isVisible());
  await page.getByRole('article',{name:'scenario',exact:true}).screenshot({path:path.join(output,mode+'-scenario.png')});
  check('FTE remains unknown and no inferred forecast appears',await known.getByRole('region',{name:'Resources'}).innerText().then(text=>text.includes('FTE: Unknown'))&&await page.getByText(/forecast/i).count()===0);
@@ -55,6 +65,8 @@ try{for(const [mode,width,height] of [['desktop',1200,1000],['phone',390,844]]){
  check('hiring preserves checked subtotal and unresolved roles',await hiringSummary.innerText().then(text=>text.includes('$924,000 USD · partial')&&text.includes('4 roles unresolved')&&text.includes('affordability: Unknown'))&&await hiringSummary.evaluate(node=>parseFloat(getComputedStyle(node).fontSize)>=16));
  if(mode==='desktop'){await hiringCard.evaluate(node=>node.style.width='350px');const tops=await hiringSections.evaluateAll(nodes=>nodes.map(node=>node.getBoundingClientRect().y));check('hiring stacks in a narrow desktop pane without clipping',tops[1]>tops[0]&&await hiringCard.evaluate(node=>node.scrollWidth<=node.clientWidth));}
  await hiringCard.screenshot({path:path.join(output,mode+'-hiring.png')});
+ const horizonCard=page.getByRole('article',{name:'out-of-horizon',exact:true});
+ check('material timing alert remains visible with assumptions closed',await horizonCard.getByRole('alert').isVisible()&&await horizonCard.getByRole('alert').innerText().then(text=>text.includes('extend beyond the shared horizon'))&&await horizonCard.getByText('Plan details and assumptions',{exact:true}).evaluate(n=>!n.parentElement.open));
  check('no overflow, runtime errors or network calls',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&external===0);await context.close();
 }}finally{await browser.close()}
 await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({checks},null,2));console.log(JSON.stringify({checks:checks.length,output}));
