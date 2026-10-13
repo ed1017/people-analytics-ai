@@ -3,7 +3,7 @@ import {currentHiringBudget} from './home-hiring-budget.ts';
 import type {SolutionRequest} from './home-solution-conversation';
 import type {HiringInputBasis} from './home-hiring-budget';
 // @ts-expect-error Native Node tests share application source.
-import {calculateRequiredStaffing,emptyRequiredStaffing,readRequiredStaffingInput,requiredStaffingFields,staffingFlagFields,staffingCashFields,type RequiredStaffingInput,type StaffingInputField} from './required-staffing.ts';
+import {calculateRequiredStaffing,emptyRequiredStaffing,readRequiredStaffingInput,requiredStaffingFields,staffingFlagFields,staffingCashFields,type RequiredStaffingInput,type RequiredStaffingOption,type StaffingInputField} from './required-staffing.ts';
 export type RequiredStaffingReview={version:1;revision:number;datasetToken:string;scopeKey:string;inputs:RequiredStaffingInput;origins:Partial<Record<StaffingInputField,HiringInputBasis>>;basisTurns:{id:string;text:string}[]};
 const basis={type:'object',properties:{kind:{type:'string',enum:['user-supplied','model-proposed']},turnId:{type:['string','null'],maxLength:80},quote:{type:['string','null'],maxLength:4000},explanation:{type:'string',minLength:1,maxLength:400}},required:['kind','turnId','quote','explanation'],additionalProperties:false};
 export const requiredStaffingTool={type:'function' as const,name:'compare_required_staffing',strict:true,description:'Compare ways to fill an explicitly required count of people without workload or a company-population lookup. Use for direct hire/train/redeploy comparisons. Inputs are scenario assumptions with provenance; no source read, save or operational action. requiredRoles/trainablePeople/redeployablePeople are whole counts up to 20; months is 1–24; hireCostPerPerson is cash for the ENTIRE stated horizon, not annual salary; trainingCostPerPerson/trainingHoursPerPerson are PER TRAINEE; redeploymentCostPerPerson and backfillCostPerInternalPerson are incremental cash PER INTERNAL PERSON for the period. hireTrainingHoursPerPerson is unknown unless explicitly specified; do not infer zero from an all-hire option. ReadyAfterMonths are whole offsets from period start, zero means ready at start. Unknown fields are null; zero and cost completeness must be explicit. An initial requiredRoles/role may reference the exact user-supplied count/role and original quote in the current scoped hiring estimate. This does not transfer salary, cash, period, availability or pool assumptions. Omit unchanged fields; existing premises change only with a current-user quote. Empty changes recalculates the current comparison for a numerical follow-up. No candidate/projection metric IDs are generated.',parameters:{type:'object',properties:{changes:{type:'array',maxItems:requiredStaffingFields.length,items:{anyOf:requiredStaffingFields.map(field=>({type:'object',properties:{field:{type:'string',enum:[field]},value:{type:[['role','currency'].includes(field)?'string':staffingFlagFields.includes(field as typeof staffingFlagFields[number])?'boolean':'number','null']},basis},required:['field','value','basis'],additionalProperties:false}))}}},required:['changes'],additionalProperties:false}};
@@ -27,6 +27,30 @@ export function currentRequiredStaffing(request:SolutionRequest,datasetToken:str
  const s=readRequiredStaffingReview(request.state.requiredStaffing);
  if(s&&(s.datasetToken!==datasetToken||s.scopeKey!==key(request)))throw Error('The staffing comparison belongs to another goal, dataset or workforce scope. Clear it before continuing.');
  return s;
+}
+export type StaffingDeliveryTarget={months:number;turnId:string;quote:string};
+/** Resolve one current interpreted target for display, eligibility, identity and saving. */
+export function resolveStaffingDeliveryTarget(state:SolutionRequest['state'],catalog:SolutionRequest['catalog']=null){
+ const constraint=state.constraints.find(c=>c.field==='horizon_months'&&c.action==='set');
+ if(!constraint||constraint.number===null)return {months:null,target:null,issue:null};
+ const months=constraint.number,review=state.requiredStaffing;
+ const turn=state.turns.find(t=>t.id===constraint.turnId&&t.role==='user')??review?.basisTurns.find(t=>t.id===constraint.turnId);
+ const saved=catalog?.plans.map(p=>p.draft.inputs.requiredStaffingPlan).find(r=>r&&r.review.datasetToken===review?.datasetToken&&r.review.scopeKey===review?.scopeKey&&r.deliveryTarget?.turnId===constraint.turnId&&r.deliveryTarget.months===months);
+ const target:StaffingDeliveryTarget|null=turn?{months,turnId:turn.id,quote:turn.text}:saved?.deliveryTarget??null;
+ return {months,target,issue:target?null:'Delivery target provenance is unavailable. Restate the target before pinning.'};
+}
+/** Keep the target's exact source alongside input provenance, beyond the rolling chat window. */
+export function retainStaffingDeliveryTarget(state:SolutionRequest['state'],catalog:SolutionRequest['catalog']=null){
+ const review=state.requiredStaffing;if(!review)return;
+ const {target}=resolveStaffingDeliveryTarget(state,catalog),used=new Set(Object.values(review.origins).flatMap(b=>b?.turnId?[b.turnId]:[]));
+ if(target)used.add(target.turnId);
+ const turns=new Map(review.basisTurns.filter(t=>used.has(t.id)).map(t=>[t.id,t]));
+ if(target)turns.set(target.turnId,{id:target.turnId,text:target.quote});
+ review.basisTurns=[...turns.values()];
+}
+export function staffingDeliveryConflict(option:RequiredStaffingOption,input:RequiredStaffingInput,targetMonths:number|null){
+ const activeReadiness=[option.readyAfterMonths,...(option.train?[input.trainingReadyAfterMonths]:[]),...(option.redeploy?[input.redeployReadyAfterMonths]:[]),...(option.hire?[input.hireReadyAfterMonths]:[])];
+ return targetMonths!==null&&activeReadiness.some(months=>months!==null&&months>targetMonths);
 }
 export const requiredStaffingView=(s:RequiredStaffingReview|null)=>s?{revision:s.revision,origins:s.origins,...calculateRequiredStaffing(s.inputs)}:null;
 /** Routing only: the model still supplies typed, provenance-checked inputs. */

@@ -19,6 +19,15 @@ const {solutionRequest}=await import('../fixtures/home-solution-conversation.mjs
 const hiringRequest=solutionRequest('Explicit fictional hiring assumptions.'),basis={kind:'user-supplied',turnId:hiringRequest.message.id,quote:hiringRequest.message.text,explanation:'Offline fixture.'};
 const hiringReview=editHiringBudget(hiringRequest,'fixture:0',Object.entries({role:'engineer',hires:10,budget:1000000,currency:'USD',startMonth:'2027-01',months:12,arrivalDate:'2027-01-01',ftePerHire:1,annualBasePay:120000,payBasis:'per_hire',annualAdditionalCostPerHire:24000,recruitingFeePerHire:10000}).map(([field,value])=>({field,value,basis})));
 const hiring=await prepareHiringPlan(hiringReview,6,{id:'goal-1',statement:'Cover 10 engineering roles within the reviewed budget.'});cases.push({name:'hiring',draft:hiring.draft,result:hiring.result});
+const {proposedPilot}=await import('../fixtures/model-proposed-pilot.mjs');
+for(const domain of ['manager_workload','learning','mobility','compensation','hiring','execution']){
+ const c=proposedPilot();c.activities[0].domain=domain;const evaluated=await evaluateSolutionCandidate(solutionRequest(),c,[]);assert.deepEqual(evaluated.blocking,[]);cases.push({name:'domain-'+domain,draft:evaluated.draft,result:evaluated.result});
+}
+const ranged=proposedPilot('range-pilot');ranged.activities.push({...ranged.activities[0],id:'c2',name:'Follow-up support',domain:'learning'});ranged.quantities=ranged.quantities.filter(q=>q.field!=='cash');ranged.quantities.find(q=>q.field==='participants').number=8;ranged.quantities.push({...ranged.quantities.find(q=>q.field==='participants'),target:'c2',number:10});ranged.quantities.find(q=>q.field==='hours_per_participant').number=3;ranged.quantities.find(q=>q.field==='coordination_hours').number=10;
+const rangeResult=await evaluateSolutionCandidate(solutionRequest(),ranged,[]);assert.deepEqual(rangeResult.blocking,[]);cases.push({name:'unknown-cash-range',draft:rangeResult.draft,result:rangeResult.result});
+const {prepareConditionalHiringPlan}=await import('../../lib/home-hiring-plan-save.ts');
+const allowanceReview=editHiringBudget(hiringRequest,'fixture:1',Object.entries({role:'engineer',hires:10,budget:1000000,currency:'EUR',startMonth:'2027-01',months:12}).map(([field,value])=>({field,value,basis})));
+const allowance=await prepareConditionalHiringPlan(allowanceReview,{id:'goal-2',statement:'Review conditional hiring.'});cases.push({name:'conditional-hiring',draft:allowance.draft,result:allowance.result});
 const compiler=webpackPackage.webpack({mode:'development',devtool:false,plugins:[new webpackPackage.webpack.DefinePlugin({'process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION':JSON.stringify('true'),'process.env.NEXT_PUBLIC_GOAL_PROGRESS':JSON.stringify('true'),'process.env.NEXT_PUBLIC_HOME_STRUCTURED_PLANS':JSON.stringify('false')})],entry:path.resolve('tests/fixtures/plan-quick-summary-client.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
 const css=(await postcss([tailwind({base:process.cwd()})]).process(await fs.readFile('app/globals.css','utf8'),{from:path.resolve('app/globals.css')})).css;
@@ -67,6 +76,16 @@ try{for(const [mode,width,height] of [['desktop',1200,1000],['phone',390,844]]){
  await hiringCard.screenshot({path:path.join(output,mode+'-hiring.png')});
  const horizonCard=page.getByRole('article',{name:'out-of-horizon',exact:true});
  check('material timing alert remains visible with assumptions closed',await horizonCard.getByRole('alert').isVisible()&&await horizonCard.getByRole('alert').innerText().then(text=>text.includes('extend beyond the shared horizon'))&&await horizonCard.getByText('Plan details and assumptions',{exact:true}).evaluate(n=>!n.parentElement.open));
+ for(const fixture of cases){
+  const card=page.getByRole('article',{name:'compact-'+fixture.name,exact:true});
+  check(fixture.name+' compact option has six bullets and one flat disclosure',await card.getByRole('region',{name:'Action Plan quick summary',exact:true}).getByRole('listitem').count()===6&&await card.locator('details').count()===1);
+  const detail=card.getByText('Assumptions & caveats',{exact:true});await detail.focus();await page.keyboard.press('Enter');check(fixture.name+' assumptions are keyboard accessible',await detail.evaluate(n=>n.parentElement.open));await page.keyboard.press('Enter');
+  check(fixture.name+' compact summary fits viewport',await card.evaluate(n=>n.scrollWidth<=n.clientWidth));
+  await card.screenshot({path:path.join(output,mode+'-compact-'+fixture.name+'.png')});
+ }
+ check('compact costed hiring retains USD subtotal and identifies included new-hire pay',await page.getByRole('article',{name:'compact-hiring',exact:true}).innerText().then(text=>text.includes('$924,000')&&text.includes('USD')&&text.includes('includes new-hire pay')&&!text.includes('payroll excluded')));
+ check('range retains unknown cash and overlap-qualified effort',await page.getByRole('article',{name:'compact-unknown-cash-range',exact:true}).innerText().then(text=>text.includes('Unknown')&&text.includes('10–18 people')&&text.includes('40–64 hours')&&text.includes('overlap unknown')));
+ check('compact unknown never becomes zero',await page.getByRole('article',{name:'compact-unknown',exact:true}).getByRole('region',{name:'Action Plan quick summary',exact:true}).getByText('Unknown',{exact:true}).first().isVisible()&&await page.getByRole('article',{name:'compact-unknown',exact:true}).getByText('$0',{exact:true}).count()===0);
  check('no overflow, runtime errors or network calls',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&external===0);await context.close();
 }}finally{await browser.close()}
 await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({checks},null,2));console.log(JSON.stringify({checks:checks.length,output}));

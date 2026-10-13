@@ -1,9 +1,14 @@
+import {requiredStaffingPlanFacts} from '@/lib/home-required-staffing-plan';
+import {bundleInputKey} from '@/lib/home-bundle-reconciliation';
+import {StaffingOptionSummary} from './home-required-staffing-review';
 import {HiringPlanningSummary} from './hiring-planning-summary';
 import type {BundleDraft,BundleResult} from '@/lib/home-bundle-reconciliation';
 import {actionPlanQuickSummary} from '@/lib/action-plan-quick-summary';
 const number=(value:number|null)=>value===null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:1});
 const money=(value:number|null)=>value===null?'Unknown':`$${value.toLocaleString('en-US',{maximumFractionDigits:2})}`;
-export function ActionPlanQuickSummary({draft,result}:{draft:BundleDraft|null;result?:BundleResult|null}){
+export function ActionPlanQuickSummary({draft,result,compact=false}:{draft:BundleDraft|null;result?:BundleResult|null;compact?:boolean}){
+ if(draft?.inputs.requiredStaffingPlan&&result?.inputKey===bundleInputKey(draft)){const f=requiredStaffingPlanFacts(draft.inputs.requiredStaffingPlan);return <section aria-label="Action Plan quick summary"><StaffingOptionSummary option={f.option} currency={f.review.inputs.currency} costMonths={f.review.inputs.months} deliveryMonths={f.deliveryTarget?.months??null}/></section>;}
+ if(compact)return <CompactPlanSummary draft={draft} result={result}/>;
  const value=actionPlanQuickSummary(draft,result);
  const planning=value.planning;
  if(value.conditionalHiring)return <section aria-label="Action Plan quick summary" className="space-y-2"><p className="font-medium">Conditional hiring proposal · assumptions unconfirmed</p><HiringPlanningSummary result={value.conditionalHiring.result}/><p>Full hiring cost, affordability and staffing availability: Unknown. Budget allowance is not reviewed complete cash.</p></section>;
@@ -44,5 +49,31 @@ export function ActionPlanQuickSummary({draft,result}:{draft:BundleDraft|null;re
    <section aria-label="Resources" className="min-w-0 space-y-1"><div className="flex flex-wrap justify-between gap-x-2"><h4 className="font-semibold">People</h4><p className="text-xl font-semibold">{number(value.people)}</p></div><p>FTE: Unknown · Delivery hours: {number(value.deliveryHours)}</p>{value.staffingHoursSeparate&&<p>Training hours separate; combined effort unknown</p>}</section>
   </div>
   {series.length>0&&<details><summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Conditional capacity scenario · not an observed trend</summary><figure aria-label="Conditional capacity scenario" className="mt-2 rounded-lg border p-3"><figcaption className="font-semibold">Capacity scenario · people</figcaption><p>Conditional on readiness · not an observed trend</p><svg role="img" aria-label={`Scenario capacity: ${series[0].people} to ${series.at(-1)!.people} people; demand ${number(value.demand)}`} viewBox="0 0 660 100" className="h-24 w-full"><title>Checked monthly conditional capacity; not FTE or guaranteed availability</title><path d="M30 15V90H630" fill="none" stroke="currentColor" opacity=".35"/>{value.demand!==null&&<path d={`M30 ${y(value.demand)}H630`} stroke="currentColor" strokeDasharray="5 4" opacity=".6"/>}<polyline points={series.map((point,index)=>`${x(index)},${y(point.people)}`).join(' ')} fill="none" stroke="currentColor" strokeWidth="3"/></svg><div className="flex justify-between gap-2"><span>{series[0].month}</span><span>{series.at(-1)!.month}</span></div><p>{number(series[0].people)} → {number(series.at(-1)!.people)} people · Demand: {number(value.demand)}</p><details><summary className="min-h-11 cursor-pointer py-2">Monthly values</summary><ul className="grid grid-cols-2 gap-2">{series.map(point=><li key={point.month}>{point.month}: {number(point.people)} people</li>)}</ul></details></figure></details>}
+ </section>;
+}
+
+const provenance=(kind:string|undefined)=>kind==='model-proposed'?'Model-proposed · unconfirmed':kind==='unknown'||!kind?'Not supplied':kind==='user-entered'?'User-entered assumption':'Retained planning assumption';
+/** One option's short bullets; every quantity comes from the checked summary. */
+function CompactPlanSummary({draft,result}:{draft:BundleDraft|null;result?:BundleResult|null}){
+ const value=actionPlanQuickSummary(draft,result),p=value.planning,h=value.hiring;
+ const range=(v:{min:number;max:number}|null)=>v===null?'Unknown':v.min===v.max?number(v.min):`${number(v.min)}–${number(v.max)}`;
+ if(value.conditionalHiring)return <section aria-label="Action Plan quick summary"><HiringPlanningSummary compact result={value.conditionalHiring.result}/></section>;
+ const stakeholders=[...new Set(draft?.bundle.components.map(c=>c.ownerRole)??[])].join('; ')||'Unknown';
+ return <section aria-label="Action Plan quick summary"><ul className="list-disc space-y-2 pl-5 text-sm leading-snug">
+ <li>Cost: <strong>{money(p?p.cash:h?h.externalSubtotal:value.cash??value.subtotal)}</strong> USD · {p?'incremental allowance':h||value.subtotal!==null?'partial cash':'incremental cash'}</li>
+ <li>{h?'Budget period':'Duration'}: <strong>{p?`${number(p.months)} months`:h?`${h.months} months`:value.days===null?'Unknown':`${number(value.days)} days`}</strong> · {p?(draft?.inputs.scope.months.kind==='model-proposed'?'proposed':'entered assumption'):h?'cost horizon':'readiness unconfirmed'}</li>
+ <li>Labor time: <strong>{range(p?.hours??null)!=='Unknown'?range(p!.hours):number(value.deliveryHours)} hours</strong> · labor cost unknown</li>
+ <li>People: <strong>{p?`${range(p.participants)} people`:h?`${h.requiredRoles} roles`:number(value.people)}</strong>{p?.participants&&p.participants.min!==p.participants.max?' · overlap unknown':' · availability unconfirmed'}</li>
+ <li>Stakeholders: {stakeholders} · unconfirmed</li>
+ <li>{p?`${p.modelProposed?'Model-proposed':'Planning assumptions'} · unconfirmed; existing payroll excluded`:h?'Entered cost assumptions · includes new-hire pay':'Planning assumptions · cost coverage '+value.coverage}</li>
+ </ul></section>;
+}
+/** Flat supporting content for the plan's single disclosure. */
+export function ActionPlanCalculationDetails({draft,result}:{draft:BundleDraft|null;result?:BundleResult|null}){
+ const value=actionPlanQuickSummary(draft,result),p=value.planning;
+ return <section aria-label="Calculation assumptions" className="space-y-2">
+ <h4 className="font-semibold">Calculation assumptions</h4>
+ {p?<><ul className="list-disc space-y-1 pl-5">{p.cashItems.map(row=><li key={row.id}>{row.label}: {money(row.amount)} USD over the whole plan.</li>)}{p.rows.map(row=><li key={row.field+row.target}>{row.label}: {number(row.assumption.value)} {row.unit} · {provenance(row.assumption.kind)}. {row.assumption.basis}</li>)}</ul><p>Labor hours = people × {number(p.perPerson)} hours per person + {number(p.coordination)} coordination hours over the whole plan. Cash excludes existing payroll; labor cost is not calculated. These assumptions do not establish staffing, funding or effectiveness.</p></>:<><ul className="list-disc pl-5">{value.costs.map(row=><li key={row.id}>{row.label}: {money(row.value)} USD</li>)}</ul><p>Cash coverage: {value.coverage}. Activity dates supplied: {value.dateCount}/{value.activityCount}. Missing inputs remain unknown.</p></>}
+ {!!value.capacitySeries.length&&<section aria-label="Conditional capacity scenario"><h4 className="font-semibold">Conditional capacity scenario · not an observed trend</h4><p>Conditional on readiness. Demand: {number(value.demand)} people.</p><ul>{value.capacitySeries.map(point=><li key={point.month}>{point.month}: {number(point.people)} people</li>)}</ul></section>}
  </section>;
 }

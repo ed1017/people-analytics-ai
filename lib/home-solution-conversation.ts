@@ -15,7 +15,7 @@ import type {Assumption,BundleDraft,BundleResult,BundleInputs} from './home-bund
 import type {PlanAlternatives,AlternativeSourceRef} from './home-plan-alternatives';
 import type {SolutionParameterEdit,SolutionCandidate,SolutionConstraint,SolutionQuantity,SolutionSource,SolutionField,SolutionMetricRef} from './home-solution-conversation-schema';
 // @ts-expect-error Native fixture tests share TypeScript source.
-import {assertSolutionShape,solutionParameterEditSchema,solutionCandidateSchema,solutionConstraintSchema,solutionMetricRefSchema} from './home-solution-conversation-schema.ts';
+import {solutionSharedQuantityScopes,assertSolutionShape,solutionParameterEditSchema,solutionCandidateSchema,solutionConstraintSchema,solutionMetricRefSchema} from './home-solution-conversation-schema.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {actionBinding,actionBindingKey,validActionBinding} from './home-action-drafts.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
@@ -238,7 +238,6 @@ function quantityValue(request:SolutionRequest,q:SolutionQuantity):Assumption<nu
   const limits:Partial<Record<SolutionField,[number,number]>>={horizon_months:[1,3],participants:[1,20],hours_per_participant:[.5,8],coordination_hours:[1,24],cash:[0,2000]};
   const range=limits[q.field];
   if(!range||q.turnId!==null||q.source!==null||q.factor!==null||q.text!==null||q.number===null||q.number<range[0]||q.number>range[1]||['participants','horizon_months'].includes(q.field)&&!Number.isInteger(q.number))fail('Use a bounded model-proposed pilot assumption without user or source provenance.');
-  if(!['participants','cash'].includes(q.field)&&q.target!==null)fail('This proposed assumption has no activity target.');
   return {value:q.number,kind:'model-proposed',basis:`Model-proposed planning choice · unconfirmed: ${q.interpretation}`.slice(0,240)};
  }
  if((q.kind==='literal'||q.kind==='scale')&&!solutionUserTurns(request).some(turn=>turn.id===q.turnId))fail('A new value or relative change must reference the user turn that requested it.');
@@ -321,10 +320,35 @@ function readQuantityForProposal(input:BundleInputs,field:SolutionField,target:s
   default:return [];
  }
 }
+function quantityScopeFeedback(q:SolutionQuantity,input:BundleInputs,activities:string[]):string[]{
+ const errors:string[]=[];
+ const shared=solutionSharedQuantityScopes[q.field];
+ if(shared&&q.target!==null)errors.push(`${q.field} uses ${shared}; set target to null, not ${JSON.stringify(q.target)}. Do not convert activity-specific values into a shared estimate silently.`);
+ if(q.source&&solutionSharedQuantityScopes[q.source.field]&&q.source.target!==null)errors.push(`${q.field}: source.field ${q.source.field} is shared; set source.target to null. An activity-specific source value is not available for this field.`);
+ if(q.field==='participants'&&q.target!=='all'&&!activities.includes(q.target??''))errors.push('participants.target must be an actual candidate activity ID or "all" for the same proposed count per activity; this does not confirm overlap or required staffing.');
+ if(q.field==='cash'){
+  const explicit=input.expenses.some(row=>row.id===q.target&&row.kind==='cash');
+  const linked=input.expenseLinks.filter(link=>link.componentIds.length===1&&link.componentIds[0]===q.target);
+  const cashItems=input.expenses.filter(row=>row.kind==='cash'&&linked.some(link=>link.expenseId===row.id));
+  if(!explicit&&(!activities.includes(q.target??'')||cashItems.length!==1))errors.push('cash.target must be an actual candidate activity with exactly one cash allowance or an exact current cash expense ID; null, "all" and ambiguous shared allowances are unsupported. Keep incremental cash separate from labor.');
+ }
+ if(['activity_start','activity_finish'].includes(q.field)&&!activities.includes(q.target??''))errors.push(`${q.field}.target must be an actual candidate activity ID; start_month is the separate shared start field with target:null.`);
+ return errors;
+}
 function applyReviewedInputs(request:SolutionRequest,evaluation:SolutionEvaluation,input:BundleInputs,quantitiesToApply:SolutionQuantity[],constraints:SolutionConstraint[],activities:string[],parameterOnly=false,parameterSource?:SolutionSource){
+  // Report every scope mismatch together before interpreting or applying any quantity.
+  // Repair remains explicit: never drop targets, aggregate labor, or rerun a model here.
+  const scopeErrors=quantitiesToApply.flatMap(q=>quantityScopeFeedback(q,input,activities));
+  if(scopeErrors.length){
+   // At most two fixed-template errors per quantity (24 quantities); each target
+   // is at most 80 characters. Keep separate entries within the existing 80/2000
+   // state metadata limits instead of joining them into an unbounded message.
+   evaluation.blocking.push(...new Set(scopeErrors));
+   return false;
+  }
   const quantities=new Set<string>();
   for(const q of quantitiesToApply){
-   const key=JSON.stringify([q.field,q.target]);if(quantities.has(key))fail('Review one normalized value for each assumption.');quantities.add(key);
+   const key=JSON.stringify([q.field,q.target]);if(quantities.has(key))fail(`${q.field}: supply one normalized value for this target; shared quantities occur once per plan. Do not silently sum conflicting values.`);quantities.add(key);
    const value=quantityValue(request,q);
    if(value.kind==='model-proposed'){
     const existing=q.field==='participants'&&q.target==='all'?activities.flatMap(target=>readQuantityForProposal(input,q.field,target)):readQuantityForProposal(input,q.field,q.target);
@@ -344,6 +368,7 @@ function applyReviewedInputs(request:SolutionRequest,evaluation:SolutionEvaluati
    const value={value:constraint.number??constraint.text,kind:'illustrative' as const,basis:`Unconfirmed model interpretation of constraint from turn ${constraint.turnId}.`};
    applyQuantity(input,{field:constraint.field,target:null} as SolutionQuantity,value as Assumption<number|string>,activities);
   }
+  return true;
 }
 function finishEvaluation(request:SolutionRequest,evaluation:SolutionEvaluation,draft:BundleDraft,constraints:SolutionConstraint[]){
  const input=draft.inputs;
@@ -377,7 +402,7 @@ export async function evaluateSolutionParameterEdit(request:SolutionRequest,edit
   const draft=structuredClone(original);draft.binding=binding;draft.revision++;
   if(draft.inputs.successMeasure&&draft.inputs.successMeasure.goal!==goal)fail('A saved outcome measure belongs to another goal; review it explicitly.');
   for(const q of edit.quantities)if(q.source){const dependency=source(request,q.source);Object.assign(evaluation.sourceKeys,dependency.sourceKeys);for(const ref of dependency.sourceRefs)if(!evaluation.sourceRefs.some(old=>old.id===ref.id))evaluation.sourceRefs.push(ref);}
-  applyReviewedInputs(request,evaluation,draft.inputs,edit.quantities,constraints,draft.bundle.components.map(c=>c.id),true,edit.source);
+  if(!applyReviewedInputs(request,evaluation,draft.inputs,edit.quantities,constraints,draft.bundle.components.map(c=>c.id),true,edit.source))return evaluation;
   evaluation.changes.push('Only the listed parameters and current constraints were changed. Source activities and unrelated assumptions, including unknowns, are retained.');
   finishEvaluation(request,evaluation,draft,constraints);
  }catch(error){evaluation.blocking.push(error instanceof Error?error.message:'The parameter edit could not be calculated.');}
@@ -467,7 +492,7 @@ export async function evaluateSolutionCandidate(request:SolutionRequest,candidat
   const newMeasure=!input.successMeasure;
   if(!input.successMeasure)input.successMeasure={goal,scopeKey:measurementScope(input),name:candidate.successMeasure,baseline:unknownAssumption(),target:unknownAssumption()};
   if(input.successMeasure.goal!==goal)fail('A saved outcome measure belongs to another goal; review it explicitly.');
-  applyReviewedInputs(request,evaluation,input,candidate.quantities,constraints,components.map(item=>item.id));
+  if(!applyReviewedInputs(request,evaluation,input,candidate.quantities,constraints,components.map(item=>item.id)))return evaluation;
   // Bind new measures after this turn's scope inputs; retained measures must stay stale after a scope change.
   if(newMeasure){input.successMeasure.scopeKey=measurementScope(input);const context=captureMetricHistory(goal,request.evidence,binding.evidenceDigest);if(context)input.successMeasure.history=context;}
   // Model same-people links are proposals, never user confirmation. Preserve only existing source identity.
