@@ -4,10 +4,13 @@ export type CapacityDraft = {
  scope:string;openingDate:string;months:string;people:string;fte:string;
  volume:string;effort:string;hours:string;hires:string;exits:string;
  hireFte:string;exitFte:string;allocation:string;productivity:string;
+ /** Absent only on legacy v1 drafts; blank is unknown. */
+ costRate?:string;
  fullTimeMovements:boolean;confirmed:boolean;
 };
 export const emptyCapacityDraft:CapacityDraft={scope:'',openingDate:'',months:'3',people:'',fte:'',volume:'',effort:'',hours:'',hires:'',exits:'',hireFte:'',exitFte:'',allocation:'',productivity:'',fullTimeMovements:false,confirmed:false};
 export const capacityLabels:Record<Exclude<keyof CapacityDraft,'fullTimeMovements'|'confirmed'>,string>={
+ costRate:'Cost per contracted FTE per month (USD, optional)',
  scope:'Workload scope',openingDate:'Opening date (month end)',months:'Planning months',people:'Opening people',fte:'Opening contracted FTE',
  volume:'Work units each month',effort:'Hours per work unit',hours:'Productive hours per FTE each month',hires:'Hires each month (people)',exits:'Departures each month (people)',hireFte:'FTE per hire',exitFte:'FTE per departure',allocation:'Time assigned to this work (%)',productivity:'Productivity improvement (%)',
 };

@@ -38,23 +38,29 @@ try{for(const width of [1366,390]){
  const saved=()=>page.getByRole('region',{name:'Saved capacity scenarios',exact:true});
  await page.getByLabel('Capacity scenario name',{exact:true}).fill('Base');await saved().getByRole('button',{name:'Save scenario',exact:true}).click();await saved().getByRole('status').filter({hasText:'Saved “Base”'}).waitFor();
 
+ const costRate=input('Cost per contracted FTE per month (USD, optional)'),costSummary=area.getByLabel('Contracted supply cost estimate',{exact:true});
+ await costRate.fill('12.34');assert.ok(await saved().getByRole('button',{name:'Save scenario',exact:true}).isDisabled());assert.equal(await costSummary.count(),0);await confirm();await calc();assert.match(await costSummary.innerText(),/\$98.72/);
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no page overflow with manual cost');
+ await page.screenshot({path:`${output}/${width}-manual-cost.png`,fullPage:true});
+ await costRate.fill('0');await confirm();await calc();assert.match(await costSummary.innerText(),/\$0.00/);
+ await costRate.fill('');assert.equal(await costSummary.count(),0);await confirm();await calc();assert.match(await costSummary.innerText(),/Unknown/);
  await input('Time assigned to this work (%)').fill('33.3');await input('Productivity improvement (%)').fill('66.6');await confirm();await calc();
- assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['10','8','2.66','3','+0.34']);
+ assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['10','8','2.66','3','+0.34','Unknown']);
  await page.screenshot({path:`${output}/${width}-fractional-percent.png`,fullPage:true});
  await input('Time assigned to this work (%)').fill('50');await input('Productivity improvement (%)').fill('0');
  // Independent acceptance examples: throughput changes demand, never supply.
  await input('Opening contracted FTE').fill('10');await input('Time assigned to this work (%)').fill('100');await input('Work units each month').fill('1920');await confirm();await calc();
- assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['10','10','10','12','+2']);
+ assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['10','10','10','12','+2','Unknown']);
  await assumptions.click();await assumptions.click();assert.match(await result().innerText(),/\+2/);assert.ok(await area.getByRole('checkbox',{name:/I confirm/}).isChecked());
- await input('Productivity improvement (%)').fill('20');await confirm();await calc();assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['10','10','10','10','0']);
- await input('Productivity improvement (%)').fill('0');await input('Work units each month').fill('1600');assert.equal(await result().count(),0);await confirm();await calc();assert.equal((await result().locator('tbody tr').first().locator('td').allTextContents()).at(-1),'0');
- await input('Opening contracted FTE').fill('8');await input('Time assigned to this work (%)').fill('75');await input('Work units each month').fill('1200');await confirm();await calc();assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['10','8','6','7.5','+1.5']);
+ await input('Productivity improvement (%)').fill('20');await confirm();await calc();assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['10','10','10','10','0','Unknown']);
+ await input('Productivity improvement (%)').fill('0');await input('Work units each month').fill('1600');assert.equal(await result().count(),0);await confirm();await calc();assert.equal((await result().locator('tbody tr').first().locator('td').allTextContents()).at(-2),'0');
+ await input('Opening contracted FTE').fill('8');await input('Time assigned to this work (%)').fill('75');await input('Work units each month').fill('1200');await confirm();await calc();assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['10','8','6','7.5','+1.5','Unknown']);
  await page.screenshot({path:`${output}/${width}-shortfall.png`,fullPage:true});
  if(width<640)assert.ok(await result().getByText('+1.5',{exact:true}).first().isVisible(),'mobile gap visible without horizontal scrolling');
- await input('Work units each month').fill('0');await confirm();await calc();assert.equal((await result().locator('tbody tr').first().locator('td').allTextContents()).at(-1),'-6');
+ await input('Work units each month').fill('0');await confirm();await calc();assert.equal((await result().locator('tbody tr').first().locator('td').allTextContents()).at(-2),'-6');
  await input('Work units each month').fill('800');await input('Time assigned to this work (%)').fill('50');
  await input('Productivity improvement (%)').fill('25');assert.equal(await result().count(),0);await confirm();await calc();
- const row=result().locator('tbody tr').first();assert.deepEqual(await row.locator('td').allTextContents(),['10','8','4','4','0']);
+ const row=result().locator('tbody tr').first();assert.deepEqual(await row.locator('td').allTextContents(),['10','8','4','4','0','Unknown']);
  await page.getByLabel('Capacity scenario name',{exact:true}).fill('Improved');await saved().getByRole('button',{name:'Save scenario',exact:true}).click();
  await page.getByLabel('Saved capacity scenario',{exact:true}).selectOption({label:'Base'});await page.getByLabel('Compare capacity scenario',{exact:true}).selectOption({label:'Improved'});
  const comparison=page.getByRole('region',{name:'Saved capacity comparison',exact:true});await comparison.waitFor();assert.deepEqual(await comparison.locator('tbody tr').first().locator('td').allTextContents(),['+1','0']);
@@ -75,12 +81,12 @@ try{for(const width of [1366,390]){
  await input('Opening contracted FTE').fill('11');await confirm();await calc();assert.match(await area.getByRole('alert').innerText(),/exceeds/);assert.equal(await result().count(),0);
  if(!await area.locator('form details').evaluate(n=>n.open))await assumptions.click();
  await input('Opening people').fill('0');await input('Opening contracted FTE').fill('0');await input('Work units each month').fill('0');await input('Time assigned to this work (%)').fill('0');await confirm();
- await area.getByRole('button',{name:'Calculate capacity',exact:true}).focus();await page.keyboard.press('Enter');await revealMonthlyCapacityDetail(page,area);await result().waitFor();assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['0','0','0','0','0']);
+ await area.getByRole('button',{name:'Calculate capacity',exact:true}).focus();await page.keyboard.press('Enter');await revealMonthlyCapacityDetail(page,area);await result().waitFor();assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['0','0','0','0','0','Unknown']);
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no page overflow');
  await page.screenshot({path:`${output}/${width}-capacity.png`,fullPage:true});
  await page.reload();await area.waitFor();assert.equal(await input('Workload scope').inputValue(),'');assert.equal(await result().count(),0);
  await page.getByLabel('Saved capacity scenario',{exact:true}).selectOption({label:'Improved'});await saved().getByRole('button',{name:'Open saved scenario',exact:true}).click();await revealMonthlyCapacityDetail(page,area);await result().waitFor();assert.equal(await input('Workload scope').inputValue(),'Service desk — tickets');assert.equal(await input('Productivity improvement (%)').inputValue(),'25');assert.match(await saved().innerText(),/matches current inputs/);
 
- assert.deepEqual(errors,[]);assert.deepEqual(mutations,[]);evidence.push({width,errors,mutations,external,checks:'confirmation, blanks, zero, invalid, edits, keyboard, monthly math, fractional percentages, navigation, old destinations, Back/Forward recovery, reload clears'});await context.close();
+ assert.deepEqual(errors,[]);assert.deepEqual(mutations,[]);evidence.push({width,errors,mutations,external,checks:'manual cost 98.72, zero versus unknown, cost edit invalidation, confirmation, blanks, zero, invalid, edits, keyboard, monthly math, fractional percentages, navigation, old destinations, Back/Forward recovery, reload clears'});await context.close();
 }}finally{await browser.close();}
 await fs.writeFile(output+'/evidence.json',JSON.stringify(evidence,null,2));console.log(JSON.stringify({output,evidence},null,2));

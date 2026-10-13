@@ -3,6 +3,7 @@ import {useState} from 'react';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
 import {datasetSession} from '@/lib/dataset-client.mjs';
 import {capacityContext,capacityBinding,monthlyCapacityField,readCapacityBucket,saveCapacityScenario,openCapacityScenario,compareSavedCapacity,type CapacityBucket,type CapacityContext} from '@/lib/swp-capacity-store';
+import {formatCapacityCost} from '@/lib/swp-capacity-cost';
 import {capacityRecordIsCurrent} from '@/lib/swp-capacity-record';
 import {usePlanningSession} from './planning-session-context';
 
@@ -21,7 +22,7 @@ export function CapacitySavedScenarios(){
   setNotice('');setActionError('');
   try{
    if(!context||!session.scope)throw Error('Calculate for a selected saved goal first.');
-   const saved=saveCapacityScenario({store,context,scope:session.scope,capture:session.capture,session:{draft:session.draft,result:session.result,error:session.error},name,id:crypto.randomUUID(),at:new Date().toISOString(),revision:storage.data.revision,assertActive});
+   const saved=saveCapacityScenario({store,context,scope:session.scope,capture:session.capture,session:{draft:session.draft,result:session.result,error:session.error,...(session.cost?{cost:session.cost}:{})},name,id:crypto.randomUUID(),at:new Date().toISOString(),revision:storage.data.revision,assertActive});
    setLeftId(saved.record.id);setRightId('');setNotice(`Saved “${saved.record.name}” in this browser.`);setName('');
   }catch(error){setActionError(error instanceof Error?error.message:'Save failed. Your draft is kept.');}
  }
@@ -30,13 +31,14 @@ export function CapacitySavedScenarios(){
   try{
    if(!context||!storage.saved)throw Error('Resolve Browser storage details before reopening saved work.');
    const opened=openCapacityScenario(store,context,leftId,storage.data.revision,assertActive);
-   setSession({draft:opened.entry.draft,result:opened.entry.record.result,error:'',scope:opened.scope,capture:opened.capture});
+   setSession({draft:opened.entry.draft,result:opened.entry.record.result,cost:opened.entry.record.schemaVersion===2?opened.entry.record.cost:null,error:'',scope:opened.scope,capture:opened.capture});
    setNotice(`Opened “${opened.entry.record.name}”; recalculated from its saved inputs.`);
   }catch(error){setActionError(error instanceof Error?error.message:'Open failed. Your draft is kept.');}
  }
  const left=bucket.entries.find(e=>e.record.id===leftId),right=bucket.entries.find(e=>e.record.id===rightId);
  let comparison:ReturnType<typeof compareSavedCapacity>|null=null,comparisonError='';
  if(context&&left&&right)try{comparison=compareSavedCapacity(left,right,context,bucket.scopes);}catch(error){comparisonError=error instanceof Error?error.message:'These records could not be compared.';}
+ const costComparison=comparison&&'costComparison' in comparison?comparison.costComparison:undefined;
  const openingDifferences=comparison?.assumptionDifferences.filter(change=>change.path.startsWith('opening.')).length??0;
  const monthDifferences=(comparison?.assumptionDifferences.length??0)-openingDifferences;
  const scope=left&&bucket.scopes.find(s=>s.id===left.record.binding.scopeId);
@@ -49,7 +51,7 @@ export function CapacitySavedScenarios(){
     <label className="min-w-0 flex-1 text-sm">Scenario name<input aria-label="Capacity scenario name" maxLength={160} value={name} onChange={e=>{setName(e.target.value);setActionError('');}} className={`${control} mt-1 w-full`} placeholder="e.g. Base workload"/></label>
     <button type="button" disabled={disabled} onClick={save} className={`${control} disabled:opacity-50`}>Save scenario</button>
    </div>
-   <p className="text-xs text-muted-foreground">Saved only in this browser under the selected goal. Calculate complete inputs before saving. Changes create a new named scenario.</p>
+   <p className="text-xs text-muted-foreground">Saved only in this browser under the selected goal. Calculate complete capacity inputs before saving. The cost rate is optional. Changes create a new named scenario.</p>
    {(!storage.saved||loadError||actionError)&&<p role="alert" className="text-sm text-destructive">{actionError||loadError||storage.notice||'Browser storage is unavailable. Resolve Browser storage details, then retry explicitly. Your draft is kept.'}</p>}
    {notice&&<p role="status" className="text-sm">{notice}</p>}
    {bucket.entries.length>0&&<>
@@ -62,6 +64,10 @@ export function CapacitySavedScenarios(){
     {(comparisonError||comparison&&!comparison.compatible)&&<p role="status" className="text-sm">{comparisonError||comparison?.reason}</p>}
     {comparison?.compatible&&left&&right&&<div role="region" aria-label="Saved capacity comparison" tabIndex={0} className="overflow-x-auto">
      <table className="w-full text-left text-sm"><caption className="mb-2 text-left">Signed gap in FTE · positive is shortfall, negative is surplus</caption><thead><tr><th scope="col" className="p-2">Month</th><th scope="col" className="p-2">{left.record.name}</th><th scope="col" className="p-2">{right.record.name}</th></tr></thead><tbody>{left.record.result.points.map((p,i)=><tr key={p.month} className="border-t"><th scope="row" className="p-2 font-normal">{p.month}</th><td className="p-2">{gap(p.gapFte)}</td><td className="p-2">{gap(right.record.result.points[i].gapFte)}</td></tr>)}</tbody></table>
+     {costComparison&&<details className="mt-3 border-t"><summary className="min-h-11 cursor-pointer py-3 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Contracted supply cost comparison</summary>
+      <p className="mb-2 text-xs text-muted-foreground">User-assumed USD per contracted FTE per month: {left.record.name} {formatCapacityCost(costComparison.leftRateCents)}; {right.record.name} {formatCapacityCost(costComparison.rightRateCents)}. Blank and older scenarios have unknown cost.</p>
+      <table className="w-full text-left text-sm"><caption className="mb-2 text-left">Monthly supply run-rate (USD/month) · right minus left, not savings</caption><thead><tr>{['Month',left.record.name,right.record.name,'Difference (USD/month)'].map((label,i)=><th key={i} scope="col" className="p-2">{label}</th>)}</tr></thead><tbody>{costComparison.points.map(p=><tr key={p.month} className="border-t"><th scope="row" className="p-2 font-normal">{p.month}</th><td className="p-2">{formatCapacityCost(p.leftCents)}</td><td className="p-2">{formatCapacityCost(p.rightCents)}</td><td className="p-2">{p.deltaCents!==null&&p.deltaCents>0?'+':''}{formatCapacityCost(p.deltaCents)}</td></tr>)}</tbody></table>
+     </details>}
      <p className="mt-2 text-xs text-muted-foreground">Opening assumption differences: {openingDifferences}. Month-level assumption differences: {monthDifferences}. A recurring change counts once per month. These are saved scenarios, not a forecast.</p>
     </div>}
    </>}
