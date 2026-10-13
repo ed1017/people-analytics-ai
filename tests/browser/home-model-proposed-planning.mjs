@@ -13,6 +13,7 @@ import {proposedPilot} from '../fixtures/model-proposed-pilot.mjs';
 import {planningPrompts} from '../fixtures/underspecified-planning.mjs';
 import {DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
+const layoutOnly=process.env.PLAN_LAYOUT_ONLY==='true',measurements=[];
 const output=await fs.mkdtemp(path.join(os.tmpdir(),'model-proposed-pilot-'));
 const compiler=webpackPackage.webpack({mode:'development',devtool:false,plugins:[new webpackPackage.webpack.DefinePlugin({'process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION':JSON.stringify('true'),'process.env.NEXT_PUBLIC_GOAL_PROGRESS':JSON.stringify('true'),'process.env.NEXT_PUBLIC_HOME_STRUCTURED_PLANS':JSON.stringify('false')})],entry:path.resolve('tests/fixtures/swp-editor-full-client.tsx'),output:{path:output,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
@@ -20,7 +21,7 @@ const css=(await postcss([tailwind({base:process.cwd()})]).process(await fs.read
 const js=await fs.readFile(path.join(output,'fixture.js'),'utf8');
 const html=`<!doctype html><html data-workspace-preference="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style></head><body><div id="root"></div><script>${js.replaceAll('</script','<\\/script')}</script></body></html>`;
 const base='http://127.0.0.1:3117',browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']}),checks=[];
-try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
+try{for(const [mode,width,height] of (layoutOnly?[['desktop',1440,900],['short-desktop',1280,720],['phone',390,844],['zoom-200',720,450]]:[['desktop',1440,1000],['phone',390,844]])){
  const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),errors=[],requests=[];let external=0;
  page.setDefaultTimeout(20000);page.on('pageerror',error=>errors.push(error.message));
  const check=(name,ok)=>{assert.ok(ok,mode+' '+name);checks.push(mode+' '+name);console.log('PASS '+mode+' '+name);};
@@ -38,6 +39,19 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  await page.goto(base);await dismissHomeOnboarding(page);
  const input=page.getByLabel('Ask Workforce AI',{exact:true}),send=async text=>{await input.fill(text);await page.getByRole('button',{name:'Send overview question',exact:true}).click();await page.getByRole('status').filter({hasText:'Thinking through the question'}).waitFor({state:'hidden'});};
  const review=page.getByRole('region',{name:'Solution conversation review',exact:true}),card=()=>review.getByRole('region',{name:'Current Action Plan options',exact:true}),readState=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
+ if(layoutOnly){
+  await send('Compare alternatives');await card().waitFor();
+  const first=card().getByRole('article').first();await first.scrollIntoViewIfNeeded();
+  const measured=await page.evaluate(()=>{const read=document.querySelector('[aria-label="Home chat workspace"]'),dock=document.querySelector('.home-composer-dock'),cards=[...document.querySelectorAll('[aria-label="Current Action Plan options"] article')];const size=node=>{const r=node.getBoundingClientRect();return {width:r.width,height:r.height,top:r.top,bottom:r.bottom};};return {viewport:{width:innerWidth,height:innerHeight},reading:size(read),readingScrollHeight:read.scrollHeight,readingOverflow:getComputedStyle(read).overflowY,composerPosition:getComputedStyle(dock).position,cards:cards.map(size),horizontalOverflow:document.documentElement.scrollWidth>innerWidth};});
+  measurements.push({mode,...measured});await page.screenshot({path:path.join(output,mode+'-layout.png'),fullPage:true});
+  check('layout retains complete visible actions and one collapsed caveat',await first.getByText('Invite volunteers for manager check-ins, review workload friction and document follow-up actions.',{exact:true}).isVisible()&&await card().locator('details').count()===1&&!await card().locator('details').evaluate(node=>node.open));
+  if(process.env.EXPECT_PLAN_DOCUMENT_FLOW==='true'){check('plan reading has no trapped inner pane or composer overlay',measured.readingOverflow==='visible'&&measured.composerPosition==='static'&&measured.reading.height>=Math.max(...measured.cards.map(c=>c.height))&&!measured.horizontalOverflow);check('complete first option fits after scrolling into view',measured.cards[0].top>=0&&measured.cards[0].bottom<=measured.viewport.height);}
+  await first.focus();await page.keyboard.press('Tab');check('keyboard reaches a plan control',await first.getByRole('button',{name:'Pin Action Plan',exact:true}).evaluate(node=>node===document.activeElement));
+  await page.keyboard.press('Enter');await first.getByRole('button',{name:/Pinned Action Plan/}).waitFor();await page.reload();await card().waitFor();check('layout preserves pin and reload',await card().getByRole('button',{name:/Pinned Action Plan/}).count()===1&&requests.length===1);
+  while(await card().getByRole('button',{name:'Discard proposal',exact:true}).count())await card().getByRole('button',{name:'Discard proposal',exact:true}).first().click();
+  check('discarding all options restores the ordinary responsive composer',await page.locator('.home-composer-dock').evaluate((node,desktop)=>getComputedStyle(node).position===(desktop?'fixed':'static'),width>=768)&&requests.length===1);
+  await context.close();continue;
+ }
  await send('Explain evidence only');check('ordinary no-plan reply stays visible without creating a card',await card().count()===0&&await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText('No team ranking can be established from this evidence. No new plan is proposed.',{exact:true}).isVisible());
  await send('Blocked proposal');await card().waitFor();
  check('blocked no-draft proposal preserves its candidate action with pin disabled',await card().getByText('Invite volunteers for manager check-ins, review workload friction and document follow-up actions.',{exact:true}).isVisible()&&await card().getByRole('button',{name:'Pin Action Plan',exact:true}).isDisabled()&&(await readState()).exploration.fields.homeSolutionConversationV1.working.at(-1).draft===null);
@@ -134,4 +148,5 @@ try{for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844]]){
  }
  check('no overflow, runtime errors or external traffic',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&errors.length===0&&external===0);await context.close();
 }}finally{await browser.close()}
+await fs.writeFile(path.join(output,'measurements.json'),JSON.stringify(measurements,null,2));
 await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({checks},null,2));console.log(JSON.stringify({checks:checks.length,output}));

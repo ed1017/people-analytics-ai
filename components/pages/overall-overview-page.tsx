@@ -206,7 +206,6 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   const responseReveal=useRef<ReturnType<typeof queueHomeResponseReveal>|null>(null);
   useLayoutEffect(()=>()=>responseReveal.current?.cancel(),[]);
   const composerSlot=useRef<HTMLDivElement>(null),composerDock=useRef<HTMLDivElement>(null);
-  useHomeComposerDock(active,composerSlot,composerDock,composer);
   useLayoutEffect(()=>{
     const node=composer.current;if(!node||!active)return;
     const resize=()=>{node.style.height='auto';node.style.height=`${Math.min(320,Math.max(112,node.scrollHeight+2))}px`;};
@@ -540,6 +539,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   }
   const planDiscussions=solutionDiscussionPresentations(messages,solutions.state);
   const reviewPresentation=solutionReviewPresentation(solutions.state);
+  const planReading=solutionConversationEnabled&&Boolean(reviewPresentation.recommended||reviewPresentation.alternatives.length||reviewPresentation.earlier.length);
+  useHomeComposerDock(active,composerSlot,composerDock,composer,planReading);
   const activePlans=[...(reviewPresentation.recommended?[reviewPresentation.recommended]:[]),...reviewPresentation.alternatives];
   const followUpMessage=messages.findLast(message=>{const presentation=planDiscussions.get(message);return presentation&&(presentation.proposals.some(proposal=>activePlans.some(item=>item.id===proposal.id&&item.revision===proposal.revision))||solutions.state.currentCalculationKinds?.includes('required-staffing')&&message.content===solutions.state.turns.at(-1)?.text);});
   const followUp=followUpMessage?planDiscussions.get(followUpMessage):undefined;
@@ -567,7 +568,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
 
     </section>
   );
-  return <HomeGuidedActionsContext.Provider value={guidedActions}><div style={{overflowAnchor:'none'}} className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]">
+  return <HomeGuidedActionsContext.Provider value={guidedActions}><div data-plan-reading={planReading?'':undefined} style={{overflowAnchor:'none'}} className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]">
     {guidedExampleActive&&<GuidedDemo active={active} conversational={solutionConversationEnabled} registry={guidedActions} onClose={onCloseDemo} actions={{
       ready:active&&conversation.storageReady&&conversation.saved&&!conversation.loading&&!solutions.pending&&!solutions.saving&&!conversation.issueEditor&&ready,
       begin:id=>conversation.beginGuidedExploration(id),

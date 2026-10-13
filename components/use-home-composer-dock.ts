@@ -2,7 +2,7 @@
 import {PHONE_LAYOUT_QUERY} from './use-phone-layout';
 import {useLayoutEffect,type RefObject} from 'react';
 /** Keep the Home input/Send group aligned with its content column and visible viewport. */
-export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement|null>,dock:RefObject<HTMLDivElement|null>,input:RefObject<HTMLTextAreaElement|null>){
+export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement|null>,dock:RefObject<HTMLDivElement|null>,input:RefObject<HTMLTextAreaElement|null>,documentFlow=false){
  useLayoutEffect(()=>{
   const anchor=slot.current,element=dock.current,textarea=input.current,root=anchor?.closest<HTMLElement>('.home-workspace');
   if(!active||!anchor||!element||!textarea||!root)return;
@@ -11,7 +11,7 @@ export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement
   const measure=()=>{
    const box=anchor.getBoundingClientRect(),height=viewport?.height??innerHeight;
    if(!box.width)return;
-   if(window.matchMedia(PHONE_LAYOUT_QUERY).matches){
+   if(documentFlow||window.matchMedia(PHONE_LAYOUT_QUERY).matches){
     document.documentElement.classList.remove('home-keyboard-open');
     for(const property of ['left','width','bottom','max-height'])element.style.removeProperty(property);
     textarea.style.setProperty('max-height',`${Math.max(96,Math.min(240,height*.4))}px`);
@@ -43,12 +43,12 @@ export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement
    }
   };
   const keepFocusVisible=(event:FocusEvent)=>{
-   if(window.matchMedia(PHONE_LAYOUT_QUERY).matches)return;
+   if(documentFlow||window.matchMedia(PHONE_LAYOUT_QUERY).matches)return;
    const target=event.target;if(!(target instanceof HTMLElement)||element.contains(target))return;
    requestAnimationFrame(()=>{const box=target.getBoundingClientRect(),cover=element.getBoundingClientRect();if(box.right>cover.left&&box.left<cover.right&&box.bottom>cover.top-8&&box.top<cover.bottom)target.scrollIntoView({block:'center',behavior:'instant'});});
   };
   measure();const observer=new ResizeObserver(measure);observer.observe(anchor);observer.observe(element);observer.observe(root);
   window.addEventListener('resize',measure);window.addEventListener('scroll',measure,{passive:true});viewport?.addEventListener('resize',measure);viewport?.addEventListener('scroll',measure);page.addEventListener('focusin',keepFocusVisible);
   return()=>{document.documentElement.classList.remove('home-keyboard-open');observer.disconnect();window.removeEventListener('resize',measure);window.removeEventListener('scroll',measure);viewport?.removeEventListener('resize',measure);viewport?.removeEventListener('scroll',measure);page.removeEventListener('focusin',keepFocusVisible);page.style.removeProperty('--home-composer-height');};
- },[active,slot,dock,input]);
+ },[active,slot,dock,input,documentFlow]);
 }
