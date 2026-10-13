@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import originEvidence from './fixtures/home-demo-origin-evidence.json' with {type:'json'};
 import {createHomeDemoGoals,hasSavedUserGoal} from '../lib/home-demo-goals.ts';
 import {homeDemoExamples,homeDemoField,homeDemoOrigin,demoBinding,readHomeDemo} from '../lib/home-demo-catalog.ts';
 import {DecisionStore,DECISIONS_STORAGE_KEY,encodeDecisions,parseDecisions} from '../lib/local-decisions.ts';
@@ -25,7 +27,18 @@ test('first run has three clearly identifiable attached examples and starts in G
  for(const example of homeDemoExamples){
   const fields=data.workspaces[example.id].fields,record=readHomeDemo(fields[homeDemoField],example.id),workspace=readBundleWorkspace(fields[bundleWorkspaceField],example.id),draft=workspace.attachments[0].draft;
   assert.equal(record.example.key,example.key);assert.equal(pinnedGoalPlanStatus(example.id,fields,{}),'saved');assert.equal(workspace.attachments.length,1);
-  assert.deepEqual(demoBinding(example),await actionBinding(example.id,example.goal,{sources:[]},{origin:homeDemoOrigin,key:example.key}));
+  // Frozen at dd178df: current normalization includes subsequently revised source metadata.
+  // Hash the original normalized packet directly; do not re-normalize or rebind saved demos.
+  const canonical=JSON.stringify(originEvidence,(_,value)=>value&&Object.getPrototypeOf(value)===Object.prototype?Object.fromEntries(Object.entries(value).sort(([a],[b])=>a.localeCompare(b))):value);
+  const evidenceDigest=createHash('sha256').update(canonical).digest('hex');
+  assert.equal(evidenceDigest,'0f38dfd582c15171ba2d3150a246d9cdc4710248816e05891670f25af4ee3bf0');
+  assert.equal(originEvidence.coverage.available,0);
+  assert.ok(originEvidence.sources.every(source=>source.facts===null));
+  const current=await actionBinding(example.id,example.goal,{sources:[]},{origin:homeDemoOrigin,key:example.key});
+  assert.deepEqual(demoBinding(example),{...current,evidenceDigest});
+  assert.deepEqual(draft.binding,demoBinding(example));
+  assert.deepEqual(restoredBundleDraft(workspace,demoBinding(example),'A'),draft);
+  assert.deepEqual(restoredBundleResult(workspace,draft),workspace.attachments[0].result);
   assert.ok(draft.bundle.name.split(' ').length<=5);assert.equal(draft.bundle.origin,homeDemoOrigin);assert.deepEqual(draft.bundle.components[0].evidence,[]);
   if(example.key==='capacity'){assert.equal(draft.inputs.mixScenario.basis.value,'conditional-scenario');assert.equal(draft.inputs.budget.amount.value,100000);assert.equal(draft.inputs.capacity.input.buy,'5');continue;}
   assert.equal(draft.inputs.expenses[0].amount.kind,'illustrative');assert.equal(draft.inputs.groups[0].count.kind,'illustrative');assert.equal(draft.inputs.scope.startMonth.value,'2026-11');assert.equal(draft.inputs.whatIf,undefined);

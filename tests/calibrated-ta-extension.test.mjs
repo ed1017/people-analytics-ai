@@ -7,6 +7,7 @@ import {taExtension,resolveTaExtension,calibratedExtensionForSource,taExtensionP
 import targets from '../lib/synthetic-ta/calibration-targets-v2.json' with {type:'json'};
 import * as extension from '../lib/synthetic-ta/extension.ts';
 import * as numeric from '../lib/numeric-contract.ts';
+import {withDatasetRequest} from '../lib/dataset-runtime.ts';
 import {homeForecastAnswer,homeForecastChartDomain} from '../lib/home-forecast.ts';
 import {homeStarterForecast,homeStarterGoal} from '../lib/home-starter-goals.ts';
 import {buildHomePack} from '../lib/home-pack.mjs';
@@ -28,7 +29,7 @@ test('source drift never silently replaces existing summary or monthly values',a
  for(const drift of [false,true]){
   const summary={...targets.summary,applications:targets.summary.applications+(drift?1:0)};
   const supabaseServer={from:name=>{const query={select:()=>query,single:()=>query,order:()=>query,then:resolve=>resolve({data:name==='talent_acquisition_current_summary'?summary:name==='talent_acquisition_monthly_summary'?targets.monthly:[],error:null})};return query}};
-  const exports={},aliases={'../../../lib/synthetic-ta/extension':extension,'../../../lib/supabase-server':{supabaseServer},'../../../lib/numeric-contract':numeric,'../../../lib/data-api-error':{},'next/server':{NextResponse:Response}};
+  const exports={},aliases={'@/lib/dataset-runtime':{withDatasetRequest},'../../../lib/synthetic-ta/extension':extension,'../../../lib/supabase-server':{supabaseServer},'../../../lib/numeric-contract':numeric,'../../../lib/data-api-error':{},'next/server':{NextResponse:Response}};
   vm.runInNewContext(code,{exports,require:name=>{assert(name in aliases,name);return aliases[name]}});
   const body=await (await exports.GET()).json();
   assert.equal(body.summary.applications,summary.applications);assert.equal(body.summary.hires,5080);assert.equal(body.summary.open_requisitions,475);
