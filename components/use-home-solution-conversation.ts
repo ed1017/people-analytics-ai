@@ -1,4 +1,7 @@
 'use client';
+import {requiredStaffingPlanIdentity} from '@/lib/home-required-staffing-plan';
+import {currentRequiredStaffing,resolveStaffingDeliveryTarget,retainStaffingDeliveryTarget} from '@/lib/home-required-staffing';
+import {prepareRequiredStaffingPlan,requiredStaffingPlanFields} from '@/lib/home-required-staffing-plan-save';
 import {prepareHiringPlan,prepareConditionalHiringPlan,hiringPlanFields,type HiringPlanSelection} from '@/lib/home-hiring-plan-save';
 import {currentHiringBudget,editHiringBudgetLocally} from '@/lib/home-hiring-budget';
 import type {HiringBudgetInput} from '@/lib/hiring-budget';
@@ -130,6 +133,28 @@ export function useHomeSolutionConversation(props:Props){
   if(controller.current||pending||saving)throw Error('Wait for the current request before clearing this comparison.');
   requireCurrent();persist({...memoryRef.current,requiredStaffing:null,currentCalculationKinds:memoryRef.current.currentCalculationKinds?.filter(kind=>kind!=='required-staffing')});
  }
+ function staffingDeliveryTarget(){
+  try{return resolveStaffingDeliveryTarget(memoryRef.current,catalog());}
+  catch{return {months:null,target:null,issue:'Saved plans could not be verified. They have been preserved. Restore a verified saved workspace before pinning this staffing comparison.'};}
+ }
+ function pinnedRequiredStaffing(optionId:string){
+  const review=memory.requiredStaffing;if(!review)return undefined;
+  try{const identity=requiredStaffingPlanIdentity({version:1,review,optionId,deliveryTarget:staffingDeliveryTarget().target});return saved?.plans.find(plan=>!plan.deleted&&plan.draft.inputs.requiredStaffingPlan&&requiredStaffingPlanIdentity(plan.draft.inputs.requiredStaffingPlan)===identity)?.number;}catch{return undefined;}
+ }
+ async function pinRequiredStaffing(optionId:string){
+  if(saving||pending||controller.current)return;setSaving(true);setNotice('');
+  try{
+   const snapshot=requireCurrent(),request=makeRequest('Pin the checked staffing option.'),review=currentRequiredStaffing(request,decisionStore.getDatasetToken());if(!review)throw Error('Review the current staffing comparison.');
+   const key=JSON.stringify(review),context=liveKey.current,initialEpoch=epoch.current,revision=snapshot.data.revision;
+   const goal={id:request.goal.id||crypto.randomUUID(),statement:request.goal.statement||`Cover ${review.inputs.requiredRoles} ${review.inputs.role??'workforce'} roles.`};
+   const delivery=staffingDeliveryTarget();if(delivery.issue)throw Error(delivery.issue);const deliveryTarget=delivery.target;
+   const boundReview={...review,scopeKey:JSON.stringify([goal,request.scope,request.filters])};
+   const selection=await prepareRequiredStaffingPlan({version:1,review:boundReview,optionId,deliveryTarget},goal);requireCurrent();
+   if(context!==liveKey.current||initialEpoch!==epoch.current||decisionStore.getSnapshot().data.revision!==revision||JSON.stringify(currentRequiredStaffing(makeRequest('Pin the checked staffing option.'),decisionStore.getDatasetToken()))!==key)throw Error('The staffing comparison changed. Review the current option.');
+   const fields=requiredStaffingPlanFields(selection,catalog(),'staffing-choice-'+crypto.randomUUID(),new Date().toISOString()),state=structuredClone(memoryRef.current);state.requiredStaffing=boundReview;retainStaffingDeliveryTarget(state,catalog());
+   currentProps.current.conversation.selectProposalGoal(goal,revision,{...fields,[solutionConversationField]:state} as unknown as Record<string,Json>);memoryRef.current=state;setMemory(state);setNotice('Action Plan pinned. Staffing assumptions remain unconfirmed.');
+  }catch(error){setNotice(error instanceof Error?error.message:'The staffing plan could not be saved.');}finally{setSaving(false);}
+ }
  function updateHiringBudget(inputs:HiringBudgetInput|null){
   if(controller.current||pending||saving)throw Error('Wait for the current request before editing this estimate.');
   requireCurrent();
@@ -171,5 +196,5 @@ export function useHomeSolutionConversation(props:Props){
   }catch(error){setNotice((error as Error).message);}finally{setSaving(false);}
  }
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
- return {hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }

@@ -7,9 +7,8 @@ import {proposedPlanningEstimate} from '@/lib/home-proposed-planning';
 import {AssumptionsDisclosure} from './assumptions-disclosure';
 import {CompactChart} from './compact-chart';
 import {measurementScope,successMeasureText} from '@/lib/home-success-measures';
-import {PlanReviewNextStep} from './plan-review-next-step';
 import {HomeHiringBudgetReview} from './home-hiring-budget-review';
-import {ActionPlanQuickSummary} from './action-plan-quick-summary';
+import {ActionPlanQuickSummary,ActionPlanCalculationDetails} from './action-plan-quick-summary';
 import {ChatContent} from './chat-content';
 import {useState} from 'react';
 import {solutionReviewPresentation} from '@/lib/home-plan-presentation';
@@ -32,30 +31,48 @@ export function HomeSolutionProposalLinks({controller}:{controller:Controller}){
  if(!proposals.length)return null;
  return <nav aria-label="Review proposed Action Plans" className="space-y-2 text-sm"><p className="font-semibold">Jump to plan review <span className="font-normal text-muted-foreground">· review before saving</span></p><div className="flex flex-wrap gap-2">{proposals.map(item=><button key={item.id} type="button" className={button+' min-w-0 max-w-full break-words text-left'} onClick={()=>{const card=document.getElementById(proposalAnchor(item.id));const details=card?.closest('details');if(details)details.open=true;card?.scrollIntoView({block:'start'});card?.focus({preventScroll:true});}}>Review {currentSolutionProposals(controller.state).findIndex(proposal=>proposal.id===item.id)+1}: {item.candidate.name}</button>)}</div></nav>;
 }
-function Proposal({item,controller,goal,number:proposalNumber,recommended=false,notes,capacityRisk}:{capacityRisk?:string;notes?:string;item:SolutionEvaluation;controller:Controller;goal:string;number:number;recommended?:boolean}){
- const [statement,setStatement]=useState(goal||item.candidate.goal.statement),[planningDirty,setPlanningDirty]=useState(false);
+type ProposalEdit={statement:string;dirty:boolean;values?:string[]};
+const proposalEditKey=(item:SolutionEvaluation)=>JSON.stringify([item.id,item.revision,item.requestId]);
+type ProposalProps={item:SolutionEvaluation;controller:Controller;goal:string;number:number;recommended?:boolean;notes?:string;capacityRisk?:string;edit:ProposalEdit;onEdit:(value:Partial<ProposalEdit>)=>void;supporting?:boolean};
+function Proposal({item,controller,goal,number:proposalNumber,recommended=false,notes,capacityRisk,edit,onEdit,supporting=false}:ProposalProps){
+ const statement=edit.statement,planningDirty=edit.dirty,setStatement=(statement:string)=>onEdit({statement}),setPlanningDirty=(dirty:boolean)=>onEdit({dirty});
  const stale=JSON.stringify(item.constraints)!==JSON.stringify(controller.state.constraints),saved=controller.saved?.plans.find(plan=>plan.operation?.proposalKey===JSON.stringify(item.candidate));
- return <article id={proposalAnchor(item.id)} tabIndex={-1} aria-label={`Working proposal: ${item.candidate.name}`} className="space-y-3 rounded border p-3 text-sm focus-visible:ring-2 focus-visible:ring-ring">
-  <p className="text-xs font-medium">{recommended?'Recommended Action Plan':`Alternative Action Plan ${proposalNumber}`} · {saved?'saved proposal':'not saved'} · effectiveness is unproven</p><h3 aria-label={recommended?'Recommendation summary':undefined} className="font-semibold">{item.candidate.name} · revision {item.revision}</h3><p><strong>Goal:</strong> {statement}.</p><ActionPlanQuickSummary draft={item.draft} result={item.result}/><p><strong>Intended outcome:</strong> {item.candidate.objective}</p>
-  {capacityRisk&&<p><strong>Capacity risk:</strong> {capacityRisk}</p>}
-  <p><strong>Suggested owners · unconfirmed:</strong> {[...new Set(item.candidate.activities.map(activity=>item.draft?.bundle.components.find(part=>part.id===activity.id)?.ownerRole??activity.ownerRole))].filter(Boolean).join('; ')||'Unknown'}</p>
-  {item.candidate.activities[0]&&<p><strong>First action:</strong> <span>{item.draft?.bundle.components.find(part=>part.id===item.candidate.activities[0].id)?.firstStep??item.candidate.activities[0].step}</span></p>}
-  <details><summary className="min-h-11 cursor-pointer py-2 font-medium">Plan details</summary><div className="space-y-3"><p>{item.candidate.rationale}</p><p>{item.candidate.approach}</p>
-  <ol className="list-decimal space-y-2 pl-5">{item.candidate.activities.map((activity,index)=>{const component=item.draft?.bundle.components.find(part=>part.id===activity.id),timing=item.draft?.inputs.timing.find(row=>row.componentId===activity.id);return <li key={activity.id}><strong>{component?.name??activity.name}</strong>{index>0&&<p>{component?.firstStep??activity.step}</p>}<p><strong>Suggested owner:</strong> {component?.ownerRole??activity.ownerRole}</p><p className="text-xs"><strong>Timing:</strong> {timing?.start.value??'Start not confirmed'} → {timing?.finish.value??'Finish not confirmed'}. Follow the proposed step sequence; dates and availability need review.</p><p className="text-xs">{component?.limitation??activity.limitation}</p></li>;})}</ol>
-  <p><strong>Tradeoffs:</strong> {item.candidate.tradeoffs.join(' ')||'Not yet evaluated.'}</p></div></details><p><strong>Next step:</strong> {item.candidate.nextStep}</p><p><strong>Success measure:</strong> {item.draft?.inputs.successMeasure?successMeasureText(item.draft.inputs.successMeasure,item.draft.inputs.successMeasure.scopeKey===measurementScope(item.draft.inputs)):`${item.candidate.successMeasure} · Baseline: Unknown; Target: Unknown.`}</p>
+ if(supporting)return <section aria-label={`Supporting details: ${item.candidate.name}`} className="space-y-4"><h4 className="font-semibold">{item.candidate.name}</h4>
 
-  <HistoricalMetricContext goal={item.draft?.binding.goal??goal} measure={item.draft?.inputs.successMeasure}/>
-  {item.draft&&proposedPlanningEstimate(item.draft)&&<ProposedPlanningEditor draft={item.draft} onDirtyChange={setPlanningDirty} disabled={controller.pending||controller.saving||!controller.canSend||stale||!!saved} onReview={changes=>controller.editPlanningInputs(item,changes)}/>}
-  <PlanReviewNextStep goal={statement}/>
-  <details><summary className="cursor-pointer py-2 font-medium">Inputs and changes</summary><ul className="list-disc space-y-1 pl-5">{[...item.interpretations,...item.changes].map((line,index)=><li key={index}>{line}</li>)}</ul>{!item.interpretations.length&&<p>No new quantities were supplied. Missing assumptions remain unknown.</p>}</details>
+  <p><strong>Goal:</strong> {statement}.</p>
+  {capacityRisk&&<p><strong>Capacity risk:</strong> {capacityRisk}</p>}
+  <ol aria-label="Practical steps" className="list-decimal space-y-1 pl-5">{item.candidate.activities.map(activity=>{const component=item.draft?.bundle.components.find(part=>part.id===activity.id);return <li key={activity.id}>{component?.firstStep??activity.step}</li>;})}</ol>
+  <p><strong>Suggested owners · unconfirmed:</strong> {[...new Set(item.candidate.activities.map(activity=>item.draft?.bundle.components.find(part=>part.id===activity.id)?.ownerRole??activity.ownerRole))].filter(Boolean).join('; ')||'Unknown'}</p>
+
+   {notes&&<section aria-label="Supporting evidence and caveats"><ChatContent content={notes}/></section>}
+   <section className="space-y-2"><h4 className="font-semibold">Rationale and limits</h4><p>{item.candidate.objective}</p><p>{item.candidate.rationale}</p><p>{item.candidate.approach}</p><p>{item.candidate.tradeoffs.join(' ')||'Tradeoffs not yet evaluated.'}</p>
+   {item.candidate.activities.map(activity=>{const component=item.draft?.bundle.components.find(part=>part.id===activity.id),timing=item.draft?.inputs.timing.find(row=>row.componentId===activity.id);return <p key={activity.id}><strong>{component?.name??activity.name}:</strong> {component?.limitation??activity.limitation} Suggested owner: {component?.ownerRole??activity.ownerRole}. Timing: {timing?.start.value??'Unknown'} → {timing?.finish.value??'Unknown'}.</p>;})}
+   {!item.candidate.activities.some(activity=>(item.draft?.bundle.components.find(part=>part.id===activity.id)?.firstStep??activity.step).trim()===item.candidate.nextStep.trim())&&<p>Follow-up: {item.candidate.nextStep}</p>}</section>
+   {!!controller.state.constraints.length&&<section><h4 className="font-semibold">Current interpreted constraints</h4>{controller.state.constraints.map(item=><p key={item.field}>{item.field.replaceAll('_',' ')}: {item.action==='remove'?'Removed':item.number??item.text} {item.unit}. Correct this in chat if needed.</p>)}</section>}
+   <ActionPlanCalculationDetails draft={item.draft} result={item.result}/>
+   {item.draft&&proposedPlanningEstimate(item.draft)&&<ProposedPlanningEditor inline values={edit.values} onValuesChange={values=>onEdit({values})} draft={item.draft} onDirtyChange={setPlanningDirty} disabled={controller.pending||controller.saving||!controller.canSend||stale||!!saved} onReview={changes=>controller.editPlanningInputs(item,changes)}/>}
+   <section><h4 className="font-semibold">Tracking</h4><p>{item.draft?.inputs.successMeasure?successMeasureText(item.draft.inputs.successMeasure,item.draft.inputs.successMeasure.scopeKey===measurementScope(item.draft.inputs)):`${item.candidate.successMeasure} · Baseline: Unknown; Target: Unknown.`}</p><p>Confirm owner, baseline, target and review date before starting.</p></section>
+   <HistoricalMetricContext inline goal={item.draft?.binding.goal??goal} measure={item.draft?.inputs.successMeasure}/>
+   <section><h4 className="font-semibold">Inputs and changes</h4><ul className="list-disc space-y-1 pl-5">{[...item.interpretations,...item.changes].map((line,index)=><li key={index}>{line}</li>)}</ul>{!item.interpretations.length&&<p>No new quantities were supplied. Missing assumptions remain unknown.</p>}</section>
+   {!!item.issues.length&&<section><h4 className="font-semibold">Unknowns</h4><ul className="list-disc space-y-1 pl-5">{item.issues.map((line,index)=><li key={index}>{line}</li>)}</ul></section>}
+   {!goal&&<OptionalConversationForm label="goal form"><label className="block">Goal for this proposal<input className="mt-1 w-full rounded border p-2" value={statement} maxLength={240} onChange={event=>setStatement(event.target.value)}/></label></OptionalConversationForm>}
+
+ </section>;
+ return <article id={proposalAnchor(item.id)} tabIndex={-1} aria-label={`Working proposal: ${item.candidate.name}`} className={`min-w-0 space-y-3 rounded border p-3 text-sm focus-visible:ring-2 focus-visible:ring-ring ${recommended?'border-primary bg-muted/30':''}`}>
+  <p className="inline-flex rounded bg-muted px-2 py-1 text-xs font-medium">{recommended?'Recommended':`Alternative ${proposalNumber}`}{saved?' · saved':''}</p>
+  <h3 aria-label={recommended?'Recommendation summary':undefined} className="font-semibold">{item.candidate.name} · revision {item.revision}</h3>
+  <ActionPlanQuickSummary compact draft={item.draft} result={item.result}/>
   {[...item.blocking,...(stale?['Current constraints changed. Refine this proposal in chat before saving.']:[])].map((line,index)=><p key={index} role="status">{line}</p>)}
-  {!!item.issues.length&&<details open={!item.draft||!proposedPlanningEstimate(item.draft)}><summary className="cursor-pointer py-2">Unknowns ({item.issues.length})</summary><ul className="list-disc space-y-1 pl-5">{item.issues.map((line,index)=><li key={index}>{line}</li>)}</ul></details>}
-  {!goal&&<OptionalConversationForm label="goal form"><label className="block">Goal for this proposal<input className="mt-1 w-full rounded border p-2" value={statement} maxLength={240} onChange={event=>setStatement(event.target.value)}/></label></OptionalConversationForm>}
-  {notes&&<details><summary className="min-h-11 cursor-pointer py-2">Additional inputs and assumptions</summary><ChatContent content={notes}/></details>}
   {planningDirty&&<p role="status">Recalculate or discard input changes before pinning.</p>}
-  <p className="text-xs">Proposal only; no operational changes applied.</p>
-  <div className="flex flex-wrap gap-2"><button data-guide-target="choose-proposal" data-guide-candidate={item.id} data-guide-revision={item.revision} data-guide-request={item.requestId} className={button} disabled={planningDirty||!controller.canSend||controller.pending||controller.saving||stale||!!item.blocking.length||!item.draft||!statement.trim()||!!saved} onClick={()=>{if(!planningDirty)void controller.save(item,true,statement);}}>{saved?`Pinned Action Plan #${saved.number}`:item.issues.length?'Pin Action Plan with unknowns':'Pin Action Plan'}</button><button className={button} disabled={controller.pending||controller.saving||!controller.canSend} onClick={()=>controller.reject(item)}>Discard proposal</button></div>
+  <div className="flex flex-wrap gap-2"><button data-guide-target="choose-proposal" data-guide-candidate={item.id} data-guide-revision={item.revision} data-guide-request={item.requestId} className={button} disabled={planningDirty||!controller.canSend||controller.pending||controller.saving||stale||!!item.blocking.length||!item.draft||!statement.trim()||!!saved} onClick={()=>{if(!planningDirty)void controller.save(item,true,statement);}}>{saved?`Pinned Action Plan #${saved.number}`:'Pin Action Plan'}</button><button className={button} disabled={controller.pending||controller.saving||!controller.canSend} onClick={()=>controller.reject(item)}>Discard proposal</button></div>
  </article>;
+}
+function ProposalGroup({items,recommended,controller,goal,notes,capacityRisk,current=true,edits,onEdit}:{edits:Record<string,Partial<ProposalEdit>>;onEdit:(key:string,value:Partial<ProposalEdit>)=>void;items:SolutionEvaluation[];recommended:SolutionEvaluation|null;controller:Controller;goal:string;notes?:string;capacityRisk?:string;current?:boolean}){
+ if(!items.length)return null;
+ const draft=items[0].draft,estimate=draft?proposedPlanningEstimate(draft):null;
+ const missing=[draft&&!draft.inputs.scope.startMonth.value&&draft.inputs.timing.every(t=>!t.start.value)?'the start date':null,estimate?.cash===null?'the incremental cash allowance':null,estimate?.perPerson===null?'hours per person':null,draft&&draft.inputs.memberships.some(m=>m.complete.value!==true)?'confirmed participants':null].filter(Boolean).slice(0,3);
+ const props=(item:SolutionEvaluation,index:number):ProposalProps=>{const key=proposalEditKey(item);return {item,controller,goal,number:currentSolutionProposals(controller.state).findIndex(p=>p.id===item.id)+1,recommended:current&&recommended?.id===item.id&&recommended.revision===item.revision&&recommended.requestId===item.requestId,notes:index===0?notes:undefined,capacityRisk:index===0?capacityRisk:undefined,edit:{statement:goal||item.candidate.goal.statement,dirty:false,...edits[key]},onEdit:value=>onEdit(key,value)};};
+ return <section aria-label={current?'Current Action Plan options':'Earlier Action Plan options'} className="space-y-3"><div className={`grid min-w-0 gap-3 ${items.length===1?'grid-cols-1':items.length===2?'md:grid-cols-2':'md:grid-cols-3'}`}>{items.map((item,index)=><Proposal key={item.id+':'+item.revision} {...props(item,index)}/>)}</div>{!!missing.length&&<p className="text-sm">If you tell me {missing.join(', ')}, I can update the plans and recommendation.</p>}<details><summary className="min-h-11 cursor-pointer py-2 font-medium">Assumptions &amp; caveats</summary><div className="space-y-4">{items.map((item,index)=><Proposal key={item.id+':'+item.revision} supporting {...props(item,index)}/>)}</div></details></section>;
 }
 export function SolutionProjectionChart({analysis}:{analysis:HeadcountProjection}){
  const values=[analysis.inputs.opening,...analysis.points.map(p=>p.headcount)],low=Math.min(...values),high=Math.max(...values),span=Math.max(1,high-low),min=Math.max(0,low-span*.12),max=high+span*.12;
@@ -75,14 +92,15 @@ export function SolutionProjectionChart({analysis}:{analysis:HeadcountProjection
  </section>;
 }
 export function HomeSolutionConversationReview({controller,goal,pack,showSaved,planningNotes,capacityRisk}:{capacityRisk?:string;planningNotes?:string;controller:Controller;goal:string;pack:unknown;showSaved:boolean}){
- const proposalNumber=(item:SolutionEvaluation)=>currentSolutionProposals(controller.state).findIndex(proposal=>proposal.id===item.id)+1;
+ const [edits,setEdits]=useState<Record<string,Partial<ProposalEdit>>>({});
+ const onEdit=(key:string,value:Partial<ProposalEdit>)=>setEdits(previous=>{const retained=new Set(controller.state.working.map(proposalEditKey));return {...Object.fromEntries(Object.entries(previous).filter(([id])=>retained.has(id))),[key]:{...previous[key],...value}};});
  const presentation=solutionReviewPresentation(controller.state);
  const current=[...(presentation.recommended?[presentation.recommended]:[]),...presentation.alternatives];
  const analyses=[...new Map(controller.state.analyses.map(item=>[item.id,item])).values()];
  return <section aria-label="Solution conversation review" className="space-y-3">
   {controller.pending&&<div role="status" className="flex items-center gap-3"><p>Thinking through the question and checking useful calculations…</p><button className={button} onClick={controller.cancel}>Cancel request</button></div>}
   {controller.notice&&<p role="status">{controller.notice}</p>}
-  {!!controller.state.constraints.length&&<details><summary className="cursor-pointer py-2 text-sm">Current interpreted constraints</summary>{controller.state.constraints.map(item=><p key={item.field} className="text-sm">{item.field.replaceAll('_',' ')}: {item.action==='remove'?'Removed':item.number??item.text} {item.unit}. Correct this in chat if needed.</p>)}</details>}
+  {!current.length&&!controller.state.requiredStaffing&&!!controller.state.constraints.length&&<details><summary className="cursor-pointer py-2 text-sm">Current interpreted constraints</summary>{controller.state.constraints.map(item=><p key={item.field} className="text-sm">{item.field.replaceAll('_',' ')}: {item.action==='remove'?'Removed':item.number??item.text} {item.unit}. Correct this in chat if needed.</p>)}</details>}
   {!!controller.state.verifiedMetrics.length&&<section aria-label="Checked quantitative results" className="rounded border p-3 text-sm"><h3 className="font-semibold">Checked quantitative results</h3>{controller.state.verifiedMetrics.map((ref,index)=>{const metric=resolveSolutionMetric(controller.state,ref);return <p key={index}>{metric.label}: {number(metric.value)} {metric.unit}. {metric.basis} · {metric.source}.</p>;})}<p>Effectiveness and savings are not established by these calculations.</p></section>}
   {controller.state.hiringBudget&&<details open={controller.state.currentCalculationKinds?.includes('hiring')===true}>
    <summary hidden={controller.state.currentCalculationKinds?.includes('hiring')===true} className="min-h-11 cursor-pointer py-2">Earlier hiring calculation</summary>
@@ -90,12 +108,12 @@ export function HomeSolutionConversationReview({controller,goal,pack,showSaved,p
   </details>}
   {controller.state.requiredStaffing&&<details open={controller.state.currentCalculationKinds?.includes('required-staffing')===true}>
    <summary hidden={controller.state.currentCalculationKinds?.includes('required-staffing')===true} className="min-h-11 cursor-pointer py-2">Earlier staffing calculation</summary>
-   <HomeRequiredStaffingReview review={controller.state.requiredStaffing} onClear={controller.clearRequiredStaffing} disabled={controller.pending||controller.saving||!controller.canSend}/>
+   <HomeRequiredStaffingReview notes={planningNotes} deliveryMonths={controller.staffingDeliveryTarget().months} deliveryIssue={controller.staffingDeliveryTarget().issue} onPin={id=>void controller.pinRequiredStaffing(id)} pinned={controller.pinnedRequiredStaffing} review={controller.state.requiredStaffing} onClear={controller.clearRequiredStaffing} disabled={controller.pending||controller.saving||!controller.canSend}/>
   </details>}
   {controller.state.requiredStaffing&&controller.state.businessPlanning?<details><summary className="min-h-11 cursor-pointer py-2">Separate workload assumptions</summary><HomeBusinessPlanningReview controller={controller}/></details>:<HomeBusinessPlanningReview controller={controller}/>}
   {analyses.map(item=><SolutionProjectionChart key={item.id+item.revision} analysis={item}/>)}
-  <div className="space-y-3">{current.map(item=>{const recommended=item===presentation.recommended;return <details key={item.id+':'+item.revision} open={recommended}><summary hidden={recommended} className="min-h-11 cursor-pointer py-2">Alternative Action Plan {proposalNumber(item)}: {item.candidate.name}</summary><Proposal item={item} controller={controller} goal={goal} number={proposalNumber(item)} recommended={recommended} notes={recommended?planningNotes:undefined} capacityRisk={recommended?capacityRisk:undefined}/></details>;})}</div>
-  {!!presentation.earlier.length&&<details><summary className="min-h-11 cursor-pointer py-2">Earlier proposals ({presentation.earlier.length})</summary><p>Reference proposals from earlier turns. Review their context and unknowns before choosing.</p>{presentation.earlier.map(item=><Proposal key={item.id+item.revision} item={item} controller={controller} goal={goal} number={proposalNumber(item)}/>)}</details>}
+  <ProposalGroup edits={edits} onEdit={onEdit} items={current} recommended={presentation.recommended} controller={controller} goal={goal} notes={planningNotes} capacityRisk={capacityRisk}/>
+  {!!presentation.earlier.length&&<details><summary className="min-h-11 cursor-pointer py-2">Earlier proposals ({presentation.earlier.length})</summary><ProposalGroup edits={edits} onEdit={onEdit} current={false} items={presentation.earlier} recommended={null} controller={controller} goal={goal}/></details>}
   {showSaved&&controller.saved&&<details><summary className="cursor-pointer py-2 font-semibold">Saved Action Plans</summary>{controller.saved.order.map(id=><PlanAlternativeCard key={id} plan={controller.saved!.plans.find(item=>item.id===id)!} catalog={controller.saved!} measurePack={pack} contextCurrent={false}/>)}</details>}
  </section>;
 }

@@ -103,10 +103,11 @@ export function solutionDiscussionPresentations(messages:ChatMessage[],state:Sol
   if(matched<0)continue;
   cursor=matched-2;const turn=state.turns[matched-1];
   const proposals=[...new Map(state.working.filter(item=>item.message.id===turn.id).map(item=>[item.id,item])).values()];
-  if(!proposals.length)continue;
+  const currentStaffing=state.requiredStaffing&&state.currentCalculationKinds?.includes('required-staffing')&&matched===state.turns.length-1;
+  if(!proposals.length&&!currentStaffing)continue;
   const split=splitPlanDiscussion(message.content);
   const followUp=splitPlanFollowUp(split.discussion,state.questions);
-  if(split.reference||followUp.furtherReading||followUp.planningNotes||followUp.explanation)result.set(message,{...split,...followUp,proposals});
+  result.set(message,{...split,...followUp,proposals});
  }
  return result;
 }

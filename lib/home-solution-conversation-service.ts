@@ -1,7 +1,11 @@
+// @ts-expect-error Native fixtures share source.
+import {captureStaffingDelivery} from './home-staffing-delivery.ts';
 // @ts-expect-error Native fixture tests share source.
 import {canReviewConditionalHiringPlan,canReviewCostedHiringPlan} from './home-hiring-plan.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {SolutionResponseError} from './home-solution-response-failure.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {solutionPreparation,solutionClock} from './home-solution-preparation.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {planningCalculationRef,planningCalculationFeedback,type PlanningCalculationRef,type PlanningCalculationKind} from './guided-planning-adapters.ts';
 // @ts-expect-error Native Node tests share application source.
@@ -11,7 +15,7 @@ import {hiringBudgetTool,currentHiringBudget,hiringBudgetView,editHiringBudget} 
 // @ts-expect-error Native Node tests share TypeScript source.
 import {answerEvidenceSeries,type ChatEvidenceSeries} from './chat-evidence-series.ts';
 // @ts-expect-error Native Node tests share application source.
-import {requiredStaffingTool,currentRequiredStaffing,requiredStaffingView,editRequiredStaffing,requiresRequiredStaffing,canCompleteRequiredStaffingAlone,requiredStaffingAnswer} from './home-required-staffing.ts';
+import {hasExplicitStaffingRequirement,retainStaffingDeliveryTarget,requiredStaffingTool,currentRequiredStaffing,requiredStaffingView,editRequiredStaffing,requiresRequiredStaffing,canCompleteRequiredStaffingAlone,requiredStaffingAnswer} from './home-required-staffing.ts';
 import type {verifySolutionEvidence} from './home-solution-grounding.mjs';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {homeAnswerScopeViolation} from './home-answer-scope.ts';
@@ -46,7 +50,16 @@ import {readSwpPlaybook} from './swp-reasoning-playbook.ts';
 
 export type SolutionModelOutput={items:unknown[];calls:{id:string;name:string;arguments:string}[];text:string;completed:boolean};
 export type SolutionReply={charts?:ChatEvidenceSeries[];requestId:string;answer:string;candidateIds:string[];analysisIds:string[];state:SolutionState;usage:{modelRounds:number;toolCalls:number};progressProposal?:ProgressEntryProposal;demandReview?:DemandReview};
-export type SolutionRuntime={staffingScenarioOnly?:boolean;grounding?:Awaited<ReturnType<typeof verifySolutionEvidence>>;complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal,capabilities:{progressEntryEnabled:boolean;requiredStaffingCalculation:boolean})=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date;natural?:{datasetToken:string};progress?:{enabled:boolean;datasetToken:string};demand?:{datasetToken:string;referenceContract?:boolean}};
+export type SolutionToolDiagnostic={round:number;name:string;status:'ok'|'feedback'|'aborted';elapsedMs:number};
+export type SolutionRuntime={requestTime?:Date;onToolResult?:(event:SolutionToolDiagnostic)=>void;staffingScenarioOnly?:boolean;grounding?:Awaited<ReturnType<typeof verifySolutionEvidence>>;complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal,capabilities:{progressEntryEnabled:boolean;requiredStaffingCalculation:boolean})=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date;natural?:{datasetToken:string};progress?:{enabled:boolean;datasetToken:string};demand?:{datasetToken:string;referenceContract?:boolean}};
+function readFinal(text:string):SolutionFinal{
+ if(!text||text.length>20000)throw new SolutionResponseError('answer_unavailable','The conversational answer is unavailable.');
+ let value;
+ try{value=JSON.parse(text);}catch{throw new SolutionResponseError('invalid_json','The conversational answer is not valid JSON.');}
+ if(typeof value?.answer==='string')throw new SolutionResponseError('invalid_schema','Use a checked recommendation, a specific unsupported planning outcome, or explicit discussion-only response.');
+ try{assertSolutionShape(value,solutionFinalSchema,'answer');}catch{throw new SolutionResponseError('invalid_schema','The conversational answer does not match the required schema.');}
+ return value;
+}
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 const abort=(signal:AbortSignal)=>{if(signal.aborted)throw Error('Conversation request cancelled.');};
 const latest=<T extends {id:string}>(items:T[])=>[...new Map(items.map(item=>[item.id,item])).values()];
@@ -61,7 +74,7 @@ function checkedMetricReferences(state:SolutionState,kind:SolutionMetricRef['kin
 }
 export function solutionModelContext(request:SolutionRequest,progress?:GoalProgressConversation){
  const saved=request.catalog?.plans.filter(plan=>!plan.deleted)??[];
- return {goal:request.goal,scope:request.scope,filters:request.filters,timeZone:request.timeZone,goalContext:request.goalContext,...(progress?{savedGoalProgress:progress}:{}),currentEvidence:request.evidence,citationCatalog:actionEvidenceCatalog(request.evidence),currentConstraints:request.state.constraints,
+ return {goal:request.goal,scope:request.scope,filters:request.filters,timeZone:request.timeZone,goalContext:request.goalContext,...(progress?{savedGoalProgress:progress}:{}),currentEvidence:request.evidence,citationCatalog:actionEvidenceCatalog(request.evidence),currentConstraints:request.state.constraints,...(request.state.staffingDeliveryTarget?{staffingDeliveryTarget:request.state.staffingDeliveryTarget}:{}),
   savedPlans:saved.map(plan=>({id:plan.id,number:plan.number,revision:plan.draft.revision,name:plan.draft.bundle.name,objective:plan.draft.bundle.objective,activities:plan.draft.bundle.components})),selectedPlan:saved.some(plan=>plan.id===request.selectedId)?solutionPlanView(saved.find(plan=>plan.id===request.selectedId)!):null,
   recentTurns:request.state.turns,modelView:{version:1,omittedInternalEqualityKeys:['draft.signature','result.signature','result.bindingKey','result.inputKey','evaluation.sourceKeys'],authoritativeState:'Retained on the server; projected views cannot be saved or used as authoritative input.',history:'All retained turns; no history truncation during projection.'},currentWorkingRevisions:currentSolutionProposals(request.state).map(({id,revision,candidate},index)=>({id,revision,name:candidate.name,label:`Proposed Action Plan ${index+1}`})),workingProposals:request.state.working.map(item=>{const view=solutionEvaluationView(request,item);return {...view,inputs:item.draft?.inputs??null,draft:undefined,result:item.result?solutionResultView(item.result):null};}),
   analyses:request.state.analyses.map(item=>({id:item.id,revision:item.revision,method:item.spec.method,months:item.spec.months,assumptions:item.assumptions,opening:item.inputs.opening,asOf:item.inputs.asOf,scope:item.inputs.scope,interpretations:item.interpretations,finalHeadcount:item.points.at(-1)?.headcount})),
@@ -72,6 +85,28 @@ export function solutionModelContext(request:SolutionRequest,progress?:GoalProgr
 /** Bounded model-directed read/calculation loop. No write, model switch or automatic retry. */
 export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,signal:AbortSignal):Promise<SolutionReply>{
  const original=readSolutionRequest(raw),request=structuredClone(original),state=request.state;
+ abort(signal);
+ if(runtime.natural&&(hasExplicitStaffingRequirement(request.message.text)||requiresRequiredStaffing(request)||state.requiredStaffing||state.staffingDeliveryTarget||state.constraints.some(c=>c.field==='horizon_months'&&c.action==='set'))){
+  const captured=captureStaffingDelivery(request.message,!!state.staffingDeliveryTarget?.issue);
+  if(captured){
+   const previous=state.staffingDeliveryTarget;
+   // The dedicated record replaces only the matching legacy staffing interpretation.
+   state.constraints=state.constraints.filter(c=>{
+    if(c.field!=='horizon_months')return true;
+    if(previous)return c.turnId!==previous.turnId||c.number!==previous.months;
+    const source=state.turns.find(t=>t.role==='user'&&t.id===c.turnId)??state.requiredStaffing?.basisTurns.find(t=>t.id===c.turnId);
+    const ownsDeadline=source?.text.split(/[;!?\n]|\.(?!\d)/).some(text=>hasExplicitStaffingRequirement(text)&&captureStaffingDelivery({id:source.id,text})?.months===c.number);
+    const legacy=source&&ownsDeadline?captureStaffingDelivery(source):null;
+    return !legacy||!!legacy.issue||legacy.months===null||legacy.months!==c.number;
+   });
+   state.staffingDeliveryTarget=captured;
+  }
+  if(captured?.issue){
+   const answer=captured.issue;state.questions=[answer];
+   state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:answer}].slice(-32);
+   return {requestId:request.requestId,answer,candidateIds:[],analysisIds:[],charts:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
+  }
+ }
  if(runtime.staffingScenarioOnly){
   const scenario=readStaffingScenario(request,{natural:!!runtime.natural,datasetToken:runtime.natural?.datasetToken??''});
   if(!scenario||runtime.grounding||runtime.demand)throw Error('The illustrative staffing contract is not eligible.');
@@ -89,11 +124,13 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  // Only the already selected, standalone comparison can finish from its first tool result.
  const staffingOnly=staffingRequired&&canCompleteRequiredStaffingAlone(request);
  const standaloneStaffing=staffingOnly&&!demand&&!entryContext&&!request.goal.id&&!request.goal.statement&&!request.goalContext&&!request.selectedId&&!request.catalog&&!state.working.length&&!state.analyses.length&&!state.constraints.length&&!state.verifiedMetrics.length&&!state.focusCandidateId;
- const modelContext={...solutionModelContext(request,progress),...(runtime.grounding?{evidenceGrounding:runtime.grounding}:{}),...(runtime.natural?{requiredStaffing:requiredStaffingView(currentRequiredStaffing(request,runtime.natural.datasetToken)),businessPlanning:businessPlanningView(natural,request.requestId,naturalStep),hiringBudget:hiringBudgetView(currentHiringBudget(request,runtime.natural.datasetToken))}:{})};
+ const modelContext={...solutionModelContext(request,progress),preparation:solutionPreparation(request,runtime.requestTime??runtime.now?.()??new Date(),runtime.requestTime?'request-start':'conversation-preparation'),...(runtime.grounding?{evidenceGrounding:runtime.grounding}:{}),...(runtime.natural?{requiredStaffing:requiredStaffingView(currentRequiredStaffing(request,runtime.natural.datasetToken)),businessPlanning:businessPlanningView(natural,request.requestId,naturalStep),hiringBudget:hiringBudgetView(currentHiringBudget(request,runtime.natural.datasetToken))}:{})};
  if(referenced&&demand){const goalContext=structuredClone(request.goalContext) as {scenarioReview:Record<string,unknown>};goalContext.scenarioReview.demandProposal=demand.demandProposal?referencedDemandView(demand.demandProposal,demand,currentDemandReference):null;modelContext.goalContext=goalContext;}
  const input:unknown[]=[{role:'user',content:'CURRENT AUTHORITATIVE CONTEXT AND CONVERSATION DATA\n'+JSON.stringify({...modelContext,...(entryContext?{progressEntryDraft:entryContext.previous}:{} )})}];
  const planningRefs=new Map<string,PlanningCalculationRef>();
  const evaluated=new Map<string,SolutionEvaluation>(),analyses=new Map<string,HeadcountProjection>();
+ let coFinalEligible=true;
+ const presentationTools=new Set(['read_clock','read_evidence','read_plans','evaluate_candidate','revise_parameters']);
  let toolCalls=0,operations=0,projectionInput:Promise<ProjectionInputs>|undefined,final:SolutionFinal|undefined,rounds=0;
  for(let round=0;round<4;round++){
   abort(signal);if(new TextEncoder().encode(JSON.stringify(input)).length>120000)throw Error('This conversation needs a narrower set of sources before another model round. Earlier work is kept.');
@@ -103,23 +140,20 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   if(output.calls.length>6||JSON.stringify(output.items).length>70000)throw new SolutionResponseError('output_bounds','The conversation response was incomplete or exceeded its bounds.');
   if(!output.calls.length){
    if(staffingRequired&&!staffingCalculated)throw Error('The staffing comparison was not calculated in this turn. Earlier work is kept.');
-   if(!output.text||output.text.length>20000)throw new SolutionResponseError('answer_unavailable','The conversational answer is unavailable.');
-   let value;
-   try{value=JSON.parse(output.text);}catch{throw new SolutionResponseError('invalid_json','The conversational answer is not valid JSON.');}
-   if(typeof value?.answer==='string')throw new SolutionResponseError('invalid_schema','Use a checked recommendation, a specific unsupported planning outcome, or explicit discussion-only response.');
-   try{assertSolutionShape(value,solutionFinalSchema,'answer');}catch{throw new SolutionResponseError('invalid_schema','The conversational answer does not match the required schema.');}
-   final=value;break;
+   final=readFinal(output.text);break;
   }
   const callCost=(call:SolutionModelOutput['calls'][number])=>{if(call.name!=='evaluate_action_plans')return 1;try{const count=JSON.parse(call.arguments)?.candidates?.length;return Number.isInteger(count)&&count>=1&&count<=3?count:3;}catch{return 3;}};
   if(round===3||operations+output.calls.reduce((total,call)=>total+callCost(call),0)>6)throw Error('The bounded calculation limit was reached. No proposal was saved.');
   input.push(...output.items);
   for(const call of output.calls){
    abort(signal);toolCalls++;operations+=callCost(call);let result:unknown;
+   const toolStartedAt=Date.now();let toolStatus:SolutionToolDiagnostic['status']='ok';
+   if(!presentationTools.has(call.name))coFinalEligible=false;
    if(runtime.natural&&call.name===requiredStaffingTool.name){staffingRequired=true;staffingCalculated=false;}
    try{
     const tool=runtime.natural&&call.name===requiredStaffingTool.name?requiredStaffingTool:runtime.natural&&call.name===hiringBudgetTool.name?hiringBudgetTool:runtime.natural&&businessPlanningTools.some(t=>t.name===call.name)?businessPlanningTools.find(t=>t.name===call.name):demand?[...(referenced?[reviewReferencedDemandTool,reviseReferencedDemandTool]:[serviceDemandTool,demandPatchTool]),...solutionTools.filter(t=>['read_clock','read_evidence'].includes(t.name))].find(t=>t.name===call.name):call.name==='propose_goal_progress'&&entryContext?goalProgressProposalTool:call.name==='read_goal_progress'&&progress?goalProgressReadTool:solutionTools.find(tool=>tool.name===call.name);if(!tool||call.arguments.length>32000)throw Error('Unsupported or oversized tool request.');const args=JSON.parse(call.arguments);
     const periodFeedback=demand?demandPeriodFeedback(call.name,args):null;
-    if(periodFeedback){input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(periodFeedback)});continue;}
+    if(periodFeedback){coFinalEligible=false;toolStatus='feedback';input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(periodFeedback)});continue;}
     assertSolutionShape(args,tool.parameters,'tool arguments');
     if(runtime.natural&&call.name===requiredStaffingTool.name){
      const next=editRequiredStaffing(request,runtime.natural.datasetToken,args.changes);state.requiredStaffing=next;result={requiredStaffing:requiredStaffingView(next),accepted:false,saved:false};staffingCalculated=true;
@@ -142,7 +176,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
     }else if(call.name==='read_workforce_planning_playbook'){
      result=readSwpPlaybook(args.sections);
     }else if(call.name==='read_clock'){
-     const now=runtime.now?.()??new Date();result={utc:now.toISOString(),timeZone:request.timeZone,local:new Intl.DateTimeFormat('en-US',{timeZone:request.timeZone,dateStyle:'full',timeStyle:'long'}).format(now),basis:'Server clock at tool execution, rendered in the supplied browser time zone.'};
+     result=solutionClock(request,runtime.now?.()??new Date(),'tool-execution');
     }else if(call.name==='read_evidence'){
      const sources=(request.evidence as {sources:Record<string,unknown>[]}).sources;
      const ids=args.sourceIds as string[];if(ids.some(id=>!sources.some(source=>source.id===id)))throw Error('A requested current evidence source is unavailable.');
@@ -160,6 +194,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
       const allowedEvidenceIds=actionEvidenceCatalog(request.evidence).map(item=>item.id);
       const invalidReferences=candidates.flatMap(candidate=>candidate.activities.filter(activity=>activity.mode!=='retain').flatMap(activity=>activity.evidenceIds.filter(id=>!allowedEvidenceIds.includes(id)).map(id=>({activityId:activity.id,id}))));
       if(invalidReferences.length){
+       coFinalEligible=false;toolStatus='feedback';
        result={ok:false,code:'invalid_evidence_identifiers',error:'Activity citations must use exact current citationCatalog item IDs, not packet source IDs.',invalidReferences,allowedEvidenceIds,instruction:'Choose justified current citationCatalog entries or leave unsupported citations empty. Do not infer aliases, claim success or change the proposal silently. A corrected tool call uses the remaining existing round/tool budget.'};
        input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(result)});continue;
       }
@@ -178,7 +213,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
      result=call.name==='evaluate_action_plans'?{proposals:views,accepted:false,saved:false}:views[0];
      if(JSON.stringify(result).length>65000)throw Error('The proposed set exceeds the result budget. Use fewer, more concise activities; no proposals or constraints were recorded.');
      state.constraints=constraints;state.working=nextState.working;
-     for(const item of items)evaluated.set(item.id,item);
+     for(const item of items){evaluated.set(item.id,item);if(item.blocking.length){coFinalEligible=false;toolStatus='feedback';}}
     }else{
      projectionInput??=runtime.loadProjection(request.filters,signal);
      const item=await calculateHeadcountProjection(args.spec as ProjectionSpec,await projectionInput,state.analyses,solutionUserTurns(request).map(turn=>turn.id));abort(signal);
@@ -188,9 +223,20 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
     const planningBinding=planningKind?await planningCalculationRef(planningKind,request,state,demandReview,planningKind==='projection'?(args.spec as ProjectionSpec).id:undefined):null;
     if(planningBinding&&result&&typeof result==='object')result={...result,planningGuidance:planningCalculationFeedback(planningBinding)};
 
-    if(JSON.stringify(result).length>65000){if(call.name===requiredStaffingTool.name)staffingCalculated=false;result={ok:false,error:'The read result exceeds the tool budget. Request fewer source IDs.'};}else if(planningBinding)planningRefs.set(planningBinding.reference,planningBinding);
-   }catch(error){abort(signal);result={ok:false,error:error instanceof Error?error.message:'The read or calculation was unavailable.',instruction:'Explain the boundary, ask a focused question, or revise typed inputs. Do not claim this calculation succeeded.'};}
+    if(JSON.stringify(result).length>65000){coFinalEligible=false;toolStatus='feedback';if(call.name===requiredStaffingTool.name)staffingCalculated=false;result={ok:false,error:'The read result exceeds the tool budget. Request fewer source IDs.'};}else if(planningBinding)planningRefs.set(planningBinding.reference,planningBinding);
+   }catch(error){coFinalEligible=false;toolStatus=signal.aborted?'aborted':'feedback';abort(signal);result={ok:false,error:error instanceof Error?error.message:'The read or calculation was unavailable.',instruction:'Explain the boundary, ask a focused question, or revise typed inputs. Do not claim this calculation succeeded.'};}
+   finally{try{runtime.onToolResult?.({round:round+1,name:call.name,status:toolStatus,elapsedMs:Math.max(0,Date.now()-toolStartedAt)});}catch{/* Diagnostics cannot change execution. */}}
    input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(result)});
+  }
+  abort(signal);
+  // An explicit co-produced final is intent to finish, not an intermediate
+  // candidate. Every tool must succeed; the normal final validation below still runs.
+  if(coFinalEligible&&!demand&&!staffingRequired&&!progressProposal&&output.text){
+   try{
+    const value=readFinal(output.text);
+    if(!value.constraintUpdates.length&&!value.rejected.length&&!value.analysisIds.length&&value.candidateIds.every(id=>{const item=evaluated.get(id);return !!item?.draft&&!!item.result&&!item.blocking.length&&same(item.constraints,state.constraints);}))final=value;
+   }catch{/* Intermediate tool-call prose is not a typed completion; continue the existing loop. */}
+   if(final)break;
   }
   if(standaloneStaffing&&round===0&&output.calls.length===1&&output.calls[0].name===requiredStaffingTool.name&&staffingCalculated&&state.requiredStaffing){
    final={answer:{discussionOnly:requiredStaffingAnswer(state.requiredStaffing)},candidateIds:[],analysisIds:[],verifiedMetrics:[],constraintUpdates:[],rejected:[],questions:[],focusCandidateId:null};
@@ -238,6 +284,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  else if(staffingCalculated||typeof final.answer!=='string'&&('recommendedPlan' in final.answer||'unsupportedPlan' in final.answer||'conditionalHiringPlan' in final.answer)){state.recommendationRequestId=null;state.focusCandidateId=null;}
  else if(final.focusCandidateId!==null){state.focusCandidateId=final.focusCandidateId;state.recommendationRequestId=state.working.findLast(item=>item.id===final.focusCandidateId)?.requestId??state.recommendationRequestId;}
  if(state.focusCandidateId&&!state.working.some(item=>item.id===state.focusCandidateId))throw Error('The conversational focus is unavailable.');
+ retainStaffingDeliveryTarget({...state,turns:[...state.turns,{...request.message,role:'user' as const}]},request.catalog);
  state.turns=[...state.turns,{id:request.message.id,role:'user' as const,text:request.message.text},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:answer}].slice(-32);
  abort(signal);
  return {...(progressProposal?{progressProposal}:{}),...(demandReview?{demandReview}:{}),charts:final.candidateIds.length||final.analysisIds.length?[]:answerEvidenceSeries(request.evidence,runtime.grounding,request.requestId,request.message.text,answer),requestId:request.requestId,answer,candidateIds:final.candidateIds,analysisIds:final.analysisIds,state:readSolutionState(state),usage:{modelRounds:rounds,toolCalls}};

@@ -17,6 +17,7 @@ const read = (value:unknown,key:string):unknown => {try{return value!==null&&(ty
 const count=(value:unknown,max:number):number|null=>typeof value==='number'&&Number.isSafeInteger(value)&&value>=0?Math.min(value,max):null;
 const providerModels=['gpt-6.1-sol'] as const;
 const providerTiers=['default','standard','auto','flex','scale','priority','fast','ultrafast'] as const;
+const toolNames=['read_clock','read_evidence','read_plans','project_headcount','revise_parameters','evaluate_candidate','compare_required_staffing','compare_service_staffing','review_scoped_service_demand','revise_scoped_service_demand','review_service_demand','revise_service_demand','clear_business_planning','review_hiring_budget','propose_goal_progress','read_goal_progress'] as const;
 const completionStatuses=['completed','incomplete','failed','cancelled','queued','in_progress'] as const;
 const incompleteReasons=['max_output_tokens','content_filter'] as const;
 type ProviderRound={completionStatus:typeof completionStatuses[number]|null;incompleteReason:typeof incompleteReasons[number]|null;attempt:number;elapsedMs:number;inputBytes:number|null;instructionsBytes:number|null;toolSchemaBytes:number|null;model:string|null;serviceTier:string|null;inputTokens:number|null;cachedInputTokens:number|null;outputTokens:number|null;reasoningTokens:number|null;totalTokens:number|null};
@@ -64,11 +65,16 @@ export function createSolutionDiagnostics(){
  const correlationId=crypto.randomUUID(),startedAt=Date.now();let stage:Stage='request_validation',modelAttempts=0,attemptStartedAt:number|null=null,reported=false;
  let stageStartedAt=startedAt,requestSizes={inputBytes:null,instructionsBytes:null,toolSchemaBytes:null} as Pick<ProviderRound,'inputBytes'|'instructionsBytes'|'toolSchemaBytes'>;
  const stageElapsedMs=Object.fromEntries(stages.map(key=>[key,0])) as Record<Stage,number>,providerRounds:ProviderRound[]=[];
+ const toolSequence:{round:number;name:string;status:string;elapsedMs:number}[]=[];
  let groundingReads:ReturnType<typeof groundingReadDetails>|null=null;
  const closeStage=()=>{const at=Date.now();stageElapsedMs[stage]=bounded(stageElapsedMs[stage]+Math.max(0,at-stageStartedAt),600000);stageStartedAt=at;};
  const setStage=(value:Stage)=>{closeStage();stage=member(value,stages)??'request_validation';};
  return {
   stage:setStage,
+  toolResult(value:unknown){
+   if(reported||toolSequence.length>=6)return;
+   toolSequence.push({round:Math.max(1,bounded(read(value,'round'),4)),name:member(read(value,'name'),toolNames)??'unknown',status:member(read(value,'status'),['ok','feedback','aborted'])??'feedback',elapsedMs:bounded(read(value,'elapsedMs'),600000)});
+  },
   groundingResult(value:unknown){if(!reported)groundingReads=groundingReadDetails(value);},
   modelAttempt(sizes?:unknown){
    setStage('provider');modelAttempts=Math.min(4,modelAttempts+1);attemptStartedAt=Date.now();
@@ -88,7 +94,7 @@ export function createSolutionDiagnostics(){
    // Numeric counters and allowlisted identifiers only; absent usage stays null.
    // response_validation includes local tool execution and continuation assembly.
    const diagnostic={version:1,correlationId,elapsedMs:bounded(Date.now()-startedAt,600000),stageElapsedMs:{...stageElapsedMs},modelAttempts,...(groundingReads?{groundingReads}:{}),
-    modelRounds:bounded(read(usage,'modelRounds'),4),toolCalls:bounded(read(usage,'toolCalls'),6),providerRounds:providerRounds.map(round=>({...round}))};
+    modelRounds:bounded(read(usage,'modelRounds'),4),toolCalls:bounded(read(usage,'toolCalls'),6),toolSequence:toolSequence.map(tool=>({...tool})),providerRounds:providerRounds.map(round=>({...round}))};
    try{console.info('Home solution conversation completed',JSON.stringify(diagnostic));}catch{/* Logging cannot change a successful response. */}
   },
   failure(error:unknown,grounding:unknown,callerAborted:boolean,deadlineAborted:boolean){
@@ -99,7 +105,7 @@ export function createSolutionDiagnostics(){
     stage==='provider'?'provider_'+(providerKind==='http'?'http_error':providerKind==='other'?'failed':providerKind):
     ({request_validation:'invalid_request',configuration:'configuration_unavailable',grounding:'evidence_verification_failed',model_setup:'model_setup_failed',conversation_preparation:'conversation_preparation_failed',response_validation:'response_validation_failed'} as const)[stage];
    if(!reported)closeStage();
-   const diagnostic={version:2,correlationId,code,stage,reason:stage==='response_validation'?member(read(error,'reason'),solutionResponseReasons):null,stageElapsedMs:{...stageElapsedMs},providerRounds:providerRounds.map(round=>({...round})),elapsedMs:bounded(Date.now()-startedAt,600000),modelAttempts,...(groundingReads?{groundingReads}:{}),
+   const diagnostic={version:2,correlationId,code,stage,reason:stage==='response_validation'?member(read(error,'reason'),solutionResponseReasons):null,stageElapsedMs:{...stageElapsedMs},toolSequence:toolSequence.map(tool=>({...tool})),providerRounds:providerRounds.map(round=>({...round})),elapsedMs:bounded(Date.now()-startedAt,600000),modelAttempts,...(groundingReads?{groundingReads}:{}),
     // An SDK attempt is not proof of a wire dispatch, provider receipt, usage or spend.
     providerKind,providerHttpStatus:provider?.status??null,providerErrorClass:provider?.errorClass??null,providerCauseCode:provider?.causeCode??null,
     providerElapsedMs:provider&&attemptStartedAt!==null?bounded(Date.now()-attemptStartedAt,600000):null,grounding:evidence};

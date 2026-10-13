@@ -17,7 +17,7 @@ import {openAIProxyTransport} from '@/lib/openai-proxy-transport';
 import {readSolutionRequest,solutionConversationEnabled} from '@/lib/home-solution-conversation';
 import {SWP_CONVERSATION_HEADER,swpConversationModel} from '@/lib/swp-conversation-model';
 import {SWP_DEMAND_MODE,requestDemandContext} from '@/lib/swp-demand';
-import {solutionConversationInstructions,solutionResponseFormat,solutionTools} from '@/lib/home-solution-conversation-schema';
+import {solutionConversationInstructions,solutionCompletionInstructions,solutionResponseFormat,solutionTools} from '@/lib/home-solution-conversation-schema';
 import {converseSolutions} from '@/lib/home-solution-conversation-service';
 import {goalProgressConversationEnabled} from '@/lib/goal-progress-conversation';
 
@@ -27,6 +27,7 @@ export const maxDuration=120;
 // This route owns the stronger Home conversation policy; other routes keep theirs.
 const homeSolutionModel={model:'gpt-6.1-sol',reasoning:{effort:'medium' as const},service_tier:'default' as const};
 async function handlePOST(request:Request){
+ const requestTime=new Date();
  if(!solutionConversationEnabled)return Response.json({error:'Solution conversation is not enabled.'},{status:404});
  const body=await request.text();if(new TextEncoder().encode(body).length>900000)return Response.json({error:'The conversation request is too large.'},{status:413});
  const diagnostics=createSolutionDiagnostics();let signal:AbortSignal|undefined;
@@ -48,7 +49,7 @@ async function handlePOST(request:Request){
   const planningInstructions=staffingScenarioOnly?'':solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions+'\n'+hiringBudgetInstructions+'\n'+requiredStaffingInstructions:'');
   diagnostics.stage('conversation_preparation');
   const reply=await converseSolutions(parsed,{
-   grounding,staffingScenarioOnly,
+   grounding,staffingScenarioOnly,requestTime,onToolResult:diagnostics.toolResult,
    ...(demand?{demand:{datasetToken:datasetRouter.current().token,referenceContract:true}}:{}),
    ...(natural?{natural:{datasetToken:datasetRouter.current().token}}:{}),
    progress:{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token},
@@ -56,7 +57,7 @@ async function handlePOST(request:Request){
     if(staffingScenarioOnly||!client)throw Error('Illustrative staffing calculations cannot dispatch a model.');
     const progressContract=progressModelContract(goalProgressConversationEnabled,capabilities.progressEntryEnabled);
     const conversationTools=capabilities.requiredStaffingCalculation?[requiredStaffingTool]:demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools,...(natural?businessPlanningModelTools:[])];
-    const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+progressContract.instructions)+planningInstructions;
+    const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+'\n'+solutionCompletionInstructions+progressContract.instructions)+planningInstructions;
     const response=await datasetAI(() => {
      diagnostics.modelAttempt({inputBytes:new TextEncoder().encode(JSON.stringify(input)).length,instructionsBytes:new TextEncoder().encode(instructions).length,toolSchemaBytes:new TextEncoder().encode(JSON.stringify(conversationTools)).length});
      return client.responses.create({...homeSolutionModel,instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:60000,signal});
