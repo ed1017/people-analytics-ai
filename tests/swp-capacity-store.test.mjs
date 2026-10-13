@@ -3,18 +3,18 @@ import assert from 'node:assert/strict';
 import {DecisionStore,DECISIONS_STORAGE_KEY,encodeDecisions} from '../lib/local-decisions.ts';
 import {capacitySpec,emptyCapacityDraft} from '../lib/swp-capacity-draft.ts';
 import {calculateMonthlyWorkload} from '../lib/swp-monthly-workload.ts';
-import {monthlyScenarioInputKey as key} from '../lib/monthly-scenario-compatibility.mjs';
+import {capacityCostAssumptions,calculateCapacityCost,capacityCalculationKey} from '../lib/swp-capacity-cost.ts';
 import {capacityContext,capacityBinding,monthlyCapacityField,readCapacityBucket,saveCapacityScenario,openCapacityScenario,compareSavedCapacity} from '../lib/swp-capacity-store.ts';
 const at='2026-10-13T20:00:00.000Z';
 const scope={id:'scope-a',label:'Service desk — tickets',workUnit:'Service desk — tickets'};
-const makeSession=(patch={})=>{const draft={...emptyCapacityDraft,scope:scope.label,openingDate:'2026-09-30',people:'10',fte:'8',volume:'800',effort:'1',hours:'160',hires:'0',exits:'0',allocation:'50',productivity:'0',fullTimeMovements:true,confirmed:true,...patch};return {draft,result:calculateMonthlyWorkload(capacitySpec(draft)),error:''};};
+const makeSession=(patch={})=>{const draft={...emptyCapacityDraft,scope:scope.label,openingDate:'2026-09-30',people:'10',fte:'8',volume:'800',effort:'1',hours:'160',hires:'0',exits:'0',allocation:'50',productivity:'0',fullTimeMovements:true,confirmed:true,costRate:'12.34',...patch};const result=calculateMonthlyWorkload(capacitySpec(draft));return {draft,result,cost:calculateCapacityCost(result,capacityCostAssumptions(draft.costRate)),error:''};};
 function setup(){
  const seed={version:1,revision:1,goals:{version:1,activeId:'a',goals:[{id:'a',statement:'Review capacity'},{id:'b',statement:'Other goal'}]},workspaces:{a:{savedAt:at,fields:{'planning.savedScenarios':[{id:'legacy'}]}}}};
  let bytes=encodeDecisions(seed),fail=false;
  const port={getItem:k=>k===DECISIONS_STORAGE_KEY?bytes:null,setItem:(k,v)=>{if(fail)throw Error('Quota fixture');if(k===DECISIONS_STORAGE_KEY)bytes=v;},removeItem:()=>{}};
  const store=new DecisionStore();store.initialize(port);
  const context=capacityContext(store,'legacy-v1:0','a');
- const args=(session=makeSession(),name='Base')=>({store,context,scope,session,capture:{inputKey:key(session.result.assumptions),binding:capacityBinding(context,scope)},name,id:name.replaceAll(' ','-'),at,revision:store.getSnapshot().data.revision,assertActive:()=>{if(store.getSnapshot().data.goals.activeId!=='a')throw Error('Context changed');}});
+ const args=(session=makeSession(),name='Base')=>({store,context,scope,session,capture:{inputKey:capacityCalculationKey(session.result,session.cost),binding:capacityBinding(context,scope)},name,id:name.replaceAll(' ','-'),at,revision:store.getSnapshot().data.revision,assertActive:()=>{if(store.getSnapshot().data.goals.activeId!=='a')throw Error('Context changed');}});
  return {store,context,args,bytes:()=>bytes,setBytes:value=>bytes=value,fail:()=>fail=true};
 }
 test('explicit transaction preserves legacy fields, reload recomputes, and returned data is detached',()=>{
@@ -65,4 +65,24 @@ test('tampered storage and renamed goal fail visibly; same-name scopes cannot re
 test('existing per-goal byte limit rejects a save atomically and retains the working calculation',()=>{
  const f=setup();f.store.setField('a','large-existing-evidence',{a:'x'.repeat(180000),b:'x'.repeat(180000),c:'x'.repeat(150000)});
  const args=f.args(),draft=structuredClone(args.session),before=f.bytes();assert.throws(()=>saveCapacityScenario(args),/512 KiB/);assert.equal(f.bytes(),before);assert.deepEqual(args.session,draft);assert.equal(f.store.getField('a',monthlyCapacityField,null),null);
+});
+
+test('v2 full bucket size rejection is atomic and all earlier entries remain readable',()=>{
+ const f=setup();let count=0,rejected=false;
+ for(let i=0;i<20;i++){
+  const args=f.args(makeSession({months:'6',costRate:String(i)}),'Cost-'+i),before=f.bytes(),session=structuredClone(args.session);
+  try{saveCapacityScenario(args);count++;}
+  catch(error){assert.match(error.message,/size limit/);assert.equal(f.bytes(),before);assert.deepEqual(args.session,session);assert.equal(f.store.getSnapshot().saved,true);rejected=true;break;}
+  assert.equal(readCapacityBucket(f.store.getField('a',monthlyCapacityField,null),f.context).entries.length,count);
+ }
+ assert.ok(rejected);assert.ok(count>0&&count<20);
+ assert.equal(readCapacityBucket(f.store.getField('a',monthlyCapacityField,null),f.context).entries.length,count);
+});
+test('v2 unknown and zero costs save separately and edit or clearing rejects stale captures',()=>{
+ const f=setup(),unknown=saveCapacityScenario(f.args(makeSession({costRate:''}),'Unknown')),zero=saveCapacityScenario(f.args(makeSession({costRate:'0'}),'Zero'));
+ assert.equal(unknown.record.cost.points[0].runRateCents,null);assert.equal(zero.record.cost.points[0].runRateCents,0);
+ for(const value of ['','0','12.35']){
+  const args=f.args(makeSession(),'Stale'),before=f.bytes();args.session.draft.costRate=value;
+  assert.throws(()=>saveCapacityScenario(args),/Cost inputs or results changed/);assert.equal(f.bytes(),before);
+ }
 });

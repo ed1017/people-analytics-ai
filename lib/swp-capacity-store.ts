@@ -1,5 +1,6 @@
 // Browser-local integration only. The existing DecisionStore owns all writes.
 import type {DecisionStore,Json} from './local-decisions';
+import type {CapacityCost} from './swp-capacity-cost';
 import type {CapacityDraft} from './swp-capacity-draft';
 import type {calculateMonthlyWorkload} from './swp-monthly-workload';
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -8,7 +9,7 @@ import {monthlyScenarioInputKey as key} from './monthly-scenario-compatibility.m
 export const monthlyCapacityField='planning.monthlyWorkloadScenarios';
 export type CapacityScope={id:string;label:string;workUnit:string};
 export type CapacityCapture={inputKey:string;binding:CapacityRecordBinding|null};
-export type CapacityCalculation={draft:CapacityDraft;result:ReturnType<typeof calculateMonthlyWorkload>|null;error:string};
+export type CapacityCalculation={draft:CapacityDraft;result:ReturnType<typeof calculateMonthlyWorkload>|null;error:string;cost?:CapacityCost|null};
 export type CapacityEntry={record:CapacityRecord;draft:CapacityDraft};
 export type CapacityBucket={version:1;scopes:CapacityScope[];entries:CapacityEntry[]};
 export type CapacityContext={datasetToken:string;goalId:string;goal:string};
@@ -42,10 +43,11 @@ export function readCapacityBucket(raw:unknown,context:CapacityContext):Capacity
  const entryIds=new Set<string>(),names=new Set<string>();
  const entries=(b.entries as unknown[]).map(rawEntry=>{
   const entry=exact(rawEntry,['record','draft']);
-  const rawRecord=exact(entry.record,['schemaVersion','kind','id','name','createdAt','binding','calculatorVersion','inputKey','inputs','result']);
+  const rawRecord=exact(entry.record,['schemaVersion','kind','id','name','createdAt','binding','calculatorVersion','inputKey','inputs','result',...((entry.record as CapacityRecord)?.schemaVersion===2?['cost']:[])]);
   const binding=exact(rawRecord.binding,['datasetToken','goalId','goal','scopeId','scopeLabel','workUnit']);
   const scope=scopes.find(s=>s.id===binding.scopeId);if(!scope)fail('Saved scenario has no registered workload identity.');
   const expected=capacityBinding(context,scope!),record=readCapacityRecord(entry.record,expected);
+  if((record.schemaVersion===2)!==Object.hasOwn(entry.draft as object,'costRate'))fail('Saved draft and record versions do not match.');
   if(!capacityRecordIsCurrent(record,expected,entry.draft as CapacityDraft))fail('Saved editable inputs do not match the recalculated scenario.');
   if(entryIds.has(record.id)||names.has(record.name.toLocaleLowerCase()))fail('Saved scenario identities or names are duplicated.');
   entryIds.add(record.id);names.add(record.name.toLocaleLowerCase());

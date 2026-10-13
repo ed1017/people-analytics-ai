@@ -6,6 +6,7 @@ import Module,{createRequire} from 'node:module';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import ts from 'typescript';
+import * as costLayer from '../lib/swp-capacity-cost.ts';
 import * as engine from '../lib/swp-monthly-workload.ts';
 import * as draftAdapter from '../lib/swp-capacity-draft.ts';
 import * as capacityStore from '../lib/swp-capacity-store.ts';
@@ -40,7 +41,7 @@ function worksheet(input=session){
  const Saved=()=>React.createElement('section',{'aria-label':'Saved capacity scenarios'});
  const {CapacityWorkspace}=component('components/workforce-planning/capacity-workspace.tsx',{
   react:{...React,useRef:()=>({current:null})},
-  '@/lib/swp-monthly-workload':engine,'@/lib/swp-capacity-draft':draftAdapter,
+  '@/lib/swp-capacity-cost':costLayer,'@/lib/swp-monthly-workload':engine,'@/lib/swp-capacity-draft':draftAdapter,
   '@/components/decision-store':{decisionStore:{}},'@/lib/dataset-client.mjs':{datasetSession:{snapshot:()=>context.datasetToken}},
   '@/lib/swp-capacity-store':{capacityContext:()=>context,capacityBinding:(value,identity)=>({...value,scopeId:identity.id,scopeLabel:identity.label,workUnit:identity.workUnit})},
   '@/lib/monthly-scenario-compatibility.mjs':{monthlyScenarioInputKey},
@@ -59,9 +60,9 @@ test('compact worksheet keeps saved controls outside its form and monthly detail
  assert.match(dateGroup.props.className,/grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,11rem\),1fr\)\)\]/);
 });
 test('compact worksheet retains edit and confirmation capture invalidation',()=>{
- for(const [label,value,clearScope] of [['Work units each month','900',false],['Workload scope','Other work',true]]){
+ for(const [label,value,clearScope] of [['Work units each month','900',false],['Workload scope','Other work',true],['Cost per contracted FTE per month (USD, optional)','0',false],['Cost per contracted FTE per month (USD, optional)','',false]]){
   const view=worksheet(),input=nodes(view.tree).find(node=>node.props['aria-label']===label);input.props.onChange({target:{value}});
-  const next=view.updated();assert.equal(next.result,null);assert.equal(next.capture,null);assert.equal(next.draft.confirmed,false);assert.deepEqual(next.scope,clearScope?null:scope);
+  const next=view.updated();assert.equal(next.result,null);assert.equal(next.cost,null);assert.equal(next.capture,null);assert.equal(next.draft.confirmed,false);assert.deepEqual(next.scope,clearScope?null:scope);
  }
  const view=worksheet(),confirmation=nodes(view.tree).find(node=>node.type==='input'&&node.props.className==='mt-1');confirmation.props.onChange({target:{checked:false}});
  assert.equal(view.updated().capture,null);assert.equal(view.updated().result,null);assert.equal(view.updated().draft.confirmed,false);
@@ -70,7 +71,7 @@ test('compact worksheet captures calculation identity and does not retain it aft
  const previous=globalThis.requestAnimationFrame;globalThis.requestAnimationFrame=callback=>{callback();return 0;};
  try{
   const view=worksheet(),form=nodes(view.tree).find(node=>node.type==='form');form.props.onSubmit({preventDefault(){}});
-  assert.equal(view.updated().capture.inputKey,monthlyScenarioInputKey(view.updated().result.assumptions));assert.deepEqual(view.updated().capture.binding,{...context,scopeId:scope.id,scopeLabel:scope.label,workUnit:scope.workUnit});
+  assert.equal(view.updated().capture.inputKey,costLayer.capacityCalculationKey(view.updated().result,view.updated().cost));assert.deepEqual(view.updated().capture.binding,{...context,scopeId:scope.id,scopeLabel:scope.label,workUnit:scope.workUnit});
   const invalid=worksheet({...session,draft:{...draft,fte:'11'}});nodes(invalid.tree).find(node=>node.type==='form').props.onSubmit({preventDefault(){}});
   assert.equal(invalid.updated().result,null);assert.equal(invalid.updated().capture,null);assert.match(invalid.updated().error,/exceeds/);
  }finally{if(previous===undefined)delete globalThis.requestAnimationFrame;else globalThis.requestAnimationFrame=previous;}
@@ -87,11 +88,22 @@ test('saved comparison labels recurring month differences separately and ignores
    react:{...React,useState:()=>[['','base','alternate','',''][stateIndex++],()=>{}]},
    '@/components/decision-store':{decisionStore:store,useDecisionStorage:()=>snapshot},
    '@/lib/dataset-client.mjs':{datasetSession:{snapshot:()=>context.datasetToken}},
-   '@/lib/swp-capacity-store':capacityStore,'@/lib/swp-capacity-record':capacityRecord,
+   '@/lib/swp-capacity-cost':costLayer,'@/lib/swp-capacity-store':capacityStore,'@/lib/swp-capacity-record':capacityRecord,
    './planning-session-context':{usePlanningSession:()=>({goalKey:'goal:a',capacitySession:session,setCapacitySession:()=>{}})},
   });
   const html=renderToStaticMarkup(React.createElement(CapacitySavedScenarios));
   assert.match(html,new RegExp('Opening assumption differences: '+openingCount+'\\.'));
   assert.match(html,/Month-level assumption differences: 3\./);assert.match(html,/A recurring change counts once per month/);
  }
+});
+
+test('optional cost shows unknown and zero distinctly without removing capacity chart or blocking calculation',()=>{
+ const previous=globalThis.requestAnimationFrame;globalThis.requestAnimationFrame=callback=>{callback();return 0;};
+ try{
+  for(const [rate,expected,cents] of [['','Unknown',null],['0','$0.00',0],['12.34','$98.72',9872]]){
+   const view=worksheet({...session,draft:{...draft,costRate:rate}});nodes(view.tree).find(n=>n.type==='form').props.onSubmit({preventDefault(){}});
+   const next=view.updated();assert.equal(next.result.status,'calculated');assert.equal(next.cost.points.at(-1).runRateCents,cents);
+   const html=renderToStaticMarkup(worksheet(next).tree);assert.ok(html.includes(expected));assert.match(html,/USD\/month/);assert.match(html,/not actual pay, cumulative spend or savings/);assert.ok(html.indexOf('Monthly supply and demand')<html.indexOf('Contracted supply cost estimate'));
+  }
+ }finally{if(previous===undefined)delete globalThis.requestAnimationFrame;else globalThis.requestAnimationFrame=previous;}
 });

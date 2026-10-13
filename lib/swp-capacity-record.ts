@@ -8,6 +8,9 @@ import {calculateMonthlyWorkload, monthlyWorkloadVersion, type MonthlyWorkloadSp
 import {validDatasetToken} from './swp-input-identity.ts';
 import {monthlyScenarioInputKey as key, monthlyScenarioAssumptionDifferences as diff} from './monthly-scenario-compatibility.mjs';
 
+// @ts-expect-error Native Node tests share TypeScript source.
+import {calculateCapacityCost,capacityCostAssumptions,capacityCalculationKey,type CapacityCost} from './swp-capacity-cost.ts';
+
 type Result = ReturnType<typeof calculateMonthlyWorkload>;
 /** These identities must come from the caller's active context, never inferred
  * from free text. scopeLabel/workUnit bind the stable ID to the reviewed draft.
@@ -17,13 +20,13 @@ export type CapacityRecordBinding = {
   datasetToken:string; goalId:string; goal:string;
   scopeId:string; scopeLabel:string; workUnit:string;
 };
-export type CapacityRecord = {
-  schemaVersion:1; kind:'monthly-workload-capacity';
+type CapacityRecordBase = { kind:'monthly-workload-capacity';
   id:string; name:string; createdAt:string; binding:CapacityRecordBinding;
   calculatorVersion:typeof monthlyWorkloadVersion; inputKey:string;
   inputs:MonthlyWorkloadSpec; result:Result;
 };
-type Session = {draft:CapacityDraft;result:Result|null;error:string};
+export type CapacityRecord=CapacityRecordBase & ({schemaVersion:1}|{schemaVersion:2;cost:CapacityCost});
+type Session = {draft:CapacityDraft;result:Result|null;error:string;cost?:CapacityCost|null};
 type Metadata = Pick<CapacityRecord,'id'|'name'|'createdAt'>;
 const recordFields = ['schemaVersion','kind','id','name','createdAt','binding','calculatorVersion','inputKey','inputs','result'];
 function requireValue(value:unknown,message:string):asserts value {if(!value)throw Error(message);}
@@ -60,27 +63,44 @@ function recalculate(inputs:unknown):Result {
  * to the normalized calculator inputs and therefore need not invalidate them.
  */
 export function prepareCapacityRecord(session:Session,context:CapacityRecordBinding,meta:Metadata):CapacityRecord {
-  exact(session,['draft','result','error'],'session');
+  exact(session,['draft','result','error',...(Object.hasOwn(session,'cost')?['cost']:[])],'session');
   requireValue(session.error==='' && session.result!==null,'A successful current calculation is required.');
-  const draft=exact(session.draft,Object.keys(emptyCapacityDraft),'draft');
+  const hasCost=Object.hasOwn(session.draft,'costRate');
+  const draft=exact(session.draft,[...Object.keys(emptyCapacityDraft),...(hasCost?['costRate']:[])],'draft');
+  if(hasCost)requireValue(typeof draft.costRate==='string','Invalid cost draft value type.');
   for(const field of Object.keys(emptyCapacityDraft)) requireValue(typeof draft[field]===typeof emptyCapacityDraft[field as keyof CapacityDraft], 'Invalid draft value type.');
   const b=binding(context),m=metadata(meta),inputs=capacitySpec(session.draft),fresh=recalculate(inputs);
   scopeMatches(inputs,b);
   requireValue(key(session.result.assumptions)===key(inputs),'Inputs changed after calculation; calculate again before saving.');
   requireValue(key(session.result)===key(fresh),'Calculated results changed; calculate again before saving.');
-  return structuredClone({schemaVersion:1,kind:'monthly-workload-capacity',...m,binding:b,calculatorVersion:monthlyWorkloadVersion,inputKey:key(inputs),inputs,result:fresh});
+  const base={kind:'monthly-workload-capacity' as const,...m,binding:b,calculatorVersion:monthlyWorkloadVersion,inputs,result:fresh};
+  if(hasCost){
+    const cost=calculateCapacityCost(fresh,capacityCostAssumptions(session.draft.costRate!));
+    requireValue(session.cost&&key(session.cost)===key(cost),'Cost inputs or results changed; calculate again before saving.');
+    return structuredClone({...base,schemaVersion:2,cost,inputKey:capacityCalculationKey(fresh,cost)});
+  }
+  requireValue(session.cost==null,'Legacy capacity cannot carry a cost result.');
+  return structuredClone({...base,schemaVersion:1,inputKey:key(inputs)});
 }
 /** Reload requires explicit expected context and recomputation. A record is a
  * verified historical snapshot; it is not automatically the current draft.
  */
 export function readCapacityRecord(raw:unknown,expected:CapacityRecordBinding):CapacityRecord {
-  const record=exact(raw,recordFields,'capacity record'),b=binding(expected);
-  requireValue(record.schemaVersion===1 && record.kind==='monthly-workload-capacity' && record.calculatorVersion===monthlyWorkloadVersion,'Unsupported capacity record or calculator version.');
+  key(raw);
+  const version=(raw as CapacityRecord)?.schemaVersion;
+  const record=exact(raw,[...recordFields,...(version===2?['cost']:[])],'capacity record'),b=binding(expected);
+  requireValue((record.schemaVersion===1||record.schemaVersion===2) && record.kind==='monthly-workload-capacity' && record.calculatorVersion===monthlyWorkloadVersion,'Unsupported capacity record or calculator version.');
   requireValue(key(binding(record.binding))===key(b),'Saved record belongs to a different dataset, goal or scope.');
   metadata({id:record.id,name:record.name,createdAt:record.createdAt});
   const fresh=recalculate(record.inputs);
   scopeMatches(fresh.assumptions,b);
-  requireValue(record.inputKey===key(fresh.assumptions),'Saved calculation input key changed.');
+  let cost:CapacityCost|undefined;
+  if(record.schemaVersion===2){
+    const saved=exact(record.cost,['assumptions','points'],'cost result');
+    cost=calculateCapacityCost(fresh,saved.assumptions as CapacityCost['assumptions']);
+    requireValue(key(saved)===key(cost),'Saved cost does not match recomputed results.');
+  }
+  requireValue(record.inputKey===capacityCalculationKey(fresh,cost),'Saved calculation input key changed.');
   requireValue(key(record.result)===key(fresh),'Saved calculation does not match recomputed results.');
   return structuredClone({...record,inputs:fresh.assumptions,result:fresh}) as CapacityRecord;
 }
@@ -90,10 +110,14 @@ export function readCapacityRecord(raw:unknown,expected:CapacityRecordBinding):C
 export function capacityRecordIsCurrent(raw:unknown,context:CapacityRecordBinding,draft:CapacityDraft):boolean {
   try {
     const record=readCapacityRecord(raw,context);
-    exact(draft,Object.keys(emptyCapacityDraft),'draft');
+    const hasCost=Object.hasOwn(draft,'costRate');
+    exact(draft,[...Object.keys(emptyCapacityDraft),...(hasCost?['costRate']:[])],'draft');
+    if(hasCost&&typeof draft.costRate!=='string')return false;
     for(const field of Object.keys(emptyCapacityDraft)) if(typeof draft[field as keyof CapacityDraft]!==typeof emptyCapacityDraft[field as keyof CapacityDraft])return false;
     const fresh=recalculate(capacitySpec(draft));
-    return key(fresh.assumptions)===record.inputKey;
+    if(record.schemaVersion===1)return (!hasCost||capacityCostAssumptions(draft.costRate!).rateCents===null)&&key(fresh.assumptions)===record.inputKey;
+    if(!hasCost)return false;
+    return capacityCalculationKey(fresh,calculateCapacityCost(fresh,capacityCostAssumptions(draft.costRate!)))===record.inputKey;
   } catch {return false;}
 }
 /** Both records are revalidated. Intentionally different scenario assumptions
@@ -108,5 +132,12 @@ export function compareCapacityRecords(left:unknown,right:unknown,context:Capaci
     ...diff(a.inputs.opening,b.inputs.opening).map(change=>({...change,path:'opening.'+change.field})),
     ...a.inputs.months.flatMap((month,index)=>diff(month,b.inputs.months[index]).map(change=>({...change,path:month.month+'.'+change.field}))),
   ];
-  return {compatible:true,differences,assumptionDifferences};
+  const ac=a.schemaVersion===2?a.cost:null,bc=b.schemaVersion===2?b.cost:null;
+  const costBasis=(cost:CapacityCost)=>{return {...cost.assumptions,rateCents:null,basis:'unknown'};};
+  const costCompatible=!!ac&&!!bc&&key(costBasis(ac))===key(costBasis(bc));
+  const costComparison={compatible:costCompatible,leftRateCents:ac?.assumptions.rateCents??null,rightRateCents:bc?.assumptions.rateCents??null,points:a.result.points.map((p,i)=>{
+    const left=ac?.points[i].runRateCents??null,right=bc?.points[i].runRateCents??null;
+    return {month:p.month,leftCents:left,rightCents:right,deltaCents:costCompatible&&left!==null&&right!==null?right-left:null};
+  })};
+  return {compatible:true,differences,assumptionDifferences,costComparison};
 }
