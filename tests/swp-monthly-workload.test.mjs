@@ -103,3 +103,13 @@ test('provenance cannot promote assumptions to source facts; outputs do not alia
  for(const kind of ['observed','model-proposed','unknown']){const x=fixture();x.opening.headcount.basis.kind=kind;assert.throws(()=>calculate(x),/assumptions/);}
  const x=fixture();x.opening.headcount.value=null;assert.throws(()=>calculate(x),/unknown provenance/);
 });
+test('unknown inflows cannot conceal a known closing headcount ceiling breach',()=>{
+ for(const swap of [false,true]){
+  const s=fixture();s.opening.headcount=q(999999,'people');s.months[0].hires=move(2,0);s.months[0].transfersIn=move(null,0);
+  if(swap)[s.months[0].hires,s.months[0].transfersIn]=[s.months[0].transfersIn,s.months[0].hires];
+  assert.throws(()=>calculate(s),/closing supply bound: infeasible headcount/);
+ }
+ const s=fixture();s.opening.headcount=q(999999,'people');s.months[0].hires=move(1,0);s.months[0].transfersIn=move(null,0);
+ const r=calculate(s);assert.equal(r.status,'needs-inputs');assert.equal(r.points[0].headcount,null);assert.equal(r.points[0].contractedFte,8);assert.equal(r.points[0].capacityHours,640);assert.equal(r.points[0].requiredFte,5);
+ s.months[0].exits=move(1,0);s.months[0].hires=move(2,0);assert.equal(first(s).headcount,null);
+});

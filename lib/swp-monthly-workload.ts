@@ -96,6 +96,9 @@ export function calculateMonthlyWorkload(raw:unknown){
     const maximumRemainingPeople=hc===null?null:hc-knownOutPeople;
     stock(maximumRemainingPeople,difference(fte,outFte),path+' remaining supply bound');
     hc=difference(hc,outPeople);fte=difference(fte,outFte);stock(hc,fte,path+' remaining opening supply');
+    // Unknown inflows cannot reduce the known closing-count lower bound.
+    const minimumClosingPeople=hc===null?null:hc+(flows.hires.people??0)+(flows.transfersIn.people??0);
+    stock(minimumClosingPeople,null,path+' closing supply bound');
     hc=sum(hc,flows.hires.people,flows.transfersIn.people);fte=sum(fte,flows.hires.fteMicro,flows.transfersIn.fteMicro);stock(hc,fte,path+' closing supply');
     const volume=quantity(m.volume,'work-units/month',1e6,path+'.volume',missing),effort=quantity(m.hoursPerUnit,'hours/work-unit',1e6,path+'.hoursPerUnit',missing);
     const year=Math.floor((openingMonth+index+1)/12),month=(openingMonth+index+1)%12;
