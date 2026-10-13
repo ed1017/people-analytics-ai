@@ -37,6 +37,8 @@ export function CapacitySavedScenarios(){
  const left=bucket.entries.find(e=>e.record.id===leftId),right=bucket.entries.find(e=>e.record.id===rightId);
  let comparison:ReturnType<typeof compareSavedCapacity>|null=null,comparisonError='';
  if(context&&left&&right)try{comparison=compareSavedCapacity(left,right,context,bucket.scopes);}catch(error){comparisonError=error instanceof Error?error.message:'These records could not be compared.';}
+ const openingDifferences=comparison?.assumptionDifferences.filter(change=>change.path.startsWith('opening.')).length??0;
+ const monthDifferences=(comparison?.assumptionDifferences.length??0)-openingDifferences;
  const scope=left&&bucket.scopes.find(s=>s.id===left.record.binding.scopeId);
  const isCurrent=Boolean(left&&scope&&context&&session.scope?.id===scope.id&&capacityRecordIsCurrent(left.record,capacityBinding(context,scope),session.draft));
  const disabled=!context||!storage.saved||!!loadError||!session.capture?.binding||session.result?.status!=='calculated';
@@ -60,7 +62,7 @@ export function CapacitySavedScenarios(){
     {(comparisonError||comparison&&!comparison.compatible)&&<p role="status" className="text-sm">{comparisonError||comparison?.reason}</p>}
     {comparison?.compatible&&left&&right&&<div role="region" aria-label="Saved capacity comparison" tabIndex={0} className="overflow-x-auto">
      <table className="w-full text-left text-sm"><caption className="mb-2 text-left">Signed gap in FTE · positive is shortfall, negative is surplus</caption><thead><tr><th scope="col" className="p-2">Month</th><th scope="col" className="p-2">{left.record.name}</th><th scope="col" className="p-2">{right.record.name}</th></tr></thead><tbody>{left.record.result.points.map((p,i)=><tr key={p.month} className="border-t"><th scope="row" className="p-2 font-normal">{p.month}</th><td className="p-2">{gap(p.gapFte)}</td><td className="p-2">{gap(right.record.result.points[i].gapFte)}</td></tr>)}</tbody></table>
-     <p className="mt-2 text-xs text-muted-foreground">{comparison.assumptionDifferences.length} monthly or opening assumption changes. These are saved scenarios, not a forecast.</p>
+     <p className="mt-2 text-xs text-muted-foreground">Opening assumption differences: {openingDifferences}. Month-level assumption differences: {monthDifferences}. A recurring change counts once per month. These are saved scenarios, not a forecast.</p>
     </div>}
    </>}
   </>}

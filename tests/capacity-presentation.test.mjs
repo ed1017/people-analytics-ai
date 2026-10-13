@@ -8,6 +8,8 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import ts from 'typescript';
 import * as engine from '../lib/swp-monthly-workload.ts';
 import * as draftAdapter from '../lib/swp-capacity-draft.ts';
+import * as capacityStore from '../lib/swp-capacity-store.ts';
+import * as capacityRecord from '../lib/swp-capacity-record.ts';
 import {monthlyScenarioInputKey} from '../lib/monthly-scenario-compatibility.mjs';
 const require=createRequire(import.meta.url);
 function component(file,mocks={}){
@@ -26,6 +28,7 @@ test('compact projection preserves empty, unknown, zero, single-month, discontin
   if(name==='single'){assert.match(html,/\+3.87/);assert.equal((html.match(/cx="340"/g)||[]).length,2);}
   if(name==='partial'){const paths=[...html.matchAll(/<path d="([^"]*)"/g)].map(x=>x[1]);assert.equal((paths[1].match(/M/g)||[]).length,2);assert(!paths[1].includes('L'));}
   if(name==='surplus')assert.match(html,/-2/);
+  if(points&&name!=='unknown'){assert.doesNotMatch(html,/<text\b/);assert.match(html,/data-capacity-axis="x"[^>]*text-xs/);assert.match(html,/data-capacity-axis="y"[^>]*text-xs/);}
  }
 });
 const scope={id:'scope-a',label:'Service desk — tickets',workUnit:'Service desk — tickets'};
@@ -52,6 +55,8 @@ test('compact worksheet keeps saved controls outside its form and monthly detail
  assert.equal(nodes(form).filter(node=>node.type===view.Saved).length,0);assert.equal(all.filter(node=>node.type===view.Saved).length,1);
  const html=renderToStaticMarkup(view.tree);assert.match(html,/Monthly supply and demand/);assert.match(html,/Saved scenarios stay in this browser/);assert.match(html,/Without a goal, calculations are session-only/);
  assert.equal((html.match(/<form/g)||[]).length,1);assert.doesNotMatch(html,/<details[^>]*open/);
+ const dateGroup=all.find(node=>node.type==='div'&&nodes(node).filter(child=>child.type==='input').length===2&&nodes(node).some(child=>child.props['aria-label']==='Opening date (month end)'));
+ assert.match(dateGroup.props.className,/grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,11rem\),1fr\)\)\]/);
 });
 test('compact worksheet retains edit and confirmation capture invalidation',()=>{
  for(const [label,value,clearScope] of [['Work units each month','900',false],['Workload scope','Other work',true]]){
@@ -69,4 +74,24 @@ test('compact worksheet captures calculation identity and does not retain it aft
   const invalid=worksheet({...session,draft:{...draft,fte:'11'}});nodes(invalid.tree).find(node=>node.type==='form').props.onSubmit({preventDefault(){}});
   assert.equal(invalid.updated().result,null);assert.equal(invalid.updated().capture,null);assert.match(invalid.updated().error,/exceeds/);
  }finally{if(previous===undefined)delete globalThis.requestAnimationFrame;else globalThis.requestAnimationFrame=previous;}
+});
+
+test('saved comparison labels recurring month differences separately and ignores scenario names',()=>{
+ const binding=capacityStore.capacityBinding(context,scope),at='2026-10-13T20:00:00.000Z';
+ const entry=(draft,id,name)=>({draft,record:capacityRecord.prepareCapacityRecord({draft,result:engine.calculateMonthlyWorkload(draftAdapter.capacitySpec(draft)),error:''},binding,{id,name,createdAt:at})});
+ for(const [openingPeople,openingCount] of [['10',0],['11',1]]){
+  const entries=[entry(draft,'base','Original name'),entry({...draft,people:openingPeople,productivity:'20'},'alternate','A completely different scenario name')];
+  const snapshot={ready:true,saved:true,data:{goals:{activeId:'a',goals:[{id:'a',statement:context.goal}]},workspaces:{a:{fields:{[capacityStore.monthlyCapacityField]:{version:1,scopes:[scope],entries}}}}}};
+  const store={getSnapshot:()=>snapshot,getDatasetToken:()=>context.datasetToken};let stateIndex=0;
+  const {CapacitySavedScenarios}=component('components/workforce-planning/capacity-saved-scenarios.tsx',{
+   react:{...React,useState:()=>[['','base','alternate','',''][stateIndex++],()=>{}]},
+   '@/components/decision-store':{decisionStore:store,useDecisionStorage:()=>snapshot},
+   '@/lib/dataset-client.mjs':{datasetSession:{snapshot:()=>context.datasetToken}},
+   '@/lib/swp-capacity-store':capacityStore,'@/lib/swp-capacity-record':capacityRecord,
+   './planning-session-context':{usePlanningSession:()=>({goalKey:'goal:a',capacitySession:session,setCapacitySession:()=>{}})},
+  });
+  const html=renderToStaticMarkup(React.createElement(CapacitySavedScenarios));
+  assert.match(html,new RegExp('Opening assumption differences: '+openingCount+'\\.'));
+  assert.match(html,/Month-level assumption differences: 3\./);assert.match(html,/A recurring change counts once per month/);
+ }
 });

@@ -37,7 +37,7 @@ export function CapacityWorkspace(){
   <form noValidate onSubmit={event=>{event.preventDefault();calculate();}} className="min-w-0 space-y-3 rounded-xl border bg-background p-4">
    <h3 className="font-semibold">Inputs &amp; assumptions</h3>
    <div>{field('scope','Name one group and work unit, e.g. Service desk — tickets.')}</div>
-   <div className="grid grid-cols-2 gap-3">{field('openingDate')}{field('months')}</div>
+   <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('openingDate')}{field('months')}</div>
    <div className="grid gap-3 sm:grid-cols-2">{field('people')}{field('fte')}</div>
    <div className="grid gap-3 sm:grid-cols-2">{field('volume')}{field('effort')}{field('hours')}</div>
    <details className="border-t pt-1">
