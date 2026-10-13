@@ -16,7 +16,10 @@ const end=page.indexOf('  async function runCustomScenario()');
 const effect=page.slice(page.lastIndexOf('  useEffect(() => {',end),end);
 const run=ts.transpileModule(page.slice(end,page.indexOf('  function resetCustomScenario()')),{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
 const reset=page.slice(page.indexOf('  function resetCustomScenario()'),page.indexOf('  async function runBuScenario()'));
-const aliases={'@/lib/legacy-source-contracts':contracts,'@/lib/display-format':format,'@/lib/numeric-contract':numeric};
+// Render the real table region; the VM loader does not resolve application aliases.
+const tableExports={};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync('components/evidence-table-region.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText,{exports:tableExports,require});
+const aliases={'@/components/evidence-table-region':tableExports,'@/lib/legacy-source-contracts':contracts,'@/lib/display-format':format,'@/lib/numeric-contract':numeric};
 const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('components/workforce-planning/scenario-modeling-panel.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText,{exports,require:name=>aliases[name]??require(name)});
 const defaults={annual_growth_pct:2,salary_inflation_pct:3,annual_attrition_pct:11.3,fill_rate_pct:90,productivity_hiring_reduction_pct:5};
 function harness(){

@@ -42,7 +42,9 @@ try{for(const width of [1366,390])for(const mode of ['legacy','constructed','unk
   await target.click();
  };
  await page.goto(base);await dismissHomeOnboarding(page);await nav('position-workforce-design');
- const area=page.locator('[data-planning-destination="position-workforce-design"]');await area.getByText('Planned headcount · Dec 2027',{exact:true}).waitFor().catch(async error=>{await fs.writeFile(output+'/failure.txt',JSON.stringify({body:await page.locator('body').innerText(),errors},null,2));throw error});
+ const area=page.locator('[data-planning-destination="position-workforce-design"]');
+ const inventory=area.locator('summary').filter({hasText:'Position inventory & source details'});await inventory.focus();await page.keyboard.press('Enter');
+ await area.getByText('Planned headcount · Dec 2027',{exact:true}).waitFor().catch(async error=>{await fs.writeFile(output+'/failure.txt',JSON.stringify({body:await page.locator('body').innerText(),errors},null,2));throw error});
  const text=await area.innerText();check(`${width} ${mode} distinct totals`,text.includes('10,475')&&text.includes('10,439'));
  check(`${width} ${mode} no actionable subtraction`,!text.includes('Net Position Change')&&!text.includes('-36')&&!text.includes('Position Change by'));
  check(`${width} ${mode} inventory sorting`,text.indexOf('Larger inventory')<text.indexOf('Smaller inventory'));
