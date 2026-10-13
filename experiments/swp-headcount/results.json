@@ -1,0 +1,440 @@
+{
+  "classification": "conditional retrospective",
+  "frozenHash": "3fddb9ed2d52f1e8c4d4c628240a92bae4f660bbc227204b5ce10a1c783ca94b",
+  "holdoutHash": "bdc60b6b471e11a4c7ef4df7dfc8adbdbd22ab25c277db48bee7c26dbf0868d6",
+  "selected": "drift",
+  "holdout": {
+    "last-value": {
+      "overall": {
+        "n": 6,
+        "mae": 177,
+        "rmse": 196.69180630282153,
+        "bias": -177
+      },
+      "byHorizon": [
+        {
+          "horizon": 1,
+          "n": 1,
+          "mae": 51,
+          "rmse": 51,
+          "bias": -51
+        },
+        {
+          "horizon": 2,
+          "n": 1,
+          "mae": 102,
+          "rmse": 102,
+          "bias": -102
+        },
+        {
+          "horizon": 3,
+          "n": 1,
+          "mae": 152,
+          "rmse": 152,
+          "bias": -152
+        },
+        {
+          "horizon": 4,
+          "n": 1,
+          "mae": 202,
+          "rmse": 202,
+          "bias": -202
+        },
+        {
+          "horizon": 5,
+          "n": 1,
+          "mae": 253,
+          "rmse": 253,
+          "bias": -253
+        },
+        {
+          "horizon": 6,
+          "n": 1,
+          "mae": 302,
+          "rmse": 302,
+          "bias": -302
+        }
+      ],
+      "byOrigin": [
+        {
+          "origin": "2026-03",
+          "n": 6,
+          "mae": 177,
+          "rmse": 196.69180630282153,
+          "bias": -177
+        }
+      ],
+      "rows": [
+        {
+          "origin": "2026-03",
+          "month": "2026-04",
+          "horizon": 1,
+          "actual": 9749,
+          "prediction": 9698
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-05",
+          "horizon": 2,
+          "actual": 9800,
+          "prediction": 9698
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-06",
+          "horizon": 3,
+          "actual": 9850,
+          "prediction": 9698
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-07",
+          "horizon": 4,
+          "actual": 9900,
+          "prediction": 9698
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-08",
+          "horizon": 5,
+          "actual": 9951,
+          "prediction": 9698
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-09",
+          "horizon": 6,
+          "actual": 10000,
+          "prediction": 9698
+        }
+      ]
+    },
+    "drift": {
+      "overall": {
+        "n": 6,
+        "mae": 2.2692307692307927,
+        "rmse": 2.366973616786616,
+        "bias": -2.2692307692307927
+      },
+      "byHorizon": [
+        {
+          "horizon": 1,
+          "n": 1,
+          "mae": 1.0769230769237765,
+          "rmse": 1.0769230769237765,
+          "bias": -1.0769230769237765
+        },
+        {
+          "horizon": 2,
+          "n": 1,
+          "mae": 2.153846153845734,
+          "rmse": 2.153846153845734,
+          "bias": -2.153846153845734
+        },
+        {
+          "horizon": 3,
+          "n": 1,
+          "mae": 2.2307692307695106,
+          "rmse": 2.2307692307695106,
+          "bias": -2.2307692307695106
+        },
+        {
+          "horizon": 4,
+          "n": 1,
+          "mae": 2.307692307691468,
+          "rmse": 2.307692307691468,
+          "bias": -2.307692307691468
+        },
+        {
+          "horizon": 5,
+          "n": 1,
+          "mae": 3.3846153846152447,
+          "rmse": 3.3846153846152447,
+          "bias": -3.3846153846152447
+        },
+        {
+          "horizon": 6,
+          "n": 1,
+          "mae": 2.4615384615390212,
+          "rmse": 2.4615384615390212,
+          "bias": -2.4615384615390212
+        }
+      ],
+      "byOrigin": [
+        {
+          "origin": "2026-03",
+          "n": 6,
+          "mae": 2.2692307692307927,
+          "rmse": 2.366973616786616,
+          "bias": -2.2692307692307927
+        }
+      ],
+      "rows": [
+        {
+          "origin": "2026-03",
+          "month": "2026-04",
+          "horizon": 1,
+          "actual": 9749,
+          "prediction": 9747.923076923076
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-05",
+          "horizon": 2,
+          "actual": 9800,
+          "prediction": 9797.846153846154
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-06",
+          "horizon": 3,
+          "actual": 9850,
+          "prediction": 9847.76923076923
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-07",
+          "horizon": 4,
+          "actual": 9900,
+          "prediction": 9897.692307692309
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-08",
+          "horizon": 5,
+          "actual": 9951,
+          "prediction": 9947.615384615385
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-09",
+          "horizon": 6,
+          "actual": 10000,
+          "prediction": 9997.538461538461
+        }
+      ]
+    },
+    "seasonal-naive": {
+      "overall": {
+        "n": 6,
+        "mae": 575.6666666666666,
+        "rmse": 575.7088384475843,
+        "bias": -575.6666666666666
+      },
+      "byHorizon": [
+        {
+          "horizon": 1,
+          "n": 1,
+          "mae": 565,
+          "rmse": 565,
+          "bias": -565
+        },
+        {
+          "horizon": 2,
+          "n": 1,
+          "mae": 570,
+          "rmse": 570,
+          "bias": -570
+        },
+        {
+          "horizon": 3,
+          "n": 1,
+          "mae": 573,
+          "rmse": 573,
+          "bias": -573
+        },
+        {
+          "horizon": 4,
+          "n": 1,
+          "mae": 579,
+          "rmse": 579,
+          "bias": -579
+        },
+        {
+          "horizon": 5,
+          "n": 1,
+          "mae": 582,
+          "rmse": 582,
+          "bias": -582
+        },
+        {
+          "horizon": 6,
+          "n": 1,
+          "mae": 585,
+          "rmse": 585,
+          "bias": -585
+        }
+      ],
+      "byOrigin": [
+        {
+          "origin": "2026-03",
+          "n": 6,
+          "mae": 575.6666666666666,
+          "rmse": 575.7088384475843,
+          "bias": -575.6666666666666
+        }
+      ],
+      "rows": [
+        {
+          "origin": "2026-03",
+          "month": "2026-04",
+          "horizon": 1,
+          "actual": 9749,
+          "prediction": 9184
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-05",
+          "horizon": 2,
+          "actual": 9800,
+          "prediction": 9230
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-06",
+          "horizon": 3,
+          "actual": 9850,
+          "prediction": 9277
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-07",
+          "horizon": 4,
+          "actual": 9900,
+          "prediction": 9321
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-08",
+          "horizon": 5,
+          "actual": 9951,
+          "prediction": 9369
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-09",
+          "horizon": 6,
+          "actual": 10000,
+          "prediction": 9415
+        }
+      ]
+    },
+    "linear-trend": {
+      "overall": {
+        "n": 6,
+        "mae": 10.990842490843534,
+        "rmse": 11.109761095962142,
+        "bias": 10.990842490843534
+      },
+      "byHorizon": [
+        {
+          "horizon": 1,
+          "n": 1,
+          "mae": 13.7094017094023,
+          "rmse": 13.7094017094023,
+          "bias": 13.7094017094023
+        },
+        {
+          "horizon": 2,
+          "n": 1,
+          "mae": 12.021978021979521,
+          "rmse": 12.021978021979521,
+          "bias": 12.021978021979521
+        },
+        {
+          "horizon": 3,
+          "n": 1,
+          "mae": 11.334554334554923,
+          "rmse": 11.334554334554923,
+          "bias": 11.334554334554923
+        },
+        {
+          "horizon": 4,
+          "n": 1,
+          "mae": 10.647130647132144,
+          "rmse": 10.647130647132144,
+          "bias": 10.647130647132144
+        },
+        {
+          "horizon": 5,
+          "n": 1,
+          "mae": 8.959706959707546,
+          "rmse": 8.959706959707546,
+          "bias": 8.959706959707546
+        },
+        {
+          "horizon": 6,
+          "n": 1,
+          "mae": 9.272283272284767,
+          "rmse": 9.272283272284767,
+          "bias": 9.272283272284767
+        }
+      ],
+      "byOrigin": [
+        {
+          "origin": "2026-03",
+          "n": 6,
+          "mae": 10.990842490843534,
+          "rmse": 11.109761095962142,
+          "bias": 10.990842490843534
+        }
+      ],
+      "rows": [
+        {
+          "origin": "2026-03",
+          "month": "2026-04",
+          "horizon": 1,
+          "actual": 9749,
+          "prediction": 9762.709401709402
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-05",
+          "horizon": 2,
+          "actual": 9800,
+          "prediction": 9812.02197802198
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-06",
+          "horizon": 3,
+          "actual": 9850,
+          "prediction": 9861.334554334555
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-07",
+          "horizon": 4,
+          "actual": 9900,
+          "prediction": 9910.647130647132
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-08",
+          "horizon": 5,
+          "actual": 9951,
+          "prediction": 9959.959706959708
+        },
+        {
+          "origin": "2026-03",
+          "month": "2026-09",
+          "horizon": 6,
+          "actual": 10000,
+          "prediction": 10009.272283272285
+        }
+      ]
+    }
+  },
+  "developmentImprovementOverLastValue": 0.8652117252655798,
+  "developmentOriginWins": 10,
+  "exploratoryFurtherWorkCriterionMet": true,
+  "operationalForecastAvailable": false,
+  "intervalAvailable": false,
+  "limitations": [
+    "Synthetic source; final-data retrospective only.",
+    "Completion and origin vintages unknown.",
+    "Overlapping origins are correlated; 60 forecast errors are not 60 independent samples.",
+    "Only 12–21 training months at development origins; annual seasonality has limited support.",
+    "No cost, subgroup, interval or operational forecast."
+  ]
+}
