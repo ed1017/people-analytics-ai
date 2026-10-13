@@ -49,3 +49,35 @@ test('existing conversation monthly-flow engine still returns the same resolved 
   const transfer={field:'monthly_transfers_in',value:1,kind:'literal',basis:'user',turnId:'user-1',interpretation:'Transfer'};
   await assert.rejects(calculateHeadcountProjection({...spec,changes:[...spec.changes,transfer]},inputs,[],['user-1']),/Internal transfers/);
 });
+
+const costRate = amount => ({basis:'user-entered',currency:'USD',unit:'per-employee-month',amount});
+test('explicit monthly USD rate yields endpoint run-rates with separate provenance and cent arithmetic',()=>{
+ const assumption=costRate(12.34), result=compareSwpHeadcount(history,flows(100,60),assumption);
+ assert.deepEqual(result.cost.points.at(-1),{month:'2027-03',baseline:127102,scenario:126361.6,difference:-740.4});
+ assert.equal(result.cost.unit,'USD/month');assert.equal(result.cost.basis,'user-assumption-run-rate');
+ assert.equal(result.points.at(-1).scenario,10240);assert.equal(result.operationalForecastAvailable,false);
+ assert.equal(Object.hasOwn(result.cost,'total'),false);assumption.amount=0;assert.equal(result.cost.assumption.amount,12.34);
+});
+test('blank cost remains unknown, explicit zero remains zero, baseline-only does not invent scenario cost',()=>{
+ assert.equal(compareSwpHeadcount(history,flows(0,0),null).cost,null);
+ assert.ok(compareSwpHeadcount(history,flows(0,0),costRate(0)).cost.points.every(p=>p.baseline===0&&p.scenario===0&&p.difference===0));
+ assert.ok(compareSwpHeadcount(history,null,costRate(1.01)).cost.points.every(p=>p.scenario===null&&p.difference===null));
+ assert.equal(compareSwpHeadcount(history,flows(100,0),costRate(1.01)).cost.points.at(-1).difference,303);
+});
+test('invalid amount, unit, currency, provenance and unsafe products are rejected without inference',()=>{
+ for(const amount of [undefined,null,'12',NaN,Infinity,-1,1.001,1e-10,1.0000000001,1e15])assert.throws(()=>compareSwpHeadcount(history,flows(0,0),costRate(amount)));
+ for(const override of [{currency:'EUR'},{unit:'per-employee-year'},{unit:'per-fte-month'},{basis:'observed'},{benefits:0}])assert.throws(()=>compareSwpHeadcount(history,flows(0,0),{...costRate(12),...override}));
+});
+
+test('bounded rates reject the reported cent-display edge and preserve cents throughout supported extremes',()=>{
+ assert.throws(()=>compareSwpHeadcount(history,flows(1,0),costRate(8744853645.37)),/at most 100,000/);
+ assert.throws(()=>compareSwpHeadcount(history,flows(1,0),costRate(100000.01)),/at most 100,000/);
+ for(const [hires,departures] of [[0,0],[1,0],[1000000,0],[0,1666]])for(const amount of [0,0.01,12.34,99999.99,100000]){
+  const r=compareSwpHeadcount(history,flows(hires,departures),costRate(amount)),rate=BigInt(Math.round(amount*100));
+  const exact=cents=>{const sign=cents<0n?'-':'';const n=cents<0n?-cents:cents;return sign+String(n/100n)+'.'+String(n%100n).padStart(2,'0');};
+  for(let i=0;i<6;i++){
+   const b=BigInt(r.points[i].baseline)*rate,s=BigInt(r.points[i].scenario)*rate;
+   for(const [value,cents] of [[r.cost.points[i].baseline,b],[r.cost.points[i].scenario,s],[r.cost.points[i].difference,s-b]])assert.equal(value.toLocaleString('en-US',{useGrouping:false,minimumFractionDigits:2,maximumFractionDigits:2}),exact(cents));
+  }
+ }
+});

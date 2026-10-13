@@ -91,7 +91,7 @@ export function StructuralPositionScenarioSummary({
             )}
           </p>
           <p className="text-xs text-muted-foreground">
-            Annualized effect of modeled fills
+            Modeled fill cost; source period unverified
           </p>
         </div>
       </div>

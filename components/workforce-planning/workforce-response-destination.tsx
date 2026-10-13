@@ -49,7 +49,7 @@ export function WorkforceResponseDestination({
       data-planning-destination="workforce-response"
       className={
         visible
-          ? "mt-6 rounded-lg border p-4"
+          ? "space-y-4"
           : "hidden"
       }
     >
@@ -90,16 +90,14 @@ export function WorkforceResponseDestination({
       <div className="mb-5 rounded-md border p-4">
         {structuralPositionResult && (
           <>
+            <details className="mb-4 rounded-md border p-3">
+              <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Inherited design assumptions</summary>
             <StructuralPositionScenarioSummary
               result={structuralPositionResult}
               showDemandDetails={false}
             />
+            </details>
 
-            <ResponseStrategyEvidence
-              responseStrategy={
-                structuralPositionResult.response_strategy
-              }
-            />
             {structuralPositionResult.job_profile_impact.filter(
               (row) =>
                 row.authorized_position_delta > 0
@@ -122,16 +120,26 @@ export function WorkforceResponseDestination({
               {...skillPlanProps}
             />
 
-            <StructuralPositionActionResults
-              result={structuralPositionResult}
+            <details className="mt-4 rounded-md border p-3">
+              <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Response strategy evidence</summary>
+            <ResponseStrategyEvidence
+              responseStrategy={
+                structuralPositionResult.response_strategy
+              }
             />
+            </details>
+            <details className="mt-4 rounded-md border p-3">
+              <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Design impact details</summary>
+              <StructuralPositionActionResults result={structuralPositionResult} />
+            </details>
           </>
         )}
       </div>
 
-      <PositionModelingSummary
-        {...positionSummaryProps}
-      />
+      <details className="rounded-lg border p-4">
+        <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Position inventory &amp; source details</summary>
+        <PositionModelingSummary {...positionSummaryProps} />
+      </details>
     </div>
   );
 }

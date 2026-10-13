@@ -138,7 +138,7 @@ export function WorkforceExecutionPanel({
                                         <div className="border-t p-4">
                                           <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                                             <p className="max-w-3xl text-xs text-muted-foreground">
-                                              Assign explicit effective months to approved BU Build, Move, and Buy capacity. Timing is user-supplied; course duration and historical time-to-fill do not set these dates.
+                                              Assign explicit effective months to modeled BU Build, Move, and Buy capacity. Timing is user-supplied; course duration and historical time-to-fill do not set these dates.
                                             </p>
                                             <div className="flex flex-wrap gap-2">
                                               <button
@@ -296,7 +296,7 @@ export function WorkforceExecutionPanel({
                                                 <tr className="border-b text-left text-muted-foreground">
                                                   <th className="p-3">Destination / Role</th>
                                                   <th className="p-3">Path</th>
-                                                  <th className="p-3 text-right">Approved</th>
+                                                  <th className="p-3 text-right">Modeled</th>
                                                   <th className="p-3 text-right">Phase Amount</th>
                                                   <th className="p-3">Effective Month</th>
                                                   <th className="p-3 text-right">Actions</th>
@@ -421,7 +421,7 @@ export function WorkforceExecutionPanel({
                                               nextMonthValue(
                                                 businessUnitResponseResult.as_of
                                               ) + "-01"
-                                            )}. Leave a phase without a month to keep that approved capacity unscheduled.
+                                            )}. Leave a phase without a month to keep that modeled capacity unscheduled.
                                           </p>
 
                                           {responseExecutionError && (
@@ -582,7 +582,7 @@ export function WorkforceExecutionPanel({
                                                         )
                                                       }
                                                     />
-                                                    Require every approved Build / Move / Buy unit to have an effective month
+                                                    Require every modeled Build / Move / Buy unit to have an effective month
                                                   </label>
 
                                                   <p className="mt-3 text-[11px] text-muted-foreground">

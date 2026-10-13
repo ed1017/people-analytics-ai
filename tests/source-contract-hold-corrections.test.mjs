@@ -9,6 +9,7 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import * as contracts from '../lib/legacy-source-contracts.ts';
 import * as format from '../lib/display-format.ts';
 import * as numeric from '../lib/numeric-contract.ts';
+import {runScenarioModel} from '../lib/scenario-engine.ts';
 const require=createRequire(import.meta.url);
 const page=fs.readFileSync('components/pages/workforce-planning-page.tsx','utf8');
 // Execute the actual page effect and reset closure, including its dependency array.
@@ -16,7 +17,10 @@ const end=page.indexOf('  async function runCustomScenario()');
 const effect=page.slice(page.lastIndexOf('  useEffect(() => {',end),end);
 const run=ts.transpileModule(page.slice(end,page.indexOf('  function resetCustomScenario()')),{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
 const reset=page.slice(page.indexOf('  function resetCustomScenario()'),page.indexOf('  async function runBuScenario()'));
-const aliases={'@/lib/legacy-source-contracts':contracts,'@/lib/display-format':format,'@/lib/numeric-contract':numeric};
+// Render the real table region; the VM loader does not resolve application aliases.
+const tableExports={};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync('components/evidence-table-region.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText,{exports:tableExports,require});
+const aliases={'@/components/evidence-table-region':tableExports,'@/lib/legacy-source-contracts':contracts,'@/lib/display-format':format,'@/lib/numeric-contract':numeric};
 const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('components/workforce-planning/scenario-modeling-panel.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText,{exports,require:name=>aliases[name]??require(name)});
 const defaults={annual_growth_pct:2,salary_inflation_pct:3,annual_attrition_pct:11.3,fill_rate_pct:90,productivity_hiring_reduction_pct:5};
 function harness(){
@@ -99,4 +103,15 @@ test('defaults failure and scenario-run failure stay independent across retries 
  const retry=h.context.runCustomScenario();const result={replacement:true};h.pending.at(-1).resolve({ok:true,json:async()=>result});await retry;
  assert.equal(h.context.customScenarioError,null);assert.equal(h.context.customScenario,result);assert.equal(h.context.scenarioDefaultsError,'Defaults unavailable');assert.match(h.html(),/Defaults unavailable/);
  h.reload();assert.equal(h.context.scenarioDefaultsError,null);assert.equal(h.context.customAssumptions.annual_attrition_pct,4);h.dispose();
+});
+
+
+test('company what-if scope note does not invent a January horizon or missing quarter for an October baseline',()=>{
+ const points=Array.from({length:6},(_,i)=>({planning_month:new Date(Date.UTC(2026,9+i,1)).toISOString().slice(0,10),planned_headcount:1000+i*10,planned_fte:1000+i*10,planned_hires:15,planned_exits:5,planned_labor_cost_usd:100000+i*1000}));
+ const result=runScenarioModel({asOf:'2026-09-30',startingHeadcount:1000,baselinePoints:points,defaults,assumptions:defaults});
+ assert.deepEqual(result.points.map(point=>point.planning_month),['2026-10-01','2026-11-01','2026-12-01','2027-01-01','2027-02-01','2027-03-01']);
+ const html=renderToStaticMarkup(React.createElement(exports.ScenarioModelingPanel,{visible:true,planningScenarios:[],scenarioDefaults:defaults,customAssumptions:defaults,customScenario:result,buScenarioOptions:[],savedScenarios:[],comparisonScenarioIds:[]}));
+ const note=html.match(/<p[^>]*>Company what-if[^<]*<\/p>/)?.[0];
+ assert.ok(note);assert.match(note,/returned Baseline window/);assert.match(note,/Dates and any gaps depend on the source plan/);
+ assert.doesNotMatch(note,/Jan–Dec 2027|September stock carries to January|Oct–Dec 2026 are unmodeled/);
 });
