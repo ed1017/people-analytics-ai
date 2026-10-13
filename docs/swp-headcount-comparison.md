@@ -12,7 +12,7 @@ The user enters two initially blank counts: total external hires and total depar
 
 Example fixture: 100 hires and 60 departures each month gives a March scenario of 10,240 versus a 10,300 demo baseline, difference −60. Explicit 0/0 gives 10,000, whereas blank fields remain unknown and produce no scenario. Edits clear the old result before recalculation. Negative, fractional, nonfinite, extra unsupported fields and infeasible outflow assumptions fail closed. Reset clears user inputs; reload starts fresh. The reviewed baseline stays unchanged throughout.
 
-`experiments/swp-headcount/comparison.ts` requires the qualified company-headcount metric, reviewed source/version, exact 33 values and calendar. This binding prevents accidental source substitution; it does not authenticate the underlying database. Costs and intervals are null. No subgroup selector is offered.
+`experiments/swp-headcount/comparison.ts` requires the qualified company-headcount metric, reviewed source/version, exact 33 values and calendar. This binding prevents accidental source substitution; it does not authenticate the underlying database. Source-derived costs and intervals remain unavailable. An optional explicit user-entered USD/employee/month rate can now produce separately labelled assumed monthly run-rates; see `swp-cost-run-rate.md`. No subgroup selector is offered.
 
 ## Reuse and regression boundary
 

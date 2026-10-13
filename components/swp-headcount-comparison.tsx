@@ -2,23 +2,27 @@
 
 import {useId, useState} from 'react';
 import type {SwpHistory} from '../lib/swp-history-qualification';
-import {compareSwpHeadcount, swpDemoDisclaimer, type SwpUserFlows} from '../experiments/swp-headcount/comparison';
+import {compareSwpHeadcount, swpDemoDisclaimer, type SwpUserFlows, type SwpUserMonthlyCost} from '../experiments/swp-headcount/comparison';
 
 const format = (v:number) => v.toLocaleString('en-US', {maximumFractionDigits:1});
+const money = (v:number) => v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const monthLabel = (month:string) => new Date(month + '-01T00:00:00Z').toLocaleDateString('en-US', {month:'short',year:'numeric',timeZone:'UTC'});
 
 export function SwpHeadcountComparison({history}:{history:SwpHistory}) {
   const id = useId();
   const [hires,setHires] = useState(''), [departures,setDepartures] = useState('');
+  const [rate,setRate] = useState(''), [cost,setCost] = useState<SwpUserMonthlyCost|null>(null);
   const [assumptions,setAssumptions] = useState<SwpUserFlows|null>(null), [error,setError] = useState('');
   let comparison:ReturnType<typeof compareSwpHeadcount>;
-  try {comparison = compareSwpHeadcount(history, assumptions);} catch {return <section aria-label="Company headcount comparison"><p>{swpDemoDisclaimer}</p><p role="alert">This company-headcount demo is unavailable: the reviewed history could not be verified.</p></section>;}
-  const edit = (field:'hires'|'departures',value:string) => {if (field === 'hires') setHires(value); else setDepartures(value); setAssumptions(null); setError('');};
+  try {comparison = compareSwpHeadcount(history, assumptions, cost);} catch {return <section aria-label="Company headcount comparison"><p>{swpDemoDisclaimer}</p><p role="alert">This company-headcount demo is unavailable: the reviewed history could not be verified.</p></section>;}
+  const edit = (field:'hires'|'departures'|'rate',value:string) => {if (field === 'hires') setHires(value); else if(field === 'departures') setDepartures(value); else setRate(value); setAssumptions(null); setCost(null); setError('');};
   const submit = (event:React.FormEvent) => {
     event.preventDefault();
     if (![hires,departures].every(v => /^\d+$/.test(v.trim()))) {setError('Enter both monthly counts. Use 0 only if you assume none.'); return;}
     const next:SwpUserFlows = {basis:'user-entered',monthlyHires:Number(hires),monthlyDepartures:Number(departures)};
-    try {compareSwpHeadcount(history,next);setAssumptions(next);setError('');} catch (e) {setAssumptions(null);setError(e instanceof Error ? e.message : 'Review your assumptions.');}
+    if(rate.trim() && !/^\d+(?:\.\d{1,2})?$/.test(rate.trim())) {setError('Enter a nonnegative monthly USD cost per employee with at most two decimal places, or leave it blank.');return;}
+    const nextCost:SwpUserMonthlyCost|null = rate.trim() ? {basis:'user-entered',currency:'USD',unit:'per-employee-month',amount:Number(rate)} : null;
+    try {compareSwpHeadcount(history,next,nextCost);setAssumptions(next);setCost(nextCost);setError('');} catch (e) {setAssumptions(null);setCost(null);setError(e instanceof Error ? e.message : 'Review your assumptions.');}
   };
   return <section aria-label="Company headcount comparison" style={{maxWidth:760,margin:'0 auto',fontSize:14,lineHeight:1.5,color:'#172033'}}>
     <h1 style={{fontSize:22,margin:'0 0 8px'}}>Compare company headcount</h1>
@@ -33,7 +37,9 @@ export function SwpHeadcountComparison({history}:{history:SwpHistory}) {
           <label style={{flex:'1 1 160px'}}>Monthly hires<input aria-describedby={id+'-help'} inputMode="numeric" value={hires} onChange={e=>edit('hires',e.target.value)} style={{display:'block',width:'100%',minHeight:44,boxSizing:'border-box',padding:8,border:'1px solid #64748b',borderRadius:4}}/></label>
           <label style={{flex:'1 1 160px'}}>Monthly departures<input aria-describedby={id+'-help'} inputMode="numeric" value={departures} onChange={e=>edit('departures',e.target.value)} style={{display:'block',width:'100%',minHeight:44,boxSizing:'border-box',padding:8,border:'1px solid #64748b',borderRadius:4}}/></label>
         </div>
-        <div style={{display:'flex',gap:12,marginTop:12}}><button type="submit" style={{minHeight:44,padding:'8px 14px'}}>Compare</button><button type="button" onClick={()=>{setHires('');setDepartures('');setAssumptions(null);setError('');}} style={{minHeight:44,padding:'8px 14px'}}>Reset</button></div>
+        <label style={{display:'block',marginTop:12}}>Monthly USD cost per employee (optional)<input inputMode="decimal" aria-describedby={id+'-cost-help'} value={rate} onChange={e=>edit('rate',e.target.value)} style={{display:'block',width:'100%',maxWidth:260,minHeight:44,boxSizing:'border-box',padding:8,border:'1px solid #64748b',borderRadius:4}}/></label>
+        <p id={id+'-cost-help'} style={{margin:'6px 0'}}>Your assumed rate per employee per month, applied equally to both paths. No FTE scaling, component additions or currency conversion. Blank means unknown.</p>
+        <div style={{display:'flex',gap:12,marginTop:12}}><button type="submit" style={{minHeight:44,padding:'8px 14px'}}>Compare</button><button type="button" onClick={()=>{setHires('');setDepartures('');setRate('');setCost(null);setAssumptions(null);setError('');}} style={{minHeight:44,padding:'8px 14px'}}>Reset</button></div>
         {error && <p role="alert" style={{color:'#a11818'}}>{error}</p>}
       </fieldset>
     </form>
@@ -43,6 +49,17 @@ export function SwpHeadcountComparison({history}:{history:SwpHistory}) {
       <thead><tr>{['Month','Demo baseline','Your scenario','Difference'].map(t=><th key={t} scope="col" style={{padding:'8px 3px',textAlign:t==='Month'?'left':'right',verticalAlign:'bottom',borderBottom:'2px solid #cbd5e1'}}>{t}</th>)}</tr></thead>
       <tbody>{comparison.points.map(p=><tr key={p.month}><th scope="row" style={{padding:'8px 3px',textAlign:'left',fontWeight:400,borderBottom:'1px solid #e2e8f0'}}>{monthLabel(p.month)}</th>{[p.baseline,p.scenario,p.difference].map((v,i)=><td key={i} style={{padding:'8px 3px',textAlign:'right',borderBottom:'1px solid #e2e8f0'}}>{v===null?'—':(i===2&&v>0?'+':'')+format(v)}</td>)}</tr>)}</tbody>
     </table>
-    <p style={{color:'#475569'}}>Difference = your scenario − demo baseline. Costs unavailable: period, components and FTE basis are not qualified. No uncertainty interval is available.</p>
+    {comparison.cost && <section aria-label="Assumed monthly cost run-rates" style={{marginTop:16}}>
+      <p><strong>Your cost assumption: USD {money(comparison.cost.assumption.amount)} per employee per month.</strong> Calculated from your rate, not sourced actual cost or statistically predicted spend. Each row is a month-end monthly run-rate; no six-month spending total is calculated.</p>
+      <h2 id={id+'-cost-table'} style={{fontSize:14,fontWeight:600,margin:'8px 0'}}>Assumed monthly cost run-rate · USD/month</h2>
+      <p style={{margin:'0 0 6px',color:'#475569'}}>Scroll the table if needed to compare all columns.</p>
+      <div style={{overflowX:'auto'}} tabIndex={0} role="region" aria-label="Monthly cost table">
+        <table aria-labelledby={id+'-cost-table'} style={{width:'100%',minWidth:520,borderCollapse:'collapse',fontVariantNumeric:'tabular-nums'}}>
+          <thead><tr>{['Month','Baseline × rate','Scenario × rate','Difference'].map(t=><th key={t} scope="col" style={{padding:'8px 4px',textAlign:t==='Month'?'left':'right',borderBottom:'2px solid #cbd5e1'}}>{t}</th>)}</tr></thead>
+          <tbody>{comparison.cost.points.map(p=><tr key={p.month}><th scope="row" style={{padding:'8px 4px',textAlign:'left',fontWeight:400,borderBottom:'1px solid #e2e8f0'}}>{monthLabel(p.month)}</th>{[p.baseline,p.scenario,p.difference].map((v,i)=><td key={i} style={{padding:'8px 4px',textAlign:'right',borderBottom:'1px solid #e2e8f0'}}>{v===null?'—':(i===2&&v>0?'+':'')+money(v)}</td>)}</tr>)}</tbody>
+        </table>
+      </div>
+    </section>}
+    <p style={{color:'#475569'}}>Difference = your scenario − demo baseline. Costs unavailable from source: period, components and FTE basis are not qualified. No uncertainty interval is available.</p>
   </section>;
 }

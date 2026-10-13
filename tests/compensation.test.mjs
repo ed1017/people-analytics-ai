@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
 import {buildCompensationResponse, COMPENSATION_COLUMNS} from '../lib/compensation.ts';
+import {withDatasetRequest} from '../lib/dataset-runtime.ts';
 
 const row=(overrides={})=>({org_code:'A',org_name:'Unit A',org_type:'business_unit',headcount:'100',fte:'80',labor_cost_usd:'8000000',...overrides});
 const second=row({org_code:'B',org_name:'Unit B',headcount:50,fte:20,labor_cost_usd:4000000});
@@ -57,20 +58,22 @@ test('allowlisted response drops any incidental private fields and never exposes
 // Execute the actual route with only its server client replaced; no sockets or credentials.
 const source=fs.readFileSync(new URL('../app/api/compensation/route.ts',import.meta.url),'utf8');
 const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-async function routeWith(result){
+async function routeWith(result,request=new Request('http://fixture.local/api/compensation')){
   const calls=[];
   const exports={};
   const supabaseServer={from:name=>{calls.push(name);return {select:async(...args)=>{calls.push(args);if(result instanceof Error)throw result;return result}}}};
   vm.runInNewContext(code,{exports,Response,require:name=>{
+    if(name==='@/lib/dataset-runtime')return {withDatasetRequest};
     if(name==='../../../lib/supabase-server')return {supabaseServer};
     if(name==='../../../lib/compensation')return {buildCompensationResponse,COMPENSATION_COLUMNS};
     throw Error('Unexpected module: '+name);
   }});
-  return {response:await exports.GET(),calls};
+  return {response:await exports.GET(request),calls};
 }
 test('actual GET reads the existing aggregate only, checks complete row count and sends no-store',async()=>{
   const {response,calls}=await routeWith({data:[row(),second],count:2,error:null});
   assert.equal(response.status,200);
+  assert.equal(response.headers.get('x-workforce-dataset'),'legacy-v1:0');
   assert.equal(response.headers.get('cache-control'),'no-store');
   assert.equal((await response.json()).current.labor_cost_usd,12000000);
   assert.equal(calls[0],'finance_current_summary');
@@ -87,4 +90,9 @@ test('actual GET sanitizes source failures and rejects capped or uncounted respo
   const {response}=await routeWith({data:[],error:null,count:0});
   assert.equal(response.status,200);
   assert.equal((await response.json()).current.labor_cost_usd,null);
+});
+
+test('actual dataset wrapper rejects mismatched identity before touching the database stub',async()=>{
+ const {response,calls}=await routeWith({data:[row()],count:1,error:null},new Request('http://fixture.local/api/compensation',{headers:{'x-workforce-dataset':'other:1'}}));
+ assert.equal(response.status,409);assert.equal(response.headers.get('x-workforce-dataset'),'legacy-v1:0');assert.deepEqual(calls,[]);
 });

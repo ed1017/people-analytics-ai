@@ -49,3 +49,22 @@ test('existing conversation monthly-flow engine still returns the same resolved 
   const transfer={field:'monthly_transfers_in',value:1,kind:'literal',basis:'user',turnId:'user-1',interpretation:'Transfer'};
   await assert.rejects(calculateHeadcountProjection({...spec,changes:[...spec.changes,transfer]},inputs,[],['user-1']),/Internal transfers/);
 });
+
+const costRate = amount => ({basis:'user-entered',currency:'USD',unit:'per-employee-month',amount});
+test('explicit monthly USD rate yields endpoint run-rates with separate provenance and cent arithmetic',()=>{
+ const assumption=costRate(12.34), result=compareSwpHeadcount(history,flows(100,60),assumption);
+ assert.deepEqual(result.cost.points.at(-1),{month:'2027-03',baseline:127102,scenario:126361.6,difference:-740.4});
+ assert.equal(result.cost.unit,'USD/month');assert.equal(result.cost.basis,'user-assumption-run-rate');
+ assert.equal(result.points.at(-1).scenario,10240);assert.equal(result.operationalForecastAvailable,false);
+ assert.equal(Object.hasOwn(result.cost,'total'),false);assumption.amount=0;assert.equal(result.cost.assumption.amount,12.34);
+});
+test('blank cost remains unknown, explicit zero remains zero, baseline-only does not invent scenario cost',()=>{
+ assert.equal(compareSwpHeadcount(history,flows(0,0),null).cost,null);
+ assert.ok(compareSwpHeadcount(history,flows(0,0),costRate(0)).cost.points.every(p=>p.baseline===0&&p.scenario===0&&p.difference===0));
+ assert.ok(compareSwpHeadcount(history,null,costRate(1.01)).cost.points.every(p=>p.scenario===null&&p.difference===null));
+ assert.equal(compareSwpHeadcount(history,flows(100,0),costRate(1.01)).cost.points.at(-1).difference,303);
+});
+test('invalid amount, unit, currency, provenance and unsafe products are rejected without inference',()=>{
+ for(const amount of [undefined,null,'12',NaN,Infinity,-1,1.001,1e-10,1.0000000001,1e15])assert.throws(()=>compareSwpHeadcount(history,flows(0,0),costRate(amount)));
+ for(const override of [{currency:'EUR'},{unit:'per-employee-year'},{unit:'per-fte-month'},{basis:'observed'},{benefits:0}])assert.throws(()=>compareSwpHeadcount(history,flows(0,0),{...costRate(12),...override}));
+});

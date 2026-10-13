@@ -74,7 +74,8 @@ try {for(const width of [1366,390]) {
   const hires=()=>demo().getByLabel('Monthly hires',{exact:true}),departures=()=>demo().getByLabel('Monthly departures',{exact:true});
   await hires().fill('100');await departures().fill('60');await demo().getByRole('button',{name:'Compare',exact:true}).click();
   assert.deepEqual(await demo().locator('tbody tr').last().locator('td').allTextContents(),['10,300','10,240','-60']);
-  await demo().getByRole('button',{name:'Reset',exact:true}).click();assert.equal(await hires().inputValue(),'');
+  const costRate=demo().getByLabel('Monthly USD cost per employee (optional)',{exact:true});await costRate.fill('12.50');await demo().getByRole('button',{name:'Compare',exact:true}).click();assert.deepEqual(await demo().getByRole('region',{name:'Assumed monthly cost run-rates',exact:true}).locator('tbody tr').last().locator('td').allTextContents(),['128,750.00','128,000.00','-750.00']);
+  await demo().getByRole('button',{name:'Reset',exact:true}).click();assert.equal(await costRate.inputValue(),'');assert.equal(await hires().inputValue(),'');
   await close();await assertPreserved();
   await page.goBack();await heading();await page.goForward();await assertPreserved();
   await launch();await heading();await page.goBack();await assertPreserved();await page.goForward();await heading();
