@@ -14,7 +14,7 @@ Native details/summary elements retain their children. No conditional remounting
 
 ## Verification
 
-- 68 contract/calculation/accessibility/source tests pass, including all cost regressions.
+- 69 contract/calculation/accessibility/source tests pass, including all cost regressions.
 - Targeted ESLint and Next webpack build/TypeScript pass.
 - Local built-shell fixtures at 1366, 1180, 390 and 320px: default/explicit AI panel choices, keyboard disclosures, independent company/BU drafts, saved-comparison selection, filtered unassigned draft round trips, chart restoration, demo Back/Forward/reset/populated-cost reload, and no page overflow.
 - Goal-linked populated result fixtures at 1366/390px: stored company/structural/role results, role allocations, named draft, saved comparisons and selections retained across Design/Response/Execution; optional evidence draft survives disclosure toggles.
@@ -29,3 +29,10 @@ The source-contract SSR test harness needed one repair: resolve its pre-existing
 ## Review limits
 
 This is a bounded layout/presentation change, not a new planning engine or workflow redesign. Existing advanced execution allocation/schedule nesting remains. Fixtures cover Execution prerequisites and retained inherited results; they do not establish operational staffing feasibility or exhaustively exercise every populated execution schedule. No live deployment or provider behavior has been tested. Full-page screenshots include synthetic fixtures only.
+
+
+## Returned-window amendment
+
+Independent review of `93bfca906e90a4e0cfd6074c57204d03fc59098e` identified an unconditional January–December 2027 horizon and a September-to-January carry statement in the new company scope note. Neither is guaranteed by the model route. The note now says “returned Baseline window” and explicitly makes dates/gaps source-dependent. Arithmetic and source-qualified disclosures are unchanged.
+
+A new SSR regression runs the real engine with an October 2026–March 2027 baseline, verifies all six returned dates, and renders the actual panel to reject the unsupported January/gap wording. The built-shell regression checks that same non-January window and note at 1366/1180/390/320px while retaining the full cleanup navigation, draft, comparison, chart and demo-return checks. This amendment adds one test (68 → 69). Earlier goal-linked, source-label and lifecycle evidence remains evidence for the unchanged portions of the reviewed cleanup.

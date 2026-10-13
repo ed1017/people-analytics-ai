@@ -25,7 +25,9 @@ try {for(const width of [1366,1180,390,320]) {
       if(u.pathname==='/api/scenario-modeler'){
         if(r.method()==='GET')return route.fulfill({json:{defaults}});
         const assumptions=r.postDataJSON().assumptions;modelInputs.push(assumptions);
-        return route.fulfill({json:runScenarioModel({asOf:'2026-09-30',startingHeadcount:10000,baselinePoints:points,defaults,assumptions})});
+        const result=runScenarioModel({asOf:'2026-09-30',startingHeadcount:10000,baselinePoints:points,defaults,assumptions});
+        assert.deepEqual(result.points.map(point=>point.planning_month),points.map(point=>point.planning_month),'non-January returned window is preserved');
+        return route.fulfill({json:result});
       }
       return route.fulfill({status:503,json:{error:'Other synthetic source unavailable.'}});
     }
@@ -48,6 +50,10 @@ try {for(const width of [1366,1180,390,320]) {
   if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
   await destination.click();await scenario();
   await page.getByRole('heading',{name:'Custom Scenario',exact:true}).waitFor();
+  const windowNote=page.locator('[data-planning-destination="scenario-modeling"] p').filter({hasText:'Company what-if ·'});
+  assert.match(await windowNote.innerText(),/returned Baseline window/);
+  assert.doesNotMatch(await windowNote.innerText(),/Jan–Dec 2027|September stock carries to January|Oct–Dec 2026 are unmodeled/);
+
   const layout=await page.getByRole('heading',{name:'Custom Scenario',exact:true}).evaluate(n=>({customHeadingY:n.getBoundingClientRect().top,documentHeight:document.documentElement.scrollHeight,viewport:innerWidth}));
   if(width>=1180)assert.ok(layout.customHeadingY<757,'Scenario editor begins within desktop first screen');
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'initial page has no horizontal overflow');
@@ -138,7 +144,7 @@ try {for(const width of [1366,1180,390,320]) {
   await page.reload();await heading();assert.equal(await hires().inputValue(),'');assert.equal(await departures().inputValue(),'');assert.equal(await costRate.inputValue(),'');assert.equal(await demo().getByRole('region',{name:'Assumed monthly cost run-rates',exact:true}).count(),0);
   await page.goto(base+'/planning/headcount-demo');await heading();assert.equal(new URL(page.url()).pathname,'/');assert.equal(new URL(page.url()).searchParams.get('demo'),'headcount');
   assert.deepEqual(ai,[]);assert.deepEqual(errors,[]);assert.deepEqual(external,[]);
-  evidence.push({width,layout,aiPreference:'default collapsed; explicit open/collapse preserved',independentBuDraft:true,keyboardDisclosures:true,chartsRestored:true,savedComparison:true,entry:'Planning → Scenario Modeling → in-shell demo',filters:{country:'UK',businessUnit:'ENG',level:'L3'},unassigned:true,assumptions:originalInputs,draftName:'Unassigned engineering draft',roundTrips:['explicit return','Back then Forward after return','Back then Forward after open'],sameDraftDOM:true,calculatedResultPreserved:true,modelInputs,aiRequests:ai,externalRequests:external,checks:'reset, populated-cost reload, full-shell cost table/mobile scroll, old route redirect, scope gates, no round-trip requests'});
+  evidence.push({width,layout,baselineWindow:points.map(point=>point.planning_month),windowNote:"generic returned Baseline window; no unsupported January/gap claim",aiPreference:'default collapsed; explicit open/collapse preserved',independentBuDraft:true,keyboardDisclosures:true,chartsRestored:true,savedComparison:true,entry:'Planning → Scenario Modeling → in-shell demo',filters:{country:'UK',businessUnit:'ENG',level:'L3'},unassigned:true,assumptions:originalInputs,draftName:'Unassigned engineering draft',roundTrips:['explicit return','Back then Forward after return','Back then Forward after open'],sameDraftDOM:true,calculatedResultPreserved:true,modelInputs,aiRequests:ai,externalRequests:external,checks:'reset, populated-cost reload, full-shell cost table/mobile scroll, old route redirect, scope gates, no round-trip requests'});
   await context.close();
 }}finally{await browser.close();}
 await fs.writeFile(output+'/checks.json',JSON.stringify(evidence,null,2));console.log(JSON.stringify({output,evidence},null,2));

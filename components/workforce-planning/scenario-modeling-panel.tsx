@@ -316,7 +316,7 @@ export function ScenarioModelingPanel({
                 : "hidden"
             }
           >
-          <p className="mb-3 text-sm text-muted-foreground">Company what-if · Jan–Dec 2027 · assumptions, not actuals. September stock carries to January; Oct–Dec 2026 are unmodeled. Workspace filters do not narrow this calculation. Cost period is unverified; outputs are not a spending forecast.</p>
+          <p className="mb-3 text-sm text-muted-foreground">Company what-if · returned Baseline window · assumptions, not actuals. Dates and any gaps depend on the source plan. Workspace filters do not narrow this calculation. Cost period is unverified; outputs are not a spending forecast.</p>
           <div className="mb-6 rounded-lg border p-4">
             <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
               <div>
