@@ -84,12 +84,16 @@ try {for(const width of [1366,390]) {
   assert.equal(await demo().getByRole('combobox').count(),0);assert.ok(await demo().getByText(/Costs unavailable/).isVisible());
   await close();await assertPreserved();await page.screenshot({path:`${output}/${width}-restored-draft.png`,fullPage:true});
   await launch();await heading();await hires().fill('100');await departures().fill('60');await demo().getByRole('button',{name:'Compare',exact:true}).click();
+  await costRate.fill('12.34');await demo().getByRole('button',{name:'Compare',exact:true}).click();
+  const costTable=demo().getByRole('region',{name:'Monthly cost table',exact:true});assert.ok(await costTable.isVisible());
+  assert.ok(await demo().getByRole('heading',{name:'Assumed monthly cost run-rate · USD/month',exact:true}).isVisible());
+  if(width===390){await costTable.evaluate(n=>n.scrollLeft=n.scrollWidth);assert.ok(await costTable.evaluate(n=>n.scrollLeft>0));await page.screenshot({path:`${output}/${width}-cost-scrolled.png`,fullPage:true});await costTable.evaluate(n=>n.scrollLeft=0);}
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.screenshot({path:`${output}/${width}-in-shell-demo.png`,fullPage:true});
-  await page.reload();await heading();assert.equal(await hires().inputValue(),'');
+  await page.reload();await heading();assert.equal(await hires().inputValue(),'');assert.equal(await departures().inputValue(),'');assert.equal(await costRate.inputValue(),'');assert.equal(await demo().getByRole('region',{name:'Assumed monthly cost run-rates',exact:true}).count(),0);
   await page.goto(base+'/planning/headcount-demo');await heading();assert.equal(new URL(page.url()).pathname,'/');assert.equal(new URL(page.url()).searchParams.get('demo'),'headcount');
   assert.deepEqual(ai,[]);assert.deepEqual(errors,[]);assert.deepEqual(external,[]);
-  evidence.push({width,entry:'Planning → Scenario Modeling → in-shell demo',filters:{country:'UK',businessUnit:'ENG',level:'L3'},unassigned:true,assumptions:originalInputs,draftName:'Unassigned engineering draft',roundTrips:['explicit return','Back then Forward after return','Back then Forward after open'],sameDraftDOM:true,calculatedResultPreserved:true,modelInputs,aiRequests:ai,externalRequests:external,checks:'reset, reload, old route redirect, scope gates, no round-trip requests'});
+  evidence.push({width,entry:'Planning → Scenario Modeling → in-shell demo',filters:{country:'UK',businessUnit:'ENG',level:'L3'},unassigned:true,assumptions:originalInputs,draftName:'Unassigned engineering draft',roundTrips:['explicit return','Back then Forward after return','Back then Forward after open'],sameDraftDOM:true,calculatedResultPreserved:true,modelInputs,aiRequests:ai,externalRequests:external,checks:'reset, populated-cost reload, full-shell cost table/mobile scroll, old route redirect, scope gates, no round-trip requests'});
   await context.close();
 }}finally{await browser.close();}
 await fs.writeFile(output+'/checks.json',JSON.stringify(evidence,null,2));console.log(JSON.stringify({output,evidence},null,2));

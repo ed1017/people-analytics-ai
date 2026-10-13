@@ -7,6 +7,9 @@ import {predict} from './baselines.mjs';
 
 export const swpDemoDisclaimer = 'Synthetic demo baseline. Conditional retrospective evaluation; not validated for operational planning.';
 export type SwpUserFlows = {basis:'user-entered';monthlyHires:number;monthlyDepartures:number};
+// With the existing <=1m/month flow bounds, this keeps dollar outputs below 2^40,
+// where Number rounding is far smaller than one cent. This is a support limit, not a pay estimate.
+export const maximumMonthlyCostPerEmployee = 100_000;
 export type SwpUserMonthlyCost = {basis:'user-entered';currency:'USD';unit:'per-employee-month';amount:number};
 const sourceVersion = '64acf5cbb0cddbaa0614e20ee3895cd026ebe3ec9c91fed622820b53b44d63cd';
 // Pin this local demo to the reviewed extract, not merely a caller-supplied version label.
@@ -22,6 +25,7 @@ export function compareSwpHeadcount(history:SwpHistory, assumptions:SwpUserFlows
   const scenario = assumptions ? monthlyHeadcountFlow({asOf, opening, months:6, hires:assumptions.monthlyHires, exits:assumptions.monthlyDepartures, transfersIn:0, transfersOut:0}) : null;
   let cost = null;
   if (monthlyCost !== null) {
+    if (monthlyCost.amount > maximumMonthlyCostPerEmployee) throw Error('Supported monthly USD cost per employee is at most 100,000.00.');
     const cents = Math.round(monthlyCost.amount * 100);
     if (Object.keys(monthlyCost).sort().join(',') !== 'amount,basis,currency,unit' || monthlyCost.basis !== 'user-entered' || monthlyCost.currency !== 'USD' || monthlyCost.unit !== 'per-employee-month' || typeof monthlyCost.amount !== 'number' || !Number.isFinite(monthlyCost.amount) || monthlyCost.amount < 0 || !Number.isSafeInteger(cents) || !/^\d+(?:\.\d{1,2})?$/.test(String(monthlyCost.amount))) throw Error('Enter a nonnegative monthly USD cost per employee with at most two decimal places.');
     const runRate = (headcount:number) => {const value=headcount*cents;if(!Number.isSafeInteger(value))throw Error('The assumed cost is too large to calculate safely.');return value;};

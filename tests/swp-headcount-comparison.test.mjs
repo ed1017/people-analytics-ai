@@ -68,3 +68,16 @@ test('invalid amount, unit, currency, provenance and unsafe products are rejecte
  for(const amount of [undefined,null,'12',NaN,Infinity,-1,1.001,1e-10,1.0000000001,1e15])assert.throws(()=>compareSwpHeadcount(history,flows(0,0),costRate(amount)));
  for(const override of [{currency:'EUR'},{unit:'per-employee-year'},{unit:'per-fte-month'},{basis:'observed'},{benefits:0}])assert.throws(()=>compareSwpHeadcount(history,flows(0,0),{...costRate(12),...override}));
 });
+
+test('bounded rates reject the reported cent-display edge and preserve cents throughout supported extremes',()=>{
+ assert.throws(()=>compareSwpHeadcount(history,flows(1,0),costRate(8744853645.37)),/at most 100,000/);
+ assert.throws(()=>compareSwpHeadcount(history,flows(1,0),costRate(100000.01)),/at most 100,000/);
+ for(const [hires,departures] of [[0,0],[1,0],[1000000,0],[0,1666]])for(const amount of [0,0.01,12.34,99999.99,100000]){
+  const r=compareSwpHeadcount(history,flows(hires,departures),costRate(amount)),rate=BigInt(Math.round(amount*100));
+  const exact=cents=>{const sign=cents<0n?'-':'';const n=cents<0n?-cents:cents;return sign+String(n/100n)+'.'+String(n%100n).padStart(2,'0');};
+  for(let i=0;i<6;i++){
+   const b=BigInt(r.points[i].baseline)*rate,s=BigInt(r.points[i].scenario)*rate;
+   for(const [value,cents] of [[r.cost.points[i].baseline,b],[r.cost.points[i].scenario,s],[r.cost.points[i].difference,s-b]])assert.equal(value.toLocaleString('en-US',{useGrouping:false,minimumFractionDigits:2,maximumFractionDigits:2}),exact(cents));
+  }
+ }
+});

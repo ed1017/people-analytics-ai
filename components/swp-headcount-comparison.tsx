@@ -2,7 +2,7 @@
 
 import {useId, useState} from 'react';
 import type {SwpHistory} from '../lib/swp-history-qualification';
-import {compareSwpHeadcount, swpDemoDisclaimer, type SwpUserFlows, type SwpUserMonthlyCost} from '../experiments/swp-headcount/comparison';
+import {compareSwpHeadcount, maximumMonthlyCostPerEmployee, swpDemoDisclaimer, type SwpUserFlows, type SwpUserMonthlyCost} from '../experiments/swp-headcount/comparison';
 
 const format = (v:number) => v.toLocaleString('en-US', {maximumFractionDigits:1});
 const money = (v:number) => v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -38,7 +38,7 @@ export function SwpHeadcountComparison({history}:{history:SwpHistory}) {
           <label style={{flex:'1 1 160px'}}>Monthly departures<input aria-describedby={id+'-help'} inputMode="numeric" value={departures} onChange={e=>edit('departures',e.target.value)} style={{display:'block',width:'100%',minHeight:44,boxSizing:'border-box',padding:8,border:'1px solid #64748b',borderRadius:4}}/></label>
         </div>
         <label style={{display:'block',marginTop:12}}>Monthly USD cost per employee (optional)<input inputMode="decimal" aria-describedby={id+'-cost-help'} value={rate} onChange={e=>edit('rate',e.target.value)} style={{display:'block',width:'100%',maxWidth:260,minHeight:44,boxSizing:'border-box',padding:8,border:'1px solid #64748b',borderRadius:4}}/></label>
-        <p id={id+'-cost-help'} style={{margin:'6px 0'}}>Your assumed rate per employee per month, applied equally to both paths. No FTE scaling, component additions or currency conversion. Blank means unknown.</p>
+        <p id={id+'-cost-help'} style={{margin:'6px 0'}}>Your assumed rate per employee per month, applied equally to both paths. No FTE scaling, component additions or currency conversion. Blank means unknown. Supported range: USD 0–{format(maximumMonthlyCostPerEmployee)} per employee per month.</p>
         <div style={{display:'flex',gap:12,marginTop:12}}><button type="submit" style={{minHeight:44,padding:'8px 14px'}}>Compare</button><button type="button" onClick={()=>{setHires('');setDepartures('');setRate('');setCost(null);setAssumptions(null);setError('');}} style={{minHeight:44,padding:'8px 14px'}}>Reset</button></div>
         {error && <p role="alert" style={{color:'#a11818'}}>{error}</p>}
       </fieldset>
