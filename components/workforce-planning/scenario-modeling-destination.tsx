@@ -1,5 +1,5 @@
 import { TrainingTimingPanel } from "@/components/training-timing-panel";
-import Link from 'next/link';
+import {HeadcountDemoWorkspace} from './headcount-demo-workspace';
 import type { ComponentProps } from "react";
 
 import { ScenarioComparisonTable } from "./scenario-comparison-table";
@@ -40,10 +40,7 @@ export function ScenarioModelingDestination({
       data-planning-destination="scenario-modeling"
       className={visible ? "evidence-pane space-y-6" : "hidden"}
     >
-      <div className="rounded-lg border p-4">
-        <Link href="/planning/headcount-demo" prefetch={false} className="inline-flex min-h-11 items-center font-semibold underline">Compare headcount — synthetic demo baseline</Link>
-        <p className="text-sm text-muted-foreground">Company-wide headcount only. Conditional retrospective evaluation; not validated for operational planning.</p>
-      </div>
+      <HeadcountDemoWorkspace>
       <ScenarioPlanSummary
         visible
         planningLoading={planningLoading}
@@ -74,7 +71,7 @@ export function ScenarioModelingDestination({
       />
 
       <TrainingTimingPanel suggestedMonth={activePlanningStart?.planning_month.slice(0,7)??""} />
-
+      </HeadcountDemoWorkspace>
     </div>
   );
 }
