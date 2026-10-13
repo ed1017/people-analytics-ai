@@ -128,7 +128,9 @@ export function mergeSolutionConstraints(request:SolutionRequest,previous:Soluti
  for(const value of updates){
   assertSolutionShape(value,solutionConstraintSchema,'constraint');
   const delivery=request.state.staffingDeliveryTarget;
-  if(delivery&&value.field==='horizon_months'&&(delivery.issue||value.action==='set'&&value.number!==delivery.months||value.action==='remove'&&delivery.months!==null))fail('The interpreted delivery constraint conflicts with the explicit staffing deadline. Keep the cost horizon separate.');
+  // This turn's explicit staffing interpretation must agree. Retained staffing targets
+  // remain authoritative for their cards, but must not constrain another plan's horizon.
+  if(delivery&&delivery.turnId===request.message.id&&(delivery.months!==null||delivery.issue)&&value.field==='horizon_months'&&(delivery.issue||value.action==='set'&&value.number!==delivery.months||value.action==='remove'&&delivery.months!==null))fail('The interpreted delivery constraint conflicts with the explicit staffing deadline. Keep the cost horizon separate.');
   const unit={budget_usd:'USD',max_hours:'hours/total',horizon_months:'months',population:'text',requirements:'text'}[value.field];
   if(!positions.has(value.turnId)||value.unit!==unit||value.action==='remove'&&(value.number!==null||value.text!==null)||value.action==='set'&&(['population','requirements'].includes(value.field)?value.number!==null||!text(value.text,240):value.number===null||!Number.isFinite(value.number)||value.text!==null))fail('A constraint needs a user-turn reference and supported units.');
   const old=result.get(value.field);

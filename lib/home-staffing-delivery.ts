@@ -25,7 +25,7 @@ export function captureStaffingDelivery(turn:{id:string;text:string},clarificati
   const found=expressions.flatMap(pattern=>[...clause.matchAll(pattern)]);
   if(new RegExp('months?\\s+(?:and|or)\\s+('+amount+')\\s+months?','i').test(clause))uncertain=true;
   if(found.length){
-   if(/\b(?:not|never|if|maybe|perhaps|example|could|would|should)\b|\bcan (?:we|you)\b|n't\b|\d\s*[-–/]\s*\d|\b(?:or|between|at least)\b/i.test(clause))uncertain=true;
+   if(text.includes('?')||/\b(?:not|never|if|unless|maybe|perhaps|example|could|would|should|may|might)\b|\bcan (?:we|you)\b|n't\b|\d\s*[-–/]\s*\d|\b(?:or|between|at least)\b/i.test(clause))uncertain=true;
    for(const match of found){const value=match[1].toLowerCase().replaceAll('-',' '),months=/^\d/.test(value)?Number(value):words.indexOf(value);if(!Number.isInteger(months)||months<1||months>24)uncertain=true;else values.push(months);}
   }else if(named&&/\b(?:unchanged|same|keep|retain|what|which|show|explain|remind)\b/i.test(clause))continue;
   else if(named||/\bby\s+(?!hir(?:e|ing)\b|train(?:ing)?\b|redeploy|transfer|using\b)/i.test(clause)||/\b(?:within|in(?: the next)?|no later than|by(?: the end of)?)\b.*\b(?:months?|weeks?|days?|year|january|february|march|april|may|june|july|august|september|october|november|december)\b/i.test(clause))uncertain=true;

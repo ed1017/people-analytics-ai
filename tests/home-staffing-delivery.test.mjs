@@ -137,3 +137,36 @@ test('legacy horizon-only targets survive discussion and support explicit edits 
   const reply=await converseSolutions(follow,runtime,new AbortController().signal);assert.equal(resolveStaffingDeliveryTarget(reply.state).months,months,text);
  }
 });
+
+test('question and uncertain modal deadlines require clarification before model execution',async()=>{
+ for(const text of ['Do we need 10 people within 3 months?','We might need 10 people within 3 months.','We may need 10 people within 3 months.']){
+  const capture=captureStaffingDelivery({id:'user-1',text});assert.equal(capture.months,null,text);assert.ok(capture.issue,text);assert.deepEqual(readStaffingDeliveryCapture(capture),capture);
+  const fixture=setup(text),reply=await run(fixture);assert.equal(fixture.runtime.rounds,0,text);assert.equal(reply.usage.modelRounds,0,text);assert.ok(resolveStaffingDeliveryTarget(reply.state).issue,text);
+ }
+});
+
+test('unrelated plan horizons can change while a staffing deadline is unresolved or removed',async()=>{
+ const unresolved=await run(setup('We need 10 people within 3 or 6 months. Compare hiring and training.'));
+ const ready=await run(setup()),remove=setup('Remove the delivery deadline.',ready.state);remove.runtime=fixtureRuntime([final('The delivery deadline is removed.')]);remove.runtime.natural={datasetToken:'legacy-v1:0'};
+ const removed=await run(remove);
+ for(const prior of [unresolved,removed]){
+  const request=solutionRequest('Switch topics: create a retention plan with a six-month horizon.',false,prior.state,3),answer=final('Review the retention plan over six months.');
+  answer.constraintUpdates=[{action:'set',field:'horizon_months',number:6,text:null,unit:'months',turnId:request.message.id}];
+  const runtime=fixtureRuntime([answer]);runtime.natural={datasetToken:'legacy-v1:0'};
+  const reply=await converseSolutions(request,runtime,new AbortController().signal);
+  assert.equal(runtime.rounds,1);assert.equal(reply.state.constraints.find(c=>c.field==='horizon_months').number,6);
+  assert.deepEqual(reply.state.staffingDeliveryTarget,prior.state.staffingDeliveryTarget);
+  assert.deepEqual(resolveStaffingDeliveryTarget(reply.state),resolveStaffingDeliveryTarget(prior.state),'staffing eligibility is unchanged by another plan horizon');
+ }
+});
+
+test('legacy deadline correction removes stale generic interpretation from model context',async()=>{
+ const first=solutionRequest('We need 10 people within 3 months.',false,undefined,1),state=first.state;
+ state.constraints=[{action:'set',field:'horizon_months',number:3,text:null,unit:'months',turnId:first.message.id}];state.turns=[{...first.message,role:'user'}];
+ for(const text of ['Actually, within four months.','Remove the delivery deadline.']){
+  const request=solutionRequest(text,false,state,2),runtime=fixtureRuntime([final('Review the updated delivery target.')]);runtime.natural={datasetToken:'legacy-v1:0'};
+  const reply=await converseSolutions(request,runtime,new AbortController().signal),context=JSON.parse(runtime.contexts[0][0].content.split('\n').slice(1).join('\n'));
+  assert.deepEqual(context.currentConstraints,[],text);assert.deepEqual(reply.state.constraints,[],text);
+  assert.equal(context.staffingDeliveryTarget.months,text.startsWith('Actually')?4:null,text);
+ }
+});

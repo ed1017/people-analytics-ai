@@ -88,7 +88,12 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  abort(signal);
  if(runtime.natural&&(hasExplicitStaffingRequirement(request.message.text)||requiresRequiredStaffing(request)||state.requiredStaffing||state.staffingDeliveryTarget||state.constraints.some(c=>c.field==='horizon_months'&&c.action==='set'))){
   const captured=captureStaffingDelivery(request.message,!!state.staffingDeliveryTarget?.issue);
-  if(captured)state.staffingDeliveryTarget=captured;
+  if(captured){
+   const previous=state.staffingDeliveryTarget;
+   // The dedicated record replaces only the matching legacy staffing interpretation.
+   state.constraints=state.constraints.filter(c=>c.field!=='horizon_months'||!!previous&&(c.turnId!==previous.turnId||c.number!==previous.months));
+   state.staffingDeliveryTarget=captured;
+  }
   if(captured?.issue){
    const answer=captured.issue;state.questions=[answer];
    state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:answer}].slice(-32);
