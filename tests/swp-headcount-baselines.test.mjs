@@ -4,6 +4,7 @@ import {mkdtempSync, writeFileSync, readFileSync, rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {spawnSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
 import {predict, errors, evaluate, select, protocol} from '../experiments/swp-headcount/baselines.mjs';
 import {swpBacktestWindows} from '../lib/swp-history-qualification.ts';
 const months = Array.from({length: 33}, (_, i) => new Date(Date.UTC(2024, i, 1)).toISOString().slice(0, 7));
@@ -54,7 +55,22 @@ test('two-stage runner freezes selection before holdout and rejects altered prov
     const r = JSON.parse(readFileSync(result));
     assert.equal(r.selected, 'drift'); assert.equal(r.holdout.drift.overall.mae, 0);
     assert.equal(r.operationalForecastAvailable, false); assert.equal(r.intervalAvailable, false);
-    const altered = JSON.parse(readFileSync(frozen)); altered.selected = 'last-value'; writeFileSync(frozen, JSON.stringify(altered));
-    assert.notEqual(run('holdout', holdout, frozen, join(dir, 'bad.json')).status, 0);
+    const original = JSON.parse(readFileSync(frozen));
+    const digest = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+    const mutations = {
+      selection: f => {f.selected = 'last-value';},
+      protocol: f => {f.protocol.simplicityTolerance = 1;},
+      protocolRehashed: f => {f.protocol.horizonMonths = 3; f.protocolHash = digest(f.protocol);},
+      history: f => {f.history.points[0].value += 1;},
+      historyRehashed: f => {f.history.points[0].value += 1; f.inputHash = digest(f.history);},
+      scopeRehashed: f => {f.history.scope.dimension = 'business-unit'; f.inputHash = digest(f.history);},
+      calendarRehashed: f => {f.history.points[0].month = '2023-12'; f.inputHash = digest(f.history);},
+      window: f => {f.windows.development[0].targets[0] = '2026-04';},
+      holdoutWindow: f => {f.windows.holdout.origin = '2026-04';},
+    };
+    for (const [name, mutate] of Object.entries(mutations)) {
+      const altered = structuredClone(original); mutate(altered); writeFileSync(frozen, JSON.stringify(altered));
+      assert.notEqual(run('holdout', holdout, frozen, join(dir, name + '.json')).status, 0, name);
+    }
   } finally {rmSync(dir, {recursive: true, force: true});}
 });

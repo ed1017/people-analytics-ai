@@ -13,12 +13,15 @@ const [phase, input, frozenPath, output] = process.argv.slice(2);
 if (!['develop', 'holdout'].includes(phase) || !input || !frozenPath) throw Error('Usage: node run.mjs develop development-history.json frozen.json | holdout holdout.json frozen.json results.json');
 const frozenMonths = Array.from({length: 33}, (_, i) => new Date(Date.UTC(2024, i, 1)).toISOString().slice(0, 7));
 const windows = swpBacktestWindows(frozenMonths, 12, 6, 6);
-if (phase === 'develop') {
-  // This input physically contains only the first 27 observations. No holdout file is opened.
-  const history = read(input);
+function verifyDevelopment(history) {
   if (history.scope.dimension !== 'company' || history.metric.kind !== 'headcount' || JSON.stringify(history.points.map(p => p.month)) !== JSON.stringify(frozenMonths.slice(0, 27))) throw Error('Expected qualified company headcount January 2024–March 2026 only.');
   const qualification = qualifySwpHistory(history);
   if (!qualification.conditionalRetrospectiveEligible) throw Error(`History blocked: ${qualification.reasons.join(', ')}`);
+}
+if (phase === 'develop') {
+  // This input physically contains only the first 27 observations. No holdout file is opened.
+  const history = read(input);
+  verifyDevelopment(history);
   const development = evaluate(history.points, windows.development);
   const selected = select(development);
   save(frozenPath, {protocol, protocolHash: hash(protocol), inputHash: hash(history), history,
@@ -29,6 +32,7 @@ if (phase === 'develop') {
   if (!output) throw Error('Holdout results path required.');
   const frozen = read(frozenPath);
   if (frozen.protocolHash !== hash(protocol) || hash(frozen.protocol) !== hash(protocol) || frozen.inputHash !== hash(frozen.history) || JSON.stringify(frozen.windows) !== JSON.stringify(windows)) throw Error('Frozen protocol/input/windows mismatch.');
+  verifyDevelopment(frozen.history);
   const reproduced = evaluate(frozen.history.points, windows.development);
   if (JSON.stringify(reproduced) !== JSON.stringify(frozen.development) || select(reproduced) !== frozen.selected) throw Error('Frozen selection not reproducible.');
   const holdout = read(input);
