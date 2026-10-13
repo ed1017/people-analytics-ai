@@ -1,4 +1,5 @@
 "use client";
+import {usePendingRequest} from "./use-pending-request";
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import {guidedReturnKey,readGuidedReturn,type GuidedReturn} from '@/lib/home-guided-return';
 import {isFirstHomeVisit} from '@/lib/home-onboarding';
@@ -62,7 +63,7 @@ export function useProblemConversation(scope = "home") {
     setInput(current=>currentGoalMatches()&&!current.trim()?prompt:current);
     return true;
   };
-  const [loading, setLoading] = useState(false);
+  const {pending:loading,setPending:setLoading,startedAt:pendingStartedAt}=usePendingRequest();
   const [error, setError] = useState<string | null>(null);
   const [problem, setProblem] = useState<HomeDecisionContext | null>(null);
   const [questionUnanswered, setQuestionUnanswered] = useState(false);
@@ -275,7 +276,7 @@ export function useProblemConversation(scope = "home") {
     if(current.activeId)persist({...current,activeId:""});
     setResetEpoch(value=>value+1);
   };
-  return { firstHomeVisit,recoveredPlanSelectionRequired,beginGuidedExploration,endGuidedExploration,resetConversation,resetEpoch,wasReset:Object.hasOwn(resetMarks,'*')||Object.hasOwn(resetMarks,scope),historyMessages:storedMessages, canSubmitPrompt, confirmWorkforceGoal, selectProposalGoal, saved:decisionStorage.saved, retrySave:()=>recoverStorage(),recovery:decisionStorage.recovery,recoverSaved:()=>recoverStorage(true), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, closeIssueEditor, openIssueEditor, updateIssueDraft, updateIssueContext, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
+  return { firstHomeVisit,recoveredPlanSelectionRequired,beginGuidedExploration,endGuidedExploration,resetConversation,resetEpoch,wasReset:Object.hasOwn(resetMarks,'*')||Object.hasOwn(resetMarks,scope),historyMessages:storedMessages, canSubmitPrompt, confirmWorkforceGoal, selectProposalGoal, saved:decisionStorage.saved, retrySave:()=>recoverStorage(),recovery:decisionStorage.recovery,recoverSaved:()=>recoverStorage(true), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, closeIssueEditor, openIssueEditor, updateIssueDraft, updateIssueContext, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, pendingStartedAt, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
 }
 export type ProblemConversation = ReturnType<typeof useProblemConversation>;
 

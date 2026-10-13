@@ -1,4 +1,5 @@
 'use client';
+import {usePendingRequest} from './use-pending-request';
 import {requiredStaffingPlanIdentity} from '@/lib/home-required-staffing-plan';
 import {currentRequiredStaffing,resolveStaffingDeliveryTarget,retainStaffingDeliveryTarget} from '@/lib/home-required-staffing';
 import {prepareRequiredStaffingPlan,requiredStaffingPlanFields} from '@/lib/home-required-staffing-plan-save';
@@ -35,7 +36,8 @@ export function useHomeSolutionConversation(props:Props){
  function hiringInputsDirty(){return hiringEditRef.current?.dirty===true&&hiringEditRef.current.key===JSON.stringify(memoryRef.current.hiringBudget);}
  function setHiringEditorDirty(key:string,dirty:boolean){if(!dirty)setNotice(current=>current===hiringEditsMessage?'':current);if(key!==JSON.stringify(memoryRef.current.hiringBudget))return;hiringEditRef.current={key,dirty};setHiringEdit({key,dirty});}
  function requireReviewedHiringInputs(){if(hiringInputsDirty())throw Error(hiringEditsMessage);}
- const storage=useDecisionStorage(),[memory,setMemory]=useState<SolutionState>(emptySolutionState),[pending,setPending]=useState(false),[saving,setSaving]=useState(false),[notice,setNotice]=useState('');
+ const storage=useDecisionStorage(),[memory,setMemory]=useState<SolutionState>(emptySolutionState),[saving,setSaving]=useState(false),[notice,setNotice]=useState('');
+ const {pending,setPending,startedAt:pendingStartedAt}=usePendingRequest();
  const controller=useRef<AbortController|null>(null),epoch=useRef(0),mounted=useRef(false),memoryRef=useRef(memory),currentProps=useRef(props);
  useLayoutEffect(()=>{currentProps.current=props;});
  useLayoutEffect(()=>{mounted.current=true;return()=>{mounted.current=false;controller.current?.abort();};},[]);
@@ -43,7 +45,7 @@ export function useHomeSolutionConversation(props:Props){
  useLayoutEffect(()=>{
   const identity=()=>{const snapshot=decisionStore.getSnapshot(),goals=snapshot.data.goals;return JSON.stringify([goals.activeId,goals.goals.find(goal=>goal.id===goals.activeId)?.statement,snapshot.saved]);};
   let previous=identity();return decisionStore.subscribe(()=>{const next=identity();if(next===previous)return;previous=next;epoch.current++;controller.current?.abort();controller.current=null;setPending(false);});
- },[]);
+ },[setPending]);
  const goal={id:props.conversation.activeGoalId,statement:props.conversation.focusedIssue};
  const guideId=props.guided?.goalId??null;
  // Recovery advances workspaceKey even when the goal itself is unchanged. Reload
@@ -59,7 +61,7 @@ export function useHomeSolutionConversation(props:Props){
  const progressInput=captureGoalProgressInput(decisionStore,goal.id);
  const contextKey=JSON.stringify([goal,guideId,props.active,props.settled,props.scope,props.query,props.evidence,props.evidenceContext,props.conversation.resetEpoch,props.conversation.issueEditor?.id,progressInput]);
  const liveKey=useRef(contextKey);
- useLayoutEffect(()=>{if(liveKey.current!==contextKey){liveKey.current=contextKey;epoch.current++;controller.current?.abort();setPending(false);}},[contextKey]);
+ useLayoutEffect(()=>{if(liveKey.current!==contextKey){liveKey.current=contextKey;epoch.current++;controller.current?.abort();setPending(false);}},[contextKey,setPending]);
  function catalog():PlanAlternatives|null{
   const p=currentProps.current,g={goalId:p.conversation.activeGoalId,goal:p.conversation.focusedIssue},snapshot=decisionStore.getSnapshot(),raw=snapshot.data.workspaces[g.goalId]?.fields[planAlternativesField];
   if(raw!==undefined){const value=readPlanAlternatives(raw,g);if(!value)throw Error('Saved plans could not be verified. They have been preserved.');return value;}
@@ -196,5 +198,5 @@ export function useHomeSolutionConversation(props:Props){
   }catch(error){setNotice((error as Error).message);}finally{setSaving(false);}
  }
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
- return {staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }
