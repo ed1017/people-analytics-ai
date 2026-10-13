@@ -7,7 +7,8 @@ import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
 import postcss from 'postcss';
 import tailwind from '@tailwindcss/postcss';
 import {converseSolutions} from '../../lib/home-solution-conversation-service.ts';
-import {fixtureRuntime} from '../fixtures/home-solution-conversation.mjs';
+import {fixtureRuntime,final} from '../fixtures/home-solution-conversation.mjs';
+import {staffingDeliveryPrompt,syntheticDeliveryChanges} from '../fixtures/staffing-delivery-prompt.mjs';
 import {fixedMessages,fixedSteps,liveStaffingMessage} from '../fixtures/required-staffing.mjs';
 import {readStaffingScenario,staffingScenarioLabel} from '../../lib/home-staffing-scenario.ts';
 import {DECISIONS_STORAGE_KEY,encodeDecisions} from '../../lib/local-decisions.ts';
@@ -34,18 +35,18 @@ try{for(const [mode,width,height] of [['desktop',1440,1100],['phone',390,844]]){
    if(isolated){
     const scenario=body.message.text===liveStaffingMessage;
     if(scenario)assert.ok(readStaffingScenario(body,{natural:true,datasetToken:'legacy-v1:0'}),'actual fresh UI request must be eligible: '+JSON.stringify({scope:body.scope,filters:body.filters,goal:body.goal,goalContext:body.goalContext,selectedId:body.selectedId,catalog:body.catalog,goalProgress:body.goalProgress,progressEntry:body.progressEntry,message:body.message,planningCalculatorAvailable:body.planningCalculatorAvailable,state:body.state,evidenceDatasetContext:body.evidence.datasetContext}));
-    const steps=fixedSteps(body),start=isolated.sandbox.__requests.length;
+    const steps=body.message.text===staffingDeliveryPrompt?[{name:'compare_required_staffing',args:{changes:syntheticDeliveryChanges(body)}},final('The delivery target is three months; costs use the first year. Complete costs and readiness remain unknown.')]:fixedSteps(body),start=isolated.sandbox.__requests.length;
     isolated.sandbox.__forbidProvider=scenario;
     const reads=isolated.sandbox.__aggregateReads?.length??0;
-    if(!scenario){isolated.sandbox.__replies.push(responseForStep(steps[0],0));if(body.catalog)isolated.sandbox.__replies.push(request=>responseForStep(steps[1](request.input),1));}
+    if(!scenario){isolated.sandbox.__replies.push(responseForStep(steps[0],0));if(body.catalog||body.message.text===staffingDeliveryPrompt)isolated.sandbox.__replies.push(request=>responseForStep(typeof steps[1]==='function'?steps[1](request.input):steps[1],1));}
     const response=await isolated.post(new Request(req.url(),{method:req.method(),headers:req.headers(),body:req.postData()})),reply=await response.json();
-    assert.equal(response.status,200,JSON.stringify(reply));assert.equal(isolated.sandbox.__requests.length-start,scenario?0:body.catalog?2:1);
+    assert.equal(response.status,200,JSON.stringify(reply));assert.equal(isolated.sandbox.__requests.length-start,scenario?0:body.catalog||body.message.text===staffingDeliveryPrompt?2:1);
     if(scenario){assert.equal(isolated.sandbox.__aggregateReads?.length??0,reads);assert.ok(reply.answer.startsWith(staffingScenarioLabel));assert.deepEqual(reply.charts,[]);assert.deepEqual(reply.usage,{modelRounds:0,toolCalls:0});}
-    else if(!body.catalog){assert.deepEqual(JSON.parse(JSON.stringify(isolated.sandbox.__requests[start].tool_choice)),{type:'function',name:'compare_required_staffing'});assert.deepEqual(JSON.parse(JSON.stringify(isolated.sandbox.__requests[start].tools.map(t=>t.name))),['compare_required_staffing']);assert.match(JSON.stringify(isolated.sandbox.__requests[start].input),/evidenceGrounding/);}
-    if(reply.providerReceipt)assert.equal(reply.providerReceipt.modelAttempts,scenario?0:body.catalog?2:1);
+    else if(!body.catalog&&body.message.text!==staffingDeliveryPrompt){assert.deepEqual(JSON.parse(JSON.stringify(isolated.sandbox.__requests[start].tool_choice)),{type:'function',name:'compare_required_staffing'});assert.deepEqual(JSON.parse(JSON.stringify(isolated.sandbox.__requests[start].tools.map(t=>t.name))),['compare_required_staffing']);assert.match(JSON.stringify(isolated.sandbox.__requests[start].input),/evidenceGrounding/);}
+    if(reply.providerReceipt)assert.equal(reply.providerReceipt.modelAttempts,scenario?0:body.catalog||body.message.text===staffingDeliveryPrompt?2:1);
     return route.fulfill({json:reply});
    }
-   const runtime=fixtureRuntime(fixedSteps(body));runtime.natural={datasetToken:'legacy-v1:0'};
+   const runtime=fixtureRuntime(body.message.text===staffingDeliveryPrompt?[{name:'compare_required_staffing',args:{changes:syntheticDeliveryChanges(body)}},final('The delivery target is three months; costs use the first year. Complete costs and readiness remain unknown.')]:fixedSteps(body));runtime.natural={datasetToken:'legacy-v1:0'};
    return route.fulfill({json:await converseSolutions(body,runtime,new AbortController().signal)});
   }
   if(req.method()==='POST'){external++;return route.abort();}
@@ -101,6 +102,18 @@ try{for(const [mode,width,height] of [['desktop',1440,1100],['phone',390,844]]){
  check('invalid saved catalog blocks recommendation and pin without a request',await card.getByText('Recommended',{exact:true}).count()===0&&await card.getByRole('button',{name:/Pin.*Action Plan/}).count()===0&&requests.length===requestCount&&external===0);
  check('invalid saved catalog and valid staffing conversation remain unchanged in storage',await page.evaluate(key=>localStorage.getItem(key),DECISIONS_STORAGE_KEY)===invalidRaw);
  await card.screenshot({path:path.join(output,mode+'-invalid-catalog.png')});
+ // Exact user prompt from UI evidence, with synthetic provider responses that omit constraints.
+ await page.evaluate(()=>localStorage.clear());await page.reload();if(fullUI)await dismissHomeOnboarding(page);
+ await send(staffingDeliveryPrompt);await card.waitFor();
+ const delivered=await state(),memory=delivered.exploration.fields.homeSolutionConversationV1;
+ check('explicit three-month deadline appears on all cards despite omitted provider constraints',await card.getByText('Delivery target: 3 months',{exact:true}).count()===3&&memory.constraints.length===0&&memory.staffingDeliveryTarget.quote===staffingDeliveryPrompt);
+ check('first-year costs and partial labor remain separate from delivery target',await card.innerText().then(t=>t.includes('495,000 USD')&&t.includes('240 hours')&&t.includes('Cost horizon: 12 months'))&&memory.requiredStaffing.inputs.costsComplete===null&&memory.requiredStaffing.origins.redeploymentCostPerPerson.kind==='model-proposed');
+ await card.getByRole('button',{name:'Pin Action Plan',exact:true}).click();await card.getByRole('button',{name:/Pinned Action Plan/}).waitFor();
+ const savedDelivery=await state(),deliveryWorkspace=savedDelivery.workspaces[savedDelivery.goals.activeId],receipt=deliveryWorkspace.fields.homePlanAlternativesV1.plans[0].draft.inputs.requiredStaffingPlan;
+ check('pin keeps exact delivery provenance and twelve-month cost basis',receipt.deliveryTarget.months===3&&receipt.deliveryTarget.quote===staffingDeliveryPrompt&&receipt.review.inputs.months===12);
+ await page.reload();if(fullUI)await dismissHomeOnboarding(page);await card.waitFor();
+ check('reload preserves deadline and pinned identity without another request',await card.getByRole('button',{name:/Pinned Action Plan/}).isDisabled()&&await card.getByText('Delivery target: 3 months',{exact:true}).count()===3&&errors.length===0&&external===0);
+ await card.screenshot({path:path.join(output,mode+'-captured-deadline.png')});
  await context.close();
 }}finally{await browser.close()}
 await fs.writeFile(path.join(output,'checks.json'),JSON.stringify({checks},null,2));console.log(JSON.stringify({checks:checks.length,output}));

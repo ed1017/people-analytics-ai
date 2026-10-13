@@ -1,3 +1,5 @@
+// @ts-expect-error Native fixtures share source.
+import {captureStaffingDelivery} from './home-staffing-delivery.ts';
 // @ts-expect-error Native fixture tests share source.
 import {canReviewConditionalHiringPlan,canReviewCostedHiringPlan} from './home-hiring-plan.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -13,7 +15,7 @@ import {hiringBudgetTool,currentHiringBudget,hiringBudgetView,editHiringBudget} 
 // @ts-expect-error Native Node tests share TypeScript source.
 import {answerEvidenceSeries,type ChatEvidenceSeries} from './chat-evidence-series.ts';
 // @ts-expect-error Native Node tests share application source.
-import {retainStaffingDeliveryTarget,requiredStaffingTool,currentRequiredStaffing,requiredStaffingView,editRequiredStaffing,requiresRequiredStaffing,canCompleteRequiredStaffingAlone,requiredStaffingAnswer} from './home-required-staffing.ts';
+import {hasExplicitStaffingRequirement,retainStaffingDeliveryTarget,requiredStaffingTool,currentRequiredStaffing,requiredStaffingView,editRequiredStaffing,requiresRequiredStaffing,canCompleteRequiredStaffingAlone,requiredStaffingAnswer} from './home-required-staffing.ts';
 import type {verifySolutionEvidence} from './home-solution-grounding.mjs';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {homeAnswerScopeViolation} from './home-answer-scope.ts';
@@ -72,7 +74,7 @@ function checkedMetricReferences(state:SolutionState,kind:SolutionMetricRef['kin
 }
 export function solutionModelContext(request:SolutionRequest,progress?:GoalProgressConversation){
  const saved=request.catalog?.plans.filter(plan=>!plan.deleted)??[];
- return {goal:request.goal,scope:request.scope,filters:request.filters,timeZone:request.timeZone,goalContext:request.goalContext,...(progress?{savedGoalProgress:progress}:{}),currentEvidence:request.evidence,citationCatalog:actionEvidenceCatalog(request.evidence),currentConstraints:request.state.constraints,
+ return {goal:request.goal,scope:request.scope,filters:request.filters,timeZone:request.timeZone,goalContext:request.goalContext,...(progress?{savedGoalProgress:progress}:{}),currentEvidence:request.evidence,citationCatalog:actionEvidenceCatalog(request.evidence),currentConstraints:request.state.constraints,...(request.state.staffingDeliveryTarget?{staffingDeliveryTarget:request.state.staffingDeliveryTarget}:{}),
   savedPlans:saved.map(plan=>({id:plan.id,number:plan.number,revision:plan.draft.revision,name:plan.draft.bundle.name,objective:plan.draft.bundle.objective,activities:plan.draft.bundle.components})),selectedPlan:saved.some(plan=>plan.id===request.selectedId)?solutionPlanView(saved.find(plan=>plan.id===request.selectedId)!):null,
   recentTurns:request.state.turns,modelView:{version:1,omittedInternalEqualityKeys:['draft.signature','result.signature','result.bindingKey','result.inputKey','evaluation.sourceKeys'],authoritativeState:'Retained on the server; projected views cannot be saved or used as authoritative input.',history:'All retained turns; no history truncation during projection.'},currentWorkingRevisions:currentSolutionProposals(request.state).map(({id,revision,candidate},index)=>({id,revision,name:candidate.name,label:`Proposed Action Plan ${index+1}`})),workingProposals:request.state.working.map(item=>{const view=solutionEvaluationView(request,item);return {...view,inputs:item.draft?.inputs??null,draft:undefined,result:item.result?solutionResultView(item.result):null};}),
   analyses:request.state.analyses.map(item=>({id:item.id,revision:item.revision,method:item.spec.method,months:item.spec.months,assumptions:item.assumptions,opening:item.inputs.opening,asOf:item.inputs.asOf,scope:item.inputs.scope,interpretations:item.interpretations,finalHeadcount:item.points.at(-1)?.headcount})),
@@ -83,6 +85,16 @@ export function solutionModelContext(request:SolutionRequest,progress?:GoalProgr
 /** Bounded model-directed read/calculation loop. No write, model switch or automatic retry. */
 export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,signal:AbortSignal):Promise<SolutionReply>{
  const original=readSolutionRequest(raw),request=structuredClone(original),state=request.state;
+ abort(signal);
+ if(runtime.natural&&(hasExplicitStaffingRequirement(request.message.text)||requiresRequiredStaffing(request)||state.requiredStaffing||state.staffingDeliveryTarget?.issue)){
+  const captured=captureStaffingDelivery(request.message,!!state.requiredStaffing,!!state.staffingDeliveryTarget?.issue);
+  if(captured)state.staffingDeliveryTarget=captured;
+  if(state.staffingDeliveryTarget?.issue){
+   const answer=state.staffingDeliveryTarget.issue;state.questions=[answer];
+   state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:answer}].slice(-32);
+   return {requestId:request.requestId,answer,candidateIds:[],analysisIds:[],charts:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
+  }
+ }
  if(runtime.staffingScenarioOnly){
   const scenario=readStaffingScenario(request,{natural:!!runtime.natural,datasetToken:runtime.natural?.datasetToken??''});
   if(!scenario||runtime.grounding||runtime.demand)throw Error('The illustrative staffing contract is not eligible.');

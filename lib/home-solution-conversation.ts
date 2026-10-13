@@ -1,4 +1,6 @@
 // @ts-expect-error Native fixtures share source.
+import {readStaffingDeliveryCapture,type StaffingDeliveryCapture} from './home-staffing-delivery.ts';
+// @ts-expect-error Native fixtures share source.
 import {captureMetricHistory} from './home-metric-context.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {proposedPlanningEstimate,proposedPlanningInputs,type PlanningInput} from './home-proposed-planning.ts';
@@ -41,7 +43,7 @@ export const solutionConversationField='homeSolutionConversationV1';
 export type SolutionTurn={id:string;role:'user'|'assistant';text:string};
 export const solutionProvenanceVersion=1 as const;
 export type SolutionEvaluation={provenanceVersion?:1;id:string;revision:number;requestId:string;message:{id:string;text:string};candidate:SolutionCandidate;binding:ActionBinding;draft:BundleDraft|null;result:BundleResult|null;sourceRefs:AlternativeSourceRef[];sourceKeys:Record<string,string>;constraints:SolutionConstraint[];interpretations:string[];changes:string[];issues:string[];blocking:string[]};
-export type SolutionState={conditionalHiringPlan?:boolean;currentCalculationKinds?:Array<'hiring'|'required-staffing'>;recommendationRequestId?:string|null;requiredStaffing?:RequiredStaffingReview|null;hiringBudget?:HiringBudgetReview|null;businessPlanning?:BusinessPlanning|null;datasetEvidenceContexts?:ReturnType<typeof readCandidateHomeContext>[];version:1;verifiedMetrics:SolutionMetricRef[];turns:SolutionTurn[];constraints:SolutionConstraint[];working:SolutionEvaluation[];analyses:HeadcountProjection[];rejected:{candidateId:string;revision:number;reason:string;turnId:string}[];questions:string[];focusCandidateId:string|null};
+export type SolutionState={staffingDeliveryTarget?:StaffingDeliveryCapture;conditionalHiringPlan?:boolean;currentCalculationKinds?:Array<'hiring'|'required-staffing'>;recommendationRequestId?:string|null;requiredStaffing?:RequiredStaffingReview|null;hiringBudget?:HiringBudgetReview|null;businessPlanning?:BusinessPlanning|null;datasetEvidenceContexts?:ReturnType<typeof readCandidateHomeContext>[];version:1;verifiedMetrics:SolutionMetricRef[];turns:SolutionTurn[];constraints:SolutionConstraint[];working:SolutionEvaluation[];analyses:HeadcountProjection[];rejected:{candidateId:string;revision:number;reason:string;turnId:string}[];questions:string[];focusCandidateId:string|null};
 export type SolutionRequest={version:1;planningCalculatorAvailable?:boolean;requestId:string;goal:{id:string;statement:string};scope:string;filters:DashboardFilters;timeZone:string;evidence:unknown;goalContext:unknown;goalProgress?:unknown;progressEntry?:unknown;selectedId:string|null;catalog:PlanAlternatives|null;state:SolutionState;message:{id:string;text:string}};
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 function fail(message:string):never {throw Error(message);}
@@ -81,6 +83,7 @@ export function readSolutionState(raw:unknown):SolutionState {
  if(raw.datasetEvidenceContexts!==undefined){if(!Array.isArray(raw.datasetEvidenceContexts)||raw.datasetEvidenceContexts.length>16)fail('Evidence recipes exceed the supported limit.');raw.datasetEvidenceContexts.forEach(readCandidateHomeContext);}
  if(raw.currentCalculationKinds!==undefined&&(!Array.isArray(raw.currentCalculationKinds)||raw.currentCalculationKinds.length>2||new Set(raw.currentCalculationKinds).size!==raw.currentCalculationKinds.length||raw.currentCalculationKinds.some(kind=>typeof kind!=='string'||!['hiring','required-staffing'].includes(kind))))fail('The current calculations could not be read.');
  const state=raw as unknown as SolutionState;
+ if(state.staffingDeliveryTarget!==undefined)state.staffingDeliveryTarget=readStaffingDeliveryCapture(state.staffingDeliveryTarget);
  state.currentCalculationKinds??=[];
  if(state.currentCalculationKinds.some(kind=>kind==='hiring'?!state.hiringBudget:!state.requiredStaffing))fail('A current calculation is unavailable.');
  if(state.requiredStaffing!==undefined)state.requiredStaffing=readRequiredStaffingReview(state.requiredStaffing);
@@ -124,6 +127,8 @@ export function mergeSolutionConstraints(request:SolutionRequest,previous:Soluti
  if(updates.length>5||new Set(updates.map(item=>item.field)).size!==updates.length)fail('Review one current interpretation of each constraint.');
  for(const value of updates){
   assertSolutionShape(value,solutionConstraintSchema,'constraint');
+  const delivery=request.state.staffingDeliveryTarget;
+  if(delivery&&value.field==='horizon_months'&&(delivery.issue||value.action==='set'&&value.number!==delivery.months||value.action==='remove'&&delivery.months!==null))fail('The interpreted delivery constraint conflicts with the explicit staffing deadline. Keep the cost horizon separate.');
   const unit={budget_usd:'USD',max_hours:'hours/total',horizon_months:'months',population:'text',requirements:'text'}[value.field];
   if(!positions.has(value.turnId)||value.unit!==unit||value.action==='remove'&&(value.number!==null||value.text!==null)||value.action==='set'&&(['population','requirements'].includes(value.field)?value.number!==null||!text(value.text,240):value.number===null||!Number.isFinite(value.number)||value.text!==null))fail('A constraint needs a user-turn reference and supported units.');
   const old=result.get(value.field);

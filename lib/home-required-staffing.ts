@@ -31,6 +31,8 @@ export function currentRequiredStaffing(request:SolutionRequest,datasetToken:str
 export type StaffingDeliveryTarget={months:number;turnId:string;quote:string};
 /** Resolve one current interpreted target for display, eligibility, identity and saving. */
 export function resolveStaffingDeliveryTarget(state:SolutionRequest['state'],catalog:SolutionRequest['catalog']=null){
+ const captured=state.staffingDeliveryTarget;
+ if(captured)return {months:captured.months,target:captured.months===null?null:{months:captured.months,turnId:captured.turnId,quote:captured.quote},issue:captured.issue};
  const constraint=state.constraints.find(c=>c.field==='horizon_months'&&c.action==='set');
  if(!constraint||constraint.number===null)return {months:null,target:null,issue:null};
  const months=constraint.number,review=state.requiredStaffing;
@@ -53,13 +55,17 @@ export function staffingDeliveryConflict(option:RequiredStaffingOption,input:Req
  return targetMonths!==null&&activeReadiness.some(months=>months!==null&&months>targetMonths);
 }
 export const requiredStaffingView=(s:RequiredStaffingReview|null)=>s?{revision:s.revision,origins:s.origins,...calculateRequiredStaffing(s.inputs)}:null;
+/** Explicit people/role requirement; independent of the model's chosen tool. */
+export function hasExplicitStaffingRequirement(text:string){
+ const count='(?:\\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)';
+ const requirement=new RegExp('\\b(?:fill|staff|cover|need|require|required)\\s+(?:exactly\\s+)?'+count+'(?:\\s+[\\w-]+){0,3}\\s+(?:roles?|positions?|people|employees?|engineers?|developers?|analysts?)\\b','i');
+ return requirement.test(text);
+}
 /** Routing only: the model still supplies typed, provenance-checked inputs. */
 export function requiresRequiredStaffing(request:SolutionRequest){
  const text=request.message.text;
  const strategies=[/\bhir(?:e|es|ing)\b/i,/\btrain(?:ing|ee|ees|able)?\b/i,/\bredeploy(?:ment|able|ing)?\b/i].filter(pattern=>pattern.test(text)).length;
- const count='(?:\\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)';
- const requirement=new RegExp('\\b(?:fill|staff|cover|need|require|required)\\s+(?:exactly\\s+)?'+count+'(?:\\s+[\\w-]+){0,3}\\s+(?:roles?|positions?|people|employees?|engineers?|developers?|analysts?)\\b','i');
- if(strategies>=2&&requirement.test(text))return true;
+ if(strategies>=2&&hasExplicitStaffingRequirement(text))return true;
  return !!request.state.requiredStaffing&&(/\b(?:numerical|numbers|totals?|recalculate|recompute|compare|comparison|options?|mixes)\b/i.test(text)||/\b(?:change|make|set|use|clear|remove|update|keep)\b/i.test(text)&&/\b(?:training|trainee|hire|hiring|redeploy\w*|backfill|budget|month\w*|horizon|currency|role\w*|pool\w*|hours?|cost\w*|USD|EUR|GBP)\b/i.test(text));
 }
 // Performance gate, not a general intent classifier. Every clause must fit a
@@ -133,4 +139,4 @@ export function editRequiredStaffing(request:SolutionRequest,datasetToken:string
  if(before.role!==null&&before.role!==s.inputs.role)requireRestated(requiredStaffingFields.filter(f=>!['role','requiredRoles','months','currency','budget'].includes(f)));
  s.revision++;return readRequiredStaffingReview(s)!;
 }
-export const requiredStaffingInstructions=`FIXED REQUIRED STAFFING: When the user supplies a required count and wants hiring/training/redeployment combinations, use compare_required_staffing directly. A stated count does not require ticket volume, contracts, productivity rates, baseline population or a workload review. Keep the existing workload tools for workload-derived requirements; review_hiring_budget remains the annual-pay/timing calculator for hire-only budgeting. Use the explicit period hire cost and PER-TRAINEE cash/hours. Never copy per-person training rates into total-path fields of compare_service_staffing. Preserve all supplied pools and rates on follow-ups; call compare_required_staffing with empty changes to obtain current numerical totals, and quote the current user for corrections. The tool calculates bounded combinations and returns up to three representative options; show the numeric comparisons, one conditional recommendation and one next step. Keep unknown release, overlap, readiness, backfill and complete costs visible without blocking useful listed-cash arithmetic. If a hire-only scenario includes no planned training, say new-hire training requirements are not specified unless the user supplied them; do not assert zero training needed. No salary feed, company-population lookup, saved Action Plan or operational verification is required or implied. New figures must come from this turn's successful tool output. Its option IDs are not candidate or projection IDs: leave candidateIds, analysisIds and verifiedMetrics empty for a standalone staffing comparison; its compact card displays the checked values. Do not fabricate a verifiedMetricReference for these results.`;
+export const requiredStaffingInstructions=`FIXED REQUIRED STAFFING: staffingDeliveryTarget in the supplied context is the explicit user delivery deadline, captured separately from cost months. Preserve it; months in this calculator is only the cost horizon. Never replace that deadline with an annual cost period or claim readiness from a target alone. When the user supplies a required count and wants hiring/training/redeployment combinations, use compare_required_staffing directly. A stated count does not require ticket volume, contracts, productivity rates, baseline population or a workload review. Keep the existing workload tools for workload-derived requirements; review_hiring_budget remains the annual-pay/timing calculator for hire-only budgeting. Use the explicit period hire cost and PER-TRAINEE cash/hours. Never copy per-person training rates into total-path fields of compare_service_staffing. Preserve all supplied pools and rates on follow-ups; call compare_required_staffing with empty changes to obtain current numerical totals, and quote the current user for corrections. The tool calculates bounded combinations and returns up to three representative options; show the numeric comparisons, one conditional recommendation and one next step. Keep unknown release, overlap, readiness, backfill and complete costs visible without blocking useful listed-cash arithmetic. If a hire-only scenario includes no planned training, say new-hire training requirements are not specified unless the user supplied them; do not assert zero training needed. No salary feed, company-population lookup, saved Action Plan or operational verification is required or implied. New figures must come from this turn's successful tool output. Its option IDs are not candidate or projection IDs: leave candidateIds, analysisIds and verifiedMetrics empty for a standalone staffing comparison; its compact card displays the checked values. Do not fabricate a verifiedMetricReference for these results.`;
