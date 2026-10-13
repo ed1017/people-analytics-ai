@@ -58,10 +58,13 @@ function CompactPlanSummary({draft,result}:{draft:BundleDraft|null;result?:Bundl
  const value=actionPlanQuickSummary(draft,result),p=value.planning,h=value.hiring;
  const range=(v:{min:number;max:number}|null)=>v===null?'Unknown':v.min===v.max?number(v.min):`${number(v.min)}–${number(v.max)}`;
  if(value.conditionalHiring)return <section aria-label="Action Plan quick summary"><HiringPlanningSummary compact result={value.conditionalHiring.result}/></section>;
+ const cash=p?p.cash:h?h.externalSubtotal:value.cash??value.subtotal;
+ const duration=(n:number|null,unit:string)=>n===null?'Unknown':`${number(n)} ${unit}${n===1?'':'s'}`;
  const stakeholders=[...new Set(draft?.bundle.components.map(c=>c.ownerRole)??[])].join('; ')||'Unknown';
  return <section aria-label="Action Plan quick summary"><ul className="list-disc space-y-2 pl-5 text-sm leading-snug">
- <li>Cost: <strong>{money(p?p.cash:h?h.externalSubtotal:value.cash??value.subtotal)}</strong> USD · {p?'incremental allowance':h||value.subtotal!==null?'partial cash':'incremental cash'}</li>
- <li>{h?'Budget period':'Duration'}: <strong>{p?`${number(p.months)} months`:h?`${h.months} months`:value.days===null?'Unknown':`${number(value.days)} days`}</strong> · {p?(draft?.inputs.scope.months.kind==='model-proposed'?'proposed':'entered assumption'):h?'cost horizon':'readiness unconfirmed'}</li>
+ <li>Actions: {draft?.bundle.components.length?draft.bundle.components.map((activity,index)=><span key={activity.id}>{index>0?' ':''}{activity.firstStep}</span>):'Not specified'}</li>
+ <li>Cost: <strong>{money(cash)}</strong>{cash===null?'':' USD'} · {p?'incremental allowance':h||value.subtotal!==null?'partial cash':'incremental cash'}</li>
+ <li>{h?'Budget period':'Duration'}: <strong>{p?duration(p.months,'month'):h?duration(h.months,'month'):duration(value.days,'day')}</strong> · {p?(draft?.inputs.scope.months.kind==='model-proposed'?'proposed':'entered assumption'):h?'cost horizon':'readiness unconfirmed'}</li>
  <li>Labor time: <strong>{range(p?.hours??null)!=='Unknown'?range(p!.hours):number(value.deliveryHours)} hours</strong> · labor cost unknown</li>
  <li>People: <strong>{p?`${range(p.participants)} people`:h?`${h.requiredRoles} roles`:number(value.people)}</strong>{p?.participants&&p.participants.min!==p.participants.max?' · overlap unknown':' · availability unconfirmed'}</li>
  <li>Stakeholders: {stakeholders} · unconfirmed</li>

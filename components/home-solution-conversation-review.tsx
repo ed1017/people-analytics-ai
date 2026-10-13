@@ -41,7 +41,6 @@ function Proposal({item,controller,goal,number:proposalNumber,recommended=false,
 
   <p><strong>Goal:</strong> {statement}.</p>
   {capacityRisk&&<p><strong>Capacity risk:</strong> {capacityRisk}</p>}
-  <ol aria-label="Practical steps" className="list-decimal space-y-1 pl-5">{item.candidate.activities.map(activity=>{const component=item.draft?.bundle.components.find(part=>part.id===activity.id);return <li key={activity.id}>{component?.firstStep??activity.step}</li>;})}</ol>
   <p><strong>Suggested owners · unconfirmed:</strong> {[...new Set(item.candidate.activities.map(activity=>item.draft?.bundle.components.find(part=>part.id===activity.id)?.ownerRole??activity.ownerRole))].filter(Boolean).join('; ')||'Unknown'}</p>
 
    {notes&&<section aria-label="Supporting evidence and caveats"><ChatContent content={notes}/></section>}

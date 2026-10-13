@@ -390,7 +390,7 @@ function finishEvaluation(request:SolutionRequest,evaluation:SolutionEvaluation,
   if(maxHours!==undefined&&maxHours!==null&&hours!==null&&hours>maxHours)evaluation.blocking.push(`Calculated ${hours} staff hours exceeds the current ${maxHours}-hour limit.`);
   const start=input.scope.startMonth.value,months=input.scope.months.value;
   if(start&&months){const [year,month]=start.split('-').map(Number),end=new Date(Date.UTC(year,month-1+months,0)).toISOString().slice(0,10);if(input.timing.some(row=>row.start.value&&row.start.value<start+'-01'||row.finish.value&&row.finish.value>end))evaluation.blocking.push('Activity dates fall outside the current planning horizon.');}
-  if(evaluation.result.cashEstimate?.cash===null)evaluation.issues.push('Cash total is unknown; the budget ceiling does not fill missing allowances.');
+  if(evaluation.result.cashEstimate?.cash===null)evaluation.issues.push(input.budget?.amount.value!=null?'Cash total is unknown; the budget ceiling does not fill missing allowances.':'Cash total is unknown; review the missing incremental cash allowances.');
   if(hours===null)evaluation.issues.push('Staff effort is unknown; changed activities need reviewed hours and participation.');
 }
 /** An explicit patch over an exact snapshot; no reconstruction or strategy invalidation. */

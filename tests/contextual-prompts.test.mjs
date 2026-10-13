@@ -3,15 +3,15 @@ import assert from 'node:assert/strict';
 import {contextualPrompts,hasKnownNumericEvidence,homeGoalStarters,homeStarterGroups,workforceStageExample} from '../lib/contextual-prompts.ts';
 import {decisionStarterLabels,decisionStarterPrompts} from './fixtures/home-starter-prompts.mjs';
 const source=(id,facts={count:0},status='loaded')=>({id,facts,status});
-const base={page:'home',goal:'Improve retention',hasConversation:false,evidenceReady:true,sources:[source('A1'),source('T1')]};
+const base={page:'home',goal:'Improve retention',hasConversation:false,evidenceReady:true,sources:[source('A1'),source('T1'),source('W1',{headcount:100})]};
 test('Home starters remain simple while skills follow-ups are contextual and permit combined methods',()=>{
  assert.deepEqual(contextualPrompts({...base,goal:''}),[...homeGoalStarters]);
- assert.deepEqual(homeStarterGroups.map(group=>group.label),['Discovery','Strategic Workforce Planning','Workforce questions']);
+ assert.deepEqual(homeStarterGroups.map(group=>group.label),['Discovery','Planning','Forecasting']);
  assert.deepEqual(homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.label)),decisionStarterLabels);
- assert.equal(homeStarterGroups[1].purpose,'swp-business');assert.equal(homeStarterGroups[0].purpose,undefined);assert.equal(homeStarterGroups[2].purpose,undefined);
+ assert.equal(homeStarterGroups[1].purpose,undefined);assert.equal(homeStarterGroups[0].purpose,undefined);assert.equal(homeStarterGroups[2].purpose,undefined);
  assert.deepEqual(homeGoalStarters,decisionStarterLabels,"Starter messages are exactly the visible words; no hidden instructions or assumptions");
  assert.deepEqual(homeGoalStarters,decisionStarterPrompts);
- assert.match(contextualPrompts({...base,goal:'Build AI skills without adding headcount'})[1],/mix of training, internal moves and hiring/);
+ assert.equal(contextualPrompts({...base,goal:'Build AI skills without adding headcount'}).length,1);
  for(const context of [base,{...base,goal:''},{...base,goal:'Build skills',sources:[source('A1')]},{...base,page:'overview',goal:'Build skills'}])assert.doesNotMatch(contextualPrompts(context).join(' '),/mix of training/);
  assert.equal(contextualPrompts({...base,goal:'',sources:[]}).length,1);
 });
@@ -28,8 +28,8 @@ test('missing, stale, budget-excluded and all-unknown evidence cannot support a 
  assert.equal(hasKnownNumericEvidence({count:0}),true);
 });
 test('conversation stage moves from specifying a comparison to reviewing assumptions',()=>{
- assert.match(contextualPrompts(base)[2],/specify/);
- assert.match(contextualPrompts({...base,hasConversation:true})[2],/revise/);
+ assert.equal(contextualPrompts(base).length,1);
+ assert.equal(contextualPrompts({...base,hasConversation:true}).length,1);
  assert.match(workforceStageExample.compare,/saved calculation.*pinned version.*not assignable capacity/);
  assert.match(workforceStageExample['save-inputs'],/unsaved/);
  assert.match(workforceStageExample['review-alternatives'],/temporary.*confirmed/);
@@ -50,4 +50,11 @@ test('page examples use only the active capability and remain small',()=>{
  assert.match(contextualPrompts({...base,page:'unsupported'})[0],/missing/);
 });
 
-test('Finance starter sends only the visible engineer and budget scenario',()=>{const prompt=homeGoalStarters.find(text=>text.includes('Finance'));assert.equal(prompt,'We need 10 engineers, but Finance capped the budget at $1 million. What are our options?');assert.doesNotMatch(prompt,/120,000|3 support|6 months|Hypothetical|Recommend an Action Plan/);});
+test('curated intents do not promise team rankings or unsupported forecasts',()=>{assert.equal(homeGoalStarters.length,4);assert.doesNotMatch(homeGoalStarters.join(' '),/weakest satisfaction|highest recorded voluntary turnover|payroll stays flat|active requisitions/);assert.match(homeStarterGroups[2].prompts[0].prompt,/headcount.*six months.*hypothetical scenario/);});
+
+test('missing separation or headcount evidence removes only dependent Discovery/Forecasting suggestions',()=>{
+ const prompts=contextualPrompts({...base,goal:'',sources:[source('T1')]});
+ assert.equal(prompts.length,2);assert.ok(prompts.includes(homeStarterGroups[1].prompts[0].prompt));
+ assert.ok(!prompts.includes(homeStarterGroups[0].prompts[0].prompt));assert.ok(!prompts.includes(homeStarterGroups[2].prompts[0].prompt));
+ for(const facts of [{headcount:null},{headcount:'unknown'},{headcount:Infinity},{otherCount:100}])assert.ok(!contextualPrompts({...base,goal:'',sources:[source('W1',facts),source('A1')]}).includes(homeStarterGroups[2].prompts[0].prompt));
+});

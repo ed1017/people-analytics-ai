@@ -28,7 +28,7 @@ test('synthetic observed missing-constraint response retains explicit delivery b
  assert.equal(context.staffingDeliveryTarget.months,3);assert.equal(context.staffingDeliveryTarget.quote,prompt);
  assert.deepEqual(reply.state.constraints,[],'provider omitted the generic constraint, as observed');
  assert.equal(reply.state.requiredStaffing.inputs.months,12);assert.equal(resolveStaffingDeliveryTarget(reply.state).months,3);
- assert.deepEqual(reply.usage,{modelRounds:2,toolCalls:1});assert.deepEqual(fixture.request,before,'caller state unchanged');
+ assert.deepEqual(reply.usage,{modelRounds:1,toolCalls:1});assert.deepEqual(fixture.request,before,'caller state unchanged');
  const option=reply.state.requiredStaffing;assert.equal(option.inputs.hireCostPerPerson,160000);assert.equal(option.origins.redeploymentCostPerPerson.kind,'model-proposed');assert.equal(option.inputs.costsComplete,null);
 });
 test('capture survives reload, aged chat and pin identity without changing cost horizon',async()=>{
@@ -64,7 +64,7 @@ test('explicit correction and removal do not overwrite the twelve-month cost bas
  }
 });
 test('provider constraints cannot replace the explicit deadline with the cost horizon',async()=>{
- const fixture=setup(),answer=final('Review the comparison.');answer.constraintUpdates=[{action:'set',field:'horizon_months',number:12,text:null,unit:'months',turnId:fixture.request.message.id}];
+ const fixture=setup(prompt+' Also explain the cost horizon.'),answer=final('Review the comparison.');answer.constraintUpdates=[{action:'set',field:'horizon_months',number:12,text:null,unit:'months',turnId:fixture.request.message.id}];
  fixture.runtime=fixtureRuntime([{name:'compare_required_staffing',args:{changes:fixedChanges(fixture.request)}},answer]);fixture.runtime.natural={datasetToken:'legacy-v1:0'};
  await assert.rejects(run(fixture),/conflicts with the explicit staffing deadline/);
 });
@@ -94,7 +94,7 @@ test('only an unambiguous affirmative instruction removes the deadline',async()=
  }
 });
 test('captured target can be corrected or removed before a calculator review exists',async()=>{
- const initial=setup();initial.runtime=fixtureRuntime([final('Which role should the staffing plan cover?')]);initial.runtime.natural={datasetToken:'legacy-v1:0'};
+ const initial=setup('We need 10 people within 3 months.');initial.runtime=fixtureRuntime([final('Which role should the staffing plan cover?')]);initial.runtime.natural={datasetToken:'legacy-v1:0'};
  const first=await run(initial);assert.equal(first.state.requiredStaffing,undefined);assert.equal(resolveStaffingDeliveryTarget(first.state).months,3);
  for(const [text,months] of [['Actually, within four months.',4],['Remove the delivery deadline.',null]]){
   const request=solutionRequest(text,false,first.state,2),runtime=fixtureRuntime([final('The delivery target is updated.')]);runtime.natural={datasetToken:'legacy-v1:0'};

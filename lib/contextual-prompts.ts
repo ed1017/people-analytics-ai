@@ -33,24 +33,17 @@ const pageExamples:Record<string,string> = {
 };
 const planningPages = new Set(['planning-overview','scenario-modeling','position-workforce-design','workforce-response','execution-feasibility','workforce-planning']);
 const readOnlyPages = new Set(['compensation','decision-brief','assess-evaluate']);
+// Small intent-based set; no team rankings, implied future starts or missing workload models.
 export const homeStarterGroups = [
-  {label:'Discovery',collapsed:true,prompts:[
-    'What workforce issues should we tackle first?',
-    'Which teams need attention first based on the available workforce data?',
+  {label:'Discovery',prompts:[
+    'What do recorded separation patterns show, and what remains unexplained?',
+    'Which recorded workforce changes deserve attention? Show the supporting figures and scope limits.',
   ].map(label=>({label,prompt:label}))},
-  {label:'Strategic Workforce Planning',purpose:'swp-business',prompts:[
-    'If support tickets rise 20% and payroll stays flat, how can we cover the work?',
-    'For a client project starting in three months, should we train, redeploy or hire engineers?',
-    'Can five recruiters handle 40 active requisitions without delaying priority hires?',
-    'If client work grows 20% without more managers, how should we adjust workload?',
-    'We need 10 engineers, but Finance capped the budget at $1 million. What are our options?',
-    'If two projects end next quarter, where can we redeploy their people before hiring?',
+  {label:'Planning',prompts:[
+    "We need 10 additional people within 3 months. Assume 4 can transfer internally, 3 can be trained at $5,000 each, and 3 must be hired at $160,000 each in first-year cost. Training takes 80 hours per person. Recommend one action plan with cost, timing, resources and key assumptions.",
   ].map(label=>({label,prompt:label}))},
-  {label:'Workforce questions',collapsed:true,prompts:[
-    'How can we reduce turnover in the team with the highest recorded voluntary turnover?',
-    'Which teams have the weakest satisfaction scores, and what should we change first?',
-    'Where are candidates dropping out of our hiring process, and what should we fix first?',
-    'Based on our current hiring and exits, what could headcount look like in six months?',
+  {label:'Forecasting',prompts:[
+    'Project headcount over six months assuming five hires and three exits per month. Label this as a hypothetical scenario.',
   ].map(label=>({label,prompt:label}))},
 ] as const;
 export const homeGoalStarters = homeStarterGroups.flatMap(group=>group.prompts.map(item=>item.prompt));
@@ -60,7 +53,7 @@ export function hasKnownNumericEvidence(value:unknown):boolean {
   return Object.values(value).some(hasKnownNumericEvidence);
 }
 export function contextualPrompts(context:PromptContext):string[] {
-  const {page,goal,hasConversation,evidenceReady,sources=[]}=context;
+  const {page,goal,evidenceReady,sources=[]}=context;
   if(readOnlyPages.has(page))return [];
   const focused=Boolean(goal.trim());
   const missing=focused?'What evidence is missing for my goal, and what should I verify first?':'What evidence is available, missing or outside this page’s scope?';
@@ -69,18 +62,21 @@ export function contextualPrompts(context:PromptContext):string[] {
   const boundary=page==='home'?'Compare prediction methods':'What historical evidence can inform my goal, and why is a validated forecast unavailable?';
   if(page==='home'||page==='overview'){
     if(!sources.some(source=>source.status==='loaded'&&hasKnownNumericEvidence(source.facts)))return [missing];
-    if(page==='home'&&!focused)return [...homeGoalStarters];
+    if(page==='home'&&!focused)return homeGoalStarters.filter(prompt=>{
+      if(prompt===homeStarterGroups[0].prompts[0].prompt)return sources.some(s=>s.id==='A1'&&s.status==='loaded'&&hasKnownNumericEvidence(s.facts));
+      if(prompt===homeStarterGroups[2].prompts[0].prompt)return sources.some(s=>s.id==='W1'&&s.status==='loaded'&&typeof (s.facts as {headcount?:unknown}|null)?.headcount==='number'&&Number.isFinite((s.facts as {headcount:number}).headcount));
+      return true;
+    });
     const topic=topics.find(topic=>topic.match.test(goal));
     const available=(ids:string[])=>sources.some(source=>ids.includes(source.id)&&source.status==='loaded'&&hasKnownNumericEvidence(source.facts));
     // Do not replace unavailable goal evidence with an unrelated confident example.
     const investigation=topic ? available(topic.ids)?topic.question:missing : focused?'Which available evidence relates to my goal, and what does it not establish?':'Which recorded workforce pattern is worth investigating, and what evidence supports it?';
-    if(page==='home'&&!forecast&&topic?.ids.includes('T1')&&available(topic.ids))return [investigation,'What mix of training, internal moves and hiring would close our skills gaps?',hasConversation?'Which assumptions should I revise before comparing options?':'What would I need to specify before comparing Build, Move and Buy scenarios?'];
-    return [forecast?boundary:investigation,focused?'Which supported options could address my goal, and what evidence would distinguish them?':'What can I investigate with the available workforce evidence?',hasConversation?'Which assumptions should I revise before comparing options?':'What would I need to specify before comparing Build, Move and Buy scenarios?'];
+    return [forecast?boundary:investigation];
   }
-  if(planningPages.has(page))return [forecast?boundary:'How do the available planning scenarios differ in assumptions and modeled costs?', 'Which budget, timing or headcount assumptions should I review for my goal?', 'What would make this scenario comparison incomplete or misleading?'];
+  if(planningPages.has(page))return [forecast?boundary:'How do the available planning scenarios differ in assumptions and modeled costs?', 'Which budget, timing or headcount assumptions should I review for my goal?'];
   const first=pageExamples[page];
   if(!first)return [missing];
-  return [forecast?boundary:first,focused?'How does this page’s evidence relate to my goal, and where is it insufficient?':'Which comparisons does this page’s evidence support?',hasConversation?'Which assumption or interpretation should I check next?':'What should I verify before using this evidence in a workforce plan?'];
+  return [forecast?boundary:first];
 }
 
 // Examples accompany the existing focus-only Continue control, never a new action menu.
