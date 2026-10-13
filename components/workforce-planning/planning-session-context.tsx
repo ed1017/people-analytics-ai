@@ -10,9 +10,10 @@ import {
 
 import {datasetSession} from '@/lib/dataset-client.mjs';
 import {emptyCapacityDraft,type CapacityDraft} from '@/lib/swp-capacity-draft';
+import type {CapacityScope,CapacityCapture} from '@/lib/swp-capacity-store';
 import type {calculateMonthlyWorkload} from '@/lib/swp-monthly-workload';
-export type CapacitySession={draft:CapacityDraft;result:ReturnType<typeof calculateMonthlyWorkload>|null;error:string};
-const emptyCapacitySession:CapacitySession={draft:emptyCapacityDraft,result:null,error:''};
+export type CapacitySession={draft:CapacityDraft;result:ReturnType<typeof calculateMonthlyWorkload>|null;error:string;scope:CapacityScope|null;capture:CapacityCapture|null};
+const emptyCapacitySession:CapacitySession={draft:emptyCapacityDraft,result:null,error:'',scope:null,capture:null};
 
 export type PlanningWorkspaceView =
   | "overview"

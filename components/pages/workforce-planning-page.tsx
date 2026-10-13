@@ -1998,8 +1998,27 @@ export function WorkforcePlanningPage({
   return (
 <section className="evidence-workspace min-w-0 p-4 sm:p-6">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 id="workforce-planning-heading" tabIndex={-1} className="rounded-sm text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-ring">Planning</h2>
+            <h2 id="workforce-planning-heading" tabIndex={-1} className="rounded-sm text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-ring">{workflowView==='overview'||workflowView==='plan'?'Capacity check':'Planning'}</h2>
+            <div className="flex flex-wrap items-center gap-2">
+          <WorkforcePlanningWorkflowNavigation
+            activeView={workflowView}
+            onViewChange={changeWorkflowView}
+            planReady={Boolean(
+              activePlanningScenario
+            )}
+            designReady={Boolean(
+              structuralPositionResult
+            )}
+            respondReady={Boolean(
+              responsePortfolioResult ||
+                roleResponsePlanResult
+            )}
+            executeReady={Boolean(
+              responseExecutionResult
+            )}
+          />
             <PlanningGuide key={requestedView} page={({overview:"planning-overview",plan:"scenario-modeling",design:"position-workforce-design",respond:"workforce-response",execute:"execution-feasibility"} as const)[requestedView]} />
+            </div>
           </div>
           {evidenceHandoff && (
             <PlanningEvidenceHandoffCard
@@ -2023,23 +2042,7 @@ export function WorkforcePlanningPage({
             />
           )}
 
-          <WorkforcePlanningWorkflowNavigation
-            activeView={workflowView}
-            onViewChange={changeWorkflowView}
-            planReady={Boolean(
-              activePlanningScenario
-            )}
-            designReady={Boolean(
-              structuralPositionResult
-            )}
-            respondReady={Boolean(
-              responsePortfolioResult ||
-                roleResponsePlanResult
-            )}
-            executeReady={Boolean(
-              responseExecutionResult
-            )}
-          />
+
 
           {(workflowView==='design'||workflowView==='respond'||workflowView==='execute')&&<p data-advanced-scope-note className="mb-3 text-sm text-muted-foreground">Calculation scope comes from the business-unit selector or structural actions. Dashboard Country, Business Unit and Level filters do not narrow these calculations.</p>}
 
@@ -2050,7 +2053,7 @@ export function WorkforcePlanningPage({
           )}
 
           <div hidden={workflowView!=="overview"&&workflowView!=="plan"} className="mb-4"><CapacityWorkspace /></div>
-          <details open={workflowView==="plan"} hidden={workflowView!=="overview"&&workflowView!=="plan"} className="rounded-lg border p-4">
+          <details open={workflowView==="plan"} hidden={workflowView!=="overview"&&workflowView!=="plan"} className="border-t pt-2">
           <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Stored plans and earlier scenario tools</summary>
           <p className="mb-2 text-sm text-muted-foreground">{goalKey.slice(goalKey.indexOf(":")+1)?"Goal-linked workspace":"General exploration · no goal selected"} · {planningLoading ? "Loading plan…" : "Stored reference plan"}. Model allocations are assumptions, not organizational approvals.</p>
           <details className="mb-3 text-sm text-muted-foreground">

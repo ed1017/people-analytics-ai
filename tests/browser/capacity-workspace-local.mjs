@@ -1,3 +1,4 @@
+import {revealMonthlyCapacityDetail} from './capacity-disclosure.mjs';
 // Real local application, synthetic API fixtures only; external and mutating requests are blocked.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -21,13 +22,13 @@ try{for(const width of [1366,390,320]){
  });
  await page.goto(base+'/?page=planning-overview');
  const area=page.getByRole('region',{name:'Workload capacity planning',exact:true}),input=name=>area.getByLabel(name,{exact:true});
- const calc=()=>area.getByRole('button',{name:'Calculate capacity',exact:true}).click();
+ const calc=async()=>{await area.getByRole('button',{name:'Calculate capacity',exact:true}).click();await revealMonthlyCapacityDetail(page,area);};
  const confirm=()=>area.getByRole('checkbox',{name:/I confirm/}).check();
  const result=()=>area.getByRole('region',{name:'Monthly capacity comparison'});
  await area.waitFor().catch(async error=>{console.log(await page.locator('body').innerText());console.log(errors);throw error;});await calc();assert.match(await area.getByRole('alert').innerText(),/Confirm/);
  const values={'Workload scope':'Service desk — tickets','Opening date (month end)':'2026-09-30','Opening people':'10','Opening contracted FTE':'8','Work units each month':'800','Hours per work unit':'1','Productive hours per FTE each month':'160'};
  for(const [name,value] of Object.entries(values))await input(name).fill(value);
- const assumptions=area.locator('summary');await assumptions.focus();await page.keyboard.press('Enter');
+ const assumptions=area.locator('form summary');await assumptions.focus();await page.keyboard.press('Enter');
  for(const [name,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await input(name).fill(value);
  await confirm();await calc();assert.match(await area.innerText(),/Incomplete/);assert.match(await result().innerText(),/Unknown/);
  await area.getByRole('checkbox',{name:/Assume every hire/}).check();assert.equal(await result().count(),0);assert.equal(await area.getByRole('checkbox',{name:/I confirm/}).isChecked(),false);
@@ -52,19 +53,19 @@ try{for(const width of [1366,390,320]){
  // Unmount via Workforce and return with history; session context retains inputs and results.
  await page.evaluate(()=>{history.pushState(null,'','/?page=workforce');dispatchEvent(new PopStateEvent('popstate'));});await area.waitFor({state:'hidden'});
  await page.goBack();await area.waitFor();
- await page.goForward();await area.waitFor({state:'hidden'});await page.goBack();await area.waitFor();assert.equal(await input('Workload scope').inputValue(),'Service desk — tickets');await result().waitFor();
+ await page.goForward();await area.waitFor({state:'hidden'});await page.goBack();await area.waitFor();assert.equal(await input('Workload scope').inputValue(),'Service desk — tickets');await revealMonthlyCapacityDetail(page,area);await result().waitFor();
  const nav=page.getByRole('navigation',{name:'Planning sections'});await nav.locator('summary').click();
  for(const [title,destination] of [['Position & Workforce Design','position-workforce-design'],['Workforce Response','workforce-response'],['Execution & Feasibility','execution-feasibility']]){
   await nav.getByRole('button',{name:'Open '+title,exact:true}).click();await page.locator(`[data-planning-destination="${destination}"]`).waitFor({state:'visible'});
-  await nav.getByRole('button',{name:'Open Planning workspace',exact:true}).click();await result().waitFor();
+  await nav.getByRole('button',{name:'Open Planning workspace',exact:true}).click();await revealMonthlyCapacityDetail(page,area);await result().waitFor();
  }
- await nav.getByRole('button',{name:'Open Stored scenario tools',exact:true}).click();await page.getByRole('heading',{name:'Custom Scenario',exact:true}).waitFor();await result().waitFor();
- await page.goBack();await result().waitFor();
+ await nav.getByRole('button',{name:'Open Stored scenario tools',exact:true}).click();await page.getByRole('heading',{name:'Custom Scenario',exact:true}).waitFor();await revealMonthlyCapacityDetail(page,area);await result().waitFor();
+ await page.goBack();await revealMonthlyCapacityDetail(page,area);await result().waitFor();
  await input('Opening contracted FTE').fill('');await confirm();await calc();assert.match(await area.innerText(),/Incomplete/);assert.match(await result().innerText(),/Unknown/);
  await input('Opening contracted FTE').fill('11');await confirm();await calc();assert.match(await area.getByRole('alert').innerText(),/exceeds/);assert.equal(await result().count(),0);
- if(!await area.locator('details').evaluate(n=>n.open))await assumptions.click();
+ if(!await area.locator('form details').evaluate(n=>n.open))await assumptions.click();
  await input('Opening people').fill('0');await input('Opening contracted FTE').fill('0');await input('Work units each month').fill('0');await input('Time assigned to this work (%)').fill('0');await confirm();
- await area.getByRole('button',{name:'Calculate capacity',exact:true}).focus();await page.keyboard.press('Enter');await result().waitFor();assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['0','0','0','0','0']);
+ await area.getByRole('button',{name:'Calculate capacity',exact:true}).focus();await page.keyboard.press('Enter');await revealMonthlyCapacityDetail(page,area);await result().waitFor();assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['0','0','0','0','0']);
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no page overflow');
  await page.screenshot({path:`${output}/${width}-capacity.png`,fullPage:true});
  await page.reload();await area.waitFor();assert.equal(await input('Workload scope').inputValue(),'');assert.equal(await result().count(),0);

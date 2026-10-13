@@ -1,3 +1,4 @@
+import {revealMonthlyCapacityDetail} from './capacity-disclosure.mjs';
 // Isolated real-component fixture: goal context and actual dataset boundary remount behavior.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -12,15 +13,15 @@ const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['-
 try{
  const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/*',route=>route.fulfill({contentType:'text/html',body:'<div id="root"></div><script>'+bundle.replaceAll('</script','<\\/script')+'</script>'}));
- await page.goto('http://capacity-fixture.test');
+ await page.goto('https://capacity-fixture.test');
  const scope=()=>page.getByLabel('Workload scope',{exact:true});await scope().fill('Goal A workload');
  for(const [label,value] of Object.entries({'Opening date (month end)':'2026-09-30','Opening people':'10','Opening contracted FTE':'8','Work units each month':'800','Hours per work unit':'1','Productive hours per FTE each month':'160'}))await page.getByLabel(label,{exact:true}).fill(value);
- await page.locator('summary').click();
+ await page.locator('form summary').click();
  for(const [label,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await page.getByLabel(label,{exact:true}).fill(value);
  await page.getByRole('checkbox',{name:/Assume every hire/}).check();await page.getByRole('checkbox',{name:/I confirm/}).check();await page.getByRole('button',{name:'Calculate capacity',exact:true}).click();
- const comparison=()=>page.getByRole('region',{name:'Monthly capacity comparison'});await comparison().waitFor();
+ const comparison=()=>page.getByRole('region',{name:'Monthly capacity comparison'});await revealMonthlyCapacityDetail(page);await comparison().waitFor();
  await page.getByRole('button',{name:'Goal B',exact:true}).click();assert.equal(await scope().inputValue(),'');assert.equal(await comparison().count(),0);await scope().fill('Goal B workload');
- await page.getByRole('button',{name:'Goal A',exact:true}).click();assert.equal(await scope().inputValue(),'Goal A workload');await comparison().waitFor();
+ await page.getByRole('button',{name:'Goal A',exact:true}).click();assert.equal(await scope().inputValue(),'Goal A workload');await revealMonthlyCapacityDetail(page);await comparison().waitFor();
  await page.getByRole('button',{name:'Goal B',exact:true}).click();assert.equal(await scope().inputValue(),'Goal B workload');
  await page.getByRole('button',{name:'Change dataset',exact:true}).click();
  await page.getByRole('status').filter({hasText:'Dataset changed.'}).waitFor();assert.equal(await scope().inputValue(),'','dataset boundary remount clears this session-only draft');
