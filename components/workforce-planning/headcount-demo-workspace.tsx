@@ -24,11 +24,11 @@ export function HeadcountDemoWorkspace({children}:{children:ReactNode}) {
   useEffect(()=>{if(open)back.current?.focus();else if(previous.current)launcher.current?.focus();previous.current=open;},[open]);
   return <>
     <div hidden={open} className="space-y-6">
+      {children}
       <div className="rounded-lg border p-4">
         <button ref={launcher} type="button" onClick={()=>navigate(true)} className="inline-flex min-h-11 items-center font-semibold underline">Compare headcount — synthetic demo baseline</button>
         <p className="text-sm text-muted-foreground">Company-wide headcount only. Conditional retrospective evaluation; not validated for operational planning.</p>
       </div>
-      {children}
     </div>
     {open&&<section aria-label="Synthetic headcount demo" className="rounded-lg bg-white p-4 text-slate-900">
       <button ref={back} type="button" onClick={()=>navigate(false)} className="mb-3 inline-flex min-h-11 items-center underline">Back to Scenario Modeling</button>

@@ -61,10 +61,10 @@ export function PlanningOverview({
     responsePortfolioResult?.allocation ??
     null;
   const responseStatus = businessUnitResponseResult
-    ? "Approved response allocated to destination business units"
+    ? "Modeled response allocated to destination business units"
     : responsePortfolioResult
       ? "Response portfolio modeled; BU allocation still pending"
-      : "No approved Build / Move / Buy response yet";
+      : "No modeled Build / Move / Buy response yet";
   const feasibility = responseConstraintResult
     ? responseConstraintResult.capacity_feasibility
       ? responseConstraintResult.user_constraints_satisfied ? "Assumptions meet limits; staffing not assessed" : "Assumption limits breached; staffing not assessed"
@@ -107,7 +107,7 @@ export function PlanningOverview({
       view: "plan" as const,
     },
     {
-      title: "Approved response",
+      title: "Modeled response",
       value: responseStatus,
       detail: approvedAllocation
         ? `Build ${formatCapacity(approvedAllocation.build)} / Move ${formatCapacity(approvedAllocation.move)} / Buy ${formatCapacity(approvedAllocation.buy)}`
@@ -129,7 +129,7 @@ export function PlanningOverview({
       value: feasibility,
       detail: responseConstraintResult
         ? `${responseConstraintResult.hard_constraint_breaches} hard-constraint breach(es) across ${responseConstraintResult.hard_constraint_count} active hard constraints.`
-        : "Feasibility is only determined after the approved response is scheduled and tested.",
+        : "Feasibility is only determined after the modeled response is scheduled and tested.",
       action: "Execution & Feasibility",
       view: "execute" as const,
     },
@@ -137,13 +137,14 @@ export function PlanningOverview({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border p-4">
-        <p className="font-semibold">Try Planning Calculator</p>
-        <p className="mt-1 text-sm text-muted-foreground">Explore a fictional managed-services workload and review how planning inputs affect its estimated capacity gap. Fictional defaults and unverified entries remain labeled.</p>
-        <PlanningAssumptionIllustration launcherOnly/>
-      </div>
+      <section className="rounded-lg border p-4" aria-label="Current planning scenario">
+        <h3 className="font-semibold">{cards[0].value}</h3>
+        <p className="mt-2 text-sm">{cards[0].detail} {cards[1].detail}</p>
+        <p className="mt-1 text-xs text-muted-foreground">Stored plan / modeled outcomes, not observed actuals.</p>
+        <button type="button" onClick={()=>onNavigate("plan")} className="mt-3 min-h-11 rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background focus-visible:ring-2 focus-visible:ring-ring">Create or compare a scenario</button>
+      </section>
       <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
-        {cards.map((card) => (
+        {cards.slice(2).map((card) => (
           <button
             key={card.title}
             type="button"
@@ -160,6 +161,8 @@ export function PlanningOverview({
         ))}
       </div>
 
+      <details className="rounded-lg border p-4">
+        <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Demand shifts and next steps</summary>
       <div className="rounded-lg border p-4">
         <div className="mb-3">
           <h3 className="font-semibold">Biggest demand shifts</h3>
@@ -198,6 +201,15 @@ export function PlanningOverview({
           </button>
         )}
       </div>
+      </details>
+      <details className="rounded-lg border p-4">
+        <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Synthetic planning examples</summary>
+      <div className="rounded-lg border p-4">
+        <p className="font-semibold">Try Planning Calculator</p>
+        <p className="mt-1 text-sm text-muted-foreground">Explore a fictional managed-services workload and review how planning inputs affect its estimated capacity gap. Fictional defaults and unverified entries remain labeled.</p>
+        <PlanningAssumptionIllustration launcherOnly/>
+      </div>
+      </details>
     </div>
   );
 }

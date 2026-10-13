@@ -1,7 +1,6 @@
 import {EvidenceTableRegion} from '@/components/evidence-table-region';
 import { attritionDefaultLabel, type ScenarioDefaultSource } from "@/lib/legacy-source-contracts";
 import { formatWholeCount, formatFte } from "@/lib/display-format";
-import { knownDifference } from "@/lib/numeric-contract";
 import type {
   Dispatch,
   SetStateAction,
@@ -162,10 +161,7 @@ function formatCurrencyCompact(value: number | null) {
 
 export function ScenarioModelingPanel({
   visible,
-  planningScenarios,
   baselinePlanningEnd,
-  activePlanningScenario,
-  onScenarioChange,
   scenarioDefaults,
   scenarioDefaultsError,
   scenarioDefaultSource,
@@ -320,75 +316,7 @@ export function ScenarioModelingPanel({
                 : "hidden"
             }
           >
-          <div className="mb-6 evidence-metric-grid grid gap-3">
-            {planningScenarios.map(
-              (scenario) => {
-                const end =
-                  scenario.points[
-                    scenario.points.length -
-                      1
-                  ];
-
-                const baselineEnd =
-                  baselinePlanningEnd
-                    ?.planned_headcount ??
-                  null;
-
-                const delta =
-                  end && baselineEnd !== null
-                    ? knownDifference(end.planned_headcount, baselineEnd)
-                    : null;
-
-                const selected =
-                  activePlanningScenario
-                    ?.scenario_name ===
-                  scenario.scenario_name;
-
-                return (
-                  <button
-                    key={
-                      scenario.scenario_name
-                    }
-                    type="button"
-                    onClick={() =>
-                      onScenarioChange(
-                        scenario.scenario_name
-                      )
-                    }
-                    className={`rounded-lg border p-4 text-left transition-colors ${
-                      selected
-                        ? "bg-muted"
-                        : "hover:bg-muted/50"
-                    }`}
-                  >
-                    <p className="text-sm font-semibold">
-                      {scenario.scenario_name}
-                    </p>
-                    <p className="mt-2 text-2xl font-semibold">
-                      {end
-                        ? formatWholeCount(end.planned_headcount)
-                        : "—"}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Dec 2027 headcount
-                    </p>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      {delta === null
-                        ? "—"
-                        : delta === 0
-                          ? "Baseline"
-                          : `${
-                              delta > 0
-                                ? "+"
-                                : ""
-                            }${delta.toLocaleString()} vs Baseline`}
-                    </p>
-                  </button>
-                );
-              }
-            )}
-          </div>
-
+          <p className="mb-3 text-sm text-muted-foreground">Company what-if · Jan–Dec 2027 · assumptions, not actuals. September stock carries to January; Oct–Dec 2026 are unmodeled. Workspace filters do not narrow this calculation. Cost period is unverified; outputs are not a spending forecast.</p>
           <div className="mb-6 rounded-lg border p-4">
             <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -888,6 +816,165 @@ export function ScenarioModelingPanel({
             )}
           </div>
 
+          {savedScenarios.length > 0 && (
+            <div className="mb-6 rounded-lg border p-4">
+              <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 className="font-semibold">
+                    Saved Scenario Comparison
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Browser-local scenarios. Select up to three to compare with Baseline.
+                  </p>
+                </div>
+                <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
+                  {comparisonScenarioIds.length}/3 selected
+                </span>
+              </div>
+
+              <div className="evidence-metric-grid grid gap-3">
+                {savedScenarios.map((entry) => {
+                  const selected =
+                    comparisonScenarioIds.includes(
+                      entry.id
+                    );
+                  const selectionLimitReached =
+                    comparisonScenarioIds.length >= 3 &&
+                    !selected;
+
+                  return (
+                    <div
+                      key={entry.id}
+                      className="rounded-md border p-3"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <label className="flex min-w-0 items-start gap-2">
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            disabled={selectionLimitReached}
+                            onChange={() =>
+                              toggleScenarioComparison(
+                                entry.id
+                              )
+                            }
+                            className="mt-1"
+                          />
+                          <span className="min-w-0">
+                            <span className="block truncate text-sm font-semibold">
+                              {entry.name}
+                            </span>
+                            <span className="block text-[11px] text-muted-foreground">
+                              Saved{" "}
+                              {new Date(
+                                entry.saved_at
+                              ).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                }
+                              )}
+                            </span>
+                          </span>
+                        </label>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            deleteSavedScenario(
+                              entry.id
+                            )
+                          }
+                          className="text-xs text-muted-foreground hover:text-foreground"
+                        >
+                          Delete
+                        </button>
+                      </div>
+
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                        <div className="rounded border p-2">
+                          <p className="text-muted-foreground">
+                            Ending HC
+                          </p>
+                          <p className="mt-1 font-semibold tabular-nums">
+                            {entry.scenario.summary.modeled_end_headcount.toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="rounded border p-2">
+                          <p className="text-muted-foreground">
+                            HC vs Base
+                          </p>
+                          <p className="mt-1 font-semibold tabular-nums">
+                            {entry.scenario.summary.headcount_delta_vs_baseline >
+                            0
+                              ? "+"
+                              : ""}
+                            {entry.scenario.summary.headcount_delta_vs_baseline.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {comparedSavedScenarios.length > 0 && (
+                <EvidenceTableRegion label="Saved scenario comparison" className="mt-5">
+                  <table className="w-full min-w-[760px] text-sm">
+                    <thead>
+                      <tr className="border-b text-left text-xs text-muted-foreground">
+                        <th className="pb-3 pr-4">
+                          Metric
+                        </th>
+                        <th className="pb-3 px-3 text-right">
+                          Baseline
+                        </th>
+                        {comparedSavedScenarios.map(
+                          (entry) => (
+                            <th
+                              key={entry.id}
+                              className="pb-3 px-3 text-right"
+                            >
+                              {entry.name}
+                            </th>
+                          )
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comparisonRows.map((row) => (
+                        <tr
+                          key={row.label}
+                          className="border-b last:border-0"
+                        >
+                          <td className="py-3 pr-4 font-medium">
+                            {row.label}
+                          </td>
+                          <td className="px-3 py-3 text-right tabular-nums">
+                            {row.baseline}
+                          </td>
+                          {comparedSavedScenarios.map(
+                            (entry) => (
+                              <td
+                                key={entry.id}
+                                className="px-3 py-3 text-right tabular-nums"
+                              >
+                                {row.value(entry)}
+                              </td>
+                            )
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </EvidenceTableRegion>
+              )}
+            </div>
+          )}
+          <details className="mb-4 rounded-lg border p-4">
+            <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Business-unit what-if — separate inputs and result{buScenarioError && !buScenarioResult ? " · source unavailable" : ""}</summary>
           <div className="mb-6 rounded-lg border p-4">
             <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -1105,163 +1192,7 @@ export function ScenarioModelingPanel({
             )}
           </div>
 
-          {savedScenarios.length > 0 && (
-            <div className="mb-6 rounded-lg border p-4">
-              <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <h3 className="font-semibold">
-                    Saved Scenario Comparison
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Browser-local scenarios. Select up to three to compare with Baseline.
-                  </p>
-                </div>
-                <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
-                  {comparisonScenarioIds.length}/3 selected
-                </span>
-              </div>
-
-              <div className="evidence-metric-grid grid gap-3">
-                {savedScenarios.map((entry) => {
-                  const selected =
-                    comparisonScenarioIds.includes(
-                      entry.id
-                    );
-                  const selectionLimitReached =
-                    comparisonScenarioIds.length >= 3 &&
-                    !selected;
-
-                  return (
-                    <div
-                      key={entry.id}
-                      className="rounded-md border p-3"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <label className="flex min-w-0 items-start gap-2">
-                          <input
-                            type="checkbox"
-                            checked={selected}
-                            disabled={selectionLimitReached}
-                            onChange={() =>
-                              toggleScenarioComparison(
-                                entry.id
-                              )
-                            }
-                            className="mt-1"
-                          />
-                          <span className="min-w-0">
-                            <span className="block truncate text-sm font-semibold">
-                              {entry.name}
-                            </span>
-                            <span className="block text-[11px] text-muted-foreground">
-                              Saved{" "}
-                              {new Date(
-                                entry.saved_at
-                              ).toLocaleDateString(
-                                "en-US",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                }
-                              )}
-                            </span>
-                          </span>
-                        </label>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            deleteSavedScenario(
-                              entry.id
-                            )
-                          }
-                          className="text-xs text-muted-foreground hover:text-foreground"
-                        >
-                          Delete
-                        </button>
-                      </div>
-
-                      <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                        <div className="rounded border p-2">
-                          <p className="text-muted-foreground">
-                            Ending HC
-                          </p>
-                          <p className="mt-1 font-semibold tabular-nums">
-                            {entry.scenario.summary.modeled_end_headcount.toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="rounded border p-2">
-                          <p className="text-muted-foreground">
-                            HC vs Base
-                          </p>
-                          <p className="mt-1 font-semibold tabular-nums">
-                            {entry.scenario.summary.headcount_delta_vs_baseline >
-                            0
-                              ? "+"
-                              : ""}
-                            {entry.scenario.summary.headcount_delta_vs_baseline.toLocaleString()}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {comparedSavedScenarios.length > 0 && (
-                <EvidenceTableRegion label="Saved scenario comparison" className="mt-5">
-                  <table className="w-full min-w-[760px] text-sm">
-                    <thead>
-                      <tr className="border-b text-left text-xs text-muted-foreground">
-                        <th className="pb-3 pr-4">
-                          Metric
-                        </th>
-                        <th className="pb-3 px-3 text-right">
-                          Baseline
-                        </th>
-                        {comparedSavedScenarios.map(
-                          (entry) => (
-                            <th
-                              key={entry.id}
-                              className="pb-3 px-3 text-right"
-                            >
-                              {entry.name}
-                            </th>
-                          )
-                        )}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {comparisonRows.map((row) => (
-                        <tr
-                          key={row.label}
-                          className="border-b last:border-0"
-                        >
-                          <td className="py-3 pr-4 font-medium">
-                            {row.label}
-                          </td>
-                          <td className="px-3 py-3 text-right tabular-nums">
-                            {row.baseline}
-                          </td>
-                          {comparedSavedScenarios.map(
-                            (entry) => (
-                              <td
-                                key={entry.id}
-                                className="px-3 py-3 text-right tabular-nums"
-                              >
-                                {row.value(entry)}
-                              </td>
-                            )
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </EvidenceTableRegion>
-              )}
-            </div>
-          )}
+          </details>
           </div>
   );
 }

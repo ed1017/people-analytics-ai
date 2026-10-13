@@ -71,6 +71,9 @@ export function RoleResponseEvidenceSummary({
           </p>
         </div>
       </div>
+      <p className="mt-3 text-xs text-muted-foreground">Conditional coverage if executed. Profile fit and historical recruiting signals do not establish current staffing availability.</p>
+      <details className="mt-4 rounded-md border p-3">
+        <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Talent and recruiting evidence</summary>
       {readiness.assessment_status === "not_assessed" ? <ConstructedTalentProfileFit data={readiness} /> : (
       <div className="mt-4 rounded-md border p-4">
         <div className="mb-3">
@@ -379,6 +382,8 @@ export function RoleResponseEvidenceSummary({
           </tbody>
         </table>
       </div>
+
+      </details>
 
       {result.warnings.length > 0 && (
         <div className="mt-4 rounded-md border p-3">

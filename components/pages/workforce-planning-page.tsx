@@ -1995,44 +1995,21 @@ export function WorkforcePlanningPage({
 
 
   return (
-<section className="evidence-workspace min-w-0 p-6">
-          {activePlanningScenario?.provenance?.status === 'constructed_draft_assumption' && (
-            <div className="mb-4 rounded-md border bg-muted/20 p-3 text-sm text-muted-foreground">
+<section className="evidence-workspace min-w-0 p-4 sm:p-6">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h2 id="workforce-planning-heading" tabIndex={-1} className="rounded-sm text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-ring">Workforce Planning</h2>
+            <PlanningGuide key={requestedView} page={({overview:"planning-overview",plan:"scenario-modeling",design:"position-workforce-design",respond:"workforce-response",execute:"execution-feasibility"} as const)[requestedView]} />
+          </div>
+          <p className="mb-2 text-sm text-muted-foreground">{goalKey.slice(goalKey.indexOf(":")+1)?"Goal-linked workspace":"General exploration · no goal selected"} · {planningLoading ? "Loading plan…" : "2027 stored plan"}. Model allocations are assumptions, not organizational approvals.</p>
+          <details className="mb-3 text-sm text-muted-foreground">
+            <summary className="min-h-11 cursor-pointer rounded-sm py-2 focus-visible:ring-2 focus-visible:ring-ring">Assumptions &amp; source details</summary>
+            <p className="mb-2">Completed results retain their recorded inputs; changes require an explicit model run. Scenario scope comes from its business-unit selector or structural actions; dashboard filters do not narrow these calculations. Source cost period and refresh date are unverified.</p>
+            {activePlanningScenario?.provenance?.status === 'constructed_draft_assumption' && <div className="space-y-2">
               <p>Constructed demo what-if calculations. Zero growth and inflation come from the stored flat draft; the attrition default annualizes company January–September exits and is a shared assumption for business-unit scenarios. Fill rate is an assumption, not proven hiring capacity.</p>
               <p className="mt-1">September stock carries to January 2027. October–December 2026 is unmodeled. Calculated hires and exits are separate from the draft’s zero flows; no independent forecast validation is supplied.</p>
               <p className="mt-1">Fourteen vacancy-only structural combinations have no draft cost basis. Affected costs display as unavailable. Scenario scope comes from its business-unit selector or structural actions; dashboard filters do not narrow these calculations. Inventory partitions retain calculation precision; displayed labels round independently. Skill profiles and career preferences do not establish assessed readiness or available movers; Borrow and Automate evidence remain unavailable.</p>
-            </div>
-          )}
-          <p className="mb-3 text-xs text-muted-foreground">{goalKey.slice(goalKey.indexOf(":")+1)?"Saved with this goal. Completed results retain their recorded inputs; changes require an explicit model run.":"General exploration: select a goal to save this decision workspace."} Model allocations are assumptions, not organizational approvals.</p>
-          <div className="mb-6 flex items-end justify-between gap-4">
-            <div>
-              <div className="flex flex-wrap items-center gap-3"><h2
-                id="workforce-planning-heading"
-                tabIndex={-1}
-                className="rounded-sm text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-ring"
-              >
-                Workforce Planning
-              </h2><PlanningGuide key={requestedView} page={({overview:"planning-overview",plan:"scenario-modeling",design:"position-workforce-design",respond:"workforce-response",execute:"execution-feasibility"} as const)[requestedView]} /></div>
-              <p className="text-muted-foreground">
-                {workflowView === "overview"
-                  ? "See the current workforce plan, biggest demand shifts, approved response, execution risk, and feasibility in one place."
-                  : workflowView === "plan"
-                    ? "Compare workforce scenarios and decide what future demand looks like."
-                  : workflowView === "design"
-                    ? "Translate the workforce plan into concrete position, recruiting, and skill demand."
-                    : workflowView === "respond"
-                      ? "Decide how to close role gaps using Build, Move, and Buy."
-                      : "Schedule the approved response and test whether the plan is actually feasible."}
-              </p>
-            </div>
-
-            <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
-              {planningLoading
-                ? "Loading plan…"
-                : "2027 Company Workforce Plan"}
-            </span>
-          </div>
-
+            </div>}
+          </details>
           {evidenceHandoff && (
             <PlanningEvidenceHandoffCard
               handoff={evidenceHandoff}

@@ -197,6 +197,13 @@ export function RoleWorkforceResponsePlan({
                                   </div>
                                 )}
 
+                                {roleResponsePlanResult && (
+                                  <RoleResponseEvidenceSummary
+                                    result={roleResponsePlanResult}
+                                  />
+                                )}
+                                <details className="mt-4 rounded-md border p-3">
+                                  <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Compare additional talent evidence</summary>
                                 <TalentResponseEvidence
                                   key={`${roleResponsePlanProfile}:${evidenceGoal ?? ""}`}
                                   roleCode={roleResponsePlanProfile}
@@ -205,11 +212,7 @@ export function RoleWorkforceResponsePlan({
                                   rolePlan={roleResponsePlanResult}
                                 />
 
-                                {roleResponsePlanResult && (
-                                  <RoleResponseEvidenceSummary
-                                    result={roleResponsePlanResult}
-                                  />
-                                )}
+                                </details>
                               </div>
                             )}
     </>

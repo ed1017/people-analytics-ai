@@ -112,7 +112,7 @@ export function ScenarioPlanSummary({
 
                 <div className="rounded-lg border p-4">
                   <p className="text-sm text-muted-foreground">
-                    Year-End Labor Cost
+                    End-plan source cost
                   </p>
                   <p className="mt-2 text-3xl font-semibold">
                     {formatCurrencyCompact(
@@ -120,7 +120,7 @@ export function ScenarioPlanSummary({
                     )}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Planned annualized labor cost
+                    Source cost period unverified
                   </p>
                 </div>
 

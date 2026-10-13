@@ -39,7 +39,7 @@ export function PositionWorkforceDesignDestination({
       data-planning-destination="position-workforce-design"
       className={
         visible
-          ? "mt-6 rounded-lg border p-4"
+          ? "space-y-4"
           : "hidden"
       }
     >
@@ -82,9 +82,10 @@ export function PositionWorkforceDesignDestination({
         )}
       </div>
 
-      <PositionModelingSummary
-        {...positionSummaryProps}
-      />
+      <details className="rounded-lg border p-4">
+        <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Position inventory &amp; source details</summary>
+        <PositionModelingSummary {...positionSummaryProps} />
+      </details>
     </div>
   );
 }

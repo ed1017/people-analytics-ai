@@ -151,7 +151,9 @@ export default function Home() {
   const [marketCarry,setMarketCarry]=useGoalWorkspace<MarketCarry|null>(conversation.workspaceKey,goalWorkspaceKeys,emptyMarketCarry,"marketCarry");
   const [talentResponseEvidenceContext, setTalentResponseEvidenceContext] = useGoalWorkspace<string | null>(conversation.workspaceKey, goalWorkspaceKeys, emptyTalentContext,"talentContext");
   const [navCollapsed, setNavCollapsed] = useState(false);
-  const [aiCollapsed, setAiCollapsed] = useState(false);
+  const [aiCollapseChoice, setAiCollapsed] = useState<boolean | null>(null);
+  // Planning starts compact; an explicit toggle or Explain action wins across navigation.
+  const aiCollapsed = aiCollapseChoice ?? getWorkspaceForPage(activePage) === "strategy";
   const [aiWidth, setAiWidth] = useState(500);
 
   const [workforcePerformance, setWorkforcePerformance] = useState<unknown>(null);
