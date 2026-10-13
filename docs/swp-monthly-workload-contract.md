@@ -46,3 +46,9 @@ Deferred: rates/forecasts, growth curves, automatic conversion of annual assumpt
 ## Verification
 
 15 focused contract tests cover units, monthly dimensions, fractional FTE conservation, signed shortfall/surplus, per-person versus explicit movement FTE, zero/unknown separation, partial outputs, fixed-precision stock arithmetic, non-January/leap windows, scope/date mismatch, bounds, infeasible stock/outflows, company transfer double counting, retirement/rate duplicates, productivity applied once, provenance and input immutability. Existing headcount and workload-period/provenance tests are also run for compatibility. No browser checks or deployment are required for this unconnected pure module.
+
+### Partial-stock review amendment
+
+Before headcount becomes unknown through an unknown departure count, validation checks the maximum remaining people (opening people minus known departure counts) against known remaining contracted FTE. Unknown additional departures cannot increase that maximum. This rejects the reviewed 10 people/8 FTE minus 4 people/1 FTE, plus unknown people/0 FTE departure: at most 6 people cannot carry 7 FTE. Inflows cannot repair this opening-stock contradiction. The bound is used only for validation, never substituted for unknown headcount. This is a local necessary feasibility check, not a general constraint solver or proof that unknown inputs are feasible. Two additional focused tests cover either outflow path, masking inflows, the feasible boundary and unresolved FTE.
+
+Sparse month arrays are rejected by an own-index check before mapping; missing rows cannot silently skip validation. A focused boundary test covers a fully sparse array, an interior hole, and an explicit undefined row. The amended focused suite contains 18 tests.

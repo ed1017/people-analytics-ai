@@ -67,6 +67,7 @@ export function calculateMonthlyWorkload(raw:unknown){
   const lastDay=new Date(Date.UTC(Math.floor(openingMonth/12),openingMonth%12+1,0)).toISOString().slice(0,10);
   if(asOf!==lastDay)fail('Opening requires an exact month-end date.');
   if(!Array.isArray(spec.months)||spec.months.length<1||spec.months.length>24)fail('Supply 1–24 explicit consecutive months.');
+  for(let index=0;index<spec.months.length;index++)if(!Object.prototype.hasOwnProperty.call(spec.months,index))fail(`months[${index}]: missing month row.`);
   const missing:string[]=[];
   let hc=quantity(opening.headcount,'people',maximumStock,'opening.headcount',missing);
   const openingFte=quantity(opening.contractedFte,'FTE',maximumStock,'opening.contractedFte',missing);
@@ -90,6 +91,10 @@ export function calculateMonthlyWorkload(raw:unknown){
     const outPeople=sum(flows.exits.people,flows.transfersOut.people),outFte=sum(flows.exits.fteMicro,flows.transfersOut.fteMicro);
     const knownOutPeople=(flows.exits.people??0)+(flows.transfersOut.people??0),knownOutFte=(flows.exits.fteMicro??0)+(flows.transfersOut.fteMicro??0);
     if(hc!==null&&knownOutPeople>hc||fte!==null&&knownOutFte>fte)fail(`${path}: outflows exceed opening supply.`);
+    // Unknown departures can only reduce the remaining people. Check this upper
+    // bound before null propagation hides a contradiction with known remaining FTE.
+    const maximumRemainingPeople=hc===null?null:hc-knownOutPeople;
+    stock(maximumRemainingPeople,difference(fte,outFte),path+' remaining supply bound');
     hc=difference(hc,outPeople);fte=difference(fte,outFte);stock(hc,fte,path+' remaining opening supply');
     hc=sum(hc,flows.hires.people,flows.transfersIn.people);fte=sum(fte,flows.hires.fteMicro,flows.transfersIn.fteMicro);stock(hc,fte,path+' closing supply');
     const volume=quantity(m.volume,'work-units/month',1e6,path+'.volume',missing),effort=quantity(m.hoursPerUnit,'hours/work-unit',1e6,path+'.hoursPerUnit',missing);

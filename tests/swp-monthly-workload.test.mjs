@@ -56,6 +56,11 @@ test('month and unit denominators cannot be silently converted or inferred',()=>
  for(const [field,unit] of [['volume','work-units/year'],['hoursPerUnit','hours/month'],['productiveHoursPerFte','hours/FTE/year'],['allocation','percent'],['productivityUplift','percent']]){const s=fixture();s.months[0][field].unit=unit;assert.throws(()=>calculate(s),/expected/);}
  const s=fixture();s.months[0].volume.period='year';assert.throws(()=>calculate(s),/unsupported/);
 });
+test('rejects sparse month arrays instead of skipping missing rows',()=>{
+ for(const rows of [new Array(1),[month(),,month('2026-12')],[undefined]]){
+  const s=fixture();s.months=rows;assert.throws(()=>calculate(s),/missing month row|unsupported or missing fields/);
+ }
+});
 test('rejects infeasible opening, aggregate outflows, remainders and count/FTE pairs',()=>{
  for(const edit of [s=>s.opening.contractedFte=q(11,'FTE'),s=>s.months[0].exits=move(11,8),s=>{s.months[0].exits=move(6,4);s.months[0].transfersOut=move(5,4)},s=>s.months[0].exits=move(4,1),s=>s.months[0].hires=move(0,1),s=>s.months[0].hires=move(1,2),s=>{s.months[0].exits=move(11,8);s.months[0].hires=move(100,100)},s=>{s.months[0].exits=move(11,null);s.months[0].transfersOut=move(null,null)}]){const s=fixture();edit(s);assert.throws(()=>calculate(s),/exceed|infeasible|outflows/);}
 });
@@ -63,6 +68,21 @@ test('company scope cannot count internal transfers as new supply or canceled gr
  const s=fixture();s.scope.kind='company';assert.equal(first(s).headcount,10);
  s.months[0].transfersIn=move(1,1);s.months[0].transfersOut=move(1,1);assert.throws(()=>calculate(s),/internal transfers/);
  s.months[0].transfersIn=move(null,null);assert.throws(()=>calculate(s),/internal transfers/);
+});
+test('unknown departure counts cannot conceal impossible remaining FTE or be repaired by inflows',()=>{
+ for(const swap of [false,true])for(const inflows of [false,true]){
+  const s=fixture();s.months[0].exits=move(4,1);s.months[0].transfersOut=move(null,0);
+  if(swap)[s.months[0].exits,s.months[0].transfersOut]=[s.months[0].transfersOut,s.months[0].exits];
+  if(inflows)s.months[0].hires=move(100,100);
+  assert.throws(()=>calculate(s),/remaining supply bound: contracted FTE exceeds people/);
+ }
+});
+test('remaining headcount bound is validation only and does not replace unknown counts',()=>{
+ const s=fixture();s.months[0].exits=move(4,2);s.months[0].transfersOut=move(null,0);
+ const r=calculate(s);assert.equal(r.status,'needs-inputs');assert.ok(r.missing.includes('months[0].transfersOut.people'));
+ assert.equal(r.points[0].headcount,null);assert.equal(r.points[0].contractedFte,6);assert.equal(r.points[0].capacityHours,480);
+ s.months[0].transfersOut=move(null,null);
+ const p=first(s);assert.equal(p.headcount,null);assert.equal(p.contractedFte,null);assert.equal(p.capacityHours,null);assert.equal(p.requiredFte,5);
 });
 test('rejects duplicate flow/rate/retirement adjustments and ambiguous accounting',()=>{
  for(const edit of [s=>s.months[0].retirements=move(1,1),s=>s.months[0].attritionRate=0.1,s=>s.months[0].hires.fte.ratio=1,s=>s.accounting.movements='overlapping',s=>s.accounting.exits='voluntary-only',s=>s.accounting.productiveHours='already-allocated',s=>s.accounting.timing='end-of-month',s=>s.version='v2']){const s=fixture();edit(s);assert.throws(()=>calculate(s));}
