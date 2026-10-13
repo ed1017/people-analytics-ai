@@ -95,7 +95,8 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
     if(c.field!=='horizon_months')return true;
     if(previous)return c.turnId!==previous.turnId||c.number!==previous.months;
     const source=state.turns.find(t=>t.role==='user'&&t.id===c.turnId)??state.requiredStaffing?.basisTurns.find(t=>t.id===c.turnId);
-    const legacy=source?captureStaffingDelivery(source):null;
+    const ownsDeadline=source?.text.split(/[;!?\n]|\.(?!\d)/).some(text=>hasExplicitStaffingRequirement(text)&&captureStaffingDelivery({id:source.id,text})?.months===c.number);
+    const legacy=source&&ownsDeadline?captureStaffingDelivery(source):null;
     return !legacy||!!legacy.issue||legacy.months===null||legacy.months!==c.number;
    });
    state.staffingDeliveryTarget=captured;

@@ -187,3 +187,15 @@ test('a new staffing capture preserves an unrelated legacy retention-plan horizo
   assert.equal(runtime.rounds,text.endsWith('?')?0:1,text);
  }
 });
+
+test('a generic retention delivery deadline does not establish legacy staffing ownership',async()=>{
+ for(const originalText of ['Deliver the retention plan within 6 months.','We need 10 people. Deliver the retention plan within 6 months.']){
+ const first=solutionRequest(originalText,false,undefined,1),state=first.state;
+ state.constraints=[{action:'set',field:'horizon_months',number:6,text:null,unit:'months',turnId:first.message.id}];state.turns=[{...first.message,role:'user'}];
+ for(const text of ['Do we need 10 people within 3 months?','We need 10 people within 3 months.']){
+  const request=solutionRequest(text,false,state,2),runtime=fixtureRuntime([final('Review the staffing request.')]);runtime.natural={datasetToken:'legacy-v1:0'};
+  const reply=await converseSolutions(request,runtime,new AbortController().signal);assert.deepEqual(reply.state.constraints,state.constraints,text);
+  assert.equal(runtime.rounds,text.endsWith('?')?0:1,text);
+ }
+ }
+});
