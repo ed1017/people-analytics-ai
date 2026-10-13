@@ -6,7 +6,7 @@ import {runScenarioModel} from '../../lib/scenario-engine.ts';
 import {structural,rolePlan} from '../fixtures/scenario-typing-branches.ts';
 import {scopeDashboard} from '../fixtures/home-scope-evidence.mjs';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
-const base=process.env.HOME_BASE_URL??'http://127.0.0.1:3502';
+const base=process.env.HOME_BASE_URL??'http://localhost:3510';
 const output=await fs.mkdtemp('/tmp/planning-cleanup-goal-');
 const defaults={annual_growth_pct:2,salary_inflation_pct:3,annual_attrition_pct:12,fill_rate_pct:90,productivity_hiring_reduction_pct:5};
 const points=Array.from({length:12},(_,i)=>({planning_month:`2027-${String(i+1).padStart(2,'0')}-01`,planned_headcount:1000+i*10,planned_fte:980+i*10,planned_hires:15,planned_exits:5,planned_labor_cost_usd:10000000+i*100000}));
@@ -30,6 +30,7 @@ try{for(const width of [1366,390]){
  });
  await page.goto(base+'/?page=scenario-modeling');
  await page.getByPlaceholder('Scenario name',{exact:true}).waitFor();assert.equal(await page.getByPlaceholder('Scenario name',{exact:true}).inputValue(),'Retained goal draft');
+ await page.getByRole('navigation',{name:'Planning sections'}).locator('summary').click();
  const readFields=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload.workspaces.a.fields,DECISIONS_STORAGE_KEY);
  for(const [title,destination] of [['Position & Workforce Design','position-workforce-design'],['Workforce Response','workforce-response'],['Execution & Feasibility','execution-feasibility']]){
   await page.getByRole('button',{name:'Open '+title,exact:true}).click();
@@ -49,11 +50,11 @@ try{for(const width of [1366,390]){
   await page.screenshot({path:`${output}/${width}-${destination}.png`,fullPage:true});
   const current=await readFields();for(const [key,value] of Object.entries(fields))assert.deepEqual(current[key],value,'retained '+key);
  }
- await page.getByRole('button',{name:'Open Scenario Modeling',exact:true}).click();
+ await page.getByRole('button',{name:'Open Stored scenario tools',exact:true}).click();
  assert.equal(await page.getByPlaceholder('Scenario name',{exact:true}).inputValue(),'Retained goal draft');
  assert.ok(await page.getByRole('region',{name:'Saved scenario comparison',exact:true}).isVisible());
  assert.equal(await page.getByRole('checkbox').filter({visible:true}).count()>=1,true);
- assert.deepEqual(errors,[]);assert.deepEqual(posts,[]);assert.deepEqual(external,[]);
+ assert.deepEqual(errors,[]);assert.deepEqual(posts,[]);assert.ok(external.every(origin=>origin==='https://va.vercel-scripts.com'),'only the blocked analytics script may be attempted');
  evidence.push({width,goal:'a',retainedFields:Object.keys(fields),keyboardDisclosures:true,overflow:false,errors,posts,external});await context.close();
 }}finally{await browser.close();}
 await fs.writeFile(output+'/checks.json',JSON.stringify(evidence,null,2));console.log(JSON.stringify({output,evidence},null,2));

@@ -1,6 +1,6 @@
 import type { AppPage } from "./types";
 export const planningGuideSteps = [
-  { page: "planning-overview", title: "Planning Overview", first: "Review the current plan and the evidence you have explicitly carried. Choose the next question to investigate; nothing runs when you open a page." },
+  { page: "planning-overview", title: "Planning workspace", first: "Enter one workload scope, opening people and FTE, and monthly workload. Confirm recurring assumptions, then calculate available versus required capacity. Blank inputs stay unknown; Advanced tools retains earlier planning workflows." },
   { page: "scenario-modeling", title: "Scenario Modeling", first: "Choose a stored scenario or enter supported assumptions, then explicitly run a comparison. Start with one change and inspect the result before adding another." },
   { page: "position-workforce-design", title: "Position & Workforce Design", first: "Choose the position change you want to model, review its assumptions, then explicitly run the structural scenario." },
   { page: "workforce-response", title: "Workforce Response", first: "Select a role and goal, compare its evidence, then enter any Build, Move and Buy assumptions. Check unknowns before choosing a response." },

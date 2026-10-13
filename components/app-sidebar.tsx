@@ -185,7 +185,7 @@ export function AppSidebar({
                 </button></h2>
 
                 <div id={groupId} hidden={!expanded} className="space-y-1">
-                  {section.pages.map(
+                  {section.pages.filter(page=>!["scenario-modeling","position-workforce-design","workforce-response","execution-feasibility"].includes(page)).map(
                     (page) => {
                       const metadata =
                         getAppPageMetadata(

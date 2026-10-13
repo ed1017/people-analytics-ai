@@ -17,6 +17,7 @@ import { ScenarioModelingDestination } from "@/components/workforce-planning/sce
 import { PositionWorkforceDesignDestination } from "@/components/workforce-planning/position-workforce-design-destination";
 import { WorkforceResponseDestination } from "@/components/workforce-planning/workforce-response-destination";
 import { ExecutionFeasibilityDestination } from "@/components/workforce-planning/execution-feasibility-destination";
+import {CapacityWorkspace} from "@/components/workforce-planning/capacity-workspace";
 import { PlanningOverview } from "@/components/workforce-planning/planning-overview";
 import {
   type PlanningWorkspaceView,
@@ -1997,19 +1998,9 @@ export function WorkforcePlanningPage({
   return (
 <section className="evidence-workspace min-w-0 p-4 sm:p-6">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 id="workforce-planning-heading" tabIndex={-1} className="rounded-sm text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-ring">Workforce Planning</h2>
+            <h2 id="workforce-planning-heading" tabIndex={-1} className="rounded-sm text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-ring">Planning</h2>
             <PlanningGuide key={requestedView} page={({overview:"planning-overview",plan:"scenario-modeling",design:"position-workforce-design",respond:"workforce-response",execute:"execution-feasibility"} as const)[requestedView]} />
           </div>
-          <p className="mb-2 text-sm text-muted-foreground">{goalKey.slice(goalKey.indexOf(":")+1)?"Goal-linked workspace":"General exploration · no goal selected"} · {planningLoading ? "Loading plan…" : "2027 stored plan"}. Model allocations are assumptions, not organizational approvals.</p>
-          <details className="mb-3 text-sm text-muted-foreground">
-            <summary className="min-h-11 cursor-pointer rounded-sm py-2 focus-visible:ring-2 focus-visible:ring-ring">Assumptions &amp; source details</summary>
-            <p className="mb-2">Completed results retain their recorded inputs; changes require an explicit model run. Scenario scope comes from its business-unit selector or structural actions; dashboard filters do not narrow these calculations. Source cost period and refresh date are unverified.</p>
-            {activePlanningScenario?.provenance?.status === 'constructed_draft_assumption' && <div className="space-y-2">
-              <p>Constructed demo what-if calculations. Zero growth and inflation come from the stored flat draft; the attrition default annualizes company January–September exits and is a shared assumption for business-unit scenarios. Fill rate is an assumption, not proven hiring capacity.</p>
-              <p className="mt-1">September stock carries to January 2027. October–December 2026 is unmodeled. Calculated hires and exits are separate from the draft’s zero flows; no independent forecast validation is supplied.</p>
-              <p className="mt-1">Fourteen vacancy-only structural combinations have no draft cost basis. Affected costs display as unavailable. Scenario scope comes from its business-unit selector or structural actions; dashboard filters do not narrow these calculations. Inventory partitions retain calculation precision; displayed labels round independently. Skill profiles and career preferences do not establish assessed readiness or available movers; Borrow and Automate evidence remain unavailable.</p>
-            </div>}
-          </details>
           {evidenceHandoff && (
             <PlanningEvidenceHandoffCard
               handoff={evidenceHandoff}
@@ -2050,7 +2041,28 @@ export function WorkforcePlanningPage({
             )}
           />
 
-          {workflowView === "overview" && (
+          {(workflowView==='design'||workflowView==='respond'||workflowView==='execute')&&<p data-advanced-scope-note className="mb-3 text-sm text-muted-foreground">Calculation scope comes from the business-unit selector or structural actions. Dashboard Country, Business Unit and Level filters do not narrow these calculations.</p>}
+
+          {planningError && (
+            <div role="alert" data-planning-load-error className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+              {planningError}
+            </div>
+          )}
+
+          <div hidden={workflowView!=="overview"&&workflowView!=="plan"} className="mb-4"><CapacityWorkspace /></div>
+          <details open={workflowView==="plan"} hidden={workflowView!=="overview"&&workflowView!=="plan"} className="rounded-lg border p-4">
+          <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Stored plans and earlier scenario tools</summary>
+          <p className="mb-2 text-sm text-muted-foreground">{goalKey.slice(goalKey.indexOf(":")+1)?"Goal-linked workspace":"General exploration · no goal selected"} · {planningLoading ? "Loading plan…" : "Stored reference plan"}. Model allocations are assumptions, not organizational approvals.</p>
+          <details className="mb-3 text-sm text-muted-foreground">
+            <summary className="min-h-11 cursor-pointer rounded-sm py-2 focus-visible:ring-2 focus-visible:ring-ring">Assumptions &amp; source details</summary>
+            <p className="mb-2">Completed results retain their recorded inputs; changes require an explicit model run. Scenario scope comes from its business-unit selector or structural actions; dashboard filters do not narrow these calculations. Source cost period and refresh date are unverified.</p>
+            {activePlanningScenario?.provenance?.status === 'constructed_draft_assumption' && <div className="space-y-2">
+              <p>Constructed demo what-if calculations. Zero growth and inflation come from the stored flat draft; the attrition default annualizes company January–September exits and is a shared assumption for business-unit scenarios. Fill rate is an assumption, not proven hiring capacity.</p>
+              <p className="mt-1">September stock carries to January 2027. October–December 2026 is unmodeled. Calculated hires and exits are separate from the draft’s zero flows; no independent forecast validation is supplied.</p>
+              <p className="mt-1">Fourteen vacancy-only structural combinations have no draft cost basis. Affected costs display as unavailable. Scenario scope comes from its business-unit selector or structural actions; dashboard filters do not narrow these calculations. Inventory partitions retain calculation precision; displayed labels round independently. Skill profiles and career preferences do not establish assessed readiness or available movers; Borrow and Automate evidence remain unavailable.</p>
+            </div>}
+          </details>
+          {(workflowView === "overview" || workflowView === "plan") && (
             <PlanningOverview
               activePlanningScenario={activePlanningScenario}
               activePlanningEnd={activePlanningEnd}
@@ -2065,14 +2077,10 @@ export function WorkforcePlanningPage({
             />
           )}
 
-          {planningError && (
-            <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-              {planningError}
-            </div>
-          )}
+
 
           <ScenarioModelingDestination
-            visible={workflowView === "plan"}
+            visible={workflowView === "plan" || workflowView === "overview"}
             planningLoading={planningLoading}
             activePlanningStart={activePlanningStart}
             activePlanningEnd={activePlanningEnd}
@@ -2118,6 +2126,7 @@ export function WorkforcePlanningPage({
             deleteSavedScenario={deleteSavedScenario}
           />
 
+          </details>
           {activePlanningScenario &&
             activePlanningEnd && (
             <>

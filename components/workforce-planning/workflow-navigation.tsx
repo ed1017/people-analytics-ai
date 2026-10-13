@@ -78,16 +78,12 @@ export function WorkforcePlanningWorkflowNavigation({
   };
 
   return (
-    <nav aria-label="Planning sections" className="mb-4 flex flex-wrap gap-1 border-b pb-2">
-      {steps.map((item) => {
-        const active = activeView === item.key;
-        return <button key={item.key} type="button" aria-label={`Open ${item.title}`} aria-current={active ? "page" : undefined}
-          title={`${item.description} ${readiness[item.key] ? "Ready" : "Not run yet"}`}
-          onClick={() => onViewChange(item.key)}
-          className={`inline-flex min-h-11 items-center rounded-md px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${active ? "bg-foreground text-background" : "bg-card hover:bg-muted"}`}>
-          <span>{item.label}</span>
-        </button>;
-      })}
+    <nav aria-label="Planning sections" className="mb-4 flex flex-wrap items-start gap-2 border-b pb-2">
+      <button type="button" aria-label="Open Planning workspace" aria-current={activeView==='overview'||activeView==='plan'?'page':undefined} onClick={()=>onViewChange('overview')} className="min-h-11 rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background focus-visible:ring-2 focus-visible:ring-ring">Planning</button>
+      <details className="rounded-md border px-3">
+        <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Advanced tools</summary>
+        <div className="flex flex-wrap gap-1 pb-2">{steps.filter(item=>item.key!=='overview').map(item=><button key={item.key} type="button" aria-label={`Open ${item.key==='plan'?'Stored scenario tools':item.title}`} aria-current={activeView===item.key?'page':undefined} title={`${item.description} ${readiness[item.key]?'Ready':'Not run yet'}`} onClick={()=>onViewChange(item.key)} className="min-h-11 rounded-md px-3 py-2 text-sm hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">{item.key==='plan'?'Stored scenario tools':item.label}</button>)}</div>
+      </details>
     </nav>
   );
 }

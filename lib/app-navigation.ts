@@ -104,10 +104,10 @@ export const appPageMetadata: Record<
       "Company-wide recorded succession-plan coverage and source-assessment readiness signals.",
   },
   "planning-overview": {
-    label: "Planning Overview",
+    label: "Planning workspace",
     section: "Planning",
     description:
-      "Executive control room for the current workforce plan, response, risk, and feasibility.",
+      "Compare assumed monthly workload with available capacity; open earlier planning tools when needed.",
   },
   "scenario-modeling": {
     label: "Scenario Modeling",
