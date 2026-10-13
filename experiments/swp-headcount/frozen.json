@@ -1,0 +1,2497 @@
+{
+  "protocol": {
+    "version": 1,
+    "classification": "conditional retrospective",
+    "trainingMonths": 12,
+    "horizonMonths": 6,
+    "holdoutMonths": 6,
+    "models": [
+      "last-value",
+      "drift",
+      "seasonal-naive",
+      "linear-trend"
+    ],
+    "primaryMetric": "MAE across 10 origins × 6 horizons, equally weighted",
+    "selection": "Choose simplest model in listed order within 1% of minimum development MAE.",
+    "simplicityTolerance": 0.01,
+    "furtherWork": "Exploratory only: selected development MAE at least 10% below last-value, strictly better at >=6/10 origins, and holdout MAE no worse than last-value. These are prespecified heuristics, not business acceptance or significance tests.",
+    "intervals": false,
+    "operationalForecast": false
+  },
+  "protocolHash": "f6b73e65450210b23335d5aa47952463b248c999f9058c12fc309e6a4a3a60f7",
+  "inputHash": "a7b1420ade2df7b9838a3ffd57427b5f50ab2b963f3d4cde87b8d180d25611fd",
+  "history": {
+    "scope": {
+      "dimension": "company",
+      "id": "all-company",
+      "population": "Distinct active employees present at month end; hire_date <= snapshot_date and termination_date absent or > snapshot_date"
+    },
+    "metric": {
+      "kind": "headcount",
+      "unit": "people",
+      "definition": {
+        "status": "verified",
+        "references": [
+          "docs/swp-history-qualification.md",
+          "docs/aggregate-exit-qualification.sql"
+        ]
+      }
+    },
+    "sourceId": "public.employee_snapshots:company-month-end:captured-2026-10-05",
+    "sourceVersion": "64acf5cbb0cddbaa0614e20ee3895cd026ebe3ec9c91fed622820b53b44d63cd",
+    "populationReconciliation": {
+      "status": "verified",
+      "references": [
+        "docs/swp-history-qualification.md",
+        "docs/aggregate-exit-qualification.sql"
+      ]
+    },
+    "historicalMembership": {
+      "status": "verified",
+      "references": [
+        "docs/swp-history-qualification.md",
+        "docs/aggregate-exit-qualification.sql"
+      ]
+    },
+    "completion": {
+      "status": "unverified",
+      "references": []
+    },
+    "historicalVintages": {
+      "status": "unverified",
+      "references": []
+    },
+    "points": [
+      {
+        "month": "2024-01",
+        "value": 8400
+      },
+      {
+        "month": "2024-02",
+        "value": 8455
+      },
+      {
+        "month": "2024-03",
+        "value": 8516
+      },
+      {
+        "month": "2024-04",
+        "value": 8570
+      },
+      {
+        "month": "2024-05",
+        "value": 8625
+      },
+      {
+        "month": "2024-06",
+        "value": 8673
+      },
+      {
+        "month": "2024-07",
+        "value": 8732
+      },
+      {
+        "month": "2024-08",
+        "value": 8783
+      },
+      {
+        "month": "2024-09",
+        "value": 8834
+      },
+      {
+        "month": "2024-10",
+        "value": 8888
+      },
+      {
+        "month": "2024-11",
+        "value": 8940
+      },
+      {
+        "month": "2024-12",
+        "value": 8994
+      },
+      {
+        "month": "2025-01",
+        "value": 9050
+      },
+      {
+        "month": "2025-02",
+        "value": 9094
+      },
+      {
+        "month": "2025-03",
+        "value": 9140
+      },
+      {
+        "month": "2025-04",
+        "value": 9184
+      },
+      {
+        "month": "2025-05",
+        "value": 9230
+      },
+      {
+        "month": "2025-06",
+        "value": 9277
+      },
+      {
+        "month": "2025-07",
+        "value": 9321
+      },
+      {
+        "month": "2025-08",
+        "value": 9369
+      },
+      {
+        "month": "2025-09",
+        "value": 9415
+      },
+      {
+        "month": "2025-10",
+        "value": 9459
+      },
+      {
+        "month": "2025-11",
+        "value": 9507
+      },
+      {
+        "month": "2025-12",
+        "value": 9553
+      },
+      {
+        "month": "2026-01",
+        "value": 9600
+      },
+      {
+        "month": "2026-02",
+        "value": 9646
+      },
+      {
+        "month": "2026-03",
+        "value": 9698
+      }
+    ]
+  },
+  "selected": "drift",
+  "development": {
+    "last-value": {
+      "overall": {
+        "n": 60,
+        "mae": 161.38333333333333,
+        "rmse": 179.58521654078322,
+        "bias": -161.38333333333333
+      },
+      "byHorizon": [
+        {
+          "horizon": 1,
+          "n": 10,
+          "mae": 46.5,
+          "rmse": 46.62724525425022,
+          "bias": -46.5
+        },
+        {
+          "horizon": 2,
+          "n": 10,
+          "mae": 92.2,
+          "rmse": 92.24640914420463,
+          "bias": -92.2
+        },
+        {
+          "horizon": 3,
+          "n": 10,
+          "mae": 138.1,
+          "rmse": 138.1314591249944,
+          "bias": -138.1
+        },
+        {
+          "horizon": 4,
+          "n": 10,
+          "mae": 184.1,
+          "rmse": 184.11979795774272,
+          "bias": -184.1
+        },
+        {
+          "horizon": 5,
+          "n": 10,
+          "mae": 230.3,
+          "rmse": 230.31348201961603,
+          "bias": -230.3
+        },
+        {
+          "horizon": 6,
+          "n": 10,
+          "mae": 277.1,
+          "rmse": 277.1225360738458,
+          "bias": -277.1
+        }
+      ],
+      "byOrigin": [
+        {
+          "origin": "2024-12",
+          "n": 6,
+          "mae": 168.5,
+          "rmse": 185.4440616466324,
+          "bias": -168.5
+        },
+        {
+          "origin": "2025-01",
+          "n": 6,
+          "mae": 157.66666666666666,
+          "rmse": 175.7659428520402,
+          "bias": -157.66666666666666
+        },
+        {
+          "origin": "2025-02",
+          "n": 6,
+          "mae": 159.5,
+          "rmse": 177.6489984960981,
+          "bias": -159.5
+        },
+        {
+          "origin": "2025-03",
+          "n": 6,
+          "mae": 159.33333333333334,
+          "rmse": 177.77888888541668,
+          "bias": -159.33333333333334
+        },
+        {
+          "origin": "2025-04",
+          "n": 6,
+          "mae": 161.16666666666666,
+          "rmse": 179.23215857280374,
+          "bias": -161.16666666666666
+        },
+        {
+          "origin": "2025-05",
+          "n": 6,
+          "mae": 161.33333333333334,
+          "rmse": 179.44637081869334,
+          "bias": -161.33333333333334
+        },
+        {
+          "origin": "2025-06",
+          "n": 6,
+          "mae": 160.33333333333334,
+          "rmse": 178.71951954575826,
+          "bias": -160.33333333333334
+        },
+        {
+          "origin": "2025-07",
+          "n": 6,
+          "mae": 162.83333333333334,
+          "rmse": 180.94428240022765,
+          "bias": -162.83333333333334
+        },
+        {
+          "origin": "2025-08",
+          "n": 6,
+          "mae": 161,
+          "rmse": 179.44637081869334,
+          "bias": -161
+        },
+        {
+          "origin": "2025-09",
+          "n": 6,
+          "mae": 162.16666666666666,
+          "rmse": 181.2544252333351,
+          "bias": -162.16666666666666
+        }
+      ],
+      "rows": [
+        {
+          "origin": "2024-12",
+          "month": "2025-01",
+          "horizon": 1,
+          "actual": 9050,
+          "prediction": 8994
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-02",
+          "horizon": 2,
+          "actual": 9094,
+          "prediction": 8994
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-03",
+          "horizon": 3,
+          "actual": 9140,
+          "prediction": 8994
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-04",
+          "horizon": 4,
+          "actual": 9184,
+          "prediction": 8994
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-05",
+          "horizon": 5,
+          "actual": 9230,
+          "prediction": 8994
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-06",
+          "horizon": 6,
+          "actual": 9277,
+          "prediction": 8994
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-02",
+          "horizon": 1,
+          "actual": 9094,
+          "prediction": 9050
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-03",
+          "horizon": 2,
+          "actual": 9140,
+          "prediction": 9050
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-04",
+          "horizon": 3,
+          "actual": 9184,
+          "prediction": 9050
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-05",
+          "horizon": 4,
+          "actual": 9230,
+          "prediction": 9050
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-06",
+          "horizon": 5,
+          "actual": 9277,
+          "prediction": 9050
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-07",
+          "horizon": 6,
+          "actual": 9321,
+          "prediction": 9050
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-03",
+          "horizon": 1,
+          "actual": 9140,
+          "prediction": 9094
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-04",
+          "horizon": 2,
+          "actual": 9184,
+          "prediction": 9094
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-05",
+          "horizon": 3,
+          "actual": 9230,
+          "prediction": 9094
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-06",
+          "horizon": 4,
+          "actual": 9277,
+          "prediction": 9094
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-07",
+          "horizon": 5,
+          "actual": 9321,
+          "prediction": 9094
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-08",
+          "horizon": 6,
+          "actual": 9369,
+          "prediction": 9094
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-04",
+          "horizon": 1,
+          "actual": 9184,
+          "prediction": 9140
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-05",
+          "horizon": 2,
+          "actual": 9230,
+          "prediction": 9140
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-06",
+          "horizon": 3,
+          "actual": 9277,
+          "prediction": 9140
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-07",
+          "horizon": 4,
+          "actual": 9321,
+          "prediction": 9140
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-08",
+          "horizon": 5,
+          "actual": 9369,
+          "prediction": 9140
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-09",
+          "horizon": 6,
+          "actual": 9415,
+          "prediction": 9140
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-05",
+          "horizon": 1,
+          "actual": 9230,
+          "prediction": 9184
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-06",
+          "horizon": 2,
+          "actual": 9277,
+          "prediction": 9184
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-07",
+          "horizon": 3,
+          "actual": 9321,
+          "prediction": 9184
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-08",
+          "horizon": 4,
+          "actual": 9369,
+          "prediction": 9184
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-09",
+          "horizon": 5,
+          "actual": 9415,
+          "prediction": 9184
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-10",
+          "horizon": 6,
+          "actual": 9459,
+          "prediction": 9184
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-06",
+          "horizon": 1,
+          "actual": 9277,
+          "prediction": 9230
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-07",
+          "horizon": 2,
+          "actual": 9321,
+          "prediction": 9230
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-08",
+          "horizon": 3,
+          "actual": 9369,
+          "prediction": 9230
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-09",
+          "horizon": 4,
+          "actual": 9415,
+          "prediction": 9230
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-10",
+          "horizon": 5,
+          "actual": 9459,
+          "prediction": 9230
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-11",
+          "horizon": 6,
+          "actual": 9507,
+          "prediction": 9230
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-07",
+          "horizon": 1,
+          "actual": 9321,
+          "prediction": 9277
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-08",
+          "horizon": 2,
+          "actual": 9369,
+          "prediction": 9277
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-09",
+          "horizon": 3,
+          "actual": 9415,
+          "prediction": 9277
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-10",
+          "horizon": 4,
+          "actual": 9459,
+          "prediction": 9277
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-11",
+          "horizon": 5,
+          "actual": 9507,
+          "prediction": 9277
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-12",
+          "horizon": 6,
+          "actual": 9553,
+          "prediction": 9277
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-08",
+          "horizon": 1,
+          "actual": 9369,
+          "prediction": 9321
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-09",
+          "horizon": 2,
+          "actual": 9415,
+          "prediction": 9321
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-10",
+          "horizon": 3,
+          "actual": 9459,
+          "prediction": 9321
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-11",
+          "horizon": 4,
+          "actual": 9507,
+          "prediction": 9321
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-12",
+          "horizon": 5,
+          "actual": 9553,
+          "prediction": 9321
+        },
+        {
+          "origin": "2025-07",
+          "month": "2026-01",
+          "horizon": 6,
+          "actual": 9600,
+          "prediction": 9321
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-09",
+          "horizon": 1,
+          "actual": 9415,
+          "prediction": 9369
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-10",
+          "horizon": 2,
+          "actual": 9459,
+          "prediction": 9369
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-11",
+          "horizon": 3,
+          "actual": 9507,
+          "prediction": 9369
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-12",
+          "horizon": 4,
+          "actual": 9553,
+          "prediction": 9369
+        },
+        {
+          "origin": "2025-08",
+          "month": "2026-01",
+          "horizon": 5,
+          "actual": 9600,
+          "prediction": 9369
+        },
+        {
+          "origin": "2025-08",
+          "month": "2026-02",
+          "horizon": 6,
+          "actual": 9646,
+          "prediction": 9369
+        },
+        {
+          "origin": "2025-09",
+          "month": "2025-10",
+          "horizon": 1,
+          "actual": 9459,
+          "prediction": 9415
+        },
+        {
+          "origin": "2025-09",
+          "month": "2025-11",
+          "horizon": 2,
+          "actual": 9507,
+          "prediction": 9415
+        },
+        {
+          "origin": "2025-09",
+          "month": "2025-12",
+          "horizon": 3,
+          "actual": 9553,
+          "prediction": 9415
+        },
+        {
+          "origin": "2025-09",
+          "month": "2026-01",
+          "horizon": 4,
+          "actual": 9600,
+          "prediction": 9415
+        },
+        {
+          "origin": "2025-09",
+          "month": "2026-02",
+          "horizon": 5,
+          "actual": 9646,
+          "prediction": 9415
+        },
+        {
+          "origin": "2025-09",
+          "month": "2026-03",
+          "horizon": 6,
+          "actual": 9698,
+          "prediction": 9415
+        }
+      ]
+    },
+    "drift": {
+      "overall": {
+        "n": 60,
+        "mae": 21.752581070889846,
+        "rmse": 24.81945864826231,
+        "bias": 21.68591440422318
+      },
+      "byHorizon": [
+        {
+          "horizon": 1,
+          "n": 10,
+          "mae": 6.205499353587402,
+          "rmse": 6.644930126415197,
+          "bias": 5.805499353587402
+        },
+        {
+          "horizon": 2,
+          "n": 10,
+          "mae": 12.410998707175349,
+          "rmse": 12.854746999630086,
+          "bias": 12.410998707175349
+        },
+        {
+          "horizon": 3,
+          "n": 10,
+          "mae": 18.81649806076275,
+          "rmse": 19.325587450211454,
+          "bias": 18.81649806076275
+        },
+        {
+          "horizon": 4,
+          "n": 10,
+          "mae": 25.121997414350155,
+          "rmse": 25.748601262199884,
+          "bias": 25.121997414350155
+        },
+        {
+          "horizon": 5,
+          "n": 10,
+          "mae": 31.227496767937918,
+          "rmse": 31.939546288605147,
+          "bias": 31.227496767937918
+        },
+        {
+          "horizon": 6,
+          "n": 10,
+          "mae": 36.7329961215255,
+          "rmse": 37.81573924135154,
+          "bias": 36.7329961215255
+        }
+      ],
+      "byOrigin": [
+        {
+          "origin": "2024-12",
+          "n": 6,
+          "mae": 21.166666666666668,
+          "rmse": 25.288337232803585,
+          "bias": 20.5
+        },
+        {
+          "origin": "2025-01",
+          "n": 6,
+          "mae": 31.916666666666668,
+          "rmse": 35.19831382745912,
+          "bias": 31.916666666666668
+        },
+        {
+          "origin": "2025-02",
+          "n": 6,
+          "mae": 27.346153846153356,
+          "rmse": 30.2720570146365,
+          "bias": 27.346153846153356
+        },
+        {
+          "origin": "2025-03",
+          "n": 6,
+          "mae": 25.666666666666668,
+          "rmse": 28.100160989201452,
+          "bias": 25.666666666666668
+        },
+        {
+          "origin": "2025-04",
+          "n": 6,
+          "mae": 21.766666666666726,
+          "rmse": 24.336544689158686,
+          "bias": 21.766666666666726
+        },
+        {
+          "origin": "2025-05",
+          "n": 6,
+          "mae": 20.229166666666668,
+          "rmse": 22.600412514671792,
+          "bias": 20.229166666666668
+        },
+        {
+          "origin": "2025-06",
+          "n": 6,
+          "mae": 20.22549019607838,
+          "rmse": 22.216910649333272,
+          "bias": 20.22549019607838
+        },
+        {
+          "origin": "2025-07",
+          "n": 6,
+          "mae": 16.25,
+          "rmse": 18.349361680289487,
+          "bias": 16.25
+        },
+        {
+          "origin": "2025-08",
+          "n": 6,
+          "mae": 17.5,
+          "rmse": 19.196353820452465,
+          "bias": 17.5
+        },
+        {
+          "origin": "2025-09",
+          "n": 6,
+          "mae": 15.458333333333334,
+          "rmse": 16.546336452520237,
+          "bias": 15.458333333333334
+        }
+      ],
+      "rows": [
+        {
+          "origin": "2024-12",
+          "month": "2025-01",
+          "horizon": 1,
+          "actual": 9050,
+          "prediction": 9048
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-02",
+          "horizon": 2,
+          "actual": 9094,
+          "prediction": 9102
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-03",
+          "horizon": 3,
+          "actual": 9140,
+          "prediction": 9156
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-04",
+          "horizon": 4,
+          "actual": 9184,
+          "prediction": 9210
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-05",
+          "horizon": 5,
+          "actual": 9230,
+          "prediction": 9264
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-06",
+          "horizon": 6,
+          "actual": 9277,
+          "prediction": 9318
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-02",
+          "horizon": 1,
+          "actual": 9094,
+          "prediction": 9104.166666666666
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-03",
+          "horizon": 2,
+          "actual": 9140,
+          "prediction": 9158.333333333334
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-04",
+          "horizon": 3,
+          "actual": 9184,
+          "prediction": 9212.5
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-05",
+          "horizon": 4,
+          "actual": 9230,
+          "prediction": 9266.666666666666
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-06",
+          "horizon": 5,
+          "actual": 9277,
+          "prediction": 9320.833333333334
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-07",
+          "horizon": 6,
+          "actual": 9321,
+          "prediction": 9375
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-03",
+          "horizon": 1,
+          "actual": 9140,
+          "prediction": 9147.384615384615
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-04",
+          "horizon": 2,
+          "actual": 9184,
+          "prediction": 9200.76923076923
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-05",
+          "horizon": 3,
+          "actual": 9230,
+          "prediction": 9254.153846153846
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-06",
+          "horizon": 4,
+          "actual": 9277,
+          "prediction": 9307.538461538461
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-07",
+          "horizon": 5,
+          "actual": 9321,
+          "prediction": 9360.923076923076
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-08",
+          "horizon": 6,
+          "actual": 9369,
+          "prediction": 9414.307692307691
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-04",
+          "horizon": 1,
+          "actual": 9184,
+          "prediction": 9192.857142857143
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-05",
+          "horizon": 2,
+          "actual": 9230,
+          "prediction": 9245.714285714286
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-06",
+          "horizon": 3,
+          "actual": 9277,
+          "prediction": 9298.57142857143
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-07",
+          "horizon": 4,
+          "actual": 9321,
+          "prediction": 9351.42857142857
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-08",
+          "horizon": 5,
+          "actual": 9369,
+          "prediction": 9404.285714285714
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-09",
+          "horizon": 6,
+          "actual": 9415,
+          "prediction": 9457.142857142857
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-05",
+          "horizon": 1,
+          "actual": 9230,
+          "prediction": 9236.266666666666
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-06",
+          "horizon": 2,
+          "actual": 9277,
+          "prediction": 9288.533333333333
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-07",
+          "horizon": 3,
+          "actual": 9321,
+          "prediction": 9340.8
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-08",
+          "horizon": 4,
+          "actual": 9369,
+          "prediction": 9393.066666666668
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-09",
+          "horizon": 5,
+          "actual": 9415,
+          "prediction": 9445.333333333334
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-10",
+          "horizon": 6,
+          "actual": 9459,
+          "prediction": 9497.6
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-06",
+          "horizon": 1,
+          "actual": 9277,
+          "prediction": 9281.875
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-07",
+          "horizon": 2,
+          "actual": 9321,
+          "prediction": 9333.75
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-08",
+          "horizon": 3,
+          "actual": 9369,
+          "prediction": 9385.625
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-09",
+          "horizon": 4,
+          "actual": 9415,
+          "prediction": 9437.5
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-10",
+          "horizon": 5,
+          "actual": 9459,
+          "prediction": 9489.375
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-11",
+          "horizon": 6,
+          "actual": 9507,
+          "prediction": 9541.25
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-07",
+          "horizon": 1,
+          "actual": 9321,
+          "prediction": 9328.588235294117
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-08",
+          "horizon": 2,
+          "actual": 9369,
+          "prediction": 9380.176470588236
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-09",
+          "horizon": 3,
+          "actual": 9415,
+          "prediction": 9431.764705882353
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-10",
+          "horizon": 4,
+          "actual": 9459,
+          "prediction": 9483.35294117647
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-11",
+          "horizon": 5,
+          "actual": 9507,
+          "prediction": 9534.941176470587
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-12",
+          "horizon": 6,
+          "actual": 9553,
+          "prediction": 9586.529411764706
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-08",
+          "horizon": 1,
+          "actual": 9369,
+          "prediction": 9372.166666666666
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-09",
+          "horizon": 2,
+          "actual": 9415,
+          "prediction": 9423.333333333334
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-10",
+          "horizon": 3,
+          "actual": 9459,
+          "prediction": 9474.5
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-11",
+          "horizon": 4,
+          "actual": 9507,
+          "prediction": 9525.666666666666
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-12",
+          "horizon": 5,
+          "actual": 9553,
+          "prediction": 9576.833333333334
+        },
+        {
+          "origin": "2025-07",
+          "month": "2026-01",
+          "horizon": 6,
+          "actual": 9600,
+          "prediction": 9628
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-09",
+          "horizon": 1,
+          "actual": 9415,
+          "prediction": 9420
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-10",
+          "horizon": 2,
+          "actual": 9459,
+          "prediction": 9471
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-11",
+          "horizon": 3,
+          "actual": 9507,
+          "prediction": 9522
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-12",
+          "horizon": 4,
+          "actual": 9553,
+          "prediction": 9573
+        },
+        {
+          "origin": "2025-08",
+          "month": "2026-01",
+          "horizon": 5,
+          "actual": 9600,
+          "prediction": 9624
+        },
+        {
+          "origin": "2025-08",
+          "month": "2026-02",
+          "horizon": 6,
+          "actual": 9646,
+          "prediction": 9675
+        },
+        {
+          "origin": "2025-09",
+          "month": "2025-10",
+          "horizon": 1,
+          "actual": 9459,
+          "prediction": 9465.75
+        },
+        {
+          "origin": "2025-09",
+          "month": "2025-11",
+          "horizon": 2,
+          "actual": 9507,
+          "prediction": 9516.5
+        },
+        {
+          "origin": "2025-09",
+          "month": "2025-12",
+          "horizon": 3,
+          "actual": 9553,
+          "prediction": 9567.25
+        },
+        {
+          "origin": "2025-09",
+          "month": "2026-01",
+          "horizon": 4,
+          "actual": 9600,
+          "prediction": 9618
+        },
+        {
+          "origin": "2025-09",
+          "month": "2026-02",
+          "horizon": 5,
+          "actual": 9646,
+          "prediction": 9668.75
+        },
+        {
+          "origin": "2025-09",
+          "month": "2026-03",
+          "horizon": 6,
+          "actual": 9698,
+          "prediction": 9719.5
+        }
+      ]
+    },
+    "seasonal-naive": {
+      "overall": {
+        "n": 60,
+        "mae": 587.5,
+        "rmse": 587.9828512238544,
+        "bias": -587.5
+      },
+      "byHorizon": [
+        {
+          "horizon": 1,
+          "n": 10,
+          "mae": 606.3,
+          "rmse": 606.7909854307329,
+          "bias": -606.3
+        },
+        {
+          "horizon": 2,
+          "n": 10,
+          "mae": 598,
+          "rmse": 598.4097258567912,
+          "bias": -598
+        },
+        {
+          "horizon": 3,
+          "n": 10,
+          "mae": 590,
+          "rmse": 590.3475247682504,
+          "bias": -590
+        },
+        {
+          "horizon": 4,
+          "n": 10,
+          "mae": 582.6,
+          "rmse": 582.9430503917171,
+          "bias": -582.6
+        },
+        {
+          "horizon": 5,
+          "n": 10,
+          "mae": 576.4,
+          "rmse": 576.709112118059,
+          "bias": -576.4
+        },
+        {
+          "horizon": 6,
+          "n": 10,
+          "mae": 571.7,
+          "rmse": 571.9504349154741,
+          "bias": -571.7
+        }
+      ],
+      "byOrigin": [
+        {
+          "origin": "2024-12",
+          "n": 6,
+          "mae": 622.6666666666666,
+          "rmse": 622.9010087218246,
+          "bias": -622.6666666666666
+        },
+        {
+          "origin": "2025-01",
+          "n": 6,
+          "mae": 612.5,
+          "rmse": 612.7064277993717,
+          "bias": -612.5
+        },
+        {
+          "origin": "2025-02",
+          "n": 6,
+          "mae": 603.6666666666666,
+          "rmse": 603.8115048037205,
+          "bias": -603.6666666666666
+        },
+        {
+          "origin": "2025-03",
+          "n": 6,
+          "mae": 596.5,
+          "rmse": 596.617549188758,
+          "bias": -596.5
+        },
+        {
+          "origin": "2025-04",
+          "n": 6,
+          "mae": 589.3333333333334,
+          "rmse": 589.4573775940038,
+          "bias": -589.3333333333334
+        },
+        {
+          "origin": "2025-05",
+          "n": 6,
+          "mae": 583,
+          "rmse": 583.1272016750147,
+          "bias": -583
+        },
+        {
+          "origin": "2025-06",
+          "n": 6,
+          "mae": 575.5,
+          "rmse": 575.5995425061883,
+          "bias": -575.5
+        },
+        {
+          "origin": "2025-07",
+          "n": 6,
+          "mae": 569,
+          "rmse": 569.1320877734213,
+          "bias": -569
+        },
+        {
+          "origin": "2025-08",
+          "n": 6,
+          "mae": 563.3333333333334,
+          "rmse": 563.4382545289827,
+          "bias": -563.3333333333334
+        },
+        {
+          "origin": "2025-09",
+          "n": 6,
+          "mae": 559.5,
+          "rmse": 559.5502658385572,
+          "bias": -559.5
+        }
+      ],
+      "rows": [
+        {
+          "origin": "2024-12",
+          "month": "2025-01",
+          "horizon": 1,
+          "actual": 9050,
+          "prediction": 8400
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-02",
+          "horizon": 2,
+          "actual": 9094,
+          "prediction": 8455
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-03",
+          "horizon": 3,
+          "actual": 9140,
+          "prediction": 8516
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-04",
+          "horizon": 4,
+          "actual": 9184,
+          "prediction": 8570
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-05",
+          "horizon": 5,
+          "actual": 9230,
+          "prediction": 8625
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-06",
+          "horizon": 6,
+          "actual": 9277,
+          "prediction": 8673
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-02",
+          "horizon": 1,
+          "actual": 9094,
+          "prediction": 8455
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-03",
+          "horizon": 2,
+          "actual": 9140,
+          "prediction": 8516
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-04",
+          "horizon": 3,
+          "actual": 9184,
+          "prediction": 8570
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-05",
+          "horizon": 4,
+          "actual": 9230,
+          "prediction": 8625
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-06",
+          "horizon": 5,
+          "actual": 9277,
+          "prediction": 8673
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-07",
+          "horizon": 6,
+          "actual": 9321,
+          "prediction": 8732
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-03",
+          "horizon": 1,
+          "actual": 9140,
+          "prediction": 8516
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-04",
+          "horizon": 2,
+          "actual": 9184,
+          "prediction": 8570
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-05",
+          "horizon": 3,
+          "actual": 9230,
+          "prediction": 8625
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-06",
+          "horizon": 4,
+          "actual": 9277,
+          "prediction": 8673
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-07",
+          "horizon": 5,
+          "actual": 9321,
+          "prediction": 8732
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-08",
+          "horizon": 6,
+          "actual": 9369,
+          "prediction": 8783
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-04",
+          "horizon": 1,
+          "actual": 9184,
+          "prediction": 8570
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-05",
+          "horizon": 2,
+          "actual": 9230,
+          "prediction": 8625
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-06",
+          "horizon": 3,
+          "actual": 9277,
+          "prediction": 8673
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-07",
+          "horizon": 4,
+          "actual": 9321,
+          "prediction": 8732
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-08",
+          "horizon": 5,
+          "actual": 9369,
+          "prediction": 8783
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-09",
+          "horizon": 6,
+          "actual": 9415,
+          "prediction": 8834
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-05",
+          "horizon": 1,
+          "actual": 9230,
+          "prediction": 8625
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-06",
+          "horizon": 2,
+          "actual": 9277,
+          "prediction": 8673
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-07",
+          "horizon": 3,
+          "actual": 9321,
+          "prediction": 8732
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-08",
+          "horizon": 4,
+          "actual": 9369,
+          "prediction": 8783
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-09",
+          "horizon": 5,
+          "actual": 9415,
+          "prediction": 8834
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-10",
+          "horizon": 6,
+          "actual": 9459,
+          "prediction": 8888
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-06",
+          "horizon": 1,
+          "actual": 9277,
+          "prediction": 8673
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-07",
+          "horizon": 2,
+          "actual": 9321,
+          "prediction": 8732
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-08",
+          "horizon": 3,
+          "actual": 9369,
+          "prediction": 8783
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-09",
+          "horizon": 4,
+          "actual": 9415,
+          "prediction": 8834
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-10",
+          "horizon": 5,
+          "actual": 9459,
+          "prediction": 8888
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-11",
+          "horizon": 6,
+          "actual": 9507,
+          "prediction": 8940
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-07",
+          "horizon": 1,
+          "actual": 9321,
+          "prediction": 8732
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-08",
+          "horizon": 2,
+          "actual": 9369,
+          "prediction": 8783
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-09",
+          "horizon": 3,
+          "actual": 9415,
+          "prediction": 8834
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-10",
+          "horizon": 4,
+          "actual": 9459,
+          "prediction": 8888
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-11",
+          "horizon": 5,
+          "actual": 9507,
+          "prediction": 8940
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-12",
+          "horizon": 6,
+          "actual": 9553,
+          "prediction": 8994
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-08",
+          "horizon": 1,
+          "actual": 9369,
+          "prediction": 8783
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-09",
+          "horizon": 2,
+          "actual": 9415,
+          "prediction": 8834
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-10",
+          "horizon": 3,
+          "actual": 9459,
+          "prediction": 8888
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-11",
+          "horizon": 4,
+          "actual": 9507,
+          "prediction": 8940
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-12",
+          "horizon": 5,
+          "actual": 9553,
+          "prediction": 8994
+        },
+        {
+          "origin": "2025-07",
+          "month": "2026-01",
+          "horizon": 6,
+          "actual": 9600,
+          "prediction": 9050
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-09",
+          "horizon": 1,
+          "actual": 9415,
+          "prediction": 8834
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-10",
+          "horizon": 2,
+          "actual": 9459,
+          "prediction": 8888
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-11",
+          "horizon": 3,
+          "actual": 9507,
+          "prediction": 8940
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-12",
+          "horizon": 4,
+          "actual": 9553,
+          "prediction": 8994
+        },
+        {
+          "origin": "2025-08",
+          "month": "2026-01",
+          "horizon": 5,
+          "actual": 9600,
+          "prediction": 9050
+        },
+        {
+          "origin": "2025-08",
+          "month": "2026-02",
+          "horizon": 6,
+          "actual": 9646,
+          "prediction": 9094
+        },
+        {
+          "origin": "2025-09",
+          "month": "2025-10",
+          "horizon": 1,
+          "actual": 9459,
+          "prediction": 8888
+        },
+        {
+          "origin": "2025-09",
+          "month": "2025-11",
+          "horizon": 2,
+          "actual": 9507,
+          "prediction": 8940
+        },
+        {
+          "origin": "2025-09",
+          "month": "2025-12",
+          "horizon": 3,
+          "actual": 9553,
+          "prediction": 8994
+        },
+        {
+          "origin": "2025-09",
+          "month": "2026-01",
+          "horizon": 4,
+          "actual": 9600,
+          "prediction": 9050
+        },
+        {
+          "origin": "2025-09",
+          "month": "2026-02",
+          "horizon": 5,
+          "actual": 9646,
+          "prediction": 9094
+        },
+        {
+          "origin": "2025-09",
+          "month": "2026-03",
+          "horizon": 6,
+          "actual": 9698,
+          "prediction": 9140
+        }
+      ]
+    },
+    "linear-trend": {
+      "overall": {
+        "n": 60,
+        "mae": 35.03761666953642,
+        "rmse": 37.09141711252406,
+        "bias": 35.032061113980944
+      },
+      "byHorizon": [
+        {
+          "horizon": 1,
+          "n": 10,
+          "mae": 19.047753754672886,
+          "rmse": 20.692537793911942,
+          "bias": 19.014420421340038
+        },
+        {
+          "horizon": 2,
+          "n": 10,
+          "mae": 25.674810031730157,
+          "rmse": 26.532427152777938,
+          "bias": 25.674810031730157
+        },
+        {
+          "horizon": 3,
+          "n": 10,
+          "mae": 32.13519964211955,
+          "rmse": 32.630235498743936,
+          "bias": 32.13519964211955
+        },
+        {
+          "horizon": 4,
+          "n": 10,
+          "mae": 38.49558925250913,
+          "rmse": 38.75732033341401,
+          "bias": 38.49558925250913
+        },
+        {
+          "horizon": 5,
+          "n": 10,
+          "mae": 44.65597886289852,
+          "rmse": 44.84073936332124,
+          "bias": 44.65597886289852
+        },
+        {
+          "horizon": 6,
+          "n": 10,
+          "mae": 50.21636847328828,
+          "rmse": 50.44734358459181,
+          "bias": 50.21636847328828
+        }
+      ],
+      "byOrigin": [
+        {
+          "origin": "2024-12",
+          "n": 6,
+          "mae": 21.619658119659107,
+          "rmse": 25.864999361666943,
+          "bias": 21.56410256410436
+        },
+        {
+          "origin": "2025-01",
+          "n": 6,
+          "mae": 30.154761904761774,
+          "rmse": 33.263429726276186,
+          "bias": 30.154761904761774
+        },
+        {
+          "origin": "2025-02",
+          "n": 6,
+          "mae": 34.59890109890148,
+          "rmse": 36.97869823960263,
+          "bias": 34.59890109890148
+        },
+        {
+          "origin": "2025-03",
+          "n": 6,
+          "mae": 37.404166666667756,
+          "rmse": 39.217000269259934,
+          "bias": 37.404166666667756
+        },
+        {
+          "origin": "2025-04",
+          "n": 6,
+          "mae": 38.50245098039189,
+          "rmse": 40.178146182366945,
+          "bias": 38.50245098039189
+        },
+        {
+          "origin": "2025-05",
+          "n": 6,
+          "mae": 38.662990196079285,
+          "rmse": 40.09049863329411,
+          "bias": 38.662990196079285
+        },
+        {
+          "origin": "2025-06",
+          "n": 6,
+          "mae": 38.85018919848638,
+          "rmse": 40.0029269883607,
+          "bias": 38.85018919848638
+        },
+        {
+          "origin": "2025-07",
+          "n": 6,
+          "mae": 37.710526315787924,
+          "rmse": 38.74413613101617,
+          "bias": 37.710526315787924
+        },
+        {
+          "origin": "2025-08",
+          "n": 6,
+          "mae": 37.248496240601526,
+          "rmse": 38.088498372038224,
+          "bias": 37.248496240601526
+        },
+        {
+          "origin": "2025-09",
+          "n": 6,
+          "mae": 35.62402597402706,
+          "rmse": 36.10088059416796,
+          "bias": 35.62402597402706
+        }
+      ],
+      "rows": [
+        {
+          "origin": "2024-12",
+          "month": "2025-01",
+          "horizon": 1,
+          "actual": 9050,
+          "prediction": 9049.833333333336
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-02",
+          "horizon": 2,
+          "actual": 9094,
+          "prediction": 9103.525641025642
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-03",
+          "horizon": 3,
+          "actual": 9140,
+          "prediction": 9157.217948717951
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-04",
+          "horizon": 4,
+          "actual": 9184,
+          "prediction": 9210.910256410258
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-05",
+          "horizon": 5,
+          "actual": 9230,
+          "prediction": 9264.602564102566
+        },
+        {
+          "origin": "2024-12",
+          "month": "2025-06",
+          "horizon": 6,
+          "actual": 9277,
+          "prediction": 9318.294871794873
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-02",
+          "horizon": 1,
+          "actual": 9094,
+          "prediction": 9103.576923076924
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-03",
+          "horizon": 2,
+          "actual": 9140,
+          "prediction": 9157.274725274725
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-04",
+          "horizon": 3,
+          "actual": 9184,
+          "prediction": 9210.972527472528
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-05",
+          "horizon": 4,
+          "actual": 9230,
+          "prediction": 9264.670329670329
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-06",
+          "horizon": 5,
+          "actual": 9277,
+          "prediction": 9318.368131868132
+        },
+        {
+          "origin": "2025-01",
+          "month": "2025-07",
+          "horizon": 6,
+          "actual": 9321,
+          "prediction": 9372.065934065933
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-03",
+          "horizon": 1,
+          "actual": 9140,
+          "prediction": 9154.538461538461
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-04",
+          "horizon": 2,
+          "actual": 9184,
+          "prediction": 9207.962637362638
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-05",
+          "horizon": 3,
+          "actual": 9230,
+          "prediction": 9261.386813186813
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-06",
+          "horizon": 4,
+          "actual": 9277,
+          "prediction": 9314.81098901099
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-07",
+          "horizon": 5,
+          "actual": 9321,
+          "prediction": 9368.235164835165
+        },
+        {
+          "origin": "2025-02",
+          "month": "2025-08",
+          "horizon": 6,
+          "actual": 9369,
+          "prediction": 9421.659340659342
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-04",
+          "horizon": 1,
+          "actual": 9184,
+          "prediction": 9204.085714285715
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-05",
+          "horizon": 2,
+          "actual": 9230,
+          "prediction": 9257.14642857143
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-06",
+          "horizon": 3,
+          "actual": 9277,
+          "prediction": 9310.207142857143
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-07",
+          "horizon": 4,
+          "actual": 9321,
+          "prediction": 9363.267857142859
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-08",
+          "horizon": 5,
+          "actual": 9369,
+          "prediction": 9416.328571428572
+        },
+        {
+          "origin": "2025-03",
+          "month": "2025-09",
+          "horizon": 6,
+          "actual": 9415,
+          "prediction": 9469.389285714287
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-05",
+          "horizon": 1,
+          "actual": 9230,
+          "prediction": 9252.125
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-06",
+          "horizon": 2,
+          "actual": 9277,
+          "prediction": 9304.742647058823
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-07",
+          "horizon": 3,
+          "actual": 9321,
+          "prediction": 9357.360294117647
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-08",
+          "horizon": 4,
+          "actual": 9369,
+          "prediction": 9409.97794117647
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-09",
+          "horizon": 5,
+          "actual": 9415,
+          "prediction": 9462.595588235294
+        },
+        {
+          "origin": "2025-04",
+          "month": "2025-10",
+          "horizon": 6,
+          "actual": 9459,
+          "prediction": 9515.213235294117
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-06",
+          "horizon": 1,
+          "actual": 9277,
+          "prediction": 9299.536764705883
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-07",
+          "horizon": 2,
+          "actual": 9321,
+          "prediction": 9351.720588235296
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-08",
+          "horizon": 3,
+          "actual": 9369,
+          "prediction": 9403.904411764706
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-09",
+          "horizon": 4,
+          "actual": 9415,
+          "prediction": 9456.088235294119
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-10",
+          "horizon": 5,
+          "actual": 9459,
+          "prediction": 9508.27205882353
+        },
+        {
+          "origin": "2025-05",
+          "month": "2025-11",
+          "horizon": 6,
+          "actual": 9507,
+          "prediction": 9560.455882352942
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-07",
+          "horizon": 1,
+          "actual": 9321,
+          "prediction": 9346.712418300653
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-08",
+          "horizon": 2,
+          "actual": 9369,
+          "prediction": 9398.50085999312
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-09",
+          "horizon": 3,
+          "actual": 9415,
+          "prediction": 9450.289301685587
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-10",
+          "horizon": 4,
+          "actual": 9459,
+          "prediction": 9502.077743378053
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-11",
+          "horizon": 5,
+          "actual": 9507,
+          "prediction": 9553.86618507052
+        },
+        {
+          "origin": "2025-06",
+          "month": "2025-12",
+          "horizon": 6,
+          "actual": 9553,
+          "prediction": 9605.654626762986
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-08",
+          "horizon": 1,
+          "actual": 9369,
+          "prediction": 9393.087719298244
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-09",
+          "horizon": 2,
+          "actual": 9415,
+          "prediction": 9444.470175438595
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-10",
+          "horizon": 3,
+          "actual": 9459,
+          "prediction": 9495.852631578946
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-11",
+          "horizon": 4,
+          "actual": 9507,
+          "prediction": 9547.235087719297
+        },
+        {
+          "origin": "2025-07",
+          "month": "2025-12",
+          "horizon": 5,
+          "actual": 9553,
+          "prediction": 9598.617543859647
+        },
+        {
+          "origin": "2025-07",
+          "month": "2026-01",
+          "horizon": 6,
+          "actual": 9600,
+          "prediction": 9649.999999999998
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-09",
+          "horizon": 1,
+          "actual": 9415,
+          "prediction": 9439.652631578947
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-10",
+          "horizon": 2,
+          "actual": 9459,
+          "prediction": 9490.69097744361
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-11",
+          "horizon": 3,
+          "actual": 9507,
+          "prediction": 9541.729323308271
+        },
+        {
+          "origin": "2025-08",
+          "month": "2025-12",
+          "horizon": 4,
+          "actual": 9553,
+          "prediction": 9592.767669172932
+        },
+        {
+          "origin": "2025-08",
+          "month": "2026-01",
+          "horizon": 5,
+          "actual": 9600,
+          "prediction": 9643.806015037593
+        },
+        {
+          "origin": "2025-08",
+          "month": "2026-02",
+          "horizon": 6,
+          "actual": 9646,
+          "prediction": 9694.844360902256
+        },
+        {
+          "origin": "2025-09",
+          "month": "2025-10",
+          "horizon": 1,
+          "actual": 9459,
+          "prediction": 9485.995238095238
+        },
+        {
+          "origin": "2025-09",
+          "month": "2025-11",
+          "horizon": 2,
+          "actual": 9507,
+          "prediction": 9536.713419913422
+        },
+        {
+          "origin": "2025-09",
+          "month": "2025-12",
+          "horizon": 3,
+          "actual": 9553,
+          "prediction": 9587.431601731603
+        },
+        {
+          "origin": "2025-09",
+          "month": "2026-01",
+          "horizon": 4,
+          "actual": 9600,
+          "prediction": 9638.149783549785
+        },
+        {
+          "origin": "2025-09",
+          "month": "2026-02",
+          "horizon": 5,
+          "actual": 9646,
+          "prediction": 9688.867965367966
+        },
+        {
+          "origin": "2025-09",
+          "month": "2026-03",
+          "horizon": 6,
+          "actual": 9698,
+          "prediction": 9739.586147186148
+        }
+      ]
+    }
+  },
+  "windows": {
+    "development": [
+      {
+        "origin": "2024-12",
+        "targets": [
+          "2025-01",
+          "2025-02",
+          "2025-03",
+          "2025-04",
+          "2025-05",
+          "2025-06"
+        ]
+      },
+      {
+        "origin": "2025-01",
+        "targets": [
+          "2025-02",
+          "2025-03",
+          "2025-04",
+          "2025-05",
+          "2025-06",
+          "2025-07"
+        ]
+      },
+      {
+        "origin": "2025-02",
+        "targets": [
+          "2025-03",
+          "2025-04",
+          "2025-05",
+          "2025-06",
+          "2025-07",
+          "2025-08"
+        ]
+      },
+      {
+        "origin": "2025-03",
+        "targets": [
+          "2025-04",
+          "2025-05",
+          "2025-06",
+          "2025-07",
+          "2025-08",
+          "2025-09"
+        ]
+      },
+      {
+        "origin": "2025-04",
+        "targets": [
+          "2025-05",
+          "2025-06",
+          "2025-07",
+          "2025-08",
+          "2025-09",
+          "2025-10"
+        ]
+      },
+      {
+        "origin": "2025-05",
+        "targets": [
+          "2025-06",
+          "2025-07",
+          "2025-08",
+          "2025-09",
+          "2025-10",
+          "2025-11"
+        ]
+      },
+      {
+        "origin": "2025-06",
+        "targets": [
+          "2025-07",
+          "2025-08",
+          "2025-09",
+          "2025-10",
+          "2025-11",
+          "2025-12"
+        ]
+      },
+      {
+        "origin": "2025-07",
+        "targets": [
+          "2025-08",
+          "2025-09",
+          "2025-10",
+          "2025-11",
+          "2025-12",
+          "2026-01"
+        ]
+      },
+      {
+        "origin": "2025-08",
+        "targets": [
+          "2025-09",
+          "2025-10",
+          "2025-11",
+          "2025-12",
+          "2026-01",
+          "2026-02"
+        ]
+      },
+      {
+        "origin": "2025-09",
+        "targets": [
+          "2025-10",
+          "2025-11",
+          "2025-12",
+          "2026-01",
+          "2026-02",
+          "2026-03"
+        ]
+      }
+    ],
+    "holdout": {
+      "origin": "2026-03",
+      "targets": [
+        "2026-04",
+        "2026-05",
+        "2026-06",
+        "2026-07",
+        "2026-08",
+        "2026-09"
+      ]
+    },
+    "independentOriginCount": null,
+    "qualification": "window-feasibility-only"
+  },
+  "frozenAt": "2026-10-13T14:15:49.066Z",
+  "limitations": [
+    "Synthetic source; final-data retrospective only.",
+    "Completion and origin vintages unknown.",
+    "Overlapping origins are correlated; 60 forecast errors are not 60 independent samples.",
+    "Only 12–21 training months at development origins; annual seasonality has limited support.",
+    "No cost, subgroup, interval or operational forecast."
+  ]
+}

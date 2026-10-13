@@ -1,4 +1,5 @@
 import { TrainingTimingPanel } from "@/components/training-timing-panel";
+import {HeadcountDemoWorkspace} from './headcount-demo-workspace';
 import type { ComponentProps } from "react";
 
 import { ScenarioComparisonTable } from "./scenario-comparison-table";
@@ -39,6 +40,7 @@ export function ScenarioModelingDestination({
       data-planning-destination="scenario-modeling"
       className={visible ? "evidence-pane space-y-6" : "hidden"}
     >
+      <HeadcountDemoWorkspace>
       <ScenarioPlanSummary
         visible
         planningLoading={planningLoading}
@@ -69,7 +71,7 @@ export function ScenarioModelingDestination({
       />
 
       <TrainingTimingPanel suggestedMonth={activePlanningStart?.planning_month.slice(0,7)??""} />
-
+      </HeadcountDemoWorkspace>
     </div>
   );
 }

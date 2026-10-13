@@ -1,0 +1,152 @@
+{
+  "scope": {
+    "dimension": "company",
+    "id": "all-company",
+    "population": "Distinct active employees present at month end; hire_date <= snapshot_date and termination_date absent or > snapshot_date"
+  },
+  "metric": {
+    "kind": "headcount",
+    "unit": "people",
+    "definition": {
+      "status": "verified",
+      "references": [
+        "docs/swp-history-qualification.md",
+        "docs/aggregate-exit-qualification.sql"
+      ]
+    }
+  },
+  "sourceId": "public.employee_snapshots:company-month-end:captured-2026-10-05",
+  "sourceVersion": "64acf5cbb0cddbaa0614e20ee3895cd026ebe3ec9c91fed622820b53b44d63cd",
+  "populationReconciliation": {
+    "status": "verified",
+    "references": [
+      "docs/swp-history-qualification.md",
+      "docs/aggregate-exit-qualification.sql"
+    ]
+  },
+  "historicalMembership": {
+    "status": "verified",
+    "references": [
+      "docs/swp-history-qualification.md",
+      "docs/aggregate-exit-qualification.sql"
+    ]
+  },
+  "completion": {
+    "status": "unverified",
+    "references": []
+  },
+  "historicalVintages": {
+    "status": "unverified",
+    "references": []
+  },
+  "points": [
+    {
+      "month": "2024-01",
+      "value": 8400
+    },
+    {
+      "month": "2024-02",
+      "value": 8455
+    },
+    {
+      "month": "2024-03",
+      "value": 8516
+    },
+    {
+      "month": "2024-04",
+      "value": 8570
+    },
+    {
+      "month": "2024-05",
+      "value": 8625
+    },
+    {
+      "month": "2024-06",
+      "value": 8673
+    },
+    {
+      "month": "2024-07",
+      "value": 8732
+    },
+    {
+      "month": "2024-08",
+      "value": 8783
+    },
+    {
+      "month": "2024-09",
+      "value": 8834
+    },
+    {
+      "month": "2024-10",
+      "value": 8888
+    },
+    {
+      "month": "2024-11",
+      "value": 8940
+    },
+    {
+      "month": "2024-12",
+      "value": 8994
+    },
+    {
+      "month": "2025-01",
+      "value": 9050
+    },
+    {
+      "month": "2025-02",
+      "value": 9094
+    },
+    {
+      "month": "2025-03",
+      "value": 9140
+    },
+    {
+      "month": "2025-04",
+      "value": 9184
+    },
+    {
+      "month": "2025-05",
+      "value": 9230
+    },
+    {
+      "month": "2025-06",
+      "value": 9277
+    },
+    {
+      "month": "2025-07",
+      "value": 9321
+    },
+    {
+      "month": "2025-08",
+      "value": 9369
+    },
+    {
+      "month": "2025-09",
+      "value": 9415
+    },
+    {
+      "month": "2025-10",
+      "value": 9459
+    },
+    {
+      "month": "2025-11",
+      "value": 9507
+    },
+    {
+      "month": "2025-12",
+      "value": 9553
+    },
+    {
+      "month": "2026-01",
+      "value": 9600
+    },
+    {
+      "month": "2026-02",
+      "value": 9646
+    },
+    {
+      "month": "2026-03",
+      "value": 9698
+    }
+  ]
+}
