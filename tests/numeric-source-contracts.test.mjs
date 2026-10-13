@@ -143,6 +143,7 @@ test('stored planning API keeps raw monthly flows distinct from the headcount cu
 });
 
 const aliases = {
+  '@/components/evidence-table-region':load('components/evidence-table-region.tsx'),
   '@/lib/display-format':format,
   '@/lib/numeric-contract':numeric,
   '@/components/synthetic-domain-demo':{SyntheticDomainDemo:()=>null},
