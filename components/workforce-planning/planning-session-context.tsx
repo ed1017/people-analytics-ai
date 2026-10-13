@@ -4,8 +4,15 @@ import {
   createContext,
   useContext,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
+
+import {datasetSession} from '@/lib/dataset-client.mjs';
+import {emptyCapacityDraft,type CapacityDraft} from '@/lib/swp-capacity-draft';
+import type {calculateMonthlyWorkload} from '@/lib/swp-monthly-workload';
+export type CapacitySession={draft:CapacityDraft;result:ReturnType<typeof calculateMonthlyWorkload>|null;error:string};
+const emptyCapacitySession:CapacitySession={draft:emptyCapacityDraft,result:null,error:''};
 
 export type PlanningWorkspaceView =
   | "overview"
@@ -16,6 +23,8 @@ export type PlanningWorkspaceView =
 
 type PlanningSessionContextValue = {
   goalKey: string;
+  capacitySession:CapacitySession;
+  setCapacitySession:(session:CapacitySession)=>void;
   activeView: PlanningWorkspaceView;
   setActiveView: (view: PlanningWorkspaceView) => void;
   setTalentEvidenceContext: (snapshot: string | null) => void;
@@ -35,10 +44,15 @@ export function PlanningSessionProvider({
   const [activeView, setActiveView] =
     useState<PlanningWorkspaceView>("overview");
 
+  const datasetToken=useSyncExternalStore(datasetSession.subscribe,datasetSession.snapshot,()=> 'pending');
+  const capacityKey=JSON.stringify([datasetToken,goalKey]);
+  const [capacitySessions,setCapacitySessions]=useState<Record<string,CapacitySession>>({});
   return (
     <PlanningSessionContext.Provider
       value={{
         goalKey,
+        capacitySession:capacitySessions[capacityKey]??emptyCapacitySession,
+        setCapacitySession:session=>setCapacitySessions(current=>({...current,[capacityKey]:session})),
         activeView,
         setActiveView,
         setTalentEvidenceContext: onTalentEvidenceContextChange,
