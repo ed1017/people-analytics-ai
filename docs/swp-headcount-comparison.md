@@ -1,6 +1,6 @@
 # Local company-headcount comparison
 
-This unpublished slice follows reviewed experiment `ff2778ecae0ad00e1a94c5d874c4350954ead512`. It adds one reusable component and an offline browser fixture, with no application route, Home starter, API, database access, paid calls, push or deployment. There is no automated action recommendation, persistence or operational planning activation. The existing withheld Forecasting starter remains untouched on its separate branch.
+This unpublished slice follows reviewed experiment `ff2778ecae0ad00e1a94c5d874c4350954ead512`. The comparison reviewed at `bb17cfde` is now accessible locally from **Planning → Scenario Modeling → Compare headcount — synthetic demo baseline**, at `/planning/headcount-demo`. Its return link opens `/?page=scenario-modeling`. Existing scenario panels remain in place. No Home starter, API, database access, paid calls, push or deployment is added. There is no automated action recommendation, persistence or operational planning activation. The existing withheld Forecasting starter remains untouched on its separate branch.
 
 Visible disclaimer, verbatim: **Synthetic demo baseline. Conditional retrospective evaluation; not validated for operational planning.**
 
@@ -30,7 +30,17 @@ PLAYWRIGHT_MODULE=/tmp/people-browser/node_modules/playwright/index.mjs node tes
 npm run build -- --webpack
 ```
 
-The browser fixture uses the actual component and captured aggregate history, bundles with the installed compiler, and intercepts all requests locally. Adjust `PLAYWRIGHT_MODULE` to an existing Playwright installation when necessary; Chromium is `/usr/bin/chromium`. No application test route is introduced.
+The isolated browser fixture uses the actual component and captured aggregate history, bundles with the installed compiler, and intercepts all requests locally. Adjust `PLAYWRIGHT_MODULE` to an existing Playwright installation when necessary; Chromium is `/usr/bin/chromium`.
+
+The actual route/navigation test runs against a locally built Next server:
+
+```sh
+npm run start -- --hostname 127.0.0.1 --port 3478
+# In a separate shell:
+PLAYWRIGHT_MODULE=/tmp/people-browser/node_modules/playwright/index.mjs node tests/browser/swp-headcount-route.mjs
+```
+
+It exercises the real sidebar from Planning Overview to Scenario Modeling, the labelled demo entry, comparison, reset, reload, browser Back/Forward, the return link and direct route access at desktop (1366px) and mobile (390px). All API requests from the existing shell are intercepted before reaching the server, with a synthetic dashboard response and unavailable-source responses elsewhere. The comparison and reset make no API requests. Assertions require zero AI requests, external requests, browser exceptions or horizontal overflow. Screenshots show the actual route with production CSS; they were visually inspected. Navigation away does not save assumptions, and reload resets them. Source fixtures remain statically imported by the server page; the calculation contract and reviewed component are unchanged in this integration.
 
 Coverage: 19 tests include nine negative freeze mutations (selection, protocol, rehashed protocol, history, rehashed history, rehashed subgroup, rehashed calendar, development window, holdout window); qualification; deterministic baseline/scenario dates and arithmetic; missing versus zero; provenance separation; source/cost/subgroup rejection; helper date rollover/decimal preservation; and regression through the existing conversation engine. The new rehashed-subgroup case initially failed, then motivated rechecking the company-only contract at holdout evaluation.
 
