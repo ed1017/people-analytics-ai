@@ -6,6 +6,8 @@ import type {ProjectionSpec,ProjectionField} from './home-solution-conversation-
 import {assertSolutionShape,projectionSpecSchema} from './home-solution-conversation-schema.ts';
 // @ts-expect-error Native fixture tests share TypeScript source.
 import {runScenarioModel} from './scenario-engine.ts';
+// @ts-expect-error Native fixture tests share TypeScript source.
+import {monthlyHeadcountFlow} from './monthly-headcount-flow.ts';
 
 export type ProjectionDatasetVersion={datasetId:string;datasetToken:string;bundleDigest:string;cutoff:string};
 export type ProjectionInputs={asOf:string;opening:number;filters:DashboardFilters;scope:string;relations:string[];datasetVersion:ProjectionDatasetVersion|null;defaults:ScenarioModelAssumptions|null;baseline:ScenarioEngineBaselinePoint[]};
@@ -64,8 +66,7 @@ function resolvedProjectionSeries(spec:ProjectionSpec,inputs:ProjectionInputs,as
   if(assumptions.monthly_hires===undefined||assumptions.monthly_exits===undefined)throw Error('Monthly hires and exits are unknown. Supply explicit user assumptions or clearly labelled illustrative values before plotting.');
   const hires=assumptions.monthly_hires,exits=assumptions.monthly_exits,transfersIn=assumptions.monthly_transfers_in??0,transfersOut=assumptions.monthly_transfers_out??0;
   if(company(inputs.filters)&&(transfersIn||transfersOut))throw Error('Internal transfers cannot change company-wide headcount. Set company transfers to zero; scoped inflows/outflows require a filtered population.');
-  let opening=inputs.opening;const date=new Date(inputs.asOf);
-  for(let index=0;index<spec.months;index++){const headcount=opening+hires-exits+transfersIn-transfersOut;if(headcount<0||headcount>1e9)throw Error('The assumed flows produce an infeasible headcount. Reduce exits/outflows or revise the horizon; negative headcount is not clamped.');points.push({month:new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+index+1,1)).toISOString().slice(0,10),opening,hires,exits,transfersIn,transfersOut,headcount,reference:null});opening=headcount;}
+  points.push(...monthlyHeadcountFlow({asOf:inputs.asOf,opening:inputs.opening,months:spec.months,hires,exits,transfersIn,transfersOut}));
   limitations.push('Constant monthly gross external hires and exits are assumptions, not observed flows. Opening + hires − exits + scoped transfers in − scoped transfers out. Unspecified transfers are assumed zero.');
  }
  return {points,limitations};
