@@ -1,3 +1,5 @@
+// @ts-expect-error Native fixtures share source.
+import {requiredStaffingAnswer} from './home-required-staffing.ts';
 import type {ChatMessage} from './types';
 import type {SolutionState,SolutionEvaluation} from './home-solution-conversation';
 
@@ -106,6 +108,14 @@ export function solutionDiscussionPresentations(messages:ChatMessage[],state:Sol
   const currentStaffing=state.requiredStaffing&&state.currentCalculationKinds?.includes('required-staffing')&&matched===state.turns.length-1;
   if(!proposals.length&&!currentStaffing)continue;
   const split=splitPlanDiscussion(message.content);
+  // Fold only the exact calculator-owned suffix; keep evidence and explanations visible.
+  if(currentStaffing&&state.requiredStaffing){
+   const checked=requiredStaffingAnswer(state.requiredStaffing).split('\n').slice(1).join('\n');
+   if(checked&&split.discussion.endsWith(checked)){
+    split.discussion=split.discussion.slice(0,-checked.length).replace('Checked fixed-role comparison:\n','').trim();
+    split.reference=[split.reference,checked].filter(Boolean).join('\n\n');
+   }
+  }
   const followUp=splitPlanFollowUp(split.discussion,state.questions);
   result.set(message,{...split,...followUp,proposals});
  }

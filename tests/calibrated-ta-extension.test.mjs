@@ -9,7 +9,6 @@ import * as extension from '../lib/synthetic-ta/extension.ts';
 import * as numeric from '../lib/numeric-contract.ts';
 import {homeForecastAnswer,homeForecastChartDomain} from '../lib/home-forecast.ts';
 import {homeStarterForecast,homeStarterGoal} from '../lib/home-starter-goals.ts';
-import {homeGoalStarters} from '../lib/contextual-prompts.ts';
 import {buildHomePack} from '../lib/home-pack.mjs';
 import {forecast} from '../lib/synthetic-ta/v1.ts';
 
@@ -43,7 +42,7 @@ test('Home R1, direct answer, starter and TA AI share version and fail closed on
  const result={status:'loaded',data:{as_of:targets.cutoff,summary:targets.summary,monthly:targets.monthly,modeled_extension:taExtension}};
  const pack=buildHomePack({'talent-acquisition':result},'All countries');
  const r1=pack.sources.find(r=>r.id==='R1');assert.equal(r1.status,'loaded');assert.equal(r1.facts.modeled_ta_version,taExtension.version);
- const starter=homeStarterGoal(homeGoalStarters.at(-1));
+ const starter=homeStarterGoal('How can we improve hiring based on recorded recruiting evidence, and which findings apply to the selected workforce scope?');
  assert.match(homeStarterForecast(starter,pack,'').summary,/474.*475/);
  for(const available of [false,true]){
   const answer=homeForecastAnswer('Forecast active requisitions',undefined,available);

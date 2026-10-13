@@ -3,7 +3,7 @@ type PromptGroup = {label:string;collapsed?:boolean;purpose?:'swp-business';prom
 export function PromptExamples({prompts,groups,draft,busy,onSend,hideHeading=false}:{hideHeading?:boolean;prompts:readonly string[];groups?:readonly PromptGroup[];draft:string;busy:boolean;onSend:(prompt:string,purpose?:'swp-business')=>void}) {
  if(!prompts.length)return null;
  const occupied=Boolean(draft.trim());
- const grouped=groups?.filter(group=>group.prompts.every(item=>prompts.includes(item.prompt)));
+ const grouped=groups?.map(group=>({...group,prompts:group.prompts.filter(item=>prompts.includes(item.prompt))})).filter(group=>group.prompts.length>0);
  const button=(prompt:string,label=prompt,purpose?:'swp-business')=><button key={prompt} type="button" disabled={busy} onClick={()=>{if(!busy)onSend(prompt,purpose)}} className="min-h-11 max-w-full rounded-lg border px-3 py-2 text-left text-sm leading-snug hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{label}</button>;
  return <section aria-label="Suggested questions" className="@container space-y-2">
   {!hideHeading&&<h3 className="text-xl font-semibold">Suggested prompts</h3>}

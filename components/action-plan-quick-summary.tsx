@@ -6,9 +6,9 @@ import type {BundleDraft,BundleResult} from '@/lib/home-bundle-reconciliation';
 import {actionPlanQuickSummary} from '@/lib/action-plan-quick-summary';
 const number=(value:number|null)=>value===null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:1});
 const money=(value:number|null)=>value===null?'Unknown':`$${value.toLocaleString('en-US',{maximumFractionDigits:2})}`;
-export function ActionPlanQuickSummary({draft,result,compact=false}:{draft:BundleDraft|null;result?:BundleResult|null;compact?:boolean}){
+export function ActionPlanQuickSummary({draft,result,compact=false,fallbackActions=[]}:{draft:BundleDraft|null;result?:BundleResult|null;compact?:boolean;fallbackActions?:readonly {id:string;step:string}[]}){
  if(draft?.inputs.requiredStaffingPlan&&result?.inputKey===bundleInputKey(draft)){const f=requiredStaffingPlanFacts(draft.inputs.requiredStaffingPlan);return <section aria-label="Action Plan quick summary"><StaffingOptionSummary option={f.option} currency={f.review.inputs.currency} costMonths={f.review.inputs.months} deliveryMonths={f.deliveryTarget?.months??null}/></section>;}
- if(compact)return <CompactPlanSummary draft={draft} result={result}/>;
+ if(compact)return <CompactPlanSummary draft={draft} result={result} fallbackActions={fallbackActions}/>;
  const value=actionPlanQuickSummary(draft,result);
  const planning=value.planning;
  if(value.conditionalHiring)return <section aria-label="Action Plan quick summary" className="space-y-2"><p className="font-medium">Conditional hiring proposal · assumptions unconfirmed</p><HiringPlanningSummary result={value.conditionalHiring.result}/><p>Full hiring cost, affordability and staffing availability: Unknown. Budget allowance is not reviewed complete cash.</p></section>;
@@ -54,14 +54,18 @@ export function ActionPlanQuickSummary({draft,result,compact=false}:{draft:Bundl
 
 const provenance=(kind:string|undefined)=>kind==='model-proposed'?'Model-proposed · unconfirmed':kind==='unknown'||!kind?'Not supplied':kind==='user-entered'?'User-entered assumption':'Retained planning assumption';
 /** One option's short bullets; every quantity comes from the checked summary. */
-function CompactPlanSummary({draft,result}:{draft:BundleDraft|null;result?:BundleResult|null}){
+function CompactPlanSummary({draft,result,fallbackActions}:{draft:BundleDraft|null;result?:BundleResult|null;fallbackActions:readonly {id:string;step:string}[]}){
  const value=actionPlanQuickSummary(draft,result),p=value.planning,h=value.hiring;
  const range=(v:{min:number;max:number}|null)=>v===null?'Unknown':v.min===v.max?number(v.min):`${number(v.min)}–${number(v.max)}`;
  if(value.conditionalHiring)return <section aria-label="Action Plan quick summary"><HiringPlanningSummary compact result={value.conditionalHiring.result}/></section>;
+ const cash=p?p.cash:h?h.externalSubtotal:value.cash??value.subtotal;
+ const duration=(n:number|null,unit:string)=>n===null?'Unknown':`${number(n)} ${unit}${n===1?'':'s'}`;
+ const actions=draft?.bundle.components.map(activity=>({id:activity.id,step:activity.firstStep}))??fallbackActions;
  const stakeholders=[...new Set(draft?.bundle.components.map(c=>c.ownerRole)??[])].join('; ')||'Unknown';
  return <section aria-label="Action Plan quick summary"><ul className="list-disc space-y-2 pl-5 text-sm leading-snug">
- <li>Cost: <strong>{money(p?p.cash:h?h.externalSubtotal:value.cash??value.subtotal)}</strong> USD · {p?'incremental allowance':h||value.subtotal!==null?'partial cash':'incremental cash'}</li>
- <li>{h?'Budget period':'Duration'}: <strong>{p?`${number(p.months)} months`:h?`${h.months} months`:value.days===null?'Unknown':`${number(value.days)} days`}</strong> · {p?(draft?.inputs.scope.months.kind==='model-proposed'?'proposed':'entered assumption'):h?'cost horizon':'readiness unconfirmed'}</li>
+ <li>Actions: {actions.length?actions.map((activity,index)=><span key={activity.id}>{index>0?' ':''}{activity.step}</span>):'Not specified'}</li>
+ <li>Cost: <strong>{money(cash)}</strong>{cash===null?'':' USD'} · {p?'incremental allowance':h||value.subtotal!==null?'partial cash':'incremental cash'}</li>
+ <li>{h?'Budget period':'Duration'}: <strong>{p?duration(p.months,'month'):h?duration(h.months,'month'):duration(value.days,'day')}</strong> · {p?(draft?.inputs.scope.months.kind==='model-proposed'?'proposed':'entered assumption'):h?'cost horizon':'readiness unconfirmed'}</li>
  <li>Labor time: <strong>{range(p?.hours??null)!=='Unknown'?range(p!.hours):number(value.deliveryHours)} hours</strong> · labor cost unknown</li>
  <li>People: <strong>{p?`${range(p.participants)} people`:h?`${h.requiredRoles} roles`:number(value.people)}</strong>{p?.participants&&p.participants.min!==p.participants.max?' · overlap unknown':' · availability unconfirmed'}</li>
  <li>Stakeholders: {stakeholders} · unconfirmed</li>
