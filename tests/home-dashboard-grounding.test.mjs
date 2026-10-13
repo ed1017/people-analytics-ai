@@ -33,7 +33,7 @@ test('normal GET enriches; real Home grounding uses one fresh RPC and identical 
  assert.deepEqual(bodyFor(overview).evidence,body.evidence);
  const old=await verifySolutionEvidence(body,{datasetToken:token,now:()=>new Date(stamp),read:async()=>({status:'loaded',data:full})},signal());
  setup();const fresh=await ground(body);assert.deepEqual(calls.map(c=>c.name),['dashboard_overview_filtered']);assert.deepEqual(JSON.parse(JSON.stringify(fresh)),old);assert.equal(JSON.stringify(body),before);
- const run=async grounding=>{const runtime=fixtureRuntime([final('Review the supplied workforce scope before acting.')]);runtime.grounding=grounding;await converseSolutions(body,runtime,signal());return runtime.contexts;};
+ const run=async grounding=>{const runtime=fixtureRuntime([final('Review the supplied workforce scope before acting.')]);runtime.grounding=grounding;runtime.requestTime=new Date(stamp);await converseSolutions(body,runtime,signal());return runtime.contexts;};
  assert.deepEqual(await run(fresh),await run(old));
  await ground(body);assert.equal(calls.length,2,'each grounding operation performs a fresh read');
  assert.deepEqual(solutionGroundingLimits,{readers:2,timeoutMs:30000});

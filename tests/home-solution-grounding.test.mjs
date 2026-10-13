@@ -105,7 +105,7 @@ test('actual POST supports a visible qualitative turnover proposal without inven
 test('explicit fictional population and horizon unlock checked effort without turning unknown costs into a complete total',async()=>{
  const body=solutionRequest('Reduce turnover with a fictional mentoring pilot for the fictional client-operations cohort: 12 participants, 2 total hours each, 3 coordination hours and 240 USD total cash. Start October 2026 for three months. These are proposed test inputs, not workforce facts.'),c=candidate('scoped-pilot');
  const text=(field,value,unit)=>({...quantity(field,null,unit),text:value});
- c.quantities=[text('population','Fictional client-operations cohort','text'),text('start_month','2026-10','YYYY-MM'),quantity('horizon_months',3,'months'),quantity('participants',12,'people','c1'),quantity('hours_per_participant',2,'hours/person/total','c1'),quantity('coordination_hours',3,'hours/total'),quantity('cash',240,'USD','c1')];
+ c.quantities=[text('population','Fictional client-operations cohort','text'),text('start_month','2026-10','YYYY-MM'),quantity('horizon_months',3,'months'),quantity('participants',12,'people','c1'),quantity('hours_per_participant',2,'hours/person/total'),quantity('coordination_hours',3,'hours/total'),quantity('cash',240,'USD','c1')];
  const runtime=fixtureRuntime([evaluate(c),(input)=>{const result=JSON.parse(input.at(-1).output);return {...final('Review the fictional pilot and its remaining unknowns.',[c.id]),verifiedMetrics:result.verifiedMetricReferences};}]);
  const reply=await converseSolutions(body,runtime,signal()),item=reply.state.working[0];
  assert.deepEqual(item.blocking,[]);assert.notEqual(item.result.calculationStatus,'awaiting-scope');
