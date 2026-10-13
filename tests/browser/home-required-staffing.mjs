@@ -38,12 +38,12 @@ try{for(const [mode,width,height] of [['desktop',1440,1100],['phone',390,844]]){
     const steps=body.message.text===staffingDeliveryPrompt?[{name:'compare_required_staffing',args:{changes:syntheticDeliveryChanges(body)}},final('The delivery target is three months; costs use the first year. Complete costs and readiness remain unknown.')]:fixedSteps(body),start=isolated.sandbox.__requests.length;
     isolated.sandbox.__forbidProvider=scenario;
     const reads=isolated.sandbox.__aggregateReads?.length??0;
-    if(!scenario){isolated.sandbox.__replies.push(responseForStep(steps[0],0));if(body.catalog)isolated.sandbox.__replies.push(request=>responseForStep(typeof steps[1]==='function'?steps[1](request.input):steps[1],1));}
+    if(!scenario){isolated.sandbox.__replies.push(responseForStep(steps[0],0));if(body.catalog||body.message.text===staffingDeliveryPrompt)isolated.sandbox.__replies.push(request=>responseForStep(typeof steps[1]==='function'?steps[1](request.input):steps[1],1));}
     const response=await isolated.post(new Request(req.url(),{method:req.method(),headers:req.headers(),body:req.postData()})),reply=await response.json();
-    assert.equal(response.status,200,JSON.stringify(reply));assert.equal(isolated.sandbox.__requests.length-start,scenario?0:body.catalog?2:1);
+    assert.equal(response.status,200,JSON.stringify(reply));assert.equal(isolated.sandbox.__requests.length-start,scenario?0:body.catalog||body.message.text===staffingDeliveryPrompt?2:1);
     if(scenario){assert.equal(isolated.sandbox.__aggregateReads?.length??0,reads);assert.ok(reply.answer.startsWith(staffingScenarioLabel));assert.deepEqual(reply.charts,[]);assert.deepEqual(reply.usage,{modelRounds:0,toolCalls:0});}
-    else if(!body.catalog){assert.deepEqual(JSON.parse(JSON.stringify(isolated.sandbox.__requests[start].tool_choice)),{type:'function',name:'compare_required_staffing'});assert.deepEqual(JSON.parse(JSON.stringify(isolated.sandbox.__requests[start].tools.map(t=>t.name))),['compare_required_staffing']);assert.match(JSON.stringify(isolated.sandbox.__requests[start].input),/evidenceGrounding/);}
-    if(reply.providerReceipt)assert.equal(reply.providerReceipt.modelAttempts,scenario?0:body.catalog?2:1);
+    else if(!body.catalog&&body.message.text!==staffingDeliveryPrompt){assert.deepEqual(JSON.parse(JSON.stringify(isolated.sandbox.__requests[start].tool_choice)),{type:'function',name:'compare_required_staffing'});assert.deepEqual(JSON.parse(JSON.stringify(isolated.sandbox.__requests[start].tools.map(t=>t.name))),['compare_required_staffing']);assert.match(JSON.stringify(isolated.sandbox.__requests[start].input),/evidenceGrounding/);}
+    if(reply.providerReceipt)assert.equal(reply.providerReceipt.modelAttempts,scenario?0:body.catalog||body.message.text===staffingDeliveryPrompt?2:1);
     return route.fulfill({json:reply});
    }
    const runtime=fixtureRuntime(body.message.text===staffingDeliveryPrompt?[{name:'compare_required_staffing',args:{changes:syntheticDeliveryChanges(body)}},final('The delivery target is three months; costs use the first year. Complete costs and readiness remain unknown.')]:fixedSteps(body));runtime.natural={datasetToken:'legacy-v1:0'};

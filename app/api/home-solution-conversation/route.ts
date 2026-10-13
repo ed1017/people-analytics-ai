@@ -1,5 +1,5 @@
 import {readStaffingScenario} from '@/lib/home-staffing-scenario';
-import {requiredStaffingCalculationInstructions,requiredStaffingInstructions,requiredStaffingTool} from '@/lib/home-required-staffing';
+import {requiredStaffingInstructions,requiredStaffingTool} from '@/lib/home-required-staffing';
 import {hiringBudgetInstructions} from '@/lib/home-hiring-budget';
 import {groundSolutionRequest} from '@/lib/home-solution-grounding-source';
 import {SolutionEvidenceError} from '@/lib/home-solution-grounding.mjs';
@@ -57,7 +57,7 @@ async function handlePOST(request:Request){
     if(staffingScenarioOnly||!client)throw Error('Illustrative staffing calculations cannot dispatch a model.');
     const progressContract=progressModelContract(goalProgressConversationEnabled,capabilities.progressEntryEnabled);
     const conversationTools=capabilities.requiredStaffingCalculation?[requiredStaffingTool]:demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools,...(natural?businessPlanningModelTools:[])];
-    const instructions=capabilities.requiredStaffingCalculation?requiredStaffingCalculationInstructions:(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+'\n'+solutionCompletionInstructions+progressContract.instructions)+planningInstructions;
+    const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+'\n'+solutionCompletionInstructions+progressContract.instructions)+planningInstructions;
     const response=await datasetAI(() => {
      diagnostics.modelAttempt({inputBytes:new TextEncoder().encode(JSON.stringify(input)).length,instructionsBytes:new TextEncoder().encode(instructions).length,toolSchemaBytes:new TextEncoder().encode(JSON.stringify(conversationTools)).length});
      return client.responses.create({...homeSolutionModel,instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:60000,signal});

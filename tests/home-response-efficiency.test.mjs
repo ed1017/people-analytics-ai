@@ -8,14 +8,14 @@ import {staffingDeliveryPrompt,syntheticDeliveryChanges} from './fixtures/staffi
 import {canCompleteRequiredStaffingAlone,requiredStaffingView,resolveStaffingDeliveryTarget} from '../lib/home-required-staffing.ts';
 import {evaluateSolutionCandidate} from '../lib/home-solution-conversation.ts';
 
-test('bounded live wording needs one checked tool response, with a smaller prompt and unchanged provenance',async()=>{
+test('mandatory-hire wording retains the full conversation path and unchanged checked arithmetic',async()=>{
  const route=await offlineBusinessRoute();route.sandbox.console={info(){},error(){}};
  const body=solutionRequest(staffingDeliveryPrompt),before=structuredClone(body);
- route.sandbox.__replies.push(responseForStep({name:'compare_required_staffing',args:{changes:syntheticDeliveryChanges(body)}},0));
+ route.sandbox.__replies.push(responseForStep({name:'compare_required_staffing',args:{changes:syntheticDeliveryChanges(body)}},0),responseForStep(final('Review the checked comparison and confirm readiness.')));
  const response=await route.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',body:JSON.stringify(body)})),reply=await response.json();
- assert.equal(response.status,200,JSON.stringify(reply));assert.deepEqual(reply.usage,{modelRounds:1,toolCalls:1});assert.equal(route.sandbox.__requests.length,1);
- const sent=route.sandbox.__requests[0];assert.deepEqual(JSON.parse(JSON.stringify(sent.tools.map(t=>t.name))),['compare_required_staffing']);assert.equal(sent.tool_choice.name,'compare_required_staffing');assert.ok(Buffer.byteLength(sent.instructions)<6000);assert.ok(Buffer.byteLength(JSON.stringify(sent.tools))<15000);
- assert.match(sent.instructions,/model-proposed/);assert.match(sent.instructions,/Unknown funding, release, readiness, overlap, backfill and complete costs stay unknown/);assert.equal(route.sandbox.__requestOptions[0].maxRetries,0);
+ assert.equal(response.status,200,JSON.stringify(reply));assert.deepEqual(reply.usage,{modelRounds:2,toolCalls:1});assert.equal(route.sandbox.__requests.length,2);
+ const sent=route.sandbox.__requests[0];assert.ok(sent.tools.length>1);assert.equal(sent.tool_choice,'auto');assert.equal(route.sandbox.__requestOptions[0].maxRetries,0);
+ for(const count of [0,1,3,5,10,11]){const text=staffingDeliveryPrompt.replace('3 must be hired',count+' must be hired');assert.equal(canCompleteRequiredStaffingAlone(solutionRequest(text)),false,'mandatory hire count '+count+' cannot auto-complete');}
  const review=reply.state.requiredStaffing,result=requiredStaffingView(review),option=result.options.find(o=>o.train===3&&o.redeploy===4&&o.hire===3);
  assert.equal(option.listedCash,495000);assert.equal(option.plannedTrainingHours,240);assert.equal(option.completeCash,null);assert.equal(option.readyAfterMonths,null);
  assert.equal(review.inputs.months,12);assert.equal(resolveStaffingDeliveryTarget(reply.state).months,3);assert.equal(review.origins.redeploymentCostPerPerson.kind,'model-proposed');assert.equal(review.inputs.poolsDistinct,null);assert.equal(review.inputs.budget,null);assert.equal(review.inputs.backfillCostPerInternalPerson,null);
@@ -49,7 +49,11 @@ test('Discovery starters stay evidence questions and require no planning inputs 
   route.sandbox.__replies.push(responseForStep(final('The supplied packet does not contain a comparable team-level ranking. Review the source scope before comparing groups.')));
   const response=await route.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',body:JSON.stringify(body)})),reply=await response.json();
   assert.equal(response.status,200);assert.deepEqual(reply.candidateIds,[]);assert.deepEqual(reply.state.working,[]);assert.deepEqual(reply.state.questions,[]);assert.deepEqual(body,before);
-  assert.match(route.sandbox.__requests.at(-1).instructions,/Do not automatically create an Action Plan/);
+  const instructions=route.sandbox.__requests.at(-1).instructions;
+  assert.match(instructions,/Do not automatically create an Action Plan/);
+  assert.match(instructions,/pure evidence or discovery reply without a checked plan or staffing comparison, put the entire direct answer and its limitations in answer\.discussionOnly/);
+  assert.match(instructions,/findings\/decisionRationale\/caveats branch only alongside checked candidateIds or a checked staffing comparison/);
+  assert.doesNotMatch(instructions,/Put this direct answer in findings;/);
  }
 });
 test('Forecasting starter uses the existing explicit six-month hypothetical flow contract',async()=>{
@@ -60,4 +64,18 @@ test('Forecasting starter uses the existing explicit six-month hypothetical flow
  const runtime=fixtureRuntime([project({...projectionSpec(),method:'monthly_flow',months:6,changes:[{field:'monthly_hires',kind:'literal',value:5,basis:'user',turnId:body.message.id,interpretation:'Explicit hypothetical five hires per month.'},{field:'monthly_exits',kind:'literal',value:3,basis:'user',turnId:body.message.id,interpretation:'Explicit hypothetical three exits per month.'}]}),final('This is a scenario under the supplied hypothetical flows, not a prediction of actual headcount.',[],['headcount'])],inputs);
  const reply=await converseSolutions(body,runtime,new AbortController().signal);
  assert.deepEqual(reply.analysisIds,['headcount']);assert.equal(reply.state.analyses[0].spec.months,6);assert.equal(reply.state.analyses[0].spec.method,'monthly_flow');assert.deepEqual(reply.candidateIds,[]);assert.match(reply.answer,/not a prediction/);assert.equal(runtime.reads,1);
+});
+
+test('assembled broad-planning instructions allow compact alternatives without a conflicting single-option default',async()=>{
+ const route=await offlineBusinessRoute();route.sandbox.console={info(){},error(){}};
+ const body=solutionRequest('How can we reduce workload friction?');
+ route.sandbox.__replies.push(responseForStep(final('Review the available evidence before selecting an approach.')));
+ const response=await route.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',body:JSON.stringify(body)}));
+ assert.equal(response.status,200);
+ const instructions=route.sandbox.__requests[0].instructions;
+ assert.match(instructions,/usually compare two or three distinct practical options/);
+ assert.match(instructions,/one conditional recommendation/);
+ assert.match(instructions,/explicit single-plan request can return one/);
+ assert.match(instructions,/one authoritative presentation per option/);
+ assert.doesNotMatch(instructions,/recommend ONE actionable approach by default|separate full alternatives only when explicitly requested|belong in ONE plan presentation/);
 });
