@@ -12,7 +12,7 @@ globalThis.fetch=async()=>{networkCalls++;throw new Error('Network is disabled i
 const routeUrl=new URL('../app/api/occupational-reference/route.ts',import.meta.url);
 const helperUrl=new URL('../lib/occupational-reference.ts',import.meta.url).href;
 const clientUrl='data:text/javascript;base64,'+Buffer.from('export const supabaseServer = { from: (...args) => globalThis.referenceDiagnosticTestFrom(...args) };').toString('base64');
-const source=(await readFile(routeUrl,'utf8')).replace('"../../../lib/occupational-reference"',JSON.stringify(helperUrl)).replace('"../../../lib/reference-source-diagnostics.mjs"',JSON.stringify(new URL('../lib/reference-source-diagnostics.mjs',import.meta.url).href)).replace('"../../../lib/supabase-server"',JSON.stringify(clientUrl));
+const source=(await readFile(routeUrl,'utf8')).replace('"../../../lib/occupational-reference"',JSON.stringify(helperUrl)).replace('"../../../lib/reference-source-diagnostics.mjs"',JSON.stringify(new URL('../lib/reference-source-diagnostics.mjs',import.meta.url).href)).replace('"../../../lib/supabase-server"',JSON.stringify(clientUrl)).replace('"@/lib/dataset-runtime"',JSON.stringify(new URL('../lib/dataset-runtime.ts',import.meta.url).href));
 const {GET}=await import('data:text/javascript;base64,'+Buffer.from(stripTypeScriptTypes(source)).toString('base64'));
 
 test('unconfigured reference index returns structured unknowns without network or raw errors',async()=>{

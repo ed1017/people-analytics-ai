@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
+import originEvidence from './fixtures/home-demo-origin-evidence.json' with {type:'json'};
 import {actionBinding} from '../lib/home-action-drafts.ts';
 import {createBundleDraft,readBundleDraft,reconcileBundle} from '../lib/home-bundle-reconciliation.ts';
 import {prepareIllustrativePilot} from '../lib/home-action-plan-pilot.ts';
@@ -78,7 +79,13 @@ test('new capacity demo gives a genuine bounded multi-path result while original
  assert.equal(value.report.summary.enumerated,12);assert.equal(value.report.preferredOptionId,'build-3-move-2-buy-0');assert.equal(value.report.results.find(r=>r.id===value.report.preferredOptionId).cash.complete,26800);
  data.goals.goals=data.goals.goals.filter(g=>g.id!=='demo-capacity-mix');delete data.workspaces['demo-capacity-mix'];
  assert.equal(hash(data),'ff142097dbd58c4647e72daf3f7472850a8720232b85bee491f875bfbfba9bb0');
- assert.equal(hash(await evaluateHomeMix(await fresh())),'d8f5b13a68678f333fd051ad4cece3ce19db1f40cda542414c08e4266949ec44');
+ // Replay the published source from 5cc1eae, not a newly bound current evidence packet.
+ // The historical normalized packet is verified independently in home-demo-goals.test.mjs.
+ const replay=await fresh(),canonical=JSON.stringify(originEvidence,(_,value)=>value&&Object.getPrototypeOf(value)===Object.prototype?Object.fromEntries(Object.entries(value).sort(([a],[b])=>a.localeCompare(b))):value);
+ replay.binding.evidenceDigest=createHash('sha256').update(canonical).digest('hex');
+ // Recovered from the original commit: every draft field, not just the binding, must match.
+ assert.equal(hash(replay),'3ab00c36de6fbbb5e95ee1c3a8a772e50aab68ec24a1b1e36cab9918ac82884e');
+ assert.equal(hash(await evaluateHomeMix(replay)),'d8f5b13a68678f333fd051ad4cece3ce19db1f40cda542414c08e4266949ec44');
 });
 test('malformed or unlabeled scenario input cannot bypass the existing draft contract',async()=>{
  const draft=await scenario();for(const mutate of [d=>d.inputs.mixScenario=null,d=>d.inputs.mixScenario.basis.kind='user-entered',d=>d.inputs.mixScenario.flows[0].componentIds=['made-up'],d=>d.inputs.mixScenario.bounds.build.value.max=-1,d=>d.inputs.mixScenario.extra=true]){const changed=structuredClone(draft);mutate(changed);assert.equal(readBundleDraft(changed),null);}
