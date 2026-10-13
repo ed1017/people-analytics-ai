@@ -50,7 +50,7 @@ try{for(const width of [1366,390]){
   await page.screenshot({path:`${output}/${width}-${destination}.png`,fullPage:true});
   const current=await readFields();for(const [key,value] of Object.entries(fields))assert.deepEqual(current[key],value,'retained '+key);
  }
- await page.getByRole('button',{name:'Open Scenario Modeling',exact:true}).click();
+ await page.getByRole('button',{name:'Open Stored scenario tools',exact:true}).click();
  assert.equal(await page.getByPlaceholder('Scenario name',{exact:true}).inputValue(),'Retained goal draft');
  assert.ok(await page.getByRole('region',{name:'Saved scenario comparison',exact:true}).isVisible());
  assert.equal(await page.getByRole('checkbox').filter({visible:true}).count()>=1,true);

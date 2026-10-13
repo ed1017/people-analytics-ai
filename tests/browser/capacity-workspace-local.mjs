@@ -32,6 +32,10 @@ try{for(const width of [1366,390,320]){
  await confirm();await calc();assert.match(await area.innerText(),/Incomplete/);assert.match(await result().innerText(),/Unknown/);
  await area.getByRole('checkbox',{name:/Assume every hire/}).check();assert.equal(await result().count(),0);assert.equal(await area.getByRole('checkbox',{name:/I confirm/}).isChecked(),false);
  await confirm();await calc();assert.match(await area.innerText(),/Calculated from your assumptions/);assert.match(await result().innerText(),/\+1/);
+ await input('Time assigned to this work (%)').fill('33.3');await input('Productivity improvement (%)').fill('66.6');await confirm();await calc();
+ assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['10','8','2.66','3','+0.34']);
+ await page.screenshot({path:`${output}/${width}-fractional-percent.png`,fullPage:true});
+ await input('Time assigned to this work (%)').fill('50');await input('Productivity improvement (%)').fill('0');
  // Independent acceptance examples: throughput changes demand, never supply.
  await input('Opening contracted FTE').fill('10');await input('Time assigned to this work (%)').fill('100');await input('Work units each month').fill('1920');await confirm();await calc();
  assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['10','10','10','12','+2']);
@@ -47,13 +51,14 @@ try{for(const width of [1366,390,320]){
  const row=result().locator('tbody tr').first();assert.deepEqual(await row.locator('td').allTextContents(),['10','8','4','4','0']);
  // Unmount via Workforce and return with history; session context retains inputs and results.
  await page.evaluate(()=>{history.pushState(null,'','/?page=workforce');dispatchEvent(new PopStateEvent('popstate'));});await area.waitFor({state:'hidden'});
- await page.goBack();await area.waitFor();assert.equal(await input('Workload scope').inputValue(),'Service desk — tickets');await result().waitFor();
+ await page.goBack();await area.waitFor();
+ await page.goForward();await area.waitFor({state:'hidden'});await page.goBack();await area.waitFor();assert.equal(await input('Workload scope').inputValue(),'Service desk — tickets');await result().waitFor();
  const nav=page.getByRole('navigation',{name:'Planning sections'});await nav.locator('summary').click();
  for(const [title,destination] of [['Position & Workforce Design','position-workforce-design'],['Workforce Response','workforce-response'],['Execution & Feasibility','execution-feasibility']]){
   await nav.getByRole('button',{name:'Open '+title,exact:true}).click();await page.locator(`[data-planning-destination="${destination}"]`).waitFor({state:'visible'});
   await nav.getByRole('button',{name:'Open Planning workspace',exact:true}).click();await result().waitFor();
  }
- await nav.getByRole('button',{name:'Open Scenario Modeling',exact:true}).click();await page.getByRole('heading',{name:'Custom Scenario',exact:true}).waitFor();await result().waitFor();
+ await nav.getByRole('button',{name:'Open Stored scenario tools',exact:true}).click();await page.getByRole('heading',{name:'Custom Scenario',exact:true}).waitFor();await result().waitFor();
  await page.goBack();await result().waitFor();
  await input('Opening contracted FTE').fill('');await confirm();await calc();assert.match(await area.innerText(),/Incomplete/);assert.match(await result().innerText(),/Unknown/);
  await input('Opening contracted FTE').fill('11');await confirm();await calc();assert.match(await area.getByRole('alert').innerText(),/exceeds/);assert.equal(await result().count(),0);
@@ -62,6 +67,7 @@ try{for(const width of [1366,390,320]){
  await area.getByRole('button',{name:'Calculate capacity',exact:true}).focus();await page.keyboard.press('Enter');await result().waitFor();assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['0','0','0','0','0']);
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no page overflow');
  await page.screenshot({path:`${output}/${width}-capacity.png`,fullPage:true});
- assert.deepEqual(errors,[]);assert.deepEqual(mutations,[]);evidence.push({width,errors,mutations,external,checks:'confirmation, blanks, zero, invalid, edits, keyboard, monthly math, navigation, old destinations, session recovery'});await context.close();
+ await page.reload();await area.waitFor();assert.equal(await input('Workload scope').inputValue(),'');assert.equal(await result().count(),0);
+ assert.deepEqual(errors,[]);assert.deepEqual(mutations,[]);evidence.push({width,errors,mutations,external,checks:'confirmation, blanks, zero, invalid, edits, keyboard, monthly math, fractional percentages, navigation, old destinations, Back/Forward recovery, reload clears'});await context.close();
 }}finally{await browser.close();}
 await fs.writeFile(output+'/evidence.json',JSON.stringify(evidence,null,2));console.log(JSON.stringify({output,evidence},null,2));

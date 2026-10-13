@@ -10,7 +10,7 @@ One named homogeneous workload (include its work unit in the name), explicit ope
 
 Calculate calls the sole reviewed monthly engine locally. Blank values remain unknown, including zero people with unknown FTE/person. Invalid inputs show an error instead of a result. Every value change and confirmation withdrawal clears the prior result; opening/closing disclosures does not. No automatic AI, calculation or save. The monthly comparison shows available FTE, required FTE, signed gap, plus distinct people/contracted FTE. Mobile renders each month as a compact card; desktop uses a table.
 
-Draft and result live in the existing Planning session provider, keyed by dataset token and goal workspace key. They survive page unmounts, Advanced tools, and Back navigation in the current browser session. Reload clears them. This is not persistent storage. Existing saved scenarios remain untouched.
+Draft and result live in the existing Planning session provider, keyed by dataset token and goal workspace key. They survive page unmounts, Advanced tools, and Back navigation in the current browser session. Reload or dataset cutover clears them. This is not persistent storage. Existing saved scenarios remain untouched.
 
 ## Stable integration seam for the parallel save/compare work
 
@@ -51,3 +51,18 @@ type CapacitySession = {
 - Full lint (zero errors; two pre-existing unused-variable warnings in tests/browser/conditional-hiring-plan.mjs), TypeScript and production build logs packaged with the review artifact. Local webpack is used because the environment's external node_modules symlink is unsupported by Turbopack; no configuration was changed.
 
 Not included: persistent monthly saved scenarios, cross-scenario comparison, cost estimates, general ledger/transfer editing, varying inputs by month, AI exposure, skills matching, action plans or exports. The comparison here is supply versus required capacity within a scenario. No real database/model evidence, production browser test, or live model validation is claimed. No deployment or publication.
+
+
+## Combined UI review amendment
+
+Base UI commit: `66b85e450846e6f74203df1069c970517f540937`.
+
+- Allocation and productivity percentages accept at most four decimal places, mapping to six fraction decimals in the unchanged engine. Scaled-integer conversion removes binary division noise for inputs such as 33.3% and 66.6%. Excess precision is rejected rather than silently rounded; blanks remain unknown. The form describes the limit.
+- The planning-source load error is outside the stored-tools disclosure, with alert semantics, so it remains visible on failed initial Design/Response/Execution deep links and with stored tools collapsed. A compact advanced-view note retains the distinction between calculation scope and dashboard Country/Business Unit/Level filters.
+- The accessible name is now “Open Stored scenario tools”, including the visible button wording.
+- The real-app flow adds fractional percentages, Back/Forward and reload clearing. Six failed-load deep-link cases cover three advanced routes at desktop/mobile widths and verify the visible scope note, error and return to the manual calculator.
+- A separate real-component fixture exercises the actual PlanningSessionProvider, capacity form and DatasetBoundary: draft/result isolation across goals, restoration when returning to a goal, and deliberate clearing on dataset remount. This is a fixture of the boundary, not a live dataset cutover. No cross-dataset draft restoration is claimed.
+
+The reviewed engine is byte-for-byte unchanged. Save/compare remains unintegrated. Tests, screenshots, lint/type/build logs and exact delta accompany the amendment; no publication or external data/model validation.
+
+Final amendment validation: 79 combined unit/compatibility/navigation tests passed (including 25 adapter/engine tests), full lint passed with the same two pre-existing warnings, TypeScript and production build passed. Production-build browser runs passed for the capacity flow at 1366/390/320 px, failed-load routes at 1366/390 px (six cases), and legacy goal-linked state at 1366/390 px. The goal/dataset real-component session fixture also passed. Browser source requests were intercepted; final app runs had no page exceptions or mutating API attempts. Screenshots include fractional-percentage results and visible mobile load errors/scope notes.

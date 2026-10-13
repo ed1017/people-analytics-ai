@@ -16,6 +16,13 @@ function number(value:string,label:string):number|null {
  if(!/^\d+(?:\.\d{1,6})?$/.test(value.trim()))throw Error(`${label}: enter a nonnegative number with at most six decimal places.`);
  const n=Number(value);if(!Number.isFinite(n))throw Error(`${label}: enter a finite number.`);return n;
 }
+// Four percentage decimals map exactly to the engine's six fraction decimals.
+// Round the scaled integer to remove binary floating-point noise, not input precision.
+function percentageFraction(value:number|null,label:string):number|null {
+ if(value===null)return null;
+ if(value>100||Number(value.toFixed(4))!==value)throw Error(`${label}: use 0–100 with at most four decimal places.`);
+ return Math.round(value*10_000)/1_000_000;
+}
 function q<U extends Unit>(value:number|null,unit:U,note:string):Quantity<U>{return {value,unit,basis:{kind:value===null?'unknown':'user-assumption',note}};}
 /** Adapter only: expands explicitly confirmed recurring inputs; the reviewed engine owns all calculations. */
 export function capacitySpec(draft:CapacityDraft):MonthlyWorkloadSpec {
@@ -36,7 +43,7 @@ export function capacitySpec(draft:CapacityDraft):MonthlyWorkloadSpec {
   months:Array.from({length:months},(_,i)=>({month:new Date(Date.UTC(year,month+i,1)).toISOString().slice(0,7),scopeId,
    hires:movement('hires','hireFte'),exits:movement('exits','exitFte'),transfersIn:noTransfer(),transfersOut:noTransfer(),
    volume:quantity('volume','work-units/month'),hoursPerUnit:quantity('effort','hours/work-unit'),productiveHoursPerFte:quantity('hours','hours/FTE/month'),
-   allocation:q(values.allocation===null?null:values.allocation/100,'fraction','User entered percentage of contracted FTE assigned to this work.'),
-   productivityUplift:q(values.productivity===null?null:values.productivity/100,'fraction','User entered throughput improvement, applied once.'),
+   allocation:q(percentageFraction(values.allocation,capacityLabels.allocation),'fraction','User entered percentage of contracted FTE assigned to this work.'),
+   productivityUplift:q(percentageFraction(values.productivity,capacityLabels.productivity),'fraction','User entered throughput improvement, applied once.'),
   }))};
 }

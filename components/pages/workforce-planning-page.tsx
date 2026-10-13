@@ -2041,6 +2041,14 @@ export function WorkforcePlanningPage({
             )}
           />
 
+          {(workflowView==='design'||workflowView==='respond'||workflowView==='execute')&&<p data-advanced-scope-note className="mb-3 text-sm text-muted-foreground">Calculation scope comes from the business-unit selector or structural actions. Dashboard Country, Business Unit and Level filters do not narrow these calculations.</p>}
+
+          {planningError && (
+            <div role="alert" data-planning-load-error className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+              {planningError}
+            </div>
+          )}
+
           <div hidden={workflowView!=="overview"&&workflowView!=="plan"} className="mb-4"><CapacityWorkspace /></div>
           <details open={workflowView==="plan"} hidden={workflowView!=="overview"&&workflowView!=="plan"} className="rounded-lg border p-4">
           <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Stored plans and earlier scenario tools</summary>
@@ -2069,11 +2077,7 @@ export function WorkforcePlanningPage({
             />
           )}
 
-          {planningError && (
-            <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-              {planningError}
-            </div>
-          )}
+
 
           <ScenarioModelingDestination
             visible={workflowView === "plan" || workflowView === "overview"}

@@ -27,7 +27,7 @@ export function CapacityWorkspace(){
    <div className="grid gap-3 sm:grid-cols-3">{field('volume')}{field('effort','Work effort before the productivity improvement.')}{field('hours','Net of leave and non-work time; before workload assignment.')}</div>
    <details className="rounded-md border p-3">
     <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Recurring assumptions — required for complete capacity</summary>
-    <div className="mt-2 grid gap-3 sm:grid-cols-2">{field('hires','Count each joiner once.')}{field('exits','All departures, including retirement; count each person once.')}{field('allocation','0–100%. Do not deduct leave again.')}{field('productivity','0–100%. Applied once to throughput, not to hires or workload.')}</div>
+    <div className="mt-2 grid gap-3 sm:grid-cols-2">{field('hires','Count each joiner once.')}{field('exits','All departures, including retirement; count each person once.')}{field('allocation','0–100%, up to four decimal places. Do not deduct leave again.')}{field('productivity','0–100%, up to four decimal places. Applied once to throughput, not to hires or workload.')}</div>
     <label className="mt-3 flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={draft.fullTimeMovements} onChange={e=>edit({fullTimeMovements:e.target.checked})}/>Assume every hire and departure is full-time (1 FTE per person)</label>
     {!draft.fullTimeMovements&&<div className="grid gap-3 sm:grid-cols-2">{field('hireFte','0–1 FTE/person; explicit assumption, not inferred from current staff.')}{field('exitFte','0–1 FTE/person.')}</div>}
    </details>
@@ -52,6 +52,6 @@ export function CapacityWorkspace(){
     <p className="text-xs text-muted-foreground">Available FTE is contracted FTE assigned to this work. Productivity changes required FTE; an FTE gap is not a number of people to hire.</p>
    </div>}
   </div>
-  <p className="text-xs text-muted-foreground">Draft and result stay in this session during navigation. No automatic saving. Reloading clears them. Saved scenario comparison and cost estimates are not included in this calculator.</p>
+  <p className="text-xs text-muted-foreground">Draft and result stay in this session during navigation. No automatic saving. Reloading or changing dataset clears them. Saved scenario comparison and cost estimates are not included in this calculator.</p>
  </section>;
 }
