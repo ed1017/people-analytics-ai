@@ -170,3 +170,20 @@ test('legacy deadline correction removes stale generic interpretation from model
   assert.equal(context.staffingDeliveryTarget.months,text.startsWith('Actually')?4:null,text);
  }
 });
+
+test('a later strategy question does not make an explicit deadline uncertain',async()=>{
+ const text='We need 10 people within 3 months. Should we hire or train?';
+ const capture=captureStaffingDelivery({id:'user-1',text});assert.equal(capture.months,3);assert.equal(capture.issue,null);assert.deepEqual(readStaffingDeliveryCapture(capture),capture);
+ const fixture=setup(text);fixture.runtime=fixtureRuntime([{name:'compare_required_staffing',args:{changes:fixedChanges(fixture.request,{requiredRoles:10})}},final('Review the hiring and training choices.')]);fixture.runtime.natural={datasetToken:'legacy-v1:0'};
+ const reply=await run(fixture);assert.equal(fixture.runtime.rounds,2);assert.equal(resolveStaffingDeliveryTarget(reply.state).months,3);assert.equal(resolveStaffingDeliveryTarget(reply.state).issue,null);
+});
+
+test('a new staffing capture preserves an unrelated legacy retention-plan horizon',async()=>{
+ const first=solutionRequest('Create a retention plan with a six-month horizon.',false,undefined,1),state=first.state;
+ state.constraints=[{action:'set',field:'horizon_months',number:6,text:null,unit:'months',turnId:first.message.id}];state.turns=[{...first.message,role:'user'}];
+ for(const text of ['Do we need 10 people within 3 months?','We need 10 people within 3 months.']){
+  const request=solutionRequest(text,false,state,2),runtime=fixtureRuntime([final('Review the staffing request.')]);runtime.natural={datasetToken:'legacy-v1:0'};
+  const reply=await converseSolutions(request,runtime,new AbortController().signal);assert.deepEqual(reply.state.constraints,state.constraints,text);
+  assert.equal(runtime.rounds,text.endsWith('?')?0:1,text);
+ }
+});

@@ -14,7 +14,10 @@ export function captureStaffingDelivery(turn:{id:string;text:string},clarificati
   return {months:null,turnId:turn.id,quote:text,issue:clarify};
  }
  const bare=clarification&&new RegExp('^('+amount+')\\s+months?[.!]?$','i').test(text);
- for(const sourceClause of text.split(/[;!?\n]|\.(?!\d)/).map(s=>s.trim()).filter(Boolean)){
+ const clauses=text.split(/([;!?\n]|\.(?!\d))/);
+ for(let index=0;index<clauses.length;index+=2){
+  const sourceClause=clauses[index].trim();if(!sourceClause)continue;
+  const question=clauses[index+1]==='?';
   const clause=bare?'Delivery deadline: '+sourceClause:sourceClause;
   const named=/\b(?:delivery (?:target|deadline)|staffing deadline|deadline)\b/i.test(clause);
   const standalone=new RegExp('^(?:(?:actually|instead|to clarify|make it|change it to|use)\\s*[, :]?\\s*)?(?:within|in(?: the next)?|by(?: the end of)?|no later than)\\s+(?:the next\\s+)?'+amount+'\\s+months?$','i').test(clause);
@@ -25,7 +28,7 @@ export function captureStaffingDelivery(turn:{id:string;text:string},clarificati
   const found=expressions.flatMap(pattern=>[...clause.matchAll(pattern)]);
   if(new RegExp('months?\\s+(?:and|or)\\s+('+amount+')\\s+months?','i').test(clause))uncertain=true;
   if(found.length){
-   if(text.includes('?')||/\b(?:not|never|if|unless|maybe|perhaps|example|could|would|should|may|might)\b|\bcan (?:we|you)\b|n't\b|\d\s*[-–/]\s*\d|\b(?:or|between|at least)\b/i.test(clause))uncertain=true;
+   if(question||/\b(?:not|never|if|unless|maybe|perhaps|example|could|would|should|may|might)\b|\bcan (?:we|you)\b|n't\b|\d\s*[-–/]\s*\d|\b(?:or|between|at least)\b/i.test(clause))uncertain=true;
    for(const match of found){const value=match[1].toLowerCase().replaceAll('-',' '),months=/^\d/.test(value)?Number(value):words.indexOf(value);if(!Number.isInteger(months)||months<1||months>24)uncertain=true;else values.push(months);}
   }else if(named&&/\b(?:unchanged|same|keep|retain|what|which|show|explain|remind)\b/i.test(clause))continue;
   else if(named||/\bby\s+(?!hir(?:e|ing)\b|train(?:ing)?\b|redeploy|transfer|using\b)/i.test(clause)||/\b(?:within|in(?: the next)?|no later than|by(?: the end of)?)\b.*\b(?:months?|weeks?|days?|year|january|february|march|april|may|june|july|august|september|october|november|december)\b/i.test(clause))uncertain=true;

@@ -91,7 +91,13 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   if(captured){
    const previous=state.staffingDeliveryTarget;
    // The dedicated record replaces only the matching legacy staffing interpretation.
-   state.constraints=state.constraints.filter(c=>c.field!=='horizon_months'||!!previous&&(c.turnId!==previous.turnId||c.number!==previous.months));
+   state.constraints=state.constraints.filter(c=>{
+    if(c.field!=='horizon_months')return true;
+    if(previous)return c.turnId!==previous.turnId||c.number!==previous.months;
+    const source=state.turns.find(t=>t.role==='user'&&t.id===c.turnId)??state.requiredStaffing?.basisTurns.find(t=>t.id===c.turnId);
+    const legacy=source?captureStaffingDelivery(source):null;
+    return !legacy||!!legacy.issue||legacy.months===null||legacy.months!==c.number;
+   });
    state.staffingDeliveryTarget=captured;
   }
   if(captured?.issue){
