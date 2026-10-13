@@ -1,4 +1,5 @@
 'use client';
+import {ElapsedWaitingTime} from './elapsed-waiting-time';
 import {HistoricalMetricContext} from './historical-metric-context';
 import {canReviewCostedHiringPlan} from '@/lib/home-hiring-plan';
 import {HomeHiringPlanReview} from './home-hiring-plan-review';
@@ -97,7 +98,7 @@ export function HomeSolutionConversationReview({controller,goal,pack,showSaved,p
  const current=[...(presentation.recommended?[presentation.recommended]:[]),...presentation.alternatives];
  const analyses=[...new Map(controller.state.analyses.map(item=>[item.id,item])).values()];
  return <section aria-label="Solution conversation review" className="space-y-3">
-  {controller.pending&&<div role="status" className="flex items-center gap-3"><p>Thinking through the question and checking useful calculations…</p><button className={button} onClick={controller.cancel}>Cancel request</button></div>}
+  {controller.pending&&<div className="flex flex-wrap items-center gap-x-3 gap-y-1"><p role="status">Thinking through the question and checking useful calculations…</p>{controller.pendingStartedAt!==null&&<ElapsedWaitingTime key={controller.pendingStartedAt} startedAt={controller.pendingStartedAt}/>}<button className={button} onClick={controller.cancel}>Cancel request</button></div>}
   {controller.notice&&<p role="status">{controller.notice}</p>}
   {!current.length&&!controller.state.requiredStaffing&&!!controller.state.constraints.length&&<details><summary className="cursor-pointer py-2 text-sm">Current interpreted constraints</summary>{controller.state.constraints.map(item=><p key={item.field} className="text-sm">{item.field.replaceAll('_',' ')}: {item.action==='remove'?'Removed':item.number??item.text} {item.unit}. Correct this in chat if needed.</p>)}</details>}
   {!!controller.state.verifiedMetrics.length&&<section aria-label="Checked quantitative results" className="rounded border p-3 text-sm"><h3 className="font-semibold">Checked quantitative results</h3>{controller.state.verifiedMetrics.map((ref,index)=>{const metric=resolveSolutionMetric(controller.state,ref);return <p key={index}>{metric.label}: {number(metric.value)} {metric.unit}. {metric.basis} · {metric.source}.</p>;})}<p>Effectiveness and savings are not established by these calculations.</p></section>}

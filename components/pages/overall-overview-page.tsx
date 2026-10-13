@@ -553,7 +553,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
         <p className="w-full text-sm text-muted-foreground">State your goal in your own words.</p>
         <button type="button" disabled={chatLoading} onClick={() => { conversation.setHomeGoalChoiceKey(null); focusQuestion(); }} className="min-h-11 rounded-lg border px-4 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">State my goal</button>
       </div>}
-      {chatLoading && <DataLoadingStatus name="AI answer status" label="Preparing your answer…" detail="Using the available evidence and your question."/>}
+      {chatLoading && <DataLoadingStatus startedAt={conversation.pendingStartedAt} name="AI answer status" label="Preparing your answer…" detail="Using the available evidence and your question."/>}
       {chatError && <p role="alert" className="text-destructive">{chatError}</p>}
     </section>
   );
