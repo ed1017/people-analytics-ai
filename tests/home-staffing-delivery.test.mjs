@@ -78,3 +78,62 @@ test('cancelled clarification cannot return or persist a new target',async()=>{
  const fixture=setup('We need 10 people within 3 or 6 months. Compare hiring and training.'),before=structuredClone(fixture.request),controller=new AbortController();controller.abort();
  await assert.rejects(converseSolutions(fixture.request,fixture.runtime,controller.signal));assert.deepEqual(fixture.request,before);assert.equal(fixture.runtime.rounds,0);
 });
+
+test('only an unambiguous affirmative instruction removes the deadline',async()=>{
+ const first=await run(setup());
+ for(const text of ['Never remove the delivery deadline.','Can we remove the delivery deadline?','What happens if we remove the deadline?',"Don't remove the deadline.",'We should remove the deadline.','Maybe remove the deadline.','Remove the deadline?','If there is no deadline, what changes?','Explain how to remove the deadline.']){
+  assert.equal(captureStaffingDelivery({id:'user-2',text},true),null,text);
+  const request=solutionRequest(text,false,first.state,2),runtime=fixtureRuntime([final('The existing deadline remains in place.')]);runtime.natural={datasetToken:'legacy-v1:0'};
+  const reply=await converseSolutions(request,runtime,new AbortController().signal);
+  assert.deepEqual(reply.state.staffingDeliveryTarget,first.state.staffingDeliveryTarget,text);
+  assert.equal(resolveStaffingDeliveryTarget(reply.state).months,3,text);
+  assert.throws(()=>readStaffingDeliveryCapture({months:null,turnId:'user-2',quote:text,issue:null}),/does not match/,text);
+ }
+ for(const text of ['Remove the delivery deadline.','Please clear the staffing deadline.','Drop our deadline!','No delivery deadline.']){
+  assert.deepEqual(captureStaffingDelivery({id:'user-2',text},true),{months:null,turnId:'user-2',quote:text,issue:null},text);
+ }
+});
+test('captured target can be corrected or removed before a calculator review exists',async()=>{
+ const initial=setup();initial.runtime=fixtureRuntime([final('Which role should the staffing plan cover?')]);initial.runtime.natural={datasetToken:'legacy-v1:0'};
+ const first=await run(initial);assert.equal(first.state.requiredStaffing,undefined);assert.equal(resolveStaffingDeliveryTarget(first.state).months,3);
+ for(const [text,months] of [['Actually, within four months.',4],['Remove the delivery deadline.',null]]){
+  const request=solutionRequest(text,false,first.state,2),runtime=fixtureRuntime([final('The delivery target is updated.')]);runtime.natural={datasetToken:'legacy-v1:0'};
+  const reply=await converseSolutions(request,runtime,new AbortController().signal);
+  assert.equal(resolveStaffingDeliveryTarget(reply.state).months,months,text);assert.equal(reply.state.staffingDeliveryTarget.quote,text);
+ }
+});
+test('pending clarification does not intercept unrelated messages or topic switches',async()=>{
+ const first=await run(setup('We need 10 people within 3 or 6 months. Compare hiring and training.'));
+ for(const text of ['Explain the cash calculation.','Switch topics: help me understand employee retention.']){
+  const request=solutionRequest(text,false,first.state,2),runtime=fixtureRuntime([final('We can discuss the requested topic.')]);runtime.natural={datasetToken:'legacy-v1:0'};
+  const reply=await converseSolutions(request,runtime,new AbortController().signal);
+  assert.equal(runtime.rounds,1,text);assert.equal(reply.usage.modelRounds,1,text);
+  assert.deepEqual(reply.state.staffingDeliveryTarget,first.state.staffingDeliveryTarget,'unresolved staffing issue remains available to eligibility checks');
+ }
+});
+
+ test('cost-only staffing follow-ups cannot replace the delivery deadline',async()=>{
+ const first=await run(setup());
+ for(const text of ['Staff costs in the next 12 months are USD 100000.','We need to budget salaries in 12 months.','We need to pay invoices in 12 months.','Staff training is ready in 6 months.']){
+  assert.equal(captureStaffingDelivery({id:'user-2',text},true),null,text);
+  const request=solutionRequest(text,false,first.state,2),runtime=fixtureRuntime([final('Review the cost assumption.')]);runtime.natural={datasetToken:'legacy-v1:0'};
+  const reply=await converseSolutions(request,runtime,new AbortController().signal);
+  assert.deepEqual(reply.state.staffingDeliveryTarget,first.state.staffingDeliveryTarget,text);assert.equal(reply.state.requiredStaffing.inputs.months,12);
+ }
+});
+
+test('capture round-trips with a later cost-review clause before and after model execution',async()=>{
+ const text='We need 10 people within 3 months. In 6 months we will review costs.';
+ const capture=captureStaffingDelivery({id:'user-1',text});assert.equal(capture.months,3);assert.deepEqual(readStaffingDeliveryCapture(capture),capture);
+ const fixture=setup(text);fixture.runtime=fixtureRuntime([final('Which role should the staffing plan cover?')]);fixture.runtime.natural={datasetToken:'legacy-v1:0'};
+ const reply=await run(fixture);assert.equal(fixture.runtime.rounds,1);assert.equal(resolveStaffingDeliveryTarget(reply.state).months,3);assert.deepEqual(readSolutionState(reply.state),reply.state);
+});
+
+test('legacy horizon-only targets survive discussion and support explicit edits without a calculator',async()=>{
+ const request=solutionRequest('We need 10 people within 3 months.',false,undefined,1),state=request.state;
+ state.constraints=[{action:'set',field:'horizon_months',number:3,text:null,unit:'months',turnId:request.message.id}];state.turns=[{...request.message,role:'user'}];
+ for(const [text,months] of [['Never remove the delivery deadline.',3],['Can we remove the delivery deadline?',3],['What happens if we remove the deadline?',3],['Staff costs in the next 12 months are USD 100000.',3],['We need to budget salaries in 12 months.',3],['Actually, within four months.',4],['Remove the delivery deadline.',null]]){
+  const follow=solutionRequest(text,false,state,2),runtime=fixtureRuntime([final('Review the requested topic.')]);runtime.natural={datasetToken:'legacy-v1:0'};
+  const reply=await converseSolutions(follow,runtime,new AbortController().signal);assert.equal(resolveStaffingDeliveryTarget(reply.state).months,months,text);
+ }
+});

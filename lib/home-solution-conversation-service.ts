@@ -86,11 +86,11 @@ export function solutionModelContext(request:SolutionRequest,progress?:GoalProgr
 export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,signal:AbortSignal):Promise<SolutionReply>{
  const original=readSolutionRequest(raw),request=structuredClone(original),state=request.state;
  abort(signal);
- if(runtime.natural&&(hasExplicitStaffingRequirement(request.message.text)||requiresRequiredStaffing(request)||state.requiredStaffing||state.staffingDeliveryTarget?.issue)){
-  const captured=captureStaffingDelivery(request.message,!!state.requiredStaffing,!!state.staffingDeliveryTarget?.issue);
+ if(runtime.natural&&(hasExplicitStaffingRequirement(request.message.text)||requiresRequiredStaffing(request)||state.requiredStaffing||state.staffingDeliveryTarget||state.constraints.some(c=>c.field==='horizon_months'&&c.action==='set'))){
+  const captured=captureStaffingDelivery(request.message,!!state.staffingDeliveryTarget?.issue);
   if(captured)state.staffingDeliveryTarget=captured;
-  if(state.staffingDeliveryTarget?.issue){
-   const answer=state.staffingDeliveryTarget.issue;state.questions=[answer];
+  if(captured?.issue){
+   const answer=captured.issue;state.questions=[answer];
    state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:answer}].slice(-32);
    return {requestId:request.requestId,answer,candidateIds:[],analysisIds:[],charts:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
   }
