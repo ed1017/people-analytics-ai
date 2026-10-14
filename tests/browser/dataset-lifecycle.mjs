@@ -96,7 +96,7 @@ try{
   const state=key=>page.evaluate(k=>JSON.parse(localStorage.getItem(k)).payload,key);
   async function navigate(target){const trigger=page.getByRole('button',{name:'Open navigation',exact:true});if(await trigger.isVisible())await trigger.click();if(target==='home')await page.getByRole('button',{name:'Action Planning',exact:true}).click();else{const link=page.locator(`[data-nav-destination="${target}"]`),group=await link.evaluate(n=>n.parentElement.id),toggle=page.locator(`button[aria-controls="${group}"]`);if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();await link.click();}await page.waitForFunction(target=>new URLSearchParams(location.search).get('page')===target||(target==='home'&&!location.search),target);}
   await page.goto(base);await dismissHomeOnboarding(page);
-  async function send(text){await page.getByLabel('Ask Workforce AI',{exact:true}).fill(text);await page.getByRole('button',{name:'Send overview question',exact:true}).click();}
+  async function send(text){const input=page.getByLabel('Ask Workforce AI',{exact:true});if(!await input.isVisible())await page.locator('summary').filter({hasText:/^Chat & saved goals$/}).click();await input.fill(text);await page.getByRole('button',{name:'Send overview question',exact:true}).click();}
   const card=page.getByRole('article',{name:'Working proposal: Accountability review',exact:true});
   await send(accountabilityMessage);await card.waitFor();await card.getByRole('button',{name:/^Pin Action Plan/}).click();await card.getByRole('button',{name:/^Pinned Action Plan/}).waitFor();
   const pinned=await state(DECISIONS_STORAGE_KEY),id=pinned.goals.activeId,attached=pinned.workspaces[id].fields.homePlanAlternativesV1;
