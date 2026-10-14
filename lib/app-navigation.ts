@@ -42,7 +42,7 @@ export const appPageMetadata: Record<
   "labor-market": {status:"Limited preview",label:"Labor Market",section:"Intelligence",description:"Compare published occupation wages, employment and separate U.S. projections."},
   "training-coaching": {status:"Limited preview",label:"Training & Coaching",section:"Intelligence",description:"Fictional simulated provider examples and unverified user-provided quotes."},
   "development-planning": { status:"Limited preview", label: "Development Planning", section: "Planning", description: "Compare explicitly selected development quotes and user-entered cost assumptions." },
-  home: { label: "Planning overview", section: "Planning", description: "Start a workforce scenario, review current capacity and continue your saved work." },
+  home: { label: "Overview", section: "Planning", description: "Start a workforce scenario, review current capacity and continue your saved work." },
   overview: {
     label: "Workforce",
     section: "Workforce",
@@ -104,7 +104,7 @@ export const appPageMetadata: Record<
       "Company-wide recorded succession-plan coverage and source-assessment readiness signals.",
   },
   "planning-overview": {
-    label: "Planning workspace",
+    label: "Demand & scenarios",
     section: "Planning",
     description:
       "Compare assumed monthly workload with available capacity; open earlier planning tools when needed.",

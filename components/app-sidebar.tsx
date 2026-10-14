@@ -89,8 +89,10 @@ export function AppSidebar({
 }: AppSidebarProps) {
   const phone=usePhoneLayout(),drawer=useRef<HTMLElement>(null),navCollapsed=phone?false:desktopNavCollapsed;
   const [openGroups,setOpenGroups]=useState<Record<string,boolean>>(()=>({[appNavigationSections.find(section=>section.pages.includes(activePage))?.key??'']:activePage!=='home'}));
+  const primaryPage=activePage==="home"||activePage==="planning-overview"||activePage==="workforce-planning";
+  const [exploreOpen,setExploreOpen]=useState(!primaryPage);
   const [previousPage,setPreviousPage]=useState(activePage);
-  if(previousPage!==activePage){setPreviousPage(activePage);const section=appNavigationSections.find(s=>s.pages.includes(activePage));if(section)setOpenGroups(current=>({...current,[section.key]:true}));}
+  if(previousPage!==activePage){setPreviousPage(activePage);if(!primaryPage)setExploreOpen(true);const section=appNavigationSections.find(s=>s.pages.includes(activePage));if(section)setOpenGroups(current=>({...current,[section.key]:true}));}
   return (
     <><div className="phone-navigation-trigger"><button type="button" popoverTarget="phone-navigation" className="min-h-11 rounded border px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring">Open navigation</button></div>
     <aside ref={drawer} id="phone-navigation" popover={phone?"auto":undefined} aria-label="Navigation drawer" onClick={event=>{if(phone&&(event.target as HTMLElement).closest('[data-nav-destination], [aria-label="Overview"]'))drawer.current?.hidePopover();}} className="app-sidebar sticky top-[var(--app-header-height)] h-[calc(100vh-var(--app-header-height))] overflow-y-auto border-r bg-sidebar p-3 max-md:p-2">
@@ -134,6 +136,16 @@ export function AppSidebar({
           className="mb-2 min-h-11 h-auto w-full justify-start gap-3 px-3 py-2 text-lg font-semibold max-md:justify-center max-md:px-0">
           <Sparkles className="h-5 w-5 shrink-0" />{!navCollapsed && <span className="max-md:hidden">Overview</span>}
         </Button>
+        <Button type="button" data-nav-destination="planning-overview" aria-label="Demand & scenarios" title="Demand & scenarios" aria-current={activePage === "planning-overview" || activePage === "workforce-planning" ? "page" : undefined}
+          variant={activePage === "planning-overview" || activePage === "workforce-planning" ? "secondary" : "ghost"} onClick={() => onPageChange("planning-overview")}
+          className="h-auto min-h-11 w-full justify-start gap-3 px-3 py-2 text-base font-semibold">
+          <CalendarDays className="h-5 w-5 shrink-0" />{!navCollapsed && <span className="whitespace-normal text-left">Demand &amp; scenarios</span>}
+        </Button>
+        <section aria-label="Explore tools" className="border-t pt-2">
+          <button type="button" aria-label="Explore" aria-expanded={exploreOpen} aria-controls="explore-navigation" onClick={()=>setExploreOpen(value=>!value)} className="flex min-h-11 w-full items-center gap-3 rounded px-3 py-2 text-left font-medium hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring">
+            <Compass className="h-5 w-5 shrink-0" />{!navCollapsed && <span>Explore</span>}<span aria-hidden="true" className="ml-auto">{exploreOpen?"−":"+"}</span>
+          </button>
+          <div id="explore-navigation" hidden={!exploreOpen}>
         {appNavigationSections.map(
           (section, sectionIndex) => {
             const journey =
@@ -185,7 +197,7 @@ export function AppSidebar({
                 </button></h2>
 
                 <div id={groupId} hidden={!expanded} className="space-y-1">
-                  {section.pages.filter(page=>!["scenario-modeling","position-workforce-design","workforce-response","execution-feasibility"].includes(page)).map(
+                  {section.pages.filter(page=>!["planning-overview","scenario-modeling","position-workforce-design","workforce-response","execution-feasibility"].includes(page)).map(
                     (page) => {
                       const metadata =
                         getAppPageMetadata(
@@ -250,6 +262,8 @@ export function AppSidebar({
             );
           }
         )}
+          </div>
+        </section>
       </nav>
     </aside></>
   );

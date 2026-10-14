@@ -64,7 +64,7 @@ export function HomeOverviewSummary({overview,receipt,requested,scopeLabel,loadi
  const gapLabel=gap===null?'Demand not set':gap>0?'Capacity shortfall':gap<0?'Capacity surplus':'Capacity balanced';
  return <section aria-label="Workforce planning overview" className={styles.surface}>
   <header className={styles.heading}>
-   <div><p className={styles.eyebrow}>Strategic workforce planning</p><h2>Workforce overview</h2><p className={styles.subtitle}>Understand your supply. Plan the work ahead.</p></div>
+   <div><p className={styles.eyebrow}>Strategic workforce planning</p><h2>Workforce overview</h2><p className={styles.subtitle}>Review current workforce, set demand, then save and compare scenarios.</p></div>
    <span className={styles.badge}>{point?'Your scenario':'Demo workforce'}</span>
   </header>
   {point?<p className={styles.context}>{scenario?.result.assumptions.scope.label} · {point.month} · FTE assigned to this work</p>:<>
@@ -89,12 +89,12 @@ export function HomeOverviewSummary({overview,receipt,requested,scopeLabel,loadi
    <aside className={styles.brief} aria-label="Planning brief">
     <p className={styles.eyebrow}>Planning brief</p>
     <h3>{gapLabel}</h3>
-    <p>{point?gap===0?'Your workload and assigned capacity match for this month.':`Review your workload, hiring and productivity assumptions for ${point.month}.`:current?'Set workload assumptions to compare the capacity you have with the work you need to deliver.':'A verified workforce snapshot or a complete workload scenario is needed before comparing supply and demand.'}</p>
+    <p>{point?gap===0?'Your workload and assigned capacity match for this month.':`Review your workload, hiring and productivity assumptions for ${point.month}.`:current?'Demand comes from business requirements: the work to deliver and the time it takes. Enter those assumptions to compare required and available capacity.':'A verified workforce snapshot or a complete workload scenario is needed before comparing supply and demand.'}</p>
     <div className={styles.cost} aria-label="Scenario supply cost">
      <span>Scenario supply run-rate</span><strong>{point?formatCapacityCost(runRate):'Not set'}{point&&runRate!==null&&runRate!==undefined&&<small> USD/month</small>}</strong>
      <p>{point?`${point.month} · User-assumed rate × contracted FTE; not actual pay or savings.`:'Optional cost from your scenario assumptions.'}</p>
     </div>
-    <button type="button" className={styles.primary} onClick={()=>onNavigate('planning-overview')}>Plan a scenario <ArrowRight size={18} aria-hidden="true"/></button>
+    <button type="button" className={styles.primary} onClick={()=>onNavigate('planning-overview')}>{point||savedNames.length?'Continue your scenarios':'Set demand & plan'} <ArrowRight size={18} aria-hidden="true"/></button>
    </aside>
   </div>
   {savedNames.length>0&&<section className={styles.saved} aria-label="Saved scenarios"><h3>Saved scenarios</h3><ul>{savedNames.slice(0,3).map((name,index)=><li key={index}>{name}</li>)}</ul></section>}

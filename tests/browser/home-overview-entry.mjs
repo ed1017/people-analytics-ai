@@ -31,28 +31,28 @@ try{for(const width of [1440,390]){
  assert.equal(await page.getByRole('dialog',{name:'Home instructions',exact:true}).isVisible(),false,'fresh entry does not obscure overview');
  assert.deepEqual(posts,[]);assert.equal(await page.locator('#navigation-analytics').isVisible(),false,'specialist navigation is secondary on entry');
  await page.screenshot({path:`${output}/${width}-overview-local.png`,fullPage:true});await page.screenshot({path:`${output}/${width}-viewport-local.png`});
- assert.equal(await summary.getByRole('img').count(),0,'no invented projection before a scenario exists');const actions=await summary.getByRole('button',{name:'Plan a scenario'}).boundingBox();assert.ok(actions.y+actions.height<900);assert.equal(await summary.getByRole('button').count(),1);assert.equal(await page.getByLabel('Ask Workforce AI',{exact:true}).isVisible(),false);
+ assert.equal(await summary.getByRole('img').count(),0,'no invented projection before a scenario exists');const actions=await summary.getByRole('button',{name:/Set demand & plan|Continue your scenarios/}).boundingBox();assert.ok(actions.y+actions.height<900);assert.equal(await summary.getByRole('button').count(),1);assert.equal(await page.getByLabel('Ask Workforce AI',{exact:true}).isVisible(),false);
  // Primary action keyboard navigation and repeated Back/Forward retain the user's unsent draft.
  await page.getByText('Chat & saved goals',{exact:true}).click();const chat=page.getByLabel('Ask Workforce AI',{exact:true});await chat.fill('Keep this unsent overview question');
  for(let i=0;i<2;i++){
-  await summary.getByRole('button',{name:'Plan a scenario'}).focus();await page.keyboard.press('Enter');await page.getByRole('region',{name:'Illustrative workforce planning'}).waitFor();
+  await summary.getByRole('button',{name:/Set demand & plan|Continue your scenarios/}).focus();await page.keyboard.press('Enter');await page.getByRole('region',{name:'Workload capacity planning'}).waitFor();
   await page.goBack();await summary.waitFor();assert.equal(await chat.inputValue(),'Keep this unsent overview question');
-  await page.goForward();await page.getByRole('region',{name:'Illustrative workforce planning'}).waitFor();
+  await page.goForward();await page.getByRole('region',{name:'Workload capacity planning'}).waitFor();
   if(width<768)await page.getByRole('button',{name:'Open navigation',exact:true}).click();await page.getByRole('button',{name:'Overview',exact:true}).click();await summary.waitFor();
  }
- await summary.getByRole('button',{name:'Plan a scenario'}).click();await page.getByRole('region',{name:'Illustrative workforce planning'}).waitFor();await page.goBack();await summary.waitFor();
+ await summary.getByRole('button',{name:/Set demand & plan|Continue your scenarios/}).click();await page.getByRole('region',{name:'Workload capacity planning'}).waitFor();await page.goBack();await summary.waitFor();
  // Use the real existing capacity form: the overview only reuses confirmed results.
- await summary.getByRole('button',{name:'Plan a scenario'}).click();
- await page.getByText('Advanced tools · your capacity scenarios',{exact:true}).click();
+ await summary.getByRole('button',{name:/Set demand & plan|Continue your scenarios/}).click();
+ await page.getByRole('region',{name:'Workload capacity planning',exact:true}).waitFor();
  const capacity=page.getByRole('region',{name:'Workload capacity planning',exact:true});
  for(const [label,value] of Object.entries({'Workload scope':'Service desk — tickets','Opening date (month end)':'2026-09-30','Opening people':'10','Opening contracted FTE':'8','Work units each month':'800','Hours per work unit':'1','Productive hours per FTE each month':'160','Cost per contracted FTE per month (USD, optional)':'0'}))await capacity.getByLabel(label,{exact:true}).fill(value);
- await capacity.getByText('Recurring assumptions (required)',{exact:true}).click();
+ await capacity.getByText('2. Adjust capacity assumptions (required)',{exact:true}).click();
  for(const [label,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await capacity.getByLabel(label,{exact:true}).fill(value);
  await capacity.getByRole('checkbox',{name:/Assume every hire/}).check();await capacity.getByRole('checkbox',{name:/I confirm/}).check();await capacity.getByRole('button',{name:'Calculate capacity',exact:true}).click();
- await capacity.getByRole('img').waitFor();assert.match(await capacity.innerText(),/\$0.00/);await page.goBack();await summary.waitFor();assert.equal(await summary.getByRole('img').count(),0);assert.doesNotMatch(await summary.innerText(),/3 months|\$0.00/);assert.match(await summary.innerText(),/Service desk — tickets · 2026-12/);assert.match(await summary.innerText(),/Shortfall/);assert.deepEqual(await summary.locator('dd').allTextContents(),['4 FTE','5 FTE','1 FTE']);
+ await capacity.getByRole('img').waitFor();assert.match(await capacity.innerText(),/\$0.00/);await page.goBack();await summary.waitFor();assert.equal(await summary.getByRole('img').count(),0);assert.doesNotMatch(await summary.innerText(),/3 months/);assert.match(await summary.innerText(),/\$0.00/);assert.match(await summary.innerText(),/Service desk — tickets · 2026-12/);assert.match(await summary.innerText(),/Shortfall/);assert.deepEqual(await summary.locator('dd').allTextContents(),['4 FTE','5 FTE','1 FTE']);
  await page.getByText('Chat & saved goals',{exact:true}).click();await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`${output}/${width}-current-scenario-local.png`,fullPage:true});
- await summary.getByRole('button',{name:'Plan a scenario'}).click();
- const advanced=page.getByText('Advanced tools · your capacity scenarios',{exact:true});if(!await capacity.isVisible())await advanced.click();
+ await summary.getByRole('button',{name:/Set demand & plan|Continue your scenarios/}).click();
+ const advanced=page.getByText('Your demand & capacity scenarios',{exact:true});if(!await capacity.isVisible())await advanced.click();
  await capacity.getByLabel('Cost per contracted FTE per month (USD, optional)',{exact:true}).fill('');await page.goBack();await summary.waitFor();assert.equal(await summary.getByRole('img').count(),0,'editing inputs withholds invalidated projection');
  assert.match(await summary.innerText(),/Demand has not been set/);
  // A pending and then mismatched receipt must never relabel old quantities as the newly selected country.
