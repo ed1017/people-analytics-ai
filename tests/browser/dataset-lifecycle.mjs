@@ -7,6 +7,7 @@ import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
 import postcss from 'postcss';
 import tailwind from '@tailwindcss/postcss';
 import {createDomainRace,hasDomainRace} from './dataset-domain-race.mjs';
+import {runDatasetRollback} from './dataset-rollback.mjs';
 import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 import {runScenarioModel} from '../../lib/scenario-engine.ts';
 import {converseSolutions} from '../../lib/home-solution-conversation-service.ts';
@@ -21,15 +22,15 @@ const chromium=playwright.chromium??playwright.default.chromium;
 const output=process.env.AUDIT_OUTPUT??await fs.mkdtemp(path.join(os.tmpdir(),'dataset-lifecycle-'));
 const build=process.env.AUDIT_BUILD??await fs.mkdtemp(path.join(os.tmpdir(),'turnover-context-client-'));
 await fs.mkdir(output,{recursive:true});await fs.mkdir(build,{recursive:true});
-const compiler=webpackPackage.webpack({mode:'development',devtool:false,plugins:[new webpackPackage.webpack.DefinePlugin({'process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION':JSON.stringify('true'),'process.env.NEXT_PUBLIC_GOAL_PROGRESS':JSON.stringify('true'),'process.env.NEXT_PUBLIC_HOME_STRUCTURED_PLANS':JSON.stringify('false')})],entry:path.resolve('tests/fixtures/dataset-lifecycle-client.tsx'),output:{path:build,filename:'fixture.js',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
+const compiler=webpackPackage.webpack({mode:'development',devtool:false,experiments:{css:true},plugins:[new webpackPackage.webpack.DefinePlugin({'process.env.NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION':JSON.stringify('true'),'process.env.NEXT_PUBLIC_GOAL_PROGRESS':JSON.stringify('true'),'process.env.NEXT_PUBLIC_HOME_STRUCTURED_PLANS':JSON.stringify('false')})],entry:path.resolve('tests/fixtures/dataset-lifecycle-client.tsx'),output:{path:build,filename:'fixture.js',cssFilename:'fixture.css',publicPath:'/assets/'},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'@':process.cwd()}},module:{rules:[{test:/\.css$/,type:'css/module',parser:{namedExports:false}},{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
 await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
 const css=(await postcss([tailwind({base:process.cwd()})]).process(await fs.readFile('app/globals.css','utf8'),{from:path.resolve('app/globals.css')})).css;
 const js=await fs.readFile(path.join(build,'fixture.js'),'utf8');
-const html=`<!doctype html><html data-workspace-preference="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style></head><body><div id="root"></div><script>${js.replaceAll('</script','<\\/script')}</script></body></html>`;
+const html=`<!doctype html><html data-workspace-preference="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/assets/fixture.css"><style>${css}</style></head><body><div id="root"></div><script>${js.replaceAll('</script','<\\/script')}</script></body></html>`;
 const base='http://127.0.0.1:3188';
-const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-background-networking','--disable-component-update','--disable-domain-reliability','--disable-sync','--metrics-recording-only','--host-resolver-rules=MAP * ~NOTFOUND']});
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH??'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-background-networking','--disable-component-update','--disable-domain-reliability','--disable-sync','--metrics-recording-only','--host-resolver-rules=MAP * ~NOTFOUND']});
 const domains=[['Action Planning','home','/api/dashboard'],['Workforce','workforce','/api/workforce'],['Attrition/listening','attrition','/api/attrition'],['Finance/compensation','finance','/api/finance'],['Hiring','talent-acquisition','/api/talent-acquisition'],['Skills/mobility','skills','/api/skills'],['Planning/scenarios','planning-overview','/api/position-modeling'],['Planning/scenarios','scenario-modeling','/api/scenario-modeler'],['Saved Decision brief','decision-brief','/api/dashboard'],['Attrition/listening','survey-sentiment','/api/survey-sentiment'],['Finance/compensation','compensation','/api/compensation'],['Skills/mobility','career-growth-mobility','/api/career-growth-mobility']];
-const report={scope:'Actual Page + DatasetBoundary, synthetic server-layout token changes. No production selector exists in this source tree.',cases:[]};
+const report={scope:'Actual Page + DatasetBoundary, synthetic server-layout token changes. Production selection is not exercised.',cases:[]};
 const legacy=JSON.parse(await fs.readFile('tests/fixtures/pre-shared-metric-context.json','utf8')).cases[0];
 const defaults={annual_growth_pct:2,salary_inflation_pct:3,annual_attrition_pct:12,fill_rate_pct:90,productivity_hiring_reduction_pct:5};
 const points=Array.from({length:12},(_,i)=>({planning_month:'2027-'+String(i+1).padStart(2,'0')+'-01',planned_headcount:1000+i*10,planned_fte:980+i*10,planned_hires:15,planned_exits:5,planned_labor_cost_usd:10000000+i*100000}));
@@ -51,7 +52,9 @@ function payload(path,query,next){
  return null;
 }
 try{
+ if(!process.env.LIFECYCLE_CASE&&!process.env.LIFECYCLE_DOMAIN_RACES)await runDatasetRollback({browser,base,html,build,payload,report});
  for(const [domain,destination,endpoint] of domains)for(const [size,width,height] of [['desktop',1350,1000],['phone',390,844]])for(const phase of process.env.LIFECYCLE_DOMAIN_RACES?['headers','body']:[null]){
+  if(process.env.LIFECYCLE_ROLLBACK_ONLY)continue;
   if(phase&&!hasDomainRace(destination))continue;
   if(process.env.LIFECYCLE_CASE&&!`${destination}-${size}`.includes(process.env.LIFECYCLE_CASE))continue;
   const item={domain,destination,size,phase,checks:[],errors:[],requests:[],blocked:[],solutionCalls:0};report.cases.push(item);
@@ -64,7 +67,7 @@ try{
    const req=route.request(),url=new URL(req.url());
    if(req.isNavigationRequest()&&url.origin===base)return route.fulfill({contentType:'text/html',body:html});
    if(url.origin!==base){item.blocked.push(url.href);return route.abort();}
-   if(url.pathname.startsWith('/assets/'))return route.fulfill({contentType:'text/javascript',body:await fs.readFile(path.join(build,path.basename(url.pathname)))});
+   if(url.pathname.startsWith('/assets/'))return route.fulfill({contentType:url.pathname.endsWith('.css')?'text/css':'text/javascript',body:await fs.readFile(path.join(build,path.basename(url.pathname)))});
    const token=req.headers()[DATASET_HEADER],next=token==='fixture-next:1';item.requests.push({path:url.pathname,token,method:req.method()});
    const headers={[DATASET_HEADER]:token??'legacy-v1:0'};
    if(url.pathname==='/api/home-solution-conversation'){
@@ -91,9 +94,9 @@ try{
    window.fetch=(input,init)=>{if(String(input).startsWith('/api/dashboard')&&init?.signal){init.signal.addEventListener('abort',()=>window.__datasetAborts.push(String(input)),{once:true});if(window.__ignoreDatasetAbort)init={...init,signal:undefined};}return transport(input,init);};
   },{key:DECISIONS_STORAGE_KEY,value:encodeDecisions(seed)});
   const state=key=>page.evaluate(k=>JSON.parse(localStorage.getItem(k)).payload,key);
-  async function navigate(target){const trigger=page.getByRole('button',{name:'Open navigation',exact:true});if(await trigger.isVisible())await trigger.click();if(target==='home')await page.getByRole('button',{name:'Action Planning',exact:true}).click();else{const link=page.locator(`[data-nav-destination="${target}"]`),group=await link.evaluate(n=>n.parentElement.id),toggle=page.locator(`button[aria-controls="${group}"]`);if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();await link.click();}await page.waitForFunction(target=>new URLSearchParams(location.search).get('page')===target||(target==='home'&&!location.search),target);}
+  async function navigate(target){if(target==='scenario-modeling'){await navigate('planning-overview');const nav=page.getByRole('navigation',{name:'Planning sections'});await nav.locator('summary').click();await nav.getByRole('button',{name:'Open Stored scenario tools',exact:true}).click();return;}const trigger=page.getByRole('button',{name:'Open navigation',exact:true});if(await trigger.isVisible())await trigger.click();if(target==='home')await page.getByRole('button',{name:'Action Planning',exact:true}).click();else{const link=page.locator(`[data-nav-destination="${target}"]`),group=await link.evaluate(n=>n.parentElement.id),toggle=page.locator(`button[aria-controls="${group}"]`);if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();await link.click();}await page.waitForFunction(target=>new URLSearchParams(location.search).get('page')===target||(target==='home'&&!location.search),target);}
   await page.goto(base);await dismissHomeOnboarding(page);
-  async function send(text){await page.getByLabel('Ask Workforce AI',{exact:true}).fill(text);await page.getByRole('button',{name:'Send overview question',exact:true}).click();}
+  async function send(text){const input=page.getByLabel('Ask Workforce AI',{exact:true});if(!await input.isVisible())await page.locator('summary').filter({hasText:/^Chat & saved goals$/}).click();await input.fill(text);await page.getByRole('button',{name:'Send overview question',exact:true}).click();}
   const card=page.getByRole('article',{name:'Working proposal: Accountability review',exact:true});
   await send(accountabilityMessage);await card.waitFor();await card.getByRole('button',{name:/^Pin Action Plan/}).click();await card.getByRole('button',{name:/^Pinned Action Plan/}).waitFor();
   const pinned=await state(DECISIONS_STORAGE_KEY),id=pinned.goals.activeId,attached=pinned.workspaces[id].fields.homePlanAlternativesV1;
