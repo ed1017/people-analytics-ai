@@ -19,6 +19,7 @@ try{
   await context.addInitScript(({key,value})=>{if(!localStorage.getItem(key))localStorage.setItem(key,value)},{key:DECISIONS_STORAGE_KEY,value:encodeDecisions(seed)});
   await context.route('**/*',async route=>{
    const request=route.request(),url=new URL(request.url());
+   if(url.origin==='https://va.vercel-scripts.com')return route.abort();
    if(url.origin!==base){external.push(url.origin);return route.abort()}
    if(url.pathname==='/api/chat'){posts.push(request.postDataJSON());return route.fulfill({json:{answer,nextStep:'none'}})}
    if(url.pathname==='/api/dashboard')return route.fulfill({json:{overview:{headcount:120,fte:118,open_positions:3,snapshot_date:'2026-09-30'},trend:[],filter_options:{countries:[],business_units:[],levels:[]}}});
@@ -40,7 +41,7 @@ try{
    await item.click();
    await page.waitForFunction(destination=>document.querySelector(`[data-nav-destination="${destination}"]`)?.getAttribute('aria-current')==='page',destination);
   }
-  async function returnHome(){await openNavigation();await button('Action Planning').click();await chat.waitFor();}
+  async function returnHome(){await openNavigation();await button('Overview').click();await chat.waitFor();}
   async function historyContains(text){
    await button('Open data details').click();
    const found=(await page.getByRole('dialog',{name:'Data details',exact:true}).getByRole('region',{name:'Conversation history',exact:true}).innerText()).includes(text);

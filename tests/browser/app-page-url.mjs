@@ -29,6 +29,7 @@ try {
     }, {key: DECISIONS_STORAGE_KEY, value: encodeDecisions(seed)});
     await context.route('**/*', route => {
       const request = route.request(), url = new URL(request.url());
+      if(url.origin==='https://va.vercel-scripts.com')return route.abort();
       if (url.origin !== base) {external.push(url.origin); return route.abort();}
       if (url.pathname.startsWith('/api/')) {
         if (request.method() !== 'GET') {posts.push(url.pathname); return route.fulfill({status: 503, json: {error: 'Synthetic AI unavailable.'}});}
@@ -43,15 +44,18 @@ try {
     const button = name => page.getByRole('button', {name, exact: true});
     const title = expected => page.locator('#app-page-title').filter({hasText: expected}).waitFor();
     const selected = destination => page.waitForFunction(destination => {
-      const node = destination === 'home'
-        ? document.querySelector('button[aria-label="Action Planning"]')
+      const planningLabels={'scenario-modeling':'Open Stored scenario tools','position-workforce-design':'Open Position & Workforce Design','workforce-response':'Open Workforce Response','execution-feasibility':'Open Execution & Feasibility'};
+      const node = planningLabels[destination] ? document.querySelector(`button[aria-label="${planningLabels[destination]}"]`) : destination === 'home'
+        ? document.querySelector('button[aria-label="Overview"]')
         : document.querySelector(`[data-nav-destination="${destination}"]`);
       return node?.getAttribute('aria-current') === 'page';
     }, destination);
     async function navigate(destination) {
+      if(destination==='scenario-modeling'){await navigate('planning-overview');const nav=page.getByRole('navigation',{name:'Planning sections'});await nav.locator('summary').click();await nav.getByRole('button',{name:'Open Stored scenario tools',exact:true}).click();return;}
+
       const trigger = button('Open navigation');
       if (await trigger.isVisible()) await trigger.click();
-      if (destination === 'home') await button('Action Planning').click();
+      if (destination === 'home') await button('Overview').click();
       else {
         const item = page.locator(`[data-nav-destination="${destination}"]`);
         const groupId = await item.evaluate(node => node.parentElement.id);
@@ -90,7 +94,7 @@ try {
       await selected(destination);
       check(mode + ' browser ' + direction + ' opens ' + destination, urlIs(destination));
     }
-    await navigate('home'); await title('Insight to Action');
+    await navigate('home'); await title('Planning overview');
     check(mode + ' Home keeps other query parameters and anchors', urlIs('home'));
     check(mode + ' shared filters, perspective, selected goal and draft survive history navigation',
       await country.inputValue() === 'UK'
@@ -114,11 +118,11 @@ try {
       for (const [query, destination, expectedTitle] of [
         ['page=overview', 'workforce', 'Workforce'],
         ['page=career-mobility', 'workforce', 'Workforce'],
-        ['page=workforce-planning', 'planning-overview', 'Planning Overview'],
-        ['page=__proto__', 'home', 'Insight to Action'],
-        ['page=javascript%3Aalert%281%29', 'home', 'Insight to Action'],
-        ['page=skills&page=finance', 'home', 'Insight to Action'],
-        ['page=home', 'home', 'Insight to Action'],
+        ['page=workforce-planning', 'planning-overview', 'Planning workspace'],
+        ['page=__proto__', 'home', 'Planning overview'],
+        ['page=javascript%3Aalert%281%29', 'home', 'Planning overview'],
+        ['page=skills&page=finance', 'home', 'Planning overview'],
+        ['page=home', 'home', 'Planning overview'],
       ]) {
         await page.goto(base + '/?campaign=fall%20review&tag=a&tag=b&' + query + '#review');
         await title(expectedTitle); await selected(destination);

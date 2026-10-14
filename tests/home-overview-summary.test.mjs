@@ -1,0 +1,32 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import Module,{createRequire} from 'node:module';
+import React from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import ts from 'typescript';
+import * as engine from '../lib/swp-monthly-workload.ts';
+import * as adapter from '../lib/swp-capacity-draft.ts';
+import * as costs from '../lib/swp-capacity-cost.ts';
+import * as keys from '../lib/monthly-scenario-compatibility.mjs';
+import * as dashboardScope from '../lib/dashboard-scope.ts';
+const require=createRequire(import.meta.url),filename=path.resolve('components/home-overview-summary.tsx');
+const mocks={'@/lib/dashboard-scope':dashboardScope,'@/components/workforce-planning/planning-session-context':{},'@/components/workforce-planning/capacity-projection':{CapacityProjection:()=>React.createElement('div',{'data-projection':true})},'@/components/decision-store':{},'@/lib/dataset-client.mjs':{},'@/lib/swp-capacity-store':{},'@/lib/swp-capacity-draft':adapter,'@/lib/swp-monthly-workload':engine,'@/lib/swp-capacity-cost':costs,'@/lib/monthly-scenario-compatibility.mjs':keys};
+const compiled=ts.transpileModule(fs.readFileSync(filename,'utf8'),{fileName:filename,compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}});
+const mod=new Module(filename);mod.filename=filename;mod.require=id=>id.endsWith('.module.css')?{default:{}}:Object.hasOwn(mocks,id)?mocks[id]:require(id);mod._compile(compiled.outputText,filename);
+const {HomeOverviewSummary,currentCapacityOverview}=mod.exports;
+const filters={country:'all',org:'all',level:'all'};
+const base={overview:{snapshot_date:'2026-09-30',headcount:120,fte:118},receipt:{version:1,status:'verified_rpc',requested:filters,effective:filters,label:'All workforce',basis:'Verified dispatch'},requested:filters,scopeLabel:'All workforce',loading:false,error:null,compact:false,onNavigate:()=>{}};
+const render=props=>renderToStaticMarkup(React.createElement(HomeOverviewSummary,{...base,...props})).replaceAll('<!-- -->','');
+const draft={...adapter.emptyCapacityDraft,scope:'Service desk — tickets',openingDate:'2026-09-30',people:'10',fte:'8',volume:'800',effort:'1',hours:'160',hires:'0',exits:'0',allocation:'50',productivity:'0',fullTimeMovements:true,confirmed:true,costRate:''};
+function session(rate=''){const input={...draft,costRate:rate},result=engine.calculateMonthlyWorkload(adapter.capacitySpec(input)),cost=costs.calculateCapacityCost(result,costs.capacityCostAssumptions(rate));return {draft:input,result,cost,error:'',scope:null,capture:{inputKey:costs.capacityCalculationKey(result,cost),binding:null}};}
+test('SWP start shows only verified current workforce and never invents horizon, demand, skills gaps or cost',()=>{const html=render({});assert.match(html,/>120</);assert.match(html,/118 FTE/);assert.match(html,/Sep 30, 2026/);assert.match(html,/Not set/);assert.match(html,/Not calculated/);assert.match(html,/No calculated workload scenario is open/);assert.match(html,/Skills gaps are not assessed/);assert.doesNotMatch(html,/data-projection/);assert.match(html,/Open planner/);});
+test('scope mismatch, loading, errors and missing receipt withhold previous workforce quantities',()=>{for(const props of [{receipt:null},{requested:{...filters,country:'UK'}},{loading:true},{error:'Source unavailable'},{overview:null},{receipt:{...base.receipt,status:'unavailable',effective:null}}]){const html=render(props);assert.doesNotMatch(html,/>120<|118 FTE/);assert.match(html,/Unavailable/);}});
+test('unknown workforce and invalid dates are not turned into zero',()=>{assert.doesNotMatch(render({overview:{...base.overview,headcount:null,fte:null}}),/>0<|0 FTE/);assert.doesNotMatch(render({overview:{...base.overview,snapshot_date:'2026-02-31'}}),/>120</);});
+test('only a current confirmed workload result is displayed; edits and invalid captures are rejected',()=>{const original=session();assert.equal(currentCapacityOverview(original).result.points[0].gapFte,1);for(const patch of [{capture:null},{error:'Invalid inputs'},{draft:{...original.draft,confirmed:false}},{draft:{...original.draft,volume:'900'}},{capture:{...original.capture,inputKey:'stale'}},{result:{...original.result,points:[]}}])assert.equal(currentCapacityOverview({...original,...patch}),null);});
+test('existing scenario supplies its own horizon and optional cost retains unknown vs zero',()=>{for(const [rate,label] of [['','Unknown'],['0','$0.00'],['12.34','$98.72']]){const html=render({scenario:currentCapacityOverview(session(rate))});assert.match(html,/3 months/);assert.match(html,/2026-10 → 2026-12/);assert.ok(html.includes(label));assert.match(html,/data-projection/);assert.match(html,/Dashboard filters do not change this scenario/);assert.match(html,/not actual pay, cumulative spend or savings/);}});
+test('saved names are read-only, escaped, and never imply a selected result',()=>{const html=render({savedNames:['<Example>','Another scenario']});assert.match(html,/&lt;Example&gt;/);assert.match(html,/2 saved for the selected goal/);assert.doesNotMatch(html,/data-projection/);assert.match(render({savedUnavailable:true}),/Saved work needs review/);});
+test('active work can collapse the summary without deleting source details',()=>{assert.match(render({}),/^<details[^>]+open=/);assert.doesNotMatch(render({compact:true}),/^<details[^>]+open=/);assert.match(render({compact:true}),/Sources, scope and calculation detail/);});
+
+test('current verified aggregate receipts preserve known empty stocks without falling back to legacy values',()=>{const receipt={...base.receipt,version:2,status:'verified_aggregate',artifactDigest:'a'.repeat(64),metricContract:'voluntary-ytd-nine-month-average-stock-v2',stockStatus:'known-empty'};const html=render({receipt:dashboardScope.readDashboardScopeReceipt(receipt),overview:{...base.overview,headcount:0,fte:0}});assert.match(html,/>0</);assert.match(html,/people · 0 FTE/);assert.doesNotMatch(render({receipt,requested:{...filters,country:'UK'}}),/people · 0 FTE/);});
