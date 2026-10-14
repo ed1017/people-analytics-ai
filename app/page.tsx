@@ -1919,7 +1919,7 @@ export default function Home() {
         activePage={activePage}
         selectedPersona={selectedPersona}
         onPersonaChange={setSelectedPersona}
-      ><GlobalWorkforceFilters focusedIssue={<FocusedIssue conversation={conversation} page={activePage} scope={JSON.stringify(selectedBusinessContext)} />} options={filterOptions} country={selectedCountry} org={selectedOrg} level={selectedLevel} loading={dashboardLoading} onCountry={setSelectedCountry} onOrg={setSelectedOrg} onLevel={setSelectedLevel} onReset={resetFilters} /></AppHeader>
+      ><GlobalWorkforceFilters page={activePage} focusedIssue={<FocusedIssue conversation={conversation} page={activePage} scope={JSON.stringify(selectedBusinessContext)} />} options={filterOptions} country={selectedCountry} org={selectedOrg} level={selectedLevel} loading={dashboardLoading} onCountry={setSelectedCountry} onOrg={setSelectedOrg} onLevel={setSelectedLevel} onReset={resetFilters} /></AppHeader>
 
       {/* Main application */}
       <div

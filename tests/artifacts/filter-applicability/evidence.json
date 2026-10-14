@@ -1,0 +1,86 @@
+[
+  {
+    "width": 1440,
+    "page": "home",
+    "note": "Filters select the workforce snapshot; other evidence keeps its own scope.",
+    "readable": true,
+    "filterAndReset": true
+  },
+  {
+    "width": 1440,
+    "page": "workforce",
+    "note": "Filters select the workforce snapshot; workforce detail below stays company-wide.",
+    "readable": true,
+    "filterAndReset": true
+  },
+  {
+    "width": 1440,
+    "page": "career-growth-mobility",
+    "note": "Filters select the performance scope; unsupported selections are unavailable and movement history stays company-wide.",
+    "readable": true,
+    "filterAndReset": true
+  },
+  {
+    "width": 1440,
+    "page": "compensation",
+    "note": "Filters select catalog assumptions; filtered pay results are unavailable and cost context stays company-wide.",
+    "readable": true,
+    "filterAndReset": true
+  },
+  {
+    "width": 1440,
+    "page": "planning-overview",
+    "note": "These filters do not narrow planning calculations; use the scenario’s own scope and assumptions.",
+    "readable": true,
+    "filterAndReset": true
+  },
+  {
+    "width": 1440,
+    "page": "attrition",
+    "note": "This page’s main evidence keeps its own scope.",
+    "readable": true,
+    "filterAndReset": true
+  },
+  {
+    "width": 390,
+    "page": "home",
+    "note": "Filters select the workforce snapshot; other evidence keeps its own scope.",
+    "readable": true,
+    "filterAndReset": true
+  },
+  {
+    "width": 390,
+    "page": "workforce",
+    "note": "Filters select the workforce snapshot; workforce detail below stays company-wide.",
+    "readable": true,
+    "filterAndReset": true
+  },
+  {
+    "width": 390,
+    "page": "career-growth-mobility",
+    "note": "Filters select the performance scope; unsupported selections are unavailable and movement history stays company-wide.",
+    "readable": true,
+    "filterAndReset": true
+  },
+  {
+    "width": 390,
+    "page": "compensation",
+    "note": "Filters select catalog assumptions; filtered pay results are unavailable and cost context stays company-wide.",
+    "readable": true,
+    "filterAndReset": true
+  },
+  {
+    "width": 390,
+    "page": "planning-overview",
+    "note": "These filters do not narrow planning calculations; use the scenario’s own scope and assumptions.",
+    "readable": true,
+    "filterAndReset": true
+  },
+  {
+    "width": 390,
+    "page": "attrition",
+    "note": "This page’s main evidence keeps its own scope.",
+    "readable": true,
+    "filterAndReset": true
+  }
+]
