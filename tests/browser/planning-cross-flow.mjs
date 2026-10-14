@@ -1,0 +1,102 @@
+// Isolated real app + synthetic read fixtures. No external, AI or hosted mutation requests.
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {encodeDecisions,DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
+import {scopedDashboardResponse} from '../../lib/dashboard-scope.ts';
+import {runScenarioModel} from '../../lib/scenario-engine.ts';
+import {STAFFING_TARGET_BASIS} from '../../lib/staffing-target.ts';
+import {monthlyCapacityField} from '../../lib/swp-capacity-store.ts';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
+const base=process.env.HOME_BASE_URL??'http://localhost:3526',output=process.env.CROSS_FLOW_OUTPUT??'/tmp/planning-cross-flow';await fs.mkdir(output,{recursive:true});
+const defaults={annual_growth_pct:0,salary_inflation_pct:0,annual_attrition_pct:0,fill_rate_pct:100,productivity_hiring_reduction_pct:0};
+const catalog={as_of:'2026-09-30',defaults,business_units:[{org_code:'OPS',org_name:'Operations',headcount:100,fte:60}],staffing_target_basis:STAFFING_TARGET_BASIS};
+const targetSupply={...runScenarioModel({asOf:catalog.as_of,startingHeadcount:100,baselinePoints:[{planning_month:'2026-10-01',planned_headcount:100,planned_fte:60,planned_labor_cost_usd:1000},{planning_month:'2026-11-01',planned_headcount:105,planned_fte:63,planned_labor_cost_usd:1050}],defaults,assumptions:defaults}),staffing_target_basis:STAFFING_TARGET_BASIS,scope:{type:'business_unit',org_code:'OPS',org_name:'Operations',current_headcount:100,current_fte:60,planning_horizon_start:'2026-10-01',planning_horizon_end:'2026-11-01'}};
+const seed={version:1,revision:1,goals:{version:1,activeId:'a',goals:[{id:'a',statement:'Synthetic service capacity review'},{id:'b',statement:'Separate synthetic goal'}]},workspaces:{a:{savedAt:'2026-10-14T00:00:00Z',fields:{sentinel:{keep:'Unrelated saved work'}}}}};
+const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});const evidence=[];
+try{for(const width of [1440,390]){
+ const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[],posts=[],external=[];page.setDefaultTimeout(20000);page.on('pageerror',error=>errors.push(error.message));
+ await context.addInitScript(({key,value})=>{if(!localStorage.getItem(key))localStorage.setItem(key,value);},{key:DECISIONS_STORAGE_KEY,value:encodeDecisions(seed)});
+ let dashboardMode='valid',releaseDashboard=null,delayedRequest=null,targetMode='valid',releaseTarget=null,targetRequest=null;
+ await context.route('**/*',async route=>{
+  const req=route.request(),url=new URL(req.url());if(url.origin==='https://va.vercel-scripts.com')return route.abort();if(url.origin!==base){external.push(url.origin);return route.abort();}if(!url.pathname.startsWith('/api/'))return route.continue();
+  if(url.pathname==='/api/business-unit-scenario'&&url.searchParams.get('staffing_target')==='1'){
+   assert(['GET','POST'].includes(req.method()));if(req.method()==='POST'){assert.deepEqual(req.postDataJSON(),{business_unit:'OPS'});if(targetMode==='delay'){targetRequest?.();await new Promise(resolve=>releaseTarget=resolve);}}
+   return route.fulfill({json:req.method()==='GET'?catalog:targetSupply,headers:{'x-workforce-dataset':'legacy-v1:0'}}).catch(()=>{});
+  }
+  if(req.method()!=='GET'){posts.push(url.pathname);return route.abort();}
+  if(url.pathname==='/api/dashboard'){
+   const country=url.searchParams.get('country')??'all',scope={country,org:url.searchParams.get('org')??'all',level:url.searchParams.get('level')??'all'};
+   const data=scopedDashboardResponse({overview:{headcount:country==='CA'?20:100,fte:country==='CA'?12:80,snapshot_date:'2026-09-30'},trend:[{snapshot_date:'2026-09-30',headcount:country==='CA'?20:100,fte:country==='CA'?12:80}],filter_options:{countries:[{value:'CA',label:'Canada'}],business_units:[],levels:[]}},dashboardMode==='mismatch'?{country:'all',org:'all',level:'all'}:scope);
+   if(dashboardMode==='delay'&&country==='CA'){delayedRequest?.();await new Promise(resolve=>releaseDashboard=resolve);}
+   return route.fulfill({json:data}).catch(()=>{});
+  }
+  const data=url.pathname==='/api/workforce-planning'?{scenarios:[]}:url.pathname==='/api/scenario-modeler'?{defaults}:url.pathname==='/api/business-unit-scenario'?{defaults,business_units:[]}:null;
+  return route.fulfill(data?{json:data}:{status:503,json:{error:'Synthetic source unavailable'}});
+ });
+ const area=page.getByRole('region',{name:'Workload capacity planning',exact:true}),saved=area.getByRole('region',{name:'Saved capacity scenarios',exact:true});
+ const input=name=>area.getByLabel(name,{exact:true});
+ async function advanced(){const summary=page.getByText('Advanced tools · your capacity scenarios',{exact:true});if(!await area.isVisible())await summary.click();await area.waitFor();}
+ async function home(){if(width<768)await page.getByRole('button',{name:'Open navigation',exact:true}).click();await page.getByRole('button',{name:'Overview',exact:true}).click();await page.getByRole('region',{name:'Workforce planning overview',exact:true}).waitFor();}
+ async function planner(){await page.getByRole('button',{name:'Plan a scenario',exact:true}).click();await advanced();}
+ async function calculate(){await area.getByRole('checkbox',{name:/I confirm/}).check();await area.getByRole('button',{name:'Calculate capacity',exact:true}).click();await area.getByText('Calculated from your assumptions',{exact:true}).waitFor();}
+ async function save(name){await input('Capacity scenario name').fill(name);await saved.getByRole('button',{name:'Save scenario',exact:true}).click();await saved.getByRole('status').filter({hasText:`Saved “${name}”`}).waitFor();}
+ const bucket=()=>page.evaluate(({key,field})=>JSON.parse(localStorage.getItem(key)).payload.workspaces.a.fields[field],{key:DECISIONS_STORAGE_KEY,field:monthlyCapacityField});
+ await page.goto(base+'/?page=planning-overview');await page.getByLabel('Selected goal',{exact:true}).selectOption('a');await advanced();
+ for(const [label,value] of Object.entries({'Workload scope':'Service desk — tickets','Opening date (month end)':'2026-09-30','Opening people':'10','Opening contracted FTE':'8','Work units each month':'800','Hours per work unit':'1','Productive hours per FTE each month':'160'}))await input(label).fill(value);
+ await area.getByText('Recurring assumptions (required)',{exact:true}).click();for(const [label,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await input(label).fill(value);
+ await area.getByRole('checkbox',{name:/Assume every hire/}).check();await calculate();await save('Base');const first=await bucket();assert.equal(first.entries.length,1);
+ await input('Productivity improvement (%)').fill('25');assert.equal(await saved.getByRole('button',{name:'Save scenario',exact:true}).isDisabled(),true);assert.match(await saved.innerText(),/saved snapshot, not the current draft/);assert.equal(await area.getByText('Calculated from your assumptions',{exact:true}).count(),0);
+ await input('Cost per contracted FTE per month (USD, optional)').fill('0');await calculate();await save('Improved zero cost');const snapshots=await bucket();assert.equal(snapshots.entries.length,2);assert.deepEqual(snapshots.entries[0],first.entries[0]);
+ await input('Saved capacity scenario').selectOption({label:'Base'});await input('Compare capacity scenario').selectOption({label:'Improved zero cost'});const compare=page.getByRole('region',{name:'Saved capacity comparison',exact:true});await compare.waitFor();assert.deepEqual(await compare.locator('tbody tr').first().locator('td').allTextContents(),['+1','0']);
+ await compare.getByText('Contracted supply cost comparison',{exact:true}).click();assert.deepEqual(await compare.locator('table').nth(1).locator('tbody tr').first().locator('td').allTextContents(),['Unknown','$0.00','Unknown']);await compare.screenshot({path:`${output}/${width}-compare.png`});
+ await input('Work units each month').fill('900');await input('Capacity scenario name').fill('Interrupted draft');await home();const overview=page.getByRole('region',{name:'Workforce planning overview',exact:true});assert.match(await overview.innerText(),/Base/);assert.match(await overview.innerText(),/Improved zero cost/);assert.doesNotMatch(await overview.innerText(),/Shortfall/);await planner();assert.equal(await input('Work units each month').inputValue(),'900');assert.equal(await area.getByRole('checkbox',{name:/I confirm/}).isChecked(),false);assert.equal(await saved.getByRole('button',{name:'Save scenario',exact:true}).isDisabled(),true);const pendingName=await input('Capacity scenario name').inputValue();assert.equal(pendingName,'Interrupted draft','pending save name survives Home navigation');assert.deepEqual(await bucket(),snapshots);
+ // Interrupted unsaved edit is explicitly session-only: reload clears it, keeps saved snapshots.
+ await page.reload();await advanced();assert.equal(await input('Workload scope').inputValue(),'');assert.deepEqual(await bucket(),snapshots);assert.equal(await input('Capacity scenario name').inputValue(),'');await input('Saved capacity scenario').selectOption({label:'Base'});await saved.getByRole('button',{name:'Open saved scenario',exact:true}).click();assert.equal(await input('Capacity scenario name').inputValue(),'');assert.equal(await input('Work units each month').inputValue(),'800');assert.equal(await input('Productivity improvement (%)').inputValue(),'0');assert.match(await saved.innerText(),/matches current inputs/);
+ await input('Compare capacity scenario').selectOption({label:'Improved zero cost'});await compare.waitFor();await saved.getByRole('button',{name:'Open saved scenario',exact:true}).click();assert.deepEqual(await bucket(),snapshots,'reopen never rewrites records');
+ // Interrupted edit -> Back/Forward -> reopening an explicit saved scenario.
+ await input('Work units each month').fill('1200');await input('Capacity scenario name').fill('History draft');await home();await page.goBack();await advanced();assert.equal(await input('Work units each month').inputValue(),'1200');assert.equal(await input('Capacity scenario name').inputValue(),'History draft');await page.goForward();await overview.waitFor();await planner();await input('Saved capacity scenario').selectOption({label:'Improved zero cost'});await saved.getByRole('button',{name:'Open saved scenario',exact:true}).click();assert.equal(await input('Work units each month').inputValue(),'800');assert.equal(await input('Productivity improvement (%)').inputValue(),'25');assert.equal(await input('Capacity scenario name').inputValue(),'');
+ await input('Capacity scenario name').fill('Goal A only');await page.getByLabel('Selected goal',{exact:true}).selectOption('b');await advanced();assert.equal(await input('Saved capacity scenario').count(),0);assert.equal(await input('Capacity scenario name').inputValue(),'');assert.equal(await input('Workload scope').inputValue(),'');await page.getByLabel('Selected goal',{exact:true}).selectOption('a');await advanced();assert.equal(await input('Capacity scenario name').inputValue(),'Goal A only');await input('Saved capacity scenario').selectOption({label:'Base'});await saved.getByRole('button',{name:'Open saved scenario',exact:true}).click();assert.deepEqual(await bucket(),snapshots);
+
+ // Fractional contracted/assigned FTE stays distinct from people across calculation and Home.
+ await saved.getByRole('button',{name:'Open saved scenario',exact:true}).click();
+ await area.getByText('Recurring assumptions (required)',{exact:true}).click();
+ await area.getByRole('checkbox',{name:/Assume every hire/}).uncheck();
+ for(const [label,value] of Object.entries({'Opening contracted FTE':'6','Hires each month (people)':'2','Departures each month (people)':'1','FTE per hire':'0.5','FTE per departure':'0.25'}))await input(label).fill(value);
+ await calculate();await save('Part-time workload');
+ await area.getByText('Monthly detail · people and FTE',{exact:true}).click();
+ const rows=area.getByRole('region',{name:'Monthly capacity comparison',exact:true}).locator('table tbody tr');
+ assert.deepEqual(await rows.last().locator('td').allTextContents(),['13','8.25','4.13','5','+0.88','Unknown']);
+ await home();assert.deepEqual(await overview.locator('dd').allTextContents(),['4.13 FTE','5 FTE','0.88 FTE']);assert.match(await overview.innerText(),/Service desk — tickets · 2026-12/);
+ const filters=page.getByRole('region',{name:'Shared workforce filters',exact:true});
+ async function filter(country){if(width===390&&!await filters.getByLabel('Country',{exact:true}).isVisible())await filters.getByText('Filters',{exact:true}).click();await filters.getByLabel('Country',{exact:true}).selectOption(country);}
+ await filter('CA');assert.deepEqual(await overview.locator('dd').allTextContents(),['4.13 FTE','5 FTE','0.88 FTE'],'header filters cannot rebind the workload');
+ await planner();await input('Planning months').fill('1');await calculate();await save('One month');
+ await input('Compare capacity scenario').selectOption({label:'Part-time workload'});assert.match(await saved.innerText(),/Opening date, horizon or calculation conventions differ/);assert.equal(await compare.count(),0);
+ await input('Planning months').fill('3');await input('Opening date (month end)').fill('2026-12-31');await calculate();await save('Year boundary');await area.getByText('Monthly detail · people and FTE',{exact:true}).click();assert.deepEqual(await rows.locator('th').allTextContents(),['2027-01','2027-02','2027-03']);
+ await input('Compare capacity scenario').selectOption({label:'Part-time workload'});assert.match(await saved.innerText(),/Opening date, horizon or calculation conventions differ/);assert.equal(await compare.count(),0);
+ const stableSnapshots=await bucket();
+ await input('Opening date (month end)').fill('2026-12-30');await area.getByRole('checkbox',{name:/I confirm/}).check();await area.getByRole('button',{name:'Calculate capacity',exact:true}).click();await area.getByRole('alert').waitFor();assert.equal(await saved.getByRole('button',{name:'Save scenario',exact:true}).isDisabled(),true);
+ await input('Opening date (month end)').fill('2026-12-31');await input('Opening contracted FTE').fill('');await area.getByRole('checkbox',{name:/I confirm/}).check();await area.getByRole('button',{name:'Calculate capacity',exact:true}).click();await area.getByText('Incomplete — some inputs are unknown',{exact:true}).waitFor();assert.equal(await saved.getByRole('button',{name:'Save scenario',exact:true}).isDisabled(),true);
+ await area.screenshot({path:`${output}/${width}-missing-fte.png`});
+ console.log(width,'missing FTE complete');await home();await overview.getByText(/20.*people/).waitFor();assert.deepEqual(await overview.locator('dd').allTextContents(),['12 FTE','Not set','Not set']);
+ // A delayed or mismatched dashboard scope never substitutes a different population.
+ console.log(width,'snapshot fallback verified');await filter('all');await overview.getByText(/100 people/).waitFor();dashboardMode='delay';const requested=new Promise(resolve=>delayedRequest=resolve);await filter('CA');await Promise.race([requested,new Promise((_,reject)=>setTimeout(()=>reject(Error('Delayed dashboard request did not start')),10000))]);assert.doesNotMatch(await overview.innerText(),/80 FTE|12 FTE/);await filter('all');await overview.getByText(/100 people/).waitFor();releaseDashboard();dashboardMode='mismatch';await filter('CA');await overview.getByText('Workforce snapshot unavailable',{exact:true}).waitFor();assert.deepEqual(await overview.locator('dd').allTextContents(),['Unavailable','Not set','Not set']);
+ console.log(width,'dashboard races verified');dashboardMode='valid';await filter('all');await overview.getByText(/100 people/).waitFor();
+ // Staffing target uses its own unit and people; a delayed response after leaving cannot restore a scratch target.
+ await planner();await page.getByRole('button',{name:/Plan a staffing target/}).click();
+ const targetArea=page.getByRole('region',{name:'Staffing target planner',exact:true});
+ await targetArea.getByLabel('Business unit',{exact:true}).selectOption('OPS');await targetArea.getByLabel('Target month',{exact:true}).selectOption('2026-11-01');await targetArea.getByLabel('Required people',{exact:true}).fill('110');assert.deepEqual(await targetArea.locator('dd').allTextContents(),['105 people','110 people']);await targetArea.getByText('5 people short of your target',{exact:true}).waitFor();
+ await filter('CA');assert.deepEqual(await targetArea.locator('dd').allTextContents(),['105 people','110 people']);await targetArea.screenshot({path:`${output}/${width}-people-target.png`});
+ await targetArea.getByLabel('Target month',{exact:true}).selectOption('2026-10-01');assert.equal(await targetArea.getByLabel('Required people',{exact:true}).inputValue(),'');
+ await targetArea.getByRole('button',{name:'Refresh supply source',exact:true}).click();targetMode='delay';const targetStarted=new Promise(resolve=>targetRequest=resolve);await targetArea.getByLabel('Business unit',{exact:true}).selectOption('OPS');await Promise.race([targetStarted,new Promise((_,reject)=>setTimeout(()=>reject(Error('Delayed target request did not start')),10000))]);await home();releaseTarget();await planner();await page.getByRole('button',{name:/Plan a staffing target/}).click();assert.equal(await targetArea.getByLabel('Business unit',{exact:true}).inputValue(),'');assert.equal(await targetArea.getByLabel('Required people',{exact:true}).inputValue(),'');targetMode='valid';
+ for(let n=0;n<3;n++){await home();await planner();assert.equal(await input('Opening contracted FTE').inputValue(),'');assert.equal(await saved.getByRole('button',{name:'Save scenario',exact:true}).isDisabled(),true);}
+ await input('Saved capacity scenario').selectOption({label:'Base'});await saved.getByRole('button',{name:'Open saved scenario',exact:true}).click();await input('Compare capacity scenario').selectOption({label:'Improved zero cost'});assert.deepEqual(await compare.locator('tbody tr').first().locator('td').allTextContents(),['+1','0']);assert.deepEqual(await bucket(),stableSnapshots);
+ await compare.screenshot({path:`${output}/${width}-comparison-after-navigation.png`});
+ // Illustrative demo edits cannot replace a calculated workload or saved scenarios.
+ const demo=page.getByRole('region',{name:'Illustrative workforce planning',exact:true});
+ await demo.getByLabel('Monthly workload',{exact:true}).fill('');await demo.getByRole('button',{name:'Update projection',exact:true}).click();await demo.getByText('More inputs needed',{exact:true}).waitFor();
+ await home();assert.deepEqual(await overview.locator('dd').allTextContents(),['4 FTE','5 FTE','1 FTE']);await overview.screenshot({path:`${output}/${width}-home-workload.png`});await planner();assert.equal(await demo.getByLabel('Monthly workload',{exact:true}).inputValue(),'8000');assert.deepEqual(await bucket(),stableSnapshots);
+ const state=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);assert.deepEqual(state.workspaces.a.fields.sentinel,seed.workspaces.a.fields.sentinel);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);assert.deepEqual(posts,[]);assert.deepEqual(external,[]);
+ evidence.push({width,pendingNameAfterHome:pendingName,errors,posts,external,additionalChecks:'illustrative demo isolation; fractional people/contracted/assigned FTE; Home scope independence; incomplete FTE; invalid opening; horizon and year-boundary comparison rejection; delayed/mismatched dashboard; target people and separate scope; interrupted target request; repeated Home navigation; saved records unchanged',checks:'save; reopen; compare; unknown versus zero cost; edit invalidation; Home saved names; stale result absent on Home; calculation draft and pending save name retained across Home and history; reload clears unsaved draft only; explicit reopen replaces draft; goal isolation; saved snapshots unchanged; no horizontal overflow'});await context.close();
+}}finally{await browser.close();}
+await fs.writeFile(output+'/evidence.json',JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence,null,2));
