@@ -85,15 +85,15 @@ test('saved comparison labels recurring month differences separately and ignores
   const snapshot={ready:true,saved:true,data:{goals:{activeId:'a',goals:[{id:'a',statement:context.goal}]},workspaces:{a:{fields:{[capacityStore.monthlyCapacityField]:{version:1,scopes:[scope],entries}}}}}};
   const store={getSnapshot:()=>snapshot,getDatasetToken:()=>context.datasetToken};let stateIndex=0;
   const {CapacitySavedScenarios}=component('components/workforce-planning/capacity-saved-scenarios.tsx',{
-   react:{...React,useState:()=>[['','base','alternate','',''][stateIndex++],()=>{}]},
+   react:{...React,useState:()=>[['base','alternate','',''][stateIndex++],()=>{}]},
    '@/components/decision-store':{decisionStore:store,useDecisionStorage:()=>snapshot},
    '@/lib/dataset-client.mjs':{datasetSession:{snapshot:()=>context.datasetToken}},
    '@/lib/swp-capacity-cost':costLayer,'@/lib/swp-capacity-store':capacityStore,'@/lib/swp-capacity-record':capacityRecord,
-   './planning-session-context':{usePlanningSession:()=>({goalKey:'goal:a',capacitySession:session,setCapacitySession:()=>{}})},
+   './planning-session-context':{usePlanningSession:()=>({goalKey:'goal:a',capacitySession:{...session,saveName:'Unsaved draft name'},setCapacitySession:()=>{}})},
   });
   const html=renderToStaticMarkup(React.createElement(CapacitySavedScenarios));
   assert.match(html,new RegExp('Opening assumption differences: '+openingCount+'\\.'));
-  assert.match(html,/Month-level assumption differences: 3\./);assert.match(html,/A recurring change counts once per month/);
+  assert.match(html,/value="Unsaved draft name"/);assert.match(html,/Month-level assumption differences: 3\./);assert.match(html,/A recurring change counts once per month/);
  }
 });
 

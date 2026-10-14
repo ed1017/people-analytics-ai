@@ -11,7 +11,9 @@ const control='min-h-11 min-w-0 rounded-md border bg-background px-3 py-2 text-s
 const gap=(n:number|null)=>n===null?'Unknown':`${n>0?'+':''}${n.toLocaleString(undefined,{maximumFractionDigits:2})}`;
 export function CapacitySavedScenarios(){
  const storage=useDecisionStorage(),{goalKey,capacitySession:session,setCapacitySession:setSession}=usePlanningSession();
- const [name,setName]=useState(''),[leftId,setLeftId]=useState(''),[rightId,setRightId]=useState(''),[notice,setNotice]=useState(''),[actionError,setActionError]=useState('');
+ const name=session.saveName??'';
+ const setName=(saveName:string)=>setSession({...session,saveName});
+ const [leftId,setLeftId]=useState(''),[rightId,setRightId]=useState(''),[notice,setNotice]=useState(''),[actionError,setActionError]=useState('');
  const goalId=goalKey.slice(goalKey.indexOf(':')+1),store=decisionStore,token=datasetSession.snapshot();
  let context:CapacityContext|null=null,bucket:CapacityBucket={version:1,scopes:[],entries:[]},loadError='';
  if(goalId)try{context=capacityContext(store,token,goalId);bucket=readCapacityBucket(storage.data.workspaces[goalId]?.fields[monthlyCapacityField],context);}catch(error){loadError=error instanceof Error?error.message:'Saved scenarios could not be verified.';}
