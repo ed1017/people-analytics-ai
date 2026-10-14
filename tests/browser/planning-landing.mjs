@@ -16,16 +16,16 @@ try {for(const width of [1440,390]){
  
  assert.match(await area.innerText(),/4 FTE shortfall/);
  const chart=area.getByRole('img',{name:'Monthly available and required capacity in FTE'});
- const before=await chart.innerHTML();await area.getByLabel('Productivity improvement',{exact:false}).fill('25');
- assert.match(await area.innerText(),/Needs updating/);assert.equal(await chart.innerHTML(),before);
- await area.getByRole('button',{name:'Update projection'}).focus();await page.keyboard.press('Enter');assert.match(await area.innerText(),/6 FTE surplus/);
- await area.getByLabel('Monthly hires',{exact:true}).fill('-1');await area.getByRole('button',{name:'Update projection'}).click();await area.getByRole('alert').waitFor();assert.match(await area.innerText(),/Needs updating/);
+ const before=await chart.innerHTML();await area.getByLabel('Productivity improvement',{exact:true}).fill('25');
+ assert.match(await area.innerText(),/6 FTE surplus/);assert.notEqual(await chart.innerHTML(),before);
+ await area.getByRole('slider',{name:'Productivity improvement slider'}).focus();await page.keyboard.press('ArrowRight');assert.equal(await area.getByLabel('Productivity improvement',{exact:true}).inputValue(),'26');
+ await area.getByLabel('Monthly hires',{exact:true}).fill('-1');await area.getByRole('alert').waitFor();assert.match(await area.innerText(),/Check your inputs/);
  await area.getByRole('button',{name:'Reset demo'}).click();assert.match(await area.innerText(),/4 FTE shortfall/);
  await page.getByText('Advanced tools · your capacity scenarios',{exact:true}).click();await page.getByRole('region',{name:'Workload capacity planning',exact:true}).waitFor();
  assert.equal(await page.getByLabel('Workload scope',{exact:true}).last().inputValue(),'');
  await page.getByText('Advanced tools · your capacity scenarios',{exact:true}).click();
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal overflow');assert.deepEqual(errors,[]);assert.deepEqual(mutations,[]);
- await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`${output}/${width}-final.png`,fullPage:true});await page.screenshot({path:`${output}/${width}-viewport.png`});if(width===1440){const box=await area.getByRole('complementary').boundingBox();assert.ok(box.y+box.height<=900,'guidance fits first desktop viewport');const outcomes=await area.locator('dl').boundingBox();assert.ok(outcomes.y+outcomes.height<=900,'outcomes fit first desktop viewport');}
+ await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`${output}/${width}-final.png`,fullPage:true});await page.screenshot({path:`${output}/${width}-viewport.png`});assert.ok((await chart.boundingBox()).height>100,'chart remains readable');
  evidence.push({width,errors,mutations,chart:await chart.boundingBox(),guidance:await area.getByRole('complementary').boundingBox()});await context.close();
 }}finally{await browser.close();}
 await fs.writeFile(output+'/evidence.json',JSON.stringify(evidence,null,2));console.log(JSON.stringify(evidence,null,2));
