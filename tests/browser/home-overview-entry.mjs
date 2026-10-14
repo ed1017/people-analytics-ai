@@ -46,7 +46,7 @@ try{for(const width of [1440,390]){
  await page.getByRole('region',{name:'Workload capacity planning',exact:true}).waitFor();
  const capacity=page.getByRole('region',{name:'Workload capacity planning',exact:true});
  await capacity.getByText('Timing & capacity assumptions (required)',{exact:true}).click();
- for(const [label,value] of Object.entries({'Workload scope':'Service desk — tickets','Opening date (month end)':'2026-09-30','Opening people':'10','Opening contracted FTE':'8','Work units each month':'800','Hours per work unit':'1','Productive hours per FTE each month':'160','Cost per contracted FTE per month (USD, optional)':'0'}))await capacity.getByLabel(label,{exact:true}).fill(value);
+ for(const [label,value] of Object.entries({'Work to plan':'Service desk — tickets','Opening date (month end)':'2026-09-30','People at the start':'10','Working time at the start (FTE)':'8','Work items each month':'800','Hours per item':'1','Work hours per FTE each month':'160','Cost per contracted FTE per month (USD, optional)':'0'}))await capacity.getByLabel(label,{exact:true}).fill(value);
 
  for(const [label,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await capacity.getByLabel(label,{exact:true}).fill(value);
  await capacity.getByRole('checkbox',{name:/Assume every hire/}).check();await capacity.getByRole('checkbox',{name:/I confirm/}).check();await capacity.getByRole('button',{name:'Calculate capacity',exact:true}).click();

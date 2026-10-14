@@ -15,11 +15,11 @@ export function CapacityProjection({result}:{result:CapacityResult|null}) {
  const x=(index:number)=>points.length===1?340:72+index*536/Math.max(1,points.length-1);
  const y=(value:number)=>242-value/maximum*194;
  const last=points.at(-1);
- const series=[{key:'requiredFte',label:'Demand · required FTE',color:'#2563eb',dash:undefined},{key:'allocatedFte',label:'Supply · available FTE',color:'#c2410c',dash:'7 4'}] as const;
+ const series=[{key:'requiredFte',label:'Needed (FTE)',color:'#2563eb',dash:undefined},{key:'allocatedFte',label:'Available (FTE)',color:'#c2410c',dash:'7 4'}] as const;
  return <div className="min-w-0 space-y-4">
   <div className="min-w-0 rounded-xl border bg-background p-4 sm:p-5">
-   <h3 className="font-semibold">Monthly supply and demand</h3>
-   <p className="mt-1 text-xs text-muted-foreground">FTE assigned to this work, compared with FTE required.</p>
+   <h3 className="font-semibold">Work needed and time available</h3>
+   <p className="mt-1 text-xs text-muted-foreground">Compared in FTE (full-time equivalents), not a count of people.</p>
    <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs" aria-label="Chart legend">{series.map(item=><li key={item.key} className="flex items-center gap-2"><span aria-hidden="true" className="inline-block w-5 border-t-2" style={{borderColor:item.color,borderStyle:item.dash?'dashed':'solid'}}/>{item.label}</li>)}</ul>
    {values.length>0 ? <div className="mt-3">
    <div className="relative">
@@ -36,7 +36,7 @@ export function CapacityProjection({result}:{result:CapacityResult|null}) {
    <div aria-hidden="true" data-capacity-axis="x" className="relative h-8 text-center text-xs leading-4 tabular-nums">
     {points.map((point,index)=><span key={point.month} className="absolute top-0" style={{left:`${x(index)/640*100}%`,transform:'translateX(-50%)'}}><span className="block">{new Date(`${point.month}-01T00:00:00Z`).toLocaleDateString(undefined,{month:'short',timeZone:'UTC'})}</span><span className="block">{point.month.slice(0,4)}</span></span>)}
    </div>
-   </div> : <div className="flex min-h-60 items-center justify-center py-8 text-center text-sm text-muted-foreground">{result?'Supply and demand are unknown. Complete the blank inputs to plot capacity.':'Enter your assumptions and calculate to see the comparison.'}</div>}
+   </div> : <div className="flex min-h-60 items-center justify-center py-8 text-center text-sm text-muted-foreground">{result?'More numbers are needed. Fill in the blank work and team inputs.':'Enter your work and team numbers to see the comparison.'}</div>}
    {result&&<p className="mt-2 text-xs text-muted-foreground">Positive gap = shortfall; negative gap = surplus. Unknown values are not plotted.</p>}
   </div>
   {last&&<div><p className="mb-2 text-xs text-muted-foreground">Final planning month · {last.month}</p><dl className="grid grid-cols-3 gap-2 sm:gap-3">{[{label:'Available FTE',value:last.allocatedFte},{label:'Required FTE',value:last.requiredFte},{label:'Gap FTE',value:last.gapFte}].map(item=><div key={item.label} className="min-w-0 rounded-xl border bg-background p-3 sm:p-4"><dt className="text-xs text-muted-foreground">{item.label}</dt><dd className="mt-2 break-words text-lg font-semibold tabular-nums sm:text-2xl">{item.label==='Gap FTE'&&item.value!==null&&item.value>0?'+':''}{format(item.value)}</dd></div>)}</dl></div>}

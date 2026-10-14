@@ -23,7 +23,7 @@ try {for(const width of [1440,390]){
  await area.getByLabel('Monthly hires',{exact:true}).fill('-1');await area.getByRole('alert').waitFor();assert.match(await area.innerText(),/Check your inputs/);
  await area.getByRole('button',{name:'Reset demo'}).click();assert.match(await area.innerText(),/4 FTE shortfall/);
  await page.getByRole('region',{name:'Workload capacity planning',exact:true}).waitFor();await page.getByRole('region',{name:'Workload capacity planning',exact:true}).waitFor();
- assert.equal(await page.getByLabel('Workload scope',{exact:true}).last().inputValue(),'');
+ assert.equal(await page.getByLabel('Work to plan',{exact:true}).last().inputValue(),'');
  await page.getByRole('region',{name:'Workload capacity planning',exact:true}).waitFor();
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal overflow');assert.deepEqual(errors,[]);assert.deepEqual(mutations,[]);
  await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`${output}/${width}-final.png`,fullPage:true});await page.screenshot({path:`${output}/${width}-viewport.png`});assert.ok((await chart.boundingBox()).height>100,'chart remains readable');

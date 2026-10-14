@@ -26,7 +26,7 @@ test('compact projection preserves empty, unknown, zero, single-month, discontin
  const cases={empty:null,unknown:[point('2026-10',null,null,null)],zero:[point('2026-10',0,0,0)],single:[point('2026-10',3.33,7.2,3.87)],partial:[point('2026-10',10,12,2),point('2026-11',null,12,null),point('2026-12',10,12,2)],surplus:[point('2026-10',12,10,-2)]};
  for(const [name,points] of Object.entries(cases)){
   const html=renderToStaticMarkup(React.createElement(CapacityProjection,{result:points===null?null:{points}}));assert.doesNotMatch(html,/NaN|Infinity/);
-  if(name==='empty')assert.match(html,/Enter your assumptions/);
+  if(name==='empty')assert.match(html,/Enter your work and team numbers/);
   if(name==='unknown'){assert.doesNotMatch(html,/<svg/);assert.match(html,/Unknown/);}
   if(name==='zero'){assert.match(html,/<svg/);assert.equal((html.match(/<circle/g)||[]).length,2);}
   if(name==='single'){assert.match(html,/\+3.87/);assert.equal((html.match(/cx="340"/g)||[]).length,2);}
@@ -58,13 +58,13 @@ const nodes=tree=>React.isValidElement(tree)?[tree,...React.Children.toArray(tre
 test('compact worksheet keeps saved controls outside its form and monthly detail collapsed',()=>{
  const view=worksheet(),all=nodes(view.tree),form=all.find(node=>node.type==='form');assert(form);
  assert.equal(nodes(form).filter(node=>node.type===view.Saved).length,0);assert.equal(all.filter(node=>node.type===view.Saved).length,1);
- const html=renderToStaticMarkup(view.tree);assert.match(html,/Monthly supply and demand/);assert.match(html,/Saved scenarios stay in this browser/);assert.match(html,/Without a goal, calculations are session-only/);
+ const html=renderToStaticMarkup(view.tree);assert.match(html,/Work needed and time available/);assert.match(html,/Saved scenarios stay in this browser/);assert.match(html,/Without a goal, calculations are session-only/);
  assert.equal((html.match(/<form/g)||[]).length,1);assert.doesNotMatch(html,/<details[^>]*open/);
  const dateGroup=all.find(node=>node.type==='div'&&nodes(node).filter(child=>child.type==='input').length===2&&nodes(node).some(child=>child.props['aria-label']==='Opening date (month end)'));
  assert.match(dateGroup.props.className,/grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,11rem\),1fr\)\)\]/);
 });
 test('compact worksheet retains edit and confirmation capture invalidation',()=>{
- for(const [label,value,clearScope] of [['Work units each month','900',false],['Workload scope','Other work',true],['Cost per contracted FTE per month (USD, optional)','0',false],['Cost per contracted FTE per month (USD, optional)','',false]]){
+ for(const [label,value,clearScope] of [['Work items each month','900',false],['Work to plan','Other work',true],['Cost per contracted FTE per month (USD, optional)','0',false],['Cost per contracted FTE per month (USD, optional)','',false]]){
   const view=worksheet(),input=nodes(view.tree).find(node=>node.props['aria-label']===label||node.props.label===label);input.props.onChange(input.props.label?value:{target:{value}});
   const next=view.updated();assert.equal(next.result,null);assert.equal(next.cost,null);assert.equal(next.capture,null);assert.equal(next.draft.confirmed,false);assert.deepEqual(next.scope,clearScope?null:scope);
  }
@@ -107,7 +107,7 @@ test('optional cost shows unknown and zero distinctly without removing capacity 
   for(const [rate,expected,cents] of [['','Unknown',null],['0','$0.00',0],['12.34','$98.72',9872]]){
    const view=worksheet({...session,draft:{...draft,costRate:rate}});nodes(view.tree).find(n=>n.type==='form').props.onSubmit({preventDefault(){}});
    const next=view.updated();assert.equal(next.result.status,'calculated');assert.equal(next.cost.points.at(-1).runRateCents,cents);
-   const html=renderToStaticMarkup(worksheet(next).tree);assert.ok(html.includes(expected));assert.match(html,/USD\/month/);assert.match(html,/not actual pay, cumulative spend or savings/);assert.ok(html.indexOf('Monthly supply and demand')<html.indexOf('Contracted supply cost estimate'));
+   const html=renderToStaticMarkup(worksheet(next).tree);assert.ok(html.includes(expected));assert.match(html,/USD\/month/);assert.match(html,/not actual pay, cumulative spend or savings/);assert.ok(html.indexOf('Work needed and time available')<html.indexOf('Contracted supply cost estimate'));
   }
  }finally{if(previous===undefined)delete globalThis.requestAnimationFrame;else globalThis.requestAnimationFrame=previous;}
 });
