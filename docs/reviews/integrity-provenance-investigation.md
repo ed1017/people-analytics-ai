@@ -1,6 +1,6 @@
 # Local integrity and provenance investigation
 
-Base: `ac505c8e9dfdf5cf7231d1ea099435d5730344bf` (merged PR #231). Scope: local test/provenance investigation plus an inaccurate comment correction. No runtime behavior, reviewed artifact, source/provider/country configuration, DB or AI changes. No publication or deployment.
+Base: `ac505c8e9dfdf5cf7231d1ea099435d5730344bf` (merged PR #231). Scope: local test/provenance investigation plus an inaccurate comment correction. No runtime behavior, reviewed artifact, source/provider/country configuration, DB or AI changes. Prepared for draft-PR publication; no merge or deployment authorized by this repair.
 
 ## Actual resumption
 
@@ -25,7 +25,7 @@ Tests now separate:
 
 The new helper exports immutable local Git trees into temporary directories and executes only the requested historical offline producers there. It supplies no credentials, blocks `fetch`, does not install dependencies or fetch Git history, never patches the historical source, and removes its temporary directory afterward. No `--write` generator was run. A missing historical object is an explicit test failure, not a skip or a fallback to current code.
 
-This introduces a test-environment prerequisite: Git, tar, and the three exact historical commits must be available locally. A shallow checkout must be provisioned with that history before running these checks. The current environment has all three objects. No app/runtime dependency is introduced.
+The test-environment prerequisites are Git, tar, Node 24.19.0, locked dependencies, and the three exact historical commits. `.github/workflows/regression-contracts.yml` uses a full-history checkout (`fetch-depth: 0`), then explicitly verifies each commit object and archives its required paths before dependency installation or tests. Missing history or paths fail the job; there is no conditional skip, hash fallback, or test-side fetch. Both GitHub Actions are pinned to full commit IDs; credentials are not persisted, permissions are read-only, and dependencies install with lifecycle scripts disabled. The workflow runs all contracts, all six prebuild checks and TypeScript on pull requests (including drafts), main pushes, and manual dispatch. No app/runtime dependency is introduced.
 
 ## Five source-meaning changes, individually exercised
 
@@ -74,4 +74,4 @@ On Node v24.19.0 with locked dependencies:
 
 While adding the explicit-review control, an intermediate test tried to append without identifying the replaced attachment. The existing guard correctly rejected it. The final test checks that rejection, then provides the explicit replacement ID and verifies retained history. No product fix was made.
 
-No test is skipped or marked expected-failing. Changes remain local for review; no push, PR, merge or deployment was performed.
+No test is skipped or marked expected-failing. The initial investigation was committed locally as `4733d0a2adac7a0df79130bc32dc7f9623381c6d`; the follow-up adds explicit CI provisioning for draft-PR review. No reviewed artifact or current-producer assertion was changed by that follow-up. Merge remains subject to independent review.

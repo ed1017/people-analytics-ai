@@ -1,0 +1,50 @@
+name: Regression contracts
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out full historical source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify pinned provenance trees
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v tar
+          for commit in \
+            5cc1eae473a6d6ba60f0bfb72b60b19cb6392854 \
+            e3eae65cc641513041c379dcf2bed6845f323c4d \
+            16018a6358261699a46a8bc3918e61b25bcc9f1e
+          do
+            git cat-file -e "${commit}^{commit}"
+            git archive --format=tar "$commit" lib tests docs package.json > /dev/null
+          done
+
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24.19.0'
+          cache: npm
+
+      - run: npm ci --ignore-scripts
+      - name: Run regression contracts
+        run: node --test --test-concurrency=4 tests/*.test.mjs
+      - name: Verify generated artifacts without writing
+        run: npm run prebuild
+      - name: Check TypeScript
+        run: npx --no-install tsc --noEmit
