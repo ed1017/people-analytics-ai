@@ -35,7 +35,7 @@ import {
 import {readSurveySource} from "@/lib/survey-source-client";
 import { employeeListeningEvidence, exitSurveyEvidence } from "@/lib/employee-listening";
 import { FocusedIssue } from "@/components/focused-issue";
-import {readDashboardScopeReceipt} from "@/lib/dashboard-scope";
+import {readDashboardScopeReceipt,isVerifiedDashboardScope} from "@/lib/dashboard-scope";
 import { buildHomePack } from "@/lib/home-pack.mjs";
 import {MarketComparison,CarriedMarketReference,type MarketCarry} from "@/components/market-reference";
 import {defaultMarketSelection,marketCarryEvidence} from "@/lib/oews-reference.mjs";
@@ -455,10 +455,10 @@ export default function Home() {
         const scopeReceipt = readDashboardScopeReceipt(payload.workforce_filter_scope);
         const filtered = selectedCountry !== 'all' || selectedOrg !== 'all' || selectedLevel !== 'all';
         const scopeUnavailable = scopeReceipt
-          ? scopeReceipt.status !== 'verified_rpc' || scopeReceipt.effective?.country !== selectedCountry || scopeReceipt.effective?.org !== selectedOrg || scopeReceipt.effective?.level !== selectedLevel
+          ? !isVerifiedDashboardScope(scopeReceipt) || scopeReceipt.effective?.country !== selectedCountry || scopeReceipt.effective?.org !== selectedOrg || scopeReceipt.effective?.level !== selectedLevel
           : filtered || payload.workforce_filter_scope !== undefined;
         setOverviewData(scopeUnavailable ? null : data.overview);
-        if (scopeUnavailable) setDashboardError('Workforce evidence is unavailable for these filters. ' + (scopeReceipt?.status !== 'verified_rpc' && scopeReceipt?.basis || 'The effective dashboard scope could not be verified.'));
+        if (scopeUnavailable) setDashboardError('Workforce evidence is unavailable for these filters. ' + (!isVerifiedDashboardScope(scopeReceipt) && scopeReceipt?.basis || 'The effective dashboard scope could not be verified.'));
         setWorkforcePerformance(scopeUnavailable ? null : data.performance_rating ?? null);
         setHeadcountTrend(scopeUnavailable ? [] : data.trend ?? []);
         setFilterOptions(

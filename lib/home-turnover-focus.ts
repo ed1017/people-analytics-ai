@@ -1,6 +1,7 @@
 import {normalizeHomePack} from './home-pack.mjs';
 
-const rate=(value:unknown):value is number=>typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<=100;
+// The new complete-calendar contract permits >100%; retain legacy input limits.
+const rate=(value:unknown,completeCalendar=false):value is number=>typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<=(completeCalendar?1e15:100);
 const count=(value:unknown):value is number=>typeof value==='number'&&Number.isSafeInteger(value)&&value>=0;
 /** Read-only goal context. No new source access, scope changes, inferred denominators or group ranking. */
 export function homeTurnoverFocus(goal:string,pack:unknown,query:string){
@@ -15,9 +16,10 @@ export function homeTurnoverFocus(goal:string,pack:unknown,query:string){
  const facts:Record<string,unknown>|null=matchingPeriod&&source?.facts?source.facts as Record<string,unknown>:null;
  const metric=voluntary?'Voluntary turnover':'Overall turnover';
  const sourceId=source?.id;
+ const completeCalendar=sourceId==='W1'&&normalized.datasetContext?.dashboardAggregate?.metricContract==='voluntary-ytd-nine-month-average-stock-v2';
  const period=validDate?'YTD through '+new Date(date+'T00:00:00Z').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}):null;
  const overallRate=sourceId==='A1'&&rate(facts?.total_turnover_ytd_pct)?facts.total_turnover_ytd_pct:null;
- const voluntaryRate=rate(facts?.voluntary_turnover_ytd_pct)?facts.voluntary_turnover_ytd_pct:null;
+ const voluntaryRate=rate(facts?.voluntary_turnover_ytd_pct,completeCalendar)?facts.voluntary_turnover_ytd_pct:null;
  const total=sourceId==='A1'&&count(facts?.total_exits)?facts.total_exits:null;
  const voluntaryCount=sourceId==='A1'&&count(facts?.voluntary_exits)?facts.voluntary_exits:null;
  const selectedRate=voluntary?voluntaryRate:overallRate,selectedCount=voluntary?voluntaryCount:total;
