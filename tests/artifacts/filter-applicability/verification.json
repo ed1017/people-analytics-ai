@@ -1,0 +1,15 @@
+{
+  "baseCommit": "d43273f5b52bca10dac12dbe38cb9bd14015cc63",
+  "environment": "Local production build; isolated synthetic read fixtures, not hosted Preview screenshots.",
+  "checks": "Six wording variants at 1440px and 390px; note visible with collapsed mobile filters; selection and Reset retained; no horizontal overflow, runtime errors, hosted mutations or AI calls.",
+  "tests": 2494,
+  "typecheck": "Passed in production build",
+  "lint": "Passed; two existing conditional-hiring-plan warnings",
+  "mappingEvidence": {
+    "home/workforce": "app/page.tsx dashboard request and snapshot props; WorkforcePage labels company composition unfiltered",
+    "performance": "CareerGrowthMobilityPage passes performanceFilters to WorkforcePerformanceField; movement history uses independent unfiltered source",
+    "compensation": "CompensationJobRanges narrows catalog assumptions and withholds filtered pay; CompensationPage cost source unfiltered",
+    "planning": "StaffingTargetCompanion owns its BU selector; other calculations use scenario inputs; shared header controls not passed as calculation filters",
+    "other pages": "app/page.tsx independent source requests; selectedBusinessContext labels context only"
+  }
+}
