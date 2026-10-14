@@ -71,7 +71,7 @@ for(const [label,value] of Object.entries({'Hires each month (people)':'0','Depa
  const filters=page.getByRole('region',{name:'Shared workforce filters',exact:true});
  async function filter(country){if(width===390&&!await filters.getByLabel('Country',{exact:true}).isVisible())await filters.getByText('Filters',{exact:true}).click();await filters.getByLabel('Country',{exact:true}).selectOption(country);}
  await filter('CA');assert.deepEqual(await overview.locator('dd').allTextContents(),['4.13 FTE','5 FTE','0.88 FTE'],'header filters cannot rebind the workload');
- await planner();await input('Planning months').fill('1');await calculate();await save('One month');
+ await planner();await area.getByText('Timing & capacity assumptions (required)',{exact:true}).click();await input('Planning months').fill('1');await calculate();await save('One month');
  await input('Compare capacity scenario').selectOption({label:'Part-time workload'});assert.match(await saved.innerText(),/Opening date, horizon or calculation conventions differ/);assert.equal(await compare.count(),0);
  await input('Planning months').fill('3');await input('Opening date (month end)').fill('2026-12-31');await calculate();await save('Year boundary');await area.getByText('Monthly detail · people and FTE',{exact:true}).click();assert.deepEqual(await rows.locator('th').allTextContents(),['2027-01','2027-02','2027-03']);
  await input('Compare capacity scenario').selectOption({label:'Part-time workload'});assert.match(await saved.innerText(),/Opening date, horizon or calculation conventions differ/);assert.equal(await compare.count(),0);
