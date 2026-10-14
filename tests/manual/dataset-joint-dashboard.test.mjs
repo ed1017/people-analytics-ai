@@ -19,6 +19,31 @@ const bytes=fs.readFileSync(config.artifactPath),jointBytes=fs.readFileSync(conf
 const hash=v=>createHash('sha256').update(v).digest('hex');
 assert.equal(hash(referenceBytes),config.expectedReferenceDigest);
 const references=JSON.parse(referenceBytes),base=JSON.parse(bytes),joint=JSON.parse(jointBytes);
+const scopeFields=['country','org','level'];
+const scopeKey=filters=>JSON.stringify(scopeFields.map(field=>filters[field]));
+const declaredScopes=['all',...joint.dimensions.country].flatMap(country=>
+ ['all',...joint.dimensions.org].flatMap(org=>['all',...joint.dimensions.level].map(level=>({country,org,level}))));
+const expectedScopeKeys=new Set(declaredScopes.map(scopeKey));
+assert.deepEqual(scopeFields.map(field=>joint.dimensions[field].length),[10,8,12]);
+assert.equal(declaredScopes.length,1287);assert.equal(expectedScopeKeys.size,1287);
+const expectedDates=Array.from({length:33},(_,i)=>new Date(Date.UTC(2024,i+1,0)).toISOString().slice(0,10));
+assert.deepEqual(joint.dates,expectedDates);assert.equal(expectedScopeKeys.size*expectedDates.length,42471);
+function assertCompleteReferenceCoverage(rows){
+ assert.equal(rows.length,1287,'Complete scope reference count');
+ const seen=new Set();let observations=0;
+ for(const row of rows){
+  assert.deepEqual(Object.keys(row.filters).sort(),[...scopeFields].sort(),'Exact scope fields');
+  const key=scopeKey(row.filters);
+  assert.ok(expectedScopeKeys.has(key),'Declared scope tuple');
+  assert.ok(!seen.has(key),'Duplicate scope reference');seen.add(key);
+  assert.deepEqual(row.trend.map(point=>point.snapshot_date),expectedDates,'Complete unique monthly calendar');
+  observations+=row.trend.length;
+ }
+ assert.deepEqual(seen,expectedScopeKeys,'Complete scope tuple inventory');
+ assert.equal(observations,42471,'Complete monthly observation count');
+}
+const referenceRows=Object.values(references);
+assertCompleteReferenceCoverage(referenceRows);
 const load=overrides=>createFilteredAggregateArtifactProvider({bytes,jointBytes,expectedArtifactDigest:config.expectedArtifactDigest,expectedDatasetDigest:config.expectedDatasetDigest,expectedJointDigest:config.expectedJointDigest,...overrides});
 const loadBase=value=>{const changed=Buffer.from(JSON.stringify(value));return createAggregateArtifactProvider({bytes:changed,expectedArtifactDigest:hash(changed),expectedDatasetDigest:config.expectedDatasetDigest});};
 const mutateJoint=edit=>{const value=structuredClone(joint);edit(value);const changed=Buffer.from(JSON.stringify(value));return load({jointBytes:changed,expectedJointDigest:hash(changed)});};
@@ -29,7 +54,8 @@ const request=filters=>new Request('http://fixture.invalid/api/dashboard?'+new U
 const call=async filters=>{const r=await integration.handle(request(filters));assert.equal(r.status,200);return r.json();};
 
 test('all 1287 API scopes and 42471 months match independent interval SQL references',async()=>{
- for(const expected of Object.values(references)){
+ const actualScopes=new Set();let actualMonths=0;
+ for(const expected of referenceRows){
   const actual=await call(expected.filters);
   assert.deepEqual(actual.overview,expected.overview);
   assert.deepEqual(actual.trend,expected.trend);
@@ -37,8 +63,20 @@ test('all 1287 API scopes and 42471 months match independent interval SQL refere
   const receipt=readDashboardScopeReceipt(actual.workforce_filter_scope);
   assert.equal(receipt.status,'verified_aggregate');assert.equal(isVerifiedDashboardScope(receipt),true);
   assert.deepEqual(receipt.effective,expected.filters);assert.equal(receipt.artifactDigest,config.expectedJointDigest);
+  const key=scopeKey(receipt.effective);assert.ok(!actualScopes.has(key),'Duplicate served scope');actualScopes.add(key);actualMonths+=actual.trend.length;
   assert.equal(actual.data_meta.dashboardAggregateDigest,config.expectedJointDigest);
   if(expected.filters.country!=='all'||expected.filters.level!=='all')assert.equal(actual.performance_rating,null);
+ }
+ assert.deepEqual(actualScopes,expectedScopeKeys);assert.equal(actualScopes.size,1287);assert.equal(actualMonths,42471);
+});
+
+test('reference coverage rejects missing, duplicate and undeclared scopes and months',()=>{
+ assert.throws(()=>assertCompleteReferenceCoverage(referenceRows.slice(1)),/Complete scope reference count/);
+ assert.throws(()=>assertCompleteReferenceCoverage([...referenceRows.slice(0,-1),referenceRows[0]]),/Duplicate scope reference/);
+ const unknown={...referenceRows[0],filters:{...referenceRows[0].filters,country:'UNKNOWN'}};
+ assert.throws(()=>assertCompleteReferenceCoverage([unknown,...referenceRows.slice(1)]),/Declared scope tuple/);
+ for(const trend of [referenceRows[0].trend.slice(1),[...referenceRows[0].trend.slice(0,-1),referenceRows[0].trend[0]]]){
+  assert.throws(()=>assertCompleteReferenceCoverage([{...referenceRows[0],trend},...referenceRows.slice(1)]),/Complete unique monthly calendar/);
  }
 });
 

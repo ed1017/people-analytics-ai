@@ -14,6 +14,16 @@ and captures immutable values. Concurrent calls share one promise. Failures stay
 cached until an explicitly constructed replacement loader is used; there is no
 fallback to another dataset or automatic retry.
 
+Semantic bounds apply before a provider is returned, even when changed aggregate
+bytes have a matching new outer digest. Regrettable exits cannot exceed voluntary
+exits, which cannot exceed all exits. Current, group and monthly voluntary and
+regrettable counts reconcile over January–September 2026 only. Monthly turnover
+uses the corresponding month-end stock; current rates use the nine-month average,
+and regrettable share uses voluntary exits. The constructed survey instrument is
+`likert_1_5`: wave, dimension and business-unit average scores stay within 1–5,
+and favorable shares within 0–100%.
+These bounds are specific to those metrics; stock-based turnover can exceed 100%.
+
 The proposal validator binds artifact, code, original dataset and per-component
 release pins. Proposed identities remain distinct from source identities. Its
 result deliberately combines `manifestValidated: true` with

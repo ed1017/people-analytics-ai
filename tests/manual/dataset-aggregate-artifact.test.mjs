@@ -9,6 +9,7 @@ import { DatasetRouter } from '../../lib/dataset-router.mjs';
 import { createLocalDatasetIntegration } from '../../lib/dataset-local-integration.mjs';
 import { createDatasetRequestBoundary } from '../../lib/dataset-request-boundary.mjs';
 import { LOCAL_PARITY_ROUTES } from '../../lib/dataset-local-api.mjs';
+import { validateAggregateRows } from '../../lib/dataset-aggregate-validation.mjs';
 
 // Manual review uses explicit private fixture locations; no fixture bytes or
 // operational configuration is included in this repository.
@@ -100,6 +101,96 @@ test('missing and unknown aggregates are rejected even with a matching new outer
   await assert.rejects(changed(v => { v.aggregates.raw_employees = []; }), /incompatible/);
   await assert.rejects(changed(v => { v.aggregates.finance_current_summary = {}; }), /incompatible/);
 });
+
+for (const name of ['attrition_current_summary', 'attrition_business_unit_summary',
+  'attrition_level_summary', 'attrition_monthly_trend', 'attrition_tenure_summary']) {
+  test(name + ' rejects regrettable exits above voluntary exits after rehashing', async () => {
+    await assert.rejects(changed(v => {
+      const row = v.aggregates[name][0]; row.regrettable_exits = row.voluntary_exits + 1;
+    }), new RegExp(name + ' regrettable exits exceed voluntary exits'));
+  });
+  test(name + ' rejects voluntary exits above all exits after rehashing', async () => {
+    await assert.rejects(changed(v => {
+      const row = v.aggregates[name][0]; row.voluntary_exits = (row.total_exits ?? row.exits) + 1;
+    }), new RegExp(name + ' voluntary exits exceed exits'));
+  });
+}
+
+for (const name of ['attrition_business_unit_summary', 'attrition_level_summary', 'attrition_tenure_summary']) {
+  for (const metric of ['voluntary_exits', 'regrettable_exits']) {
+    test(name + ' reconciles YTD ' + metric + ' even when the row remains within bounds', async () => {
+      await assert.rejects(changed(v => {
+        const row = v.aggregates[name].find(r => r.voluntary_exits > 1);
+        row[metric] += metric === 'voluntary_exits' ? -1 : 1;
+      }), new RegExp(name + ' YTD ' + metric + ' reconciliation'));
+    });
+  }
+}
+
+test('monthly voluntary and regrettable counts reconcile to the matching YTD summary', async () => {
+  await assert.rejects(changed(v => {
+    const row = v.aggregates.attrition_monthly_trend.find(r => r.month === '2026-09-01');
+    row.voluntary_exits--; row.involuntary_exits++;
+    const hc = v.aggregates.dashboard_headcount_trend.at(-1).headcount;
+    row.monthly_voluntary_turnover_pct = Math.round(10000 * row.voluntary_exits / hc) / 100;
+  }), /attrition YTD voluntary_exits reconciliation/);
+  await assert.rejects(changed(v => {
+    v.aggregates.attrition_monthly_trend.at(-1).regrettable_exits++;
+  }), /attrition YTD regrettable_exits reconciliation/);
+});
+
+test('a current regret count and matching fractional share still require matching YTD counts', async () => {
+  await assert.rejects(changed(v => {
+    const row = v.aggregates.attrition_current_summary[0];
+    row.regrettable_exits = 1;
+    row.regrettable_share_of_voluntary_pct = Math.round(1000 / row.voluntary_exits) / 10;
+  }), /attrition YTD regrettable_exits reconciliation/);
+});
+
+test('pre-2026 monthly regret counts do not enter the current YTD comparison', async () => {
+  await assert.doesNotReject(changed(v => {
+    const row = v.aggregates.attrition_monthly_trend.find(r => r.month < '2026-01-01' && r.voluntary_exits > 0);
+    row.regrettable_exits = 1;
+  }));
+});
+
+test('current, monthly and reason percentages use their own declared denominators', async () => {
+  for (const [name, field, message] of [
+    ['attrition_current_summary', 'annualized_voluntary_turnover_pct', 'annualized company turnover'],
+    ['attrition_current_summary', 'regrettable_share_of_voluntary_pct', 'regrettable share of voluntary exits'],
+    ['attrition_monthly_trend', 'monthly_turnover_pct', 'attrition monthly turnover'],
+    ['attrition_monthly_trend', 'monthly_voluntary_turnover_pct', 'attrition monthly turnover'],
+    ['attrition_reason_summary', 'pct_of_exits', 'attrition reason share'],
+  ]) await assert.rejects(changed(v => { v.aggregates[name][0][field] += 1; }), new RegExp(message));
+});
+
+test('monthly exit partitions and dates cannot break matched-window reconciliation', async () => {
+  await assert.rejects(changed(v => { v.aggregates.attrition_monthly_trend.at(-1).involuntary_exits++; }), /exit type partition/);
+  await assert.rejects(changed(v => { v.aggregates.attrition_monthly_trend[0].month = '2023-12-01'; }), /attrition monthly calendar/);
+});
+
+for (const name of ['survey_dimensions', 'survey_business_units', 'survey_waves']) {
+  test(name + ' rejects out-of-contract scores and shares independently after rehashing', async () => {
+    for (const [field, value] of [['avg_score', 0.99], ['avg_score', 5.01], ['avg_score', 6],
+      ['favorable_pct', -0.01], ['favorable_pct', 100.01], ['favorable_pct', 101]]) {
+      await assert.rejects(changed(v => { v.aggregates[name][0][field] = value; }),
+        error => error.message.startsWith('Aggregate contract: ') && error.message.includes(name) && error.message.includes(field));
+    }
+    await assert.rejects(changed(v => {
+      Object.assign(v.aggregates[name][0], { avg_score: 6, favorable_pct: 101 });
+    }), new RegExp(name + ' avg_score outside 1..5'));
+  });
+
+  test(name + ' includes both endpoints of its score and favorable-share bounds', () => {
+    // Exercise only the bounds here; a changed wave's share separately needs to
+    // match its sealed component before a serving provider can be constructed.
+    for (const [avg_score, favorable_pct] of [[1, 0], [5, 100]]) {
+      const value = JSON.parse(bytes);
+      Object.assign(value.aggregates[name][0], { avg_score, favorable_pct });
+      assert.doesNotThrow(() => validateAggregateRows(value.aggregates, value.components));
+    }
+  });
+}
 
 test('caller byte mutation and result mutation cannot change a serving instance', async () => {
   const mutable = Buffer.from(bytes), own = await load(mutable); mutable.fill(0);
