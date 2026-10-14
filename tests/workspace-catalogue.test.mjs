@@ -18,5 +18,5 @@ test('five core Planning destinations retain their order and aliases',()=>{
 test('decision brief is separate from five core steps; evaluation has no scorecard destination',()=>{
  assert.equal(getWorkspaceForPage('decision-brief'),'strategy');
  assert.deepEqual(appNavigationSections[3].pages,['assess-evaluate']);
- assert.equal(appPageMetadata['assess-evaluate'].label,'Coming soon');
+ assert.equal(appPageMetadata['assess-evaluate'].label,'Assess & Evaluate · Coming soon');
 });

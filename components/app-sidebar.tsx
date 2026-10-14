@@ -47,7 +47,7 @@ const workspaceDisplayTitles: Record<
   analytics: "Workforce",
   talent: "Intelligence",
   strategy: "Planning",
-  evaluate: "Assess & Evaluate",
+  evaluate: "More",
 };
 
 const pageIcons: Record<
@@ -88,12 +88,12 @@ export function AppSidebar({
   onPageChange,
 }: AppSidebarProps) {
   const phone=usePhoneLayout(),drawer=useRef<HTMLElement>(null),navCollapsed=phone?false:desktopNavCollapsed;
-  const [openGroups,setOpenGroups]=useState<Record<string,boolean>>({analytics:true,talent:false,strategy:false,evaluate:false});
+  const [openGroups,setOpenGroups]=useState<Record<string,boolean>>(()=>({[appNavigationSections.find(section=>section.pages.includes(activePage))?.key??'']:activePage!=='home'}));
   const [previousPage,setPreviousPage]=useState(activePage);
   if(previousPage!==activePage){setPreviousPage(activePage);const section=appNavigationSections.find(s=>s.pages.includes(activePage));if(section)setOpenGroups(current=>({...current,[section.key]:true}));}
   return (
     <><div className="phone-navigation-trigger"><button type="button" popoverTarget="phone-navigation" className="min-h-11 rounded border px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring">Open navigation</button></div>
-    <aside ref={drawer} id="phone-navigation" popover={phone?"auto":undefined} aria-label="Navigation drawer" onClick={event=>{if(phone&&(event.target as HTMLElement).closest('[data-nav-destination], [aria-label="Action Planning"]'))drawer.current?.hidePopover();}} className="app-sidebar sticky top-[var(--app-header-height)] h-[calc(100vh-var(--app-header-height))] overflow-y-auto border-r bg-sidebar p-3 max-md:p-2">
+    <aside ref={drawer} id="phone-navigation" popover={phone?"auto":undefined} aria-label="Navigation drawer" onClick={event=>{if(phone&&(event.target as HTMLElement).closest('[data-nav-destination], [aria-label="Overview"]'))drawer.current?.hidePopover();}} className="app-sidebar sticky top-[var(--app-header-height)] h-[calc(100vh-var(--app-header-height))] overflow-y-auto border-r bg-sidebar p-3 max-md:p-2">
       <Button
         variant="ghost"
         className={
@@ -129,10 +129,10 @@ export function AppSidebar({
         aria-label="Workforce navigation"
         className="space-y-4"
       >
-        <Button type="button" aria-label="Action Planning" title="Action Planning" aria-current={activePage === "home" ? "page" : undefined}
+        <Button type="button" aria-label="Overview" title="Overview" aria-current={activePage === "home" ? "page" : undefined}
           variant={activePage === "home" ? "secondary" : "ghost"} onClick={() => onPageChange("home")}
           className="mb-2 min-h-11 h-auto w-full justify-start gap-3 px-3 py-2 text-lg font-semibold max-md:justify-center max-md:px-0">
-          <Sparkles className="h-5 w-5 shrink-0" />{!navCollapsed && <span className="max-md:hidden">Action Planning</span>}
+          <Sparkles className="h-5 w-5 shrink-0" />{!navCollapsed && <span className="max-md:hidden">Overview</span>}
         </Button>
         {appNavigationSections.map(
           (section, sectionIndex) => {
@@ -141,7 +141,7 @@ export function AppSidebar({
                 (item) =>
                   item.key === section.key
               );
-            const groupLabel = journey
+            const groupLabel = section.key==='evaluate'?'More — Assess & Evaluate, coming soon':journey
               ? `${section.title} — ${journey.subtitle}`
               : section.title;
 
@@ -171,10 +171,10 @@ export function AppSidebar({
 
                   {!navCollapsed && (
                     <span className="min-w-0 max-md:hidden">
-                      <span className="block text-xl font-bold leading-[1.1]">
+                      <span className={section.key==='evaluate'?"block text-sm font-medium":"block text-xl font-bold leading-[1.1]"}>
                         {workspaceDisplayTitles[section.key]}
                       </span>
-                      {journey && (
+                      {journey && section.key!=='evaluate' && (
                         <span className="nav-journey-subtitle mt-1 block text-sm font-medium leading-tight text-muted-foreground">
                           {journey.subtitle}
                         </span>

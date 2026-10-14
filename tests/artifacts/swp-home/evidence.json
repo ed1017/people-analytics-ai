@@ -1,0 +1,52 @@
+{
+  "source": "Local production build with synthetic browser-test fixtures; not hosted Preview screenshots",
+  "fixture_source": "tests/browser/home-overview-entry.mjs",
+  "screenshots": [
+    "1440-viewport-local.png",
+    "390-overview-local.png",
+    "1440-saved-scenarios-local.png",
+    "1440-current-scenario-local.png",
+    "390-current-scenario-local.png"
+  ],
+  "privacy_review": "Visually inspected: synthetic workforce, workload and saved scenario only. No private user content, credentials, absolute paths or embedded text metadata.",
+  "data_assumptions": {
+    "no_scenario": "Verified demo snapshot: 1240 people and 1206 FTE, global scope, 2026-09-30. No demand for that scope/date: demand and gap are not set.",
+    "scenario": "Existing deterministic workload engine: Service desk tickets, final month 2026-12, assigned supply 4 FTE, required demand 5 FTE, shortfall 1 FTE. Both values use the same scenario scope, month and unit. Not a company forecast.",
+    "validity": "Only confirmed session results matching recalculated inputs, capture and active goal/dataset binding are used. Editing inputs invalidates the comparison. Saved scenarios are never selected automatically.",
+    "cost": "No cost is displayed or mutated. Unknown and zero remain distinct in the planner."
+  },
+  "source_sha256": {
+    "app/page.tsx": "1e8bcaeecf8121b5be91b2ba268a45e897cb098732664b4dcf68abb9c31c5cf4",
+    "app/globals.css": "c55325767ded266da01e2526d2b253dca5299d732c239069e62f1baf2ecb82e7",
+    "components/home-overview-summary.tsx": "a12c5dc2ca8899b47719be0628ae01102f173bc9d7f6cc5261c7dc575a6db04c",
+    "components/home-overview-summary.module.css": "a707dfaa1c8fe16704ee1d618190e628a3d773c28cc53b97becbbdfc6f645ada"
+  },
+  "results": [
+    {
+      "width": 1440,
+      "actions": {
+        "x": 552,
+        "y": 237.1875,
+        "width": 616,
+        "height": 48
+      },
+      "errors": [],
+      "posts": [],
+      "external": [],
+      "checks": "verified scope, unknown/mismatch, keyboard primary action, repeated navigation, Back/Forward, retained draft, planner intact, same-month workload FTE comparison, invalidated scenarios withheld, cost zero preserved, secondary chat disclosure, goal-bound saved names, saved record unchanged, no automatic AI"
+    },
+    {
+      "width": 390,
+      "actions": {
+        "x": 20,
+        "y": 423.59375,
+        "width": 350,
+        "height": 48
+      },
+      "errors": [],
+      "posts": [],
+      "external": [],
+      "checks": "verified scope, unknown/mismatch, keyboard primary action, repeated navigation, Back/Forward, retained draft, planner intact, same-month workload FTE comparison, invalidated scenarios withheld, cost zero preserved, secondary chat disclosure, goal-bound saved names, saved record unchanged, no automatic AI"
+    }
+  ]
+}

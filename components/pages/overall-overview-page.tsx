@@ -90,7 +90,8 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
 const noActionSubscription=()=>()=>{};
 const noActionSnapshot=()=>emptyOptionActions;
 
-export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()=>{}, guidedExampleActive=false, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry, onEvidencePack, marketReference }: {
+export function OverallOverviewPage({ overviewEntry=false, optionActions, onStartDemo, onCloseDemo=()=>{}, guidedExampleActive=false, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry, onEvidencePack, marketReference }: {
+  overviewEntry?:boolean;
   optionActions?:WorkforceOptionActions;
   marketReference:unknown;
   onEvidencePack:(value:string)=>void;
@@ -540,7 +541,8 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
   const planDiscussions=solutionDiscussionPresentations(messages,solutions.state);
   const reviewPresentation=solutionReviewPresentation(solutions.state);
   const planReading=solutionConversationEnabled&&Boolean(reviewPresentation.recommended||reviewPresentation.alternatives.length||reviewPresentation.earlier.length);
-  useHomeComposerDock(active,composerSlot,composerDock,composer,planReading);
+  const overviewStarting=overviewEntry&&!messages.length&&!guidedExampleActive;
+  useHomeComposerDock(active,composerSlot,composerDock,composer,planReading||overviewStarting);
   const activePlans=[...(reviewPresentation.recommended?[reviewPresentation.recommended]:[]),...reviewPresentation.alternatives];
   const followUpMessage=messages.findLast(message=>{const presentation=planDiscussions.get(message);return presentation&&(presentation.proposals.some(proposal=>activePlans.some(item=>item.id===proposal.id&&item.revision===proposal.revision))||solutions.state.currentCalculationKinds?.includes('required-staffing')&&message.content===solutions.state.turns.at(-1)?.text);});
   const followUp=followUpMessage?planDiscussions.get(followUpMessage):undefined;
@@ -568,7 +570,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
 
     </section>
   );
-  return <HomeGuidedActionsContext.Provider value={guidedActions}><div data-plan-reading={planReading?'':undefined} style={{overflowAnchor:'none'}} className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]">
+  return <HomeGuidedActionsContext.Provider value={guidedActions}><div data-overview-starting={overviewStarting?'':undefined} data-plan-reading={planReading?'':undefined} style={{overflowAnchor:'none'}} className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]">
     {guidedExampleActive&&<GuidedDemo active={active} conversational={solutionConversationEnabled} registry={guidedActions} onClose={onCloseDemo} actions={{
       ready:active&&conversation.storageReady&&conversation.saved&&!conversation.loading&&!solutions.pending&&!solutions.saving&&!conversation.issueEditor&&ready,
       begin:id=>conversation.beginGuidedExploration(id),
@@ -578,7 +580,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
       <header className="flex flex-wrap items-start justify-between gap-3">
         <h2 id="overall-overview-heading" className="text-2xl font-semibold leading-tight tracking-tight">Workforce AI</h2>
         <button type="button" onClick={resetHomeConversation} className="min-h-11 rounded px-2 text-xs font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Reset conversation</button>
-        <HomeGettingStarted conversational={solutionConversationEnabled} active={active} ready={conversation.storageReady} autoOpen={conversation.firstHomeVisit&&!conversation.input.trim()&&!conversation.issueEditor} busy={chatLoading||guidedExampleActive} dismissKey={JSON.stringify([instructionsDismissed,conversation.workspaceKey,guidedExampleActive])} onNavigate={onNavigate} onStartDemo={onStartDemo} status={
+        <HomeGettingStarted conversational={solutionConversationEnabled} active={active} ready={conversation.storageReady} autoOpen={!overviewEntry&&conversation.firstHomeVisit&&!conversation.input.trim()&&!conversation.issueEditor} busy={chatLoading||guidedExampleActive} dismissKey={JSON.stringify([instructionsDismissed,conversation.workspaceKey,guidedExampleActive])} onNavigate={onNavigate} onStartDemo={onStartDemo} status={
         <div className="ml-auto flex items-center gap-3 text-xs">
           <span className="text-muted-foreground">In development</span>
           <button type="button" popoverTarget="home-data-details" aria-label="Open data details" title="Data, scope and conversation history" className="flex min-h-11 items-center gap-1 rounded px-2 text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"><Info size={16}/><span>Data details</span>{!sourcesSettled&&<span role="status" aria-label="Evidence refresh status">Refreshing…</span>}</button>
@@ -620,7 +622,7 @@ export function OverallOverviewPage({ optionActions, onStartDemo, onCloseDemo=()
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!guidedExampleActive&&<SwpGuidedJourney discussionKey={JSON.stringify([workforceScope,workforceQuery,persona])} conversation={conversation} active={active} busy={chatLoading||solutions.pending||solutions.saving} commandRef={swpCommand} modelContextRef={swpModelContext} demandControlRef={demandControl} demandReviewRef={demandReview} demandContextRef={demandContext} sources={sources??[]} onNavigate={onNavigate}/>}
-    {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&startingGuide}
+    {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&(overviewEntry?<details><summary className="min-h-11 cursor-pointer py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Ideas for your first question</summary>{startingGuide}</details>:startingGuide)}
     {!solutionConversationEnabled&&showFallbackPin&&!chatLoading&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
     {!activePinnedGoal&&conversationPanel}
 
