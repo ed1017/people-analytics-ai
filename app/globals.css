@@ -736,3 +736,29 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .home-secondary-entry > summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
 .home-secondary-entry[open] { max-width: none; }
 @media(max-width: 600px) { .home-secondary-entry { padding: 0 20px 20px; } }
+
+/* A slightly tighter desktop rhythm, without scaling text or touch controls.
+   Keep phone/short landscape layouts on their existing readable spacing. */
+@media (min-width: 768px) and (min-height: 501px) {
+  #app-page-title { font-size: 1.75rem; }
+  .app-dashboard {
+    --workspace-page-padding: 1.25rem;
+    --workspace-card-padding: 1.25rem;
+    --workspace-section-gap: 1.25rem;
+  }
+  .app-dashboard > :is(section, article).p-6,
+  .app-dashboard .evidence-workspace { padding: var(--workspace-page-padding); }
+  .app-dashboard :is(section, article, div, form, details).border.p-6 {
+    padding: var(--workspace-card-padding);
+  }
+  .app-dashboard :is(section, article, div, form, details).border.p-4 { padding: .875rem; }
+  .app-dashboard .gap-6 { gap: var(--workspace-section-gap); }
+  .app-dashboard .space-y-6 > :not(:last-child) {
+    margin-block-start: calc(var(--workspace-section-gap) * var(--tw-space-y-reverse));
+    margin-block-end: calc(var(--workspace-section-gap) * (1 - var(--tw-space-y-reverse)));
+  }
+  .app-dashboard :is(h1, h2).text-3xl { font-size: 1.75rem; }
+  .evidence-workspace table:not(.compact-data-table) :is(th, td) { padding-block: .625rem; }
+  .evidence-chart { height: clamp(16rem, 60cqi, 18rem); }
+  .home-secondary-entry { padding-bottom: 20px; }
+}
