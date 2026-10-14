@@ -1,5 +1,6 @@
 'use client';
 import {useRef} from 'react';
+import {SkillClientDemand} from './skill-client-demand';
 import {CapacityProjection} from './capacity-projection';
 import {calculateMonthlyWorkload} from '@/lib/swp-monthly-workload';
 import {capacitySpec,capacityLabels,type CapacityDraft} from '@/lib/swp-capacity-draft';
@@ -43,6 +44,7 @@ export function CapacityWorkspace(){
  }
  return <section aria-label="Workload capacity planning" className="space-y-4">
   <p className="text-sm text-muted-foreground">One workload, 1–6 months. Demand comes from your business requirements: work units to deliver and hours per unit. Enter your own assumptions; no demo values or workforce snapshot are copied here. Blank values stay unknown.</p>
+  <SkillClientDemand goalKey={goalKey} onStart={draft=>setSession({draft,result:null,cost:null,error:'',scope:null,capture:null,saveName:''})}/>
   <div className="grid min-w-0 items-start gap-5 lg:grid-cols-[minmax(15rem,0.85fr)_minmax(0,1.65fr)]">
   <form noValidate onSubmit={event=>{event.preventDefault();calculate();}} className="min-w-0 space-y-3 rounded-xl border bg-background p-4">
    <h3 className="font-semibold">1. Set demand &amp; starting capacity</h3>

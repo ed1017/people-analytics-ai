@@ -49,7 +49,7 @@ function worksheet(input=session){
   '@/components/decision-store':{decisionStore:{}},'@/lib/dataset-client.mjs':{datasetSession:{snapshot:()=>context.datasetToken}},
   '@/lib/swp-capacity-store':{capacityContext:()=>context,capacityBinding:(value,identity)=>({...value,scopeId:identity.id,scopeLabel:identity.label,workUnit:identity.workUnit})},
   '@/lib/monthly-scenario-compatibility.mjs':{monthlyScenarioInputKey},
-  './capacity-projection':{CapacityProjection},'./capacity-saved-scenarios':{CapacitySavedScenarios:Saved},
+  './skill-client-demand':{SkillClientDemand:()=>null},'./capacity-projection':{CapacityProjection},'./capacity-saved-scenarios':{CapacitySavedScenarios:Saved},
   './planning-session-context':{usePlanningSession:()=>({goalKey:'goal:a',capacitySession:input,setCapacitySession:value=>{updated=value;}})},
  });
  return {tree:CapacityWorkspace(),Saved,updated:()=>updated};
