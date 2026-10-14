@@ -1,0 +1,35 @@
+{
+  "baseCommit": "6c3f45f2882e5c5504f474dbdc5298d267c53bb8",
+  "result": "No confirmed product defect; QA-only change.",
+  "environment": "Isolated synthetic data in a local production build, not hosted Preview captures. Real saved records and population-recovery work untouched.",
+  "checks": {
+    "regressionTests": 2494,
+    "failed": 0,
+    "buildAndGeneratedArtifacts": "passed",
+    "standaloneTypeScript": "passed",
+    "lint": "passed with two existing unrelated warnings"
+  },
+  "mathExamples": {
+    "partTime": {
+      "finalPeople": 13,
+      "contractedFte": 8.25,
+      "assignedFte": 4.125,
+      "requiredFte": 5,
+      "gapFte": 0.875
+    },
+    "staffingTarget": {
+      "supplyPeople": 105,
+      "requiredPeople": 110,
+      "gapPeople": 5
+    },
+    "scopedSnapshot": {
+      "country": "CA",
+      "people": 20,
+      "fte": 12,
+      "demand": "not set"
+    }
+  },
+  "network": "All API traffic intercepted; deterministic staffing supply POSTs fulfilled locally from synthetic fixtures. evidence.posts lists unexpected mutations (none). No hosted writes, paid AI or external calls.",
+  "preservation": "Original saved scenarios and unrelated sentinel remained unchanged; scratch staffing targets never persisted.",
+  "limitations": "Synthetic acceptance validates UI and calculation contracts; it does not validate live source population availability or deployment data."
+}

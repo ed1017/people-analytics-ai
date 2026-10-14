@@ -1,0 +1,20 @@
+[
+  {
+    "width": 1440,
+    "pendingNameAfterHome": "Interrupted draft",
+    "errors": [],
+    "posts": [],
+    "external": [],
+    "additionalChecks": "illustrative demo isolation; fractional people/contracted/assigned FTE; Home scope independence; incomplete FTE; invalid opening; horizon and year-boundary comparison rejection; delayed/mismatched dashboard; target people and separate scope; interrupted target request; repeated Home navigation; saved records unchanged",
+    "checks": "save; reopen; compare; unknown versus zero cost; edit invalidation; Home saved names; stale result absent on Home; calculation draft and pending save name retained across Home and history; reload clears unsaved draft only; explicit reopen replaces draft; goal isolation; saved snapshots unchanged; no horizontal overflow"
+  },
+  {
+    "width": 390,
+    "pendingNameAfterHome": "Interrupted draft",
+    "errors": [],
+    "posts": [],
+    "external": [],
+    "additionalChecks": "illustrative demo isolation; fractional people/contracted/assigned FTE; Home scope independence; incomplete FTE; invalid opening; horizon and year-boundary comparison rejection; delayed/mismatched dashboard; target people and separate scope; interrupted target request; repeated Home navigation; saved records unchanged",
+    "checks": "save; reopen; compare; unknown versus zero cost; edit invalidation; Home saved names; stale result absent on Home; calculation draft and pending save name retained across Home and history; reload clears unsaved draft only; explicit reopen replaces draft; goal isolation; saved snapshots unchanged; no horizontal overflow"
+  }
+]
