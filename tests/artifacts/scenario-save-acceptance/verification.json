@@ -1,0 +1,17 @@
+{
+  "baseCommit": "aa6fe583c28f5bdc51c9c4c34c18d39016321a32",
+  "data": "Isolated synthetic browser fixtures. Local production build; screenshots are not hosted Preview captures.",
+  "reproducedBeforeFix": {
+    "pendingNameAfterHome": {
+      "1440": "",
+      "390": ""
+    }
+  },
+  "fix": "Keep pending save name in the existing dataset/goal in-memory capacity session. Reload and explicit reopen clear it.",
+  "regressionTests": {
+    "passed": 2494,
+    "failed": 0
+  },
+  "additionalBrowserCoverage": "Existing capacity-save suite passed desktop and narrow save/reopen/edit/duplicate/compare, dataset and goal isolation, keyboard, quota and other-tab conflict checks. Existing staffing-target suite passed unchanged.",
+  "storage": "Saved snapshots and unrelated sentinel unchanged; no persisted schema changes. No hosted mutations, external requests or paid AI calls."
+}

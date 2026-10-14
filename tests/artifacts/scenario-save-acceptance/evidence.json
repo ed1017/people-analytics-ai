@@ -1,0 +1,18 @@
+[
+  {
+    "width": 1440,
+    "pendingNameAfterHome": "Interrupted draft",
+    "errors": [],
+    "posts": [],
+    "external": [],
+    "checks": "save; reopen; compare; unknown versus zero cost; edit invalidation; Home saved names; stale result absent on Home; calculation draft and pending save name retained across Home and history; reload clears unsaved draft only; explicit reopen replaces draft; goal isolation; saved snapshots unchanged; no horizontal overflow"
+  },
+  {
+    "width": 390,
+    "pendingNameAfterHome": "Interrupted draft",
+    "errors": [],
+    "posts": [],
+    "external": [],
+    "checks": "save; reopen; compare; unknown versus zero cost; edit invalidation; Home saved names; stale result absent on Home; calculation draft and pending save name retained across Home and history; reload clears unsaved draft only; explicit reopen replaces draft; goal isolation; saved snapshots unchanged; no horizontal overflow"
+  }
+]
