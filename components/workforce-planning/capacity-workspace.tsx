@@ -42,16 +42,16 @@ export function CapacityWorkspace(){
   requestAnimationFrame(()=>feedback.current?.focus());
  }
  return <section aria-label="Workload capacity planning" className="space-y-4">
-  <p className="text-sm text-muted-foreground">One workload, 1–6 months. User assumptions, not a staffing forecast. Blank values stay unknown.</p>
+  <p className="text-sm text-muted-foreground">One workload, 1–6 months. Demand comes from your business requirements: work units to deliver and hours per unit. Enter your own assumptions; no demo values or workforce snapshot are copied here. Blank values stay unknown.</p>
   <div className="grid min-w-0 items-start gap-5 lg:grid-cols-[minmax(15rem,0.85fr)_minmax(0,1.65fr)]">
   <form noValidate onSubmit={event=>{event.preventDefault();calculate();}} className="min-w-0 space-y-3 rounded-xl border bg-background p-4">
-   <h3 className="font-semibold">Inputs &amp; assumptions</h3>
+   <h3 className="font-semibold">1. Set demand &amp; starting capacity</h3>
    <div>{field('scope','Name one group and work unit, e.g. Service desk — tickets.')}</div>
    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('openingDate')}{field('months')}</div>
    <div className="grid gap-3 sm:grid-cols-2">{field('people')}{field('fte')}</div>
    <div className="grid gap-3 sm:grid-cols-2">{field('volume')}{field('effort')}{field('hours')}</div>
    <details className="border-t pt-1">
-    <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Recurring assumptions (required)</summary>
+    <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">2. Adjust capacity assumptions (required)</summary>
     <p className="mb-3 text-xs text-muted-foreground">Opening stocks are immediately before the first planning month. People are whole people; contracted FTE is before workload assignment. Work effort is before productivity improvement. Productive hours are net of leave and non-work time, before assignment.</p>
     <div className="mt-2 grid gap-3 sm:grid-cols-2">{field('hires','Count each joiner once.')}{field('exits','All departures, including retirement; count each person once.')}{field('allocation','0–100%, up to four decimal places. Do not deduct leave again.')}{field('productivity','0–100%, up to four decimal places. Applied once to throughput, not to hires or workload.')}</div>
     <label className="mt-3 flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={draft.fullTimeMovements} onChange={e=>edit({fullTimeMovements:e.target.checked})}/>Assume every hire and departure is full-time (1 FTE per person)</label>

@@ -16,6 +16,7 @@ try{for(const width of [1440,390]){
  await context.addInitScript(({key,value})=>{if(!localStorage.getItem(key))localStorage.setItem(key,value);},{key:DECISIONS_STORAGE_KEY,value:encodeDecisions(seed)});
  await context.route('**/*',route=>{const req=route.request(),url=new URL(req.url());if(url.origin==='https://va.vercel-scripts.com')return route.abort();if(url.origin!==base||req.method()!=='GET'){unexpected.push(url.pathname);return route.abort();}if(!url.pathname.startsWith('/api/'))return route.continue();const defaults={annual_growth_pct:0,salary_inflation_pct:0,annual_attrition_pct:0,fill_rate_pct:100,productivity_hiring_reduction_pct:0};const data=url.pathname==='/api/dashboard'?scopedDashboardResponse({overview:{headcount:100,fte:80,snapshot_date:'2026-09-30'},trend:[],filter_options:{countries:[],business_units:[],levels:[]}},{country:'all',org:'all',level:'all'}):url.pathname==='/api/workforce-planning'?{scenarios:[]}:url.pathname==='/api/scenario-modeler'?{defaults}:url.pathname==='/api/business-unit-scenario'?{defaults,business_units:[]}:null;return route.fulfill(data?{json:data}:{status:503,json:{error:'Synthetic source unavailable'}});});
  await page.goto(base+'/?page=planning-overview');
+ await page.getByText('Try an illustrative demo',{exact:true}).click();
  const demo=page.getByRole('region',{name:'Illustrative workforce planning',exact:true});await demo.waitFor();
  const numeric=label=>demo.getByLabel(label,{exact:true}),slider=label=>demo.getByRole('slider',{name:label+' slider',exact:true});
  await numeric('Productivity improvement').fill('25');assert.equal(await slider('Productivity improvement').inputValue(),'25');assert.match(await demo.innerText(),/6 FTE surplus/);
@@ -29,10 +30,10 @@ try{for(const width of [1440,390]){
  await numeric('Monthly workload').fill('12000.123456');assert.equal(await slider('Monthly workload').inputValue(),'12000.123456');
  await numeric('Monthly hires').fill('0.5');assert.equal(await numeric('Monthly hires').getAttribute('aria-invalid'),'true');assert.equal(await demo.getByRole('img').count(),0);
  await demo.getByRole('button',{name:'Reset demo'}).click();await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`${output}/${width}-demo.png`,fullPage:true});
- await page.getByText('Advanced tools · your capacity scenarios',{exact:true}).click();
+ await page.getByRole('region',{name:'Workload capacity planning',exact:true}).waitFor();
  const area=page.getByRole('region',{name:'Workload capacity planning',exact:true});
  for(const [label,value] of Object.entries({'Workload scope':'Service desk - tickets','Opening date (month end)':'2026-09-30','Opening people':'10','Opening contracted FTE':'8','Work units each month':'800','Hours per work unit':'1','Productive hours per FTE each month':'160'}))await area.getByLabel(label,{exact:true}).fill(value);
- await area.getByText('Recurring assumptions (required)',{exact:true}).click();
+ await area.getByText('2. Adjust capacity assumptions (required)',{exact:true}).click();
  for(const [label,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await area.getByLabel(label,{exact:true}).fill(value);
  await area.getByRole('checkbox',{name:/Assume every hire/}).check();
  assert.match(await area.innerText(),/Preview from your current inputs/);assert(await area.getByRole('button',{name:'Save scenario',exact:true}).isDisabled());
@@ -46,7 +47,7 @@ try{for(const width of [1440,390]){
  const targets=await area.getByRole('slider').evaluateAll(els=>els.filter(e=>e.getBoundingClientRect().width).map(e=>({width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height})));
  assert(targets.every(t=>t.height>=44&&t.width>=44));assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  await area.screenshot({path:`${output}/${width}-worksheet.png`});
- await page.reload();await page.getByText('Advanced tools · your capacity scenarios',{exact:true}).click();await area.getByLabel('Saved capacity scenario',{exact:true}).selectOption({label:'Improved'});await area.getByRole('button',{name:'Open saved scenario',exact:true}).click();await area.getByText('Recurring assumptions (required)',{exact:true}).click();assert.equal(await area.getByRole('slider',{name:'Productivity improvement (%) slider',exact:true}).inputValue(),'25');
+ await page.reload();await page.getByRole('region',{name:'Workload capacity planning',exact:true}).waitFor();await area.getByLabel('Saved capacity scenario',{exact:true}).selectOption({label:'Improved'});await area.getByRole('button',{name:'Open saved scenario',exact:true}).click();await area.getByText('2. Adjust capacity assumptions (required)',{exact:true}).click();assert.equal(await area.getByRole('slider',{name:'Productivity improvement (%) slider',exact:true}).inputValue(),'25');
  assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);evidence.push({width,bidirectional:true,pointer:true,keyboard:true,precision:true,invalidAndBlank:true,localPreview:true,savedCompareReopen:true,targets,errors,unexpected});await context.close();
 }}finally{await browser.close();}
 await fs.writeFile(output+'/evidence.json',JSON.stringify(evidence,null,2));console.log(JSON.stringify(evidence,null,2));

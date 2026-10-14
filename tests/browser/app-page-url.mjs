@@ -56,7 +56,9 @@ try {
       const trigger = button('Open navigation');
       if (await trigger.isVisible()) await trigger.click();
       if (destination === 'home') await button('Overview').click();
+      else if(destination==='planning-overview')await button('Demand & scenarios').click();
       else {
+        const explore=button('Explore');if(await explore.getAttribute('aria-expanded')==='false')await explore.click();
         const item = page.locator(`[data-nav-destination="${destination}"]`);
         const groupId = await item.evaluate(node => node.parentElement.id);
         const toggle = page.locator(`button[aria-controls="${groupId}"]`);
@@ -94,7 +96,7 @@ try {
       await selected(destination);
       check(mode + ' browser ' + direction + ' opens ' + destination, urlIs(destination));
     }
-    await navigate('home'); await title('Planning overview');
+    await navigate('home'); await title('Workforce Intelligence');
     check(mode + ' Home keeps other query parameters and anchors', urlIs('home'));
     check(mode + ' shared filters, perspective, selected goal and draft survive history navigation',
       await country.inputValue() === 'UK'
@@ -118,11 +120,11 @@ try {
       for (const [query, destination, expectedTitle] of [
         ['page=overview', 'workforce', 'Workforce'],
         ['page=career-mobility', 'workforce', 'Workforce'],
-        ['page=workforce-planning', 'planning-overview', 'Planning workspace'],
-        ['page=__proto__', 'home', 'Planning overview'],
-        ['page=javascript%3Aalert%281%29', 'home', 'Planning overview'],
-        ['page=skills&page=finance', 'home', 'Planning overview'],
-        ['page=home', 'home', 'Planning overview'],
+        ['page=workforce-planning', 'planning-overview', 'Demand & scenarios'],
+        ['page=__proto__', 'home', 'Workforce Intelligence'],
+        ['page=javascript%3Aalert%281%29', 'home', 'Workforce Intelligence'],
+        ['page=skills&page=finance', 'home', 'Workforce Intelligence'],
+        ['page=home', 'home', 'Workforce Intelligence'],
       ]) {
         await page.goto(base + '/?campaign=fall%20review&tag=a&tag=b&' + query + '#review');
         await title(expectedTitle); await selected(destination);

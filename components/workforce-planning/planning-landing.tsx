@@ -23,7 +23,7 @@ export function PlanningLanding(){
   : <label className={styles.field} key={key}><span>{label}</span><span className={styles.inputWrap}><input aria-label={label} type={key==='openingDate'?'date':'text'} inputMode={key==='scope'||key==='openingDate'?undefined:'decimal'} value={draft[key]} onChange={event=>edit(key,event.target.value)}/>{unit&&<span>{unit}</span>}</span></label>;
  return <section className={styles.landing} aria-label="Illustrative workforce planning">
   <header className={styles.header}>
-   <div><h3>Shape your next move.</h3><p>Explore the balance between your team and the work ahead.</p></div>
+   <div><h3>Shape your next move.</h3><p>Try fictional service-desk assumptions. These values are separate from your demand and saved scenarios.</p></div>
    <span className={styles.demo}>Illustrative demo · not live data</span>
   </header>
   <div className={styles.context}><span><strong>{draft.scope}</strong><span> · {draft.months}-month scenario</span></span><span>Opening {draft.openingDate} · {draft.people} people / {draft.fte} FTE</span></div>
@@ -53,7 +53,7 @@ export function PlanningLanding(){
     <div className={styles.cardTitle}><span className={styles.icon}><Lightbulb size={20} aria-hidden="true"/></span><h4>Planning guidance</h4></div>
     
     <div className={styles.insight}><p className={styles.eyebrow}>WHAT THIS SCENARIO SHOWS</p><h4>{!last||last.gapFte===null?'More inputs needed':last.gapFte>0?`${number(last.gapFte)} FTE shortfall`:last.gapFte<0?`${number(-last.gapFte)} FTE surplus`:'Capacity meets demand'}</h4><p>{last?<>By {last.month}, this demo has {number(last.allocatedFte)} available FTE against {number(last.requiredFte)} required FTE.</>:'Complete valid inputs to see the comparison.'}</p></div>
-    <ol className={styles.steps}><li><strong>Explore hiring</strong><span>Change monthly hires to see how supply builds over time.</span></li><li><strong>Test productivity</strong><span>Increase throughput to see how much capacity the work requires.</span></li><li><strong>Use your own assumptions</strong><span>Calculate, save and compare your own scenarios in Advanced tools.</span></li></ol>
+    <ol className={styles.steps}><li><strong>Explore hiring</strong><span>Change monthly hires to see how supply builds over time.</span></li><li><strong>Test productivity</strong><span>Increase throughput to see how much capacity the work requires.</span></li><li><strong>Use your own assumptions</strong><span>Use Your demand & capacity scenarios above to calculate, save and compare your own inputs.</span></li></ol>
     <p className={styles.guidanceNote}>No AI call · demo changes are not saved.</p>
    </aside>
   </div>

@@ -2000,7 +2000,7 @@ export function WorkforcePlanningPage({
   return (
 <section className="evidence-workspace min-w-0 p-4 sm:p-6">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 id="workforce-planning-heading" tabIndex={-1} className="rounded-sm text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-ring">Planning</h2>
+            <h2 id="workforce-planning-heading" tabIndex={-1} className="rounded-sm text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-ring">Demand &amp; scenarios</h2>
             <div className="flex flex-wrap items-center gap-2">
           <WorkforcePlanningWorkflowNavigation
             activeView={workflowView}
@@ -2055,11 +2055,15 @@ export function WorkforcePlanningPage({
           )}
 
           <div hidden={workflowView!=="overview"&&workflowView!=="plan"} className="mb-4 space-y-4">
-            <StaffingTargetCompanion />
-            <PlanningLanding />
-            <details className="rounded-xl border bg-background p-4">
-              <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Advanced tools · your capacity scenarios</summary>
+            <p className="text-sm text-muted-foreground">Start with the work your business needs to deliver. Enter your demand, adjust capacity assumptions, then save and compare scenarios.</p>
+            <details open className="rounded-xl border bg-background p-4">
+              <summary className="min-h-11 cursor-pointer py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring">Your demand &amp; capacity scenarios</summary>
               <CapacityWorkspace />
+            </details>
+            <StaffingTargetCompanion />
+            <details className="rounded-xl border bg-background p-4">
+              <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Try an illustrative demo</summary>
+              <PlanningLanding />
             </details>
           </div>
           <details open={workflowView==="plan"} hidden={workflowView!=="overview"&&workflowView!=="plan"} className="border-t pt-2">

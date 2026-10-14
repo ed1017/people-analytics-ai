@@ -1,0 +1,54 @@
+// Real app assets; synthetic reads, no API writes or paid AI. Works against local production or an accessible Preview.
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {scopedDashboardResponse} from '../../lib/dashboard-scope.ts';
+import {encodeDecisions,DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
+const base=process.env.HOME_BASE_URL??'http://localhost:3530';
+const output=process.env.JOURNEY_OUTPUT??'tests/artifacts/planning-journey';
+await fs.mkdir(output,{recursive:true});
+const browser=await chromium.launch({...(process.env.BROWSER_EXECUTABLE?{executablePath:process.env.BROWSER_EXECUTABLE}:{}),args:['--no-sandbox']});
+const evidence=[];
+try{for(const width of [1440,390]){
+ const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[],unexpected=[];
+ page.setDefaultTimeout(30000);page.on('pageerror',error=>errors.push(error.message));
+ const seed={version:1,revision:1,goals:{version:1,activeId:'a',goals:[{id:'a',statement:'Synthetic slider review'}]},workspaces:{}};
+ await context.addInitScript(({key,value})=>{if(!localStorage.getItem(key))localStorage.setItem(key,value);},{key:DECISIONS_STORAGE_KEY,value:encodeDecisions(seed)});
+ await context.route('**/*',route=>{const req=route.request(),url=new URL(req.url());if(url.origin==='https://va.vercel-scripts.com')return route.abort();if(url.origin!==base||req.method()!=='GET'){unexpected.push(url.pathname);return route.abort();}if(!url.pathname.startsWith('/api/'))return route.continue();const defaults={annual_growth_pct:0,salary_inflation_pct:0,annual_attrition_pct:0,fill_rate_pct:100,productivity_hiring_reduction_pct:0};const data=url.pathname==='/api/dashboard'?scopedDashboardResponse({overview:{headcount:100,fte:80,snapshot_date:'2026-09-30'},trend:[{snapshot_date:'2026-09-30',headcount:100,fte:80}],filter_options:{countries:[{value:'UK',label:'United Kingdom'}],business_units:[],levels:[]}},{country:'all',org:'all',level:'all'}):url.pathname==='/api/workforce-planning'?{scenarios:[]}:url.pathname==='/api/scenario-modeler'?{defaults}:url.pathname==='/api/business-unit-scenario'?{defaults,business_units:[]}:null;return route.fulfill(data?{json:data}:{status:503,json:{error:'Synthetic source unavailable'}});});
+
+ await page.goto(base);
+ const overview=page.getByRole('region',{name:'Workforce planning overview',exact:true});await overview.getByText('100',{exact:true}).first().waitFor();
+ assert.match(await overview.innerText(),/Demand comes from business requirements/);
+ await page.screenshot({path:output+'/'+width+'-overview.png',fullPage:true});
+ const openNav=async()=>{if(width<768)await page.getByRole('button',{name:'Open navigation',exact:true}).click();};
+ await openNav();const nav=page.getByRole('navigation',{name:'Workforce navigation',exact:true});
+ assert.equal(await nav.locator('[data-nav-destination="planning-overview"]').count(),1);
+ assert.equal(await nav.getByRole('button',{name:'Explore',exact:true}).getAttribute('aria-expanded'),'false');
+ await page.screenshot({path:output+'/'+width+'-navigation.png'});
+ await nav.getByRole('button',{name:'Demand & scenarios',exact:true}).focus();await page.keyboard.press('Enter');
+ const area=page.getByRole('region',{name:'Workload capacity planning',exact:true});await area.waitFor();
+ assert.equal(new URL(page.url()).searchParams.get('page'),'planning-overview');
+ assert.match(await area.innerText(),/Demand comes from your business requirements/);
+ assert.equal(await area.getByLabel('Workload scope',{exact:true}).inputValue(),'');
+ assert.equal(await area.getByLabel('Work units each month',{exact:true}).inputValue(),'');
+ assert.equal(await page.getByRole('region',{name:'Illustrative workforce planning',exact:true}).isVisible(),false);
+ await page.screenshot({path:output+'/'+width+'-planner.png',fullPage:true});
+ await area.getByLabel('Workload scope',{exact:true}).fill('User entered work');
+ await page.getByText('Try an illustrative demo',{exact:true}).click();
+ const demo=page.getByRole('region',{name:'Illustrative workforce planning',exact:true});await demo.getByLabel('Monthly workload',{exact:true}).fill('999');
+ assert.equal(await area.getByLabel('Work units each month',{exact:true}).inputValue(),'');
+ await page.getByText('Try an illustrative demo',{exact:true}).click();
+ await openNav();if(await nav.getByRole('button',{name:'Explore',exact:true}).getAttribute('aria-expanded')==='false')await nav.getByRole('button',{name:'Explore',exact:true}).click();const analyticsToggle=nav.locator('button[aria-controls="navigation-analytics"]');if(await analyticsToggle.getAttribute('aria-expanded')==='false')await analyticsToggle.click();
+ await nav.getByRole('button',{name:/^Workforce . Attrition$/}).click();await page.getByRole('heading',{name:'Attrition',exact:true,level:1}).waitFor();
+ await page.goBack();await area.waitFor();assert.equal(await area.getByLabel('Workload scope',{exact:true}).inputValue(),'User entered work');
+ await page.goBack();await overview.waitFor();
+ if(width<768)await page.getByText('Filters',{exact:true}).click();
+ await page.getByLabel('Country',{exact:true}).selectOption('UK');
+ await overview.getByRole('button',{name:'Set demand & plan',exact:true}).click();await area.waitFor();
+ assert.equal(await page.getByLabel('Country',{exact:true}).inputValue(),'UK');
+ await page.getByRole('button',{name:/Plan a staffing target/}).click();await page.getByRole('region',{name:'Staffing target planner',exact:true}).waitFor();
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);
+ evidence.push({width,primaryNavigation:true,exploreReachable:true,backKeepsDraft:true,filtersRetained:true,demoSeparate:true,staffingTargetReachable:true,errors,unexpected});await context.close();
+}}finally{await browser.close();}
+await fs.writeFile(output+'/evidence.json',JSON.stringify(evidence,null,2));console.log(JSON.stringify(evidence,null,2));
