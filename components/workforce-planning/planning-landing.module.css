@@ -49,3 +49,19 @@
 .landing :is(button,input,summary):focus-visible { outline: 3px solid #245cdb; outline-offset: 3px; }
 @media(max-width: 1150px) { .columns { grid-template-columns: minmax(180px, .75fr) minmax(0, 1.5fr); } .guidance { grid-column: 1 / -1; } .steps { display: flex; gap: 22px; } .steps li { flex: 1; } }
 @media(max-width: 700px) { .landing { padding: 16px; } .header { align-items: start; flex-direction: column; } .columns { grid-template-columns: minmax(0, 1fr); } .steps { display: block; } .header h3 { font-size: 28px; } .landing .inputWrap input { font-size: 16px; } .context { line-height: 1.7; } }
+
+@media (min-width: 768px) and (min-height: 501px) {
+  .landing { padding: 16px; }
+  .header, .context { margin-bottom: 14px; }
+  .header h3 { font-size: clamp(25px, 2.3vw, 30px); }
+  .columns { gap: 16px; }
+  .levers, .guidance { padding: 14px; }
+  .field { margin: 10px 0; }
+  .inputWrap { margin-top: 5px; }
+  .muted { margin-bottom: 12px; }
+  .primary { margin-top: 14px; }
+  .status { margin-bottom: 13px; }
+  .insight { margin-top: 12px; padding: 14px; }
+  .insight h4 { font-size: 21px; }
+  .steps { margin: 12px 0; }
+}
