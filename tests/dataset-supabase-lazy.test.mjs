@@ -1,9 +1,10 @@
-/** Actual runtime/server module bodies with synthetic credentials and SDK only. */
+/** Actual runtime/server bodies with synthetic credentials; mocked and installed SDK clients. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { DatasetRouter } from '../lib/dataset-router.mjs';
 import { createDatasetRequestBoundary } from '../lib/dataset-request-boundary.mjs';
 import { createDeferredLegacyClient } from '../lib/dataset-legacy-client.mjs';
@@ -21,7 +22,7 @@ function evaluate(file, imports, globals = {}) {
   return exports;
 }
 
-function fixture({ configured = true, creationFailure = false } = {}) {
+function fixture({ configured = true, creationFailure = false, sdkFactory = null } = {}) {
   const runtime = evaluate('dataset-runtime.ts', {
     './dataset-router.mjs': { DatasetRouter },
     './dataset-request-boundary.mjs': { createDatasetRequestBoundary },
@@ -38,6 +39,7 @@ function fixture({ configured = true, creationFailure = false } = {}) {
     '@supabase/supabase-js': { createClient(...args) {
       creations.push(args);
       if (creationFailure) throw Error('synthetic-private-key-and-endpoint');
+      if (sdkFactory) return sdkFactory(...args);
       return client;
     } },
   }, { process: { env: new Proxy({}, { get(_target, key) {
@@ -121,4 +123,40 @@ test('the production runtime still has only legacy generation zero and rejects s
   assert.equal(await f.datasetRouter.bootstrapToken(), LEGACY_DATASET_TOKEN);
   assert.equal(f.creations.length, 0);
   assert.deepEqual(f.credentialReads, []);
+});
+
+test('installed Supabase SDK constructs once and binds query builders without issuing a request', async () => {
+  let networkAttempts = 0, initializedClient;
+  const f = fixture({ sdkFactory: (url, key, options) => createClient(url, key, {
+    ...options, global: { fetch() { networkAttempts++; throw Error('Network forbidden in SDK smoke'); } },
+  }) });
+  assert.equal(f.creations.length, 0);
+  assert.equal(await f.datasetRouter.bootstrapToken(), LEGACY_DATASET_TOKEN);
+  for (let i = 0; i < 2; i++) {
+    const response = await f.withDatasetRequest(request(), async () => {
+      const client = f.datasetRouter.client();
+      assert.ok(client instanceof SupabaseClient);
+      if (initializedClient) assert.equal(client, initializedClient);
+      initializedClient = client;
+      assert.equal(client.auth.autoRefreshToken, false);
+      assert.equal(client.auth.persistSession, false);
+      await client.auth.initialize();
+      const from = f.supabaseServer.from, rpc = f.supabaseServer.rpc;
+      // Construct real SDK builders but do not execute/await them.
+      const tableQuery = from('synthetic_table').select('id').limit(1);
+      const rpcQuery = rpc('synthetic_rpc', { synthetic: true });
+      assert.equal(tableQuery.url.pathname, '/rest/v1/synthetic_table');
+      assert.equal(rpcQuery.url.pathname, '/rest/v1/rpc/synthetic_rpc');
+      assert.equal(typeof tableQuery.then, 'function');
+      assert.equal(typeof rpcQuery.then, 'function');
+      assert.equal(f.supabaseServer.auth, client.auth);
+      return Response.json({ synthetic: true });
+    });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get(DATASET_HEADER), LEGACY_DATASET_TOKEN);
+  }
+  assert.equal(f.creations.length, 1);
+  assert.deepEqual(f.credentialReads, ['SUPABASE_URL', 'SUPABASE_SECRET_KEY']);
+  assert.equal(networkAttempts, 0);
+  assert.throws(() => f.supabaseServer.from('synthetic_table'), /context required/);
 });
