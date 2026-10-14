@@ -79,7 +79,11 @@ test('Home instructions are a closed accessible dialog in server markup and the 
   assert.match(intro, /<dialog\b[^>]*aria-labelledby=/);
   assert.doesNotMatch(intro, /<dialog\b[^>]*\sopen(?:=|[\s>])/);
   assert.match(intro, /Close instructions/);
-  assert.match(intro, /From question to action/);
+  assert.match(intro, /connect a business objective to workforce choices, a reviewed Action Plan and progress tracking/);
+  assert.match(intro, /Benefits are conditional estimates/);
+  assert.match(intro, /Discussing a plan does not save it/);
+  assert.match(intro, /Saving does not authorize implementation/);
+  assert.match(intro, /Proposed benefits are not achieved results/);
   const guide = fs.readFileSync(new URL('../components/planning-guide.tsx', import.meta.url), 'utf8');
   assert.match(guide, /<details><summary[^>]*>See the full Planning sequence<\/summary>/);
   assert.match(guide, /<AssumptionsDisclosure>/);

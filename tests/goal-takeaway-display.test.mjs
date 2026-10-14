@@ -7,10 +7,11 @@ import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {createRequire} from 'node:module';
 import * as goalContext from '../lib/goal-context.ts';
+import * as datasetClient from '../lib/dataset-client.mjs';
 const require=createRequire(import.meta.url),exports={};
 const source=fs.readFileSync(new URL('../components/goal-takeaway.tsx',import.meta.url),'utf8');
 const js=ts.transpileModule(source,{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-vm.runInNewContext(js,{exports,require:name=>name==='@/lib/goal-context'?goalContext:name==='@/components/decision-store'?{recordDecisionEvidence:()=>{throw Error('Rendering must not save evidence')}}:name==='@/components/chat-content'?{ChatContent:({content})=>React.createElement('p',null,content)}:require(name)});
+vm.runInNewContext(js,{exports,require:name=>name==='@/lib/dataset-client.mjs'?datasetClient:name==='@/lib/goal-context'?goalContext:name==='@/components/decision-store'?{recordDecisionEvidence:()=>{throw Error('Rendering must not save evidence')}}:name==='@/components/chat-content'?{ChatContent:({content})=>React.createElement('p',null,content)}:require(name)});
 const goal='Review skill coverage in the sample workforce.';
 const render=(displayedGoal,focusedIssue=goal,overrides={})=>renderToStaticMarkup(React.createElement('div',null,React.createElement('p',null,'Goal: '+displayedGoal),React.createElement(exports.GoalTakeaway,{goalId:'synthetic',goalContext:{goal:focusedIssue,currentScope:'Company-wide; unfiltered'},displayedGoal,payload:{page:'skills'},active:true,ready:false,paused:true,validGoalIds:['synthetic'],unavailable:'Company-wide evidence is unavailable.',...overrides})));
 

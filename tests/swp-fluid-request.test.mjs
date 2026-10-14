@@ -1,11 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs/promises';
-import os from 'node:os';
-import path from 'node:path';
-import vm from 'node:vm';
-import {createRequire} from 'node:module';
-import webpackPackage from 'next/dist/compiled/webpack/webpack.js';
+import {offlineBusinessRoute} from './helpers/offline-business-route.mjs';
 import {solutionRequest,final} from './fixtures/home-solution-conversation.mjs';
 import {readSolutionRequest} from '../lib/home-solution-conversation.ts';
 import {SWP_DEMAND_MODE,illustrativeServiceReview} from '../lib/swp-demand.ts';
@@ -32,12 +27,8 @@ test('guidance preserves unknowns, provenance and deliberate review/save boundar
  assert.equal(solutionPlanningInstructions(solutionRequest('What is the weather?'),null),'');
 });
 
-const out=await fs.mkdtemp(path.join(os.tmpdir(),'swp-fluid-route-')),isolation=path.resolve('tests/fixtures/solution-planning-route-isolation.ts');
-const compiler=webpackPackage.webpack({mode:'development',devtool:false,target:'node',entry:path.resolve('app/api/home-solution-conversation/route.ts'),output:{path:out,filename:'route.cjs',library:{type:'commonjs2'}},resolve:{extensions:['.tsx','.ts','.mjs','.js'],alias:{'openai$':isolation,'@/lib/openai-proxy-transport$':isolation,'@/lib/dataset-runtime$':isolation,'@':process.cwd()}},module:{rules:[{test:/\.tsx?$/,exclude:/node_modules/,use:path.resolve('tests/fixtures/typescript-browser-loader.mjs')}]}});
-await new Promise((resolve,reject)=>compiler.run((error,stats)=>compiler.close(()=>error?reject(error):stats.hasErrors()?reject(Error(stats.toString({all:false,errors:true}))):resolve())));
-const sandbox={exports:{},require:createRequire(import.meta.url),Response,Request,URL,URLSearchParams,TextEncoder,TextDecoder,AbortController,AbortSignal,console,Intl,process:{env:{OPENAI_API_KEY:'synthetic-harness-only',NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION:'true'}},__requests:[],__replies:[],__requestOptions:[],fetch:()=>{throw Error('Network forbidden')}};
-sandbox.module={exports:sandbox.exports};
-vm.runInNewContext('globalThis.structuredClone=value=>JSON.parse(JSON.stringify(value));\n'+await fs.readFile(path.join(out,'route.cjs'),'utf8'),sandbox);
+// Share the established offline provider/source ports and real dataset wrapper.
+const {sandbox}=await offlineBusinessRoute();
 test('actual full-app POST adds scoped recommendation guidance and preserves checked reference tools',async()=>{
  for(const [available,c] of [[true,reviewed],[false,reviewed],[true,context],['true',reviewed]]){
   const body=make(available,c),before=JSON.stringify(body),n=sandbox.__requests.length;
@@ -72,7 +63,7 @@ test('general Home and validated SWP use the route policy without client model o
   assert.equal(response.status,200);assert.equal(sandbox.__requests.length,n+1);
   const sent=JSON.parse(JSON.stringify(sandbox.__requests.at(-1))),options=sandbox.__requestOptions.at(-1);
   assert.equal(sent.model,'gpt-6.1-sol');assert.deepEqual(sent.reasoning,{effort:'medium'});assert.equal(sent.service_tier,'default');
-  assert.equal(sent.max_output_tokens,5000);assert.equal(sent.parallel_tool_calls,false);assert.equal(options.maxRetries,0);assert.equal(options.timeout,30000);
+  assert.equal(sent.max_output_tokens,5000);assert.equal(sent.parallel_tool_calls,false);assert.equal(options.maxRetries,0);assert.equal(options.timeout,60000); // f111fed: provider budget within the shared 90-second deadline.
  }
  delete sandbox.process.env.SWP_DEMO_MODEL_PROFILE;delete sandbox.process.env.SWP_DEMO_MODEL_ID;
 });
