@@ -60,3 +60,27 @@ recovery readback remain separate work. Ratings retain company/eight-BU scope;
 job pay means retain company scope and suppression; listening retains engagement
 coverage. Missing assessed readiness, external reference bindings and independent
 forecast validation remain missing. Loading this pair does not expand them.
+
+## Portable real-entrypoint integration regression
+
+`node --test tests/dashboard-candidate-integration.test.mjs` bundles the actual
+`GET` and `readDashboardOverview` entrypoints using the same locked webpack and
+TypeScript test tooling as `home-dashboard-grounding.test.mjs`. A test-only runtime
+alias supplies the real `DatasetRouter` and `createDatasetRequestBoundary`, which
+dispatch to the existing `createLocalApiPresenter`. The production runtime is not
+modified. This suite is included by the existing `tests/*.test.mjs` CI glob.
+
+Analytics and release ports contain explicitly invented in-memory fixtures,
+including an invented aggregate receipt. The company count satisfies the current
+presenter's fixed contract; it is not evidence of a private artifact's contents.
+The suite does not load, validate, or certify private seals or replace the manual
+filesystem loader tests above.
+
+Coverage includes scoped dashboard/Home identity and no-store headers, the full
+33-month known-empty history, null zero-denominator turnover in API and Home
+facts, unknown codes/parameters, stale or missing tokens rejected before readers,
+sanitized reader failures without legacy fallback, and concurrent requests across
+an in-memory rollback that advances the generation. Network is denied; legacy
+RPC and environment reads throw, and the bundled VM permits only the crypto
+builtin as an external dependency. Production remains `legacy-v1:0` with disabled
+selector writes. No model, database, credential, or private artifact is needed.
