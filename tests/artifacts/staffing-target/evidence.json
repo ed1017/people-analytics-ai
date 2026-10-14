@@ -1,0 +1,40 @@
+{
+  "source": "Local production-build companion screenshots at desktop/mobile viewport sizes, using synthetic fixtures; not hosted Preview screenshots.",
+  "base_commit": "b5baefd243e4a503bf4fabc060f71ce4a9f04efb",
+  "screenshots": [
+    "1440-unknown.png",
+    "1440-target.png",
+    "390-target.png"
+  ],
+  "privacy_review": "Visually inspected: synthetic aggregate workforce and staffing targets only. No private user content, credentials, absolute paths or embedded metadata.",
+  "assumptions": {
+    "group": "Business unit Operations (OPS), across all countries and levels; not job family.",
+    "supply": "Existing runScenarioModel with BU current headcount 100 and stored Baseline points 100 in October and 105 in November 2026. FTE 80/84 is not used in the gap. Baseline assumptions: zero growth, inflation, attrition and productivity hiring reduction; 100% fill.",
+    "target": "Explicit 110 people for November only. Initially blank, never seeded from engine target_headcount.",
+    "gap": "110 required people minus 105 projected people equals 5 people short. No demand curve is generated.",
+    "source_limitation": "Authenticated Preview GET returned 200 with matching dataset receipt and source basis. All 8 actual source curves passed strict replay; hosted POST remains unverified because executor direct access is proxy-blocked."
+  },
+  "source_sha256": {
+    "components/workforce-planning/staffing-target-companion.tsx": "ba169f23cf735cc997a30b3ebc9307c3dbdc7a4e8d175a06308548637bb257a7",
+    "components/workforce-planning/staffing-target-companion.module.css": "a29188e81c3e17e9cb0708c62d95fb2a9adf70f21bd3907d2f8f3222401a0e84",
+    "lib/staffing-target.ts": "f299370190b15a0613d5d6b0d6118f94360e5c724ca73d10247b1f9ac218d3a6",
+    "lib/business-unit-scenario.ts": "9a1c8bf49988e2f3d5de10b1fb46c7499459827df5cc8f715919d809fa5f5fc6",
+    "app/api/business-unit-scenario/route.ts": "ef744cef890ca85884e289f1c9ded8ed17f7f1367493cde228a5b1ded7b6864f"
+  },
+  "browser_results": [
+    {
+      "width": 1440,
+      "errors": [],
+      "external": [],
+      "deterministicSupplyRequests": 7,
+      "checks": "unknown target; people not FTE; one month only; immediate local gap; shortfall/surplus/zero; invalid input; unit/month/goal reset; late response ignored; scope mismatch and missing first month rejected; missing dataset receipt rejected; saved sentinel unchanged; no horizontal overflow; no AI calls"
+    },
+    {
+      "width": 390,
+      "errors": [],
+      "external": [],
+      "deterministicSupplyRequests": 7,
+      "checks": "unknown target; people not FTE; one month only; immediate local gap; shortfall/surplus/zero; invalid input; unit/month/goal reset; late response ignored; scope mismatch and missing first month rejected; missing dataset receipt rejected; saved sentinel unchanged; no horizontal overflow; no AI calls"
+    }
+  ]
+}
