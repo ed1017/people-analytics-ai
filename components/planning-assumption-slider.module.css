@@ -1,0 +1,9 @@
+.field { min-width: 0; margin-block: 10px; font-size: 12px; }
+.field > label { display: block; font-weight: 550; }
+.unit { font-weight: 400; color: var(--muted-foreground); }
+.row { display: flex; align-items: center; gap: 8px; margin-top: 4px; min-width: 0; }
+.field .range { flex: 1; width: 0; min-width: 0; min-height: 44px; padding: 0; border: 0; box-shadow: none; accent-color: #245cdb; cursor: pointer; background: transparent; }
+.field .number { flex: 0 0 5.5rem; width: 5.5rem; min-width: 0; min-height: 44px; padding: 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--background); color: var(--foreground); font-size: 16px; font-variant-numeric: tabular-nums; }
+.help { display: block; color: var(--muted-foreground); font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
+.field input:focus-visible { outline: 3px solid var(--ring, #245cdb); outline-offset: 2px; }
+.field input:disabled { opacity: .6; cursor: default; }

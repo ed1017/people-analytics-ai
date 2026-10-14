@@ -17,6 +17,9 @@ function component(file,mocks={}){
  const filename=path.resolve(file),compiled=ts.transpileModule(fs.readFileSync(filename,'utf8'),{fileName:filename,compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}});
  const compiledModule=new Module(filename);compiledModule.filename=filename;compiledModule.require=id=>Object.hasOwn(mocks,id)?mocks[id]:require(id);compiledModule._compile(compiled.outputText,filename);return compiledModule.exports;
 }
+const previewLayer=component('lib/capacity-preview.ts',{'./swp-capacity-draft':draftAdapter,'./swp-monthly-workload':engine});
+const sliderLayer=component('lib/planning-slider.ts');
+const {PlanningAssumptionSlider}=component('components/planning-assumption-slider.tsx',{'@/lib/planning-slider':sliderLayer,'./planning-assumption-slider.module.css':{default:{}},react:{...React,useId:()=> 'slider'}});
 const {CapacityProjection}=component('components/workforce-planning/capacity-projection.tsx');
 const point=(month,allocatedFte,requiredFte,gapFte)=>({month,allocatedFte,requiredFte,gapFte});
 test('compact projection preserves empty, unknown, zero, single-month, discontinuity and surplus semantics',()=>{
@@ -40,6 +43,7 @@ function worksheet(input=session){
  let updated;
  const Saved=()=>React.createElement('section',{'aria-label':'Saved capacity scenarios'});
  const {CapacityWorkspace}=component('components/workforce-planning/capacity-workspace.tsx',{
+  '@/lib/capacity-preview':previewLayer,'@/lib/planning-slider':sliderLayer,'@/components/planning-assumption-slider':{PlanningAssumptionSlider},
   react:{...React,useRef:()=>({current:null})},
   '@/lib/swp-capacity-cost':costLayer,'@/lib/swp-monthly-workload':engine,'@/lib/swp-capacity-draft':draftAdapter,
   '@/components/decision-store':{decisionStore:{}},'@/lib/dataset-client.mjs':{datasetSession:{snapshot:()=>context.datasetToken}},
@@ -61,7 +65,7 @@ test('compact worksheet keeps saved controls outside its form and monthly detail
 });
 test('compact worksheet retains edit and confirmation capture invalidation',()=>{
  for(const [label,value,clearScope] of [['Work units each month','900',false],['Workload scope','Other work',true],['Cost per contracted FTE per month (USD, optional)','0',false],['Cost per contracted FTE per month (USD, optional)','',false]]){
-  const view=worksheet(),input=nodes(view.tree).find(node=>node.props['aria-label']===label);input.props.onChange({target:{value}});
+  const view=worksheet(),input=nodes(view.tree).find(node=>node.props['aria-label']===label||node.props.label===label);input.props.onChange(input.props.label?value:{target:{value}});
   const next=view.updated();assert.equal(next.result,null);assert.equal(next.cost,null);assert.equal(next.capture,null);assert.equal(next.draft.confirmed,false);assert.deepEqual(next.scope,clearScope?null:scope);
  }
  const view=worksheet(),confirmation=nodes(view.tree).find(node=>node.type==='input'&&node.props.className==='mt-1');confirmation.props.onChange({target:{checked:false}});
