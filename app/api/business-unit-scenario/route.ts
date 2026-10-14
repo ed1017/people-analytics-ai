@@ -12,10 +12,11 @@ import {
 
 export const dynamic = "force-dynamic";
 
-async function handleGET() {
+async function handleGET(request:Request) {
+  const strictSupply=new URL(request.url).searchParams.get("staffing_target")==="1";
   try {
     const catalog =
-      await getBusinessUnitScenarioCatalog();
+      await getBusinessUnitScenarioCatalog(strictSupply);
 
     return NextResponse.json(
       catalog,
@@ -57,9 +58,10 @@ async function handlePOST(
         },
         { status: 400 }
       );
-    }    const result =
+    }    const strictSupply=request.nextUrl.searchParams.get("staffing_target")==="1";
+    const result =
       await runBusinessUnitScenario(
-        body
+        strictSupply?{business_unit:body.business_unit}:body, strictSupply
       );
 
     return NextResponse.json(
@@ -88,7 +90,7 @@ async function handlePOST(
   }
 }
 export async function GET(request: Request) {
-  return withDatasetRequest(request, () => handleGET());
+  return withDatasetRequest(request, () => handleGET(request));
 }
 
 export async function POST(request: NextRequest) {

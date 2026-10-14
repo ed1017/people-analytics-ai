@@ -1,3 +1,4 @@
+import {assertStaffingCatalogSource,assertStaffingBaselineSource,STAFFING_TARGET_BASIS} from './staffing-target';
 import { supabaseServer } from "./supabase-server";
 import {
   runScenarioModel,
@@ -56,7 +57,7 @@ function round2(value: number) {
   return Math.round(value * 100) / 100;
 }
 
-async function loadCatalogAndDefaults() {
+async function loadCatalogAndDefaults(strictSupply=false) {
   const [
     defaultsResult,
     businessUnitsResult,
@@ -97,7 +98,8 @@ async function loadCatalogAndDefaults() {
           result.error.message
       );
     }
-  }  const defaults: ScenarioModelAssumptions = {
+  }  if(strictSupply)assertStaffingCatalogSource(defaultsResult.data,businessUnitsResult.data);
+  const defaults: ScenarioModelAssumptions = {
     annual_growth_pct: toNumber(
       defaultsResult.data
         ?.baseline_annual_growth_pct
@@ -151,20 +153,22 @@ async function loadCatalogAndDefaults() {
   };
 }
 
-export async function getBusinessUnitScenarioCatalog() {
+export async function getBusinessUnitScenarioCatalog(strictSupply=false) {
   const catalog =
-    await loadCatalogAndDefaults();
+    await loadCatalogAndDefaults(strictSupply);
 
   return {
+    ...(strictSupply?{staffing_target_basis:STAFFING_TARGET_BASIS}:{}),
     as_of: catalog.asOf,
     defaults: catalog.defaults,
     business_units: catalog.businessUnits,
   };
 }export async function runBusinessUnitScenario(
-  request: BusinessUnitScenarioRequest
+  request: BusinessUnitScenarioRequest,
+  strictSupply=false
 ): Promise<BusinessUnitScenarioResponse> {
   const catalog =
-    await loadCatalogAndDefaults();
+    await loadCatalogAndDefaults(strictSupply);
 
   const requestedBusinessUnit =
     request.business_unit.trim().toLowerCase();
@@ -204,6 +208,7 @@ export async function getBusinessUnitScenarioCatalog() {
     );
   }
 
+  if(strictSupply)assertStaffingBaselineSource(baselineResult.data,catalog.asOf);
   const defaults = catalog.defaults;
 
   const explicitAttrition =
@@ -289,6 +294,7 @@ export async function getBusinessUnitScenarioCatalog() {
 
   return {
     ...result,
+    ...(strictSupply?{staffing_target_basis:STAFFING_TARGET_BASIS}:{}),
     scope: {
       type: "business_unit",
       org_code: businessUnit.org_code,

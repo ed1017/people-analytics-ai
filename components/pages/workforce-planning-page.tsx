@@ -18,6 +18,7 @@ import { PositionWorkforceDesignDestination } from "@/components/workforce-plann
 import { WorkforceResponseDestination } from "@/components/workforce-planning/workforce-response-destination";
 import { ExecutionFeasibilityDestination } from "@/components/workforce-planning/execution-feasibility-destination";
 import {CapacityWorkspace} from "@/components/workforce-planning/capacity-workspace";
+import {StaffingTargetCompanion} from "@/components/workforce-planning/staffing-target-companion";
 import {PlanningLanding} from "@/components/workforce-planning/planning-landing";
 import { PlanningOverview } from "@/components/workforce-planning/planning-overview";
 import {
@@ -2054,6 +2055,7 @@ export function WorkforcePlanningPage({
           )}
 
           <div hidden={workflowView!=="overview"&&workflowView!=="plan"} className="mb-4 space-y-4">
+            <StaffingTargetCompanion />
             <PlanningLanding />
             <details className="rounded-xl border bg-background p-4">
               <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Advanced tools · your capacity scenarios</summary>
