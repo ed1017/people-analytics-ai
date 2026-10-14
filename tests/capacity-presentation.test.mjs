@@ -32,7 +32,7 @@ test('compact projection preserves empty, unknown, zero, single-month, discontin
   if(name==='single'){assert.match(html,/\+3.87/);assert.equal((html.match(/cx="340"/g)||[]).length,2);}
   if(name==='partial'){const paths=[...html.matchAll(/<path d="([^"]*)"/g)].map(x=>x[1]);assert.equal((paths[1].match(/M/g)||[]).length,2);assert(!paths[1].includes('L'));}
   if(name==='surplus')assert.match(html,/-2/);
-  if(points&&name!=='unknown'){assert.doesNotMatch(html,/<text\b/);assert.match(html,/data-capacity-axis="x"[^>]*text-xs/);assert.match(html,/data-capacity-axis="y"[^>]*text-xs/);}
+  if(points&&name!=='unknown'){assert.doesNotMatch(html,/<text\b/);assert.match(html,/data-capacity-axis="x"[^>]*text-xs/);assert.match(html,/data-capacity-axis="y"[^>]*text-xs/);assert.match(html,/<desc[^>]*>Calculated from the displayed assumptions\./);assert.doesNotMatch(html,/confirmed assumptions/);}
  }
 });
 const scope={id:'scope-a',label:'Service desk — tickets',workUnit:'Service desk — tickets'};
