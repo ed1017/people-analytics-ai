@@ -9,7 +9,7 @@ import {datasetSession} from '@/lib/dataset-client.mjs';
 import {capacityContext,capacityBinding,readCapacityBucket,monthlyCapacityField} from '@/lib/swp-capacity-store';
 import {capacitySpec} from '@/lib/swp-capacity-draft';
 import {calculateMonthlyWorkload} from '@/lib/swp-monthly-workload';
-import {calculateCapacityCost,capacityCostAssumptions,capacityCalculationKey} from '@/lib/swp-capacity-cost';
+import {calculateCapacityCost,capacityCostAssumptions,capacityCalculationKey,formatCapacityCost} from '@/lib/swp-capacity-cost';
 import {monthlyScenarioInputKey as inputKey} from '@/lib/monthly-scenario-compatibility.mjs';
 import styles from './home-overview-summary.module.css';
 
@@ -60,24 +60,42 @@ export function HomeOverviewSummary({overview,receipt,requested,scopeLabel,loadi
  const comparable=known(supply)&&known(demand);
  const gap=comparable?demand-supply:null;
  const maximum=Math.max(known(supply)?supply:0,known(demand)?demand:0,1);
+ const runRate=scenario?.cost?.points.find(row=>row.month===point?.month)?.runRateCents;
+ const gapLabel=gap===null?'Demand not set':gap>0?'Capacity shortfall':gap<0?'Capacity surplus':'Capacity balanced';
  return <section aria-label="Workforce planning overview" className={styles.surface}>
-  <h2>Plan your workforce.</h2>
-  <button type="button" className={styles.primary} onClick={()=>onNavigate('planning-overview')}>Plan a scenario <ArrowRight size={18} aria-hidden="true"/></button>
-  <div className={styles.snapshot}>
-   <div className={styles.label}>Supply vs demand <span>{point?'Your scenario':'Demo workforce'}</span></div>
-   {point?<p className={styles.context}>{scenario?.result.assumptions.scope.label} · {point.month} · FTE assigned to this work</p>:<>
-    {current?<p className={styles.context}><strong>{count(current.headcount)}</strong> people · {scopeLabel} · {date(current.snapshot_date)}</p>:<p className={styles.notice} role="status">{loading?'Updating workforce…':'Workforce snapshot unavailable'}</p>}
-   </>}
-   <div className={styles.bars} aria-hidden="true">
-    <div><span>Supply</span><div className={styles.track}>{known(supply)&&<i style={{width:`${supply/maximum*100}%`}}/>}</div></div>
-    <div><span>Demand</span><div className={`${styles.track} ${known(demand)?styles.demand:styles.unset}`}>{known(demand)?<i style={{width:`${demand/maximum*100}%`}}/>:<span>Not set</span>}</div></div>
+  <header className={styles.heading}>
+   <div><p className={styles.eyebrow}>Strategic workforce planning</p><h2>Workforce overview</h2><p className={styles.subtitle}>Understand your supply. Plan the work ahead.</p></div>
+   <span className={styles.badge}>{point?'Your scenario':'Demo workforce'}</span>
+  </header>
+  {point?<p className={styles.context}>{scenario?.result.assumptions.scope.label} · {point.month} · FTE assigned to this work</p>:<>
+   {current?<p className={styles.context}><strong>{count(current.headcount)}</strong> people · {scopeLabel} · {date(current.snapshot_date)}</p>:<p className={styles.notice} role="status">{loading?'Updating workforce…':'Workforce snapshot unavailable'}</p>}
+  </>}
+  <dl className={styles.boxes}>
+   <div><dt>Supply</dt><dd>{known(supply)?count(supply):'Unavailable'}{known(supply)&&<small> FTE</small>}</dd></div>
+   <div><dt>Demand</dt><dd>{known(demand)?count(demand):'Not set'}{known(demand)&&<small> FTE</small>}</dd></div>
+   <div><dt>{gap===null?'Gap':gap>0?'Shortfall':gap<0?'Surplus':'Balanced'}</dt><dd>{gap===null?'Not set':count(Math.abs(gap))}{gap!==null&&<small> FTE</small>}</dd></div>
+  </dl>
+  <div className={styles.layout}>
+   <div className={styles.snapshot}>
+    <h3 className={styles.label}>Supply vs demand</h3>
+    <p className={styles.context}>{point?`${scenario?.result.assumptions.scope.label} · ${point.month}`:'Selected workforce snapshot'}</p>
+    <div className={styles.bars} aria-hidden="true">
+     <div><span>Supply</span><div className={styles.track}>{known(supply)&&<i style={{width:`${supply/maximum*100}%`}}/>}</div><strong>{known(supply)?count(supply):'Unavailable'}</strong></div>
+     <div><span>Demand</span><div className={`${styles.track} ${known(demand)?styles.demand:styles.unset}`}>{known(demand)?<i style={{width:`${demand/maximum*100}%`}}/>:<span>Not set</span>}</div><strong>{known(demand)?count(demand):'—'}</strong></div>
+    </div>
+    <p className={styles.note}>{point?'Calculated from your scenario assumptions, not a company forecast.':'Demand has not been set for this workforce snapshot.'}</p>
+    <p className={styles.note}>FTE measures capacity, not a number of people to hire.</p>
    </div>
-   <dl className={styles.boxes}>
-    <div><dt>Supply</dt><dd>{known(supply)?count(supply):'Unavailable'}{known(supply)&&<small> FTE</small>}</dd></div>
-    <div><dt>Demand</dt><dd>{known(demand)?count(demand):'Not set'}{known(demand)&&<small> FTE</small>}</dd></div>
-    <div><dt>{gap===null?'Gap':gap>0?'Shortfall':gap<0?'Surplus':'Balanced'}</dt><dd>{gap===null?'Not set':count(Math.abs(gap))}{gap!==null&&<small> FTE</small>}</dd></div>
-   </dl>
-   <p className={styles.note}>{point?'Calculated from your scenario assumptions, not a company forecast.':'Demand has not been set for this workforce snapshot.'}</p>
+   <aside className={styles.brief} aria-label="Planning brief">
+    <p className={styles.eyebrow}>Planning brief</p>
+    <h3>{gapLabel}</h3>
+    <p>{point?gap===0?'Your workload and assigned capacity match for this month.':`Review your workload, hiring and productivity assumptions for ${point.month}.`:current?'Set workload assumptions to compare the capacity you have with the work you need to deliver.':'A verified workforce snapshot or a complete workload scenario is needed before comparing supply and demand.'}</p>
+    <div className={styles.cost} aria-label="Scenario supply cost">
+     <span>Scenario supply run-rate</span><strong>{point?formatCapacityCost(runRate):'Not set'}{point&&runRate!==null&&runRate!==undefined&&<small> USD/month</small>}</strong>
+     <p>{point?`${point.month} · User-assumed rate × contracted FTE; not actual pay or savings.`:'Optional cost from your scenario assumptions.'}</p>
+    </div>
+    <button type="button" className={styles.primary} onClick={()=>onNavigate('planning-overview')}>Plan a scenario <ArrowRight size={18} aria-hidden="true"/></button>
+   </aside>
   </div>
   {savedNames.length>0&&<section className={styles.saved} aria-label="Saved scenarios"><h3>Saved scenarios</h3><ul>{savedNames.slice(0,3).map((name,index)=><li key={index}>{name}</li>)}</ul></section>}
  </section>;

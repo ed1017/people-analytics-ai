@@ -1,0 +1,20 @@
+[
+  {
+    "width": 1440,
+    "primaryActionInViewport": true,
+    "snapshot": "100 people, 80 FTE; demand and cost unset",
+    "scenario": "4 assigned FTE; 5 required FTE; 1 FTE shortfall; $800/month from 8 contracted FTE × $100",
+    "savedWorkUnchanged": true,
+    "errors": [],
+    "unexpected": []
+  },
+  {
+    "width": 390,
+    "primaryActionInViewport": true,
+    "snapshot": "100 people, 80 FTE; demand and cost unset",
+    "scenario": "4 assigned FTE; 5 required FTE; 1 FTE shortfall; $800/month from 8 contracted FTE × $100",
+    "savedWorkUnchanged": true,
+    "errors": [],
+    "unexpected": []
+  }
+]
