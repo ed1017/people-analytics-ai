@@ -35,7 +35,7 @@ export function AppHeader({
   }, []);
   const page = getAppPageMetadata(activePage);
   const title = activePage === "home"
-    ? "Planning overview"
+    ? "Workforce Intelligence"
     : activePage === "assess-evaluate"
       ? "Assess & Evaluate"
       : page.label;

@@ -1,0 +1,22 @@
+{
+  "baseCommit": "bc91069ec9167282859b6b7df1a773cc0b11db5f",
+  "scope": "Presentation-only overview and product title; existing dataset, filters, provenance, calculation contracts and saved scenarios retained.",
+  "checks": {
+    "regressionTests": 2494,
+    "failures": 0,
+    "focusedOverviewTests": 8,
+    "productionBuild": "passed",
+    "generatedArtifacts": "passed",
+    "standaloneTypeScript": "passed",
+    "lint": "passed; two pre-existing conditional-hiring-plan warnings",
+    "browserWidths": [
+      1440,
+      390
+    ]
+  },
+  "evidence": "Local production-build synthetic browser assertions. Local screenshots are internal QA only; no hosted Preview capture is claimed here.",
+  "unsupportedData": "No job-family demand, AI exposure, redeployable talent, forecast or reference numbers introduced.",
+  "cost": "Existing validated optional scenario cost; blank/legacy stays Unknown, explicit zero stays $0.00; USD/month from contracted FTE, not assigned FTE or actual pay.",
+  "network": "Synthetic API fixtures only for browser tests; no paid AI or hosted data writes.",
+  "reference": "Library read supplied the Workforce Navigator layout description; image materialization failed. Software-engineering skill unavailable."
+}

@@ -6,10 +6,10 @@ import { datasetRouter } from "@/lib/dataset-runtime";
 import "./globals.css";
 
 const productTitle =
-  "Insight to Action | People Analytics & Strategic Workforce Planning";
+  "Workforce Intelligence | Strategic Workforce Planning";
 
 const productDescription =
-  "Insight to Action is a public portfolio demo for people analytics and workforce planning, connecting workforce evidence, talent responses and planning scenarios with grounded AI assistance.";
+  "Workforce Intelligence is a public portfolio demo with strategic workforce planning at its core, connecting workforce evidence, talent responses and planning scenarios with grounded AI assistance.";
 
 export const metadata: Metadata = {
   title: productTitle,
