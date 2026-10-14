@@ -48,7 +48,7 @@ export function CapacitySavedScenarios(){
  const disabled=!context||!storage.saved||!!loadError||!session.capture?.binding||session.result?.status!=='calculated';
  const options=bucket.entries.map(e=><option key={e.record.id} value={e.record.id}>{e.record.name}</option>);
  return <section aria-label="Saved capacity scenarios" className="space-y-3 border-t pt-4">
-  <h3 className="font-semibold">3. Save &amp; compare</h3>
+  <h3 className="font-semibold">Save &amp; compare</h3>
   {!goalId?<p className="text-sm text-muted-foreground">Session only. Select an existing goal to save scenarios; no goal is created automatically.</p>:<>
    <div className="flex flex-wrap items-end gap-2">
     <label className="min-w-0 flex-1 text-sm">Scenario name<input aria-label="Capacity scenario name" maxLength={160} value={name} onChange={e=>{setName(e.target.value);setActionError('');}} className={`${control} mt-1 w-full`} placeholder="e.g. Base workload"/></label>

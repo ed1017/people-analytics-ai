@@ -42,8 +42,9 @@ try{for(const width of [1440,390]){
  async function save(name){await input('Capacity scenario name').fill(name);await saved.getByRole('button',{name:'Save scenario',exact:true}).click();await saved.getByRole('status').filter({hasText:`Saved “${name}”`}).waitFor();}
  const bucket=()=>page.evaluate(({key,field})=>JSON.parse(localStorage.getItem(key)).payload.workspaces.a.fields[field],{key:DECISIONS_STORAGE_KEY,field:monthlyCapacityField});
  await page.goto(base+'/?page=planning-overview');await page.getByLabel('Selected goal',{exact:true}).selectOption('a');await advanced();
+ await area.getByText('Timing & capacity assumptions (required)',{exact:true}).click();
  for(const [label,value] of Object.entries({'Workload scope':'Service desk — tickets','Opening date (month end)':'2026-09-30','Opening people':'10','Opening contracted FTE':'8','Work units each month':'800','Hours per work unit':'1','Productive hours per FTE each month':'160'}))await input(label).fill(value);
- await area.getByText('2. Adjust capacity assumptions (required)',{exact:true}).click();for(const [label,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await input(label).fill(value);
+for(const [label,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await input(label).fill(value);
  await area.getByRole('checkbox',{name:/Assume every hire/}).check();await calculate();await save('Base');const first=await bucket();assert.equal(first.entries.length,1);
  await input('Productivity improvement (%)').fill('25');assert.equal(await saved.getByRole('button',{name:'Save scenario',exact:true}).isDisabled(),true);assert.match(await saved.innerText(),/saved snapshot, not the current draft/);assert.equal(await area.getByText('Calculated from your assumptions',{exact:true}).count(),0);
  await input('Cost per contracted FTE per month (USD, optional)').fill('0');await calculate();await save('Improved zero cost');const snapshots=await bucket();assert.equal(snapshots.entries.length,2);assert.deepEqual(snapshots.entries[0],first.entries[0]);
@@ -59,7 +60,7 @@ try{for(const width of [1440,390]){
 
  // Fractional contracted/assigned FTE stays distinct from people across calculation and Home.
  await saved.getByRole('button',{name:'Open saved scenario',exact:true}).click();
- await area.getByText('2. Adjust capacity assumptions (required)',{exact:true}).click();
+ await area.getByText('Timing & capacity assumptions (required)',{exact:true}).click();
  await area.getByRole('checkbox',{name:/Assume every hire/}).uncheck();
  for(const [label,value] of Object.entries({'Opening contracted FTE':'6','Hires each month (people)':'2','Departures each month (people)':'1','FTE per hire':'0.5','FTE per departure':'0.25'}))await input(label).fill(value);
  await calculate();await save('Part-time workload');

@@ -20,16 +20,19 @@ try{for(const width of [1440,390]){
  await page.goto(base+'/?page=planning-overview');
  const area=page.getByRole('region',{name:'Workload capacity planning',exact:true});await area.waitFor();
  const input=label=>area.getByLabel(label,{exact:true});
+ assert.equal(await input('Opening people').isVisible(),false);assert.equal(await input('Opening date (month end)').isVisible(),false);assert.equal(await input('Work units each month').isVisible(),true);
+ await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:output+'/'+width+'-first-view.png',fullPage:true});
  await input('Workload scope').fill('Unsent manual workload');
- await area.getByText('Start with a skill and client demand',{exact:true}).click();
+ await area.getByText('1. Choose a skill (optional)',{exact:true}).click();
  const setup=area.getByRole('region',{name:'Skill client demand setup',exact:true});
  await setup.getByLabel('Skill reference',{exact:true}).selectOption('1');
  assert.equal(await input('Workload scope').inputValue(),'Unsent manual workload','selection alone must not replace draft');
  await setup.getByRole('button',{name:'Start new skill workload',exact:true}).click();
  assert.match(await input('Workload scope').inputValue(),/Data analysis.*DATA; reference 2026-09-30.*clients/);
  for(const label of ['Opening people','Opening contracted FTE','Work units each month','Opening date (month end)'])assert.equal(await input(label).inputValue(),'');
+ await area.getByText('Timing & capacity assumptions (required)',{exact:true}).click();
  for(const [label,value] of Object.entries({'Opening date (month end)':'2026-09-30','Planning months':'2','Work units each month':'20','Hours per work unit':'8','Productive hours per FTE each month':'160'}))await input(label).fill(value);
- await area.getByText('2. Adjust capacity assumptions (required)',{exact:true}).click();
+
  for(const [label,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await input(label).fill(value);
  await area.getByRole('checkbox',{name:/Assume every hire/}).check();
  assert.match(await area.innerText(),/Incomplete/);assert(await area.getByRole('button',{name:'Save scenario',exact:true}).isDisabled());
@@ -44,10 +47,10 @@ try{for(const width of [1440,390]){
  await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:output+'/'+width+'-skill-demand.png',fullPage:true});await comparison.screenshot({path:output+'/'+width+'-comparison.png'});
  await page.reload();await input('Saved capacity scenario').selectOption({label:'40 clients'});await area.getByRole('button',{name:'Open saved scenario',exact:true}).click();
  assert.equal(await input('Work units each month').inputValue(),'40');assert.match(await input('Workload scope').inputValue(),/DATA; reference 2026-09-30/);
- await area.getByText('Start with a skill and client demand',{exact:true}).click();await setup.getByLabel('Skill reference',{exact:true}).selectOption('2');await setup.getByRole('button',{name:'Start new skill workload',exact:true}).click();assert.equal(await input('Opening contracted FTE').inputValue(),'');assert.equal(await input('Work units each month').inputValue(),'');assert.match(await input('Workload scope').inputValue(),/Communication/);
+ await area.getByText('1. Choose a skill (optional)',{exact:true}).click();await setup.getByLabel('Skill reference',{exact:true}).selectOption('2');await setup.getByRole('button',{name:'Start new skill workload',exact:true}).click();assert.equal(await input('Opening contracted FTE').inputValue(),'');assert.equal(await input('Work units each month').inputValue(),'');assert.match(await input('Workload scope').inputValue(),/Communication/);
  assert.equal(await input('Saved capacity scenario').locator('option').count(),3);
- await page.getByLabel('Selected goal',{exact:true}).selectOption('b');if(!await setup.isVisible())await area.getByText('Start with a skill and client demand',{exact:true}).click();await setup.getByLabel('Skill reference',{exact:true}).locator('option[value="1"]').waitFor({state:'attached'});assert.equal(await setup.getByLabel('Skill reference',{exact:true}).inputValue(),'');assert.equal(await input('Workload scope').inputValue(),'');
- missingReceipt=true;await page.reload();await area.getByText('Start with a skill and client demand',{exact:true}).click();await setup.getByRole('alert').waitFor();assert.equal(await setup.getByLabel('Skill reference',{exact:true}).count(),0);
+ await page.getByLabel('Selected goal',{exact:true}).selectOption('b');if(!await setup.isVisible())await area.getByText('1. Choose a skill (optional)',{exact:true}).click();await setup.getByLabel('Skill reference',{exact:true}).locator('option[value="1"]').waitFor({state:'attached'});assert.equal(await setup.getByLabel('Skill reference',{exact:true}).inputValue(),'');assert.equal(await input('Workload scope').inputValue(),'');
+ missingReceipt=true;await page.reload();await area.getByText('1. Choose a skill (optional)',{exact:true}).click();await setup.getByRole('alert').waitFor();assert.equal(await setup.getByLabel('Skill reference',{exact:true}).count(),0);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);
  evidence.push({width,verifiedReference:true,noInferredSupply:true,monthlyClientDemand:true,saveCompareReopen:true,newSkillClearsInputs:true,missingReceiptClosed:true,errors,unexpected});await context.close();
 }}finally{await browser.close();}
