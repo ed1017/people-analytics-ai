@@ -49,11 +49,12 @@ try{for(const width of [1440,390]){
  await capacity.getByText('Recurring assumptions (required)',{exact:true}).click();
  for(const [label,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await capacity.getByLabel(label,{exact:true}).fill(value);
  await capacity.getByRole('checkbox',{name:/Assume every hire/}).check();await capacity.getByRole('checkbox',{name:/I confirm/}).check();await capacity.getByRole('button',{name:'Calculate capacity',exact:true}).click();
- await capacity.getByRole('img').waitFor();assert.match(await capacity.innerText(),/\$0.00/);await page.goBack();await summary.waitFor();assert.equal(await summary.getByRole('img').count(),0);assert.doesNotMatch(await summary.innerText(),/3 months|\$0.00|Service desk/);
+ await capacity.getByRole('img').waitFor();assert.match(await capacity.innerText(),/\$0.00/);await page.goBack();await summary.waitFor();assert.equal(await summary.getByRole('img').count(),0);assert.doesNotMatch(await summary.innerText(),/3 months|\$0.00/);assert.match(await summary.innerText(),/Service desk — tickets · 2026-12/);assert.match(await summary.innerText(),/Shortfall/);assert.deepEqual(await summary.locator('dd').allTextContents(),['4 FTE','5 FTE','1 FTE']);
  await page.getByText('Chat & saved goals',{exact:true}).click();await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`${output}/${width}-current-scenario-local.png`,fullPage:true});
  await summary.getByRole('button',{name:'Plan a scenario'}).click();
  const advanced=page.getByText('Advanced tools · your capacity scenarios',{exact:true});if(!await capacity.isVisible())await advanced.click();
  await capacity.getByLabel('Cost per contracted FTE per month (USD, optional)',{exact:true}).fill('');await page.goBack();await summary.waitFor();assert.equal(await summary.getByRole('img').count(),0,'editing inputs withholds invalidated projection');
+ assert.match(await summary.innerText(),/Demand has not been set/);
  // A pending and then mismatched receipt must never relabel old quantities as the newly selected country.
  if(width<768)await page.getByText('Filters',{exact:true}).click();await page.getByLabel('Country',{exact:true}).selectOption('UK');
  await summary.getByText('Updating workforce…').waitFor();assert.equal(await summary.getByText('1,240',{exact:true}).count(),0);await page.waitForTimeout(100);holdScope=false;for(const resolve of scopeWaiters)resolve();
@@ -73,6 +74,6 @@ try{for(const width of [1440,390]){
  await page.screenshot({path:`${output}/${width}-saved-scenarios-local.png`,fullPage:true});await page.getByLabel('Selected goal',{exact:true}).selectOption('goal-b');await page.waitForFunction(()=>!document.querySelector('[aria-label="Saved scenarios"]'));assert.equal(await summary.getByText(record.name,{exact:true}).count(),0);
  const retained=await page.evaluate(({key,field})=>JSON.parse(localStorage.getItem(key)).payload.workspaces['goal-a'].fields[field],{key:DECISIONS_STORAGE_KEY,field:monthlyCapacityField});assert.deepEqual(retained,bucket,'navigation never rewrites saved capacity data');
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal page overflow');assert.deepEqual(errors,[]);assert.deepEqual(posts,[]);assert.deepEqual(external,[]);
- evidence.push({width,actions,errors,posts,external,checks:'verified scope, unknown/mismatch, keyboard primary action, repeated navigation, Back/Forward, retained draft, planner intact, calculation details remain in planner, cost zero preserved, secondary chat disclosure, goal-bound saved names, saved record unchanged, no automatic AI'});await context.close();
+ evidence.push({width,actions,errors,posts,external,checks:'verified scope, unknown/mismatch, keyboard primary action, repeated navigation, Back/Forward, retained draft, planner intact, same-month workload FTE comparison, invalidated scenarios withheld, cost zero preserved, secondary chat disclosure, goal-bound saved names, saved record unchanged, no automatic AI'});await context.close();
 }}finally{await browser.close();}
 await fs.writeFile(output+'/evidence.json',JSON.stringify(evidence,null,2));console.log(JSON.stringify(evidence,null,2));
