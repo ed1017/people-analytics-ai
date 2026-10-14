@@ -1,0 +1,35 @@
+{
+  "verified_at_utc": "2026-10-14T04:32:17Z",
+  "preview_sha": "bc32c7a79302b3be5bac37217768fdc86f54b2f2",
+  "preview_catalog": {
+    "path": "/api/business-unit-scenario?staffing_target=1",
+    "status": 200,
+    "dataset_receipt": "legacy-v1:0",
+    "source_basis": "business-unit-baseline-v1",
+    "snapshot": "2026-09-30",
+    "business_units": 8
+  },
+  "actual_source_replay": {
+    "method": "Read-only source query from the configured project; actual raw rows replayed through the existing business-unit service, deterministic engine and strict source/response checks. Not a hosted POST.",
+    "business_units_passed": 8,
+    "baseline_rows": 120,
+    "months_per_unit": 15,
+    "first_month": "2026-10-01",
+    "last_month": "2027-12-01",
+    "canonical_contiguous_months": true
+  },
+  "executor_failures": {
+    "local_api": {
+      "status": 500,
+      "error": "Business-unit scenario: TypeError: fetch failed"
+    },
+    "direct_preview": "Outbound proxy: Tunnel connection failed: 403 Forbidden. Direct requests stopped.",
+    "source_host": {
+      "diagnostic": "Credential-free request to configured source host",
+      "error": "TypeError: fetch failed",
+      "cause": "EAI_AGAIN",
+      "classification": "Executor DNS resolution failure"
+    }
+  },
+  "remaining_verification": "A successful hosted POST and browser flow using actual supply have not been verified. Available authenticated Vercel fetch supports GET only. No merge or production publication."
+}

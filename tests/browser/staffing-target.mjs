@@ -26,6 +26,7 @@ try{for(const width of [1440,390]){
    const body=req.postDataJSON();posts.push(body);assert.deepEqual(Object.keys(body),['business_unit']);const data=supply(body.business_unit);
    if(mode==='delay'&&body.business_unit==='OPS')await new Promise(resolve=>release=resolve);
    if(mode==='wrong-scope')data.scope.org_code='WRONG';
+   if(mode==='skipped-first'){data.points=data.points.slice(1);data.scope.planning_horizon_start=data.points[0].planning_month;}
    return route.fulfill({json:data,headers}).catch(()=>{});
   }
   const data=url.pathname==='/api/dashboard'?{overview:{headcount:120,fte:96,snapshot_date:'2026-09-30'},trend:[],filter_options:{countries:[],business_units:[],levels:[]}}:url.pathname==='/api/workforce-planning'?{scenarios:[]}:url.pathname==='/api/business-unit-scenario'?catalog:url.pathname==='/api/scenario-modeler'?{defaults}:null;
@@ -43,9 +44,10 @@ try{for(const width of [1440,390]){
  await group.selectOption('HR');assert.equal(await target.inputValue(),'');await month.selectOption('2026-11-01');await target.fill('30');await region.getByText('5 people short of your target',{exact:true}).waitFor();
  mode='delay';await group.selectOption('OPS');await page.waitForFunction(()=>document.querySelector('[aria-label="Staffing target planner"]')?.getAttribute('aria-busy')==='true');await page.waitForTimeout(100);await group.selectOption('HR');await month.selectOption('2026-11-01');release?.();await target.fill('30');await region.getByText('5 people short of your target',{exact:true}).waitFor();assert.match(await region.innerText(),/People team · November 2026 · people/);assert.doesNotMatch(await region.innerText(),/105 people/);
  mode='wrong-scope';await group.selectOption('OPS');await region.getByRole('alert').waitFor();assert.equal(await target.isDisabled(),true);assert.doesNotMatch(await region.innerText(),/people (short of|above) your target/);
+ mode='skipped-first';await group.selectOption('HR');await region.getByRole('alert').waitFor();assert.equal(await target.isDisabled(),true);
  mode='valid';await page.getByLabel('Selected goal',{exact:true}).selectOption('goal-b');const reopen=page.getByRole('button',{name:/Plan a staffing target/});if(await reopen.getAttribute('aria-expanded')==='false')await reopen.click();await group.selectOption('OPS');assert.equal(await target.inputValue(),'');assert.equal(await month.inputValue(),'');
  mode='missing-receipt';await region.getByRole('button',{name:'Refresh supply source'}).click();await region.getByRole('alert').waitFor();assert.equal(await group.isDisabled(),true);
  const stored=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);assert.deepEqual(stored.workspaces['goal-a'].fields.sentinel,seed.workspaces['goal-a'].fields.sentinel);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);assert.deepEqual(external,[]);assert.equal(posts.some(row=>row.unexpected),false);
- evidence.push({width,errors,external,deterministicSupplyRequests:posts.length,checks:'unknown target; people not FTE; one month only; immediate local gap; shortfall/surplus/zero; invalid input; unit/month/goal reset; late response ignored; scope mismatch rejected; missing dataset receipt rejected; saved sentinel unchanged; no horizontal overflow; no AI calls'});await context.close();
+ evidence.push({width,errors,external,deterministicSupplyRequests:posts.length,checks:'unknown target; people not FTE; one month only; immediate local gap; shortfall/surplus/zero; invalid input; unit/month/goal reset; late response ignored; scope mismatch and missing first month rejected; missing dataset receipt rejected; saved sentinel unchanged; no horizontal overflow; no AI calls'});await context.close();
 }}finally{await browser.close();}
 await fs.writeFile(output+'/evidence.json',JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence,null,2));

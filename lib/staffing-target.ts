@@ -8,6 +8,7 @@ const finite=(value:unknown):value is number=>typeof value==='number'&&Number.is
 const stock=(value:unknown):value is number=>finite(value)&&value>=0&&value<=1e9;
 const text=(value:unknown):value is string=>typeof value==='string'&&value.trim().length>0&&value.length<=200;
 export const validStaffingDate=(value:unknown):value is string=>typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;
+const nextMonth=(month:string)=>{const [year,value]=month.split('-').map(Number);return `${year+(value===12?1:0)}-${String(value===12?1:value+1).padStart(2,'0')}`;};
 const fail=()=>{throw Error('Comparable business-unit supply is unavailable. Refresh source data before comparing.');};
 const rawNumber=(value:unknown)=>{if((typeof value!=='number'&&typeof value!=='string')||String(value).trim()===''||!Number.isFinite(Number(value)))fail();return Number(value);};
 const rawStock=(value:unknown)=>{const number=rawNumber(value);if(!stock(number))fail();return number;};
@@ -21,7 +22,7 @@ export function assertStaffingCatalogSource(defaults:Record<string,unknown>|null
 }
 export function assertStaffingBaselineSource(rows:Record<string,unknown>[]|null,asOf:string){
  if(!validStaffingDate(asOf)||!rows?.length)fail();let previous=asOf.slice(0,7);
- for(const row of rows!){if(!validStaffingDate(row.planning_month)||row.planning_month.slice(0,7)<=previous)fail();previous=(row.planning_month as string).slice(0,7);for(const key of ['planned_headcount','planned_fte','planned_labor_cost_usd'])rawStock(row[key]);}
+ for(const row of rows!){if(!validStaffingDate(row.planning_month)||row.planning_month.slice(8)!=='01'||row.planning_month.slice(0,7)!==nextMonth(previous))fail();previous=(row.planning_month as string).slice(0,7);for(const key of ['planned_headcount','planned_fte','planned_labor_cost_usd'])rawStock(row[key]);}
 }
 export function readStaffingCatalog(value:unknown):StaffingCatalog{
  const data=value as StaffingCatalog;
@@ -36,7 +37,7 @@ export function readStaffingSupply(value:unknown,catalog:StaffingCatalog,orgCode
  if(!unit||!data||data.staffing_target_basis!==STAFFING_TARGET_BASIS||data.as_of!==catalog.as_of||data.source_scenario!=='Baseline'||data.scope?.type!=='business_unit'||data.scope.org_code!==orgCode||data.scope.org_name!==unit.org_name||data.scope.current_headcount!==unit.headcount||data.summary?.starting_headcount!==unit.headcount||!data.assumptions||!data.defaults)fail();
  for(const key of keys)if(data.assumptions[key]!==catalog.defaults[key]||data.defaults[key]!==catalog.defaults[key])fail();
  if(!Array.isArray(data.points)||!data.points.length)fail();let previous=catalog.as_of.slice(0,7);
- for(const point of data.points){if(!validStaffingDate(point.planning_month)||point.planning_month.slice(0,7)<=previous||!stock(point.modeled_headcount))fail();previous=point.planning_month.slice(0,7);}
+ for(const point of data.points){if(!validStaffingDate(point.planning_month)||point.planning_month.slice(8)!=='01'||point.planning_month.slice(0,7)!==nextMonth(previous)||!stock(point.modeled_headcount))fail();previous=point.planning_month.slice(0,7);}
  if(data.scope.planning_horizon_start!==data.points[0].planning_month||data.scope.planning_horizon_end!==data.points.at(-1)!.planning_month)fail();
  return data;
 }

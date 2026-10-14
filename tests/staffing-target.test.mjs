@@ -43,3 +43,26 @@ test('strict BU rerun reuses the existing engine and ordinary planner contract s
  sources.workforce_scenario_by_org=[{...baseline[0],planned_headcount:null}];await assert.rejects(compiledModule.exports.runBusinessUnitScenario({business_unit:'OPS'},true));
  sources.workforce_scenario_by_org=baseline;sources.workforce_business_unit_summary=[{...units[0],headcount:null}];await assert.rejects(compiledModule.exports.getBusinessUnitScenarioCatalog(true));assert.equal((await compiledModule.exports.getBusinessUnitScenarioCatalog()).business_units[0].headcount,0);
 });
+
+test('supply requires consecutive monthly points starting immediately after the snapshot',()=>{
+ const skippedFirst=[{...baseline[0],planning_month:'2026-11-01'}];
+ const skippedMiddle=[baseline[0],{...baseline[1],planning_month:'2026-12-01'}];
+ for(const rows of [skippedFirst,skippedMiddle,[{...baseline[0],planning_month:'2026-10-15'}],[{...baseline[0],planning_month:'2026-10-31'}]]){
+  assert.throws(()=>target.assertStaffingBaselineSource(rows,catalog.as_of));
+  const data=result();data.points=rows.map((row,index)=>({...data.points[index],planning_month:row.planning_month}));data.scope.planning_horizon_start=rows[0].planning_month;data.scope.planning_horizon_end=rows.at(-1).planning_month;
+  assert.throws(()=>target.readStaffingSupply(data,catalog,'OPS'));
+ }
+ target.assertStaffingBaselineSource(baseline,catalog.as_of);
+ target.assertStaffingBaselineSource([{...baseline[0],planning_month:'2027-01-01'},{...baseline[1],planning_month:'2027-02-01'}],'2026-12-31');
+ assert.equal(target.readStaffingSupply(result(),catalog,'OPS').points.length,2);
+});
+
+test('the reviewer attrition example rejects November-only supply instead of overstating it',()=>{
+ const assumptions={...defaults,annual_attrition_pct:12,fill_rate_pct:0};
+ const curve=baseline.map(row=>({...row,planned_headcount:100}));
+ const run=baselinePoints=>engine.runScenarioModel({asOf:catalog.as_of,startingHeadcount:100,baselinePoints,defaults:assumptions,assumptions});
+ assert.equal(run([curve[1]]).points[0].modeled_headcount,99);
+ assert.equal(run(curve).points[1].modeled_headcount,98);
+ assert.throws(()=>target.assertStaffingBaselineSource([curve[1]],catalog.as_of));
+ target.assertStaffingBaselineSource(curve,catalog.as_of);
+});
