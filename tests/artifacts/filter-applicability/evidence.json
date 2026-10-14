@@ -37,7 +37,7 @@
   {
     "width": 1440,
     "page": "attrition",
-    "note": "These selections do not filter this page’s evidence or calculations.",
+    "note": "This page’s main evidence keeps its own scope.",
     "readable": true,
     "filterAndReset": true
   },
@@ -79,7 +79,7 @@
   {
     "width": 390,
     "page": "attrition",
-    "note": "These selections do not filter this page’s evidence or calculations.",
+    "note": "This page’s main evidence keeps its own scope.",
     "readable": true,
     "filterAndReset": true
   }

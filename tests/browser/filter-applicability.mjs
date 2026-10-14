@@ -6,7 +6,7 @@ const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const base=process.env.FILTER_BASE_URL??'http://localhost:3524';
 const output=process.env.FILTER_OUTPUT??'/tmp/filter-applicability';
 await fs.mkdir(output,{recursive:true});
-const cases={home:/workforce snapshot; other evidence/,workforce:/workforce snapshot; workforce detail/, 'career-growth-mobility':/performance scope; unsupported selections/,compensation:/catalog assumptions; filtered pay results/, 'planning-overview':/do not narrow planning calculations/,attrition:/do not filter this page’s evidence/};
+const cases={home:/workforce snapshot; other evidence/,workforce:/workforce snapshot; workforce detail/, 'career-growth-mobility':/performance scope; unsupported selections/,compensation:/catalog assumptions; filtered pay results/, 'planning-overview':/do not narrow planning calculations/,attrition:/main evidence keeps its own scope/};
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
 const evidence=[];
 try{for(const width of [1440,390]){
