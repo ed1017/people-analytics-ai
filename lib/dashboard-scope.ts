@@ -3,7 +3,9 @@
  * A receipt verifies dispatch and returned catalogue consistency, not database integrity.
  */
 export type DashboardFilters={country:string;org:string;level:string};
-export type DashboardScopeReceipt={version:1;status:'verified_rpc'|'unsupported'|'mismatch'|'unavailable';requested:DashboardFilters;effective:DashboardFilters|null;label:string;basis:string};
+type ScopeFields={requested:DashboardFilters;effective:DashboardFilters|null;label:string;basis:string};
+export type DashboardScopeReceipt=ScopeFields&({version:1;status:'verified_rpc'|'unsupported'|'mismatch'|'unavailable'}|{version:2;status:'verified_aggregate';artifactDigest:string;metricContract:'voluntary-ytd-nine-month-average-stock-v2';stockStatus:'positive'|'known-empty'});
+export function isVerifiedDashboardScope(value:DashboardScopeReceipt|null|undefined):boolean{return value?.status==='verified_rpc'||value?.status==='verified_aggregate';}
 const object=(value:unknown):Record<string,unknown>=>value!==null&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:{};
 const dimensions=['country','org','level'] as const;
 const optionKeys={country:'countries',org:'business_units',level:'levels'} as const;
@@ -12,7 +14,7 @@ const normalized=(value:unknown)=>value===null||value===undefined||value===''||v
 export function dashboardRequestedFilters(params:URLSearchParams):DashboardFilters{return {country:normalized(params.get('country')),org:normalized(params.get('org')),level:normalized(params.get('level'))};}
 export function dashboardScopeReceipt(raw:unknown,requested:DashboardFilters):DashboardScopeReceipt{
  const data=object(raw),options=object(data.filter_options),overview=object(data.overview);
- const receipt=(status:DashboardScopeReceipt['status'],effective:DashboardFilters|null,label:string,basis:string):DashboardScopeReceipt=>({version:1,status,requested:{...requested},effective,label,basis});
+ const receipt=(status:Extract<DashboardScopeReceipt,{version:1}>['status'],effective:DashboardFilters|null,label:string,basis:string):DashboardScopeReceipt=>({version:1,status,requested:{...requested},effective,label,basis});
  const supported=dimensions.every(key=>requested[key]==='all'||Array.isArray(options[optionKeys[key]])&&(options[optionKeys[key]] as unknown[]).some(raw=>object(raw).value===requested[key]));
  if(!supported)return receipt('unsupported',null,'Scope unavailable','Requested filter code is absent from the dashboard catalogue; source zeros are withheld.');
  // Do not ignore a future/alternate RPC applied-filter contract that contradicts dispatch.
@@ -26,6 +28,11 @@ export function dashboardScopeReceipt(raw:unknown,requested:DashboardFilters):Da
 }
 export function readDashboardScopeReceipt(raw:unknown):DashboardScopeReceipt|null{
  const value=object(raw),requested=object(value.requested),effective=object(value.effective);
+ if(value.version===2){
+  const keys=['version','status','requested','effective','label','basis','artifactDigest','metricContract','stockStatus'];
+  if(Object.keys(value).length!==keys.length||keys.some(key=>!Object.hasOwn(value,key))||value.status!=='verified_aggregate'||typeof value.artifactDigest!=='string'||!/^[a-f0-9]{64}$/.test(value.artifactDigest)||value.metricContract!=='voluntary-ytd-nine-month-average-stock-v2'||!['positive','known-empty'].includes(String(value.stockStatus))||Object.keys(requested).length!==3||Object.keys(effective).length!==3||dimensions.some(key=>typeof requested[key]!=='string'||String(requested[key]).length===0||String(requested[key]).length>100||effective[key]!==requested[key])||typeof value.label!=='string'||value.label.length===0||value.label.length>200||value.label==='Scope unavailable'||typeof value.basis!=='string'||value.basis.length===0||value.basis.length>300)return null;
+  return value as DashboardScopeReceipt;
+ }
  if(value.version!==1||!['verified_rpc','unsupported','mismatch','unavailable'].includes(String(value.status))||typeof value.label!=='string'||value.label.length>200||typeof value.basis!=='string'||value.basis.length>300||dimensions.some(key=>typeof requested[key]!=='string'||String(requested[key]).length>100))return null;
  if(value.status==='verified_rpc'?(dimensions.some(key=>typeof effective[key]!=='string'||effective[key]!==requested[key])||value.label==='Scope unavailable'):value.effective!==null)return null;
  return value as DashboardScopeReceipt;

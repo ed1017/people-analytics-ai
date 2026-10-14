@@ -2,7 +2,7 @@ export type OverviewData = {
   snapshot_date: string;
   headcount: number;
   fte: number;
-  voluntary_turnover_ytd_pct: number;
+  voluntary_turnover_ytd_pct: number | null;
   labor_cost_usd: number;
   open_positions: number;
 };
