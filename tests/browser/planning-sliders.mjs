@@ -32,8 +32,9 @@ try{for(const width of [1440,390]){
  await demo.getByRole('button',{name:'Reset demo'}).click();await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`${output}/${width}-demo.png`,fullPage:true});
  await page.getByRole('region',{name:'Workload capacity planning',exact:true}).waitFor();
  const area=page.getByRole('region',{name:'Workload capacity planning',exact:true});
+ await area.getByText('Timing & capacity assumptions (required)',{exact:true}).click();
  for(const [label,value] of Object.entries({'Workload scope':'Service desk - tickets','Opening date (month end)':'2026-09-30','Opening people':'10','Opening contracted FTE':'8','Work units each month':'800','Hours per work unit':'1','Productive hours per FTE each month':'160'}))await area.getByLabel(label,{exact:true}).fill(value);
- await area.getByText('2. Adjust capacity assumptions (required)',{exact:true}).click();
+
  for(const [label,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await area.getByLabel(label,{exact:true}).fill(value);
  await area.getByRole('checkbox',{name:/Assume every hire/}).check();
  assert.match(await area.innerText(),/Preview from your current inputs/);assert(await area.getByRole('button',{name:'Save scenario',exact:true}).isDisabled());
@@ -47,7 +48,7 @@ try{for(const width of [1440,390]){
  const targets=await area.getByRole('slider').evaluateAll(els=>els.filter(e=>e.getBoundingClientRect().width).map(e=>({width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height})));
  assert(targets.every(t=>t.height>=44&&t.width>=44));assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  await area.screenshot({path:`${output}/${width}-worksheet.png`});
- await page.reload();await page.getByRole('region',{name:'Workload capacity planning',exact:true}).waitFor();await area.getByLabel('Saved capacity scenario',{exact:true}).selectOption({label:'Improved'});await area.getByRole('button',{name:'Open saved scenario',exact:true}).click();await area.getByText('2. Adjust capacity assumptions (required)',{exact:true}).click();assert.equal(await area.getByRole('slider',{name:'Productivity improvement (%) slider',exact:true}).inputValue(),'25');
+ await page.reload();await page.getByRole('region',{name:'Workload capacity planning',exact:true}).waitFor();await area.getByLabel('Saved capacity scenario',{exact:true}).selectOption({label:'Improved'});await area.getByRole('button',{name:'Open saved scenario',exact:true}).click();await area.getByText('Timing & capacity assumptions (required)',{exact:true}).click();assert.equal(await area.getByRole('slider',{name:'Productivity improvement (%) slider',exact:true}).inputValue(),'25');
  assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);evidence.push({width,bidirectional:true,pointer:true,keyboard:true,precision:true,invalidAndBlank:true,localPreview:true,savedCompareReopen:true,targets,errors,unexpected});await context.close();
 }}finally{await browser.close();}
 await fs.writeFile(output+'/evidence.json',JSON.stringify(evidence,null,2));console.log(JSON.stringify(evidence,null,2));

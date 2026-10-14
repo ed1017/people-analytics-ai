@@ -43,27 +43,29 @@ export function CapacityWorkspace(){
   requestAnimationFrame(()=>feedback.current?.focus());
  }
  return <section aria-label="Workload capacity planning" className="space-y-4">
-  <p className="text-sm text-muted-foreground">One workload, 1–6 months. Demand comes from your business requirements: work units to deliver and hours per unit. Enter your own assumptions; no demo values or workforce snapshot are copied here. Blank values stay unknown.</p>
+  <p className="text-sm text-muted-foreground">Choose a skill, enter the expected work, then compare it with your assumed capacity. Blank inputs stay unknown.</p>
   <SkillClientDemand goalKey={goalKey} onStart={draft=>setSession({draft,result:null,cost:null,error:'',scope:null,capture:null,saveName:''})}/>
   <div className="grid min-w-0 items-start gap-5 lg:grid-cols-[minmax(15rem,0.85fr)_minmax(0,1.65fr)]">
   <form noValidate onSubmit={event=>{event.preventDefault();calculate();}} className="min-w-0 space-y-3 rounded-xl border bg-background p-4">
-   <h3 className="font-semibold">1. Set demand &amp; starting capacity</h3>
-   <div>{field('scope','Name one group and work unit, e.g. Service desk — tickets.')}</div>
-   <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('openingDate')}{field('months')}</div>
-   <div className="grid gap-3 sm:grid-cols-2">{field('people')}{field('fte')}</div>
-   <div className="grid gap-3 sm:grid-cols-2">{field('volume')}{field('effort')}{field('hours')}</div>
+   <h3 className="font-semibold">2. Enter expected work</h3>
+   <div>{field('scope','Use the skill above or name a workload, e.g. Service desk - tickets.')}</div>
+   <div className="grid gap-3 sm:grid-cols-2">{field('volume','For client demand, enter clients per month.')}{field('effort','For client demand, enter hours per client, before productivity improvement.')}</div>
+   <p className="text-sm text-muted-foreground">To see a gap, complete the timing and capacity assumptions below. Skill references do not supply available FTE.</p>
    <details className="border-t pt-1">
-    <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">2. Adjust capacity assumptions (required)</summary>
+    <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Timing &amp; capacity assumptions (required)</summary>
     <p className="mb-3 text-xs text-muted-foreground">Opening stocks are immediately before the first planning month. People are whole people; contracted FTE is before workload assignment. Work effort is before productivity improvement. Productive hours are net of leave and non-work time, before assignment.</p>
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('openingDate')}{field('months','Plan 1-6 months.')}</div>
+    <div className="mt-3 grid gap-3 sm:grid-cols-2">{field('people')}{field('fte')}{field('hours')}</div>
     <div className="mt-2 grid gap-3 sm:grid-cols-2">{field('hires','Count each joiner once.')}{field('exits','All departures, including retirement; count each person once.')}{field('allocation','0–100%, up to four decimal places. Do not deduct leave again.')}{field('productivity','0–100%, up to four decimal places. Applied once to throughput, not to hires or workload.')}</div>
     <label className="mt-3 flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={draft.fullTimeMovements} onChange={e=>edit({fullTimeMovements:e.target.checked})}/>Assume every hire and departure is full-time (1 FTE per person)</label>
     {!draft.fullTimeMovements&&<div className="grid gap-3 sm:grid-cols-2">{field('hireFte','0–1 FTE/person; explicit assumption, not inferred from current staff.')}{field('exitFte','0–1 FTE/person.')}</div>}
-   </details>
    {field('costRate','Manual USD 0–100,000 per contracted FTE per month, up to two decimal places. Blank = unknown; 0 = zero. Define what your rate includes; no compensation period, loaded components or exchange rate is inferred.')}
+   </details>
    <label className="flex min-h-11 items-start gap-2 text-sm"><input className="mt-1" type="checkbox" checked={draft.confirmed} onChange={e=>setSession({...session,draft:{...draft,confirmed:e.target.checked},result:null,cost:null,capture:null,error:''})}/><span>I confirm the entered values repeat each month, with no transfers. Departures leave the opening stock before hires; hires contribute for the full month. These are my planning assumptions.</span></label>
    <button className="min-h-11 rounded-md bg-foreground px-4 py-2 font-medium text-background focus-visible:ring-2 focus-visible:ring-ring" type="submit">Calculate capacity</button>
   </form>
   <div className="min-w-0 space-y-4">
+  <h3 className="font-semibold">3. See the capacity gap</h3>
   {isPreview&&<p role="status" className="text-sm">Live preview only. Confirm and calculate before saving or using this scenario in Overview.</p>}
   {isPreview&&draft.scope&&preview.error&&<p role="status" className="text-sm text-destructive">{preview.error}</p>}
   <CapacityProjection result={result}/>
@@ -77,7 +79,7 @@ export function CapacityWorkspace(){
    {!result&&!error&&<p className="text-sm text-muted-foreground">Calculate to compare monthly supply and workload. Editing an input clears the previous result and confirmation.</p>}
    {result&&<div className="space-y-3">
     <p className="font-medium">{result.status==='needs-inputs'?'Incomplete - some inputs are unknown':isPreview?'Preview from your current inputs':'Calculated from your assumptions'}</p>
-    {result.status==='needs-inputs'&&<p className="text-sm">Complete blank capacity fields in the form and Recurring assumptions, then confirm and calculate again. Known workload requirements can still be shown when supply is unknown.</p>}
+    {result.status==='needs-inputs'&&<p className="text-sm">Complete the blank inputs in Timing &amp; capacity assumptions, then confirm and calculate again. Known workload requirements can still be shown when supply is unknown.</p>}
     <p className="text-sm">{result.assumptions.scope.label} · Opening {result.assumptions.opening.asOf}. Positive gap = shortfall; negative gap = surplus.</p>
     <details className="border-t"><summary className="min-h-11 cursor-pointer py-3 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Monthly detail · people and FTE</summary>
     <div className="overflow-x-auto" role="region" aria-label="Monthly capacity comparison" tabIndex={0}>
