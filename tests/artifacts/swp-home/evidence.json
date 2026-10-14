@@ -1,0 +1,39 @@
+{
+  "source": "Local production build with synthetic browser-test fixtures; not hosted Preview screenshots",
+  "application_commit": "d85cd2cd24e5fa5b34377abe2a2b28312e2ef313",
+  "fixture_source": "tests/browser/home-overview-entry.mjs",
+  "screenshots": [
+    "1440-viewport-local.png",
+    "390-overview-local.png",
+    "1440-current-scenario-local.png"
+  ],
+  "privacy_review": "Visually inspected: synthetic workforce, demo goals and test draft only. No private user content, credentials or embedded text metadata.",
+  "results": [
+    {
+      "width": 1440,
+      "actions": {
+        "x": 1087.25,
+        "y": 599.890625,
+        "width": 286.75,
+        "height": 44
+      },
+      "errors": [],
+      "posts": [],
+      "external": [],
+      "checks": "verified scope, unknown/mismatch, keyboard primary action, repeated navigation, Back/Forward, retained draft, planner intact, current scenario only, cost zero, edit invalidation, goal-bound saved names, saved record unchanged, no automatic AI"
+    },
+    {
+      "width": 390,
+      "actions": {
+        "x": 29,
+        "y": 564.296875,
+        "width": 332,
+        "height": 44
+      },
+      "errors": [],
+      "posts": [],
+      "external": [],
+      "checks": "verified scope, unknown/mismatch, keyboard primary action, repeated navigation, Back/Forward, retained draft, planner intact, current scenario only, cost zero, edit invalidation, goal-bound saved names, saved record unchanged, no automatic AI"
+    }
+  ]
+}
