@@ -730,3 +730,9 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .home-workspace[data-overview-starting] .home-composer-dock { position: static; max-height: none; overflow: visible; }
 .home-workspace[data-overview-starting] .home-composer-slot { min-height: 0; }
 .home-workspace[data-overview-starting] [aria-label="Home chat workspace"] { max-height: none; overflow: visible; }
+
+.home-secondary-entry { max-width: 680px; margin: 0 auto; padding: 0 32px 24px; }
+.home-secondary-entry > summary { cursor: pointer; min-height: 44px; padding: 12px 0; color: var(--muted-foreground); font-size: 13px; }
+.home-secondary-entry > summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+.home-secondary-entry[open] { max-width: none; }
+@media(max-width: 600px) { .home-secondary-entry { padding: 0 20px 20px; } }
