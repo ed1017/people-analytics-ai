@@ -1,17 +1,20 @@
 import { DatasetRouter } from './dataset-router.mjs';
 import { createDatasetRequestBoundary } from './dataset-request-boundary.mjs';
+import { createDeferredLegacyClient } from './dataset-legacy-client.mjs';
 // Preparation only: no environment variable, request, or public endpoint can select v2.
 // This digest label is deliberately not a claim that live v1 is immutable/certified.
 const legacy = Object.freeze({ datasetId: 'legacy-v1', generation: 0, digest: 'uncertified-live-v1' });
-let sourceClient: unknown;
-const provider = { digest: legacy.digest, get client() { if (!sourceClient) throw Error('Source client unavailable'); return sourceClient; } };
+const sourceClient = createDeferredLegacyClient();
+const provider = { digest: legacy.digest, get client() { return sourceClient.read(); } };
 export const datasetRouter = new DatasetRouter({ 'legacy-v1': provider }, {
   read: async () => legacy,
   compareAndSwap: async () => false,
 });
 export function registerLegacyDatasetClient(client: unknown) {
-  if (sourceClient && sourceClient !== client) throw Error('Legacy client already registered');
-  sourceClient = client;
+  sourceClient.register(client);
+}
+export function registerLegacyDatasetClientFactory(factory: () => unknown) {
+  sourceClient.registerFactory(factory);
 }
 // Generation-zero production behavior remains the same mutable live binding.
 // This guard is not an immutable-source certificate. No candidate is configured.
