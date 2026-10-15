@@ -139,3 +139,15 @@ test('recorded KPIs retain scope and units separately from projected flows',()=>
  const zero=render({overview:{...base.overview,voluntary_turnover_ytd_pct:0,labor_cost_usd:0}});
  assert.match(zero,/0%/);assert.match(zero,/0 USD/);
 });
+
+test('unavailable headcount selector is unique among five withheld indicators',()=>{
+ const html=render({receipt:null,trend:history,overview:{...base.overview,labor_cost_usd:45200},recruitingKpi:{hires:7,month:'2026-09',asOf:'2026-09-30'}});
+ assert.equal(html.split('>Unavailable<').length-1,5,'invalid receipt reproduces all five unavailable indicators');
+ const snapshot=html.match(/<section aria-label="Workforce snapshot"[^>]*>([\s\S]*?)<\/section>/)?.[1];
+ assert.ok(snapshot);
+ assert.deepEqual([...snapshot.matchAll(/<strong[^>]*>([^<]*)<\/strong>/g)].map(match=>match[1]),['Unavailable']);
+ assert.doesNotMatch(html,/role="img"/,'invalid receipt must still withhold the chart');
+ const source=fs.readFileSync('tests/browser/home-overview-entry.mjs','utf8');
+ assert.ok(source.includes("welcome.getByRole('region',{name:'Workforce snapshot',exact:true}).locator('strong').filter({hasText:/^Unavailable$/}).waitFor();assert.equal(await welcome.getByRole('img').count(),0)"));
+ assert.ok(!source.includes("welcome.getByText('Unavailable',{exact:true})"));
+});
