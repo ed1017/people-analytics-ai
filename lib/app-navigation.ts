@@ -28,7 +28,7 @@ export const appWorkspaceJourneys: Array<{key: AppWorkspaceKey; journeyLabel: st
 export const appNavigationSections: AppNavigationSection[] = [
   {key:"analytics", title:"Workforce", pages:["workforce","attrition","talent-acquisition","compensation","survey-sentiment","skills","learning-development","career-growth-mobility","succession-planning"]},
   {key:"talent", title:"Intelligence", pages:["occupational-references","labor-market","training-coaching"]},
-  {key:"strategy", title:"Planning", pages:["planning-overview","scenario-modeling","position-workforce-design","workforce-response","execution-feasibility","finance","development-planning","decision-brief"]},
+  {key:"strategy", title:"Planning", pages:["future-of-work","action-plans","plan-track","planning-overview","scenario-modeling","position-workforce-design","workforce-response","execution-feasibility","finance","development-planning","decision-brief"]},
   {key:"evaluate",title:"Assess & Evaluate",pages:["assess-evaluate"]},
 ];
 
@@ -36,13 +36,16 @@ export const appPageMetadata: Record<
   AppPage,
   AppPageMetadata
 > = {
+  "future-of-work": {label:"Future of Work",section:"Planning",description:"Review the task and adoption inputs needed to model how work could change."},
+  "action-plans": {label:"Action plans",section:"Planning",description:"Review saved proposals for the selected goal; proposals are not completed actions."},
+  "plan-track": {label:"Track",section:"Planning",description:"Review saved dated measurements and their scope."},
   "decision-brief":{label:"Decision brief",section:"Planning",description:"Your browser-local evidence, assumptions, proposals and explicit approval notes."},
   "assess-evaluate":{label:"Assess & Evaluate · Coming soon",section:"Assess & Evaluate",description:"Placeholder only; no outcomes, scorecard or ROI calculation."},
   "occupational-references": {label:"Occupational References",section:"Intelligence",description:"Search job-profile mappings, role requirements and O*NET occupation references."},
   "labor-market": {status:"Limited preview",label:"Labor Market",section:"Intelligence",description:"Compare published occupation wages, employment and separate U.S. projections."},
   "training-coaching": {status:"Limited preview",label:"Training & Coaching",section:"Intelligence",description:"Fictional simulated provider examples and unverified user-provided quotes."},
   "development-planning": { status:"Limited preview", label: "Development Planning", section: "Planning", description: "Compare explicitly selected development quotes and user-entered cost assumptions." },
-  home: { label: "Overview", section: "Planning", description: "Start a workforce scenario, review current capacity and continue your saved work." },
+  home: { label: "Plan home", section: "Planning", description: "Start a workforce scenario, review current capacity and continue your saved work." },
   overview: {
     label: "Workforce",
     section: "Workforce",

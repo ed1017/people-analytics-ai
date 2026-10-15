@@ -1,4 +1,5 @@
 "use client";
+import {planningJourney,planningEvidence} from "@/lib/planning-journey";
 import {LimitedPreviewBadge} from "@/components/limited-preview-badge";
 import {useRef,useState} from "react";
 import {usePhoneLayout} from "@/components/use-phone-layout";
@@ -54,6 +55,9 @@ const pageIcons: Record<
   AppPage,
   LucideIcon
 > = {
+  "future-of-work": Sparkles,
+  "action-plans": CalendarDays,
+  "plan-track": TrendingUp,
   "decision-brief": MessageSquareText,
   "assess-evaluate": ShieldCheck,
   "occupational-references": Compass,
@@ -89,7 +93,7 @@ export function AppSidebar({
 }: AppSidebarProps) {
   const phone=usePhoneLayout(),drawer=useRef<HTMLElement>(null),navCollapsed=phone?false:desktopNavCollapsed;
   const [openGroups,setOpenGroups]=useState<Record<string,boolean>>(()=>({[appNavigationSections.find(section=>section.pages.includes(activePage))?.key??'']:activePage!=='home'}));
-  const primaryPage=activePage==="home"||activePage==="planning-overview"||activePage==="workforce-planning";
+  const primaryPage=activePage==="home"||planningJourney.some(step=>step.page===activePage)||activePage==="workforce-planning";
   const [exploreOpen,setExploreOpen]=useState(!primaryPage);
   const [previousPage,setPreviousPage]=useState(activePage);
   if(previousPage!==activePage){setPreviousPage(activePage);if(!primaryPage)setExploreOpen(true);const section=appNavigationSections.find(s=>s.pages.includes(activePage));if(section)setOpenGroups(current=>({...current,[section.key]:true}));}
@@ -129,21 +133,22 @@ export function AppSidebar({
 
       <nav
         aria-label="Workforce navigation"
-        className="space-y-4"
+        className="space-y-1"
       >
-        <Button type="button" aria-label="Overview" title="Overview" aria-current={activePage === "home" ? "page" : undefined}
-          variant={activePage === "home" ? "secondary" : "ghost"} onClick={() => onPageChange("home")}
-          className="mb-2 min-h-11 h-auto w-full justify-start gap-3 px-3 py-2 text-lg font-semibold max-md:justify-center max-md:px-0">
-          <Sparkles className="h-5 w-5 shrink-0" />{!navCollapsed && <span className="max-md:hidden">Overview</span>}
-        </Button>
-        <Button type="button" data-nav-destination="planning-overview" aria-label="Demand & scenarios" title="Demand & scenarios" aria-current={activePage === "planning-overview" || activePage === "workforce-planning" ? "page" : undefined}
-          variant={activePage === "planning-overview" || activePage === "workforce-planning" ? "secondary" : "ghost"} onClick={() => onPageChange("planning-overview")}
-          className="h-auto min-h-11 w-full justify-start gap-3 px-3 py-2 text-base font-semibold">
-          <CalendarDays className="h-5 w-5 shrink-0" />{!navCollapsed && <span className="whitespace-normal text-left">Demand &amp; scenarios</span>}
-        </Button>
+        {[{page:'home' as AppPage,label:'Plan home'},...planningJourney].map(item=>{
+          const Icon=pageIcons[item.page];
+          const active=activePage===item.page||(item.page==='planning-overview'&&activePage==='workforce-planning');
+          return <Button key={item.page} type="button" data-nav-destination={item.page} aria-label={item.label} title={item.label} aria-current={active?'page':undefined} variant={active?'secondary':'ghost'} onClick={()=>onPageChange(item.page)} className={`h-auto min-h-11 w-full gap-3 px-3 py-2 text-sm ${navCollapsed?'justify-center':'justify-start'}`}>
+            <Icon className="h-4 w-4 shrink-0"/>{!navCollapsed&&<span className="whitespace-normal text-left">{item.label}</span>}
+          </Button>;
+        })}
+        <section aria-label="Explore evidence" className="border-t pt-3">
+          {!navCollapsed&&<h2 className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Explore evidence</h2>}
+          {planningEvidence.map(item=>{const Icon=pageIcons[item.page];return <Button key={item.page} type="button" data-nav-destination={item.page} title={item.label} aria-label={item.label} aria-current={activePage===item.page?'page':undefined} variant={activePage===item.page?'secondary':'ghost'} onClick={()=>onPageChange(item.page)} className={`min-h-10 w-full gap-3 px-3 text-sm text-muted-foreground ${navCollapsed?'justify-center':'justify-start'}`}><Icon className="h-4 w-4 shrink-0"/>{!navCollapsed&&<span>{item.label}</span>}</Button>})}
+        </section>
         <section aria-label="Explore tools" className="border-t pt-2">
-          <button type="button" aria-label="Explore" aria-expanded={exploreOpen} aria-controls="explore-navigation" onClick={()=>setExploreOpen(value=>!value)} className="flex min-h-11 w-full items-center gap-3 rounded px-3 py-2 text-left font-medium hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring">
-            <Compass className="h-5 w-5 shrink-0" />{!navCollapsed && <span>Explore</span>}<span aria-hidden="true" className="ml-auto">{exploreOpen?"−":"+"}</span>
+          <button type="button" aria-label="More evidence and tools" aria-expanded={exploreOpen} aria-controls="explore-navigation" onClick={()=>setExploreOpen(value=>!value)} className="flex min-h-11 w-full items-center gap-3 rounded px-3 py-2 text-left font-medium hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring">
+            <Compass className="h-5 w-5 shrink-0" />{!navCollapsed && <span>More</span>}<span aria-hidden="true" className="ml-auto">{exploreOpen?"−":"+"}</span>
           </button>
           <div id="explore-navigation" hidden={!exploreOpen}>
         {appNavigationSections.map(
@@ -183,7 +188,7 @@ export function AppSidebar({
 
                   {!navCollapsed && (
                     <span className="min-w-0 max-md:hidden">
-                      <span className={section.key==='evaluate'?"block text-sm font-medium":"block text-xl font-bold leading-[1.1]"}>
+                      <span className={section.key==='evaluate'?"block text-sm font-medium":"block text-sm font-semibold leading-tight"}>
                         {workspaceDisplayTitles[section.key]}
                       </span>
                       {journey && section.key!=='evaluate' && (
@@ -197,7 +202,7 @@ export function AppSidebar({
                 </button></h2>
 
                 <div id={groupId} hidden={!expanded} className="space-y-1">
-                  {section.pages.filter(page=>!["planning-overview","scenario-modeling","position-workforce-design","workforce-response","execution-feasibility"].includes(page)).map(
+                  {section.pages.filter(page=>!planningJourney.some(item=>item.page===page)&&!planningEvidence.some(item=>item.page===page)).map(
                     (page) => {
                       const metadata =
                         getAppPageMetadata(
@@ -248,7 +253,7 @@ export function AppSidebar({
                           <Icon className="h-5 w-5 shrink-0" />
                           {navCollapsed&&metadata.status&&<span id={`nav-preview-${page}`} className="sr-only">Limited preview</span>}
                           {!navCollapsed && (
-                            <span className="min-w-0 whitespace-normal text-left text-[17px] font-medium leading-[1.15] max-md:hidden">
+                            <span className="min-w-0 whitespace-normal text-left text-sm font-medium leading-[1.15] max-md:hidden">
                               {metadata.label}
                               {metadata.status&&<span className="mt-1 block"><LimitedPreviewBadge id={`nav-preview-${page}`}/></span>}
                             </span>
