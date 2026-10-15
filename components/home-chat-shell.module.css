@@ -55,3 +55,11 @@
 .setupNote { margin-top: 4px; }
 
 .projectionLine { stroke: var(--primary); stroke-width: 2; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
+
+.kpiRow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; list-style:none; padding:10px 0; margin:0; border-top:1px solid var(--border); }
+.kpiRow li { min-width:0; }
+.kpiRow span,.kpiRow b,.kpiRow small { display:block; overflow-wrap:anywhere; }
+.kpiRow span { font-size:12px; color:var(--muted-foreground); }
+.kpiRow b { font-size:18px; margin:3px 0; }
+.kpiRow small { font-size:11px; color:var(--muted-foreground); line-height:1.4; }
+@media (max-width:640px) { .kpiRow { grid-template-columns:repeat(2,minmax(0,1fr)); } }

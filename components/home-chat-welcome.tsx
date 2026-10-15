@@ -3,6 +3,7 @@
 import { ChartNoAxesCombined, Sparkles, Wallet, Users } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { HomeOverviewSummaryProps } from './home-overview-summary';
+import type {HomeRecruitingKpi} from '@/lib/home-kpi-source';
 import type { HeadcountTrendPoint } from '@/lib/types';
 import { isVerifiedDashboardScope } from '@/lib/dashboard-scope';
 import type {CheckedHomeProjection} from '@/lib/home-projection-selection';
@@ -35,6 +36,7 @@ export function welcomeHistory(trend: readonly HeadcountTrendPoint[], snapshotDa
 export type HomeChatWelcomeProps = Omit<HomeOverviewSummaryProps, 'onNavigate'> & {
   onQuestion: (question: string) => void;
   disabled?: boolean;
+  recruitingKpi?: HomeRecruitingKpi|null;
   /** The owning chat supplies its existing composer; this component never submits requests. */
   composer?: ReactNode;
   /** From the same dataset-scoped dashboard response as overview and receipt. */
@@ -42,7 +44,7 @@ export type HomeChatWelcomeProps = Omit<HomeOverviewSummaryProps, 'onNavigate'> 
 };
 
 export type HomeSnapshotProps = Pick<HomeChatWelcomeProps, 'overview'|'receipt'|'requested'|'scopeLabel'|'loading'|'error'|'trend'>;
-export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,loading,error,trend=[],projection=null,projectionStatus}:HomeSnapshotProps & {projection?:CheckedHomeProjection|null;projectionStatus?:string}) {
+export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,loading,error,trend=[],recruitingKpi=null,projection=null,projectionStatus}:HomeSnapshotProps & {recruitingKpi?:HomeRecruitingKpi|null;projection?:CheckedHomeProjection|null;projectionStatus?:string}) {
   const verified = isVerifiedDashboardScope(receipt) && (['country', 'org', 'level'] as const).every(key => receipt?.effective?.[key] === requested[key]);
   const snapshotDate = overview?.snapshot_date ?? '';
   const current = !loading && !error && verified && validDate(snapshotDate) ? overview : null;
@@ -65,6 +67,12 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         <p className={styles.watch}>Watch: Not assessed</p>
       </div>
       <p className={styles.scope}>{scopeLabel} · Recorded synthetic workforce history</p>
+      <ul className={styles.kpiRow} aria-label="Recorded workforce indicators">
+        <li><span>Recruiting hires</span><b>{current&&recruitingKpi?.asOf===snapshotDate ? recruitingKpi.hires.toLocaleString() : 'Unavailable'}</b><small>{current&&recruitingKpi?.asOf===snapshotDate ? recruitingKpi.month+' through '+recruitingKpi.asOf+'; company-wide recruiting events, including internal fills. Not net workforce additions.' : 'Company-wide monthly recruiting source needed.'}</small></li>
+        <li><span>Voluntary turnover YTD</span><b>{known(current?.voluntary_turnover_ytd_pct) ? format(current.voluntary_turnover_ytd_pct)+'%' : 'Unavailable'}</b><small>{current ? snapshotDate.slice(0,4)+'-01-01 through '+snapshotDate+'; selected workforce scope. Source-reported rate; not annualized.' : 'Verified scoped turnover needed.'}</small></li>
+        <li><span>Sentiment</span><b>Unavailable</b><small>Eligible survey result and suppression metadata needed; survey respondents are a separate population.</small></li>
+        <li><span>Labor cost</span><b>{known(current?.labor_cost_usd) ? format(current.labor_cost_usd)+' USD' : 'Unavailable'}</b><small>{current ? 'As of '+snapshotDate+'; selected workforce scope. Cost period unspecified.' : 'Verified scoped cost needed.'}</small></li>
+      </ul>
       {(first && last || checked) ? <figure className={styles.historyFigure}>
         <svg viewBox="0 0 488 88" role="img" aria-label={'Recorded synthetic headcount history in people. ' + scopeLabel + '. ' + history.map(point => point.snapshot_date + ': ' + point.headcount).join('; ') + '. Missing months are not connected. ' + (checked ? 'Conditional projection: '+projected.map(point=>point.month+': '+format(point.headcount)).join('; ') : 'No projection.')}>
           <line x1="40" y1="76" x2="472" y2="76" className={styles.chartAxis}/>
@@ -77,18 +85,18 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         </svg>
         <figcaption>{history.length === 1 ? 'One recorded snapshot: ' + first?.snapshot_date + '; no trend inferred.' : history.length ? first?.snapshot_date + ' – ' + last?.snapshot_date + ' · ' + history.length + ' recorded monthly snapshots; gaps left unconnected.' : 'Recorded history unavailable.'}{checked && <span> Dashed: conditional projection through {horizonEnd?.slice(0,7)}.</span>}</figcaption>
       </figure> : <p className={styles.historyState} role="status">{loading ? 'Updating workforce history…' : 'Verified headcount history unavailable.'}</p>}
-      <dl className={styles.movementNotes} aria-label="Workforce movements"><div><dt>Hires</dt><dd>{checked ? format(flowTotal('hires')) : 'Not available'}</dd></div><div><dt>Departures</dt><dd>{checked ? format(flowTotal('exits')) : 'Not available'}</dd></div></dl>
+      <dl className={styles.movementNotes} aria-label="Workforce movements"><div><dt>Projected hires</dt><dd>{checked ? format(flowTotal('hires')) : 'Not available'}</dd></div><div><dt>Projected departures</dt><dd>{checked ? format(flowTotal('exits')) : 'Not available'}</dd></div></dl>
       {checked&&(flowTotal('transfersIn')>0||flowTotal('transfersOut')>0)&&<p className={styles.setupNote}>Also projected over this period: {format(flowTotal('transfersIn'))} transfers in and {format(flowTotal('transfersOut'))} transfers out.</p>}
       <p className={styles.setupNote}>{checked ? 'Projected people over '+projected[0].month.slice(0,7)+' – '+horizonEnd?.slice(0,7)+'. Assumption-based scenario, not a trained forecast.' : projectionStatus === 'checking' ? 'Checking the selected projection against current source inputs…' : projectionStatus ? 'Selected projection unavailable. Review it and choose Show on Home again.' : 'Projection not configured. Set monthly hiring and departure assumptions in Scenarios.'}</p>
       {checked && <details className={styles.setupNote}><summary>Projection assumptions and source check</summary><p>Projection {checked.analysis.id}, revision {checked.analysis.revision}. Legacy live-source read checked {checked.checkedAt}; no immutable dataset certification.</p><p>Projected transfers in: {format(flowTotal('transfersIn'))}; out: {format(flowTotal('transfersOut'))} people over the same period.</p>{Object.entries(checked.analysis.assumptions).map(([field,value])=><p key={field}>{field.replaceAll('_',' ')}: {format(value!)}{field.endsWith('_pct')?'%':' people/month'}.</p>)}{[...checked.analysis.interpretations,...checked.analysis.limitations].map((text,index)=><p key={index}>{text}</p>)}</details>}
     </section>;
 }
 
-export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, disabled = false, composer, trend = []}: HomeChatWelcomeProps) {
+export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, disabled = false, composer, trend = [], recruitingKpi}: HomeChatWelcomeProps) {
   return <section aria-label="Plan your workforce" className={styles.welcome}>
     <h2>Plan the workforce you’ll need<br className={styles.titleBreak}/> as AI changes the work</h2>
     <p className={styles.subtitle}>Start with a decision. Explore the evidence, compare assumptions, and build your plan.</p>
-    <HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend}/>
+    <HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi}/>
     <h3>What decision are you facing?</h3>
     <div className={styles.questions}>
       {planningQuestions.map((question, index) => {
