@@ -31,6 +31,9 @@ try { for(const width of [1173,1188,685,390]) {
  await input('Work items each month').fill('1000');assert.equal(await area.getByRole('slider',{name:'Work items each month slider',exact:true}).inputValue(),'1000');assert.deepEqual(await cards.locator('dd').allTextContents(),['4','6.25','+2.25']);
  await area.getByRole('slider',{name:'Work items each month slider',exact:true}).focus();await page.keyboard.press('ArrowRight');assert.equal(await input('Work items each month').inputValue(),await area.getByRole('slider',{name:'Work items each month slider',exact:true}).inputValue());
  metrics=await inspect();assert(metrics.every(m=>m.scroll<=m.width+1));assert(metrics.filter(m=>/^[-+\d]/.test(m.text)).every(m=>oneLine(m.rects)));
+ await input('Work items each month').fill('1000000');await input('Hours per item').fill('1000000');await input('Work hours per FTE each month').fill('1');
+ assert.deepEqual(await cards.locator('dd').allTextContents(),['4','1,000,000,000,000','+999,999,999,996']);
+ metrics=await inspect();assert(metrics.every(m=>m.scroll<=m.width+1),'large valid values fit without truncation');assert(metrics.filter(m=>/^[-+\d]/.test(m.text)).every(m=>oneLine(m.rects)));
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);
  evidence.push({width,stacked:true,valuesUnsplit:true,synchronized:true,errors,unexpected});
  // Opt in only for a genuine accessible Preview run, after all checks for this width pass.
