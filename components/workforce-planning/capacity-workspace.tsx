@@ -44,26 +44,26 @@ export function CapacityWorkspace(){
   catch(error){setSession({...session,result:null,cost:null,capture:null,error:error instanceof Error?error.message:'Check your inputs.'});}
   requestAnimationFrame(()=>feedback.current?.focus());
  }
- return <section aria-label="Workload capacity planning" className="space-y-4">
+ return <section aria-label="Workload capacity planning" className="@container/capacity space-y-4">
   <p className="text-sm text-muted-foreground">Enter the work and the team you expect to have. Blank numbers stay unknown.</p>
   <SkillClientDemand goalKey={goalKey} onStart={draft=>setSession({draft,result:null,cost:null,error:'',scope:null,capture:null,saveName:''})}/>
-  <div className="grid min-w-0 items-start gap-5 lg:grid-cols-[minmax(15rem,0.85fr)_minmax(0,1.65fr)]">
+  <div className="grid min-w-0 items-start gap-5 grid-cols-1 @min-[48rem]/capacity:grid-cols-[minmax(15rem,0.85fr)_minmax(0,1.65fr)]">
   <form noValidate onSubmit={event=>{event.preventDefault();calculate();}} className="min-w-0 space-y-3 rounded-xl border bg-background p-4">
    <h3 className="font-semibold">1. What work needs doing?</h3>
    <div>{field('scope','For example, Service desk - tickets.')}</div>
-   <div className="grid gap-3 sm:grid-cols-2">{field('volume','For example, clients or tickets.')}{field('effort','Before any productivity improvement.')}</div>
+   <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('volume','For example, clients or tickets.')}{field('effort','Before any productivity improvement.')}</div>
    <h3 className="border-t pt-3 font-semibold">2. How many people do you have?</h3>
    <p className="text-sm text-muted-foreground">Count people separately from working time. FTE means full-time equivalent: two half-time people = 1 FTE.</p>
-   <div className="grid gap-3 sm:grid-cols-2">{field('people')}{field('fte')}</div>
+   <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('people')}{field('fte')}</div>
    <p className="text-sm text-muted-foreground">Add the dates and how much time is spent on this work below. Skill records do not fill in these numbers.</p>
    <details className="border-t pt-1">
     <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Timing &amp; capacity assumptions (required)</summary>
     <p className="mb-3 text-xs text-muted-foreground">Starting people and FTE are measured just before the first planning month. FTE is contracted working time, before assigning time to this work. Leave blanks when unknown; enter 0 only when none.</p>
     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('openingDate')}{field('months','Plan 1-6 months.')}</div>
-    <div className="mt-3 grid gap-3 sm:grid-cols-2">{field('hours','After leave and other non-work time; before time assigned to this work.')}</div>
-    <div className="mt-2 grid gap-3 sm:grid-cols-2">{field('hires','Count each joiner once.')}{field('exits','All departures, including retirement; count each person once.')}{field('allocation','0–100%, up to four decimal places. Do not deduct leave again.')}{field('productivity','0–100%, up to four decimal places. Applied once to throughput, not to hires or workload.')}</div>
+    <div className="mt-3 grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('hours','After leave and other non-work time; before time assigned to this work.')}</div>
+    <div className="mt-2 grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('hires','Count each joiner once.')}{field('exits','All departures, including retirement; count each person once.')}{field('allocation','0–100%, up to four decimal places. Do not deduct leave again.')}{field('productivity','0–100%, up to four decimal places. Applied once to throughput, not to hires or workload.')}</div>
     <label className="mt-3 flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={draft.fullTimeMovements} onChange={e=>edit({fullTimeMovements:e.target.checked})}/>Assume every hire and departure is full-time (1 FTE per person)</label>
-    {!draft.fullTimeMovements&&<div className="grid gap-3 sm:grid-cols-2">{field('hireFte','0–1 FTE/person; explicit assumption, not inferred from current staff.')}{field('exitFte','0–1 FTE/person.')}</div>}
+    {!draft.fullTimeMovements&&<div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('hireFte','0–1 FTE/person; explicit assumption, not inferred from current staff.')}{field('exitFte','0–1 FTE/person.')}</div>}
    {field('costRate','Manual USD 0–100,000 per contracted FTE per month, up to two decimal places. Blank = unknown; 0 = zero. Define what your rate includes; no compensation period, loaded components or exchange rate is inferred.')}
    </details>
    <label className="flex min-h-11 items-start gap-2 text-sm"><input className="mt-1" type="checkbox" checked={draft.confirmed} onChange={e=>setSession({...session,draft:{...draft,confirmed:e.target.checked},result:null,cost:null,capture:null,error:''})}/><span>I confirm the entered values repeat each month, with no transfers. Departures leave the opening stock before hires; hires contribute for the full month. These are my planning assumptions.</span></label>
