@@ -1,6 +1,7 @@
 export type PlanningSliderSpec = {min:number;max:number;precision:number;keyboardStep:number;extent:number;unit:string};
 // Bounds and precision match the existing monthly workload adapter/engine.
 export const capacitySliders:Record<string,PlanningSliderSpec>={
+ months:{min:1,max:6,precision:0,keyboardStep:1,extent:6,unit:'months'},
  hires:{min:0,max:1e6,precision:0,keyboardStep:1,extent:100,unit:'people / month'},
  exits:{min:0,max:1e6,precision:0,keyboardStep:1,extent:100,unit:'people / month'},
  volume:{min:0,max:1e6,precision:6,keyboardStep:100,extent:10000,unit:'work units / month'},

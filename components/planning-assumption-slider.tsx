@@ -8,8 +8,8 @@ export function PlanningAssumptionSlider({label,value,onChange,spec,help,disable
  const id=useId(),number=sliderNumber(value,spec),maximum=sliderExtent(value,spec);
  const invalid=value.trim()!==''&&number===null;
  return <div className={styles.field}>
-  <label htmlFor={id}>{label} <span className={styles.unit}>({spec.unit})</span></label>
   <div className={styles.row}>
+   <label htmlFor={id}>{label} <span className={styles.unit}>({spec.unit})</span></label>
    <input className={styles.range} type="range" aria-label={`${label} slider`} aria-describedby={`${id}-help`} aria-valuetext={number===null?'Not set — edit the number or move the slider':`${value} ${spec.unit}`} min={spec.min} max={maximum} step="any" value={number??spec.min} disabled={disabled}
     onChange={event=>onChange(sliderEdit(Number(event.target.value),spec))}
     onKeyDown={event=>{const direction=event.key==='ArrowRight'||event.key==='ArrowUp'?1:event.key==='ArrowLeft'||event.key==='ArrowDown'?-1:0;if(direction){event.preventDefault();onChange(sliderEdit((number??spec.min)+direction*spec.keyboardStep,spec));}else if(event.key==='Home'||event.key==='End'){event.preventDefault();onChange(sliderEdit(event.key==='Home'?spec.min:maximum,spec));}}}/>
