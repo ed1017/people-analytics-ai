@@ -53,3 +53,5 @@
 .movementNotes > div { display: flex; gap: 6px; }
 .movementNotes dt { font-weight: 600; }
 .setupNote { margin-top: 4px; }
+
+.projectionLine { stroke: var(--primary); stroke-width: 2; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
