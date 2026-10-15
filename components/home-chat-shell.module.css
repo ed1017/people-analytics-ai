@@ -1,0 +1,39 @@
+.shell { color: var(--foreground); }
+.shell :global(.home-workspace) { gap: 24px; padding: 20px 24px; }
+.shell :global(.home-workspace[data-overview-starting]) > section { border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 18px 22px; }
+.shell :global(.home-workspace[data-overview-starting]) > section > header { gap: 4px 12px; }
+.shell :global(.home-workspace[data-overview-starting]) > section > header > h2 { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.shell :global(.home-workspace[data-overview-starting]) :global(.home-composer-dock) { box-shadow: none; border-radius: 10px; }
+.shell :global(.home-workspace[data-overview-starting]) :global(.home-composer-dock) textarea { min-height: 80px; }
+@media (min-width: 1100px) { .shell :global(.home-workspace) { grid-template-columns: minmax(0, 1fr) minmax(250px, 290px); } }
+@media (max-width: 1099px) { .shell :global(.home-workspace) { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) { .shell :global(.home-workspace) { padding: 12px; gap: 16px; } .shell :global(.home-workspace[data-overview-starting]) > section { padding: 12px; } }
+.welcome { padding: 12px 2px 4px; }
+.welcome h2 { max-width: 660px; font-size: clamp(25px, 2.6vw, 36px); line-height: 1.17; font-weight: 650; letter-spacing: -.035em; }
+.subtitle { margin-top: 12px; max-width: 580px; color: var(--muted-foreground); font-size: 14px; line-height: 1.6; }
+.metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 25px; }
+.metrics > div { min-width: 0; border: 1px solid var(--border); border-radius: 9px; padding: 13px 14px; background: var(--card); }
+.metrics dt { color: var(--muted-foreground); font-size: 12px; }
+.metrics dd { margin-top: 8px; font-size: clamp(16px, 1.7vw, 23px); font-weight: 650; line-height: 1.3; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.metrics p { margin-top: 5px; color: var(--muted-foreground); font-size: 11px; line-height: 1.5; }
+.scope { margin-top: 9px; color: var(--muted-foreground); font-size: 11px; line-height: 1.5; }
+.welcome h3 { margin: 26px 0 12px; font-size: 16px; font-weight: 600; }
+.questions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.questions button { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; min-height: 110px; border: 1px solid var(--border); border-radius: 9px; padding: 17px; text-align: left; font-size: 14px; line-height: 1.45; background: var(--card); }
+.questions button.featured { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.questions svg { color: var(--muted-foreground); }
+.questions .featured svg { color: var(--primary); }
+.questions button:hover { background: var(--accent); }
+.questions button:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+.questions button:disabled { opacity: .55; cursor: not-allowed; }
+.composer { margin-top: 18px; }
+.planPane { min-width: 0; padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+.planPane h2 { font-size: 17px; font-weight: 650; }
+.planPane > p { margin-top: 6px; font-size: 12px; line-height: 1.6; color: var(--muted-foreground); }
+.planPane section { margin-top: 22px; }
+.planPane h3 { font-size: 12px; font-weight: 600; color: var(--muted-foreground); }
+.planPane button { display: block; min-height: 40px; margin-top: 3px; padding: 8px 0; text-align: left; font-size: 13px; color: var(--muted-foreground); }
+.planPane button:hover { color: var(--foreground); text-decoration: underline; }
+.planPane button:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+@media (max-width: 600px) { .welcome h2 { font-size: 27px; } .metrics { gap: 6px; } .metrics > div { padding: 10px 8px; } .metrics dd { font-size: 16px; } .questions { gap: 8px; } .questions button { min-height: 120px; padding: 13px; } .titleBreak { display: none; } }
+@media (max-width: 360px) { .metrics, .questions { grid-template-columns: 1fr; } }

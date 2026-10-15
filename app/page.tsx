@@ -36,6 +36,9 @@ import {readSurveySource} from "@/lib/survey-source-client";
 import { employeeListeningEvidence, exitSurveyEvidence } from "@/lib/employee-listening";
 import { FocusedIssue } from "@/components/focused-issue";
 import {readDashboardScopeReceipt,isVerifiedDashboardScope,type DashboardScopeReceipt} from "@/lib/dashboard-scope";
+import {PlanningJourney} from "@/components/planning-journey";
+import {HomeChatWelcome,HomeChatShell} from "@/components/home-chat-welcome";
+import {FutureOfWorkPage,PlanningSupportPage,HomePlanPane} from "@/components/planning-support-pages";
 import {HomePlanningOverview} from "@/components/home-overview-summary";
 import { buildHomePack } from "@/lib/home-pack.mjs";
 import {MarketComparison,CarriedMarketReference,type MarketCarry} from "@/components/market-reference";
@@ -1912,7 +1915,7 @@ export default function Home() {
 
   return (
     <PlanningSessionProvider goalKey={conversation.workspaceKey} onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
-    <main data-workspace-palette={workspacePalette} className={`min-h-screen bg-background text-foreground${activePage === "home" ? " app-home-composer" : ""}${["home","decision-brief","assess-evaluate"].includes(activePage) ? " app-overview-mode" : ""}`}>
+    <main data-workspace-palette={workspacePalette} className={`min-h-screen bg-background text-foreground${activePage === "home" ? " app-home-composer" : ""}${["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) ? " app-overview-mode" : ""}`}>
       {/* Top header */}
       <AppHeader
         activePage={activePage}
@@ -1922,7 +1925,7 @@ export default function Home() {
 
       {/* Main application */}
       <div
-        className={`app-shell app-ai-left${["home","decision-brief","assess-evaluate"].includes(activePage) ? " app-home" : ""}`}
+        className={`app-shell app-ai-left${["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) ? " app-home" : ""}`}
         style={
           {
             "--nav-width": `${
@@ -1947,17 +1950,18 @@ export default function Home() {
 
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
-        {activePage!=="home"&&<SelectedGoalProgress/>}
+        {!["home","future-of-work","action-plans","plan-track"].includes(activePage)&&<SelectedGoalProgress/>}
+        {(planningWorkspaceActive||["workforce","future-of-work","action-plans","plan-track"].includes(activePage))&&<PlanningJourney activePage={activePage} onNavigate={setActivePage}/>}
         <SelectedProgressEntry/>
         {pageDataLoading&&<div className="m-4"><DataLoadingStatus/></div>}
-        {activePage!=="home"&&<WorkforceSolutionPanel optionActions={optionActions} page={activePage} onNavigate={setActivePage}/>}
-        {!["home","decision-brief","assess-evaluate","compensation"].includes(activePage)&&<p className="px-6 pt-3 text-xs text-muted-foreground" aria-label="Evidence type">{evidenceTrustLabel(activePage)}</p>}
+        {!["home","future-of-work","action-plans","plan-track"].includes(activePage)&&<WorkforceSolutionPanel optionActions={optionActions} page={activePage} onNavigate={setActivePage}/>}
+        {!["home","decision-brief","assess-evaluate","compensation","future-of-work","action-plans","plan-track"].includes(activePage)&&<p className="px-6 pt-3 text-xs text-muted-foreground" aria-label="Evidence type">{evidenceTrustLabel(activePage)}</p>}
         <div hidden={activePage !== "home"}>
-          <HomePlanningOverview overview={overviewData} receipt={overviewScope} requested={{country:selectedCountry,org:selectedOrg,level:selectedLevel}} scopeLabel={`${selectedCountryLabel} · ${selectedOrgLabel} · ${selectedLevelLabel}`} loading={dashboardLoading} error={dashboardError} onNavigate={setActivePage}/>
-          <details className="home-secondary-entry" open={Boolean(conversation.messages.length||demoActive)}><summary>Chat &amp; saved goals</summary>
-          <OverallOverviewPage overviewEntry onCloseDemo={()=>{setDemoActive(false);requestAnimationFrame(()=>document.getElementById("overview-question")?.focus({preventScroll:true}));}} guidedExampleActive={demoActive} optionActions={optionActions} marketReference={marketCarry} onEvidencePack={setHomeEvidencePacket} countryOptions={filterOptions.countries} onCountry={setSelectedCountry} developmentSession={developmentSession} conversation={conversation} onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></details></div>
+          <HomeChatShell>
+          <OverallOverviewPage overviewEntry renderWelcome={controls=><HomeChatWelcome {...controls} overview={overviewData} receipt={overviewScope} requested={{country:selectedCountry,org:selectedOrg,level:selectedLevel}} scopeLabel={`${selectedCountryLabel} · ${selectedOrgLabel} · ${selectedLevelLabel}`} loading={dashboardLoading} error={dashboardError}/>} renderPlanPane={savedWork=><HomePlanPane onNavigate={setActivePage} onExample={()=>setDemoActive(true)}>{savedWork}</HomePlanPane>} onCloseDemo={()=>{setDemoActive(false);requestAnimationFrame(()=>document.getElementById("overview-question")?.focus({preventScroll:true}));}} guidedExampleActive={demoActive} optionActions={optionActions} marketReference={marketCarry} onEvidencePack={setHomeEvidencePacket} countryOptions={filterOptions.countries} onCountry={setSelectedCountry} developmentSession={developmentSession} conversation={conversation} onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></HomeChatShell></div>
+        {activePage==="planning-overview"&&<details className="mx-5 my-3 rounded border"><summary className="min-h-11 cursor-pointer px-4 py-3 text-sm font-medium">Current scenario summary</summary><HomePlanningOverview overview={overviewData} receipt={overviewScope} requested={{country:selectedCountry,org:selectedOrg,level:selectedLevel}} scopeLabel={`${selectedCountryLabel} · ${selectedOrgLabel} · ${selectedLevelLabel}`} loading={dashboardLoading} error={dashboardError} onNavigate={setActivePage}/></details>}
         {planningWorkspaceActive && marketCarry && <CarriedMarketReference carry={marketCarry} onClear={()=>setMarketCarry(null)}/>}
-        {activePage === "decision-brief" ? <DecisionBrief key={conversation.workspaceKey} conversation={conversation} onNavigate={setActivePage}/> : activePage === "assess-evaluate" ? <section className="p-6"><h2 className="text-lg font-semibold">Coming soon</h2><p className="mt-3 text-muted-foreground">A future space to compare agreed targets with observed outcomes. No scorecard, predicted impact or ROI is calculated here.</p></section> : activePage === "home" ? null : intelligencePage ? <IntelligencePage page={activePage as "occupational-references" | "labor-market" | "training-coaching"} occupational={<OccupationalReference onEvidenceChange={setOccupationalEvidence} />} bls={blsData} blsLoading={blsLoading} blsError={blsError} market={<MarketComparison selection={marketSelection} onChange={setMarketSelection} goal={conversation.focusedIssue} onCarry={carry=>{recordDecisionEvidence(conversation.activeGoalId,"labor-market",marketCarryEvidence(carry));setMarketCarry(carry);setActivePage("planning-overview");}} />} catalog={<DevelopmentCatalog session={developmentSession} onChange={setDevelopmentSession} onOpen={() => setActivePage("development-planning")} />} /> : activePage === "compensation" ? (
+        {activePage === "future-of-work" ? <FutureOfWorkPage onNavigate={setActivePage}/> : activePage === "action-plans" || activePage === "plan-track" ? <PlanningSupportPage page={activePage} onNavigate={setActivePage}/> : activePage === "decision-brief" ? <DecisionBrief key={conversation.workspaceKey} conversation={conversation} onNavigate={setActivePage}/> : activePage === "assess-evaluate" ? <section className="p-6"><h2 className="text-lg font-semibold">Coming soon</h2><p className="mt-3 text-muted-foreground">A future space to compare agreed targets with observed outcomes. No scorecard, predicted impact or ROI is calculated here.</p></section> : activePage === "home" ? null : intelligencePage ? <IntelligencePage page={activePage as "occupational-references" | "labor-market" | "training-coaching"} occupational={<OccupationalReference onEvidenceChange={setOccupationalEvidence} />} bls={blsData} blsLoading={blsLoading} blsError={blsError} market={<MarketComparison selection={marketSelection} onChange={setMarketSelection} goal={conversation.focusedIssue} onCarry={carry=>{recordDecisionEvidence(conversation.activeGoalId,"labor-market",marketCarryEvidence(carry));setMarketCarry(carry);setActivePage("planning-overview");}} />} catalog={<DevelopmentCatalog session={developmentSession} onChange={setDevelopmentSession} onOpen={() => setActivePage("development-planning")} />} /> : activePage === "compensation" ? (
           <CompensationPage scope={{country: selectedCountry, org: selectedOrg, level: selectedLevel}} />
         ) : activePage === "development-planning" ? (
           <DevelopmentPlanning session={developmentSession} onChange={setDevelopmentSession} onCatalog={() => setActivePage("training-coaching")} />
@@ -2134,7 +2138,7 @@ export default function Home() {
         )}
         </div>
 
-        {activePage !== "home" && activePage!=="decision-brief" && activePage!=="assess-evaluate" && <AiPanel
+        {!["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) && <AiPanel
           workforceIntro={getWorkspaceForPage(activePage)==='analytics'}
           suppressIntro={demoActive}
           goalViewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,activePage,selectedPersona,selectedBusinessContext,conversation.resetEpoch])}

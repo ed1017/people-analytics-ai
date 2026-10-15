@@ -1,4 +1,5 @@
 "use client";
+import type {ReactNode} from "react";
 import {SelectedGoalProgress} from '@/components/goal-progress-summary';
 import {ChatEvidenceChart} from '@/components/chat-evidence-chart';
 import type {ChatEvidenceSeries} from '@/lib/chat-evidence-series';
@@ -87,11 +88,16 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
   return { clarification:readHomeClarification(data.clarification??proposal?.question), findingFollowups:readHomeFindingFollowups(data.findingFollowups,data.answer,sources), answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal, diagnostic, diagnosticStage:useServer?'server' as const:'client' as const };
 }
 
+type WelcomeControls = {onQuestion: (question: string) => void; disabled: boolean};
+function WelcomeSlot({render, ...controls}: WelcomeControls & {render: (controls: WelcomeControls) => ReactNode}) { return render(controls); }
+
 const noActionSubscription=()=>()=>{};
 const noActionSnapshot=()=>emptyOptionActions;
 
-export function OverallOverviewPage({ overviewEntry=false, optionActions, onStartDemo, onCloseDemo=()=>{}, guidedExampleActive=false, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry, onEvidencePack, marketReference }: {
+export function OverallOverviewPage({ overviewEntry=false, renderWelcome, renderPlanPane, optionActions, onStartDemo, onCloseDemo=()=>{}, guidedExampleActive=false, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry, onEvidencePack, marketReference }: {
   overviewEntry?:boolean;
+  renderWelcome?: (controls: {onQuestion: (question: string) => void; disabled: boolean}) => ReactNode;
+  renderPlanPane?: (savedWork: ReactNode) => ReactNode;
   optionActions?:WorkforceOptionActions;
   marketReference:unknown;
   onEvidencePack:(value:string)=>void;
@@ -570,6 +576,8 @@ export function OverallOverviewPage({ overviewEntry=false, optionActions, onStar
 
     </section>
   );
+  const savedWork = (<div className="min-w-0 space-y-3">{active&&<SelectedGoalProgress/>}
+    <HomePinnedGoals goals={conversation.goals} activeGoalId={conversation.activeGoalId} ready={conversation.storageReady} disabled={!active||!conversation.storageReady||!conversation.saved||Boolean(conversation.issueEditor)} packet={pack} onSelect={openPinnedGoal}/></div>);
   return <HomeGuidedActionsContext.Provider value={guidedActions}><div data-overview-starting={overviewStarting?'':undefined} data-plan-reading={planReading?'':undefined} style={{overflowAnchor:'none'}} className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]">
     {guidedExampleActive&&<GuidedDemo active={active} conversational={solutionConversationEnabled} registry={guidedActions} onClose={onCloseDemo} actions={{
       ready:active&&conversation.storageReady&&conversation.saved&&!conversation.loading&&!solutions.pending&&!solutions.saving&&!conversation.issueEditor&&ready,
@@ -622,7 +630,7 @@ export function OverallOverviewPage({ overviewEntry=false, optionActions, onStar
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!guidedExampleActive&&<SwpGuidedJourney discussionKey={JSON.stringify([workforceScope,workforceQuery,persona])} conversation={conversation} active={active} busy={chatLoading||solutions.pending||solutions.saving} commandRef={swpCommand} modelContextRef={swpModelContext} demandControlRef={demandControl} demandReviewRef={demandReview} demandContextRef={demandContext} sources={sources??[]} onNavigate={onNavigate}/>}
-    {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&(overviewEntry?<details><summary className="min-h-11 cursor-pointer py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Ideas for your first question</summary>{startingGuide}</details>:startingGuide)}
+    {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&(renderWelcome ? <WelcomeSlot render={renderWelcome} onQuestion={submitStarterQuestion} disabled={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)}/> : overviewEntry?<details><summary className="min-h-11 cursor-pointer py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Ideas for your first question</summary>{startingGuide}</details>:startingGuide)}
     {!solutionConversationEnabled&&showFallbackPin&&!chatLoading&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
     {!activePinnedGoal&&conversationPanel}
 
@@ -660,8 +668,6 @@ export function OverallOverviewPage({ overviewEntry=false, optionActions, onStar
       {!solutionConversationEnabled&&structuredPlansEnabled&&recoveryPlanChoice?.goalId===conversation.activeGoalId&&<label className="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={structuredMode} onChange={event=>{selectedPlanForChat.current?.discard();setStructuredMode(event.target.checked);}}/>Discuss saved plans · turn off to use existing chat controls</label>}
       {actionOffers.length>0&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2 text-sm">Option action suggestions</summary><section aria-label="Workforce option actions" className="mt-3 space-y-2"><p className="text-sm text-muted-foreground">{input.trim()?'Your draft is kept. Clear it to choose an option action.':'Click to open the local action. Saving, calculation and search remain explicit.'}</p><div className="flex flex-wrap gap-2">{actionOffers.map(offer=><button key={offer.id} type="button" disabled={suggestionPending||chatLoading||Boolean(input.trim())} onClick={()=>submitOption(offer.id)} className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{offer.label}</button>)}</div></section></details>}
   </section>
-    <div className="min-w-0 space-y-3">{active&&<SelectedGoalProgress/>}
-    <HomePinnedGoals goals={conversation.goals} activeGoalId={conversation.activeGoalId} ready={conversation.storageReady} disabled={!active||!conversation.storageReady||!conversation.saved||Boolean(conversation.issueEditor)} packet={pack} onSelect={openPinnedGoal}/></div>
-
+    {renderPlanPane ? renderPlanPane(savedWork) : savedWork}
   </div></HomeGuidedActionsContext.Provider>;
 }
