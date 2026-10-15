@@ -1,4 +1,8 @@
 "use client";
+import {HomeHeadcountSummary,type HomeSnapshotProps} from '@/components/home-chat-welcome';
+import {useHomeProjection} from '@/components/use-home-projection';
+import {datasetSession} from '@/lib/dataset-client.mjs';
+import {isVerifiedDashboardScope} from '@/lib/dashboard-scope';
 import type {ReactNode} from "react";
 import {SelectedGoalProgress} from '@/components/goal-progress-summary';
 import {ChatEvidenceChart} from '@/components/chat-evidence-chart';
@@ -94,8 +98,9 @@ function WelcomeSlot({render, ...controls}: WelcomeControls & {render: (controls
 const noActionSubscription=()=>()=>{};
 const noActionSnapshot=()=>emptyOptionActions;
 
-export function OverallOverviewPage({ overviewEntry=false, renderWelcome, renderPlanPane, optionActions, onStartDemo, onCloseDemo=()=>{}, guidedExampleActive=false, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry, onEvidencePack, marketReference }: {
+export function OverallOverviewPage({ overviewEntry=false, renderWelcome, renderPlanPane, projectionOverview, optionActions, onStartDemo, onCloseDemo=()=>{}, guidedExampleActive=false, active, persona, onNavigate, workforceQuery, workforceScope, conversation, developmentSession, countryOptions, onCountry, onEvidencePack, marketReference }: {
   overviewEntry?:boolean;
+  projectionOverview?:HomeSnapshotProps;
   renderWelcome?: (controls: {onQuestion: (question: string) => void; disabled: boolean}) => ReactNode;
   renderPlanPane?: (savedWork: ReactNode) => ReactNode;
   optionActions?:WorkforceOptionActions;
@@ -430,6 +435,11 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   const ready = Boolean(sources?.some(source => source.facts)) && !loading && loadedScope === workforceQuery;
   const demoPlan=readHomeDemo(storage.data.workspaces[conversation.activeGoalId]?.fields[homeDemoField],conversation.activeGoalId);
   const solutions=useHomeSolutionConversation({enabled:solutionConversationEnabled,conversation,active,settled:sourcesSettled,evidence:pack,evidenceContext:{sourceResults,developmentSession},evidenceForMessage:message=>buildHomePack(sourceResults,workforceScope,homeEvidenceSelection(message,messages,conversation.focusedIssue),developmentSession),scope:workforceScope,query:workforceQuery,planningContext:()=>demandContext.current??swpModelContext.current,demandReviewRef:demandReview,planningCalculatorAvailable:()=>demandControl.current?.calculatorAvailable()===true,target:()=>selectedPlanForChat.current,guided:guidedExampleActive?guidedActions:null});
+  const projectionFilters=projectionOverview?.requested??{country:'all',org:'all',level:'all'};
+  const projectionSnapshot=projectionOverview?.overview;
+  const projectionReady=Boolean(projectionOverview&&!projectionOverview.loading&&!projectionOverview.error&&isVerifiedDashboardScope(projectionOverview.receipt)&&(['country','org','level'] as const).every(key=>projectionOverview.receipt?.effective?.[key]===projectionFilters[key]));
+  const projectionKey=JSON.stringify([conversation.workspaceKey,conversation.resetEpoch,conversation.storageReady,conversation.issueEditor,conversation.activeGoalId,conversation.focusedIssue,storage.data.revision,active,ready,guidedExampleActive,solutions.pending,solutions.saving,solutions.state.analyses,projectionOverview]);
+  const homeProjection=useHomeProjection({key:projectionKey,enabled:projectionReady&&active&&ready&&conversation.storageReady&&conversation.saved&&!conversation.issueEditor&&!guidedExampleActive&&!solutions.pending&&!solutions.saving,goal:{id:conversation.activeGoalId,statement:conversation.focusedIssue},datasetToken:datasetSession.snapshot(),filters:projectionFilters,analyses:solutions.state.analyses,snapshot:projectionReady&&projectionSnapshot?{asOf:projectionSnapshot.snapshot_date,headcount:projectionSnapshot.headcount}:null});
   const planEditReady=ready||Boolean(demoPlan&&demoPlan.example.goal===conversation.focusedIssue&&conversation.storageReady);
   function findingCurrent(turn:FindingTurn){
     const goals=decisionStore.getSnapshot().data.goals;
@@ -627,6 +637,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       {active&&hasRetention&&<RetentionWhatIfPanel key={conversation.activeGoalId} openSequence={retentionEntry?.sequence??0} initiallyOpen={retentionEntry?.id===conversation.activeGoalId}/>}
       {active&&<WorkforceSolutionPanel hideEntry optionActions={optionActions} page="home" onNavigate={onNavigate}/>}
     </div>
+    {homeProjection.requested&&conversation.focusedIssue&&projectionOverview&&<HomeHeadcountSummary {...projectionOverview} projection={homeProjection.value} projectionStatus={homeProjection.status}/>}
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!guidedExampleActive&&<SwpGuidedJourney discussionKey={JSON.stringify([workforceScope,workforceQuery,persona])} conversation={conversation} active={active} busy={chatLoading||solutions.pending||solutions.saving} commandRef={swpCommand} modelContextRef={swpModelContext} demandControlRef={demandControl} demandReviewRef={demandReview} demandContextRef={demandContext} sources={sources??[]} onNavigate={onNavigate}/>}
@@ -636,7 +647,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
 
     <HomeSolutionBundles existingOnly={solutionConversationEnabled} settled={sourcesSettled} chatChange={planEdit&&editPreview?{goalId:planEdit.goalId,planId:planEdit.id,inputKey:editPreview.inputKey,ready:!chatLoading&&planEditReady&&conversation.saved&&input.trim()===editPreview.request,isCurrent:planEdit.isCurrent,apply:applyPlanChanges}:null} openRequest={planOpen} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} projectEvidence={destination=>buildHomePack(sourceResults,workforceScope,conversation.focusedIssue||conversation.problem?.latestQuestion||'',destination.development??developmentSession)} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={actionPin} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions} onDiscuss={registerPlanForChat}/>
     {activePinnedGoal&&conversationPanel}
-    {solutionConversationEnabled&&<HomeSolutionConversationReview planningNotes={followUp?[followUp.reference,followUp.planningNotes,followUp.explanation].filter(Boolean).join('\n\n'):undefined} capacityRisk={followUp?.capacityRisk} controller={solutions} goal={conversation.focusedIssue} pack={pack} showSaved={recoveryPlanChoice?.goalId!==conversation.activeGoalId}/>}
+    {solutionConversationEnabled&&<HomeSolutionConversationReview onShowProjection={projectionReady&&conversation.activeGoalId&&datasetSession.snapshot()==="legacy-v1:0" ? (id,revision)=>{void homeProjection.show(id,revision);} : undefined} planningNotes={followUp?[followUp.reference,followUp.planningNotes,followUp.explanation].filter(Boolean).join('\n\n'):undefined} capacityRisk={followUp?.capacityRisk} controller={solutions} goal={conversation.focusedIssue} pack={pack} showSaved={recoveryPlanChoice?.goalId!==conversation.activeGoalId}/>}
     {solutionConversationEnabled&&(followUp?.furtherReading||followUpQuestions.length>0)&&<section aria-label="Further reading and investigation" className="space-y-3 text-base"><h3 className="text-lg font-semibold">Further reading / investigation</h3><ChatContent content={followUp?.furtherReading??''} onNavigate={onNavigate}/>{followUpQuestions.length>0&&<ul className="list-disc space-y-1 pl-5">{followUpQuestions.map(question=><li key={question}>{question}</li>)}</ul>}</section>}
     {planEdit?.goalId===conversation.activeGoalId&&<div ref={editReview} tabIndex={-1}><HomeBundleChatReview target={planEdit} preview={editPreview} text={input} busy={chatLoading||!planEditReady||!conversation.saved} notice={editNotice} onClose={()=>{setPlanEdit(null);setEditPreview(null);setEditNotice('');focusQuestion();}}/></div>}
 
