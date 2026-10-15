@@ -52,7 +52,7 @@ test('missing and unsupported selections remain distinct and never substitute co
   assert.match(reply.answer,text.includes('2025')?/unknown/:/not supported/);
  }
  const {request}=chatSeriesFixture('Monthly turnover'),first=await run(request);
- const scope=await run(follow(request,first,'What about Engineering?'));assert.match(scope.answer,/not supported/);assert.deepEqual(scope.charts,[]);
+ const scope=await run(follow(request,first,'What about turnover in Engineering?'));assert.match(scope.answer,/not supported/);assert.deepEqual(scope.charts,[]);
 });
 test('YTD uses verified summary only, annual remains ambiguous, missing annualized stays unknown',async()=>{
  const {request}=chatSeriesFixture('Voluntary turnover YTD'),reply=await run(request);

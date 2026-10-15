@@ -14,6 +14,7 @@ const topic=/\b(?:turnover|attrition)\b/i;
 const rate=(v:unknown):v is number=>typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=100;
 const filters=(r:SolutionRequest)=>JSON.stringify([r.filters.country,r.filters.org,r.filters.level]);
 const answerId=(r:SolutionRequest)=>'reply-'+r.requestId.slice(0,70);
+const selectionRemainder=(text:string)=>text.replace(monthPattern,' ').replace(/\b(?:year.to.date|company.wide|whole company|all company)\b/g,' ').replace(/\b(?:whats|what|is|are|how|does|do|the|our|company|we|us|looking|look|like|doing|show|me|tell|about|and|or|please|just|only|now|instead|actually|make|it|for|in|over|turnover|attrition|rate|rates|trend|trends|monthly|voluntary|total|overall|ytd|annual|yearly|annualized|annualised|latest|available|recorded|periods|months|versus|vs|compare|with|to|through)\b/g,' ').replace(/[\s.,?!:;%()\u2013\u2014-]/g,'');
 
 /** Selection only, never stored evidence. Unknown/old contexts cannot authorize a follow-up. */
 function previousSelection(request:SolutionRequest,grounding:Grounding|undefined):Selection|undefined {
@@ -27,8 +28,9 @@ export function turnoverIntent(question:string,availableMonths:string[],previous
  const text=question.toLowerCase().replace(/[’']/g,'');
  const explicit=topic.test(text);
  const follow=/^(?:(?:and|what about|how about|show|show me|just|only|now|instead|actually|make it|for|in|please)\s+)*(?:voluntary|total|overall|monthly|ytd|year.to.date|annual(?:ized|ised)?|20\d{2}|january|february|march|april|may|june|july|august|september|october|november|december|company.wide)\b/.test(text);
- const scopeFollow=!!previous&&/^(?:and |what about |how about |just |only |now |for |in )/i.test(text);
- if(!explicit&&!follow&&!scopeFollow)return {kind:'other'};
+ // A previous turnover answer does not make an arbitrary "what about ..." a
+ // turnover request. Inherit only a complete, bounded measure/period selection.
+ if(!explicit&&(!follow||selectionRemainder(text)))return {kind:'other'};
  // Planning, causality and other named metrics belong to the existing richer conversation.
  if(/\b(?:why|cause|investigate|highest|lowest|rank|ranking|reduce|improve|plan|target|forecast|predict|headcount|hires|hiring|salary|pay|engagement|retention|skills|learning|mentoring|feedback|revenue|performance|promotion|promotions)\b/.test(text))return {kind:'other'};
  if(/\b(?:involuntary|regrettable|non[ -]?voluntary|exits?|count)\b/.test(text))return {kind:'unsupported',answer:'This turnover chart supports total or voluntary monthly rates. That requested measure is not supported here.'};
@@ -46,12 +48,14 @@ export function turnoverIntent(question:string,availableMonths:string[],previous
   else {const month=String(monthNames.indexOf(match[3])+1).padStart(2,'0');const candidates=[...new Set(availableMonths.filter(m=>m.endsWith('-'+month)))];if(match[4])months.push(match[4]+'-'+month);else if(candidates.length===1)months.push(candidates[0]);else ambiguous=true;}
  }
  if(ambiguous)return {kind:'clarify',answer:'Which year do you mean for those months? I cannot resolve it from the available turnover observations.'};
- if(matches.length===2&&/^(?:\s*(?:to|through|–|—)\s*)$/.test(text.slice(matches[0].index!+matches[0][0].length,matches[1].index))&&months.length===2){
+ // Inspect only the separator BETWEEN complete month matches. ISO date hyphens
+ // remain inside their matches and cannot accidentally become range separators.
+ if(matches.length===2&&/^\s*(?:to|through|-|\u2013|\u2014)\s*$/.test(text.slice(matches[0].index!+matches[0][0].length,matches[1].index))&&months.length===2){
   const [start,end]=months;if(start>end)return {kind:'clarify',answer:'Please give the monthly range in chronological order.'};
   const cursor=new Date(start+'-01T00:00:00Z');months.length=0;
   while(cursor.toISOString().slice(0,7)<=end&&months.length<4){months.push(cursor.toISOString().slice(0,7));cursor.setUTCMonth(cursor.getUTCMonth()+1);}
  }
- const rest=text.replace(monthPattern,' ').replace(/\b(?:year.to.date|company.wide|whole company|all company)\b/g,' ').replace(/\b(?:whats|what|is|are|how|does|do|the|our|company|we|us|looking|look|like|doing|show|me|tell|about|and|or|please|just|only|now|instead|actually|make|it|for|in|over|turnover|attrition|rate|rates|trend|trends|monthly|voluntary|total|overall|ytd|annualized|annualised|latest|available|recorded|periods|months|versus|vs|compare|with|to|through)\b/g,' ').replace(/[\s.,?!:;%()–—-]/g,'');
+ const rest=selectionRemainder(text);
  if(rest){if(!explicit&&!previous)return {kind:'other'};return {kind:'unsupported',answer:'That scope or time selection is not supported by this company-wide turnover view. I can show the available company monthly total or voluntary rates; subgroup rates and other time windows need separate verified evidence.'};}
  if(!explicit&&!previous)return {kind:'clarify',answer:'Which turnover measure and period do you mean? Please specify monthly total or voluntary turnover and the months.'};
  if(months.length>3)return {kind:'unsupported',answer:'This view supports up to three available monthly observations at a time. Please choose up to three months.'};
