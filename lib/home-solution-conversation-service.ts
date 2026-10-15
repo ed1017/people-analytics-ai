@@ -14,6 +14,8 @@ import {readStaffingScenario,converseStaffingScenario} from './home-staffing-sce
 import {hiringBudgetTool,currentHiringBudget,hiringBudgetView,editHiringBudget} from './home-hiring-budget.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {answerEvidenceSeries,type ChatEvidenceSeries} from './chat-evidence-series.ts';
+// @ts-expect-error Native fixtures share source.
+import {turnoverChatReply,clearTurnoverChat,retainTurnoverChat} from './home-turnover-chat.ts';
 // @ts-expect-error Native Node tests share application source.
 import {hasExplicitStaffingRequirement,retainStaffingDeliveryTarget,requiredStaffingTool,currentRequiredStaffing,requiredStaffingView,editRequiredStaffing,requiresRequiredStaffing,canCompleteRequiredStaffingAlone,requiredStaffingAnswer} from './home-required-staffing.ts';
 import type {verifySolutionEvidence} from './home-solution-grounding.mjs';
@@ -86,6 +88,15 @@ export function solutionModelContext(request:SolutionRequest,progress?:GoalProgr
 export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,signal:AbortSignal):Promise<SolutionReply>{
  const original=readSolutionRequest(raw),request=structuredClone(original),state=request.state;
  abort(signal);
+ const turnover=!runtime.staffingScenarioOnly&&!runtime.demand?turnoverChatReply(request,runtime.grounding):null;
+ clearTurnoverChat(state);
+ if(turnover){
+  const {answer,chartQuestion,context}=turnover;
+  retainTurnoverChat(state,context);
+  state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:answer}].slice(-32);
+  state.questions=[];
+  return {requestId:request.requestId,answer,candidateIds:[],analysisIds:[],charts:chartQuestion?answerEvidenceSeries(request.evidence,runtime.grounding,request.requestId,chartQuestion,answer):[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
+ }
  if(runtime.natural&&(hasExplicitStaffingRequirement(request.message.text)||requiresRequiredStaffing(request)||state.requiredStaffing||state.staffingDeliveryTarget||state.constraints.some(c=>c.field==='horizon_months'&&c.action==='set'))){
   const captured=captureStaffingDelivery(request.message,!!state.staffingDeliveryTarget?.issue);
   if(captured){
