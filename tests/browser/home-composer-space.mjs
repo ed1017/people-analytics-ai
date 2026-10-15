@@ -1,3 +1,4 @@
+import {openHomeQuestionIdeas} from './home-entry-disclosures.mjs';
 // Built Home composer geometry with intercepted aggregate responses; no live calls.
 import assert from 'node:assert/strict';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright'),base=process.env.HOME_BASE_URL??'http://127.0.0.1:3150';
@@ -5,7 +6,7 @@ const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['-
 try{for(const [mode,width,height] of [['wide',1721,1000],['desktop',1366,900],['mobile',390,900],['reflow',683,450]]){
  const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),errors=[];let posts=0;page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/*',route=>{const req=route.request(),url=new URL(req.url());if(url.origin!==base)return route.abort();if(url.pathname.startsWith('/api/')){if(req.method()!=='GET'){posts++;return route.abort()}return route.fulfill({json:{overview:{headcount:100,fte:100,open_positions:3,snapshot_date:'2026-09-30'},summary:{current_workforce:100}}})}return route.continue()});
- await page.goto(base);const input=page.getByLabel('Ask Workforce AI',{exact:true}),dock=page.locator('.home-composer-dock'),send=page.getByRole('button',{name:'Send overview question'});await input.waitFor();const phone=width<768||(width<=950&&height<=500);
+ await page.goto(base);const input=page.getByLabel('Ask Workforce AI',{exact:true}),dock=page.locator('.home-composer-dock'),send=page.getByRole('button',{name:'Send overview question'});await input.waitFor();await openHomeQuestionIdeas(page);const phone=width<768||(width<=950&&height<=500);
  check(mode+' empty-state reserve has no raised box while composer and controls remain',await page.locator('.home-chat-form').evaluate(el=>{const style=getComputedStyle(el),slot=el.querySelector('.home-composer-slot'),dock=el.querySelector('.home-composer-dock');return style.boxShadow==='none'&&style.backgroundColor==='rgba(0, 0, 0, 0)'&&getComputedStyle(slot).boxShadow==='none'&&getComputedStyle(dock).boxShadow!=='none'})&&await input.inputValue()===''&&await page.getByRole('button',{name:'What skills are we missing?',exact:true}).isVisible()&&await send.count()===1);
  const geometry=()=>input.evaluate(el=>({height:el.getBoundingClientRect().height,width:el.getBoundingClientRect().width,client:el.clientHeight,scroll:el.scrollHeight,font:getComputedStyle(el).fontSize,rows:el.rows}));
  let g=await geometry();check(mode+' empty input has three rows and comfortable minimum without font inflation',g.height>=112&&g.rows===3&&g.font==='16px'&&g.scroll<=g.client);

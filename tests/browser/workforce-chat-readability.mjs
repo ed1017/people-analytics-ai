@@ -1,3 +1,4 @@
+import {openHomeQuestionIdeas} from './home-entry-disclosures.mjs';
 // Real app shell with every API intercepted. Never calls a model or a database.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -18,7 +19,7 @@ try {for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844],[
  page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(20000);
  await page.route('**/*',route=>{const req=route.request(),url=new URL(req.url());if(url.origin!==base)return route.abort();if(url.pathname==='/api/chat'){if(req.postDataJSON().summaryOnly)return route.fulfill({json:{answer:'Synthetic goal summary.'}});calls++;return route.fulfill({json:{answer,nextStep:'none'}});}if(url.pathname.startsWith('/api/'))return route.fulfill({json:url.pathname==='/api/dashboard'?scopeDashboard(url.search):url.pathname==='/api/workforce'?workforce:scopeEnterprise[url.pathname.slice(5)]??{}});return route.continue();});
  const check=(name,pass)=>{assert.ok(pass,mode+' '+name);checks.push(mode+' '+name);console.log('PASS '+mode+' '+name);};
- await page.goto(base);await dismissHomeOnboarding(page);
+ await page.goto(base);await dismissHomeOnboarding(page);await openHomeQuestionIdeas(page);
  const input=page.getByLabel('Ask Workforce AI',{exact:true}),send=page.getByRole('button',{name:'Send overview question',exact:true});
  check('header controls stay inside the viewport',await page.locator('.home-workspace > section > header button').evaluateAll(nodes=>nodes.every(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth;})));
  check('Workforce AI heading is prominent',await page.locator('#overall-overview-heading').evaluate(el=>parseFloat(getComputedStyle(el).fontSize)>=24));
@@ -57,7 +58,7 @@ try {for(const [mode,width,height] of [['desktop',1440,1000],['phone',390,844],[
  for(const item of homeStarterGroups.flatMap(group=>group.prompts)){
   const context=await browser.newContext({viewport:{width:390,height:844}}),page=await context.newPage(),sent=[];
   await page.route('**/*',route=>{const req=route.request(),url=new URL(req.url());if(url.origin!==base)return route.abort();if(url.pathname==='/api/chat'){sent.push(req.postDataJSON());return route.fulfill({json:{answer:'Review the known inputs and editable assumptions before choosing a plan.',nextStep:'none'}});}if(url.pathname.startsWith('/api/'))return route.fulfill({json:url.pathname==='/api/dashboard'?scopeDashboard(url.search):scopeEnterprise[url.pathname.slice(5)]??{}});return route.continue();});
-  await page.goto(base);await dismissHomeOnboarding(page);const input=page.getByLabel('Ask Workforce AI',{exact:true});await input.fill('Keep my draft');
+  await page.goto(base);await dismissHomeOnboarding(page);await openHomeQuestionIdeas(page);const input=page.getByLabel('Ask Workforce AI',{exact:true});await input.fill('Keep my draft');
   await page.getByRole('button',{name:item.label,exact:true}).click();await page.locator('[aria-label="Overview conversation"] .home-answer').last().waitFor();
   assert.equal(sent.length,1,item.label+' sends once');assert.equal(sent[0].message.split('\n\n')[0],item.prompt,item.label+' sends exact prompt');assert.equal(await input.inputValue(),'Keep my draft',item.label+' preserves the draft');checks.push('click-to-send: '+item.label);console.log('PASS click-to-send: '+item.label);await context.close();
  }

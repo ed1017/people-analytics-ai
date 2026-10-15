@@ -1,3 +1,4 @@
+import {openHomeWorkforceSummary} from './home-entry-disclosures.mjs';
 // Isolated real app + synthetic read fixtures. No external, AI or hosted mutation requests.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -36,7 +37,7 @@ try{for(const width of [1440,390]){
  const area=page.getByRole('region',{name:'Workload capacity planning',exact:true}),saved=area.getByRole('region',{name:'Saved capacity scenarios',exact:true});
  const input=name=>area.getByLabel(name,{exact:true});
  async function advanced(){const summary=page.getByText('Your demand & capacity scenarios',{exact:true});if(!await area.isVisible())await summary.click();await area.waitFor();}
- async function home(){if(width<768)await page.getByRole('button',{name:'Open navigation',exact:true}).click();await page.getByRole('button',{name:'Overview',exact:true}).click();await page.getByRole('region',{name:'Workforce planning overview',exact:true}).waitFor();}
+ async function home(){if(width<768)await page.getByRole('button',{name:'Open navigation',exact:true}).click();await page.getByRole('button',{name:'Overview',exact:true}).click();await openHomeWorkforceSummary(page);}
  async function planner(){await page.getByRole('button',{name:/Set demand & plan|Continue your scenarios/,exact:true}).click();await advanced();}
  async function calculate(){await area.getByRole('checkbox',{name:/I confirm/}).check();await area.getByRole('button',{name:'Calculate capacity',exact:true}).click();await area.getByText('Calculated from your assumptions',{exact:true}).waitFor();}
  async function save(name){await input('Capacity scenario name').fill(name);await saved.getByRole('button',{name:'Save scenario',exact:true}).click();await saved.getByRole('status').filter({hasText:`Saved “${name}”`}).waitFor();}

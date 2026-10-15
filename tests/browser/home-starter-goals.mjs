@@ -1,3 +1,4 @@
+import {openHomeQuestionIdeas} from './home-entry-disclosures.mjs';
 import {dismissHomeOnboarding} from './dismiss-home-onboarding.mjs';
 // Production UI; synthetic source and chat fixtures, no live model/data requests.
 import assert from 'node:assert/strict';
@@ -18,7 +19,7 @@ async function open(width=390,missing=false){
  if(url.pathname==='/api/chat'){const body=request.postDataJSON();posts.push(body);if(body.message==='Prepare coordinated solution bundles for my exact pinned goal.')return route.fulfill({status:502,json:{error:'Synthetic preparation unavailable; pinned goal remains saved.'}});
  return route.fulfill({json:{answer:homeForecastAnswer(body.message)??'Review current recorded evidence for this question. [W1] Causes and intervention effects remain unknown.',nextStep:'none',candidateProposal:null,findingFollowups:[]}})}
  if(url.pathname.startsWith('/api/')){if(missing&&['/api/attrition','/api/survey-sentiment','/api/talent-acquisition'].includes(url.pathname))return route.fulfill({status:503,json:{error:'Synthetic unavailable'}});return route.fulfill({json:url.pathname==='/api/dashboard'?scopeDashboard(url.search):({'/api/workforce':workforce,'/api/attrition':attrition,'/api/survey-sentiment':survey,'/api/talent-acquisition':talent,'/api/career-growth-mobility':career}[url.pathname]??{})})}return route.continue()});
- await page.goto(base);await dismissHomeOnboarding(page);const input=page.getByLabel('Ask Workforce AI',{exact:true});await input.waitFor();await page.waitForFunction(()=>!document.querySelector('[aria-label="Suggested questions"] button')?.disabled);
+ await page.goto(base);await dismissHomeOnboarding(page);await openHomeQuestionIdeas(page);const input=page.getByLabel('Ask Workforce AI',{exact:true});await input.waitFor();await page.waitForFunction(()=>!document.querySelector('[aria-label="Suggested questions"] button')?.disabled);
  return {context,page,posts,errors,input,external:()=>external,state:()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY)};
 }
 try{
@@ -38,7 +39,7 @@ try{
   check(width+' Pin saves exact goal and context, one preparation only',posts.length===2&&goal.statement===starter.goal&&preparation.goalContext.goal===starter.goal&&preparation.goalContext.notes.some(note=>note.text===item.prompt)&&preparation.goalContext.notes.every(note=>!note.text.includes('Dec 2026 projections')));
   check(width+' pinned discussion follows its Action Plans panel',await page.getByRole('region',{name:'Overview conversation',exact:true}).evaluate(node=>Boolean(document.querySelector('[aria-label="Action Plans for your goal"]').compareDocumentPosition(node)&Node.DOCUMENT_POSITION_FOLLOWING)));
   check(width+' existing demo snapshots remain untouched',Object.keys(before.workspaces).every(key=>JSON.stringify(saved.workspaces[key])===JSON.stringify(before.workspaces[key])));
-  await page.getByLabel('Selected goal',{exact:true}).selectOption('');await page.getByRole('button',{name:'Reset conversation',exact:true}).click();await page.getByRole('region',{name:'Suggested questions',exact:true}).getByRole('button',{name:item.label,exact:true}).click();await pin.waitFor();await pin.click();await page.getByText('This goal is already saved. Select it from your goals to continue; your draft is retained.',{exact:true}).waitFor();
+  await page.getByLabel('Selected goal',{exact:true}).selectOption('');await page.getByRole('button',{name:'Reset conversation',exact:true}).click();await openHomeQuestionIdeas(page);await page.getByRole('region',{name:'Suggested questions',exact:true}).getByRole('button',{name:item.label,exact:true}).click();await pin.waitFor();await pin.click();await page.getByText('This goal is already saved. Select it from your goals to continue; your draft is retained.',{exact:true}).waitFor();
   check(width+' repeat starter prevents duplicate goal or preparation',posts.length===3&&(await state()).goals.goals.length===before.goals.goals.length+1&&!(await state()).goals.activeId);
   await context.close();
  }

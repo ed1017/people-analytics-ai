@@ -1,3 +1,4 @@
+import {openHomeQuestionIdeas} from './home-entry-disclosures.mjs';
 /** Full client app, intercepted HTTP fixture only; no server, model or database. */
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -98,7 +99,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
  if(mode==='mobile')await button('Open navigation')[click]();
  await button('Action Planning')[click]();await chat.waitFor();
  check(mode+' existing instructions data link and Home return preserve saved goals',JSON.stringify((await state()).goals)===demoGoals&&requests.length===0);
- const starter=homeStarterGroups.flatMap(group=>group.prompts)[0];await page.getByRole('group',{name:homeStarterGroups[0].label,exact:true}).locator('summary')[click]();await button(starter.label)[click]();await page.getByText('This ordinary question is answered directly without new proposals.',{exact:true}).filter({visible:true}).first().waitFor();
+ await openHomeQuestionIdeas(page);const starter=homeStarterGroups.flatMap(group=>group.prompts)[0];await page.getByRole('group',{name:homeStarterGroups[0].label,exact:true}).locator('summary')[click]();await button(starter.label)[click]();await page.getByText('This ordinary question is answered directly without new proposals.',{exact:true}).filter({visible:true}).first().waitFor();
  check(mode+' prompt click sends once without mode or pin',requests.length===1&&requests[0].message.text===starter.prompt&&!requests[0].goal.id);
  await button('Reset conversation')[click]();
  for(const [kind,question] of [['turnover',turnoverQuestion],['product',productQuestion]]){

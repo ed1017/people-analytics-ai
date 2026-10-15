@@ -1,3 +1,4 @@
+import {openHomeQuestionIdeas} from './home-entry-disclosures.mjs';
 // Built application, isolated browser state and synthetic transport. No provider calls.
 // A fresh Home visit intentionally opens a native modal. Dismiss it through its
 // visible Close control before hit-testing starter buttons; do not bypass it.
@@ -35,9 +36,9 @@ try{for(const [mode,width,height] of [['wide',1844,1100],['desktop',1366,900],['
   check(mode+' '+label+' actual pointer hit target',g.receivesPointer&&!g.modal);
   await locator[touch?'tap':'click']();
  };
- const reset=async()=>{await activate(button('Reset conversation'),'reset');await button(items[0].label).waitFor();};
+ const reset=async()=>{await activate(button('Reset conversation'),'reset');await openHomeQuestionIdeas(page);await button(items[0].label).waitFor();};
  const sendStarter=async(item,label,keyboard=false)=>{
-  const before=posts.length,target=button(item.label);
+  await openHomeQuestionIdeas(page);const before=posts.length,target=button(item.label);
   if(keyboard){await target.focus();await page.keyboard.press('Enter');}else await activate(target,label);
   await page.getByRole('region',{name:'Overview conversation',exact:true}).getByText(`Synthetic pointer response ${before+1}.`,{exact:true}).waitFor();
   check(mode+' '+label+' submits exactly once',posts.length===before+1&&posts.at(-1).message===item.prompt);
@@ -45,17 +46,17 @@ try{for(const [mode,width,height] of [['wide',1844,1100],['desktop',1366,900],['
  };
  await page.goto(base+'/?page=home');await dialog.waitFor();
  await page.waitForFunction(()=>!document.querySelector('[aria-controls="home-starting-instructions"]')?.disabled);
- const initial=await geometry(button(satisfaction.label));evidence.push({mode,label:'first-visit-modal',...initial});
+ const initial=await geometry(page.getByLabel('Ask Workforce AI',{exact:true}));evidence.push({mode,label:'first-visit-modal',...initial});
  check(mode+' fresh instructions are a native modal',await dialog.evaluate(node=>node.open&&node.matches(':modal')));
- if(initial.rect.top>=0&&initial.rect.bottom<=height)check(mode+' modal owns background starter hit point',initial.hitDialog==='home-starting-instructions'&&!initial.receivesPointer);
- await button(satisfaction.label).focus();
+ if(initial.rect.top>=0&&initial.rect.bottom<=height)check(mode+' modal owns background composer hit point',initial.hitDialog==='home-starting-instructions'&&!initial.receivesPointer);
+ await page.getByLabel('Ask Workforce AI',{exact:true}).focus();
  check(mode+' background focus cannot bypass native modal',await dialog.evaluate(node=>node.contains(document.activeElement)));
  await page.keyboard.press('Enter');
  check(mode+' background keyboard attempt cannot send',posts.length===0&&await dialog.isVisible());
  await page.screenshot({path:`${output}/${mode}-instructions.png`});
  const close=button('Close instructions');await close[touch?'tap':'click']({trial:true});
  check(mode+' Close is a real hit-tested target',(await geometry(close)).receivesPointer);
- await close[touch?'tap':'click']();await dialog.waitFor({state:'hidden'});
+ await close[touch?'tap':'click']();await dialog.waitFor({state:'hidden'});await openHomeQuestionIdeas(page);
  check(mode+' five exact planning openers and three unchanged challenges',await page.getByRole('group',{name:'Strategic Workforce Planning',exact:true}).getByRole('button').count()===5&&await page.getByRole('group',{name:'Workforce challenges',exact:true}).getByRole('button').count()===3&&await page.getByText('Skills & growth',{exact:true}).count()===0);
  await page.screenshot({path:`${output}/${mode}-starters.png`,fullPage:true});
  await page.waitForFunction(key=>localStorage.getItem(key)==='1',HOME_INSTRUCTIONS_DISMISSED_KEY);
