@@ -44,7 +44,7 @@ export function CapacityWorkspace(){
   catch(error){setSession({...session,result:null,cost:null,capture:null,error:error instanceof Error?error.message:'Check your inputs.'});}
   requestAnimationFrame(()=>feedback.current?.focus());
  }
- return <section aria-label="Workload capacity planning" className="@container/capacity space-y-4">
+ return <section aria-label="Workload capacity planning" className="capacity-workspace @container/capacity space-y-4">
   <p className="text-sm text-muted-foreground">Enter the work and the team you expect to have. Blank numbers stay unknown.</p>
   <SkillClientDemand goalKey={goalKey} onStart={draft=>setSession({draft,result:null,cost:null,error:'',scope:null,capture:null,saveName:''})}/>
   <div className="grid min-w-0 items-start gap-5 grid-cols-1 @min-[48rem]/capacity:grid-cols-[minmax(15rem,0.85fr)_minmax(0,1.65fr)]">
@@ -71,19 +71,17 @@ export function CapacityWorkspace(){
   </form>
   <div className="min-w-0 space-y-4">
   <h3 className="font-semibold">3. Do you have enough?</h3>
-  {isPreview&&<p role="status" className="text-sm">Preview. Confirm and calculate to save or use in Overview.</p>}
-  {isPreview&&draft.scope&&preview.error&&<p role="status" className="text-sm text-destructive">{preview.error}</p>}
+  {isPreview&&draft.scope&&preview.error&&<p className="text-sm text-destructive">{preview.error}</p>}
   <CapacityProjection result={result}/>
   {result&&!isPreview&&<div className="rounded-xl border bg-background p-4" aria-label="Contracted supply cost estimate">
    <p className="text-sm">Estimated monthly workforce cost - final month · {result.points.at(-1)?.month}</p>
    <p className="mt-2 break-words text-xl font-semibold tabular-nums">{formatCapacityCost(cost?.points.at(-1)?.runRateCents)} <span className="text-sm font-normal">USD/month</span></p>
    <p className="mt-2 text-xs text-muted-foreground">User-assumed {formatCapacityCost(cost?.assumptions.rateCents)} USD per contracted FTE per month × contracted FTE supply, rounded to cents. Assignment and productivity do not change this estimate. It is not actual pay, cumulative spend or savings.</p>
   </div>}
-  <div ref={feedback} tabIndex={-1} aria-live="polite" className="rounded-sm focus-visible:ring-2 focus-visible:ring-ring">
-   {error&&<p role="alert" className="text-sm text-destructive">{error}</p>}
-   {!result&&!error&&<p className="text-sm text-muted-foreground">Changing a number clears the previous calculation and confirmation.</p>}
+  <div ref={feedback} tabIndex={-1} aria-label="Capacity calculation feedback" className="rounded-sm focus-visible:ring-2 focus-visible:ring-ring">
+   <p role="alert" aria-atomic="true" className={error?'text-sm text-destructive':'sr-only'}>{error}</p>
+   <p role="status" aria-atomic="true" className={error?'sr-only':'font-medium'}>{error?'':result?.status==='needs-inputs'?'Incomplete - some inputs are unknown':isPreview?'Preview from your current inputs. Confirm and calculate to save or use in Overview.':'Calculated from your assumptions'}</p>
    {result&&<div className="space-y-3">
-    <p className="font-medium">{result.status==='needs-inputs'?'Incomplete - some inputs are unknown':isPreview?'Preview from your current inputs':'Calculated from your assumptions'}</p>
     {result.status==='needs-inputs'&&<p className="text-sm">Fill in the missing numbers, including Timing &amp; capacity assumptions, then confirm and calculate. Known work needs can still be shown while available time is unknown.</p>}
     <p className="text-sm">{result.assumptions.scope.label} · Opening {result.assumptions.opening.asOf}.</p>
     <details className="border-t"><summary className="min-h-11 cursor-pointer py-3 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Monthly detail · people and FTE</summary>

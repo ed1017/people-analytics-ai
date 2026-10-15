@@ -42,11 +42,11 @@ const context={datasetToken:'legacy-v1:0',goalId:'a',goal:'Review capacity'};
 const draft={...draftAdapter.emptyCapacityDraft,scope:scope.label,openingDate:'2026-09-30',people:'10',fte:'8',volume:'800',effort:'1',hours:'160',hires:'0',exits:'0',allocation:'50',productivity:'0',fullTimeMovements:true,confirmed:true};
 const session={draft,result:engine.calculateMonthlyWorkload(draftAdapter.capacitySpec(draft)),error:'',scope,capture:{inputKey:'previous',binding:{...context,scopeId:scope.id,scopeLabel:scope.label,workUnit:scope.workUnit}}};
 function worksheet(input=session){
- let updated;
+ let updated,focused=0;
  const Saved=()=>React.createElement('section',{'aria-label':'Saved capacity scenarios'});
  const {CapacityWorkspace}=component('components/workforce-planning/capacity-workspace.tsx',{
   '@/lib/capacity-preview':previewLayer,'@/lib/planning-slider':sliderLayer,'@/components/planning-assumption-slider':{PlanningAssumptionSlider},
-  react:{...React,useRef:()=>({current:null})},
+  react:{...React,useRef:()=>({current:{focus(){focused++;}}})},
   '@/lib/swp-capacity-cost':costLayer,'@/lib/swp-monthly-workload':engine,'@/lib/swp-capacity-draft':draftAdapter,
   '@/components/decision-store':{decisionStore:{}},'@/lib/dataset-client.mjs':{datasetSession:{snapshot:()=>context.datasetToken}},
   '@/lib/swp-capacity-store':{capacityContext:()=>context,capacityBinding:(value,identity)=>({...value,scopeId:identity.id,scopeLabel:identity.label,workUnit:identity.workUnit})},
@@ -54,7 +54,7 @@ function worksheet(input=session){
   './skill-client-demand':{SkillClientDemand:()=>null},'./capacity-projection':{CapacityProjection},'./capacity-saved-scenarios':{CapacitySavedScenarios:Saved},
   './planning-session-context':{usePlanningSession:()=>({goalKey:'goal:a',capacitySession:input,setCapacitySession:value=>{updated=value;}})},
  });
- return {tree:CapacityWorkspace(),Saved,updated:()=>updated};
+ return {tree:CapacityWorkspace(),Saved,updated:()=>updated,focused:()=>focused};
 }
 const nodes=tree=>React.isValidElement(tree)?[tree,...React.Children.toArray(tree.props.children).flatMap(nodes)]:[];
 test('compact worksheet keeps saved controls outside its form and monthly detail collapsed',()=>{
@@ -77,8 +77,10 @@ test('compact worksheet captures calculation identity and does not retain it aft
  const previous=globalThis.requestAnimationFrame;globalThis.requestAnimationFrame=callback=>{callback();return 0;};
  try{
   const view=worksheet(),form=nodes(view.tree).find(node=>node.type==='form');form.props.onSubmit({preventDefault(){}});
+  assert.equal(view.focused(),1,'Submitting moves focus to calculation feedback');
   assert.equal(view.updated().capture.inputKey,costLayer.capacityCalculationKey(view.updated().result,view.updated().cost));assert.deepEqual(view.updated().capture.binding,{...context,scopeId:scope.id,scopeLabel:scope.label,workUnit:scope.workUnit});
   const invalid=worksheet({...session,draft:{...draft,fte:'11'}});nodes(invalid.tree).find(node=>node.type==='form').props.onSubmit({preventDefault(){}});
+  assert.equal(invalid.focused(),1,'Invalid submission also moves focus to feedback');
   assert.equal(invalid.updated().result,null);assert.equal(invalid.updated().capture,null);assert.match(invalid.updated().error,/exceeds/);
  }finally{if(previous===undefined)delete globalThis.requestAnimationFrame;else globalThis.requestAnimationFrame=previous;}
 });
@@ -97,7 +99,12 @@ test('saved comparison labels recurring month differences separately and ignores
    '@/lib/swp-capacity-cost':costLayer,'@/lib/swp-capacity-store':capacityStore,'@/lib/swp-capacity-record':capacityRecord,
    './planning-session-context':{usePlanningSession:()=>({goalKey:'goal:a',capacitySession:{...session,saveName:'Unsaved draft name'},setCapacitySession:()=>{}})},
   });
-  const html=renderToStaticMarkup(React.createElement(CapacitySavedScenarios));
+  const tree=CapacitySavedScenarios(),all=nodes(tree),html=renderToStaticMarkup(tree);
+  const announcement=all.find(n=>n.props.role==='status'&&String(n.props.children).startsWith('Comparing '));
+  assert(announcement);assert.equal(announcement.props['aria-atomic'],'true');
+  assert(!nodes(announcement).some(n=>n.type==='table'));
+  assert.equal(all.find(n=>n.props['aria-label']==='Saved capacity comparison').props.tabIndex,0);
+  assert.equal(all.find(n=>n.props.role==='alert').props.children,'');
   assert.match(html,new RegExp('Opening assumption differences: '+openingCount+'\\.'));
   assert.match(html,/value="Unsaved draft name"/);assert.match(html,/Month-level assumption differences: 3\./);assert.match(html,/A recurring change counts once per month/);
  }
@@ -128,4 +135,19 @@ test('role FTE labels retain full-time guidance, bounds and unknown input instru
  for(const label of ['FTE per current role','FTE per new role'])assert.match(html,new RegExp(label+'<input[^>]*min="0" max="1"'));
  assert.equal((html.match(/Use 1 for full-time or 0.5 for half-time/g)||[]).length,2);
  assert.match(html,/Leave unknown inputs blank/);assert.match(html,/Whole planning period/);assert.deepEqual(review,before);
+});
+
+
+test('calculation live feedback excludes changing tables and retains an empty alert before errors',()=>{
+ for(const input of [session,{...session,result:null,draft:{...draft,confirmed:false}},{...session,result:null,error:'Contracted FTE exceeds people.'}]){
+  const tree=worksheet(input).tree,all=nodes(tree);
+  const feedback=all.find(n=>n.props['aria-label']==='Capacity calculation feedback');
+  assert.equal(feedback.props.tabIndex,-1);assert.equal(feedback.props['aria-live'],undefined);
+  const live=all.filter(n=>['status','alert'].includes(n.props.role));
+  assert.equal(live.length,2);
+  for(const region of live){assert.equal(region.props['aria-atomic'],'true');assert(!nodes(region).some(n=>['table','details'].includes(n.type)));}
+  const alert=live.find(n=>n.props.role==='alert'),status=live.find(n=>n.props.role==='status');
+  assert.equal(alert.props.children,input.error);
+  assert.match(status.props.children,input.error?/^$/:input.result?/Calculated from your assumptions/:/Preview.*Confirm and calculate/);
+ }
 });

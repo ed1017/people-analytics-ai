@@ -762,3 +762,10 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
   .evidence-chart { height: clamp(16rem, 60cqi, 18rem); }
   .home-secondary-entry { padding-bottom: 20px; }
 }
+
+/* Keep keyboard location visible in compact controls and scrollable results. */
+.capacity-workspace :is(button, input, select, summary, [tabindex]):focus-visible,
+.global-workforce-filters :is(button, select, summary):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
