@@ -56,3 +56,18 @@ test('new support destinations round-trip without dropping scope or goal URL sta
     assert.match(href, /country=UK&goal=existing/);
   }
 });
+
+test('compact tiles retain complete long labels and allow text to wrap without clipping', () => {
+  const html = render({});
+  for (const question of planningQuestions) assert.ok(html.includes(question));
+  const css = fs.readFileSync('components/home-chat-shell.module.css', 'utf8');
+  const tileRules = [...css.matchAll(/\.questions button(?:\s*>\s*span)?\s*\{([^}]+)\}/g)].map(match => match[1]);
+  assert.ok(tileRules.length >= 3, 'desktop, label, and narrow-screen sizing are covered');
+  for (const rule of tileRules) {
+    assert.doesNotMatch(rule, /(?:^|;)\s*(?:height|max-height)\s*:|overflow\s*:\s*hidden|white-space\s*:\s*nowrap|text-overflow\s*:\s*ellipsis/);
+  }
+  assert.match(css, /\.questions button > span\s*\{[^}]*min-width:\s*0;[^}]*overflow-wrap:\s*anywhere/);
+  assert.match(css, /\.questions button\s*\{[^}]*justify-content:\s*center;[^}]*text-align:\s*left;/);
+  assert.match(css, /\.metrics\s*\{[^}]*grid-template-columns:\s*repeat\(3,/);
+  assert.match(css, /\.questions\s*\{[^}]*grid-template-columns:\s*repeat\(2,/);
+});
