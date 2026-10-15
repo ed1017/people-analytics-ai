@@ -36,10 +36,10 @@ export function HomePlanPane({onNavigate, onExample, children}: Navigate & {onEx
   const storage = useDecisionStorage();
   const goal = storage.data.goals.goals.find(item => item.id === storage.data.goals.activeId);
   return <aside aria-label="Your plan" className={styles.planPane}>
-    <h2>Your plan</h2><p>Builds here as you go</p>
-    <section aria-label="Current plan"><h3>{!storage.ready ? 'Loading saved work…' : goal ? 'Selected goal' : 'No goal selected yet'}</h3>{goal && <p className="mt-2 break-words text-sm">{goal.statement}</p>}<p className="mt-2 text-xs leading-relaxed text-muted-foreground">Review assumptions and save a plan when ready. Visiting a step does not mark it complete.</p><button type="button" onClick={() => onNavigate('action-plans')}>Review saved Action Plans →</button><button type="button" onClick={() => onNavigate('plan-track')}>Review dated progress →</button></section>
+    <h2>Your plan</h2>
+    <section aria-label="Current plan"><h3>{!storage.ready ? 'Loading saved work…' : goal ? 'Selected goal' : 'No goal selected yet'}</h3>{goal && <p className="mt-2 break-words text-sm">{goal.statement}</p>}<button type="button" onClick={() => onNavigate('action-plans')}>Review saved Action Plans →</button><button type="button" onClick={() => onNavigate('plan-track')}>Review dated progress →</button></section>
     {children}
-    <section aria-label="Explore data"><h3>Explore data</h3>{planningEvidence.map(item => <button key={item.page} type="button" onClick={() => onNavigate(item.page)}>{item.label}</button>)}</section>
-    {onExample && <section><h3>Need a starting point?</h3><button type="button" onClick={onExample}>Try a guided example</button></section>}
+    <details><summary>Explore supporting data</summary><nav aria-label="Explore data">{planningEvidence.map(item => <button key={item.page} type="button" onClick={() => onNavigate(item.page)}>{item.label}</button>)}</nav></details>
+    {onExample && <section><button type="button" onClick={onExample}>Try a guided example</button></section>}
   </aside>;
 }
