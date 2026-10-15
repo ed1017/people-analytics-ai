@@ -75,7 +75,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,844]]){
  check(mode+' reading neither submits again nor saves',requests.length===1&&JSON.stringify((await state()).goals)===originalGoals);
  check(mode+' keyboard focus and mobile containment',await guide.getByRole('heading',{name:/^Step 3/}).evaluate(n=>n===document.activeElement)&&await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await guide.screenshot({path:path.join(output,mode+'-guide.png')});
- await card.getByRole('button',{name:'Pin Action Plan with unknowns',exact:true}).click();await guide.getByRole('heading',{name:/^Step 5/}).waitFor();
+ await card.getByRole('button',{name:'Save plan',exact:true}).click();await guide.getByRole('heading',{name:/^Step 5/}).waitFor();
  const saved=await state(),id=saved.goals.activeId,catalog=saved.workspaces[id].fields[planAlternativesField];
  check(mode+' explicit pin saves exactly one plan without applying it or submitting',requests.length===1&&catalog.plans.length===1&&catalog.attachments.length===1&&!catalog.plans[0].applied);
  check(mode+' saved original goals and content preserved',original.goals.goals.every(g=>saved.goals.goals.some(n=>n.id===g.id&&n.statement===g.statement)&&JSON.stringify(saved.workspaces[g.id].fields)===JSON.stringify(original.workspaces[g.id].fields)));

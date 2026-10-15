@@ -23,7 +23,7 @@ try{for(const [mode,width,height] of [['desktop',1200,1000],['phone',390,844]]){
  await context.route('**/*',route=>{if(route.request().url()==='http://localhost:3123/')return route.fulfill({contentType:'text/html',body:html});external++;return route.abort();});
  await page.goto('http://localhost:3123/');
  const check=(name,ok)=>{assert.ok(ok,mode+' '+name);checks.push(mode+' '+name);};
- const card=()=>page.locator('article[aria-label="Working proposal: Pilot A"]'),field=()=>card().getByLabel('Participants · Manager check-ins and workload review (people)',{exact:true}),pin=()=>card().getByRole('button',{name:/^Pin Action Plan/});
+ const card=()=>page.locator('article[aria-label="Working proposal: Pilot A"]'),field=()=>card().getByLabel('Participants · Manager check-ins and workload review (people)',{exact:true}),pin=()=>card().getByRole('button',{name:/^Save plan/});
  await card().waitFor();await card().getByText('Edit planning assumptions',{exact:true}).click();await field().fill('17');
  await card().getByText('Open goal form',{exact:true}).click();const goal=card().getByLabel('Goal for this proposal');await goal.fill('My unsaved custom goal');
  check('dirty input blocks Pin before focus changes',await pin().isDisabled());
