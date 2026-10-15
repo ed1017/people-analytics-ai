@@ -75,6 +75,7 @@ export function AppHeader({
             onChange={(event) => onPersonaChange(event.target.value as Persona)}
             className="h-9 min-w-28 cursor-pointer rounded-md border border-input bg-card px-3 pr-8 text-sm font-medium shadow-sm outline-none"
             aria-label="Select persona"
+            aria-describedby="perspective-effect"
           >
             <option value="HR">HR</option>
             <option value="Leader">Leader</option>
@@ -82,6 +83,9 @@ export function AppHeader({
           </select>
           <WorkspacePaletteControl/>
         </div>
+        <p id="perspective-effect" className="col-span-2 text-right text-xs leading-4 text-muted-foreground">
+          {selectedPersona} perspective shapes AI explanations. Figures and calculations stay the same.
+        </p>
       </div>
       {children}
     </header>

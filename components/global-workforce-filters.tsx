@@ -6,6 +6,7 @@ import type { AppPage, DashboardFilterOptions } from "@/lib/types";
 
 type Props = { page?: AppPage; focusedIssue?: ReactNode; options: DashboardFilterOptions; country: string; org: string; level: string; loading: boolean; onCountry: (value: string) => void; onOrg: (value: string) => void; onLevel: (value: string) => void; onReset: () => void };
 export function GlobalWorkforceFilters({ page, options, country, org, level, loading, onCountry, onOrg, onLevel, onReset, focusedIssue }: Props) {
+  const filtersApply = !page || ["home", "overview", "workforce", "career-growth-mobility", "compensation"].includes(page);
   const scopeNote = page === "home" || page === "overview"
     ? "Filters select the workforce snapshot; other evidence keeps its own scope."
     : page === "workforce"
@@ -15,8 +16,8 @@ export function GlobalWorkforceFilters({ page, options, country, org, level, loa
     : page === "compensation"
     ? "Filters select catalog assumptions; filtered pay results are unavailable and cost context stays company-wide."
     : ["planning-overview", "workforce-planning", "scenario-modeling", "position-workforce-design", "workforce-response", "execution-feasibility"].includes(page ?? "")
-    ? "These filters do not narrow planning calculations; use the scenario’s own scope and assumptions."
-    : "This page’s main evidence keeps its own scope.";
+    ? "Workforce filters do not narrow planning calculations. The selected goal guides advice; capacity figures come from the scenario's own scope and entered assumptions."
+    : "Workforce filters are not applied here. This page's main evidence keeps its own scope.";
   const phone=usePhoneLayout();const [expanded,setExpanded]=useState(false);
   const fields=<>
       {([{label: "Country", value:country, options:options.countries, onChange:onCountry, all:"All countries"}, {label:"Business Unit",value:org,options:options.business_units,onChange:onOrg,all:"All business units"}, {label:"Level",value:level,options:options.levels,onChange:onLevel,all:"All levels"}]).map(field=><label key={field.label} className="min-w-0 text-xs text-muted-foreground lg:flex lg:items-center lg:gap-1.5"><span className="block">{field.label}</span><select aria-label={field.label} title={field.options.find(option=>option.value===field.value)?.label ?? field.all} value={field.value} onChange={e=>field.onChange(e.target.value)} className="h-9 w-full min-w-0 rounded-md border border-input bg-card px-1.5 text-sm text-foreground lg:w-36"><option value="all">{field.all}</option>{field.options.map(option=><option key={option.value} value={option.value}>{option.label}</option>)}</select></label>)}
@@ -26,7 +27,7 @@ export function GlobalWorkforceFilters({ page, options, country, org, level, loa
   return <div className="global-workforce-filters border-t px-3 py-1 sm:px-5" role="region" aria-label="Shared workforce filters">
     <div className="workforce-toolbar grid grid-cols-3 items-end gap-x-2 gap-y-1 lg:flex lg:items-start lg:justify-end">
       <div className="workforce-goal col-span-3 min-w-0 lg:mr-auto lg:flex-1">{focusedIssue}</div>
-      {phone?<details className="workforce-filter-disclosure" open={expanded} onToggle={event=>{if(phone)setExpanded(event.currentTarget.open)}}><summary className="min-h-11 cursor-pointer py-3 text-sm">Filters</summary><div className="workforce-filter-fields">
+      {!filtersApply?<details key={page} className="col-span-3 min-w-0 text-xs text-muted-foreground"><summary className="min-h-11 cursor-pointer py-3">Workforce filters — not applied here</summary><p className="pb-2">Selections are retained for pages that support them. Change them on Overview or Workforce.</p><fieldset disabled className="grid grid-cols-3 gap-2 opacity-60">{fields}</fieldset></details>:phone?<details className="workforce-filter-disclosure" open={expanded} onToggle={event=>{if(phone)setExpanded(event.currentTarget.open)}}><summary className="min-h-11 cursor-pointer py-3 text-sm">Filters</summary><div className="workforce-filter-fields">
 {fields}
     </div></details>:fields}</div>
     {page && <p aria-label="Filter applicability" className="py-1 text-xs leading-relaxed text-muted-foreground">{scopeNote}</p>}
