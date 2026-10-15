@@ -589,6 +589,9 @@ async function handlePOST(
       try{capacityPrompt=capacityChatPrompt(body.capacityContext,{datasetToken:datasetRouter.current().token,goalId:body.goalId??'',goal:goalContext.goal});}
       catch{return NextResponse.json({error:'Capacity context changed or is invalid. Calculate again.'},{status:400});}
     }
+    const scopeWording=capacityPrompt
+      ? 'Describe the validated capacity calculation using its explicit user-entered workload scope; do not relabel it company-wide. Other evidence retains its own stated population and scope. Global workforce filters do not narrow manual workload assumptions.'
+      : 'Use company or company-wide in user-facing explanations; internal scope markers do not change the source population.';
     const chatTools=progress?[...peopleAnalyticsTools,goalProgressReadTool]:peopleAnalyticsTools;
     const marketReference=marketCarryEvidence(body?.marketReference);
     if(summaryOnly&&!goalContext.goal.trim())return NextResponse.json({error:"Select a goal before requesting its page takeaway."},{status:400});
@@ -1565,7 +1568,7 @@ ${message}
     let response =
       await datasetAI(() => client.responses.create({
         model: CHAT_MODEL,
-        instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? (prepareHomeGoal ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions : "") + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeAnswerStyle+"\n"+homeInstructions : "\n"+conversationalStyle),
+        instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? (prepareHomeGoal ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions : "") + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\n"+scopeWording+" Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeAnswerStyle+"\n"+homeInstructions : "\n"+conversationalStyle),
         ...(page === "home" ? { text: { format: homeReplyFormat! } } : entryFormat),
         input: page==='home'&&!summaryOnly?homeInput:aiInput,
         tools: chatTools,
@@ -1635,7 +1638,7 @@ ${message}
       response =
         await datasetAI(() => client.responses.create({
           model: CHAT_MODEL,
-          instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? (prepareHomeGoal ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions : "") + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\nUse company or company-wide in user-facing explanations; internal scope markers do not change the source population. Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeAnswerStyle+"\n"+homeInstructions : "\n"+conversationalStyle),
+          instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? (prepareHomeGoal ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions : "") + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\n"+scopeWording+" Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeAnswerStyle+"\n"+homeInstructions : "\n"+conversationalStyle),
           ...(page === "home" ? { text: { format: homeReplyFormat! } } : entryFormat),
           previous_response_id:
             response.id,

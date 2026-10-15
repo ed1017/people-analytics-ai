@@ -77,7 +77,12 @@ test('actual chat POST includes calculator in HR and Leader model inputs; mismat
   const request=sandbox.__requests.at(-1),input=JSON.stringify(request.input);
   for(const value of ['CURRENT WORKLOAD CAPACITY CALCULATOR','Support team - tickets','6.25','1.25','1000','workforceFiltersApplied'])assert.ok(input.includes(value),value);
   assert.match(input,/global workforce filters do not narrow it/);
+  assert.match(request.instructions,/explicit user-entered workload scope; do not relabel it company-wide/);
+  assert.doesNotMatch(request.instructions,/Use company or company-wide in user-facing explanations/);
  }
+ sandbox.__replies.push({status:'completed',output:[],output_text:JSON.stringify({answer:{discussion:'Synthetic answer.'}})});
+ assert.equal((await post({...body,capacityContext:null})).status,200);
+ assert.match(sandbox.__requests.at(-1).instructions,/Use company or company-wide in user-facing explanations/);
  const before=sandbox.__requests.length;
  for(const capacityContext of [{...body.capacityContext,datasetToken:'other:1'},{...body.capacityContext,goalId:'wrong'},{...body.capacityContext,result:{gapFte:99}}])assert.equal((await post({...body,capacityContext})).status,400);
  assert.equal(sandbox.__requests.length,before);
