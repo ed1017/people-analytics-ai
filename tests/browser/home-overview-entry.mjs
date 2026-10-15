@@ -39,8 +39,12 @@ try{for(const width of [1440,390]){
  await page.goto(base);await welcome.getByText('1,240',{exact:true}).waitFor();
  assert.equal(await page.getByRole('dialog',{name:'Home instructions',exact:true}).isVisible(),false,'fresh entry does not obscure the welcome');
  assert.deepEqual(posts,[]);assert.equal(await page.locator('#navigation-analytics').isVisible(),false,'specialist navigation remains secondary');
- assert.deepEqual(await welcome.locator('dd').allTextContents(),['1,240','Not configured','Not configured']);
- assert.equal(await welcome.getByRole('button').count(),4);assert.equal(await welcome.getByRole('img').count(),0,'no invented projection on welcome');
+ assert.deepEqual(await welcome.locator('dd').allTextContents(),['Not available','Not available']);
+ assert.equal(await welcome.getByRole('button').count(),4);
+ const historyChart=welcome.getByRole('img',{name:/Recorded synthetic headcount history/});
+ assert.equal(await historyChart.count(),1);assert.equal(await historyChart.locator('circle').count(),9);
+ assert.match(await historyChart.getAttribute('aria-label'),/2026-01-31: 1180.*2026-09-30: 1240.*No projection/);
+ assert.match(await welcome.innerText(),/Projection not configured/);assert.match(await welcome.innerText(),/Watch: Not assessed/);
  assert.equal(await summary.isVisible(),false,'scenario chart does not precede chat');
  const tiles=await welcome.getByRole('button').all(),boxes=await Promise.all(tiles.map(tile=>tile.boundingBox()));
  assert.ok(boxes.every(Boolean));assert.equal(boxes[0].y,boxes[1].y);assert.equal(boxes[2].y,boxes[3].y);assert.ok(boxes[2].y>boxes[0].y&&boxes[1].x>boxes[0].x,'question tiles retain a two-by-two layout');

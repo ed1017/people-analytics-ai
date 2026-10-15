@@ -17,7 +17,11 @@ try{for(const width of [1440,390]){
  const data=url.pathname==='/api/dashboard'?scopedDashboardResponse({overview:{headcount:100,fte:80,snapshot_date:'2026-09-30'},trend:[{snapshot_date:'2026-09-30',headcount:100,fte:80}],filter_options:{countries:[],business_units:[],levels:[]}},{country:'all',org:'all',level:'all'}):url.pathname==='/api/workforce-planning'?{scenarios:[]}:url.pathname==='/api/scenario-modeler'?{defaults}:url.pathname==='/api/business-unit-scenario'?{defaults,business_units:[]}:null;return route.fulfill(data?{json:data}:{status:503,json:{error:'Synthetic source unavailable'}});});
  await page.goto(base);await page.getByRole('heading',{name:'Workforce Intelligence',exact:true}).waitFor();
  const welcome=page.getByRole('region',{name:'Plan your workforce',exact:true});await welcome.getByText('100',{exact:true}).waitFor();
- assert.deepEqual(await welcome.locator('dd').allTextContents(),['100','Not configured','Not configured']);assert.equal(await welcome.getByRole('button').count(),4);
+ assert.deepEqual(await welcome.locator('dd').allTextContents(),['Not available','Not available']);assert.equal(await welcome.getByRole('button').count(),4);
+ const historyChart=welcome.getByRole('img',{name:/Recorded synthetic headcount history/});
+ assert.equal(await historyChart.locator('circle').count(),1);assert.equal(await historyChart.locator('line').count(),1,'single observation has only an axis, no trend line');
+ assert.match(await historyChart.getAttribute('aria-label'),/2026-09-30: 100.*No projection/);
+ assert.match(await welcome.innerText(),/One recorded snapshot/);assert.match(await welcome.innerText(),/Projection not configured/);assert.match(await welcome.innerText(),/Watch: Not assessed/);
  assert.equal(await page.getByLabel('Ask Workforce AI',{exact:true}).isVisible(),true);
  const action=await welcome.getByRole('button').first().boundingBox();assert(action.y+action.height<=1000,'first question visible in first viewport');
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.screenshot({path:output+'/'+width+'-welcome.png',fullPage:true});

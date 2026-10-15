@@ -16,7 +16,7 @@ const mod = new Module(filename);
 mod.filename = filename;
 mod.require = id => id.endsWith('.module.css') ? {default: {}} : id === '@/lib/dashboard-scope' ? dashboardScope : require(id);
 mod._compile(compiled.outputText, filename);
-const {HomeChatWelcome, planningQuestions} = mod.exports;
+const {HomeChatWelcome, planningQuestions, welcomeHistory} = mod.exports;
 const filters = {country: 'all', org: 'all', level: 'all'};
 const base = {overview: {snapshot_date: '2026-09-30', headcount: 120, fte: 118, voluntary_turnover_ytd_pct: 8.2}, receipt: {version: 1, status: 'verified_rpc', requested: filters, effective: filters}, requested: filters, scopeLabel: 'All workforce', loading: false, error: null, onQuestion: () => {}};
 const render = props => renderToStaticMarkup(React.createElement(HomeChatWelcome, {...base, ...props})).replaceAll('<!-- -->', '');
@@ -25,7 +25,9 @@ test('welcome shows only verified headcount, never turns YTD into annual attriti
   const html = render({});
   assert.match(html, />120</);
   assert.match(html, /2026-09-30/);
-  assert.equal((html.match(/Not configured/g) ?? []).length, 2);
+  assert.equal((html.match(/Not available/g) ?? []).length, 2);
+  assert.match(html, /Projection not configured/);
+  assert.match(html, /Watch: Not assessed/);
   assert.doesNotMatch(html, /8\.2|18%|10,000|Supply vs demand/);
   assert.equal((html.match(/<button/g) ?? []).length, 4);
 });
@@ -68,6 +70,38 @@ test('compact tiles retain complete long labels and allow text to wrap without c
   }
   assert.match(css, /\.questions button > span\s*\{[^}]*min-width:\s*0;[^}]*overflow-wrap:\s*anywhere/);
   assert.match(css, /\.questions button\s*\{[^}]*justify-content:\s*center;[^}]*text-align:\s*left;/);
-  assert.match(css, /\.metrics\s*\{[^}]*grid-template-columns:\s*repeat\(3,/);
   assert.match(css, /\.questions\s*\{[^}]*grid-template-columns:\s*repeat\(2,/);
+});
+
+const history = [{snapshot_date:'2026-07-31',headcount:110,fte:108},{snapshot_date:'2026-08-31',headcount:115,fte:113},{snapshot_date:'2026-09-30',headcount:120,fte:118}];
+const chartMarkup = html => html.match(/<figure[^>]*>([\s\S]*?)<\/figure>/)?.[1] ?? '';
+test('history is dated recorded evidence with an accessible series, never a forecast or inferred flow', () => {
+  const html = render({trend:history});
+  assert.match(html, /role="img" aria-label="Recorded synthetic headcount history in people\. All workforce\./);
+  for (const row of history) assert.ok(html.includes(`${row.snapshot_date}: ${row.headcount}`));
+  assert.equal((chartMarkup(html).match(/<circle/g)??[]).length,3);
+  assert.equal((chartMarkup(html).match(/<line /g)??[]).length,3, 'axis and two adjacent-month segments');
+  assert.match(html,/No projection\./);
+  assert.doesNotMatch(html,/2026-10|5 hires|5 departures/);
+  assert.deepEqual(welcomeHistory([...history].reverse(), '2026-09-30', 120),history);
+});
+test('history rejects malformed, conflicting, future or stale snapshots rather than drawing partial truth', () => {
+  for (const trend of [null,[],[...history,history[0]],history.slice(0,2),[...history.slice(0,2),{...history[2],headcount:119}],[...history,{snapshot_date:'2026-10-31',headcount:130}],history.map((row,index)=>index===0?{...row,snapshot_date:'2026-02-31'}:row),history.map((row,index)=>index===0?{...row,headcount:null}:row)]) {
+    const html=render({trend});
+    assert.doesNotMatch(html,/role="img"/);
+    assert.match(html,/Verified headcount history unavailable/);
+    assert.match(html,/>120</, 'valid current snapshot remains useful');
+  }
+  for(const patch of [{receipt:null},{requested:{...filters,org:'other'}},{loading:true},{error:'Failed'}]) assert.doesNotMatch(render({trend:history,...patch}),/role="img"|2026-07-31: 110/);
+  assert.match(render({loading:true,trend:history}),/Updating workforce history/);
+});
+test('missing months stay disconnected; a single zero observation never becomes a trend', () => {
+  const gap=render({trend:[history[0],history[2]]});
+  assert.equal((chartMarkup(gap).match(/<line /g)??[]).length,1,'axis only across the missing month');
+  assert.equal((chartMarkup(gap).match(/<circle/g)??[]).length,2);
+  const zero=render({overview:{...base.overview,headcount:0},trend:[{...history[2],headcount:0}]});
+  assert.match(zero,/2026-09-30: 0/);
+  assert.match(zero,/One recorded snapshot/);
+  assert.equal((chartMarkup(zero).match(/<line /g)??[]).length,1);
+  assert.doesNotMatch(zero,/NaN|Infinity/);
 });
