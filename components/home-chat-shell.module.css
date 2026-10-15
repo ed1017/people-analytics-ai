@@ -66,3 +66,9 @@
 .kpiRow b { font-size:18px; margin:3px 0; }
 .kpiRow small { font-size:11px; color:var(--muted-foreground); line-height:1.4; }
 @media (max-width:640px) { .kpiRow { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
+/* Keep full monetary values readable without shrinking text or clipping digits. */
+.historySummary { container-type: inline-size; }
+.kpiRow b { white-space: nowrap; }
+@container (max-width: 50rem) { .kpiRow { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (max-width: 28rem) { .kpiRow { grid-template-columns: minmax(0, 1fr); } }
