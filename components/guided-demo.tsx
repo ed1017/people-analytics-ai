@@ -23,7 +23,7 @@ const conversationSteps=[
  ['Review the retention example','Start a separate example conversation. Your current conversation and draft are kept. Send only when you are ready.'],
  ['Describe the goal in chat','Review the example question, then use the actual Send button. A useful reply can propose approaches without saving a goal yet.'],
  ['Explore and refine the approach','In the proposed plan, review the owner, baseline, target and review date. Keep unverified values unknown and ask in chat about gaps. Activities completed are not measured outcomes. Say what to keep or change, or ask for another approach.'],
- ['Pin an Action Plan','Review the plan’s goal, actions, success measure and unknowns, then choose Pin Action Plan. The plan and goal are saved together; pinning does not apply the plan.'],
+ ['Save an Action Plan','Review the plan’s goal, actions, success measure and unknowns, then choose Save plan. The plan and goal are saved together; saving does not apply the plan.'],
  ['Refine your selected plan in chat','Describe another adjustment and Send. Reuse the known context; mention only what should change. The original proposal stays attached.'],
  ['Pin the revised Action Plan','Review the new proposal and its unknowns, then pin it. Both versions remain with their goal and progress history.'],
 ] as const;

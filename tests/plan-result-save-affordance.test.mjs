@@ -30,6 +30,21 @@ test('incomplete mocked reply explains why save is unavailable without inventing
  assert.match(html,/Plan cannot be saved yet/);assert.match(html,/Clarify the operational role slice/);
  assert.equal(nodes(tree).filter(n=>n.type==='button'&&String(n.props.children).startsWith('Save plan')).length,0);
 });
+test('no-gap calculation explains there is no staffing plan to save and offers no save action',async()=>{
+ const state=await journey(),business=state.businessPlanning;
+ // Local scenario fixture: sufficient capacity, recalculated by the real kernels.
+ business.review.spec.availabilityPct.value=100;
+ business.review.result=demand.calculateServiceDemand(business.review.spec);
+ business.staffing.result=staffing.calculateServiceStaffing(business.review,business.staffing.inputs);
+ assert.equal(business.review.result.additionalRoles,0);
+ assert.equal(business.staffing.result.status,'no-gap');
+ const calls=[],tree=harness({state,canSend:true,reviewBusinessOption:()=>calls.push('review'),saveBusinessOption:()=>calls.push('save')})();
+ const html=renderToStaticMarkup(tree);
+ assert.match(html,/No staffing plan to save: the calculated workload has no positive gap\./);
+ assert.doesNotMatch(html,/Plan cannot be saved yet|Choose an option to review below/);
+ assert.equal(nodes(tree).some(n=>n.type==='button'&&/^(Save plan|Review to save:)/.test(String(n.props.children))),false);
+ assert.deepEqual(calls,[]);
+});
 test('reviewable mocked response requires explicit review then explicit save; stale review disappears',async()=>{
  const state=await journey(),calls=[];
  const review={key:JSON.stringify(state.businessPlanning),selection:{goal:{statement:'Cover contract workload'},draft:{inputs:{}},option:state.businessPlanning.staffing.result.options[0],result:{issues:[]}}};
