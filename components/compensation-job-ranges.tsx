@@ -35,9 +35,14 @@ export function CompensationJobRanges({scope = defaultRangeScope}: {scope?: Rang
   const [catalog, setCatalog] = useState<RangeCatalog | null>(null);
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
-  const [release, setRelease] = useState<ReleaseRow[] | null>(null);
-  const constructed = release?.[0]?.range_policy_version === 'constructed-demo-9847-ranges-v2';
   const company = scope.country === 'all' && scope.org === 'all' && scope.level === 'all';
+  const releaseKey = `${company}:${attempt}`;
+  const [releaseState, setReleaseState] = useState<{key:string;status:'loading'|'loaded'|'failed';rows:ReleaseRow[]|null}>({key:releaseKey,status:'loading',rows:null});
+  // Hide the preceding request's release immediately, including the render before effects run.
+  if (releaseState.key !== releaseKey) setReleaseState({key:releaseKey,status:'loading',rows:null});
+  const releaseLoading = company && (releaseState.key !== releaseKey || releaseState.status === 'loading');
+  const release = company && releaseState.key === releaseKey && releaseState.status === 'loaded' ? releaseState.rows : null;
+  const constructed = release?.[0]?.range_policy_version === 'constructed-demo-9847-ranges-v2';
   useEffect(() => {
     if (!company) return;
     const controller = new AbortController();
@@ -47,10 +52,10 @@ export function CompensationJobRanges({scope = defaultRangeScope}: {scope?: Rang
         const data = await response.json();
         return validateCompensationContext(data, datasetSession.current());
       })
-      .then(rows => {if (!controller.signal.aborted) setRelease(rows);})
-      .catch(() => {if (!controller.signal.aborted) setRelease(null);});
+      .then(rows => {if (!controller.signal.aborted) setReleaseState({key:releaseKey,status:'loaded',rows});})
+      .catch(() => {if (!controller.signal.aborted) setReleaseState({key:releaseKey,status:'failed',rows:null});});
     return () => controller.abort();
-  }, [company, attempt]);
+  }, [company, releaseKey]);
   useEffect(() => {
     const controller = new AbortController();
     void datasetFetch('/api/compensation-ranges', {signal: controller.signal, cache: 'no-store'})
@@ -63,8 +68,8 @@ export function CompensationJobRanges({scope = defaultRangeScope}: {scope?: Rang
     <div><h2 className="text-lg font-semibold">Salary ranges by job</h2>
       <p className="text-xs text-muted-foreground">{catalog?.constructedPolicy ? 'Constructed demo bands · USD · 1.0 FTE · Stored policy from 2010; September 2026 snapshot' : 'Demo data · Assumed annual base ranges · USD · 1.0 FTE · Effective 30 Sep 2026–29 Sep 2027'}</p></div>
     <p className="text-xs text-muted-foreground">Top filters: {scope.org === 'all' ? 'All business units' : scope.org} · {scope.level === 'all' ? 'All levels' : scope.level} · {scope.country === 'all' ? 'Global range assumption' : `${scope.country} range assumption`}. Country selects a policy assumption; filtered pay analysis is not released.</p>
-    <p role="status" className="text-xs text-muted-foreground">{!company ? 'Compa-ratios are not released for these filters. No company results are substituted.' : release ? constructed ? 'Company-wide constructed demo · USD coverage labeled by job · Withheld jobs protected · Exact counts unpublished.' : 'Company-wide USD-pay subset · Partial job coverage · Withheld jobs protected · Exact counts unpublished.' : 'Compa-ratio release unavailable. The demo pay convention is approved; aggregate publication is separately gated.'}</p>
-    {failed ? <div role="alert" className="text-sm">Job range catalog unavailable. <button className="min-h-11 px-2 underline" onClick={() => {setFailed(false); setCatalog(null); setAttempt(value => value + 1);}}>Try again</button></div> : !catalog ? <p role="status" className="text-sm">Loading existing jobs…</p> : <JobRangeTable catalog={catalog} scope={scope} releaseRows={company && Boolean(catalog.constructedPolicy) === constructed ? release : null} />}
+    <p role="status" className="text-xs text-muted-foreground">{!company ? 'Compa-ratios are not released for these filters. No company results are substituted.' : releaseLoading ? 'Loading company compa-ratios.' : release?.length ? constructed ? 'Company-wide constructed demo · USD coverage labeled by job · Withheld jobs protected · Exact counts unpublished.' : 'Company-wide USD-pay subset · Partial job coverage · Withheld jobs protected · Exact counts unpublished.' : release ? 'No compa-ratio results were returned. Aggregate publication is separately gated.' : 'Could not load compa-ratios. The demo pay convention is approved; aggregate publication is separately gated.'}</p>
+    {failed ? <div role="alert" className="text-sm">Job range catalog unavailable. <button className="min-h-11 px-2 underline" onClick={() => {setFailed(false); setCatalog(null); setAttempt(value => value + 1);}}>Try again</button></div> : !catalog ? <p role="status" className="text-sm">Loading existing jobs…</p> : <JobRangeTable catalog={catalog} scope={scope} releasePending={releaseLoading} releaseRows={company && Boolean(catalog.constructedPolicy) === constructed ? release : null} />}
     <AssumptionsDisclosure>
       <div className="space-y-2">
         <p>All jobs come from the existing job catalog. At company scope, each job receives an assumed range at every level found in the existing position inventory; these are policy proposals, not observed employee combinations. Business-unit and level filters narrow catalog combinations, not employee pay records.</p>
@@ -78,7 +83,7 @@ export function CompensationJobRanges({scope = defaultRangeScope}: {scope?: Rang
   </section>;
 }
 
-export function JobRangeTable({catalog, scope, releaseRows}: {catalog: RangeCatalog; scope: RangeScope; releaseRows?: ReleaseRow[] | null}) {
+export function JobRangeTable({catalog, scope, releaseRows, releasePending=false}: {catalog: RangeCatalog; scope: RangeScope; releaseRows?: ReleaseRow[] | null; releasePending?:boolean}) {
   const ranges = rangesForScope(catalog, scope);
   const jobs = catalog.jobs.filter(job => ranges.some(range => range.job === job.job_profile_code));
   if (!jobs.length) return <p role="status" className="text-sm">No catalog job/level combinations match these filters. No pay coverage is implied.</p>;
@@ -90,7 +95,7 @@ export function JobRangeTable({catalog, scope, releaseRows}: {catalog: RangeCata
       <tbody className="grid gap-4 md:table-row-group">{jobs.map(job => <tr key={job.job_profile_code} className="grid min-w-0 gap-3 rounded-lg border p-3 md:table-row md:rounded-none md:border-x-0 md:border-t-0 md:p-0">
         <th scope="row" className="min-w-0 break-words text-base font-medium md:py-4 md:pr-4">{job.job_profile_name}</th>
         <td className="min-w-0 md:py-4 md:pr-6"><RangeValues ranges={ranges.filter(range => range.job === job.job_profile_code)}/></td>
-        <td className="min-w-0 md:py-4"><ReleasedJobGraph job={job.job_profile_code} rows={scope.country === 'all' && scope.org === 'all' && scope.level === 'all' ? releaseRows : null}/></td>
+        <td className="min-w-0 md:py-4">{releasePending ? <p>Loading compa-ratio.</p> : <ReleasedJobGraph job={job.job_profile_code} rows={scope.country === 'all' && scope.org === 'all' && scope.level === 'all' ? releaseRows : null}/>}</td>
       </tr>)}</tbody>
     </table>
   </div>;

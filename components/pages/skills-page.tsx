@@ -29,7 +29,7 @@ type SkillsPageProps = {
 };
 
 export function SkillsPage({
-  skillsData,
+  skillsData: sourceData,
   skillsLoading,
   skillsError,
   maxSkillDemand,
@@ -39,6 +39,7 @@ export function SkillsPage({
   onClearHandoff,
   onOpenPlanning,
 }: SkillsPageProps) {
+  const skillsData = !skillsLoading && !skillsError ? sourceData : null;
   return (
 <section className="evidence-workspace evidence-pane min-w-0 p-6">
             <div className="mb-6 flex items-end justify-between gap-4">
@@ -51,12 +52,12 @@ export function SkillsPage({
               <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
                 {skillsLoading
                   ? "Loading skills…"
-                  : "As of September 30, 2026"}
+                  : skillsData ? "As of September 30, 2026" : "Skills"}
               </span>
             </div>
 
-            {skillsError && (
-              <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+            {!skillsLoading && skillsError && (
+              <div role="alert" className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
                 {skillsError}
               </div>
             )}
@@ -361,7 +362,7 @@ export function SkillsPage({
                 />
               </>
             ) : (
-              <div className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
+              (skillsLoading || !skillsError) && <div role="status" className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
                 {skillsLoading
                   ? "Loading workforce skills…"
                   : "No skills data returned."}

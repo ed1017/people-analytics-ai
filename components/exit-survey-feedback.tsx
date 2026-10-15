@@ -4,11 +4,11 @@ import { exitSurveyEvidence } from "@/lib/employee-listening";
 import type { SurveySentimentResponse } from "@/lib/types";
 const display = (v: unknown, decimals=0) => typeof v === "number" ? v.toLocaleString("en-US",{minimumFractionDigits:decimals,maximumFractionDigits:decimals}) : "Unavailable";
 export function ExitSurveyFeedback({data,loading,error}:{data:SurveySentimentResponse|null;loading:boolean;error:string|null}) {
- const evidence=exitSurveyEvidence(data);
+ const evidence=exitSurveyEvidence(!loading&&!error?data:null);
  return <section aria-label="Exit survey feedback" className="mt-6 space-y-4 rounded-lg border p-4">
   <h3 className="text-xl font-semibold">Exit Survey Feedback</h3>
-  <p className="text-sm text-muted-foreground">Company-wide recorded responses; workforce filters do not narrow this evidence. As of {evidence.as_of ?? "unavailable"}. Exit-survey fieldwork period and monthly trend are not supplied.</p>
-  {loading?<p role="status">Loading exit-survey feedback…</p>:error||!data?<p role="status">Exit-survey feedback unavailable. Attrition records remain separate.</p>:<>
+  <p className="text-sm text-muted-foreground">Company-wide recorded responses; workforce filters do not narrow this evidence.{!loading&&!error&&data&&<> {evidence.as_of?`As of ${evidence.as_of}.`:'Date not supplied.'}</>} Exit-survey fieldwork period and monthly trend are not supplied.</p>
+  {loading?<p role="status">Loading exit-survey feedback…</p>:error?<p role="alert">Could not load exit-survey feedback. Attrition records remain separate.</p>:!data?<p role="status">No exit-survey feedback was returned. Attrition records remain separate.</p>:<>
    <p className="text-sm">{display(evidence.respondents)} exit-survey respondents, not current employees or all recorded separations. Shares describe responses, not an employee attrition rate or proven cause.</p>
    <div className="min-w-0 rounded border p-4"><h4 className="font-semibold">Exit Reasons</h4><p className="my-2 text-sm">Primary reason reported by exit-survey respondents.</p>
     <EvidenceTableRegion label="Exit survey reasons"><table className="w-full min-w-[420px] text-sm"><thead><tr className="border-b text-left"><th>Reason</th><th className="text-right">Responses</th><th className="text-right">Share of exit responses</th></tr></thead><tbody>{evidence.reasons.map((r,i)=><tr key={i} className="border-b"><td className="py-2">{String(r.primary_reason ?? "Unavailable")}</td><td className="text-right">{display(r.exits)}</td><td className="text-right">{display(r.pct_of_exit_responses,1)}{typeof r.pct_of_exit_responses === "number"?"%":""}</td></tr>)}</tbody></table></EvidenceTableRegion>
