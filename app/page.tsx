@@ -46,6 +46,7 @@ import { useGoalWorkspace } from "@/components/use-goal-workspace";
 import { useProblemConversation } from "@/components/problem-conversation";
 import { getProblemChatHistory, withProblemContext } from "@/lib/problem-session";
 import {useWorkspacePalette} from "@/components/use-workspace-palette";
+import {usePerspective} from "@/components/use-perspective";
 import { AppSidebar } from "@/components/app-sidebar";
 import { completeScopedChatTurn } from "@/lib/chat-context-history";
 import { buildAggregateExport, downloadAggregateCsv } from "@/lib/aggregate-export";
@@ -98,7 +99,6 @@ import type {
   HeadcountTrendPoint,
   LearningDevelopmentResponse,
   OverviewData,
-  Persona,
   PositionModelingResponse,
   ScenarioModelResponse,
   SkillsResponse,
@@ -170,8 +170,7 @@ export default function Home() {
   const [selectedOrg, setSelectedOrg] = useState("all");
   const [selectedLevel, setSelectedLevel] = useState("all");
 
-  const [selectedPersona, setSelectedPersona] =
-    useState<Persona>("HR");
+  const [selectedPersona, setSelectedPersona] = usePerspective();
 
 
   const lastPageByWorkspaceRef = useRef<
