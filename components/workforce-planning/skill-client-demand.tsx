@@ -10,7 +10,7 @@ export function SkillClientDemand({goalKey,onStart}:{goalKey:string;onStart:(dra
  const token=useSyncExternalStore(datasetSession.subscribe,datasetSession.snapshot,()=> 'pending');
  const [started,setStarted]=useState(false);
  return <details className="rounded-lg border p-3" onToggle={event=>{if(event.currentTarget.open)setStarted(true);}}>
-  <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">1. Choose a skill (optional)</summary>
+  <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Choose a skill (optional)</summary>
   {started&&<SkillReference key={JSON.stringify([token,goalKey])} token={token} onStart={onStart}/>}
  </details>;
 }
@@ -26,13 +26,13 @@ function SkillReference({token,onStart}:{token:string;onStart:(draft:CapacityDra
   if(!token.startsWith('pending'))void load();return ()=>controller.abort();
  },[token,attempt]);
  return <section aria-label="Skill client demand setup" className="space-y-3 text-sm">
-  <p>Company-wide references; partial list, unaffected by dashboard filters. Skill counts are not available FTE.</p>
+  <p>Partial company-wide list; dashboard filters do not change it. Skills do not tell us how much working time is available.</p>
   {error?<div><p role="alert">{error}</p><button type="button" className={control} onClick={()=>{setCatalog(null);setSelected('');setError('');setNotice('');setAttempt(value=>value+1);}}>Retry skill references</button></div>:!catalog?<p role="status">Loading skill references.</p>:<>
    <label className="block">Skill reference<select aria-label="Skill reference" className={control} value={selected} onChange={event=>{setSelected(event.target.value);setNotice('');}}><option value="">Choose a skill</option>{catalog.skills.map(skill=><option key={skill.id} value={skill.id}>{skill.name} ({skill.code})</option>)}</select></label>
-   <p className="text-xs text-muted-foreground">Source snapshot: {catalog.asOf}. The saved workload name retains this reference date; it is not a live skill assessment.</p>
-   <p>Next, enter clients per month and hours per client. Capacity is your assumption; nothing is inferred from revenue or skill records.</p>
+   <p className="text-xs text-muted-foreground">Skill list dated {catalog.asOf}. This date stays in the saved name; it is not a live assessment.</p>
+   <p>Enter clients per month and hours per client below. Team numbers are your estimates, not inferred from revenue or skill records.</p>
    <p className="text-xs text-muted-foreground">Replaces unsaved worksheet inputs; saved scenarios are kept. One skill workload per scenario: do not add overlapping skill capacities together.</p>
-   <button type="button" disabled={!selected} className={`${control} font-medium disabled:opacity-50`} onClick={()=>{if(!catalog||datasetSession.snapshot()!==token)return;onStart(skillClientDraft(catalog,selected));setNotice('Skill selected. Continue to step 2: enter expected work.');}}>Start new skill workload</button>
+   <button type="button" disabled={!selected} className={`${control} font-medium disabled:opacity-50`} onClick={()=>{if(!catalog||datasetSession.snapshot()!==token)return;onStart(skillClientDraft(catalog,selected));setNotice('Skill selected. Enter the work below.');}}>Start new skill workload</button>
   </>}
   {notice&&<p role="status">{notice}</p>}
  </section>;

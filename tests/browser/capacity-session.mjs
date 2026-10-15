@@ -14,8 +14,8 @@ try{
  const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/*',route=>route.fulfill({contentType:'text/html',body:'<div id="root"></div><script>'+bundle.replaceAll('</script','<\\/script')+'</script>'}));
  await page.goto('https://capacity-fixture.test');
- const scope=()=>page.getByLabel('Workload scope',{exact:true});await scope().fill('Goal A workload');
- for(const [label,value] of Object.entries({'Opening date (month end)':'2026-09-30','Opening people':'10','Opening contracted FTE':'8','Work units each month':'800','Hours per work unit':'1','Productive hours per FTE each month':'160'}))await page.getByLabel(label,{exact:true}).fill(value);
+ const scope=()=>page.getByLabel('Work to plan',{exact:true});await scope().fill('Goal A workload');
+ for(const [label,value] of Object.entries({'Opening date (month end)':'2026-09-30','People at the start':'10','Working time at the start (FTE)':'8','Work items each month':'800','Hours per item':'1','Work hours per FTE each month':'160'}))await page.getByLabel(label,{exact:true}).fill(value);
  await page.locator('form summary').click();
  for(const [label,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await page.getByLabel(label,{exact:true}).fill(value);
  await page.getByRole('checkbox',{name:/Assume every hire/}).check();await page.getByRole('checkbox',{name:/I confirm/}).check();await page.getByRole('button',{name:'Calculate capacity',exact:true}).click();

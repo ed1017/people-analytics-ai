@@ -16,6 +16,8 @@ import {capacitySliders} from '@/lib/planning-slider';
 import {capacityPreview} from '@/lib/capacity-preview';
 
 const control='mt-1 min-h-11 w-full min-w-0 rounded-md border bg-background px-3 py-2 text-foreground';
+// Display wording only: adapter labels and saved calculation notes stay unchanged.
+const displayLabels={...capacityLabels,scope:'Work to plan',volume:'Work items each month',effort:'Hours per item',people:'People at the start',fte:'Working time at the start (FTE)',hours:'Work hours per FTE each month'};
 const format=(n:number|null)=>n===null?'Unknown':n.toLocaleString(undefined,{maximumFractionDigits:2});
 export function CapacityWorkspace(){
  const {goalKey,capacitySession:session,setCapacitySession:setSession}=usePlanningSession();
@@ -25,8 +27,8 @@ export function CapacityWorkspace(){
  const cost=session.cost;
  const isPreview=!session.result;
  const edit=(patch:Partial<CapacityDraft>)=>setSession({...session,draft:{...draft,...patch,confirmed:false},result:null,cost:null,error:'',capture:null,scope:patch.scope!==undefined&&patch.scope.trim()!==session.scope?.label?null:session.scope});
- const field=(key:Exclude<keyof CapacityDraft,'fullTimeMovements'|'confirmed'>,help?:string)=>capacitySliders[key]?<PlanningAssumptionSlider key={key} label={capacityLabels[key]} value={draft[key]??''} onChange={value=>edit({[key]:value})} spec={capacitySliders[key]} help={help}/>:<label className="block min-w-0 text-sm" key={key}>{capacityLabels[key]}
-  <input aria-label={capacityLabels[key]} className={control} value={draft[key]??''} type={key==='openingDate'?'date':'text'} inputMode={key==='scope'||key==='openingDate'?undefined:'decimal'} aria-describedby={help?`capacity-${key}-help`:undefined} onChange={event=>edit({[key]:event.target.value})}/>
+ const field=(key:Exclude<keyof CapacityDraft,'fullTimeMovements'|'confirmed'>,help?:string)=>capacitySliders[key]?<PlanningAssumptionSlider key={key} label={displayLabels[key]} value={draft[key]??''} onChange={value=>edit({[key]:value})} spec={capacitySliders[key]} help={help}/>:<label className="block min-w-0 text-sm" key={key}>{displayLabels[key]}
+  <input aria-label={displayLabels[key]} className={control} value={draft[key]??''} type={key==='openingDate'?'date':'text'} inputMode={key==='scope'||key==='openingDate'?undefined:'decimal'} aria-describedby={help?`capacity-${key}-help`:undefined} onChange={event=>edit({[key]:event.target.value})}/>
   {help&&<span id={`capacity-${key}-help`} className="mt-1 block text-xs text-muted-foreground">{help}</span>}
  </label>;
  function calculate(){
@@ -43,19 +45,22 @@ export function CapacityWorkspace(){
   requestAnimationFrame(()=>feedback.current?.focus());
  }
  return <section aria-label="Workload capacity planning" className="space-y-4">
-  <p className="text-sm text-muted-foreground">Choose a skill, enter the expected work, then compare it with your assumed capacity. Blank inputs stay unknown.</p>
+  <p className="text-sm text-muted-foreground">Enter the work and the team you expect to have. Blank numbers stay unknown.</p>
   <SkillClientDemand goalKey={goalKey} onStart={draft=>setSession({draft,result:null,cost:null,error:'',scope:null,capture:null,saveName:''})}/>
   <div className="grid min-w-0 items-start gap-5 lg:grid-cols-[minmax(15rem,0.85fr)_minmax(0,1.65fr)]">
   <form noValidate onSubmit={event=>{event.preventDefault();calculate();}} className="min-w-0 space-y-3 rounded-xl border bg-background p-4">
-   <h3 className="font-semibold">2. Enter expected work</h3>
-   <div>{field('scope','Use the skill above or name a workload, e.g. Service desk - tickets.')}</div>
-   <div className="grid gap-3 sm:grid-cols-2">{field('volume','For client demand, enter clients per month.')}{field('effort','For client demand, enter hours per client, before productivity improvement.')}</div>
-   <p className="text-sm text-muted-foreground">To see a gap, complete the timing and capacity assumptions below. Skill references do not supply available FTE.</p>
+   <h3 className="font-semibold">1. What work needs doing?</h3>
+   <div>{field('scope','For example, Service desk - tickets.')}</div>
+   <div className="grid gap-3 sm:grid-cols-2">{field('volume','For example, clients or tickets.')}{field('effort','Before any productivity improvement.')}</div>
+   <h3 className="border-t pt-3 font-semibold">2. How many people do you have?</h3>
+   <p className="text-sm text-muted-foreground">Count people separately from working time. FTE means full-time equivalent: two half-time people = 1 FTE.</p>
+   <div className="grid gap-3 sm:grid-cols-2">{field('people')}{field('fte')}</div>
+   <p className="text-sm text-muted-foreground">Add the dates and how much time is spent on this work below. Skill records do not fill in these numbers.</p>
    <details className="border-t pt-1">
     <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Timing &amp; capacity assumptions (required)</summary>
-    <p className="mb-3 text-xs text-muted-foreground">Opening stocks are immediately before the first planning month. People are whole people; contracted FTE is before workload assignment. Work effort is before productivity improvement. Productive hours are net of leave and non-work time, before assignment.</p>
+    <p className="mb-3 text-xs text-muted-foreground">Starting people and FTE are measured just before the first planning month. FTE is contracted working time, before assigning time to this work. Leave blanks when unknown; enter 0 only when none.</p>
     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('openingDate')}{field('months','Plan 1-6 months.')}</div>
-    <div className="mt-3 grid gap-3 sm:grid-cols-2">{field('people')}{field('fte')}{field('hours')}</div>
+    <div className="mt-3 grid gap-3 sm:grid-cols-2">{field('hours','After leave and other non-work time; before time assigned to this work.')}</div>
     <div className="mt-2 grid gap-3 sm:grid-cols-2">{field('hires','Count each joiner once.')}{field('exits','All departures, including retirement; count each person once.')}{field('allocation','0–100%, up to four decimal places. Do not deduct leave again.')}{field('productivity','0–100%, up to four decimal places. Applied once to throughput, not to hires or workload.')}</div>
     <label className="mt-3 flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={draft.fullTimeMovements} onChange={e=>edit({fullTimeMovements:e.target.checked})}/>Assume every hire and departure is full-time (1 FTE per person)</label>
     {!draft.fullTimeMovements&&<div className="grid gap-3 sm:grid-cols-2">{field('hireFte','0–1 FTE/person; explicit assumption, not inferred from current staff.')}{field('exitFte','0–1 FTE/person.')}</div>}
@@ -65,8 +70,8 @@ export function CapacityWorkspace(){
    <button className="min-h-11 rounded-md bg-foreground px-4 py-2 font-medium text-background focus-visible:ring-2 focus-visible:ring-ring" type="submit">Calculate capacity</button>
   </form>
   <div className="min-w-0 space-y-4">
-  <h3 className="font-semibold">3. See the capacity gap</h3>
-  {isPreview&&<p role="status" className="text-sm">Live preview only. Confirm and calculate before saving or using this scenario in Overview.</p>}
+  <h3 className="font-semibold">3. Do you have enough?</h3>
+  {isPreview&&<p role="status" className="text-sm">Preview. Confirm and calculate to save or use in Overview.</p>}
   {isPreview&&draft.scope&&preview.error&&<p role="status" className="text-sm text-destructive">{preview.error}</p>}
   <CapacityProjection result={result}/>
   {result&&!isPreview&&<div className="rounded-xl border bg-background p-4" aria-label="Contracted supply cost estimate">
@@ -76,10 +81,10 @@ export function CapacityWorkspace(){
   </div>}
   <div ref={feedback} tabIndex={-1} aria-live="polite" className="rounded-sm focus-visible:ring-2 focus-visible:ring-ring">
    {error&&<p role="alert" className="text-sm text-destructive">{error}</p>}
-   {!result&&!error&&<p className="text-sm text-muted-foreground">Calculate to compare monthly supply and workload. Editing an input clears the previous result and confirmation.</p>}
+   {!result&&!error&&<p className="text-sm text-muted-foreground">Changing a number clears the previous calculation and confirmation.</p>}
    {result&&<div className="space-y-3">
     <p className="font-medium">{result.status==='needs-inputs'?'Incomplete - some inputs are unknown':isPreview?'Preview from your current inputs':'Calculated from your assumptions'}</p>
-    {result.status==='needs-inputs'&&<p className="text-sm">Complete the blank inputs in Timing &amp; capacity assumptions, then confirm and calculate again. Known workload requirements can still be shown when supply is unknown.</p>}
+    {result.status==='needs-inputs'&&<p className="text-sm">Fill in the missing numbers, including Timing &amp; capacity assumptions, then confirm and calculate. Known work needs can still be shown while available time is unknown.</p>}
     <p className="text-sm">{result.assumptions.scope.label} · Opening {result.assumptions.opening.asOf}. Positive gap = shortfall; negative gap = surplus.</p>
     <details className="border-t"><summary className="min-h-11 cursor-pointer py-3 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Monthly detail · people and FTE</summary>
     <div className="overflow-x-auto" role="region" aria-label="Monthly capacity comparison" tabIndex={0}>
