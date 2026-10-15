@@ -6,6 +6,8 @@ import Module,{createRequire} from 'node:module';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import ts from 'typescript';
+import * as demand from '../lib/swp-demand.ts';
+import * as demandEditor from '../lib/swp-demand-editor.ts';
 import * as costLayer from '../lib/swp-capacity-cost.ts';
 import * as engine from '../lib/swp-monthly-workload.ts';
 import * as draftAdapter from '../lib/swp-capacity-draft.ts';
@@ -110,4 +112,20 @@ test('optional cost shows unknown and zero distinctly without removing capacity 
    const html=renderToStaticMarkup(worksheet(next).tree);assert.ok(html.includes(expected));assert.match(html,/USD\/month/);assert.match(html,/not actual pay, cumulative spend or savings/);assert.ok(html.indexOf('Work needed and time available')<html.indexOf('Contracted supply cost estimate'));
   }
  }finally{if(previous===undefined)delete globalThis.requestAnimationFrame;else globalThis.requestAnimationFrame=previous;}
+});
+
+test('worksheet labels separate contracted time, productive hours and monthly cost',()=>{
+ const html=renderToStaticMarkup(worksheet().tree);
+ for(const text of ['Contracted time at start (FTE)','Productive hours per FTE / month','Assume each person joining or leaving accounts for 1 FTE','with no transfers','People leave before new hires join; new hires contribute for the full month','Estimated monthly workforce cost - final month','not actual pay, cumulative spend or savings'])assert.ok(html.includes(text),text);
+ assert.equal((html.match(/Positive gap = shortfall; negative gap = surplus/g)||[]).length,1);
+ assert.doesNotMatch(html,/Supply run-rate|Final-month contracted supply run-rate/);
+});
+test('role FTE labels retain full-time guidance, bounds and unknown input instructions',()=>{
+ const {SwpDemandEditor}=component('components/swp-demand-editor.tsx',{'@/lib/swp-demand':demand,'@/lib/swp-demand-editor':demandEditor});
+ const context={conversationMode:demand.SWP_DEMAND_MODE,classification:'unverified-business-inputs',intakeId:'copy-fixture',datasetToken:'legacy-v1:0',boundGoal:{id:'',statement:''},revision:1};
+ const review=demand.illustrativeServiceReview(context,'2026-10-08T12:00:00Z'),before=structuredClone(review);
+ const html=renderToStaticMarkup(React.createElement(SwpDemandEditor,{review,disabled:false,onReview:()=>{},onCancel:()=>{}}));
+ for(const label of ['FTE per current role','FTE per new role'])assert.match(html,new RegExp(label+'<input[^>]*min="0" max="1"'));
+ assert.equal((html.match(/Use 1 for full-time or 0.5 for half-time/g)||[]).length,2);
+ assert.match(html,/Leave unknown inputs blank/);assert.match(html,/Whole planning period/);assert.deepEqual(review,before);
 });

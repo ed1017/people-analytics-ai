@@ -28,12 +28,12 @@ try{for(const width of [1366,390]){
  const confirm=()=>area.getByRole('checkbox',{name:/I confirm/}).check();
  const result=()=>area.getByRole('region',{name:'Monthly capacity comparison'});
  await area.waitFor().catch(async error=>{console.log(await page.locator('body').innerText());console.log(errors);throw error;});await calc();assert.match(await area.getByRole('alert').innerText(),/Confirm/);
- const values={'Work to plan':'Service desk — tickets','Opening date (month end)':'2026-09-30','People at the start':'10','Working time at the start (FTE)':'8','Work items each month':'800','Hours per item':'1','Work hours per FTE each month':'160'};
+ const values={'Work to plan':'Service desk — tickets','Opening date (month end)':'2026-09-30','People at the start':'10','Contracted time at start (FTE)':'8','Work items each month':'800','Hours per item':'1','Productive hours per FTE / month':'160'};
  for(const [name,value] of Object.entries(values))await input(name).fill(value);
  const assumptions=area.locator('form summary');await assumptions.focus();await page.keyboard.press('Enter');
  for(const [name,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await input(name).fill(value);
  await confirm();await calc();assert.match(await area.innerText(),/Incomplete/);assert.match(await result().innerText(),/Unknown/);
- await area.getByRole('checkbox',{name:/Assume every hire/}).check();assert.match(await area.innerText(),/Preview from your current inputs/);assert.equal(await area.getByRole('checkbox',{name:/I confirm/}).isChecked(),false);
+ await area.getByRole('checkbox',{name:/Assume each person joining/}).check();assert.match(await area.innerText(),/Preview from your current inputs/);assert.equal(await area.getByRole('checkbox',{name:/I confirm/}).isChecked(),false);
  await confirm();await calc();assert.match(await area.innerText(),/Calculated from your assumptions/);assert.match(await result().innerText(),/\+1/);
  const saved=()=>page.getByRole('region',{name:'Saved capacity scenarios',exact:true});
  await page.getByLabel('Capacity scenario name',{exact:true}).fill('Base');await saved().getByRole('button',{name:'Save scenario',exact:true}).click();await saved().getByRole('status').filter({hasText:'Saved “Base”'}).waitFor();
@@ -49,12 +49,12 @@ try{for(const width of [1366,390]){
  await page.screenshot({path:`${output}/${width}-fractional-percent.png`,fullPage:true});
  await input('Time assigned to this work (%)').fill('50');await input('Productivity improvement (%)').fill('0');
  // Independent acceptance examples: throughput changes demand, never supply.
- await input('Working time at the start (FTE)').fill('10');await input('Time assigned to this work (%)').fill('100');await input('Work items each month').fill('1920');await confirm();await calc();
+ await input('Contracted time at start (FTE)').fill('10');await input('Time assigned to this work (%)').fill('100');await input('Work items each month').fill('1920');await confirm();await calc();
  assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['10','10','10','12','+2','Unknown']);
  await assumptions.click();await assumptions.click();assert.match(await result().innerText(),/\+2/);assert.ok(await area.getByRole('checkbox',{name:/I confirm/}).isChecked());
  await input('Productivity improvement (%)').fill('20');await confirm();await calc();assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['10','10','10','10','0','Unknown']);
  await input('Productivity improvement (%)').fill('0');await input('Work items each month').fill('1600');assert.match(await area.innerText(),/Preview from your current inputs/);await confirm();await calc();assert.equal((await result().locator('tbody tr').first().locator('td').allTextContents()).at(-2),'0');
- await input('Working time at the start (FTE)').fill('8');await input('Time assigned to this work (%)').fill('75');await input('Work items each month').fill('1200');await confirm();await calc();assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['10','8','6','7.5','+1.5','Unknown']);
+ await input('Contracted time at start (FTE)').fill('8');await input('Time assigned to this work (%)').fill('75');await input('Work items each month').fill('1200');await confirm();await calc();assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['10','8','6','7.5','+1.5','Unknown']);
  await page.screenshot({path:`${output}/${width}-shortfall.png`,fullPage:true});
  if(width<640)assert.ok(await result().getByText('+1.5',{exact:true}).first().isVisible(),'mobile gap visible without horizontal scrolling');
  await input('Work items each month').fill('0');await confirm();await calc();assert.equal((await result().locator('tbody tr').first().locator('td').allTextContents()).at(-2),'-6');
@@ -77,10 +77,10 @@ try{for(const width of [1366,390]){
  }
  await nav.getByRole('button',{name:'Open Stored scenario tools',exact:true}).click();await page.getByRole('heading',{name:'Custom Scenario',exact:true}).waitFor();await revealMonthlyCapacityDetail(page,area);await result().waitFor();
  await page.goBack();await revealMonthlyCapacityDetail(page,area);await result().waitFor();
- await input('Working time at the start (FTE)').fill('');await confirm();await calc();assert.match(await area.innerText(),/Incomplete/);assert.match(await result().innerText(),/Unknown/);
- await input('Working time at the start (FTE)').fill('11');await confirm();await calc();assert.match(await area.getByRole('alert').innerText(),/exceeds/);assert.equal(await result().count(),0);
+ await input('Contracted time at start (FTE)').fill('');await confirm();await calc();assert.match(await area.innerText(),/Incomplete/);assert.match(await result().innerText(),/Unknown/);
+ await input('Contracted time at start (FTE)').fill('11');await confirm();await calc();assert.match(await area.getByRole('alert').innerText(),/exceeds/);assert.equal(await result().count(),0);
  if(!await area.locator('form details').evaluate(n=>n.open))await assumptions.click();
- await input('People at the start').fill('0');await input('Working time at the start (FTE)').fill('0');await input('Work items each month').fill('0');await input('Time assigned to this work (%)').fill('0');await confirm();
+ await input('People at the start').fill('0');await input('Contracted time at start (FTE)').fill('0');await input('Work items each month').fill('0');await input('Time assigned to this work (%)').fill('0');await confirm();
  await area.getByRole('button',{name:'Calculate capacity',exact:true}).focus();await page.keyboard.press('Enter');await revealMonthlyCapacityDetail(page,area);await result().waitFor();assert.deepEqual(await result().locator('tbody tr').first().locator('td').allTextContents(),['0','0','0','0','0','Unknown']);
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no page overflow');
  await page.screenshot({path:`${output}/${width}-capacity.png`,fullPage:true});

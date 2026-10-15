@@ -83,8 +83,8 @@ try{
   await page.getByRole('combobox',{name:/^Work hours per full-time role period/}).selectOption('year');
   await page.getByLabel('Available team time (%)',{exact:true}).fill('50');
   await page.getByText('Advanced role assumptions',{exact:true}).click();
-  await page.getByLabel('Current role workload (full-time = 1)',{exact:true}).fill('1');
-  await page.getByLabel('New role workload (full-time = 1)',{exact:true}).fill('1');
+  await page.getByLabel('FTE per current role',{exact:true}).fill('1');
+  await page.getByLabel('FTE per new role',{exact:true}).fill('1');
   await page.getByRole('button',{name:'Review planning inputs',exact:true}).click();
   const expectExact=async()=>{
    check(await latest.isVisible()&&await page.getByRole('dialog').count()===0,label+' latest result visible immediately outside closed dialog');
