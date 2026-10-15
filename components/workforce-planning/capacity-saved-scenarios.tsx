@@ -46,6 +46,8 @@ export function CapacitySavedScenarios(){
  const scope=left&&bucket.scopes.find(s=>s.id===left.record.binding.scopeId);
  const isCurrent=Boolean(left&&scope&&context&&session.scope?.id===scope.id&&capacityRecordIsCurrent(left.record,capacityBinding(context,scope),session.draft));
  const disabled=!context||!storage.saved||!!loadError||!session.capture?.binding||session.result?.status!=='calculated';
+ const saveError=actionError||loadError||(!storage.saved?(storage.notice||'Browser storage is unavailable. Resolve Browser storage details, then retry explicitly. Your draft is kept.'):'');
+ const comparisonStatus=comparisonError|| (comparison&&!comparison.compatible?comparison.reason:comparison?.compatible&&left&&right?`Comparing ${left.record.name} with ${right.record.name}. Monthly FTE gaps are shown below; positive is shortfall, negative is surplus.`:'');
  const options=bucket.entries.map(e=><option key={e.record.id} value={e.record.id}>{e.record.name}</option>);
  return <section aria-label="Saved capacity scenarios" className="space-y-3 border-t pt-4">
   <h3 className="font-semibold">Save &amp; compare</h3>
@@ -55,8 +57,9 @@ export function CapacitySavedScenarios(){
     <button type="button" disabled={disabled} onClick={save} className={`${control} disabled:opacity-50`}>Save scenario</button>
    </div>
    <p className="text-xs text-muted-foreground">Saved only in this browser under the selected goal. Calculate complete capacity inputs before saving. The cost rate is optional. Changes create a new named scenario.</p>
-   {(!storage.saved||loadError||actionError)&&<p role="alert" className="text-sm text-destructive">{actionError||loadError||storage.notice||'Browser storage is unavailable. Resolve Browser storage details, then retry explicitly. Your draft is kept.'}</p>}
-   {notice&&<p role="status" className="text-sm">{notice}</p>}
+   <p role="alert" aria-atomic="true" className={saveError?'text-sm text-destructive':'sr-only'}>{saveError}</p>
+   <p role="status" aria-atomic="true" className={notice?'text-sm':'sr-only'}>{notice}</p>
+   <p role="status" aria-atomic="true" className={comparisonStatus?'text-sm':'sr-only'}>{comparisonStatus}</p>
    {bucket.entries.length>0&&<>
     <div className="flex flex-wrap items-end gap-2">
      <label className="min-w-0 flex-1 text-sm">Saved scenario<select aria-label="Saved capacity scenario" value={leftId} onChange={e=>{setLeftId(e.target.value);setRightId('');setNotice('');setActionError('');}} className={`${control} mt-1 w-full`}><option value="">Choose a scenario</option>{options}</select></label>
@@ -64,7 +67,6 @@ export function CapacitySavedScenarios(){
     </div>
     <p className="text-xs text-muted-foreground">Opening replaces the current draft. Open an existing scenario before varying the same workload. {left&&(isCurrent?'Selected saved scenario matches current inputs.':'Selected scenario is a saved snapshot, not the current draft.')}</p>
     {left&&<label className="block text-sm">Compare with<select aria-label="Compare capacity scenario" value={rightId} onChange={e=>setRightId(e.target.value)} className={`${control} mt-1 w-full`}><option value="">Choose another saved scenario</option>{bucket.entries.filter(e=>e.record.id!==leftId).map(e=><option key={e.record.id} value={e.record.id}>{e.record.name}</option>)}</select></label>}
-    {(comparisonError||comparison&&!comparison.compatible)&&<p role="status" className="text-sm">{comparisonError||comparison?.reason}</p>}
     {comparison?.compatible&&left&&right&&<div role="region" aria-label="Saved capacity comparison" tabIndex={0} className="overflow-x-auto">
      <table className="w-full text-left text-sm"><caption className="mb-2 text-left">Signed gap in FTE · positive is shortfall, negative is surplus</caption><thead><tr><th scope="col" className="p-2">Month</th><th scope="col" className="p-2">{left.record.name}</th><th scope="col" className="p-2">{right.record.name}</th></tr></thead><tbody>{left.record.result.points.map((p,i)=><tr key={p.month} className="border-t"><th scope="row" className="p-2 font-normal">{p.month}</th><td className="p-2">{gap(p.gapFte)}</td><td className="p-2">{gap(right.record.result.points[i].gapFte)}</td></tr>)}</tbody></table>
      {costComparison&&<details className="mt-3 border-t"><summary className="min-h-11 cursor-pointer py-3 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Contracted supply cost comparison</summary>

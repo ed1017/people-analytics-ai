@@ -60,3 +60,16 @@ test('each perspective has a visible description linked to its selector', () => 
     assert.match(html,/Figures and calculations stay the same/);
   }
 });
+
+
+test('desktop Level and Business Unit keep readable nonshrinking widths and full native labels',()=>{
+ const {GlobalWorkforceFilters}=component('components/global-workforce-filters.tsx',{react:{...React,useState:()=>[false,()=>{}]},'@/components/use-phone-layout':{usePhoneLayout:()=>false}});
+ const label='Senior Analyst / Senior Specialist';let selected;
+ const tree=GlobalWorkforceFilters({page:'home',options:{...options,levels:[{value:'L5',label}]},country:'all',org:'all',level:'L5',onLevel:value=>{selected=value;}});
+ const all=nodes(tree),level=all.find(n=>n.type==='select'&&n.props['aria-label']==='Level');
+ assert.match(level.props.className,/lg:w-80/);assert.equal(level.props.title,label);
+ assert.match(all.find(n=>n.type==='label'&&nodes(n).some(child=>child.props['aria-label']==='Level')).props.className,/lg:shrink-0/);
+ assert.match(all.find(n=>n.type==='select'&&n.props['aria-label']==='Business Unit').props.className,/lg:w-64/);
+ level.props.onChange({target:{value:'all'}});assert.equal(selected,'all');
+ assert.match(renderToStaticMarkup(tree),/lg:flex-wrap/);
+});
