@@ -1,24 +1,34 @@
-# Fluid conversation: recommendation acceptance proposal
+# Fluid conversation: current recommendation acceptance specification
 
-Inspected against remote main `48d1b006afd24e0ccf93386c2507ed103b2f392d`. This is a proposal for the next behavior revision, not an implemented model change. The starter-copy revision preserves the current instructions, model, response schema, tools, planning inputs and persistence contracts. No provider evaluation was run and the frozen v5 real-AI fixture was not changed.
+Source audit: released main `a04ff3d02c56adfe7e4962fbea41dae924ac8875`, tree `1ba638cb53da6001a7360658a47455947172c95d`, inspected 2026-10-15. This document supersedes the diagnosis against `48d1b006` previously stored here; that historical diagnosis remains in Git history. This is a documentation update, not a model, prompt, tool, feature-flag or persistence change. It adds no release gate.
 
-## Diagnosis
+## Current implementation and resolved historical gaps
 
-The normal Home opener route (`app/api/chat/route.ts`) classifies these questions as an answer, uses `gpt-5.6-luna`, and sends `tool_choice: none`. It supplies the current Home evidence packet and recent conversation, plus `homeConversationInstructions`, `conversationalAnswerStyle` and the bounded `strategicPlanningInstructions` guidance. The response envelope already permits a complete natural-language answer without a goal card. A conversational recommendation does not require a new schema or automatic plan creation.
+Two request paths must be distinguished:
 
-`lib/home-strategic-planning.ts` asks for a "useful provisional planning approach" and reviewable proposed assumptions. It does not positively require choosing a provisional course, explaining why it fits, or identifying the next concrete action. Its per-topic considerations are lists of things to clarify. `lib/home-conversation.ts` also asks that optional follow-ups deepen the question. Together these permit an exploratory response even when a conditional recommendation would be useful. This is a code-level diagnosis; it does not establish what a live model answered.
+- Ordinary chat in [`app/api/chat/route.ts`](../app/api/chat/route.ts) retains `CHAT_MODEL` (`gpt-5.6-luna`, defined in [`lib/chat-model.ts`](../lib/chat-model.ts)). Some answer branches explicitly disable tools. Do not describe this entire route as the natural business-planning tool loop.
+- The enabled Home solution conversation uses [`app/api/home-solution-conversation/route.ts`](../app/api/home-solution-conversation/route.ts). Its source policy is `gpt-6.1-sol`, medium reasoning, default service tier. The route returns 404 when `NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION` is not enabled. For a natural request without a fictional-mode header, it adds business-planning tools and instructions; normal rounds allow automatic tool selection, final-only rounds disable tools, and a required-staffing capability can force its specific calculator. Explicit fictional/demand modes have separate binding checks. These are inspected source rules, not a fresh production configuration or live-model observation.
 
-There is also a reproducible continuity gap: after each of the five starters, `strategicPlanningContext('Or how about both?', history)` returns null, while `Why?` retains the context. A generic mixed-option follow-up does not match the topic regex or existing short-follow-up allowlist. Recent history still reaches the model, but the bounded planning guidance drops. This should be addressed with contextual follow-up recognition, preserving explicit topic-change and goal/plan routing.
+[`lib/home-strategic-planning.ts`](../lib/home-strategic-planning.ts) now requires a grounded or conditional recommendation, decisive reason, meaningful tradeoff and concrete next move. It discourages questionnaires before useful guidance, unsupported faster/cheaper/best claims, forced mixes and implicit acceptance. Its bounded continuity logic now recognizes "Or how about both?", comparative follow-ups, partial agreement and corrections while clearing on topic changes. The old proposal's missing-instruction and dropped-follow-up diagnoses are therefore historical, not current defects.
 
-The source data supports workforce/profile counts, aggregate skills and recruiting evidence, not measured ticket throughput, backlog, project allocations, uncommitted staff, onboarding effort or manager capacity. `lib/swp-demand.ts` implements a narrow managed-services effort bridge; on this main it is used by the optional standalone illustration/editor, not wired into ordinary Home starter chat. Do not promise that clicking a starter invokes it. Existing explicit plan/mix workflows can compute supported comparisons after input and scope review; they do not make every business question calculable.
+The natural business-planning bridge is implemented in [`lib/home-business-planning.ts`](../lib/home-business-planning.ts), the solution service and [`lib/home-business-planning-save.ts`](../lib/home-business-planning-save.ts). It supports scoped demand review/correction, checked staffing comparisons and explicit reviewed selection. It does not require an exact starter or prebound demand fixture. Omitted values and provenance are retained; quoted corrections or withdrawals must pass existing guards. Saved selections preserve proposal snapshots and receipts. Code availability does not prove that a live model chooses the right tool or explains a useful recommendation.
 
-## Minimal proposed behavior change
+Scope remains bounded: employee/profile counts are not uncommitted capacity, source snapshots are not measured throughput, and arithmetic under entered assumptions is not evidence of operational feasibility or causal training effects. The manual capacity workspace and its hosted save/reopen acceptance are separate from natural-language interpretation quality.
 
-For an active business-planning conversation, ask the model to offer a useful provisional recommendation with a brief reason, tradeoffs and a concrete next move. If an important input is unknown, make the recommendation conditional or propose clearly labeled assumptions for correction. Ask a question only if its answer materially changes the choice and cannot sensibly be handled conditionally. Consider alternatives and combinations when they fit the objective; do not force a binary choice, a fixed mix, three options, or a universal hire/train answer. Adapt when the user changes a constraint.
+## Evidence and its limits
 
-Keep this guidance scoped to planning conversation rather than every factual answer. Retain the existing schema, model, tools, unknown-value provenance, explicit review/accept/save boundaries and frozen v5 fixture. Extend only bounded comparative follow-up recognition (for example, "how about both?") when a planning context is active; topic switches must still end it. Any subsequent tool integration is a separate implementation requiring explicit scope and data checks, not implied by this recommendation change.
+| Evidence | What it establishes | What it does not establish |
+| --- | --- | --- |
+| `tests/home-strategic-planning.test.mjs` and `tests/home-planning-continuation.test.mjs` | Instruction content, bounded context retention and topic-change behavior | Model adherence, usefulness or semantic quality |
+| `tests/home-business-planning.test.mjs` | Checked arithmetic, provenance/unknown retention, quoted corrections/withdrawals, scope/reference guards and explicit selection contracts | Correct interpretation of arbitrary language |
+| `tests/browser/home-natural-business-full-client.mjs` | Existing full-client harness for actual request transport, compiled route, provisional state, review/save and reload using synthetic provider/dataset transports | Live-provider acceptance; this audit does not claim a fresh browser run |
+| PR268 pre/post-merge CI | 2,629 regression tests plus provenance, generated-artifact and TypeScript checks passed on the released application tree | A real-model semantic evaluation |
+| Parent-reported hosted planner acceptance | Manual calculation, save/open/compare and narrow layout behavior within the recorded test scope | Natural conversation quality or all browsers/screen readers |
 
-## Proposed semantic acceptance examples
+The historical full-client narrative in `home-natural-business-planning.md` describes its original candidate and local evidence. Its old publication status is not current release status. The frozen provider reference is unchanged and is not fresh acceptance for this source.
+
+## Semantic acceptance cases
+
 
 These examples describe acceptable reasoning and interaction, not exact required wording or canned recommendations. They must eventually be evaluated on real model responses separately from calculation/schema/save tests. No such evaluation is claimed here.
 
@@ -30,6 +40,17 @@ These examples describe acceptable reasoning and interaction, not exact required
 - **Review and save remain intentional:** "Use your assumptions for now" must not become source verification or silent save. "What if we split the work?" must not change the reviewed/saved plan without its existing checks. An explicit later calculation/review/save request continues through the current workflow.
 - **No endless discovery:** An answer that only lists missing inputs or repeatedly asks exploratory questions fails, even if its schema and calculation contracts pass. A conditional recommendation with a reason and a useful next action can pass when measured inputs remain unknown. A single essential clarification can pass when different interpretations would materially change the recommendation.
 
-## Evidence limits
 
-The supplied response screenshot (`libfile_b5fe738a1290819191937e84f3f6ced7`) was resolved and attempted through the supported Library materialization helper, including one fresh preparation/retry. Both transfers failed with `download failed`; no readable local image was produced, so actual pixels could not be inspected. Its contents are not used as evidence here. No provider, database write, permission or deployment action was performed for this proposal.
+## Verification of this documentation update
+
+All 20 targeted tests across strategic planning, planning continuation and business planning passed on this source. The seven semantic case descriptions were preserved verbatim from the previous document; relative source links resolve and the whitespace diff check passes. No application files changed, so a new application build or browser run was not needed. These checks validate the specification against deterministic source evidence only.
+
+## Next actionable increment
+
+The remaining agreed gap is real-model interpretation and recommendation quality on the natural conversation path, not an established missing deterministic planning feature. Start with the cases above, record the actual route and source identity, and assess each response for recommendation, reason, next move, grounded comparative claims, adaptation, preserved unknowns and intentional save behavior. Report failed cases with exact observations before proposing a bounded behavior fix. Do not require a fixed recommendation, tool sequence, ratio, number of alternatives or exact wording.
+
+The [provider-free evaluation manifest](recommendation-evaluation-manifest.json) now supplies stable case IDs, user turns or explicit scenario/rubric prerequisites, verbatim semantic criteria, source/route identity, evidence-origin labels, nullable usage and separate synthetic/real-provider outcomes. Every outcome is unrun and execution is disabled. Copy the template for a future authorized review and record actual conversations, tool results and reasoned observations; there is no provider client, runner or automatic semantic scorer. Reuse the current route/harness rather than add another planner or canned response path. This completes the small evaluation-preparation increment; it is not a release requirement or evidence of model quality.
+
+No paid evaluation is authorized in this increment. Population retries remain paused. A later real-provider run requires an available approved budget and an enforceable bound for the actual request journey, including instructions, schemas, history and tool returns. The route's 5,000 output-token limit per response, retry setting and deadline alone do not establish total cost; serialized byte counts are not a verified billable-token or dollar bound. No new credential, data-upload or access route is part of this work.
+
+The earlier screenshot transfer failure and historical unexecuted proposal remain recorded in Git history; no screenshot pixels or real model responses were inspected for this documentation update.

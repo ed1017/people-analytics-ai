@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "purpose": "Manual semantic evaluation preparation; no execution or release gate.",
+  "sourceCommit": "a04ff3d02c56adfe7e4962fbea41dae924ac8875",
+  "sourceTree": "1ba638cb53da6001a7360658a47455947172c95d",
+  "route": "/api/home-solution-conversation",
+  "featureRequirement": "NEXT_PUBLIC_HOME_SOLUTION_CONVERSATION=true",
+  "evidenceOrigin": "none",
+  "executionEnabled": false,
+  "outcomeVocabulary": [
+    "unrun",
+    "pass",
+    "fail"
+  ],
+  "evidenceOriginVocabulary": [
+    "none",
+    "synthetic",
+    "real-provider"
+  ],
+  "instructions": [
+    "Copy this template for a future authorized run; retain the original unrun manifest.",
+    "Record the actual source, route, environment, exact user and assistant turns, tool results, reviewer and criteria-level observations. Context case IDs indicate prior turns, not canned assistant replies.",
+    "Empty userTurns are scenario/rubric cases, not executable prompts: record a supported explicit scenario for supported-calculation; assess useful-guidance against the recorded support-workload conversation.",
+    "Synthetic evidence can validate the harness only; it cannot establish real-provider semantic acceptance. Record usage as unknown when unavailable, never zero by default.",
+    "A pass/fail requires actual response evidence and reasoned review against the semantic criterion. No exact wording, mandatory mix or automatic scorer is implied."
+  ],
+  "cases": [
+    {
+      "id": "support-workload",
+      "title": "Conditional support workload",
+      "contextCaseIds": [],
+      "userTurns": [
+        "If the new contracts bring more support tickets, should we hire specialists or train people from another team?"
+      ],
+      "semanticCriterion": "\"If the new contracts bring more support tickets, should we hire specialists or train people from another team?\" A useful response might suggest checking whether the increase is short-lived or sustained, then conditionally favor training for repeatable work with adequate lead time and hiring for specialist coverage needed immediately. It should explain speed, training effort and source-team disruption, and propose reviewing work types and release constraints next. It must not claim an observed backlog, known spare team or numeric staffing requirement.",
+      "realProviderOutcome": "unrun",
+      "syntheticOutcome": "unrun",
+      "evidence": [],
+      "reviewer": null,
+      "observations": null,
+      "usage": null
+    },
+    {
+      "id": "justified-combination",
+      "title": "A justified combination",
+      "contextCaseIds": [
+        "support-workload"
+      ],
+      "userTurns": [
+        "Or how about both?"
+      ],
+      "semanticCriterion": "Follow with \"Or how about both?\" The answer should stay with the same objective and consider, for example, specialist coverage plus training for repeatable work, if their responsibilities and timing are complementary. Explain the additional onboarding/training burden and prevent double-counting the same people or manager time. It must be equally able to reject a mix when that burden defeats the objective. No fixed ratio or mandatory three options.",
+      "realProviderOutcome": "unrun",
+      "syntheticOutcome": "unrun",
+      "evidence": [],
+      "reviewer": null,
+      "observations": null,
+      "usage": null
+    },
+    {
+      "id": "manager-capacity",
+      "title": "Recruiting versus manager capacity",
+      "contextCaseIds": [],
+      "userTurns": [
+        "The product is due in six months, but managers are stretched. Should we recruit more engineers?"
+      ],
+      "semanticCriterion": "\"The product is due in six months, but managers are stretched. Should we recruit more engineers?\" Recommend a phased or otherwise conditional hiring/onboarding approach if onboarding would consume the constrained resource; contrast it with reassignment or narrowing delivery scope. The next move should check manager/buddy time and the critical work before asserting a feasible hire count. Do not infer manager capacity from headcount or invent a hiring lead time.",
+      "realProviderOutcome": "unrun",
+      "syntheticOutcome": "unrun",
+      "evidence": [],
+      "reviewer": null,
+      "observations": null,
+      "usage": null
+    },
+    {
+      "id": "changed-release-constraint",
+      "title": "Adapting after a constraint",
+      "contextCaseIds": [
+        "support-workload",
+        "justified-combination"
+      ],
+      "userTurns": [
+        "We can't release people from other client work, and we need coverage next month."
+      ],
+      "semanticCriterion": "\"We can't release people from other client work, and we need coverage next month.\" Revise the previous recommendation and explain why the new release/timing constraints change it. Do not keep recommending redeployment as though people were available. A reasonable answer can prefer external specialist coverage conditionally while acknowledging hiring lead time and cost remain unknown.",
+      "realProviderOutcome": "unrun",
+      "syntheticOutcome": "unrun",
+      "evidence": [],
+      "reviewer": null,
+      "observations": null,
+      "usage": null
+    },
+    {
+      "id": "supported-calculation",
+      "title": "Use data and code where they apply",
+      "contextCaseIds": [],
+      "userTurns": [],
+      "semanticCriterion": "If the user asks to compare a supported explicit planning scenario, use its existing input/review/calculation path and explain the returned result and scope. Cite available workforce/skills/recruiting facts at their supplied population and period. For unsupported operational throughput, state the boundary once and offer a qualitative or clearly assumed comparison; never label a proposed number as measured or imply a tool was run.",
+      "realProviderOutcome": "unrun",
+      "syntheticOutcome": "unrun",
+      "evidence": [],
+      "reviewer": null,
+      "observations": null,
+      "usage": null
+    },
+    {
+      "id": "intentional-save",
+      "title": "Review and save remain intentional",
+      "contextCaseIds": [
+        "support-workload",
+        "justified-combination"
+      ],
+      "userTurns": [
+        "Use your assumptions for now",
+        "What if we split the work?"
+      ],
+      "semanticCriterion": "\"Use your assumptions for now\" must not become source verification or silent save. \"What if we split the work?\" must not change the reviewed/saved plan without its existing checks. An explicit later calculation/review/save request continues through the current workflow.",
+      "realProviderOutcome": "unrun",
+      "syntheticOutcome": "unrun",
+      "evidence": [],
+      "reviewer": null,
+      "observations": null,
+      "usage": null
+    },
+    {
+      "id": "useful-guidance",
+      "title": "No endless discovery",
+      "contextCaseIds": [
+        "support-workload"
+      ],
+      "userTurns": [],
+      "semanticCriterion": "An answer that only lists missing inputs or repeatedly asks exploratory questions fails, even if its schema and calculation contracts pass. A conditional recommendation with a reason and a useful next action can pass when measured inputs remain unknown. A single essential clarification can pass when different interpretations would materially change the recommendation.",
+      "realProviderOutcome": "unrun",
+      "syntheticOutcome": "unrun",
+      "evidence": [],
+      "reviewer": null,
+      "observations": null,
+      "usage": null
+    }
+  ]
+}
