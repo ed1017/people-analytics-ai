@@ -40,11 +40,12 @@ function durationLabel(
 }
 
 export function LearningDevelopmentPage({
-  data,
+  data: sourceData,
   loading,
   error,
   selectedContext,
 }: LearningDevelopmentPageProps) {
+  const data = !loading && !error ? sourceData : null;
   return (
     <section className="learning-development-page min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
@@ -70,8 +71,8 @@ export function LearningDevelopmentPage({
         </p>
       )}
 
-      {error && (
-        <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+      {!loading && error && (
+        <div role="alert" className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
           {error}
         </div>
       )}
@@ -402,7 +403,7 @@ export function LearningDevelopmentPage({
           </details>
         </>
       ) : (
-        <div className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
+        (loading || !error) && <div role="status" className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
           {loading
             ? "Loading Learning & Development pathway coverage…"
             : "No Learning & Development data returned."}

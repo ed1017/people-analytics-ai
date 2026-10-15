@@ -117,7 +117,7 @@ try{for(const [size,width,height] of [['laptop',1366,768],['phone',390,844],['sm
  const composer=page.getByLabel('Ask Workforce AI',{exact:true}),unsent='Unsent revision: keep my proposed coordination hours at 24.';
  await composer.fill(unsent);const beforeDisclosureCalls=serviceCalls;await inspect('working',card);
  check(size+' disclosure preserves unsent revision without requests',await composer.inputValue()===unsent&&serviceCalls===beforeDisclosureCalls);await composer.fill('');
- await card.getByRole('button',{name:/^Pin Action Plan/}).click();await card.getByRole('button',{name:/^Pinned Action Plan/}).waitFor();await capture('home-pinned');
+ await card.getByRole('button',{name:/^Save plan/}).click();await card.getByRole('button',{name:/^Pinned Action Plan/}).waitFor();await capture('home-pinned');
  const saved=page.locator('summary').filter({hasText:/^Saved Action Plans$/});if(await saved.count()){await saved.click();await capture('home-saved-expanded');await inspect('saved',page.getByRole('article',{name:'Action Plan option 1',exact:true}).first());await saved.click();}
  await navigate('decision-brief');await capture('decision-brief');
  const attached=page.getByRole('region',{name:'Attached Action Plans',exact:true}),attachedCard=attached.getByRole('article').first();

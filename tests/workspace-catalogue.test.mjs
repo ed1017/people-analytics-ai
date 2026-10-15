@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {appNavigationSections,getWorkspaceForPage,getDefaultPageForWorkspace,appPageMetadata} from '../lib/app-navigation.ts';
+import {planningJourney,planningEvidence} from '../lib/planning-journey.ts';
 test('four groups preserve existing destinations and expose only an evaluation placeholder',()=>{
   assert.deepEqual(appNavigationSections.map(s=>s.title),['Workforce','Intelligence','Planning','Assess & Evaluate']);
   for(const page of ['skills','learning-development','career-mobility','career-growth-mobility','succession-planning'])assert.equal(getWorkspaceForPage(page),'analytics');
@@ -9,8 +10,25 @@ test('four groups preserve existing destinations and expose only an evaluation p
   const pages=appNavigationSections.flatMap(s=>s.pages);assert.equal(new Set(pages).size,pages.length);
   for(const page of pages)assert.ok(appPageMetadata[page]);
 });
-test('five core Planning destinations retain their order and aliases',()=>{
-  assert.deepEqual(appNavigationSections[2].pages.slice(0,5),['planning-overview','scenario-modeling','position-workforce-design','workforce-response','execution-feasibility']);
+test('SWP journey leads navigation while core Planning tools retain their relative order and aliases',()=>{
+  assert.deepEqual(planningJourney,[
+    {page:'workforce',label:'Baseline'},
+    {page:'future-of-work',label:'Future of Work'},
+    {page:'planning-overview',label:'Scenarios'},
+    {page:'action-plans',label:'Action plans'},
+    {page:'plan-track',label:'Track'},
+  ]);
+  const core=['planning-overview','scenario-modeling','position-workforce-design','workforce-response','execution-feasibility'];
+  assert.deepEqual(appNavigationSections[2].pages.filter(page=>core.includes(page)),core);
+  for(const {page} of planningJourney){
+    assert.ok(appPageMetadata[page]);
+    assert.equal(getWorkspaceForPage(page),page==='workforce'?'analytics':'strategy');
+    assert.equal(appNavigationSections.flatMap(section=>section.pages).filter(item=>item===page).length,1);
+  }
+  assert.equal(appPageMetadata.home.label,'Plan home');
+  assert.equal(getDefaultPageForWorkspace('strategy'),'planning-overview');
+  assert.deepEqual(planningEvidence.map(item=>item.page),['attrition','skills','labor-market','compensation']);
+  assert.equal(planningEvidence.some(item=>planningJourney.some(step=>step.page===item.page)),false);
   assert.equal(getWorkspaceForPage('workforce-planning'),'strategy');
   assert.ok(appNavigationSections[2].pages.includes('development-planning'));
 });

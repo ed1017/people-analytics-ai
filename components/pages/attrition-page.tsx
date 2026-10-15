@@ -34,7 +34,8 @@ function monthLabel(value: string) {
 }
 // Draft edits update the application shell. Keep unchanged chart inputs out of
 // that render path: Recharts registers data and axes through store subscriptions.
-export const AttritionPage = memo(function AttritionPage({ data, loading, error, exitData, exitLoading, exitError }: Props) {
+export const AttritionPage = memo(function AttritionPage({ data: sourceData, loading, error, exitData, exitLoading, exitError }: Props) {
+  const data = !loading && !error ? sourceData : null;
   const summary = data?.summary;
   const trend2026 = useMemo(() => (data?.trend ?? []).filter((row) => row.month >= "2026-01-01"), [data?.trend]);
 
@@ -51,8 +52,8 @@ export const AttritionPage = memo(function AttritionPage({ data, loading, error,
         </span>
       </div>
 
-      {error && (
-        <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+      {!loading && error && (
+        <div role="alert" className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
           {error}
         </div>
       )}
@@ -182,7 +183,7 @@ export const AttritionPage = memo(function AttritionPage({ data, loading, error,
           </div>
         </>
       ) : (
-        <div className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
+        (loading || !error) && <div role="status" className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
           {loading ? "Loading attrition analytics…" : "No attrition data returned."}
         </div>
       )}

@@ -46,7 +46,7 @@ try {
     const selected = destination => page.waitForFunction(destination => {
       const planningLabels={'scenario-modeling':'Open Stored scenario tools','position-workforce-design':'Open Position & Workforce Design','workforce-response':'Open Workforce Response','execution-feasibility':'Open Execution & Feasibility'};
       const node = planningLabels[destination] ? document.querySelector(`button[aria-label="${planningLabels[destination]}"]`) : destination === 'home'
-        ? document.querySelector('button[aria-label="Overview"]')
+        ? document.querySelector('button[aria-label="Plan home"]')
         : document.querySelector(`[data-nav-destination="${destination}"]`);
       return node?.getAttribute('aria-current') === 'page';
     }, destination);
@@ -55,14 +55,19 @@ try {
 
       const trigger = button('Open navigation');
       if (await trigger.isVisible()) await trigger.click();
-      if (destination === 'home') await button('Overview').click();
-      else if(destination==='planning-overview')await button('Demand & scenarios').click();
+      const sidebar = page.getByRole('navigation', {name: 'Workforce navigation', exact: true});
+      if (destination === 'home') await sidebar.getByRole('button', {name: 'Plan home', exact: true}).click();
+      else if(destination==='planning-overview')await sidebar.getByRole('button', {name: 'Scenarios', exact: true}).click();
       else {
-        const explore=button('Explore');if(await explore.getAttribute('aria-expanded')==='false')await explore.click();
+        const explore=button('More evidence and tools');
         const item = page.locator(`[data-nav-destination="${destination}"]`);
-        const groupId = await item.evaluate(node => node.parentElement.id);
-        const toggle = page.locator(`button[aria-controls="${groupId}"]`);
-        if (await toggle.getAttribute('aria-expanded') === 'false') await toggle.click();
+        if (!await item.isVisible()) {
+          if (await explore.getAttribute('aria-expanded') === 'false') await explore.click();
+          const groupId = await item.evaluate(node => node.closest('[id^="navigation-"]')?.id);
+          assert.ok(groupId, 'secondary destination belongs to an expandable group');
+          const toggle = page.locator(`button[aria-controls="${groupId}"]`);
+          if (await toggle.getAttribute('aria-expanded') === 'false') await toggle.click();
+        }
         await item.click();
       }
       await selected(destination);
@@ -79,11 +84,13 @@ try {
     await title('Skills Intelligence'); await selected('skills');
     check(mode + ' initial deep link opens the selected destination', urlIs('skills'));
     await page.waitForFunction(() => document.querySelector('select[aria-label="Selected goal"]')?.value === 'private-goal');
+    await navigate('workforce'); // Snapshot filters are editable on Baseline, not Skills.
     await page.waitForFunction(() => document.querySelector('select[aria-label="Country"] option[value="UK"]'));
     const country = page.getByLabel('Country', {exact: true});
     if (!await country.isVisible()) await page.locator('.workforce-filter-disclosure summary').click();
     await country.selectOption('UK');
     await page.getByLabel('Select persona', {exact: true}).selectOption('Finance');
+    await navigate('skills');
     const initialHistory = await page.evaluate(() => {window.__navigationShell = document.querySelector('main'); return history.length;});
     await navigate('skills'); await navigate('skills');
     check(mode + ' repeated page clicks add no duplicate history', await page.evaluate(() => history.length) === initialHistory);
@@ -103,6 +110,10 @@ try {
       && await page.getByLabel('Select persona', {exact: true}).inputValue() === 'Finance'
       && await page.getByLabel('Selected goal', {exact: true}).inputValue() === 'private-goal'
       && await page.getByLabel('Ask Workforce AI', {exact: true}).inputValue() === privateDraft);
+    for (const [destination, expectedTitle] of [['future-of-work','Future of Work'],['action-plans','Action plans'],['plan-track','Track']]) {
+      await navigate(destination); await title(expectedTitle);
+      check(mode + ' journey destination retains URL context: ' + destination, urlIs(destination));
+    }
     await navigate('scenario-modeling'); await title('Scenario Modeling');
     await button('Open Position & Workforce Design').click(); await selected('position-workforce-design');
     check(mode + ' internal Planning navigation updates the destination URL', urlIs('position-workforce-design'));

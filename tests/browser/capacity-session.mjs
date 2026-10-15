@@ -15,10 +15,10 @@ try{
  await page.route('**/*',route=>route.fulfill({contentType:'text/html',body:'<div id="root"></div><script>'+bundle.replaceAll('</script','<\\/script')+'</script>'}));
  await page.goto('https://capacity-fixture.test');
  const scope=()=>page.getByLabel('Work to plan',{exact:true});await scope().fill('Goal A workload');
- for(const [label,value] of Object.entries({'Opening date (month end)':'2026-09-30','People at the start':'10','Working time at the start (FTE)':'8','Work items each month':'800','Hours per item':'1','Work hours per FTE each month':'160'}))await page.getByLabel(label,{exact:true}).fill(value);
+ for(const [label,value] of Object.entries({'Opening date (month end)':'2026-09-30','People at the start':'10','Contracted time at start (FTE)':'8','Work items each month':'800','Hours per item':'1','Productive hours per FTE / month':'160'}))await page.getByLabel(label,{exact:true}).fill(value);
  await page.locator('form summary').click();
  for(const [label,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await page.getByLabel(label,{exact:true}).fill(value);
- await page.getByRole('checkbox',{name:/Assume every hire/}).check();await page.getByRole('checkbox',{name:/I confirm/}).check();await page.getByRole('button',{name:'Calculate capacity',exact:true}).click();
+ await page.getByRole('checkbox',{name:/Assume each person joining/}).check();await page.getByRole('checkbox',{name:/I confirm/}).check();await page.getByRole('button',{name:'Calculate capacity',exact:true}).click();
  const comparison=()=>page.getByRole('region',{name:'Monthly capacity comparison'});await revealMonthlyCapacityDetail(page);await comparison().waitFor();
  await page.getByRole('button',{name:'Goal B',exact:true}).click();assert.equal(await scope().inputValue(),'');assert.equal(await comparison().count(),0);await scope().fill('Goal B workload');
  await page.getByRole('button',{name:'Goal A',exact:true}).click();assert.equal(await scope().inputValue(),'Goal A workload');await revealMonthlyCapacityDetail(page);await comparison().waitFor();

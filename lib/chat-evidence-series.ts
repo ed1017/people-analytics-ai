@@ -1,4 +1,6 @@
 import {normalizeHomePack} from './home-pack.mjs';
+// @ts-expect-error Native fixtures share source.
+import {turnoverChartMonths} from './home-turnover-chat.ts';
 export type ChatEvidenceSeries={version:1;requestId:string;datasetToken:string;packetSha256:string;kind:'recorded';synthetic:boolean;metric:'headcount'|'hires'|'monthly_turnover_pct'|'monthly_voluntary_turnover_pct';title:string;unit:'people'|'hires'|'%';sourceId:'W1'|'A1'|'R1';scope:string;asOf:string;limitation:string;sampled:true;omitted:number;points:{date:string;value:number}[]};
 type Grounding={datasetToken:string;packetSha256:string;sources:{id:string;status:string;scope:string;asOf:string|null;basis:string}[]};
 const date=(value:unknown):value is string=>typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;
@@ -16,12 +18,14 @@ export function answerEvidenceSeries(evidence:unknown,grounding:Grounding|undefi
  if(!source||source.status!=='loaded'||!date(source.date)||!receipt||receipt.status!=='loaded'||receipt.basis!=='database-backed-aggregate'||receipt.scope!==source.scope||receipt.asOf!==source.date)return [];
  const facts=source.facts as Record<string,unknown>,asOf=source.date!;
  const rows=(metric.startsWith('monthly_')?facts.monthly??[]:facts.rows??[]) as Record<string,unknown>[];
- const selected=rows.filter(row=>row.suppressed!==true&&date(row[definition.date])&&String(row[definition.date])<=asOf&&validValue(row[metric],definition.unit==='%'));
+ const requested=metric.startsWith('monthly_')?turnoverChartMonths(question,rows.filter(row=>date(row[definition.date])).map(row=>String(row[definition.date]))):undefined;
+ if(requested===null)return [];
+ const selected=rows.filter(row=>(!requested||requested.includes(String(row[definition.date])))&&row.suppressed!==true&&date(row[definition.date])&&String(row[definition.date])<=asOf&&validValue(row[metric],definition.unit==='%'));
  const points=selected.map(row=>({date:String(row[definition.date]),value:Number(row[metric])})).sort((a,b)=>a.date.localeCompare(b.date));
  if(points.length<2||points.length>3||new Set(points.map(point=>point.date)).size!==points.length)return [];
  const denominator=(source.coverage as {monthly?:{denominator?:unknown}}).monthly?.denominator;
  const limitation=[source.limitation,metric.startsWith('monthly_')&&typeof denominator==='string'?`Monthly-rate denominator: ${denominator}`:''].filter(Boolean).join(' ');
- return [{version:1,requestId,datasetToken:grounding.datasetToken,packetSha256:grounding.packetSha256,kind:'recorded',synthetic:!!source.sourceContext||/synthetic|fictional|simulated|constructed/i.test(source.limitation),metric,title:definition.title,unit:definition.unit,sourceId:definition.source,scope:source.scope,asOf:source.date,limitation,sampled:true,omitted:rows.length-points.length,points}];
+ return [{version:1,requestId,datasetToken:grounding.datasetToken,packetSha256:grounding.packetSha256,kind:'recorded',synthetic:!!source.sourceContext||/synthetic|fictional|simulated|constructed/i.test(source.limitation),metric,title:definition.title,unit:definition.unit,sourceId:definition.source,scope:source.scope,asOf:source.date,limitation,sampled:true,omitted:rows.filter(row=>!requested||requested.includes(String(row[definition.date]))).length-points.length,points}];
 }
 /** Reject malformed or stale supplemental data without losing a valid text answer. */
 export function readChatEvidenceSeries(raw:unknown,requestId:string,datasetToken:string):ChatEvidenceSeries[]{

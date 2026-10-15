@@ -35,19 +35,23 @@ try{
   async function navigate(destination){
    await openNavigation();
    const item=page.locator(`[data-nav-destination="${destination}"]`);
-   const group=await item.evaluate(node=>node.parentElement.id);
-   const toggle=page.locator(`button[aria-controls="${group}"]`);
-   if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
+   if(!await item.isVisible()){
+    const more=button('More evidence and tools');if(await more.getAttribute('aria-expanded')==='false')await more.click();
+    const group=await item.evaluate(node=>node.closest('[id^="navigation-"]')?.id);
+    assert.ok(group,'secondary destination retains an expandable group');
+    const toggle=page.locator(`button[aria-controls="${group}"]`);
+    if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
+   }
    await item.click();
    await page.waitForFunction(destination=>document.querySelector(`[data-nav-destination="${destination}"]`)?.getAttribute('aria-current')==='page',destination);
   }
-  async function returnHome(){await openNavigation();await button('Overview').click();if(!await chat.isVisible())await page.getByText('Chat & saved goals',{exact:true}).click();await chat.waitFor();}
+  async function returnHome(){await openNavigation();await button('Plan home').click();await chat.waitFor();}
   async function historyContains(text){
    await button('Open data details').click();
    const found=(await page.getByRole('dialog',{name:'Data details',exact:true}).getByRole('region',{name:'Conversation history',exact:true}).innerText()).includes(text);
    await button('Close data details').click();return found;
   }
-  await page.goto(base);await page.getByText('Chat & saved goals',{exact:true}).click();await chat.waitFor();await chat.fill(goal);
+  await page.goto(base);await page.getByRole('region',{name:'Plan your workforce',exact:true}).waitFor();await chat.waitFor();check(mode+' chat composer is available without a disclosure',await chat.isVisible());await chat.fill(goal);
   await button('Send overview question').click();
   await pin.waitFor();
   check(mode+' completed answer and its Pin candidate are visible',await transcript.getByText(answer,{exact:true}).isVisible()&&await pin.isVisible());

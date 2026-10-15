@@ -17,6 +17,7 @@ import { MAX_GOALS, emptyLocalGoals, type LocalGoals } from "@/lib/local-goals";
 import {solutionConversationEnabled} from '@/lib/home-solution-conversation';
 import {datasetDecisionKey,type Json} from '@/lib/local-decisions';
 import {decisionStore,useDecisionStorage} from "@/components/decision-store";
+import {ExplorationDraftStore} from '@/lib/exploration-draft';
 
 type GoalChat = { messages: ChatMessage[]; input: string; problem: HomeDecisionContext | null; questionUnanswered: boolean; resetMarks?:Record<string,number>; recoveredPlanSelectionRequired?:boolean };
 export function useProblemConversation(scope = "home") {
@@ -26,7 +27,9 @@ export function useProblemConversation(scope = "home") {
   const firstVisitSnapshot=useRef<boolean|null>(null);
   const [firstHomeVisit,setFirstHomeVisit]=useState(false);
   const decisionStorage=useDecisionStorage();
-  const storageNotice=decisionStorage.notice;
+  const tabDraft=useRef<ExplorationDraftStore|null>(null);
+  const [tabDraftNotice,setTabDraftNotice]=useState<string|null>(null);
+  const storageNotice=[decisionStorage.notice,tabDraftNotice].filter(Boolean).join(' ')||null;
   const chats = useRef(new Map<string, GoalChat>());
   const guidedIsolation=useRef<GuidedReturn|null>(null);
   const [workspaceRevision, setWorkspaceRevision] = useState(0);
@@ -75,6 +78,12 @@ export function useProblemConversation(scope = "home") {
     setFirstHomeVisit(firstVisitSnapshot.current);
     // Restore browser-owned state after hydration; never write defaults over unread storage.
     let saved=decisionStore.initialize({getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),removeItem:key=>localStorage.removeItem(key)},createHomeDemoGoals,{getItem:key=>sessionStorage.getItem(key),setItem:(key,value)=>sessionStorage.setItem(key,value),removeItem:key=>sessionStorage.removeItem(key)}).goals;
+    if(!solutionConversationEnabled){
+      tabDraft.current??=new ExplorationDraftStore({getItem:key=>sessionStorage.getItem(key),setItem:(key,value)=>sessionStorage.setItem(key,value),removeItem:key=>sessionStorage.removeItem(key)},decisionStore.getDatasetToken());
+      const input=tabDraft.current.read();
+      if(input!==null&&!chats.current.has(''))chats.current.set('',{messages:[],input,problem:null,questionUnanswered:false});
+      setTabDraftNotice(tabDraft.current.notice);
+    }
     let returned:GuidedReturn|null=null;
     try{returned=readGuidedReturn(sessionStorage.getItem(guidedReturnKey));sessionStorage.removeItem(guidedReturnKey);}catch{/* Normal browser storage recovery remains available. */}
     if(returned){
@@ -99,6 +108,10 @@ export function useProblemConversation(scope = "home") {
   const setMessages: Dispatch<SetStateAction<ChatMessage[]>> = update => {const current=storedMessagesRef.current,start=conversationBoundary(resetMarksRef.current,scope,current.length);setStoredMessages([...current.slice(0,start),...(typeof update === "function" ? update(current.slice(start)) : update)]);};
   useEffect(()=>{
     if(storageReady&&(localGoals.activeId||solutionConversationEnabled&&!guidedIsolation.current))decisionStore.setField(localGoals.activeId,"chat",{messages:storedMessages,input,problem,questionUnanswered:false,resetMarks,...(recoveredPlanSelectionRequired?{recoveredPlanSelectionRequired:true}:{})});
+    if(storageReady&&!localGoals.activeId&&!solutionConversationEnabled&&!guidedIsolation.current){
+      if(tabDraft.current?.datasetToken!==decisionStore.getDatasetToken())return;
+      tabDraft.current.save(input);setTabDraftNotice(tabDraft.current.notice);
+    }
   },[storageReady,localGoals.activeId,storedMessages,input,problem,resetMarks,recoveredPlanSelectionRequired]);
   const rememberQuestion = (key: string, question: string) => setProblem(current => rememberProblemQuestion(current, key, question));
   const cancelPending = () => { requestGate.current.invalidate(); setHomeGoalChoiceKey(null); setLoading(false); };
@@ -111,6 +124,15 @@ export function useProblemConversation(scope = "home") {
     setFocusedIssue(next.goals.find(g=>g.id===next.activeId)?.statement ?? ""); persist(next);
   };
   const recoverStorage=(keepSaved=false)=>{
+    // General exploration is tab-owned in this mode, so a shared-decision merge
+    // cannot restore it. Capture the live draft even when its tab save failed.
+    const explorationChat:GoalChat|undefined=!solutionConversationEnabled&&!guidedIsolation.current
+      ?goalsRef.current.activeId?chats.current.get(''):{messages:storedMessagesRef.current,input:inputRef.current,problem,questionUnanswered,resetMarks:resetMarksRef.current,recoveredPlanSelectionRequired}
+      :undefined;
+    if(!solutionConversationEnabled&&tabDraft.current?.datasetToken===decisionStore.getDatasetToken()&&!guidedIsolation.current){
+      tabDraft.current.save(explorationChat?.input??'');
+      setTabDraftNotice(tabDraft.current.notice);
+    }
     const wasRecovery=!!decisionStore.getSnapshot().recovery;
     if(keepSaved)decisionStore.recoverDraft(true);else decisionStore.retry();
     const state=decisionStore.getSnapshot();
@@ -118,7 +140,8 @@ export function useProblemConversation(scope = "home") {
     // Replace React's cached transcript and goal selection with the reviewed merge.
     // Reusing a stale chat cache here would write this tab's old history over the merge.
     cancelPending();chats.current.clear();history.current={key:'',messages:[]};
-    const next=state.data.goals,chat=decisionStore.getField<GoalChat|null>(next.activeId,'chat',null);
+    if(explorationChat)chats.current.set('',explorationChat);
+    const next=state.data.goals,chat=!next.activeId&&explorationChat?explorationChat:decisionStore.getField<GoalChat|null>(next.activeId,'chat',null);
     goalsRef.current=next;setLocalGoals(next);setFocusedIssue(next.goals.find(g=>g.id===next.activeId)?.statement??'');
     setStoredMessages(chat?.messages??[]);setResetMarks(chat?.resetMarks??{});setInput(chat?.input??'');setRecoveredPlanSelectionRequired(chat?.recoveredPlanSelectionRequired===true);setProblem(chat?.problem??null);setQuestionUnanswered(false);
     setIssueEditor(null);setError(null);setWorkspaceRevision(value=>value+1);
@@ -258,10 +281,12 @@ export function useProblemConversation(scope = "home") {
   const goalRequirements=activeGoal?.context ?? emptyGoalRequirements();
   const goalContext=activeGoal?{goal:activeGoal.statement,...goalRequirements}:null;
   const clearAllGoals = () => {
+    if(tabDraft.current){tabDraft.current.clear();setTabDraftNotice(tabDraft.current.notice);}
     explorationContext.current=emptyGoalRequirements();cancelPending(); chats.current.clear(); history.current={key:"",messages:[]}; setStoredMessages([]);setResetMarks({}); setInput(""); setProblem(null); setQuestionUnanswered(false); setFocusedIssue(""); setIssueEditor(null); setError(null); setWorkspaceRevision(v=>v+1); persist(emptyLocalGoals(),true);
   };
   const resetConversation=()=>{
     if(!storageReady)return;
+    if(tabDraft.current&&!guidedIsolation.current){tabDraft.current.clear();setTabDraftNotice(tabDraft.current.notice);}
     const current=goalsRef.current;
     explorationContext.current=emptyGoalRequirements();
     cancelPending();history.current={key:"",messages:[]};setInput("");setProblem(null);setQuestionUnanswered(false);setError(null);setIssueEditor(null);

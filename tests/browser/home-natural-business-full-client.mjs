@@ -80,12 +80,12 @@ try{for(const [mode,width,height] of [['desktop',1280,900],['mobile',390,844]]){
  await page.screenshot({path:path.join(output,mode+'-comparison.png'),fullPage:true});
  const before=JSON.stringify(business);await page.reload();await dismissHomeOnboarding(page);await card.waitFor();
  check(mode+' reload retains exact provisional state through the normal conversation envelope',JSON.stringify(conversation(await state()).businessPlanning)===before);
- await button('Review 0/0/2').click();await page.getByRole('region',{name:'Review provisional staffing selection'}).waitFor();
+ await button('Review to save: 0/0/2').click();await page.getByRole('region',{name:'Review provisional staffing selection'}).waitFor();
  check(mode+' review alone preserves no-save boundary',JSON.stringify((await state()).goals)===originalGoals&&!((await state()).exploration.fields[planAlternativesField]));
  await button('Cancel plan review').click();await send('correct');s=await state();const corrected=conversation(s).businessPlanning;
  check(mode+' correction uses retained actual UI state and recalculates to one role',requests.at(-1).state.businessPlanning.review.key===business.review.key&&corrected.review.result.additionalRoles===1&&corrected.staffing.inputs.values.trainingCash.value===7000&&corrected.staffing.result.options[0].cash===58500);
  check(mode+' omitted staffing values and provenance remain exact',Object.keys(business.staffing.inputs.values).filter(k=>k!=='trainingCash').every(k=>JSON.stringify(corrected.staffing.inputs.values[k])===JSON.stringify(business.staffing.inputs.values[k])));
- await button('Review 0/0/1').click();await page.getByRole('region',{name:'Review provisional staffing selection'}).waitFor();await button('Pin Action Plan with unknowns').click();
+ await button('Review to save: 0/0/1').click();await page.getByRole('region',{name:'Review provisional staffing selection'}).waitFor();await button('Save plan with unknowns').click();
  await card.getByRole('button',{name:'Pinned Action Plan #1',exact:true}).waitFor();
  s=await state();const goalId=s.goals.activeId,fields=s.workspaces[goalId].fields;
  check(mode+' deliberate selection saves the calculated plan with a preserved assumption receipt',!!goalId&&fields[businessPlanningReceiptField].length===1&&fields[businessPlanningReceiptField][0].state.review.result.additionalRoles===1&&!!fields[planAlternativesField]);

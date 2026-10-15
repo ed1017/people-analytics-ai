@@ -95,10 +95,11 @@ function DimensionList({
 }
 
 export function SurveySentimentPage({
-  data,
+  data: sourceData,
   loading,
   error,
 }: SurveySentimentPageProps) {
+  const data = !loading && !error ? sourceData : null;
   const summary = data?.summary;
   const priorEngagement =
     data?.engagement_trend.length && data.engagement_trend.length >= 2
@@ -134,8 +135,8 @@ export function SurveySentimentPage({
         </span>
       </div>
 
-      {error && (
-        <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+      {!loading && error && (
+        <div role="alert" className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
           {error}
         </div>
       )}
@@ -404,7 +405,7 @@ export function SurveySentimentPage({
           </div>
         </>
       ) : (
-        <div className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
+        (loading || !error) && <div role="status" className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
           {loading
             ? "Loading Employee Listening analytics…"
             : "No Employee Listening data returned."}

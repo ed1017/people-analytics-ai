@@ -43,9 +43,9 @@ try{for(const width of [1440,390]){
  const bucket=()=>page.evaluate(({key,field})=>JSON.parse(localStorage.getItem(key)).payload.workspaces.a.fields[field],{key:DECISIONS_STORAGE_KEY,field:monthlyCapacityField});
  await page.goto(base+'/?page=planning-overview');await page.getByLabel('Selected goal',{exact:true}).selectOption('a');await advanced();
  await area.getByText('Timing & capacity assumptions (required)',{exact:true}).click();
- for(const [label,value] of Object.entries({'Work to plan':'Service desk — tickets','Opening date (month end)':'2026-09-30','People at the start':'10','Working time at the start (FTE)':'8','Work items each month':'800','Hours per item':'1','Work hours per FTE each month':'160'}))await input(label).fill(value);
+ for(const [label,value] of Object.entries({'Work to plan':'Service desk — tickets','Opening date (month end)':'2026-09-30','People at the start':'10','Contracted time at start (FTE)':'8','Work items each month':'800','Hours per item':'1','Productive hours per FTE / month':'160'}))await input(label).fill(value);
 for(const [label,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await input(label).fill(value);
- await area.getByRole('checkbox',{name:/Assume every hire/}).check();await calculate();await save('Base');const first=await bucket();assert.equal(first.entries.length,1);
+ await area.getByRole('checkbox',{name:/Assume each person joining/}).check();await calculate();await save('Base');const first=await bucket();assert.equal(first.entries.length,1);
  await input('Productivity improvement (%)').fill('25');assert.equal(await saved.getByRole('button',{name:'Save scenario',exact:true}).isDisabled(),true);assert.match(await saved.innerText(),/saved snapshot, not the current draft/);assert.equal(await area.getByText('Calculated from your assumptions',{exact:true}).count(),0);
  await input('Cost per contracted FTE per month (USD, optional)').fill('0');await calculate();await save('Improved zero cost');const snapshots=await bucket();assert.equal(snapshots.entries.length,2);assert.deepEqual(snapshots.entries[0],first.entries[0]);
  await input('Saved capacity scenario').selectOption({label:'Base'});await input('Compare capacity scenario').selectOption({label:'Improved zero cost'});const compare=page.getByRole('region',{name:'Saved capacity comparison',exact:true});await compare.waitFor();assert.deepEqual(await compare.locator('tbody tr').first().locator('td').allTextContents(),['+1','0']);
@@ -61,8 +61,8 @@ for(const [label,value] of Object.entries({'Hires each month (people)':'0','Depa
  // Fractional contracted/assigned FTE stays distinct from people across calculation and Home.
  await saved.getByRole('button',{name:'Open saved scenario',exact:true}).click();
  await area.getByText('Timing & capacity assumptions (required)',{exact:true}).click();
- await area.getByRole('checkbox',{name:/Assume every hire/}).uncheck();
- for(const [label,value] of Object.entries({'Working time at the start (FTE)':'6','Hires each month (people)':'2','Departures each month (people)':'1','FTE per hire':'0.5','FTE per departure':'0.25'}))await input(label).fill(value);
+ await area.getByRole('checkbox',{name:/Assume each person joining/}).uncheck();
+ for(const [label,value] of Object.entries({'Contracted time at start (FTE)':'6','Hires each month (people)':'2','Departures each month (people)':'1','FTE per hire':'0.5','FTE per departure':'0.25'}))await input(label).fill(value);
  await calculate();await save('Part-time workload');
  await area.getByText('Monthly detail · people and FTE',{exact:true}).click();
  const rows=area.getByRole('region',{name:'Monthly capacity comparison',exact:true}).locator('table tbody tr');
@@ -77,7 +77,7 @@ for(const [label,value] of Object.entries({'Hires each month (people)':'0','Depa
  await input('Compare capacity scenario').selectOption({label:'Part-time workload'});assert.match(await saved.innerText(),/Opening date, horizon or calculation conventions differ/);assert.equal(await compare.count(),0);
  const stableSnapshots=await bucket();
  await input('Opening date (month end)').fill('2026-12-30');await area.getByRole('checkbox',{name:/I confirm/}).check();await area.getByRole('button',{name:'Calculate capacity',exact:true}).click();await area.getByRole('alert').waitFor();assert.equal(await saved.getByRole('button',{name:'Save scenario',exact:true}).isDisabled(),true);
- await input('Opening date (month end)').fill('2026-12-31');await input('Working time at the start (FTE)').fill('');await area.getByRole('checkbox',{name:/I confirm/}).check();await area.getByRole('button',{name:'Calculate capacity',exact:true}).click();await area.getByText(/^Incomplete .*some inputs are unknown$/).waitFor();assert.equal(await saved.getByRole('button',{name:'Save scenario',exact:true}).isDisabled(),true);
+ await input('Opening date (month end)').fill('2026-12-31');await input('Contracted time at start (FTE)').fill('');await area.getByRole('checkbox',{name:/I confirm/}).check();await area.getByRole('button',{name:'Calculate capacity',exact:true}).click();await area.getByText(/^Incomplete .*some inputs are unknown$/).waitFor();assert.equal(await saved.getByRole('button',{name:'Save scenario',exact:true}).isDisabled(),true);
  await area.screenshot({path:`${output}/${width}-missing-fte.png`});
  console.log(width,'missing FTE complete');await home();await overview.getByText(/20.*people/).waitFor();assert.deepEqual(await overview.locator('dd').allTextContents(),['12 FTE','Not set','Not set']);
  // A delayed or mismatched dashboard scope never substitutes a different population.
@@ -90,7 +90,7 @@ for(const [label,value] of Object.entries({'Hires each month (people)':'0','Depa
  await filter('CA');assert.deepEqual(await targetArea.locator('dd').allTextContents(),['105 people','110 people']);await targetArea.screenshot({path:`${output}/${width}-people-target.png`});
  await targetArea.getByLabel('Target month',{exact:true}).selectOption('2026-10-01');assert.equal(await targetArea.getByLabel('Required people',{exact:true}).inputValue(),'');
  await targetArea.getByRole('button',{name:'Refresh supply source',exact:true}).click();targetMode='delay';const targetStarted=new Promise(resolve=>targetRequest=resolve);await targetArea.getByLabel('Business unit',{exact:true}).selectOption('OPS');await Promise.race([targetStarted,new Promise((_,reject)=>setTimeout(()=>reject(Error('Delayed target request did not start')),10000))]);await home();releaseTarget();await planner();await page.getByRole('button',{name:/Plan a staffing target/}).click();assert.equal(await targetArea.getByLabel('Business unit',{exact:true}).inputValue(),'');assert.equal(await targetArea.getByLabel('Required people',{exact:true}).inputValue(),'');targetMode='valid';
- for(let n=0;n<3;n++){await home();await planner();assert.equal(await input('Working time at the start (FTE)').inputValue(),'');assert.equal(await saved.getByRole('button',{name:'Save scenario',exact:true}).isDisabled(),true);}
+ for(let n=0;n<3;n++){await home();await planner();assert.equal(await input('Contracted time at start (FTE)').inputValue(),'');assert.equal(await saved.getByRole('button',{name:'Save scenario',exact:true}).isDisabled(),true);}
  await input('Saved capacity scenario').selectOption({label:'Base'});await saved.getByRole('button',{name:'Open saved scenario',exact:true}).click();await input('Compare capacity scenario').selectOption({label:'Improved zero cost'});assert.deepEqual(await compare.locator('tbody tr').first().locator('td').allTextContents(),['+1','0']);assert.deepEqual(await bucket(),stableSnapshots);
  await compare.screenshot({path:`${output}/${width}-comparison-after-navigation.png`});
  // Illustrative demo edits cannot replace a calculated workload or saved scenarios.

@@ -31,13 +31,14 @@ function formatCurrencyCompact(value: number | null) {
 }
 
 export function FinancePage({
-  financeData,
+  financeData: sourceData,
   financeLoading,
   financeError,
   financeBusinessUnits,
   financeScenarios,
   maxFinanceLaborCost,
 }: FinancePageProps) {
+  const financeData = !financeLoading && !financeError ? sourceData : null;
   const exposure=financeData?financeVacancyBasis(financeData.current.estimated_vacancy_cost_exposure_usd,financeBusinessUnits):null;
   const count=(value:number|null)=>value===null?"Unavailable":value.toLocaleString();
   const precise=(value:number|null)=>value!==null&&Number.isFinite(value)?'$'+value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' USD':'Unavailable';
@@ -54,12 +55,12 @@ export function FinancePage({
               <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
                 {financeLoading
                   ? "Loading finance…"
-                  : "As of September 30, 2026"}
+                  : financeData ? "As of September 30, 2026" : "Finance"}
               </span>
             </div>
 
-            {financeError && (
-              <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+            {!financeLoading && financeError && (
+              <div role="alert" className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
                 {financeError}
               </div>
             )}
@@ -337,7 +338,7 @@ export function FinancePage({
                 </div>
               </>
             ) : (
-              <div className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
+              (financeLoading || !financeError) && <div role="status" className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
                 {financeLoading
                   ? "Loading workforce finance…"
                   : "No finance data returned."}

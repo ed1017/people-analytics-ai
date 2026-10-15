@@ -33,11 +33,12 @@ function formatDate(value: string | null) {
 }
 
 export function CareerMobilityPage({
-  data,
+  data: sourceData,
   loading,
   error,
   selectedContext,
 }: CareerMobilityPageProps) {
+  const data = !loading && !error ? sourceData : null;
   return (
     <section className="min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
@@ -60,8 +61,8 @@ export function CareerMobilityPage({
         </span>
       </div>
 
-      {error && (
-        <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+      {!loading && error && (
+        <div role="alert" className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
           {error}
         </div>
       )}
@@ -511,7 +512,7 @@ export function CareerMobilityPage({
           </details>
         </>
       ) : (
-        <div className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
+        (loading || !error) && <div role="status" className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
           {loading
             ? "Loading Career Interests preference coverage…"
             : "No Career Interests data returned."}

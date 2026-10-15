@@ -98,7 +98,7 @@ try{
   await page.goto(base);await dismissHomeOnboarding(page);
   async function send(text){const input=page.getByLabel('Ask Workforce AI',{exact:true});if(!await input.isVisible())await page.locator('summary').filter({hasText:/^Chat & saved goals$/}).click();await input.fill(text);await page.getByRole('button',{name:'Send overview question',exact:true}).click();}
   const card=page.getByRole('article',{name:'Working proposal: Accountability review',exact:true});
-  await send(accountabilityMessage);await card.waitFor();await card.getByRole('button',{name:/^Pin Action Plan/}).click();await card.getByRole('button',{name:/^Pinned Action Plan/}).waitFor();
+  await send(accountabilityMessage);await card.waitFor();await card.getByRole('button',{name:/^Save plan/}).click();await card.getByRole('button',{name:/^Pinned Action Plan/}).waitFor();
   const pinned=await state(DECISIONS_STORAGE_KEY),id=pinned.goals.activeId,attached=pinned.workspaces[id].fields.homePlanAlternativesV1;
   await send(accountabilityScopeChange);await card.getByText(/revision 2/).waitFor();
   check('working revision differs from immutable pinned and attached revision',JSON.stringify((await state(DECISIONS_STORAGE_KEY)).workspaces[id].fields.homePlanAlternativesV1)===JSON.stringify(attached));

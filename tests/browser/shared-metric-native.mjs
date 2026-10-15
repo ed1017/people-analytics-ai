@@ -59,7 +59,7 @@ try{
   assert.ok(await card().getByText(/Baseline: Unknown; Target: Unknown/).isVisible());
   assert.ok(await card().getByText(accountabilityNextStep,{exact:false}).isVisible());
   assert.ok(await card().getByText(/Suggested owners · unconfirmed: Learning lead/).isVisible());
-  assert.ok(await card().getByText(new RegExp('Suggested historical metric.*'+value)).isVisible());assert.ok(await card().getByText('Metric definitions and limits',{exact:true}).evaluate(n=>!n.parentElement.open));await card().getByRole('button',{name:/^Pin Action Plan/}).click();await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key)).payload.goals.activeId,DECISIONS_STORAGE_KEY);
+  assert.ok(await card().getByText(new RegExp('Suggested historical metric.*'+value)).isVisible());assert.ok(await card().getByText('Metric definitions and limits',{exact:true}).evaluate(n=>!n.parentElement.open));await card().getByRole('button',{name:/^Save plan/}).click();await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key)).payload.goals.activeId,DECISIONS_STORAGE_KEY);
   const pinned=await state(),id=pinned.goals.activeId,original=pinned.workspaces[id].fields.homePlanAlternativesV1,measure=original.plans[0].draft.inputs.successMeasure;
   assert.equal(measure.scopeKey,measurementScope(original.plans[0].draft.inputs));assert.equal(measure.baseline.kind,'unknown');assert.equal(measure.target.kind,'unknown');assert.equal(measure.history.observations.find(o=>o.metric===metric).value,value);
   assert.equal(pinned.goals.goals.find(goal=>goal.id===id).statement,goal);assert.equal(original.attachments[0].purpose,'proposal-selection');assert.ok(!original.plans[0].applied);
@@ -84,7 +84,7 @@ try{
   const changed=(await state()).workspaces[id].fields.homeSolutionConversationV1.working.filter(value=>value.id==='accountability').at(-1);
   assert.deepEqual(changed.draft.inputs.successMeasure,measure);assert.notEqual(measure.scopeKey,measurementScope(changed.draft.inputs));assert.ok(changed.result.issues.some(issue=>issue.startsWith('Success measure')));
   // Pinning the revision preserves both numbered plans; it must not revalidate the stale measure.
-  await card().getByRole('button',{name:/^Pin Action Plan/}).click();await card().getByRole('button',{name:/^Pinned Action Plan/}).waitFor();
+  await card().getByRole('button',{name:/^Save plan/}).click();await card().getByRole('button',{name:/^Pinned Action Plan/}).waitFor();
   const summary=review.locator('summary').filter({hasText:/^Saved Action Plans$/});if(!await summary.evaluate(node=>node.parentElement.open))await summary.click();
   const stale=review.getByRole('article',{name:'Action Plan option 2',exact:true}).getByRole('list',{name:'How success is measured',exact:true});
   const staleText=await stale.innerText();assert.match(staleText,/needs renewed review/);assert.doesNotMatch(staleText,/Assumed baseline:|Assumed target:/);
