@@ -33,10 +33,10 @@ try{for(const width of [1440,390]){
  await page.getByRole('region',{name:'Workload capacity planning',exact:true}).waitFor();
  const area=page.getByRole('region',{name:'Workload capacity planning',exact:true});
  await area.getByText('Timing & capacity assumptions (required)',{exact:true}).click();
- for(const [label,value] of Object.entries({'Work to plan':'Service desk - tickets','Opening date (month end)':'2026-09-30','People at the start':'10','Working time at the start (FTE)':'8','Work items each month':'800','Hours per item':'1','Work hours per FTE each month':'160'}))await area.getByLabel(label,{exact:true}).fill(value);
+ for(const [label,value] of Object.entries({'Work to plan':'Service desk - tickets','Opening date (month end)':'2026-09-30','People at the start':'10','Contracted time at start (FTE)':'8','Work items each month':'800','Hours per item':'1','Productive hours per FTE / month':'160'}))await area.getByLabel(label,{exact:true}).fill(value);
 
  for(const [label,value] of Object.entries({'Hires each month (people)':'0','Departures each month (people)':'0','Time assigned to this work (%)':'50','Productivity improvement (%)':'0'}))await area.getByLabel(label,{exact:true}).fill(value);
- await area.getByRole('checkbox',{name:/Assume every hire/}).check();
+ await area.getByRole('checkbox',{name:/Assume each person joining/}).check();
  assert.match(await area.innerText(),/Preview from your current inputs/);assert(await area.getByRole('button',{name:'Save scenario',exact:true}).isDisabled());
  await area.getByRole('checkbox',{name:/I confirm/}).check();await area.getByRole('button',{name:'Calculate capacity',exact:true}).click();
  await area.getByLabel('Capacity scenario name',{exact:true}).fill('Base');await area.getByRole('button',{name:'Save scenario',exact:true}).click();
