@@ -75,6 +75,21 @@ test('compact tiles retain complete long labels and allow text to wrap without c
 
 const history = [{snapshot_date:'2026-07-31',headcount:110,fte:108},{snapshot_date:'2026-08-31',headcount:115,fte:113},{snapshot_date:'2026-09-30',headcount:120,fte:118}];
 const chartMarkup = html => html.match(/<figure[^>]*>([\s\S]*?)<\/figure>/)?.[1] ?? '';
+test('headcount KPI selector remains unique when the chart axis repeats the current value', () => {
+  for (const value of [120, 1240, 100]) {
+    const html=render({overview:{...base.overview,headcount:value},trend:[{...history[2],headcount:value}]});
+    const formatted=value.toLocaleString();
+    assert.equal(html.split('>'+formatted+'<').length-1,2,'fixture reproduces the ambiguous exact-text match');
+    const snapshot=html.match(/<section aria-label="Workforce snapshot"[^>]*>([\s\S]*?)<\/section>/)?.[1];
+    assert.ok(snapshot);
+    assert.deepEqual([...snapshot.matchAll(/<strong[^>]*>([^<]*)<\/strong>/g)].map(match=>match[1]),[formatted]);
+  }
+  for (const [script,value] of [['home-overview-entry','1,240'],['workforce-intelligence-overview','100']]) {
+    const source=fs.readFileSync(`tests/browser/${script}.mjs`,'utf8');
+    assert.ok(source.includes(`welcome.getByRole('region',{name:'Workforce snapshot',exact:true}).locator('strong').filter({hasText:/^${value}$/}).waitFor()`));
+    assert.ok(!source.includes(`welcome.getByText('${value}',{exact:true})`),'all numeric KPI checks use the scoped selector');
+  }
+});
 test('history is dated recorded evidence with an accessible series, never a forecast or inferred flow', () => {
   const html = render({trend:history});
   assert.match(html, /role="img" aria-label="Recorded synthetic headcount history in people\. All workforce\./);

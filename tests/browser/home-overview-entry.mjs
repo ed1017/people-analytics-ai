@@ -36,7 +36,7 @@ try{for(const width of [1440,390]){
   if(keyboard){await item.focus();await page.keyboard.press('Enter');}else await item.click();
  }
  async function showSummary(){const toggle=page.getByText('Current scenario summary',{exact:true});if(!await summary.isVisible())await toggle.click();await summary.waitFor();}
- await page.goto(base);await welcome.getByText('1,240',{exact:true}).waitFor();
+ await page.goto(base);await welcome.getByRole('region',{name:'Workforce snapshot',exact:true}).locator('strong').filter({hasText:/^1,240$/}).waitFor();
  assert.equal(await page.getByRole('dialog',{name:'Home instructions',exact:true}).isVisible(),false,'fresh entry does not obscure the welcome');
  assert.deepEqual(posts,[]);assert.equal(await page.locator('#navigation-analytics').isVisible(),false,'specialist navigation remains secondary');
  assert.deepEqual(await welcome.locator('dd').allTextContents(),['Not available','Not available']);
@@ -77,10 +77,10 @@ try{for(const width of [1440,390]){
  await navigate('Plan home');await welcome.waitFor();
  // A pending and then mismatched receipt must never relabel old quantities as the newly selected country.
  if(width<768)await page.getByText('Filters',{exact:true}).click();await page.getByLabel('Country',{exact:true}).selectOption('UK');
- await welcome.getByText('Updating…',{exact:true}).waitFor();assert.equal(await welcome.getByText('1,240',{exact:true}).count(),0);await page.waitForTimeout(100);holdScope=false;for(const resolve of scopeWaiters)resolve();
- await welcome.getByText('Unavailable',{exact:true}).waitFor();assert.equal(await welcome.getByRole('img').count(),0);assert.equal(await welcome.getByText('1,240',{exact:true}).count(),0);
- await page.getByLabel('Country',{exact:true}).selectOption('all');await welcome.getByText('1,240',{exact:true}).waitFor();
- if(width<768)await page.getByText('Filters',{exact:true}).click();await chat.fill('');await page.reload();await welcome.getByText('1,240',{exact:true}).waitFor();await page.evaluate(()=>scrollTo(0,0));
+ await welcome.getByText('Updating…',{exact:true}).waitFor();assert.equal(await welcome.getByRole('region',{name:'Workforce snapshot',exact:true}).locator('strong').filter({hasText:/^1,240$/}).count(),0);await page.waitForTimeout(100);holdScope=false;for(const resolve of scopeWaiters)resolve();
+ await welcome.getByText('Unavailable',{exact:true}).waitFor();assert.equal(await welcome.getByRole('img').count(),0);assert.equal(await welcome.getByRole('region',{name:'Workforce snapshot',exact:true}).locator('strong').filter({hasText:/^1,240$/}).count(),0);
+ await page.getByLabel('Country',{exact:true}).selectOption('all');await welcome.getByRole('region',{name:'Workforce snapshot',exact:true}).locator('strong').filter({hasText:/^1,240$/}).waitFor();
+ if(width<768)await page.getByText('Filters',{exact:true}).click();await chat.fill('');await page.reload();await welcome.getByRole('region',{name:'Workforce snapshot',exact:true}).locator('strong').filter({hasText:/^1,240$/}).waitFor();await page.evaluate(()=>scrollTo(0,0));
  await page.screenshot({path:`${output}/${width}-overview-local.png`,fullPage:true});await page.screenshot({path:`${output}/${width}-viewport-local.png`});
  // A validated saved record is discoverable only for its active goal; it is never selected automatically.
  const savedDraft={...emptyCapacityDraft,scope:'Service desk — tickets',openingDate:'2026-09-30',people:'10',fte:'8',volume:'800',effort:'1',hours:'160',hires:'0',exits:'0',allocation:'50',productivity:'0',fullTimeMovements:true,confirmed:true,costRate:''};
