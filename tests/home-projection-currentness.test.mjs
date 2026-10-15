@@ -22,7 +22,7 @@ function routeHarness({load=async()=>projectionInputs(),enabled=true}={}){
  const calls={source:0,model:0,write:0},router=new DatasetRouter({ 'legacy-v1':{digest:'uncertified-live-v1'} },{read:async()=>({datasetId:'legacy-v1',generation:0,digest:'uncertified-live-v1'}),compareAndSwap:async()=>{calls.write++;throw Error('Write forbidden');}});
  const boundary=createDatasetRequestBoundary({router,retained:{'legacy-v1':{assertAvailable:async()=>true}}});
  const runtime={withDatasetRequest:boundary,datasetRouter:router,datasetAI:()=>{calls.model++;throw Error('Model forbidden');}};
- const module=loadModule('app/api/home-solution-conversation/route.ts',name=>{
+ const routeModule=loadModule('app/api/home-solution-conversation/route.ts',name=>{
   if(name==='@/lib/dataset-runtime')return runtime;
   if(name==='@/lib/home-projection-currentness')return currentness;
   if(name==='@/lib/home-solution-conversation')return {solutionConversationEnabled:enabled};
@@ -30,7 +30,7 @@ function routeHarness({load=async()=>projectionInputs(),enabled=true}={}){
   if(name==='openai')return {default:class{constructor(){calls.model++;throw Error('Model forbidden');}}};
   return {};
  });
- return {get:module.GET,calls};
+ return {get:routeModule.GET,calls};
 }
 async function selectionFixture(inputs=projectionInputs(),spec=projectionSpec()){
  const item=await calculateHeadcountProjection(spec,inputs,[],[]),receipt=await createProjectionCurrentnessReceipt(inputs,token,filters);
