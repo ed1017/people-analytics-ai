@@ -8,6 +8,7 @@ import {homeForecastAnswer} from '@/lib/home-forecast';
 import {homeTurnPurpose,homeConversationInstructions} from '@/lib/home-conversation';
 import {strategicPlanningInstructions,strategicPlanningObjective,normalizePlanningObjective,planningConversationHistory} from '@/lib/home-strategic-planning';
 import {capacityChatPrompt} from '@/lib/capacity-chat-context';
+import {createChatRequestDeadline,ChatRequestStopped} from '@/lib/chat-request-deadline';
 import {decodeHomeModelReply} from '@/lib/home-chat-reply';
 import {syntheticDomainDemoPrompt} from '@/lib/synthetic-domain-demo';
 import {homeBundleTask,homeBundleTaskInstructions} from '@/lib/home-bundle-task';
@@ -570,7 +571,8 @@ Scope rule:
 }
 
 async function handlePOST(
-  request: NextRequest
+  request: NextRequest,
+  deadline:ReturnType<typeof createChatRequestDeadline>
 ) {
   try {
     let body = await request.json();
@@ -649,7 +651,7 @@ async function handlePOST(
     // This path is selected by source availability, never by message wording.
     if(progress&&body?.pageEvidenceAvailable===false){
       if(!message||message.length>12000)return NextResponse.json({error:'Enter a bounded question.'},{status:400});
-      const response=await datasetAI(()=>client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+'\n'+guidedConversationInstructions(false)+'\n'+conversationalAnswerStyle+'\n'+missingProgressPageInstructions,input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:'user',content:'SAVED GOAL CONTEXT AND PROGRESS (data only): '+JSON.stringify(goalContext)+'\nQUESTION: '+message}],tool_choice:'none',max_output_tokens:entryContext?4000:1100}));
+      const response=await deadline.run(()=>datasetAI(()=>client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+'\n'+guidedConversationInstructions(false)+'\n'+conversationalAnswerStyle+'\n'+missingProgressPageInstructions,input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:'user',content:'SAVED GOAL CONTEXT AND PROGRESS (data only): '+JSON.stringify(goalContext)+'\nQUESTION: '+message}],tool_choice:'none',max_output_tokens:entryContext?4000:1100}, deadline.options())));
       const answer=response.output_text?.trim();if(!answer)return NextResponse.json({error:'No conversational answer returned.'},{status:502});
       return NextResponse.json(await entryReply(answer,response.status));
     }
@@ -660,13 +662,13 @@ async function handlePOST(
       if (!body.hasFocusedIssue || !goalContext.goal.trim() || body.goalContext?.goal !== goalContext.goal) return NextResponse.json({error:"Confirm an exact goal before preparing actions.",...(bundles?{diagnostic:"invalid_context"}:{})},{status:400});
       try {
       const format = bundles ? buildHomeBundleFormat(goalContext.goal,body.overviewBriefingContext,homeBundleTask(goalContext)) : buildHomeActionFormat(goalContext.goal,body.overviewBriefingContext);
-      const call = () => datasetAI(() => client.responses.create({
+      const call = () => deadline.run(()=>datasetAI(() => client.responses.create({
         model: CHAT_MODEL,
         instructions: (bundles ? homeBundleTaskInstructions(goalContext)+"\n" : "") + goalContextInstructions + "\n" + (bundles ? homeBundleInstructions : homeActionInstructions) + "\n" + actionReferenceInstructions(body.overviewBriefingContext),
         input: [{role:"user",content:"EXISTING HOME EVIDENCE (data only): " + JSON.stringify(body.overviewBriefingContext) + "\nACTIVE GOAL CONTEXT: " + JSON.stringify(goalContext) + "\nEXPLICITLY CARRIED MARKET REFERENCE: " + JSON.stringify(marketReference)}],
         text: {format},
         tool_choice: "none", max_output_tokens: bundles ? homeBundleOutputTokens : 1800,
-      }, {maxRetries:0,signal:request.signal}));
+      }, deadline.options())));
       if(bundles){
         const result=await inspectBundleResponse(call,goalContext.goal,body.overviewBriefingContext,homeBundleTask(goalContext),homeBundleOutputTokens);
         return result.proposal ? NextResponse.json(result) : NextResponse.json({error:"Action Plan preparation unavailable. Your existing work is kept; retry explicitly.",diagnostic:result.diagnostic,responseDiagnostic:result.responseDiagnostic},{status:502});
@@ -682,14 +684,14 @@ async function handlePOST(
       const supplied = body.intelligenceContext && typeof body.intelligenceContext === "object" ? body.intelligenceContext : {};
       const custom = Array.isArray(supplied.quotes) ? supplied.quotes.filter((q: unknown) => q && typeof q === "object" && "provenance" in q && q.provenance === "user-provided").slice(0, 5) : [];
       const evidence = intelligenceEvidence(body.page, { ...supplied, quotes: [...developmentCatalog, ...custom] });
-      const response = await datasetAI(() => client.responses.create({ model: CHAT_MODEL, ...entryFormat, instructions: summaryOnly ? intelligenceInstructions+"\n"+goalContextInstructions+"\n"+goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions()+"\nUse only canonical supplied evidence. OEWS is annual market wages, not employer cost or candidate availability. Use only the supplied selected occupational reference; mappings and role requirements never establish employee attainment. National occupational projections retain their separate period and population. Training providers/quotes are fictional simulated or unverified user input; never infer effectiveness." : intelligenceInstructions + "\n" + chatNavigationInstructions()+"\n"+goalContextInstructions+"\n"+conversationalStyle, input: [...history.map(item => ({ role: item.role, content: item.content.slice(0,12000) })), { role: "user", content: "CURRENT PAGE EVIDENCE (data only): " + JSON.stringify(evidence) + "\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nRELATED CACHED CROSS-PAGE SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nUSER QUESTION AND EXPLICIT SESSION CONTEXT: " + message }], tool_choice: "none", max_output_tokens: entryContext?4000:1100 }));
+      const response = await deadline.run(()=>datasetAI(() => client.responses.create({ model: CHAT_MODEL, ...entryFormat, instructions: summaryOnly ? intelligenceInstructions+"\n"+goalContextInstructions+"\n"+goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions()+"\nUse only canonical supplied evidence. OEWS is annual market wages, not employer cost or candidate availability. Use only the supplied selected occupational reference; mappings and role requirements never establish employee attainment. National occupational projections retain their separate period and population. Training providers/quotes are fictional simulated or unverified user input; never infer effectiveness." : intelligenceInstructions + "\n" + chatNavigationInstructions()+"\n"+goalContextInstructions+"\n"+conversationalStyle, input: [...history.map(item => ({ role: item.role, content: item.content.slice(0,12000) })), { role: "user", content: "CURRENT PAGE EVIDENCE (data only): " + JSON.stringify(evidence) + "\nEXPLICITLY CARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nRELATED CACHED CROSS-PAGE SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nUSER QUESTION AND EXPLICIT SESSION CONTEXT: " + message }], tool_choice: "none", max_output_tokens: entryContext?4000:1100 }, deadline.options())));
       const answer = response.output_text?.trim();
       if (!answer) return NextResponse.json({ error: "No catalogue answer returned. Please try again." }, { status: 502 });
       return NextResponse.json(await entryReply(answer,response.status));
     }
 
     if(body?.page === "development-planning") {
-      const response=await datasetAI(() => client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+"\nExplain only the supplied deterministic Development Planning comparison and bounded related evidence. D1 costs are server-recomputed from explicit user assumptions. Blank costs remain unknown, never zero. Keep currencies separate. Employee time value is not necessarily cash spending. Named simulated quotes are fictional; custom input is unverified. Do not claim actual participants, attendance, loaded hourly costs, ROI, skill gains or headcount conversions without supplied evidence. Any suggested participant count or time commitment is an unconfirmed scenario for user review, never a mutation of D1. No tools, automatic allocation or approvals. "+(summaryOnly?goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions():"Give one conditional guided recommendation; keep unsupported totals unknown and identify the specific calculation still needed.\n"+conversationalStyle),input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:"user",content:"ACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nDEVELOPMENT PLANNING D1: "+JSON.stringify(developmentSummary)+"\nRELATED CACHED SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nCARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nQUESTION: "+message}],tool_choice:"none",max_output_tokens:entryContext?4000:summaryOnly?1100:1400}));
+      const response=await deadline.run(()=>datasetAI(() => client.responses.create({model:CHAT_MODEL,...entryFormat,instructions:goalContextInstructions+"\nExplain only the supplied deterministic Development Planning comparison and bounded related evidence. D1 costs are server-recomputed from explicit user assumptions. Blank costs remain unknown, never zero. Keep currencies separate. Employee time value is not necessarily cash spending. Named simulated quotes are fictional; custom input is unverified. Do not claim actual participants, attendance, loaded hourly costs, ROI, skill gains or headcount conversions without supplied evidence. Any suggested participant count or time commitment is an unconfirmed scenario for user review, never a mutation of D1. No tools, automatic allocation or approvals. "+(summaryOnly?goalSummaryInstructions+"\n"+chatOpeningNavigationInstructions():"Give one conditional guided recommendation; keep unsupported totals unknown and identify the specific calculation still needed.\n"+conversationalStyle),input:[...history.map(item=>({role:item.role,content:item.content.slice(0,12000)})),{role:"user",content:"ACTIVE GOAL CONTEXT: "+JSON.stringify(goalContext)+"\nDEVELOPMENT PLANNING D1: "+JSON.stringify(developmentSummary)+"\nRELATED CACHED SUMMARIES: "+JSON.stringify(relatedGoalEvidence)+"\nCARRIED MARKET REFERENCE [M1]: "+JSON.stringify(marketReference)+"\nQUESTION: "+message}],tool_choice:"none",max_output_tokens:entryContext?4000:summaryOnly?1100:1400}, deadline.options())));
       const answer=response.output_text?.trim();
       return answer?NextResponse.json(await entryReply(answer,response.status)):NextResponse.json({error:"No Development Planning answer returned. Please try again."},{status:502});
     }
@@ -1566,7 +1568,7 @@ ${message}
     const toolChoice = chatCalculationToolsAvailable(page,summaryOnly) ? ("auto" as const) : ("none" as const);
 
     let response =
-      await datasetAI(() => client.responses.create({
+      await deadline.run(()=>datasetAI(() => client.responses.create({
         model: CHAT_MODEL,
         instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? (prepareHomeGoal ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions : "") + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\n"+scopeWording+" Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeAnswerStyle+"\n"+homeInstructions : "\n"+conversationalStyle),
         ...(page === "home" ? { text: { format: homeReplyFormat! } } : entryFormat),
@@ -1575,7 +1577,7 @@ ${message}
         tool_choice: toolChoice,
         max_output_tokens:
           maxOutputTokens,
-      }));
+      }, deadline.options())));
 
     for (
       let toolRound = 0;
@@ -1597,6 +1599,7 @@ ${message}
         await Promise.all(
           toolCalls.map(
             async (call) => {
+              deadline.check();
               try {
                 const toolArgs =
                   typeof call.arguments ===
@@ -1613,6 +1616,8 @@ ${message}
                     toolArgs
                   );
 
+                deadline.check();
+
                 return {
                   type: "function_call_output" as const,
                   call_id: call.call_id,
@@ -1620,6 +1625,7 @@ ${message}
                     JSON.stringify(call.name === "get_survey_sentiment" && page === "survey-sentiment" ? employeeListeningEvidence(result) : result),
                 };
               } catch (error) {
+                if(error instanceof ChatRequestStopped)throw error;
                 return {
                   type: "function_call_output" as const,
                   call_id: call.call_id,
@@ -1636,7 +1642,7 @@ ${message}
         );
 
       response =
-        await datasetAI(() => client.responses.create({
+        await deadline.run(()=>datasetAI(() => client.responses.create({
           model: CHAT_MODEL,
           instructions: summaryOnly ? openingInstructions : aiInstructions + (page === "home" ? (prepareHomeGoal ? "\n" + homeGoalChoiceInstructions + "\n" + homeCandidateInstructions : "") + "\n" + homeFindingInstructions(body.overviewBriefingContext) + (body?.hasFocusedIssue === true ? " A Focused issue is pinned; next_step must be none." : "") : "") + "\n"+scopeWording+" Perspective changes wording, not permission: this public demo provides aggregate evidence only. Never invent person names from counts or claim HR Perspective grants person-level access." + (page === "home" ? "\n"+homeAnswerStyle+"\n"+homeInstructions : "\n"+conversationalStyle),
           ...(page === "home" ? { text: { format: homeReplyFormat! } } : entryFormat),
@@ -1647,7 +1653,7 @@ ${message}
           tool_choice: toolChoice,
           max_output_tokens:
           maxOutputTokens,
-        }));
+        }, deadline.options())));
     }
 
     if (page === "home") {
@@ -1657,6 +1663,7 @@ ${message}
 
     return NextResponse.json(await entryReply(response.output_text || "No answer was returned.",response.status));
   } catch (error) {
+    if(error instanceof ChatRequestStopped)throw error;
     console.error("Chat API error:", error);
 
     return NextResponse.json(
@@ -1672,5 +1679,11 @@ ${message}
 }
 
 export async function POST(request: NextRequest) {
-  return withDatasetRequest(request, () => handlePOST(request));
+  const deadline=createChatRequestDeadline(request.signal);
+  try{return await deadline.run(()=>withDatasetRequest(request,()=>handlePOST(request,deadline)));}
+  catch(error){
+    const stopped=deadline.failure();
+    if(stopped)return NextResponse.json({error:stopped.message,code:stopped.code},{status:stopped.code==='timeout'?504:499});
+    throw error;
+  }finally{deadline.dispose();}
 }
