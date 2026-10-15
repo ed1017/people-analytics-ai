@@ -1,3 +1,4 @@
+import {openHomeWorkforceSummary} from './home-entry-disclosures.mjs';
 // Real app assets; synthetic reads, no API writes or paid AI. Works against local production or an accessible Preview.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -17,7 +18,7 @@ try{for(const width of [1440,390]){
  await context.route('**/*',route=>{const req=route.request(),url=new URL(req.url());if(url.origin==='https://va.vercel-scripts.com')return route.abort();if(url.origin!==base||req.method()!=='GET'){unexpected.push(url.pathname);return route.abort();}if(!url.pathname.startsWith('/api/'))return route.continue();const defaults={annual_growth_pct:0,salary_inflation_pct:0,annual_attrition_pct:0,fill_rate_pct:100,productivity_hiring_reduction_pct:0};const data=url.pathname==='/api/dashboard'?scopedDashboardResponse({overview:{headcount:100,fte:80,snapshot_date:'2026-09-30'},trend:[{snapshot_date:'2026-09-30',headcount:100,fte:80}],filter_options:{countries:[{value:'UK',label:'United Kingdom'}],business_units:[],levels:[]}},{country:'all',org:'all',level:'all'}):url.pathname==='/api/workforce-planning'?{scenarios:[]}:url.pathname==='/api/scenario-modeler'?{defaults}:url.pathname==='/api/business-unit-scenario'?{defaults,business_units:[]}:null;return route.fulfill(data?{json:data}:{status:503,json:{error:'Synthetic source unavailable'}});});
 
  await page.goto(base);
- const overview=page.getByRole('region',{name:'Workforce planning overview',exact:true});await overview.getByText('100',{exact:true}).first().waitFor();
+ await openHomeWorkforceSummary(page);const overview=page.getByRole('region',{name:'Workforce planning overview',exact:true});await overview.getByText('100',{exact:true}).first().waitFor();
  assert.match(await overview.innerText(),/Demand comes from business requirements/);
  await page.screenshot({path:output+'/'+width+'-overview.png',fullPage:true});
  const openNav=async()=>{if(width<768)await page.getByRole('button',{name:'Open navigation',exact:true}).click();};

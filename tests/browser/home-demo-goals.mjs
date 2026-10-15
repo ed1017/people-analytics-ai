@@ -1,3 +1,4 @@
+import {openHomeQuestionIdeas} from './home-entry-disclosures.mjs';
 import assert from 'node:assert/strict';
 import {DECISIONS_STORAGE_KEY} from '../../lib/local-decisions.ts';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
@@ -36,7 +37,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  await select('Reduce turnover');await button('Show Action Plan').waitFor();await button('Show Action Plan').click();await page.reload();await panel.getByRole('heading',{name:'Manager check-ins',exact:true}).waitFor();
  data=await state();check(mode+' reload preserves latest draft, attachments and exactly three goals',data.goals.goals.length===3&&data.workspaces['demo-reduce-turnover'].fields.homePlanAlternativesV1.attachments.length===1&&posts.length===0);
  await button('Reset conversation').click();check(mode+' reset returns to exploration without duplicating examples',await selector.inputValue()===''&&await page.getByRole('region',{name:'Starting guide'}).isVisible()&&(await state()).goals.goals.length===3);
- await button('Show instructions').click();await button('Close instructions').click();await page.getByRole('region',{name:'Starting guide'}).getByRole('button').first().click();await page.getByText('FTE means full-time equivalent.',{exact:true}).last().waitFor();
+ await button('Show instructions').click();await button('Close instructions').click();await openHomeQuestionIdeas(page);await page.getByRole('region',{name:'Suggested questions',exact:true}).getByRole('button').first().click();await page.getByText('FTE means full-time equivalent.',{exact:true}).last().waitFor();
  check(mode+' starter submission keeps dismissed instructions closed without deleting goals',await button('Show instructions').isVisible()&&!await page.getByText('From question to action',{exact:true}).isVisible()&&(await state()).goals.goals.length===3);
  await button('Show instructions').click();await page.keyboard.press('Escape');await chat.fill('What does FTE mean?');await button('Send overview question').click();await button('Show instructions').waitFor();check(mode+' typed submission keeps instructions closed after Escape',!await page.getByText('From question to action',{exact:true}).isVisible());
  await button('Reset conversation').click();await button('Show instructions').click();await button('Try a guided example').focus();await page.keyboard.press('Enter');

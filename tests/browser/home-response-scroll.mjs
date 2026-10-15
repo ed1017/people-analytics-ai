@@ -1,3 +1,4 @@
+import {openHomeQuestionIdeas} from './home-entry-disclosures.mjs';
 import assert from 'node:assert/strict';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const base=process.env.HOME_BASE_URL??'http://127.0.0.1:3181',browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
@@ -19,7 +20,7 @@ try{for(const [mode,width,height] of [['desktop-expanded',1366,900],['desktop-co
   return route.continue();
  });
  const button=name=>page.getByRole('button',{name,exact:true}),chat=page.getByLabel('Ask Workforce AI',{exact:true}),status=page.getByRole('status',{name:'AI answer status',exact:true});
- await page.goto(base);await page.getByRole('dialog',{name:'Home instructions',exact:true}).waitFor();await button('Close instructions').click();await button('How can we reduce turnover?').waitFor();if(mode.endsWith('expanded')){await button('Show instructions').click();await page.keyboard.press('Escape');}await button('How can we reduce turnover?').scrollIntoViewIfNeeded();
+ await page.goto(base);await page.getByRole('dialog',{name:'Home instructions',exact:true}).waitFor();await button('Close instructions').click();await openHomeQuestionIdeas(page);await button('How can we reduce turnover?').waitFor();if(mode.endsWith('expanded')){await button('Show instructions').click();await page.keyboard.press('Escape');}await button('How can we reduce turnover?').scrollIntoViewIfNeeded();
  const before=await page.evaluate(()=>scrollY);await button('How can we reduce turnover?').click();await status.waitFor();
  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
  const pending=await page.evaluate(geometry,'[aria-label="AI answer status"]');console.log(JSON.stringify({mode,before,pending,starters:await page.getByRole('region',{name:'Starting guide'}).count()}));await page.screenshot({path:'/tmp/home-response-pending-'+mode+'.png'});
