@@ -46,8 +46,8 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]])for(const kind o
  await page.getByLabel('Ask Workforce AI',{exact:true}).fill(kind==='complete'?accountabilityMessage:'Reduce turnover. Owner, review date, baseline, target, participation and workload are unknown.');
  await page.getByRole('button',{name:'Send overview question',exact:true}).click();
  const review=page.getByRole('region',{name:'Solution conversation review',exact:true}),card=review.getByRole('article').filter({hasText:'Recommended Action Plan'});
- await card.waitFor();assert.equal(await card.count(),1);assert.equal(await card.getByRole('button',{name:/^Pin Action Plan/}).count(),1);
- await card.getByRole('button',{name:/^Pin Action Plan/}).click();await card.getByRole('button',{name:/^Pinned Action Plan/}).waitFor();
+ await card.waitFor();assert.equal(await card.count(),1);assert.equal(await card.getByRole('button',{name:/^Save plan/}).count(),1);
+ await card.getByRole('button',{name:/^Save plan/}).click();await card.getByRole('button',{name:/^Pinned Action Plan/}).waitFor();
  const state=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).payload,DECISIONS_STORAGE_KEY);
  const pinned=await state(),id=pinned.goals.activeId,catalog=pinned.workspaces[id].fields.homePlanAlternativesV1;
  assert.equal(catalog.plans.length,1);assert.equal(catalog.attachments.length,1);assert.equal(catalog.attachments[0].purpose,'proposal-selection');assert.ok(!catalog.plans[0].applied);
