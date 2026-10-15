@@ -80,3 +80,27 @@ async function handlePOST(request:Request){
 export async function POST(request:Request) {
  return withDatasetRequest(request, () => handlePOST(request));
 }
+
+/** Current aggregate projection inputs only: no conversation, model or writes. */
+export async function GET(request:Request){
+ return withDatasetRequest(request,async()=>{
+  const headers={'Cache-Control':'no-store'};
+  if(!solutionConversationEnabled)return Response.json({error:'Solution conversation is not enabled.'},{status:404,headers});
+  const {projectionCurrentnessFilters,createProjectionCurrentnessReceipt}=await import('@/lib/home-projection-currentness');
+  let filters;
+  try{filters=projectionCurrentnessFilters(new URL(request.url).searchParams);}
+  catch{return Response.json({error:'Supply exactly valid country, org and level filters.'},{status:400,headers});}
+  try{
+   const signal=AbortSignal.any([request.signal,AbortSignal.timeout(15000)]);
+   signal.throwIfAborted();
+   const token=datasetRouter.current().token;
+   if(token!=='legacy-v1:0')throw Error('Unsupported projection source binding.');
+   const {loadSolutionProjectionInputs}=await import('@/lib/home-solution-projection-source');
+   const inputs=await loadSolutionProjectionInputs(filters,signal);
+   signal.throwIfAborted();
+   const receipt=await createProjectionCurrentnessReceipt(inputs,token,filters);
+   signal.throwIfAborted();
+   return Response.json(receipt,{headers});
+  }catch{return Response.json({error:'Current projection inputs could not be verified. Refresh and try again.'},{status:503,headers});}
+ });
+}
