@@ -21,14 +21,18 @@ const filters = {country: 'all', org: 'all', level: 'all'};
 const base = {overview: {snapshot_date: '2026-09-30', headcount: 120, fte: 118, voluntary_turnover_ytd_pct: 8.2}, receipt: {version: 1, status: 'verified_rpc', requested: filters, effective: filters}, requested: filters, scopeLabel: 'All workforce', loading: false, error: null, onQuestion: () => {}};
 const render = props => renderToStaticMarkup(React.createElement(HomeChatWelcome, {...base, ...props})).replaceAll('<!-- -->', '');
 
-test('welcome shows only verified headcount, never turns YTD into annual attrition or invents AI exposure', () => {
+test('welcome shows verified snapshot KPIs without annualization or invented sentiment', () => {
   const html = render({});
   assert.match(html, />120</);
   assert.match(html, /2026-09-30/);
   assert.equal((html.match(/Not available/g) ?? []).length, 2);
   assert.match(html, /Projection not configured/);
   assert.match(html, /Watch: Not assessed/);
-  assert.doesNotMatch(html, /8\.2|18%|10,000|Supply vs demand/);
+  assert.match(html, /8\.2%/);
+  assert.match(html, /Voluntary turnover YTD/);
+  assert.match(html, /not annualized/);
+  assert.match(html, /Cost period unspecified/);
+  assert.doesNotMatch(html, /18%|10,000|Supply vs demand/);
   assert.equal((html.match(/<button/g) ?? []).length, 4);
 });
 
@@ -119,4 +123,31 @@ test('missing months stay disconnected; a single zero observation never becomes 
   assert.match(zero,/One recorded snapshot/);
   assert.equal((chartMarkup(zero).match(/<line /g)??[]).length,1);
   assert.doesNotMatch(zero,/NaN|Infinity/);
+});
+
+test('recorded KPIs retain scope and units separately from projected flows',()=>{
+ const props={overview:{...base.overview,labor_cost_usd:45200},recruitingKpi:{hires:7,month:'2026-09',asOf:'2026-09-30'}};
+ const html=render(props);
+ assert.match(html,/7<\/b>/);assert.match(html,/company-wide recruiting events/);assert.match(html,/including internal fills/);
+ assert.match(html,/45,200 USD/);assert.match(html,/Cost period unspecified/);
+ assert.match(html,/Projected hires/);assert.match(html,/Projected departures/);
+ assert.match(html,/Eligible survey result and suppression metadata needed/);
+ for(const patch of [{loading:true},{error:'failed'},{receipt:null},{requested:{...filters,country:'UK'}}]){
+  const stale=render({...props,...patch});assert.doesNotMatch(stale,/7<\/b>|8\.2%|45,200 USD/);
+ }
+ assert.doesNotMatch(render({...props,recruitingKpi:{...props.recruitingKpi,asOf:'2026-08-31'}}),/7<\/b>/);
+ const zero=render({overview:{...base.overview,voluntary_turnover_ytd_pct:0,labor_cost_usd:0}});
+ assert.match(zero,/0%/);assert.match(zero,/0 USD/);
+});
+
+test('unavailable headcount selector is unique among five withheld indicators',()=>{
+ const html=render({receipt:null,trend:history,overview:{...base.overview,labor_cost_usd:45200},recruitingKpi:{hires:7,month:'2026-09',asOf:'2026-09-30'}});
+ assert.equal(html.split('>Unavailable<').length-1,5,'invalid receipt reproduces all five unavailable indicators');
+ const snapshot=html.match(/<section aria-label="Workforce snapshot"[^>]*>([\s\S]*?)<\/section>/)?.[1];
+ assert.ok(snapshot);
+ assert.deepEqual([...snapshot.matchAll(/<strong[^>]*>([^<]*)<\/strong>/g)].map(match=>match[1]),['Unavailable']);
+ assert.doesNotMatch(html,/role="img"/,'invalid receipt must still withhold the chart');
+ const source=fs.readFileSync('tests/browser/home-overview-entry.mjs','utf8');
+ assert.ok(source.includes("welcome.getByRole('region',{name:'Workforce snapshot',exact:true}).locator('strong').filter({hasText:/^Unavailable$/}).waitFor();assert.equal(await welcome.getByRole('img').count(),0)"));
+ assert.ok(!source.includes("welcome.getByText('Unavailable',{exact:true})"));
 });
