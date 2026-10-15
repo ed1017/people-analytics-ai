@@ -25,7 +25,7 @@ export function CapacitySavedScenarios(){
   try{
    if(!context||!session.scope)throw Error('Calculate for a selected saved goal first.');
    const saved=saveCapacityScenario({store,context,scope:session.scope,capture:session.capture,session:{draft:session.draft,result:session.result,error:session.error,...(session.cost?{cost:session.cost}:{})},name,id:crypto.randomUUID(),at:new Date().toISOString(),revision:storage.data.revision,assertActive});
-   setLeftId(saved.record.id);setRightId('');setNotice(`Saved “${saved.record.name}” in this browser.`);setName('');
+   setLeftId(saved.record.id);setRightId('');setNotice(`Saved “${saved.record.name}” in this browser.`);setSession({...session,saveName:'',openedScenario:{id:saved.record.id,name:saved.record.name,inputKey:saved.record.inputKey}});
   }catch(error){setActionError(error instanceof Error?error.message:'Save failed. Your draft is kept.');}
  }
  function open(){
@@ -33,7 +33,7 @@ export function CapacitySavedScenarios(){
   try{
    if(!context||!storage.saved)throw Error('Resolve Browser storage details before reopening saved work.');
    const opened=openCapacityScenario(store,context,leftId,storage.data.revision,assertActive);
-   setSession({draft:opened.entry.draft,result:opened.entry.record.result,cost:opened.entry.record.schemaVersion===2?opened.entry.record.cost:null,error:'',scope:opened.scope,capture:opened.capture});
+    setSession({draft:opened.entry.draft,result:opened.entry.record.result,cost:opened.entry.record.schemaVersion===2?opened.entry.record.cost:null,error:'',scope:opened.scope,capture:opened.capture,openedScenario:{id:opened.entry.record.id,name:opened.entry.record.name,inputKey:opened.entry.record.inputKey}});
    setNotice(`Opened “${opened.entry.record.name}”; recalculated from its saved inputs.`);
   }catch(error){setActionError(error instanceof Error?error.message:'Open failed. Your draft is kept.');}
  }

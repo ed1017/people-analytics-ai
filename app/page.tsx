@@ -1,5 +1,6 @@
 "use client";
 import {SelectedProgressEntry} from '@/components/goal-progress-entry-review';
+import {capacityChatContext} from '@/lib/capacity-chat-context';
 import {progressEntryContext,retainProgressEntryProposal} from '@/lib/goal-progress-entry-store';
 import {progressEntryPacket} from '@/lib/goal-progress-entry-service';
 import {captureGoalProgressInput} from '@/lib/goal-progress-conversation';
@@ -70,6 +71,7 @@ import { SuccessionPlanningPage } from "@/components/pages/succession-planning-p
 import { WorkforcePlanningPage } from "@/components/pages/workforce-planning-page";
 import {
   PlanningSessionProvider,
+  useCapacitySessionState,
   type PlanningWorkspaceView,
 } from "@/components/workforce-planning/planning-session-context";
 import { TalentAcquisitionPage } from "@/components/pages/talent-acquisition-page";
@@ -141,6 +143,7 @@ const PLANNING_VIEW_TO_PAGE: Record<
 export default function Home() {
   const activePage = useSyncExternalStore(subscribeToAppPage, currentAppPage, serverAppPage);
   const conversation = useProblemConversation(activePage);
+  const capacityState=useCapacitySessionState(conversation.workspaceKey);
   const [workspacePalette]=useWorkspacePalette();
   const [optionActions] = useState(()=>new WorkforceOptionActions());
   const [homeEvidencePacket,setHomeEvidencePacket]=useState("");
@@ -1250,6 +1253,7 @@ export default function Home() {
 
   const catalogueContext = activePage === "occupational-references" ? { occupationalReference: occupationalEvidence } : activePage === "labor-market" ? { loading: blsLoading, unavailable: Boolean(blsError) || !blsData, metrics: blsData?.metrics,marketSelection } : activePage === "training-coaching" ? { quotes: [...developmentCatalog, ...developmentSession.custom], selected: developmentSession.selected, goal: developmentSession.goal } : null;
   const chatEvidence = intelligencePage ? { page: activePage, persona: selectedPersona, intelligenceContext: catalogueContext } : overviewData ? {
+            capacityContext:planningWorkspaceActive?capacityChatContext(capacityState.capacitySession,{datasetToken:capacityState.datasetToken,goalId:conversation.activeGoalId??'',goal:conversation.focusedIssue}):null,
             persona: selectedPersona,
             page: planningWorkspaceActive
               ? "workforce-planning"
@@ -1911,7 +1915,7 @@ export default function Home() {
   };
 
   return (
-    <PlanningSessionProvider goalKey={conversation.workspaceKey} onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
+    <PlanningSessionProvider goalKey={conversation.workspaceKey} capacityState={capacityState} onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
     <main data-workspace-palette={workspacePalette} className={`min-h-screen bg-background text-foreground${activePage === "home" ? " app-home-composer" : ""}${["home","decision-brief","assess-evaluate"].includes(activePage) ? " app-overview-mode" : ""}`}>
       {/* Top header */}
       <AppHeader
