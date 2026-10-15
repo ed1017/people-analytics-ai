@@ -22,7 +22,8 @@ function formatLongDate(value: string) {
   return new Date(value + "T00:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 }
 
-export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitionPageProps) {
+export function TalentAcquisitionPage({ data: sourceData, loading, error }: TalentAcquisitionPageProps) {
+  const data = !loading && !error ? sourceData : null;
   const summary = data?.summary;
   const separateDataset = isSeparateTaDataset(data);
   const extension = !loading&&!error ? resolveTaResponseExtension(data) : null;
@@ -38,7 +39,7 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
         </span>
       </div>
 
-      {error && <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">{error}</div>}
+      {!loading && error && <div role="alert" className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">{error}</div>}
 
 
 
@@ -171,9 +172,9 @@ export function TalentAcquisitionPage({ data, loading, error }: TalentAcquisitio
           </div>
         </>
       ) : (
-        <div className="rounded-lg border p-8 text-center text-sm text-muted-foreground">{loading ? "Loading Talent Acquisition analytics…" : "No Talent Acquisition data returned."}</div>
+        (loading || !error) && <div role="status" className="rounded-lg border p-8 text-center text-sm text-muted-foreground">{loading ? "Loading Talent Acquisition analytics…" : "No Talent Acquisition data returned."}</div>
       )}
-      <div className="mb-4">{extension ? <CalibratedTaPanels data={extension} /> : <p className="rounded-lg border p-3 text-sm">{separateDataset?'Active-requisition history, projections and a screening stage are not released for this dataset. The recruiting summary and funnel use its own events.':'Calibrated projections and expanded funnel unavailable: source data is loading or differs from the calibration snapshot.'}</p>}</div>
+      {data && <div className="mb-4">{extension ? <CalibratedTaPanels data={extension} /> : <p role="status" className="rounded-lg border p-3 text-sm">{separateDataset?'Active-requisition history, projections and a screening stage are not released for this dataset. The recruiting summary and funnel use its own events.':'Calibrated projections and expanded funnel unavailable: source data does not match the calibration snapshot.'}</p>}</div>}
     </section>
   );
 }

@@ -28,7 +28,8 @@ function monthLabel(value: string) {
     year: "2-digit",
   });
 }
-export function WorkforcePage({ data, loading, error }: Props) {
+export function WorkforcePage({ data: sourceData, loading, error }: Props) {
+  const data = !loading && !error ? sourceData : null;
   const summary = data?.summary;
   const movementTotals = (data?.movements ?? []).reduce<Record<string, number>>(
     (acc, row) => {
@@ -53,8 +54,8 @@ export function WorkforcePage({ data, loading, error }: Props) {
           {loading ? "Loading workforce…" : data ? "As of " + data.as_of : "Workforce"}
         </span>
       </div>
-      {error && (
-        <div className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+      {!loading && error && (
+        <div role="alert" className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
           {error}
         </div>
       )}
@@ -178,7 +179,7 @@ export function WorkforcePage({ data, loading, error }: Props) {
           </div>
         </>
       ) : (
-        <div className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
+        (loading || !error) && <div role="status" className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
           {loading ? "Loading workforce analytics…" : "No workforce data returned."}
         </div>
       )}

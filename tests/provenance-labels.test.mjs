@@ -38,7 +38,7 @@ function compensationMarkup(release,scope=ranges.defaultRangeScope) {
  const catalog={jobs:manifest.jobCodes.slice(0,3).map(job=>({job_profile_code:job,job_profile_name:job})),levels:[{level_code:'L1',level_rank:1}],combinations:[]};
  let state=0;
  const {CompensationJobRanges}=load('components/compensation-job-ranges.tsx',{
-  react:{...React,useEffect:()=>{},useState:()=>[[catalog,false,0,release][state++],()=>{}]},
+  react:{...React,useEffect:()=>{},useState:()=>[[catalog,false,0,{key:`${scope.country==='all'&&scope.org==='all'&&scope.level==='all'}:0`,status:release?'loaded':'failed',rows:release}][state++],()=>{}]},
   '@/components/assumptions-disclosure':disclosure,
   '@/lib/dataset-client.mjs':{datasetFetch:()=>{throw Error('Network forbidden');},datasetSession:{}},
   '@/lib/compensation-range-context':ranges,
@@ -51,11 +51,11 @@ test('enabled release renders partial company USD coverage and withheld jobs wit
  const html=compensationMarkup(result.body.rows);
  assert.match(html,/Company-wide USD-pay subset · Partial job coverage/);
  assert.match(html,/Current: Withheld/);assert.match(html,/Current: 101.0%/);assert.match(html,/Partial USD inputs/);
- assert.doesNotMatch(html,/Compa-ratio release unavailable|matched_count|excluded_count/);
+ assert.doesNotMatch(html,/Loading company compa-ratios|Could not load compa-ratios|matched_count|excluded_count/);
 });
-test('disabled release renders unavailable without a pay point or mocked aggregate read',async()=>{
+test('disabled release renders failure without a pay point or mocked aggregate read',async()=>{
  const result=await releaseRoute('',false);assert.equal(result.status,503);assert.equal(result.reads,0);
- const html=compensationMarkup(null);assert.match(html,/Compa-ratio release unavailable/);assert.doesNotMatch(html,/<circle|Current: 101/);
+ const html=compensationMarkup(null);assert.match(html,/Could not load compa-ratios/);assert.doesNotMatch(html,/<circle|Current: 101|Loading company compa-ratios/);
 });
 test('unsupported filters never substitute retained company release values',async()=>{
  for(const key of ['country','org','level']){
