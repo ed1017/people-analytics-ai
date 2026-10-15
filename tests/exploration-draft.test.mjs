@@ -175,3 +175,47 @@ test('failed explicit clear preserves bytes, reports failure, and retries withou
   fail = false; first.current().retrySave(); first.flush();
   assert.equal(session.getItem(key), null); assert.equal(first.current().storageNotice, null);
 });
+
+test('cross-tab decision recovery preserves the tab-owned exploration request through retry and reload', () => {
+  const first = mount(); first.current().setInput(draft); first.flush();
+  const before = first.session.getItem(explorationDraftKey(token));
+  const other = new DecisionStore(); other.initialize(first.local);
+  other.saveGoals({version: 1, activeId: '', goals: [{id: 'remote', statement: 'Goal added in another tab'}]});
+  first.store.invalidateExternalChange();
+  assert.ok(first.store.getSnapshot().recovery);
+  first.current().retrySave(); first.flush();
+  assert.equal(first.current().input, draft);
+  assert.equal(first.session.getItem(explorationDraftKey(token)), before);
+  assert.equal(first.current().goals.some(goal => goal.id === 'remote'), true);
+  assert.equal(first.store.getField('', 'chat', null), null, 'tab-only request never enters the shared decision store');
+  assert.equal(mount({local: first.local, session: first.session}).current().input, draft);
+});
+
+test('recovery of another active goal retains exploration separately without replacing the saved goal draft', () => {
+  const first = mount(); first.current().setInput(draft); first.flush();
+  const other = new DecisionStore(); other.initialize(first.local);
+  other.saveGoals({version: 1, activeId: 'remote', goals: [{id: 'remote', statement: 'Goal added in another tab'}]});
+  other.setField('remote', 'chat', {messages: [], input: 'Remote goal draft', problem: null});
+  first.store.invalidateExternalChange(); first.current().recoverSaved(); first.flush();
+  assert.equal(first.current().activeGoalId, 'remote');
+  assert.equal(first.current().input, 'Remote goal draft');
+  assert.equal(JSON.parse(first.session.getItem(explorationDraftKey(token))).input, draft);
+  first.current().selectGoal(''); first.flush();
+  assert.equal(first.current().input, draft);
+  assert.equal(first.store.getField('remote', 'chat', null).input, 'Remote goal draft');
+});
+
+test('decision recovery keeps the live exploration draft even when the tab copy cannot be updated', () => {
+  const session = port(), key = explorationDraftKey(token); let fail = false;
+  const tab = {...session, setItem(name, value) {if (name === key && fail) throw Error('Quota'); session.setItem(name, value);}};
+  const first = mount({session: tab}); first.current().setInput('Older tab draft'); first.flush();
+  fail = true; first.current().setInput(draft); first.flush();
+  const other = new DecisionStore(); other.initialize(first.local);
+  other.saveGoals({version: 1, activeId: '', goals: [{id: 'remote', statement: 'Unrelated remote goal'}]});
+  first.store.invalidateExternalChange(); first.current().retrySave(); first.flush();
+  assert.equal(first.current().input, draft);
+  assert.match(first.current().storageNotice, /could not be saved/);
+  assert.equal(JSON.parse(session.getItem(key)).input, 'Older tab draft');
+  fail = false; first.current().retrySave(); first.flush();
+  assert.equal(mount({local: first.local, session: tab}).current().input, draft);
+});

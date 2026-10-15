@@ -124,8 +124,13 @@ export function useProblemConversation(scope = "home") {
     setFocusedIssue(next.goals.find(g=>g.id===next.activeId)?.statement ?? ""); persist(next);
   };
   const recoverStorage=(keepSaved=false)=>{
+    // General exploration is tab-owned in this mode, so a shared-decision merge
+    // cannot restore it. Capture the live draft even when its tab save failed.
+    const explorationChat:GoalChat|undefined=!solutionConversationEnabled&&!guidedIsolation.current
+      ?goalsRef.current.activeId?chats.current.get(''):{messages:storedMessagesRef.current,input:inputRef.current,problem,questionUnanswered,resetMarks:resetMarksRef.current,recoveredPlanSelectionRequired}
+      :undefined;
     if(!solutionConversationEnabled&&tabDraft.current?.datasetToken===decisionStore.getDatasetToken()&&!guidedIsolation.current){
-      tabDraft.current.save(goalsRef.current.activeId?chats.current.get('')?.input??'':inputRef.current);
+      tabDraft.current.save(explorationChat?.input??'');
       setTabDraftNotice(tabDraft.current.notice);
     }
     const wasRecovery=!!decisionStore.getSnapshot().recovery;
@@ -135,7 +140,8 @@ export function useProblemConversation(scope = "home") {
     // Replace React's cached transcript and goal selection with the reviewed merge.
     // Reusing a stale chat cache here would write this tab's old history over the merge.
     cancelPending();chats.current.clear();history.current={key:'',messages:[]};
-    const next=state.data.goals,chat=decisionStore.getField<GoalChat|null>(next.activeId,'chat',null);
+    if(explorationChat)chats.current.set('',explorationChat);
+    const next=state.data.goals,chat=!next.activeId&&explorationChat?explorationChat:decisionStore.getField<GoalChat|null>(next.activeId,'chat',null);
     goalsRef.current=next;setLocalGoals(next);setFocusedIssue(next.goals.find(g=>g.id===next.activeId)?.statement??'');
     setStoredMessages(chat?.messages??[]);setResetMarks(chat?.resetMarks??{});setInput(chat?.input??'');setRecoveredPlanSelectionRequired(chat?.recoveredPlanSelectionRequired===true);setProblem(chat?.problem??null);setQuestionUnanswered(false);
     setIssueEditor(null);setError(null);setWorkspaceRevision(value=>value+1);
