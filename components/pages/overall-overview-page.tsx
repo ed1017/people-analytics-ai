@@ -33,6 +33,7 @@ import {homePlanningNoteParts,resolveHomeUserGoal,workforceChoiceDiscoveryGoal} 
 import {HomePinnedGoals} from "@/components/home-pinned-goals";
 import {homeDemoField,readHomeDemo} from '@/lib/home-demo-catalog';
 import type {LocalGoal} from "@/lib/local-goals";
+import {HomeEntryStarters} from "@/components/home-entry-starters";
 import {HomeGettingStarted} from "@/components/home-getting-started";
 import {HomeDataStatus} from '@/components/home-data-status';
 import {DataLoadingStatus} from '@/components/data-loading-status';
@@ -561,13 +562,14 @@ export function OverallOverviewPage({ overviewEntry=false, optionActions, onStar
   );
   const startingGuide=(
     <section aria-label="Starting guide" data-testid="overview-starting-guide" className="space-y-3 pt-0 pb-1">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <h3 className="text-2xl font-semibold">What workforce decision will support your goal?</h3>
-        <p className="text-sm text-muted-foreground">Ask your question or use a prompt. Compare proposed Action Plans, then refine your choice in chat.</p>
-      </div>
-
-      <div className="mt-3"><PromptExamples groups={conversation.focusedIssue?undefined:homeStarterGroups} prompts={[...contextualPrompts({page:"home",goal:conversation.focusedIssue,hasConversation:messages.some(message=>message.role==="user"),evidenceReady:ready,sources})]} draft={input} busy={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)} onSend={submitStarterQuestion}/></div>
-
+      <h3 className="text-2xl font-semibold">What would you like to work on?</h3>
+      <HomeEntryStarters goals={conversation.goals} workspaces={storage.data.workspaces}
+        disabled={!active||!conversation.storageReady||!conversation.saved||chatLoading||solutions.pending||solutions.saving||Boolean(conversation.issueEditor)||Boolean(input.trim())}
+        onSelect={openPinnedGoal}/>
+      {Boolean(input.trim())&&<p className="text-xs text-muted-foreground">Send or clear your draft before opening an example.</p>}
+      <details><summary className="min-h-11 cursor-pointer py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">More question ideas</summary>
+        <PromptExamples groups={conversation.focusedIssue?undefined:homeStarterGroups} prompts={[...contextualPrompts({page:"home",goal:conversation.focusedIssue,hasConversation:messages.some(message=>message.role==="user"),evidenceReady:ready,sources})]} draft={input} busy={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)} onSend={submitStarterQuestion}/>
+      </details>
     </section>
   );
   return <HomeGuidedActionsContext.Provider value={guidedActions}><div data-overview-starting={overviewStarting?'':undefined} data-plan-reading={planReading?'':undefined} style={{overflowAnchor:'none'}} className="home-workspace mx-auto grid w-full max-w-none items-start gap-3 px-5 pt-3 pb-2 sm:px-8 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]">
@@ -622,7 +624,7 @@ export function OverallOverviewPage({ overviewEntry=false, optionActions, onStar
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!guidedExampleActive&&<SwpGuidedJourney discussionKey={JSON.stringify([workforceScope,workforceQuery,persona])} conversation={conversation} active={active} busy={chatLoading||solutions.pending||solutions.saving} commandRef={swpCommand} modelContextRef={swpModelContext} demandControlRef={demandControl} demandReviewRef={demandReview} demandContextRef={demandContext} sources={sources??[]} onNavigate={onNavigate}/>}
-    {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&(overviewEntry?<details><summary className="min-h-11 cursor-pointer py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Ideas for your first question</summary>{startingGuide}</details>:startingGuide)}
+    {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&startingGuide}
     {!solutionConversationEnabled&&showFallbackPin&&!chatLoading&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
     {!activePinnedGoal&&conversationPanel}
 
