@@ -780,3 +780,16 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
   .header-settings-content #perspective-effect { grid-column: 1; text-align: left; }
   .header-settings summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 }
+
+.global-workforce-filters[data-compact] .workforce-filter-disclosure { display: block; min-width: 0; }
+.global-workforce-filters[data-compact] .workforce-filter-disclosure > summary { display: list-item; }
+.global-workforce-filters[data-compact] .workforce-filter-fields { display: grid; gap: 8px; padding-block: 8px; }
+.global-workforce-filters[data-compact] .workforce-filter-disclosure:not([open]) > .workforce-filter-fields { display: none; }
+@media (min-width: 768px) {
+  .global-workforce-filters[data-compact] .workforce-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+  .global-workforce-filters[data-compact] .workforce-goal { flex: 1 1 30rem; }
+  .global-workforce-filters[data-compact] .workforce-filter-disclosure[open] { flex-basis: 100%; }
+  .global-workforce-filters[data-compact] .workforce-filter-fields { grid-template-columns: repeat(3, minmax(0,1fr)) auto; align-items: end; }
+  .global-workforce-filters[data-compact] .workforce-filter-fields label { display: block; }
+  .global-workforce-filters[data-compact] .workforce-filter-fields select { width: 100%; }
+}

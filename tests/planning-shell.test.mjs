@@ -158,17 +158,17 @@ test('compact cost keeps its exact source amount and period limits available', (
   const html = render({overview:{...base.overview,labor_cost_usd:2047306374.48}});
   assert.match(html, /USD 2\.05B/);
   assert.match(html, /<details[^>]*><summary>Exact amount<\/summary><p>USD 2,047,306,374\.48<\/p><\/details>/);
-  assert.match(html, /<details[^>]*><summary>Indicator scope and source details<\/summary>/);
+  assert.match(html, /<details[^>]*><summary>Sources and exact cost/);
   assert.match(html, /Cost period unspecified; no monthly or annual basis is inferred/);
   assert.match(html, /survey respondents are a separate population/);
   assert.doesNotMatch(render({}), /<summary>Exact amount<\/summary>/);
 });
 
 
-test('initial question composer precedes the visible workforce snapshot without duplication', () => {
+test('initial intro keeps trend, indicators and a single question composer in reading order', () => {
   const html=render({composer:React.createElement('form',null,React.createElement('textarea',{'aria-label':'Existing composer'}))});
   assert.equal((html.match(/<form/g)??[]).length,1);
-  assert.ok(html.indexOf('Existing composer')<html.indexOf('aria-label="Workforce snapshot"'));
+  assert.ok(html.indexOf('aria-label="Workforce snapshot"')<html.indexOf('Existing composer'));
   assert.match(html,/Recorded synthetic workforce history/);
   assert.match(html,/Cost period unspecified/);
 });
