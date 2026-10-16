@@ -34,6 +34,7 @@ test('pinned SDK sends identical full count/create payloads including schemas an
 });
 test('actual route preserves real progress proposal and second-round final; budgets include all context',async()=>{
  const isolated=await offlineBusinessRoute();Object.assign(isolated.sandbox.process.env,env);isolated.sandbox.console={info(){},error(){}};
+ const probe=await isolated.get(new Request('http://offline.invalid/api/home-solution-conversation'));assert.equal(probe.status,400);assert.equal(probe.headers.get('X-Tracking-Preview-Budget'),'v1; rounds=2; input=25000; output=2000');
  const counts=[];isolated.sandbox.__countTokens=async(body,options)=>{counts.push(JSON.parse(JSON.stringify(body)));assert.equal(options.maxRetries,0);assert.equal(options.timeout,15000);return {input_tokens:24000};};
  const text='Synthetic QA: maintain exactly 100 active employees across all countries, all business units and all levels through 2026-12-31. Freshness is 30 days. Report a complete 100 people on 2026-08-01 as baseline.';
  const body=solutionRequest(text,true);body.goal.statement='Maintain 100 active employees through 2026-12-31';body.catalog=null;body.selectedId=null;body.goalProgress={version:1,goalId:body.goal.id,datasetToken:'legacy-v1:0',origin:'authored',ledger:emptyGoalProgress(body.goal.id,'authored'),unavailableReason:null};
@@ -62,5 +63,6 @@ test('actual route preserves real progress proposal and second-round final; budg
  isolated.sandbox.__countTokens=async()=>assert.fail('production must not count');
  isolated.sandbox.__replies.push(responseForStep(final('No progress was recorded.')));
  assert.equal((await send()).status,200);assert.equal(isolated.sandbox.__requests[0].max_output_tokens,5000);
+ assert.equal((await isolated.get(new Request('http://offline.invalid/api/home-solution-conversation'))).headers.get('X-Tracking-Preview-Budget'),null);
 
 });

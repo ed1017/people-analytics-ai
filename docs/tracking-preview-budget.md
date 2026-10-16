@@ -4,6 +4,10 @@ Temporary server-only opt-in: `VERCEL_ENV=preview`, exact branch
 `VERCEL_GIT_COMMIT_REF=codex/progress-target-context`, and
 `HOME_TRACKING_QA_BUDGET=v1`. All three are required. Production ignores the flag.
 Do not start paid QA until the exact deployment and branch-scoped flag are verified.
+A GET to `/api/home-solution-conversation` with no query returns the existing 400
+validation response before dataset/projection reads. When the guard is active, it
+also returns `X-Tracking-Preview-Budget: v1; rounds=2; input=25000; output=2000`.
+Require this header on the exact Preview before any Send; absence means stop.
 
 The normal Home model, reasoning, instructions, tools, schemas, progress validation
 and confirmation flow remain intact. Preview caps each HTTP Send at two inference

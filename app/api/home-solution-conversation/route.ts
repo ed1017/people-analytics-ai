@@ -90,7 +90,8 @@ export async function POST(request:Request) {
 /** Current aggregate projection inputs only: no conversation, model or writes. */
 export async function GET(request:Request){
  return withDatasetRequest(request,async()=>{
-  const headers={'Cache-Control':'no-store'};
+  const headers:Record<string,string>={'Cache-Control':'no-store'};
+  if(trackingPreviewBudgetEnabled(process.env))headers['X-Tracking-Preview-Budget']='v1; rounds=2; input=25000; output=2000';
   if(!solutionConversationEnabled)return Response.json({error:'Solution conversation is not enabled.'},{status:404,headers});
   const {projectionCurrentnessFilters,createProjectionCurrentnessReceipt}=await import('@/lib/home-projection-currentness');
   let filters;
