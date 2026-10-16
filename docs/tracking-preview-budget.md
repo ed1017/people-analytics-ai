@@ -55,3 +55,21 @@ response is a failed QA step, never evidence the functional gate passed.
 Offline tests exercise the actual route, SDK serialization, real progress proposal
 validation, production exclusion and refusal paths with synthetic transports.
 They incur no provider calls and do not establish hosted token counts or success.
+
+## Count-only investigation
+
+After an over-limit/invalid-count failure, use the same branch-scoped Preview with
+`HOME_TRACKING_QA_COUNT_ONLY=true`. Require the activation header to end with
+`; mode=count-only`. This server mode counts the genuine full request but always
+stops before inference, even if the count fits. It does not trim or mock context.
+The 422 response includes `budgetDiagnostic`: fixed reason (`count_invalid`,
+`input_limit`, or `count_only`), validated input token count (null for invalid),
+serialized provider-request bytes and input/instruction/tool/response-schema byte
+counts. Only numbers/codes are exposed, never request content or provider errors.
+
+The earlier combined error did not preserve the count; it cannot retroactively
+prove an exact token number. Its hosted log confirms zero inference attempts.
+Keep the two failed-Send reservations ($0.363) unchanged. Remaining allowance is
+$0.637; at existing limits at most three further inference Sends reserve $0.5445.
+Do not enable inference or raise limits until the count-only evidence supports
+an explicit feasible test allocation. Count-only mode is ignored in production.

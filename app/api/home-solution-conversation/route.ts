@@ -31,7 +31,7 @@ async function handlePOST(request:Request){
  const requestTime=new Date();
  if(!solutionConversationEnabled)return Response.json({error:'Solution conversation is not enabled.'},{status:404});
  const body=await request.text();if(new TextEncoder().encode(body).length>900000)return Response.json({error:'The conversation request is too large.'},{status:413});
- const previewBudget=trackingPreviewBudgetEnabled(process.env)?createTrackingPreviewBudget():null;
+ const previewBudget=trackingPreviewBudgetEnabled(process.env)?createTrackingPreviewBudget(process.env.HOME_TRACKING_QA_COUNT_ONLY==='true'):null;
  const diagnostics=createSolutionDiagnostics();let signal:AbortSignal|undefined;
  try{
   const parsed=readSolutionRequest(JSON.parse(body));
@@ -78,7 +78,7 @@ async function handlePOST(request:Request){
   return Response.json(reply,{headers:{'Cache-Control':'no-store'}});
  }catch(error){
   const evidence=error instanceof SolutionEvidenceError,diagnostic=diagnostics.failure(error,evidence?error.diagnostic:null,request.signal.aborted,signal?.aborted===true);
-  return Response.json({error:error instanceof PreviewBudgetError?error.message:evidence?error.message:'The conversation could not be completed or verified. Your request and earlier work are kept. Try a narrower question or retry explicitly.',...diagnostic},
+  return Response.json({error:error instanceof PreviewBudgetError?error.message:evidence?error.message:'The conversation could not be completed or verified. Your request and earlier work are kept. Try a narrower question or retry explicitly.',...diagnostic,...(error instanceof PreviewBudgetError&&error.diagnostic?{budgetDiagnostic:error.diagnostic}:{})},
    {status:evidence?503:422,headers:{'Cache-Control':'no-store','X-Correlation-ID':diagnostic.correlationId}});
  }
 }
@@ -91,7 +91,7 @@ export async function POST(request:Request) {
 export async function GET(request:Request){
  return withDatasetRequest(request,async()=>{
   const headers:Record<string,string>={'Cache-Control':'no-store'};
-  if(trackingPreviewBudgetEnabled(process.env))headers['X-Tracking-Preview-Budget']='v1; rounds=2; input=25000; output=2000';
+  if(trackingPreviewBudgetEnabled(process.env))headers['X-Tracking-Preview-Budget']='v1; rounds=2; input=25000; output=2000'+(process.env.HOME_TRACKING_QA_COUNT_ONLY==='true'?'; mode=count-only':'');
   if(!solutionConversationEnabled)return Response.json({error:'Solution conversation is not enabled.'},{status:404,headers});
   const {projectionCurrentnessFilters,createProjectionCurrentnessReceipt}=await import('@/lib/home-projection-currentness');
   let filters;

@@ -16,7 +16,7 @@ test('only the explicit tracking Preview branch enables limits; production remai
  assert.equal(5*trackingPreviewLimits.rounds*(trackingPreviewLimits.inputTokens*2.5+trackingPreviewLimits.outputTokens*10)/1e6*1.1,0.9075);
 });
 test('counts fail closed and two reservations cannot be exceeded after inference failure',async()=>{
- for(const count of [0,-1,NaN,1.5,25001,undefined])await assert.rejects(createTrackingPreviewBudget().prepare(base,async()=>({input_tokens:count})),/invalid count/);
+ for(const count of [0,-1,NaN,1.5,25001,undefined])await assert.rejects(createTrackingPreviewBudget().prepare(base,async()=>({input_tokens:count})),/invalid input token count|exceeding/);
  await assert.rejects(createTrackingPreviewBudget().prepare(base,async()=>{throw Error('private failure');}),/count unavailable/);
  const budget=createTrackingPreviewBudget();let counts=0;
  for(let n=0;n<2;n++)assert.equal((await budget.prepare(base,async()=>{counts++;return {input_tokens:25000};})).max_output_tokens,2000);
@@ -52,6 +52,17 @@ test('actual route preserves real progress proposal and second-round final; budg
  // The same real route rejects oversized initial input before any inference.
  isolated.sandbox.__requests.length=0;isolated.sandbox.__countTokens=async()=>({input_tokens:25001});
  const blocked=await send();assert.equal(blocked.status,422);assert.match((await blocked.json()).error,/Tracking Preview budget/);assert.equal(isolated.sandbox.__requests.length,0);
+ // Count-only server mode always stops before inference, for fitting and oversized inputs.
+ isolated.sandbox.process.env.HOME_TRACKING_QA_COUNT_ONLY='true';
+ for(const tokens of [24000,31000,NaN]){
+  isolated.sandbox.__countTokens=async()=>({input_tokens:tokens});
+  const inspected=await send(),packet=await inspected.json();assert.equal(inspected.status,422);assert.equal(isolated.sandbox.__requests.length,0);
+  assert.equal(packet.budgetDiagnostic.inputTokens,Number.isNaN(tokens)?null:tokens);assert.equal(packet.budgetDiagnostic.countOnly,true);
+  assert.equal(packet.budgetDiagnostic.reason,Number.isNaN(tokens)?'count_invalid':tokens>25000?'input_limit':'count_only');
+  assert.ok(packet.budgetDiagnostic.serializedBytes>100000);assert.ok(packet.budgetDiagnostic.toolSchemaBytes>50000);
+ }
+ assert.match((await isolated.get(new Request('http://offline.invalid/api/home-solution-conversation'))).headers.get('X-Tracking-Preview-Budget'),/mode=count-only/);
+ delete isolated.sandbox.process.env.HOME_TRACKING_QA_COUNT_ONLY;
  // A continuation recount includes the tool result; rejection cannot dispatch round two.
  let n=0;isolated.sandbox.__countTokens=async()=>({input_tokens:++n===1?24000:25001});
  isolated.sandbox.__replies.push(responseForStep({name:'propose_goal_progress',args:{spec}},2));
