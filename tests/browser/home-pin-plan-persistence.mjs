@@ -99,7 +99,7 @@ try{for(const [mode,width] of [['desktop',1366],['mobile',390]])for(const kind o
   check('participation',!draft.inputs.groups.some(g=>g.count.value!==null)&&working.includes('People / FTE / staff hours: Unknown'));
   check('workload',working.includes('People / FTE / staff hours: Unknown'));
  }
- check('noInventedProgress',!(await state()).workspaces[id].fields.goalProgressV1&&await page.getByText('No confirmed measurement link yet. Review and confirm progress in chat.',{exact:false}).isVisible());
+ check('noInventedProgress',!(await state()).workspaces[id].fields.goalProgressV1&&await page.getByText('No saved plan link. Progress entries are recorded separately from pinned proposals.',{exact:false}).isVisible());
  await rail.getByText('Earlier saved goals and drafts',{exact:true}).click();await rail.getByRole('button',{name:'Earlier goal without a plan',exact:true}).click();
  result.legacyFields=(await state()).workspaces.legacy.fields;check('legacyNoInventedPlan',result.legacyFields.sentinel.keep===true&&!result.legacyFields.homePlanAlternativesV1&&!result.legacyFields.goalProgressV1);
  check('offline',calls===1&&blocked.length===0&&errors.length===0);

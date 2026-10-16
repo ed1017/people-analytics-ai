@@ -25,13 +25,15 @@ for(const [direction,label] of [['increase','Higher is better'],['decrease','Low
  assert.match(compact,/Pinned proposal:.*Service plan/);assert.match(compact,/Selection is not approval or execution/);
  assert.ok(compact.includes(`${direction==='increase'?120:80} people by 2026-12-31`));assert.ok(compact.includes(label));
  assert.match(compact,/Measured progress:.*2026-09-20.*User-reported/);assert.match(compact,/Execution not recorded/);
- assert.match(html,/No confirmed measurement link yet/);assert.doesNotMatch(html,/<details[^>]*open/);
+ assert.match(html,/Plan link:<\/strong> No saved plan link\. Progress entries are recorded separately from pinned proposals\./);assert.doesNotMatch(html,/No confirmed measurement link|Review and confirm progress in chat/);assert.doesNotMatch(html,/<details[^>]*open/);
  if(direction==='maintain')assert.doesNotMatch(html,/At or below the limit/);
  assert.deepEqual(snapshot,before);
 });
 
 test('missing, unsupported, stale and expired progress retains honest target and observation states',()=>{
  const empty=render(readProgressSnapshot(emptyGoalProgress('goal'),'goal',day));
+ const pinnedEmpty=render(readProgressSnapshot(emptyGoalProgress('goal'),'goal',day),{pinnedPlanName:'Service plan'});
+ assert.match(pinnedEmpty,/No saved plan link/);assert.match(pinnedEmpty,/Not yet measured/);assert.doesNotMatch(pinnedEmpty,/No confirmed measurement link|Review and confirm progress in chat/);
  assert.match(empty,/Target:<\/strong> Not defined/);assert.match(empty,/Not yet measured/);assert.doesNotMatch(empty,/Pinned proposal/);
  const unsupported=render(readProgressSnapshot(progressFixture('goal','increase',{unsupported:true}),'goal',day));
  assert.match(unsupported.split('<details>')[0],/120 percent by 2026-12-31/);assert.match(unsupported,/Comparable measurement unavailable/);assert.match(unsupported,/no supported measurement summary/);
