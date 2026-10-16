@@ -1,3 +1,4 @@
+import * as previewBudget from '../lib/home-preview-budget.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -23,6 +24,7 @@ function routeHarness({load=async()=>projectionInputs(),enabled=true}={}){
  const boundary=createDatasetRequestBoundary({router,retained:{'legacy-v1':{assertAvailable:async()=>true}}});
  const runtime={withDatasetRequest:boundary,datasetRouter:router,datasetAI:()=>{calls.model++;throw Error('Model forbidden');}};
  const routeModule=loadModule('app/api/home-solution-conversation/route.ts',name=>{
+  if(name==='@/lib/home-preview-budget')return previewBudget;
   if(name==='@/lib/dataset-runtime')return runtime;
   if(name==='@/lib/home-projection-currentness')return currentness;
   if(name==='@/lib/home-solution-conversation')return {solutionConversationEnabled:enabled};
