@@ -107,7 +107,27 @@ test('saved comparison labels recurring month differences separately and ignores
   assert.equal(all.find(n=>n.props.role==='alert').props.children,'');
   assert.match(html,new RegExp('Opening assumption differences: '+openingCount+'\\.'));
   assert.match(html,/value="Unsaved draft name"/);assert.match(html,/Month-level assumption differences: 3\./);assert.match(html,/A recurring change counts once per month/);
+  assert.match(html,/What changed between these scenarios/);assert.match(html,/Productivity improvement/);assert.match(html,/20 %/);assert.match(html,/current draft edits are excluded/);
  }
+});
+
+test('comparison explains changed saved values with units, effective movement assumptions and unknown cost',()=>{
+ const {CapacityAssumptionChanges}=component('components/workforce-planning/capacity-saved-scenarios.tsx',{
+  '@/components/decision-store':{},'@/lib/dataset-client.mjs':{},'@/lib/swp-capacity-cost':costLayer,
+  '@/lib/swp-capacity-store':capacityStore,'@/lib/swp-capacity-record':capacityRecord,'./planning-session-context':{},
+ });
+ const render=(a,b)=>renderToStaticMarkup(React.createElement(CapacityAssumptionChanges,{left:{name:'Original',draft:a},right:{name:'Alternative',draft:b}}));
+ const baseline={...draft,hireFte:'',exitFte:''};
+ const before=structuredClone(baseline);
+ const html=render(baseline,{...baseline,volume:'900',hours:'140',allocation:'60.1234',productivity:'10',fullTimeMovements:false,hireFte:'0.5',exitFte:'1',costRate:'0'});
+ for(const text of ['Work items each month','800 items/month','900 items/month','140 hours/FTE/month','60.1234 %','1 FTE/person','0.5 FTE/person','Joiner and departure FTE basis','Unknown','0 USD/FTE/month','not effects attributed to any one change','Unknown cost is not zero'])assert.ok(html.includes(text),text);
+ assert.doesNotMatch(html,/Contracted time per departure<\/h4>/,'effective 1 FTE is unchanged');
+ assert.deepEqual(baseline,before,'rendering must not edit the saved draft');
+ assert.match(render({...baseline,costRate:''},{...baseline,people:'10.0'}),/No differences in the recurring capacity or cost inputs/);
+ assert.doesNotMatch(render({...baseline,costRate:'0'},{...baseline,costRate:'0.00'}),/Cost per contracted FTE<\/h4>/);
+ const rated=render({...baseline,costRate:'12.34'},{...baseline,costRate:'12.35'});
+ assert.match(rated,/12.34 USD\/FTE\/month/);assert.match(rated,/12.35 USD\/FTE\/month/);
+ assert.doesNotMatch(html,/<details[^>]*open/,'secondary assumptions start collapsed');
 });
 
 test('optional cost shows unknown and zero distinctly without removing capacity chart or blocking calculation',()=>{
