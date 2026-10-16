@@ -1,5 +1,7 @@
 // @ts-expect-error Native Node tests share TypeScript source.
-import {defaultGuidedWorkload,syncGuidedWorkloadDemand,guidedWorkloadResult} from './guided-workload.ts';
+import {optionRoleMonths} from './guided-plan-summary.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {defaultGuidedWorkload,syncGuidedWorkloadDemand} from './guided-workload.ts';
 /** A presentation/commit adapter over existing staffing, plan and progress contracts.
  * No model, network, workforce write or replacement workflow engine. */
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -110,25 +112,8 @@ export function swpOptions(evaluation:HomeMixEvaluation):SwpOption[]{
   return {id:candidate.id,label:index===0?'Current mix':`Option ${index}`,candidate,draft,coverage};
  });
 }
-/** Qualified role-months exclude partial readiness months, using the existing dependency gates. */
-function optionRoleMonths(option:SwpOption){
- const months=option.draft.inputs.scope.months.value!;
- if(!option.coverage||option.coverage.length!==months||option.coverage.some(v=>v===null))return null;
- const covered=[...option.coverage] as number[],start=option.draft.inputs.scope.startMonth.value!,capacity=option.draft.inputs.capacity!,ready=reviewBundleProposal(option.draft).componentReady;
- for(const flow of capacity.flows.filter(f=>f.path!=='backfills')){
-  const arrival=flow.path==='buy'?capacity.input.arrivalDate:capacity.input[flow.path==='build'?'buildMonth':'moveMonth']+'-01',prerequisites=flow.componentIds.map(id=>ready[id]);
-  if(prerequisites.some(v=>v===null))return null;
-  const effective=[arrival,...prerequisites as string[]].sort().at(-1)!,index=(Number(effective.slice(0,4))-Number(start.slice(0,4)))*12+Number(effective.slice(5,7))-Number(start.slice(5,7));
-  if(Number(effective.slice(8,10))>1&&index>=0&&index<months)covered[index]=Math.max(0,covered[index]-Number(capacity.input[flow.path]));
- }
- return covered.reduce((sum,n)=>sum+n,0);
-}
-export function guidedOptionEffort(option:SwpOption){
- const baseline=guidedWorkloadResult(option.draft.inputs),roleMonths=optionRoleMonths(option);
- if(!baseline||baseline.status!=='calculated'||roleMonths===null)return null;
- const additionalHours=roleMonths*option.draft.inputs.guidedWorkload!.productiveHours.value!;
- return {additionalHours,totalHours:baseline.capacityHours!+additionalHours,shortfallHours:Math.max(0,baseline.workloadHours!-baseline.capacityHours!-additionalHours)};
-}
+// @ts-expect-error Native Node tests share TypeScript source.
+export {guidedOptionEffort} from './guided-plan-summary.ts';
 /** Uniform within-month effort is an explicit scenario conversion, not proof of service coverage. */
 export function serviceOptionEffort(option:SwpOption,bridge:SwpDemandBridge){
  const r=validateDemandBridge(option.draft,bridge,bridge.review.datasetToken),months=r.spec.months!;

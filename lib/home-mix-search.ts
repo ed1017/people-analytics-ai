@@ -8,6 +8,9 @@ import {planStaffEffort} from './home-plan-delivery-estimate.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {componentOrder} from './home-solution-bundles.ts';
 import type {WorkforceIncrement, WorkforcePlanInput} from './workforce-increment';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {calculateWorkforceIncrement} from './workforce-increment.ts';
+import type {BundleDraft} from './home-bundle-reconciliation';
 
 export type HomeMixMetrics = {incrementalCash: number | null; staffHours: number | null; addedEmployees: number; fullCoverageDate: string | null};
 type Check = {dimension: string; status: 'met' | 'not-met' | 'unknown'};
@@ -29,7 +32,7 @@ const amount = (value: string) => value === '' ? null : Number(value);
 const cashFields = ['hireStaffingCost', 'backfillStaffingCost', 'internalSalaryUplift', 'recruitingFees', 'trainingCash'] as const;
 
 /** Reconcile full cash and dependency-gated coverage using the one already calculated staffing plan. */
-function project(source: HomeMixSource, plan: WorkforceIncrement, id: string, isReferenceMix: boolean): HomeMixCandidate {
+function project(source: Pick<HomeMixSource,'draft'|'input'|'request'>, plan: WorkforceIncrement, id: string, isReferenceMix: boolean): HomeMixCandidate {
   // Retain the original field/provenance for adoption; Home never evaluates its monetary time valuation.
   const draft = structuredClone(source.draft), input = draft.inputs, staffing = {...plan.input, loadedHourlyCost: source.input.loadedHourlyCost};
   input.capacity!.input = structuredClone(staffing);
@@ -182,4 +185,10 @@ export function homeMixReportsComparable(left: HomeMixReport, right: HomeMixRepo
   const binding = (report: HomeMixReport) => ({goalId: report.binding.goalId, goal: report.binding.goal, evidenceDigest: report.binding.evidenceDigest, planningDigest: report.binding.planningDigest});
   return canonical([binding(left), left.dimensions, left.constraints, left.objective, left.calculator, left.projectionVersion, left.costPolicy])
     === canonical([binding(right), right.dimensions, right.constraints, right.objective, right.calculator, right.projectionVersion, right.costPolicy]);
+}
+
+/** Reuse the search projection for one saved, validated staffing choice; no search or network. */
+export function projectSavedStaffingChoice(draft:BundleDraft){
+ const input=draft.inputs.capacity!.input;
+ return project({draft,input,request:{draft}},calculateWorkforceIncrement({...input,loadedHourlyCost:"0"},null),"saved-choice",true);
 }

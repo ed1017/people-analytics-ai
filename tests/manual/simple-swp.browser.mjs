@@ -8,7 +8,12 @@ try { for(const width of [1440,390]) {
  const context=await browser.newContext({viewport:{width,height:width===390?844:900}}),page=await context.newPage(),blocked=[],errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  await context.route('**/*',async route=>{const r=route.request(),u=new URL(r.url());if(u.origin!==origin||r.method()!=='GET'){blocked.push(u.pathname);return route.abort();}if(!process.env.WORKLOAD_FIXTURES||!u.pathname.startsWith('/api/'))return route.continue();try{return route.fulfill({contentType:'application/json',body:await fs.readFile(process.env.WORKLOAD_FIXTURES+'/history-'+u.pathname.slice(5)+'.json','utf8')});}catch{return route.fulfill({status:503,json:{error:'Source unavailable in isolated fixture'}});}});
- await page.goto(origin,{timeout:90000});await page.getByRole('button',{name:'Start the 3-minute demo',exact:true}).click();
+ await page.goto(origin,{timeout:90000});
+ const intro=page.getByRole('button',{name:'Start the 3-minute demo',exact:true});await intro.waitFor();
+ if(width===390){assert.ok((await intro.boundingBox()).y<400,'ordinary Overview CTA near top');assert.equal(await page.getByRole('button',{name:'Menu',exact:true}).isVisible(),true);}
+ assert.equal(await page.locator('li').filter({has:page.getByText('Labor cost',{exact:true})}).count(),0,'undated cost is not a headline KPI');
+ if(process.env.WORKLOAD_OUTPUT_DIR)await page.screenshot({path:process.env.WORKLOAD_OUTPUT_DIR+'/overview-'+width+'.png',fullPage:true});
+ await page.getByRole('button',{name:'Start the 3-minute demo',exact:true}).click();
  const heading=page.getByRole('heading',{name:'How can we cover the capacity gap?',exact:true});await heading.waitFor();
  const compare=page.getByRole('button',{name:'Compare staffing options',exact:true});await compare.waitFor();
  if(process.env.WORKLOAD_OUTPUT_DIR)await page.screenshot({path:process.env.WORKLOAD_OUTPUT_DIR+'/initial-'+width+'.png',fullPage:true});
@@ -52,9 +57,9 @@ try { for(const width of [1440,390]) {
  for(const radio of await page.getByRole('radio').all())if(await radio.isEnabled()){await radio.check();break;}
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'horizontal overflow');
  if(process.env.WORKLOAD_OUTPUT_DIR)await page.screenshot({path:process.env.WORKLOAD_OUTPUT_DIR+'/workload-compare-'+width+'.png',fullPage:true});
- await page.getByRole('button',{name:'Review selected Action Plan',exact:true}).click();assert.equal(await page.locator('.demo-stepper [aria-current="step"]').innerText(),'3 Save and review');await page.getByRole('button',{name:'Save reviewed plan and goal',exact:true}).click();await page.getByRole('heading',{name:'Reopen and track',exact:true}).waitFor();
+ await page.getByRole('button',{name:'Review selected Action Plan',exact:true}).click();assert.equal(await page.locator('.demo-stepper [aria-current="step"]').innerText(),'3 Save and review');const selectedSummary=await page.getByRole('region',{name:'Review and save workforce plan',exact:true}).getByRole('region',{name:'Selected workforce choice',exact:true}).innerText();assert.match(selectedSummary,/Incremental cash:[\s\S]*Conditional readiness:[\s\S]*Uncovered work/);await page.getByRole('button',{name:'Save reviewed plan and goal',exact:true}).click();await page.getByRole('heading',{name:'Reopen and track',exact:true}).waitFor();
  await page.reload();await heading.waitFor();await page.getByText('Adjust assumptions',{exact:true}).click();assert.equal(await volume.inputValue(),'1120');
- await page.getByRole('button',{name:'Review target and tracking',exact:true}).click();await page.getByRole('heading',{name:'Track your plan',exact:true}).waitFor();assert.match(await page.getByRole('region',{name:'Track',exact:true}).innerText(),/4 roles/);
+ await page.getByRole('button',{name:'Review target and tracking',exact:true}).click();await page.getByRole('heading',{name:'Track your plan',exact:true}).waitFor();assert.match(await page.getByRole('region',{name:'Track',exact:true}).innerText(),/4 roles/);assert.equal(await page.getByRole('region',{name:'Selected workforce choice',exact:true}).innerText(),selectedSummary);
  if(process.env.WORKLOAD_OUTPUT_DIR)await page.screenshot({path:process.env.WORKLOAD_OUTPUT_DIR+'/workload-track-'+width+'.png',fullPage:true});
  assert.deepEqual(errors,[]);assert.deepEqual(blocked,[]);console.log(JSON.stringify({width,options,reopenedUnits:1120,targetRoles:4,errors,blocked}));await context.close();
 }} finally {await browser.close();}
