@@ -17,7 +17,7 @@ import {monthlyScenarioInputKey} from '../lib/monthly-scenario-compatibility.mjs
 const require=createRequire(import.meta.url);
 function component(file,mocks={}){
  const filename=path.resolve(file),compiled=ts.transpileModule(fs.readFileSync(filename,'utf8'),{fileName:filename,compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}});
- const compiledModule=new Module(filename);compiledModule.filename=filename;compiledModule.require=id=>Object.hasOwn(mocks,id)?mocks[id]:require(id);compiledModule._compile(compiled.outputText,filename);return compiledModule.exports;
+ const compiledModule=new Module(filename);compiledModule.filename=filename;compiledModule.require=id=>Object.hasOwn(mocks,id)?mocks[id]:id==='./carried-planning-goal'?component('components/workforce-planning/carried-planning-goal.tsx'):require(id);compiledModule._compile(compiled.outputText,filename);return compiledModule.exports;
 }
 const previewLayer=component('lib/capacity-preview.ts',{'./swp-capacity-draft':draftAdapter,'./swp-monthly-workload':engine});
 const sliderLayer=component('lib/planning-slider.ts');
