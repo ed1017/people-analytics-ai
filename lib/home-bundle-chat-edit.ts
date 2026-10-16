@@ -1,4 +1,6 @@
 // @ts-expect-error Native Node tests share TypeScript source.
+import {guidedWorkloadFields,guidedWorkloadLabels,syncGuidedWorkloadDemand} from './guided-workload.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
 import {withHomeMixScenario,homeMixScenarioCommand} from './home-mix-scenario.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {whatIfScope} from './home-plan-what-if.ts';
@@ -15,7 +17,7 @@ import {planDate} from './workforce-increment.ts';
 export type BundleEditChange={field:string;before:Assumption<string|number>;after:Assumption<string|number>};
 export type BundleEditPreview={inputKey:string;request:string;changes:BundleEditChange[];inputs:BundleInputs};
 export type BundleEditSelection={option:number;count:number};
-type Target={key:string;label:string;type:'text'|'money'|'percent'|'count'|'months'|'month'|'date';read:()=>Assumption<string|number>;write:(value:Assumption<string|number>)=>void};
+type Target={key:string;label:string;type:'text'|'money'|'percent'|'count'|'decimal'|'months'|'month'|'date';read:()=>Assumption<string|number>;write:(value:Assumption<string|number>)=>void};
 const normalize=(value:string)=>value.trim().toLowerCase().replace(/\s+/g,' ');
 function fail(message:string):never{throw Error(message)}
 function targets(input:BundleInputs,draft:BundleDraft){
@@ -26,6 +28,7 @@ function targets(input:BundleInputs,draft:BundleDraft){
    if(input.capacity&&(key==='startMonth'||key==='months')){const field=key==='startMonth'?'planningMonth':'months';input.capacity.input[field]=value.value===null?'':String(value.value);input.capacity.origins[field]={kind:value.kind==='model-proposed'?'illustrative':value.kind,basis:value.basis};}
   }},[...aliases]);
  }
+ if(input.guidedWorkload){const workload=input.guidedWorkload;for(const key of guidedWorkloadFields)add({key:'guidedWorkload.'+key,label:guidedWorkloadLabels[key],type:key.endsWith('Pct')?'percent':key==='existingPeople'?'count':'decimal',read:()=>workload[key],write:value=>{workload[key]=value as Assumption<number>;}},[]);}
  if(input.capacity){const capacity=input.capacity;
   for(const [key,label,type,aliases] of [['annualHireCost','Annual hire cost (USD)','money',['annual hire cost']],['hireFee','Recruiting fee per hire (USD)','money',['hire fee','recruiting fee per hire']],['annualBackfillCost','Annual backfill cost (USD)','money',['annual backfill cost']],['backfillFee','Recruiting fee per backfill (USD)','money',['backfill fee']],['internalAnnualCostChange','Total annual internal salary change (USD)','money',['internal salary change']],['trainingCash','Total training cash (USD)','money',['training cash']],['trainingHours','Total training hours','count',['training hours']],['arrivalDate','Hire arrival date','date',['hiring arrival date']],['buildMonth','Build effective month','month',['build month']],['moveMonth','Move effective month','month',['move month']],['backfillDate','Backfill arrival date','date',['backfill date']],['backfills','External backfill count','count',['backfills']]] as const){
    add({key:'capacity.'+key,label,type,read:()=>({value:capacity.input[key]===''?null:type==='month'||type==='date'?capacity.input[key]:Number(capacity.input[key]),...capacity.origins[key]}),write:value=>{capacity.input[key]=value.value===null?'':String(value.value);capacity.origins[key]={kind:value.kind==='model-proposed'?'illustrative':value.kind,basis:value.basis};}},[...aliases]);
@@ -130,13 +133,13 @@ function parseValue(raw:string,target:Target):Assumption<string|number>{
  if(/^unknown$/i.test(raw))return unknownAssumption();
  let value:string|number=raw,kind:'user-entered'|'illustrative'='user-entered';
  if(/^illustrative\s+/i.test(raw)){kind='illustrative';raw=raw.replace(/^illustrative\s+/i,'');value=raw;}
- if(target.type==='count'||target.type==='months'||target.type==='money'||target.type==='percent'){
+ if(target.type==='decimal'||target.type==='count'||target.type==='months'||target.type==='money'||target.type==='percent'){
   const year=target.type==='months'&&/\s*[- ]?\s*years?$/i.test(raw);
   let cleaned=(target.type==='percent'?raw.replace(/\s*(?:%|percent)$/i,''):raw).replace(target.type==='money'?/^(?:\$|USD\s+)/i:/^$/,'').replace(target.type==='months'?/\s*[- ]?\s*(?:months?|years?)$/i:target.type==='count'?/\s+(?:people|participants)$/i:/\s+USD$/i,'');
   if(year&&/^an?$/i.test(cleaned))cleaned='1';
   const word=numberWords.indexOf(cleaned.toLowerCase());if(word>=0)cleaned=String(word);
   if(!/^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d{1,2})?$/.test(cleaned))fail(`Use an explicit ${target.type==='money'?'USD amount':'whole count'} for ${target.label}, or Unknown.`);
-  value=Number(cleaned.replaceAll(',',''))*(year?12:1);if(target.type!=='money'&&target.type!=='percent'&&!Number.isInteger(value))fail(`${target.label} needs a whole count.`);
+  value=Number(cleaned.replaceAll(',',''))*(year?12:1);if(target.type!=='decimal'&&target.type!=='money'&&target.type!=='percent'&&!Number.isInteger(value))fail(`${target.label} needs a whole count.`);
  }else if(target.type==='month'){const named=raw.match(/^([A-Za-z]+)\s+(\d{4})$/),month=named?monthNames.findIndex(name=>name===named[1].toLowerCase()||name.slice(0,3)===named[1].toLowerCase()):-1;if(named&&month>=0){raw=`${named[2]}-${String(month+1).padStart(2,'0')}`;value=raw;}if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(raw)||!planDate(raw+'-01'))fail(`Which month and year should ${target.label} use? Say December 2026 or 2026-12, or Unknown.`);}
  else if(target.type==='date'){if(!planDate(raw))fail(`Use YYYY-MM-DD for ${target.label}, or Unknown.`);}
  return {value,kind,basis:kind==='illustrative'?'Explicit illustrative assumption accepted from a reviewed text edit; not evidence.':'Explicit user assumption accepted from a reviewed text edit; not independently verified.'};
@@ -162,7 +165,7 @@ export function previewBundleChatEdit(draft:BundleDraft,request:string,selection
  // Keep amounts, expense labels and budget-basis qualifiers intact; validation
  // still rejects the entire proposal if any clause is ambiguous or invalid.
  const clauses=editRequest.split(/;|\n|\s+and\s+(?=(?:start|make|use|set|change|update|move|run|extend|shorten|adjust|correct)\b|(?:(?:i|we)\s+)?(?:have|only have)\b|(?:(?:a|my|our|the)\s+)?(?:(?:cash|all-in|total|overall|plan)\s+)?budget\b|(?:\d[\d,]*|twenty)\s+participants\b)/i).map(value=>value.trim()).filter(Boolean).map(value=>/^(?:\d[\d,]*|twenty)\s+participants\b/i.test(value)?'use '+value:value);
- if(!clauses.length||clauses.length>6)fail('Use up to six changes, separated by semicolons.');
+ if(!clauses.length||clauses.length>(draft.inputs.guidedWorkload?18:6))fail(`Use up to ${draft.inputs.guidedWorkload?18:6} changes, separated by semicolons.`);
  const inputs=legacyReplay?structuredClone(draft.inputs):cashHoursInputs(draft.inputs,draft.binding.goal),available=targets(inputs,draft),changes:BundleEditChange[]=[],seen=new Set<string>();
  for(const clause of clauses){
   const budget=budgetClause(clause);
@@ -193,6 +196,24 @@ export function previewBundleChatEdit(draft:BundleDraft,request:string,selection
  // A changed horizon must not silently move component dates, expenses or the frozen preset.
  for(const timing of inputs.timing)if(timing.start.value&&timing.finish.value&&timing.start.value>timing.finish.value)fail('A component finish cannot precede its start. Review both dates.');
  if(changes.some(change=>['Population','Shared start month','Shared horizon','Comparison requirements'].includes(change.field)))inputs.scope.comparisonConfirmed=unknownAssumption();
+ if(inputs.guidedWorkload){
+  const before=structuredClone(inputs.scope.demand);syncGuidedWorkloadDemand(inputs);
+  if(before.value!==inputs.scope.demand.value){
+   changes.push({field:'Calculated additional roles',before,after:inputs.scope.demand});
+   // Narrow maxima to the smaller gap, without expanding available pools or relaxing minimums.
+   const roles=inputs.scope.demand.value;
+   if(roles!==null&&inputs.mixScenario)for(const path of ['build','move','buy'] as const){const bound=inputs.mixScenario.bounds[path];if(bound.value&&bound.value.max>roles){
+    if(bound.value.min>roles)fail('Calculated demand is below a reviewed staffing minimum. Review that constraint separately.');
+    const after={...bound,value:{...bound.value,max:roles},basis:'Search maximum capped to the recalculated gap; no pool expansion.'};changes.push({field:`${path} search maximum`,before:{...bound,value:bound.value.max},after:{...after,value:roles}});inputs.mixScenario.bounds[path]=after;
+   }}
+   // Rebase the reference, not distinct internal pools. Show every reset for acceptance.
+   const c=inputs.capacity!;
+   for(const path of ['build','move','buy'] as const){const value=String(path==='buy'?(inputs.scope.demand.value??0):0);if(c.input[path]===value)continue;
+    const prior={value:c.input[path],...c.origins[path]},after={value,kind:'illustrative' as const,basis:'Reference mix reset to the recalculated gap; internal pools and search limits remain unchanged.'};
+    changes.push({field:`Reference ${path} roles`,before:prior,after});c.input[path]=value;c.origins[path]={kind:after.kind,basis:after.basis};
+   }
+  }
+ }
  reviseBundleDraft(draft,inputs,legacyReplay); // Reuse the strict draft validator without calculating.
  return {inputKey:bundleInputKey(draft),request,changes,inputs};
 }

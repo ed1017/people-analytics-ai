@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {defaultGuidedWorkload,syncGuidedWorkloadDemand,guidedWorkloadResult} from './guided-workload.ts';
 /** A presentation/commit adapter over existing staffing, plan and progress contracts.
  * No model, network, workforce write or replacement workflow engine. */
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -45,7 +47,8 @@ export async function createSwpDemo(goalId:string,now:string):Promise<BundleDraf
  input.budget={amount:assumed(325000),basis:assumed('cash')};capacity.input.budget='325000';capacity.origins.budget={kind:'illustrative',basis:premise};
  input.scope.population=assumed('Fictional Service Operations / Service Analyst');
  input.scope.businessUnit=assumed('Fictional Service Operations');input.scope.jobProfile=assumed('Service Analyst');
- input.scope.requirements=assumed('Support service growth. Five additional roles is an explicit demo demand assumption, not a conversion from revenue. Review availability, source-team coverage and skill readiness.');
+ input.scope.requirements=assumed('Cover the entered fictional service workload. Review productive hours, qualified allocation, separate internal pools and dated readiness; these assumptions do not establish measured outcomes.');
+ input.guidedWorkload=defaultGuidedWorkload();syncGuidedWorkloadDemand(input);
  capacity.input.businessUnit=input.scope.businessUnit.value!;capacity.input.jobProfile=input.scope.jobProfile.value!;
  for(const key of ['businessUnit','jobProfile'] as const)capacity.origins[key]={kind:'illustrative',basis:premise};
  delete input.whatIf;
@@ -68,6 +71,8 @@ export async function createServiceStaffingDemo(goalId:string,bridge:SwpDemandBr
  if(checked.result.status!=='calculated'||roles===null||roles<=0||roles>20||checked.spec.ftePerRole.value!==1||!months||!start)throw Error('This staffing illustration needs a positive gap of at most 20 whole full-time roles. Fractional schedules or a zero gap retain their useful demand calculation without an invented staffing plan.');
  if(previous)validateDemandBridge(previous.draft,previous.bridge,r.datasetToken);
  const draft=previous?structuredClone(previous.draft):await createSwpDemo(goalId,now),input=draft.inputs,capacity=input.capacity!;draft.bundle=serviceStaffingBundle();draft.signature=bundleSignature(draft.bundle);
+ // The accepted service-demand bridge owns its baseline; never inherit fictional guided assumptions.
+ delete input.guidedWorkload;
  draft.binding.goal=checked.spec.objective;
  const scopeValues={startMonth:start,months,population:checked.spec.scope!,businessUnit:checked.spec.scope!,jobProfile:'Illustrative service-analyst role slice',demand:roles,requirements:checked.spec.objective+' Provisional managed-services effort gap for one role slice; staffing inputs are separate assumptions. Delivery outcomes are unproven.'};
  for(const [key,value] of Object.entries(scopeValues)){const k=key as keyof typeof scopeValues;if(input.scope[k]?.value!==value)Object.assign(input.scope,{[k]:assumed(value)});}
@@ -105,18 +110,31 @@ export function swpOptions(evaluation:HomeMixEvaluation):SwpOption[]{
   return {id:candidate.id,label:index===0?'Current mix':`Option ${index}`,candidate,draft,coverage};
  });
 }
+/** Qualified role-months exclude partial readiness months, using the existing dependency gates. */
+function optionRoleMonths(option:SwpOption){
+ const months=option.draft.inputs.scope.months.value!;
+ if(!option.coverage||option.coverage.length!==months||option.coverage.some(v=>v===null))return null;
+ const covered=[...option.coverage] as number[],start=option.draft.inputs.scope.startMonth.value!,capacity=option.draft.inputs.capacity!,ready=reviewBundleProposal(option.draft).componentReady;
+ for(const flow of capacity.flows.filter(f=>f.path!=='backfills')){
+  const arrival=flow.path==='buy'?capacity.input.arrivalDate:capacity.input[flow.path==='build'?'buildMonth':'moveMonth']+'-01',prerequisites=flow.componentIds.map(id=>ready[id]);
+  if(prerequisites.some(v=>v===null))return null;
+  const effective=[arrival,...prerequisites as string[]].sort().at(-1)!,index=(Number(effective.slice(0,4))-Number(start.slice(0,4)))*12+Number(effective.slice(5,7))-Number(start.slice(5,7));
+  if(Number(effective.slice(8,10))>1&&index>=0&&index<months)covered[index]=Math.max(0,covered[index]-Number(capacity.input[flow.path]));
+ }
+ return covered.reduce((sum,n)=>sum+n,0);
+}
+export function guidedOptionEffort(option:SwpOption){
+ const baseline=guidedWorkloadResult(option.draft.inputs),roleMonths=optionRoleMonths(option);
+ if(!baseline||baseline.status!=='calculated'||roleMonths===null)return null;
+ const additionalHours=roleMonths*option.draft.inputs.guidedWorkload!.productiveHours.value!;
+ return {additionalHours,totalHours:baseline.capacityHours!+additionalHours,shortfallHours:Math.max(0,baseline.workloadHours!-baseline.capacityHours!-additionalHours)};
+}
 /** Uniform within-month effort is an explicit scenario conversion, not proof of service coverage. */
 export function serviceOptionEffort(option:SwpOption,bridge:SwpDemandBridge){
  const r=validateDemandBridge(option.draft,bridge,bridge.review.datasetToken),months=r.spec.months!;
  if(!option.coverage||option.coverage.length!==months||option.coverage.some(v=>v===null))return {status:'unknown' as const,additionalHours:null,totalHours:null,shortfallHours:null};
- const covered=[...option.coverage] as number[],start=r.spec.startMonth!,capacity=option.draft.inputs.capacity!,ready=reviewBundleProposal(option.draft).componentReady;
- for(const flow of capacity.flows.filter(f=>f.path!=='backfills')){
-  const arrival=flow.path==='buy'?capacity.input.arrivalDate:capacity.input[flow.path==='build'?'buildMonth':'moveMonth']+'-01',prerequisites=flow.componentIds.map(id=>ready[id]);
-  if(prerequisites.some(v=>v===null))return {status:'unknown' as const,additionalHours:null,totalHours:null,shortfallHours:null};
-  const effective=[arrival,...prerequisites as string[]].sort().at(-1)!,index=(Number(effective.slice(0,4))-Number(start.slice(0,4)))*12+Number(effective.slice(5,7))-Number(start.slice(5,7));
-  if(Number(effective.slice(8,10))>1&&index>=0&&index<months)covered[index]=Math.max(0,covered[index]-Number(capacity.input[flow.path]));
- }
- const additionalHours=covered.reduce((sum,n)=>sum+n,0)*r.result.productiveHoursInHorizon!/months;
+ const roleMonths=optionRoleMonths(option);if(roleMonths===null)return {status:'unknown' as const,additionalHours:null,totalHours:null,shortfallHours:null};
+ const additionalHours=roleMonths*r.result.productiveHoursInHorizon!/months;
  const totalHours=r.result.capacityHours!+additionalHours,shortfallHours=Math.max(0,r.result.workloadHours!-totalHours);
  return {status:shortfallHours>1e-7?'shortfall' as const:'conditional-coverage' as const,additionalHours,totalHours,shortfallHours,assumption:'Uniform monthly productive hours; any partial effective readiness month is conservatively excluded. No peak or service-level model.'};
 }
