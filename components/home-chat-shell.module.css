@@ -179,12 +179,13 @@
     .welcome :global(.home-chat-form),
     .welcome :global(.home-composer-slot),
     .welcome :global(.home-composer-dock) { flex: 1; }
-    /* Stretch only the starting intro input; the conversation autosizer remains
-       unchanged. Content can still grow beyond the viewport's minimum height. */
+    /* The desktop intro input fills its allocated area; long drafts scroll
+       inside it. Narrow layouts and the conversation retain native resizing. */
     .welcome :global(.home-composer-dock) textarea {
       align-self: stretch;
       height: auto !important;
       max-height: none !important;
+      resize: none;
     }
   }
 }
