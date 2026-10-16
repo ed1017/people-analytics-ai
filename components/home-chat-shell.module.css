@@ -1,4 +1,4 @@
-.shell { color: var(--foreground); container-type: inline-size; }
+.shell { color: var(--foreground); container-type: inline-size; container-name: home-intro; }
 .shell :global(.home-workspace) { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 12px 18px; max-width: 1240px; margin-inline: auto; }
 .shell :global(.home-workspace[data-overview-starting]) > section { border: 0; background: transparent; padding: 0; }
 .shell :global(.home-workspace[data-overview-starting]) > section > header { gap: 4px 12px; }
@@ -127,20 +127,20 @@
 /* Use spare space on wide, tall desktops; preserve the compact laptop intro.
    Pane width also guards against enlarging a narrow workspace beside other UI. */
 @media (min-height: 900px) {
-  @container (min-width: 1300px) {
+  @container home-intro (min-width: 1300px) {
     .shell :global(.home-workspace[data-overview-starting]) { max-width: 1440px; }
     .welcome { padding-top: 12px; column-gap: 24px; row-gap: 8px; }
     .welcome h2 { font-size: 32px; }
     .subtitle { font-size: 16px; line-height: 1.5; }
-    .historySummary { margin-top: 16px; padding: 14px 16px; }
-    .historyHeading strong { font-size: 28px; }
-    .historyHeading p, .historyHeading span { font-size: 14px; }
-    .scope, .historyFigure figcaption, .kpiRow small { font-size: 12px; }
-    .historyFigure { margin-top: 8px; }
-    .kpiRow { gap: 12px; padding-block: 8px; }
-    .kpiRow li { padding: 10px 8px; }
-    .kpiRow span { font-size: 14px; }
-    .kpiRow b { font-size: 24px; margin-block: 4px; }
+    .welcome .historySummary { margin-top: 16px; padding: 14px 16px; }
+    .welcome .historyHeading strong { font-size: 28px; }
+    .welcome .historyHeading p, .welcome .historyHeading span { font-size: 14px; }
+    .welcome .scope, .welcome .historyFigure figcaption, .welcome .kpiRow small { font-size: 12px; }
+    .welcome .historyFigure { margin-top: 8px; }
+    .welcome .kpiRow { gap: 12px; padding-block: 8px; }
+    .welcome .kpiRow li { padding: 10px 8px; }
+    .welcome .kpiRow span { font-size: 14px; }
+    .welcome .kpiRow b { font-size: 24px; margin-block: 4px; }
     .welcome > h3 { margin-top: 12px; font-size: 18px; }
     .questions { gap: 12px; }
     .questions button { min-height: 72px; padding: 12px; font-size: 16px; }
