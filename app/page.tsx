@@ -160,6 +160,9 @@ export default function Home() {
   const [navCollapsed, setNavCollapsed] = useState(false);
   const [aiCollapseChoice, setAiCollapsed] = useState<boolean | null>(null);
   // Planning starts compact; an explicit toggle or Explain action wins across navigation.
+  const evidenceDrawer = activePage === "workforce" || activePage === "skills";
+  const [drawerPage, setDrawerPage] = useState<string | null>(null);
+  const drawerOpen = drawerPage === activePage;
   const aiCollapsed = aiCollapseChoice ?? getWorkspaceForPage(activePage) === "strategy";
   const [aiWidth, setAiWidth] = useState(500);
 
@@ -1929,7 +1932,7 @@ export default function Home() {
 
       {/* Main application */}
       <div
-        className={`app-shell app-ai-left${["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) ? " app-home" : ""}`}
+        className={`app-shell app-ai-left${evidenceDrawer ? " app-evidence-first" : ""}${["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) ? " app-home" : ""}`}
         style={
           {
             "--nav-width": `${
@@ -1954,6 +1957,7 @@ export default function Home() {
 
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
+        {evidenceDrawer && <div className="evidence-ai-toolbar"><p>Explore the evidence, then ask a question with your goal as context.</p><button type="button" aria-haspopup="dialog" aria-expanded={drawerOpen} onClick={() => setDrawerPage(activePage)}>Open Workforce AI</button></div>}
         {!["home","future-of-work","action-plans","plan-track"].includes(activePage)&&<SelectedGoalProgress/>}
         {(planningWorkspaceActive||["workforce","future-of-work","action-plans","plan-track"].includes(activePage))&&<PlanningJourney activePage={activePage} onNavigate={setActivePage}/>}
         <SelectedProgressEntry/>
@@ -2143,14 +2147,15 @@ export default function Home() {
         </div>
 
         {!["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) && <AiPanel
+          drawer={evidenceDrawer ? {open: drawerOpen, onClose: () => setDrawerPage(null)} : undefined}
           workforceIntro={getWorkspaceForPage(activePage)==='analytics'}
           suppressIntro={demoActive}
           goalViewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,activePage,selectedPersona,selectedBusinessContext,conversation.resetEpoch])}
           hasGoal={Boolean(conversation.focusedIssue)}
           goalStatement={conversation.focusedIssue}
-          goalTakeaway={!conversation.wasReset&&<GoalTakeaway goalId={conversation.activeGoalId} displayedGoal={conversation.focusedIssue} goalContext={{...conversation.goalContext,currentScope:JSON.stringify(selectedBusinessContext)}} payload={goalSummaryPayload} active={true} ready={summaryEvidenceReady} paused={chatLoading||Boolean(chatInput.trim())||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} unavailable={activePage==="compensation"?"Public US wage references and reported workforce-cost context are available on this page. Internal salary analysis and a goal-specific AI briefing are unavailable.":undefined} onNavigate={setActivePage}/>}
+          goalTakeaway={!conversation.wasReset&&<GoalTakeaway goalId={conversation.activeGoalId} displayedGoal={conversation.focusedIssue} goalContext={{...conversation.goalContext,currentScope:JSON.stringify(selectedBusinessContext)}} payload={goalSummaryPayload} active={!evidenceDrawer || drawerOpen} ready={summaryEvidenceReady} paused={chatLoading||Boolean(chatInput.trim())||Boolean(conversation.issueEditor)} validGoalIds={conversation.goals.map(g=>g.id)} unavailable={activePage==="compensation"?"Public US wage references and reported workforce-cost context are available on this page. Internal salary analysis and a goal-specific AI briefing are unavailable.":undefined} onNavigate={setActivePage}/>}
           readOnlyReason={readOnlyReason}
-          aiCollapsed={aiCollapsed}
+          aiCollapsed={evidenceDrawer ? false : aiCollapsed}
           aiExpanded={aiExpanded}
           aiWidth={aiWidth}
           previewPage={previewPage}
