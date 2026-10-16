@@ -1130,6 +1130,20 @@ export default function Home() {
     );
   };
 
+  const attachCarriedPlanningGoal = (choice:{id:string}|{statement:string}) => {
+    const before=decisionStore.getSnapshot();
+    if(conversation.activeGoalId||before.data.goals.activeId||!planningEvidenceHandoff||!before.ready||!before.saved||conversation.loading||conversation.issueEditor)throw Error('The planning context changed or storage is unavailable. Your worksheet is kept; review again.');
+    if(capacityState.datasetToken!==datasetSession.snapshot())throw Error('The dataset changed. Review the carried evidence again.');
+    const existing='id' in choice?before.data.goals.goals.find(g=>g.id===choice.id):null;
+    if('id' in choice&&!existing)throw Error('Choose an existing saved goal.');
+    const id=existing?existing.id:conversation.confirmWorkforceGoal('statement' in choice?choice.statement:'');
+    if(!decisionStore.getSnapshot().saved)throw Error('The goal could not be saved. Your worksheet is kept; resolve browser storage before retrying.');
+    capacityState.setCapacitySessionForGoal(id,capacityState.capacitySession);
+    decisionStore.setField(id,'skillsHandoff',planningEvidenceHandoff);
+    if(!decisionStore.getSnapshot().saved)throw Error('Carried context could not be saved. Your worksheet is kept; resolve browser storage before retrying.');
+    if(existing)conversation.selectGoal(existing.id);
+  };
+
   const clearPlanningEvidenceHandoff = () => {
     setPlanningEvidenceHandoff(null);
     focusAfterRender(
@@ -1921,7 +1935,7 @@ export default function Home() {
   };
 
   return (
-    <PlanningSessionProvider goalKey={conversation.workspaceKey} capacityState={capacityState} onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
+    <PlanningSessionProvider goalKey={conversation.workspaceKey} capacityState={capacityState} carriedGoalActions={planningEvidenceHandoff&&!conversation.activeGoalId?{businessGoal:planningEvidenceHandoff.businessGoal,goals:conversation.goals,disabled:!conversation.storageReady||!conversation.saved||conversation.loading||!!conversation.issueEditor,onCreate:statement=>attachCarriedPlanningGoal({statement}),onSelect:id=>attachCarriedPlanningGoal({id})}:undefined} onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
     <main data-workspace-palette={workspacePalette} className={`min-h-screen bg-background text-foreground${activePage === "home" ? " app-home-composer" : ""}${["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) ? " app-overview-mode" : ""}`}>
       {/* Top header */}
       <AppHeader onNavigate={setActivePage}
