@@ -97,6 +97,7 @@ test('headcount KPI selector remains unique when the chart axis repeats the curr
 test('history is dated recorded evidence with an accessible series, never a forecast or inferred flow', () => {
   const html = render({trend:history});
   assert.match(html, /role="img" aria-label="Recorded synthetic headcount history in people\. All workforce\./);
+  assert.ok(html.indexOf('<figure')<html.indexOf('aria-label="Recorded workforce indicators"'),'trend precedes KPI cards in the snapshot');
   for (const row of history) assert.ok(html.includes(`${row.snapshot_date}: ${row.headcount}`));
   assert.equal((chartMarkup(html).match(/<circle/g)??[]).length,3);
   assert.equal((chartMarkup(html).match(/<line /g)??[]).length,3, 'axis and two adjacent-month segments');
