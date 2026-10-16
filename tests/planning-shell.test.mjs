@@ -131,20 +131,20 @@ test('recorded KPIs retain scope and units separately from projected flows',()=>
  const props={overview:{...base.overview,labor_cost_usd:45200},recruitingKpi:{hires:7,month:'2026-09',asOf:'2026-09-30'}};
  const html=render(props);
  assert.match(html,/7<\/b>/);assert.match(html,/company-wide recruiting events/);assert.match(html,/including internal fills/);
- assert.match(html,/USD 45\.2K/);assert.match(html,/Cost period unspecified/);
+ assert.match(html,/USD 45,200\.00/);assert.match(html,/Cost period unspecified/);
  assert.match(html,/Projected hires/);assert.match(html,/Projected departures/);
  assert.match(html,/eligible survey result and suppression metadata/);
  for(const patch of [{loading:true},{error:'failed'},{receipt:null},{requested:{...filters,country:'UK'}}]){
-  const stale=render({...props,...patch});assert.doesNotMatch(stale,/7<\/b>|8\.2%|USD 45\.2K/);
+  const stale=render({...props,...patch});assert.doesNotMatch(stale,/7<\/b>|8\.2%|USD 45,200\.00/);
  }
  assert.doesNotMatch(render({...props,recruitingKpi:{...props.recruitingKpi,asOf:'2026-08-31'}}),/7<\/b>/);
  const zero=render({overview:{...base.overview,voluntary_turnover_ytd_pct:0,labor_cost_usd:0}});
  assert.match(zero,/0%/);assert.match(zero,/USD 0\.00/);
 });
 
-test('unavailable headcount selector is unique among five withheld indicators',()=>{
+test('unavailable headcount selector is unique among four withheld indicators',()=>{
  const html=render({receipt:null,trend:history,overview:{...base.overview,labor_cost_usd:45200},recruitingKpi:{hires:7,month:'2026-09',asOf:'2026-09-30'}});
- assert.equal(html.split('>Unavailable<').length-1,5,'invalid receipt reproduces all five unavailable indicators');
+ assert.equal(html.split('>Unavailable<').length-1,4,'invalid receipt reproduces all four unavailable indicators');
  const snapshot=html.match(/<section aria-label="Workforce snapshot"[^>]*>([\s\S]*?)<\/section>/)?.[1];
  assert.ok(snapshot);
  assert.deepEqual([...snapshot.matchAll(/<strong[^>]*>([^<]*)<\/strong>/g)].map(match=>match[1]),['Unavailable']);
@@ -155,14 +155,15 @@ test('unavailable headcount selector is unique among five withheld indicators',(
 });
 
 
-test('compact cost keeps its exact source amount and period limits available', () => {
+test('undated cost stays out of headline KPIs while exact source amount and period limits remain available', () => {
   const html = render({overview:{...base.overview,labor_cost_usd:2047306374.48}});
-  assert.match(html, /USD 2\.05B/);
-  assert.match(html, /<details[^>]*><summary>Exact amount<\/summary><p>USD 2,047,306,374\.48<\/p><\/details>/);
+  assert.doesNotMatch(html, /USD 2\.05B/);
+  assert.doesNotMatch(html.match(/<ul aria-label="Recorded workforce indicators">([\s\S]*?)<\/ul>/)[1],/Labor cost|2,047/);
+  assert.match(html, /<details[^>]*><summary>Labor cost: period unspecified<\/summary><p>USD 2,047,306,374\.48\. Cost period unspecified; no monthly or annual basis is inferred\.<\/p><\/details>/);
   assert.match(html, /<details[^>]*><summary>Sources and exact cost/);
   assert.match(html, /Cost period unspecified; no monthly or annual basis is inferred/);
   assert.match(html, /survey respondents are a separate population/);
-  assert.doesNotMatch(render({}), /<summary>Exact amount<\/summary>/);
+  assert.doesNotMatch(render({}), /<summary>Labor cost: period unspecified<\/summary>/);
 });
 
 

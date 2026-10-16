@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {applicablePlanComponents} from './guided-plan-summary.ts';
 import type {BundleDraft} from './home-bundle-reconciliation';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {componentOrder} from './home-solution-bundles.ts';
@@ -27,7 +29,7 @@ function completionEvidence(action:string,title:string):string{
  */
 export function planDirections(draft:BundleDraft):PlanDirection[]{
  const {bundle,inputs}=draft;
- return componentOrder(bundle.components).map(id=>{
+ return componentOrder(bundle.components).filter(id=>applicablePlanComponents(draft).some(c=>c.id===id)).map(id=>{
   const component=bundle.components.find(item=>item.id===id)!;
   const timing=inputs.timing.find(item=>item.componentId===id);
   const action=bundleDisplayText(component.firstStep,bundle,inputs);

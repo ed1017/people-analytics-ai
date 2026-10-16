@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {applicablePlanComponents} from './guided-plan-summary.ts';
 /** Read-only presentation of existing progress and exact saved-plan records. */
 // @ts-expect-error Native Node tests share TypeScript source.
 import {buildGoalProgressContext,readGoalProgressLedger,HEADCOUNT_DEFINITION,type GoalProgressContext,type GoalScope,type ProgressObservation,type ProgressEvent} from './goal-progress.ts';
@@ -27,7 +29,7 @@ export function readProgressLinkedPlan(rawLedger:unknown,fields:Record<string,un
   if(!event||event.data.datasetToken!==datasetToken)return unavailable;
   const catalog=readPlanAlternatives(fields[planAlternativesField],{goalId:context.goalId,goal}),plan=catalog?.plans.find(p=>p.id===link.planId&&!p.deleted);
   if(!plan||plan.draft.revision!==link.revision||bundleInputKey(plan.draft)!==event.data.inputKey||plan.draft.binding.evidenceDigest!==link.evidenceDigest)return unavailable;
-  return {status:'available' as const,label:`Action Plan #${plan.number} · ${plan.draft.bundle.name} · revision ${plan.draft.revision}`,steps:plan.draft.bundle.components.map(c=>({id:c.id,name:c.name,ownerRole:c.ownerRole,firstStep:c.firstStep,checkpoint:plan.draft.inputs.timing.find(t=>t.componentId===c.id)?.finish??null}))};
+  return {status:'available' as const,label:`Action Plan #${plan.number} · ${plan.draft.bundle.name} · revision ${plan.draft.revision}`,steps:applicablePlanComponents(plan.draft).map(c=>({id:c.id,name:c.name,ownerRole:c.ownerRole,firstStep:c.firstStep,checkpoint:plan.draft.inputs.timing.find(t=>t.componentId===c.id)?.finish??null}))};
  }catch{return unavailable;}
 }
 export type ProgressLinkedPlan=ReturnType<typeof readProgressLinkedPlan>;

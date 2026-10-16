@@ -1,3 +1,5 @@
+import {applicablePlanComponents} from '@/lib/guided-plan-summary';
+import {GuidedPlanSummary} from '@/components/guided-plan-summary';
 import type {ReactNode} from 'react';
 import {ActionPlanQuickSummary} from './action-plan-quick-summary';
 import {PlanReviewNextStep} from './plan-review-next-step';
@@ -14,7 +16,7 @@ export function HomePlanSummary({draft,result,measurePack,children,savedBudgetTe
  const measurement=sections.find(section=>section.heading==='How success is measured')!;
  const budget=sections.find(section=>section.heading==='Cost')!.items.filter(item=>item===savedBudgetText||isBudgetText(item));
  return <section aria-label="Plan overview" className="min-w-0 space-y-1 text-sm">
-  <ActionPlanQuickSummary draft={draft} result={result}/>
+  <GuidedPlanSummary draft={draft}/><ActionPlanQuickSummary draft={draft} result={result}/>
   <p aria-label="Plan description"><strong>Proposed approach:</strong> {bundleDisplayText(draft.bundle.objective,draft.bundle,draft.inputs)}</p>
   <section aria-label="Goal and success measure" className="space-y-1">
    <p>{measurement.items[0]}</p><p>{measurement.items.slice(1).join(' ')}</p>
@@ -22,7 +24,7 @@ export function HomePlanSummary({draft,result,measurePack,children,savedBudgetTe
   {budget.length>0&&<div aria-label="Plan budget check" className="space-y-1">{budget.map(item=><p key={item}>{item}</p>)}</div>}
   {lastFinish&&end&&lastFinish>end&&<p role="alert">Proposed component dates extend beyond the shared horizon. Review the actual dates before calculating.</p>}
   {!!result?.issues.length&&<p role="status">Unresolved calculation inputs: {result.issues.length}. Review the assumptions before acting.</p>}
-  {draft.bundle.components[0]&&<p><strong>First action:</strong> {bundleDisplayText(draft.bundle.components[0].firstStep,draft.bundle,draft.inputs)} <strong>Proposed owner:</strong> {draft.bundle.components[0].ownerRole}.</p>}
+  {applicablePlanComponents(draft)[0]&&<p><strong>First action:</strong> {bundleDisplayText(applicablePlanComponents(draft)[0].firstStep,draft.bundle,draft.inputs)} <strong>Proposed owner:</strong> {applicablePlanComponents(draft)[0].ownerRole}.</p>}
   <p>Proposal · effects, owners and funding unconfirmed.</p>
   <p><strong>Before starting:</strong> Confirm owner, baseline, target and review date.</p>
   <p aria-label="Plan population and source scope" className="text-xs">

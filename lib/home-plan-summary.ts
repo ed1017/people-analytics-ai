@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share TypeScript source.
+import {applicablePlanComponents} from './guided-plan-summary.ts';
 import type {Assumption,BundleDraft,BundleResult} from './home-bundle-reconciliation';
 // @ts-expect-error Native fixtures share source.
 import {historicalContextText,historicalContextLimit} from './home-metric-context.ts';
@@ -40,7 +42,7 @@ export function homePlanSummary(draft:BundleDraft,result:BundleResult|null|undef
  const timeline=[delivery?.finish?`Assumed deliverables by ${delivery.finish}.`:result?.planFinish?`Assumed component finish ${result.planFinish}.`:'Deliverable finish: Unknown.'];
  timeline.push(`Planning start: ${bundleAssumptionText(inputs.scope.startMonth)}.`,`Planning horizon: ${bundleAssumptionText(inputs.scope.months,value=>`${value} months`)}.`,`Horizon end: ${bundleAssumptionText(bundleHorizonEnd(inputs.scope))}.`);
  if(result?.capacityReadyMonth)timeline.push(`Conditional capacity from ${result.capacityReadyMonth}.`);
- const outcomes=(delivery?.deliverables??bundle.components.map(component=>component.name)).map(item=>`Deliverable target: ${item}.`);
+ const outcomes=(delivery?.deliverables??applicablePlanComponents(draft).map(component=>component.name)).map(item=>`Deliverable target: ${item}.`);
  outcomes.push('Proposed deliverables; effects unvalidated.');
  if(/\b(turnover|retention|retain|exits)\b/i.test(binding.goal))outcomes.push('Retention effects are not established.');
  const measurement=[`Goal: ${binding.goal}`];
@@ -60,7 +62,7 @@ export function homePlanSummary(draft:BundleDraft,result:BundleResult|null|undef
  if(bundleIsAnalysisOnly(bundle))approach.push('Analytical first steps; a delivery intervention still needs review.');
  return [
   {heading:'Approach',items:approach},
-  {heading:'Stakeholders',items:[...new Set(bundle.components.map(item=>`Proposed role: ${item.ownerRole}.`)),'Owners are not assigned.']},
+  {heading:'Stakeholders',items:[...new Set(applicablePlanComponents(draft).map(item=>`Proposed role: ${item.ownerRole}.`)),'Owners are not assigned.']},
   {heading:'People needed',items:people},
   {heading:'Cost',label:'Plan budget check',items:costs},
   {heading:'Timeline',items:timeline},

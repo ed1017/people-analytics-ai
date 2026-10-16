@@ -859,13 +859,13 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .demo-stepper li { padding:6px 8px; border-bottom:3px solid transparent; border-radius:5px 5px 0 0; }
 .demo-stepper [aria-current="step"] { font-weight:700; color:var(--foreground); background:var(--accent); border-bottom-color:var(--primary); }
 @media(max-width:767px) {
- main.app-home-composer:has(.home-workspace[data-simple-demo]) .calm-brand { flex-basis:auto; flex:1; }
- main.app-home-composer:has(.home-workspace[data-simple-demo]) .calm-brand h1 { font-size:18px; }
- main.app-home-composer:has(.home-workspace[data-simple-demo]) .guided-mobile-menu-button { display:block; min-height:44px; padding:8px; border:1px solid var(--border); border-radius:6px; font-size:14px; }
- main.app-home-composer:has(.home-workspace[data-simple-demo]) .guided-header-navigation { flex-basis:100%; display:flex; flex-wrap:wrap; align-items:center; gap:4px; }
- main.app-home-composer:has(.home-workspace[data-simple-demo]) .app-top-header:not([data-mobile-menu-open]) :is(.guided-header-navigation,.guided-header-context),
- main.app-home-composer:has(.home-workspace[data-simple-demo]):has(.app-top-header:not([data-mobile-menu-open])) :is(.phone-navigation-trigger,#guided-workspace-controls) { display:none; }
- main.app-home-composer:has(.home-workspace[data-simple-demo]) .app-top-header[data-mobile-menu-open] { position:relative; }
+ main.app-home-composer:has(.home-workspace) .calm-brand { flex-basis:auto; flex:1; }
+ main.app-home-composer:has(.home-workspace) .calm-brand h1 { font-size:18px; }
+ main.app-home-composer:has(.home-workspace) .guided-mobile-menu-button { display:block; min-height:44px; padding:8px; border:1px solid var(--border); border-radius:6px; font-size:14px; }
+ main.app-home-composer:has(.home-workspace) .guided-header-navigation { flex-basis:100%; display:flex; flex-wrap:wrap; align-items:center; gap:4px; }
+ main.app-home-composer:has(.home-workspace) .app-top-header:not([data-mobile-menu-open]) :is(.guided-header-navigation,.guided-header-context),
+ main.app-home-composer:has(.home-workspace):has(.app-top-header:not([data-mobile-menu-open])) :is(.phone-navigation-trigger,#guided-workspace-controls) { display:none; }
+ main.app-home-composer:has(.home-workspace) .app-top-header[data-mobile-menu-open] { position:relative; }
  .demo-stepper { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }
  .demo-stepper li { padding:6px; }
 }
