@@ -1,6 +1,7 @@
 "use client";
 import {useCallback,useLayoutEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
+import {goalProgressEnabled} from '@/lib/goal-progress';
 import {HomeGuidedFlow,guidedReceiptStep,conversationalReceiptStep,type GuidedReceipt,type GuidedCandidate} from '@/lib/home-guided-flow';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
 import {GuidedActionArrow} from '@/components/guided-action-arrow';
@@ -27,6 +28,10 @@ const conversationSteps=[
  ['Refine your selected plan in chat','Describe another adjustment and Send. Reuse the known context; mention only what should change. The original proposal stays attached.'],
  ['Pin the revised Action Plan','Review the new proposal and its unknowns, then pin it. Both versions remain with their goal and progress history.'],
 ] as const;
+/** Read-only completion guidance follows the same flag as the Track summary. */
+export function GuidedCompletionGuidance(){
+ return <p className="text-xs text-white/85">{goalProgressEnabled?'To record progress, review and confirm proposed dated measurements in chat, then inspect the saved measurements in Track. Saving a plan does not record execution or achieved results.':'Progress tracking is not enabled in this environment.'} Share Action Plan is not available yet.</p>;
+}
 export type GuidedDemoActions={ready:boolean;loading:boolean;draft:string;begin:(id:string)=>void;fillDraft:(text:string)=>void;cancel:()=>void;leave:()=>void};
 const button='min-h-11 rounded border border-white/60 px-3 py-2 text-sm font-semibold text-white hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-50';
 async function settle(signal:AbortSignal){await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));if(signal.aborted)throw Error('Example action cancelled.');}
@@ -102,7 +107,7 @@ export function GuidedDemo({active,actions,registry,onClose,conversational=false
   {error&&<p role="alert" className="my-2 text-sm">{error}</p>}
   {selectionNotice&&<p role="status" className="my-2 text-sm">{selectionNotice}</p>}
   {done&&!complete&&<p className="my-2 text-sm">{conversational&&step<4&&completedSteps.includes(3)?'Your plan is already selected. Continuing keeps the saved result.':'This step is complete. Continuing keeps the saved result.'}</p>}
-  {complete&&<p className="text-xs text-white/85">Share Action Plan (TBD) and Track results (TBD) are future features.</p>}
+  {complete&&<GuidedCompletionGuidance/>}
   </div>
   <div className="mt-3 flex shrink-0 flex-wrap gap-2"><button className={button} disabled={step===0} onClick={back}>Back</button>{done&&!complete?<button className={button} onClick={()=>setStep(value=>value+1)}>Continue walkthrough</button>:step===0&&<button className={button} disabled={pending||!actions.ready} onClick={()=>void start()}>Next → Start example</button>}</div>
   {point&&selector&&<GuidedActionArrow key={step} selector={selector} label={targetLabel}/>}
