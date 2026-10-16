@@ -11,7 +11,6 @@ import {
 } from "recharts";
 
 import {
-  formatCurrencyCompact,
   formatFte,
   formatPercent,
   formatSignedPercent,
@@ -68,6 +67,8 @@ export function OverviewPage({
   dashboardError,
   headcountGrowthPct,
 }: OverviewPageProps) {
+  const reportedCost = !dashboardLoading && !dashboardError && typeof overviewData?.labor_cost_usd === 'number' && Number.isFinite(overviewData.labor_cost_usd)
+    ? overviewData.labor_cost_usd : null;
   return (
     <section className="evidence-workspace @container min-w-0 p-6">
       <div className="mb-6 flex items-end justify-between gap-4">
@@ -96,7 +97,8 @@ export function OverviewPage({
 
       <p aria-label="Workforce snapshot scope" className="mb-3 rounded-lg border bg-muted/30 px-3 py-2 text-base font-semibold">{dashboardLoading?'Updating requested scope:':overviewData?'Filters applied:':'Requested scope:'} {selectedCountryLabel} · {selectedOrgLabel} · {selectedLevelLabel}</p>
       <div
-        className={`grid grid-cols-1 gap-4 transition-opacity @min-[26rem]:grid-cols-2 @min-[56rem]:grid-cols-4 ${
+        aria-label="Baseline headline metrics"
+        className={`grid grid-cols-1 gap-4 transition-opacity @min-[26rem]:grid-cols-2 @min-[56rem]:grid-cols-3 ${
           dashboardLoading
             ? "opacity-60"
             : "opacity-100"
@@ -134,22 +136,6 @@ export function OverviewPage({
 
         <div className="rounded-lg border p-4">
           <p className="text-sm text-muted-foreground">
-            Labor Cost
-          </p>
-          <p className="mt-2 text-3xl font-semibold">
-            {overviewData
-              ? formatCurrencyCompact(
-                  Number(overviewData.labor_cost_usd)
-                )
-              : "—"}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Reported labor cost · period unknown
-          </p>
-        </div>
-
-        <div className="rounded-lg border p-4">
-          <p className="text-sm text-muted-foreground">
             Open Positions
           </p>
           <p className="mt-2 text-3xl font-semibold">
@@ -162,6 +148,15 @@ export function OverviewPage({
           </p>
         </div>
       </div>
+
+      <details className="mt-3 rounded-lg border px-4 text-sm">
+        <summary className="min-h-11 cursor-pointer py-3 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Labor cost: period unspecified</summary>
+        <div className="space-y-2 pb-4">
+          <p>{reportedCost === null ? 'Verified scoped cost unavailable.' : `Reported amount: USD ${reportedCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}.`}</p>
+          <p>Cost period unspecified; no monthly or annual basis is inferred.</p>
+          {reportedCost !== null && overviewData && <p>Snapshot as of {formatLongDate(overviewData.snapshot_date)}; {selectedCountryLabel} / {selectedOrgLabel} / {selectedLevelLabel}. The snapshot date does not establish the cost period.</p>}
+        </div>
+      </details>
 
       <div
         className={`mt-6 rounded-lg border p-4 transition-opacity ${

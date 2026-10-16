@@ -174,3 +174,34 @@ test('initial intro keeps trend, indicators and a single question composer in re
   assert.match(html,/Recorded synthetic workforce history/);
   assert.match(html,/Cost period unspecified/);
 });
+
+
+// Both entry surfaces must keep undated cost out of headline metrics.
+import * as displayFormat from '../lib/display-format.ts';
+const baselineFilename=path.resolve('components/pages/overview-page.tsx');
+const baselineCompiled=ts.transpileModule(fs.readFileSync(baselineFilename,'utf8'),{fileName:baselineFilename,compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}});
+const baselineModule=new Module(baselineFilename);baselineModule.filename=baselineFilename;
+baselineModule.require=id=>id==='@/lib/display-format'?displayFormat:require(id);
+baselineModule._compile(baselineCompiled.outputText,baselineFilename);
+const baselineProps={overviewData:{...base.overview,labor_cost_usd:2047306374.48,open_positions:12},headcountTrend:[],selectedCountryLabel:'Global workforce',selectedOrgLabel:'All business units',selectedLevelLabel:'All levels',dashboardLoading:false,dashboardError:null,headcountGrowthPct:null};
+const renderBaseline=patch=>renderToStaticMarkup(React.createElement(baselineModule.exports.OverviewPage,{...baselineProps,...patch})).replaceAll('<!-- -->','');
+test('Baseline demotes undated cost consistently with Overview and retains exact amount, scope and period warning',()=>{
+ const html=renderBaseline({});
+ const headlines=html.slice(html.indexOf('aria-label="Baseline headline metrics"'),html.indexOf('<details'));
+ assert.doesNotMatch(headlines,/Labor Cost|2\.05B|2,047,306/);
+ assert.match(headlines,/Headcount/);assert.match(headlines,/Attrition/);assert.match(headlines,/Open Positions/);
+ const detail=html.match(/<details[^>]*>([\s\S]*?)<\/details>/)[1];
+ assert.match(detail,/<summary[^>]*>Labor cost: period unspecified<\/summary>/);
+ assert.match(detail,/USD 2,047,306,374\.48/);
+ assert.match(detail,/Cost period unspecified; no monthly or annual basis is inferred/);
+ assert.match(detail,/September 30, 2026/);assert.match(detail,/Global workforce \/ All business units \/ All levels/);
+ assert.match(detail,/snapshot date does not establish the cost period/);
+ const overview=render({overview:{...base.overview,labor_cost_usd:2047306374.48}});
+ assert.doesNotMatch(overview,/>USD 2\.05B</);assert.match(overview,/Labor cost: period unspecified/);
+});
+test('Baseline cost details withhold stale, missing and invalid values while preserving verified zero',()=>{
+ for(const patch of [{dashboardLoading:true},{dashboardError:'failed'},{overviewData:null},{overviewData:{...baselineProps.overviewData,labor_cost_usd:null}},{overviewData:{...baselineProps.overviewData,labor_cost_usd:NaN}}]){
+  const html=renderBaseline(patch);assert.doesNotMatch(html,/USD 2,047,306|USD 0\.00/);assert.match(html,/Verified scoped cost unavailable/);
+ }
+ assert.match(renderBaseline({overviewData:{...baselineProps.overviewData,labor_cost_usd:0}}),/USD 0\.00/);
+});
