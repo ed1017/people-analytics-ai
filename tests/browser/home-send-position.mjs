@@ -20,7 +20,7 @@ try{for(const [mode,width,height] of [['desktop',1366,900],['mobile',390,900],['
  const states=report[mode]={};
  const capture=async name=>{
   await send.scrollIntoViewIfNeeded();await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-  const geometry=await send.evaluate(button=>{const row=button.parentElement.getBoundingClientRect(),rect=button.getBoundingClientRect(),hint=document.getElementById('overview-question-context-tip');return {left:rect.left,right:rect.right,width:rect.width,rowLeft:row.left,rowRight:row.right,rightGap:row.right-rect.right,hintHidden:hint.hidden,disabled:button.disabled,painted:button.contains(document.elementFromPoint(rect.left+rect.width/2,rect.top+rect.height/2))}});
+  const geometry=await send.evaluate(button=>{const row=button.parentElement.getBoundingClientRect(),rect=button.getBoundingClientRect(),hint=document.getElementById('overview-question-context-tip');return {left:rect.left,right:rect.right,width:rect.width,rowLeft:row.left,rowRight:row.right,rightGap:row.right-rect.right,hintHidden:!hint||hint.hidden,disabled:button.disabled,painted:button.contains(document.elementFromPoint(rect.left+rect.width/2,rect.top+rect.height/2))}});
   states[name]=geometry;
   check(mode+' '+name+' has one reachable Send without overflow',await send.count()===1&&geometry.painted&&geometry.left>=0&&geometry.right<=width&&await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   if(!observe)check(mode+' '+name+' keeps Send at the action row right edge',Math.abs(geometry.rightGap)<=1&&Math.abs(geometry.width-states.empty.width)<=1);

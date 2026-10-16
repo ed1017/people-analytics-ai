@@ -4,7 +4,7 @@ import {useLayoutEffect,type RefObject} from 'react';
 /** Reset the measured height so clearing or reflowing a draft can shrink it again. */
 export function resizeHomeComposer(node:Pick<HTMLTextAreaElement,'style'|'scrollHeight'>,compactInitial:boolean){
  node.style.height='auto';
- node.style.height=`${Math.min(320,Math.max(compactInitial?72:112,node.scrollHeight+2))}px`;
+ node.style.height=`${Math.min(320,Math.max(compactInitial?104:112,node.scrollHeight+2))}px`;
 }
 /** Keep the Home input/Send group aligned with its content column and visible viewport. */
 export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement|null>,dock:RefObject<HTMLDivElement|null>,input:RefObject<HTMLTextAreaElement|null>,documentFlow=false,compactInitial=false){
@@ -19,8 +19,9 @@ export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement
    if(documentFlow||window.matchMedia(PHONE_LAYOUT_QUERY).matches){
     document.documentElement.classList.remove('home-keyboard-open');
     for(const property of ['left','width','bottom','max-height'])element.style.removeProperty(property);
-    textarea.style.setProperty('max-height',`${Math.max(96,Math.min(240,height*.4))}px`);
-    textarea.style.setProperty('min-height',compactInitial?'72px':'96px');
+    const inputMax=Math.max(96,Math.min(240,height*.4));
+    textarea.style.setProperty('max-height',`${inputMax}px`);
+    textarea.style.setProperty('min-height',`${Math.min(compactInitial?104:96,inputMax)}px`);
     root.style.setProperty('--home-composer-height','0px');page.style.setProperty('--home-composer-height','0px');
     root.style.removeProperty('--home-reading-height');
     return;

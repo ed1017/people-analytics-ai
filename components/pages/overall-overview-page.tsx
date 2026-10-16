@@ -579,10 +579,10 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       <div ref={composerSlot} className="home-composer-slot"><div ref={composerDock} className="home-composer-dock rounded-t-2xl border bg-card p-3 shadow-lg">
       {planEdit?.goalId===conversation.activeGoalId&&<p className="mb-1 text-xs font-medium">Editing Action Plan #{planEdit.option}. Send previews changes for your review.</p>}
       <label htmlFor="overview-question" className="sr-only">Ask Workforce AI</label>
-      <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" aria-describedby="overview-question-context-tip" value={input} onChange={event => changeQuestion(event.target.value)} rows={welcomeComposer?2:3}
+      <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" value={input} onChange={event => changeQuestion(event.target.value)} rows={welcomeComposer?2:3}
         placeholder="Ask your question or use a prompt. Compare proposed Action Plans, then refine your choice in chat." className="max-h-80 min-h-28 w-full resize-y rounded-lg border bg-background/40 p-3 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
       <div className="home-compose-actions mt-2 flex items-end justify-between gap-3">
-        <p hidden={showCandidatePin||Boolean(activePinnedGoal)} id="overview-question-context-tip" className="min-w-0 text-sm leading-relaxed text-muted-foreground">Ask a question or follow up on an answer. To plan an action, include your desired outcome, timeline and constraints.</p>
+
         <button data-guide-target="submit" type="submit" aria-label="Send overview question" disabled={(solutionConversationEnabled?!solutions.canSend:(!localCandidate&&!ready&&!(demoPlan&&planEditReady&&(structuredPlansEnabled&&structuredMode||bundleChatEditIntent(input).edit||localPlanDiscussion(input))))) || chatLoading || structuredPending || solutions.pending || !input.trim()} className="ms-auto flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{structuredPending?'Reviewing…':'Send'} <ArrowUp size={17} /></button></div>
       </div></div>
     </form>

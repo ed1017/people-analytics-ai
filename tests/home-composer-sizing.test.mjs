@@ -10,10 +10,10 @@ mod._compile(ts.transpileModule(fs.readFileSync(filename,'utf8'),{compilerOption
 const {resizeHomeComposer,useHomeComposerDock}=mod.exports;
 test('initial composer grows for a long draft, shrinks after clear, and retains conversation sizing',()=>{
  let scroll=48;const node={style:{height:'200px'},get scrollHeight(){assert.equal(this.style.height,'auto');return scroll},value:'draft'};
- resizeHomeComposer(node,true);assert.equal(node.style.height,'72px');
+ resizeHomeComposer(node,true);assert.equal(node.style.height,'104px');
  scroll=180;resizeHomeComposer(node,true);assert.equal(node.style.height,'182px');
  scroll=600;resizeHomeComposer(node,true);assert.equal(node.style.height,'320px');assert.equal(node.value,'draft');
- scroll=48;resizeHomeComposer(node,true);assert.equal(node.style.height,'72px');
+ scroll=48;resizeHomeComposer(node,true);assert.equal(node.style.height,'104px');
  resizeHomeComposer(node,false);assert.equal(node.style.height,'112px');
 });
 test('compact document-flow docking preserves viewport caps and restores ordinary sizing',()=>{
@@ -27,7 +27,7 @@ test('compact document-flow docking preserves viewport caps and restores ordinar
  globalThis.document={documentElement:{classList:{remove(){}}}};
  globalThis.ResizeObserver=class{observe(){}disconnect(){}};globalThis.innerHeight=900;
  try {
-  for(const [compact,height,min,max] of [[true,900,'72px','240px'],[true,200,'72px','96px'],[false,900,'96px','240px']]){
+  for(const [compact,height,min,max] of [[true,900,'104px','240px'],[true,200,'96px','96px'],[false,900,'96px','240px']]){
    effectDeps=undefined;cleanup=undefined;viewport.height=height;useHomeComposerDock(true,{current:anchor},{current:dock},{current:textarea},true,compact);
    assert.equal(textarea.style.values['min-height'],min);assert.equal(textarea.style.values['max-height'],max);
    assert.equal(root.style.values['--home-composer-height'],'0px');cleanup();

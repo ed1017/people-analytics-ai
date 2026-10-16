@@ -29,7 +29,7 @@ export function GlobalWorkforceFilters({ page, options, country, org, level, loa
       <div className="workforce-goal col-span-3 min-w-0 lg:mr-auto lg:flex-1">{focusedIssue}</div>
       {!filtersApply?<details key={page} className="col-span-3 min-w-0 text-xs text-muted-foreground"><summary className="min-h-11 cursor-pointer py-3">Workforce filters — not applied here</summary><p className="pb-2">Selections are retained for pages that support them. Change them on Overview or Workforce.</p><fieldset disabled className="flex flex-col gap-2 opacity-60 lg:flex-row lg:flex-wrap lg:items-end">{fields}</fieldset></details>:compact?<details className="workforce-filter-disclosure" open={expanded} onToggle={event=>{if(compact)setExpanded(event.currentTarget.open)}}><summary className="min-h-11 cursor-pointer py-3 text-sm">Filters{page==="home"?(country==="all"&&org==="all"&&level==="all"?" · All workforce":" · Selected workforce"):""}</summary><div className="workforce-filter-fields">
 {fields}
-    </div></details>:fields}</div>
-    {page && <p aria-label="Filter applicability" className="py-1 text-xs leading-relaxed text-muted-foreground">{scopeNote}</p>}
+    </div>{page==="home"&&<p aria-label="Filter applicability" className="pb-2 text-xs leading-relaxed text-muted-foreground">{scopeNote}</p>}</details>:fields}</div>
+    {page && page!=="home" && <p aria-label="Filter applicability" className="py-1 text-xs leading-relaxed text-muted-foreground">{scopeNote}</p>}
   </div>;
 }
