@@ -91,7 +91,7 @@ export async function POST(request:Request) {
 export async function GET(request:Request){
  return withDatasetRequest(request,async()=>{
   const headers:Record<string,string>={'Cache-Control':'no-store'};
-  if(trackingPreviewBudgetEnabled(process.env))headers['X-Tracking-Preview-Budget']='v1; rounds=2; input=25000; output=2000'+(process.env.HOME_TRACKING_QA_COUNT_ONLY==='true'?'; mode=count-only':'');
+  if(trackingPreviewBudgetEnabled(process.env))headers['X-Tracking-Preview-Budget']=`v1; rounds=${trackingPreviewLimits.rounds}; input=${trackingPreviewLimits.inputTokens}; output=${trackingPreviewLimits.outputTokens}`+(process.env.HOME_TRACKING_QA_COUNT_ONLY==='true'?'; mode=count-only':'');
   if(!solutionConversationEnabled)return Response.json({error:'Solution conversation is not enabled.'},{status:404,headers});
   const {projectionCurrentnessFilters,createProjectionCurrentnessReceipt}=await import('@/lib/home-projection-currentness');
   let filters;
