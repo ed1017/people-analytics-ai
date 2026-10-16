@@ -1,0 +1,11 @@
+# Full-width Baseline and Skills evidence
+
+This bounded slice follows PR278 (878f38e27a4b36a8310bb3de15123c41ac680a0b). Baseline and Skills use the full content width, with the existing Workforce AI conversation available through an explicit button. Other destinations retain their current panel behavior. Evidence, filter applicability, dates, scope and saved planning contracts are unchanged.
+
+The native modal drawer keeps existing conversation state mounted while closed. Automatic goal takeaways are inactive until it opens. Closing the drawer preserves the draft and returns focus to its trigger; Escape, a close button, keyboard cycling and native background inertness are supported. Body scrolling is restored on cleanup. Only the conversation area scrolls inside the drawer; the composer stays visible and grows from a compact input to a bounded height. VisualViewport resize/scroll follows the area available above a mobile keyboard.
+
+Validation uses tests/manual/evidence-drawer.browser.mjs against a running app. Set EVIDENCE_BASE_URL, optional PLAYWRIGHT_MODULE and CHROME_PATH, and optionally EVIDENCE_FIXTURES to a directory containing captured public synthetic history-<endpoint>.json responses. All external and non-GET requests are blocked. Optional EVIDENCE_OUTPUT_DIR stores acceptance screenshots locally. The check covers Baseline and Skills at desktop, phone portrait, landscape and reduced phone height; draft close/reopen, focus return/cycling, details, growing composer visibility, overflow and unchanged evidence width. Reduced height is a keyboard-space simulation, not a physical-device keyboard test.
+
+PR278 shipped neutral light/dark surfaces, compact Overview/Plan/Evidence/About/Settings navigation, deterministic guided service-growth inputs, comparison/save/reopen/target flow, on-demand saved plans and a compact active composer. Its production CI passed 2,668 tests: https://github.com/ed1017/people-analytics-ai/actions/runs/38946316607. Its production screenshot remains a local acceptance artifact; no Library ID was verified.
+
+Richer workload/skills demos remain queued. Population rollout is paused. No database changes, paid AI calls, access changes or dataset regeneration are included.

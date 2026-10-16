@@ -26,6 +26,7 @@ import { GoalConversationMessages, ConversationMessages } from "@/components/goa
 import type { ChatMessage } from "@/lib/types";
 
 type AiPanelProps = {
+  drawer?: {open: boolean; onClose: () => void};
   workforceIntro?:boolean;
   suppressIntro?:boolean;
   goalTakeaway?:ReactNode;
@@ -56,6 +57,7 @@ type AiPanelProps = {
 };
 
 export function AiPanel({
+  drawer,
   workforceIntro=false,suppressIntro=false,
   goalTakeaway,goalViewKey="",hasGoal=false,goalStatement="",
   readOnlyReason,
@@ -79,6 +81,39 @@ export function AiPanel({
   onSend,onResetConversation,conversationHistory=chatMessages,
 }: AiPanelProps) {
   const composer = useRef<HTMLTextAreaElement>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const drawerTitle = useId();
+  const drawerOpen = drawer?.open ?? false;
+  const drawerMode = Boolean(drawer);
+  useEffect(() => {
+    const node = dialog.current;
+    if (!node) return;
+    if (!drawerOpen) { node.close(); return; }
+    node.showModal();
+    const viewport = window.visualViewport;
+    const fitViewport = () => {
+      node.style.height = `${viewport?.height ?? window.innerHeight}px`;
+      node.style.top = `${viewport?.offsetTop ?? 0}px`;
+    };
+    fitViewport();
+    viewport?.addEventListener("resize", fitViewport);
+    viewport?.addEventListener("scroll", fitViewport);
+    window.addEventListener("resize", fitViewport);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      node.close(); document.body.style.overflow = previousOverflow;
+      viewport?.removeEventListener("resize", fitViewport);
+      viewport?.removeEventListener("scroll", fitViewport);
+      window.removeEventListener("resize", fitViewport);
+    };
+  }, [drawerOpen]);
+  useEffect(() => {
+    if (!drawerMode || !drawerOpen || !composer.current) return;
+    const input = composer.current;
+    input.style.height = "auto";
+    input.style.height = `${Math.min(160, Math.max(52, input.scrollHeight))}px`;
+  }, [chatInput, drawerOpen, drawerMode]);
   const [viewportWidth, setViewportWidth] =
     useState(1440);
 
@@ -126,9 +161,9 @@ export function AiPanel({
             100
         );
 
-  return (
+  const panel = (
     <>
-      {!aiCollapsed && (
+      {!drawer && !aiCollapsed && (
         <div
           role="separator"
           aria-orientation="vertical"
@@ -161,12 +196,12 @@ export function AiPanel({
             : "app-ai-panel sticky top-[var(--app-header-height)] flex h-[calc(100vh-var(--app-header-height))] min-w-0 flex-col overflow-hidden border-l bg-card p-4 max-md:h-[70vh] max-md:min-h-[520px]"
         }
       >
-        <WorkforceChatIntro active={workforceIntro&&!aiCollapsed&&!previewPage&&!readOnlyReason} suppressed={suppressIntro}/>
+        <WorkforceChatIntro active={!drawer&&workforceIntro&&!aiCollapsed&&!previewPage&&!readOnlyReason} suppressed={suppressIntro}/>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           {!aiCollapsed && (
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
-              <div><h2 className="text-2xl font-semibold tracking-tight">
+              <div><h2 id={drawerTitle} className="text-2xl font-semibold tracking-tight">
                 Workforce AI
               </h2></div>
             </div>
@@ -175,7 +210,7 @@ export function AiPanel({
           {!aiCollapsed&&onResetConversation&&<button type="button" onClick={()=>{onResetConversation();requestAnimationFrame(()=>composer.current?.focus());}} className="min-h-11 rounded px-2 text-xs font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Reset conversation</button>}
           <div className="ml-auto flex gap-1">
             {!aiCollapsed&&<button type="button" popoverTarget={detailsId} aria-label="Open conversation details" className="flex h-9 w-9 items-center justify-center rounded hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"><Info size={18}/></button>}
-            {!aiCollapsed && (
+            {!drawer && !aiCollapsed && (
               <Button
                 variant="ghost"
                 size="icon"
@@ -193,9 +228,10 @@ export function AiPanel({
             <Button
               variant="ghost"
               size="icon"
-              onClick={onToggleCollapsed}
+              onClick={drawer ? drawer.onClose : onToggleCollapsed}
+              aria-label={drawer ? "Close Workforce AI" : aiCollapsed ? "Open AI panel" : "Collapse AI panel"}
               title={
-                aiCollapsed
+                drawer ? "Close Workforce AI" : aiCollapsed
                   ? "Open AI panel"
                   : "Collapse AI panel"
               }
@@ -217,6 +253,7 @@ export function AiPanel({
           </div>
         ) : (
           <div data-ai-conversation-body className="flex min-h-0 flex-1 flex-col">
+            <div className={drawer ? "evidence-ai-scroll" : "contents"} tabIndex={drawer ? 0 : undefined} role={drawer ? "region" : undefined} aria-label={drawer ? "Workforce AI conversation" : undefined}>
             <div id={goalHelpId} className="mb-3 space-y-1 text-base leading-relaxed text-muted-foreground">
               <p>{readOnlyReason ? "AI analysis is not available on this page." : goalStatement ? "Ask a question about this topic. Responses will use your selected goal as context." : "Select a goal to give your questions context."}</p>
               <p className="break-words text-foreground">Goal: {goalStatement || "General exploration"}</p>
@@ -243,7 +280,8 @@ export function AiPanel({
               </div>
             )}
 
-            <div className="flex items-end gap-2">
+            </div>
+            <div className="ai-composer flex shrink-0 items-end gap-2">
               <textarea
                 ref={composer}
                 value={chatInput}
@@ -267,10 +305,10 @@ export function AiPanel({
                     : "Ask about this page and your goal."
                 }
                 disabled={previewPage}
-                rows={5}
+                rows={drawer ? 2 : 5}
                 aria-label="Ask People Analytics AI"
                 aria-describedby={goalHelpId}
-                className="h-36 min-h-32 max-h-64 min-w-0 flex-1 resize-y rounded-lg border bg-background p-3.5 text-base leading-relaxed outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+                className={`${drawer ? "min-h-[52px] max-h-40 resize-none" : "h-36 min-h-32 max-h-64 resize-y"} min-w-0 flex-1 rounded-lg border bg-background p-3 text-base leading-relaxed outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60`}
               />
 
               <Button
@@ -300,4 +338,11 @@ export function AiPanel({
       </aside>
     </>
   );
+  return drawer ? <dialog ref={dialog} className="evidence-ai-dialog" aria-labelledby={drawerTitle} onKeyDown={event => {
+    if (event.key !== "Tab") return;
+    const items = [...event.currentTarget.querySelectorAll<HTMLElement>('a[href], button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary, [tabindex="0"]')].filter(node => node.getClientRects().length > 0);
+    const first = items[0], last = items[items.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+  }} onCancel={drawer.onClose} onClose={drawer.onClose}>{panel}</dialog> : panel;
 }
