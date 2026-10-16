@@ -1,4 +1,5 @@
 'use client';
+import {conversationPlanCatalog} from '@/lib/home-conversation-plan-catalog';
 import {usePendingRequest} from './use-pending-request';
 import {requiredStaffingPlanIdentity} from '@/lib/home-required-staffing-plan';
 import {currentRequiredStaffing,resolveStaffingDeliveryTarget,retainStaffingDeliveryTarget} from '@/lib/home-required-staffing';
@@ -62,8 +63,9 @@ export function useHomeSolutionConversation(props:Props){
  const contextKey=JSON.stringify([goal,guideId,props.active,props.settled,props.scope,props.query,props.evidence,props.evidenceContext,props.conversation.resetEpoch,props.conversation.issueEditor?.id,progressInput]);
  const liveKey=useRef(contextKey);
  useLayoutEffect(()=>{if(liveKey.current!==contextKey){liveKey.current=contextKey;epoch.current++;controller.current?.abort();setPending(false);}},[contextKey,setPending]);
- function catalog():PlanAlternatives|null{
+ function catalog(forConversation=false):PlanAlternatives|null{
   const p=currentProps.current,g={goalId:p.conversation.activeGoalId,goal:p.conversation.focusedIssue},snapshot=decisionStore.getSnapshot(),raw=snapshot.data.workspaces[g.goalId]?.fields[planAlternativesField];
+  if(forConversation){const target=p.target();return conversationPlanCatalog(g,raw,target?.goalId===g.goalId?target.snapshots?.()??null:null);}
   if(raw!==undefined){const value=readPlanAlternatives(raw,g);if(!value)throw Error('Saved plans could not be verified. They have been preserved.');return value;}
   const target=p.target(),sources=target?.goalId===g.goalId?target.snapshots?.():null;
   return sources?.length?createPlanAlternatives(g,sources):null;
@@ -72,12 +74,12 @@ export function useHomeSolutionConversation(props:Props){
  function persist(state:SolutionState){const p=currentProps.current,snapshot=requireCurrent(),build=()=>({[solutionConversationField]:state as unknown as Json});if(p.conversation.activeGoalId)decisionStore.commitGoalFields(p.conversation.activeGoalId,p.conversation.focusedIssue,snapshot.data.revision,new Date().toISOString(),build);else if(!p.guided?.goalId)decisionStore.commitExplorationFields(snapshot.data.revision,new Date().toISOString(),build);memoryRef.current=state;setMemory(state);}
  function selectedPlanId(value:PlanAlternatives|null){const p=currentProps.current,target=p.target();return target?.goalId===p.conversation.activeGoalId&&value?.order.includes(target.id)?target.id:null;}
  function makeRequest(text:string):SolutionRequest{
-  const p=currentProps.current,current=catalog(),params=new URLSearchParams(p.query),progress=captureGoalProgressInput(decisionStore,p.conversation.activeGoalId);
+  const p=currentProps.current,current=catalog(true),params=new URLSearchParams(p.query),progress=captureGoalProgressInput(decisionStore,p.conversation.activeGoalId);
   return readSolutionRequest({version:1,planningCalculatorAvailable:p.planningCalculatorAvailable?.()===true,requestId:crypto.randomUUID(),goal:{id:p.conversation.activeGoalId,statement:p.conversation.focusedIssue},scope:p.scope,filters:{country:params.get('country')||'all',org:params.get('org')||'all',level:params.get('level')||'all'},timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,evidence:p.evidenceForMessage?.(text)??p.evidence,goalContext:p.planningContext?.()?{goalContext:p.conversation.goalContext,scenarioReview:p.planningContext()}:p.conversation.goalContext,...(progress?{progressEntry:progressEntryContext(decisionStore,'context',[{id:'context',text}])?.previous??null}:{}),...(progress?{goalProgress:progress}:{}),selectedId:selectedPlanId(current),catalog:current,state:memoryRef.current,message:{id:crypto.randomUUID(),text}});
  }
  async function send(text:string){
   if(controller.current||saving)return;requireCurrent();const request=makeRequest(text),entryContext=progressEntryContext(decisionStore,request.requestId,[...request.state.turns.filter(t=>t.role==='user').map(({id,text})=>({id,text})),request.message]),captured=++epoch.current,key=liveKey.current,scenario=JSON.stringify(currentProps.current.planningContext?.()??null),abort=new AbortController();controller.current=abort;answerSeries.current=[];setPending(true);setNotice('');
-  const current=()=>!abort.signal.aborted&&mounted.current&&captured===epoch.current&&key===liveKey.current&&scenario===JSON.stringify(currentProps.current.planningContext?.()??null)&&equal(request.goalProgress,captureGoalProgressInput(decisionStore,currentProps.current.conversation.activeGoalId))&&equal(request.catalog,catalog())&&selectedPlanId(catalog())===(request.selectedId??null);
+  const current=()=>!abort.signal.aborted&&mounted.current&&captured===epoch.current&&key===liveKey.current&&scenario===JSON.stringify(currentProps.current.planningContext?.()??null)&&equal(request.goalProgress,captureGoalProgressInput(decisionStore,currentProps.current.conversation.activeGoalId))&&equal(request.catalog,catalog(true))&&selectedPlanId(catalog(true))===(request.selectedId??null);
   try{
    const response=await datasetFetch('/api/home-solution-conversation',{method:'POST',headers:{'Content-Type':'application/json',...swpConversationHeaders(request.goalContext)},body:JSON.stringify(request),signal:abort.signal});const data=await response.json();
    if(!current())return null;if(!response.ok)throw Error(homeConversationErrorMessage(data));

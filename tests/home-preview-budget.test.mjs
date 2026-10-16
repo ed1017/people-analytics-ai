@@ -1,3 +1,5 @@
+import {conversationPlanCatalog} from '../lib/home-conversation-plan-catalog.ts';
+import {conversationCatalog} from './fixtures/home-plan-conversation.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import OpenAI from 'openai';
@@ -37,7 +39,7 @@ test('actual route preserves real progress proposal and second-round final; budg
  const probe=await isolated.get(new Request('http://offline.invalid/api/home-solution-conversation'));assert.equal(probe.status,400);assert.equal(probe.headers.get('X-Tracking-Preview-Budget'),'v1; rounds=2; input=25000; output=2000');
  const counts=[];isolated.sandbox.__countTokens=async(body,options)=>{counts.push(JSON.parse(JSON.stringify(body)));assert.equal(options.maxRetries,0);assert.equal(options.timeout,15000);return {input_tokens:24000};};
  const text='Synthetic QA: maintain exactly 100 active employees across all countries, all business units and all levels through 2026-12-31. Freshness is 30 days. Report a complete 100 people on 2026-08-01 as baseline.';
- const body=solutionRequest(text,true);body.goal.statement='Maintain 100 active employees through 2026-12-31';body.catalog=null;body.selectedId=null;body.goalProgress={version:1,goalId:body.goal.id,datasetToken:'legacy-v1:0',origin:'authored',ledger:emptyGoalProgress(body.goal.id,'authored'),unavailableReason:null};
+ const body=solutionRequest(text,true);body.goal.statement='Maintain 100 active employees through 2026-12-31';body.catalog=conversationPlanCatalog({goalId:body.goal.id,goal:body.goal.statement},undefined,conversationCatalog().plans.map(({id,draft})=>({id,draft})));body.selectedId=null;body.goalProgress={version:1,goalId:body.goal.id,datasetToken:'legacy-v1:0',origin:'authored',ledger:emptyGoalProgress(body.goal.id,'authored'),unavailableReason:null};
  const spec={metric:'headcount',definition:HEADCOUNT_DEFINITION,unit:'people',scope:{country:'all',org:'all',level:'all'},measurement:{direction:'maintain',targetValue:100,targetDate:'2026-12-31',maxAgeDays:30,baselineId:null},observation:{value:100,date:'2026-08-01',complete:true,supersedes:null,useAsBaseline:true},basis:[{turnId:body.message.id,quote:text}]};
  isolated.sandbox.__replies.push(responseForStep({name:'propose_goal_progress',args:{spec}},1),responseForStep(final('Review the proposed progress entry.')));
  const send=()=>isolated.post(new Request('http://offline.invalid/api/home-solution-conversation',{method:'POST',body:JSON.stringify(body)}));
