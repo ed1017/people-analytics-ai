@@ -53,7 +53,7 @@ test('every offered choice retains exact computed summary and active actions aft
    assert.deepEqual(guidedPlanSummary(saved.draft),summary);
    const actions=applicablePlanComponents(saved.draft),directions=planDirections(saved.draft);
    assert.deepEqual(directions.map(d=>d.id).sort(),actions.map(c=>c.id).sort());
-   for(const [path,domain] of [['buy','recruiting'],['build','learning'],['move','mobility']]){
+   for(const [path,domain] of [['buy','hiring'],['build','learning'],['move','mobility']]){
     if(choice.candidate.mix[path]===0)assert.ok(!actions.some(c=>c.domain===domain));
    }
    assert.equal(saved.draft.bundle.components.length,3,'canonical calculation template retained');
