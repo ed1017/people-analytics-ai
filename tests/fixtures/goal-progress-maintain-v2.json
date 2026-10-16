@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "goalId": "legacy-maintain",
+  "origin": "demo",
+  "events": [
+    {
+      "id": "base",
+      "kind": "observed",
+      "at": "2026-08-01T12:00:00Z",
+      "supersedes": null,
+      "data": {
+        "metric": "headcount",
+        "definition": "active-employees-point-in-time-v1",
+        "unit": "people",
+        "scope": {
+          "country": "all",
+          "org": "all",
+          "level": "all"
+        },
+        "period": {
+          "kind": "point",
+          "start": "2026-08-01",
+          "end": "2026-08-01"
+        },
+        "value": 100,
+        "quality": {
+          "complete": true,
+          "suppressed": false,
+          "denominatorRequired": false,
+          "denominator": null
+        },
+        "source": {
+          "classification": "user-reported",
+          "datasetToken": "legacy-v1:0",
+          "releaseId": "fixture-base",
+          "releaseDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "lineageId": "user-reported:legacy-maintain"
+        },
+        "capturedAt": "2026-08-01T12:00:00Z"
+      }
+    },
+    {
+      "id": "measure",
+      "kind": "measurement",
+      "at": "2026-08-02T12:00:00Z",
+      "supersedes": null,
+      "data": {
+        "metric": "headcount",
+        "definition": "active-employees-point-in-time-v1",
+        "unit": "people",
+        "direction": "maintain",
+        "scope": {
+          "country": "all",
+          "org": "all",
+          "level": "all"
+        },
+        "lineageId": "user-reported:legacy-maintain",
+        "baselineId": "base",
+        "target": {
+          "value": 100,
+          "date": "2026-12-31"
+        },
+        "maxAgeDays": 30,
+        "provenance": "Explicit fictional planning target."
+      }
+    },
+    {
+      "id": "latest",
+      "kind": "observed",
+      "at": "2026-09-20T12:00:00Z",
+      "supersedes": null,
+      "data": {
+        "metric": "headcount",
+        "definition": "active-employees-point-in-time-v1",
+        "unit": "people",
+        "scope": {
+          "country": "all",
+          "org": "all",
+          "level": "all"
+        },
+        "period": {
+          "kind": "point",
+          "start": "2026-09-20",
+          "end": "2026-09-20"
+        },
+        "value": 90,
+        "quality": {
+          "complete": true,
+          "suppressed": false,
+          "denominatorRequired": false,
+          "denominator": null
+        },
+        "source": {
+          "classification": "user-reported",
+          "datasetToken": "legacy-v1:0",
+          "releaseId": "fixture-latest",
+          "releaseDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "lineageId": "user-reported:legacy-maintain"
+        },
+        "capturedAt": "2026-09-20T12:00:00Z"
+      }
+    },
+    {
+      "id": "milestone",
+      "kind": "milestone-proposed",
+      "at": "2026-09-21T12:00:00Z",
+      "supersedes": null,
+      "data": {
+        "measurementId": "measure",
+        "value": 85,
+        "date": "2026-11-01",
+        "provenance": "Proposed synthetic checkpoint, not achieved."
+      }
+    },
+    {
+      "id": "old-assessment",
+      "at": "2026-10-08T13:00:00.000Z",
+      "supersedes": null,
+      "kind": "assessed",
+      "data": {
+        "asOf": "2026-10-08",
+        "currentSource": null,
+        "result": {
+          "version": 2,
+          "goalId": "legacy-maintain",
+          "measurementId": "measure",
+          "assessedOn": "2026-10-08",
+          "baseline": {
+            "id": "base",
+            "observation": {
+              "metric": "headcount",
+              "definition": "active-employees-point-in-time-v1",
+              "unit": "people",
+              "scope": {
+                "country": "all",
+                "org": "all",
+                "level": "all"
+              },
+              "period": {
+                "kind": "point",
+                "start": "2026-08-01",
+                "end": "2026-08-01"
+              },
+              "value": 100,
+              "quality": {
+                "complete": true,
+                "suppressed": false,
+                "denominatorRequired": false,
+                "denominator": null
+              },
+              "source": {
+                "classification": "user-reported",
+                "datasetToken": "legacy-v1:0",
+                "releaseId": "fixture-base",
+                "releaseDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "lineageId": "user-reported:legacy-maintain"
+              },
+              "capturedAt": "2026-08-01T12:00:00Z"
+            }
+          },
+          "latestComparable": {
+            "id": "latest",
+            "observation": {
+              "metric": "headcount",
+              "definition": "active-employees-point-in-time-v1",
+              "unit": "people",
+              "scope": {
+                "country": "all",
+                "org": "all",
+                "level": "all"
+              },
+              "period": {
+                "kind": "point",
+                "start": "2026-09-20",
+                "end": "2026-09-20"
+              },
+              "value": 90,
+              "quality": {
+                "complete": true,
+                "suppressed": false,
+                "denominatorRequired": false,
+                "denominator": null
+              },
+              "source": {
+                "classification": "user-reported",
+                "datasetToken": "legacy-v1:0",
+                "releaseId": "fixture-latest",
+                "releaseDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "lineageId": "user-reported:legacy-maintain"
+              },
+              "capturedAt": "2026-09-20T12:00:00Z"
+            }
+          },
+          "latestReceivedId": "latest",
+          "change": -10,
+          "gap": 0,
+          "intendedChangePercent": null,
+          "reference": {
+            "kind": "linear-reference",
+            "value": 100,
+            "date": "2026-09-20",
+            "difference": -10,
+            "milestoneId": null
+          },
+          "requiredPace": {
+            "value": 0,
+            "unit": "people/day",
+            "from": "2026-09-20",
+            "through": "2026-12-31",
+            "arithmeticOnly": true
+          },
+          "currentStatus": "unavailable",
+          "reasons": [
+            "Current source is unavailable; historical observations remain dated evidence."
+          ],
+          "completion": "not_assessed",
+          "forecast": {
+            "status": "unavailable",
+            "confidence": null,
+            "successProbability": null
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,5 +1,20 @@
 # Compact saved goal progress summary
 
+## Tracking activation review (PR274)
+
+Assessment version 3 distinguishes a maintain target from a ceiling: its gap is
+the absolute distance from the target, above or below. Required pace, when
+available, points toward the target; it remains dated arithmetic, not a forecast.
+No directional progress status is inferred for an off-target maintain result.
+Historical version 1 and 2 assessments replay with their original semantics and
+are never rewritten; new assessments use version 3. A frozen synthetic version-2
+record tests preservation alongside current assessment of the same observations.
+
+The public progress flag is enabled only on the PR274 preview branch for review.
+Production activation requires actual hosted workflow/visual checks, independent
+review and the approved release gate. The offline card fixture is component QA
+only and creates no application route or deployed feature bypass.
+
 Separate source successor to editor acceptance commit
 `3a7c466c6b6b5e359b605bc4722a3b0fb90bf3c3`. The frozen real-AI predecessor and
 diagnostic source are untouched. Integration owner
