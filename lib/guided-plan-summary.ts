@@ -1,4 +1,7 @@
 import type {SwpOption} from './swp-demo';
+import type {HomeMixCandidate} from './home-mix-search';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {bundleHorizonEnd} from './home-bundle-display.ts';
 import type {BundleDraft} from './home-bundle-reconciliation';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {reviewBundleProposal,readBundleDraft} from './home-bundle-reconciliation.ts';
@@ -17,7 +20,7 @@ export function applicablePlanComponents(draft:BundleDraft){
 export function guidedPlanSummary(draft:BundleDraft){
  if(!draft.inputs.guidedWorkload||!draft.inputs.capacity||!readBundleDraft(draft))return null;
  try{const candidate=projectSavedStaffingChoice(draft),coverage=reviewBundleProposal(draft).conditionalCoverage;
- return {mix:candidate.mix,cash:candidate.cash.complete,ready:candidate.metrics?.fullCoverageDate??null,effort:guidedOptionEffort({draft,coverage})};}catch{return null;}
+ return {mix:candidate.mix,cash:candidate.cash.complete,cashBreakdown:candidate.cash,target:guidedPlanTarget(draft),ready:candidate.metrics?.fullCoverageDate??null,effort:guidedOptionEffort({draft,coverage})};}catch{return null;}
 }
 /** Qualified role-months exclude partial readiness months, using the existing dependency gates. */
 export function optionRoleMonths(option:Pick<SwpOption,'draft'|'coverage'>){
@@ -37,4 +40,21 @@ export function guidedOptionEffort(option:Pick<SwpOption,'draft'|'coverage'>){
  if(!baseline||baseline.status!=='calculated'||roleMonths===null)return null;
  const additionalHours=roleMonths*option.draft.inputs.guidedWorkload!.productiveHours.value!;
  return {additionalHours,totalHours:baseline.capacityHours!+additionalHours,shortfallHours:Math.max(0,baseline.workloadHours!-baseline.capacityHours!-additionalHours)};
+}
+
+export const conditionalRoleEvidence='Record a dated baseline and later comparable count for this exact unit and role, with proficiency/work-sample validation, contracted FTE, allocation and source-team release or hire-start evidence. Training completion alone is insufficient. Actual progress remains unknown until measured; automated progress arithmetic is not supported for this metric.';
+/** Read the saved scenario; never add assumptions or alter its input identity. */
+export function guidedPlanTarget(draft:BundleDraft){
+ if(!draft.inputs.guidedWorkload||!draft.inputs.capacity||!readBundleDraft(draft))return null;
+ const scope=draft.inputs.scope,deadline=bundleHorizonEnd(scope).value,roles=scope.demand.value,workload=guidedWorkloadResult(draft.inputs);
+ if(!deadline||roles===null||Number(draft.inputs.capacity.input.roles)!==roles)return null;
+ return {metric:'Conditional additional-role coverage',roles,deadline,population:scope.population.value,unit:scope.businessUnit.value,role:scope.jobProfile.value,fteGap:workload?.additionalFte??null,
+  lines:[`Metric: Conditional additional-role coverage.`,`Scenario target: ${roles} whole roles by ${deadline}.`,`Scope: ${scope.population.value}; unit: ${scope.businessUnit.value}; role: ${scope.jobProfile.value}.`,
+   `The model rounds the additional FTE gap (${workload?.additionalFte??'Unknown'} FTE) up to whole roles and assumes 1 qualified, allocated FTE per additional role. Roles are not added company headcount.`,
+   'Baseline: Unknown. Measured outcome: Unknown. Delivery milestones are proposed steps, not evidence of capacity achieved. End-date role coverage does not erase earlier uncovered workload.',conditionalRoleEvidence]};
+}
+const cashLabels:Record<string,string>={'capacity:hireStaffingCost':'New-hire payroll','capacity:backfillStaffingCost':'Backfill payroll','capacity:internalSalaryUplift':'Internal salary uplift','capacity:recruitingFees':'Recruiting fees','capacity:trainingCash':'Training cash'};
+export function staffingCashBreakdown(draft:BundleDraft,cash:HomeMixCandidate['cash']){
+ return {start:draft.inputs.scope.startMonth.value,end:bundleHorizonEnd(draft.inputs.scope).value,months:draft.inputs.scope.months.value,total:cash.complete,knownSubtotal:cash.knownSubtotal,
+  lines:cash.ledger.map(line=>({id:line.id,label:cashLabels[line.id]??draft.inputs.expenses.find(e=>e.id===line.id)?.label??line.id,total:line.total}))};
 }

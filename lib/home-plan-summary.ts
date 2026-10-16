@@ -1,5 +1,5 @@
 // @ts-expect-error Native Node tests share TypeScript source.
-import {applicablePlanComponents} from './guided-plan-summary.ts';
+import {applicablePlanComponents,guidedPlanTarget} from './guided-plan-summary.ts';
 import type {Assumption,BundleDraft,BundleResult} from './home-bundle-reconciliation';
 // @ts-expect-error Native fixtures share source.
 import {historicalContextText,historicalContextLimit} from './home-metric-context.ts';
@@ -49,6 +49,8 @@ export function homePlanSummary(draft:BundleDraft,result:BundleResult|null|undef
  if(measure){
   if(measure.scopeKey!==measurementScope(inputs))measurement.push('Saved measure needs renewed review: the plan population or horizon changed.');
   else measurement.push(`Metric: ${measure.name}.`,legacyCompanyBaseline(measure)?`Legacy source value: ${measure.baseline.value}; plan baseline: Unverified.`:measureValue(measure.baseline),measureValue(measure.target,true));
+ }else if(guidedPlanTarget(draft)){
+  measurement.push(...guidedPlanTarget(draft)!.lines);
  }else if(inputs.whatIf&&inputs.whatIf.scopeKey===measurementScope(inputs)){
   const kind=inputs.whatIf.kind;
   measurement.push(`Metric: ${kind==='turnover'?'Turnover rate (%)':'Additional roles covered'}.`,measureValue(inputs.whatIf.baseline,false,kind==='turnover'?'%':' roles'),measureValue(inputs.whatIf.target,true,kind==='turnover'?'%':' roles'));
