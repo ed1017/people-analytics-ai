@@ -174,6 +174,7 @@ export function previewBundleChatEdit(draft:BundleDraft,request:string,selection
    const basis=legacyReplay!==true?{value:'cash' as const,kind:budget.basis?'user-entered' as const:'illustrative' as const,basis:'Cash spending ceiling for the shared planning horizon; staff hours are tracked separately without a monetary value.'}:budget.basis?{value:budget.basis,kind:'user-entered' as const,basis:'Explicit user budget basis; not an expense.'}:before?.basis??{value:'cash' as const,kind:'illustrative' as const,basis:'Proposed cash ceiling, retaining this plan’s separate cash and employee-time convention for its shared planning horizon.'};
    if(before?.amount.value!==amount.value||JSON.stringify(before?.basis)!==JSON.stringify(basis)){
     inputs.budget={amount,basis};changes.push({field:'Budget limit (USD)',before:before?.amount??unknownAssumption(),after:amount});
+    if(legacyReplay!==true&&inputs.capacity){inputs.capacity.input.budget=amount.value===null?'':String(amount.value);inputs.capacity.origins.budget={kind:amount.kind==='model-proposed'?'illustrative':amount.kind,basis:amount.basis};}
     if(before?.basis.value!==basis.value)changes.push({field:'Budget basis',before:before?.basis??unknownAssumption(),after:basis});
    }
    continue;

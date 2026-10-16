@@ -1,7 +1,6 @@
 "use client";
 import {LimitedPreviewBadge} from "@/components/limited-preview-badge";
 import { useEffect, useRef, type ReactNode } from "react";
-import {usePhoneLayout} from "@/components/use-phone-layout";
 import {WorkspacePaletteControl} from "@/components/workspace-palette-control";
 import { PageHelp } from "@/components/page-help";
 
@@ -15,6 +14,7 @@ import type {
 
 type AppHeaderProps = {
   children?: ReactNode;
+  onNavigate?: (page: AppPage) => void;
   activePage: AppPage;
   selectedPersona: Persona;
   onPersonaChange: (persona: Persona) => void;
@@ -22,11 +22,11 @@ type AppHeaderProps = {
 
 export function AppHeader({
   children,
+  onNavigate,
   activePage,
   selectedPersona,
   onPersonaChange,
 }: AppHeaderProps) {
-  const phone=usePhoneLayout();
   const header = useRef<HTMLElement>(null);
   useEffect(() => {
     const element=header.current; if(!element) return;
@@ -75,20 +75,19 @@ export function AppHeader({
           </p>
   </>;
   return (
-    <header ref={header} className="sticky top-0 z-30 border-b bg-card">
-      <div className="grid min-h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-0.5 px-4 py-1.5 sm:px-5">
-        <div className="col-span-2 flex min-w-0 flex-wrap items-center gap-x-5 gap-y-1 sm:col-span-1">
-          <div className="flex min-w-0 flex-wrap items-center gap-2">
-            <h1 id="app-page-title" className="min-w-0 break-words text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
-              {title}
-            </h1>
-            {page.status&&<LimitedPreviewBadge/>}
-            <PageHelp key={activePage} page={activePage} label={page.label} />
-          </div>
-          {phone?<details className="header-contact"><summary className="min-h-11 cursor-pointer py-3 text-xs">About &amp; contact</summary><div className="header-contact-content">
-{contact}</div></details>:contact}
-        </div>
-        {phone?<details className="header-settings"><summary className="min-h-11 cursor-pointer py-3 text-xs">Settings · {selectedPersona}</summary><div className="header-settings-content">{preferences}</div></details>:preferences}
+    <header ref={header} className="app-top-header sticky top-0 z-30 border-b bg-card">
+      <div className="calm-header-row">
+        <div className="calm-brand"><h1 id="app-page-title">{title}</h1>{page.status&&<LimitedPreviewBadge/>}<PageHelp key={activePage} page={activePage} label={page.label}/></div>
+        {onNavigate&&<nav aria-label="Main navigation" className="calm-main-nav">
+          {([{label:'Overview',page:'home'},{label:'Plan',page:'planning-overview'},{label:'Evidence',page:'workforce'}] as const).map(item=><button key={item.page} type="button" aria-current={activePage===item.page?'page':undefined} onClick={()=>onNavigate(item.page)}>{item.label}</button>)}
+        </nav>}
+        <details className="calm-header-menu"><summary>About this project</summary><div className="calm-header-popover">
+          <h2 className="font-semibold">Workforce planning by Ed Om</h2>
+          <p className="my-2 text-sm">An independently developed portfolio project, built with AI assistance. Explore workforce evidence and compare explicit planning assumptions.</p>
+          <p className="my-2 text-sm">Workforce data is synthetic. Public reference data has separate sources and dates. Calculations are tested against defined contracts; scenario outputs are conditional, not verified business outcomes.</p>
+          {contact}
+        </div></details>
+        <details className="header-settings calm-header-menu"><summary>Settings</summary><div className="calm-header-popover">{preferences}<p className="mt-3 text-xs text-muted-foreground">Plans are stored in this browser. Use the saved-work controls to review storage status and manage local work.</p></div></details>
       </div>
       {children}
     </header>

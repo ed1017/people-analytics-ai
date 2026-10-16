@@ -8,6 +8,7 @@ import type { HeadcountTrendPoint } from '@/lib/types';
 import { isVerifiedDashboardScope } from '@/lib/dashboard-scope';
 import type {CheckedHomeProjection} from '@/lib/home-projection-selection';
 import styles from './home-chat-shell.module.css';
+import {swpDemoPrompt} from '@/lib/swp-demo';
 
 export const planningQuestions = [
   'Do we have the people for our growth plan?',
@@ -83,7 +84,7 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
       <ul className={styles.kpiRow} aria-label="Recorded workforce indicators">
         <li><span>Recruiting hires</span><b>{current&&recruitingKpi?.asOf===snapshotDate ? recruitingKpi.hires.toLocaleString() : 'Unavailable'}</b><small>Company-wide · monthly</small></li>
         <li><span>Voluntary turnover YTD</span><b>{known(current?.voluntary_turnover_ytd_pct) ? format(current.voluntary_turnover_ytd_pct)+'%' : 'Unavailable'}</b><small>Source-reported · not annualized</small></li>
-        <li><span>Sentiment</span><b>Unavailable</b><small>Eligible survey evidence needed</small></li>
+        <li><span>Current headcount</span><b>{known(headcount) ? format(headcount) : 'Unavailable'}</b><small>People · verified scope</small></li>
         <li><span>Labor cost</span><b>{known(current?.labor_cost_usd) ? welcomeCurrency(current.labor_cost_usd).compact : 'Unavailable'}</b><small>Cost period unspecified</small></li>
       </ul>
       <details className={styles.evidenceDetails}><summary>Sources and exact cost · {checked?"Conditional projection":projectionStatus==="checking"?"Checking projection":projectionStatus?"Projection unavailable":"Projection not configured"}</summary>
@@ -103,8 +104,10 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
 
 export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, disabled = false, composer, trend = [], recruitingKpi}: HomeChatWelcomeProps) {
   return <section aria-label="Plan your workforce" className={styles.welcome}>
-    <h2>Plan the workforce you’ll need<br className={styles.titleBreak}/> as AI changes the work</h2>
+    <h2>Plan the workforce your business needs</h2>
     <p className={styles.subtitle}>Start with a decision. Explore the evidence, compare assumptions, and build your plan.</p>
+    <div className={styles.entryActions}><button type="button" disabled={disabled} onClick={()=>onQuestion(swpDemoPrompt)}>Start the 3-minute demo</button><a href="?page=workforce">Explore the full app</a></div>
+    <p className={styles.demoNote}>A fictional service-growth decision: edit assumptions, compare options, save a plan and review its target. No AI call required.</p>
     <HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi}/>
     <h3>What decision are you facing?</h3>
     <div className={styles.questions}>

@@ -135,7 +135,7 @@ export function AppSidebar({
         aria-label="Workforce navigation"
         className="space-y-1"
       >
-        {[{page:'home' as AppPage,label:'Plan home'},...planningJourney].map(item=>{
+        {[{page:'home' as AppPage,label:'Overview'},...planningJourney].map(item=>{
           const Icon=pageIcons[item.page];
           const active=activePage===item.page||(item.page==='planning-overview'&&activePage==='workforce-planning');
           return <Button key={item.page} type="button" data-nav-destination={item.page} aria-label={item.label} title={item.label} aria-current={active?'page':undefined} variant={active?'secondary':'ghost'} onClick={()=>onPageChange(item.page)} className={`h-auto min-h-11 w-full gap-3 px-3 py-2 text-sm ${navCollapsed?'justify-center':'justify-start'}`}>
