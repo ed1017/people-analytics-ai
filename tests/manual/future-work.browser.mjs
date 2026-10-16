@@ -14,6 +14,8 @@ try {for(const width of [1440,390]){
  const review=async()=>p.getByRole('button',{name:'Review handoff to Scenarios',exact:true}).click();
  const use=()=>p.getByRole('button',{name:'Use reviewed example in Scenarios',exact:true});
  await p.goto(origin+'/?page=future-of-work',{timeout:90000});await begin();
+ if(process.env.FUTURE_OUTPUT_DIR)await p.screenshot({path:process.env.FUTURE_OUTPUT_DIR+'/future-summary-'+width+'.png',fullPage:true});
+ await p.getByText('Adjust assumptions',{exact:true}).click();
  await p.getByRole('slider',{name:'Adoption slider',exact:true}).focus();await p.keyboard.press('ArrowRight');assert.equal(await p.getByRole('textbox',{name:'Adoption',exact:true}).inputValue(),'51');
  await p.getByRole('textbox',{name:'Adoption',exact:true}).fill('');assert.equal(await p.getByRole('button',{name:'Review handoff to Scenarios',exact:true}).isDisabled(),true);await p.getByRole('textbox',{name:'Adoption',exact:true}).fill('50');
  assert.match(await p.getByLabel('Task time results',{exact:true}).innerText(),/64 hours/);

@@ -1,0 +1,38 @@
+"use client";
+import {useState} from 'react';
+import {guidedWorkloadResult} from '@/lib/guided-workload';
+import {SwpDemoInputs} from './swp-demo-inputs';
+import {GuidedWorkloadSummary} from './guided-workload-summary';
+import {SwpOutcomeChart} from './swp-outcome-chart';
+import {compareSwpDemo,guidedOptionEffort,swpEnd} from '@/lib/swp-demo';
+import type {BundleDraft} from '@/lib/home-bundle-reconciliation';
+import type {BundleEditPreview} from '@/lib/home-bundle-chat-edit';
+const button='min-h-11 rounded border px-3 py-2 text-sm disabled:opacity-50';
+const money=(n:number|null|undefined)=>n==null?'Cost unknown':'$'+n.toLocaleString('en-US');
+type Comparison=Awaited<ReturnType<typeof compareSwpDemo>>;
+export function SimpleSwpDemo({reviewing,draft,comparison,edit,selection,disabled,editingDisabled,pending,onSelect,onEdit,onAccept,onCancel,onCalculate,onPrepare,onPrimaryChange,alreadySaved}:{reviewing:boolean;draft:BundleDraft;comparison:Comparison|null;edit:BundleEditPreview|null;selection:string|null;disabled:boolean;editingDisabled:boolean;pending:boolean;onSelect:(id:string)=>void;onEdit:(value:BundleEditPreview)=>void;onAccept:()=>void;onCancel:()=>void;onCalculate:()=>void;onPrepare:()=>void;onPrimaryChange:(request:string)=>void;alreadySaved:boolean}){
+ const [valid,setValid]=useState(true),[formVersion,setFormVersion]=useState(0);
+ const workload=guidedWorkloadResult(draft.inputs),n=(v:number|null|undefined)=>!valid||v==null?'Unknown':v.toLocaleString('en-US',{maximumFractionDigits:2});
+ const demand=workload?.workloadHours!=null&&workload.productiveHoursInHorizon?workload.workloadHours/workload.productiveHoursInHorizon:null,supply=workload?.qualifiedAllocatedFte??null,gap=workload?.additionalFte;
+ const date=(value:string)=>Number.isFinite(Date.parse(value))?new Date(value+'T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'}):'Unknown';
+ const maximum=Math.max(demand??0,supply??0,1);
+ const options=comparison?.options??[],feasible=options.filter(o=>o.candidate.status==='met'),primary=(feasible.length?feasible:options).slice(0,2),other=options.filter(o=>!primary.includes(o));
+ const option=(o:Comparison['options'][number])=>{const e=guidedOptionEffort(o);return <label key={o.id} className="simple-demo-option"><span className="flex min-h-11 items-center gap-2"><input type="radio" name="swp-option" checked={selection===o.id} disabled={disabled||!valid||o.candidate.status!=='met'} onChange={()=>onSelect(o.id)}/><strong>{o.candidate.mix.buy===0?'Develop and move your team':o.candidate.mix.build+o.candidate.mix.move===0?'Hire the roles':'Mix hiring and development'}</strong></span><p>{o.candidate.mix.build} develop · {o.candidate.mix.move} move · {o.candidate.mix.buy} hire</p><p><strong>{money(o.candidate.cash.complete)}</strong> · ready {o.candidate.metrics?.fullCoverageDate?date(o.candidate.metrics.fullCoverageDate):'date unknown'}</p><p className="text-xs">{o.candidate.status==='met'?'Within entered staffing and budget limits.':'Outside entered limits.'} {e?`Uncovered work: ${e.shortfallHours.toLocaleString()} hours over this period.`:'Workload coverage unknown.'}</p></label>};
+ return <div className="simple-demo space-y-3">
+ <ol aria-label="Demo steps" className="flex flex-wrap gap-4 text-xs text-muted-foreground"><li aria-current={!comparison&&!reviewing?'step':undefined}>1 Understand the gap</li><li aria-current={comparison&&!reviewing?'step':undefined}>2 Compare options</li><li aria-current={reviewing?'step':undefined}>3 Save and review</li></ol>
+ {!reviewing&&<><header><p className="text-xs text-muted-foreground">Demo · fictional data · {draft.inputs.scope.population.value} · {date(draft.inputs.scope.startMonth.value!+'-01')}–{date(swpEnd(draft))}</p><h2 className="mt-1 text-xl font-semibold">How can we cover the capacity gap?</h2><p className="text-sm">{valid?`${n(gap)} FTE of additional capacity needed within a ${money(draft.inputs.budget?.amount.value)} budget.`:'Review the incomplete inputs below.'}</p></header>
+ <div aria-label="Capacity gap" className="simple-capacity-gap"><div className="flex justify-between gap-3 text-sm"><span>Work needs <strong>{n(demand)} FTE</strong></span><span>Qualified capacity <strong>{n(supply)} FTE</strong></span><span>Gap <strong>{n(gap)} FTE</strong></span></div><div aria-hidden="true" className="capacity-gap-track"><span style={{width:`${(Math.min(valid?(supply??0):0,demand??0))/maximum*100}%`}}/><i style={{width:`${Math.max(0,valid?(demand??0)-(supply??0):0)/maximum*100}%`}}/></div></div>
+
+ {pending&&<p role="status">Updating your choices…</p>}
+ {comparison?.evaluation.context.status==='needs-inputs'&&<p role="status">{comparison.evaluation.context.missing.map(m=>m.reason).join(' ')}</p>}
+ {!!primary.length&&<fieldset disabled={disabled}><legend className="sr-only">Choose a staffing option</legend><div className="simple-demo-options">{primary.map(option)}</div></fieldset>}
+ {!pending&&!comparison&&!edit&&<button className={button+' bg-primary text-primary-foreground'} onClick={onCalculate} disabled={disabled||!valid}>Compare staffing options</button>}
+ {!reviewing&&comparison&&<button className={button+' bg-primary text-primary-foreground'} disabled={disabled||!valid||!selection||alreadySaved} onClick={onPrepare}>{alreadySaved?'This choice is already saved':'Review selected Action Plan'}</button>}
+ <p className="text-xs text-muted-foreground">Example assumptions, not an approved plan. Readiness and staff release still need validation.</p>
+ <p className="text-xs text-muted-foreground">Prefilled example: {n(draft.inputs.guidedWorkload?.existingPeople.value)} analysts today · {n(draft.inputs.guidedWorkload?.allocationPct.value)}% time available · {n(draft.inputs.guidedWorkload?.skillCoveragePct.value)}% qualified share.</p>
+ <details><summary className="min-h-11 cursor-pointer py-2 text-sm">Adjust assumptions</summary><SwpDemoInputs key={formVersion} draft={draft} disabled={editingDisabled||!!edit} onReview={onEdit} onPrimaryChange={onPrimaryChange} onValidity={setValid}/></details>
+ {edit&&<section aria-label="Review scenario changes" className="rounded border p-3 text-sm"><h3 className="font-semibold">Review your changes</h3>{edit.changes.map(c=><p key={c.field}>{c.field}: {String(c.before.value??'Unknown')} → {String(c.after.value??'Unknown')}</p>)}<div className="mt-2 flex gap-2"><button className={button} disabled={disabled} onClick={()=>{onAccept();setFormVersion(v=>v+1);}}>Use changes in this draft</button><button className={button} disabled={disabled} onClick={onCancel}>Cancel changes</button></div></section>}
+ <details><summary className="min-h-11 cursor-pointer py-2 text-sm">All options, calculations and assumptions</summary><div className="space-y-3">{other.map(option)}<GuidedWorkloadSummary draft={draft}/>{comparison&&<SwpOutcomeChart draft={draft} options={options}/>}<p className="text-xs">Cost and readiness assumptions can be edited above. Internal pools are distinct; developing people does not add headcount. End-date role coverage may leave earlier workload uncovered. Partial readiness months are excluded.</p><dl className="grid grid-cols-2 gap-2 text-xs">{Object.entries(draft.inputs.capacity?.input??{}).filter(([,v])=>v!=='').map(([key,value])=><div key={key}><dt>{key.replace(/([A-Z])/g,' $1')}</dt><dd>{value}</dd></div>)}</dl></div></details>
+ </>}
+ </div>;
+}
