@@ -69,3 +69,13 @@ test('read_evidence returns all normalized historical rows with no model or live
  const output=JSON.parse(runtime.contexts[1].find(item=>item.type==='function_call_output').output);
  assert.deepEqual(output.map(s=>[s.id,s.id==='A1'?s.facts.monthly.length:s.facts.rows.length]),[['W1',9],['A1',9],['R1',9],['S1',1],['T4',8]]);
 });
+
+test('explicit endpoints override YTD shorthand across every observed historical type',()=>{
+ for(const query of ['January through June 2026 YTD','YTD through June 2026','YTD through June','YTD as of 2026-06-30','Jan\u2013Jun 2026 YTD']){
+  const pack=buildHomePack(inputs(),'All workforce',query);
+  for(const id of ['W1','R1','A1','S1','T4']){
+   const s=source(pack,id),rows=id==='A1'?s.facts.monthly:s.facts.rows;
+   assert.equal(rows.length,id==='S1'?1:6,id+' '+query);
+  }
+ }
+});
