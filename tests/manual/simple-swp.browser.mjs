@@ -12,6 +12,15 @@ try { for(const width of [1440,390]) {
  const heading=page.getByRole('heading',{name:'How can we cover the capacity gap?',exact:true});await heading.waitFor();
  const compare=page.getByRole('button',{name:'Compare staffing options',exact:true});await compare.waitFor();
  if(process.env.WORKLOAD_OUTPUT_DIR)await page.screenshot({path:process.env.WORKLOAD_OUTPUT_DIR+'/initial-'+width+'.png',fullPage:true});
+ if(width===390){
+  assert.ok((await heading.boundingBox()).y<250,'demo begins near compact header');
+  assert.equal(await page.getByRole('button',{name:'Open navigation',exact:true}).isVisible(),false);
+  const menu=page.getByRole('button',{name:'Menu',exact:true});await menu.click();
+  assert.equal(await page.getByRole('button',{name:'Open navigation',exact:true}).isVisible(),true);
+  assert.equal(await page.getByText('Workspace controls and saved plans',{exact:true}).isVisible(),true);
+  await page.keyboard.press('Escape');assert.equal(await menu.getAttribute('aria-expanded'),'false');assert.equal(await menu.evaluate(e=>e===document.activeElement),true);
+ }
+ assert.equal(await page.locator('.demo-stepper [aria-current="step"]').innerText(),'1 Understand the gap');
  const initialBox=await compare.boundingBox();assert.ok(initialBox.y+initialBox.height<=(width===390?844:900),'primary action in first viewport');
  assert.match(await page.getByLabel('Capacity gap',{exact:true}).innerText(),/8 FTE[\s\S]*3 FTE[\s\S]*5 FTE/);
  assert.equal(await page.getByRole('textbox',{name:'Monthly service requests',exact:true}).isVisible(),false);
@@ -19,7 +28,7 @@ try { for(const width of [1440,390]) {
  await page.getByRole('button',{name:'Ask about this',exact:true}).click();
  const composer=page.locator('textarea:visible').first();await composer.fill('Keep this unsent draft');
  await page.getByRole('button',{name:'Close chat',exact:true}).click();await page.getByRole('button',{name:'Ask about this',exact:true}).click();assert.equal(await composer.inputValue(),'Keep this unsent draft');await page.getByRole('button',{name:'Close chat',exact:true}).click();
- await compare.click();await page.getByRole('radio').first().waitFor();
+ await compare.click();await page.getByRole('radio').first().waitFor();assert.equal(await page.locator('.demo-stepper [aria-current="step"]').innerText(),'2 Compare options');
  await page.getByText('Adjust assumptions',{exact:true}).click();
  const volume=page.getByRole('textbox',{name:'Monthly service requests',exact:true}),budget=page.getByRole('textbox',{name:'Budget for this plan',exact:true});
  await budget.fill('0');await volume.fill('1120');
@@ -27,6 +36,13 @@ try { for(const width of [1440,390]) {
  await budget.fill('500000');await page.getByRole('radio').first().waitFor();
  await page.waitForFunction(()=>!document.body.innerText.includes('Updating your choices.'));
  assert.match(await page.getByLabel('Capacity gap',{exact:true}).innerText(),/Gap 4 FTE/);
+ if(width===390){
+  await page.getByRole('button',{name:'Menu',exact:true}).click();await page.getByRole('navigation',{name:'Main navigation',exact:true}).getByRole('button',{name:'Evidence',exact:true}).click();
+  await page.getByRole('button',{name:'Open Workforce AI',exact:true}).waitFor();
+  assert.equal(await page.getByRole('button',{name:'Menu',exact:true}).isVisible(),false,'ordinary navigation stays expanded away from demo');
+  await page.getByRole('navigation',{name:'Main navigation',exact:true}).getByRole('button',{name:'Overview',exact:true}).click();await heading.waitFor();
+  assert.equal(await volume.inputValue(),'1120','navigation preserves assumptions');assert.equal(await page.getByRole('button',{name:'Menu',exact:true}).getAttribute('aria-expanded'),'false');
+ }
  await page.getByText('Edit detailed assumptions',{exact:true}).click();
  await page.getByRole('spinbutton',{name:'Total training effort (staff hours)',exact:true}).fill('90');
  await page.getByRole('button',{name:'Review input changes',exact:true}).click();await page.getByRole('button',{name:'Use changes in this draft',exact:true}).click();
@@ -36,7 +52,7 @@ try { for(const width of [1440,390]) {
  for(const radio of await page.getByRole('radio').all())if(await radio.isEnabled()){await radio.check();break;}
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'horizontal overflow');
  if(process.env.WORKLOAD_OUTPUT_DIR)await page.screenshot({path:process.env.WORKLOAD_OUTPUT_DIR+'/workload-compare-'+width+'.png',fullPage:true});
- await page.getByRole('button',{name:'Review selected Action Plan',exact:true}).click();await page.getByRole('button',{name:'Save reviewed plan and goal',exact:true}).click();await page.getByRole('heading',{name:'Reopen and track',exact:true}).waitFor();
+ await page.getByRole('button',{name:'Review selected Action Plan',exact:true}).click();assert.equal(await page.locator('.demo-stepper [aria-current="step"]').innerText(),'3 Save and review');await page.getByRole('button',{name:'Save reviewed plan and goal',exact:true}).click();await page.getByRole('heading',{name:'Reopen and track',exact:true}).waitFor();
  await page.reload();await heading.waitFor();await page.getByText('Adjust assumptions',{exact:true}).click();assert.equal(await volume.inputValue(),'1120');
  await page.getByRole('button',{name:'Review target and tracking',exact:true}).click();await page.getByRole('heading',{name:'Track your plan',exact:true}).waitFor();assert.match(await page.getByRole('region',{name:'Track',exact:true}).innerText(),/4 roles/);
  if(process.env.WORKLOAD_OUTPUT_DIR)await page.screenshot({path:process.env.WORKLOAD_OUTPUT_DIR+'/workload-track-'+width+'.png',fullPage:true});

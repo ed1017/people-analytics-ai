@@ -1,6 +1,6 @@
 "use client";
 import {LimitedPreviewBadge} from "@/components/limited-preview-badge";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {WorkspacePaletteControl} from "@/components/workspace-palette-control";
 import { PageHelp } from "@/components/page-help";
 
@@ -28,6 +28,18 @@ export function AppHeader({
   onPersonaChange,
 }: AppHeaderProps) {
   const header = useRef<HTMLElement>(null);
+  const menuButton=useRef<HTMLButtonElement>(null);
+  const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- Navigation dismisses the mobile disclosure without resetting its mounted controls.
+  useEffect(()=>{setMobileMenuOpen(false);},[activePage]);
+  useEffect(()=>{
+    if(!mobileMenuOpen)return;
+    const dismiss=(event:KeyboardEvent)=>{
+      if(event.key!=='Escape'||event.defaultPrevented||(event.target as Element)?.closest('dialog[open], [popover]:popover-open'))return;
+      setMobileMenuOpen(false);menuButton.current?.focus();
+    };
+    document.addEventListener('keydown',dismiss);return()=>document.removeEventListener('keydown',dismiss);
+  },[mobileMenuOpen]);
   useEffect(() => {
     const element=header.current; if(!element) return;
     const measure=()=>document.documentElement.style.setProperty("--app-header-height",`${element.getBoundingClientRect().height}px`);
@@ -75,9 +87,11 @@ export function AppHeader({
           </p>
   </>;
   return (
-    <header ref={header} className="app-top-header sticky top-0 z-30 border-b bg-card">
+    <header ref={header} data-mobile-menu-open={mobileMenuOpen?"":undefined} className="app-top-header sticky top-0 z-30 border-b bg-card">
       <div className="calm-header-row">
         <div className="calm-brand"><h1 id="app-page-title">{title}</h1>{page.status&&<LimitedPreviewBadge/>}<PageHelp key={activePage} page={activePage} label={page.label}/></div>
+        <button ref={menuButton} type="button" className="guided-mobile-menu-button" aria-expanded={mobileMenuOpen} aria-controls="guided-header-navigation guided-header-context guided-workspace-controls" onClick={()=>setMobileMenuOpen(open=>!open)}>{mobileMenuOpen?'Close menu':'Menu'}</button>
+        <div id="guided-header-navigation" className="guided-header-navigation">
         {onNavigate&&<nav aria-label="Main navigation" className="calm-main-nav">
           {([{label:'Overview',page:'home'},{label:'Plan',page:'planning-overview'},{label:'Evidence',page:'workforce'}] as const).map(item=><button key={item.page} type="button" aria-current={activePage===item.page?'page':undefined} onClick={()=>onNavigate(item.page)}>{item.label}</button>)}
         </nav>}
@@ -88,8 +102,9 @@ export function AppHeader({
           {contact}
         </div></details>
         <details className="header-settings calm-header-menu"><summary>Settings</summary><div className="calm-header-popover">{preferences}<p className="mt-3 text-xs text-muted-foreground">Plans are stored in this browser. Use the saved-work controls to review storage status and manage local work.</p></div></details>
+        </div>
       </div>
-      {children}
+      <div id="guided-header-context" className="guided-header-context">{children}</div>
     </header>
   );
 }
