@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share application source.
+import {HOME_HISTORY_ROWS,selectHomeHistory} from './home-history-selection.ts';
 const months=['january','february','march','april','may','june','july','august','september','october','november','december'];
 const monthPattern=/\b(january|february|march|april|may|june|july|august|september|october|november|december)\b(?:\s+(?:of\s+)?(20\d{2}))?|\b(20\d{2})-(0[1-9]|1[0-2])\b/gi;
 type Row = Record<string,unknown>;
@@ -5,7 +7,7 @@ const validMonth=(value:unknown):value is string=>typeof value==='string'&&/^20\
 const fields=['total_exits','voluntary_exits','involuntary_exits','regrettable_exits','monthly_turnover_pct','monthly_voluntary_turnover_pct'];
 export function normalizeHomeMonthlyRows(raw:unknown,limit=3):Row[] {
   if(!Array.isArray(raw))return [];
-  return raw.slice(0,Math.min(12,Math.max(0,limit))).filter(row=>row&&typeof row==='object'&&validMonth(row.month)).map(row=>Object.fromEntries([
+  return raw.slice(0,Math.min(HOME_HISTORY_ROWS,Math.max(0,limit))).filter(row=>row&&typeof row==='object'&&validMonth(row.month)).map(row=>Object.fromEntries([
     ['month',row.month],...fields.map(field=>{const value=row[field],rate=field.endsWith('_pct');return [field,row.suppressed!==true&&typeof value==='number'&&Number.isFinite(value)&&value>=0&&(rate?value<=100:Number.isSafeInteger(value))?value:null];}),
   ]));
 }
@@ -16,17 +18,8 @@ export function selectHomeMonthlyRows(raw:unknown,question:string,asOf?:string):
   // The current turn's explicit periods take priority over earlier ambiguous questions.
   // Keep every requested comparison month before adding automatic comparison rows.
   const turns=question.split('\n\nCURRENT USER TURN:\n');
-  const current=turns.at(-1)??'';
-  // A monthly YTD request is a calendar window, not three sampled observations
-  // and not a request to derive monthly values from a cumulative YTD rate.
-  if(/\b(?:by month|month by month|monthly)\b/i.test(current)&&/\b(?:ytd|year.to.date)\b/i.test(current)){
-    const cutoff=typeof asOf==='string'&&/^20\d{2}-\d{2}-\d{2}$/.test(asOf)?asOf:undefined;
-    if(!cutoff)return [];
-    const years=[...new Set(current.match(/\b20\d{2}\b/g)??[])];
-    if(years.length>1)return [];
-    const year=years[0]??cutoff.slice(0,4);
-    return normalizeHomeMonthlyRows(rows.filter(row=>row.month.startsWith(year+'-')&&row.month<=cutoff),12);
-  }
+  const window=selectHomeHistory(rows,'month',question,asOf);
+  if(window!==null)return normalizeHomeMonthlyRows(window,HOME_HISTORY_ROWS);
   const turnIndex=turns.findLastIndex(turn=>[...turn.matchAll(monthPattern)].length>0);
   if(turnIndex<0)return normalizeHomeMonthlyRows(rows.slice(-3));
   const turn=turns[turnIndex],mentions=[...turn.matchAll(monthPattern)];
