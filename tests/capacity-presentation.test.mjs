@@ -62,11 +62,11 @@ test('compact worksheet keeps saved controls outside its form and monthly detail
  assert.equal(nodes(form).filter(node=>node.type===view.Saved).length,0);assert.equal(all.filter(node=>node.type===view.Saved).length,1);
  const html=renderToStaticMarkup(view.tree);assert.match(html,/Work needed and time available/);assert.match(html,/Saved scenarios stay in this browser/);assert.match(html,/Without a goal, calculations are session-only/);
  assert.equal((html.match(/<form/g)||[]).length,1);assert.doesNotMatch(html,/<details[^>]*open/);
- const dateGroup=all.find(node=>node.type==='div'&&nodes(node).filter(child=>child.type==='input').length===2&&nodes(node).some(child=>child.props['aria-label']==='Opening date (month end)'));
+ const dateGroup=all.find(node=>node.type==='div'&&React.Children.toArray(node.props.children).some(child=>child.props?.label==='Planning months')&&nodes(node).some(child=>child.props['aria-label']==='Opening date (month end)'));
  assert.match(dateGroup.props.className,/grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,11rem\),1fr\)\)\]/);
 });
 test('compact worksheet retains edit and confirmation capture invalidation',()=>{
- for(const [label,value,clearScope] of [['Work items each month','900',false],['Work to plan','Other work',true],['Cost per contracted FTE per month (USD, optional)','0',false],['Cost per contracted FTE per month (USD, optional)','',false]]){
+ for(const [label,value,clearScope] of [['Planning months','2',false],['Work items each month','900',false],['Work to plan','Other work',true],['Cost per contracted FTE per month (USD, optional)','0',false],['Cost per contracted FTE per month (USD, optional)','',false]]){
   const view=worksheet(),input=nodes(view.tree).find(node=>node.props['aria-label']===label||node.props.label===label);input.props.onChange(input.props.label?value:{target:{value}});
   const next=view.updated();assert.equal(next.result,null);assert.equal(next.cost,null);assert.equal(next.capture,null);assert.equal(next.draft.confirmed,false);assert.deepEqual(next.scope,clearScope?null:scope);
  }

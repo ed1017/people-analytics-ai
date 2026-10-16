@@ -41,3 +41,16 @@ test('local preview recalculates independently without confirming or mutating a 
  for(const patch of [{hires:'0.5'},{exits:'11'},{allocation:'100.0001'},{volume:'abc'},{fte:'11'}])assert.equal(capacityPreview({...draft,...patch}).result,null);
  assert.deepEqual(draft,before);assert.equal(draft.confirmed,false);assert.throws(()=>adapter.capacitySpec(draft),/Confirm/);
 });
+
+
+test('planning duration links both controls within the existing 1-6 month contract',()=>{
+ let value='3';const spec=sliders.capacitySliders.months;
+ const controls=()=>nodes(PlanningAssumptionSlider({label:'Planning months',value,spec,onChange:next=>value=next})).filter(n=>n.type==='input');
+ controls()[1].props.onChange({target:{value:'6'}});assert.equal(controls()[0].props.value,6);
+ controls()[0].props.onChange({target:{value:'2'}});assert.equal(controls()[1].props.value,'2');
+ for(const raw of ['','0','7','2.5']){controls()[1].props.onChange({target:{value:raw}});assert.equal(controls()[1].props.value,raw);assert.equal(sliders.sliderNumber(value,spec),null);}
+ controls()[0].props.onKeyDown({key:'Home',preventDefault(){}});assert.equal(value,'1');
+ controls()[0].props.onKeyDown({key:'End',preventDefault(){}});assert.equal(value,'6');
+ assert.equal(capacityPreview({...draft,months:'2'}).result.points.length,2);
+ assert.equal(draft.confirmed,false);
+});
