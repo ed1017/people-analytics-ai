@@ -1,20 +1,19 @@
-.shell { color: var(--foreground); }
-.shell :global(.home-workspace) { gap: 16px; padding: 14px 18px; }
-.shell :global(.home-workspace[data-overview-starting]) > section { border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 12px 16px; }
+.shell { color: var(--foreground); container-type: inline-size; }
+.shell :global(.home-workspace) { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 12px 18px; max-width: 1240px; margin-inline: auto; }
+.shell :global(.home-workspace[data-overview-starting]) > section { border: 0; background: transparent; padding: 0; }
 .shell :global(.home-workspace[data-overview-starting]) > section > header { gap: 4px 12px; }
 .shell :global(.home-workspace[data-overview-starting]) > section > header > h2 { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .shell :global(.home-workspace[data-overview-starting]) :global(.home-composer-dock) { box-shadow: none; border-radius: 10px; }
-.shell :global(.home-workspace[data-overview-starting]) :global(.home-composer-dock) textarea { min-height: 80px; }
-@media (min-width: 1100px) { .shell :global(.home-workspace) { grid-template-columns: minmax(0, 1fr) minmax(250px, 290px); } }
-@media (max-width: 1099px) { .shell :global(.home-workspace) { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 600px) { .shell :global(.home-workspace) { padding: 12px; gap: 16px; } .shell :global(.home-workspace[data-overview-starting]) > section { padding: 12px; } }
+.shell :global(.home-workspace[data-overview-starting]) :global(.home-composer-dock) textarea { min-height: auto; }
+@container (min-width: 1080px) { .shell :global(.home-workspace) { grid-template-columns: minmax(0, 1fr) 260px; } }
+@media (max-width: 600px) { .shell :global(.home-workspace) { padding: 12px; gap: 16px; } .shell :global(.home-workspace[data-overview-starting]) > section { padding: 0; } }
 .welcome { padding: 6px 2px 2px; }
-.welcome h2 { max-width: 660px; font-size: clamp(25px, 2.6vw, 36px); line-height: 1.17; font-weight: 650; letter-spacing: -.035em; }
+.welcome h2 { max-width: 660px; font-size: clamp(25px, 2.4vw, 32px); line-height: 1.17; font-weight: 650; letter-spacing: -.035em; }
 .subtitle { margin-top: 8px; max-width: 580px; color: var(--muted-foreground); font-size: 14px; line-height: 1.6; }
 .scope { margin-top: 6px; color: var(--muted-foreground); font-size: 11px; line-height: 1.5; }
 .welcome h3 { margin: 16px 0 8px; font-size: 16px; font-weight: 600; }
 .questions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.questions button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 64px; border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; text-align: left; font-size: 16px; line-height: 1.45; background: var(--card); }
+.questions button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; text-align: left; font-size: 14px; line-height: 1.45; background: var(--card); }
 /* Short icon/label groups center; a label that fills the available width wraps left.
    Intrinsic sizing keeps this stable at every width without measuring rendered text. */
 .questions button > span { flex: 0 1 auto; min-width: 0; overflow-wrap: anywhere; }
@@ -36,7 +35,7 @@
 .planPane button { display: block; min-height: 36px; margin-top: 2px; padding: 6px 0; text-align: left; font-size: 13px; color: var(--muted-foreground); }
 .planPane button:hover { color: var(--foreground); text-decoration: underline; }
 .planPane button:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
-@media (max-width: 600px) { .welcome h2 { font-size: 27px; } .questions { gap: 8px; } .questions button { min-height: 80px; padding: 8px; } .titleBreak { display: none; } }
+@media (max-width: 600px) { .welcome h2 { font-size: 27px; } .questions { gap: 8px; } .questions button { min-height: 44px; padding: 8px; } .titleBreak { display: none; } }
 @media (max-width: 360px) { .questions { grid-template-columns: 1fr; } }
 
 .historySummary { margin-top: 10px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 9px; background: var(--card); }
@@ -60,15 +59,67 @@
 .projectionLine { stroke: var(--primary); stroke-width: 2; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
 
 .kpiRow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; list-style:none; padding:8px 0; margin:0; border-top:1px solid var(--border); }
-.kpiRow li { min-width:0; }
+.kpiRow li { min-width:0; padding: 8px; border: 0; border-radius: 0; background: transparent; }
 .kpiRow span,.kpiRow b,.kpiRow small { display:block; overflow-wrap:anywhere; }
 .kpiRow span { font-size:12px; color:var(--muted-foreground); }
-.kpiRow b { font-size:18px; margin:3px 0; }
+.kpiRow b { font-size:22px; margin:5px 0; font-variant-numeric: tabular-nums; color:var(--foreground); }
 .kpiRow small { font-size:11px; color:var(--muted-foreground); line-height:1.4; }
 @media (max-width:640px) { .kpiRow { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 
-/* Keep full monetary values readable without shrinking text or clipping digits. */
-.historySummary { container-type: inline-size; }
-.kpiRow b { white-space: nowrap; }
-@container (max-width: 50rem) { .kpiRow { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@container (max-width: 28rem) { .kpiRow { grid-template-columns: minmax(0, 1fr); } }
+/* Compact indicators retain exact values and source limits in native disclosures. */
+.historySummary { container-type: inline-size; padding: 10px 12px; background: var(--card); }
+.kpiRow b { white-space: normal; }
+@container (max-width: 38rem) { .kpiRow { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (max-width: 18rem) { .kpiRow { grid-template-columns: minmax(0, 1fr); } }
+.exactCost, .evidenceDetails { font-size: 12px; line-height: 1.5; color: var(--foreground); }
+.exactCost summary, .evidenceDetails summary { min-height: 32px; padding-block: 6px; cursor: pointer; font-weight: 550; }
+.exactCost p { overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.evidenceDetails p { margin: 6px 0; }
+.historyHeading strong { font-size: 30px; letter-spacing: -.03em; }
+.historyHeading .watch { padding: 4px 8px; border: 1px solid var(--border); border-radius: 20px; }
+.scope, .kpiRow span, .questions button { color: var(--foreground); }
+.historyFigure { padding-top: 4px; }
+.shell :global(.home-workspace[data-overview-starting]) :global(.home-composer-dock) { padding: 10px; border-color: var(--input); }
+.shell :global(.home-workspace[data-overview-starting]) :global(.home-composer-dock) textarea { padding: 10px 12px; }
+.shell :global(.home-workspace[data-overview-starting]) :global(.home-composer-dock) button[type="submit"] { min-height: 44px; }
+
+.exactCost summary:focus-visible, .evidenceDetails summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; border-radius: 3px; }
+
+.shell :global(.home-workspace[data-overview-starting]) > section > header { gap: 0 12px; }
+.shell :global(.home-workspace[data-overview-starting]) :global([aria-label="Home instructions"]) { flex-basis: 20rem; }
+.welcome h2 { max-width: none; font-size: clamp(25px, 2.2vw, 30px); }
+.titleBreak { display: none; }
+.subtitle { margin-top: 6px; max-width: none; line-height: 1.45; }
+
+/* The intro is a compact dashboard; secondary saved work expands in document flow. */
+.shell :global(.home-workspace[data-overview-starting]) { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.shell :global(.home-saved-plan-disclosure) > summary { min-height: 36px; padding-block: 8px; cursor: pointer; font-size: 13px; }
+.shell :global(.home-saved-plan-disclosure) > summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.historyHeading p { display: inline; margin-right: 8px; }
+.historyHeading strong { font-size: 24px; }
+.historySummary { padding: 6px 10px; }
+.historyFigure { margin-top: 2px; padding-top: 0; }
+.kpiRow { padding: 4px 0; }
+.kpiRow li { padding: 4px; }
+.kpiRow b { margin: 2px 0; }
+.evidenceDetails > summary { min-height: 28px; padding-block: 4px; }
+@container (min-width: 760px) {
+  .welcome { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; row-gap: 4px; }
+  .welcome > h2, .subtitle, .welcome > .historySummary { grid-column: 1 / -1; }
+  .welcome h2 { font-size: 26px; }
+  .subtitle { margin: 0; }
+  .welcome > h3 { grid-column: 1; grid-row: 4; margin: 6px 0 0; }
+  .questions { grid-column: 1; grid-row: 5; }
+  .composer { grid-column: 2; grid-row: 4 / 6; margin-top: 6px; }
+  .questions button { padding: 6px 8px; }
+}
+
+.shell :global(.home-workspace[data-overview-starting]) { padding-top: 8px; padding-bottom: 0; }
+.shell :global(.home-saved-plan-disclosure) { min-width: 0; }
+.shell :global(.home-saved-plan-disclosure) > summary { min-height: 44px; padding-block: 12px; }
+.shell :global(.home-saved-plan-disclosure[open]) { flex-basis: 100%; order: 3; }
+
+.kpiRow li { border: 1px solid var(--border); border-radius: 8px; text-align: center; }
+.shell :global(.home-workspace[data-overview-starting]) :global(.home-composer-dock) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 8px; }
+.shell :global(.home-workspace[data-overview-starting]) :global(.home-compose-actions) { margin-top: 0; }
+.shell :global(.home-workspace[data-overview-starting]) :global(.home-composer-dock) > p { grid-column: 1 / -1; }

@@ -769,3 +769,30 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
   outline: 2px solid var(--ring);
   outline-offset: 3px;
 }
+
+/* Keep secondary mobile preferences on the contact row; every control stays reachable. */
+@media (max-width: 767px), (max-width: 950px) and (max-height: 500px) {
+  .header-settings { grid-column: 2; grid-row: 2; min-width: 0; }
+  .header-settings[open] { grid-column: 1 / -1; grid-row: 4; }
+  .header-settings-content { display: grid; gap: .5rem; padding-bottom: .5rem; }
+  .header-settings:not([open]) .header-settings-content { display: none; }
+  .header-settings-content .header-preferences { grid-column: 1; grid-row: 1; justify-self: start; }
+  .header-settings-content #perspective-effect { grid-column: 1; text-align: left; }
+  .header-settings summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+}
+
+.global-workforce-filters[data-compact] .workforce-filter-disclosure { display: block; min-width: 0; }
+.global-workforce-filters[data-compact] .workforce-filter-disclosure > summary { display: list-item; }
+.global-workforce-filters[data-compact] .workforce-filter-fields { display: grid; gap: 8px; padding-block: 8px; }
+.global-workforce-filters[data-compact] .workforce-filter-disclosure:not([open]) > .workforce-filter-fields { display: none; }
+@media (min-width: 768px) {
+  .global-workforce-filters[data-compact] .workforce-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+  .global-workforce-filters[data-compact] .workforce-goal { flex: 1 1 30rem; }
+  .global-workforce-filters[data-compact] .workforce-filter-disclosure[open] { flex-basis: 100%; }
+  .global-workforce-filters[data-compact] .workforce-filter-fields { grid-template-columns: repeat(3, minmax(0,1fr)) auto; align-items: end; }
+  .global-workforce-filters[data-compact] .workforce-filter-fields label { display: block; }
+  .global-workforce-filters[data-compact] .workforce-filter-fields select { width: 100%; }
+}
+
+/* The initial composer is in document flow; it needs no extra dock reserve. */
+.app-home-composer .app-dashboard:has(.home-workspace[data-overview-starting]) { padding-bottom: 0; }

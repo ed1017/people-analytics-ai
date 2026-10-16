@@ -72,6 +72,9 @@ test('summary shows same-period projected hires/departures, transfers and qualif
   const render=patch=>renderToStaticMarkup(React.createElement(welcome.HomeHeadcountSummary,{...props,...patch}));
   const html=render({});
   assert.equal((html.match(/class="projection"/g)||[]).length,3);
+  const recordedY=html.match(/<circle[^>]*cy="([^"]+)"/)?.[1];
+  const projectedY=html.match(/<line[^>]*y1="([^"]+)"[^>]*class="projection"/)?.[1];
+  assert.ok(recordedY);assert.equal(projectedY,recordedY,'projection starts at the recorded opening height');
   const format=value=>value.toLocaleString(undefined,{maximumFractionDigits:2});
   const values=[...html.matchAll(/<dd>([^<]+)<\/dd>/g)].map(match=>match[1]);
   assert.deepEqual(values,[format(f.analysis.points.reduce((sum,row)=>sum+row.hires,0)),format(f.analysis.points.reduce((sum,row)=>sum+row.exits,0))]);

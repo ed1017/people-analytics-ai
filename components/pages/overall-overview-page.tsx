@@ -53,7 +53,7 @@ import {decisionStore,recordDecisionEvidence,useDecisionStorage} from "@/compone
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUp, RefreshCw, Info } from "lucide-react";
 import {queueHomeResponseReveal} from '@/components/home-response-reveal';
-import {useHomeComposerDock} from '@/components/use-home-composer-dock';
+import {useHomeComposerDock,resizeHomeComposer} from '@/components/use-home-composer-dock';
 import {HomeSolutionBundles} from '@/components/home-solution-bundles';
 import type {BundleDiscussion} from '@/components/home-bundle-plans';
 import {bundleInputKey} from '@/lib/home-bundle-reconciliation';
@@ -93,7 +93,7 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
   return { clarification:readHomeClarification(data.clarification??proposal?.question), findingFollowups:readHomeFindingFollowups(data.findingFollowups,data.answer,sources), answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal, diagnostic, diagnosticStage:useServer?'server' as const:'client' as const };
 }
 
-type WelcomeControls = {onQuestion: (question: string) => void; disabled: boolean; recruitingKpi:HomeRecruitingKpi|null};
+type WelcomeControls = {onQuestion: (question: string) => void; disabled: boolean; recruitingKpi:HomeRecruitingKpi|null;composer?:ReactNode};
 function WelcomeSlot({render, ...controls}: WelcomeControls & {render: (controls: WelcomeControls) => ReactNode}) { return render(controls); }
 
 const noActionSubscription=()=>()=>{};
@@ -214,6 +214,8 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   }
   function changeQuestion(value:string){setRecoveryConfirmation(null);setLocalAction(null);setInput(value)}
   const loaded = useRef("");
+  const overviewStarting=overviewEntry&&!messages.length&&!guidedExampleActive;
+  const welcomeComposer=overviewStarting&&!conversation.focusedIssue&&Boolean(renderWelcome);
   const composer = useRef<HTMLTextAreaElement>(null);
   const conversationViewport = useRef<HTMLDivElement>(null);
   const responseReveal=useRef<ReturnType<typeof queueHomeResponseReveal>|null>(null);
@@ -221,11 +223,11 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   const composerSlot=useRef<HTMLDivElement>(null),composerDock=useRef<HTMLDivElement>(null);
   useLayoutEffect(()=>{
     const node=composer.current;if(!node||!active)return;
-    const resize=()=>{node.style.height='auto';node.style.height=`${Math.min(320,Math.max(112,node.scrollHeight+2))}px`;};
+    const resize=()=>resizeHomeComposer(node,welcomeComposer);
     resize();let width=node.clientWidth;
     const observer=new ResizeObserver(()=>{if(node.clientWidth!==width){width=node.clientWidth;resize();}});
     observer.observe(node);return()=>observer.disconnect();
-  },[input,active]);
+  },[input,active,welcomeComposer]);
   const selectedCountry = new URLSearchParams(workforceQuery).get("country") ?? "all";
   const scopeIdentity = JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,persona]);
   useLayoutEffect(()=>{if(active&&conversationViewport.current)conversationViewport.current.scrollTop=0;},[active,scopeIdentity,workforceQuery]);
@@ -559,12 +561,32 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   const planDiscussions=solutionDiscussionPresentations(messages,solutions.state);
   const reviewPresentation=solutionReviewPresentation(solutions.state);
   const planReading=solutionConversationEnabled&&Boolean(reviewPresentation.recommended||reviewPresentation.alternatives.length||reviewPresentation.earlier.length);
-  const overviewStarting=overviewEntry&&!messages.length&&!guidedExampleActive;
-  useHomeComposerDock(active,composerSlot,composerDock,composer,planReading||overviewStarting);
+  useHomeComposerDock(active,composerSlot,composerDock,composer,planReading||overviewStarting,welcomeComposer);
   const activePlans=[...(reviewPresentation.recommended?[reviewPresentation.recommended]:[]),...reviewPresentation.alternatives];
   const followUpMessage=messages.findLast(message=>{const presentation=planDiscussions.get(message);return presentation&&(presentation.proposals.some(proposal=>activePlans.some(item=>item.id===proposal.id&&item.revision===proposal.revision))||solutions.state.currentCalculationKinds?.includes('required-staffing')&&message.content===solutions.state.turns.at(-1)?.text);});
   const followUp=followUpMessage?planDiscussions.get(followUpMessage):undefined;
   const followUpQuestions=activePlans.length||solutions.state.currentCalculationKinds?.includes('required-staffing')?solutions.state.questions.filter(question=>!(followUp?[followUp.discussion,followUp.furtherReading].join('\n'):messages.at(-1)?.content??'').replace(/\s+/g,' ').includes(question.replace(/\s+/g,' ').trim())):[];
+  const questionComposer=(
+    <form onSubmit={event => { event.preventDefault(); void send(); }} className="home-chat-form shrink-0">
+      {visibleScopeChoice && <div aria-label="Requested country scope" className="mb-3 text-sm"><p>{visibleScopeChoice.kind==="ambiguous" ? "Which country should this workforce snapshot use?" : visibleScopeChoice.kind==="unsupported" ? "That country scope is not fully supported. Choose an available country or keep the current scope; missing evidence stays unavailable." : "Use country-specific workforce evidence for this question?"}</p><div className="mt-2 flex flex-wrap gap-2">{visibleScopeChoice.options.map(option=><button key={option.value} type="button" onClick={()=>applyCountry(option)} className="min-h-11 rounded border border-primary px-3 py-2 font-semibold text-primary">Apply {option.label} and answer</button>)}<button type="button" onClick={()=>void send(visibleScopeChoice.message,false,true)} className="min-h-11 px-2 text-primary underline">Answer with current scope</button></div><p className="mt-1 text-xs text-muted-foreground">Only the workforce snapshot changes. Other filters stay selected; company-wide sources retain their scope.</p></div>}
+      {recoveredPlanNeedsConfirmation(input)&&<section aria-label="Confirm plan for recovered request" className="mb-3 space-y-2 rounded border p-3 text-sm">
+        <p>Your recovered request does not name a plan. Another tab may have changed the selection. Select the intended Action Plan tab, then confirm it here before sending.</p>
+        {recoveryPlanChoice?.goalId===conversation.activeGoalId&&<button type="button" className="min-h-11 rounded border px-3 py-2 font-medium" disabled={!conversation.saved||chatLoading||!planEditReady} onClick={confirmRecoveredPlan}>Use Action Plan #{recoveryPlanChoice.option} for this recovered request</button>}
+        {recoveryConfirmation?.request===input.trim()&&recoveryConfirmation.context===contextKey&&JSON.stringify(recoveryConfirmation.choice)===JSON.stringify(recoveryPlanChoice)&&<p role="status">Action Plan #{recoveryPlanChoice?.option} confirmed for this request. Press Send to create a new alternative.</p>}
+      </section>}
+      {pendingScope && <p role="status" className="mb-3 text-sm">Refreshing the selected workforce evidence before answering. Edit your question to cancel.</p>}
+      {localAction?.goalId===conversation.activeGoalId&&<p role="status" className="mb-3 text-sm">{localAction.notice}</p>}
+      <div ref={composerSlot} className="home-composer-slot"><div ref={composerDock} className="home-composer-dock rounded-t-2xl border bg-card p-3 shadow-lg">
+      {planEdit?.goalId===conversation.activeGoalId&&<p className="mb-1 text-xs font-medium">Editing Action Plan #{planEdit.option}. Send previews changes for your review.</p>}
+      <label htmlFor="overview-question" className="sr-only">Ask Workforce AI</label>
+      <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" value={input} onChange={event => changeQuestion(event.target.value)} rows={welcomeComposer?2:3}
+        placeholder="Ask your question or use a prompt. Compare proposed Action Plans, then refine your choice in chat." className="max-h-80 min-h-28 w-full resize-y rounded-lg border bg-background/40 p-3 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+      <div className="home-compose-actions mt-2 flex items-end justify-between gap-3">
+
+        <button data-guide-target="submit" type="submit" aria-label="Send overview question" disabled={(solutionConversationEnabled?!solutions.canSend:(!localCandidate&&!ready&&!(demoPlan&&planEditReady&&(structuredPlansEnabled&&structuredMode||bundleChatEditIntent(input).edit||localPlanDiscussion(input))))) || chatLoading || structuredPending || solutions.pending || !input.trim()} className="ms-auto flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{structuredPending?'Reviewing…':'Send'} <ArrowUp size={17} /></button></div>
+      </div></div>
+    </form>
+  );
   const conversationPanel=(
     <section hidden={messages.length===0&&!chatError&&!chatLoading} aria-label="Overview conversation" className="space-y-3">
       {/* Leaving Home does not start a new conversation or archive the visible reply. */}
@@ -600,6 +622,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       <header className="flex flex-wrap items-start justify-between gap-3">
         <h2 id="overall-overview-heading" className="text-2xl font-semibold leading-tight tracking-tight">Workforce AI</h2>
         <button type="button" onClick={resetHomeConversation} className="min-h-11 rounded px-2 text-xs font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Reset conversation</button>
+        {overviewStarting&&renderPlanPane&&<details className="home-saved-plan-disclosure"><summary>Saved plans</summary>{renderPlanPane(savedWork)}</details>}
         <HomeGettingStarted conversational={solutionConversationEnabled} active={active} ready={conversation.storageReady} autoOpen={!overviewEntry&&conversation.firstHomeVisit&&!conversation.input.trim()&&!conversation.issueEditor} busy={chatLoading||guidedExampleActive} dismissKey={JSON.stringify([instructionsDismissed,conversation.workspaceKey,guidedExampleActive])} onNavigate={onNavigate} onStartDemo={onStartDemo} status={
         <div className="ml-auto flex items-center gap-3 text-xs">
           <span className="text-muted-foreground">In development</span>
@@ -643,7 +666,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!guidedExampleActive&&<SwpGuidedJourney discussionKey={JSON.stringify([workforceScope,workforceQuery,persona])} conversation={conversation} active={active} busy={chatLoading||solutions.pending||solutions.saving} commandRef={swpCommand} modelContextRef={swpModelContext} demandControlRef={demandControl} demandReviewRef={demandReview} demandContextRef={demandContext} sources={sources??[]} onNavigate={onNavigate}/>}
-    {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&(renderWelcome ? <WelcomeSlot render={renderWelcome} recruitingKpi={recruitingKpi} onQuestion={submitStarterQuestion} disabled={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)}/> : overviewEntry?<details><summary className="min-h-11 cursor-pointer py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Ideas for your first question</summary>{startingGuide}</details>:startingGuide)}
+    {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&(renderWelcome ? <WelcomeSlot render={renderWelcome} composer={welcomeComposer?questionComposer:undefined} recruitingKpi={recruitingKpi} onQuestion={submitStarterQuestion} disabled={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)}/> : overviewEntry?<details><summary className="min-h-11 cursor-pointer py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Ideas for your first question</summary>{startingGuide}</details>:startingGuide)}
     {!solutionConversationEnabled&&showFallbackPin&&!chatLoading&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
     {!activePinnedGoal&&conversationPanel}
 
@@ -659,28 +682,10 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
     {candidateNotice&&<p role="status">{candidateNotice}</p>}
     </div>
 
-    <form onSubmit={event => { event.preventDefault(); void send(); }} className="home-chat-form shrink-0">
-      {visibleScopeChoice && <div aria-label="Requested country scope" className="mb-3 text-sm"><p>{visibleScopeChoice.kind==="ambiguous" ? "Which country should this workforce snapshot use?" : visibleScopeChoice.kind==="unsupported" ? "That country scope is not fully supported. Choose an available country or keep the current scope; missing evidence stays unavailable." : "Use country-specific workforce evidence for this question?"}</p><div className="mt-2 flex flex-wrap gap-2">{visibleScopeChoice.options.map(option=><button key={option.value} type="button" onClick={()=>applyCountry(option)} className="min-h-11 rounded border border-primary px-3 py-2 font-semibold text-primary">Apply {option.label} and answer</button>)}<button type="button" onClick={()=>void send(visibleScopeChoice.message,false,true)} className="min-h-11 px-2 text-primary underline">Answer with current scope</button></div><p className="mt-1 text-xs text-muted-foreground">Only the workforce snapshot changes. Other filters stay selected; company-wide sources retain their scope.</p></div>}
-      {recoveredPlanNeedsConfirmation(input)&&<section aria-label="Confirm plan for recovered request" className="mb-3 space-y-2 rounded border p-3 text-sm">
-        <p>Your recovered request does not name a plan. Another tab may have changed the selection. Select the intended Action Plan tab, then confirm it here before sending.</p>
-        {recoveryPlanChoice?.goalId===conversation.activeGoalId&&<button type="button" className="min-h-11 rounded border px-3 py-2 font-medium" disabled={!conversation.saved||chatLoading||!planEditReady} onClick={confirmRecoveredPlan}>Use Action Plan #{recoveryPlanChoice.option} for this recovered request</button>}
-        {recoveryConfirmation?.request===input.trim()&&recoveryConfirmation.context===contextKey&&JSON.stringify(recoveryConfirmation.choice)===JSON.stringify(recoveryPlanChoice)&&<p role="status">Action Plan #{recoveryPlanChoice?.option} confirmed for this request. Press Send to create a new alternative.</p>}
-      </section>}
-      {pendingScope && <p role="status" className="mb-3 text-sm">Refreshing the selected workforce evidence before answering. Edit your question to cancel.</p>}
-      {localAction?.goalId===conversation.activeGoalId&&<p role="status" className="mb-3 text-sm">{localAction.notice}</p>}
-      <div ref={composerSlot} className="home-composer-slot"><div ref={composerDock} className="home-composer-dock rounded-t-2xl border bg-card p-3 shadow-lg">
-      {planEdit?.goalId===conversation.activeGoalId&&<p className="mb-1 text-xs font-medium">Editing Action Plan #{planEdit.option}. Send previews changes for your review.</p>}
-      <label htmlFor="overview-question" className="sr-only">Ask Workforce AI</label>
-      <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" aria-describedby="overview-question-context-tip" value={input} onChange={event => changeQuestion(event.target.value)} rows={3}
-        placeholder="Ask your question or use a prompt. Compare proposed Action Plans, then refine your choice in chat." className="max-h-80 min-h-28 w-full resize-y rounded-lg border bg-background/40 p-3 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
-      <div className="home-compose-actions mt-2 flex items-end justify-between gap-3">
-        <p hidden={showCandidatePin||Boolean(activePinnedGoal)} id="overview-question-context-tip" className="min-w-0 text-sm leading-relaxed text-muted-foreground">Ask a question or follow up on an answer. To plan an action, include your desired outcome, timeline and constraints.</p>
-        <button data-guide-target="submit" type="submit" aria-label="Send overview question" disabled={(solutionConversationEnabled?!solutions.canSend:(!localCandidate&&!ready&&!(demoPlan&&planEditReady&&(structuredPlansEnabled&&structuredMode||bundleChatEditIntent(input).edit||localPlanDiscussion(input))))) || chatLoading || structuredPending || solutions.pending || !input.trim()} className="ms-auto flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{structuredPending?'Reviewing…':'Send'} <ArrowUp size={17} /></button></div>
-      </div></div>
-    </form>
+    {!welcomeComposer&&questionComposer}
       {!solutionConversationEnabled&&structuredPlansEnabled&&recoveryPlanChoice?.goalId===conversation.activeGoalId&&<label className="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={structuredMode} onChange={event=>{selectedPlanForChat.current?.discard();setStructuredMode(event.target.checked);}}/>Discuss saved plans · turn off to use existing chat controls</label>}
       {actionOffers.length>0&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2 text-sm">Option action suggestions</summary><section aria-label="Workforce option actions" className="mt-3 space-y-2"><p className="text-sm text-muted-foreground">{input.trim()?'Your draft is kept. Clear it to choose an option action.':'Click to open the local action. Saving, calculation and search remain explicit.'}</p><div className="flex flex-wrap gap-2">{actionOffers.map(offer=><button key={offer.id} type="button" disabled={suggestionPending||chatLoading||Boolean(input.trim())} onClick={()=>submitOption(offer.id)} className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{offer.label}</button>)}</div></section></details>}
   </section>
-    {renderPlanPane ? renderPlanPane(savedWork) : savedWork}
+    {renderPlanPane ? !overviewStarting&&renderPlanPane(savedWork) : savedWork}
   </div></HomeGuidedActionsContext.Provider>;
 }
