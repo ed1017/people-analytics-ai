@@ -128,7 +128,6 @@
    Pane width also guards against enlarging a narrow workspace beside other UI. */
 @media (min-height: 900px) {
   @container home-intro (min-width: 1300px) {
-    .shell :global(.home-workspace[data-overview-starting]) { max-width: 1440px; }
     .welcome { padding-top: 12px; column-gap: 24px; row-gap: 8px; }
     .welcome h2 { font-size: 32px; }
     .subtitle { font-size: 16px; line-height: 1.5; }
@@ -149,5 +148,43 @@
     /* The shared autosizer writes an inline compact minimum. Only this roomy
        intro overrides that floor; its content growth and resize handle remain. */
     .shell :global(.home-workspace[data-overview-starting]) :global(.home-composer-dock) textarea { min-height: 176px !important; padding: 14px 16px; }
+  }
+}
+
+/* Fill the desktop canvas using the measured app header. Flex layout subtracts
+   the actual Home toolbar height; intrinsic minimums allow overflow when open
+   disclosures, short viewports or larger text need more room. */
+@media (min-width: 1024px) {
+  .shell :global(.home-workspace[data-overview-starting]) {
+    max-width: none;
+    min-height: calc(100dvh - var(--app-header-height, 124px));
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding-bottom: 12px;
+  }
+  .shell :global(.home-workspace[data-overview-starting]) > section { flex: 1; }
+  .shell :global(.home-workspace[data-overview-starting]) :global([aria-label="Home chat workspace"]) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .welcome { flex: 1; }
+  @container home-intro (min-width: 760px) {
+    .welcome { grid-template-rows: auto auto auto auto minmax(min-content, 1fr); }
+    .welcome > h3 { align-self: start; }
+    .welcome .composer,
+    .welcome :global(.home-chat-form),
+    .welcome :global(.home-composer-slot) { display: flex; flex-direction: column; }
+    .welcome :global(.home-chat-form),
+    .welcome :global(.home-composer-slot),
+    .welcome :global(.home-composer-dock) { flex: 1; }
+    /* Stretch only the starting intro input; the conversation autosizer remains
+       unchanged. Content can still grow beyond the viewport's minimum height. */
+    .welcome :global(.home-composer-dock) textarea {
+      align-self: stretch;
+      height: auto !important;
+      max-height: none !important;
+    }
   }
 }
