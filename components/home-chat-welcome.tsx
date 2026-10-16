@@ -60,8 +60,8 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
   const maximum = Math.max(1, checked?.analysis.inputs.opening ?? 0, ...history.map(point => point.headcount), ...projected.map(point=>point.headcount));
   const startMonth = monthIndex(first?.snapshot_date ?? snapshotDate);
   const monthSpan = horizonEnd ? monthIndex(horizonEnd) - startMonth : 0;
-  const plot = history.map(point => ({...point, x: monthSpan ? 40 + 432 * (monthIndex(point.snapshot_date) - startMonth) / monthSpan : 256, y: 100 - 80 * point.headcount / maximum}));
-  const futurePlot = checked ? [{month:snapshotDate,headcount:checked.analysis.inputs.opening},...projected].map(point=>({...point,x:40+432*(monthIndex(point.month)-startMonth)/Math.max(1,monthSpan),y:100-80*point.headcount/maximum})) : [];
+  const plot = history.map(point => ({...point, x: monthSpan ? 40 + 432 * (monthIndex(point.snapshot_date) - startMonth) / monthSpan : 256, y: 76 - 64 * point.headcount / maximum}));
+  const futurePlot = checked ? [{month:snapshotDate,headcount:checked.analysis.inputs.opening},...projected].map(point=>({...point,x:40+432*(monthIndex(point.month)-startMonth)/Math.max(1,monthSpan),y:76-64*point.headcount/maximum})) : [];
   return <section aria-label="Workforce snapshot" className={styles.historySummary}>
       <div className={styles.historyHeading}>
         <div><p>Current headcount</p><strong>{known(headcount) ? headcount.toLocaleString() : loading ? 'Updating…' : 'Unavailable'}</strong><span>{known(headcount) ? ' people · ' + snapshotDate : ' · Verified snapshot needed'}</span></div>
@@ -81,9 +81,9 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         <p>{current ? 'Labor cost as of '+snapshotDate+'; selected workforce scope. Cost period unspecified; no monthly or annual basis is inferred.' : 'Verified scoped cost needed.'}</p>
       </details>
       {(first && last || checked) ? <figure className={styles.historyFigure}>
-        <svg viewBox="0 0 488 120" role="img" aria-label={'Recorded synthetic headcount history in people. ' + scopeLabel + '. ' + history.map(point => point.snapshot_date + ': ' + point.headcount).join('; ') + '. Missing months are not connected. ' + (checked ? 'Conditional projection: '+projected.map(point=>point.month+': '+format(point.headcount)).join('; ') : 'No projection.')}>
-          <line x1="40" y1="100" x2="472" y2="100" className={styles.chartAxis}/>
-          <text x="34" y="24" textAnchor="end">{maximum.toLocaleString()}</text><text x="34" y="104" textAnchor="end">0</text>
+        <svg viewBox="0 0 488 88" role="img" aria-label={'Recorded synthetic headcount history in people. ' + scopeLabel + '. ' + history.map(point => point.snapshot_date + ': ' + point.headcount).join('; ') + '. Missing months are not connected. ' + (checked ? 'Conditional projection: '+projected.map(point=>point.month+': '+format(point.headcount)).join('; ') : 'No projection.')}>
+          <line x1="40" y1="76" x2="472" y2="76" className={styles.chartAxis}/>
+          <text x="34" y="16" textAnchor="end">{maximum.toLocaleString()}</text><text x="34" y="80" textAnchor="end">0</text>
           {plot.map((point, index) => <g key={point.snapshot_date}>
             {index > 0 && monthIndex(point.snapshot_date) === monthIndex(plot[index - 1].snapshot_date) + 1 && <line x1={plot[index - 1].x} y1={plot[index - 1].y} x2={point.x} y2={point.y} className={styles.historyLine}/>}
             <circle cx={point.x} cy={point.y} r="3" className={styles.historyPoint}/>
@@ -103,7 +103,6 @@ export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loadi
   return <section aria-label="Plan your workforce" className={styles.welcome}>
     <h2>Plan the workforce you’ll need<br className={styles.titleBreak}/> as AI changes the work</h2>
     <p className={styles.subtitle}>Start with a decision. Explore the evidence, compare assumptions, and build your plan.</p>
-    <HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi}/>
     <h3>What decision are you facing?</h3>
     <div className={styles.questions}>
       {planningQuestions.map((question, index) => {
@@ -114,6 +113,7 @@ export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loadi
       })}
     </div>
     {composer && <div className={styles.composer}>{composer}</div>}
+    <HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi}/>
   </section>;
 }
 

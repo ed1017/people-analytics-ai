@@ -1,8 +1,13 @@
 "use client";
 import {PHONE_LAYOUT_QUERY} from './use-phone-layout';
 import {useLayoutEffect,type RefObject} from 'react';
+/** Reset the measured height so clearing or reflowing a draft can shrink it again. */
+export function resizeHomeComposer(node:Pick<HTMLTextAreaElement,'style'|'scrollHeight'>,compactInitial:boolean){
+ node.style.height='auto';
+ node.style.height=`${Math.min(320,Math.max(compactInitial?72:112,node.scrollHeight+2))}px`;
+}
 /** Keep the Home input/Send group aligned with its content column and visible viewport. */
-export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement|null>,dock:RefObject<HTMLDivElement|null>,input:RefObject<HTMLTextAreaElement|null>,documentFlow=false){
+export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement|null>,dock:RefObject<HTMLDivElement|null>,input:RefObject<HTMLTextAreaElement|null>,documentFlow=false,compactInitial=false){
  useLayoutEffect(()=>{
   const anchor=slot.current,element=dock.current,textarea=input.current,root=anchor?.closest<HTMLElement>('.home-workspace');
   if(!active||!anchor||!element||!textarea||!root)return;
@@ -15,7 +20,7 @@ export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement
     document.documentElement.classList.remove('home-keyboard-open');
     for(const property of ['left','width','bottom','max-height'])element.style.removeProperty(property);
     textarea.style.setProperty('max-height',`${Math.max(96,Math.min(240,height*.4))}px`);
-    textarea.style.setProperty('min-height','96px');
+    textarea.style.setProperty('min-height',compactInitial?'72px':'96px');
     root.style.setProperty('--home-composer-height','0px');page.style.setProperty('--home-composer-height','0px');
     root.style.removeProperty('--home-reading-height');
     return;
@@ -50,5 +55,5 @@ export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement
   measure();const observer=new ResizeObserver(measure);observer.observe(anchor);observer.observe(element);observer.observe(root);
   window.addEventListener('resize',measure);window.addEventListener('scroll',measure,{passive:true});viewport?.addEventListener('resize',measure);viewport?.addEventListener('scroll',measure);page.addEventListener('focusin',keepFocusVisible);
   return()=>{document.documentElement.classList.remove('home-keyboard-open');observer.disconnect();window.removeEventListener('resize',measure);window.removeEventListener('scroll',measure);viewport?.removeEventListener('resize',measure);viewport?.removeEventListener('scroll',measure);page.removeEventListener('focusin',keepFocusVisible);page.style.removeProperty('--home-composer-height');};
- },[active,slot,dock,input,documentFlow]);
+ },[active,slot,dock,input,documentFlow,compactInitial]);
 }

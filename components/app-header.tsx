@@ -40,6 +40,28 @@ export function AppHeader({
       ? "Assess & Evaluate"
       : page.label;
 
+  const preferences=<>
+        <div className="header-preferences col-start-2 row-start-2 flex min-w-0 items-center justify-self-end gap-2 sm:row-start-1">
+          <span className="hidden text-xs font-medium text-muted-foreground md:inline">
+            Perspective
+          </span>
+          <select
+            value={selectedPersona}
+            onChange={(event) => onPersonaChange(event.target.value as Persona)}
+            className="h-9 min-w-28 cursor-pointer rounded-md border border-input bg-card px-3 pr-8 text-sm font-medium shadow-sm outline-none"
+            aria-label="Select persona"
+            aria-describedby="perspective-effect"
+          >
+            <option value="HR">HR</option>
+            <option value="Leader">Leader</option>
+            <option value="Finance">Finance</option>
+          </select>
+          <WorkspacePaletteControl/>
+        </div>
+        <p id="perspective-effect" className="col-span-2 text-right text-xs leading-4 text-muted-foreground">
+          {selectedPersona} perspective shapes AI explanations. Figures and calculations stay the same.
+        </p>
+  </>;
   const contact=<>
           <p className="flex flex-wrap items-center gap-x-1.5 text-xs leading-5 text-muted-foreground sm:text-sm">
             <span>By Ed Om</span>
@@ -66,26 +88,7 @@ export function AppHeader({
           {phone?<details className="header-contact"><summary className="min-h-11 cursor-pointer py-3 text-xs">About &amp; contact</summary><div className="header-contact-content">
 {contact}</div></details>:contact}
         </div>
-        <div className="header-preferences col-start-2 row-start-2 flex min-w-0 items-center justify-self-end gap-2 sm:row-start-1">
-          <span className="hidden text-xs font-medium text-muted-foreground md:inline">
-            Perspective
-          </span>
-          <select
-            value={selectedPersona}
-            onChange={(event) => onPersonaChange(event.target.value as Persona)}
-            className="h-9 min-w-28 cursor-pointer rounded-md border border-input bg-card px-3 pr-8 text-sm font-medium shadow-sm outline-none"
-            aria-label="Select persona"
-            aria-describedby="perspective-effect"
-          >
-            <option value="HR">HR</option>
-            <option value="Leader">Leader</option>
-            <option value="Finance">Finance</option>
-          </select>
-          <WorkspacePaletteControl/>
-        </div>
-        <p id="perspective-effect" className="col-span-2 text-right text-xs leading-4 text-muted-foreground">
-          {selectedPersona} perspective shapes AI explanations. Figures and calculations stay the same.
-        </p>
+        {phone?<details className="header-settings"><summary className="min-h-11 cursor-pointer py-3 text-xs">Settings · {selectedPersona}</summary><div className="header-settings-content">{preferences}</div></details>:preferences}
       </div>
       {children}
     </header>

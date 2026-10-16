@@ -162,3 +162,12 @@ test('compact cost keeps its exact source amount and period limits available', (
   assert.match(html, /survey respondents are a separate population/);
   assert.doesNotMatch(render({}), /<summary>Exact amount<\/summary>/);
 });
+
+
+test('initial question composer precedes the visible workforce snapshot without duplication', () => {
+  const html=render({composer:React.createElement('form',null,React.createElement('textarea',{'aria-label':'Existing composer'}))});
+  assert.equal((html.match(/<form/g)??[]).length,1);
+  assert.ok(html.indexOf('Existing composer')<html.indexOf('aria-label="Workforce snapshot"'));
+  assert.match(html,/Recorded synthetic workforce history/);
+  assert.match(html,/Cost period unspecified/);
+});
