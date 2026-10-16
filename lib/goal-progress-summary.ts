@@ -1,5 +1,5 @@
 // @ts-expect-error Native Node tests share TypeScript source.
-import {applicablePlanComponents} from './guided-plan-summary.ts';
+import {applicablePlanComponents,conditionalRoleEvidence} from './guided-plan-summary.ts';
 /** Read-only presentation of existing progress and exact saved-plan records. */
 // @ts-expect-error Native Node tests share TypeScript source.
 import {buildGoalProgressContext,readGoalProgressLedger,HEADCOUNT_DEFINITION,type GoalProgressContext,type GoalScope,type ProgressObservation,type ProgressEvent} from './goal-progress.ts';
@@ -17,7 +17,7 @@ export function readProgressSnapshot(raw:unknown,goalId:string,asOf:string){
  const baseline=context.assessment.baseline&&comparable(context.assessment.baseline.observation)?context.assessment.baseline.observation:null;
  const latest=context.assessment.latestComparable?.observation??(!baseline?observations.filter(e=>!superseded.has(e.id)&&comparable(e.data)).sort((a,b)=>a.data.period.end.localeCompare(b.data.period.end)||Date.parse(a.data.capturedAt)-Date.parse(b.data.capturedAt)).at(-1)?.data:null);
  const stale=!!latest&&!!m&&(Date.parse(asOf)-Date.parse(latest.period.end))/86400000>m.maxAgeDays;
- const nextAction=!m?'Define a metric, scope, dated baseline and target in chat.':!supported?'This metric has no supported measurement summary; review its definition in chat.':!baseline?'Record and review a dated baseline in chat.':!latest||latest.period.end===baseline.period.end?'Record a later dated measurement in chat, then review and confirm it.':stale?'Record a fresh dated measurement in chat, then review and confirm it.':context.assessment.latestReceivedId!==context.assessment.latestComparable?.id?'Review the latest report’s date, scope and quality in chat.':'Review the dated result and the proposed plan steps before acting.';
+ const nextAction=!m?'Define a metric, scope, dated baseline and target in chat.':m.metric==='additional-role-coverage'&&m.unit==='roles'&&m.lineageId==='swp-demo-conditional-coverage'?conditionalRoleEvidence:!supported?'This metric has no supported measurement summary; review its definition in chat.':!baseline?'Record and review a dated baseline in chat.':!latest||latest.period.end===baseline.period.end?'Record a later dated measurement in chat, then review and confirm it.':stale?'Record a fresh dated measurement in chat, then review and confirm it.':context.assessment.latestReceivedId!==context.assessment.latestComparable?.id?'Review the latest report’s date, scope and quality in chat.':'Review the dated result and the proposed plan steps before acting.';
  return {context,baseline,latest:latest??null,stale,supported,hasObservations:observations.length>0,nextAction};
 }
 export type ProgressSnapshot=ReturnType<typeof readProgressSnapshot>;
