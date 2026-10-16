@@ -1,5 +1,6 @@
 'use client';
 import {useState} from 'react';
+import {CarriedPlanningGoal} from './carried-planning-goal';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
 import {datasetSession} from '@/lib/dataset-client.mjs';
 import {capacityContext,capacityBinding,monthlyCapacityField,readCapacityBucket,saveCapacityScenario,openCapacityScenario,compareSavedCapacity,type CapacityBucket,type CapacityContext} from '@/lib/swp-capacity-store';
@@ -50,7 +51,7 @@ export function CapacityAssumptionChanges({left,right}:{left:{name:string;draft:
  </details>;
 }
 export function CapacitySavedScenarios(){
- const storage=useDecisionStorage(),{goalKey,capacitySession:session,setCapacitySession:setSession}=usePlanningSession();
+ const storage=useDecisionStorage(),{goalKey,capacitySession:session,setCapacitySession:setSession,carriedGoalActions}=usePlanningSession();
  const name=session.saveName??'';
  const setName=(saveName:string)=>setSession({...session,saveName});
  const [leftId,setLeftId]=useState(''),[rightId,setRightId]=useState(''),[notice,setNotice]=useState(''),[actionError,setActionError]=useState('');
@@ -91,7 +92,7 @@ export function CapacitySavedScenarios(){
  const options=bucket.entries.map(e=><option key={e.record.id} value={e.record.id}>{e.record.name}</option>);
  return <section aria-label="Saved capacity scenarios" className="space-y-3 border-t pt-4">
   <h3 className="font-semibold">Save &amp; compare</h3>
-  {!goalId?<p className="text-sm text-muted-foreground">Session only. Select an existing goal to save scenarios; no goal is created automatically.</p>:<>
+  {!goalId?<><p className="text-sm text-muted-foreground">Session only. Choose a goal to save scenarios; no goal is created automatically.</p>{carriedGoalActions&&<CarriedPlanningGoal key={carriedGoalActions.businessGoal} actions={carriedGoalActions}/>}</>:<>
    <div className="flex flex-wrap items-end gap-2">
     <label className="min-w-0 flex-1 text-sm">Scenario name<input aria-label="Capacity scenario name" maxLength={160} value={name} onChange={e=>{setName(e.target.value);setActionError('');}} className={`${control} mt-1 w-full`} placeholder="e.g. Base workload"/></label>
     <button type="button" disabled={disabled} onClick={save} className={`${control} disabled:opacity-50`}>Save scenario</button>

@@ -1,0 +1,23 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import Module,{createRequire} from 'node:module';
+import React from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import ts from 'typescript';
+import * as display from '../lib/display-format.ts';
+import * as scope from '../lib/talent-evidence-scope.ts';
+import {skillsData} from './fixtures/skills-evidence.mjs';
+const require=createRequire(import.meta.url),filename=path.resolve('components/pages/skills-page.tsx'),mod=new Module(filename);
+mod.filename=filename;
+mod.require=id=>id==='@/lib/display-format'?display:id==='@/lib/talent-evidence-scope'?scope:id==='@/components/evidence-scope-notice'?{EvidenceScopeNotice:()=>null}:id==='@/components/skills-evidence-handoff-panel'?{SkillsEvidenceHandoffPanel:()=>null}:require(id);
+mod._compile(ts.transpileModule(fs.readFileSync(filename,'utf8'),{fileName:filename,compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,filename);
+const render=patch=>renderToStaticMarkup(React.createElement(mod.exports.SkillsPage,{skillsData,skillsLoading:false,skillsError:null,maxSkillDemand:674,selectedContext:{},activeHandoff:null,onCarryToPlanning(){},onClearHandoff(){},onOpenPlanning(){},...patch})).replaceAll('<!-- -->','');
+test('Skills gap cards retain source order, attainment and its denominator together outside details',()=>{
+ const html=render({}),list=html.match(/<ol aria-label="Largest apparent proficiency gaps"[\s\S]*?<\/ol>/)[0],rows=list.match(/<li[\s\S]*?<\/li>/g);
+ assert.equal(rows.length,skillsData.largest_gaps.length);
+ rows.forEach((row,i)=>{const source=skillsData.largest_gaps[i],primary=row.split('<details')[0];assert.ok(primary.includes(source.skill_name));assert.ok(primary.includes(source.requirement_met_pct.toFixed(1)+'%'));assert.ok(primary.includes(source.employees_in_roles_requiring_skill.toLocaleString()));assert.ok(primary.includes(source.employees_meeting_requirement.toLocaleString()+' employees'));assert.match(primary,/Population for this percentage/);assert.ok(row.includes(source.skill_category));assert.ok(row.includes(source.avg_required_proficiency.toFixed(2)));assert.ok(row.includes(source.avg_observed_proficiency.toFixed(2)));assert.doesNotMatch(row,/<details[^>]*open/);});
+ assert.doesNotMatch(list,/<table|min-w-\[/);
+});
+test('Skills cards withhold stale response during loading or error',()=>{for(const patch of [{skillsLoading:true},{skillsError:'Unavailable'}])assert.doesNotMatch(render(patch),/<ol aria-label="Largest apparent proficiency gaps"/);});

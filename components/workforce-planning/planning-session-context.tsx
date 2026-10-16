@@ -21,7 +21,13 @@ export function useCapacitySessionState(goalKey:string) {
   const capacityKey=JSON.stringify([datasetToken,goalKey]);
   const [sessions,setSessions]=useState<Record<string,CapacitySession>>({});
   return {datasetToken,capacitySession:sessions[capacityKey]??emptyCapacitySession,
-    setCapacitySession:(session:CapacitySession)=>setSessions(current=>({...current,[capacityKey]:session}))};
+    setCapacitySession:(session:CapacitySession)=>setSessions(current=>({...current,[capacityKey]:session})),
+    // An explicit goal choice carries this worksheet, never a saved scenario binding.
+    setCapacitySessionForGoal:(id:string,session:CapacitySession)=>{
+      const targetKey=JSON.stringify([datasetToken,goalKey.slice(0,goalKey.indexOf(':')+1)+id]);
+      const next=structuredClone(session);next.capture=null;delete next.openedScenario;
+      setSessions(current=>({...current,[targetKey]:next}));
+    }};
 }
 
 export type PlanningWorkspaceView =
@@ -31,7 +37,9 @@ export type PlanningWorkspaceView =
   | "respond"
   | "execute";
 
+export type CarriedPlanningGoalActions={businessGoal:string;goals:{id:string;statement:string}[];disabled:boolean;onCreate:(statement:string)=>void;onSelect:(id:string)=>void};
 type PlanningSessionContextValue = {
+  carriedGoalActions?:CarriedPlanningGoalActions;
   goalKey: string;
   capacitySession:CapacitySession;
   setCapacitySession:(session:CapacitySession)=>void;
@@ -47,11 +55,13 @@ export function PlanningSessionProvider({
   goalKey,
   onTalentEvidenceContextChange,
   capacityState,
+  carriedGoalActions,
 }: {
   children: ReactNode;
   goalKey: string;
   onTalentEvidenceContextChange: (snapshot: string | null) => void;
   capacityState?:ReturnType<typeof useCapacitySessionState>;
+  carriedGoalActions?:CarriedPlanningGoalActions;
 }) {
   const [activeView, setActiveView] =
     useState<PlanningWorkspaceView>("overview");
@@ -61,6 +71,7 @@ export function PlanningSessionProvider({
   return (
     <PlanningSessionContext.Provider
       value={{
+        carriedGoalActions,
         goalKey,
         capacitySession:currentCapacityState.capacitySession,
         setCapacitySession:currentCapacityState.setCapacitySession,

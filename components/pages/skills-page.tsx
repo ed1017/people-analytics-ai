@@ -1,6 +1,5 @@
 "use client";
 
-import {EvidenceTableRegion} from '@/components/evidence-table-region';
 import {
   formatPercent,
   formatWholeCount,
@@ -143,7 +142,7 @@ export function SkillsPage({
 
                 <div className="mt-6 evidence-panel-grid grid gap-6">
                   <div className="rounded-lg border p-4">
-                    <div className="mb-4 flex items-start justify-between gap-4">
+                    <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
                       <div>
                         <h3 className="font-semibold">
                           Largest Apparent Proficiency Gaps
@@ -160,71 +159,24 @@ export function SkillsPage({
                       </span>
                     </div>
 
-                    <EvidenceTableRegion label="Largest apparent proficiency gaps">
-                      <table className="w-full min-w-[760px] text-sm">
-                        <thead>
-                          <tr className="border-b text-left text-xs text-muted-foreground">
-                            <th className="pb-3 pr-4">
-                              Skill
-                            </th>
-                            <th className="pb-3 pr-4">
-                              Category
-                            </th>
-                            <th className="pb-3 pr-4 text-right">
-                              Required
-                            </th>
-                            <th className="pb-3 pr-4 text-right">
-                              Observed
-                            </th>
-                            <th className="pb-3 pr-4 text-right">
-                              Meet %
-                            </th>
-                            <th className="pb-3 text-right">
-                              Below / Missing
-                            </th>
-                          </tr>
-                        </thead>
-
-                        <tbody>
-                          {skillsData.largest_gaps.map(
-                            (row) => (
-                              <tr
-                                key={String(
-                                  row.skill_id
-                                )}
-                                className="border-b last:border-0"
-                              >
-                                <td className="py-3 pr-4 font-medium">
-                                  {row.skill_name}
-                                </td>
-                                <td className="py-3 pr-4 text-muted-foreground">
-                                  {row.skill_category}
-                                </td>
-                                <td className="py-3 pr-4 text-right tabular-nums">
-                                  {row.avg_required_proficiency.toFixed(
-                                    2
-                                  )}
-                                </td>
-                                <td className="py-3 pr-4 text-right tabular-nums">
-                                  {row.avg_observed_proficiency.toFixed(
-                                    2
-                                  )}
-                                </td>
-                                <td className="py-3 pr-4 text-right font-semibold tabular-nums">
-                                  {row.requirement_met_pct.toFixed(
-                                    1
-                                  )}
-                                  %
-                                </td>
-                                <td className="py-3 text-right tabular-nums">
-                                  {row.employees_below_or_missing_requirement.toLocaleString()}
-                                </td>
-                              </tr>
-                            )
-                          )}
-                        </tbody>
-                      </table>
-                    </EvidenceTableRegion>
+                    <ol aria-label="Largest apparent proficiency gaps" className="min-w-0 space-y-3">
+                      {skillsData.largest_gaps.map(row=><li key={String(row.skill_id)} className="min-w-0 rounded-lg border p-3 text-sm">
+                        <h4 className="break-words font-semibold">{row.skill_name}</h4>
+                        <dl className="mt-2 grid min-w-0 grid-cols-2 gap-3">
+                          <div className="min-w-0"><dt className="text-xs text-muted-foreground">Meeting requirement</dt><dd className="font-semibold tabular-nums">{row.requirement_met_pct.toFixed(1)}%</dd><dd className="text-xs">{row.employees_meeting_requirement.toLocaleString()} employees</dd></div>
+                          <div className="min-w-0"><dt className="text-xs text-muted-foreground">Employees in roles requiring skill</dt><dd className="font-semibold tabular-nums">{row.employees_in_roles_requiring_skill.toLocaleString()}</dd><dd className="text-xs">Population for this percentage</dd></div>
+                        </dl>
+                        <details className="mt-1"><summary className="min-h-11 cursor-pointer py-2 text-xs font-medium focus-visible:ring-2 focus-visible:ring-ring">Category and proficiency details</summary>
+                          <dl className="grid grid-cols-2 gap-2 text-xs">
+                            <div><dt>Category</dt><dd className="break-words">{row.skill_category}</dd></div>
+                            <div><dt>Below or missing requirement</dt><dd>{row.employees_below_or_missing_requirement.toLocaleString()} employees</dd></div>
+                            <div><dt>Average required proficiency</dt><dd>{row.avg_required_proficiency.toFixed(2)}</dd></div>
+                            <div><dt>Average observed proficiency</dt><dd>{row.avg_observed_proficiency.toFixed(2)}</dd></div>
+                            <div><dt>Employees with observed proficiency</dt><dd>{row.employees_with_observed_proficiency.toLocaleString()}</dd></div>
+                          </dl>
+                        </details>
+                      </li>)}
+                    </ol>
                   </div>
 
                   <div className="rounded-lg border p-4">
