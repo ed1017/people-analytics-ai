@@ -53,7 +53,7 @@ import {readSwpPlaybook} from './swp-reasoning-playbook.ts';
 export type SolutionModelOutput={items:unknown[];calls:{id:string;name:string;arguments:string}[];text:string;completed:boolean};
 export type SolutionReply={charts?:ChatEvidenceSeries[];requestId:string;answer:string;candidateIds:string[];analysisIds:string[];state:SolutionState;usage:{modelRounds:number;toolCalls:number};progressProposal?:ProgressEntryProposal;demandReview?:DemandReview};
 export type SolutionToolDiagnostic={round:number;name:string;status:'ok'|'feedback'|'aborted';elapsedMs:number};
-export type SolutionRuntime={requestTime?:Date;onToolResult?:(event:SolutionToolDiagnostic)=>void;staffingScenarioOnly?:boolean;grounding?:Awaited<ReturnType<typeof verifySolutionEvidence>>;complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal,capabilities:{progressEntryEnabled:boolean;requiredStaffingCalculation:boolean})=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date;natural?:{datasetToken:string};progress?:{enabled:boolean;datasetToken:string};demand?:{datasetToken:string;referenceContract?:boolean}};
+export type SolutionRuntime={maxModelRounds?:2;requestTime?:Date;onToolResult?:(event:SolutionToolDiagnostic)=>void;staffingScenarioOnly?:boolean;grounding?:Awaited<ReturnType<typeof verifySolutionEvidence>>;complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal,capabilities:{progressEntryEnabled:boolean;requiredStaffingCalculation:boolean})=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date;natural?:{datasetToken:string};progress?:{enabled:boolean;datasetToken:string};demand?:{datasetToken:string;referenceContract?:boolean}};
 function readFinal(text:string):SolutionFinal{
  if(!text||text.length>20000)throw new SolutionResponseError('answer_unavailable','The conversational answer is unavailable.');
  let value;
@@ -143,10 +143,11 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  let coFinalEligible=true;
  const presentationTools=new Set(['read_clock','read_evidence','read_plans','evaluate_candidate','revise_parameters']);
  let toolCalls=0,operations=0,projectionInput:Promise<ProjectionInputs>|undefined,final:SolutionFinal|undefined,rounds=0;
- for(let round=0;round<4;round++){
+ const maxRounds=runtime.maxModelRounds??4;
+ for(let round=0;round<maxRounds;round++){
   abort(signal);if(new TextEncoder().encode(JSON.stringify(input)).length>120000)throw Error('This conversation needs a narrower set of sources before another model round. Earlier work is kept.');
-  if(staffingRequired&&!staffingCalculated&&(round===3||operations>=6))throw Error('The staffing comparison was not calculated within this turn\'s limits. Earlier work is kept.');
-  const output=await runtime.complete(input,round===3||operations>=6,signal,{progressEntryEnabled:!!entryContext,requiredStaffingCalculation:standaloneStaffing&&!staffingCalculated});rounds++;abort(signal);
+  if(staffingRequired&&!staffingCalculated&&(round===maxRounds-1||operations>=6))throw Error('The staffing comparison was not calculated within this turn\'s limits. Earlier work is kept.');
+  const output=await runtime.complete(input,round===maxRounds-1||operations>=6,signal,{progressEntryEnabled:!!entryContext,requiredStaffingCalculation:standaloneStaffing&&!staffingCalculated});rounds++;abort(signal);
   if(!output.completed)throw new SolutionResponseError('incomplete_output','The conversation response was incomplete or exceeded its bounds.');
   if(output.calls.length>6||JSON.stringify(output.items).length>70000)throw new SolutionResponseError('output_bounds','The conversation response was incomplete or exceeded its bounds.');
   if(!output.calls.length){
@@ -154,7 +155,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
    final=readFinal(output.text);break;
   }
   const callCost=(call:SolutionModelOutput['calls'][number])=>{if(call.name!=='evaluate_action_plans')return 1;try{const count=JSON.parse(call.arguments)?.candidates?.length;return Number.isInteger(count)&&count>=1&&count<=3?count:3;}catch{return 3;}};
-  if(round===3||operations+output.calls.reduce((total,call)=>total+callCost(call),0)>6)throw Error('The bounded calculation limit was reached. No proposal was saved.');
+  if(round===maxRounds-1||operations+output.calls.reduce((total,call)=>total+callCost(call),0)>6)throw Error('The bounded calculation limit was reached. No proposal was saved.');
   input.push(...output.items);
   for(const call of output.calls){
    abort(signal);toolCalls++;operations+=callCost(call);let result:unknown;

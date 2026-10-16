@@ -5,7 +5,11 @@ export default class OpenAI {
   harness.__providerConstructions=(harness.__providerConstructions??0)+1;
   if(harness.__forbidProvider)throw Error('Provider construction forbidden');
  }
- responses={create:async(request:unknown,options?:unknown)=>{
+ responses={inputTokens:{count:async(request:unknown,options?:unknown)=>{
+  const harness=globalThis as unknown as {__countTokens?:(request:unknown,options:unknown)=>Promise<unknown>};
+  if(!harness.__countTokens)throw Error('Unexpected synthetic token count');
+  return harness.__countTokens(request,options);
+ }},create:async(request:unknown,options?:unknown)=>{
   const harness=globalThis as unknown as {__requests:unknown[];__replies:unknown[];__requestOptions?:unknown[]};
   harness.__requests.push(request);harness.__requestOptions?.push(options);
   const reply=harness.__replies.shift();if(!reply)throw Error('Unexpected synthetic Responses call');return typeof reply==='function'?reply(request):reply;
