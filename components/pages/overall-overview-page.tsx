@@ -622,6 +622,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       <header className="flex flex-wrap items-start justify-between gap-3">
         <h2 id="overall-overview-heading" className="text-2xl font-semibold leading-tight tracking-tight">Workforce AI</h2>
         <button type="button" onClick={resetHomeConversation} className="min-h-11 rounded px-2 text-xs font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Reset conversation</button>
+        {overviewStarting&&renderPlanPane&&<details className="home-saved-plan-disclosure"><summary>Saved plans</summary>{renderPlanPane(savedWork)}</details>}
         <HomeGettingStarted conversational={solutionConversationEnabled} active={active} ready={conversation.storageReady} autoOpen={!overviewEntry&&conversation.firstHomeVisit&&!conversation.input.trim()&&!conversation.issueEditor} busy={chatLoading||guidedExampleActive} dismissKey={JSON.stringify([instructionsDismissed,conversation.workspaceKey,guidedExampleActive])} onNavigate={onNavigate} onStartDemo={onStartDemo} status={
         <div className="ml-auto flex items-center gap-3 text-xs">
           <span className="text-muted-foreground">In development</span>
@@ -685,6 +686,6 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       {!solutionConversationEnabled&&structuredPlansEnabled&&recoveryPlanChoice?.goalId===conversation.activeGoalId&&<label className="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={structuredMode} onChange={event=>{selectedPlanForChat.current?.discard();setStructuredMode(event.target.checked);}}/>Discuss saved plans · turn off to use existing chat controls</label>}
       {actionOffers.length>0&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2 text-sm">Option action suggestions</summary><section aria-label="Workforce option actions" className="mt-3 space-y-2"><p className="text-sm text-muted-foreground">{input.trim()?'Your draft is kept. Clear it to choose an option action.':'Click to open the local action. Saving, calculation and search remain explicit.'}</p><div className="flex flex-wrap gap-2">{actionOffers.map(offer=><button key={offer.id} type="button" disabled={suggestionPending||chatLoading||Boolean(input.trim())} onClick={()=>submitOption(offer.id)} className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{offer.label}</button>)}</div></section></details>}
   </section>
-    {renderPlanPane ? overviewStarting?<details className="home-saved-plan-disclosure"><summary>Saved plans and supporting data</summary>{renderPlanPane(savedWork)}</details>:renderPlanPane(savedWork) : savedWork}
+    {renderPlanPane ? !overviewStarting&&renderPlanPane(savedWork) : savedWork}
   </div></HomeGuidedActionsContext.Provider>;
 }

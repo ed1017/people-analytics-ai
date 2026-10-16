@@ -114,3 +114,8 @@
   .composer { grid-column: 2; grid-row: 4 / 6; margin-top: 6px; }
   .questions button { padding: 6px 8px; }
 }
+
+.shell :global(.home-workspace[data-overview-starting]) { padding-bottom: 4px; }
+.shell :global(.home-saved-plan-disclosure) { min-width: 0; }
+.shell :global(.home-saved-plan-disclosure) > summary { min-height: 44px; padding-block: 12px; }
+.shell :global(.home-saved-plan-disclosure[open]) { flex-basis: 100%; order: 3; }

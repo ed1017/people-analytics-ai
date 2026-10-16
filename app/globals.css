@@ -793,3 +793,6 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
   .global-workforce-filters[data-compact] .workforce-filter-fields label { display: block; }
   .global-workforce-filters[data-compact] .workforce-filter-fields select { width: 100%; }
 }
+
+/* The initial composer is in document flow; it needs no extra dock reserve. */
+.app-home-composer .app-dashboard:has(.home-workspace[data-overview-starting]) { padding-bottom: 0; }
