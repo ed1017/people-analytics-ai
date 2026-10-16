@@ -19,7 +19,7 @@ test('initial composer grows for a long draft, shrinks after clear, and retains 
 test('compact document-flow docking preserves viewport caps and restores ordinary sizing',()=>{
  const prior={window:globalThis.window,document:globalThis.document,ResizeObserver:globalThis.ResizeObserver,innerHeight:globalThis.innerHeight};
  const style=()=>({values:{},setProperty(k,v){this.values[k]=v},removeProperty(k){delete this.values[k]}});
- const root={style:style(),closest:()=>null,addEventListener(){},removeEventListener(){}};
+ const root={getBoundingClientRect:()=>({top:160}),style:style(),closest:()=>null,addEventListener(){},removeEventListener(){}};
  const anchor={closest:()=>root,getBoundingClientRect:()=>({width:400})};
  const dock={style:style()},textarea={style:style()};
  const viewport={height:900,addEventListener(){},removeEventListener(){}};
@@ -30,7 +30,7 @@ test('compact document-flow docking preserves viewport caps and restores ordinar
   for(const [compact,height,min,max] of [[true,900,'104px','240px'],[true,200,'96px','96px'],[false,900,'96px','240px']]){
    effectDeps=undefined;cleanup=undefined;viewport.height=height;useHomeComposerDock(true,{current:anchor},{current:dock},{current:textarea},true,compact);
    assert.equal(textarea.style.values['min-height'],min);assert.equal(textarea.style.values['max-height'],max);
-   assert.equal(root.style.values['--home-composer-height'],'0px');cleanup();
+   assert.equal(root.style.values['--home-composer-height'],'0px');assert.equal(root.style.values['--home-workspace-height'],`${Math.max(320,height-160)}px`);cleanup();
   }
   // Refs stay stable while React replaces their DOM nodes when a goal moves the composer.
   const slotRef={current:anchor},dockRef={current:dock},inputRef={current:textarea};

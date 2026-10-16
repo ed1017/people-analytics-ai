@@ -19,6 +19,9 @@ export function useHomeComposerDock(active:boolean,slot:RefObject<HTMLDivElement
    if(documentFlow||window.matchMedia(PHONE_LAYOUT_QUERY).matches){
     document.documentElement.classList.remove('home-keyboard-open');
     for(const property of ['left','width','bottom','max-height'])element.style.removeProperty(property);
+    // Fit below the actual toolbar position rather than a guessed header height.
+    const top=root.getBoundingClientRect().top;
+    root.style.setProperty('--home-workspace-height',`${Math.max(320,height-Math.max(0,top))}px`);
     const inputMax=Math.max(96,Math.min(240,height*.4));
     textarea.style.setProperty('max-height',`${inputMax}px`);
     textarea.style.setProperty('min-height',`${Math.min(compactInitial?104:96,inputMax)}px`);

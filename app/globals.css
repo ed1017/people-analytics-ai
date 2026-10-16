@@ -796,3 +796,18 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 
 /* The initial composer is in document flow; it needs no extra dock reserve. */
 .app-home-composer .app-dashboard:has(.home-workspace[data-overview-starting]) { padding-bottom: 0; }
+
+/* One in-flow composer, without duplicate dock clearance. Short and narrow
+   viewports retain document scrolling so every control remains reachable. */
+.app-home-composer .app-dashboard:has(.home-workspace:not([data-overview-starting])) { padding-bottom: 0; }
+.home-workspace:not([data-overview-starting]) .home-composer-slot { min-height: 0; }
+.home-workspace:not([data-overview-starting]) .home-composer-dock { position: static; max-height: none; overflow: visible; }
+.home-workspace:not([data-overview-starting]) [aria-label="Home chat workspace"] { max-height: none; overflow: visible; }
+@media (min-width: 1024px) and (min-height: 700px) {
+ @container home-intro (min-width: 900px) {
+  .home-workspace:not([data-overview-starting]) { height: var(--home-workspace-height, calc(100dvh - var(--app-header-height, 120px))); min-height: 320px; grid-template-rows: minmax(0, 1fr); }
+  .home-workspace:not([data-overview-starting]) > section { height: 100%; min-height: 0; }
+  .home-workspace:not([data-overview-starting]) [aria-label="Home chat workspace"] { flex: 1 1 0; min-height: 6rem; overflow-y: auto; }
+  .home-workspace:not([data-overview-starting]) > section > :not([aria-label="Home chat workspace"]) { flex-shrink: 0; }
+ }
+}
