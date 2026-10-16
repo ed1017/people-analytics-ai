@@ -66,7 +66,7 @@ export function prepareCapacityRecord(session:Session,context:CapacityRecordBind
   exact(session,['draft','result','error',...(Object.hasOwn(session,'cost')?['cost']:[])],'session');
   requireValue(session.error==='' && session.result!==null,'A successful current calculation is required.');
   const hasCost=Object.hasOwn(session.draft,'costRate');
-  const draft=exact(session.draft,[...Object.keys(emptyCapacityDraft),...(hasCost?['costRate']:[])],'draft');
+  const draft=exact(session.draft,[...Object.keys(emptyCapacityDraft),...(hasCost?['costRate']:[]),...(Object.hasOwn(session.draft,'sourceNote')?['sourceNote']:[])],'draft');
   if(hasCost)requireValue(typeof draft.costRate==='string','Invalid cost draft value type.');
   for(const field of Object.keys(emptyCapacityDraft)) requireValue(typeof draft[field]===typeof emptyCapacityDraft[field as keyof CapacityDraft], 'Invalid draft value type.');
   const b=binding(context),m=metadata(meta),inputs=capacitySpec(session.draft),fresh=recalculate(inputs);
@@ -111,7 +111,7 @@ export function capacityRecordIsCurrent(raw:unknown,context:CapacityRecordBindin
   try {
     const record=readCapacityRecord(raw,context);
     const hasCost=Object.hasOwn(draft,'costRate');
-    exact(draft,[...Object.keys(emptyCapacityDraft),...(hasCost?['costRate']:[])],'draft');
+    exact(draft,[...Object.keys(emptyCapacityDraft),...(hasCost?['costRate']:[]),...(Object.hasOwn(draft,'sourceNote')?['sourceNote']:[])],'draft');
     if(hasCost&&typeof draft.costRate!=='string')return false;
     for(const field of Object.keys(emptyCapacityDraft)) if(typeof draft[field as keyof CapacityDraft]!==typeof emptyCapacityDraft[field as keyof CapacityDraft])return false;
     const fresh=recalculate(capacitySpec(draft));

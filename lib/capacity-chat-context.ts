@@ -19,8 +19,8 @@ export function readCapacityChatContext(raw:unknown,expected:Identity) {
  requireValue(new TextEncoder().encode(key(raw)).length<=8192);
  exact(raw,['version','datasetToken','goalId','goal','draft','scenario']);
  requireValue(raw.version===1&&raw.datasetToken===expected.datasetToken&&raw.goalId===expected.goalId&&raw.goal===expected.goal);
- exact(raw.draft,[...Object.keys(emptyCapacityDraft),...(Object.hasOwn(raw.draft as object,'costRate')?['costRate']:[])]);
- for(const [field,value] of Object.entries(raw.draft))requireValue(field==='confirmed'||field==='fullTimeMovements'?typeof value==='boolean':typeof value==='string'&&value.length<=(field==='scope'?400:40));
+ exact(raw.draft,[...Object.keys(emptyCapacityDraft),...(Object.hasOwn(raw.draft as object,'costRate')?['costRate']:[]),...(Object.hasOwn(raw.draft as object,'sourceNote')?['sourceNote']:[])]);
+ for(const [field,value] of Object.entries(raw.draft))requireValue(field==='confirmed'||field==='fullTimeMovements'?typeof value==='boolean':typeof value==='string'&&value.length<=(field==='scope'?400:field==='sourceNote'?300:40));
  if(raw.scenario!==null){exact(raw.scenario,['id','name']);requireValue(typeof raw.scenario.id==='string'&&/^[a-zA-Z0-9-]{1,80}$/.test(raw.scenario.id)&&typeof raw.scenario.name==='string'&&raw.scenario.name.trim().length>0&&raw.scenario.name.length<=160);}
  const draft=raw.draft as CapacityDraft;
  const result=calculateMonthlyWorkload(capacitySpec(draft));
