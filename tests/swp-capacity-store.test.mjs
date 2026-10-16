@@ -86,3 +86,12 @@ test('v2 unknown and zero costs save separately and edit or clearing rejects sta
   assert.throws(()=>saveCapacityScenario(args),/Cost inputs or results changed/);assert.equal(f.bytes(),before);
  }
 });
+
+test('optional fictional handoff origin survives the existing save and reopen transaction',()=>{
+ const f=setup(),session=makeSession({sourceNote:'Fictional task example: adoption 50%; origin only, not measured results.'});
+ const saved=saveCapacityScenario(f.args(session,'Task example'));
+ const reopened=openCapacityScenario(f.store,f.context,saved.record.id,f.store.getSnapshot().data.revision,()=>{});
+ assert.equal(reopened.entry.draft.sourceNote,session.draft.sourceNote);
+ assert.match(reopened.entry.record.inputs.months[0].hoursPerUnit.basis.note,/Fictional task example/);
+ assert.deepEqual(f.store.getField('a','planning.savedScenarios',[]),[{id:'legacy'}]);
+});

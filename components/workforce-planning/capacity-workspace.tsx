@@ -27,7 +27,7 @@ export function CapacityWorkspace(){
  const cost=session.cost;
  const isPreview=!session.result;
  const edit=(patch:Partial<CapacityDraft>)=>setSession({...session,draft:{...draft,...patch,confirmed:false},result:null,cost:null,error:'',capture:null,scope:patch.scope!==undefined&&patch.scope.trim()!==session.scope?.label?null:session.scope});
- const field=(key:Exclude<keyof CapacityDraft,'fullTimeMovements'|'confirmed'>,help?:string)=>capacitySliders[key]?<PlanningAssumptionSlider key={key} label={displayLabels[key]} value={draft[key]??''} onChange={value=>edit({[key]:value})} spec={capacitySliders[key]} help={help}/>:<label className="block min-w-0 text-sm" key={key}>{displayLabels[key]}
+ const field=(key:Exclude<keyof CapacityDraft,'fullTimeMovements'|'confirmed'|'sourceNote'>,help?:string)=>capacitySliders[key]?<PlanningAssumptionSlider key={key} label={displayLabels[key]} value={draft[key]??''} onChange={value=>edit({[key]:value})} spec={capacitySliders[key]} help={help}/>:<label className="block min-w-0 text-sm" key={key}>{displayLabels[key]}
   <input aria-label={displayLabels[key]} className={control} value={draft[key]??''} type={key==='openingDate'?'date':'text'} inputMode={key==='scope'||key==='openingDate'?undefined:'decimal'} aria-describedby={help?`capacity-${key}-help`:undefined} onChange={event=>edit({[key]:event.target.value})}/>
   {help&&<span id={`capacity-${key}-help`} className="mt-1 block text-xs text-muted-foreground">{help}</span>}
  </label>;
@@ -46,6 +46,7 @@ export function CapacityWorkspace(){
  }
  return <section aria-label="Workload capacity planning" className="capacity-workspace @container/capacity space-y-4">
   <p className="text-sm text-muted-foreground">Enter the work and the team you expect to have. Blank numbers stay unknown.</p>
+  {draft.sourceNote&&<aside aria-label="Scenario origin" className="rounded border bg-card p-3 text-sm"><strong>Illustrative handoff origin</strong><p>{draft.sourceNote}</p><p>Origin values are retained for review. Later edits below are independent; the reduction is not applied again. No observed savings or staffing release is established.</p></aside>}
   <SkillClientDemand goalKey={goalKey} onStart={draft=>setSession({draft,result:null,cost:null,error:'',scope:null,capture:null,saveName:''})}/>
   <div className="grid min-w-0 items-start gap-5 grid-cols-1 @min-[48rem]/capacity:grid-cols-[minmax(15rem,0.85fr)_minmax(0,1.65fr)]">
   <form noValidate onSubmit={event=>{event.preventDefault();calculate();}} className="min-w-0 space-y-3 rounded-xl border bg-background p-4">

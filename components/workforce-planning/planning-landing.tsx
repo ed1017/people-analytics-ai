@@ -18,7 +18,7 @@ export function PlanningLanding(){
  const {result,error}=capacityPreview(draft);
  const last=result?.points.at(-1);
  const edit=(key:keyof CapacityDraft,value:string)=>setDraft(current=>({...current,[key]:value}));
- const field=(key:Exclude<keyof CapacityDraft,'confirmed'|'fullTimeMovements'|'costRate'>,label:string,unit?:string)=>capacitySliders[key]
+ const field=(key:Exclude<keyof CapacityDraft,'confirmed'|'fullTimeMovements'|'costRate'|'sourceNote'>,label:string,unit?:string)=>capacitySliders[key]
   ? <PlanningAssumptionSlider key={key} label={label} value={draft[key]} spec={{...capacitySliders[key],unit:unit??capacitySliders[key].unit}} onChange={value=>edit(key,value)}/>
   : <label className={styles.field} key={key}><span>{label}</span><span className={styles.inputWrap}><input aria-label={label} type={key==='openingDate'?'date':'text'} inputMode={key==='scope'||key==='openingDate'?undefined:'decimal'} value={draft[key]} onChange={event=>edit(key,event.target.value)}/>{unit&&<span>{unit}</span>}</span></label>;
  return <section className={styles.landing} aria-label="Illustrative workforce planning">
