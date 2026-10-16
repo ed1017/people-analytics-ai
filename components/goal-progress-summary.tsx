@@ -10,6 +10,7 @@ import {readHomeDemo,homeDemoField} from '@/lib/home-demo-catalog';
 import {decisionStore,useDecisionStorage} from './decision-store';
 const number=(value:number|null)=>value===null?'Unavailable':value.toLocaleString('en-US',{maximumFractionDigits:1});
 const classification=(value:string)=>value==='user-reported'?'User-reported · unverified':value==='recorded-synthetic'?'Synthetic measured fixture':'Recorded workforce observation';
+const targetDirection={increase:'Higher is better',decrease:'Lower is better',maintain:'Maintain the target',ceiling:'At or below the limit'};
 /** Compact saved-record read. No forms, forecasts, ingestion or implicit writes. */
 export function GoalProgressSummary({context,snapshot,plan,goal,pinnedPlanName}:{pinnedPlanName?:string;context:GoalProgressContext;snapshot?:ProgressSnapshot;plan?:ProgressLinkedPlan;goal?:string}){
  const a=context.assessment,m=context.measurement,baseline=snapshot?snapshot.baseline:a.baseline?.observation,latest=snapshot?snapshot.latest:a.latestComparable?.observation;
@@ -17,6 +18,8 @@ export function GoalProgressSummary({context,snapshot,plan,goal,pinnedPlanName}:
  const absent=!snapshot?.hasObservations&&!baseline&&!latest,missing=absent?'Not yet measured':'Comparable measurement unavailable';
  return <section aria-label="Goal progress" className="min-w-0 space-y-1 break-words rounded border p-3 text-sm">
   <h2 className="font-semibold">Goal progress{goal?` · ${goal}`:''}</h2>
+  {pinnedPlanName&&<p><strong>Pinned proposal:</strong> {pinnedPlanName}. Selection is not approval or execution.</p>}
+  <p aria-label="Saved progress target"><strong>Target:</strong> {m?`${number(m.target.value)} ${m.unit} by ${m.target.date} · ${targetDirection[m.direction]}`:'Not defined. Review a metric, scope, baseline and target before tracking progress.'}</p>
   <p><strong>Measured progress:</strong> {latest?`${number(latest.value)} ${m?.unit} · ${latest.period.end} · ${classification(latest.source.classification)}${snapshot?.stale?' · Stale under saved freshness policy':''}${baseline&&latest.period.end===baseline.period.end?' · Baseline only; no later measurement':''}`:missing}. Execution not recorded. Plan assumptions are not measured results.</p>
   {m&&<p className="text-xs">Saved scope: {m.metric} · {m.scope.country} / {m.scope.org} / {m.scope.level}. Page filters do not change this scope.</p>}
   {context.origin==='demo'&&<p className="text-xs">Fictional demo goal.</p>}
@@ -25,11 +28,10 @@ export function GoalProgressSummary({context,snapshot,plan,goal,pinnedPlanName}:
   <details>
    <summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Measurement details and plan link</summary>
    <div className="space-y-3 pt-2">
-  {pinnedPlanName&&<p><strong>Pinned Action Plan:</strong> {pinnedPlanName}</p>}
   <dl className="grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-3">
    <div><dt className="text-xs text-muted-foreground">Baseline</dt><dd>{baseline?`${number(baseline.value)} ${m?.unit}`:missing}</dd>{baseline&&<dd className="text-xs">{baseline.period.end} · {classification(baseline.source.classification)}</dd>}</div>
    <div><dt className="text-xs text-muted-foreground">Latest dated measurement</dt><dd>{latest?`${number(latest.value)} ${m?.unit}`:missing}</dd>{latest&&<dd className="text-xs">{latest.period.end} · {classification(latest.source.classification)}{snapshot?.stale?' · Stale under saved freshness policy':''}{baseline&&latest.period.end===baseline.period.end?' · Baseline only; no later measurement':''}</dd>}</div>
-   <div><dt className="text-xs text-muted-foreground">Target</dt><dd>{m?`${number(m.target.value)} ${m.unit}`:'Not defined'}</dd>{m&&<dd className="text-xs">{m.direction==='increase'?'Higher is better':m.direction==='decrease'?'Lower is better':'At or below the limit'}</dd>}</div>
+   <div><dt className="text-xs text-muted-foreground">Target</dt><dd>{m?`${number(m.target.value)} ${m.unit}`:'Not defined'}</dd>{m&&<dd className="text-xs">{targetDirection[m.direction]}</dd>}</div>
    <div><dt className="text-xs text-muted-foreground">Deadline</dt><dd>{m?.target.date??'Not defined'}</dd></div>
    <div><dt className="text-xs text-muted-foreground">Remaining gap</dt><dd>{a.gap!==null?`${number(a.gap)} ${m?.unit}`:'Unavailable'}</dd>{a.gap!==null&&<dd className="text-xs">At {a.latestComparable?.observation.period.end}; dated arithmetic{snapshot?.stale?', stale':''}</dd>}</div>
    <div><dt className="text-xs text-muted-foreground">Execution status</dt><dd>Not recorded</dd><dd className="text-xs">Plan selection does not record implementation</dd></div>
