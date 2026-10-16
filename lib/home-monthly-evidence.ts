@@ -1,21 +1,25 @@
+// @ts-expect-error Native Node tests share application source.
+import {HOME_HISTORY_ROWS,selectHomeHistory} from './home-history-selection.ts';
 const months=['january','february','march','april','may','june','july','august','september','october','november','december'];
 const monthPattern=/\b(january|february|march|april|may|june|july|august|september|october|november|december)\b(?:\s+(?:of\s+)?(20\d{2}))?|\b(20\d{2})-(0[1-9]|1[0-2])\b/gi;
 type Row = Record<string,unknown>;
 const validMonth=(value:unknown):value is string=>typeof value==='string'&&/^20\d{2}-(0[1-9]|1[0-2])-01$/.test(value);
 const fields=['total_exits','voluntary_exits','involuntary_exits','regrettable_exits','monthly_turnover_pct','monthly_voluntary_turnover_pct'];
-export function normalizeHomeMonthlyRows(raw:unknown):Row[] {
+export function normalizeHomeMonthlyRows(raw:unknown,limit=3):Row[] {
   if(!Array.isArray(raw))return [];
-  return raw.slice(0,3).filter(row=>row&&typeof row==='object'&&validMonth(row.month)).map(row=>Object.fromEntries([
+  return raw.slice(0,Math.min(HOME_HISTORY_ROWS,Math.max(0,limit))).filter(row=>row&&typeof row==='object'&&validMonth(row.month)).map(row=>Object.fromEntries([
     ['month',row.month],...fields.map(field=>{const value=row[field],rate=field.endsWith('_pct');return [field,row.suppressed!==true&&typeof value==='number'&&Number.isFinite(value)&&value>=0&&(rate?value<=100:Number.isSafeInteger(value))?value:null];}),
   ]));
 }
 /** Existing company trend only. Never label it with the selected dashboard filters. */
-export function selectHomeMonthlyRows(raw:unknown,question:string):Row[] {
+export function selectHomeMonthlyRows(raw:unknown,question:string,asOf?:string):Row[] {
   if(!Array.isArray(raw))return [];
   const rows=raw.filter(row=>row&&typeof row==='object'&&validMonth(row.month)).sort((a,b)=>a.month.localeCompare(b.month));
   // The current turn's explicit periods take priority over earlier ambiguous questions.
   // Keep every requested comparison month before adding automatic comparison rows.
   const turns=question.split('\n\nCURRENT USER TURN:\n');
+  const window=selectHomeHistory(rows,'month',question,asOf);
+  if(window!==null)return normalizeHomeMonthlyRows(window,HOME_HISTORY_ROWS);
   const turnIndex=turns.findLastIndex(turn=>[...turn.matchAll(monthPattern)].length>0);
   if(turnIndex<0)return normalizeHomeMonthlyRows(rows.slice(-3));
   const turn=turns[turnIndex],mentions=[...turn.matchAll(monthPattern)];

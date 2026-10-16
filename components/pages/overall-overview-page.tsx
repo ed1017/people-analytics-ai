@@ -561,7 +561,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   const planDiscussions=solutionDiscussionPresentations(messages,solutions.state);
   const reviewPresentation=solutionReviewPresentation(solutions.state);
   const planReading=solutionConversationEnabled&&Boolean(reviewPresentation.recommended||reviewPresentation.alternatives.length||reviewPresentation.earlier.length);
-  useHomeComposerDock(active,composerSlot,composerDock,composer,planReading||overviewStarting,welcomeComposer);
+  useHomeComposerDock(active,composerSlot,composerDock,composer,true,welcomeComposer);
   const activePlans=[...(reviewPresentation.recommended?[reviewPresentation.recommended]:[]),...reviewPresentation.alternatives];
   const followUpMessage=messages.findLast(message=>{const presentation=planDiscussions.get(message);return presentation&&(presentation.proposals.some(proposal=>activePlans.some(item=>item.id===proposal.id&&item.revision===proposal.revision))||solutions.state.currentCalculationKinds?.includes('required-staffing')&&message.content===solutions.state.turns.at(-1)?.text);});
   const followUp=followUpMessage?planDiscussions.get(followUpMessage):undefined;
