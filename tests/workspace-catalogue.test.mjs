@@ -25,7 +25,7 @@ test('SWP journey leads navigation while core Planning tools retain their relati
     assert.equal(getWorkspaceForPage(page),page==='workforce'?'analytics':'strategy');
     assert.equal(appNavigationSections.flatMap(section=>section.pages).filter(item=>item===page).length,1);
   }
-  assert.equal(appPageMetadata.home.label,'Plan home');
+  assert.equal(appPageMetadata.home.label,'Overview');
   assert.equal(getDefaultPageForWorkspace('strategy'),'planning-overview');
   assert.deepEqual(planningEvidence.map(item=>item.page),['attrition','skills','labor-market','compensation']);
   assert.equal(planningEvidence.some(item=>planningJourney.some(step=>step.page===item.page)),false);

@@ -6,6 +6,7 @@ import Module, {createRequire} from 'node:module';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import ts from 'typescript';
+import * as swpDemo from '../lib/swp-demo.ts';
 import * as dashboardScope from '../lib/dashboard-scope.ts';
 import {appPageFromSearch, appPageHref} from '../lib/app-page-url.ts';
 
@@ -14,7 +15,7 @@ const filename = path.resolve('components/home-chat-welcome.tsx');
 const compiled = ts.transpileModule(fs.readFileSync(filename, 'utf8'), {fileName: filename, compilerOptions: {jsx: ts.JsxEmit.ReactJSX, module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022}});
 const mod = new Module(filename);
 mod.filename = filename;
-mod.require = id => id.endsWith('.module.css') ? {default: {}} : id === '@/lib/dashboard-scope' ? dashboardScope : require(id);
+mod.require = id => id.endsWith('.module.css') ? {default: {}} : id === '@/lib/dashboard-scope' ? dashboardScope : id === '@/lib/swp-demo' ? swpDemo : require(id);
 mod._compile(compiled.outputText, filename);
 const {HomeChatWelcome, planningQuestions, welcomeHistory} = mod.exports;
 const filters = {country: 'all', org: 'all', level: 'all'};
@@ -33,7 +34,7 @@ test('welcome shows verified snapshot KPIs without annualization or invented sen
   assert.match(html, /not annualized/);
   assert.match(html, /Cost period unspecified/);
   assert.doesNotMatch(html, /18%|10,000|Supply vs demand/);
-  assert.equal((html.match(/<button/g) ?? []).length, 4);
+  assert.equal((html.match(/<button/g) ?? []).length, 5);
 });
 
 test('welcome withholds stale or unverified numbers and preserves verified zero', () => {
@@ -50,9 +51,9 @@ test('question tiles use the supplied callback and composer slot without owning 
   function visit(node) { if (!node || typeof node !== 'object') return; if (Array.isArray(node)) {node.forEach(visit); return;} if(node.type === 'button') buttons.push(node); visit(node.props?.children); }
   visit(tree);
   buttons.forEach(button => button.props.onClick());
-  assert.deepEqual(sent, [...planningQuestions]);
+  assert.deepEqual(sent, [swpDemo.swpDemoPrompt,...planningQuestions]);
   assert.match(render({composer: React.createElement('textarea', {'aria-label': 'Existing composer'})}), /Existing composer/);
-  assert.equal((render({disabled: true}).match(/disabled=""/g) ?? []).length, 4);
+  assert.equal((render({disabled: true}).match(/disabled=""/g) ?? []).length, 5);
 });
 
 test('new support destinations round-trip without dropping scope or goal URL state', () => {
@@ -83,7 +84,7 @@ test('headcount KPI selector remains unique when the chart axis repeats the curr
   for (const value of [120, 1240, 100]) {
     const html=render({overview:{...base.overview,headcount:value},trend:[{...history[2],headcount:value}]});
     const formatted=value.toLocaleString();
-    assert.equal(html.split('>'+formatted+'<').length-1,2,'fixture reproduces the ambiguous exact-text match');
+    assert.equal(html.split('>'+formatted+'<').length-1,3,'header, chart axis and compact KPI repeat the value; the scoped strong selector stays unique');
     const snapshot=html.match(/<section aria-label="Workforce snapshot"[^>]*>([\s\S]*?)<\/section>/)?.[1];
     assert.ok(snapshot);
     assert.deepEqual([...snapshot.matchAll(/<strong[^>]*>([^<]*)<\/strong>/g)].map(match=>match[1]),[formatted]);

@@ -1921,7 +1921,7 @@ export default function Home() {
     <PlanningSessionProvider goalKey={conversation.workspaceKey} capacityState={capacityState} onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
     <main data-workspace-palette={workspacePalette} className={`min-h-screen bg-background text-foreground${activePage === "home" ? " app-home-composer" : ""}${["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) ? " app-overview-mode" : ""}`}>
       {/* Top header */}
-      <AppHeader
+      <AppHeader onNavigate={setActivePage}
         activePage={activePage}
         selectedPersona={selectedPersona}
         onPersonaChange={setSelectedPersona}
