@@ -107,7 +107,7 @@ export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loadi
     <h2>Plan the workforce your business needs</h2>
     <p className={styles.subtitle}>Start with a decision. Explore the evidence, compare assumptions, and build your plan.</p>
     <div className={styles.entryActions}><button type="button" disabled={disabled} onClick={()=>onQuestion(swpDemoPrompt)}>Start the 3-minute demo</button><a href="?page=workforce">Explore the full app</a></div>
-    <p className={styles.demoNote}>A fictional service-growth decision: edit assumptions, compare options, save a plan and review its target. No AI call required.</p>
+    <p className={styles.demoNote}>A fictional service-growth decision: edit assumptions, compare options, save a plan and review its target.</p>
     <HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi}/>
     <h3>What decision are you facing?</h3>
     <div className={styles.questions}>
