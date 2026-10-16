@@ -129,15 +129,15 @@ test('recorded KPIs retain scope and units separately from projected flows',()=>
  const props={overview:{...base.overview,labor_cost_usd:45200},recruitingKpi:{hires:7,month:'2026-09',asOf:'2026-09-30'}};
  const html=render(props);
  assert.match(html,/7<\/b>/);assert.match(html,/company-wide recruiting events/);assert.match(html,/including internal fills/);
- assert.match(html,/45,200 USD/);assert.match(html,/Cost period unspecified/);
+ assert.match(html,/USD 45\.2K/);assert.match(html,/Cost period unspecified/);
  assert.match(html,/Projected hires/);assert.match(html,/Projected departures/);
- assert.match(html,/Eligible survey result and suppression metadata needed/);
+ assert.match(html,/eligible survey result and suppression metadata/);
  for(const patch of [{loading:true},{error:'failed'},{receipt:null},{requested:{...filters,country:'UK'}}]){
-  const stale=render({...props,...patch});assert.doesNotMatch(stale,/7<\/b>|8\.2%|45,200 USD/);
+  const stale=render({...props,...patch});assert.doesNotMatch(stale,/7<\/b>|8\.2%|USD 45\.2K/);
  }
  assert.doesNotMatch(render({...props,recruitingKpi:{...props.recruitingKpi,asOf:'2026-08-31'}}),/7<\/b>/);
  const zero=render({overview:{...base.overview,voluntary_turnover_ytd_pct:0,labor_cost_usd:0}});
- assert.match(zero,/0%/);assert.match(zero,/0 USD/);
+ assert.match(zero,/0%/);assert.match(zero,/USD 0\.00/);
 });
 
 test('unavailable headcount selector is unique among five withheld indicators',()=>{
@@ -150,4 +150,15 @@ test('unavailable headcount selector is unique among five withheld indicators',(
  const source=fs.readFileSync('tests/browser/home-overview-entry.mjs','utf8');
  assert.ok(source.includes("welcome.getByRole('region',{name:'Workforce snapshot',exact:true}).locator('strong').filter({hasText:/^Unavailable$/}).waitFor();assert.equal(await welcome.getByRole('img').count(),0)"));
  assert.ok(!source.includes("welcome.getByText('Unavailable',{exact:true})"));
+});
+
+
+test('compact cost keeps its exact source amount and period limits available', () => {
+  const html = render({overview:{...base.overview,labor_cost_usd:2047306374.48}});
+  assert.match(html, /USD 2\.05B/);
+  assert.match(html, /<details[^>]*><summary>Exact amount<\/summary><p>USD 2,047,306,374\.48<\/p><\/details>/);
+  assert.match(html, /<details[^>]*><summary>Indicator scope and source details<\/summary>/);
+  assert.match(html, /Cost period unspecified; no monthly or annual basis is inferred/);
+  assert.match(html, /survey respondents are a separate population/);
+  assert.doesNotMatch(render({}), /<summary>Exact amount<\/summary>/);
 });

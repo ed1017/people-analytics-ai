@@ -16,6 +16,7 @@ export const planningQuestions = [
   'Where are we at risk of losing key talent?',
 ] as const;
 const icons = [ChartNoAxesCombined, Sparkles, Wallet, Users];
+export const welcomeCurrency = (value:number) => ({compact:'USD '+new Intl.NumberFormat('en-US',{notation:value>=1000?'compact':'standard',maximumFractionDigits:2,minimumFractionDigits:value<1000?2:0}).format(value),exact:'USD '+value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:20})});
 const known = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0;
 const validDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;
 const monthIndex = (date: string) => Number(date.slice(0, 4)) * 12 + Number(date.slice(5, 7));
@@ -59,8 +60,8 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
   const maximum = Math.max(1, checked?.analysis.inputs.opening ?? 0, ...history.map(point => point.headcount), ...projected.map(point=>point.headcount));
   const startMonth = monthIndex(first?.snapshot_date ?? snapshotDate);
   const monthSpan = horizonEnd ? monthIndex(horizonEnd) - startMonth : 0;
-  const plot = history.map(point => ({...point, x: monthSpan ? 40 + 432 * (monthIndex(point.snapshot_date) - startMonth) / monthSpan : 256, y: 76 - 64 * point.headcount / maximum}));
-  const futurePlot = checked ? [{month:snapshotDate,headcount:checked.analysis.inputs.opening},...projected].map(point=>({...point,x:40+432*(monthIndex(point.month)-startMonth)/Math.max(1,monthSpan),y:76-64*point.headcount/maximum})) : [];
+  const plot = history.map(point => ({...point, x: monthSpan ? 40 + 432 * (monthIndex(point.snapshot_date) - startMonth) / monthSpan : 256, y: 100 - 80 * point.headcount / maximum}));
+  const futurePlot = checked ? [{month:snapshotDate,headcount:checked.analysis.inputs.opening},...projected].map(point=>({...point,x:40+432*(monthIndex(point.month)-startMonth)/Math.max(1,monthSpan),y:100-80*point.headcount/maximum})) : [];
   return <section aria-label="Workforce snapshot" className={styles.historySummary}>
       <div className={styles.historyHeading}>
         <div><p>Current headcount</p><strong>{known(headcount) ? headcount.toLocaleString() : loading ? 'Updating…' : 'Unavailable'}</strong><span>{known(headcount) ? ' people · ' + snapshotDate : ' · Verified snapshot needed'}</span></div>
@@ -68,15 +69,21 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
       </div>
       <p className={styles.scope}>{scopeLabel} · Recorded synthetic workforce history</p>
       <ul className={styles.kpiRow} aria-label="Recorded workforce indicators">
-        <li><span>Recruiting hires</span><b>{current&&recruitingKpi?.asOf===snapshotDate ? recruitingKpi.hires.toLocaleString() : 'Unavailable'}</b><small>{current&&recruitingKpi?.asOf===snapshotDate ? recruitingKpi.month+' through '+recruitingKpi.asOf+'; company-wide recruiting events, including internal fills. Not net workforce additions.' : 'Company-wide monthly recruiting source needed.'}</small></li>
-        <li><span>Voluntary turnover YTD</span><b>{known(current?.voluntary_turnover_ytd_pct) ? format(current.voluntary_turnover_ytd_pct)+'%' : 'Unavailable'}</b><small>{current ? snapshotDate.slice(0,4)+'-01-01 through '+snapshotDate+'; selected workforce scope. Source-reported rate; not annualized.' : 'Verified scoped turnover needed.'}</small></li>
-        <li><span>Sentiment</span><b>Unavailable</b><small>Eligible survey result and suppression metadata needed; survey respondents are a separate population.</small></li>
-        <li><span>Labor cost</span><b>{known(current?.labor_cost_usd) ? format(current.labor_cost_usd)+' USD' : 'Unavailable'}</b><small>{current ? 'As of '+snapshotDate+'; selected workforce scope. Cost period unspecified.' : 'Verified scoped cost needed.'}</small></li>
+        <li><span>Recruiting hires</span><b>{current&&recruitingKpi?.asOf===snapshotDate ? recruitingKpi.hires.toLocaleString() : 'Unavailable'}</b><small>Company-wide · monthly</small></li>
+        <li><span>Voluntary turnover YTD</span><b>{known(current?.voluntary_turnover_ytd_pct) ? format(current.voluntary_turnover_ytd_pct)+'%' : 'Unavailable'}</b><small>Source-reported · not annualized</small></li>
+        <li><span>Sentiment</span><b>Unavailable</b><small>Eligible survey evidence needed</small></li>
+        <li><span>Labor cost</span><b>{known(current?.labor_cost_usd) ? welcomeCurrency(current.labor_cost_usd).compact : 'Unavailable'}</b><small>Cost period unspecified</small>{known(current?.labor_cost_usd)&&<details className={styles.exactCost}><summary>Exact amount</summary><p>{welcomeCurrency(current.labor_cost_usd).exact}</p></details>}</li>
       </ul>
+      <details className={styles.evidenceDetails}><summary>Indicator scope and source details</summary>
+        <p>{current&&recruitingKpi?.asOf===snapshotDate ? 'Recruiting: '+recruitingKpi.month+' through '+recruitingKpi.asOf+'; company-wide recruiting events, including internal fills. Not net workforce additions.' : 'Company-wide monthly recruiting source needed.'}</p>
+        <p>{current ? 'Turnover: '+snapshotDate.slice(0,4)+'-01-01 through '+snapshotDate+'; selected workforce scope. Source-reported rate; not annualized.' : 'Verified scoped turnover needed.'}</p>
+        <p>Sentiment requires an eligible survey result and suppression metadata; survey respondents are a separate population.</p>
+        <p>{current ? 'Labor cost as of '+snapshotDate+'; selected workforce scope. Cost period unspecified; no monthly or annual basis is inferred.' : 'Verified scoped cost needed.'}</p>
+      </details>
       {(first && last || checked) ? <figure className={styles.historyFigure}>
-        <svg viewBox="0 0 488 88" role="img" aria-label={'Recorded synthetic headcount history in people. ' + scopeLabel + '. ' + history.map(point => point.snapshot_date + ': ' + point.headcount).join('; ') + '. Missing months are not connected. ' + (checked ? 'Conditional projection: '+projected.map(point=>point.month+': '+format(point.headcount)).join('; ') : 'No projection.')}>
-          <line x1="40" y1="76" x2="472" y2="76" className={styles.chartAxis}/>
-          <text x="34" y="16" textAnchor="end">{maximum.toLocaleString()}</text><text x="34" y="80" textAnchor="end">0</text>
+        <svg viewBox="0 0 488 120" role="img" aria-label={'Recorded synthetic headcount history in people. ' + scopeLabel + '. ' + history.map(point => point.snapshot_date + ': ' + point.headcount).join('; ') + '. Missing months are not connected. ' + (checked ? 'Conditional projection: '+projected.map(point=>point.month+': '+format(point.headcount)).join('; ') : 'No projection.')}>
+          <line x1="40" y1="100" x2="472" y2="100" className={styles.chartAxis}/>
+          <text x="34" y="24" textAnchor="end">{maximum.toLocaleString()}</text><text x="34" y="104" textAnchor="end">0</text>
           {plot.map((point, index) => <g key={point.snapshot_date}>
             {index > 0 && monthIndex(point.snapshot_date) === monthIndex(plot[index - 1].snapshot_date) + 1 && <line x1={plot[index - 1].x} y1={plot[index - 1].y} x2={point.x} y2={point.y} className={styles.historyLine}/>}
             <circle cx={point.x} cy={point.y} r="3" className={styles.historyPoint}/>
