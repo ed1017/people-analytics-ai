@@ -11,7 +11,7 @@ export type GoalMeasurement={metric:string;definition:string;unit:string;directi
 export type ProgressCurrentSource=ProgressSource&{available:boolean;scope:GoalScope};
 export type ProgressPlanLink={planId:string;revision:number;inputKey:string;evidenceDigest:string;datasetToken:string};
 export type ProgressMilestone={measurementId:string;value:number;date:string;provenance:string};
-export type ProgressAssessment={version:1|2;goalId:string;measurementId:string|null;assessedOn:string;baseline:{id:string;observation:ProgressObservation}|null;latestComparable:{id:string;observation:ProgressObservation}|null;latestReceivedId:string|null;change:number|null;gap:number|null;intendedChangePercent:number|null;reference:{kind:'accepted-milestone'|'linear-reference';value:number;date:string;difference:number;milestoneId:string|null}|null;requiredPace:{value:number;unit:'people/day';from:string;through:string;arithmeticOnly:true}|null;currentStatus:'undefined'|'unavailable'|'baseline_only'|'deadline_passed'|'within_limit'|'outside_limit'|'meets_point_target'|'behind_reference'|'at_or_beyond_reference';reasons:string[];completion:'not_assessed';forecast:{status:'unavailable';confidence:null;successProbability:null}};
+export type ProgressAssessment={version:1|2|3;goalId:string;measurementId:string|null;assessedOn:string;baseline:{id:string;observation:ProgressObservation}|null;latestComparable:{id:string;observation:ProgressObservation}|null;latestReceivedId:string|null;change:number|null;gap:number|null;intendedChangePercent:number|null;reference:{kind:'accepted-milestone'|'linear-reference';value:number;date:string;difference:number;milestoneId:string|null}|null;requiredPace:{value:number;unit:'people/day';from:string;through:string;arithmeticOnly:true}|null;currentStatus:'undefined'|'unavailable'|'baseline_only'|'deadline_passed'|'within_limit'|'outside_limit'|'meets_point_target'|'behind_reference'|'at_or_beyond_reference';reasons:string[];completion:'not_assessed';forecast:{status:'unavailable';confidence:null;successProbability:null}};
 type EventBase={id:string;at:string;supersedes:string|null};
 export type ProgressEvent=EventBase&({kind:'observed';data:ProgressObservation}|{kind:'measurement';data:GoalMeasurement}|{kind:'milestone-proposed';data:ProgressMilestone}|{kind:'milestone-accepted';data:{proposalId:string;intent:'accept-milestone'}}|{kind:'plan-linked';data:ProgressPlanLink}|{kind:'assessed';data:{asOf:string;currentSource:ProgressCurrentSource|null;result:ProgressAssessment}});
 export type GoalProgressLedger={version:1;goalId:string;origin:'authored'|'demo';events:ProgressEvent[]};
@@ -54,9 +54,9 @@ function acceptedMilestones(l:GoalProgressLedger){
  }
  return {accepted,active};
 }
-// Version 1 is replay-only: preserve historical snapshots without letting new
-// assessments select the obsolete milestone and threshold semantics.
-function assess(l:GoalProgressLedger,asOf:string,source:ProgressCurrentSource|null,version:1|2=2):ProgressAssessment{
+// Versions 1 and 2 are replay-only. Version 3 distinguishes a maintain target
+// from a ceiling without rewriting historical saved assessments.
+function assess(l:GoalProgressLedger,asOf:string,source:ProgressCurrentSource|null,version:1|2|3=3):ProgressAssessment{
  must(progressDay(asOf),'Assessment date required.');if(source!==null)currentSource(source);
  l={...l,events:l.events.filter(e=>e.at.slice(0,10)<=asOf)};
  const result:ProgressAssessment={version,goalId:l.goalId,measurementId:null,assessedOn:asOf,baseline:null,latestComparable:null,latestReceivedId:null,change:null,gap:null,intendedChangePercent:null,reference:null,requiredPace:null,currentStatus:'undefined',reasons:[],completion:'not_assessed',forecast:{status:'unavailable',confidence:null,successProbability:null}};
@@ -68,19 +68,20 @@ function assess(l:GoalProgressLedger,asOf:string,source:ProgressCurrentSource|nu
  const received=records.at(-1),comparable=records.filter(e=>!observationIssues(e.data,m,baseline.data).length&&e.data.period.end<=asOf).at(-1);result.latestReceivedId=received?.id??null;
  if(!comparable){result.reasons.push('No comparable dated observation is available.');return result;}const o=comparable.data;result.latestComparable={id:comparable.id,observation:o};
  if(received)result.reasons.push(...observationIssues(received.data,m,baseline.data));if(received?.data.period.end&&received.data.period.end>asOf)result.reasons.push('Latest input is future-dated.');
- const base=baseline.data.value!,value=o.value!,date=o.period.end,threshold=m.direction==='maintain'||m.direction==='ceiling',decreasing=m.direction==='decrease'||threshold;
- result.change=value-base;result.gap=Math.max(0,decreasing?value-m.target.value:m.target.value-value);
- const intended=decreasing?base-m.target.value:m.target.value-base;if(!threshold&&intended>0)result.intendedChangePercent=(decreasing?base-value:value-base)/intended*100;
+ const base=baseline.data.value!,value=o.value!,date=o.period.end,maintaining=version>=3&&m.direction==='maintain',threshold=m.direction==='ceiling'||version<3&&m.direction==='maintain',decreasing=m.direction==='decrease'||threshold;
+ result.change=value-base;result.gap=maintaining?Math.abs(value-m.target.value):Math.max(0,decreasing?value-m.target.value:m.target.value-value);
+ const intended=decreasing?base-m.target.value:m.target.value-base;if(!threshold&&!maintaining&&intended>0)result.intendedChangePercent=(decreasing?base-value:value-base)/intended*100;
  const accepted=version===1?new Set(l.events.filter(e=>e.kind==='milestone-accepted').map(e=>e.data.proposalId)):acceptedMilestones(l).active;
  if(version===1)for(const e of l.events)if(e.kind==='milestone-proposed'&&e.supersedes&&accepted.has(e.id))accepted.delete(e.supersedes);
  const milestone=l.events.filter((e):e is ProgressEvent&{kind:'milestone-proposed'}=>e.kind==='milestone-proposed'&&e.data.measurementId===revision.id&&accepted.has(e.id)&&e.data.date<=date).sort((a,b)=>a.data.date.localeCompare(b.data.date)||l.events.indexOf(a)-l.events.indexOf(b)).at(-1);
- const reference=milestone?milestone.data.value:threshold||intended<=0?m.target.value:base+(m.target.value-base)*Math.min(1,Math.max(0,days(baseline.data.period.end,date)/days(baseline.data.period.end,m.target.date)));
+ const reference=milestone?milestone.data.value:threshold||maintaining||intended<=0?m.target.value:base+(m.target.value-base)*Math.min(1,Math.max(0,days(baseline.data.period.end,date)/days(baseline.data.period.end,m.target.date)));
  result.reference={kind:milestone?'accepted-milestone':'linear-reference',value:reference,date:milestone?.data.date??date,difference:value-reference,milestoneId:milestone?.id??null};
- const remaining=days(date,m.target.date);if(asOf<=m.target.date&&(remaining>0||result.gap===0))result.requiredPace={value:result.gap===0?0:(decreasing?-1:1)*result.gap/remaining,unit:'people/day',from:date,through:m.target.date,arithmeticOnly:true};
+ const remaining=days(date,m.target.date);if(asOf<=m.target.date&&(remaining>0||result.gap===0))result.requiredPace={value:result.gap===0?0:(maintaining?Math.sign(m.target.value-value):decreasing?-1:1)*result.gap/remaining,unit:'people/day',from:date,through:m.target.date,arithmeticOnly:true};
  if(days(date,asOf)>m.maxAgeDays)result.reasons.push('Latest comparable observation has expired under the saved freshness policy.');
  if(!source?.available)result.reasons.push('Current source is unavailable; historical observations remain dated evidence.');else{if(!same(source.scope,m.scope))result.reasons.push('Current source scope differs from saved goal scope.');if(!same(o.source,{classification:source.classification,datasetToken:source.datasetToken,releaseId:source.releaseId,releaseDigest:source.releaseDigest,lineageId:source.lineageId}))result.reasons.push('Current source release, dataset identity or lineage differs; explicitly record and review new data.');}
+ if(maintaining&&result.gap>0)result.reasons.push('Maintain-target distance is dated arithmetic, not directional progress or completion.');
  if(result.reasons.length)return result;
- result.currentStatus=date===baseline.data.period.end?'baseline_only':asOf>m.target.date?'deadline_passed':threshold&&result.gap===0?'within_limit':version===2&&threshold&&result.gap>0?'outside_limit':!threshold&&result.gap===0?'meets_point_target':(decreasing?value>reference:value<reference)?'behind_reference':'at_or_beyond_reference';return result;
+ result.currentStatus=date===baseline.data.period.end?'baseline_only':asOf>m.target.date?'deadline_passed':threshold&&result.gap===0?'within_limit':version>=2&&threshold&&result.gap>0?'outside_limit':!threshold&&result.gap===0?'meets_point_target':(decreasing?value>reference:value<reference)?'behind_reference':'at_or_beyond_reference';return result;
 }
 function observationKey(o:ProgressObservation){const {capturedAt,...value}=o;void capturedAt;return JSON.stringify(canonical(value));}
 function append(l:GoalProgressLedger,event:ProgressEvent,replaying=false):GoalProgressLedger{
@@ -101,7 +102,7 @@ function append(l:GoalProgressLedger,event:ProgressEvent,replaying=false):GoalPr
  }else if(event.kind==='plan-linked'){
   exact(event.data,['planId','revision','inputKey','evidenceDigest','datasetToken']);must(event.supersedes===null&&id(event.data.planId)&&Number.isSafeInteger(event.data.revision)&&event.data.revision>0&&text(event.data.inputKey,50000)&&/^[a-f0-9]{64}$/.test(event.data.evidenceDigest)&&validDatasetToken(event.data.datasetToken),'Exact saved plan revision and input binding required.');if(l.events.some(e=>e.kind==='plan-linked'&&same(e.data,event.data)))return l;
  }else if(event.kind==='assessed'){
-  exact(event.data,['asOf','currentSource','result']);const version=replaying&&event.data.result?.version===1?1:2;must(event.supersedes===null&&event.data.asOf===event.at.slice(0,10)&&same(event.data.result,assess(l,event.data.asOf,event.data.currentSource,version)),'Assessment must equal the deterministic result at this ledger revision.');
+  exact(event.data,['asOf','currentSource','result']);const storedVersion=event.data.result?.version,version=replaying&&(storedVersion===1||storedVersion===2)?storedVersion:3;must(event.supersedes===null&&event.data.asOf===event.at.slice(0,10)&&same(event.data.result,assess(l,event.data.asOf,event.data.currentSource,version)),'Assessment must equal the deterministic result at this ledger revision.');
  }else throw Error('Unsupported progress event.');
  const next={...l,events:[...l.events,structuredClone(event)]};must(next.events.length<=MAX_EVENTS&&new TextEncoder().encode(JSON.stringify(next)).length<=MAX_BYTES,'Goal progress storage is full. History was not pruned.');return next;
 }

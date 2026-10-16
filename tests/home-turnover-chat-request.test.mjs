@@ -1,3 +1,4 @@
+import {trackingPreviewBudgetEnabled,trackingPreviewLimits,createTrackingPreviewBudget,PreviewBudgetError} from '../lib/home-preview-budget.ts';
 /** Actual exported POST and request boundary; in-memory aggregate/provider ports only. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -20,6 +21,7 @@ function route(results){
  const source=ts.createSourceFile('route.ts',readFileSync(new URL('../app/api/home-solution-conversation/route.ts',import.meta.url),'utf8'),ts.ScriptTarget.Latest,true);
  const code=source.statements.filter(node=>!ts.isImportDeclaration(node)).map(node=>node.getText(source)).join('\n');
  const sandbox={exports:{},Response,AbortSignal,TextEncoder,Date,JSON,console,process:{env:{OPENAI_API_KEY:'offline-fixture-not-a-key'}},
+  trackingPreviewBudgetEnabled,trackingPreviewLimits,createTrackingPreviewBudget,PreviewBudgetError,
   withDatasetRequest,datasetRouter,readSolutionRequest,converseSolutions,SolutionEvidenceError,createSolutionDiagnostics,
   solutionConversationEnabled:true,goalProgressConversationEnabled:false,SWP_CONVERSATION_HEADER:'x-offline-swp',SWP_DEMAND_MODE:'demand',
   swpConversationModel:()=>({}),readStaffingScenario:()=>null,solutionPlanningInstructions:()=>'',businessPlanningInstructions:'',hiringBudgetInstructions:'',requiredStaffingInstructions:'',

@@ -1,3 +1,4 @@
+import {trackingPreviewBudgetEnabled,trackingPreviewLimits,createTrackingPreviewBudget,PreviewBudgetError} from '@/lib/home-preview-budget';
 import {readStaffingScenario} from '@/lib/home-staffing-scenario';
 import {requiredStaffingInstructions,requiredStaffingTool} from '@/lib/home-required-staffing';
 import {hiringBudgetInstructions} from '@/lib/home-hiring-budget';
@@ -30,6 +31,7 @@ async function handlePOST(request:Request){
  const requestTime=new Date();
  if(!solutionConversationEnabled)return Response.json({error:'Solution conversation is not enabled.'},{status:404});
  const body=await request.text();if(new TextEncoder().encode(body).length>900000)return Response.json({error:'The conversation request is too large.'},{status:413});
+ const previewBudget=trackingPreviewBudgetEnabled(process.env)?createTrackingPreviewBudget(process.env.HOME_TRACKING_QA_COUNT_ONLY==='true'):null;
  const diagnostics=createSolutionDiagnostics();let signal:AbortSignal|undefined;
  try{
   const parsed=readSolutionRequest(JSON.parse(body));
@@ -50,6 +52,7 @@ async function handlePOST(request:Request){
   diagnostics.stage('conversation_preparation');
   const reply=await converseSolutions(parsed,{
    grounding,staffingScenarioOnly,requestTime,onToolResult:diagnostics.toolResult,
+   ...(previewBudget?{maxModelRounds:trackingPreviewLimits.rounds}:{}),
    ...(demand?{demand:{datasetToken:datasetRouter.current().token,referenceContract:true}}:{}),
    ...(natural?{natural:{datasetToken:datasetRouter.current().token}}:{}),
    progress:{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token},
@@ -58,9 +61,12 @@ async function handlePOST(request:Request){
     const progressContract=progressModelContract(goalProgressConversationEnabled,capabilities.progressEntryEnabled);
     const conversationTools=capabilities.requiredStaffingCalculation?[requiredStaffingTool]:demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools,...(natural?businessPlanningModelTools:[])];
     const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+'\n'+solutionCompletionInstructions+progressContract.instructions)+planningInstructions;
+    let providerRequest:import('openai/resources/responses/responses').ResponseCreateParamsNonStreaming={...homeSolutionModel,instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000};
+    if(previewBudget)providerRequest=await datasetAI(()=>previewBudget.prepare(providerRequest,body=>client.responses.inputTokens.count(body,{maxRetries:0,timeout:15000,signal})));
+    signal.throwIfAborted();
     const response=await datasetAI(() => {
      diagnostics.modelAttempt({inputBytes:new TextEncoder().encode(JSON.stringify(input)).length,instructionsBytes:new TextEncoder().encode(instructions).length,toolSchemaBytes:new TextEncoder().encode(JSON.stringify(conversationTools)).length});
-     return client.responses.create({...homeSolutionModel,instructions,input:input as ResponseInput,tools:conversationTools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{maxRetries:0,timeout:60000,signal});
+     return client.responses.create(providerRequest,{maxRetries:0,timeout:60000,signal});
     });
     diagnostics.providerResult(response);
     diagnostics.stage('response_validation');
@@ -72,7 +78,7 @@ async function handlePOST(request:Request){
   return Response.json(reply,{headers:{'Cache-Control':'no-store'}});
  }catch(error){
   const evidence=error instanceof SolutionEvidenceError,diagnostic=diagnostics.failure(error,evidence?error.diagnostic:null,request.signal.aborted,signal?.aborted===true);
-  return Response.json({error:evidence?error.message:'The conversation could not be completed or verified. Your request and earlier work are kept. Try a narrower question or retry explicitly.',...diagnostic},
+  return Response.json({error:error instanceof PreviewBudgetError?error.message:evidence?error.message:'The conversation could not be completed or verified. Your request and earlier work are kept. Try a narrower question or retry explicitly.',...diagnostic,...(error instanceof PreviewBudgetError&&error.diagnostic?{budgetDiagnostic:error.diagnostic}:{})},
    {status:evidence?503:422,headers:{'Cache-Control':'no-store','X-Correlation-ID':diagnostic.correlationId}});
  }
 }
@@ -84,7 +90,8 @@ export async function POST(request:Request) {
 /** Current aggregate projection inputs only: no conversation, model or writes. */
 export async function GET(request:Request){
  return withDatasetRequest(request,async()=>{
-  const headers={'Cache-Control':'no-store'};
+  const headers:Record<string,string>={'Cache-Control':'no-store'};
+  if(trackingPreviewBudgetEnabled(process.env))headers['X-Tracking-Preview-Budget']=`v1; rounds=${trackingPreviewLimits.rounds}; input=${trackingPreviewLimits.inputTokens}; output=${trackingPreviewLimits.outputTokens}`+(process.env.HOME_TRACKING_QA_COUNT_ONLY==='true'?'; mode=count-only':'');
   if(!solutionConversationEnabled)return Response.json({error:'Solution conversation is not enabled.'},{status:404,headers});
   const {projectionCurrentnessFilters,createProjectionCurrentnessReceipt}=await import('@/lib/home-projection-currentness');
   let filters;
