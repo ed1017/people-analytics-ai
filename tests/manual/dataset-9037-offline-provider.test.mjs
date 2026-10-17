@@ -3,7 +3,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import {create9037OfflineProvider, OFFLINE_9037_DATASET_ID as id, OFFLINE_9037_INTEGRITY_DIGEST as digest} from '../../lib/dataset-9037-offline-provider.mjs';
+import {create9037OfflineProvider, reviewed9037PresenterContract, OFFLINE_9037_DATASET_ID as id, OFFLINE_9037_INTEGRITY_DIGEST as digest} from '../../lib/dataset-9037-offline-provider.mjs';
+import {localPresenterContract} from '../../lib/dataset-presenter-contract.mjs';
+import {createLocalApiPresenter} from '../../lib/dataset-local-api.mjs';
+import {DatasetReleaseDispatcher} from '../../lib/dataset-composition.mjs';
 import {createSealedDemoProvider} from '../../lib/dataset-sealed-demo.mjs';
 import {createLocalDatasetIntegration} from '../../lib/dataset-local-integration.mjs';
 import {DatasetRouter} from '../../lib/dataset-router.mjs';
@@ -80,4 +83,28 @@ test('original 9847 constructor boundary remains unchanged', async () => {
   let reads=0;
   await assert.rejects(() => createSealedDemoProvider({expectedDatasetId:id,expectedDigest:digest,source:{readSeal:async()=>{reads++;},readComponent:async()=>{reads++;}}}), /Explicit local reviewed binding/);
   assert.equal(reads,0);
+});
+
+test('presenter policies preserve 9847 and bind the reviewed 9037 population/history/range policy', () => {
+  const current=reviewed9037PresenterContract(provider);
+  assert.equal(current.population,9037);
+  assert.equal(current.externalStarts,4163);
+  assert.equal(current.exits,3526);
+  assert.equal(current.rangePolicy,'constructed-9037-inherited-range-policy-v1');
+  const old=localPresenterContract({datasetId:'workforce-demo-9847-2026-09-30-local-final-v1'});
+  assert.deepEqual([old.population,old.externalStarts,old.exits,old.rangePolicy],[9847,4327,2880,'constructed-demo-9847-ranges-v2']);
+  assert.throws(()=>localPresenterContract({datasetId:id,provider:{...provider}}),/Reviewed/);
+  assert.throws(()=>localPresenterContract({datasetId:'unknown'}),/Unsupported/);
+});
+
+test('skills response uses verified component population, not a query-supplied or legacy population', async () => {
+  // One explicit catalog stub tests presentation only, not captured-query parity.
+  const analytics={datasetId:id,bundleDigest:digest,read:async name=>{
+    assert.equal(name,'skill_catalog_counts');return [{active_skills:5,total_job_profiles:50,onet_mapped_job_profiles:0}];
+  }};
+  const presenter=createLocalApiPresenter({router,analytics,releases:new DatasetReleaseDispatcher(router)});
+  const req=request('/api/skills');
+  const response=await router.request(req,()=>presenter.handle(req));
+  assert.equal(response.status,200);
+  assert.equal((await response.json()).summary.current_workforce,9037);
 });
