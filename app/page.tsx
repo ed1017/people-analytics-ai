@@ -1,4 +1,5 @@
 "use client";
+import {focusNavigationTarget} from "@/lib/navigation-focus";
 import {capacityChatContext} from '@/lib/capacity-chat-context';
 import {SelectedProgressEntry} from '@/components/goal-progress-entry-review';
 import {progressEntryContext,retainProgressEntryProposal} from '@/lib/goal-progress-entry-store';
@@ -145,6 +146,21 @@ const PLANNING_VIEW_TO_PAGE: Record<
 
 export default function Home() {
   const activePage = useSyncExternalStore(subscribeToAppPage, currentAppPage, serverAppPage);
+  const previousNavigationPage = useRef(activePage);
+  const pendingPageFocus = useRef<{page: AppPage; id: string} | null>(null);
+  useLayoutEffect(() => {
+    if (previousNavigationPage.current === activePage) return;
+    previousNavigationPage.current = activePage;
+    const frame = requestAnimationFrame(() => {
+      const requested = pendingPageFocus.current;
+      pendingPageFocus.current = null;
+      const target = (requested?.page === activePage ? document.getElementById(requested.id) : null) ?? document.getElementById('app-page-title');
+      const pageStart = target?.id === 'app-page-title';
+      focusNavigationTarget(target, pageStart);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [activePage]);
+
   const conversation = useProblemConversation(activePage);
   const capacityState=useCapacitySessionState(conversation.workspaceKey);
   const [workspacePalette]=useWorkspacePalette();
@@ -191,8 +207,12 @@ export default function Home() {
     evaluate: "assess-evaluate",
   });
 
-  const setActivePage = (page: AppPage) => {
+  const setActivePage = (page: AppPage, focusTarget?: string) => {
     const destination = resolveAppPage(page);
+    if (destination === activePage && focusTarget) {
+      requestAnimationFrame(() => focusNavigationTarget(document.getElementById(focusTarget)));
+    }
+    pendingPageFocus.current = destination !== activePage && focusTarget ? {page: destination, id: focusTarget} : null;
     if (destination !== activePage) conversation.cancelPending();
     const href = appPageHref(window.location, destination);
     if (href !== window.location.pathname + window.location.search + window.location.hash) {
@@ -1115,19 +1135,13 @@ export default function Home() {
   const openPlanningWithHandoff = () => {
     lastPageByWorkspaceRef.current.strategy =
       "planning-overview";
-    setActivePage("planning-overview");
-    focusAfterRender(
-      "carried-planning-evidence"
-    );
+    setActivePage("planning-overview", "carried-planning-evidence");
   };
 
   const backToSkillsFromHandoff = () => {
     lastPageByWorkspaceRef.current.analytics =
       "skills";
-    setActivePage("skills");
-    focusAfterRender(
-      "skills-evidence-handoff"
-    );
+    setActivePage("skills", "skills-evidence-handoff");
   };
 
   const attachCarriedPlanningGoal = (choice:{id:string}|{statement:string}) => {
