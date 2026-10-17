@@ -214,3 +214,11 @@ test('period change uses verified historical endpoints, with readable intermedia
  assert.match(render({trend:[{...history[0],headcount:120},history[2]]}),/>0 people</);
  for(const patch of [{trend:[history[2]]},{trend:history,loading:true},{trend:history,receipt:null},{trend:[history[0],{...history[2],headcount:119}]}])assert.doesNotMatch(render(patch),/[+-]10 people/);
 });
+
+ test('recruiting distinguishes pending from unavailable and withholds stale counts', () => {
+  const kpi={hires:75,month:'2026-09',asOf:'2026-09-30'};
+  assert.match(render({recruitingPending:true,recruitingKpi:kpi}), /Recruiting hires<\/span><b>Loading…<\/b>/);
+  assert.doesNotMatch(render({recruitingPending:true,recruitingKpi:kpi}), />75</);
+  assert.match(render({recruitingPending:false,recruitingKpi:null}), /Recruiting hires<\/span><b>Unavailable<\/b>/);
+  assert.match(render({recruitingPending:false,recruitingKpi:kpi}), /Recruiting hires<\/span><b>75<\/b>/);
+ });

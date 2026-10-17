@@ -306,7 +306,7 @@ export function AiPanel({
                 }
                 disabled={previewPage}
                 rows={drawer ? 2 : 5}
-                aria-label="Ask People Analytics AI"
+                aria-label="Ask Workforce AI"
                 aria-describedby={goalHelpId}
                 className={`${drawer ? "min-h-[52px] max-h-40 resize-none" : "h-36 min-h-32 max-h-64 resize-y"} min-w-0 flex-1 rounded-lg border bg-background p-3 text-base leading-relaxed outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60`}
               />

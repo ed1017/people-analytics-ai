@@ -31,6 +31,14 @@ export function AppHeader({
   onPersonaChange,
 }: AppHeaderProps) {
   const header = useRef<HTMLElement>(null);
+  const aboutMenu=useRef<HTMLDetailsElement>(null);
+  useEffect(()=>{if(aboutMenu.current)aboutMenu.current.open=false;},[activePage]);
+  useEffect(()=>{
+    const outside=(event:PointerEvent)=>{const menu=aboutMenu.current;if(menu?.open&&!menu.contains(event.target as Node))menu.open=false;};
+    const escape=(event:KeyboardEvent)=>{const menu=aboutMenu.current;if(event.key!=='Escape'||event.defaultPrevented||!menu?.open||(event.target as Element)?.closest('dialog[open], [popover]:popover-open'))return;menu.open=false;menu.querySelector('summary')?.focus();event.preventDefault();};
+    document.addEventListener('pointerdown',outside);document.addEventListener('keydown',escape);
+    return()=>{document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',escape);};
+  },[]);
   const menuButton=useRef<HTMLButtonElement>(null);
   const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
   // eslint-disable-next-line react-hooks/set-state-in-effect -- Navigation dismisses the mobile disclosure without resetting its mounted controls.
@@ -98,7 +106,7 @@ export function AppHeader({
         {onNavigate&&<nav aria-label="Main navigation" className="calm-main-nav">
           {mainNavigation.map(item=><button key={item.page} type="button" aria-current={activePage===item.page?'page':mainNavigationSection(activePage)===item.key?'location':undefined} onClick={()=>onNavigate(item.page)}>{item.label}</button>)}
         </nav>}
-        <details className="calm-header-menu"><summary>About this project</summary><div className="calm-header-popover">
+        <details ref={aboutMenu} className="calm-header-menu"><summary>About this project</summary><div className="calm-header-popover">
           <h2 className="font-semibold">Workforce planning by Ed Om</h2>
           <p className="my-2 text-sm">An independently developed portfolio project, built with AI assistance. Explore workforce evidence and compare explicit planning assumptions.</p>
           <p className="my-2 text-sm">Workforce data is synthetic. Public reference data has separate sources and dates. Calculations are tested against defined contracts; scenario outputs are conditional, not verified business outcomes.</p>

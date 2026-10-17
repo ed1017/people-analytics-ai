@@ -17,7 +17,7 @@ import styles from './home-chat-shell.module.css';
 type Navigate = {onNavigate: (page: AppPage) => void};
 export function FutureOfWorkPage({onNavigate}: Navigate) {
   return <section className="mx-auto max-w-4xl space-y-5 p-6" aria-label="Future of Work">
-    <header><p className="text-xs text-muted-foreground">Future of Work · Not configured</p><h2 className="mt-2 text-2xl font-semibold">How could the work change?</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">Explore a fictional task example before setting your own assumptions. Actual task impact is not configured.</p></header>
+    <header><p className="text-xs text-muted-foreground">Future of Work · Illustrative task example</p><h2 className="mt-2 text-2xl font-semibold">How could the work change?</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">Start with the fictional task example below to explore how task time and adoption affect modeled savings. Your actual workforce impact remains unconfigured.</p></header>
     <FutureWorkExample onNavigate={onNavigate}/>
     <div className="flex flex-wrap gap-3"><button type="button" onClick={() => onNavigate('occupational-references')} className="min-h-11 rounded-md border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Explore role references</button><button type="button" onClick={() => onNavigate('planning-overview')} className="min-h-11 rounded-md border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Enter manual scenario assumptions</button></div>
     <p className="text-xs text-muted-foreground">Scenario calculations use your entered assumptions. No AI adjustment is applied automatically.</p>
