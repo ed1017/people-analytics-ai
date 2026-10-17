@@ -29,7 +29,7 @@ try{
   if(out)await results.screenshot({path:`${out}/form-${width}.png`});
   await results.getByRole('button',{name:'Review result',exact:true}).click();await results.getByRole('button',{name:'Save result',exact:true}).click();
   await results.getByRole('status').waitFor();assert.match(await results.innerText(),/Reported result: 0 roles/);assert.match(await results.innerText(),/Interim measurement/);
-  if(out)await results.screenshot({path:`${out}/saved-${width}.png`});
+  if(out){await results.screenshot({path:`${out}/saved-${width}.png`});await page.screenshot({path:`${out}/page-${width}.png`});}
   await results.getByText('Result history (1 entries for this goal)',{exact:true}).click();
   await results.getByRole('button',{name:`Correct entry from ${today}`,exact:true}).click();
   await results.getByRole('checkbox',{name:'Result is unknown',exact:true}).check();
@@ -54,11 +54,13 @@ try{
  // Exact-date headcount arithmetic and plan isolation use a clearly fictional,
  // browser-local fixture, never an API dataset or uploaded employee records.
  for(const width of [1440,390]){
-  const fixture=await manualResultFixture({headcount:true,value:0,targetDate:today});
   const context=await browser.newContext({viewport:{width,height:900}});
-  await context.addInitScript(values=>{if(!sessionStorage.getItem('manual-result-fixture')){for(const [k,v]of values)localStorage.setItem(k,v);sessionStorage.setItem('manual-result-fixture','1');}},[...fixture.values]);
   await context.route('**/*',r=>{const q=r.request(),u=new URL(q.url());return q.method()!=='GET'||u.origin!==new URL(base).origin||u.pathname.startsWith('/api/bls')?r.abort():r.continue();});
   const page=await context.newPage();page.setDefaultTimeout(20000);await page.goto(base);
+  await page.waitForFunction(()=>document.querySelector('nav[aria-label="Main navigation"]')||[...document.querySelectorAll('button')].some(b=>b.textContent==='Start the 3-minute demo'));
+  const datasetToken=await page.evaluate(()=>localStorage.getItem('insights-to-action.dataset-workspace.v1')||'legacy-v1:0');
+  const fixture=await manualResultFixture({headcount:true,value:0,targetDate:today,datasetToken});
+  await page.evaluate(values=>{for(const [k,v]of values)localStorage.setItem(k,v);},[...fixture.values]);await page.reload();
 
   if(width<768)await page.getByRole('button',{name:'Browse pages',exact:true}).click();
   await page.getByRole('button',{name:'Track',exact:true}).click();
