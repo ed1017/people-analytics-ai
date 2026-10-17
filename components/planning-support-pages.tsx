@@ -39,8 +39,9 @@ export function PlanningSupportPage({page, onNavigate}: Navigate & {page: 'actio
     {!storage.ready ? <p role="status">Loading saved work…</p> : !storage.saved ? <p role="status">Saved work needs review. Existing records are retained.</p> : !goal ? <p className="text-sm text-muted-foreground">Select a saved goal on Overview to review its {page === 'action-plans' ? 'plans' : 'dated measurements'}. No goal is selected.</p> : page === 'action-plans' ? <>
       <p className="text-sm">{goal.statement}</p>
       {fields.homeSolutionBundlesV1 === undefined && fields.homePlanAlternativesV1 === undefined ? <p className="text-sm text-muted-foreground">No attached Action Plan is recorded for this goal. Review proposals in chat on Overview.</p> : <AttachedActionPlansBrief goalId={goal.id} goal={goal.statement} raw={fields.homeSolutionBundlesV1} alternatives={fields.homePlanAlternativesV1} onReview={() => onNavigate('home')}/>}
-    </> : goalProgressEnabled ? <SelectedGoalProgress/> : null}
+    </> : null}
     {storage.ready&&storage.saved&&goal&&<ManualPlanResults key={`${decisionStore.getDatasetToken()}/${goal.id}/${goal.statement}`} goalId={goal.id} goal={goal.statement} fields={fields} datasetToken={decisionStore.getDatasetToken()}/>}
+    {page==='plan-track'&&storage.ready&&storage.saved&&goal&&goalProgressEnabled&&<details><summary className="min-h-11 cursor-pointer text-sm">Other goal measurements</summary><p className="mb-3 text-sm text-muted-foreground">These goal measurements do not include the manually reported plan results above. They are recorded separately.</p><SelectedGoalProgress/></details>}
     {page==='plan-track'&&savedChoice&&<details><summary className="min-h-11 cursor-pointer text-sm">Saved scenario assumptions (not recorded results)</summary><GuidedPlanSummary draft={savedChoice.draft}/></details>}
     <button type="button" onClick={() => onNavigate('home')} className="min-h-11 rounded border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Return to Overview</button>
   </section>;
