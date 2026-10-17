@@ -1,4 +1,5 @@
 "use client";
+import {mainNavigation,mainNavigationSection} from '@/lib/workspace-navigation';
 import {LimitedPreviewBadge} from "@/components/limited-preview-badge";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {WorkspacePaletteControl} from "@/components/workspace-palette-control";
@@ -93,7 +94,7 @@ export function AppHeader({
         <button ref={menuButton} type="button" className="guided-mobile-menu-button" aria-expanded={mobileMenuOpen} aria-controls="guided-header-navigation guided-header-context guided-workspace-controls" onClick={()=>setMobileMenuOpen(open=>!open)}>{mobileMenuOpen?'Close menu':'Menu'}</button>
         <div id="guided-header-navigation" className="guided-header-navigation">
         {onNavigate&&<nav aria-label="Main navigation" className="calm-main-nav">
-          {([{label:'Overview',page:'home'},{label:'Plan',page:'planning-overview'},{label:'Evidence',page:'workforce'}] as const).map(item=><button key={item.page} type="button" aria-current={activePage===item.page?'page':undefined} onClick={()=>onNavigate(item.page)}>{item.label}</button>)}
+          {mainNavigation.map(item=><button key={item.page} type="button" aria-current={activePage===item.page?'page':mainNavigationSection(activePage)===item.key?'location':undefined} onClick={()=>onNavigate(item.page)}>{item.label}</button>)}
         </nav>}
         <details className="calm-header-menu"><summary>About this project</summary><div className="calm-header-popover">
           <h2 className="font-semibold">Workforce planning by Ed Om</h2>

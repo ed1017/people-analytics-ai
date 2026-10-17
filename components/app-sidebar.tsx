@@ -1,4 +1,5 @@
 "use client";
+import {secondaryNavigationSections,secondaryNavigationSection} from '@/lib/workspace-navigation';
 import {planningJourney,planningEvidence} from "@/lib/planning-journey";
 import {LimitedPreviewBadge} from "@/components/limited-preview-badge";
 import {useRef,useState} from "react";
@@ -23,8 +24,6 @@ import {
 
 import { Button } from "@/components/ui/button";
 import {
-  appNavigationSections,
-  appWorkspaceJourneys,
   getAppPageMetadata,
   type AppWorkspaceKey,
 } from "@/lib/app-navigation";
@@ -39,16 +38,6 @@ type AppSidebarProps = {
   onWorkspaceChange: (
     workspace: AppWorkspaceKey
   ) => void;
-};
-
-const workspaceDisplayTitles: Record<
-  AppWorkspaceKey,
-  string
-> = {
-  analytics: "Workforce",
-  talent: "Intelligence",
-  strategy: "Planning",
-  evaluate: "More",
 };
 
 const pageIcons: Record<
@@ -92,11 +81,11 @@ export function AppSidebar({
   onPageChange,
 }: AppSidebarProps) {
   const phone=usePhoneLayout(),drawer=useRef<HTMLElement>(null),navCollapsed=phone?false:desktopNavCollapsed;
-  const [openGroups,setOpenGroups]=useState<Record<string,boolean>>(()=>({[appNavigationSections.find(section=>section.pages.includes(activePage))?.key??'']:activePage!=='home'}));
-  const primaryPage=activePage==="home"||planningJourney.some(step=>step.page===activePage)||activePage==="workforce-planning";
+  const [openGroups,setOpenGroups]=useState<Record<string,boolean>>(()=>({[secondaryNavigationSection(activePage)??'']:activePage!=='home'}));
+  const primaryPage=secondaryNavigationSection(activePage)===null;
   const [exploreOpen,setExploreOpen]=useState(!primaryPage);
   const [previousPage,setPreviousPage]=useState(activePage);
-  if(previousPage!==activePage){setPreviousPage(activePage);if(!primaryPage)setExploreOpen(true);const section=appNavigationSections.find(s=>s.pages.includes(activePage));if(section)setOpenGroups(current=>({...current,[section.key]:true}));}
+  if(previousPage!==activePage){setPreviousPage(activePage);if(!primaryPage)setExploreOpen(true);const section=secondaryNavigationSection(activePage);if(section)setOpenGroups(current=>({...current,[section]:true}));}
   return (
     <><div className="phone-navigation-trigger"><button type="button" popoverTarget="phone-navigation" className="min-h-11 rounded border px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring">Open navigation</button></div>
     <aside ref={drawer} id="phone-navigation" popover={phone?"auto":undefined} aria-label="Navigation drawer" onClick={event=>{if(phone&&(event.target as HTMLElement).closest('[data-nav-destination], [aria-label="Overview"]'))drawer.current?.hidePopover();}} className="app-sidebar sticky top-[var(--app-header-height)] h-[calc(100vh-var(--app-header-height))] overflow-y-auto border-r bg-sidebar p-3 max-md:p-2">
@@ -151,16 +140,9 @@ export function AppSidebar({
             <Compass className="h-5 w-5 shrink-0" />{!navCollapsed && <span>More</span>}<span aria-hidden="true" className="ml-auto">{exploreOpen?"−":"+"}</span>
           </button>
           <div id="explore-navigation" hidden={!exploreOpen}>
-        {appNavigationSections.map(
+        {secondaryNavigationSections.map(
           (section, sectionIndex) => {
-            const journey =
-              appWorkspaceJourneys.find(
-                (item) =>
-                  item.key === section.key
-              );
-            const groupLabel = section.key==='evaluate'?'More — Assess & Evaluate, coming soon':journey
-              ? `${section.title} — ${journey.subtitle}`
-              : section.title;
+            const groupLabel=section.title;
 
             const expanded=Boolean(openGroups[section.key]);
             const groupId="navigation-"+section.key;
@@ -189,20 +171,16 @@ export function AppSidebar({
                   {!navCollapsed && (
                     <span className="min-w-0 max-md:hidden">
                       <span className={section.key==='evaluate'?"block text-sm font-medium":"block text-sm font-semibold leading-tight"}>
-                        {workspaceDisplayTitles[section.key]}
+                        {section.title}
                       </span>
-                      {journey && section.key!=='evaluate' && (
-                        <span className="nav-journey-subtitle mt-1 block text-sm font-medium leading-tight text-muted-foreground">
-                          {journey.subtitle}
-                        </span>
-                      )}
+
                     </span>
                   )}
                   <span aria-hidden="true" className="ml-auto px-1 text-sm">{expanded?"−":"+"}</span>
                 </button></h2>
 
                 <div id={groupId} hidden={!expanded} className="space-y-1">
-                  {section.pages.filter(page=>!planningJourney.some(item=>item.page===page)&&!planningEvidence.some(item=>item.page===page)).map(
+                  {section.pages.map(
                     (page) => {
                       const metadata =
                         getAppPageMetadata(

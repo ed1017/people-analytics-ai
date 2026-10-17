@@ -780,7 +780,7 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .calm-brand h1 { font-size:20px; font-weight:650; line-height:1.3; }
 .calm-main-nav { display:flex; gap:4px; }
 .calm-main-nav button, .calm-header-menu > summary { min-height:44px; display:flex; align-items:center; padding:8px 10px; cursor:pointer; font-size:14px; border-radius:6px; }
-.calm-main-nav button[aria-current="page"] { background:var(--accent); color:var(--primary); font-weight:600; }
+.calm-main-nav button:is([aria-current="page"], [aria-current="location"]) { background:var(--accent); color:var(--primary); font-weight:600; }
 .calm-header-menu { position:relative; }
 .calm-header-popover { position:absolute; right:0; top:100%; z-index:60; width:min(360px,calc(100vw - 24px)); padding:16px; background:var(--card); color:var(--foreground); border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 24px #0002; }
 .calm-header-popover .header-preferences { display:flex; flex-wrap:wrap; justify-content:flex-start; margin-bottom:8px; }
