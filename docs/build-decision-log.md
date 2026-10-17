@@ -749,3 +749,9 @@ Survey boundary and blocking decisions
 - Reconciled the historical roadmap with shipped PRs 297-300 at main `20d9db40ef142a5ff031345b1426f3b9348e9f8a`; see [current status](roadmap-status-2026-10-17.md). Earlier navigation, chart, cost, target and uncovered-work fixes are complete, not remaining backlog.
 - Fresh independent production review at 1440/390 covered demo through saved plan, Track/result form and representative evidence charts. No new blocker; a zero-development option had an inaccurate development title. Correct only the action-derived label and verify all action combinations, leaving calculations/storage unchanged.
 - Repeated mobile goal context is a lower-priority follow-up. Acceptable uncovered-work thresholds and broader outcome/predictive definitions require explicit business/data contracts. The 9,037 protected-preview stream remains separate. No population, database, paid AI, credential or access change.
+
+### Mobile evidence context density (2026-10-17)
+
+- User approved continuing the roadmap with the previously identified repeated mobile goal context; deferred another general fresh-user review until a meaningful milestone. Current base is published PR301 (`2c0f73ffbce4280781e366eb5946664ccfa3190f`). No overlapping new open PR identified in the refreshed repository check.
+- Opt in only the five primary evidence pages to a phone disclosure. Preserve visible goal/saved scope/fictional qualifier/assumption-versus-result distinction, full desktop summary, filters and underlying records. See [behavior and validation](mobile-evidence-context.md).
+- Production baseline at390px: repeated summary482px tall. Independent source review found no actionable accessibility/state issues. Local15focused tests, scoped lint, build/TypeScript/artifact checks pass. Browser and release evidence are recorded in the PR; no hosted pass implied by local validation.

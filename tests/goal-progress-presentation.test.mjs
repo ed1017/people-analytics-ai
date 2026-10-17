@@ -42,3 +42,22 @@ test('missing, unsupported, stale and expired progress retains honest target and
  const expired=render(readProgressSnapshot(progressFixture('goal'),'goal','2027-01-01'));
  assert.match(expired.split('<details>')[0],/Deadline passed \(2026-12-31\)/);assert.match(expired,/No trajectory, forecast, on-track status or completion claim is inferred/);
 });
+
+test('mobile evidence context keeps scope and qualifications with accessible collapsed details',()=>{
+ const snapshot=readProgressSnapshot(progressFixture('goal'),'goal',day),before=structuredClone(snapshot);
+ const html=render(snapshot,{compactOnMobile:true,goal:'Review the team'});
+ assert.match(html,/aria-label="Saved goal context"/);
+ assert.match(html,/aria-expanded="false" aria-controls="[^"]+"/);
+ assert.match(html,/Saved goal: Review the team/);
+ assert.match(html,/Show details/);
+ assert.match(html,/Page filters do not change this scope/);
+ assert.match(html,/Plan assumptions are not measured results/);
+ assert.match(html,/class="hidden md:block"/);
+ assert.match(html,/aria-label="Goal progress"/);
+ assert.match(html,/Saved progress target/);
+ assert.deepEqual(snapshot,before);
+ const demo=readProgressSnapshot(emptyGoalProgress('goal','demo'),'goal',day);
+ const empty=render(demo,{compactOnMobile:true,goal:'Fictional plan'});
+ assert.match(empty,/Saved measurement scope is not defined/);
+ assert.match(empty,/Fictional demo goal/);
+});
