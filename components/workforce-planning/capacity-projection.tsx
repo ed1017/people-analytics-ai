@@ -1,6 +1,7 @@
 'use client';
 
 import {useId} from 'react';
+import {capacityPeriodSummary,formatShortfallFte} from '@/lib/capacity-period-summary';
 import type {calculateMonthlyWorkload} from '@/lib/swp-monthly-workload';
 
 type CapacityResult = ReturnType<typeof calculateMonthlyWorkload>;
@@ -15,6 +16,7 @@ export function CapacityProjection({result}:{result:CapacityResult|null}) {
  const x=(index:number)=>points.length===1?340:72+index*536/Math.max(1,points.length-1);
  const y=(value:number)=>242-value/maximum*194;
  const last=points.at(-1);
+ const period=capacityPeriodSummary(result);
  const series=[{key:'requiredFte',label:'Needed (FTE)',color:'#2563eb',dash:undefined},{key:'allocatedFte',label:'Available (FTE)',color:'#c2410c',dash:'7 4'}] as const;
  return <div className="min-w-0 space-y-4">
   <div className="min-w-0 rounded-xl border bg-background p-4 sm:p-5">
@@ -39,6 +41,13 @@ export function CapacityProjection({result}:{result:CapacityResult|null}) {
    </div> : <div className="flex min-h-60 items-center justify-center py-8 text-center text-sm text-muted-foreground">{result?'More numbers are needed. Fill in the blank work and team inputs.':'Enter your work and team numbers to see the comparison.'}</div>}
    {result&&<p className="mt-2 text-xs text-muted-foreground">Positive gap = shortfall; negative gap = surplus. Unknown values are not plotted.</p>}
   </div>
+  {period&&<section aria-label="Capacity across the planning period" className="rounded-xl border bg-background p-4 text-sm">
+   <h3 className="font-semibold">Across the planning period</h3>
+   <p className="mt-2">{period.shortfallMonths>0?`Shortfall in ${period.shortfallMonths} of ${period.months} months.`:period.unknownMonths>0?'Full-period coverage is unknown.':`No shortfall in any of the ${period.months} months.`}</p>
+   {period.peakShortfall&&<p className="mt-1">First shortfall: {period.firstShortfall}. Largest known monthly shortfall: {formatShortfallFte(period.peakShortfall.fte)} FTE in {period.peakShortfall.month}.</p>}
+   {period.unknownMonths>0&&<p className="mt-1">{period.unknownMonths} {period.unknownMonths===1?'month has':'months have'} an unknown gap and {period.unknownMonths===1?'is':'are'} excluded from the shortfall count.</p>}
+   <p className="mt-2 text-xs text-muted-foreground">Monthly work is due in its month; later surplus does not erase an earlier shortfall. These are conditional capacity calculations, not a hiring target.</p>
+  </section>}
   {last&&<div><p className="mb-2 text-xs text-muted-foreground">Final planning month · {last.month}</p><dl className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-2 sm:gap-3">{[{label:'Available FTE',value:last.allocatedFte},{label:'Required FTE',value:last.requiredFte},{label:'Gap FTE',value:last.gapFte}].map(item=>{const text=`${item.label==='Gap FTE'&&item.value!==null&&item.value>0?'+':''}${format(item.value)}`,longValue=text.length>9;return <div key={item.label} className={`min-w-0 rounded-xl border bg-background p-3 sm:p-4 ${longValue?'col-span-full':''}`}><dt className="text-xs text-muted-foreground">{item.label}</dt><dd className={`mt-2 whitespace-nowrap font-semibold tabular-nums ${longValue?'text-base sm:text-lg':'text-lg sm:text-2xl'}`}>{text}</dd></div>;})}</dl></div>}
  </div>;
 }
