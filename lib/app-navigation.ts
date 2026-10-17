@@ -42,7 +42,7 @@ export const appPageMetadata: Record<
   "decision-brief":{label:"Decision brief",section:"Planning",description:"Your browser-local evidence, assumptions, proposals and explicit approval notes."},
   "assess-evaluate":{label:"Assess & Evaluate · Coming soon",section:"Assess & Evaluate",description:"Placeholder only; no outcomes, scorecard or ROI calculation."},
   "occupational-references": {label:"Occupational References",section:"Intelligence",description:"Search job-profile mappings, role requirements and O*NET occupation references."},
-  "labor-market": {status:"Limited preview",label:"Labor Market",section:"Intelligence",description:"Compare published occupation wages, employment and separate U.S. projections."},
+  "labor-market": {status:"Limited preview",label:"Labor market",section:"Intelligence",description:"Compare published occupation wages, employment and separate U.S. projections."},
   "training-coaching": {status:"Limited preview",label:"Training & Coaching",section:"Intelligence",description:"Fictional simulated provider examples and unverified user-provided quotes."},
   "development-planning": { status:"Limited preview", label: "Development Planning", section: "Planning", description: "Compare explicitly selected development quotes and user-entered cost assumptions." },
   home: { label: "Overview", section: "Planning", description: "Start a workforce scenario, review current capacity and continue your saved work." },
@@ -53,12 +53,12 @@ export const appPageMetadata: Record<
       "Executive workforce health, trends, and business impact.",
   },
   workforce: {
-    label: "Workforce",
+    label: "Baseline",
     section: "Workforce",
     description:
       "Workforce size, structure, tenure, management layers, and mobility.",
   },
-  compensation: { label: "Compensation", section: "Workforce", description: "Demo job salary ranges and USD-subset compa-ratios with partial coverage. Public US wage references and workforce-cost context have separate scopes." },
+  compensation: { label: "Pay and cost", section: "Workforce", description: "Demo job salary ranges and USD-subset compa-ratios with partial coverage. Public US wage references and workforce-cost context have separate scopes." },
   attrition: {
     label: "Attrition",
     section: "Workforce",
@@ -77,7 +77,7 @@ export const appPageMetadata: Record<
       "Employee sentiment, participation, themes, and workforce signals.",
   },
   skills: {
-    label: "Skills Intelligence",
+    label: "Skills",
     section: "Workforce",
     description:
       "Internal workforce skills, recorded proficiency gaps and role demand.",
@@ -107,7 +107,7 @@ export const appPageMetadata: Record<
       "Company-wide recorded succession-plan coverage and source-assessment readiness signals.",
   },
   "planning-overview": {
-    label: "Demand & scenarios",
+    label: "Scenarios",
     section: "Planning",
     description:
       "Compare assumed monthly workload with available capacity; open earlier planning tools when needed.",

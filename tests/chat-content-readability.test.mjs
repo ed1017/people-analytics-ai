@@ -61,7 +61,7 @@ test('grouped starter labels submit exactly their visible text without overwriti
 });
 test('linked markers retain their explicit targets and references still use superscripts without a navigation handler',()=>{
  const visited=[],content='One fact [a1](app:attrition); another [W1](app:workforce).';
- const html=render(content,{onNavigate:page=>visited.push(page)});assert.equal((html.match(/<sup /g)??[]).length,2);assert.match(html,/Source A1: Attrition/);assert.match(html,/Source W1: Workforce/);
+ const html=render(content,{onNavigate:page=>visited.push(page)});assert.equal((html.match(/<sup /g)??[]).length,2);assert.match(html,/Source A1: Attrition/);assert.match(html,/Source W1: Baseline/);
  nodes(ChatContent({content,onNavigate:page=>visited.push(page)})).filter(node=>node.type==='button').forEach(button=>button.props.onClick());assert.deepEqual(visited,['attrition','workforce']);
  const inert=render('[a1] See [Attrition](app:attrition).');assert.match(inert,/<sup[^>]*data-chat-citation="A1"/);assert.doesNotMatch(inert,/<button/);
 });

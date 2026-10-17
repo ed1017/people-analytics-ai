@@ -1,8 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {appNavigationSections} from '../lib/app-navigation.ts';
+import {appNavigationSections,appPageMetadata} from '../lib/app-navigation.ts';
 import {planningJourney,planningEvidence} from '../lib/planning-journey.ts';
 import {mainNavigationSection,secondaryNavigationSections,secondaryNavigationSection} from '../lib/workspace-navigation.ts';
+test('primary journey and evidence destinations use the same title as their navigation control',()=>{
+ for(const {page,label} of [...planningJourney,...planningEvidence])assert.equal(appPageMetadata[page].label,label,page);
+});
 test('top navigation stays in its section on child pages and distinguishes the future evaluation placeholder',()=>{
  assert.equal(mainNavigationSection('home'),'overview');
  for(const page of ['future-of-work','planning-overview','action-plans','plan-track','finance','workforce-planning'])assert.equal(mainNavigationSection(page),'plan');
