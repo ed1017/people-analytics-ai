@@ -52,7 +52,7 @@ export function PlanningLanding(){
    <aside className={styles.guidance} aria-label="Planning guidance">
     <div className={styles.cardTitle}><span className={styles.icon}><Lightbulb size={20} aria-hidden="true"/></span><h4>Planning guidance</h4></div>
     
-    <div className={styles.insight}><p className={styles.eyebrow}>WHAT THIS SCENARIO SHOWS</p><h4>{!last||last.gapFte===null?'More inputs needed':last.gapFte>0?`${number(last.gapFte)} FTE shortfall`:last.gapFte<0?`${number(-last.gapFte)} FTE surplus`:'Capacity meets demand'}</h4><p>{last?<>By {last.month}, this demo has {number(last.allocatedFte)} available FTE against {number(last.requiredFte)} required FTE.</>:'Complete valid inputs to see the comparison.'}</p></div>
+    <div className={styles.insight}><p className={styles.eyebrow}>FINAL PLANNING MONTH</p><h4>{!last||last.gapFte===null?'More inputs needed':last.gapFte>0?`${number(last.gapFte)} FTE shortfall`:last.gapFte<0?`${number(-last.gapFte)} FTE surplus`:'Capacity meets demand'}</h4><p>{last?<>By {last.month}, this demo has {number(last.allocatedFte)} available FTE against {number(last.requiredFte)} required FTE.</>:'Complete valid inputs to see the comparison.'}</p></div>
     <ol className={styles.steps}><li><strong>Explore hiring</strong><span>Change monthly hires to see how supply builds over time.</span></li><li><strong>Test productivity</strong><span>Increase throughput to see how much capacity the work requires.</span></li><li><strong>Use your own assumptions</strong><span>Use Your demand & capacity scenarios above to calculate, save and compare your own inputs.</span></li></ol>
     <p className={styles.guidanceNote}>No AI call · demo changes are not saved.</p>
    </aside>

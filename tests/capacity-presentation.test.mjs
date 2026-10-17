@@ -10,6 +10,7 @@ import * as demand from '../lib/swp-demand.ts';
 import * as demandEditor from '../lib/swp-demand-editor.ts';
 import * as costLayer from '../lib/swp-capacity-cost.ts';
 import * as engine from '../lib/swp-monthly-workload.ts';
+import * as periodSummary from '../lib/capacity-period-summary.ts';
 import * as draftAdapter from '../lib/swp-capacity-draft.ts';
 import * as capacityStore from '../lib/swp-capacity-store.ts';
 import * as capacityRecord from '../lib/swp-capacity-record.ts';
@@ -22,15 +23,15 @@ function component(file,mocks={}){
 const previewLayer=component('lib/capacity-preview.ts',{'./swp-capacity-draft':draftAdapter,'./swp-monthly-workload':engine});
 const sliderLayer=component('lib/planning-slider.ts');
 const {PlanningAssumptionSlider}=component('components/planning-assumption-slider.tsx',{'@/lib/planning-slider':sliderLayer,'./planning-assumption-slider.module.css':{default:{}},react:{...React,useId:()=> 'slider'}});
-const {CapacityProjection}=component('components/workforce-planning/capacity-projection.tsx');
+const {CapacityProjection}=component('components/workforce-planning/capacity-projection.tsx',{'@/lib/capacity-period-summary':periodSummary});
 const point=(month,allocatedFte,requiredFte,gapFte)=>({month,allocatedFte,requiredFte,gapFte});
 test('compact projection preserves empty, unknown, zero, single-month, discontinuity and surplus semantics',()=>{
  const cases={empty:null,unknown:[point('2026-10',null,null,null)],zero:[point('2026-10',0,0,0)],single:[point('2026-10',3.33,7.2,3.87)],partial:[point('2026-10',10,12,2),point('2026-11',null,12,null),point('2026-12',10,12,2)],surplus:[point('2026-10',12,10,-2)]};
  for(const [name,points] of Object.entries(cases)){
   const html=renderToStaticMarkup(React.createElement(CapacityProjection,{result:points===null?null:{points}}));assert.doesNotMatch(html,/NaN|Infinity/);
   if(name==='empty')assert.match(html,/Enter your work and team numbers/);
-  if(name==='unknown'){assert.doesNotMatch(html,/<svg/);assert.match(html,/Unknown/);}
-  if(name==='zero'){assert.match(html,/<svg/);assert.equal((html.match(/<circle/g)||[]).length,2);}
+  if(name==='unknown'){assert.match(html,/Full-period coverage is unknown/);assert.match(html,/1 month has an unknown gap/);assert.doesNotMatch(html,/<svg/);assert.match(html,/Unknown/);}
+  if(name==='zero'){assert.match(html,/No shortfall in any of the 1 months/);assert.match(html,/<svg/);assert.equal((html.match(/<circle/g)||[]).length,2);}
   if(name==='single'){assert.match(html,/\+3.87/);assert.equal((html.match(/cx="340"/g)||[]).length,2);}
   if(name==='partial'){const paths=[...html.matchAll(/<path d="([^"]*)"/g)].map(x=>x[1]);assert.equal((paths[1].match(/M/g)||[]).length,2);assert(!paths[1].includes('L'));}
   if(name==='surplus')assert.match(html,/-2/);
