@@ -33,7 +33,7 @@ test('loopback routing retains token guards and refuses unsupported/AI operation
  assert.equal((await binding.handle(request('https://example.com/api/workforce'))).status,503);
  assert.equal((await binding.handle(request('http://127.0.0.1:9037/api/workforce',null))).status,409);
  assert.equal((await binding.handle(request('http://localhost:9037/api/workforce',token.replace(':1',':2')))).status,409);
- for(const url of ['/api/chat','/api/scenario-modeler','/api/capability-agent'])assert.equal((await binding.handle(request('http://localhost:9037'+url))).status,503);
+ for(const url of ['/api/chat','/api/home-plan-conversation','/api/capability-agent'])assert.equal((await binding.handle(request('http://localhost:9037'+url))).status,503);
  const response=await binding.handle(request('http://localhost:9037/api/dashboard?country=US&org=BU-TECH&level=L6'));
  assert.equal(response.status,200);assert.equal(response.headers.get('x-workforce-dataset'),token);
  const value=await response.json();assert.equal(value.workforce_filter_scope.status,'verified_aggregate');assert.equal(value.performance_rating,null);

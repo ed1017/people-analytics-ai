@@ -31,11 +31,11 @@ test('all 19 reviewed company GET presenters succeed with captured rows',async()
   }
 });
 
-test('analytics is immutable, provider-specific and company GET only',async()=>{
+test('analytics is immutable, provider-specific and limited to reviewed operations',async()=>{
   assert.throws(()=>createLocalDatasetIntegration({router,candidateDatasetId:id,candidateProvider:provider,analytics:{...analytics}}),/registry/);
   assert.throws(()=>createLocalDatasetIntegration({router,candidateDatasetId:id,candidateProvider:create9037OfflineProvider(input),analytics}),/registry/);
   assert.equal((await integration.handle(request('/api/workforce','POST'))).status,503);
-  assert.equal((await integration.handle(request('/api/scenario-modeler'))).status,503);
+  assert.equal((await integration.handle(request('/api/scenario-modeler'))).status,200);
   await assert.rejects(()=>analytics.read('dashboard',['US',null,null]),/Uncaptured/);
   await assert.rejects(()=>analytics.read('unknown'),/Uncaptured/);
   const before=await analytics.read('workforce_current_summary');assert.ok(Object.isFrozen(before[0]));
