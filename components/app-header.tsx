@@ -15,6 +15,7 @@ import type {
 
 type AppHeaderProps = {
   children?: ReactNode;
+  contextLabel?: string;
   onNavigate?: (page: AppPage) => void;
   activePage: AppPage;
   selectedPersona: Persona;
@@ -23,6 +24,7 @@ type AppHeaderProps = {
 
 export function AppHeader({
   children,
+  contextLabel,
   onNavigate,
   activePage,
   selectedPersona,
@@ -91,7 +93,7 @@ export function AppHeader({
     <header ref={header} data-mobile-menu-open={mobileMenuOpen?"":undefined} className="app-top-header sticky top-0 z-30 border-b bg-card">
       <div className="calm-header-row">
         <div className="calm-brand"><h1 id="app-page-title">{title}</h1>{page.status&&<LimitedPreviewBadge/>}<PageHelp key={activePage} page={activePage} label={page.label}/></div>
-        <button ref={menuButton} type="button" className="guided-mobile-menu-button" aria-expanded={mobileMenuOpen} aria-controls="guided-header-navigation guided-header-context guided-workspace-controls" onClick={()=>setMobileMenuOpen(open=>!open)}>{mobileMenuOpen?'Close menu':'Menu'}</button>
+        <button ref={menuButton} type="button" className="guided-mobile-menu-button" aria-expanded={mobileMenuOpen} aria-controls="guided-header-navigation guided-header-context guided-workspace-controls" onClick={()=>setMobileMenuOpen(open=>!open)}>{mobileMenuOpen?'Close workspace':'Workspace'}</button>
         <div id="guided-header-navigation" className="guided-header-navigation">
         {onNavigate&&<nav aria-label="Main navigation" className="calm-main-nav">
           {mainNavigation.map(item=><button key={item.page} type="button" aria-current={activePage===item.page?'page':mainNavigationSection(activePage)===item.key?'location':undefined} onClick={()=>onNavigate(item.page)}>{item.label}</button>)}
@@ -105,7 +107,7 @@ export function AppHeader({
         <details className="header-settings calm-header-menu"><summary>Settings</summary><div className="calm-header-popover">{preferences}<p className="mt-3 text-xs text-muted-foreground">Plans are stored in this browser. Use the saved-work controls to review storage status and manage local work.</p></div></details>
         </div>
       </div>
-      <div id="guided-header-context" className="guided-header-context">{children}</div>
+      <details id="guided-header-context" className="guided-header-context workspace-context"><summary>Workspace · Action Plan and filters{contextLabel&&<span className="ml-2">— {contextLabel}</span>}</summary>{children}</details>
     </header>
   );
 }
