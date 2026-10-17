@@ -1,5 +1,5 @@
 // @ts-expect-error Native Node tests share TypeScript source.
-import {optionRoleMonths} from './guided-plan-summary.ts';
+import {optionMonthlyCoverage,monthlyCapacityEffort} from './guided-plan-summary.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {defaultGuidedWorkload,syncGuidedWorkloadDemand} from './guided-workload.ts';
 /** A presentation/commit adapter over existing staffing, plan and progress contracts.
@@ -118,10 +118,9 @@ export {guidedOptionEffort} from './guided-plan-summary.ts';
 export function serviceOptionEffort(option:SwpOption,bridge:SwpDemandBridge){
  const r=validateDemandBridge(option.draft,bridge,bridge.review.datasetToken),months=r.spec.months!;
  if(!option.coverage||option.coverage.length!==months||option.coverage.some(v=>v===null))return {status:'unknown' as const,additionalHours:null,totalHours:null,shortfallHours:null};
- const roleMonths=optionRoleMonths(option);if(roleMonths===null)return {status:'unknown' as const,additionalHours:null,totalHours:null,shortfallHours:null};
- const additionalHours=roleMonths*r.result.productiveHoursInHorizon!/months;
- const totalHours=r.result.capacityHours!+additionalHours,shortfallHours=Math.max(0,r.result.workloadHours!-totalHours);
- return {status:shortfallHours>1e-7?'shortfall' as const:'conditional-coverage' as const,additionalHours,totalHours,shortfallHours,assumption:'Uniform monthly productive hours; any partial effective readiness month is conservatively excluded. No peak or service-level model.'};
+ const covered=optionMonthlyCoverage(option);if(covered===null)return {status:'unknown' as const,additionalHours:null,totalHours:null,shortfallHours:null};
+ const {additionalHours,totalHours,shortfallHours}=monthlyCapacityEffort(covered,r.result.workloadHours!/months,r.result.capacityHours!/months,r.result.productiveHoursInHorizon!/months);
+ return {status:shortfallHours>1e-7?'shortfall' as const:'conditional-coverage' as const,additionalHours,totalHours,shortfallHours,assumption:'Uniform monthly productive hours; any partial effective readiness month is conservatively excluded. Monthly shortages are summed; surplus is not carried between months. No peak or service-level model.'};
 }
 export async function compareSwpDemo(draft:BundleDraft,signal?:AbortSignal){
  if(!readBundleDraft(draft))throw Error('Review a valid scoped draft.');

@@ -22,8 +22,8 @@ export function guidedPlanSummary(draft:BundleDraft){
  try{const candidate=projectSavedStaffingChoice(draft),coverage=reviewBundleProposal(draft).conditionalCoverage;
  return {mix:candidate.mix,cash:candidate.cash.complete,cashBreakdown:candidate.cash,target:guidedPlanTarget(draft),ready:candidate.metrics?.fullCoverageDate??null,effort:guidedOptionEffort({draft,coverage})};}catch{return null;}
 }
-/** Qualified role-months exclude partial readiness months, using the existing dependency gates. */
-export function optionRoleMonths(option:Pick<SwpOption,'draft'|'coverage'>){
+/** Monthly qualified roles exclude partial readiness months, using the existing dependency gates. */
+export function optionMonthlyCoverage(option:Pick<SwpOption,'draft'|'coverage'>){
  const months=option.draft.inputs.scope.months.value!;
  if(!option.coverage||option.coverage.length!==months||option.coverage.some(v=>v===null))return null;
  const covered=[...option.coverage] as number[],start=option.draft.inputs.scope.startMonth.value!,capacity=option.draft.inputs.capacity!,ready=reviewBundleProposal(option.draft).componentReady;
@@ -33,13 +33,24 @@ export function optionRoleMonths(option:Pick<SwpOption,'draft'|'coverage'>){
   const effective=[arrival,...prerequisites as string[]].sort().at(-1)!,index=(Number(effective.slice(0,4))-Number(start.slice(0,4)))*12+Number(effective.slice(5,7))-Number(start.slice(5,7));
   if(Number(effective.slice(8,10))>1&&index>=0&&index<months)covered[index]=Math.max(0,covered[index]-Number(capacity.input[flow.path]));
  }
- return covered.reduce((sum,n)=>sum+n,0);
+ return covered;
+}
+export function optionRoleMonths(option:Pick<SwpOption,'draft'|'coverage'>){
+ const covered=optionMonthlyCoverage(option);
+ return covered===null?null:covered.reduce((sum,n)=>sum+n,0);
+}
+/** Work is due in its month: later surplus cannot recover an earlier shortage. */
+export function monthlyCapacityEffort(coveredRoles:number[],workloadHoursPerMonth:number,baselineHoursPerMonth:number,productiveHoursPerRoleMonth:number){
+ return coveredRoles.reduce((total,roles)=>{
+  const additionalHours=roles*productiveHoursPerRoleMonth,totalHours=baselineHoursPerMonth+additionalHours;
+  return {additionalHours:total.additionalHours+additionalHours,totalHours:total.totalHours+totalHours,
+   shortfallHours:total.shortfallHours+Math.max(0,workloadHoursPerMonth-totalHours)};
+ },{additionalHours:0,totalHours:0,shortfallHours:0});
 }
 export function guidedOptionEffort(option:Pick<SwpOption,'draft'|'coverage'>){
- const baseline=guidedWorkloadResult(option.draft.inputs),roleMonths=optionRoleMonths(option);
- if(!baseline||baseline.status!=='calculated'||roleMonths===null)return null;
- const additionalHours=roleMonths*option.draft.inputs.guidedWorkload!.productiveHours.value!;
- return {additionalHours,totalHours:baseline.capacityHours!+additionalHours,shortfallHours:Math.max(0,baseline.workloadHours!-baseline.capacityHours!-additionalHours)};
+ const baseline=guidedWorkloadResult(option.draft.inputs),covered=optionMonthlyCoverage(option);
+ if(!baseline||baseline.status!=='calculated'||covered===null)return null;
+ return monthlyCapacityEffort(covered,baseline.workloadHours!/covered.length,baseline.capacityHours!/covered.length,option.draft.inputs.guidedWorkload!.productiveHours.value!);
 }
 
 export const conditionalRoleEvidence='Record a dated baseline and later comparable count for this exact unit and role, with proficiency/work-sample validation, contracted FTE, allocation and source-team release or hire-start evidence. Training completion alone is insufficient. Actual progress remains unknown until measured; automated progress arithmetic is not supported for this metric.';
