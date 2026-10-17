@@ -2,7 +2,7 @@
 import {solutionConversationEnabled} from '@/lib/home-solution-conversation';
 import {pinnedActionPlans} from '@/lib/pinned-action-plans';
 import {alternativeViewField} from '@/lib/home-plan-alternative-chat';
-import {useEffect,useState} from 'react';
+import {useEffect,useId,useState} from 'react';
 import {emptyGoalProgress,goalProgressEnabled,goalProgressField,type GoalProgressContext} from '@/lib/goal-progress';
 import {readProgressSnapshot,readProgressLinkedPlan,type ProgressSnapshot,type ProgressLinkedPlan} from '@/lib/goal-progress-summary';
 import {readHomeGuideOrigin,homeGuideOriginField} from '@/lib/home-guide-origin';
@@ -12,11 +12,12 @@ const number=(value:number|null)=>value===null?'Unavailable':value.toLocaleStrin
 const classification=(value:string)=>value==='user-reported'?'User-reported · unverified':value==='recorded-synthetic'?'Synthetic measured fixture':'Recorded workforce observation';
 const targetDirection={increase:'Higher is better',decrease:'Lower is better',maintain:'Maintain the target',ceiling:'At or below the limit'};
 /** Compact saved-record read. No forms, forecasts, ingestion or implicit writes. */
-export function GoalProgressSummary({context,snapshot,plan,goal,pinnedPlanName}:{pinnedPlanName?:string;context:GoalProgressContext;snapshot?:ProgressSnapshot;plan?:ProgressLinkedPlan;goal?:string}){
+export function GoalProgressSummary({context,snapshot,plan,goal,pinnedPlanName,compactOnMobile=false}:{compactOnMobile?:boolean;pinnedPlanName?:string;context:GoalProgressContext;snapshot?:ProgressSnapshot;plan?:ProgressLinkedPlan;goal?:string}){
+ const [expanded,setExpanded]=useState(false),detailsId=useId();
  const a=context.assessment,m=context.measurement,baseline=snapshot?snapshot.baseline:a.baseline?.observation,latest=snapshot?snapshot.latest:a.latestComparable?.observation;
  const next=snapshot?.nextAction??'Review the measurement definition and record dated results in chat.';
  const absent=!snapshot?.hasObservations&&!baseline&&!latest,missing=absent?'Not yet measured':'Comparable measurement unavailable';
- return <section aria-label="Goal progress" className="min-w-0 space-y-1 break-words rounded border p-3 text-sm">
+ const summary=<section aria-label="Goal progress" className="min-w-0 space-y-1 break-words rounded border p-3 text-sm">
   <h2 className="font-semibold">Goal progress{goal?` · ${goal}`:''}</h2>
   {pinnedPlanName&&<p><strong>Pinned proposal:</strong> {pinnedPlanName}. Selection is not approval or execution.</p>}
   <p aria-label="Saved progress target"><strong>Target:</strong> {m?`${number(m.target.value)} ${m.unit} by ${m.target.date} · ${targetDirection[m.direction]}`:'Not defined. Review a metric, scope, baseline and target before tracking progress.'}</p>
@@ -43,8 +44,17 @@ export function GoalProgressSummary({context,snapshot,plan,goal,pinnedPlanName}:
    </div>
   </details>
  </section>;
+ if(!compactOnMobile)return summary;
+ return <>
+  <div className="space-y-1 rounded border p-3 text-sm md:hidden" aria-label="Saved goal context">
+   <button type="button" aria-expanded={expanded} aria-controls={detailsId} onClick={()=>setExpanded(value=>!value)} className="flex min-h-11 w-full items-center justify-between gap-3 rounded text-left font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"><span>Saved goal: {goal}</span><span className="shrink-0 text-xs font-normal">{expanded?'Hide details':'Show details'}</span></button>
+   {m?<p className="text-xs">Saved scope: {m.scope.country} / {m.scope.org} / {m.scope.level}. Page filters do not change this scope.</p>:<p className="text-xs">Saved measurement scope is not defined.</p>}
+   <p className="text-xs">{context.origin==='demo'?'Fictional demo goal. ':''}Plan assumptions are not measured results.</p>
+  </div>
+  <div id={detailsId} className={expanded?'mt-2 md:mt-0':'hidden md:block'}>{summary}</div>
+ </>;
 }
-function SelectedProgress(){
+function SelectedProgress({compactOnMobile=false}:{compactOnMobile?:boolean}){
  const state=useDecisionStorage(),[today,setToday]=useState<string|null>(null);
  useEffect(()=>{const update=()=>setToday(new Date().toISOString().slice(0,10));update();const timer=setInterval(update,60000);return()=>clearInterval(timer);},[]);
  const goal=state.data.goals.goals.find(g=>g.id===state.data.goals.activeId);if(!state.ready||!goal||!today)return null;
@@ -52,6 +62,6 @@ function SelectedProgress(){
  try{const fields=state.data.workspaces[goal.id]?.fields??{},demo=!!readHomeGuideOrigin(fields[homeGuideOriginField],goal.id)||!!readHomeDemo(fields[homeDemoField],goal.id),raw=fields[goalProgressField]??emptyGoalProgress(goal.id,demo?'demo':'authored');snapshot=readProgressSnapshot(raw,goal.id,today);plan=readProgressLinkedPlan(raw,fields,snapshot.context,goal.statement,decisionStore.getDatasetToken());}catch{/* Saved bytes remain unchanged. */}
  if(!snapshot)return <p role="status" className="m-4">Saved progress could not be verified. Its earlier history is retained; resolve browser storage before recording a result.</p>;
  const fields=state.data.workspaces[goal.id]?.fields??{},view=fields[alternativeViewField] as {selectedId?:string}|undefined,pins=solutionConversationEnabled?pinnedActionPlans([goal],state.data.workspaces).filter(item=>!item.legacy):[],pin=pins.find(item=>item.planId===view?.selectedId)??pins[0];
- return <div className="m-4 min-w-0"><GoalProgressSummary pinnedPlanName={pin?.name} context={snapshot.context} snapshot={snapshot} plan={plan} goal={goal.statement}/></div>;
+ return <div className="m-4 min-w-0"><GoalProgressSummary key={goal.id} compactOnMobile={compactOnMobile} pinnedPlanName={pin?.name} context={snapshot.context} snapshot={snapshot} plan={plan} goal={goal.statement}/></div>;
 }
-export function SelectedGoalProgress(){return goalProgressEnabled?<SelectedProgress/>:null;}
+export function SelectedGoalProgress({compactOnMobile=false}:{compactOnMobile?:boolean}){return goalProgressEnabled?<SelectedProgress compactOnMobile={compactOnMobile}/>:null;}

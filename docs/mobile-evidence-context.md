@@ -1,0 +1,9 @@
+# Compact saved-goal context on phone evidence pages
+
+Baseline, Attrition, Skills, Finance and Pay/cost opt into a collapsed saved-goal summary below the `md` breakpoint. The compact context retains the complete selected goal, saved country/unit/role scope, the fact that page filters do not change that scope, the fictional-demo qualifier when applicable, and the distinction between plan assumptions and measured results. Undefined saved scope remains explicitly undefined.
+
+The native button exposes `aria-expanded` and `aria-controls`; Enter/Space opens the unchanged target, progress, next-action and nested evidence/plan details. A single content tree remains expanded on desktop through responsive display classes. Changing the selected goal resets the disclosure. Track, planning pages and direct summary callers retain existing behavior. No stored state, measurements, filters, calculations or page-level evidence qualifications change.
+
+Focused validation: goal-progress presentation and summary tests; manual browser runner `tests/manual/mobile-evidence-context.browser.mjs` checks fictional demo save then Skills/Baseline/Attrition/Pay-cost at desktop1440 and phone390, keyboard expansion/collapse, focus, resize, filter accessibility/applicability and no overflow. Set PLAYWRIGHT_MODULE, CHROME_PATH, CONTEXT_URL and CONTEXT_OUT as needed. CONTEXT_BASELINE=true measures the old expanded summary. The runner blocks non-GET, external-origin and BLS requests; no AI submit or server write.
+
+Before change, the production demo saved-goal summary measured482px high at390px width on all four reviewed pages. Local checks use the real UI without database credentials; live evidence-chart availability must be checked separately after publication. This is a bounded follow-up to the previous review, not another general first-use review.

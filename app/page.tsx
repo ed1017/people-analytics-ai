@@ -1972,7 +1972,7 @@ export default function Home() {
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
         {evidenceDrawer && <div className="evidence-ai-toolbar"><p>Explore the evidence, then ask a question with your goal as context.</p><button type="button" aria-haspopup="dialog" aria-expanded={drawerOpen} onClick={() => setDrawerPage(activePage)}>Open Workforce AI</button></div>}
-        {!["home","future-of-work","action-plans","plan-track"].includes(activePage)&&<SelectedGoalProgress/>}
+        {!["home","future-of-work","action-plans","plan-track"].includes(activePage)&&<SelectedGoalProgress compactOnMobile={["workforce","attrition","skills","finance","compensation"].includes(activePage)}/>}
         {(planningWorkspaceActive||["workforce","future-of-work","action-plans","plan-track"].includes(activePage))&&<PlanningJourney activePage={activePage} onNavigate={setActivePage}/>}
         <SelectedProgressEntry/>
         {pageDataLoading&&<div className="m-4"><DataLoadingStatus/></div>}
