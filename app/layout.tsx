@@ -12,15 +12,19 @@ const productDescription =
   "Workforce Intelligence is a public portfolio demo with strategic workforce planning at its core, connecting workforce evidence, talent responses and planning scenarios with grounded AI assistance.";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ed-ai.app"),
   title: productTitle,
   description: productDescription,
   openGraph: {
     title: productTitle,
     description: productDescription,
     type: "website",
+    url: "/",
+    siteName: "Workforce Intelligence",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
+    images: [{ url: "/opengraph-image", alt: "Workforce Intelligence by Ed Om. Explore evidence, compare assumptions, and save a plan. Portfolio demo with synthetic workforce data." }],
     title: productTitle,
     description: productDescription,
   },
