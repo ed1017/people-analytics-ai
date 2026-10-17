@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import {create9037OfflineProvider, reviewed9037PresenterContract, OFFLINE_9037_DATASET_ID as id, OFFLINE_9037_INTEGRITY_DIGEST as digest} from '../../lib/dataset-9037-offline-provider.mjs';
+import {validateAggregateRow} from '../../lib/dataset-aggregate-validation.mjs';
 import {localPresenterContract} from '../../lib/dataset-presenter-contract.mjs';
 import {createLocalApiPresenter} from '../../lib/dataset-local-api.mjs';
 import {DatasetReleaseDispatcher} from '../../lib/dataset-composition.mjs';
@@ -107,4 +108,25 @@ test('skills response uses verified component population, not a query-supplied o
   const response=await router.request(req,()=>presenter.handle(req));
   assert.equal(response.status,200);
   assert.equal((await response.json()).summary.current_workforce,9037);
+});
+
+test('reviewed 9037 preference role pairs stay candidate-specific and reject unknown or crossed labels', () => {
+  const added=['CONS-TRANS','SALES-OPS','LEGAL-COUNSEL','OPS-BUS','CLOUD-ARCH','HR-PA','CYBER-ENG','HR-HRBP'];
+  for(const code of added){
+    const row={code,label:'Demo '+code,employees:100};
+    assert.doesNotThrow(()=>validateAggregateRow('preferences_roles',row,{provider}));
+    assert.throws(()=>validateAggregateRow('preferences_roles',row),/preferences_roles/);
+    assert.throws(()=>validateAggregateRow('preferences_roles',{...row,label:'Demo MKT-BRAND'},{provider}),/catalog label/);
+  }
+  assert.equal(Object.keys(reviewed9037PresenterContract(provider).preferenceRoles).length,15);
+  for(const row of [
+    {code:'UNKNOWN',label:'Demo UNKNOWN',employees:1},
+    {code:'CONS-TRANS',label:'Unknown label',employees:1},
+    {code:'CONS-TRANS',label:'Demo CONS-TRANS',employees:-1},
+    {code:'CONS-TRANS',label:'Demo CONS-TRANS',employees:1,extra:true},
+  ]) assert.throws(()=>validateAggregateRow('preferences_roles',row,{provider}),/preferences_roles/);
+  const legacy={code:'DS-SCI',label:'Demo DS-SCI',employees:1};
+  assert.doesNotThrow(()=>validateAggregateRow('preferences_roles',legacy));
+  assert.throws(()=>validateAggregateRow('preferences_roles',legacy,{provider}),/preferences_roles/);
+  assert.throws(()=>validateAggregateRow('preferences_roles',legacy,{provider:{...provider}}),/Reviewed 9037 provider/);
 });
