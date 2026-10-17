@@ -755,3 +755,9 @@ Survey boundary and blocking decisions
 - User approved continuing the roadmap with the previously identified repeated mobile goal context; deferred another general fresh-user review until a meaningful milestone. Current base is published PR301 (`2c0f73ffbce4280781e366eb5946664ccfa3190f`). No overlapping new open PR identified in the refreshed repository check.
 - Opt in only the five primary evidence pages to a phone disclosure. Preserve visible goal/saved scope/fictional qualifier/assumption-versus-result distinction, full desktop summary, filters and underlying records. See [behavior and validation](mobile-evidence-context.md).
 - Production baseline at390px: repeated summary482px tall. Independent source review found no actionable accessibility/state issues. Local15focused tests, scoped lint, build/TypeScript/artifact checks pass. Browser and release evidence are recorded in the PR; no hosted pass implied by local validation.
+
+### Navigation and demo-stage scroll correction (2026-10-17)
+
+- User authorized independent reproduction and repair of page/demo transitions retaining deep scroll. Confirmed on production desktop1440 and narrow viewport393 (not phone emulation/zoom). Baseline retained384px scroll; the review heading was340px above the narrow viewport.
+- Added transition-only heading focus and scroll, preserving same-page edits/filters and explicit evidence handoffs. Independent review caught a handoff-priority conflict; unified navigation target intent resolves it. Phone header offset is clamped to viewport. See [contract and checks](navigation-transition-focus.md).
+- Eleven focused navigation/controls tests, scoped lint, production build/TypeScript/artifacts pass; browser checks cover strict visible coordinates, focus and history. Final exact-head CI/release verification belongs in the PR. No data, security, credential or paidAI changes.
