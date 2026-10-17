@@ -3,18 +3,18 @@ import type { AppPage } from "./types";
 // Navigation only: no routes, URLs, tool names, assumptions or handoff payloads.
 export const chatNavigationTargets = {
   "occupational-references": "Occupational References",
-  "labor-market": "Labor Market",
+  "labor-market": "Labor market",
   "training-coaching": "Training & Coaching",
-  workforce: "Workforce",
+  workforce: "Baseline",
   attrition: "Attrition",
   "survey-sentiment": "Employee Listening",
-  skills: "Skills Intelligence",
+  skills: "Skills",
   "learning-development": "Learning & Development",
   "development-planning": "Development Planning",
   "career-growth-mobility": "Career Growth & Internal Mobility",
   "succession-planning": "Succession Planning",
   "talent-acquisition": "Talent Acquisition",
-  "planning-overview": "Demand & scenarios",
+  "planning-overview": "Scenarios",
   "scenario-modeling": "Scenario Modeling",
   "position-workforce-design": "Position & Workforce Design",
   "workforce-response": "Workforce Response",
@@ -23,7 +23,7 @@ export const chatNavigationTargets = {
 } as const satisfies Partial<Record<AppPage, string>>;
 
 export function getChatNavigationAction(href: string) {
-  if (href === "app:career-mobility") return {page:"workforce" as const,label:"Workforce"};
+  if (href === "app:career-mobility") return {page:"workforce" as const,label:"Baseline"};
   if (!href.startsWith("app:")) return null;
   const page = href.slice(4);
   if (!Object.prototype.hasOwnProperty.call(chatNavigationTargets, page)) return null;
@@ -42,5 +42,5 @@ For a normal options comparison, use at most 180 words: one line acknowledging t
 export function chatOpeningNavigationInstructions() {
   return `If the next action benefits from navigation, use at most one exact Markdown token from this existing allowlist:
 ${Object.entries(chatNavigationTargets).map(([page,label])=>`[${label}](app:${page})`).join("; ")}
-For Skills use [Skills Intelligence](app:skills), never /skills. Do not invent paths, URLs, parameters or new destinations. These links only open an existing page; they never carry evidence, change filters, run calculations or approve actions. If none applies, give the action in plain text.`;
+For Skills use [Skills](app:skills), never /skills. Do not invent paths, URLs, parameters or new destinations. These links only open an existing page; they never carry evidence, change filters, run calculations or approve actions. If none applies, give the action in plain text.`;
 }

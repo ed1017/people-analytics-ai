@@ -20,7 +20,7 @@ test("navigation guidance distinguishes opening pages from explicit carry and ca
 
 test("retired Career Interests navigation keeps safe legacy links and mobility destination",()=>{
  assert.equal(chatNavigationTargets['career-mobility'],undefined);
- assert.deepEqual(getChatNavigationAction('app:career-mobility'),{page:'workforce',label:'Workforce'});
+ assert.deepEqual(getChatNavigationAction('app:career-mobility'),{page:'workforce',label:'Baseline'});
  assert.equal(getChatNavigationAction('app:career-growth-mobility').page,'career-growth-mobility');
 });
 
