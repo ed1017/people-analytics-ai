@@ -140,7 +140,7 @@ test("AI composer has visible keyboard focus and the panel resizer is keyboard o
   );
   assert.equal(
     source.includes(
-      'aria-label="Ask People Analytics AI"'
+      'aria-label="Ask Workforce AI"'
     ),
     true
   );
