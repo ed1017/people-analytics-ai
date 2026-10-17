@@ -6,6 +6,7 @@ import Module, {createRequire} from 'node:module';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import ts from 'typescript';
+import * as workspaceNavigation from '../lib/workspace-navigation.ts';
 const require = createRequire(import.meta.url);
 function component(file, mocks = {}) {
   const filename = path.resolve(file);
@@ -52,6 +53,7 @@ test('each perspective has a visible description linked to its selector', () => 
     '@/components/workspace-palette-control':{WorkspacePaletteControl:()=>null},
     '@/components/page-help':{PageHelp:()=>null},
     '@/lib/app-navigation':{getAppPageMetadata:()=>({label:'Overview'})},
+    '@/lib/workspace-navigation':workspaceNavigation,
   });
   for (const selectedPersona of ['HR','Leader','Finance']) {
     const html = renderToStaticMarkup(React.createElement(AppHeader,{activePage:'home',selectedPersona,onPersonaChange:()=>{}}));
