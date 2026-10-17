@@ -75,6 +75,9 @@ function fixture() {
     }};
   const nativeRequire = createRequire(import.meta.url);
   const sandbox = {exports: {}, require: name => {
+    // Pure equality primitive used by reviewed providers; no filesystem/network capability.
+    if (name === 'node:async_hooks') return {AsyncLocalStorage: nativeRequire(name).AsyncLocalStorage};
+    if (name === 'node:util') return {isDeepStrictEqual: nativeRequire(name).isDeepStrictEqual};
     if (name !== 'node:crypto') return forbidden('external')();
     return nativeRequire(name);
   }, Response, Request, URL, URLSearchParams,
@@ -83,6 +86,13 @@ function fixture() {
     process: {env: new Proxy({}, {get: forbidden('credentials')})}};
   sandbox.module = {exports: sandbox.exports}; vm.runInNewContext(source, sandbox);
   const api = sandbox.module.exports;
+  // Exercise the rejection branch without counting these intentional probes as application attempts.
+  for (const name of ['node:fs', 'node:net', 'node:https']) {
+    const before = calls.external;
+    assert.throws(() => sandbox.require(name), /Forbidden external/);
+    assert.equal(calls.external, before + 1);
+    calls.external = before;
+  }
   const presenter = api.createLocalApiPresenter({router, analytics, releases: {read: async name => {
     calls.releases.push(name); assert.equal(name, 'ratings');
     return {data: {counts: {population: 9847}, fixture: 'synthetic-rating'}};
