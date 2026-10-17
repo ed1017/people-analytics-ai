@@ -60,6 +60,7 @@ try{
   await context.route('**/*',r=>{const q=r.request(),u=new URL(q.url());return q.method()!=='GET'||u.origin!==new URL(base).origin||u.pathname.startsWith('/api/bls')?r.abort():r.continue();});
   const page=await context.newPage();page.setDefaultTimeout(20000);await page.goto(base);
 
+  if(width<768)await page.getByRole('button',{name:'Browse pages',exact:true}).click();
   await page.getByRole('button',{name:'Track',exact:true}).click();
   const results=page.getByRole('region',{name:'Recorded plan results',exact:true});await results.getByRole('combobox',{name:/Saved plan/}).selectOption('plan-one');
   await results.getByRole('button',{name:'Record a result',exact:true}).click();await results.getByRole('textbox',{name:'Active employees (people)',exact:true}).fill('0');
