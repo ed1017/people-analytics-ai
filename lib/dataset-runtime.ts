@@ -1,4 +1,5 @@
-import {development9037Options,load9037DevelopmentBinding} from './dataset-9037-development.server.mjs';
+import {development9037Options} from './dataset-9037-development-options.mjs';
+import type {load9037DevelopmentBinding} from './dataset-9037-development.server.mjs';
 import { DatasetRouter } from './dataset-router.mjs';
 import { createDatasetRequestBoundary } from './dataset-request-boundary.mjs';
 import { createDeferredLegacyClient } from './dataset-legacy-client.mjs';
@@ -39,7 +40,9 @@ let activeLocal: Awaited<ReturnType<typeof load9037DevelopmentBinding>> | null=n
 let localPromise: Promise<Awaited<ReturnType<typeof load9037DevelopmentBinding>>> | null=null;
 function localBinding(){
  if(!localOptions)throw Error('Local binding not configured');
- return localPromise??=load9037DevelopmentBinding(localOptions).then(binding=>{activeLocal=binding;return binding;});
+ return localPromise??=import('./dataset-9037-development.server.mjs')
+  .then(({load9037DevelopmentBinding})=>load9037DevelopmentBinding(localOptions))
+  .then(binding=>{activeLocal=binding;return binding;});
 }
 export const datasetRouter=localOptions?{
  bootstrapToken:async()=>localOptions?(await localBinding()).router.bootstrapToken():legacyRouter.bootstrapToken(),
