@@ -19,6 +19,7 @@ try{
   await page.getByRole('button',{name:'Review selected Action Plan',exact:true}).click();await page.getByRole('button',{name:'Save reviewed plan and goal',exact:true}).click();
   await page.getByRole('button',{name:'Review target and tracking',exact:true}).click();
   const results=page.getByRole('region',{name:'Recorded plan results',exact:true});await results.waitFor();
+  const legacy=page.locator('details').filter({has:page.getByText('Other goal measurements',{exact:true})});if(await legacy.count()){assert.equal(await legacy.getAttribute('open'),null);await legacy.locator('summary').first().click();assert.match(await legacy.innerText(),/do not include the manually reported plan results above/);await legacy.locator('summary').first().click();}
   assert.match(await results.innerText(),/practice reports for this scenario, not company outcomes/);
   assert.match(await results.innerText(),/No result recorded/);
   await results.getByRole('button',{name:'Record a result',exact:true}).click();
