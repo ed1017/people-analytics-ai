@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { DatasetBoundary } from "@/components/dataset-boundary";
 import { connection } from "next/server";
-import { datasetRouter } from "@/lib/dataset-runtime";
+import { datasetRouter, isLocal9037Development } from "@/lib/dataset-runtime";
 import "./globals.css";
 
 const productTitle =
@@ -39,7 +39,7 @@ export default async function RootLayout({
       <head><script dangerouslySetInnerHTML={{__html: `(function(){var p='light';try{var s=localStorage.getItem('people-analytics-workspace-palette-v1');if(s==='slate-blue'||s==='original-navy-teal')p='slate-blue'}catch(e){}document.documentElement.dataset.workspacePreference=p})()`}} /></head>
       <body>
         <DatasetBoundary initialToken={initialDatasetToken}>{children}</DatasetBoundary>
-        <Analytics />
+        {!isLocal9037Development && <Analytics />}
       </body>
     </html>
   );

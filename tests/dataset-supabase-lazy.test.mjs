@@ -1,5 +1,6 @@
 /** Actual runtime/server bodies with synthetic credentials; mocked and installed SDK clients. */
 import test from 'node:test';
+import {development9037Options} from '../lib/dataset-9037-development-options.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
@@ -24,10 +25,11 @@ function evaluate(file, imports, globals = {}) {
 
 function fixture({ configured = true, creationFailure = false, sdkFactory = null } = {}) {
   const runtime = evaluate('dataset-runtime.ts', {
+    './dataset-9037-development-options.mjs': { development9037Options },
     './dataset-router.mjs': { DatasetRouter },
     './dataset-request-boundary.mjs': { createDatasetRequestBoundary },
     './dataset-legacy-client.mjs': { createDeferredLegacyClient },
-  });
+  }, {process: {env: {}}});
   const credentialReads = [], creations = [], calls = [];
   const client = {
     auth: { synthetic: true },
