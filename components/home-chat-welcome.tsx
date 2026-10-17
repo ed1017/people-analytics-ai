@@ -55,14 +55,17 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
   const checked = current && projection?.analysis.inputs.asOf === snapshotDate && projection.analysis.inputs.opening === headcount && (['country','org','level'] as const).every(key=>projection.analysis.inputs.filters[key]===requested[key]) ? projection : null;
   const projected = checked?.analysis.points ?? [];
   const first = history[0], last = history.at(-1);
+  const change = first && last && history.length>1 ? last.headcount-first.headcount : null;
+  const dateLabel = (date:string) => new Date(date.slice(0,7)+'-01T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'});
   const horizonEnd = projected.at(-1)?.month ?? last?.snapshot_date;
   const flowTotal = (field:'hires'|'exits'|'transfersIn'|'transfersOut') => projected.reduce((sum,point)=>sum+point[field],0);
   const format = (value:number) => value.toLocaleString(undefined,{maximumFractionDigits:2});
   const maximum = Math.max(1, checked?.analysis.inputs.opening ?? 0, ...history.map(point => point.headcount), ...projected.map(point=>point.headcount));
   const startMonth = monthIndex(first?.snapshot_date ?? snapshotDate);
   const monthSpan = horizonEnd ? monthIndex(horizonEnd) - startMonth : 0;
-  const plot = history.map(point => ({...point, x: monthSpan ? 12 + 85 * (monthIndex(point.snapshot_date) - startMonth) / monthSpan : 54.5, y: 64 - 52 * point.headcount / maximum}));
-  const futurePlot = checked ? [{month:snapshotDate,headcount:checked.analysis.inputs.opening},...projected].map(point=>({...point,x:12+85*(monthIndex(point.month)-startMonth)/Math.max(1,monthSpan),y:64-52*point.headcount/maximum})) : [];
+  const plot = history.map(point => ({...point, x: monthSpan ? 12 + 85 * (monthIndex(point.snapshot_date) - startMonth) / monthSpan : 54.5, y: 96 - 76 * point.headcount / maximum}));
+  const futurePlot = checked ? [{month:snapshotDate,headcount:checked.analysis.inputs.opening},...projected].map(point=>({...point,x:12+85*(monthIndex(point.month)-startMonth)/Math.max(1,monthSpan),y:96-76*point.headcount/maximum})) : [];
+  const dateMarks = [...new Set([first?.snapshot_date,history.length>2?history[Math.floor((history.length-1)/2)].snapshot_date:undefined,horizonEnd])].filter((date):date is string=>!!date);
   return <section aria-label="Workforce snapshot" className={styles.historySummary}>
       <div className={styles.historyHeading}>
         <div><p>Current headcount</p><strong>{known(headcount) ? headcount.toLocaleString() : loading ? 'Updating…' : 'Unavailable'}</strong><span>{known(headcount) ? ' people · ' + snapshotDate : ' · Verified snapshot needed'}</span></div>
@@ -71,8 +74,9 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
       <p className={styles.scope}>{scopeLabel} · Recorded synthetic workforce history</p>
       {(first && last || checked) ? <figure className={styles.historyFigure}>
         <svg  role="img" aria-label={'Recorded synthetic headcount history in people. ' + scopeLabel + '. ' + history.map(point => point.snapshot_date + ': ' + point.headcount).join('; ') + '. Missing months are not connected. ' + (checked ? 'Conditional projection: '+projected.map(point=>point.month+': '+format(point.headcount)).join('; ') : 'No projection.')}>
-          <line x1="12%" y1="64" x2="97%" y2="64" className={styles.chartAxis}/>
-          <text x="10%" y="12" textAnchor="end">{maximum.toLocaleString()}</text><text x="10%" y="68" textAnchor="end">0</text>
+          <line x1="12%" y1="96" x2="97%" y2="96" className={styles.chartAxis}/>
+          <text x="10%" y="20" textAnchor="end">{maximum.toLocaleString()}</text><text x="10%" y="100" textAnchor="end">0</text>
+          {dateMarks.map((date,index)=><text key={date} x={(monthSpan?12+85*(monthIndex(date)-startMonth)/monthSpan:54.5)+'%'} y="120" textAnchor={index===0?'start':index===dateMarks.length-1?'end':'middle'}>{dateLabel(date)}</text>)}
           {plot.map((point, index) => <g key={point.snapshot_date}>
             {index > 0 && monthIndex(point.snapshot_date) === monthIndex(plot[index - 1].snapshot_date) + 1 && <line x1={plot[index - 1].x+'%'} y1={plot[index - 1].y} x2={point.x+'%'} y2={point.y} className={styles.historyLine}/>}
             <circle cx={point.x+'%'} cy={point.y} r="3" className={styles.historyPoint}/>
@@ -84,7 +88,7 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
       <ul className={styles.kpiRow} aria-label="Recorded workforce indicators">
         <li><span>Recruiting hires</span><b>{current&&recruitingKpi?.asOf===snapshotDate ? recruitingKpi.hires.toLocaleString() : 'Unavailable'}</b><small>Company-wide · monthly</small></li>
         <li><span>Voluntary turnover YTD</span><b>{known(current?.voluntary_turnover_ytd_pct) ? format(current.voluntary_turnover_ytd_pct)+'%' : 'Unavailable'}</b><small>Source-reported · not annualized</small></li>
-        <li><span>Current headcount</span><b>{known(headcount) ? format(headcount) : 'Unavailable'}</b><small>People · verified scope</small></li>
+        <li><span>Recorded period change</span><b>{change===null?'Unavailable':(change>0?'+':'')+format(change)+' people'}</b><small>{change===null?'Two verified snapshots needed':dateLabel(first.snapshot_date)+' – '+dateLabel(last.snapshot_date)}</small></li>
       </ul>
       <details className={styles.evidenceDetails}><summary>Sources and exact cost · {checked?"Conditional projection":projectionStatus==="checking"?"Checking projection":projectionStatus?"Projection unavailable":"Projection not configured"}</summary>
         {known(current?.labor_cost_usd)&&<details className={styles.exactCost}><summary>Labor cost: period unspecified</summary><p>{welcomeCurrency(current.labor_cost_usd).exact}. Cost period unspecified; no monthly or annual basis is inferred.</p></details>}

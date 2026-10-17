@@ -1,0 +1,45 @@
+// Focused first-use acceptance: landing, disclosures and one saved demo choice per viewport.
+// Uses isolated browser-local storage; all non-GET and external requests are blocked.
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
+const origin=process.env.OUTCOME_BASE_URL||'http://127.0.0.1:4209',out=process.env.OUTCOME_OUTPUT_DIR;
+if(out)await fs.mkdir(out,{recursive:true});
+const b=await chromium.launch({executablePath:process.env.CHROME_PATH||undefined,headless:true});
+try{for(const width of [1440,390])for(const changed of [false])for(const optionIndex of [0]){
+ const context=await b.newContext({viewport:{width,height:900}}),p=await context.newPage(),errors=[],blocked=[],responses=[];
+ p.setDefaultTimeout(15000);p.setDefaultNavigationTimeout(30000);
+ p.on('pageerror',e=>errors.push(e.message));p.on('response',r=>{if(new URL(r.url()).pathname.startsWith('/api/'))responses.push({path:new URL(r.url()).pathname,status:r.status()});});
+ await context.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(q.method()!=='GET'||u.origin!==origin){blocked.push(u.pathname);return r.abort();}if(process.env.OUTCOME_FIXTURES&&u.pathname.startsWith('/api/')){try{return r.fulfill({contentType:'application/json',body:await fs.readFile(process.env.OUTCOME_FIXTURES+'/history-'+u.pathname.slice(5)+'.json','utf8')});}catch{return r.fulfill({status:503,json:{error:'Unavailable fixture'}});}}return r.continue();});
+ const dashboardResponse=p.waitForResponse(r=>new URL(r.url()).pathname==='/api/dashboard'&&r.status()===200);
+ await p.goto(origin);
+ const dashboard=await (await dashboardResponse).json(),history=[...dashboard.trend].sort((a,b)=>a.snapshot_date.localeCompare(b.snapshot_date)),change=history.at(-1).headcount-history[0].headcount;
+ await p.getByRole('list',{name:'Recorded workforce indicators',exact:true}).getByText((change>0?'+':'')+change.toLocaleString()+' people',{exact:true}).waitFor();
+ await p.getByRole('list',{name:'Recorded workforce indicators',exact:true}).getByText('Recorded period change',{exact:true}).waitFor();
+ const contextDetails=p.locator('#guided-header-context');assert.equal(await contextDetails.getAttribute('open'),null);
+ if(width===390){await p.getByRole('button',{name:'Browse pages',exact:true}).click();await p.keyboard.press('Escape');await p.getByRole('button',{name:'Workspace',exact:true}).click();}
+ await contextDetails.locator('summary').first().focus();await p.keyboard.press('Enter');assert.equal(await contextDetails.getAttribute('open'),'');
+ await contextDetails.locator('summary').first().click();if(width===390)await p.getByRole('button',{name:'Close workspace',exact:true}).click();
+ if(out)await p.screenshot({path:out+`/landing-${width}.png`,fullPage:true});
+ await p.getByRole('button' ,{name:'Start the 3-minute demo',exact:true}).click();
+ if(changed){await p.getByText('Adjust assumptions',{exact:true}).click();await p.getByRole('textbox',{name:'Monthly service requests',exact:true}).fill('1200');}
+ await p.waitForFunction(()=>document.querySelector('.simple-demo-option')||[...document.querySelectorAll('button')].some(b=>b.textContent==='Compare staffing options'));const compare=p.getByRole('button',{name:'Compare staffing options',exact:true});if(await compare.isVisible())await compare.click();const option=p.locator('.simple-demo-options .simple-demo-option').nth(optionIndex);await option.getByRole('radio').waitFor();
+ const expected=optionIndex===0?(changed?1120:1280):(changed?240:320);assert.ok((await option.innerText()).includes(`Uncovered work: ${expected.toLocaleString('en-US')} hours`));
+ const cost=option.getByLabel('Incremental cash components',{exact:true});await cost.locator('summary').focus();await p.keyboard.press('Enter');assert.equal(await cost.getAttribute('open'),'');
+ const amounts=await cost.locator('dd').allTextContents(),sum=amounts.reduce((n,t)=>n+Number(t.replace(/[^\d.]/g,'')),0),costText=await cost.innerText(),total=Number(costText.match(/Incremental cash total: USD ([\d,]+\.\d{2})/)[1].replaceAll(',',''));
+ assert.equal(Math.round(sum*100),Math.round(total*100));assert.match(costText,/2026-11-01 through 2027-10-31 \(12 months\)/);assert.match(costText,/Existing payroll is excluded/);assert.match(costText,/Staff effort remains hours, not cash/);assert.match(costText,/Training cash/);
+ if(out){await option.scrollIntoViewIfNeeded();await p.screenshot({path:out+`/shortfall-options-${width}-${changed}-${optionIndex}.png`});}
+ await option.getByRole('radio').check();await p.getByRole('button',{name:'Review selected Action Plan',exact:true}).click();const review=p.getByRole('region',{name:'Review and save workforce plan',exact:true});await review.waitFor();const shortage=`Uncovered work over this period: ${expected.toLocaleString('en-US')} hours`;assert.ok((await review.getByLabel('Selected workforce choice',{exact:true}).innerText()).includes(shortage));assert.equal(await review.locator('details').filter({has:p.getByText('Measurement details and assumptions',{exact:true})}).getAttribute('open'),null);
+ assert.match(await review.innerText(),/Next proposed checkpoint: 2026-12-01/);
+ assert.match(await review.innerText(),/Still unverified/);
+ if(out)await review.screenshot({path:out+`/review-${width}.png`});
+ await review.getByText('Measurement details and assumptions',{exact:true}).click();const target=review.getByLabel('Conditional capacity target',{exact:true}),targetText=await target.innerText(),roles=5;
+ assert.ok(targetText.includes(`Scenario target: ${roles} whole roles by 2027-10-31`));assert.match(targetText,/1 qualified, allocated FTE per additional role/);assert.match(targetText,/Measured outcome: Unknown/);assert.doesNotMatch(await review.innerText(),/cost review in the saved plan/);
+ await review.getByLabel('Incremental cash components',{exact:true}).locator('summary').click();assert.equal(await review.getByLabel('Incremental cash components',{exact:true}).innerText(),costText);
+ await p.getByRole('button',{name:'Save reviewed plan and goal',exact:true}).click();await p.getByRole('heading',{name:'Reopen and track',exact:true}).waitFor();assert.ok((await p.locator('[aria-label="Selected workforce choice"]:visible').innerText()).includes(shortage));await p.reload();await p.getByRole('heading',{name:'Reopen and track',exact:true}).waitFor();assert.ok((await p.locator('[aria-label="Conditional capacity target"]:visible').innerText()).includes(`Scenario target: ${roles} whole roles by 2027-10-31`));
+ await p.getByRole('button',{name:'Open saved plans',exact:true}).click();const measure=p.getByRole('region',{name:'Goal and success measure',exact:true});assert.ok((await measure.innerText()).includes(`Scenario target: ${roles} whole roles by 2027-10-31`));assert.doesNotMatch(await measure.innerText(),/Completion of agreed delivery milestones|Target: Unknown/);
+ await p.getByRole('article').filter({has:measure}).getByText('Plan details and assumptions',{exact:true}).click();assert.ok((await p.getByRole('list',{name:'How success is measured',exact:true}).innerText()).includes(`Scenario target: ${roles} whole roles by 2027-10-31`));
+ assert.ok((await p.locator('[aria-label="Selected workforce choice"]:visible').innerText()).includes(shortage));const savedCost=p.locator('details[aria-label="Incremental cash components"]:visible');await savedCost.locator('summary').click();assert.equal(await savedCost.innerText(),costText);
+ await p.getByRole('button',{name:'Return to Overview',exact:true}).click();await p.getByRole('button',{name:'Review target and tracking',exact:true}).click();const progress=p.getByRole('region',{name:'Track',exact:true});await progress.waitFor();assert.ok((await progress.getByLabel('Selected workforce choice',{exact:true}).innerText()).includes(shortage));assert.ok((await progress.innerText()).includes(`${roles} roles by 2027-10-31`));assert.match(await progress.innerText(),/Not yet measured|Measured outcome: Unknown/);assert.match(await progress.innerText(),/proficiency\/work-sample validation/);assert.doesNotMatch(await progress.innerText(),/no supported measurement summary/);
+ assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);if(out)await progress.screenshot({path:out+`/shortfall-track-${width}-${changed}-${optionIndex}.png`});assert.deepEqual(errors,[]);assert.deepEqual(blocked,[]);assert.ok(responses.some(r=>r.status===200));console.log(JSON.stringify({origin,width,changed,optionIndex,roles,shortfall:expected,total,components:amounts,fixtures:!!process.env.OUTCOME_FIXTURES,savedReopenedTracked:true,errors,blocked}));await context.close();
+}}finally{await b.close();}

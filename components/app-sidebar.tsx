@@ -87,7 +87,7 @@ export function AppSidebar({
   const [previousPage,setPreviousPage]=useState(activePage);
   if(previousPage!==activePage){setPreviousPage(activePage);if(!primaryPage)setExploreOpen(true);const section=secondaryNavigationSection(activePage);if(section)setOpenGroups(current=>({...current,[section]:true}));}
   return (
-    <><div className="phone-navigation-trigger"><button type="button" popoverTarget="phone-navigation" className="min-h-11 rounded border px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring">Open navigation</button></div>
+    <><div className="phone-navigation-trigger"><button type="button" popoverTarget="phone-navigation" className="min-h-11 rounded border px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring">Browse pages</button></div>
     <aside ref={drawer} id="phone-navigation" popover={phone?"auto":undefined} aria-label="Navigation drawer" onClick={event=>{if(phone&&(event.target as HTMLElement).closest('[data-nav-destination], [aria-label="Overview"]'))drawer.current?.hidePopover();}} className="app-sidebar sticky top-[var(--app-header-height)] h-[calc(100vh-var(--app-header-height))] overflow-y-auto border-r bg-sidebar p-3 max-md:p-2">
       <Button
         variant="ghost"

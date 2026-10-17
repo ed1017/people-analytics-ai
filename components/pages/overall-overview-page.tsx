@@ -621,7 +621,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       cancel:()=>{const id=decisionStore.getSnapshot().data.goals.activeId;if(!id||id===guidedActions.goalId){solutions.cancel();conversation.cancelPending();}},leave:()=>conversation.endGuidedExploration(),
     }}/>}<section aria-labelledby="overall-overview-heading" className="flex min-w-0 flex-col gap-3">
       <header id="guided-workspace-controls" className="flex flex-wrap items-start justify-between gap-3">
-        <details open={swpDemoVisible?undefined:true} className={swpDemoVisible?"w-full":"contents"}><summary hidden={!swpDemoVisible} className="min-h-11 cursor-pointer py-2 text-sm">Workspace controls and saved plans</summary><div className="flex w-full flex-wrap items-start justify-between gap-3">
+        <details open={swpDemoVisible||overviewStarting?undefined:true} className={swpDemoVisible||overviewStarting?"w-full":"contents"}><summary hidden={!swpDemoVisible&&!overviewStarting} className="min-h-11 cursor-pointer py-2 text-sm">Workspace controls and saved plans</summary><div className="flex w-full flex-wrap items-start justify-between gap-3">
         <h2 id="overall-overview-heading" className="text-2xl font-semibold leading-tight tracking-tight">Workforce AI</h2>
         <button type="button" onClick={resetHomeConversation} className="min-h-11 rounded px-2 text-xs font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Reset conversation</button>
         {renderPlanPane&&<details className="home-saved-plan-disclosure"><summary>Saved plans</summary>{renderPlanPane(savedWork)}</details>}

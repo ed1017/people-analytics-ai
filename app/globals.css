@@ -854,7 +854,11 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 
 /* A mobile disclosure keeps the same mounted controls and planning state. */
 .guided-mobile-menu-button { display:none; }
-.guided-header-navigation,.guided-header-context { display:contents; }
+.guided-header-navigation { display:contents; }
+.workspace-context > summary,.planning-steps > summary { min-height:44px; padding:10px 20px; cursor:pointer; font-size:13px; color:var(--muted-foreground); }
+.workspace-context > summary:focus-visible,.planning-steps > summary:focus-visible { outline:2px solid var(--ring); outline-offset:-2px; }
+.workspace-context { border-top:1px solid var(--border); }
+.planning-steps { border-bottom:1px solid var(--border); }
 .demo-stepper { display:flex; flex-wrap:wrap; gap:8px; font-size:13px; color:var(--muted-foreground); }
 .demo-stepper li { padding:6px 8px; border-bottom:3px solid transparent; border-radius:5px 5px 0 0; }
 .demo-stepper [aria-current="step"] { font-weight:700; color:var(--foreground); background:var(--accent); border-bottom-color:var(--primary); }
@@ -864,8 +868,15 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
  main.app-home-composer:has(.home-workspace) .guided-mobile-menu-button { display:block; min-height:44px; padding:8px; border:1px solid var(--border); border-radius:6px; font-size:14px; }
  main.app-home-composer:has(.home-workspace) .guided-header-navigation { flex-basis:100%; display:flex; flex-wrap:wrap; align-items:center; gap:4px; }
  main.app-home-composer:has(.home-workspace) .app-top-header:not([data-mobile-menu-open]) :is(.guided-header-navigation,.guided-header-context),
- main.app-home-composer:has(.home-workspace):has(.app-top-header:not([data-mobile-menu-open])) :is(.phone-navigation-trigger,#guided-workspace-controls) { display:none; }
+ main.app-home-composer:has(.home-workspace):has(.app-top-header:not([data-mobile-menu-open])) :is(#guided-workspace-controls) { display:none; }
  main.app-home-composer:has(.home-workspace) .app-top-header[data-mobile-menu-open] { position:relative; }
  .demo-stepper { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }
  .demo-stepper li { padding:6px; }
+}
+
+@media(max-width:767px) {
+ .guided-mobile-menu-button { display:block; min-height:44px; padding:8px; border:1px solid var(--border); border-radius:6px; font-size:14px; }
+ .guided-header-navigation { flex-basis:100%; display:flex; flex-wrap:wrap; align-items:center; gap:4px; }
+ .app-top-header:not([data-mobile-menu-open]) :is(.guided-header-navigation,.guided-header-context) { display:none; }
+ .app-top-header[data-mobile-menu-open] { position:relative; }
 }

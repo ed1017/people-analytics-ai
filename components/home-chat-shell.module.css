@@ -44,7 +44,7 @@
 .historyHeading strong { font-size: 23px; font-weight: 650; font-variant-numeric: tabular-nums; }
 .historyHeading .watch { font-size: 11px; }
 .historyFigure { margin-top: 6px; }
-.historyFigure svg { display: block; width: 100%; height: 72px; overflow: visible; }
+.historyFigure svg { display: block; width: 100%; height: 128px; overflow: visible; }
 .historyFigure svg text { fill: var(--muted-foreground); font-size: 13px; }
 .chartAxis { stroke: var(--border); }
 .historyLine { stroke: var(--primary); stroke-width: 2; vector-effect: non-scaling-stroke; }

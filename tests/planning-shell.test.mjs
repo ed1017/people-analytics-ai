@@ -84,7 +84,7 @@ test('headcount KPI selector remains unique when the chart axis repeats the curr
   for (const value of [120, 1240, 100]) {
     const html=render({overview:{...base.overview,headcount:value},trend:[{...history[2],headcount:value}]});
     const formatted=value.toLocaleString();
-    assert.equal(html.split('>'+formatted+'<').length-1,3,'header, chart axis and compact KPI repeat the value; the scoped strong selector stays unique');
+    assert.equal(html.split('>'+formatted+'<').length-1,2,'only header and chart axis repeat the value; duplicate KPI is replaced by period change');
     const snapshot=html.match(/<section aria-label="Workforce snapshot"[^>]*>([\s\S]*?)<\/section>/)?.[1];
     assert.ok(snapshot);
     assert.deepEqual([...snapshot.matchAll(/<strong[^>]*>([^<]*)<\/strong>/g)].map(match=>match[1]),[formatted]);
@@ -204,4 +204,13 @@ test('Baseline cost details withhold stale, missing and invalid values while pre
   const html=renderBaseline(patch);assert.doesNotMatch(html,/USD 2,047,306|USD 0\.00/);assert.match(html,/Verified scoped cost unavailable/);
  }
  assert.match(renderBaseline({overviewData:{...baselineProps.overviewData,labor_cost_usd:0}}),/USD 0\.00/);
+});
+
+test('period change uses verified historical endpoints, with readable intermediate dates and no inferred rate',()=>{
+ const html=render({trend:history});
+ assert.match(html,/Recorded period change/);assert.match(html,/\+10 people/);
+ for(const date of ['Jul 2026','Aug 2026','Sep 2026'])assert.ok(chartMarkup(html).includes(date));
+ assert.match(render({trend:[{...history[0],headcount:130},history[2]]}),/-10 people/);
+ assert.match(render({trend:[{...history[0],headcount:120},history[2]]}),/>0 people</);
+ for(const patch of [{trend:[history[2]]},{trend:history,loading:true},{trend:history,receipt:null},{trend:[history[0],{...history[2],headcount:119}]}])assert.doesNotMatch(render(patch),/[+-]10 people/);
 });
