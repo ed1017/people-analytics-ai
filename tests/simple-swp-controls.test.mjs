@@ -15,3 +15,18 @@ test('both displayed primary values must be valid independently',()=>{
  for(const invalid of ['', '-1','1.5','1000001','abc'])assert.equal(primarySwpValuesValid('500000',invalid),false);
  assert.equal(primarySwpValuesValid('500000','1120'),true);
 });
+
+
+test('2000 monthly requests leaves the unaffordable reference blocked; returning to1280 recovers the same choices',async()=>{
+ const original=await createSwpDemo('guided-no-feasible-recovery','2026-10-18T12:00:00Z');
+ const before=JSON.stringify(original),bounds=original.inputs.mixScenario.bounds;
+ const apply=(draft,value)=>acceptBundleChatEdit(draft,previewBundleChatEdit(draft,primarySwpRequest(draft,bounds,'Service units per month',value)));
+ const increased=apply(original,'2000'),blocked=await compareSwpDemo(increased);
+ assert.equal(blocked.evaluation.context.status,'ready');assert.equal(blocked.options.length,1);
+ assert.deepEqual(blocked.options[0].candidate.mix,{build:0,move:0,buy:10});
+ assert.equal(blocked.options[0].candidate.cash.complete,990000);
+ assert.notEqual(blocked.options[0].candidate.status,'met');assert.equal(increased.inputs.budget.amount.value,325000);
+ const recovered=await compareSwpDemo(apply(increased,'1280')),baseline=await compareSwpDemo(original);
+ assert.deepEqual(recovered.options.map(o=>({mix:o.candidate.mix,status:o.candidate.status,cash:o.candidate.cash.complete})),baseline.options.map(o=>({mix:o.candidate.mix,status:o.candidate.status,cash:o.candidate.cash.complete})));
+ assert.ok(recovered.options.some(o=>o.candidate.status==='met'));assert.equal(JSON.stringify(original),before);
+});
