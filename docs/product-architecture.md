@@ -1,8 +1,14 @@
 # Product Architecture
 
+> **Availability note — October 19, 2026:** The sections below preserve the repository's product direction and architectural proposals. They are not a checklist of enabled public capabilities. The live site is a synthetic-data, deterministic workforce-planning prototype; live AI conversations are disabled. AI integration code and proposed assistant behavior below do not imply an available AI service.
+>
+> The public application baseline in this repository is `f8c9304`, which differs from the separately released live 9,037-person application. A public-safe fixture layer and matching integration tests require separate review before this repository can reproduce that release. See the [README](../README.md) for the source/deployment boundary.
+>
+> Currently available live entry points include the guided staffing demo, browser-local proposals, workforce evidence and an explicit-input company headcount what-if. These do not establish predictive accuracy, enterprise persistence, realized savings or business outcomes.
+
 ## What this product is becoming
 
-This is a public People Analytics + Strategic Workforce Planning product with an AI assistant built across the experience.
+The proposed direction is a People Analytics + Strategic Workforce Planning product with an AI assistant across the experience. That assistant is not enabled in the current public release.
 
 The goal is not to make another dashboard with a chatbot stuck on the side.
 
