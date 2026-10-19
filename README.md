@@ -1,95 +1,48 @@
-# Workforce AI
+# Workforce-planning portfolio prototype
 
-A public People Analytics + Strategic Workforce Planning product that combines governed workforce data, deterministic planning logic, and an AI assistant.
+Live app: https://www.ed-ai.app
 
-Live app: https://ed-workforce-ai.vercel.app
+A synthetic-data People Analytics and Strategic Workforce Planning prototype. The public app offers workforce evidence, deterministic staffing scenarios, a guided three-minute demo, and an explicit-input headcount what-if. Live AI conversations are disabled in the public release. AI-assisted development does not mean that the site runs a live AI advisor.
 
-The product is designed to move beyond dashboards:
+Ed defined the workforce-planning problem, product requirements and acceptance criteria; AI assisted with implementation, design and testing.
 
-**Understand the workforce -> model future demand -> design the workforce -> choose a response -> test whether the plan is executable.**
+## Try the public app
 
-## Product areas
+Start with the three-minute demo on Home, compare staffing options, and save a proposal in your browser. Saved proposals are browser-local planning records. They are not approved workforce actions or shared enterprise records.
 
-The target architecture is organized around:
+The public workforce snapshot contains 9,037 synthetic people as of September 30, 2026. The company headcount what-if takes explicit monthly hires and exits for October 2026 through March 2027. It illustrates conditional arithmetic, not a validated prediction or a payroll forecast.
 
-- Workforce Analytics
-- Talent Management
-- Workforce Strategy & Planning
-- Workforce AI as the cross-domain assistant
+This is a portfolio prototype. No measured adoption, savings, business impact or predictive performance is claimed.
 
-See [docs/product-architecture.md](docs/product-architecture.md) for the current architecture and roadmap.
+## Repository and deployment status
 
-## Workforce Planning flow
+This repository's application baseline is the earlier public source at `f8c9304`. It is not an exact reproduction of the currently deployed 9,037-person release. The live application was released from a separately reviewed source snapshot; copying this repository or following its local setup does not reproduce that deployment.
 
-The current planning experience follows four steps:
+The deployed runtime depends on inputs excluded from public source distribution. A separately reviewed, public-safe fixture layer and matching integration tests are needed before synchronizing a reproducible public application release. Those excluded inputs and private release materials must not be added merely to make this repository match the live site.
 
-1. **Plan** — model workforce demand and scenarios
-2. **Design** — translate the plan into position, recruiting, and skill demand
-3. **Respond** — allocate Build / Move / Buy strategies
-4. **Execute** — schedule the response and test feasibility
+Automatic Vercel deployments from `main` and this documentation branch are disabled in `vercel.json` so a documentation update cannot replace the separately reviewed live release with older application code. Re-enable the relevant branch only after the public application source and runtime fixtures are reconciled and reviewed.
 
-## Current capabilities
+Documentation updates describe the current live experience while keeping that source gap explicit. Historical documentation, experiments and AI integration code in this repository are not evidence that their features are enabled publicly.
 
-The live product includes:
+See [Product architecture and availability](docs/product-architecture.md) for the distinction between the live prototype, the repository and proposed capabilities.
 
-- workforce overview and composition
-- attrition analytics
-- talent acquisition analytics
-- survey and sentiment analytics
-- workforce finance / labor cost
-- skills intelligence
-- deterministic workforce scenarios
-- position and structural workforce modeling
-- internal talent readiness
-- development-pathway coverage
-- recruiting feasibility
-- Build / Move / Buy response planning
-- multi-role response portfolios
-- business-unit response allocation
-- time-phased execution
-- hard-constraint feasibility
-- constraint-aware auto-scheduling
-- governed AI tools across the product
+## Technology
 
-## Stack
+The application uses Next.js, React, TypeScript, Tailwind CSS, shadcn/ui, Recharts and Vercel. This repository also contains Supabase/PostgreSQL and OpenAI integration code. Their presence does not establish an active company data connection or enabled live AI in the public release.
 
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
-- shadcn/ui
-- Recharts
-- Supabase / PostgreSQL
-- OpenAI API
-- Vercel
+Deterministic analytics and planning engines own the calculations. The public prototype does not require a visitor to make a paid AI call.
 
-## Data
+## Local development of this repository
 
-The public portfolio uses synthetic workforce data so the product can demonstrate realistic People Analytics and workforce-planning workflows without exposing real employee information.
-
-## Local development
-
-Install dependencies and run the development server:
+These commands start the repository's application, not the exact deployed release. Individual integrations may require their own configuration; do not assume access to the live site's runtime inputs.
 
 ```powershell
 npm.cmd install
 npm.cmd run dev
 ```
 
-Then open:
-
-```text
-http://localhost:3000
-```
-
-Production builds are validated with:
+Open http://localhost:3000. To build this source:
 
 ```powershell
 npm.cmd run build
 ```
-
-## Product principle
-
-The LLM helps interpret questions, choose governed tools, explain results, and compare options.
-
-Deterministic workforce calculations remain in the governed analytics and planning engines rather than being generated by the LLM.
