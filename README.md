@@ -20,6 +20,8 @@ This repository's application baseline is the earlier public source at `f8c9304`
 
 The deployed runtime depends on inputs excluded from public source distribution. A separately reviewed, public-safe fixture layer and matching integration tests are needed before synchronizing a reproducible public application release. Those excluded inputs and private release materials must not be added merely to make this repository match the live site.
 
+Automatic Vercel deployments from `main` and this documentation branch are disabled in `vercel.json` so a documentation update cannot replace the separately reviewed live release with older application code. Re-enable the relevant branch only after the public application source and runtime fixtures are reconciled and reviewed.
+
 Documentation updates describe the current live experience while keeping that source gap explicit. Historical documentation, experiments and AI integration code in this repository are not evidence that their features are enabled publicly.
 
 See [Product architecture and availability](docs/product-architecture.md) for the distinction between the live prototype, the repository and proposed capabilities.
