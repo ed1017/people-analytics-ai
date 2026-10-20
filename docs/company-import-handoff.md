@@ -2,7 +2,7 @@
 
 This increment adds an **offline, invented-aggregate importer**. It reuses the existing two-route `invented-public-read-fixture-v1` provider; it does not duplicate the published-company adapters or bind a new company to the application. No product controls, Home/popup, production identity, 9,037 data, AI, database, credentials or deployment configuration change.
 
-Start with `AGENTS.md`, [company portability](company-portability.md) and [fixture provider](public-fixture-provider.md). `lib/public-fixture/company-import.mjs` is the executable mapping contract. Its only dependency is the existing read-provider module and Node built-ins. No framework installation, environment variables, private inputs or network are needed. Next.js server/client guidance still applies if a later increment wires this into the app; this importer belongs outside browser rendering.
+Start with `AGENTS.md`, [public reproducibility package](public-reproducibility-package.md) and [fixture provider](public-fixture-provider.md). `lib/public-fixture/company-import.mjs` is the executable mapping contract. Its only dependency is the existing read-provider module and Node built-ins. No framework installation, environment variables, private inputs or network are needed. Next.js server/client guidance still applies if a later increment wires this into the app; this importer belongs outside browser rendering.
 
 ## Reproduce the invented second company
 
