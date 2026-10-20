@@ -1,0 +1,17 @@
+{
+  "scope": "invalid-public-request-status-only",
+  "examples": [
+    {
+      "input": {
+        "add_positions": -1
+      },
+      "status": 400
+    },
+    {
+      "input": {
+        "unexpected": 1
+      },
+      "status": 400
+    }
+  ]
+}
