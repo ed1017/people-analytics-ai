@@ -54,6 +54,12 @@ test('hundredth-FTE binary representation is accepted without changing the recon
   assert.equal(createPublicFixtureProvider(result.manifestText, result.manifestSha256).read('/api/headcount-trend').body[1].fte, 5.63);
 });
 
+test('percent-sum source values reject fractional precision without rounding into matching controls', () => {
+  for (const value of [325.000000001, 324.999999999, 0.000000001]) {
+    assert.throws(changed((c, r) => { r[0].capacity_percent_total = value; }), /FTE precision/);
+  }
+});
+
 test('explicit zero populations work; missing or null values never become zero', () => {
   const c = clone(config); const r = clone(rows);
   for (const row of r) { row.staffed_people = 0; row.capacity_percent_total = 0; }
