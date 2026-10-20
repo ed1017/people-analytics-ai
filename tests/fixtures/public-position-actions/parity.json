@@ -1,0 +1,215 @@
+{
+  "origin": "https://www.ed-ai.app",
+  "target": "/api/position-actions",
+  "scope": "three-invented-requests-data-only",
+  "examples": [
+    {
+      "input": {},
+      "expected": {
+        "as_of": "2026-09-30",
+        "defaults": {
+          "add_positions": 0,
+          "close_vacant_positions": 0,
+          "freeze_vacancies": 0,
+          "vacancy_fill_pct": 0
+        },
+        "assumptions": {
+          "add_positions": 0,
+          "close_vacant_positions": 0,
+          "freeze_vacancies": 0,
+          "vacancy_fill_pct": 0
+        },
+        "current": {
+          "authorized_positions": 9234,
+          "filled_positions": 9037,
+          "open_vacancies": 197,
+          "frozen_positions": 0,
+          "closed_positions": 4145
+        },
+        "modeled": {
+          "authorized_positions": 9234,
+          "filled_positions": 9037,
+          "open_vacancies": 197,
+          "frozen_positions": 0,
+          "projected_fills": 0,
+          "net_authorized_position_change": 0,
+          "net_filled_position_change": 0,
+          "vacancy_rate_pct": 2.1,
+          "occupancy_rate_pct": 97.9
+        },
+        "methodology": [
+          "Constructed what-if position capacity. Fills do not create employee records or establish realized hires.",
+          "The scenario starts from the current authorized position inventory: filled + open vacant + frozen positions.",
+          "Added positions enter the scenario as open vacancies and increase authorized positions.",
+          "Closed positions in this model are restricted to currently vacant positions; the model does not convert filled-position closures into employee exits.",
+          "Frozen vacancies remain authorized positions but are removed from the fillable vacancy pool.",
+          "The vacancy fill percentage is applied to the remaining fillable vacancies after adds, closures, and freezes.",
+          "This model is read-only and does not change position records, requisitions, or employee assignments.",
+          "This first position-actions model does not yet calculate labor-cost effects; cost modeling should use explicit position/job-level cost assumptions in a later step."
+        ],
+        "accounting": {
+          "basis": "Unrounded conditional capacity; UI labels round independently. No observed hires or exits.",
+          "before": {
+            "authorized": 9234,
+            "filled": 9037,
+            "vacant": 197,
+            "frozen": 0
+          },
+          "after": {
+            "authorized": 9234,
+            "filled": 9037,
+            "vacant": 197,
+            "frozen": 0
+          },
+          "effective_fill_pct": 0,
+          "added": 0,
+          "closed": 0,
+          "newly_frozen": 0,
+          "conditional_fills": 0
+        }
+      }
+    },
+    {
+      "input": {
+        "add_positions": 17,
+        "close_vacant_positions": 3,
+        "freeze_vacancies": 2,
+        "vacancy_fill_pct": 33.333
+      },
+      "expected": {
+        "as_of": "2026-09-30",
+        "defaults": {
+          "add_positions": 0,
+          "close_vacant_positions": 0,
+          "freeze_vacancies": 0,
+          "vacancy_fill_pct": 0
+        },
+        "assumptions": {
+          "add_positions": 17,
+          "close_vacant_positions": 3,
+          "freeze_vacancies": 2,
+          "vacancy_fill_pct": 33.3
+        },
+        "current": {
+          "authorized_positions": 9234,
+          "filled_positions": 9037,
+          "open_vacancies": 197,
+          "frozen_positions": 0,
+          "closed_positions": 4145
+        },
+        "modeled": {
+          "authorized_positions": 9248,
+          "filled_positions": 9106.66597,
+          "open_vacancies": 139.33402999999998,
+          "frozen_positions": 2,
+          "projected_fills": 69.66597,
+          "net_authorized_position_change": 14,
+          "net_filled_position_change": 69.66597,
+          "vacancy_rate_pct": 1.5,
+          "occupancy_rate_pct": 98.5
+        },
+        "methodology": [
+          "Constructed what-if position capacity. Fills do not create employee records or establish realized hires.",
+          "The scenario starts from the current authorized position inventory: filled + open vacant + frozen positions.",
+          "Added positions enter the scenario as open vacancies and increase authorized positions.",
+          "Closed positions in this model are restricted to currently vacant positions; the model does not convert filled-position closures into employee exits.",
+          "Frozen vacancies remain authorized positions but are removed from the fillable vacancy pool.",
+          "The vacancy fill percentage is applied to the remaining fillable vacancies after adds, closures, and freezes.",
+          "This model is read-only and does not change position records, requisitions, or employee assignments.",
+          "This first position-actions model does not yet calculate labor-cost effects; cost modeling should use explicit position/job-level cost assumptions in a later step."
+        ],
+        "accounting": {
+          "basis": "Unrounded conditional capacity; UI labels round independently. No observed hires or exits.",
+          "before": {
+            "authorized": 9234,
+            "filled": 9037,
+            "vacant": 197,
+            "frozen": 0
+          },
+          "after": {
+            "authorized": 9248,
+            "filled": 9106.66597,
+            "vacant": 139.33402999999998,
+            "frozen": 2
+          },
+          "effective_fill_pct": 33.333,
+          "added": 17,
+          "closed": 3,
+          "newly_frozen": 2,
+          "conditional_fills": 69.66597
+        }
+      }
+    },
+    {
+      "input": {
+        "add_positions": 0,
+        "close_vacant_positions": 5000,
+        "freeze_vacancies": 5000,
+        "vacancy_fill_pct": 100
+      },
+      "expected": {
+        "as_of": "2026-09-30",
+        "defaults": {
+          "add_positions": 0,
+          "close_vacant_positions": 0,
+          "freeze_vacancies": 0,
+          "vacancy_fill_pct": 0
+        },
+        "assumptions": {
+          "add_positions": 0,
+          "close_vacant_positions": 197,
+          "freeze_vacancies": 0,
+          "vacancy_fill_pct": 100
+        },
+        "current": {
+          "authorized_positions": 9234,
+          "filled_positions": 9037,
+          "open_vacancies": 197,
+          "frozen_positions": 0,
+          "closed_positions": 4145
+        },
+        "modeled": {
+          "authorized_positions": 9037,
+          "filled_positions": 9037,
+          "open_vacancies": 0,
+          "frozen_positions": 0,
+          "projected_fills": 0,
+          "net_authorized_position_change": -197,
+          "net_filled_position_change": 0,
+          "vacancy_rate_pct": 0,
+          "occupancy_rate_pct": 100
+        },
+        "methodology": [
+          "Constructed what-if position capacity. Fills do not create employee records or establish realized hires.",
+          "The scenario starts from the current authorized position inventory: filled + open vacant + frozen positions.",
+          "Added positions enter the scenario as open vacancies and increase authorized positions.",
+          "Closed positions in this model are restricted to currently vacant positions; the model does not convert filled-position closures into employee exits.",
+          "Frozen vacancies remain authorized positions but are removed from the fillable vacancy pool.",
+          "The vacancy fill percentage is applied to the remaining fillable vacancies after adds, closures, and freezes.",
+          "This model is read-only and does not change position records, requisitions, or employee assignments.",
+          "This first position-actions model does not yet calculate labor-cost effects; cost modeling should use explicit position/job-level cost assumptions in a later step."
+        ],
+        "accounting": {
+          "basis": "Unrounded conditional capacity; UI labels round independently. No observed hires or exits.",
+          "before": {
+            "authorized": 9234,
+            "filled": 9037,
+            "vacant": 197,
+            "frozen": 0
+          },
+          "after": {
+            "authorized": 9037,
+            "filled": 9037,
+            "vacant": 0,
+            "frozen": 0
+          },
+          "effective_fill_pct": 100,
+          "added": 0,
+          "closed": 197,
+          "newly_frozen": 0,
+          "conditional_fills": 0
+        }
+      }
+    }
+  ]
+}

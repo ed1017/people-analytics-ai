@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contract": "invented-public-read-fixture-v1",
+  "dataClass": "invented-test-only",
+  "parity": "none",
+  "documents": [
+    {
+      "target": "/api/headcount",
+      "body": {
+        "headcount": 12
+      },
+      "sha256": "c05476e0f33ce00477afa3014d5224fa0b0d7051e89cadbd0d260968b70ec9a9"
+    },
+    {
+      "target": "/api/headcount-trend",
+      "body": [
+        {
+          "snapshot_date": "2025-01-31",
+          "headcount": 10,
+          "fte": 9.5
+        },
+        {
+          "snapshot_date": "2025-02-28",
+          "headcount": 12,
+          "fte": 11
+        }
+      ],
+      "sha256": "b17433275eb49d7a13a4c2c69506a7f7bb0fa8608dfb1f9d016a1bc4e968e965"
+    }
+  ]
+}

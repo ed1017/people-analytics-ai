@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "contract": "public-position-actions-data-v1",
+  "provenance": {
+    "origin": "https://www.ed-ai.app",
+    "capturedAt": "2026-10-20T04:23:36.629Z",
+    "parity": "position-actions-get-data-only"
+  },
+  "document": {
+    "target": "/api/position-actions",
+    "sha256": "fc53fd22db5d2c774d269698071249eabdf003c89838c8f7c529490639a6a6fe",
+    "body": {
+      "as_of": "2026-09-30",
+      "defaults": {
+        "add_positions": 0,
+        "close_vacant_positions": 0,
+        "freeze_vacancies": 0,
+        "vacancy_fill_pct": 0
+      },
+      "current": {
+        "authorized_positions": 9234,
+        "filled_positions": 9037,
+        "open_vacancies": 197,
+        "frozen_positions": 0,
+        "closed_positions": 4145
+      },
+      "bounds": {
+        "add_positions": {
+          "min": 0,
+          "max": 5000
+        },
+        "close_vacant_positions": {
+          "min": 0,
+          "max": 197
+        },
+        "freeze_vacancies": {
+          "min": 0,
+          "max": 197
+        },
+        "vacancy_fill_pct": {
+          "min": 0,
+          "max": 100
+        }
+      }
+    }
+  }
+}

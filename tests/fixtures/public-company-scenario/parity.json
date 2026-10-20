@@ -1,0 +1,893 @@
+{
+  "scope": "company-fields-only-no-segment-or-metadata-parity",
+  "examples": [
+    {
+      "input": {
+        "assumptions": {}
+      },
+      "expected": {
+        "as_of": "2026-09-30",
+        "source_scenario": "Baseline",
+        "defaults": {
+          "annual_growth_pct": 0,
+          "salary_inflation_pct": 0,
+          "annual_attrition_pct": 16.01,
+          "fill_rate_pct": 100,
+          "productivity_hiring_reduction_pct": 0
+        },
+        "assumptions": {
+          "annual_growth_pct": 0,
+          "salary_inflation_pct": 0,
+          "annual_attrition_pct": 16.01,
+          "fill_rate_pct": 100,
+          "productivity_hiring_reduction_pct": 0
+        },
+        "summary": {
+          "starting_headcount": 9037,
+          "baseline_end_headcount": 9037,
+          "target_end_headcount": 9037,
+          "modeled_end_headcount": 9037,
+          "modeled_end_fte": 8851.4,
+          "headcount_delta_vs_baseline": 0,
+          "headcount_gap_vs_target": 0,
+          "baseline_end_labor_cost_usd": 1288763372.72,
+          "modeled_end_labor_cost_usd": 1288763372.72,
+          "labor_cost_delta_vs_baseline_usd": 0,
+          "cumulative_modeled_hires": 1446.8,
+          "cumulative_modeled_exits": 1446.8
+        },
+        "points": [
+          {
+            "planning_month": "2027-01-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9037,
+            "modeled_headcount": 9037,
+            "modeled_fte": 8851.4,
+            "planned_hiring_demand": 120.6,
+            "modeled_hires": 120.6,
+            "modeled_exits": 120.6,
+            "modeled_labor_cost_usd": 1288763372.72,
+            "gap_vs_target": 0
+          },
+          {
+            "planning_month": "2027-02-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9037,
+            "modeled_headcount": 9037,
+            "modeled_fte": 8851.4,
+            "planned_hiring_demand": 120.6,
+            "modeled_hires": 120.6,
+            "modeled_exits": 120.6,
+            "modeled_labor_cost_usd": 1288763372.72,
+            "gap_vs_target": 0
+          },
+          {
+            "planning_month": "2027-03-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9037,
+            "modeled_headcount": 9037,
+            "modeled_fte": 8851.4,
+            "planned_hiring_demand": 120.6,
+            "modeled_hires": 120.6,
+            "modeled_exits": 120.6,
+            "modeled_labor_cost_usd": 1288763372.72,
+            "gap_vs_target": 0
+          },
+          {
+            "planning_month": "2027-04-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9037,
+            "modeled_headcount": 9037,
+            "modeled_fte": 8851.4,
+            "planned_hiring_demand": 120.6,
+            "modeled_hires": 120.6,
+            "modeled_exits": 120.6,
+            "modeled_labor_cost_usd": 1288763372.72,
+            "gap_vs_target": 0
+          },
+          {
+            "planning_month": "2027-05-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9037,
+            "modeled_headcount": 9037,
+            "modeled_fte": 8851.4,
+            "planned_hiring_demand": 120.6,
+            "modeled_hires": 120.6,
+            "modeled_exits": 120.6,
+            "modeled_labor_cost_usd": 1288763372.72,
+            "gap_vs_target": 0
+          },
+          {
+            "planning_month": "2027-06-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9037,
+            "modeled_headcount": 9037,
+            "modeled_fte": 8851.4,
+            "planned_hiring_demand": 120.6,
+            "modeled_hires": 120.6,
+            "modeled_exits": 120.6,
+            "modeled_labor_cost_usd": 1288763372.72,
+            "gap_vs_target": 0
+          },
+          {
+            "planning_month": "2027-07-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9037,
+            "modeled_headcount": 9037,
+            "modeled_fte": 8851.4,
+            "planned_hiring_demand": 120.6,
+            "modeled_hires": 120.6,
+            "modeled_exits": 120.6,
+            "modeled_labor_cost_usd": 1288763372.72,
+            "gap_vs_target": 0
+          },
+          {
+            "planning_month": "2027-08-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9037,
+            "modeled_headcount": 9037,
+            "modeled_fte": 8851.4,
+            "planned_hiring_demand": 120.6,
+            "modeled_hires": 120.6,
+            "modeled_exits": 120.6,
+            "modeled_labor_cost_usd": 1288763372.72,
+            "gap_vs_target": 0
+          },
+          {
+            "planning_month": "2027-09-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9037,
+            "modeled_headcount": 9037,
+            "modeled_fte": 8851.4,
+            "planned_hiring_demand": 120.6,
+            "modeled_hires": 120.6,
+            "modeled_exits": 120.6,
+            "modeled_labor_cost_usd": 1288763372.72,
+            "gap_vs_target": 0
+          },
+          {
+            "planning_month": "2027-10-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9037,
+            "modeled_headcount": 9037,
+            "modeled_fte": 8851.4,
+            "planned_hiring_demand": 120.6,
+            "modeled_hires": 120.6,
+            "modeled_exits": 120.6,
+            "modeled_labor_cost_usd": 1288763372.72,
+            "gap_vs_target": 0
+          },
+          {
+            "planning_month": "2027-11-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9037,
+            "modeled_headcount": 9037,
+            "modeled_fte": 8851.4,
+            "planned_hiring_demand": 120.6,
+            "modeled_hires": 120.6,
+            "modeled_exits": 120.6,
+            "modeled_labor_cost_usd": 1288763372.72,
+            "gap_vs_target": 0
+          },
+          {
+            "planning_month": "2027-12-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9037,
+            "modeled_headcount": 9037,
+            "modeled_fte": 8851.4,
+            "planned_hiring_demand": 120.6,
+            "modeled_hires": 120.6,
+            "modeled_exits": 120.6,
+            "modeled_labor_cost_usd": 1288763372.72,
+            "gap_vs_target": 0
+          }
+        ],
+        "methodology": [
+          "The stored Baseline scenario is the reference curve.",
+          "Growth changes scale the stored Baseline headcount target relative to the Baseline annual growth assumption.",
+          "Gross hiring demand equals target net headcount change plus replacement demand based on the Baseline annual attrition rate.",
+          "Productivity reduces gross hiring demand before the fill-rate assumption is applied.",
+          "Modeled exits use the custom annual attrition assumption and reduce realized headcount.",
+          "Modeled FTE preserves each Baseline month's FTE-to-headcount ratio.",
+          "Labor cost uses the Baseline cost per FTE adjusted for the custom salary-inflation assumption, then multiplies by modeled FTE.",
+          "This is a deterministic custom model, not an LLM-generated forecast.",
+          "Constructed September 2026 stock is carried to January 2027; October–December 2026 is unmodeled, not an observed or forecast bridge.",
+          "Stored flat draft hires/exits are zero and reconcile. What-if hires/exits are separate engine-implied gross flows; they are not stored plan flows or observed future outcomes.",
+          "The 16.01% company annualized January–September exit rate is a shared scenario assumption. Fill rate and productivity are authored assumptions, not estimated capacity.",
+          "Growth and inflation adjustments span the twelve explicit planning points; there is no independent forecast validation."
+        ],
+        "accounting": {
+          "scope": {
+            "type": "company"
+          },
+          "basis": "Unrounded conditional arithmetic; display values are rounded separately.",
+          "monthly": [
+            {
+              "planning_month": "2027-01-01",
+              "opening_headcount": 9037,
+              "hires": 120.56864166666668,
+              "exits": 120.56864166666668,
+              "closing_headcount": 9037
+            },
+            {
+              "planning_month": "2027-02-01",
+              "opening_headcount": 9037,
+              "hires": 120.56864166666668,
+              "exits": 120.56864166666668,
+              "closing_headcount": 9037
+            },
+            {
+              "planning_month": "2027-03-01",
+              "opening_headcount": 9037,
+              "hires": 120.56864166666668,
+              "exits": 120.56864166666668,
+              "closing_headcount": 9037
+            },
+            {
+              "planning_month": "2027-04-01",
+              "opening_headcount": 9037,
+              "hires": 120.56864166666668,
+              "exits": 120.56864166666668,
+              "closing_headcount": 9037
+            },
+            {
+              "planning_month": "2027-05-01",
+              "opening_headcount": 9037,
+              "hires": 120.56864166666668,
+              "exits": 120.56864166666668,
+              "closing_headcount": 9037
+            },
+            {
+              "planning_month": "2027-06-01",
+              "opening_headcount": 9037,
+              "hires": 120.56864166666668,
+              "exits": 120.56864166666668,
+              "closing_headcount": 9037
+            },
+            {
+              "planning_month": "2027-07-01",
+              "opening_headcount": 9037,
+              "hires": 120.56864166666668,
+              "exits": 120.56864166666668,
+              "closing_headcount": 9037
+            },
+            {
+              "planning_month": "2027-08-01",
+              "opening_headcount": 9037,
+              "hires": 120.56864166666668,
+              "exits": 120.56864166666668,
+              "closing_headcount": 9037
+            },
+            {
+              "planning_month": "2027-09-01",
+              "opening_headcount": 9037,
+              "hires": 120.56864166666668,
+              "exits": 120.56864166666668,
+              "closing_headcount": 9037
+            },
+            {
+              "planning_month": "2027-10-01",
+              "opening_headcount": 9037,
+              "hires": 120.56864166666668,
+              "exits": 120.56864166666668,
+              "closing_headcount": 9037
+            },
+            {
+              "planning_month": "2027-11-01",
+              "opening_headcount": 9037,
+              "hires": 120.56864166666668,
+              "exits": 120.56864166666668,
+              "closing_headcount": 9037
+            },
+            {
+              "planning_month": "2027-12-01",
+              "opening_headcount": 9037,
+              "hires": 120.56864166666668,
+              "exits": 120.56864166666668,
+              "closing_headcount": 9037
+            }
+          ],
+          "starting_headcount": 9037,
+          "total_hires": 1446.8237000000006,
+          "total_exits": 1446.8237000000006,
+          "ending_headcount": 9037
+        }
+      }
+    },
+    {
+      "input": {
+        "assumptions": {
+          "annual_growth_pct": 5,
+          "salary_inflation_pct": 3,
+          "fill_rate_pct": 80,
+          "productivity_hiring_reduction_pct": 10
+        }
+      },
+      "expected": {
+        "as_of": "2026-09-30",
+        "source_scenario": "Baseline",
+        "defaults": {
+          "annual_growth_pct": 0,
+          "salary_inflation_pct": 0,
+          "annual_attrition_pct": 16.01,
+          "fill_rate_pct": 100,
+          "productivity_hiring_reduction_pct": 0
+        },
+        "assumptions": {
+          "annual_growth_pct": 5,
+          "salary_inflation_pct": 3,
+          "annual_attrition_pct": 16.01,
+          "fill_rate_pct": 80,
+          "productivity_hiring_reduction_pct": 10
+        },
+        "summary": {
+          "starting_headcount": 9037,
+          "baseline_end_headcount": 9037,
+          "target_end_headcount": 9488.9,
+          "modeled_end_headcount": 8985.7,
+          "modeled_end_fte": 8801.1,
+          "headcount_delta_vs_baseline": -51.3,
+          "headcount_gap_vs_target": -503.2,
+          "baseline_end_labor_cost_usd": 1288763372.72,
+          "modeled_end_labor_cost_usd": 1319885764.74,
+          "labor_cost_delta_vs_baseline_usd": 31122392.02,
+          "cumulative_modeled_hires": 1390.7,
+          "cumulative_modeled_exits": 1442
+        },
+        "points": [
+          {
+            "planning_month": "2027-01-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9073.8,
+            "modeled_headcount": 9029.7,
+            "modeled_fte": 8844.3,
+            "planned_hiring_demand": 157.4,
+            "modeled_hires": 113.3,
+            "modeled_exits": 120.6,
+            "modeled_labor_cost_usd": 1290905289.13,
+            "gap_vs_target": -44.1
+          },
+          {
+            "planning_month": "2027-02-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9110.8,
+            "modeled_headcount": 9023.1,
+            "modeled_fte": 8837.7,
+            "planned_hiring_demand": 158,
+            "modeled_hires": 113.8,
+            "modeled_exits": 120.5,
+            "modeled_labor_cost_usd": 1293129958.91,
+            "gap_vs_target": -87.7
+          },
+          {
+            "planning_month": "2027-03-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9147.9,
+            "modeled_headcount": 9016.9,
+            "modeled_fte": 8831.7,
+            "planned_hiring_demand": 158.7,
+            "modeled_hires": 114.2,
+            "modeled_exits": 120.4,
+            "modeled_labor_cost_usd": 1295437174.48,
+            "gap_vs_target": -131
+          },
+          {
+            "planning_month": "2027-04-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9185.2,
+            "modeled_headcount": 9011.3,
+            "modeled_fte": 8826.3,
+            "planned_hiring_demand": 159.3,
+            "modeled_hires": 114.7,
+            "modeled_exits": 120.3,
+            "modeled_labor_cost_usd": 1297826735.07,
+            "gap_vs_target": -173.8
+          },
+          {
+            "planning_month": "2027-05-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9222.6,
+            "modeled_headcount": 9006.3,
+            "modeled_fte": 8821.3,
+            "planned_hiring_demand": 160,
+            "modeled_hires": 115.2,
+            "modeled_exits": 120.2,
+            "modeled_labor_cost_usd": 1300298446.71,
+            "gap_vs_target": -216.3
+          },
+          {
+            "planning_month": "2027-06-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9260.2,
+            "modeled_headcount": 9001.8,
+            "modeled_fte": 8816.9,
+            "planned_hiring_demand": 160.6,
+            "modeled_hires": 115.6,
+            "modeled_exits": 120.2,
+            "modeled_labor_cost_usd": 1302852122.13,
+            "gap_vs_target": -258.4
+          },
+          {
+            "planning_month": "2027-07-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9297.9,
+            "modeled_headcount": 8997.8,
+            "modeled_fte": 8813,
+            "planned_hiring_demand": 161.3,
+            "modeled_hires": 116.1,
+            "modeled_exits": 120.1,
+            "modeled_labor_cost_usd": 1305487580.76,
+            "gap_vs_target": -300.1
+          },
+          {
+            "planning_month": "2027-08-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9335.8,
+            "modeled_headcount": 8994.3,
+            "modeled_fte": 8809.6,
+            "planned_hiring_demand": 161.9,
+            "modeled_hires": 116.6,
+            "modeled_exits": 120,
+            "modeled_labor_cost_usd": 1308204648.67,
+            "gap_vs_target": -341.5
+          },
+          {
+            "planning_month": "2027-09-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9373.8,
+            "modeled_headcount": 8991.4,
+            "modeled_fte": 8806.7,
+            "planned_hiring_demand": 162.6,
+            "modeled_hires": 117.1,
+            "modeled_exits": 120,
+            "modeled_labor_cost_usd": 1311003158.53,
+            "gap_vs_target": -382.4
+          },
+          {
+            "planning_month": "2027-10-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9412,
+            "modeled_headcount": 8989,
+            "modeled_fte": 8804.4,
+            "planned_hiring_demand": 163.3,
+            "modeled_hires": 117.5,
+            "modeled_exits": 120,
+            "modeled_labor_cost_usd": 1313882949.58,
+            "gap_vs_target": -423
+          },
+          {
+            "planning_month": "2027-11-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9450.3,
+            "modeled_headcount": 8987.1,
+            "modeled_fte": 8802.5,
+            "planned_hiring_demand": 163.9,
+            "modeled_hires": 118,
+            "modeled_exits": 119.9,
+            "modeled_labor_cost_usd": 1316843867.58,
+            "gap_vs_target": -463.3
+          },
+          {
+            "planning_month": "2027-12-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 9488.9,
+            "modeled_headcount": 8985.7,
+            "modeled_fte": 8801.1,
+            "planned_hiring_demand": 164.6,
+            "modeled_hires": 118.5,
+            "modeled_exits": 119.9,
+            "modeled_labor_cost_usd": 1319885764.74,
+            "gap_vs_target": -503.2
+          }
+        ],
+        "methodology": [
+          "The stored Baseline scenario is the reference curve.",
+          "Growth changes scale the stored Baseline headcount target relative to the Baseline annual growth assumption.",
+          "Gross hiring demand equals target net headcount change plus replacement demand based on the Baseline annual attrition rate.",
+          "Productivity reduces gross hiring demand before the fill-rate assumption is applied.",
+          "Modeled exits use the custom annual attrition assumption and reduce realized headcount.",
+          "Modeled FTE preserves each Baseline month's FTE-to-headcount ratio.",
+          "Labor cost uses the Baseline cost per FTE adjusted for the custom salary-inflation assumption, then multiplies by modeled FTE.",
+          "This is a deterministic custom model, not an LLM-generated forecast.",
+          "Constructed September 2026 stock is carried to January 2027; October–December 2026 is unmodeled, not an observed or forecast bridge.",
+          "Stored flat draft hires/exits are zero and reconcile. What-if hires/exits are separate engine-implied gross flows; they are not stored plan flows or observed future outcomes.",
+          "The 16.01% company annualized January–September exit rate is a shared scenario assumption. Fill rate and productivity are authored assumptions, not estimated capacity.",
+          "Growth and inflation adjustments span the twelve explicit planning points; there is no independent forecast validation."
+        ],
+        "accounting": {
+          "scope": {
+            "type": "company"
+          },
+          "basis": "Unrounded conditional arithmetic; display values are rounded separately.",
+          "monthly": [
+            {
+              "planning_month": "2027-01-01",
+              "opening_headcount": 9037,
+              "hires": 113.31827877563742,
+              "exits": 120.56864166666668,
+              "closing_headcount": 9029.749637108971
+            },
+            {
+              "planning_month": "2027-02-01",
+              "opening_headcount": 9029.749637108971,
+              "hires": 113.77995147031841,
+              "exits": 120.4719097417622,
+              "closing_headcount": 9023.057678837527
+            },
+            {
+              "planning_month": "2027-03-01",
+              "opening_headcount": 9023.057678837527,
+              "hires": 114.24350507670843,
+              "exits": 120.38262786515736,
+              "closing_headcount": 9016.918556049079
+            },
+            {
+              "planning_month": "2027-04-01",
+              "opening_headcount": 9016.918556049079,
+              "hires": 114.7089472578673,
+              "exits": 120.30072173528814,
+              "closing_headcount": 9011.326781571659
+            },
+            {
+              "planning_month": "2027-05-01",
+              "opening_headcount": 9011.326781571659,
+              "hires": 115.1762857080874,
+              "exits": 120.22611814413523,
+              "closing_headcount": 9006.27694913561
+            },
+            {
+              "planning_month": "2027-06-01",
+              "opening_headcount": 9006.27694913561,
+              "hires": 115.64552815300306,
+              "exits": 120.15874496305095,
+              "closing_headcount": 9001.763732325562
+            },
+            {
+              "planning_month": "2027-07-01",
+              "opening_headcount": 9001.763732325562,
+              "hires": 116.11668234972495,
+              "exits": 120.09853112877688,
+              "closing_headcount": 8997.78188354651
+            },
+            {
+              "planning_month": "2027-08-01",
+              "opening_headcount": 8997.78188354651,
+              "hires": 116.58975608696338,
+              "exits": 120.04540662964969,
+              "closing_headcount": 8994.326233003823
+            },
+            {
+              "planning_month": "2027-09-01",
+              "opening_headcount": 8994.326233003823,
+              "hires": 117.06475718516597,
+              "exits": 119.9993024919927,
+              "closing_headcount": 8991.391687696996
+            },
+            {
+              "planning_month": "2027-10-01",
+              "opening_headcount": 8991.391687696996,
+              "hires": 117.54169349664308,
+              "exits": 119.96015076669077,
+              "closing_headcount": 8988.97323042695
+            },
+            {
+              "planning_month": "2027-11-01",
+              "opening_headcount": 8988.97323042695,
+              "hires": 118.02057290568817,
+              "exits": 119.92788451594623,
+              "closing_headcount": 8987.065918816692
+            },
+            {
+              "planning_month": "2027-12-01",
+              "opening_headcount": 8987.065918816692,
+              "hires": 118.50140332872084,
+              "exits": 119.90243780021271,
+              "closing_headcount": 8985.6648843452
+            }
+          ],
+          "starting_headcount": 9037,
+          "total_hires": 1390.7073617945287,
+          "total_exits": 1442.0424774493297,
+          "ending_headcount": 8985.6648843452
+        }
+      }
+    },
+    {
+      "input": {
+        "assumptions": {
+          "annual_growth_pct": -10,
+          "annual_attrition_pct": 30,
+          "fill_rate_pct": 0
+        }
+      },
+      "expected": {
+        "as_of": "2026-09-30",
+        "source_scenario": "Baseline",
+        "defaults": {
+          "annual_growth_pct": 0,
+          "salary_inflation_pct": 0,
+          "annual_attrition_pct": 16.01,
+          "fill_rate_pct": 100,
+          "productivity_hiring_reduction_pct": 0
+        },
+        "assumptions": {
+          "annual_growth_pct": -10,
+          "salary_inflation_pct": 0,
+          "annual_attrition_pct": 30,
+          "fill_rate_pct": 0,
+          "productivity_hiring_reduction_pct": 0
+        },
+        "summary": {
+          "starting_headcount": 9037,
+          "baseline_end_headcount": 9037,
+          "target_end_headcount": 8133.3,
+          "modeled_end_headcount": 6669.3,
+          "modeled_end_fte": 6532.3,
+          "headcount_delta_vs_baseline": -2367.7,
+          "headcount_gap_vs_target": -1464,
+          "baseline_end_labor_cost_usd": 1288763372.72,
+          "modeled_end_labor_cost_usd": 951105237.23,
+          "labor_cost_delta_vs_baseline_usd": -337658135.49,
+          "cumulative_modeled_hires": 0,
+          "cumulative_modeled_exits": 2367.7
+        },
+        "points": [
+          {
+            "planning_month": "2027-01-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 8958,
+            "modeled_headcount": 8811.1,
+            "modeled_fte": 8630.1,
+            "planned_hiring_demand": 41.6,
+            "modeled_hires": 0,
+            "modeled_exits": 225.9,
+            "modeled_labor_cost_usd": 1256544288.4,
+            "gap_vs_target": -146.9
+          },
+          {
+            "planning_month": "2027-02-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 8879.7,
+            "modeled_headcount": 8590.8,
+            "modeled_fte": 8414.4,
+            "planned_hiring_demand": 41.2,
+            "modeled_hires": 0,
+            "modeled_exits": 220.3,
+            "modeled_labor_cost_usd": 1225130681.19,
+            "gap_vs_target": -288.9
+          },
+          {
+            "planning_month": "2027-03-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 8802.1,
+            "modeled_headcount": 8376,
+            "modeled_fte": 8204,
+            "planned_hiring_demand": 40.8,
+            "modeled_hires": 0,
+            "modeled_exits": 214.8,
+            "modeled_labor_cost_usd": 1194502414.16,
+            "gap_vs_target": -426
+          },
+          {
+            "planning_month": "2027-04-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 8725.1,
+            "modeled_headcount": 8166.6,
+            "modeled_fte": 7998.9,
+            "planned_hiring_demand": 40.5,
+            "modeled_hires": 0,
+            "modeled_exits": 209.4,
+            "modeled_labor_cost_usd": 1164639853.81,
+            "gap_vs_target": -558.5
+          },
+          {
+            "planning_month": "2027-05-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 8648.9,
+            "modeled_headcount": 7962.5,
+            "modeled_fte": 7798.9,
+            "planned_hiring_demand": 40.1,
+            "modeled_hires": 0,
+            "modeled_exits": 204.2,
+            "modeled_labor_cost_usd": 1135523857.46,
+            "gap_vs_target": -686.4
+          },
+          {
+            "planning_month": "2027-06-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 8573.3,
+            "modeled_headcount": 7763.4,
+            "modeled_fte": 7604,
+            "planned_hiring_demand": 39.8,
+            "modeled_hires": 0,
+            "modeled_exits": 199.1,
+            "modeled_labor_cost_usd": 1107135761.03,
+            "gap_vs_target": -809.9
+          },
+          {
+            "planning_month": "2027-07-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 8498.3,
+            "modeled_headcount": 7569.3,
+            "modeled_fte": 7413.9,
+            "planned_hiring_demand": 39.4,
+            "modeled_hires": 0,
+            "modeled_exits": 194.1,
+            "modeled_labor_cost_usd": 1079457367,
+            "gap_vs_target": -929
+          },
+          {
+            "planning_month": "2027-08-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 8424,
+            "modeled_headcount": 7380.1,
+            "modeled_fte": 7228.5,
+            "planned_hiring_demand": 39.1,
+            "modeled_hires": 0,
+            "modeled_exits": 189.2,
+            "modeled_labor_cost_usd": 1052470932.83,
+            "gap_vs_target": -1043.9
+          },
+          {
+            "planning_month": "2027-09-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 8350.4,
+            "modeled_headcount": 7195.6,
+            "modeled_fte": 7047.8,
+            "planned_hiring_demand": 38.8,
+            "modeled_hires": 0,
+            "modeled_exits": 184.5,
+            "modeled_labor_cost_usd": 1026159159.51,
+            "gap_vs_target": -1154.8
+          },
+          {
+            "planning_month": "2027-10-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 8277.4,
+            "modeled_headcount": 7015.7,
+            "modeled_fte": 6871.6,
+            "planned_hiring_demand": 38.4,
+            "modeled_hires": 0,
+            "modeled_exits": 179.9,
+            "modeled_labor_cost_usd": 1000505180.52,
+            "gap_vs_target": -1261.7
+          },
+          {
+            "planning_month": "2027-11-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 8205,
+            "modeled_headcount": 6840.3,
+            "modeled_fte": 6699.8,
+            "planned_hiring_demand": 38.1,
+            "modeled_hires": 0,
+            "modeled_exits": 175.4,
+            "modeled_labor_cost_usd": 975492551,
+            "gap_vs_target": -1364.7
+          },
+          {
+            "planning_month": "2027-12-01",
+            "baseline_headcount": 9037,
+            "target_headcount": 8133.3,
+            "modeled_headcount": 6669.3,
+            "modeled_fte": 6532.3,
+            "planned_hiring_demand": 37.7,
+            "modeled_hires": 0,
+            "modeled_exits": 171,
+            "modeled_labor_cost_usd": 951105237.23,
+            "gap_vs_target": -1464
+          }
+        ],
+        "methodology": [
+          "The stored Baseline scenario is the reference curve.",
+          "Growth changes scale the stored Baseline headcount target relative to the Baseline annual growth assumption.",
+          "Gross hiring demand equals target net headcount change plus replacement demand based on the Baseline annual attrition rate.",
+          "Productivity reduces gross hiring demand before the fill-rate assumption is applied.",
+          "Modeled exits use the custom annual attrition assumption and reduce realized headcount.",
+          "Modeled FTE preserves each Baseline month's FTE-to-headcount ratio.",
+          "Labor cost uses the Baseline cost per FTE adjusted for the custom salary-inflation assumption, then multiplies by modeled FTE.",
+          "This is a deterministic custom model, not an LLM-generated forecast.",
+          "Constructed September 2026 stock is carried to January 2027; October–December 2026 is unmodeled, not an observed or forecast bridge.",
+          "Stored flat draft hires/exits are zero and reconcile. What-if hires/exits are separate engine-implied gross flows; they are not stored plan flows or observed future outcomes.",
+          "The 16.01% company annualized January–September exit rate is a shared scenario assumption. Fill rate and productivity are authored assumptions, not estimated capacity.",
+          "Growth and inflation adjustments span the twelve explicit planning points; there is no independent forecast validation."
+        ],
+        "accounting": {
+          "scope": {
+            "type": "company"
+          },
+          "basis": "Unrounded conditional arithmetic; display values are rounded separately.",
+          "monthly": [
+            {
+              "planning_month": "2027-01-01",
+              "opening_headcount": 9037,
+              "hires": 0,
+              "exits": 225.92499999999998,
+              "closing_headcount": 8811.075
+            },
+            {
+              "planning_month": "2027-02-01",
+              "opening_headcount": 8811.075,
+              "hires": 0,
+              "exits": 220.276875,
+              "closing_headcount": 8590.798125000001
+            },
+            {
+              "planning_month": "2027-03-01",
+              "opening_headcount": 8590.798125000001,
+              "hires": 0,
+              "exits": 214.769953125,
+              "closing_headcount": 8376.028171875001
+            },
+            {
+              "planning_month": "2027-04-01",
+              "opening_headcount": 8376.028171875001,
+              "hires": 0,
+              "exits": 209.400704296875,
+              "closing_headcount": 8166.627467578126
+            },
+            {
+              "planning_month": "2027-05-01",
+              "opening_headcount": 8166.627467578126,
+              "hires": 0,
+              "exits": 204.16568668945314,
+              "closing_headcount": 7962.461780888673
+            },
+            {
+              "planning_month": "2027-06-01",
+              "opening_headcount": 7962.461780888673,
+              "hires": 0,
+              "exits": 199.06154452221682,
+              "closing_headcount": 7763.400236366457
+            },
+            {
+              "planning_month": "2027-07-01",
+              "opening_headcount": 7763.400236366457,
+              "hires": 0,
+              "exits": 194.0850059091614,
+              "closing_headcount": 7569.315230457295
+            },
+            {
+              "planning_month": "2027-08-01",
+              "opening_headcount": 7569.315230457295,
+              "hires": 0,
+              "exits": 189.23288076143237,
+              "closing_headcount": 7380.082349695863
+            },
+            {
+              "planning_month": "2027-09-01",
+              "opening_headcount": 7380.082349695863,
+              "hires": 0,
+              "exits": 184.50205874239654,
+              "closing_headcount": 7195.580290953466
+            },
+            {
+              "planning_month": "2027-10-01",
+              "opening_headcount": 7195.580290953466,
+              "hires": 0,
+              "exits": 179.88950727383664,
+              "closing_headcount": 7015.690783679629
+            },
+            {
+              "planning_month": "2027-11-01",
+              "opening_headcount": 7015.690783679629,
+              "hires": 0,
+              "exits": 175.3922695919907,
+              "closing_headcount": 6840.298514087638
+            },
+            {
+              "planning_month": "2027-12-01",
+              "opening_headcount": 6840.298514087638,
+              "hires": 0,
+              "exits": 171.00746285219094,
+              "closing_headcount": 6669.291051235447
+            }
+          ],
+          "starting_headcount": 9037,
+          "total_hires": 0,
+          "total_exits": 2367.7089487645535,
+          "ending_headcount": 6669.291051235447
+        }
+      }
+    }
+  ]
+}

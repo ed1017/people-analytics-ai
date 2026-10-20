@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "contract": "public-company-scenario-arithmetic-v1",
+  "provenance": {
+    "origin": "https://www.ed-ai.app",
+    "capturedAt": "2026-10-20T04:38:53.376Z",
+    "scope": "company-arithmetic-public-input-subsets-only"
+  },
+  "documents": [
+    {
+      "target": "/api/headcount",
+      "sha256": "235824ac01ce223ab39bec82b714f3fff606e1e2ebac12b511369f938e58f942",
+      "body": {
+        "headcount": 9037
+      }
+    },
+    {
+      "target": "/api/scenario-modeler",
+      "sha256": "6f8e5f0422cfbe9b328c69313283f1cb63dba9651fe605c1febebcc2bef8902c",
+      "body": {
+        "as_of": "2026-09-30",
+        "defaults": {
+          "annual_growth_pct": 0,
+          "salary_inflation_pct": 0,
+          "annual_attrition_pct": 16.01,
+          "fill_rate_pct": 100,
+          "productivity_hiring_reduction_pct": 0
+        },
+        "bounds": {
+          "annual_growth_pct": {
+            "min": -10,
+            "max": 20
+          },
+          "salary_inflation_pct": {
+            "min": -5,
+            "max": 15
+          },
+          "annual_attrition_pct": {
+            "min": 0,
+            "max": 30
+          },
+          "fill_rate_pct": {
+            "min": 0,
+            "max": 100
+          },
+          "productivity_hiring_reduction_pct": {
+            "min": 0,
+            "max": 50
+          }
+        }
+      }
+    },
+    {
+      "target": "/api/workforce-planning",
+      "sha256": "2f0dd1e704825db1ad9c333b6fa344cf04f74b74a5196dc303d7e1648c740ea0",
+      "body": {
+        "scenario_name": "Baseline",
+        "scenario_type": "draft_assumption",
+        "opening_headcount": 9037,
+        "history_cutoff": "2026-09-30",
+        "planning_start": "2027-01-01",
+        "planning_end": "2027-12-01",
+        "unmodeled_gap": [
+          "2026-10",
+          "2026-11",
+          "2026-12"
+        ],
+        "independent_forecast_validation": false,
+        "points": [
+          {
+            "planning_month": "2027-01-01",
+            "planned_headcount": 9037,
+            "planned_fte": 8851.4,
+            "planned_hires": 0,
+            "planned_exits": 0,
+            "planned_labor_cost_usd": 1288763372.72
+          },
+          {
+            "planning_month": "2027-02-01",
+            "planned_headcount": 9037,
+            "planned_fte": 8851.4,
+            "planned_hires": 0,
+            "planned_exits": 0,
+            "planned_labor_cost_usd": 1288763372.72
+          },
+          {
+            "planning_month": "2027-03-01",
+            "planned_headcount": 9037,
+            "planned_fte": 8851.4,
+            "planned_hires": 0,
+            "planned_exits": 0,
+            "planned_labor_cost_usd": 1288763372.72
+          },
+          {
+            "planning_month": "2027-04-01",
+            "planned_headcount": 9037,
+            "planned_fte": 8851.4,
+            "planned_hires": 0,
+            "planned_exits": 0,
+            "planned_labor_cost_usd": 1288763372.72
+          },
+          {
+            "planning_month": "2027-05-01",
+            "planned_headcount": 9037,
+            "planned_fte": 8851.4,
+            "planned_hires": 0,
+            "planned_exits": 0,
+            "planned_labor_cost_usd": 1288763372.72
+          },
+          {
+            "planning_month": "2027-06-01",
+            "planned_headcount": 9037,
+            "planned_fte": 8851.4,
+            "planned_hires": 0,
+            "planned_exits": 0,
+            "planned_labor_cost_usd": 1288763372.72
+          },
+          {
+            "planning_month": "2027-07-01",
+            "planned_headcount": 9037,
+            "planned_fte": 8851.4,
+            "planned_hires": 0,
+            "planned_exits": 0,
+            "planned_labor_cost_usd": 1288763372.72
+          },
+          {
+            "planning_month": "2027-08-01",
+            "planned_headcount": 9037,
+            "planned_fte": 8851.4,
+            "planned_hires": 0,
+            "planned_exits": 0,
+            "planned_labor_cost_usd": 1288763372.72
+          },
+          {
+            "planning_month": "2027-09-01",
+            "planned_headcount": 9037,
+            "planned_fte": 8851.4,
+            "planned_hires": 0,
+            "planned_exits": 0,
+            "planned_labor_cost_usd": 1288763372.72
+          },
+          {
+            "planning_month": "2027-10-01",
+            "planned_headcount": 9037,
+            "planned_fte": 8851.4,
+            "planned_hires": 0,
+            "planned_exits": 0,
+            "planned_labor_cost_usd": 1288763372.72
+          },
+          {
+            "planning_month": "2027-11-01",
+            "planned_headcount": 9037,
+            "planned_fte": 8851.4,
+            "planned_hires": 0,
+            "planned_exits": 0,
+            "planned_labor_cost_usd": 1288763372.72
+          },
+          {
+            "planning_month": "2027-12-01",
+            "planned_headcount": 9037,
+            "planned_fte": 8851.4,
+            "planned_hires": 0,
+            "planned_exits": 0,
+            "planned_labor_cost_usd": 1288763372.72
+          }
+        ]
+      }
+    }
+  ]
+}
