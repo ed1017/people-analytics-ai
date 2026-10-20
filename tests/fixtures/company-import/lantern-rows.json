@@ -1,0 +1,6 @@
+[
+  {"period_end": "2026-09-30", "division_key": "studio", "staffed_people": 4, "capacity_percent_total": 325},
+  {"period_end": "2026-08-31", "division_key": "workshop", "staffed_people": 4, "capacity_percent_total": 350},
+  {"period_end": "2026-09-30", "division_key": "workshop", "staffed_people": 5, "capacity_percent_total": 450},
+  {"period_end": "2026-08-31", "division_key": "studio", "staffed_people": 3, "capacity_percent_total": 250}
+]
