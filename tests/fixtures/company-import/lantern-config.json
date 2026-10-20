@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "companyKey": "lantern-invented",
+  "dataClass": "invented-test-only",
+  "grain": "nonoverlapping-leaf-unit-snapshot",
+  "fields": {
+    "snapshot_date": "period_end",
+    "org_code": "division_key",
+    "headcount": "staffed_people",
+    "fte": "capacity_percent_total"
+  },
+  "fteUnit": "fte-percent-sum",
+  "units": [
+    {"source": "workshop", "org_code": "OPS"},
+    {"source": "studio", "org_code": "DESIGN"}
+  ],
+  "controls": [
+    {"snapshot_date": "2026-08-31", "headcount": 7, "fte": 6},
+    {"snapshot_date": "2026-09-30", "headcount": 9, "fte": 7.75}
+  ]
+}
