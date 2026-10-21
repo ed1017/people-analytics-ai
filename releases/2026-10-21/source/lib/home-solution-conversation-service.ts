@@ -1,3 +1,4 @@
+import {homeAggregateTool} from './home-aggregate-tool.mjs';
 import {acceptsPublicHomeReceipt,isPublicHomeReceiptCandidate} from './public-home-receipt.mjs';
 import type {createPublicHomeGrounding} from './public-home-grounding.server.mjs';
 // @ts-expect-error Native fixtures share source.
@@ -59,7 +60,7 @@ import {readSwpPlaybook} from './swp-reasoning-playbook.ts';
 export type SolutionModelOutput={items:unknown[];calls:{id:string;name:string;arguments:string}[];text:string;completed:boolean};
 export type SolutionReply={charts?:ChatEvidenceSeries[];requestId:string;answer:string;candidateIds:string[];analysisIds:string[];state:SolutionState;usage:{modelRounds:number;toolCalls:number};progressProposal?:ProgressEntryProposal;demandReview?:DemandReview};
 export type SolutionToolDiagnostic={round:number;name:string;status:'ok'|'feedback'|'aborted';elapsedMs:number};
-export type SolutionRuntime={maxModelRounds?:2;requestTime?:Date;onToolResult?:(event:SolutionToolDiagnostic)=>void;staffingScenarioOnly?:boolean;grounding?:Awaited<ReturnType<typeof verifySolutionEvidence>>|Awaited<ReturnType<ReturnType<typeof createPublicHomeGrounding>['verify']>>;complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal,capabilities:{progressEntryEnabled:boolean;requiredStaffingCalculation:boolean})=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date;natural?:{datasetToken:string};progress?:{enabled:boolean;datasetToken:string};demand?:{datasetToken:string;referenceContract?:boolean}};
+export type SolutionRuntime={readAggregate?:(args:Record<string,unknown>,signal:AbortSignal)=>Promise<{answer:string}>;maxModelRounds?:2;requestTime?:Date;onToolResult?:(event:SolutionToolDiagnostic)=>void;staffingScenarioOnly?:boolean;grounding?:Awaited<ReturnType<typeof verifySolutionEvidence>>|Awaited<ReturnType<ReturnType<typeof createPublicHomeGrounding>['verify']>>;complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal,capabilities:{progressEntryEnabled:boolean;requiredStaffingCalculation:boolean})=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date;natural?:{datasetToken:string};progress?:{enabled:boolean;datasetToken:string};demand?:{datasetToken:string;referenceContract?:boolean}};
 function readFinal(text:string):SolutionFinal{
  if(!text||text.length>20000)throw new SolutionResponseError('answer_unavailable','The conversational answer is unavailable.');
  let value;
@@ -185,10 +186,18 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
    if(!presentationTools.has(call.name))coFinalEligible=false;
    if(runtime.natural&&call.name===requiredStaffingTool.name){staffingRequired=true;staffingCalculated=false;}
    try{
-    const tool=runtime.natural&&call.name===requiredStaffingTool.name?requiredStaffingTool:runtime.natural&&call.name===hiringBudgetTool.name?hiringBudgetTool:runtime.natural&&businessPlanningTools.some(t=>t.name===call.name)?businessPlanningTools.find(t=>t.name===call.name):demand?[...(referenced?[reviewReferencedDemandTool,reviseReferencedDemandTool]:[serviceDemandTool,demandPatchTool]),...solutionTools.filter(t=>['read_clock','read_evidence'].includes(t.name))].find(t=>t.name===call.name):call.name==='propose_goal_progress'&&entryContext?goalProgressProposalTool:call.name==='read_goal_progress'&&progress?goalProgressReadTool:solutionTools.find(tool=>tool.name===call.name);if(!tool||call.arguments.length>32000)throw Error('Unsupported or oversized tool request.');const args=JSON.parse(call.arguments);
+    const tool=runtime.readAggregate&&call.name===homeAggregateTool.name?homeAggregateTool:runtime.natural&&call.name===requiredStaffingTool.name?requiredStaffingTool:runtime.natural&&call.name===hiringBudgetTool.name?hiringBudgetTool:runtime.natural&&businessPlanningTools.some(t=>t.name===call.name)?businessPlanningTools.find(t=>t.name===call.name):demand?[...(referenced?[reviewReferencedDemandTool,reviseReferencedDemandTool]:[serviceDemandTool,demandPatchTool]),...solutionTools.filter(t=>['read_clock','read_evidence'].includes(t.name))].find(t=>t.name===call.name):call.name==='propose_goal_progress'&&entryContext?goalProgressProposalTool:call.name==='read_goal_progress'&&progress?goalProgressReadTool:solutionTools.find(tool=>tool.name===call.name);if(!tool||call.arguments.length>32000)throw Error('Unsupported or oversized tool request.');const args=JSON.parse(call.arguments);
     const periodFeedback=demand?demandPeriodFeedback(call.name,args):null;
     if(periodFeedback){coFinalEligible=false;toolStatus='feedback';input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(periodFeedback)});continue;}
     assertSolutionShape(args,tool.parameters,'tool arguments');
+    if(call.name===homeAggregateTool.name&&runtime.readAggregate){
+     if(round!==0||output.calls.length!==1||staffingRequired||demand)throw Error('Aggregate comparison must be a separate factual request before planning calculations.');
+     const comparison=await runtime.readAggregate(args,signal);abort(signal);
+     if(typeof comparison.answer!=='string'||!comparison.answer.trim()||comparison.answer.length>10000)throw Error('Aggregate response exceeds its bounds.');
+     state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:comparison.answer}].slice(-32);
+     state.questions=[];
+     return {requestId:request.requestId,answer:comparison.answer,candidateIds:[],analysisIds:[],charts:[],state:readSolutionState(state),usage:{modelRounds:rounds,toolCalls}};
+    }
     if(runtime.natural&&call.name===requiredStaffingTool.name){
      const next=editRequiredStaffing(request,runtime.natural.datasetToken,args.changes);state.requiredStaffing=next;result={requiredStaffing:requiredStaffingView(next),accepted:false,saved:false};staffingCalculated=true;
     }else if(runtime.natural&&call.name===hiringBudgetTool.name){
