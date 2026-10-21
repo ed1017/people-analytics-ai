@@ -17,3 +17,5 @@ Current source: runtime e2e13c23d59bd808caeb45edef20b101d05e4ceb; exact deployme
 Five existing public headcount experiment support files remain pinned by normalized content. The transport-only fixture overrides and original current Home components are preserved. The recipe runs the current source while the data replay remains explicitly historical.
 
 The current accounting-schema metadata and applied migration chain are documented in CURRENT-COMPANY-HANDOFF.md. This does not claim empty-database provisioning or a transferable production-data migration. Narrowed filters, arbitrary calculator output, live AI/accounting, private input reconstruction and complete new-company onboarding remain outside this increment.
+
+A subsequent one-selector CSS fix a86acfa includes saved-plan split views in the desktop reading-area rule. The recipe consumes this latest source; the clean reproduction build above was e2e13c2. The final CSS is checked in the actual hosted build with retained real saved state; no data or runtime binding changed.
