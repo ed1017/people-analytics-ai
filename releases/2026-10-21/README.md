@@ -48,3 +48,9 @@ The renderer formats only eight exact public business-unit labels through the ex
 ## Multi-turn topic continuity
 
 A real three-turn conversation covered a four-role staffing comparison, a changed budget and redeployment pool, then recorded monthly turnover. The two staffing turns used two model rounds each; turnover used zero. Numeric assumptions, conditional recommendations and explicit evidence limits were preserved. The captured topic switch exposed stale staffing cards alongside the new metric answer. Current calculation markers now reset per answering turn while retaining scenario inputs and provenance. Seventeen route tests, TypeScript and captured-request replay passed; an independent focused review found no blocker. Saved/reopened state remains covered by earlier fixture checks rather than a fresh paid save journey. No model, budget, permission or data changes accompany this correction.
+
+## Coordinated pricing renewal
+
+The reviewed rolling price window is October 21 09:59 through October 22 09:59 UTC. Admission stops 90 seconds before expiry. Application policy, rollout expiry, database admission ceiling and receipt settlement upper bound must match the coordinated renewal; existing receipt lower bound and ten-minute freshness remain intact. The cap, reservations, uncertain holds, prices and permissions are unchanged. Twenty-five accounting/round tests and exact live-definition date-transform checks passed with independent review. This supersedes the earlier midnight deadline above.
+
+One additional actual model investigation plan passed evidence review and explicit browser Save/reload, preserving the candidate, goal, scope and unknown resources. It remains a qualitative proposal, not an executed intervention or proof of causes.
