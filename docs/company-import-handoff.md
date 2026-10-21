@@ -36,6 +36,8 @@ Only headcount and trend bodies enter the manifest; company labels, crosswalk/so
 
 ## Integration and remaining work
 
+The subsequent [synthetic provider integration](company-provider-integration.md) now binds these validated inputs to immutable company/snapshot identity and serves the two supported routes through tested loopback HTTP. It remains outside the production app; real-company ingestion and full UI parity are unfinished.
+
 Cherry-pick only this increment's commit onto the main task's chosen base. It adds files only, based on local public-scenario commit `63be154b9e1cba2aec2e7f553a28bc6b7cda76b2`; no dependency on the live AI branch. Keep generated artifacts unwired. The existing local public-app mode pins its own reviewed published manifest and token; this invented import cannot replace those pins or prove app parity. No app build or hosted verification is claimed by the Node tests.
 
 For the next increment, obtain approved source-owner definitions and private sample exports in an authorized private boundary; record owner, grain/key, population, period, units, null rules, privacy, coverage and reconciliation provenance. Extend the versioned mapping contract deliberately for needed domains, with independent controls and tests. Org-level UI data, suppression/complementary suppression, actual-company provider identity, publication approval, server persistence and models each need separate work. Keep deterministic calculations in existing engines. The LLM may explain checked mappings/results; it must not invent missing values, weaken 9,037 guards, repin private inputs or treat invented tests as validation for an actual company.
