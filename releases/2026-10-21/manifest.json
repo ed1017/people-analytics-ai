@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "sourceCommit": "19c25b94aa59e59edd4a309dec1a712361e98649",
-  "deployment": "dpl_DNrb8Py5xmmtN26GVJzx93VKnX64",
-  "verifiedDeployedArchiveSha256": "d004c1e7314bbe70fda8215ca59094983920dd72ae0fc5aac02ab3f3975700d7",
+  "sourceCommit": "cb065cc6e7120b6826d379469c10d73d2fded545",
+  "deployment": "dpl_FTt2zHhBpUbCr4EPNGDMv7s9CNJT",
+  "verifiedDeployedArchiveSha256": "fa40ba64f5e390d1ec973b75a5014f788e0967d97eef17db0da34a660c14840b",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -2465,8 +2465,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "7bc3627add470840f40613063584e4bf0056fa0402ba426f58f6e1f505ce707e",
-      "bytes": 36634
+      "sha256": "2ec987f525016ff5a97f4172b2d9513464cd55f9bf4399887f969a9609e6321d",
+      "bytes": 37240
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -3597,7 +3597,11 @@
       "path": "lib/home-headcount-chat.ts",
       "sha256": "d3531c044261a130471481070add6b50e34fc8c075c6196dff36f1fbb77f9d5a",
       "bytes": 2037
+    },
+    {
+      "path": "lib/home-staffing-intake.ts",
+      "sha256": "d91e414639649de239a104f9342f6f685479ac11a2ebbf657a1c524fb6534459",
+      "bytes": 1043
     }
   ]
 }
-

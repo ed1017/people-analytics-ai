@@ -20,6 +20,8 @@ import {answerEvidenceSeries,type ChatEvidenceSeries} from './chat-evidence-seri
 import {turnoverChatReply,clearTurnoverChat,retainTurnoverChat} from './home-turnover-chat.ts';
 // @ts-expect-error Native fixtures share source.
 import {headcountChatReply} from './home-headcount-chat.ts';
+// @ts-expect-error Native fixtures share source.
+import {staffingStarterIntake} from './home-staffing-intake.ts';
 // @ts-expect-error Native Node tests share application source.
 import {hasExplicitStaffingRequirement,retainStaffingDeliveryTarget,requiredStaffingTool,currentRequiredStaffing,requiredStaffingView,editRequiredStaffing,requiresRequiredStaffing,canCompleteRequiredStaffingAlone,requiredStaffingAnswer} from './home-required-staffing.ts';
 import type {verifySolutionEvidence} from './home-solution-grounding.mjs';
@@ -107,6 +109,12 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:headcount.answer}].slice(-32);
   state.questions=[];
   return {requestId:request.requestId,...headcount,candidateIds:[],analysisIds:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
+ }
+ const intake=!runtime.staffingScenarioOnly&&!runtime.demand?staffingStarterIntake(request):null;
+ if(intake){
+  state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:intake.answer}].slice(-32);
+  state.questions=intake.questions;
+  return {requestId:request.requestId,answer:intake.answer,candidateIds:[],analysisIds:[],charts:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
  }
  if(runtime.natural&&(hasExplicitStaffingRequirement(request.message.text)||requiresRequiredStaffing(request)||state.requiredStaffing||state.staffingDeliveryTarget||state.constraints.some(c=>c.field==='horizon_months'&&c.action==='set'))){
   const captured=captureStaffingDelivery(request.message,!!state.staffingDeliveryTarget?.issue);
