@@ -28,7 +28,7 @@ The fixture is intentionally company-wide. The dataset token in recorded receipt
 
 Five already-public headcount experiment support files are reused from the root repository and pinned in `public-support.json`. Their normalized contents match the deployed archive. They are existing fictional experiments, not new private inputs or proof of forecast accuracy.
 
-The source manifest verifies all 714 original source files before copying. `REPRODUCTION.json` lists local overrides. The recipe replaces only the transport/runtime binding, adds the replay notice, removes private file tracing and changes local build/start scripts. Home layout, chart calculations and existing UI handlers are not rewritten. Analytics is suppressed. Historical generation scripts are not rerun: generated source assets are already pinned by the manifest, while their excluded historical evidence is not reconstructed.
+The source manifest verifies all 719 source files in the current manifest before copying. `REPRODUCTION.json` lists local overrides. The recipe replaces only the transport/runtime binding, adds the replay notice, removes private file tracing and changes local build/start scripts. Home layout, chart calculations and existing UI handlers are not rewritten. Analytics is suppressed. Historical generation scripts are not rerun: generated source assets are already pinned by the manifest, while their excluded historical evidence is not reconstructed.
 
 ## Supported and deliberately unavailable
 

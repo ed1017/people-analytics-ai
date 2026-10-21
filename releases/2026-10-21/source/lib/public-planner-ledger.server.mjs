@@ -21,5 +21,9 @@ export function createPublicPlannerLedger({transport,url,secretKey}={}){
     p_policy_id:reservation.policyId,p_reserve_micro_usd:reservation.reserveMicroUsd},signal);}
    catch{return {granted:false};}
   },
+  async settle({requestId,contextId,policyId,receipt},signal){
+   try{return await rpc('settle_public_ai_call',{p_request_id:requestId,p_context_id:contextId,p_policy_id:policyId,p_receipt:receipt},signal);}
+   catch{return {settled:false};}
+  },
  });
 }

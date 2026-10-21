@@ -1,5 +1,7 @@
 // @ts-expect-error Native Node tests share application source.
 import {validHistoryDate} from './history-date.ts';
+// @ts-expect-error Native Node tests share application source.
+import {annualTurnoverSelection} from './home-turnover-year.ts';
 export const HOME_HISTORY_ROWS=36;
 type Row=Record<string,unknown>;
 const names=['january','february','march','april','may','june','july','august','september','october','november','december'];
@@ -18,8 +20,13 @@ export function selectHomeHistory(raw:unknown,dateField:string,question:string,a
   const date=`${year}-${month}-${day}`;return validHistoryDate(date)?date:null;
  };
  let start:string,end:string;
+ const annual=annualTurnoverSelection(text);
  // Explicit bounds override YTD and full-history shorthand.
- if(matches.length===2&&/^\s*(?:to|through|until|[\u2013\u2014-])\s*$/i.test(text.slice((matches[0].index??0)+matches[0][0].length,matches[1].index))){
+ if(annual){
+  // Relative dates are resolved by the trusted server clock at answer time.
+  // Supply existing bounded history rather than guessing a year from a stale cutoff.
+  start=annual.year==='last'?'2000-01-01':annual.year+'-01-01';end=annual.year==='last'?'2099-12-31':annual.year+'-12-31';
+ }else if(matches.length===2&&/^\s*(?:to|through|until|[\u2013\u2014-])\s*$/i.test(text.slice((matches[0].index??0)+matches[0][0].length,matches[1].index))){
   const fallback=years.length===1?years[0]:null,first=resolve(matches[0],false,fallback),last=resolve(matches[1],true,fallback);
   if(!first||!last)return [];start=first;end=last;
  }else if(/\b(?:ytd|year[ -]to[ -]date)\b/i.test(text)){
