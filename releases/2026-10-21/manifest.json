@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "sourceCommit": "46409b3543b402c1c0c20656b77d2903153113c5",
-  "deployment": "dpl_Dg49CcwAcTFHk1d6G2yjpVNEzUU8",
-  "verifiedDeployedArchiveSha256": "cf6f81599c1ae7dd0bcddf2115d5d975887bf23764fb59dd96f0c436cbd98c27",
+  "sourceCommit": "b55cb255be220db7dc67f07aa378d1af474d158b",
+  "deployment": "dpl_4aaTu62hZVrSgKcqqtKu1CQbqt3A",
+  "verifiedDeployedArchiveSha256": "2e95948caa88c7d2fe119678987d6ddb24a97641eb3b2760491b6102af1b0562",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -2555,8 +2555,8 @@
     },
     {
       "path": "lib/home-turnover-chat.ts",
-      "sha256": "7ee79e5e54a12c0b82c5f23b92537c75d7e5125c6ab9899096152a9a4fc17059",
-      "bytes": 16363
+      "sha256": "e84ec78efc345480f0b2f25cd390f9a1db6ffc0d8430f0421686d50316dbba3c",
+      "bytes": 16472
     },
     {
       "path": "lib/home-turnover-context.ts",
@@ -3590,23 +3590,28 @@
     },
     {
       "path": "lib/home-turnover-year.ts",
-      "sha256": "8f9beeaf979e5aa072201ecf91230c1866bafaeccd5585419d4902ad244aa786",
-      "bytes": 1118
+      "sha256": "ed527a9db38b1d66167f4b3740e5afdcaa285748be04d301372000160611bb2e",
+      "bytes": 1218
     },
     {
       "path": "lib/home-headcount-chat.ts",
-      "sha256": "d3531c044261a130471481070add6b50e34fc8c075c6196dff36f1fbb77f9d5a",
-      "bytes": 2037
+      "sha256": "0b2eaae98227f224ad04a7bd36695c07fc9ce02875a328ce5c49581bc455b508",
+      "bytes": 2136
     },
     {
       "path": "lib/home-staffing-intake.ts",
-      "sha256": "d91e414639649de239a104f9342f6f685479ac11a2ebbf657a1c524fb6534459",
-      "bytes": 1043
+      "sha256": "fba7c6881356679aeea3eab80f64c2d827eb7e28f4b762258eaec049064b8439",
+      "bytes": 1136
     },
     {
       "path": "lib/public-planner-receipt.server.mjs",
       "sha256": "a300c2ae82b573474888484cd005a2fe0195b28cc175d11a87930821b20401eb",
       "bytes": 4229
+    },
+    {
+      "path": "lib/home-question-text.ts",
+      "sha256": "6d76e3f88f1239ffaf0c41ed7c7a296194286ede6159abff2430e939a1ff43c1",
+      "bytes": 348
     }
   ]
 }

@@ -1,3 +1,5 @@
+// @ts-expect-error Native fixtures share source.
+import {normalizeHomeQuestion} from './home-question-text.ts';
 import {acceptsGroundedAggregate,isPublicHomeReceiptCandidate} from './public-home-receipt.mjs';
 import {normalizeHomePack} from './home-pack.mjs';
 import type {SolutionRequest, SolutionState} from './home-solution-conversation';
@@ -17,7 +19,7 @@ const topic=/\b(?:turnover|attrition)\b/i;
 const rate=(v:unknown):v is number=>typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=100;
 const filters=(r:SolutionRequest)=>JSON.stringify([r.filters.country,r.filters.org,r.filters.level]);
 const answerId=(r:SolutionRequest)=>'reply-'+r.requestId.slice(0,70);
-const selectionRemainder=(text:string)=>text.replace(monthPattern,' ').replace(/\b(?:year.to.date|company.wide|whole company|all company)\b/g,' ').replace(/\b(?:whats|what|is|are|how|does|do|the|our|company|we|us|looking|look|like|doing|show|me|tell|about|and|or|please|just|only|now|instead|actually|make|it|for|in|over|turnover|attrition|rate|rates|trend|trends|monthly|voluntary|total|overall|ytd|annual|yearly|annualized|annualised|latest|available|recorded|periods|months|versus|vs|compare|with|to|through)\b/g,' ').replace(/[\s.,?!:;%()\u2013\u2014-]/g,'');
+const selectionRemainder=(text:string)=>text.replace(monthPattern,' ').replace(/\b(?:year.to.date|company.wide|whole company|all company)\b/g,' ').replace(/\b(?:whats|what|was|were|is|are|how|does|do|the|our|company|we|us|looking|look|like|doing|show|me|tell|about|and|or|please|just|only|now|instead|actually|make|it|for|in|over|turnover|attrition|rate|rates|trend|trends|monthly|voluntary|total|overall|ytd|annual|yearly|annualized|annualised|latest|available|recorded|periods|months|versus|vs|compare|with|to|through)\b/g,' ').replace(/[\s.,?!:;%()\u2013\u2014-]/g,'');
 
 /** Selection only, never stored evidence. Unknown/old contexts cannot authorize a follow-up. */
 function previousSelection(request:SolutionRequest,grounding:Grounding|undefined):Selection|undefined {
@@ -29,7 +31,7 @@ function previousSelection(request:SolutionRequest,grounding:Grounding|undefined
 /** Deliberately small language surface. Other workforce questions keep the existing conversation. */
 export function turnoverIntent(question:string,availableMonths:string[],previous?:Selection):Intent {
  const annual=annualTurnoverSelection(question);if(annual)return {kind:'annual',selection:annual};
- const text=question.toLowerCase().replace(/[’']/g,'');
+ const text=normalizeHomeQuestion(question);
  const explicit=topic.test(text);
  const follow=/^(?:(?:and|what about|how about|show|show me|just|only|now|instead|actually|make it|for|in|please)\s+)*(?:voluntary|total|overall|monthly|ytd|year.to.date|annual(?:ized|ised)?|20\d{2}|january|february|march|april|may|june|july|august|september|october|november|december|company.wide)\b/.test(text);
  // A previous turnover answer does not make an arbitrary "what about ..." a

@@ -5,7 +5,7 @@ This directory publishes the application source from the reviewed 9,037-person r
 - Deployed source commit: `b3890b9a17bd1da661ae2463c91589774fc4d955` (local release identity; not a GitHub commit link).
 - Verified production deployment: `dpl_Eg21b7PzxbtsoKE35RgyBykAUbnk`.
 - Original deployed package SHA-256: `73d6cdf115ac754ebf2f7a0f02febe56a82ee94c4669ff452645237fc276095b`.
-- `source/` contains 716 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before the same build was promoted.
+- `source/` contains 720 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before the same build was promoted.
 
 Verify without dependencies, credentials or network:
 
@@ -36,3 +36,7 @@ The calendar-year turnover shortcut now resolves relative years using the truste
 Home keeps the conversation and composer left and the current answer's supported visuals right, with a stacked mobile layout. New questions, errors and stale evidence clear prior visuals. Four natural-language prompts submit their visible text; the planning scenario popup remains separate. No cost-driver causality or new forecasting capability is claimed.
 
 Validation: 11 annual-contract tests, 8 existing consumer/grounding tests, 13 route tests (including exact prompt routing with fake provider ports), and 12 UI tests pass; TypeScript, focused lint and the production build pass. Independent reviews cleared the annual contract and UI. Real staged desktop/phone checks returned the annual answer and monthly chart with zero model rounds. Other prompt answers were not re-tested with fresh paid provider calls. Data inputs, provider configuration, budget and permissions are unchanged.
+
+## Conversational framing repair
+
+Shared normalization removes polite framing while preserving dates, populations, negation and substantive qualifiers. Verified turnover and headcount calculations remain bounded; unsupported causal and planning questions retain the grounded model/tool path. Twenty-three focused tests and TypeScript passed. A separately captured freeform cost-summary question completed in one model round with grounded figures and explicit limitations; this is not arbitrary-query acceptance. The 19-case offline matrix tests routing only and deliberately denies model dispatch. Pricing renewal must align app, rollout, admission and settlement windows before October 22, 2026 at 00:00 UTC.
