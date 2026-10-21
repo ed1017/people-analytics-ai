@@ -1,24 +1,20 @@
-# Verified stages — October 21, 2026
+# Verified stages - October 21, 2026
 
-This is a bounded local reproduction, not complete hosted-service parity.
+Current source: runtime e2e13c23d59bd808caeb45edef20b101d05e4ceb; exact deployment dpl_Adxkz2ykw6FfvTETUZxBzkR38ks8. This is bounded local reproduction, not complete hosted-service parity.
 
 | Stage | Result |
 | --- | --- |
-| Public source provenance | All 714 immutable snapshot files verified before preparation. |
-| Public fixture provenance | 19 unauthenticated public GET bodies, dataset headers and complete receipts captured; original source-ordered bundle digest reconstructed successfully. No private source package was used to generate fixture data. |
-| Fresh Git checkout | Prepared from a new clone of the public-only integration branch, without node_modules, private files, environment files or a .vercel project link. |
-| Dependency install | Locked npm install with lifecycle scripts disabled succeeded; the fresh-checkout repetition used the local npm cache offline. |
-| Contract tests | Seven pass: fixture pin/receipts, exact 19-route replay, scope restrictions, disabled services, request boundary, tampering and launcher overrides. |
-| Production build | Next.js 16.3.6 webpack compilation, TypeScript, page generation and build tracing passed. No ignored TypeScript errors or fake credentials were used. |
-| Desktop 1440 / phone 390 | Original Home shows 9,037, replay notice and unavailable AI; scenario comparison, save and restored results after reload pass. No horizontal overflow or page exceptions. |
-| Pay and cost | Both widths render 50 catalog jobs and 9,037 snapshot people, without crash or horizontal overflow. |
-| External operations | Browser tests permitted only local GETs; no blocked external attempts or writes occurred. Unit tests reject AI/POST operations and non-loopback/deployed requests. |
-| Focused review | Data provenance, privacy and local boundary reviewed. Launcher hostname-override issue and incomplete support-file mapping were fixed and cleared. |
+| Source provenance | All 720 current snapshot files verified before preparation. |
+| Fixture provenance | 19 previously public GET bodies, headers and complete receipts; original source-ordered bundle digest reconstructed. No private source inputs used to generate fixture data. |
+| Clean checkout | Fresh no-hardlinks clone of public-only integration branch at 5f286a8; no private files, environment files, credentials or Vercel project link supplied. |
+| Dependencies | 643 locked packages installed from existing npm cache offline, lifecycle scripts disabled. |
+| Contract tests | Seven pass: exact replay, pin/receipt integrity, scope restrictions, disabled services, request boundary, tampering and launcher overrides. |
+| Build | Next 16.3.6 webpack, TypeScript, 11-page generation and tracing passed. No ignored errors or fake credentials. |
+| Desktop 1440 / phone 390 | Home shows 9,037, replay notice and unavailable AI. Scenario comparison, explicit save/reload and no horizontal overflow passed; no page exceptions. |
+| Pay | Both widths render 50 catalog jobs and 9,037 people, without crash, overflow or external requests. |
+| External operations | Browser harnesses allow only localhost GETs. No remote writes, provider requests or DB access. |
 
-The first build exposed missing imports from the existing public headcount experiment. The recipe now includes five pinned public support files; their normalized bytes match the deployed archive. The successful clean build includes them. Afterward, only launcher argument validation, documentation and reproduction metadata changed; final committed preparation was compared against the built application and application bytes were unchanged. The tested launcher matches apart from Git checkout line endings.
+Five existing public headcount experiment support files remain pinned by normalized content. The transport-only fixture overrides and original current Home components are preserved. The recipe runs the current source while the data replay remains explicitly historical.
 
-Browser harness corrections scoped a duplicate Compare button to the scenario dialog, checked the already restored results region after reload, and used Salary ranges by job rather than a desktop navigation label on mobile. The existing application was not changed to accommodate these selectors. Passed Home/save/reload checks were retained; only the final Pay check was rerun separately.
+The current accounting-schema metadata and applied migration chain are documented in CURRENT-COMPANY-HANDOFF.md. This does not claim empty-database provisioning or a transferable production-data migration. Narrowed filters, arbitrary calculator output, live AI/accounting, private input reconstruction and complete new-company onboarding remain outside this increment.
 
-Next emitted a multiple-lockfile workspace-root warning because the generated app is nested inside the checkout. Build completed successfully; all available parent files in that clean checkout were public source. The standalone app is served locally and is not packaged for deployment.
-
-Not established: narrowed workforce filters, arbitrary server calculator outputs, provider-backed AI, live billing/admission, private data reproduction, predictive performance or every application screen. Unsupported operations return explicit errors, not invented totals. Follow the [README](README.md) to reproduce the supported stages.

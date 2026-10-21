@@ -25,7 +25,7 @@ This release restores provider-backed planning routes, preserves the current wor
 
 Protected provider checks cover intake, comparison, revisions, combinations, capability review and grounded chat. Captured two-round Home output passed corrected offline contract grading; the original failed hosted grading receipt was not rewritten. Seven local React continuity checks cover selected-goal follow-up, save/reload, cancellation and stale-response isolation using fake provider/admission ports. Public desktop/mobile smoke confirms enabled UI and configuration without paid requests. This is not evidence of a fresh paid production browser journey through all these steps or of arbitrary recommendation correctness.
 
-At publication, pricing verification expires October 22, 2026 at 00:00 UTC. Continuing operation requires aligned app pricing, rollout pricing, admission SQL ceiling, and settlement dispatch windows/rates. The cumulative budget is not reset by a release. This snapshot records a point in time; it is not a claim of perpetual availability.
+Current pricing verification expires October 22, 2026 at 09:59 UTC (admission cutoff 09:57:30 UTC). Continuing operation requires aligned app pricing, rollout pricing, admission SQL ceiling, and settlement dispatch windows/rates. The cumulative budget is not reset by a release. This snapshot records a point in time; it is not a claim of perpetual availability.
 
 The [local replay recipe](reproduction/README.md) implements bounded public fixture/receipt integration with a separate generated app. Full private calculator reconstruction and live AI are not reproduced. Saved/versioned headcount what-if remains a separate design proposal, not an implemented feature. No predictive accuracy, realized savings or enterprise persistence is claimed.
 
@@ -54,3 +54,4 @@ A real three-turn conversation covered a four-role staffing comparison, a change
 The reviewed rolling price window is October 21 09:59 through October 22 09:59 UTC. Admission stops 90 seconds before expiry. Application policy, rollout expiry, database admission ceiling and receipt settlement upper bound must match the coordinated renewal; existing receipt lower bound and ten-minute freshness remain intact. The cap, reservations, uncertain holds, prices and permissions are unchanged. Twenty-five accounting/round tests and exact live-definition date-transform checks passed with independent review. This supersedes the earlier midnight deadline above.
 
 One additional actual model investigation plan passed evidence review and explicit browser Save/reload, preserving the candidate, goal, scope and unknown resources. It remains a qualitative proposal, not an executed intervention or proof of causes.
+

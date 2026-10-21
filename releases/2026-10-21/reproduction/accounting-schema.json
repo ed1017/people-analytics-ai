@@ -1,0 +1,245 @@
+{
+  "capturedAt": "2026-10-21",
+  "scope": "Schema metadata only; no production records or credentials; descriptive not executable provisioning",
+  "schema": "public_ai_budget",
+  "columns": [
+    {
+      "table_name": "provider_usage_receipt",
+      "column_name": "request_id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "provider_usage_receipt",
+      "column_name": "response_id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "provider_usage_receipt",
+      "column_name": "receipt",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "provider_usage_receipt",
+      "column_name": "charged_micro_usd",
+      "data_type": "bigint",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "provider_usage_receipt",
+      "column_name": "group_id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "provider_usage_receipt",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "clock_timestamp()"
+    },
+    {
+      "table_name": "reservation",
+      "column_name": "request_id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "reservation",
+      "column_name": "context_id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "reservation",
+      "column_name": "policy_id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "reservation",
+      "column_name": "reserved_micro_usd",
+      "data_type": "bigint",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "reservation",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "clock_timestamp()"
+    },
+    {
+      "table_name": "rollout",
+      "column_name": "id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "rollout",
+      "column_name": "cap_micro_usd",
+      "data_type": "bigint",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "rollout",
+      "column_name": "reserved_micro_usd",
+      "data_type": "bigint",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "rollout",
+      "column_name": "enabled",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "rollout",
+      "column_name": "policy_id",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "rollout",
+      "column_name": "per_call_micro_usd",
+      "data_type": "bigint",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "rollout",
+      "column_name": "pricing_valid_until",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "settlement_debit",
+      "column_name": "event_id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "settlement_debit",
+      "column_name": "group_id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "settlement_debit",
+      "column_name": "evidence_digest",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "settlement_debit",
+      "column_name": "evidence",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "settlement_debit",
+      "column_name": "amount_micro_usd",
+      "data_type": "bigint",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "settlement_debit",
+      "column_name": "halt_admission",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "settlement_debit",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "clock_timestamp()"
+    },
+    {
+      "table_name": "settlement_group",
+      "column_name": "group_id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "settlement_group",
+      "column_name": "evidence_digest",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "settlement_group",
+      "column_name": "evidence",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "settlement_group",
+      "column_name": "member_count",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "settlement_group",
+      "column_name": "reserved_micro_usd",
+      "data_type": "bigint",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "settlement_group",
+      "column_name": "charged_micro_usd",
+      "data_type": "bigint",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "settlement_group",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "clock_timestamp()"
+    },
+    {
+      "table_name": "settlement_member",
+      "column_name": "request_id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "settlement_member",
+      "column_name": "group_id",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    }
+  ]
+}
