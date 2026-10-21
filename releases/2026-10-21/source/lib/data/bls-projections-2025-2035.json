@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "source": "U.S. Bureau of Labor Statistics, Employment Projections",
+  "source_table": "Table 1.2 Occupational projections, 2025–35, and worker characteristics, 2025",
+  "source_url": "https://www.bls.gov/emp/tables/occupational-projections-and-characteristics.htm",
+  "release_url": "https://www.bls.gov/news.release/ecopro.nr0.htm",
+  "definitions_url": "https://www.bls.gov/emp/documentation/definitions.htm",
+  "release_date": "2026-08-27",
+  "verified_at": "2026-10-07",
+  "base_year": 2025,
+  "projection_year": 2035,
+  "geography": "United States",
+  "employment_unit": "thousands of jobs",
+  "openings_unit": "thousands of openings per year, average over 2025–2035",
+  "population": "National Employment Matrix total jobs, including self-employment; not the OEWS wage-and-salary employment population",
+  "extraction_note": "Application-authored transcription of three detailed occupation rows from the official HTML table. Source values and one-decimal precision retained; no values recomputed from rounded endpoints. This is a frozen subset, not a live feed or a full BLS dataset.",
+  "records": [
+    {
+      "soc": "15-1252",
+      "title": "Software developers",
+      "occupation_type": "Line item",
+      "employment_base_thousands": 1717.8,
+      "employment_projected_thousands": 1892.6,
+      "employment_change_thousands": 174.7,
+      "employment_change_percent": 10.2,
+      "annual_openings_thousands": 95.3
+    },
+    {
+      "soc": "15-2051",
+      "title": "Data scientists",
+      "occupation_type": "Line item",
+      "employment_base_thousands": 275.6,
+      "employment_projected_thousands": 371.0,
+      "employment_change_thousands": 95.4,
+      "employment_change_percent": 34.6,
+      "annual_openings_thousands": 24.8
+    },
+    {
+      "soc": "29-1141",
+      "title": "Registered nurses",
+      "occupation_type": "Line item",
+      "employment_base_thousands": 3465.4,
+      "employment_projected_thousands": 3660.1,
+      "employment_change_thousands": 194.7,
+      "employment_change_percent": 5.6,
+      "annual_openings_thousands": 180.8
+    }
+  ]
+}

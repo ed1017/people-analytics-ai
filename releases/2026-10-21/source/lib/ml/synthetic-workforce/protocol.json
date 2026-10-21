@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "version": "synthetic-workforce-protocol-v1",
+  "generatorVersion": "synthetic-workforce-generator-v1",
+  "dataClass": "constructed-synthetic",
+  "observationBasis": "simulated",
+  "startMonth": "2021-01",
+  "months": 72,
+  "initialHeadcount": 8400,
+  "seeds": [17, 29, 43],
+  "families": ["stationary", "gradual-improvement", "regime-reversal", "reporting-stress", "survey-break"],
+  "regimeChangeMonth": "2026-07",
+  "finalScoringCutoff": "2027-07-01T00:00:00.000Z",
+  "fixedRunTimestamp": "2026-10-05T00:00:00.000Z",
+  "windows": {
+    "developmentOrigins": ["2024-12-31T23:59:59.999Z", "2025-03-31T23:59:59.999Z", "2025-06-30T23:59:59.999Z"],
+    "assessmentOrigin": "2026-06-30T23:59:59.999Z",
+    "assessmentMonths": ["2026-07", "2026-08", "2026-09"],
+    "reservedMonths": ["2026-10", "2026-11", "2026-12"],
+    "hiringHorizonDays": 90
+  },
+  "custody": "Protocol committed before dataset generation or model evaluation; constructed holdouts are not independently blinded real-world validation.",
+  "evaluation": "This checkpoint generates, reconciles and replays aggregates only. No predictive performance, causal effect or calibrated interval is claimed.",
+  "operationallyQualified": false
+}

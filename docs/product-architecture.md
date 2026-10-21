@@ -1,14 +1,12 @@
 # Product Architecture
 
-> **Availability note — October 19, 2026:** The sections below preserve the repository's product direction and architectural proposals. They are not a checklist of enabled public capabilities. The live site is a synthetic-data, deterministic workforce-planning prototype; live AI conversations are disabled. AI integration code and proposed assistant behavior below do not imply an available AI service.
->
-> The public application baseline in this repository is `f8c9304`, which differs from the separately released live 9,037-person application. A public-safe fixture layer and matching integration tests require separate review before this repository can reproduce that release. See the [README](../README.md) for the source/deployment boundary.
->
-> Currently available live entry points include the guided staffing demo, browser-local proposals, workforce evidence and an explicit-input company headcount what-if. These do not establish predictive accuracy, enterprise persistence, realized savings or business outcomes.
+> **Availability — October 21, 2026:** Provider-backed planning conversations are restored in the hosted synthetic-data application, bounded by pricing verification and cumulative budget admission. Guided planning, browser-local proposals, workforce evidence and the explicit-input company headcount what-if remain available. The sections below describe product direction, not an exhaustive shipped-feature checklist.
+
+> The [versioned deployed source](../releases/2026-10-21/README.md) publishes the exact application subset with hashes. Private runtime inputs remain excluded; the root development app is separate and full public-fixture reproduction remains unfinished. See the release notes for precise validation limits. No predictive accuracy, enterprise persistence or realized business outcomes are claimed.
 
 ## What this product is becoming
 
-The proposed direction is a People Analytics + Strategic Workforce Planning product with an AI assistant across the experience. That assistant is not enabled in the current public release.
+The proposed direction is a People Analytics + Strategic Workforce Planning product with an AI assistant across the experience. The restored bounded planner does not establish that every proposed capability below is implemented.
 
 The goal is not to make another dashboard with a chatbot stuck on the side.
 

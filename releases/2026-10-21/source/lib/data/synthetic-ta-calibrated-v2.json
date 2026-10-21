@@ -1,0 +1,466 @@
+{
+  "version": "synthetic-ta-calibrated-v2",
+  "modelVersion": "synthetic-ta-calibrated-v2-proposal",
+  "cutoff": "2026-09-30",
+  "auditDate": "2026-10-08",
+  "scope": "Company-wide aggregate calibration; applications November 2023–September 2026; hires January 2024–September 2026",
+  "source": "Generated aggregate chronology calibrated to public TA snapshot targets; not reconstructed database records",
+  "coverage": "Complete generated ledger; source historical coverage remains unverified",
+  "history": [
+    {
+      "month": "2023-11",
+      "active": 623,
+      "complete": true
+    },
+    {
+      "month": "2023-12",
+      "active": 692,
+      "complete": true
+    },
+    {
+      "month": "2024-01",
+      "active": 760,
+      "complete": true
+    },
+    {
+      "month": "2024-02",
+      "active": 642,
+      "complete": true
+    },
+    {
+      "month": "2024-03",
+      "active": 782,
+      "complete": true
+    },
+    {
+      "month": "2024-04",
+      "active": 632,
+      "complete": true
+    },
+    {
+      "month": "2024-05",
+      "active": 624,
+      "complete": true
+    },
+    {
+      "month": "2024-06",
+      "active": 631,
+      "complete": true
+    },
+    {
+      "month": "2024-07",
+      "active": 637,
+      "complete": true
+    },
+    {
+      "month": "2024-08",
+      "active": 626,
+      "complete": true
+    },
+    {
+      "month": "2024-09",
+      "active": 623,
+      "complete": true
+    },
+    {
+      "month": "2024-10",
+      "active": 624,
+      "complete": true
+    },
+    {
+      "month": "2024-11",
+      "active": 637,
+      "complete": true
+    },
+    {
+      "month": "2024-12",
+      "active": 636,
+      "complete": true
+    },
+    {
+      "month": "2025-01",
+      "active": 799,
+      "complete": true
+    },
+    {
+      "month": "2025-02",
+      "active": 642,
+      "complete": true
+    },
+    {
+      "month": "2025-03",
+      "active": 646,
+      "complete": true
+    },
+    {
+      "month": "2025-04",
+      "active": 640,
+      "complete": true
+    },
+    {
+      "month": "2025-05",
+      "active": 628,
+      "complete": true
+    },
+    {
+      "month": "2025-06",
+      "active": 638,
+      "complete": true
+    },
+    {
+      "month": "2025-07",
+      "active": 639,
+      "complete": true
+    },
+    {
+      "month": "2025-08",
+      "active": 635,
+      "complete": true
+    },
+    {
+      "month": "2025-09",
+      "active": 640,
+      "complete": true
+    },
+    {
+      "month": "2025-10",
+      "active": 626,
+      "complete": true
+    },
+    {
+      "month": "2025-11",
+      "active": 640,
+      "complete": true
+    },
+    {
+      "month": "2025-12",
+      "active": 641,
+      "complete": true
+    },
+    {
+      "month": "2026-01",
+      "active": 784,
+      "complete": true
+    },
+    {
+      "month": "2026-02",
+      "active": 625,
+      "complete": true
+    },
+    {
+      "month": "2026-03",
+      "active": 637,
+      "complete": true
+    },
+    {
+      "month": "2026-04",
+      "active": 625,
+      "complete": true
+    },
+    {
+      "month": "2026-05",
+      "active": 639,
+      "complete": true
+    },
+    {
+      "month": "2026-06",
+      "active": 657,
+      "complete": true
+    },
+    {
+      "month": "2026-07",
+      "active": 631,
+      "complete": true
+    },
+    {
+      "month": "2026-08",
+      "active": 549,
+      "complete": true
+    },
+    {
+      "month": "2026-09",
+      "active": 474,
+      "complete": true
+    }
+  ],
+  "forecasts": [
+    {
+      "month": "2026-10",
+      "carryForward": 474,
+      "recentMean": 551,
+      "dampedChange": 435
+    },
+    {
+      "month": "2026-11",
+      "carryForward": 474,
+      "recentMean": 551,
+      "dampedChange": 415
+    },
+    {
+      "month": "2026-12",
+      "carryForward": 474,
+      "recentMean": 551,
+      "dampedChange": 405
+    }
+  ],
+  "stages": [
+    {
+      "stage": "Applied",
+      "count": 62104
+    },
+    {
+      "stage": "Screening",
+      "count": 31052
+    },
+    {
+      "stage": "Interview",
+      "count": 15269
+    },
+    {
+      "stage": "Offer",
+      "count": 5800
+    },
+    {
+      "stage": "Accepted",
+      "count": 5080
+    },
+    {
+      "stage": "Hired",
+      "count": 5080
+    }
+  ],
+  "outcomes": {
+    "active": 926,
+    "closed": 1494,
+    "hired": 5080,
+    "offer_declined": 720,
+    "rejected": 46744,
+    "withdrawn": 7140
+  },
+  "monthly": [
+    {
+      "month": "2023-11",
+      "applications": 57,
+      "offers": 0,
+      "hires": 0
+    },
+    {
+      "month": "2023-12",
+      "applications": 620,
+      "offers": 0,
+      "hires": 0
+    },
+    {
+      "month": "2024-01",
+      "applications": 1508,
+      "offers": 123,
+      "hires": 69
+    },
+    {
+      "month": "2024-02",
+      "applications": 1613,
+      "offers": 161,
+      "hires": 137
+    },
+    {
+      "month": "2024-03",
+      "applications": 1907,
+      "offers": 196,
+      "hires": 168
+    },
+    {
+      "month": "2024-04",
+      "applications": 1656,
+      "offers": 171,
+      "hires": 159
+    },
+    {
+      "month": "2024-05",
+      "applications": 1730,
+      "offers": 181,
+      "hires": 158
+    },
+    {
+      "month": "2024-06",
+      "applications": 1629,
+      "offers": 165,
+      "hires": 150
+    },
+    {
+      "month": "2024-07",
+      "applications": 1846,
+      "offers": 183,
+      "hires": 157
+    },
+    {
+      "month": "2024-08",
+      "applications": 1613,
+      "offers": 180,
+      "hires": 163
+    },
+    {
+      "month": "2024-09",
+      "applications": 1732,
+      "offers": 173,
+      "hires": 152
+    },
+    {
+      "month": "2024-10",
+      "applications": 1701,
+      "offers": 179,
+      "hires": 149
+    },
+    {
+      "month": "2024-11",
+      "applications": 1709,
+      "offers": 165,
+      "hires": 150
+    },
+    {
+      "month": "2024-12",
+      "applications": 1864,
+      "offers": 202,
+      "hires": 163
+    },
+    {
+      "month": "2025-01",
+      "applications": 1840,
+      "offers": 178,
+      "hires": 162
+    },
+    {
+      "month": "2025-02",
+      "applications": 1785,
+      "offers": 180,
+      "hires": 157
+    },
+    {
+      "month": "2025-03",
+      "applications": 1960,
+      "offers": 185,
+      "hires": 168
+    },
+    {
+      "month": "2025-04",
+      "applications": 1856,
+      "offers": 202,
+      "hires": 172
+    },
+    {
+      "month": "2025-05",
+      "applications": 1741,
+      "offers": 193,
+      "hires": 166
+    },
+    {
+      "month": "2025-06",
+      "applications": 1776,
+      "offers": 178,
+      "hires": 154
+    },
+    {
+      "month": "2025-07",
+      "applications": 1998,
+      "offers": 179,
+      "hires": 164
+    },
+    {
+      "month": "2025-08",
+      "applications": 1899,
+      "offers": 199,
+      "hires": 165
+    },
+    {
+      "month": "2025-09",
+      "applications": 1822,
+      "offers": 177,
+      "hires": 161
+    },
+    {
+      "month": "2025-10",
+      "applications": 2043,
+      "offers": 184,
+      "hires": 166
+    },
+    {
+      "month": "2025-11",
+      "applications": 1661,
+      "offers": 175,
+      "hires": 152
+    },
+    {
+      "month": "2025-12",
+      "applications": 1819,
+      "offers": 182,
+      "hires": 166
+    },
+    {
+      "month": "2026-01",
+      "applications": 2004,
+      "offers": 173,
+      "hires": 167
+    },
+    {
+      "month": "2026-02",
+      "applications": 1654,
+      "offers": 202,
+      "hires": 159
+    },
+    {
+      "month": "2026-03",
+      "applications": 1955,
+      "offers": 167,
+      "hires": 151
+    },
+    {
+      "month": "2026-04",
+      "applications": 1629,
+      "offers": 178,
+      "hires": 163
+    },
+    {
+      "month": "2026-05",
+      "applications": 2037,
+      "offers": 190,
+      "hires": 151
+    },
+    {
+      "month": "2026-06",
+      "applications": 2305,
+      "offers": 177,
+      "hires": 165
+    },
+    {
+      "month": "2026-07",
+      "applications": 2463,
+      "offers": 209,
+      "hires": 180
+    },
+    {
+      "month": "2026-08",
+      "applications": 2433,
+      "offers": 154,
+      "hires": 141
+    },
+    {
+      "month": "2026-09",
+      "applications": 2239,
+      "offers": 59,
+      "hires": 75
+    }
+  ],
+  "active": 474,
+  "onHold": 67,
+  "filled": 5080,
+  "cancelled": 149,
+  "opened": 5703,
+  "internalHires": 600,
+  "externalHires": 4480,
+  "currentStatusOpen": 475,
+  "methodLimits": "Unvalidated stock baselines, no confidence intervals or selected winner. Generated history is not recovered source history. The cutoff-truncated fill ledger affects recent stock changes; these baselines are not future opening, hire or capacity estimates.",
+  "exclusions": [
+    "Not calibrated to timing or aging distributions, role/BU/recruiter/source dimensions, or monthly interview-event counts",
+    "Generated screening count and all paired dates are assumptions, not source observations",
+    "474 active and 149 cancelled match date-bounded interval targets; the unchanged current-status source has 475 active and 150 cancelled"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "evidenceCommit": "2d9dd96329c42cac89024f7f8f64fb67f18bb502",
+  "workforceManifest": {
+    "path": "docs/evidence/synthetic-workforce-v1/manifest.json",
+    "sha256": "f53e69f8176092908fd5d70c75ea10dcf39ce681c07f29d156c51747dc94ec4a"
+  },
+  "groupReport": {
+    "path": "docs/evidence/synthetic-group-turnover-v1/report.json",
+    "sha256": "4fb1ea163d580d16b7d2aab4a70d47e2a5c21ea652e93d69a65b4c42d7611731"
+  }
+}

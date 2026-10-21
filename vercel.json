@@ -9,7 +9,8 @@
       "codex/finance-evidence-scope-20261011": false,
       "prep/dataset-server-next-20261014": false,
       "main": false,
-      "codex/truthful-public-docs": false
+      "codex/truthful-public-docs": false,
+      "codex/deployed-source-20261021": false
     }
   }
 }
