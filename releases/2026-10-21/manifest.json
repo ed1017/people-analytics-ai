@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "sourceCommit": "0b9e52d514d0b8ef1d65db561460ee8a119d51f3",
-  "deployment": "dpl_GBs5v71FfBkLTXMZ8n3M9dKDGdyv",
-  "verifiedDeployedArchiveSha256": "27e94a44564722be9ca824778a0ba93f2e13c35363b697e9180f6348b905504d",
+  "sourceCommit": "b3890b9a17bd1da661ae2463c91589774fc4d955",
+  "deployment": "dpl_Eg21b7PzxbtsoKE35RgyBykAUbnk",
+  "verifiedDeployedArchiveSha256": "73d6cdf115ac754ebf2f7a0f02febe56a82ee94c4669ff452645237fc276095b",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -540,8 +540,8 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "11ded2a336bec8021d3de1d9c297a968a9a1afcf82371b5f8b00e5813c1b0830",
-      "bytes": 16448
+      "sha256": "a554ee7fd5ca9d7569841fb38ea94acc027bf92e3a7417889c3cef960584db38",
+      "bytes": 17072
     },
     {
       "path": "components/home-chat-welcome.tsx",

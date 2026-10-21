@@ -234,3 +234,17 @@
 @container home-intro (min-width:760px) {
  .shell :global(.home-conversation-split[data-split]) { grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); }
 }
+
+/* The legacy reading pane flexes inside a fixed-height section. In the split,
+   its immediate parent has intrinsic height, so a zero flex basis collapses it
+   to the old 6rem minimum. Give desktop conversation text its own reading area. */
+@media (min-width:1024px) and (min-height:700px) {
+ @container home-intro (min-width:760px) {
+  .shell :global(.home-workspace:not([data-plan-reading]):not([data-simple-demo])) :global(.home-conversation-split[data-split]) :global([aria-label="Home chat workspace"]) {
+   flex:0 1 auto;
+   min-height:min(40dvh,400px);
+   max-height:min(60dvh,600px);
+   overflow-y:auto;
+  }
+ }
+}

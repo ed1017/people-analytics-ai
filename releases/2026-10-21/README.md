@@ -2,9 +2,9 @@
 
 This directory publishes the application source from the reviewed 9,037-person release at https://www.ed-ai.app. It is a source snapshot, not a deployable replacement for the root development application.
 
-- Deployed source commit: `0b9e52d514d0b8ef1d65db561460ee8a119d51f3` (local release identity; not a GitHub commit link).
-- Verified production deployment: `dpl_GBs5v71FfBkLTXMZ8n3M9dKDGdyv`.
-- Original deployed package SHA-256: `27e94a44564722be9ca824778a0ba93f2e13c35363b697e9180f6348b905504d`.
+- Deployed source commit: `b3890b9a17bd1da661ae2463c91589774fc4d955` (local release identity; not a GitHub commit link).
+- Verified production deployment: `dpl_Eg21b7PzxbtsoKE35RgyBykAUbnk`.
+- Original deployed package SHA-256: `73d6cdf115ac754ebf2f7a0f02febe56a82ee94c4669ff452645237fc276095b`.
 - `source/` contains 716 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before the same build was promoted.
 
 Verify without dependencies, credentials or network:
