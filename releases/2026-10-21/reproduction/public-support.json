@@ -1,0 +1,22 @@
+[
+  {
+    "path": "experiments/swp-headcount/baselines.d.mts",
+    "sha256": "898c0abee9a751cd5051bdb80ca3420a20b56ab0e6164429a6d3a632333b9d60"
+  },
+  {
+    "path": "experiments/swp-headcount/baselines.mjs",
+    "sha256": "fe0210e08eddf37868d609fb7643547af0d94c5be79892f2cbf3c54f0f5633b7"
+  },
+  {
+    "path": "experiments/swp-headcount/comparison.ts",
+    "sha256": "c0cf1a21c670bbca440c48d7b9b2ad678a87e2f2ab172e1c0ccbf80f54a41a26"
+  },
+  {
+    "path": "experiments/swp-headcount/development-history.json",
+    "sha256": "afc9610d27e79d9ec78ddcfc3df3257a2a2471a8183970943eec7b682f3b5b5a"
+  },
+  {
+    "path": "experiments/swp-headcount/holdout.json",
+    "sha256": "d52ecb9068996cca7f793cb925cf0427f0102f86d83b8aed98d53a43fbc071ab"
+  }
+]

@@ -42,6 +42,10 @@ jobs:
           cache: npm
 
       - run: npm ci --ignore-scripts
+      - name: Verify versioned source and public replay contracts
+        run: |
+          node releases/2026-10-21/verify.mjs
+          node --test releases/2026-10-21/reproduction/fixture-handler.test.mjs
       - name: Run regression contracts
         run: node --test --test-concurrency=4 tests/*.test.mjs
       - name: Verify generated artifacts without writing
