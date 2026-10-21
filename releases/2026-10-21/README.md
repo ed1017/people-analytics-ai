@@ -54,4 +54,3 @@ A real three-turn conversation covered a four-role staffing comparison, a change
 The reviewed rolling price window is October 21 09:59 through October 22 09:59 UTC. Admission stops 90 seconds before expiry. Application policy, rollout expiry, database admission ceiling and receipt settlement upper bound must match the coordinated renewal; existing receipt lower bound and ten-minute freshness remain intact. The cap, reservations, uncertain holds, prices and permissions are unchanged. Twenty-five accounting/round tests and exact live-definition date-transform checks passed with independent review. This supersedes the earlier midnight deadline above.
 
 One additional actual model investigation plan passed evidence review and explicit browser Save/reload, preserving the candidate, goal, scope and unknown resources. It remains a qualitative proposal, not an executed intervention or proof of causes.
-

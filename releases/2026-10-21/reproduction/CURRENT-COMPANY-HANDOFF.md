@@ -31,4 +31,3 @@ Admission uses `reserve_public_ai(text,text,text,bigint)` with a row lock, exact
 App pricing, rollout expiry, admission SQL ceiling and settlement dispatch window must be coordinated. App policy lasts at most 24 hours and stops admission 90 seconds early. Retain old in-flight receipt eligibility when refreshing; never reset spend or clear uncertain holds per release.
 
 The older repository schema/archive predates these accounting stages and cannot by itself reproduce the current live app. Full fresh-database provisioning, migration replay from empty storage and real-company ingestion remain unfinished. This handoff makes that gap explicit rather than claiming the replay recipe covers it.
-
