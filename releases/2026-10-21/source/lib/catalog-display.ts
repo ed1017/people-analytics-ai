@@ -3,6 +3,17 @@ export function catalogDisplayLabel(label: string): string {
   return label.replace(/^Demo\s+(?=\S)/i, '');
 }
 
+// Exact public aggregate catalogue labels only. Unknown names and identifiers
+// stay untouched; this formatter must never be applied to stored model context.
+const publicBusinessUnitLabels = new Set([
+  'Demo BU-CLIENTOPS', 'Demo BU-CONS', 'Demo BU-CORP', 'Demo BU-DATAAI',
+  'Demo BU-DIGITAL', 'Demo BU-MGSVC', 'Demo BU-SALES', 'Demo BU-TECH',
+]);
+export function catalogProseDisplay(text: string): string {
+  return text.replace(/(?<![\w-])Demo BU-[A-Z0-9_-]+(?![\w-])/g,
+    label => publicBusinessUnitLabels.has(label) ? catalogDisplayLabel(label) : label);
+}
+
 // The same ISO country names used by Home country selection.
 const countryNames: Record<string, string> = {
   US: 'United States', CA: 'Canada', MX: 'Mexico', GB: 'United Kingdom',

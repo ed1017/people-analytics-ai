@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "sourceCommit": "b55cb255be220db7dc67f07aa378d1af474d158b",
-  "deployment": "dpl_4aaTu62hZVrSgKcqqtKu1CQbqt3A",
-  "verifiedDeployedArchiveSha256": "2e95948caa88c7d2fe119678987d6ddb24a97641eb3b2760491b6102af1b0562",
+  "sourceCommit": "53b2d6bb43f6ba907ad380e5dff9fc4f782c9fb4",
+  "deployment": "dpl_9DQ9mCPsTALRrDFLfp1iZzeyQPyo",
+  "verifiedDeployedArchiveSha256": "2c4e38111f1fa7bd0f434eb919baf1ffa5b6238fcbfef41f35c378713790312f",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -340,8 +340,8 @@
     },
     {
       "path": "components/chat-content.tsx",
-      "sha256": "f0ee414b4adb87fa6e2d0891c88ac6a6e83c7224d6fb048503faba7aed3536f4",
-      "bytes": 12891
+      "sha256": "e6cd81ef7471f291e760b657d99fdebab9d4c5d3c465a9ea3b5aa31e819b316c",
+      "bytes": 12971
     },
     {
       "path": "components/chat-evidence-chart.tsx",
@@ -3580,8 +3580,8 @@
     },
     {
       "path": "lib/catalog-display.ts",
-      "sha256": "37bf812a3976b5d1e875c250d2c25a8c2b6069bcc834d5d47e073e7c227ece81",
-      "bytes": 739
+      "sha256": "924b4f536b31e412203cfab100c4dcde8a76a428eea2dcfb4ae40928a42b1035",
+      "bytes": 1306
     },
     {
       "path": "components/home-answer-visuals.tsx",

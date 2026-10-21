@@ -40,3 +40,8 @@ Validation: 11 annual-contract tests, 8 existing consumer/grounding tests, 13 ro
 ## Conversational framing repair
 
 Shared normalization removes polite framing while preserving dates, populations, negation and substantive qualifiers. Verified turnover and headcount calculations remain bounded; unsupported causal and planning questions retain the grounded model/tool path. Twenty-three focused tests and TypeScript passed. A separately captured freeform cost-summary question completed in one model round with grounded figures and explicit limitations; this is not arbitrary-query acceptance. The 19-case offline matrix tests routing only and deliberately denies model dispatch. Pricing renewal must align app, rollout, admission and settlement windows before October 22, 2026 at 00:00 UTC.
+
+## Conversation display labels
+
+The renderer formats only eight exact public business-unit labels through the existing catalog display convention. Stored answers, model context, filter IDs, unknown labels and quantities are unchanged. The focused display/saved-evidence/visual suites passed 24 tests; actual-route tests passed 17. A fixture-provider browser journey passed ten checks covering paraphrased planning, selection/save/reopen, explicit budget changes, topic switches and late-response cancellation. These checks do not establish arbitrary model answer quality. A captured real cost answer is used for hosted rendering verification without another paid call.
+
