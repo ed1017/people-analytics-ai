@@ -11,6 +11,7 @@ import {datasetSession} from '@/lib/dataset-client.mjs';
 import {isVerifiedDashboardScope} from '@/lib/dashboard-scope';
 import type {ReactNode} from "react";
 import {SelectedGoalProgress} from '@/components/goal-progress-summary';
+import {HomeAnswerVisuals,HomeConversationSplit,currentHomeVisualAnswer} from '@/components/home-answer-visuals';
 import {ChatEvidenceChart} from '@/components/chat-evidence-chart';
 import type {ChatEvidenceSeries} from '@/lib/chat-evidence-series';
 import {alternativeViewField} from '@/lib/home-plan-alternative-chat';
@@ -38,6 +39,7 @@ import {homeStarterGoal,homeStarterForecast,type HomeStarterGoal} from '@/lib/ho
 import {homeStarterExploration,buildHomeStarterExplorationPrompt,type HomeStarterExploration} from '@/lib/home-starter-exploration';
 import {HomeStarterForecastChart} from '@/components/home-forecast-chart';
 import {HomeForecastChart} from '@/components/home-forecast-chart';
+import {homeForecastChartDomain} from '@/lib/home-forecast';
 import {homeForecastIntent} from '@/lib/home-forecast-intent';
 import {assumptionsGoalFromStatements,assumptionsOnlyBundle,unavailableSourceLabels} from '@/lib/home-assumptions-fallback';
 import {homePlanningNoteParts,resolveHomeUserGoal,workforceChoiceDiscoveryGoal} from '@/lib/home-planning-intent';
@@ -146,9 +148,9 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   const [sourceResults, setSourceResults] = useState<Record<string, unknown>>({});
   const sourceResultsRef=useRef<Record<string,unknown>>({});
   const [sourceRequests]=useState(()=>new HomeSourceRequests());
-  const answerCharts=useRef(new Map<ChatMessage,{context:string;series:ChatEvidenceSeries[]}>());
-  const starterForecasts=useRef(new Map<ChatMessage,{context:string;forecast:NonNullable<ReturnType<typeof homeStarterForecast>>}>());
-  const exitReasonCharts=useRef(new Map<ChatMessage,{context:string;source:unknown;chart:ExitReasonChartData}>());
+  const [answerCharts,setAnswerCharts]=useState(()=>new Map<ChatMessage,{context:string;series:ChatEvidenceSeries[]}>());
+  const [starterForecasts,setStarterForecasts]=useState(()=>new Map<ChatMessage,{context:string;forecast:NonNullable<ReturnType<typeof homeStarterForecast>>}>());
+  const [exitReasonCharts,setExitReasonCharts]=useState(()=>new Map<ChatMessage,{context:string;source:unknown;chart:ExitReasonChartData}>());
   const [loadedScope, setLoadedScope] = useState("");
   const [settledEvidenceKey,setSettledEvidenceKey]=useState("");
   const [evidenceRevision, setEvidenceRevision] = useState(0);
@@ -337,7 +339,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       setMessages(current=>current.at(-1)?.role==='user'&&current.at(-1)?.content===message?current:[...current,{role:'user',content:message}]);
       setInput(current=>current.trim()?current:message);
       responseReveal.current?.cancel();const reveal=guidedExampleActive?null:queueHomeResponseReveal(()=>conversationViewport.current,()=>requestEpoch===promptEpoch.current&&liveActive.current&&currentEvidenceKey.current===key);responseReveal.current=reveal;
-      try{const answer=await solutions.send(message);if(answer&&sending.current===ticket&&requestEpoch===promptEpoch.current&&liveActive.current&&currentEvidenceKey.current===key){const assistantMessage:ChatMessage={role:'assistant',content:answer};if(solutions.answerSeries.current.length){answerCharts.current.set(assistantMessage,{context:key,series:solutions.answerSeries.current});while(answerCharts.current.size>16)answerCharts.current.delete(answerCharts.current.keys().next().value!);}setMessages(current=>[...current,assistantMessage]);if(!keepComposer||emptyComposer)setInput(current=>current.trim()===message?'':current);setQuestionUnanswered(false);}}
+      try{const answer=await solutions.send(message);if(answer&&sending.current===ticket&&requestEpoch===promptEpoch.current&&liveActive.current&&currentEvidenceKey.current===key){const assistantMessage:ChatMessage={role:'assistant',content:answer};const series=solutions.answerSeries.current;setAnswerCharts(current=>{const next=new Map(current).set(assistantMessage,{context:key,series});while(next.size>16)next.delete(next.keys().next().value!);return next;});setMessages(current=>[...current,assistantMessage]);if(!keepComposer||emptyComposer)setInput(current=>current.trim()===message?'':current);setQuestionUnanswered(false);}}
       catch(error){if(sending.current===ticket&&requestEpoch===promptEpoch.current&&liveActive.current&&currentEvidenceKey.current===key)setChatError(error instanceof Error?error.message:'The conversation is unavailable. Your draft is kept.');}
       finally{if(sending.current===ticket)sending.current=null;if(requestEpoch===promptEpoch.current&&liveActive.current&&currentEvidenceKey.current===key)reveal?.complete();else reveal?.cancel();}return;
     }
@@ -409,9 +411,10 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       const starterForecast=starter?homeStarterForecast(starter,requestPack,workforceQuery,undefined,decisionStore.getDatasetToken()):null;
       const answer = starterForecast?starterForecast.summary+'\n\n'+reply.answer:reply.answer;
       const assistantMessage:ChatMessage={role:"assistant",content:answer};
-      if(starterForecast)starterForecasts.current.set(assistantMessage,{context:key,forecast:starterForecast});
+      setAnswerCharts(current=>{const next=new Map(current).set(assistantMessage,{context:key,series:[]});while(next.size>16)next.delete(next.keys().next().value!);return next;});
+      if(starterForecast)setStarterForecasts(current=>new Map(current).set(assistantMessage,{context:key,forecast:starterForecast}));
       const chart=homeExitReasonChartFromPacket(requestPack);
-      if(chart&&homeExitReasonChartMatches(answer,chart))exitReasonCharts.current.set(assistantMessage,{context:key,source:sourceResults['survey-sentiment'],chart});
+      if(chart&&homeExitReasonChartMatches(answer,chart))setExitReasonCharts(current=>new Map(current).set(assistantMessage,{context:key,source:sourceResults['survey-sentiment'],chart}));
       if(actionPlan)planRationale.current.set(assistantMessage,conversation.activeGoalId);
       const priorStatements=history.filter(item=>item.role==='user').map(item=>item.content);
       // Preserve chronological repetitions (including a restated goal after withdrawal).
@@ -476,11 +479,11 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
     void send(buildHomeStarterExplorationPrompt(verified),false,false,true,true,'explanation');
   }
   function renderStarterForecast(message:ChatMessage){
-    const snapshot=starterForecasts.current.get(message);
+    const snapshot=starterForecasts.get(message);
     return ready&&active&&snapshot?.context===contextKey?<HomeStarterForecastChart datasetContext={pack.datasetContext} datasetToken={decisionStore.getDatasetToken()} domain={snapshot.forecast.domain} taReady={ready && Boolean(resolveTaResponseExtension((sourceResults["talent-acquisition"] as {status?:string;data?:unknown}|undefined)?.status==='loaded'?(sourceResults["talent-acquisition"] as {data?:unknown}).data:null))}/>:null;
   }
   function renderExitReasonChart(message:ChatMessage){
-    const snapshot=exitReasonCharts.current.get(message);
+    const snapshot=exitReasonCharts.get(message);
     return ready&&active&&snapshot&&snapshot.context===contextKey&&snapshot.source===sourceResults['survey-sentiment']?<HomeExitReasonChart chart={snapshot.chart}/>:null;
   }
   function renderFindingAction(message:ChatMessage,text:string){
@@ -597,10 +600,20 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       </div></div>
     </form>
   );
+  const currentVisualAnswer=currentHomeVisualAnswer(messages,answerCharts,contextKey,ready&&active,chatLoading||solutions.pending,Boolean(chatError));
+  const currentVisualSeries=currentVisualAnswer?answerCharts.get(currentVisualAnswer)?.series??[]:[];
+  const visualQuestion=messages[messages.length-2]?.role==='user'?messages[messages.length-2].content:'';
+  const visualTaReady=ready&&Boolean(resolveTaResponseExtension((sourceResults["talent-acquisition"] as {status?:string;data?:unknown})?.status==='loaded'?(sourceResults["talent-acquisition"] as {data?:unknown}).data:null));
+  const visualForecastDomain=currentVisualAnswer?homeForecastChartDomain(visualQuestion,currentVisualAnswer.content):null;
+  const legacyVisualsAllowed=!solutionConversationEnabled&&!pack.datasetContext&&decisionStore.getDatasetToken()==='legacy-v1:0';
+  const visualForecast=legacyVisualsAllowed&&currentVisualAnswer&&visualForecastDomain&&(visualForecastDomain!=='hiring'||visualTaReady)?<HomeForecastChart datasetContext={pack.datasetContext} datasetToken={decisionStore.getDatasetToken()} taReady={visualTaReady} question={visualQuestion} answer={currentVisualAnswer.content}/>:null;
+  const visualStarter=legacyVisualsAllowed&&currentVisualAnswer&&(starterForecasts.get(currentVisualAnswer)?.forecast.domain!=='hiring'||visualTaReady)?renderStarterForecast(currentVisualAnswer):null;
+  const visualExit=currentVisualAnswer&&!solutionConversationEnabled?renderExitReasonChart(currentVisualAnswer):null;
+  const currentVisualSupplement=visualForecast||visualStarter||visualExit?<>{visualForecast}{visualStarter}{visualExit}</>:null;
   const conversationPanel=(
     <section hidden={messages.length===0&&!chatError&&!chatLoading} aria-label="Overview conversation" className="space-y-3">
       {/* Leaving Home does not start a new conversation or archive the visible reply. */}
-      {solutionConversationEnabled?<ConversationMessages renderMessageContent={message=>{const presentation=planDiscussions.get(message);const reference=[presentation?.reference,message!==followUpMessage?[presentation?.planningNotes,presentation?.explanation].filter(Boolean).join('\n\n'):''].filter(Boolean).join('\n\n');return <><ChatContent compact={message.role==='assistant'} content={message===followUpMessage&&presentation?[presentation.discussion,presentation.proposals.length?(reviewPresentation.recommended?`Recommendation: ${reviewPresentation.recommended.candidate.name}.`:'Plan options below · no current recommendation.'):'Staffing options below · assumptions unconfirmed.'].filter(Boolean).join('\n\n'):presentation?.discussion??message.content} onNavigate={message.role==='assistant'?onNavigate:undefined}/>{ready&&active&&answerCharts.current.get(message)?.context===contextKey&&answerCharts.current.get(message)?.series.map(series=><ChatEvidenceChart key={series.metric} series={series}/>)}{reference&&message!==followUpMessage&&<details className="mt-3 text-sm text-muted-foreground" data-plan-discussion-reference><summary className="min-h-11 cursor-pointer py-2">Original wording</summary><ChatContent compact content={reference} onNavigate={onNavigate}/></details>}{message!==followUpMessage&&presentation?.furtherReading&&<ChatContent content={'### Further reading / investigation\n\n'+presentation.furtherReading} onNavigate={onNavigate}/>}</>;}} messages={messages} responseStart={responseStart} onNavigate={onNavigate} home/>:<GoalConversationMessages messages={messages} responseStart={responseStart} renderBeforeMessage={message=>prioritizeGoal&&candidate?.rationale===message?candidatePanel:null} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,workforceQuery,persona,conversation.resetEpoch,conversation.storageReady])} onNavigate={onNavigate} home hideHistory collapsedRationale={message=>activePinnedGoal&&(planRationale.current.get(message)===conversation.activeGoalId||messages[messages.indexOf(message)-1]?.content===HOME_ACTION_PLAN_LABEL)} renderBulletAction={renderFindingAction} renderMessageSupplement={message=><><HomeForecastChart datasetContext={pack.datasetContext} datasetToken={decisionStore.getDatasetToken()} taReady={ready && Boolean(resolveTaResponseExtension((sourceResults["talent-acquisition"] as {status?:string;data?:unknown}|undefined)?.status==='loaded'?(sourceResults["talent-acquisition"] as {data?:unknown}).data:null))} question={messages[messages.indexOf(message)-1]?.role==='user'?messages[messages.indexOf(message)-1].content:''} answer={message.content}/>{renderStarterForecast(message)}{renderExitReasonChart(message)}</>}/>}
+      {solutionConversationEnabled?<ConversationMessages renderMessageContent={message=>{const presentation=planDiscussions.get(message);const reference=[presentation?.reference,message!==followUpMessage?[presentation?.planningNotes,presentation?.explanation].filter(Boolean).join('\n\n'):''].filter(Boolean).join('\n\n');return <><ChatContent compact={message.role==='assistant'} content={message===followUpMessage&&presentation?[presentation.discussion,presentation.proposals.length?(reviewPresentation.recommended?`Recommendation: ${reviewPresentation.recommended.candidate.name}.`:'Plan options below · no current recommendation.'):'Staffing options below · assumptions unconfirmed.'].filter(Boolean).join('\n\n'):presentation?.discussion??message.content} onNavigate={message.role==='assistant'?onNavigate:undefined}/>{!overviewEntry&&ready&&active&&answerCharts.get(message)?.context===contextKey&&answerCharts.get(message)?.series.map(series=><ChatEvidenceChart key={series.metric} series={series}/>)}{reference&&message!==followUpMessage&&<details className="mt-3 text-sm text-muted-foreground" data-plan-discussion-reference><summary className="min-h-11 cursor-pointer py-2">Original wording</summary><ChatContent compact content={reference} onNavigate={onNavigate}/></details>}{message!==followUpMessage&&presentation?.furtherReading&&<ChatContent content={'### Further reading / investigation\n\n'+presentation.furtherReading} onNavigate={onNavigate}/>}</>;}} messages={messages} responseStart={responseStart} onNavigate={onNavigate} home/>:<GoalConversationMessages messages={messages} responseStart={responseStart} renderBeforeMessage={message=>prioritizeGoal&&candidate?.rationale===message?candidatePanel:null} hasGoal={Boolean(conversation.focusedIssue)} viewKey={JSON.stringify([conversation.workspaceKey,conversation.focusedIssue,workforceQuery,persona,conversation.resetEpoch,conversation.storageReady])} onNavigate={onNavigate} home hideHistory collapsedRationale={message=>activePinnedGoal&&(planRationale.current.get(message)===conversation.activeGoalId||messages[messages.indexOf(message)-1]?.content===HOME_ACTION_PLAN_LABEL)} renderBulletAction={renderFindingAction} renderMessageSupplement={message=>overviewEntry?null:<><HomeForecastChart datasetContext={pack.datasetContext} datasetToken={decisionStore.getDatasetToken()} taReady={ready && Boolean(resolveTaResponseExtension((sourceResults["talent-acquisition"] as {status?:string;data?:unknown}|undefined)?.status==='loaded'?(sourceResults["talent-acquisition"] as {data?:unknown}).data:null))} question={messages[messages.indexOf(message)-1]?.role==='user'?messages[messages.indexOf(message)-1].content:''} answer={message.content}/>{renderStarterForecast(message)}{renderExitReasonChart(message)}</>}/>}
       {conversation.homeGoalChoiceKey === contextKey && !conversation.focusedIssue && <div role="group" aria-label="Choose a goal" className="flex flex-wrap gap-2">
         <p className="w-full text-sm text-muted-foreground">State your goal in your own words.</p>
         <button type="button" disabled={chatLoading} onClick={() => { conversation.setHomeGoalChoiceKey(null); focusQuestion(); }} className="min-h-11 rounded-lg border px-4 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">State my goal</button>
@@ -675,6 +688,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       {active&&<WorkforceSolutionPanel hideEntry optionActions={optionActions} page="home" onNavigate={onNavigate}/>}
     </div>
     {homeProjection.requested&&conversation.focusedIssue&&projectionOverview&&<HomeHeadcountSummary {...projectionOverview} recruitingKpi={recruitingKpi} recruitingPending={!sourcesSettled} projection={homeProjection.value} projectionStatus={homeProjection.status}/>}
+    <HomeConversationSplit enabled={overviewEntry&&!welcomeComposer} visuals={<HomeAnswerVisuals pending={chatLoading||solutions.pending} error={Boolean(chatError)} current={Boolean(currentVisualAnswer)} series={currentVisualSeries} supplement={currentVisualSupplement}/>} >
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions publicEvidenceContext={publicEvidenceContext} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!guidedExampleActive&&<SwpGuidedJourney onDemoStateChange={setSwpDemoVisible} discussionKey={JSON.stringify([workforceScope,workforceQuery,persona])} conversation={conversation} active={active} busy={chatLoading||solutions.pending||solutions.saving} commandRef={swpCommand} modelContextRef={swpModelContext} demandControlRef={demandControl} demandReviewRef={demandReview} demandContextRef={demandContext} sources={sources??[]} onNavigate={onNavigate}/>}
@@ -698,6 +712,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
     <div hidden={swpDemoVisible&&!demoChatOpen}>{!welcomeComposer&&questionComposer}</div>
       {liveChatAvailable&&!solutionConversationEnabled&&structuredPlansEnabled&&recoveryPlanChoice?.goalId===conversation.activeGoalId&&<label className="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={structuredMode} onChange={event=>{selectedPlanForChat.current?.discard();setStructuredMode(event.target.checked);}}/>Discuss saved plans · turn off to use existing chat controls</label>}
       {actionOffers.length>0&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2 text-sm">Option action suggestions</summary><section aria-label="Workforce option actions" className="mt-3 space-y-2"><p className="text-sm text-muted-foreground">{input.trim()?'Your draft is kept. Clear it to choose an option action.':'Click to open the local action. Saving, calculation and search remain explicit.'}</p><div className="flex flex-wrap gap-2">{actionOffers.map(offer=><button key={offer.id} type="button" disabled={suggestionPending||chatLoading||Boolean(input.trim())} onClick={()=>submitOption(offer.id)} className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{offer.label}</button>)}</div></section></details>}
+      </HomeConversationSplit>
   </section>
     {renderPlanPane ? null : savedWork}
   </div></HomeGuidedActionsContext.Provider>;
