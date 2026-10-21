@@ -1,1 +1,4 @@
 source/** -text
+reproduction/fixtures.json -text
+reproduction/fixtures.sha256 text eol=lf
+reproduction/public-support.json text eol=lf

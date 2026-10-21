@@ -2,9 +2,9 @@
 
 This directory publishes the application source from the reviewed 9,037-person release at https://www.ed-ai.app. It is a source snapshot, not a deployable replacement for the root development application.
 
-- Deployed source commit: `b3890b9a17bd1da661ae2463c91589774fc4d955` (local release identity; not a GitHub commit link).
-- Verified production deployment: `dpl_Eg21b7PzxbtsoKE35RgyBykAUbnk`.
-- Original deployed package SHA-256: `73d6cdf115ac754ebf2f7a0f02febe56a82ee94c4669ff452645237fc276095b`.
+- Deployed source commit: `e2e13c23d59bd808caeb45edef20b101d05e4ceb` (local release identity; not a GitHub commit link).
+- Verified deployment: `dpl_Adxkz2ykw6FfvTETUZxBzkR38ks8`.
+- Original deployed package SHA-256: `b31790a01dd108d10cc68b151a9e95e4d98888f3ec343ca1324c31357d51fa57`.
 - `source/` contains 720 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before the same build was promoted.
 
 Verify without dependencies, credentials or network:
@@ -25,9 +25,9 @@ This release restores provider-backed planning routes, preserves the current wor
 
 Protected provider checks cover intake, comparison, revisions, combinations, capability review and grounded chat. Captured two-round Home output passed corrected offline contract grading; the original failed hosted grading receipt was not rewritten. Seven local React continuity checks cover selected-goal follow-up, save/reload, cancellation and stale-response isolation using fake provider/admission ports. Public desktop/mobile smoke confirms enabled UI and configuration without paid requests. This is not evidence of a fresh paid production browser journey through all these steps or of arbitrary recommendation correctness.
 
-At publication, pricing verification expires October 22, 2026 at 00:00 UTC. Continuing operation requires a freshly verified policy and matching admission window. The cumulative budget is not reset by a release. This snapshot records a point in time; it is not a claim of perpetual availability.
+Current pricing verification expires October 22, 2026 at 09:59 UTC (admission cutoff 09:57:30 UTC). Continuing operation requires aligned app pricing, rollout pricing, admission SQL ceiling, and settlement dispatch windows/rates. The cumulative budget is not reset by a release. This snapshot records a point in time; it is not a claim of perpetual availability.
 
-The next source-reproducibility step is the already identified public fixture/receipt integration. Saved/versioned headcount what-if remains a separate design proposal, not an implemented feature. No predictive accuracy, realized savings or enterprise persistence is claimed.
+The [local replay recipe](reproduction/README.md) implements bounded public fixture/receipt integration with a separate generated app. Full private calculator reconstruction and live AI are not reproduced. Saved/versioned headcount what-if remains a separate design proposal, not an implemented feature. No predictive accuracy, realized savings or enterprise persistence is claimed.
 
 ## Home question and split-view update
 
