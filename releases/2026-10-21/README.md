@@ -39,7 +39,7 @@ Validation: 11 annual-contract tests, 8 existing consumer/grounding tests, 13 ro
 
 ## Conversational framing repair
 
-Shared normalization removes polite framing while preserving dates, populations, negation and substantive qualifiers. Verified turnover and headcount calculations remain bounded; unsupported causal and planning questions retain the grounded model/tool path. Twenty-three focused tests and TypeScript passed. A separately captured freeform cost-summary question completed in one model round with grounded figures and explicit limitations; this is not arbitrary-query acceptance. The 19-case offline matrix tests routing only and deliberately denies model dispatch. Pricing renewal must align app, rollout, admission and settlement windows before October 22, 2026 at 00:00 UTC.
+Shared normalization removes polite framing while preserving dates, populations, negation and substantive qualifiers. Verified turnover and headcount calculations remain bounded; unsupported causal and planning questions retain the grounded model/tool path. Twenty-three focused tests and TypeScript passed. A separately captured freeform cost-summary question completed in one model round with grounded figures and explicit limitations; this is not arbitrary-query acceptance. The 19-case offline matrix tests routing only and deliberately denies model dispatch. The original midnight pricing deadline was superseded by the coordinated renewal below: expiry October 22, 2026 at 09:59 UTC, with admission cutoff 09:57:30 UTC.
 
 ## Conversation display labels
 

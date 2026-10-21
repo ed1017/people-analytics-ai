@@ -1,6 +1,6 @@
 # Local synthetic company/snapshot transitions
 
-This adapter is an unpublished acceptance increment after PR323. The generated local Home now integrates a fixed synthetic picker and registered-snapshot HTTP reader. It adds no private ingestion, production session changes or deployment. It reuses the exact versioned current-release `DatasetSession` and `DecisionStore`.
+This adapter was published source-only in PR #324 after PR #323. The generated local Home now integrates a fixed synthetic picker and registered-snapshot HTTP reader. It adds no private ingestion, production session changes or deployment. It reuses the exact versioned current-release `DatasetSession` and `DecisionStore`.
 
 `CompanyWorkspaceSession` accepts a finite, prevalidated registry of synthetic partial dashboards. The original immutable `invented-company-<digest>:1` identifies a snapshot and its saved workspace. Each activation gets a monotonically increasing transport generation, so A → B → A reopens A's workspace while rejecting the response captured during the first A activation. Repeated selection of the current snapshot is a no-op. Reload creates a new browser session; its earlier page requests no longer exist.
 
@@ -18,4 +18,4 @@ Ten tests cover activation/return, real DecisionStore persistence and zero value
 
 The generated reader binds the requested registered snapshot to the activation digest; ordering remains client-local, not server-wide. Chat and charts are withheld until workspace, response and activation agree. An activation token is not authentication. Do not expose this local registry as a production tenant selector or imply authorization from a matching digest.
 
-Publication is held. The next publication action would be an explicitly coordinated source-only branch/PR for this adapter and tests, with Git deployment disabled and required CI; no production rollout is part of it. Actual private-company source and access approvals remain separate.
+PR #324 merged as `d410a2259bca2f8dfb10e3f06e1a4bb18f729b68` after required CI passed. Git deployment remained disabled; no production rollout accompanied the source publication. Actual private-company source and access approvals remain separate.
