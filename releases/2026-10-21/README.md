@@ -2,10 +2,10 @@
 
 This directory publishes the application source from the reviewed 9,037-person release at https://www.ed-ai.app. It is a source snapshot, not a deployable replacement for the root development application.
 
-- Deployed source commit: `a86acfa4ebc28015f2652685536750c300ca083a` (local release identity; not a GitHub commit link).
-- Verified deployment: `dpl_fw5A59MB2HhM74R5qzrxEAqhVmM5`.
-- Original deployed package SHA-256: `d1355bde21786753b1bc1bf71a21d6c1f0c4cb9fe8ad94007ccaf7a35e3e9416`.
-- `source/` contains 720 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before the same build was promoted.
+- Deployed source commit: `100943ea83ccc8394586cc5c41acc97197569c56` (local release identity; not a GitHub commit link).
+- Verified deployment: `dpl_7AUakS8L8wvBo66H6uqNe4fKUrkN`.
+- Original deployed package SHA-256: `d49403ef3d7093345bf9a7f90e6282f9ebfbd16e4fad7b78d1540204a8db3f7b`.
+- `source/` contains 721 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before the same build was promoted.
 
 Verify without dependencies, credentials or network:
 
@@ -58,3 +58,13 @@ One additional actual model investigation plan passed evidence review and explic
 ## Saved-plan reading area
 
 After pinning and reopening a real model-generated qualitative plan, the desktop split transcript collapsed to 96px. Include saved-plan mode in the existing split-specific reading-area rule; mobile, scenario popup and saved state are unchanged. Focused independent review and retained-state browser verification cover the correction without another provider call.
+
+## Complete business-unit engagement evidence
+
+Home previously omitted the existing business-unit survey comparison, so the model incorrectly reported that only company totals were available. The evidence packet now retains the complete eligible partition (up to 40 groups), its date, respondent counts and engagement metric definition. Invalid, incomplete, suppressed or oversized partitions are excluded whole; company totals remain available. Group citations and the response scope guard distinguish engagement comparison measures from unsupported turnover, country, team, demographic or other-survey claims.
+
+Seventeen synthetic regressions cover complete rankings, exact-question/paraphrase evidence, invalid inputs, suppression, date/count grounding and citation scope. An actual application-route test used a simulated two-round provider for the exact question and a paraphrase. Independent focused review cleared the changes; the protected production build passed TypeScript and asset checks. A single real protected provider check answered the original question in one round: Sales was lowest among all eight released business units at 39.3% engagement favorability, 659 respondents, September 30, 2026. This is survey favorability, not text sentiment or a statistically established difference. No paid highest-ranking, demographic or team answer check is claimed; those boundaries have offline coverage only.
+
+The same five private aggregate inputs are unchanged and remain excluded from this repository. No model, budget cap, accounting permission or persistent project configuration changes accompany this repair. The existing exact-project runtime guard remains enforced; staging supplies the already verified, non-secret organization ID as deployment-scoped metadata.
+
+The browser request was checked at desktop 1440px and phone 390px. Retained-answer presentation checks rebind only local replay request/turn IDs; they do not make another paid request. Survey answers preserve the left transcript/right visual panel; no unsupported survey chart is generated.

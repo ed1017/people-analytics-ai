@@ -16,7 +16,7 @@ This is a portfolio prototype. No measured adoption, savings, business impact or
 
 ## Repository and deployment status
 
-The exact application source subset from the October 21 hosted release is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. That snapshot maps to deployment `dpl_fw5A59MB2HhM74R5qzrxEAqhVmM5` and local source identity `a86acfa4ebc28015f2652685536750c300ca083a`.
+The exact application source subset from the October 21 hosted release is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. That snapshot maps to deployment `dpl_7AUakS8L8wvBo66H6uqNe4fKUrkN` and local source identity `100943ea83ccc8394586cc5c41acc97197569c56`.
 
 The root development application remains distinct from that versioned snapshot. Private synthetic runtime inputs, credentials and release evidence are excluded. Publishing the source closes the missing-source record; it does not make this repository a self-contained reproduction of the hosted service. A [local public-fixture replay recipe](releases/2026-10-21/reproduction/README.md) now builds and serves the versioned UI without private inputs or credentials. It preserves recorded company-wide receipts; live AI, narrowed filters and unrecorded server calculations are deliberately unavailable.
 

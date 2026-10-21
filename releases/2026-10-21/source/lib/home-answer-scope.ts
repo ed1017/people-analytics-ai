@@ -43,7 +43,14 @@ export function homeAnswerScopeViolation(answer:string,raw:unknown,options:Scope
  const financeFacts=finance?.facts as Record<string,unknown>|null;
  const financeRows=(financeFacts?.rows??[]) as Record<string,unknown>[];
  const financeLabels=financeRows.flatMap(row=>[row.org_name,...(typeof row.org_code==='string'&&row.org_code.length>=3?[row.org_code]:[])]).filter((value):value is string=>typeof value==='string');
- const labels=[...new Set([...selected,...countryAliases.flat(),...financeLabels])];
+ const survey=pack.sources.find((source:{id:string})=>source.id==='S1');
+ const surveyFacts=survey?.facts as {businessUnitComparison?:{rows:Record<string,unknown>[]}}|null;
+ const surveyRows=surveyFacts?.businessUnitComparison?.rows??[];
+ const surveyLabels=surveyRows.flatMap(row=>[row.org_name,row.org_code]).filter((value):value is string=>typeof value==='string');
+ const labels=[...new Set([...selected,...countryAliases.flat(),...financeLabels,...surveyLabels])];
+ for(const ref of [...answer.matchAll(/\[([^\]\n]+)\]/g)].flatMap(match=>match[1].split(/[,;\s]+/)).concat(options.references??[]).filter(ref=>ref.startsWith('S1:businessUnit:'))){
+  const match=/^S1:businessUnit:(\d+)$/.exec(ref);if(!match||survey?.status!=='loaded'||!surveyRows[Number(match[1])])return true;
+ }
  // Field citations bind to the supplied packet, whose row identities/values are
  // checked against freshly loaded allowlisted aggregates before the model runs.
  const financeReferences=[...answer.matchAll(/\[([^\]\n]+)\]/g)].flatMap(match=>match[1].split(/[,;\s]+/)).concat(options.references??[]).filter(ref=>ref.startsWith('F1:'));
@@ -62,6 +69,14 @@ export function homeAnswerScopeViolation(answer:string,raw:unknown,options:Scope
  };
  const sourceAllows=(id:string,label:string,claim:string)=>{
   const source=sources.get(id);if(!source)return false;
+  if(id==='S1'){
+   if(countryAliases.flat().includes(label)||survey?.status!=='loaded')return false;
+   if(!/\b(?:engagement|favorability|favo(?:u)?rable|respondents|score)\b/i.test(claim)||/\b(?:turnover|headcount|FTE|pay|salary|costs?|hires|exits|vacancies|pulse|onboarding|manager survey)\b/i.test(claim))return false;
+   const refs=[...claim.matchAll(/S1:([^\]\s,;]+)/g)].map(match=>match[1]).concat((options.references??[]).filter(ref=>ref.startsWith('S1:')).map(ref=>ref.slice(3)));
+   if(refs.some(ref=>!/^businessUnit:\d+$/.test(ref)))return false;
+   if(refs.length)return refs.some(ref=>{const match=/^businessUnit:(\d+)$/.exec(ref),row=match?surveyRows[Number(match[1])]:null;return row&&(row.org_name===label||row.org_code===label);});
+   return surveyRows.some(row=>row.org_name===label||row.org_code===label);
+  }
   if(id==='F1'){
    if(countryAliases.flat().includes(label))return false;
    const refs=[...claim.matchAll(/F1:row:(\d+)(?::([a-z_]+))?/g)].map(match=>Number(match[1]));
