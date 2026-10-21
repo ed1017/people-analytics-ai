@@ -15,7 +15,7 @@ import {readSolutionRequest} from './home-solution-conversation.ts';
 import {converseSolutions} from './home-solution-conversation-service.ts';
 import {projectionCurrentnessFilters} from './home-projection-currentness.ts';
 import {readStaffingScenario} from './home-staffing-scenario.ts';
-import {SWP_CONVERSATION_HEADER,swpConversationModel} from './swp-conversation-model.ts';
+import {SWP_CONVERSATION_HEADER,SWP_CONVERSATION_MODE,swpConversationModel} from './swp-conversation-model.ts';
 import {SWP_DEMAND_MODE,requestDemandContext} from './swp-demand.ts';
 import {requiredStaffingInstructions,requiredStaffingTool} from './home-required-staffing.ts';
 import {hiringBudgetInstructions} from './home-hiring-budget.ts';
@@ -77,7 +77,7 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
    const currentContext=()=>{current();return contextId;};
    const planningInstructions=staffingScenarioOnly?'':solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions+'\n'+hiringBudgetInstructions+'\n'+requiredStaffingInstructions:'');
    const reply=await converseSolutions(parsed,{grounding,staffingScenarioOnly,requestTime,...(roundLimit===2?{maxModelRounds:2}:{}),
-    ...(natural?{natural:{datasetToken:P.token}}:{}),...(aggregateEligible?{readAggregate:async(args,readSignal)=>{current();const result=await readPublicHomeAggregate({binding,hostname,identity,filters:parsed.filters,args,signal:readSignal});current();return result;}}:{}),...(demand?{demand:{datasetToken:P.token,referenceContract:true}}:{}),progress:{enabled:progressEnabled===true,datasetToken:P.token},
+    ...(natural?{natural:{datasetToken:P.token}}:{}),...(mode===SWP_CONVERSATION_MODE?{scenario:{datasetToken:P.token}}:{}),...(aggregateEligible?{readAggregate:async(args,readSignal)=>{current();const result=await readPublicHomeAggregate({binding,hostname,identity,filters:parsed.filters,args,signal:readSignal});current();return result;}}:{}),...(demand?{demand:{datasetToken:P.token,referenceContract:true}}:{}),progress:{enabled:progressEnabled===true,datasetToken:P.token},
     complete:async(input,finalOnly,completionSignal,capabilities)=>{
      current();must(round<roundLimit&&!staffingScenarioOnly&&typeof completionFactory==='function');stage='provider';
      completion??=completionFactory({requestId:parsed.requestId,contextId,datasetToken:P.token,currentContext});must(typeof completion?.complete==='function');

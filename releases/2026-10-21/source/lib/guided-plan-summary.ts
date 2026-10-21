@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share application source.
+import {unavailableMonthFraction} from './staffing-monthly-capacity.ts';
 import type {SwpOption} from './swp-demo';
 import type {HomeMixCandidate} from './home-mix-search';
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -22,7 +24,7 @@ export function guidedPlanSummary(draft:BundleDraft){
  try{const candidate=projectSavedStaffingChoice(draft),coverage=reviewBundleProposal(draft).conditionalCoverage;
  return {mix:candidate.mix,cash:candidate.cash.complete,cashBreakdown:candidate.cash,target:guidedPlanTarget(draft),ready:candidate.metrics?.fullCoverageDate??null,effort:guidedOptionEffort({draft,coverage})};}catch{return null;}
 }
-/** Monthly qualified roles exclude partial readiness months, using the existing dependency gates. */
+/** Monthly qualified roles prorate calendar days after all existing dependency gates. */
 export function optionMonthlyCoverage(option:Pick<SwpOption,'draft'|'coverage'>){
  const months=option.draft.inputs.scope.months.value!;
  if(!option.coverage||option.coverage.length!==months||option.coverage.some(v=>v===null))return null;
@@ -31,7 +33,7 @@ export function optionMonthlyCoverage(option:Pick<SwpOption,'draft'|'coverage'>)
   const arrival=flow.path==='buy'?capacity.input.arrivalDate:capacity.input[flow.path==='build'?'buildMonth':'moveMonth']+'-01',prerequisites=flow.componentIds.map(id=>ready[id]);
   if(prerequisites.some(v=>v===null))return null;
   const effective=[arrival,...prerequisites as string[]].sort().at(-1)!,index=(Number(effective.slice(0,4))-Number(start.slice(0,4)))*12+Number(effective.slice(5,7))-Number(start.slice(5,7));
-  if(Number(effective.slice(8,10))>1&&index>=0&&index<months)covered[index]=Math.max(0,covered[index]-Number(capacity.input[flow.path]));
+  if(Number(effective.slice(8,10))>1&&index>=0&&index<months)covered[index]=Math.max(0,covered[index]-Number(capacity.input[flow.path])*unavailableMonthFraction(effective));
  }
  return covered;
 }
@@ -59,10 +61,10 @@ export function guidedPlanTarget(draft:BundleDraft){
  if(!draft.inputs.guidedWorkload||!draft.inputs.capacity||!readBundleDraft(draft))return null;
  const scope=draft.inputs.scope,deadline=bundleHorizonEnd(scope).value,roles=scope.demand.value,workload=guidedWorkloadResult(draft.inputs);
  if(!deadline||roles===null||Number(draft.inputs.capacity.input.roles)!==roles)return null;
- return {metric:'Conditional additional-role coverage',roles,deadline,population:scope.population.value,unit:scope.businessUnit.value,role:scope.jobProfile.value,fteGap:workload?.additionalFte??null,
+ return {baselineFte:workload?.qualifiedAllocatedFte??null,metric:'Conditional additional-role coverage',roles,deadline,population:scope.population.value,unit:scope.businessUnit.value,role:scope.jobProfile.value,fteGap:workload?.additionalFte??null,
   lines:[`Metric: Conditional additional-role coverage.`,`Scenario target: ${roles} whole roles by ${deadline}.`,`Scope: ${scope.population.value}; unit: ${scope.businessUnit.value}; role: ${scope.jobProfile.value}.`,
    `The model rounds the additional FTE gap (${workload?.additionalFte??'Unknown'} FTE) up to whole roles and assumes 1 qualified, allocated FTE per additional role. Roles are not added company headcount.`,
-   'Baseline: Unknown. Measured outcome: Unknown. Delivery milestones are proposed steps, not evidence of capacity achieved. End-date role coverage does not erase earlier uncovered workload.',conditionalRoleEvidence]};
+   `Starting qualified capacity assumption: ${workload?.qualifiedAllocatedFte??'Unknown'} FTE. This is the entered scenario baseline, not a measured outcome. Measured baseline and later outcome for additional-role delivery remain unknown. Delivery milestones are proposed steps, not evidence of capacity achieved. End-date role coverage does not erase earlier uncovered workload.`,conditionalRoleEvidence]};
 }
 const cashLabels:Record<string,string>={'capacity:hireStaffingCost':'New-hire payroll','capacity:backfillStaffingCost':'Backfill payroll','capacity:internalSalaryUplift':'Internal salary uplift','capacity:recruitingFees':'Recruiting fees','capacity:trainingCash':'Training cash'};
 export function staffingCashBreakdown(draft:BundleDraft,cash:HomeMixCandidate['cash']){

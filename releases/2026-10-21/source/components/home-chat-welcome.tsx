@@ -9,6 +9,7 @@ import { isVerifiedDashboardScope } from '@/lib/dashboard-scope';
 import type {CheckedHomeProjection} from '@/lib/home-projection-selection';
 import styles from './home-chat-shell.module.css';
 import {swpDemoPrompt} from '@/lib/swp-demo';
+import {HomeConversationSplit,HomeSplitProvider} from './home-answer-visuals';
 
 export const planningEntries = [
   {label:'How has our headcount changed?'},
@@ -133,6 +134,7 @@ export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loadi
     <p className={styles.subtitle}>Start with a decision. Explore the evidence, compare assumptions, and build your plan.</p>
     <div className={styles.entryActions}><button type="button" aria-haspopup="dialog" disabled={disabled} onClick={()=>onQuestion(swpDemoPrompt)}>Try a planning scenario</button><a href="?page=workforce">Explore the full app</a></div>
     <p className={styles.demoNote}>Edit assumptions, compare staffing options and save a proposal in this browser. No live AI call.</p>
+    <HomeConversationSplit enabled visuals={<HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending}/> }>
     <h3>What decision are you facing?</h3>
     <div className={styles.questions}>
       {planningEntries.map((entry, index) => {
@@ -143,11 +145,11 @@ export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loadi
       })}
     </div>
     {composer && <div className={styles.composer}>{composer}</div>}
-    <HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending}/>
+    </HomeConversationSplit>
   </section>;
 }
 
 /** Layout slot for the current conversation. Response/chart components remain owned by chat. */
 export function HomeChatShell({children}: {children: ReactNode}) {
-  return <div className={styles.shell}>{children}</div>;
+  return <HomeSplitProvider><div className={styles.shell}>{children}</div></HomeSplitProvider>;
 }

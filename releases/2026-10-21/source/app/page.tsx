@@ -6,6 +6,7 @@ import {progressEntryPacket} from '@/lib/goal-progress-entry-service';
 import {captureGoalProgressInput} from '@/lib/goal-progress-conversation';
 import {validateSuccessionContext} from "@/lib/succession-release-context";
 import { datasetFetch, datasetSession } from "@/lib/dataset-client.mjs";
+import {publicAiFetch} from '@/lib/public-ai-readiness-client.mjs';
 
 
 import { contextualPrompts, hasKnownNumericEvidence } from "@/lib/contextual-prompts";
@@ -1715,7 +1716,7 @@ export default function Home() {
     conversation.setQuestionUnanswered(true);
 
     try {
-      const response = await datasetFetch(
+      const response = await publicAiFetch(
         "/api/chat",
         {
           method: "POST",

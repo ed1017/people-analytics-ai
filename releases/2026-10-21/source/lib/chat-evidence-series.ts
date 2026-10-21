@@ -7,6 +7,7 @@ type Grounding={datasetToken:string;packetSha256:string;sources:{id:string;statu
 const date=(value:unknown):value is string=>typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;
 const metrics={headcount:{source:'W1',title:'Headcount snapshots',unit:'people',date:'snapshot_date'},hires:{source:'R1',title:'Monthly hires',unit:'hires',date:'month'},monthly_turnover_pct:{source:'A1',title:'Monthly turnover',unit:'%',date:'month'},monthly_voluntary_turnover_pct:{source:'A1',title:'Monthly voluntary turnover',unit:'%',date:'month'}} as const;
 const validValue=(value:unknown,rate:boolean):value is number=>typeof value==='number'&&Number.isFinite(value)&&value>=0&&(rate?value<=100:Number.isSafeInteger(value));
+const boundedPoints=(points:{date:string}[],metric:string)=>points.length>=2&&(points.length<=3||metric.startsWith('monthly_')&&points.length===12&&points.every((p,i)=>p.date===`${points[0].date.slice(0,4)}-${String(i+1).padStart(2,'0')}-01`));
 /** Only already-grounded, cited packet rows. No new reads, model points, forecasts or YTD conversion. */
 export function answerEvidenceSeries(evidence:unknown,grounding:Grounding|undefined,requestId:string,question:string,answer:string):ChatEvidenceSeries[]{
  if(!grounding||!/^[a-f0-9]{64}$/.test(grounding.packetSha256))return [];
@@ -23,7 +24,7 @@ export function answerEvidenceSeries(evidence:unknown,grounding:Grounding|undefi
  if(requested===null)return [];
  const selected=rows.filter(row=>(!requested||requested.includes(String(row[definition.date])))&&row.suppressed!==true&&date(row[definition.date])&&String(row[definition.date])<=asOf&&validValue(row[metric],definition.unit==='%'));
  const points=selected.map(row=>({date:String(row[definition.date]),value:Number(row[metric])})).sort((a,b)=>a.date.localeCompare(b.date));
- if(points.length<2||points.length>3||new Set(points.map(point=>point.date)).size!==points.length)return [];
+ if(!boundedPoints(points,metric)||new Set(points.map(point=>point.date)).size!==points.length)return [];
  const denominator=(source.coverage as {monthly?:{denominator?:unknown}}).monthly?.denominator;
  const limitation=[source.limitation,metric.startsWith('monthly_')&&typeof denominator==='string'?`Monthly-rate denominator: ${denominator}`:''].filter(Boolean).join(' ');
  return [{version:1,requestId,datasetToken:grounding.datasetToken,packetSha256:grounding.packetSha256,kind:'recorded',synthetic:isPublicHomeReceiptCandidate(grounding)||!!source.sourceContext||/synthetic|fictional|simulated|constructed/i.test(source.limitation),metric,title:definition.title,unit:definition.unit,sourceId:definition.source,scope:source.scope,asOf:source.date,limitation,sampled:true,omitted:rows.filter(row=>!requested||requested.includes(String(row[definition.date]))).length-points.length,points}];
@@ -32,7 +33,7 @@ export function answerEvidenceSeries(evidence:unknown,grounding:Grounding|undefi
 export function readChatEvidenceSeries(raw:unknown,requestId:string,datasetToken:string):ChatEvidenceSeries[]{
  if(!Array.isArray(raw)||raw.length!==1)return [];
  const item=raw[0] as ChatEvidenceSeries,definition=metrics[item?.metric];
- if(!definition||item.version!==1||item.kind!=='recorded'||typeof item.synthetic!=='boolean'||item.sampled!==true||item.requestId!==requestId||item.datasetToken!==datasetToken||!/^[a-f0-9]{64}$/.test(item.packetSha256)||item.sourceId!==definition.source||item.unit!==definition.unit||item.title!==definition.title||!date(item.asOf)||typeof item.scope!=='string'||item.scope.length>300||typeof item.limitation!=='string'||item.limitation.length>2000||!Number.isInteger(item.omitted)||item.omitted<0||!Array.isArray(item.points)||item.points.length<2||item.points.length>3)return [];
- if(item.points.some((point,index)=>!point||typeof point!=='object'||Array.isArray(point)||!date(point.date)||point.date>item.asOf||!validValue(point.value,item.unit==='%')||index>0&&point.date<=item.points[index-1].date))return [];
+ if(!definition||item.version!==1||item.kind!=='recorded'||typeof item.synthetic!=='boolean'||item.sampled!==true||item.requestId!==requestId||item.datasetToken!==datasetToken||!/^[a-f0-9]{64}$/.test(item.packetSha256)||item.sourceId!==definition.source||item.unit!==definition.unit||item.title!==definition.title||!date(item.asOf)||typeof item.scope!=='string'||item.scope.length>300||typeof item.limitation!=='string'||item.limitation.length>2000||!Number.isInteger(item.omitted)||item.omitted<0||!Array.isArray(item.points)||item.points.length<2||item.points.length>12)return [];
+ if(item.points.some((point,index)=>!point||typeof point!=='object'||Array.isArray(point)||!date(point.date)||point.date>item.asOf||!validValue(point.value,item.unit==='%')||index>0&&point.date<=item.points[index-1].date)||!boundedPoints(item.points,item.metric))return [];
  return structuredClone(raw);
 }

@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share application source.
+import {scenarioComparisonIntent,scenarioQuestionMismatch,readScenarioChatDraft,compareScenarioForChat} from './scenario-planning-parity.ts';
 import {homeAggregateTool} from './home-aggregate-tool.mjs';
 import {acceptsPublicHomeReceipt,isPublicHomeReceiptCandidate} from './public-home-receipt.mjs';
 import type {createPublicHomeGrounding} from './public-home-grounding.server.mjs';
@@ -60,7 +62,7 @@ import {readSwpPlaybook} from './swp-reasoning-playbook.ts';
 export type SolutionModelOutput={items:unknown[];calls:{id:string;name:string;arguments:string}[];text:string;completed:boolean};
 export type SolutionReply={charts?:ChatEvidenceSeries[];requestId:string;answer:string;candidateIds:string[];analysisIds:string[];state:SolutionState;usage:{modelRounds:number;toolCalls:number};progressProposal?:ProgressEntryProposal;demandReview?:DemandReview};
 export type SolutionToolDiagnostic={round:number;name:string;status:'ok'|'feedback'|'aborted';elapsedMs:number};
-export type SolutionRuntime={readAggregate?:(args:Record<string,unknown>,signal:AbortSignal)=>Promise<{answer:string}>;maxModelRounds?:2;requestTime?:Date;onToolResult?:(event:SolutionToolDiagnostic)=>void;staffingScenarioOnly?:boolean;grounding?:Awaited<ReturnType<typeof verifySolutionEvidence>>|Awaited<ReturnType<ReturnType<typeof createPublicHomeGrounding>['verify']>>;complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal,capabilities:{progressEntryEnabled:boolean;requiredStaffingCalculation:boolean})=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date;natural?:{datasetToken:string};progress?:{enabled:boolean;datasetToken:string};demand?:{datasetToken:string;referenceContract?:boolean}};
+export type SolutionRuntime={scenario?:{datasetToken:string};readAggregate?:(args:Record<string,unknown>,signal:AbortSignal)=>Promise<{answer:string}>;maxModelRounds?:2;requestTime?:Date;onToolResult?:(event:SolutionToolDiagnostic)=>void;staffingScenarioOnly?:boolean;grounding?:Awaited<ReturnType<typeof verifySolutionEvidence>>|Awaited<ReturnType<ReturnType<typeof createPublicHomeGrounding>['verify']>>;complete:(input:unknown[],finalOnly:boolean,signal:AbortSignal,capabilities:{progressEntryEnabled:boolean;requiredStaffingCalculation:boolean})=>Promise<SolutionModelOutput>;loadProjection:(filters:SolutionRequest['filters'],signal:AbortSignal)=>Promise<ProjectionInputs>;now?:()=>Date;natural?:{datasetToken:string};progress?:{enabled:boolean;datasetToken:string};demand?:{datasetToken:string;referenceContract?:boolean}};
 function readFinal(text:string):SolutionFinal{
  if(!text||text.length>20000)throw new SolutionResponseError('answer_unavailable','The conversational answer is unavailable.');
  let value;
@@ -99,6 +101,14 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  // Deterministic replies can return before the model path sets fresh markers.
  state.currentCalculationKinds=[];
  if(isPublicHomeReceiptCandidate(runtime.grounding)&&!acceptsPublicHomeReceipt(runtime.grounding,request.evidence,request))throw new SolutionResponseError('answer_unavailable','Current public evidence could not be verified.');
+ if(runtime.scenario&&scenarioComparisonIntent(request.message.text)){
+  const draft=readScenarioChatDraft(request.goalContext,runtime.scenario.datasetToken);
+  if(!draft)throw new SolutionResponseError('answer_unavailable','Review the current complete scenario assumptions before comparing.');
+  const mismatch=scenarioQuestionMismatch(request.message.text,draft);
+   const result=mismatch?{answer:mismatch}:await compareScenarioForChat(draft,signal);abort(signal);clearTurnoverChat(state);
+  state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:result.answer}].slice(-32);state.questions=[];
+  return {requestId:request.requestId,answer:result.answer,charts:[],candidateIds:[],analysisIds:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
+ }
  const turnover=!runtime.staffingScenarioOnly&&!runtime.demand?turnoverChatReply(request,runtime.grounding,runtime.requestTime??runtime.now?.()??new Date()):null;
  clearTurnoverChat(state);
  if(turnover){

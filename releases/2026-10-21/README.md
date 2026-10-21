@@ -2,10 +2,10 @@
 
 This directory publishes the application source from the reviewed 9,037-person release at https://www.ed-ai.app. It is a source snapshot, not a deployable replacement for the root development application.
 
-- Deployed source commit: `6712a9281aca806ff95b8556efd3d3f24ee143c4` (local release identity; not a GitHub commit link).
-- Verified deployment: `dpl_8oyjQVeL3nuiQDzfzX2ts5mH6QpU`.
-- Original deployed package SHA-256: `8d004072c820f459c0722b113009f5ac23b000de09f872b0378c43771e5fa021`.
-- `source/` contains 725 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before promotion; the release handoff records the promotion outcome separately.
+- Deployed source commit: `d287811e87db07be16505f0ef273e75adf9b1880` (local release identity; not a GitHub commit link).
+- Verified deployment: `dpl_AuFkMwMdktaX4KUrQb3P9zCeTsrS`.
+- Original deployed package SHA-256: `35c90f1def7943209697023022d3290614b8a005ea21a7ba41c4fb0464b26f07`.
+- `source/` contains 726 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before promotion; the release handoff records the promotion outcome separately.
 
 Verify without dependencies, credentials or network:
 
@@ -72,3 +72,7 @@ The browser request was checked at desktop 1440px and phone 390px. Retained-answ
 ## Catalog and skills retrieval
 
 The [coverage contract](../../../docs/catalog-skills-grounding.md) adds published job compa comparisons, complete listed policy bands and three explicitly bounded skills lists. Eight targeted regressions, five actual application route cases with simulated provider/accounting, existing registry/server checks and independent review cover the increment. No additional paid model call was made for this mechanical registry extension.
+
+### Explicit scenario parity
+
+The guided popup and explicit chat continuation now share the same complete fictional inputs, staffing-option calculator and reviewed save flow. The prominent question updates with accepted assumptions. Bare questions do not import hidden scenario assumptions. See [acceptance and boundaries](../../../docs/scenario-workflow-parity.md).

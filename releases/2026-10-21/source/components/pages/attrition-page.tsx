@@ -65,7 +65,7 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
             {[
               ["Voluntary Turnover YTD", summary.voluntary_turnover_ytd_pct.toFixed(1) + "%", summary.voluntary_exits.toLocaleString() + " voluntary exits", "Voluntary exits year to date divided by average monthly headcount over the same period."],
               ["Annualized Voluntary", summary.annualized_voluntary_turnover_pct.toFixed(1) + "%", "Run-rate based on Jan-Sep", "Current year-to-date voluntary turnover converted to a 12-month run rate. It is a pace indicator, not a forecast."],
-              ["Regrettable Exits", summary.regrettable_exits.toLocaleString(), summary.regrettable_share_of_voluntary_pct.toFixed(1) + "% of voluntary exits", "Voluntary exits flagged as regrettable in the synthetic separation data. This is a supplied classification, not an AI judgment."],
+              ["Regrettable Exits", typeof summary.regrettable_exits==='number'?summary.regrettable_exits.toLocaleString():'Unavailable', typeof summary.regrettable_share_of_voluntary_pct==='number'?summary.regrettable_share_of_voluntary_pct.toFixed(1)+'% of voluntary exits':'Classification share unavailable', "Source-reported exits flagged as regrettable. Zero means none flagged in the supplied data; it does not establish that every exit was assessed. Missing counts remain unavailable."],
               ["Total Exits YTD", summary.total_exits.toLocaleString(), summary.total_turnover_ytd_pct.toFixed(1) + "% total turnover", "All recorded separations year to date, including voluntary, involuntary, retirement, and other recorded exits."],
             ].map(([label, value, note, definition]) => (
               <div key={label} className="rounded-lg border p-4">
@@ -93,7 +93,7 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
                     <XAxis dataKey="month" tickFormatter={monthLabel} tick={{ fontSize: 11 }} />
                     <YAxis tickFormatter={(v) => v + "%"} tick={{ fontSize: 11 }} />
                     <Tooltip labelFormatter={(v) => monthLabel(String(v))} formatter={(v) => [Number(v).toFixed(2) + "%", "Voluntary turnover"]} />
-                    <Line type="monotone" dataKey="monthly_voluntary_turnover_pct" stroke="currentColor" strokeWidth={2.5} dot={{ r: 3 }} />
+                    <Line type="linear" dataKey="monthly_voluntary_turnover_pct" stroke="currentColor" strokeWidth={2.5} dot={{ r: 3 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -104,7 +104,7 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
               <p className="mb-4 text-sm text-muted-foreground">YTD rate using average monthly headcount</p>
               <div className="evidence-chart">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data.business_units} layout="vertical" margin={{ left: 90 }}>
+                  <BarChart data={data.business_units.map(row=>({...row,org_name:catalogDisplayLabel(row.org_name)}))} layout="vertical" margin={{ left: 90 }}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
                     <XAxis type="number" tickFormatter={(v) => v + "%"} tick={{ fontSize: 11 }} />
                     <YAxis type="category" dataKey="org_name" width={120} tick={{ fontSize: 10 }} />
@@ -127,8 +127,8 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
                     <th className="pb-3 text-right">Exits</th><th className="pb-3 text-right">Share</th>
                   </tr></thead>
                   <tbody>{data.reasons.map((row) => (
-                    <tr key={row.separation_reason} className="border-b last:border-0">
-                      <td className="py-3 font-medium">{row.separation_reason}</td>
+                    <tr key={row.separation_reason.replace(/^Constructed demo (voluntary|involuntary)$/i, '$1 (constructed classification)')} className="border-b last:border-0">
+                      <td className="py-3 font-medium">{row.separation_reason.replace(/^Constructed demo (voluntary|involuntary)$/i, '$1 (constructed classification)')}</td>
                       <td className="py-3 capitalize">{row.separation_type.replaceAll("_", " ")}</td>
                       <td className="py-3 text-right">{row.exits}</td>
                       <td className="py-3 text-right">{row.pct_of_exits.toFixed(1)}%</td>
@@ -172,7 +172,7 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
                     <td className="py-3">{catalogDisplayLabel(row.level_name)}</td>
                     <td className="py-3 text-right">{row.exits}</td>
                     <td className="py-3 text-right">{row.voluntary_exits}</td>
-                    <td className="py-3 text-right">{row.regrettable_exits}</td>
+                    <td className="py-3 text-right">{typeof row.regrettable_exits==='number'?row.regrettable_exits.toLocaleString():'Unavailable'}</td>
                   </tr>
                 ))}</tbody>
               </table>

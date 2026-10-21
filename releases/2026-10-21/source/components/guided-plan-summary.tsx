@@ -11,7 +11,7 @@ export function GuidedPlanSummary({draft,compact=false}:{draft:BundleDraft;compa
   {summary.target&&(compact?<div aria-label="Conditional capacity target">
    <p><strong>Scenario target:</strong> {summary.target.roles} whole roles by {summary.target.deadline}.</p>
    <p>{summary.target.population} · {summary.target.metric}. Roles are not added company headcount.</p>
-   <p><strong>Still unverified:</strong> Baseline: Unknown. Measured outcome: Unknown. Availability, source-team release, skill readiness and funding need confirmation. Proposed milestones do not prove capacity achieved.</p>
+   <p>Starting qualified capacity assumption: {summary.target.baselineFte??'Unknown'} FTE. This is the scenario input, not measured capacity.</p><p><strong>Still unverified:</strong> Measured baseline and later outcome for additional-role delivery. Availability, source-team release, skill readiness and funding need confirmation. Proposed milestones do not prove capacity achieved.</p>
    <details><summary className="min-h-11 cursor-pointer py-2 font-medium">Measurement details and assumptions</summary>{summary.target.lines.filter((_,index)=>index===2||index===3||index===5).map(line=><p key={line}>{line}</p>)}<p>Partial readiness months are excluded.</p></details>
   </div>:<div aria-label="Conditional capacity target">{summary.target.lines.map(line=><p key={line}>{line}</p>)}</div>)}
   <StaffingOptionCost draft={draft} cash={summary.cashBreakdown}/>

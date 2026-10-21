@@ -1,5 +1,11 @@
+// @ts-expect-error Native Node tests share application source.
+import {guidedBusinessPlanning} from './guided-business-planning.ts';
+// @ts-expect-error Native Node tests share application source.
+import {prepareBusinessPlanningSelection,businessPlanningSelectionFields,businessPlanningReceiptField} from './home-business-planning-save.ts';
+// @ts-expect-error Native Node tests share application source.
+import {selectStaffingOptions} from './staffing-option-presentation.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
-import {optionMonthlyCoverage,monthlyCapacityEffort} from './guided-plan-summary.ts';
+import {optionMonthlyCoverage,monthlyCapacityEffort,guidedOptionEffort as guidedEffortForRanking} from './guided-plan-summary.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {defaultGuidedWorkload,syncGuidedWorkloadDemand} from './guided-workload.ts';
 /** A presentation/commit adapter over existing staffing, plan and progress contracts.
@@ -101,6 +107,10 @@ export type SwpOption={id:string;label:string;candidate:HomeMixCandidate;draft:B
 /** Uses dependency-gated monthly outputs. Never interpolates or converts role coverage into company headcount. */
 export function swpOptions(evaluation:HomeMixEvaluation):SwpOption[]{
  const {context,report}=evaluation;if(context.status!=='ready'||!report)return [];
+ if(context.source.draft.inputs.guidedWorkload){
+  const all=swpCandidateOptions(evaluation,report.results);
+  return selectStaffingOptions(all.map(o=>({...o,mix:o.candidate.mix,cash:o.candidate.cash.complete,status:o.candidate.status,addedEmployees:o.candidate.metrics?.addedEmployees??o.candidate.mix.buy,shortfallHours:guidedEffortForRanking(o)?.shortfallHours??null}))).map((o,index)=>({...o,label:index===0?'All-hire reference':`Option ${index}`}));
+ }
  const reference=report.reference,selected=[reference];
  const feasible=report.results.filter(c=>c.status==='met'&&c.cash.complete!==null&&!c.isReferenceMix).sort((a,b)=>Number(b.id===report.preferredOptionId)-Number(a.id===report.preferredOptionId)||(a.metrics?.fullCoverageDate??'9999').localeCompare(b.metrics?.fullCoverageDate??'9999'));
  for(const row of feasible){if(selected.length===3)break;if(!selected.some(other=>JSON.stringify(other.mix)===JSON.stringify(row.mix)))selected.push(row);}
@@ -120,6 +130,7 @@ function swpCandidateOptions(evaluation:HomeMixEvaluation,selected:HomeMixCandid
  * Existing eligible choices stay first; fill with lowest cash, then earliest readiness
  * (cash breaks date ties). This is not an economic optimum or a change to save eligibility. */
 export function swpTradeoffOptions(evaluation:HomeMixEvaluation):SwpOption[]{
+ if(evaluation.context.status==='ready'&&evaluation.context.source.draft.inputs.guidedWorkload)return swpOptions(evaluation);
  const selected=swpOptions(evaluation).filter(o=>!o.candidate.isReferenceMix).map(o=>o.candidate);
  const candidates=(evaluation.report?.results??[]).filter(c=>!c.isReferenceMix&&c.cash.complete!==null);
  const cash=(a:HomeMixCandidate,b:HomeMixCandidate)=>a.cash.complete!-b.cash.complete!;
@@ -135,7 +146,7 @@ export function serviceOptionEffort(option:SwpOption,bridge:SwpDemandBridge){
  if(!option.coverage||option.coverage.length!==months||option.coverage.some(v=>v===null))return {status:'unknown' as const,additionalHours:null,totalHours:null,shortfallHours:null};
  const covered=optionMonthlyCoverage(option);if(covered===null)return {status:'unknown' as const,additionalHours:null,totalHours:null,shortfallHours:null};
  const {additionalHours,totalHours,shortfallHours}=monthlyCapacityEffort(covered,r.result.workloadHours!/months,r.result.capacityHours!/months,r.result.productiveHoursInHorizon!/months);
- return {status:shortfallHours>1e-7?'shortfall' as const:'conditional-coverage' as const,additionalHours,totalHours,shortfallHours,assumption:'Uniform monthly productive hours; any partial effective readiness month is conservatively excluded. Monthly shortages are summed; surplus is not carried between months. No peak or service-level model.'};
+ return {status:shortfallHours>1e-7?'shortfall' as const:'conditional-coverage' as const,additionalHours,totalHours,shortfallHours,assumption:'Uniform monthly productive hours; partial effective readiness months are prorated by calendar days. Monthly shortages are summed; surplus is not carried between months. No peak or service-level model.'};
 }
 export async function compareSwpDemo(draft:BundleDraft,signal?:AbortSignal){
  if(!readBundleDraft(draft))throw Error('Review a valid scoped draft.');
@@ -159,6 +170,22 @@ export async function prepareSwpSelection(store:DecisionStore,draft:BundleDraft,
  if(saved&&saved.datasetToken===token&&bundleInputKey(saved.draft)===bundleInputKey(draft)&&saved.candidateId===candidateId&&catalog?.attachments.some(a=>a.planId===saved.selectedPlanId&&a.purpose==='proposal-selection'))return {alreadySaved:true as const,goal,revision,fields:null};
  const evaluation=await verifyHomeMix(raw,draft,signal);guard();
  const option=evaluation&&swpOptions(evaluation).find(o=>o.id===candidateId);
+ if(draft.inputs.guidedWorkload){
+  if(!evaluation||!option)throw Error('Choose an option from the current verified comparison.');
+  const state=guidedBusinessPlanning(draft,token),prepared=await prepareBusinessPlanningSelection(state,candidateId);guard();
+  // Retain the dependency-checked guide as audit/restore metadata, but save through the ordinary adapter.
+  if(prepared.option.cash!==option.candidate.cash.complete||prepared.option.coverageDate!==option.candidate.metrics?.fullCoverageDate||Math.abs((prepared.option.shortfallHours??NaN)-(guidedEffortForRanking(option)?.shortfallHours??NaN))>1e-7)throw Error('The guided and ordinary selection contracts differ. Review the explicit inputs.');
+  const shared=businessPlanningSelectionFields(prepared,catalog,'swp-choice-'+revision,at,fields[businessPlanningReceiptField]);
+  const next=readPlanAlternatives(shared[planAlternativesField],{goalId:goal.id,goal:goal.statement})!;
+  const planId=shared[businessPlanningReceiptField].at(-1)!.planId,plan=next.plans.find(p=>p.id===planId)!;
+  const existing=fields[goalProgressField];let ledger=existing===undefined?emptyGoalProgress(goal.id,'demo'):readGoalProgressLedger(existing,goal.id);
+  const prior=ledger.events.filter(e=>e.kind==='measurement').at(-1),measurementId='swp-measure-'+revision;
+  ledger=appendGoalProgressEvent(ledger,{id:measurementId,at,supersedes:prior?.id??null,kind:'measurement',data:{metric:'additional-role-coverage',definition:'Conditional additional roles in the named unit and role; not company headcount.',unit:'roles',direction:'increase',scope:{country:'Fictional scenario',org:draft.inputs.scope.businessUnit.value!,level:draft.inputs.scope.jobProfile.value!},lineageId:'swp-demo-conditional-coverage',baselineId:null,target:{value:draft.inputs.scope.demand.value!,date:swpEnd(draft)},maxAgeDays:90,provenance:'Reviewed fictional scenario target; no baseline or realized outcome asserted.'}});
+  ledger=appendGoalProgressEvent(ledger,{id:'swp-link-'+revision,at,supersedes:null,kind:'plan-linked',data:{planId,revision:plan.draft.revision,inputKey:plan.result.inputKey,evidenceDigest:plan.draft.binding.evidenceDigest,datasetToken:token}});
+  if(prepared.option.coverageDate)ledger=appendGoalProgressEvent(ledger,{id:'swp-milestone-'+revision,at,supersedes:null,kind:'milestone-proposed',data:{measurementId,value:draft.inputs.scope.demand.value!,date:prepared.option.coverageDate,provenance:'Proposed conditional role-coverage checkpoint; readiness and operational release require validation.'}});
+  guard();return {alreadySaved:false as const,goal,revision,fields:{...shared,[swpDemoField]:{version:1,datasetToken:token,draft,candidateId,selectedPlanId:planId},[goalProgressField]:ledger} as unknown as Record<string,Json>};
+ }
+
  if(!option||option.candidate.status!=='met'||option.candidate.cash.complete===null)throw Error('Choose an available option that meets the entered scenario limits.');
  // The verified reference retains the source draft; only emitted alternatives need a proposal.
  const mix=await prepareHomeMixCommit(draft,evaluation,option.candidate.isReferenceMix?null:candidateId,at,fields[homeMixHistoryField],signal);guard();if(demandBridge)validateDemandBridge(mix.draft,demandBridge,token);

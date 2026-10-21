@@ -41,6 +41,11 @@ export async function prepareBusinessPlanningSelection(raw:BusinessPlanning,opti
  i.costReviews=components.map(c=>({componentId:c.id,complete:fromAtom<boolean>(values.costsCompleteAndDistinct)}));
  i.expenseLinks=[['hireStaffingCost','c1'],['recruitingFees',option.mix.buy?'c1':components[0].id],['backfillStaffingCost',components.find(c=>c.domain!=='hiring')?.id??components[0].id],['internalSalaryUplift',components.find(c=>c.domain!=='hiring')?.id??components[0].id],['trainingCash','c2']].filter(([,id])=>components.some(c=>c.id===id)).map(([field,id])=>({expenseId:'capacity:'+field,componentIds:[id],allocations:null}));
  i.budget={amount:proposed(s.budgetUsd.value,`${s.budgetUsd.basis.kind}: ${s.budgetUsd.basis.explanation}`),basis:proposed('cash')};
+ // Preserve the workload summary through the same save adapter for either entry.
+ // availabilityPct already means qualified available allocation; represent it once,
+ // with a 100% conversion factor, not a new claim about employee proficiency.
+ const monthly=(q:typeof s.hoursPerContract)=>q.value===null?null:q.period==='month'?q.value:q.period==='year'?q.value/12:q.period==='horizon'?q.value/s.months!:null;
+ if(state.review.result.status==='calculated')i.guidedWorkload={version:1,volume:proposed(s.contracts.value),hoursPerUnit:proposed(monthly(s.hoursPerContract)),productiveHours:proposed(monthly(s.productiveHoursPerFte)),existingPeople:proposed(s.existingRoles.value),ftePerPerson:proposed(s.existingFtePerRole.value),allocationPct:proposed(s.availabilityPct.value,'Qualified available allocation from the original demand review; original decomposition and provenance remain in the receipt.'),skillCoveragePct:proposed(100,'Identity conversion only: qualification is already included in the available allocation. Not a measured proficiency share.')};
  const result=reviewBundleProposal(draft);
  if(result.cashEstimate?.cash!==option.cash)throw Error('The selected proposal cash does not match its checked comparison.');
  return {state,option,draft,result,goal};
