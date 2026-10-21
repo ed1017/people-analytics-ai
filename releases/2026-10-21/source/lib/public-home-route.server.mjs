@@ -43,6 +43,10 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
   const url=new URL(request.url);
   if(!/^people-analytics-[a-z0-9]+-ed-56dc\.vercel\.app$/.test(hostname)||url.protocol!=='https:'||url.host!==hostname||url.pathname!=='/api/home-solution-conversation'||!['POST','GET'].includes(request.method))return Response.json({error:'Unsupported Home request.'},{status:404,headers});
   if(request.headers.get('x-workforce-dataset')!==P.token)return Response.json({error:'Dataset changed.'},{status:409,headers});
+  const requestedLimit=request.headers.get('x-workforce-max-rounds');
+  if(requestedLimit!==null&&requestedLimit!=='2')return Response.json({error:'Unsupported lower round limit.'},{status:400,headers});
+  const roundLimit=requestedLimit==='2'?2:4;
+  let completedRounds=0,stage='validation';
   if(!Number.isInteger(timeoutMs)||timeoutMs<1||timeoutMs>90000)return Response.json({error:'Invalid deadline.'},{status:503,headers});
   const controller=new AbortController(),signal=AbortSignal.any([request.signal,controller.signal]),timer=setTimeout(()=>controller.abort(),timeoutMs);
   try{signal.throwIfAborted();return await awaitPublicQaBinding((async()=>{
@@ -69,20 +73,20 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
    const contextId=hash({identity,request:parsed}),requestTime=new Date();let round=0,completion;
    const currentContext=()=>{current();return contextId;};
    const planningInstructions=staffingScenarioOnly?'':solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions+'\n'+hiringBudgetInstructions+'\n'+requiredStaffingInstructions:'');
-   const reply=await converseSolutions(parsed,{grounding,staffingScenarioOnly,requestTime,
+   const reply=await converseSolutions(parsed,{grounding,staffingScenarioOnly,requestTime,...(roundLimit===2?{maxModelRounds:2}:{}),
     ...(natural?{natural:{datasetToken:P.token}}:{}),...(demand?{demand:{datasetToken:P.token,referenceContract:true}}:{}),progress:{enabled:progressEnabled===true,datasetToken:P.token},
     complete:async(input,finalOnly,completionSignal,capabilities)=>{
-     current();must(!staffingScenarioOnly&&typeof completionFactory==='function');
+     current();must(round<roundLimit&&!staffingScenarioOnly&&typeof completionFactory==='function');stage='provider';
      completion??=completionFactory({requestId:parsed.requestId,contextId,datasetToken:P.token,currentContext});must(typeof completion?.complete==='function');
      const progress=progressModelContract(progressEnabled===true,capabilities.progressEntryEnabled);
      const tools=capabilities.requiredStaffingCalculation?[requiredStaffingTool]:demand?demandReferenceModelContract.tools:[...solutionTools,...progress.tools,...(natural?businessPlanningModelTools:[])];
      const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+'\n'+solutionCompletionInstructions+progress.instructions)+planningInstructions;
      const response=await completion.complete({model:'gpt-6.1-sol',reasoning:{effort:'medium'},service_tier:'default',store:false,include:['reasoning.encrypted_content'],instructions,input,tools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{signal:completionSignal,requestId:parsed.requestId,contextId,datasetToken:P.token,round:++round});
-     current();must(response&&Array.isArray(response.output));
+     completedRounds++;stage='answer-validation-or-calculation';current();must(response&&Array.isArray(response.output));
      return {completed:response.status==='completed',items:toResponseInputItems(response.output),calls:response.output.filter(item=>item.type==='function_call').map(item=>({id:item.call_id,name:item.name,arguments:item.arguments})),text:response.output_text};
     },loadProjection:async(filters,readSignal)=>{current();const source=await loadProjection(readSignal),inputs=await source.projection(filters,readSignal);current();must(inputs.datasetVersion.publicDigest===identity.digest);return inputs;}
    },signal);current();return Response.json(reply,{headers});
-  })(),signal);}catch{return Response.json({error:'The public Home conversation or evidence could not be verified. Earlier work is preserved.'},{status:503,headers});}
+  })(),signal);}catch{return Response.json({error:'The public Home conversation or evidence could not be verified. Earlier work is preserved.',...(roundLimit===2?{boundedRequest:{maxModelRounds:2,completedRounds,stage}}:{})},{status:503,headers});}
   finally{clearTimeout(timer);controller.abort();}
  }});
 }
