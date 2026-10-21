@@ -2,10 +2,10 @@
 
 This directory publishes the application source from the reviewed 9,037-person release at https://www.ed-ai.app. It is a source snapshot, not a deployable replacement for the root development application.
 
-- Deployed source commit: `b554a4f4a7c4807f3a8f6704364c37a03adb2457` (local release identity; not a GitHub commit link).
-- Verified deployment: `dpl_DJ8jpXE5fkTUJvnFy3PPDBP2fC4G`.
-- Original deployed package SHA-256: `03cdb993488e7b3d245417c5e78f486ab78024e637284dc73b5cf02f7d1db411`.
-- `source/` contains 724 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before promotion; the release handoff records the promotion outcome separately.
+- Deployed source commit: `6712a9281aca806ff95b8556efd3d3f24ee143c4` (local release identity; not a GitHub commit link).
+- Verified deployment: `dpl_8oyjQVeL3nuiQDzfzX2ts5mH6QpU`.
+- Original deployed package SHA-256: `8d004072c820f459c0722b113009f5ac23b000de09f872b0378c43771e5fa021`.
+- `source/` contains 725 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before promotion; the release handoff records the promotion outcome separately.
 
 Verify without dependencies, credentials or network:
 
@@ -68,3 +68,7 @@ Seventeen synthetic regressions cover complete rankings, exact-question/paraphra
 The same five private aggregate inputs are unchanged and remain excluded from this repository. No model, budget cap, accounting permission or persistent project configuration changes accompany this repair. The existing exact-project runtime guard remains enforced; staging supplies the already verified, non-secret organization ID as deployment-scoped metadata.
 
 The browser request was checked at desktop 1440px and phone 390px. Retained-answer presentation checks rebind only local replay request/turn IDs; they do not make another paid request. Survey answers preserve the left transcript/right visual panel; no unsupported survey chart is generated.
+
+## Catalog and skills retrieval
+
+The [coverage contract](../../../docs/catalog-skills-grounding.md) adds published job compa comparisons, complete listed policy bands and three explicitly bounded skills lists. Eight targeted regressions, five actual application route cases with simulated provider/accounting, existing registry/server checks and independent review cover the increment. No additional paid model call was made for this mechanical registry extension.

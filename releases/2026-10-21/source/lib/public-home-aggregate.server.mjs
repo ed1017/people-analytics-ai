@@ -15,7 +15,7 @@ export function formatHomeAggregate(result){
   const plain=label.replace(/[\\`*_[\]<>]/g,'');
   return `${row.rank}. ${plain}: ${row.value.toLocaleString('en-US',{maximumFractionDigits:10})} ${result.unit}`;
  });
- return [title,result.scope,result.period,...labels,...(result.excludedGroups?[`${result.excludedGroups} groups have unknown values and are excluded; this does not rank them as zero.`]:[]),...(result.truncated?[`Showing ${result.returnedGroups} of ${result.eligibleGroups} eligible groups after ranking the whole released collection; ties at the cutoff are retained.`]:[]),...result.limitations].join('\n\n');
+ return [title,result.scope,result.period,...labels,...(result.excludedGroups?[`${result.excludedGroups} groups are excluded: ${result.exclusionReason}. They are not ranked as zero.`]:[]),...(result.truncated?[`Showing ${result.returnedGroups} of ${result.eligibleGroups} eligible groups after ranking the whole released collection; ties at the cutoff are retained.`]:[]),...result.limitations].join('\n\n');
 }
 
 /** Uses only the already-authenticated server binding and reviewed public aggregate routes. */
