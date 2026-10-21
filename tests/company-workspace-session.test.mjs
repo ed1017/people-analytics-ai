@@ -1,11 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {CompanyWorkspaceSession} from '../lib/public-fixture/company-workspace-session.ts';
+import {CompanyWorkspaceSession,companyWorkspaceToken} from '../lib/public-fixture/company-workspace-session.ts';
 import {createCompanyBinding} from '../lib/public-fixture/company-binding.mjs';
 import {createCompanyDashboard} from '../lib/public-fixture/company-dashboard.server.mjs';
 import {sha256} from '../lib/public-fixture/read-provider.mjs';
-import {datasetDecisionKey} from '../releases/2026-10-21/source/lib/local-decisions.ts';
+import {DecisionStore,datasetDecisionKey as originalKey} from '../releases/2026-10-21/source/lib/local-decisions.ts';
+const datasetDecisionKey=token=>originalKey(companyWorkspaceToken(token));
 const read=name=>readFileSync(new URL('./fixtures/company-import/'+name,import.meta.url),'utf8').replaceAll('\r\n','\n');
 function fixture(company,revision=''){
  const config=JSON.parse(read('lantern-config.json'));config.companyKey=company;
@@ -19,6 +20,12 @@ test('activation generation increases across companies and return; storage snaps
  const {s}=setup();const first=s.select(a.datasetToken);s.select(b.datasetToken);const returned=s.select(a.datasetToken);
  assert.match(first.activationToken,/:1$/);assert.match(returned.activationToken,/:3$/);assert.equal(returned.snapshotToken,first.snapshotToken);
  assert.deepEqual(s.select(a.datasetToken),returned);
+});
+test('existing Home shell store cannot collide with company workspace storage',()=>{
+ const {s,storage,recovery}=setup();const shell=new DecisionStore(a.datasetToken);shell.initialize(storage,undefined,recovery);
+ s.select(a.datasetToken);s.workspace().setField('','companyHome',{question:'company only'});const before=storage.getItem(datasetDecisionKey(a.datasetToken));
+ shell.setField('','chat',{messages:[],input:'shell only',problem:null});assert.equal(storage.getItem(datasetDecisionKey(a.datasetToken)),before);
+ s.select(b.datasetToken);s.select(a.datasetToken);assert.deepEqual(s.workspace().getField('','companyHome',null),{question:'company only'});assert.equal(s.workspace().getField('','chat',null),null);
 });
 test('actual current-release DecisionStore preserves zero assumptions, goal and plan on return/reopen with no cross-company seeding',()=>{
  const {s,storage,recovery}=setup();s.select(a.datasetToken);

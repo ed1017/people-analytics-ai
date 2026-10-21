@@ -7,6 +7,10 @@ import {readCompanyDashboard} from './company-dashboard.mjs';
 type Port={getItem:(key:string)=>string|null;setItem:(key:string,value:string)=>unknown;removeItem:(key:string)=>unknown};
 type Dashboard=ReturnType<typeof readCompanyDashboard>;
 type Selection={activationToken:string;snapshotToken:string;companyKey:string;asOf:string};
+export function companyWorkspaceToken(snapshotToken:string){
+ if(!/^invented-company-[a-f0-9]{64}:1$/.test(snapshotToken))throw Error('Invalid company snapshot');
+ return snapshotToken.replace('invented-company-','invented-workspace-');
+}
 
 /** Transport generations order activations; immutable snapshot tokens key storage.
  * Returning to a snapshot reopens its workspace without reviving old responses.
@@ -41,7 +45,7 @@ export class CompanyWorkspaceSession {
   const generation=Number(this.session.current().split(':')[1])+1;
   if(!Number.isSafeInteger(generation)||generation>999999999999)throw Error('Activation generation exhausted');
   const activationToken=snapshotToken.replace(/:1$/,':'+generation);
-  const next=this.pending.get(snapshotToken)??new DecisionStore(snapshotToken); // No prior-company goal seed.
+  const next=this.pending.get(snapshotToken)??new DecisionStore(companyWorkspaceToken(snapshotToken)); // Separate from the shell's store; no goal seed.
   this.pending.set(snapshotToken,next);
   next.initialize(this.storage,undefined,this.recovery);
   next.invalidateExternalChange();

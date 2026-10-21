@@ -8,6 +8,7 @@ From a clean checkout with Node and npm:
 
 ```sh
 node --test tests/company-dashboard.test.mjs tests/company-binding.test.mjs
+node --test tests/company-workspace-session.test.mjs
 node tools/prepare-company-home.mjs ../company-home
 cd ../company-home
 npm ci
@@ -27,10 +28,20 @@ The invented August/September snapshots are 7/9 people and 6/7.75 FTE, respectiv
 
 This is a partial Home capability integration, not full real-company readiness or general conversational AI. Production's complete-dashboard receipt is unchanged. No legacy demo values fill gaps.
 
+## Local company/snapshot controls
+
+The unpublished transition increment also generates two fixed invented variants from the reviewed Lantern fixture: Second company has 14/18 people and 12/15.5 FTE; revised Lantern has 21/27 people and 18/23.25 FTE. These are intentionally synthetic test transformations, not independently sourced company totals. No arbitrary file, company or upload input is accepted.
+
+Home's selector opens one exact snapshot. The server returns only a registered snapshot whose digest matches the activation header; the client separately rejects completions from older activations. The immutable snapshot keys saved conversations and drafts in a dedicated `invented-workspace-` namespace, separate from the existing Home shell. Selection is tab-local in sessionStorage. Returning to a snapshot or reloading restores its conversation; revised source starts separately and does not silently copy old goals/evidence.
+
+Failed saves prevent switching. Pending target recovery is visible without activating that company; explicit recovery and retry use the existing DecisionStore conflict controls. Source retry refreshes React state from the recovered record. At 100 saved answers, further submissions are refused without discarding history or the draft. Unsupported answers still remove the chart, and failed/loading requests withhold prior company values.
+
+Run `node tools/verify-company-transitions-browser.mjs` with the same optional Playwright/browser environment variables for the integrated desktop/mobile selection, reload, delayed response, quota/recovery and transcript-limit journey. This tests local synthetic Home, not production tenant authentication or hosted persistence.
+
 ## Remaining acceptance boundaries
 
 - A real-company source needs explicit data approval, validated mappings/controls, and separately authorized storage/access configuration. This tool deliberately cannot load arbitrary files or credentials.
 - Cost, turnover and recruiting need numerator/denominator, currency, period and scope contracts before they can appear as supported capabilities.
-- Planning, AI grounding, persistence and company selection require company-isolated integration acceptance; this fixture does not establish them.
+- Planning, AI grounding, real-company selection and hosted persistence remain unverified. Local synthetic selection and browser storage acceptance do not establish those capabilities.
 - Accounting-only fresh-database bootstrap remains separate from full application schema/bootstrap. Refer to `fresh-company-bootstrap.md` and `company-provider-integration.md`.
 - Current live AI windows still expire October 22 09:59 UTC, with application cutoff 09:57:30; this offline tool neither renews them nor changes cumulative spending.

@@ -1,0 +1,38 @@
+import fs from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {parseDecisions,encodeDecisions} from '../releases/2026-10-21/source/lib/local-decisions.ts';
+const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const origin='http://127.0.0.1:3098',result={checks:[],errors:[],external:[]};
+const browser=await chromium.launch({headless:true,...(process.env.BROWSER_EXECUTABLE?{executablePath:process.env.BROWSER_EXECUTABLE}:{})});let last;
+try{for(const width of [1440,390]){
+ const context=await browser.newContext({viewport:{width,height:1000}}),page=await context.newPage();last=page;page.setDefaultTimeout(15000);
+ page.on('pageerror',e=>result.errors.push(e.message));await context.route('**/*',r=>{if(new URL(r.request().url()).origin!==origin){result.external.push(r.request().url());return r.abort();}return r.continue();});
+ await page.goto(origin);const home=page.getByRole('region',{name:'Synthetic company Home'}),chat=home.getByLabel('Home chat workspace'),visual=home.getByLabel('Current answer visuals'),input=home.getByLabel('Ask about recorded company headcount or FTE'),select=home.getByLabel('Company and snapshot');
+ const choose=async index=>{await select.selectOption({index});await home.getByRole('button',{name:'Open selected snapshot',exact:true}).click();};
+ const count=async n=>{await page.waitForFunction(n=>document.querySelector('[aria-label="Current answer visuals"] strong')?.textContent===String(n),n);};
+ await count(9);await home.getByRole('button',{name:'How has our headcount changed?',exact:true}).click();await input.fill('A draft');
+ await choose(1);await count(18);assert.equal(await chat.innerText(),'');assert.equal(await input.inputValue(),'');
+ await home.getByRole('button',{name:'What is our FTE?',exact:true}).click();assert.match(await chat.innerText(),/18 people and 15.5 FTE/);
+ await page.reload();await count(18);assert.match(await chat.innerText(),/18 people and 15.5 FTE/);
+ const l=await chat.boundingBox(),r=await visual.boundingBox();assert.ok(width>700?r.x>l.x:r.y>l.y);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await page.screenshot({path:'company-transition-home-'+width+'.png',fullPage:true});
+ await choose(0);await count(9);assert.equal(await input.inputValue(),'A draft');assert.match(await chat.innerText(),/9 people and 7.75 FTE/);assert.doesNotMatch(await chat.innerText(),/18 people/);
+ await choose(2);await count(27);assert.equal(await chat.innerText(),'');assert.equal(await input.inputValue(),'');
+ await home.getByRole('button',{name:'What was turnover last year?',exact:true}).click();await visual.getByText('No supported visual for this question. No earlier chart is reused.').waitFor();assert.equal(await visual.locator('svg').count(),0);
+ let release,started;const held=new Promise(r=>release=r),pending=new Promise(r=>started=r);let intercepted=false;
+ await context.route('**/api/company-dashboard',async route=>{if(!intercepted){intercepted=true;started();await held;try{await route.continue();}catch{}return;}await route.continue();});
+ await choose(1);await pending;assert.equal(await chat.innerText(),'');assert.equal(await visual.locator('svg').count(),0);await choose(0);await count(9);release();await page.waitForTimeout(200);await count(9);assert.doesNotMatch(await chat.innerText(),/18 people/);await context.unroute('**/api/company-dashboard');
+ await page.evaluate(()=>{const old=Storage.prototype.setItem;window.fixtureWriteFail=true;Storage.prototype.setItem=function(k,v){if(this===localStorage&&window.fixtureWriteFail&&k.includes('insights-to-action.decisions.v1.dataset.'))throw Error('Synthetic quota failure');return old.call(this,k,v);};});
+ await input.fill('A unsaved draft');await choose(1);await home.getByText('Save or resolve the current workspace before switching',{exact:true}).waitFor();await count(9);assert.equal(await input.inputValue(),'A unsaved draft');
+ await page.evaluate(()=>window.fixtureWriteFail=false);await home.getByRole('button',{name:'Retry saving current workspace'}).click();await choose(1);await count(18);
+ await page.evaluate(()=>window.fixtureWriteFail=true);await input.fill('B recovered draft');await page.reload();await home.getByRole('region',{name:'Target workspace recovery'}).waitFor();assert.equal(await chat.innerText(),'');
+ await home.getByRole('button',{name:'Recover target workspace and open'}).click();await count(18);assert.equal(await input.inputValue(),'B recovered draft');await choose(0);await count(9);assert.equal(await input.inputValue(),'A unsaved draft');
+ assert.match(await visual.innerText(),/Unavailable/);assert.doesNotMatch(await home.innerText(),/9,037/);
+ const stored=await page.evaluate(()=>{const token=sessionStorage.getItem('invented-company-home.selection.v1'),key='insights-to-action.decisions.v1.dataset.'+token.replace('invented-company-','invented-workspace-');return{key,raw:localStorage.getItem(key)};});
+ const envelope=parseDecisions(stored.raw);envelope.exploration.fields.companyHome={messages:Array.from({length:100},(_,i)=>({question:'Synthetic question '+i,text:'Synthetic answer '+i,supported:false})),question:'Retained draft',showVisual:false};
+ await page.evaluate(({key,raw})=>localStorage.setItem(key,raw),{key:stored.key,raw:encodeDecisions(envelope)});await page.reload();await input.waitFor();await page.waitForFunction(()=>document.querySelector('#company-question')?.value==='Retained draft');
+ await home.getByRole('button',{name:'What is our FTE?',exact:true}).click();await home.getByText('This snapshot has 100 saved answers. Existing history and your draft are retained; no answer was added.',{exact:true}).waitFor();assert.equal(await chat.locator('article').count(),100);assert.equal(await input.inputValue(),'Retained draft');
+ await page.reload();await page.waitForFunction(()=>document.querySelector('#company-question')?.value==='Retained draft');assert.equal(await chat.locator('article').count(),100);
+ result.checks.push({width,companySwitch:true,snapshotRevision:true,saveReload:true,delayedResponse:true,quotaBlocksSwitch:true,targetRecovery:true,transcriptLimitRetainsHistory:true,missingMetrics:true,noOverflow:true});await context.close();
+}assert.deepEqual(result.errors,[]);assert.deepEqual(result.external,[]);}catch(e){result.failure=String(e.stack??e);if(last&&!last.isClosed()){result.body=await last.locator('body').innerText();await last.screenshot({path:'company-transition-home-failure.png',fullPage:true});}process.exitCode=1;}finally{await browser.close();await fs.writeFile('COMPANY-TRANSITION-HOME-BROWSER.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));}

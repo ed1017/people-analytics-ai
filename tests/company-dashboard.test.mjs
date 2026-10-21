@@ -37,3 +37,11 @@ test('actual Request handler denies external domains writes scopes and full dash
  assert.equal(handle(req('/')),null);
  assert.deepEqual((await handle(req('/api/public-ai-capabilities')).json()).routes,[]);
 });
+test('registered snapshot and activation must agree; later generations never select another snapshot',async()=>{
+ const second=structuredClone(dashboard);second.token='invented-company-'+'b'.repeat(64)+':1';second.value.datasetToken=second.token;second.value.companyKey='second-invented';
+ const handle=createCompanyHomeHandler([dashboard,second]);
+ const request=(snapshot,activation)=>new Request('http://127.0.0.1:3098/api/company-dashboard',{headers:{'x-workforce-snapshot':snapshot,'x-workforce-dataset':activation}});
+ const later=second.token.replace(/:1$/,':3'),r=handle(request(second.token,later));assert.equal(r.status,200);assert.equal(r.headers.get('x-workforce-dataset'),later);assert.equal(r.headers.get('x-workforce-snapshot'),second.token);assert.equal((await r.json()).companyKey,'second-invented');
+ for(const activation of [dashboard.token,second.token.replace(/:1$/,':0'),second.token.replace(/:1$/,':-1'),second.token.replace(/:1$/,':01')])assert.equal(handle(request(second.token,activation)).status,409);
+ assert.equal(handle(request('unknown',later)).status,409);
+});
