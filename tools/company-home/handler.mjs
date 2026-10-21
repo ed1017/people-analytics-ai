@@ -1,5 +1,6 @@
 export function createCompanyHomeHandler(dashboard){
- const token=dashboard.token;
+ const registry=Array.isArray(dashboard)?dashboard:[dashboard];
+ const token=registry[0].token;
  const reply=(body,status=200)=>Response.json(body,{status,headers:{'x-workforce-dataset':token,'cache-control':'no-store','x-content-type-options':'nosniff'}});
  return (request,env={})=>{
   const u=new URL(request.url);
@@ -12,8 +13,10 @@ export function createCompanyHomeHandler(dashboard){
   if(!u.pathname.startsWith('/api/'))return u.pathname==='/'&&!u.search||u.pathname.startsWith('/_next/')||u.pathname==='/favicon.ico'?null:reply({error:'Only company Home is supported'},404);
   if(u.search||request.method!=='GET')return reply({error:'Unsupported method or scope'},400);
   if(u.pathname==='/api/company-dashboard'){
-   if(request.headers.get('x-workforce-dataset')!==token)return reply({error:'Company snapshot changed'},409);
-   return reply(dashboard.value);
+   const activation=request.headers.get('x-workforce-dataset'),snapshot=request.headers.get('x-workforce-snapshot')??activation;
+   const selected=registry.find(d=>d.token===snapshot);
+   if(!selected||typeof activation!=='string'||!/^invented-company-[a-f0-9]{64}:[1-9][0-9]{0,11}$/.test(activation)||activation.split(':')[0]!==selected.token.split(':')[0])return reply({error:'Company snapshot changed'},409);
+   return Response.json(selected.value,{headers:{'x-workforce-dataset':activation,'x-workforce-snapshot':selected.token,'cache-control':'no-store','x-content-type-options':'nosniff'}});
   }
   if(u.pathname==='/api/public-ai-capabilities')return reply({version:2,datasetToken:token,status:'unavailable',expiresAt:new Date(Date.now()+30000).toISOString(),routes:[]});
   return reply({error:'This company does not provide this domain.'},503);

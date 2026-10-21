@@ -1,49 +1,41 @@
 'use client';
-import {useEffect,useRef,useState,useSyncExternalStore} from 'react';
-import {datasetSession} from '@/lib/dataset-client.mjs';
+import {useEffect,useRef,useState} from 'react';
 import {HomeConversationSplit} from '@/components/home-answer-visuals';
 import {HomeHeadcountSummary} from '@/components/home-chat-welcome';
 import {readCompanyDashboard,companyHeadcountAnswer} from '@/lib/company-dashboard.mjs';
-import {expectedCompany} from '@/lib/company-home-identity.mjs';
-
+import {CompanyWorkspaceSession} from '@/lib/company-workspace-session';
+import {dashboards,labels} from '@/lib/company-home-registry.mjs';
+type Saved={messages:{question:string;text:string;supported:boolean}[];question:string;showVisual:boolean};
+const pointer='invented-company-home.selection.v1';
+const empty=():Saved=>({messages:[],question:'',showVisual:true});
+function readSaved(value:unknown):Saved{if(value===null)return empty();const v=value as Saved;if(!v||typeof v.question!=='string'||typeof v.showVisual!=='boolean'||!Array.isArray(v.messages)||v.messages.length>100||v.messages.some(m=>!m||typeof m.question!=='string'||typeof m.text!=='string'||typeof m.supported!=='boolean'))throw Error('Invalid saved conversation');return v;}
 export function PartialCompanyHome(){
- const token=useSyncExternalStore(datasetSession.subscribe,datasetSession.snapshot,datasetSession.snapshot);
- const [data,setData]=useState<ReturnType<typeof readCompanyDashboard>|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[question,setQuestion]=useState(''),[messages,setMessages]=useState<{question:string;text:string;supported:boolean;token:string}[]>([]),[showVisual,setShowVisual]=useState(true),[reload,setReload]=useState(0);
- const sequence=useRef(0);
- const currentData=data?.datasetToken===token&&datasetSession.snapshot()===token?data:null;
- useEffect(()=>{
-  const id=++sequence.current,c=new AbortController();setData(null);setMessages([]);setShowVisual(false);setLoading(true);setError('');
-  if(!token.startsWith('invented-company-'))return()=>c.abort();
-  void (async()=>{try{
-   const r=await fetch('/api/company-dashboard',{headers:{'x-workforce-dataset':token},cache:'no-store',signal:c.signal});
-   if(!r.ok||r.headers.get('x-workforce-dataset')!==token)throw Error('Company source unavailable or changed.');
-   const checked=readCompanyDashboard(await r.json(),token,expectedCompany);
-   if(c.signal.aborted||id!==sequence.current||datasetSession.snapshot()!==token)return;
-   setData(checked);setShowVisual(true);
-  }catch{if(!c.signal.aborted&&id===sequence.current)setError('Company source unavailable or changed. No previous company values are shown.');}
-  finally{if(!c.signal.aborted&&id===sequence.current)setLoading(false);}})();
-  return()=>c.abort();
- },[token,reload]);
- function ask(value:string){if(!currentData||loading||error||!value.trim())return;const answer=companyHeadcountAnswer(currentData,value);setQuestion('');setMessages(old=>[...old,{question:value,text:answer.text,supported:answer.supported,token}]);setShowVisual(answer.supported);}
+ const controller=useRef<CompanyWorkspaceSession|null>(null),sequence=useRef(0);
+ const [selection,setSelection]=useState<ReturnType<CompanyWorkspaceSession['current']>>(null),[choice,setChoice]=useState(dashboards[0].datasetToken),[pending,setPending]=useState('');
+ const [data,setData]=useState<ReturnType<typeof readCompanyDashboard>|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[notice,setNotice]=useState(''),[saved,setSaved]=useState<Saved>(empty),[viewToken,setViewToken]=useState(''),[reload,setReload]=useState(0);
+ const current=controller.current?.current(),currentData=data&&selection&&current?.activationToken===selection.activationToken&&viewToken===selection.activationToken&&data.datasetToken===selection.snapshotToken?data:null;
+ function activate(token:string){const c=controller.current;if(!c)return;try{const next=c.select(token);sequence.current++;setSelection(next);setChoice(token);setPending('');setData(null);setViewToken('');setLoading(true);setError('');setNotice('');try{sessionStorage.setItem(pointer,token);}catch{setNotice('Company selected for this tab, but selection could not be saved for reload.');}setReload(n=>n+1);}catch(e){setNotice(e instanceof Error?e.message:'Selection failed');setPending(c.pendingWorkspace(token)?token:'');}}
+ useEffect(()=>{try{controller.current=new CompanyWorkspaceSession(dashboards,localStorage,sessionStorage);activate(sessionStorage.getItem(pointer)??dashboards[0].datasetToken);}catch{setLoading(false);setError('Saved company selection unavailable. Select a supported synthetic snapshot.');}return()=>{sequence.current++;};},[]);
+ useEffect(()=>{const c=controller.current;if(!c||!selection)return;const captured=c.capture(),id=++sequence.current,abort=new AbortController();setData(null);setLoading(true);setError('');setViewToken('');
+  void(async()=>{try{const r=await fetch('/api/company-dashboard',{headers:{'x-workforce-dataset':captured.activationToken,'x-workforce-snapshot':captured.snapshotToken},cache:'no-store',signal:abort.signal});if(!r.ok||r.headers.get('x-workforce-dataset')!==captured.activationToken||r.headers.get('x-workforce-snapshot')!==captured.snapshotToken)throw Error('Response mismatch');const checked=c.accept(captured,await r.json());if(abort.signal.aborted||id!==sequence.current)return;setSaved(readSaved(c.workspace().getField('','companyHome',null)));setData(checked);setViewToken(captured.activationToken);
+  }catch{if(!abort.signal.aborted&&id===sequence.current)setError('Company source or saved conversation unavailable. No previous company values are shown.');}finally{if(!abort.signal.aborted&&id===sequence.current)setLoading(false);}})();return()=>abort.abort();
+ },[selection,reload]);
+ function persist(next:Saved){const c=controller.current;if(!c||!currentData)return;setSaved(next);c.workspace().setField('','companyHome',next);const state=c.workspace().getSnapshot();setNotice(state.saved?'Workspace saved for this company snapshot.':state.notice??'Workspace not saved. Keep this tab open.');}
+ function ask(value:string){if(!currentData||loading||error||!value.trim())return;if(saved.messages.length>=100){setNotice('This snapshot has 100 saved answers. Existing history and your draft are retained; no answer was added.');return;}const answer=companyHeadcountAnswer(currentData,value);persist({question:'',messages:[...saved.messages,{question:value,text:answer.text,supported:answer.supported}],showVisual:answer.supported});}
+ function recoverTarget(){const c=controller.current,target=c?.pendingWorkspace(pending);if(!c||!target)return;target.retry();const state=target.getSnapshot();if(state.saved&&!state.recovery)activate(pending);else setNotice(state.notice??'Target recovery needs review; saved work was not overwritten.');}
  return <section className="p-4" aria-label="Synthetic company Home">
   <h2 className="text-2xl font-semibold">Plan the workforce your business needs</h2>
+  <div className="my-3 flex flex-wrap gap-2 items-center"><label htmlFor="company-source">Company and snapshot</label><select id="company-source" value={choice} onChange={e=>setChoice(e.target.value)}>{dashboards.map((d:typeof dashboards[number],i:number)=><option key={d.datasetToken} value={d.datasetToken}>{labels[i]}</option>)}</select><button className="min-h-11 border rounded px-3" onClick={()=>activate(choice)}>Open selected snapshot</button></div>
+  {notice&&<p role="status">{notice}</p>}
+  {pending&&<div role="region" aria-label="Target workspace recovery"><p>Recovery required for {labels[dashboards.findIndex((d:typeof dashboards[number])=>d.datasetToken===pending)]}. The active company has not changed.</p><button className="min-h-11 border rounded px-3" onClick={recoverTarget}>Recover target workspace and open</button></div>}
   <p className="my-3 text-sm">{currentData?`${currentData.companyKey} · ${currentData.asOf} · company-wide`:error?'Company source unavailable':'Company source loading'} · Synthetic headcount-only integration. No live AI.</p>
-  <HomeConversationSplit enabled visuals={<aside className="home-answer-visuals" aria-label="Current answer visuals">
-   {loading?<p role="status">Loading this company’s snapshots.</p>:error?<p role="alert">{error}</p>:currentData&&showVisual?<HomeHeadcountSummary overview={null} receipt={null} requested={{country:'all',org:'all',level:'all'}} scopeLabel={currentData.companyKey+' · company-wide'} loading={false} error={null} trend={currentData.trend} partialCompany={currentData}/>:<p role="status">No supported visual for this question. No earlier chart is reused.</p>}
-  </aside>}>
-   <div className="grid gap-2 sm:grid-cols-2">
-    {['How has our headcount changed?','What is our FTE?','What was turnover last year?','What are our recorded workforce costs?'].map(q=><button className="min-h-11 rounded border p-3 text-left" key={q} disabled={!currentData||loading||!!error} onClick={()=>ask(q)}>{q}</button>)}
-   </div>
-   <div aria-label="Home chat workspace" aria-live="polite" className="space-y-4">
-    {(currentData?messages.filter(m=>m.token===token):[]).map((m,i)=><article key={i}><p className="font-semibold">{m.question}</p><p>{m.text}</p></article>)}
-   </div>
-   <form onSubmit={e=>{e.preventDefault();ask(question);}} className="space-y-2">
-    <label htmlFor="company-question">Ask about recorded company headcount or FTE</label>
-    <textarea id="company-question" value={question} onChange={e=>setQuestion(e.target.value)} maxLength={500} className="block w-full min-h-32 rounded border p-3"/>
-    <button className="min-h-11 rounded border px-4" disabled={!currentData||loading||!!error||!question.trim()}>Ask</button>
-   </form>
-   <p className="text-sm">Unavailable: recruiting, turnover, pay/cost, vacancies, forecasts, planning and subgroup analysis. These are not zero values.</p>
-   <button className="min-h-11 rounded border px-4" onClick={()=>{sequence.current++;setData(null);setShowVisual(false);setMessages([]);setLoading(true);setReload(n=>n+1);}}>Reload company source</button>
+  <HomeConversationSplit enabled visuals={<aside className="home-answer-visuals" aria-label="Current answer visuals">{loading?<p role="status">Loading this company's snapshots.</p>:error?<p role="alert">{error}</p>:currentData&&saved.showVisual?<HomeHeadcountSummary overview={null} receipt={null} requested={{country:'all',org:'all',level:'all'}} scopeLabel={currentData.companyKey+' · company-wide'} loading={false} error={null} trend={currentData.trend} partialCompany={currentData}/>:<p role="status">No supported visual for this question. No earlier chart is reused.</p>}</aside>}>
+   <div className="grid gap-2 sm:grid-cols-2">{['How has our headcount changed?','What is our FTE?','What was turnover last year?','What are our recorded workforce costs?'].map(q=><button className="min-h-11 rounded border p-3 text-left" key={q} disabled={!currentData||loading||!!error} onClick={()=>ask(q)}>{q}</button>)}</div>
+   <div aria-label="Home chat workspace" aria-live="polite" className="space-y-4">{(currentData?saved.messages:[]).map((m,i)=><article key={i}><p className="font-semibold">{m.question}</p><p>{m.text}</p></article>)}</div>
+   <form onSubmit={e=>{e.preventDefault();ask(saved.question);}} className="space-y-2"><label htmlFor="company-question">Ask about recorded company headcount or FTE</label><textarea id="company-question" disabled={!currentData} value={currentData?saved.question:''} onChange={e=>persist({...saved,question:e.target.value})} maxLength={500} className="block w-full min-h-32 rounded border p-3"/><button className="min-h-11 rounded border px-4" disabled={!currentData||loading||!!error||!saved.question.trim()}>Ask</button></form>
+   <button className="min-h-11 border rounded px-3" onClick={()=>{const c=controller.current;if(!c)return;try{c.workspace().retry();const state=c.workspace().getSnapshot();if(state.saved)setSaved(readSaved(c.workspace().getField('','companyHome',null)));setNotice(state.saved?'Workspace saved for this company snapshot.':state.notice??'Saving failed.');}catch{setNotice('Select a company first.');}}}>Retry saving current workspace</button>
+   <p className="text-sm">Unavailable: recruiting, turnover, pay/cost, vacancies, forecasts, planning and subgroup analysis. These are not zero values. Goals and evidence are not copied between snapshots.</p>
+   <button className="min-h-11 rounded border px-4" onClick={()=>{sequence.current++;setData(null);setViewToken('');setLoading(true);setReload(n=>n+1);}}>Reload company source</button>
   </HomeConversationSplit>
  </section>;
 }
