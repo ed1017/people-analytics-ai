@@ -24,11 +24,12 @@ export function publicAiRequestAllowed(options,request,enabled=PUBLIC_AI_ENABLED
 }
 
 /** Version2 describes configuration only, never provider health/budget balance. */
-// Allow at most one second of server/browser clock skew; every paid round still needs server admission.
+// Allow five seconds of clock skew for presentation; clamp client lifetime to thirty seconds.
+// Every paid round still requires independent server admission and valid pricing windows.
 export function readPublicAiCapabilityReceipt(raw,now=Date.now()){
- if(!Number.isFinite(now)||!exact(raw,['version','datasetToken','status','expiresAt','routes'])||raw.version!==2||raw.datasetToken!==P.token||!['configured','unavailable'].includes(raw.status)||typeof raw.expiresAt!=='string'||!Number.isFinite(Date.parse(raw.expiresAt))||new Date(raw.expiresAt).toISOString()!==raw.expiresAt||Date.parse(raw.expiresAt)<=now||Date.parse(raw.expiresAt)>now+31000||!Array.isArray(raw.routes))return null;
+ if(!Number.isFinite(now)||!exact(raw,['version','datasetToken','status','expiresAt','routes'])||raw.version!==2||raw.datasetToken!==P.token||!['configured','unavailable'].includes(raw.status)||typeof raw.expiresAt!=='string'||!Number.isFinite(Date.parse(raw.expiresAt))||new Date(raw.expiresAt).toISOString()!==raw.expiresAt||Date.parse(raw.expiresAt)<=now||Date.parse(raw.expiresAt)>now+35000||!Array.isArray(raw.routes))return null;
  const expected=raw.status==='configured'?PUBLIC_AI_ROUTES:[];
  if(raw.routes.length!==expected.length||raw.routes.some((v,i)=>v!==expected[i]))return null;
- return Object.freeze({...raw,routes:Object.freeze([...raw.routes])});
+ return Object.freeze({...raw,expiresAt:new Date(Math.min(Date.parse(raw.expiresAt),now+30000)).toISOString(),routes:Object.freeze([...raw.routes])});
 }
 

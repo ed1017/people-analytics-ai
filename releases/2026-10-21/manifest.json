@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "3179520f4116baf85d7eb3493135bcba328d528a",
+  "sourceCommit": "129d3cd14323018ced8c8fd1dff2127df672f5a1",
   "deployment": "pending-staged-production-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -2954,8 +2954,8 @@
     },
     {
       "path": "lib/public-ai-capabilities.mjs",
-      "sha256": "94be328bdf6e7c10899f5b0ecb6e25879ae1a8f47aac345eac04d0f6640d7434",
-      "bytes": 2797
+      "sha256": "3ad2e89b5619a0628da09eec29ed5b2a5f262b6ec560e06635112818d06fe2f3",
+      "bytes": 2958
     },
     {
       "path": "lib/public-ai-dispatch.server.mjs",
@@ -3673,5 +3673,5 @@
       "bytes": 1627
     }
   ],
-  "candidateArchiveSha256": "efc6b57b3b243d6a077337ce447c807f4618c726287e74ffa8a0fef0259e24a8"
+  "candidateArchiveSha256": "dca6535613c25ab1f6a5d569ce7aab34ff5fda28cdb5157a448b713bd86fb46a"
 }
