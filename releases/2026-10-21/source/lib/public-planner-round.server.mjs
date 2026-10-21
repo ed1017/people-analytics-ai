@@ -4,6 +4,7 @@ import {createHash} from 'node:crypto';
 import {PUBLIC_9037 as P} from './public-9037-contract.mjs';
 import {boundedJson} from './public-qa-stream.server.mjs';
 import {awaitPublicQaBinding} from './public-qa-application.server.mjs';
+import {normalizePublicPlannerReceipt,PUBLIC_PLANNER_PROVIDER_REQUEST_ID} from './public-planner-receipt.server.mjs';
 
 export const PUBLIC_PLANNER_ENABLED=false;
 export const PUBLIC_PLANNER_LEDGER='public-9037-ai-initial-v1';
@@ -88,7 +89,7 @@ function response(raw,p,spec){
  * never request-body options. admit MUST be the persistent atomic RPC adapter.
  * The local consumed/round state is only extra protection, never the budget.
  * No default policy, provider, ledger reader, fetch, SDK or environment lookup. */
-export function createPublicPlannerRoundBoundary({enabled=PUBLIC_PLANNER_ENABLED,policy,admit,provider,currentContext,now=Date.now}={}){
+export function createPublicPlannerRoundBoundary({enabled=PUBLIC_PLANNER_ENABLED,policy,admit,settle,provider,currentContext,now=Date.now}={}){
  let p;try{p=readPublicPlannerPolicy(policy);}catch{}
  let operation=null,lastRound=0,busy=false,closed=false;
  return Object.freeze({async complete(raw,meta){
@@ -102,7 +103,8 @@ export function createPublicPlannerRoundBoundary({enabled=PUBLIC_PLANNER_ENABLED
   meta.signal.throwIfAborted();
   meta={signal:meta.signal,requestId:meta.requestId,contextId:meta.contextId,datasetToken:meta.datasetToken,round:meta.round};
   operation=identity;busy=true;lastRound=meta.round;
-  const controller=new AbortController(),signal=AbortSignal.any([meta.signal,controller.signal]),timer=setTimeout(()=>controller.abort(),p.timeoutMs);
+  const controller=new AbortController(),signal=AbortSignal.any([meta.signal,controller.signal]);
+  let timer=setTimeout(()=>controller.abort(),p.timeoutMs);
   const check=async()=>{signal.throwIfAborted();must(live(p,now()),'planner_policy_expired');must(await currentContext(signal)===meta.contextId,'planner_context_changed');signal.throwIfAborted();};
   try{return await awaitPublicQaBinding((async()=>{
    await check();
@@ -111,6 +113,17 @@ export function createPublicPlannerRoundBoundary({enabled=PUBLIC_PLANNER_ENABLED
    must(exact(grant,['granted','requestId','contextId','policyId','reserveMicroUsd','reservationId'])&&grant.granted===true&&['requestId','contextId','policyId','reserveMicroUsd'].every(k=>grant[k]===reservation[k])&&typeof grant.reservationId==='string'&&/^[a-zA-Z0-9_-]{1,100}$/.test(grant.reservationId),'planner_admission_denied');
    await check();
    const output=await provider(spec,signal);
+   clearTimeout(timer); // Provider deadline ends with its body; finalization has its own bound.
+   // A paid completed body is accounting evidence even if its answer is later
+   // rejected or the caller leaves. Settlement never retries the provider.
+   const receipt=normalizePublicPlannerReceipt(output,spec,p);
+   if(receipt&&typeof settle==='function'){
+    const finalization=new AbortController(),settlementTimer=setTimeout(()=>finalization.abort(),5000);
+    try{await awaitPublicQaBinding(Promise.resolve().then(()=>settle({requestId:reservation.requestId,contextId:reservation.contextId,policyId:reservation.policyId,receipt},finalization.signal)),finalization.signal);}
+    catch{/* Unconfirmed settlement retains the durable hold; answer handling continues. */}
+    finally{clearTimeout(settlementTimer);finalization.abort();}
+   }
+   if(!signal.aborted)timer=setTimeout(()=>controller.abort(),p.timeoutMs); // Bound the final context check too.
    await check();
    return response(output,p,spec);
   })(),signal);}catch{closed=true;throw Error('planner_round_unavailable');}
@@ -128,7 +141,9 @@ export function createPublicPlannerProvider({transport,apiKey}={}){
   if(!r.ok){await r.body?.cancel().catch(()=>{});throw Error('planner_provider_failed');}
   const raw=await boundedJson(r.body,2097152,signal);
   // Native HTTP has no SDK convenience output_text property.
-  return {...raw,output_text:Array.isArray(raw?.output)?raw.output.filter(x=>x?.type==='message').flatMap(x=>x.content??[]).filter(x=>x?.type==='output_text').map(x=>x.text).join(''):''};
+  const output={...raw,output_text:Array.isArray(raw?.output)?raw.output.filter(x=>x?.type==='message').flatMap(x=>x.content??[]).filter(x=>x?.type==='output_text').map(x=>x.text).join(''):''};
+  Object.defineProperty(output,PUBLIC_PLANNER_PROVIDER_REQUEST_ID,{value:r.headers.get('x-request-id'),enumerable:false});
+  return output;
  };
 }
 

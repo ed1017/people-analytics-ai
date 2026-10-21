@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "sourceCommit": "cb065cc6e7120b6826d379469c10d73d2fded545",
-  "deployment": "dpl_FTt2zHhBpUbCr4EPNGDMv7s9CNJT",
-  "verifiedDeployedArchiveSha256": "fa40ba64f5e390d1ec973b75a5014f788e0967d97eef17db0da34a660c14840b",
+  "sourceCommit": "274c7fcb8471cf916df2606a9c4f424be4a1f16b",
+  "deployment": "dpl_EpVRQ4iS9QymSDBSXDnAjGcyQ3Eo",
+  "verifiedDeployedArchiveSha256": "1e9a7a341a95a67c7af2f0827587a1b7b62ab6c2ed5aa28ff1b1001469b1eae7",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -2950,8 +2950,8 @@
     },
     {
       "path": "lib/public-ai-application.server.mjs",
-      "sha256": "80091f931d34bf0828fa1228f7067fe04f0ab9046dad6b46a59ca1f2aa479120",
-      "bytes": 2901
+      "sha256": "559bd0d828b08eebdc5209e09551fe35b09732dad84c097207770670d739bcfe",
+      "bytes": 2933
     },
     {
       "path": "lib/public-ai-capabilities.mjs",
@@ -2975,8 +2975,8 @@
     },
     {
       "path": "lib/public-ai-runtime.server.ts",
-      "sha256": "bddce25a0207cc064019e5da55b8e5391787fbdf5f9aacb046d4cbaf831657b2",
-      "bytes": 1744
+      "sha256": "177c608ed96b2b025ae150d526174ed7699363e7c79a50e21f58a20e566ecd4b",
+      "bytes": 2217
     },
     {
       "path": "lib/public-chat-conversation.mjs",
@@ -3010,8 +3010,8 @@
     },
     {
       "path": "lib/public-planner-ledger.server.mjs",
-      "sha256": "1f5ab8b16dec7634249acfc2737cc8a9528e3e5c73ca87260f994f44c2df4a8e",
-      "bytes": 1485
+      "sha256": "cac1f42e64b1fb3de0c9eacbe21bf76804eed63dd5ddbe37f59eb93efbaa05d4",
+      "bytes": 1732
     },
     {
       "path": "lib/public-planner-price-candidate.mjs",
@@ -3020,8 +3020,8 @@
     },
     {
       "path": "lib/public-planner-round.server.mjs",
-      "sha256": "a6c97b4b6aedaeb30d44870f3b2c0e68db236f8aa6fb18b8ae81dd2e7521b214",
-      "bytes": 13681
+      "sha256": "27d3de91a37048ab2c7bcf7e5d605d53bb11b60934327643b6eefd2dd3179b2e",
+      "bytes": 14917
     },
     {
       "path": "lib/public-projection-contract.mjs",
@@ -3602,6 +3602,11 @@
       "path": "lib/home-staffing-intake.ts",
       "sha256": "d91e414639649de239a104f9342f6f685479ac11a2ebbf657a1c524fb6534459",
       "bytes": 1043
+    },
+    {
+      "path": "lib/public-planner-receipt.server.mjs",
+      "sha256": "a300c2ae82b573474888484cd005a2fe0195b28cc175d11a87930821b20401eb",
+      "bytes": 4229
     }
   ]
 }
