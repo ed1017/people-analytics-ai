@@ -75,6 +75,7 @@ async function handleGET(includeBusinessUnits: boolean) {
     return NextResponse.json(
       {
         as_of: current.as_of,
+        ...(current.suppressed === true ? {suppressed:true} : {}),
         exit_enps: replacementEnabled ? summarizeExitEnps(generateExitEnpsScores()) : null,
         summary: {
           engagement_respondents: toNumber(current.engagement_respondents),
@@ -112,6 +113,7 @@ async function handleGET(includeBusinessUnits: boolean) {
         onboarding_dimensions: dimensions.filter((row) => ["ONB-30", "ONB-60", "ONB-90"].includes(row.survey_code)),
         exit_dimensions: dimensions.filter((row) => row.survey_code === "EXIT"),
         business_units: (businessUnitResult.data ?? []).map((row) => ({
+          ...(Object.hasOwn(row, "suppressed") ? {suppressed:row.suppressed} : {}),
           org_code: row.org_code,
           org_name: row.org_name,
           respondents: toNumber(row.respondents),
@@ -139,7 +141,7 @@ export async function readSurveySentiment(request: Request) {
   return withDatasetRequest(request, () => handleGET(true));
 }
 
-/** Fresh Home evidence uses the same projection without the unused business-unit query. */
+/** Home needs the same complete released business-unit comparison as Listening. */
 export async function readHomeSurveyEvidence(request: Request) {
-  return withDatasetRequest(request, () => handleGET(false));
+  return withDatasetRequest(request, () => handleGET(true));
 }

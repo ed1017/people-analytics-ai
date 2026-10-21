@@ -21,6 +21,10 @@ export function actionEvidenceCatalog(input:unknown):ActionEvidence[]{
   const add=(suffix:string,location:string)=>items.push({id:`${source.id}:${suffix}`,sourceId:source.id,location,scope:source.scope,date:source.date,limitation:source.limitation});
   if(Object.entries(facts).some(([key,value])=>key!=='rows'&&knownNumber(value)))add('summary','facts (summary fields)');
   if(source.id==='F1')for(const [field,value] of Object.entries(facts))if(knownNumber(value))add(`summary:${field}`,`facts.${field}`);
+  if(source.id==='S1'){
+   const comparison=plain(facts.businessUnitComparison);
+   if(comparison&&Array.isArray(comparison.rows))comparison.rows.forEach((raw,index)=>{const row=plain(raw);if(row)items.push({id:`S1:businessUnit:${index}`,sourceId:'S1',location:`facts.businessUnitComparison.rows[${index}]`,scope:String(comparison.scope),date:String(comparison.asOf),limitation:String(comparison.metric)});});
+  }
   if(Array.isArray(facts.rows))facts.rows.forEach((raw,index)=>{const row=plain(raw);if(row&&row.suppressed!==true&&Object.values(row).some(knownNumber)){add(`row:${index}`,`facts.rows[${index}]`);if(source.id==='F1')for(const [field,value] of Object.entries(row))if(knownNumber(value))add(`row:${index}:${field}`,`facts.rows[${index}].${field}`);}});
  }
  return items;

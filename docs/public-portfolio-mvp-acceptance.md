@@ -18,7 +18,7 @@ Detailed validation and release identities are in the [versioned release notes](
 
 ## Production versus source-only handoff tooling
 
-The latest verified production mapping is local release source `a86acfa4ebc28015f2652685536750c300ca083a`, deployment `dpl_fw5A59MB2HhM74R5qzrxEAqhVmM5`. Root repository code and the versioned deployed snapshot are distinct.
+The latest verified production mapping is local release source `100943ea83ccc8394586cc5c41acc97197569c56`, deployment `dpl_7AUakS8L8wvBo66H6uqNe4fKUrkN`. Root repository code and the versioned deployed snapshot are distinct.
 
 PRs #321–324 added accounting-only fresh-database bootstrap, invented-company mapping/provider binding, partial Home contracts and local company/snapshot workspace recovery. These are tested synthetic handoff capabilities, not a production rollout of company switching or authentication. They do not need deployment to satisfy the public synthetic MVP. See [bootstrap boundaries](fresh-company-bootstrap.md), [company Home integration](company-home-integration.md) and [workspace transitions](company-workspace-transitions.md).
 

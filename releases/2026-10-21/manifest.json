@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "sourceCommit": "a86acfa4ebc28015f2652685536750c300ca083a",
-  "deployment": "dpl_fw5A59MB2HhM74R5qzrxEAqhVmM5",
-  "verifiedDeployedArchiveSha256": "d1355bde21786753b1bc1bf71a21d6c1f0c4cb9fe8ad94007ccaf7a35e3e9416",
+  "sourceCommit": "100943ea83ccc8394586cc5c41acc97197569c56",
+  "deployment": "dpl_7AUakS8L8wvBo66H6uqNe4fKUrkN",
+  "verifiedDeployedArchiveSha256": "d49403ef3d7093345bf9a7f90e6282f9ebfbd16e4fad7b78d1540204a8db3f7b",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -1990,8 +1990,8 @@
     },
     {
       "path": "lib/home-action-proposal.ts",
-      "sha256": "3ffff3abda9427ef672911fada72a5fcabafc9805b51a2d39d597c185a3413a3",
-      "bytes": 8479
+      "sha256": "a888138594afe38de16d7135157422a7c4ed6a3a49672c12505b48cb890c81a4",
+      "bytes": 8893
     },
     {
       "path": "lib/home-action-saved-inputs.ts",
@@ -2015,8 +2015,8 @@
     },
     {
       "path": "lib/home-answer-scope.ts",
-      "sha256": "d8817d3b39e52df947b33e2ec8d06886cfd61ccc4e20aa9fb3e87d83ebdaaad1",
-      "bytes": 11453
+      "sha256": "422175e11f19250bc59a72a77754c3529bbf065e0c3604050141b640518ca3ed",
+      "bytes": 12982
     },
     {
       "path": "lib/home-assumptions-fallback.ts",
@@ -2315,8 +2315,8 @@
     },
     {
       "path": "lib/home-pack.mjs",
-      "sha256": "86d9a08f9faa4bd02ed3905541d2ab19fce21a651f2105de9062276317e620f7",
-      "bytes": 28762
+      "sha256": "9a04fb07756fa0b2b71e756ef6590c8400f32b562da5727d233a4282b6d656b1",
+      "bytes": 29444
     },
     {
       "path": "lib/home-pinned-goals.ts",
@@ -2460,8 +2460,8 @@
     },
     {
       "path": "lib/home-solution-conversation-schema.ts",
-      "sha256": "b643d41fc64d3b57d9a8f2771b0372f05395ca5ffaa42c32b13ea6cd820ded0a",
-      "bytes": 38626
+      "sha256": "da4237d353b9bb4d6a1aff132daa78d6d13d7b9ba128b3d6fb27a37c978666a3",
+      "bytes": 39062
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
@@ -3230,8 +3230,8 @@
     },
     {
       "path": "lib/survey-sentiment-reader.ts",
-      "sha256": "6acc74a58f9bd5e68b3234a8e0db09b5fedf56fca47fe645bf65637e8aea6ebc",
-      "bytes": 6032
+      "sha256": "1c109c580cb6966a4ff3ea0b88c8680f60217ae65775de9fb1cba77808556f4d",
+      "bytes": 6174
     },
     {
       "path": "lib/survey-source-client.ts",
@@ -3612,6 +3612,11 @@
       "path": "lib/home-question-text.ts",
       "sha256": "6d76e3f88f1239ffaf0c41ed7c7a296194286ede6159abff2430e939a1ff43c1",
       "bytes": 348
+    },
+    {
+      "path": "lib/home-survey-groups.mjs",
+      "sha256": "e8b989c5a6070e0f5f882f5b45de0d74024c6754f0baadb1641f7842c1ffc9bb",
+      "bytes": 1925
     }
   ]
 }
