@@ -1,0 +1,49 @@
+'use client';
+import {useEffect,useRef,useState,useSyncExternalStore} from 'react';
+import {datasetSession} from '@/lib/dataset-client.mjs';
+import {HomeConversationSplit} from '@/components/home-answer-visuals';
+import {HomeHeadcountSummary} from '@/components/home-chat-welcome';
+import {readCompanyDashboard,companyHeadcountAnswer} from '@/lib/company-dashboard.mjs';
+import {expectedCompany} from '@/lib/company-home-identity.mjs';
+
+export function PartialCompanyHome(){
+ const token=useSyncExternalStore(datasetSession.subscribe,datasetSession.snapshot,datasetSession.snapshot);
+ const [data,setData]=useState<ReturnType<typeof readCompanyDashboard>|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[question,setQuestion]=useState(''),[messages,setMessages]=useState<{question:string;text:string;supported:boolean;token:string}[]>([]),[showVisual,setShowVisual]=useState(true),[reload,setReload]=useState(0);
+ const sequence=useRef(0);
+ const currentData=data?.datasetToken===token&&datasetSession.snapshot()===token?data:null;
+ useEffect(()=>{
+  const id=++sequence.current,c=new AbortController();setData(null);setMessages([]);setShowVisual(false);setLoading(true);setError('');
+  if(!token.startsWith('invented-company-'))return()=>c.abort();
+  void (async()=>{try{
+   const r=await fetch('/api/company-dashboard',{headers:{'x-workforce-dataset':token},cache:'no-store',signal:c.signal});
+   if(!r.ok||r.headers.get('x-workforce-dataset')!==token)throw Error('Company source unavailable or changed.');
+   const checked=readCompanyDashboard(await r.json(),token,expectedCompany);
+   if(c.signal.aborted||id!==sequence.current||datasetSession.snapshot()!==token)return;
+   setData(checked);setShowVisual(true);
+  }catch{if(!c.signal.aborted&&id===sequence.current)setError('Company source unavailable or changed. No previous company values are shown.');}
+  finally{if(!c.signal.aborted&&id===sequence.current)setLoading(false);}})();
+  return()=>c.abort();
+ },[token,reload]);
+ function ask(value:string){if(!currentData||loading||error||!value.trim())return;const answer=companyHeadcountAnswer(currentData,value);setQuestion('');setMessages(old=>[...old,{question:value,text:answer.text,supported:answer.supported,token}]);setShowVisual(answer.supported);}
+ return <section className="p-4" aria-label="Synthetic company Home">
+  <h2 className="text-2xl font-semibold">Plan the workforce your business needs</h2>
+  <p className="my-3 text-sm">{currentData?`${currentData.companyKey} · ${currentData.asOf} · company-wide`:error?'Company source unavailable':'Company source loading'} · Synthetic headcount-only integration. No live AI.</p>
+  <HomeConversationSplit enabled visuals={<aside className="home-answer-visuals" aria-label="Current answer visuals">
+   {loading?<p role="status">Loading this company’s snapshots.</p>:error?<p role="alert">{error}</p>:currentData&&showVisual?<HomeHeadcountSummary overview={null} receipt={null} requested={{country:'all',org:'all',level:'all'}} scopeLabel={currentData.companyKey+' · company-wide'} loading={false} error={null} trend={currentData.trend} partialCompany={currentData}/>:<p role="status">No supported visual for this question. No earlier chart is reused.</p>}
+  </aside>}>
+   <div className="grid gap-2 sm:grid-cols-2">
+    {['How has our headcount changed?','What is our FTE?','What was turnover last year?','What are our recorded workforce costs?'].map(q=><button className="min-h-11 rounded border p-3 text-left" key={q} disabled={!currentData||loading||!!error} onClick={()=>ask(q)}>{q}</button>)}
+   </div>
+   <div aria-label="Home chat workspace" aria-live="polite" className="space-y-4">
+    {(currentData?messages.filter(m=>m.token===token):[]).map((m,i)=><article key={i}><p className="font-semibold">{m.question}</p><p>{m.text}</p></article>)}
+   </div>
+   <form onSubmit={e=>{e.preventDefault();ask(question);}} className="space-y-2">
+    <label htmlFor="company-question">Ask about recorded company headcount or FTE</label>
+    <textarea id="company-question" value={question} onChange={e=>setQuestion(e.target.value)} maxLength={500} className="block w-full min-h-32 rounded border p-3"/>
+    <button className="min-h-11 rounded border px-4" disabled={!currentData||loading||!!error||!question.trim()}>Ask</button>
+   </form>
+   <p className="text-sm">Unavailable: recruiting, turnover, pay/cost, vacancies, forecasts, planning and subgroup analysis. These are not zero values.</p>
+   <button className="min-h-11 rounded border px-4" onClick={()=>{sequence.current++;setData(null);setShowVisual(false);setMessages([]);setLoading(true);setReload(n=>n+1);}}>Reload company source</button>
+  </HomeConversationSplit>
+ </section>;
+}
