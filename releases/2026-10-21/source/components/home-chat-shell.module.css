@@ -210,6 +210,7 @@
  /* Keep the evidence beside a single decision column, with prompts above chat.
     DOM and narrow-screen order is prompts, composer, then snapshot. */
  .welcome { grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); grid-template-rows:auto auto auto auto auto auto minmax(min-content,1fr); }
+ .welcome > :global(.home-conversation-split) { grid-column:1 / -1; grid-row:5 / 8; }
  .entryActions { grid-column:1 / -1; grid-row:3; margin-top:8px; }
  .demoNote { grid-column:1 / -1; grid-row:4; margin:0; }
  .welcome > .historySummary { grid-column:2; grid-row:5 / 8; min-width:0; align-self:start; }
@@ -230,9 +231,13 @@
 .shell :global(.home-conversation-text) { min-width:0; display:flex; flex-direction:column; gap:12px; }
 .shell :global(.home-conversation-split) { min-width:0; }
 .shell :global(.home-conversation-split[data-split]) { display:grid; gap:24px; align-items:start; }
+.shell :global(.home-conversation-visuals) { min-width:0; }
+.shell :global(.home-split-divider) { display:none; }
 .shell :global(.home-answer-visuals) { min-width:0; display:grid; gap:12px; border:1px solid var(--border); border-radius:10px; padding:16px; overflow-wrap:anywhere; }
 @container home-intro (min-width:760px) {
- .shell :global(.home-conversation-split[data-split]) { grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); }
+ .shell :global(.home-conversation-split[data-split]) { grid-template-columns:minmax(300px,clamp(300px,var(--chat-share,54%),calc(100% - 344px))) 12px minmax(320px,1fr); gap:10px; }
+ .shell :global(.home-split-divider) { display:block; align-self:stretch; min-height:80px; border-radius:6px; cursor:col-resize; touch-action:none; background:linear-gradient(to right,transparent 5px,var(--border) 5px,var(--border) 7px,transparent 7px); }
+ .shell :global(.home-split-divider:hover), .shell :global(.home-split-divider:focus-visible) { background:var(--accent); outline:2px solid var(--ring); outline-offset:1px; }
 }
 
 /* The legacy reading pane flexes inside a fixed-height section. In the split,

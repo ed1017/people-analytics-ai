@@ -1,4 +1,5 @@
 'use client';
+import {annualTurnoverEvidenceQuestion} from '@/lib/home-turnover-chat';
 import {publicAiFetch} from '@/lib/public-ai-readiness-client.mjs';
 import {datasetSession} from '@/lib/dataset-client.mjs';
 import {PUBLIC_9037} from '@/lib/public-9037-contract.mjs';
@@ -80,7 +81,9 @@ export function useHomeSolutionConversation(props:Props){
  function selectedPlanId(value:PlanAlternatives|null){const p=currentProps.current,target=p.target();return target?.goalId===p.conversation.activeGoalId&&value?.order.includes(target.id)?target.id:null;}
  function makeRequest(text:string):SolutionRequest{
   const p=currentProps.current,current=catalog(true),params=new URLSearchParams(p.query),progress=captureGoalProgressInput(decisionStore,p.conversation.activeGoalId);
-  return readSolutionRequest({version:1,planningCalculatorAvailable:p.planningCalculatorAvailable?.()===true,requestId:crypto.randomUUID(),goal:{id:p.conversation.activeGoalId,statement:p.conversation.focusedIssue},scope:p.scope,filters:{country:params.get('country')||'all',org:params.get('org')||'all',level:params.get('level')||'all'},timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,evidence:p.evidenceForMessage?.(text)??p.evidence,goalContext:p.planningContext?.()?{goalContext:p.conversation.goalContext,scenarioReview:p.planningContext()}:p.conversation.goalContext,...(progress?{progressEntry:progressEntryContext(decisionStore,'context',[{id:'context',text}])?.previous??null}:{}),...(progress?{goalProgress:progress}:{}),selectedId:selectedPlanId(current),catalog:current,state:memoryRef.current,message:{id:crypto.randomUUID(),text}});
+  const filters={country:params.get('country')||'all',org:params.get('org')||'all',level:params.get('level')||'all'};
+  const evidenceQuestion=annualTurnoverEvidenceQuestion(text,memoryRef.current,p.scope,filters,datasetSession.snapshot());
+  return readSolutionRequest({version:1,planningCalculatorAvailable:p.planningCalculatorAvailable?.()===true,requestId:crypto.randomUUID(),goal:{id:p.conversation.activeGoalId,statement:p.conversation.focusedIssue},scope:p.scope,filters,timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,evidence:p.evidenceForMessage?.(evidenceQuestion)??p.evidence,goalContext:p.planningContext?.()?{goalContext:p.conversation.goalContext,scenarioReview:p.planningContext()}:p.conversation.goalContext,...(progress?{progressEntry:progressEntryContext(decisionStore,'context',[{id:'context',text}])?.previous??null}:{}),...(progress?{goalProgress:progress}:{}),selectedId:selectedPlanId(current),catalog:current,state:memoryRef.current,message:{id:crypto.randomUUID(),text}});
  }
  async function send(text:string){
   if(controller.current||saving)return;requireCurrent();const request=makeRequest(text),entryContext=progressEntryContext(decisionStore,request.requestId,[...request.state.turns.filter(t=>t.role==='user').map(({id,text})=>({id,text})),request.message]),captured=++epoch.current,key=liveKey.current,scenario=JSON.stringify(currentProps.current.planningContext?.()??null),abort=new AbortController();controller.current=abort;answerSeries.current=[];setPending(true);setNotice('');

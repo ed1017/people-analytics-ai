@@ -1,3 +1,7 @@
+// @ts-expect-error Native Node tests share application source.
+import {unavailableMonthFraction} from './staffing-monthly-capacity.ts';
+// @ts-expect-error Native Node tests share application source.
+import {selectStaffingOptions} from './staffing-option-presentation.ts';
 /** Typed provisional inputs over the existing deterministic staffing kernel. No demo defaults. */
 import type {DemandBasis,DemandReview} from './swp-demand';
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -91,15 +95,15 @@ export function calculateServiceStaffing(review:DemandReview,raw:StaffingInputs)
    const candidateInput={...input,build:String(b),move:String(m),buy:String(buy),backfills:b+m?input.backfills:''};
    result.options.push(staffingOption(`build-${b}-move-${m}-buy-${buy}`,mix,candidateInput,review,value('costsCompleteAndDistinct')===true));
   }
-  const referenceOption=result.options.find(o=>o.mix.build===0&&o.mix.move===0);
-  const ranked=[...result.options].sort((a,b)=>(a.shortfallHours??Infinity)-(b.shortfallHours??Infinity)||(a.cash??Infinity)-(b.cash??Infinity)||a.addedEmployees-b.addedEmployees||a.id.localeCompare(b.id));
-  result.options=[...(referenceOption?[referenceOption]:[]),...ranked.filter(o=>o!==referenceOption)].slice(0,6);
-  result.limitations.push('At most six options are shown: the all-hire reference, then smaller known workload shortfall and complete cash within the explicit bounds. Unknown metrics do not establish a best option.');
+  result.options=selectStaffingOptions(result.options);
+  result.limitations.push('At most six options are shown: the all-hire reference, the lowest complete-cash feasible option when one exists, then smaller known workload shortfall and complete cash within the explicit bounds. Lowest cash is not a claim of lowest delivery risk. Unknown metrics do not establish a best option.');
   result.status='calculated';return result;
  }catch(error){missing.push(error instanceof Error?error.message:'Staffing inputs could not be calculated.');return result;}
 }
 // @ts-expect-error Native Node tests share TypeScript source.
 import {calculateWorkforceIncrement} from './workforce-increment.ts';
+// @ts-expect-error Native Node tests share TypeScript source.
+import {monthlyCapacityEffort} from './guided-plan-summary.ts';
 function staffingOption(id:string,mix:ServiceStaffingOption['mix'],input:WorkforcePlanInput,review:DemandReview,complete:boolean):ServiceStaffingOption{
  const base:ServiceStaffingOption={id,mix,input,cash:null,listedCash:null,staffHours:null,addedEmployees:mix.buy,coverageDate:null,additionalHours:null,shortfallHours:null,status:'invalid',reason:null,monthly:[]};
  try{
@@ -107,16 +111,18 @@ function staffingOption(id:string,mix:ServiceStaffingOption['mix'],input:Workfor
   const cash=complete?p.totalCash:null;
   const monthly=p.rows.map(row=>({month:row.month,roles:row.conditionalRoleCoverage,cash:complete?row.incrementalCash:null}));
   const coverageDate=[mix.buy?p.arrivalDate:null,mix.build?input.buildMonth+'-01':null,mix.move?input.moveMonth+'-01':null].filter(Boolean).sort().at(-1)??null;
-  let additionalHours:number|null=null;
+  let additionalHours:number|null=null,shortfallHours:number|null=null;
   if(monthly.every(row=>row.roles!==null)){
    const perMonth=review.result.productiveHoursInHorizon!/review.spec.months!;
-   additionalHours=monthly.reduce((total,row)=>{
-    let roles=row.roles!;if(mix.buy&&p.arrivalDate?.slice(0,7)===row.month){const start=planDate(row.month+'-01')!,next=new Date(start);next.setUTCMonth(next.getUTCMonth()+1);roles-=mix.buy*(planDate(p.arrivalDate)!-start)/(next.getTime()-start);}
-    return total+roles*perMonth;
-   },0);
+   const covered=monthly.map(row=>{
+    let roles=row.roles!;if(mix.buy&&p.arrivalDate?.slice(0,7)===row.month){roles-=mix.buy*unavailableMonthFraction(p.arrivalDate);}
+    return roles;
+   });
+   const effort=monthlyCapacityEffort(covered,review.result.workloadHours!/review.spec.months!,review.result.capacityHours!/review.spec.months!,perMonth);
+   additionalHours=effort.additionalHours;shortfallHours=effort.shortfallHours;
   }
   const budget=review.spec.budgetUsd.value,checks=p.checks.filter(c=>c.name!=='Incremental cash budget');
   const status=checks.some(c=>c.status==='not met')||cash!==null&&budget!==null&&cash>budget?'not-met':checks.some(c=>c.status==='unknown')||cash===null||budget===null?'unknown':'met';
-  return {...base,cash,listedCash:p.totalCash,staffHours:hours,addedEmployees:p.maxAddedEmployees,coverageDate:monthly.some(row=>row.roles===null)?null:coverageDate,additionalHours,shortfallHours:additionalHours===null?null:Math.max(0,review.result.gapHours!-additionalHours),status,monthly};
+  return {...base,cash,listedCash:p.totalCash,staffHours:hours,addedEmployees:p.maxAddedEmployees,coverageDate:monthly.some(row=>row.roles===null)?null:coverageDate,additionalHours,shortfallHours,status,monthly};
  }catch(error){return {...base,reason:error instanceof Error?error.message:'Invalid staffing inputs.'};}
 }

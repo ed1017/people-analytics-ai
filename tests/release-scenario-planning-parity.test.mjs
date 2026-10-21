@@ -1,9 +1,20 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {createSwpDemo,compareSwpDemo,swpTradeoffOptions} from '../releases/2026-10-21/source/lib/swp-demo.ts';
-import {compareScenarioForChat,readScenarioChatDraft,scenarioComparisonIntent,scenarioQuestionMismatch} from '../releases/2026-10-21/source/lib/scenario-planning-parity.ts';
+import {scenarioRecommendationIntent,scenarioRecommendation,offersCapacityExample,compareScenarioForChat,readScenarioChatDraft,scenarioComparisonIntent,scenarioQuestionMismatch} from '../releases/2026-10-21/source/lib/scenario-planning-parity.ts';
 import {bundleInputKey} from '../releases/2026-10-21/source/lib/home-bundle-reconciliation.ts';
 import {previewBundleChatEdit,acceptBundleChatEdit} from '../releases/2026-10-21/source/lib/home-bundle-chat-edit.ts';
 const draft=await createSwpDemo('guided-swp-parity','2026-10-21T12:00:00Z');
+test('natural recommendation follow-ups keep the reviewed budget and options; changed quantities require review',async()=>{
+ for(const text of ['With the new budget, which option do you recommend','Which staffing option would you recommend?','Under the revised budget, what is your recommendation?'])assert.equal(scenarioRecommendationIntent(text),true);
+ for(const text of ['With a 200000 budget, which option do you recommend?','Which country has the highest turnover?'])assert.equal(scenarioRecommendationIntent(text),false);
+ const revised=acceptBundleChatEdit(draft,previewBundleChatEdit(draft,'Set budget to 100000')),result=await compareScenarioForChat(revised);
+ assert.match(result.answer,/current \$100,000 USD budget/);assert.match(result.answer,/develop 3, move 2, hire 0/);assert.ok(result.answer.includes(scenarioRecommendation(revised,result)));assert.match(result.answer,/not a claim of lowest delivery risk/);
+ const none=await compareScenarioForChat(acceptBundleChatEdit(draft,previewBundleChatEdit(draft,'Set budget to 0')));assert.match(none.answer,/No displayed option meets/);
+});
+test('an incomplete matching question offers but never assumes the example; conflicting or complete context is not hijacked',()=>{
+ for(const text of ['How would you close a 5 FTE capacity gap with a $325,000 USD budget?','Close the 5 FTE capacity gap'])assert.equal(offersCapacityExample(text),true);
+ for(const text of ['Close a 5 FTE capacity gap with a $100,000 budget','Close a 6 FTE capacity gap','Close a 5 FTE capacity gap for nurses in May 2027','Compare staffing options','What was turnover last year?'])assert.equal(offersCapacityExample(text),false);
+});
 test('guided and conversational comparisons use identical complete inputs, options and timing',async()=>{
  for(const d of [draft,acceptBundleChatEdit(draft,previewBundleChatEdit(draft,'Set budget to 100000; Set Service units per month to 1120')),acceptBundleChatEdit(draft,previewBundleChatEdit(draft,'Set budget to 0'))]){
   const before=JSON.stringify(d),guided=await compareSwpDemo(d),chat=await compareScenarioForChat(d);

@@ -10,22 +10,39 @@ type Metric='total'|'voluntary';
 type Period='monthly'|'ytd'|'annualized';
 type Selection={metric:Metric;period:Period;months:string[]};
 type Grounding={datasetToken:string;packetSha256:string;sources:{id:string;status:string;scope:string;asOf:string|null;basis:string}[]};
-type Context=Selection&{version:1;datasetToken:string;scope:string;filters:string;answerId:string};
+type Context=Selection&{annualYear?:number;version:1;datasetToken:string;scope:string;filters:string;answerId:string};
 type TurnoverState=SolutionState&{turnoverChat?:Context};
 type Intent={kind:'selected';selection:Selection}|{kind:'annual';selection:{year:number|'last';metric:Metric}}|{kind:'clarify'|'unsupported';answer:string}|{kind:'other'};
 const monthNames=['january','february','march','april','may','june','july','august','september','october','november','december'];
 const monthPattern=/\b(20\d{2})-(0[1-9]|1[0-2])(?:-01)?\b|\b(january|february|march|april|may|june|july|august|september|october|november|december)\b(?:\s+(20\d{2}))?/g;
 const topic=/\b(?:turnover|attrition)\b/i;
 const rate=(v:unknown):v is number=>typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=100;
-const filters=(r:SolutionRequest)=>JSON.stringify([r.filters.country,r.filters.org,r.filters.level]);
+const filters=(r:Pick<SolutionRequest,'filters'>)=>JSON.stringify([r.filters.country,r.filters.org,r.filters.level]);
 const answerId=(r:SolutionRequest)=>'reply-'+r.requestId.slice(0,70);
 const selectionRemainder=(text:string)=>text.replace(monthPattern,' ').replace(/\b(?:year.to.date|company.wide|whole company|all company)\b/g,' ').replace(/\b(?:whats|what|was|were|is|are|how|does|do|the|our|company|we|us|looking|look|like|doing|show|me|tell|about|and|or|please|just|only|now|instead|actually|make|it|for|in|over|turnover|attrition|rate|rates|trend|trends|monthly|voluntary|total|overall|ytd|annual|yearly|annualized|annualised|latest|available|recorded|periods|months|versus|vs|compare|with|to|through)\b/g,' ').replace(/[\s.,?!:;%()\u2013\u2014-]/g,'');
 
 /** Selection only, never stored evidence. Unknown/old contexts cannot authorize a follow-up. */
 function previousSelection(request:SolutionRequest,grounding:Grounding|undefined):Selection|undefined {
  const c=(request.state as TurnoverState).turnoverChat;
- if(!c||c.version!==1||!grounding||c.datasetToken!==grounding.datasetToken||c.scope!==request.scope||c.filters!==filters(request)||c.answerId!==request.state.turns.at(-1)?.id||request.state.turns.at(-1)?.role!=='assistant'||!['total','voluntary'].includes(c.metric)||!['monthly','ytd','annualized'].includes(c.period)||!Array.isArray(c.months)||c.months.length>3||c.months.some(m=>typeof m!=='string'||!/^20\d{2}-(0[1-9]|1[0-2])$/.test(m)))return;
+ if(!c||c.annualYear!==undefined||c.version!==1||!grounding||c.datasetToken!==grounding.datasetToken||c.scope!==request.scope||c.filters!==filters(request)||c.answerId!==request.state.turns.at(-1)?.id||request.state.turns.at(-1)?.role!=='assistant'||!['total','voluntary'].includes(c.metric)||!['monthly','ytd','annualized'].includes(c.period)||!Array.isArray(c.months)||c.months.length>3||c.months.some(m=>typeof m!=='string'||!/^20\d{2}-(0[1-9]|1[0-2])$/.test(m)))return;
  return {metric:c.metric,period:c.period,months:[...c.months]};
+}
+
+function annualFollowup(request:Pick<SolutionRequest,'message'|'state'|'scope'|'filters'>,grounding:Pick<Grounding,'datasetToken'>|undefined){
+ const c=(request.state as TurnoverState).turnoverChat,text=normalizeHomeQuestion(request.message.text);
+ if(!c||!Number.isInteger(c.annualYear)||c.annualYear!<2000||c.annualYear!>2099||!grounding||c.version!==1||c.datasetToken!==grounding.datasetToken||c.scope!==request.scope||c.filters!==filters(request)||c.answerId!==request.state.turns.at(-1)?.id||request.state.turns.at(-1)?.role!=='assistant'||!['total','voluntary'].includes(c.metric))return null;
+ if(/\b(?:country|countries|india|team|department|business unit|demographic|forecast|predict|reduce|plan|hire|salary|engagement)\b/.test(text))return null;
+ if([...text.matchAll(/\b20\d{2}\b/g)].some(m=>Number(m[0])!==c.annualYear))return null;
+ const chart=/^(?:please )?(?:show|plot|draw|display)(?: me)?(?: a| the)?(?: turnover)? (?:chart|graph|visual)(?: for (?:that|it|this))?[.!?]?$/.test(text);
+ const compare=/\b(?:compare|compares|comparison|different|difference|versus|vs|but)\b/.test(text)&&/\b(?:voluntary|ytd|year.to.date|home|dashboard|turnover|rate)\b/.test(text);
+ if(!chart&&!compare)return null;
+ return {kind:'annual' as const,selection:{year:c.annualYear!,metric:c.metric},compare};
+}
+
+/** Select fresh annual rows for a validated continuation, never authorize stored facts. */
+export function annualTurnoverEvidenceQuestion(text:string,state:SolutionState,scope:string,requestFilters:SolutionRequest['filters'],datasetToken:string){
+ const continuation=annualFollowup({message:{id:'selection',text},state,scope,filters:requestFilters},{datasetToken});
+ return continuation?`${continuation.selection.metric} turnover for ${continuation.selection.year}`:text;
 }
 
 /** Deliberately small language surface. Other workforce questions keep the existing conversation. */
@@ -70,6 +87,8 @@ export function turnoverIntent(question:string,availableMonths:string[],previous
 }
 
 export function turnoverChartMonths(question:string,dates:string[]):string[]|null {
+ const year=question.match(/^Monthly (total|voluntary) turnover for calendar year (20\d{2})$/);
+ if(year){const selected=dates.filter(d=>d.startsWith(year[2]+'-'));return selected.length===12&&new Set(selected.map(d=>d.slice(0,7))).size===12?selected:null;}
  const intent=turnoverIntent(question,dates.map(d=>d.slice(0,7)));
  if(intent.kind!=='selected'||intent.selection.period!=='monthly')return null;
  const wanted=intent.selection.months;
@@ -83,7 +102,7 @@ export function turnoverChatReply(request:SolutionRequest,grounding:Grounding|un
  const facts=source?.facts as Record<string,unknown>|null|undefined;
  const rows=(facts?.monthly??[]) as Record<string,unknown>[];
  const dates=rows.map(r=>String(r.month).slice(0,7));
- const previous=previousSelection(request,grounding),intent=turnoverIntent(request.message.text,dates,previous);
+ const previous=previousSelection(request,grounding),followup=annualFollowup(request,grounding),intent=followup??turnoverIntent(request.message.text,dates,previous);
  if(intent.kind==='other')return null;
  if(intent.kind==='annual'){
   const localYear=Number(new Intl.DateTimeFormat('en-US',{timeZone:request.timeZone,year:'numeric'}).format(now));
@@ -111,7 +130,11 @@ export function turnoverChatReply(request:SolutionRequest,grounding:Grounding|un
   const exits=counts.reduce((a,b)=>a+b,0),stockSum=stocks.reduce((a,b)=>a+b,0),average=stockSum/12;
   if(!Number.isSafeInteger(exits)||!Number.isSafeInteger(stockSum)||average<=0)return reply('annual turnover is undefined because the verified average workforce denominator is zero or invalid.'+closest);
   const fmt=(n:number,digits=2)=>n.toLocaleString('en-US',{maximumFractionDigits:digits});
-  return reply(`${label} company-wide turnover was ${fmt(exits/average*100)}%. Calculation: ${fmt(exits,0)} recorded ${metric==='total'?'total':'voluntary'} exits [A1] / ${fmt(average)} average month-end headcount across all 12 months [W1] × 100. This uses the average of monthly closing headcounts, not a sum of monthly rates. Synthetic recorded data as of ${source.date}; no forecast or causal claim.`);
+  const result=reply(`${label} company-wide turnover was ${fmt(exits/average*100)}%. Calculation: ${fmt(exits,0)} recorded ${metric==='total'?'total':'voluntary'} exits [A1] / ${fmt(average)} average month-end headcount across all 12 months [W1] × 100. This uses the average of monthly closing headcounts, not a sum of monthly rates. Synthetic recorded data as of ${source.date}; no forecast or causal claim.`);
+  const voluntary=facts?.voluntary_turnover_ytd_pct;
+  if(followup?.compare)result.answer+=rate(voluntary)?` The source-reported voluntary YTD snapshot is ${voluntary}% as of ${source.date} [A1]. It counts voluntary exits in the current YTD window, whereas the ${year} result above counts ${metric} exits over a full calendar year. These are different measures and periods; neither retracts the other, and their difference is not a like-for-like trend.`:' The voluntary YTD comparator is unavailable in current verified evidence. That does not invalidate the independently calculated annual result.';
+  return {...result,chartQuestion:`Monthly ${metric} turnover for calendar year ${year}`,context:{version:1,datasetToken:grounding.datasetToken,scope:request.scope,filters:filters(request),answerId:answerId(request),metric,period:'monthly',months:[],annualYear:year}};
+
  }
  if(intent.kind!=='selected')return {answer:intent.answer,chartQuestion:null,context:null};
  if(!grounding||!/^[a-f0-9]{64}$/.test(grounding.packetSha256)||source?.status!=='loaded'||!source.date||!acceptsGroundedAggregate(grounding,request.evidence,source,request))return {answer:'Turnover is unknown for this request because current company aggregate evidence could not be verified. No chart is available.',chartQuestion:null,context:null};

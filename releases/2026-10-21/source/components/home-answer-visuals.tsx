@@ -1,4 +1,5 @@
-import type {ReactNode} from 'react';
+'use client';
+import {createContext,useContext,useEffect,useRef,useState,type CSSProperties,type ReactNode} from 'react';
 import type {ChatEvidenceSeries} from '@/lib/chat-evidence-series';
 import {ChatEvidenceChart} from './chat-evidence-chart';
 import type {ChatMessage} from '@/lib/types';
@@ -8,8 +9,19 @@ export function currentHomeVisualAnswer(messages:ChatMessage[], charts:Map<ChatM
   return ready&&!pending&&!error&&latest?.role==='assistant'&&charts.get(latest)?.context===context?latest:null;
 }
 
+const SplitWidth=createContext<{width:number;setWidth:(value:number)=>void}|null>(null);
+export function HomeSplitProvider({children}:{children:ReactNode}){
+ const [width,setWidth]=useState(54);
+ return <SplitWidth.Provider value={{width,setWidth}}>{children}</SplitWidth.Provider>;
+}
 export function HomeConversationSplit({enabled,visuals,children}:{enabled:boolean;visuals:ReactNode;children:ReactNode}) {
-  return <div className="home-conversation-split" data-split={enabled?'':undefined}><div className="home-conversation-text">{children}</div>{enabled&&visuals}</div>;
+  const root=useRef<HTMLDivElement>(null),shared=useContext(SplitWidth),[localWidth,setLocalWidth]=useState(54),[available,setAvailable]=useState(0);
+  useEffect(()=>{const element=root.current;if(!element)return;const observer=new ResizeObserver(entries=>setAvailable(entries[0].contentRect.width));observer.observe(element);return()=>observer.disconnect();},[]);
+  const minimum=available>=652?Math.max(40,Math.ceil(300/available*100)):40;
+  const maximum=available>=652?Math.max(minimum,Math.min(65,Math.floor((available-344)/available*100))):65;
+  const width=Math.max(minimum,Math.min(maximum,shared?.width??localWidth)),setWidth=shared?.setWidth??setLocalWidth;
+  const resize=(value:number)=>setWidth(Math.max(minimum,Math.min(maximum,value)));
+  return <div ref={root} style={{'--chat-share':`${width}%`} as CSSProperties} className="home-conversation-split" data-split={enabled?'':undefined}><div className="home-conversation-text">{children}</div>{enabled&&<><div className="home-split-divider" role="separator" tabIndex={0} aria-label="Resize chat and visuals" aria-orientation="vertical" aria-valuemin={minimum} aria-valuemax={maximum} aria-valuenow={width} aria-valuetext={`Chat width ${width} percent`} onKeyDown={event=>{const next=event.key==='ArrowLeft'?width-2:event.key==='ArrowRight'?width+2:event.key==='Home'?minimum:event.key==='End'?maximum:null;if(next!==null){event.preventDefault();resize(next);}}} onPointerDown={event=>{if(event.button!==0)return;event.preventDefault();event.currentTarget.focus();event.currentTarget.setPointerCapture(event.pointerId);}} onPointerMove={event=>{if(!event.currentTarget.hasPointerCapture(event.pointerId)||!root.current)return;const bounds=root.current.getBoundingClientRect();resize(Math.round(100*(event.clientX-bounds.left)/bounds.width));}} onPointerUp={event=>{if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);}}/><div className="home-conversation-visuals">{visuals}</div></>}</div>;
 }
 
 /** Only the current turn's verified series enters this panel; never retain a prior chart while answering. */
