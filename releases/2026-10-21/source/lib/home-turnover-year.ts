@@ -1,6 +1,8 @@
+// @ts-expect-error Native fixtures share source.
+import {normalizeHomeQuestion} from './home-question-text.ts';
 /** Recognize a bounded calendar-year question, without inferring a population. */
 export function annualTurnoverSelection(question:string):{year:number|'last';metric:'total'|'voluntary'}|null {
- const text=question.toLowerCase().replace(/[’']/g,'');
+ const text=normalizeHomeQuestion(question);
  if(!/\b(?:turnover|attrition)\b/.test(text)||/\b(?:monthly|annualized|annualised|ytd|year.to.date)\b/.test(text))return null;
  if(/\bvoluntary\b/.test(text)&&/\b(?:total|overall)\b/.test(text))return null;
  const relative=/\b(?:last|previous)\s+(?:calendar\s+)?year\b/.test(text);

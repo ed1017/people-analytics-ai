@@ -1,13 +1,15 @@
 import {acceptsGroundedAggregate} from './public-home-receipt.mjs';
 import {normalizeHomePack} from './home-pack.mjs';
+// @ts-expect-error Native fixtures share source.
+import {normalizeHomeQuestion} from './home-question-text.ts';
 import type {SolutionRequest} from './home-solution-conversation';
 // @ts-expect-error Native fixtures share source.
 import {answerEvidenceSeries} from './chat-evidence-series.ts';
 type Grounding=Parameters<typeof answerEvidenceSeries>[1];
 /** Only a bounded snapshot question. Planning, causal and dated questions retain their normal route. */
 export function headcountChatReply(request:SolutionRequest,grounding:Grounding){
- const text=request.message.text.trim().toLowerCase().replace(/[?.!]$/,'');
- if(!['how has our headcount changed','show headcount snapshots','show our headcount trend'].includes(text))return null;
+ const text=normalizeHomeQuestion(request.message.text);
+ if(!/^(?:how has (?:our |the )?headcount changed|show (?:our |the )?headcount (?:snapshots|trend))$/.test(text))return null;
  const unavailable={answer:'The current headcount snapshots could not be verified for this scope. Refresh the workforce evidence before comparing them.',charts:[]};
  const source=normalizeHomePack(request.evidence).sources.find((s:{id:string})=>s.id==='W1');
  if(!source||!grounding||!acceptsGroundedAggregate(grounding,request.evidence,source,request))return unavailable;
