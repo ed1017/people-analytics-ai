@@ -1,0 +1,387 @@
+{
+  "version": "synthetic-ta-calibration-targets-v2",
+  "auditDate": "2026-10-08",
+  "cutoff": "2026-09-30",
+  "provenance": "Read-only aggregate snapshot of existing public TA views. Calibration targets only; no identities or generated chronology claimed as observed.",
+  "summary": {
+    "as_of": "2026-09-30",
+    "hires": 5080,
+    "applications": 62104,
+    "external_hires": 4480,
+    "internal_hires": 600,
+    "open_positions": 475,
+    "offer_to_hire_pct": 87.6,
+    "open_requisitions": 475,
+    "offer_acceptance_pct": 87.6,
+    "offered_applications": 5800,
+    "avg_open_req_age_days": 83.1,
+    "avg_time_to_fill_days": 51.7,
+    "interview_to_offer_pct": 38,
+    "open_reqs_over_60_days": 323,
+    "application_to_hire_pct": 8.2,
+    "interviewed_applications": 15269,
+    "median_open_req_age_days": 83,
+    "median_time_to_fill_days": 49,
+    "application_to_interview_pct": 24.6
+  },
+  "monthly": [
+    {
+      "hires": 69,
+      "month": "2024-01-01",
+      "offers": 123,
+      "applications": 1508,
+      "interviewed_applications": 388,
+      "external_hires": 69,
+      "internal_hires": 0
+    },
+    {
+      "hires": 137,
+      "month": "2024-02-01",
+      "offers": 161,
+      "applications": 1613,
+      "interviewed_applications": 479,
+      "external_hires": 130,
+      "internal_hires": 7
+    },
+    {
+      "hires": 168,
+      "month": "2024-03-01",
+      "offers": 196,
+      "applications": 1907,
+      "interviewed_applications": 547,
+      "external_hires": 144,
+      "internal_hires": 24
+    },
+    {
+      "hires": 159,
+      "month": "2024-04-01",
+      "offers": 171,
+      "applications": 1656,
+      "interviewed_applications": 503,
+      "external_hires": 138,
+      "internal_hires": 21
+    },
+    {
+      "hires": 158,
+      "month": "2024-05-01",
+      "offers": 181,
+      "applications": 1730,
+      "interviewed_applications": 474,
+      "external_hires": 139,
+      "internal_hires": 19
+    },
+    {
+      "hires": 150,
+      "month": "2024-06-01",
+      "offers": 165,
+      "applications": 1629,
+      "interviewed_applications": 496,
+      "external_hires": 130,
+      "internal_hires": 20
+    },
+    {
+      "hires": 157,
+      "month": "2024-07-01",
+      "offers": 183,
+      "applications": 1846,
+      "interviewed_applications": 525,
+      "external_hires": 138,
+      "internal_hires": 19
+    },
+    {
+      "hires": 163,
+      "month": "2024-08-01",
+      "offers": 180,
+      "applications": 1613,
+      "interviewed_applications": 506,
+      "external_hires": 142,
+      "internal_hires": 21
+    },
+    {
+      "hires": 152,
+      "month": "2024-09-01",
+      "offers": 173,
+      "applications": 1732,
+      "interviewed_applications": 477,
+      "external_hires": 135,
+      "internal_hires": 17
+    },
+    {
+      "hires": 149,
+      "month": "2024-10-01",
+      "offers": 179,
+      "applications": 1701,
+      "interviewed_applications": 511,
+      "external_hires": 134,
+      "internal_hires": 15
+    },
+    {
+      "hires": 150,
+      "month": "2024-11-01",
+      "offers": 165,
+      "applications": 1709,
+      "interviewed_applications": 482,
+      "external_hires": 134,
+      "internal_hires": 16
+    },
+    {
+      "hires": 163,
+      "month": "2024-12-01",
+      "offers": 202,
+      "applications": 1864,
+      "interviewed_applications": 566,
+      "external_hires": 134,
+      "internal_hires": 29
+    },
+    {
+      "hires": 162,
+      "month": "2025-01-01",
+      "offers": 178,
+      "applications": 1840,
+      "interviewed_applications": 530,
+      "external_hires": 145,
+      "internal_hires": 17
+    },
+    {
+      "hires": 157,
+      "month": "2025-02-01",
+      "offers": 180,
+      "applications": 1785,
+      "interviewed_applications": 508,
+      "external_hires": 132,
+      "internal_hires": 25
+    },
+    {
+      "hires": 168,
+      "month": "2025-03-01",
+      "offers": 185,
+      "applications": 1960,
+      "interviewed_applications": 553,
+      "external_hires": 145,
+      "internal_hires": 23
+    },
+    {
+      "hires": 172,
+      "month": "2025-04-01",
+      "offers": 202,
+      "applications": 1856,
+      "interviewed_applications": 549,
+      "external_hires": 142,
+      "internal_hires": 30
+    },
+    {
+      "hires": 166,
+      "month": "2025-05-01",
+      "offers": 193,
+      "applications": 1741,
+      "interviewed_applications": 514,
+      "external_hires": 145,
+      "internal_hires": 21
+    },
+    {
+      "hires": 154,
+      "month": "2025-06-01",
+      "offers": 178,
+      "applications": 1776,
+      "interviewed_applications": 499,
+      "external_hires": 135,
+      "internal_hires": 19
+    },
+    {
+      "hires": 164,
+      "month": "2025-07-01",
+      "offers": 179,
+      "applications": 1998,
+      "interviewed_applications": 544,
+      "external_hires": 148,
+      "internal_hires": 16
+    },
+    {
+      "hires": 165,
+      "month": "2025-08-01",
+      "offers": 199,
+      "applications": 1899,
+      "interviewed_applications": 530,
+      "external_hires": 142,
+      "internal_hires": 23
+    },
+    {
+      "hires": 161,
+      "month": "2025-09-01",
+      "offers": 177,
+      "applications": 1822,
+      "interviewed_applications": 538,
+      "external_hires": 146,
+      "internal_hires": 15
+    },
+    {
+      "hires": 166,
+      "month": "2025-10-01",
+      "offers": 184,
+      "applications": 2043,
+      "interviewed_applications": 541,
+      "external_hires": 139,
+      "internal_hires": 27
+    },
+    {
+      "hires": 152,
+      "month": "2025-11-01",
+      "offers": 175,
+      "applications": 1661,
+      "interviewed_applications": 506,
+      "external_hires": 136,
+      "internal_hires": 16
+    },
+    {
+      "hires": 166,
+      "month": "2025-12-01",
+      "offers": 182,
+      "applications": 1819,
+      "interviewed_applications": 514,
+      "external_hires": 149,
+      "internal_hires": 17
+    },
+    {
+      "hires": 167,
+      "month": "2026-01-01",
+      "offers": 173,
+      "applications": 2004,
+      "interviewed_applications": 556,
+      "external_hires": 149,
+      "internal_hires": 18
+    },
+    {
+      "hires": 159,
+      "month": "2026-02-01",
+      "offers": 202,
+      "applications": 1654,
+      "interviewed_applications": 504,
+      "external_hires": 133,
+      "internal_hires": 26
+    },
+    {
+      "hires": 151,
+      "month": "2026-03-01",
+      "offers": 167,
+      "applications": 1955,
+      "interviewed_applications": 534,
+      "external_hires": 136,
+      "internal_hires": 15
+    },
+    {
+      "hires": 163,
+      "month": "2026-04-01",
+      "offers": 178,
+      "applications": 1629,
+      "interviewed_applications": 503,
+      "external_hires": 149,
+      "internal_hires": 14
+    },
+    {
+      "hires": 151,
+      "month": "2026-05-01",
+      "offers": 190,
+      "applications": 2037,
+      "interviewed_applications": 545,
+      "external_hires": 136,
+      "internal_hires": 15
+    },
+    {
+      "hires": 165,
+      "month": "2026-06-01",
+      "offers": 177,
+      "applications": 2305,
+      "interviewed_applications": 647,
+      "external_hires": 144,
+      "internal_hires": 21
+    },
+    {
+      "hires": 180,
+      "month": "2026-07-01",
+      "offers": 209,
+      "applications": 2463,
+      "interviewed_applications": 760,
+      "external_hires": 152,
+      "internal_hires": 28
+    },
+    {
+      "hires": 141,
+      "month": "2026-08-01",
+      "offers": 154,
+      "applications": 2433,
+      "interviewed_applications": 808,
+      "external_hires": 135,
+      "internal_hires": 6
+    },
+    {
+      "hires": 75,
+      "month": "2026-09-01",
+      "offers": 59,
+      "applications": 2239,
+      "interviewed_applications": 785,
+      "external_hires": 75,
+      "internal_hires": 0
+    }
+  ],
+  "pre2024Applications": [
+    {
+      "month": "2023-11-01",
+      "applications": 57
+    },
+    {
+      "month": "2023-12-01",
+      "applications": 620
+    }
+  ],
+  "outcomes": [
+    {
+      "applications": 926,
+      "application_status": "active"
+    },
+    {
+      "applications": 1494,
+      "application_status": "closed"
+    },
+    {
+      "applications": 5080,
+      "application_status": "hired"
+    },
+    {
+      "applications": 720,
+      "application_status": "offer_declined"
+    },
+    {
+      "applications": 46744,
+      "application_status": "rejected"
+    },
+    {
+      "applications": 7140,
+      "application_status": "withdrawn"
+    }
+  ],
+  "sourceChecks": {
+    "applicationBounds": {
+      "min": "2023-11-02",
+      "before_2024": 677,
+      "max_in_scope": "2026-09-29"
+    },
+    "hireBounds": {
+      "min": "2024-01-13",
+      "before_2024": 0,
+      "max_in_scope": "2026-09-22",
+      "starts_after_cutoff": 0
+    },
+    "requisitionsAtCutoff": {
+      "active": 474,
+      "filled": 5080,
+      "opened": 5703,
+      "cancelled": 149,
+      "held_current": 67,
+      "positions_active": 474
+    },
+    "interviews": {
+      "unique": 15269,
+      "monthly_sum": 17922
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "experiment": "New synthetic aggregate experiment; not reconstruction or replacement of existing workforce data",
+  "recoveredEvidence": {
+    "commit": "c9ace41df024c4fb186e32ebf4da05b88597a799",
+    "path": "docs/evidence/recovered-construction-constraints.json",
+    "sha256": "33dddfd7d66cb4836d5e51ab0aa21c54e2b5f44eaf2d99806bc6c00eef499bd9",
+    "basis": "Previously preserved attributed construction evidence. No new source or database query in this workstream.",
+    "reusedConventions": ["Initial workforce anchor 8400", "Hires on snapshot date included; departures on snapshot date excluded", "Engagement 1–5 answer scale and favorable values 4/5", "Mean respondent favorable-answer shares rather than pooled-item satisfaction"],
+    "notRecovered": ["Complete executable original generator", "Original seed and sequence allocation", "Former employee entry rules", "Actual historical availability and revision logs", "Complete original hiring stage and survey instrument semantics"]
+  },
+  "newAssumptions": [
+    "72 new months and quarterly waves, company-wide aggregate population",
+    "Seeded independent domain random streams and five frozen scenario families",
+    "Monthly all-external opening cohorts, competing hiring outcomes and reporting-delay bounds",
+    "Generated actual external starts within the 72-month workforce window feed daily stock; later starts remain hiring follow-up, with explicit boundary reconciliation",
+    "Explicit five-item scoring, missing/invalid answers and independent within-wave nonresponse",
+    "Simulated availability, classifications and eligibility corrections, missing and suppressed releases",
+    "Forced early true-zero mechanics cases do not describe observed source patterns"
+  ],
+  "sourceObservedAt": null,
+  "sourceTruthVerified": false,
+  "operationallyQualified": false,
+  "causalEffect": null,
+  "calibratedInterval": null
+}

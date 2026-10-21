@@ -2,13 +2,13 @@
 
 Live app: https://www.ed-ai.app
 
-A synthetic-data People Analytics and Strategic Workforce Planning prototype. The public app offers workforce evidence, deterministic staffing scenarios, a guided three-minute demo, and an explicit-input headcount what-if. Live AI conversations are disabled in the public release. AI-assisted development does not mean that the site runs a live AI advisor.
+A synthetic-data People Analytics and Strategic Workforce Planning prototype. The public app offers workforce evidence, deterministic staffing scenarios, a guided planning scenario, and an explicit-input headcount what-if. Provider-backed planning conversations were restored in the October 21 release, subject to verified pricing windows and cumulative budget admission. See the release evidence boundaries below.
 
 Ed defined the workforce-planning problem, product requirements and acceptance criteria; AI assisted with implementation, design and testing.
 
 ## Try the public app
 
-Start with the three-minute demo on Home, compare staffing options, and save a proposal in your browser. Saved proposals are browser-local planning records. They are not approved workforce actions or shared enterprise records.
+Start with Try a planning scenario on Home, compare staffing options, and save a proposal in your browser. Saved proposals are browser-local planning records. They are not approved workforce actions or shared enterprise records.
 
 The public workforce snapshot contains 9,037 synthetic people as of September 30, 2026. The company headcount what-if takes explicit monthly hires and exits for October 2026 through March 2027. It illustrates conditional arithmetic, not a validated prediction or a payroll forecast.
 
@@ -16,19 +16,16 @@ This is a portfolio prototype. No measured adoption, savings, business impact or
 
 ## Repository and deployment status
 
-This repository's application baseline is the earlier public source at `f8c9304`. It is not an exact reproduction of the currently deployed 9,037-person release. The live application was released from a separately reviewed source snapshot; copying this repository or following its local setup does not reproduce that deployment.
+The exact application source subset from the October 21 hosted release is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. That snapshot maps to deployment `dpl_627T9CMztxkzoCqoqruB8PL3pEky` and local source identity `e974354f8abf28345c0ad219cd2cb9f321b7878b`.
 
-The deployed runtime depends on inputs excluded from public source distribution. A separately reviewed, public-safe fixture layer and matching integration tests are needed before synchronizing a reproducible public application release. Those excluded inputs and private release materials must not be added merely to make this repository match the live site.
+The root development application remains distinct from that versioned snapshot. Private synthetic runtime inputs, credentials and release evidence are excluded. Publishing the source closes the missing-source record; it does not make this repository a self-contained reproduction of the hosted service. Public fixture/receipt integration remains unfinished.
 
-Automatic Vercel deployments from `main` and this documentation branch are disabled in `vercel.json` so a documentation update cannot replace the separately reviewed live release with older application code. Re-enable the relevant branch only after the public application source and runtime fixtures are reconciled and reviewed.
-
-Documentation updates describe the current live experience while keeping that source gap explicit. Historical documentation, experiments and AI integration code in this repository are not evidence that their features are enabled publicly.
-
+Automatic Vercel deployments from main and this publication branch remain disabled. No production rebuild, configuration change or paid call accompanies this source publication. The release notes distinguish protected provider checks, captured-answer replay, local continuity tests and public configuration smoke; no fresh paid production browser journey through every step is claimed.
 See [Product architecture and availability](docs/product-architecture.md) for the distinction between the live prototype, the repository and proposed capabilities.
 
 ## Technology
 
-The application uses Next.js, React, TypeScript, Tailwind CSS, shadcn/ui, Recharts and Vercel. This repository also contains Supabase/PostgreSQL and OpenAI integration code. Their presence does not establish an active company data connection or enabled live AI in the public release.
+The application uses Next.js, React, TypeScript, Tailwind CSS, shadcn/ui, Recharts and Vercel. This repository also contains Supabase/PostgreSQL and OpenAI integration code. The hosted release uses reviewed server-side provider and admission configuration; those credentials and services are not supplied by this repository.
 
 Deterministic analytics and planning engines own the calculations. The public prototype does not require a visitor to make a paid AI call.
 

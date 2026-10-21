@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "dataset": "separate-synthetic-career-v1",
+  "seed": 51007,
+  "years": [2023, 2024, 2025],
+  "minimumCohort": 5,
+  "rubric": "demo-five-point-v1",
+  "departments": [{"code":"engineering","label":"Engineering"},{"code":"operations","label":"Operations"},{"code":"commercial","label":"Commercial"}],
+  "levels": [{"code":"L2","rank":2},{"code":"L3","rank":3},{"code":"L4","rank":4}],
+  "ratings": ["Below expectations","Partly meets expectations","Meets expectations","Exceeds expectations","Far exceeds expectations"],
+  "population": "Separate invented annual cohorts, not the recorded workforce, movement-event source or synthetic pay population. Department and job level are fixed at 1 January. Dashboard filters do not apply.",
+  "eligibility": "Active salaried at 1 January, hired by that date, at least 12 completed calendar months in the starting job level, and complete promotion-event coverage through 31 December or recorded exit. This is an invented demo eligibility rule, not company promotion policy. Later hires and incomplete or inconsistent inputs are excluded. Exits remain in the start-of-year denominator.",
+  "promotionRate": "Distinct eligible people with at least one recorded move to a higher level during the year, on or before exit, divided by all eligible people at the start of that year. Each person counts once; transfers and lateral moves do not count. This is a cohort proportion, not an event share or person-time incidence rate.",
+  "performance": "Share rated 3–5 divided by eligible people with one valid in-year rating on the unchanged synthetic 1–5 ordinal rubric. Missing or incompatible ratings are excluded, never zero. Rating categories are ordered, not assumed equally spaced; no mean rating or normal curve is used. Trends compare annual cohorts, not individual improvement.",
+  "duration": "Median and interpolated Q1–Q3 of completed calendar months from the start of the prior level to the first observed promotion, among eligible promotees only. Unpromoted people are excluded from this duration statistic. This selected subset is not a survival estimate, typical future wait, probability of promotion or prediction.",
+  "disclosure": "Only fixed department × starting-level × year cells are published. If any year has a small eligible, rated, rating-category, missing-rating, promoted or nonpromoted group (1–4), the whole cell series is withheld; eligible groups below five are withheld even at zero. A sole suppressed department within a level gets a complementary suppressed department, fixed across every year. No overall totals, overlapping marginals, individual rows, identifiers or rankings are shipped.",
+  "interpretation": "Descriptive invented aggregates only. Differences do not establish performance fairness, promotion fairness, causation, merit or individual readiness. No individual promotion recommendations. Deterministic suppression limits displayed detail; reproducible invented data is not a general privacy guarantee for real records."
+}

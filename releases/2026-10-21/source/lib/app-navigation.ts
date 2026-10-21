@@ -1,0 +1,180 @@
+import type { AppPage } from "./types";
+
+export type AppWorkspaceKey =
+  | "analytics"
+  | "talent"
+  | "strategy"
+  | "evaluate";
+
+export type AppNavigationSection = {
+  key: AppWorkspaceKey;
+  title: string;
+  pages: AppPage[];
+};
+
+export type AppPageMetadata = {
+  status?: "Limited preview";
+  label: string;
+  section: string;
+  description: string;
+};
+
+export const appWorkspaceJourneys: Array<{key: AppWorkspaceKey; journeyLabel: string; subtitle: string; defaultPage: AppPage}> = [
+  {key:"analytics", journeyLabel:"Workforce", subtitle:"Understand Our Workforce", defaultPage:"workforce"},
+  {key:"talent", journeyLabel:"Intelligence", subtitle:"Realize your potential", defaultPage:"occupational-references"},
+  {key:"strategy", journeyLabel:"Planning", subtitle:"Plan Our Future", defaultPage:"planning-overview"},
+  {key:"evaluate",journeyLabel:"Assess & Evaluate",subtitle:"Coming soon",defaultPage:"assess-evaluate"},
+];
+export const appNavigationSections: AppNavigationSection[] = [
+  {key:"analytics", title:"Workforce", pages:["workforce","attrition","talent-acquisition","compensation","survey-sentiment","skills","learning-development","career-growth-mobility","succession-planning"]},
+  {key:"talent", title:"Intelligence", pages:["occupational-references","labor-market","training-coaching"]},
+  {key:"strategy", title:"Planning", pages:["future-of-work","action-plans","plan-track","planning-overview","scenario-modeling","position-workforce-design","workforce-response","execution-feasibility","finance","development-planning","decision-brief"]},
+  {key:"evaluate",title:"Assess & Evaluate",pages:["assess-evaluate"]},
+];
+
+export const appPageMetadata: Record<
+  AppPage,
+  AppPageMetadata
+> = {
+  "future-of-work": {label:"Future of Work",section:"Planning",description:"Review the task and adoption inputs needed to model how work could change."},
+  "action-plans": {label:"Action plans",section:"Planning",description:"Review saved proposals for the selected goal; proposals are not completed actions."},
+  "plan-track": {label:"Track",section:"Planning",description:"Review saved dated measurements and their scope."},
+  "decision-brief":{label:"Decision brief",section:"Planning",description:"Your browser-local evidence, assumptions, proposals and explicit approval notes."},
+  "assess-evaluate":{label:"Assess & Evaluate · Coming soon",section:"Assess & Evaluate",description:"Placeholder only; no outcomes, scorecard or ROI calculation."},
+  "occupational-references": {label:"Occupational References",section:"Intelligence",description:"Search job-profile mappings, role requirements and O*NET occupation references."},
+  "labor-market": {status:"Limited preview",label:"Labor Market",section:"Intelligence",description:"Compare published occupation wages, employment and separate U.S. projections."},
+  "training-coaching": {status:"Limited preview",label:"Training & Coaching",section:"Intelligence",description:"Fictional simulated provider examples and unverified user-provided quotes."},
+  "development-planning": { status:"Limited preview", label: "Development Planning", section: "Planning", description: "Compare explicitly selected development quotes and user-entered cost assumptions." },
+  home: { label: "Overview", section: "Planning", description: "Start a workforce scenario, review current capacity and continue your saved work." },
+  overview: {
+    label: "Workforce",
+    section: "Workforce",
+    description:
+      "Executive workforce health, trends, and business impact.",
+  },
+  workforce: {
+    label: "Workforce",
+    section: "Workforce",
+    description:
+      "Workforce size, structure, tenure, management layers, and mobility.",
+  },
+  compensation: { label: "Compensation", section: "Workforce", description: "Demo job salary ranges and USD-subset compa-ratios with partial coverage. Public US wage references and workforce-cost context have separate scopes." },
+  attrition: {
+    label: "Attrition",
+    section: "Workforce",
+    description:
+      "Turnover patterns, regrettable loss, and separation drivers.",
+  },  "talent-acquisition": {
+    label: "Talent Acquisition",
+    section: "Workforce",
+    description:
+      "Recruiting demand, funnel performance, hiring outcomes, and speed.",
+  },
+  "survey-sentiment": {
+    label: "Employee Listening",
+    section: "Workforce",
+    description:
+      "Employee sentiment, participation, themes, and workforce signals.",
+  },
+  skills: {
+    label: "Skills Intelligence",
+    section: "Workforce",
+    description:
+      "Internal workforce skills, recorded proficiency gaps and role demand.",
+  },
+  "learning-development": {
+    label: "Learning & Development",
+    section: "Workforce",
+    description:
+      "Learning pathway coverage for current skill gaps and job-profile requirements.",
+  },
+  "career-mobility": {
+    label: "Career Interests",
+    section: "Workforce",
+    description:
+      "Recorded career interests, desired destinations, relocation willingness, and preference coverage.",
+  },
+  "career-growth-mobility": {
+    label: "Career Growth & Internal Mobility",
+    section: "Workforce",
+    description:
+      "Original-workforce ratings, promotion rate and prior-level time, with unavailable measures identified.",
+  },
+  "succession-planning": {
+    label: "Succession Planning",
+    section: "Workforce",
+    description:
+      "Company-wide recorded succession-plan coverage and source-assessment readiness signals.",
+  },
+  "planning-overview": {
+    label: "Demand & scenarios",
+    section: "Planning",
+    description:
+      "Compare assumed monthly workload with available capacity; open earlier planning tools when needed.",
+  },
+  "scenario-modeling": {
+    label: "Scenario Modeling",
+    section: "Planning",
+    description:
+      "Model company and business-unit workforce demand and compare scenarios.",
+  },
+  "position-workforce-design": {
+    label: "Position & Workforce Design",
+    section: "Planning",
+    description:
+      "Translate scenarios into authorized-position, recruiting, and skill-demand changes.",
+  },
+  "workforce-response": {
+    label: "Workforce Response",
+    section: "Planning",
+    description:
+      "Plan Build, Move, and Buy responses against modeled role gaps.",
+  },
+  "execution-feasibility": {
+    label: "Execution & Feasibility",
+    section: "Planning",
+    description:
+      "Schedule workforce responses, test constraints, and identify execution blockers.",
+  },
+  "workforce-planning": {
+    label: "Workforce Planning",
+    section: "Planning",
+    description:
+      "Plan, design, respond, and execute against future workforce demand.",
+  },  finance: {
+    label: "Labor Cost Planning",
+    section: "Planning",
+    description:
+      "Labor cost, workforce economics, vacancy exposure, and scenario impact.",
+  },
+};
+
+export function getAppPageMetadata(
+  page: AppPage
+) {
+  return appPageMetadata[page];
+}
+
+export function getWorkspaceForPage(
+  page: AppPage
+): AppWorkspaceKey {
+  if (page === "workforce-planning") {
+    return "strategy";
+  }
+
+  return (
+    appNavigationSections.find((section) =>
+      section.pages.includes(page)
+    )?.key ?? "analytics"
+  );
+}
+
+export function getDefaultPageForWorkspace(
+  workspace: AppWorkspaceKey
+): AppPage {
+  return (
+    appWorkspaceJourneys.find(
+      (item) => item.key === workspace
+    )?.defaultPage ?? "workforce"
+  );
+}

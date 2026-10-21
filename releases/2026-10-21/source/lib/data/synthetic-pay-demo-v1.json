@@ -1,0 +1,412 @@
+{
+  "version": 1,
+  "status": "verified",
+  "dataset": "separate-synthetic-pay-v1",
+  "dataClass": "constructed-synthetic",
+  "effectiveDate": "2026-09-30",
+  "currency": "USD",
+  "payUnit": "Annual base pay at 1.0 FTE",
+  "minimumCohort": 5,
+  "seed": 51006,
+  "jobs": [
+    {
+      "code": "software-developer",
+      "label": "Software developer"
+    },
+    {
+      "code": "data-analyst",
+      "label": "Data analyst"
+    },
+    {
+      "code": "people-operations",
+      "label": "People operations specialist"
+    }
+  ],
+  "levels": [
+    {
+      "code": "L2",
+      "label": "L2"
+    },
+    {
+      "code": "L3",
+      "label": "L3"
+    }
+  ],
+  "locations": [
+    {
+      "code": "austin",
+      "label": "Austin"
+    },
+    {
+      "code": "chicago",
+      "label": "Chicago"
+    },
+    {
+      "code": "seattle",
+      "label": "Seattle"
+    }
+  ],
+  "definitions": {
+    "population": "Invented active salaried workforce, separate from every recorded-data cohort and public wage reference.",
+    "compaRatio": "100 * sum(annual contracted base pay / FTE) / sum(matching annual full-time base-pay range midpoint)",
+    "distribution": "Equal-person descriptive statistics of annual contracted base pay / FTE; population SD divides by eligible N; quartiles use linear interpolation at (N-1)*p.",
+    "disclosure": "Release only fixed disjoint job-level-location cells. Withhold every measure for eligible N<5, then suppress one additional cell when a job-level partition has exactly one suppressed location. No totals, marginals, arbitrary bins, time comparisons or row records are published. Counts of 1-4 excluded records and their total/coverage denominator are withheld.",
+    "interpretation": "Designed demonstration only. Midpoints and location multipliers are invented, not BLS estimates, employer pay policy, market premiums, pay-equity findings or individual rankings. No normality assumption. Suppression is a demonstration disclosure rule, not a general privacy guarantee."
+  },
+  "cohorts": [
+    {
+      "id": "software-developer:L2:austin",
+      "job": "software-developer",
+      "level": "L2",
+      "location": "austin",
+      "status": "published",
+      "coverage": {
+        "eligible": 16,
+        "status": "complete",
+        "excluded": 0,
+        "total": 16
+      },
+      "metrics": {
+        "compaRatioPct": 97.45,
+        "rangeMidpoint": 100000,
+        "mean": 97450,
+        "median": 94650,
+        "q1": 89100,
+        "q3": 106300,
+        "sd": 11562.01
+      }
+    },
+    {
+      "id": "software-developer:L2:chicago",
+      "job": "software-developer",
+      "level": "L2",
+      "location": "chicago",
+      "status": "published",
+      "coverage": {
+        "eligible": 16,
+        "status": "partial",
+        "excluded": null,
+        "total": null
+      },
+      "metrics": {
+        "compaRatioPct": 100.61,
+        "rangeMidpoint": 105000,
+        "mean": 105643.75,
+        "median": 106750,
+        "q1": 99800,
+        "q3": 113425,
+        "sd": 9452.11
+      }
+    },
+    {
+      "id": "software-developer:L2:seattle",
+      "job": "software-developer",
+      "level": "L2",
+      "location": "seattle",
+      "status": "published",
+      "coverage": {
+        "eligible": 17,
+        "status": "partial",
+        "excluded": null,
+        "total": null
+      },
+      "metrics": {
+        "compaRatioPct": 93.66,
+        "rangeMidpoint": 115000,
+        "mean": 107705.88,
+        "median": 105700,
+        "q1": 100400,
+        "q3": 114000,
+        "sd": 9632.63
+      }
+    },
+    {
+      "id": "software-developer:L3:austin",
+      "job": "software-developer",
+      "level": "L3",
+      "location": "austin",
+      "status": "published",
+      "coverage": {
+        "eligible": 14,
+        "status": "partial",
+        "excluded": null,
+        "total": null
+      },
+      "metrics": {
+        "compaRatioPct": 100.07,
+        "rangeMidpoint": 130000,
+        "mean": 130092.86,
+        "median": 129950,
+        "q1": 124725,
+        "q3": 137000,
+        "sd": 10539.28
+      }
+    },
+    {
+      "id": "software-developer:L3:chicago",
+      "job": "software-developer",
+      "level": "L3",
+      "location": "chicago",
+      "status": "published",
+      "coverage": {
+        "eligible": 14,
+        "status": "partial",
+        "excluded": null,
+        "total": null
+      },
+      "metrics": {
+        "compaRatioPct": 96.53,
+        "rangeMidpoint": 136500,
+        "mean": 131757.14,
+        "median": 131250,
+        "q1": 119650,
+        "q3": 144650,
+        "sd": 13686.79
+      }
+    },
+    {
+      "id": "software-developer:L3:seattle",
+      "job": "software-developer",
+      "level": "L3",
+      "location": "seattle",
+      "status": "published",
+      "coverage": {
+        "eligible": 20,
+        "status": "complete",
+        "excluded": 0,
+        "total": 20
+      },
+      "metrics": {
+        "compaRatioPct": 95.52,
+        "rangeMidpoint": 149500,
+        "mean": 142800,
+        "median": 140000,
+        "q1": 133525,
+        "q3": 148825,
+        "sd": 12836.59
+      }
+    },
+    {
+      "id": "data-analyst:L2:austin",
+      "job": "data-analyst",
+      "level": "L2",
+      "location": "austin",
+      "status": "published",
+      "coverage": {
+        "eligible": 22,
+        "status": "partial",
+        "excluded": null,
+        "total": null
+      },
+      "metrics": {
+        "compaRatioPct": 102.06,
+        "rangeMidpoint": 80000,
+        "mean": 81650,
+        "median": 82400,
+        "q1": 77200,
+        "q3": 88525,
+        "sd": 8214.39
+      }
+    },
+    {
+      "id": "data-analyst:L2:chicago",
+      "job": "data-analyst",
+      "level": "L2",
+      "location": "chicago",
+      "status": "published",
+      "coverage": {
+        "eligible": 14,
+        "status": "partial",
+        "excluded": null,
+        "total": null
+      },
+      "metrics": {
+        "compaRatioPct": 95.91,
+        "rangeMidpoint": 84000,
+        "mean": 80564.29,
+        "median": 80100,
+        "q1": 75000,
+        "q3": 84600,
+        "sd": 7803.81
+      }
+    },
+    {
+      "id": "data-analyst:L2:seattle",
+      "job": "data-analyst",
+      "level": "L2",
+      "location": "seattle",
+      "status": "published",
+      "coverage": {
+        "eligible": 22,
+        "status": "complete",
+        "excluded": 0,
+        "total": 22
+      },
+      "metrics": {
+        "compaRatioPct": 101.47,
+        "rangeMidpoint": 92000,
+        "mean": 93354.55,
+        "median": 91550,
+        "q1": 84975,
+        "q3": 100675,
+        "sd": 10104.04
+      }
+    },
+    {
+      "id": "data-analyst:L3:austin",
+      "job": "data-analyst",
+      "level": "L3",
+      "location": "austin",
+      "status": "suppressed",
+      "coverage": null,
+      "metrics": null
+    },
+    {
+      "id": "data-analyst:L3:chicago",
+      "job": "data-analyst",
+      "level": "L3",
+      "location": "chicago",
+      "status": "published",
+      "coverage": {
+        "eligible": 18,
+        "status": "complete",
+        "excluded": 0,
+        "total": 18
+      },
+      "metrics": {
+        "compaRatioPct": 99.23,
+        "rangeMidpoint": 109200,
+        "mean": 108361.11,
+        "median": 107800,
+        "q1": 103350,
+        "q3": 117050,
+        "sd": 9878.49
+      }
+    },
+    {
+      "id": "data-analyst:L3:seattle",
+      "job": "data-analyst",
+      "level": "L3",
+      "location": "seattle",
+      "status": "suppressed",
+      "coverage": null,
+      "metrics": null
+    },
+    {
+      "id": "people-operations:L2:austin",
+      "job": "people-operations",
+      "level": "L2",
+      "location": "austin",
+      "status": "suppressed",
+      "coverage": null,
+      "metrics": null
+    },
+    {
+      "id": "people-operations:L2:chicago",
+      "job": "people-operations",
+      "level": "L2",
+      "location": "chicago",
+      "status": "published",
+      "coverage": {
+        "eligible": 22,
+        "status": "complete",
+        "excluded": 0,
+        "total": 22
+      },
+      "metrics": {
+        "compaRatioPct": 102.34,
+        "rangeMidpoint": 73500,
+        "mean": 75218.18,
+        "median": 77250,
+        "q1": 70225,
+        "q3": 81175,
+        "sd": 7659.02
+      }
+    },
+    {
+      "id": "people-operations:L2:seattle",
+      "job": "people-operations",
+      "level": "L2",
+      "location": "seattle",
+      "status": "suppressed",
+      "coverage": null,
+      "metrics": null
+    },
+    {
+      "id": "people-operations:L3:austin",
+      "job": "people-operations",
+      "level": "L3",
+      "location": "austin",
+      "status": "published",
+      "coverage": {
+        "eligible": 22,
+        "status": "complete",
+        "excluded": 0,
+        "total": 22
+      },
+      "metrics": {
+        "compaRatioPct": 104.1,
+        "rangeMidpoint": 91000,
+        "mean": 94731.82,
+        "median": 97650,
+        "q1": 91150,
+        "q3": 101600,
+        "sd": 9782.52
+      }
+    },
+    {
+      "id": "people-operations:L3:chicago",
+      "job": "people-operations",
+      "level": "L3",
+      "location": "chicago",
+      "status": "published",
+      "coverage": {
+        "eligible": 22,
+        "status": "partial",
+        "excluded": null,
+        "total": null
+      },
+      "metrics": {
+        "compaRatioPct": 97.94,
+        "rangeMidpoint": 95550,
+        "mean": 93581.82,
+        "median": 92300,
+        "q1": 84500,
+        "q3": 102100,
+        "sd": 9117.45
+      }
+    },
+    {
+      "id": "people-operations:L3:seattle",
+      "job": "people-operations",
+      "level": "L3",
+      "location": "seattle",
+      "status": "published",
+      "coverage": {
+        "eligible": 20,
+        "status": "partial",
+        "excluded": null,
+        "total": null
+      },
+      "metrics": {
+        "compaRatioPct": 99.16,
+        "rangeMidpoint": 104650,
+        "mean": 103775,
+        "median": 101100,
+        "q1": 96900,
+        "q3": 113300,
+        "sd": 10286
+      }
+    }
+  ],
+  "evidence": {
+    "sourceHashes": {
+      "lib/simulation/pay-demo-protocol.json": "ef7fc27310d4ef933d31a256d5448e3d5750b74919d05259e60acfc3b8f12d4f",
+      "lib/simulation/pay-demo.mjs": "be46b7bed0f9732e0f33eeaf7bb0e0fc3c69befeceb1e8b35e4e180ca1c74adf",
+      "lib/ml/synthetic-workforce/common.mjs": "60c9349a01e839e1a6fb6f6c67eb46a64f7ed6f5744e9a7757c9c4642783fc03"
+    },
+    "rowRecordsPublished": false,
+    "overallTotalsPublished": false,
+    "operationallyQualified": false
+  }
+}
