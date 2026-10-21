@@ -27,4 +27,4 @@ Protected provider checks cover intake, comparison, revisions, combinations, cap
 
 At publication, pricing verification expires October 22, 2026 at 00:00 UTC. Continuing operation requires a freshly verified policy and matching admission window. The cumulative budget is not reset by a release. This snapshot records a point in time; it is not a claim of perpetual availability.
 
-The next source-reproducibility step is the already identified public fixture/receipt integration. Saved/versioned headcount what-if remains a separate design proposal, not an implemented feature. No predictive accuracy, realized savings or enterprise persistence is claimed.
+The [local replay recipe](reproduction/README.md) implements bounded public fixture/receipt integration with a separate generated app. Full private calculator reconstruction and live AI are not reproduced. Saved/versioned headcount what-if remains a separate design proposal, not an implemented feature. No predictive accuracy, realized savings or enterprise persistence is claimed.

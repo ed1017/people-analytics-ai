@@ -38,4 +38,4 @@ The source manifest verifies all 714 original source files before copying. `REPR
 - Narrowed country/business-unit/level filters, unknown or duplicate query parameters and mismatched dataset tokens fail visibly. They never receive silently substituted company totals.
 - Full server calculator parity, live AI, private-source reconstruction and company-data onboarding are not reproduced by this increment.
 
-The six fixture tests cover exact 19-response replay, receipt/data tampering, explicit global scope, unsupported scope, disabled external operations and local-only request boundaries. Run the standalone source verifier as well. Build and browser verification outcomes belong to the implementation report, not inferred from this instruction list.
+The seven fixture tests cover exact 19-response replay, receipt/data tampering, explicit global scope, unsupported scope, disabled external operations local-only request boundaries and launcher argument restrictions. Run the standalone source verifier as well. Build and browser verification outcomes belong to the implementation report, not inferred from this instruction list.

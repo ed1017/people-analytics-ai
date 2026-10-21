@@ -3,9 +3,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import {createFixtureHandler} from './fixture-handler.mjs';
+import {commandArgs} from './run-next.mjs';
 const bytes=fs.readFileSync(new URL('./fixtures.json',import.meta.url));
 const capture=JSON.parse(bytes),handle=createFixtureHandler(capture);
 const request=(path,options)=>new Request('http://127.0.0.1:3097'+path,options);
+test('launcher permits ports but never an external binding override',()=>{
+ assert.deepEqual(commandArgs('start',['--port','3097']),['start','--hostname','127.0.0.1','--port','3097']);
+ for(const args of [['--hostname','0.0.0.0'],['-H','0.0.0.0'],['--port','0'],['--port','65536'],['--port','3097','--hostname','0.0.0.0']])assert.throws(()=>commandArgs('start',args));
+ assert.throws(()=>commandArgs('build',['--port','3097']));assert.throws(()=>commandArgs('start',[],{VERCEL:'1'}));
+});
 test('public fixture pin and full receipt bundle verify',()=>{
  assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),fs.readFileSync(new URL('./fixtures.sha256',import.meta.url),'utf8').trim());
  assert.equal(capture.documents.length,19);
