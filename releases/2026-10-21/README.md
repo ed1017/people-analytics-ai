@@ -2,10 +2,10 @@
 
 This directory publishes the application source from the reviewed 9,037-person release at https://www.ed-ai.app. It is a source snapshot, not a deployable replacement for the root development application.
 
-- Deployed source commit: `e974354f8abf28345c0ad219cd2cb9f321b7878b` (local release identity; not a GitHub commit link).
-- Verified production deployment: `dpl_627T9CMztxkzoCqoqruB8PL3pEky`.
-- Original deployed package SHA-256: `40c78460cbbe49c97545c17b7e3bbbf560b199f85679359bf17bf7cc5b9d3ed7`.
-- `source/` contains 714 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The deployed archive was independently downloaded and matched before this subset was extracted.
+- Deployed source commit: `b3890b9a17bd1da661ae2463c91589774fc4d955` (local release identity; not a GitHub commit link).
+- Verified production deployment: `dpl_Eg21b7PzxbtsoKE35RgyBykAUbnk`.
+- Original deployed package SHA-256: `73d6cdf115ac754ebf2f7a0f02febe56a82ee94c4669ff452645237fc276095b`.
+- `source/` contains 716 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before the same build was promoted.
 
 Verify without dependencies, credentials or network:
 
@@ -28,3 +28,11 @@ Protected provider checks cover intake, comparison, revisions, combinations, cap
 At publication, pricing verification expires October 22, 2026 at 00:00 UTC. Continuing operation requires a freshly verified policy and matching admission window. The cumulative budget is not reset by a release. This snapshot records a point in time; it is not a claim of perpetual availability.
 
 The next source-reproducibility step is the already identified public fixture/receipt integration. Saved/versioned headcount what-if remains a separate design proposal, not an implemented feature. No predictive accuracy, realized savings or enterprise persistence is claimed.
+
+## Home question and split-view update
+
+The calendar-year turnover shortcut now resolves relative years using the trusted server clock and request timezone, and computes annual exits divided by average monthly closing headcount only when all twelve months and matching company-wide sources are verified. For calendar 2025 the current synthetic dataset yields 1,342 exits / 8,743.67 average headcount, or 15.35%. Missing or conflicting evidence remains unavailable; monthly rates are never summed.
+
+Home keeps the conversation and composer left and the current answer's supported visuals right, with a stacked mobile layout. New questions, errors and stale evidence clear prior visuals. Four natural-language prompts submit their visible text; the planning scenario popup remains separate. No cost-driver causality or new forecasting capability is claimed.
+
+Validation: 11 annual-contract tests, 8 existing consumer/grounding tests, 13 route tests (including exact prompt routing with fake provider ports), and 12 UI tests pass; TypeScript, focused lint and the production build pass. Independent reviews cleared the annual contract and UI. Real staged desktop/phone checks returned the annual answer and monthly chart with zero model rounds. Other prompt answers were not re-tested with fresh paid provider calls. Data inputs, provider configuration, budget and permissions are unchanged.

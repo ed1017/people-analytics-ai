@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "sourceCommit": "e974354f8abf28345c0ad219cd2cb9f321b7878b",
-  "deployment": "dpl_627T9CMztxkzoCqoqruB8PL3pEky",
-  "verifiedDeployedArchiveSha256": "40c78460cbbe49c97545c17b7e3bbbf560b199f85679359bf17bf7cc5b9d3ed7",
+  "sourceCommit": "b3890b9a17bd1da661ae2463c91589774fc4d955",
+  "deployment": "dpl_Eg21b7PzxbtsoKE35RgyBykAUbnk",
+  "verifiedDeployedArchiveSha256": "73d6cdf115ac754ebf2f7a0f02febe56a82ee94c4669ff452645237fc276095b",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -540,13 +540,13 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "c945d3fe560fe2d6817e229a4232ef2d2490e211836f8be0ce90a40ecb386025",
-      "bytes": 15867
+      "sha256": "a554ee7fd5ca9d7569841fb38ea94acc027bf92e3a7417889c3cef960584db38",
+      "bytes": 17072
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "1e539d8a35a4c3a4b3ab373638a1865b5e31d52ac967109ff82854bdffe671c5",
-      "bytes": 16600
+      "sha256": "b635168f0bbac9064cb4e9c767cd47a65f675d84f31cd69bfab9363464c15e23",
+      "bytes": 16496
     },
     {
       "path": "components/home-data-status.tsx",
@@ -745,8 +745,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "857ba3215dc3abc1d0200ac37168d047478c6877db986b84c9cae2831febb675",
-      "bytes": 93247
+      "sha256": "842ff0ef6e10b355e52868fdabb567026ef681b472fe8e81640f7b2665f8a29c",
+      "bytes": 95625
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -2220,8 +2220,8 @@
     },
     {
       "path": "lib/home-history-selection.ts",
-      "sha256": "af672b5104e3134bcff4754d13cfa95e3efbcfa6daa0a3cdb43296e4c0476076",
-      "bytes": 3004
+      "sha256": "b0a3dcde3cb8fa4dcd572428683a7d1e7e431974f779e7d99e15d773d69b30aa",
+      "bytes": 3483
     },
     {
       "path": "lib/home-investigation-contract.ts",
@@ -2465,8 +2465,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "795f03c85ba363ac2a4a797987fc89facdd974cca35ccc3a4f896977059f2b18",
-      "bytes": 35991
+      "sha256": "5fd39fe1d6412dbe7e865cd74bf0340ccb9f714c205745c6d3909ba30f8ea31f",
+      "bytes": 36040
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -2555,8 +2555,8 @@
     },
     {
       "path": "lib/home-turnover-chat.ts",
-      "sha256": "9efd30c711f97e29193cebd0b830919ddc71696c038b8f52d7d1828b3d4e82cd",
-      "bytes": 11960
+      "sha256": "7ee79e5e54a12c0b82c5f23b92537c75d7e5125c6ab9899096152a9a4fc17059",
+      "bytes": 16363
     },
     {
       "path": "lib/home-turnover-context.ts",
@@ -3582,6 +3582,16 @@
       "path": "lib/catalog-display.ts",
       "sha256": "37bf812a3976b5d1e875c250d2c25a8c2b6069bcc834d5d47e073e7c227ece81",
       "bytes": 739
+    },
+    {
+      "path": "components/home-answer-visuals.tsx",
+      "sha256": "a4a99d87e2c64ba48bd7c07152b5458ab8a2d3e3ca1ccdbac50d165eb40206c0",
+      "bytes": 1768
+    },
+    {
+      "path": "lib/home-turnover-year.ts",
+      "sha256": "8f9beeaf979e5aa072201ecf91230c1866bafaeccd5585419d4902ad244aa786",
+      "bytes": 1118
     }
   ]
 }

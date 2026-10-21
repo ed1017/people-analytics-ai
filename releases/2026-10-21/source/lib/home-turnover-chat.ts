@@ -1,6 +1,8 @@
 import {acceptsGroundedAggregate,isPublicHomeReceiptCandidate} from './public-home-receipt.mjs';
 import {normalizeHomePack} from './home-pack.mjs';
 import type {SolutionRequest, SolutionState} from './home-solution-conversation';
+// @ts-expect-error Native Node tests share application source.
+import {annualTurnoverSelection} from './home-turnover-year.ts';
 
 type Metric='total'|'voluntary';
 type Period='monthly'|'ytd'|'annualized';
@@ -8,7 +10,7 @@ type Selection={metric:Metric;period:Period;months:string[]};
 type Grounding={datasetToken:string;packetSha256:string;sources:{id:string;status:string;scope:string;asOf:string|null;basis:string}[]};
 type Context=Selection&{version:1;datasetToken:string;scope:string;filters:string;answerId:string};
 type TurnoverState=SolutionState&{turnoverChat?:Context};
-type Intent={kind:'selected';selection:Selection}|{kind:'clarify'|'unsupported';answer:string}|{kind:'other'};
+type Intent={kind:'selected';selection:Selection}|{kind:'annual';selection:{year:number|'last';metric:Metric}}|{kind:'clarify'|'unsupported';answer:string}|{kind:'other'};
 const monthNames=['january','february','march','april','may','june','july','august','september','october','november','december'];
 const monthPattern=/\b(20\d{2})-(0[1-9]|1[0-2])(?:-01)?\b|\b(january|february|march|april|may|june|july|august|september|october|november|december)\b(?:\s+(20\d{2}))?/g;
 const topic=/\b(?:turnover|attrition)\b/i;
@@ -26,6 +28,7 @@ function previousSelection(request:SolutionRequest,grounding:Grounding|undefined
 
 /** Deliberately small language surface. Other workforce questions keep the existing conversation. */
 export function turnoverIntent(question:string,availableMonths:string[],previous?:Selection):Intent {
+ const annual=annualTurnoverSelection(question);if(annual)return {kind:'annual',selection:annual};
  const text=question.toLowerCase().replace(/[’']/g,'');
  const explicit=topic.test(text);
  const follow=/^(?:(?:and|what about|how about|show|show me|just|only|now|instead|actually|make it|for|in|please)\s+)*(?:voluntary|total|overall|monthly|ytd|year.to.date|annual(?:ized|ised)?|20\d{2}|january|february|march|april|may|june|july|august|september|october|november|december|company.wide)\b/.test(text);
@@ -72,14 +75,42 @@ export function turnoverChartMonths(question:string,dates:string[]):string[]|nul
  return wanted.length?dates.filter(d=>wanted.includes(d.slice(0,7))):dates;
 }
 
-/** Fresh checked A1 only. No new readers, model numbers, conversions or calculations. */
-export function turnoverChatReply(request:SolutionRequest,grounding:Grounding|undefined):{answer:string;chartQuestion:string|null;context:Context|null}|null {
+/** Fresh verified aggregates only; complete calendar years additionally require matching W1 stocks. */
+export function turnoverChatReply(request:SolutionRequest,grounding:Grounding|undefined,now=new Date()):{answer:string;chartQuestion:string|null;context:Context|null}|null {
  const pack=normalizeHomePack(request.evidence),source=pack.sources.find((s:{id:string})=>s.id==='A1');
  const facts=source?.facts as Record<string,unknown>|null|undefined;
  const rows=(facts?.monthly??[]) as Record<string,unknown>[];
  const dates=rows.map(r=>String(r.month).slice(0,7));
  const previous=previousSelection(request,grounding),intent=turnoverIntent(request.message.text,dates,previous);
  if(intent.kind==='other')return null;
+ if(intent.kind==='annual'){
+  const localYear=Number(new Intl.DateTimeFormat('en-US',{timeZone:request.timeZone,year:'numeric'}).format(now));
+  const year=intent.selection.year==='last'?localYear-1:intent.selection.year;
+  const start=year+'-01-01',end=year+'-12-31',metric=intent.selection.metric;
+  const label=metric==='total'?'Total':'Voluntary';
+  const resolved=intent.selection.year==='last'?`“Last year” means ${start} through ${end}, using the current calendar year in ${request.timeZone}. `:`For ${start} through ${end}, `;
+  const reply=(answer:string)=>({answer:resolved+answer,chartQuestion:null,context:null});
+  if(!grounding||source?.status!=='loaded'||!source.date||!acceptsGroundedAggregate(grounding,request.evidence,source,request))return reply('annual turnover is unavailable because the current exit-count evidence could not be verified. Refresh the workforce evidence before calculating.');
+  const latest=rows.filter(r=>/^20\d{2}-(0[1-9]|1[0-2])-01$/.test(String(r.month))&&String(r.month)<=source.date!&&rate(r[metric==='total'?'monthly_turnover_pct':'monthly_voluntary_turnover_pct'])).sort((a,b)=>String(a.month).localeCompare(String(b.month))).at(-1);
+  const closest=latest?` The closest supplied result is company-wide ${metric} monthly turnover for ${String(latest.month).slice(0,7)}: ${latest[metric==='total'?'monthly_turnover_pct':'monthly_voluntary_turnover_pct']}% [A1]. This is a monthly rate, not the requested annual rate.`:'';
+  if(!['country','org','level'].every(k=>request.filters[k as keyof SolutionRequest['filters']]==='all'))return reply('the supplied exit counts are company-wide and cannot establish annual turnover for the selected subgroup.'+closest);
+  const stock=pack.sources.find((s:{id:string})=>s.id==='W1');
+  if(stock?.status!=='loaded'||stock.date!==source.date||!acceptsGroundedAggregate(grounding,request.evidence,stock,request))return reply('annual turnover needs verified company-wide month-end headcounts for the same year and source date; those denominators are not available.'+closest);
+  if(end>source.date)return reply(`the full calendar year is not covered by the data, which ends ${source.date}. I cannot substitute YTD or annualized turnover.`+closest);
+  const counts:number[]=[],stocks:number[]=[],missing:string[]=[];
+  for(let month=1;month<=12;month++){
+   const key=year+'-'+String(month).padStart(2,'0'),monthEnd=new Date(Date.UTC(year,month,0)).toISOString().slice(0,10);
+   const exits=rows.filter(r=>r.month===key+'-01'),heads=((stock.facts as {rows?:Record<string,unknown>[]} | null)?.rows??[]).filter((r:Record<string,unknown>)=>r.snapshot_date===monthEnd);
+   const n=exits[0]?.[metric==='total'?'total_exits':'voluntary_exits'],h=heads[0]?.headcount;
+   if(exits.length!==1||heads.length!==1||exits[0]?.suppressed===true||heads[0]?.suppressed===true||!Number.isSafeInteger(n)||Number(n)<0||!Number.isSafeInteger(h)||Number(h)<0){missing.push(key);continue;}
+   counts.push(Number(n));stocks.push(Number(h));
+  }
+  if(missing.length)return reply(`annual turnover needs one verified exit count and month-end headcount for each of all 12 months. Missing, duplicate or unknown evidence affects: ${missing.join(', ')}. I will not sum monthly rates or use today's headcount instead.`+closest);
+  const exits=counts.reduce((a,b)=>a+b,0),stockSum=stocks.reduce((a,b)=>a+b,0),average=stockSum/12;
+  if(!Number.isSafeInteger(exits)||!Number.isSafeInteger(stockSum)||average<=0)return reply('annual turnover is undefined because the verified average workforce denominator is zero or invalid.'+closest);
+  const fmt=(n:number,digits=2)=>n.toLocaleString('en-US',{maximumFractionDigits:digits});
+  return reply(`${label} company-wide turnover was ${fmt(exits/average*100)}%. Calculation: ${fmt(exits,0)} recorded ${metric==='total'?'total':'voluntary'} exits [A1] / ${fmt(average)} average month-end headcount across all 12 months [W1] × 100. This uses the average of monthly closing headcounts, not a sum of monthly rates. Synthetic recorded data as of ${source.date}; no forecast or causal claim.`);
+ }
  if(intent.kind!=='selected')return {answer:intent.answer,chartQuestion:null,context:null};
  if(!grounding||!/^[a-f0-9]{64}$/.test(grounding.packetSha256)||source?.status!=='loaded'||!source.date||!acceptsGroundedAggregate(grounding,request.evidence,source,request))return {answer:'Turnover is unknown for this request because current company aggregate evidence could not be verified. No chart is available.',chartQuestion:null,context:null};
  const {metric,period,months}=intent.selection;

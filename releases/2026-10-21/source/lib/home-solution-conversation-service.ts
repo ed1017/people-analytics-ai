@@ -91,7 +91,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  const original=readSolutionRequest(raw),request=structuredClone(original),state=request.state;
  abort(signal);
  if(isPublicHomeReceiptCandidate(runtime.grounding)&&!acceptsPublicHomeReceipt(runtime.grounding,request.evidence,request))throw new SolutionResponseError('answer_unavailable','Current public evidence could not be verified.');
- const turnover=!runtime.staffingScenarioOnly&&!runtime.demand?turnoverChatReply(request,runtime.grounding):null;
+ const turnover=!runtime.staffingScenarioOnly&&!runtime.demand?turnoverChatReply(request,runtime.grounding,runtime.requestTime??runtime.now?.()??new Date()):null;
  clearTurnoverChat(state);
  if(turnover){
   const {answer,chartQuestion,context}=turnover;
