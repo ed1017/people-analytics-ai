@@ -94,6 +94,9 @@ export function solutionModelContext(request:SolutionRequest,progress?:GoalProgr
 export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,signal:AbortSignal):Promise<SolutionReply>{
  const original=readSolutionRequest(raw),request=structuredClone(original),state=request.state;
  abort(signal);
+ // Calculation visibility belongs to this answer, not retained scenario memory.
+ // Deterministic replies can return before the model path sets fresh markers.
+ state.currentCalculationKinds=[];
  if(isPublicHomeReceiptCandidate(runtime.grounding)&&!acceptsPublicHomeReceipt(runtime.grounding,request.evidence,request))throw new SolutionResponseError('answer_unavailable','Current public evidence could not be verified.');
  const turnover=!runtime.staffingScenarioOnly&&!runtime.demand?turnoverChatReply(request,runtime.grounding,runtime.requestTime??runtime.now?.()??new Date()):null;
  clearTurnoverChat(state);
