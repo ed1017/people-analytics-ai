@@ -2,10 +2,10 @@
 
 This directory publishes the application source from the reviewed 9,037-person release at https://www.ed-ai.app. It is a source snapshot, not a deployable replacement for the root development application.
 
-- Deployed source commit: `46409b3543b402c1c0c20656b77d2903153113c5` (local release identity; not a GitHub commit link).
-- Verified production deployment: `dpl_Dg49CcwAcTFHk1d6G2yjpVNEzUU8`.
-- Original deployed package SHA-256: `cf6f81599c1ae7dd0bcddf2115d5d975887bf23764fb59dd96f0c436cbd98c27`.
-- `source/` contains 719 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before the same build was promoted.
+- Deployed source commit: `e2e13c23d59bd808caeb45edef20b101d05e4ceb` (local release identity; not a GitHub commit link).
+- Verified deployment: `dpl_Adxkz2ykw6FfvTETUZxBzkR38ks8`.
+- Original deployed package SHA-256: `b31790a01dd108d10cc68b151a9e95e4d98888f3ec343ca1324c31357d51fa57`.
+- `source/` contains 720 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before the same build was promoted.
 
 Verify without dependencies, credentials or network:
 
@@ -37,3 +37,20 @@ Home keeps the conversation and composer left and the current answer's supported
 
 Validation: 11 annual-contract tests, 8 existing consumer/grounding tests, 13 route tests (including exact prompt routing with fake provider ports), and 12 UI tests pass; TypeScript, focused lint and the production build pass. Independent reviews cleared the annual contract and UI. Real staged desktop/phone checks returned the annual answer and monthly chart with zero model rounds. Other prompt answers were not re-tested with fresh paid provider calls. Data inputs, provider configuration, budget and permissions are unchanged.
 
+## Conversational framing repair
+
+Shared normalization removes polite framing while preserving dates, populations, negation and substantive qualifiers. Verified turnover and headcount calculations remain bounded; unsupported causal and planning questions retain the grounded model/tool path. Twenty-three focused tests and TypeScript passed. A separately captured freeform cost-summary question completed in one model round with grounded figures and explicit limitations; this is not arbitrary-query acceptance. The 19-case offline matrix tests routing only and deliberately denies model dispatch. Pricing renewal must align app, rollout, admission and settlement windows before October 22, 2026 at 00:00 UTC.
+
+## Conversation display labels
+
+The renderer formats only eight exact public business-unit labels through the existing catalog display convention. Stored answers, model context, filter IDs, unknown labels and quantities are unchanged. The focused display/saved-evidence/visual suites passed 24 tests; actual-route tests passed 17. A fixture-provider browser journey passed ten checks covering paraphrased planning, selection/save/reopen, explicit budget changes, topic switches and late-response cancellation. These checks do not establish arbitrary model answer quality. A captured real cost answer is used for hosted rendering verification without another paid call.
+
+## Multi-turn topic continuity
+
+A real three-turn conversation covered a four-role staffing comparison, a changed budget and redeployment pool, then recorded monthly turnover. The two staffing turns used two model rounds each; turnover used zero. Numeric assumptions, conditional recommendations and explicit evidence limits were preserved. The captured topic switch exposed stale staffing cards alongside the new metric answer. Current calculation markers now reset per answering turn while retaining scenario inputs and provenance. Seventeen route tests, TypeScript and captured-request replay passed; an independent focused review found no blocker. Saved/reopened state remains covered by earlier fixture checks rather than a fresh paid save journey. No model, budget, permission or data changes accompany this correction.
+
+## Coordinated pricing renewal
+
+The reviewed rolling price window is October 21 09:59 through October 22 09:59 UTC. Admission stops 90 seconds before expiry. Application policy, rollout expiry, database admission ceiling and receipt settlement upper bound must match the coordinated renewal; existing receipt lower bound and ten-minute freshness remain intact. The cap, reservations, uncertain holds, prices and permissions are unchanged. Twenty-five accounting/round tests and exact live-definition date-transform checks passed with independent review. This supersedes the earlier midnight deadline above.
+
+One additional actual model investigation plan passed evidence review and explicit browser Save/reload, preserving the candidate, goal, scope and unknown resources. It remains a qualitative proposal, not an executed intervention or proof of causes.

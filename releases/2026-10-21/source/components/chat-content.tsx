@@ -6,6 +6,7 @@ import type { AppPage } from "@/lib/types";
 import { getChatNavigationAction } from "@/lib/chat-navigation";
 import {chatCaveatLineNumbers} from '@/lib/chat-caveat-blocks';
 import {homeAnswerPresentation} from '@/lib/home-answer-presentation';
+import {catalogProseDisplay} from '@/lib/catalog-display';
 
 // Evidence IDs identify their own pages, including S2 exit feedback in Attrition.
 const sourceTargets:Readonly<Record<string,string>>={W1:'workforce',W2:'workforce',A1:'attrition',R1:'talent-acquisition',S1:'survey-sentiment',S2:'attrition',T1:'skills',T2:'learning-development',T4:'career-growth-mobility',T5:'succession-planning',P1:'planning-overview',P2:'position-workforce-design',F1:'finance',I1:'occupational-references',I2:'labor-market',I3:'training-coaching',D1:'development-planning',M1:'labor-market'};
@@ -81,7 +82,7 @@ function renderInlineMarkdown(
 
     return (
       <span key={index}>
-        {part}
+        {catalogProseDisplay(part)}
       </span>
     );
   });

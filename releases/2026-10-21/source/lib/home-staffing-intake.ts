@@ -1,8 +1,10 @@
 import type {SolutionRequest} from './home-solution-conversation';
+// @ts-expect-error Native fixtures share source.
+import {normalizeHomeQuestion} from './home-question-text.ts';
 
 /** Initial, unspecified starter only: collect premises without buying a model round. */
 export function staffingStarterIntake(request:SolutionRequest){
- const text=request.message.text.trim().toLowerCase().replace(/[?.!]+$/,'');
+ const text=normalizeHomeQuestion(request.message.text);
  const s=request.state;
  if(text!=='how can we close a staffing gap'||request.goal.statement||request.selectedId||request.catalog||request.goalContext||s.turns.length||s.constraints.length||s.working.length||s.analyses.length||s.requiredStaffing||s.staffingDeliveryTarget||s.hiringBudget||s.businessPlanning)return null;
  const questions=[
