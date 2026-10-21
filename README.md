@@ -16,12 +16,14 @@ This is a portfolio prototype. No measured adoption, savings, business impact or
 
 ## Repository and deployment status
 
-The exact application source subset from the October 21 hosted release is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. That snapshot maps to deployment `dpl_627T9CMztxkzoCqoqruB8PL3pEky` and local source identity `e974354f8abf28345c0ad219cd2cb9f321b7878b`.
+The exact application source subset from the October 21 hosted release is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. That snapshot maps to deployment `dpl_fw5A59MB2HhM74R5qzrxEAqhVmM5` and local source identity `a86acfa4ebc28015f2652685536750c300ca083a`.
 
 The root development application remains distinct from that versioned snapshot. Private synthetic runtime inputs, credentials and release evidence are excluded. Publishing the source closes the missing-source record; it does not make this repository a self-contained reproduction of the hosted service. A [local public-fixture replay recipe](releases/2026-10-21/reproduction/README.md) now builds and serves the versioned UI without private inputs or credentials. It preserves recorded company-wide receipts; live AI, narrowed filters and unrecorded server calculations are deliberately unavailable.
 
 Automatic Vercel deployments from main and this publication branch remain disabled. No production rebuild, configuration change or paid call accompanies this source publication. The release notes distinguish protected provider checks, captured-answer replay, local continuity tests and public configuration smoke; no fresh paid production browser journey through every step is claimed.
 See [Product architecture and availability](docs/product-architecture.md) for the distinction between the live prototype, the repository and proposed capabilities.
+
+See [Public portfolio MVP acceptance](docs/public-portfolio-mvp-acceptance.md) for completed evidence, operational dependencies and optional extensions.
 
 ## Technology
 

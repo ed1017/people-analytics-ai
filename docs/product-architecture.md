@@ -2,7 +2,9 @@
 
 > **Availability — October 21, 2026:** Provider-backed planning conversations are restored in the hosted synthetic-data application, bounded by pricing verification and cumulative budget admission. Guided planning, browser-local proposals, workforce evidence and the explicit-input company headcount what-if remain available. The sections below describe product direction, not an exhaustive shipped-feature checklist.
 
-> The [versioned deployed source](../releases/2026-10-21/README.md) publishes the exact application subset with hashes. Private runtime inputs remain excluded; the root development app is separate and full public-fixture reproduction remains unfinished. See the release notes for precise validation limits. No predictive accuracy, enterprise persistence or realized business outcomes are claimed.
+> The [versioned deployed source](../releases/2026-10-21/README.md) publishes the exact application subset with hashes. Private runtime inputs remain excluded; the root development app is separate. A [verified public-fixture replay](../releases/2026-10-21/reproduction/README.md) builds and serves the versioned UI with recorded company-wide receipts; live AI, narrowed filters and unrecorded calculations remain outside that replay. See the release notes for precise validation limits. No predictive accuracy, enterprise persistence or realized business outcomes are claimed.
+
+See [Public portfolio MVP acceptance](public-portfolio-mvp-acceptance.md) for the boundary between the delivered portfolio and optional extensions.
 
 ## What this product is becoming
 
