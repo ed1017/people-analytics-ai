@@ -157,6 +157,17 @@ export function useProblemConversation(scope = "home") {
     if(!decisionStore.getSnapshot().saved)throw Error('The example workspace could not be saved. Your original draft is kept; resolve browser storage before retrying.');
     setStoredMessages([]);setResetMarks({});setInput("");setProblem(null);setQuestionUnanswered(false);explorationContext.current=emptyGoalRequirements();
   };
+  const continueGuidedConversation=()=>{
+    const isolated=guidedIsolation.current;if(!isolated)return;
+    // Explicitly keep this conversation: retire the popup's restore-on-close receipt.
+    // Earlier general discussion remains readable; saved goals remain untouched.
+    sessionStorage.removeItem(guidedReturnKey);
+    guidedIsolation.current=null;
+    const prior=isolated.general?.messages??[];
+    if(prior.length)setStoredMessages([...prior,{role:'assistant',content:'Continuing an explicitly selected fictional scenario. Earlier discussion remains for reference.'},...storedMessagesRef.current]);
+    setResetMarks({});explorationContext.current=emptyGoalRequirements();
+    snapshot();
+  };
   const endGuidedExploration=(keepSavedSelection=false)=>{
     const isolated=guidedIsolation.current;if(!isolated)return;
     guidedIsolation.current=null;
@@ -301,7 +312,7 @@ export function useProblemConversation(scope = "home") {
     if(current.activeId)persist({...current,activeId:""});
     setResetEpoch(value=>value+1);
   };
-  return { firstHomeVisit,recoveredPlanSelectionRequired,beginGuidedExploration,endGuidedExploration,resetConversation,resetEpoch,wasReset:Object.hasOwn(resetMarks,'*')||Object.hasOwn(resetMarks,scope),historyMessages:storedMessages, canSubmitPrompt, confirmWorkforceGoal, selectProposalGoal, saved:decisionStorage.saved, retrySave:()=>recoverStorage(),recovery:decisionStorage.recovery,recoverSaved:()=>recoverStorage(true), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, closeIssueEditor, openIssueEditor, updateIssueDraft, updateIssueContext, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, pendingStartedAt, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
+  return { firstHomeVisit,recoveredPlanSelectionRequired,continueGuidedConversation,beginGuidedExploration,endGuidedExploration,resetConversation,resetEpoch,wasReset:Object.hasOwn(resetMarks,'*')||Object.hasOwn(resetMarks,scope),historyMessages:storedMessages, canSubmitPrompt, confirmWorkforceGoal, selectProposalGoal, saved:decisionStorage.saved, retrySave:()=>recoverStorage(),recovery:decisionStorage.recovery,recoverSaved:()=>recoverStorage(true), goalContext, goalRequirements, recordGoalStatement, updateGoalRequirements, goals:localGoals.goals, activeGoalId:localGoals.activeId, workspaceKey:`${workspaceRevision}:${localGoals.activeId}`, storageReady, storageNotice, selectGoal, removeGoal, clearAllGoals, homeGoalChoiceKey, setHomeGoalChoiceKey, focusedIssue, issueEditor, setIssueEditor, closeIssueEditor, openIssueEditor, updateIssueDraft, updateIssueContext, updateFocusedIssue, cancelPending, beginRequest: () => { setHomeGoalChoiceKey(null); return requestGate.current.begin(); }, messages, setMessages, input, setInput, draftExample, loading, pendingStartedAt, setLoading, error, setError, problem, rememberQuestion, questionUnanswered, setQuestionUnanswered, history, startNewProblem };
 }
 export type ProblemConversation = ReturnType<typeof useProblemConversation>;
 

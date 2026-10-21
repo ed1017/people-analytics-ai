@@ -1,4 +1,6 @@
 'use client';
+import {createPortal} from 'react-dom';
+import {scenarioComparisonIntent,scenarioQuestionMismatch,scenarioAssumptionText,compareScenarioForChat} from '@/lib/scenario-planning-parity';
 import {applicablePlanComponents} from '@/lib/guided-plan-summary';
 import {GuidedPlanSummary} from '@/components/guided-plan-summary';
 import {SimpleSwpDemo} from './simple-swp-demo';
@@ -29,10 +31,10 @@ type Comparison=Awaited<ReturnType<typeof compareSwpDemo>>;
 type Selection=Awaited<ReturnType<typeof prepareSwpSelection>>;
 type Source={id:string;label:string;status:string;scope:string;date:string|null;limitation:string;facts?:unknown};
 const effortText=(option:Comparison['options'][number],bridge:SwpDemandBridge)=>{const e=serviceOptionEffort(option,bridge),n=(v:number|null)=>v===null?'unknown':v.toLocaleString('en-US',{maximumFractionDigits:2});return `Whole-period conditional capacity: ${n(e.totalHours)} of ${n(bridge.review.result.workloadHours)} hours; remaining effort gap ${n(e.shortfallHours)} hours. Uniform monthly productive capacity is assumed; partial effective readiness months are excluded. Peak coverage and service levels remain unproven.`;};
-type Props={onDemoStateChange?:(visible:boolean)=>void;conversation:ProblemConversation;active:boolean;busy:boolean;commandRef:RefObject<((text:string)=>Promise<string|null>)|null>;modelContextRef:RefObject<unknown>;demandControlRef:RefObject<DemandIntakeControl|null>;demandReviewRef:RefObject<((review:DemandReview)=>void)|null>;demandContextRef:RefObject<unknown>;sources:Source[];discussionKey?:string;onNavigate:(page:AppPage)=>void};
-export function SwpGuidedJourney({onDemoStateChange,conversation,active,busy,commandRef,modelContextRef,demandControlRef,demandReviewRef,demandContextRef,sources,onNavigate,discussionKey=''}:Props){
+type Props={onGeneralQuestion?:(text:string)=>void;scenarioTarget?:HTMLElement|null;onScenarioChatChange?:(visible:boolean)=>void;onDemoStateChange?:(visible:boolean)=>void;conversation:ProblemConversation;active:boolean;busy:boolean;commandRef:RefObject<((text:string)=>Promise<string|null>)|null>;modelContextRef:RefObject<unknown>;demandControlRef:RefObject<DemandIntakeControl|null>;demandReviewRef:RefObject<((review:DemandReview)=>void)|null>;demandContextRef:RefObject<unknown>;sources:Source[];discussionKey?:string;onNavigate:(page:AppPage)=>void};
+export function SwpGuidedJourney({onGeneralQuestion,scenarioTarget,onScenarioChatChange,onDemoStateChange,conversation,active,busy,commandRef,modelContextRef,demandControlRef,demandReviewRef,demandContextRef,sources,onNavigate,discussionKey=''}:Props){
  const storage=useDecisionStorage(),[draft,setDraft]=useState<BundleDraft|null>(null),[draftDataset,setDraftDataset]=useState<string|null>(null),[comparison,setComparison]=useState<Comparison|null>(null),[edit,setEdit]=useState<BundleEditPreview|null>(null),[selection,setSelection]=useState<string|null>(null),[review,setReview]=useState<Selection|null>(null),[pending,setPending]=useState(false),[notice,setNotice]=useState('');
- const [showOptions,setShowOptions]=useState(false);
+ const [showOptions,setShowOptions]=useState(false),[chatScenario,setChatScenario]=useState(false);
  const [demoOpen,setDemoOpen]=useState(false),[restartRequested,setRestartRequested]=useState(false);
  const suspended=useRef(false);
  const [demandBridge,setDemandBridge]=useState<SwpDemandBridge|null>(null),[demandStale,setDemandStale]=useState(false);
@@ -54,7 +56,7 @@ export function SwpGuidedJourney({onDemoStateChange,conversation,active,busy,com
  useEffect(()=>{restore();},[conversation.activeGoalId,conversation.focusedIssue,token]);
  // eslint-disable-next-line react-hooks/set-state-in-effect -- Navigation cancels the currently owned calculation and closes its review.
  useEffect(()=>{if(!active){generation.current++;abort.current?.abort();if(opening.current&&ownedIsolation.current){endIsolation.current();ownedIsolation.current=null;}opening.current=false;setPending(false);setReview(null);}},[active]);
- function exit(){suspended.current=false;setDemoOpen(false);setRestartRequested(false);setShowOptions(false);demandControlRef.current?.close();setDemandBridge(null);setDemandStale(false);generation.current++;opening.current=false;abort.current?.abort();if(ownedIsolation.current){endIsolation.current();ownedIsolation.current=null;}const goals=decisionStore.getSnapshot().data.goals;restored.current=JSON.stringify([decisionStore.getDatasetToken(),goals.activeId,goals.goals.find(g=>g.id===goals.activeId)?.statement??'']);setDraft(null);setComparison(null);setEdit(null);setReview(null);setSelection(null);setPending(false);setNotice('Example closed. Earlier goals and plans are kept.');}
+ function exit(){setChatScenario(false);suspended.current=false;setDemoOpen(false);setRestartRequested(false);setShowOptions(false);demandControlRef.current?.close();setDemandBridge(null);setDemandStale(false);generation.current++;opening.current=false;abort.current?.abort();if(ownedIsolation.current){endIsolation.current();ownedIsolation.current=null;}const goals=decisionStore.getSnapshot().data.goals;restored.current=JSON.stringify([decisionStore.getDatasetToken(),goals.activeId,goals.goals.find(g=>g.id===goals.activeId)?.statement??'']);setDraft(null);setComparison(null);setEdit(null);setReview(null);setSelection(null);setPending(false);setNotice('Example closed. Earlier goals and plans are kept.');}
  const handleReset=useEffectEvent(()=>{if(resetSeen.current!==conversation.resetEpoch){resetSeen.current=conversation.resetEpoch;exit();}});
  useEffect(()=>{handleReset();},[conversation.resetEpoch]);
  const draftKey=draft?bundleInputKey(draft):'',matches=!!draft&&(suspended.current||ownedIsolation.current===draft.binding.goalId||!conversation.activeGoalId||conversation.activeGoalId===draft.binding.goalId&&conversation.focusedIssue===draft.binding.goal)&&token===draftDataset;
@@ -75,16 +77,21 @@ export function SwpGuidedJourney({onDemoStateChange,conversation,active,busy,com
     return '';
    }catch(error){if(!current())return '';exit();throw error;}finally{if(generation.current===job){opening.current=false;setPending(false);}}
   }
-  if(!matches||!draft||(!demandBridge&&!demoOpen)||demandContextRef.current||!bundleChatEditIntent(text).edit)return null;
+  if(chatScenario&&matches&&draft&&!demandBridge){
+   if(edit)return 'Review or cancel the pending scenario edits beside the chat before requesting another result. Saved plans are unchanged.';
+   if(scenarioComparisonIntent(text)){const mismatch=scenarioQuestionMismatch(text,draft);if(mismatch){setComparison(null);setSelection(null);clearReview();setShowOptions(false);return mismatch;}const result=await calculate();return result&&'answer' in result&&typeof result.answer==='string'?result.answer:'The scenario changed before calculation completed. Review the current inputs and compare again.';}
+   if(!bundleChatEditIntent(text).edit){setChatScenario(false);modelContextRef.current=null;if(conversation.activeGoalId&&onGeneralQuestion){onGeneralQuestion(text);return '';}return null;}
+  }
+  if(!matches||!draft||(!demandBridge&&!demoOpen&&!chatScenario)||demandContextRef.current||!bundleChatEditIntent(text).edit)return null;
   clearReview();try{const preview=previewBundleChatEdit(draft,text);setEdit(preview);return 'Review the proposed assumption changes below. Existing results are stale until you accept the draft changes and compare again; saved plans stay unchanged.';}
   catch(error){setEdit(null);return `${(error as Error).message} The draft and saved plans are kept. Use a displayed assumption name, or discuss an unsupported choice without treating it as calculated.`;}
  }
- useLayoutEffect(()=>{commandRef.current=handle;modelContextRef.current=active&&(demandBridge||demoOpen)&&draft&&matches&&!demandStale?{conversationMode:SWP_CONVERSATION_MODE,goalId:draft.binding.goalId,classification:'fictional-scenario',acceptedOperationalReview:demandBridge?{spec:demandBridge.review.spec,result:demandBridge.review.result,reviewedAt:demandBridge.reviewedAt,acceptance:'Scenario use only; original provenance retained.'}:null,datasetToken:token,revision:draft.revision,selectedCandidateId:selection,selectedSavedPlanId:saved?.selectedPlanId??null,goal:draft.binding.goal,objective:draft.inputs.scope.requirements,scope:draft.inputs.scope,budget:draft.inputs.budget,reviewState:edit?'pending-edits':currentComparison?'calculated-unsaved':'not-calculated',options:currentComparison?.options.map(o=>({id:o.id,label:o.label,mix:o.candidate.mix,wholePeriodEffort:demandBridge?serviceOptionEffort(o,demandBridge):null,conditionalCoverage:o.coverage,fullCoverageDate:o.candidate.metrics?.fullCoverageDate??null,incrementalCash:o.candidate.cash.complete,staffHours:o.candidate.effort?.totalHours??null,addedCompanyEmployees:o.candidate.metrics?.addedEmployees??null,status:o.candidate.status}))??[],limitations:['End-date staffing and cash limits do not prove whole-period effort coverage; review any separately calculated shortfall.','Additional-role demand is a reviewed assumption, not inferred from growth.','Skill coverage does not establish available staff or causal uplift.','Contract and automate are discussion-only here; no calculated benefit.','Changing staffing inputs requires the displayed local assumption review and recalculation.']} : null;});
- function closeDemo(){
+ useLayoutEffect(()=>{commandRef.current=handle;modelContextRef.current=active&&(demandBridge||demoOpen||chatScenario)&&draft&&matches&&!demandStale?{conversationMode:SWP_CONVERSATION_MODE,goalId:draft.binding.goalId,classification:'fictional-scenario',acceptedOperationalReview:demandBridge?{spec:demandBridge.review.spec,result:demandBridge.review.result,reviewedAt:demandBridge.reviewedAt,acceptance:'Scenario use only; original provenance retained.'}:null,datasetToken:token,revision:draft.revision,...(chatScenario?{draft:structuredClone(draft),inputKey:draftKey}:{}),selectedCandidateId:selection,selectedSavedPlanId:saved?.selectedPlanId??null,goal:draft.binding.goal,objective:draft.inputs.scope.requirements,scope:draft.inputs.scope,budget:draft.inputs.budget,reviewState:edit?'pending-edits':currentComparison?'calculated-unsaved':'not-calculated',options:currentComparison?.options.map(o=>({id:o.id,label:o.label,mix:o.candidate.mix,wholePeriodEffort:demandBridge?serviceOptionEffort(o,demandBridge):null,conditionalCoverage:o.coverage,fullCoverageDate:o.candidate.metrics?.fullCoverageDate??null,incrementalCash:o.candidate.cash.complete,staffHours:o.candidate.effort?.totalHours??null,addedCompanyEmployees:o.candidate.metrics?.addedEmployees??null,status:o.candidate.status}))??[],limitations:['End-date staffing and cash limits do not prove whole-period effort coverage; review any separately calculated shortfall.','Additional-role demand is a reviewed assumption, not inferred from growth.','Skill coverage does not establish available staff or causal uplift.','Contract and automate are discussion-only here; no calculated benefit.','Changing staffing inputs requires the displayed local assumption review and recalculation.']} : null;});
+ function closeDemo(){setChatScenario(false);
   suspended.current=true;generation.current++;abort.current?.abort();setPending(false);setDemoOpen(false);
   if(ownedIsolation.current){conversation.endGuidedExploration();ownedIsolation.current=null;}
  }
- function resumeDemo(){
+ function resumeDemo(){setChatScenario(false);
   if(!draft||draftDataset!==token||busy||pending||!active||!storage.saved)return;
   try{if(conversation.activeGoalId!==draft.binding.goalId){conversation.beginGuidedExploration(draft.binding.goalId);ownedIsolation.current=draft.binding.goalId;}}
   catch(error){setNotice((error as Error).message);return;}
@@ -103,7 +110,7 @@ export function SwpGuidedJourney({onDemoStateChange,conversation,active,busy,com
  async function calculate(){
   setShowOptions(true);
   if(!draft||!matches||busy||pending||edit||demandStale||!active)return;abort.current?.abort();const job=new AbortController();abort.current=job;const key=draftKey,goalId=conversation.activeGoalId,dataset=token;setPending(true);clearReview();setComparison(null);
-  try{const result=await compareSwpDemo(draft,job.signal);if(job.signal.aborted||!mounted.current||!live.current.active||live.current.goalId!==goalId||!live.current.draft||bundleInputKey(live.current.draft)!==key||decisionStore.getDatasetToken()!==dataset)return;setComparison(result);setSelection(null);}
+  try{const result=draft.inputs.guidedWorkload?await compareScenarioForChat(draft,job.signal):await compareSwpDemo(draft,job.signal);if(job.signal.aborted||!mounted.current||!live.current.active||live.current.goalId!==goalId||!live.current.draft||bundleInputKey(live.current.draft)!==key||decisionStore.getDatasetToken()!==dataset)return;setComparison(result);setSelection(null);return result;}
   catch(error){if(!job.signal.aborted)setNotice((error as Error).message);}finally{if(abort.current===job){abort.current=null;setPending(false);}}
  }
  async function prepare(){
@@ -127,10 +134,17 @@ export function SwpGuidedJourney({onDemoStateChange,conversation,active,busy,com
   }finally{if(abort.current===controller){abort.current=null;setPending(false);}}
  }
  const hasEdit=!!edit;
- const autoCompare=useEffectEvent(()=>{if((demandBridge||demoOpen)&&showOptions&&draft?.inputs.guidedWorkload&&matches&&active&&!edit&&!comparison&&!pending&&!busy)void calculate();});
- // eslint-disable-next-line react-hooks/set-state-in-effect -- Recalculate the existing local engine after an accepted interactive draft edit.
+ const autoCompare=useEffectEvent(()=>{if((demandBridge||demoOpen||chatScenario)&&showOptions&&draft?.inputs.guidedWorkload&&matches&&active&&!edit&&!comparison&&!pending&&!busy)void calculate();});
  useEffect(()=>{autoCompare();},[draftKey,matches,active,hasEdit]);
  useEffect(()=>{onDemoStateChange?.(false);},[onDemoStateChange]);
+ useEffect(()=>{onScenarioChatChange?.(chatScenario&&active&&matches);},[chatScenario,active,matches,onScenarioChatChange]);
+ function continueScenario(){
+  if(!draft||!matches||busy||pending||edit||demandStale||!active)return;
+  conversation.continueGuidedConversation();ownedIsolation.current=null;
+  setDemoOpen(false);setChatScenario(true);suspended.current=false;
+  conversation.setMessages(current=>[...current,{role:'user',content:'Continue this scenario with its disclosed fictional assumptions.'},{role:'assistant',content:scenarioAssumptionText(draft)+' Ask “Compare staffing options”, or propose an edit such as “Set budget to 100000”. Nothing has been saved.'}]);
+  requestAnimationFrame(()=>document.querySelector<HTMLTextAreaElement>('#overview-question')?.focus());
+ }
  const selected=currentComparison?.options.find(o=>o.id===selection);
  const checkpoints=selected?applicablePlanComponents(selected.draft).map(c=>({...c,date:selected.draft.inputs.timing.find(t=>t.componentId===c.id)?.finish.value??null})).sort((a,b)=>(a.date??'9999').localeCompare(b.date??'9999')):[];
  const fields=storage.data.workspaces[conversation.activeGoalId]?.fields;
@@ -175,5 +189,6 @@ export function SwpGuidedJourney({onDemoStateChange,conversation,active,busy,com
   {!demandBridge&&<div><button className={button} onClick={()=>setRestartRequested(true)}>Start over</button>{restartRequested&&<div role="group" aria-label="Confirm restart"><p>Discard unsaved scenario edits and start a fresh example? Saved plans are kept.</p><button className={button} disabled={busy||pending} onClick={()=>void restartDemo()}>Restart scenario</button><button className={button} onClick={()=>setRestartRequested(false)}>Keep editing</button></div>}</div>}
   {notice&&<p role="status" className="text-sm">{notice}</p>}
  </section>;
- return demandBridge?content:<><button type="button" data-demo-resume className={button} onClick={resumeDemo}>Resume planning scenario</button><WorkforceDemoDialog gapFte={guidedWorkloadResult(draft.inputs)?.additionalFte??null} open={demoOpen&&active} onClose={closeDemo} step={review?'3. Result and save':currentComparison?'2. Compare options':'1. Understand the gap'}>{content}</WorkforceDemoDialog></>;
+
+ return demandBridge?content:<><button type="button" data-demo-resume className={button} onClick={resumeDemo}>Resume planning scenario</button>{!chatScenario&&<WorkforceDemoDialog gapFte={guidedWorkloadResult(draft.inputs)?.additionalFte??null} open={demoOpen&&active} onClose={closeDemo} step={review?'3. Result and save':currentComparison?'2. Compare options':'1. Understand the gap'}>{content}<div className="p-4 pt-0"><button className={button} disabled={busy||pending||!!edit||demandStale} onClick={continueScenario}>Continue this scenario in chat</button><p className="mt-2 text-xs">Use these exact fictional inputs and the same calculated options in the main workspace. Nothing is saved automatically.</p></div></WorkforceDemoDialog>}{chatScenario&&active&&matches&&scenarioTarget&&createPortal(<><div className="mb-3 rounded border p-3 text-sm"><strong>Explicit fictional scenario</strong><p>Same draft, calculator and saved-plan review as the guided view. Assumption changes need review. Other questions leave this scenario view.</p><button className={button} onClick={closeDemo}>Leave scenario context</button></div>{content}</>,scenarioTarget)}</>;
 }

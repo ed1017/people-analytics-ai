@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "sourceCommit": "6712a9281aca806ff95b8556efd3d3f24ee143c4",
-  "deployment": "dpl_8oyjQVeL3nuiQDzfzX2ts5mH6QpU",
-  "verifiedDeployedArchiveSha256": "8d004072c820f459c0722b113009f5ac23b000de09f872b0378c43771e5fa021",
+  "sourceCommit": "d287811e87db07be16505f0ef273e75adf9b1880",
+  "deployment": "dpl_AuFkMwMdktaX4KUrQb3P9zCeTsrS",
+  "verifiedDeployedArchiveSha256": "35c90f1def7943209697023022d3290614b8a005ea21a7ba41c4fb0464b26f07",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -245,8 +245,8 @@
     },
     {
       "path": "app/globals.css",
-      "sha256": "12837564b5644abc7b8a9d8a812273812b1068513bccf1b800299f514582ebf5",
-      "bytes": 47885
+      "sha256": "1f5984161ef47b17434d1f7cda7ef3fe22709c19a1667a5f509eefb48c49bad0",
+      "bytes": 48610
     },
     {
       "path": "app/layout.tsx",
@@ -745,8 +745,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "842ff0ef6e10b355e52868fdabb567026ef681b472fe8e81640f7b2665f8a29c",
-      "bytes": 95625
+      "sha256": "d0c4e52ca9911d2237d90fe46b1cdc002aea3f84d6f45e2a5aaa3ca2f2f7fe35",
+      "bytes": 97057
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -850,8 +850,8 @@
     },
     {
       "path": "components/problem-conversation.tsx",
-      "sha256": "6b027f4371cafde0a07cc8fff57d60bd8a1af68a4199646de689bd355e7fa5fb",
-      "bytes": 28758
+      "sha256": "133ca36905853c10c4503b4d0deb47ac453c6a6ca039016b1006f5810875e8ab",
+      "bytes": 29489
     },
     {
       "path": "components/project-case-study.tsx",
@@ -885,8 +885,8 @@
     },
     {
       "path": "components/simple-swp-demo.tsx",
-      "sha256": "05b24f2345b2e8f5b87c48f74e9c6da33dfbdf6a49de3e65a984938b2fe1fcc9",
-      "bytes": 9504
+      "sha256": "ee0c2bf4b8a35b51ab70c906a803a408a2bb7d36308a9a488300e49cc425888c",
+      "bytes": 10249
     },
     {
       "path": "components/site-footer.tsx",
@@ -920,8 +920,8 @@
     },
     {
       "path": "components/swp-guided-journey.tsx",
-      "sha256": "3e571571abeeda8394c95d2545006dfd6a471b7fa5a33bc8f1a4259ce498e9d0",
-      "bytes": 32882
+      "sha256": "199067f0891526a5316142f1cdbbe2c90c8d777c0b04511c572ea5c9135daa52",
+      "bytes": 35752
     },
     {
       "path": "components/swp-headcount-comparison.tsx",
@@ -2465,8 +2465,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "33ace793b03a539085aca6f7c354673218e8a0ac1a82d7596027e5fb4c0fcb0a",
-      "bytes": 38525
+      "sha256": "aac46db4176e9a03176743c322870c7c17b554eaf20092726a80851da70b6e3b",
+      "bytes": 39618
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -2995,8 +2995,8 @@
     },
     {
       "path": "lib/public-home-route.server.mjs",
-      "sha256": "797d289d69a2b448f4731936631aae096581272a9f19e145cbd330c4bc3a3d4a",
-      "bytes": 10327
+      "sha256": "7e483d998d15614a9a0fafe8f7e528dba54af331679685b598db879c35f9eee1",
+      "bytes": 10420
     },
     {
       "path": "lib/public-other-routes.server.mjs",
@@ -3600,8 +3600,8 @@
     },
     {
       "path": "lib/home-staffing-intake.ts",
-      "sha256": "fba7c6881356679aeea3eab80f64c2d827eb7e28f4b762258eaec049064b8439",
-      "bytes": 1136
+      "sha256": "0ec24f70a6ab8725b19a881c4cf5e22e232450e0c777338884b5dc0872bcb131",
+      "bytes": 1419
     },
     {
       "path": "lib/public-planner-receipt.server.mjs",
@@ -3637,6 +3637,11 @@
       "path": "lib/home-pay-catalog-aggregates.mjs",
       "sha256": "a63d5181b29e1d9b18e7ff0437b92049b9ed9c056a607052a404780f42bd0f45",
       "bytes": 2803
+    },
+    {
+      "path": "lib/scenario-planning-parity.ts",
+      "sha256": "2d56302e88e62b645120e1d2e9c04e01df8f446fed3d367f146785ca3d4418c8",
+      "bytes": 4043
     }
   ]
 }
