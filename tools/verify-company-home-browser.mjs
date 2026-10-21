@@ -27,12 +27,16 @@ try{
   assert.equal(await visual.locator('svg').count(),0);
   await home.getByRole('button',{name:'What is our FTE?',exact:true}).click();
   await visual.getByText('7.75 FTE',{exact:true}).waitFor();
-  await context.route('**/api/company-dashboard',r=>r.fulfill({status:503,body:'unavailable'}));
+  let firstRequest,release;const pending=new Promise(resolve=>firstRequest=resolve),held=new Promise(resolve=>release=resolve);let calls=0;
+  await context.route('**/api/company-dashboard',async r=>{if(++calls===1){firstRequest();await held;try{await r.continue();}catch{}return;}return r.fulfill({status:503,body:'unavailable'});});
+  await home.getByRole('button',{name:'Reload company source'}).click();await pending;
+  assert.equal(await transcript.innerText(),'');assert.equal(await visual.locator('svg').count(),0);
   await home.getByRole('button',{name:'Reload company source'}).click();
+  await visual.getByRole('alert').waitFor();release();await page.waitForTimeout(150);
   await visual.getByRole('alert').waitFor();
   assert.equal(await transcript.innerText(),'');assert.equal(await visual.locator('svg').count(),0);
   assert.ok(await home.getByRole('button',{name:'What is our FTE?',exact:true}).isDisabled());
-  result.checks.push({width,realApi:true,headcount:9,fte:7.75,change:2,split:true,unsupportedClears:true,reloadFailureClears:true,noOverflow:true});
+  result.checks.push({width,realApi:true,headcount:9,fte:7.75,change:2,split:true,unsupportedClears:true,reloadFailureClears:true,olderRequestCannotRestore:true,noOverflow:true});
   await context.close();
  }
  assert.deepEqual(result.errors,[]);assert.deepEqual(result.external,[]);

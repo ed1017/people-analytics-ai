@@ -17,6 +17,8 @@ node run-next.mjs start --port 3098
 
 Open `http://127.0.0.1:3098`. The generator requires a new output directory, verifies the 720-file release manifest and public support pins, and accepts only the checked-in invented Lantern fixture. No environment credentials are needed. The server binds to loopback and refuses Vercel execution; its proxy denies other API domains, writes, unsupported routes and alternate page URLs. The underlying release files are not modified.
 
+Optional browser acceptance: with an existing Playwright installation and browser, run `node tools/verify-company-home-browser.mjs` while the server is running. `PLAYWRIGHT_MODULE` may point to that installation and `BROWSER_EXECUTABLE` to an existing browser. The script writes desktop/mobile screenshots and `COMPANY-HOME-BROWSER.json` into its working directory. It checks actual API values/layout, unsupported answers, reload failure and an older delayed request completing after a newer failed reload. It makes no provider calls.
+
 ## Supported contract
 
 `invented-headcount-dashboard-v1` includes company identity, dataset token, as-of date, exact capabilities, snapshot and ordered history. The browser validates all fields against the fixed expected company/date and current dataset session. Unsupported metrics must be absent, never fabricated as zero. Identity, token, scope, date, missing/extra fields and conflicting final snapshots fail closed.
