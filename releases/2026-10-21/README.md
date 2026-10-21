@@ -2,9 +2,9 @@
 
 This directory publishes the application source from the reviewed 9,037-person release at https://www.ed-ai.app. It is a source snapshot, not a deployable replacement for the root development application.
 
-- Deployed source commit: `e2e13c23d59bd808caeb45edef20b101d05e4ceb` (local release identity; not a GitHub commit link).
-- Verified deployment: `dpl_Adxkz2ykw6FfvTETUZxBzkR38ks8`.
-- Original deployed package SHA-256: `b31790a01dd108d10cc68b151a9e95e4d98888f3ec343ca1324c31357d51fa57`.
+- Deployed source commit: `a86acfa4ebc28015f2652685536750c300ca083a` (local release identity; not a GitHub commit link).
+- Verified deployment: `dpl_fw5A59MB2HhM74R5qzrxEAqhVmM5`.
+- Original deployed package SHA-256: `d1355bde21786753b1bc1bf71a21d6c1f0c4cb9fe8ad94007ccaf7a35e3e9416`.
 - `source/` contains 720 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before the same build was promoted.
 
 Verify without dependencies, credentials or network:
@@ -54,3 +54,7 @@ A real three-turn conversation covered a four-role staffing comparison, a change
 The reviewed rolling price window is October 21 09:59 through October 22 09:59 UTC. Admission stops 90 seconds before expiry. Application policy, rollout expiry, database admission ceiling and receipt settlement upper bound must match the coordinated renewal; existing receipt lower bound and ten-minute freshness remain intact. The cap, reservations, uncertain holds, prices and permissions are unchanged. Twenty-five accounting/round tests and exact live-definition date-transform checks passed with independent review. This supersedes the earlier midnight deadline above.
 
 One additional actual model investigation plan passed evidence review and explicit browser Save/reload, preserving the candidate, goal, scope and unknown resources. It remains a qualitative proposal, not an executed intervention or proof of causes.
+
+## Saved-plan reading area
+
+After pinning and reopening a real model-generated qualitative plan, the desktop split transcript collapsed to 96px. Include saved-plan mode in the existing split-specific reading-area rule; mobile, scenario popup and saved state are unchanged. Focused independent review and retained-state browser verification cover the correction without another provider call.
