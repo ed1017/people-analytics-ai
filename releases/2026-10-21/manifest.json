@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "sourceCommit": "b554a4f4a7c4807f3a8f6704364c37a03adb2457",
-  "deployment": "dpl_DJ8jpXE5fkTUJvnFy3PPDBP2fC4G",
-  "verifiedDeployedArchiveSha256": "03cdb993488e7b3d245417c5e78f486ab78024e637284dc73b5cf02f7d1db411",
+  "sourceCommit": "6712a9281aca806ff95b8556efd3d3f24ee143c4",
+  "deployment": "dpl_8oyjQVeL3nuiQDzfzX2ts5mH6QpU",
+  "verifiedDeployedArchiveSha256": "8d004072c820f459c0722b113009f5ac23b000de09f872b0378c43771e5fa021",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -3620,8 +3620,8 @@
     },
     {
       "path": "lib/home-aggregate-registry.mjs",
-      "sha256": "a7126545118807edfe246fff62f4a306be8ae58135ffe1125a7556cd6dd8319d",
-      "bytes": 12162
+      "sha256": "e50b1093e06d6892820fd566c65d23da46a50e5535c43c152477b3e6ae0b0ae3",
+      "bytes": 14470
     },
     {
       "path": "lib/home-aggregate-tool.mjs",
@@ -3630,8 +3630,13 @@
     },
     {
       "path": "lib/public-home-aggregate.server.mjs",
-      "sha256": "9b49c77524fc2f9400ece4735a367f8c17138dafc177ed2e19579d029d3bf74d",
-      "bytes": 4454
+      "sha256": "8ba25340ca4dcc387a2002796e5d4511bfae680a31f93d8df2357c4bf931aa2b",
+      "bytes": 4453
+    },
+    {
+      "path": "lib/home-pay-catalog-aggregates.mjs",
+      "sha256": "a63d5181b29e1d9b18e7ff0437b92049b9ed9c056a607052a404780f42bd0f45",
+      "bytes": 2803
     }
   ]
 }
