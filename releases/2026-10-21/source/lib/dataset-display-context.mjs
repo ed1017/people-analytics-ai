@@ -1,3 +1,4 @@
+import {PUBLIC_9037} from './public-9037-contract.mjs';
 /** Allowlisted provenance for constructed aggregates; caller labels are never trusted. */
 export const DEMO_DATASET_ID='workforce-demo-9847-2026-09-30-local-final-v1';
 const fields=['datasetToken','datasetId','bundleDigest','cutoff','dataClass','publicationApproved','contract'];
@@ -7,6 +8,18 @@ export function readDemoDisplayContext(input){
   typeof input.bundleDigest!=='string'||!/^[a-f0-9]{64}$/.test(input.bundleDigest)||input.cutoff!=='2026-09-30'||
   input.dataClass!=='constructed-synthetic'||input.publicationApproved!==false||input.contract!=='local-app-parity-v1')return null;
  return Object.fromEntries(fields.map(k=>[k,input[k]]));
+}
+/** Display identity only: server grounding must still bind the digest and facts to its loaded source. */
+export function readPublicDisplayContext(input){
+ if(!input||typeof input!=='object'||Array.isArray(input)||
+  input.datasetId!==PUBLIC_9037.datasetId||input.datasetToken!==PUBLIC_9037.token||
+  input.contract!==PUBLIC_9037.contract||input.publicationReceiptId!==PUBLIC_9037.approval||
+  input.cutoff!==PUBLIC_9037.cutoff||input.dataClass!=='constructed-synthetic'||input.publicationApproved!==true||
+  typeof input.bundleDigest!=='string'||!/^[a-f0-9]{64}$/.test(input.bundleDigest))return null;
+ return Object.fromEntries([...fields,'publicationReceiptId'].map(k=>[k,input[k]]));
+}
+export function readConstructedDisplayContext(input){
+ return readPublicDisplayContext(input)??readDemoDisplayContext(input);
 }
 export const DOMAIN_DEMO_LABELS=Object.freeze({
  R1:{label:'Constructed recruiting history',population:'Constructed applications, accepted offers and requisitions',limitation:'Accepted-offer dates count hires; start dates drive headcount. Internal fills are movements. October–December is unmodeled; no candidate stock forecast or screening stage is released.'},

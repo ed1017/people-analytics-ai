@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "sourceCommit": "100943ea83ccc8394586cc5c41acc97197569c56",
-  "deployment": "dpl_7AUakS8L8wvBo66H6uqNe4fKUrkN",
-  "verifiedDeployedArchiveSha256": "d49403ef3d7093345bf9a7f90e6282f9ebfbd16e4fad7b78d1540204a8db3f7b",
+  "sourceCommit": "b554a4f4a7c4807f3a8f6704364c37a03adb2457",
+  "deployment": "dpl_DJ8jpXE5fkTUJvnFy3PPDBP2fC4G",
+  "verifiedDeployedArchiveSha256": "03cdb993488e7b3d245417c5e78f486ab78024e637284dc73b5cf02f7d1db411",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -1690,8 +1690,8 @@
     },
     {
       "path": "lib/dataset-display-context.mjs",
-      "sha256": "25dea85b75774108e1623b16017361ae5958ac0101da5b23e174d83638ace4d6",
-      "bytes": 1910
+      "sha256": "699829819ad2d9c7cb84d22b1567cd2ae923f53fc8c9f1d97da515f25abc7226",
+      "bytes": 2784
     },
     {
       "path": "lib/dataset-domain-presenters.mjs",
@@ -2315,8 +2315,8 @@
     },
     {
       "path": "lib/home-pack.mjs",
-      "sha256": "9a04fb07756fa0b2b71e756ef6590c8400f32b562da5727d233a4282b6d656b1",
-      "bytes": 29444
+      "sha256": "2ec98148c079907af73c6e93bdc59be27b600969900e744e0a8e065a316277bc",
+      "bytes": 29458
     },
     {
       "path": "lib/home-pinned-goals.ts",
@@ -2465,8 +2465,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "fc6ea4f0f22281526b2ee4cf1503b8308a58ec5921b6392cc9fcbadefd6564d9",
-      "bytes": 37435
+      "sha256": "33ace793b03a539085aca6f7c354673218e8a0ac1a82d7596027e5fb4c0fcb0a",
+      "bytes": 38525
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -2995,8 +2995,8 @@
     },
     {
       "path": "lib/public-home-route.server.mjs",
-      "sha256": "cf517ff0a0fd7cecf10379a02ce1327a1b0c82fb15b8882bde7487267176497f",
-      "bytes": 9798
+      "sha256": "797d289d69a2b448f4731936631aae096581272a9f19e145cbd330c4bc3a3d4a",
+      "bytes": 10327
     },
     {
       "path": "lib/public-other-routes.server.mjs",
@@ -3617,6 +3617,21 @@
       "path": "lib/home-survey-groups.mjs",
       "sha256": "e8b989c5a6070e0f5f882f5b45de0d74024c6754f0baadb1641f7842c1ffc9bb",
       "bytes": 1925
+    },
+    {
+      "path": "lib/home-aggregate-registry.mjs",
+      "sha256": "a7126545118807edfe246fff62f4a306be8ae58135ffe1125a7556cd6dd8319d",
+      "bytes": 12162
+    },
+    {
+      "path": "lib/home-aggregate-tool.mjs",
+      "sha256": "65495ff9e01535feb19dde67ee9bd852bdb212acbee13f476007836755094ad3",
+      "bytes": 2287
+    },
+    {
+      "path": "lib/public-home-aggregate.server.mjs",
+      "sha256": "9b49c77524fc2f9400ece4735a367f8c17138dafc177ed2e19579d029d3bf74d",
+      "bytes": 4454
     }
   ]
 }

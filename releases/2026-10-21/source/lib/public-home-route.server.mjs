@@ -1,5 +1,7 @@
 /** Disabled Home orchestration. Root owns authentication, capability dispatch and admission composition. */
 import {createHash} from 'node:crypto';
+import {homeAggregateTool,standaloneAggregateQuestion} from './home-aggregate-tool.mjs';
+import {readPublicHomeAggregate} from './public-home-aggregate.server.mjs';
 import {isDeepStrictEqual as same} from 'node:util';
 import {toResponseInputItems} from 'openai/lib/responses/ResponseInputItems';
 import {PUBLIC_9037 as P} from './public-9037-contract.mjs';
@@ -67,6 +69,7 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
    if(envelope){const replay=await verifySaved({kind:'solution',request:raw.request,current:raw.current,previous:raw.previous},signal);current();must(replay.datasetToken===P.token&&replay.publicDigest===identity.digest&&same(replay.goal,parsed.goal)&&replay.selectedId===parsed.selectedId);}
    const mode=request.headers.get(SWP_CONVERSATION_HEADER);swpConversationModel(mode,parsed,P.token,{});
    const natural=mode===null,demand=mode===SWP_DEMAND_MODE?requestDemandContext(parsed,P.token):null;
+   const aggregateEligible=natural&&standaloneAggregateQuestion(parsed.message.text);
    const staffingScenarioOnly=readStaffingScenario(parsed,{natural,datasetToken:P.token})!==null;
    const grounding=staffingScenarioOnly?undefined:await verifyHome({...parsed,datasetToken:P.token},signal);current();
    if(grounding)must(grounding.datasetToken===P.token&&grounding.bundleDigest===identity.digest);
@@ -74,12 +77,12 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
    const currentContext=()=>{current();return contextId;};
    const planningInstructions=staffingScenarioOnly?'':solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions+'\n'+hiringBudgetInstructions+'\n'+requiredStaffingInstructions:'');
    const reply=await converseSolutions(parsed,{grounding,staffingScenarioOnly,requestTime,...(roundLimit===2?{maxModelRounds:2}:{}),
-    ...(natural?{natural:{datasetToken:P.token}}:{}),...(demand?{demand:{datasetToken:P.token,referenceContract:true}}:{}),progress:{enabled:progressEnabled===true,datasetToken:P.token},
+    ...(natural?{natural:{datasetToken:P.token}}:{}),...(aggregateEligible?{readAggregate:async(args,readSignal)=>{current();const result=await readPublicHomeAggregate({binding,hostname,identity,filters:parsed.filters,args,signal:readSignal});current();return result;}}:{}),...(demand?{demand:{datasetToken:P.token,referenceContract:true}}:{}),progress:{enabled:progressEnabled===true,datasetToken:P.token},
     complete:async(input,finalOnly,completionSignal,capabilities)=>{
      current();must(round<roundLimit&&!staffingScenarioOnly&&typeof completionFactory==='function');stage='provider';
      completion??=completionFactory({requestId:parsed.requestId,contextId,datasetToken:P.token,currentContext});must(typeof completion?.complete==='function');
      const progress=progressModelContract(progressEnabled===true,capabilities.progressEntryEnabled);
-     const tools=capabilities.requiredStaffingCalculation?[requiredStaffingTool]:demand?demandReferenceModelContract.tools:[...solutionTools,...progress.tools,...(natural?businessPlanningModelTools:[])];
+     const tools=capabilities.requiredStaffingCalculation?[requiredStaffingTool]:demand?demandReferenceModelContract.tools:[...solutionTools,...progress.tools,...(natural?businessPlanningModelTools:[]),...(aggregateEligible&&round===0?[homeAggregateTool]:[])];
      const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+'\n'+solutionCompletionInstructions+progress.instructions)+planningInstructions;
      const response=await completion.complete({model:'gpt-6.1-sol',reasoning:{effort:'medium'},service_tier:'default',store:false,include:['reasoning.encrypted_content'],instructions,input,tools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{signal:completionSignal,requestId:parsed.requestId,contextId,datasetToken:P.token,round:++round});
      completedRounds++;stage='answer-validation-or-calculation';current();must(response&&Array.isArray(response.output));

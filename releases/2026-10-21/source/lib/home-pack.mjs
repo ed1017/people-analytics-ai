@@ -11,7 +11,7 @@ import { intelligenceEvidence } from "./intelligence-chat.ts";
 import { validateSuccessionPublicSummary } from "./succession-public-contract.mjs";
 import {normalizeHomeMonthlyRows,selectHomeMonthlyRows} from './home-monthly-evidence.ts';
 import {wantsHomeExitReasons} from './home-exit-reason-selection.ts';
-import {readDemoDisplayContext,DOMAIN_DEMO_LABELS} from './dataset-display-context.mjs';
+import {readConstructedDisplayContext,DOMAIN_DEMO_LABELS} from './dataset-display-context.mjs';
 
 export const HOME_MAX_BYTES = 48000;
 export const HOME_SOURCE_BYTES = 1900;
@@ -72,7 +72,7 @@ const factsAvailable = f => Object.values(f).some(v=>v!==null && (!Array.isArray
 function finish(def, input, scope) {
  const [id,,label,page,canonicalScope,population,limitation,numeric,text,bool]=def;
  const src={...object(input)}, raw=object(src.facts);
- const context=readDemoDisplayContext(src.sourceContext),demoLabels=context?DOMAIN_DEMO_LABELS[id]:null;
+ const context=readConstructedDisplayContext(src.sourceContext),demoLabels=context?DOMAIN_DEMO_LABELS[id]:null;
  const facts={...pick(raw,numeric,text,bool)};
  if(id==="S1"&&raw.businessUnitComparison!==undefined)facts.businessUnitComparison=readHomeSurveyGroups(raw.businessUnitComparison);
  if(id==="F1")Object.assign(facts,{source:"finance_current_summary",currency:"USD",cost_period:null,source_refreshed_at:null});
