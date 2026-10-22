@@ -1,4 +1,5 @@
 /** Disabled Home orchestration. Root owns authentication, capability dispatch and admission composition. */
+import {PublicPlannerAdmissionError} from './public-planner-round.server.mjs';
 import {createHash} from 'node:crypto';
 import {homeAggregateTool,standaloneAggregateQuestion} from './home-aggregate-tool.mjs';
 import {readPublicHomeAggregate} from './public-home-aggregate.server.mjs';
@@ -89,7 +90,14 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
      return {completed:response.status==='completed',items:toResponseInputItems(response.output),calls:response.output.filter(item=>item.type==='function_call').map(item=>({id:item.call_id,name:item.name,arguments:item.arguments})),text:response.output_text};
     },loadProjection:async(filters,readSignal)=>{current();const source=await loadProjection(readSignal),inputs=await source.projection(filters,readSignal);current();must(inputs.datasetVersion.publicDigest===identity.digest);return inputs;}
    },signal);current();return Response.json(reply,{headers});
-  })(),signal);}catch{return Response.json({error:'The public Home conversation or evidence could not be verified. Earlier work is preserved.',...(roundLimit===2?{boundedRequest:{maxModelRounds:2,completedRounds,stage}}:{})},{status:503,headers});}
+  })(),signal);}catch(error){
+   const admission=error instanceof PublicPlannerAdmissionError;
+   const message=admission?(completedRounds===0?'AI could not start this answer because spending approval is unavailable. Ask the app owner to check the remaining budget or budget service before retrying.':'AI could not finish this answer because spending approval for the next step is unavailable. Ask the app owner to check the budget before retrying.')
+    :signal.aborted?'This answer took too long or was cancelled. No completed answer was saved. You can review your question and send it again.'
+    :stage==='validation'?'This request or its current evidence could not be checked. Refresh Home, review the selected scope, and try again.'
+    :'AI could not complete a verified answer. Review your question before trying again.';
+   return Response.json({error:message,code:admission?'planner_admission_unavailable':signal.aborted?'home_request_interrupted':stage==='validation'?'home_request_unverified':'home_answer_unavailable',...(roundLimit===2?{boundedRequest:{maxModelRounds:2,completedRounds,stage}}:{})},{status:admission?429:503,headers});}
+
   finally{clearTimeout(timer);controller.abort();}
  }});
 }
