@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "3b448dddffb07eb7b93b368bc0a78e52e4736f34",
+  "sourceCommit": "a2dc9de769cb19f6958f9a44d67b7a968df4532d",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -1004,8 +1004,8 @@
     },
     {
       "path": "components/use-home-solution-conversation.ts",
-      "sha256": "6ef843ae08c1045c340c2ca14a4e2216fed30a5b45337c8f1e0a4cea3c5ed288",
-      "bytes": 30322
+      "sha256": "4cc8fd113f5be914f23998533216e19eba914e0c8e6b1313b7c3d7b6b4ac42fb",
+      "bytes": 30423
     },
     {
       "path": "components/use-page-briefing.ts",
@@ -3789,5 +3789,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "faadfb9eee318b5e6fd4130492bd6f6c628fc0dc365dab9d6978b35e17b1839d"
+  "verifiedDeployedArchiveSha256": "b4088b0f19af1518abc0cbb49312e4930ca63ed97315f9984520276d54dc5231"
 }

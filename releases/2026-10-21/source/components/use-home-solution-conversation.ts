@@ -185,7 +185,7 @@ export function useHomeSolutionConversation(props:Props){
   requireReviewedHiringInputs();
   const snapshot=requireCurrent(),request=makeRequest('Review the hiring route.'),review=currentHiringBudget(request,decisionStore.getDatasetToken());if(!review)throw Error('The hiring estimate changed.');
   const key=JSON.stringify(review),revision=snapshot.data.revision,context=liveKey.current,initialEpoch=epoch.current;
-  const goal={id:request.goal.id||crypto.randomUUID(),statement:request.goal.statement||`Cover ${review.inputs.hires} ${review.inputs.role??'workforce'} roles within the proposed budget.`};
+  const goal={id:request.goal.id||crypto.randomUUID(),statement:request.goal.statement||`Explore options for ${review.inputs.hires} additional ${review.inputs.role??'workforce'} roles${review.inputs.budget===null?'; affordability not yet assessed': ' within the entered budget ceiling'}.`};
   const selection=externalHires===null?await prepareConditionalHiringPlan(review,goal):await prepareHiringPlan(review,externalHires,goal);requireCurrent();requireReviewedHiringInputs();
   if(context!==liveKey.current||initialEpoch!==epoch.current||JSON.stringify(currentHiringBudget(makeRequest('Review the hiring route.'),decisionStore.getDatasetToken()))!==key||decisionStore.getSnapshot().data.revision!==revision)throw Error('The estimate changed. Review the current hiring route.');
   return {selection,key,revision,context,epoch:initialEpoch};
