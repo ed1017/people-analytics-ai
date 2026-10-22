@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "e213d60a85654b24eb9930a2e36e82a231bb84b7",
+  "sourceCommit": "af78d1bf482008ab4b51a0fada2745841a46f360",
   "deployment": "pending-staged-production-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -539,8 +539,8 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "65d3dee98b059da30741162ff9a724d73bbbf584a223e481cd9868ad07994b45",
-      "bytes": 18334
+      "sha256": "ca8e56daf6acbb9b0fc447ac75948f5e3acf926038dd7e53f8c93614ae479047",
+      "bytes": 18482
     },
     {
       "path": "components/home-chat-welcome.tsx",
@@ -659,8 +659,8 @@
     },
     {
       "path": "components/home-solution-conversation-review.tsx",
-      "sha256": "bb393560872c75e1bdb468bff56fb2b08715dbf2133fcbfa10de7351f9266cc0",
-      "bytes": 20976
+      "sha256": "1277ee6279848697bfa5d07022a74b8f111dc7994ff37fe5fecb27ad7219c26e",
+      "bytes": 21089
     },
     {
       "path": "components/home-success-measure-review.tsx",
@@ -744,8 +744,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "958c125cbb3884e41d85bc1bfbc8770d94d5e05331123c77c20a1c4adbdad8cf",
-      "bytes": 98508
+      "sha256": "c8c7c79bc413391beb21059d195380664d6e23ee23edc222dc9dfd0f3e42023d",
+      "bytes": 98855
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -3584,8 +3584,8 @@
     },
     {
       "path": "components/home-answer-visuals.tsx",
-      "sha256": "9ded4e93ee618875f8f7eee123f374b78bac31a5a7a070bbf1ea2f62bc2ac70f",
-      "bytes": 3990
+      "sha256": "181e09cb10b82e3b9a312167d80596267fca2cb7c3feaf623388c2d2d739b0c3",
+      "bytes": 4200
     },
     {
       "path": "lib/home-turnover-year.ts",
@@ -3671,7 +3671,12 @@
       "path": "lib/workforce-input-display.ts",
       "sha256": "a3f3cc2c6449e10656f9f5f30990a51ea456759642f250229738a74453f5f857",
       "bytes": 1627
+    },
+    {
+      "path": "lib/home-next-details.ts",
+      "sha256": "237b144e2f7b484b6bd8bc2c244b7e8ad6d9838d9d55ecfdee2092d158ef27e3",
+      "bytes": 2447
     }
   ],
-  "candidateArchiveSha256": "4c8669099528668571877e59189d71410b4630bd9c5214921410f42634cbefd6"
+  "candidateArchiveSha256": "e1182ea24f27e62010bbed1a6a748289b0890ad92abe4c1ed7ec3083332549b2"
 }
