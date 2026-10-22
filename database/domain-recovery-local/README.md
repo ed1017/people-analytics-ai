@@ -18,9 +18,9 @@ The SQL rejects existing recovery schemas/functions and requires the public anal
 ## What this establishes
 
 - Schema columns and identities, 12 empty-view executions, RLS and denied API access.
-- Invented task exposure: partial coverage, unknown unscored jobs, failed scoring runs excluded.
+- Invented task exposure: partial coverage, unknown unscored jobs, failed scoring runs excluded, replacement by later successful scores, job/function suppression, scored-only weighted denominators and exclusion of another dataset's unscored jobs from the first rollup. This is not scoring tenancy: legacy latest scores are selected globally by task ID, so cross-dataset shared-task score isolation is not claimed.
 - Invented nine-row performance release: digest consistency, aggregate totals, unsupported scopes, frozen fields/deletion, deactivation, small-category suppression and invalid-total rejection.
 
 The performance fixture retains the schema's fixed source-hash marker **only to exercise its existing constraint**. Its invented payload is not the production release, and the marker does not authenticate those invented counts. Actual source-file provenance and full payload semantics remain separate application validations.
 
-Populated results for the other legacy views, complete analytics data reconstruction, hosted access setup and full app bootstrap remain unverified. No production permissions/data, provider calls or spending state are changed.
+Populated results for unrelated legacy adoption/readiness/register views remain unverified; these are not used by the current illustrative FOW UI and are outside this bounded acceptance increment. Full analytics data reconstruction and hosted activation are not implied. See the [public MVP acceptance boundary](../../docs/public-mvp-acceptance-boundary.md). No production permissions/data, provider calls or spending state are changed.
