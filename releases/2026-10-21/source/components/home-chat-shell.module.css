@@ -253,3 +253,14 @@
   }
  }
 }
+
+/* Align the initial snapshot with the introduction, not below the CTA rows.
+   Keep shared split sizing/keyboard controls and mobile text-first DOM order. */
+.welcome { display: flex; flex-direction: column; }
+.welcome > :global(.home-conversation-split) { flex: 1; }
+.welcome :global(.home-conversation-visuals) > .historySummary { margin-top: 0; }
+.welcome :global(.home-conversation-text) { gap: 8px; }
+.welcome .entryActions { margin-top: 4px; }
+.welcome .demoNote { margin: 0; }
+.welcome .composer { margin-top: 4px; }
+.welcome .historyFigure figcaption { margin-bottom: 6px; }

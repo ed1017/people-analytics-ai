@@ -68,6 +68,7 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
   const snapshotDate = overview?.snapshot_date ?? '';
   const current = !loading && !error && verified && validDate(snapshotDate) ? overview : null;
   const headcount = current?.headcount;
+  const recruiting = current && recruitingKpi?.asOf===snapshotDate ? recruitingKpi : null;
   const history = current && known(headcount) ? welcomeHistory(trend, snapshotDate, headcount) : [];
   const checked = current && projection?.analysis.inputs.asOf === snapshotDate && projection.analysis.inputs.opening === headcount && (['country','org','level'] as const).every(key=>projection.analysis.inputs.filters[key]===requested[key]) ? projection : null;
   const projected = checked?.analysis.points ?? [];
@@ -108,10 +109,11 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
       <ul className={styles.kpiRow} aria-label="Recorded workforce indicators">
         <li><span>Recruiting hires</span><b>{recruitingPending ? 'Loading…' : current&&recruitingKpi?.asOf===snapshotDate ? recruitingKpi.hires.toLocaleString() : 'Unavailable'}</b><small>Company-wide · monthly</small></li>
         <li><span>Voluntary turnover YTD</span><b>{loading ? 'Loading.' : known(current?.voluntary_turnover_ytd_pct) ? format(current.voluntary_turnover_ytd_pct)+'%' : 'Unavailable'}</b><small>Source-reported · not annualized</small></li>
-        <li><span>Recorded period change</span><b>{loading?'Loading.':change===null?'Unavailable':(change>0?'+':'')+format(change)+' people'}</b><small>{loading?'Loading recorded snapshots.':change===null?'Two verified snapshots needed':dateLabel(first.snapshot_date)+' – '+dateLabel(last.snapshot_date)}</small></li>
+        <li><span>Average time to fill</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.timeToFillDays) ? format(recruiting.timeToFillDays)+' days' : 'Unavailable'}</b><small>Company-wide · recorded hires through {snapshotDate || 'unavailable date'}</small></li>
         <li><span>FTE capacity</span><b>{loading ? 'Loading.' : known(current?.fte) ? format(current.fte)+' FTE' : 'Unavailable'}</b><small>Full-time-equivalent capacity · {current ? snapshotDate : 'Snapshot unavailable'}</small></li>
         <li><span>Open positions</span><b>{loading ? 'Loading.' : Number.isSafeInteger(current?.open_positions)&&known(current?.open_positions) ? format(current.open_positions)+' positions' : 'Unavailable'}</b><small>Recorded vacancies · {current ? snapshotDate : 'Snapshot unavailable'}</small></li>
-        <li><span>Period-start headcount</span><b>{loading ? 'Loading.' : first ? format(first.headcount)+' people' : 'Unavailable'}</b><small>{first ? 'Recorded on '+first.snapshot_date : 'Verified history needed'}</small></li>
+        <li><span>Average open requisition age</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.openReqAgeDays) ? format(recruiting.openReqAgeDays)+' days' : 'Unavailable'}</b><small>Company-wide · as of {snapshotDate || 'unavailable date'}</small></li>
+        <li><span>Recruiting offers</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.offers) ? format(recruiting.offers) : 'Unavailable'}</b><small>Company-wide · {recruiting?.month ?? 'month unavailable'}</small></li>
       </ul>
       <details className={styles.evidenceDetails}><summary>Sources and exact cost · {checked?"Conditional projection":projectionStatus==="checking"?"Checking projection":projectionStatus?"Projection unavailable":"Projection not configured"}</summary>
         {known(current?.labor_cost_usd)&&<details className={styles.exactCost}><summary>Labor cost: period unspecified</summary><p>{welcomeCurrency(current.labor_cost_usd).exact}. Cost period unspecified; no monthly or annual basis is inferred.</p></details>}
@@ -130,11 +132,11 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
 
 export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, disabled = false, composer, trend = [], recruitingKpi, recruitingPending}: HomeChatWelcomeProps) {
   return <section aria-label="Plan your workforce" className={styles.welcome}>
+    <HomeConversationSplit enabled visuals={<HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending}/> }>
     <h2>Plan the workforce your business needs</h2>
     <p className={styles.subtitle}>Start with a decision. Explore the evidence, compare assumptions, and build your plan.</p>
     <div className={styles.entryActions}><button type="button" aria-haspopup="dialog" disabled={disabled} onClick={()=>onQuestion(swpDemoPrompt)}>Try a planning scenario</button><a href="?page=workforce">Explore the full app</a></div>
     <p className={styles.demoNote}>Edit assumptions, compare staffing options and save a proposal in this browser. No live AI call.</p>
-    <HomeConversationSplit enabled visuals={<HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending}/> }>
     <h3>What decision are you facing?</h3>
     <div className={styles.questions}>
       {planningEntries.map((entry, index) => {
