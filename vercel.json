@@ -35,7 +35,8 @@
       "codex/home-bounded-association-20261022": false,
       "codex/cumulative-cap30-20261022": false,
       "codex/cap30-deployment-receipt-20261022": false,
-      "codex/home-safe-diagnostics-20261022": false
+      "codex/home-safe-diagnostics-20261022": false,
+      "codex/home-flows-catalog-20261022": false
     }
   }
 }
