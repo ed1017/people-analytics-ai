@@ -5,7 +5,7 @@ const amount='(?:\\d+(?:\\.\\d+)?|twenty[ -](?:one|two|three|four)|'+words.slice
 const clarify='Please clarify one staffing delivery deadline in whole months (1–24), or explicitly remove the deadline. The cost horizon is separate.';
 /** Deliberately bounded grammar: unfamiliar or contradictory timing is not guessed. */
 export function captureStaffingDelivery(turn:{id:string;text:string},clarification=false):StaffingDeliveryCapture|null{
- const values:number[]=[],text=turn.text.trim();let uncertain=false;
+ const values:number[]=[],text=turn.text.trim();let uncertain=false,calendar=false;
  // Removal is an instruction only when the entire message is an affirmative directive.
  // Preserve the current target for questions, negation and hypothetical discussion.
  if(/\b(?:remove|clear|drop) (?:the |our )?(?:(?:delivery|staffing) )?(?:deadline|target)\b|\bno (?:delivery |staffing )?deadline\b/i.test(text)){
@@ -30,11 +30,17 @@ export function captureStaffingDelivery(turn:{id:string;text:string},clarificati
   if(found.length){
    if(question||/\b(?:not|never|if|unless|maybe|perhaps|example|could|would|should|may|might)\b|\bcan (?:we|you)\b|n't\b|\d\s*[-–/]\s*\d|\b(?:or|between|at least)\b/i.test(clause))uncertain=true;
    for(const match of found){const value=match[1].toLowerCase().replaceAll('-',' '),months=/^\d/.test(value)?Number(value):words.indexOf(value);if(!Number.isInteger(months)||months<1||months>24)uncertain=true;else values.push(months);}
+  }else if(/\b(?:20\d{2}-\d{2}(?:-\d{2})?|(?:january|february|march|april|may|june|july|august|september|october|november|december)\s+(?:\d{1,2},?\s+)?20\d{2})\b/i.test(clause)&&!new RegExp('\\b('+amount+')\\s*[- ]?(?:months?|weeks?|days?|years?)\\b','i').test(clause)){
+   // This capture owns relative whole-month targets only. Explicit calendar
+   // dates belong to ordinary planning's typed date/provenance validation;
+   // do not turn them into an invented duration or block that interpretation.
+   if(!question&&!/\b(?:not|never|if|unless|maybe|perhaps|could|would|should|may|might|what|which|explain|remind)\b|n't\b/i.test(clause.replace(/\bmay\s+(?:\d{1,2},?\s+)?20\d{2}\b/gi,'calendar-date')))calendar=true;
+   continue;
   }else if(named&&/\b(?:unchanged|same|keep|retain|what|which|show|explain|remind)\b/i.test(clause))continue;
   else if(named||/\bby\s+(?!hir(?:e|ing)\b|train(?:ing)?\b|redeploy|transfer|using\b)/i.test(clause)||/\b(?:within|in(?: the next)?|no later than|by(?: the end of)?)\b.*\b(?:months?|weeks?|days?|year|january|february|march|april|may|june|july|august|september|october|november|december)\b/i.test(clause))uncertain=true;
  }
  const distinct=[...new Set(values)];
- if(!uncertain&&!distinct.length)return null;
+ if(!uncertain&&!distinct.length)return calendar?{months:null,turnId:turn.id,quote:text,issue:null}:null;
  const issue=uncertain||distinct.length>1?clarify:null;
  return {months:issue?null:distinct[0],turnId:turn.id,quote:text,issue};
 }

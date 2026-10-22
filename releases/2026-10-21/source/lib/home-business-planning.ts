@@ -37,7 +37,18 @@ export function currentBusinessPlanning(request:SolutionRequest,datasetToken:str
  return s;
 }
 export function businessPlanningView(s:BusinessPlanning|null,requestId:string,step=0){
- return s?{demandProposal:referencedDemandView(s.review,s.context,demandReferenceId(requestId,step)),staffing:s.staffing?{inputs:s.staffing.inputs.values,result:s.staffing.result,decisionTradeoffs:staffingChoiceSummary(s.staffing.result.options)}:null,accepted:false,saved:false}:null;
+ if(!s)return null;
+ // Model projection only: retain each exact provenance object once. Repeated
+ // quotes and six copies of calculator inputs otherwise exhaust the conversation
+ // bound before the model can explain a successful comparison. Saved state stays full.
+ const bases:unknown[]=[];
+ const basisRef=(basis:unknown)=>{let index=bases.findIndex(item=>equal(item,basis));if(index<0){index=bases.length;bases.push(basis);}return {basisRef:index};};
+ const demandProposal=referencedDemandView(s.review,s.context,demandReferenceId(requestId,step));
+ const spec=Object.fromEntries(Object.entries(demandProposal.spec).map(([key,value])=>[
+  key,key.endsWith('Basis')?basisRef(value):value&&typeof value==='object'&&'basis' in value?{...value,basis:basisRef(value.basis)}:value,
+ ]));
+ const staffing=s.staffing?{inputs:Object.fromEntries(Object.entries(s.staffing.inputs.values).map(([key,atom])=>[key,{...atom,basis:basisRef(atom.basis)}])),result:{...s.staffing.result,monthlyColumns:['month','roles','cash'],options:s.staffing.result.options.map(({input: _input,monthly,...option})=>({...option,monthly:monthly.map(row=>[row.month,row.roles,row.cash])}))},decisionTradeoffs:staffingChoiceSummary(s.staffing.result.options)}:null;
+ return {demandProposal:{...demandProposal,spec},staffing,bases,projection:'Model-only: basisRef indexes bases. Option calculator inputs are derived from the shared demand, staffing inputs and each mix; full authoritative inputs and provenance remain server-side.',accepted:false,saved:false};
 }
 export async function runBusinessPlanningTool(request:SolutionRequest,datasetToken:string,s:BusinessPlanning|null,name:string,args:Record<string,unknown>,step:number){
  const tool=businessPlanningTools.find(t=>t.name===name);if(!tool)throw Error('Unsupported business planning tool.');assertSolutionShape(args,tool.parameters,'business planning tool');
