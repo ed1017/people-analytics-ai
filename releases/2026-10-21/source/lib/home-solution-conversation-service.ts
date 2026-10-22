@@ -1,3 +1,4 @@
+import {omitDuplicateComparisonTable} from './home-comparison-visual.mjs';
 import {homeDatasetQueryTool} from './home-dataset-query.mjs';
 import {policyEstimateTool} from './home-policy-estimate.mjs';
 import {compactPlanningInput} from './model-planning-context.mjs';
@@ -354,7 +355,10 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  else if(final.focusCandidateId!==null){state.focusCandidateId=final.focusCandidateId;state.recommendationRequestId=state.working.findLast(item=>item.id===final.focusCandidateId)?.requestId??state.recommendationRequestId;}
  if(state.focusCandidateId&&!state.working.some(item=>item.id===state.focusCandidateId))throw Error('The conversational focus is unavailable.');
  retainStaffingDeliveryTarget({...state,turns:[...state.turns,{...request.message,role:'user' as const}]},request.catalog);
+ const answerCharts=final.candidateIds.length||final.analysisIds.length?[]:answerEvidenceSeries(request.evidence,runtime.grounding,request.requestId,request.message.text,answer);
+ const comparison=answerCharts.find(chart=>chart.axis==='comparison');
+ if(comparison?.comparison)answer=omitDuplicateComparisonTable(answer,comparison.comparison);
  state.turns=[...state.turns,{id:request.message.id,role:'user' as const,text:request.message.text},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:answer}].slice(-32);
  abort(signal);
- return {...(progressProposal?{progressProposal}:{}),...(demandReview?{demandReview}:{}),charts:final.candidateIds.length||final.analysisIds.length?[]:answerEvidenceSeries(request.evidence,runtime.grounding,request.requestId,request.message.text,answer),requestId:request.requestId,answer,candidateIds:final.candidateIds,analysisIds:final.analysisIds,state:readSolutionState(state),usage:{modelRounds:rounds,toolCalls}};
+ return {...(progressProposal?{progressProposal}:{}),...(demandReview?{demandReview}:{}),charts:answerCharts,requestId:request.requestId,answer,candidateIds:final.candidateIds,analysisIds:final.analysisIds,state:readSolutionState(state),usage:{modelRounds:rounds,toolCalls}};
 }
