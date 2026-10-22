@@ -614,8 +614,11 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       </div></div>
     </form>
   );
-  const currentVisualAnswer=currentHomeVisualAnswer(messages,answerCharts,contextKey,ready&&active,chatLoading||solutions.pending,Boolean(chatError));
-  const currentVisualSeries=currentVisualAnswer?answerCharts.get(currentVisualAnswer)?.series??[]:[];
+  const displayedAnswerCharts=new Map(answerCharts);
+  const lastAnswer=messages.at(-1),lastStoredTurn=solutions.state.turns.at(-1),priorStoredTurn=solutions.state.turns.at(-2);
+  if(lastAnswer?.role==='assistant'&&!displayedAnswerCharts.has(lastAnswer)&&lastAnswer.content===lastStoredTurn?.text&&messages.at(-2)?.content===priorStoredTurn?.text&&solutions.restoredAnswerSeries.length)displayedAnswerCharts.set(lastAnswer,{context:contextKey,series:solutions.restoredAnswerSeries});
+  const currentVisualAnswer=currentHomeVisualAnswer(messages,displayedAnswerCharts,contextKey,ready&&active,chatLoading||solutions.pending,Boolean(chatError));
+  const currentVisualSeries=currentVisualAnswer?displayedAnswerCharts.get(currentVisualAnswer)?.series??[]:[];
   const visualQuestion=messages[messages.length-2]?.role==='user'?messages[messages.length-2].content:'';
   const visualTaReady=ready&&Boolean(resolveTaResponseExtension((sourceResults["talent-acquisition"] as {status?:string;data?:unknown})?.status==='loaded'?(sourceResults["talent-acquisition"] as {data?:unknown}).data:null));
   const visualForecastDomain=currentVisualAnswer?homeForecastChartDomain(visualQuestion,currentVisualAnswer.content):null;

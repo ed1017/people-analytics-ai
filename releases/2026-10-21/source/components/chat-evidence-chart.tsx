@@ -4,6 +4,15 @@ import type {ChatEvidenceSeries} from '@/lib/chat-evidence-series';
 /** Discrete sampled periods; no line interpolates missing months or projects future values. */
 export function ChatEvidenceChart({series}:{series:ChatEvidenceSeries}){
  const scope=series.scope.replace(/^(?:Selected workforce snapshot:\s*)+/,'');
+ if(series.axis==='aggregate'&&series.aggregate){
+  const a=series.aggregate,max=Math.max(1,...a.rows.map(r=>r.value)),format=(v:number)=>v.toLocaleString('en-US',{maximumFractionDigits:2});
+  return <figure aria-label={series.title+' for this answer'} className="my-3 min-w-0 space-y-2 rounded-lg border p-3 text-sm">
+   <figcaption className="font-semibold">{series.title}</figcaption><p>{scope} — as of {series.asOf}</p><p>{a.period}</p>
+   {a.completeTie?<p className="text-lg font-semibold">All {a.completeTie.count} released groups tie at {format(a.completeTie.value)} {series.unit}. No unique highest or lowest group.</p>:<div role="region" aria-label="Recorded group comparison" tabIndex={0} className="overflow-x-auto focus-visible:ring-2 focus-visible:ring-ring"><table className="w-full min-w-64"><thead><tr><th scope="col" className="text-left">Group</th><th scope="col" className="text-right">{series.unit}</th></tr></thead><tbody>{a.rows.map(r=><tr key={r.id}><th scope="row" className="p-2 text-left font-medium">{catalogDisplayLabel(r.label)}</th><td className="min-w-24 p-2 text-right tabular-nums">{format(r.value)}<div aria-hidden="true" className="h-2 bg-muted"><div className="h-2 bg-primary" style={{width:`${r.value/max*100}%`}}/></div></td></tr>)}</tbody></table></div>}
+   <p>{a.complete?'Complete released collection':'Eligible released groups only'}: {a.eligibleGroups} eligible of {a.totalGroups}.{a.truncated?` Showing ${a.rows.length} after ranking all eligible groups, retaining cutoff ties.`:''}{a.excludedGroups?` ${a.excludedGroups} unavailable values excluded, not zero.`:''}</p>
+   <AssumptionsDisclosure><p>{series.limitation}</p><p>Recorded synthetic aggregates. Bars share a zero baseline; values retain their stated units.</p></AssumptionsDisclosure>
+  </figure>;
+ }
  if(series.axis==='scalar')return <figure aria-label={series.title+' for this answer'} className="my-3 min-w-0 space-y-2 rounded-lg border p-4 text-base">
   <figcaption className="font-semibold">{series.title}</figcaption>
   <p className="text-3xl font-semibold tabular-nums">{series.points[0].value.toLocaleString('en-US',{maximumFractionDigits:2})} <span className="text-lg">{series.unit}</span></p>
