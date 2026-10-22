@@ -1,5 +1,7 @@
 # Fresh accounting database and company ingestion boundary
 
+The original `bootstrap.sql` and `rehearse.mjs` below remain a frozen October 21 artifact. For the updated October 22 contract, use [current accounting reconstruction](current-accounting-reconstruction.md).
+
 This is an **accounting-only bootstrap**, not a complete new-company application installer. It reproduces the six-table accounting contract of runtime `a86acfa4ebc28015f2652685536750c300ca083a` and the seven applied migrations listed in [the current-company handoff](../releases/2026-10-21/reproduction/CURRENT-COMPANY-HANDOFF.md). The separate [public reproduction recipe](../releases/2026-10-21/reproduction/README.md) rebuilds the app using safe public historical fixtures; it does not prove database ingestion or real-company readiness.
 
 ## Artifact and scope
@@ -49,6 +51,6 @@ Acceptance sequence: reviewed private mapping and controls → offline validatio
 
 ## Coordinated pricing refresh
 
-Current four-window expiry is **October 22, 2026 at 09:59 UTC**, superseding the earlier cutoff. The app's 60-second timeout plus 30-second margin stops admission at **09:57:30 UTC**. The four controls are app `verifiedAt`/`validUntil` (maximum 24 hours), rollout `pricing_valid_until`, admission-function upper ceiling, and receipt-settlement dispatch upper bound. A timestamp extension alone is not price verification.
+The archived October 21 four-window expiry was **October 22, 2026 at 09:59 UTC**, superseding the earlier cutoff. The app's 60-second timeout plus 30-second margin stops admission at **09:57:30 UTC**. The four controls are app `verifiedAt`/`validUntil` (maximum 24 hours), rollout `pricing_valid_until`, admission-function upper ceiling, and receipt-settlement dispatch upper bound. A timestamp extension alone is not price verification.
 
 Before the cutoff, check the same official model/default-tier prices, input/output/reasoning bounds and worst-case reservations. Choose an actually verified time and at most 24-hour end. Compare current definitions, ACLs and ledger baseline; prepare one guarded update to all four controls, with existing spend, reservations, receipts, uncertain holds and permissions preserved. Keep settlement's prior lower dispatch bound for valid in-flight receipts; its ten-minute freshness and exact replay checks remain. Run focused expiry/boundary and conservation checks, stage the matching app source, then verify deployed identity and database postconditions. If any guard fails or pricing cannot be verified, admission expires closed; never reset the ledger or simply advance dates. The existing protected release/authorization path remains required. This document does not perform a refresh.
