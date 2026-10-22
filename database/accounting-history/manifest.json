@@ -1,0 +1,78 @@
+{
+  "observedAt": "2026-10-22",
+  "purpose": "Historical applied-version inventory, not an executable migration sequence. Null source means exact historical SQL is not supplied here; the no-seed bootstrap reproduces the consolidated accounting contract.",
+  "migrations": [
+    {
+      "version": "20261020072031",
+      "name": "public_ai_lifetime_budget",
+      "source": null,
+      "sha256": null
+    },
+    {
+      "version": "20261020150705",
+      "name": "raise_public_ai_cumulative_cap_to_twenty_preserve_reservations",
+      "source": null,
+      "sha256": null
+    },
+    {
+      "version": "20261020193119",
+      "name": "public_ai_multiprice_guarded_48",
+      "source": null,
+      "sha256": null
+    },
+    {
+      "version": "20261020202346",
+      "name": "public_ai_verified_group_settlement_50",
+      "source": null,
+      "sha256": null
+    },
+    {
+      "version": "20261021020352",
+      "name": "align_reviewed_planner_pricing_ceiling_oct22",
+      "source": null,
+      "sha256": null
+    },
+    {
+      "version": "20261021024517",
+      "name": "private_verified_provider_usage_receipts",
+      "source": null,
+      "sha256": null
+    },
+    {
+      "version": "20261021100552",
+      "name": "renew_reviewed_planner_pricing_oct22_0959",
+      "source": null,
+      "sha256": null
+    },
+    {
+      "version": "20261021225942",
+      "name": "renew_reviewed_planner_pricing_oct22_2251",
+      "source": "database/accounting-history/PRICING-ROLLING-RENEWAL-2251.sql",
+      "sha256": "23d048036dfe1adc722c11be8e144aa6cec4c25513e7e9c84eb1113126370a4b"
+    },
+    {
+      "version": "20261022022945",
+      "name": "bounded_home_4k_policy_20261022",
+      "source": "database/bounded-home-4k-20261022.sql",
+      "sha256": "3baf29c7a8e213630882ebe5c8dc4aa4e9a4c5be5dd8cc0b3d0ca9d4d379e5e7"
+    },
+    {
+      "version": "20261022032422",
+      "name": "raise_cumulative_app_cap_to_thirty_preserving_history",
+      "source": "database/accounting-history/CAP30-PROPOSED.sql",
+      "sha256": "190febcb22914c7e4998021b9acb084f0b484335534640d567bf65f20ac2617f"
+    },
+    {
+      "version": "20261022153911",
+      "name": "renew_reviewed_planner_pricing_oct23_1500",
+      "source": "database/accounting-history/PRICING-ROLLING-RENEWAL-231500.sql",
+      "sha256": "6f47daa7cb56099f4fa07544231eed14d20734c733cfb8ba45b461bda72b2df8"
+    },
+    {
+      "version": "20261022162630",
+      "name": "cumulative_cap_fifty_20261022",
+      "source": "docs/cumulative-cap50-20261022.sql",
+      "sha256": "8852f31eb1efb95051a3b583dcbeb71eb77b52e3d72eea1f88b070bd9c454760"
+    }
+  ]
+}

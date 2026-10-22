@@ -1,5 +1,7 @@
 # Current release and new-company handoff
 
+This is a frozen October 21 handoff, not the latest production identity. See [October 22 accounting reconstruction](../../../docs/current-accounting-reconstruction.md) for the updated contract and remaining domain-DDL gap.
+
 This handoff tracks runtime a86acfa4ebc28015f2652685536750c300ca083a and the source manifest alongside it. The replay recipe verifies 720 files and serves 19 pinned, previously public aggregate GET responses. It does not reconstruct private data or provision a new live company.
 
 ## Three distinct contracts
