@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "f77b238f63f98a0da4b432c9af8701ad5b68cb43",
-  "deployment": "pending-staged-production-verification",
+  "sourceCommit": "8a325485b7eadf24922ae67f9fa39cc7529dacab",
+  "deployment": "dpl_G9TSvscsjfTcBP9ZfYkhZhT6KW82",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -3019,7 +3019,7 @@
     },
     {
       "path": "lib/public-planner-round.server.mjs",
-      "sha256": "678c16b643450d2aa2bacb2e6faceb6a547d8cf89184238ed0bb8d3a5d7c6f3b",
+      "sha256": "e6533ff9c40c0834037548f220b97f523ea44c3064f7a465d686b4d94da9fa8d",
       "bytes": 15230
     },
     {
@@ -3700,13 +3700,14 @@
     {
       "path": "tests/public-planner-price-proposal.test.mjs",
       "bytes": 4095,
-      "sha256": "62aee3a01fffb04298521094b3411d8af0aac3f1ec4ad8d2c1db0326789156af"
+      "sha256": "e727b0c2aa5eebb749c3e871b77257a3b41853949043d312b15d6d768a71d46d"
     },
     {
       "path": "tests/public-planner-round.test.mjs",
-      "bytes": 14282,
-      "sha256": "fd6ecdadd0835d303b928a3f8b44c1fbfec7f66fd673d0ef38090d2326d70e62"
+      "bytes": 14307,
+      "sha256": "c494ca3b5c822afaca673c9a635eacdd573b67d51253c633fecb7950ce727432"
     }
   ],
-  "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8"
+  "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
+  "verifiedDeployedArchiveSha256": "e7fb8756a27a2afee4c40db86572f22affde46b44f28f8246ff19b3047bed039"
 }
