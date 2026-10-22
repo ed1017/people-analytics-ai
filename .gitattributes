@@ -7,3 +7,5 @@ database/bounded-home-4k-20261022.sql text eol=lf
 docs/cumulative-cap50-20261022.sql text eol=lf
 database/analytics-local/*.sql -text
 database/analytics-local/*.sha256 text eol=lf
+
+database/domain-recovery-local/schema.sql -text

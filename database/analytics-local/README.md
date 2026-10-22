@@ -26,8 +26,8 @@ The SQL checks the exact database name and loopback address with null-safe compa
 
 ## Explicit exclusions and next work
 
-- `workforce_performance_release_v1` is excluded because it depends on the separate `workforce_release.performance_rating_v1` schema and immutable release activation contract.
-- Future-of-Work (`fow`) objects, accounting, the operational preview-claims table and platform-managed schemas are excluded.
+- `workforce_performance_release_v1` and Future-of-Work (`fow`) objects are installed separately by the optional [domain recovery fixture](../domain-recovery-local/README.md), preserving this package's empty public-schema test contract.
+- Accounting, the operational preview-claims table and platform-managed schemas are excluded from this package.
 - Empty view execution proves dependency validity, not numeric correctness with loaded data. Synthetic fixture loading, independently reconciled domain results and full app/API acceptance remain required.
 - No backend activation grants or new-company data ingestion are included. Any later hosted setup requires a separately reviewed least-privilege contract; never copy legacy broad grants just to make a query work.
 

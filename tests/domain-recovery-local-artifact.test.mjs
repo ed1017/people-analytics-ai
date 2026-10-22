@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {createHash} from 'node:crypto';
+test('domain recovery SQL matches isolated rehearsal artifact',()=>{const root=new URL('../database/domain-recovery-local/',import.meta.url);assert.equal(createHash('sha256').update(fs.readFileSync(new URL('schema.sql',root))).digest('hex'),fs.readFileSync(new URL('schema.sha256',root),'utf8').trim());});
