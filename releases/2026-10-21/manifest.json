@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "cb225d691ee63e32b404ccc53d7d8a2b3159402b",
+  "sourceCommit": "1bd08ebe3062c27d1adebaee1f48a92d84e7fcf1",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -519,8 +519,8 @@
     },
     {
       "path": "components/home-business-planning-review.tsx",
-      "sha256": "4cbc09d09349b2edc22e7c8e5e2a455dfa6a6303d20e3de8fa77688c523b5a70",
-      "bytes": 8164
+      "sha256": "d60c8a1617778f228f6c230a8473f1ef43f1968bcbafe524c03e3cbba7fca74f",
+      "bytes": 8505
     },
     {
       "path": "components/home-candidate-options.tsx",
@@ -1004,8 +1004,8 @@
     },
     {
       "path": "components/use-home-solution-conversation.ts",
-      "sha256": "d89209c47f4e74aac5cf45882079bc12e08732112994d76fec80065298e12e78",
-      "bytes": 31762
+      "sha256": "3498bf953ee10691e802fb7820c5c229db1ed9875cc3850dbebda08e1b0aaffd",
+      "bytes": 32247
     },
     {
       "path": "components/use-page-briefing.ts",
@@ -2079,8 +2079,8 @@
     },
     {
       "path": "lib/home-business-planning.ts",
-      "sha256": "09fdcbe5d2201323bde50b13c9af6f34063d918f91630b9099a846ecf35c9ae4",
-      "bytes": 13264
+      "sha256": "425b97e07106fa8d176b65b3afb1051237611af6c731bbb8183baf51aa273fea",
+      "bytes": 14368
     },
     {
       "path": "lib/home-candidate-options.ts",
@@ -2449,8 +2449,8 @@
     },
     {
       "path": "lib/home-service-staffing.ts",
-      "sha256": "16e0df967c07bd5f083fdbc7417d237c47d8f600f9af1ef5645245c2ef7dac97",
-      "bytes": 14914
+      "sha256": "276ec4168197022e314d4bbe116fd2ba25f6999de39ec28b940ab33e832a1e28",
+      "bytes": 15743
     },
     {
       "path": "lib/home-solution-bundles.ts",
@@ -3896,8 +3896,18 @@
       "path": "tests/hiring-scenario-reset.test.mjs",
       "sha256": "7ec71f453f23beb46a277801e2a8800c2440dd7e1d45ca2cf6806b8061a2dfe5",
       "bytes": 2108
+    },
+    {
+      "path": "components/staffing-mix-controls.tsx",
+      "sha256": "248cb22045c083225f27e565ac17fbfd84e988b6259142bd2e1faae665ce2731",
+      "bytes": 2692
+    },
+    {
+      "path": "tests/staffing-mix-controls.test.mjs",
+      "sha256": "7a98df2bdccdae3c75109a4a38dfd035ba716772ba22f85f2385f922f92c119f",
+      "bytes": 4460
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "d0c61983072aa89a02b98126cb701bee5e08db06159e43ecc9ced96c75a169b0"
+  "verifiedDeployedArchiveSha256": "cf8dfdccf008305a20bdeb09f3e30a49c8cc5723ce9899e737f9779a029e91b0"
 }

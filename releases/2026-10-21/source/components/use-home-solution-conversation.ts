@@ -1,4 +1,5 @@
 'use client';
+import {selectBusinessPlanningMix} from '@/lib/home-business-planning';
 import {homeAnswerVisualField,restoreHomeAnswerVisual} from '@/lib/home-answer-visual-save';
 import {annualTurnoverEvidenceQuestion} from '@/lib/home-turnover-chat';
 import {publicAiFetch} from '@/lib/public-ai-readiness-client.mjs';
@@ -205,6 +206,11 @@ export function useHomeSolutionConversation(props:Props){
  }
  function clearBusinessPlanning(){try{requireCurrent();persist({...memoryRef.current,businessPlanning:null});}catch(error){setNotice((error as Error).message);}}
  function currentBusinessState(){return currentBusinessPlanning(makeRequest('Review the current provisional staffing option.'),decisionStore.getDatasetToken());}
+ function adjustBusinessMix(mix:{build:number;move:number;buy:number}|null){
+  if(pending||saving)throw Error('Finish the current operation before adjusting this scenario.');
+  requireCurrent();const state=currentBusinessState();if(!state)throw Error('The current staffing comparison is unavailable.');
+  persist({...memoryRef.current,businessPlanning:selectBusinessPlanningMix(state,mix)});
+ }
  async function reviewBusinessOption(id:string){
   const snapshot=requireCurrent(),state=currentBusinessState();if(!state)throw Error('The business discussion changed.');
   const key=JSON.stringify(state),revision=snapshot.data.revision,context=liveKey.current,initialEpoch=epoch.current;
@@ -223,5 +229,5 @@ export function useHomeSolutionConversation(props:Props){
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
  const storedVisual=(goal.id?storage.data.workspaces[goal.id]:storage.data.exploration)?.fields[homeAnswerVisualField];
  const restoredAnswerSeries=restoreHomeAnswerVisual(storedVisual,JSON.stringify([props.scope,props.query]),decisionStore.getDatasetToken(),memory.turns);
- return {resetHiringScenario,restoredAnswerSeries,staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {adjustBusinessMix,resetHiringScenario,restoredAnswerSeries,staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }

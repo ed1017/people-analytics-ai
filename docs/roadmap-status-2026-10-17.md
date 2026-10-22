@@ -1,3 +1,9 @@
+## October 22, compact planner verification
+
+- Hiring controls are live in PR354, runtime `cb225d691ee63e32b404ccc53d7d8a2b3159402b`, deployment `dpl_9jMiHDgGXca59iawVAMUqh8yaauc`. CI and protected desktop/mobile plus production browser replay passed; edited calculations and visuals survive reload.
+- Mixed staffing controls are implemented and independently reviewed in the next source increment: two actual development/redeployment allocation sliders, hiring explicitly calculated as the remainder, bounded by the supplied pools and current gap. Cost, shortfall, coverage chart and saving use the same validated calculation. Selection is not labeled optimal; changing assumptions clears it. Reset returns to current comparison assumptions. Five focused regressions and existing shared parity tests passed; local mobile browser replay passed, including stale-review invalidation and saved-plan reload. Hosted checks/promotion pending at this checkpoint.
+- These controls support the existing whole-role, 1-FTE-per-role comparison contract; they do not invent fractional-role support or source availability. No paid calls, accounting or access changes. Fresh-model acceptance remains distinct from replay.
+
 ## October 22, 21:40 UTC implementation checkpoint
 
 - PR353 is live: complete 50-role recruiting comparisons correctly report the 33-day tie, generic categorical tables/bars occupy the right pane, and the latest scoped visual survives reload. Runtime `1861c2d65349e86fdb50ef6ee03c10fd72394be4`; deployment `dpl_7J8bfcisP5A52uw7nVMu1RqZfUCK`. Protected desktop/mobile and production browser replay passed. No fresh model calls were made for that increment.
