@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "7adaf36c24aee3ab6c79b6cdd84ebf48ff3daadd",
+  "sourceCommit": "9a7a823b3d6a576fe92acfa8492dc78ac71ba569",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -344,8 +344,8 @@
     },
     {
       "path": "components/chat-evidence-chart.tsx",
-      "sha256": "2f19b5c032b8f6582f8d8ddfa361e8da63cf6f272a42269d12c1634395c4af07",
-      "bytes": 4478
+      "sha256": "32648b91a5c14bd8c0746544da504c2f0a40f06bf715fce841918f85333e51dc",
+      "bytes": 4510
     },
     {
       "path": "components/compact-chart.tsx",
@@ -3854,5 +3854,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "78f39055093e477c61013d0d9dce1f5aa636d6df747b11f0d2c2f44b1f1aba5d"
+  "verifiedDeployedArchiveSha256": "7f70d7012dd040ad3935b0c7fbfe29cc8a017022819f45ce6839978362b394d6"
 }
