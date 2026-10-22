@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useId,useState,type RefObject} from 'react';
 import {datasetFetch} from '@/lib/dataset-client.mjs';
+import {composerPromptHelpers,insertPromptHelper} from '@/lib/composer-prompt-helpers';
 import {composerCatalogMatch,composerCatalogOptions,filterComposerOptions,insertComposerOption,type CatalogOption} from '@/lib/composer-catalog';
 export function CatalogComposer({value,onChange,textareaRef,rows,workforce,datasetToken}:{value:string;onChange:(v:string)=>void;textareaRef:RefObject<HTMLTextAreaElement|null>;rows:number;workforce:unknown;datasetToken:string}){
  const id=useId(),[caret,setCaret]=useState(0),[closed,setClosed]=useState<string|null>(null),[active,setActive]=useState(0),[roleSource,setRoleSource]=useState<{token:string;data:unknown}|null>(null);
@@ -11,7 +12,13 @@ export function CatalogComposer({value,onChange,textareaRef,rows,workforce,datas
  const chosen=options[active];
  const select=(option:CatalogOption)=>{if(!match)return;const next=insertComposerOption(value,match,option);onChange(next.value);setCaret(next.caret);setClosed(next.value+'|'+next.caret);requestAnimationFrame(()=>{textareaRef.current?.focus();textareaRef.current?.setSelectionRange(next.caret,next.caret);});};
  const updateCaret=(element:HTMLTextAreaElement)=>{setCaret(element.selectionStart);setActive(0);};
+ const insertHelper=(helperId:string)=>{const next=insertPromptHelper(value,helperId);if(!next)return;onChange(next.value);setCaret(next.end);setActive(0);setClosed(null);requestAnimationFrame(()=>{textareaRef.current?.focus();textareaRef.current?.setSelectionRange(next.start,next.end);});};
  return <div className="relative min-w-0" onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null))setClosed(signature);}}>
+  <div role="group" aria-label="Editable prompt helpers" className="mb-2 flex flex-wrap items-center gap-2">
+   <span className="text-xs text-muted-foreground">Draft helpers</span>
+   {composerPromptHelpers.map(helper=><button key={helper.id} type="button" onClick={()=>insertHelper(helper.id)} title={value.length?'Add an editable starter after your current draft':'Insert an editable starter'} className="min-h-11 rounded-full border px-3 py-1 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{helper.label}</button>)}
+  </div>
+  <p className="mb-2 text-xs text-muted-foreground">Fill in what you know; unknown details can stay blank. Helpers add to your draft without sending.</p>
   <textarea ref={textareaRef} id="overview-question" aria-label="Ask Workforce AI" role="combobox" aria-autocomplete="list" aria-expanded={open} aria-controls={open?id:undefined} aria-activedescendant={open&&chosen?id+'-'+active:undefined} aria-describedby={id+'-help'}
    onKeyDown={event=>{if(event.nativeEvent.isComposing)return;if(open&&event.key==='Escape'){event.preventDefault();setClosed(signature);return;}if(open&&options.length&&['ArrowDown','ArrowUp'].includes(event.key)){event.preventDefault();setActive(n=>(n+(event.key==='ArrowDown'?1:-1)+options.length)%options.length);return;}if(open&&chosen&&!event.shiftKey&&(event.key==='Enter'||event.key==='Tab')){event.preventDefault();select(chosen);return;}if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();event.currentTarget.form?.requestSubmit();}}}
    value={value} onChange={event=>{onChange(event.target.value);updateCaret(event.target);setClosed(null);}} onSelect={event=>{const next=event.currentTarget.selectionStart;if(next!==caret)updateCaret(event.currentTarget);}} rows={rows}

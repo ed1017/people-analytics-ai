@@ -5,13 +5,13 @@ export type CatalogOption={code:string;label:string};
 export type CatalogMatch={kind:CatalogKind;query:string;start:number;end:number};
 export function composerCatalogMatch(value:string,caret:number):CatalogMatch|null{
  if(!Number.isInteger(caret)||caret<0||caret>value.length)return null;
- for(const hit of value.matchAll(/\[(role|level|business unit|department)(?::\s*([^\]\n]*))?\]/gi)){
+ for(const hit of value.matchAll(/\[(role|level|business unit|department)(?::[ \t]*([^\]\n]*))?\]/gi)){
   const start=hit.index!,end=start+hit[0].length;
   if(caret>start&&caret<=end)return {kind:hit[1].toLowerCase() as CatalogKind,query:hit[2]??'',start,end};
  }
- const before=value.slice(0,caret),open=before.match(/\[(role|level|business unit|department)(?::\s*([^\]\n]*))?$/i);
+ const before=value.slice(0,caret),open=before.match(/\[(role|level|business unit|department)(?::[ \t]*([^\]\n]*))?$/i);
  if(open)return {kind:open[1].toLowerCase() as CatalogKind,query:open[2]??'',start:caret-open[0].length,end:caret};
- const typed=before.match(/\b(role|level|business unit|department)\s*:\s*([^\n,;[\]]*)$/i);
+ const typed=before.match(/\b(role|level|business unit|department)[ \t]*:[ \t]*([^\n,;[\]]*)$/i);
  return typed?{kind:typed[1].toLowerCase() as CatalogKind,query:typed[2],start:caret-typed[2].length,end:caret}:null;
 }
 const obj=(v:unknown):Record<string,unknown>=>v&&typeof v==='object'&&!Array.isArray(v)?v as Record<string,unknown>:{};

@@ -28,8 +28,9 @@ function proposedTextContainsFact(text:string,labels:readonly string[]):boolean 
  return metricValue.test(words)||valueFact||/\b(?:was|were|recorded|reported)\b/.test(words)&&/\d/.test(words);
 }
 /** Grouped IDs and field/row references share the same authoritative source scope. */
+const normalizeCitations=(text:string)=>text.replace(/\(([^()\n]+)\)/g,(whole,inner:string)=>/^[A-Z]\d(?::[A-Za-z0-9_]+)*(?:\s*[,;]\s*[A-Z]\d(?::[A-Za-z0-9_]+)*)*$/i.test(inner.trim())?'['+inner.trim()+']':whole);
 export function homeScopeCitations(text:string):string[]{
- return [...text.matchAll(/\[([^\]\n]+)\]/g)].flatMap(match=>[...match[1].matchAll(/(?:^|[,;\s])([A-Z]\d)(?=[\s,;.:]|$)/gi)].map(item=>item[1].toUpperCase()));
+ return [...normalizeCitations(text).matchAll(/\[([^\]\n]+)\]/g)].flatMap(match=>[...match[1].matchAll(/(?:^|[,;\s])([A-Z]\d)(?=[\s,;.:]|$)/gi)].map(item=>item[1].toUpperCase()));
 }
 type ScopeOptions={references?:string[];scopeContext?:string};
 /** Reject recognizable source/scope contradictions; never rewrite or relabel evidence.
@@ -37,6 +38,7 @@ type ScopeOptions={references?:string[];scopeContext?:string};
  * this bounded check is not a general factual or causal verifier.
  */
 export function homeAnswerScopeViolation(answer:string,raw:unknown,options:ScopeOptions={}):boolean {
+ answer=normalizeCitations(answer);
  const pack=normalizeHomePack(raw);
  const selected=(pack.workforceScope??'').replace(/Selected workforce snapshot:\s*/gi,'').split(/;/).map((part:string)=>part.trim().replace(/^(?:country|business unit|level):\s*/i,'' )).filter((part:string)=>part&&!/^(?:all\b|global workforce|company|synthetic|scope unavailable)/i.test(part));
  const finance=pack.sources.find((source:{id:string})=>source.id==='F1');
