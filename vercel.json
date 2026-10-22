@@ -40,7 +40,8 @@
       "codex/home-cross-metric-comparison-20261022": false,
       "codex/finance-calculation-renewal-20261022": false,
       "codex/cumulative-cap50-context-20261022": false,
-      "codex/preserve-deadline-20261022": false
+      "codex/preserve-deadline-20261022": false,
+      "codex/historical-multipart-20261022": false
     }
   }
 }

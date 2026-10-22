@@ -1,3 +1,4 @@
+import {createHash} from 'node:crypto';
 import {estimatePolicyBasePay} from './home-policy-estimate.mjs';
 import {isDeepStrictEqual as same} from 'node:util';
 import {PUBLIC_9037 as P} from './public-9037-contract.mjs';
@@ -5,6 +6,30 @@ import {public9037Metadata,public9037Fields} from './public-9037-projection.mjs'
 import {boundedJson} from './public-qa-stream.server.mjs';
 import {aggregateRegistry,queryAggregate} from './home-aggregate-registry.mjs';
 import {catalogDisplayLabel,countryDisplayLabel} from './catalog-display.ts';
+import {readDashboardScopeReceipt} from './dashboard-scope.ts';
+import {queryWorkforceHistory} from './home-history-query.mjs';
+
+/** Same pinned dashboard source, with an explicit supported intersection per question. */
+export async function readPublicWorkforceHistory({binding,hostname,identity,args,signal,requestId}){
+ const must=v=>{if(!v)throw Error('Historical workforce evidence could not be verified.');};
+ const current=()=>{signal.throwIfAborted();must(same(binding.router.current(),identity));};
+ current();must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===2&&/^[a-f0-9]{64}$/.test(identity.digest));
+ must(await binding.router.bootstrapToken()===P.token);
+ must(/^people-analytics-[a-z0-9]+-ed-56dc\.vercel\.app$/.test(hostname));
+ must(args&&same(Object.keys(args).sort(),['country','end','level','metric','org','start']));
+ const filters={country:args.country,org:args.org,level:args.level};
+ must(Object.values(filters).every(v=>typeof v==='string'&&v.length>0&&v.length<=100));
+ const response=await binding.handle(new Request('https://'+hostname+'/api/dashboard?'+new URLSearchParams(filters),{headers:{'x-workforce-dataset':P.token},signal}));
+ current();must(response.ok&&response.headers.get('x-workforce-dataset')===P.token);
+ const data=await boundedJson(response.body,8*1024*1024,signal);current();
+ must(data?.data_meta?.bundleDigest===identity.digest&&same(data.data_meta,public9037Metadata(identity.digest,data.data_meta)));
+ const receipt=readDashboardScopeReceipt(data.workforce_filter_scope);
+ if(!receipt||receipt.status!=='verified_public_aggregate'||!same(receipt.requested,filters)||!same(receipt.effective,filters))return {answer:'The requested country, business-unit and level intersection is not verified. Use catalog codes from the workforce filters. Departments and business units are not interchangeable; no company-wide result was substituted.'};
+ const result=queryWorkforceHistory(data,args);
+ const scope=receipt.label.split(';').map((label,i)=>i===0&&filters.country!=='all'?countryDisplayLabel(label.trim(),filters.country):catalogDisplayLabel(label.trim())).join('; ').replace(/[\\`*_[\]<>]/g,'');
+ const chart=result.status==='available'&&result.points.length>=2?{version:1,requestId,datasetToken:P.token,packetSha256:createHash('sha256').update(JSON.stringify({digest:identity.digest,filters,args,points:result.points})).digest('hex'),kind:'recorded',synthetic:true,metric:args.metric,title:args.metric==='fte'?'FTE snapshots':'Headcount snapshots',unit:result.unit,sourceId:'W1',scope,asOf:P.cutoff,limitation:'Complete requested month-end stock series from the verified synthetic joint aggregate. No rates or causal inference.',sampled:false,omitted:0,points:result.points}:undefined;
+ return {...result,chart,answer:`Scope: ${scope}. Source: recorded workforce dashboard, as of ${P.cutoff}.\n\n${result.answer}`};
+}
 
 export function formatHomeAggregate(result){
  const order=result.order==='ascending'?'lowest to highest':'highest to lowest';

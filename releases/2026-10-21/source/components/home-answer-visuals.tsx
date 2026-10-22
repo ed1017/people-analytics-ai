@@ -31,6 +31,6 @@ export function HomeAnswerVisuals({pending,error,current,series,supplement}: {pe
   const status=pending?'Preparing visuals for your question.':error?'No current visual: the answer could not be completed.':!current?'Ask a question to see its supported visuals here.':!series.length&&!supplement?'No chart is available for this answer.':null;
   return <aside className="home-answer-visuals" aria-label="Current answer visuals" aria-busy={pending}>
     <h3 className="text-lg font-semibold">{status?'Answer visuals':'Visuals for this answer'}</h3>
-    {status?<p role="status" className="text-sm text-muted-foreground">{status}</p>:<>{series.map(series=><ChatEvidenceChart key={series.metric} series={series}/>)}{supplement}</>}
+    {status?<p role="status" className="text-sm text-muted-foreground">{status}</p>:<>{series.map(series=><ChatEvidenceChart key={JSON.stringify([series.metric,series.scope,series.points[0]?.date,series.points.at(-1)?.date])} series={series}/>)}{supplement}</>}
   </aside>;
 }
