@@ -16,7 +16,7 @@ test('official-source full-context candidate amounts conservatively cover every 
 });
 test('multi-price readiness requires the reviewed global version and maximum, not a caller discount',async()=>{
  const p=publicPlannerPriceCandidate('plan'),now=()=>Date.parse(p.verifiedAt)+60*60*1000;
- const row={id:'public-9037-ai-initial-v1',enabled:true,cap_micro_usd:20000000,reserved_micro_usd:34,policy_id:PUBLIC_PLANNER_PRICE_GROUP,per_call_micro_usd:4800000,pricing_valid_until:p.validUntil};
+ const row={id:'public-9037-ai-initial-v1',enabled:true,cap_micro_usd:30000000,reserved_micro_usd:34,policy_id:PUBLIC_PLANNER_PRICE_GROUP,per_call_micro_usd:4800000,pricing_valid_until:p.validUntil};
  const options={enabled:true,policy:p,now,readLedgerStatus:async()=>row,ledgerPolicyId:PUBLIC_PLANNER_PRICE_GROUP,ledgerPerCallMicroUsd:4800000};
  assert.equal(await publicPlannerReadiness(options),true);
  assert.equal(await publicPlannerReadiness({...options,ledgerPerCallMicroUsd:500000}),false);
