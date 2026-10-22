@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "abcf1919240a54eb0fe0d3ed5957a1f8ba9ed5c2",
-  "deployment": "dpl_59mzCzmJiLF4TtTyhU4nucvrDqDd",
+  "sourceCommit": "026011979614b2c53fd430a78391abb705c04b32",
+  "deployment": "dpl_5trHDX2KRrqCr1TtQpbtFCGz1T9L",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -3679,8 +3679,8 @@
     },
     {
       "path": "lib/public-home-association.server.mjs",
-      "bytes": 5386,
-      "sha256": "f6bc833379b00a10f8d1fe52a107be90b674b88a49af3c3497cb44a6d02c781f"
+      "sha256": "1f01b53cd647c8ced6461f7f68fbf1c919f85c60fa7007ca14f9105f364ea500",
+      "bytes": 5511
     },
     {
       "path": "tests/public-ai-application.test.mjs",
@@ -3689,8 +3689,8 @@
     },
     {
       "path": "tests/public-home-association.test.mjs",
-      "bytes": 4282,
-      "sha256": "1620d7674bbc87f6b875ff3d09ba4715de70a878747c9845638104c36eb8a5e8"
+      "sha256": "4b8c9747df4f7c80f340fb39c84ada3d6c88589cc468ad451834c47ab4e619b3",
+      "bytes": 5446
     },
     {
       "path": "tests/public-home-route-approved.test.mjs",
@@ -3734,5 +3734,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "91b4f5a139589c4d6a251b857b15447e0b539f062441cdbf194c3cad5198e885"
+  "verifiedDeployedArchiveSha256": "5d7ba1e9772cbcd18598483ee1c5364e71ac94d76461929980c992cf3df76c5f"
 }
