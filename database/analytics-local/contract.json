@@ -1,0 +1,6059 @@
+{
+  "tables": [
+    {
+      "name": "applications",
+      "columns": [
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "candidate_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "requisition_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "recruiting_source_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "application_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "application_status",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "current_stage",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "disposition_reason",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "applications_candidate_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "applications_pkey",
+          "type": "p"
+        },
+        {
+          "name": "applications_recruiting_source_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "applications_requisition_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "name": "benchmark_metrics",
+      "columns": [
+        {
+          "name": "benchmark_metric_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "metric_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "benchmark_group",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "country_code",
+          "type": "character(2)",
+          "notNull": false
+        },
+        {
+          "name": "effective_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "benchmark_value",
+          "type": "numeric(14,4)",
+          "notNull": false
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "source_system",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "benchmark_metrics_country_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "benchmark_metrics_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "calendar",
+      "columns": [
+        {
+          "name": "calendar_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "date_key",
+          "type": "integer",
+          "notNull": true
+        },
+        {
+          "name": "day_of_week",
+          "type": "smallint",
+          "notNull": true
+        },
+        {
+          "name": "day_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "week_start_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "month_number",
+          "type": "smallint",
+          "notNull": true
+        },
+        {
+          "name": "month_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "month_start_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "quarter_number",
+          "type": "smallint",
+          "notNull": true
+        },
+        {
+          "name": "year_number",
+          "type": "smallint",
+          "notNull": true
+        },
+        {
+          "name": "fiscal_month",
+          "type": "smallint",
+          "notNull": true
+        },
+        {
+          "name": "fiscal_quarter",
+          "type": "smallint",
+          "notNull": true
+        },
+        {
+          "name": "fiscal_year",
+          "type": "smallint",
+          "notNull": true
+        },
+        {
+          "name": "is_month_end",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "is_quarter_end",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "is_year_end",
+          "type": "boolean",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "calendar_date_key_key",
+          "type": "u"
+        },
+        {
+          "name": "calendar_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "candidates",
+      "columns": [
+        {
+          "name": "candidate_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "candidate_number",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "first_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "last_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "country_code",
+          "type": "character(2)",
+          "notNull": false
+        },
+        {
+          "name": "current_location",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "candidates_candidate_number_key",
+          "type": "u"
+        },
+        {
+          "name": "candidates_country_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "candidates_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "career_preferences",
+      "columns": [
+        {
+          "name": "career_preference_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "desired_job_family_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "desired_job_profile_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "desired_location_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "relocation_willingness",
+          "type": "boolean",
+          "notNull": false
+        },
+        {
+          "name": "career_interest",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "last_updated",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "career_preferences_desired_job_family_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "career_preferences_desired_job_profile_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "career_preferences_desired_location_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "career_preferences_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "career_preferences_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "certifications",
+      "columns": [
+        {
+          "name": "certification_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "certification_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "certification_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "issuing_organization",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "skill_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "certifications_certification_code_key",
+          "type": "u"
+        },
+        {
+          "name": "certifications_pkey",
+          "type": "p"
+        },
+        {
+          "name": "certifications_skill_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "company_events",
+      "columns": [
+        {
+          "name": "company_event_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "event_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "event_type",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "event_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "event_description",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "affected_org_unit_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "affected_country_code",
+          "type": "character(2)",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "company_events_affected_country_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "company_events_affected_org_unit_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "company_events_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "company_profile",
+      "columns": [
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "company_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "company_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "industry",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "industry_description",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "headquarters_city",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "headquarters_country_code",
+          "type": "character(2)",
+          "notNull": false
+        },
+        {
+          "name": "current_snapshot_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "current_active_headcount",
+          "type": "integer",
+          "notNull": true
+        },
+        {
+          "name": "current_us_headcount",
+          "type": "integer",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "company_profile_company_code_key",
+          "type": "u"
+        },
+        {
+          "name": "company_profile_headquarters_country_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "company_profile_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "compensation",
+      "columns": [
+        {
+          "name": "compensation_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "effective_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "base_salary",
+          "type": "numeric(14,2)",
+          "notNull": true
+        },
+        {
+          "name": "target_bonus",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "equity_value",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "total_compensation",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        },
+        {
+          "name": "base_salary_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "target_bonus_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "equity_value_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "total_compensation_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "compa_ratio",
+          "type": "numeric(8,4)",
+          "notNull": false
+        }
+      ],
+      "constraints": [
+        {
+          "name": "compensation_employee_id_effective_date_key",
+          "type": "u"
+        },
+        {
+          "name": "compensation_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "compensation_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "compensation_bands",
+      "columns": [
+        {
+          "name": "compensation_band_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "job_profile_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "job_level_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "country_code",
+          "type": "character(2)",
+          "notNull": true
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "notNull": true
+        },
+        {
+          "name": "minimum_salary",
+          "type": "numeric(14,2)",
+          "notNull": true
+        },
+        {
+          "name": "midpoint_salary",
+          "type": "numeric(14,2)",
+          "notNull": true
+        },
+        {
+          "name": "maximum_salary",
+          "type": "numeric(14,2)",
+          "notNull": true
+        },
+        {
+          "name": "effective_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        },
+        {
+          "name": "minimum_salary_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "midpoint_salary_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "maximum_salary_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        }
+      ],
+      "constraints": [
+        {
+          "name": "compensation_bands_country_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "compensation_bands_job_level_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "compensation_bands_job_profile_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "compensation_bands_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "compensation_job_release_v1",
+      "columns": [
+        {
+          "name": "release_id",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "snapshot_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "job_profile_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "job_profile_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "mean_compa_pct",
+          "type": "numeric",
+          "notNull": false
+        },
+        {
+          "name": "coverage",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "base_pay_provenance",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "range_provenance",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "range_policy_version",
+          "type": "text",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "compensation_job_release_v1_base_pay_provenance_check",
+          "type": "c"
+        },
+        {
+          "name": "compensation_job_release_v1_check",
+          "type": "c"
+        },
+        {
+          "name": "compensation_job_release_v1_coverage_check",
+          "type": "c"
+        },
+        {
+          "name": "compensation_job_release_v1_job_profile_code_check",
+          "type": "c"
+        },
+        {
+          "name": "compensation_job_release_v1_job_profile_name_check",
+          "type": "c"
+        },
+        {
+          "name": "compensation_job_release_v1_pkey",
+          "type": "p"
+        },
+        {
+          "name": "compensation_job_release_v1_range_policy_version_check",
+          "type": "c"
+        },
+        {
+          "name": "compensation_job_release_v1_range_provenance_check",
+          "type": "c"
+        },
+        {
+          "name": "compensation_job_release_v1_release_id_check",
+          "type": "c"
+        },
+        {
+          "name": "compensation_job_release_v1_snapshot_date_check",
+          "type": "c"
+        },
+        {
+          "name": "compensation_job_release_v1_status_check",
+          "type": "c"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "contingent_assignments",
+      "columns": [
+        {
+          "name": "contingent_assignment_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "contingent_worker_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "position_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "assignment_start_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "assignment_end_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "bill_rate",
+          "type": "numeric(12,2)",
+          "notNull": false
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "contingent_assignments_contingent_worker_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "contingent_assignments_pkey",
+          "type": "p"
+        },
+        {
+          "name": "contingent_assignments_position_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "contingent_workers",
+      "columns": [
+        {
+          "name": "contingent_worker_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "contingent_worker_number",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "worker_type",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "vendor_name",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "start_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "end_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "location_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "org_unit_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "job_profile_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "contingent_workers_contingent_worker_number_key",
+          "type": "u"
+        },
+        {
+          "name": "contingent_workers_job_profile_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "contingent_workers_location_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "contingent_workers_org_unit_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "contingent_workers_pkey",
+          "type": "p"
+        },
+        {
+          "name": "contingent_workers_worker_type_check",
+          "type": "c"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "cost_centers",
+      "columns": [
+        {
+          "name": "cost_center_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "cost_center_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "cost_center_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "legal_entity_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "cost_centers_cost_center_code_key",
+          "type": "u"
+        },
+        {
+          "name": "cost_centers_legal_entity_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "cost_centers_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "countries",
+      "columns": [
+        {
+          "name": "country_code",
+          "type": "character(2)",
+          "notNull": true
+        },
+        {
+          "name": "country_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "region",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "subregion",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "notNull": true
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "countries_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "critical_roles",
+      "columns": [
+        {
+          "name": "critical_role_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "job_profile_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "criticality_level",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "scarcity_level",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "replacement_difficulty",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "business_impact",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "critical_roles_criticality_level_check",
+          "type": "c"
+        },
+        {
+          "name": "critical_roles_job_profile_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "critical_roles_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "data_quality_results",
+      "columns": [
+        {
+          "name": "data_quality_result_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "check_date",
+          "type": "timestamp with time zone",
+          "notNull": true
+        },
+        {
+          "name": "table_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "rule_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "severity",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "failed_record_count",
+          "type": "integer",
+          "notNull": true
+        },
+        {
+          "name": "total_record_count",
+          "type": "integer",
+          "notNull": false
+        },
+        {
+          "name": "quality_score",
+          "type": "numeric(8,4)",
+          "notNull": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "data_quality_results_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "employee_absences",
+      "columns": [
+        {
+          "name": "absence_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "absence_start_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "absence_end_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "absence_category",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "leave_type",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "paid_flag",
+          "type": "boolean",
+          "notNull": false
+        },
+        {
+          "name": "duration_days",
+          "type": "numeric(8,2)",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "employee_absences_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_absences_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "employee_certifications",
+      "columns": [
+        {
+          "name": "employee_certification_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "certification_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "earned_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "expiration_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "employee_certifications_certification_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_certifications_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_certifications_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "employee_demographics",
+      "columns": [
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "gender_identity",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "age_band",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "race_ethnicity_us",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "veteran_status_us",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "disability_status",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "employee_demographics_age_band_check",
+          "type": "c"
+        },
+        {
+          "name": "employee_demographics_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_demographics_gender_identity_check",
+          "type": "c"
+        },
+        {
+          "name": "employee_demographics_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "employee_goals",
+      "columns": [
+        {
+          "name": "employee_goal_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "goal_year",
+          "type": "integer",
+          "notNull": true
+        },
+        {
+          "name": "goal_category",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "strategic_priority",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "completion_percent",
+          "type": "numeric(6,2)",
+          "notNull": false
+        },
+        {
+          "name": "goal_status",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "employee_goals_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_goals_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "employee_learning",
+      "columns": [
+        {
+          "name": "employee_learning_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "course_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "enrollment_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "completion_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "learning_status",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "assessment_score",
+          "type": "numeric(6,2)",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "employee_learning_course_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_learning_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_learning_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "name": "employee_movements",
+      "columns": [
+        {
+          "name": "movement_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "movement_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "movement_type",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "from_position_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "to_position_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "from_org_unit_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "to_org_unit_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "from_job_level_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "to_job_level_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "employee_movements_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_movements_from_job_level_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_movements_from_org_unit_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_movements_from_position_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_movements_movement_type_check",
+          "type": "c"
+        },
+        {
+          "name": "employee_movements_pkey",
+          "type": "p"
+        },
+        {
+          "name": "employee_movements_to_job_level_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_movements_to_org_unit_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_movements_to_position_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "employee_skills",
+      "columns": [
+        {
+          "name": "employee_skill_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "skill_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "proficiency",
+          "type": "smallint",
+          "notNull": true
+        },
+        {
+          "name": "assessment_source",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "confidence",
+          "type": "numeric(5,4)",
+          "notNull": false
+        },
+        {
+          "name": "last_validated_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "employee_skills_assessment_source_check",
+          "type": "c"
+        },
+        {
+          "name": "employee_skills_confidence_check",
+          "type": "c"
+        },
+        {
+          "name": "employee_skills_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_skills_employee_id_skill_id_key",
+          "type": "u"
+        },
+        {
+          "name": "employee_skills_pkey",
+          "type": "p"
+        },
+        {
+          "name": "employee_skills_proficiency_check",
+          "type": "c"
+        },
+        {
+          "name": "employee_skills_skill_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "employee_snapshots",
+      "columns": [
+        {
+          "name": "employee_snapshot_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "snapshot_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "position_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "manager_employee_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "org_unit_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "cost_center_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "job_profile_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "job_level_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "location_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "legal_entity_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "employment_status",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "employment_type",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "work_arrangement",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "fte",
+          "type": "numeric(4,3)",
+          "notNull": false
+        },
+        {
+          "name": "base_salary",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "target_bonus",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "total_compensation",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "total_labor_cost",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "notNull": false
+        },
+        {
+          "name": "tenure_months",
+          "type": "integer",
+          "notNull": false
+        },
+        {
+          "name": "span_of_control",
+          "type": "integer",
+          "notNull": false
+        },
+        {
+          "name": "is_people_manager",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        },
+        {
+          "name": "base_salary_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "total_compensation_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "total_labor_cost_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "compa_ratio",
+          "type": "numeric(8,4)",
+          "notNull": false
+        }
+      ],
+      "constraints": [
+        {
+          "name": "employee_snapshots_cost_center_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_snapshots_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_snapshots_job_level_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_snapshots_job_profile_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_snapshots_legal_entity_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_snapshots_location_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_snapshots_manager_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_snapshots_org_unit_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_snapshots_pkey",
+          "type": "p"
+        },
+        {
+          "name": "employee_snapshots_position_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employee_snapshots_snapshot_date_employee_id_key",
+          "type": "u"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "name": "employees",
+      "columns": [
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_number",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "first_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "last_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "preferred_name",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "work_email",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "hire_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "original_hire_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "termination_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "employment_status",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "employment_type",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "fte",
+          "type": "numeric(4,3)",
+          "notNull": true
+        },
+        {
+          "name": "legal_entity_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "home_location_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "current_org_unit_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "current_cost_center_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "manager_employee_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "worker_country_code",
+          "type": "character(2)",
+          "notNull": false
+        },
+        {
+          "name": "work_arrangement",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "source_system",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "employees_current_cost_center_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employees_current_org_unit_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employees_employee_number_key",
+          "type": "u"
+        },
+        {
+          "name": "employees_employment_status_check",
+          "type": "c"
+        },
+        {
+          "name": "employees_employment_type_check",
+          "type": "c"
+        },
+        {
+          "name": "employees_fte_check",
+          "type": "c"
+        },
+        {
+          "name": "employees_home_location_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employees_legal_entity_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employees_manager_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "employees_pkey",
+          "type": "p"
+        },
+        {
+          "name": "employees_work_arrangement_check",
+          "type": "c"
+        },
+        {
+          "name": "employees_work_email_key",
+          "type": "u"
+        },
+        {
+          "name": "employees_worker_country_code_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "name": "external_labor_observations",
+      "columns": [
+        {
+          "name": "series_id",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "observation_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "value",
+          "type": "numeric",
+          "notNull": true
+        },
+        {
+          "name": "period",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "period_name",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "source_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "fetched_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "external_labor_observations_pkey",
+          "type": "p"
+        },
+        {
+          "name": "external_labor_observations_series_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "external_labor_series",
+      "columns": [
+        {
+          "name": "series_id",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "series_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "source_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "external_labor_series_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "external_occupations",
+      "columns": [
+        {
+          "name": "external_occupation_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "source_system",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "occupation_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "occupation_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "occupation_description",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "external_occupations_pkey",
+          "type": "p"
+        },
+        {
+          "name": "external_occupations_source_system_occupation_code_key",
+          "type": "u"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "fx_rates",
+      "columns": [
+        {
+          "name": "fx_rate_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "effective_month",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "notNull": true
+        },
+        {
+          "name": "rate_to_usd",
+          "type": "numeric(14,8)",
+          "notNull": true
+        },
+        {
+          "name": "source_system",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "fx_rates_effective_month_currency_code_key",
+          "type": "u"
+        },
+        {
+          "name": "fx_rates_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "hires",
+      "columns": [
+        {
+          "name": "hire_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "requisition_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "hire_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "start_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "external_internal",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "hires_application_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "hires_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "hires_external_internal_check",
+          "type": "c"
+        },
+        {
+          "name": "hires_pkey",
+          "type": "p"
+        },
+        {
+          "name": "hires_requisition_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "internal_job_applications",
+      "columns": [
+        {
+          "name": "internal_application_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "requisition_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "application_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "application_status",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "internal_job_applications_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "internal_job_applications_pkey",
+          "type": "p"
+        },
+        {
+          "name": "internal_job_applications_requisition_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "interviews",
+      "columns": [
+        {
+          "name": "interview_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "interview_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "interview_stage",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "interviewer_employee_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "interview_result",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "interview_score",
+          "type": "numeric(5,2)",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "interviews_application_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "interviews_interviewer_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "interviews_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "job_families",
+      "columns": [
+        {
+          "name": "job_family_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "family_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "family_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "job_function_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "job_families_family_code_key",
+          "type": "u"
+        },
+        {
+          "name": "job_families_job_function_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "job_families_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "job_functions",
+      "columns": [
+        {
+          "name": "job_function_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "function_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "function_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "job_functions_function_code_key",
+          "type": "u"
+        },
+        {
+          "name": "job_functions_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "job_levels",
+      "columns": [
+        {
+          "name": "job_level_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "level_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "level_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "level_rank",
+          "type": "smallint",
+          "notNull": true
+        },
+        {
+          "name": "career_track",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "people_manager_expected",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "job_levels_career_track_check",
+          "type": "c"
+        },
+        {
+          "name": "job_levels_level_code_key",
+          "type": "u"
+        },
+        {
+          "name": "job_levels_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "job_occupation_mapping",
+      "columns": [
+        {
+          "name": "job_occupation_mapping_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "job_profile_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "external_occupation_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "mapping_confidence",
+          "type": "numeric(5,4)",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "job_occupation_mapping_external_occupation_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "job_occupation_mapping_job_profile_id_external_occupation_i_key",
+          "type": "u"
+        },
+        {
+          "name": "job_occupation_mapping_job_profile_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "job_occupation_mapping_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "job_onet_mapping",
+      "columns": [
+        {
+          "name": "job_profile_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "onetsoc_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "mapping_confidence",
+          "type": "numeric(5,4)",
+          "notNull": false
+        },
+        {
+          "name": "mapping_method",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "job_onet_mapping_job_profile_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "job_onet_mapping_onetsoc_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "job_onet_mapping_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "job_profiles",
+      "columns": [
+        {
+          "name": "job_profile_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "job_profile_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "job_profile_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "job_family_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "exempt_status",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "job_profiles_exempt_status_check",
+          "type": "c"
+        },
+        {
+          "name": "job_profiles_job_family_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "job_profiles_job_profile_code_key",
+          "type": "u"
+        },
+        {
+          "name": "job_profiles_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "job_skill_requirements",
+      "columns": [
+        {
+          "name": "job_skill_requirement_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "job_profile_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "skill_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "required_proficiency",
+          "type": "smallint",
+          "notNull": true
+        },
+        {
+          "name": "importance",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "weight",
+          "type": "numeric(5,4)",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "job_skill_requirements_importance_check",
+          "type": "c"
+        },
+        {
+          "name": "job_skill_requirements_job_profile_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "job_skill_requirements_job_profile_id_skill_id_key",
+          "type": "u"
+        },
+        {
+          "name": "job_skill_requirements_pkey",
+          "type": "p"
+        },
+        {
+          "name": "job_skill_requirements_required_proficiency_check",
+          "type": "c"
+        },
+        {
+          "name": "job_skill_requirements_skill_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "job_skill_requirements_weight_check",
+          "type": "c"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "labor_costs",
+      "columns": [
+        {
+          "name": "labor_cost_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "effective_month",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "base_salary_cost",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "bonus_cost",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "equity_cost",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "benefits_cost",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "employer_tax_cost",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "other_labor_cost",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "total_labor_cost",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        },
+        {
+          "name": "base_salary_cost_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "bonus_cost_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "equity_cost_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "benefits_cost_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "employer_tax_cost_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "other_labor_cost_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "total_labor_cost_usd",
+          "type": "numeric(14,2)",
+          "notNull": false
+        }
+      ],
+      "constraints": [
+        {
+          "name": "labor_costs_employee_id_effective_month_key",
+          "type": "u"
+        },
+        {
+          "name": "labor_costs_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "labor_costs_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "learning_courses",
+      "columns": [
+        {
+          "name": "course_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "course_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "course_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "skill_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "provider",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "duration_hours",
+          "type": "numeric(8,2)",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "learning_courses_course_code_key",
+          "type": "u"
+        },
+        {
+          "name": "learning_courses_pkey",
+          "type": "p"
+        },
+        {
+          "name": "learning_courses_skill_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "legal_entities",
+      "columns": [
+        {
+          "name": "legal_entity_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "legal_entity_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "legal_entity_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "country_code",
+          "type": "character(2)",
+          "notNull": true
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "notNull": true
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "legal_entities_country_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "legal_entities_legal_entity_code_key",
+          "type": "u"
+        },
+        {
+          "name": "legal_entities_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "locations",
+      "columns": [
+        {
+          "name": "location_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "location_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "location_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "city",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "state_province",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "metro_area",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "country_code",
+          "type": "character(2)",
+          "notNull": true
+        },
+        {
+          "name": "region",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "location_type",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "timezone",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "locations_country_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "locations_location_code_key",
+          "type": "u"
+        },
+        {
+          "name": "locations_location_type_check",
+          "type": "c"
+        },
+        {
+          "name": "locations_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "market_compensation",
+      "columns": [
+        {
+          "name": "market_compensation_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "external_occupation_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "location_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "effective_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "percentile_25",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "percentile_50",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "percentile_75",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "notNull": false
+        },
+        {
+          "name": "source_system",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "market_compensation_external_occupation_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "market_compensation_location_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "market_compensation_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "market_demand",
+      "columns": [
+        {
+          "name": "market_demand_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "external_occupation_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "location_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "effective_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "estimated_postings",
+          "type": "integer",
+          "notNull": false
+        },
+        {
+          "name": "demand_index",
+          "type": "numeric(10,4)",
+          "notNull": false
+        },
+        {
+          "name": "source_system",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "market_demand_external_occupation_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "market_demand_location_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "market_demand_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "market_skills",
+      "columns": [
+        {
+          "name": "market_skill_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "external_occupation_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "skill_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "effective_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "demand_index",
+          "type": "numeric(10,4)",
+          "notNull": false
+        },
+        {
+          "name": "growth_index",
+          "type": "numeric(10,4)",
+          "notNull": false
+        },
+        {
+          "name": "source_system",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "market_skills_external_occupation_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "market_skills_pkey",
+          "type": "p"
+        },
+        {
+          "name": "market_skills_skill_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "market_supply",
+      "columns": [
+        {
+          "name": "market_supply_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "external_occupation_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "location_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "effective_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "estimated_supply",
+          "type": "integer",
+          "notNull": false
+        },
+        {
+          "name": "supply_index",
+          "type": "numeric(10,4)",
+          "notNull": false
+        },
+        {
+          "name": "source_system",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "market_supply_external_occupation_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "market_supply_location_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "market_supply_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "metric_definitions",
+      "columns": [
+        {
+          "name": "metric_definition_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "metric_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "metric_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "metric_category",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "business_definition",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "numerator_definition",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "denominator_definition",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "calculation_logic",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "metric_owner",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "effective_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "metric_definitions_metric_code_key",
+          "type": "u"
+        },
+        {
+          "name": "metric_definitions_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "offers",
+      "columns": [
+        {
+          "name": "offer_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "application_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "offer_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "base_salary_offer",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "target_bonus_offer",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "notNull": false
+        },
+        {
+          "name": "offer_status",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "response_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "offers_application_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "offers_offer_status_check",
+          "type": "c"
+        },
+        {
+          "name": "offers_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "onet_essential_skills",
+      "columns": [
+        {
+          "name": "row_key",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "onetsoc_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "occupation_title",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "element_id",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "element_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "scale_id",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "scale_name",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "data_value",
+          "type": "numeric(8,4)",
+          "notNull": true
+        },
+        {
+          "name": "sample_size",
+          "type": "integer",
+          "notNull": false
+        },
+        {
+          "name": "standard_error",
+          "type": "numeric(10,6)",
+          "notNull": false
+        },
+        {
+          "name": "lower_ci_bound",
+          "type": "numeric(10,6)",
+          "notNull": false
+        },
+        {
+          "name": "upper_ci_bound",
+          "type": "numeric(10,6)",
+          "notNull": false
+        },
+        {
+          "name": "recommend_suppress",
+          "type": "boolean",
+          "notNull": false
+        },
+        {
+          "name": "not_relevant",
+          "type": "boolean",
+          "notNull": false
+        },
+        {
+          "name": "date_updated",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "domain_source",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "onet_release",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "source_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "refreshed_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "onet_essential_skills_onetsoc_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "onet_essential_skills_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "onet_occupations",
+      "columns": [
+        {
+          "name": "onetsoc_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "occupation_title",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "occupation_description",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "onet_release",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "source_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "refreshed_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "onet_occupations_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "onet_software_skills",
+      "columns": [
+        {
+          "name": "row_key",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "onetsoc_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "occupation_title",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "workplace_example",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "element_id",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "element_name",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "hot_technology",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "in_demand",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "onet_release",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "source_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "refreshed_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "onet_software_skills_onetsoc_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "onet_software_skills_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "name": "org_units",
+      "columns": [
+        {
+          "name": "org_unit_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "org_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "org_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "org_type",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "parent_org_unit_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "cost_center_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "legal_entity_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "org_units_cost_center_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "org_units_legal_entity_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "org_units_org_code_key",
+          "type": "u"
+        },
+        {
+          "name": "org_units_org_type_check",
+          "type": "c"
+        },
+        {
+          "name": "org_units_parent_org_unit_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "org_units_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "pay_adjustments",
+      "columns": [
+        {
+          "name": "pay_adjustment_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "adjustment_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "adjustment_type",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "previous_base_salary",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "new_base_salary",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "adjustment_percent",
+          "type": "numeric(8,4)",
+          "notNull": false
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "pay_adjustments_adjustment_type_check",
+          "type": "c"
+        },
+        {
+          "name": "pay_adjustments_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "pay_adjustments_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "performance_reviews",
+      "columns": [
+        {
+          "name": "performance_review_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "review_period",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "review_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "performance_rating",
+          "type": "numeric(4,2)",
+          "notNull": false
+        },
+        {
+          "name": "rating_category",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "manager_employee_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "performance_reviews_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "performance_reviews_employee_id_review_period_key",
+          "type": "u"
+        },
+        {
+          "name": "performance_reviews_manager_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "performance_reviews_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "position_plans",
+      "columns": [
+        {
+          "name": "position_plan_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "workforce_scenario_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "planning_month",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "org_unit_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "job_profile_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "job_level_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "location_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "planned_headcount",
+          "type": "numeric(10,2)",
+          "notNull": false
+        },
+        {
+          "name": "planned_fte",
+          "type": "numeric(10,2)",
+          "notNull": false
+        },
+        {
+          "name": "planned_hires",
+          "type": "numeric(10,2)",
+          "notNull": false
+        },
+        {
+          "name": "planned_exits",
+          "type": "numeric(10,2)",
+          "notNull": false
+        },
+        {
+          "name": "planned_labor_cost",
+          "type": "numeric(16,2)",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        },
+        {
+          "name": "cost_center_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "planned_labor_cost_usd",
+          "type": "numeric(16,2)",
+          "notNull": false
+        }
+      ],
+      "constraints": [
+        {
+          "name": "position_plans_cost_center_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "position_plans_job_level_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "position_plans_job_profile_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "position_plans_location_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "position_plans_org_unit_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "position_plans_pkey",
+          "type": "p"
+        },
+        {
+          "name": "position_plans_workforce_scenario_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "name": "position_snapshots",
+      "columns": [
+        {
+          "name": "position_snapshot_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "snapshot_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "position_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "position_status",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "incumbent_employee_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "org_unit_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "job_profile_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "job_level_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "location_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "budgeted",
+          "type": "boolean",
+          "notNull": false
+        },
+        {
+          "name": "planned_fte",
+          "type": "numeric(6,2)",
+          "notNull": false
+        },
+        {
+          "name": "budgeted_labor_cost",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "position_snapshots_incumbent_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "position_snapshots_job_level_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "position_snapshots_job_profile_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "position_snapshots_location_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "position_snapshots_org_unit_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "position_snapshots_pkey",
+          "type": "p"
+        },
+        {
+          "name": "position_snapshots_position_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "position_snapshots_snapshot_date_position_id_key",
+          "type": "u"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "positions",
+      "columns": [
+        {
+          "name": "position_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "position_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "position_title",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "job_profile_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "job_level_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "org_unit_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "cost_center_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "location_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "legal_entity_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "reports_to_position_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "incumbent_employee_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "position_status",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "worker_type",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "position_type",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "fte",
+          "type": "numeric(4,3)",
+          "notNull": true
+        },
+        {
+          "name": "budgeted",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "planned_start_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "planned_end_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "position_created_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "position_closed_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "source_system",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "positions_cost_center_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "positions_fte_check",
+          "type": "c"
+        },
+        {
+          "name": "positions_incumbent_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "positions_job_level_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "positions_job_profile_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "positions_legal_entity_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "positions_location_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "positions_org_unit_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "positions_pkey",
+          "type": "p"
+        },
+        {
+          "name": "positions_position_code_key",
+          "type": "u"
+        },
+        {
+          "name": "positions_position_status_check",
+          "type": "c"
+        },
+        {
+          "name": "positions_position_type_check",
+          "type": "c"
+        },
+        {
+          "name": "positions_reports_to_position_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "positions_worker_type_check",
+          "type": "c"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "name": "recruiters",
+      "columns": [
+        {
+          "name": "recruiter_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "recruiter_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "region",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "specialty",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        },
+        {
+          "name": "recruiter_code",
+          "type": "text",
+          "notNull": false
+        }
+      ],
+      "constraints": [
+        {
+          "name": "recruiters_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "recruiters_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "recruiting_sources",
+      "columns": [
+        {
+          "name": "recruiting_source_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "source_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "source_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "source_category",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "recruiting_sources_pkey",
+          "type": "p"
+        },
+        {
+          "name": "recruiting_sources_source_code_key",
+          "type": "u"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "requisitions",
+      "columns": [
+        {
+          "name": "requisition_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "requisition_number",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "position_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "job_profile_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "job_level_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "hiring_manager_employee_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "recruiter_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "org_unit_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "location_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "approved_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "opened_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "closed_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "target_start_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "requisition_status",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "openings",
+          "type": "integer",
+          "notNull": true
+        },
+        {
+          "name": "budgeted_salary_min",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "budgeted_salary_max",
+          "type": "numeric(14,2)",
+          "notNull": false
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        },
+        {
+          "name": "requisition_type",
+          "type": "text",
+          "notNull": false
+        }
+      ],
+      "constraints": [
+        {
+          "name": "requisitions_hiring_manager_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "requisitions_job_level_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "requisitions_job_profile_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "requisitions_location_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "requisitions_org_unit_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "requisitions_pkey",
+          "type": "p"
+        },
+        {
+          "name": "requisitions_position_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "requisitions_recruiter_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "requisitions_requisition_number_key",
+          "type": "u"
+        },
+        {
+          "name": "requisitions_requisition_status_check",
+          "type": "c"
+        },
+        {
+          "name": "requisitions_requisition_type_check",
+          "type": "c"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "name": "scenario_assumptions",
+      "columns": [
+        {
+          "name": "scenario_assumption_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "workforce_scenario_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "assumption_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "assumption_value",
+          "type": "numeric(14,4)",
+          "notNull": false
+        },
+        {
+          "name": "assumption_text",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "scenario_assumptions_pkey",
+          "type": "p"
+        },
+        {
+          "name": "scenario_assumptions_workforce_scenario_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "separations",
+      "columns": [
+        {
+          "name": "separation_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "separation_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "separation_type",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "separation_reason",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "regrettable",
+          "type": "boolean",
+          "notNull": false
+        },
+        {
+          "name": "retirement_flag",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "destination_category",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "eligible_for_rehire",
+          "type": "boolean",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "separations_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "separations_employee_id_separation_date_key",
+          "type": "u"
+        },
+        {
+          "name": "separations_pkey",
+          "type": "p"
+        },
+        {
+          "name": "separations_separation_type_check",
+          "type": "c"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "skills",
+      "columns": [
+        {
+          "name": "skill_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "skill_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "skill_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "skill_category",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "source_system",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "external_skill_id",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "skills_pkey",
+          "type": "p"
+        },
+        {
+          "name": "skills_skill_code_key",
+          "type": "u"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "succession_plans",
+      "columns": [
+        {
+          "name": "succession_plan_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "position_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "assessment_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "succession_risk",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "succession_plans_pkey",
+          "type": "p"
+        },
+        {
+          "name": "succession_plans_position_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "successor_candidates",
+      "columns": [
+        {
+          "name": "successor_candidate_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "succession_plan_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "readiness",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "ranking",
+          "type": "integer",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "successor_candidates_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "successor_candidates_pkey",
+          "type": "p"
+        },
+        {
+          "name": "successor_candidates_readiness_check",
+          "type": "c"
+        },
+        {
+          "name": "successor_candidates_succession_plan_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "survey_questions",
+      "columns": [
+        {
+          "name": "survey_question_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "survey_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "question_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "question_text",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "question_type",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "dimension",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "sort_order",
+          "type": "integer",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "survey_questions_pkey",
+          "type": "p"
+        },
+        {
+          "name": "survey_questions_survey_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "survey_questions_survey_id_question_code_key",
+          "type": "u"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "survey_responses",
+      "columns": [
+        {
+          "name": "survey_response_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "survey_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "survey_question_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "candidate_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "separation_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "response_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "numeric_response",
+          "type": "numeric(8,2)",
+          "notNull": false
+        },
+        {
+          "name": "text_response",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "response_category",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        },
+        {
+          "name": "response_key",
+          "type": "text",
+          "notNull": false
+        }
+      ],
+      "constraints": [
+        {
+          "name": "survey_responses_candidate_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "survey_responses_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "survey_responses_pkey",
+          "type": "p"
+        },
+        {
+          "name": "survey_responses_separation_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "survey_responses_survey_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "survey_responses_survey_question_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "name": "survey_scores",
+      "columns": [
+        {
+          "name": "survey_score_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "survey_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "org_unit_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "dimension",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "score",
+          "type": "numeric(8,3)",
+          "notNull": false
+        },
+        {
+          "name": "benchmark_score",
+          "type": "numeric(8,3)",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        },
+        {
+          "name": "score_key",
+          "type": "text",
+          "notNull": false
+        }
+      ],
+      "constraints": [
+        {
+          "name": "survey_scores_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "survey_scores_org_unit_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "survey_scores_pkey",
+          "type": "p"
+        },
+        {
+          "name": "survey_scores_survey_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "name": "surveys",
+      "columns": [
+        {
+          "name": "survey_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "survey_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "survey_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "survey_type",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "launch_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "close_date",
+          "type": "date",
+          "notNull": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "surveys_pkey",
+          "type": "p"
+        },
+        {
+          "name": "surveys_survey_code_key",
+          "type": "u"
+        },
+        {
+          "name": "surveys_survey_type_check",
+          "type": "c"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "synthetic_business_unit_targets",
+      "columns": [
+        {
+          "name": "org_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "target_active_headcount",
+          "type": "integer",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "synthetic_business_unit_targets_org_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "synthetic_business_unit_targets_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "synthetic_country_comp_factors",
+      "columns": [
+        {
+          "name": "country_code",
+          "type": "character(2)",
+          "notNull": true
+        },
+        {
+          "name": "market_factor",
+          "type": "numeric(8,4)",
+          "notNull": true
+        },
+        {
+          "name": "benefits_pct",
+          "type": "numeric(8,4)",
+          "notNull": true
+        },
+        {
+          "name": "employer_tax_pct",
+          "type": "numeric(8,4)",
+          "notNull": true
+        },
+        {
+          "name": "other_cost_pct",
+          "type": "numeric(8,4)",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "synthetic_country_comp_factors_country_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "synthetic_country_comp_factors_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "synthetic_country_targets",
+      "columns": [
+        {
+          "name": "country_code",
+          "type": "character(2)",
+          "notNull": true
+        },
+        {
+          "name": "target_active_headcount",
+          "type": "integer",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "synthetic_country_targets_country_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "synthetic_country_targets_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "synthetic_function_comp_factors",
+      "columns": [
+        {
+          "name": "function_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "salary_factor",
+          "type": "numeric(8,4)",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "synthetic_function_comp_factors_function_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "synthetic_function_comp_factors_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "synthetic_history_targets",
+      "columns": [
+        {
+          "name": "snapshot_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "target_headcount",
+          "type": "integer",
+          "notNull": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "notNull": false
+        }
+      ],
+      "constraints": [
+        {
+          "name": "synthetic_history_targets_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "synthetic_level_compensation",
+      "columns": [
+        {
+          "name": "level_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "midpoint_usd_2026",
+          "type": "numeric(14,2)",
+          "notNull": true
+        },
+        {
+          "name": "target_bonus_pct",
+          "type": "numeric(8,4)",
+          "notNull": true
+        },
+        {
+          "name": "equity_pct",
+          "type": "numeric(8,4)",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "synthetic_level_compensation_level_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "synthetic_level_compensation_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "synthetic_level_targets",
+      "columns": [
+        {
+          "name": "level_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "target_active_headcount",
+          "type": "integer",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "synthetic_level_targets_level_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "synthetic_level_targets_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "synthetic_location_targets",
+      "columns": [
+        {
+          "name": "location_code",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "target_active_headcount",
+          "type": "integer",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "synthetic_location_targets_location_code_fkey",
+          "type": "f"
+        },
+        {
+          "name": "synthetic_location_targets_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0
+      ]
+    },
+    {
+      "name": "talent_ratings",
+      "columns": [
+        {
+          "name": "talent_rating_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "assessment_date",
+          "type": "date",
+          "notNull": true
+        },
+        {
+          "name": "performance_category",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "potential_category",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "talent_segment",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "flight_risk",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "loss_impact",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "talent_ratings_employee_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "talent_ratings_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "name": "workforce_budgets",
+      "columns": [
+        {
+          "name": "workforce_budget_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "fiscal_year",
+          "type": "integer",
+          "notNull": true
+        },
+        {
+          "name": "org_unit_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "cost_center_id",
+          "type": "uuid",
+          "notNull": false
+        },
+        {
+          "name": "budgeted_fte",
+          "type": "numeric(10,2)",
+          "notNull": false
+        },
+        {
+          "name": "budgeted_headcount",
+          "type": "integer",
+          "notNull": false
+        },
+        {
+          "name": "budgeted_labor_cost",
+          "type": "numeric(16,2)",
+          "notNull": false
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "workforce_budgets_cost_center_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "workforce_budgets_org_unit_id_fkey",
+          "type": "f"
+        },
+        {
+          "name": "workforce_budgets_pkey",
+          "type": "p"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "workforce_plans",
+      "columns": [
+        {
+          "name": "workforce_plan_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "plan_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "plan_year",
+          "type": "integer",
+          "notNull": true
+        },
+        {
+          "name": "plan_version",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "plan_status",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "workforce_plans_pkey",
+          "type": "p"
+        },
+        {
+          "name": "workforce_plans_plan_status_check",
+          "type": "c"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "workforce_scenarios",
+      "columns": [
+        {
+          "name": "workforce_scenario_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "workforce_plan_id",
+          "type": "uuid",
+          "notNull": true
+        },
+        {
+          "name": "scenario_name",
+          "type": "text",
+          "notNull": true
+        },
+        {
+          "name": "scenario_type",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "notNull": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "workforce_scenarios_pkey",
+          "type": "p"
+        },
+        {
+          "name": "workforce_scenarios_workforce_plan_id_fkey",
+          "type": "f"
+        }
+      ],
+      "indexes": [
+        0,
+        1
+      ]
+    }
+  ],
+  "views": [
+    {
+      "name": "ai_upskilling_pipeline"
+    },
+    {
+      "name": "attrition_business_unit_summary"
+    },
+    {
+      "name": "attrition_current_summary"
+    },
+    {
+      "name": "attrition_level_summary"
+    },
+    {
+      "name": "attrition_monthly_trend"
+    },
+    {
+      "name": "attrition_reason_summary"
+    },
+    {
+      "name": "attrition_tenure_summary"
+    },
+    {
+      "name": "candidate_experience_summary"
+    },
+    {
+      "name": "certification_summary"
+    },
+    {
+      "name": "current_employee_skill_gaps"
+    },
+    {
+      "name": "dashboard_headcount_trend"
+    },
+    {
+      "name": "dashboard_overview_current"
+    },
+    {
+      "name": "employee_listening_trends"
+    },
+    {
+      "name": "employee_skill_latest"
+    },
+    {
+      "name": "exit_survey_summary"
+    },
+    {
+      "name": "finance_current_summary"
+    },
+    {
+      "name": "job_onet_essential_skills"
+    },
+    {
+      "name": "job_onet_intelligence"
+    },
+    {
+      "name": "job_onet_software_skills"
+    },
+    {
+      "name": "learning_by_org"
+    },
+    {
+      "name": "learning_summary"
+    },
+    {
+      "name": "mobility_summary"
+    },
+    {
+      "name": "onboarding_summary"
+    },
+    {
+      "name": "position_action_structural_inventory"
+    },
+    {
+      "name": "position_modeling_current_summary"
+    },
+    {
+      "name": "position_modeling_scenario_summary"
+    },
+    {
+      "name": "position_skill_requirement_map"
+    },
+    {
+      "name": "scenario_modeler_defaults"
+    },
+    {
+      "name": "skill_gap_summary"
+    },
+    {
+      "name": "skills_current_demand"
+    },
+    {
+      "name": "skills_current_supply"
+    },
+    {
+      "name": "skills_gap_summary"
+    },
+    {
+      "name": "skills_proficiency_gap_summary"
+    },
+    {
+      "name": "succession_coverage"
+    },
+    {
+      "name": "succession_coverage_public_summary_v1"
+    },
+    {
+      "name": "survey_listening_business_unit_summary"
+    },
+    {
+      "name": "survey_listening_current_summary"
+    },
+    {
+      "name": "survey_listening_dimension_summary"
+    },
+    {
+      "name": "survey_listening_engagement_trend"
+    },
+    {
+      "name": "survey_listening_exit_reason_summary"
+    },
+    {
+      "name": "ta_funnel_summary"
+    },
+    {
+      "name": "ta_requisition_metrics"
+    },
+    {
+      "name": "talent_acquisition_business_unit_summary"
+    },
+    {
+      "name": "talent_acquisition_current_summary"
+    },
+    {
+      "name": "talent_acquisition_monthly_summary"
+    },
+    {
+      "name": "talent_acquisition_recruiter_summary"
+    },
+    {
+      "name": "talent_acquisition_source_summary"
+    },
+    {
+      "name": "talent_overview"
+    },
+    {
+      "name": "workforce_business_unit_summary"
+    },
+    {
+      "name": "workforce_country_summary"
+    },
+    {
+      "name": "workforce_current_summary"
+    },
+    {
+      "name": "workforce_level_summary"
+    },
+    {
+      "name": "workforce_movement_summary"
+    },
+    {
+      "name": "workforce_response_strategy_signals"
+    },
+    {
+      "name": "workforce_scenario_by_job_family"
+    },
+    {
+      "name": "workforce_scenario_by_org"
+    },
+    {
+      "name": "workforce_scenario_summary"
+    },
+    {
+      "name": "workforce_tenure_summary"
+    }
+  ]
+}
