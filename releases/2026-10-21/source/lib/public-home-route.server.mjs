@@ -1,3 +1,4 @@
+import {isHomeAssociationQuestion,readPublicHomeAssociation} from './public-home-association.server.mjs';
 /** Disabled Home orchestration. Root owns authentication, capability dispatch and admission composition. */
 import {PublicPlannerAdmissionError} from './public-planner-round.server.mjs';
 import {createHash} from 'node:crypto';
@@ -12,7 +13,7 @@ import {createPublicSavedEvidence} from './public-saved-evidence.server.mjs';
 import {loadPublicProjectionSource} from './public-projection-source.server.mjs';
 import {boundedJson} from './public-qa-stream.server.mjs';
 import {awaitPublicQaBinding} from './public-qa-application.server.mjs';
-import {readSolutionRequest} from './home-solution-conversation.ts';
+import {readSolutionRequest,readSolutionState} from './home-solution-conversation.ts';
 import {converseSolutions} from './home-solution-conversation-service.ts';
 import {projectionCurrentnessFilters} from './home-projection-currentness.ts';
 import {readStaffingScenario} from './home-staffing-scenario.ts';
@@ -74,6 +75,11 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
    const staffingScenarioOnly=readStaffingScenario(parsed,{natural,datasetToken:P.token})!==null;
    const grounding=staffingScenarioOnly?undefined:await verifyHome({...parsed,datasetToken:P.token},signal);current();
    if(grounding)must(grounding.datasetToken===P.token&&grounding.bundleDigest===identity.digest);
+   if(natural&&!staffingScenarioOnly&&isHomeAssociationQuestion(parsed.message.text)){
+    const result=await readPublicHomeAssociation({binding,hostname,identity,filters:parsed.filters,text:parsed.message.text,signal});current();
+    const state=structuredClone(parsed.state);delete state.turnoverChat;state.currentCalculationKinds=[];state.questions=[];state.turns=[...state.turns,{...parsed.message,role:'user'},{id:'reply-'+parsed.requestId.slice(0,70),role:'assistant',text:result.answer}].slice(-32);
+    return Response.json({requestId:parsed.requestId,...result,state:readSolutionState(state),charts:[],candidateIds:[],analysisIds:[],usage:{modelRounds:0,toolCalls:0}},{headers});
+   }
    const contextId=hash({identity,request:parsed}),requestTime=new Date();let round=0,completion;
    const currentContext=()=>{current();return contextId;};
    const planningInstructions=staffingScenarioOnly?'':solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions+'\n'+hiringBudgetInstructions+'\n'+requiredStaffingInstructions:'');
@@ -85,7 +91,7 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
      const progress=progressModelContract(progressEnabled===true,capabilities.progressEntryEnabled);
      const tools=capabilities.requiredStaffingCalculation?[requiredStaffingTool]:demand?demandReferenceModelContract.tools:[...solutionTools,...progress.tools,...(natural?businessPlanningModelTools:[]),...(aggregateEligible&&round===0?[homeAggregateTool]:[])];
      const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+'\n'+solutionCompletionInstructions+progress.instructions)+planningInstructions;
-     const response=await completion.complete({model:'gpt-6.1-sol',reasoning:{effort:'medium'},service_tier:'default',store:false,include:['reasoning.encrypted_content'],instructions,input,tools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:5000},{signal:completionSignal,requestId:parsed.requestId,contextId,datasetToken:P.token,round:++round});
+     const response=await completion.complete({model:'gpt-6.1-sol',reasoning:{effort:'medium'},service_tier:'default',store:false,include:['reasoning.encrypted_content'],instructions,input,tools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:4000},{signal:completionSignal,requestId:parsed.requestId,contextId,datasetToken:P.token,round:++round});
      completedRounds++;stage='answer-validation-or-calculation';current();must(response&&Array.isArray(response.output));
      return {completed:response.status==='completed',items:toResponseInputItems(response.output),calls:response.output.filter(item=>item.type==='function_call').map(item=>({id:item.call_id,name:item.name,arguments:item.arguments})),text:response.output_text};
     },loadProjection:async(filters,readSignal)=>{current();const source=await loadProjection(readSignal),inputs=await source.projection(filters,readSignal);current();must(inputs.datasetVersion.publicDigest===identity.digest);return inputs;}

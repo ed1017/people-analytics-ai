@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "b153c10d4886de5aae9f468201f8b81b29bf3280",
+  "sourceCommit": "f77b238f63f98a0da4b432c9af8701ad5b68cb43",
   "deployment": "pending-staged-production-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -2994,8 +2994,8 @@
     },
     {
       "path": "lib/public-home-route.server.mjs",
-      "sha256": "7a5686526e5e8d4c3abfdcf8fdf5c882d7b132cccd191dffe37bce291bd11582",
-      "bytes": 11402
+      "sha256": "e4deabc43713a48e7206076144d28d6c11f6cb27b80880745f64defbf7658b89",
+      "bytes": 12220
     },
     {
       "path": "lib/public-other-routes.server.mjs",
@@ -3014,12 +3014,12 @@
     },
     {
       "path": "lib/public-planner-price-candidate.mjs",
-      "sha256": "5530394a8ae5c10670a2ea11b64c34dac76449cf971f5bf9948e23761ddbd3b1",
-      "bytes": 1396
+      "sha256": "a7d23fab342da27d0f076f1cdfa2402914627d1813cca4787266d9e9302edcab",
+      "bytes": 1399
     },
     {
       "path": "lib/public-planner-round.server.mjs",
-      "sha256": "cd7bed05548740728402d7d079c891af2f6d32c474a5be34ec3696bea0dece45",
+      "sha256": "678c16b643450d2aa2bacb2e6faceb6a547d8cf89184238ed0bb8d3a5d7c6f3b",
       "bytes": 15230
     },
     {
@@ -3676,6 +3676,36 @@
       "path": "lib/home-next-details.ts",
       "sha256": "237b144e2f7b484b6bd8bc2c244b7e8ad6d9838d9d55ecfdee2092d158ef27e3",
       "bytes": 2447
+    },
+    {
+      "path": "lib/public-home-association.server.mjs",
+      "bytes": 5386,
+      "sha256": "f6bc833379b00a10f8d1fe52a107be90b674b88a49af3c3497cb44a6d02c781f"
+    },
+    {
+      "path": "tests/public-ai-application.test.mjs",
+      "bytes": 29309,
+      "sha256": "2fb9df496095e5bfa31d7e4762fa35319aa59da44b49a279e1392da511a37cf6"
+    },
+    {
+      "path": "tests/public-home-association.test.mjs",
+      "bytes": 4282,
+      "sha256": "1620d7674bbc87f6b875ff3d09ba4715de70a878747c9845638104c36eb8a5e8"
+    },
+    {
+      "path": "tests/public-home-route-approved.test.mjs",
+      "bytes": 27168,
+      "sha256": "79588e913b84f74c097fe5537cdadeac1fb1fb1b57009ea7aaa0e042375cd92c"
+    },
+    {
+      "path": "tests/public-planner-price-proposal.test.mjs",
+      "bytes": 4095,
+      "sha256": "62aee3a01fffb04298521094b3411d8af0aac3f1ec4ad8d2c1db0326789156af"
+    },
+    {
+      "path": "tests/public-planner-round.test.mjs",
+      "bytes": 14282,
+      "sha256": "fd6ecdadd0835d303b928a3f8b44c1fbfec7f66fd673d0ef38090d2326d70e62"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8"
