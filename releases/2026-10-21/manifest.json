@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "34cd45fa0752fb138be751c851e0f8a5804c3483",
-  "deployment": "dpl_4nGyp6sZCf1TrNy886MBx2guuwpt",
+  "sourceCommit": "1ef4184dd5f52e40068636e531802fec063f9d26",
+  "deployment": "dpl_8J4Gvs16SZLtgmLmnaH9dqiFtzvy",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -2459,13 +2459,13 @@
     },
     {
       "path": "lib/home-solution-conversation-schema.ts",
-      "sha256": "da4237d353b9bb4d6a1aff132daa78d6d13d7b9ba128b3d6fb27a37c978666a3",
-      "bytes": 39062
+      "sha256": "f2f7410c284be2d50e232be743485adadad9537100b213b61d02c35a79a632e0",
+      "bytes": 39219
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "02cec965b7d2ebe3df42159f078aeb6cb0eb28291526ad064f4830cae75bcd42",
-      "bytes": 41163
+      "sha256": "f6f7d19bc2d1a7bd42ab685a27b206e651cd3800e99bb60100a8d03f9facda20",
+      "bytes": 41274
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -3019,7 +3019,7 @@
     },
     {
       "path": "lib/public-planner-round.server.mjs",
-      "sha256": "e6533ff9c40c0834037548f220b97f523ea44c3064f7a465d686b4d94da9fa8d",
+      "sha256": "15fa22a65b700cc92dd26bb5fe4c0bee040cf156dded6e519b6c302913a3b07e",
       "bytes": 15230
     },
     {
@@ -3704,8 +3704,8 @@
     },
     {
       "path": "tests/public-planner-round.test.mjs",
-      "bytes": 14307,
-      "sha256": "c494ca3b5c822afaca673c9a635eacdd573b67d51253c633fecb7950ce727432"
+      "sha256": "0f5c0d21623a6da660383cf4cfb7a2357e656510758d4249dc90a4e11cc25eba",
+      "bytes": 14332
     },
     {
       "path": "components/catalog-composer.tsx",
@@ -3741,8 +3741,23 @@
       "path": "tests/staffing-calendar-routing.test.mjs",
       "sha256": "5b1dc63da1ed9de8374abdc0c18ad3876aaffbd88f5e4f161a83e68ff9e9d4e4",
       "bytes": 1269
+    },
+    {
+      "path": "lib/model-citation-catalog.mjs",
+      "sha256": "ba084912369eebb82107dcd4f0c07507223e3c9c49fc47bb68e5a4d3c9cbf2b4",
+      "bytes": 763
+    },
+    {
+      "path": "tests/model-citation-catalog.test.mjs",
+      "sha256": "535b617f7c1b0cdcef457aa2df52edcb472dea62759eba0db08cb0580b04742b",
+      "bytes": 2828
+    },
+    {
+      "path": "tests/public-planner-ledger.test.mjs",
+      "sha256": "b2e1fc9e2aebc4c189bb003cc3c6718be8ab62288e07d49ea3a653c35847916a",
+      "bytes": 2436
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "e4eba2a1bbc49b0ef7d93dd63cd00e7b48e35aa5533ac07743c728401278b08e"
+  "verifiedDeployedArchiveSha256": "eb17389ef240e7c224cc3c1ecf7abd4035d6c13f8b1470d13454bb83a4ebfa2a"
 }
