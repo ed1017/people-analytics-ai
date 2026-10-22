@@ -1,3 +1,4 @@
+import {compactPlanningInput} from './model-planning-context.mjs';
 import {modelCitationCatalog} from './model-citation-catalog.mjs';
 // @ts-expect-error Native Node tests share application source.
 import {scenarioComparisonIntent,scenarioQuestionMismatch,readScenarioChatDraft,compareScenarioForChat} from './scenario-planning-parity.ts';
@@ -179,9 +180,9 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  let toolCalls=0,operations=0,projectionInput:Promise<ProjectionInputs>|undefined,final:SolutionFinal|undefined,rounds=0;
  const maxRounds=runtime.maxModelRounds??4;
  for(let round=0;round<maxRounds;round++){
-  abort(signal);if(new TextEncoder().encode(JSON.stringify(input)).length>120000)throw new SolutionResponseError('context_bounds','This conversation needs a narrower set of sources before another model round. Earlier work is kept.');
+  abort(signal);const modelInput=compactPlanningInput(input);if(new TextEncoder().encode(JSON.stringify(modelInput)).length>120000)throw new SolutionResponseError('context_bounds','This conversation needs a narrower set of sources before another model round. Earlier work is kept.');
   if(staffingRequired&&!staffingCalculated&&(round===maxRounds-1||operations>=6))throw new SolutionResponseError('staffing_not_calculated','The staffing comparison was not calculated within this turn\'s limits. Earlier work is kept.');
-  const output=await runtime.complete(input,round===maxRounds-1||operations>=6,signal,{progressEntryEnabled:!!entryContext,requiredStaffingCalculation:standaloneStaffing&&!staffingCalculated});rounds++;abort(signal);
+  const output=await runtime.complete(modelInput,round===maxRounds-1||operations>=6,signal,{progressEntryEnabled:!!entryContext,requiredStaffingCalculation:standaloneStaffing&&!staffingCalculated});rounds++;abort(signal);
   if(!output.completed)throw new SolutionResponseError('incomplete_output','The conversation response was incomplete or exceeded its bounds.');
   if(output.calls.length>6||JSON.stringify(output.items).length>70000)throw new SolutionResponseError('output_bounds','The conversation response was incomplete or exceeded its bounds.');
   if(!output.calls.length){

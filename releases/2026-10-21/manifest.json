@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "7f6874c03863312ecabd0408cc42237969921454",
-  "deployment": "dpl_CxPfSaGQagZjZnN7oA4k8phim2zK",
+  "sourceCommit": "39798c5fce9597c18adc14165fbea8047dfa8b05",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -2464,8 +2464,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "f6f7d19bc2d1a7bd42ab685a27b206e651cd3800e99bb60100a8d03f9facda20",
-      "bytes": 41274
+      "sha256": "e1f49354e845ab64665d5d215b1adb343c22ffe5efbc581bb7e4ca950962ec63",
+      "bytes": 41396
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -3756,8 +3756,18 @@
       "path": "tests/public-planner-ledger.test.mjs",
       "sha256": "b2e1fc9e2aebc4c189bb003cc3c6718be8ab62288e07d49ea3a653c35847916a",
       "bytes": 2436
+    },
+    {
+      "path": "lib/model-planning-context.mjs",
+      "sha256": "8c463fbd45f8d87b4d81d1a303f5743b0625fcbe8387ccaadffd76a7d93886a9",
+      "bytes": 2542
+    },
+    {
+      "path": "tests/model-planning-context.test.mjs",
+      "sha256": "a59d2b1916a4c30c5216a18f825b8c1afc4c8971942f53ddd794fa622c4e6f69",
+      "bytes": 2692
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "351404861968ae6fe22da6f4cc168d990877b581b8d176ba4cda71602235ba83"
+  "verifiedDeployedArchiveSha256": "7878487ca964e86156448aef1b5e15b93162215b54a7e3f7f94f335a018a071a"
 }
