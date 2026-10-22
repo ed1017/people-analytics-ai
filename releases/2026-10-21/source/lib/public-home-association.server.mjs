@@ -5,7 +5,7 @@ import {boundedJson} from './public-qa-stream.server.mjs';
 import {homeSurveyGroups} from './home-survey-groups.mjs';
 import {queryAggregate} from './home-aggregate-registry.mjs';
 import {catalogDisplayLabel} from './catalog-display.ts';
-export const isHomeAssociationQuestion=text=>typeof text==='string'&&/\b(?:sentiment|engagement|favorability)\b/i.test(text)&&/\b(?:turnover|attrition)\b/i.test(text)&&/\b(?:correlat\w*|relat\w*|associat\w*|link\w*|connect\w*)\b/i.test(text);
+export const isHomeAssociationQuestion=text=>typeof text==='string'&&/\b(?:sentiment|engagement|favorability)\b/i.test(text)&&/\b(?:turnover|attrition)\b/i.test(text)&&/\b(?:correlat\w*|relat\w*|associat\w*|link\w*|connect\w*|compar\w*|contrast\w*|versus|vs|caus\w*|predict\w*)\b/i.test(text);
 const limitation='The available comparison is across all eight business units, not departments, HR subgroups or individual employees: September 2026 engagement favorability versus January-September 2026 voluntary turnover. Clear filters and ask for that business-unit comparison. Other populations, periods and causal or predictive questions need separate evidence.';
 /** Complete public partitions only; never pair sampled Home rows or employee records. */
 export function describeHomeAssociation(survey,attrition){
@@ -23,7 +23,7 @@ export async function readPublicHomeAssociation({binding,hostname,identity,filte
  must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===2&&/^[a-f0-9]{64}$/.test(identity.digest)&&await binding.router.bootstrapToken()===P.token);
  must(/^people-analytics-[a-z0-9]+-ed-56dc\.vercel\.app$/.test(hostname));
  // Any unrecognized qualification is a clarification, never a silent scope substitution.
- const remainder=text.toLowerCase().replace(/\b(?:is|are|does|do|how|what|the|our|company|companywide|all|eight|8|business|units?|bu|bus|sentiment|engagement|favorability|turnover|attrition|voluntary|correlat\w*|relat\w*|associat\w*|link\w*|connect\w*|between|with|to|and|there|a|an|any|show|me|please|have)\b/g,'').replace(/[\s?.,!\u2013\u2014-]/g,'');
+ const remainder=text.toLowerCase().replace(/\b(?:is|are|does|do|how|what|the|our|company|companywide|all|eight|8|business|units?|bu|bus|survey|sentiment|engagement|favorability|turnover|attrition|voluntary|compar(?:e[sd]?|ing|isons?)|contrast(?:s|ed|ing)?|across|versus|vs|correlat\w*|relat\w*|associat\w*|link\w*|connect\w*|between|with|to|and|there|a|an|any|show|me|please|have)\b/g,'').replace(/[\s?.,!\u2013\u2014-]/g,'');
  if(!filters||Object.values(filters).some(v=>v!=='all')||remainder)return {answer:limitation};
  const values=[];
  for(const path of ['/api/survey-sentiment','/api/attrition']){
