@@ -48,31 +48,37 @@
       "version": "20261021225942",
       "name": "renew_reviewed_planner_pricing_oct22_2251",
       "source": "database/accounting-history/PRICING-ROLLING-RENEWAL-2251.sql",
-      "sha256": "23d048036dfe1adc722c11be8e144aa6cec4c25513e7e9c84eb1113126370a4b"
+      "sha256": "5e5c645246acaae0119dc52857f183eb504965f3c1b5027644ad20c07b6206f8",
+      "originalArtifactSha256": "23d048036dfe1adc722c11be8e144aa6cec4c25513e7e9c84eb1113126370a4b"
     },
     {
       "version": "20261022022945",
       "name": "bounded_home_4k_policy_20261022",
       "source": "database/bounded-home-4k-20261022.sql",
-      "sha256": "3baf29c7a8e213630882ebe5c8dc4aa4e9a4c5be5dd8cc0b3d0ca9d4d379e5e7"
+      "sha256": "e11258d68b0c9ff375589beb036d15cd756ee102e14d76aabd279ab1110e43b7",
+      "originalArtifactSha256": "3baf29c7a8e213630882ebe5c8dc4aa4e9a4c5be5dd8cc0b3d0ca9d4d379e5e7"
     },
     {
       "version": "20261022032422",
       "name": "raise_cumulative_app_cap_to_thirty_preserving_history",
       "source": "database/accounting-history/CAP30-PROPOSED.sql",
-      "sha256": "190febcb22914c7e4998021b9acb084f0b484335534640d567bf65f20ac2617f"
+      "sha256": "606b40dce936a95a23d7460fb40b52391f61fc5c4a2dde5e2b98b621ef6a0f56",
+      "originalArtifactSha256": "190febcb22914c7e4998021b9acb084f0b484335534640d567bf65f20ac2617f"
     },
     {
       "version": "20261022153911",
       "name": "renew_reviewed_planner_pricing_oct23_1500",
       "source": "database/accounting-history/PRICING-ROLLING-RENEWAL-231500.sql",
-      "sha256": "6f47daa7cb56099f4fa07544231eed14d20734c733cfb8ba45b461bda72b2df8"
+      "sha256": "1dd1ebe15977365c196baea3337876df810be32a7e9a37fb23ec00b21b29a5f5",
+      "originalArtifactSha256": "6f47daa7cb56099f4fa07544231eed14d20734c733cfb8ba45b461bda72b2df8"
     },
     {
       "version": "20261022162630",
       "name": "cumulative_cap_fifty_20261022",
       "source": "docs/cumulative-cap50-20261022.sql",
-      "sha256": "8852f31eb1efb95051a3b583dcbeb71eb77b52e3d72eea1f88b070bd9c454760"
+      "sha256": "8852f31eb1efb95051a3b583dcbeb71eb77b52e3d72eea1f88b070bd9c454760",
+      "originalArtifactSha256": "8852f31eb1efb95051a3b583dcbeb71eb77b52e3d72eea1f88b070bd9c454760"
     }
-  ]
+  ],
+  "hashContract": "sha256 identifies repository UTF-8 LF bytes with one terminal newline; originalArtifactSha256 identifies the pre-publication local artifact. SQL content is unchanged apart from line endings and trailing whitespace."
 }

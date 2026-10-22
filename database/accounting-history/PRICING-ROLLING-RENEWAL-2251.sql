@@ -24,4 +24,3 @@ BEGIN
  IF NOT EXISTS(SELECT 1 FROM public_ai_budget.rollout WHERE id='public-9037-ai-initial-v1' AND pricing_valid_until='2026-10-22T22:51:00Z') OR before_data IS DISTINCT FROM after_data OR before_meta IS DISTINCT FROM after_meta THEN RAISE EXCEPTION 'Preservation failure'; END IF;
 END $renew$;
 COMMIT;
-
