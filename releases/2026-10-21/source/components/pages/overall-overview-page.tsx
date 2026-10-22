@@ -4,6 +4,8 @@ import {publicAiFetch} from '@/lib/public-ai-readiness-client.mjs';
 import {publicAiReadiness,usePublicAiReadiness} from '@/components/use-public-ai-readiness';
 import {publicHomeSourceVersion} from '@/lib/public-ai-evidence-client.mjs';
 import {PUBLIC_AI_ENABLED} from '@/lib/public-ai-capabilities.mjs';
+import {homeWorkforceFlows,type WorkforceFlow} from '@/lib/home-workforce-flows';
+import {CatalogComposer} from '@/components/catalog-composer';
 import {homeNextDetails} from '@/lib/home-next-details';
 import {homeRecruitingKpi,type HomeRecruitingKpi} from '@/lib/home-kpi-source';
 import {HomeHeadcountSummary,type HomeSnapshotProps} from '@/components/home-chat-welcome';
@@ -101,7 +103,7 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
   return { clarification:readHomeClarification(data.clarification??proposal?.question), findingFollowups:readHomeFindingFollowups(data.findingFollowups,data.answer,sources), answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal, diagnostic, diagnosticStage:useServer?'server' as const:'client' as const };
 }
 
-type WelcomeControls = {onNavigate:(page:AppPage)=>void; onQuestion: (question: string) => void; disabled: boolean; recruitingKpi:HomeRecruitingKpi|null;recruitingPending:boolean;composer?:ReactNode};
+type WelcomeControls = {onNavigate:(page:AppPage)=>void; onQuestion: (question: string) => void; disabled: boolean; recruitingKpi:HomeRecruitingKpi|null;recruitingPending:boolean;flows:WorkforceFlow[]|null;composer?:ReactNode};
 function WelcomeSlot({render, ...controls}: WelcomeControls & {render: (controls: WelcomeControls) => ReactNode}) { return render(controls); }
 
 const noActionSubscription=()=>()=>{};
@@ -451,6 +453,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   }
 
   const sourcesSettled=!loading&&loadedScope===workforceQuery&&settledEvidenceKey===JSON.stringify({workforceQuery,workforceScope,refresh,persona});
+  const flows=homeWorkforceFlows(sourceResults.workforce,sourceResults.attrition,sourcesSettled,datasetSession.snapshot(),projectionOverview?.overview?.snapshot_date??'',projectionOverview?.requested??{});
   const recruitingKpi=homeRecruitingKpi(sourceResults['talent-acquisition'],sourcesSettled,datasetSession.snapshot(),projectionOverview?.overview?.snapshot_date??'');
   function refreshHomeData(){liveFindingTurn.current=null;loaded.current='';sourceRequests.invalidate(workforceQuery);setRefresh(value=>value+1);}
   const ready = Boolean(sources?.some(source => source.facts)) && !loading && loadedScope === workforceQuery;
@@ -603,8 +606,8 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       <div ref={composerSlot} className="home-composer-slot"><div ref={composerDock} className="home-composer-dock rounded-t-2xl border bg-card p-3 shadow-lg">
       {planEdit?.goalId===conversation.activeGoalId&&<p className="mb-1 text-xs font-medium">Editing Action Plan #{planEdit.option}. Send previews changes for your review.</p>}
       <label htmlFor="overview-question" className="sr-only">Ask Workforce AI</label>
-      <textarea ref={composer} id="overview-question" aria-label="Ask Workforce AI" onKeyDown={event=>{if(event.key==='Enter'&&!event.shiftKey&&!event.nativeEvent.isComposing){event.preventDefault();event.currentTarget.form?.requestSubmit();}}} value={input} onChange={event => changeQuestion(event.target.value)} rows={welcomeComposer?2:3}
-        placeholder="Ask your question or use a prompt. Compare proposed Action Plans, then refine your choice in chat." className="max-h-80 min-h-28 w-full resize-y rounded-lg border bg-background/40 p-3 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+      <CatalogComposer textareaRef={composer} value={input} onChange={changeQuestion} rows={welcomeComposer?2:3} workforce={sourceResults.workforce} datasetToken={datasetSession.snapshot()}/>
+
       <div className="home-compose-actions mt-2 flex items-end justify-between gap-3">
 
         <button data-guide-target="submit" type="submit" aria-label="Send overview question" disabled={(solutionConversationEnabled?!solutions.canSend:(!localCandidate&&!ready&&!(demoPlan&&planEditReady&&(structuredPlansEnabled&&structuredMode||bundleChatEditIntent(input).edit||localPlanDiscussion(input))))) || chatLoading || structuredPending || solutions.pending || !input.trim()} className="ms-auto flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{structuredPending?'Reviewing…':'Send'} <ArrowUp size={17} /></button></div>
@@ -699,12 +702,12 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       {active&&hasRetention&&<RetentionWhatIfPanel key={conversation.activeGoalId} openSequence={retentionEntry?.sequence??0} initiallyOpen={retentionEntry?.id===conversation.activeGoalId}/>}
       {active&&<WorkforceSolutionPanel hideEntry optionActions={optionActions} page="home" onNavigate={onNavigate}/>}
     </div>
-    {homeProjection.requested&&conversation.focusedIssue&&projectionOverview&&<HomeHeadcountSummary {...projectionOverview} recruitingKpi={recruitingKpi} recruitingPending={!sourcesSettled} projection={homeProjection.value} projectionStatus={homeProjection.status}/>}
+    {homeProjection.requested&&conversation.focusedIssue&&projectionOverview&&<HomeHeadcountSummary {...projectionOverview} recruitingKpi={recruitingKpi} recruitingPending={!sourcesSettled} flows={flows} projection={homeProjection.value} projectionStatus={homeProjection.status}/>}
     <HomeConversationSplit enabled={scenarioChat||overviewEntry&&!welcomeComposer} visuals={<><aside hidden={!scenarioChat} ref={setScenarioTarget} id="home-scenario-visuals" aria-label="Scenario calculations and assumptions" className="min-w-0"/><div hidden={scenarioChat}>{(Boolean(currentVisualAnswer)||chatLoading||solutions.pending||Boolean(chatError)||!solutions.state.businessPlanning)&&<HomeAnswerVisuals pending={chatLoading||solutions.pending} error={Boolean(chatError)} current={Boolean(currentVisualAnswer)} series={currentVisualSeries} supplement={currentVisualSupplement}/>}<section aria-label="Planning workspace" className="mt-4 space-y-3">{overviewEntry&&planningReviewPanel}</section></div></>} >
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions publicEvidenceContext={publicEvidenceContext} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!guidedExampleActive&&<SwpGuidedJourney onGeneralQuestion={text=>{conversation.startNewProblem(text);setScenarioQuestion({text,token:datasetSession.snapshot(),reset:conversation.resetEpoch,workspace:conversation.workspaceKey.slice(0,conversation.workspaceKey.lastIndexOf(':')+1)});}} scenarioTarget={scenarioTarget} onScenarioChatChange={setScenarioChat} onDemoStateChange={setSwpDemoVisible} discussionKey={JSON.stringify([workforceScope,workforceQuery,persona])} conversation={conversation} active={active} busy={chatLoading||solutions.pending||solutions.saving} commandRef={swpCommand} modelContextRef={swpModelContext} demandControlRef={demandControl} demandReviewRef={demandReview} demandContextRef={demandContext} sources={sources??[]} onNavigate={onNavigate}/>}
-    {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&(renderWelcome ? <WelcomeSlot render={renderWelcome} onNavigate={onNavigate} composer={welcomeComposer?questionComposer:undefined} recruitingKpi={recruitingKpi} recruitingPending={!sourcesSettled} onQuestion={submitStarterQuestion} disabled={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)}/> : overviewEntry?<details><summary className="min-h-11 cursor-pointer py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Ideas for your first question</summary>{startingGuide}</details>:startingGuide)}
+    {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&(renderWelcome ? <WelcomeSlot render={renderWelcome} onNavigate={onNavigate} composer={welcomeComposer?questionComposer:undefined} recruitingKpi={recruitingKpi} recruitingPending={!sourcesSettled} flows={flows} onQuestion={submitStarterQuestion} disabled={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)}/> : overviewEntry?<details><summary className="min-h-11 cursor-pointer py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Ideas for your first question</summary>{startingGuide}</details>:startingGuide)}
     {!solutionConversationEnabled&&showFallbackPin&&!chatLoading&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
     <div hidden={swpDemoVisible&&!demoChatOpen}>{!activePinnedGoal&&conversationPanel}</div>
 

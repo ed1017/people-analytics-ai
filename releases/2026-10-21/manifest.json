@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "f1a62bf96e034a414fa7558e75dbde4af9901ae0",
-  "deployment": "dpl_7mFQTNugFm11YLwrurivpLg6N1gh",
+  "sourceCommit": "abcf1919240a54eb0fe0d3ed5957a1f8ba9ed5c2",
+  "deployment": "dpl_59mzCzmJiLF4TtTyhU4nucvrDqDd",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -544,8 +544,8 @@
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "46b4d9badfea44379bd783ceb9eae90f7412464cfc8b61250eebdd4d4fe6f8c9",
-      "bytes": 17003
+      "sha256": "4b5aaebeeec3fae2c5ea0f18df9afd886677a584f7c9f42fd914cb86bcd0829e",
+      "bytes": 17276
     },
     {
       "path": "components/home-data-status.tsx",
@@ -744,8 +744,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "c8c7c79bc413391beb21059d195380664d6e23ee23edc222dc9dfd0f3e42023d",
-      "bytes": 98855
+      "sha256": "70aca79908c4f033905077fb19708f783620916486bd5fb875fb7276123b9d86",
+      "bytes": 98796
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -3706,8 +3706,33 @@
       "path": "tests/public-planner-round.test.mjs",
       "bytes": 14307,
       "sha256": "c494ca3b5c822afaca673c9a635eacdd573b67d51253c633fecb7950ce727432"
+    },
+    {
+      "path": "components/catalog-composer.tsx",
+      "sha256": "7913e507c293fa7654c32be9746c2aba7e56f6551cd7c6da0a5e394e60d059a2",
+      "bytes": 5082
+    },
+    {
+      "path": "components/home-workforce-flows.tsx",
+      "sha256": "30202c8f9b1a943b2f14ce8c097354d6fc7a037ef2105201651cada0cab50216",
+      "bytes": 3389
+    },
+    {
+      "path": "lib/composer-catalog.ts",
+      "sha256": "796b0fce8e610be15b781686b000aef579986aef62d521ee159c32316fcca931",
+      "bytes": 3040
+    },
+    {
+      "path": "lib/home-workforce-flows.ts",
+      "sha256": "118e97e91afca309044388f3d732f5ef2ea28e647d33d2608bb08bd262d3ca5c",
+      "bytes": 2909
+    },
+    {
+      "path": "tests/home-flows-catalog.test.mjs",
+      "sha256": "81e4224b0b79e6a494e70c90482a5ba2cb6b16edab3c0a9e573681190dc5a337",
+      "bytes": 5426
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "9498780a843e7fb71bfce1ded0bfce3a699d122b57cc86cf3dcbb6642c1a0359"
+  "verifiedDeployedArchiveSha256": "91b4f5a139589c4d6a251b857b15447e0b539f062441cdbf194c3cad5198e885"
 }
