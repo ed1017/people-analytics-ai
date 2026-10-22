@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "1861c2d65349e86fdb50ef6ee03c10fd72394be4",
+  "sourceCommit": "cb225d691ee63e32b404ccc53d7d8a2b3159402b",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -579,8 +579,8 @@
     },
     {
       "path": "components/home-hiring-budget-review.tsx",
-      "sha256": "acafe4736959d6691ed1121ae20ce17204b77992f8f1308bc28ba370f12c6e99",
-      "bytes": 8257
+      "sha256": "c597c15732388f0430879aa5d1041a0f2548768048d51e3abcaf1b3ea961cbdc",
+      "bytes": 8749
     },
     {
       "path": "components/home-hiring-plan-review.tsx",
@@ -659,8 +659,8 @@
     },
     {
       "path": "components/home-solution-conversation-review.tsx",
-      "sha256": "1277ee6279848697bfa5d07022a74b8f111dc7994ff37fe5fecb27ad7219c26e",
-      "bytes": 21089
+      "sha256": "a8358226a13ff23400ab7486bb4244432757c26e41d5849272b649486847c002",
+      "bytes": 21132
     },
     {
       "path": "components/home-success-measure-review.tsx",
@@ -1004,8 +1004,8 @@
     },
     {
       "path": "components/use-home-solution-conversation.ts",
-      "sha256": "601ad9384f3b4288eaecebdebc83de6d2fc698e987d32073faf4f47d5e33fb69",
-      "bytes": 31204
+      "sha256": "d89209c47f4e74aac5cf45882079bc12e08732112994d76fec80065298e12e78",
+      "bytes": 31762
     },
     {
       "path": "components/use-page-briefing.ts",
@@ -2204,8 +2204,8 @@
     },
     {
       "path": "lib/home-hiring-budget.ts",
-      "sha256": "13e87b11579d0e4d753b0bd2d9c87ab81ec848e299436025f41350e471760e78",
-      "bytes": 13688
+      "sha256": "48b9c826df7781938438d20bb4d52401c9225585cc4087bc415c1b47719a390f",
+      "bytes": 14216
     },
     {
       "path": "lib/home-hiring-plan-save.ts",
@@ -3886,8 +3886,18 @@
       "path": "tests/home-role-recruiting.test.mjs",
       "sha256": "0b29d60e196215ddcc0379e080648593bead12f507361b4d5bab5826f52768c5",
       "bytes": 2856
+    },
+    {
+      "path": "components/hiring-scenario-controls.tsx",
+      "sha256": "f53f6d6a26da78df48035a41c6c9da20fc93112fe2f7e20e23dc63484fdcf32e",
+      "bytes": 4220
+    },
+    {
+      "path": "tests/hiring-scenario-reset.test.mjs",
+      "sha256": "7ec71f453f23beb46a277801e2a8800c2440dd7e1d45ca2cf6806b8061a2dfe5",
+      "bytes": 2108
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "0e18fee790fe39d3742e2ff42d3cb61a9f1c5a22b97c7aae71fc62003540f96c"
+  "verifiedDeployedArchiveSha256": "d0c61983072aa89a02b98126cb701bee5e08db06159e43ecc9ced96c75a169b0"
 }
