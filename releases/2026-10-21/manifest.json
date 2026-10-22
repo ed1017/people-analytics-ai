@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "0834363bef7ea10a6ed9c8712c99bfc95f6c0f4a",
+  "sourceCommit": "889c2cc38331e3968d6b4f57c3a802f46c70777c",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -1414,8 +1414,8 @@
     },
     {
       "path": "lib/chat-evidence-series.ts",
-      "sha256": "e097908d452ed5b0a59d2e134836950676ed8c40c0b1e9a2b93108ec524f9d33",
-      "bytes": 9642
+      "sha256": "9d4d2652398a84b387991bf9d94739781abde0c5adcf7aa29048568225dcecfa",
+      "bytes": 9741
     },
     {
       "path": "lib/chat-model.ts",
@@ -2014,8 +2014,8 @@
     },
     {
       "path": "lib/home-answer-scope.ts",
-      "sha256": "422175e11f19250bc59a72a77754c3529bbf065e0c3604050141b640518ca3ed",
-      "bytes": 12982
+      "sha256": "50764067ee1b954fc983b615f4fb1f8bb893b81f8f167e20b7d6d6640383d844",
+      "bytes": 13252
     },
     {
       "path": "lib/home-assumptions-fallback.ts",
@@ -3709,8 +3709,8 @@
     },
     {
       "path": "components/catalog-composer.tsx",
-      "sha256": "7913e507c293fa7654c32be9746c2aba7e56f6551cd7c6da0a5e394e60d059a2",
-      "bytes": 5082
+      "sha256": "fa51177ea5a76346103578681c0cfce58d0d465a333b37a5500341009bb0c7ee",
+      "bytes": 6201
     },
     {
       "path": "components/home-workforce-flows.tsx",
@@ -3719,8 +3719,8 @@
     },
     {
       "path": "lib/composer-catalog.ts",
-      "sha256": "796b0fce8e610be15b781686b000aef579986aef62d521ee159c32316fcca931",
-      "bytes": 3040
+      "sha256": "66126a65151aca11a6e401384279c9d715bd59f910918b7e7cff223534acae06",
+      "bytes": 3052
     },
     {
       "path": "lib/home-workforce-flows.ts",
@@ -3826,8 +3826,23 @@
       "path": "tests/home-scalar-visual.test.mjs",
       "sha256": "054b57ffae7651de192a3e47421e30a5e3e720979835aea36ed384b5222b1eaf",
       "bytes": 2055
+    },
+    {
+      "path": "lib/composer-prompt-helpers.ts",
+      "sha256": "e25eabf2abb254531f5842a952062ab77b061b3070b3cbdae6a13b0bcfff28e6",
+      "bytes": 985
+    },
+    {
+      "path": "tests/composer-prompt-helpers.test.mjs",
+      "sha256": "608c737af2ac511b16c7e2aa7a07d2241a76de654aa9b9e7cc0c7527f7e87491",
+      "bytes": 4250
+    },
+    {
+      "path": "tests/evidence-citation-visuals.test.mjs",
+      "sha256": "b56a2f1da080890a7acd64663e95156dbbd2b4799887fa2f31790e799f2a3c93",
+      "bytes": 2955
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "5fe9b0c90ee2df201602607fa7af5c141d4a4d8c1a9a2fb3a9d78125d80816ce"
+  "verifiedDeployedArchiveSha256": "266e6527e6a03bd171a59eeda61d18acce04d75c3eee3b65472deabed2731cfd"
 }

@@ -1,6 +1,8 @@
 import {acceptsGroundedAggregate,isPublicHomeReceiptCandidate} from './public-home-receipt.mjs';
 import {normalizeHomePack} from './home-pack.mjs';
 // @ts-expect-error Native fixtures share source.
+import {homeScopeCitations} from './home-answer-scope.ts';
+// @ts-expect-error Native fixtures share source.
 import {turnoverChartMonths} from './home-turnover-chat.ts';
 export type ChatEvidenceSeries={version:1;requestId:string;datasetToken:string;packetSha256:string;kind:'recorded';synthetic:boolean;axis?:'business-unit'|'scalar';metric:'median_time_to_fill_days'|'bu_total_turnover_pct'|'bu_voluntary_turnover_pct'|'headcount'|'fte'|'hires'|'monthly_turnover_pct'|'monthly_voluntary_turnover_pct';title:string;unit:'people'|'FTE'|'hires'|'%'|'days';sourceId:'W1'|'A1'|'R1';scope:string;asOf:string;limitation:string;sampled:boolean;omitted:number;points:{date:string;value:number}[]};
 type Grounding={datasetToken:string;packetSha256:string;sources:{id:string;status:string;scope:string;asOf:string|null;basis:string}[]};
@@ -11,7 +13,7 @@ const boundedPoints=(points:{date:string}[],metric:string)=>points.length>=2&&(p
 /** Only already-grounded, cited packet rows. No new reads, model points, forecasts or YTD conversion. */
 export function answerEvidenceSeries(evidence:unknown,grounding:Grounding|undefined,requestId:string,question:string,answer:string):ChatEvidenceSeries[]{
  if(!grounding||!/^[a-f0-9]{64}$/.test(grounding.packetSha256))return [];
- if(/\btime[ -]to[ -]fill\b|\b(?:long|quickly|fast)\b.*\b(?:fill|hire)\b/i.test(question)&&/\bmedian\b/i.test(answer)&&/\[R1(?::[^\]\n]+)?\]/.test(answer)){
+ if(/\btime[ -]to[ -]fill\b|\b(?:long|quickly|fast)\b.*\b(?:fill|hire)\b/i.test(question)&&/\bmedian\b/i.test(answer)&&homeScopeCitations(answer).includes('R1')){
   const source=normalizeHomePack(evidence).sources.find((s:{id:string})=>s.id==='R1');
   const value=(source?.facts as Record<string,unknown>|undefined)?.median_time_to_fill_days;
   if(source?.status==='loaded'&&date(source.date)&&acceptsGroundedAggregate(grounding,evidence,source)&&typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<=100000){
@@ -22,7 +24,7 @@ export function answerEvidenceSeries(evidence:unknown,grounding:Grounding|undefi
  const metric=/\b(?:turnover|attrition|exits?)\b/i.test(question)?/\bvoluntary\b/i.test(question)?'monthly_voluntary_turnover_pct':'monthly_turnover_pct':/\b(?:hiring|hires|recruiting)\b/i.test(question)?'hires':/\b(?:headcount|workforce size|how many employees)\b/i.test(question)?'headcount':null;
  if(!metric)return [];
  const definition=metrics[metric];
- if(!new RegExp('\\['+definition.source+'(?::[^\\]\\n]+)?\\]').test(answer))return [];
+ if(!homeScopeCitations(answer).includes(definition.source))return [];
  const source=normalizeHomePack(evidence).sources.find((source:{id:string})=>source.id===definition.source);
  if(!source||source.status!=='loaded'||!date(source.date)||!acceptsGroundedAggregate(grounding,evidence,source))return [];
  const facts=source.facts as Record<string,unknown>,asOf=source.date!;
