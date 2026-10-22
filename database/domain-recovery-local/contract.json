@@ -1,0 +1,1674 @@
+{
+  "tables": [
+    {
+      "schema": "fow",
+      "name": "action_recommendations",
+      "columns": [
+        {
+          "name": "recommendation_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "run_id",
+          "type": "uuid",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "dataset_id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "scope_key",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "move",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "evidence",
+          "type": "jsonb",
+          "default": "'[]'::jsonb",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "model",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "prompt_sha",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "action_recommendations_dataset_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (dataset_id) REFERENCES fow.datasets(dataset_id) ON DELETE CASCADE"
+        },
+        {
+          "name": "action_recommendations_evidence_check",
+          "type": "c",
+          "definition": "CHECK (jsonb_typeof(evidence) = 'array'::text)"
+        },
+        {
+          "name": "action_recommendations_move_check",
+          "type": "c",
+          "definition": "CHECK (move = ANY (ARRAY['reskill'::text, 'redesign'::text, 'redeploy'::text, 'hold'::text]))"
+        },
+        {
+          "name": "action_recommendations_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (recommendation_id)"
+        },
+        {
+          "name": "action_recommendations_run_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (run_id) REFERENCES fow.scoring_runs(run_id) ON DELETE SET NULL"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX action_recommendations_pkey ON fow.action_recommendations USING btree (recommendation_id)",
+        "CREATE INDEX action_recommendations_dataset_idx ON fow.action_recommendations USING btree (dataset_id, scope_key)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "ai_pulse_questions",
+      "columns": [
+        {
+          "name": "question_code",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "question_text",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "reverse_scored",
+          "type": "boolean",
+          "default": "false",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "ai_pulse_questions_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (question_code)"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX ai_pulse_questions_pkey ON fow.ai_pulse_questions USING btree (question_code)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "ai_pulse_responses",
+      "columns": [
+        {
+          "name": "response_id",
+          "type": "bigint",
+          "default": null,
+          "notNull": true,
+          "identity": "a",
+          "generated": ""
+        },
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "question_code",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "score",
+          "type": "smallint",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "response_date",
+          "type": "date",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "ai_pulse_responses_employee_id_question_code_response_date_key",
+          "type": "u",
+          "definition": "UNIQUE (employee_id, question_code, response_date)"
+        },
+        {
+          "name": "ai_pulse_responses_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (response_id)"
+        },
+        {
+          "name": "ai_pulse_responses_question_code_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (question_code) REFERENCES fow.ai_pulse_questions(question_code) ON UPDATE CASCADE"
+        },
+        {
+          "name": "ai_pulse_responses_score_check",
+          "type": "c",
+          "definition": "CHECK (score >= 1 AND score <= 5)"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX ai_pulse_responses_pkey ON fow.ai_pulse_responses USING btree (response_id)",
+        "CREATE UNIQUE INDEX ai_pulse_responses_employee_id_question_code_response_date_key ON fow.ai_pulse_responses USING btree (employee_id, question_code, response_date)",
+        "CREATE INDEX ai_pulse_responses_date_idx ON fow.ai_pulse_responses USING btree (response_date, question_code)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "ai_tools",
+      "columns": [
+        {
+          "name": "tool_id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "licenses",
+          "type": "integer",
+          "default": "0",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "approved",
+          "type": "boolean",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "ai_tools_licenses_check",
+          "type": "c",
+          "definition": "CHECK (licenses >= 0)"
+        },
+        {
+          "name": "ai_tools_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (tool_id)"
+        },
+        {
+          "name": "ai_tools_tool_id_check",
+          "type": "c",
+          "definition": "CHECK (tool_id ~ '^[a-z0-9-]+$'::text)"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX ai_tools_pkey ON fow.ai_tools USING btree (tool_id)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "ai_usage_weekly",
+      "columns": [
+        {
+          "name": "employee_id",
+          "type": "uuid",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "tool_id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "week_start",
+          "type": "date",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "active_days",
+          "type": "smallint",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "sessions",
+          "type": "integer",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "ai_usage_weekly_active_days_check",
+          "type": "c",
+          "definition": "CHECK (active_days >= 0 AND active_days <= 7)"
+        },
+        {
+          "name": "ai_usage_weekly_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (employee_id, tool_id, week_start)"
+        },
+        {
+          "name": "ai_usage_weekly_sessions_check",
+          "type": "c",
+          "definition": "CHECK (sessions >= 0)"
+        },
+        {
+          "name": "ai_usage_weekly_tool_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (tool_id) REFERENCES fow.ai_tools(tool_id) ON UPDATE CASCADE"
+        },
+        {
+          "name": "ai_usage_weekly_week_start_check",
+          "type": "c",
+          "definition": "CHECK (EXTRACT(isodow FROM week_start) = 1::numeric)"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX ai_usage_weekly_pkey ON fow.ai_usage_weekly USING btree (employee_id, tool_id, week_start)",
+        "CREATE INDEX ai_usage_weekly_week_idx ON fow.ai_usage_weekly USING btree (week_start, tool_id)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "ai_use_cases",
+      "columns": [
+        {
+          "name": "use_case_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "hr_process",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "tool_id",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "decision_impact",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "owner",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "human_in_loop",
+          "type": "boolean",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "ai_use_cases_decision_impact_check",
+          "type": "c",
+          "definition": "CHECK (decision_impact = ANY (ARRAY['none'::text, 'informs'::text, 'determines'::text]))"
+        },
+        {
+          "name": "ai_use_cases_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (use_case_id)"
+        },
+        {
+          "name": "ai_use_cases_status_check",
+          "type": "c",
+          "definition": "CHECK (status = ANY (ARRAY['proposed'::text, 'pilot'::text, 'production'::text, 'retired'::text]))"
+        },
+        {
+          "name": "ai_use_cases_tool_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (tool_id) REFERENCES fow.ai_tools(tool_id) ON UPDATE CASCADE ON DELETE SET NULL"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX ai_use_cases_pkey ON fow.ai_use_cases USING btree (use_case_id)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "dataset_jobs",
+      "columns": [
+        {
+          "name": "dataset_id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "job_key",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "function_name",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "family_name",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "onetsoc_code",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "headcount",
+          "type": "integer",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "labor_cost_usd",
+          "type": "numeric(14,2)",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "job_profile_id",
+          "type": "uuid",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "dataset_jobs_dataset_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (dataset_id) REFERENCES fow.datasets(dataset_id) ON DELETE CASCADE"
+        },
+        {
+          "name": "dataset_jobs_headcount_check",
+          "type": "c",
+          "definition": "CHECK (headcount >= 0)"
+        },
+        {
+          "name": "dataset_jobs_labor_cost_usd_check",
+          "type": "c",
+          "definition": "CHECK (labor_cost_usd >= 0::numeric)"
+        },
+        {
+          "name": "dataset_jobs_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (dataset_id, job_key)"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX dataset_jobs_pkey ON fow.dataset_jobs USING btree (dataset_id, job_key)",
+        "CREATE INDEX dataset_jobs_job_profile_idx ON fow.dataset_jobs USING btree (job_profile_id)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "datasets",
+      "columns": [
+        {
+          "name": "dataset_id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "created_by",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "datasets_dataset_id_check",
+          "type": "c",
+          "definition": "CHECK (dataset_id ~ '^[a-z0-9][a-z0-9_-]{2,63}$'::text)"
+        },
+        {
+          "name": "datasets_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (dataset_id)"
+        },
+        {
+          "name": "datasets_source_check",
+          "type": "c",
+          "definition": "CHECK (source = ANY (ARRAY['builtin'::text, 'upload'::text]))"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX datasets_pkey ON fow.datasets USING btree (dataset_id)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "job_tasks",
+      "columns": [
+        {
+          "name": "dataset_id",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "job_key",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "task_id",
+          "type": "bigint",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "time_share",
+          "type": "numeric(8,6)",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "job_tasks_dataset_id_job_key_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (dataset_id, job_key) REFERENCES fow.dataset_jobs(dataset_id, job_key) ON DELETE CASCADE"
+        },
+        {
+          "name": "job_tasks_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (dataset_id, job_key, task_id)"
+        },
+        {
+          "name": "job_tasks_task_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (task_id) REFERENCES fow.task_statements(task_id)"
+        },
+        {
+          "name": "job_tasks_time_share_check",
+          "type": "c",
+          "definition": "CHECK (time_share > 0::numeric AND time_share <= 1::numeric)"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX job_tasks_pkey ON fow.job_tasks USING btree (dataset_id, job_key, task_id)",
+        "CREATE INDEX job_tasks_task_idx ON fow.job_tasks USING btree (task_id)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "retest_runs",
+      "columns": [
+        {
+          "name": "retest_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "model",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "prompt_sha",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": "'running'::text",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "tasks_scored",
+          "type": "integer",
+          "default": "0",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "input_tokens",
+          "type": "bigint",
+          "default": "0",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "output_tokens",
+          "type": "bigint",
+          "default": "0",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "cost_usd",
+          "type": "numeric(10,4)",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "error",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "retest_runs_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (retest_id)"
+        },
+        {
+          "name": "retest_runs_status_check",
+          "type": "c",
+          "definition": "CHECK (status = ANY (ARRAY['running'::text, 'succeeded'::text, 'failed'::text]))"
+        },
+        {
+          "name": "retest_runs_tasks_scored_check",
+          "type": "c",
+          "definition": "CHECK (tasks_scored >= 0)"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX retest_runs_pkey ON fow.retest_runs USING btree (retest_id)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "retest_scores",
+      "columns": [
+        {
+          "name": "retest_id",
+          "type": "uuid",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "task_id",
+          "type": "bigint",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "label",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "confidence",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "retest_scores_confidence_check",
+          "type": "c",
+          "definition": "CHECK (confidence = ANY (ARRAY['low'::text, 'medium'::text, 'high'::text]))"
+        },
+        {
+          "name": "retest_scores_label_check",
+          "type": "c",
+          "definition": "CHECK (label = ANY (ARRAY['automate'::text, 'augment'::text, 'unaffected'::text]))"
+        },
+        {
+          "name": "retest_scores_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (retest_id, task_id)"
+        },
+        {
+          "name": "retest_scores_retest_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (retest_id) REFERENCES fow.retest_runs(retest_id) ON DELETE CASCADE"
+        },
+        {
+          "name": "retest_scores_task_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (task_id) REFERENCES fow.task_statements(task_id)"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX retest_scores_pkey ON fow.retest_scores USING btree (retest_id, task_id)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "risk_assessments",
+      "columns": [
+        {
+          "name": "assessment_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "use_case_id",
+          "type": "uuid",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "framework",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "tier",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "rationale",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "review_state",
+          "type": "text",
+          "default": "'draft'::text",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "assessed_on",
+          "type": "date",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "bias_audit_date",
+          "type": "date",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "next_review_date",
+          "type": "date",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "risk_assessments_framework_check",
+          "type": "c",
+          "definition": "CHECK (framework = ANY (ARRAY['EU AI Act'::text, 'NYC LL 144'::text, 'NIST AI RMF'::text, 'Internal'::text]))"
+        },
+        {
+          "name": "risk_assessments_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (assessment_id)"
+        },
+        {
+          "name": "risk_assessments_review_state_check",
+          "type": "c",
+          "definition": "CHECK (review_state = ANY (ARRAY['draft'::text, 'in_review'::text, 'approved'::text, 'changes_requested'::text]))"
+        },
+        {
+          "name": "risk_assessments_tier_check",
+          "type": "c",
+          "definition": "CHECK (tier = ANY (ARRAY['low'::text, 'medium'::text, 'high'::text]))"
+        },
+        {
+          "name": "risk_assessments_use_case_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (use_case_id) REFERENCES fow.ai_use_cases(use_case_id) ON DELETE CASCADE"
+        },
+        {
+          "name": "risk_assessments_use_case_id_framework_assessed_on_key",
+          "type": "u",
+          "definition": "UNIQUE (use_case_id, framework, assessed_on)"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX risk_assessments_pkey ON fow.risk_assessments USING btree (assessment_id)",
+        "CREATE UNIQUE INDEX risk_assessments_use_case_id_framework_assessed_on_key ON fow.risk_assessments USING btree (use_case_id, framework, assessed_on)",
+        "CREATE INDEX risk_assessments_use_case_idx ON fow.risk_assessments USING btree (use_case_id, framework, assessed_on DESC)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "score_reviews",
+      "columns": [
+        {
+          "name": "review_id",
+          "type": "bigint",
+          "default": null,
+          "notNull": true,
+          "identity": "a",
+          "generated": ""
+        },
+        {
+          "name": "run_id",
+          "type": "uuid",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "task_id",
+          "type": "bigint",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "reviewer",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "agrees",
+          "type": "boolean",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "override_label",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "reviewed_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "score_reviews_override_label_check",
+          "type": "c",
+          "definition": "CHECK (override_label = ANY (ARRAY['automate'::text, 'augment'::text, 'unaffected'::text]))"
+        },
+        {
+          "name": "score_reviews_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (review_id)"
+        },
+        {
+          "name": "score_reviews_run_id_task_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (run_id, task_id) REFERENCES fow.task_exposure_scores(run_id, task_id) ON DELETE CASCADE"
+        },
+        {
+          "name": "score_reviews_run_id_task_id_reviewer_key",
+          "type": "u",
+          "definition": "UNIQUE (run_id, task_id, reviewer)"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX score_reviews_pkey ON fow.score_reviews USING btree (review_id)",
+        "CREATE UNIQUE INDEX score_reviews_run_id_task_id_reviewer_key ON fow.score_reviews USING btree (run_id, task_id, reviewer)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "scoring_runs",
+      "columns": [
+        {
+          "name": "run_id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "dataset_id",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "model",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "rubric_version",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "prompt_sha",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "default": "'running'::text",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "tasks_scored",
+          "type": "integer",
+          "default": "0",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "input_tokens",
+          "type": "bigint",
+          "default": "0",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "output_tokens",
+          "type": "bigint",
+          "default": "0",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "cost_usd",
+          "type": "numeric(10,4)",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "error",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "scoring_runs_dataset_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (dataset_id) REFERENCES fow.datasets(dataset_id) ON DELETE SET NULL"
+        },
+        {
+          "name": "scoring_runs_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (run_id)"
+        },
+        {
+          "name": "scoring_runs_status_check",
+          "type": "c",
+          "definition": "CHECK (status = ANY (ARRAY['running'::text, 'succeeded'::text, 'failed'::text]))"
+        },
+        {
+          "name": "scoring_runs_tasks_scored_check",
+          "type": "c",
+          "definition": "CHECK (tasks_scored >= 0)"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX scoring_runs_pkey ON fow.scoring_runs USING btree (run_id)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "task_exposure_scores",
+      "columns": [
+        {
+          "name": "run_id",
+          "type": "uuid",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "task_id",
+          "type": "bigint",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "label",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "exposure",
+          "type": "numeric(3,2)",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "confidence",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "rationale",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "task_exposure_scores_confidence_check",
+          "type": "c",
+          "definition": "CHECK (confidence = ANY (ARRAY['low'::text, 'medium'::text, 'high'::text]))"
+        },
+        {
+          "name": "task_exposure_scores_exposure_check",
+          "type": "c",
+          "definition": "CHECK (exposure >= 0::numeric AND exposure <= 1::numeric)"
+        },
+        {
+          "name": "task_exposure_scores_label_check",
+          "type": "c",
+          "definition": "CHECK (label = ANY (ARRAY['automate'::text, 'augment'::text, 'unaffected'::text]))"
+        },
+        {
+          "name": "task_exposure_scores_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (run_id, task_id)"
+        },
+        {
+          "name": "task_exposure_scores_rationale_check",
+          "type": "c",
+          "definition": "CHECK (cardinality(regexp_split_to_array(btrim(rationale), '\\s+'::text)) <= 40)"
+        },
+        {
+          "name": "task_exposure_scores_run_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (run_id) REFERENCES fow.scoring_runs(run_id) ON DELETE CASCADE"
+        },
+        {
+          "name": "task_exposure_scores_task_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (task_id) REFERENCES fow.task_statements(task_id)"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX task_exposure_scores_pkey ON fow.task_exposure_scores USING btree (run_id, task_id)",
+        "CREATE INDEX task_exposure_scores_task_idx ON fow.task_exposure_scores USING btree (task_id)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "task_statements",
+      "columns": [
+        {
+          "name": "task_id",
+          "type": "bigint",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "onetsoc_code",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "task_text",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "task_type",
+          "type": "text",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "importance",
+          "type": "numeric(4,2)",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "frequency",
+          "type": "numeric(4,2)",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "default": "'onet'::text",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "task_statements_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (task_id)"
+        },
+        {
+          "name": "task_statements_source_check",
+          "type": "c",
+          "definition": "CHECK (source = ANY (ARRAY['onet'::text, 'custom'::text]))"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX task_statements_pkey ON fow.task_statements USING btree (task_id)",
+        "CREATE INDEX task_statements_onetsoc_idx ON fow.task_statements USING btree (onetsoc_code)"
+      ]
+    },
+    {
+      "schema": "fow",
+      "name": "validation_sample",
+      "columns": [
+        {
+          "name": "run_id",
+          "type": "uuid",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "task_id",
+          "type": "bigint",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "stratum",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "stratum_size",
+          "type": "integer",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "position",
+          "type": "integer",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "drawn_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "validation_sample_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (run_id, task_id)"
+        },
+        {
+          "name": "validation_sample_position_check",
+          "type": "c",
+          "definition": "CHECK (\"position\" > 0)"
+        },
+        {
+          "name": "validation_sample_position_key",
+          "type": "u",
+          "definition": "UNIQUE (\"position\")"
+        },
+        {
+          "name": "validation_sample_run_id_task_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (run_id, task_id) REFERENCES fow.task_exposure_scores(run_id, task_id) ON DELETE CASCADE"
+        },
+        {
+          "name": "validation_sample_stratum_check",
+          "type": "c",
+          "definition": "CHECK (stratum = ANY (ARRAY['automate'::text, 'augment'::text, 'unaffected'::text]))"
+        },
+        {
+          "name": "validation_sample_stratum_size_check",
+          "type": "c",
+          "definition": "CHECK (stratum_size > 0)"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX validation_sample_pkey ON fow.validation_sample USING btree (run_id, task_id)",
+        "CREATE UNIQUE INDEX validation_sample_position_key ON fow.validation_sample USING btree (\"position\")"
+      ]
+    },
+    {
+      "schema": "workforce_release",
+      "name": "performance_rating_v1",
+      "columns": [
+        {
+          "name": "org_code",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "source_sha256",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "content_sha256",
+          "type": "text",
+          "default": null,
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "extracted_at",
+          "type": "timestamp with time zone",
+          "default": "transaction_timestamp()",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "activated_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "notNull": false,
+          "identity": "",
+          "generated": ""
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "default": "false",
+          "notNull": true,
+          "identity": "",
+          "generated": ""
+        }
+      ],
+      "constraints": [
+        {
+          "name": "performance_rating_v1_content_sha256_check",
+          "type": "c",
+          "definition": "CHECK (content_sha256 ~ '^[a-f0-9]{64}$'::text)"
+        },
+        {
+          "name": "performance_rating_v1_org_code_check",
+          "type": "c",
+          "definition": "CHECK (org_code = ANY (ARRAY['all'::text, 'BU-CLIENTOPS'::text, 'BU-CONS'::text, 'BU-CORP'::text, 'BU-DATAAI'::text, 'BU-DIGITAL'::text, 'BU-MGSVC'::text, 'BU-SALES'::text, 'BU-TECH'::text]))"
+        },
+        {
+          "name": "performance_rating_v1_payload_check",
+          "type": "c",
+          "definition": "CHECK (jsonb_typeof(payload) = 'object'::text AND (payload - ARRAY['version'::text, 'source'::text, 'snapshotDate'::text, 'reviewPeriod'::text, 'periodKind'::text, 'filters'::text, 'status'::text, 'availabilityKind'::text, 'simulatedAvailableAt'::text, 'originalAvailableAt'::text, 'provenance'::text, 'notRatedStatus'::text, 'counts'::text]) = '{}'::jsonb)"
+        },
+        {
+          "name": "performance_rating_v1_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (org_code)"
+        },
+        {
+          "name": "performance_rating_v1_source_sha256_check",
+          "type": "c",
+          "definition": "CHECK (source_sha256 = '6b9ad129a9b8b24f775cd0d78895140ee8c16f2425016a9b091f3ff96cde9a60'::text)"
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX performance_rating_v1_pkey ON workforce_release.performance_rating_v1 USING btree (org_code)"
+      ]
+    }
+  ],
+  "views": [
+    {
+      "schema": "fow",
+      "name": "job_exposure_base"
+    },
+    {
+      "schema": "fow",
+      "name": "v_adoption_manager"
+    },
+    {
+      "schema": "fow",
+      "name": "v_course_catalog"
+    },
+    {
+      "schema": "fow",
+      "name": "v_exposure_adoption"
+    },
+    {
+      "schema": "fow",
+      "name": "v_function_exposure"
+    },
+    {
+      "schema": "fow",
+      "name": "v_function_readiness"
+    },
+    {
+      "schema": "fow",
+      "name": "v_function_skill_gaps"
+    },
+    {
+      "schema": "fow",
+      "name": "v_job_exposure"
+    },
+    {
+      "schema": "fow",
+      "name": "v_pulse_sentiment"
+    },
+    {
+      "schema": "fow",
+      "name": "v_redeployment_paths"
+    },
+    {
+      "schema": "fow",
+      "name": "v_register"
+    },
+    {
+      "schema": "fow",
+      "name": "v_tool_mix"
+    }
+  ],
+  "excluded": [
+    "fow.seed_builtin"
+  ]
+}
