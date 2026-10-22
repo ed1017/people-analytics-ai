@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "a2dc9de769cb19f6958f9a44d67b7a968df4532d",
+  "sourceCommit": "24f0c7e22e322b4c179660c3c42ee168dad3fba7",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -3274,8 +3274,8 @@
     },
     {
       "path": "lib/swp-demand.ts",
-      "sha256": "51e4b4b42448d4bceb98738e9fb95d2febec8693ecf50f6467ef2989d505b6a6",
-      "bytes": 23644
+      "sha256": "f8b547c4f3f939983edb5df6eeb54a476ab0403f11d2d1664d3595346a85e283",
+      "bytes": 23712
     },
     {
       "path": "lib/swp-demo.ts",
@@ -3786,8 +3786,13 @@
       "path": "tests/home-policy-estimate.test.mjs",
       "sha256": "b154dc0cf42e3eecc740e0b7fd06b76a78596511584032013187a7dfcfa0a8c2",
       "bytes": 3084
+    },
+    {
+      "path": "tests/optional-budget-demand.test.mjs",
+      "sha256": "eaf67e36f6c7ae4fccea5aab68da65f06625585b082f18af643d0adb8ae21351",
+      "bytes": 1646
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "b4088b0f19af1518abc0cbb49312e4930ca63ed97315f9984520276d54dc5231"
+  "verifiedDeployedArchiveSha256": "c41029cb6db6c721f1117b678c1614ec06bb8c985e22094a8c15abbf47e87c32"
 }
