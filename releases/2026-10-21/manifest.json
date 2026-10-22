@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "026011979614b2c53fd430a78391abb705c04b32",
-  "deployment": "dpl_5trHDX2KRrqCr1TtQpbtFCGz1T9L",
+  "sourceCommit": "34cd45fa0752fb138be751c851e0f8a5804c3483",
+  "deployment": "dpl_4nGyp6sZCf1TrNy886MBx2guuwpt",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -2079,8 +2079,8 @@
     },
     {
       "path": "lib/home-business-planning.ts",
-      "sha256": "620c1481758ddcc2004e468a06ec4056f717c9bbf8766195da0e7130e0464450",
-      "bytes": 12019
+      "sha256": "09fdcbe5d2201323bde50b13c9af6f34063d918f91630b9099a846ecf35c9ae4",
+      "bytes": 13264
     },
     {
       "path": "lib/home-candidate-options.ts",
@@ -2464,8 +2464,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "56bd3fb5834f9f3f4add852cfb87f13566744000b391f5a24f200e34eab06b50",
-      "bytes": 39787
+      "sha256": "02cec965b7d2ebe3df42159f078aeb6cb0eb28291526ad064f4830cae75bcd42",
+      "bytes": 41163
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -2524,8 +2524,8 @@
     },
     {
       "path": "lib/home-staffing-delivery.ts",
-      "sha256": "bc728ec8e8904bdb41bfb95561ba0a86ddf272de4433a2a9f50f72a38c94216b",
-      "bytes": 5306
+      "sha256": "5faed99e7db1dd2add11ea95a4ce2d7a1121093edb463619e6cfe287f92bfd2e",
+      "bytes": 6113
     },
     {
       "path": "lib/home-staffing-scenario.ts",
@@ -3014,7 +3014,7 @@
     },
     {
       "path": "lib/public-planner-price-candidate.mjs",
-      "sha256": "a7d23fab342da27d0f076f1cdfa2402914627d1813cca4787266d9e9302edcab",
+      "sha256": "aca8c0c7c0d205fd31c0e9d6e0135b6e58022ea22de3a37c3b601be483a22367",
       "bytes": 1399
     },
     {
@@ -3731,8 +3731,18 @@
       "path": "tests/home-flows-catalog.test.mjs",
       "sha256": "81e4224b0b79e6a494e70c90482a5ba2cb6b16edab3c0a9e573681190dc5a337",
       "bytes": 5426
+    },
+    {
+      "path": "tests/business-planning-model-view.test.mjs",
+      "sha256": "e651169eba4ddf7fd7f75b1c5ae8015b48f52ce674157d2470827c4032c5e307",
+      "bytes": 1441
+    },
+    {
+      "path": "tests/staffing-calendar-routing.test.mjs",
+      "sha256": "5b1dc63da1ed9de8374abdc0c18ad3876aaffbd88f5e4f161a83e68ff9e9d4e4",
+      "bytes": 1269
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "5d7ba1e9772cbcd18598483ee1c5364e71ac94d76461929980c992cf3df76c5f"
+  "verifiedDeployedArchiveSha256": "e4eba2a1bbc49b0ef7d93dd63cd00e7b48e35aa5533ac07743c728401278b08e"
 }

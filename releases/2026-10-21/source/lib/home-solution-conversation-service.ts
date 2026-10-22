@@ -85,7 +85,7 @@ function checkedMetricReferences(state:SolutionState,kind:SolutionMetricRef['kin
 }
 export function solutionModelContext(request:SolutionRequest,progress?:GoalProgressConversation){
  const saved=request.catalog?.plans.filter(plan=>!plan.deleted)??[];
- return {goal:request.goal,scope:request.scope,filters:request.filters,timeZone:request.timeZone,goalContext:request.goalContext,...(progress?{savedGoalProgress:progress}:{}),currentEvidence:request.evidence,citationCatalog:actionEvidenceCatalog(request.evidence),currentConstraints:request.state.constraints,...(request.state.staffingDeliveryTarget?{staffingDeliveryTarget:request.state.staffingDeliveryTarget}:{}),
+ return {goal:request.goal,scope:request.scope,filters:request.filters,timeZone:request.timeZone,goalContext:request.goalContext,...(progress?{savedGoalProgress:progress}:{}),currentEvidence:request.evidence,citationCatalog:actionEvidenceCatalog(request.evidence),currentConstraints:request.state.constraints,...(request.state.staffingDeliveryTarget?{staffingDeliveryTarget:{months:request.state.staffingDeliveryTarget.months,turnId:request.state.staffingDeliveryTarget.turnId,issue:request.state.staffingDeliveryTarget.issue,source:'Source: recentTurns/currentMessage at turnId.'}}:{}),
   savedPlans:saved.map(plan=>({id:plan.id,number:plan.number,revision:plan.draft.revision,name:plan.draft.bundle.name,objective:plan.draft.bundle.objective,activities:plan.draft.bundle.components})),selectedPlan:saved.some(plan=>plan.id===request.selectedId)?solutionPlanView(saved.find(plan=>plan.id===request.selectedId)!):null,
   recentTurns:request.state.turns,modelView:{version:1,omittedInternalEqualityKeys:['draft.signature','result.signature','result.bindingKey','result.inputKey','evaluation.sourceKeys'],authoritativeState:'Retained on the server; projected views cannot be saved or used as authoritative input.',history:'All retained turns; no history truncation during projection.'},currentWorkingRevisions:currentSolutionProposals(request.state).map(({id,revision,candidate},index)=>({id,revision,name:candidate.name,label:`Proposed Action Plan ${index+1}`})),workingProposals:request.state.working.map(item=>{const view=solutionEvaluationView(request,item);return {...view,inputs:item.draft?.inputs??null,draft:undefined,result:item.result?solutionResultView(item.result):null};}),
   analyses:request.state.analyses.map(item=>({id:item.id,revision:item.revision,method:item.spec.method,months:item.spec.months,assumptions:item.assumptions,opening:item.inputs.opening,asOf:item.inputs.asOf,scope:item.inputs.scope,interpretations:item.interpretations,finalHeadcount:item.points.at(-1)?.headcount})),
@@ -215,8 +215,18 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
      state.hiringBudget=next;result={hiringBudget:hiringBudgetView(next),accepted:false,saved:false};
     }else if(runtime.natural&&businessPlanningTools.some(t=>t.name===call.name)){
      const next=await runBusinessPlanningTool(request,runtime.natural.datasetToken,natural,call.name,args,naturalStep);
-     result={businessPlanning:businessPlanningView(next,request.requestId,naturalStep+1),accepted:false,saved:false};
+     const currentView=businessPlanningView(next,request.requestId,naturalStep+1);result={businessPlanning:currentView,accepted:false,saved:false};
      if(JSON.stringify(result).length>65000)throw Error('The provisional comparison exceeds the tool budget. Narrow the scope or inputs. Earlier state is retained.');
+     // A successful comparison repeats the same checked demand snapshot. Keep
+     // one complete copy, not two, while retaining its earlier result/reference
+     // and every user turn/tool argument. Never compact a changed demand result.
+     if(call.name==='compare_service_staffing')for(const item of input){
+      const prior=item as {type?:string;output?:string};if(prior.type!=='function_call_output'||typeof prior.output!=='string')continue;
+      const previous=JSON.parse(prior.output),old=previous.businessPlanning,current=currentView;
+      if(old&&!old.staffing&&old.demandProposal&&current?.demandProposal&&JSON.stringify(old.demandProposal.spec)===JSON.stringify(current.demandProposal.spec)&&JSON.stringify(old.demandProposal.result)===JSON.stringify(current.demandProposal.result)&&old.bases?.every((basis:unknown,index:number)=>JSON.stringify(basis)===JSON.stringify(current.bases[index]))){
+       previous.businessPlanning={demandProposal:{reviewRef:old.demandProposal.reviewRef},supersededByReviewRef:current.demandProposal.reviewRef,projection:'Identical full demand is in the later comparison.'};prior.output=JSON.stringify(previous);
+      }
+     }
      natural=next;naturalStep++;state.businessPlanning=natural;
     }else if(['review_service_demand','revise_service_demand','review_scoped_service_demand','revise_scoped_service_demand'].includes(call.name)&&demand){
      const prior=demandReview??demand.demandProposal,turns=solutionUserTurns(request).map(({id,text})=>({id,text}));
