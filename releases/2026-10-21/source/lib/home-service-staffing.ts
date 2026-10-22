@@ -64,8 +64,9 @@ export function editStaffingInputs(review:DemandReview,previous:StaffingInputs|n
 }
 export type ServiceStaffingOption={id:string;mix:{build:number;move:number;buy:number};input:WorkforcePlanInput;cash:number|null;listedCash:number|null;staffHours:number|null;addedEmployees:number;coverageDate:string|null;additionalHours:number|null;shortfallHours:number|null;status:'met'|'not-met'|'unknown'|'invalid';reason:string|null;monthly:{month:string;roles:number|null;cash:number|null}[]};
 export type ServiceStaffingResult={status:'calculated'|'needs-inputs'|'no-gap';missing:string[];options:ServiceStaffingOption[];enumerated:number;sourceScope:string|null;operationalFeasibilityVerified:false;accepted:false;limitations:string[]};
-export function calculateServiceStaffing(review:DemandReview,raw:StaffingInputs):ServiceStaffingResult{
+export function calculateServiceStaffing(review:DemandReview,raw:StaffingInputs,selectedMix?:ServiceStaffingOption['mix']):ServiceStaffingResult{
  const s=readStaffingInputs(raw),d=review.spec,r=review.result,missing:string[]=[];
+ if(selectedMix&&(!selectedMix||Object.keys(selectedMix).sort().join()!=='build,buy,move'||Object.values(selectedMix).some(v=>!Number.isSafeInteger(v)||v<0)||selectedMix.build+selectedMix.move+selectedMix.buy!==r.additionalRoles))throw Error('Select whole roles totaling the current capacity gap.');
  const result:ServiceStaffingResult={status:'needs-inputs',missing,options:[],enumerated:0,sourceScope:d.scope,operationalFeasibilityVerified:false,accepted:false,limitations:[
   'Provisional assumptions only; scope and employee availability are not source verified. Comparison alone accepts no scenario and saves no plan.',
   'Only this additional whole-role slice is modeled. Contract wins, peaks, shifts, service levels and causal training effects are not established.',
@@ -94,6 +95,11 @@ export function calculateServiceStaffing(review:DemandReview,raw:StaffingInputs)
    const buy=roles-b-m,mix={build:b,move:m,buy};
    const candidateInput={...input,build:String(b),move:String(m),buy:String(buy),backfills:b+m?input.backfills:''};
    result.options.push(staffingOption(`build-${b}-move-${m}-buy-${buy}`,mix,candidateInput,review,value('costsCompleteAndDistinct')===true));
+  }
+  if(selectedMix){
+   const selected=result.options.find(o=>o.mix.build===selectedMix.build&&o.mix.move===selectedMix.move&&o.mix.buy===selectedMix.buy);
+   if(!selected||selected.status==='invalid')throw Error('This mix exceeds the supplied pools or cannot be calculated.');
+   return {...result,status:'calculated',options:[selected],limitations:[...result.limitations,'User-adjusted mix only; not an optimized recommendation. Original comparison assumptions remain unchanged.']};
   }
   result.options=selectStaffingOptions(result.options);
   result.limitations.push('At most six options are shown: the all-hire reference, the lowest complete-cash feasible option when one exists, then smaller known workload shortfall and complete cash within the explicit bounds. Lowest cash is not a claim of lowest delivery risk. Unknown metrics do not establish a best option.');

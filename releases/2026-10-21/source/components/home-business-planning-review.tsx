@@ -1,4 +1,5 @@
 'use client';
+import {StaffingMixControls} from './staffing-mix-controls';
 import {StaffingCoverageChart} from './swp-outcome-chart';
 import {StaffingOptionsTable} from './staffing-options-table';
 import {useState} from 'react';
@@ -27,10 +28,11 @@ export function HomeBusinessPlanningReview({controller}:{controller:Controller})
   {r.status==='calculated'?<p>Workload: {number(r.workloadHours)} hours · existing available capacity: {number(r.capacityHours)} hours · gap: {number(r.gapHours)} hours ({number(r.additionalRoles)} additional whole roles).</p>:<p>{r.missing.join(' ')}</p>}
   <p>Proposed and user-supplied inputs remain unverified. Correct any assumption in chat; no mode or separate input form is required.</p>
   {saveUnavailable?<p role="status">{saveUnavailable}</p>:<p><strong>Save plan:</strong> Choose an option to review below, then select Save plan. Saving keeps its assumptions with your goal; it does not approve a workforce change.</p>}
-  {staffing&&<><h4 className="font-semibold">Calculated provisional options</h4>{staffing.result.status==='calculated'&&<p>{staffingChoiceSummary(staffing.result.options)}</p>}{staffing.result.missing.map(line=><p key={line}>{line}</p>)}
+  {staffing&&<><h4 className="font-semibold">Calculated provisional options</h4>{staffing.result.status==='calculated'&&<p>{staffing.selectedMix?'User-adjusted scenario. This is not an optimized recommendation; compare the calculated cost, timing and workload shortfall.':staffingChoiceSummary(staffing.result.options)}</p>}{staffing.result.missing.map(line=><p key={line}>{line}</p>)}
    {staffing.result.status==='no-gap'&&<p>No positive workload gap; no staffing plan was generated.</p>}
+   <StaffingMixControls state={state} disabled={busy} onChange={controller.adjustBusinessMix}/>
    <StaffingOptionsTable options={staffing.result.options} enumerated={staffing.result.enumerated} action={option=><button className={button} disabled={busy||option.status==='invalid'||!!selected(option.id)} onClick={async()=>{setPreparing(true);setError('');try{setReview(await controller.reviewBusinessOption(option.id));}catch(e){setError((e as Error).message);}finally{setPreparing(false);}}}>{selected(option.id)?`Pinned Action Plan #${selected(option.id)!.number}`:`Review to save: ${option.mix.build}/${option.mix.move}/${option.mix.buy}`}</button>}/>
-   {staffing.result.options.length>0&&<StaffingCoverageChart target={r.additionalRoles} scope={s.scope} start={s.startMonth} months={s.months} options={staffing.result.options.map((o,index)=>({id:o.id,label:index===0?'All-hire reference':`Option ${index}`,mix:o.mix,coverage:o.monthly.length===s.months?o.monthly.map(m=>m.roles):null}))}/>}
+   {staffing.result.options.length>0&&<StaffingCoverageChart target={r.additionalRoles} scope={s.scope} start={s.startMonth} months={s.months} options={staffing.result.options.map((o,index)=>({id:o.id,label:staffing.selectedMix?'Adjusted mix':index===0?'All-hire reference':`Option ${index}`,mix:o.mix,coverage:o.monthly.length===s.months?o.monthly.map(m=>m.roles):null}))}/>}
    <p>End-date coverage does not prove full-period delivery. “Met” applies only to entered limits; actual availability, readiness and release remain unverified.</p>
   </>}
   <details><summary className="min-h-11 cursor-pointer py-2">Inputs and calculation limits</summary>

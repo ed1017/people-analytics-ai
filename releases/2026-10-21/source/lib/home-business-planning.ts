@@ -14,7 +14,7 @@ import {assertSolutionShape} from './home-solution-conversation-schema.ts';
 import {canonical} from './workforce-mix-search-core.ts';
 // @ts-expect-error Native Node tests share application source.
 import {staffingChoiceSummary} from './staffing-choice-summary.ts';
-export type BusinessPlanning={version:1;context:DemandContext;scopeKey:string;review:DemandReview;staffing:{inputs:StaffingInputs;result:ServiceStaffingResult}|null};
+export type BusinessPlanning={version:1;context:DemandContext;scopeKey:string;review:DemandReview;staffing:{inputs:StaffingInputs;result:ServiceStaffingResult;selectedMix?:{build:number;move:number;buy:number}}|null};
 const equal=(a:unknown,b:unknown)=>canonical(a)===canonical(b);
 const scopeKey=(request:SolutionRequest)=>JSON.stringify([request.scope,request.filters]);
 const string={type:'string',minLength:1,maxLength:400};
@@ -28,8 +28,14 @@ export function readBusinessPlanning(raw:unknown):BusinessPlanning|null{
  const s=raw as BusinessPlanning;
  if(!s||Object.keys(s).sort().join()!=='context,review,scopeKey,staffing,version'||s.version!==1||typeof s.scopeKey!=='string'||s.scopeKey.length>2000||!demandContext(s.context)||Object.keys(s.context).sort().join()!=='boundGoal,classification,conversationMode,datasetToken,intakeId,revision')throw Error('The provisional business context cannot be verified.');
  readDemandReview(s.review,s.context);
- if(s.staffing){if(Object.keys(s.staffing).sort().join()!=='inputs,result')throw Error('Invalid staffing state.');readStaffingInputs(s.staffing.inputs);if(!equal(calculateServiceStaffing(s.review,s.staffing.inputs),s.staffing.result))throw Error('The provisional staffing calculation changed.');}
+ if(s.staffing){if(!['inputs,result','inputs,result,selectedMix'].includes(Object.keys(s.staffing).sort().join()))throw Error('Invalid staffing state.');if('selectedMix' in s.staffing&&(!s.staffing.selectedMix||s.staffing.result.status!=='calculated'||s.staffing.result.options.length!==1))throw Error('Invalid selected staffing mix.');readStaffingInputs(s.staffing.inputs);if(!equal(calculateServiceStaffing(s.review,s.staffing.inputs,s.staffing.selectedMix),s.staffing.result))throw Error('The provisional staffing calculation changed.');}
  return structuredClone(s);
+}
+export function selectBusinessPlanningMix(raw:BusinessPlanning,mix:{build:number;move:number;buy:number}|null):BusinessPlanning{
+ const state=readBusinessPlanning(raw)!;if(!state.staffing)throw Error('A checked staffing comparison is required.');
+ const result=calculateServiceStaffing(state.review,state.staffing.inputs,mix??undefined);
+ if(mix&&(result.status!=='calculated'||result.options.length!==1||result.options[0].status==='invalid'))throw Error('This mix cannot be calculated from the supplied assumptions.');
+ return readBusinessPlanning({...state,staffing:{inputs:state.staffing.inputs,result,...(mix?{selectedMix:mix}:{})}})!;
 }
 export function currentBusinessPlanning(request:SolutionRequest,datasetToken:string){
  const s=readBusinessPlanning(request.state.businessPlanning);
@@ -47,7 +53,7 @@ export function businessPlanningView(s:BusinessPlanning|null,requestId:string,st
  const spec=Object.fromEntries(Object.entries(demandProposal.spec).map(([key,value])=>[
   key,key.endsWith('Basis')?basisRef(value):value&&typeof value==='object'&&'basis' in value?{...value,basis:basisRef(value.basis)}:value,
  ]));
- const staffing=s.staffing?{inputs:Object.fromEntries(Object.entries(s.staffing.inputs.values).map(([key,atom])=>[key,{...atom,basis:basisRef(atom.basis)}])),result:{...s.staffing.result,monthlyColumns:['month','roles','cash'],options:s.staffing.result.options.map(({input: _input,monthly,...option})=>({...option,monthly:monthly.map(row=>[row.month,row.roles,row.cash])}))},decisionTradeoffs:staffingChoiceSummary(s.staffing.result.options)}:null;
+ const staffing=s.staffing?{inputs:Object.fromEntries(Object.entries(s.staffing.inputs.values).map(([key,atom])=>[key,{...atom,basis:basisRef(atom.basis)}])),result:{...s.staffing.result,monthlyColumns:['month','roles','cash'],options:s.staffing.result.options.map(({input: _input,monthly,...option})=>({...option,monthly:monthly.map(row=>[row.month,row.roles,row.cash])}))},decisionTradeoffs:s.staffing.selectedMix?'User-adjusted scenario, not an optimized recommendation. Compare its calculated cost, timing and shortfall against the original assumptions.':staffingChoiceSummary(s.staffing.result.options)}:null;
  return {demandProposal:{...demandProposal,spec},staffing,bases,projection:'Model-only: basisRef indexes bases. Option calculator inputs are derived from the shared demand, staffing inputs and each mix; full authoritative inputs and provenance remain server-side.',accepted:false,saved:false};
 }
 export async function runBusinessPlanningTool(request:SolutionRequest,datasetToken:string,s:BusinessPlanning|null,name:string,args:Record<string,unknown>,step:number){
