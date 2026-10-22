@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "889c2cc38331e3968d6b4f57c3a802f46c70777c",
+  "sourceCommit": "9a7a823b3d6a576fe92acfa8492dc78ac71ba569",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -344,8 +344,8 @@
     },
     {
       "path": "components/chat-evidence-chart.tsx",
-      "sha256": "2e187b73bc43ae2485077654b14871cd410ef3de03141554ff2ad50cd955a450",
-      "bytes": 2852
+      "sha256": "32648b91a5c14bd8c0746544da504c2f0a40f06bf715fce841918f85333e51dc",
+      "bytes": 4510
     },
     {
       "path": "components/compact-chart.tsx",
@@ -1414,8 +1414,8 @@
     },
     {
       "path": "lib/chat-evidence-series.ts",
-      "sha256": "9d4d2652398a84b387991bf9d94739781abde0c5adcf7aa29048568225dcecfa",
-      "bytes": 9741
+      "sha256": "d2b4975cad2d93097b349327a74578ccaba857e78cbe93463d0876900a428fbd",
+      "bytes": 12414
     },
     {
       "path": "lib/chat-model.ts",
@@ -2464,8 +2464,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "9ebb8dd95fe26da1864661c882b81965eeae7d18dca020cc7e70166a6db115c6",
-      "bytes": 42729
+      "sha256": "62b4ef4a7765bf50e34c52c3e45aab09e7ec2dbaa269977a5db7c1ccf7a44436",
+      "bytes": 43003
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -3841,8 +3841,18 @@
       "path": "tests/evidence-citation-visuals.test.mjs",
       "sha256": "b56a2f1da080890a7acd64663e95156dbbd2b4799887fa2f31790e799f2a3c93",
       "bytes": 2955
+    },
+    {
+      "path": "lib/home-comparison-visual.mjs",
+      "sha256": "462834fd03538f4a9d7a06f68f1affb800f576d9ca2912fd3d534bcfd8e2c8bc",
+      "bytes": 1869
+    },
+    {
+      "path": "tests/home-comparison-visual.test.mjs",
+      "sha256": "5e889545cee1a65532376e870769f74a20f47bac18ced3455e77da5c7db713c1",
+      "bytes": 4032
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "266e6527e6a03bd171a59eeda61d18acce04d75c3eee3b65472deabed2731cfd"
+  "verifiedDeployedArchiveSha256": "7f70d7012dd040ad3935b0c7fbfe29cc8a017022819f45ce6839978362b394d6"
 }
