@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "1ef4184dd5f52e40068636e531802fec063f9d26",
-  "deployment": "dpl_8J4Gvs16SZLtgmLmnaH9dqiFtzvy",
+  "sourceCommit": "7f6874c03863312ecabd0408cc42237969921454",
+  "deployment": "dpl_CxPfSaGQagZjZnN7oA4k8phim2zK",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -2524,8 +2524,8 @@
     },
     {
       "path": "lib/home-staffing-delivery.ts",
-      "sha256": "5faed99e7db1dd2add11ea95a4ce2d7a1121093edb463619e6cfe287f92bfd2e",
-      "bytes": 6113
+      "sha256": "39ba8c6ac2da0515192535ac2c420604c149d827a76ea1f761650e66c1e030d0",
+      "bytes": 6319
     },
     {
       "path": "lib/home-staffing-scenario.ts",
@@ -3739,8 +3739,8 @@
     },
     {
       "path": "tests/staffing-calendar-routing.test.mjs",
-      "sha256": "5b1dc63da1ed9de8374abdc0c18ad3876aaffbd88f5e4f161a83e68ff9e9d4e4",
-      "bytes": 1269
+      "sha256": "d3645595c4de5c19e199280bf28b3c7cb7a0acc4f2478fc8c3b8ea91bcc26494",
+      "bytes": 2125
     },
     {
       "path": "lib/model-citation-catalog.mjs",
@@ -3759,5 +3759,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "eb17389ef240e7c224cc3c1ecf7abd4035d6c13f8b1470d13454bb83a4ebfa2a"
+  "verifiedDeployedArchiveSha256": "351404861968ae6fe22da6f4cc168d990877b581b8d176ba4cda71602235ba83"
 }
