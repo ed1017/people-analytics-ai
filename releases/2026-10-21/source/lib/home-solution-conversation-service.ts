@@ -178,17 +178,17 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  let toolCalls=0,operations=0,projectionInput:Promise<ProjectionInputs>|undefined,final:SolutionFinal|undefined,rounds=0;
  const maxRounds=runtime.maxModelRounds??4;
  for(let round=0;round<maxRounds;round++){
-  abort(signal);if(new TextEncoder().encode(JSON.stringify(input)).length>120000)throw Error('This conversation needs a narrower set of sources before another model round. Earlier work is kept.');
-  if(staffingRequired&&!staffingCalculated&&(round===maxRounds-1||operations>=6))throw Error('The staffing comparison was not calculated within this turn\'s limits. Earlier work is kept.');
+  abort(signal);if(new TextEncoder().encode(JSON.stringify(input)).length>120000)throw new SolutionResponseError('context_bounds','This conversation needs a narrower set of sources before another model round. Earlier work is kept.');
+  if(staffingRequired&&!staffingCalculated&&(round===maxRounds-1||operations>=6))throw new SolutionResponseError('staffing_not_calculated','The staffing comparison was not calculated within this turn\'s limits. Earlier work is kept.');
   const output=await runtime.complete(input,round===maxRounds-1||operations>=6,signal,{progressEntryEnabled:!!entryContext,requiredStaffingCalculation:standaloneStaffing&&!staffingCalculated});rounds++;abort(signal);
   if(!output.completed)throw new SolutionResponseError('incomplete_output','The conversation response was incomplete or exceeded its bounds.');
   if(output.calls.length>6||JSON.stringify(output.items).length>70000)throw new SolutionResponseError('output_bounds','The conversation response was incomplete or exceeded its bounds.');
   if(!output.calls.length){
-   if(staffingRequired&&!staffingCalculated)throw Error('The staffing comparison was not calculated in this turn. Earlier work is kept.');
+   if(staffingRequired&&!staffingCalculated)throw new SolutionResponseError('staffing_not_calculated','The staffing comparison was not calculated in this turn. Earlier work is kept.');
    final=readFinal(output.text);break;
   }
   const callCost=(call:SolutionModelOutput['calls'][number])=>{if(call.name!=='evaluate_action_plans')return 1;try{const count=JSON.parse(call.arguments)?.candidates?.length;return Number.isInteger(count)&&count>=1&&count<=3?count:3;}catch{return 3;}};
-  if(round===maxRounds-1||operations+output.calls.reduce((total,call)=>total+callCost(call),0)>6)throw Error('The bounded calculation limit was reached. No proposal was saved.');
+  if(round===maxRounds-1||operations+output.calls.reduce((total,call)=>total+callCost(call),0)>6)throw new SolutionResponseError('calculation_limit','The bounded calculation limit was reached. No proposal was saved.');
   input.push(...output.items);
   for(const call of output.calls){
    abort(signal);toolCalls++;operations+=callCost(call);let result:unknown;
