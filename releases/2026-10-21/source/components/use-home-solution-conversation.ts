@@ -11,7 +11,7 @@ import {requiredStaffingPlanIdentity} from '@/lib/home-required-staffing-plan';
 import {currentRequiredStaffing,resolveStaffingDeliveryTarget,retainStaffingDeliveryTarget} from '@/lib/home-required-staffing';
 import {prepareRequiredStaffingPlan,requiredStaffingPlanFields} from '@/lib/home-required-staffing-plan-save';
 import {prepareHiringPlan,prepareConditionalHiringPlan,hiringPlanFields,type HiringPlanSelection} from '@/lib/home-hiring-plan-save';
-import {currentHiringBudget,editHiringBudgetLocally} from '@/lib/home-hiring-budget';
+import {currentHiringBudget,editHiringBudgetLocally,restoreHiringBudgetBaseline,type HiringBudgetReview} from '@/lib/home-hiring-budget';
 import type {HiringBudgetInput} from '@/lib/hiring-budget';
 import {readChatEvidenceSeries,type ChatEvidenceSeries} from '@/lib/chat-evidence-series';
 import {prepareBusinessPlanningSelection,businessPlanningSelectionFields,businessPlanningReceiptField,type BusinessPlanningSelection} from '@/lib/home-business-planning-save';
@@ -182,6 +182,11 @@ export function useHomeSolutionConversation(props:Props){
   if(inputs!==null&&!previous)throw Error('The hiring estimate changed.');
   persist({...memoryRef.current,conditionalHiringPlan:inputs===null?false:memoryRef.current.conditionalHiringPlan,hiringBudget:inputs===null?null:editHiringBudgetLocally(previous!,inputs),currentCalculationKinds:inputs===null?memoryRef.current.currentCalculationKinds?.filter(kind=>kind!=='hiring'):memoryRef.current.currentCalculationKinds});
  }
+ function resetHiringScenario(baseline:HiringBudgetReview){
+  if(controller.current||pending||saving)throw Error('Wait for the current request before resetting.');
+  requireReviewedHiringInputs();requireCurrent();const previous=currentHiringBudget(makeRequest('Reset local scenario adjustments.'),decisionStore.getDatasetToken());if(!previous)throw Error('The hiring estimate changed.');
+  persist({...memoryRef.current,hiringBudget:restoreHiringBudgetBaseline(previous,baseline)});
+ }
  async function reviewHiringPlan(externalHires:number|null){
   requireReviewedHiringInputs();
   const snapshot=requireCurrent(),request=makeRequest('Review the hiring route.'),review=currentHiringBudget(request,decisionStore.getDatasetToken());if(!review)throw Error('The hiring estimate changed.');
@@ -218,5 +223,5 @@ export function useHomeSolutionConversation(props:Props){
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
  const storedVisual=(goal.id?storage.data.workspaces[goal.id]:storage.data.exploration)?.fields[homeAnswerVisualField];
  const restoredAnswerSeries=restoreHomeAnswerVisual(storedVisual,JSON.stringify([props.scope,props.query]),decisionStore.getDatasetToken(),memory.turns);
- return {restoredAnswerSeries,staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {resetHiringScenario,restoredAnswerSeries,staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }

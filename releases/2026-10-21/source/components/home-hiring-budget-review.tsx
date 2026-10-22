@@ -1,4 +1,5 @@
 'use client';
+import {HiringScenarioControls} from './hiring-scenario-controls';
 import {AssumptionsDisclosure} from '@/components/assumptions-disclosure';
 import {useState,type ReactNode} from 'react';
 import {HiringPlanningSummary} from './hiring-planning-summary';
@@ -8,8 +9,9 @@ const labels:Record<HiringBudgetField,string>={role:'Comparable role',level:'Lev
 const number=(value:number|null)=>value===null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:2});
 const control='mt-1 block min-h-11 w-full rounded border bg-background p-2';
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50';
-type Props={children?:ReactNode;recommended?:boolean;onDirtyChange?:(dirty:boolean)=>void;review:HiringBudgetReview;onUpdate:(inputs:HiringBudgetInput|null)=>void;disabled:boolean};
-export function HomeHiringBudgetReview({review,onUpdate,onDirtyChange,disabled,children,recommended=false}:Props){
+type Props={children?:ReactNode;recommended?:boolean;onDirtyChange?:(dirty:boolean)=>void;review:HiringBudgetReview;onUpdate:(inputs:HiringBudgetInput|null)=>void;onRestore?:(baseline:HiringBudgetReview)=>void;disabled:boolean};
+export function HomeHiringBudgetReview({review,onUpdate,onRestore,onDirtyChange,disabled,children,recommended=false}:Props){
+ const [editorEdit,setEditorEdit]=useState<{key:string;dirty:boolean}|null>(null);const reviewKey=JSON.stringify(review),editorDirty=editorEdit?.key===reviewKey&&editorEdit.dirty;
  const result=calculateHiringBudget(review.inputs,review.datasetToken),salary=result.salary,unit=review.inputs.currency??'currency unspecified';
  const money=(v:number|null)=>v===null?'Unknown':`${number(v)} ${unit}`;
  return <section aria-label="Hiring budget estimate" className="space-y-3 rounded border p-3 text-sm">
@@ -18,6 +20,7 @@ export function HomeHiringBudgetReview({review,onUpdate,onDirtyChange,disabled,c
   {Object.values(review.origins).some(b=>b.kind==='model-proposed')&&<p className="font-medium">Model-proposed scenario assumptions · unconfirmed</p>}
   {result.annualBasePayCeiling!==null&&<p><strong>Annual base-pay ceiling per hire:</strong> {money(result.annualBasePayCeiling)} before any unlisted costs. This is a spending limit under the entered timing and cost assumptions, not a salary estimate or proof that hiring is feasible.</p>}
   <p><strong>Budget check:</strong> {review.inputs.budget===null?'Budget not provided; affordability not assessed':result.budgetStatus==='within'?'Within the entered period budget, subject to the stated cost coverage':result.budgetStatus==='over'?'Known costs exceed the budget':'Unknown until costs, currency and coverage are supplied'}. Hiring feasibility remains unverified.</p>
+  {onRestore&&<HiringScenarioControls review={review} onUpdate={onUpdate} onRestore={onRestore} disabled={disabled||editorDirty}/>}
   {children}
   <details><summary className="min-h-11 cursor-pointer py-2">Calculation details and unknowns</summary><div className="space-y-3">
   {result.budgetPerHire===null&&<p><strong>Budget allowance per hire:</strong> Unknown</p>}
@@ -29,7 +32,7 @@ export function HomeHiringBudgetReview({review,onUpdate,onDirtyChange,disabled,c
   {result.rateSource==='scenario-override'&&<p>The base-pay override is an unverified scenario input. Benefits, employer costs and recruiting fees are separate.</p>}
   {!!result.missing.length&&<div><p>Unknowns ({result.missing.length})</p><ul className="list-disc pl-5">{result.missing.map(line=><li key={line}>{line}</li>)}</ul></div>}
   </div></details>
-  <HiringBudgetEditor key={JSON.stringify(review)} review={review} onUpdate={onUpdate} onDirtyChange={onDirtyChange} disabled={disabled}/>
+  <HiringBudgetEditor key={JSON.stringify(review)} review={review} onUpdate={onUpdate} onDirtyChange={dirty=>{setEditorEdit({key:reviewKey,dirty});onDirtyChange?.(dirty);}} disabled={disabled}/>
   <AssumptionsDisclosure><ul className="list-disc pl-5">{Object.entries(review.origins).map(([field,basis])=><li key={field}>{labels[field as HiringBudgetField]}: {basis.kind.replaceAll('-',' ')} — {basis.explanation}{basis.quote?` “${basis.quote}”`:''}</li>)}</ul>{result.limitations.map(line=><p key={line}>{line}</p>)}</AssumptionsDisclosure>
  </section>;
 }

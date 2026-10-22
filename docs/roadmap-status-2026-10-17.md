@@ -1,3 +1,10 @@
+## October 22, 21:40 UTC implementation checkpoint
+
+- PR353 is live: complete 50-role recruiting comparisons correctly report the 33-day tie, generic categorical tables/bars occupy the right pane, and the latest scoped visual survives reload. Runtime `1861c2d65349e86fdb50ef6ee03c10fd72394be4`; deployment `dpl_7J8bfcisP5A52uw7nVMu1RqZfUCK`. Protected desktop/mobile and production browser replay passed. No fresh model calls were made for that increment.
+- PR354: three compact hiring controls (hires, optional period budget, planning horizon) use the existing calculator. Edited cost and monthly presence visual survive reload; reset restores original provenance. Local desktop/mobile replay, independent review, TS/lint/build passed. Protected verification and promotion are pending at this checkpoint.
+- Mixed develop/move/hire allocation controls remain unfinished. Existing pool maxima are availability assumptions, not allocations; they must not be relabeled as mix sliders. The next increment must validate an explicit selected mix, reuse the shared calculation and save adapter, and invalidate stale recommendation claims when the mix changes.
+- No paid calls, cap/ledger changes, uncertain-hold releases or new access in these increments. The existing approximately $3 test batch has about $0.137144 left, not $0.99.
+
 # Workforce app roadmap — updated October 22, 2026
 
 This existing roadmap now tracks the latest owner requests. The October 17 reconciliation below remains historical. Prioritize answer/visual reliability, then prompt assistance and compact recommendation controls. Do not interpret shipped samples as unrestricted model acceptance.
