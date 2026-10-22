@@ -1,0 +1,31 @@
+# Public synthetic MVP: bounded acceptance status
+
+Evidence reconciled October 22, 2026. This is a completion boundary for the existing public workforce/planning app, not a promise of unrestricted analytics or enterprise readiness.
+
+Last verified application release: runtime `17ecb9d9378fe3554a4eec176c982e55870abe6f`, public PR344 merge `772fd5c698c6e4dfaccfaff0504a7868971cb98a`, deployment `dpl_61kXG5GEHrqaubja2iHy6hUG6uEv`. Subsequent recovery PRs are source-only and do not change that application. Earlier release evidence below is retained evidence, not a claim that every flow was freshly rerun on the latest build.
+
+| Required user journey | Shipped and verified evidence | Remaining qualification |
+|---|---|---|
+| Ordinary staffing question through calculated options | A fresh production Finance/L8/six-additional-FTE request completed four model rounds and three tools. Explicit synthetic inputs yielded six options; develop2/move2/hire2 cost $100,000.04 with no uncovered hours; six hires cost $252,000 and exceeded the entered $240,000 ceiling. | This proves one complete interpreted scenario, not every paraphrase. Costs and internal availability were explicit test assumptions, not observed employee data. |
+| Planning before Finance approves a budget | Fresh model initial estimate and natural confirmation follow-up passed on PR343: constructed global USD base-pay policy, explicit exclusions, no approved-budget state inferred. | An estimate is not an affordability ceiling or loaded cost. Arbitrary department/job/location joins remain unsupported. |
+| Changed budget, timing, capacity and available internal pools | Shared-tool replay covers tight/infeasible budgets, delayed arrivals, changed quantity/horizon, unknown cost, zero internal pools, unknown versus zero budget, and restoration of a ceiling without mutating prior state. | Authored tool arguments validate calculations/state, not fresh natural-language interpretation of every change. |
+| Guided and ordinary same explicit inputs | Shared calculation/presentation/save adapters; production desktop/mobile browser journeys and captured interpretation replay compare options, natural budget follow-up, partial-month shortages and explicit assumptions. | Bare gap/budget wording does not contain all example assumptions. Ordinary clarification remains necessary; no hidden example defaults. |
+| Correct visuals and save/reopen | Hosted desktop/mobile checks cover right-pane options, review/save/reload/reopen, deterministic headcount topic switch, retained draft and responsive split. Captured live Finance answers also exercised this browser journey. | Browser replay proves UI/state mechanics, not a fresh provider call on reopening. Multipart analytics output is not a new saved-chart feature. |
+| Historical and combined supported scope | Fresh model US/L8/2025 headcount plus FTE request returned two complete 12-month series. Natural Canada follow-up retained year/level and returned only FTE. Every point matched independently fetched dashboard data. | Supports verified country/BU/level contracts; no invented historical pay or unsupported intersections. |
+| Multipart and topic changes | Actual-route/local tests cover bounded independent parts, supported rankings and honest unsupported parts; fresh history-plus-FTE and country-switch evidence above. Mobile captured-live replay removed stale US/headcount visuals. | Not every multipart/domain combination has live-model acceptance. |
+| Existing dataset grounding | Shared provenance repair and complete eligible partitions cover supported survey, recruiting, learning, succession, positions, workforce/finance, pay/catalog and skills aggregates. Scope/date/metric checks remain mandatory. | Availability differs by domain. Sentiment is not interchangeable with engagement. Group-level descriptive comparisons do not establish individual correlation or causality; incompatible measurement windows must remain explicit. |
+| Recovery/handoff | Public synthetic reproduction, isolated accounting reconstruction, public analytics schema, and FOW/performance schema recovery are versioned and tested within documented boundaries. | These are handoff artifacts, not a production rollout, full data restore or a prerequisite for every public UI feature. |
+
+## Remaining acceptance blockers
+
+1. **Intermittent final-answer rejection remains unresolved.** The earlier owner Finance failure was classified `calculation_reference`; the final response was not retained, so its exact failing subcheck cannot be recovered. Shared eligibility/diagnostic hardening and later successful calls do not prove it permanently fixed. A new occurrence needs its safe classification and retained allowed evidence before a targeted repair/retest; do not repeatedly charge for blind retries.
+2. **Coverage has limits, not a blanket pass.** Unsupported historical measures, arbitrary department/BU joins and unavailable dimensions should produce useful, specific limitations. New supported-domain claims require an explicit source/scope contract and representative tests. A finite representative matrix is the acceptance target, not all possible questions.
+3. **Operational verification windows must stay current.** Existing coordinated pricing, rollout, ceiling and settlement checks remain an ongoing dependency. Renewal must preserve cumulative spend, liabilities, permissions and safeguards; it is not a budget reset.
+
+## Stop boundary and deferred work
+
+This increment closes bounded populated recovery checks and records the evidence matrix. Do not grow it into an indefinite full-app reconstruction program. The next user-facing work should follow a reproducible shared-path failure or a specific unsupported capability request, not another speculative architecture project.
+
+Deferred: welcome popup/video; live-company ingestion, tenancy and enterprise persistence; new forecasting realism assumptions; unrestricted raw-record analysis; and unrelated legacy FOW features. The current FOW UI is a local illustrative capacity calculator, not the recovered legacy scoring system.
+
+Private captures and accounting receipts remain outside the public repository. No new paid calls are necessary to publish this evidence boundary.
