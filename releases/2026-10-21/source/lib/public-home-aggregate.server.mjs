@@ -26,7 +26,7 @@ export async function readPublicWorkforceHistory({binding,hostname,identity,args
  const receipt=readDashboardScopeReceipt(data.workforce_filter_scope);
  if(!receipt||receipt.status!=='verified_public_aggregate'||!same(receipt.requested,filters)||!same(receipt.effective,filters))return {answer:'The requested country, business-unit and level intersection is not verified. Use catalog codes from the workforce filters. Departments and business units are not interchangeable; no company-wide result was substituted.'};
  const result=queryWorkforceHistory(data,args);
- const scope=catalogDisplayLabel(receipt.label).replace(/[\\`*_[\]<>]/g,'');
+ const scope=receipt.label.split(';').map((label,i)=>i===0&&filters.country!=='all'?countryDisplayLabel(label.trim(),filters.country):catalogDisplayLabel(label.trim())).join('; ').replace(/[\\`*_[\]<>]/g,'');
  const chart=result.status==='available'&&result.points.length>=2?{version:1,requestId,datasetToken:P.token,packetSha256:createHash('sha256').update(JSON.stringify({digest:identity.digest,filters,args,points:result.points})).digest('hex'),kind:'recorded',synthetic:true,metric:args.metric,title:args.metric==='fte'?'FTE snapshots':'Headcount snapshots',unit:result.unit,sourceId:'W1',scope,asOf:P.cutoff,limitation:'Complete requested month-end stock series from the verified synthetic joint aggregate. No rates or causal inference.',sampled:false,omitted:0,points:result.points}:undefined;
  return {...result,chart,answer:`Scope: ${scope}. Source: recorded workforce dashboard, as of ${P.cutoff}.\n\n${result.answer}`};
 }

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "822516a9c1db69240ac1256c17dad8545579b697",
+  "sourceCommit": "17ecb9d9378fe3554a4eec176c982e55870abe6f",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -3629,8 +3629,8 @@
     },
     {
       "path": "lib/public-home-aggregate.server.mjs",
-      "sha256": "72feb3217d99d38d949bfd1270dbf7315d1fd8b281591d6d20b72f85a6af37ff",
-      "bytes": 8822
+      "sha256": "da14f873c48530a2dcef5692c02b214db57038a6e8fd31bff21268fa39dc56c0",
+      "bytes": 8954
     },
     {
       "path": "lib/home-pay-catalog-aggregates.mjs",
@@ -3804,10 +3804,10 @@
     },
     {
       "path": "tests/home-dataset-query.test.mjs",
-      "sha256": "4b3bdd33f83e7d95636bd2f04127af1a4fbc62e1aa6d73170705355d931095f6",
-      "bytes": 5036
+      "sha256": "d51375ba0b7813729c082ed93c6c35aa634ac3359c44a32d3a6438cecad5e792",
+      "bytes": 5111
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "eb84b89d44d2f2c75e912496438ced67e7991202845a2e2d13083557e6344d6c"
+  "verifiedDeployedArchiveSha256": "d9bb2c4d0c01ff34f73719e4192c30c38462fcc43405c72c0999397ef52f7c76"
 }
