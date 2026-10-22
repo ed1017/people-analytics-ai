@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "81ff553863dff4b9c33ad8f5839df31a6f412699",
+  "sourceCommit": "e213d60a85654b24eb9930a2e36e82a231bb84b7",
   "deployment": "pending-staged-production-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -539,13 +539,13 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "703055acb6a472d0e5e1895b04daab5f2d827f093f483ecdebc3361303beab66",
-      "bytes": 17749
+      "sha256": "65d3dee98b059da30741162ff9a724d73bbbf584a223e481cd9868ad07994b45",
+      "bytes": 18334
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "205338ce8c6839ff72e3f2b5cf6ca11f9e2d7be3311fa867162aaae2eb8e1c4b",
-      "bytes": 16686
+      "sha256": "46b4d9badfea44379bd783ceb9eae90f7412464cfc8b61250eebdd4d4fe6f8c9",
+      "bytes": 17003
     },
     {
       "path": "components/home-data-status.tsx",
@@ -2229,8 +2229,8 @@
     },
     {
       "path": "lib/home-kpi-source.ts",
-      "sha256": "a9396843090fb300fb5aeaeba1b3cb2ac000d41aed4237b6b982b2d3c7806a4d",
-      "bytes": 2407
+      "sha256": "484efb5a52eb4b92c360fb17291bfff9b0a2f346457292fc0d5cae2beaaa5d6d",
+      "bytes": 2987
     },
     {
       "path": "lib/home-linked-attachment.ts",
@@ -3673,5 +3673,5 @@
       "bytes": 1627
     }
   ],
-  "candidateArchiveSha256": "1ebde8498039225d7851e2fbdb25f3f8d09cced628b86aa25f59776dccb48a9a"
+  "candidateArchiveSha256": "4c8669099528668571877e59189d71410b4630bd9c5214921410f42634cbefd6"
 }
