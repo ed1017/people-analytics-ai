@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {restoreHomeAnswerVisual} from '../lib/home-answer-visual-save.ts';
+const series={version:1,requestId:'r',datasetToken:'t',packetSha256:'a'.repeat(64),kind:'recorded',synthetic:true,axis:'scalar',metric:'median_time_to_fill_days',title:'Median time to fill',unit:'days',sourceId:'R1',scope:'Company-wide',asOf:'2026-09-30',limitation:'Recorded median',sampled:false,omitted:0,points:[{date:'2026-09-30',value:33}]};
+const saved={version:1,context:'scope',datasetToken:'t',requestId:'r',question:'Time to fill?',answer:'33 days',series:[series]},turns=[{role:'user',text:saved.question},{role:'assistant',text:saved.answer}];
+test('latest visual survives serialization linked to exact question, answer, dataset and scope',()=>{assert.equal(restoreHomeAnswerVisual(JSON.parse(JSON.stringify(saved)),'scope','t',turns).length,1);});
+test('reset, topic switch, changed dataset/scope and malformed chart never restore old visual',()=>{for(const [raw,context,token,t]of [[saved,'scope','t',[]],[saved,'scope','new',turns],[saved,'new','t',turns],[saved,'scope','t',[...turns,{role:'user',text:'Different topic'}]],[saved,'scope','t',[{role:'user',text:'Another question'},turns[1]]],[{...saved,series:[null]},'scope','t',turns]])assert.deepEqual(restoreHomeAnswerVisual(raw,context,token,t),[]);});
