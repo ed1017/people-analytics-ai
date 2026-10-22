@@ -264,3 +264,5 @@
 .welcome .demoNote { margin: 0; }
 .welcome .composer { margin-top: 4px; }
 .welcome .historyFigure figcaption { margin-bottom: 6px; }
+
+.shell :global(.home-answer-empty) { padding: 4px 0; font-size: 14px; line-height: 1.5; color: var(--muted-foreground); overflow-wrap: anywhere; }

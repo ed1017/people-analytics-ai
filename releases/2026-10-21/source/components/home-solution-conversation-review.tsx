@@ -59,7 +59,7 @@ function Proposal({item,controller,goal,number:proposalNumber,recommended=false,
 
  </section>;
  return <article id={proposalAnchor(item.id)} tabIndex={-1} aria-label={`Working proposal: ${item.candidate.name}`} className={`min-w-0 space-y-3 rounded border p-3 text-sm focus-visible:ring-2 focus-visible:ring-ring ${recommended?'border-primary bg-muted/30':''}`}>
-  <p className="inline-flex rounded bg-muted px-2 py-1 text-xs font-medium">{recommended?'Recommended':`Alternative ${proposalNumber}`}{saved?' · saved':''}</p>
+  <p className={recommended?"whitespace-normal break-words text-sm font-bold":"inline-flex rounded bg-muted px-2 py-1 text-xs font-medium"}>{recommended?'My recommendation based on the information you’ve provided':`Alternative ${proposalNumber}`}{saved?' · saved':''}</p>
   <h3 aria-label={recommended?'Recommendation summary':undefined} className="font-semibold">{item.candidate.name} · revision {item.revision}</h3>
   <ActionPlanQuickSummary compact draft={item.draft} result={item.result} fallbackActions={item.candidate.activities}/>
   {[...item.blocking,...(stale?['Current constraints changed. Refine this proposal in chat before saving.']:[])].map((line,index)=><p key={index} role="status">{line}</p>)}
