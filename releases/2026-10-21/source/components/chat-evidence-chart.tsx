@@ -3,13 +3,20 @@ import type {ChatEvidenceSeries} from '@/lib/chat-evidence-series';
 /** Discrete sampled periods; no line interpolates missing months or projects future values. */
 export function ChatEvidenceChart({series}:{series:ChatEvidenceSeries}){
  const scope=series.scope.replace(/^(?:Selected workforce snapshot:\s*)+/,'');
+ if(series.axis==='scalar')return <figure aria-label={series.title+' for this answer'} className="my-3 min-w-0 space-y-2 rounded-lg border p-4 text-base">
+  <figcaption className="font-semibold">{series.title}</figcaption>
+  <p className="text-3xl font-semibold tabular-nums">{series.points[0].value.toLocaleString('en-US',{maximumFractionDigits:2})} <span className="text-lg">{series.unit}</span></p>
+  <p>{scope} · as of {series.asOf}</p>
+  <p>Recorded {series.synthetic?'synthetic ':''}median, not a forecast.</p>
+  <AssumptionsDisclosure><p>[{series.sourceId}] {series.limitation}</p></AssumptionsDisclosure>
+ </figure>;
  const max=Math.max(1,...series.points.map(point=>point.value));
  const format=(value:number)=>value.toLocaleString('en-US',{maximumFractionDigits:2})+(series.unit==='%'?'%':'');
  return <figure aria-label={series.title+' for this answer'} className="my-3 min-w-0 space-y-2 rounded-lg border p-3 text-base">
   <figcaption className="font-semibold">{series.title} · {series.unit}</figcaption>
   <p>{scope} · recorded {series.synthetic?'synthetic ':''}aggregate, not a forecast</p>
-  <div role="region" aria-label="Recorded period chart; scroll to see all months" tabIndex={series.points.length>3?0:undefined} className="overflow-x-auto focus-visible:ring-2 focus-visible:ring-ring"><div className="grid gap-3" style={{gridTemplateColumns:`repeat(${series.points.length},minmax(${series.points.length>3?'5rem':'0'},1fr))`}}>{series.points.map(point=><div key={point.date} className="min-w-0 text-center"><p className="font-semibold">{format(point.value)}</p><div aria-hidden="true" className="mt-1 flex h-20 items-end justify-center border-b"><div className="w-10 max-w-full rounded-t bg-primary" style={{height:`${point.value/max*100}%`}}/></div><p className="mt-1 break-words">{point.date}</p></div>)}</div></div>
-  <p>Selected periods only · as of {series.asOf}{series.omitted?` · ${series.omitted} unavailable period(s) omitted`:''}</p>
-  <AssumptionsDisclosure><p>[{series.sourceId}] {series.limitation}</p><p>Missing periods are not filled. Monthly rates are not YTD rates.</p></AssumptionsDisclosure>
+  <div role="region" aria-label={series.axis==="business-unit"?"Business-unit comparison; scroll to see all groups":"Recorded period chart; scroll to see all months"} tabIndex={series.points.length>3?0:undefined} className="overflow-x-auto focus-visible:ring-2 focus-visible:ring-ring"><div className="grid gap-3" style={{gridTemplateColumns:`repeat(${series.points.length},minmax(${series.points.length>3?'5rem':'0'},1fr))`}}>{series.points.map(point=><div key={point.date} className="min-w-0 text-center"><p className="font-semibold">{format(point.value)}</p><div aria-hidden="true" className="mt-1 flex h-20 items-end justify-center border-b"><div className="w-10 max-w-full rounded-t bg-primary" style={{height:`${point.value/max*100}%`}}/></div><p className="mt-1 break-words">{point.date}</p></div>)}</div></div>
+  <p>{series.axis==="business-unit"?"All eight business units":"Selected periods only"} · as of {series.asOf}{series.omitted?` · ${series.omitted} unavailable period(s) omitted`:''}</p>
+  <AssumptionsDisclosure><p>[{series.sourceId}] {series.limitation}</p><p>{series.axis==="business-unit"?"YTD rates use matching average month-end headcounts, not current headcount. Total and voluntary turnover are different measures.":"Missing periods are not filled. Monthly rates are not YTD rates."}</p></AssumptionsDisclosure>
  </figure>;
 }
