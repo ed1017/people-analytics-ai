@@ -16,6 +16,11 @@ export function conditionalHiringPlanFacts(raw:ConditionalHiringPlanReceipt){
 }
 export function canReviewCostedHiringPlan(review:HiringBudgetReview){return review.inputs.currency==='USD'&&calculateHiringBudget(review.inputs,review.datasetToken).listedCost!==null&&review.inputs.ftePerHire!==null;}
 export function canReviewConditionalHiringPlan(review:HiringBudgetReview){try{conditionalHiringPlanFacts({version:2,kind:'conditional',review});return true;}catch{return false;}}
+/** Match model presentation guidance to the same eligibility checks used by final validation. */
+export function hiringAnswerContract(review:HiringBudgetReview){
+ const costed=canReviewCostedHiringPlan(review),conditional=canReviewConditionalHiringPlan(review)&&!costed;
+ return {allowedAnswerKinds:costed?['recommendedPlan','unsupportedPlan']:conditional?['conditionalHiringPlan']:['discussionOnly'],presentation:costed?'Use the exact current hiring calculation reference for a costed plan; preserve all unknowns and operational limits.':conditional?'Use conditionalHiringPlan with the exact current hiring calculation reference. Count and budget support only an allowance, not verified salary, affordability or availability.':'Count and budget do not yet support a conditional hiring plan. Use discussionOnly to explain the checked inputs and ask for the missing count or budget. Do not return conditionalHiringPlan, invent a budget, or claim a calculated recommendation.'};
+}
 /** Native hiring inputs remain intact; a reviewed route count never replaces required roles. */
 export function hiringPlanFacts(raw:CostedHiringPlanReceipt){
  if(!raw||Object.keys(raw).sort().join()!=='externalHires,review,version'||raw.version!==1)throw Error('Invalid hiring plan receipt.');

@@ -107,7 +107,7 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
    const message=admission?(completedRounds===0?'AI could not start this answer because spending approval is unavailable. Ask the app owner to check the remaining budget or budget service before retrying.':'AI could not finish this answer because spending approval for the next step is unavailable. Ask the app owner to check the budget before retrying.')
     :signal.aborted?'This answer took too long or was cancelled. No completed answer was saved. You can review your question and send it again.'
     :stage==='validation'?'This request or its current evidence could not be checked. Refresh Home, review the selected scope, and try again.'
-    :'AI could not complete a verified answer. Review your question before trying again.';
+    :'The AI response could not be verified. This is an app processing failure, not a problem with your question. No completed answer was saved.';
    return Response.json({error:message,correlationId:diagnostic.correlationId,code:admission?'planner_admission_unavailable':signal.aborted?'home_request_interrupted':stage==='validation'?'home_request_unverified':'home_answer_unavailable',...(roundLimit===2?{boundedRequest:{maxModelRounds:2,completedRounds,stage}}:{})},{status:admission?429:503,headers});}
 
   finally{clearTimeout(timer);controller.abort();}

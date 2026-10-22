@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "39798c5fce9597c18adc14165fbea8047dfa8b05",
+  "sourceCommit": "7f2f754ac261acc3dc9c4e1a39cd2a97c7c1c88a",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -2214,8 +2214,8 @@
     },
     {
       "path": "lib/home-hiring-plan.ts",
-      "sha256": "fd04b344ebdece48e57103d3e69b7944740b1e88b39ebe25c2927e7ca661b044",
-      "bytes": 8756
+      "sha256": "d6198794a6d5848a468dfaf2b41003c6b28f77960cd2e95707f979a4639abbd8",
+      "bytes": 9736
     },
     {
       "path": "lib/home-history-selection.ts",
@@ -2459,13 +2459,13 @@
     },
     {
       "path": "lib/home-solution-conversation-schema.ts",
-      "sha256": "f2f7410c284be2d50e232be743485adadad9537100b213b61d02c35a79a632e0",
-      "bytes": 39219
+      "sha256": "30527a1fe04578ddce025e8665a22ff3d0ff0b343410344172a45bde7958c3ea",
+      "bytes": 39301
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "e1f49354e845ab64665d5d215b1adb343c22ffe5efbc581bb7e4ca950962ec63",
-      "bytes": 41396
+      "sha256": "dc2ba0919b65097a80aed161db23cba0117ef61833cf8cf9c882db83866aca74",
+      "bytes": 41732
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -2474,8 +2474,8 @@
     },
     {
       "path": "lib/home-solution-diagnostics.ts",
-      "sha256": "c757bad30772e5023d15b226d948a04d6113403e35c357b0dd1feb20262e0147",
-      "bytes": 12471
+      "sha256": "ad83f764d974941055bcf6c219be7cc52113c9927cc2710bb02889b9b1b9e8ec",
+      "bytes": 12650
     },
     {
       "path": "lib/home-solution-grounding-source.ts",
@@ -2514,8 +2514,8 @@
     },
     {
       "path": "lib/home-solution-response-failure.ts",
-      "sha256": "0291b0b73b7178fba7caac54b37c3a931f3cd3dd3f79e36a6c9ac29c2d395741",
-      "bytes": 599
+      "sha256": "966bcaf98ac29f1b7d1bdbd6bb0fe998a93350261b085a3d09f3957ee28b86ef",
+      "bytes": 1053
     },
     {
       "path": "lib/home-source-client.ts",
@@ -2994,8 +2994,8 @@
     },
     {
       "path": "lib/public-home-route.server.mjs",
-      "sha256": "5a5499f31cbbe71c55dc89356d23f01bd9facd575614a67c9437bb4d42f2ade9",
-      "bytes": 12879
+      "sha256": "d59e6e5b6f2e1e2fd79e08b53eaf52dac1a8bdfee5354c27108fe8b1dd905398",
+      "bytes": 12935
     },
     {
       "path": "lib/public-other-routes.server.mjs",
@@ -3766,8 +3766,13 @@
       "path": "tests/model-planning-context.test.mjs",
       "sha256": "a59d2b1916a4c30c5216a18f825b8c1afc4c8971942f53ddd794fa622c4e6f69",
       "bytes": 2692
+    },
+    {
+      "path": "tests/hiring-answer-contract.test.mjs",
+      "sha256": "c3ba477014d873d3b753869b670a2ff392969f936aeb0f404a848eb8c29f14a2",
+      "bytes": 2361
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "7878487ca964e86156448aef1b5e15b93162215b54a7e3f7f94f335a018a071a"
+  "verifiedDeployedArchiveSha256": "1a3581c92bdc2357582e39824015ed27b6b8a1da8a9e77d3934dfc843cad512a"
 }

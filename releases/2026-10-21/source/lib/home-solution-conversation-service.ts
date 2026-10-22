@@ -8,7 +8,7 @@ import type {createPublicHomeGrounding} from './public-home-grounding.server.mjs
 // @ts-expect-error Native fixtures share source.
 import {captureStaffingDelivery} from './home-staffing-delivery.ts';
 // @ts-expect-error Native fixture tests share source.
-import {canReviewConditionalHiringPlan,canReviewCostedHiringPlan} from './home-hiring-plan.ts';
+import {canReviewConditionalHiringPlan,canReviewCostedHiringPlan,hiringAnswerContract} from './home-hiring-plan.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {SolutionResponseError} from './home-solution-response-failure.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -286,7 +286,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
     }
     const planningKind:PlanningCalculationKind|null=call.name==='review_hiring_budget'?'hiring':call.name==='compare_required_staffing'?'fixed-staffing':call.name==='project_headcount'?'projection':['review_service_demand','revise_service_demand','review_scoped_service_demand','revise_scoped_service_demand','compare_service_staffing'].includes(call.name)?'workload':null;
     const planningBinding=planningKind?await planningCalculationRef(planningKind,request,state,demandReview,planningKind==='projection'?(args.spec as ProjectionSpec).id:undefined):null;
-    if(planningBinding&&result&&typeof result==='object')result={...result,planningGuidance:planningCalculationFeedback(planningBinding)};
+    if(planningBinding&&result&&typeof result==='object')result={...result,planningGuidance:{...planningCalculationFeedback(planningBinding),...(planningKind==='hiring'&&state.hiringBudget?hiringAnswerContract(state.hiringBudget):{})}};
 
     if(JSON.stringify(result).length>65000){coFinalEligible=false;toolStatus='feedback';if(call.name===requiredStaffingTool.name)staffingCalculated=false;result={ok:false,error:'The read result exceeds the tool budget. Request fewer source IDs.'};}else if(planningBinding)planningRefs.set(planningBinding.reference,planningBinding);
    }catch(error){coFinalEligible=false;toolStatus=signal.aborted?'aborted':'feedback';abort(signal);result={ok:false,error:error instanceof Error?error.message:'The read or calculation was unavailable.',instruction:'Explain the boundary, ask a focused question, or revise typed inputs. Do not claim this calculation succeeded.'};}
@@ -323,23 +323,23 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  state.constraints=mergeSolutionConstraints(request,state.constraints,final.constraintUpdates);
  if(typeof final.answer!=='string'&&('recommendedPlan' in final.answer||'unsupportedPlan' in final.answer||'conditionalHiringPlan' in final.answer)){
   const refs=('recommendedPlan' in final.answer?final.answer.recommendedPlan:'conditionalHiringPlan' in final.answer?final.answer.conditionalHiringPlan:final.answer.unsupportedPlan).calculationRefs;
-  if('conditionalHiringPlan' in final.answer&&(!state.hiringBudget||!canReviewConditionalHiringPlan(state.hiringBudget)||canReviewCostedHiringPlan(state.hiringBudget)||refs.length!==1||planningRefs.get(refs[0])?.kind!=='hiring'))throw new SolutionResponseError('calculation_reference','A conditional hiring plan needs the current count-and-budget calculation.');
-  if(planningRefs.size&&!refs.length)throw new SolutionResponseError('calculation_reference','Use the current checked planning references for this outcome.');
-  if(new Set(refs).size!==refs.length)throw new SolutionResponseError('calculation_reference','Use distinct checked planning references.');
+  if('conditionalHiringPlan' in final.answer&&(!state.hiringBudget||!canReviewConditionalHiringPlan(state.hiringBudget)||canReviewCostedHiringPlan(state.hiringBudget)||refs.length!==1||planningRefs.get(refs[0])?.kind!=='hiring'))throw new SolutionResponseError('calculation_reference','A conditional hiring plan needs the current count-and-budget calculation.','conditional_hiring_ineligible');
+  if(planningRefs.size&&!refs.length)throw new SolutionResponseError('calculation_reference','Use the current checked planning references for this outcome.','missing_planning_reference');
+  if(new Set(refs).size!==refs.length)throw new SolutionResponseError('calculation_reference','Use distinct checked planning references.','duplicate_planning_reference');
   for(const ref of refs){
    const known=planningRefs.get(ref),current=known?await planningCalculationRef(known.kind,request,state,demandReview,known.analysisId):null;
-   if(!known||!current||current.reference!==ref)throw new SolutionResponseError('calculation_reference','The recommended plan must reference the current checked inputs and results from this turn.');
+   if(!known||!current||current.reference!==ref)throw new SolutionResponseError('calculation_reference','The recommended plan must reference the current checked inputs and results from this turn.','unknown_or_stale_planning_reference');
   }
  }
 
- if(new Set(final.candidateIds).size!==final.candidateIds.length||final.candidateIds.some(id=>!evaluated.has(id))||new Set(final.analysisIds).size!==final.analysisIds.length||final.analysisIds.some(id=>!analyses.has(id)))throw new SolutionResponseError('calculation_reference','The answer references a proposal or analysis that was not checked in this turn.');
+ if(new Set(final.candidateIds).size!==final.candidateIds.length||final.candidateIds.some(id=>!evaluated.has(id))||new Set(final.analysisIds).size!==final.analysisIds.length||final.analysisIds.some(id=>!analyses.has(id)))throw new SolutionResponseError('calculation_reference','The answer references a proposal or analysis that was not checked in this turn.','unchecked_proposal_reference');
  for(const id of final.candidateIds){const item=evaluated.get(id)!;if(!same(item.constraints,state.constraints)){item.blocking.push('Constraints changed after this calculation. Refine the proposal against the current constraints before saving.');}}
  for(const rejected of final.rejected){const item=latest(state.working).find(item=>item.id===rejected.candidateId);if(!item||!solutionUserTurns(request).some(turn=>turn.id===rejected.turnId))throw Error('The rejected idea has no current candidate or user-turn reference.');// Model rejection is interpretation only; the existing explicit review control owns rejection state.
   item.interpretations.push(`Proposed rejection (unconfirmed), turn ${rejected.turnId}: ${rejected.reason}`);}
  for(const ref of final.verifiedMetrics){
   const checked=ref.kind==='candidate'?evaluated.get(ref.id):analyses.get(ref.id);
-  if(!checked||checked.revision!==ref.revision)throw new SolutionResponseError('calculation_reference','A claimed quantitative result was not checked in this turn.');
-  try{resolveSolutionMetric(state,ref);}catch{throw new SolutionResponseError('calculation_reference','A claimed quantitative result has an invalid metric reference.');}
+  if(!checked||checked.revision!==ref.revision)throw new SolutionResponseError('calculation_reference','A claimed quantitative result was not checked in this turn.','unchecked_metric_reference');
+  try{resolveSolutionMetric(state,ref);}catch{throw new SolutionResponseError('calculation_reference','A claimed quantitative result has an invalid metric reference.','invalid_metric_reference');}
  }
  if([...planningRefs.values()].some(ref=>ref.kind==='hiring'))state.conditionalHiringPlan=typeof final.answer!=='string'&&'conditionalHiringPlan' in final.answer;
  state.currentCalculationKinds=[...([...planningRefs.values()].some(ref=>ref.kind==='hiring')?['hiring' as const]:[]),...(staffingCalculated?['required-staffing' as const]:[])];
