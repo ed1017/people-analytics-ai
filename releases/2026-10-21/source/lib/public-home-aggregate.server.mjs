@@ -8,6 +8,7 @@ import {aggregateRegistry,queryAggregate} from './home-aggregate-registry.mjs';
 import {catalogDisplayLabel,countryDisplayLabel} from './catalog-display.ts';
 import {readDashboardScopeReceipt} from './dashboard-scope.ts';
 import {queryWorkforceHistory} from './home-history-query.mjs';
+import {withBusinessUnitTurnover} from './home-bu-turnover.mjs';
 
 /** Same pinned dashboard source, with an explicit supported intersection per question. */
 export async function readPublicWorkforceHistory({binding,hostname,identity,args,signal,requestId}){
@@ -39,13 +40,13 @@ export function formatHomeAggregate(result){
   const keys=JSON.parse(row.id),label=result.registryId==='workforce.countries'?countryDisplayLabel(row.label,keys[0]):catalogDisplayLabel(row.label);
   // Labels are source text, not Markdown structure or model instructions.
   const plain=label.replace(/[\\`*_[\]<>]/g,'');
-  return `${row.rank}. ${plain}: ${row.value.toLocaleString('en-US',{maximumFractionDigits:10})} ${result.unit}`;
+  return `${row.rank}. ${plain}: ${row.value.toLocaleString('en-US',{maximumFractionDigits:result.registryId==="attrition.business_units"&&result.unit==="percent"?2:10})} ${result.unit}`;
  });
- return [title,result.scope,result.period,...labels,...(result.excludedGroups?[`${result.excludedGroups} groups are excluded: ${result.exclusionReason}. They are not ranked as zero.`]:[]),...(result.truncated?[`Showing ${result.returnedGroups} of ${result.eligibleGroups} eligible groups after ranking the whole released collection; ties at the cutoff are retained.`]:[]),...result.limitations].join('\n\n');
+ return [title,result.scope,result.registryId==='attrition.business_units'&&result.definition.startsWith('Total YTD turnover:')?'January-September 2026; all departures divided by matching average month-end headcount.':result.period,...labels,...(result.excludedGroups?[`${result.excludedGroups} groups are excluded: ${result.exclusionReason}. They are not ranked as zero.`]:[]),...(result.truncated?[`Showing ${result.returnedGroups} of ${result.eligibleGroups} eligible groups after ranking the whole released collection; ties at the cutoff are retained.`]:[]),...result.limitations].join('\n\n');
 }
 
 /** Uses only the already-authenticated server binding and reviewed public aggregate routes. */
-export async function readPublicHomeAggregate({binding,hostname,identity,filters,args,signal}){
+export async function readPublicHomeAggregate({binding,hostname,identity,filters,args,signal,requestId}){
  const must=value=>{if(!value)throw Error('Current aggregate evidence could not be verified.');};
  const current=()=>{signal.throwIfAborted();must(same(binding.router.current(),identity));};
  current();
@@ -57,14 +58,28 @@ export async function readPublicHomeAggregate({binding,hostname,identity,filters
  if(args.scope!=='company-wide'||!filters||Object.values(filters).some(value=>value!=='all'))return {answer:'This comparison is available only for the complete company-wide aggregate. The current filters are not applied to these groups. Clear the workforce filters and ask for a company-wide comparison, or use the supported filtered headcount view.'};
  const response=await binding.handle(new Request('https://'+hostname+definition.path,{headers:{'x-workforce-dataset':P.token},signal}));
  current();must(response.ok&&response.headers.get('x-workforce-dataset')===P.token);
- const data=await boundedJson(response.body,8*1024*1024,signal);current();
+ let data=await boundedJson(response.body,8*1024*1024,signal);current();
  must(data?.data_meta?.bundleDigest===identity.digest&&same(data.data_meta,public9037Metadata(identity.digest,data.data_meta)));
  let result;
- try{result=queryAggregate({registryId:args.registryId,metric:args.metric,order:args.order,limit:args.limit},data);}
- catch(error){current();return {answer:error?.message==='Tie group exceeds20-row bound; request cannot be truncated safely'?`More than 20 groups are tied at the requested cutoff in ${definition.id}. A shortened list would omit equally ranked groups, so no partial ranking is shown. Choose another supported measure or inspect the complete catalog.`:`The requested ${definition.id} comparison cannot be verified from the released aggregate: the metric, group completeness, date or suppression checks did not pass. No ranking is shown. Available metric names for this collection are ${Object.keys(definition.metrics).join(', ')}; current company-wide comparisons are the supported scope.`};}
+ try{
+  if(definition.id==='attrition.business_units'&&args.metric==='total_turnover_ytd_pct'){
+   const dashboards=[];
+   for(const org of [...(data.business_units??[]).map(r=>r.org_code),'all']){
+    must(dashboards.length<9&&typeof org==='string');
+    const r=await binding.handle(new Request('https://'+hostname+'/api/dashboard?'+new URLSearchParams({country:'all',org,level:'all'}),{headers:{'x-workforce-dataset':P.token},signal}));current();must(r.ok&&r.headers.get('x-workforce-dataset')===P.token);
+    const d=await boundedJson(r.body,8*1024*1024,signal);current();must(d?.data_meta?.bundleDigest===identity.digest&&same(d.data_meta,public9037Metadata(identity.digest,d.data_meta)));dashboards.push(d);
+   }
+   data=withBusinessUnitTurnover(data,dashboards);
+  }
+  result=queryAggregate({registryId:args.registryId,metric:args.metric,order:args.order,limit:args.limit},data);
+ }
+ catch(error){current();return {answer:error?.message==='Tie group exceeds20-row bound; request cannot be truncated safely'?'More than 20 groups are tied at this cutoff. A shortened list would omit equally ranked groups, so no partial ranking is shown. Choose another supported measure.':definition.id==='attrition.business_units'?'I cannot verify a complete business-unit comparison for that turnover measure and period. Total turnover needs all departures and matching average headcounts; voluntary turnover is a different measure. Ask for the latest business-unit total turnover or explicitly request voluntary turnover. No other rate has been substituted.':'This comparison cannot be verified for that measure and period from the released data. No ranking is shown. Specify the measure and latest recorded period, or choose a supported workforce comparison.'};}
  current();
  if(args.asOf!=='current'&&args.asOf!==result.asOf)return {answer:`This collection is dated ${result.asOf}, not the requested ${/^\d{4}-\d{2}-\d{2}$/.test(args.asOf)?args.asOf:'historical period'}. No ranking for the requested date is available. Ask for the latest released comparison; it will retain the source's recorded date and period.`};
- return {answer:formatHomeAggregate(result)};
+ const turnover=definition.id==='attrition.business_units'&&['total_turnover_ytd_pct','voluntary_turnover_ytd_pct'].includes(args.metric);
+ const all=turnover?queryAggregate({registryId:args.registryId,metric:args.metric,order:args.order,limit:20},data):null;
+ const chart=all&&requestId?{version:1,requestId,datasetToken:P.token,packetSha256:createHash('sha256').update(JSON.stringify({digest:identity.digest,result:all})).digest('hex'),kind:'recorded',synthetic:true,axis:'business-unit',metric:args.metric==='total_turnover_ytd_pct'?'bu_total_turnover_pct':'bu_voluntary_turnover_pct',title:args.metric==='total_turnover_ytd_pct'?'Business-unit total turnover':'Business-unit voluntary turnover',unit:'%',sourceId:'A1',scope:'All business units; all countries and levels. January–September 2026.',asOf:result.asOf,limitation:result.definition+'; complete eight-business-unit partition, not a forecast.',sampled:false,omitted:0,points:all.rows.map(r=>({date:JSON.parse(r.id)[0],value:r.value}))}:undefined;
+ return {answer:formatHomeAggregate(result),...(chart?{chart,charts:[chart]}:{})};
 }
 
 /** Read-only policy estimate through the same authenticated, version-bound aggregate transport. */

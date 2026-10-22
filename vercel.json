@@ -45,7 +45,8 @@
       "codex/current-accounting-reconstruction-20261022": false,
       "codex/analytics-local-reconstruction-20261022": false,
       "codex/fow-performance-recovery-20261022": false,
-      "codex/bounded-acceptance-20261022": false
+      "codex/bounded-acceptance-20261022": false,
+      "codex/bu-turnover-scalar-20261022": false
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "17ecb9d9378fe3554a4eec176c982e55870abe6f",
+  "sourceCommit": "0834363bef7ea10a6ed9c8712c99bfc95f6c0f4a",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -344,8 +344,8 @@
     },
     {
       "path": "components/chat-evidence-chart.tsx",
-      "sha256": "80e3685ce2472bf33f082e56b088890add8f95e99e95007b8fb701012fe8904d",
-      "bytes": 1915
+      "sha256": "2e187b73bc43ae2485077654b14871cd410ef3de03141554ff2ad50cd955a450",
+      "bytes": 2852
     },
     {
       "path": "components/compact-chart.tsx",
@@ -1414,8 +1414,8 @@
     },
     {
       "path": "lib/chat-evidence-series.ts",
-      "sha256": "ef624396243b74fe92414a1989b4be5e35e82aca09847a74f24cca9ec2a0ac1c",
-      "bytes": 6334
+      "sha256": "e097908d452ed5b0a59d2e134836950676ed8c40c0b1e9a2b93108ec524f9d33",
+      "bytes": 9642
     },
     {
       "path": "lib/chat-model.ts",
@@ -2994,8 +2994,8 @@
     },
     {
       "path": "lib/public-home-route.server.mjs",
-      "sha256": "4e2e67804341526601b946454c05a9ad7e6199e4030e508fd362d6330b35408e",
-      "bytes": 13947
+      "sha256": "8fa2d35dffb2b4848ab2fba9718773b7c9f2da22b76fda5ee40cdd0b0d089bac",
+      "bytes": 14028
     },
     {
       "path": "lib/public-other-routes.server.mjs",
@@ -3619,18 +3619,18 @@
     },
     {
       "path": "lib/home-aggregate-registry.mjs",
-      "sha256": "e50b1093e06d6892820fd566c65d23da46a50e5535c43c152477b3e6ae0b0ae3",
-      "bytes": 14470
+      "sha256": "1880ac75e5141317ad9827456ed4ff5077e78c7c086fad3e0a7d45e3dbda83e7",
+      "bytes": 14630
     },
     {
       "path": "lib/home-aggregate-tool.mjs",
-      "sha256": "65495ff9e01535feb19dde67ee9bd852bdb212acbee13f476007836755094ad3",
-      "bytes": 2287
+      "sha256": "f47747e5051f2c56ea8cf23ba31c35bfdcb94e6deceb4a5a2f667fb1517f8331",
+      "bytes": 2644
     },
     {
       "path": "lib/public-home-aggregate.server.mjs",
-      "sha256": "da14f873c48530a2dcef5692c02b214db57038a6e8fd31bff21268fa39dc56c0",
-      "bytes": 8954
+      "sha256": "b41bdbf88b5e6b0cd23f91817c5437f5ce71acef0120a53c6f362d7afdfdd3c5",
+      "bytes": 11288
     },
     {
       "path": "lib/home-pay-catalog-aggregates.mjs",
@@ -3794,8 +3794,8 @@
     },
     {
       "path": "lib/home-dataset-query.mjs",
-      "sha256": "99f28c9ee666e3b9a2bab5da5b21e5b7f859eb8339b804bd08b2c8176086185e",
-      "bytes": 3522
+      "sha256": "4831daa82e22f2166082e7b39c80d4a7039d492b94ea6258dbf40e5ef218e029",
+      "bytes": 3774
     },
     {
       "path": "lib/home-history-query.mjs",
@@ -3806,8 +3806,28 @@
       "path": "tests/home-dataset-query.test.mjs",
       "sha256": "d51375ba0b7813729c082ed93c6c35aa634ac3359c44a32d3a6438cecad5e792",
       "bytes": 5111
+    },
+    {
+      "path": "lib/home-bu-turnover.mjs",
+      "sha256": "bac3479b148f07e2f412695baefcf7b4b949e75508448a51ea3894c93bf2b4d8",
+      "bytes": 2539
+    },
+    {
+      "path": "tests/home-answer-visuals.test.mjs",
+      "sha256": "76adf998bcaf240d13fc9a47992a0a16b63a3c3b8164171c0c97cbba4e4cd2fc",
+      "bytes": 4036
+    },
+    {
+      "path": "tests/home-bu-turnover.test.mjs",
+      "sha256": "8c74fd1c3235b967e1c8d9400ae9d1e9cdc87c56b0d0b810ecb16f0f6389439e",
+      "bytes": 3343
+    },
+    {
+      "path": "tests/home-scalar-visual.test.mjs",
+      "sha256": "054b57ffae7651de192a3e47421e30a5e3e720979835aea36ed384b5222b1eaf",
+      "bytes": 2055
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "d9bb2c4d0c01ff34f73719e4192c30c38462fcc43405c72c0999397ef52f7c76"
+  "verifiedDeployedArchiveSha256": "5fe9b0c90ee2df201602607fa7af5c141d4a4d8c1a9a2fb3a9d78125d80816ce"
 }
