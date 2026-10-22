@@ -1,5 +1,5 @@
 // @ts-expect-error Native Node tests share TypeScript source.
-import {solutionResponseReasons,SolutionResponseError} from './home-solution-response-failure.ts';
+import {solutionResponseReasons,solutionReferenceDetails,SolutionResponseError} from './home-solution-response-failure.ts';
 import {APIError,APIConnectionError,APIConnectionTimeoutError,APIUserAbortError} from 'openai/core/error';
 import {sourceAuthenticationCode,correlationReceipt} from './data-source-failure.mjs';
 import {solutionEvidenceCode} from './home-evidence-recovery.mjs';
@@ -17,7 +17,7 @@ const read = (value:unknown,key:string):unknown => {try{return value!==null&&(ty
 const count=(value:unknown,max:number):number|null=>typeof value==='number'&&Number.isSafeInteger(value)&&value>=0?Math.min(value,max):null;
 const providerModels=['gpt-6.1-sol'] as const;
 const providerTiers=['default','standard','auto','flex','scale','priority','fast','ultrafast'] as const;
-const toolNames=['read_clock','read_evidence','read_plans','project_headcount','revise_parameters','evaluate_candidate','compare_required_staffing','compare_service_staffing','review_scoped_service_demand','revise_scoped_service_demand','review_service_demand','revise_service_demand','clear_business_planning','review_hiring_budget','propose_goal_progress','read_goal_progress'] as const;
+const toolNames=['estimate_policy_base_pay','read_clock','read_evidence','read_plans','project_headcount','revise_parameters','evaluate_candidate','compare_required_staffing','compare_service_staffing','review_scoped_service_demand','revise_scoped_service_demand','review_service_demand','revise_service_demand','clear_business_planning','review_hiring_budget','propose_goal_progress','read_goal_progress'] as const;
 const completionStatuses=['completed','incomplete','failed','cancelled','queued','in_progress'] as const;
 const incompleteReasons=['max_output_tokens','content_filter'] as const;
 type ProviderRound={completionStatus:typeof completionStatuses[number]|null;incompleteReason:typeof incompleteReasons[number]|null;attempt:number;elapsedMs:number;inputBytes:number|null;instructionsBytes:number|null;toolSchemaBytes:number|null;model:string|null;serviceTier:string|null;inputTokens:number|null;cachedInputTokens:number|null;outputTokens:number|null;reasoningTokens:number|null;totalTokens:number|null};
@@ -105,7 +105,7 @@ export function createSolutionDiagnostics(){
     stage==='provider'?'provider_'+(providerKind==='http'?'http_error':providerKind==='other'?'failed':providerKind):
     ({request_validation:'invalid_request',configuration:'configuration_unavailable',grounding:'evidence_verification_failed',model_setup:'model_setup_failed',conversation_preparation:'conversation_preparation_failed',response_validation:'response_validation_failed'} as const)[stage];
    if(!reported)closeStage();
-   const diagnostic={version:2,correlationId,code,stage,reason:(stage==='response_validation'||stage==='conversation_preparation')&&error instanceof SolutionResponseError?member(read(error,'reason'),solutionResponseReasons):null,stageElapsedMs:{...stageElapsedMs},toolSequence:toolSequence.map(tool=>({...tool})),providerRounds:providerRounds.map(round=>({...round})),elapsedMs:bounded(Date.now()-startedAt,600000),modelAttempts,...(groundingReads?{groundingReads}:{}),
+   const diagnostic={version:2,correlationId,code,stage,reason:(stage==='response_validation'||stage==='conversation_preparation')&&error instanceof SolutionResponseError?member(read(error,'reason'),solutionResponseReasons):null,referenceDetail:error instanceof SolutionResponseError&&error.reason==='calculation_reference'?member(read(error,'detail'),solutionReferenceDetails):null,stageElapsedMs:{...stageElapsedMs},toolSequence:toolSequence.map(tool=>({...tool})),providerRounds:providerRounds.map(round=>({...round})),elapsedMs:bounded(Date.now()-startedAt,600000),modelAttempts,...(groundingReads?{groundingReads}:{}),
     // An SDK attempt is not proof of a wire dispatch, provider receipt, usage or spend.
     providerKind,providerHttpStatus:provider?.status??null,providerErrorClass:provider?.errorClass??null,providerCauseCode:provider?.causeCode??null,
     providerElapsedMs:provider&&attemptStartedAt!==null?bounded(Date.now()-attemptStartedAt,600000):null,grounding:evidence};

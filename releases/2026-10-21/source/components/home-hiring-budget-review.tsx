@@ -4,7 +4,7 @@ import {useState,type ReactNode} from 'react';
 import {HiringPlanningSummary} from './hiring-planning-summary';
 import {calculateHiringBudget,hiringBudgetFields,type HiringBudgetInput,type HiringBudgetField} from '@/lib/hiring-budget';
 import type {HiringBudgetReview} from '@/lib/home-hiring-budget';
-const labels:Record<HiringBudgetField,string>={role:'Comparable role',level:'Level',location:'Location',snapshotDate:'Salary snapshot date',hires:'Number of hires',budget:'Total budget for the period',currency:'Currency',startMonth:'Budget start month',months:'Budget horizon (months)',arrivalDate:'Hire arrival date',ftePerHire:'FTE per hire',annualBasePay:'Annual base pay override',payBasis:'Base pay basis',annualAdditionalCostPerHire:'Annual non-base cost per hire',recruitingFeePerHire:'One-time recruiting cost per hire',otherCostsComplete:'All other costs included'};
+const labels:Record<HiringBudgetField,string>={role:'Comparable role',level:'Level',location:'Location',snapshotDate:'Salary snapshot date',hires:'Number of hires',budget:'Optional budget ceiling for the period',currency:'Currency',startMonth:'Planning start month',months:'Planning horizon (months)',arrivalDate:'Hire arrival date',ftePerHire:'FTE per hire',annualBasePay:'Annual base pay override',payBasis:'Base pay basis',annualAdditionalCostPerHire:'Annual non-base cost per hire',recruitingFeePerHire:'One-time recruiting cost per hire',otherCostsComplete:'All other costs included'};
 const number=(value:number|null)=>value===null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:2});
 const control='mt-1 block min-h-11 w-full rounded border bg-background p-2';
 const button='min-h-11 rounded border px-3 py-2 text-sm font-medium disabled:opacity-50';
@@ -17,7 +17,7 @@ export function HomeHiringBudgetReview({review,onUpdate,onDirtyChange,disabled,c
   <HiringPlanningSummary result={result}/>
   {Object.values(review.origins).some(b=>b.kind==='model-proposed')&&<p className="font-medium">Model-proposed scenario assumptions · unconfirmed</p>}
   {result.annualBasePayCeiling!==null&&<p><strong>Annual base-pay ceiling per hire:</strong> {money(result.annualBasePayCeiling)} before any unlisted costs. This is a spending limit under the entered timing and cost assumptions, not a salary estimate or proof that hiring is feasible.</p>}
-  <p><strong>Budget check:</strong> {result.budgetStatus==='within'?'Within the entered period budget, subject to the stated cost coverage':result.budgetStatus==='over'?'Known costs exceed the budget':'Unknown until costs, currency and coverage are supplied'}. Hiring feasibility remains unverified.</p>
+  <p><strong>Budget check:</strong> {review.inputs.budget===null?'Budget not provided; affordability not assessed':result.budgetStatus==='within'?'Within the entered period budget, subject to the stated cost coverage':result.budgetStatus==='over'?'Known costs exceed the budget':'Unknown until costs, currency and coverage are supplied'}. Hiring feasibility remains unverified.</p>
   {children}
   <details><summary className="min-h-11 cursor-pointer py-2">Calculation details and unknowns</summary><div className="space-y-3">
   {result.budgetPerHire===null&&<p><strong>Budget allowance per hire:</strong> Unknown</p>}

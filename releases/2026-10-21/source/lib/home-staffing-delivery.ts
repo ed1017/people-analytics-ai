@@ -37,6 +37,7 @@ export function captureStaffingDelivery(turn:{id:string;text:string},clarificati
    if(!question&&!/\b(?:not|never|if|unless|maybe|perhaps|could|would|should|may|might|what|which|explain|remind)\b|n't\b/i.test(clause.replace(/\bmay\s+(?:\d{1,2},?\s+)?20\d{2}\b/gi,'calendar-date')))calendar=true;
    continue;
   }else if(named&&/\b(?:unchanged|same|keep|retain|what|which|show|explain|remind)\b/i.test(clause))continue;
+  else if(named&&/\b(?:do not|don['\u2019]t|never)\b/i.test(clause)&&/\b(?:change|relax|extend|shorten|move|reset|override)\b/i.test(clause))continue; // Preserve-only prose is not a new relative deadline.
   else if(named||/\bby\s+(?!hir(?:e|ing)\b|train(?:ing)?\b|redeploy|transfer|using\b)/i.test(clause)||/\b(?:within|in(?: the next)?|no later than|by(?: the end of)?)\b.*\b(?:months?|weeks?|days?|year|january|february|march|april|may|june|july|august|september|october|november|december)\b/i.test(clause))uncertain=true;
  }
  const distinct=[...new Set(values)];

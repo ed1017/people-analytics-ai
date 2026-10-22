@@ -10,3 +10,8 @@ test('invalid and conflicting relative deadlines still fail closed',()=>{
 });
 
 
+test('preserve-only deadline instructions do not block explicit calendar/budget corrections',()=>{
+ for(const text of ['Reduce the budget to USD 50000. Hires arrive April 1, 2027; the readiness deadline remains January 2027. Do not invent lower costs or silently relax the deadline.','The deadline remains January 2027. Never extend the deadline.'])assert.equal(captureStaffingDelivery({id:'t',text})?.issue,null,text);
+ for(const text of ["Do not change the deadline.","Don't relax the deadline.","Don\u2019t relax the deadline.",'Never move the staffing deadline.'])assert.equal(captureStaffingDelivery({id:'t',text}),null,text);
+ for(const text of ['Do not change the deadline to 0 months.','Do not change the deadline to 25 months.','Do not change the deadline to within 2.5 months.'])assert.ok(captureStaffingDelivery({id:'t',text})?.issue,text);
+});

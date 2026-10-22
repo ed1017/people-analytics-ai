@@ -1,9 +1,10 @@
+import {policyEstimateTool} from './home-policy-estimate.mjs';
 import {isHomeAssociationQuestion,readPublicHomeAssociation} from './public-home-association.server.mjs';
 /** Disabled Home orchestration. Root owns authentication, capability dispatch and admission composition. */
 import {PublicPlannerAdmissionError} from './public-planner-round.server.mjs';
 import {createHash} from 'node:crypto';
 import {homeAggregateTool,standaloneAggregateQuestion} from './home-aggregate-tool.mjs';
-import {readPublicHomeAggregate} from './public-home-aggregate.server.mjs';
+import {readPublicHomeAggregate,readPublicPolicyEstimate} from './public-home-aggregate.server.mjs';
 import {isDeepStrictEqual as same} from 'node:util';
 import {toResponseInputItems} from 'openai/lib/responses/ResponseInputItems';
 import {PUBLIC_9037 as P} from './public-9037-contract.mjs';
@@ -87,12 +88,12 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
    const planningInstructions=staffingScenarioOnly?'':solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions+'\n'+hiringBudgetInstructions+'\n'+requiredStaffingInstructions:'');
    diagnostics.stage('conversation_preparation');
    const reply=await converseSolutions(parsed,{grounding,staffingScenarioOnly,requestTime,onToolResult:diagnostics.toolResult,...(roundLimit===2?{maxModelRounds:2}:{}),
-    ...(natural?{natural:{datasetToken:P.token}}:{}),...(mode===SWP_CONVERSATION_MODE?{scenario:{datasetToken:P.token}}:{}),...(aggregateEligible?{readAggregate:async(args,readSignal)=>{current();const result=await readPublicHomeAggregate({binding,hostname,identity,filters:parsed.filters,args,signal:readSignal});current();return result;}}:{}),...(demand?{demand:{datasetToken:P.token,referenceContract:true}}:{}),progress:{enabled:progressEnabled===true,datasetToken:P.token},
+    ...(natural?{natural:{datasetToken:P.token},readPolicyEstimate:async(args,readSignal)=>{current();const result=await readPublicPolicyEstimate({binding,hostname,identity,filters:parsed.filters,args,signal:readSignal});current();return result;}}:{}),...(mode===SWP_CONVERSATION_MODE?{scenario:{datasetToken:P.token}}:{}),...(aggregateEligible?{readAggregate:async(args,readSignal)=>{current();const result=await readPublicHomeAggregate({binding,hostname,identity,filters:parsed.filters,args,signal:readSignal});current();return result;}}:{}),...(demand?{demand:{datasetToken:P.token,referenceContract:true}}:{}),progress:{enabled:progressEnabled===true,datasetToken:P.token},
     complete:async(input,finalOnly,completionSignal,capabilities)=>{
      current();must(round<roundLimit&&!staffingScenarioOnly&&typeof completionFactory==='function');stage='provider';
      completion??=completionFactory({requestId:parsed.requestId,contextId,datasetToken:P.token,currentContext});must(typeof completion?.complete==='function');
      const progress=progressModelContract(progressEnabled===true,capabilities.progressEntryEnabled);
-     const tools=capabilities.requiredStaffingCalculation?[requiredStaffingTool]:demand?demandReferenceModelContract.tools:[...solutionTools,...progress.tools,...(natural?businessPlanningModelTools:[]),...(aggregateEligible&&round===0?[homeAggregateTool]:[])];
+     const tools=capabilities.requiredStaffingCalculation?[requiredStaffingTool]:demand?demandReferenceModelContract.tools:[...solutionTools,...progress.tools,...(natural?[...businessPlanningModelTools,policyEstimateTool]:[]),...(aggregateEligible&&round===0?[homeAggregateTool]:[])];
      const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+'\n'+solutionCompletionInstructions+progress.instructions)+planningInstructions;
      diagnostics.modelAttempt({inputBytes:Buffer.byteLength(JSON.stringify(input)),instructionsBytes:Buffer.byteLength(instructions),toolSchemaBytes:Buffer.byteLength(JSON.stringify(tools))});
      const response=await completion.complete({model:'gpt-6.1-sol',reasoning:{effort:'medium'},service_tier:'default',store:false,include:['reasoning.encrypted_content'],instructions,input,tools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:4000},{signal:completionSignal,requestId:parsed.requestId,contextId,datasetToken:P.token,round:++round});
@@ -107,7 +108,7 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
    const message=admission?(completedRounds===0?'AI could not start this answer because spending approval is unavailable. Ask the app owner to check the remaining budget or budget service before retrying.':'AI could not finish this answer because spending approval for the next step is unavailable. Ask the app owner to check the budget before retrying.')
     :signal.aborted?'This answer took too long or was cancelled. No completed answer was saved. You can review your question and send it again.'
     :stage==='validation'?'This request or its current evidence could not be checked. Refresh Home, review the selected scope, and try again.'
-    :'AI could not complete a verified answer. Review your question before trying again.';
+    :'The AI response could not be verified. This is an app processing failure, not a problem with your question. No completed answer was saved.';
    return Response.json({error:message,correlationId:diagnostic.correlationId,code:admission?'planner_admission_unavailable':signal.aborted?'home_request_interrupted':stage==='validation'?'home_request_unverified':'home_answer_unavailable',...(roundLimit===2?{boundedRequest:{maxModelRounds:2,completedRounds,stage}}:{})},{status:admission?429:503,headers});}
 
   finally{clearTimeout(timer);controller.abort();}
