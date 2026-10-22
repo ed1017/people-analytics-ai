@@ -1,3 +1,4 @@
+import {estimatePolicyBasePay} from './home-policy-estimate.mjs';
 import {isDeepStrictEqual as same} from 'node:util';
 import {PUBLIC_9037 as P} from './public-9037-contract.mjs';
 import {public9037Metadata,public9037Fields} from './public-9037-projection.mjs';
@@ -39,4 +40,20 @@ export async function readPublicHomeAggregate({binding,hostname,identity,filters
  current();
  if(args.asOf!=='current'&&args.asOf!==result.asOf)return {answer:`This collection is dated ${result.asOf}, not the requested ${/^\d{4}-\d{2}-\d{2}$/.test(args.asOf)?args.asOf:'historical period'}. No ranking for the requested date is available. Ask for the latest released comparison; it will retain the source's recorded date and period.`};
  return {answer:formatHomeAggregate(result)};
+}
+
+/** Read-only policy estimate through the same authenticated, version-bound aggregate transport. */
+export async function readPublicPolicyEstimate({binding,hostname,identity,filters,args,signal}){
+ const must=value=>{if(!value)throw Error('Current policy evidence could not be verified.');};
+ const current=()=>{signal.throwIfAborted();must(same(binding.router.current(),identity));};
+ current();must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===2&&/^[a-f0-9]{64}$/.test(identity.digest));
+ must(await binding.router.bootstrapToken()===P.token);
+ must(/^people-analytics-[a-z0-9]+-ed-56dc\.vercel\.app$/.test(hostname));
+ if(!filters||Object.values(filters).some(v=>v!=='all'))return {status:'unsupported_scope',message:'Only global constructed policy bands are available. Clear filters to inspect a global scenario estimate; selected department/location rates are unavailable.'};
+ const path='/api/compensation-ranges';must(Object.hasOwn(public9037Fields,path));
+ const response=await binding.handle(new Request('https://'+hostname+path,{headers:{'x-workforce-dataset':P.token},signal}));
+ current();must(response.ok&&response.headers.get('x-workforce-dataset')===P.token);
+ const data=await boundedJson(response.body,8*1024*1024,signal);current();
+ must(data?.data_meta?.bundleDigest===identity.digest&&same(data.data_meta,public9037Metadata(identity.digest,data.data_meta)));
+ const result=estimatePolicyBasePay(data,args);current();return result;
 }

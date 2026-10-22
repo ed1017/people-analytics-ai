@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "7f2f754ac261acc3dc9c4e1a39cd2a97c7c1c88a",
+  "sourceCommit": "3b448dddffb07eb7b93b368bc0a78e52e4736f34",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -579,8 +579,8 @@
     },
     {
       "path": "components/home-hiring-budget-review.tsx",
-      "sha256": "6e4cf688e9d9b122a5686ca6d0757e924ebe5de2b1414466a23d67d296e41240",
-      "bytes": 8164
+      "sha256": "acafe4736959d6691ed1121ae20ce17204b77992f8f1308bc28ba370f12c6e99",
+      "bytes": 8257
     },
     {
       "path": "components/home-hiring-plan-review.tsx",
@@ -2204,18 +2204,18 @@
     },
     {
       "path": "lib/home-hiring-budget.ts",
-      "sha256": "b5a01fcd214d0c5ba39b4f646c12c85f69885a3b6df09fc021bdf4a296c52286",
-      "bytes": 11973
+      "sha256": "13e87b11579d0e4d753b0bd2d9c87ab81ec848e299436025f41350e471760e78",
+      "bytes": 13688
     },
     {
       "path": "lib/home-hiring-plan-save.ts",
-      "sha256": "e6e4926d5168957d1fa53cb36ec4cbd21c817fbae849f25bbd74d498bb2a18cb",
-      "bytes": 5909
+      "sha256": "f6895f2780bb28ba577334432fe959f74772c6dff714139d96e3d445f3506797",
+      "bytes": 5948
     },
     {
       "path": "lib/home-hiring-plan.ts",
-      "sha256": "d6198794a6d5848a468dfaf2b41003c6b28f77960cd2e95707f979a4639abbd8",
-      "bytes": 9736
+      "sha256": "ac9ba6b28d8092ae8dff30e48a5e3198c2fce2981212d4a7f2aa781d0025964d",
+      "bytes": 10222
     },
     {
       "path": "lib/home-history-selection.ts",
@@ -2464,8 +2464,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "dc2ba0919b65097a80aed161db23cba0117ef61833cf8cf9c882db83866aca74",
-      "bytes": 41732
+      "sha256": "5432fef90af51584b8b5a954523fa4077e87a27b7b32f34353a61cb65305096c",
+      "bytes": 42213
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -2474,8 +2474,8 @@
     },
     {
       "path": "lib/home-solution-diagnostics.ts",
-      "sha256": "ad83f764d974941055bcf6c219be7cc52113c9927cc2710bb02889b9b1b9e8ec",
-      "bytes": 12650
+      "sha256": "4a796a296777704116edd2cfb761784a5a8be2345c1f391d686190adf7f6bb6e",
+      "bytes": 12677
     },
     {
       "path": "lib/home-solution-grounding-source.ts",
@@ -2994,8 +2994,8 @@
     },
     {
       "path": "lib/public-home-route.server.mjs",
-      "sha256": "d59e6e5b6f2e1e2fd79e08b53eaf52dac1a8bdfee5354c27108fe8b1dd905398",
-      "bytes": 12935
+      "sha256": "6ecb3d3048d76ebcc4266989293eff17017939d084e4a963a3443b318a7ce349",
+      "bytes": 13246
     },
     {
       "path": "lib/public-other-routes.server.mjs",
@@ -3629,8 +3629,8 @@
     },
     {
       "path": "lib/public-home-aggregate.server.mjs",
-      "sha256": "8ba25340ca4dcc387a2002796e5d4511bfae680a31f93d8df2357c4bf931aa2b",
-      "bytes": 4453
+      "sha256": "742a2d00287c31bc031154409d1dbbadb31650eabbff16e80bbed0cb81816834",
+      "bytes": 6010
     },
     {
       "path": "lib/home-pay-catalog-aggregates.mjs",
@@ -3769,10 +3769,25 @@
     },
     {
       "path": "tests/hiring-answer-contract.test.mjs",
-      "sha256": "c3ba477014d873d3b753869b670a2ff392969f936aeb0f404a848eb8c29f14a2",
-      "bytes": 2361
+      "sha256": "6acf6a57aada4e71646cf4236fbfdf3ee79722688d777b763744246df2b1df8c",
+      "bytes": 6075
+    },
+    {
+      "path": "lib/hiring-budget-authority.ts",
+      "sha256": "78c4142c1fd1d50b6e3edb3af5cfd729e83d55934d598a721211292fe9e610e6",
+      "bytes": 1461
+    },
+    {
+      "path": "lib/home-policy-estimate.mjs",
+      "sha256": "031c39c4e66f42f896d96821ecc89b93f84f6da472b96957917f0dd9d0871141",
+      "bytes": 3292
+    },
+    {
+      "path": "tests/home-policy-estimate.test.mjs",
+      "sha256": "b154dc0cf42e3eecc740e0b7fd06b76a78596511584032013187a7dfcfa0a8c2",
+      "bytes": 3084
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "1a3581c92bdc2357582e39824015ed27b6b8a1da8a9e77d3934dfc843cad512a"
+  "verifiedDeployedArchiveSha256": "faadfb9eee318b5e6fd4130492bd6f6c628fc0dc365dab9d6978b35e17b1839d"
 }
