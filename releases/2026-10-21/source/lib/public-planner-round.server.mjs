@@ -13,7 +13,7 @@ export const PUBLIC_PLANNER_LEDGER='public-9037-ai-initial-v1';
 export const PUBLIC_PLANNER_CAP_MICRO_USD=20000000;
 export const PUBLIC_PLANNER_PROVIDER_URL='https://api.openai.com/v1/responses';
 export const PUBLIC_PLANNER_ROUTE_LIMITS=Object.freeze({
- 'home-solution':Object.freeze({model:'gpt-6.1-sol',rounds:4,outputTokens:5000}),
+ 'home-solution':Object.freeze({model:'gpt-6.1-sol',rounds:4,outputTokens:4000}),
  chat:Object.freeze({model:'gpt-5.6-luna',rounds:6,outputTokens:10000}),
  plan:Object.freeze({model:'gpt-5.6-luna',rounds:1,outputTokens:1600}),
  intake:Object.freeze({model:'gpt-5.6-luna',rounds:1,outputTokens:3000}),
