@@ -219,3 +219,27 @@ test('ordinary correlation question reads complete public BU partitions with no 
  const response=await route.handle(http(r));assert.equal(response.status,200);const body=await response.json();assert.match(body.answer,/r = /);assert.match(body.answer,/eight business units/);assert.deepEqual(body.state.currentCalculationKinds,[]);assert.match(body.answer,/different measurement windows/);assert.equal(body.usage.modelRounds,0);assert.deepEqual(body.charts,[]);assert.equal(body.state.turns.at(-1).text,body.answer);
  }
 });
+
+test('public failure capture preserves fixed reason and tool sequence without raw data',async()=>{
+ const logs=[];const original=console.error;console.error=(...args)=>logs.push(args);try{
+  let rounds=0;const route=createPublicHomeRouteTestAdapter(ports(()=>++rounds===1?output([{name:'read_evidence',args:{sourceIds:[]}}],null):output([],null)));
+  const response=await route.handle(http(request('we need to add 12 hr fte at level 10')));assert.equal(response.status,503);const body=await response.json();assert.match(body.correlationId,/^[a-f0-9-]{36}$/);const entry=logs.map(x=>JSON.parse(x[1])).find(x=>x.correlationId===body.correlationId);assert.ok(entry);assert.equal(entry.stage,'response_validation');assert.equal(entry.reason,'invalid_schema');assert.equal(entry.modelAttempts,2);assert.equal(entry.toolSequence[0].name,'read_evidence');assert.equal(entry.providerRounds.length,2);assert.doesNotMatch(JSON.stringify(entry),/we need|hr fte|CURRENT AUTHORITATIVE|sourceIds|input_text/);
+ }finally{console.error=original;}
+});
+
+test('public failure capture never leaks arbitrary exception messages or stack',async()=>{
+ const logs=[];const original=console.error;console.error=(...args)=>logs.push(args);try{
+  const route=createPublicHomeRouteTestAdapter(ports(()=>{throw Error('SECRET_MODEL_PAYLOAD_AND_KEY');}));const response=await route.handle(http(request()));const body=await response.json();assert.equal(response.status,503);assert.ok(body.correlationId);assert.doesNotMatch(JSON.stringify({logs,body}),/SECRET_MODEL_PAYLOAD_AND_KEY|stack|Authorization/);assert.equal(logs.length,1);
+ }finally{console.error=original;}
+});
+
+test('bounded two-round exhaustion is distinct from invalid final schema',async()=>{
+ const logs=[];const original=console.error;console.error=(...args)=>logs.push(args);try{
+  const route=createPublicHomeRouteTestAdapter(ports(()=>output([{name:'read_evidence',args:{sourceIds:[]}}],null)));const req=http(request('we need to add 12 hr fte at level 10'));req.headers.set('x-workforce-max-rounds','2');const response=await route.handle(req);assert.equal(response.status,503);const body=await response.json();const entry=logs.map(x=>JSON.parse(x[1])).find(x=>x.correlationId===body.correlationId);assert.equal(entry.reason,'calculation_limit');assert.equal(entry.modelAttempts,2);assert.equal(body.boundedRequest.completedRounds,2);
+ }finally{console.error=original;}
+});
+
+
+test('pre-provider context overflow retains typed reason with zero attempts',async()=>{
+ const {createSolutionDiagnostics}=await import('../lib/home-solution-diagnostics.ts');const {SolutionResponseError}=await import('../lib/home-solution-response-failure.ts');const logs=[];const original=console.error;console.error=(...args)=>logs.push(args);try{const d=createSolutionDiagnostics();d.stage('conversation_preparation');d.failure(new SolutionResponseError('context_bounds','DO_NOT_LOG_THIS_CONTEXT'),null,false,false);const entry=JSON.parse(logs[0][1]);assert.equal(entry.reason,'context_bounds');assert.equal(entry.modelAttempts,0);assert.doesNotMatch(JSON.stringify(logs),/DO_NOT_LOG/);}finally{console.error=original;}
+});

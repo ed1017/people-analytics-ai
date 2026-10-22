@@ -12,6 +12,7 @@ import {createPublicHomeGrounding} from './public-home-grounding.server.mjs';
 import {createPublicSavedEvidence} from './public-saved-evidence.server.mjs';
 import {loadPublicProjectionSource} from './public-projection-source.server.mjs';
 import {boundedJson} from './public-qa-stream.server.mjs';
+import {createSolutionDiagnostics} from './home-solution-diagnostics.ts';
 import {awaitPublicQaBinding} from './public-qa-application.server.mjs';
 import {readSolutionRequest,readSolutionState} from './home-solution-conversation.ts';
 import {converseSolutions} from './home-solution-conversation-service.ts';
@@ -50,7 +51,7 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
   const requestedLimit=request.headers.get('x-workforce-max-rounds');
   if(requestedLimit!==null&&requestedLimit!=='2')return Response.json({error:'Unsupported lower round limit.'},{status:400,headers});
   const roundLimit=requestedLimit==='2'?2:4;
-  let completedRounds=0,stage='validation';
+  let completedRounds=0,stage='validation';const diagnostics=createSolutionDiagnostics();
   if(!Number.isInteger(timeoutMs)||timeoutMs<1||timeoutMs>90000)return Response.json({error:'Invalid deadline.'},{status:503,headers});
   const controller=new AbortController(),signal=AbortSignal.any([request.signal,controller.signal]),timer=setTimeout(()=>controller.abort(),timeoutMs);
   try{signal.throwIfAborted();return await awaitPublicQaBinding((async()=>{
@@ -73,6 +74,7 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
    const natural=mode===null,demand=mode===SWP_DEMAND_MODE?requestDemandContext(parsed,P.token):null;
    const aggregateEligible=natural&&standaloneAggregateQuestion(parsed.message.text);
    const staffingScenarioOnly=readStaffingScenario(parsed,{natural,datasetToken:P.token})!==null;
+   diagnostics.stage('grounding');
    const grounding=staffingScenarioOnly?undefined:await verifyHome({...parsed,datasetToken:P.token},signal);current();
    if(grounding)must(grounding.datasetToken===P.token&&grounding.bundleDigest===identity.digest);
    if(natural&&!staffingScenarioOnly&&isHomeAssociationQuestion(parsed.message.text)){
@@ -83,7 +85,8 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
    const contextId=hash({identity,request:parsed}),requestTime=new Date();let round=0,completion;
    const currentContext=()=>{current();return contextId;};
    const planningInstructions=staffingScenarioOnly?'':solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions+'\n'+hiringBudgetInstructions+'\n'+requiredStaffingInstructions:'');
-   const reply=await converseSolutions(parsed,{grounding,staffingScenarioOnly,requestTime,...(roundLimit===2?{maxModelRounds:2}:{}),
+   diagnostics.stage('conversation_preparation');
+   const reply=await converseSolutions(parsed,{grounding,staffingScenarioOnly,requestTime,onToolResult:diagnostics.toolResult,...(roundLimit===2?{maxModelRounds:2}:{}),
     ...(natural?{natural:{datasetToken:P.token}}:{}),...(mode===SWP_CONVERSATION_MODE?{scenario:{datasetToken:P.token}}:{}),...(aggregateEligible?{readAggregate:async(args,readSignal)=>{current();const result=await readPublicHomeAggregate({binding,hostname,identity,filters:parsed.filters,args,signal:readSignal});current();return result;}}:{}),...(demand?{demand:{datasetToken:P.token,referenceContract:true}}:{}),progress:{enabled:progressEnabled===true,datasetToken:P.token},
     complete:async(input,finalOnly,completionSignal,capabilities)=>{
      current();must(round<roundLimit&&!staffingScenarioOnly&&typeof completionFactory==='function');stage='provider';
@@ -91,18 +94,21 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
      const progress=progressModelContract(progressEnabled===true,capabilities.progressEntryEnabled);
      const tools=capabilities.requiredStaffingCalculation?[requiredStaffingTool]:demand?demandReferenceModelContract.tools:[...solutionTools,...progress.tools,...(natural?businessPlanningModelTools:[]),...(aggregateEligible&&round===0?[homeAggregateTool]:[])];
      const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+'\n'+solutionCompletionInstructions+progress.instructions)+planningInstructions;
+     diagnostics.modelAttempt({inputBytes:Buffer.byteLength(JSON.stringify(input)),instructionsBytes:Buffer.byteLength(instructions),toolSchemaBytes:Buffer.byteLength(JSON.stringify(tools))});
      const response=await completion.complete({model:'gpt-6.1-sol',reasoning:{effort:'medium'},service_tier:'default',store:false,include:['reasoning.encrypted_content'],instructions,input,tools,text:{format:solutionResponseFormat},tool_choice:capabilities.requiredStaffingCalculation?{type:'function',name:requiredStaffingTool.name}:finalOnly?'none':'auto',parallel_tool_calls:false,max_output_tokens:4000},{signal:completionSignal,requestId:parsed.requestId,contextId,datasetToken:P.token,round:++round});
+     diagnostics.providerResult(response);diagnostics.stage('response_validation');
      completedRounds++;stage='answer-validation-or-calculation';current();must(response&&Array.isArray(response.output));
      return {completed:response.status==='completed',items:toResponseInputItems(response.output),calls:response.output.filter(item=>item.type==='function_call').map(item=>({id:item.call_id,name:item.name,arguments:item.arguments})),text:response.output_text};
     },loadProjection:async(filters,readSignal)=>{current();const source=await loadProjection(readSignal),inputs=await source.projection(filters,readSignal);current();must(inputs.datasetVersion.publicDigest===identity.digest);return inputs;}
    },signal);current();return Response.json(reply,{headers});
   })(),signal);}catch(error){
+   const diagnostic=diagnostics.failure(error,null,request.signal.aborted,controller.signal.aborted);
    const admission=error instanceof PublicPlannerAdmissionError;
    const message=admission?(completedRounds===0?'AI could not start this answer because spending approval is unavailable. Ask the app owner to check the remaining budget or budget service before retrying.':'AI could not finish this answer because spending approval for the next step is unavailable. Ask the app owner to check the budget before retrying.')
     :signal.aborted?'This answer took too long or was cancelled. No completed answer was saved. You can review your question and send it again.'
     :stage==='validation'?'This request or its current evidence could not be checked. Refresh Home, review the selected scope, and try again.'
     :'AI could not complete a verified answer. Review your question before trying again.';
-   return Response.json({error:message,code:admission?'planner_admission_unavailable':signal.aborted?'home_request_interrupted':stage==='validation'?'home_request_unverified':'home_answer_unavailable',...(roundLimit===2?{boundedRequest:{maxModelRounds:2,completedRounds,stage}}:{})},{status:admission?429:503,headers});}
+   return Response.json({error:message,correlationId:diagnostic.correlationId,code:admission?'planner_admission_unavailable':signal.aborted?'home_request_interrupted':stage==='validation'?'home_request_unverified':'home_answer_unavailable',...(roundLimit===2?{boundedRequest:{maxModelRounds:2,completedRounds,stage}}:{})},{status:admission?429:503,headers});}
 
   finally{clearTimeout(timer);controller.abort();}
  }});
