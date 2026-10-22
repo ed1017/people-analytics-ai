@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "af78d1bf482008ab4b51a0fada2745841a46f360",
+  "sourceCommit": "b153c10d4886de5aae9f468201f8b81b29bf3280",
   "deployment": "pending-staged-production-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -2994,8 +2994,8 @@
     },
     {
       "path": "lib/public-home-route.server.mjs",
-      "sha256": "7e483d998d15614a9a0fafe8f7e528dba54af331679685b598db879c35f9eee1",
-      "bytes": 10420
+      "sha256": "7a5686526e5e8d4c3abfdcf8fdf5c882d7b132cccd191dffe37bce291bd11582",
+      "bytes": 11402
     },
     {
       "path": "lib/public-other-routes.server.mjs",
@@ -3019,8 +3019,8 @@
     },
     {
       "path": "lib/public-planner-round.server.mjs",
-      "sha256": "27d3de91a37048ab2c7bcf7e5d605d53bb11b60934327643b6eefd2dd3179b2e",
-      "bytes": 14917
+      "sha256": "cd7bed05548740728402d7d079c891af2f6d32c474a5be34ec3696bea0dece45",
+      "bytes": 15230
     },
     {
       "path": "lib/public-projection-contract.mjs",
@@ -3678,5 +3678,5 @@
       "bytes": 2447
     }
   ],
-  "candidateArchiveSha256": "e1182ea24f27e62010bbed1a6a748289b0890ad92abe4c1ed7ec3083332549b2"
+  "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8"
 }

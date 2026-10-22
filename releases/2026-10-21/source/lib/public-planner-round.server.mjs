@@ -6,6 +6,8 @@ import {boundedJson} from './public-qa-stream.server.mjs';
 import {awaitPublicQaBinding} from './public-qa-application.server.mjs';
 import {normalizePublicPlannerReceipt,PUBLIC_PLANNER_PROVIDER_REQUEST_ID} from './public-planner-receipt.server.mjs';
 
+/** Safe admission category only; never includes ledger/provider internals. */
+export class PublicPlannerAdmissionError extends Error { constructor(){super('planner_admission_unavailable');this.name='PublicPlannerAdmissionError';} }
 export const PUBLIC_PLANNER_ENABLED=false;
 export const PUBLIC_PLANNER_LEDGER='public-9037-ai-initial-v1';
 export const PUBLIC_PLANNER_CAP_MICRO_USD=20000000;
@@ -110,7 +112,7 @@ export function createPublicPlannerRoundBoundary({enabled=PUBLIC_PLANNER_ENABLED
    await check();
    const reservation=frozen({requestId:'planner_'+hash([p.route,meta.requestId,meta.round]),contextId:hash([meta.contextId,spec]),policyId:p.id,reserveMicroUsd:p.reserveMicroUsd});
    const grant=await admit(reservation,signal);
-   must(exact(grant,['granted','requestId','contextId','policyId','reserveMicroUsd','reservationId'])&&grant.granted===true&&['requestId','contextId','policyId','reserveMicroUsd'].every(k=>grant[k]===reservation[k])&&typeof grant.reservationId==='string'&&/^[a-zA-Z0-9_-]{1,100}$/.test(grant.reservationId),'planner_admission_denied');
+   if(!(exact(grant,['granted','requestId','contextId','policyId','reserveMicroUsd','reservationId'])&&grant.granted===true&&['requestId','contextId','policyId','reserveMicroUsd'].every(k=>grant[k]===reservation[k])&&typeof grant.reservationId==='string'&&/^[a-zA-Z0-9_-]{1,100}$/.test(grant.reservationId)))throw new PublicPlannerAdmissionError();
    await check();
    const output=await provider(spec,signal);
    clearTimeout(timer); // Provider deadline ends with its body; finalization has its own bound.
@@ -126,7 +128,7 @@ export function createPublicPlannerRoundBoundary({enabled=PUBLIC_PLANNER_ENABLED
    if(!signal.aborted)timer=setTimeout(()=>controller.abort(),p.timeoutMs); // Bound the final context check too.
    await check();
    return response(output,p,spec);
-  })(),signal);}catch{closed=true;throw Error('planner_round_unavailable');}
+  })(),signal);}catch(error){closed=true;if(error instanceof PublicPlannerAdmissionError)throw error;throw Error('planner_round_unavailable');}
   finally{clearTimeout(timer);controller.abort();busy=false;}
  }});
 }

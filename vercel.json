@@ -30,7 +30,8 @@
       "codex/readiness-clock-bound-20261021": false,
       "codex/pricing-renewal-2251-20261021": false,
       "codex/home-summary-space-20261022": false,
-      "codex/home-copy-details-20261022": false
+      "codex/home-copy-details-20261022": false,
+      "codex/home-admission-error-20261022": false
     }
   }
 }
