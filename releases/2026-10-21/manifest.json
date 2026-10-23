@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "858d1766e8e4724281e4fe7271d3bd7da614431c",
+  "sourceCommit": "e0d4b66ac25ad0469848ba4f0c33a885e0549695",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -709,8 +709,8 @@
     },
     {
       "path": "components/pages/attrition-page.tsx",
-      "sha256": "66249161319364d573f80ac670ef4f0d9a09ea338b7dc3e55a295979a5bb8115",
-      "bytes": 11293
+      "sha256": "abf2e8c516e4e3fdf36a059ab2a588c518be95f0e9a79ba28111c19c6b1c72c6",
+      "bytes": 11356
     },
     {
       "path": "components/pages/career-growth-mobility-page.tsx",
@@ -739,8 +739,8 @@
     },
     {
       "path": "components/pages/learning-development-page.tsx",
-      "sha256": "c31051eb9352f7c4d86483e5f4a16fa304e67e5232be175ea955629a91b52eac",
-      "bytes": 16589
+      "sha256": "b1f0e54d9f3c68c13ba29c77d5c28ae6456cc9354182991ad1408329e15b9d47",
+      "bytes": 16476
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
@@ -759,8 +759,8 @@
     },
     {
       "path": "components/pages/succession-planning-page.tsx",
-      "sha256": "1f19dc45d8ddce7366f4706d4b3f90856d13ea532a89ab55dc3cf0ba59d3a511",
-      "bytes": 11915
+      "sha256": "bf9a8c0bfe7ab11e5e9c3d7048fd3c1b808ef1eeac49b864d82af7d09853904a",
+      "bytes": 11782
     },
     {
       "path": "components/pages/survey-sentiment-page.tsx",
@@ -3944,5 +3944,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "96721705c04ed642bba1bf62b5a5352166525c466edd5140e2325c45cee3d21a"
+  "verifiedDeployedArchiveSha256": "4a948199e7aeada68a7991fe98a939f3d4741d967082cbc8b2c0765cd048a3cd"
 }

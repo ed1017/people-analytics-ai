@@ -182,9 +182,10 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
             </EvidenceTableRegion>
           </div>
 
-          <div className="mt-6 rounded-md border bg-muted/20 p-4 text-xs text-muted-foreground">
-            Separation reasons are reported administrative reasons in the synthetic dataset. They describe recorded exits and should not be treated as proven causal drivers of attrition without additional analysis.
-          </div>
+          <details className="mt-6 text-sm text-muted-foreground">
+            <summary className="w-fit cursor-pointer rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-4">Separation reason definitions</summary>
+            <p className="mt-2">Separation reasons are recorded administrative classifications, not proven causes of attrition.</p>
+          </details>
         </>
       ) : (
         (loading || !error) && <div role="status" className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
