@@ -2,7 +2,7 @@ import {verifyPublicBundle} from './verify-receipts.mjs';
 const TOKEN='workforce-demo-9037-public-aggregates-v2:3';
 const loopback=host=>['localhost','127.0.0.1','[::1]'].includes(host);
 export function createFixtureHandler(capture){
- if(!['https://www.ed-ai.app','https://people-analytics-r4qpj70pm-ed-56dc.vercel.app'].includes(capture.origin)||!Number.isFinite(Date.parse(capture.capturedAt)))throw Error('Invalid fixture provenance');
+ if(capture.origin!=='https://www.ed-ai.app'||!Number.isFinite(Date.parse(capture.capturedAt)))throw Error('Invalid fixture provenance');
  if(capture.documents.some(d=>d.token!==TOKEN))throw Error('Invalid fixture token');
  const digest=capture.documents[0]?.body?.data_meta?.bundleDigest;
  const checked=verifyPublicBundle(capture.documents.map(d=>d.body),digest);

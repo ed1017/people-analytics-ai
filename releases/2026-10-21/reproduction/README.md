@@ -22,7 +22,7 @@ The generated wrapper enables the original Home conversation layout at build tim
 
 ## Provenance and fidelity
 
-`fixtures.json` records the capture time, public origin, original dataset headers and exact bodies. `fixtures.sha256` pins its bytes. `verify-receipts.mjs` reuses the reviewed public projection allowlist, verifies complete metadata and dashboard scope, rejects extra fields, and reconstructs the original source-ordered bundle digest. These are pinned candidate receipts captured through the existing protected preview, not newly issued proof of live-source currentness.
+`fixtures.json` records the capture time, public origin, original dataset headers and exact bodies. `fixtures.sha256` pins its bytes. `verify-receipts.mjs` reuses the reviewed public projection allowlist, verifies complete metadata and dashboard scope, rejects extra fields, and reconstructs the original source-ordered bundle digest. These are pinned public-production receipts, not newly issued proof of live-source currentness.
 
 The fixture is intentionally company-wide. The dataset token in recorded receipts is retained so the original UI validators can inspect those historical responses. A permanent local notice and response header identify replay. Browser storage uses this local origin; do not interpret saved local examples as live production plans.
 
@@ -42,4 +42,4 @@ The seven fixture tests cover exact 19-response replay, receipt/data tampering, 
 
 ## Coordinated baseline revision
 
-The current fixture capture is from the exact protected candidate origin recorded in `fixtures.json`, not a claim that production has already changed. All 19 bodies use generation 3 and the revised public aggregate digest. The previous production fixture remains in Git history. No private aggregate source files or employee records are included.
+The current fixture capture is from the public production origin recorded in `fixtures.json`, after promotion of the reviewed baseline. All 19 bodies use generation 3 and the revised public aggregate digest. The previous production fixture remains in Git history. No private aggregate source files or employee records are included.
