@@ -50,5 +50,5 @@ export function verifyPublicBundle(bodies,digest=OBSERVED_PUBLIC_DIGEST){
  // This insertion order and JSON.stringify exactly match public-9037.server.mjs.
  const reconstructedDigest=sourceOrderedBundleDigest(checked.map(x=>x.document));
  if(reconstructedDigest!==digest)throw Error('Public placeholder bundle digest mismatch.');
- return {contract:PUBLIC_9037.contract,observedDigest:digest,reconstructedDigest,routes:checked.map(x=>x.evidence),meaning:'Observed published receipt compatibility only; no new approval or local runtime identity.'};
+ return {contract:PUBLIC_9037.contract,observedDigest:digest,reconstructedDigest,routes:checked.map(x=>x.evidence),meaning:'Observed captured receipt compatibility only; no new approval or local runtime identity.'};
 }
