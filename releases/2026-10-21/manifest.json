@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "a6ec3fc74e1e7965bcbd180764c331fadf7435d7",
-  "deployment": "dpl_Ae6YiXR7ZkLCmut4228rskaGJkDs",
+  "sourceCommit": "36cd6273764e4a5d5266a93a30b7fb0bbf924336",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -1598,16 +1598,6 @@
       "bytes": 3356
     },
     {
-      "path": "lib/dataset-9037-joint-dashboard.mjs",
-      "sha256": "69702f5ba7d5d104375c7049ebdacd1bedee2f20d90c9e443b997161d143a147",
-      "bytes": 9327
-    },
-    {
-      "path": "lib/dataset-9037-offline-provider.mjs",
-      "sha256": "679986bfd417927607eaf32f19a6143568a543b666474011e4e8a93a056e793e",
-      "bytes": 6234
-    },
-    {
       "path": "lib/dataset-9037-preview-marker.mjs",
       "sha256": "08eed8e94f01da610babe9706a54a0297bc420947ac31d296ab86905102737b6",
       "bytes": 81
@@ -1616,11 +1606,6 @@
       "path": "lib/dataset-9037-preview-options.mjs",
       "sha256": "74ab7545f16da42a2946a16c100df49a6a355cc7e31ac627286756ca4ca592e3",
       "bytes": 2100
-    },
-    {
-      "path": "lib/dataset-9037-preview.server.mjs",
-      "sha256": "84e8aa3f73fd0d234a7f13b321560f7f5ecbb4268fe84c77a9b6533755c87ed4",
-      "bytes": 3379
     },
     {
       "path": "lib/dataset-9037-request-policy.mjs",
@@ -2508,11 +2493,6 @@
       "bytes": 2793
     },
     {
-      "path": "lib/home-solution-projection.ts",
-      "sha256": "3e3c38d2d12f214817ff3c04cdbde2c2830a870e01d22ce0975c17c70435bbd7",
-      "bytes": 13148
-    },
-    {
       "path": "lib/home-solution-response-failure.ts",
       "sha256": "966bcaf98ac29f1b7d1bdbd6bb0fe998a93350261b085a3d09f3957ee28b86ef",
       "bytes": 1053
@@ -2923,11 +2903,6 @@
       "bytes": 2048
     },
     {
-      "path": "lib/public-9037-contract.mjs",
-      "sha256": "a8527430675c3de10eca32ab6331c16280f3ffdef2b78d67d430ff2afe70804a",
-      "bytes": 612
-    },
-    {
       "path": "lib/public-9037-fields.json",
       "sha256": "0ad759700470548279f733b5849e7c6ade66c5ab45ea53e7849db93596fa3d5f",
       "bytes": 121181
@@ -2978,11 +2953,6 @@
       "bytes": 2217
     },
     {
-      "path": "lib/public-chat-conversation.mjs",
-      "sha256": "5a8d2a7875caa8bb0a6879edde10625738015519e2cfb74878e25806b0a6ca80",
-      "bytes": 11606
-    },
-    {
       "path": "lib/public-home-grounding.server.mjs",
       "sha256": "209af68b4e6441f65bb1a224cc24bd3a7c5bdaa9899acd60b86803b863f7bc4d",
       "bytes": 6704
@@ -3021,11 +2991,6 @@
       "path": "lib/public-planner-round.server.mjs",
       "sha256": "15fa22a65b700cc92dd26bb5fe4c0bee040cf156dded6e519b6c302913a3b07e",
       "bytes": 15230
-    },
-    {
-      "path": "lib/public-projection-contract.mjs",
-      "sha256": "e5a54dd47a278136cd014c955c82e78305c6b03362f8a383fbbca5baf37de369",
-      "bytes": 690
     },
     {
       "path": "lib/public-projection-currentness-client.mjs",
@@ -3976,8 +3941,58 @@
       "path": "tests/scenario-decision-summary.test.mjs",
       "sha256": "e62fe4f5a9b7428128a3ab8c931846bc2cce69347e3edb2d05fb4db4324b4f51",
       "bytes": 3074
+    },
+    {
+      "path": "lib/dataset-9037-joint-dashboard.mjs",
+      "sha256": "fd95987d9f360852540243ea7bd79ce694f863c39faaacfa9d438dd7b2331d57",
+      "bytes": 9327
+    },
+    {
+      "path": "lib/dataset-9037-offline-provider.mjs",
+      "sha256": "68daac9eb8f0e9be1ff92073f3c7b4a09fd836b2e2479f24c748a52d41887bdc",
+      "bytes": 6221
+    },
+    {
+      "path": "lib/dataset-9037-preview.server.mjs",
+      "sha256": "80dfd8bbd0be06046b30b9cec133c56323c1d26eac2e7b7e1fe99e8b48d4121b",
+      "bytes": 3379
+    },
+    {
+      "path": "lib/home-solution-projection.ts",
+      "sha256": "abb870e9a91481e11559e54c7248b3d296f37b48fa63836f70b6125138bdfb7a",
+      "bytes": 13256
+    },
+    {
+      "path": "lib/public-9037-contract.mjs",
+      "sha256": "78c7bfaa03071a6ce341afea4dc4d9280a8b70c4d10691644a8c409312f42b96",
+      "bytes": 625
+    },
+    {
+      "path": "lib/public-chat-conversation.mjs",
+      "sha256": "07a845af5994f54cf0935435145bf5b0c9b17a33545748cdfdd5206bdb4b9787",
+      "bytes": 11635
+    },
+    {
+      "path": "lib/public-projection-contract.mjs",
+      "sha256": "039e70e0dc733bccd0189d3b315b6b95e58149b26f35e649db6fb0b33c693163",
+      "bytes": 1446
+    },
+    {
+      "path": "tests/public-home-integration.test.mjs",
+      "sha256": "49305bbd5cc8140f3c97c7ead8a10c282c8a93ff5b48c4fb3741ce07e3316dc5",
+      "bytes": 13679
+    },
+    {
+      "path": "tests/public-projection-restoration.test.mjs",
+      "sha256": "03d49c60f2636e3a91dc50764ce0c956d9f2766539dc8121ac760ab0fa47a005",
+      "bytes": 9866
+    },
+    {
+      "path": "tests/realism-version-transition.test.mjs",
+      "sha256": "25fd61bea1914ba4ad68f1a549d84d3e9f8e90caf29b35028ac723b5161b21df",
+      "bytes": 4325
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "2afb6f22e31c37d7249a548ff19179806652dd85a5f1cc88b2650498a3259979"
+  "verifiedDeployedArchiveSha256": "0f47a8a8a4dcdc842f06ce8f6e05a5cf356fe40ad88a54eb0f346684d05694e1"
 }

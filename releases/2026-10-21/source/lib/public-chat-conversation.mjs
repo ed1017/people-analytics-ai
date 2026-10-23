@@ -1,3 +1,4 @@
+import {PUBLIC_9037} from './public-9037-contract.mjs';
 import {capacityChatPrompt} from './capacity-chat-context.ts';
 import {planningConversationHistory,strategicPlanningInstructions,strategicPlanningObjective} from './home-strategic-planning.ts';
 import {homeFindingInstructions} from './home-finding-followups.ts';
@@ -30,7 +31,7 @@ const instructions='All workforce evidence is constructed synthetic demo data th
 
 /** Full structured Home and page conversation contracts; public source port only. */
 export function createPublicChatConversation({inputs,progressEnabled=false,now}){
- const tools=createAnalyticsToolDispatch(inputs.read),metadata=()=>({datasetToken:'workforce-demo-9037-public-aggregates-v1:2'});
+ const tools=createAnalyticsToolDispatch(inputs.read),metadata=()=>({datasetToken:PUBLIC_9037.token});
  return async function chat(body,call,signal){
   requireInput(body&&boundedText(body.message,body.page==='home'?6000:12000));
   const independent=isIntelligencePage(body.page)||body.page==='development-planning';

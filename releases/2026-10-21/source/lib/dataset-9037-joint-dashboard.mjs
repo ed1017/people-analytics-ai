@@ -7,7 +7,7 @@ import {isReviewed9037Provider,OFFLINE_9037_DATASET_ID} from './dataset-9037-off
 import {deepFreeze,exact,DEMO_BUS} from './dataset-demo-contracts.mjs';
 
 export const JOINT_DASHBOARD_FORMAT='workforce-9037-offline-joint-dashboard-v1';
-export const REVIEWED_9037_JOINT_DIGEST='aa01cfd83b1e38ac704330dd5749ce0026c4d351b99839321ffd7c52d0172ce5';
+export const REVIEWED_9037_JOINT_DIGEST='ab050057b688ea98eb8cdd45b94ef5287164132fd9910cfda58b2cf3d8714fbc';
 export const JOINT_TURNOVER_CONTRACT='voluntary-ytd-nine-month-average-stock-v2';
 export const MAX_JOINT_DASHBOARD_BYTES=2*1024*1024;
 const countries=['AU','BR','CA','DE','FR','GB','IN','JP','SG','US'];
@@ -15,7 +15,7 @@ const levels=Array.from({length:12},(_,i)=>'L'+(i+1));
 const dimensions={country:countries,org:[...DEMO_BUS],level:levels};
 const fields=['country','org','level'];
 const expectedDates=Array.from({length:33},(_,i)=>new Date(Date.UTC(2024,i+1,0)).toISOString().slice(0,10));
-const fixture='13f69613e20866bfa64c77251eafb9f6ecfe7386801588a4f9d5cd3721b5aaa1';
+const fixture='b6d0f8fe6ccc85c8907a4a66be4447f7bdda39a6095ce4a09f29ae57e074beec';
 const must=(v,m)=>{if(!v)throw Error('Joint aggregate contract: '+m);};
 const hash=v=>createHash('sha256').update(v).digest('hex');
 const safe=n=>Number.isSafeInteger(n),count=n=>safe(n)&&n>=0;
@@ -30,7 +30,7 @@ export async function create9037JointDashboard({jointBytes,provider,rows}){
  const owned=Buffer.from(jointBytes);must(hash(owned)===expectedJointDigest,'digest');
  const joint=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(owned));
  must(exact(joint,['format','datasetId','sourceBundleDigest','parentArtifactDigest','sourceFixtureDigest','cutoff','metricContract','publicationApproved','independentForecastValidation','dimensions','dates','cells','flows']),'root fields');
- must(joint.format===JOINT_DASHBOARD_FORMAT&&joint.datasetId===OFFLINE_9037_DATASET_ID&&joint.sourceBundleDigest==='deb27b293dab544ad6ba0eef3e02402585508c1db498031f350e33605b98d976'&&joint.parentArtifactDigest==='255b252cf3efb43b7fac67183dd137c269798c5d0b5d68d4092d5198e7766205'&&joint.sourceFixtureDigest===fixture&&joint.cutoff==='2026-09-30'&&joint.metricContract===JOINT_TURNOVER_CONTRACT&&joint.publicationApproved===false&&joint.independentForecastValidation===false,'binding and conventions');
+ must(joint.format===JOINT_DASHBOARD_FORMAT&&joint.datasetId===OFFLINE_9037_DATASET_ID&&joint.sourceBundleDigest==='f0233363ad006ffb3db670f830be58422d6491b88b2d1e11a92a6aa981488175'&&joint.parentArtifactDigest==='1583d3feb9eb08b0aab6e3d6b4f60ab975c5c37939d984abfd98f2f4f2c74bed'&&joint.sourceFixtureDigest===fixture&&joint.cutoff==='2026-09-30'&&joint.metricContract===JOINT_TURNOVER_CONTRACT&&joint.publicationApproved===false&&joint.independentForecastValidation===false,'binding and conventions');
  must(same(joint.dimensions,dimensions)&&same(joint.dates,expectedDates),'exact dimensions/calendar');
  must(Array.isArray(joint.cells)&&joint.cells.length===960&&Array.isArray(joint.flows)&&joint.flows.length<=960*32,'bounded cells/flows');
  const keys=countries.flatMap(country=>DEMO_BUS.flatMap(org=>levels.map(level=>[country,org,level]))),cells=[];
