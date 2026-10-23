@@ -1,4 +1,6 @@
 "use client";
+import {KeyFindings} from "@/components/key-findings";
+import {snapshotFindings} from "@/lib/key-findings";
 
 import {
   CartesianGrid,
@@ -71,6 +73,7 @@ export function OverviewPage({
     ? overviewData.labor_cost_usd : null;
   return (
     <section className="evidence-workspace @container min-w-0 p-6">
+      <KeyFindings findings={!dashboardLoading && !dashboardError && overviewData ? snapshotFindings(overviewData, [selectedCountryLabel, selectedOrgLabel, selectedLevelLabel].join(" / ")) : null} />
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold">

@@ -1,4 +1,6 @@
 "use client";
+import {KeyFindings} from "@/components/key-findings";
+import {skillsFindings} from "@/lib/key-findings";
 
 import {
   formatPercent,
@@ -41,6 +43,7 @@ export function SkillsPage({
   const skillsData = !skillsLoading && !skillsError ? sourceData : null;
   return (
 <section className="evidence-workspace evidence-pane min-w-0 p-6">
+      <KeyFindings findings={skillsData ? skillsFindings(skillsData) : null} />
             <div className="mb-6 flex items-end justify-between gap-4">
               <div>
                 <p className="text-muted-foreground">

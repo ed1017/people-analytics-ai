@@ -1,4 +1,6 @@
 "use client";
+import {KeyFindings} from "@/components/key-findings";
+import {successionFindings} from "@/lib/key-findings";
 
 import {
   formatPercent,
@@ -62,6 +64,7 @@ export function SuccessionPlanningPage({
 
   return (
     <section className="min-w-0 p-4 sm:p-6">
+      <KeyFindings findings={!loading && !error && data ? successionFindings(data) : null} />
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="max-w-3xl text-muted-foreground">

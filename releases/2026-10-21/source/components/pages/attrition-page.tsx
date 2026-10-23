@@ -1,4 +1,6 @@
 "use client";
+import {KeyFindings} from "@/components/key-findings";
+import {attritionFindings} from "@/lib/key-findings";
 import {catalogDisplayLabel} from "@/lib/catalog-display";
 
 import {EvidenceTableRegion} from '@/components/evidence-table-region';
@@ -42,6 +44,7 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
 
   return (
     <section className="evidence-workspace evidence-pane min-w-0 p-6">
+      <KeyFindings findings={data ? attritionFindings(data) : null} />
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">

@@ -1,4 +1,6 @@
 "use client";
+import {KeyFindings} from "@/components/key-findings";
+import {growthFindings} from "@/lib/key-findings";
 
 import {EvidenceTableRegion} from '@/components/evidence-table-region';
 import {
@@ -85,6 +87,7 @@ export function CareerGrowthMobilityPage({
 
   return (
     <section className="evidence-pane min-w-0 p-6">
+      <KeyFindings findings={!loading && !error && data ? growthFindings(data) : null} />
       <WorkforcePerformanceField value={performance} population={workforceHeadcount} filters={performanceFilters} selectedContext={selectedContext} loading={performanceLoading} />
       <section className="mt-6" aria-labelledby="recorded-movement-history-heading">
         <h2 id="recorded-movement-history-heading" className="text-sm font-medium">Recorded movement history · company-wide context</h2>
