@@ -1,14 +1,26 @@
-## Current decision queue - October 23 follow-through
+## Active roadmap — October 23, after PR366
 
-Current production before this increment: PR365 (compact navigation preference and valid scenario comparison return), deployment `dpl_H5DUhDpZdALFXp6uGAnrShXGahTn`. Earlier dated sections below are history, not the active queue.
+Production: [PR366](https://github.com/ed1017/people-analytics-ai/pull/366), runtime `600a4b2f22ed81a606fb83f761055b66cbb34806`, deployment `dpl_Di6RhyQdpEWr5oSYVwru4sudQk18`. This reconciliation changes documentation only. Dated sections below are historical checkpoints; their pending labels are not the active queue.
 
-1. **Live and desktop/mobile production verified in PR365:** desktop navigation defaults to the existing compact rail only when chat is visible. Explicit expansion/collapse is saved and wins across pages and reloads; the mobile drawer is unchanged. Home, drawer pages and pages without chat use their actual visibility.
-2. **Live and desktop/mobile production verified in PR365:** reopen a valid existing scenario at its comparison with the introduction under "About this scenario." Saved inputs are recalculated locally once, not trusted as cached results. First-use assumptions remain explicit; pending edits, stale context and missing inputs do not acquire valid comparison status. Closing/navigation cancels pending work. Desktop/mobile save-reload retained identical options. No automatic choice or save.
-3. **Baseline AI discoverability, approved and implemented in this increment:** the existing Open Workforce AI action is left-aligned in an accent strip, visibly labeled with a decorative chat icon, keyboard focus outline and full-width mobile button. Drawer behavior, closed full-width evidence and Skills remain unchanged. No automatic opening or additional explanatory copy. TypeScript, navigation tests and independent review passed; protected/public browser checks and CI gate publication. Earlier diagnosis confirmed the entrypoint worked; no user-approved AI removal was found.
-4. **Remaining decision/data constraint:** full BU names require a verified source mapping; no guessed expansions. Broader unpaid reliability work should address concrete failures or named acceptance gaps, not duplicate completed checks. No further navigation redesign is included.
-5. **Deferred:** onboarding/video/credits, dark mode, pinning/action integration, wholesale redesign and dataset regeneration.
+| Agreed milestone | Current acceptance and remaining limit |
+| --- | --- |
+| Historical workforce, joint filters and multipart retrieval | Shipped. Headcount/FTE history supports the verified country/business-unit/level intersection; each multipart answer retains its own scope and dates. This does not authorize arbitrary cross-domain joins or historical compensation. |
+| Supported aggregate catalogue and right-pane visuals | Current local acceptance passed **140/140 cases: 70 metrics in 24 collections, both ranking directions**, using the actual synthetic binding, server adapters and client visual validator. All cases returned an accepted visual. This is unpaid data-to-visual contract coverage, not fresh-model prompt interpretation or new browser acceptance. See [coverage evidence](current-catalogue-acceptance-2026-10-23.md). |
+| Scalar time-to-fill, survey and role comparisons | PR350/353 repairs shipped. Role recruiting reports the complete 50-role 33-day tie, not a unique winner. Existing release evidence covers browser replay; do not convert that into a fresh-model claim. |
+| Templates, complete role catalogue and multiselect | PR350/356 shipped, including optional multiline fields, draft protection, Business unit catalogue, placement outside composer and hiding after submission. No automatic submission or invented allocation among roles. |
+| Recommendation controls, actual recalculation and visuals | PR354–357 shipped. Hiring and supported mixed development/move/hire controls share calculation, summary, visual and saved state. Whole-role model limits remain; historical actuals are never changed by sliders. |
+| Compact scoped Key findings | PR357/358 closed the applicable-page inventory, including reference/quote and planning summaries. Configuration/placeholder pages do not invent analytical findings. Pinning and action integration remain deferred. |
+| Agreed polish and navigation | PR359/361–366 shipped: disclosures, hierarchy, titles, compact navigation with saved preference, valid scenario comparison return, and prominent Baseline AI entry. PR366 protected/public desktop/mobile checks passed, including keyboard open/close, focus return, draft retention and loaded evidence. |
 
-Validation: 15 existing scenario/parity/disclosure tests, three new preference tests, focused lint, TypeScript and production build; independent review corrected a chat-visibility edge case. Local desktop/mobile browser verification passed. PR365 CI, protected hosted checks, promotion and public desktop/mobile verification passed. Baseline entry styling is the new bounded increment. No paid AI, accounting or access changes.
+### Remaining work, without restarting completed milestones
+
+- **Fresh-model reliability:** intermittent interpretation/validation is not proven eliminated. Further paid acceptance remains paused by current coordination instruction. Captured replay and deterministic contracts cannot close that evidence gap. No new API calls or budget changes were made for this reconciliation.
+- **Full business-unit display names:** a verified mapping is absent. Retain supported labels/codes until the owner supplies or approves an authoritative mapping; do not invent expansions.
+- **Planning sufficiency:** service-specific uncovered-work tolerance and outcome metric/population/period contracts are not defined. Preserve explicit limitations rather than label a plan operationally sufficient or infer causal impact.
+- **Upcoming feedback:** inspect the owner's new review for concrete defects before another design pass. No reproducible new product defect was established by this catalogue check.
+- **Explicitly deferred:** onboarding/video/credits, dark mode, pinning/action-planning integration, wholesale redesign and dataset regeneration. Real-company ingestion/tenancy is not implicitly authorized by the public portfolio roadmap.
+
+Recommended next decision: use the incoming review to select a specific usability defect; separately resolve the paid-test pause before fresh-model reliability validation. Neither requires rebuilding already-shipped catalogue adapters or slider flows. Coding pacing targets Monday afternoon, October 26, New York time, with a buffer; this is not a guaranteed reset schedule.
 
 ## October 22, compact planner verification
 
