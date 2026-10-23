@@ -907,3 +907,6 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .simple-demo-selected-details { border:1px solid var(--border); border-radius:.5rem; padding:.75rem; }
 .simple-demo-gap-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.75rem; font-size:.875rem; }
 .simple-demo-gap-metrics strong { display:block; }
+
+/* Keep plain-text template fields distinct without changing submitted values. */
+.home-workspace textarea#overview-question { line-height: 1.75; }

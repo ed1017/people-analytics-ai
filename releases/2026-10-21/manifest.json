@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "1bd08ebe3062c27d1adebaee1f48a92d84e7fcf1",
+  "sourceCommit": "bd620d5321afd977fa9451fc6cd263f39e32968f",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -244,8 +244,8 @@
     },
     {
       "path": "app/globals.css",
-      "sha256": "1f5984161ef47b17434d1f7cda7ef3fe22709c19a1667a5f509eefb48c49bad0",
-      "bytes": 48610
+      "sha256": "63da30420165e6a20a380b2bd99685be5962d456d2e92ed4d2a9d7bdb4102c79",
+      "bytes": 48759
     },
     {
       "path": "app/layout.tsx",
@@ -474,8 +474,8 @@
     },
     {
       "path": "components/hiring-planning-summary.tsx",
-      "sha256": "e0126f4a930109eb722a7717e6e536613e865d4773cfa1fbee9a0943bb36afc7",
-      "bytes": 3133
+      "sha256": "10e34045af49abb36c1c2dd9a7983ab6ff96161f8c89d693b929431b9ce0d542",
+      "bytes": 2392
     },
     {
       "path": "components/historical-metric-context.tsx",
@@ -539,13 +539,13 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "ca8e56daf6acbb9b0fc447ac75948f5e3acf926038dd7e53f8c93614ae479047",
-      "bytes": 18482
+      "sha256": "903e7cadaee01d57e483f2507be2d1a5c7b01c9387911efec003a03121c3ebb5",
+      "bytes": 18477
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "4b5aaebeeec3fae2c5ea0f18df9afd886677a584f7c9f42fd914cb86bcd0829e",
-      "bytes": 17276
+      "sha256": "aec8c3a0450e3a00ca86a6b681c58222c1963a53f8082491459dc7a3e863872a",
+      "bytes": 17321
     },
     {
       "path": "components/home-data-status.tsx",
@@ -579,8 +579,8 @@
     },
     {
       "path": "components/home-hiring-budget-review.tsx",
-      "sha256": "c597c15732388f0430879aa5d1041a0f2548768048d51e3abcaf1b3ea961cbdc",
-      "bytes": 8749
+      "sha256": "9c83de3d490c4e236dbae2288ec4915e9604aa386e28160d4ff895d29c3548d3",
+      "bytes": 8750
     },
     {
       "path": "components/home-hiring-plan-review.tsx",
@@ -744,8 +744,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "3c80d891823b2b9377c27b1a863d08008113fba0ad86457ba9ec6bcb8d379ae2",
-      "bytes": 99290
+      "sha256": "9c49eaa5965bb0ed22f31b50031dd7150bede3086f84c1c807ec8105b42113e5",
+      "bytes": 99468
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -3709,18 +3709,18 @@
     },
     {
       "path": "components/catalog-composer.tsx",
-      "sha256": "fa51177ea5a76346103578681c0cfce58d0d465a333b37a5500341009bb0c7ee",
-      "bytes": 6201
+      "sha256": "c135efb22fa5b8b4f9b4e171ed16b76fc5fd5d3860e52696ef9802ae4a5f87af",
+      "bytes": 8291
     },
     {
       "path": "components/home-workforce-flows.tsx",
-      "sha256": "30202c8f9b1a943b2f14ce8c097354d6fc7a037ef2105201651cada0cab50216",
-      "bytes": 3389
+      "sha256": "638a6a0e45bc40900fb632604011fe14ef15e1be3901ba44b01948abde68477a",
+      "bytes": 4009
     },
     {
       "path": "lib/composer-catalog.ts",
-      "sha256": "66126a65151aca11a6e401384279c9d715bd59f910918b7e7cff223534acae06",
-      "bytes": 3052
+      "sha256": "a1ca729173e0ce68e5b870d837546a6b7e2c6c34e74a4967e0c142cc3ead1454",
+      "bytes": 4307
     },
     {
       "path": "lib/home-workforce-flows.ts",
@@ -3829,13 +3829,13 @@
     },
     {
       "path": "lib/composer-prompt-helpers.ts",
-      "sha256": "e25eabf2abb254531f5842a952062ab77b061b3070b3cbdae6a13b0bcfff28e6",
-      "bytes": 985
+      "sha256": "3dadc7a44b0fa2a17cf346755419e29f0b04d6900f2d1a6ab74a798173f11f27",
+      "bytes": 983
     },
     {
       "path": "tests/composer-prompt-helpers.test.mjs",
-      "sha256": "608c737af2ac511b16c7e2aa7a07d2241a76de654aa9b9e7cc0c7527f7e87491",
-      "bytes": 4250
+      "sha256": "70f78b896d2c1039f0a12eb6d06497878cc0041ba9f871b2c62911ad0c7e74e4",
+      "bytes": 6375
     },
     {
       "path": "tests/evidence-citation-visuals.test.mjs",
@@ -3909,5 +3909,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "cf8dfdccf008305a20bdeb09f3e30a49c8cc5723ce9899e737f9779a029e91b0"
+  "verifiedDeployedArchiveSha256": "b22257b3adb3beacae10f592edd61e84785a01081a968638e7661abe6758a0ad"
 }

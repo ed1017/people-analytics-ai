@@ -1,5 +1,5 @@
 export const composerPromptHelpers = [
- {id:'need',label:'I need FTE to fill a capacity gap',text:'Help me estimate the FTE needed and compare options. I can leave unknown details blank.\nDescription: \nFTE needed: \nBudget (optional): \nRole: \nDepartment/team: \nLevel: \nLocation: \nNeeded by: '},
+ {id:'need',label:'I need FTE to fill a capacity gap',text:'Help me estimate the FTE needed and compare options. I can leave unknown details blank.\nDescription: \nFTE needed: \nBudget (optional): \nRole: \nBusiness unit: \nLevel: \nLocation: \nNeeded by: '},
  {id:'compare',label:'Compare…',text:'Compare staffing options for [role].'},
  {id:'what-if',label:'What if…',text:'What if we change staffing for [role]?'}
 ] as const;
