@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "cb1a61c2443da89069017741f66383a33cd5222f",
+  "sourceCommit": "7d30cff8bd1e122519c6d2c6892da82972e1e25d",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -2314,8 +2314,8 @@
     },
     {
       "path": "lib/home-pack.mjs",
-      "sha256": "59def1d5f2fd9ddeb4597f30340ade567282cbaa28e20edaa985ecc044555d31",
-      "bytes": 29512
+      "sha256": "1f5843c27fadc60bd41ab7b346ab99be571b3d3bd1d075a7de80b537d24d41cc",
+      "bytes": 29518
     },
     {
       "path": "lib/home-pinned-goals.ts",
@@ -3964,10 +3964,10 @@
     },
     {
       "path": "tests/review-polish-contracts.test.mjs",
-      "sha256": "df3702903b855ce60b0c8deebe4aea87fc7fa94c99e9b8c0d43420cebfa5655d",
-      "bytes": 1535
+      "sha256": "7cbb52b452e24e26eb4a81cb321a1bb998d429484c4c5f32ae875062c826e730",
+      "bytes": 1805
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "8d88225f7117e279fcbfc57f455b54483d249261106648b0fd38a0ecd9980178"
+  "verifiedDeployedArchiveSha256": "3ee5f22d967193aa3674e59ce9855f957ba40f92068e8301e7b2a0ec0c05dd3f"
 }

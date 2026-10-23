@@ -18,3 +18,7 @@ test('About is a public read-only document, not a broader API or route permissio
 test('main destination labels agree with their page headings',()=>{
  for(const item of mainNavigation)assert.equal(item.label,getAppPageMetadata(item.page).label);
 });
+
+test('absent, null and empty scopes remain explicitly unavailable',()=>{
+ for(const value of [undefined,null,''])assert.equal(normalizeHomePack({workforceScope:value,sources:[]}).sources.find(s=>s.id==='W1').scope,'Selected workforce snapshot: scope unavailable');
+});
