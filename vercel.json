@@ -72,7 +72,8 @@
       "docs/realism-release-verification": false,
       "feat/fictional-role-skills": false,
       "fix/coherent-geography": false,
-      "docs/geography-release-evidence": false
+      "docs/geography-release-evidence": false,
+      "fix/pricing-window-242314": false
     }
   }
 }

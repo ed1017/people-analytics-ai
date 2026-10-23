@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "834f3b9da202c977021c5f12d1de015302e9824c",
-  "deployment": "dpl_HZcrSFM67bCLnb6c5QnmAN4CT1Ng",
+  "sourceCommit": "044f26e854d8cad6407b4c683f1c762858f7ebb8",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -3209,7 +3209,7 @@
     },
     {
       "path": "lib/public-planner-price-candidate.mjs",
-      "sha256": "e5afac436a7805dd9ee392b5cb25cb90cf1c333b74c5f9cf58d2f6ee68df3f30",
+      "sha256": "036ee1b1b75cb7fea85024e62cc8ec4c39c8360e030f3cbc4439143f9c9cd458",
       "bytes": 1399
     },
     {
@@ -4054,5 +4054,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "0f47a8a8a4dcdc842f06ce8f6e05a5cf356fe40ad88a54eb0f346684d05694e1"
+  "verifiedDeployedArchiveSha256": "dac9d6b5ceaca89056661d7578698c43e67a998f3d1c996f3e2dd8cc18d8c97a"
 }

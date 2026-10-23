@@ -15,7 +15,7 @@ export function publicPlannerPriceCandidate(route){
  const sol=route==='home-solution';
  return readPublicPlannerPolicy({
   id:sol?'planner-sol-4k-20261022-v1':'planner-luna-20261020-v1',
-  route,model:limit.model,verifiedAt:'2026-10-23T09:55:00.000Z',validUntil:'2026-10-24T09:55:00.000Z',
+  route,model:limit.model,verifiedAt:'2026-10-23T23:14:00.000Z',validUntil:'2026-10-24T23:14:00.000Z',
   contextTokens:1050000,maxOutputTokens:limit.outputTokens,maxInputBytes:1500000,maxRounds:limit.rounds,timeoutMs:60000,
   inputMicroUsdPerMillion:sol?4000000:400000,outputMicroUsdPerMillion:sol?15000000:1800000,
   safetyBasisPoints:11000,reserveMicroUsd:sol?4686000:500000,
