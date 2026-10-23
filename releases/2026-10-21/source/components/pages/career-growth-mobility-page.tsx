@@ -200,10 +200,9 @@ export function CareerGrowthMobilityPage({
             )}
           </div>
 
-          <div className="mt-4 rounded-lg border border-amber-700/30 bg-amber-700/10 p-4 text-sm">
-            <p className="font-semibold">
-              Source coverage & limitations
-            </p>
+          <p className="mt-4 text-sm text-muted-foreground">Incomplete movement history; event shares are not workforce rates.</p>
+          <details className="mt-2 text-sm">
+            <summary className="min-h-11 cursor-pointer py-2 font-medium">Source coverage &amp; limitations</summary>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
               <li>
                 Recorded events cover{" "}
@@ -262,7 +261,7 @@ export function CareerGrowthMobilityPage({
                 transfer, or mobility rates.
               </li>
             </ul>
-          </div>
+          </details>
 
           <div className="mt-6 rounded-lg border p-4">
             <div className="mb-4">
@@ -394,10 +393,8 @@ export function CareerGrowthMobilityPage({
             ))}
           </div>
 
-          <div className="mt-6 rounded-md border bg-muted/20 p-4 text-sm text-muted-foreground">
-            <p className="font-medium text-foreground">
-              Interpretation
-            </p>
+          <details className="mt-4 text-sm text-muted-foreground">
+            <summary className="min-h-11 cursor-pointer py-2 font-medium text-foreground">Interpretation</summary>
             <ul className="mt-2 list-disc space-y-1 pl-5">
               {data.methodology.map(
                 (item) => (
@@ -407,7 +404,7 @@ export function CareerGrowthMobilityPage({
                 )
               )}
             </ul>
-          </div>
+          </details>
         </>
       ) : (
         !loading && !error && (

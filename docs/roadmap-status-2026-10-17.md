@@ -1,3 +1,13 @@
+## Current decision queue — October 23 follow-through
+
+Current delivery: PR363 live. Earlier dated status sections below are history, not the active queue.
+
+1. **In this increment:** compact Career Growth unavailable-measure panels; collapse retained rating/source/interpretation explanations while keeping missing-data, incomplete-history and scope visible. No arithmetic changes.
+2. **Navigation reconciliation and next proposal:** the phone already has a native “Browse pages” drawer; do not rebuild it. For desktop evidence pages with chat open, recommend starting the existing sidebar in its compact icon-rail state, with its current expand control and labels/tooltips preserved. Benefit: more evidence width without removing destinations or moving chat right. Tradeoff: less immediate discoverability for first-time users. This default change awaits product direction; explicit user resizing/collapse choices must continue to win.
+3. **Next proposed planning-flow change (awaiting product direction):** when a valid existing comparison is available, open on its compact recommendation and options, with the original intro accessible through “How this comparison works.” With missing inputs, keep clarification first. Benefit: returning users reach options sooner; tradeoff: first-time users may miss context unless the disclosure is clear. No automatic selection or hidden assumptions.
+4. **Independent remaining constraint:** full BU names require a verified mapping. No guessed expansions. Broader unpaid reliability regressions can proceed under the existing roadmap when a concrete failure or acceptance gap is identified; do not repeat paid model tests or invent new scope.
+5. **Deferred:** onboarding/video/credits, dark-mode work, pinning/action integration, wholesale redesign and dataset regeneration.
+
 ## October 22, compact planner verification
 
 - Hiring controls are live in PR354, runtime `cb225d691ee63e32b404ccc53d7d8a2b3159402b`, deployment `dpl_9jMiHDgGXca59iawVAMUqh8yaauc`. CI and protected desktop/mobile plus production browser replay passed; edited calculations and visuals survive reload.

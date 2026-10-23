@@ -6,9 +6,9 @@ export function WorkforcePerformanceField({ value, filters, selectedContext, pop
   const result = loading ? null : resolveWorkforcePerformance(value, filters, population);
   const counts = result?.counts;
   return <section className="mb-6" aria-label="Workforce career measures">
-    <p className="text-sm text-muted-foreground">Demo data · Original workforce on 30 Sep 2026 · 2026 year to date</p>
+    <p className="text-sm text-muted-foreground">Workforce at 30 Sep 2026 · 2026 year to date</p>
     <p className="mt-1 text-xs text-muted-foreground">{selectedContext.country} · {selectedContext.businessUnit} · {selectedContext.level}</p>
-    <div className="mt-4 grid min-w-0 gap-4 xl:grid-cols-3">
+    <div className="mt-4 evidence-panel-grid grid min-w-0 gap-4">
       <section className="min-w-0 rounded-lg border p-4" aria-label="Workforce performance ratings">
         <h3 className="font-semibold">Ratings distribution</h3>
         <p className="mt-1 text-xs text-muted-foreground">Employees by numeric rating · Counts</p>
@@ -19,14 +19,14 @@ export function WorkforcePerformanceField({ value, filters, selectedContext, pop
             </li>)}
           </ul>
           <p className="mt-4 text-xs text-muted-foreground">{counts.rated.toLocaleString('en-US')} rated / {counts.population.toLocaleString('en-US')} employees. Unavailable ratings: {counts.unavailable}. Not-rated status: not collected.</p>
-        </> : <p role="status" className="flex min-h-48 items-center text-sm text-muted-foreground">{!supportsPerformanceFilters(filters) ? 'Unavailable for this selection. Ratings support the whole company or one business unit only; select all countries and all levels.' : loading ? 'Loading ratings for the selected workforce…' : 'Ratings unavailable. No active, validated aggregate release was returned for this workforce.'}</p>}
+        </> : <p role="status" className="mt-3 text-sm text-muted-foreground">{!supportsPerformanceFilters(filters) ? 'Unavailable for this selection. Ratings support the whole company or one business unit only; select all countries and all levels.' : loading ? 'Loading ratings for the selected workforce…' : 'Ratings unavailable. No active, validated aggregate release was returned for this workforce.'}</p>}
       </section>
       <UnavailableMeasure title="Promotion rate" unit="Promoted employees / eligible employees · %" reason="Unavailable. A verified promotion-eligible population and linked promotion outcomes for this workforce and period are not available. Recorded event shares are not promotion rates." />
       <UnavailableMeasure title="Median time in prior level" unit="Months before promotion" reason="Unavailable. Verified prior-level start dates and linked promotion dates are not available for this workforce. Current tenure and recorded movement counts cannot establish this duration." />
     </div>
-    <p className="mt-3 text-xs text-muted-foreground">Numeric ratings are ordinal categories; category names and calibration are unverified. The September 30 availability date is a simulated display convention, not a verified historical release date. These measures are descriptive only and excluded from AI evidence.</p>
+    <details className="mt-3 text-xs text-muted-foreground"><summary className="min-h-11 cursor-pointer py-2 font-medium">Rating definitions &amp; availability</summary><p>Numeric ratings are ordinal categories; category names and calibration are unverified. The September 30 availability date is a simulated display convention, not a verified historical release date. These measures are descriptive only and excluded from AI evidence.</p></details>
   </section>;
 }
 function UnavailableMeasure({ title, unit, reason }: { title: string; unit: string; reason: string }) {
-  return <section className="min-w-0 rounded-lg border p-4" aria-label={title}><h3 className="font-semibold">{title}</h3><p className="mt-1 text-xs text-muted-foreground">{unit}</p><p role="status" className="flex min-h-48 items-center text-sm text-muted-foreground">{reason}</p></section>;
+  return <section className="min-w-0 rounded-lg border p-4" aria-label={title}><h3 className="font-semibold">{title}</h3><p className="mt-1 text-xs text-muted-foreground">{unit}</p><p role="status" className="mt-3 text-sm text-muted-foreground">Unavailable for this workforce and period.</p><details className="mt-2 text-xs text-muted-foreground"><summary className="min-h-11 cursor-pointer py-2 font-medium">What is missing?</summary><p>{reason}</p></details></section>;
 }
