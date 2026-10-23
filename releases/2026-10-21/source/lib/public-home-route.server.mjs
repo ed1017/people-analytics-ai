@@ -58,7 +58,7 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
   const controller=new AbortController(),signal=AbortSignal.any([request.signal,controller.signal]),timer=setTimeout(()=>controller.abort(),timeoutMs);
   try{signal.throwIfAborted();return await awaitPublicQaBinding((async()=>{
    const binding=await loadBinding();signal.throwIfAborted();const identity=structuredClone(binding.router.current());
-   must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===2&&/^[a-f0-9]{64}$/.test(identity.digest)&&await binding.router.bootstrapToken()===P.token);
+   must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===P.generation&&/^[a-f0-9]{64}$/.test(identity.digest)&&await binding.router.bootstrapToken()===P.token);
    const current=()=>{signal.throwIfAborted();must(same(binding.router.current(),identity));};current();
    if(request.method==='GET'){
     const filters=projectionCurrentnessFilters(url.searchParams),source=await loadProjection(signal),receipt=await source.currentness(filters,signal);current();must(receipt.datasetToken===P.token&&receipt.inputs.datasetVersion.publicDigest===identity.digest);return Response.json(receipt,{headers});

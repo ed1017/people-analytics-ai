@@ -1,11 +1,11 @@
-# Deployed application source — October 21, 2026
+# Versioned application source
 
-This directory publishes the application source from the reviewed 9,037-person release at https://www.ed-ai.app. It is a source snapshot, not a deployable replacement for the root development application.
+This directory contains the reviewed candidate source for the coordinated 9,037-person synthetic baseline revision. Production promotion is recorded separately after hosted acceptance and CI. It is not a deployable replacement for the root development application.
 
-- Deployed source commit: `d287811e87db07be16505f0ef273e75adf9b1880` (local release identity; not a GitHub commit link).
-- Verified deployment: `dpl_AuFkMwMdktaX4KUrQb3P9zCeTsrS`.
-- Original deployed package SHA-256: `35c90f1def7943209697023022d3290614b8a005ea21a7ba41c4fb0464b26f07`.
-- `source/` contains 726 exact application, asset and configuration files. `manifest.json` records individual byte hashes. The base archive was independently downloaded and matched; this update changes only the reviewed source files. The staged build restored and verified the pinned archive before promotion; the release handoff records the promotion outcome separately.
+- Candidate runtime: `7ea8bc36e814396530c70d5889ebd1f5aa24da3d`.
+- Protected candidate preview: `dpl_4hwHRmwMrHUEgC5kuUb8gEwjGrCx`. Production remains unchanged pending release gates.
+- Candidate package SHA-256: `fb857b754b8618ebea13b00d89056988e23b9d93fbd563fb43db6e53f216cf21`.
+- `source/` contains 804 exact reviewed source files. `manifest.json` pins their bytes. The protected build restored the candidate package and passed build/type checks; production promotion remains gated on CI.
 
 Verify without dependencies, credentials or network:
 

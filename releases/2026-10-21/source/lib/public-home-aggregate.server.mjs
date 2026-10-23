@@ -16,7 +16,7 @@ import {withBusinessUnitTurnover} from './home-bu-turnover.mjs';
 export async function readPublicWorkforceHistory({binding,hostname,identity,args,signal,requestId}){
  const must=v=>{if(!v)throw Error('Historical workforce evidence could not be verified.');};
  const current=()=>{signal.throwIfAborted();must(same(binding.router.current(),identity));};
- current();must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===2&&/^[a-f0-9]{64}$/.test(identity.digest));
+ current();must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===P.generation&&/^[a-f0-9]{64}$/.test(identity.digest));
  must(await binding.router.bootstrapToken()===P.token);
  must(/^people-analytics-[a-z0-9]+-ed-56dc\.vercel\.app$/.test(hostname));
  must(args&&same(Object.keys(args).sort(),['country','end','level','metric','org','start']));
@@ -52,7 +52,7 @@ export async function readPublicHomeAggregate({binding,hostname,identity,filters
  const must=value=>{if(!value)throw Error('Current aggregate evidence could not be verified.');};
  const current=()=>{signal.throwIfAborted();must(same(binding.router.current(),identity));};
  current();
- must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===2&&/^[a-f0-9]{64}$/.test(identity.digest));
+ must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===P.generation&&/^[a-f0-9]{64}$/.test(identity.digest));
  must(await binding.router.bootstrapToken()===P.token);
  must(/^people-analytics-[a-z0-9]+-ed-56dc\.vercel\.app$/.test(hostname));
  const definition=aggregateRegistry.find(item=>item.id===args.registryId);
@@ -100,7 +100,7 @@ export async function readPublicHomeAggregate({binding,hostname,identity,filters
 export async function readPublicPolicyEstimate({binding,hostname,identity,filters,args,signal}){
  const must=value=>{if(!value)throw Error('Current policy evidence could not be verified.');};
  const current=()=>{signal.throwIfAborted();must(same(binding.router.current(),identity));};
- current();must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===2&&/^[a-f0-9]{64}$/.test(identity.digest));
+ current();must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===P.generation&&/^[a-f0-9]{64}$/.test(identity.digest));
  must(await binding.router.bootstrapToken()===P.token);
  must(/^people-analytics-[a-z0-9]+-ed-56dc\.vercel\.app$/.test(hostname));
  if(!filters||Object.values(filters).some(v=>v!=='all'))return {status:'unsupported_scope',message:'Only global constructed policy bands are available. Clear filters to inspect a global scenario estimate; selected department/location rates are unavailable.'};

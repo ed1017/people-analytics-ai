@@ -21,7 +21,7 @@ test('historical version is readable but never current-source authority',()=>{
 test('actual new binding rejects old request tokens and publishes revised coherent summaries',async()=>{
  const b=await loadPublic9037Binding({hostname:'www.ed-ai.app'});
  const stale=await b.handle(new Request('https://www.ed-ai.app/api/dashboard',{headers:{'x-workforce-dataset':old}}));assert.equal(stale.status,409);
- const response=await b.handle(new Request('https://www.ed-ai.app/api/dashboard',{headers:{'x-workforce-dataset':P.token}}));assert.equal(response.status,200);const d=await response.json();assert.equal(d.overview.headcount,9037);assert.equal(d.data_meta.datasetToken,P.token);assert.equal(b.router.current().digest,'bddfe25c13f71434defdf37493ae14a86841fc9f5d4dab8162a1767273111f72');
+ const response=await b.handle(new Request('https://www.ed-ai.app/api/dashboard',{headers:{'x-workforce-dataset':P.token}}));assert.equal(response.status,200);const d=await response.json();assert.equal(d.overview.headcount,9037);assert.equal(d.data_meta.datasetToken,P.token);assert.equal(b.router.current().digest,'b320608fd2edd49f838e9834cdcd13dea1a2cfc3167bdc84c5fbe487a4d0dc97');
 });
 
 test('historical calculated projection reopens unchanged but cannot seed a new calculation',async()=>{
@@ -35,4 +35,12 @@ test('historical calculated projection reopens unchanged but cannot seed a new c
  const before=JSON.stringify(p);assert.deepEqual(readHeadcountProjections([p]),[p]);assert.equal(JSON.stringify(p),before);
  await assert.rejects(calculateHeadcountProjection(spec,p.inputs,[],[]),/unavailable or invalid/);
  await assert.rejects(calculateHeadcountProjection({...spec,base:{id:p.id,revision:p.revision}},inputs,[p],[]),/binding changed/);
+});
+
+test('an already-open old tab refreshes to the higher generation without consuming mixed evidence',async()=>{
+ const {DatasetSession}=await import('../lib/dataset-client.mjs');
+ const s=new DatasetSession(old,{requireBootstrap:true});s.bootstrap(old);
+ await assert.rejects(s.fetch('/api/dashboard',{},async()=>Response.json({salary:'must not consume'},{status:409,headers:{'x-workforce-dataset':P.token}})),/Dataset changed/);
+ assert.equal(s.snapshot(),'pending:'+P.token);let prepared=null;s.bootstrap(P.token,t=>prepared=t);assert.equal(prepared,P.token);assert.equal(s.current(),P.token);
+ s.bootstrap(old);assert.equal(s.current(),P.token);
 });

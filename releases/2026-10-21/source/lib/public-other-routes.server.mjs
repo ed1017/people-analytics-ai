@@ -42,7 +42,7 @@ export function createPublicOtherRoutesTestAdapter({enabled=PUBLIC_OTHER_ROUTES_
   try{signal.throwIfAborted();return await awaitPublicQaBinding((async()=>{
    const body=await boundedJson(request.body,kind==='intake'?16384:kind==='capability'?24576:kind==='plan'?900000:180000,signal);
    phase='source';const binding=await loadBinding();signal.throwIfAborted();const identity=structuredClone(binding.router.current());
-   must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===2&&/^[a-f0-9]{64}$/.test(identity.digest)&&await binding.router.bootstrapToken()===P.token);
+   must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===P.generation&&/^[a-f0-9]{64}$/.test(identity.digest)&&await binding.router.bootstrapToken()===P.token);
    const check=()=>{signal.throwIfAborted();must(same(binding.router.current(),identity),'Public binding changed.');};
    const observed=[];
    async function read(path,body,readSignal=signal){

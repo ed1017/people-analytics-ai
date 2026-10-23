@@ -10,7 +10,7 @@ const filters={country:'all',org:'all',level:'all'},digest='a'.repeat(64);
 const spec={id:'public-flow',base:null,method:'monthly_flow',months:3,changes:[['monthly_hires',20],['monthly_exits',10]].map(([field,value])=>({field,kind:'literal',value,basis:'illustrative',turnId:null,interpretation:'Explicit fixture assumption.'}))};
 function fake({mutate=()=>{},changed=false,scope=filters}={}){
  let count=0;
- const identity={datasetId:P.datasetId,token:P.token,digest,generation:2};
+ const identity={datasetId:P.datasetId,token:P.token,digest,generation:P.generation};
  const binding={router:{bootstrapToken:async()=>P.token,current:()=>({...identity,digest:changed&&count>0?'b'.repeat(64):digest})},async handle(req){
   assert.equal(req.headers.get('x-workforce-dataset'),P.token);count++;
   const path=new URL(req.url).pathname;
@@ -57,7 +57,7 @@ test('actual approved9037 public source: snapshot, filters, public digest and ga
  const source=await loadPublicProjectionSource({hostname:'people-analytics-gkl61lnek-ed-56dc.vercel.app',production:true});
  const preview=await loadPublicProjectionSource({hostname:'people-analytics-gkl61lnek-ed-56dc.vercel.app',production:false});assert.equal((await preview.projection(filters)).opening,9037);
  const all=await source.projection(filters),scoped=await source.projection({...filters,country:'US',level:'L1'});
- assert.equal(all.opening,9037);assert.equal(all.datasetVersion.publicDigest,'bddfe25c13f71434defdf37493ae14a86841fc9f5d4dab8162a1767273111f72');assert.equal(all.baseline[0].planning_month,'2027-01-01');assert.ok(scoped.opening>0&&scoped.opening<9037);assert.equal(scoped.defaults,null);
+ assert.equal(all.opening,9037);assert.equal(all.datasetVersion.publicDigest,'b320608fd2edd49f838e9834cdcd13dea1a2cfc3167bdc84c5fbe487a4d0dc97');assert.equal(all.baseline[0].planning_month,'2027-01-01');assert.ok(scoped.opening>0&&scoped.opening<9037);assert.equal(scoped.defaults,null);
  await assert.rejects(calculateHeadcountProjection({...spec,method:'configured_scenario',months:1,changes:[]},all,[],[]),/complete forward window/);
  const receipt=await source.currentness(filters);assert.equal(receipt.inputs.opening,9037);
 });
@@ -72,7 +72,7 @@ test('legacy mutable-source receipt and private-version projections preserve the
 test('bounded loader, handle and response stream terminate; oversized producers are cancelled',async()=>{
  const {loadPublicProjectionTestSource}=await import('../lib/public-projection-source.server.mjs');
  await assert.rejects(loadPublicProjectionTestSource(()=>new Promise(()=>{}),undefined,15),/aborted/);
- const identity={datasetId:P.datasetId,token:P.token,digest,generation:2};
+ const identity={datasetId:P.datasetId,token:P.token,digest,generation:P.generation};
  const router={current:()=>identity,bootstrapToken:async()=>P.token};
  let observedSignal;
  const stalled=createPublicProjectionTestAdapter({router,handle:req=>{observedSignal=req.signal;return new Promise(()=>{});}},{timeoutMs:15});

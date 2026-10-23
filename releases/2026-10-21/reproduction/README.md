@@ -1,6 +1,6 @@
 # Local reproduction with public synthetic fixtures
 
-This recipe starts the versioned release's actual Home and analytics components against a pinned replay of 19 unauthenticated public GET responses. It uses no private runtime inputs, credentials, database, provider calls or production access. It creates a separate local application; the immutable source snapshot and repository root app are not modified.
+This recipe starts the versioned release's actual Home and analytics components against a pinned replay of 19 public-schema aggregate GET responses. It uses no private runtime inputs, credentials, database, provider calls or production access. It creates a separate local application; the immutable source snapshot and repository root app are not modified.
 
 ## Setup
 
@@ -22,13 +22,13 @@ The generated wrapper enables the original Home conversation layout at build tim
 
 ## Provenance and fidelity
 
-`fixtures.json` records the capture time, public origin, original dataset headers and exact bodies. `fixtures.sha256` pins its bytes. `verify-receipts.mjs` reuses the reviewed public projection allowlist, verifies complete metadata and dashboard scope, rejects extra fields, and reconstructs the original source-ordered bundle digest. These are historical published receipts, not newly issued proof of live-source currentness.
+`fixtures.json` records the capture time, public origin, original dataset headers and exact bodies. `fixtures.sha256` pins its bytes. `verify-receipts.mjs` reuses the reviewed public projection allowlist, verifies complete metadata and dashboard scope, rejects extra fields, and reconstructs the original source-ordered bundle digest. These are pinned candidate receipts captured through the existing protected preview, not newly issued proof of live-source currentness.
 
 The fixture is intentionally company-wide. The dataset token in recorded receipts is retained so the original UI validators can inspect those historical responses. A permanent local notice and response header identify replay. Browser storage uses this local origin; do not interpret saved local examples as live production plans.
 
 Five already-public headcount experiment support files are reused from the root repository and pinned in `public-support.json`. Their normalized contents match the deployed archive. They are existing fictional experiments, not new private inputs or proof of forecast accuracy.
 
-The source manifest verifies all 720 source files in the current manifest before copying. `REPRODUCTION.json` lists local overrides. The recipe replaces only the transport/runtime binding, adds the replay notice, removes private file tracing and changes local build/start scripts. Home layout, chart calculations and existing UI handlers are not rewritten. Analytics is suppressed. Historical generation scripts are not rerun: generated source assets are already pinned by the manifest, while their excluded historical evidence is not reconstructed.
+The source manifest verifies all source files in the current manifest before copying. `REPRODUCTION.json` lists local overrides. The recipe replaces only the transport/runtime binding, adds the replay notice, removes private file tracing and changes local build/start scripts. Home layout, chart calculations and existing UI handlers are not rewritten. Analytics is suppressed. Historical generation scripts are not rerun: generated source assets are already pinned by the manifest, while their excluded historical evidence is not reconstructed.
 
 ## Supported and deliberately unavailable
 
@@ -39,3 +39,7 @@ The source manifest verifies all 720 source files in the current manifest before
 - Full server calculator parity, live AI, private-source reconstruction and company-data onboarding are not reproduced by this increment.
 
 The seven fixture tests cover exact 19-response replay, receipt/data tampering, explicit global scope, unsupported scope, disabled external operations local-only request boundaries and launcher argument restrictions. Run the standalone source verifier as well. Build and browser verification outcomes belong to the implementation report, not inferred from this instruction list.
+
+## Coordinated baseline revision
+
+The current fixture capture is from the exact protected candidate origin recorded in `fixtures.json`, not a claim that production has already changed. All 19 bodies use generation 3 and the revised public aggregate digest. The previous production fixture remains in Git history. No private aggregate source files or employee records are included.

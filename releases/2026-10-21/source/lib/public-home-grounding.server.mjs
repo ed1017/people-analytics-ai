@@ -42,7 +42,7 @@ export function createPublicHomeGroundingTestAdapter({enabled=PUBLIC_HOME_GROUND
    const current=async()=>{
     must(typeof binding?.router?.current==='function'&&typeof binding.handle==='function');
     const identity=await binding.router.current();
-    must(identity?.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===2&&/^[a-f0-9]{64}$/.test(identity.digest)&&await binding.router.bootstrapToken()===P.token);
+    must(identity?.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===P.generation&&/^[a-f0-9]{64}$/.test(identity.digest)&&await binding.router.bootstrapToken()===P.token);
     return identity.digest;
    };
    const digest=await current(),keys=[...new Set(ids.map(id=>definitions.get(id)[1]))],results={};let next=0;
