@@ -1,3 +1,13 @@
+## Current decision queue — October 23 follow-through
+
+Current delivery: PR363 live. Earlier dated status sections below are history, not the active queue.
+
+1. **In this increment:** compact Career Growth unavailable-measure panels; collapse retained rating/source/interpretation explanations while keeping missing-data, incomplete-history and scope visible. No arithmetic changes.
+2. **Next proposed navigation change (awaiting product direction):** retain top-level Overview/Plan/Evidence and every destination, but make the evidence sidebar a single labeled drawer on narrow screens and expose only the current page and a “Browse evidence” control. Keep the goal/scope row available as its existing disclosure. Benefit: fewer competing navigation rows and more chart space. Tradeoff: switching evidence pages adds one tap; do not remove destinations or move chat right. Verify current mobile sidebar behavior before implementing to avoid duplication.
+3. **Next proposed planning-flow change (awaiting product direction):** when a valid existing comparison is available, open on its compact recommendation and options, with the original intro accessible through “How this comparison works.” With missing inputs, keep clarification first. Benefit: returning users reach options sooner; tradeoff: first-time users may miss context unless the disclosure is clear. No automatic selection or hidden assumptions.
+4. **Independent remaining constraint:** full BU names require a verified mapping. No guessed expansions. Broader unpaid reliability regressions can proceed under the existing roadmap when a concrete failure or acceptance gap is identified; do not repeat paid model tests or invent new scope.
+5. **Deferred:** onboarding/video/credits, dark-mode work, pinning/action integration, wholesale redesign and dataset regeneration.
+
 ## October 22, compact planner verification
 
 - Hiring controls are live in PR354, runtime `cb225d691ee63e32b404ccc53d7d8a2b3159402b`, deployment `dpl_9jMiHDgGXca59iawVAMUqh8yaauc`. CI and protected desktop/mobile plus production browser replay passed; edited calculations and visuals survive reload.
