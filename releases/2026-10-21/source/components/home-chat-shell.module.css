@@ -1,5 +1,5 @@
 .shell { color: var(--foreground); container-type: inline-size; container-name: home-intro; }
-.shell :global(.home-workspace) { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 12px 18px; max-width: 1240px; margin-inline: auto; }
+.shell :global(.home-workspace) { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 12px 18px; max-width: none; margin-inline: 0; }
 .shell :global(.home-workspace[data-overview-starting]) > section { border: 0; background: transparent; padding: 0; }
 .shell :global(.home-workspace[data-overview-starting]) > section > header { gap: 4px 12px; }
 .shell :global(.home-workspace[data-overview-starting]) > section > header > h2 { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

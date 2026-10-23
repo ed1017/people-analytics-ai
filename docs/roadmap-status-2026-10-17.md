@@ -68,3 +68,18 @@ The reviewer also noted Action plans still references "Home" while navigation sa
 
 No new feature program or new data source is proposed by this reconciliation.
 
+
+
+## Owner review batch — October 23, 2026 (local work, not yet released)
+
+- Templates beside suggested questions, outside composer; hide after submission and restore on a new conversation. Preserve drafts, explicit Send and optional inputs; improve plain-text field spacing.
+- Complete verified role catalogue (50 loaded roles), searchable multi-selection/removal; preserve all roles and other fields. No implicit FTE allocation. Rename template Department/team to Business unit, with real BU suggestions; historical department text remains distinct.
+- Remove centered active-chat width limit; preserve responsive adjustable split.
+- Condense recommendation cards, lead with a short conditional action derived from current calculation. Sliders, numeric summary, saved plan and supported scenario visual must stay synchronized. Historical actuals remain unchanged.
+- Put monthly hires/separations directly below headcount, default January 2026 through latest September data. Retain December baseline for derived January starts; tooltip/table expose signed net change, with keyboard/touch access.
+
+### Next: informational Key findings (requested, not implemented)
+
+Inventory and verify 2–3 scoped, dated observations for Workforce/Overview, Attrition, Finance, Compensation, Talent Acquisition, Employee Listening, Skills, Learning/Development, Career Mobility/Growth, Succession, Workforce Planning and Intelligence. Inspect each existing page's source and current summaries before adding duplicates. Home already has scoped snapshot metrics; add only useful nonredundant findings. Planning pages use the selected calculation; unsupported/empty/incomplete sources get truthful states. Catalogues/settings/navigation or pages without analytical evidence require an explicit applicability decision, not fabricated findings.
+
+Reuse shared deterministic summaries, no paid calls on page load/filter changes and no implication these are live model output. Preserve live AI. Pinning findings and connecting them to action planning are a later phase, outside this informational-summary increment. Welcome/video and live-company tenancy remain deferred.

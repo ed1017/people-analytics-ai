@@ -11,7 +11,7 @@ export function composerCatalogMatch(value:string,caret:number):CatalogMatch|nul
  }
  const before=value.slice(0,caret),open=before.match(/\[(role|level|business unit|department)(?::[ \t]*([^\]\n]*))?$/i);
  if(open)return {kind:open[1].toLowerCase() as CatalogKind,query:open[2]??'',start:caret-open[0].length,end:caret};
- const typed=before.match(/\b(role|level|business unit|department)[ \t]*:[ \t]*([^\n,;[\]]*)$/i);
+ const typed=before.match(/\b(role|level|business unit|department)[ \t]*:[ \t]*([^\n;[\]]*)$/i);
  return typed?{kind:typed[1].toLowerCase() as CatalogKind,query:typed[2],start:caret-typed[2].length,end:caret}:null;
 }
 const obj=(v:unknown):Record<string,unknown>=>v&&typeof v==='object'&&!Array.isArray(v)?v as Record<string,unknown>:{};
@@ -28,5 +28,21 @@ export function composerCatalogOptions(kind:CatalogKind,workforce:unknown,roles:
  }
  return new Set(options.map(o=>o.code)).size===options.length?options:[];
 }
-export function filterComposerOptions(options:CatalogOption[],query:string){const q=query.trim().toLowerCase();return options.filter(o=>o.label.toLowerCase().includes(q)||o.code.toLowerCase().includes(q)).slice(0,8);}
+export function filterComposerOptions(options:CatalogOption[],query:string){const q=query.trim().toLowerCase();return options.filter(o=>o.label.toLowerCase().includes(q)||o.code.toLowerCase().includes(q));}
 export function insertComposerOption(value:string,match:CatalogMatch,option:CatalogOption){const insertion=option.label===option.code?option.code:option.label+' ('+option.code+')';return {value:value.slice(0,match.start)+insertion+value.slice(match.end),caret:match.start+insertion.length};}
+
+/** Toggle a verified role in the active field; retain unrecognized manually entered values. */
+export function toggleComposerRole(value:string,match:CatalogMatch,option:CatalogOption,replaceSearch=false,catalogue:CatalogOption[]=[]){
+ const end=value.indexOf('\n',match.end),fieldEnd=end<0?value.length:end;
+ let parts=value.slice(match.start,fieldEnd).split(',').map(s=>s.trim()).filter(Boolean);
+ const label=option.label===option.code?option.code:option.label+' ('+option.code+')';
+ const same=(s:string)=>s===label||s===option.code;
+ const selected=parts.some(same);
+ const activeIndex=value.slice(match.start,match.end).split(',').length-1;
+ const fragment=parts[activeIndex];
+ const known=fragment&&catalogue.some(o=>fragment===o.code||fragment===o.label||fragment===(o.label===o.code?o.code:o.label+' ('+o.code+')'));
+ if(!selected&&replaceSearch&&fragment&&!known&&(option.label.toLowerCase().includes(fragment.toLowerCase())||option.code.toLowerCase().includes(fragment.toLowerCase())))parts=parts.filter((_,i)=>i!==activeIndex);
+ const next=selected?parts.filter(s=>!same(s)):[...parts,label];
+ const insertion=[...new Set(next)].join(', ');
+ return {value:value.slice(0,match.start)+insertion+value.slice(fieldEnd),caret:match.start+insertion.length};
+}

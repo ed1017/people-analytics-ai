@@ -61,6 +61,7 @@ export type HomeChatWelcomeProps = Omit<HomeOverviewSummaryProps, 'onNavigate'> 
   flows?: WorkforceFlow[]|null;
   /** The owning chat supplies its existing composer; this component never submits requests. */
   composer?: ReactNode;
+  templates?: ReactNode;
   /** From the same dataset-scoped dashboard response as overview and receipt. */
   trend?: readonly HeadcountTrendPoint[];
 };
@@ -109,6 +110,7 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         </svg>
         <figcaption><span>{axisLabel} {periodContext} </span>{history.length === 1 ? 'One recorded snapshot: ' + first?.snapshot_date + '; no trend inferred.' : history.length ? first?.snapshot_date + ' – ' + last?.snapshot_date + ' · ' + history.length + ' recorded monthly snapshots; gaps left unconnected.' : 'Recorded history unavailable.'}{checked && <span> Dashed: conditional projection through {horizonEnd?.slice(0,7)}.</span>}</figcaption>
       </figure> : <p className={styles.historyState} role="status">{loading ? 'Updating workforce history…' : 'Verified headcount history unavailable.'}</p>}
+      {current&&<HomeWorkforceFlows rows={flows}/>}
       <ul className={styles.kpiRow} aria-label="Recorded workforce indicators">
         <li><span>Recruiting hires</span><b>{recruitingPending ? 'Loading…' : current&&recruitingKpi?.asOf===snapshotDate ? recruitingKpi.hires.toLocaleString() : 'Unavailable'}</b><small>Company-wide · monthly</small></li>
         <li><span>Voluntary turnover YTD</span><b>{loading ? 'Loading.' : known(current?.voluntary_turnover_ytd_pct) ? format(current.voluntary_turnover_ytd_pct)+'%' : 'Unavailable'}</b><small>Source-reported · not annualized</small></li>
@@ -118,7 +120,6 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         <li><span>Average open requisition age</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.openReqAgeDays) ? format(recruiting.openReqAgeDays)+' days' : 'Unavailable'}</b><small>Company-wide · as of {snapshotDate || 'unavailable date'}</small></li>
         <li><span>Recruiting offers</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.offers) ? format(recruiting.offers) : 'Unavailable'}</b><small>Company-wide · {recruiting?.month ?? 'month unavailable'}</small></li>
       </ul>
-      {current&&<HomeWorkforceFlows rows={flows}/>}
       <details className={styles.evidenceDetails}><summary>Sources and exact cost · {checked?"Conditional projection":projectionStatus==="checking"?"Checking projection":projectionStatus?"Projection unavailable":"Projection not configured"}</summary>
         {known(current?.labor_cost_usd)&&<details className={styles.exactCost}><summary>Labor cost: period unspecified</summary><p>{welcomeCurrency(current.labor_cost_usd).exact}. Cost period unspecified; no monthly or annual basis is inferred.</p></details>}
       <dl className={styles.movementNotes} aria-label="Workforce movements"><div><dt>Projected hires</dt><dd>{checked ? format(flowTotal('hires')) : 'Not available'}</dd></div><div><dt>Projected departures</dt><dd>{checked ? format(flowTotal('exits')) : 'Not available'}</dd></div></dl>
@@ -134,7 +135,7 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
     </section>;
 }
 
-export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, disabled = false, composer, trend = [], recruitingKpi, recruitingPending, flows}: HomeChatWelcomeProps) {
+export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, disabled = false, composer, templates, trend = [], recruitingKpi, recruitingPending, flows}: HomeChatWelcomeProps) {
   return <section aria-label="Plan your workforce" className={styles.welcome}>
     <HomeConversationSplit enabled visuals={<HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending} flows={flows}/> }>
     <h2>Plan the workforce your business needs</h2>
@@ -150,6 +151,7 @@ export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loadi
         </button>;
       })}
     </div>
+    {templates}
     {composer && <div className={styles.composer}>{composer}</div>}
     </HomeConversationSplit>
   </section>;

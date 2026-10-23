@@ -5,7 +5,7 @@ import {publicAiReadiness,usePublicAiReadiness} from '@/components/use-public-ai
 import {publicHomeSourceVersion} from '@/lib/public-ai-evidence-client.mjs';
 import {PUBLIC_AI_ENABLED} from '@/lib/public-ai-capabilities.mjs';
 import {homeWorkforceFlows,type WorkforceFlow} from '@/lib/home-workforce-flows';
-import {CatalogComposer} from '@/components/catalog-composer';
+import {CatalogComposer,PromptTemplates} from '@/components/catalog-composer';
 import {homeNextDetails} from '@/lib/home-next-details';
 import {homeRecruitingKpi,type HomeRecruitingKpi} from '@/lib/home-kpi-source';
 import {HomeHeadcountSummary,type HomeSnapshotProps} from '@/components/home-chat-welcome';
@@ -103,7 +103,7 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
   return { clarification:readHomeClarification(data.clarification??proposal?.question), findingFollowups:readHomeFindingFollowups(data.findingFollowups,data.answer,sources), answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal, diagnostic, diagnosticStage:useServer?'server' as const:'client' as const };
 }
 
-type WelcomeControls = {onNavigate:(page:AppPage)=>void; onQuestion: (question: string) => void; disabled: boolean; recruitingKpi:HomeRecruitingKpi|null;recruitingPending:boolean;flows:WorkforceFlow[]|null;composer?:ReactNode};
+type WelcomeControls = {onNavigate:(page:AppPage)=>void; onQuestion: (question: string) => void; disabled: boolean; recruitingKpi:HomeRecruitingKpi|null;recruitingPending:boolean;flows:WorkforceFlow[]|null;composer?:ReactNode;templates?:ReactNode};
 function WelcomeSlot({render, ...controls}: WelcomeControls & {render: (controls: WelcomeControls) => ReactNode}) { return render(controls); }
 
 const noActionSubscription=()=>()=>{};
@@ -640,6 +640,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       {chatError && <p role="alert" className="text-destructive">{chatError}</p>}
     </section>
   );
+  const templates=<PromptTemplates value={input} onChange={changeQuestion} textareaRef={composer}/>;
   const startingGuide=(
     <section aria-label="Starting guide" data-testid="overview-starting-guide" className="space-y-3 pt-0 pb-1">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -648,6 +649,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       </div>
 
       <div className="mt-3"><PromptExamples groups={conversation.focusedIssue?undefined:homeStarterGroups} prompts={[...contextualPrompts({page:"home",goal:conversation.focusedIssue,hasConversation:messages.some(message=>message.role==="user"),evidenceReady:ready,sources})]} draft={input} busy={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)} onSend={submitStarterQuestion}/></div>
+      {templates}
 
     </section>
   );
@@ -710,7 +712,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions publicEvidenceContext={publicEvidenceContext} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!guidedExampleActive&&<SwpGuidedJourney onGeneralQuestion={text=>{conversation.startNewProblem(text);setScenarioQuestion({text,token:datasetSession.snapshot(),reset:conversation.resetEpoch,workspace:conversation.workspaceKey.slice(0,conversation.workspaceKey.lastIndexOf(':')+1)});}} scenarioTarget={scenarioTarget} onScenarioChatChange={setScenarioChat} onDemoStateChange={setSwpDemoVisible} discussionKey={JSON.stringify([workforceScope,workforceQuery,persona])} conversation={conversation} active={active} busy={chatLoading||solutions.pending||solutions.saving} commandRef={swpCommand} modelContextRef={swpModelContext} demandControlRef={demandControl} demandReviewRef={demandReview} demandContextRef={demandContext} sources={sources??[]} onNavigate={onNavigate}/>}
-    {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&(renderWelcome ? <WelcomeSlot render={renderWelcome} onNavigate={onNavigate} composer={welcomeComposer?questionComposer:undefined} recruitingKpi={recruitingKpi} recruitingPending={!sourcesSettled} flows={flows} onQuestion={submitStarterQuestion} disabled={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)}/> : overviewEntry?<details><summary className="min-h-11 cursor-pointer py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Ideas for your first question</summary>{startingGuide}</details>:startingGuide)}
+    {!guidedExampleActive&&!messages.length&&!conversation.focusedIssue&&(renderWelcome ? <WelcomeSlot render={renderWelcome} templates={templates} onNavigate={onNavigate} composer={welcomeComposer?questionComposer:undefined} recruitingKpi={recruitingKpi} recruitingPending={!sourcesSettled} flows={flows} onQuestion={submitStarterQuestion} disabled={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)}/> : overviewEntry?<details><summary className="min-h-11 cursor-pointer py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Ideas for your first question</summary>{startingGuide}</details>:startingGuide)}
     {!solutionConversationEnabled&&showFallbackPin&&!chatLoading&&<section aria-label="Review your goal without evidence" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">Keep your goal and review assumptions</h3><p>{fallbackGoal}</p><p>Some sources are unavailable. You can pin this user-authored goal and explicitly prepare a local assumptions-only proposal. This does not verify the goal against evidence or run a model or calculation.</p><button className="min-h-11 rounded border px-3 py-2 font-medium disabled:opacity-50" disabled={chatLoading||!active||!conversation.saved||!conversation.storageReady||Boolean(conversation.issueEditor)} onClick={pinAssumptionsGoal}>Pin goal for assumptions-only planning</button></section>}
     <div hidden={swpDemoVisible&&!demoChatOpen}>{!activePinnedGoal&&conversationPanel}</div>
 
