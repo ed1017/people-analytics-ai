@@ -16,7 +16,7 @@ This is a portfolio prototype. No measured adoption, savings, business impact or
 
 ## Repository and deployment status
 
-The versioned application source subset, updated through the October 23 coherent geography revision, is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. That snapshot maps to deployment `dpl_HZcrSFM67bCLnb6c5QnmAN4CT1Ng` and local source identity `834f3b9da202c977021c5f12d1de015302e9824c`.
+The versioned application source subset, updated through the October 23 date-only pricing renewal, is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. That snapshot maps to deployment `dpl_A3AqcMu2rdJ9KXBJH53vCzCCxNRL` and local source identity `044f26e854d8cad6407b4c683f1c762858f7ebb8`.
 
 The root development application remains distinct from that versioned snapshot. Private synthetic runtime inputs, credentials and release evidence are excluded. Publishing the source closes the missing-source record; it does not make this repository a self-contained reproduction of the hosted service. A [local public-fixture replay recipe](releases/2026-10-21/reproduction/README.md) now builds and serves the versioned UI without private inputs or credentials. It preserves recorded company-wide receipts; live AI, narrowed filters and unrecorded server calculations are deliberately unavailable.
 
@@ -45,3 +45,5 @@ Open http://localhost:3000. To build this source:
 ```powershell
 npm.cmd run build
 ```
+
+Pricing renewal PR379: app, rollout, admission and settlement upper windows align at October 24 23:14 UTC. Round admission cutoff 23:12:30 UTC; new configuration receipts stop at 23:12:00 UTC. Independent review, 30 focused tests, CI, protected/public Home and capability checks passed. Rates, $50 cumulative cap, original reservations, receipts and uncertain holds are unchanged; accounting preservation verified. No paid provider call. This is configuration acceptance, not fresh-model answer acceptance.

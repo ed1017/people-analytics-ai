@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "sourceCommit": "044f26e854d8cad6407b4c683f1c762858f7ebb8",
-  "deployment": "pending-protected-verification",
+  "deployment": "dpl_A3AqcMu2rdJ9KXBJH53vCzCCxNRL",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",

@@ -1,10 +1,10 @@
 # Versioned application source
 
-This directory contains the reviewed production source through the coherent fictional geography revision.
+This directory contains the reviewed production source through the October 23 date-only pricing renewal; the coherent fictional geography revision is retained.
 
-- Runtime: `834f3b9da202c977021c5f12d1de015302e9824c`.
-- Deployment: `dpl_HZcrSFM67bCLnb6c5QnmAN4CT1Ng`; public alias verified.
-- Package SHA-256: `d477ad694d047a944f07ffead6efe6d75d143622ec29b71a21903ce43e09c492`.
+- Runtime: `044f26e854d8cad6407b4c683f1c762858f7ebb8`.
+- Deployment: `dpl_A3AqcMu2rdJ9KXBJH53vCzCCxNRL`; public alias verified.
+- Package SHA-256: `dac9d6b5ceaca89056661d7578698c43e67a998f3d1c996f3e2dd8cc18d8c97a`.
 - `source/` contains 808 exact reviewed source files pinned by `manifest.json`.
 - PR377: independent review and CI passed. Six geography tests, 2,527 reconciled group transitions, 62 PostgreSQL query replays, all 1,287 supported dashboard intersections, historical saved-plan isolation, and protected/public desktop/mobile country-filter checks passed. All 19 public aggregate responses exactly match the reviewed stage.
 - Dataset is `workforce-demo-9037-public-aggregates-v4:5`. Geography follows explicit fictional operating-footprint assumptions; event dates, monthly company totals, pay, hierarchy and skills are unchanged. Country differences are not calibrated geographic effects. Existing seasonal hiring/departure patterns are preserved.
@@ -80,3 +80,5 @@ The [coverage contract](../../../docs/catalog-skills-grounding.md) adds publishe
 ### Explicit scenario parity
 
 The guided popup and explicit chat continuation now share the same complete fictional inputs, staffing-option calculator and reviewed save flow. The prominent question updates with accepted assumptions. Bare questions do not import hidden scenario assumptions. See [acceptance and boundaries](../../../docs/scenario-workflow-parity.md).
+
+Pricing renewal PR379: app, rollout, admission and settlement upper windows align at October 24 23:14 UTC. Round admission cutoff 23:12:30 UTC; new configuration receipts stop at 23:12:00 UTC. Independent review, 30 focused tests, CI, protected/public Home and capability checks passed. Rates, $50 cumulative cap, original reservations, receipts and uncertain holds are unchanged; accounting preservation verified. No paid provider call. This is configuration acceptance, not fresh-model answer acceptance.
