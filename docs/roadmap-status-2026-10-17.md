@@ -102,7 +102,7 @@ This increment adds deterministic observations, not model-generated conclusions 
 | Learning & Development | Company catalogue/pathway coverage; not readiness/completion. |
 | Career Growth & Mobility | Recorded events versus distinct employees; partial latest month flagged. |
 | Career Interests (legacy component) | Preference coverage/missing records, not readiness. Current navigation redirects this legacy route to Workforce. |
-| Succession | Recorded coverage/flags with suppression honored; illustrative flags labeled. |
+| Succession | Recorded coverage/flags with suppression honored; illustrative flags labeled. Correct the UI adapter that rejected the approved public release identity despite valid aggregate source data. |
 | Labor Market | Available dated US national BLS observations only. Selected occupation comparisons retain their existing scoped result; no company inference. |
 | Occupational References; Training & Coaching | Reference/catalogue workspaces, not company observations. No generic company findings added. Selected reference/quote-specific takeaway coverage remains a follow-on, not an asserted pass. |
 | Future of Work | Existing explicitly illustrative task calculation; no actual-company findings are available. Keep the calculated example summary rather than imply measured workforce impact. |

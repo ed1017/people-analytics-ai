@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "7d5297837a35caeee032f54dcd1e229316c3a625",
+  "sourceCommit": "3d04c5070776ed3daadef2cbe301a31ceaa88d9b",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -3219,8 +3219,8 @@
     },
     {
       "path": "lib/succession-release-context.ts",
-      "sha256": "ccfe744025f5cdecf6ac6369e62f4f99421626112077933bf1232bd6fac1481b",
-      "bytes": 1788
+      "sha256": "b22e6870c8bfe67aa8820ad41691c00a4547d52e467bf585e40f7173e313ae4d",
+      "bytes": 2577
     },
     {
       "path": "lib/supabase-server.ts",
@@ -3921,8 +3921,13 @@
       "path": "tests/key-findings.test.mjs",
       "sha256": "efcc027376246e3eac26b876026f1f13b8af8bd0322d18c001e7b9cb1c454dbb",
       "bytes": 4179
+    },
+    {
+      "path": "tests/succession-display-release.test.mjs",
+      "sha256": "ec41a867e8219f9664f24ba847f073df022cb5bc13b804c6d8a76ad17bac2f17",
+      "bytes": 2561
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "8141b5c65baddf37856717bc048c99771656a422500e13b6c2ac6c5270edee1d"
+  "verifiedDeployedArchiveSha256": "bdf2eb2bae7f814c05840be87174551d8eb0b825c7e2150651b3b0691245ec0c"
 }
