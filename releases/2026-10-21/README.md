@@ -1,12 +1,12 @@
 # Versioned application source
 
-This directory contains the reviewed skills-baseline candidate source, not yet the production deployment. The public production app remains on the preceding generation until CI and hosted acceptance permit promotion.
+This directory contains the reviewed fictional skills-baseline source promoted to production after CI and hosted acceptance.
 
-- Candidate runtime: `2854b6e4de0c36f88198cb916f713af843d4ad94`.
+- Production runtime: `2854b6e4de0c36f88198cb916f713af843d4ad94`.
 - Earlier candidate protected preview: `dpl_57oy8nsYAd8UA6uxc6ckdT2VQwtH` (same data and logic; final candidate changes two proficiency labels).
-- Candidate package SHA-256: `799d1c917753338a8438053a27d9c71a2e0f4bd58af798734c6fdbf0003eed45`.
-- `source/` contains 806 exact reviewed source files. `manifest.json` pins their bytes. Final staging and production verification remain pending.
-- Current production remains runtime `7ea8bc36e814396530c70d5889ebd1f5aa24da3d`, deployment `dpl_2n3Ey5BtR4xJQwCWNrXgDzx7jBwA`.
+- Package SHA-256: `799d1c917753338a8438053a27d9c71a2e0f4bd58af798734c6fdbf0003eed45`.
+- `source/` contains 806 exact reviewed source files. `manifest.json` pins their bytes. All 19 public aggregate responses match the tested staging release; desktop/mobile Skills, Learning and staged explicit save/reopen checks passed without provider calls.
+- Production deployment: `dpl_7gtJCa1dHkKEbnzd6fND27h6SoKA`, public dataset token `workforce-demo-9037-public-aggregates-v3:4`. Previous runtime `7ea8bc36e814396530c70d5889ebd1f5aa24da3d` and deployment `dpl_2n3Ey5BtR4xJQwCWNrXgDzx7jBwA` remain the rollback basis.
 
 Verify without dependencies, credentials or network:
 
