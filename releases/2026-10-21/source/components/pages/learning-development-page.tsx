@@ -55,7 +55,7 @@ export function LearningDevelopmentPage({
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">
-            Connect current skill-gap signals to active learning pathways without treating course availability as readiness.
+            Connect skill gaps to active courses. Course coverage does not measure readiness.
           </p>
         </div>
 
@@ -68,12 +68,6 @@ export function LearningDevelopmentPage({
               : "Learning & Development"}
         </span>
       </div>
-
-      {data?.data_meta?.dataClass === "constructed-synthetic" && (
-        <p className="mb-4 rounded-md border bg-muted/20 p-3 text-sm text-muted-foreground">
-          {data.data_meta.sourceLabel}. Employee preferences remain separate from assessed readiness. No measured learning gains are supplied.
-        </p>
-      )}
 
       {!loading && error && (
         <div role="alert" className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
@@ -161,14 +155,13 @@ export function LearningDevelopmentPage({
             </div>
           </div>
 
-          <div className="mt-4 rounded-md border bg-muted/20 p-4 text-sm text-muted-foreground">
-            <p className="font-medium text-foreground">
-              What this page does — and does not — mean
-            </p>
+          <details className="mt-4 text-sm text-muted-foreground">
+            <summary className="w-fit cursor-pointer rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-4">Learning sources and definitions</summary>
+            {data.data_meta?.dataClass === "constructed-synthetic" && <p className="mt-2">{data.data_meta.sourceLabel}. Employee preferences remain separate from assessed readiness. No measured learning gains are supplied.</p>}
             <p className="mt-1">
               An active pathway means at least one active course is mapped to the skill. Course availability is evidence of a development path, not proof that completion will raise proficiency or make someone role-ready. Catalog duration is course duration only, not time-to-readiness.
             </p>
-          </div>
+          </details>
 
           <div className="mt-6 rounded-lg border p-4">
             <div className="mb-4 flex flex-wrap items-start justify-between gap-3">

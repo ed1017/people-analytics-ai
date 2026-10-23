@@ -68,7 +68,7 @@ export function SuccessionPlanningPage({
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="max-w-3xl text-muted-foreground">
-            {illustrative ? 'Illustrative demo succession-plan coverage and authored plan flags. No assessed or predicted individual readiness is supplied.' : 'Company-wide recorded succession-plan coverage and source-assessment readiness signals. No individual candidate records are shown.'}
+            {illustrative ? 'Illustrative plan coverage and authored flags; not assessed readiness.' : 'Company-wide recorded plan coverage and source-assessed readiness.'}
           </p>
         </div>
 
@@ -76,7 +76,7 @@ export function SuccessionPlanningPage({
           {loading
             ? "Loading summary…"
             : data
-              ? (illustrative ? "Demo as of " : "Assessment ") +
+              ? (illustrative ? "As of " : "Assessment ") +
                 formatDate(data.as_of_date)
               : "Company summary"}
         </span>
@@ -151,7 +151,7 @@ export function SuccessionPlanningPage({
 
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">
-                {illustrative ? 'Positions with Demo Plan' : 'Positions with Recorded Plan'}
+                {illustrative ? 'Positions with Plan' : 'Positions with Recorded Plan'}
               </p>
               <p className="mt-2 text-3xl font-semibold">
                 {displayCount(
@@ -176,7 +176,7 @@ export function SuccessionPlanningPage({
                 )}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                {illustrative ? 'Demo plans with an authored illustrative flag; not assessed readiness' : 'Planned positions with at least one candidate recorded as ready now'}
+                {illustrative ? 'Plans with an authored flag; not assessed readiness' : 'Planned positions with at least one candidate recorded as ready now'}
               </p>
             </div>
           </div>
@@ -225,7 +225,7 @@ export function SuccessionPlanningPage({
               <div className="mt-4 space-y-3 text-sm">
                 <div className="flex items-center justify-between gap-4 border-b pb-3">
                   <span className="text-muted-foreground">
-                    {illustrative ? 'Demo plans with illustrative flag' : 'Planned positions with ready-now record'}
+                    {illustrative ? 'Plans with illustrative flag' : 'Planned positions with ready-now record'}
                   </span>
                   <span className="font-medium tabular-nums">
                     {displayCount(
@@ -235,7 +235,7 @@ export function SuccessionPlanningPage({
                 </div>
                 <div className="flex items-center justify-between gap-4 border-b pb-3">
                   <span className="text-muted-foreground">
-                    {illustrative ? 'Demo plans without illustrative flag' : 'Planned positions without ready-now record'}
+                    {illustrative ? 'Plans without illustrative flag' : 'Planned positions without ready-now record'}
                   </span>
                   <span className="font-medium tabular-nums">
                     {displayCount(
@@ -245,7 +245,7 @@ export function SuccessionPlanningPage({
                 </div>
                 <div className="flex items-center justify-between gap-4">
                   <span className="text-muted-foreground">
-                    {illustrative ? 'Illustrative share of demo plans' : 'Ready-now share of recorded plans'}
+                    {illustrative ? 'Flagged share of plans' : 'Ready-now share of recorded plans'}
                   </span>
                   <span className="font-medium tabular-nums">
                     {displayPercent(
@@ -269,14 +269,12 @@ export function SuccessionPlanningPage({
             </div>
           )}
 
-          <div className="mt-6 rounded-md border bg-muted/20 p-4 text-sm text-muted-foreground">
-            <p className="font-medium text-foreground">
-              How to read this summary
-            </p>
+          <details className="mt-6 text-sm text-muted-foreground">
+            <summary className="w-fit cursor-pointer rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-4">Succession sources and definitions</summary>
             <p className="mt-1">
-              {illustrative ? 'Constructed demo plan flags are authored examples, not source assessments or model predictions. The flags establish no individual readiness, capability, promotion or transfer recommendation. Career preferences are employee-expressed interests and remain separate from assessed readiness.' : 'Recorded plan coverage means a filled position in an active critical job profile has a source succession-plan record. Ready-now coverage means that source plan records at least one candidate in the ready-now category. These are recorded source assessments, not model predictions, promotion recommendations, transfer recommendations, or individual employment decisions.'}
+              {illustrative ? 'Illustrative plan flags are authored examples, not source assessments or model predictions. The flags establish no individual readiness, capability, promotion or transfer recommendation. Career preferences are employee-expressed interests and remain separate from assessed readiness.' : 'Recorded plan coverage means a filled position in an active critical job profile has a source succession-plan record. Ready-now coverage means that source plan records at least one candidate in the ready-now category. These are recorded source assessments, not model predictions, promotion recommendations, transfer recommendations, or individual employment decisions.'}
             </p>
-          </div>
+          </details>
         </>
       ) : !error && !loading ? (
         <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
