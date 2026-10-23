@@ -21,7 +21,7 @@ test('historical version is readable but never current-source authority',()=>{
 test('actual new binding rejects old request tokens and publishes revised coherent summaries',async()=>{
  const b=await loadPublic9037Binding({hostname:'www.ed-ai.app'});
  const stale=await b.handle(new Request('https://www.ed-ai.app/api/dashboard',{headers:{'x-workforce-dataset':old}}));assert.equal(stale.status,409);
- const response=await b.handle(new Request('https://www.ed-ai.app/api/dashboard',{headers:{'x-workforce-dataset':P.token}}));assert.equal(response.status,200);const d=await response.json();assert.equal(d.overview.headcount,9037);assert.equal(d.data_meta.datasetToken,P.token);assert.equal(b.router.current().digest,'5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54');
+ const response=await b.handle(new Request('https://www.ed-ai.app/api/dashboard',{headers:{'x-workforce-dataset':P.token}}));assert.equal(response.status,200);const d=await response.json();assert.equal(d.overview.headcount,9037);assert.equal(d.data_meta.datasetToken,P.token);assert.equal(b.router.current().digest,'53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9');
 });
 
 test('historical calculated projection reopens unchanged but cannot seed a new calculation',async()=>{

@@ -283,3 +283,10 @@ Intermittent rejection remains unresolved: current safe diagnostics already dist
 ### Optional clarification repair — production verified
 
 PR375 merged `aa22078988331fa6f39da6287c48f70ce59d3417`. Runtime `52490f460599892415836e8b34cb5f0e5d17bf6b`, deployment `dpl_GkmMgh7GUvtiiQ8sm5eSLec4T4pZ`. Six focused regressions, independent review, required CI and protected/public desktop/mobile captured-Finance replay passed. The spurious population hint is absent; genuine timing remains, budget stays unknown, and layout has no horizontal overflow. Verification intercepted model submissions: zero new provider calls. Data, saved plans, accounting, access and provider configuration remain unchanged. Existing diagnostics already expose safe calculation-reference subreasons; no missing observability correction was demonstrated. Historical intermittent rejection remains unproven, not silently accepted or claimed fixed.
+
+
+### Coherent geography revision - reviewed candidate
+
+The fictional operating footprint now varies by entry business unit, with country fixed throughout each employee's history. Existing uneven hiring/departure dates, all 33 monthly company totals, hierarchy, pay and skills are unchanged. Country turnover differences are compositional, not geographic causal effects or calibrated market rates. Global USD compensation remains illustrative; no local market pay is introduced.
+
+Six geography regressions, 2,527 group-flow transitions, all 62 isolated PostgreSQL queries (60 exact; only country and location-preference summaries changed), all eight unchanged global components and 1,287 public dashboard intersections passed. Dataset v4:5 keeps historical v3:4 saved country/pay values readable but not eligible as current inputs. Exact public-route replay and source snapshot updated; no private row data or evidence published. Runtime834f3b9, protected build passed; CI and hosted desktop/mobile country-filter/save checks remain before promotion. No paid provider calls, ledger/access or live database mutation. Pricing cutoff remains October24 09:53:30UTC.
