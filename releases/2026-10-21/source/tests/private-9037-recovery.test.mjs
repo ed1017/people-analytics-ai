@@ -31,7 +31,7 @@ vm.runInNewContext(js,{exports,require:name=>name==='@/lib/catalog-display'?cata
 const render=value=>renderToStaticMarkup(React.createElement(exports.JobRangeTable,{catalog:value,scope:rangeContext.defaultRangeScope,releaseRows:null}));
 
 test('pinned private 9037 catalog renders actual stored ranges with recovered component',()=>{
-  assert.equal(token,'workforce-demo-skills-20261023-local-v1:1');
+  assert.equal(token,'workforce-demo-geography-20261023-local-v1:1');
   assert.equal(catalog.constructedPolicy.version,'constructed-9037-inherited-range-policy-v1');
   const ranges=rangeContext.rangesForScope(catalog,rangeContext.defaultRangeScope);
   assert.ok(ranges.length>0);

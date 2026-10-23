@@ -7,9 +7,9 @@ import {isDeepStrictEqual} from 'node:util';
 import {DATASET_COMPONENTS, defineDatasetProvider} from './dataset-composition.mjs';
 import {deepFreeze, exact, validateDemoRequest, validateDemoBundle} from './dataset-demo-contracts.mjs';
 
-export const OFFLINE_9037_DATASET_ID = 'workforce-demo-skills-20261023-local-v1';
-export const OFFLINE_9037_INTEGRITY_DIGEST = '353528c6f453e7ee06ac54726f2b296973f4b45eb88d150c193a993dce8f3c2a';
-const sourceBundle = '554e488d84b977a080c6f2ff8138bada62cc93e0fde48f2a94d65bb4c7b3e752';
+export const OFFLINE_9037_DATASET_ID = 'workforce-demo-geography-20261023-local-v1';
+export const OFFLINE_9037_INTEGRITY_DIGEST = '2f2cd9744a7e3dfd71d685ac9c8a070c152454375f96cb681f687a9f39f96be9';
+const sourceBundle = 'bb61cab68e4395f8462d37e88cda9da300b71e91062998df64fe2aba9631e658';
 const REVIEWED_SKILL_POPULATIONS = deepFreeze({"AI-APPLICATION":880,"DATA-ANALYSIS":6148,"SOFTWARE-DELIVERY":2659,"PLATFORM-OPERATIONS":1893,"SECURITY-RISK":3254,"SERVICE-DELIVERY":936,"PROJECT-DELIVERY":2126,"CLIENT-PARTNERSHIP":1876,"PEOPLE-ADVISORY":1219,"FINANCIAL-ANALYSIS":1604,"COMMUNICATION":4742,"EXPERIENCE-DESIGN":731});
 const reviewed = new WeakSet();
 const presenterContracts = new WeakMap();

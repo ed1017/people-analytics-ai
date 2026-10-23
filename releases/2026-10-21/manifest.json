@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "52490f460599892415836e8b34cb5f0e5d17bf6b",
-  "deployment": "dpl_GkmMgh7GUvtiiQ8sm5eSLec4T4pZ",
+  "sourceCommit": "834f3b9da202c977021c5f12d1de015302e9824c",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -1514,8 +1514,8 @@
     },
     {
       "path": "lib/compensation-release-context.ts",
-      "sha256": "f14ec992394229ae3964a96ef9a8050b90fed9a1e73ac001f4bdb47606be11f7",
-      "bytes": 5739
+      "sha256": "65b65a4faa28c36fd3c21543df9f2f249c8b54dcb4450f243f1a038c2aa3ed7a",
+      "bytes": 5967
     },
     {
       "path": "lib/compensation-release.ts",
@@ -1669,13 +1669,13 @@
     },
     {
       "path": "lib/dataset-9037-joint-dashboard.mjs",
-      "sha256": "44c9e3a7a064b753658e390441a99a25a535d95396c225ce99c0b1d6cd5000e9",
+      "sha256": "36748ac695dee708c0f5dab9c9accca55b8f60bd0235a80d41cecb1a397b3544",
       "bytes": 9327
     },
     {
       "path": "lib/dataset-9037-offline-provider.mjs",
-      "sha256": "e404feb4b7d1df7fa7ccb4c0767ba17ecc14c1fe52e74cad464b452730de66af",
-      "bytes": 10475
+      "sha256": "4490d1b630f656fd21fd9148e44d9252942e111bf918eb619b908298c047c0b5",
+      "bytes": 10478
     },
     {
       "path": "lib/dataset-9037-preview-marker.mjs",
@@ -1689,7 +1689,7 @@
     },
     {
       "path": "lib/dataset-9037-preview.server.mjs",
-      "sha256": "5b64a1decee387776b9c876fade178bd931332b84c66507a61fd3988fbf2f40e",
+      "sha256": "fa53fe709e9da6d8cd0d4888d6e335b9d1c88d66e799831a5c11d456d3b46f88",
       "bytes": 3379
     },
     {
@@ -3109,7 +3109,7 @@
     },
     {
       "path": "lib/public-9037-contract.mjs",
-      "sha256": "308fe829ecf7279781372e175515d5ea32293a1b7cf6e59fb2a256249a78617f",
+      "sha256": "558233b978c5d3438a5f404703fd4e1ef505e5365d9d65a6936b77cf4f3f7fe7",
       "bytes": 638
     },
     {
@@ -3224,8 +3224,8 @@
     },
     {
       "path": "lib/public-projection-contract.mjs",
-      "sha256": "91048d367eca13407621fa81dc0b2233c194f76df3156b20e98c96d542f77292",
-      "bytes": 2020
+      "sha256": "e0d77e999687d18aa9e43b41053a1e71b799c5afeb54c9b438edae9daf7c06b5",
+      "bytes": 2602
     },
     {
       "path": "lib/public-projection-currentness-client.mjs",
@@ -3934,8 +3934,8 @@
     },
     {
       "path": "tests/private-9037-recovery.test.mjs",
-      "bytes": 8509,
-      "sha256": "52fcb4ddfd82fa6647b2b3803bdccef7d9ec5263b0a644e109d8a4f276194538"
+      "bytes": 8625,
+      "sha256": "69482568f9b8774b3ab413c781b3d5b767be2d522c71b0d2639caa6a871dbcaa"
     },
     {
       "path": "tests/private-skills-candidate.test.mjs",
@@ -3994,8 +3994,8 @@
     },
     {
       "path": "tests/public-projection-restoration.test.mjs",
-      "sha256": "fe0b70b22060f3e86c935f15d73661375543c557344890890a2f55fba81fba9a",
-      "bytes": 9888
+      "sha256": "18f69e39e039a185c9d15cef1d3e9fb176e1efcdf4bd210622ae9db2c8f424ec",
+      "bytes": 9975
     },
     {
       "path": "tests/public-saved-evidence.test.mjs",
@@ -4004,8 +4004,8 @@
     },
     {
       "path": "tests/realism-version-transition.test.mjs",
-      "sha256": "8a7fd08160c680da26967b43ccde805b94c3a8245b70b08c227caff4c7671394",
-      "bytes": 4977
+      "sha256": "cb19095896a3884f62de33d4bb2041c48ae07e7e233713807c76df53b61842e0",
+      "bytes": 5023
     },
     {
       "path": "tests/review-polish-contracts.test.mjs",
@@ -4046,6 +4046,11 @@
       "path": "tests/home-next-details.test.mjs",
       "bytes": 3930,
       "sha256": "f5bf440d6e3fa23e0f3086694793eafc2613c1dc4e829639e4177d52e120fa77"
+    },
+    {
+      "path": "tests/geography-version-transition.test.mjs",
+      "bytes": 3032,
+      "sha256": "76e8b8023ccd0b0a678edeee648c0575b2c9b76c6dbf352db547d47a79b7907b"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

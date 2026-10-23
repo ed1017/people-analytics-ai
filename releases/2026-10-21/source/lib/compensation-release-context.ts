@@ -29,7 +29,9 @@ export function validateCompensationContext(data: unknown, token: string): Relea
     if(value.release_id!==compensationRelease.releaseId)throw Error('Wrong legacy release');
     return validateRelease(value.rows);
   }
-  const boundPreview = token.startsWith('workforce-demo-skills-20261023-local-v1:')
+  const boundPreview = token.startsWith('workforce-demo-geography-20261023-local-v1:')
+    ? {...preview9037,datasetId:'workforce-demo-geography-20261023-local-v1',bundleDigest:'2f2cd9744a7e3dfd71d685ac9c8a070c152454375f96cb681f687a9f39f96be9'}
+    : token.startsWith('workforce-demo-skills-20261023-local-v1:')
     ? {...preview9037,datasetId:'workforce-demo-skills-20261023-local-v1',bundleDigest:'353528c6f453e7ee06ac54726f2b296973f4b45eb88d150c193a993dce8f3c2a'}
     : preview9037;
   if (token.startsWith(boundPreview.datasetId + ':')) {

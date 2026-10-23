@@ -1,11 +1,11 @@
 {
   "origin": "local public-route replay; not a hosted capture",
-  "capturedAt": "2026-10-23T21:59:04.333Z",
+  "capturedAt": "2026-10-23T22:47:08.591Z",
   "documents": [
     {
       "route": "/api/workforce",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "as_of": "2026-09-30",
         "summary": {
@@ -272,84 +272,84 @@
         ],
         "countries": [
           {
-            "fte": 905,
+            "fte": 2657.4,
             "as_of": "2026-09-30",
-            "headcount": 923,
+            "headcount": 2713,
             "country_code": "IN",
             "country_name": "Demo IN",
             "avg_tenure_years": 5.5
           },
           {
-            "fte": 900.4,
+            "fte": 2262.4,
             "as_of": "2026-09-30",
-            "headcount": 920,
-            "country_code": "CA",
-            "country_name": "Demo CA",
-            "avg_tenure_years": 5.3
-          },
-          {
-            "fte": 893.4,
-            "as_of": "2026-09-30",
-            "headcount": 914,
-            "country_code": "JP",
-            "country_name": "Demo JP",
-            "avg_tenure_years": 5.5
-          },
-          {
-            "fte": 892.2,
-            "as_of": "2026-09-30",
-            "headcount": 910,
-            "country_code": "AU",
-            "country_name": "Demo AU",
-            "avg_tenure_years": 5.7
-          },
-          {
-            "fte": 890.4,
-            "as_of": "2026-09-30",
-            "headcount": 906,
-            "country_code": "SG",
-            "country_name": "Demo SG",
-            "avg_tenure_years": 5.7
-          },
-          {
-            "fte": 879.8,
-            "as_of": "2026-09-30",
-            "headcount": 900,
-            "country_code": "BR",
-            "country_name": "Demo BR",
-            "avg_tenure_years": 5.4
-          },
-          {
-            "fte": 876.8,
-            "as_of": "2026-09-30",
-            "headcount": 897,
-            "country_code": "GB",
-            "country_name": "Demo GB",
-            "avg_tenure_years": 5.3
-          },
-          {
-            "fte": 874.2,
-            "as_of": "2026-09-30",
-            "headcount": 896,
+            "headcount": 2311,
             "country_code": "US",
             "country_name": "Demo US",
+            "avg_tenure_years": 5.6
+          },
+          {
+            "fte": 912.8,
+            "as_of": "2026-09-30",
+            "headcount": 931,
+            "country_code": "GB",
+            "country_name": "Demo GB",
             "avg_tenure_years": 5.5
           },
           {
-            "fte": 875.4,
+            "fte": 691,
             "as_of": "2026-09-30",
-            "headcount": 892,
+            "headcount": 705,
+            "country_code": "CA",
+            "country_name": "Demo CA",
+            "avg_tenure_years": 5.5
+          },
+          {
+            "fte": 468,
+            "as_of": "2026-09-30",
+            "headcount": 478,
+            "country_code": "SG",
+            "country_name": "Demo SG",
+            "avg_tenure_years": 5.3
+          },
+          {
+            "fte": 460.8,
+            "as_of": "2026-09-30",
+            "headcount": 470,
             "country_code": "DE",
             "country_name": "Demo DE",
+            "avg_tenure_years": 5.3
+          },
+          {
+            "fte": 381.4,
+            "as_of": "2026-09-30",
+            "headcount": 391,
+            "country_code": "AU",
+            "country_name": "Demo AU",
             "avg_tenure_years": 5.5
           },
           {
-            "fte": 863.8,
+            "fte": 374,
             "as_of": "2026-09-30",
-            "headcount": 879,
+            "headcount": 382,
+            "country_code": "JP",
+            "country_name": "Demo JP",
+            "avg_tenure_years": 5.1
+          },
+          {
+            "fte": 328.4,
+            "as_of": "2026-09-30",
+            "headcount": 337,
             "country_code": "FR",
             "country_name": "Demo FR",
-            "avg_tenure_years": 5.5
+            "avg_tenure_years": 5.6
+          },
+          {
+            "fte": 315.2,
+            "as_of": "2026-09-30",
+            "headcount": 319,
+            "country_code": "BR",
+            "country_name": "Demo BR",
+            "avg_tenure_years": 5.9
           }
         ],
         "levels": [
@@ -594,9 +594,9 @@
           }
         ],
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -609,7 +609,7 @@
     {
       "route": "/api/attrition",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "as_of": "2026-09-30",
         "summary": {
@@ -1131,9 +1131,9 @@
           }
         ],
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -1146,7 +1146,7 @@
     {
       "route": "/api/talent-acquisition",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "as_of": "2026-09-30",
         "summary": {
@@ -1504,9 +1504,9 @@
         ],
         "data_meta": {
           "hireDateConvention": "hire_date is accepted offer; start_date drives headcount inflow. Internal hires are movements, not external starts.",
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -1519,7 +1519,7 @@
     {
       "route": "/api/overview",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "fte": 8851.4,
         "headcount": 9037,
@@ -1528,9 +1528,9 @@
         "snapshot_date": "2026-09-30",
         "voluntary_turnover_ytd_pct": 8.8,
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -1543,13 +1543,13 @@
     {
       "route": "/api/headcount",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "headcount": 9037,
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -1562,7 +1562,7 @@
     {
       "route": "/api/headcount-trend",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": [
         {
           "fte": 8234.6,
@@ -1734,7 +1734,7 @@
     {
       "route": "/api/dashboard",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "overview": {
           "snapshot_date": "2026-09-30",
@@ -2056,7 +2056,7 @@
           "basis": "Pinned complete synthetic joint cube; exact calendar, group flows and sealed company totals reconciled. Not an RPC or real-world attestation.",
           "metricContract": "voluntary-ytd-nine-month-average-stock-v2",
           "stockStatus": "positive",
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
           "contract": "public-synthetic-aggregates-and-calculations-v1",
           "cutoff": "2026-09-30"
         },
@@ -2101,9 +2101,9 @@
           "version": "ratings-9037-2026-09-30-offline-v1"
         },
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -2116,7 +2116,7 @@
     {
       "route": "/api/compensation",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "source": "finance_current_summary",
         "evidence_type": "synthetic_aggregate",
@@ -2206,9 +2206,9 @@
           }
         ],
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -2221,7 +2221,7 @@
     {
       "route": "/api/compensation-ranges",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "jobs": [
           {
@@ -21724,9 +21724,9 @@
           ]
         },
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -21739,9 +21739,9 @@
     {
       "route": "/api/compensation-job-release",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
-        "release_id": "compensation-9037-public-v3",
+        "release_id": "compensation-9037-public-v4",
         "snapshot_date": "2026-09-30",
         "scope": {
           "country": null,
@@ -21758,7 +21758,7 @@
             "mean_compa_pct": null,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "withheld"
           },
@@ -21770,7 +21770,7 @@
             "mean_compa_pct": 99.339809,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21782,7 +21782,7 @@
             "mean_compa_pct": 101.185952,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21794,7 +21794,7 @@
             "mean_compa_pct": 99.652446,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21806,7 +21806,7 @@
             "mean_compa_pct": 100.279999,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21818,7 +21818,7 @@
             "mean_compa_pct": 99.566784,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21830,7 +21830,7 @@
             "mean_compa_pct": null,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "withheld"
           },
@@ -21842,7 +21842,7 @@
             "mean_compa_pct": 99.905807,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21854,7 +21854,7 @@
             "mean_compa_pct": 99.347358,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21866,7 +21866,7 @@
             "mean_compa_pct": 100.251878,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21878,7 +21878,7 @@
             "mean_compa_pct": 100.268813,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21890,7 +21890,7 @@
             "mean_compa_pct": 99.024149,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21902,7 +21902,7 @@
             "mean_compa_pct": 100.550529,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21914,7 +21914,7 @@
             "mean_compa_pct": 100.208579,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21926,7 +21926,7 @@
             "mean_compa_pct": 99.895435,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21938,7 +21938,7 @@
             "mean_compa_pct": 99.344402,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21950,7 +21950,7 @@
             "mean_compa_pct": 100.025227,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21962,7 +21962,7 @@
             "mean_compa_pct": 98.957192,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21974,7 +21974,7 @@
             "mean_compa_pct": 100.022,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21986,7 +21986,7 @@
             "mean_compa_pct": 100.345189,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -21998,7 +21998,7 @@
             "mean_compa_pct": 100.444691,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22010,7 +22010,7 @@
             "mean_compa_pct": 100.358186,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22022,7 +22022,7 @@
             "mean_compa_pct": 101.127894,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22034,7 +22034,7 @@
             "mean_compa_pct": 100.165096,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22046,7 +22046,7 @@
             "mean_compa_pct": 99.418094,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22058,7 +22058,7 @@
             "mean_compa_pct": 99.517834,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22070,7 +22070,7 @@
             "mean_compa_pct": 99.195537,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22082,7 +22082,7 @@
             "mean_compa_pct": 99.941911,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22094,7 +22094,7 @@
             "mean_compa_pct": 100.322879,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22106,7 +22106,7 @@
             "mean_compa_pct": 99.654871,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22118,7 +22118,7 @@
             "mean_compa_pct": 100.159149,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22130,7 +22130,7 @@
             "mean_compa_pct": 100.098485,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22142,7 +22142,7 @@
             "mean_compa_pct": 100.663723,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22154,7 +22154,7 @@
             "mean_compa_pct": 100.377871,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22166,7 +22166,7 @@
             "mean_compa_pct": 99.464833,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22178,7 +22178,7 @@
             "mean_compa_pct": 99.366096,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22190,7 +22190,7 @@
             "mean_compa_pct": 99.546457,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22202,7 +22202,7 @@
             "mean_compa_pct": 100.954093,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22214,7 +22214,7 @@
             "mean_compa_pct": 99.445397,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22226,7 +22226,7 @@
             "mean_compa_pct": 100.069306,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22238,7 +22238,7 @@
             "mean_compa_pct": 100.983401,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22250,7 +22250,7 @@
             "mean_compa_pct": 99.979817,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22262,7 +22262,7 @@
             "mean_compa_pct": 100.205948,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22274,7 +22274,7 @@
             "mean_compa_pct": 99.640721,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22286,7 +22286,7 @@
             "mean_compa_pct": 99.996963,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22298,7 +22298,7 @@
             "mean_compa_pct": 100.600943,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22310,7 +22310,7 @@
             "mean_compa_pct": 101.163444,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22322,7 +22322,7 @@
             "mean_compa_pct": 100.304424,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22334,7 +22334,7 @@
             "mean_compa_pct": 99.499487,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           },
@@ -22346,15 +22346,15 @@
             "mean_compa_pct": 100.275961,
             "range_policy_version": "constructed-9037-inherited-range-policy-v1",
             "range_provenance": "synthetic_assumed_range",
-            "release_id": "compensation-9037-public-v3",
+            "release_id": "compensation-9037-public-v4",
             "snapshot_date": "2026-09-30",
             "status": "published"
           }
         ],
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -22367,7 +22367,7 @@
     {
       "route": "/api/skills",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "as_of": "2026-09-30",
         "summary": {
@@ -22928,9 +22928,9 @@
           }
         ],
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -22943,7 +22943,7 @@
     {
       "route": "/api/career-growth-mobility",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "source": {
           "recorded_months": 31,
@@ -23394,9 +23394,9 @@
           "Separate January-1 eligible cohort rates remain in the career release and are not substituted for event shares."
         ],
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -23409,7 +23409,7 @@
     {
       "route": "/api/career-mobility",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "as_of": "2026-09-30",
         "summary": {
@@ -23541,83 +23541,83 @@
         "desired_locations": [
           {
             "city": null,
-            "employees": 476,
+            "employees": 1360,
             "country_code": "IN",
             "location_code": "DEMO-IN",
             "location_name": "Demo location IN",
-            "share_pct": 10.5
+            "share_pct": 30.1
           },
           {
             "city": null,
-            "employees": 470,
-            "country_code": "GB",
-            "location_code": "DEMO-GB",
-            "location_name": "Demo location GB",
-            "share_pct": 10.4
-          },
-          {
-            "city": null,
-            "employees": 463,
-            "country_code": "JP",
-            "location_code": "DEMO-JP",
-            "location_name": "Demo location JP",
-            "share_pct": 10.2
-          },
-          {
-            "city": null,
-            "employees": 461,
-            "country_code": "CA",
-            "location_code": "DEMO-CA",
-            "location_name": "Demo location CA",
-            "share_pct": 10.2
+            "employees": 1150,
+            "country_code": "US",
+            "location_code": "DEMO-US",
+            "location_name": "Demo location US",
+            "share_pct": 25.4
           },
           {
             "city": null,
             "employees": 458,
-            "country_code": "AU",
-            "location_code": "DEMO-AU",
-            "location_name": "Demo location AU",
+            "country_code": "GB",
+            "location_code": "DEMO-GB",
+            "location_name": "Demo location GB",
             "share_pct": 10.1
           },
           {
             "city": null,
-            "employees": 449,
-            "country_code": "SG",
-            "location_code": "DEMO-SG",
-            "location_name": "Demo location SG",
-            "share_pct": 9.9
+            "employees": 366,
+            "country_code": "CA",
+            "location_code": "DEMO-CA",
+            "location_name": "Demo location CA",
+            "share_pct": 8.1
           },
           {
             "city": null,
-            "employees": 442,
-            "country_code": "BR",
-            "location_code": "DEMO-BR",
-            "location_name": "Demo location BR",
-            "share_pct": 9.8
-          },
-          {
-            "city": null,
-            "employees": 434,
-            "country_code": "FR",
-            "location_code": "DEMO-FR",
-            "location_name": "Demo location FR",
-            "share_pct": 9.6
-          },
-          {
-            "city": null,
-            "employees": 434,
-            "country_code": "US",
-            "location_code": "DEMO-US",
-            "location_name": "Demo location US",
-            "share_pct": 9.6
-          },
-          {
-            "city": null,
-            "employees": 432,
+            "employees": 252,
             "country_code": "DE",
             "location_code": "DEMO-DE",
             "location_name": "Demo location DE",
-            "share_pct": 9.6
+            "share_pct": 5.6
+          },
+          {
+            "city": null,
+            "employees": 249,
+            "country_code": "SG",
+            "location_code": "DEMO-SG",
+            "location_name": "Demo location SG",
+            "share_pct": 5.5
+          },
+          {
+            "city": null,
+            "employees": 186,
+            "country_code": "JP",
+            "location_code": "DEMO-JP",
+            "location_name": "Demo location JP",
+            "share_pct": 4.1
+          },
+          {
+            "city": null,
+            "employees": 185,
+            "country_code": "AU",
+            "location_code": "DEMO-AU",
+            "location_name": "Demo location AU",
+            "share_pct": 4.1
+          },
+          {
+            "city": null,
+            "employees": 159,
+            "country_code": "BR",
+            "location_code": "DEMO-BR",
+            "location_name": "Demo location BR",
+            "share_pct": 3.5
+          },
+          {
+            "city": null,
+            "employees": 154,
+            "country_code": "FR",
+            "location_code": "DEMO-FR",
+            "location_name": "Demo location FR",
+            "share_pct": 3.4
           }
         ],
         "current_org_coverage": [
@@ -23685,9 +23685,9 @@
           "Role and location distributions show at most 15 destinations with their full known-response denominators."
         ],
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -23700,7 +23700,7 @@
     {
       "route": "/api/survey-sentiment",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "as_of": "2026-09-30",
         "exit_enps": null,
@@ -23987,9 +23987,9 @@
         ],
         "exit_reasons": [],
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -24002,7 +24002,7 @@
     {
       "route": "/api/workforce-planning",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "scenarios": [
           {
@@ -24160,9 +24160,9 @@
           "independent_forecast_validation": false
         },
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -24175,7 +24175,7 @@
     {
       "route": "/api/finance",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "as_of": "2026-09-30",
         "source": "finance_current_summary",
@@ -24304,9 +24304,9 @@
           }
         ],
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -24319,7 +24319,7 @@
     {
       "route": "/api/learning-development",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "as_of": "2026-09-30",
         "summary": {
@@ -24939,9 +24939,9 @@
           "Only company aggregates are returned; no employee identities or individual rankings."
         ],
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -24954,7 +24954,7 @@
     {
       "route": "/api/position-modeling",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "as_of": "2026-09-30",
         "planning_month": "2027-12-01",
@@ -25364,9 +25364,9 @@
           }
         ],
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,
@@ -25379,7 +25379,7 @@
     {
       "route": "/api/succession-coverage",
       "status": 200,
-      "token": "workforce-demo-9037-public-aggregates-v3:4",
+      "token": "workforce-demo-9037-public-aggregates-v4:5",
       "body": {
         "as_of_date": "2026-09-30",
         "small_cell_threshold": 10,
@@ -25395,9 +25395,9 @@
         "ready_now_suppressed": false,
         "suppression_reason": null,
         "data_meta": {
-          "datasetToken": "workforce-demo-9037-public-aggregates-v3:4",
-          "datasetId": "workforce-demo-9037-public-aggregates-v3",
-          "bundleDigest": "5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54",
+          "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+          "datasetId": "workforce-demo-9037-public-aggregates-v4",
+          "bundleDigest": "53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9",
           "cutoff": "2026-09-30",
           "dataClass": "constructed-synthetic",
           "publicationApproved": true,

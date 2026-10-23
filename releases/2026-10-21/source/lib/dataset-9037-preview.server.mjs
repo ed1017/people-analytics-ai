@@ -23,11 +23,11 @@ async function bounded(file,limit){
 export async function load9037PreviewBinding(options){
  const directory=path.join(process.cwd(),'.private-9037');
  const pins={
- 'integrity-manifest.json':'353528c6f453e7ee06ac54726f2b296973f4b45eb88d150c193a993dce8f3c2a',
- 'component-contracts.json':'ba29514659f15c49aee237fb362ab37bc8c6760f6a692999c397933620bea460',
+ 'integrity-manifest.json':'2f2cd9744a7e3dfd71d685ac9c8a070c152454375f96cb681f687a9f39f96be9',
+ 'component-contracts.json':'10a7c8a4088c5c3743fb14af68c70133f9ce3be627e1cb028e0504ab41a2be0b',
  'components.json':'3bd40d5c0a896991caacbd5352fa03d8b82a3efde3bf9b5183b29905acd1f8a5',
- 'joint-dashboard.json':'e792ecbe35892281931e9841ac13069f3b2ad5cca059c377c5c284a5c34c8c1c',
- 'captured-62-queries.json':'1eff2d99b0ef7219640ec7c00af17d4c3b161b29c146c5347a191cd094844d72'};
+ 'joint-dashboard.json':'bc2cee280389fa646dfdb7901ded66946b4552c65d59d00a0c616bd0cf28d8a8',
+ 'captured-62-queries.json':'075bcb282ba21785d40190ff115bd20d7c0606f5615f314c5f60d7d30784bd7b'};
  const component=async name=>{must(Object.hasOwn(pins,name),'Unallowlisted artifact');const bytes=await bounded(path.join(directory,name),3*1024*1024);must(hash(bytes)===pins[name],'Preview artifact pin mismatch');return bytes;};
  const provider=create9037OfflineProvider({expectedIntegrityDigest:OFFLINE_9037_INTEGRITY_DIGEST,
   integrityBytes:await component('integrity-manifest.json'),contractBytes:await component('component-contracts.json'),componentBytes:await component('components.json')});
