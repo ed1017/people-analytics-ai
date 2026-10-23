@@ -1,8 +1,8 @@
 import {verifyPublicBundle} from './verify-receipts.mjs';
-const TOKEN='workforce-demo-9037-public-aggregates-v1:2';
+const TOKEN='workforce-demo-9037-public-aggregates-v2:3';
 const loopback=host=>['localhost','127.0.0.1','[::1]'].includes(host);
 export function createFixtureHandler(capture){
- if(capture.origin!=='https://www.ed-ai.app'||!Number.isFinite(Date.parse(capture.capturedAt)))throw Error('Invalid fixture provenance');
+ if(!['https://www.ed-ai.app','https://people-analytics-r4qpj70pm-ed-56dc.vercel.app'].includes(capture.origin)||!Number.isFinite(Date.parse(capture.capturedAt)))throw Error('Invalid fixture provenance');
  if(capture.documents.some(d=>d.token!==TOKEN))throw Error('Invalid fixture token');
  const digest=capture.documents[0]?.body?.data_meta?.bundleDigest;
  const checked=verifyPublicBundle(capture.documents.map(d=>d.body),digest);
@@ -27,7 +27,7 @@ export function createFixtureHandler(capture){
   if(!bodies.has(url.pathname))return reply({error:'This operation is outside the recorded public fixture.'},503);
   for(const [key,value]of url.searchParams){
    const scoped=['/api/dashboard','/api/compensation-job-release'].includes(url.pathname);
-   const allowed=scoped&&(['country','org','level'].includes(key)&&value==='all'||url.pathname==='/api/compensation-job-release'&&key==='release'&&value==='compensation-9037-public-v1');
+   const allowed=scoped&&(['country','org','level'].includes(key)&&value==='all'||url.pathname==='/api/compensation-job-release'&&key==='release'&&value==='compensation-9037-public-v2');
    if(!allowed||url.searchParams.getAll(key).length!==1)return reply({error:'Only recorded company-wide scope is available.'},400);
   }
   return reply(bodies.get(url.pathname));

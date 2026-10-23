@@ -28,7 +28,7 @@ export function createPublicAiApplication({options,enabled=PUBLIC_AI_ENABLED,adm
   const binding=await loadPublic9037Binding({hostname:options?.hostname,production:false});
   signal.throwIfAborted();
   const identity=binding.router.current();
-  if(identity.datasetId!==P.datasetId||identity.token!==P.token||identity.generation!==2||!/^[a-f0-9]{64}$/.test(identity.digest)||await binding.router.bootstrapToken()!==P.token)return false;
+  if(identity.datasetId!==P.datasetId||identity.token!==P.token||identity.generation!==P.generation||!/^[a-f0-9]{64}$/.test(identity.digest)||await binding.router.bootstrapToken()!==P.token)return false;
   signal.throwIfAborted();
   const at=now();
   return Number.isFinite(at)&&['home-solution','chat','plan','intake','capability'].every(kind=>{

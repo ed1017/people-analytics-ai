@@ -20,7 +20,7 @@ export function describeHomeAssociation(survey,attrition){
 export async function readPublicHomeAssociation({binding,hostname,identity,filters,text,signal}){
  const must=v=>{if(!v)throw Error('Association evidence unavailable');};
  const current=()=>{signal.throwIfAborted();must(same(binding.router.current(),identity));};current();
- must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===2&&/^[a-f0-9]{64}$/.test(identity.digest)&&await binding.router.bootstrapToken()===P.token);
+ must(identity.datasetId===P.datasetId&&identity.token===P.token&&identity.generation===P.generation&&/^[a-f0-9]{64}$/.test(identity.digest)&&await binding.router.bootstrapToken()===P.token);
  must(/^people-analytics-[a-z0-9]+-ed-56dc\.vercel\.app$/.test(hostname));
  // Any unrecognized qualification is a clarification, never a silent scope substitution.
  const remainder=text.toLowerCase().replace(/\b(?:is|are|does|do|how|what|the|our|company|companywide|all|eight|8|business|units?|bu|bus|survey|sentiment|engagement|favorability|turnover|attrition|voluntary|compar(?:e[sd]?|ing|isons?)|contrast(?:s|ed|ing)?|across|versus|vs|correlat\w*|relat\w*|associat\w*|link\w*|connect\w*|between|with|to|and|there|a|an|any|show|me|please|have)\b/g,'').replace(/[\s?.,!\u2013\u2014-]/g,'');

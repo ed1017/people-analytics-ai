@@ -42,7 +42,7 @@ export function createPublicProjectionTestAdapter(binding,{timeoutMs=30000,hostn
   must(hostname==='www.ed-ai.app'||/^people-analytics-[a-z0-9]+-ed-56dc\.vercel\.app$/.test(hostname),'Invalid public projection hostname');
   const filters=checkedFilters(rawFilters);signal.throwIfAborted();
   const identity=structuredClone(binding.router.current());
-  must(exact(identity,['datasetId','digest','token','generation'])&&identity.datasetId===PUBLIC_9037.datasetId&&identity.token===PUBLIC_9037.token&&identity.generation===2&&/^[a-f0-9]{64}$/.test(identity.digest)&&await binding.router.bootstrapToken()===PUBLIC_9037.token,'Public projection binding unavailable');
+  must(exact(identity,['datasetId','digest','token','generation'])&&identity.datasetId===PUBLIC_9037.datasetId&&identity.token===PUBLIC_9037.token&&identity.generation===PUBLIC_9037.generation&&/^[a-f0-9]{64}$/.test(identity.digest)&&await binding.router.bootstrapToken()===PUBLIC_9037.token,'Public projection binding unavailable');
   const check=()=>{signal.throwIfAborted();must(same(binding.router.current(),identity),'Public projection binding changed');};
   async function read(path){
    check();const r=await binding.handle(new Request('https://'+hostname+path,{signal,headers:{'x-workforce-dataset':identity.token}}));

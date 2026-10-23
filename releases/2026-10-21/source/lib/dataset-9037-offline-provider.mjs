@@ -7,9 +7,9 @@ import {isDeepStrictEqual} from 'node:util';
 import {DATASET_COMPONENTS, defineDatasetProvider} from './dataset-composition.mjs';
 import {deepFreeze, exact, validateDemoRequest, validateDemoBundle} from './dataset-demo-contracts.mjs';
 
-export const OFFLINE_9037_DATASET_ID = 'workforce-demo-9037-2026-09-30-v3-1-offline-candidate';
-export const OFFLINE_9037_INTEGRITY_DIGEST = '5f7c0952361565579df7354d863441698d776fa2ef2ab1f9c70f8b0c14079ab7';
-const sourceBundle = 'deb27b293dab544ad6ba0eef3e02402585508c1db498031f350e33605b98d976';
+export const OFFLINE_9037_DATASET_ID = 'workforce-demo-realism-20261023-local-v2';
+export const OFFLINE_9037_INTEGRITY_DIGEST = '9303cfd60190978e502d4b7304321512aaab295a71e94a21ab31a9caf1c3447f';
+const sourceBundle = 'f0233363ad006ffb3db670f830be58422d6491b88b2d1e11a92a6aa981488175';
 const reviewed = new WeakSet();
 const presenterContracts = new WeakMap();
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');

@@ -34,7 +34,7 @@ test('four public domains load, normalize stably, and retain their limitations',
 });
 test('fresh server grounding binds all four public sources and rejects a changed display digest or facts',async()=>{
  const all=results(),p=buildHomePack(all,scope),hostname='people-analytics-test-ed-56dc.vercel.app';
- const binding={router:{bootstrapToken:()=>P.token,current:()=>({datasetId:P.datasetId,token:P.token,digest,generation:2})},handle:async request=>Response.json(all[new URL(request.url).pathname.slice(5)].data,{headers:{'x-workforce-dataset':P.token}})};
+ const binding={router:{bootstrapToken:()=>P.token,current:()=>({datasetId:P.datasetId,token:P.token,digest,generation:P.generation})},handle:async request=>Response.json(all[new URL(request.url).pathname.slice(5)].data,{headers:{'x-workforce-dataset':P.token}})};
  const verify=createPublicHomeGroundingTestAdapter({enabled:true,hostname,loadPublicBinding:()=>binding}).verify,request={datasetToken:P.token,filters:{country:'all',org:'all',level:'all'},scope,evidence:p};
  const receipt=await verify(request);assert.deepEqual(receipt.verifiedSourceIds,['R1','T2','T5','P2']);
  for(const mutate of [s=>s.sourceContext.bundleDigest='b'.repeat(64),s=>s.facts.hires=999,s=>s.sourceContext.publicationReceiptId='other']){const bad=structuredClone(request);mutate(bad.evidence.sources.find(s=>s.id==='R1'));await assert.rejects(verify(bad));}
