@@ -8,7 +8,7 @@
 - Constructed skill codes are retained until an authoritative semantic mapping exists; no invented skills.
 - Next explicitly approved sequence: bounded decision-first planning showcase, then assess a coordinated synthetic-data realism batch and report its scope/risks before production changes. This supersedes the earlier blanket deferral only for that bounded work. Popup/video, tornado charts, extra scenario features and wholesale app redesign remain deferred. No paid calls.
 
-## Active roadmap — October 23, after PR366
+## Active roadmap â€” October 23, after PR366
 
 Production: [PR366](https://github.com/ed1017/people-analytics-ai/pull/366), runtime `600a4b2f22ed81a606fb83f761055b66cbb34806`, deployment `dpl_Di6RhyQdpEWr5oSYVwru4sudQk18`. This reconciliation changes documentation only. Dated sections below are historical checkpoints; their pending labels are not the active queue.
 
@@ -18,9 +18,9 @@ Production: [PR366](https://github.com/ed1017/people-analytics-ai/pull/366), run
 | Supported aggregate catalogue and right-pane visuals | Current local acceptance passed **140/140 cases: 70 metrics in 24 collections, both ranking directions**, using the actual synthetic binding, server adapters and client visual validator. All cases returned an accepted visual. This is unpaid data-to-visual contract coverage, not fresh-model prompt interpretation or new browser acceptance. See [coverage evidence](current-catalogue-acceptance-2026-10-23.md). |
 | Scalar time-to-fill, survey and role comparisons | PR350/353 repairs shipped. Role recruiting reports the complete 50-role 33-day tie, not a unique winner. Existing release evidence covers browser replay; do not convert that into a fresh-model claim. |
 | Templates, complete role catalogue and multiselect | PR350/356 shipped, including optional multiline fields, draft protection, Business unit catalogue, placement outside composer and hiding after submission. No automatic submission or invented allocation among roles. |
-| Recommendation controls, actual recalculation and visuals | PR354–357 shipped. Hiring and supported mixed development/move/hire controls share calculation, summary, visual and saved state. Whole-role model limits remain; historical actuals are never changed by sliders. |
+| Recommendation controls, actual recalculation and visuals | PR354â€“357 shipped. Hiring and supported mixed development/move/hire controls share calculation, summary, visual and saved state. Whole-role model limits remain; historical actuals are never changed by sliders. |
 | Compact scoped Key findings | PR357/358 closed the applicable-page inventory, including reference/quote and planning summaries. Configuration/placeholder pages do not invent analytical findings. Pinning and action integration remain deferred. |
-| Agreed polish and navigation | PR359/361–366 shipped: disclosures, hierarchy, titles, compact navigation with saved preference, valid scenario comparison return, and prominent Baseline AI entry. PR366 protected/public desktop/mobile checks passed, including keyboard open/close, focus return, draft retention and loaded evidence. |
+| Agreed polish and navigation | PR359/361â€“366 shipped: disclosures, hierarchy, titles, compact navigation with saved preference, valid scenario comparison return, and prominent Baseline AI entry. PR366 protected/public desktop/mobile checks passed, including keyboard open/close, focus return, draft retention and loaded evidence. |
 
 ### Remaining work, without restarting completed milestones
 
@@ -45,7 +45,7 @@ Recommended next decision: use the incoming review to select a specific usabilit
 - Mixed develop/move/hire allocation controls remain unfinished. Existing pool maxima are availability assumptions, not allocations; they must not be relabeled as mix sliders. The next increment must validate an explicit selected mix, reuse the shared calculation and save adapter, and invalidate stale recommendation claims when the mix changes.
 - No paid calls, cap/ledger changes, uncertain-hold releases or new access in these increments. The existing approximately $3 test batch has about $0.137144 left, not $0.99.
 
-# Workforce app roadmap — updated October 22, 2026
+# Workforce app roadmap â€” updated October 22, 2026
 
 This existing roadmap now tracks the latest owner requests. The October 17 reconciliation below remains historical. Prioritize answer/visual reliability, then prompt assistance and compact recommendation controls. Do not interpret shipped samples as unrestricted model acceptance.
 
@@ -57,7 +57,7 @@ This existing roadmap now tracks the latest owner requests. The October 17 recon
 | 1 | Shared right-pane evidence visuals | PR349 shipped turnover bars and scalar KPI support, but the owner's 20:26 time-to-fill response still had no visual. PR350 repairs the demonstrated (R1) versus [R1] citation mismatch with common scope/visual parsing. Actual bound-route replay and hosted mobile replacement passed; fresh model result for this correction remains unverified. Broader scalar coverage, structured comparisons and survey table remain open. |
 | 1 | Survey business-unit comparison | Requested, not yet implemented: put validated eight-BU engagement favorability/score/respondent table and suitable comparison bars on right; short takeaway and metric clarification left. Derive from verified records, not model prose. Preserve survey date, scope and counts; distinguish engagement from text sentiment/eNPS. Include ordinary lists/rankings/paraphrases, topic replacement, save/reload and mobile. |
 | 2 | Editable prompt helpers | PR350 implemented/reviewed: task-oriented capacity-gap helper alongside full suggested questions. Inserts multiline Description, FTE needed, Budget (optional), Role, Department/team, Level, Location, Needed by. Unknown fields remain allowed; no autosubmit; append without overwriting draft. Real role/level catalogue and free-text department/team. Desktop/mobile keyboard/touch checks passed. |
-| 3 | Compact recommendation sliders | Requested, design inspected, implementation pending: 2–4 compact inline controls beside the recommendation, initialized from user inputs first or explicit recommendation assumptions. Relevant budget 0–1M, timing and staffing controls only; unknown is distinct from zero. Mixed-FTE plans need 2–3 labeled component controls matching actual supported roles/categories/channels. Precise editing, baseline/reset and accessible keyboard/touch/mobile. Do not invent a generic mix taxonomy or silently approve an estimated funding need. |
+| 3 | Compact recommendation sliders | Requested, design inspected, implementation pending: 2â€“4 compact inline controls beside the recommendation, initialized from user inputs first or explicit recommendation assumptions. Relevant budget 0â€“1M, timing and staffing controls only; unknown is distinct from zero. Mixed-FTE plans need 2â€“3 labeled component controls matching actual supported roles/categories/channels. Precise editing, baseline/reset and accessible keyboard/touch/mobile. Do not invent a generic mix taxonomy or silently approve an estimated funding need. |
 | 3 | Synchronized what-if calculation and visual | Pending with sliders: use the existing shared plan calculator/editor. Each change recalculates actual cost, capacity, gap and timing; update recommendation claims and an appropriate visual from the same state. No paid AI call on drag. Preserve input provenance, missing-cost limits and saved/reopened plan identity. Do not relabel hire arrival as a required deadline or people as FTE. |
 
 ## Latest checked release
@@ -104,7 +104,7 @@ No new feature program or new data source is proposed by this reconciliation.
 
 
 
-## Owner review batch — October 23, 2026 (local work, not yet released)
+## Owner review batch â€” October 23, 2026 (local work, not yet released)
 
 - Templates beside suggested questions, outside composer; hide after submission and restore on a new conversation. Preserve drafts, explicit Send and optional inputs; improve plain-text field spacing.
 - Complete verified role catalogue (50 loaded roles), searchable multi-selection/removal; preserve all roles and other fields. No implicit FTE allocation. Rename template Department/team to Business unit, with real BU suggestions; historical department text remains distinct.
@@ -114,12 +114,12 @@ No new feature program or new data source is proposed by this reconciliation.
 
 ### Informational Key findings (implementation and verification in progress)
 
-Inventory and verify 2–3 scoped, dated observations for Workforce/Overview, Attrition, Finance, Compensation, Talent Acquisition, Employee Listening, Skills, Learning/Development, Career Mobility/Growth, Succession, Workforce Planning and Intelligence. Inspect each existing page's source and current summaries before adding duplicates. Home already has scoped snapshot metrics; add only useful nonredundant findings. Planning pages use the selected calculation; unsupported/empty/incomplete sources get truthful states. Catalogues/settings/navigation or pages without analytical evidence require an explicit applicability decision, not fabricated findings.
+Inventory and verify 2â€“3 scoped, dated observations for Workforce/Overview, Attrition, Finance, Compensation, Talent Acquisition, Employee Listening, Skills, Learning/Development, Career Mobility/Growth, Succession, Workforce Planning and Intelligence. Inspect each existing page's source and current summaries before adding duplicates. Home already has scoped snapshot metrics; add only useful nonredundant findings. Planning pages use the selected calculation; unsupported/empty/incomplete sources get truthful states. Catalogues/settings/navigation or pages without analytical evidence require an explicit applicability decision, not fabricated findings.
 
 Reuse shared deterministic summaries, no paid calls on page load/filter changes and no implication these are live model output. Preserve live AI. Pinning findings and connecting them to action planning are a later phase, outside this informational-summary increment. Welcome/video and live-company tenancy remain deferred.
 
 
-## Key findings coverage — October 23 increment
+## Key findings coverage â€” October 23 increment
 
 This increment adds deterministic observations, not model-generated conclusions or new pin/action integrations. Source publication and production verification are reported separately in the release PR.
 
@@ -172,7 +172,7 @@ This supersedes the pending reference/planning coverage in the previous incremen
 The requested informational coverage is implemented with the applicability boundaries above. No new forecasting, candidate availability, causal conclusions, pinning or action integration. Welcome/video and live-company tenancy remain deferred. No paid provider calls, ledger mutations or permission changes in this follow-on.
 
 
-## Focused presentation polish — October 23
+## Focused presentation polish â€” October 23
 
 Implemented in the associated release: compact Key findings hierarchy and shared typography; persistent synthetic-data indicator; source/methodology and AI-configuration detail disclosures; narrow-filter mismatch stays visible; explicit new-page navigation starts at top while Back/Forward remains browser-managed; whole-number automatic headcount ticks; evidence-based headcount change, full-time share, aged-requisition share and voluntary share of exits. Chat-left/visuals-right and controls remain unchanged.
 
@@ -206,7 +206,7 @@ This reconciles the forwarded review findings and agreed scope; the complete ori
 No paid AI calls, financial changes, permission changes or dataset regeneration. The exact remaining naming and critique-provenance gaps above do not block the independent visual repairs.
 
 
-## Original critique reconciliation — October 23 follow-through
+## Original critique reconciliation â€” October 23 follow-through
 
 The parent re-read both original text critiques and supplied their findings. This supersedes the earlier missing-text attribution gap. Local Library materialization failed because its helper requires os.setxattr on Windows; the consuming executor did not inspect the original image. The image is directional, not an implementation specification.
 
@@ -244,7 +244,7 @@ The unchanged original synthetic generator now reproduces the exact table digest
 The remaining final 62-query capture replay is **not verified**. The isolated pinned PostgreSQL load failed on local disk exhaustion while writing WAL; the temporary process and runtime were cleaned up, restoring approximately 2.7 GB free space. No production database or records were touched. Further populated replay needs sufficient temporary disk capacity and recovery/reconciliation of the historical succession-flag overlay referenced by one query. This is a concrete reproducibility gap, not permission to substitute or fabricate aggregate values. Realism edits and new dataset promotion remain pending this baseline gate; manager/span and work-arrangement changes are the proposed first coordinated candidate.
 
 
-### Coordinated synthetic realism revision � October 23
+### Coordinated synthetic realism revision ï¿½ October 23
 
 Validated candidate now uses varied reporting spans (1,515 managers, mean 5.96; maximum 12), a coherent grade/compensation baseline, and hybrid/remote/onsite arrangements. Historical employment/events and all 33 monthly populations are preserved. All 62 application queries execute and reproduce after isolated backup/restore. Runtime integration introduces a distinct public v2 dataset identity so old saved plans retain their original basis; historical projections remain readable but cannot be silently revised against new source inputs.
 
@@ -252,7 +252,7 @@ Annual base payroll changes from $896.53M to $773.12M because of synthetic grade
 
 Generation-3 integration passed 110 focused route/version/saved-plan checks and 24 mocked-provider application checks. Protected preview served all 19 coherent public aggregate routes; desktop/mobile comparison, explicit save/reopen and affected workforce/succession pages passed without paid calls. Old saved projections remain readable on their original basis, while new calculations require current identity. The refreshed public replay is explicitly a protected-candidate capture. Production promotion remains pending CI; no current-world savings or unmodified country/attrition/skill realism is claimed.
 
-### Coordinated realism — production verified
+### Coordinated realism â€” production verified
 
 PR371 merged as `713692894422686d1d5582655f3ad6ba0ef6bd32`; runtime `7ea8bc36e814396530c70d5889ebd1f5aa24da3d`, deployment `dpl_2n3Ey5BtR4xJQwCWNrXgDzx7jBwA`, public token `workforce-demo-9037-public-aggregates-v2:3`. Required CI passed 2,983 regression contracts, seven public-replay checks and TypeScript. All 19 production aggregate responses exactly match the accepted preview. Public desktop/mobile guided comparison, explicit save/reopen and capability configuration passed without provider calls. Old-dataset browser storage retains its original salary basis and receives a transition notice; it is not silently imported into the new workspace. Original runtime/archive and dataset rollback remain retained.
 
@@ -262,6 +262,8 @@ This completes the bounded coordinated hierarchy/grade/work-arrangement revision
 
 The existing five placeholder skills and identical three-skill requirements are replaced in an isolated candidate by 12 explicitly fictional named skills and 155 role-specific requirements across all 50 roles. Recorded profiles vary deterministically by entry role; missing profiles stay unknown. There is no external taxonomy mapping, real assessment, inferred readiness or promised learning gain. Learning course references and role supply/demand/gap outputs reconcile.
 
-All 62 application queries replayed in isolated PostgreSQL: 48 exact, two ordering-only, 12 skill-dependent changes. All seven non-skill component payloads remain exact, including salary/hierarchy, headcount and 152 illustrative succession flags. Focused route tests cover all 50 roles, a four-requirement planning/response path, compensation boundaries and saved-version isolation; independent source review found no blocker. Current candidate runtime is 7c4ed90efa23baa63bd3a9910bb38c9f96a51261, public v3:4. Previous v2:3 plans remain readable on their original basis, not silently migrated.
+All 62 application queries replayed in isolated PostgreSQL: 48 exact, two ordering-only, 12 skill-dependent changes. All seven non-skill component payloads remain exact, including salary/hierarchy, headcount and 152 illustrative succession flags. Focused route tests cover all 50 roles, a four-requirement planning/response path, compensation boundaries and saved-version isolation; independent source review found no blocker. Current candidate runtime is 2854b6e4de0c36f88198cb916f713af843d4ad94, public v3:4. Previous v2:3 plans remain readable on their original basis, not silently migrated.
 
 Public reproduction currently uses an explicitly labeled local public-route capture, not a production observation. Its seven receipt/replay checks and 806-file source verification pass. Non-production protected build/browser checks and CI are pending; production remains PR371/372. The broad private-checkout test sweep also exposed older harness/copy assumptions; this is not represented as a passing whole-suite result. No paid AI, accounting, permissions or country/attrition changes. Intermittent AI rejection diagnosis follows this bounded release with fresh budget checks.
+
+Skills protected preview passed all 19 public-route parity checks, desktop/mobile Skills and Learning rendering, guided comparison and explicit save/reopen. A seeded generation-3 workspace retained its exact original bytes through reload. Final wording uses recorded rather than observed proficiency. Production remains unchanged pending final staging and CI.
