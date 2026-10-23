@@ -233,3 +233,12 @@ No claim of complete subjective visual polish or unrestricted AI reliability. Th
 - Coordinated synthetic realism is now approved for assessment, superseding the earlier blanket regeneration deferral. The original 9037 generation pipeline was located and key manifest hashes matched; exact final 62-query capture reproduction remains unproven. First establish an isolated unchanged baseline, then propose a separate manager/span and work-arrangement candidate. Do not hand-edit aggregates. Any new dataset needs coherent 33-snapshot reporting links and new identity/pins; turnover/skills changes have broader cross-domain dependencies.
 - Raw constructed skill labels and BU expansions still require authoritative mappings; labels are not invented. Popup/video, tornado charts, extra scenarios and wholesale redesign remain deferred.
 - No paid AI, financial, access or credential changes in these increments.
+
+
+### Verified outcome and remaining realism dependency
+
+PR369 is live: runtime `a6ec3fc74e1e7965bcbd180764c331fadf7435d7`, deployment `dpl_Ae6YiXR7ZkLCmut4228rskaGJkDs`, public merge `b356f3421b771fa1028c35c003832ce12c7e3c34`. Full CI and independent review passed. Protected and public desktop/mobile browsers verified the actual $26,800/1,280-hour versus $319,000/320-hour tradeoff, visible essential inputs, no automatic selection, explicit saving/reload, and contained mobile layout. No fresh provider call was made or needed for this deterministic flow.
+
+The unchanged original synthetic generator now reproduces the exact table digest: 29 SQL checks, zero FK violations, 33 snapshots, 32 company transitions and 2,527 group transitions reconciled. All 83 source-schema adapter CSV hashes and all four live component/contract/integrity/joint-dashboard artifact hashes reproduced exactly.
+
+The remaining final 62-query capture replay is **not verified**. The isolated pinned PostgreSQL load failed on local disk exhaustion while writing WAL; the temporary process and runtime were cleaned up, restoring approximately 2.7 GB free space. No production database or records were touched. Further populated replay needs sufficient temporary disk capacity and recovery/reconciliation of the historical succession-flag overlay referenced by one query. This is a concrete reproducibility gap, not permission to substitute or fabricate aggregate values. Realism edits and new dataset promotion remain pending this baseline gate; manager/span and work-arrangement changes are the proposed first coordinated candidate.
