@@ -71,7 +71,8 @@
       "feat/coordinated-realism-baseline": false,
       "docs/realism-release-verification": false,
       "feat/fictional-role-skills": false,
-      "fix/coherent-geography": false
+      "fix/coherent-geography": false,
+      "docs/geography-release-evidence": false
     }
   }
 }
