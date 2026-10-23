@@ -12,7 +12,6 @@ const productDescription =
   "Workforce Intelligence is a public portfolio demo with strategic workforce planning at its core, connecting workforce evidence, talent responses and planning scenarios with grounded AI assistance.";
 
 export const metadata: Metadata = {
-  title: productTitle,
   description: productDescription,
   openGraph: {
     title: productTitle,

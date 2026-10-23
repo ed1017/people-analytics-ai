@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "2070bc39ef52d967a8d352e7dcb95181bc006781",
+  "sourceCommit": "7711d64a46d83612230d1b99bb3c5a9387b54975",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -249,8 +249,8 @@
     },
     {
       "path": "app/layout.tsx",
-      "sha256": "c167fcb5b357adce8c2979d1db2a260f1004e6e67cfaf77ae4a29b42a8f331df",
-      "bytes": 1777
+      "sha256": "f290f031fbec1df9e7eb25bf19854da6859c82a9a7197cd57930bc082d8917db",
+      "bytes": 1754
     },
     {
       "path": "app/local-preview/talent-acquisition/page.tsx",
@@ -259,8 +259,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "105fe5e787d283ca95d8eb70d4d684af686171373695788c2a51c7e55f86d207",
-      "bytes": 87602
+      "sha256": "ad21bb408199ba740ed822e19e530597aecf0d8d90a00ac8805d51f6169d243f",
+      "bytes": 87563
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -3949,5 +3949,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "e6351da5c6d0b7dd5eb31d63dd97d442036eff4b03b14b16e7cf86f614407e05"
+  "verifiedDeployedArchiveSha256": "44ba6da1d23f4cb5071e3bec079111ca960cde479b6651e099fe7c5e3205e89c"
 }
