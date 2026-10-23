@@ -1,7 +1,4 @@
-/** Closed schema for the reviewed synthetic aggregate query projections.
- * No inferred fields, arbitrary nested objects or employee records are accepted.
- * Enumerated text is the constructed catalog vocabulary, not an open text channel.
- * A changed projection/catalog requires an explicit contract revision. */
+/** Closed vocabulary for the original and reviewed fictional skill revisions; no arbitrary text. */
 export const AGGREGATE_ROW_SCHEMAS = {
   "attrition_business_unit_summary": {
     "exits": "integer",
@@ -463,7 +460,19 @@ export const AGGREGATE_ROW_SCHEMAS = {
         "DEMO-SKILL-2",
         "DEMO-SKILL-3",
         "DEMO-SKILL-4",
-        "DEMO-SKILL-5"
+        "DEMO-SKILL-5",
+        "AI-APPLICATION",
+        "CLIENT-PARTNERSHIP",
+        "COMMUNICATION",
+        "DATA-ANALYSIS",
+        "EXPERIENCE-DESIGN",
+        "FINANCIAL-ANALYSIS",
+        "PEOPLE-ADVISORY",
+        "PLATFORM-OPERATIONS",
+        "PROJECT-DELIVERY",
+        "SECURITY-RISK",
+        "SERVICE-DELIVERY",
+        "SOFTWARE-DELIVERY"
       ]
     },
     "skill_id": "uuid"
@@ -952,7 +961,15 @@ export const AGGREGATE_ROW_SCHEMAS = {
         "PROD-PM",
         "QA-ENG",
         "STRAT-ANA",
-        "UX-DES"
+        "UX-DES",
+        "CONS-TRANS",
+        "SALES-OPS",
+        "LEGAL-COUNSEL",
+        "OPS-BUS",
+        "CLOUD-ARCH",
+        "HR-PA",
+        "CYBER-ENG",
+        "HR-HRBP"
       ]
     },
     "employees": "integer",
@@ -972,7 +989,15 @@ export const AGGREGATE_ROW_SCHEMAS = {
         "Demo PROD-PM",
         "Demo QA-ENG",
         "Demo STRAT-ANA",
-        "Demo UX-DES"
+        "Demo UX-DES",
+        "Demo CONS-TRANS",
+        "Demo SALES-OPS",
+        "Demo LEGAL-COUNSEL",
+        "Demo OPS-BUS",
+        "Demo CLOUD-ARCH",
+        "Demo HR-PA",
+        "Demo CYBER-ENG",
+        "Demo HR-HRBP"
       ]
     }
   },
@@ -1090,7 +1115,19 @@ export const AGGREGATE_ROW_SCHEMAS = {
         "DEMO-SKILL-2",
         "DEMO-SKILL-3",
         "DEMO-SKILL-4",
-        "DEMO-SKILL-5"
+        "DEMO-SKILL-5",
+        "AI-APPLICATION",
+        "CLIENT-PARTNERSHIP",
+        "COMMUNICATION",
+        "DATA-ANALYSIS",
+        "EXPERIENCE-DESIGN",
+        "FINANCIAL-ANALYSIS",
+        "PEOPLE-ADVISORY",
+        "PLATFORM-OPERATIONS",
+        "PROJECT-DELIVERY",
+        "SECURITY-RISK",
+        "SERVICE-DELIVERY",
+        "SOFTWARE-DELIVERY"
       ]
     }
   },
@@ -1158,21 +1195,55 @@ export const AGGREGATE_ROW_SCHEMAS = {
     "skill_category": {
       "enum": [
         "AI",
-        "Demo general"
+        "Demo general",
+        "Data",
+        "Technology",
+        "Collaboration",
+        "Risk",
+        "Commercial",
+        "Design",
+        "Delivery",
+        "People",
+        "Finance",
+        "Operations"
       ]
     },
     "skill_code": {
       "enum": [
         "DEMO-SKILL-1",
         "DEMO-SKILL-2",
-        "DEMO-SKILL-3"
+        "DEMO-SKILL-3",
+        "AI-APPLICATION",
+        "DATA-ANALYSIS",
+        "SOFTWARE-DELIVERY",
+        "COMMUNICATION",
+        "PLATFORM-OPERATIONS",
+        "SECURITY-RISK",
+        "CLIENT-PARTNERSHIP",
+        "EXPERIENCE-DESIGN",
+        "PROJECT-DELIVERY",
+        "PEOPLE-ADVISORY",
+        "FINANCIAL-ANALYSIS",
+        "SERVICE-DELIVERY"
       ]
     },
     "skill_name": {
       "enum": [
         "Constructed DEMO-SKILL-1",
         "Constructed DEMO-SKILL-2",
-        "Constructed DEMO-SKILL-3"
+        "Constructed DEMO-SKILL-3",
+        "Applied AI",
+        "Data analysis",
+        "Software delivery",
+        "Stakeholder communication",
+        "Platform operations",
+        "Security and risk review",
+        "Client partnership",
+        "Experience design",
+        "Project delivery",
+        "People advisory",
+        "Financial analysis",
+        "Service delivery"
       ]
     },
     "weight": "integer"
@@ -1745,21 +1816,55 @@ export const AGGREGATE_ROW_SCHEMAS = {
     "skill_category": {
       "enum": [
         "AI",
-        "Demo general"
+        "Demo general",
+        "Data",
+        "Technology",
+        "Collaboration",
+        "Risk",
+        "Commercial",
+        "Design",
+        "Delivery",
+        "People",
+        "Finance",
+        "Operations"
       ]
     },
     "skill_code": {
       "enum": [
         "DEMO-SKILL-1",
         "DEMO-SKILL-2",
-        "DEMO-SKILL-3"
+        "DEMO-SKILL-3",
+        "AI-APPLICATION",
+        "DATA-ANALYSIS",
+        "SOFTWARE-DELIVERY",
+        "COMMUNICATION",
+        "PLATFORM-OPERATIONS",
+        "SECURITY-RISK",
+        "CLIENT-PARTNERSHIP",
+        "EXPERIENCE-DESIGN",
+        "PROJECT-DELIVERY",
+        "PEOPLE-ADVISORY",
+        "FINANCIAL-ANALYSIS",
+        "SERVICE-DELIVERY"
       ]
     },
     "skill_name": {
       "enum": [
         "Constructed DEMO-SKILL-1",
         "Constructed DEMO-SKILL-2",
-        "Constructed DEMO-SKILL-3"
+        "Constructed DEMO-SKILL-3",
+        "Applied AI",
+        "Data analysis",
+        "Software delivery",
+        "Stakeholder communication",
+        "Platform operations",
+        "Security and risk review",
+        "Client partnership",
+        "Experience design",
+        "Project delivery",
+        "People advisory",
+        "Financial analysis",
+        "Service delivery"
       ]
     }
   },
@@ -1782,7 +1887,19 @@ export const AGGREGATE_ROW_SCHEMAS = {
         "DEMO-SKILL-2",
         "DEMO-SKILL-3",
         "DEMO-SKILL-4",
-        "DEMO-SKILL-5"
+        "DEMO-SKILL-5",
+        "AI-APPLICATION",
+        "CLIENT-PARTNERSHIP",
+        "COMMUNICATION",
+        "DATA-ANALYSIS",
+        "EXPERIENCE-DESIGN",
+        "FINANCIAL-ANALYSIS",
+        "PEOPLE-ADVISORY",
+        "PLATFORM-OPERATIONS",
+        "PROJECT-DELIVERY",
+        "SECURITY-RISK",
+        "SERVICE-DELIVERY",
+        "SOFTWARE-DELIVERY"
       ]
     },
     "total_contingent_records": "integer"
@@ -1795,7 +1912,19 @@ export const AGGREGATE_ROW_SCHEMAS = {
         "DEMO-SKILL-2",
         "DEMO-SKILL-3",
         "DEMO-SKILL-4",
-        "DEMO-SKILL-5"
+        "DEMO-SKILL-5",
+        "AI-APPLICATION",
+        "CLIENT-PARTNERSHIP",
+        "COMMUNICATION",
+        "DATA-ANALYSIS",
+        "EXPERIENCE-DESIGN",
+        "FINANCIAL-ANALYSIS",
+        "PEOPLE-ADVISORY",
+        "PLATFORM-OPERATIONS",
+        "PROJECT-DELIVERY",
+        "SECURITY-RISK",
+        "SERVICE-DELIVERY",
+        "SOFTWARE-DELIVERY"
       ]
     }
   },
@@ -2155,7 +2284,19 @@ export const AGGREGATE_ROW_SCHEMAS = {
           "enum": [
             "Constructed DEMO-SKILL-1",
             "Constructed DEMO-SKILL-2",
-            "Constructed DEMO-SKILL-3"
+            "Constructed DEMO-SKILL-3",
+            "Applied AI",
+            "Data analysis",
+            "Software delivery",
+            "Stakeholder communication",
+            "Platform operations",
+            "Security and risk review",
+            "Client partnership",
+            "Experience design",
+            "Project delivery",
+            "People advisory",
+            "Financial analysis",
+            "Service delivery"
           ]
         },
         "requiredProficiency": "integer",
@@ -2163,7 +2304,19 @@ export const AGGREGATE_ROW_SCHEMAS = {
           "enum": [
             "DEMO-SKILL-1",
             "DEMO-SKILL-2",
-            "DEMO-SKILL-3"
+            "DEMO-SKILL-3",
+            "AI-APPLICATION",
+            "DATA-ANALYSIS",
+            "SOFTWARE-DELIVERY",
+            "COMMUNICATION",
+            "PLATFORM-OPERATIONS",
+            "SECURITY-RISK",
+            "CLIENT-PARTNERSHIP",
+            "EXPERIENCE-DESIGN",
+            "PROJECT-DELIVERY",
+            "PEOPLE-ADVISORY",
+            "FINANCIAL-ANALYSIS",
+            "SERVICE-DELIVERY"
           ]
         }
       }
@@ -2298,14 +2451,38 @@ export const AGGREGATE_ROW_SCHEMAS = {
       "enum": [
         "DEMO-SKILL-1",
         "DEMO-SKILL-2",
-        "DEMO-SKILL-3"
+        "DEMO-SKILL-3",
+        "AI-APPLICATION",
+        "DATA-ANALYSIS",
+        "SOFTWARE-DELIVERY",
+        "COMMUNICATION",
+        "PLATFORM-OPERATIONS",
+        "SECURITY-RISK",
+        "CLIENT-PARTNERSHIP",
+        "EXPERIENCE-DESIGN",
+        "PROJECT-DELIVERY",
+        "PEOPLE-ADVISORY",
+        "FINANCIAL-ANALYSIS",
+        "SERVICE-DELIVERY"
       ]
     },
     "skill_name": {
       "enum": [
         "Constructed DEMO-SKILL-1",
         "Constructed DEMO-SKILL-2",
-        "Constructed DEMO-SKILL-3"
+        "Constructed DEMO-SKILL-3",
+        "Applied AI",
+        "Data analysis",
+        "Software delivery",
+        "Stakeholder communication",
+        "Platform operations",
+        "Security and risk review",
+        "Client partnership",
+        "Experience design",
+        "Project delivery",
+        "People advisory",
+        "Financial analysis",
+        "Service delivery"
       ]
     },
     "total_shortfall": "integer"

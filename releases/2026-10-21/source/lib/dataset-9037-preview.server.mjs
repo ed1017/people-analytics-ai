@@ -23,11 +23,11 @@ async function bounded(file,limit){
 export async function load9037PreviewBinding(options){
  const directory=path.join(process.cwd(),'.private-9037');
  const pins={
- 'integrity-manifest.json':'9303cfd60190978e502d4b7304321512aaab295a71e94a21ab31a9caf1c3447f',
- 'component-contracts.json':'2faa48bbfd3d7fd9fd43547b96be64519fc1c42890e50ecd7f8fa155ab3923b2',
- 'components.json':'150a2cce1ee34f70de9d11158be96398c4e2b199bba334bcf0863f56e1324a0f',
- 'joint-dashboard.json':'ab050057b688ea98eb8cdd45b94ef5287164132fd9910cfda58b2cf3d8714fbc',
- 'captured-62-queries.json':'a5adb6cb737b55e97f93f5cc4dc4ee56d9a7cff8ebb3375edf09a3d05e5b78ff'};
+ 'integrity-manifest.json':'353528c6f453e7ee06ac54726f2b296973f4b45eb88d150c193a993dce8f3c2a',
+ 'component-contracts.json':'ba29514659f15c49aee237fb362ab37bc8c6760f6a692999c397933620bea460',
+ 'components.json':'3bd40d5c0a896991caacbd5352fa03d8b82a3efde3bf9b5183b29905acd1f8a5',
+ 'joint-dashboard.json':'e792ecbe35892281931e9841ac13069f3b2ad5cca059c377c5c284a5c34c8c1c',
+ 'captured-62-queries.json':'1eff2d99b0ef7219640ec7c00af17d4c3b161b29c146c5347a191cd094844d72'};
  const component=async name=>{must(Object.hasOwn(pins,name),'Unallowlisted artifact');const bytes=await bounded(path.join(directory,name),3*1024*1024);must(hash(bytes)===pins[name],'Preview artifact pin mismatch');return bytes;};
  const provider=create9037OfflineProvider({expectedIntegrityDigest:OFFLINE_9037_INTEGRITY_DIGEST,
   integrityBytes:await component('integrity-manifest.json'),contractBytes:await component('component-contracts.json'),componentBytes:await component('components.json')});

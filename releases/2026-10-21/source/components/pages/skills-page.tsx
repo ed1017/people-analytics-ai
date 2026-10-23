@@ -47,7 +47,7 @@ export function SkillsPage({
             <div className="mb-6 flex items-end justify-between gap-4">
               <div>
                 <p className="text-muted-foreground">
-                  Compare observed employee proficiency with recorded job-required proficiency. External references are in Intelligence.
+                  Compare recorded employee proficiency with recorded job-required proficiency. External references are in Intelligence.
                 </p>
               </div>
 
@@ -140,7 +140,7 @@ export function SkillsPage({
                 </div>
 
                 <div className="mt-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
-                  Apparent proficiency gaps compare observed employee proficiency with the proficiency required by the employee&apos;s current job profile. Missing or stale skill records should not be interpreted as proof that an employee lacks a capability.
+                  Apparent proficiency gaps compare recorded employee proficiency with the proficiency required by the employee&apos;s current job profile. Missing or stale skill records should not be interpreted as proof that an employee lacks a capability.
                 </div>
 
                 <div className="mt-6 evidence-panel-grid grid gap-6">

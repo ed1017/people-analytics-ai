@@ -61,13 +61,13 @@ export function createResponseAdapters({planning,talent,analytics,metadata,contr
  const context=()=>metadata({sourceLabel:'Constructed demo response assumptions; staffing feasibility is not assessed',independentForecastValidation:false,coverageSemantics:'conditional-if-executed',readinessSemantics:'not-assessed',schedulingStatus:'not-composed'});
  function common(){return {as_of:DEMO_CUTOFF,capacity_feasibility:feasibility(),data_meta:context()};}
  async function recruiting(c){
-  const rows=await analytics.read('response_recruiting');must(Array.isArray(rows)&&rows.length===5&&new Set(rows.map(r=>r.skill_code)).size===5,'Missing external skill recruiting');
+  const rows=await analytics.read('response_recruiting');must(Array.isArray(rows)&&rows.length===contract().skillCatalogSize&&new Set(rows.map(r=>r.skill_code)).size===contract().skillCatalogSize,'Missing external skill recruiting');
   for(const r of rows){const s=c.signals.get(r.skill_code);must(exact(r,PLANNING_COLUMNS.response_recruiting)&&s&&['external_filled_requisitions','internal_fills_excluded'].every(k=>Number.isSafeInteger(r[k])&&r[k]>=0)&&r.external_filled_requisitions<=contract().externalStarts&&r.internal_fills_excluded<=contract().internalFills&&r.external_filled_requisitions+r.internal_fills_excluded===s.historical_filled_requisitions&&(r.external_filled_requisitions===0?r.median_open_to_accepted_days===null:finite(r.median_open_to_accepted_days)&&r.median_open_to_accepted_days>=0),'Skill external/internal fill partition');}
   return new Map(rows.map(r=>[r.skill_code,r]));
  }
  async function requirements(c){
-  const rows=await analytics.read('response_requirements');must(Array.isArray(rows)&&rows.length===150&&new Set(rows.map(r=>r.job_profile_code+':'+r.skill_code)).size===150,'Missing response requirements');
-  for(const r of rows)must(exact(r,PLANNING_COLUMNS.response_requirements)&&r.required_proficiency===3&&r.importance==='required'&&r.weight===1&&c.skillRequirements.some(s=>['job_profile_code','skill_code','skill_name','skill_category'].every(k=>s[k]===r[k])),'Invalid response requirements');return rows;
+  const rows=await analytics.read('response_requirements');must(Array.isArray(rows)&&rows.length===contract().skillRequirementCount&&new Set(rows.map(r=>r.job_profile_code+':'+r.skill_code)).size===contract().skillRequirementCount,'Missing response requirements');
+  for(const r of rows)must(exact(r,PLANNING_COLUMNS.response_requirements)&&r.required_proficiency===contract().roleSkillRequirements[r.job_profile_code]?.[r.skill_code]&&r.importance==='required'&&r.weight===1&&c.skillRequirements.some(s=>['job_profile_code','skill_code','skill_name','skill_category'].every(k=>s[k]===r[k])),'Invalid response requirements');return rows;
  }
  async function role(c,requested,a,requirements){
   const p=resolve(c.scenario.job_profile_impact,requested,'job_profile_code','job_profile_name');req(positive(p.authorized_position_delta),'The selected role has no positive scenario-created demand.');
@@ -76,7 +76,7 @@ export function createResponseAdapters({planning,talent,analytics,metadata,contr
   const skills=requirements.filter(r=>r.job_profile_code===p.job_profile_code).map(r=>{
    const s=c.signals.get(r.skill_code),h=c.external.get(r.skill_code);must(s&&h&&evidence.role.requirements.some(t=>t.skill_code===r.skill_code&&t.requiredProficiency===r.required_proficiency),'Role skill coverage');
    return {...pick(r,['skill_code','skill_name','skill_category','required_proficiency','importance','weight']),build_pathway_available:s.active_course_count>0,...pick(s,['active_course_count','mobility_candidates']),historical_filled_requisitions:h.external_filled_requisitions,median_time_to_fill_days:h.median_open_to_accepted_days,internal_fills_excluded:h.internal_fills_excluded,available_movers:null};
-  });must(skills.length===3,'Whole-role requirement completeness');
+  });must(skills.length===Object.keys(contract().roleSkillRequirements[p.job_profile_code]??{}).length,'Whole-role requirement completeness');
   const d=tidy(p.authorized_position_delta),v=coverage(d,a);
   return {...common(),job_profile_code:p.job_profile_code,job_profile_name:p.job_profile_name,scenario_created_role_demand:d,allocation:a,planned_role_coverage_if_executed:v.raw,remaining_role_gap_if_executed:v.remaining,overplanned_capacity:v.excess,coverage_pct_if_executed:ratio(v.effective,d),internal_talent_readiness:ready,external_recruiting_feasibility:buy,skill_bundle:skills,evidence_summary:{required_skill_count:skills.length,skills_with_build_pathway:skills.filter(s=>s.build_pathway_available).length,skills_with_move_signal:skills.filter(s=>s.mobility_candidates>0).length,skills_with_buy_history:skills.filter(s=>s.historical_filled_requisitions>0).length},warnings:[warning,...(a.buy>0?buy.warnings:[]),...(v.excess>epsilon?['Excess allocation is contingency and cannot close another role gap.']:[])],methodology:[...method,'Skill-level course, preference and fill counts can overlap across required skills; never sum them as unique people. Separate profile-fit buckets are constructed comparisons, not assessed readiness.']};
  }

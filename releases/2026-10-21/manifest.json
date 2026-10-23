@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "7ea8bc36e814396530c70d5889ebd1f5aa24da3d",
-  "deployment": "dpl_2n3Ey5BtR4xJQwCWNrXgDzx7jBwA",
+  "sourceCommit": "2854b6e4de0c36f88198cb916f713af843d4ad94",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -16,6 +16,11 @@
       "path": ".gitignore",
       "sha256": "0122c3e600f3a272eb55c04690a9a0ce99c0d837d6859dd92731b5f50d471e4e",
       "bytes": 557
+    },
+    {
+      "path": "app/about/page.tsx",
+      "sha256": "5a0c89ef746323f6123bea98a50fba376d59c82355b2245937ebc7fb87d5664d",
+      "bytes": 775
     },
     {
       "path": "app/api/attrition/route.ts",
@@ -338,6 +343,11 @@
       "bytes": 11681
     },
     {
+      "path": "components/catalog-composer.tsx",
+      "sha256": "c135efb22fa5b8b4f9b4e171ed16b76fc5fd5d3860e52696ef9802ae4a5f87af",
+      "bytes": 8291
+    },
+    {
       "path": "components/chat-content.tsx",
       "sha256": "e6cd81ef7471f291e760b657d99fdebab9d4c5d3c465a9ea3b5aa31e819b316c",
       "bytes": 12971
@@ -478,6 +488,11 @@
       "bytes": 2392
     },
     {
+      "path": "components/hiring-scenario-controls.tsx",
+      "sha256": "f53f6d6a26da78df48035a41c6c9da20fc93112fe2f7e20e23dc63484fdcf32e",
+      "bytes": 4220
+    },
+    {
       "path": "components/historical-metric-context.tsx",
       "sha256": "51346413dc915e3812ba02fcfba8c777ea8e560d15a8cf9a07eb4adabee4fd45",
       "bytes": 1343
@@ -496,6 +511,11 @@
       "path": "components/home-action-plan-application.tsx",
       "sha256": "83e471d71ffa2859730876da520448a306267ab3077987d4d43ffe31fd3cd215",
       "bytes": 15140
+    },
+    {
+      "path": "components/home-answer-visuals.tsx",
+      "sha256": "952e9852fb4c85ed254a446c604d3a78a6e252804e78f0479555662d64eb0e16",
+      "bytes": 4281
     },
     {
       "path": "components/home-assumptions-fallback.tsx",
@@ -668,6 +688,16 @@
       "bytes": 3917
     },
     {
+      "path": "components/home-workforce-flows.tsx",
+      "sha256": "638a6a0e45bc40900fb632604011fe14ef15e1be3901ba44b01948abde68477a",
+      "bytes": 4009
+    },
+    {
+      "path": "components/key-findings.tsx",
+      "sha256": "ef37b058af8f973ef2c409260a56dcf1ffe5c8f6755306f683ffd1ff8da7ca1e",
+      "bytes": 700
+    },
+    {
       "path": "components/limited-preview-badge.tsx",
       "sha256": "edf091968290198477c8ceee1c74e9f0494ce059c7d615fc5c2b52fe99cef302",
       "bytes": 384
@@ -754,7 +784,7 @@
     },
     {
       "path": "components/pages/skills-page.tsx",
-      "sha256": "5b63033afcc78e0c99f9aae0c65c051e5f81da7435f9719a77db9f160c0e0253",
+      "sha256": "7cd7037b9199515a103e5cee2861bbe9bf57766603cc9860de6d78942ca719cd",
       "bytes": 14922
     },
     {
@@ -883,6 +913,11 @@
       "bytes": 13774
     },
     {
+      "path": "components/scenario-decision-summary.tsx",
+      "sha256": "ea3c1b66278d3c951aab73c0ca92ef3ba1c7e41157e2b3ca43f66fdb867bb038",
+      "bytes": 2262
+    },
+    {
       "path": "components/simple-swp-demo.tsx",
       "sha256": "a23b32af8989a28b31d78589d5f1810e82d98e7d44ba4574c15589a8015ec139",
       "bytes": 10120
@@ -898,9 +933,19 @@
       "bytes": 10478
     },
     {
+      "path": "components/staffing-mix-controls.tsx",
+      "sha256": "248cb22045c083225f27e565ac17fbfd84e988b6259142bd2e1faae665ce2731",
+      "bytes": 2692
+    },
+    {
       "path": "components/staffing-option-cost.tsx",
       "sha256": "e9a501ed7485dc856f74e0b3533662150f257462b199b8e32dbfc59efc544248",
       "bytes": 1588
+    },
+    {
+      "path": "components/staffing-options-table.tsx",
+      "sha256": "f8d752d7816068c932fc7163114287435ad8b85490f78ca4ac48c8549b2fa95a",
+      "bytes": 1639
     },
     {
       "path": "components/swp-demand-editor.tsx",
@@ -1006,6 +1051,11 @@
       "path": "components/use-home-solution-conversation.ts",
       "sha256": "3498bf953ee10691e802fb7820c5c229db1ed9875cc3850dbebda08e1b0aaffd",
       "bytes": 32247
+    },
+    {
+      "path": "components/use-navigation-preference.ts",
+      "sha256": "9a5c72a3f1350fb28af25456e2214a54bfcc48b55f98c4a5fa483591340fd256",
+      "bytes": 1280
     },
     {
       "path": "components/use-page-briefing.ts",
@@ -1398,6 +1448,11 @@
       "bytes": 9767
     },
     {
+      "path": "lib/catalog-display.ts",
+      "sha256": "924b4f536b31e412203cfab100c4dcde8a76a428eea2dcfb4ae40928a42b1035",
+      "bytes": 1306
+    },
+    {
       "path": "lib/chat-answer-style.ts",
       "sha256": "3fcf986e62921d32ee6223627692e8d6396ec5c60a27132df4a979932b119c4f",
       "bytes": 2023
@@ -1459,8 +1514,8 @@
     },
     {
       "path": "lib/compensation-release-context.ts",
-      "sha256": "694ebbf5226a2e51fe79cd323dbbffc93cfae7d40d34e6d03959fc3add0493b6",
-      "bytes": 5477
+      "sha256": "f14ec992394229ae3964a96ef9a8050b90fed9a1e73ac001f4bdb47606be11f7",
+      "bytes": 5739
     },
     {
       "path": "lib/compensation-release.ts",
@@ -1473,9 +1528,24 @@
       "bytes": 3691
     },
     {
+      "path": "lib/composer-catalog.ts",
+      "sha256": "a1ca729173e0ce68e5b870d837546a6b7e2c6c34e74a4967e0c142cc3ead1454",
+      "bytes": 4307
+    },
+    {
+      "path": "lib/composer-prompt-helpers.ts",
+      "sha256": "3dadc7a44b0fa2a17cf346755419e29f0b04d6900f2d1a6ab74a798173f11f27",
+      "bytes": 983
+    },
+    {
       "path": "lib/constraint-aware-workforce-scheduler.ts",
       "sha256": "54e83d9df66eb079b5dc1d2ecd0b876f5c7faa45864daa2d2d36bec1cb9991ac",
       "bytes": 12882
+    },
+    {
+      "path": "lib/context-findings.ts",
+      "sha256": "b5acc8f687129d24087a348e833be78f7691192b6b353dfde18ba7d2d32faa65",
+      "bytes": 6755
     },
     {
       "path": "lib/contextual-prompts.ts",
@@ -1598,6 +1668,16 @@
       "bytes": 3356
     },
     {
+      "path": "lib/dataset-9037-joint-dashboard.mjs",
+      "sha256": "44c9e3a7a064b753658e390441a99a25a535d95396c225ce99c0b1d6cd5000e9",
+      "bytes": 9327
+    },
+    {
+      "path": "lib/dataset-9037-offline-provider.mjs",
+      "sha256": "e404feb4b7d1df7fa7ccb4c0767ba17ecc14c1fe52e74cad464b452730de66af",
+      "bytes": 10475
+    },
+    {
       "path": "lib/dataset-9037-preview-marker.mjs",
       "sha256": "08eed8e94f01da610babe9706a54a0297bc420947ac31d296ab86905102737b6",
       "bytes": 81
@@ -1606,6 +1686,11 @@
       "path": "lib/dataset-9037-preview-options.mjs",
       "sha256": "74ab7545f16da42a2946a16c100df49a6a355cc7e31ac627286756ca4ca592e3",
       "bytes": 2100
+    },
+    {
+      "path": "lib/dataset-9037-preview.server.mjs",
+      "sha256": "5b64a1decee387776b9c876fade178bd931332b84c66507a61fd3988fbf2f40e",
+      "bytes": 3379
     },
     {
       "path": "lib/dataset-9037-request-policy.mjs",
@@ -1619,8 +1704,8 @@
     },
     {
       "path": "lib/dataset-aggregate-row-schema.mjs",
-      "sha256": "0667b633cd9cb1f852e730ec9ce689557069531156494f4f12a410b33a465270",
-      "bytes": 54255
+      "sha256": "8347d31517d75660da2115615b272800ec7ba75c4eb37b1c5cd4e84bd5b9c24c",
+      "bytes": 58977
     },
     {
       "path": "lib/dataset-aggregate-validation.mjs",
@@ -1669,8 +1754,8 @@
     },
     {
       "path": "lib/dataset-demo-contracts.mjs",
-      "sha256": "64c25e87b5ba4ac2b7ec0cd3fab65c5483bf14ce0cc811b95383aa14797bd910",
-      "bytes": 13873
+      "sha256": "02e2a580c6437a1c3b686eb9d2b1bc9d4f2a80e0d418e4d997c6d2f2cf60d276",
+      "bytes": 14378
     },
     {
       "path": "lib/dataset-display-context.mjs",
@@ -1679,8 +1764,8 @@
     },
     {
       "path": "lib/dataset-domain-presenters.mjs",
-      "sha256": "acc62b2554e951b310078074de9da2d8ecc2cf3c5fdead888ce8d516be45e0f7",
-      "bytes": 12332
+      "sha256": "55ef1defa2b3ac8f6266c9aed0b593511470baa79fa7a4aa3ab879ec87255467",
+      "bytes": 12358
     },
     {
       "path": "lib/dataset-domain-queries.mjs",
@@ -1719,18 +1804,18 @@
     },
     {
       "path": "lib/dataset-local-api.mjs",
-      "sha256": "9c086f5f8314f23eed4ec7ad9f8b5da4a8ba12c81f4743923ff9e9d91b0dac60",
-      "bytes": 29765
+      "sha256": "8c7c298f07fbd99f59dfb2f1bfcf2fc3f469c8c2c696c4b72dfe95cdc9e67183",
+      "bytes": 29791
     },
     {
       "path": "lib/dataset-local-integration.mjs",
-      "sha256": "bdf23c7edb54ecb456dee2f0174182c5b345143608270f8b562a66e33739cc53",
-      "bytes": 7903
+      "sha256": "bcaf34b2c772a613c21bc93a41014a107758de39712e684ed5acec3e759742d5",
+      "bytes": 8057
     },
     {
       "path": "lib/dataset-planning-adapters.mjs",
-      "sha256": "f48b704cff736701f6ef313a9a7925df6bd971da779d0f74491df787c210e231",
-      "bytes": 28825
+      "sha256": "0f61643696613ea30b72d493bc2ddd0de99d2487bff373acada85cca7d784c6b",
+      "bytes": 28992
     },
     {
       "path": "lib/dataset-planning-queries.mjs",
@@ -1739,8 +1824,8 @@
     },
     {
       "path": "lib/dataset-presenter-contract.mjs",
-      "sha256": "4c6c7a4cee0807afff206542069e7cb83c2a1c687b95993d3017d3d87825fe5b",
-      "bytes": 1018
+      "sha256": "8f3b15c80a5203e4808cb8029a74606827eafb1d6cd04bfbbf4f252eecd86d77",
+      "bytes": 1215
     },
     {
       "path": "lib/dataset-publication-proposal.mjs",
@@ -1759,8 +1844,8 @@
     },
     {
       "path": "lib/dataset-response-adapters.mjs",
-      "sha256": "3c52e09492bbb5ee70b27ac79fce6867ddb49c5b6b5702f434c8d911a4462fe8",
-      "bytes": 22476
+      "sha256": "eb946ce5dfd4aa325d68208b23304cc5830690cabc8c70b8f3693a274c132f9c",
+      "bytes": 22728
     },
     {
       "path": "lib/dataset-router.mjs",
@@ -1784,8 +1869,8 @@
     },
     {
       "path": "lib/dataset-talent-adapters.mjs",
-      "sha256": "168af1c8b1bd7080d11dfab3e5f609f384d4a39818b15e89e0adaad13c7f4a11",
-      "bytes": 19004
+      "sha256": "2475d89fefbf416e2c853b50d963ece6e6bc56b5ba03e1fd744a37c7ca399171",
+      "bytes": 19229
     },
     {
       "path": "lib/dataset-talent-queries.mjs",
@@ -1918,6 +2003,11 @@
       "bytes": 23942
     },
     {
+      "path": "lib/guided-business-planning.ts",
+      "sha256": "52770e70a7ffcdd4d4894281e1935c715abbfc1d76b8dd7f9d0f4a2b038f3dc8",
+      "bytes": 4594
+    },
+    {
       "path": "lib/guided-chat-contract.ts",
       "sha256": "35e8873716887fc9744e5e8c48b9db3a33f6d2428d6b8c1f82e359d202dd910b",
       "bytes": 3874
@@ -1941,6 +2031,11 @@
       "path": "lib/guided-workload.ts",
       "sha256": "86a0f920f50574d755f4bb5e63571e1bada8fe45046becb071bb2df6790fd550",
       "bytes": 4761
+    },
+    {
+      "path": "lib/hiring-budget-authority.ts",
+      "sha256": "78c4142c1fd1d50b6e3edb3af5cfd729e83d55934d598a721211292fe9e610e6",
+      "bytes": 1461
     },
     {
       "path": "lib/hiring-budget.ts",
@@ -1988,6 +2083,21 @@
       "bytes": 12221
     },
     {
+      "path": "lib/home-aggregate-registry.mjs",
+      "sha256": "75ee80a003078db6bccd477778b6d86afa5d6710f0ba839b84f341dee6c36a0c",
+      "bytes": 15385
+    },
+    {
+      "path": "lib/home-aggregate-tool.mjs",
+      "sha256": "f47747e5051f2c56ea8cf23ba31c35bfdcb94e6deceb4a5a2f667fb1517f8331",
+      "bytes": 2644
+    },
+    {
+      "path": "lib/home-aggregate-visual.mjs",
+      "sha256": "75edcf8adeb820f2993f7d9be51181ebaeffdfd47c0b3fe990bd6357480af4b2",
+      "bytes": 2325
+    },
+    {
       "path": "lib/home-alternative-issue.ts",
       "sha256": "514632a773a2c994d68c2636b8511042ee44794b35ba72c535b8589b1ea10939",
       "bytes": 810
@@ -2003,9 +2113,19 @@
       "bytes": 13252
     },
     {
+      "path": "lib/home-answer-visual-save.ts",
+      "sha256": "fe50e2b73fea892393297b7fbdfdc1fff72ff37ff9d0d4b8385febf2ae8ea2e0",
+      "bytes": 803
+    },
+    {
       "path": "lib/home-assumptions-fallback.ts",
       "sha256": "524aaeb6e796095416c5b69b5179eb656c4c53b3f7b18fffe75ac4e2de5cb4ef",
       "bytes": 4897
+    },
+    {
+      "path": "lib/home-bu-turnover.mjs",
+      "sha256": "bac3479b148f07e2f412695baefcf7b4b949e75508448a51ea3894c93bf2b4d8",
+      "bytes": 2539
     },
     {
       "path": "lib/home-bundle-chat-edit.ts",
@@ -2098,6 +2218,11 @@
       "bytes": 3326
     },
     {
+      "path": "lib/home-comparison-visual.mjs",
+      "sha256": "462834fd03538f4a9d7a06f68f1affb800f576d9ca2912fd3d534bcfd8e2c8bc",
+      "bytes": 1869
+    },
+    {
       "path": "lib/home-conversation-plan-catalog.ts",
       "sha256": "e5efe47e6f93bacfa404b23db2b910619e4cee75b2cd4159964d8cf1b828fd9c",
       "bytes": 1630
@@ -2111,6 +2236,11 @@
       "path": "lib/home-country-scope.ts",
       "sha256": "02e2e61ae67787ea006838eb81283afff567db3cf3f45b26926e375f1e1565fd",
       "bytes": 1368
+    },
+    {
+      "path": "lib/home-dataset-query.mjs",
+      "sha256": "4831daa82e22f2166082e7b39c80d4a7039d492b94ea6258dbf40e5ef218e029",
+      "bytes": 3774
     },
     {
       "path": "lib/home-decision-journey.ts",
@@ -2188,6 +2318,11 @@
       "bytes": 1962
     },
     {
+      "path": "lib/home-headcount-chat.ts",
+      "sha256": "0b2eaae98227f224ad04a7bd36695c07fc9ce02875a328ce5c49581bc455b508",
+      "bytes": 2136
+    },
+    {
       "path": "lib/home-hiring-budget.ts",
       "sha256": "48b9c826df7781938438d20bb4d52401c9225585cc4087bc415c1b47719a390f",
       "bytes": 14216
@@ -2201,6 +2336,11 @@
       "path": "lib/home-hiring-plan.ts",
       "sha256": "ac9ba6b28d8092ae8dff30e48a5e3198c2fce2981212d4a7f2aa781d0025964d",
       "bytes": 10222
+    },
+    {
+      "path": "lib/home-history-query.mjs",
+      "sha256": "468196e660cf324060405419fe119e0b628417c770949cfae1b4607e661d45a1",
+      "bytes": 1906
     },
     {
       "path": "lib/home-history-selection.ts",
@@ -2293,6 +2433,11 @@
       "bytes": 3517
     },
     {
+      "path": "lib/home-next-details.ts",
+      "sha256": "237b144e2f7b484b6bd8bc2c244b7e8ad6d9838d9d55ecfdee2092d158ef27e3",
+      "bytes": 2447
+    },
+    {
       "path": "lib/home-onboarding.ts",
       "sha256": "8820a24e82aa4437cd4160fbb9bcb2ded45da1998bb73640608139129de6ec2a",
       "bytes": 677
@@ -2301,6 +2446,11 @@
       "path": "lib/home-pack.mjs",
       "sha256": "1f5843c27fadc60bd41ab7b346ab99be571b3d3bd1d075a7de80b537d24d41cc",
       "bytes": 29518
+    },
+    {
+      "path": "lib/home-pay-catalog-aggregates.mjs",
+      "sha256": "a63d5181b29e1d9b18e7ff0437b92049b9ed9c056a607052a404780f42bd0f45",
+      "bytes": 2803
     },
     {
       "path": "lib/home-pinned-goals.ts",
@@ -2393,6 +2543,11 @@
       "bytes": 12178
     },
     {
+      "path": "lib/home-policy-estimate.mjs",
+      "sha256": "031c39c4e66f42f896d96821ecc89b93f84f6da472b96957917f0dd9d0871141",
+      "bytes": 3292
+    },
+    {
       "path": "lib/home-preview-budget.ts",
       "sha256": "46e86aa59c64fe01ba023150ecc230ef572f1ca4a4a38772361ea9abecb847a1",
       "bytes": 3902
@@ -2413,6 +2568,11 @@
       "bytes": 3753
     },
     {
+      "path": "lib/home-question-text.ts",
+      "sha256": "6d76e3f88f1239ffaf0c41ed7c7a296194286ede6159abff2430e939a1ff43c1",
+      "bytes": 348
+    },
+    {
       "path": "lib/home-required-staffing-plan-save.ts",
       "sha256": "ba7a88b1acf2b8647b638b03b9e54b0fa3dd95f4ea573b54aa5cd1be3e3a37ea",
       "bytes": 3774
@@ -2426,6 +2586,11 @@
       "path": "lib/home-required-staffing.ts",
       "sha256": "34fa4d0ab9a0c27d56b7bd8f6f096f1da8973cb7ad0c6dc43233318caa827ac8",
       "bytes": 19551
+    },
+    {
+      "path": "lib/home-role-recruiting.mjs",
+      "sha256": "72c0669c097a60e214778d4c872b346c68746a52a708789acf67993a09e6e898",
+      "bytes": 2523
     },
     {
       "path": "lib/home-saved-pilot-correction.ts",
@@ -2493,6 +2658,11 @@
       "bytes": 2793
     },
     {
+      "path": "lib/home-solution-projection.ts",
+      "sha256": "abb870e9a91481e11559e54c7248b3d296f37b48fa63836f70b6125138bdfb7a",
+      "bytes": 13256
+    },
+    {
       "path": "lib/home-solution-response-failure.ts",
       "sha256": "966bcaf98ac29f1b7d1bdbd6bb0fe998a93350261b085a3d09f3957ee28b86ef",
       "bytes": 1053
@@ -2506,6 +2676,11 @@
       "path": "lib/home-staffing-delivery.ts",
       "sha256": "39ba8c6ac2da0515192535ac2c420604c149d827a76ea1f761650e66c1e030d0",
       "bytes": 6319
+    },
+    {
+      "path": "lib/home-staffing-intake.ts",
+      "sha256": "0ec24f70a6ab8725b19a881c4cf5e22e232450e0c777338884b5dc0872bcb131",
+      "bytes": 1419
     },
     {
       "path": "lib/home-staffing-scenario.ts",
@@ -2533,6 +2708,11 @@
       "bytes": 4150
     },
     {
+      "path": "lib/home-survey-groups.mjs",
+      "sha256": "e8b989c5a6070e0f5f882f5b45de0d74024c6754f0baadb1641f7842c1ffc9bb",
+      "bytes": 1925
+    },
+    {
       "path": "lib/home-turnover-chat.ts",
       "sha256": "4eeec160955b304ed4855aeaffdeca2d24558fdde404ba309c515215ca0e08b0",
       "bytes": 19503
@@ -2553,9 +2733,19 @@
       "bytes": 2634
     },
     {
+      "path": "lib/home-turnover-year.ts",
+      "sha256": "ed527a9db38b1d66167f4b3740e5afdcaa285748be04d301372000160611bb2e",
+      "bytes": 1218
+    },
+    {
       "path": "lib/home-user-goal-intent.ts",
       "sha256": "16f457bea9af5618bc0103d64684d01613b14a28c27303fe8fba3da476fecbcb",
       "bytes": 5232
+    },
+    {
+      "path": "lib/home-workforce-flows.ts",
+      "sha256": "118e97e91afca309044388f3d732f5ef2ea28e647d33d2608bb08bd262d3ca5c",
+      "bytes": 2909
     },
     {
       "path": "lib/intelligence-chat.ts",
@@ -2566,6 +2756,11 @@
       "path": "lib/internal-talent-readiness.ts",
       "sha256": "c5b319231c9bed069c179ded94dd5977c47ac60b4d95a51e44bb60f4ae172d4e",
       "bytes": 19512
+    },
+    {
+      "path": "lib/key-findings.ts",
+      "sha256": "708c5191bbe629b0af8f027eaa11852a1a8e96a28fec018789c6674cc995b61d",
+      "bytes": 8834
     },
     {
       "path": "lib/labor-outlook.mjs",
@@ -2788,6 +2983,16 @@
       "bytes": 6790
     },
     {
+      "path": "lib/model-citation-catalog.mjs",
+      "sha256": "ba084912369eebb82107dcd4f0c07507223e3c9c49fc47bb68e5a4d3c9cbf2b4",
+      "bytes": 763
+    },
+    {
+      "path": "lib/model-planning-context.mjs",
+      "sha256": "8c463fbd45f8d87b4d81d1a303f5743b0625fcbe8387ccaadffd76a7d93886a9",
+      "bytes": 2542
+    },
+    {
       "path": "lib/monthly-headcount-flow.ts",
       "sha256": "41b664298ebfb01cb912f4115c0878f6613f087c3cd6af4764982bf9050a4da6",
       "bytes": 1284
@@ -2903,6 +3108,11 @@
       "bytes": 2048
     },
     {
+      "path": "lib/public-9037-contract.mjs",
+      "sha256": "308fe829ecf7279781372e175515d5ea32293a1b7cf6e59fb2a256249a78617f",
+      "bytes": 638
+    },
+    {
       "path": "lib/public-9037-fields.json",
       "sha256": "0ad759700470548279f733b5849e7c6ade66c5ab45ea53e7849db93596fa3d5f",
       "bytes": 121181
@@ -2953,6 +3163,21 @@
       "bytes": 2217
     },
     {
+      "path": "lib/public-chat-conversation.mjs",
+      "sha256": "07a845af5994f54cf0935435145bf5b0c9b17a33545748cdfdd5206bdb4b9787",
+      "bytes": 11635
+    },
+    {
+      "path": "lib/public-home-aggregate.server.mjs",
+      "sha256": "8334499bb90957b28f4650b3e528c1e51177068848e9f59e2595b292fc0832c0",
+      "bytes": 13077
+    },
+    {
+      "path": "lib/public-home-association.server.mjs",
+      "sha256": "e1e4f125a897d69457fe1e887f34079f8facf8ec4681b458e430010ecab22bca",
+      "bytes": 5522
+    },
+    {
       "path": "lib/public-home-grounding.server.mjs",
       "sha256": "fee0dc166b9b2e83404b313de29b329fb04d4e7821890fb118f39e4a38d458b8",
       "bytes": 6715
@@ -2988,9 +3213,19 @@
       "bytes": 1399
     },
     {
+      "path": "lib/public-planner-receipt.server.mjs",
+      "sha256": "a300c2ae82b573474888484cd005a2fe0195b28cc175d11a87930821b20401eb",
+      "bytes": 4229
+    },
+    {
       "path": "lib/public-planner-round.server.mjs",
       "sha256": "15fa22a65b700cc92dd26bb5fe4c0bee040cf156dded6e519b6c302913a3b07e",
       "bytes": 15230
+    },
+    {
+      "path": "lib/public-projection-contract.mjs",
+      "sha256": "91048d367eca13407621fa81dc0b2233c194f76df3156b20e98c96d542f77292",
+      "bytes": 2020
     },
     {
       "path": "lib/public-projection-currentness-client.mjs",
@@ -3098,6 +3333,11 @@
       "bytes": 12740
     },
     {
+      "path": "lib/scenario-planning-parity.ts",
+      "sha256": "be62a9b8ac04533570937a38ceaea8d2407d7ab102889a700d783591385e9910",
+      "bytes": 5610
+    },
+    {
       "path": "lib/simple-swp-controls.ts",
       "sha256": "faca89d7d93beffc9de51b9a55886a49617e76d667247799a57f59af9218ab38",
       "bytes": 1408
@@ -3148,9 +3388,24 @@
       "bytes": 2581
     },
     {
+      "path": "lib/staffing-choice-summary.ts",
+      "sha256": "3494b2fb8876ab914d530fafe1c336a3c84bd44eda44b86dacc11de6c4120f23",
+      "bytes": 2840
+    },
+    {
+      "path": "lib/staffing-monthly-capacity.ts",
+      "sha256": "9fa793517ca5bf124e4a5211e6e0517e004292174fd4a8ea985204d79846d62b",
+      "bytes": 479
+    },
+    {
       "path": "lib/staffing-option-label.ts",
       "sha256": "10fb0c47281f3ecb1e95e6e8b0b4bd1e978e71c06605e289ddee8565e5b49ad5",
       "bytes": 569
+    },
+    {
+      "path": "lib/staffing-option-presentation.ts",
+      "sha256": "117a303f8251620df7acb260aefa54c2cb9382a1564f2c2fca8fa62961930e17",
+      "bytes": 895
     },
     {
       "path": "lib/staffing-option-title.ts",
@@ -3368,6 +3623,11 @@
       "bytes": 13809
     },
     {
+      "path": "lib/workforce-input-display.ts",
+      "sha256": "a3f3cc2c6449e10656f9f5f30990a51ea456759642f250229738a74453f5f857",
+      "bytes": 1627
+    },
+    {
       "path": "lib/workforce-input-readiness.ts",
       "sha256": "da83db9331c3c197e6202f5366969a41003f37bbf5066b0159fa7eaac053492c",
       "bytes": 3654
@@ -3533,269 +3793,14 @@
       "bytes": 385
     },
     {
-      "path": "tsconfig.json",
-      "sha256": "be18523b23b78b6e1a876ddd107d330f0168bddf09d751b57e0b5edce69c66f3",
-      "bytes": 666
-    },
-    {
-      "path": "vercel.json",
-      "sha256": "c9f33c545b21f6eb391cdd09a24827c71dd2e3bc016b18b68f7258900d981f98",
-      "bytes": 435
-    },
-    {
-      "path": "lib/catalog-display.ts",
-      "sha256": "924b4f536b31e412203cfab100c4dcde8a76a428eea2dcfb4ae40928a42b1035",
-      "bytes": 1306
-    },
-    {
-      "path": "components/home-answer-visuals.tsx",
-      "sha256": "952e9852fb4c85ed254a446c604d3a78a6e252804e78f0479555662d64eb0e16",
-      "bytes": 4281
-    },
-    {
-      "path": "lib/home-turnover-year.ts",
-      "sha256": "ed527a9db38b1d66167f4b3740e5afdcaa285748be04d301372000160611bb2e",
-      "bytes": 1218
-    },
-    {
-      "path": "lib/home-headcount-chat.ts",
-      "sha256": "0b2eaae98227f224ad04a7bd36695c07fc9ce02875a328ce5c49581bc455b508",
-      "bytes": 2136
-    },
-    {
-      "path": "lib/home-staffing-intake.ts",
-      "sha256": "0ec24f70a6ab8725b19a881c4cf5e22e232450e0c777338884b5dc0872bcb131",
-      "bytes": 1419
-    },
-    {
-      "path": "lib/public-planner-receipt.server.mjs",
-      "sha256": "a300c2ae82b573474888484cd005a2fe0195b28cc175d11a87930821b20401eb",
-      "bytes": 4229
-    },
-    {
-      "path": "lib/home-question-text.ts",
-      "sha256": "6d76e3f88f1239ffaf0c41ed7c7a296194286ede6159abff2430e939a1ff43c1",
-      "bytes": 348
-    },
-    {
-      "path": "lib/home-survey-groups.mjs",
-      "sha256": "e8b989c5a6070e0f5f882f5b45de0d74024c6754f0baadb1641f7842c1ffc9bb",
-      "bytes": 1925
-    },
-    {
-      "path": "lib/home-aggregate-registry.mjs",
-      "sha256": "75ee80a003078db6bccd477778b6d86afa5d6710f0ba839b84f341dee6c36a0c",
-      "bytes": 15385
-    },
-    {
-      "path": "lib/home-aggregate-tool.mjs",
-      "sha256": "f47747e5051f2c56ea8cf23ba31c35bfdcb94e6deceb4a5a2f667fb1517f8331",
-      "bytes": 2644
-    },
-    {
-      "path": "lib/public-home-aggregate.server.mjs",
-      "sha256": "8334499bb90957b28f4650b3e528c1e51177068848e9f59e2595b292fc0832c0",
-      "bytes": 13077
-    },
-    {
-      "path": "lib/home-pay-catalog-aggregates.mjs",
-      "sha256": "a63d5181b29e1d9b18e7ff0437b92049b9ed9c056a607052a404780f42bd0f45",
-      "bytes": 2803
-    },
-    {
-      "path": "lib/scenario-planning-parity.ts",
-      "sha256": "be62a9b8ac04533570937a38ceaea8d2407d7ab102889a700d783591385e9910",
-      "bytes": 5610
-    },
-    {
-      "path": "components/staffing-options-table.tsx",
-      "sha256": "f8d752d7816068c932fc7163114287435ad8b85490f78ca4ac48c8549b2fa95a",
-      "bytes": 1639
-    },
-    {
-      "path": "lib/guided-business-planning.ts",
-      "sha256": "52770e70a7ffcdd4d4894281e1935c715abbfc1d76b8dd7f9d0f4a2b038f3dc8",
-      "bytes": 4594
-    },
-    {
-      "path": "lib/staffing-choice-summary.ts",
-      "sha256": "3494b2fb8876ab914d530fafe1c336a3c84bd44eda44b86dacc11de6c4120f23",
-      "bytes": 2840
-    },
-    {
-      "path": "lib/staffing-monthly-capacity.ts",
-      "sha256": "9fa793517ca5bf124e4a5211e6e0517e004292174fd4a8ea985204d79846d62b",
-      "bytes": 479
-    },
-    {
-      "path": "lib/staffing-option-presentation.ts",
-      "sha256": "117a303f8251620df7acb260aefa54c2cb9382a1564f2c2fca8fa62961930e17",
-      "bytes": 895
-    },
-    {
-      "path": "lib/workforce-input-display.ts",
-      "sha256": "a3f3cc2c6449e10656f9f5f30990a51ea456759642f250229738a74453f5f857",
-      "bytes": 1627
-    },
-    {
-      "path": "lib/home-next-details.ts",
-      "sha256": "237b144e2f7b484b6bd8bc2c244b7e8ad6d9838d9d55ecfdee2092d158ef27e3",
-      "bytes": 2447
-    },
-    {
-      "path": "lib/public-home-association.server.mjs",
-      "sha256": "e1e4f125a897d69457fe1e887f34079f8facf8ec4681b458e430010ecab22bca",
-      "bytes": 5522
-    },
-    {
-      "path": "tests/public-ai-application.test.mjs",
-      "bytes": 29312,
-      "sha256": "e9f5ce951b20950891e6531f9344cbc17a4bc5419697fd57a9a451aac97dc13b"
-    },
-    {
-      "path": "tests/public-home-association.test.mjs",
-      "sha256": "33205b7f1f900b9174830bc2a39517cb2807f1e2b1c8a0e9f606045017926e50",
-      "bytes": 5456
-    },
-    {
-      "path": "tests/public-home-route-approved.test.mjs",
-      "bytes": 30334,
-      "sha256": "5dc04611b4a51f57433fce6f92dd3740680b5d835c2eef91333b8084caf0bbb0"
-    },
-    {
-      "path": "tests/public-planner-price-proposal.test.mjs",
-      "bytes": 4095,
-      "sha256": "e727b0c2aa5eebb749c3e871b77257a3b41853949043d312b15d6d768a71d46d"
-    },
-    {
-      "path": "tests/public-planner-round.test.mjs",
-      "sha256": "0f5c0d21623a6da660383cf4cfb7a2357e656510758d4249dc90a4e11cc25eba",
-      "bytes": 14332
-    },
-    {
-      "path": "components/catalog-composer.tsx",
-      "sha256": "c135efb22fa5b8b4f9b4e171ed16b76fc5fd5d3860e52696ef9802ae4a5f87af",
-      "bytes": 8291
-    },
-    {
-      "path": "components/home-workforce-flows.tsx",
-      "sha256": "638a6a0e45bc40900fb632604011fe14ef15e1be3901ba44b01948abde68477a",
-      "bytes": 4009
-    },
-    {
-      "path": "lib/composer-catalog.ts",
-      "sha256": "a1ca729173e0ce68e5b870d837546a6b7e2c6c34e74a4967e0c142cc3ead1454",
-      "bytes": 4307
-    },
-    {
-      "path": "lib/home-workforce-flows.ts",
-      "sha256": "118e97e91afca309044388f3d732f5ef2ea28e647d33d2608bb08bd262d3ca5c",
-      "bytes": 2909
-    },
-    {
-      "path": "tests/home-flows-catalog.test.mjs",
-      "sha256": "81e4224b0b79e6a494e70c90482a5ba2cb6b16edab3c0a9e573681190dc5a337",
-      "bytes": 5426
-    },
-    {
       "path": "tests/business-planning-model-view.test.mjs",
       "sha256": "e651169eba4ddf7fd7f75b1c5ae8015b48f52ce674157d2470827c4032c5e307",
       "bytes": 1441
     },
     {
-      "path": "tests/staffing-calendar-routing.test.mjs",
-      "sha256": "d3645595c4de5c19e199280bf28b3c7cb7a0acc4f2478fc8c3b8ea91bcc26494",
-      "bytes": 2125
-    },
-    {
-      "path": "lib/model-citation-catalog.mjs",
-      "sha256": "ba084912369eebb82107dcd4f0c07507223e3c9c49fc47bb68e5a4d3c9cbf2b4",
-      "bytes": 763
-    },
-    {
-      "path": "tests/model-citation-catalog.test.mjs",
-      "sha256": "535b617f7c1b0cdcef457aa2df52edcb472dea62759eba0db08cb0580b04742b",
-      "bytes": 2828
-    },
-    {
-      "path": "tests/public-planner-ledger.test.mjs",
-      "sha256": "b2e1fc9e2aebc4c189bb003cc3c6718be8ab62288e07d49ea3a653c35847916a",
-      "bytes": 2436
-    },
-    {
-      "path": "lib/model-planning-context.mjs",
-      "sha256": "8c463fbd45f8d87b4d81d1a303f5743b0625fcbe8387ccaadffd76a7d93886a9",
-      "bytes": 2542
-    },
-    {
-      "path": "tests/model-planning-context.test.mjs",
-      "sha256": "a59d2b1916a4c30c5216a18f825b8c1afc4c8971942f53ddd794fa622c4e6f69",
-      "bytes": 2692
-    },
-    {
-      "path": "tests/hiring-answer-contract.test.mjs",
-      "sha256": "6acf6a57aada4e71646cf4236fbfdf3ee79722688d777b763744246df2b1df8c",
-      "bytes": 6075
-    },
-    {
-      "path": "lib/hiring-budget-authority.ts",
-      "sha256": "78c4142c1fd1d50b6e3edb3af5cfd729e83d55934d598a721211292fe9e610e6",
-      "bytes": 1461
-    },
-    {
-      "path": "lib/home-policy-estimate.mjs",
-      "sha256": "031c39c4e66f42f896d96821ecc89b93f84f6da472b96957917f0dd9d0871141",
-      "bytes": 3292
-    },
-    {
-      "path": "tests/home-policy-estimate.test.mjs",
-      "sha256": "274c7d345e14f0db96b83e1edf8329188720b8d4a27a67cc9530a24c6052ba6b",
-      "bytes": 3095
-    },
-    {
-      "path": "tests/optional-budget-demand.test.mjs",
-      "sha256": "eaf67e36f6c7ae4fccea5aab68da65f06625585b082f18af643d0adb8ae21351",
-      "bytes": 1646
-    },
-    {
-      "path": "lib/home-dataset-query.mjs",
-      "sha256": "4831daa82e22f2166082e7b39c80d4a7039d492b94ea6258dbf40e5ef218e029",
-      "bytes": 3774
-    },
-    {
-      "path": "lib/home-history-query.mjs",
-      "sha256": "468196e660cf324060405419fe119e0b628417c770949cfae1b4607e661d45a1",
-      "bytes": 1906
-    },
-    {
-      "path": "tests/home-dataset-query.test.mjs",
-      "sha256": "5118035d5c86a6b9789f17f6d30fefc461bdf5a34a74d746693723c3b3098e49",
-      "bytes": 5122
-    },
-    {
-      "path": "lib/home-bu-turnover.mjs",
-      "sha256": "bac3479b148f07e2f412695baefcf7b4b949e75508448a51ea3894c93bf2b4d8",
-      "bytes": 2539
-    },
-    {
-      "path": "tests/home-answer-visuals.test.mjs",
-      "sha256": "76adf998bcaf240d13fc9a47992a0a16b63a3c3b8164171c0c97cbba4e4cd2fc",
-      "bytes": 4036
-    },
-    {
-      "path": "tests/home-bu-turnover.test.mjs",
-      "sha256": "8c74fd1c3235b967e1c8d9400ae9d1e9cdc87c56b0d0b810ecb16f0f6389439e",
-      "bytes": 3343
-    },
-    {
-      "path": "tests/home-scalar-visual.test.mjs",
-      "sha256": "054b57ffae7651de192a3e47421e30a5e3e720979835aea36ed384b5222b1eaf",
-      "bytes": 2055
-    },
-    {
-      "path": "lib/composer-prompt-helpers.ts",
-      "sha256": "3dadc7a44b0fa2a17cf346755419e29f0b04d6900f2d1a6ab74a798173f11f27",
-      "bytes": 983
+      "path": "tests/catalog-display.test.mjs",
+      "sha256": "b8b16f043dd246f8205fe441c2de2a99f17c0ff16cf55f361f84184dafe85b3d",
+      "bytes": 4032
     },
     {
       "path": "tests/composer-prompt-helpers.test.mjs",
@@ -3803,34 +3808,24 @@
       "bytes": 6375
     },
     {
+      "path": "tests/context-findings.test.mjs",
+      "sha256": "589d4efa6dda8ac55b32f841feb673112a78b000edc87a55b913db93c7b2419d",
+      "bytes": 4494
+    },
+    {
       "path": "tests/evidence-citation-visuals.test.mjs",
       "sha256": "b56a2f1da080890a7acd64663e95156dbbd2b4799887fa2f31790e799f2a3c93",
       "bytes": 2955
     },
     {
-      "path": "lib/home-comparison-visual.mjs",
-      "sha256": "462834fd03538f4a9d7a06f68f1affb800f576d9ca2912fd3d534bcfd8e2c8bc",
-      "bytes": 1869
+      "path": "tests/hiring-answer-contract.test.mjs",
+      "sha256": "6acf6a57aada4e71646cf4236fbfdf3ee79722688d777b763744246df2b1df8c",
+      "bytes": 6075
     },
     {
-      "path": "tests/home-comparison-visual.test.mjs",
-      "sha256": "5e889545cee1a65532376e870769f74a20f47bac18ced3455e77da5c7db713c1",
-      "bytes": 4032
-    },
-    {
-      "path": "lib/home-aggregate-visual.mjs",
-      "sha256": "75edcf8adeb820f2993f7d9be51181ebaeffdfd47c0b3fe990bd6357480af4b2",
-      "bytes": 2325
-    },
-    {
-      "path": "lib/home-answer-visual-save.ts",
-      "sha256": "fe50e2b73fea892393297b7fbdfdc1fff72ff37ff9d0d4b8385febf2ae8ea2e0",
-      "bytes": 803
-    },
-    {
-      "path": "lib/home-role-recruiting.mjs",
-      "sha256": "72c0669c097a60e214778d4c872b346c68746a52a708789acf67993a09e6e898",
-      "bytes": 2523
+      "path": "tests/hiring-scenario-reset.test.mjs",
+      "sha256": "7ec71f453f23beb46a277801e2a8800c2440dd7e1d45ca2cf6806b8061a2dfe5",
+      "bytes": 2108
     },
     {
       "path": "tests/home-aggregate-registry.test.mjs",
@@ -3843,159 +3838,39 @@
       "bytes": 2772
     },
     {
+      "path": "tests/home-annual-turnover.test.mjs",
+      "bytes": 8685,
+      "sha256": "be8af550550cd7e6b5ee356983b6517bd832241c18e24c5fac5375ab2a6de6db"
+    },
+    {
       "path": "tests/home-answer-visual-save.test.mjs",
       "sha256": "64d7aae1a2ac03b049a4b1de15616584116cf1b7fb6b5bb283cb843a9521e0b0",
       "bytes": 1370
     },
     {
-      "path": "tests/home-role-recruiting.test.mjs",
-      "sha256": "0b29d60e196215ddcc0379e080648593bead12f507361b4d5bab5826f52768c5",
-      "bytes": 2856
+      "path": "tests/home-answer-visuals.test.mjs",
+      "sha256": "76adf998bcaf240d13fc9a47992a0a16b63a3c3b8164171c0c97cbba4e4cd2fc",
+      "bytes": 4036
     },
     {
-      "path": "components/hiring-scenario-controls.tsx",
-      "sha256": "f53f6d6a26da78df48035a41c6c9da20fc93112fe2f7e20e23dc63484fdcf32e",
-      "bytes": 4220
+      "path": "tests/home-bu-turnover.test.mjs",
+      "sha256": "8c74fd1c3235b967e1c8d9400ae9d1e9cdc87c56b0d0b810ecb16f0f6389439e",
+      "bytes": 3343
     },
     {
-      "path": "tests/hiring-scenario-reset.test.mjs",
-      "sha256": "7ec71f453f23beb46a277801e2a8800c2440dd7e1d45ca2cf6806b8061a2dfe5",
-      "bytes": 2108
-    },
-    {
-      "path": "components/staffing-mix-controls.tsx",
-      "sha256": "248cb22045c083225f27e565ac17fbfd84e988b6259142bd2e1faae665ce2731",
-      "bytes": 2692
-    },
-    {
-      "path": "tests/staffing-mix-controls.test.mjs",
-      "sha256": "7a98df2bdccdae3c75109a4a38dfd035ba716772ba22f85f2385f922f92c119f",
-      "bytes": 4460
-    },
-    {
-      "path": "components/key-findings.tsx",
-      "sha256": "ef37b058af8f973ef2c409260a56dcf1ffe5c8f6755306f683ffd1ff8da7ca1e",
-      "bytes": 700
-    },
-    {
-      "path": "lib/key-findings.ts",
-      "sha256": "708c5191bbe629b0af8f027eaa11852a1a8e96a28fec018789c6674cc995b61d",
-      "bytes": 8834
-    },
-    {
-      "path": "tests/key-findings.test.mjs",
-      "sha256": "efcc027376246e3eac26b876026f1f13b8af8bd0322d18c001e7b9cb1c454dbb",
-      "bytes": 4179
-    },
-    {
-      "path": "tests/succession-display-release.test.mjs",
-      "sha256": "ec41a867e8219f9664f24ba847f073df022cb5bc13b804c6d8a76ad17bac2f17",
-      "bytes": 2561
-    },
-    {
-      "path": "lib/context-findings.ts",
-      "sha256": "b5acc8f687129d24087a348e833be78f7691192b6b353dfde18ba7d2d32faa65",
-      "bytes": 6755
-    },
-    {
-      "path": "tests/context-findings.test.mjs",
-      "sha256": "589d4efa6dda8ac55b32f841feb673112a78b000edc87a55b913db93c7b2419d",
-      "bytes": 4494
-    },
-    {
-      "path": "tests/polish-findings.test.mjs",
-      "sha256": "2b8803547962844af953c9700a23fce8e2f59f7fcfb48cb6a4a8aed411dc2d38",
-      "bytes": 2104
-    },
-    {
-      "path": "tests/catalog-display.test.mjs",
-      "sha256": "b8b16f043dd246f8205fe441c2de2a99f17c0ff16cf55f361f84184dafe85b3d",
+      "path": "tests/home-comparison-visual.test.mjs",
+      "sha256": "5e889545cee1a65532376e870769f74a20f47bac18ced3455e77da5c7db713c1",
       "bytes": 4032
     },
     {
-      "path": "components/use-navigation-preference.ts",
-      "sha256": "9a5c72a3f1350fb28af25456e2214a54bfcc48b55f98c4a5fa483591340fd256",
-      "bytes": 1280
+      "path": "tests/home-dataset-query.test.mjs",
+      "sha256": "5118035d5c86a6b9789f17f6d30fefc461bdf5a34a74d746693723c3b3098e49",
+      "bytes": 5122
     },
     {
-      "path": "tests/navigation-preference.test.mjs",
-      "sha256": "32db69f75d49dbed834152fc0fcfcb990c25b2eb590598a3030436b824bfbca0",
-      "bytes": 2100
-    },
-    {
-      "path": "app/about/page.tsx",
-      "sha256": "5a0c89ef746323f6123bea98a50fba376d59c82355b2245937ebc7fb87d5664d",
-      "bytes": 775
-    },
-    {
-      "path": "tests/review-polish-contracts.test.mjs",
-      "sha256": "7cbb52b452e24e26eb4a81cb321a1bb998d429484c4c5f32ae875062c826e730",
-      "bytes": 1805
-    },
-    {
-      "path": "components/scenario-decision-summary.tsx",
-      "sha256": "ea3c1b66278d3c951aab73c0ca92ef3ba1c7e41157e2b3ca43f66fdb867bb038",
-      "bytes": 2262
-    },
-    {
-      "path": "tests/scenario-decision-summary.test.mjs",
-      "sha256": "e62fe4f5a9b7428128a3ab8c931846bc2cce69347e3edb2d05fb4db4324b4f51",
-      "bytes": 3074
-    },
-    {
-      "path": "lib/dataset-9037-joint-dashboard.mjs",
-      "sha256": "fd95987d9f360852540243ea7bd79ce694f863c39faaacfa9d438dd7b2331d57",
-      "bytes": 9327
-    },
-    {
-      "path": "lib/dataset-9037-offline-provider.mjs",
-      "sha256": "68daac9eb8f0e9be1ff92073f3c7b4a09fd836b2e2479f24c748a52d41887bdc",
-      "bytes": 6221
-    },
-    {
-      "path": "lib/dataset-9037-preview.server.mjs",
-      "sha256": "80dfd8bbd0be06046b30b9cec133c56323c1d26eac2e7b7e1fe99e8b48d4121b",
-      "bytes": 3379
-    },
-    {
-      "path": "lib/home-solution-projection.ts",
-      "sha256": "abb870e9a91481e11559e54c7248b3d296f37b48fa63836f70b6125138bdfb7a",
-      "bytes": 13256
-    },
-    {
-      "path": "lib/public-9037-contract.mjs",
-      "sha256": "7dc70d3efbd69f8e784746be3a397acaf21ce2682b84f37372729fc3f09835db",
-      "bytes": 638
-    },
-    {
-      "path": "lib/public-chat-conversation.mjs",
-      "sha256": "07a845af5994f54cf0935435145bf5b0c9b17a33545748cdfdd5206bdb4b9787",
-      "bytes": 11635
-    },
-    {
-      "path": "lib/public-projection-contract.mjs",
-      "sha256": "039e70e0dc733bccd0189d3b315b6b95e58149b26f35e649db6fb0b33c693163",
-      "bytes": 1446
-    },
-    {
-      "path": "tests/public-home-integration.test.mjs",
-      "sha256": "49305bbd5cc8140f3c97c7ead8a10c282c8a93ff5b48c4fb3741ce07e3316dc5",
-      "bytes": 13679
-    },
-    {
-      "path": "tests/public-projection-restoration.test.mjs",
-      "sha256": "2e516d0b8ed94f290d823e7aa49fb09d29e6b36c93be036312a21b2097ff585f",
-      "bytes": 9888
-    },
-    {
-      "path": "tests/realism-version-transition.test.mjs",
-      "sha256": "1536a67f240aad942db860876331669acff8ab129b8f13efce77d9803534bd19",
-      "bytes": 4977
-    },
-    {
-      "path": "tests/home-annual-turnover.test.mjs",
-      "bytes": 8685,
-      "sha256": "be8af550550cd7e6b5ee356983b6517bd832241c18e24c5fac5375ab2a6de6db"
+      "path": "tests/home-flows-catalog.test.mjs",
+      "sha256": "81e4224b0b79e6a494e70c90482a5ba2cb6b16edab3c0a9e573681190dc5a337",
+      "bytes": 5426
     },
     {
       "path": "tests/home-headcount-chat.test.mjs",
@@ -4003,9 +3878,24 @@
       "sha256": "8d6a8686c76ab2dd4c933e9312738cf1b2139e74dee0b5e04f3eadd3c0f89283"
     },
     {
+      "path": "tests/home-policy-estimate.test.mjs",
+      "sha256": "274c7d345e14f0db96b83e1edf8329188720b8d4a27a67cc9530a24c6052ba6b",
+      "bytes": 3095
+    },
+    {
       "path": "tests/home-public-provenance.test.mjs",
       "bytes": 4566,
       "sha256": "c07f02dca21c692ec77f16318cf2cfd89f57e5154807ca4a3103b0df0a8e25a2"
+    },
+    {
+      "path": "tests/home-role-recruiting.test.mjs",
+      "sha256": "0b29d60e196215ddcc0379e080648593bead12f507361b4d5bab5826f52768c5",
+      "bytes": 2856
+    },
+    {
+      "path": "tests/home-scalar-visual.test.mjs",
+      "sha256": "054b57ffae7651de192a3e47421e30a5e3e720979835aea36ed384b5222b1eaf",
+      "bytes": 2055
     },
     {
       "path": "tests/home-survey-groups.test.mjs",
@@ -4013,9 +3903,59 @@
       "sha256": "0239cee6036c6361b2f1f4412dd18262091a168e557f861437b3817ee7e97853"
     },
     {
+      "path": "tests/key-findings.test.mjs",
+      "sha256": "efcc027376246e3eac26b876026f1f13b8af8bd0322d18c001e7b9cb1c454dbb",
+      "bytes": 4179
+    },
+    {
+      "path": "tests/model-citation-catalog.test.mjs",
+      "sha256": "535b617f7c1b0cdcef457aa2df52edcb472dea62759eba0db08cb0580b04742b",
+      "bytes": 2828
+    },
+    {
+      "path": "tests/model-planning-context.test.mjs",
+      "sha256": "a59d2b1916a4c30c5216a18f825b8c1afc4c8971942f53ddd794fa622c4e6f69",
+      "bytes": 2692
+    },
+    {
+      "path": "tests/navigation-preference.test.mjs",
+      "sha256": "32db69f75d49dbed834152fc0fcfcb990c25b2eb590598a3030436b824bfbca0",
+      "bytes": 2100
+    },
+    {
+      "path": "tests/optional-budget-demand.test.mjs",
+      "sha256": "eaf67e36f6c7ae4fccea5aab68da65f06625585b082f18af643d0adb8ae21351",
+      "bytes": 1646
+    },
+    {
+      "path": "tests/polish-findings.test.mjs",
+      "sha256": "2b8803547962844af953c9700a23fce8e2f59f7fcfb48cb6a4a8aed411dc2d38",
+      "bytes": 2104
+    },
+    {
+      "path": "tests/private-9037-recovery.test.mjs",
+      "bytes": 8509,
+      "sha256": "52fcb4ddfd82fa6647b2b3803bdccef7d9ec5263b0a644e109d8a4f276194538"
+    },
+    {
+      "path": "tests/private-skills-candidate.test.mjs",
+      "bytes": 3846,
+      "sha256": "1a907fae38ef70d22dd63aecc1cd1fdd5b93cd69f75f27bc72aa162e66a995c3"
+    },
+    {
+      "path": "tests/public-ai-application.test.mjs",
+      "bytes": 29312,
+      "sha256": "e9f5ce951b20950891e6531f9344cbc17a4bc5419697fd57a9a451aac97dc13b"
+    },
+    {
       "path": "tests/public-home-aggregate.test.mjs",
       "bytes": 4240,
       "sha256": "eba83a59ba50e55b8e9c72c9e04232002f4d9251fd764ce2d8bcb0373e476047"
+    },
+    {
+      "path": "tests/public-home-association.test.mjs",
+      "sha256": "33205b7f1f900b9174830bc2a39517cb2807f1e2b1c8a0e9f606045017926e50",
+      "bytes": 5456
     },
     {
       "path": "tests/public-home-consumers.test.mjs",
@@ -4028,9 +3968,79 @@
       "sha256": "7a5af7e3d65f60fde6e9eaa61f39fe60259a5e5039433a70430f3231227cc073"
     },
     {
+      "path": "tests/public-home-integration.test.mjs",
+      "sha256": "49305bbd5cc8140f3c97c7ead8a10c282c8a93ff5b48c4fb3741ce07e3316dc5",
+      "bytes": 13679
+    },
+    {
+      "path": "tests/public-home-route-approved.test.mjs",
+      "bytes": 30334,
+      "sha256": "5dc04611b4a51f57433fce6f92dd3740680b5d835c2eef91333b8084caf0bbb0"
+    },
+    {
+      "path": "tests/public-planner-ledger.test.mjs",
+      "sha256": "b2e1fc9e2aebc4c189bb003cc3c6718be8ab62288e07d49ea3a653c35847916a",
+      "bytes": 2436
+    },
+    {
+      "path": "tests/public-planner-price-proposal.test.mjs",
+      "bytes": 4095,
+      "sha256": "e727b0c2aa5eebb749c3e871b77257a3b41853949043d312b15d6d768a71d46d"
+    },
+    {
+      "path": "tests/public-planner-round.test.mjs",
+      "sha256": "0f5c0d21623a6da660383cf4cfb7a2357e656510758d4249dc90a4e11cc25eba",
+      "bytes": 14332
+    },
+    {
+      "path": "tests/public-projection-restoration.test.mjs",
+      "sha256": "fe0b70b22060f3e86c935f15d73661375543c557344890890a2f55fba81fba9a",
+      "bytes": 9888
+    },
+    {
       "path": "tests/public-saved-evidence.test.mjs",
       "bytes": 9959,
       "sha256": "8cc46dee16e3a7b6d82678d6aa84dad496f372d4ff6f64c086c51d70245471a0"
+    },
+    {
+      "path": "tests/realism-version-transition.test.mjs",
+      "sha256": "8a7fd08160c680da26967b43ccde805b94c3a8245b70b08c227caff4c7671394",
+      "bytes": 4977
+    },
+    {
+      "path": "tests/review-polish-contracts.test.mjs",
+      "sha256": "7cbb52b452e24e26eb4a81cb321a1bb998d429484c4c5f32ae875062c826e730",
+      "bytes": 1805
+    },
+    {
+      "path": "tests/scenario-decision-summary.test.mjs",
+      "sha256": "e62fe4f5a9b7428128a3ab8c931846bc2cce69347e3edb2d05fb4db4324b4f51",
+      "bytes": 3074
+    },
+    {
+      "path": "tests/staffing-calendar-routing.test.mjs",
+      "sha256": "d3645595c4de5c19e199280bf28b3c7cb7a0acc4f2478fc8c3b8ea91bcc26494",
+      "bytes": 2125
+    },
+    {
+      "path": "tests/staffing-mix-controls.test.mjs",
+      "sha256": "7a98df2bdccdae3c75109a4a38dfd035ba716772ba22f85f2385f922f92c119f",
+      "bytes": 4460
+    },
+    {
+      "path": "tests/succession-display-release.test.mjs",
+      "sha256": "ec41a867e8219f9664f24ba847f073df022cb5bc13b804c6d8a76ad17bac2f17",
+      "bytes": 2561
+    },
+    {
+      "path": "tsconfig.json",
+      "sha256": "be18523b23b78b6e1a876ddd107d330f0168bddf09d751b57e0b5edce69c66f3",
+      "bytes": 666
+    },
+    {
+      "path": "vercel.json",
+      "sha256": "c9f33c545b21f6eb391cdd09a24827c71dd2e3bc016b18b68f7258900d981f98",
+      "bytes": 435
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

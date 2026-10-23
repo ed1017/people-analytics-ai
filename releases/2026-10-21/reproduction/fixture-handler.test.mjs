@@ -22,7 +22,7 @@ test('all 19 recorded routes replay exact data and receipt bodies',async()=>{
 test('explicit company scope works; narrowed, unknown and repeated scope fail',()=>{
  assert.equal(handle(request('/api/dashboard?country=all&org=all&level=all')).status,200);
  for(const query of ['country=US','country=all&country=all','unknown=all'])assert.equal(handle(request('/api/dashboard?'+query)).status,400);
- assert.equal(handle(request('/api/compensation-job-release?country=all&release=compensation-9037-public-v2')).status,200);
+ assert.equal(handle(request('/api/compensation-job-release?country=all&release=compensation-9037-public-v3')).status,200);
  assert.equal(handle(request('/api/compensation-job-release?release=other')).status,400);
 });
 test('no AI, POST calculations, wrong token or unrelated source fallback',async()=>{
