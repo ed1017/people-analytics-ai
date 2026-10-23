@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "7c4ed90efa23baa63bd3a9910bb38c9f96a51261",
+  "sourceCommit": "2854b6e4de0c36f88198cb916f713af843d4ad94",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -784,7 +784,7 @@
     },
     {
       "path": "components/pages/skills-page.tsx",
-      "sha256": "5b63033afcc78e0c99f9aae0c65c051e5f81da7435f9719a77db9f160c0e0253",
+      "sha256": "7cd7037b9199515a103e5cee2861bbe9bf57766603cc9860de6d78942ca719cd",
       "bytes": 14922
     },
     {
