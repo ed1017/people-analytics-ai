@@ -1,4 +1,6 @@
 "use client";
+import {KeyFindings} from "@/components/key-findings";
+import {learningFindings} from "@/lib/key-findings";
 import {catalogDisplayLabel} from "@/lib/catalog-display";
 
 import {
@@ -49,6 +51,7 @@ export function LearningDevelopmentPage({
   const data = !loading && !error ? sourceData : null;
   return (
     <section className="learning-development-page min-w-0 p-6">
+      <KeyFindings findings={data ? learningFindings(data) : null} />
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">

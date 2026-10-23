@@ -6,7 +6,7 @@ import {useState} from 'react';
 import type {useHomeSolutionConversation} from './use-home-solution-conversation';
 import {demandQuantityFields,type DemandBasis} from '@/lib/swp-demand';
 import {staffingFields} from '@/lib/home-service-staffing';
-import {staffingChoiceSummary} from '@/lib/staffing-choice-summary';
+import {staffingChoiceSummary,adjustedStaffingSummary} from '@/lib/staffing-choice-summary';
 type Controller=ReturnType<typeof useHomeSolutionConversation>;
 const number=(value:number|null|undefined)=>value==null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:1});
 const demandLabels={contracts:'Contracts',hoursPerContract:'Hours per contract',productiveHoursPerFte:'Productive hours per FTE',existingRoles:'Existing roles',existingFtePerRole:'FTE per existing role',availabilityPct:'Available team time (%)',ftePerRole:'FTE per additional role',explicitAdditionalRoles:'Stated additional roles',budgetUsd:'Budget (USD)'};
@@ -28,7 +28,7 @@ export function HomeBusinessPlanningReview({controller}:{controller:Controller})
   {r.status==='calculated'?<p>Workload: {number(r.workloadHours)} hours · existing available capacity: {number(r.capacityHours)} hours · gap: {number(r.gapHours)} hours ({number(r.additionalRoles)} additional whole roles).</p>:<p>{r.missing.join(' ')}</p>}
   <p>Proposed and user-supplied inputs remain unverified. Correct any assumption in chat; no mode or separate input form is required.</p>
   {saveUnavailable?<p role="status">{saveUnavailable}</p>:<p><strong>Save plan:</strong> Choose an option to review below, then select Save plan. Saving keeps its assumptions with your goal; it does not approve a workforce change.</p>}
-  {staffing&&<><h4 className="font-semibold">Calculated provisional options</h4>{staffing.result.status==='calculated'&&<p>{staffing.selectedMix?'User-adjusted scenario. This is not an optimized recommendation; compare the calculated cost, timing and workload shortfall.':staffingChoiceSummary(staffing.result.options)}</p>}{staffing.result.missing.map(line=><p key={line}>{line}</p>)}
+  {staffing&&<><h4 className="font-semibold">Calculated provisional options</h4>{staffing.result.status==='calculated'&&<p>{staffing.selectedMix?adjustedStaffingSummary(staffing.result.options[0]):staffingChoiceSummary(staffing.result.options)}</p>}{staffing.result.missing.map(line=><p key={line}>{line}</p>)}
    {staffing.result.status==='no-gap'&&<p>No positive workload gap; no staffing plan was generated.</p>}
    <StaffingMixControls state={state} disabled={busy} onChange={controller.adjustBusinessMix}/>
    <StaffingOptionsTable options={staffing.result.options} enumerated={staffing.result.enumerated} action={option=><button className={button} disabled={busy||option.status==='invalid'||!!selected(option.id)} onClick={async()=>{setPreparing(true);setError('');try{setReview(await controller.reviewBusinessOption(option.id));}catch(e){setError((e as Error).message);}finally{setPreparing(false);}}}>{selected(option.id)?`Pinned Action Plan #${selected(option.id)!.number}`:`Review to save: ${option.mix.build}/${option.mix.move}/${option.mix.buy}`}</button>}/>

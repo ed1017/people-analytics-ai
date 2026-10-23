@@ -1,4 +1,6 @@
 "use client";
+import {KeyFindings} from "@/components/key-findings";
+import {compensationFindings} from "@/lib/key-findings";
 import {catalogDisplayLabel} from "@/lib/catalog-display";
 import {AssumptionsDisclosure} from '@/components/assumptions-disclosure';
 import { datasetFetch } from "@/lib/dataset-client.mjs";
@@ -57,7 +59,7 @@ export function CompensationPage({scope}: {scope?: RangeScope}) {
       {loading ? <p role="status" className="rounded-lg border p-6 text-sm text-muted-foreground">Loading compensation cost context…</p>
         : error ? <div role="alert" className="rounded-lg border p-5"><p className="text-sm">Compensation cost context is unavailable. Try again.</p><button type="button" onClick={retry} className="mt-3 rounded-md border px-3 py-2 text-sm font-medium">Try again</button></div>
         : data && data.by_business_unit.length === 0 ? <div className="rounded-lg border p-5"><p role="status" className="text-sm">No business-unit cost aggregates were returned. Company totals are unavailable.</p><button type="button" onClick={retry} className="mt-3 rounded-md border px-3 py-2 text-sm font-medium">Try again</button></div>
-        : data ? <CompensationEvidence data={data} /> : null}
+        : data ? <><KeyFindings findings={compensationFindings(data)} /><CompensationEvidence data={data} /></> : null}
     </section></>
   );
 }

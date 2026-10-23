@@ -1,4 +1,6 @@
 "use client";
+import {KeyFindings} from "@/components/key-findings";
+import {mobilityFindings} from "@/lib/key-findings";
 import {catalogDisplayLabel} from "@/lib/catalog-display";
 
 import {
@@ -42,6 +44,7 @@ export function CareerMobilityPage({
   const data = !loading && !error ? sourceData : null;
   return (
     <section className="min-w-0 p-6">
+      <KeyFindings findings={data ? mobilityFindings(data) : null} />
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold">

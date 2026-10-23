@@ -78,8 +78,38 @@ No new feature program or new data source is proposed by this reconciliation.
 - Condense recommendation cards, lead with a short conditional action derived from current calculation. Sliders, numeric summary, saved plan and supported scenario visual must stay synchronized. Historical actuals remain unchanged.
 - Put monthly hires/separations directly below headcount, default January 2026 through latest September data. Retain December baseline for derived January starts; tooltip/table expose signed net change, with keyboard/touch access.
 
-### Next: informational Key findings (requested, not implemented)
+### Informational Key findings (implementation and verification in progress)
 
 Inventory and verify 2–3 scoped, dated observations for Workforce/Overview, Attrition, Finance, Compensation, Talent Acquisition, Employee Listening, Skills, Learning/Development, Career Mobility/Growth, Succession, Workforce Planning and Intelligence. Inspect each existing page's source and current summaries before adding duplicates. Home already has scoped snapshot metrics; add only useful nonredundant findings. Planning pages use the selected calculation; unsupported/empty/incomplete sources get truthful states. Catalogues/settings/navigation or pages without analytical evidence require an explicit applicability decision, not fabricated findings.
 
 Reuse shared deterministic summaries, no paid calls on page load/filter changes and no implication these are live model output. Preserve live AI. Pinning findings and connecting them to action planning are a later phase, outside this informational-summary increment. Welcome/video and live-company tenancy remain deferred.
+
+
+## Key findings coverage — October 23 increment
+
+This increment adds deterministic observations, not model-generated conclusions or new pin/action integrations. Source publication and production verification are reported separately in the release PR.
+
+| Destination | Coverage / applicability |
+| --- | --- |
+| Home Overview | Receipt-validated selected snapshot; headcount/FTE, open positions, voluntary YTD rate. Hidden for stale or unverified scope. |
+| Workforce (including legacy Overview route) | Company composition/tenure/manager observations. The legacy selected-snapshot component also has scoped findings. |
+| Attrition | Company YTD exits and total versus voluntary turnover, dated explicitly. |
+| Talent Acquisition | Recorded median time to fill, current open requisitions, aging requisitions. No future-hire promise. |
+| Employee Listening | Engagement favorability/respondents/participation. Not comment sentiment or causal analysis. |
+| Finance | Company recorded labor cost, vacancies and FTE. Unknown cost period is explicit; no annualization. |
+| Compensation | Company cost context only, separate from job-range filters. Selected range and benchmark insights are not newly inferred. |
+| Skills | Company demand, weighted requirement coverage and missing-profile limitation. |
+| Learning & Development | Company catalogue/pathway coverage; not readiness/completion. |
+| Career Growth & Mobility | Recorded events versus distinct employees; partial latest month flagged. |
+| Career Interests (legacy component) | Preference coverage/missing records, not readiness. Current navigation redirects this legacy route to Workforce. |
+| Succession | Recorded coverage/flags with suppression honored; illustrative flags labeled. Correct the UI adapter that rejected the approved public release identity despite valid aggregate source data. |
+| Labor Market | Available dated US national BLS observations only. Selected occupation comparisons retain their existing scoped result; no company inference. |
+| Occupational References; Training & Coaching | Reference/catalogue workspaces, not company observations. No generic company findings added. Selected reference/quote-specific takeaway coverage remains a follow-on, not an asserted pass. |
+| Future of Work | Existing explicitly illustrative task calculation; no actual-company findings are available. Keep the calculated example summary rather than imply measured workforce impact. |
+| Planning Overview; Scenario Modeling; Position/Workforce Design; Workforce Response; Execution Feasibility; Development Planning | Scenario-dependent results already expose assumptions/calculations. A consistent compact findings treatment across these tools remains pending; no global dataset summary is substituted for a selected plan. |
+| Decision brief; Action plans; Track | Existing selected-goal proposals/manual measurements remain authoritative. New pinning/action integration is deferred by owner instruction; no inferred outcomes added. |
+| Assess & Evaluate | Coming-soon placeholder; no analytical source or scorecard to summarize. |
+
+Recommendation/visual acceptance: hiring count, cost and monthly presence derive from one calculated result; mixed staffing uses the same selected option for its concrete conditional sentence, costs and stepped monthly role-coverage chart. Monthly role readiness is not projected company headcount. Historical actuals are unchanged. Missing timing does not create a fabricated trajectory. Targeted browser replay covers mix/quantity changes and saved/reopened state; no fresh provider call is part of this increment.
+
+Outstanding: selected reference/quote takeaways and consistent compact summaries in the existing planning tools. This is an explicit bounded follow-on to the all-applicable-pages request, not a claim that every page is finished. Pinning findings, welcome/video and live-company tenancy remain deferred.

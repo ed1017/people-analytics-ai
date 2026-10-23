@@ -1,4 +1,6 @@
 "use client";
+import {KeyFindings} from "@/components/key-findings";
+import {recruitingFindings} from "@/lib/key-findings";
 import {catalogDisplayLabel} from "@/lib/catalog-display";
 
 import {EvidenceTableRegion} from '@/components/evidence-table-region';
@@ -31,6 +33,7 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
 
   return (
     <section className="evidence-workspace evidence-pane min-w-0 p-6">
+      <KeyFindings findings={data ? recruitingFindings(data) : null} />
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">Monitor recruiting demand, funnel conversion, hiring velocity, and source effectiveness.</p>

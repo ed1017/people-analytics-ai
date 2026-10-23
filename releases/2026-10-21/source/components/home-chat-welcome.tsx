@@ -1,4 +1,6 @@
 'use client';
+import {KeyFindings} from './key-findings';
+import {snapshotFindings} from '@/lib/key-findings';
 
 import {HomeWorkforceFlows} from './home-workforce-flows';
 import type {WorkforceFlow} from '@/lib/home-workforce-flows';
@@ -96,6 +98,7 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         <div><p>Current headcount</p><strong>{known(headcount) ? headcount.toLocaleString() : loading ? 'Updating…' : 'Unavailable'}</strong><span>{known(headcount) ? ' people · ' + snapshotDate : ' · Verified snapshot needed'}</span></div>
         <p className={styles.watch}>Watch: Not assessed</p>
       </div>
+      <KeyFindings findings={current ? snapshotFindings(current, scopeLabel) : null} />
       <p className={styles.scope}>{scopeLabel} · Recorded synthetic workforce history</p>
       {(first && last || checked) ? <figure className={styles.historyFigure}>
         <svg  role="img" aria-label={'Recorded synthetic headcount history in people. ' + axisLabel + ' ' + periodContext + ' ' + scopeLabel + '. ' + history.map(point => point.snapshot_date + ': ' + point.headcount).join('; ') + '. Missing months are not connected. ' + (checked ? 'Conditional projection: '+projected.map(point=>point.month+': '+format(point.headcount)).join('; ') : 'No projection.')}>

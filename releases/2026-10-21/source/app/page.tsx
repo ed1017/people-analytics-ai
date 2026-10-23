@@ -1574,7 +1574,7 @@ export default function Home() {
                     sources:
                       talentAcquisitionData.sources,
                     recruiters:
-                      talentAcquisitionData.recruiters.slice(
+                      talentAcquisitionData.recruiters?.slice(
                         0,
                         10
                       ),

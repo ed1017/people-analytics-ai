@@ -1,6 +1,6 @@
 import {SUCCESSION_PUBLIC_FIELDS,validateSuccessionPublicSummary} from './succession-public-contract.mjs';
 import {DEMO_CONTRACTS,DEMO_SUCCESSION_LABEL} from './dataset-demo-contracts.mjs';
-import {readDemoDisplayContext} from './dataset-display-context.mjs';
+import {readDemoDisplayContext,readPublicDisplayContext} from './dataset-display-context.mjs';
 import type {SuccessionCoverageResponse} from './types';
 
 /** Keep the frozen 13-field validator intact; only the bound demo adds provenance. */
@@ -13,6 +13,14 @@ export function validateSuccessionContext(input: unknown, token: string): Succes
   return legacy.value as SuccessionCoverageResponse;
  }
  const meta=data.data_meta as Record<string,unknown>|undefined;
+ const publicContext=readPublicDisplayContext(meta);
+ if(publicContext){
+  if(publicContext.datasetToken!==token||Object.keys(data).length!==SUCCESSION_PUBLIC_FIELDS.length+1||!SUCCESSION_PUBLIC_FIELDS.every(k=>Object.hasOwn(data,k)))throw Error('Succession dataset unavailable.');
+  const payload=Object.fromEntries(SUCCESSION_PUBLIC_FIELDS.map(k=>[k,data[k]]));
+  const validation=validateSuccessionPublicSummary(payload);
+  if(!('value' in validation)||payload.as_of_date!==publicContext.cutoff)throw Error('Succession summary unavailable.');
+  return {...validation.value,data_meta:{...publicContext,sourceLabel:'Public synthetic succession plan flags; not assessed readiness.',successionSemantics:'illustrative-plan-flags'}} as SuccessionCoverageResponse;
+ }
  const context=readDemoDisplayContext(meta);
  if(!context||context.datasetToken!==token||meta?.releaseId!==DEMO_CONTRACTS.succession.releaseId||
   meta?.sourceLabel!==DEMO_SUCCESSION_LABEL||meta?.successionSemantics!=='illustrative-plan-flags'||

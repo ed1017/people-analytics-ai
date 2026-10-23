@@ -1,4 +1,6 @@
 "use client";
+import {KeyFindings} from "@/components/key-findings";
+import {workforceFindings} from "@/lib/key-findings";
 import {catalogDisplayLabel, countryDisplayLabel} from "@/lib/catalog-display";
 
 import {EvidenceTableRegion} from '@/components/evidence-table-region';
@@ -48,6 +50,7 @@ export function WorkforcePage({ data: sourceData, loading, error }: Props) {
 
   return (
     <section className="evidence-workspace evidence-pane @container min-w-0 p-6">
+      <KeyFindings findings={data ? workforceFindings(data) : null} />
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold">Company composition</h2>

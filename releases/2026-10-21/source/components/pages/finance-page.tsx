@@ -1,4 +1,6 @@
 "use client";
+import {KeyFindings} from "@/components/key-findings";
+import {financeFindings} from "@/lib/key-findings";
 import {catalogDisplayLabel} from "@/lib/catalog-display";
 import {financeVacancyBasis} from '@/lib/finance-vacancy-basis';
 import { PlanningGuide } from "@/components/planning-guide";
@@ -45,6 +47,7 @@ export function FinancePage({
   const precise=(value:number|null)=>value!==null&&Number.isFinite(value)?'$'+value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' USD':'Unavailable';
   return (
 <section className="evidence-workspace @container min-w-0 p-4 sm:p-6">
+      <KeyFindings findings={financeData ? financeFindings(financeData) : null} />
             <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
               <div>
                 <div className="flex flex-wrap items-center gap-3"><PlanningGuide page="finance" /></div>
